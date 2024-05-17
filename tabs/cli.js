@@ -1,6 +1,7 @@
 'use strict';
 
 const path = require('path');
+const fs = require('fs');
 const { dialog } = require("@electron/remote");
 
 const MSP = require('./../js/msp');
@@ -13,6 +14,9 @@ const { globalSettings } = require('./../js/globalSettings');
 const CliAutoComplete = require('./../js/CliAutoComplete');
 const { ConnectionType } = require('./../js/connection/connection');
 const jBox = require('./../js/libraries/jBox/jBox.min');
+const mspDeduplicationQueue = require('./../js/msp/mspDeduplicationQueue');
+const FC = require('./../js/fc');
+const { generateFilename } = require('./../js/helpers');
 
 TABS.cli = {
     lineDelayMs: 50,
@@ -80,7 +84,7 @@ function copyToClipboard(text) {
     function onCopyFailed(ex) {
         console.warn(ex);
     }
-    
+
     navigator.clipboard.writeText(text)
         .then(onCopySuccessful, onCopyFailed);
 }
@@ -94,6 +98,7 @@ TABS.cli.initialize = function (callback) {
 
     // Flush MSP queue as well as all MSP registered callbacks
     mspQueue.flush();
+    mspDeduplicationQueue.flush();
     MSP.callbacks_cleanup();
 
     self.outputHistory = "";
@@ -112,8 +117,8 @@ TABS.cli.initialize = function (callback) {
         self.history.add(out_string.trim());
 
         var outputArray = out_string.split("\n");
-        return outputArray.reduce((p, line, index) => 
-            p.then((delay) => 
+        return outputArray.reduce((p, line, index) =>
+            p.then((delay) =>
                 new Promise((resolve) => {
                     timeout.add('CLI_send_slowly', () => {
                         let processingDelay = TABS.cli.lineDelayMs;
@@ -157,11 +162,14 @@ TABS.cli.initialize = function (callback) {
         });
 
         $('.tab-cli .save').on('click', function () {
-            
+            var prefix = 'cli';
+            var suffix = 'txt';
+            var filename = generateFilename(FC.CONFIG, prefix, suffix);
             var options = {
-                filters: [ 
-                    { name: 'CLI', extensions: ['cli'] } ,
-                    { name: 'TXT', extensions: ['txt'] } 
+                defaultPath: filename,
+                filters: [
+                    { name: suffix.toUpperCase(), extensions: [suffix] },
+                    { name: prefix.toUpperCase(), extensions: [prefix] }
                 ],
             };
             dialog.showSaveDialog(options).then(result => {
@@ -169,8 +177,7 @@ TABS.cli.initialize = function (callback) {
                     GUI.log(i18n.getMessage('cliSaveToFileAborted'));
                     return;
                 }
-                
-                const fs = require('fs');
+
                 fs.writeFile(result.filePath, self.outputHistory, (err) => {
                     if (err) {
                         GUI.log(i18n.getMessage('ErrorWritingFile'));
@@ -217,7 +224,7 @@ TABS.cli.initialize = function (callback) {
 
         $('.tab-cli .load').on('click', function () {
             var options = {
-                filters: [ 
+                filters: [
                     { name: 'CLI/TXT', extensions: ['cli', 'txt'] },
                     { name: 'ALL', extensions: ['*'] }
                 ],
@@ -255,7 +262,6 @@ TABS.cli.initialize = function (callback) {
                 }
 
                 if (result.filePaths.length == 1) {
-                    const fs = require('fs');
                     fs.readFile(result.filePaths[0], (err, data) => {
                         if (err) {
                             GUI.log(i18n.getMessage('ErrorReadingFile'));
@@ -352,14 +358,14 @@ TABS.cli.initialize = function (callback) {
 
         if (CONFIGURATOR.connection.type == ConnectionType.BLE) {
             let delay = CONFIGURATOR.connection.deviceDescription.delay;
-            if (delay > 0) {    
+            if (delay > 0) {
                 timeout.add('cli_delay', () =>  {
                     self.send(getCliCommand("cli_delay " +  delay + '\n', TABS.cli.cliBuffer));
                     self.send(getCliCommand('# ' + i18n.getMessage('connectionBleCliEnter') + '\n', TABS.cli.cliBuffer));
                 }, 400);
-            } 
+            }
         }
-    
+
         GUI.content_ready(callback);
     });
 };

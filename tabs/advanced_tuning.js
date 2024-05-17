@@ -19,6 +19,20 @@ TABS.advanced_tuning.initialize = function (callback) {
 
     loadHtml();
 
+    function save_to_eeprom() {
+        console.log('save_to_eeprom');
+        MSP.send_message(MSPCodes.MSP_EEPROM_WRITE, false, false, function () {
+            GUI.log(i18n.getMessage('eepromSaved'));
+
+            GUI.tab_switch_cleanup(function () {
+                MSP.send_message(MSPCodes.MSP_SET_REBOOT, false, false, function () {
+                    GUI.log(i18n.getMessage('deviceRebooting'));
+                    GUI.handleReconnect($('.tab_advanced_tuning a'));
+                });
+            });
+        });
+    }
+
     function loadHtml() {
         GUI.load(path.join(__dirname, "advanced_tuning.html"), Settings.processHtml(function () {
 
@@ -68,34 +82,11 @@ TABS.advanced_tuning.initialize = function (callback) {
         TABS.advanced_tuning.checkRequirements_LinearDescent();
 
         $('a.save').on('click', function () {
-            Settings.saveInputs().then(function () {
-                var self = this;
-                MSP.promise(MSPCodes.MSP_EEPROM_WRITE);
-                var oldText = $(this).text();
-                $(this).html("Saved");
-                setTimeout(function () {
-                    $(self).html(oldText);
-                }, 2000);
-                reboot();
-            });
+            Settings.saveInputs(save_to_eeprom);
         });
         GUI.content_ready(callback);
 
         }));
-    }
-
-    function reboot() {
-        //noinspection JSUnresolvedVariable
-        GUI.log(i18n.getMessage('configurationEepromSaved'));
-        GUI.tab_switch_cleanup(function () {
-            MSP.send_message(MSPCodes.MSP_SET_REBOOT, false, false, reinitialize);
-        });
-    }
-
-    function reinitialize() {
-        //noinspection JSUnresolvedVariable
-        GUI.log(i18n.getMessage('deviceRebooting'));
-        GUI.handleReconnect($('.tab_advanced_tuning a'));
     }
 };
 

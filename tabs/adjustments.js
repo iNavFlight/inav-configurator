@@ -6,12 +6,10 @@ const wNumb = require('wnumb/wNumb')
 const mspHelper = require('./../js/msp/MSPHelper');
 const MSPCodes = require('./../js/msp/MSPCodes');
 const MSP = require('./../js/msp');
-const mspQueue = require('./../js/serial_queue');
 const { GUI, TABS } = require('./../js/gui');
 const FC = require('./../js/fc');
-const mspBalancedInterval = require('./../js/msp_balanced_interval');
 const i18n = require('./../js/localization');
-
+const interval = require('./../js/intervals');
 
 TABS.adjustments = {};
 
@@ -19,13 +17,7 @@ TABS.adjustments.initialize = function (callback) {
     GUI.active_tab_ref = this;
     GUI.active_tab = 'adjustments';
 
-    function get_adjustment_ranges() {
-        MSP.send_message(MSPCodes.MSP_ADJUSTMENT_RANGES, false, false, get_box_ids);
-    }
-
-    function get_box_ids() {
-        MSP.send_message(MSPCodes.MSP_BOXIDS, false, false, get_rc_data);
-    }
+    MSP.send_message(MSPCodes.MSP_ADJUSTMENT_RANGES, false, false, get_rc_data);
 
     function get_rc_data() {
         MSP.send_message(MSPCodes.MSP_RC, false, false, load_html);
@@ -34,8 +26,6 @@ TABS.adjustments.initialize = function (callback) {
     function load_html() {
         GUI.load(path.join(__dirname, "adjustments.html"), process_html);
     }
-
-    MSP.send_message(MSPCodes.MSP_BOXNAMES, false, false, get_adjustment_ranges);
 
     function addAdjustment(adjustmentIndex, adjustmentRange, auxChannelCount) {
 
@@ -260,11 +250,6 @@ TABS.adjustments.initialize = function (callback) {
 
         // data pulling functions used inside interval timer
         function get_rc_data() {
-
-            if (mspQueue.shouldDrop()) {
-                return;
-            }
-
             MSP.send_message(MSPCodes.MSP_RC, false, false, update_ui);
         }
 
@@ -280,7 +265,7 @@ TABS.adjustments.initialize = function (callback) {
         update_ui();
 
         // enable data pulling
-        mspBalancedInterval.add('aux_data_pull', 50, 1, get_rc_data);
+        interval.add('aux_data_pull', get_rc_data, 50);
 
         GUI.content_ready(callback);
     }

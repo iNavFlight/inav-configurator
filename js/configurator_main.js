@@ -24,6 +24,7 @@ const update = require('./globalUpdates');
 const appUpdater = require('./appUpdater');
 const CliAutoComplete = require('./CliAutoComplete');
 const { SITLProcess } = require('./sitl');
+const settingsCache = require('./settingsCache');
 
 process.on('uncaughtException', function (error) {   
     if (process.env.NODE_ENV !== 'development') {
@@ -224,10 +225,6 @@ $(function() {
                             require('./../tabs/receiver');
                             TABS.receiver.initialize(content_ready);
                             break;
-                        case 'modes':
-                            require('./../tabs/modes');
-                            TABS.modes.initialize(content_ready);
-                            break;
                         case 'gps':
                             require('./../tabs/gps');
                             TABS.gps.initialize(content_ready);
@@ -388,6 +385,9 @@ $(function() {
                     });
                     $('#demoModeReset').on('click', function () {
                         SITLProcess.deleteEepromFile('demo.bin');
+                    });
+                    $('#maintenanceFlushSettingsCache').on('click', function () {
+                        settingsCache.flush();
                     });
                     function close_and_cleanup(e) {
                         if (e.type == 'click' && !$.contains($('div#options-window')[0], e.target) || e.type == 'keyup' && e.keyCode == 27) {

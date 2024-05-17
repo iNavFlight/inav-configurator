@@ -1,0 +1,59 @@
+{
+    "manifest_version": 2,
+    "minimum_chrome_version": "38",
+    "version": "7.1.1",
+    "author": "Several",
+    "name": "INAV - Configurator",
+    "short_name": "INAV",
+    "description": "Crossplatform configuration tool for INAVFlight flight control system",
+
+    "offline_enabled": true,
+
+    "default_locale": "en",
+
+    "app": {
+        "background": {
+            "scripts": ["eventPage.js"],
+            "persistent": false
+        }
+    },
+
+    "sandbox": {
+    "pages": ["tabs/map.html"]
+    },
+    
+    "sockets": {
+        "udp": {
+            "send": ["*"],
+            "bind": ["*"]
+        }
+    },
+
+    "permissions": [
+        "https://www.google-analytics.com/",
+        "https://maps.googleapis.com/*",    
+        "https://*.github.com/",
+        "https://*.githubusercontent.com/",
+        "https://*.amazonaws.com/",
+        "https://dev.virtualearth.net/",
+        "serial",
+        "usb",
+        "bluetooth",
+        "sockets",
+        "storage",
+        "fileSystem",
+        "fileSystem.write",
+        "fileSystem.retainEntries",
+        "notifications",
+        "alwaysOnTopWindows",
+        {"usbDevices": [
+            {"vendorId": 1155, "productId": 57105},
+            {"vendorId": 11836, "productId": 57105},
+            {'vendorId': 12619, 'productId': 262} // APM32 DFU Bootloader
+        ]}
+    ],
+
+    "icons": {
+        "128": "images/inav_icon_128.png"
+    }
+}

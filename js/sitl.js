@@ -9,121 +9,50 @@ const { GUI } = require('./gui');
 
 const serialRXProtocolls = [
 {
+    name : "Flight Controller Proxy",
+    baudRate: 115200,
+    stopBits: "One",
+    parity: "None"
+},
+{
     name : "SBus",
-    baudrate: 100000,
+    baudRate: 100000,
     stopBits: "Two",
     parity: "Even"
 },
 {
     name : "SBus Fast",
-    baudrate: 200000,
+    baudRate: 200000,
     stopBits: "Two",
     parity: "Even"
 },
 {
     name : "Crossfire/Ghost",
-    baudrate: 420000,
+    baudRate: 420000,
     stopBits: "One",
     parity: "None"
 },
 {
     name : "FPort/IBus/Spektrum/SRXL2/SUMD",
-    baudrate: 115200,
+    baudRate: 115200,
     stopBits: "One",
     parity: "None"
 },
 {
     name : "JETI EX Bus",
-    baudrate: 125000,
+    baudRate: 125000,
     stopBits: "One",
     parity: "None"
 },
 ];
 
-var Ser2TCP = {
+var SitlSerialPortUtils = {
 
-    isRunning: false,
-    process: null,
     portsList: [],
     stopPolling: false,
 
     getProtocolls: function() {
         return serialRXProtocolls;
-    },
-
-    start: function(comPort, serialPortOptions, ipAddress, tcpPort, callback) {
-
-        if (this.isRunning)
-            this.stop();
-
-        var path;
-        if (GUI.operating_system == 'Windows') {
-            path = './../resources/sitl/windows/Ser2TCP.exe'
-        } else if (GUI.operating_system == 'Linux') {
-            path = './../resources/sitl/linux/Ser2TCP'
-            chmod(path, 0o755, (err) => {
-                if (err)
-                    console.log(err);
-            });
-        } else {
-            return;
-        }
-
-        var protocoll = serialRXProtocolls.find(proto => {
-            return proto.name == serialPortOptions.protocollName;
-        });
-
-        var args = [];
-        if (protocoll && protocoll.name != "manual") {
-            args.push(`--comport=${comPort}`)
-            args.push(`--baudrate=${protocoll.baudrate}`);
-            args.push(`--stopbits=${protocoll.stopBits}`)
-            args.push(`--parity=${protocoll.parity}`)
-            args.push(`--ip=${ipAddress}`);
-            args.push(`--tcpport=${tcpPort}`);
-        } else {
-            args.push(`--comport=${comPort}`)
-            args.push(`--baudrate${proserialPortOptionstocoll.baudrate}`);
-            args.push(`--stopbits=${protserialPortOptionsocoll.stopBits}`)
-            args.push(`--parity=${serialPortOptions.parity}`)
-            args.push(`--ip=${ipAddress}`);
-            args.push(`--tcpport=${tcpPort}`);
-        }
-
-        var opts = undefined;
-        if (GUI.operating_system == 'Linux')
-            opts = { useShell: true };
-
-        this.process = spawn(path, args, opts);
-        this.isRunning = true;
-
-        this.process.stdout.on('data', (data) => {
-            if (callback)
-                callback(data);
-        });
-
-        this.process.stderr.on('data', (data) => {
-            if (callback)
-                callback(data);
-        });
-
-        this.process.on('error', (error) => {
-            if (callback)
-                callback(error);
-            this.isRunning = false;
-        });
-
-        this.process.on('exit', () => {
-            if (this.isRunning)
-               this.spawn(path, args, callback);
-        });
-    },
-
-    stop: function() {
-        if (this.isRunning) {
-            this.isRunning = false;
-            this.process.kill();
-        }
     },
 
     getDevices: function(callback) {
@@ -133,18 +62,19 @@ var Ser2TCP = {
                 GUI.log("Unable to list serial ports.");
             } else {  
                  ports.forEach((device) => {
-                    if (GUI.operating_system == 'Windows') {
-                        var m = device.path.match(/COM\d?\d/g)
+                if (GUI.operating_system == 'Windows') {
+                    var m = device.path.match(/COM\d?\d/g)
                         if (m)
-                            devices.push(m[0]);
-                    } else {
-                        if (device.displayName != null) {
-                            var m = device.path.match(/\/dev\/.*/)
-                            if (m)
-                                devices.push(m[0]);
-                        }
+                          devices.push(m[0]);
+                } else {
+			/* Limit to: USB serial, RFCOMM (BT), 6 legacy devices */
+			if (device.pnpId ||
+			    device.path.match(/rfcomm\d*/) ||
+			    device.path.match(/ttyS[0-5]$/)) {
+			    devices.push(device.path);
                     }
-                });
+                    }
+            });
             }
             callback(devices);
         });
@@ -201,7 +131,7 @@ var SITLProcess = {
         });
     },
 
-    start: function(eepromFileName, sim, useIMU, simIp, simPort, channelMap, callback) {
+    start: function(eepromFileName, sim, useIMU, simIp, simPort, channelMap, serialPortOptions, callback) {
 
         if (this.isRunning)
             this.stop();
@@ -217,7 +147,16 @@ var SITLProcess = {
                 if (err)
                     console.log(err);
             });
+        } else if (GUI.operating_system == 'MacOS') {
+            sitlExePath = path.join(__dirname, './../resources/sitl/macos/inav_SITL');
+            eepromPath = `${app.getPath('userData')}/${eepromFileName}`
+            chmod(sitlExePath, 0o755, err => {
+                if (err)
+                    console.log(err);
+            });
+ 
         } else {
+            alert(GUI.operating_system);
             return;
         }
 
@@ -238,6 +177,32 @@ var SITLProcess = {
             if (channelMap)
                 args.push(`--chanmap=${channelMap}`)
         }
+
+        if (serialPortOptions != null) {
+            var protocoll = serialRXProtocolls.find(proto => {
+                return proto.name == serialPortOptions.protocollName;
+            });
+
+            if (protocoll && protocoll.name != "manual") {
+                args.push(`--serialport=${serialPortOptions.serialPort}`)
+                args.push(`--baudrate=${protocoll.baudRate}`);
+                args.push(`--stopbits=${protocoll.stopBits}`)
+                args.push(`--parity=${protocoll.parity}`)
+                if ( protocoll.name == "Flight Controller Proxy") {
+                    args.push(`--fcproxy`);
+                } else {
+                    args.push(`--serialuart=${serialPortOptions.serialUart}`);
+                }
+            } else {
+                args.push(`--serialport=${serialPortOptions.serialPort}`)
+                args.push(`--baudrate=${serialPortOptions.baudRate}`);
+                args.push(`--stopbits=${serialPortOptions.stopBits}`)
+                args.push(`--parity=${serialPortOptions.parity}`)
+                args.push(`--serialuart=${serialPortOptions.serialUart}`);
+            }
+        }
+
+        callback( sitlExePath + " " + args.join(" ") + "\n");
         this.spawn(sitlExePath, args, callback);
     },
 
@@ -275,4 +240,4 @@ var SITLProcess = {
     }
 };
 
-module.exports = { Ser2TCP, SITLProcess };
+module.exports = { SITLProcess, SitlSerialPortUtils };

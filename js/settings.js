@@ -53,6 +53,16 @@ var Settings = (function () {
             var settingName = input.data('setting');
             var inputUnit = input.data('unit');
 
+            let elementId = input.attr('id');
+            if (elementId === undefined) {
+
+                // If the element ID is not defined, we need to create one
+                // based on the setting name. If this ID exists, we will not create it
+                if ($('#' + settingName).length === 0) {
+                    input.attr('id', settingName);
+                }
+            }
+
             if (globalSettings.showProfileParameters) {
                 if (FC.isBatteryProfileParameter(settingName)) {
                     input.css("background-color","#fef2d5");
@@ -149,7 +159,8 @@ var Settings = (function () {
                 input.data('setting-info', s.setting);
                 if (input.data('live')) {
                     input.on('change', function () {
-                        self.saveInput(input);
+                        const settingPair = self.processInput(input);
+                        return mspHelper.setSetting(settingPair.setting, settingPair.value);
                     });
                 }
             });
@@ -528,7 +539,7 @@ var Settings = (function () {
         };
     }
 
-    self.saveInput = function(input) {
+    self.processInput = function(input) {
         var settingName = input.data('setting');
         var setting = input.data('setting-info');
         var value;
@@ -536,7 +547,6 @@ var Settings = (function () {
         if (typeof setting == 'undefined') {
             return null;
         }
-
         if (setting.table) {
             if (input.attr('type') == 'checkbox') {
                 value = input.prop('checked') ? 1 : 0;
@@ -585,8 +595,7 @@ var Settings = (function () {
                 }
             }
         }
-
-        return mspHelper.setSetting(settingName, value);
+        return {setting: settingName, value: value};
     };
 
     self.countDecimals = function(value) {
@@ -604,14 +613,26 @@ var Settings = (function () {
         return 0;
     };
 
-    self.saveInputs = function() {
+    self.pickAndSaveSingleInput = function(inputs, finalCallback) {
+        if (inputs.length > 0) {
+            var input = inputs.shift();
+            var settingPair = self.processInput(input);
+            return mspHelper.setSetting(settingPair.setting, settingPair.value, function() {       
+                return self.pickAndSaveSingleInput(inputs, finalCallback);
+            });
+        } else {
+            if (finalCallback) {
+                finalCallback();
+            }
+        }
+    };
+
+    self.saveInputs = function(finalCallback) {
         var inputs = [];
         $('[data-setting!=""][data-setting]').each(function() {
             inputs.push($(this));
         });
-        return mapSeries(inputs, function (input, ii) {
-            return self.saveInput(input);
-        });
+        self.pickAndSaveSingleInput(inputs, finalCallback);
     };
 
     self.processHtml = function(callback) {

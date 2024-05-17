@@ -44,7 +44,7 @@
                                 </td>
                                 <td style="width: 90%; padding-bottom: 10px;">
                                     <p class="table-title">
-                                        <span data-i18n="axisTableTitleSlider"></span>
+                                        <span style="font-weight:normal;">align_board_roll, align_board_pitch, align_board_yaw</span>
                                     </p>
                                 </td>
                                 <td style="width: 5%; padding-bottom: 10px;">
@@ -91,6 +91,9 @@
                             </tr>
                         </tbody>
                     </table>
+                    <div class="cli-box">
+                        <span class="cli-settings-title">CLI:&nbsp;</span><span id="cli_settings_fc"></span>
+                    </div>
                 </div>
             </div>
 
@@ -100,16 +103,44 @@
                         <span data-i18n="magnetometerInfo"></span>
                     </div>
                     <div class="select" style="display: flex; justify-content: left;">
-                        <select id="magalign" class="magalign">
+                        <select id="magalign" class="magalign" style="width: 210px; flex-grow: 0; flex-shrink: 0">
                             <option value="0">Default</option>
                             <!-- list generated here -->
                         </select>
                         <label for="magalign" data-i18n="magnetometerOrientationPreset"></label>
                     </div>
                     <div class="select" style="display: flex; justify-content: left;">
-                        <select id="element_to_show">
-                            <option value="0" selected>Magnetometer</option>
-                            <option value="1">XYZ</option>
+                        <select id="element_to_show" style="width: 210px; flex-grow: 0; flex-shrink: 0">
+                            <option value="0" selected data-i18n="magnetometerAxes"></option>
+                            <option value="1">AK8963C</option>
+                            <option value="2">AK8963N</option>
+                            <option value="3">AK8975</option>
+                            <option value="4">AK8975C</option>
+                            <option value="5">BN-880</option>
+                            <option value="6">DIATONE Mamba M10 PRO</option>
+                            <option value="7">FLYWOO GOKU M10 PRO V3</option>
+                            <option value="8">FOXEER-M10Q-120</option>
+                            <option value="9">FOXEER-M10Q-180</option>
+                            <option value="10">FOXEER-M10Q-250</option>
+                            <option value="11">GEPRC GEP-M10-DQ</option>
+                            <option value="12">GY-271</option>
+                            <option value="13">GY-273</option>
+                            <option value="14">HGLRC-M100-5883</option>
+                            <option value="15">HMC5833</option>
+                            <option value="16">HOLYBRO Micro M9N IST8310</option>
+                            <option value="17">HOLYBRO Micro M10 IST8310</option>
+                            <option value="18">IST8308</option>
+                            <option value="19">IST8310</option>
+                            <option value="20">LIS3MDL</option>
+                            <option value="21">MAG3110</option>
+                            <option value="22">MATEK M8Q-5833</option>
+                            <option value="23">MATEK M9N-5833</option>
+                            <option value="24">MATEK M10Q-5833</option>
+                            <option value="25">MLX90393</option>
+                            <option value="26">MP9250</option>
+                            <option value="27">QMC5833</option>
+                            <option value="28">SPEEDYEBEE BZ-251</option>
+                            <option value="29">WS-M181</option>
                             <!-- list generated here -->
                         </select>
                         <label for="element_to_show" data-i18n="magnetometerElementToShow"></label>
@@ -125,7 +156,7 @@
                                 </td>
                                 <td style="width: 90%; padding-bottom: 10px;">
                                     <p class="table-title">
-                                        <span data-i18n="axisTableTitleSlider"></span>
+                                        <span id="align_mag_xxx">align_mag_roll, align_mag_pitch, align_mag_yaw</span>
                                     </p>
                                 </td>
                                 <td style="width: 5%; padding-bottom: 10px;">
@@ -172,6 +203,13 @@
                             </tr>
                         </tbody>
                     </table>
+                    <div class="cli-box">
+                        <span class="cli-settings-title">CLI:&nbsp;</span><span id="cli_settings_mag"></span>
+                    </div>
+                    <div class="cli-box" style="font-style:normal;">
+                        <span id="comment_sensor_mag_preset" data-i18n="configurationSensorMagPreset"></span>
+                        <span id="comment_sensor_mag_angles" data-i18n="configurationSensorMagAngles"></span>
+                    </div>
                 </div>
             </div>
         </div>

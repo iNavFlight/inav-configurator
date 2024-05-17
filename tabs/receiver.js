@@ -4,8 +4,6 @@ const path = require('path');
 
 const MSPChainerClass = require('./../js/msp/MSPchainer');
 const mspHelper = require('./../js/msp/MSPHelper');
-const mspQueue = require('./../js/serial_queue');
-const mspBalancedInterval = require('./../js/msp_balanced_interval');
 const MSPCodes = require('./../js/msp/MSPCodes');
 const MSP = require('./../js/msp');
 const { GUI, TABS } = require('./../js/gui');
@@ -13,6 +11,7 @@ const FC = require('./../js/fc');
 const CONFIGURATOR = require('./../js/data_storage');
 const Settings = require('./../js/settings');
 const i18n = require('./../js/localization');
+const interval = require('./../js/intervals');
 
 TABS.receiver = {
     rateChartHeight: 117
@@ -45,42 +44,7 @@ TABS.receiver.initialize = function (callback) {
     }
 
     function saveSettings(onComplete) {
-        Settings.saveInputs().then(onComplete);
-    }
-
-    function drawRollPitchExpo() {
-        var pitch_roll_curve = $('.pitch_roll_curve canvas').get(0);
-        var context = pitch_roll_curve.getContext("2d");
-
-        var expoAVal = $('.tunings .rate input[name="expo"]');
-        var expoA = parseFloat(expoAVal.val());
-
-        var expoMVal = $('.tunings .rate input[name="manual_expo"]');
-        var expoM = parseFloat(expoMVal.val());
-
-        if (expoA <= parseFloat(expoAVal.prop('min')) || expoA >= parseFloat(expoAVal.prop('max')) ||
-            expoM <= parseFloat(expoMVal.prop('min')) || expoM >= parseFloat(expoMVal.prop('max'))) {
-            return;
-        }
-
-        var rateHeight = TABS.receiver.rateChartHeight;
-
-        // draw
-        context.clearRect(0, 0, 200, rateHeight);
-
-        context.beginPath();
-        context.moveTo(0, rateHeight);
-        context.quadraticCurveTo(110, rateHeight - ((rateHeight / 2) * (1 - expoA)), 200, 0);
-        context.lineWidth = 2;
-        context.strokeStyle = '#37a8db';
-        context.stroke();
-
-        context.beginPath();
-        context.moveTo(0, rateHeight);
-        context.quadraticCurveTo(110, rateHeight - ((rateHeight / 2) * (1 - expoM)), 200, 0);
-        context.lineWidth = 2;
-        context.strokeStyle = '#a837db';
-        context.stroke();
+        Settings.saveInputs(onComplete);
     }
 
     function process_html() {
@@ -120,12 +84,6 @@ TABS.receiver.initialize = function (callback) {
         // fill in data from RC_tuning
         $('.tunings .throttle input[name="mid"]').val(FC.RC_tuning.throttle_MID.toFixed(2));
         $('.tunings .throttle input[name="expo"]').val(FC.RC_tuning.throttle_EXPO.toFixed(2));
-
-        $('.tunings .rate input[name="expo"]').val(FC.RC_tuning.RC_EXPO.toFixed(2));
-        $('.tunings .yaw_rate input[name="yaw_expo"]').val(FC.RC_tuning.RC_YAW_EXPO.toFixed(2));
-
-        $('.tunings .rate input[name="manual_expo"]').val(FC.RC_tuning.manual_RC_EXPO.toFixed(2));
-        $('.tunings .yaw_rate input[name="manual_yaw_expo"]').val(FC.RC_tuning.manual_RC_YAW_EXPO.toFixed(2));
 
         $('.deadband input[name="yaw_deadband"]').val(FC.RC_deadband.yaw_deadband);
         $('.deadband input[name="deadband"]').val(FC.RC_deadband.deadband);
@@ -285,22 +243,10 @@ TABS.receiver.initialize = function (callback) {
             }, 0);
         }).trigger('input');
 
-        $('.tunings .rate input').on('input change', function () {
-            setTimeout(function () { // let global validation trigger and adjust the values first
-                drawRollPitchExpo();
-            }, 0);
-        }).trigger('input');
-
         $('a.update').on('click', function () {
             // catch RC_tuning changes
             FC.RC_tuning.throttle_MID = parseFloat($('.tunings .throttle input[name="mid"]').val());
             FC.RC_tuning.throttle_EXPO = parseFloat($('.tunings .throttle input[name="expo"]').val());
-
-            FC.RC_tuning.RC_EXPO = parseFloat($('.tunings .rate input[name="expo"]').val());
-            FC.RC_tuning.RC_YAW_EXPO = parseFloat($('.tunings .yaw_rate input[name="yaw_expo"]').val());
-
-            FC.RC_tuning.manual_RC_EXPO = parseFloat($('.tunings .rate input[name="manual_expo"]').val());
-            FC.RC_tuning.manual_RC_YAW_EXPO = parseFloat($('.tunings .yaw_rate input[name="manual_yaw_expo"]').val());
 
             FC.RC_deadband.yaw_deadband = parseInt($('.deadband input[name="yaw_deadband"]').val());
             FC.RC_deadband.deadband = parseInt($('.deadband input[name="deadband"]').val());
@@ -370,21 +316,10 @@ TABS.receiver.initialize = function (callback) {
         });
 
         function get_rc_data() {
-
-            /*
-             * Throttling
-             */
-            if (mspQueue.shouldDrop()) {
-                update_ui();
-                return;
-            }
-
             MSP.send_message(MSPCodes.MSP_RC, false, false, update_ui);
         }
 
         function update_ui() {
-            var i;
-
             // update bars with latest data
             for (let i = 0; i < FC.RC.active_channels; i++) {
                 meter_fill_array[i].css('width', ((FC.RC.channels[i] - meter_scale.min) / (meter_scale.max - meter_scale.min) * 100).clamp(0, 100) + '%');
@@ -393,7 +328,7 @@ TABS.receiver.initialize = function (callback) {
 
         }
 
-        mspBalancedInterval.add('receiver_pull', 35, 1, get_rc_data);
+        interval.add('receiver_pull', get_rc_data, 25);
 
         GUI.content_ready(callback);
     }
