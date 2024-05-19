@@ -117,6 +117,7 @@ TABS.calibration.initialize = function (callback) {
             $('[name=MagGain' + item + ']').val(FC.CALIBRATION_DATA.magGain[item]);
         });
         $('[name=OpflowScale]').val(FC.CALIBRATION_DATA.opflow.Scale);
+        $('[name=YawFixedDegrees]').val(FC.CALIBRATION_DATA.magFixedYaw.yawDegrees);
         updateCalibrationSteps();
     }
 
@@ -230,16 +231,73 @@ TABS.calibration.initialize = function (callback) {
 
         if (FC.SENSOR_CONFIG.magnetometer === 0) {
             //Comment for test
-            $('#mag_btn, #mag-calibrated-data').css('pointer-events', 'none').css('opacity', '0.4');
+            $('#mag_btn, #mag-calibrated-data, #magfixed_btn, #mag-fixed-calibrated-data').css('pointer-events', 'none').css('opacity', '0.4');
+        } else {
+            if (!(FC.GPS_DATA.fix >= 2)) {
+                $('#magfixed_btn, #mag-fixed-calibrated-data').css('pointer-events', 'none').css('opacity', '0.4');
+            }
         }
 
         if (FC.SENSOR_CONFIG.opflow === 0) {
             //Comment for test
             $('#opflow_btn, #opflow-calibrated-data').css('pointer-events', 'none').css('opacity', '0.4');
         }
+        
+        $('#magfixed_btn').on('click', function () {
+            var buffer = [];
+
+            var button = $(this);
+
+            $(button).addClass('disabled');
+
+            buffer.push(0x00FF & parseInt($('[name=YawFixedDegrees]').val()));
+            buffer.push(parseInt($('[name=YawFixedDegrees]').val()) >> 8);
+
+            MSP.send_message(MSPCodes.MSP_MAG_CALIBRATION, buffer, false, function () {
+                GUI.log(i18n.getMessage('initialSetupMagFixedCalibStarted'));
+            });
+
+            let modalProcessing = new jBox('Modal', {
+                width: 400,
+                height: 120,
+                animation: false,
+                closeOnClick: false,
+                closeOnEsc: false,
+                content: $('#modal-compass-processing').clone()
+            }).open();
+
+            var countdown = 3;
+            interval.add('compass_calibration_interval', function () {
+                countdown--;
+                if (countdown === 0) {
+                    setTimeout(function () {
+                        $(button).removeClass('disabled');
+
+                        modalProcessing.close();
+                        GUI.log(i18n.getMessage('initialSetupMagFixedCalibEnded'));
+                        
+                        MSP.send_message(MSPCodes.MSP_CALIBRATION_DATA, false, false, updateSensorData);
+                        interval.remove('compass_calibration_interval');
+
+                        //Cleanup
+                       //delete modalProcessing;
+                        $('.jBox-wrapper').remove();
+                    }, 1000);
+                } else {
+                    modalProcessing.content.find('.modal-compass-countdown').text(countdown);
+                }
+
+            }, 1000);
+        });
 
         $('#mag_btn').on('click', function () {
-            MSP.send_message(MSPCodes.MSP_MAG_CALIBRATION, false, false, function () {
+            var buffer = [];
+            
+            // 32767 = Indicates to INAV that sample calibration will be used
+            buffer.push(0x00FF & 32767);
+            buffer.push(32767 >> 8);
+
+            MSP.send_message(MSPCodes.MSP_MAG_CALIBRATION, buffer, false, function () {
                 GUI.log(i18n.getMessage('initialSetupMagCalibStarted'));
             });
 

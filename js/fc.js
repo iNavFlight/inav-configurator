@@ -442,6 +442,9 @@ var FC = {
                 X: null,
                 Y: null,
                 Z: null
+            },
+            magFixedYaw: {
+                yawDegrees: null
             }
         };
 
