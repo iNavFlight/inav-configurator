@@ -14,6 +14,7 @@ const FwApproachCollection = require('./fwApproachCollection')
 const { PLATFORM } = require('./model')
 const VTX = require('./vtx');
 const BitHelper = require('./bitHelper');
+const { FLIGHT_MODES } = require('./flightModes');
 
 
 var FC = {
@@ -28,8 +29,8 @@ var FC = {
     RC_MAP: null,
     RC: null,
     RC_tuning: null,
-    AUX_CONFIG: null,
-    AUX_CONFIG_IDS: null,
+    AUX_CONFIG: [],
+    AUX_CONFIG_IDS: [],
     MODE_RANGES: null,
     ADJUSTMENT_RANGES: null,
     SERVO_CONFIG: null,
@@ -77,7 +78,6 @@ var FC = {
     MIXER_CONFIG: null,
     BATTERY_CONFIG: null,
     OUTPUT_MAPPING: null,
-    SETTINGS: null,
     BRAKING_CONFIG: null,
     SAFEHOMES: null,
     BOARD_ALIGNMENT: null,
@@ -85,6 +85,7 @@ var FC = {
     FEATURES: null,
     RATE_DYNAMICS: null,
     EZ_TUNE: null,
+    FLIGHT_MODES: null,
 
     restartRequired: false,
     MAX_SERVO_RATE: 125,
@@ -198,8 +199,16 @@ var FC = {
             manual_yaw_rate: 0,
         };
 
-        this.AUX_CONFIG = [];
-        this.AUX_CONFIG_IDS = [];
+        this.generateAuxConfig = function () {
+            console.log('Generating AUX_CONFIG');
+            this.AUX_CONFIG = [];
+            for ( let i = 0; i < this.AUX_CONFIG_IDS.length; i++ ) {
+                let found = FLIGHT_MODES.find( mode => mode.permanentId === this.AUX_CONFIG_IDS[i] );
+                if (found) {
+                    this.AUX_CONFIG.push(found.boxName);
+                }
+            }
+        };
 
         this.MODE_RANGES = [];
         this.ADJUSTMENT_RANGES = [];
@@ -559,8 +568,6 @@ var FC = {
         this.RXFAIL_CONFIG = [];
 
         this.OUTPUT_MAPPING = new OutputMappingCollection();
-
-        this.SETTINGS = {};
 
         this.SAFEHOMES = new SafehomeCollection();
 
@@ -940,11 +947,13 @@ var FC = {
         return this.getServoMixInputNames()[input];
     },
     getModeId: function (name) {
-        for (var i = 0; i < this.AUX_CONFIG.length; i++) {
-            if (this.AUX_CONFIG[i] == name)
-                return i;
+
+        let mode = FLIGHT_MODES.find( mode => mode.boxName === name );
+        if (mode) {
+            return mode.permanentId;
+        } else {
+            return -1;
         }
-        return -1;
     },
     isModeBitSet: function (i) {
         return BitHelper.bit_check(this.CONFIG.mode[Math.trunc(i / 32)], i % 32);

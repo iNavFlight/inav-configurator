@@ -229,8 +229,8 @@ TABS.gps.initialize = function (callback) {
             var feature = mapHandler.forEachFeatureAtPixel(mapHandler.getEventPixel(evt.originalEvent), function(feature, layer) {
                 return feature;
             });
-
-            if (feature) {
+            
+            if (feature && feature.get('data') && feature.get('name')) {
                 TABS.gps.toolboxAdsbVehicle.setContent(
                     `icao: <strong>` + feature.get('name') + `</strong><br />`
                     + `lat: <strong>`+ (feature.get('data').lat / 10000000) + `</strong><br />`

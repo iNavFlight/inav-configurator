@@ -47,41 +47,6 @@ TABS.receiver.initialize = function (callback) {
         Settings.saveInputs(onComplete);
     }
 
-    function drawRollPitchExpo() {
-        var pitch_roll_curve = $('.pitch_roll_curve canvas').get(0);
-        var context = pitch_roll_curve.getContext("2d");
-
-        var expoAVal = $('.tunings .rate input[name="expo"]');
-        var expoA = parseFloat(expoAVal.val());
-
-        var expoMVal = $('.tunings .rate input[name="manual_expo"]');
-        var expoM = parseFloat(expoMVal.val());
-
-        if (expoA <= parseFloat(expoAVal.prop('min')) || expoA >= parseFloat(expoAVal.prop('max')) ||
-            expoM <= parseFloat(expoMVal.prop('min')) || expoM >= parseFloat(expoMVal.prop('max'))) {
-            return;
-        }
-
-        var rateHeight = TABS.receiver.rateChartHeight;
-
-        // draw
-        context.clearRect(0, 0, 200, rateHeight);
-
-        context.beginPath();
-        context.moveTo(0, rateHeight);
-        context.quadraticCurveTo(110, rateHeight - ((rateHeight / 2) * (1 - expoA)), 200, 0);
-        context.lineWidth = 2;
-        context.strokeStyle = '#37a8db';
-        context.stroke();
-
-        context.beginPath();
-        context.moveTo(0, rateHeight);
-        context.quadraticCurveTo(110, rateHeight - ((rateHeight / 2) * (1 - expoM)), 200, 0);
-        context.lineWidth = 2;
-        context.strokeStyle = '#a837db';
-        context.stroke();
-    }
-
     function process_html() {
         // translate to user-selected language
        i18n.localize();;
@@ -119,12 +84,6 @@ TABS.receiver.initialize = function (callback) {
         // fill in data from RC_tuning
         $('.tunings .throttle input[name="mid"]').val(FC.RC_tuning.throttle_MID.toFixed(2));
         $('.tunings .throttle input[name="expo"]').val(FC.RC_tuning.throttle_EXPO.toFixed(2));
-
-        $('.tunings .rate input[name="expo"]').val(FC.RC_tuning.RC_EXPO.toFixed(2));
-        $('.tunings .yaw_rate input[name="yaw_expo"]').val(FC.RC_tuning.RC_YAW_EXPO.toFixed(2));
-
-        $('.tunings .rate input[name="manual_expo"]').val(FC.RC_tuning.manual_RC_EXPO.toFixed(2));
-        $('.tunings .yaw_rate input[name="manual_yaw_expo"]').val(FC.RC_tuning.manual_RC_YAW_EXPO.toFixed(2));
 
         $('.deadband input[name="yaw_deadband"]').val(FC.RC_deadband.yaw_deadband);
         $('.deadband input[name="deadband"]').val(FC.RC_deadband.deadband);
@@ -284,22 +243,10 @@ TABS.receiver.initialize = function (callback) {
             }, 0);
         }).trigger('input');
 
-        $('.tunings .rate input').on('input change', function () {
-            setTimeout(function () { // let global validation trigger and adjust the values first
-                drawRollPitchExpo();
-            }, 0);
-        }).trigger('input');
-
         $('a.update').on('click', function () {
             // catch RC_tuning changes
             FC.RC_tuning.throttle_MID = parseFloat($('.tunings .throttle input[name="mid"]').val());
             FC.RC_tuning.throttle_EXPO = parseFloat($('.tunings .throttle input[name="expo"]').val());
-
-            FC.RC_tuning.RC_EXPO = parseFloat($('.tunings .rate input[name="expo"]').val());
-            FC.RC_tuning.RC_YAW_EXPO = parseFloat($('.tunings .yaw_rate input[name="yaw_expo"]').val());
-
-            FC.RC_tuning.manual_RC_EXPO = parseFloat($('.tunings .rate input[name="manual_expo"]').val());
-            FC.RC_tuning.manual_RC_YAW_EXPO = parseFloat($('.tunings .yaw_rate input[name="manual_yaw_expo"]').val());
 
             FC.RC_deadband.yaw_deadband = parseInt($('.deadband input[name="yaw_deadband"]').val());
             FC.RC_deadband.deadband = parseInt($('.deadband input[name="deadband"]').val());

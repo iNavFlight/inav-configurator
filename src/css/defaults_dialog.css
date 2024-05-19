@@ -9,7 +9,22 @@
     z-index: 2001;
 }
 
-.defaults-dialog__content {
+.defaults-dialog__bottom_buttons {
+    position: absolute;
+    bottom: 1em;
+    width: 500px;
+}
+
+.defaults-dialog__bottom_buttons .btn {
+    float: right;
+    margin-left: 2em;
+}
+
+.defaults-dialog__bottom_buttons  {
+    font-size: 14pt !important;
+}
+
+.defaults-dialog__content, .defaults-dialog__wizard {
     background-color: #efefef;
     border-radius: 2px;
     z-index: 2002;
@@ -23,6 +38,25 @@
     right: 0;
     margin: auto;
     padding: 1em;
+}
+
+.defaults-dialog__wizard {
+    font-size: 1.2em;
+}
+
+.defaults-dialog__wizard > div {
+    margin-top: 1em;
+}
+
+.defaults-dialog__wizard label {
+    min-width: 30%;
+    display: inline-block;
+}
+
+.defaults-dialog__wizard p {
+    margin-top: 1em;
+    font-size: 0.9em;
+    color:#444;
 }
 
 .defaults-dialog__content--wrapper {

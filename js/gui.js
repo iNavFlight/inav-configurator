@@ -9,6 +9,7 @@ const FC = require('./fc');
 const interval = require('./intervals');
 const { scaleRangeInt } = require('./helpers');
 const i18n = require('./localization');
+const mspDeduplicationQueue = require("./msp/mspDeduplicationQueue");
 
 var TABS = {}; // filled by individual tab js file
 
@@ -90,6 +91,7 @@ GUI_control.prototype.log = function (message) {
 // default switch doesn't require callback to be set
 GUI_control.prototype.tab_switch_cleanup = function (callback) {
     MSP.callbacks_cleanup(); // we don't care about any old data that might or might not arrive
+    mspDeduplicationQueue.flush();
 
     interval.killAll(['global_data_refresh', 'msp-load-update', 'ltm-connection-check']);
 

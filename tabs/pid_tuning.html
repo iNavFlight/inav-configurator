@@ -185,6 +185,11 @@
                                 <td id="preview-yaw-expo"></td>
                             </tr>
                         </table>
+                        <div style="margin-top: 1em;">
+                            <div id="ez_tune_expo_curve" class="expo-chart" style="width: 250px; height: 200px; margin: auto;">
+                                <canvas width="250" height="200"></canvas>
+                            </div>
+                        </div>
                     </div>
         
                 </div>
@@ -436,82 +441,137 @@
         </div>
 
         <div id="subtab-rates" class="subtab__content">
-            <div class="tab_subtitle" style="margin-top: 1em;" data-i18n="pidTuning_RatesAndExpo"></div>
+
             <div class="clear-both"></div>
-            <div class="cf_column">
-                <table class="settings-table settings-table--inav">
-                    <tbody>
-                        <tr class="not-for-ez-tune">
-                            <th class="roll" data-i18n="pidTuning_RollRate"></th>
-                            <td class="roll">
-                                <div class="pidTuning_number"><input id="rate-roll" type="number" class="rate-tpa_input" data-setting="roll_rate" data-unit="decadegps" /></div>
-                            </td>
-                        </tr>
-                        <tr class="not-for-ez-tune">
-                            <th class="pitch" data-i18n="pidTuning_PitchRate"></th>
-                            <td class="pitch">
-                                <div class="pidTuning_number"><input id="rate-pitch" type="number" class="rate-tpa_input" data-setting="pitch_rate" data-unit="decadegps" /></div>
-                            </td>
-                        </tr>
-                        <tr class="not-for-ez-tune">
-                            <th class="yaw" data-i18n="pidTuning_YawRate"></th>
-                            <td class="yaw">
-                                <div class="pidTuning_number"><input id="rate-yaw" type="number" class="rate-tpa_input" data-setting="yaw_rate" data-unit="decadegps" /></div>
-                            </td>
-                        </tr>
-                        <tr class="not-for-ez-tune">
-                            <th data-i18n="pidTuning_RollAndPitchExpo"></th>
-                            <td>
-                                <div class="pidTuning_number"><input type="number" class="rate-tpa_input" data-setting="rc_expo" data-unit="percent" /></div>
-                            </td>
-                        </tr>
-                        <tr class="not-for-ez-tune">
-                            <th data-i18n="pidTuning_YawExpo"></th>
-                            <td>
-                                <div class="pidTuning_number"><input type="number" class="rate-tpa_input" data-setting="rc_yaw_expo" data-unit="percent" /></div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th data-i18n="pidTuning_MaxRollAngle"></th>
-                            <td>
-                                <div class="pidTuning_number"><input id="maxRollInclination" type="number" class="rate-tpa_input" data-setting="max_angle_inclination_rll" data-unit="decideg-lrg" /></div>
-                                <div for="maxRollInclination" class="helpicon cf_tip" data-i18n_title="pidTuning_MaxRollAngleHelp"></div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th data-i18n="pidTuning_MaxPitchAngle"></th>
-                            <td>
-                                <div class="pidTuning_number"><input id="maxPitchInclination" type="number" class="rate-tpa_input" data-setting="max_angle_inclination_pit" data-unit="decideg-lrg" /></div>
-                                <div for="maxPitchInclination" class="helpicon cf_tip" data-i18n_title="pidTuning_MaxPitchAngleHelp"></div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th data-i18n="pidTuning_magHoldYawRate"></th>
-                            <td>
-                                <div class="pidTuning_number"><input id="headingHoldRate" type="number" class="rate-tpa_input" data-setting="heading_hold_rate_limit" data-unit="degps" /></div>
-                                <div for="headingHoldRate" class="helpicon cf_tip" data-i18n_title="pidTuning_MagHoldYawRateHelp"></div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th class="roll" data-i18n="pidTuning_ManualRollRate"></th>
-                            <td class="roll">
-                                <div class="pidTuning_number"><input id="rate-manual-roll" type="number" class="rate-tpa_input" data-setting="manual_roll_rate" data-unit="percent" /></div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th class="pitch" data-i18n="pidTuning_ManualPitchRate"></th>
-                            <td class="pitch">
-                                <div class="pidTuning_number"><input id="rate-manual-pitch" type="number" class="rate-tpa_input" data-setting="manual_pitch_rate" data-unit="percent" /></div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th class="yaw" data-i18n="pidTuning_ManualYawRate"></th>
-                            <td class="yaw">
-                                <div class="pidTuning_number"><input id="rate-manual-yaw" type="number" class="rate-tpa_input" data-setting="manual_yaw_rate" data-unit="percent" /></div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+            <div class="tab_subtitle" style="margin-top: 1em;" data-i18n="pidTuning_RatesAndExpo"></div>
+
+            <div class="pid-sliders-axis not-for-ez-tune" data-axis="roll">
+                <h3 data-i18n="pidTuning_Rates_Stabilized"></h3>
+                <div class="pid-slider-row">
+                    <span data-i18n="pidTuning_Rates_Roll"></span>
+                    <div class="number no-border">
+                        <input id="rate_roll_rate" class="controlProfileHighlightActive" type="number"/>
+                    </div>
+                    <div class="clear-both"></div>
+                </div>
+                <div class="pid-slider-row">
+                    <span data-i18n="pidTuning_Rates_Pitch"></span>
+                    <div class="number no-border">
+                        <input id="rate_pitch_rate" class="controlProfileHighlightActive" type="number"/>
+                    </div>
+                    <div class="clear-both"></div>
+                </div>
+
+                <div class="pid-slider-row">
+                    <span data-i18n="pidTuning_Rates_Yaw"></span>
+                    <div class="number no-border">
+                        <input id="rate_yaw_rate" class="controlProfileHighlightActive" type="number"/>
+                    </div>
+                    <div class="clear-both"></div>
+                </div>
+            </div>
+
+            <div class="pid-sliders-axis not-for-ez-tune" data-axis="pitch">
+                <div style="float: right">
+                    <div class="pitch_roll_curve expo-chart">
+                        <canvas width="200" height="117"></canvas>
+                    </div>
+                </div>
+                <h3 data-i18n="pidTuning_Expo_Stabilized"></h3>
+                <div class="pid-slider-row">
+                    <span data-i18n="pidTuning_Expo_RollPitch"></span>
+                    <div class="number no-border">
+                        <input id="rate_rollpitch_expo" class="controlProfileHighlightActive" type="number"/>
+                    </div>
+                    <div class="clear-both"></div>
+                </div>
+                <div class="pid-slider-row">
+                    <span data-i18n="pidTuning_Expo_Yaw"></span>
+                    <div class="number no-border">
+                        <input id="rate_yaw_expo" class="controlProfileHighlightActive" type="number"/>
+                    </div>
+                    <div class="clear-both"></div>
+                </div>
+            </div>
+
+            <div class="pid-sliders-axis not-for-multirotor" data-axis="yaw">
+                <h3 data-i18n="pidTuning_Manual_Rates"></h3>
+                <div class="pid-slider-row">
+                    <span data-i18n="pidTuning_Manual_Roll"></span>
+                    <div class="number no-border">
+                        <input id="rate_manual_roll" class="controlProfileHighlightActive" type="number"/>
+                    </div>
+                    <div class="clear-both"></div>
+                </div>
+                <div class="pid-slider-row">
+                    <span data-i18n="pidTuning_Manual_Pitch"></span>
+                    <div class="number no-border">
+                        <input id="rate_manual_pitch" class="controlProfileHighlightActive" type="number"/>
+                    </div>
+                    <div class="clear-both"></div>
+                </div>
+                <div class="pid-slider-row">
+                    <span data-i18n="pidTuning_Manual_Yaw"></span>
+                    <div class="number no-border">
+                        <input id="rate_manual_yaw" class="controlProfileHighlightActive" type="number"/>
+                    </div>
+                    <div class="clear-both"></div>
+                </div>
+                
+            </div>
+
+            <div class="pid-sliders-axis not-for-multirotor" data-axis="3">
+                <div style="float: right">
+                    <div class="manual_expo_curve expo-chart">
+                        <canvas width="200" height="117"></canvas>
+                    </div>
+                </div>
+                <h3 data-i18n="pidTuning_Expo_Manual"></h3>
+                <div class="pid-slider-row">
+                    <span data-i18n="pidTuning_Expo_RollPitch"></span>
+                    <div class="number no-border">
+                        <input id="manual_rollpitch_expo" class="controlProfileHighlightActive" type="number"/>
+                    </div>
+                    <div class="clear-both"></div>
+                </div>
+                <div class="pid-slider-row">
+                    <span data-i18n="pidTuning_Expo_Yaw"></span>
+                    <div class="number no-border">
+                        <input id="manual_yaw_expo" class="controlProfileHighlightActive" type="number"/>
+                    </div>
+                    <div class="clear-both"></div>
+                </div>
+            </div>
+
+            <div class="pid-sliders-axis only-for-multirotor" data-axis="3">
+                <h3 data-i18n="pidTuning_Other"></h3>
+                <div class="pid-slider-row">
+                    <span data-i18n="pidTuning_HeadingHold_Rate"></span>
+                    <div class="number no-border">
+                        <input id="heading_hold_rate_limit" class="controlProfileHighlightActive rate-tpa_input" data-setting="heading_hold_rate_limit" type="number" data-presentation="range" />
+                    </div>
+                    <div class="clear-both"></div>
+                </div>       
+            </div>
+
+            <div class="tab_subtitle" style="margin-top: 1em;" data-i18n="pidTuning_Limits"></div>
+
+            <div class="pid-sliders-axis" data-axis="roll">
+                <h3 data-i18n="pidTuning_Max_Inclination_Angle"></h3>
+                <div class="pid-slider-row">
+                    <span data-i18n="pidTuning_Max_Roll"></span>
+                    <div class="number no-border">
+                        <input id="max_angle_inclination_rll" class="controlProfileHighlightActive rate-tpa_input" data-setting="max_angle_inclination_rll" type="number" data-presentation="range" />
+                    </div>
+                    <div class="clear-both"></div>
+                </div>   
+                <div class="pid-slider-row">
+                    <span data-i18n="pidTuning_Max_Pitch"></span>
+                    <div class="number no-border">
+                        <input id="max_angle_inclination_pit" class="controlProfileHighlightActive rate-tpa_input" data-setting="max_angle_inclination_pit" type="number" data-presentation="range" />
+                    </div>
+                    <div class="clear-both"></div>
+                </div>       
             </div>
 
             <div class="clear-both"></div>

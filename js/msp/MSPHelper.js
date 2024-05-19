@@ -20,6 +20,7 @@ const { FwApproach } = require('./../fwApproach');
 const Waypoint = require('./../waypoint');
 const mspDeduplicationQueue = require('./mspDeduplicationQueue');
 const mspStatistics = require('./mspStatistics');
+const settingsCache = require('./../settingsCache');
 
 var mspHelper = (function () {
     var self = {};
@@ -385,21 +386,6 @@ var mspHelper = (function () {
                 break;
             case MSPCodes.MSP_MOTOR_PINS:
                 console.log(data);
-                break;
-            case MSPCodes.MSP_BOXNAMES:
-                //noinspection JSUndeclaredVariable
-                FC.AUX_CONFIG = []; // empty the array as new data is coming in
-                buff = [];
-                for (let i = 0; i < data.byteLength; i++) {
-                    if (data.getUint8(i) == 0x3B) { // ; (delimeter char)
-                        FC.AUX_CONFIG.push(String.fromCharCode.apply(null, buff)); // convert bytes into ASCII and save as strings
-
-                        // empty buffer
-                        buff = [];
-                    } else {
-                        buff.push(data.getUint8(i));
-                    }
-                }
                 break;
             case MSPCodes.MSP_PIDNAMES:
                 //noinspection JSUndeclaredVariable
@@ -1863,6 +1849,7 @@ var mspHelper = (function () {
                 break;
 
             case MSPCodes.MSP2_SET_CF_SERIAL_CONFIG:
+                console.log('will crunch', FC.SERIAL_CONFIG);
                 for (let i = 0; i < FC.SERIAL_CONFIG.ports.length; i++) {
                     var serialPort = FC.SERIAL_CONFIG.ports[i];
 
@@ -3078,9 +3065,12 @@ var mspHelper = (function () {
     };
 
     self._getSetting = function (name) {
-        if (FC.SETTINGS[name]) {
-            return Promise.resolve(FC.SETTINGS[name]);
+
+        const storedSetting = settingsCache.get(name);
+        if (typeof storedSetting !== 'undefined') {
+            return Promise.resolve(storedSetting);
         }
+
         var data = [];
         self._encodeSettingReference(name, null, data);
         return MSP.promise(MSPCodes.MSP2_COMMON_SETTING_INFO, data).then(function (result) {
@@ -3127,7 +3117,7 @@ var mspHelper = (function () {
                 }
                 setting.table = { values: values };
             }
-            FC.SETTINGS[name] = setting;
+            settingsCache.set(name, setting);
             return setting;
         });
     }
@@ -3244,7 +3234,7 @@ var mspHelper = (function () {
         this.encodeSetting(name, value).then(function (data) {
             return MSP.promise(MSPCodes.MSPV2_SET_SETTING, data).then(callback);
         }).catch(error =>  {
-            console.log("Invalid setting: " + name);
+            console.log("Invalid setting: " + name, error);
             return Promise.resolve().then(callback);
         });
     };

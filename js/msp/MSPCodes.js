@@ -84,7 +84,6 @@ var MSPCodes = {
     MSP_PID:                112,
     MSP_ACTIVEBOXES:        113,
     MSP_MOTOR_PINS:         115,
-    MSP_BOXNAMES:           116,
     MSP_PIDNAMES:           117,
     MSP_WP:                 118,
     MSP_BOXIDS:             119,
