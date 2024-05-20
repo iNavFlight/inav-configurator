@@ -252,14 +252,21 @@ TABS.calibration.initialize = function (callback) {
                 return;
             }
 
+            const yawBoxValue = parseInt($('[name=YawFixedDegrees]').val());
+
+            if (yawBoxValue > 360) {
+                GUI.alert("Value Min = 0 and Max = 360");
+                return;
+            }
+
             var buffer = [];
 
             var button = $(this);
 
             $(button).addClass('disabled');
 
-            buffer.push(0x00FF & parseInt($('[name=YawFixedDegrees]').val()));
-            buffer.push(parseInt($('[name=YawFixedDegrees]').val()) >> 8);
+            buffer.push(0x00FF & yawBoxValue);
+            buffer.push(yawBoxValue >> 8);
 
             MSP.send_message(MSPCodes.MSP_MAG_CALIBRATION, buffer, false, function () {
                 GUI.log(i18n.getMessage('initialSetupMagFixedCalibStarted'));
