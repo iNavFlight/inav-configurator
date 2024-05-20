@@ -2954,7 +2954,7 @@
         "message": "After pressing the button 'Calibrate Compass' you have 30 seconds to hold the model in the air and rotate it so that each side (front, back, left, right, top and bottom) points down towards the earth. Be sure that your compass is not near magnets or electromagnets when installed in the craft or performing the calibration."
     },
     "MagFixedCalText": {
-        "message": "Large or heavy vehicles are impractical to use the primary method and manually rotate all axles. This feature allows for very accurate calibration if the GPS has 3D Fix status and the vehicles actual heading is known. First make sure you have aligned (CLI Param 'align_mag') your Compass correctly. With the help of a compass (for example, the one on your smartphone) you must enter your vehicle heading. The heading entered should be TRUE, not MAGNETIC. Finally, click on the 'Compass Calibration for Large Vehicles' button and wait for the calibration result."
+        "message": "Large or heavy vehicles are impractical to use the primary method and manually rotate all axles. This feature allows for very accurate calibration if the GPS has 3D Fix status and the vehicles actual heading is known. First make sure you have aligned (CLI Param 'align_mag') your Compass correctly. With the help of a compass (for example, the one on your smartphone) you must enter your vehicle heading. The heading entered should be TRUE, not MAGNETIC. Finally, click on the 'Large Vehicles Compass Calibration' button and wait for the calibration result."
     },
     "MagBtn": {
         "message": "Calibrate Compass"

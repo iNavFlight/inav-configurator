@@ -232,10 +232,6 @@ TABS.calibration.initialize = function (callback) {
         if (FC.SENSOR_CONFIG.magnetometer === 0) {
             //Comment for test
             $('#mag_btn, #mag-calibrated-data, #magfixed_btn, #mag-fixed-calibrated-data').css('pointer-events', 'none').css('opacity', '0.4');
-        } else {
-            if (!(FC.GPS_DATA.fix >= 2)) {
-                $('#magfixed_btn, #mag-fixed-calibrated-data').css('pointer-events', 'none').css('opacity', '0.4');
-            }
         }
 
         if (FC.SENSOR_CONFIG.opflow === 0) {
@@ -244,6 +240,19 @@ TABS.calibration.initialize = function (callback) {
         }
         
         $('#magfixed_btn').on('click', function () {
+
+            const yawBoxIsEmpty = $('[name=YawFixedDegrees]').val().length === 0;
+
+            if (yawBoxIsEmpty) {
+                GUI.alert("Heading box value is empty!");
+                return;
+            }
+
+            if (!(FC.GPS_DATA.fix >= 2)) {
+                GUI.alert("GPS without 3D Fix!");
+                return;
+            }
+
             var buffer = [];
 
             var button = $(this);
