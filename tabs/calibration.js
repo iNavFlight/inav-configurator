@@ -117,7 +117,6 @@ TABS.calibration.initialize = function (callback) {
             $('[name=MagGain' + item + ']').val(FC.CALIBRATION_DATA.magGain[item]);
         });
         $('[name=OpflowScale]').val(FC.CALIBRATION_DATA.opflow.Scale);
-        $('[name=YawFixedDegrees]').val(FC.CALIBRATION_DATA.magFixedYaw.yawDegrees);
         updateCalibrationSteps();
     }
 
