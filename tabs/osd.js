@@ -3144,7 +3144,7 @@ OSD.GUI.updateAll = function() {
             if(OSD.data.selected_layout >= 0 && OSD.data.selected_layout < OSD.data.layout_count){
                 layout_clipboard = {layout: JSON.parse(JSON.stringify(OSD.data.layouts[OSD.data.selected_layout])), filled: true};
                 paste.show();
-                GUI.log(chrome.i18n.getMessage('osdLayoutInsertedIntoClipboard'));
+                GUI.log(i18n.getMessage('osdLayoutInsertedIntoClipboard'));
             }
         });
 
@@ -3159,7 +3159,7 @@ OSD.GUI.updateAll = function() {
                         OSD.saveItem({id: index});
                     }
                 });
-                GUI.log(chrome.i18n.getMessage('osdLayoutPasteFromClipboard'));
+                GUI.log(i18n.getMessage('osdLayoutPasteFromClipboard'));
             }
         });
 
