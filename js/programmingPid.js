@@ -2,6 +2,7 @@
 
 const FC = require('./fc');
 const { GUI } = require('./gui');
+const { OPERAND_TYPES } = require('./logicConditionOperantTypes');
 
 let ProgrammingPid = function (enabled, setpointType, setpointValue, measurementType, measurementValue, gainP, gainI, gainD, gainFF) {
     let self = {};
@@ -159,7 +160,7 @@ let ProgrammingPid = function (enabled, setpointType, setpointValue, measurement
         let $cT = $(event.currentTarget),
             operand = $cT.data("operand"),
             $container = $cT.parent(),
-            operandMetadata = FC.getOperandTypes()[$cT.val()];
+            operandMetadata = OPERAND_TYPES[$cT.val()];
 
         if (operand == 0) {
             self.setSetpointType($cT.val());
@@ -189,9 +190,9 @@ let ProgrammingPid = function (enabled, setpointType, setpointValue, measurement
         $container.append('<select class="logic_element__operand--type" data-operand="' + operand + '"></select>');
         let $t = $container.find('.logic_element__operand--type');
 
-        for (let k in FC.getOperandTypes()) {
-            if (FC.getOperandTypes().hasOwnProperty(k)) {
-                let op = FC.getOperandTypes()[k];
+        for (let k in OPERAND_TYPES) {
+            if (OPERAND_TYPES.hasOwnProperty(k)) {
+                let op = OPERAND_TYPES[k];
                 
                 if (type == k) {
                     $t.append('<option value="' + k + '" selected>' + op.name + '</option>');
