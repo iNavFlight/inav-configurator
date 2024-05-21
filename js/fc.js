@@ -1097,7 +1097,7 @@ var FC = {
             },
             21: {
                 name: "Set IO Port",
-                operandType: "Set Flight Parameter",
+                operandType: "IO Expander",
                 hasOperand: [true, true],
                 output: "none"
             },
@@ -1288,6 +1288,12 @@ var FC = {
                 hasOperand: [false, false],
                 output: "boolean"
             },
+            55: {
+                name: "Read IO Port",
+                operandType: "IO Expander",
+                hasOperand: [true, false],
+                output: "boolean"
+            }
         }
     },
     getOperandTypes: function () {
