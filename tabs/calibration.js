@@ -248,8 +248,8 @@ TABS.calibration.initialize = function (callback) {
             }
 
             if (!(FC.GPS_DATA.fix >= 2)) {
-                GUI.alert("GPS without 3D Fix!");
-                return;
+                //GUI.alert("GPS without 3D Fix!");
+                //return;
             }
 
             const yawBoxValue = parseInt($('[name=YawFixedDegrees]').val());
@@ -281,7 +281,7 @@ TABS.calibration.initialize = function (callback) {
                 content: $('#modal-compass-processing').clone()
             }).open();
 
-            var countdown = 3;
+            var countdown = 1;
             interval.add('compass_calibration_interval', function () {
                 countdown--;
                 if (countdown === 0) {
@@ -289,7 +289,7 @@ TABS.calibration.initialize = function (callback) {
                         $(button).removeClass('disabled');
 
                         modalProcessing.close();
-                        GUI.log(i18n.getMessage('initialSetupMagFixedCalibEnded'));
+                        GUI.log(i18n.getMessage('initialSetupMagCalibEnded'));
                         
                         MSP.send_message(MSPCodes.MSP_CALIBRATION_DATA, false, false, updateSensorData);
                         interval.remove('compass_calibration_interval');
@@ -298,8 +298,6 @@ TABS.calibration.initialize = function (callback) {
                        //delete modalProcessing;
                         $('.jBox-wrapper').remove();
                     }, 1000);
-                } else {
-                    modalProcessing.content.find('.modal-compass-countdown').text(countdown);
                 }
 
             }, 1000);
