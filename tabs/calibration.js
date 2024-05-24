@@ -243,19 +243,19 @@ TABS.calibration.initialize = function (callback) {
             const yawBoxIsEmpty = $('[name=YawFixedDegrees]').val().length === 0;
 
             if (yawBoxIsEmpty) {
-                GUI.alert("Heading box value is empty!");
+                GUI.log("Heading box value is empty!");
                 return;
             }
 
             if (!(FC.GPS_DATA.fix >= 2)) {
-                //GUI.alert("GPS without 3D Fix!");
-                //return;
+                GUI.log("GPS without 3D Fix!");
+                return;
             }
 
             const yawBoxValue = parseInt($('[name=YawFixedDegrees]').val());
 
             if (yawBoxValue > 360) {
-                GUI.alert("Value Min = 0 and Max = 360");
+                GUI.log("Heading box value Min = 0 and Max = 360");
                 return;
             }
 
