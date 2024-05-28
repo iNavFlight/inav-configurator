@@ -229,10 +229,10 @@ TABS.gps.initialize = function (callback) {
             var feature = mapHandler.forEachFeatureAtPixel(mapHandler.getEventPixel(evt.originalEvent), function(feature, layer) {
                 return feature;
             });
-            
+
             if (feature && feature.get('data') && feature.get('name')) {
                 TABS.gps.toolboxAdsbVehicle.setContent(
-                    `icao: <strong>` + feature.get('name') + `</strong><br />`
+                    `callsign: <strong>` + feature.get('name') + `</strong><br />`
                     + `lat: <strong>`+ (feature.get('data').lat / 10000000) + `</strong><br />`
                     + `lon: <strong>`+ (feature.get('data').lon / 10000000) + `</strong><br />`
                     + `ASL: <strong>`+ (feature.get('data').altCM ) / 100 + `m</strong><br />`
@@ -357,7 +357,7 @@ TABS.gps.initialize = function (callback) {
                             mapHandler.addLayer(vehicleLayer);
                         }
 
-                        if (vehicle.lat > 0 && vehicle.lon > 0 && vehicle.ttl > 0) {
+                        if (vehicle.lat != 0 && vehicle.lon != 0 && vehicle.ttl > 0) {
                             let vehicleIconStyle = new ol.style.Style({
                                 image: new ol.style.Icon(({
                                     opacity: 1,
