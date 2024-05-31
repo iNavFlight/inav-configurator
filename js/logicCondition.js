@@ -2,6 +2,8 @@
 
 const FC = require('./fc');
 const { GUI } = require('./../js/gui');
+const { LOGIC_OPERATORS } = require('./logicConditionOperators');
+const { OPERAND_TYPES } = require('./logicConditionOperantTypes');
 
 let LogicCondition = function (enabled, activatorId, operation, operandAType, operandAValue, operandBType, operandBValue, flags) {
     let self = {};
@@ -79,7 +81,7 @@ let LogicCondition = function (enabled, activatorId, operation, operandAType, op
     };
 
     self.getOperatorMetadata = function () {
-        return FC.getLogicOperators()[self.getOperation()];
+        return LOGIC_OPERATORS[self.getOperation()];
     };
 
     self.hasOperand = function (val) {
@@ -103,7 +105,7 @@ let LogicCondition = function (enabled, activatorId, operation, operandAType, op
         let $cT = $(event.currentTarget),
             operand = $cT.data("operand"),
             $container = $cT.parent(),
-            operandMetadata = FC.getOperandTypes()[$cT.val()];
+            operandMetadata = OPERAND_TYPES[$cT.val()];
 
         if (operand == 0) {
             self.setOperandAType($cT.val());
@@ -145,9 +147,9 @@ let LogicCondition = function (enabled, activatorId, operation, operandAType, op
             $container.append('<select class="logic_element__operand--type" data-operand="' + operand + '"></select>');
             let $t = $container.find('.logic_element__operand--type');
 
-            for (let k in FC.getOperandTypes()) {
-                if (FC.getOperandTypes().hasOwnProperty(k)) {
-                    let op = FC.getOperandTypes()[k];
+            for (let k in OPERAND_TYPES) {
+                if (OPERAND_TYPES.hasOwnProperty(k)) {
+                    let op = OPERAND_TYPES[k];
                     
                     if (type == k) {
                         $t.append('<option value="' + k + '" selected>' + op.name + '</option>');
@@ -173,7 +175,7 @@ let LogicCondition = function (enabled, activatorId, operation, operandAType, op
 
     self.renderStatus = function () {
         let $e = $row.find('.logic_cell__status'),
-            displayType = FC.getLogicOperators()[self.getOperation()].output;
+            displayType = LOGIC_OPERATORS[self.getOperation()].output;
         
         if (self.getEnabled() && displayType == "boolean") {
             $e.html('<div class="logic_cell__active_marker"></div>');
@@ -189,7 +191,7 @@ let LogicCondition = function (enabled, activatorId, operation, operandAType, op
             return;
         }
 
-        let displayType = FC.getLogicOperators()[self.getOperation()].output,
+        let displayType = LOGIC_OPERATORS[self.getOperation()].output,
             $marker;
         
         if (self.getEnabled() && displayType == "boolean") {
@@ -261,9 +263,9 @@ let LogicCondition = function (enabled, activatorId, operation, operandAType, op
         
         let lcOperators = [];
 
-        for (let lcID in FC.getLogicOperators()) {
-            if (FC.getLogicOperators().hasOwnProperty(lcID)) {
-                let op = FC.getLogicOperators()[lcID];
+        for (let lcID in LOGIC_OPERATORS) {
+            if (LOGIC_OPERATORS.hasOwnProperty(lcID)) {
+                let op = LOGIC_OPERATORS[lcID];
                 lcOperators[parseInt(lcID, 10)] = {
                     id: parseInt(lcID, 10),
                     name: op.name,

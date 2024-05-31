@@ -655,7 +655,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
 
         const updateMotorDirection = function () {
             let motorDirectionCheckbox = $('input[name=motor_direction_inverted]:checked');
-            const isReversed = motorDirectionCheckbox.val() == 1 && (MIXER_CONFIG.platformType == PLATFORM_MULTIROTOR || MIXER_CONFIG.platformType == PLATFORM_TRICOPTER);
+            const isReversed = motorDirectionCheckbox.val() == 1 && (FC.MIXER_CONFIG.platformType == PLATFORM.MULTIROTOR || FC.MIXER_CONFIG.platformType == PLATFORM.TRICOPTER);
 
             const path = './resources/motor_order/'
                 + currentMixerPreset.image + (isReversed ? "_reverse" : "") + '.svg';
