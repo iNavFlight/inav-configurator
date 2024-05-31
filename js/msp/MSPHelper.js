@@ -1420,13 +1420,15 @@ var mspHelper = (function () {
  */
             case MSPCodes.MSPV2_INAV_OUTPUT_MAPPING_EXT2:
                 FC.OUTPUT_MAPPING.flush();
-                for (let i = 0; i < data.byteLength; i += 5) {
+                for (let i = 0; i < data.byteLength; i += 6) {
                     let timerId = data.getUint8(i);
                     let usageFlags = data.getUint32(i + 1, true);
+                    let specialLabels = data.getUint8(i + 5);
                     FC.OUTPUT_MAPPING.put(
                         {
                             'timerId': timerId,
-                            'usageFlags': usageFlags
+                            'usageFlags': usageFlags,
+                            'specialLabels': specialLabels
                         });
                 }
                 break;

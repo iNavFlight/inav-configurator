@@ -32,6 +32,8 @@ var OutputMappingCollection = function () {
     const OUTPUT_TYPE_SERVO = 1;
     const OUTPUT_TYPE_LED   = 2;
 
+    const SPECIAL_LABEL_LED = 1;
+
     self.TIMER_OUTPUT_MODE_AUTO = 0;
     self.TIMER_OUTPUT_MODE_MOTORS = 1;
     self.TIMER_OUTPUT_MODE_SERVOS = 2;
@@ -53,6 +55,10 @@ var OutputMappingCollection = function () {
         let timerIndex = self.getUsedTimerIds().indexOf(String(timer));
      
         return colorTable[timerIndex % colorTable.length];
+    }
+
+    self.isLedPin = function(timer) {
+        return data[timer].specialLabels == SPECIAL_LABEL_LED;
     }
 
     self.getOutputTimerColor = function (output) {
