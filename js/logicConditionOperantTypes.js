@@ -53,13 +53,13 @@ const OPERAND_TYPES = {
             30: "CRSF SNR",
             31: "GPS Valid Fix",
             32: "Loiter Radius [cm]",
-            33: "Active PIDProfile",
+            33: "Active Control Profile",
             34: "Battery cells",
             35: "AGL status [0/1]",
             36: "AGL [cm]",
             37: "Rangefinder [cm]",
             38: "Active MixerProfile",
-            39: "MixerTransition Active",
+            39: "Mixer Transition Active",
             40: "Yaw [deg]",
             41: "FW Land State"
         }
