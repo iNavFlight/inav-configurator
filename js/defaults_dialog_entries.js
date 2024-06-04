@@ -2,12 +2,22 @@
 
 var defaultsDialogData = [
     {
+        "title": 'Wizard',
+        "id": 63,
+        "notRecommended": false,
+        "reboot": false,
+        "mixerToApply": 3,
+        "wizardPages": ['receiver', 'gps'],
+        "settings": [
+        ]
+    },
+    {
         "title": 'Mini Quad with 3" propellers',
         "id": 6,
         "notRecommended": false,
         "reboot": true,
         "mixerToApply": 3,
-        "wizardPages": ['receiver'],
+        "wizardPages": ['receiver', 'gps'],
         "settings": [
             {
                 key: "model_preview_type",

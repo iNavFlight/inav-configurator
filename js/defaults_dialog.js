@@ -72,6 +72,30 @@ var defaultsDialog = (function () {
                 name: "receiverProtocol",
                 value: $container.find('#wizard-receiver-protocol option:selected').text()
             });
+        } else if (stepName == "gps") {
+            let port = $container.find('#wizard-gps-port').val();
+            let baud = $container.find('#wizard-gps-baud').val();
+            let protocol = $container.find('#wizard-gps-protocol option:selected').text();
+
+            privateScope.wizardSettings.push({
+                name: "gpsPort",
+                value: port
+            });
+
+            privateScope.wizardSettings.push({
+                name: "gpsBaud",
+                value: baud
+            });
+
+            privateScope.wizardSettings.push({
+                name: "gpsProtocol",
+                value: protocol
+            });
+
+            // privateScope.wizardSettings.push({
+            // });
+
+            // let gpsBit = FC.getFeatures().find( feature => feature.name === 'GPS' ).bit;
         }
 
         privateScope.wizard(selectedDefaultPreset, wizardStep + 1);
@@ -88,13 +112,13 @@ var defaultsDialog = (function () {
             $container.hide();
 
             wizardSaveFramework.persist(privateScope.wizardSettings, function () {
-                mspHelper.saveToEeprom(function () {
-                    //noinspection JSUnresolvedVariable
-                    GUI.log(i18n.getMessage('configurationEepromSaved'));
-                    if (selectedDefaultPreset.reboot) {
-                        privateScope.reboot();
-                    }
-                });
+                // mspHelper.saveToEeprom(function () {
+                //     //noinspection JSUnresolvedVariable
+                //     GUI.log(i18n.getMessage('configurationEepromSaved'));
+                //     if (selectedDefaultPreset.reboot) {
+                //         privateScope.reboot();
+                //     }
+                // });
             });
         } else {
             const $content = $container.find('.defaults-dialog__wizard');
@@ -121,6 +145,12 @@ var defaultsDialog = (function () {
                          * Bindings executed when the receiver wizard tab is loaded
                          */
                         wizardUiBindings.receiver($content);
+                    } else if (stepName == "gps") {
+                        /**
+                         * Bindings executed when the GPS wizard tab is loaded
+                         * 
+                         */
+                        wizardUiBindings.gps($content);
                     }
 
                     Settings.configureInputs().then(
@@ -346,9 +376,9 @@ var defaultsDialog = (function () {
 
     privateScope.onInitSettingReturned = function (promise) {
 
-        if (promise.value > 0) {
-            return; //Defaults were applied, we can just ignore
-        }
+        // if (promise.value > 0) {
+        //     return; //Defaults were applied, we can just ignore
+        // }
 
         privateScope.render();
         $container.show();

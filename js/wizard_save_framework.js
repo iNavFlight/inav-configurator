@@ -3,16 +3,13 @@
 const mspHelper = require('./msp/MSPHelper');
 const serialPortHelper = require('./serialPortHelper');
 const FC = require('./fc');
+const features = require('./feature_framework');
 
 var wizardSaveFramework = (function () {
 
     let self = {};
 
     self.saveSetting = function (config, callback) {
-        /*
-        serialrx_provider to 2
-        serialrx_provider to 6
-        */
        
         switch (config.name) {
             case 'receiverPort':
@@ -21,6 +18,27 @@ var wizardSaveFramework = (function () {
                 break;
             case 'receiverProtocol':
                 mspHelper.setSetting('serialrx_provider', config.value, callback);
+                break;
+            case 'gpsPort':
+                console.log(config);
+                
+                let gpsBit = FC.getFeatures().find( feature => feature.name === 'GPS' ).bit;
+
+                if (config.value == '-1') {
+                    features.unset(gpsBit);
+
+                    console.log('Unset GPS');
+                    
+                } else {
+                    features.set(gpsBit);
+                    console.log('Set GPS');
+                }
+                break;
+            case 'gpsBaud':
+                console.log(config);
+                break;
+            case 'gpsProtocol':
+                console.log(config);
                 break;
             default:
                 callback();
