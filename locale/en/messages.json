@@ -5132,10 +5132,10 @@
         "message": "Enable if the motor direction is reversed and the props are mounted in the opposite direction."
     },
     "mixer_pid_profile_linking": {
-        "message": "PID Profile will use same index as Mixer Profile index"
+        "message": "Control Profile will use same index as Mixer Profile index"
     },
     "mixer_pid_profile_linking_hint": {
-        "message": "mixer_pid_profile_linking: Enable on both Mixer Profile if you want PID Profile switching handled by Mixer Profile switching(Recommend in vtol/mixed plaform type setup)"
+        "message": "mixer_pid_profile_linking: Enable on both Mixer Profile if you want Control Profile switching handled by Mixer Profile switching(Recommend in vtol/mixed plaform type setup)"
     },
     "blackboxFields": {
         "message": "Blackbox fields"
@@ -5459,13 +5459,13 @@
         "message": "Mixer Profile 2"
     },
     "sensorProfile1": {
-        "message": "PID Profile 1"
+        "message": "Control Profile 1"
     },
     "sensorProfile2": {
-        "message": "PID Profile 2"
+        "message": "Control Profile 2"
     },
     "sensorProfile3": {
-        "message": "PID Profile 3"
+        "message": "Control Profile 3"
     },
     "sensorBatteryProfile1": {
         "message": "Battery Profile 1"

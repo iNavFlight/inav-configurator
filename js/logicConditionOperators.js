@@ -242,6 +242,13 @@ const LOGIC_OPERATORS = {
         output: "boolean"
     },
 
+    39: {
+        name: "Set Heading Target",
+        operandType: "Set Flight Parameter",
+        hasOperand: [true, false],
+        output: "raw"
+    },
+
     41: {
         name: "Override Loiter Radius",
         operandType: "Set Flight Parameter",
@@ -249,7 +256,7 @@ const LOGIC_OPERATORS = {
         output: "boolean"
     },
     42: {
-        name: "Set Profile",
+        name: "Set Control Profile",
         operandType: "Set Flight Parameter",
         hasOperand: [true, false],
         output: "boolean"

@@ -1319,7 +1319,7 @@ var mspHelper = (function () {
                 console.log('Looptime saved');
                 break;
             case MSPCodes.MSP_SET_RESET_CURR_PID:
-                console.log('Current PID profile reset');
+                console.log('Current Control profile reset');
                 break;
             case MSPCodes.MSP_SET_3D:
                 console.log('3D settings saved');
