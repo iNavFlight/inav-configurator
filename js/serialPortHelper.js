@@ -121,6 +121,11 @@ const serialPortHelper = (function () {
             name: 'SBUS_OUTPUT',
             groups: ['peripherals'],
             defaultBaud: 115200
+        },
+        {
+            name: 'GIMBAL',
+            groups: ['peripherals'],
+            defaultBaud: 115200
         }
     ];
 
@@ -150,6 +155,7 @@ const serialPortHelper = (function () {
         'SBUS_OUTPUT': 22,
         'SMARTPORT_MASTER': 23,
         'MSP_DISPLAYPORT': 25,
+        'GIMBAL': 26
     };
 
     privateScope.identifierToName = {

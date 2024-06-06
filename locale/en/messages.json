@@ -1325,6 +1325,9 @@
     "portsFunction_SBUS_OUTPUT": {
         "message": "SBus Output"
     },
+    "portsFunction_GIMBAL": {
+        "message": "Serial Gimbal"
+    },
     "pidTuning_Other": {
         "message": "Other"
     },
