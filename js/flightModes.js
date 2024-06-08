@@ -283,12 +283,12 @@ var FLIGHT_MODES = [
     },
     {
         boxId: 56,
-        boxName: "GIMBAL PITCH LOCK",
+        boxName: "GIMBAL LEVEL PITCH",
         permanentId: 65,
     },
     {
         boxId: 57,
-        boxName: "GIMABL PITCH ROLL LOCK",
+        boxName: "GIMBAL LEVEL PITCH ROLL",
         permanentId: 66
     },
     {
