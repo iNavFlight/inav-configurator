@@ -62,7 +62,7 @@ TABS.auxiliary.initialize = function (callback) {
         modeSections["VTOL"] = ["MIXER PROFILE 2", "MIXER TRANSITION"];
         modeSections["Beeper"] = ["BEEPER", "BEEPER MUTE"];
         modeSections["Gimbal"] = ["GIMBAL CENTER", "GIMBAL LEVEL PITCH", "GIMBAL LEVEL PITCH ROLL"];
-        modeSections["Misc Modes"] = ["BEEPER", "LEDS OFF", "LIGHTS", "HOME RESET", "WP PLANNER", "MISSION CHANGE", "BLACKBOX", "FAILSAFE", "KILLSWITCH", "TELEMETRY", "MSP RC OVERRIDE", "USER1", "USER2", "USER3", "USER4"];
+        modeSections["Misc Modes"] = ["LEDS OFF", "LIGHTS", "HOME RESET", "WP PLANNER", "MISSION CHANGE", "BLACKBOX", "FAILSAFE", "KILLSWITCH", "TELEMETRY", "MSP RC OVERRIDE", "USER1", "USER2", "USER3", "USER4"];
 
     function sort_modes_for_display() {
         // Sort the modes
