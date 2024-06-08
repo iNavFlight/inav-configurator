@@ -1343,6 +1343,9 @@
     "portsFunction_GIMBAL": {
         "message": "Serial Gimbal"
     },
+    "portsFunction_HEADTRACKER": {
+        "message": "Serial Headtracker"
+    },
     "pidTuning_Other": {
         "message": "Other"
     },

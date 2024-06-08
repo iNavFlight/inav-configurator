@@ -295,6 +295,11 @@ var FLIGHT_MODES = [
         boxId: 58,
         boxName: "GIMBAL CENTER",
         permanentId: 67
+    },
+    {
+        boxId: 59,
+        boxName: "GIMBAL HEADTRACKER",
+        permanentId: 68
     }
 ];
 
