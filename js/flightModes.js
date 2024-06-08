@@ -280,6 +280,21 @@ var FLIGHT_MODES = [
         boxId: 55,
         boxName: "ANGLE HOLD",
         permanentId: 64
+    },
+    {
+        boxId: 56,
+        boxName: "GIMBAL PITCH LOCK",
+        permanentId: 65,
+    },
+    {
+        boxId: 57,
+        boxName: "GIMABL PITCH ROLL LOCK",
+        permanentId: 66
+    },
+    {
+        boxId: 58,
+        boxName: "GIMBAL CENTER",
+        permanentId: 67
     }
 ];
 
