@@ -1238,6 +1238,21 @@
     "configurationVTXLowPowerDisarmValue_2": {
         "message": "Until first arm"
     },
+    "configurationGimbal": {
+        "message": "Serial Gimbal"
+    },
+    "configurationGimbalSensitivity": { 
+        "message":"Gimbal sensitivity"
+    },
+    "configurationGimbalPanChannel": { 
+        "message":"Pan channel (yaw)"
+    },
+    "configurationGimbalTiltChannel": { 
+        "message":"Tilt channel (pitch)"
+    },
+    "configurationGimbalRollChannel": { 
+        "message":"Roll channel"
+    },
     "portsHelp": {
         "message": "<strong>Note:</strong> not all combinations are valid.  When the flight controller firmware detects this the serial port configuration will be reset."
     },
