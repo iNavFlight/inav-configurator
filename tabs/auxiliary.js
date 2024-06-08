@@ -59,6 +59,8 @@ TABS.auxiliary.initialize = function (callback) {
         modeSections["Multi-rotor"] = ["FPV ANGLE MIX", "TURTLE", "MC BRAKING", "HEADFREE", "HEADADJ"];
         modeSections["OSD Modes"] = ["OSD OFF", "OSD ALT 1", "OSD ALT 2", "OSD ALT 3"];
         modeSections["FPV Camera Modes"] = ["CAMSTAB", "CAMERA CONTROL 1", "CAMERA CONTROL 2", "CAMERA CONTROL 3"];
+        modeSections["VTOL"] = ["MIXER PROFILE 2", "MIXER TRANSITION"];
+        modeSections["Beeper"] = ["BEEPER", "BEEPER MUTE"];
         modeSections["Gimbal"] = ["GIMBAL CENTER", "GIMBAL LEVEL PITCH", "GIMBAL LEVEL PITCH ROLL"];
         modeSections["Misc Modes"] = ["BEEPER", "LEDS OFF", "LIGHTS", "HOME RESET", "WP PLANNER", "MISSION CHANGE", "BLACKBOX", "FAILSAFE", "KILLSWITCH", "TELEMETRY", "MSP RC OVERRIDE", "USER1", "USER2", "USER3", "USER4"];
 
