@@ -283,12 +283,12 @@ var FLIGHT_MODES = [
     },
     {
         boxId: 56,
-        boxName: "GIMBAL LEVEL PITCH",
+        boxName: "GIMBAL LEVEL TILT",
         permanentId: 65,
     },
     {
         boxId: 57,
-        boxName: "GIMBAL LEVEL PITCH ROLL",
+        boxName: "GIMBAL LEVEL ROLL",
         permanentId: 66
     },
     {
