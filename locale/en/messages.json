@@ -1253,6 +1253,9 @@
     "configurationGimbalRollChannel": { 
         "message":"Roll channel"
     },
+    "configurationHeadtrackerType": {
+        "message": "Head tracker type"
+    },
     "portsHelp": {
         "message": "<strong>Note:</strong> not all combinations are valid.  When the flight controller firmware detects this the serial port configuration will be reset."
     },
