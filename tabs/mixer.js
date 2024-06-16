@@ -94,8 +94,9 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
 
             let timerId = FC.OUTPUT_MAPPING.getTimerId(i - 1);
             let color = FC.OUTPUT_MAPPING.getOutputTimerColor(i - 1);
+            let isLed = FC.OUTPUT_MAPPING.isLedPin(i - 1);
 
-            $outputRow.append('<td style="background-color: ' + color + '">S' + i + ' (Timer ' + (timerId + 1) + ')</td>');
+            $outputRow.append('<td style="background-color: ' + color + '">S' + i + (isLed ? '/LED' : '') + ' (Timer&nbsp;' + (timerId + 1) + ')</td>');
             $functionRow.append('<td id="function-' + i +'">-</td>');
         }
 
@@ -131,6 +132,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
                                 '<option value=' + FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_AUTO + '' + (usageMode == FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_AUTO ? ' selected' : '')+ '>AUTO</option>'+
                                 '<option value=' + FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_MOTORS + '' + (usageMode == FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_MOTORS ? ' selected' : '')+ '>MOTORS</option>'+
                                 '<option value=' + FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_SERVOS + '' + (usageMode == FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_SERVOS ? ' selected' : '')+ '>SERVOS</option>'+
+                                '<option value=' + FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_LED + '' + (usageMode == FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_LED ? ' selected' : '')+ '>LED</option>'+
                             '</select>' +
                             '<label for="timer-output-' + t + '">' +
                                 '<span> Timer ' + (parseInt(t) + 1) + '</span>' +
@@ -654,7 +656,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
 
         const updateMotorDirection = function () {
             let motorDirectionCheckbox = $('input[name=motor_direction_inverted]:checked');
-            const isReversed = motorDirectionCheckbox.val() == 1 && (MIXER_CONFIG.platformType == PLATFORM_MULTIROTOR || MIXER_CONFIG.platformType == PLATFORM_TRICOPTER);
+            const isReversed = motorDirectionCheckbox.val() == 1 && (FC.MIXER_CONFIG.platformType == PLATFORM.MULTIROTOR || FC.MIXER_CONFIG.platformType == PLATFORM.TRICOPTER);
 
             const path = './resources/motor_order/'
                 + currentMixerPreset.image + (isReversed ? "_reverse" : "") + '.svg';

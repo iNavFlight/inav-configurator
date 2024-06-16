@@ -30,10 +30,14 @@ var OutputMappingCollection = function () {
 
     const OUTPUT_TYPE_MOTOR = 0;
     const OUTPUT_TYPE_SERVO = 1;
+    const OUTPUT_TYPE_LED   = 2;
+
+    const SPECIAL_LABEL_LED = 1;
 
     self.TIMER_OUTPUT_MODE_AUTO = 0;
     self.TIMER_OUTPUT_MODE_MOTORS = 1;
     self.TIMER_OUTPUT_MODE_SERVOS = 2;
+    self.TIMER_OUTPUT_MODE_LED = 3;
 
     self.flushTimerOverrides = function() {
         timerOverrides = {};
@@ -51,6 +55,10 @@ var OutputMappingCollection = function () {
         let timerIndex = self.getUsedTimerIds().indexOf(String(timer));
      
         return colorTable[timerIndex % colorTable.length];
+    }
+
+    self.isLedPin = function(timer) {
+        return data[timer].specialLabels == SPECIAL_LABEL_LED;
     }
 
     self.getOutputTimerColor = function (output) {
@@ -79,10 +87,15 @@ var OutputMappingCollection = function () {
         for (let i = 0; i < data.length; i++) {
             timerMap[i] = null;
 
-            if (servosToGo > 0 && BitHelper.bit_check(data[i]['usageFlags'], TIM_USE_SERVO)) {
+            if (servosToGo > 0 && BitHelper.bit_check(data[i]['usageFlags'], TIM_USE_LED)) {
+                console.log(i + ": LED");
+                timerMap[i] = OUTPUT_TYPE_LED;
+            } else if (servosToGo > 0 && BitHelper.bit_check(data[i]['usageFlags'], TIM_USE_SERVO)) {
+                console.log(i + ": SERVO");
                 servosToGo--;
                 timerMap[i] = OUTPUT_TYPE_SERVO;
             } else if (motorsToGo > 0 && BitHelper.bit_check(data[i]['usageFlags'], TIM_USE_MOTOR)) {
+                console.log(i + ": MOTOR");
                 motorsToGo--;
                 timerMap[i] = OUTPUT_TYPE_MOTOR;
             }
@@ -98,6 +111,7 @@ var OutputMappingCollection = function () {
             outputMap = [],
             offset = getFirstOutputOffset();
 
+        console.log("Offset: " + offset)
         for (let i = 0; i < self.getOutputCount(); i++) {
             
             let assignment = timerMap[i + offset];
@@ -110,6 +124,8 @@ var OutputMappingCollection = function () {
             } else if (assignment == OUTPUT_TYPE_SERVO) {
                 outputMap[i] = "Servo " + servos[currentServoIndex];
                 currentServoIndex++;
+            } else if (assignment == OUTPUT_TYPE_LED) {
+                outputMap[i] = "Led";
             }
         }
 
@@ -128,9 +144,11 @@ var OutputMappingCollection = function () {
         let retVal = 0;
 
         for (let i = 0; i < data.length; i++) {
+            let flags = data[i]['usageFlags'];
             if (
-                BitHelper.bit_check(data[i]['usageFlags'], TIM_USE_MOTOR) ||
-                BitHelper.bit_check(data[i]['usageFlags'], TIM_USE_SERVO)
+                BitHelper.bit_check(flags, TIM_USE_MOTOR) ||
+                BitHelper.bit_check(flags, TIM_USE_SERVO) ||
+                BitHelper.bit_check(flags, TIM_USE_LED)
             ) {
                 retVal++;
             };
@@ -143,7 +161,8 @@ var OutputMappingCollection = function () {
         for (let i = 0; i < data.length; i++) {
             if (
                 BitHelper.bit_check(data[i]['usageFlags'], TIM_USE_MOTOR) ||
-                BitHelper.bit_check(data[i]['usageFlags'], TIM_USE_SERVO)
+                BitHelper.bit_check(data[i]['usageFlags'], TIM_USE_SERVO) ||
+                BitHelper.bit_check(data[i]['usageFlags'], TIM_USE_LED)
             ) {
                 return i;
             }

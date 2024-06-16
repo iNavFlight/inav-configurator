@@ -1700,7 +1700,7 @@ dialog {
 
 }
 
-#mixer_profile_change {
+#profile_change {
     color: white;
     margin-top: 16px;
     width: 130px;
@@ -1709,7 +1709,7 @@ dialog {
     line-height: 12px;
 }
 
-#profile_change {
+#mixer_profile_change {
     color: white;
     margin-top: 16px;
     width: 130px;
