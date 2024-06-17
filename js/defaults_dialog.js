@@ -72,6 +72,23 @@ var defaultsDialog = (function () {
                 name: "receiverProtocol",
                 value: $container.find('#wizard-receiver-protocol option:selected').text()
             });
+        } else if (stepName == "gps") {
+            let port = $container.find('#wizard-gps-port').val();
+            let baud = $container.find('#wizard-gps-baud').val();
+            let protocol = $container.find('#wizard-gps-protocol option:selected').text();
+
+            privateScope.wizardSettings.push({
+                name: "gpsPort",
+                value: {
+                    port: port,
+                    baud: baud
+                }
+            });
+
+            privateScope.wizardSettings.push({
+                name: "gpsProtocol",
+                value: protocol
+            });
         }
 
         privateScope.wizard(selectedDefaultPreset, wizardStep + 1);
@@ -121,6 +138,12 @@ var defaultsDialog = (function () {
                          * Bindings executed when the receiver wizard tab is loaded
                          */
                         wizardUiBindings.receiver($content);
+                    } else if (stepName == "gps") {
+                        /**
+                         * Bindings executed when the GPS wizard tab is loaded
+                         * 
+                         */
+                        wizardUiBindings.gps($content);
                     }
 
                     Settings.configureInputs().then(
