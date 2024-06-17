@@ -112,6 +112,7 @@ var defaultsDialog = (function () {
             $container.hide();
 
             wizardSaveFramework.persist(privateScope.wizardSettings, function () {
+                //FIXME this has to be enabled when the settings are saved
                 // mspHelper.saveToEeprom(function () {
                 //     //noinspection JSUnresolvedVariable
                 //     GUI.log(i18n.getMessage('configurationEepromSaved'));
@@ -376,6 +377,7 @@ var defaultsDialog = (function () {
 
     privateScope.onInitSettingReturned = function (promise) {
 
+        //FIXME: This is a workaround to avoid applying defaults when the settings are already applied
         // if (promise.value > 0) {
         //     return; //Defaults were applied, we can just ignore
         // }

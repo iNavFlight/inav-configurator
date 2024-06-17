@@ -20,19 +20,16 @@ var wizardSaveFramework = (function () {
                 mspHelper.setSetting('serialrx_provider', config.value, callback);
                 break;
             case 'gpsPort':
-                console.log(config);
                 
                 let gpsBit = FC.getFeatures().find( feature => feature.name === 'GPS' ).bit;
 
                 if (config.value == '-1') {
                     features.unset(gpsBit);
-
-                    console.log('Unset GPS');
-                    
                 } else {
                     features.set(gpsBit);
-                    console.log('Set GPS');
                 }
+
+                features.execute(callback);
                 break;
             case 'gpsBaud':
                 console.log(config);
