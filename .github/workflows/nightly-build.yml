@@ -1,0 +1,58 @@
+name: Build pre-release
+
+on: 
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - mmosca-nightly-builds-fixed
+
+jobs:
+    ci:
+        uses: ./.github/workflows/ci.yml
+    
+    release:
+        name: Build nightly-release
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Get current date
+              id: date
+              run: echo "today=$(date '+%Y%m%d')" >> $GITHUB_OUTPUT
+            - name: Code Checkout
+              uses: actions/checkout@v4
+            - name: Fetch build artifacts
+              uses: actions/download-artifact@v4
+              with:
+                path: artifacts
+                merge-multiple: true
+            - name: Upload release artifacts
+              uses: softprops/action-gh-release@v2
+              with:
+                name: inav-configurator-dev-${{ steps.date.outputs.today }}-${{ github.run_number }}-${{ github.sha }}
+                tag_name: v${{ steps.date.outputs.today }}.${{ github.run_number }}
+                # To create release on a different repo, we need a token setup
+                token: ${{ secrets.NIGHTLY_TOKEN }}
+                repository: iNavFlight/inav-configurator-nightly
+                prerelease: true
+                draft: false
+                #generate_release_notes: true
+                make_latest: false
+                files: |
+                  artifacts/*
+                body: |
+                  ${{ steps.notes.outputs.notes }}
+      
+                  ### Repository:
+                  ${{ github.repository }} ([link](${{ github.event.repository.html_url }}))
+      
+                  ### Branch:
+                  ${{ github.ref_name }} ([link](${{ github.event.repository.html_url }}/tree/${{ github.ref_name }}))
+      
+                  ### Latest changeset:
+                  ${{ github.event.head_commit.id }} ([link](${{ github.event.head_commit.url }}))
+      
+                  ### Changes:
+                  ${{ github.event.head_commit.message }}
+      
