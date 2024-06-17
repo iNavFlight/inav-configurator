@@ -52,17 +52,17 @@ jobs:
             - name: Build Linux
               run: npm run make
             - name: Upload Linux deb
-              uses: actions/upload-artifact@v3
+              uses: actions/upload-artifact@v4
               with:
                 name: ${{ env.BUILD_NAME }}_DEB
                 path: ./out/make/deb/x64/*.deb
             - name: Upload Linux rpm
-              uses: actions/upload-artifact@v3
+              uses: actions/upload-artifact@v4
               with:
                 name: ${{ env.BUILD_NAME }}_RPM
                 path: ./out/make/rpm/x64/*.rpm
             - name: Upload Linux zip
-              uses: actions/upload-artifact@v3
+              uses: actions/upload-artifact@v4
               with:
                 name: ${{ env.BUILD_NAME }}_ZIP
                 path: ./out/make/zip/linux/x64/*.zip
