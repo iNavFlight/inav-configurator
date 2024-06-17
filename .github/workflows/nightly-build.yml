@@ -7,9 +7,11 @@ on:
   pull_request:
     branches:
       - mmosca-nightly-builds-fixed
+        master
 
 jobs:
     ci:
+        name: build
         uses: ./.github/workflows/ci.yml
     
     release:
