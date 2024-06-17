@@ -2,7 +2,16 @@ name: Build Configurator
 # Don't enable CI on push, just on PR. If you
 # are working on the main repo and want to trigger
 # a CI build submit a draft PR.
-on: pull_request
+on: 
+  pull_request:
+
+  workflow_call:
+    #inputs:
+    #  release_build:
+    #   description: 'Specifies if it is a build that should include commit hash in hex file names or not'
+    #   default: false
+    #   required: false
+    #   type: boolean
 
 jobs:
     build-linux:
@@ -43,17 +52,17 @@ jobs:
             - name: Build Linux
               run: npm run make
             - name: Upload Linux deb
-              uses: actions/upload-artifact@v3
+              uses: actions/upload-artifact@v4
               with:
                 name: ${{ env.BUILD_NAME }}_DEB
                 path: ./out/make/deb/x64/*.deb
             - name: Upload Linux rpm
-              uses: actions/upload-artifact@v3
+              uses: actions/upload-artifact@v4
               with:
                 name: ${{ env.BUILD_NAME }}_RPM
                 path: ./out/make/rpm/x64/*.rpm
             - name: Upload Linux zip
-              uses: actions/upload-artifact@v3
+              uses: actions/upload-artifact@v4
               with:
                 name: ${{ env.BUILD_NAME }}_ZIP
                 path: ./out/make/zip/linux/x64/*.zip
