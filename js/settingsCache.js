@@ -12,7 +12,7 @@ var settingsCache = (function() {
     const SETTINGS_KEY = 'settings';
 
     privateScope.getSetingKey = function(settingName) {
-        return FC.CONFIG.target + '_' + FC.CONFIG.flightControllerVersion + '_' + settingName;
+        return FC.CONFIG.target + '_' + FC.CONFIG.flightControllerVersion + '_' + FC.CONFIG.buildInfo + '_' + settingName;
     }
 
     publicScope.flush = function() {
