@@ -79,23 +79,16 @@ var defaultsDialog = (function () {
 
             privateScope.wizardSettings.push({
                 name: "gpsPort",
-                value: port
-            });
-
-            privateScope.wizardSettings.push({
-                name: "gpsBaud",
-                value: baud
+                value: {
+                    port: port,
+                    baud: baud
+                }
             });
 
             privateScope.wizardSettings.push({
                 name: "gpsProtocol",
                 value: protocol
             });
-
-            // privateScope.wizardSettings.push({
-            // });
-
-            // let gpsBit = FC.getFeatures().find( feature => feature.name === 'GPS' ).bit;
         }
 
         privateScope.wizard(selectedDefaultPreset, wizardStep + 1);

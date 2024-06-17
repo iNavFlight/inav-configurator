@@ -23,19 +23,19 @@ var wizardSaveFramework = (function () {
                 
                 let gpsBit = FC.getFeatures().find( feature => feature.name === 'GPS' ).bit;
 
-                if (config.value == '-1') {
+                if (config.value.port == '-1') {
                     features.unset(gpsBit);
                 } else {
                     features.set(gpsBit);
                 }
 
-                features.execute(callback);
-                break;
-            case 'gpsBaud':
-                console.log(config);
+                serialPortHelper.set(config.value.port, 'GPS', config.value.baud);
+                mspHelper.saveSerialPorts(function () {
+                    features.execute(callback);
+                });
                 break;
             case 'gpsProtocol':
-                console.log(config);
+                mspHelper.setSetting('gps_provider', config.value, callback);
                 break;
             default:
                 callback();
