@@ -7,7 +7,7 @@ var defaultsDialogData = [
         "notRecommended": false,
         "reboot": true,
         "mixerToApply": 3,
-        "wizardPages": ['receiver'],
+        "wizardPages": ['receiver', 'gps'],
         "settings": [
             {
                 key: "model_preview_type",
@@ -129,7 +129,7 @@ var defaultsDialogData = [
         "notRecommended": false,
         "reboot": true,
         "mixerToApply": 3,
-        "wizardPages": ['receiver'],
+        "wizardPages": ['receiver', 'gps'],
         "settings": [
             {
                 key: "model_preview_type",
@@ -270,7 +270,7 @@ var defaultsDialogData = [
         "notRecommended": false,
         "reboot": true,
         "mixerToApply": 3,
-        "wizardPages": ['receiver'],
+        "wizardPages": ['receiver', 'gps'],
         "settings": [
             {
                 key: "model_preview_type",
@@ -392,7 +392,7 @@ var defaultsDialogData = [
         "id": 3,
         "reboot": true,
         "mixerToApply": 14,
-        "wizardPages": ['receiver'],
+        "wizardPages": ['receiver', 'gps'],
         "settings": [
             {
                 key: "model_preview_type",
@@ -598,7 +598,7 @@ var defaultsDialogData = [
         "id": 4,
         "reboot": true,
         "mixerToApply": 8,
-        "wizardPages": ['receiver'],
+        "wizardPages": ['receiver', 'gps'],
         "settings": [
             {
                 key: "model_preview_type",
@@ -804,7 +804,7 @@ var defaultsDialogData = [
         "notRecommended": false,
         "reboot": true,
         "mixerToApply": 31,
-        "wizardPages": ['receiver'],
+        "wizardPages": ['receiver', 'gps'],
         "settings": [
             {
                 key: "model_preview_type",
