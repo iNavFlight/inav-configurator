@@ -1235,6 +1235,36 @@
     "configurationVTXLowPowerDisarmValue_2": {
         "message": "Until first arm"
     },
+    "configurationGimbal": {
+        "message": "Serial Gimbal"
+    },
+    "configurationGimbalSensitivity": { 
+        "message":"Gimbal sensitivity"
+    },
+    "configurationGimbalPanChannel": { 
+        "message":"Pan channel (yaw)"
+    },
+    "configurationGimbalTiltChannel": { 
+        "message":"Tilt channel (pitch)"
+    },
+    "configurationGimbalRollChannel": { 
+        "message":"Roll channel"
+    },
+    "configurationHeadtracker": {
+        "message": "Headtracker"
+    },
+    "configurationHeadtrackerType": {
+        "message": "Head tracker type"
+    },
+    "configurationHeadtrackerPanRatio": {
+        "message": "Head tracker pan movement ratio"
+    },
+    "configurationHeadtrackerTiltRatio": {
+        "message": "Head tracker tilt movement ratio"
+    },
+    "configurationHeadtrackerRollRatio": {
+        "message": "Head tracker roll movement ratio"
+    },
     "portsHelp": {
         "message": "<strong>Note:</strong> not all combinations are valid.  When the flight controller firmware detects this the serial port configuration will be reset."
     },
@@ -1321,6 +1351,12 @@
     },
     "portsFunction_SBUS_OUTPUT": {
         "message": "SBus Output"
+    },
+    "portsFunction_GIMBAL": {
+        "message": "Serial Gimbal"
+    },
+    "portsFunction_HEADTRACKER": {
+        "message": "Serial Headtracker"
     },
     "pidTuning_Other": {
         "message": "Other"

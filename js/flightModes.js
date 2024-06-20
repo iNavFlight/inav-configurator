@@ -280,6 +280,26 @@ var FLIGHT_MODES = [
         boxId: 55,
         boxName: "ANGLE HOLD",
         permanentId: 64
+    },
+    {
+        boxId: 56,
+        boxName: "GIMBAL LEVEL TILT",
+        permanentId: 65,
+    },
+    {
+        boxId: 57,
+        boxName: "GIMBAL LEVEL ROLL",
+        permanentId: 66
+    },
+    {
+        boxId: 58,
+        boxName: "GIMBAL CENTER",
+        permanentId: 67
+    },
+    {
+        boxId: 59,
+        boxName: "GIMBAL HEADTRACKER",
+        permanentId: 68
     }
 ];
 

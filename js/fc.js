@@ -941,6 +941,9 @@ var FC = {
             'GVAR 6',               // 36
             'GVAR 7',               // 37
             'Mixer Transition',     // 38
+	    'Head Tracker Pan',     // 39
+            'Head Tracker Tilt',    // 40
+            'Head Tracker Roll',    // 41
         ];
     },
     getServoMixInputName: function (input) {
