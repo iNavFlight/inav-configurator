@@ -147,6 +147,9 @@ SYM.AH_AIRCRAFT2 = 0x1A4;
 SYM.AH_AIRCRAFT3 = 0x1A5;
 SYM.AH_AIRCRAFT4 = 0x1A6;
 
+SYM.SYM_HUD_SIGNAL_3 = 0x163;
+SYM.SYM_HUD_CARDINAL = 0x1BA;
+
 SYM.AH_CROSSHAIRS = new Array(0x166, 0x1A4, new Array(0x190, 0x191, 0x192), new Array(0x193, 0x194, 0x195), new Array(0x196, 0x197, 0x198), new Array(0x199, 0x19A, 0x19B), new Array (0x19C, 0x19D, 0x19E), new Array (0x19F, 0x1A0, 0x1A1));
 
 var video_type = null;
@@ -1774,6 +1777,15 @@ OSD.constants = {
                     id: 99,
                     preview: FONT.symbol(SYM.DIRECTION) + '\nN',
                 },
+                {
+                    name: 'FORMATION_FLIGHT',
+                    id: 153,
+                    min_version: '8.0.0',
+                    positionable: true,
+                    preview:  function(osd_data) {
+                        return FONT.symbol(SYM.DIRECTION) + 'B' + FONT.symbol(SYM.SYM_HUD_SIGNAL_3) + FONT.symbol(SYM.SYM_HUD_CARDINAL) + "\n 150" + "\n" + FONT.symbol(SYM.AH_DECORATION_UP) + " 27" ;
+                    }
+                },
             ],
         },
         {
@@ -1912,7 +1924,7 @@ OSD.constants = {
                     min_version: '7.1.0',
                     positionable: true,
                     preview: "CE_3",
-                },
+                }
             ]
         },
         {

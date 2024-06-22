@@ -4129,6 +4129,12 @@
     "osdElement_MAP_REFERENCE_HELP": {
         "message": "Reference (direction that points up) of the current map. N for North and T for takeoff direction."
     },
+    "osdElement_FORMATION_FLIGHT": {
+        "message": "Inav radar fixed"
+    },
+    "osdElement_FORMATION_FLIGHT_HELP": {
+        "message": "The closest aircraft from Inav radar/Formation flight"
+    },
     "osdElement_WIND_SPEED_HORIZONTAL": {
         "message": "Horizontal wind speed"
     },
@@ -4551,7 +4557,7 @@
     },
     "missionTitleAdd": {
         "message": "Add"
-    }, 
+    },
     "missionTitleMoveToCenterView": {
         "message": "move to center view"
     },
@@ -4565,7 +4571,7 @@
         "message": "Edit Mission"
     },
     "MissionPlannerFwLAndingAltitudeChangeReset": {
-        "message": "Altitude below min land altitude. Change ignored" 
+        "message": "Altitude below min land altitude. Change ignored"
     },
     "missionWpType": {
         "message": "Type:"
