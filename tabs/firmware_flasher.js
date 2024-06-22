@@ -124,7 +124,8 @@ TABS.firmware_flasher.initialize = function (callback) {
             });
         });
 
-        var buildBoardOptions = function(releasesData){
+        var buildBoardOptions = function(releasesData) {
+            const start = performance.now();
             var boards_e = $('select[name="board"]').empty();
             var versions_e = $('select[name="firmware_version"]').empty();
             var showDevReleases = ($('input.show_development_releases').is(':checked'));
@@ -151,22 +152,24 @@ TABS.firmware_flasher.initialize = function (callback) {
                         unsortedTargets.push(result.target);
                     }
                 });
-                sortedTargets = unsortedTargets.sort();
             });
 
-            TABS.firmware_flasher.devReleasesData.forEach(function(release){
-                release.assets.forEach(function(asset){
-                    var result = parseDevFilename(asset.name);
+            if (showDevReleases) {
+                TABS.firmware_flasher.devReleasesData.forEach(function (release) {
+                    release.assets.forEach(function (asset) {
+                        var result = parseDevFilename(asset.name);
 
-                    if ((!showDevReleases && release.prerelease) || !result) {
-                        return;
-                    }
-                    if($.inArray(result.target, unsortedTargets) == -1) {
-                        unsortedTargets.push(result.target);
-                    }
+                        if ((!showDevReleases && release.prerelease) || !result) {
+                            return;
+                        }
+                        if ($.inArray(result.target, unsortedTargets) == -1) {
+                            unsortedTargets.push(result.target);
+                        }
+                    });
                 });
-                sortedTargets = unsortedTargets.sort();
-            });
+            }
+
+            sortedTargets = unsortedTargets.sort();
 
             sortedTargets.forEach(function(release) {
                 releases[release] = [];
@@ -213,46 +216,48 @@ TABS.firmware_flasher.initialize = function (callback) {
                 });
             });
 
-            TABS.firmware_flasher.devReleasesData.forEach(function(release){
+            if(showDevReleases) {
+                TABS.firmware_flasher.devReleasesData.forEach(function(release){
 
-                var versionFromTagExpression = /v?(.*)/;
-                var matchVersionFromTag = versionFromTagExpression.exec(release.tag_name);
-                var version = matchVersionFromTag[1];
+                    var versionFromTagExpression = /v?(.*)/;
+                    var matchVersionFromTag = versionFromTagExpression.exec(release.tag_name);
+                    var version = matchVersionFromTag[1];
 
-                release.assets.forEach(function(asset){
-                    var result = parseDevFilename(asset.name);
-                    if ((!showDevReleases && release.prerelease) || !result) {
-                        return;
-                    }
+                    release.assets.forEach(function(asset){
+                        var result = parseDevFilename(asset.name);
+                        if ((!showDevReleases && release.prerelease) || !result) {
+                            return;
+                        }
 
-                    if (result.format != 'hex') {
-                        return;
-                    }
+                        if (result.format != 'hex') {
+                            return;
+                        }
 
-                    var date = new Date(release.published_at);
-                    var formattedDate = "{0}-{1}-{2} {3}:{4}".format(
-                            date.getFullYear(),
-                            date.getMonth() + 1,
-                            date.getDate(),
-                            date.getUTCHours(),
-                            date.getMinutes()
-                    );
+                        var date = new Date(release.published_at);
+                        var formattedDate = "{0}-{1}-{2} {3}:{4}".format(
+                                date.getFullYear(),
+                                date.getMonth() + 1,
+                                date.getDate(),
+                                date.getUTCHours(),
+                                date.getMinutes()
+                        );
 
-                    var descriptor = {
-                        "releaseUrl": release.html_url,
-                        "name"      : semver.clean(release.name),
-                        "version"   : release.tag_name,
-                        "url"       : asset.browser_download_url,
-                        "file"      : asset.name,
-                        "raw_target": result.raw_target,
-                        "target"    : result.target,
-                        "date"      : formattedDate,
-                        "notes"     : release.body,
-                        "status"    : release.prerelease ? "nightly" : "stable"
-                    };
-                    releases[result.target].push(descriptor);
+                        var descriptor = {
+                            "releaseUrl": release.html_url,
+                            "name"      : semver.clean(release.name),
+                            "version"   : release.tag_name,
+                            "url"       : asset.browser_download_url,
+                            "file"      : asset.name,
+                            "raw_target": result.raw_target,
+                            "target"    : result.target,
+                            "date"      : formattedDate,
+                            "notes"     : release.body,
+                            "status"    : release.prerelease ? "nightly" : "stable"
+                        };
+                        releases[result.target].push(descriptor);
+                    });
                 });
-            });
+            }
             
             var selectTargets = [];
             Object.keys(releases)
@@ -272,10 +277,12 @@ TABS.firmware_flasher.initialize = function (callback) {
                     });
                 });
             TABS.firmware_flasher.releases = releases;
+            const end = performance.now();
+            console.log(`buildBoardOptions: ${end - start} ms`)
             return;
         };
 
-        $.get('https://api.github.com/repos/iNavFlight/inav-nightly/releases?per_page=10', function(releasesData) {
+        $.get('https://api.github.com/repos/iNavFlight/inav-nightly/releases?per_page=5', function(releasesData) {
             TABS.firmware_flasher.devReleasesData = releasesData;
         }).fail(function (data){
             TABS.firmware_flasher.devReleasesData = {};
