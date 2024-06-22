@@ -62,11 +62,8 @@ TABS.firmware_flasher.initialize = function (callback) {
             var match = targetFromFilenameExpression.exec(filename);
 
             if (!match) {
-                GUI.log("no match: dev filename: " + filename);
                 return null;
             }
-
-            GUI.log("non dev: match[2]: " + match[2] + " match[7]: " + match[7]);
 
             return {
                 raw_target: match[2],
@@ -136,10 +133,6 @@ TABS.firmware_flasher.initialize = function (callback) {
             var releases = {};
             var sortedTargets = [];
             var unsortedTargets = [];
-
-            var processRelease = function(release) {
-
-            }
 
             TABS.firmware_flasher.releasesData.forEach(function(release){
                 release.assets.forEach(function(asset){
@@ -282,7 +275,7 @@ TABS.firmware_flasher.initialize = function (callback) {
             return;
         };
 
-        $.get('https://api.github.com/repos/iNavFlight/inav-nightly/releases?per_page=5', function(releasesData) {
+        $.get('https://api.github.com/repos/iNavFlight/inav-nightly/releases?per_page=10', function(releasesData) {
             TABS.firmware_flasher.devReleasesData = releasesData;
         }).fail(function (data){
             TABS.firmware_flasher.devReleasesData = {};
