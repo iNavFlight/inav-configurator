@@ -47,13 +47,11 @@ const wizardUiBindings = (function () {
 
             $port.on('change', function () {
                 let port = $(this).val();
-
-                let portConfig = serialPortHelper.getPortByIdentifier(currentPort);
-                $baud.val(portConfig.sensors_baudrate);
+                
+                $baud.val(serialPortHelper.getRuleByName('GPS').defaultBaud);
                 if (port == -1) {
                     $('#wizard-gps-baud-container').hide();
                     $('#wizard-gps-protocol-container').hide();
-                    $baud.val(serialPortHelper.getRuleByName('GPS').defaultBaud);
                 } else {
                     $('#wizard-gps-baud-container').show();
                     $('#wizard-gps-protocol-container').show();
