@@ -5932,5 +5932,8 @@
     },
     "gpsAssistnowUpdate": {
         "message": "AssistNow messages sent."
+    },
+    "gpsAssistnowLoadDataError": {
+        "message": "Error loading AssistNow data."
     }
 }
