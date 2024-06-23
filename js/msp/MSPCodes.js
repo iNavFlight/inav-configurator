@@ -225,6 +225,8 @@ var MSPCodes = {
     MSP2_INAV_FW_APPROACH:              0x204A,
     MSP2_INAV_SET_FW_APPROACH:          0x204B,
 
+    MSP2_INAV_GPS_UBLOX_COMMAND:        0x2050,
+
     MSP2_INAV_RATE_DYNAMICS:            0x2060,
     MSP2_INAV_SET_RATE_DYNAMICS:        0x2061,
 
