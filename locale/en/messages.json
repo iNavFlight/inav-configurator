@@ -5925,12 +5925,12 @@
         "message": "Load AssistNow Online"
     },
     "gpsAssistnowStart": {
-        "message": "Assistnow data transfer starting..."
+        "message": "AssistNow data transfer starting..."
     },
     "gpsAssistnowDone": {
-        "message": "Assistnow data transfer complete."
+        "message": "AssistNow data transfer complete."
     },
     "gpsAssistnowUpdate": {
-        "message": "Assistnow messages sent."
+        "message": "AssistNow messages sent."
     }
 }
