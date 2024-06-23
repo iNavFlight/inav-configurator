@@ -941,9 +941,17 @@ var FC = {
             'GVAR 6',               // 36
             'GVAR 7',               // 37
             'Mixer Transition',     // 38
-	    'Head Tracker Pan',     // 39
+            'Head Tracker Pan',     // 39
             'Head Tracker Tilt',    // 40
             'Head Tracker Roll',    // 41
+            'RC Channel 17',        // 42
+            'RC Channel 18',        // 43
+            'RC Channel 19',        // 44
+            'RC Channel 20',        // 45
+            'RC Channel 21',        // 46
+            'RC Channel 22',        // 47
+            'RC Channel 23',        // 48
+            'RC Channel 24',        // 49
         ];
     },
     getServoMixInputName: function (input) {
