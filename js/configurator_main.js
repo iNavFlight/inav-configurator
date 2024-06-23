@@ -78,6 +78,7 @@ $(function() {
             $('a', activeTab).trigger('click');
         }
 
+        globalSettings.store = store;
         globalSettings.unitType = store.get('unit_type', UnitType.none);
         globalSettings.mapProviderType = store.get('map_provider_type', 'osm'); 
         globalSettings.mapApiKey = store.get('map_api_key', '');
@@ -85,6 +86,8 @@ $(function() {
         globalSettings.proxyURL = store.get('proxyurl', 'http://192.168.1.222/mapproxy/service?');
         globalSettings.proxyLayer = store.get('proxylayer', 'your_proxy_layer_name');
         globalSettings.showProfileParameters = store.get('show_profile_parameters', 1);
+        globalSettings.assistnowOfflineData = store.get('assistnow_offline_data', []);
+        globalSettings.assistnowOfflineDate = store.get('assistnow_offline_date', 0);
         updateProfilesHighlightColours();
 
         var cliAutocomplete = store.get('cli_autocomplete', true);

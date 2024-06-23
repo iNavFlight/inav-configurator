@@ -7,6 +7,7 @@ const jBox = require('./../libraries/jBox/jBox.min');
 const i18n = require('./../localization');
 const { GUI } = require('./../gui');
 const { globalSettings } = require('../globalSettings');
+const Store = require('electron-store');
 
 
 var ublox = (function () {
@@ -181,9 +182,16 @@ var ublox = (function () {
         console.log(url);
 
         function processOfflineData(data) {
-            assistnowOffline = splitUbloxData(data);
-            console.log("Assitnow offline commands:" + assistnowOffline.length);
-            callback(assistnowOffline);
+            if(globalSettings.assistnowOfflineData == null || ((Date.now() / 1000)-globalSettings.assistnowOfflineDate) > (60*60*24*3))  {
+                console.log("AssistnowOfflineData older than 3 days, refreshing.");
+                globalSettings.assistnowOfflineData = splitUbloxData(data);
+                globalSettings.assistnowOfflineDate = Math.floor(Date.now() / 1000);
+                globalSettings.saveAssistnowData();
+            } else {
+                console.log("AssitnowOfflineData newer than 3 days. Re-using.");
+            }
+            console.log("Assitnow offline commands:" + globalSettings.assistnowOfflineData.length);
+            callback(globalSettings.assistnowOfflineData);
         }
 
         getBinaryData(url, processOfflineData, loadError);
