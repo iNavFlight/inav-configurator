@@ -63,8 +63,8 @@ var ublox = (function () {
     }
 
     function splitUbloxData(ubxBytesBuffer) {
-        console.log("type of data: " +typeof(ubxBytesBuffer));
-        console.log("splitUbloxData: " + ubxBytesBuffer.byteLength);
+        //console.log("type of data: " +typeof(ubxBytesBuffer));
+        //console.log("splitUbloxData: " + ubxBytesBuffer.byteLength);
         let ubxBytes = new DataView(ubxBytesBuffer);
 
         var ubxCommands = []
@@ -176,10 +176,9 @@ var ublox = (function () {
     // https://developer.thingstream.io/guides/location-services/assistnow-user-guide
     // Currently only supported for M8+ units
     self.loadAssistnowOffline = function(callback) {
-        // offline_url = "https://offline-live1.services.u-blox.com/GetOfflineData.ashx?token=" + offline_token + ";gnss=" + offline_gnss + ";format=" + fmt + ";period=" + period + ";resolution=1;alm=" + alm + ";"
 
         let url = `https://${ offlineServers[0] }/GetOfflineData.ashx?token=${globalSettings.assistnowApiKey};gnss=${offline_gnss};format=${fmt};period=${period};resolution=1;alm=${offline_alm};`
-        console.log(url);
+        //console.log(url);
 
         function processOfflineData(data) {
             if(globalSettings.assistnowOfflineData == null || ((Date.now() / 1000)-globalSettings.assistnowOfflineDate) > (60*60*24*3))  {
@@ -190,7 +189,7 @@ var ublox = (function () {
             } else {
                 console.log("AssitnowOfflineData newer than 3 days. Re-using.");
             }
-            console.log("Assitnow offline commands:" + globalSettings.assistnowOfflineData.length);
+            //console.log("Assitnow offline commands:" + globalSettings.assistnowOfflineData.length);
             callback(globalSettings.assistnowOfflineData);
         }
 
@@ -205,7 +204,7 @@ var ublox = (function () {
         function processOnlineData(data) {
             assistnowOnline = splitUbloxData(data);
 
-            console.log("Assitnow online commands:" + assistnowOnline.length);
+            //console.log("Assitnow online commands:" + assistnowOnline.length);
             callback(assistnowOnline);
         }
 
@@ -220,11 +219,11 @@ var ublox = (function () {
                 const payloadOffset = 6;
                 if (((ubxMessage[payloadOffset + 4] + 2000) == cy) && (ubxMessage[payloadOffset + 5] == cm) && (ubxMessage[payloadOffset + 6] == cd))
                 {
-                    console.log("UBX-MGA_ANO date matches");
+                    //console.log("UBX-MGA_ANO date matches");
                     return true;
                 }
             } else {
-                console.log("UBX-CMD: class: 0x" + ubxMessage[2].toString(16) + " id: 0x" + ubxMessage[3].toString(16));
+                //console.log("UBX-CMD: class: 0x" + ubxMessage[2].toString(16) + " id: 0x" + ubxMessage[3].toString(16));
                 return true;
             }
         
