@@ -111,7 +111,7 @@ Example (note the double -- ):
 
 ### Running with debug | Inspector
 
-To be able to open Inspector, set envorinment variable `NODE_ENV` to `develpoment` or set the flag directly when run `npm start`:
+To be able to open Inspector, set environment variable `NODE_ENV` to `development` or set the flag directly when run `npm start`:
 
 ```NODE_ENV=development npm start``` or ```$env:NODE_ENV="development" | npm start``` for Windows PowerShell
 
