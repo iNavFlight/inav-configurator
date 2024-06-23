@@ -1588,11 +1588,14 @@ var mspHelper = (function () {
                     FC.OSD_CUSTOM_ELEMENTS .items.push(customElement)
                 }
                 break;
+            case MSPCodes.MSP2_INAV_GPS_UBLOX_COMMAND:
+                // Just and ACK from the fc.
+                break;
 
             default:
-                console.log('Unknown code detected: ' + dataHandler.code);
+                console.log('Unknown code detected: 0x' + dataHandler.code.toString(16));
         } else {
-            console.log('FC reports unsupported message error: ' + dataHandler.code);
+            console.log('FC reports unsupported message error: 0x' + dataHandler.code.toString(16));
         }
 
         // trigger callbacks, cleanup/remove callback after trigger

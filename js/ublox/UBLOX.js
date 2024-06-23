@@ -49,7 +49,7 @@ var ublox = (function () {
     var currentCommand;
 
     function resetUbloxState() {
-        console.log("Reset ublox state");
+        //console.log("Reset ublox state");
         hasFirstHeader = false;
         hasSecondHeader = false;
         ubxClass = false;
@@ -61,19 +61,20 @@ var ublox = (function () {
         currentCommand = [];
     }
 
-    function splitUbloxData(ubxBytes) {
-        console.log("type of data: " +typeof(ubxBytes));
-        console.log("splitUbloxData: " + ubxBytes.length);
+    function splitUbloxData(ubxBytesBuffer) {
+        console.log("type of data: " +typeof(ubxBytesBuffer));
+        console.log("splitUbloxData: " + ubxBytesBuffer.byteLength);
+        let ubxBytes = new DataView(ubxBytesBuffer);
 
         var ubxCommands = []
         resetUbloxState()
 
-        for(var i = 0; i < ubxBytes.length;++i) {
-            let c = ubxBytes.charCodeAt(i);
-            //let c = ubxBytes[i];
+        for(var i = 0; i < ubxBytes.byteLength;++i) {
+            let c = ubxBytes.getUint8(i);
+            //console.log("byte: 0x" + c.toString(16));
             if (!hasFirstHeader) {
                 if (c == 0xb5) {
-                    console.log("First header");
+                    //console.log("First header");
                     hasFirstHeader = true;
                     currentCommand.push(c);
                     continue;
@@ -86,7 +87,7 @@ var ublox = (function () {
             }
             if (!hasSecondHeader) {
                 if (c == 0x62) {
-                    console.log("Second header");
+                    //console.log("Second header");
                     hasSecondHeader = true;
                     currentCommand.push(c);
                     continue;
@@ -99,18 +100,18 @@ var ublox = (function () {
             }
             if (!ubxClass) {
                 ubxClass = true;
-                console.log("ubxClass: 0x"+ (c).toString(16));
+                //console.log("ubxClass: 0x"+ (c).toString(16));
                 currentCommand.push(c)
                 continue;
             }
             if (!ubxId) {
                 ubxId = true;
-                console.log("ubxId: 0x"+ (c).toString(16));
+                //console.log("ubxId: 0x"+ (c).toString(16));
                 currentCommand.push(c);
                 continue;
             }
             if (!lenLow) {
-                console.log("Len low");
+                //console.log("Len low");
                 lenLow = true;
                 //(int) c
                 payloadLen = c;
@@ -118,17 +119,17 @@ var ublox = (function () {
                 continue;
             }
             if (!lenHigh) {
-                console.log("Len high");
+                //console.log("Len high");
                 lenHigh = true;
                 // (int)c
                 payloadLen = (c << 8) | payloadLen;
-                console.log("Payload len " + payloadLen);
+                //console.log("Payload len " + payloadLen);
                 payloadLen += 2; // add crc bytes;
                 currentCommand.push(c);
                 continue
             }
             if (skipped < payloadLen - 1) {
-                console.log("payload + crc");
+                //console.log("payload + crc");
                 skipped = skipped + 1;
                 currentCommand.push(c);
                 continue;
@@ -137,7 +138,7 @@ var ublox = (function () {
                 skipped = skipped + 1;
                 currentCommand.push(c);
                 ubxCommands.push(currentCommand);
-                console.log("Adding command");
+                //console.log("Adding command");
                 resetUbloxState();
                 continue;
             }
@@ -145,18 +146,30 @@ var ublox = (function () {
         return ubxCommands
     }
 
-    function processOnlineData(data) {
-        assistnowOnline = splitUbloxData(data);
+    function getBinaryData(url, successCallback, failCallback) {
+        const req = new XMLHttpRequest();
+        req.open("GET", url, true);
+        req.responseType = "arraybuffer";
 
-        console.log("Assitnow online commands:" + assistnowOnline.length);
+        if (successCallback != null) {
+            req.onload = (event) => {
+                successCallback(req.response);
+            };
+        }
+
+        if (failCallback != null) {
+            req.onerror = (event) => {
+                failCallback(event);
+            }
+        }
+          
+        req.send(null);
     }
 
-    function processOfflineData(data) {
-        assistnowOffline = splitUbloxData(data);
-        console.log("Assitnow offline commands:" + assistnowOffline.length);
+
+    function loadError(event) {
+        GUI.alert("Error loading AssistNow data");
     }
-
-
 
     // For more info on assistnow, check:
     // https://developer.thingstream.io/guides/location-services/assistnow-user-guide
@@ -167,22 +180,29 @@ var ublox = (function () {
         let url = `https://${ offlineServers[0] }/GetOfflineData.ashx?token=${globalSettings.assistnowApiKey};gnss=${offline_gnss};format=${fmt};period=${period};resolution=1;alm=${offline_alm};`
         console.log(url);
 
-        $.get(url, processOfflineData).fail(function() {GUI.alert("Error loading Offline data")});
-
-        if(callback != null) {
-            callback("");
+        function processOfflineData(data) {
+            assistnowOffline = splitUbloxData(data);
+            console.log("Assitnow offline commands:" + assistnowOffline.length);
+            callback(assistnowOffline);
         }
+
+        getBinaryData(url, processOfflineData, loadError);
+        //$.get(url, processOfflineData).fail(function() {GUI.alert("Error loading Offline data")});
     };
 
     self.loadAssistnowOnline = function(callback) {
         //url = "https://online-live1.services.u-blox.com/GetOnlineData.ashx?token=" + online_token + ";gnss=" + gnss + ";datatype=eph,alm,aux,pos;format=" + fmt + ";"
         let url = `https://${ onlineServers[0] }/GetOnlineData.ashx?token=${globalSettings.assistnowApiKey};gnss=${ gnss };datatype=eph,alm,aux,pos;format=${ fmt }`;
 
-        $.get(url, processOnlineData).fail(function() {GUI.alert("Error loading Offline data")});
+        function processOnlineData(data) {
+            assistnowOnline = splitUbloxData(data);
 
-        if(callback != null) {
-            callback("");
+            console.log("Assitnow online commands:" + assistnowOnline.length);
+            callback(assistnowOnline);
         }
+
+        //$.get(url, processOnlineData).fail(function() {GUI.alert("Error loading Offline data")});
+        getBinaryData(url, processOnlineData, loadError);
     }
 
     return self;

@@ -5923,5 +5923,14 @@
     },
     "gpsLoadAssistnowOnlineButton": {
         "message": "Load AssistNow Online"
+    },
+    "gpsAssistnowStart": {
+        "message": "Assistnow data transfer starting..."
+    },
+    "gpsAssistnowDone": {
+        "message": "Assistnow data transfer complete."
+    },
+    "gpsAssistnowUpdate": {
+        "message": "Assistnow messages sent."
     }
 }

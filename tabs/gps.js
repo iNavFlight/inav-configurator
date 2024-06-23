@@ -421,8 +421,33 @@ TABS.gps.initialize = function (callback) {
 
         function processUbloxData(data) {
             if(data != null) {
-                // foreach data
-                //mspHelper.sendUbloxCommand(d);
+                //console.log("processing data type: " + typeof(data));
+                let totalSent = 0;
+                let total = data.length;
+
+                var ubloxChainer = MSPChainerClass();
+                var chain = [];
+
+                GUI.log(i18n.getMessage('gpsAssistnowStart'));
+                data.forEach((item) => {
+                    chain.push(function (callback) {
+                        //console.log("UBX command: " + item.length);
+                        mspHelper.sendUbloxCommand(item, callback);
+                        totalSent++;
+                        if((totalSent % 100) == 0) {
+                            GUI.log(totalSent + '/' + total + ' ' + i18n.getMessage('gpsAssistnowUpdate'));
+                        }
+                    });
+                });
+                ubloxChainer.setChain(chain);
+                ubloxChainer.setExitPoint(function () {
+                    if ((totalSent % 100) != 0) {
+                        GUI.log(totalSent + '/' + total + ' ' + i18n.getMessage('gpsAssistnowUpdate'));
+                    }
+                    GUI.log(i18n.getMessage('gpsAssistnowDone'));
+                });
+
+                ubloxChainer.execute();
             }
         }
 
