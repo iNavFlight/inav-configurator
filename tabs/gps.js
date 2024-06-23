@@ -427,15 +427,25 @@ TABS.gps.initialize = function (callback) {
 
                 var ubloxChainer = MSPChainerClass();
                 var chain = [];
+                let d = new Date();
 
                 GUI.log(i18n.getMessage('gpsAssistnowStart'));
                 data.forEach((item) => {
                     chain.push(function (callback) {
                         //console.log("UBX command: " + item.length);
-                        mspHelper.sendUbloxCommand(item, callback);
+                        let callCallback = false;
+                        if (ublox.isAssistnowDataRelevant(item, d.getUTCFullYear(), d.getUTCMonth()+1, d.getUTCDate()+1)) {
+                            mspHelper.sendUbloxCommand(item, callback);
+                        } else {
+                            // Ignore msp command, but keep counter going.
+                            callCallback = true;
+                        }
                         totalSent++;
                         if((totalSent % 100) == 0) {
                             GUI.log(totalSent + '/' + total + ' ' + i18n.getMessage('gpsAssistnowUpdate'));
+                        }
+                        if(callCallback) {
+                            callback();
                         }
                     });
                 });

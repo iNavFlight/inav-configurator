@@ -205,6 +205,25 @@ var ublox = (function () {
         getBinaryData(url, processOnlineData, loadError);
     }
 
+    self.isAssistnowDataRelevant = function(ubxMessage, cy, cm, cd) {
+        if ((ubxMessage[2] == 0x13 /*UBX_CLASS_MGA*/) && (ubxMessage[3] == 0x20 /*UBX_MGA_ANO*/))
+            {
+                // UBX-MGA-ANO
+                const payloadOffset = 6;
+                if (((ubxMessage[payloadOffset + 4] + 2000) == cy) && (ubxMessage[payloadOffset + 5] == cm) && (ubxMessage[payloadOffset + 6] == cd))
+                {
+                    console.log("UBX-MGA_ANO date matches");
+                    return true;
+                }
+            } else {
+                console.log("UBX-CMD: class: 0x" + ubxMessage[2].toString(16) + " id: 0x" + ubxMessage[3].toString(16));
+                return true;
+            }
+        
+            return false;
+    }
+
+
     return self;
 })();
 
