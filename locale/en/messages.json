@@ -5917,5 +5917,11 @@
     },
     "gpsOptionsAssistnowToken": {
         "message": "AssitNow Token"
+    },
+    "gpsLoadAssistnowOfflineButton": {
+        "message": "Load AssistNow Offline"
+    },
+    "gpsLoadAssistnowOnlineButton": {
+        "message": "Load AssistNow Online"
     }
 }

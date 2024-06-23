@@ -18,6 +18,7 @@ const features = require('./../js/feature_framework');
 const { globalSettings } = require('./../js/globalSettings');
 const jBox = require('./../js/libraries/jBox/jBox.min');
 const SerialBackend = require('../js/serial_backend');
+const ublox = require('../js/ublox/UBLOX');
 
 
 TABS.gps = {};
@@ -416,6 +417,29 @@ TABS.gps.initialize = function (callback) {
             features.execute(function () {
                 saveChainer.execute();
             });
+        });
+
+        function processUbloxData(data) {
+            if(data != null) {
+                // foreach data
+                //mspHelper.sendUbloxCommand(d);
+            }
+        }
+
+        $('a.loadAssistnowOnline').on('click', function () {
+            if(globalSettings.assistnowApiKey != null && globalSettings.assistnowApiKey != '') {
+                ublox.loadAssistnowOnline(processUbloxData);
+           } else {
+                GUI.alert("Assistnow Token not set!");
+            }
+        });
+
+        $('a.loadAssistnowOffline').on('click', function () {
+            if(globalSettings.assistnowApiKey != null && globalSettings.assistnowApiKey != '') {
+                ublox.loadAssistnowOffline(processUbloxData);
+            } else {
+                GUI.alert("Assistnow Token not set!");
+            }
         });
 
         GUI.content_ready(callback);
