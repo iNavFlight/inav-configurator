@@ -89,6 +89,7 @@ sources.js = [
     './js/msp/MSPCodes.js',
     './js/msp/MSPHelper.js',
     './js/msp/MSPchainer.js',
+	'./js/ublox/UBLOX.js',
     './js/port_handler.js',
     './js/connection/connection.js',
     './js/connection/connectionBle.js',

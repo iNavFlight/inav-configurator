@@ -21,6 +21,7 @@ var globalSettings = {
     // tree target for documents
     docsTreeLocation: 'master',
     cliAutocomplete: true,
+    assistnowApiKey: null,
 };
 
 module.exports = { globalSettings, UnitType };

@@ -3383,6 +3383,10 @@ var mspHelper = (function () {
         MSP.send_message(MSPCodes.MSP2_SET_CF_SERIAL_CONFIG, mspHelper.crunch(MSPCodes.MSP2_SET_CF_SERIAL_CONFIG), false, callback);
     };
 
+    self.sendUbloxCommand = function (ubloxData, callback) {
+        MSP.send_message(MSPCodes.MSP2_INAV_GPS_UBLOX_COMMAND, ubloxData, false, callback);
+    };
+
     return self;
 })();
 
