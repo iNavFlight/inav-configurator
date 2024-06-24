@@ -5911,5 +5911,29 @@
     },
     "maintenanceFlushSettingsCache": {
         "message": "Flush settings cache"
+    },
+    "gpsOptions": {
+        "message": "GPS Options"
+    },
+    "gpsOptionsAssistnowToken": {
+        "message": "AssitNow Token"
+    },
+    "gpsLoadAssistnowOfflineButton": {
+        "message": "Load AssistNow Offline"
+    },
+    "gpsLoadAssistnowOnlineButton": {
+        "message": "Load AssistNow Online"
+    },
+    "gpsAssistnowStart": {
+        "message": "AssistNow data transfer starting..."
+    },
+    "gpsAssistnowDone": {
+        "message": "AssistNow data transfer complete."
+    },
+    "gpsAssistnowUpdate": {
+        "message": "AssistNow messages sent."
+    },
+    "gpsAssistnowLoadDataError": {
+        "message": "Error loading AssistNow data."
     }
 }
