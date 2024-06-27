@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, Menu, MenuItem } = require('electron');
+const { app, BrowserWindow, ipcMain, Menu, MenuItem, shell } = require('electron');
 const windowStateKeeper = require('electron-window-state');
 const path = require('path');
 const Store = require('electron-store');
@@ -148,6 +148,12 @@ function createWindow() {
   });
 
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
+    // Open links starts with https:// in default browser
+    if (url.startsWith('https://')) {
+      shell.openExternal(url);
+      return { action: 'deny' };
+    }
+
     return {
       action: 'allow',
       overrideBrowserWindowOptions: {
