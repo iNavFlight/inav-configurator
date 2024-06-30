@@ -82,7 +82,7 @@ sudo mv inav-configurator.desktop /usr/share/applications/
 For local development, the **node.js** build system is used.
 
 1. Install node.js
-1. From the project folder run `npm install`
+1. From the project folder run `yarn install` and then `npm install`
 1. To build the  and start the configurator:
     - Run `npm start`.
 
