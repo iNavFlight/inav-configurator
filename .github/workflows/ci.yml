@@ -43,7 +43,7 @@ jobs:
             - name: Install dependencies
               run: sudo apt-get update && sudo apt-get -y install dpkg fakeroot rpm build-essential libudev-dev
             - name: Install deps
-              uses: nick-fields/retry@v2
+              uses: nick-fields/retry@v3
               with:
                 max_attempts: 3
                 retry_on: error
@@ -97,7 +97,7 @@ jobs:
         - name: Install Setuptools
           run: python3 -m pip install --break-system-packages setuptools
         - name: Install deps
-          uses: nick-fields/retry@v2
+          uses: nick-fields/retry@v3
           with:
             max_attempts: 3
             retry_on: error
@@ -145,7 +145,7 @@ jobs:
         - name: Install Setuptools
           run: python3 -m pip install --break-system-packages setuptools
         - name: Install deps
-          uses: nick-fields/retry@v2
+          uses: nick-fields/retry@v3
           with:
             max_attempts: 3
             retry_on: error
@@ -198,7 +198,7 @@ jobs:
                 url: "https://github.com/wixtoolset/wix3/releases/download/wix3141rtm/wix314-binaries.zip"
                 pathInArchive: "/"
             - name: Install deps
-              uses: nick-fields/retry@v2
+              uses: nick-fields/retry@v3
               with:
                 max_attempts: 3
                 retry_on: error
@@ -251,7 +251,7 @@ jobs:
                 url: "https://github.com/wixtoolset/wix3/releases/download/wix3141rtm/wix314-binaries.zip"
                 pathInArchive: "/"
             - name: Install deps
-              uses: nick-fields/retry@v2
+              uses: nick-fields/retry@v3
               with:
                 max_attempts: 3
                 retry_on: error
