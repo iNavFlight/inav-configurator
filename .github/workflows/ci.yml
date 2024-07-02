@@ -87,7 +87,6 @@ jobs:
             echo "BUILD_SUFFIX=${BUILD_SUFFIX}" >> $GITHUB_ENV
             echo "BUILD_NAMEx64=inav-configurator_darwin_x64_${VERSION}_${BUILD_SUFFIX}" >> $GITHUB_ENV
             echo "BUILD_NAMEarm64=inav-configurator_darwin_arm64_${VERSION}_${BUILD_SUFFIX}" >> $GITHUB_ENV
-            echo "BUILD_NAME=inav-configurator_darwin_${VERSION}_${BUILD_SUFFIX}" >> $GITHUB_ENV
         - uses: actions/setup-node@v4
           with:
             node-version: 20
@@ -103,18 +102,30 @@ jobs:
             retry_on: error
             command: npm install
             timeout_minutes: 10
-        - name: Build MacOS
-          run: npm run make -- --arch="universal"
-        - name: Upload MacOS zip
+        - name: Build MacOS x64
+          run: npm run make -- --arch="x64"
+        - name: Build MacOS arm64
+          run: npm run make -- --arch="arm64"
+        - name: Upload MacOS x64 zip
           uses: actions/upload-artifact@v4
           with:
-            name: ${{env.BUILD_NAME}}_ZIP
-            path: ./out/make/zip/darwin/universal/*.zip
-        - name: Upload MacOS4 dmg
+            name: ${{env.BUILD_NAMEx64}}_ZIP
+            path: ./out/make/zip/darwin/x64/*.zip
+        - name: Upload MacOS x64 dmg
           uses: actions/upload-artifact@v4
           with:
-            name: ${{env.BUILD_NAME}}_DMG
+            name: ${{env.BUILD_NAMEx64}}_DMG
             path: ./out/make/*x64*.dmg
+        - name: Upload MacOS arm64 zip
+          uses: actions/upload-artifact@v4
+          with:
+            name: ${{env.BUILD_NAMEarm64}}_ZIP
+            path: ./out/make/zip/darwin/arm64/*.zip
+        - name: Upload MacOS arm64 dmg
+          uses: actions/upload-artifact@v4
+          with:
+            name: ${{env.BUILD_NAMEarm64}}_DMG
+            path: ./out/make/*arm64*.dmg
     build-windows:
         runs-on: windows-latest
         steps:
