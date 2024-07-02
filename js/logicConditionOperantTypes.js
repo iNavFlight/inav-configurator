@@ -63,6 +63,7 @@ const OPERAND_TYPES = {
             40: "Yaw [deg]",
             41: "FW Land State",
             42: "Active Battery Profile",
+            43: "Flown Loiter Radius [m]",
         }
     },
     3: {
