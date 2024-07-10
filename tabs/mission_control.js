@@ -449,7 +449,7 @@ TABS.mission_control.initialize = function (callback) {
             saveSettings();
             settings = missionPlannerSettings;
         }
-        refreshSettings();        
+        refreshSettings();
     }
 
     function saveSettings() {
@@ -1709,7 +1709,7 @@ TABS.mission_control.initialize = function (callback) {
          // * @param {Object=} opt_options Control options.
          // */
         app.PlannerMultiMissionControl = function (opt_options) {
-            
+
             var options = opt_options || {};
             var button = document.createElement('button');
 
@@ -2214,7 +2214,7 @@ TABS.mission_control.initialize = function (callback) {
         // Update Alt display in meters on ALT field keypress up
         //////////////////////////////////////////////////////////////////////////
         $('#pointAlt').on('keyup', () => {
-            let altitudeMeters = app.ConvertCentimetersToMeters($(this).val());
+            let altitudeMeters = app.ConvertCentimetersToMeters($('#pointAlt').val());
             $('#altitudeInMeters').text(` ${altitudeMeters}m`);
         });
 
@@ -2397,7 +2397,7 @@ TABS.mission_control.initialize = function (callback) {
         $('#pointP3Alt').on('change', function (event) {
             if (selectedMarker) {
                 var P3Value = selectedMarker.getP3();
-                
+
                 if (disableMarkerEdit) {
                     changeSwitchery($('#pointP3Alt'), TABS.mission_control.isBitSet(P3Value, MWNP.P3.ALT_TYPE));
                 }
@@ -2491,7 +2491,7 @@ TABS.mission_control.initialize = function (callback) {
 
                 var P3Value = TABS.mission_control.setBit(selectedMarker.getP3(), MWNP.P3.USER_ACTION_1, $('#pointP3UserAction1').prop("checked"));
                 selectedMarker.setP3(P3Value);
-    
+
                 mission.updateWaypoint(selectedMarker);
                 mission.update(singleMissionActive());
                 redrawLayer();
@@ -2518,7 +2518,7 @@ TABS.mission_control.initialize = function (callback) {
                 if (disableMarkerEdit) {
                     changeSwitchery($('#pointP3UserAction3'), TABS.mission_control.isBitSet(selectedMarker.getP3(), MWNP.P3.USER_ACTION_3));
                 }
-    
+
                 var P3Value = TABS.mission_control.setBit(selectedMarker.getP3(), MWNP.P3.USER_ACTION_3, $('#pointP3UserAction3').prop("checked"));
                 selectedMarker.setP3(P3Value);
 
@@ -2533,7 +2533,7 @@ TABS.mission_control.initialize = function (callback) {
                 if (disableMarkerEdit) {
                     changeSwitchery($('#pointP3UserAction4'), TABS.mission_control.isBitSet(selectedMarker.getP3(), MWNP.P3.USER_ACTION_4));
                 }
-    
+
                 var P3Value = TABS.mission_control.setBit(selectedMarker.getP3(), MWNP.P3.USER_ACTION_4, $('#pointP3UserAction4').prop("checked"));
                 selectedMarker.setP3(P3Value);
 

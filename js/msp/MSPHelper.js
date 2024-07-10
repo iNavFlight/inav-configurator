@@ -1588,11 +1588,14 @@ var mspHelper = (function () {
                     FC.OSD_CUSTOM_ELEMENTS .items.push(customElement)
                 }
                 break;
+            case MSPCodes.MSP2_INAV_GPS_UBLOX_COMMAND:
+                // Just and ACK from the fc.
+                break;
 
             default:
-                console.log('Unknown code detected: ' + dataHandler.code);
+                console.log('Unknown code detected: 0x' + dataHandler.code.toString(16));
         } else {
-            console.log('FC reports unsupported message error: ' + dataHandler.code);
+            console.log('FC reports unsupported message error: 0x' + dataHandler.code.toString(16));
         }
 
         // trigger callbacks, cleanup/remove callback after trigger
@@ -3381,6 +3384,10 @@ var mspHelper = (function () {
 
     self.saveSerialPorts = function (callback) {
         MSP.send_message(MSPCodes.MSP2_SET_CF_SERIAL_CONFIG, mspHelper.crunch(MSPCodes.MSP2_SET_CF_SERIAL_CONFIG), false, callback);
+    };
+
+    self.sendUbloxCommand = function (ubloxData, callback) {
+        MSP.send_message(MSPCodes.MSP2_INAV_GPS_UBLOX_COMMAND, ubloxData, false, callback);
     };
 
     return self;

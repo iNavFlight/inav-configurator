@@ -55,8 +55,7 @@ const PLATFORM = {
     HELICOPTER: 2,
     TRICOPTER:  3,
     ROVER:      4,
-    BOAT:       5,
-    OTHER:      6
+    BOAT:       5
 }
 
 // generate mixer
@@ -647,44 +646,6 @@ const mixerList = [
             new ServoMixRule(3, INPUT.STABILIZED_YAW,  100, 0),
         ]
     },
-    // ** Misc **
-    {
-        id: 33,
-        name: 'Other',
-        model: 'custom',
-        image: 'custom',
-        enabled: true,
-        legacy: false,
-        platform: PLATFORM.OTHER,
-        motorMixer: [
-            new MotorMixRule(1.0, 0.0, 0.0, 0.0),
-        ],
-        servoMixer: [
-            new ServoMixRule(3, INPUT.STABILIZED_YAW,  100, 0),
-        ]
-    },
-    {
-        id: 5,
-        name: 'Gimbal',
-        model: 'custom',
-        image: 'custom',
-        enabled: false,
-        legacy: true,
-        platform: PLATFORM.OTHER,
-        motorMixer: [],
-        servoMixer: []
-    }, // 5
-    {
-        id: 19,
-        name: 'PPM to SERVO',
-        model: 'custom',
-        image: 'custom',
-        enabled: false,
-        legacy: true,
-        platform: PLATFORM.OTHER,
-        motorMixer: [],
-        servoMixer: []
-    }, // 19               
 ];
 
 const platformList = [
@@ -721,12 +682,6 @@ const platformList = [
     {
         id: 5,
         name: "Boat",
-        enabled: true,
-        flapsPossible: false
-    },
-    {
-        id: 6,
-        name: "Other",
         enabled: true,
         flapsPossible: false
     }

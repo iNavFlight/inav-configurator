@@ -78,12 +78,16 @@ $(function() {
             $('a', activeTab).trigger('click');
         }
 
+        globalSettings.store = store;
         globalSettings.unitType = store.get('unit_type', UnitType.none);
         globalSettings.mapProviderType = store.get('map_provider_type', 'osm'); 
         globalSettings.mapApiKey = store.get('map_api_key', '');
+        globalSettings.assistnowApiKey = store.get('assistnow_api_key', '');
         globalSettings.proxyURL = store.get('proxyurl', 'http://192.168.1.222/mapproxy/service?');
         globalSettings.proxyLayer = store.get('proxylayer', 'your_proxy_layer_name');
         globalSettings.showProfileParameters = store.get('show_profile_parameters', 1);
+        globalSettings.assistnowOfflineData = store.get('assistnow_offline_data', []);
+        globalSettings.assistnowOfflineDate = store.get('assistnow_offline_date', 0);
         updateProfilesHighlightColours();
 
         var cliAutocomplete = store.get('cli_autocomplete', true);
@@ -340,6 +344,7 @@ $(function() {
                     $('#proxylayer').val(globalSettings.proxyLayer);
                     $('#showProfileParameters').prop('checked', globalSettings.showProfileParameters);
                     $('#cliAutocomplete').prop('checked', globalSettings.cliAutocomplete);
+                    $('#assistnow-api-key').val(globalSettings.assistnowApiKey);
                     
                     i18n.getLanguages().forEach(lng => {
                         $('#languageOption').append("<option value='{0}'>{1}</option>".format(lng, i18n.getMessage("language_" + lng)));
@@ -383,6 +388,11 @@ $(function() {
                         store.set('proxylayer', $(this).val());
                         globalSettings.proxyLayer = $(this).val();
                     });
+                    $('#assistnow-api-key').on('change', function () {
+                        store.set('assistnow_api_key', $(this).val());
+                        globalSettings.assistnowApiKey = $(this).val();
+                    });
+ 
                     $('#demoModeReset').on('click', function () {
                         SITLProcess.deleteEepromFile('demo.bin');
                     });

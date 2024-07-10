@@ -55,6 +55,23 @@ TABS.firmware_flasher.initialize = function (callback) {
             worker.postMessage(str);
         }
 
+        function parseDevFilename(filename) {
+            //var targetFromFilenameExpression = /inav_([\d.]+)?_?([^.]+)\.(.*)/;
+            // inav_8.0.0_TUNERCF405_dev-20240617-88fb1d0.hex
+            var targetFromFilenameExpression = /^inav_([\d.]+)_([A-Z0-9_]+)_dev-(\d{4})(\d{2})(\d{2})-(\w+)\.(hex)$/;
+            var match = targetFromFilenameExpression.exec(filename);
+
+            if (!match) {
+                return null;
+            }
+
+            return {
+                raw_target: match[2],
+                target: match[2].replace("_", " "),
+                format: match[7],
+            };
+        }
+
         function parseFilename(filename) {
             //var targetFromFilenameExpression = /inav_([\d.]+)?_?([^.]+)\.(.*)/;
             var targetFromFilenameExpression = /inav_([\d.]+(?:-rc\d+)?)?_?([^.]+)\.(.*)/;
@@ -63,6 +80,8 @@ TABS.firmware_flasher.initialize = function (callback) {
             if (!match) {
                 return null;
             }
+
+            //GUI.log("non dev: match[2]: " + match[2] + " match[3]: " + match[3]);
 
             return {
                 raw_target: match[2],
@@ -102,7 +121,8 @@ TABS.firmware_flasher.initialize = function (callback) {
             });
         });
 
-        var buildBoardOptions = function(){
+        var buildBoardOptions = function(releasesData) {
+            const start = performance.now();
             var boards_e = $('select[name="board"]').empty();
             var versions_e = $('select[name="firmware_version"]').empty();
             var showDevReleases = ($('input.show_development_releases').is(':checked'));
@@ -113,6 +133,7 @@ TABS.firmware_flasher.initialize = function (callback) {
             var releases = {};
             var sortedTargets = [];
             var unsortedTargets = [];
+
             TABS.firmware_flasher.releasesData.forEach(function(release){
                 release.assets.forEach(function(asset){
                     var result = parseFilename(asset.name);
@@ -124,8 +145,25 @@ TABS.firmware_flasher.initialize = function (callback) {
                         unsortedTargets.push(result.target);
                     }
                 });
-                sortedTargets = unsortedTargets.sort();
             });
+
+            if (showDevReleases) {
+                TABS.firmware_flasher.devReleasesData.forEach(function (release) {
+                    release.assets.forEach(function (asset) {
+                        var result = parseDevFilename(asset.name);
+
+                        if ((!showDevReleases && release.prerelease) || !result) {
+                            return;
+                        }
+                        if ($.inArray(result.target, unsortedTargets) == -1) {
+                            unsortedTargets.push(result.target);
+                        }
+                    });
+                });
+            }
+
+            sortedTargets = unsortedTargets.sort();
+
             sortedTargets.forEach(function(release) {
                 releases[release] = [];
             });
@@ -154,7 +192,7 @@ TABS.firmware_flasher.initialize = function (callback) {
                             date.getUTCHours(),
                             date.getMinutes()
                     );
-
+                    
                     var descriptor = {
                         "releaseUrl": release.html_url,
                         "name"      : semver.clean(release.name),
@@ -170,6 +208,49 @@ TABS.firmware_flasher.initialize = function (callback) {
                     releases[result.target].push(descriptor);
                 });
             });
+
+            if(showDevReleases) {
+                TABS.firmware_flasher.devReleasesData.forEach(function(release){
+
+                    var versionFromTagExpression = /v?(.*)/;
+                    var matchVersionFromTag = versionFromTagExpression.exec(release.tag_name);
+                    var version = matchVersionFromTag[1];
+
+                    release.assets.forEach(function(asset){
+                        var result = parseDevFilename(asset.name);
+                        if ((!showDevReleases && release.prerelease) || !result) {
+                            return;
+                        }
+
+                        if (result.format != 'hex') {
+                            return;
+                        }
+
+                        var date = new Date(release.published_at);
+                        var formattedDate = "{0}-{1}-{2} {3}:{4}".format(
+                                date.getFullYear(),
+                                date.getMonth() + 1,
+                                date.getDate(),
+                                date.getUTCHours(),
+                                date.getMinutes()
+                        );
+
+                        var descriptor = {
+                            "releaseUrl": release.html_url,
+                            "name"      : semver.clean(release.name),
+                            "version"   : release.tag_name,
+                            "url"       : asset.browser_download_url,
+                            "file"      : asset.name,
+                            "raw_target": result.raw_target,
+                            "target"    : result.target,
+                            "date"      : formattedDate,
+                            "notes"     : release.body,
+                            "status"    : release.prerelease ? "nightly" : "stable"
+                        };
+                        releases[result.target].push(descriptor);
+                    });
+                });
+            }
             
             var selectTargets = [];
             Object.keys(releases)
@@ -189,12 +270,27 @@ TABS.firmware_flasher.initialize = function (callback) {
                     });
                 });
             TABS.firmware_flasher.releases = releases;
+            const end = performance.now();
+            console.log(`buildBoardOptions: ${end - start} ms`)
             return;
         };
 
+        $.get('https://api.github.com/repos/iNavFlight/inav-nightly/releases?per_page=10', function(releasesData) {
+            TABS.firmware_flasher.devReleasesData = releasesData;
+        }).fail(function (data){
+            TABS.firmware_flasher.devReleasesData = {};
+            if (data["responseJSON"]){
+                GUI.log("<b>GITHUB Query Failed: <code>{0}</code></b>".format(data["responseJSON"].message));
+            }
+            $('select[name="board"]').empty().append('<option value="0">Offline</option>');
+            $('select[name="firmware_version"]').empty().append('<option value="0">Offline</option>');
+            $('a.auto_select_target').addClass('disabled');
+        });
+
+
         $.get('https://api.github.com/repos/iNavFlight/inav/releases?per_page=10', function (releasesData){
             TABS.firmware_flasher.releasesData = releasesData;
-            buildBoardOptions();
+            buildBoardOptions(releasesData);
 
             // bind events
             $('select[name="board"]').on('change', function () {

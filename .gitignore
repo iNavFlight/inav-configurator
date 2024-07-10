@@ -8,3 +8,12 @@ inav-configurator.iml
 /out
 .eslintrc.json
 /.project
+/cache/
+/dist/
+/apps/
+/build/
+*~
+*.swp
+*.bak
+eeprom.bin
+yarn.lock

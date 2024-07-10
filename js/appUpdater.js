@@ -10,12 +10,11 @@ var appUpdater = appUpdater || {};
 
 appUpdater.checkRelease = function (currVersion) {
     var modalStart;
-    $.get('https://api.github.com/repos/iNavFlight/inav-configurator/releases', function (releaseData) {
+    $.get('https://api.github.com/repos/iNavFlight/inav-configurator/releases/latest', function (releaseData) {
         GUI.log(i18n.getMessage('loadedReleaseInfo'));
-        //Git return sorted list, 0 - last release
 
-        let newVersion = releaseData[0].tag_name;
-        let newPrerelase = releaseData[0].prerelease;
+        let newVersion = releaseData.tag_name;
+        let newPrerelase = releaseData.prerelease;
 
         if (newPrerelase == false && semver.gt(newVersion, currVersion)) {
             GUI.log(newVersion, app.getVersion());

@@ -1184,9 +1184,6 @@
     "configurationGPSubxSbas": {
         "message": "Ground Assistance Type"
     },
-    "configurationGPSHelp": {
-        "message": "<strong>Note:</strong> Remember to configure a Serial Port (via Ports tab) when using GPS feature."
-    },
     "receiverType": {
         "message": "Receiver type"
     },
@@ -1237,6 +1234,36 @@
     },
     "configurationVTXLowPowerDisarmValue_2": {
         "message": "Until first arm"
+    },
+    "configurationGimbal": {
+        "message": "Serial Gimbal"
+    },
+    "configurationGimbalSensitivity": { 
+        "message":"Gimbal sensitivity"
+    },
+    "configurationGimbalPanChannel": { 
+        "message":"Pan channel (yaw)"
+    },
+    "configurationGimbalTiltChannel": { 
+        "message":"Tilt channel (pitch)"
+    },
+    "configurationGimbalRollChannel": { 
+        "message":"Roll channel"
+    },
+    "configurationHeadtracker": {
+        "message": "Headtracker"
+    },
+    "configurationHeadtrackerType": {
+        "message": "Head tracker type"
+    },
+    "configurationHeadtrackerPanRatio": {
+        "message": "Head tracker pan movement ratio"
+    },
+    "configurationHeadtrackerTiltRatio": {
+        "message": "Head tracker tilt movement ratio"
+    },
+    "configurationHeadtrackerRollRatio": {
+        "message": "Head tracker roll movement ratio"
     },
     "portsHelp": {
         "message": "<strong>Note:</strong> not all combinations are valid.  When the flight controller firmware detects this the serial port configuration will be reset."
@@ -1324,6 +1351,12 @@
     },
     "portsFunction_SBUS_OUTPUT": {
         "message": "SBus Output"
+    },
+    "portsFunction_GIMBAL": {
+        "message": "Serial Gimbal"
+    },
+    "portsFunction_HEADTRACKER": {
+        "message": "Serial Headtracker"
     },
     "pidTuning_Other": {
         "message": "Other"
@@ -4096,6 +4129,12 @@
     "osdElement_MAP_REFERENCE_HELP": {
         "message": "Reference (direction that points up) of the current map. N for North and T for takeoff direction."
     },
+    "osdElement_FORMATION_FLIGHT": {
+        "message": "Inav radar fixed"
+    },
+    "osdElement_FORMATION_FLIGHT_HELP": {
+        "message": "The closest aircraft from Inav radar/Formation flight"
+    },
     "osdElement_WIND_SPEED_HORIZONTAL": {
         "message": "Horizontal wind speed"
     },
@@ -4518,7 +4557,7 @@
     },
     "missionTitleAdd": {
         "message": "Add"
-    }, 
+    },
     "missionTitleMoveToCenterView": {
         "message": "move to center view"
     },
@@ -4532,7 +4571,7 @@
         "message": "Edit Mission"
     },
     "MissionPlannerFwLAndingAltitudeChangeReset": {
-        "message": "Altitude below min land altitude. Change ignored" 
+        "message": "Altitude below min land altitude. Change ignored"
     },
     "missionWpType": {
         "message": "Type:"
@@ -5872,5 +5911,29 @@
     },
     "maintenanceFlushSettingsCache": {
         "message": "Flush settings cache"
+    },
+    "gpsOptions": {
+        "message": "GPS Options"
+    },
+    "gpsOptionsAssistnowToken": {
+        "message": "AssitNow Token"
+    },
+    "gpsLoadAssistnowOfflineButton": {
+        "message": "Load AssistNow Offline"
+    },
+    "gpsLoadAssistnowOnlineButton": {
+        "message": "Load AssistNow Online"
+    },
+    "gpsAssistnowStart": {
+        "message": "AssistNow data transfer starting..."
+    },
+    "gpsAssistnowDone": {
+        "message": "AssistNow data transfer complete."
+    },
+    "gpsAssistnowUpdate": {
+        "message": "AssistNow messages sent."
+    },
+    "gpsAssistnowLoadDataError": {
+        "message": "Error loading AssistNow data."
     }
 }

@@ -121,6 +121,16 @@ const serialPortHelper = (function () {
             name: 'SBUS_OUTPUT',
             groups: ['peripherals'],
             defaultBaud: 115200
+        },
+        {
+            name: 'GIMBAL',
+            groups: ['peripherals'],
+            defaultBaud: 115200
+        },
+        {
+            name: 'HEADTRACKER',
+            groups: ['peripherals'],
+            defaultBaud: 115200
         }
     ];
 
@@ -150,6 +160,8 @@ const serialPortHelper = (function () {
         'SBUS_OUTPUT': 22,
         'SMARTPORT_MASTER': 23,
         'MSP_DISPLAYPORT': 25,
+        'GIMBAL': 26,
+        'HEADTRACKER': 27
     };
 
     privateScope.identifierToName = {
@@ -182,7 +194,8 @@ const serialPortHelper = (function () {
             '19200',
             '38400',
             '57600',
-            '115200'
+            '115200',
+            '230400'
         ],
         'TELEMETRY': [
             'AUTO',
@@ -193,7 +206,9 @@ const serialPortHelper = (function () {
             '19200',
             '38400',
             '57600',
-            '115200'
+            '115200',
+            '230400',
+            '460800'
         ],
         'PERIPHERAL': [
             '19200',

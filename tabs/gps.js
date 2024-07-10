@@ -18,6 +18,7 @@ const features = require('./../js/feature_framework');
 const { globalSettings } = require('./../js/globalSettings');
 const jBox = require('./../js/libraries/jBox/jBox.min');
 const SerialBackend = require('../js/serial_backend');
+const ublox = require('../js/ublox/UBLOX');
 
 
 TABS.gps = {};
@@ -416,6 +417,64 @@ TABS.gps.initialize = function (callback) {
             features.execute(function () {
                 saveChainer.execute();
             });
+        });
+
+        function processUbloxData(data) {
+            if(data != null) {
+                //console.log("processing data type: " + typeof(data));
+                let totalSent = 0;
+                let total = data.length;
+
+                var ubloxChainer = MSPChainerClass();
+                var chain = [];
+                let d = new Date();
+
+                GUI.log(i18n.getMessage('gpsAssistnowStart'));
+                data.forEach((item) => {
+                    chain.push(function (callback) {
+                        //console.log("UBX command: " + item.length);
+                        let callCallback = false;
+                        if (ublox.isAssistnowDataRelevant(item, d.getUTCFullYear(), d.getUTCMonth()+1, d.getUTCDate()+1)) {
+                            mspHelper.sendUbloxCommand(item, callback);
+                        } else {
+                            // Ignore msp command, but keep counter going.
+                            callCallback = true;
+                        }
+                        totalSent++;
+                        if((totalSent % 100) == 0) {
+                            GUI.log(totalSent + '/' + total + ' ' + i18n.getMessage('gpsAssistnowUpdate'));
+                        }
+                        if(callCallback) {
+                            callback();
+                        }
+                    });
+                });
+                ubloxChainer.setChain(chain);
+                ubloxChainer.setExitPoint(function () {
+                    if ((totalSent % 100) != 0) {
+                        GUI.log(totalSent + '/' + total + ' ' + i18n.getMessage('gpsAssistnowUpdate'));
+                    }
+                    GUI.log(i18n.getMessage('gpsAssistnowDone'));
+                });
+
+                ubloxChainer.execute();
+            }
+        }
+
+        $('a.loadAssistnowOnline').on('click', function () {
+            if(globalSettings.assistnowApiKey != null && globalSettings.assistnowApiKey != '') {
+                ublox.loadAssistnowOnline(processUbloxData);
+           } else {
+                GUI.alert("Assistnow Token not set!");
+            }
+        });
+
+        $('a.loadAssistnowOffline').on('click', function () {
+            if(globalSettings.assistnowApiKey != null && globalSettings.assistnowApiKey != '') {
+                ublox.loadAssistnowOffline(processUbloxData);
+            } else {
+                GUI.alert("Assistnow Token not set!");
+            }
         });
 
         GUI.content_ready(callback);
