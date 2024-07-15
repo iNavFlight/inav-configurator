@@ -696,9 +696,9 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
             FC.MIXER_CONFIG.appliedMixerPreset = presetId;
 
             if (currentMixerPreset.id == 3) {
-                $wizardButton.parent().removeClass("is-hidden");
+                $("#mixer-wizard-gui_box").removeClass("is-hidden");
             } else {
-                $wizardButton.parent().addClass("is-hidden");
+                $("#mixer-wizard-gui_box").addClass("is-hidden");
             }
 
             if (FC.MIXER_CONFIG.platformType == PLATFORM.AIRPLANE && currentMixerPreset.id != loadedMixerPresetID) {
