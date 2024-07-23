@@ -1994,7 +1994,6 @@ TABS.mission_control.initialize = function (callback) {
                         source: vectorSource,
                     }),
                 );
-                map.getView().fit(vectorSource.getExtent());
             });
             map.addInteraction(dragAndDropInteraction);
         }
