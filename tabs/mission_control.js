@@ -1965,6 +1965,69 @@ TABS.mission_control.initialize = function (callback) {
             })
         });
 
+        //////////////////////////////////////////////////////////////////////////////////////////////
+        // Add drag and drop support for GEO files
+        //////////////////////////////////////////////////////////////////////////////////////////////
+
+        let dragAndDropInteraction;
+
+        function setInteraction() {
+            if (dragAndDropInteraction) {
+                map.removeInteraction(dragAndDropInteraction);
+            }
+            dragAndDropInteraction = new ol.interaction.DragAndDrop({
+                formatConstructors: [
+                    ol.format.GPX,
+                    ol.format.GeoJSON,
+                    ol.format.IGC,
+                    ol.format.KML,
+                    ol.format.TopoJSON,
+                ],
+            });
+            dragAndDropInteraction.on('addfeatures', function (event) {
+                const vectorSource = new ol.source.Vector({
+                    features: event.features,
+                });
+                GUI.alert("adding file");
+                map.addLayer(
+                    new ol.layer.Vector({
+                        source: vectorSource,
+                    }),
+                );
+                map.getView().fit(vectorSource.getExtent());
+            });
+            map.addInteraction(dragAndDropInteraction);
+        }
+        setInteraction();
+
+
+        const displayFeatureInfo = function (pixel) {
+            const features = [];
+            map.forEachFeatureAtPixel(pixel, function (feature) {
+                features.push(feature);
+            });
+            if (features.length > 0) {
+                const info = [];
+                let i, ii;
+                for (i = 0, ii = features.length; i < ii; ++i) {
+                    info.push(features[i].get('name'));
+                }
+                document.getElementById('geo_info').innerHTML = info.join(', ') || '&nbsp';
+            } else {
+                document.getElementById('geo_info').innerHTML = '&nbsp;';
+            }
+        };
+
+        map.on('pointermove', function (evt) {
+            if (evt.dragging) {
+                return;
+            }
+            const pixel = map.getEventPixel(evt.originalEvent);
+            displayFeatureInfo(pixel);
+        });
+
+
+
         //////////////////////////////////////////////////////////////////////////
         // Set the attribute link to open on an external browser window, so
         // it doesn't interfere with the configurator.
