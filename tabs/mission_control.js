@@ -2004,7 +2004,9 @@ TABS.mission_control.initialize = function (callback) {
         const displayFeatureInfo = function (pixel) {
             const features = [];
             map.forEachFeatureAtPixel(pixel, function (feature) {
-                features.push(feature);
+                if (feature.get('name') !== "Null Island"){
+                    features.push(feature);
+                }
             });
             if (features.length > 0) {
                 const info = [];
