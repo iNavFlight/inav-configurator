@@ -1988,7 +1988,7 @@ TABS.mission_control.initialize = function (callback) {
                 const vectorSource = new ol.source.Vector({
                     features: event.features,
                 });
-                GUI.alert("adding file");
+                GUI.log("adding file to map");
                 map.addLayer(
                     new ol.layer.Vector({
                         source: vectorSource,
