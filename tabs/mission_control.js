@@ -29,6 +29,7 @@ const SerialBackend = require('./../js/serial_backend');
 const { distanceOnLine, wrap_360, calculate_new_cooridatnes } = require('./../js/helpers');
 const Plotly = require('./../js/libraries/plotly-latest.min');
 const interval = require('./../js/intervals');
+const {generateFilename} = require("../js/helpers");
 
 var MAX_NEG_FW_LAND_ALT = -2000; // cm
 
@@ -1746,12 +1747,20 @@ TABS.mission_control.initialize = function (callback) {
 
             var feature = map.forEachFeatureAtPixel(evt.pixel,
                 function (feature, layer) {
-                    return feature;
+                    if(layer.get("no_interaction") != true){
+                        return feature;
+                    }
+                    // for features from layers that have this set to true, ignore their existence.
+                    // This currently applies only to files the user has dragged onto the map.
                 });
 
             tempMarker = map.forEachFeatureAtPixel(evt.pixel,
                 function (feature, layer) {
-                    return layer;
+                    if(layer.get("no_interaction") != true){
+                        return layer;
+                    }
+                    // for features from layers that have this set to true, ignore their existence.
+                    // This currently applies only to files the user has dragged onto the map.
                 });
 
             if (feature) {
@@ -1989,11 +1998,13 @@ TABS.mission_control.initialize = function (callback) {
                     features: event.features,
                 });
                 GUI.log("adding file to map");
-                map.addLayer(
-                    new ol.layer.Vector({
-                        source: vectorSource,
-                    }),
-                );
+
+                let temp_layer = new ol.layer.Vector({
+                    source: vectorSource,
+                });
+                temp_layer.set("no_interaction", true, true);
+
+                map.addLayer(temp_layer);
             });
             map.addInteraction(dragAndDropInteraction);
         }
