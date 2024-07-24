@@ -1450,7 +1450,8 @@ TABS.mission_control.initialize = function (callback) {
                 ');
                 let element = document.getElementById(element_id);
                 element.addEventListener("change", function () {
-
+                    GUI.log("setting visibility of layer: " + layer_name + " to " + (element.checked ? "true" : "false"));
+                    layer.setVisible(layer.getVisible(element.checked));
                 });
             }
         })
