@@ -29,7 +29,6 @@ const SerialBackend = require('./../js/serial_backend');
 const { distanceOnLine, wrap_360, calculate_new_cooridatnes } = require('./../js/helpers');
 const Plotly = require('./../js/libraries/plotly-latest.min');
 const interval = require('./../js/intervals');
-const {generateFilename} = require("../js/helpers");
 
 var MAX_NEG_FW_LAND_ALT = -2000; // cm
 
