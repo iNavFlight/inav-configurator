@@ -2004,6 +2004,7 @@ TABS.mission_control.initialize = function (callback) {
                 });
                 temp_layer.set("no_interaction", true, true);
 
+                temp_layer.set("show_info_on_hover", true, true); // allows info box to work with this feature
                 map.addLayer(temp_layer);
             });
             map.addInteraction(dragAndDropInteraction);
@@ -2014,7 +2015,7 @@ TABS.mission_control.initialize = function (callback) {
         const displayFeatureInfo = function (pixel) {
             const features = [];
             map.forEachFeatureAtPixel(pixel, function (feature) {
-                if (feature.get('name') !== "Null Island"){
+                if (feature.get('show_info_on_hover') === true){
                     features.push(feature);
                 }
             });
