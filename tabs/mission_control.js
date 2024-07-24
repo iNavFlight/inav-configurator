@@ -1444,9 +1444,9 @@ TABS.mission_control.initialize = function (callback) {
                 let element_id = "layerVisOption_" + layer_name;
 
                 let element_str = '\
-                <div class="point">\
-                    <label class="point-label" for="' + element_id + '">' + layer_name + '</label>\
-                    <input id="' + element_id + '" type="checkbox"' + (is_visible ? "checked=\"true\"" : "") + '">\
+                <div class="checkbox">\
+                    <label class="point-label" for="' + element_id + '"><span ' + layer_name + '>' + layer_name + '</span></label>\
+                    <input id="' + element_id + '" type="checkbox" data-live="true" class="toggle"' + (is_visible ? "checked=\"true\"" : "") + '">\
                 </div>';
 
                 $('#layerSelectContent').append(element_str);
@@ -1457,6 +1457,7 @@ TABS.mission_control.initialize = function (callback) {
                 });
             }
         })
+        GUI.switchery();
     }
 
     function renderWaypointOptionsTable(waypoint) {

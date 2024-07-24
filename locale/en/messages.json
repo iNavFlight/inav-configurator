@@ -5937,7 +5937,7 @@
         "message": "Error loading AssistNow data."
     },
     "layerVisibilitySelectBoxTitle": {
-        "message": "Select Visible Layers"
+        "message": "Layer Visibility"
     },
     "layerVisibilitySelectCancel": {
         "message": "Cancel"
