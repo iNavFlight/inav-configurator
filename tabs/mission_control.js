@@ -1437,21 +1437,23 @@ TABS.mission_control.initialize = function (callback) {
         map.getLayers().forEach(layer => {
             if (layer.get("is_vis_toggleable") === true) {
                 let layer_name = layer.get("name");
-                let is_visible = layer.getVisible();
+                let is_visible = !!layer.getVisible();
                 GUI.log("adding to options: " + layer_name);
                 GUI.log("is visible? " + (is_visible ? "true" : "false"));
 
                 let element_id = "layerVisOption_" + layer_name;
-                $('#layerSelectContent').append('\
+
+                let element_str = '\
                 <div class="point">\
                     <label class="point-label" for="' + element_id + '">' + layer_name + '</label>\
-                    <input id="' + element_id + '" type="checkbox" checked="' + (is_visible ? "true" : "false") + '">\
-                </div>\
-                ');
+                    <input id="' + element_id + '" type="checkbox"' + (is_visible ? "checked=\"true\"" : "") + '">\
+                </div>';
+
+                $('#layerSelectContent').append(element_str);
                 let element = document.getElementById(element_id);
                 element.addEventListener("change", function () {
                     GUI.log("setting visibility of layer: " + layer_name + " to " + (element.checked ? "true" : "false"));
-                    layer.setVisible(layer.getVisible(element.checked));
+                    layer.setVisible(element.checked);
                 });
             }
         })
