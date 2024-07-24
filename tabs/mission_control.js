@@ -1429,6 +1429,33 @@ TABS.mission_control.initialize = function (callback) {
         }
     }
 
+
+    function updateLayerVisibilitySelectOptions() {
+
+        $('#layerSelectContent').empty();
+
+        map.getLayers().forEach(layer => {
+            if (layer.get("is_vis_toggleable") === true) {
+                let layer_name = layer.get("name");
+                let is_visible = layer.getVisible();
+                GUI.log("adding to options: " + layer_name);
+                GUI.log("is visible? " + (is_visible ? "true" : "false"));
+
+                let element_id = "layerVisOption_" + layer_name;
+                $('#layerSelectContent').append('\
+                <div class="point">\
+                    <label class="point-label" for="' + element_id + '">' + layer_name + '</label>\
+                    <input id="' + element_id + '" type="checkbox" checked="' + (is_visible ? "true" : "false") + '">\
+                </div>\
+                ');
+                let element = document.getElementById(element_id);
+                element.addEventListener("change", function () {
+
+                });
+            }
+        })
+    }
+
     function renderWaypointOptionsTable(waypoint) {
         /*
          * Process Waypoint Options table UI
@@ -1631,6 +1658,40 @@ TABS.mission_control.initialize = function (callback) {
 
         };
         ol.inherits(app.PlannerSettingsControl, ol.control.Control);
+
+        /**
+         * @constructor
+         * @extends {ol.control.Control}
+         * @param {Object=} opt_options Control options.
+         */
+        app.PlannerLayerVisibilityControl = function (opt_options) {
+            var options = opt_options || {};
+            var button = document.createElement('button');
+
+            button.innerHTML = ' ';
+            button.style = 'background: url(\'./images/CF_template_white.svg\') no-repeat 1px -1px;background-color: rgba(0,60,136,.5);';
+
+            var handleShowSettings = function () {
+                $('#layerVisibilitySelect').fadeIn(300);
+                updateLayerVisibilitySelectOptions();
+            };
+
+            button.addEventListener('click', handleShowSettings, false);
+            button.addEventListener('touchstart', handleShowSettings, false);
+
+            var element = document.createElement('div');
+            element.className = 'layer-vis-select ol-unselectable ol-control';
+            element.appendChild(button);
+            element.title = 'Map Layer Select';
+
+            ol.control.Control.call(this, {
+                element: element,
+                target: options.target
+            });
+
+        };
+        ol.inherits(app.PlannerLayerVisibilityControl, ol.control.Control);
+
 
         /**
          * @constructor
@@ -1940,6 +2001,7 @@ TABS.mission_control.initialize = function (callback) {
                 new app.PlannerMultiMissionControl(),
                 new app.PlannerSafehomeControl(),
                 new app.PlannerElevationControl(),
+                new app.PlannerLayerVisibilityControl(),
             ]
         }
         else {
@@ -1947,6 +2009,7 @@ TABS.mission_control.initialize = function (callback) {
                 new app.PlannerSettingsControl(),
                 new app.PlannerMultiMissionControl(),
                 new app.PlannerElevationControl(),
+                new app.PlannerLayerVisibilityControl(),
                 //new app.PlannerSafehomeControl() // TO COMMENT FOR RELEASE : DECOMMENT FOR DEBUG
             ]
         }
@@ -1996,13 +2059,16 @@ TABS.mission_control.initialize = function (callback) {
                 const vectorSource = new ol.source.Vector({
                     features: event.features,
                 });
-                GUI.log("adding file to map");
+                let file_name = event.file.name;
+                GUI.log("adding file to map: " + file_name);
 
                 let temp_layer = new ol.layer.Vector({
                     source: vectorSource,
                 });
                 temp_layer.set("no_interaction", true, true); // stops custom dragging controls for waypoints from preventing the user panning the map
                 temp_layer.set("show_info_on_hover", true, true); // allows info box to work with this feature
+                temp_layer.set("is_vis_toggleable", true, true); // allows user to hide this layer in visibility selector
+                temp_layer.set("name", file_name, true); // name for visibility toggler
                 map.addLayer(temp_layer);
             });
             map.addInteraction(dragAndDropInteraction);
@@ -2347,6 +2413,19 @@ TABS.mission_control.initialize = function (callback) {
             }
             else {
                 $('#HomeContent').fadeOut(300);
+            }
+        });
+
+        $('#showHideVisibilityButton').on('click', function () {
+            var src = ($(this).children().attr('class') === 'ic_hide')
+                ? 'ic_show'
+                : 'ic_hide';
+            $(this).children().attr('class', src);
+            if ($(this).children().attr('class') === 'ic_hide') {
+                $('#layerSelectContent').fadeIn(300);
+            }
+            else {
+                $('#layerSelectContent').fadeOut(300);
             }
         });
 
@@ -3066,6 +3145,10 @@ TABS.mission_control.initialize = function (callback) {
 
         $('#cancelMultimission').on('click', function () {
             $('#missionPlannerMultiMission').fadeOut(300);
+        });
+
+        $('#cancelVisibility').on('click', function () {
+            $('#layerVisibilitySelect').fadeOut(300);
         });
 
         $('#setActiveMissionButton').on('click', function () {
