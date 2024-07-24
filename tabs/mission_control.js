@@ -2002,8 +2002,7 @@ TABS.mission_control.initialize = function (callback) {
                 let temp_layer = new ol.layer.Vector({
                     source: vectorSource,
                 });
-                temp_layer.set("no_interaction", true, true);
-
+                temp_layer.set("no_interaction", true, true); // stops custom dragging controls for waypoints from preventing the user panning the map
                 temp_layer.set("show_info_on_hover", true, true); // allows info box to work with this feature
                 map.addLayer(temp_layer);
             });
@@ -2011,7 +2010,10 @@ TABS.mission_control.initialize = function (callback) {
         }
         setInteraction();
 
-
+        /**
+         * Populates info box with names of all features marked to display info that the mouse is over
+         * @param pixel the pixel the mouse is over
+         */
         const displayFeatureInfo = function (pixel) {
             const features = [];
             map.forEachFeatureAtPixel(pixel, function (feature) {
