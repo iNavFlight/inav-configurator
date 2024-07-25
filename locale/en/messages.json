@@ -5944,5 +5944,11 @@
     },
     "layerVisibilitySelectHide": {
         "message": "Hide"
+    },
+    "layerVisibilityWindowLayerSave": {
+        "message": "Save"
+    },
+    "layerVisibilityWindowLayerDelete": {
+        "message": "Delete"
     }
 }

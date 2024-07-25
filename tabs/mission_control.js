@@ -1448,10 +1448,10 @@ TABS.mission_control.initialize = function (callback) {
                     <label class="point-label" for="' + element_id + '"><span ' + layer_name + '>' + layer_name + '</span></label>\
                     <input id="' + element_id + '" type="checkbox" data-live="true" class="toggle"' + (is_visible ? "checked=\"true\"" : "") + '">\
                     <div class="default_btn">\
-                        <a id="' + element_id + 'Save" href="#" i18n="Save"></a>\
+                        <a id="' + element_id + '_Save" href="#" i18n="layerVisibilityWindowLayerSave"></a>\
                     </div>\
                     <div class="default_btn">\
-                        <a id="' + element_id + 'Delete" href="#" i18n="Delete"></a>\
+                        <a id="' + element_id + '_Delete" href="#" i18n="layerVisibilityWindowLayerDelete"></a>\
                     </div>\
                 </div>';
 
