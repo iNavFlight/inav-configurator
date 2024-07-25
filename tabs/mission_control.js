@@ -1444,18 +1444,18 @@ TABS.mission_control.initialize = function (callback) {
                 let element_id = "layerVisOption_" + layer_name;
 
                 let element_str = '\
-                <div class="checkbox">\
-                    <label class="point-label" for="' + element_id + '"><span ' + layer_name + '>' + layer_name + '</span></label>\
-                    <input id="' + element_id + '" type="checkbox" data-live="true" class="toggle"' + (is_visible ? "checked=\"true\"" : "") + '">\
-                    <div class="default_btn">\
-                        <a id="' + element_id + '_Save" href="#" i18n="layerVisibilityWindowLayerSave"></a>\
+                <div class="point">\
+                    <div class="checkbox">\
+                        <label class="point-label" for="' + element_id + '"><span ' + layer_name + '>' + layer_name + '</span></label>\
+                        <input id="' + element_id + '" type="checkbox" data-live="true" class="toggle"' + (is_visible ? "checked=\"true\"" : "") + '">\
                     </div>\
                     <div class="default_btn">\
-                        <a id="' + element_id + '_Delete" href="#" i18n="layerVisibilityWindowLayerDelete"></a>\
+                        <a id="' + element_id + '_Save" href="#" i18n="layerVisibilityWindowLayerSave">Save</a>\
+                    </div>\
+                    <div class="default_btn">\
+                        <a id="' + element_id + '_Delete" href="#" i18n="layerVisibilityWindowLayerDelete">Delete</a>\
                     </div>\
                 </div>';
-
-
 
                 $('#layerSelectContent').append(element_str);
                 let element = document.getElementById(element_id);
@@ -1463,9 +1463,27 @@ TABS.mission_control.initialize = function (callback) {
                     GUI.log("setting visibility of layer: " + layer_name + " to " + (element.checked ? "true" : "false"));
                     layer.setVisible(element.checked);
                 });
+                let save_element = document.getElementById(element_id + "_Save");
+                save_element.addEventListener("click", function () {
+                    save_layer_to_disk(layer);
+                });
+
             }
         })
         GUI.switchery();
+    }
+
+    function save_layer_to_disk(layer){
+        let custom_overlay_list = store.get("custom_overlay_list");
+        if(custom_overlay_list === undefined){
+            custom_overlay_list = [];
+        }
+        let layer_to_save = JSON.stringify(layer) // TODO: ERROR
+        let name = layer.get("name");
+        custom_overlay_list.push(layer_to_save);
+        GUI.log("saving layer...");
+        store.set("custom_overlay_list", custom_overlay_list);
+        GUI.log("saved layer: " + name);
     }
 
     function renderWaypointOptionsTable(waypoint) {
@@ -2098,12 +2116,6 @@ TABS.mission_control.initialize = function (callback) {
         }
         setInteraction();
 
-        function save_layer_to_disk(layer){
-            const userDataPath = app.getPath("userData")
-            let layer_to_save = JSON.stringify(layer)
-            let name = layer.get("name");
-            fs.writeFile(`${userDataPath}/iNavMapOverlay_${name}.json`, layer_to_save)
-        }
 
         /**
          * Populates info box with names of all features marked to display info that the mouse is over
