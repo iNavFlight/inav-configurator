@@ -1447,7 +1447,15 @@ TABS.mission_control.initialize = function (callback) {
                 <div class="checkbox">\
                     <label class="point-label" for="' + element_id + '"><span ' + layer_name + '>' + layer_name + '</span></label>\
                     <input id="' + element_id + '" type="checkbox" data-live="true" class="toggle"' + (is_visible ? "checked=\"true\"" : "") + '">\
+                    <div class="default_btn">\
+                        <a id="' + element_id + 'Save" href="#" i18n="Save"></a>\
+                    </div>\
+                    <div class="default_btn">\
+                        <a id="' + element_id + 'Delete" href="#" i18n="Delete"></a>\
+                    </div>\
                 </div>';
+
+
 
                 $('#layerSelectContent').append(element_str);
                 let element = document.getElementById(element_id);
@@ -2044,6 +2052,17 @@ TABS.mission_control.initialize = function (callback) {
         // Add drag and drop support for GEO files
         //////////////////////////////////////////////////////////////////////////////////////////////
 
+        // write file
+
+
+        // read file
+        // const path = app.getPath("userData")
+        // fs.readFile(path, {encoding: 'utf-8'}, (err,data)=> {
+        // if (err)return null
+        // updateGlobalStore(JSON.parse(data))
+        // })
+
+
         let dragAndDropInteraction;
 
         function setInteraction() {
@@ -2078,6 +2097,13 @@ TABS.mission_control.initialize = function (callback) {
             map.addInteraction(dragAndDropInteraction);
         }
         setInteraction();
+
+        function save_layer_to_disk(layer){
+            const userDataPath = app.getPath("userData")
+            let layer_to_save = JSON.stringify(layer)
+            let name = layer.get("name");
+            fs.writeFile(`${userDataPath}/iNavMapOverlay_${name}.json`, layer_to_save)
+        }
 
         /**
          * Populates info box with names of all features marked to display info that the mouse is over
