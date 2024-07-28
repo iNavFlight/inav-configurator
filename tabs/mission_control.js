@@ -1486,6 +1486,13 @@ TABS.mission_control.initialize = function (callback) {
         GUI.log("saved layer: " + name);
     }
 
+    function remove_layer_from_disk(layer_name){
+        let custom_overlay_list = store.get("custom_overlay_list");
+        let new_custom_overlay_list = custom_overlay_list.filter(
+            (layer_element) => layer_element.get("name") !== layer_name);
+        store.set("custom_overlay_list", new_custom_overlay_list);
+    }
+
     function renderWaypointOptionsTable(waypoint) {
         /*
          * Process Waypoint Options table UI
