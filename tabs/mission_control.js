@@ -1591,7 +1591,7 @@ TABS.mission_control.initialize = function (callback) {
 
         });
         GUI.switchery();
-        i18n.localize();;
+        i18n.localize();
         return waypoint;
     }
 
