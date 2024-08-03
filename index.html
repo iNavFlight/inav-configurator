@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html>
+<html data-inav-theme="light">
 
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <link type="text/css" rel="stylesheet" href="./src/css/styles.css" media="all" />    
+    <link type="text/css" rel="stylesheet" href="./src/css/styles.css" media="all" />
     <script type="text/javascript">require('./js/configurator_main.js');</script>
     <!-- TODO: Update to newer Versions and use proper modules (require) -->
     <script type="text/javascript" src="./js/libraries/three/three.min.js"></script>
@@ -28,7 +28,7 @@
                     data-i18n="closeUpdateBtn"></a>
             </div>
         </div>
-        <div class="headerbar">
+        <div class="headerbar" data-inav-theme="dark" >
             <div id="logo">
                 <div class="logo_text">
                     <span i18n="mainLogoText"></span>
@@ -175,12 +175,14 @@
             </div>
         </div>
         <div class="clear-both"></div>
-        <div id="log">
-            <div class="logswitch">
-                <a href="#" id="showlog" i18n="mainShowLog"></a>
+        <div data-inav-theme="dark" style="background: var(--inav-body-bg)">
+            <div id="log" >
+                <div class="logswitch">
+                    <a href="#" id="showlog" i18n="mainShowLog"></a>
+                </div>
+                <div id="scrollicon"></div>
+                <div class="wrapper"></div>
             </div>
-            <div id="scrollicon"></div>
-            <div class="wrapper"></div>
         </div>
         <div id="view-groundstation" style="display: none;">
             <div id="groundstation-telemetry">
@@ -225,7 +227,7 @@
             </div>
             <div id="groundstation-map"></div>
         </div>
-        <div class="tab_container">
+        <div class="tab_container" data-inav-theme="dark">
             <div id="tabs">
                 <ul class="mode-disconnected">
                     <li class="tab_landing">
@@ -362,7 +364,7 @@
         </div>
     </div>
     <div id="modal-reconnect" class="is-hidden">
-        <div data-i18n="deviceRebooting">Device - <span style="color: red">Rebooting</span></div>
+        <div data-i18n="deviceRebooting">Device - <span style="color: var(--inav-danger)">Rebooting</span></div>
     </div>
     <div id="modal-saving-defaults" class="is-hidden">
         <div data-i18n="savingDefaults"></div>

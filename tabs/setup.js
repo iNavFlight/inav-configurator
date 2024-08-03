@@ -48,7 +48,7 @@ TABS.setup.initialize = function (callback) {
        i18n.localize();
 
         if (!FC.isMotorOutputEnabled()) {
-            GUI.log("<span style='color: red; font-weight: bolder'><strong>" + i18n.getMessage("logPwmOutputDisabled") + "</strong></span>");
+            GUI.log("<span style='color: var(--inav-danger); font-weight: bolder'><strong>" + i18n.getMessage("logPwmOutputDisabled") + "</strong></span>");
         }
 
         // initialize 3D
@@ -237,7 +237,7 @@ TABS.setup.initialize3D = function () {
     if (useWebGlRenderer) {
         if (FC.MIXER_CONFIG.appliedMixerPreset === -1) {
             model_file = 'custom';
-            GUI.log("<span style='color: red; font-weight: bolder'><strong>" + i18n.getMessage("mixerNotConfigured") + "</strong></span>");
+            GUI.log("<span style='color: var(--inav-danger); font-weight: bolder'><strong>" + i18n.getMessage("mixerNotConfigured") + "</strong></span>");
         } else {
             model_file = mixer.getById(FC.MIXER_CONFIG.appliedMixerPreset).model;
         }

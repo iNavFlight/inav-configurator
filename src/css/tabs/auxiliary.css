@@ -9,17 +9,18 @@
 }
 
 .tab-auxiliary .range .marker, .tab-auxiliary .channel-slider .noUi-connect {
-    background: #37a8db;
-    border-radius: 3px;
+    background: var(--inav-primary);
+    border-radius: var(--inav-border-radius);
+    box-shadow: none;
 }
 
 .tab-auxiliary .mode.on .info {
-    background: #37a8db;
+    background: var(--inav-primary);
     color: white;
 }
 
 .tab-auxiliary .mode.on:nth-child(odd) .info {
-    background: #37a8db;
+    background: var(--inav-primary);
 }
 
 .tab-auxiliary .mode.inRange .info {
@@ -31,12 +32,7 @@
 }
 
 .tab-auxiliary .mode.off .info {
-    background: #828885;
-    color: white;
-}
-
-.tab-auxiliary .mode.off:nth-child(odd) .info {
-    background: #828885;
+    background-color: rgba(var(--inav-emphasis-color-rgb), 0.05);
 }
 
 #tab-auxiliary-templates {
@@ -49,24 +45,22 @@
 }
 
 .tab-auxiliary .modeSection > td {
-    background-color: #f9f9f9;
     vertical-align: top;
-    padding-bottom: 5px;
+    padding-top: .5rem;
 }
 
 .tab-auxiliary .modeSectionArea {
-    background-color: #37a8db;
+    background-color: var(--inav-primary);
     color: white;
+    border-bottom: none;
+    border-radius: var(--inav-border-radius) var(--inav-border-radius) 0 0;
     font-weight: bold;
     font-size: 1.1em;
-    text-shadow: 0 1px rgba(0, 0, 0, 0.5);
-    padding: 5px;
+    padding: 5px 10px;
 }
 
 .tab-auxiliary .mode {
-    background-color: #f9f9f9;
     vertical-align: top;
-    border-bottom: 1px solid #000000;
 }
 
 .tab-auxiliary .mode .name {
@@ -76,14 +70,12 @@
 
 .tab-auxiliary .mode .info {
     text-align: center;
-    width: 10%;
     position: relative;
-    background-color: #e4e4e4;
-    border-bottom: 5px solid white;
-    color: grey;
+    background-color: rgba(var(--inav-emphasis-color-rgb), 0.05);
+    color: var(--inav-body-color);
     height: 85px;
     width: 130px;
-    padding: 0px 5px;
+    padding: 0 5px;
 }
 
 .tab-auxiliary .mode .info .name {
@@ -99,15 +91,15 @@
     margin-left:-5px;
 }
 
-.tab-auxiliary .mode .info .buttons a {
-    padding: 2px 5px;
-    border-radius: 4px;
+.tab-auxiliary .buttons a {
+    padding: 4px 10px;
+    border-radius: var(--inav-border-radius);
+    background-color: var(--inav-body-bg);
 }
 
 .tab-auxiliary .ranges {
     margin: 10px;
     padding-right: 0;
-    border-bottom: 5px solid white;
 }
 
 .tab-auxiliary .range {
@@ -115,9 +107,8 @@
     height: 70px;
     padding-top: 15px;
     padding-left: 0;
-    border-top: 1px solid #fff;
-    border-bottom: 1px solid #cccccc;
-    background-color: #ececec;
+    border-bottom: var(--inav-border-width) var(--inav-border-color) solid;
+    background-color: rgba(var(--inav-body-color-rgb), 0.1);
     padding-bottom: 5px;
 }
 
@@ -146,6 +137,8 @@
 }
 
 .tab-auxiliary .mode .range .channelInfo .limits {
+    font-size: .9rem;
+    font-family: monospace;
     padding: 10px 0;
 }
 
@@ -180,18 +173,12 @@
 
 .tab-auxiliary .buttons a {
     text-align: center;
-    font-weight: bold;
-    background-color: #fff;
-    color: black;
-    opacity: 0.8;
-    transition: all ease 0.3s;
+    border: var(--inav-border-width) var(--inav-border-color) solid;
+    color: var(--inav-body-color);
 }
 
 .tab-auxiliary .buttons a:hover {
-    background-color: #fff;
-    opacity: 1.0;
-    color: black;
-    transition: all ease 0.3s;
+    background-color: var(--inav-secondary-bg-subtle);
 }
 
 .tab-auxiliary .delete a {
@@ -203,8 +190,9 @@
     float: right;
     margin-right: 5px;
     margin-top: -9px;
-    background: url('./../../../images/icons/close1.svg') no-repeat center 100%;
     display: block;
+    background-color: var(--inav-secondary);
+    mask: url('./../../../images/icons/close1.svg');
 }
 
 .tab-auxiliary .delete a:hover {
@@ -220,8 +208,7 @@
     line-height: 28px;
 }
 .tab-auxiliary .toolbox {
-    font-weight: bold;
-    color: rgb(105, 99, 99);
+    color: var(--inav-body-color);
     padding: 10px 5px;
 }
 
@@ -230,8 +217,6 @@
     margin-bottom: 0;
     background-color: #828885;
     color: white;
-    font-family: 'open_sansbold', Arial, serif;
-    font-size: 12px;
     display: block;
     cursor: pointer;
     transition: all ease 0.2s;
@@ -245,7 +230,7 @@
 }
 
 .tab-auxiliary .acroEnabled.on {
-    background-color: #37a8db;
+    background-color: var(--inav-primary);
 }
 
 .tab-auxiliary .acroEnabled.off {

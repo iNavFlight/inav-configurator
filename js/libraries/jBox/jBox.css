@@ -12,7 +12,7 @@
 }
 
 .jBox-container {
-  background: #fff;
+  background: var(--inav-body-bg);
 }
 
 .jBox-content {
@@ -28,8 +28,8 @@
 
 .jBox-Tooltip .jBox-container,
 .jBox-Mouse .jBox-container {
-  border-radius: 4px;
-  box-shadow: 0 0 3px rgba(0, 0, 0, 0.25);
+  border-radius: var(--inav-border-radius);
+  border: var(--inav-border-color) var(--inav-border-width) solid;
 }
 
 .jBox-Tooltip .jBox-title,
@@ -58,7 +58,7 @@
   width: 20px;
   height: 20px;
   position: absolute;
-  background: #fff;
+  background: var(--inav-body-bg);
   transform: rotate(45deg);
   box-sizing: border-box;
 }
@@ -70,7 +70,7 @@
 .jBox-pointer-top:after {
   left: 5px;
   top: 6px;
-  box-shadow: -1px -1px 2px rgba(0, 0, 0, 0.15);
+  border: var(--inav-border-color) var(--inav-border-width) solid;
 }
 
 .jBox-pointer-right {
@@ -80,7 +80,7 @@
 .jBox-pointer-right:after {
   top: 5px;
   right: 6px;
-  box-shadow: 1px -1px 2px rgba(0, 0, 0, 0.15);
+  border: var(--inav-border-color) var(--inav-border-width) solid;
 }
 
 .jBox-pointer-left {
@@ -90,7 +90,7 @@
 .jBox-pointer-left:after {
   top: 5px;
   left: 6px;
-  box-shadow: -1px 1px 2px rgba(0, 0, 0, 0.15);
+  border: var(--inav-border-color) var(--inav-border-width) solid;
 }
 
 .jBox-pointer-bottom {
@@ -100,7 +100,7 @@
 .jBox-pointer-bottom:after {
   left: 5px;
   bottom: 6px;
-  box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.15);
+  border: var(--inav-border-color) var(--inav-border-width) solid;
 }
 
 .jBox-pointer-top, .jBox-pointer-bottom {
@@ -114,11 +114,11 @@
 }
 
 .jBox-Modal .jBox-container {
-  border-radius: 4px;
+  border-radius: var(--inav-border-radius);
 }
 
 .jBox-Modal .jBox-container, .jBox-Modal.jBox-closeButton-box:before {
-  box-shadow: 0 3px 15px rgba(0, 0, 0, 0.4), 0 0 5px rgba(0, 0, 0, 0.4);
+  border: var(--inav-border-color) var(--inav-border-width) solid;
 }
 
 .jBox-Modal .jBox-content {
@@ -126,10 +126,10 @@
 }
 
 .jBox-Modal .jBox-title {
-  border-radius: 4px 4px 0 0;
+  border-radius: var(--inav-border-radius) var(--inav-border-radius) 0 0;
   padding: 15px 20px;
-  background: #fafafa;
-  border-bottom: 1px solid #eee;
+  background: var(--inav-body-bg);
+  border-bottom: var(--inav-border-color) var(--inav-border-width) solid;
 }
 
 .jBox-Modal.jBox-closeButton-title .jBox-title {
@@ -137,7 +137,7 @@
 }
 
 .jBox-Modal .jBox-footer {
-  border-radius: 0 0 4px 4px;
+  border-radius: 0 0 var(--inav-border-radius) var(--inav-border-radius);
 }
 
 .jBox-closeButton {
@@ -226,7 +226,7 @@
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+  border: var(--inav-border-color) var(--inav-border-width) solid;
 }
 
 .jBox-closeButton-box.jBox-pointerPosition-top:before {
@@ -251,10 +251,10 @@
 }
 
 .jBox-footer {
-  background: #fafafa;
-  border-top: 1px solid #eee;
+  background: var(--inav-body-bg);
+  border-top: var(--inav-border-color) var(--inav-border-width) solid;
   padding: 8px 10px;
-  border-radius: 0 0 3px 3px;
+  border-radius: 0 0 var(--inav-border-radius) var(--inav-border-radius);
 }
 
 body[class^="jBox-blockScroll-"],
@@ -300,13 +300,13 @@ body[class*=" jBox-blockScroll-"] {
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  border: 2px solid rgba(0, 0, 0, 0.2);
+  border: var(--inav-border-color) var(--inav-border-width) solid;
   border-top-color: rgba(0, 0, 0, 0.8);
   animation: jBoxLoading .6s linear infinite;
 }
 
 .jBox-countdown {
-  border-radius: 4px 4px 0 0;
+  border-radius: var(--inav-border-radius) var(--inav-border-radius) 0 0;
   z-index: 0;
   background: #000;
   opacity: .2;
@@ -324,7 +324,7 @@ body[class*=" jBox-blockScroll-"] {
   width: 100%;
   height: 3px;
   position: absolute;
-  background: #fff;
+  background: var(--inav-body-bg);
 }
 
 [class^="jBox-animated-"],

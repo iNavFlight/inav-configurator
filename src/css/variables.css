@@ -1,0 +1,124 @@
+:root,
+[data-inav-theme=light] {
+    /* INAV primary color: #37a8db; */
+
+    --font-size: 12px;
+
+    --inav-font-sans-serif: "Open Sans", "Segoe UI", Tahoma;
+    --inav-font-monospace: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+
+    --inav-body-font-family: var(--inav-font-sans-serif);
+    --inav-body-font-size: 1rem;
+    --inav-body-font-weight: 400;
+    --inav-body-line-height: 1.4;
+    --inav-body-color: #212529;
+    --inav-body-bg: #ffffff;
+
+    --inav-blue: #0d6efd;
+    --inav-indigo: #6610f2;
+    --inav-purple: #6f42c1;
+    --inav-pink: #d63384;
+    --inav-red: #dc3545;
+    --inav-orange: #fd7e14;
+    --inav-yellow: #ffc107;
+    --inav-green: #198754;
+    --inav-teal: #20c997;
+    --inav-cyan: #0dcaf0;
+    --inav-black: #000;
+    --inav-white: #fff;
+    --inav-gray-dark: #343a40;
+    --inav-gray-100: #f8f9fa;
+    --inav-gray-200: #e9ecef;
+    --inav-gray-300: #dee2e6;
+    --inav-gray-400: #ced4da;
+    --inav-gray-500: #adb5bd;
+    --inav-gray-600: #6c757d;
+    --inav-gray-700: #495057;
+    --inav-gray-800: #343a40;
+    --inav-gray-900: #212529;
+    --inav-gray: var(--inav-gray-400);
+
+    --inav-primary: #37a8db;
+    --inav-secondary: #969fa6;
+    --inav-success: #2fb344;
+    --inav-info: #4299e1;
+    --inav-warning: #f79507;
+    --inav-danger: #da4c4c;
+    --inav-light: #f8f9fa;
+    --inav-dark: #212529;
+
+    --inav-primary-text-emphasis: #164358;
+    --inav-secondary-text-emphasis: #3c4042;
+    --inav-success-text-emphasis: #13481b;
+    --inav-info-text-emphasis: #1a3d5a;
+    --inav-warning-text-emphasis: #633c03;
+    --inav-danger-text-emphasis: #571e1e;
+    --inav-light-text-emphasis: #495057;
+    --inav-dark-text-emphasis: #495057;
+
+    --inav-primary-bg-subtle: #d7eef8;
+    --inav-secondary-bg-subtle: #eaeced;
+    --inav-success-bg-subtle: #d5f0da;
+    --inav-info-bg-subtle: #d9ebf9;
+    --inav-warning-bg-subtle: #fdeacd;
+    --inav-danger-bg-subtle: #f8dbdb;
+    --inav-light-bg-subtle: #fcfcfd;
+    --inav-dark-bg-subtle: #ced4da;
+
+    --inav-primary-border-subtle: #afdcf1;
+    --inav-secondary-border-subtle: #d5d9db;
+    --inav-success-border-subtle: #ace1b4;
+    --inav-info-border-subtle: #b3d6f3;
+    --inav-warning-border-subtle: #fcd59c;
+    --inav-danger-border-subtle: #f0b7b7;
+    --inav-light-border-subtle: #e9ecef;
+    --inav-dark-border-subtle: #adb5bd;
+
+    --inav-emphasis-color: #000;
+    --inav-secondary-color: rgba(33, 37, 41, 0.75);
+    --inav-secondary-bg: #e9ecef;
+    --inav-tertiary-color: rgba(33, 37, 41, 0.5);
+    --inav-tertiary-bg: #f8f9fa;
+    --inav-heading-color: inherit;
+    --inav-link-color: #37a8db;
+    --inav-link-decoration: underline;
+    --inav-link-hover-color: #2c86af;
+    --inav-code-color: #d63384;
+    --inav-highlight-color: #212529;
+    --inav-highlight-bg: #fff3cd;
+
+    --inav-body-color-rgb: 33, 37, 41;
+    --inav-body-bg-rgb: 255, 255, 255;
+    --inav-emphasis-color-rgb: 0, 0, 0;
+    --inav-secondary-color-rgb: 33, 37, 41;
+    --inav-secondary-bg-rgb: 233, 236, 239;
+    --inav-tertiary-color-rgb: 33, 37, 41;
+    --inav-tertiary-bg-rgb: 248, 249, 250;
+    --inav-link-color-rgb: 55, 168, 219;
+    --inav-link-hover-color-rgb: 44, 134, 175;
+
+    --inav-border-width: 1px;
+    --inav-border-style: solid;
+    --inav-border-color: #dee2e6;
+    --inav-border-color-translucent: rgba(0, 0, 0, 0.175);
+    --inav-border-radius: 0.375rem;
+    --inav-border-radius-sm: 0.25rem;
+    --inav-border-radius-lg: 0.5rem;
+    --inav-border-radius-xl: 1rem;
+    --inav-border-radius-xxl: 2rem;
+    --inav-border-radius-2xl: var(--inav-border-radius-xxl);
+    --inav-border-radius-pill: 50rem;
+    --inav-box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    --inav-box-shadow-sm: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    --inav-box-shadow-lg: 0 1rem 3rem rgba(0, 0, 0, 0.175);
+    --inav-box-shadow-inset: inset 0 1px 2px rgba(0, 0, 0, 0.075);
+
+    --inav-focus-ring-width: 0.25rem;
+    --inav-focus-ring-opacity: 0.25;
+
+    --inav-focus-ring-color: rgba(55, 168, 219, 0.25);
+    --inav-form-valid-color: #2fb344;
+    --inav-form-valid-border-color: #2fb344;
+    --inav-form-invalid-color: #da4c4c;
+    --inav-form-invalid-border-color: #da4c4c;
+}

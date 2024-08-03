@@ -6,6 +6,7 @@ window.$ = window.jQuery =  require('jquery'),
                             require('./libraries/jquery.ba-throttle-debounce');
 
 const { app } = require('@electron/remote');
+const darkMode = require('./darkMode');
 const d3 = require('./libraries/d3.min');
 const Store = require('electron-store');
 const store = new Store();
@@ -40,6 +41,7 @@ process.on('uncaughtException', function (error) {
 
 // Set how the units render on the configurator only
 $(function() {
+    darkMode.init();
     i18n.init( () => {
         i18n.localize();
 
@@ -299,6 +301,9 @@ $(function() {
                 el.after('<div id="options-window"></div>');
 
                 $('div#options-window').load('./tabs/options.html', function () {
+                    // Set current value of configurator theme
+                    darkMode.setConfiguratorTheme(darkMode.getPreferredTheme());
+                    document.getElementById('options-window').setAttribute('data-inav-theme', darkMode.getPreferredTheme())
 
                     // translate to user-selected language
                     i18n.localize();
@@ -371,6 +376,10 @@ $(function() {
                         const activeTab = $('#tabs li.active');
                         activeTab.removeClass('active');
                         activeTab.find('a').trigger( "click" );
+                    });
+                    $('#configurator-theme-select').on('change', function () {
+                        darkMode.setConfiguratorTheme($(this).val());
+                        document.getElementById('options-window').setAttribute('data-inav-theme', darkMode.getPreferredTheme())
                     });
                     $('#map-provider-type').on('change', function () {
                         store.set('map_provider_type', $(this).val());

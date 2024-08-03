@@ -3,6 +3,25 @@
     </div>
 
     <div class="Wrapper">
+
+        <div class="options-section gui_box grey">
+            <div class="gui_box_titlebar">
+                <div class="spacer_box_title"><span data-i18n="configuratorTheme"></span></div>
+            </div>
+
+            <div class="spacer_box settings">
+                <div class="select">
+                    <select id="configurator-theme-select">
+                        <option value="auto" data-i18n="configuratorThemeSystem"></option>
+                        <option value="light" data-i18n="configuratorThemeLight"></option>
+                        <option value="dark" data-i18n="configuratorThemeDark"></option>
+                    </select>
+                    <label><span data-i18n="toogleConfiguratorTheme"></span></label>
+                </div>
+            </div>
+
+        </div>
+
         <div class="options-section gui_box grey">
 
             <div class="spacer_box settings">
@@ -46,16 +65,16 @@
                 </div>
 
                 <div class="number">
-                    <input type="password" id="map-api-key" style="border: solid 1px black" />                
+                    <input type="password" id="map-api-key" />
                     <label for="map-api-key" data-i18n="mapApiKey"></label>                    
                 </div>
 
                 <div class="number">                    
-                    <input type="text" id="proxyurl" style="border: solid 1px black" />
+                    <input type="text" id="proxyurl" />
                     <label for="proxyurl" data-i18n="proxyURL"></label>
                 </div>
                 <div class="number">                    
-                    <input type="text" id="proxylayer" style="border: solid 1px black" />
+                    <input type="text" id="proxylayer" />
                     <label for="proxylayer" data-i18n="proxyLayer"></label>
                 </div>
             </div>
@@ -104,7 +123,7 @@
 
             <div class="spacer_box settings">
                 <div class="number">
-                    <input type="password" id="assistnow-api-key" style="border: solid 1px black" />                
+                    <input type="password" id="assistnow-api-key" />
                     <label for="assistnow-api-key" data-i18n="gpsOptionsAssistnowToken"></label>                    
                 </div>
             </div>

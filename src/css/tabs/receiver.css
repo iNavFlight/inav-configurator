@@ -51,9 +51,9 @@
     margin-top: 2px;
     width: calc(100% - 2px);
     height: 15px;
-    border: 1px solid silver;
-    background-color: #f4f4f4;
-    border-radius: 3px;
+    border: var(--inav-border-width) var(--inav-border-color) solid;
+    background-color: rgba(var(--inav-emphasis-color-rgb), 0.05);
+    border-radius: var(--inav-border-radius);
 }
 
 .tab-receiver .bars .meter-bar .label {
@@ -62,7 +62,7 @@
     height: 15px;
     line-height: 15px;
     text-align: center;
-    color: #474747;
+    color: var(--inav-body-color);
 }
 
 .tab-receiver .bars .meter-bar .fill {
@@ -172,34 +172,30 @@
 }
 
 .tab-receiver .tunings table th {
-    background: #828885;
-    color: white;
-    border-right: 1px solid silver;
-    font-weight: normal;
+    background: rgba(var(--inav-body-color-rgb), 0.03);
+    color: var(--inav-body-color);
+    border: var(--inav-border-width) var(--inav-border-color) solid;
     width: 50%;
 }
 
 .tab-receiver .tunings table th:first-child {
-    border-top-left-radius: 3px;
+    border-top-left-radius: var(--inav-border-radius);
 }
 
 .tab-receiver .tunings table th:last-child {
-    border-top-right-radius: 3px;
-    border-right: 0;
+    border-top-right-radius: var(--inav-border-radius);
 }
 
 .tab-receiver .tunings table td {
-    background: #DEDEDE;
-    border-right: 1px solid silver;
+    border: var(--inav-border-width) var(--inav-border-color) solid;
 }
 
 .tab-receiver .tunings table td:first-child {
-    border-bottom-left-radius: 3px;
+    border-bottom-left-radius: var(--inav-border-radius);
 }
 
 .tab-receiver .tunings table td:last-child {
-    border-bottom-right-radius: 3px;
-    border-right: 0px;
+    border-bottom-right-radius: var(--inav-border-radius);
 }
 
 .tab-receiver .tunings table td {
@@ -207,13 +203,12 @@
 }
 
 .tab-receiver .tunings table tr:nth-child(odd) {
-    background-color: #ececec;
 }
 
 .tab-receiver .tunings table input {
-    width: calc(100% - 8px);
-    border: 1px solid silver;
-    border-radius: 3px;
+    width: calc(100% - 16px);
+    border: var(--inav-border-width) var(--inav-border-color) solid;
+    border-radius: var(--inav-border-radius);;
     height: 20px;
     margin: 3px;
     line-height: 20px;
@@ -223,18 +218,19 @@
 
 .tab-receiver .rssi_channel_wrapper {
     float: right;
-    margin: 0px 0px 20px 0;
+    margin: 0 0 20px;
+    border: var(--inav-border-width) var(--inav-border-color) solid;
     border-left: 0;
-    width: 30%;
-    border-top-right-radius: 5px;
-    border-bottom-right-radius: 5px;
-    background-color: #DEDEDE;
+    width: 29%;
+    border-top-right-radius: var(--inav-border-radius);
+    border-bottom-right-radius: var(--inav-border-radius);
+    background-color: rgba(var(--inav-body-color-rgb), 0.03);
 }
 
 .tab-receiver .rssi_channel_wrapper select {
     height: 22px;
     padding-left: 5px;
-    border: 1px solid silver;
+    /*border: 1px solid silver;*/
     margin: 4px;
     width: calc(100% - 8px);
 }
@@ -244,15 +240,15 @@
     text-align: left;
     padding-left: 6px;
     font-weight: normal;
-    background: #828885;
-    color: white;
-    border-top-right-radius: 3px;
+    background: rgba(var(--inav-body-color-rgb), 0.03);
+    color: var(--inav-body-color);
+    border-top-right-radius: var(--inav-border-radius);
 }
 
 .tab-receiver .rssi_channel_wrapper select {
     height: 22px;
     padding-left: 5px;
-    border: 1px solid silver;
+    /*border: 1px solid silver;*/
     margin: 4px;
     width: calc(100% - 8px);
 }
@@ -260,11 +256,13 @@
 .tab-receiver .rcmap_wrapper {
     float: right;
     position: relative;
-    margin: 0px 0px 20px 0;
+    margin: 0 0 20px 0;
     width: calc(70% - 0px);
-    border-top-left-radius: 5px;
-    border-bottom-left-radius: 5px;
-    background-color: #DEDEDE;
+    border: var(--inav-border-width) var(--inav-border-color) solid;
+    border-right: none;
+    border-top-left-radius: var(--inav-border-radius);
+    border-bottom-left-radius: var(--inav-border-radius);
+    background-color: rgba(var(--inav-body-color-rgb), 0.03);
 }
 
 .tab-receiver .rcmap_wrapper .head {
@@ -272,34 +270,29 @@
     padding: 4px;
     text-align: left;
     padding-left: 6px;
-    font-weight: normal;
-    background: #828885;
-    color: white;
-    border-top-left-radius: 3px;
-    border-right: 1px solid silver;
+    background: rgba(var(--inav-body-color-rgb), 0.03);
+    color: var(--inav-body-color);
+    border-top-left-radius: var(--inav-border-radius);
+    border-right: var(--inav-border-width) var(--inav-border-color) solid;
 }
 
 .tab-receiver .hybrid_element {
-    border-right: 1px solid silver;
+    border-right: var(--inav-border-width) var(--inav-border-color) solid;
 }
 
 .tab-receiver .hybrid_element input {
     position: absolute;
     padding-left: 5px;
     width: calc(100% - 36px);
-    height: 20px;
     z-index: 2;
-    border-radius: 0px;
-    border: 1px solid silver;
+    border: var(--inav-border-width) var(--inav-border-color) solid;
     margin: 4px;
-    border-top-left-radius: 3px;
-    border-bottom-left-radius: 3px;
+    border-radius: var(--inav-border-radius) 0 0 var(--inav-border-radius);
 }
 
 .tab-receiver .hybrid_element select {
     height: 22px;
     z-index: 1;
-    border: 1px solid silver;
     margin: 4px;
     width: calc(100% - 10px);
 }
@@ -310,18 +303,20 @@
 }
 
 .tab-receiver .throttle_curve {
-    margin: 0 0px 0px 0;
+    --paper-line: rgba(var(--inav-secondary-color-rgb), .05);
+    margin: 0;
     width: 200px;
     height: 117px;
-    border: 1px solid silver;
-    border-radius: 3px;
-    background-image: url(./../../../images/paper.jpg);
-    background-size: 200%;
-    background-position: center;
+    border: var(--inav-border-width) var(--inav-border-color) solid;
+    border-radius: var(--inav-border-radius);
+    background-image: linear-gradient(to right, var(--paper-line) 0, var(--paper-line) 1px, transparent 1px, transparent 100% ),
+    linear-gradient( to bottom, var(--paper-line) 0, var(--paper-line) 1px, transparent 1px, transparent 100% );
+    background-position: -1px 0, 0 -1px;
+    background-size: 16px 16px;
 }
 
 .tab-receiver .pitch_roll_curve {
-    margin: 0 0px 0px 0;
+    margin: 0;
     width: 200px;
     height: 117px;
     border: 1px solid silver;

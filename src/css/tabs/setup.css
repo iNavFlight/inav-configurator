@@ -10,9 +10,8 @@
     position: absolute;
     width: calc(75% - 30px);
     height: calc(100% - 245px);
-    background-color: #f9f9f9;
-    border-radius: 5px;
-    border: 1px solid #e4e4e4;
+    border-radius: var(--inav-border-radius);
+    border: var(--inav-border-width) var(--inav-border-color) solid;
     margin-bottom: 10px;
 }
 
@@ -22,8 +21,7 @@
     left: 10px;
     width: 120px;
     margin: 0;
-    font-weight: normal;
-    color: #616161;
+    color: var(--inav-body-color);
 }
 
 .attitude_info dl {
@@ -60,20 +58,19 @@
     display: block;
     top: 10px;
     right: 10px;
-    border-radius: 3px;
+    border-radius: var(--inav-border-radius);
+    border: var(--inav-border-width) var(--inav-border-color) solid;
     bottom: 10px;
     height: 28px;
     line-height: 28px;
     padding: 0 15px 0 15px;
     text-align: center;
     font-weight: bold;
-    border: 1px solid silver;
-    background-color: #ececec;
     z-index: 100;
 }
 
 #interactive_block a.reset:hover {
-    background-color: #dedcdc;
+    background-color: var(--inav-primary-bg-subtle);
 }
 
 #canvas_wrapper {
@@ -82,14 +79,20 @@
     height: 100%;
     top: 0;
     left: 0;
-    background: url(./../../../images/paper.jpg) center;
-    border-radius: 5px;
+    border-radius: var(--inav-border-radius);
     background-size: contain;
 }
 
 #canvas {
+    --paper-line: rgba(var(--inav-secondary-color-rgb), .05);
     width: 100% !important;
     height: 100% !important;
+    background-color: var(--inav-body-bg);
+    border-radius: var(--inav-border-radius);
+    background-image: linear-gradient(to right, var(--paper-line) 0, var(--paper-line) 1px, transparent 1px, transparent 100% ),
+    linear-gradient( to bottom, var(--paper-line) 0, var(--paper-line) 1px, transparent 1px, transparent 100% );
+    background-position: -1px 0, 0 -1px;
+    background-size: 16px 16px;
 }
 
 .gui_box grey .block_wrapper {
@@ -166,9 +169,8 @@
 }
 
 .cell_setup {
-    border-bottom: solid 1px #ddd;
+    border-bottom: solid var(--inav-border-color) var(--inav-border-width);
     padding-bottom: 8px;
-    padding-top: 7px;
 }
 
 .tab_setup .content_wrapper {
@@ -236,8 +238,6 @@
     border-radius: 4px;
     border: 1px solid #39a9dc;
     color: #39a9dc;
-    font-family: 'open_sanssemibold', Arial,serif;
-    font-size: 12px;
     line-height: 13px;
     transition: all ease 0.2s;
     text-decoration:none;
@@ -246,21 +246,17 @@
 
 #mag_calib_running {
     display: none;
-    
     width: 100%;
     position: relative;
     margin-bottom: 0;
     margin-top: 0;
     float: left;
-    
     padding: 5px 0 5px 0;
     text-align: center;
     background-color: #fff;
     border-radius: 4px;
     border: 1px solid #39a9dc;
     color: #39a9dc;
-    font-family: 'open_sanssemibold', Arial,serif;
-    font-size: 12px;
     line-height: 13px;
     transition: all ease 0.2s;
     text-decoration:none;
@@ -279,7 +275,7 @@
 .armin-status-element {
     margin: 2px 0;
     font-weight: bold;
-    color: #37a8db;
+    color: var(--inav-primary);
     font-size: 1em;
 }
 

@@ -3,19 +3,40 @@
 }
 
 .tab-adjustments .range .marker, .tab-adjustments .channel-slider .noUi-connect {
-    background: #37a8db;
-    box-shadow: inset 0 0 2px rgba(0, 0, 0, 0.4), 0 1px 0 rgba(255, 255, 255, 0.6);
+    background: var(--inav-primary);
+}
+
+.noUi-handle {
+    box-shadow: none;
+}
+
+.noUi-pips {
+    color: var(--inav-secondary);
+    font-family: monospace;
+    font-size: .9rem;
+}
+.noUi-value-horizontal {
+    padding-top: 15px;
+}
+.noUi-marker {
+    background-color: var(--inav-gray);
+}
+.noUi-marker-horizontal.noUi-marker {
+    width: 1px;
+    height: 4px;
+}
+.noUi-marker-horizontal.noUi-marker-large {
+    height: 10px;
 }
 
 .noUi-target {
-    border-radius: 4px;
-    border: 1px solid #D3D3D3;
-    box-shadow: inset 0 0 2px rgba(0, 0, 0, 0.4), 0 1px 0 rgba(255, 255, 255, 0.6);
+    border-radius: var(--inav-border-radius);
+    border: var(--inav-border-width) var(--inav-border-color) solid;
 }
 
 .noUi-background {
-    box-shadow: inset 0 0 2px rgba(0, 0, 0, 0.4), 0 1px 0 rgba(255, 255, 255, 0.6);
-    background: #D2D2D2;
+    background: var(--inav-body-bg);
+    box-shadow: none;
 }
 
 .tab-adjustments .adjustments {
@@ -24,8 +45,6 @@
 }
 
 .tab-adjustments td {
-    border-top: 1px solid #fff;
-    border-bottom: 1px solid #cccccc;
 }
 
 .tab-adjustments .range:first-child {
@@ -40,8 +59,7 @@
     text-align: center;
     white-space: nowrap;
     padding: 10px 10px;
-    background-color: #828885;
-    color: white;
+    background-color: rgba(var(--inav-emphasis-color-rgb), 0.05);
 }
 
 .tab-adjustments .adjustments thead td:first-child {
@@ -52,12 +70,11 @@
     border-top-right-radius: 5px;
 }
 
-.tab-adjustments .adjustment:nth-child(odd) {
-    background-color: #f4f4f4;
+.tab-adjustments .adjustment:nth-child(even) {
+    background-color: rgba(var(--inav-emphasis-color-rgb), 0.05);
 }
 
 .tab-adjustments .adjustments {
-    background-color: #e4e4e4;
 }
 
 .tab-adjustments .adjustment td {

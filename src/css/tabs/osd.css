@@ -13,8 +13,6 @@
     line-height: 24px;
     color: white;
     font-weight: bold;
-
-    /* text-shadow: 1px 0px 2px rgba(0, 0, 0, 0.9);*/
 }
 
 .darkgrey {
@@ -22,7 +20,7 @@
 }
 
 .blue {
-    color: #151f8c;
+    color: var(--inav-blue);
 }
 
 .tab-osd .spacer_box_title {
@@ -350,7 +348,6 @@
 
 button {
     padding: 4px 10px !important;
-    font-family: 'open_sanssemibold', Arial, serif;
     font-size: 9pt !important;
     cursor: pointer;
 }
@@ -364,7 +361,7 @@ button {
 
 .tab-osd .display-field {
     padding: 4px;
-    border-bottom: 1px solid #ddd;
+    border-bottom: var(--inav-border-width) var(--inav-border-color) solid;
 }
 
 .tab-osd .display-field.mouseover {
@@ -394,13 +391,9 @@ button {
     margin-top: 5px;
     margin-bottom: 8px;
     width: 100%;
-
 }
 
 .spacer_box_title span {
-    font-size: 11px;
-    font-weight: normal;
-    font-family: 'open_sansregular', 'Segoe UI', Tahoma, sans-serif;
 }
 
 .spacer_box div input[type="radio"] {
@@ -643,7 +636,7 @@ button {
 .tab-osd .settings label {
     display: block;
     width: 100%;
-    border-bottom: 1px solid #ddd;
+    border-bottom: var(--inav-border-width) var(--inav-border-color) solid;
     margin-top: 5px;
     padding-bottom: 5px
 }
@@ -659,10 +652,6 @@ button {
     height: 18px;
     line-height: 20px;
     text-align: left;
-    border: 1px solid silver;
-    border-radius: 3px;
-    font-size: 11px;
-    font-weight: normal;
 }
 
 .tab-osd .settings select {
@@ -738,25 +727,26 @@ button {
 .settings .btn a{
     margin-top: 0;
     margin-bottom: 0;
-    border-radius: 3px;
+    border-radius: var(--inav-border-radius);
     color: #fff;
-    font-family: 'open_sansbold', Arial, serif;
-    font-size: 12px;
-    text-shadow: 0 1px rgba(0, 0, 0, 0.25);
+    /*font-family: 'open_sansbold', Arial, serif;*/
+    /*font-size: 12px;*/
+    /*text-shadow: 0 1px rgba(0, 0, 0, 0.25);*/
     cursor: pointer;
-    transition: all ease 0.2s;
+    /*transition: all ease 0.2s;*/
     padding: 0 9px;
     line-height: 22px;
 }
 
 .settings .btn_blue a{
-    background-color: #37a8db;
-    border: 1px solid #3394b5;
+    background-color: var(--inav-primary);
+    border: 1px solid var(--inav-primary);
 }
 
 .settings .btn_danger a{
-    background-color: #e2a2a2;
-    border: 1px solid #e58383;
+    background-color: var(--inav-danger);
+    border: var(--inav-border-width) var(--inav-danger) solid;
+    color: white;
 }
 
 
