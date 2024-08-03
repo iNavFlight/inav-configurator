@@ -172,9 +172,9 @@ function createWindow() {
   mainWindowState.manage(mainWindow);
 
   // Open the DevTools.
-  // if (process.env.NODE_ENV === 'development') {
+  if (process.env.NODE_ENV === 'development') {
     mainWindow.webContents.openDevTools();
-  // }
+  }
 };
 
 app.on('window-all-closed', () => {
