@@ -120,10 +120,8 @@ hr {
 
 .tab-configuration .mixerPreview {
     max-width: 230px;
-    background-color: #eeeeee;
     text-align: center;
     float: left;
-    border-radius: 5px;
     margin-top: 5px;
 }
 
@@ -142,7 +140,7 @@ hr {
     position: relative;
     width: 20px;
     height: 20px;
-    margin-top: 0px;
+    margin-top: 0;
     margin-left: 6px;
     margin-right: 2px;
     top: 6px;

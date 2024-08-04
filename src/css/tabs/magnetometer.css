@@ -10,7 +10,7 @@
     text-align: center;
     line-height: 20px;
     font-weight: bold;
-    border-bottom: 1px solid silver;
+    border-bottom: var(--inav-border-width) var(--inav-border-color) solid;
     background-color: #ececec;
 }
 
@@ -119,7 +119,7 @@
     width: 100%;
     table-layout: auto;
     text-align: center;
-    border-bottom: 1px solid #ddd;
+    border-bottom: var(--inav-border-width) var(--inav-border-color) solid;
 }
 
 .tab-magnetometer .slider {
@@ -140,9 +140,8 @@
     width: calc(100% - 655px);
     height: 836px;
     min-height: calc(100% - 200px);
-    background-color: #f9f9f9;
-    border-radius: 5px;
-    border: 1px solid #e4e4e4;
+    border-radius: var(--inav-border-radius);
+    border: var(--inav-border-width) var(--inav-border-color) solid;
     margin-bottom: 10px;
 }
 
@@ -171,7 +170,6 @@
 }
 
 .tab-magnetometer .info {
-    background-color: #e4e4e4;
 }
 
 .tab-magnetometer .table-title {
@@ -184,7 +182,6 @@
 progress[value]::-webkit-progress-bar {
     background-color: #d2d2d2;
     border-radius: 2px;
-    box-shadow: 0 0 3px rgba(0, 0, 0, 0.25) inset;
 }
 
 /*noinspection ALL*/

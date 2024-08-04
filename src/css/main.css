@@ -1458,35 +1458,23 @@ dialog {
 
 .green a {
     background-color: var(--inav-primary);
-    text-shadow: 0 1px rgba(0, 0, 0, 0.25);
     color: #fff;
-    border: 1px solid #3a9dbf;
-    transition: all ease 0.2s;
+    border: var(--inav-border-width) var(--inav-primary-border-subtle) solid;
 }
 
 .green a:hover {
-    background-color: #45bce5;
-    border: 1px solid #3a9dbf;
-    text-shadow: 0 1px rgba(0, 0, 0, 0.25);
-    color: #fff;
-    transition: all ease 0.2s;
+    background-color: var(--inav-primary-border-subtle);
 }
 
 .btn.red a,
 .btn.red a:active {
-    background-color: #fafafa;
-    text-shadow: 0 1px rgba(0, 0, 0, 0.25);
-    color: #ff1e1e;
-    border: 1px solid #a00000;
-    transition: all ease 0.2s;
+    color: var(--inav-danger);
+    border: var(--inav-border-width) var(--inav-danger-border-subtle) solid;
 }
 
 .btn.red a:hover {
-    background-color: #f86975;
-    border: 1px solid #a00000;
-    text-shadow: 0 1px rgba(0, 0, 0, 0.25);
+    background-color: var(--inav-danger-border-subtle);
     color: #fff;
-    transition: all ease 0.2s;
 }
 
 /* Table styling */

@@ -69,7 +69,7 @@ var Settings = (function () {
                 }
 
                 if (FC.isControlProfileParameter(settingName)) {
-                    input.css("background-color","#d5ebfe");
+                    input.css("background-color","var(--inav-primary-bg-subtle)");
                 }
             }
 

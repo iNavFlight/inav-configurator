@@ -62,10 +62,9 @@
 }
 
 .output-table th {
-    background-color: #828885;
-    color: #fff;
+    background-color: var(--inav-tertiary-bg);
     text-align: left;
-    padding-left: 1em;
+    padding-left: 1rem;
 }
 
 .output-table td {
