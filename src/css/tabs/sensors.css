@@ -178,4 +178,5 @@
 
 .tab-sensors .gui_box {
     flex-direction: row-reverse;
+    flex-wrap: wrap;
 }
