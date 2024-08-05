@@ -19,6 +19,7 @@ const { globalSettings } = require('./../js/globalSettings');
 const { PortHandler } = require('./../js/port_handler');
 const i18n = require('./../js/localization');
 const jBox = require('./../js/libraries/jBox/jBox.min');
+const { Console } = require('console');
 
 
 var SYM = SYM || {};
@@ -553,7 +554,6 @@ OSD.DjiElements =  {
         "Timers",
         "VTX",
         "CRSF",
-        "SwitchIndicators",
         "GVars",
         "PIDs",
         "PIDOutputs",
@@ -1849,35 +1849,6 @@ OSD.constants = {
             ]
         },
         {
-            name: 'osdGroupSwitchIndicators',
-            items: [
-                {
-                    name: 'SWITCH_INDICATOR_0',
-                    id: 130,
-                    positionable: true,
-                    preview: 'SWI1' + FONT.symbol(SYM.SWITCH_INDICATOR_HIGH)
-                },
-                {
-                    name: 'SWITCH_INDICATOR_1',
-                    id: 131,
-                    positionable: true,
-                    preview: 'SWI2' + FONT.symbol(SYM.SWITCH_INDICATOR_HIGH)
-                },
-                {
-                    name: 'SWITCH_INDICATOR_2',
-                    id: 132,
-                    positionable: true,
-                    preview: 'SWI3' + FONT.symbol(SYM.SWITCH_INDICATOR_HIGH)
-                },
-                {
-                    name: 'SWITCH_INDICATOR_3',
-                    id: 133,
-                    positionable: true,
-                    preview: 'SWI4' + FONT.symbol(SYM.SWITCH_INDICATOR_HIGH)
-                }
-            ]
-        },
-        {
             name: 'osdGroupGVars',
             items: [
                 {
@@ -2812,7 +2783,6 @@ OSD.GUI.updateFields = function() {
     GUI.switchery();
 
     // Update the OSD preview
-    refreshOSDSwitchIndicators();
     updatePilotAndCraftNames();
     updatePanServoPreview();
 };
@@ -3290,6 +3260,7 @@ TABS.osd = {};
 TABS.osd.initialize = function (callback) {
 
     mspHelper.loadServoMixRules();
+    mspHelper.loadLogicConditions();
 
     if (GUI.active_tab != 'osd') {
         GUI.active_tab = 'osd';
@@ -3344,12 +3315,6 @@ TABS.osd.initialize = function (callback) {
                 }
     
                 // Update the OSD preview
-                refreshOSDSwitchIndicators();
-            });
-    
-            // Function to update the OSD layout when the switch text alignment changes
-            $("#switchIndicators_alignLeft").on('change', function() {
-                refreshOSDSwitchIndicators();
             });
     
             // Functions for when pan servo settings change
@@ -3633,8 +3598,7 @@ function customElementNormaliseRow(row){
     }
 }
 
-function customElementDisableNonValidOptionsRow(row){
-
+function customElementDisableNonValidOptionsRow(row) {
     var selectedTextIndex = false;
     for(let i = 0; i < 3; i++){
         let elementType = $('.osdCustomElement-' + row + '-part-' + i + '-type');
@@ -3657,13 +3621,12 @@ function customElementDisableNonValidOptionsRow(row){
 }
 
 function customElementGetDataForRow(row){
-
     var data = [];
     data.push8(row);
 
     var text = "";
 
-    for(var ii = 0; ii < 3; ii++){
+    for(var ii = 0; ii < FC.OSD_CUSTOM_ELEMENTS.settings.customElementParts; ii++){
         var elementType = $('.osdCustomElement-' + row + '-part-' + ii + '-type');
         var valueCell = $('.' + elementType.data('valueCellClass'));
         var partValue = 0;
@@ -3705,7 +3668,9 @@ function customElementGetDataForRow(row){
     data.push8(parseInt(elementVisibilityType.val()));
     data.push16(visibilityValue);
 
-    for(var i = 0; i < FC.OSD_CUSTOM_ELEMENTS .settings.customElementTextSize; i++){
+    console.log("Saving osd custom data for number " + row + " | data: " + data);
+
+    for(var i = 0; i < FC.OSD_CUSTOM_ELEMENTS.settings.customElementTextSize; i++){
         if(i < text.length){
             data.push8(text.charCodeAt(i))
         }else{
@@ -3718,42 +3683,20 @@ function customElementGetDataForRow(row){
 
 function getGVoptions(){
     var result = '';
-    for(var i = 0; i < 8; i++){
-        result += `<option value="` + i + `">GV `+i+`</option>`;
+    for(var i = 0; i < 8; i++) {
+        result += `<option value="` + i + `">GV ` + i + `</option>`;
     }
     return result;
 }
 
 function getLCoptions(){
     var result = '';
-    for(var i = 0; i < 64; i++){
-        result += `<option value="` + i + `">LC `+i+`</option>`;
-    }
-    return result;
-}
-
-
-function refreshOSDSwitchIndicators() {
-    let group = OSD.constants.ALL_DISPLAY_GROUPS.filter(function(e) {
-        return e.name == "osdGroupSwitchIndicators";
-      })[0];
-    for (let si = 0; si < group.items.length; si++) {
-        let item = group.items[si];
-        if ($("#osdSwitchInd" + si +"_name").val() != undefined) {
-            let switchIndText = $("#osdSwitchInd" + si +"_name").val();
-            if (switchIndText == "") {
-                item.preview = FONT.symbol(SYM.SWITCH_INDICATOR_HIGH);
-            } else {
-                if ($("#switchIndicators_alignLeft").prop('checked')) {
-                    item.preview = switchIndText + FONT.symbol(SYM.SWITCH_INDICATOR_HIGH);
-                } else {
-                    item.preview = FONT.symbol(SYM.SWITCH_INDICATOR_HIGH) + switchIndText;
-                }
-            }
+    for(var i = 0; i < FC.LOGIC_CONDITIONS.getMaxLogicConditionCount(); i++) {
+        if (FC.LOGIC_CONDITIONS.isEnabled(i)) {
+            result += `<option value="` + i + `">LC ` + i + `</option>`;
         }
     }
-
-    OSD.GUI.updatePreviews();
+    return result;
 }
 
 function updatePilotAndCraftNames() {
