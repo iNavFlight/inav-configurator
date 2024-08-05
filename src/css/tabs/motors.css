@@ -257,6 +257,7 @@
     width: 100%;
     text-align: center;
     border-radius: 2px;
+    background-color: var(--inav-primary);
 }
 
 .tab-motors .motor_testing {
