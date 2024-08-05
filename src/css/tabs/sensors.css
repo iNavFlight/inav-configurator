@@ -107,7 +107,7 @@
 }
 
 .tab-sensors .grid .tick {
-    stroke: silver;
+    stroke: var(--inav-border-color);
     stroke-width: 1px;
     shape-rendering: crispEdges;
 }
@@ -123,14 +123,14 @@
 
 .tab-sensors .axis path, .tab-sensors .axis line {
     fill: none;
-    stroke: #ccc;
+    stroke: var(--inav-border-color);
     stroke-width: 1px;
     shape-rendering: crispEdges;
 }
 
 .tab-sensors text {
     stroke: none;
-    fill: #828885;
+    fill: var(--inav-body-color);
     font-size: 10px;
 }
 
