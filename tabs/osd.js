@@ -554,6 +554,7 @@ OSD.DjiElements =  {
         "Timers",
         "VTX",
         "CRSF",
+        "OSDCustomElements",
         "GVars",
         "PIDs",
         "PIDOutputs",
@@ -1849,6 +1850,67 @@ OSD.constants = {
             ]
         },
         {
+            name: 'osdGroupOSDCustomElements',
+            items: [
+                {
+                    name: 'CUSTOM ELEMENT 1',
+                    id: 147,
+                    min_version: '7.1.0',
+                    positionable: true,
+                    preview: "CE_1",
+                },
+                {
+                    name: 'CUSTOM ELEMENT 2',
+                    id: 148,
+                    min_version: '7.1.0',
+                    positionable: true,
+                    preview: "CE_2",
+                },
+                {
+                    name: 'CUSTOM ELEMENT 3',
+                    id: 149,
+                    min_version: '7.1.0',
+                    positionable: true,
+                    preview: "CE_3",
+                },
+                {
+                    name: 'CUSTOM ELEMENT 4',
+                    id: 130,
+                    min_version: '8.0.0',
+                    positionable: true,
+                    preview: "CE_4",
+                },
+                {
+                    name: 'CUSTOM ELEMENT 5',
+                    id: 131,
+                    min_version: '8.0.0',
+                    positionable: true,
+                    preview: "CE_5",
+                },
+                {
+                    name: 'CUSTOM ELEMENT 6',
+                    id: 132,
+                    min_version: '8.0.0',
+                    positionable: true,
+                    preview: "CE_6",
+                },
+                {
+                    name: 'CUSTOM ELEMENT 7',
+                    id: 133,
+                    min_version: '8.0.0',
+                    positionable: true,
+                    preview: "CE_7",
+                },
+                {
+                    name: 'CUSTOM ELEMENT 8',
+                    id: 154,
+                    min_version: '8.0.0',
+                    positionable: true,
+                    preview: "CE_8",
+                },
+            ]
+        },
+        {
             name: 'osdGroupGVars',
             items: [
                 {
@@ -1874,27 +1936,6 @@ OSD.constants = {
                     id: 116,
                     positionable: true,
                     preview: 'G3:30126'
-                },
-                {
-                    name: 'CUSTOM ELEMENT 1',
-                    id: 147,
-                    min_version: '7.1.0',
-                    positionable: true,
-                    preview: "CE_1",
-                },
-                {
-                    name: 'CUSTOM ELEMENT 2',
-                    id: 148,
-                    min_version: '7.1.0',
-                    positionable: true,
-                    preview: "CE_2",
-                },
-                {
-                    name: 'CUSTOM ELEMENT 3',
-                    id: 149,
-                    min_version: '7.1.0',
-                    positionable: true,
-                    preview: "CE_3",
                 }
             ]
         },

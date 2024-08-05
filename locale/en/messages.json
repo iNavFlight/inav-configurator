@@ -4201,21 +4201,6 @@
     "osdElement_ESC_TEMPERATURE_HELP": {
         "message": "Temperature of the ESC read from DSHOT telemetry"
     },
-    "osdGroupSwitchIndicators": {
-        "message": "Switch Indicators"
-    },
-    "osdElement_SWITCH_INDICATOR_0": {
-        "message": "Switch Indicator 1"
-    },
-    "osdElement_SWITCH_INDICATOR_1": {
-        "message": "Switch Indicator 2"
-    },
-    "osdElement_SWITCH_INDICATOR_2": {
-        "message": "Switch Indicator 3"
-    },
-    "osdElement_SWITCH_INDICATOR_3": {
-        "message": "Switch Indicator 4"
-    },
     "osd_pan_servo_settings": {
         "message": "Pan Servo OSD Settings"
     },
@@ -4242,6 +4227,9 @@
     },
     "osdPanServoOffcentreWarning_HELP": {
         "message": "Degrees either side of the pan servo centre; where it is assumed camera is wanted to be facing forwards, but isn't at 0. If in this range and not 0 for longer than 10 seconds, the pan servo offset OSD element will blink. 0 means the warning is disabled."
+    },
+    "osdGroupOSDCustomElements": {
+        "message": "OSD Custom Elements"
     },
     "osdGroupGVars": {
         "message": "Global Variables"
@@ -4329,24 +4317,6 @@
     },
     "osd_dji_cn_alternating_duration": {
         "message": "Craft Name alternating duration (in 1/10 sec)"
-    },
-    "osd_switch_indicator_settings": {
-        "message": "Switch Indicator Settings"
-    },
-    "osd_switch_indicators_align_left": {
-        "message": "Align switch names to left of switches"
-    },
-    "osdSwitchInd0": {
-        "message": "Switch 1"
-    },
-    "osdSwitchInd1": {
-        "message": "Switch 2"
-    },
-    "osdSwitchInd2": {
-        "message": "Switch 3"
-    },
-    "osdSwitchInd3": {
-        "message": "Switch 4"
     },
     "osd_font_default": {
         "message": "Default"
