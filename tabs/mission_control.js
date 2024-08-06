@@ -2101,7 +2101,8 @@ TABS.mission_control.initialize = function (callback) {
             console.log("found saved layer: ");
             console.log(saved_layer.name);
 
-            var features = (new ol.format.GeoJSON()).readFeatures(saved_layer.layer_data);
+            let features = (new ol.format.GeoJSON()).readFeatures(saved_layer.layer_data);
+
             var vectorSource = new ol.source.Vector({
                 features: features,
                 format: new ol.format.GeoJSON()
