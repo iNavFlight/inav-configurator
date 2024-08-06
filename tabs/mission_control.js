@@ -1473,14 +1473,32 @@ TABS.mission_control.initialize = function (callback) {
         GUI.switchery();
     }
 
+
+    /**
+     *
+     * @param {ol.layer.Vector} layer
+     */
     function save_layer_to_disk(layer){
         let custom_overlay_list = store.get("custom_overlay_list");
         if(custom_overlay_list === undefined){
             custom_overlay_list = [];
         }
-        let layer_to_save = JSON.stringify(layer) // TODO: ERROR
+
+        var writer = new ol.format.GeoJSON();
+        let geojsonStr = writer.writeFeatures(layer.getSource().getFeatures());
+
         let name = layer.get("name");
-        custom_overlay_list.push(layer_to_save);
+
+        let saved_layer = {
+            name: name,
+            no_interaction: layer.get("no_interaction"),
+            show_info_on_hover: layer.get("show_info_on_hover"),
+            is_vis_toggleable: layer.get("is_vis_toggleable"),
+            layer_data: geojsonStr
+        }
+
+
+        custom_overlay_list.push(saved_layer);
         GUI.log("saving layer...");
         store.set("custom_overlay_list", custom_overlay_list);
         GUI.log("saved layer: " + name);
