@@ -2091,6 +2091,36 @@ TABS.mission_control.initialize = function (callback) {
             })
         });
 
+
+        //////////////////////////////////////////////////////////////////////////////////////////////
+        // Add previously saved GEO files
+        //////////////////////////////////////////////////////////////////////////////////////////////
+
+        // store.set("custom_overlay_list", [])
+        for(let saved_layer of store.get("custom_overlay_list")){
+            console.log("found saved layer: ");
+            console.log(saved_layer.name);
+
+            var features = (new ol.format.GeoJSON()).readFeatures(saved_layer.layer_data);
+            var vectorSource = new ol.source.Vector({
+                features: features,
+                format: new ol.format.GeoJSON()
+            });
+
+            var vectorLayer = new ol.layer.Vector({
+                title: saved_layer.name,
+                source: vectorSource
+            });
+
+            vectorLayer.set("no_interaction", saved_layer.no_interaction, true); // stops custom dragging controls for waypoints from preventing the user panning the map
+            vectorLayer.set("show_info_on_hover", saved_layer.show_info_on_hover, true); // allows info box to work with this feature
+            vectorLayer.set("is_vis_toggleable", saved_layer.is_vis_toggleable, true); // allows user to hide this layer in visibility selector
+            vectorLayer.set("name", saved_layer.name, true); // name for visibility toggler
+            map.addLayer(vectorLayer);
+        }
+
+
+
         //////////////////////////////////////////////////////////////////////////////////////////////
         // Add drag and drop support for GEO files
         //////////////////////////////////////////////////////////////////////////////////////////////
