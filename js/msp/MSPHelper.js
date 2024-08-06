@@ -196,6 +196,8 @@ var mspHelper = (function () {
                 FC.ADSB_VEHICLES.vehicles = [];
                 FC.ADSB_VEHICLES.vehiclesCount = data.getUint8(byteOffsetCounter++);
                 FC.ADSB_VEHICLES.callsignLength = data.getUint8(byteOffsetCounter++);
+                FC.ADSB_VEHICLES.vehiclePacketCount = data.getUint32(byteOffsetCounter, true); byteOffsetCounter += 4;
+                FC.ADSB_VEHICLES.heartbeatPacketCount = data.getUint32(byteOffsetCounter, true); byteOffsetCounter += 4;
 
                 for(i = 0; i < FC.ADSB_VEHICLES.vehiclesCount; i++){
 

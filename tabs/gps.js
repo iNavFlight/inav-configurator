@@ -30,26 +30,26 @@ TABS.gps.initialize = function (callback) {
 
     // mavlink ADSB_EMITTER_TYPE
     const ADSB_VEHICLE_TYPE = {
-        0: 'adsb_14.png', // ADSB_EMITTER_TYPE_NO_INFO
-        1: 'adsb_1.png', // ADSB_EMITTER_TYPE_LIGHT
-        2: 'adsb_1.png', // ADSB_EMITTER_TYPE_SMALL
-        3: 'adsb_2.png', // ADSB_EMITTER_TYPE_LARGE
-        4: 'adsb_14.png', // ADSB_EMITTER_TYPE_HIGH_VORTEX_LARGE
-        5: 'adsb_5.png', // ADSB_EMITTER_TYPE_HEAVY
-        6: 'adsb_14.png', // ADSB_EMITTER_TYPE_HIGHLY_MANUV
-        7: 'adsb_13.png', // ADSB_EMITTER_TYPE_ROTOCRAFT
-        8: 'adsb_14.png', // ADSB_EMITTER_TYPE_UNASSIGNED
-        9: 'adsb_6.png', // ADSB_EMITTER_TYPE_GLIDER
-        10: 'adsb_7.png', // ADSB_EMITTER_TYPE_LIGHTER_AIR
-        11: 'adsb_15.png', // ADSB_EMITTER_TYPE_PARACHUTE
-        12: 'adsb_1.png', // ADSB_EMITTER_TYPE_ULTRA_LIGHT
-        13: 'adsb_14.png', // ADSB_EMITTER_TYPE_UNASSIGNED2
-        14: 'adsb_8.png', // ADSB_EMITTER_TYPE_UAV
-        15: 'adsb_14.png', // ADSB_EMITTER_TYPE_SPACE
-        16: 'adsb_14.png', // ADSB_EMITTER_TYPE_UNASSGINED3
-        17: 'adsb_9.png', // ADSB_EMITTER_TYPE_EMERGENCY_SURFACE
-        18: 'adsb_10.png', // ADSB_EMITTER_TYPE_SERVICE_SURFACE
-        19: 'adsb_12.png', // ADSB_EMITTER_TYPE_POINT_OBSTACLE
+        0: {icon: 'adsb_14.png', name: 'No info'}, // ADSB_EMITTER_TYPE_NO_INFO
+        1: {icon: 'adsb_1.png', name: 'Light'}, // ADSB_EMITTER_TYPE_LIGHT
+        2: {icon: 'adsb_1.png', name: 'Small'}, // ADSB_EMITTER_TYPE_SMALL
+        3: {icon: 'adsb_2.png', name: 'Large'}, // ADSB_EMITTER_TYPE_LARGE
+        4: {icon: 'adsb_14.png', name: 'High vortex large'}, // ADSB_EMITTER_TYPE_HIGH_VORTEX_LARGE
+        5: {icon: 'adsb_5.png', name: 'Heavy'}, // ADSB_EMITTER_TYPE_HEAVY
+        6: {icon: 'adsb_14.png', name: 'Manuv'}, // ADSB_EMITTER_TYPE_HIGHLY_MANUV
+        7: {icon: 'adsb_13.png', name: 'Rotorcraft'}, // ADSB_EMITTER_TYPE_ROTOCRAFT
+        8: {icon: 'adsb_14.png', name: 'Unassigned'}, // ADSB_EMITTER_TYPE_UNASSIGNED
+        9: {icon: 'adsb_6.png', name: 'Glider'}, // ADSB_EMITTER_TYPE_GLIDER
+        10:{icon:  'adsb_7.png', name: 'Lighter air'}, // ADSB_EMITTER_TYPE_LIGHTER_AIR
+        11:{icon:  'adsb_15.png', name: 'Parachute'}, // ADSB_EMITTER_TYPE_PARACHUTE
+        12:{icon:  'adsb_1.png', name: 'Ultra light'}, // ADSB_EMITTER_TYPE_ULTRA_LIGHT
+        13:{icon:  'adsb_14.png', name: 'Unassigned 2'}, // ADSB_EMITTER_TYPE_UNASSIGNED2
+        14:{icon:  'adsb_8.png', name: 'UAV'}, // ADSB_EMITTER_TYPE_UAV
+        15:{icon:  'adsb_14.png', name: 'Space'}, // ADSB_EMITTER_TYPE_SPACE
+        16:{icon:  'adsb_14.png', name: 'Unassigned 3'}, // ADSB_EMITTER_TYPE_UNASSGINED3
+        17:{icon:  'adsb_9.png', name: 'Surface'}, // ADSB_EMITTER_TYPE_EMERGENCY_SURFACE
+        18:{icon:  'adsb_10.png', name: 'Service surface'}, // ADSB_EMITTER_TYPE_SERVICE_SURFACE
+        19:{icon:  'adsb_12.png', name: 'Pint obstacle'}, // ADSB_EMITTER_TYPE_POINT_OBSTACLE
     };
 
     var loadChainer = new MSPChainerClass();
@@ -238,7 +238,7 @@ TABS.gps.initialize = function (callback) {
                     + `lon: <strong>`+ (feature.get('data').lon / 10000000) + `</strong><br />`
                     + `ASL: <strong>`+ (feature.get('data').altCM ) / 100 + `m</strong><br />`
                     + `heading: <strong>`+ feature.get('data').headingDegrees + `°</strong><br />`
-                    + `type: <strong>`+ feature.get('data').emitterType + `</strong>`
+                    + `type: <strong>`+ ADSB_VEHICLE_TYPE[feature.get('data').emitterType].name + `</strong>`
                 ).open();
             }else{
                 TABS.gps.toolboxAdsbVehicle.close();
@@ -258,10 +258,14 @@ TABS.gps.initialize = function (callback) {
         }
 
         function get_gpsstatistics_data() {
-            MSP.send_message(MSPCodes.MSP_GPSSTATISTICS, false, false, update_ui);
+            MSP.send_message(MSPCodes.MSP_GPSSTATISTICS, false, false, update_gps_ui);
         }
 
-        function update_ui() {
+        function get_raw_adsb_data() {
+            MSP.send_message(MSPCodes.MSP2_ADSB_VEHICLE_LIST, false, false, update_adsb_ui);
+        }
+
+        function update_gps_ui() {
             let lat = FC.GPS_DATA.lat / 10000000;
             let lon = FC.GPS_DATA.lon / 10000000;
 
@@ -334,64 +338,64 @@ TABS.gps.initialize = function (callback) {
                 iconGeometry.setCoordinates(center);
 
             }
+        }
 
-            if (semver.gte(FC.CONFIG.flightControllerVersion, "7.1.0")) {
-                MSP.send_message(MSPCodes.MSP2_ADSB_VEHICLE_LIST, false, false, function () {
-                    //ADSB vehicles
+        function update_adsb_ui() {
 
-                    if (vehiclesCursorInitialized) {
-                        vehicleVectorSource.clear();
-                    }
+            if (vehiclesCursorInitialized) {
+                vehicleVectorSource.clear();
+            }
 
-                    for (let key in FC.ADSB_VEHICLES.vehicles) {
-                        let vehicle = FC.ADSB_VEHICLES.vehicles[key];
+            $('.adsbVehicleTotalMessages').html(FC.ADSB_VEHICLES.vehiclePacketCount);
+            $('.adsbHeartbeatTotalMessages').html(FC.ADSB_VEHICLES.heartbeatPacketCount);
 
-                        if (!vehiclesCursorInitialized) {
-                            vehiclesCursorInitialized = true;
+            for (let key in FC.ADSB_VEHICLES.vehicles) {
+                let vehicle = FC.ADSB_VEHICLES.vehicles[key];
 
-                            vehicleVectorSource = new ol.source.Vector({});
+                if (!vehiclesCursorInitialized) {
+                    vehiclesCursorInitialized = true;
 
-                            let vehicleLayer = new ol.layer.Vector({
-                                source: vehicleVectorSource
-                            });
+                    vehicleVectorSource = new ol.source.Vector({});
 
-                            mapHandler.addLayer(vehicleLayer);
-                        }
+                    let vehicleLayer = new ol.layer.Vector({
+                        source: vehicleVectorSource
+                    });
 
-                        if (vehicle.lat != 0 && vehicle.lon != 0 && vehicle.ttl > 0) {
-                            let vehicleIconStyle = new ol.style.Style({
-                                image: new ol.style.Icon(({
-                                    opacity: 1,
-                                    rotation: vehicle.headingDegrees * (Math.PI / 180),
-                                    scale: 0.8,
-                                    anchor: [0.5, 0.5],
-                                    src: path.join(__dirname, './../resources/adsb/' + ADSB_VEHICLE_TYPE[vehicle.emitterType]),
-                                })),
-                                text: new ol.style.Text(({
-                                    text: vehicle.callsign,
-                                    textAlign: 'center',
-                                    textBaseline: "bottom",
-                                    offsetY: +40,
-                                    padding: [2, 2, 2, 2],
-                                    backgroundFill: '#444444',
-                                    fill: new ol.style.Fill({color: '#ffffff'}),
-                                })),
-                            });
+                    mapHandler.addLayer(vehicleLayer);
+                }
+
+                if (vehicle.lat != 0 && vehicle.lon != 0 && vehicle.ttl > 0) {
+                    let vehicleIconStyle = new ol.style.Style({
+                        image: new ol.style.Icon(({
+                            opacity: 1,
+                            rotation: vehicle.headingDegrees * (Math.PI / 180),
+                            scale: 0.8,
+                            anchor: [0.5, 0.5],
+                            src: path.join(__dirname, './../resources/adsb/' + ADSB_VEHICLE_TYPE[vehicle.emitterType].icon),
+                        })),
+                        text: new ol.style.Text(({
+                            text: vehicle.callsign,
+                            textAlign: 'center',
+                            textBaseline: "bottom",
+                            offsetY: +40,
+                            padding: [2, 2, 2, 2],
+                            backgroundFill: '#444444',
+                            fill: new ol.style.Fill({color: '#ffffff'}),
+                        })),
+                    });
 
 
-                            let iconGeometry = new ol.geom.Point(ol.proj.fromLonLat([vehicle.lon / 10000000, vehicle.lat / 10000000]));
-                            let iconFeature = new ol.Feature({
-                                geometry: iconGeometry,
-                                name: vehicle.callsign,
-                                type: 'adsb',
-                                data: vehicle,
-                            });
+                    let iconGeometry = new ol.geom.Point(ol.proj.fromLonLat([vehicle.lon / 10000000, vehicle.lat / 10000000]));
+                    let iconFeature = new ol.Feature({
+                        geometry: iconGeometry,
+                        name: vehicle.callsign,
+                        type: 'adsb',
+                        data: vehicle,
+                    });
 
-                            iconFeature.setStyle(vehicleIconStyle);
-                            vehicleVectorSource.addFeature(iconFeature);
-                        }
-                    }
-                });
+                    iconFeature.setStyle(vehicleIconStyle);
+                    vehicleVectorSource.addFeature(iconFeature);
+                }
             }
         }
 
@@ -402,13 +406,27 @@ TABS.gps.initialize = function (callback) {
         interval.add('gps_pull', function gps_update() {
             // avoid usage of the GPS commands until a GPS sensor is detected for targets that are compiled without GPS support.
             if (!SerialBackend.have_sensor(FC.CONFIG.activeSensors, 'gps')) {
-                update_ui();
+                update_gps_ui();
                 return;
             }
 
             get_raw_gps_data();
+
         }, 200);
 
+
+        if (semver.gte(FC.CONFIG.flightControllerVersion, "8.0.0")) {
+            $('.adsb_info_block').hide();
+            mspHelper.loadSerialPorts(function () {
+                for(var i  in FC.SERIAL_CONFIG.ports){
+                   if(FC.SERIAL_CONFIG.ports[i].functions && FC.SERIAL_CONFIG.ports[i].functions.includes("TELEMETRY_MAVLINK")){
+                       $('.adsb_info_block').show();
+                       interval.add('adsb_pull', get_raw_adsb_data, 200);
+                       break;
+                   }
+                }
+            });
+        }
 
         $('a.save').on('click', function () {
             serialPortHelper.set($port.val(), 'GPS', $baud.val());
