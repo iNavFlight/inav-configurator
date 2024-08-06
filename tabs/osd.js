@@ -1853,56 +1853,56 @@ OSD.constants = {
             name: 'osdGroupOSDCustomElements',
             items: [
                 {
-                    name: 'CUSTOM ELEMENT 1',
+                    name: 'CUSTOM_ELEMENT_1',
                     id: 147,
                     min_version: '7.1.0',
                     positionable: true,
                     preview: "CE_1",
                 },
                 {
-                    name: 'CUSTOM ELEMENT 2',
+                    name: 'CUSTOM_ELEMENT_2',
                     id: 148,
                     min_version: '7.1.0',
                     positionable: true,
                     preview: "CE_2",
                 },
                 {
-                    name: 'CUSTOM ELEMENT 3',
+                    name: 'CUSTOM_ELEMENT_3',
                     id: 149,
                     min_version: '7.1.0',
                     positionable: true,
                     preview: "CE_3",
                 },
                 {
-                    name: 'CUSTOM ELEMENT 4',
+                    name: 'CUSTOM_ELEMENT_4',
                     id: 130,
                     min_version: '8.0.0',
                     positionable: true,
                     preview: "CE_4",
                 },
                 {
-                    name: 'CUSTOM ELEMENT 5',
+                    name: 'CUSTOM_ELEMENT_5',
                     id: 131,
                     min_version: '8.0.0',
                     positionable: true,
                     preview: "CE_5",
                 },
                 {
-                    name: 'CUSTOM ELEMENT 6',
+                    name: 'CUSTOM_ELEMENT_6',
                     id: 132,
                     min_version: '8.0.0',
                     positionable: true,
                     preview: "CE_6",
                 },
                 {
-                    name: 'CUSTOM ELEMENT 7',
+                    name: 'CUSTOM_ELEMENT_7',
                     id: 133,
                     min_version: '8.0.0',
                     positionable: true,
                     preview: "CE_7",
                 },
                 {
-                    name: 'CUSTOM ELEMENT 8',
+                    name: 'CUSTOM_ELEMENT_8',
                     id: 154,
                     min_version: '8.0.0',
                     positionable: true,
@@ -2964,176 +2964,178 @@ OSD.GUI.updatePreviews = function() {
     // buffer the preview;
     OSD.data.preview = [];
 
-    // clear the buffer
-    for (let i = 0; i < OSD.data.display_size.total; i++) {
-        OSD.data.preview.push([null, ' '.charCodeAt(0)]);
-    };
+    if (OSD.data.display_size != undefined) {
+        // clear the buffer
+        for (let i = 0; i < OSD.data.display_size.total; i++) {
+            OSD.data.preview.push([null, ' '.charCodeAt(0)]);
+        };
 
-    // draw all the displayed items and the drag and drop preview images
-    for (var ii = 0; ii < OSD.data.items.length; ii++) {
-        var item = OSD.get_item(ii);
-        if (!item || !OSD.is_item_displayed(item, OSD.data.groups[item.id])) {
-            continue;
-        }
-        var itemData = OSD.data.items[ii];
-        if (!itemData.isVisible) {
-            continue;
-        }
-
-		if (itemData.x >= OSD.data.display_size.x)
-		{
-			continue;
-		}
-
-        // DJI HD FPV: Hide elements that only appear in craft name
-        if (OSD.DjiElements.craftNameElements.includes(item.name) &&
-        $('#djiUnsupportedElements').find('input').is(':checked')) {
-            continue;
-        }
-        var j = (itemData.position >= 0) ? itemData.position : itemData.position + OSD.data.display_size.total;
-        // create the preview image
-        item.preview_img = new Image();
-        var canvas = document.createElement('canvas');
-        var ctx = canvas.getContext("2d");
-        // fill the screen buffer
-        var preview = OSD.get_item_preview(item);
-        if (!preview) {
-            continue;
-        }
-        var x = 0;
-        var y = 0;
-        for (let i = 0; i < preview.length; i++) {
-            var charCode = preview.charCodeAt(i);
-            if (charCode == '\n'.charCodeAt(0)) {
-                x = 0;
-                y++;
+        // draw all the displayed items and the drag and drop preview images
+        for (var ii = 0; ii < OSD.data.items.length; ii++) {
+            var item = OSD.get_item(ii);
+            if (!item || !OSD.is_item_displayed(item, OSD.data.groups[item.id])) {
                 continue;
             }
-            var previewPos = j + x + (y * OSD.data.display_size.x);
-            if (previewPos >= OSD.data.preview.length) {
-                // Character is outside the viewport
+            var itemData = OSD.data.items[ii];
+            if (!itemData.isVisible) {
+                continue;
+            }
+
+            if (itemData.x >= OSD.data.display_size.x)
+            {
+                continue;
+            }
+
+            // DJI HD FPV: Hide elements that only appear in craft name
+            if (OSD.DjiElements.craftNameElements.includes(item.name) &&
+            $('#djiUnsupportedElements').find('input').is(':checked')) {
+                continue;
+            }
+            var j = (itemData.position >= 0) ? itemData.position : itemData.position + OSD.data.display_size.total;
+            // create the preview image
+            item.preview_img = new Image();
+            var canvas = document.createElement('canvas');
+            var ctx = canvas.getContext("2d");
+            // fill the screen buffer
+            var preview = OSD.get_item_preview(item);
+            if (!preview) {
+                continue;
+            }
+            var x = 0;
+            var y = 0;
+            for (let i = 0; i < preview.length; i++) {
+                var charCode = preview.charCodeAt(i);
+                if (charCode == '\n'.charCodeAt(0)) {
+                    x = 0;
+                    y++;
+                    continue;
+                }
+                var previewPos = j + x + (y * OSD.data.display_size.x);
+                if (previewPos >= OSD.data.preview.length) {
+                    // Character is outside the viewport
+                    x++;
+                    continue;
+                }
+                // test if this position already has a character placed
+                if (OSD.data.preview[previewPos][0] !== null) {
+                    // if so set background color to red to show user double usage of position
+                    OSD.data.preview[previewPos] = [item, charCode, 'red'];
+                } else {
+                    OSD.data.preview[previewPos] = [item, charCode];
+                }
+                // draw the preview
+                var img = new Image();
+                img.src = FONT.draw(charCode);
+                ctx.drawImage(img, x*FONT.constants.SIZES.CHAR_WIDTH, y*FONT.constants.SIZES.CHAR_HEIGHT);
                 x++;
-                continue;
             }
-            // test if this position already has a character placed
-            if (OSD.data.preview[previewPos][0] !== null) {
-                // if so set background color to red to show user double usage of position
-                OSD.data.preview[previewPos] = [item, charCode, 'red'];
+            item.preview_img.src = canvas.toDataURL('image/png');
+            // Required for NW.js - Otherwise the <img /> will
+            // consume drag/drop events.
+            item.preview_img.style.pointerEvents = 'none';
+        }
+
+
+        var centerPosition = (OSD.data.display_size.x * OSD.data.display_size.y / 2);
+        if (OSD.data.display_size.y % 2 == 0) {
+            centerPosition += Math.floor(OSD.data.display_size.x / 2);
+        }
+
+        let hudCenterPosition = centerPosition - (OSD.constants.VIDEO_COLS[video_type] * $('#osd_horizon_offset').val());
+
+        // artificial horizon
+        if ($('input[name="ARTIFICIAL_HORIZON"]').prop('checked')) {
+            for (let i = 0; i < 9; i++) {
+                OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition - 4 + i, SYM.AH_BAR9_0 + 4);
+            }
+        }
+
+        // crosshairs
+        if ($('input[name="CROSSHAIRS"]').prop('checked')) {
+            let crsHNumber = Settings.getInputValue('osd_crosshairs_style');
+            if (crsHNumber == 1) {
+                // AIRCRAFT style
+                OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition - 2, SYM.AH_AIRCRAFT0);
+                OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition - 1, SYM.AH_AIRCRAFT1);
+                OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition, SYM.AH_AIRCRAFT2);
+                OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition + 1, SYM.AH_AIRCRAFT3);
+                OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition + 2, SYM.AH_AIRCRAFT4);
+            } else if ((crsHNumber > 1) && (crsHNumber < 8)) {
+                // TYPES 3 to 8 (zero indexed)
+                OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition - 1, SYM.AH_CROSSHAIRS[crsHNumber][0]);
+                OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition, SYM.AH_CROSSHAIRS[crsHNumber][1]);
+                OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition + 1, SYM.AH_CROSSHAIRS[crsHNumber][2]);
             } else {
-                OSD.data.preview[previewPos] = [item, charCode];
-            }
-            // draw the preview
-            var img = new Image();
-            img.src = FONT.draw(charCode);
-            ctx.drawImage(img, x*FONT.constants.SIZES.CHAR_WIDTH, y*FONT.constants.SIZES.CHAR_HEIGHT);
-            x++;
-        }
-        item.preview_img.src = canvas.toDataURL('image/png');
-        // Required for NW.js - Otherwise the <img /> will
-        // consume drag/drop events.
-        item.preview_img.style.pointerEvents = 'none';
-    }
-
-
-    var centerPosition = (OSD.data.display_size.x * OSD.data.display_size.y / 2);
-    if (OSD.data.display_size.y % 2 == 0) {
-        centerPosition += Math.floor(OSD.data.display_size.x / 2);
-    }
-
-    let hudCenterPosition = centerPosition - (OSD.constants.VIDEO_COLS[video_type] * $('#osd_horizon_offset').val());
-
-    // artificial horizon
-    if ($('input[name="ARTIFICIAL_HORIZON"]').prop('checked')) {
-        for (let i = 0; i < 9; i++) {
-            OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition - 4 + i, SYM.AH_BAR9_0 + 4);
-        }
-    }
-
-    // crosshairs
-    if ($('input[name="CROSSHAIRS"]').prop('checked')) {
-        let crsHNumber = Settings.getInputValue('osd_crosshairs_style');
-        if (crsHNumber == 1) {
-            // AIRCRAFT style
-            OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition - 2, SYM.AH_AIRCRAFT0);
-            OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition - 1, SYM.AH_AIRCRAFT1);
-            OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition, SYM.AH_AIRCRAFT2);
-            OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition + 1, SYM.AH_AIRCRAFT3);
-            OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition + 2, SYM.AH_AIRCRAFT4);
-        } else if ((crsHNumber > 1) && (crsHNumber < 8)) {
-            // TYPES 3 to 8 (zero indexed)
-            OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition - 1, SYM.AH_CROSSHAIRS[crsHNumber][0]);
-            OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition, SYM.AH_CROSSHAIRS[crsHNumber][1]);
-            OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition + 1, SYM.AH_CROSSHAIRS[crsHNumber][2]);
-        } else {
-            // DEFAULT or unknown style
-            OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition - 1, SYM.AH_CENTER_LINE);
-            OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition, SYM.AH_CROSSHAIRS[crsHNumber]);
-            OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition + 1, SYM.AH_CENTER_LINE_RIGHT);
-        }
-    }
-
-    // sidebars
-    if ($('input[name="HORIZON_SIDEBARS"]').prop('checked')) {
-        var hudwidth = OSD.constants.AHISIDEBARWIDTHPOSITION;
-        var hudheight = OSD.constants.AHISIDEBARHEIGHTPOSITION;
-        for (let i = -hudheight; i <= hudheight; i++) {
-            OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition - hudwidth + (i * FONT.constants.SIZES.LINE), SYM.AH_DECORATION);
-            OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition + hudwidth + (i * FONT.constants.SIZES.LINE), SYM.AH_DECORATION);
-        }
-        // AH level indicators
-        OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition - hudwidth + 1, SYM.AH_LEFT);
-        OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition + hudwidth - 1, SYM.AH_RIGHT);
-    }
-
-    OSD.GUI.updateMapPreview(centerPosition, 'MAP_NORTH', 'N', SYM.HOME);
-    OSD.GUI.updateMapPreview(centerPosition, 'MAP_TAKEOFF', 'T', SYM.HOME);
-    OSD.GUI.updateMapPreview(centerPosition, 'RADAR', null, SYM.DIR_TO_HOME);
-
-    // render
-    var $preview = $('.display-layout .preview').empty();
-    var $row = $('<div class="row"/>');
-    for (let i = 0; i < OSD.data.display_size.total;) {
-        var charCode = OSD.data.preview[i];
-        var colorStyle = '';
-
-        if (typeof charCode === 'object') {
-            var item = OSD.data.preview[i][0];
-            charCode = OSD.data.preview[i][1];
-            if (OSD.data.preview[i][2] !== undefined) {
-                // if third field is set it contains a background color
-                colorStyle = 'style="background-color: ' + OSD.data.preview[i][2] + ';"';
+                // DEFAULT or unknown style
+                OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition - 1, SYM.AH_CENTER_LINE);
+                OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition, SYM.AH_CROSSHAIRS[crsHNumber]);
+                OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition + 1, SYM.AH_CENTER_LINE_RIGHT);
             }
         }
-        var $img = $('<div class="char"' + colorStyle + '><img src=' + FONT.draw(charCode) + '></img></div>')
-            .on('mouseenter', OSD.GUI.preview.onMouseEnter)
-            .on('mouseleave', OSD.GUI.preview.onMouseLeave)
-            .on('dragover', OSD.GUI.preview.onDragOver)
-            .on('dragleave', OSD.GUI.preview.onDragLeave)
-            .on('drop', OSD.GUI.preview.onDrop)
-            .data('item', item)
-            .data('position', i);
-        // Required for NW.js - Otherwise the <img /> will
-        // consume drag/drop events.
-        $img.find('img').css('pointer-events', 'none');
-        if (item && item.positionable !== false) {
-            var nameKey = 'osdElement_' + item.name;
-            var nameMessage = i18n.getMessage(nameKey);
 
-            if (!nameMessage) {
-                nameMessage = inflection.titleize(item.name);
+        // sidebars
+        if ($('input[name="HORIZON_SIDEBARS"]').prop('checked')) {
+            var hudwidth = OSD.constants.AHISIDEBARWIDTHPOSITION;
+            var hudheight = OSD.constants.AHISIDEBARHEIGHTPOSITION;
+            for (let i = -hudheight; i <= hudheight; i++) {
+                OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition - hudwidth + (i * FONT.constants.SIZES.LINE), SYM.AH_DECORATION);
+                OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition + hudwidth + (i * FONT.constants.SIZES.LINE), SYM.AH_DECORATION);
             }
+            // AH level indicators
+            OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition - hudwidth + 1, SYM.AH_LEFT);
+            OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition + hudwidth - 1, SYM.AH_RIGHT);
+        }
 
-            $img.addClass('field-' + item.id)
+        OSD.GUI.updateMapPreview(centerPosition, 'MAP_NORTH', 'N', SYM.HOME);
+        OSD.GUI.updateMapPreview(centerPosition, 'MAP_TAKEOFF', 'T', SYM.HOME);
+        OSD.GUI.updateMapPreview(centerPosition, 'RADAR', null, SYM.DIR_TO_HOME);
+
+        // render
+        var $preview = $('.display-layout .preview').empty();
+        var $row = $('<div class="row"/>');
+        for (let i = 0; i < OSD.data.display_size.total;) {
+            var charCode = OSD.data.preview[i];
+            var colorStyle = '';
+
+            if (typeof charCode === 'object') {
+                var item = OSD.data.preview[i][0];
+                charCode = OSD.data.preview[i][1];
+                if (OSD.data.preview[i][2] !== undefined) {
+                    // if third field is set it contains a background color
+                    colorStyle = 'style="background-color: ' + OSD.data.preview[i][2] + ';"';
+                }
+            }
+            var $img = $('<div class="char"' + colorStyle + '><img src=' + FONT.draw(charCode) + '></img></div>')
+                .on('mouseenter', OSD.GUI.preview.onMouseEnter)
+                .on('mouseleave', OSD.GUI.preview.onMouseLeave)
+                .on('dragover', OSD.GUI.preview.onDragOver)
+                .on('dragleave', OSD.GUI.preview.onDragLeave)
+                .on('drop', OSD.GUI.preview.onDrop)
                 .data('item', item)
-                .prop('draggable', true)
-                .on('dragstart', OSD.GUI.preview.onDragStart)
-                .prop('title', nameMessage);
-        }
+                .data('position', i);
+            // Required for NW.js - Otherwise the <img /> will
+            // consume drag/drop events.
+            $img.find('img').css('pointer-events', 'none');
+            if (item && item.positionable !== false) {
+                var nameKey = 'osdElement_' + item.name;
+                var nameMessage = i18n.getMessage(nameKey);
 
-        $row.append($img);
-        if (++i % OSD.data.display_size.x == 0) {
-            $preview.append($row);
-            $row = $('<div class="row"/>');
+                if (!nameMessage) {
+                    nameMessage = inflection.titleize(item.name);
+                }
+
+                $img.addClass('field-' + item.id)
+                    .data('item', item)
+                    .prop('draggable', true)
+                    .on('dragstart', OSD.GUI.preview.onDragStart)
+                    .prop('title', nameMessage);
+            }
+
+            $row.append($img);
+            if (++i % OSD.data.display_size.x == 0) {
+                $preview.append($row);
+                $row = $('<div class="row"/>');
+            }
         }
     }
 };
@@ -3338,25 +3340,6 @@ TABS.osd.initialize = function (callback) {
     
             // Initialise guides checkbox
             isGuidesChecked = store.get('showOSDGuides', false); 
-            
-            // Setup switch indicators
-            $(".osdSwitchInd_channel option").each(function() {
-                $(this).text("Ch " + $(this).text());
-            });
-    
-            // Function when text for switch indicators change
-            $('.osdSwitchIndName').on('keyup', function() {
-                // Make sure that the switch hint only contains A to Z
-                let testExp = new RegExp('^[A-Za-z0-9]');
-                let testText = $(this).val();
-                if (testExp.test(testText.slice(-1))) {
-                    $(this).val(testText.toUpperCase());
-                } else {
-                    $(this).val(testText.slice(0, -1));
-                }
-    
-                // Update the OSD preview
-            });
     
             // Functions for when pan servo settings change
             $('#osdPanServoIndicatorShowDegrees').on('change', function() {
@@ -3501,19 +3484,38 @@ function createCustomElements(){
         var customElementTable = $('<table>').addClass('osdCustomElement_main_table');
         var customElementRowType = $('<tr>').data('row', i);
         var customElementRowValue = $('<tr>').data('row', i);
+        
         var customElementLabel = $('<tr>');
+        customElementLabel.append($('<td>').attr('colspan', 2).append($('<span>').html(i18n.getMessage("custom_element") + ' ' + (i + 1))));
 
-        for(var ii = 0; ii < 3; ii++){
-
+        for(var ii = 0; ii < FC.OSD_CUSTOM_ELEMENTS.settings.customElementParts; ii++){
             var select = $('<select>').addClass('osdCustomElement-' + i + '-part-' + ii + '-type').data('valueCellClass', 'osdCustomElement-' + i + '-part-' + ii + '-value').html(`
                         <option value="0">none</option>
                         <option data-value="text" value="1">Text</option>
                         <option data-value="ico" value="2">Icon Static</option>
                         <option data-value="ico_gv" value="3">Icon Global Variable</option>
-                        <option data-value="gv" value="4">Global Variable 00000</option>
-                        <option data-value="gv" value="5">Global Variable 000.00</option>
+                        <option data-value="gv" value="4">Global Variable 0</option>
+                        <option data-value="gv" value="5">Global Variable 00</option>
                         <option data-value="gv" value="6">Global Variable 000</option>
-                        <option data-value="gv" value="7">Global Variable 0.0</option>
+                        <option data-value="gv" value="7">Global Variable 0000</option>
+                        <option data-value="gv" value="8">Global Variable 00000</option>
+                        <option data-value="gv" value="9">Global Variable 0.0</option>
+                        <option data-value="gv" value="10">Global Variable 00.0</option>
+                        <option data-value="gv" value="11">Global Variable 00.00</option>
+                        <option data-value="gv" value="12">Global Variable 000.0</option>
+                        <option data-value="gv" value="13">Global Variable 000.00</option>
+                        <option data-value="gv" value="14">Global Variable 0000.0</option>
+                        <option data-value="lc" value="15">Logic Condition 0</option>
+                        <option data-value="lc" value="16">Logic Condition 00</option>
+                        <option data-value="lc" value="17">Logic Condition 000</option>
+                        <option data-value="lc" value="18">Logic Condition 0000</option>
+                        <option data-value="lc" value="19">Logic Condition 00000</option>
+                        <option data-value="lc" value="20">Logic Condition 0.0</option>
+                        <option data-value="lc" value="21">Logic Condition 00.0</option>
+                        <option data-value="lc" value="22">Logic Condition 00.00</option>
+                        <option data-value="lc" value="23">Logic Condition 000.0</option>
+                        <option data-value="lc" value="24">Logic Condition 000.00</option>
+                        <option data-value="lc" value="25">Logic Condition 0000.0</option>
                         `);
 
             customElementRowType.append($('<td>').append(select));
@@ -3525,6 +3527,8 @@ function createCustomElements(){
                 $('<select>').addClass('value').addClass('ico_gv').html(getGVoptions()).hide()
             ).append(
                 $('<select>').addClass('value').addClass('gv').html(getGVoptions()).hide()
+            ).append(
+                $('<select>').addClass('value').addClass('lc').html(getLCoptions()).hide()
             ));
 
             select.change(function(){
@@ -3532,6 +3536,7 @@ function createCustomElements(){
                 var valueBlock = $('.' + $(this).data('valueCellClass'))
                 valueBlock.find('.value').hide();
                 valueBlock.find('.' + dataValue).show();
+                updateOSDCustomElementsDisplay();
             });
         }
 
@@ -3554,9 +3559,7 @@ function createCustomElements(){
             valueBlock.find('.' + dataValue).show();
         });
 
-        customElementLabel.append($('<td>').attr('colspan', 2).append($('<span>').html(i18n.getMessage("custom_element") + ' ' + (i + 1))));
-
-        customElementTable.append(customElementRowType).append(customElementRowValue).append(customElementLabel);
+        customElementTable.append(customElementLabel).append(customElementRowType).append(customElementRowValue);
         label.append(customElementTable);
         customElementsContainer.append(label);
     }
@@ -3565,27 +3568,139 @@ function createCustomElements(){
     customElementsInitCallback();
 }
 
+function updateOSDCustomElementsDisplay() {
+    let foundOSDCustomElements = 0;
+    let generalGroup = OSD.constants.ALL_DISPLAY_GROUPS.filter(function(e) {
+        return e.name == "osdGroupOSDCustomElements";
+    })[0];
+
+    for (var i = 0; i < FC.OSD_CUSTOM_ELEMENTS.settings.customElementsCount; i++) {
+        if ($('.osdCustomElement-' + i + '-part-0-type').val() != undefined) {
+            for (let si = 0; si < generalGroup.items.length; si++) {
+                if (generalGroup.items[si].name == "CUSTOM_ELEMENT_" + (i + 1)) {
+                    let preview = "";
+                    foundOSDCustomElements++;
+
+                    for (let ii = 0; ii < FC.OSD_CUSTOM_ELEMENTS.settings.customElementParts; ii++) {
+                        var typeCell = $('.osdCustomElement-' + i + '-part-' + ii + '-type');
+                        var valueCell = $('.osdCustomElement-' + i + '-part-' + ii + '-value');
+
+                        switch (parseInt(typeCell.val())) {
+                            case 1:
+                                preview += valueCell.find('.text').val();
+                                break;
+                            case 2:
+                                preview += FONT.symbol("0x" + parseInt(valueCell.find('.ico').val()).toString(16).toUpperCase());
+                                break;
+                            case 3:
+                                preview += FONT.symbol(SYM.HOME);
+                                break;
+                            case 4:
+                            case 15:
+                                preview += " 2";
+                                break;
+                            case 5:
+                            case 16:
+                                preview += " 57";
+                                break;
+                            case 6:
+                            case 17:
+                                preview += " 316";
+                                break;
+                            case 7:
+                            case 18:
+                                preview += " 6926";
+                                break;
+                            case 8:
+                            case 19:
+                                preview += " 36520";
+                                break;
+                            case 9:
+                            case 20:
+                                preview += " " + FONT.embed_dot("1.6");
+                                break;
+                            case 10:
+                            case 21:
+                                preview += " " + FONT.embed_dot("21.4");
+                                break;
+                            case 11:
+                            case 22:
+                                preview += " " + FONT.embed_dot("34.26");
+                                break;
+                            case 12:
+                            case 23:
+                                preview += " " + FONT.embed_dot("315.7");
+                                break;
+                            case 13:
+                            case 24:
+                                preview += " " + FONT.embed_dot("562.46");
+                                break;
+                            case 14:
+                            case 25:
+                                preview += " " + FONT.embed_dot("4629.1");
+                                break;
+                        }
+                    }
+
+                    preview = preview.trim();
+
+                    if (preview == "") {
+                        preview = "CE_" + (i + 1);
+                    }
+
+                    generalGroup.items[si].preview = preview;
+                }
+            }
+        }
+
+        if (foundOSDCustomElements >= FC.OSD_CUSTOM_ELEMENTS.settings.customElementsCount) {
+            break;
+        }
+    }
+    OSD.GUI.updatePreviews();
+}
+
 function fillCustomElementsValues() {
     for (var i = 0; i < FC.OSD_CUSTOM_ELEMENTS.settings.customElementsCount; i++) {
-        for (var ii = 0; ii < 3; ii++) {
+        for (var ii = 0; ii < FC.OSD_CUSTOM_ELEMENTS.settings.customElementParts; ii++) {
             $('.osdCustomElement-' + i + '-part-' + ii + '-type').val(FC.OSD_CUSTOM_ELEMENTS.items[i].customElementItems[ii].type).trigger('change');
 
             var valueCell = $('.osdCustomElement-' + i + '-part-' + ii + '-value');
-            switch (FC.OSD_CUSTOM_ELEMENTS .items[i].customElementItems[ii].type){
+            switch (FC.OSD_CUSTOM_ELEMENTS.items[i].customElementItems[ii].type){
                 case 1:
                     valueCell.find('.text').val(FC.OSD_CUSTOM_ELEMENTS .items[i].customElementText).trigger('change');
                     break;
                 case 2:
-                    valueCell.find('.ico').val(FC.OSD_CUSTOM_ELEMENTS .items[i].customElementItems[ii].value).trigger('change');
+                    valueCell.find('.ico').val(FC.OSD_CUSTOM_ELEMENTS.items[i].customElementItems[ii].value).trigger('change');
                     break;
                 case 3:
-                    valueCell.find('.ico_gv').val(FC.OSD_CUSTOM_ELEMENTS .items[i].customElementItems[ii].value).trigger('change');
+                    valueCell.find('.ico_gv').val(FC.OSD_CUSTOM_ELEMENTS.items[i].customElementItems[ii].value).trigger('change');
                     break;
                 case 4:
                 case 5:
                 case 6:
                 case 7:
-                    valueCell.find('.gv').val(FC.OSD_CUSTOM_ELEMENTS .items[i].customElementItems[ii].value).trigger('change');
+                case 8:
+                case 9:
+                case 10:
+                case 11:
+                case 12:
+                case 13:
+                case 14:
+                    valueCell.find('.gv').val(FC.OSD_CUSTOM_ELEMENTS.items[i].customElementItems[ii].value).trigger('change');
+                    break;
+                case 15:
+                case 16:
+                case 17:
+                case 18:
+                case 19:
+                case 20:
+                case 21:
+                case 22:
+                case 23:
+                case 24:
+                case 25:
+                    valueCell.find('.lc').val(FC.OSD_CUSTOM_ELEMENTS.items[i].customElementItems[ii].value).trigger('change');
                     break;
             }
         }
@@ -3623,7 +3738,7 @@ function customElementsInitCallback() {
 }
 
 function customElementNormaliseRow(row){
-    for(var i = 0; i < 3; i++){
+    for(var i = 0; i < FC.OSD_CUSTOM_ELEMENTS.settings.customElementParts; i++){
         var elementType = $('.osdCustomElement-' + row + '-part-' + i + '-type');
         var valueCell = $('.' + elementType.data('valueCellClass'));
 
@@ -3634,14 +3749,15 @@ function customElementNormaliseRow(row){
                 break;
             case 2:
                 valueCell.find('.ico').val(valueCell.find('.ico').val() > 255 ? 255 : valueCell.find('.ico').val());
-                valueCell.find('.ico').val(valueCell.find('.ico').val() < 1 ? 1 : valueCell.find('.ico').val());
+                valueCell.find('.ico').val((valueCell.find('.ico').val() != '' && valueCell.find('.ico').val() < 1 )? 1 : valueCell.find('.ico').val());
         }
     }
+    updateOSDCustomElementsDisplay();
 }
 
 function customElementDisableNonValidOptionsRow(row) {
     var selectedTextIndex = false;
-    for(let i = 0; i < 3; i++){
+    for(let i = 0; i < FC.OSD_CUSTOM_ELEMENTS.settings.customElementParts; i++){
         let elementType = $('.osdCustomElement-' + row + '-part-' + i + '-type');
 
         if(parseInt(elementType.val()) === 1)
@@ -3651,7 +3767,7 @@ function customElementDisableNonValidOptionsRow(row) {
         }
     }
 
-    for(let i = 0; i < 3; i++){
+    for(let i = 0; i < FC.OSD_CUSTOM_ELEMENTS.settings.customElementParts; i++){
         let elementType = $('.osdCustomElement-' + row + '-part-' + i + '-type');
         if(i !== selectedTextIndex && selectedTextIndex !== false){
             elementType.find('option[value="1"]').attr('disabled', 'disabled');
@@ -3686,7 +3802,27 @@ function customElementGetDataForRow(row){
             case 5:
             case 6:
             case 7:
+            case 8:
+            case 9:
+            case 10:
+            case 11:
+            case 12:
+            case 13:
+            case 14:
                 partValue = parseInt(valueCell.find('.gv').find(':selected').val());
+                break;
+            case 15:
+            case 16:
+            case 17:
+            case 18:
+            case 19:
+            case 20:
+            case 21:
+            case 22:
+            case 23:
+            case 24:
+            case 25:
+                partValue = parseInt(valueCell.find('.lc').find(':selected').val());
                 break;
         }
 

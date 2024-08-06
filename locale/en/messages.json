@@ -3628,6 +3628,9 @@
     "osd_custom_element_settings": {
         "message": "Custom OSD elements"
     },
+    "osd_custom_element_settings_HELP": {
+        "message": "You can find the icon numbers by clicking this help button."
+    },
     "custom_element": {
         "message": "Custom element"
     },
