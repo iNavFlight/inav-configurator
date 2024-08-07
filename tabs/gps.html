@@ -9,16 +9,18 @@
                         <div class="spacer_box_title" data-i18n="configurationGPS"></div>
                     </div>
                     <div class="spacer_box">
-                        <div class="note">
-                            <div class="note_spacer">
-                                <p data-i18n="configurationGPSHelp"></p>
-                            </div>
-                        </div>
-
                         <div class="checkbox">
                             <input type="checkbox" data-bit="7" class="feature toggle" name="GPS" title="GPS" id="feature-7">
                             <label for="feature-7"><span data-i18n="featureGPS"></span></label>
                             <div for="feature-7" class="helpicon cf_tip" data-i18n_title="featureGPSTip"></div>
+                        </div>
+                        <div class="select">
+                            <select id="gps_port" class="gps_port"></select>
+                            <label for="gps_port"><span data-i18n="gpsPort"></span></label>
+                        </div>
+                        <div class="select">
+                            <select id="gps_baud" class="gps_baud"></select>
+                            <label for="gps_baud"><span data-i18n="gpsBaud"></span></label>
                         </div>
                         <div class="select">
                             <select id="gps_protocol" class="gps_protocol">
@@ -156,6 +158,12 @@
     <div class="content_toolbar">
         <div class="btn save_btn">
             <a class="save" href="#" data-i18n="configurationButtonSave"></a>
+        </div>
+        <div class="btn save_btn">
+            <a class="loadAssistnowOnline" href="#" data-i18n="gpsLoadAssistnowOnlineButton"></a>
+        </div>
+        <div class="btn save_btn">
+            <a class="loadAssistnowOffline" href="#" data-i18n="gpsLoadAssistnowOfflineButton"></a>
         </div>
     </div>
 </div>

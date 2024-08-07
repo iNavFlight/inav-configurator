@@ -1,45 +1,36 @@
 'use strict';
 
-////////////////////////////////////
-//
-// global Parameters definition
-//
-////////////////////////////////////
+const path = require('path');
+const fs = require('fs');
+const ol = require('openlayers');
+const xml2js = require('xml2js');
+const Store = require('electron-store');
+const store = new Store();
+const { dialog } = require("@electron/remote");
 
+const MSPChainerClass = require('./../js/msp/MSPchainer');
+const mspHelper = require('./../js/msp/MSPHelper');
+const MSPCodes = require('./../js/msp/MSPCodes');
+const MSP = require('./../js/msp');
+const mspQueue = require('./../js/serial_queue');
+const { GUI, TABS } = require('./../js/gui');
+const FC = require('./../js/fc');
+const CONFIGURATOR = require('./../js/data_storage');
+const i18n = require('./../js/localization');
+const { globalSettings } = require('./../js/globalSettings');
+const MWNP = require('./../js/mwnp');
+const Waypoint = require('./../js/waypoint')
+const WaypointCollection = require('./../js/waypointCollection');
+const Safehome = require('./../js/safehome');
+const SafehomeCollection = require('./../js/safehomeCollection');
+const { ApproachDirection, FwApproach } = require('./../js/fwApproach');
+const FwApproachCollection = require('./../js/fwApproachCollection');
+const SerialBackend = require('./../js/serial_backend');
+const { distanceOnLine, wrap_360, calculate_new_cooridatnes } = require('./../js/helpers');
+const Plotly = require('./../js/libraries/plotly-latest.min');
+const interval = require('./../js/intervals');
 
-// MultiWii NAV Protocol
-var MWNP = MWNP || {};
-
-// WayPoint type
-MWNP.WPTYPE = {
-    WAYPOINT:           1,
-    POSHOLD_UNLIM:      2,
-    POSHOLD_TIME:       3,
-    RTH:                4,
-    SET_POI:            5,
-    JUMP:               6,
-    SET_HEAD:           7,
-    LAND:               8
-};
-
-MWNP.P3 = {
-    ALT_TYPE:       0,  // Altitude (alt) : Relative (to home altitude) (0) or Absolute (AMSL) (1).
-    USER_ACTION_1:  1,  // WP Action 1
-    USER_ACTION_2:  2,  // WP Action 2
-    USER_ACTION_3:  3,  // WP Action 3
-    USER_ACTION_4:  4,  // WP Action 4
-}
-
-// Reverse WayPoint type dictionary
-function swap(dict) {
-    let rev_dict = {};
-    for (let key in dict) {
-        rev_dict[dict[key]] = key;
-    }
-    return rev_dict;
-}
-
-MWNP.WPTYPE.REV = swap(MWNP.WPTYPE);
+var MAX_NEG_FW_LAND_ALT = -2000; // cm
 
 // Dictionary of Parameter 1,2,3 definition depending on type of action selected (refer to MWNP.WPTYPE)
 var dictOfLabelParameterPoint = {
@@ -78,11 +69,13 @@ TABS.mission_control.initialize = function (callback) {
     let textFeature;
     var textGeom;
     let isOffline = false;
-    let rthUpdateInterval = 0;
+    let selectedSafehome;
+    let $safehomeContentBox;
+    let $waypointOptionsTableBody;
+    let settings = {speed: 0, alt: 5000, safeRadiusSH: 50, fwApproachAlt: 60, fwLandAlt: 5, maxDistSH: 0, fwApproachLength: 0, fwLoiterRadius: 0, bingDemModel: false};
 
     if (GUI.active_tab != 'mission_control') {
         GUI.active_tab = 'mission_control';
-        googleAnalytics.sendAppView('Mission Control');
     }
 
     if (CONFIGURATOR.connectionValid) {
@@ -90,7 +83,23 @@ TABS.mission_control.initialize = function (callback) {
         loadChainer.setChain([
             mspHelper.getMissionInfo,
             //mspHelper.loadWaypoints,
-            //mspHelper.loadSafehomes
+            mspHelper.loadSafehomes,
+            mspHelper.loadFwApproach,
+            function (callback) {
+                mspHelper.getSetting("nav_fw_land_approach_length").then((data) =>  {
+                    settings.fwApproachLength = parseInt(data.value);
+                }).then(callback);
+            },
+            function (callback) {
+                mspHelper.getSetting("safehome_max_distance").then((data) => {
+                    settings.maxDistSH = parseInt(data.value) / 100;
+                }).then(callback);
+            },
+            function (callback) {
+                mspHelper.getSetting(("nav_fw_loiter_radius")).then((data) => {
+                    settings.fwLoiterRadius = parseInt(data.value);
+                }).then(callback);
+            }
         ]);
         loadChainer.setExitPoint(loadHtml);
         loadChainer.execute();
@@ -98,10 +107,19 @@ TABS.mission_control.initialize = function (callback) {
 
         // FC not connected, load page anyway
         loadHtml();
+        if (!FC.FW_APPROACH) {
+            FC.FW_APPROACH = new FwApproachCollection();
+        }
+        if (!FC.SAFEHOMES) {
+            FC.SAFEHOMES = new SafehomeCollection();
+        }
+        for (let i = 0; i < FC.FW_APPROACH.getMaxFwApproachCount(); i++){
+            FC.FW_APPROACH.put(new FwApproach(i));
+        }
     }
 
     function loadHtml() {
-        GUI.load("./tabs/mission_control.html", process_html);
+        GUI.load(path.join(__dirname, "mission_control.html"), process_html);
     }
 
     function process_html() {
@@ -117,20 +135,30 @@ TABS.mission_control.initialize = function (callback) {
             isOffline = true;
         }
 
-        $safehomesTable = $('.safehomesTable');
-        $safehomesTableBody = $('#safehomesTableBody');
-        $waypointOptionsTable = $('.waypointOptionsTable');
+        $safehomeContentBox = $('#SafehomeContentBox');
         $waypointOptionsTableBody = $('#waypointOptionsTableBody');
 
         if (typeof require !== "undefined") {
             loadSettings();
             // let the dom load finish, avoiding the resizing of the map
             setTimeout(initMap, 200);
+            if (!isOffline) {
+                setTimeout(() => {
+                    if (FC.SAFEHOMES.safehomeCount() >= 1) {
+                        updateSelectedShAndFwAp(0);
+                    } else {
+                        selectedSafehome = null;
+                        selectedFwApproachSh = null;
+                    }
+                    renderSafehomesOnMap();
+                    updateSafehomeInfo();
+                }, 500);
+            }
         } else {
             $('#missionMap, #missionControls').hide();
             $('#notLoadMap').show();
         }
-        localize();
+        i18n.localize();
 
         function get_raw_gps_data() {
             MSP.send_message(MSPCodes.MSP_RAW_GPS, false, false, get_comp_gps_data);
@@ -151,11 +179,11 @@ TABS.mission_control.initialize = function (callback) {
 
         function update_gpsTrack() {
 
-          let lat = GPS_DATA.lat / 10000000;
-          let lon = GPS_DATA.lon / 10000000;
+          let lat = FC.GPS_DATA.lat / 10000000;
+          let lon = FC.GPS_DATA.lon / 10000000;
 
           //Update map
-          if (GPS_DATA.fix >= 2) {
+          if (FC.GPS_DATA.fix >= 2) {
 
               if (!cursorInitialized) {
                   cursorInitialized = true;
@@ -167,7 +195,7 @@ TABS.mission_control.initialize = function (callback) {
                           anchor: [0.5, 0.5],
                           opacity: 1,
                           scale: 0.6,
-                          src: '../images/icons/icon_mission_airplane.png'
+                          src: './images/icons/icon_mission_airplane.png'
                       }))
                   });
 
@@ -194,7 +222,7 @@ TABS.mission_control.initialize = function (callback) {
                           anchor: [0.5, 1.0],
                           opacity: 1,
                           scale: 0.5,
-                          src: '../images/icons/cf_icon_RTH.png'
+                          src: './images/icons/cf_icon_RTH.png'
                       }))
                   });
 
@@ -289,28 +317,16 @@ TABS.mission_control.initialize = function (callback) {
                 breadCrumbLS.setCoordinates(coords);
               }
 
-              curPosStyle.getImage().setRotation((SENSOR_DATA.kinematics[2]/360.0) * 6.28318);
+              curPosStyle.getImage().setRotation((FC.SENSOR_DATA.kinematics[2]/360.0) * 6.28318);
 
               //update data text
               textGeom.setCoordinates(map.getCoordinateFromPixel([0,0]));
               let tmpText = textStyle.getText();
               tmpText.setText('                                \n' +
-                              'H: ' + SENSOR_DATA.kinematics[2] +
-                              '\nAlt: ' + SENSOR_DATA.altitude +
-                              'm\nSpeed: ' + GPS_DATA.speed + 'cm/s\n' +
-                              'Dist: ' + GPS_DATA.distanceToHome + 'm');
-
-              //update RTH every 5th GPS update since it really shouldn't change
-              if(rthUpdateInterval >= 5)
-              {
-                MISSION_PLANNER.bufferPoint.number = -1; //needed to get point 0 which id RTH
-                MSP.send_message(MSPCodes.MSP_WP, mspHelper.crunch(MSPCodes.MSP_WP), false, function rth_update() {
-                    var coord = ol.proj.fromLonLat([MISSION_PLANNER.bufferPoint.lon, MISSION_PLANNER.bufferPoint.lat]);
-                    rthGeo.setCoordinates(coord);
-                  });
-                rthUpdateInterval = 0;
-              }
-              rthUpdateInterval++;
+                              'H: ' + FC.SENSOR_DATA.kinematics[2] +
+                              '\nAlt: ' + FC.SENSOR_DATA.altitude +
+                              'm\nSpeed: ' + FC.GPS_DATA.speed + 'cm/s\n' +
+                              'Dist: ' + FC.GPS_DATA.distanceToHome + 'm');
           }
         }
 
@@ -320,19 +336,15 @@ TABS.mission_control.initialize = function (callback) {
          */
         if(!isOffline)
         {
-          helper.mspBalancedInterval.add('gps_pull', 200, 3, function gps_update() {
+            interval.add('gps_pull', function gps_update() {
               // avoid usage of the GPS commands until a GPS sensor is detected for targets that are compiled without GPS support.
-              if (!have_sensor(CONFIG.activeSensors, 'gps')) {
+              if (!SerialBackend.have_sensor(FC.CONFIG.activeSensors, 'gps')) {
                   update_gpsTrack();
                   return;
               }
 
-              if (helper.mspQueue.shouldDrop()) {
-                  return;
-              }
-
               get_raw_gps_data();
-          });
+          }, 200);
         }
 
         GUI.content_ready(callback);
@@ -349,7 +361,11 @@ TABS.mission_control.initialize = function (callback) {
     //////////////////////////////////////////////////////////////////////////////////////////////
     var markers = [];           // Layer for Waypoints
     var lines = [];             // Layer for lines between waypoints
-    var safehomeMarkers = [];    // layer for Safehome points
+    var safehomeMarkers = [];   // layer for Safehome points
+    var safehomeMarkers = [];   // layer for Safehome points
+    var approachLayers = []     // Layers for FW approach
+    var safehomeMarkers = [];   // layer for Safehome points
+    var approachLayers = []     // Layers for FW approach
 
     var map;
 
@@ -360,19 +376,16 @@ TABS.mission_control.initialize = function (callback) {
     var selectedFeature = null;
     var tempMarker = null;
     var disableMarkerEdit = false;
+    var selectedFwApproachWp = null;
+    var selectedFwApproachSh = null;
+    var lockShExclHeading = false;
+
 
     //////////////////////////////////////////////////////////////////////////////////////////////
     //      define & init parameters for default Settings
     //////////////////////////////////////////////////////////////////////////////////////////////
-    var settings = {speed: 0, alt: 5000, safeRadiusSH : 50, maxDistSH : 0, bingDemModel : false};
 
-    if (CONFIGURATOR.connectionValid) {
-        mspHelper.getSetting("safehome_max_distance").then(function (s) {
-            if (s) {
-                settings.maxDistSH = Number(s.value)/100;
-            }
-        });
-    }
+
 
     //////////////////////////////////////////////////////////////////////////////////////////////
     //      define & init Waypoints parameters
@@ -395,8 +408,8 @@ TABS.mission_control.initialize = function (callback) {
     //////////////////////////////////////////////////////////////////////////////////////////////
     //      define & init Safehome parameters
     //////////////////////////////////////////////////////////////////////////////////////////////
-    //var SAFEHOMES = new SafehomeCollection(); // TO COMMENT FOR RELEASE : DECOMMENT FOR DEBUG
-    //SAFEHOMES.inflate(); // TO COMMENT FOR RELEASE : DECOMMENT FOR DEBUG
+    //var FC.SAFEHOMES = new SafehomeCollection(); // TO COMMENT FOR RELEASE : DECOMMENT FOR DEBUG
+    //FC.SAFEHOMES.inflate(); // TO COMMENT FOR RELEASE : DECOMMENT FOR DEBUG
     //var safehomeRangeRadius = 200; //meters
     //var safehomeSafeRadius = 50; //meters
 
@@ -426,22 +439,29 @@ TABS.mission_control.initialize = function (callback) {
     //
     /////////////////////////////////////////////
     function loadSettings() {
-        chrome.storage.local.get('missionPlannerSettings', function (result) {
-            if (result.missionPlannerSettings) {
-                settings = result.missionPlannerSettings;
+        var missionPlannerSettings = store.get('missionPlannerSettings', false);
+        if (missionPlannerSettings) {
+            if (!missionPlannerSettings.fwApproachLength && settings.fwApproachLength) {
+                missionPlannerSettings.fwApproachLength = settings.fwApproachLength;
+                missionPlannerSettings.maxDistSH = settings.maxDistSH;
+                missionPlannerSettings.fwLoiterRadius = settings.fwLoiterRadius;
             }
-            refreshSettings();
-        });
+            saveSettings();
+            settings = missionPlannerSettings;
+        }
+        refreshSettings();
     }
 
     function saveSettings() {
-        chrome.storage.local.set({'missionPlannerSettings': settings});
+        store.set('missionPlannerSettings', settings);
     }
 
     function refreshSettings() {
         $('#MPdefaultPointAlt').val(String(settings.alt));
         $('#MPdefaultPointSpeed').val(String(settings.speed));
         $('#MPdefaultSafeRangeSH').val(String(settings.safeRadiusSH));
+        $('#MPdefaultFwApproachAlt').val(String(settings.fwApproachAlt));
+        $('#MPdefaultLandAlt').val(String(settings.fwLandAlt));
     }
 
     function closeSettingsPanel() {
@@ -458,59 +478,29 @@ TABS.mission_control.initialize = function (callback) {
         cleanSafehomeLayers();
     }
 
-    function renderSafehomesTable() {
-        /*
-         * Process safehome table UI
-         */
-        let safehomes = SAFEHOMES.get();
-        $safehomesTableBody.find("*").remove();
-        for (let safehomeIndex in safehomes) {
-            if (safehomes.hasOwnProperty(safehomeIndex)) {
-                const safehome = safehomes[safehomeIndex];
+    function checkApproachAltitude(altitude, isSeaLevelRef, sealevel) {
 
-                $safehomesTableBody.append('\
-                    <tr>\
-                    <td><div id="viewSafomePoint" class="btnTable btnTableIcon"> \
-                            <a class="ic_center" data-role="safehome-center" href="#"  title="move to center view"></a> \
-                        </div>\
-                    </td> \
-                    <td><span class="safehome-number"/></td>\
-                    <td class="safehome-enabled"><input type="checkbox" class="togglesmall safehome-enabled-value"/></td> \
-                    <td><input type="number" class="safehome-lat" /></td>\
-                    <td><input type="number" class="safehome-lon" /></td>\
-                    </tr>\
-                ');
-
-                const $row = $safehomesTableBody.find('tr:last');
-
-                $row.find(".safehome-number").text(safehome.getNumber()+1);
-
-                $row.find(".safehome-enabled-value").prop('checked',safehome.isUsed()).change(function () {
-                    safehome.setEnabled((($(this).prop('checked')) ? 1 : 0));
-                    SAFEHOMES.updateSafehome(safehome);
-                    cleanSafehomeLayers();
-                    renderSafehomesOnMap();
-                });
-
-                $row.find(".safehome-lon").val(safehome.getLonMap()).change(function () {
-                    safehome.setLon(Math.round(Number($(this).val()) * 10000000));
-                    SAFEHOMES.updateSafehome(safehome);
-                    cleanSafehomeLayers();
-                    renderSafehomesOnMap();
-                });
-
-                $row.find(".safehome-lat").val(safehome.getLatMap()).change(function () {
-                    safehome.setLat(Math.round(Number($(this).val()) * 10000000));
-                    SAFEHOMES.updateSafehome(safehome);
-                    cleanSafehomeLayers();
-                    renderSafehomesOnMap();
-                });
-
-                $row.find("[data-role='safehome-center']").attr("data-index", safehomeIndex);
-            }
+        if (altitude - (isSeaLevelRef ? sealevel * 100 : 0 ) < 0) {
+            GUI.alert(i18n.getMessage('MissionPlannerAltitudeChangeReset'));
+            return false;
         }
-        GUI.switchery();
-        localize();
+
+        return true;
+    }
+
+    function checkLandingAltitude(altitude, isSeaLevelRef, sealevel) {
+
+        if (altitude - (isSeaLevelRef ? sealevel * 100 : 0 ) < MAX_NEG_FW_LAND_ALT) {
+            GUI.alert(i18n.getMessage('MissionPlannerFwLAndingAltitudeChangeReset'));
+            return false;
+        }
+
+        return true;
+    }
+
+    function updateSafehomeInfo(){
+        let freeSamehomes = FC.SAFEHOMES.getMaxSafehomeCount() - FC.SAFEHOMES.safehomeCount()
+        $('#availableSafehomes').text(freeSamehomes + '/' + FC.SAFEHOMES.getMaxSafehomeCount());
     }
 
 
@@ -518,8 +508,12 @@ TABS.mission_control.initialize = function (callback) {
         /*
          * Process safehome on Map
          */
-        SAFEHOMES.get().forEach(function (safehome) {
-            map.addLayer(addSafeHomeMarker(safehome));
+        FC.SAFEHOMES.get().forEach(safehome => {
+            addFwApproach(safehome.getLonMap(), safehome.getLatMap(), FC.FW_APPROACH.get()[safehome.getNumber()], safehomeMarkers);
+        });
+        FC.SAFEHOMES.get().forEach(safehome => {
+            addSafehomeCircles(safehome);
+            addSafeHomeMarker(safehome);
         });
     }
 
@@ -539,7 +533,7 @@ TABS.mission_control.initialize = function (callback) {
                 anchor: [0.5, 1],
                 opacity: 1,
                 scale: 0.5,
-                src: '../images/icons/cf_icon_safehome' + (safehome.isUsed() ? '_used' : '')+ '.png'
+                src: './images/icons/cf_icon_safehome' + (safehome.isUsed() ? '_used' : '')+ '.png'
             })),
             text: new ol.style.Text(({
                 text: String(Number(safehome.getNumber())+1),
@@ -556,7 +550,107 @@ TABS.mission_control.initialize = function (callback) {
         });
     }
 
-    function addSafeHomeMarker(safehome) {
+    function paintApproachLine(pos1, pos2, color, layers)
+    {
+        var line = new ol.geom.LineString([ol.proj.fromLonLat([pos1.lon, pos1.lat]), ol.proj.fromLonLat([pos2.lon, pos2.lat])]);
+
+        var feature = new ol.Feature({
+            geometry: line
+        });
+
+        var styles = [  new ol.style.Style({
+                stroke: new ol.style.Stroke({
+                    color: color,
+                    width: 3,
+                }),
+            })
+        ];
+
+        var geometry = feature.getGeometry();
+        geometry.forEachSegment(function (start, end) {
+            var dx = end[0] - start[0];
+            var dy = end[1] - start[1];
+            var rotation = Math.atan2(dy, dx);
+
+            styles.push(new ol.style.Style({
+              geometry: new ol.geom.Point(distanceOnLine(start, end, -8)),
+              image: new ol.style.RegularShape({
+                fill: new ol.style.Fill({color}),
+                points: 3,
+                radius: 8,
+                rotation: -rotation,
+                angle: Math.PI / 2 // rotate -90°
+              })
+            }));
+        });
+
+        feature.setStyle(styles);
+
+        var vectorSource = new ol.source.Vector({
+                features: [feature]
+        });
+
+
+        var vectorLayer = new ol.layer.Vector({
+            source: vectorSource
+        });
+
+
+
+        vectorLayer.kind = "approachline";
+        vectorLayer.selection = false;
+
+
+        approachLayers.push(vectorLayer);
+
+        approachLayers.push(vectorLayer);
+        map.addLayer(vectorLayer);
+        layers.push(vectorLayer);
+
+        return vectorLayer;
+    }
+
+    function paintApproach(landCoord, approachLength, bearing, approachDirection, layers) {
+
+        var pos1 = calculate_new_cooridatnes(landCoord, bearing, approachLength);
+        let direction;
+        if (approachDirection == ApproachDirection.LEFT) {
+            direction = wrap_360(bearing + 90);
+        } else {
+            direction = wrap_360(bearing - 90);
+        }
+
+        var pos2 = calculate_new_cooridatnes(pos1, direction, Math.max(settings.fwLoiterRadius * 4, settings.fwApproachLength / 2));
+
+        paintApproachLine(landCoord, pos2, '#0025a1', layers);
+        paintApproachLine(pos2, pos1, '#0025a1', layers);
+        paintApproachLine(pos1, landCoord, '#f78a05', layers);
+    }
+
+    function addFwApproach(lon, lat, fwApproach, layers)
+    {
+        if (fwApproach.getLandHeading1() != 0) {
+            let bearing = wrap_360(Math.abs(fwApproach.getLandHeading1()) + 180);
+            paintApproach({lat: lat, lon: lon}, settings.fwApproachLength, bearing, fwApproach.getApproachDirection(), layers);
+        }
+
+        if (fwApproach.getLandHeading1() > 0) {
+            let direction = fwApproach.getApproachDirection() == ApproachDirection.LEFT ? ApproachDirection.RIGHT : ApproachDirection.LEFT;
+            paintApproach({lat: lat, lon: lon}, settings.fwApproachLength, fwApproach.getLandHeading1(), direction, layers);
+        }
+
+        if (fwApproach.getLandHeading2() != 0) {
+            let bearing = wrap_360(Math.abs(fwApproach.getLandHeading2()) + 180);
+            paintApproach({lat: lat, lon: lon}, settings.fwApproachLength, bearing, fwApproach.getApproachDirection(), layers);
+        }
+
+        if (fwApproach.getLandHeading2() > 0) {
+            let direction = fwApproach.getApproachDirection() == ApproachDirection.LEFT ? ApproachDirection.RIGHT : ApproachDirection.LEFT;
+            paintApproach({lat: lat, lon: lon}, settings.fwApproachLength, fwApproach.getLandHeading2(), direction, layers);
+        }
+    }
+
+    function addSafehomeCircles(safehome) {
         /*
          * add safehome on Map
          */
@@ -611,8 +705,32 @@ TABS.mission_control.initialize = function (callback) {
         vectorLayer.selection = false;
 
         safehomeMarkers.push(vectorLayer);
+        map.addLayer(vectorLayer);
+    }
 
-        return vectorLayer;
+    function addSafeHomeMarker(safehome) {
+
+        let coord = ol.proj.fromLonLat([safehome.getLonMap(), safehome.getLatMap()]);
+        var iconFeature = new ol.Feature({
+            geometry: new ol.geom.Point(coord),
+            name: 'safehome'
+        });
+
+        var vectorLayer = new ol.layer.Vector({
+            source: new ol.source.Vector({
+                        features: [iconFeature]
+                    }),
+            style : function(iconFeature) {
+                return [getSafehomeIcon(safehome)];
+            }
+        });
+
+        vectorLayer.kind = "safehome";
+        vectorLayer.number = safehome.getNumber();
+        vectorLayer.selection = true;
+
+        safehomeMarkers.push(vectorLayer);
+        map.addLayer(vectorLayer);
     }
 
     function getProjectedRadius(radius) {
@@ -646,13 +764,13 @@ TABS.mission_control.initialize = function (callback) {
          * Process home table UI
          */
 
-        $(".home-lat").val(HOME.getLatMap()).change(function () {
+        $(".home-lat").val(HOME.getLatMap()).on('change', function () {
             HOME.setLat(Math.round(Number($(this).val()) * 10000000));
             cleanHomeLayers();
             renderHomeOnMap();
         });
 
-        $(".home-lon").val(HOME.getLonMap()).change(function () {
+        $(".home-lon").val(HOME.getLonMap()).on('change', function () {
             HOME.setLon(Math.round(Number($(this).val()) * 10000000));
             cleanHomeLayers();
             renderHomeOnMap();
@@ -724,7 +842,7 @@ TABS.mission_control.initialize = function (callback) {
                 anchor: [0.5, 1],
                 opacity: 1,
                 scale: 0.5,
-                src: '../images/icons/cf_icon_home.png'
+                src: './images/icons/cf_icon_home.png'
             })),
         });
     }
@@ -875,7 +993,7 @@ TABS.mission_control.initialize = function (callback) {
         });
 
         mission.reinit();
-        tempMissionData = multimission.get().slice(startWPCount, endWPCount + 1);   // copy selected single mission from MM
+        var tempMissionData = multimission.get().slice(startWPCount, endWPCount + 1);   // copy selected single mission from MM
         let i = 0;
         tempMissionData.forEach(function (element) {    // write mission copy to active map mission
             mission.put(element);
@@ -905,7 +1023,7 @@ TABS.mission_control.initialize = function (callback) {
                 MMCount ++;
             }
         });
-        $('#multimissionOptionList').val(MMCount).change();
+        $('#multimissionOptionList').val(MMCount).trigger('change');
     }
 
     function deleteMultimission() {
@@ -948,14 +1066,23 @@ TABS.mission_control.initialize = function (callback) {
     function fileLoadMultiMissionCheck() {
         if (singleMissionActive()) {
             return true;
-        } else if (confirm(chrome.i18n.getMessage('confirm_overwrite_multimission_file_load_option'))) {
-            nwdialog.setContext(document);
-            nwdialog.openFileDialog(function(result) {
-                loadMissionFile(result);
-                multimissionCount = 0;
-                multimission.flush();
-                renderMultimissionTable();
-            })
+        } else if (confirm(i18n.getMessage('confirm_overwrite_multimission_file_load_option'))) {
+            var options = {
+                filters: [ { name: "Mission file", extensions: ['mission'] } ]
+            };
+            dialog.showOpenDialog(options).then(result => {
+                if (result.canceled) {
+                    console.log('No file selected');
+                    return;
+                }
+
+                if (result.filePaths.length == 1) {
+                    loadMissionFile(result.filePaths[0]);
+                    multimissionCount = 0;
+                    multimission.flush();
+                    renderMultimissionTable();
+                }
+            });
         }
         return false;
     }
@@ -1029,7 +1156,7 @@ TABS.mission_control.initialize = function (callback) {
                 anchor: [0.5, 1],
                 opacity: 1,
                 scale: 0.5,
-                src: '../images/icons/cf_icon_position' + (dictofPointIcon[waypoint.getAction()] != '' ? '_'+dictofPointIcon[waypoint.getAction()] : '') + (isEdit ? '_edit' : '')+ '.png'
+                src: './images/icons/cf_icon_position' + (dictofPointIcon[waypoint.getAction()] != '' ? '_'+dictofPointIcon[waypoint.getAction()] : '') + (isEdit ? '_edit' : '')+ '.png'
             })),
             text: new ol.style.Text(({
                 text: String(Number(waypoint.getLayerNumber()+1)),
@@ -1073,15 +1200,15 @@ TABS.mission_control.initialize = function (callback) {
                     // If one is POI, draw orange line in-between and modulate dashline each time a new POI is defined
                     else if (typeof oldPos !== 'undefined' && activatePoi == true && activateHead != true) {
                         if ((poiList.length % 2) == 0) {
-                            paintLine(oldPos, coord, element.getNumber(), color='#ffb725', lineDash=5);
+                            paintLine(oldPos, coord, element.getNumber(), '#ffb725', 5);
                         }
                         else {
-                            paintLine(oldPos, coord, element.getNumber(), color='#ffb725');
+                            paintLine(oldPos, coord, element.getNumber(), '#ffb725');
                         }
                     }
                     // If one is SET_HEAD, draw labelled line in-between with heading value
                     else if (typeof oldPos !== 'undefined' && activatePoi != true && activateHead == true) {
-                        paintLine(oldPos, coord, element.getNumber(), color='#1497f1', lineDash=0, lineText=String(oldHeading)+"°");
+                        paintLine(oldPos, coord, element.getNumber(), '#1497f1', 0, String(oldHeading)+"°");
                     }
 
                     if (element.getEndMission() == 0xA5) {
@@ -1098,7 +1225,7 @@ TABS.mission_control.initialize = function (callback) {
                 if (element.getAction() == MWNP.WPTYPE.JUMP) {
                     let jumpWPIndex = multiMissionWPNum + element.getP1();
                     let coord = ol.proj.fromLonLat([mission.getWaypoint(jumpWPIndex).getLonMap(), mission.getWaypoint(jumpWPIndex).getLatMap()]);
-                    paintLine(oldPos, coord, element.getNumber(), color='#e935d6', lineDash=5, lineText="Repeat x"+(element.getP2() == -1 ? " infinite" : String(element.getP2())), selection=false, arrow=true);
+                    paintLine(oldPos, coord, element.getNumber(), '#e935d6', 5, "Repeat x"+(element.getP2() == -1 ? " infinite" : String(element.getP2())), false, true);
                 }
                 // If classic WPs is defined with a heading = -1, change Boolean for POI to false. If it is defined with a value different from -1, activate Heading boolean
                 else if (element.getAction() == MWNP.WPTYPE.SET_HEAD) {
@@ -1121,6 +1248,9 @@ TABS.mission_control.initialize = function (callback) {
                     multiMissionWPNum = element.getNumber() + 1;
                 }
             }
+            if (element.getAction() == MWNP.WPTYPE.LAND) {
+                addFwApproach(element.getLonMap(), element.getLatMap(), FC.FW_APPROACH.get()[FC.SAFEHOMES.getMaxSafehomeCount() + element.getMultiMissionIdx()], lines);
+            }
         });
         //reset text position
         if (textGeom) {
@@ -1131,7 +1261,11 @@ TABS.mission_control.initialize = function (callback) {
         if (disableMarkerEdit) {
             $('#missionDistance').text('N/A');
         } else {
-            $('#missionDistance').text(lengthMission[lengthMission.length -1] != -1 ? lengthMission[lengthMission.length -1].toFixed(1) : 'infinite');
+            if (lengthMission.length >= 1) {
+                $('#missionDistance').text(lengthMission[lengthMission.length -1].toFixed(1));
+            } else {
+                $('#missionDistance').text('infinite');
+            }
         }
     }
 
@@ -1171,7 +1305,7 @@ TABS.mission_control.initialize = function (callback) {
             featureArrow.setStyle(
                 new ol.style.Style({
                     image: new ol.style.Icon({
-                        src: '../images/icons/cf_icon_arrow.png',
+                        src: './images/icons/cf_icon_arrow.png',
                         scale: 0.3,
                         anchor: [0.5, 0.5],
                         rotateWithView: true,
@@ -1234,20 +1368,65 @@ TABS.mission_control.initialize = function (callback) {
 
     function redrawLayers() {
         if (!mission.isEmpty()) {
+            repaintLine4Waypoints(mission);
             mission.get().forEach(function (element) {
                 if (!element.isAttached()) {
                     map.addLayer(addWaypointMarker(element));
                 }
             });
-            repaintLine4Waypoints(mission);
+
         }
     }
 
     function redrawLayer() {
+        repaintLine4Waypoints(mission);
         if (selectedFeature && selectedMarker) {
             selectedFeature.setStyle(getWaypointIcon(selectedMarker, true));
         }
-        repaintLine4Waypoints(mission);
+    }
+
+    function renderSafeHomeOptions()  {
+        if (selectedSafehome && selectedFwApproachSh) {
+
+            lockShExclHeading = true;
+            if (!$('#missionPlannerSafehome').is(':visible')) {
+                $('#missionPlannerSafehome').fadeIn(300);
+            }
+
+            $('#SafehomeContentBox').show();
+
+            if (selectedFwApproachSh.getLandHeading1() == 0 && selectedFwApproachSh.getLandHeading1() == 0 && selectedFwApproachSh.getApproachAltAsl() == 0 && selectedFwApproachSh.getLandAltAsl() == 0) {
+                selectedFwApproachSh.setApproachAltAsl(settings.fwApproachAlt * 100);
+                selectedFwApproachSh.setLandAltAsl(settings.fwLandAlt * 100);
+            }
+
+            if (selectedFwApproachSh.getElevation() == 0) {
+                (async () => {
+                    const elevation = await selectedFwApproachSh.getElevationFromServer(selectedSafehome.getLonMap(), selectedSafehome.getLatMap(), globalSettings) * 100;
+                    selectedFwApproachSh.setElevation(elevation);
+                    $('#safehomeElevation').text(selectedFwApproachSh.getElevation() / 100 + " m");
+                })();
+            }
+
+            const $safehomeBox = $safehomeContentBox.find('.missionPlannerSafehomeBox:last-child');
+            $safehomeBox.find('.spacer_box_title').text(i18n.getMessage('safehomeEdit') + ' '  + (selectedSafehome.getNumber() + 1));
+
+            $('#safehomeLatitude').val(selectedSafehome.getLatMap());
+            $('#safehomeLongitude').val(selectedSafehome.getLonMap());
+            changeSwitchery($('#safehomeSeaLevelRef'), selectedFwApproachSh.getIsSeaLevelRef());
+            $('#safehomeApproachAlt').val(selectedFwApproachSh.getApproachAltAsl());
+            $('#safehomeLandAlt').val(selectedFwApproachSh.getLandAltAsl());
+            $('#geozoneApproachDirection').val(selectedFwApproachSh.getApproachDirection());
+            $('#safehomeLandHeading1').val(Math.abs(selectedFwApproachSh.getLandHeading1()));
+            changeSwitchery($('#safehomeLandHeading1Excl'), selectedFwApproachSh.getLandHeading1() < 0);
+            $('#safehomeLandHeading2').val(Math.abs(selectedFwApproachSh.getLandHeading2()));
+            changeSwitchery($('#safehomeLandHeading2Excl'), selectedFwApproachSh.getLandHeading2() < 0);
+            $('#safehomeLandAltM').text(selectedFwApproachSh.getLandAltAsl() / 100 + " m");
+            $('#safehomeApproachAltM').text(selectedFwApproachSh.getApproachAltAsl() / 100 + " m");
+            lockShExclHeading = false;
+        } else {
+            $('#SafehomeContentBox').hide();
+        }
     }
 
     function renderWaypointOptionsTable(waypoint) {
@@ -1284,7 +1463,7 @@ TABS.mission_control.initialize = function (callback) {
 
             GUI.fillSelect($row.find(".waypointOptions-action"), waypointOptions, waypointOptions.indexOf(MWNP.WPTYPE.REV[element.getAction()]));
 
-            $row.find(".waypointOptions-action").val(waypointOptions.indexOf(MWNP.WPTYPE.REV[element.getAction()])).change(function () {
+            $row.find(".waypointOptions-action").val(waypointOptions.indexOf(MWNP.WPTYPE.REV[element.getAction()])).on('change', function () {
                 element.setAction(MWNP.WPTYPE[waypointOptions[$(this).val()]]);
                 for (var i = 1; i <= 3; i++) {
                     if (dictOfLabelParameterPoint[element.getAction()]['parameter'+String(i)] != '') {
@@ -1303,31 +1482,31 @@ TABS.mission_control.initialize = function (callback) {
 
             $row.find(".waypointOptions-number").text(element.getAttachedNumber()+1);
 
-            $row.find(".waypointOptions-p1").val((MWNP.WPTYPE.REV[element.getAction()] == "JUMP" ? element.getP1()+1 : element.getP1())).change(function () {
+            $row.find(".waypointOptions-p1").val((MWNP.WPTYPE.REV[element.getAction()] == "JUMP" ? element.getP1()+1 : element.getP1())).on('change', function () {
                 if (MWNP.WPTYPE.REV[element.getAction()] == "SET_HEAD") {
                     if ($(this).val() >= 360 || ($(this).val() < 0 && $(this).val() != -1))
                     {
                       $(this).val(-1);
-                      alert(chrome.i18n.getMessage('MissionPlannerHeadSettingsCheck'));
+                      GUI.alert(i18n.getMessage('MissionPlannerHeadSettingsCheck'));
                     }
                 }
                 else if (MWNP.WPTYPE.REV[element.getAction()] == "RTH") {
                     if ($(this).val() != 0 && $(this).val() != 1)
                     {
                       $(this).val(0);
-                      alert(chrome.i18n.getMessage('MissionPlannerRTHSettingsCheck'));
+                      GUI.alert(i18n.getMessage('MissionPlannerRTHSettingsCheck'));
                     }
                 }
                 else if (MWNP.WPTYPE.REV[element.getAction()] == "JUMP") {
                     if ($(this).val() > mission.getNonAttachedList().length || $(this).val() < 1)
                     {
                       $(this).val(1);
-                      alert(chrome.i18n.getMessage('MissionPlannerJumpSettingsCheck'));
+                      GUI.alert(i18n.getMessage('MissionPlannerJumpSettingsCheck'));
                     }
                     else if (mission.getPoiList().length != 0 && mission.getPoiList()) {
                         if (mission.getPoiList().includes(mission.convertJumpNumberToWaypoint(Number($(this).val())-1))) {
                             $(this).val(1);
-                            alert(chrome.i18n.getMessage('MissionPlannerJump3SettingsCheck'));
+                            GUI.alert(i18n.getMessage('MissionPlannerJump3SettingsCheck'));
                         }
                     }
                 }
@@ -1337,12 +1516,12 @@ TABS.mission_control.initialize = function (callback) {
                 redrawLayer();
             });
 
-            $row.find(".waypointOptions-p2").val(element.getP2()).change(function () {
+            $row.find(".waypointOptions-p2").val(element.getP2()).on('change', function () {
                 if (MWNP.WPTYPE.REV[element.getAction()] == "JUMP") {
                     if ($(this).val() > 10 || ($(this).val() < 0 && $(this).val() != -1))
                     {
                       $(this).val(0);
-                      alert(chrome.i18n.getMessage('MissionPlannerJump2SettingsCheck'));
+                      GUI.alert(i18n.getMessage('MissionPlannerJump2SettingsCheck'));
                     }
                 }
                 element.setP2(Number($(this).val()));
@@ -1355,7 +1534,7 @@ TABS.mission_control.initialize = function (callback) {
 
         });
         GUI.switchery();
-        localize();
+        i18n.localize();;
         return waypoint;
     }
 
@@ -1431,7 +1610,7 @@ TABS.mission_control.initialize = function (callback) {
             var button = document.createElement('button');
 
             button.innerHTML = ' ';
-            button.style = 'background: url(\'../images/CF_settings_white.svg\') no-repeat 1px -1px;background-color: rgba(0,60,136,.5);';
+            button.style = 'background: url(\'./images/CF_settings_white.svg\') no-repeat 1px -1px;background-color: rgba(0,60,136,.5);';
 
             var handleShowSettings = function () {
                 $('#missionPlannerSettings').fadeIn(300);
@@ -1463,14 +1642,11 @@ TABS.mission_control.initialize = function (callback) {
             var button = document.createElement('button');
 
             button.innerHTML = ' ';
-            button.style = 'background: url(\'../images/icons/cf_icon_safehome_white.svg\') no-repeat 1px -1px;background-color: rgba(0,60,136,.5);';
+            button.style = 'background: url(\'./images/icons/cf_icon_safehome_white.svg\') no-repeat 1px -1px;background-color: rgba(0,60,136,.5);';
 
             var handleShowSafehome = function () {
                 $('#missionPlannerSafehome').fadeIn(300);
-                //SAFEHOMES.flush();
-                //mspHelper.loadSafehomes();
                 cleanSafehomeLayers();
-                renderSafehomesTable();
                 renderSafehomesOnMap();
                 $('#safeHomeMaxDistance').text(settings.maxDistSH);
                 $('#SafeHomeSafeDistance').text(settings.safeRadiusSH);
@@ -1501,7 +1677,7 @@ TABS.mission_control.initialize = function (callback) {
             var button = document.createElement('button');
 
             button.innerHTML = ' ';
-            button.style = 'background: url(\'../images/icons/cf_icon_elevation_white.svg\') no-repeat 1px -1px;background-color: rgba(0,60,136,.5);';
+            button.style = 'background: url(\'./images/icons/cf_icon_elevation_white.svg\') no-repeat 1px -1px;background-color: rgba(0,60,136,.5);';
 
             var handleShowSettings = function () {
                 $('#missionPlannerHome').fadeIn(300);
@@ -1538,7 +1714,7 @@ TABS.mission_control.initialize = function (callback) {
             var button = document.createElement('button');
 
             button.innerHTML = ' ';
-            button.style = 'background: url(\'../images/icons/cf_icon_multimission_white.svg\') no-repeat 1px -1px;background-color: rgba(0,60,136,.5);';
+            button.style = 'background: url(\'./images/icons/cf_icon_multimission_white.svg\') no-repeat 1px -1px;background-color: rgba(0,60,136,.5);';
 
             var handleShowSettings = function () {
                 $('#missionPlannerMultiMission').fadeIn(300);
@@ -1591,6 +1767,10 @@ TABS.mission_control.initialize = function (callback) {
          * @param {ol.MapBrowserEvent} evt Map browser event.
          */
         app.Drag.prototype.handleDragEvent = function (evt) {
+            if (tempMarker.kind == "safehomecircle") {
+                return;
+            }
+
             var map = evt.map;
 
             var feature = map.forEachFeatureAtPixel(evt.pixel,
@@ -1622,12 +1802,16 @@ TABS.mission_control.initialize = function (callback) {
                 repaintLine4Waypoints(mission);
             }
             else if (tempMarker.kind == "safehome") {
-                let tempSH = SAFEHOMES.getSafehome(tempMarker.number);
-                tempSH.setLon(Math.round(coord[0] * 10000000));
-                tempSH.setLat(Math.round(coord[1] * 10000000));
-                SAFEHOMES.updateSafehome(tempSH);
-                $safehomesTableBody.find('tr:nth-child('+String(tempMarker.number+1)+') > td > .safehome-lon').val(Math.round(coord[0] * 10000000) / 10000000);
-                $safehomesTableBody.find('tr:nth-child('+String(tempMarker.number+1)+') > td > .safehome-lat').val(Math.round(coord[1] * 10000000) / 10000000);
+                let tmpSafehome = FC.SAFEHOMES.get()[tempMarker.number];
+                tmpSafehome.setLon(Math.round(coord[0] * 1e7));
+                tmpSafehome.setLat(Math.round(coord[1] * 1e7));
+
+                $('#safeHomeLongitude').val(Math.round(coord[0] * 1e7));
+                $('#safeHomeLatitude').val(Math.round(coord[1] * 1e7));
+                updateSelectedShAndFwAp(tempMarker.number);
+                renderSafeHomeOptions();
+                cleanSafehomeLayers();
+                renderSafehomesOnMap();
             }
             else if (tempMarker.kind == "home") {
                 HOME.setLon(Math.round(coord[0] * 10000000));
@@ -1672,6 +1856,22 @@ TABS.mission_control.initialize = function (callback) {
                         $('#elevationValueAtWP').text(elevationAtWP);
                         const returnAltitude = checkAltElevSanity(false, mission.getWaypoint(tempMarker.number).getAlt(), elevationAtWP, mission.getWaypoint(tempMarker.number).getP3());
                         mission.getWaypoint(tempMarker.number).setAlt(returnAltitude);
+
+                        if (mission.getWaypoint(tempMarker.number).getAction() == MWNP.WPTYPE.LAND) {
+                            let approach = FC.FW_APPROACH.get()[FC.SAFEHOMES.getMaxSafehomeCount() + mission.getWaypoint(tempMarker.number).getMultiMissionIdx()];
+                            if (approach.getIsSeaLevelRef()) {
+                                if (approach.getElevation() != 0) {
+                                    approach.setApproachAltAsl(approach.getApproachAltAsl() - approach.getElevation() + elevationAtWP * 100);
+                                    approach.setLandAltAsl(approach.getLandAltAsl() - approach.getElevation() + elevationAtWP * 100);
+                                }
+                                approach.setElevation(elevationAtWP * 100);
+                                $('#wpApproachAlt').val(approach.getApproachAltAsl());
+                                $('#wpLandAlt').val(approach.getLandAltAsl);
+                                $('#wpLandAltM').text(approach.getLandAltAsl() / 100 + " m");
+                                $('#wpApproachAltM').text(approach.getApproachAltAsl() / 100 + " m");
+                            }
+                        }
+
                         plotElevation();
                     })()
                 }
@@ -1684,15 +1884,32 @@ TABS.mission_control.initialize = function (callback) {
                     plotElevation();
                 })()
             }
+            else if (tempMarker.kind == "safehome") {
+                (async () => {
+                    let approach = FC.FW_APPROACH.get()[tempMarker.number];
+                    let safehome = FC.SAFEHOMES.get()[tempMarker.number];
+                    const elevation = await approach.getElevationFromServer(safehome.getLonMap(), safehome.getLatMap(), globalSettings) * 100;
+                    $('#safehomeElevation').text(elevation / 100 + " m");
+                    if (approach.getIsSeaLevelRef()) {
+                        if (approach.getElevation() != 0) {
+                            approach.setApproachAltAsl(approach.getApproachAltAsl() - approach.getElevation() + elevation);
+                            approach.setLandAltAsl(approach.getLandAltAsl() - approach.getElevation() + elevation);
+                        }
+                        approach.setElevation(elevation);
+                    }
+                    renderSafeHomeOptions();
+                })()
+            }
             this.coordinate_ = null;
             this.feature_ = null;
             return false;
         };
 
-        var lat = (GPS_DATA ? (GPS_DATA.lat / 10000000) : 0);
-        var lon = (GPS_DATA ? (GPS_DATA.lon / 10000000) : 0);
+        var lat = (FC.GPS_DATA ? (FC.GPS_DATA.lat / 10000000) : 0);
+        var lon = (FC.GPS_DATA ? (FC.GPS_DATA.lon / 10000000) : 0);
 
         let mapLayer;
+        let control_list;
 
         if (globalSettings.mapProviderType == 'bing') {
             mapLayer = new ol.source.BingMaps({
@@ -1759,20 +1976,20 @@ TABS.mission_control.initialize = function (callback) {
         // save map view settings when user moves it
         //////////////////////////////////////////////////////////////////////////
         map.on('moveend', function (evt) {
-            chrome.storage.local.set({'missionPlannerLastValues': {
+            store.set('missionPlannerLastValues', {
                 center: ol.proj.toLonLat(map.getView().getCenter()),
                 zoom: map.getView().getZoom()
-            }});
+            });
         });
         //////////////////////////////////////////////////////////////////////////
         // load map view settings on startup
         //////////////////////////////////////////////////////////////////////////
-        chrome.storage.local.get('missionPlannerLastValues', function (result) {
-            if (result.missionPlannerLastValues && result.missionPlannerLastValues.center) {
-                map.getView().setCenter(ol.proj.fromLonLat(result.missionPlannerLastValues.center));
-                map.getView().setZoom(result.missionPlannerLastValues.zoom);
-            }
-        });
+        var missionPlannerLastValues = store.get('missionPlannerLastValues', false);
+        if (missionPlannerLastValues && missionPlannerLastValues.zoom && missionPlannerLastValues.center) {
+            map.getView().setCenter(ol.proj.fromLonLat(missionPlannerLastValues.center));
+            map.getView().setZoom(missionPlannerLastValues.zoom);
+        }
+
 
         //////////////////////////////////////////////////////////////////////////
         // Map on-click behavior definition
@@ -1789,7 +2006,7 @@ TABS.mission_control.initialize = function (callback) {
                     clearEditForm();
                 } catch (e) {
                     console.log(e);
-                    GUI.log(chrome.i18n.getMessage('notAWAYPOINT'));
+                    GUI.log(i18n.getMessage('notAWAYPOINT'));
                 }
             }
             selectedFeature = map.forEachFeatureAtPixel(evt.pixel,
@@ -1803,6 +2020,14 @@ TABS.mission_control.initialize = function (callback) {
             if (selectedFeature && tempMarker.kind == "waypoint") {
                 $("#editMission").hide();
                 selectedMarker = mission.getWaypoint(tempMarker.number);
+
+                selectedFwApproachWp = FC.FW_APPROACH.get()[FC.SAFEHOMES.getMaxSafehomeCount() + selectedMarker.getMultiMissionIdx()];
+
+                if (selectedFwApproachWp.getLandHeading1() == 0 && selectedFwApproachWp.getLandHeading1() == 0 && selectedFwApproachWp.getApproachAltAsl() == 0 && selectedFwApproachWp.getLandAltAsl() == 0) {
+                    selectedFwApproachWp.setApproachAltAsl(settings.fwApproachAlt * 100);
+                    selectedFwApproachWp.setLandAltAsl(settings.fwLandAlt * 100);
+                }
+
                 var geometry = selectedFeature.getGeometry();
                 var coord = ol.proj.toLonLat(geometry.getCoordinates());
 
@@ -1818,12 +2043,34 @@ TABS.mission_control.initialize = function (callback) {
 
                 var altitudeMeters = app.ConvertCentimetersToMeters(selectedMarker.getAlt());
 
+                if (selectedMarker.getAction() == MWNP.WPTYPE.LAND) {
+                    $('#wpFwLanding').fadeIn(300);
+                } else  {
+                    $('#wpFwLanding').fadeOut(300);
+                }
+
                 if (tempSelectedMarkerIndex == null || tempSelectedMarkerIndex != selectedMarker.getLayerNumber()) {
                     (async () => {
                         const elevationAtWP = await selectedMarker.getElevation(globalSettings);
                         $('#elevationValueAtWP').text(elevationAtWP);
                         const returnAltitude = checkAltElevSanity(false, selectedMarker.getAlt(), elevationAtWP, P3Value);
                         selectedMarker.setAlt(returnAltitude);
+
+                        /*
+                        if (TABS.mission_control.isBitSet(P3Value, MWNP.P3.ALT_TYPE)) {
+                            if (!selectedFwApproachWp.getIsSeaLevelRef()) {
+                                selectedFwApproachWp.setApproachDirection(selectedFwApproachWp.getApproachDirection() + elevationAtWP * 100);
+                                selectedFwApproachWp.setLandAltAsl(selectedFwApproachWp.getLandAltAsl() + elevationAtWP * 100);
+                            }
+
+                        }
+                        */
+                        selectedFwApproachWp.setIsSeaLevelRef(TABS.mission_control.isBitSet(P3Value, MWNP.P3.ALT_TYPE) ? 1 : 0);
+                        $('#wpApproachAlt').val(selectedFwApproachWp.getApproachAltAsl());
+                        $('#wpLandAlt').val(selectedFwApproachWp.getLandAltAsl);
+                        $('#wpLandAltM').text(selectedFwApproachWp.getLandAltAsl() / 100 + " m");
+                        $('#wpApproachAltM').text(selectedFwApproachWp.getApproachAltAsl() / 100 + " m");
+
                         plotElevation();
                     })()
                 }
@@ -1839,6 +2086,22 @@ TABS.mission_control.initialize = function (callback) {
                 $('#pointP1').val(selectedMarker.getP1());
                 $('#pointP2').val(selectedMarker.getP2());
 
+
+
+
+                $('#wpApproachDirection').val(selectedFwApproachWp.getApproachDirection());
+                $('#wpLandHeading1').val(Math.abs(selectedFwApproachWp.getLandHeading1()));
+                changeSwitchery($('#wpLandHeading1Excl'), selectedFwApproachWp.getLandHeading1() < 0);
+                $('#wpLandHeading2').val(Math.abs(selectedFwApproachWp.getLandHeading2()));
+                changeSwitchery($('#wpLandHeading2Excl'), selectedFwApproachWp.getLandHeading2() < 0);
+
+
+
+                $('#wpApproachDirection').val(selectedFwApproachWp.getApproachDirection());
+                $('#wpLandHeading1').val(Math.abs(selectedFwApproachWp.getLandHeading1()));
+                changeSwitchery($('#wpLandHeading1Excl'), selectedFwApproachWp.getLandHeading1() < 0);
+                $('#wpLandHeading2').val(Math.abs(selectedFwApproachWp.getLandHeading2()));
+                changeSwitchery($('#wpLandHeading2Excl'), selectedFwApproachWp.getLandHeading2() < 0);
 
                 // Selection box update depending on choice of type of waypoint
                 for (var j in dictOfLabelParameterPoint[selectedMarker.getAction()]) {
@@ -1856,7 +2119,9 @@ TABS.mission_control.initialize = function (callback) {
             }
             else if (selectedFeature && tempMarker.kind == "line" && tempMarker.selection && !disableMarkerEdit) {
                 let tempWpCoord = ol.proj.toLonLat(evt.coordinate);
-                let tempWp = new Waypoint(tempMarker.number, MWNP.WPTYPE.WAYPOINT, Math.round(tempWpCoord[1] * 10000000), Math.round(tempWpCoord[0] * 10000000), alt=Number(settings.alt), p1=Number(settings.speed));
+                let tempWp = new Waypoint(tempMarker.number, MWNP.WPTYPE.WAYPOINT, Math.round(tempWpCoord[1] * 10000000), Math.round(tempWpCoord[0] * 10000000), Number(settings.alt), Number(settings.speed));
+                tempWp.setMultiMissionIdx(mission.getWaypoint(0).getMultiMissionIdx());
+
                 if (homeMarkers.length && HOME.getAlt() != "N/A") {
                     (async () => {
                         const elevationAtWP = await tempWp.getElevation(globalSettings);
@@ -1875,12 +2140,8 @@ TABS.mission_control.initialize = function (callback) {
                 }
             }
             else if (selectedFeature && tempMarker.kind == "safehome" && tempMarker.selection) {
-                selectedMarker = SAFEHOMES.getSafehome(tempMarker.number);
-                var geometry = selectedFeature.getGeometry();
-                var coord = ol.proj.toLonLat(geometry.getCoordinates());
-                $safehomesTableBody.find('tr:nth-child('+String(tempMarker.number+1)+') > td > .safehome-enabled-value').val(selectedMarker.isUsed());
-                $safehomesTableBody.find('tr:nth-child('+String(tempMarker.number+1)+') > td > .safehome-lon').val(Math.round(coord[0] * 10000000) / 10000000);
-                $safehomesTableBody.find('tr:nth-child('+String(tempMarker.number+1)+') > td > .safehome-lat').val(Math.round(coord[1] * 10000000) / 10000000);
+                updateSelectedShAndFwAp(tempMarker.number);
+                //renderSafeHomeOptions();
             }
             else if (selectedFeature && tempMarker.kind == "home" && tempMarker.selection) {
                 selectedMarker = HOME;
@@ -1891,7 +2152,15 @@ TABS.mission_control.initialize = function (callback) {
             }
             else if (!disableMarkerEdit) {
                 let tempWpCoord = ol.proj.toLonLat(evt.coordinate);
-                let tempWp = new Waypoint(mission.get().length, MWNP.WPTYPE.WAYPOINT, Math.round(tempWpCoord[1] * 10000000), Math.round(tempWpCoord[0] * 10000000), alt=Number(settings.alt), p1=Number(settings.speed));
+                let tempWp = new Waypoint(mission.get().length, MWNP.WPTYPE.WAYPOINT, Math.round(tempWpCoord[1] * 10000000), Math.round(tempWpCoord[0] * 10000000), Number(settings.alt), Number(settings.speed));
+
+                if (mission.get().length == 0) {
+                    tempWp.setMultiMissionIdx(multimissionCount == 0 ? 0 : multimissionCount - 1);
+                    FC.FW_APPROACH.clean(FC.SAFEHOMES.getMaxSafehomeCount() + tempWp.getMultiMissionIdx());
+                } else {
+                    tempWp.setMultiMissionIdx(mission.getWaypoint(mission.get().length - 1).getMultiMissionIdx());
+                }
+
                 if (homeMarkers.length && HOME.getAlt() != "N/A") {
                     (async () => {
                         const elevationAtWP = await tempWp.getElevation(globalSettings);
@@ -1918,10 +2187,14 @@ TABS.mission_control.initialize = function (callback) {
         //////////////////////////////////////////////////////////////////////////
         $(map.getViewport()).on('mousemove', function (e) {
             var pixel = map.getEventPixel(e.originalEvent);
+            var name = "";
             var hit = map.forEachFeatureAtPixel(pixel, function (feature, layer) {
+                if (feature) {
+                    name = feature.getProperties().name;
+                }
                 return true;
             });
-            if (hit) {
+            if (hit && name != "safehomeDist" && name != "safehomeSafe") {
                 map.getTarget().style.cursor = 'pointer';
             } else {
                 map.getTarget().style.cursor = '';
@@ -1940,8 +2213,8 @@ TABS.mission_control.initialize = function (callback) {
         //////////////////////////////////////////////////////////////////////////
         // Update Alt display in meters on ALT field keypress up
         //////////////////////////////////////////////////////////////////////////
-        $('#pointAlt').keyup(function(){
-            let altitudeMeters = app.ConvertCentimetersToMeters($(this).val());
+        $('#pointAlt').on('keyup', () => {
+            let altitudeMeters = app.ConvertCentimetersToMeters($('#pointAlt').val());
             $('#altitudeInMeters').text(` ${altitudeMeters}m`);
         });
 
@@ -2029,8 +2302,26 @@ TABS.mission_control.initialize = function (callback) {
         /////////////////////////////////////////////
         // Callback for Waypoint edition
         /////////////////////////////////////////////
-        $('#pointType').change(function () {
+        $('#pointType').on('change', (event) => {
             if (selectedMarker) {
+                if (Number($('#pointType').val()) == MWNP.WPTYPE.LAND) {
+                    let found = false;
+                    mission.get().forEach(wp => {
+                        if (wp.getAction() == MWNP.WPTYPE.LAND) {
+                            GUI.alert(i18n.getMessage('MissionPlannerOnlyOneLandWp'));
+                            found = true;
+                            $(event.currentTarget).val(selectedMarker.getAction());
+                        }
+                    });
+
+                    if (!found) {
+                        $('#wpFwLanding').fadeIn(300);
+                    }
+
+                } else  {
+                    $('#wpFwLanding').fadeOut(300);
+                }
+
                 selectedMarker.setAction(Number($('#pointType').val()));
                 if ([MWNP.WPTYPE.SET_POI,MWNP.WPTYPE.POSHOLD_TIME,MWNP.WPTYPE.LAND].includes(selectedMarker.getAction())) {
                     selectedMarker.setP1(0.0);
@@ -2105,7 +2396,7 @@ TABS.mission_control.initialize = function (callback) {
 
         $('#pointP3Alt').on('change', function (event) {
             if (selectedMarker) {
-                P3Value = selectedMarker.getP3();
+                var P3Value = selectedMarker.getP3();
 
                 if (disableMarkerEdit) {
                     changeSwitchery($('#pointP3Alt'), TABS.mission_control.isBitSet(P3Value, MWNP.P3.ALT_TYPE));
@@ -2134,19 +2425,61 @@ TABS.mission_control.initialize = function (callback) {
                             }
                             selectedMarker.setAlt(groundClearance + 100 * (elevationAtWP - elevationAtHome));
                         }
+
+                        if (selectedMarker.getAction() == MWNP.WPTYPE.LAND && selectedFwApproachWp && selectedFwApproachWp.getIsSeaLevelRef() != $('#pointP3Alt').prop("checked")) {
+
+                            let oldElevation = 0;
+                            if (selectedFwApproachWp.getIsSeaLevelRef()) {
+                                oldElevation = selectedFwApproachWp.getElevation();
+                            }
+
+                            if ($('#pointP3Alt').prop("checked")) {
+                                selectedFwApproachWp.setApproachAltAsl(selectedFwApproachWp.getApproachAltAsl() - oldElevation + elevationAtWP * 100);
+                                selectedFwApproachWp.setLandAltAsl(selectedFwApproachWp.getLandAltAsl() - oldElevation + elevationAtWP * 100);
+                            } else {
+                                selectedFwApproachWp.setApproachAltAsl(selectedFwApproachWp.getApproachAltAsl() - elevationAtWP * 100);
+                                selectedFwApproachWp.setLandAltAsl(selectedFwApproachWp.getLandAltAsl() - elevationAtWP * 100);
+                            }
+                            selectedFwApproachWp.setElevation(elevationAtWP * 100);
+                            selectedFwApproachWp.setIsSeaLevelRef($('#pointP3Alt').prop("checked") ? 1 : 0);
+                            $('#wpApproachAlt').val(selectedFwApproachWp.getApproachAltAsl());
+                            $('#wpLandAlt').val(selectedFwApproachWp.getLandAltAsl());
+                        }
+
                     }
 
                     const returnAltitude = checkAltElevSanity(false, selectedMarker.getAlt(), elevationAtWP, selectedMarker.getP3());
                     selectedMarker.setAlt(returnAltitude);
                     $('#pointAlt').val(selectedMarker.getAlt());
-                    altitudeMeters = app.ConvertCentimetersToMeters(selectedMarker.getAlt());
+                    let altitudeMeters = app.ConvertCentimetersToMeters(selectedMarker.getAlt());
                     $('#altitudeInMeters').text(` ${altitudeMeters}m`);
+
+                    $('#wpLandAltM').text(selectedFwApproachWp.getLandAltAsl() / 100 + " m");
+                    $('#wpApproachAltM').text(selectedFwApproachWp.getApproachAltAsl() / 100 + " m");
+
+                    if (selectedFwApproachWp && selectedFwApproachWp.getIsSeaLevelRef() != $('#pointP3Alt').prop("checked")) {
+                        selectedFwApproachWp.setIsSeaLevelRef($('#pointP3Alt').prop("checked"));
+                        selectedFwApproachWp.setElevation(elevationAtWP * 100);
+                        if ($('#pointP3Alt').prop("checked")) {
+                            selectedFwApproachWp.setApproachAltAsl(selectedFwApproachWp.getApproachAltAsl() + elevationAtWP * 100);
+                            selectedFwApproachWp.setLandAltAsl(selectedFwApproachWp.getLandAltAsl() + elevationAtWP * 100);
+                        } else {
+                            selectedFwApproachWp.setApproachAltAsl(selectedFwApproachWp.getApproachAltAsl() - elevationAtWP * 100);
+                            selectedFwApproachWp.setLandAltAsl(selectedFwApproachWp.getLandAltAsl() - elevationAtWP * 100);
+                        }
+
+                        $('#wpApproachAlt').val(selectedFwApproachWp.getApproachAltAsl());
+                        $('#wpLandAlt').val(selectedFwApproachWp.getLandAltAsl());
+                    }
+
+                    $('#wpLandAltM').text(selectedFwApproachWp.getLandAltAsl() / 100 + " m");
+                    $('#wpApproachAltM').text(selectedFwApproachWp.getApproachAltAsl() / 100 + " m");
 
                     mission.updateWaypoint(selectedMarker);
                     mission.update(singleMissionActive());
                     redrawLayer();
                     plotElevation();
-                })()
+                })();
             }
         });
 
@@ -2156,7 +2489,7 @@ TABS.mission_control.initialize = function (callback) {
                     changeSwitchery($('#pointP3UserAction1'), TABS.mission_control.isBitSet(selectedMarker.getP3(), MWNP.P3.USER_ACTION_1));
                 }
 
-                P3Value = TABS.mission_control.setBit(selectedMarker.getP3(), MWNP.P3.USER_ACTION_1, $('#pointP3UserAction1').prop("checked"));
+                var P3Value = TABS.mission_control.setBit(selectedMarker.getP3(), MWNP.P3.USER_ACTION_1, $('#pointP3UserAction1').prop("checked"));
                 selectedMarker.setP3(P3Value);
 
                 mission.updateWaypoint(selectedMarker);
@@ -2171,7 +2504,7 @@ TABS.mission_control.initialize = function (callback) {
                     changeSwitchery($('#pointP3UserAction2'), TABS.mission_control.isBitSet(selectedMarker.getP3(), MWNP.P3.USER_ACTION_2));
                 }
 
-                P3Value = TABS.mission_control.setBit(selectedMarker.getP3(), MWNP.P3.USER_ACTION_2, $('#pointP3UserAction2').prop("checked"));
+                var P3Value = TABS.mission_control.setBit(selectedMarker.getP3(), MWNP.P3.USER_ACTION_2, $('#pointP3UserAction2').prop("checked"));
                 selectedMarker.setP3(P3Value);
 
                 mission.updateWaypoint(selectedMarker);
@@ -2186,7 +2519,7 @@ TABS.mission_control.initialize = function (callback) {
                     changeSwitchery($('#pointP3UserAction3'), TABS.mission_control.isBitSet(selectedMarker.getP3(), MWNP.P3.USER_ACTION_3));
                 }
 
-                P3Value = TABS.mission_control.setBit(selectedMarker.getP3(), MWNP.P3.USER_ACTION_3, $('#pointP3UserAction3').prop("checked"));
+                var P3Value = TABS.mission_control.setBit(selectedMarker.getP3(), MWNP.P3.USER_ACTION_3, $('#pointP3UserAction3').prop("checked"));
                 selectedMarker.setP3(P3Value);
 
                 mission.updateWaypoint(selectedMarker);
@@ -2201,7 +2534,7 @@ TABS.mission_control.initialize = function (callback) {
                     changeSwitchery($('#pointP3UserAction4'), TABS.mission_control.isBitSet(selectedMarker.getP3(), MWNP.P3.USER_ACTION_4));
                 }
 
-                P3Value = TABS.mission_control.setBit(selectedMarker.getP3(), MWNP.P3.USER_ACTION_4, $('#pointP3UserAction4').prop("checked"));
+                var P3Value = TABS.mission_control.setBit(selectedMarker.getP3(), MWNP.P3.USER_ACTION_4, $('#pointP3UserAction4').prop("checked"));
                 selectedMarker.setP3(P3Value);
 
                 mission.updateWaypoint(selectedMarker);
@@ -2209,6 +2542,109 @@ TABS.mission_control.initialize = function (callback) {
                 redrawLayer();
             }
         });
+
+        $('#wpApproachAlt').on('change', (event) => {
+            if (selectedMarker && selectedFwApproachWp) {
+                let altitude = Number($(event.currentTarget).val());
+                if (checkApproachAltitude(altitude, $('#pointP3Alt').prop('checked'), Number($('#elevationValueAtWP').text()))) {
+                    selectedFwApproachWp.setApproachAltAsl(Number($(event.currentTarget).val()));
+                    $('#wpApproachAltM').text(selectedFwApproachWp.getApproachAltAsl() / 100 + " m");
+                }
+            }
+        });
+
+        $('#wpLandAlt').on('change', (event) => {
+            if (selectedMarker && selectedFwApproachWp) {
+                let altitude = Number($(event.currentTarget).val());
+                if (checkLandingAltitude(altitude, $('#pointP3Alt').prop('checked'), Number($('#elevationValueAtWP').text()))) {
+                    selectedFwApproachWp.setLandAltAsl(Number($(event.currentTarget).val()));
+                    $('#wpLandAltM').text(selectedFwApproachWp.getLandAltAsl() / 100 + " m");
+                }
+            }
+        });
+
+        $('#wpApproachDirection').on('change', (event) => {
+            if (selectedMarker && selectedFwApproachWp) {
+                selectedFwApproachWp.setApproachDirection($(event.currentTarget).val());
+                refreshLayers();
+                }
+        });
+
+        $('#wpLandHeading1').on('change', (event) => {
+            if (selectedMarker && selectedFwApproachWp) {
+                let val = Number($(event.currentTarget).val());
+                if (val < 0) {
+                    val = 360;
+                    $('#wpLandHeading1').val(360);
+                }
+                if (val > 360) {
+                    val = 0;
+                    $('#wpLandHeading1').val(0);
+                }
+
+                if ($('#wpLandHeading1Excl').prop('checked')) {
+                    val *= -1;
+                }
+
+                selectedFwApproachWp.setLandHeading1(val);
+                refreshLayers();
+            }
+        });
+
+        $('#wpLandHeading1Excl').on('change', (event) => {
+
+            if (selectedMarker && selectedFwApproachWp) {
+                if (disableMarkerEdit) {
+                    changeSwitchery($('#wpLandHeading1Excl'), selectedFwApproachWp.getLandHeading1() < 0);
+                    return;
+                }
+
+                if ($('#wpLandHeading1Excl').prop('checked')) {
+                    selectedFwApproachWp.setLandHeading1(-Math.abs(selectedFwApproachWp.getLandHeading1()));
+                } else {
+                    selectedFwApproachWp.setLandHeading1(Math.abs(selectedFwApproachWp.getLandHeading1()));
+                }
+
+                refreshLayers();
+            }
+        });
+
+        $('#wpLandHeading2').on('change', (event) => {
+            if (selectedMarker && selectedFwApproachWp) {
+                let val = Number($(event.currentTarget).val());
+                if (val < 0) {
+                    val = 360;
+                    $('#wpLandHeading2').val(360);
+                }
+                if (val > 360) {
+                    val = 0;
+                    $('#wpLandHeading2').val(0);
+                }
+
+                if ($('#wpLandHeading2Excl').prop('checked')) {
+                    val *= -1;
+                }
+
+                selectedFwApproachWp.setLandHeading2(val);
+                refreshLayers();
+            }
+        });
+
+        $('#wpLandHeading2Excl').on('change', (event) => {
+            if (selectedMarker && selectedFwApproachWp) {
+                if (disableMarkerEdit) {
+                    changeSwitchery($('#wpLandHeading2Excl'), selectedFwApproachWp.getLandHeading2() < 0);
+                    return;
+                }
+                if ($('#wpLandHeading2Excl').prop('checked')) {
+                    selectedFwApproachWp.setLandHeading2(-Math.abs(selectedFwApproachWp.getLandHeading2()));
+                } else {
+                    selectedFwApproachWp.setLandHeading2(Math.abs(selectedFwApproachWp.getLandHeading2()));
+                }
+                refreshLayers();
+            }
+        });
+
 
         /////////////////////////////////////////////
         // Callback for Waypoint Options Table
@@ -2224,7 +2660,7 @@ TABS.mission_control.initialize = function (callback) {
             }
         });
 
-        $("[data-role='waypointOptions-add']").click(function () {
+        $("[data-role='waypointOptions-add']").on('click', function () {
             if (selectedMarker) {
                 mission.addAttachedFromWaypoint(selectedMarker);
                 renderWaypointOptionsTable(selectedMarker);
@@ -2240,17 +2676,25 @@ TABS.mission_control.initialize = function (callback) {
         });
 
         /////////////////////////////////////////////
-        // Callback for SAFEHOMES Table
+        // Callback for SAFEHOMES
         /////////////////////////////////////////////
-        $safehomesTableBody.on('click', "[data-role='safehome-center']", function (event) {
+
+
+        $('#addSafehome').on('click', () => {
+            if (FC.SAFEHOMES.safehomeCount() + 1 > FC.SAFEHOMES.getMaxSafehomeCount()){
+                GUI.alert(i18n.getMessage('missionSafehomeMaxSafehomesReached'));
+                return;
+            }
+
             let mapCenter = map.getView().getCenter();
-            let tmpSH = SAFEHOMES.getSafehome($(event.currentTarget).attr("data-index"));
-            tmpSH.setLon(Math.round(ol.proj.toLonLat(mapCenter)[0] * 1e7));
-            tmpSH.setLat(Math.round(ol.proj.toLonLat(mapCenter)[1] * 1e7));
-            SAFEHOMES.updateSafehome(tmpSH);
-            renderSafehomesTable();
+            let midLon = Math.round(ol.proj.toLonLat(mapCenter)[0] * 1e7);
+            let midLat = Math.round(ol.proj.toLonLat(mapCenter)[1] * 1e7);
+            FC.SAFEHOMES.put(new Safehome(FC.SAFEHOMES.safehomeCount(), 1, midLat, midLon));
+            updateSelectedShAndFwAp(FC.SAFEHOMES.safehomeCount() - 1);
+            renderSafeHomeOptions();
             cleanSafehomeLayers();
             renderSafehomesOnMap();
+            updateSafehomeInfo();
         });
 
         $('#cancelSafehome').on('click', function () {
@@ -2259,27 +2703,214 @@ TABS.mission_control.initialize = function (callback) {
 
         $('#loadEepromSafehomeButton').on('click', function () {
             $(this).addClass('disabled');
-            GUI.log(chrome.i18n.getMessage('startGettingSafehomePoints'));
-            mspHelper.loadSafehomes();
-            setTimeout(function(){
-                renderSafehomesTable();
-                cleanSafehomeLayers();
-                renderSafehomesOnMap();
-                GUI.log(chrome.i18n.getMessage('endGettingSafehomePoints'));
-                $('#loadEepromSafehomeButton').removeClass('disabled');
-            }, 500);
-
+            GUI.log('Start of getting Safehome points');
+            var loadChainer = new MSPChainerClass();
+            loadChainer.setChain([
+                mspHelper.loadSafehomes,
+                mspHelper.loadFwApproach,
+                function() {
+                    if (FC.SAFEHOMES.safehomeCount() >= 1) {
+                        updateSelectedShAndFwAp(0);
+                    } else {
+                        selectedSafehome = null;
+                        selectedFwApproachSh = null;
+                    }
+                    renderSafeHomeOptions();
+                    cleanSafehomeLayers();
+                    renderSafehomesOnMap();
+                    updateSafehomeInfo();
+                    GUI.log(i18n.getMessage('endGettingSafehomePoints'));
+                    $('#loadEepromSafehomeButton').removeClass('disabled');
+                }
+            ]);
+            loadChainer.execute();
         });
 
         $('#saveEepromSafehomeButton').on('click', function() {
             $(this).addClass('disabled');
-            GUI.log(chrome.i18n.getMessage('startSendingSafehomePoints'));
-            mspHelper.saveSafehomes();
-            setTimeout(function(){
-                mspHelper.saveToEeprom();
-                GUI.log(chrome.i18n.getMessage('endSendingSafehomePoints'));
-                $('#saveEepromSafehomeButton').removeClass('disabled');
-            }, 500);
+            GUI.log(i18n.getMessage('startSendingSafehomePoints'));
+
+            var saveChainer = new MSPChainerClass();
+            saveChainer.setChain([
+                mspHelper.saveSafehomes,
+                mspHelper.saveFwApproach,
+                function() {
+                    mspHelper.saveToEeprom();
+                    GUI.log(i18n.getMessage('endSendingSafehomePoints'));
+                    $('#saveEepromSafehomeButton').removeClass('disabled');
+                }
+            ]);
+            saveChainer.execute();
+        });
+
+        $('#deleteSafehome').on('click', () => {
+            if (selectedSafehome && selectedFwApproachSh) {
+                var shNum = selectedSafehome.getNumber();
+                FC.SAFEHOMES.drop(shNum);
+                FC.FW_APPROACH.clean(shNum);
+
+                if (FC.SAFEHOMES.safehomeCount() > 0) {
+                    updateSelectedShAndFwAp(FC.SAFEHOMES.safehomeCount() - 1);
+                } else {
+                    selectedSafehome = null;
+                    selectedFwApproachSh = null;
+                }
+                renderSafeHomeOptions();
+                cleanSafehomeLayers();
+                renderSafehomesOnMap();
+                updateSafehomeInfo();
+            }
+        });
+
+        $('#safehomeLatitude').on('change', event => {
+            if (selectedFwApproachSh) {
+                selectedFwApproachSh.setLat(Math.round(Number($(event.currentTarget).val()) * 1e7));
+                renderSafeHomeOptions();
+                cleanSafehomeLayers();
+                renderSafehomesOnMap();
+            }
+        });
+
+
+        $('#safehomeLongitude').on('change', event => {
+            if (selectedFwApproachSh) {
+                selectedFwApproachSh.setLon(Math.round(Number($(event.currentTarget).val()) * 1e7));
+                renderSafeHomeOptions();
+                cleanSafehomeLayers();
+                renderSafehomesOnMap();
+            }
+        });
+
+        $('#safehomeSeaLevelRef').on('change', event => {
+
+            let isChecked = $(event.currentTarget).prop('checked') ? 1 : 0;
+            if (selectedSafehome && selectedFwApproachSh && isChecked != selectedFwApproachSh.getIsSeaLevelRef()) {
+                selectedFwApproachSh.setIsSeaLevelRef(isChecked);
+
+                (async () => {
+                    const elevation = await selectedFwApproachSh.getElevationFromServer(selectedSafehome.getLonMap(), selectedSafehome.getLatMap(), globalSettings) * 100;
+                    selectedFwApproachSh.setElevation(elevation);
+
+                    if (isChecked) {
+                        selectedFwApproachSh.setApproachAltAsl(selectedFwApproachSh.getApproachAltAsl() + elevation);
+                        selectedFwApproachSh.setLandAltAsl(selectedFwApproachSh.getLandAltAsl() + elevation);
+                    } else {
+                        selectedFwApproachSh.setApproachAltAsl(selectedFwApproachSh.getApproachAltAsl() - elevation);
+                        selectedFwApproachSh.setLandAltAsl(selectedFwApproachSh.getLandAltAsl() - elevation);
+
+                    }
+
+                    $('#safehomeElevation').text(elevation / 100);
+                    $('#safehomeApproachAlt').val(selectedFwApproachSh.getApproachAltAsl());
+                    $('#safehomeLandAlt').val(selectedFwApproachSh.getLandAltAsl());
+                    $('#safehomeLandAltM').text(selectedFwApproachSh.getLandAltAsl() / 100 + " m");
+                    $('#safehomeApproachAltM').text(selectedFwApproachSh.getApproachAltAsl() / 100 + " m");
+
+                    renderSafeHomeOptions();
+                })();
+            }
+        });
+
+        $('#safehomeApproachAlt').on('change', event => {
+
+            if (selectedFwApproachSh) {
+                let altitude = Number($(event.currentTarget).val());
+                if (checkApproachAltitude(altitude, $('#safehomeSeaLevelRef').prop('checked'), Number($('#safehomeElevation').text()))) {
+                    selectedFwApproachSh.setApproachAltAsl(Number($(event.currentTarget).val()));
+                    $('#safehomeApproachAltM').text(selectedFwApproachSh.getApproachAltAsl() / 100 + " m");
+                    cleanSafehomeLayers();
+                    renderSafehomesOnMap();
+                    renderHomeTable();
+                }
+                $('#safehomeApproachAlt').val(selectedFwApproachSh.getApproachAltAsl());
+            }
+
+        });
+
+        $('#safehomeLandAlt').on('change', event => {
+
+            if (selectedFwApproachSh) {
+                let altitude = Number($(event.currentTarget).val());
+                if (checkLandingAltitude(altitude, $('#safehomeSeaLevelRef').prop('checked'), Number($('#safehomeElevation').text()))) {
+                    selectedFwApproachSh.setLandAltAsl(altitude);
+                    $('#safehomeLandAltM').text(selectedFwApproachSh.getLandAltAsl() / 100 + " m");
+                    cleanSafehomeLayers();
+                    renderSafehomesOnMap();
+                    renderHomeTable();
+                } else {
+                    $('#safehomeLandAlt').val(selectedFwApproachSh.getLandAltAsl());
+                }
+            }
+        });
+
+        $('#geozoneApproachDirection').on('change', event => {
+            if (selectedFwApproachSh) {
+                selectedFwApproachSh.setApproachDirection($(event.currentTarget).val());
+                cleanSafehomeLayers();
+                renderSafehomesOnMap();
+            }
+        });
+
+        $('#safehomeLandHeading1Excl').on('change', event => {
+            if (selectedFwApproachSh && !lockShExclHeading) {
+                selectedFwApproachSh.setLandHeading1(selectedFwApproachSh.getLandHeading1() * -1);
+                cleanSafehomeLayers();
+                renderSafehomesOnMap();
+            }
+        });
+
+        $('#safehomeLandHeading1').on('change', event => {
+            if (selectedFwApproachSh) {
+                let val = Number($(event.currentTarget).val());
+                if (val < 0) {
+                    val = 360;
+                    $('#safehomeLandHeading1').val(360);
+                }
+                if (val > 360) {
+                    val = 0;
+                    $('#safehomeLandHeading1').val(0);
+                }
+
+                if ($('#safehomeLandHeading1Excl').prop('checked')) {
+                    val *= -1;
+                }
+
+                selectedFwApproachSh.setLandHeading1(val);
+                cleanSafehomeLayers();
+                renderSafehomesOnMap();
+            }
+        });
+
+
+        $('#safehomeLandHeading2Excl').on('change', event => {
+            if (selectedFwApproachSh && !lockShExclHeading) {
+                selectedFwApproachSh.setLandHeading2(selectedFwApproachSh.getLandHeading2() * -1);
+                cleanSafehomeLayers();
+                renderSafehomesOnMap();
+            }
+        });
+
+
+        $('#safehomeLandHeading2').on('change', event => {
+            if (selectedFwApproachSh) {
+                let val = Number($(event.currentTarget).val());
+                if (val < 0) {
+                    val = 360;
+                    $('#safehomeLandHeading2').val(360);
+                }
+                if (val > 360) {
+                    val = 0;
+                    $('#safehomeLandHeading2').val(0);
+                }
+
+                if ($('#safehomeLandHeading2Excl').prop('checked')) {
+                    val *= -1;
+                }
+
+                selectedFwApproachSh.setLandHeading2(val);
+                cleanSafehomeLayers();
+                renderSafehomesOnMap();
+            }
         });
 
         /////////////////////////////////////////////
@@ -2353,7 +2984,7 @@ TABS.mission_control.initialize = function (callback) {
         });
 
         $('#updateMultimissionButton').on('click', function () {
-            $('#multimissionOptionList').val('0').change();
+            $('#multimissionOptionList').val('0').trigger('change');
         });
 
         $('#cancelMultimission').on('click', function () {
@@ -2368,12 +2999,14 @@ TABS.mission_control.initialize = function (callback) {
         // Callback for Remove buttons
         /////////////////////////////////////////////
         $('#removeAllPoints').on('click', function () {
-            if (markers.length && confirm(chrome.i18n.getMessage('confirm_delete_all_points'))) {
+            if (markers.length && confirm(i18n.getMessage('confirm_delete_all_points'))) {
                 if (removeAllMultiMissionCheck()) {
                     removeAllWaypoints();
                     updateMultimissionState();
                 }
-
+                for (let i = FC.SAFEHOMES.getMaxSafehomeCount(); i < FC.FW_APPROACH.getMaxFwApproachCount(); i++) {
+                    FC.FW_APPROACH.clean(i);
+                }
                 plotElevation();
             }
         });
@@ -2381,11 +3014,16 @@ TABS.mission_control.initialize = function (callback) {
         $('#removePoint').on('click', function () {
             if (selectedMarker) {
                 if (mission.isJumpTargetAttached(selectedMarker)) {
-                    alert(chrome.i18n.getMessage('MissionPlannerJumpTargetRemoval'));
+                    GUI.alert(i18n.getMessage('MissionPlannerJumpTargetRemoval'));
                 }
                 else if (mission.getAttachedFromWaypoint(selectedMarker) && mission.getAttachedFromWaypoint(selectedMarker).length != 0) {
-                    if (confirm(chrome.i18n.getMessage('confirm_delete_point_with_options'))) {
+                    if (confirm(i18n.getMessage('confirm_delete_point_with_options'))) {
                         mission.getAttachedFromWaypoint(selectedMarker).forEach(function (element) {
+
+                            if (element.getAction() == MWNP.WPTYPE.LAND) {
+                                FC.FW_APPROACH.clean(element.getNumber());
+                            }
+
                             mission.dropWaypoint(element);
                             mission.update(singleMissionActive());
                         });
@@ -2399,6 +3037,9 @@ TABS.mission_control.initialize = function (callback) {
                 }
                 else {
                     mission.dropWaypoint(selectedMarker);
+                    if (selectedMarker.getAction() == MWNP.WPTYPE.LAND) {
+                        FC.FW_APPROACH.clean(selectedFwApproachWp.getNumber());
+                    }
                     selectedMarker = null;
                     mission.update(singleMissionActive());
                     clearEditForm();
@@ -2415,55 +3056,68 @@ TABS.mission_control.initialize = function (callback) {
         $('#loadFileMissionButton').on('click', function () {
             if (!fileLoadMultiMissionCheck()) return;
 
-            if (markers.length && !confirm(chrome.i18n.getMessage('confirm_delete_all_points'))) return;
-            nwdialog.setContext(document);
-            nwdialog.openFileDialog('.mission', function(result) {
-                loadMissionFile(result);
+            if (markers.length && !confirm(i18n.getMessage('confirm_delete_all_points'))) return;
+            var options = {
+                filters: [ { name: "Mission file", extensions: ['mission'] } ]
+            };
+            dialog.showOpenDialog(options).then(result => {
+                if (result.canceled) {
+                    console.log('No file selected');
+                    return;
+                }
+                if (result.filePaths.length == 1) {
+                    loadMissionFile(result.filePaths[0]);
+                }
             })
         });
 
         $('#saveFileMissionButton').on('click', function () {
-            nwdialog.setContext(document);
-            nwdialog.saveFileDialog('', '.mission', function(result) {
-                saveMissionFile(result);
-            })
+            var options = {
+                filters: [ { name: "Mission file", extensions: ['mission'] } ]
+            };
+            dialog.showSaveDialog(options).then(result =>  {
+                if (result.canceled) {
+                    return;
+                }
+                saveMissionFile(result.filePath);
+            });
         });
 
         $('#loadMissionButton').on('click', function () {
             let message = multimissionCount ? 'confirm_overwrite_multimission_file_load_option' : 'confirm_delete_all_points';
-            if ((markers.length || multimissionCount) && !confirm(chrome.i18n.getMessage(message))) return;
+            if ((markers.length || multimissionCount) && !confirm(i18n.getMessage(message))) return;
             removeAllWaypoints();
             $(this).addClass('disabled');
-            GUI.log(chrome.i18n.getMessage('startGetPoint'));
+            GUI.log(i18n.getMessage('startGetPoint'));
             getWaypointsFromFC(false);
         });
 
         $('#saveMissionButton').on('click', function () {
             if (mission.isEmpty()) {
-                alert(chrome.i18n.getMessage('no_waypoints_to_save'));
+                GUI.alert(i18n.getMessage('no_waypoints_to_save'));
                 return;
             }
             $(this).addClass('disabled');
-            GUI.log(chrome.i18n.getMessage('startSendPoint'));
+            GUI.log(i18n.getMessage('startSendPoint'));
             sendWaypointsToFC(false);
         });
 
         $('#loadEepromMissionButton').on('click', function () {
             let message = multimissionCount ? 'confirm_overwrite_multimission_file_load_option' : 'confirm_delete_all_points';
-            if ((markers.length || multimissionCount) && !confirm(chrome.i18n.getMessage(message))) return;
+            if ((markers.length || multimissionCount) && !confirm(i18n.getMessage(message))) return;
             removeAllWaypoints();
             $(this).addClass('disabled');
-            GUI.log(chrome.i18n.getMessage('startGetPoint'));
+            GUI.log(i18n.getMessage('startGetPoint'));
             getWaypointsFromFC(true);
         });
 
         $('#saveEepromMissionButton').on('click', function () {
             if (mission.isEmpty()) {
-                alert(chrome.i18n.getMessage('no_waypoints_to_save'));
+                GUI.alert(i18n.getMessage('no_waypoints_to_save'));
                 return;
             }
             $(this).addClass('disabled');
-            GUI.log(chrome.i18n.getMessage('startSendPoint'));
+            GUI.log(i18n.getMessage('startSendPoint'));
             sendWaypointsToFC(true);
         });
 
@@ -2473,9 +3127,12 @@ TABS.mission_control.initialize = function (callback) {
         $('#saveSettings').on('click', function () {
             let oldSafeRadiusSH = settings.safeRadiusSH;
 
-            settings.speed = Number($('#MPdefaultPointSpeed').val());
+            // update only default settings
             settings.alt = Number($('#MPdefaultPointAlt').val());
+            settings.speed = Number($('#MPdefaultPointSpeed').val());
             settings.safeRadiusSH = Number($('#MPdefaultSafeRangeSH').val());
+            settings.fwApproachAlt = Number($('#MPdefaultFwApproachAlt').val());
+            settings.fwLandAlt = Number($('#MPdefaultLandAlt').val());
 
             saveSettings();
 
@@ -2502,18 +3159,19 @@ TABS.mission_control.initialize = function (callback) {
     //
     /////////////////////////////////////////////
     function loadMissionFile(filename) {
-        const fs = require('fs');
-        if (!window.xml2js) return GUI.log(chrome.i18n.getMessage('errorReadingFileXml2jsNotFound'));
+        for (let i = FC.SAFEHOMES.getMaxSafehomeCount(); i < FC.FW_APPROACH.getMaxFwApproachCount(); i++) {
+            FC.FW_APPROACH.clean(i);
+        }
 
         fs.readFile(filename, (err, data) => {
             if (err) {
-                GUI.log(chrome.i18n.getMessage('errorReadingFile'));
+                GUI.log(i18n.getMessage('errorReadingFile'));
                 return console.error(err);
             }
 
-            window.xml2js.Parser({ 'explicitChildren': true, 'preserveChildrenOrder': true }).parseString(data, (err, result) => {
+            xml2js.Parser({ 'explicitChildren': true, 'preserveChildrenOrder': true }).parseString(data, (err, result) => {
                 if (err) {
-                    GUI.log(chrome.i18n.getMessage('errorParsingFile'));
+                    GUI.log(i18n.getMessage('errorParsingFile'));
                     return console.error(err);
                 }
 
@@ -2525,6 +3183,7 @@ TABS.mission_control.initialize = function (callback) {
                 for (var noderoot in result) {
                     if (!nodemission && noderoot.match(/mission/i)) {
                         nodemission = result[noderoot];
+                        var missionIdx = -1;
                         if (nodemission.$$ && nodemission.$$.length) {
                             for (var i = 0; i < nodemission.$$.length; i++) {
                                 node = nodemission.$$[i];
@@ -2536,7 +3195,9 @@ TABS.mission_control.initialize = function (callback) {
                                     }
                                 } else if (node['#name'].match(/meta/i) || node['#name'].match(/mwp/i) && node.$) {
                                     for (var attr in node.$) {
-                                        if (attr.match(/zoom/i)) {
+                                        if (attr.match(/mission/i)) {
+                                            missionIdx = parseInt(node.$[attr]) -1;
+                                        } else if (attr.match(/zoom/i)) {
                                             mission.setCenterZoom(parseInt(node.$[attr]));
                                         } else if (attr.match(/cx/i)) {
                                             mission.setCenterLon(parseFloat(node.$[attr]) * 10000000);
@@ -2593,7 +3254,33 @@ TABS.mission_control.initialize = function (callback) {
                                             }
                                         }
                                     }
+                                    if (missionIdx >= 0) {
+                                        point.setMultiMissionIdx(missionIdx);
+                                    }
                                     mission.put(point);
+                                } else if (node['#name'].match(/fwapproach/i) && node.$) {
+                                    var fwApproach = new FwApproach(0);
+                                    var idx = -1;
+                                    for (var attr in node.$) {
+                                        if (attr.match(/index/i)) {
+                                            idx = parseInt(node.$[attr]);
+                                        } else if (attr.match(/no/i)) {
+                                            fwApproach.setNumber(parseInt(node.$[attr]));
+                                        } else if (attr.match(/approach-alt/i)) {
+                                            fwApproach.setApproachAltAsl(parseInt(node.$[attr]));
+                                        } else if (attr.match(/land-alt/i)) {
+                                            fwApproach.setLandAltAsl(parseInt(node.$[attr]));
+                                        } else if (attr.match(/approach-direction/i)) {
+                                            fwApproach.setApproachDirection(node.$[attr] == 'left' ? 0 : 1);
+                                        } else if (attr.match(/landheading1/i)) {
+                                            fwApproach.setLandHeading1(parseInt(node.$[attr]));
+                                        } else if (attr.match(/landheading2/i)) {
+                                            fwApproach.setLandHeading2(parseInt(node.$[attr]));
+                                        } else if (attr.match(/sealevel-ref/i)) {
+                                            fwApproach.setIsSeaLevelRef(parseBooleans(node.$[attr]) ? 1 : 0);
+                                        }
+                                    }
+                                    FC.FW_APPROACH.insert(fwApproach, FC.SAFEHOMES.getMaxSafehomeCount() + idx);
                                 }
                             }
                         }
@@ -2601,7 +3288,7 @@ TABS.mission_control.initialize = function (callback) {
                 }
 
                 if (missionEndFlagCount > 1) {
-                    if (multimissionCount && !confirm(chrome.i18n.getMessage('confirm_multimission_file_load'))) {
+                    if (multimissionCount && !confirm(i18n.getMessage('confirm_multimission_file_load'))) {
                         mission.flush();
                         return;
                     } else {
@@ -2645,16 +3332,13 @@ TABS.mission_control.initialize = function (callback) {
                 }
                 updateTotalInfo();
                 let sFilename = String(filename.split('\\').pop().split('/').pop());
-                GUI.log(sFilename + chrome.i18n.getMessage('loadedSuccessfully'));
+                GUI.log(sFilename + i18n.getMessage('loadedSuccessfully'));
                 updateFilename(sFilename);
             });
         });
     }
 
     function saveMissionFile(filename) {
-        const fs = require('fs');
-        if (!window.xml2js) return GUI.log(chrome.i18n.getMessage('errorWritingFileXml2jsNotFound'));
-
         var center = ol.proj.toLonLat(map.getView().getCenter());
         var zoom = map.getView().getZoom();
         let multimission = multimissionCount && !singleMissionActive();
@@ -2666,7 +3350,8 @@ TABS.mission_control.initialize = function (callback) {
                           'home-x' : HOME.getLonMap(),
                           'home-y' : HOME.getLatMap(),
                           'zoom': zoom } },
-            'missionitem': []
+            'missionitem': [],
+            'fwapproach': []
         };
 
         let missionStartWPNumber = 0;
@@ -2696,100 +3381,129 @@ TABS.mission_control.initialize = function (callback) {
                 missionNumber ++;
             }
         });
+        let approachIdx = 0;
+        for (let i = FC.SAFEHOMES.getMaxSafehomeCount(); i < FC.FW_APPROACH.getMaxFwApproachCount(); i++){
+            let approach = FC.FW_APPROACH.get()[i];
+            if (approach.getLandHeading1() != 0 || approach.getLandHeading2() != 0) {
+                var item = { $: {
+                    'index': approachIdx,
+                    'no': approach.getNumber(),
+                    'approach-alt': approach.getApproachAltAsl(),
+                    'land-alt': approach.getLandAltAsl(),
+                    'approach-direction': approach.getApproachDirection() == 0 ? 'left' : 'right',
+                    'landheading1': approach.getLandHeading1(),
+                    'landheading2': approach.getLandHeading2(),
+                    'sealevel-ref': approach.getIsSeaLevelRef() ? 'true' : 'false'
+                }};
+                data.fwapproach.push(item);
+            }
+            approachIdx++;
+        }
 
-        var builder = new window.xml2js.Builder({ 'rootName': 'mission', 'renderOpts': { 'pretty': true, 'indent': '\t', 'newline': '\n' } });
+        var builder = new xml2js.Builder({ 'rootName': 'mission', 'renderOpts': { 'pretty': true, 'indent': '\t', 'newline': '\n' } });
         var xml = builder.buildObject(data);
         xml = xml.replace(/missionitem mission/g, 'meta mission');
         fs.writeFile(filename, xml, (err) => {
             if (err) {
-                GUI.log(chrome.i18n.getMessage('ErrorWritingFile'));
+                GUI.log(i18n.getMessage('ErrorWritingFile'));
                 return console.error(err);
             }
             let sFilename = String(filename.split('\\').pop().split('/').pop());
-            GUI.log(sFilename + chrome.i18n.getMessage('savedSuccessfully'));
+            GUI.log(sFilename + i18n.getMessage('savedSuccessfully'));
             updateFilename(sFilename);
         });
     }
 
     /////////////////////////////////////////////
     // Load/Save FC mission Toolbox
-    // mission = configurator store, WP number indexed from 0, MISSION_PLANNER = FC NVM store, WP number indexed from 1
+    // mission = configurator store, WP number indexed from 0, FC.MISSION_PLANNER = FC NVM store, WP number indexed from 1
     /////////////////////////////////////////////
     function getWaypointsFromFC(loadEeprom) {
+
+        var loadChainer = new MSPChainerClass();
+        var chain = [mspHelper.loadFwApproach];
         if (loadEeprom) {
-            MSP.send_message(MSPCodes.MSP_WP_MISSION_LOAD, [0], getWaypointData);
-        } else {
-            getWaypointData();
-        }
-
-        function getWaypointData() {
-            mspHelper.loadWaypoints(function() {
-                GUI.log(chrome.i18n.getMessage('endGetPoint'));
-                if (loadEeprom) {
-                    GUI.log(chrome.i18n.getMessage('eeprom_load_ok'));
-                    $('#loadEepromMissionButton').removeClass('disabled');
-                } else {
-                    $('#loadMissionButton').removeClass('disabled');
-                }
-                if (!MISSION_PLANNER.getCountBusyPoints()) {
-                    alert(chrome.i18n.getMessage('no_waypoints_to_load'));
-                    return;
-                }
-                mission.reinit();
-                mission.copy(MISSION_PLANNER);
-                mission.update(false, true);
-
-                /* check multimissions */
-                multimissionCount = 0;
-                mission.get().forEach(function (element) {
-                    if (element.getEndMission() == 0xA5) {
-                        multimissionCount ++;
-                    }
-                });
-                multimissionCount = multimissionCount > 1 ? multimissionCount : 0;
-                multimission.reinit();
-                if (multimissionCount > 1) {
-                    multimission.copy(mission);
-                    $('#missionPlannerMultiMission').fadeIn(300);
-                }
-                renderMultimissionTable();
-
-                setView(16);
-                redrawLayers();
-                updateTotalInfo();
+            chain.push(function(callback) {
+                MSP.send_message(MSPCodes.MSP_WP_MISSION_LOAD, [0], callback);
             });
-        };
+        }
+        chain.push(mspHelper.loadWaypoints);
+        chain.push(function() {
+            GUI.log(i18n.getMessage('endGetPoint'));
+            if (loadEeprom) {
+                GUI.log(i18n.getMessage('eeprom_load_ok'));
+                $('#loadEepromMissionButton').removeClass('disabled');
+            } else {
+                $('#loadMissionButton').removeClass('disabled');
+            }
+            if (!FC.MISSION_PLANNER.getCountBusyPoints()) {
+                GUI.alert(i18n.getMessage('no_waypoints_to_load'));
+                return;
+            }
+            mission.reinit();
+            mission.copy(FC.MISSION_PLANNER);
+            mission.update(false, true);
+
+            /* check multimissions */
+            multimissionCount = 0;
+            mission.get().forEach(function (element) {
+                if (element.getEndMission() == 0xA5) {
+                    element.setMultiMissionIdx(multimissionCount);
+                    multimissionCount++;
+                }
+            });
+            multimissionCount = multimissionCount > 1 ? multimissionCount : 0;
+            multimission.reinit();
+            if (multimissionCount > 1) {
+                multimission.copy(mission);
+                $('#missionPlannerMultiMission').fadeIn(300);
+            }
+            renderMultimissionTable();
+            setView(16);
+            redrawLayers();
+            updateTotalInfo();
+        });
+
+        loadChainer.setChain(chain);
+        loadChainer.execute();
     }
 
     function sendWaypointsToFC(saveEeprom) {
-        MISSION_PLANNER.reinit();
-        MISSION_PLANNER.copy(mission);
-        MISSION_PLANNER.update(false, true, true);
-        mspHelper.saveWaypoints(function() {
-            GUI.log(chrome.i18n.getMessage('endSendPoint'));
-            if (saveEeprom) {
-                $('#saveEepromMissionButton').removeClass('disabled');
-                GUI.log(chrome.i18n.getMessage('eeprom_saved_ok'));
-                MSP.send_message(MSPCodes.MSP_WP_MISSION_SAVE, [0], false, setMissionIndex);
-            } else {
-                $('#saveMissionButton').removeClass('disabled');
+        FC.MISSION_PLANNER.reinit();
+        FC.MISSION_PLANNER.copy(mission);
+        FC.MISSION_PLANNER.update(false, true, true);
+        let saveChainer = new MSPChainerClass();
+        saveChainer.setChain([
+            mspHelper.saveWaypoints,
+            mspHelper.saveFwApproach,
+            function () {
+                GUI.log(i18n.getMessage('endSendPoint'));
+                if (saveEeprom) {
+                    $('#saveEepromMissionButton').removeClass('disabled');
+                    GUI.log(i18n.getMessage('eeprom_saved_ok'));
+                    MSP.send_message(MSPCodes.MSP_WP_MISSION_SAVE, [0], false, setMissionIndex);
+                } else {
+                    $('#saveMissionButton').removeClass('disabled');
+                }
+                mission.setMaxWaypoints(FC.MISSION_PLANNER.getMaxWaypoints());
+                mission.setValidMission(FC.MISSION_PLANNER.getValidMission());
+                mission.setCountBusyPoints(FC.MISSION_PLANNER.getCountBusyPoints());
+                multimission.setMaxWaypoints(mission.getMaxWaypoints());
+                updateTotalInfo();
+                mission.reinit();
+                mission.copy(FC.MISSION_PLANNER);
+                mission.update(false, true);
+                refreshLayers();
+                $('#MPeditPoint').fadeOut(300);
             }
-            mission.setMaxWaypoints(MISSION_PLANNER.getMaxWaypoints());
-            mission.setValidMission(MISSION_PLANNER.getValidMission());
-            mission.setCountBusyPoints(MISSION_PLANNER.getCountBusyPoints());
-            multimission.setMaxWaypoints(mission.getMaxWaypoints());
-            updateTotalInfo();
-            mission.reinit();
-            mission.copy(MISSION_PLANNER);
-            mission.update(false, true);
-            refreshLayers();
-            $('#MPeditPoint').fadeOut(300);
-        });
+        ]);
+        saveChainer.execute();
+
         function setMissionIndex() {
             let activeIndex = singleMissionActive() ? 1 : $('#activeNissionIndex').text();
             mspHelper.setSetting("nav_wp_multi_mission_index", activeIndex, function () {
                 MSP.send_message(MSPCodes.MSP_EEPROM_WRITE, false, false, function () {
-                    GUI.log(chrome.i18n.getMessage('multimission_active_index_saved_eeprom'));
+                    GUI.log(i18n.getMessage('multimission_active_index_saved_eeprom'));
                 });
             });
         }
@@ -2802,7 +3516,7 @@ TABS.mission_control.initialize = function (callback) {
                 availableWPs = availableWPs - multimission.get().length;
             }
             $('#availablePoints').text(availableWPs + '/' + mission.getMaxWaypoints());
-            $('#missionValid').html(mission.getValidMission() ? chrome.i18n.getMessage('armingCheckPass') : chrome.i18n.getMessage('armingCheckFail'));
+            $('#missionValid').html(mission.getValidMission() ? i18n.getMessage('armingCheckPass') : i18n.getMessage('armingCheckFail'));
         }
     }
 
@@ -2817,6 +3531,11 @@ TABS.mission_control.initialize = function (callback) {
         }
     }
 
+    function updateSelectedShAndFwAp(index) {
+        selectedSafehome = FC.SAFEHOMES.get()[index];
+        selectedFwApproachSh = FC.FW_APPROACH.get()[index];
+    }
+
     /* resetAltitude = true : For selected WPs only. Changes WP Altitude value back to previous value if setting below ground level.
      ^ resetAltitude = false : changes WP Altitude to value required to give ground clearance = default Altitude setting
      ^ AbsAltCheck : check value for whether or not to use absolute altitude. This can be the P3 bitset or excplicitly set to true or false */
@@ -2828,7 +3547,7 @@ TABS.mission_control.initialize = function (callback) {
         if (AbsAltCheck) {
             if (checkAltitude < 100 * elevation) {
                 if (resetAltitude) {
-                    alert(chrome.i18n.getMessage('MissionPlannerAltitudeChangeReset'));
+                    GUI.alert(i18n.getMessage('MissionPlannerAltitudeChangeReset'));
                     altitude = selectedMarker.getAlt();
                 } else {
                     altitude = settings.alt + 100 * elevation;
@@ -2839,7 +3558,7 @@ TABS.mission_control.initialize = function (callback) {
             let elevationAtHome = HOME.getAlt();
             if ((checkAltitude / 100 + elevationAtHome) < elevation) {
                 if (resetAltitude) {
-                    alert(chrome.i18n.getMessage('MissionPlannerAltitudeChangeReset'));
+                    GUI.alert(i18n.getMessage('MissionPlannerAltitudeChangeReset'));
                     altitude = selectedMarker.getAlt();
                 } else {
                     let currentGroundClearance = 100 * Number($('#groundClearanceValueAtWP').text());
@@ -2952,6 +3671,13 @@ TABS.mission_control.initialize = function (callback) {
             }
         }
     }
+
+    function parseBooleans (str) {
+        if (/^(?:true|false)$/i.test(str)) {
+          str = str.toLowerCase() === 'true';
+        }
+        return str;
+      };
 };
 
 TABS.mission_control.isBitSet = function(bits, testBit) {
@@ -2968,9 +3694,9 @@ TABS.mission_control.setBit = function(bits, bit, value) {
 
 // function handleError(evt) {
     // if (evt.message) { // Chrome sometimes provides this
-      // alert("error: "+evt.message +" at linenumber: "+evt.lineno+" of file: "+evt.filename);
+      // GUI.alert("error: "+evt.message +" at linenumber: "+evt.lineno+" of file: "+evt.filename);
     // } else {
-      // alert("error: "+evt.type+" from element: "+(evt.srcElement || evt.target));
+      // GUI.alert("error: "+evt.type+" from element: "+(evt.srcElement || evt.target));
     // }
 // }
 

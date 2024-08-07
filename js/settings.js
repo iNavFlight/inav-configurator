@@ -1,12 +1,35 @@
 'use strict';
 
+const mapSeries = require('promise-map-series')
+
+const mspHelper = require('./../js/msp/MSPHelper');
+const { GUI } = require('./gui');
+const FC = require('./fc');
+const { globalSettings, UnitType } = require('./globalSettings');
+const i18n = require('./localization');
+
+function padZeros(val, length) {
+    let str = val.toString();
+
+    if (str.length < length) {
+        if (str.charAt(0) === '-') {
+            str = "-0" + str.substring(1);
+            str = padZeros(str, length);
+        } else {
+            str = padZeros("0" + str, length);
+        }
+    }
+
+    return str;
+}
+
 var Settings = (function () {
     let self = {};
 
     self.fillSelectOption = function(s, ii) {
         var name = (s.setting.table ? s.setting.table.values[ii] : null);
         if (name) {
-            var localizedName = chrome.i18n.getMessage(name);
+            var localizedName = i18n.getMessage(name);
             if (localizedName) {
                 name = localizedName;
             }
@@ -26,9 +49,19 @@ var Settings = (function () {
         $('[data-setting!=""][data-setting]').each(function() {
             inputs.push($(this));
         });
-        return Promise.mapSeries(inputs, function (input, ii) {
+        return mapSeries(inputs, function (input, ii) {
             var settingName = input.data('setting');
             var inputUnit = input.data('unit');
+
+            let elementId = input.attr('id');
+            if (elementId === undefined) {
+
+                // If the element ID is not defined, we need to create one
+                // based on the setting name. If this ID exists, we will not create it
+                if ($('#' + settingName).length === 0) {
+                    input.attr('id', settingName);
+                }
+            }
 
             if (globalSettings.showProfileParameters) {
                 if (FC.isBatteryProfileParameter(settingName)) {
@@ -61,6 +94,8 @@ var Settings = (function () {
                 if (input.prop('tagName') == 'SELECT' || s.setting.table) {
                     if (input.attr('type') == 'checkbox') {
                         input.prop('checked', s.value > 0);
+                    } else if (input.attr('type') == 'radio') {
+                        input.prop( 'checked', s.value == input.attr('value') );
                     } else {
                         input.empty();
                         let option = null;
@@ -123,8 +158,9 @@ var Settings = (function () {
 
                 input.data('setting-info', s.setting);
                 if (input.data('live')) {
-                    input.change(function() {
-                        self.saveInput(input);
+                    input.on('change', function () {
+                        const settingPair = self.processInput(input);
+                        return mspHelper.setSetting(settingPair.setting, settingPair.value);
                     });
                 }
             });
@@ -503,7 +539,7 @@ var Settings = (function () {
         };
     }
 
-    self.saveInput = function(input) {
+    self.processInput = function(input) {
         var settingName = input.data('setting');
         var setting = input.data('setting-info');
         var value;
@@ -511,10 +547,13 @@ var Settings = (function () {
         if (typeof setting == 'undefined') {
             return null;
         }
-
         if (setting.table) {
             if (input.attr('type') == 'checkbox') {
                 value = input.prop('checked') ? 1 : 0;
+            } else if (input.attr('type') == 'radio') {
+                if (input.prop('checked')) {
+                    value = parseInt(input.val());
+                }
             } else {
                 value = parseInt(input.val());
             }
@@ -556,8 +595,7 @@ var Settings = (function () {
                 }
             }
         }
-
-        return mspHelper.setSetting(settingName, value);
+        return {setting: settingName, value: value};
     };
 
     self.countDecimals = function(value) {
@@ -575,14 +613,26 @@ var Settings = (function () {
         return 0;
     };
 
-    self.saveInputs = function() {
+    self.pickAndSaveSingleInput = function(inputs, finalCallback) {
+        if (inputs.length > 0) {
+            var input = inputs.shift();
+            var settingPair = self.processInput(input);
+            return mspHelper.setSetting(settingPair.setting, settingPair.value, function() {       
+                return self.pickAndSaveSingleInput(inputs, finalCallback);
+            });
+        } else {
+            if (finalCallback) {
+                finalCallback();
+            }
+        }
+    };
+
+    self.saveInputs = function(finalCallback) {
         var inputs = [];
         $('[data-setting!=""][data-setting]').each(function() {
             inputs.push($(this));
         });
-        return Promise.mapSeries(inputs, function (input, ii) {
-            return self.saveInput(input);
-        });
+        self.pickAndSaveSingleInput(inputs, finalCallback);
     };
 
     self.processHtml = function(callback) {
@@ -602,7 +652,7 @@ var Settings = (function () {
             helpIcons.push($(this));
         });
 
-        return Promise.mapSeries(helpIcons, function(helpIcon, ii) {
+        return mapSeries(helpIcons, function(helpIcon, ii) {
             let forAtt = helpIcon.attr('for');
 
             if (typeof forAtt !== "undefined" && forAtt !== "") {
@@ -623,3 +673,5 @@ var Settings = (function () {
 
     return self;
 })();
+
+module.exports = Settings;

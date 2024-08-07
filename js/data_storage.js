@@ -10,3 +10,5 @@ var CONFIGURATOR = {
     'cliValid': false,
     'connection': false
 };
+
+module.exports = CONFIGURATOR;

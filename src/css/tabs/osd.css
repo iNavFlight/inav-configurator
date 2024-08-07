@@ -634,7 +634,7 @@ button {
     /* please don't copy the generic background image from another project
      * and replace the one that @nathantsoi took :)
      */
-    background: url(/images/osd-bg-1.jpg);
+    background: url(./../../../images/osd-bg-1.jpg);
     background-size: cover;
     border-bottom-left-radius: 3px;
     border-bottom-right-radius: 3px;
@@ -719,4 +719,48 @@ button {
 .tab-osd .osd_settings .switchery,
 .tab-osd .unit_wrapper {
     vertical-align: top;
+}
+
+.osdCustomElement_main_table {
+    width: 100%;
+    table-layout: fixed;
+    max-width: 400px;
+}
+
+.osdCustomElement_main_table td{
+    max-width: 80px;
+}
+
+.osdCustomElement_main_table select, .osdCustomElement_main_table input{
+    width: 100% !important;
+}
+
+.settings .btn a{
+    margin-top: 0;
+    margin-bottom: 0;
+    border-radius: 3px;
+    color: #fff;
+    font-family: 'open_sansbold', Arial, serif;
+    font-size: 12px;
+    text-shadow: 0 1px rgba(0, 0, 0, 0.25);
+    cursor: pointer;
+    transition: all ease 0.2s;
+    padding: 0 9px;
+    line-height: 22px;
+}
+
+.settings .btn_blue a{
+    background-color: #37a8db;
+    border: 1px solid #3394b5;
+}
+
+.settings .btn_danger a{
+    background-color: #e2a2a2;
+    border: 1px solid #e58383;
+}
+
+
+.settings .btn a:hover {
+    background-color: #3394b5;
+    transition: all ease 0.2s;
 }

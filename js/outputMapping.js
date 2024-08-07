@@ -1,10 +1,21 @@
-/*global bit_check*/
 'use strict';
 
-let OutputMappingCollection = function () {
+const BitHelper = require("./bitHelper");
+
+var OutputMappingCollection = function () {
     let self = {},
         data = [],
         timerOverrides = {};
+
+    const colorTable = [
+            "#8ecae6",
+            "#2a9d8f",
+            "#e9c46a",
+            "#f4a261",
+            "#e76f51",
+            "#ef476f",
+            "#ffc300"
+        ];
 
     const TIM_USE_ANY = 0;
     const TIM_USE_PPM = 0;
@@ -19,10 +30,14 @@ let OutputMappingCollection = function () {
 
     const OUTPUT_TYPE_MOTOR = 0;
     const OUTPUT_TYPE_SERVO = 1;
+    const OUTPUT_TYPE_LED   = 2;
+
+    const SPECIAL_LABEL_LED = 1;
 
     self.TIMER_OUTPUT_MODE_AUTO = 0;
     self.TIMER_OUTPUT_MODE_MOTORS = 1;
     self.TIMER_OUTPUT_MODE_SERVOS = 2;
+    self.TIMER_OUTPUT_MODE_LED = 3;
 
     self.flushTimerOverrides = function() {
         timerOverrides = {};
@@ -37,13 +52,17 @@ let OutputMappingCollection = function () {
     }
 
     self.getTimerColor = function (timer) {
-        let timerIndex = OUTPUT_MAPPING.getUsedTimerIds().indexOf(String(timer));
+        let timerIndex = self.getUsedTimerIds().indexOf(String(timer));
      
-        return GUI.colorTable[timerIndex % GUI.colorTable.length];
+        return colorTable[timerIndex % colorTable.length];
+    }
+
+    self.isLedPin = function(timer) {
+        return data[timer].specialLabels == SPECIAL_LABEL_LED;
     }
 
     self.getOutputTimerColor = function (output) {
-        let timerId = OUTPUT_MAPPING.getTimerId(output);
+        let timerId = self.getTimerId(output);
 
         return self.getTimerColor(timerId);
     }
@@ -68,10 +87,15 @@ let OutputMappingCollection = function () {
         for (let i = 0; i < data.length; i++) {
             timerMap[i] = null;
 
-            if (servosToGo > 0 && bit_check(data[i]['usageFlags'], TIM_USE_SERVO)) {
+            if (servosToGo > 0 && BitHelper.bit_check(data[i]['usageFlags'], TIM_USE_LED)) {
+                console.log(i + ": LED");
+                timerMap[i] = OUTPUT_TYPE_LED;
+            } else if (servosToGo > 0 && BitHelper.bit_check(data[i]['usageFlags'], TIM_USE_SERVO)) {
+                console.log(i + ": SERVO");
                 servosToGo--;
                 timerMap[i] = OUTPUT_TYPE_SERVO;
-            } else if (motorsToGo > 0 && bit_check(data[i]['usageFlags'], TIM_USE_MOTOR)) {
+            } else if (motorsToGo > 0 && BitHelper.bit_check(data[i]['usageFlags'], TIM_USE_MOTOR)) {
+                console.log(i + ": MOTOR");
                 motorsToGo--;
                 timerMap[i] = OUTPUT_TYPE_MOTOR;
             }
@@ -87,6 +111,7 @@ let OutputMappingCollection = function () {
             outputMap = [],
             offset = getFirstOutputOffset();
 
+        console.log("Offset: " + offset)
         for (let i = 0; i < self.getOutputCount(); i++) {
             
             let assignment = timerMap[i + offset];
@@ -99,6 +124,8 @@ let OutputMappingCollection = function () {
             } else if (assignment == OUTPUT_TYPE_SERVO) {
                 outputMap[i] = "Servo " + servos[currentServoIndex];
                 currentServoIndex++;
+            } else if (assignment == OUTPUT_TYPE_LED) {
+                outputMap[i] = "Led";
             }
         }
 
@@ -117,9 +144,11 @@ let OutputMappingCollection = function () {
         let retVal = 0;
 
         for (let i = 0; i < data.length; i++) {
+            let flags = data[i]['usageFlags'];
             if (
-                bit_check(data[i]['usageFlags'], TIM_USE_MOTOR) ||
-                bit_check(data[i]['usageFlags'], TIM_USE_SERVO)
+                BitHelper.bit_check(flags, TIM_USE_MOTOR) ||
+                BitHelper.bit_check(flags, TIM_USE_SERVO) ||
+                BitHelper.bit_check(flags, TIM_USE_LED)
             ) {
                 retVal++;
             };
@@ -131,8 +160,9 @@ let OutputMappingCollection = function () {
     function getFirstOutputOffset() {
         for (let i = 0; i < data.length; i++) {
             if (
-                bit_check(data[i]['usageFlags'], TIM_USE_MOTOR) ||
-                bit_check(data[i]['usageFlags'], TIM_USE_SERVO)
+                BitHelper.bit_check(data[i]['usageFlags'], TIM_USE_MOTOR) ||
+                BitHelper.bit_check(data[i]['usageFlags'], TIM_USE_SERVO) ||
+                BitHelper.bit_check(data[i]['usageFlags'], TIM_USE_LED)
             ) {
                 return i;
             }
@@ -151,7 +181,7 @@ let OutputMappingCollection = function () {
         let lastFound = 0;
 
         for (let i = offset; i < data.length; i++) {
-            if (bit_check(data[i]['usageFlags'], bit)) {
+            if (BitHelper.bit_check(data[i]['usageFlags'], bit)) {
                 if (lastFound == servoIndex) {
                     return i - offset + 1;
                 } else {
@@ -177,3 +207,5 @@ let OutputMappingCollection = function () {
 
     return self;
 }
+
+module.exports = OutputMappingCollection;

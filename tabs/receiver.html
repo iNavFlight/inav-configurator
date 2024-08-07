@@ -37,7 +37,7 @@
                 </div>
                 <div class="spacer_box">
                     <div class="select">
-                        <select id="receiver_type" data-setting="receiver_type"/>
+                        <select id="receiver_type" data-setting="receiver_type"></select>
                         <label for="receiver_type">
                             <span data-i18n="receiverType"></span>
                         </label>
@@ -45,18 +45,18 @@
                     <div id="serialrx_provider-wrapper">
                         <div class="info-box ok-box" data-i18n="configurationSerialRXHelp"></div>
                         <div class="select">
-                            <select id="serialrx_provider" data-setting="serialrx_provider"/>
+                            <select id="serialrx_provider" data-setting="serialrx_provider"></select>
                             <label for="serialrx_provider">
                                 <span data-i18n="configurationSerialRX"></span>
                             </label>
                         </div>
                         <div class="select">
-                            <select id="serialrx_inverted" data-setting="serialrx_inverted"/>
+                            <select id="serialrx_inverted" data-setting="serialrx_inverted"></select>
                             <label for="serialrx_inverted">
                                 <span data-i18n="serialrx_inverted"></span>
                             </label>
                         </div><div class="select">
-                            <select id="serialrx_halfduplex" data-setting="serialrx_halfduplex"/>
+                            <select id="serialrx_halfduplex" data-setting="serialrx_halfduplex"></select>
                             <label for="serialrx_halfduplex">
                                 <span data-i18n="serialrx_halfduplex"></span>
                             </label>
@@ -70,28 +70,13 @@
                 <div class="gui_box_titlebar">
                     <div class="spacer_box_title" data-i18n="rcSmoothing"></div>
                 </div>
-                <div class="spacer_box">
-                    <div class="select">
-                        <select id="rc_filter_auto" data-setting="rc_filter_auto" />
-                            <span data-i18n="rc_filter_auto"></span>
-                        </label>
-                    </div>
-
-                    <div class="number">
-                        <input id="rc_filter_lpf_hz" data-setting="rc_filter_lpf_hz" type="number" data-presentation="range" data-normal-max="125" />
-                        <label for="rc_filter_lpf_hz">
-                            <span data-i18n="rc_filter_lpf_hz"></span>
-                        </label>
-                    </div>
-                    
+                <div class="spacer_box">                   
                     <div class="number">
                         <input id="rc_filter_smoothing_factor" data-setting="rc_filter_smoothing_factor" type="number" data-presentation="range" />
                         <label for="rc_filter_smoothing_factor">
                             <span data-i18n="rc_filter_smoothing_factor"></span>
                         </label>
                     </div>
-
-
                 </div>
             </div>
 
@@ -134,43 +119,7 @@
                     </div>
                 </div>
             </div>
-            <div class="gui_box grey">
-                <div class="spacer" style="margin-top: 10px; margin-bottom: 10px;">
-                    <div class="fc_column curves" style="width: calc(50% - 10px);">
-                        <table>
-                            <tr>
-                                <td>
-                                    <div class="pitch_roll_curve">
-                                        <canvas width="200" height="117"></canvas>
-                                    </div>
-                                </td>
-                            </tr>
-                        </table>
-                    </div>
-                    <div class="fc_column half tunings">
-                        <table class="rate">
-                            <tr>
-                                <th data-i18n="receiverRcExpo"></th>
-                                <th data-i18n="receiverManualRcExpo"></th>
-                            </tr>
-                            <tr>
-                                <td><input class="controlProfileHighlight" type="number" name="expo" step="0.01" min="0" max="2" /></td>
-                                <td><input class="controlProfileHighlight" type="number" name="manual_expo" step="0.01" min="0" max="1" /></td>
-                            </tr>
-                        </table>
-                        <table class="yaw_rate" style="margin-bottom: 0;">
-                            <tr>
-                                <th data-i18n="receiverRcYawExpo"></th>
-                                <th data-i18n="receiverManualRcYawExpo"></th>
-                            </tr>
-                            <tr>
-                                <td><input class="controlProfileHighlight" type="number" name="yaw_expo" step="0.01" min="0" max="2" /></td>
-                                <td><input class="controlProfileHighlight" type="number" name="manual_yaw_expo" step="0.01" min="0" max="1" /></td>
-                            </tr>
-                        </table>
-                    </div>
-                </div>
-            </div>
+            
         </div>
     </div>
     <div class="content_toolbar">

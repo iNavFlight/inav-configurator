@@ -1,21 +1,26 @@
 'use strict';
 
+const semver = require('semver');
+
+const { GUI } = require('./gui');
+const jBox = require('./libraries/jBox/jBox.min');
+const i18n = require('./localization');
+
 var appUpdater = appUpdater || {};
 
 appUpdater.checkRelease = function (currVersion) {
     var modalStart;
-    $.get('https://api.github.com/repos/iNavFlight/inav-configurator/releases', function (releaseData) {
-        GUI.log(chrome.i18n.getMessage('loadedReleaseInfo'));
-        //Git return sorted list, 0 - last release
+    $.get('https://api.github.com/repos/iNavFlight/inav-configurator/releases/latest', function (releaseData) {
+        GUI.log(i18n.getMessage('loadedReleaseInfo'));
 
-        let newVersion = releaseData[0].tag_name;
-        let newPrerelase = releaseData[0].prerelease;
+        let newVersion = releaseData.tag_name;
+        let newPrerelase = releaseData.prerelease;
 
         if (newPrerelase == false && semver.gt(newVersion, currVersion)) {
-            GUI.log(newVersion, chrome.runtime.getManifest().version);
+            GUI.log(newVersion, app.getVersion());
             GUI.log(currVersion);
 
-            GUI.log(chrome.i18n.getMessage('newVersionAvailable'));
+            GUI.log(i18n.getMessage('newVersionAvailable'));
             modalStart = new jBox('Modal', {
                 width: 400,
                 height: 200,
@@ -34,3 +39,5 @@ appUpdater.checkRelease = function (currVersion) {
         modalStart.close();
     });
 };
+
+module.exports = appUpdater;

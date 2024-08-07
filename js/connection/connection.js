@@ -1,5 +1,7 @@
 'use strict';
 
+const { GUI } = require('./../gui');
+
 const ConnectionType = {
     Serial: 0,
     TCP:    1,
@@ -10,7 +12,7 @@ const ConnectionType = {
 class Connection {
 
     constructor() {       
-        this._connectionId   = false;
+        this._connectionId   = 0;
         this._openRequested  = false;
         this._openCanceled   = false;
         this._bitrate        = 0;
@@ -20,6 +22,7 @@ class Connection {
         this._outputBuffer   = [];
         this._onReceiveListeners      = [];
         this._onReceiveErrorListeners = [];
+        this._type = null;
         
         if (this.constructor === Connection) {
             throw new TypeError("Abstract class, cannot be instanced.");
@@ -59,40 +62,8 @@ class Connection {
     }
 
     get type() {
-        switch (this.constructor.name) {
-            case ConnectionSerial.name:
-                return ConnectionType.Serial;
-            case ConnectionTcp.name:
-                return ConnectionType.TCP;
-            case ConnectionUdp.name:
-                return ConnectionType.UDP;
-            case ConnectionBle.name:
-                return ConnectionType.BLE;       
-        }
+        return this._type;
     }
-
-    static create(type) {
-        if (Connection.instance && (Connection.instance.type == type || Connection.instance.connectionId)){
-            return Connection.instance;
-        }
-
-        switch (type) {
-            case ConnectionType.BLE:
-                Connection.instance = new ConnectionBle();
-                break;
-            case ConnectionType.TCP:
-                Connection.instance = new ConnectionTcp();
-                break;
-            case ConnectionType.UDP:
-                Connection.instance = new ConnectionUdp();
-                break;
-            default:
-            case ConnectionType.Serial:
-                Connection.instance = new ConnectionSerial();
-                break;
-        }
-        return Connection.instance;
-    };
 
     connectImplementation(path, options, callback) {
         throw new TypeError("Abstract method");
@@ -100,6 +71,7 @@ class Connection {
 
     connect(path, options, callback) {
         this._openRequested = true;
+        this._openCanceled = false;
         this._failed = 0;
         this.connectImplementation(path, options, connectionInfo => {                   
             if (connectionInfo && !this._openCanceled) { 
@@ -118,7 +90,7 @@ class Connection {
                 if (callback) { 
                     callback(connectionInfo);
                 }
-            } else if (connectionInfo && this.openCanceled) {
+            } else if (connectionInfo && this._openCanceled) {
                 // connection opened, but this connect sequence was canceled
                 // we will disconnect without triggering any callbacks
                 this._connectionId = connectionInfo.connectionId;
@@ -145,7 +117,6 @@ class Connection {
             } else {
                 this._openRequested = false;
                 console.log('Failed to open');
-                googleAnalytics.sendException('FailedToOpen', false);
                 if (callback) {
                     callback(false);
                 }
@@ -163,13 +134,11 @@ class Connection {
             this.removeAllListeners();
             
             this.disconnectImplementation(result => {           
-                this.checkChromeLastError();
     
                 if (result) {
                     console.log('Connection with ID: ' + this._connectionId + ' closed, Sent: ' + this._bytesSent + ' bytes, Received: ' + this._bytesReceived + ' bytes');
                 } else {
                     console.log('Failed to close connection with ID: ' + this._connectionId + ' closed, Sent: ' + this._bytesSent + ' bytes, Received: ' + this._bytesReceived + ' bytes');
-                    googleAnalytics.sendException('Connection: FailedToClose', false);
                 }
                 
                 this._connectionId = false;
@@ -240,12 +209,6 @@ class Connection {
         }
     }
 
-    checkChromeLastError() {
-        if (chrome.runtime.lastError) {
-            console.error(chrome.runtime.lastError.message);
-        } 
-    }
-
     addOnReceiveCallback(callback) {
         throw new TypeError("Abstract method");
     }
@@ -292,8 +255,12 @@ class Connection {
     getTimeout() {
         if (this._bitrate >= 57600) {
             return 3000;
-        } else {
+        } if (this._bitrate >= 19200) {
             return 4000;
+        } else {
+            return 6000;
         }
     }
 }
+
+module.exports = { ConnectionType, Connection};

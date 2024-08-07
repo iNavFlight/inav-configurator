@@ -1,4 +1,4 @@
-/*global $*/
+
 'use strict';
 
 var MSPChainerClass = function () {
@@ -33,3 +33,5 @@ var MSPChainerClass = function () {
 
     return self;
 };
+
+module.exports = MSPChainerClass;

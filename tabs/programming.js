@@ -1,5 +1,14 @@
-/*global TABS,MSPChainerClass,mspHelper,googleAnalytics,GUI,LOGIC_CONDITIONS,PROGRAMMING_PID,GLOBAL_VARIABLES_STATUS,helper,LOGIC_CONDITIONS_STATUS,PROGRAMMING_PID_STATUS*/
 'use strict';
+
+const path = require('path');
+
+const MSPChainerClass = require('./../js/msp/MSPchainer');
+const mspHelper = require('./../js/msp/MSPHelper');
+const { GUI, TABS } = require('./../js/gui');
+const FC = require('./../js/fc');
+const tabs = require('./../js/tabs');
+const i18n = require('./../js/localization');
+const interval = require('./../js/intervals');
 
 TABS.programming = {};
 
@@ -10,7 +19,6 @@ TABS.programming.initialize = function (callback, scrollPosition) {
 
     if (GUI.active_tab != 'programming') {
         GUI.active_tab = 'programming';
-        googleAnalytics.sendAppView('Programming');
     }
 
     loadChainer.setChain([
@@ -36,38 +44,40 @@ TABS.programming.initialize = function (callback, scrollPosition) {
     statusChainer.setExitPoint(onStatusPullDone);
 
     function loadHtml() {
-        GUI.load("./tabs/programming.html", processHtml);
+        GUI.load(path.join(__dirname, "programming.html"), processHtml);
     }
 
     function processHtml() {
-        LOGIC_CONDITIONS.init($('#subtab-lc'));
-        LOGIC_CONDITIONS.render();
+        FC.LOGIC_CONDITIONS.init($('#subtab-lc'));
+        FC.LOGIC_CONDITIONS.render();
+        GUI.switchery();
 
-        PROGRAMMING_PID.init($('#subtab-pid'));
-        PROGRAMMING_PID.render();
+        FC.PROGRAMMING_PID.init($('#subtab-pid'));
+        FC.PROGRAMMING_PID.render();
+        GUI.switchery();
 
-        GLOBAL_VARIABLES_STATUS.init($(".gvar__container"));
+        FC.GLOBAL_VARIABLES_STATUS.init($(".gvar__container"));
 
-        helper.tabs.init($('.tab-programming'));
+        tabs.init($('.tab-programming'));
 
-        localize();
+        i18n.localize();;
 
-        $('#save-button').click(function () {
+        $('#save-button').on('click', function () {
             saveChainer.execute();
-            GUI.log(chrome.i18n.getMessage('programmingEepromSaved'));
+            GUI.log(i18n.getMessage('programmingEepromSaved'));
         });
 
-        helper.mspBalancedInterval.add('logic_conditions_pull', 100, 1, function () {
+        interval.add('logic_conditions_pull', function () {
             statusChainer.execute();
-        });
+        }, 100);
 
         GUI.content_ready(callback);
     }
 
     function onStatusPullDone() {
-        LOGIC_CONDITIONS.update(LOGIC_CONDITIONS_STATUS);
-        GLOBAL_VARIABLES_STATUS.update($('.tab-programming'));
-        PROGRAMMING_PID.update(PROGRAMMING_PID_STATUS);
+        FC.LOGIC_CONDITIONS.update(FC.LOGIC_CONDITIONS_STATUS);
+        FC.GLOBAL_VARIABLES_STATUS.update($('.tab-programming'));
+        FC.PROGRAMMING_PID.update(FC.PROGRAMMING_PID_STATUS);
     }
 }
 

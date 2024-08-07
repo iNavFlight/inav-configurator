@@ -5,14 +5,15 @@ npm-debug.log
 .idea/
 npm-debug.log
 inav-configurator.iml
-# Generated scripts and styles
-/build
-# Used by nw-builder to download runtimes
-/cache
-# Where we put the final app directory structure
-/dist
-# Path where the NW.js apps get built
-/apps
-/.vscode/
+/out
 .eslintrc.json
 /.project
+/cache/
+/dist/
+/apps/
+/build/
+*~
+*.swp
+*.bak
+eeprom.bin
+yarn.lock

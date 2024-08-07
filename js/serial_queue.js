@@ -1,8 +1,12 @@
 'use strict';
 
-var helper = helper || {};
+const CONFIGURATOR = require('./data_storage');
+const MSPCodes = require('./msp/MSPCodes');
+const SimpleSmoothFilter = require('./simple_smooth_filter');
+const eventFrequencyAnalyzer = require('./eventFrequencyAnalyzer');
+const mspDeduplicationQueue = require('./msp/mspDeduplicationQueue');
 
-helper.mspQueue = (function (MSP) {
+var mspQueue = function () {
 
     var publicScope = {},
         privateScope = {};
@@ -10,9 +14,9 @@ helper.mspQueue = (function (MSP) {
     privateScope.handlerFrequency = 100;
     privateScope.balancerFrequency = 20;
 
-    privateScope.loadFilter = new classes.SimpleSmoothFilter(1, 0.85);
-    privateScope.roundtripFilter = new classes.SimpleSmoothFilter(20, 0.95);
-    privateScope.hardwareRoundtripFilter = new classes.SimpleSmoothFilter(10, 0.95);
+    privateScope.loadFilter = new SimpleSmoothFilter(1, 0.85);
+    privateScope.roundtripFilter = new SimpleSmoothFilter(20, 0.95);
+    privateScope.hardwareRoundtripFilter = new SimpleSmoothFilter(10, 0.95);
 
     /**
      * Target load for MSP queue. When load is above target, throttling might start to appear
@@ -23,25 +27,8 @@ helper.mspQueue = (function (MSP) {
 
     privateScope.currentLoad = 0;
 
-    /**
-     * PID controller used to perform throttling
-     * @type {classes.PidController}
-     */
-    privateScope.loadPidController = new classes.PidController();
-    privateScope.loadPidController.setTarget(privateScope.targetLoad);
-    privateScope.loadPidController.setOutput(0, 99, 0);
-    privateScope.loadPidController.setGains(5, 6, 3);
-    privateScope.loadPidController.setItermLimit(0, 90);
-
-    privateScope.dropRatio = 0;
-
-    publicScope.computeDropRatio = function () {
-        privateScope.dropRatio = privateScope.loadPidController.run(publicScope.getLoad());
-    };
-
-    publicScope.getDropRatio = function () {
-        return privateScope.dropRatio;
-    };
+    privateScope.removeCallback = null;
+    privateScope.putCallback = null;
 
     privateScope.queue = [];
 
@@ -51,6 +38,14 @@ helper.mspQueue = (function (MSP) {
     privateScope.lockMethod = 'soft';
 
     privateScope.queueLocked = false;
+
+    publicScope.setremoveCallback = function(cb) {
+        privateScope.removeCallback = cb;
+    }
+
+    publicScope.setPutCallback = function(cb) {
+        privateScope.putCallback = cb;
+    }
 
     /**
      * Method locks queue
@@ -69,6 +64,10 @@ helper.mspQueue = (function (MSP) {
 
     publicScope.setLockMethod = function (method) {
         privateScope.lockMethod = method;
+    };
+
+    publicScope.getLockMethod = function () {   
+        return privateScope.lockMethod;
     };
 
     publicScope.setSoftLock = function () {
@@ -121,7 +120,7 @@ helper.mspQueue = (function (MSP) {
         /*
          * Debug
          */
-        helper.eventFrequencyAnalyzer.put("execute");
+        eventFrequencyAnalyzer.put("execute");
 
         privateScope.loadFilter.apply(privateScope.queue.length);
 
@@ -129,7 +128,7 @@ helper.mspQueue = (function (MSP) {
          * if port is blocked or there is no connection, do not process the queue
          */
         if (publicScope.isLocked() || CONFIGURATOR.connection === false) {
-            helper.eventFrequencyAnalyzer.put("port in use");
+            eventFrequencyAnalyzer.put("port in use");
             return false;
         }
 
@@ -145,10 +144,12 @@ helper.mspQueue = (function (MSP) {
 
             request.timer = setTimeout(function () {
                 console.log('MSP data request timed-out: ' + request.code);
+                mspDeduplicationQueue.remove(request.code);
                 /*
                  * Remove current callback
                  */
-                MSP.removeCallback(request.code);
+                
+                privateScope.removeCallback(request.code);
 
                 /*
                  * To prevent infinite retry situation, allow retry only while counter is positive
@@ -171,9 +172,9 @@ helper.mspQueue = (function (MSP) {
             /*
              * Set receive callback here
              */
-            MSP.putCallback(request);
+            privateScope.putCallback(request);
 
-            helper.eventFrequencyAnalyzer.put('message sent');
+            eventFrequencyAnalyzer.put('message sent');
 
             /*
              * Send data to serial port
@@ -207,9 +208,18 @@ helper.mspQueue = (function (MSP) {
      */
     publicScope.put = function (mspRequest) {
 
+        const isMessageInQueue = mspDeduplicationQueue.check(mspRequest.code);
+
+        if (isMessageInQueue) {
+            eventFrequencyAnalyzer.put('MSP Duplicate ' + mspRequest.code);
+            return false;
+        }
+
         if (privateScope.queueLocked === true) {
             return false;
         }
+
+        mspDeduplicationQueue.put(mspRequest.code);
 
         privateScope.queue.push(mspRequest);
         return true;
@@ -253,7 +263,6 @@ helper.mspQueue = (function (MSP) {
 
     publicScope.balancer = function () {
         privateScope.currentLoad = privateScope.loadFilter.get();
-        helper.mspQueue.computeDropRatio();
 
         /*
          * Also, check if port lock if hanging. Free is so
@@ -261,27 +270,23 @@ helper.mspQueue = (function (MSP) {
         var currentTimestamp = new Date().getTime(),
             threshold = publicScope.getHardwareRoundtrip() * 3;
 
-        if (threshold > 1000) {
+        if (threshold > 5000) {
+            threshold = 5000;
+        }
+        if (threshold < 1000) {
             threshold = 1000;
         }
 
         if (privateScope.softLock !== false && currentTimestamp - privateScope.softLock > threshold) {
-            privateScope.softLock = false;
-            helper.eventFrequencyAnalyzer.put('force free soft lock');
+            publicScope.freeSoftLock();
+            eventFrequencyAnalyzer.put('force free soft lock');
         }
         if (privateScope.hardLock !== false && currentTimestamp - privateScope.hardLock > threshold) {
-            privateScope.hardLock = false;
-            helper.eventFrequencyAnalyzer.put('force free hard lock');
+            console.log('Force free hard lock');
+            publicScope.freeHardLock();
+            eventFrequencyAnalyzer.put('force free hard lock');
         }
 
-    };
-
-    publicScope.shouldDrop = function () {
-        return (Math.round(Math.random()*100) < privateScope.dropRatio);
-    };
-
-    publicScope.shouldDropStatus = function () {
-        return (Math.round(Math.random()*100) < (privateScope.dropRatio * privateScope.statusDropFactor));
     };
 
     /**
@@ -301,8 +306,14 @@ helper.mspQueue = (function (MSP) {
         }
     };
 
+    publicScope.getQueue = function () {
+        return privateScope.queue;
+    };
+
     setInterval(publicScope.executor, Math.round(1000 / privateScope.handlerFrequency));
     setInterval(publicScope.balancer, Math.round(1000 / privateScope.balancerFrequency));
 
     return publicScope;
-})(MSP);
+}();
+
+module.exports = mspQueue;

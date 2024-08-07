@@ -1,4 +1,11 @@
 'use strict'
+const path = require('path');
+
+const { GUI, TABS } = require('./../js/gui');
+const i18n = require('./../js/localization');
+const { SITLProcess, SitlSerialPortUtils } = require('./../js/sitl');
+const Store = require('electron-store');
+const store = new Store();
 
 const localhost = "127.0.0.1"
 
@@ -21,21 +28,39 @@ const simulators = [
 
 const stdProfiles = [
     {
-        name: "[Standard] X-Plane",
+        name: "[Standard] Confgurator",
         sim: "X-Plane",
-        eepromFileName: "standard-x-plane.bin",
+        eepromFileName: "standard-configurator.bin",
         isStdProfile: true,
-        simEnabeld: true,
+        simEnabled: false,
         port: 49001,
         ip: "127.0.0.1",
         useImu: false,
         channelMap: [ 1, 15, 13, 16],
-        useSerialTcp: true,
-        comPort: "",
-        tcpPort: 5762,
+        useSerialReceiver: true,
+        serialPort: "",
+        serialUart: 3,
         serialProtocol: "SBus",
-        baudrate: false,
-        stopbits: false,
+        baudRate: false,
+        stopBits: false,
+        parity: false
+    },
+    {
+        name: "[Standard] X-Plane",
+        sim: "X-Plane",
+        eepromFileName: "standard-x-plane.bin",
+        isStdProfile: true,
+        simEnabled: true,
+        port: 49001,
+        ip: "127.0.0.1",
+        useImu: false,
+        channelMap: [ 1, 15, 13, 16],
+        useSerialReceiver: true,
+        serialPort: "",
+        serialUart: 3,
+        serialProtocol: "SBus",
+        baudRate: false,
+        stopBits: false,
         parity: false
     },
     {
@@ -43,19 +68,18 @@ const stdProfiles = [
         sim: "RealFlight",
         eepromFileName: "standard-realflight.bin",
         isStdProfile: true,
-        simEnabeld: true,
+        simEnabled: true,
         port: 49001,
         ip: "127.0.0.1",
         useImu: false,
         channelMap: [ 1, 13, 14, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        useSerialTcp: true,
-        comPort: "",
-        tcpPort: 5762,
+        useSerialReceiver: true,
+        serialPort: "",
+        serialUart: 3,
         serialProtocol: "SBus",
-        baudrate: false,
-        stopbits: false,
+        baudRate: false,
+        stopBits: false,
         parity: false
-        
     }
 ];
 
@@ -66,31 +90,14 @@ TABS.sitl.initialize = (callback) => {
  
     if (GUI.active_tab != 'sitl') {
         GUI.active_tab = 'sitl';
-        googleAnalytics.sendAppView('SITL');
     }
 
-    if (GUI.active_tab != 'sitl') {
-        GUI.active_tab = 'sitl';
-        googleAnalytics.sendAppView('SITL');
-    }
-
-    GUI.load("./tabs/sitl.html", function () {
-        localize();
+    GUI.load(path.join(__dirname, "sitl.html"), function () {
+        i18n.localize();
     
-    var os = GUI.operating_system;
-    if (os != 'Windows' && os != 'Linux') {
-
-        $('.content_wrapper').find('*').remove();
-        $('.content_wrapper').append(`<h2>${chrome.i18n.getMessage('sitlOSNotSupported')}</h2>`);
-        
-        GUI.content_ready(callback);
-        return;
-    }
-
-
     var currentSim, currentProfile, profiles;
     var mapping = new Array(28).fill(0);
-    var serialProtocolls = Ser2TCP.getProtocolls();
+    var serialProtocolls = SitlSerialPortUtils.getProtocolls();
     var sim_e = $('#simulator');
     var enableSim_e = $('#sitlEnableSim');
     var port_e = $('#simPort');
@@ -101,13 +108,12 @@ TABS.sitl.initialize = (callback) => {
     var profileNewBtn_e = $('#sitlProfileNew');
     var profileDeleteBtn_e = $('#sitlProfileDelete');
     var serialPorts_e = $('#sitlSerialPort');
-    var serialTcpEnable = $('#serialTcpEnable')
-    var tcpPort_e = $('#serialTCPPort');
+    var serialReceiverEnable_e = $('#serialReceiverEnable');
+    var serialUart_e = $('#sitlSerialUART');
     var protocollPreset_e = $('#serialProtocoll'); 
     var baudRate_e = $('#sitlBaud');
     var stopBits_e = $('#serialStopbits');
     var parity_e = $('#serialParity');
-    var serialTcpEable_e = $('#serialTcpEnable');
     
     if (SITLProcess.isRunning) {
         $('.sitlStart').addClass('disabled');
@@ -117,19 +123,23 @@ TABS.sitl.initialize = (callback) => {
         $('.sitlStart').removeClass('disabled');
     }
 
-    $('#sitlLog').val(SITL_LOG);
-    $('#sitlLog').animate({scrollTop: $('#sitlLog').scrollHeight}, "fast");
+    var $sitlLog = $('#sitlLog');
+    $sitlLog.val(SITL_LOG);
+    if ($sitlLog && $sitlLog.length == 1) {
+        $sitlLog.val(SITL_LOG);
+        $sitlLog.animate({scrollTop: $sitlLog[0].scrollHeight -  $sitlLog.height()}, "fast");
+    }
 
     profiles = stdProfiles.slice(0);
-    chrome.storage.local.get('sitlProfiles', (result) => {
-        if(result.sitlProfiles) 
-            profiles.push(...result.sitlProfiles);
-  
-        initElements(true);
-    });
+    var sitlProfiles = store.get('sitlProfiles', false);
+    if (sitlProfiles) {
+        profiles.push(...sitlProfiles);
+    }
+    initElements(true);
     
-    Ser2TCP.resetPortsList();
-    Ser2TCP.pollSerialPorts(ports => {
+    
+    SitlSerialPortUtils.resetPortsList();
+    SitlSerialPortUtils.pollSerialPorts(ports => {
         serialPorts_e.find('*').remove();
         ports.forEach(port => {
             serialPorts_e.append(`<option value="${port}">${port}</option>`)
@@ -138,7 +148,8 @@ TABS.sitl.initialize = (callback) => {
     });
     
     enableSim_e.on('change', () => {
-        currentProfile.simEnabeld = enableSim_e.is(':checked');
+        currentProfile.simEnabled = enableSim_e.is(':checked');
+        updateSim();
     });
 
     sim_e.on('change', () => {     
@@ -204,51 +215,52 @@ TABS.sitl.initialize = (callback) => {
         }
         channelMap = channelMap.substring(0, channelMap.length - 1);
         
-        var serialOptions;
-        var selectedProtocoll = protocollPreset_e.find(':selected').val();
-        if (selectedProtocoll == "manual") {
-            serialOptions = {
-                protocollName: "manual",
-                bitrate: currentProfile.baudrate,
-                stopBits: currentProfile.stopBits,
-                parityBit: currentProfile.parity
-            }
-        } else {;
-            serialOptions = {
-                protocollName: selectedProtocoll
+        var serialOptions = null;
+        if ( serialReceiverEnable_e.is(':checked') && !!serialPorts_e.val()) {
+            var selectedProtocoll = protocollPreset_e.find(':selected').val();
+            if (selectedProtocoll == "manual") {
+                serialOptions = {
+                    protocollName: "manual",
+                    baudRate: baudRate_e.val() || currentProfile.baudRate || "115200",
+                    stopBits: stopBits_e.val() || currentProfile.stopBits || "One",
+                    parity: parity_e.val() || currentProfile.parity || "None",
+                    serialPort: serialPorts_e.val() || currentProfile.serialPort || "",
+                    serialUart: serialUart_e.val() || currentProfile.serialUart || -1
+                }
+            } else {;
+                serialOptions = {
+                    protocollName: selectedProtocoll || "SBus",
+                    serialPort: serialPorts_e.val() || currentProfile.serialPort || "" ,
+                    serialUart: serialUart_e.val() || currentProfile.serialUart || -1
+                }
             }
         }
+
+        appendLog("\n");
         
-        SITLProcess.start(currentProfile.eepromFileName, sim, useImu_e.is(':checked'), simIp, simPort, channelMap, result => {
-                        
-        appendLog(result);            
-        if (serialTcpEnable.is(':checked') && result == `[SIM] Connection with ${currentProfile.sim} successfully established.\n`) {
-            Ser2TCP.start(serialPorts_e.val(), serialOptions, currentProfile.ip, currentProfile.tcpPort, result => {
-                appendLog(`[Serial2TCP] ${result}`);
-            });
-        }
+        SITLProcess.start(currentProfile.eepromFileName, sim, useImu_e.is(':checked'), simIp, simPort, channelMap, serialOptions,result => {
+            appendLog(result);
         });
     });
 
     $('.sitlStop').on('click', ()=> {
         $('.sitlStop').addClass('disabled');
         $('.sitlStart').removeClass('disabled');
-        Ser2TCP.stop();
         SITLProcess.stop();
-        appendLog(chrome.i18n.getMessage('sitlStopped'));
+        appendLog(i18n.getMessage('sitlStopped'));
     });
 
-    profileSaveBtn_e.on('click', () => {
+    profileSaveBtn_e.on('click', function () {
         saveProfiles();
     });
 
-    profileNewBtn_e.on('click', () => {
-        var name = prompt(chrome.i18n.getMessage('sitlNewProfile'), chrome.i18n.getMessage('sitlEnterName'));
+    profileNewBtn_e.on('click', function () {
+        var name = prompt(i18n.getMessage('sitlNewProfile'), i18n.getMessage('sitlEnterName'));
         if (!name)
             return;
 
         if (profiles.find(e => { return e.name == name })) {
-            alert(chrome.i18n.getMessage('sitlProfileExists'))
+            GUI.alert(i18n.getMessage('sitlProfileExists'))
             return;
         }
         var eerpromName = name.replace(/[^a-z0-9]/gi, '_').toLowerCase() + ".bin";
@@ -256,17 +268,18 @@ TABS.sitl.initialize = (callback) => {
                 name: name,
                 sim: "RealFlight",
                 isStdProfile: false,
-                simEnabeld: true,
+                simEnabled: false,
                 eepromFileName: eerpromName,
                 port: 49001,
                 ip: "127.0.0.1",
                 useImu: false,
                 channelMap: [ 1, 13, 14, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                useSerialTcp: true,
-                tcpPort: 5762,
+                useSerialReceiver: true,
+                serialPort: serialPorts_e.val(),
+                serialUart: 3,
                 serialProtocol: "SBus",
-                baudrate: false,
-                stopbits: false,
+                baudRate: false,
+                stopBits: false,
                 parity: false
         }
         profiles.push(profile);
@@ -276,10 +289,10 @@ TABS.sitl.initialize = (callback) => {
         saveProfiles();
     });
 
-    profileDeleteBtn_e.on('click', () => {
+    profileDeleteBtn_e.on('click', function () {
 
         if (currentProfile.isStdProfile) {
-            alert(chrome.i18n.getMessage('sitlStdProfileCantDeleted'));
+            GUI.alert(i18n.getMessage('sitlStdProfileCantDeleted'));            
             return;
         }
 
@@ -295,8 +308,8 @@ TABS.sitl.initialize = (callback) => {
         saveProfiles();
     });
 
-    serialTcpEable_e.on('change', () => {
-       currentProfile.useSerialTcp = serialTcpEable_e.is(':checked');
+    serialReceiverEnable_e.on('change', () => {
+       currentProfile.useSerialReceiver = serialReceiverEnable_e.is(':checked');
     });
 
     protocollPreset_e.on('change', () => {
@@ -308,36 +321,34 @@ TABS.sitl.initialize = (callback) => {
 
         if (selectedProtocoll != 'manual'){  
             baudRate_e.prop('disabled', true);
-            baudRate_e.val(protocoll.baudrate);
+            baudRate_e.val(protocoll.baudRate);
             stopBits_e.prop('disabled', true);
             stopBits_e.val(protocoll.stopBits);
             parity_e.prop('disabled', true);
             parity_e.val(protocoll.parity);
-
+            serialUart_e.prop('disabled', selectedProtocoll == "Flight Controller Proxy");
         } else {
             baudRate_e.prop('disabled', false);
-            baudRate_e.val('');
             stopBits_e.prop('disabled', false);
-            stopBits_e.val('');
             parity_e.prop('disabled', false);
-            parity_e.val('');
+            serialUart_e.prop('disabled', false);
         }
 
         currentProfile.serialProtocol = selectedProtocoll;
     });
 
     serialPorts_e.on('change', () => {
-        currentProfile.comPort = serialPorts_e.val();
+        currentProfile.serialPort = serialPorts_e.val();
     });
 
-    tcpPort_e.on('change', () => {
-        currentProfile.tcpPort = parseInt(tcpPort_e.val());
+    serialUart_e.on('change', () => {
+        currentProfile.serialUart = parseInt(serialUart_e.val());
     });
 
     baudRate_e.on('change', () => {
         var baud = parseInt(baudRate_e.val());
         if (baud != NaN)
-            currentProfile.baudrate = baud
+            currentProfile.baudRate = baud
     });
 
     stopBits_e.on('change', () => {
@@ -364,17 +375,15 @@ TABS.sitl.initialize = (callback) => {
                 protocollPreset_e.append(`<option value="${protocoll.name}">${protocoll.name}</option>`);
             });
 
-            chrome.storage.local.get('sitlLastProfile', (result) => {
-                if (result.sitlLastProfile) {    
-                    var element = profiles.find(profile => {
-                        return profile.name == result.sitlLastProfile;
-                    });
+            var sitlLastProfile = store.get('sitlLastProfile', false);
+            if (sitlLastProfile) {    
+                var element = profiles.find(profile => {
+                    return profile.name == sitlLastProfile;
+                });
 
-                    if (element)
-                        profiles_e.val(element.name).trigger('change');
-                }
-            });
-
+                if (element)
+                    profiles_e.val(element.name).trigger('change');
+            }
         }
         
         updateCurrentProfile();
@@ -382,7 +391,7 @@ TABS.sitl.initialize = (callback) => {
 
     function saveProfiles() {
         if (currentProfile.isStdProfile) {
-            alert(chrome.i18n.getMessage('sitlStdProfileCantOverwritten'));
+            GUI.alert(i18n.getMessage('sitlStdProfileCantOverwritten'));
             return;
         }        
         var profilesToSave = [];
@@ -391,9 +400,7 @@ TABS.sitl.initialize = (callback) => {
                 profilesToSave.push(profile);
         });
 
-        chrome.storage.local.set({
-            'sitlProfiles': profilesToSave
-        });
+        store.set('sitlProfiles', profilesToSave);
     
     }
 
@@ -407,9 +414,12 @@ TABS.sitl.initialize = (callback) => {
                 } else {
                     port_e.val(currentProfile.port);
                 }
-                port_e.prop('disabled', simulator.isPortFixed);
+                sim_e.prop('disabled', !currentProfile.simEnabled);
+                simIp_e.prop('disabled', !currentProfile.simEnabled);
+                port_e.prop('disabled', simulator.isPortFixed || !currentProfile.simEnabled);
+                useImu_e.prop('disabled', !currentProfile.simEnabled);
                 
-                renderChanMapTable();                                
+                renderChanMapTable();
                 return;
             }
         });
@@ -422,48 +432,42 @@ TABS.sitl.initialize = (callback) => {
         });
         currentProfile = profiles[selectedIndex];
         
-        if (currentProfile.isStdProfile) {
-            currentProfile = structuredClone(stdProfiles.find((profile) => {
-                return profile.sim == currentProfile.sim;
-            }));
-        }
-
         protocollPreset_e.val(currentProfile.serialProtocol);
         if (currentProfile.serialProtocol == "manual")
         {
-            baudRate_e.val(currentProfile.baudrate);
+            baudRate_e.val(currentProfile.baudRate);
             baudRate_e.prop('disabled', false);
             stopBits_e.val(currentProfile.stopBits);
             stopBits_e.prop('disabled', false);
             parity_e.val(currentProfile.parity);
             parity_e.prop('disabled', false);
+            serialUart_e.prop('disabled', false);
         } else {      
             var protocoll = serialProtocolls.find(protocoll => {
                 return protocoll.name == currentProfile.serialProtocol;
             });
             baudRate_e.prop('disabled', true);
-            baudRate_e.val(protocoll.baudrate);
+            baudRate_e.val(protocoll.baudRate);
             stopBits_e.prop('disabled', true);
             stopBits_e.val(protocoll.stopBits);
             parity_e.prop('disabled', true);
             parity_e.val(protocoll.parity);   
+            serialUart_e.prop('disabled', currentProfile.serialProtocol == "Flight Controller Proxy");
         }
         
-        if (currentProfile.comPort != "")
-            serialPorts_e.val(currentProfile.comPort);
+        if (currentProfile.serialPort != "")
+            serialPorts_e.val(currentProfile.serialPort);
         
-        enableSim_e.prop('checked', currentProfile.simEnabeld).trigger('change');
-        serialTcpEable_e.prop('checked', currentProfile.useSerialTcp).trigger('change');
-        tcpPort_e.val(currentProfile.tcpPort);
+        enableSim_e.prop('checked', currentProfile.simEnabled).trigger('change');
+        serialReceiverEnable_e.prop('checked', currentProfile.useSerialReceiver).trigger('change');
+        serialUart_e.val(currentProfile.serialUart);
         mapping = currentProfile.channelMap;
         sim_e.val(currentProfile.sim);
         updateSim();
         simIp_e.val(currentProfile.ip).trigger('change'); 
         useImu_e.prop('checked', currentProfile.useImu).trigger('change');
 
-        chrome.storage.local.set({
-            'sitlLastProfile': selected
-        });
+        store.set('sitlLastProfile', selected);
     }
 
     function renderChanMapTable() 
@@ -485,7 +489,7 @@ TABS.sitl.initialize = (callback) => {
 
             row.find(".inavChannel").val(mapping[i]).on('change', (sender) => {
                 mapping[$(sender.target).data('out')] = parseInt($(sender.target).val());
-                chrome.storage.local.set({'sitlMapping': mapping});
+                store.set('sitlMapping', mapping);
             });
         }
     }
@@ -510,8 +514,11 @@ TABS.sitl.initialize = (callback) => {
 
     function appendLog(message){
         SITL_LOG += message;
-        $('#sitlLog').val(SITL_LOG);
-        $('#sitlLog').animate({scrollTop: $('#sitlLog')[0].scrollHeight}, "fast");
+        var $sitlLog = $('#sitlLog');
+        if ($sitlLog && $sitlLog.length == 1) {
+            $sitlLog.val(SITL_LOG);
+            $sitlLog.animate({scrollTop: $sitlLog[0].scrollHeight -  $sitlLog.height()}, "fast");
+        }
     }
 
     GUI.content_ready(callback);
@@ -519,7 +526,7 @@ TABS.sitl.initialize = (callback) => {
 };
 
 TABS.sitl.cleanup = (callback) => {
-    Ser2TCP.stopPollSerialPorts();
+    SitlSerialPortUtils.stopPollSerialPorts();
     if (callback) 
         callback();
 };

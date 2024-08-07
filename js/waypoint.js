@@ -1,7 +1,6 @@
-/*global $*/
 'use strict';
 
-let Waypoint = function (number, action, lat, lon, alt=0, p1=0, p2=0, p3=0, endMission=0, isUsed=true, isAttached=false, attachedId="") {
+let Waypoint = function (number, action, lat, lon, alt=0, p1=0, p2=0, p3=0, endMission=0, isUsed=true, isAttached=false, attachedId="", multiMissionIdx = 0) {
 
     var self = {};
     let layerNumber = "undefined";
@@ -136,6 +135,14 @@ let Waypoint = function (number, action, lat, lon, alt=0, p1=0, p2=0, p3=0, endM
         attachedNumber = data;
     };
 
+    self.setMultiMissionIdx = function(data) {
+        multiMissionIdx = data;
+    }
+
+    self.getMultiMissionIdx = function() {
+        return multiMissionIdx;
+    }
+
     self.getElevation = async function (globalSettings) {
         let elevation = "N/A";
         if (globalSettings.mapProviderType == 'bing') {
@@ -157,3 +164,5 @@ let Waypoint = function (number, action, lat, lon, alt=0, p1=0, p2=0, p3=0, endM
 
     return self;
 };
+
+module.exports = Waypoint;
