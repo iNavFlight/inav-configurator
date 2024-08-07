@@ -1445,6 +1445,7 @@ TABS.mission_control.initialize = function (callback) {
 
                 let element_str = '\
                 <div class="point">\
+                    <hr>\
                     <div class="checkbox">\
                         <label class="point-label" for="' + element_id + '"><span ' + layer_name + '>' + layer_name + '</span></label>\
                         <input id="' + element_id + '" type="checkbox" data-live="true" class="toggle"' + (is_visible ? "checked=\"true\"" : "") + '">\
