@@ -2101,6 +2101,11 @@ TABS.mission_control.initialize = function (callback) {
         // Add previously saved GEO files
         //////////////////////////////////////////////////////////////////////////////////////////////
 
+        if(store.get("custom_overlay_list") === undefined) {
+            store.set("custom_overlay_list", []);
+        }
+
+
         // store.set("custom_overlay_list", [])
         for(let saved_layer of store.get("custom_overlay_list")){
             console.log("found saved layer: ");
