@@ -1444,11 +1444,11 @@ TABS.mission_control.initialize = function (callback) {
                 let element_id = "layerVisOption_" + layer_name;
 
                 let element_str = '\
-                <div class="point">\
+                <div>\
                     <hr>\
                     <div class="checkbox">\
                         <label class="point-label" for="' + element_id + '"><span ' + layer_name + '>' + layer_name + '</span></label>\
-                        <input id="' + element_id + '" type="checkbox" data-live="true" class="toggle"' + (is_visible ? "checked=\"true\"" : "") + '">\
+                        <input id="' + element_id + '" type="checkbox" data-live="true" class="togglemedium"' + (is_visible ? "checked=\"true\"" : "") + '">\
                     </div>\
                     <div class="default_btn">\
                         <a id="' + element_id + '_Save" href="#" i18n="layerVisibilityWindowLayerSave">Save</a>\
@@ -1733,8 +1733,8 @@ TABS.mission_control.initialize = function (callback) {
             button.style = 'background: url(\'./images/CF_template_white.svg\') no-repeat 1px -1px;background-color: rgba(0,60,136,.5);';
 
             var handleShowSettings = function () {
-                $('#layerVisibilitySelect').fadeIn(300);
                 updateLayerVisibilitySelectOptions();
+                $('#layerVisibilitySelect').fadeIn(300);
             };
 
             button.addEventListener('click', handleShowSettings, false);
