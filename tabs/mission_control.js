@@ -2125,7 +2125,7 @@ TABS.mission_control.initialize = function (callback) {
             });
 
             vectorLayer.set("no_interaction", saved_layer.no_interaction, true); // stops custom dragging controls for waypoints from preventing the user panning the map
-            vectorLayer.set("show_info_on_hover", saved_layer.show_info_on_hover, true); // allows info box to work with this feature
+            vectorLayer.set("show_info_on_hover", saved_layer.show_info_on_hover); // allows info box to work with this feature
             vectorLayer.set("is_vis_toggleable", saved_layer.is_vis_toggleable, true); // allows user to hide this layer in visibility selector
             vectorLayer.set("name", saved_layer.name, true); // name for visibility toggler
             map.addLayer(vectorLayer);
@@ -2173,10 +2173,10 @@ TABS.mission_control.initialize = function (callback) {
                 let temp_layer = new ol.layer.Vector({
                     source: vectorSource,
                 });
-                temp_layer.set("no_interaction", true, true); // stops custom dragging controls for waypoints from preventing the user panning the map
-                temp_layer.set("show_info_on_hover", true, true); // allows info box to work with this feature
-                temp_layer.set("is_vis_toggleable", true, true); // allows user to hide this layer in visibility selector
-                temp_layer.set("name", file_name, true); // name for visibility toggler
+                temp_layer.set("no_interaction", true); // stops custom dragging controls for waypoints from preventing the user panning the map
+                temp_layer.set("show_info_on_hover", true); // allows info box to work with this feature
+                temp_layer.set("is_vis_toggleable", true); // allows user to hide this layer in visibility selector
+                temp_layer.set("name", file_name); // name for visibility toggler
                 map.addLayer(temp_layer);
                 updateLayerVisibilitySelectOptions();
             });
@@ -2191,7 +2191,7 @@ TABS.mission_control.initialize = function (callback) {
          */
         const displayFeatureInfo = function (pixel) {
             const features = [];
-            map.forEachFeatureAtPixel(pixel, function (feature) {
+            map.forEachFeatureAtPixel(pixel, function (feature) { //TODO: This does not include the features I actually want
                 if (feature.get('show_info_on_hover') === true){
                     features.push(feature);
                 }
