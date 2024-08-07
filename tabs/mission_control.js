@@ -1469,7 +1469,7 @@ TABS.mission_control.initialize = function (callback) {
                 });
                 let delete_element = document.getElementById(element_id + "_Delete");
                 delete_element.addEventListener("click", function () {
-                    remove_layer_from_disk(layer.get("name"));
+                    remove_layer_from_disk(layer);
                 });
             }
         })
@@ -1507,11 +1507,13 @@ TABS.mission_control.initialize = function (callback) {
         GUI.log("saved layer: " + name);
     }
 
-    function remove_layer_from_disk(layer_name){
+    function remove_layer_from_disk(layer){
         let custom_overlay_list = store.get("custom_overlay_list");
         let new_custom_overlay_list = custom_overlay_list.filter(
-            (layer_element) => layer_element.name !== layer_name);
+            (layer_element) => layer_element.name !== layer.get("name"));
         store.set("custom_overlay_list", new_custom_overlay_list);
+        map.removeLayer(layer);
+        updateLayerVisibilitySelectOptions();
     }
 
     function renderWaypointOptionsTable(waypoint) {
