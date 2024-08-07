@@ -2177,6 +2177,7 @@ TABS.mission_control.initialize = function (callback) {
                 temp_layer.set("is_vis_toggleable", true, true); // allows user to hide this layer in visibility selector
                 temp_layer.set("name", file_name, true); // name for visibility toggler
                 map.addLayer(temp_layer);
+                updateLayerVisibilitySelectOptions();
             });
             map.addInteraction(dragAndDropInteraction);
         }
