@@ -1467,7 +1467,10 @@ TABS.mission_control.initialize = function (callback) {
                 save_element.addEventListener("click", function () {
                     save_layer_to_disk(layer);
                 });
-
+                let delete_element = document.getElementById(element_id + "_Delete");
+                delete_element.addEventListener("click", function () {
+                    remove_layer_from_disk(layer.get("name"));
+                });
             }
         })
         GUI.switchery();
@@ -1507,7 +1510,7 @@ TABS.mission_control.initialize = function (callback) {
     function remove_layer_from_disk(layer_name){
         let custom_overlay_list = store.get("custom_overlay_list");
         let new_custom_overlay_list = custom_overlay_list.filter(
-            (layer_element) => layer_element.get("name") !== layer_name);
+            (layer_element) => layer_element.name !== layer_name);
         store.set("custom_overlay_list", new_custom_overlay_list);
     }
 
