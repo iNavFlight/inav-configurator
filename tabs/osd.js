@@ -3493,41 +3493,39 @@ function createCustomElements(){
                         <option value="0">none</option>
                         <option data-value="text" value="1">Text</option>
                         <option data-value="ico" value="2">Icon Static</option>
-                        <option data-value="ico_gv" value="3">Icon Global Variable</option>
-                        <option data-value="gv" value="4">Global Variable 0</option>
-                        <option data-value="gv" value="5">Global Variable 00</option>
-                        <option data-value="gv" value="6">Global Variable 000</option>
-                        <option data-value="gv" value="7">Global Variable 0000</option>
-                        <option data-value="gv" value="8">Global Variable 00000</option>
-                        <option data-value="gv" value="9">Global Variable 0.0</option>
-                        <option data-value="gv" value="10">Global Variable 00.0</option>
-                        <option data-value="gv" value="11">Global Variable 00.00</option>
-                        <option data-value="gv" value="12">Global Variable 000.0</option>
-                        <option data-value="gv" value="13">Global Variable 000.00</option>
-                        <option data-value="gv" value="14">Global Variable 0000.0</option>
-                        <option data-value="lc" value="15">Logic Condition 0</option>
-                        <option data-value="lc" value="16">Logic Condition 00</option>
-                        <option data-value="lc" value="17">Logic Condition 000</option>
-                        <option data-value="lc" value="18">Logic Condition 0000</option>
-                        <option data-value="lc" value="19">Logic Condition 00000</option>
-                        <option data-value="lc" value="20">Logic Condition 0.0</option>
-                        <option data-value="lc" value="21">Logic Condition 00.0</option>
-                        <option data-value="lc" value="22">Logic Condition 00.00</option>
-                        <option data-value="lc" value="23">Logic Condition 000.0</option>
-                        <option data-value="lc" value="24">Logic Condition 000.00</option>
-                        <option data-value="lc" value="25">Logic Condition 0000.0</option>
+                        <option data-value="ico_gv" value="3">Icon from Global Variable</option>
+                        <option data-value="ico_lc" value="4">Icon from Logic Condition</option>
+                        <option data-value="gv" value="5">Global Variable 0</option>
+                        <option data-value="gv" value="6">Global Variable 00</option>
+                        <option data-value="gv" value="7">Global Variable 000</option>
+                        <option data-value="gv" value="8">Global Variable 0000</option>
+                        <option data-value="gv" value="9">Global Variable 00000</option>
+                        <option data-value="gv" value="10">Global Variable 0.0</option>
+                        <option data-value="gv" value="11">Global Variable 00.0</option>
+                        <option data-value="gv" value="12">Global Variable 00.00</option>
+                        <option data-value="gv" value="13">Global Variable 000.0</option>
+                        <option data-value="gv" value="14">Global Variable 000.00</option>
+                        <option data-value="gv" value="15">Global Variable 0000.0</option>
+                        <option data-value="lc" value="16">Logic Condition 0</option>
+                        <option data-value="lc" value="17">Logic Condition 00</option>
+                        <option data-value="lc" value="18">Logic Condition 000</option>
+                        <option data-value="lc" value="19">Logic Condition 0000</option>
+                        <option data-value="lc" value="20">Logic Condition 00000</option>
+                        <option data-value="lc" value="21">Logic Condition 0.0</option>
+                        <option data-value="lc" value="22">Logic Condition 00.0</option>
+                        <option data-value="lc" value="23">Logic Condition 00.00</option>
+                        <option data-value="lc" value="24">Logic Condition 000.0</option>
+                        <option data-value="lc" value="25">Logic Condition 000.00</option>
+                        <option data-value="lc" value="26">Logic Condition 0000.0</option>
                         `);
 
             customElementRowType.append($('<td>').append(select));
             customElementRowValue.append($('<td>').addClass('osdCustomElement-' + i + '-part-' + ii + '-value').append(
-                $('<input>').addClass('value').addClass('text').attr('type', 'text').attr('maxlength', FC.OSD_CUSTOM_ELEMENTS.settings.customElementTextSize).hide()
-            ).append(
-                $('<input>').addClass('value').addClass('ico').attr('min', 1).attr('max', 255).hide()
-            ).append(
-                $('<select>').addClass('value').addClass('ico_gv').html(getGVoptions()).hide()
-            ).append(
-                $('<select>').addClass('value').addClass('gv').html(getGVoptions()).hide()
-            ).append(
+                $('<input>').addClass('value').addClass('text').attr('type', 'text').attr('maxlength', FC.OSD_CUSTOM_ELEMENTS.settings.customElementTextSize).hide()).append(
+                $('<input>').addClass('value').addClass('ico').attr('min', 1).attr('max', 255).hide()).append(
+                $('<select>').addClass('value').addClass('ico_gv').html(getGVoptions()).hide()).append(
+                $('<select>').addClass('value').addClass('ico_lc').html(getLCoptions()).hide()).append(
+                $('<select>').addClass('value').addClass('gv').html(getGVoptions()).hide()).append(
                 $('<select>').addClass('value').addClass('lc').html(getLCoptions()).hide()
             ));
 
@@ -3596,47 +3594,50 @@ function updateOSDCustomElementsDisplay() {
                                 preview += FONT.symbol(SYM.HOME);
                                 break;
                             case 4:
-                            case 15:
-                                preview += " 2";
+                                preview += FONT.symbol(SYM.HOME);
                                 break;
                             case 5:
                             case 16:
-                                preview += " 57";
+                                preview += " 2";
                                 break;
                             case 6:
                             case 17:
-                                preview += " 316";
+                                preview += " 57";
                                 break;
                             case 7:
                             case 18:
-                                preview += " 6926";
+                                preview += " 316";
                                 break;
                             case 8:
                             case 19:
-                                preview += " 36520";
+                                preview += " 6926";
                                 break;
                             case 9:
                             case 20:
-                                preview += " " + FONT.embed_dot("1.6");
+                                preview += " 36520";
                                 break;
                             case 10:
                             case 21:
-                                preview += " " + FONT.embed_dot("21.4");
+                                preview += " " + FONT.embed_dot("1.6");
                                 break;
                             case 11:
                             case 22:
-                                preview += " " + FONT.embed_dot("34.26");
+                                preview += " " + FONT.embed_dot("21.4");
                                 break;
                             case 12:
                             case 23:
-                                preview += " " + FONT.embed_dot("315.7");
+                                preview += " " + FONT.embed_dot("34.26");
                                 break;
                             case 13:
                             case 24:
-                                preview += " " + FONT.embed_dot("562.46");
+                                preview += " " + FONT.embed_dot("315.7");
                                 break;
                             case 14:
                             case 25:
+                                preview += " " + FONT.embed_dot("562.46");
+                                break;
+                            case 15:
+                            case 26:
                                 preview += " " + FONT.embed_dot("4629.1");
                                 break;
                         }
@@ -3677,6 +3678,8 @@ function fillCustomElementsValues() {
                     valueCell.find('.ico_gv').val(FC.OSD_CUSTOM_ELEMENTS.items[i].customElementItems[ii].value).trigger('change');
                     break;
                 case 4:
+                    valueCell.find('.ico_lc').val(FC.OSD_CUSTOM_ELEMENTS.items[i].customElementItems[ii].value).trigger('change');
+                    break;
                 case 5:
                 case 6:
                 case 7:
@@ -3687,9 +3690,9 @@ function fillCustomElementsValues() {
                 case 12:
                 case 13:
                 case 14:
+                case 15:
                     valueCell.find('.gv').val(FC.OSD_CUSTOM_ELEMENTS.items[i].customElementItems[ii].value).trigger('change');
                     break;
-                case 15:
                 case 16:
                 case 17:
                 case 18:
@@ -3700,6 +3703,7 @@ function fillCustomElementsValues() {
                 case 23:
                 case 24:
                 case 25:
+                case 26:
                     valueCell.find('.lc').val(FC.OSD_CUSTOM_ELEMENTS.items[i].customElementItems[ii].value).trigger('change');
                     break;
             }
@@ -3799,6 +3803,8 @@ function customElementGetDataForRow(row){
                 partValue = parseInt(valueCell.find('.ico_gv').find(':selected').val());
                 break;
             case 4:
+                partValue = parseInt(valueCell.find('.ico_lc').find(':selected').val());
+                break;
             case 5:
             case 6:
             case 7:
@@ -3809,9 +3815,9 @@ function customElementGetDataForRow(row){
             case 12:
             case 13:
             case 14:
+            case 15:
                 partValue = parseInt(valueCell.find('.gv').find(':selected').val());
                 break;
-            case 15:
             case 16:
             case 17:
             case 18:
@@ -3822,6 +3828,7 @@ function customElementGetDataForRow(row){
             case 23:
             case 24:
             case 25:
+            case 26:
                 partValue = parseInt(valueCell.find('.lc').find(':selected').val());
                 break;
         }
