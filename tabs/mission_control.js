@@ -1450,11 +1450,13 @@ TABS.mission_control.initialize = function (callback) {
                         <label class="point-label" for="' + element_id + '"><span ' + layer_name + '>' + layer_name + '</span></label>\
                         <input id="' + element_id + '" type="checkbox" data-live="true" class="togglemedium"' + (is_visible ? "checked=\"true\"" : "") + '">\
                     </div>\
-                    <div class="default_btn">\
-                        <a id="' + element_id + '_Save" href="#" i18n="layerVisibilityWindowLayerSave">Save</a>\
-                    </div>\
-                    <div class="default_btn">\
-                        <a id="' + element_id + '_Delete" href="#" i18n="layerVisibilityWindowLayerDelete">Delete</a>\
+                    <div>\
+                        <div class="default_btn">\
+                            <a id="' + element_id + '_Save" href="#" i18n="layerVisibilityWindowLayerSave">Save</a>\
+                        </div>\
+                        <div class="default_btn">\
+                            <a id="' + element_id + '_Delete" href="#" i18n="layerVisibilityWindowLayerDelete">Delete</a>\
+                        </div>\
                     </div>\
                 </div>';
 
@@ -2119,6 +2121,10 @@ TABS.mission_control.initialize = function (callback) {
                 format: new ol.format.GeoJSON()
             });
 
+            vectorSource.forEachFeature(function (temp_feature) {
+                temp_feature.set("show_info_on_hover", saved_layer.show_info_on_hover);
+            });
+
             var vectorLayer = new ol.layer.Vector({
                 title: saved_layer.name,
                 source: vectorSource
@@ -2167,6 +2173,11 @@ TABS.mission_control.initialize = function (callback) {
                 const vectorSource = new ol.source.Vector({
                     features: event.features,
                 });
+
+                vectorSource.forEachFeature(function (temp_feature) {
+                    temp_feature.set("show_info_on_hover", true);
+                });
+
                 let file_name = event.file.name;
                 GUI.log("adding file to map: " + file_name);
 
