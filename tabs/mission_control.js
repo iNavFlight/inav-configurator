@@ -1437,9 +1437,7 @@ TABS.mission_control.initialize = function (callback) {
         map.getLayers().forEach(layer => {
             if (layer.get("is_vis_toggleable") === true) {
                 let layer_name = layer.get("name");
-                let is_visible = !!layer.getVisible();
-                GUI.log("adding to options: " + layer_name);
-                GUI.log("is visible? " + (is_visible ? "true" : "false"));
+                let is_visible = layer.getVisible();
 
                 let element_id = "layerVisOption_" + layer_name;
 
@@ -1463,7 +1461,6 @@ TABS.mission_control.initialize = function (callback) {
                 $('#layerSelectContent').append(element_str);
                 let element = document.getElementById(element_id);
                 element.addEventListener("change", function () {
-                    GUI.log("setting visibility of layer: " + layer_name + " to " + (element.checked ? "true" : "false"));
                     layer.setVisible(element.checked);
                 });
                 let save_element = document.getElementById(element_id + "_Save");
@@ -2117,7 +2114,7 @@ TABS.mission_control.initialize = function (callback) {
             });
 
             vectorSource.forEachFeature(function (temp_feature) {
-                temp_feature.set("show_info_on_hover", saved_layer.show_info_on_hover);
+                temp_feature.set("show_info_on_hover", saved_layer.show_info_on_hover); // `show info on hover` is saved to the layer, but is read per feature.
             });
 
             const vectorLayer = new ol.layer.Vector({
