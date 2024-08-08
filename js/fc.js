@@ -952,6 +952,16 @@ var FC = {
             'RC Channel 22',        // 47
             'RC Channel 23',        // 48
             'RC Channel 24',        // 49
+            'RC Channel 25',        // 50
+            'RC Channel 26',        // 51
+            'RC Channel 27',        // 52
+            'RC Channel 28',        // 53
+            'RC Channel 29',        // 54
+            'RC Channel 30',        // 55
+            'RC Channel 31',        // 56
+            'RC Channel 32',        // 57
+            'RC Channel 33',        // 58
+            'RC Channel 34',        // 59
         ];
     },
     getServoMixInputName: function (input) {
