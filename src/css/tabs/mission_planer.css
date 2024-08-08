@@ -285,6 +285,11 @@
       float: left;
     }
 */
+.layer-vis-select {
+    top: 160px;
+    left: .5em;
+}
+
 .mission-control-settings {
     top: 65px;
     left: .5em;

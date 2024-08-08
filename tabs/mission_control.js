@@ -1429,6 +1429,93 @@ TABS.mission_control.initialize = function (callback) {
         }
     }
 
+
+    function updateLayerVisibilitySelectOptions() {
+
+        $('#layerSelectContent').empty();
+
+        map.getLayers().forEach(layer => {
+            if (layer.get("is_vis_toggleable") === true) { // for every layer that has `is_vis_toggleable` set to true:
+                let layer_name = layer.get("name");
+                let is_visible = layer.getVisible();
+
+                let element_id = "layerVisOption_" + layer_name;
+
+                let element_str = '\
+                <div>\
+                    <hr>\
+                    <div class="checkbox">\
+                        <label class="point-label" for="' + element_id + '"><span ' + layer_name + '>' + layer_name + '</span></label>\
+                        <input id="' + element_id + '" type="checkbox" data-live="true" class="togglemedium"' + (is_visible ? "checked=\"true\"" : "") + '">\
+                    </div>\
+                    <div>\
+                        <div class="default_btn">\
+                            <a id="' + element_id + '_Save" href="#" i18n="layerVisibilityWindowLayerSave">Save</a>\
+                        </div>\
+                        <div class="default_btn">\
+                            <a id="' + element_id + '_Delete" href="#" i18n="layerVisibilityWindowLayerDelete">Delete</a>\
+                        </div>\
+                    </div>\
+                </div>';
+
+                $('#layerSelectContent').append(element_str);
+                let element = document.getElementById(element_id);
+                element.addEventListener("change", function () { // when the switch is toggled, update the layer's visibility on the map to reflect the state of the switch
+                    layer.setVisible(element.checked);
+                });
+                let save_element = document.getElementById(element_id + "_Save");
+                save_element.addEventListener("click", function () {
+                    save_layer_to_disk(layer);
+                });
+                let delete_element = document.getElementById(element_id + "_Delete");
+                delete_element.addEventListener("click", function () {
+                    remove_layer_from_disk(layer);
+                });
+            }
+        })
+        GUI.switchery();
+    }
+
+
+    /**
+     *
+     * @param {ol.layer.Vector} layer
+     */
+    function save_layer_to_disk(layer){
+        let custom_overlay_list = store.get("custom_overlay_list");
+        if(custom_overlay_list === undefined){
+            custom_overlay_list = [];
+        }
+
+        var writer = new ol.format.GeoJSON();
+        let geojsonStr = writer.writeFeatures(layer.getSource().getFeatures());  // save the features of the custom layer in a GEOJSON format
+
+        let name = layer.get("name");
+
+        let saved_layer = {
+            name: name,
+            no_interaction: layer.get("no_interaction"),
+            show_info_on_hover: layer.get("show_info_on_hover"),
+            is_vis_toggleable: layer.get("is_vis_toggleable"),
+            layer_data: geojsonStr
+        } // wrap the feature data with some extra info
+
+
+        custom_overlay_list.push(saved_layer);
+        GUI.log("saving layer...");
+        store.set("custom_overlay_list", custom_overlay_list);
+        GUI.log("saved layer: " + name);
+    }
+
+    function remove_layer_from_disk(layer){
+        let custom_overlay_list = store.get("custom_overlay_list");
+        let new_custom_overlay_list = custom_overlay_list.filter(
+            (layer_element) => layer_element.name !== layer.get("name"));
+        store.set("custom_overlay_list", new_custom_overlay_list);
+        map.removeLayer(layer);
+        updateLayerVisibilitySelectOptions();
+    }
+
     function renderWaypointOptionsTable(waypoint) {
         /*
          * Process Waypoint Options table UI
@@ -1534,7 +1621,7 @@ TABS.mission_control.initialize = function (callback) {
 
         });
         GUI.switchery();
-        i18n.localize();;
+        i18n.localize();
         return waypoint;
     }
 
@@ -1631,6 +1718,41 @@ TABS.mission_control.initialize = function (callback) {
 
         };
         ol.inherits(app.PlannerSettingsControl, ol.control.Control);
+
+        /**
+         * Responsible for adding the button that brings up the custom layer menu
+         * @constructor
+         * @extends {ol.control.Control}
+         * @param {Object=} opt_options Control options.
+         */
+        app.PlannerLayerVisibilityControl = function (opt_options) {
+            var options = opt_options || {};
+            var button = document.createElement('button');
+
+            button.innerHTML = ' ';
+            button.style = 'background: url(\'./images/icons/cf_icon_gps_white.svg\') no-repeat 1px -1px;background-color: rgba(0,60,136,.5);';
+
+            var handleShowSettings = function () {
+                updateLayerVisibilitySelectOptions();
+                $('#layerVisibilitySelect').fadeIn(300);
+            };
+
+            button.addEventListener('click', handleShowSettings, false);
+            button.addEventListener('touchstart', handleShowSettings, false);
+
+            var element = document.createElement('div');
+            element.className = 'layer-vis-select ol-unselectable ol-control';
+            element.appendChild(button);
+            element.title = 'Map Layer Select';
+
+            ol.control.Control.call(this, {
+                element: element,
+                target: options.target
+            });
+
+        };
+        ol.inherits(app.PlannerLayerVisibilityControl, ol.control.Control);
+
 
         /**
          * @constructor
@@ -1746,12 +1868,20 @@ TABS.mission_control.initialize = function (callback) {
 
             var feature = map.forEachFeatureAtPixel(evt.pixel,
                 function (feature, layer) {
-                    return feature;
+                    if(layer.get("no_interaction") !== true){
+                        return feature;
+                    }
+                    // for features from layers that have this set to true, ignore their existence.
+                    // This currently applies only to files the user has dragged onto the map.
                 });
 
             tempMarker = map.forEachFeatureAtPixel(evt.pixel,
                 function (feature, layer) {
-                    return layer;
+                    if(layer.get("no_interaction") != true){
+                        return layer;
+                    }
+                    // for features from layers that have this set to true, ignore their existence.
+                    // This currently applies only to files the user has dragged onto the map.
                 });
 
             if (feature) {
@@ -1932,6 +2062,7 @@ TABS.mission_control.initialize = function (callback) {
                 new app.PlannerMultiMissionControl(),
                 new app.PlannerSafehomeControl(),
                 new app.PlannerElevationControl(),
+                new app.PlannerLayerVisibilityControl(),
             ]
         }
         else {
@@ -1939,6 +2070,7 @@ TABS.mission_control.initialize = function (callback) {
                 new app.PlannerSettingsControl(),
                 new app.PlannerMultiMissionControl(),
                 new app.PlannerElevationControl(),
+                new app.PlannerLayerVisibilityControl(),
                 //new app.PlannerSafehomeControl() // TO COMMENT FOR RELEASE : DECOMMENT FOR DEBUG
             ]
         }
@@ -1964,6 +2096,116 @@ TABS.mission_control.initialize = function (callback) {
                 zoom: 2
             })
         });
+
+
+        //////////////////////////////////////////////////////////////////////////////////////////////
+        // Add previously saved GEO files
+        //////////////////////////////////////////////////////////////////////////////////////////////
+
+        if(store.get("custom_overlay_list") === undefined) {  // For new installations, add this to electron store
+            store.set("custom_overlay_list", []);
+        }
+
+        for(let saved_layer of store.get("custom_overlay_list")){
+            let features = (new ol.format.GeoJSON()).readFeatures(saved_layer.layer_data);
+
+            var vectorSource = new ol.source.Vector({
+                features: features,
+                format: new ol.format.GeoJSON()
+            });
+
+            vectorSource.forEachFeature(function (temp_feature) {
+                temp_feature.set("show_info_on_hover", saved_layer.show_info_on_hover); // `show info on hover` is saved to the layer, but is read per feature.
+            });
+
+            const vectorLayer = new ol.layer.Vector({
+                title: saved_layer.name,
+                source: vectorSource
+            });
+
+            vectorLayer.set("no_interaction", saved_layer.no_interaction, true); // stops custom dragging controls for waypoints from preventing the user panning the map
+            vectorLayer.set("show_info_on_hover", saved_layer.show_info_on_hover); // allows info box to work with this feature
+            vectorLayer.set("is_vis_toggleable", saved_layer.is_vis_toggleable, true); // allows user to hide this layer in visibility selector
+            vectorLayer.set("name", saved_layer.name, true); // name for visibility toggle
+
+            map.addLayer(vectorLayer);
+        }
+
+
+
+        //////////////////////////////////////////////////////////////////////////////////////////////
+        // Add drag and drop support for GEO files
+        //////////////////////////////////////////////////////////////////////////////////////////////
+
+
+        let dragAndDropInteraction = new ol.interaction.DragAndDrop({
+            formatConstructors: [
+                ol.format.GPX,
+                ol.format.GeoJSON,
+                ol.format.IGC,
+                ol.format.KML,
+                ol.format.TopoJSON,
+            ],
+        });
+        dragAndDropInteraction.on('addfeatures', function (event) {
+            const vectorSource = new ol.source.Vector({
+                features: event.features,
+            });
+
+            vectorSource.forEachFeature(function (temp_feature) {
+                temp_feature.set("show_info_on_hover", true);  // This tag is read per feature, but is also stored on the layer
+            });
+
+            let file_name = event.file.name;
+            GUI.log("adding file to map: " + file_name);
+
+            let temp_layer = new ol.layer.Vector({
+                source: vectorSource,
+            });
+            temp_layer.set("no_interaction", true); // stops custom dragging controls for waypoints from preventing the user panning the map
+            temp_layer.set("show_info_on_hover", true); // allows info box to work with this feature
+            temp_layer.set("is_vis_toggleable", true); // allows user to hide this layer in visibility selector
+            temp_layer.set("name", file_name); // name for visibility toggler
+            map.addLayer(temp_layer);
+            updateLayerVisibilitySelectOptions();  // add the new layer to the list of layers in the menu
+        });
+        map.addInteraction(dragAndDropInteraction);
+
+
+        /**
+         * Populates info box with names of all features marked to display info that the mouse is over.
+         *
+         * Lets you identify flight zones and such
+         * @param pixel the pixel the mouse is over
+         */
+        const displayFeatureInfo = function (pixel) {
+            const features = [];
+            map.forEachFeatureAtPixel(pixel, function (feature) {
+                if (feature.get('show_info_on_hover') === true){
+                    features.push(feature);
+                }
+            });
+            if (features.length > 0) {
+                const info = [];
+                let i, ii;
+                for (i = 0, ii = features.length; i < ii; ++i) {
+                    info.push(features[i].get('name'));
+                }
+                document.getElementById('geo_info').innerHTML = info.join(', ') || '&nbsp';
+            } else {
+                document.getElementById('geo_info').innerHTML = '&nbsp;';
+            }
+        };
+
+        map.on('pointermove', function (evt) {
+            if (evt.dragging) {
+                return;
+            }
+            const pixel = map.getEventPixel(evt.originalEvent);
+            displayFeatureInfo(pixel);
+        });
+
+
 
         //////////////////////////////////////////////////////////////////////////
         // Set the attribute link to open on an external browser window, so
@@ -2270,6 +2512,19 @@ TABS.mission_control.initialize = function (callback) {
             }
             else {
                 $('#HomeContent').fadeOut(300);
+            }
+        });
+
+        $('#showHideVisibilityButton').on('click', function () {
+            var src = ($(this).children().attr('class') === 'ic_hide')
+                ? 'ic_show'
+                : 'ic_hide';
+            $(this).children().attr('class', src);
+            if ($(this).children().attr('class') === 'ic_hide') {
+                $('#layerSelectContent').fadeIn(300);
+            }
+            else {
+                $('#layerSelectContent').fadeOut(300);
             }
         });
 
@@ -2989,6 +3244,10 @@ TABS.mission_control.initialize = function (callback) {
 
         $('#cancelMultimission').on('click', function () {
             $('#missionPlannerMultiMission').fadeOut(300);
+        });
+
+        $('#cancelVisibility').on('click', function () {
+            $('#layerVisibilitySelect').fadeOut(300);
         });
 
         $('#setActiveMissionButton').on('click', function () {

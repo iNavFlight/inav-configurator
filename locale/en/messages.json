@@ -5935,5 +5935,20 @@
     },
     "gpsAssistnowLoadDataError": {
         "message": "Error loading AssistNow data."
+    },
+    "layerVisibilitySelectBoxTitle": {
+        "message": "Layer Visibility"
+    },
+    "layerVisibilitySelectCancel": {
+        "message": "Cancel"
+    },
+    "layerVisibilitySelectHide": {
+        "message": "Hide"
+    },
+    "layerVisibilityWindowLayerSave": {
+        "message": "Save"
+    },
+    "layerVisibilityWindowLayerDelete": {
+        "message": "Delete"
     }
 }
