@@ -1726,8 +1726,8 @@ var mspHelper = (function () {
                 break;
 
             case MSPCodes.MSP_SET_RX_MAP:
-                for (let i = 0; i < FC.SENSOR_ALIGNMENT.length; i++) {
-                    buffer.push(FC.SENSOR_ALIGNMENT[i]);
+                for (let i = 0; i < FC.RC_MAP.length; i++) {
+                    buffer.push(FC.RC_MAP[i]);
                 }
                 break;
             case MSPCodes.MSP_SET_ACC_TRIM:
