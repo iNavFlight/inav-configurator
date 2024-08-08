@@ -1732,7 +1732,7 @@ TABS.mission_control.initialize = function (callback) {
             var button = document.createElement('button');
 
             button.innerHTML = ' ';
-            button.style = 'background: url(\'./images/CF_template_white.svg\') no-repeat 1px -1px;background-color: rgba(0,60,136,.5);';
+            button.style = 'background: url(\'./images/icons/cf_icon_gps_white.svg\') no-repeat 1px -1px;background-color: rgba(0,60,136,.5);';
 
             var handleShowSettings = function () {
                 updateLayerVisibilitySelectOptions();
@@ -1870,7 +1870,7 @@ TABS.mission_control.initialize = function (callback) {
 
             var feature = map.forEachFeatureAtPixel(evt.pixel,
                 function (feature, layer) {
-                    if(layer.get("no_interaction") != true){
+                    if(layer.get("no_interaction") !== true){
                         return feature;
                     }
                     // for features from layers that have this set to true, ignore their existence.
@@ -2108,11 +2108,7 @@ TABS.mission_control.initialize = function (callback) {
             store.set("custom_overlay_list", []);
         }
 
-
         for(let saved_layer of store.get("custom_overlay_list")){
-            console.log("found saved layer: ");
-            console.log(saved_layer.name);
-
             let features = (new ol.format.GeoJSON()).readFeatures(saved_layer.layer_data);
 
             var vectorSource = new ol.source.Vector({
@@ -2132,7 +2128,8 @@ TABS.mission_control.initialize = function (callback) {
             vectorLayer.set("no_interaction", saved_layer.no_interaction, true); // stops custom dragging controls for waypoints from preventing the user panning the map
             vectorLayer.set("show_info_on_hover", saved_layer.show_info_on_hover); // allows info box to work with this feature
             vectorLayer.set("is_vis_toggleable", saved_layer.is_vis_toggleable, true); // allows user to hide this layer in visibility selector
-            vectorLayer.set("name", saved_layer.name, true); // name for visibility toggler
+            vectorLayer.set("name", saved_layer.name, true); // name for visibility toggle
+
             map.addLayer(vectorLayer);
         }
 
@@ -2183,7 +2180,7 @@ TABS.mission_control.initialize = function (callback) {
          */
         const displayFeatureInfo = function (pixel) {
             const features = [];
-            map.forEachFeatureAtPixel(pixel, function (feature) { //TODO: This does not include the features I actually want
+            map.forEachFeatureAtPixel(pixel, function (feature) {
                 if (feature.get('show_info_on_hover') === true){
                     features.push(feature);
                 }
