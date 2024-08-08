@@ -1435,7 +1435,7 @@ TABS.mission_control.initialize = function (callback) {
         $('#layerSelectContent').empty();
 
         map.getLayers().forEach(layer => {
-            if (layer.get("is_vis_toggleable") === true) {
+            if (layer.get("is_vis_toggleable") === true) { // for every layer that has `is_vis_toggleable` set to true:
                 let layer_name = layer.get("name");
                 let is_visible = layer.getVisible();
 
@@ -1460,7 +1460,7 @@ TABS.mission_control.initialize = function (callback) {
 
                 $('#layerSelectContent').append(element_str);
                 let element = document.getElementById(element_id);
-                element.addEventListener("change", function () {
+                element.addEventListener("change", function () { // when the switch is toggled, update the layer's visibility on the map to reflect the state of the switch
                     layer.setVisible(element.checked);
                 });
                 let save_element = document.getElementById(element_id + "_Save");
@@ -1488,7 +1488,7 @@ TABS.mission_control.initialize = function (callback) {
         }
 
         var writer = new ol.format.GeoJSON();
-        let geojsonStr = writer.writeFeatures(layer.getSource().getFeatures());
+        let geojsonStr = writer.writeFeatures(layer.getSource().getFeatures());  // save the features of the custom layer in a GEOJSON format
 
         let name = layer.get("name");
 
@@ -1498,7 +1498,7 @@ TABS.mission_control.initialize = function (callback) {
             show_info_on_hover: layer.get("show_info_on_hover"),
             is_vis_toggleable: layer.get("is_vis_toggleable"),
             layer_data: geojsonStr
-        }
+        } // wrap the feature data with some extra info
 
 
         custom_overlay_list.push(saved_layer);
@@ -1720,6 +1720,7 @@ TABS.mission_control.initialize = function (callback) {
         ol.inherits(app.PlannerSettingsControl, ol.control.Control);
 
         /**
+         * Responsible for adding the button that brings up the custom layer menu
          * @constructor
          * @extends {ol.control.Control}
          * @param {Object=} opt_options Control options.
@@ -2101,7 +2102,7 @@ TABS.mission_control.initialize = function (callback) {
         // Add previously saved GEO files
         //////////////////////////////////////////////////////////////////////////////////////////////
 
-        if(store.get("custom_overlay_list") === undefined) {
+        if(store.get("custom_overlay_list") === undefined) {  // For new installations, add this to electron store
             store.set("custom_overlay_list", []);
         }
 
@@ -2152,7 +2153,7 @@ TABS.mission_control.initialize = function (callback) {
             });
 
             vectorSource.forEachFeature(function (temp_feature) {
-                temp_feature.set("show_info_on_hover", true);
+                temp_feature.set("show_info_on_hover", true);  // This tag is read per feature, but is also stored on the layer
             });
 
             let file_name = event.file.name;
@@ -2166,13 +2167,15 @@ TABS.mission_control.initialize = function (callback) {
             temp_layer.set("is_vis_toggleable", true); // allows user to hide this layer in visibility selector
             temp_layer.set("name", file_name); // name for visibility toggler
             map.addLayer(temp_layer);
-            updateLayerVisibilitySelectOptions();
+            updateLayerVisibilitySelectOptions();  // add the new layer to the list of layers in the menu
         });
         map.addInteraction(dragAndDropInteraction);
 
 
         /**
-         * Populates info box with names of all features marked to display info that the mouse is over
+         * Populates info box with names of all features marked to display info that the mouse is over.
+         *
+         * Lets you identify flight zones and such
          * @param pixel the pixel the mouse is over
          */
         const displayFeatureInfo = function (pixel) {
