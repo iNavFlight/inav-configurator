@@ -2109,7 +2109,6 @@ TABS.mission_control.initialize = function (callback) {
         }
 
 
-        // store.set("custom_overlay_list", [])
         for(let saved_layer of store.get("custom_overlay_list")){
             console.log("found saved layer: ");
             console.log(saved_layer.name);
@@ -2125,7 +2124,7 @@ TABS.mission_control.initialize = function (callback) {
                 temp_feature.set("show_info_on_hover", saved_layer.show_info_on_hover);
             });
 
-            var vectorLayer = new ol.layer.Vector({
+            const vectorLayer = new ol.layer.Vector({
                 title: saved_layer.name,
                 source: vectorSource
             });
@@ -2143,57 +2142,39 @@ TABS.mission_control.initialize = function (callback) {
         // Add drag and drop support for GEO files
         //////////////////////////////////////////////////////////////////////////////////////////////
 
-        // write file
 
-
-        // read file
-        // const path = app.getPath("userData")
-        // fs.readFile(path, {encoding: 'utf-8'}, (err,data)=> {
-        // if (err)return null
-        // updateGlobalStore(JSON.parse(data))
-        // })
-
-
-        let dragAndDropInteraction;
-
-        function setInteraction() {
-            if (dragAndDropInteraction) {
-                map.removeInteraction(dragAndDropInteraction);
-            }
-            dragAndDropInteraction = new ol.interaction.DragAndDrop({
-                formatConstructors: [
-                    ol.format.GPX,
-                    ol.format.GeoJSON,
-                    ol.format.IGC,
-                    ol.format.KML,
-                    ol.format.TopoJSON,
-                ],
+        let dragAndDropInteraction = new ol.interaction.DragAndDrop({
+            formatConstructors: [
+                ol.format.GPX,
+                ol.format.GeoJSON,
+                ol.format.IGC,
+                ol.format.KML,
+                ol.format.TopoJSON,
+            ],
+        });
+        dragAndDropInteraction.on('addfeatures', function (event) {
+            const vectorSource = new ol.source.Vector({
+                features: event.features,
             });
-            dragAndDropInteraction.on('addfeatures', function (event) {
-                const vectorSource = new ol.source.Vector({
-                    features: event.features,
-                });
 
-                vectorSource.forEachFeature(function (temp_feature) {
-                    temp_feature.set("show_info_on_hover", true);
-                });
-
-                let file_name = event.file.name;
-                GUI.log("adding file to map: " + file_name);
-
-                let temp_layer = new ol.layer.Vector({
-                    source: vectorSource,
-                });
-                temp_layer.set("no_interaction", true); // stops custom dragging controls for waypoints from preventing the user panning the map
-                temp_layer.set("show_info_on_hover", true); // allows info box to work with this feature
-                temp_layer.set("is_vis_toggleable", true); // allows user to hide this layer in visibility selector
-                temp_layer.set("name", file_name); // name for visibility toggler
-                map.addLayer(temp_layer);
-                updateLayerVisibilitySelectOptions();
+            vectorSource.forEachFeature(function (temp_feature) {
+                temp_feature.set("show_info_on_hover", true);
             });
-            map.addInteraction(dragAndDropInteraction);
-        }
-        setInteraction();
+
+            let file_name = event.file.name;
+            GUI.log("adding file to map: " + file_name);
+
+            let temp_layer = new ol.layer.Vector({
+                source: vectorSource,
+            });
+            temp_layer.set("no_interaction", true); // stops custom dragging controls for waypoints from preventing the user panning the map
+            temp_layer.set("show_info_on_hover", true); // allows info box to work with this feature
+            temp_layer.set("is_vis_toggleable", true); // allows user to hide this layer in visibility selector
+            temp_layer.set("name", file_name); // name for visibility toggler
+            map.addLayer(temp_layer);
+            updateLayerVisibilitySelectOptions();
+        });
+        map.addInteraction(dragAndDropInteraction);
 
 
         /**
