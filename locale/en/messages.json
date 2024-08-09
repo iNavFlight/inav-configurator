@@ -8,15 +8,15 @@
     },
     "language_el": {
         "message": "Ελληνικά",
-        "_comment": "Don't translate!"
+        "comment": "Don't translate!"
     },
     "language_uk": {
         "message": "Українські",
-        "_comment": "Don't translate!"
+        "comment": "Don't translate!"
     },
     "language_en": {
         "message": "English",
-        "_comment": "Don't translate!"
+        "comment": "Don't translate!"
     },
     "language": {
         "message": "Language"
@@ -1382,7 +1382,7 @@
         "message": "Roll (°/10)"
     },
     "pidTuning_Max_Pitch": {
-        "m  essage": "Pitch (°/10)"
+        "message": "Pitch (°/10)"
     },
     "pidTuning_ShowAllPIDs": {
         "message": "Show all PIDs"
@@ -1809,7 +1809,9 @@
     "auxiliaryEepromSaved": {
         "message": "EEPROM <span style=\"color: #37a8db\">saved</span>"
     },
-    
+    "eepromSaved": {
+        "message": "EEPROM <span style=\"color: #37a8db\">saved</span>"
+    },
     "adjustmentsHelp": {
         "message": "Configure adjustment switches.  See the 'in-flight adjustments' section of the manual for details.  The changes that adjustment functions make are not saved automatically.  There are 4 slots.  Each switch used to concurrently make adjustments requires exclusive use of a slot."
     },
