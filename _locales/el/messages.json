@@ -606,7 +606,7 @@
         "message": "Επαναφορά άξονα Z, αποκλίνουσα τιμή: $1 μοίρες"
     },
     "initialSetupMixerHead": {
-        "message": "Τύπος μείκτη"
+        "message": "Τύπος μίκτη"
     },
     "initialSetupThrottleHead": {
         "message": "Ρυθμίσεις γκαζιού"
@@ -971,7 +971,7 @@
 		"message": "Ελάχιστο γκάζι"
 	},
 	"configurationThrottleMid": {
-		"message": "Μέσο γκάζι [μέση μοχλού Τ/Κ]"
+		"message": "Μέσο γκάζι [μέση μοχλού RC]"
 	},
 	"configurationThrottleMaximum": {
 		"message": "Μέγιστο γκάζι"
@@ -1731,31 +1731,31 @@
 		"message": "Expo γκάζιου"
 	},
 	"receiverRcRate": {
-		"message": "Rate Τ/Κ"
+		"message": "Rate RC"
 	},
 	"receiverDeadband": {
-		"message": "Νεκτή-ζώνη Τ/Κ (deadband)"
+		"message": "Νεκρή-ζώνη RC (deadband)"
 	},
 	"receiverHelpDeadband": {
-		"message": "Αυτές είναι οι τιμές (σε μικροδευτερόλεπτα) με τις οποίες μπορεί να διαφέρει η είσοδος Τ/Κ πριν θεωρηθεί έγκυρη. Για πομπούς με θόρυβο στις εξόδους, αυτή η τιμή μπορεί να αυξηθεί εάν οι είσοδοι Τ/Κ κουνιούνται κατά τη διάρκεια αδράνειας."
+		"message": "Αυτές είναι οι τιμές (σε μικροδευτερόλεπτα) με τις οποίες μπορεί να διαφέρει η είσοδος RC πριν θεωρηθεί έγκυρη. Για πομπούς με θόρυβο στις εξόδους, αυτή η τιμή μπορεί να αυξηθεί εάν οι είσοδοι RC κουνιούνται κατά τη διάρκεια αδράνειας."
 	},
 	"receiverHelpYawDeadband": {
-		"message": "Αυτές είναι οι τιμές (σε μικροδευτερόλεπτα) με τις οποίες μπορεί να διαφέρει η είσοδος Τ/Κ πριν θεωρηθεί έγκυρη. Για πομπούς με θόρυβο στις εξόδους, αυτή η τιμή μπορεί να αυξηθεί εάν οι είσοδοι Τ/Κ κουνιούνται κατά τη διάρκεια αδράνειας. <strong>Αυτή η ρύθμιση αφορά μόνο το YAW.</strong>"
+		"message": "Αυτές είναι οι τιμές (σε μικροδευτερόλεπτα) με τις οποίες μπορεί να διαφέρει η είσοδος RC πριν θεωρηθεί έγκυρη. Για πομπούς με θόρυβο στις εξόδους, αυτή η τιμή μπορεί να αυξηθεί εάν οι είσοδοι RC κουνιούνται κατά τη διάρκεια αδράνειας. <strong>Αυτή η ρύθμιση αφορά μόνο το YAW.</strong>"
 	},
 	"receiverYawDeadband": {
 		"message": "Νεκρή ζώνη Yaw (Deadband)"
 	},
 	"receiverRcExpo": {
-		"message": "Expo T/K"
+		"message": "Expo RC"
 	},
 	"receiverRcYawExpo": {
-		"message": "T/K Yaw Expo"
+		"message": "RC Yaw Expo"
 	},
 	"receiverManualRcExpo": {
-		"message": "Χειροκίνητo T/K Expo"
+		"message": "Χειροκίνητo RC Expo"
 	},
 	"receiverManualRcYawExpo": {
-		"message": "Χειροκίνητo T/K Yaw Expo"
+		"message": "Χειροκίνητo RC Yaw Expo"
 	},
 	"receiverChannelMap": {
 		"message": "ChannelMap"
@@ -1779,7 +1779,7 @@
 		"message": "Μοχλοί ελέγχου"
 	},
 	"receiverDataRefreshed": {
-		"message": "Δεδομένα ρύθμισης T/K <strong>ανανεώθηκαν</strong>"
+		"message": "Δεδομένα ρύθμισης RC <strong>ανανεώθηκαν</strong>"
 	},
 	"receiverEepromSaved": {
 		"message": "EEPROM <span style=\"color: #37a8db\">αποθηκεύτηκε</span>: Δέκτης"
@@ -1876,10 +1876,10 @@
 		"message": "Χωρίς αλλαγές"
 	},
 	"adjustmentsFunction1": {
-		"message": "Προσαρμογή T/K Rate"
+		"message": "Προσαρμογή RC Rate"
 	},
 	"adjustmentsFunction2": {
-		"message": "Προσαρμογή T/K Expo"
+		"message": "Προσαρμογή RC Expo"
 	},
 	"adjustmentsFunction3": {
 		"message": "Προσαρμογή Expo Γκαζιού"
@@ -1948,13 +1948,13 @@
 		"message": "Ρυθμός Roll"
 	},
 	"adjustmentsFunction25": {
-		"message": "Προσαρμογή T/K Yaw Expo"
+		"message": "Προσαρμογή RC Yaw Expo"
 	},
 	"adjustmentsFunction26": {
-		"message": "Προσαρμογή Manual T/K Expo"
+		"message": "Προσαρμογή Manual RC Expo"
 	},
 	"adjustmentsFunction27": {
-		"message": "Προσαρμογή Manual T/K Yaw Expo"
+		"message": "Προσαρμογή Manual RC Yaw Expo"
 	},
 	"adjustmentsFunction28": {
 		"message": "Προσαρμογή Manual Pitch & Roll Rate"
@@ -2062,7 +2062,7 @@
 		"message": "EEPROM <span style=\"color: #37a8db\">αποθηκεύτηκε</span>: Προγραμματισμός"
 	},
 	"servosChangeDirection": {
-		"message": "Αλλαγή Κατεύθυνσης στην Τ/Κ για να ταιριάζει"
+		"message": "Αλλαγή Κατεύθυνσης στην RC για να ταιριάζει"
 	},
 	"servosName": {
 		"message": "Όνομα"
@@ -2095,7 +2095,7 @@
 		"message": "Κανονικό"
 	},
 	"servoEmptyTableInfo": {
-		"message": "Δεν έχουν διαμορφωθεί servos. Προσθέστε τα χρησιμοποιώντας την καρτέλα Μείκτης."
+		"message": "Δεν έχουν διαμορφωθεί servos. Προσθέστε τα χρησιμοποιώντας την καρτέλα Μίκτης."
 	},
 	"servosEepromSave": {
 		"message": "EEPROM <span style=\"color: #37a8db\">αποθηκεύτηκε</span>"
@@ -2104,7 +2104,7 @@
 		"message": "Mixer <span style=\"color: #37a8db\">αποθηκεύτηκε</span>"
 	},
 	"mixerWizard": {
-		"message": "Οδηγός Μείκτη"
+		"message": "Οδηγός Μίκτη"
 	},
 	"mixerWizardInfo": {
 		"message": "<ol><li>Αφαιρέστε τις προπέλες</li><li>Συνδέστε τη LiPo μπαταρία και χρησιμοποιήστε την καρτέλα Έξοδοι για να δοκιμάσετε όλους τους κινητήρες</li><li>Σημειώστε τη θέση κάθε κινητήρα (κινητήρας #1 - Πάνω Αριστερά και ούτω καθεξής)</li><li>Συμπληρώστε τον παρακάτω πίνακα</li></ol>"
@@ -2631,13 +2631,13 @@
         "message": "γκάζι Failsafe"
     },
     "failsafeFeaturesHelpNew": {
-        "message": "Το Failsafe έχει δύο στάδια. Το <strong>Στάδιο 1</strong> ενεργοποιείται όταν ένα flightchannel έχει μια μη-έγκυρη διάρκεια παλμού, ο δέκτης αναφέρει failsafe πτήσης ή δεν υπάρχει σήμα από τον δέκτη, οι ρυθμίσεις ανάκλησης του καναλιού εφαρμόζονται σε <span style=\"color: red\">όλα τα κανάλια</span> και παρέχεται μια σύντομη χρονική περίοδος για επαναφορά. Το <strong>Στάδιο 2</strong> ενεργοποιείται όταν η κατάσταση σφάλματος διαρκεί περισσότερο από το ρυθμισμένο χρονικό διάστημα προστασίας ενώ το αεροσκάφος είναι <span style=\"color: red\">armed</span>, όλα τα κανάλια θα παραμείνουν στην εφαρμοσμένη ρύθμιση ανάκλησης του καναλιού, εκτός αν αναιρεθούν από την επιλεγμένη διαδικασία. <br /><strong>Σημείωση:</strong> Πριν από την είσοδο στο στάδιο 1, οι ρυθμίσεις ανάκλησης του καναλιού εφαρμόζονται επίσης σε μεμονωμένα κανάλια Τ/Κ που έχουν μη έγκυρους παλμούς."
+        "message": "Το Failsafe έχει δύο στάδια. Το <strong>Στάδιο 1</strong> ενεργοποιείται όταν ένα flightchannel έχει μια μη-έγκυρη διάρκεια παλμού, ο δέκτης αναφέρει failsafe πτήσης ή δεν υπάρχει σήμα από τον δέκτη, οι ρυθμίσεις ανάκλησης του καναλιού εφαρμόζονται σε <span style=\"color: red\">όλα τα κανάλια</span> και παρέχεται μια σύντομη χρονική περίοδος για επαναφορά. Το <strong>Στάδιο 2</strong> ενεργοποιείται όταν η κατάσταση σφάλματος διαρκεί περισσότερο από το ρυθμισμένο χρονικό διάστημα προστασίας ενώ το αεροσκάφος είναι <span style=\"color: red\">armed</span>, όλα τα κανάλια θα παραμείνουν στην εφαρμοσμένη ρύθμιση ανάκλησης του καναλιού, εκτός αν αναιρεθούν από την επιλεγμένη διαδικασία. <br /><strong>Σημείωση:</strong> Πριν από την είσοδο στο στάδιο 1, οι ρυθμίσεις ανάκλησης του καναλιού εφαρμόζονται επίσης σε μεμονωμένα κανάλια RC που έχουν μη έγκυρους παλμούς."
     },
     "failsafePulsrangeTitle": {
         "message": "Ρυθμίσεις Έγκυρου Εύρους Παλμών"
     },
     "failsafePulsrangeHelp": {
-        "message": "Οι παλμοί μικρότεροι από το ελάχιστο ή μεγαλύτεροι από το μέγιστο θεωρούνται μη έγκυροι και θα ενεργοποιήσουν την εφαρμογή των ρυθμίσεων ανάκλησης του μεμονωμένου καναλιού για τα κανάλια T/K ή την είσοδο στο στάδιο 1 για τα flightchannels"
+        "message": "Οι παλμοί μικρότεροι από το ελάχιστο ή μεγαλύτεροι από το μέγιστο θεωρούνται μη έγκυροι και θα ενεργοποιήσουν την εφαρμογή των ρυθμίσεων ανάκλησης του μεμονωμένου καναλιού για τα κανάλια RC ή την είσοδο στο στάδιο 1 για τα flightchannels"
     },
     "failsafeRxMinUsecItem": {
         "message": "Ελάχιστη διάρκεια"
@@ -2649,7 +2649,7 @@
         "message": "Ρυθμίσεις Ανάκλησης Καναλιού"
     },
     "failsafeChannelFallbackSettingsHelp": {
-        "message": "Αυτές οι ρυθμίσεις εφαρμόζονται σε μη έγκυρα μεμονωμένα κανάλια T/K ή σε όλα τα κανάλια κατά την είσοδο στο στάδιο 1. <strong>Σημείωση:</strong> οι τιμές αποθηκεύονται σε βήματα των 25usec, οπότε μικρές αλλαγές εξαφανίζονται"
+        "message": "Αυτές οι ρυθμίσεις εφαρμόζονται σε μη έγκυρα μεμονωμένα κανάλια RC ή σε όλα τα κανάλια κατά την είσοδο στο στάδιο 1. <strong>Σημείωση:</strong> οι τιμές αποθηκεύονται σε βήματα των 25usec, οπότε μικρές αλλαγές εξαφανίζονται"
     },
     "failsafeChannelFallbackSettingsAuto": {
         "message": "<strong>Auto</strong> σημαίνει Roll, Pitch και Yaw στο κέντρο και χαμηλό Γκάζι. <strong>Holdη</strong> σημαίνει διατήρηση της τελευταίας καλής τιμής που λήφθηκε"
@@ -3007,7 +3007,7 @@
         "message": "Προειδοποίηση"
     },
     "presetApplyDescription": {
-        "message": "<p style='color: darkred;'>Βεβαιωθείτε ότι ο <strong>μίκτης</strong> έχει ρυθμιστεί πριν εφαρμόσετε οποιεσδήποτε Προεπιλογές!</p><p>Οι Προεπιλογές αντικαθιστούν τις επιλεγμένες τιμές ρύθμισης, συμπεριλαμβανομένου του μίκτη, του φιλτραρίσματος, των PID και άλλων. Ρυθμίσεις όπως: flight modes, ρυθμίσεις Τ/Κ, failsafe και OSD δεν αλλάζουν. Οι εφαρμοσμένες τιμές δεν πρέπει να θεωρούνται ως τελικές τιμές, αλλά ως σημεία εισόδου για την τελική ρύθμιση. <br> Πάντα ελέγξτε τη νέα ρύθμιση πριν από την πτήση!</p>"
+        "message": "<p style='color: darkred;'>Βεβαιωθείτε ότι ο <strong>μίκτης</strong> έχει ρυθμιστεί πριν εφαρμόσετε οποιεσδήποτε Προεπιλογές!</p><p>Οι Προεπιλογές αντικαθιστούν τις επιλεγμένες τιμές ρύθμισης, συμπεριλαμβανομένου του μίκτη, του φιλτραρίσματος, των PID και άλλων. Ρυθμίσεις όπως: flight modes, ρυθμίσεις R/C, failsafe και OSD δεν αλλάζουν. Οι εφαρμοσμένες τιμές δεν πρέπει να θεωρούνται ως τελικές τιμές, αλλά ως σημεία εισόδου για την τελική ρύθμιση. <br> Πάντα ελέγξτε τη νέα ρύθμιση πριν από την πτήση!</p>"
     },
     "OK": {
         "message": "Εντάξει"
@@ -3862,7 +3862,7 @@
 		"message": "Όρια Ισχύος"
 	},
 	"osdGroupPIDs": {
-		"message": "Ρυθμίσεις προσαρμοστικών τιμών Τ/Κ"
+		"message": "Ρυθμίσεις προσαρμοστικών τιμών RC"
 	},
 	"osdGroupPIDOutputs": {
 		"message": "Έξοδοι Ελεγκτών PID"
@@ -4471,7 +4471,7 @@
         "message": "Όνομα αρχείου που φορτώθηκε:"
     },
     "missionTotalInfoDistance": {
-        "message": "Απόσταση (μ):"
+        "message": "Απόσταση (m):"
     },
     "missionTotalInfoAvailablePoints": {
         "message": "Διαθέσιμα Σημεία"
@@ -4480,13 +4480,13 @@
         "message": "Έγκυρη αποστολή"
     },
     "missionDefaultPointAlt": {
-        "message": "Υψόμετρο (εκ): "
+        "message": "Υψόμετρο (cm): "
     },
     "missionDefaultPointSpeed": {
-        "message": "Ταχύτητα (εκ/δ): "
+        "message": "Ταχύτητα (cm/s): "
     },
     "missionDefaultSafeRangeSH": {
-        "message": "Ακτίνα (μ): "
+        "message": "Ακτίνα (m): "
     },
     "missionMultiMissionsInfo": {
         "message": "Πληροφορίες Αποστολών:"
@@ -4510,10 +4510,10 @@
         "message": "Υποσημείωση : "
     },
     "SafehomeMaxDistance": {
-        "message": "Μέγιστη απόσταση (μ):"
+        "message": "Μέγιστη απόσταση (m):"
     },
     "SafehomeSafeRadius": {
-        "message": "Ασφαλής ακτίνα (μ):"
+        "message": "Ασφαλής ακτίνα (m):"
     },
 	"SafehomeFwAppraoch": {
         "message": "Προσέγγιση σταθερής πτέρυγας:"
@@ -4594,13 +4594,13 @@
         "message": "Επίπεδο θάλασσας ως σημείο αναφοράς: "
     },
     "missionElevation": {
-        "message": "Ύψος (μ):"
+        "message": "Ύψος (m):"
     },
     "missionNA": {
         "message": "N/A"
     },
     "missionGroundDist": {
-        "message": "Απόσταση εδάφους (μ):"
+        "message": "Απόσταση εδάφους (m):"
     },
     "missionParameter1": {
         "message": "Παράμετρος 1:"
@@ -4615,10 +4615,10 @@
         "message": "Ρυθμήσεις προσγείωσης σταθερής πτέρυγας:"
     },
     "missionFwApproachAlt": {
-        "message": "Υψόμετρο προσέγγισης: (εκ):"
+        "message": "Υψόμετρο προσέγγισης: (cm):"
     },
     "missionFwLandAlt": {
-        "message": "Υψόμετρο προσγείωσης: (εκ):"
+        "message": "Υψόμετρο προσγείωσης: (cm):"
     },
     "missionFwApproachDir": {
         "message": "διεύθυνση προσέγγισης:"
@@ -5459,10 +5459,10 @@
 		"message": "GPS: καμία εντοπισμένη δορυφορική σύνδεση"
 	},
 	"ledStripModeColorsModeGPSNoLock": {
-		"message": "GPS: κανένα κλείδωμα"
+		"message": "GPS: κανένα fix"
 	},
 	"ledStripModeColorsModeGPSLocked": {
-		"message": "GPS: κλειδωμένο"
+		"message": "GPS: fixed"
 	},
 	"ledStripWiring": {
 		"message": "Σύνδεση Επιλέγματος LED"
@@ -5500,10 +5500,10 @@
 		"message": "Dataflash: ελεύθερος χώρος"
 	},
 	"mixerProfile1": {
-        "message": "Προφίλ Μείκτη 1"
+        "message": "Προφίλ Μίκτη 1"
     },
     "mixerProfile2": {
-        "message": "Προφίλ Μείκτη 2"
+        "message": "Προφίλ Μίκτη 2"
 	},
 	"sensorProfile1": {
 		"message": "προφίλ Ελέγχου 1"
@@ -5645,10 +5645,10 @@
 		"message": "Βαρόμετρο - μέτρα"
 	},
 	"sensorsSonar": {
-		"message": "Υπέρηχος - εκ"
+		"message": "Υπέρηχος - cm"
 	},
 	"sensorsAirspeed": {
-		"message": "Ταχύτητα αέρα - εκ/δ"
+		"message": "Ταχύτητα αέρα - cm/s"
 	},
 	"sensorsTemperature0": {
 		"message": "Θερμοκρασία 0 - °C"
