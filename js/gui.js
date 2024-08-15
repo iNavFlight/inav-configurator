@@ -106,8 +106,8 @@ GUI_control.prototype.switchery = function() {
     $('.togglesmall').each(function(index, elem) {
         var switchery = new Switchery(elem, {
             size: 'small',
-            color: '#37a8db',
-            secondaryColor: '#c4c4c4'
+            color: 'var(--inav-primary)',
+            secondaryColor: 'var(--inav-gray)'
         });
         $(elem).on("change", function (evt) {
             switchery.setPosition();
@@ -117,8 +117,8 @@ GUI_control.prototype.switchery = function() {
 
     $('.toggle').each(function(index, elem) {
         var switchery = new Switchery(elem, {
-            color: '#37a8db',
-            secondaryColor: '#c4c4c4'
+            color: 'var(--inav-primary)',
+            secondaryColor: 'var(--inav-gray)'
         });
         $(elem).on("change", function (evt) {
             switchery.setPosition();
@@ -129,8 +129,8 @@ GUI_control.prototype.switchery = function() {
     $('.togglemedium').each(function(index, elem) {
         var switchery = new Switchery(elem, {
             className: 'switcherymid',
-            color: '#37a8db',
-            secondaryColor: '#c4c4c4'
+            color: 'var(--inav-primary)',
+            secondaryColor: 'var(--inav-gray)'
         });
         $(elem).on("change", function (evt) {
             switchery.setPosition();
@@ -144,9 +144,9 @@ GUI_control.prototype.content_ready = function (callback) {
     const content = $('#content').removeClass('loading');
     $('.togglesmall').each(function(index, elem) {
         var switchery = new Switchery(elem, {
-          size: 'small',
-          color: '#37a8db',
-          secondaryColor: '#c4c4c4'
+            size: 'small',
+            color: 'var(--inav-primary)',
+            secondaryColor: 'var(--inav-gray)'
         });
         $(elem).on("change", function (evt) {
             switchery.setPosition();
@@ -156,8 +156,8 @@ GUI_control.prototype.content_ready = function (callback) {
 
     $('.toggle').each(function(index, elem) {
         var switchery = new Switchery(elem, {
-            color: '#37a8db',
-            secondaryColor: '#c4c4c4'
+            color: 'var(--inav-primary)',
+            secondaryColor: 'var(--inav-gray)'
         });
         $(elem).on("change", function (evt) {
             switchery.setPosition();
@@ -168,8 +168,8 @@ GUI_control.prototype.content_ready = function (callback) {
     $('.togglemedium').each(function(index, elem) {
         var switchery = new Switchery(elem, {
             className: 'switcherymid',
-            color: '#37a8db',
-            secondaryColor: '#c4c4c4'
+            color: 'var(--inav-primary)',
+            secondaryColor: 'var(--inav-gray)'
          });
          $(elem).on("change", function (evt) {
              switchery.setPosition();
