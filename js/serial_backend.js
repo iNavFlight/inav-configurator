@@ -44,6 +44,7 @@ var SerialBackend = (function () {
         
         privateScope.$port = $('#port'),
         privateScope.$baud = $('#baud'),
+        privateScope.$wirelessMode = $('#wireless-mode'),
         publicScope.$portOverride = $('#port-override'),
         mspHelper.setSensorStatusEx(privateScope.sensor_status_ex);
         
@@ -109,7 +110,7 @@ var SerialBackend = (function () {
             }
         };
 
-        
+
 
         GUI.updateManualPortVisibility = function(){
             var selected_port = privateScope.$port.find('option:selected');
@@ -163,7 +164,7 @@ var SerialBackend = (function () {
             GUI.updateManualPortVisibility();
         });
 
-    $('div.connect_controls a.connect').click(function () {
+    $('#connect-btn').click(function () {
 
         if (groundstation.isActivated()) {
             groundstation.deactivate();
@@ -173,9 +174,9 @@ var SerialBackend = (function () {
 
                 var clicks = $(this).data('clicks');
                 var selected_baud = parseInt(privateScope.$baud.val());
-                var selected_port = privateScope.$port.find('option:selected').data().isManual ?
-                    publicScope.$portOverride.val() :
-                        String(privateScope.$port.val());
+                var selected_port = privateScope.$port.find('option:selected').data().isManual
+                    ? publicScope.$portOverride.val()
+                    : String(privateScope.$port.val());
                 
                 if (selected_port === 'DFU') {
                     GUI.log(i18n.getMessage('dfu_connect_message'));
@@ -186,8 +187,9 @@ var SerialBackend = (function () {
                         GUI.connecting_to = selected_port;
 
                         // lock port select & baud while we are connecting / connected
-                        $('#port, #baud, #delay').prop('disabled', true);
-                        $('div.connect_controls a.connect_state').text(i18n.getMessage('connecting'));
+                        $('#port, #baud, #delay, #wireless-mode').prop('disabled', true);
+
+                        $('#connect-btn').text(i18n.getMessage('connecting'));
 
                         if (selected_port == 'tcp' || selected_port == 'udp') {
                             CONFIGURATOR.connection.connect(publicScope.$portOverride.val(), {}, privateScope.onOpen);
@@ -251,10 +253,10 @@ var SerialBackend = (function () {
                             // unlock port select & baud
                             privateScope.$port.prop('disabled', false);
                             privateScope.$baud.prop('disabled', false);
+                            privateScope.$wirelessMode.prop('disabled', false);
 
                             // reset connect / disconnect button
-                            $('div.connect_controls a.connect').removeClass('active');
-                            $('div.connect_controls a.connect_state').text(i18n.getMessage('connect'));
+                            $('#connect-btn').removeClass('btn-danger').addClass('btn-primary').text(i18n.getMessage('connect'));
 
                             // reset active sensor indicators
                             privateScope.sensor_status(0);
@@ -264,7 +266,7 @@ var SerialBackend = (function () {
                                 $('#content').empty();
                             }
 
-                            $('#tabs .tab_landing a').trigger( "click" );
+                            $('[data-tab="landing"] a').trigger( "click" );
                         }
                     }
 
@@ -278,33 +280,33 @@ var SerialBackend = (function () {
 
     privateScope.onValidFirmware = function ()
     {
-    MSP.send_message(MSPCodes.MSP_BUILD_INFO, false, false, function () {
+        MSP.send_message(MSPCodes.MSP_BUILD_INFO, false, false, function () {
 
-        GUI.log(i18n.getMessage('buildInfoReceived', [FC.CONFIG.buildInfo]));
+            GUI.log(i18n.getMessage('buildInfoReceived', [FC.CONFIG.buildInfo]));
 
-        MSP.send_message(MSPCodes.MSP_BOARD_INFO, false, false, function () {
+            MSP.send_message(MSPCodes.MSP_BOARD_INFO, false, false, function () {
 
-            GUI.log(i18n.getMessage('boardInfoReceived', [FC.CONFIG.boardIdentifier, FC.CONFIG.boardVersion]));
+                GUI.log(i18n.getMessage('boardInfoReceived', [FC.CONFIG.boardIdentifier, FC.CONFIG.boardVersion]));
 
-            MSP.send_message(MSPCodes.MSP_UID, false, false, function () {
+                MSP.send_message(MSPCodes.MSP_UID, false, false, function () {
 
-                GUI.log(i18n.getMessage('uniqueDeviceIdReceived', [FC.CONFIG.uid[0].toString(16) + FC.CONFIG.uid[1].toString(16) + FC.CONFIG.uid[2].toString(16)]));
+                    GUI.log(i18n.getMessage('uniqueDeviceIdReceived', [FC.CONFIG.uid[0].toString(16) + FC.CONFIG.uid[1].toString(16) + FC.CONFIG.uid[2].toString(16)]));
 
-                // continue as usually
-                CONFIGURATOR.connectionValid = true;
-                GUI.allowedTabs = GUI.defaultAllowedTabsWhenConnected.slice();
-                privateScope.onConnect();
+                    // continue as usually
+                    CONFIGURATOR.connectionValid = true;
+                    GUI.allowedTabs = GUI.defaultAllowedTabsWhenConnected.slice();
+                    privateScope.onConnect();
 
-                defaultsDialog.init();
+                    defaultsDialog.init();
 
-                $('#tabs ul.mode-connected .tab_setup a').trigger( "click" );
+                    $('[data-tab="setup"] > a').trigger( "click" );
 
-                GUI.updateEzTuneTabVisibility(true);
-                update.firmwareVersion();
+                    GUI.updateEzTuneTabVisibility(true);
+                    update.firmwareVersion();
+                });
             });
         });
-    });
-}
+    }
 
     privateScope.onInvalidFirmwareVariant = function ()
     {
@@ -312,7 +314,7 @@ var SerialBackend = (function () {
         CONFIGURATOR.connectionValid = true; // making it possible to open the CLI tab
         GUI.allowedTabs = ['cli'];
         privateScope.onConnect();
-        $('#tabs .tab_cli a').trigger( "click" );
+        $('[data-tab="cli"] > a').trigger( "click" );
     }
 
     privateScope.onInvalidFirmwareVersion = function ()
@@ -321,7 +323,7 @@ var SerialBackend = (function () {
         CONFIGURATOR.connectionValid = true; // making it possible to open the CLI tab
         GUI.allowedTabs = ['cli'];
         privateScope.onConnect();
-        $('#tabs .tab_cli a').trigger( "click" );
+        $('[data-tab="cli"] > a').trigger( "click" );
     }
 
     privateScope.onBleNotSupported = function () {
@@ -333,8 +335,8 @@ var SerialBackend = (function () {
     privateScope.onOpen = function (openInfo) {
 
         if (FC.restartRequired) {
-            GUI_control.prototype.log("<span style='color: red; font-weight: bolder'><strong>" + i18n.getMessage("illegalStateRestartRequired") + "</strong></span>");
-            $('div.connect_controls a').trigger( "click" ); // disconnect
+            GUI_control.prototype.log("<span style='color: var(--inav-danger); font-weight: bolder'><strong>" + i18n.getMessage("illegalStateRestartRequired") + "</strong></span>");
+            $('#connect-btn').trigger( "click" ); // disconnect
             return;
         }
 
@@ -379,7 +381,7 @@ var SerialBackend = (function () {
                         mspDeduplicationQueue.flush();
                         CONFIGURATOR.connection.emptyOutputBuffer();
 
-                    $('div.connect_controls a').click(); // disconnect
+                    $('#connect-btn').click(); // disconnect
                 }
             }, 10000);
 
@@ -398,7 +400,7 @@ var SerialBackend = (function () {
             MSP.send_message(MSPCodes.MSP_API_VERSION, false, false, function () {
                 
                 if (FC.CONFIG.apiVersion === "0.0.0") {
-                    GUI_control.prototype.log("<span style='color: red; font-weight: bolder'><strong>" + i18n.getMessage("illegalStateRestartRequired") + "</strong></span>");
+                    GUI_control.prototype.log("<span style='color: var(--inav-danger); font-weight: bolder'><strong>" + i18n.getMessage("illegalStateRestartRequired") + "</strong></span>");
                     FC.restartRequired = true;
                     return;
                 }
@@ -434,13 +436,13 @@ var SerialBackend = (function () {
             console.log('Failed to open serial port');
             GUI.log(i18n.getMessage('serialPortOpenFail'));
 
-            var $connectButton = $('#connectbutton');
+            var $connectButton = $('#connect-btn');
 
-            $connectButton.find('.connect_state').text(i18n.getMessage('connect'));
-            $connectButton.find('.connect').removeClass('active');
+            $connectButton.text(i18n.getMessage('connect'));
+            $connectButton.removeClass('btn-danger').addClass('btn-primary');
 
             // unlock port select & baud
-            $('#port, #baud, #delay').prop('disabled', false);
+            $('#port, #baud, #delay, #wireless-mode').prop('disabled', false);
 
             // reset data
             $connectButton.find('.connect').data("clicks", false);
@@ -448,13 +450,14 @@ var SerialBackend = (function () {
     }
 
     privateScope.onConnect = function () {
+        $('html').attr('data-connected', true);
+
         timeout.remove('connecting'); // kill connecting timer
-        $('#connectbutton a.connect_state').text(i18n.getMessage('disconnect')).addClass('active');
-        $('#connectbutton a.connect').addClass('active');
-        $('.mode-disconnected').hide();
-        $('.mode-connected').show();
+
+        $('#connect-btn').text(i18n.getMessage('disconnect')).removeClass('btn-primary').addClass('btn-danger');
 
         MSP.send_message(MSPCodes.MSP_DATAFLASH_SUMMARY, false, false, function () {
+            // TODO
             $('#sensor-status').show();
             $('#portsinput').hide();
             $('#dataflash_wrapper_global').show();
@@ -487,13 +490,7 @@ var SerialBackend = (function () {
             GUI.log(i18n.getMessage('serialPortClosedFail'));
         }
 
-        $('.mode-connected').hide();
-        $('.mode-disconnected').show();
-
-        $('#sensor-status').hide();
-        $('#portsinput').show();
-        $('#dataflash_wrapper_global').hide();
-        $('#quad-status_wrapper').hide();
+        $('html').attr('data-connected', false);
 
         //updateFirmwareVersion();
     }
@@ -520,34 +517,28 @@ var SerialBackend = (function () {
 
         privateScope.sensor_status_ex.previousHash = statusHash;
 
-        privateScope.sensor_status_update_icon('.gyro',      '.gyroicon',        hw_status.gyroHwStatus);
-        privateScope.sensor_status_update_icon('.accel',     '.accicon',         hw_status.accHwStatus);
-        privateScope.sensor_status_update_icon('.mag',       '.magicon',         hw_status.magHwStatus);
-        privateScope.sensor_status_update_icon('.baro',      '.baroicon',        hw_status.baroHwStatus);
-        privateScope.sensor_status_update_icon('.gps',       '.gpsicon',         hw_status.gpsHwStatus);
-        privateScope.sensor_status_update_icon('.sonar',     '.sonaricon',       hw_status.rangeHwStatus);
-        privateScope.sensor_status_update_icon('.airspeed',  '.airspeedicon',    hw_status.speedHwStatus);
-        privateScope.sensor_status_update_icon('.opflow',    '.opflowicon',      hw_status.flowHwStatus);
+        privateScope.sensor_status_update_icon('gyro', hw_status.gyroHwStatus);
+        privateScope.sensor_status_update_icon('accel', hw_status.accHwStatus);
+        privateScope.sensor_status_update_icon('mag', hw_status.magHwStatus);
+        privateScope.sensor_status_update_icon('baro', hw_status.baroHwStatus);
+        privateScope.sensor_status_update_icon('gps', hw_status.gpsHwStatus);
+        privateScope.sensor_status_update_icon('sonar', hw_status.rangeHwStatus);
+        privateScope.sensor_status_update_icon('airspeed', hw_status.speedHwStatus);
+        privateScope.sensor_status_update_icon('opflow', hw_status.flowHwStatus);
     }
 
-    privateScope.sensor_status_update_icon = function (sensId, sensIconId, status)
+    // privateScope.sensor_status_update_icon = function (sensId, sensIconId, status)
+    privateScope.sensor_status_update_icon = function (sensId, status)
     {
-        var e_sensor_status = $('#sensor-status');
 
-        if (status == 0) {
-            $(sensId, e_sensor_status).removeClass('on');
-            $(sensIconId, e_sensor_status).removeClass('active');
-            $(sensIconId, e_sensor_status).removeClass('error');
+        if (status === 0) {
+            $(`[data-sensor="${sensId}"]`).removeClass('on is-active error');
         }
-        else if (status == 1) {
-            $(sensId, e_sensor_status).addClass('on');
-            $(sensIconId, e_sensor_status).addClass('active');
-            $(sensIconId, e_sensor_status).removeClass('error');
+        else if (status === 1) {
+            $(`[data-sensor="${sensId}"]`).removeClass('error').addClass('on is-active');
         }
         else {
-            $(sensId, e_sensor_status).removeClass('on');
-            $(sensIconId, e_sensor_status).removeClass('active');
-            $(sensIconId, e_sensor_status).addClass('error');
+            $(`[data-sensor="${sensId}"]`).removeClass('on is-active').addClass('error');
         }
     }
 
