@@ -13,9 +13,9 @@
 }
 
 .tab-ports table, .tab-ports table th, .tab-ports table td {
-    border-left: 0px;
-    border-right: 0px;
-    border-top: 0px;
+    border-left: 0;
+    border-right: 0;
+    border-top: 0;
 }
 
 .tab-ports table tr td:first-child {
@@ -23,24 +23,17 @@
 }
 
 .tab-ports table td {
-    border-bottom: 1px solid #e4e4e4;
+    border: var(--inav-border-width) var(--inav-border-color) solid;
+    border-top: none;
     padding: 6px 5px 7px 5px;
-    border-left: 1px solid #e4e4e4;
-    border-right: 1px solid #e4e4e4;
 }
 
 .tab-ports table thead tr:first-child, .tab-ports table tr:nth-child(even) {
-    background-color: #f9f9f9;
+    background-color: rgba(var(--inav-emphasis-color-rgb), 0.05);
 }
 
 .tab-ports table thead tr:first-child {
-    background-color: #e4e4e4;
-    font-size: 12px;
-    height: 25px;
-    font-family: 'open_sansregular', Arial;
-    border-top: 0px;
-    border-right: 0px;
-    border-left: 0px;
+    background-color: rgba(var(--inav-emphasis-color-rgb), 0.05);
 }
 
 .tab-ports .function input {
@@ -52,7 +45,6 @@
 }
 
 .tab-ports select {
-    border: 1px solid silver;
     margin-right: 3px;
 }
 
@@ -76,18 +68,18 @@
     text-align: left;
     white-space: nowrap;
     padding: 5px 7px;
-    background-color: #828885;
-    color: white;
+    background-color: rgba(var(--inav-emphasis-color-rgb), 0.05);
+    color: var(--inav-body-color);
 }
 
 .tab-ports .ports thead td:first-child {
-    border-top-left-radius: 5px;
-    border-left: 0px;
+    border-top-left-radius: var(--inav-border-radius);
+    border-left: 0;
 }
 
 .tab-ports .ports thead td:last-child {
-    border-top-right-radius: 5px;
-    border-right: 0px;
+    border-top-right-radius: var(--inav-border-radius);
+    border-right: 0;
 }
 
 @media only screen and (max-width: 1055px) , only screen and (max-device-width: 1055px) {
