@@ -38,13 +38,13 @@
         "message": "Unexpected error: $1"
     },
     "disconnecting": {
-        "message": "Disconnecting..."
+        "message": "Disconnecting.."
     },
     "connect": {
         "message": "Connect"
     },
     "connecting": {
-        "message": "Connecting"
+        "message": "Connecting.."
     },
     "disconnect": {
         "message": "Disconnect"
@@ -62,7 +62,7 @@
         "message": "Device - <span style=\"color: red\">Rebooting</span>"
     },
     "deviceReady": {
-        "message": "Device - <span style=\"color: #37a8db\">Ready</span>"
+        "message": "Device - <span style=\"color: var(--inav-primary)\">Ready</span>"
     },
     "savingDefaults": {
         "message": "Device - <span style=\"color: red\">Saving default settings</span>"
@@ -284,13 +284,13 @@
         "message": "ACRO"
     },
     "serialPortOpened": {
-        "message": "MSP connection <span style=\"color: #37a8db\">successfully</span> opened with ID: $1"
+        "message": "MSP connection <span style=\"color: var(--inav-primary)\">successfully</span> opened with ID: $1"
     },
     "serialPortOpenFail": {
         "message": "<span style=\"color: red\">Failed</span> to open MSP connection"
     },
     "serialPortClosedOk": {
-        "message": "MSP connection <span style=\"color: #37a8db\">successfully</span> closed"
+        "message": "MSP connection <span style=\"color: var(--inav-primary)\">successfully</span> closed"
     },
     "serialPortClosedFail": {
         "message": "<span style=\"color: red\">Failed</span> to close MSP connection"
@@ -320,13 +320,13 @@
         "message": "UDP connection timed out."
     },
     "usbDeviceOpened": {
-        "message": "USB device <span style=\"color: #37a8db\">successfully</span> opened"
+        "message": "USB device <span style=\"color: var(--inav-primary)\">successfully</span> opened"
     },
     "usbDeviceOpenFail": {
         "message": "<span style=\"color: red\">Failed</span> to open USB device!"
     },
     "usbDeviceClosed": {
-        "message": "USB device <span style=\"color: #37a8db\">successfully</span> closed"
+        "message": "USB device <span style=\"color: var(--inav-primary)\">successfully</span> closed"
     },
     "usbDeviceCloseFail": {
         "message": "<span style=\"color: red\">Failed</span> to close USB device"
@@ -440,10 +440,10 @@
         "message": "Firmware Version: <strong>$1</strong>"
     },
     "apiVersionReceived": {
-        "message": "MultiWii API version <span style=\"color: #37a8db\">received</span> - <strong>$1</strong>"
+        "message": "MultiWii API version <span style=\"color: var(--inav-primary)\">received</span> - <strong>$1</strong>"
     },
     "uniqueDeviceIdReceived": {
-        "message": "Unique device ID <span style=\"color: #37a8db\">received</span> - <strong>0x$1</strong>"
+        "message": "Unique device ID <span style=\"color: var(--inav-primary)\">received</span> - <strong>0x$1</strong>"
     },
     "boardInfoReceived": {
         "message": "Board: <strong>$1</strong>, version: <strong>$2</strong>"
@@ -491,7 +491,7 @@
         "message": "Please use the Firmware Flasher to access DFU devices"
     },
     "dfu_erased_kilobytes": {
-        "message": "Erased $1 kB of flash <span style=\"color: #37a8db\">successfully</span>"
+        "message": "Erased $1 kB of flash <span style=\"color: var(--inav-primary)\">successfully</span>"
     },
     "dfu_device_flash_info": {
         "message": "Detected device with total flash size $1 kiB"
@@ -501,7 +501,7 @@
     },
 
     "eeprom_saved_ok": {
-        "message": "EEPROM <span style=\"color: #37a8db\">saved</span>"
+        "message": "EEPROM <span style=\"color: var(--inav-primary)\">saved</span>"
     },
 
     "defaultWelcomeIntro": {
@@ -556,7 +556,7 @@
         "message": "Facebook Group"
     },
     "initialSetupBackupAndRestoreApiVersion": {
-        "message": "<span style=\"color: red\">Backup and restore functionality disabled.</span>  You have firmware with API version <span style=\"color: red\">$1</span>, backup and restore requires <span style=\"color: #37a8db\">$2</span>.  Please backup your settings via the CLI, see INAV documentation for procedure."
+        "message": "<span style=\"color: red\">Backup and restore functionality disabled.</span>  You have firmware with API version <span style=\"color: red\">$1</span>, backup and restore requires <span style=\"color: var(--inav-primary)\">$2</span>.  Please backup your settings via the CLI, see INAV documentation for procedure."
     },
     "initialSetupButtonCalibrateAccel": {
         "message": "Calibrate Accelerometer"
@@ -586,10 +586,10 @@
         "message": "<strong>Backup</strong> your configuration in case of an accident, <strong>CLI</strong> settings are <span style=\"color: red\">not</span> included - See 'dump' cli command"
     },
     "initialSetupBackupSuccess": {
-        "message": "Backup saved <span style=\"color: #37a8db\">successfully</span>"
+        "message": "Backup saved <span style=\"color: var(--inav-primary)\">successfully</span>"
     },
     "initialSetupRestoreSuccess": {
-        "message": "Configuration restored <span style=\"color: #37a8db\">successfully</span>"
+        "message": "Configuration restored <span style=\"color: var(--inav-primary)\">successfully</span>"
     },
     "initialSetupButtonResetZaxis": {
         "message": "Reset Z axis, offset: 0 deg"
@@ -730,25 +730,25 @@
         "message": "Accelerometer calibration started"
     },
     "initialSetupAccelCalibEnded": {
-        "message": "Accelerometer calibration <span style=\"color: #37a8db\">finished</span>"
+        "message": "Accelerometer calibration <span style=\"color: var(--inav-primary)\">finished</span>"
     },
     "initialSetupMagCalibStarted": {
         "message": "Magnetometer calibration started"
     },
     "initialSetupMagCalibEnded": {
-        "message": "Magnetometer calibration <span style=\"color: #37a8db\">finished</span>"
+        "message": "Magnetometer calibration <span style=\"color: var(--inav-primary)\">finished</span>"
     },
     "initialSetupOpflowCalibStarted": {
         "message": "Optic flow calibration started"
     },
     "initialSetupOpflowCalibEnded": {
-        "message": "Optic flow calibration <span style=\"color: #37a8db\">finished</span>"
+        "message": "Optic flow calibration <span style=\"color: var(--inav-primary)\">finished</span>"
     },
     "initialSetupSettingsRestored": {
         "message": "Settings restored to <strong>default</strong>"
     },
     "initialSetupEepromSaved": {
-        "message": "EEPROM <span style=\"color: #37a8db\">saved</span>: Setup"
+        "message": "EEPROM <span style=\"color: var(--inav-primary)\">saved</span>: Setup"
     },
 
     "RX_PPM": {
@@ -1194,7 +1194,7 @@
         "message": "RX SPI protocol"
     },
     "configurationEepromSaved": {
-        "message": "EEPROM <span style=\"color: #37a8db\">saved</span>: Configuration"
+        "message": "EEPROM <span style=\"color: var(--inav-primary)\">saved</span>: Configuration"
     },
     "configurationButtonSave": {
         "message": "Save and Reboot"
@@ -1665,7 +1665,7 @@
         "message": "Profile"
     },
     "pidTuning_LoadedProfile": {
-        "message": "Loaded Profile: <strong style=\"color: #37a8db\">$1</strong>"
+        "message": "Loaded Profile: <strong style=\"color: var(--inav-primary)\">$1</strong>"
     },
     "pidTuning_Manual_Rates": {
         "message": "Manual Rates"
@@ -1701,16 +1701,16 @@
         "message": "Defines the gyro LPF cutoff frequency at maximum throttle. When throttle is decreased, LPF cutoff frequency is decreased as well, down to the minimum cutoff frequency."
     },
     "loadedMixerProfile": {
-        "message": "Loaded Mixer Profile: <strong style=\"color: #37a8db\">$1</strong>, Check modes tab: MIXER PROFILE 2 if you don't see the changes"
+        "message": "Loaded Mixer Profile: <strong style=\"color: var(--inav-primary)\">$1</strong>, Check modes tab: MIXER PROFILE 2 if you don't see the changes"
     },
     "loadedBatteryProfile": {
-        "message": "Loaded Battery Profile: <strong style=\"color: #37a8db\">$1</strong>"
+        "message": "Loaded Battery Profile: <strong style=\"color: var(--inav-primary)\">$1</strong>"
     },
     "pidTuningDataRefreshed": {
         "message": "PID data <strong>refreshed</strong>"
     },
     "pidTuningEepromSaved": {
-        "message": "EEPROM <span style=\"color: #37a8db\">saved</span>: PID Tuning"
+        "message": "EEPROM <span style=\"color: var(--inav-primary)\">saved</span>: PID Tuning"
     },
 
     "receiverHelp": {
@@ -1774,7 +1774,7 @@
         "message": "RC Tuning data <strong>refreshed</strong>"
     },
     "receiverEepromSaved": {
-        "message": "EEPROM <span style=\"color: #37a8db\">saved</span>: Receiver"
+        "message": "EEPROM <span style=\"color: var(--inav-primary)\">saved</span>: Receiver"
     },
 
     "auxiliaryHelp": {
@@ -1799,10 +1799,10 @@
         "message": "Save"
     },
     "auxiliaryEepromSaved": {
-        "message": "EEPROM <span style=\"color: #37a8db\">saved</span>"
+        "message": "EEPROM <span style=\"color: var(--inav-primary)\">saved</span>"
     },
     "eepromSaved": {
-        "message": "EEPROM <span style=\"color: #37a8db\">saved</span>"
+        "message": "EEPROM <span style=\"color: var(--inav-primary)\">saved</span>"
     },
     "adjustmentsHelp": {
         "message": "Configure adjustment switches.  See the 'in-flight adjustments' section of the manual for details.  The changes that adjustment functions make are not saved automatically.  There are 4 slots.  Each switch used to concurrently make adjustments requires exclusive use of a slot."
@@ -2048,10 +2048,10 @@
         "message": "Save"
     },
     "adjustmentsEepromSaved": {
-        "message": "EEPROM <span style=\"color: #37a8db\">saved</span>: Adjustments"
+        "message": "EEPROM <span style=\"color: var(--inav-primary)\">saved</span>: Adjustments"
     },
     "programmingEepromSaved": {
-        "message": "EEPROM <span style=\"color: #37a8db\">saved</span>: Programming"
+        "message": "EEPROM <span style=\"color: var(--inav-primary)\">saved</span>: Programming"
     },
     "servosChangeDirection": {
         "message": "Change Direction in TX To Match"
@@ -2090,10 +2090,10 @@
         "message": "No servos configured. Add them using the Mixer tab."
     },
     "servosEepromSave": {
-        "message": "EEPROM <span style=\"color: #37a8db\">saved</span>"
+        "message": "EEPROM <span style=\"color: var(--inav-primary)\">saved</span>"
     },
     "mixerSaved": {
-        "message": "Mixer <span style=\"color: #37a8db\">saved</span>"
+        "message": "Mixer <span style=\"color: var(--inav-primary)\">saved</span>"
     },
     "mixerWizard": {
         "message": "Mixer wizard"
@@ -2574,7 +2574,7 @@
         "message": "HEX file appears to be corrupted"
     },
     "firmwareFlasherRemoteFirmwareLoaded": {
-        "message": "<span style=\"color: #37a8db\">Remote Firmware loaded, ready for flashing</span>"
+        "message": "<span style=\"color: var(--inav-primary)\">Remote Firmware loaded, ready for flashing</span>"
     },
     "firmwareFlasherFailedToLoadOnlineFirmware": {
         "message": "Failed to load remote firmware"
@@ -2587,7 +2587,7 @@
         "message": "Save"
     },
     "ledStripEepromSaved": {
-        "message": "EEPROM <span style=\"color: #37a8db\">saved</span>: LED"
+        "message": "EEPROM <span style=\"color: var(--inav-primary)\">saved</span>: LED"
     },
     "controlAxisRoll": {
         "message": "Roll [A]"
@@ -4658,7 +4658,7 @@
         "message": "Use stand-alone application.<br> Please visit the <a href=\"https://github.com/iNavFlight/inav-configurator/releases\" target=\"_blank\">website</a> to read the release notes and download."
     },
     "eeprom_load_ok": {
-        "message": "EEPROM <span style=\"color: #37a8db\">loaded</span>"
+        "message": "EEPROM <span style=\"color: var(--inav-primary)\">loaded</span>"
     },
     "confirm_delete_all_points": {
         "message": "Do you really want to delete all points?"
@@ -5486,34 +5486,34 @@
         "message": "Manual"
     },
     "sensorDataFlashNotFound": {
-        "message": "No dataflash <br>chip found"
+        "message": "No dataflash chip found"
     },
     "sensorDataFlashFreeSpace": {
         "message": "Dataflash: free space"
     },
     "mixerProfile1": {
-        "message": "Mixer Profile 1"
+        "message": "Mixer 1"
     },
     "mixerProfile2": {
-        "message": "Mixer Profile 2"
+        "message": "Mixer 2"
     },
     "sensorProfile1": {
-        "message": "Control Profile 1"
+        "message": "Control 1"
     },
     "sensorProfile2": {
-        "message": "Control Profile 2"
+        "message": "Control 2"
     },
     "sensorProfile3": {
-        "message": "Control Profile 3"
+        "message": "Control 3"
     },
     "sensorBatteryProfile1": {
-        "message": "Battery Profile 1"
+        "message": "Battery 1"
     },
     "sensorBatteryProfile2": {
-        "message": "Battery Profile 2"
+        "message": "Battery 2"
     },
     "sensorBatteryProfile3": {
-        "message": "Battery Profile 3"
+        "message": "Battery 3"
     },
     "sensorStatusGyro": {
         "message": "Gyroscope"
@@ -5935,5 +5935,20 @@
     },
     "gpsAssistnowLoadDataError": {
         "message": "Error loading AssistNow data."
+    },
+    "configuratorTheme": {
+        "message": "Configurator theme"
+    },
+    "configuratorThemeSystem": {
+        "message": "System"
+    },
+    "configuratorThemeLight": {
+        "message": "Light"
+    },
+    "configuratorThemeDark": {
+        "message": "Dark"
+    },
+    "toogleConfiguratorTheme": {
+        "message": "Toggle configurator theme"
     }
 }
