@@ -108,7 +108,7 @@ $(function() {
             i18n.getMessage('getConfiguratorVersion') + app.getVersion() + '</strong>');
 
         $('#status-bar .version').text(app.getVersion());
-        $('#logo .version').text(app.getVersion());
+        $('[data-configurator-version-info]').text(app.getVersion());
         update.firmwareVersion();
 
         if (store.get('logopen', false)) {
@@ -126,20 +126,19 @@ $(function() {
         var ui_tabs = $('#tabs > ul');
         $('a', ui_tabs).on('click', function() {
 
-            if ($(this).parent().hasClass("tab_help")) {
+            let tab = $(this).parent();
+            let tabName = tab.attr('data-tab');
+            let isActiveTab = tab.hasClass('active');
+            let requireConnectedMode = tab.parent().hasClass('mode-connected');
+
+            if (tabName === 'help') {
                 return;
             }
 
-            if ($(this).parent().hasClass('active') == false && !GUI.tab_switch_in_progress) { // only initialize when the tab isn't already active
-                var self = this,
-                    tabClass = $(self).parent().prop('class');
+            if (isActiveTab === false && !GUI.tab_switch_in_progress) { // only initialize when the tab isn't already active
+                console.log('tabName', tabName)
 
-                var tabRequiresConnection = $(self).parent().hasClass('mode-connected');
-
-                var tab = tabClass.substring(4);
-                var tabName = $(self).text();
-
-                if (tabRequiresConnection && !CONFIGURATOR.connectionValid) {
+                if (requireConnectedMode && !CONFIGURATOR.connectionValid) {
                     GUI.log(i18n.getMessage('tabSwitchConnectionRequired'));
                     return;
                 }
@@ -149,7 +148,7 @@ $(function() {
                     return;
                 }
 
-                if (GUI.allowedTabs.indexOf(tab) < 0) {
+                if (GUI.allowedTabs.indexOf(tabName) < 0) {
                     GUI.log(i18n.getMessage('tabSwitchUpgradeRequired', [tabName]));
                     return;
                 }
@@ -161,7 +160,7 @@ $(function() {
                     $('li', ui_tabs).removeClass('active');
 
                     // Highlight selected tab
-                    $(self).parent().addClass('active');
+                    tab.addClass('active');
 
                     // detach listeners and remove element data
                     var content = $('#content');
@@ -170,127 +169,25 @@ $(function() {
 
                     // display loading screen
                     $('#cache .data-loading').clone().appendTo(content);
+                    // $('#loading').clone().appendTo(content);
 
-                    function content_ready() {
+                    function contentReady() {
                         GUI.tab_switch_in_progress = false;
-
-                        // Update CSS on to show highlighing or not
-                        updateProfilesHighlightColours();
+                        updateProfilesHighlightColours(); // Update CSS on to show highlighting or not
                     }
 
-                    switch (tab) {
-                        case 'landing':
-                            require('./../tabs/landing')
-                            TABS.landing.initialize(content_ready);
-                            break;
-                        case 'firmware_flasher':
-                            require('./../tabs/firmware_flasher')
-                            TABS.firmware_flasher.initialize(content_ready);
-                            break;
-                        case 'sitl':
-                            require('./../tabs/sitl')
-                            TABS.sitl.initialize(content_ready);
-                            break;
-                        case 'auxiliary':
-                            require('./../tabs/auxiliary')
-                            TABS.auxiliary.initialize(content_ready);
-                            break;
-                        case 'adjustments':
-                            require('./../tabs/adjustments')
-                            TABS.adjustments.initialize(content_ready);
-                            break;
-                        case 'ports':
-                            require('./../tabs/ports');
-                            TABS.ports.initialize(content_ready);
-                            break;
-                        case 'led_strip':
-                            require('./../tabs/led_strip');
-                            TABS.led_strip.initialize(content_ready);
-                            break;
-                        case 'failsafe':
-                            require('./../tabs/failsafe');
-                            TABS.failsafe.initialize(content_ready);
-                            break;
-                        case 'setup':
-                            require('./../tabs/setup');
-                            TABS.setup.initialize(content_ready);
-                            break;
-                        case 'calibration':
-                            require('./../tabs/calibration');
-                            TABS.calibration.initialize(content_ready);
-                            break;
-                        case 'configuration':
-                            require('./../tabs/configuration');
-                            TABS.configuration.initialize(content_ready);
-                            break;
-                        case 'pid_tuning':
-                            require('./../tabs/pid_tuning');
-                            TABS.pid_tuning.initialize(content_ready);
-                            break;
-                        case 'receiver':
-                            require('./../tabs/receiver');
-                            TABS.receiver.initialize(content_ready);
-                            break;
-                        case 'gps':
-                            require('./../tabs/gps');
-                            TABS.gps.initialize(content_ready);
-                            break;
-                        case 'magnetometer':
-                            require('./../tabs/magnetometer');
-                            TABS.magnetometer.initialize(content_ready);
-                            break;
-                        case 'mission_control':
-                            require('./../tabs/mission_control');
-                            TABS.mission_control.initialize(content_ready);
-                            break;
-                        case 'mixer':
-                            require('./../tabs/mixer');
-                            TABS.mixer.initialize(content_ready);
-                            break;
-                        case 'outputs':
-                            require('./../tabs/outputs');
-                            TABS.outputs.initialize(content_ready);
-                            break;
-                        case 'osd':
-                            require('./../tabs/osd');
-                            TABS.osd.initialize(content_ready);
-                            break;
-                        case 'sensors':
-                            require('./../tabs/sensors');
-                            TABS.sensors.initialize(content_ready);
-                            break;
-                        case 'logging':
-                            require('./../tabs/logging');
-                            TABS.logging.initialize(content_ready);
-                            break;
-                        case 'onboard_logging':
-                            require('./../tabs/onboard_logging');
-                            TABS.onboard_logging.initialize(content_ready);
-                            break;
-                        case 'advanced_tuning':
-                            require('./../tabs/advanced_tuning');
-                            TABS.advanced_tuning.initialize(content_ready);
-                            break;
-                        case 'programming':
-                            require('./../tabs/programming');
-                            TABS.programming.initialize(content_ready);
-                            break;
-                        case 'cli':
-                            require('./../tabs/cli');
-                            TABS.cli.initialize(content_ready);
-                            break;
-                        case 'ez_tune':
-                            require('./../tabs/ez_tune');
-                            TABS.ez_tune.initialize(content_ready);
-                            break;
-                        default:
-                            console.log('Tab not found:' + tab);
+                    try {
+                        require('./../tabs/' + tabName);
+                        TABS[tabName].initialize(contentReady);
+                    } catch (e) {
+                        console.log('Tab not found:' + tab);
                     }
                 });
             }
+
         });
 
-        $('#tabs ul.mode-disconnected li a:first').trigger( "click" );
+        $('[data-tab="landing"] > a').trigger( "click" );
 
         // options
         $('#options').on('click', function() {
@@ -503,37 +400,12 @@ $(function() {
             }
         });
 
-        $("#showlog").on('click', function() {
-        var state = $(this).data('state'),
-            $log = $("#log");
 
-        if (state) {
-            $log.animate({height: 27}, 200, function() {
-                var command_log = $('div#log');
-                //noinspection JSValidateTypes
-                command_log.scrollTop($('div.wrapper', command_log).height());
-            });
-            $log.removeClass('active');
-            $("#content").removeClass('logopen');
-            $(".tab_container").removeClass('logopen');
-            $("#scrollicon").removeClass('active');
-            store.set('logopen', false);
+        $("#logs-toggle").on('click', function() {
 
-            state = false;
-        }else{
-            $log.animate({height: 111}, 200);
-            $log.addClass('active');
-            $("#content").addClass('logopen');
-            $(".tab_container").addClass('logopen');
-            $("#scrollicon").addClass('active');
-            store.set('logopen', true);
+            $('#logs').toggleClass('open');
 
-            state = true;
-        }
-        
-        $(this).html(state ? i18n.getMessage("mainHideLog") : i18n.getMessage("mainShowLog"));
-        $(this).data('state', state);
-
+            $(this).html($('#logs').hasClass('open') ? i18n.getMessage("mainHideLog") : i18n.getMessage("mainShowLog"))
         });
 
         var mixerprofile_e = $('#mixerprofilechange');
@@ -589,6 +461,7 @@ function get_osd_settings() {
     });
 }
 
+// TODO
 function updateProfilesHighlightColours() {
     if (globalSettings.showProfileParameters) {
         $('.dropdown-dark #profilechange').addClass('showProfileParams');
