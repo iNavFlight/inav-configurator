@@ -5935,5 +5935,11 @@
     },
     "gpsAssistnowLoadDataError": {
         "message": "Error loading AssistNow data."
+    },
+    "adsbVehicleTotalMessages": {
+        "message": "Vehicle msgs"
+    },
+    "adsbHeartbeatTotalMessages": {
+        "message": "Heartbeat msgs"
     }
 }
