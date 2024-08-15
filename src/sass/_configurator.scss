@@ -1,0 +1,258 @@
+html, body {
+  height: 100%;
+}
+
+// GRID
+
+.app-container {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  grid-template-rows: 60px auto 1fr 2rem;
+  grid-auto-columns: 1fr;
+  gap: 0 0;
+  grid-auto-flow: row;
+  grid-template-areas:
+        "app-header app-header"
+        "app-logs app-logs"
+        "app-sidebar app-content"
+        "app-statusbar app-statusbar";
+}
+
+.app-header {
+  grid-area: app-header;
+}
+
+.app-logs {
+  grid-area: app-logs;
+  height: 2rem;
+}
+
+.app-sidebar {
+  grid-area: app-sidebar;
+  overflow-y: auto;
+}
+
+.app-statusbar {
+  grid-area: app-statusbar;
+}
+
+.app-content {
+  grid-area: app-content;
+  overflow-y: auto;
+  position: relative;
+}
+
+
+.app-header {
+  display: flex;
+  justify-content: space-between;
+  background-color: var(--inav-body-bg);
+  color: var(--inav-body-color);
+
+
+  .logo {
+    width: 150px;
+    img {
+      height: 100%;
+    }
+  }
+
+  .sensors {
+    font-size: .9rem;
+
+    .list-group-item {
+      display: flex;
+      align-items: center;
+      background-size: contain;
+      text-shadow: 0 0 1px var(--inav-body-bg), 0 0 1px var(--inav-body-bg), 0 0 1px var(--inav-body-bg), 0 0 1px var(--inav-body-bg);
+      span {
+        position: relative;
+        color: rgba(var(--inav-body-color-rgb), 0.5);
+      }
+      .background-mask {
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+        background-color: var(--inav-secondary-bg);
+        mask-size: contain;
+        mask-position: center;
+        mask-repeat: no-repeat;
+      }
+
+      &.is-active,
+      &.error {
+        span {
+          color: var(--inav-body-color);
+        }
+      }
+
+      &.is-active {
+        .background-mask {
+          background-color: var(--inav-primary);
+        }
+      }
+
+      &.error {
+        span {
+          color: var(--inav-danger-text-emphasis);
+        }
+        .background-mask {
+          background-color: var(--inav-danger);
+        }
+      }
+    }
+  }
+
+}
+
+.app-logs {
+  background: var(--inav-tertiary-bg);
+  overflow: auto;
+  opacity: .66;
+  transition: .25s all;
+
+  &.open {
+    height: 10rem;
+    opacity: 1;
+  }
+
+  .logs-toggle {
+    font-weight: 600;
+    position: absolute;
+    right: 0;
+    cursor: pointer;
+  }
+
+  .log-row {
+    color: var(--inav-body-color);
+  }
+}
+
+.app-container {
+  height: 100vh;
+  background-color: var(--inav-body-bg);
+
+  & > .app-sidebar {
+    background-color: var(--inav-body-bg);
+    border-right: 2px solid var(--inav-primary);
+  }
+
+  & > .app-statusbar {
+    display: flex;
+    align-items: center;
+    background-color: var(--inav-tertiary-bg);
+    font-size: 0.9rem;
+  }
+
+}
+
+
+$tabIcons: (
+  'welcome': url(./images/icons/cf_icon_welcome_white.svg),
+  'help': url(./images/icons/cf_icon_help_white.svg),
+  'mission-control': url(./images/icons/cf_icon_mission_white.svg),
+  'firmware-flasher': url(./images/icons/cf_icon_flasher_white.svg),
+  'sitl': url(./images/icons/cf_icon_sitl_white.svg),
+  'setup': url(./images/icons/cf_icon_setup_white.svg),
+  'calibration': url(./images/icons/cf_icon_cal_white.svg),
+  'mixer': url(./images/icons/cf_icon_mixer_white.svg),
+  'outputs': url(./images/icons/cf_icon_motor_white.svg),
+  'ports': url(./images/icons/cf_icon_ports_white.svg),
+  'configuration': url(./images/icons/cf_icon_config_white.svg),
+  'failsafe': url(./images/icons/cf_icon_failsafe_white.svg),
+  'pid-tuning': url(./images/icons/cf_icon_pid_white.svg),
+  'advanced-tuning': url(./images/icons/cf_icon_advanced_grey.svg),
+  'programming': url(./images/icons/cf_icon_config_grey.svg),
+  'receiver': url(./images/icons/cf_icon_rx_white.svg),
+  'adjustments': url(./images/icons/cf_icon_adjust_white.svg),
+  'auxiliary': url(./images/icons/cf_icon_modes_white.svg),
+  'gps': url(./images/icons/cf_icon_gps_white.svg),
+  'magnetometer': url(./images/icons/cf_icon_mag_white.svg),
+  'osd': url(./images/icons/icon_osd.svg),
+  'led-strip': url(./images/icons/cf_icon_led_white.svg),
+  'sensors': url(./images/icons/cf_icon_sensors_white.svg),
+  'logging': url(./images/icons/cf_icon_log_white.svg),
+  'onboard-logging': url(./images/icons/cf_icon_data_white.svg),
+  'cli': url(./images/icons/cf_icon_cli_white.svg),
+);
+
+
+
+.sidebar-nav {
+  li {
+    max-width: 100%;
+  }
+
+  a {
+    position: relative;
+    font-size: 1.1rem;
+    height: 2.25rem;
+    padding-left: 2.5rem;
+    color: var(--inav-secondary-color);
+    text-wrap: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+
+    &:before {
+      content: " ";
+      width: 1.33rem;
+      height: 1.33rem;
+      position: absolute;
+      background-color: var(--inav-secondary-color);
+      top: 0.45rem;
+      left: .66rem;
+      mask-repeat: no-repeat;
+      mask-position: center center;
+      mask-size: cover;
+    }
+
+    @each $name, $url in $tabIcons {
+      &.icon-#{$name}:before {
+        mask-image: $url;
+      }
+    }
+  }
+
+  li.active a {
+    color: var(--inav-body-color);
+    background-color: var(--inav-primary);
+    &:before {
+      background-color: var(--inav-body-color);
+    }
+  }
+
+  li:not(.active) .nav-link:hover {
+    color: var(--inav-body-color);
+    background-color: var(--inav-tertiary-bg);
+    &:before {
+      background-color: var(--inav-body-color);
+    }
+  }
+
+}
+
+
+#status-bar .status-bar-item:last-child {
+  padding: 0 0.5rem;
+  margin-left: auto;
+}
+
+#status-bar .status-bar-item:has(span:not(:empty)) {
+  padding: 0 0.5rem;
+  border-right: var(--inav-border-width) var(--inav-border-color) solid;
+}
+
+[data-connected="true"] .mode-connected,
+[data-connected="false"] .mode-disconnected
+{
+  display: unset;
+}
+
+[data-connected="false"] .mode-connected,
+[data-connected="true"] .mode-disconnected
+{
+  display: none !important;
+}
+

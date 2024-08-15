@@ -1,0 +1,13 @@
+// .w-1r, .w-2r ... .w-20r
+@for $i from 1 through 20 {
+  .w-#{$i}r {
+    width: #{$i}rem;
+  }
+}
+
+// .wm-1r, .wm-2r ... .wm-20r
+@for $i from 1 through 20 {
+  .wm-#{$i}r {
+    max-width: #{$i}rem;
+  }
+}
