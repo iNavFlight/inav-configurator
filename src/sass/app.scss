@@ -43,6 +43,9 @@
 @import "../../node_modules/bootstrap/scss/offcanvas";
 @import "../../node_modules/bootstrap/scss/placeholders";
 
+// Custom sass
+@import "alerts";
+
 // Helpers
 @import "../../node_modules/bootstrap/scss/helpers";
 

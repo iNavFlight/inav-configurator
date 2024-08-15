@@ -1,0 +1,5 @@
+@each $state in map-keys($theme-colors) {
+  .alert-#{$state} {
+    border-left: var(--#{$prefix}border-radius) solid var(--#{$prefix}#{$state}-border-subtle);
+  }
+}
