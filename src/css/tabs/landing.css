@@ -2,6 +2,7 @@
 .tab-landing {
     min-height: 100%;
     overflow: hidden;
+    background: var(--inav-body-bg) url(./../../../images/map_bg.svg);
 }
 
 .tab-landing .content_wrapper {
@@ -9,76 +10,92 @@
     min-height: 100%;
     height: 100%;
     overflow-y: auto;
-    background-color: #104156;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: center;
 }
 
 .tab-landing .content_top {
-    height: 140px;
-    background: white url(./../../../images/map_bg.svg);
-    padding: 20px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 3rem;
 }
 
 .tab-landing .community {
-    text-align: center;
-    margin: 15px 0px;
+    margin: 15px 0;
+    display: flex;
+    justify-content: center;
+    gap: 5rem;
 }
 
 .tab-landing .community a {
-    display: block;
 }
 
 .tab-landing .community ul span {
-    color: white;
-    position: absolute;
-    padding: 10px;
+    color: var(--inav-body-color);
 }
 
 .tab-landing .community ul {
-    font-size: 20px;
-    text-align: center;
-    width: 300px;
-    height: 45px;
-    display: inline-block;
-    position: relative;
+    font-size: 1.5rem;
+}
+
+.tab-landing .community ul a {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .tab-landing .community ul i {
     font-size: 35px;
-    color: white;
-    margin-left: -200px;
-    margin-top: 5px;
+    /*color: var(--inav-secondary);*/
 }
 
 .tab-landing .content_mid {
-    background-color: #37a8db;
+    height: 320px;
+    margin-top: auto;
+    background-color: var(--inav-primary-bg-subtle);
+    color: var(--inav-primary-text-emphasis);
     overflow: hidden;
 }
 
 .tab-landing .content_mid a {
-    color: white;
+    text-decoration: underline;
+    color: var(--inav-primary-text-emphasis);
+}
+
+.tab-landing .content_mid .wrap {
+    padding: 2rem;
 }
 
 .tab-landing .content_foot {
     clear: both;
-    padding: 20px 20px 5px;
 }
 
 /* hero block */
 .tab-landing .logowrapper {
     margin-left: auto;
     margin-right: auto;
-    margin-top: 5px;
-    width: 800px;
-    color: black;
-    font-size: 14px;
-    font-family: 'open_sanslight', Arial,serif;
+    max-width: 1200px;
+    color: var(--inav-body-color);
+    font-size: 1.5rem;
 }
 
-.tab-landing .logowrapper img {
-    width: 700px;
-    margin: 10px;
+.tab-landing .logowrapper img.dark-theme,
+.tab-landing .logowrapper img.light-theme
+{
+    display: none;
 }
 
+[data-bs-theme="light"] .tab-landing .logowrapper img.light-theme {
+    display: unset;
+}
+
+[data-bs-theme="dark"] .tab-landing .logowrapper img.dark-theme {
+    display: unset;
+}
 
 /* sponsors blocks */
 .sponsors .title {
@@ -107,23 +124,15 @@
     padding: 2px 4px;
     font-size: 35px;
     line-height: 40px;
-    color: white;
     font-weight: normal;
     font-family: 'open_sanslight', Arial,serif;
 }
 
 .sponsors li a:hover {
     background-color: rgba(255, 255, 255, 0.30);
-    color: #fff;
 }
 
 .text1, .text2, .text3 {
-    margin-top: 15px;
-    margin-bottom: 15px;
-    font-weight: normal;
-    font-family: 'open_sansregular', Arial,serif;
-    font-size: 1.2em;
-	color: #c2efff;
 }
 
 .text3 {
@@ -132,21 +141,17 @@
 
 /* text columns */
 .tab-landing .content_mid .column .wrap {
-    padding: 0 15px;
 }
 
 .tab-landing .content_mid .column .wrap2 {
-    padding: 10px;
 }
 
 .tab-landing .content_mid h2 {
     margin-bottom: 5px;
-    font-size: 13px;
-	color: white;
+    color: var(--inav-primary-text-emphasis);
 }
 
 .tab-landing .content_mid h3 {
-    font-size: 12px;
     margin-bottom: 5px;
 }
 
@@ -155,11 +160,9 @@
 }
 
 .tab-landing .content_mid .text1 {
-    width: 47%;
 }
 
 .tab-landing .content_mid .text2 {
-    width: 47%;
 }
 
 .tab-landing .content_mid .text2 ul {
@@ -168,7 +171,6 @@
 
 .tab-landing .content_mid .text2 li {
     padding: 5px 0;
-    border-top: 1px dotted silver;
 }
 
 .tab-landing .content_mid .text3 {
@@ -176,14 +178,10 @@
 }
 
 .tab-landing .content_mid .text3 .wrap2 {
-    border: 1px solid silver;
-    border-radius: 5px;
-    background: white;
     margin-right: 25px;
     margin-left: 20px;
     margin-top: 5px;
     min-height: 187px;
-    font-size: 11px;
 }
 
 .tab-landing .content_mid .text3 .donate {
