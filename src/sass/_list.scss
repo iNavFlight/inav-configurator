@@ -1,0 +1,21 @@
+.card {
+  .card-header {
+    font-size: 1.1rem;
+    font-weight: 600;
+  }
+  .card-body {
+    .list-group-flush {
+      .list-group-item {
+        background-color: transparent;
+        padding-left: 0;
+        padding-right: 0;
+        &:first-child {
+          padding-top: 0;
+        }
+        &:last-child {
+          padding-bottom: 0;
+        }
+      }
+    }
+  }
+}
