@@ -34,10 +34,10 @@
 
 /* .mixer-table tbody tr:first-child, */
 .mixer-table thead tr {
-    border-left: 1px solid #e4e4e4;
-    border-right: 1px solid #e4e4e4;
-    background-color: #828885;
-    color: #FFF;
+    border-left: var(--inav-border-width) var(--inav-border-color) solid;
+    border-right: var(--inav-border-width) var(--inav-border-color) solid;
+    background-color: rgba(var(--inav-emphasis-color-rgb), 0.05);
+    color: var(--inav-body-color);
 }
 
 .mixer-table td,
@@ -48,7 +48,7 @@
 
 .mixer-table tr:nth-child(even) td,
 .mixer-table tr:nth-child(even) th {
-    background-color: #ebe7e7;
+    background-color: rgba(var(--inav-emphasis-color-rgb), 0.05);;
 }
 
 .tab-mixer .rightWrapper {
@@ -62,10 +62,9 @@
 }
 
 .output-table th {
-    background-color: #828885;
-    color: #fff;
+    background-color: var(--inav-tertiary-bg);
     text-align: left;
-    padding-left: 1em;
+    padding-left: 1rem;
 }
 
 .output-table td {
@@ -82,7 +81,6 @@
 }
 
 .output-table #function-row td {
-    background-color: #ebe7e7;
 }
 
 .mixer_btn_add {
