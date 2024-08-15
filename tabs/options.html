@@ -18,71 +18,174 @@
             </div>
         </div>
 
-        <div class="options-section gui_box grey">
 
-            <div class="spacer_box settings">
-                <div class="checkbox notifications">
-                    <input id="notificationsOptions" type="checkbox" />
-                    <label for="notificationsOptions"><span data-i18n="options_receive_app_notifications"></span></label>
-                </div>
-                <!--
-                <div class="checkbox statistics">
-                    <input id="improveConfigurator" type="checkbox" />
-                    <label for="improveConfigurator"><span data-i18n="options_improve_configurator"></span></label>
-                </div>
-                -->
-                <div class="checkbox show_profile_parameters">
-                    <input id="showProfileParameters" type="checkbox" />
-                    <label for="showProfileParameters"><span data-i18n="options_showProfileParameters"></span></label>
-                </div>
-                <div class="checkbox cli_autocomplete">
-                    <input id="cliAutocomplete" type="checkbox" />
-                    <label for="cliAutocomplete"><span data-i18n="options_cliAutocomplete"></span></label>
-                </div>
-                
-                <div class="select">                    
-                    <select id="languageOption">
-                    </select>
-                    <label for="languageOption" data-i18n="language"></label>
-                </div>
+<!--        <div class="options-section gui_box grey">-->
+<!--            <div class="gui_box_titlebar">-->
+<!--                <div class="spacer_box_title"><span data-i18n="configuratorTheme"></span></div>-->
+<!--            </div>-->
+
+<!--            <div class="spacer_box settings">-->
+<!--                <div class="select">-->
+<!--                    <select id="configurator-theme-select">-->
+<!--                        <option value="auto" data-i18n="configuratorThemeSystem"></option>-->
+<!--                        <option value="light" data-i18n="configuratorThemeLight"></option>-->
+<!--                        <option value="dark" data-i18n="configuratorThemeDark"></option>-->
+<!--                    </select>-->
+<!--                    <label><span data-i18n="toogleConfiguratorTheme"></span></label>-->
+<!--                </div>-->
+<!--            </div>-->
+
+<!--        </div>-->
+
+        <div class="card mb-3">
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">
+                        <div class="checkbox notifications">
+                            <input id="notificationsOptions" type="checkbox" />
+                            <label for="notificationsOptions"><span data-i18n="options_receive_app_notifications"></span></label>
+                        </div>
+                    </li>
+<!--                    <li class="list-group-item">-->
+<!--                        <div class="checkbox statistics">-->
+<!--                            <input id="improveConfigurator" type="checkbox" />-->
+<!--                            <label for="improveConfigurator"><span data-i18n="options_improve_configurator"></span></label>-->
+<!--                        </div>-->
+<!--                    </li>-->
+                    <li class="list-group-item">
+                        <div class="checkbox show_profile_parameters">
+                            <input id="showProfileParameters" type="checkbox" class="form-check-input" />
+                            <label for="showProfileParameters" class="form-check-label"><span data-i18n="options_showProfileParameters"></span></label>
+                        </div>
+                    </li>
+                    <li class="list-group-item">
+                        <div class="checkbox cli_autocomplete">
+                            <input id="cliAutocomplete" type="checkbox" />
+                            <label for="cliAutocomplete"><span data-i18n="options_cliAutocomplete"></span></label>
+                        </div>
+                    </li>
+                    <li class="list-group-item hstack">
+                        <select id="languageOption" class="form-select w-10rem"></select>
+                        <label for="languageOption" data-i18n="language"></label>
+                    </li>
+                </ul>
             </div>
         </div>
 
-        <div class="options-section gui_box grey">
+<!--        <div class="options-section gui_box grey">-->
 
-            <div class="spacer_box settings">
-                <div class="select">                    
-                    <select id="map-provider-type">
-                        <option value="osm">OpenStreetMap</option>
-                        <option value="bing">Bing Maps</option>
-                        <option value="mapproxy">MapProxy</option>
-                    </select>       
-                    <label for="map-provider-type" data-i18n="mapProvider"></label>             
-                </div>
+<!--            <div class="spacer_box settings">-->
+<!--                <div class="checkbox notifications">-->
+<!--                    <input id="notificationsOptions" type="checkbox" />-->
+<!--                    <label for="notificationsOptions"><span data-i18n="options_receive_app_notifications"></span></label>-->
+<!--                </div>-->
+<!--                &lt;!&ndash;-->
+<!--                <div class="checkbox statistics">-->
+<!--                    <input id="improveConfigurator" type="checkbox" />-->
+<!--                    <label for="improveConfigurator"><span data-i18n="options_improve_configurator"></span></label>-->
+<!--                </div>-->
+<!--                &ndash;&gt;-->
+<!--                <div class="checkbox show_profile_parameters">-->
+<!--                    <input id="showProfileParameters" type="checkbox" />-->
+<!--                    <label for="showProfileParameters"><span data-i18n="options_showProfileParameters"></span></label>-->
+<!--                </div>-->
+<!--                <div class="checkbox cli_autocomplete">-->
+<!--                    <input id="cliAutocomplete" type="checkbox" />-->
+<!--                    <label for="cliAutocomplete"><span data-i18n="options_cliAutocomplete"></span></label>-->
+<!--                </div>-->
+<!--                -->
+<!--                <div class="select">                    -->
+<!--                    <select id="languageOption">-->
+<!--                    </select>-->
+<!--                    <label for="languageOption" data-i18n="language"></label>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </div>-->
 
-                <div class="number">
-                    <input type="password" id="map-api-key" style="border: solid 1px black" />                
-                    <label for="map-api-key" data-i18n="mapApiKey"></label>                    
-                </div>
+        <div class="card mb-3">
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item hstack">
+                        <select id="map-provider-type" class="form-select w-10rem">
+                            <option value="osm">OpenStreetMap</option>
+                            <option value="bing">Bing Maps</option>
+                            <option value="mapproxy">MapProxy</option>
+                        </select>
+                        <label for="map-provider-type" data-i18n="mapProvider"></label>
+                    </li>
+                    <li class="list-group-item hstack">
+                        <input type="password" id="map-api-key" class="form-control w-10rem"/>
+                        <label for="map-api-key" data-i18n="mapApiKey"></label>
+                    </li>
+                    <li class="list-group-item hstack">
+                        <input type="text" id="proxyurl" class="form-control w-10rem"/>
+                        <label for="proxyurl" data-i18n="proxyURL"></label>
+                    </li>
+                    <li class="list-group-item hstack">
+                        <input type="text" id="proxylayer" class="form-control w-10rem"/>
+                        <label for="proxylayer" data-i18n="proxyLayer"></label>
+                    </li>
+                </ul>
 
-                <div class="number">                    
-                    <input type="text" id="proxyurl" style="border: solid 1px black" />
-                    <label for="proxyurl" data-i18n="proxyURL"></label>
-                </div>
-                <div class="number">                    
-                    <input type="text" id="proxylayer" style="border: solid 1px black" />
-                    <label for="proxylayer" data-i18n="proxyLayer"></label>
-                </div>
+
+<!--                <div class="select">-->
+<!--                    <select id="map-provider-type">-->
+<!--                        <option value="osm">OpenStreetMap</option>-->
+<!--                        <option value="bing">Bing Maps</option>-->
+<!--                        <option value="mapproxy">MapProxy</option>-->
+<!--                    </select>-->
+<!--                    <label for="map-provider-type" data-i18n="mapProvider"></label>-->
+<!--                </div>-->
+
+<!--                <div class="number">-->
+<!--                    <input type="password" id="map-api-key" />-->
+<!--                    <label for="map-api-key" data-i18n="mapApiKey"></label>-->
+<!--                </div>-->
+
+<!--                <div class="number">-->
+<!--                    <input type="text" id="proxyurl" />-->
+<!--                    <label for="proxyurl" data-i18n="proxyURL"></label>-->
+<!--                </div>-->
+<!--                <div class="number">-->
+<!--                    <input type="text" id="proxylayer" />-->
+<!--                    <label for="proxylayer" data-i18n="proxyLayer"></label>-->
+<!--                </div>-->
             </div>
         </div>
 
-        <div class="options-section gui_box grey">
-            <div class="gui_box_titlebar">
-                <div class="spacer_box_title" data-i18n="options_render"></div>
-            </div>
-            <div class="spacer_box settings">
-                <div class="select">
-                    <select id="ui-unit-type">
+<!--        <div class="options-section gui_box grey">-->
+
+<!--            <div class="spacer_box settings">-->
+<!--                <div class="select">                    -->
+<!--                    <select id="map-provider-type">-->
+<!--                        <option value="osm">OpenStreetMap</option>-->
+<!--                        <option value="bing">Bing Maps</option>-->
+<!--                        <option value="mapproxy">MapProxy</option>-->
+<!--                    </select>       -->
+<!--                    <label for="map-provider-type" data-i18n="mapProvider"></label>             -->
+<!--                </div>-->
+
+<!--                <div class="number">-->
+<!--                    <input type="password" id="map-api-key" />-->
+<!--                    <label for="map-api-key" data-i18n="mapApiKey"></label>                    -->
+<!--                </div>-->
+
+<!--                <div class="number">                    -->
+<!--                    <input type="text" id="proxyurl" />-->
+<!--                    <label for="proxyurl" data-i18n="proxyURL"></label>-->
+<!--                </div>-->
+<!--                <div class="number">                    -->
+<!--                    <input type="text" id="proxylayer" />-->
+<!--                    <label for="proxylayer" data-i18n="proxyLayer"></label>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </div>-->
+
+        <div class="card mb-3">
+            <div class="card-header" data-i18n="options_render"></div>
+            <div class="card-body">
+                <div class="hstack">
+                    <select id="ui-unit-type" class="form-select w-10rem">
                         <option value="none">None</option>
                         <option value="OSD">OSD</option>
                         <option value="imperial">Imperial</option>
@@ -92,37 +195,87 @@
                 </div>
             </div>
         </div>
-        <div class="options-section gui_box grey">
-            <div class="gui_box_titlebar">
-                <div class="spacer_box_title" data-i18n="sitlDemoMode"></div>
-            </div>
-            <div class="spacer_box settings">
-                <div class="default_btn" style="float: none; width: 200px;">
-                    <a id="demoModeReset" href="#" i18n="sitlResetDemoModeData"></a>
-                </div>
-            </div>
-        </div>
-        <div class="options-section gui_box grey">
-            <div class="gui_box_titlebar">
-                <div class="spacer_box_title" data-i18n="maintenance"></div>
-            </div>
-            <div class="spacer_box settings">
-                <div class="default_btn" style="float: none; width: 200px;">
-                    <a id="maintenanceFlushSettingsCache" href="#" i18n="maintenanceFlushSettingsCache"></a>
-                </div>
-            </div>
-        </div>
-        <div class="options-section gui_box grey">
-            <div class="gui_box_titlebar">
-                <div class="spacer_box_title" data-i18n="gpsOptions"></div>
-            </div>
 
-            <div class="spacer_box settings">
-                <div class="number">
-                    <input type="password" id="assistnow-api-key" style="border: solid 1px black" />                
-                    <label for="assistnow-api-key" data-i18n="gpsOptionsAssistnowToken"></label>                    
+<!--        <div class="options-section gui_box grey">-->
+<!--            <div class="gui_box_titlebar">-->
+<!--                <div class="spacer_box_title" data-i18n="options_render"></div>-->
+<!--            </div>-->
+<!--            <div class="spacer_box settings">-->
+<!--                <div class="select">-->
+<!--                    <select id="ui-unit-type">-->
+<!--                        <option value="none">None</option>-->
+<!--                        <option value="OSD">OSD</option>-->
+<!--                        <option value="imperial">Imperial</option>-->
+<!--                        <option value="metric">Metric</option>-->
+<!--                    </select>-->
+<!--                    <label for="ui-unit-type" data-i18n="options_unit_type"></label>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </div>-->
+
+        <div class="card mb-3">
+            <div class="card-header" data-i18n="sitlDemoMode"></div>
+            <div class="card-body">
+                <div class="d-grid">
+                    <a id="demoModeReset" href="#" i18n="sitlResetDemoModeData" class="btn btn-outline-primary"></a>
                 </div>
             </div>
         </div>
+
+
+        <div class="card mb-3">
+            <div class="card-header" data-i18n="maintenance"></div>
+            <div class="card-body">
+                <div class="d-grid">
+                    <a id="maintenanceFlushSettingsCache" href="#" i18n="maintenanceFlushSettingsCache" class="btn btn-outline-primary"></a>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header" data-i18n="gpsOptions"></div>
+            <div class="card-body">
+                <div class="hstack">
+                    <input type="password" id="assistnow-api-key" class="form-control w-10rem" />
+                    <label for="assistnow-api-key" data-i18n="gpsOptionsAssistnowToken"></label>
+                </div>
+            </div>
+        </div>
+
+<!--        <div class="options-section gui_box grey">-->
+<!--            <div class="gui_box_titlebar">-->
+<!--                <div class="spacer_box_title" data-i18n="sitlDemoMode"></div>-->
+<!--            </div>-->
+<!--            <div class="spacer_box settings">-->
+<!--                <div class="default_btn" style="float: none; width: 200px;">-->
+<!--                    <a id="demoModeReset" href="#" i18n="sitlResetDemoModeData"></a>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </div>-->
+
+<!--        <div class="options-section gui_box grey">-->
+<!--            <div class="gui_box_titlebar">-->
+<!--                <div class="spacer_box_title" data-i18n="maintenance"></div>-->
+<!--            </div>-->
+<!--            <div class="spacer_box settings">-->
+<!--                <div class="default_btn" style="float: none; width: 200px;">-->
+<!--                    <a id="maintenanceFlushSettingsCache" href="#" i18n="maintenanceFlushSettingsCache"></a>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </div>-->
+
+<!--        <div class="options-section gui_box grey">-->
+<!--            <div class="gui_box_titlebar">-->
+<!--                <div class="spacer_box_title" data-i18n="gpsOptions"></div>-->
+<!--            </div>-->
+
+<!--            <div class="spacer_box settings">-->
+<!--                <div class="number">-->
+<!--                    <input type="password" id="assistnow-api-key" />-->
+<!--                    <label for="assistnow-api-key" data-i18n="gpsOptionsAssistnowToken"></label>                    -->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </div>-->
+
     </div>
 </div>
