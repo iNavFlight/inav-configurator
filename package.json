@@ -19,6 +19,7 @@
   "license": "GPL-3.0",
   "dependencies": {
     "@electron/remote": "^2.1.1",
+    "bootstrap": "^5.3.3",
     "electron-squirrel-startup": "^1.0.0",
     "electron-store": "^8.1.0",
     "electron-window-state": "^5.0.3",
@@ -50,6 +51,7 @@
     "@electron-forge/maker-zip": "^7.2.0",
     "@electron/packager": "^18.3.3",
     "electron": "28.1.4",
-    "node-gyp": "^10.1.0"
+    "node-gyp": "^10.1.0",
+    "sass": "^1.77.8"
   }
 }
