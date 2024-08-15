@@ -20,18 +20,9 @@
 
 .tab-failsafe .number input {
     width: 50px;
-    padding-left: 3px;
-    height: 20px;
-    line-height: 20px;
-    text-align: left;
-    border: 1px solid silver;
-    border-radius: 3px;
-    font-size: 12px;
-    font-weight: normal;
 }
 
 .tab-failsafe .number input:disabled {
-    background-color: #ececec;
 }
 
 .tab-failsafe .number span {
@@ -43,7 +34,7 @@
     width: 100%;
     margin-bottom: 6px;
     padding-bottom: 5px;
-    border-bottom: 1px solid #ddd;
+    border-bottom: var(--inav-border-color) var(--inav-border-width) solid;
     margin-top: 0;
 }
 
@@ -58,8 +49,7 @@
 .tab-failsafe .radioarea {
     float: left;
     width: 100%;
-    border-radius: 5px;
-    background-color: #ededed;
+    border-radius: var(--inav-border-radius);
     margin-bottom: 0;
     margin-top: 5px;
     height: 150px;
@@ -70,8 +60,6 @@
     width: 50%;
     margin-top: 38px;
     margin-left: 15px;
-    font-size: 12px;
-    font-family: 'open_sansregular', sans-serif;
 }
 
 .tab-failsafe .radiobuttons input {
@@ -111,7 +99,6 @@
 }
 
 .tab-failsafe .pro5 {
-    background-color: #fafafa;
     background-size: 200px;
     height: auto;
 }
@@ -147,7 +134,7 @@
 
 .tab-failsafe .number {
     padding-bottom: 5px;
-    border-bottom: 1px solid #ddd;
+    border-bottom: var(--inav-border-color) var(--inav-border-width) solid;
     width: 100%;
     float: left;
 }
@@ -169,18 +156,11 @@
 }
 
 .tab-failsafe .gui_box {
-    font-style: normal;
-    font-family: 'open_sanssemibold', sans-serif;
     margin-bottom: 15px;
     float: left;
 }
 
 .tab-failsafe .gui_box span {
-    font-style: normal;
-    font-family: 'open_sansregular', sans-serif;
-    line-height: 19px;
-    color: #4F4F4F;
-    font-size: 11px;
 }
 
 .tab-failsafe .stage1 .number input {
@@ -198,10 +178,8 @@
 .tab-failsafe .modename {
     background-color: #828885;
     border-radius: 3px;
-    border: 1px solid #686c6a;
+    border: var(--inav-border-color) var(--inav-border-width) solid;
     color: #fff !important;
-    font-weight: normal;
-    font-family: 'open_sanssemibold', sans-serif;
     padding-left: 3px;
     padding-right: 3px;
     margin-right: 3px;
