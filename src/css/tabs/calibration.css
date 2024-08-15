@@ -6,12 +6,10 @@
     float: left;
     width: calc(33% - 10px);
     height: 180px;
-    background-color: #ddd;
-    border-radius: 7px;
-    border: solid 1px silver;
+    border-radius: var(--inav-border-radius);
+    border: var(--inav-border-width) var(--inav-border-color) solid;
     margin-right: 14px;
     margin-bottom: 15px;
-    box-shadow: inset 0 0 10px #ccc;
     background-size: 140px;
     background-position: center;
     background-repeat: no-repeat;
@@ -34,10 +32,10 @@
     width: calc(100% - 10px);
     text-align: center;
     padding: 5px;
-    background-color: silver;
-    border-top-left-radius: 5px;
-    border-top-right-radius: 5px;
-    color: white;
+    background-color: var(--inav-tertiary-bg);
+    border-top-left-radius: var(--inav-border-radius);
+    border-top-right-radius: var(--inav-border-radius);
+    color: var(--inav-body-color);
 }
 
 .tab-calibration .indicator {
@@ -58,22 +56,20 @@
     }
 
 .tab-calibration .finished .steptitle {
-    background-color: grey;
 }
 
 .tab-calibration .active .steptitle {
-    background-color: #37a8db;
+    background-color: var(--inav-primary);
 }
 
 .tab-calibration .active {
-    border: solid 1px #37a8db;
+    border: solid 1px var(--inav-primary);
     background-color: white;
     box-shadow: 0 0 10px #ccc;
 
 }
 
 .tab-calibration .finished {
-    background-color: #FFF;
 }
 
  .tab-calibration .step1 {
@@ -148,26 +144,16 @@
  }
 
  #calib_btn a.resetCalibration {
-    background-color: grey;
-    color: rgb(212, 212, 212);
  }
 
  #calib_btn a.resetCalibration:hover {
-    background-color: #e60000;
+    background-color: var(--inav-danger);
+    border: var(--inav-border-width) var(--inav-danger) solid;
     color: #ffffff;
  }
  
 .tab-calibration input {
     width: 57px;
-    padding-left: 3px;
-    height: 20px;
-    line-height: 20px;
-    text-align: left;
-    border: 1px solid silver;
-    border-radius: 3px;
-    margin-left: 11px;
-    font-size: 12px;
-    font-weight: normal;
 }
 
 .tab-calibration .spacer_box div input {
