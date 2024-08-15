@@ -22,14 +22,6 @@
 
 .config-section input,
 .tab-configuration input {
-    padding-left: 3px;
-    height: 20px;
-    line-height: 20px;
-    text-align: left;
-    border: 1px solid silver;
-    border-radius: 3px;
-    font-size: 12px;
-    font-weight: normal;
 }
 
 .config-section .number input,
@@ -44,12 +36,10 @@
 }
 
 .tab-configuration .disabled {
-    background-color: #ececec;
 }
 
 .config-section input,
 .tab-configuration input {
-    /*float: left;*/
 }
 
 .config-section .spacer_box,
@@ -84,7 +74,7 @@ hr {
     margin-bottom: 5px;
     clear: left;
     padding-bottom: 5px;
-    border-bottom: 1px solid #ddd;
+    border-bottom: 1px solid var(--inav-border-color);
     width: 100%;
     float: left;
 }
@@ -130,10 +120,8 @@ hr {
 
 .tab-configuration .mixerPreview {
     max-width: 230px;
-    background-color: #eeeeee;
     text-align: center;
     float: left;
-    border-radius: 5px;
     margin-top: 5px;
 }
 
@@ -142,15 +130,9 @@ hr {
 }
 
 .tab-configuration .gui_box {
-    font-family: 'open_sanssemibold', Arial, serif;
 }
 
 .tab-configuration .gui_box span {
-    font-style: normal;
-    font-family: 'open_sansregular', Arial, serif;
-    line-height: 19px;
-    color: #4F4F4F;
-    font-size: 12px;
 }
 
 .tab-configuration .alignicon {
@@ -158,7 +140,7 @@ hr {
     position: relative;
     width: 20px;
     height: 20px;
-    margin-top: 0px;
+    margin-top: 0;
     margin-left: 6px;
     margin-right: 2px;
     top: 6px;
