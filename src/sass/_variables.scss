@@ -1,0 +1,35 @@
+html {
+  font-size: 13px; // The only one place where devs should use pixels for font-size
+}
+
+$prefix: 'inav-';
+
+$font-family-sans-serif: "Open Sans", Helvetica, Arial, sans-serif;
+
+// Override standard colors
+$primary: #37a8db;
+$secondary: #969fa6;
+$success: #2fb344;
+$warning: #f79507;
+$danger: #da4c4c;
+$info: #4299e1;
+
+$min-contrast-ratio: 2;
+
+// Spacers
+$spacer: .75rem;
+$input-btn-padding-y: .25rem;
+
+$nav-link-padding-y: .33rem !default;
+$nav-link-padding-x: .5rem !default;
+
+$tooltip-padding-x: .75rem;
+
+// Forms, Form Inputs
+$form-switch-width: 2em;
+
+// Card
+$card-bg: rgba(var(--#{$prefix}body-color-rgb), .025) !default;
+
+// List Groups
+$list-group-bg: trasparent;
