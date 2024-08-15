@@ -1,16 +1,18 @@
 .ez-tune-preview {
-    background-color: #8ecae6;
+    background-color: var(--inav-primary-bg-subtle);
+    border: var(--inav-border-width) var(--inav-primary-border-subtle) solid;
+    color: var(--inav-primary-text-emphasis);
     margin-left: 1em;
     margin-bottom: 1em;
     min-width: 25%;
     padding: 0.5em;
+    border-radius: var(--inav-border-radius);
 }
 
 .ez-tune-preview h2 {
     font-size: 1.3em;
     margin-bottom: 1em;
     margin-top: 0.5em;
-    color: #303030
 }
 
 .ez-tune-preview table {
@@ -26,9 +28,11 @@
 }
 
 .ez-tune-preview table th {
-    background-color: #3EA5D4 !important;
+    background-color: var(--inav-primary-border-subtle) !important;
 }
 
 .ez-tune-preview table td {
-    background-color: #A8D6EC !important;
+    background-color: var(--inav-primary-bg-subtle) !important;
+    border-right: var(--inav-border-width) var(--inav-primary-border-subtle) solid !important;
+    border-bottom: var(--inav-border-width) var(--inav-primary-border-subtle) solid !important;
 }
