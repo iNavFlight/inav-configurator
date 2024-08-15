@@ -65,11 +65,11 @@ var Settings = (function () {
 
             if (globalSettings.showProfileParameters) {
                 if (FC.isBatteryProfileParameter(settingName)) {
-                    input.css("background-color","#fef2d5");
+                    input.css("background-color","var(--inav-warning-bg-subtle)");
                 }
 
                 if (FC.isControlProfileParameter(settingName)) {
-                    input.css("background-color","#d5ebfe");
+                    input.css("background-color","var(--inav-primary-bg-subtle)");
                 }
             }
 
