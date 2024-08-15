@@ -1238,16 +1238,16 @@
     "configurationGimbal": {
         "message": "Serial Gimbal"
     },
-    "configurationGimbalSensitivity": { 
+    "configurationGimbalSensitivity": {
         "message":"Gimbal sensitivity"
     },
-    "configurationGimbalPanChannel": { 
+    "configurationGimbalPanChannel": {
         "message":"Pan channel (yaw)"
     },
-    "configurationGimbalTiltChannel": { 
+    "configurationGimbalTiltChannel": {
         "message":"Tilt channel (pitch)"
     },
-    "configurationGimbalRollChannel": { 
+    "configurationGimbalRollChannel": {
         "message":"Roll channel"
     },
     "configurationHeadtracker": {
@@ -5217,6 +5217,9 @@
     },
     "BLACKBOX_FEATURE_GYRO_PEAKS_YAW": {
         "message": "Gyro Noise peak freq. Yaw"
+    },
+    "BLACKBOX_FEATURE_SERVOS": {
+        "message": "Servos output"
     },
     "axisRoll": {
         "message": "Roll"
