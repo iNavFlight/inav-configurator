@@ -1,33 +1,34 @@
-<div class="tab-landing">
-    <div class="content_wrapper">
-        <div class="content_top">
-            <div class="logowrapper" align="center">
-                <img src="images/cf_logo_white.svg" class="dark-theme"/>
-                <img src="images/cf_logo_black.svg" class="light-theme"/>
-                <div class="" i18n="defaultWelcomeIntro" align="center"></div>
+<div class="container-fluid h-100 d-flex flex-column" style="background: var(--inav-body-bg) url(./images/map_bg.svg);">
+    <div class="row h-100">
+        <div class="col d-flex justify-content-center flex-column">
+            <div class="text-center p-5">
+                <img src="images/cf_logo_white.svg" class="d-none-dark"/>
+                <img src="images/cf_logo_black.svg" class="d-none-light"/>
+                <div class="fs-4 p-5" i18n="defaultWelcomeIntro"></div>
             </div>
-            <div class="community">
-                <ul class="communityDiscordSupport"><a href="https://discord.gg/peg2hhbYwN" target="_blank"><i class="fab fa-discord" aria-hidden="true"></i><span i18n="communityDiscordServer"></span></a></ul>
-                <!-- <ul class="communityTelegramSupport"><a href="https://t.me/INAVFlight" target="_blank"><i class="fab fa-telegram" aria-hidden="true"></i><span i18n="communityTelegramSupport"></span></a></ul> -->
-                <ul class="communityFacebookSupport"><a href="https://www.facebook.com/groups/INAVOfficial" target="_blank"><i class="fab fa-facebook" aria-hidden="true"></i><span i18n="communityFacebookSupport"></span></a></ul>
-            </div>
-        </div>
-        <div class="content_mid">
-            <div class="column half text1">
-                <div class="wrap">
-                    <h2 i18n="defaultWelcomeHead"></h2>
-                    <div i18n="defaultWelcomeText"></div>
-                    <h2 i18n="defaultWelcomeHead2" style="margin-top: 1em;"></h2>
-                    <div i18n="defaultWelcomeText2"></div>
-                </div>
-            </div>
-            <div class="column half text2">
-                <div class="wrap">
-                    <h2 i18n="defaultContributingHead"></h2>
-                    <div i18n="defaultContributingText"></div>
-                </div>
+            <div class="d-flex justify-content-center gap-5">
+                <a href="https://discord.gg/peg2hhbYwN" target="_blank" class="text-center text-decoration-none fs-5">
+                    <i class="fab fa-discord fs-1 d-block"></i>
+                    <span i18n="communityDiscordServer"></span>
+                </a>
+                <a href="https://www.facebook.com/groups/INAVOfficial" target="_blank" class="text-center text-decoration-none fs-5">
+                    <i class="fab fa-facebook fs-1 d-block"></i>
+                    <span i18n="communityFacebookSupport"></span>
+                </a>
             </div>
         </div>
-        <div class="content_foot"></div>
+    </div>
+
+    <div class="row mt-auto bg-primary-subtle">
+        <div class="col p-5">
+            <h2 i18n="defaultWelcomeHead"></h2>
+            <div i18n="defaultWelcomeText"></div>
+            <h2 i18n="defaultWelcomeHead2" style="margin-top: 1em;"></h2>
+            <div i18n="defaultWelcomeText2"></div>
+        </div>
+        <div class="col p-5">
+            <h2 i18n="defaultContributingHead"></h2>
+            <div i18n="defaultContributingText"></div>
+        </div>
     </div>
 </div>
