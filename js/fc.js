@@ -656,7 +656,6 @@ var FC = {
     getGpsProtocols: function () {
         return [
             'UBLOX',
-            'UBLOX7',
             'MSP',
             'FAKE'
         ];
