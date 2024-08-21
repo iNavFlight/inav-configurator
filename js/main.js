@@ -72,7 +72,7 @@ function createWindow() {
     icon: "images/inav_icon_128.png",
     webPreferences: {
       nodeIntegration: true,
-      contextIsolation: false,
+      contextIsolation: false
     },
   });
 
@@ -163,6 +163,12 @@ function createWindow() {
   });
 
   app.commandLine.appendSwitch('disable-features', 'OutOfBlinkCors')
+  
+  if (process.platform === "linux"){
+    app.commandLine.appendSwitch("enable-experimental-web-platform-features", true);
+  }
+
+  app.commandLine.appendSwitch("enable-web-bluetooth", true);
 
   require("@electron/remote/main").enable(mainWindow.webContents);
   mainWindow.removeMenu();
