@@ -2,8 +2,6 @@
 
 INAV Configurator is a cross-platform configuration tool for the [INAV](https://github.com/iNavFlight/inav) flight control system.
 
-It runs as an app within Google Chrome and allows you to configure the INAV software running on any supported INAV target.
-
 Various types of aircraft are supported by the tool and by INAV, e.g. quadcopters, hexacopters, octocopters, and fixed-wing aircraft.
 
 # Support
@@ -17,6 +15,7 @@ everything, the hardware is not working, or you have any other _support_ problem
 * [INAV Official on Facebook](https://www.facebook.com/groups/INAVOfficial)
 * [RC Groups Support](https://www.rcgroups.com/forums/showthread.php?2495732-Cleanflight-iNav-(navigation-rewrite)-project)
 * [INAV Official on Telegram](https://t.me/INAVFlight)
+* [GitHub Discussions](https://github.com/iNavFlight/inav-configurator/discussions)
 
 ## Installation
 
@@ -28,7 +27,7 @@ everything, the hardware is not working, or you have any other _support_ problem
 2. Download Configurator for Windows platform (ia32 or win64 is present)
 3. Install
     * Extract ZIP archive and run the INAV Configurator app from the unpacked folder
-    * OR just use the setup program `INAV-Configurator_win32_arch_x.y.z.msi`, **arch** is your computer architecture (ia32 (32bit) or x64 (64bit)), **x.y.z** is the INAV Configurator version number.
+    * OR just use the setup program `INAV-Configurator_win32_arch_x.y.z.exe`, **arch** is your computer architecture (ia32 (32bit) or x64 (64bit)), **x.y.z** is the INAV Configurator version number.
 
 4.  Configurator is not signed, so you have to allow Windows to run untrusted applications. There might be a monit for it during the first run
 
