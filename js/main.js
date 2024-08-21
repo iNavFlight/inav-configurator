@@ -166,9 +166,9 @@ function createWindow() {
   
   if (process.platform === "linux"){
     app.commandLine.appendSwitch("enable-experimental-web-platform-features", true);
-  } else {
-    app.commandLine.appendSwitch("enable-web-bluetooth", true);
   }
+
+  app.commandLine.appendSwitch("enable-web-bluetooth", true);
 
   require("@electron/remote/main").enable(mainWindow.webContents);
   mainWindow.removeMenu();
