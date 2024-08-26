@@ -122,7 +122,7 @@ jobs:
 
 
     build-mac-arm64:
-        runs-on: [macos-latest, arm64]
+        runs-on: [macos-latest]
         steps:
         - uses: actions/checkout@v4
         - name: Setup environment
@@ -170,7 +170,7 @@ jobs:
             path: ./out/make/*arm64*.dmg
 
     build-mac:
-        runs-on: [macos-latest, x64]
+        runs-on: [macos-latest]
         steps:
         - uses: actions/checkout@v4
         - name: Setup environment
