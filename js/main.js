@@ -166,7 +166,7 @@ function createWindow() {
 
   require("@electron/remote/main").enable(mainWindow.webContents);
   mainWindow.removeMenu();
-  mainWindow.setMinimumSize(800, 600);
+  mainWindow.setMinimumSize(768, 600);
   mainWindow.loadFile('./index.html');
   
   mainWindowState.manage(mainWindow);
