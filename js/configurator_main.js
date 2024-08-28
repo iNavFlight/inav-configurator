@@ -195,7 +195,7 @@ $(function() {
 
             if (!el.hasClass('active')) {
                 el.addClass('active');
-                el.after('<div id="options-window"></div>');
+                el.after('<div id="options-window" class="mh-100 overflow-auto"></div>');
 
                 $('div#options-window').load('./tabs/options.html', function () {
                     // Set current value of configurator theme
@@ -207,11 +207,11 @@ $(function() {
 
                     // if notifications are enabled, or wasn't set, check the notifications checkbox
                     if (store.get('update_notify', true)) {
-                        $('div.notifications input').prop('checked', true);
+                        $('#receive-desktop-notifications').prop('checked', true);
                     }
 
-                    $('div.notifications input').on('change', function () {
-                        var check = $(this).is(':checked');
+                    $('#receive-desktop-notifications').on('change', function () {
+                        let check = $(this).is(':checked');
                         store.set('update_notify', check);
                     });
 
@@ -219,7 +219,7 @@ $(function() {
                         var check = $(this).is(':checked');
                     });
 
-                    $('div.show_profile_parameters input').on('change', function () {
+                    $('#show-profile-parameters').on('change', function () {
                         globalSettings.showProfileParameters = $(this).is(':checked');
                         store.set('show_profile_parameters', globalSettings.showProfileParameters);
 
@@ -232,7 +232,7 @@ $(function() {
                         activeTab.find('a').trigger( "click" );
                     });
 
-                    $('div.cli_autocomplete input').on('change', function () {
+                    $('#use-advanced-cli-autocomplete').on('change', function () {
                         globalSettings.cliAutocomplete = $(this).is(':checked');
                         store.set('cli_autocomplete', globalSettings.cliAutocomplete);
 
@@ -244,8 +244,8 @@ $(function() {
                     $('#map-api-key').val(globalSettings.mapApiKey);
                     $('#proxyurl').val(globalSettings.proxyURL);
                     $('#proxylayer').val(globalSettings.proxyLayer);
-                    $('#showProfileParameters').prop('checked', globalSettings.showProfileParameters);
-                    $('#cliAutocomplete').prop('checked', globalSettings.cliAutocomplete);
+                    $('#show-profile-parameters').prop('checked', globalSettings.showProfileParameters);
+                    $('#use-advanced-cli-autocomplete').prop('checked', globalSettings.cliAutocomplete);
                     $('#assistnow-api-key').val(globalSettings.assistnowApiKey);
                     
                     i18n.getLanguages().forEach(lng => {

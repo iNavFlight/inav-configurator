@@ -1,4 +1,4 @@
-<div class="page">
+<div class="page overflow-y-auto mh-100">
 
     <div class="page-header" data-i18n="options_title"></div>
 
@@ -20,9 +20,9 @@
         <div class="card-body">
             <ul class="list-group list-group-flush">
                 <li class="list-group-item">
-                    <div class="checkbox notifications">
-                        <input id="notificationsOptions" type="checkbox" />
-                        <label for="notificationsOptions"><span data-i18n="options_receive_app_notifications"></span></label>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="receive-desktop-notifications">
+                        <label class="form-check-label" for="receive-desktop-notifications" data-i18n="options_receive_app_notifications"></label>
                     </div>
                 </li>
                 <!--                    <li class="list-group-item">-->
@@ -32,15 +32,15 @@
                 <!--                        </div>-->
                 <!--                    </li>-->
                 <li class="list-group-item">
-                    <div class="checkbox show_profile_parameters">
-                        <input id="showProfileParameters" type="checkbox" class="form-check-input" />
-                        <label for="showProfileParameters" class="form-check-label"><span data-i18n="options_showProfileParameters"></span></label>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="show-profile-parameters">
+                        <label class="form-check-label" for="show-profile-parameters" data-i18n="options_showProfileParameters"></label>
                     </div>
                 </li>
                 <li class="list-group-item">
-                    <div class="checkbox cli_autocomplete">
-                        <input id="cliAutocomplete" type="checkbox" />
-                        <label for="cliAutocomplete"><span data-i18n="options_cliAutocomplete"></span></label>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="use-advanced-cli-autocomplete">
+                        <label class="form-check-label" for="use-advanced-cli-autocomplete" data-i18n="options_cliAutocomplete"></label>
                     </div>
                 </li>
                 <li class="list-group-item hstack">
