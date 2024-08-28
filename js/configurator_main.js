@@ -215,8 +215,8 @@ $(function() {
                         store.set('update_notify', check);
                     });
 
-                    $('div.statistics input').on('change', function () {
-                        var check = $(this).is(':checked');
+                    $('#send-anonymous-data').on('change', function () {
+                        let check = $(this).is(':checked');
                     });
 
                     $('#show-profile-parameters').on('change', function () {
