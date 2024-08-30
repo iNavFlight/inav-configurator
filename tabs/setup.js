@@ -266,7 +266,7 @@ TABS.setup.initialize3D = function () {
     camera = new THREE.PerspectiveCamera(50, wrapper.width() / wrapper.height(), 1, 10000);
 
     // some light
-    light = new THREE.AmbientLight(0x404040);
+    light = new THREE.AmbientLight();
     light2 = new THREE.DirectionalLight(new THREE.Color(1, 1, 1), 1.5);
     light2.position.set(0, 1, 0);
 
