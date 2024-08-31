@@ -3,11 +3,10 @@ html, body {
 }
 
 // GRID
-
 .app-container {
   display: grid;
-  grid-template-columns: 200px 1fr;
-  grid-template-rows: 60px auto 1fr 2rem;
+  grid-template-columns: auto 1fr;
+  grid-template-rows: auto auto 1fr 2rem;
   grid-auto-columns: 1fr;
   gap: 0 0;
   grid-auto-flow: row;
@@ -20,6 +19,30 @@ html, body {
 
 .app-header {
   grid-area: app-header;
+  display: grid;
+  grid-template-columns: 1fr auto auto auto;
+  grid-template-rows: 40px 1fr;
+  gap: 0px 0px;
+  grid-auto-flow: row;
+  grid-template-areas:
+    "logotype widget-group-1 widget-group-2 connections"
+    ". . . .";
+}
+
+.logotype {
+  grid-area: logotype;
+}
+
+.widget-group-1 {
+  grid-area: widget-group-1;
+}
+
+.widget-group-2 {
+  grid-area: widget-group-2;
+}
+
+.connections {
+  grid-area: connections;
 }
 
 .app-logs {
@@ -30,6 +53,7 @@ html, body {
 .app-sidebar {
   grid-area: app-sidebar;
   overflow-y: auto;
+  width: 200px;
 }
 
 .app-statusbar {
@@ -44,17 +68,26 @@ html, body {
 
 
 .app-header {
-  display: flex;
-  justify-content: space-between;
   background-color: var(--inav-body-bg);
   color: var(--inav-body-color);
 
+  .header-gap {
+    gap: 0.75rem;
+
+    .vr:last-child {
+      margin-right: 0.75rem;
+    }
+  }
 
   .logo {
     width: 150px;
     img {
       height: 100%;
     }
+  }
+
+  .profiles {
+    flex-direction: column;
   }
 
   .sensors {
@@ -110,7 +143,6 @@ html, body {
 .app-logs {
   background: var(--inav-tertiary-bg);
   overflow: auto;
-  opacity: .66;
   transition: .25s all;
 
   &.open {
@@ -147,6 +179,52 @@ html, body {
   }
 
 }
+
+.page {
+  --inav-gutter-x: 2rem;
+  --inav-gutter-y: 2rem;
+
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+
+  padding: calc(var(--inav-gutter-y) * 0.5) calc(var(--inav-gutter-x) * 0.5);
+  margin-right: auto;
+  margin-left: auto;
+
+  .page-header {
+    color: var(--inav-body-color);
+    font-size: 1.75rem;
+    border-bottom: var(--inav-border-width) var(--inav-border-color) solid;
+    padding-bottom: .5rem;
+    margin-bottom: 1rem;
+  }
+
+  .page-content {
+
+  }
+
+  .page-footer {
+    display: flex;
+    position: sticky;
+    bottom: 0;
+    justify-content: flex-end;
+    margin: auto calc(var(--inav-gutter-x) * -0.5) calc(var(--inav-gutter-y) * -0.5);
+    padding: .75rem;
+    border-top: var(--inav-border-width) var(--inav-border-color) solid;
+    background-color: var(--inav-tertiary-bg);
+  }
+}
+
+.bg-grid {
+  --paper-line: rgba(var(--inav-secondary-color-rgb), .05);
+  background-image: linear-gradient(to right, var(--paper-line) 0, var(--paper-line) 1px, transparent 1px, transparent 100% ),
+  linear-gradient( to bottom, var(--paper-line) 0, var(--paper-line) 1px, transparent 1px, transparent 100% );
+  background-position: -1px 0, 0 -1px;
+  background-size: 16px 16px;
+}
+
 
 
 $tabIcons: (
@@ -195,6 +273,13 @@ $tabIcons: (
     text-overflow: ellipsis;
     overflow: hidden;
 
+    // .icon-mixer:before, ...
+    @each $name, $url in $tabIcons {
+      &.icon-#{$name}:before {
+        mask-image: $url;
+      }
+    }
+
     &:before {
       content: " ";
       width: 1.33rem;
@@ -206,12 +291,6 @@ $tabIcons: (
       mask-repeat: no-repeat;
       mask-position: center center;
       mask-size: cover;
-    }
-
-    @each $name, $url in $tabIcons {
-      &.icon-#{$name}:before {
-        mask-image: $url;
-      }
     }
   }
 
@@ -230,9 +309,7 @@ $tabIcons: (
       background-color: var(--inav-body-color);
     }
   }
-
 }
-
 
 #status-bar .status-bar-item:last-child {
   padding: 0 0.5rem;
@@ -243,6 +320,16 @@ $tabIcons: (
   padding: 0 0.5rem;
   border-right: var(--inav-border-width) var(--inav-border-color) solid;
 }
+
+@include media-breakpoint-down(lg) {
+  #status-bar .status-bar-item:last-child {
+    padding: 0 0.25rem;
+  }
+  #status-bar .status-bar-item:has(span:not(:empty)) {
+    padding: 0 0.25rem;
+  }
+}
+
 
 [data-connected="true"] .mode-connected,
 [data-connected="false"] .mode-disconnected
@@ -256,3 +343,76 @@ $tabIcons: (
   display: none !important;
 }
 
+@include media-breakpoint-down(sm) {
+  .app-header {
+    .header-gap {
+      gap: 0.75rem !important;
+
+      .vr:last-child {
+        margin-right: 0.75rem;
+      }
+    }
+  }
+}
+
+@include media-breakpoint-down(lg) {
+  .app-sidebar {
+    width: auto;
+  }
+  .sidebar-nav a {
+    font-size: 0;
+    padding-left: 2rem;
+  }
+}
+
+@include media-breakpoint-down(xl) {
+  .app-header {
+    grid-template-columns: 1fr auto auto;
+    grid-template-rows: 40px auto;
+    gap: 0 0;
+    grid-auto-flow: row;
+    grid-template-areas:
+    "logotype widget-group-1 connections"
+    "widget-group-2 widget-group-2 widget-group-2";
+
+    .widget-group-2 {
+      margin-top: .5rem;
+      padding-top: .5rem;
+      flex-direction: row-reverse;
+    }
+  }
+
+  .profiles {
+    flex-direction: row !important;
+    gap: .75rem !important;
+    line-height: 2rem;
+    width: -webkit-fill-available;
+    small {
+      font-size: 1rem !important;
+    }
+  }
+
+  .sensors {
+    .list-group-item {
+      padding: .25rem .5rem;
+    }
+  }
+}
+
+@include media-breakpoint-down(xxl) {
+  .app-header {
+    .header-gap {
+      gap: 0.45rem !important;
+
+      .vr:last-child {
+        margin-right: 0.45rem;
+      }
+    }
+  }
+
+  .sensors {
+    .list-group-item {
+      padding: .5rem;
+    }
+  }
+}

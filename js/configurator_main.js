@@ -108,7 +108,7 @@ $(function() {
             i18n.getMessage('getConfiguratorVersion') + app.getVersion() + '</strong>');
 
         $('#status-bar .version').text(app.getVersion());
-        $('[data-configurator-version-info]').text(app.getVersion());
+        $('[data-configurator-version-info]').text('v' + app.getVersion());
         update.firmwareVersion();
 
         if (store.get('logopen', false)) {
@@ -195,7 +195,7 @@ $(function() {
 
             if (!el.hasClass('active')) {
                 el.addClass('active');
-                el.after('<div id="options-window" class="mh-100 overflow-auto"></div>');
+                el.after('<div id="options-window" class="mh-100 shadow overflow-auto"></div>');
 
                 $('div#options-window').load('./tabs/options.html', function () {
                     // Set current value of configurator theme
@@ -309,7 +309,7 @@ $(function() {
                         if (e.type == 'click' && !$.contains($('div#options-window')[0], e.target) || e.type == 'keyup' && e.keyCode == 27) {
                             $(document).unbind('click keyup', close_and_cleanup);
 
-                            $('div#options-window').slideUp(250, function () {
+                            $('div#options-window').slideUp(125, function () {
                                 el.removeClass('active');
                                 $(this).empty().remove();
                             });
@@ -318,7 +318,7 @@ $(function() {
 
                     $(document).bind('click keyup', close_and_cleanup);
 
-                    $(this).slideDown(250);
+                    $(this).slideDown(125);
                 });
             }
         });

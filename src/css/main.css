@@ -456,16 +456,17 @@ input[type="number"]::-webkit-inner-spin-button {
 #options {
     display: inline-block;
     /*float: right;*/
-    width: 20px;
-    height: 20px;
+    width: 1.5rem;
+    height: 2rem;
     /*margin-top: 7px;*/
-    /*margin-right: 10px;*/
-    background: url('./../../images/CF_settings_white.svg') no-repeat -1px -1px;
-    opacity: 0.4;
+    margin-left: .5rem;
+    background: url('./../../images/three-dots-vertical.svg') no-repeat center;
+    background-size: cover;
+    opacity: 0.75;
 }
 
 #options:hover {
-    opacity: 0.65;
+    opacity: 1;
 }
 
 #options.active {
@@ -482,8 +483,8 @@ input[type="number"]::-webkit-inner-spin-button {
     border: var(--inav-border-width) solid var(--inav-border-color);
     background-color: var(--inav-body-bg);
     border-radius: var(--inav-border-radius);
-    right: 35px;
-    top: 25px;
+    right: 42px;
+    top: 10px;
     z-index: 10000;
 }
 
@@ -974,31 +975,31 @@ li.active .ic_mag {
     background-image: url("./../../images/icons/cf_icon_mag_white.svg");
 }
 
-#content {
-    margin-top: 0;
-    padding: 0;
-    /*height: calc(100% - 135px);*/
-    /*  (port picker 105px, log CLOSED 25px, status bar: 20px + padding) - was: calc(100% - 171px)*/
-    background-color: var(--inav-body-bg);
-    overflow-x: hidden;
-    overflow-y: auto;
-    border: 0 solid;
-    -webkit-transform: rotateX(0deg); /* DO NOT REMOVE! this fixes the UI freezing bug on MAC OS X */
-    transition: all 0.3s;
-}
+/*#content {*/
+/*    margin-top: 0;*/
+/*    padding: 0;*/
+/*    !*height: calc(100% - 135px);*!*/
+/*    !*  (port picker 105px, log CLOSED 25px, status bar: 20px + padding) - was: calc(100% - 171px)*!*/
+/*    background-color: var(--inav-body-bg);*/
+/*    overflow-x: hidden;*/
+/*    overflow-y: auto;*/
+/*    border: 0 solid;*/
+/*    -webkit-transform: rotateX(0deg); !* DO NOT REMOVE! this fixes the UI freezing bug on MAC OS X *!*/
+/*    transition: all 0.3s;*/
+/*}*/
 
-#content.logopen {
-    margin-top: 0;
-    padding: 0;
-    height: calc(100% - 219px); /*  (port picker, log OPEN, status bar: 20px + padding) - was: calc(100% - 171px)*/
-    background-color: var(--inav-body-bg);
-    overflow-x: hidden;
-    overflow-y: auto;
-    border: 0 solid;
-    -webkit-transform: rotateX(0deg); /* DO NOT REMOVE! this fixes the UI freezing bug on MAC OS X */
-    transition: all 0.5s;
-    /* Cause the height to shrink to contain its floated contents while log is open */
-}
+/*#content.logopen {*/
+/*    margin-top: 0;*/
+/*    padding: 0;*/
+/*    height: calc(100% - 219px); !*  (port picker, log OPEN, status bar: 20px + padding) - was: calc(100% - 171px)*!*/
+/*    background-color: var(--inav-body-bg);*/
+/*    overflow-x: hidden;*/
+/*    overflow-y: auto;*/
+/*    border: 0 solid;*/
+/*    -webkit-transform: rotateX(0deg); !* DO NOT REMOVE! this fixes the UI freezing bug on MAC OS X *!*/
+/*    transition: all 0.5s;*/
+/*    !* Cause the height to shrink to contain its floated contents while log is open *!*/
+/*}*/
 
 #content.loading {
     overflow-y: hidden;
@@ -1743,66 +1744,66 @@ dialog {
 
 #quad-status_wrapper {
     display: none;
-    color: var(--inav-body-color);
-    font-size: 10px;
-    margin-top: -1rem;
-    width: 100px;
-    float: right;
+    /*color: var(--inav-body-color);*/
+    /*font-size: 10px;*/
+    /*margin-top: -1rem;*/
+    width: 6rem;
+    /*float: right;*/
     /*margin-right: 20px;*/
-    line-height: 12px;
-    height: 67px;
-    background-color: rgba(var(--inav-emphasis-color-rgb), 0.05);
-    border-radius: var(--inav-border-radius);
-    border: var(--inav-border-width) var(--inav-border-color) solid;
+    /*line-height: 12px;*/
+    /*height: 67px;*/
+    /*background-color: rgba(var(--inav-emphasis-color-rgb), 0.05);*/
+    /*border-radius: var(--inav-border-radius);*/
+    /*border: var(--inav-border-width) var(--inav-border-color) solid;*/
 }
 
-.quad-status-contents {
-    display: none;
-    margin-top: 10px;
-    margin-left: 14px;
-    height: 10px;
-    width: 30px;
-}
+/*.quad-status-contents {*/
+/*    display: none;*/
+/*    margin-top: 10px;*/
+/*    margin-left: 14px;*/
+/*    height: 10px;*/
+/*    width: 30px;*/
+/*}*/
 
-.battery-legend {
-    display: inline;
-    position: relative;
-    top: -2px;
-    margin-top: 0;
-    left: 0;
-    right: 0;
-    width: 40px;
-    text-align: left;
-    color: silver;
-    margin-left: -8px;
-}
+/*.battery-legend {*/
+/*    display: inline;*/
+/*    position: relative;*/
+/*    top: -2px;*/
+/*    margin-top: 0;*/
+/*    left: 0;*/
+/*    right: 0;*/
+/*    width: 40px;*/
+/*    text-align: left;*/
+/*    color: silver;*/
+/*    margin-left: -8px;*/
+/*}*/
 
-.quad-status-contents progress::-webkit-progress-bar {
-    height: 12px;
-    background-color: #eee;
-}
+/*.quad-status-contents progress::-webkit-progress-bar {*/
+/*    height: 12px;*/
+/*    background-color: #eee;*/
+/*}*/
 
-.quad-status-contents progress::-webkit-progress-value {
-    background-color: #bcf;
-}
+/*.quad-status-contents progress::-webkit-progress-value {*/
+/*    background-color: #bcf;*/
+/*}*/
 
-.battery-status {
-    height: 11px;
-    position: relative;
-    border-radius: 0;
-    background-color: var(--inav-success);
-    margin-top: 0;
-}
+/*.battery-status {*/
+/*    height: 11px;*/
+/*    position: relative;*/
+/*    border-radius: 0;*/
+/*    background-color: var(--inav-success);*/
+/*    margin-top: 0;*/
+/*}*/
 
-.battery-icon {
-    display: inline-block;
-    height: 30px;
-    width: 60px;
-    transition: none;
-    margin-top: 4px;
-    background: url("./../../images/icons/cf_icon_bat_grey.svg") no-repeat center;
-    background-size: contain;
-}
+/*.battery-icon {*/
+/*    display: inline-block;*/
+/*    height: 30px;*/
+/*    width: 60px;*/
+/*    transition: none;*/
+/*    margin-top: 4px;*/
+/*    background: url("./../../images/icons/cf_icon_bat_grey.svg") no-repeat center;*/
+/*    background-size: contain;*/
+/*}*/
 
 .armedicon,
 .failsafeicon,
@@ -1830,11 +1831,12 @@ dialog {
     display: flex;
     justify-content: space-evenly;
     align-items: center;
-    background-color: rgba(var(--inav-emphasis-color-rgb), 0.05);
-    height: 31px;
-    margin-top: 2px;
-    border-bottom-left-radius: 5px;
-    border-bottom-right-radius: 5px;
+    /*align-items: center;*/
+    /*background-color: rgba(var(--inav-emphasis-color-rgb), 0.05);*/
+    height: 2rem;
+    /*margin-top: 2px;*/
+    /*border-bottom-left-radius: 5px;*/
+    /*border-bottom-right-radius: 5px;*/
 }
 
 @media only screen and (max-width: 1055px) , only screen and (max-device-width: 1055px) {

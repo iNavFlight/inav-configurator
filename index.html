@@ -8,6 +8,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link id="data-refresh" type="text/css" rel="stylesheet" href="output.css?" media="all" />
     <link type="text/css" rel="stylesheet" href="./src/css/styles.css" media="all" />
     <script type="text/javascript">require('./js/configurator_main.js');</script>
     <!-- TODO: Update to newer Versions and use proper modules (require) -->
@@ -21,146 +22,171 @@
 
 <div class="app-container">
     <div class="app-header p-3" data-bs-theme="dark">
-        <div class="d-flex">
+        <div class="logotype d-flex">
             <div class="logo">
                 <img src="./images/light-wide-2.svg" alt="Logo">
             </div>
             <div class="versions text-muted d-flex flex-column justify-content-end lh-1">
                 <div>
-                    <small i18n="mainLogoText"></small>
+<!--                    <small i18n="mainLogoText"></small>-->
                     <small data-configurator-version-info></small>
                 </div>
                 <div>
                     <small i18n="mainLogoTextFirmware"></small>
-                    <small data-firmware-version-info></small>
+                    <small class="text-nowrap" data-firmware-version-info></small>
                 </div>
             </div>
         </div>
-        <div class="d-flex gap-3">
-
-            <div class="mode-connected d-flex gap-3">
-
-
-                <!--            <div class="uav-status">-->
-                <!--                <div id="quad-status_wrapper">-->
-                <!--                    <div class="battery-icon">-->
-                <!--                        <div class="quad-status-contents">-->
-                <!--                            <div class="battery-status"></div>-->
-                <!--                        </div>-->
-                <!--                    </div>-->
-                <!--                    <div class="battery-legend" i18n="sensorBatteryVoltage"></div>-->
-                <!--                    <div class="bottomStatusIcons">-->
-                <!--                        <div class="armedicon cf_tip" data-i18n_title="mainHelpArmed"></div>-->
-                <!--                        <div class="failsafeicon cf_tip" data-i18n_title="mainHelpFailsafe"></div>-->
-                <!--                        <div class="linkicon cf_tip" data-i18n_title="mainHelpLink"></div>-->
-                <!--                    </div>-->
-                <!--                </div>-->
-                <!--            </div>-->
-
-                <!--            <div class="vr"></div>-->
-
-                <div class="sensors d-flex">
-                    <ul id="sensors" class="list-group list-group-horizontal">
-                        <li data-sensor="gyro" class="list-group-item" i18n_title="sensorStatusGyro">
-                            <div class="background-mask" style="mask-image: url(./images/icons/sensor_gyro_on.png);"></div>
-                            <span class="" i18n="sensorStatusGyroShort"></span>
-                        </li>
-                        <li data-sensor="accel" class="list-group-item" i18n_title="sensorStatusAccel">
-                            <div class="background-mask" style="mask-image: url(./images/icons/sensor_acc_on.png);"></div>
-                            <span class="" i18n="sensorStatusAccelShort"></span>
-                        </li>
-                        <li data-sensor="mag" class="list-group-item" i18n_title="sensorStatusMag">
-                            <div class="background-mask" style="mask-image: url(./images/icons/sensor_mag_on.png);"></div>
-                            <span class="" i18n="sensorStatusMagShort"></span>
-                        </li>
-                        <li data-sensor="baro" class="list-group-item" i18n_title="sensorStatusBaro">
-                            <div class="background-mask" style="mask-image: url(./images/icons/sensor_baro_on.png);"></div>
-                            <span class="" i18n="sensorStatusBaroShort"></span>
-                        </li>
-                        <li data-sensor="gps" class="list-group-item" i18n_title="sensorStatusGPS">
-                            <div class="background-mask" style="mask-image: url(./images/icons/sensor_sat_on.png);"></div>
-                            <span class="" i18n="sensorStatusGPSShort"></span>
-                        </li>
-                        <li data-sensor="opflow" class="list-group-item" i18n_title="sensorOpticalFlow">
-                            <div class="background-mask" style="mask-image: url(./images/icons/sensor_flow_on.png);"></div>
-                            <span class="" i18n="sensorOpticalFlowShort"></span>
-                        </li>
-                        <li data-sensor="sonar" class="list-group-item" i18n_title="sensorStatusSonar">
-                            <div class="background-mask" style="mask-image: url(./images/icons/sensor_sonar_on.png);"></div>
-                            <span class="" i18n="sensorStatusSonarShort"></span>
-                        </li>
-                        <li data-sensor="airspeed" class="list-group-item" i18n_title="sensorAirspeed">
-                            <div class="background-mask" style="mask-image: url(./images/icons/sensor_airspeed_on.png);"></div>
-                            <span class="" i18n="sensorAirspeedShort"></span>
-                        </li>
-                    </ul>
-                </div>
-
-                <div class="vr"></div>
-
-                <div class="d-flex justify-content-end flex-column">
-                    <!--                Flash Info-->
-                    <div><small>Profiles:</small></div>
-                    <div class="d-flex gap-1">
-                        <select class="form-select py-0" id="profilechange">
-                            <option value="0" i18n="sensorProfile1"></option>
-                            <option value="1" i18n="sensorProfile2"></option>
-                            <option value="2" i18n="sensorProfile3"></option>
-                        </select>
-                        <select class="form-select py-0" id="mixerprofilechange">
-                            <option value="0" i18n="mixerProfile1"></option>
-                            <option value="1" i18n="mixerProfile2"></option>
-                        </select>
-                        <select class="form-select py-0" id="batteryprofilechange">
-                            <option value="0" i18n="sensorBatteryProfile1"></option>
-                            <option value="1" i18n="sensorBatteryProfile2"></option>
-                            <option value="2" i18n="sensorBatteryProfile3"></option>
-                        </select>
-
-                    </div>
-
-                </div>
-
-                <div class="vr"></div>
-
-                <!--            TODO -->
-                <div id="dataflash_wrapper_global" class="d-flex justify-content-center">
-                    <div class="w-12rem dataflash-contents_global">
-                        <div i18n="sensorDataFlashFreeSpace"></div>
-                        <div class="progress" role="progressbar">
-                            <div class="progress-bar dataflash-free_global"></div>
-                        </div>
-                    </div>
-                    <div class="w-12rem noflash_global">
-                        <div class="border rounded px-3 h-100 text-center d-flex align-items-center">
-                            <small class="text-muted" i18n="sensorDataFlashNotFound"></small>
-                        </div>
+        <div class="widget-group-1 header-gap d-flex mode-connected">
+            <div class="uav-status d-flex align-items-center">
+                <div id="quad-status_wrapper">
+                    <div class="bottomStatusIcons">
+                        <div class="armedicon cf_tip" data-i18n_title="mainHelpArmed"></div>
+                        <div class="failsafeicon cf_tip" data-i18n_title="mainHelpFailsafe"></div>
+                        <div class="linkicon cf_tip" data-i18n_title="mainHelpLink"></div>
                     </div>
                 </div>
+            </div>
 
-                <div class="vr"></div>
+            <div class="vr"></div>
+
+            <div class="battery vstack text-center justify-content-between">
+                <div class="battery-wrapper border border-2 rounded-2 border-secondary-subtle">
+                    <div id="battery-indicator" class="rounded-1 h-100">
+                    </div>
+                    <div class="battery-element rounded-end"></div>
+                </div>
+                <small id="battery-voltage" i18n="sensorBatteryVoltage"></small>
+            </div>
+
+            <style>
+                .battery-wrapper {
+                    --element-width: .25rem;
+                    --element-height: .75rem;
+                    position: relative;
+                    border-radius: 2px;
+                    width: 3rem;
+                    height: 1.5rem;
+                    margin-right: var(--element-width);
+                }
+                .battery-element {
+                    width: var(--element-width);
+                    height: var(--element-height);
+                    background: var(--inav-secondary-border-subtle);
+                    position: absolute;
+                    right: calc(-2px - var(--element-width));
+                    top: calc(50% - var(--element-height) / 2);
+                }
+            </style>
+
+            <div class="vr"></div>
+
+            <!--            TODO -->
+            <div id="dataflash_wrapper_global" class="d-flex justify-content-center min-w-7r">
+                <div class="dataflash-contents_global">
+                    <div><small i18n="sensorDataFlashFreeSpace"></small></div>
+                    <div class="progress" role="progressbar">
+                        <div class="progress-bar dataflash-free_global"></div>
+                    </div>
+                </div>
+                <div class="noflash_global">
+                    <div class="border rounded px-3 h-100 text-center d-flex align-items-center">
+                        <small class="text-muted" i18n="sensorDataFlashNotFound"></small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="vr"></div>
+
+        </div>
+
+        <div class="widget-group-2 header-gap d-flex mode-connected">
+            <div class="sensors d-flex">
+                <ul id="sensors" class="list-group list-group-horizontal">
+                    <li data-sensor="gyro" class="list-group-item" i18n_title="sensorStatusGyro">
+                        <div class="background-mask" style="mask-image: url(./images/icons/sensor_gyro_on.png);"></div>
+                        <span class="" i18n="sensorStatusGyroShort"></span>
+                    </li>
+                    <li data-sensor="accel" class="list-group-item" i18n_title="sensorStatusAccel">
+                        <div class="background-mask" style="mask-image: url(./images/icons/sensor_acc_on.png);"></div>
+                        <span class="" i18n="sensorStatusAccelShort"></span>
+                    </li>
+                    <li data-sensor="mag" class="list-group-item" i18n_title="sensorStatusMag">
+                        <div class="background-mask" style="mask-image: url(./images/icons/sensor_mag_on.png);"></div>
+                        <span class="" i18n="sensorStatusMagShort"></span>
+                    </li>
+                    <li data-sensor="baro" class="list-group-item" i18n_title="sensorStatusBaro">
+                        <div class="background-mask" style="mask-image: url(./images/icons/sensor_baro_on.png);"></div>
+                        <span class="" i18n="sensorStatusBaroShort"></span>
+                    </li>
+                    <li data-sensor="gps" class="list-group-item" i18n_title="sensorStatusGPS">
+                        <div class="background-mask" style="mask-image: url(./images/icons/sensor_sat_on.png);"></div>
+                        <span class="" i18n="sensorStatusGPSShort"></span>
+                    </li>
+                    <li data-sensor="opflow" class="list-group-item" i18n_title="sensorOpticalFlow">
+                        <div class="background-mask" style="mask-image: url(./images/icons/sensor_flow_on.png);"></div>
+                        <span class="" i18n="sensorOpticalFlowShort"></span>
+                    </li>
+                    <li data-sensor="sonar" class="list-group-item" i18n_title="sensorStatusSonar">
+                        <div class="background-mask" style="mask-image: url(./images/icons/sensor_sonar_on.png);"></div>
+                        <span class="" i18n="sensorStatusSonarShort"></span>
+                    </li>
+                    <li data-sensor="airspeed" class="list-group-item" i18n_title="sensorAirspeed">
+                        <div class="background-mask" style="mask-image: url(./images/icons/sensor_airspeed_on.png);"></div>
+                        <span class="" i18n="sensorAirspeedShort"></span>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="vr"></div>
+
+            <div class="profiles d-flex justify-content-end">
+                <!--                Flash Info-->
+                <div><small>Profiles:</small></div>
+                <div class="d-flex gap-1 w-100">
+                    <select class="form-select py-0 min-w-4r" id="profilechange">
+                        <option value="0" i18n="sensorProfile1"></option>
+                        <option value="1" i18n="sensorProfile2"></option>
+                        <option value="2" i18n="sensorProfile3"></option>
+                    </select>
+                    <select class="form-select py-0 min-w-4r" id="mixerprofilechange">
+                        <option value="0" i18n="mixerProfile1"></option>
+                        <option value="1" i18n="mixerProfile2"></option>
+                    </select>
+                    <select class="form-select py-0 min-w-4r" id="batteryprofilechange">
+                        <option value="0" i18n="sensorBatteryProfile1"></option>
+                        <option value="1" i18n="sensorBatteryProfile2"></option>
+                        <option value="2" i18n="sensorBatteryProfile3"></option>
+                    </select>
+
+                </div>
 
             </div>
+
+            <div class="vr d-none d-xl-inline-block"></div>
+
+        </div>
+        <div class="connections d-flex">
 
             <div class="connection d-flex">
 
                 <div class="mode-disconnected">
 
-                    <div class="d-flex gap-2 px-3">
+                    <div class="d-flex gap-2 px-3 align-items-start">
 
                         <div id="port-override-option">
-                            <div class="input-group w-12rem">
+                            <div class="input-group w-10r">
                                 <span id="port-override-label" for="port-override" class="input-group-text" i18n="mainPortOverrideLabel"></span>
                                 <input id="port-override" type="text" class="form-control" value="/dev/rfcomm0">
                             </div>
                         </div>
 
-                        <select class="form-select w-12rem" id="port" title="Port">
+                        <select class="form-select mw-12r" id="port" title="Port">
                             <option value="manual" i18n="mainManual"></option>
                             <!-- port list gets generated here -->
                         </select>
 
-                        <select class="form-select w-12rem" id="baud" title="Baud Rate">
+                        <select class="form-select mw-8r" id="baud" title="Baud Rate">
                             <option value="115200" selected="selected">115200</option>
                             <option value="57600">57600</option>
                             <option value="38400">38400</option>
@@ -173,12 +199,11 @@
                             <option value="1200">1200</option>
                         </select>
 
-                        <div class="d-flex align-items-center">
-                            <div class="form-check form-switch">
-                                <input id="wireless-mode" class="form-check-input" type="checkbox" role="switch" >
-                                <label for="wireless-mode" class="form-check-label ms-0" data-i18n="wirelessModeSwitch"></label>
-                            </div>
+                        <div class="form-check form-switch w-12r">
+                            <input id="wireless-mode" class="form-check-input" type="checkbox" role="switch" >
+                            <label for="wireless-mode" class="form-check-label ms-0" data-i18n="wirelessModeSwitch"></label>
                         </div>
+
                     </div>
 
                 </div>
@@ -189,14 +214,14 @@
 
             </div>
 
-            <div>
+            <div class="vstack justify-content-center">
                 <a id="options" href="#" data-i18n_title="options_title"></a>
             </div>
-
         </div>
+
     </div>
     <div id="logs" class="app-logs lh-lg" data-bs-theme="dark">
-        <span id="logs-toggle" class="logs-toggle px-2 text-muted lh-lg" i18n="mainShowLog"></span>
+        <span id="logs-toggle" class="logs-toggle px-2 text-muted lh-lg bg-body-tertiary" i18n="mainShowLog"></span>
         <div id="logs-stream" class="px-3"></div>
     </div>
     <div class="app-sidebar" data-bs-theme="dark">
@@ -294,7 +319,7 @@
 
     </div>
     <div class="app-content">
-        <div id="content"></div>
+        <div id="content" class="h-100"></div>
         <div id="loading" class="vstack position-absolute w-100 h-100 top-0 justify-content-center align-items-center bg-body d-none">
             <img class="loading-bars" src="./images/loading-bars.svg" alt="Loading.."/>
             <div i18n="waitingForData"></div>
@@ -328,9 +353,9 @@
         <div class="status-bar-item">
             <span id="hardware-roundtrip"></span>
         </div>
-        <div class="status-bar-item d-inline-block text-truncate ">
-            <span data-i18n="statusbar_arming_flags"></span>
-            <span class="arming-flags">-</span>
+        <div class="status-bar-item d-inline-block text-truncate arming-flags-title">
+            <span class="arming-flags-title" data-i18n="statusbar_arming_flags"></span>
+            <span class="arming-flags-title arming-flags">-</span>
         </div>
         <div class="status-bar-item version">
             <!-- configuration version generated here -->

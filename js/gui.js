@@ -178,6 +178,7 @@ GUI_control.prototype.content_ready = function (callback) {
     });
 
     // Insert a documentation button next to the tab title
+    // TODO
     const tabTitle = $('div#content .tab_title').first();
     const documentationDiv = $('<div>').addClass('cf_doc_version_bt');
     $('<a>').attr('href', 'https://github.com/iNavFlight/inav/wiki')
@@ -257,6 +258,7 @@ GUI_control.prototype.updateStatusBar = function() {
     $('span.cycle-time').text(FC.CONFIG.cycleTime);
     $('span.cpu-load').text(i18n.getMessage('statusbar_cpu_load', [FC.CONFIG.cpuload]));
     $('span.arming-flags').text(activeArmFlags.length ? activeArmFlags.join(', ') : '-');
+    $('.arming-flags-title').prop('title', activeArmFlags.length ? activeArmFlags.join(', ') : '-');
 };
 
 GUI_control.prototype.updateProfileChange = function(refresh) {
