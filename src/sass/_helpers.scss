@@ -5,9 +5,24 @@
   }
 }
 
-// .wm-1r, .wm-2r ... .wm-20r
+// .mw-1r, .mw-2r ... .mw-20r
 @for $i from 1 through 20 {
-  .wm-#{$i}r {
+  .mw-#{$i}r {
     max-width: #{$i}rem;
   }
+}
+
+// .min-w-1r, .min-w-2r ... .min-w-20r
+@for $i from 1 through 20 {
+  .min-w-#{$i}r {
+    min-width: #{$i}rem;
+  }
+}
+
+[data-bs-theme="light"] .d-none-dark {
+  display: none !important;
+}
+
+[data-bs-theme="dark"] .d-none-light {
+  display: none !important;
 }
