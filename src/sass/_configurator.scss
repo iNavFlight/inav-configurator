@@ -189,7 +189,7 @@ html, body {
   display: flex;
   flex-direction: column;
 
-  padding: calc(var(--inav-gutter-y) * 0.5) calc(var(--inav-gutter-x) * 0.5);
+  padding: calc(var(--inav-gutter-y) * 0.25) calc(var(--inav-gutter-x) * 0.5)  calc(var(--inav-gutter-y) * 0.5);
   margin-right: auto;
   margin-left: auto;
 
