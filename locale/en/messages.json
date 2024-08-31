@@ -1266,10 +1266,10 @@
         "message": "Head tracker roll movement ratio"
     },
     "portsHelp": {
-        "message": "<strong>Note:</strong> not all combinations are valid.  When the flight controller firmware detects this the serial port configuration will be reset."
+        "message": "<b>Note:</b> Not all combinations are valid.  When the flight controller firmware detects this the serial port configuration will be reset."
     },
     "portsMSPHelp": {
-        "message": "<strong>Note:</strong> Do <span style=\"color: red\">NOT</span> disable MSP on the first serial port unless you know what you are doing.  You may have to reflash and erase your configuration if you do."
+        "message": "<b>Note:</b> Do <b class='text-danger'>NOT</b> disable MSP on the first serial port unless you know what you are doing.  You may have to reflash and erase your configuration if you do."
     },
     "portsFirmwareUpgradeRequired": {
         "message": "Firmware upgrade <span style=\"color: red\">required</span>."

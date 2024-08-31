@@ -26,8 +26,6 @@ TABS.ports.initialize = function (callback) {
 
     function update_ui() {
 
-        $(".tab-ports").addClass("supported");
-
         var i,
             $elements;
 
@@ -51,7 +49,7 @@ TABS.ports.initialize = function (callback) {
             $elements.append('<option value="' + serialPortHelper.getBauds('PERIPHERAL')[i] + '">' + serialPortHelper.getBauds('PERIPHERAL')[i] + '</option>');
         }
 
-        var ports_e = $('.tab-ports .ports');
+        var ports_e = $('#ports-table');
         var port_configuration_template_e = $('#tab-ports-templates .portConfiguration');
 
         for (var portIndex = 0; portIndex < FC.SERIAL_CONFIG.ports.length; portIndex++) {
@@ -96,7 +94,7 @@ TABS.ports.initialize = function (callback) {
                         var select_e;
                         if (column !== 'telemetry' && column !== 'peripherals' && column !== 'sensors') {
                             var checkboxId = 'functionCheckbox-' + portIndex + '-' + columnIndex + '-' + i;
-                            functions_e.prepend('<span class="function"><input type="checkbox" class="togglemedium" id="' + checkboxId + '" value="' + functionName + '" /><label for="' + checkboxId + '"> ' + functionRule.displayName + '</label></span>');
+                            functions_e.children().first().prepend('<span class="function min-w-7r"><input type="checkbox" class="togglemedium" id="' + checkboxId + '" value="' + functionName + '" /><label for="' + checkboxId + '"> ' + functionRule.displayName + '</label></span>');
 
                             if (serialPort.functions.indexOf(functionName) >= 0) {
                                 var checkbox_e = functions_e.find('#' + checkboxId);
@@ -110,7 +108,7 @@ TABS.ports.initialize = function (callback) {
                             select_e = functions_e.find(selectElementSelector);
                             
                             if (select_e.length == 0) {
-                                functions_e.prepend('<span class="function"><select id="' + selectElementName + '" name="' + selectElementName + '" class="function-select ' + selectElementName + '" /></span>');
+                                functions_e.children().first().prepend('<span class="function"><select id="' + selectElementName + '" name="' + selectElementName + '" class="form-select function-select ' + selectElementName + '" /></span>');
                                 
                                 functions_e.find('#' + selectElementName).on('change', () => {
                                     updateDefaultBaud(functions_e_id, column);
@@ -133,8 +131,8 @@ TABS.ports.initialize = function (callback) {
             }            
         }
 
-        $('table.ports tbody').on('change', 'select', onSwitchChange);
-        $('table.ports tbody').on('change', 'input', onSwitchChange);
+        $('#ports-table tbody').on('change', 'select', onSwitchChange);
+        $('#ports-table tbody').on('change', 'input', onSwitchChange);
     }
 
     function onSwitchChange(e) {
@@ -178,11 +176,11 @@ TABS.ports.initialize = function (callback) {
 
     function on_tab_loaded_handler() {
 
-       i18n.localize();;
+       i18n.localize();
 
         update_ui();
 
-        $('a.save').on('click', on_save_handler);
+        $('#save-btn').on('click', on_save_handler);
 
         GUI.content_ready(callback);
     }
@@ -192,7 +190,7 @@ TABS.ports.initialize = function (callback) {
         //Clear ports of any previous for serials different than USB VCP
         FC.SERIAL_CONFIG.ports = FC.SERIAL_CONFIG.ports.filter(item => item.identifier == 20)
 
-        $('.tab-ports .portConfiguration').each(function () {
+        $('#ports-table .portConfiguration').each(function () {
 
             var portConfiguration_e = this;
 
@@ -248,7 +246,7 @@ TABS.ports.initialize = function (callback) {
 
         function on_reboot_success_handler() {
             GUI.log(i18n.getMessage('deviceRebooting'));
-            GUI.handleReconnect($('.tab_ports a'));
+            GUI.handleReconnect($('[data-tab="ports"] > a'));
         }
     }
 };
@@ -256,7 +254,7 @@ TABS.ports.initialize = function (callback) {
 function updateDefaultBaud(baudSelect, column) {
     let section = $("#" + baudSelect);
     let portName = section.find('.function-' + column).val();
-    let baudRate = (column === 'telemetry') ? "AUTO" : 115200;;
+    let baudRate = (column === 'telemetry') ? "AUTO" : 115200;
 
     let rule = serialPortHelper.getRuleByName(portName);
 
