@@ -102,15 +102,20 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
                 feature_tip_html = '<div class="helpicon cf_tip" title="' + tips.join("<br><br>") + '"></div>';
             }
 
-            row_e = $('<div class="checkbox">' +
-                '<input type="checkbox" data-bit="' + fcFeatures[i].bit + '" class="feature toggle" name="' + fcFeatures[i].name + '" title="' + fcFeatures[i].name + '"' +
-                ' id="feature-' + fcFeatures[i].bit + '" ' +
-                '>' +
-                '<label for="feature-' + fcFeatures[i].bit + '">' +
-                '<span data-i18n="feature' + fcFeatures[i].name + '"></span>' +
-                '</label>' +
-                feature_tip_html +
-                '</div>');
+            let checkboxHtml = `
+            <li class="list-group-item hstack gap-2">
+                <input type="checkbox" class="feature toggle"
+                    id="feature-${fcFeatures[i].bit}"
+                    name="${fcFeatures[i].name}"
+                    title="${fcFeatures[i].name}"
+                    data-bit="${fcFeatures[i].bit}"
+                />
+                <label for="feature-${fcFeatures[i].bit}"><span data-i18n="feature${fcFeatures[i].name}"></span></label>
+                ${feature_tip_html}
+            </li>
+            `;
+
+            row_e = $(checkboxHtml);
 
             features_e.each(function () {
                 if ($(this).hasClass(fcFeatures[i].group)) {
@@ -119,10 +124,10 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             });
         }
 
-        features.updateUI($('.tab-configuration'), FC.FEATURES);
+        features.updateUI($('#tab-configuration'), FC.FEATURES);
 
         // translate to user-selected language
-       i18n.localize();;
+       i18n.localize();
 
         // VTX
         var config_vtx = $('.config-vtx');
@@ -267,7 +272,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
 
         $i2cSpeed.trigger('change');
 
-        $('a.save').on('click', function () {
+        $('#save-btn').on('click', function () {
             //UPDATE: moved to GPS tab and hidden
             //FC.MISC.mag_declination = parseFloat($('#mag_declination').val());
 
@@ -285,7 +290,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             FC.MISC.battery_capacity_unit = $('#battery_capacity_unit').val();
 
             features.reset();
-            features.fromUI($('.tab-configuration'));
+            features.fromUI($('#tab-configuration'));
             features.execute(function () {
                 FC.CURRENT_METER_CONFIG.scale = parseInt($('#currentscale').val());
                 FC.CURRENT_METER_CONFIG.offset = Math.round(parseFloat($('#currentoffset').val()) * 10);
