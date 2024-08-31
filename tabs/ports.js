@@ -108,7 +108,7 @@ TABS.ports.initialize = function (callback) {
                             select_e = functions_e.find(selectElementSelector);
                             
                             if (select_e.length == 0) {
-                                functions_e.children().first().prepend('<span class="function"><select id="' + selectElementName + '" name="' + selectElementName + '" class="form-select function-select ' + selectElementName + '" /></span>');
+                                functions_e.children().first().prepend('<span class="function w-100"><select id="' + selectElementName + '" name="' + selectElementName + '" class="form-select function-select ' + selectElementName + '" /></span>');
                                 
                                 functions_e.find('#' + selectElementName).on('change', () => {
                                     updateDefaultBaud(functions_e_id, column);
