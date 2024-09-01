@@ -2096,7 +2096,7 @@
         "message": "Mixer <span style=\"color: var(--inav-primary)\">saved</span>"
     },
     "mixerWizard": {
-        "message": "Mixer wizard"
+        "message": "Motor Mixer Wizard"
     },
     "mixerWizardInfo": {
         "message": "<ol><li>Remove propellers</li><li>Connect LiPo and use Outputs Tab to test all motors</li><li>Note the position of each motor (motor #1 - Left Top and so on)</li><li>Fill the table below</li></ol>"
@@ -2559,7 +2559,7 @@
         "message": "Please do <span style=\"color: red\">not</span> try to flash <strong>non-iNAV</strong> hardware with this firmware flasher.<br />Do <span style=\"color: red\">not</span> <strong>disconnect</strong> the board or <strong>turn off</strong> your computer while flashing.<br /><br /><strong>Note: </strong>STM32 bootloader is stored in ROM, it cannot be bricked.<br /><!--strong>Note: </strong><span style=\"color: red\">Auto-Connect</span> is always disabled while you are inside firmware flasher.<br / --><strong>Note: </strong>Make sure you have a backup; some upgrades/downgrades will wipe your configuration.<br /><strong>Note:</strong> If you have problems flashing try disconnecting all cables from your FC first, try rebooting, upgrade chrome, upgrade drivers.<br /><strong>Note:</strong> When flashing boards that have directly connected USB sockets (Matek H743-SLIM, Holybro Kakute etc) ensure you have read the USB Flashing section of the INAV manual and have the correct software and drivers installed"
     },
     "firmwareFlasherRecoveryHead": {
-        "message": "Recovery / Lost communication"
+        "message": "<strong>Recovery / Lost communication<strong>"
     },
     "firmwareFlasherRecoveryText": {
         "message": "If you have lost communication with your board follow these steps to restore communication: <ul><li>Power off</li><li>Enable 'No reboot sequence', enable 'Full chip erase'.</li><li>Jumper the BOOT pins or hold BOOT button.</li><li>Power on (activity LED will NOT flash if done correctly).</li><li>Install all STM32 drivers and Zadig if required (see <a href=\"https://github.com/iNavFlight/inav/blob/master/docs/USB%20Flashing.md\"target=\"_blank\">USB Flashing</a> section of INAV manual).</li><li>Close configurator, Close all running chrome instances, Close all Chrome apps, Restart Configurator.</li><li>Release BOOT button if your FC has one.</li><li>Flash with correct firmware (using manual baud rate if specified in your FC's manual).</li><li>Power off.</li><li>Remove BOOT jumper.</li><li>Power on (activity LED should flash).</li><li>Connect normally.</li></ul>"
@@ -2574,7 +2574,7 @@
         "message": "HEX file appears to be corrupted"
     },
     "firmwareFlasherRemoteFirmwareLoaded": {
-        "message": "<span style=\"color: var(--inav-primary)\">Remote Firmware loaded, ready for flashing</span>"
+        "message": "<span style=\"color: #37a8db\">Remote Firmware loaded, ready for flashing</span>"
     },
     "firmwareFlasherFailedToLoadOnlineFirmware": {
         "message": "Failed to load remote firmware"
@@ -2587,7 +2587,7 @@
         "message": "Save"
     },
     "ledStripEepromSaved": {
-        "message": "EEPROM <span style=\"color: var(--inav-primary)\">saved</span>: LED"
+        "message": "EEPROM <span style=\"color: #37a8db\">saved</span>: LED"
     },
     "controlAxisRoll": {
         "message": "Roll [A]"
@@ -2711,12 +2711,6 @@
     },
     "failsafeMinDistanceProcedureHelp": {
         "message": "This is the failsafe procedure that will be followed when the craft is closer than the Failsafe Minimum Distance from Home."
-    },
-    "failsafeProcedureVisualizationHeaderText": {
-        "message": "Procedure visualization"
-    },
-    "failsafeProcedureNothingVisualizationText": {
-        "message": "No visualization."
     },
     "mainHelpArmed": {
         "message": "Motor Arming"
@@ -4664,7 +4658,7 @@
         "message": "Use stand-alone application.<br> Please visit the <a href=\"https://github.com/iNavFlight/inav-configurator/releases\" target=\"_blank\">website</a> to read the release notes and download."
     },
     "eeprom_load_ok": {
-        "message": "EEPROM <span style=\"color: var(--inav-primary)\">loaded</span>"
+        "message": "EEPROM <span style=\"color: #37a8db\">loaded</span>"
     },
     "confirm_delete_all_points": {
         "message": "Do you really want to delete all points?"
@@ -5224,6 +5218,9 @@
     "BLACKBOX_FEATURE_GYRO_PEAKS_YAW": {
         "message": "Gyro Noise peak freq. Yaw"
     },
+    "BLACKBOX_FEATURE_SERVOS": {
+        "message": "Servos output"
+    },
     "axisRoll": {
         "message": "Roll"
     },
@@ -5492,34 +5489,34 @@
         "message": "Manual"
     },
     "sensorDataFlashNotFound": {
-        "message": "No dataflash<br/> chip found"
+        "message": "No dataflash <br>chip found"
     },
     "sensorDataFlashFreeSpace": {
         "message": "Dataflash: free space"
     },
     "mixerProfile1": {
-        "message": "Mixer 1"
+        "message": "Mixer Profile 1"
     },
     "mixerProfile2": {
-        "message": "Mixer 2"
+        "message": "Mixer Profile 2"
     },
     "sensorProfile1": {
-        "message": "Control 1"
+        "message": "Control Profile 1"
     },
     "sensorProfile2": {
-        "message": "Control 2"
+        "message": "Control Profile 2"
     },
     "sensorProfile3": {
-        "message": "Control 3"
+        "message": "Control Profile 3"
     },
     "sensorBatteryProfile1": {
-        "message": "Battery 1"
+        "message": "Battery Profile 1"
     },
     "sensorBatteryProfile2": {
-        "message": "Battery 2"
+        "message": "Battery Profile 2"
     },
     "sensorBatteryProfile3": {
-        "message": "Battery 3"
+        "message": "Battery Profile 3"
     },
     "sensorStatusGyro": {
         "message": "Gyroscope"
@@ -5956,5 +5953,11 @@
     },
     "toogleConfiguratorTheme": {
         "message": "Toggle configurator theme"
+    },
+    "adsbVehicleTotalMessages": {
+        "message": "Vehicle msgs"
+    },
+    "adsbHeartbeatTotalMessages": {
+        "message": "Heartbeat msgs"
     }
 }

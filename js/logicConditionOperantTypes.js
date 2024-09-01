@@ -12,7 +12,7 @@ const OPERAND_TYPES = {
     1: {
         name: "Get RC Channel",
         type: "range",
-        range: [1, 16],
+        range: [1, 34],
         default: 1
     },
     2: {

@@ -282,6 +282,8 @@ var FC = {
         this.ADSB_VEHICLES = {
             vehiclesCount: 0,
             callsignLength: 0,
+            vehiclePacketCount: 0,
+            heartbeatPacketCount: 0,
             vehicles: []
         };
 
@@ -654,7 +656,6 @@ var FC = {
     getGpsProtocols: function () {
         return [
             'UBLOX',
-            'UBLOX7',
             'MSP',
             'FAKE'
         ];
