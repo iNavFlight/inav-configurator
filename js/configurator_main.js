@@ -32,7 +32,7 @@ process.on('uncaughtException', function (error) {
         GUI.log(i18n.getMessage('unexpectedError', error.message));
         if (GUI.connected_to || GUI.connecting_to) {
             GUI.log(i18n.getMessage('disconnecting'));
-            $('a.connect').trigger('click');
+            $('#connect-btn').trigger('click');
         } 
     } else {
         throw error;

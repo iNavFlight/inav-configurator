@@ -203,7 +203,7 @@ class Connection {
     
     abort() {
         if (GUI.connected_to || GUI.connecting_to) {
-            $('a.connect').trigger('click');
+            $('#connect-btn').trigger('click');
         } else {
             this.disconnect();
         }

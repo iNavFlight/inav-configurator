@@ -77,7 +77,7 @@ var SerialBackend = (function () {
                 Disconnect
                 */
                 setTimeout(function () {
-                    $('a.connect').trigger( "click" );
+                    $('#connect-btn').trigger("click");
                 }, 100);
 
                 /*
@@ -85,7 +85,7 @@ var SerialBackend = (function () {
                 */
                 setTimeout(function start_connection() {
                     modal.close();
-                    $('a.connect').trigger( "click" );
+                    $('#connect-btn').trigger("click");
 
                     /*
                     Open configuration tab
