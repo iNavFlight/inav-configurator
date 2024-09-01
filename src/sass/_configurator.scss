@@ -212,7 +212,7 @@ html, body {
     bottom: 0;
     justify-content: flex-end;
     margin: auto calc(var(--inav-gutter-x) * -0.5) calc(var(--inav-gutter-y) * -0.5);
-    padding: .75rem;
+    padding: calc(var(--inav-gutter-y) * 0.5) calc(var(--inav-gutter-x) * 0.5);
     border-top: var(--inav-border-width) var(--inav-border-color) solid;
     background-color: var(--inav-tertiary-bg);
   }
