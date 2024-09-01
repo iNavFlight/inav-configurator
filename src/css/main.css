@@ -1898,9 +1898,9 @@ dialog {
     .spacer_box_title {
     }
 
-    input {
-        font-size: 11px !important;
-    }
+    /*input {*/
+    /*    font-size: 11px !important;*/
+    /*}*/
 
     .helpicon {
         float: right;
