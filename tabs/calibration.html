@@ -1,144 +1,218 @@
-<div class="tab-calibration toolbar_fixed_bottom">
-    <div class="content_wrapper">
-        <!-- should be the first DIV on each tab -->
-        <div class="cf_column full spacerbottom">
-            <div class="tab_title" data-i18n="tabCalibration">Calibration</div>
-            <div class="cf_column left" style="width: 75%;">
-                <div class="spacer_right">
-                    <div class="gui_box grey">
-                        <div class="gui_box_titlebar">
-                            <div class="spacer_box_title" data-i18n="calibrationHead1"></div>
+<div class="page tab-calibration">
+
+    <div class="page-header">
+        <span data-i18n="tabCalibration"></span>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-9">
+            <div class="card">
+                <div class="card-header" data-i18n="calibrationHead1"></div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-8">
+                            <div class="alert alert-warning" data-i18n="NoteCalibration"></div>
                         </div>
-                        <div class="spacer_box">
-                            <div class="calibHeader">
-                                <div class="twothird">
-                                    <div class="note" data-i18n="NoteCalibration"></div>
+                        <div class="col-4 d-grid align-items-start">
+                            <button id="calibrate-start-button" class="btn btn-outline-primary" data-i18n="AccBtn"></button>
+                        </div>
+                    </div>
+                    <div class="row row-cols-3 mb-3">
+                        <div class="col mb-3">
+                            <div class="card">
+                                <div data-step="1" class="card-body acc-calibration-step">
+                                    <div class="text-center fw-semibold" data-i18n="stepTitle1"></div>
+                                    <div class="step step1"></div>
+                                    <div class="indicator"></div>
                                 </div>
-                                <div class="third_right">
-                                    <div class="default_btn">
-                                        <div id="calib_btn">
-                                            <a id="calibrate-start-button" class="calibrate" href="#" data-i18n="AccBtn"></a>
-                                        </div>
-                                    </div>
+                            </div>
+                        </div>
+                        <div class="col mb-3">
+                            <div class="card">
+                                <div data-step="2" class="card-body acc-calibration-step">
+                                    <div class="text-center fw-semibold" data-i18n="stepTitle2"></div>
+                                    <div class="step step2"></div>
+                                    <div class="indicator"></div>
                                 </div>
                             </div>
-                            <div data-step="1" class="tile step1 finished">
-                                <div class="steptitle" data-i18n="stepTitle1"></div>
-                                <div class="indicator"></div>
-                            </div>
-                            <div data-step="2" class="tile step2 active">
-                                <div class="steptitle" data-i18n="stepTitle2"></div>
-                                <div class="indicator"></div>
-                            </div>
-                            <div data-step="3" class="tile step3">
-                                <div class="steptitle" data-i18n="stepTitle3"></div>
-                                <div class="indicator"></div>
-                            </div>
-                            <div data-step="4" class="tile step4">
-                                <div class="steptitle" data-i18n="stepTitle4"></div>
-                                <div class="indicator"></div>
-                            </div>
-                            <div data-step="5" class="tile step5">
-                                <div class="steptitle" data-i18n="stepTitle5"></div>
-                                <div class="indicator"></div>
-                            </div>
-                            <div data-step="6" class="tile step6">
-                                <div class="steptitle" data-i18n="stepTitle6"></div>
-                                <div class="indicator"></div>
-                            </div>
-                            <div class="gui_box grey" id="accPosAll">
-                                <div class="gui_box_titlebar">
-                                    <div class="spacer_box_title" data-i18n="calibrationHead2"></div>
+                        </div>
+                        <div class="col mb-3">
+                            <div class="card">
+                                <div data-step="3" class="card-body acc-calibration-step">
+                                    <div class="text-center fw-semibold" data-i18n="stepTitle3"></div>
+                                    <div class="step step3"></div>
+                                    <div class="indicator"></div>
                                 </div>
-                                <div class="spacer_box">
-                                    <table class="cf_table acc">
-                                        <tr>
-                                            <td data-i18n="accZero"></td>
-                                            <td><label for="accZeroX"><span>X</span></label><input readonly disabled type="number" name="accZeroX" min="-32768" max="32767"></td>
-                                            <td><label for="accZeroY"><span>Y</span></label><input readonly disabled type="number" name="accZeroY" min="-32768" max="32767"></td>
-                                            <td><label for="accZeroZ"><span>Z</span></label><input readonly disabled type="number" name="accZeroZ" min="-32768" max="32767"></td>
-                                        </tr>
-                                        <tr>
-                                            <td data-i18n="accGain"></td>
-                                            <td><label for="accGainX"><span>X</span></label><input readonly disabled type="number" name="accGainX" min="1" max="8192"></td>
-                                            <td><label for="accGainY"><span>Y</span></label><input readonly disabled type="number" name="accGainY" min="1" max="8192"></td>
-                                            <td><label for="accGainZ"><span>Z</span></label><input readonly disabled type="number" name="accGainZ" min="1" max="8192"></td>
-                                        </tr>
-                                    </table>
+                            </div>
+                        </div>
+                        <div class="col mb-3">
+                            <div class="card">
+                                <div data-step="4" class="card-body acc-calibration-step">
+                                    <div class="text-center fw-semibold" data-i18n="stepTitle4"></div>
+                                    <div class="step step4"></div>
+                                    <div class="indicator"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col mb-3">
+                            <div class="card">
+                                <div data-step="5" class="card-body acc-calibration-step">
+                                    <div class="text-center fw-semibold" data-i18n="stepTitle5"></div>
+                                    <div class="step step5"></div>
+                                    <div class="indicator"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col mb-3">
+                            <div class="card">
+                                <div data-step="6" class="card-body acc-calibration-step">
+                                    <div class="text-center fw-semibold" data-i18n="stepTitle6"></div>
+                                    <div class="step step6"></div>
+                                    <div class="indicator"></div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
-            <div class="cf_column left" style="width: 25%;">
-                <div class="gui_box grey">
-                    <div class="gui_box_titlebar">
-                        <div class="spacer_box_title" data-i18n="calibrationHead4"></div>
-                    </div>
-                    <div class="spacer_box">
-                        <span data-i18n="MagCalText">text</span>
-                        <div class="default_btn">
-                            <div id="mag_btn">
-                                <a class="calibratemag" href="#" data-i18n="MagBtn"></a>
+                    <div class="row">
+                        <div class="col">
+                            <div class="card">
+                                <div class="card-header" data-i18n="calibrationHead2"></div>
+                                <div class="card-body">
+                                    <ul class="list-group list-group-flush">
+                                        <li class="list-group-item hstack gap-2">
+                                            <div class="min-w-6r fw-bold">
+                                                <span data-i18n="accZero"></span>:
+                                            </div>
+                                            <div class="input-group flex-nowrap">
+                                                <span class="input-group-text">X</span>
+                                                <input type="text" class="form-control" name="accZeroX" readonly>
+                                            </div>
+                                            <div class="input-group flex-nowrap">
+                                                <span class="input-group-text">Y</span>
+                                                <input type="text" class="form-control" name="accZeroY" readonly>
+                                            </div>
+                                            <div class="input-group flex-nowrap">
+                                                <span class="input-group-text">Z</span>
+                                                <input type="text" class="form-control" name="accZeroZ" readonly>
+                                            </div>
+                                        </li>
+                                        <li class="list-group-item hstack gap-2">
+                                            <div class="min-w-6r fw-bold">
+                                                <span data-i18n="accGain"></span>:
+                                            </div>
+                                            <div class="input-group flex-nowrap">
+                                                <span class="input-group-text">X</span>
+                                                <input type="text" class="form-control" name="accGainX" readonly>
+                                            </div>
+                                            <div class="input-group flex-nowrap">
+                                                <span class="input-group-text">Y</span>
+                                                <input type="text" class="form-control" name="accGainY" readonly>
+                                            </div>
+                                            <div class="input-group flex-nowrap">
+                                                <span class="input-group-text">Z</span>
+                                                <input type="text" class="form-control" name="accGainZ" readonly>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
                             </div>
                         </div>
-                        <table id="mag-calibrated-data" class="cf_table">
-                            <tr>
-                                <td><label for="MagX" data-i18n="MagXText"><span></span></label></td>
-                                <td><input readonly disabled type="number" name="MagX" min="-32768" max="32767"></td>
-                            </tr>
-                            <tr>
-                                <td><label for="MagY" data-i18n="MagYText"><span></span></label></td>
-                                <td><input readonly disabled type="number" name="MagY" min="-32768" max="32767"></td>
-                            </tr>
-                            <tr>
-                                <td><label for="MagZ" data-i18n="MagZText"><span></span></label></td>
-                                <td><input readonly disabled type="number" name="MagZ" min="-32768" max="32767"></td>
-                            </tr>
-                            <tr>
-                                <td><label for="MagGainX" data-i18n="MagGainXText"><span></span></label></td>
-                                <td><input readonly disabled type="number" name="MagGainX" min="-32768" max="32767"></td>
-                            </tr>
-                            <tr>
-                                <td><label for="MagGainY" data-i18n="MagGainYText"><span></span></label></td>
-                                <td><input readonly disabled type="number" name="MagGainY" min="-32768" max="32767"></td>
-                            </tr>
-                            <tr>
-                                <td><label for="MagGainZ" data-i18n="MagGainZText"><span></span></label></td>
-                                <td><input readonly disabled type="number" name="MagGainZ" min="-32768" max="32767"></td>
-                            </tr>
-                        </table>
-                    </div>
-                </div>
-                <div class="gui_box grey">
-                    <div class="gui_box_titlebar">
-                        <div class="spacer_box_title" data-i18n="calibrationHead5"></div>
-                    </div>
-                    <div class="spacer_box">
-                        <span data-i18n="OpflowCalText">text</span>
-                        <div class="default_btn">
-                            <div id="opflow_btn">
-                                <a class="calibrateopflow" href="#" data-i18n="OpflowCalBtn"></a>
-                            </div>
-                        </div>
-                        <table id="opflow-calibrated-data" class="cf_table">
-                            <tr>
-                                <td><label for="OpflowScale"><span data-i18n="OpflowScaleText"></span></label></td>
-                                <td><input type="number" name="OpflowScale" min="0" max="10000"></td>
-                            </tr>
-                        </table>
                     </div>
                 </div>
             </div>
         </div>
+        <div class="col-3">
+            <div class="card mb-3">
+                <div class="card-header" data-i18n="calibrationHead4"></div>
+                <div class="card-body">
+                    <div class="alert alert-info" data-i18n="MagCalText"></div>
+                    <ul id="mag-calibrated-data" class="list-group list-group-flush">
+                        <li class="list-group-item d-grid">
+                            <button id="mag_btn" class="btn btn-primary" data-i18n="MagBtn"></button>
+                        </li>
+                        <li class="list-group-item">
+                            <div class="input-group flex-nowrap">
+                                <span class="input-group-text" data-i18n="MagXText"></span>
+                                <input type="text" class="form-control" name="MagX" readonly>
+                            </div>
+                        </li>
+                        <li class="list-group-item">
+                            <div class="input-group flex-nowrap">
+                                <span class="input-group-text" data-i18n="MagYText"></span>
+                                <input type="text" class="form-control" name="MagY" readonly>
+                            </div>
+                        </li>
+                        <li class="list-group-item">
+                            <div class="input-group flex-nowrap">
+                                <span class="input-group-text" data-i18n="MagZText"></span>
+                                <input type="text" class="form-control" name="MagZ" readonly>
+                            </div>
+                        </li>
+                        <li class="list-group-item">
+                            <div class="input-group flex-nowrap">
+                                <span class="input-group-text" data-i18n="MagGainXText"></span>
+                                <input type="text" class="form-control" name="MagGainX" readonly>
+                            </div>
+                        </li>
+                        <li class="list-group-item">
+                            <div class="input-group flex-nowrap">
+                                <span class="input-group-text" data-i18n="MagGainYText"></span>
+                                <input type="text" class="form-control" name="MagGainY" readonly>
+                            </div>
+                        </li>
+                        <li class="list-group-item">
+                            <div class="input-group flex-nowrap">
+                                <span class="input-group-text" data-i18n="MagGainZText"></span>
+                                <input type="text" class="form-control" name="MagGainZ" readonly>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header" data-i18n="calibrationHead5"></div>
+                <div class="card-body">
+                    <div class="alert alert-info" data-i18n="OpflowCalText"></div>
+                    <ul id="opflow-calibrated-data" class="list-group list-group-flush">
+                        <li class="list-group-item d-grid">
+                            <button id="opflow_btn" class="btn btn-primary" data-i18n="OpflowCalBtn"></button>
+                        </li>
+                        <li class="list-group-item">
+                            <div class="input-group flex-nowrap">
+                                <span class="input-group-text" data-i18n="OpflowScaleText"></span>
+                                <input type="number" class="form-control" name="OpflowScale" min="0" max="10000">
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="content_toolbar">
-        <div class="btn save_btn">
-            <a id="calibrateButtonSave" class="save" href="#" data-i18n="configurationButtonSave"></a>
+
+    <div class="page-footer">
+        <button id="save-btn" class="btn btn-primary" data-i18n="configurationButtonSave"></button>
+    </div>
+</div>
+
+<div class="modal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Modal title</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Modal body text goes here.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary">Save changes</button>
+            </div>
         </div>
     </div>
 </div>
+
 <div id="modal-acc-calibration-start" class="is-hidden">
     <div class="modal__content">
         <h1 class="modal__title" data-i18n="accCalibrationStartTitle"></h1>
@@ -148,6 +222,7 @@
         <a id="modal-start-button" class="modal__button modal__button--main" data-i18n="OK"></a>
     </div>
 </div>
+
 <div id="modal-acc-calibration-stop" class="is-hidden">
     <div class="modal__content">
         <h1 class="modal__title" data-i18n="accCalibrationStopTitle"></h1>

@@ -1,177 +1,74 @@
-.tab-calibration .content_toolbar {
-    left: 0px;
-    }
-    
-.tab-calibration .tile {
-    float: left;
-    width: calc(33% - 10px);
-    height: 180px;
-    border-radius: var(--inav-border-radius);
-    border: var(--inav-border-width) var(--inav-border-color) solid;
-    margin-right: 14px;
-    margin-bottom: 15px;
-    background-size: 140px;
-    background-position: center;
+.tab-calibration .acc-calibration-step .step {
+    height: 9rem;
+    background-size: contain;
     background-repeat: no-repeat;
-    background-position-y: 30px;
-} 
-  
-.tab-calibration .tile:nth-child(4) {
-    margin-right: 0px;
-    margin-left: 1px;
-}
-    
-.tab-calibration .tile:nth-child(7) {
-    margin-right: 0px;
-    margin-left: 1px;
-
+    background-position: center center;
 }
 
-.tab-calibration .steptitle {
-    float: left;
-    width: calc(100% - 10px);
-    text-align: center;
-    padding: 5px;
-    background-color: var(--inav-tertiary-bg);
-    border-top-left-radius: var(--inav-border-radius);
-    border-top-right-radius: var(--inav-border-radius);
-    color: var(--inav-body-color);
-}
-
-.tab-calibration .indicator {
-    float: right;
-    margin-right: 20px;
-    margin-top: 106px;
-    width: 30px;
-    height: 30px;
-    text-align: center;
+.tab-calibration .acc-calibration-step .indicator {
+    position: absolute;
+    right: .75rem;
+    bottom: .75rem;
+    width: 2.5rem;
+    height: 2.5rem;
     display: none;
     background-image: url(./../../../images/icons/check.svg);
-    background-size: contain;
-    
 }
 
-.tab-calibration .finished .indicator {
-    display: block;
-    }
-
-.tab-calibration .finished .steptitle {
+.tab-calibration .acc-calibration-step.finished .indicator {
+    display: unset;
 }
 
-.tab-calibration .active .steptitle {
-    background-color: var(--inav-primary);
-}
-
-.tab-calibration .active {
-    border: solid 1px var(--inav-primary);
-    background-color: white;
-    box-shadow: 0 0 10px #ccc;
-
-}
-
-.tab-calibration .finished {
-}
-
- .tab-calibration .step1 {
+.tab-calibration .acc-calibration-step .step1 {
     background-image: url(./../../../images/icons/pos1_grey.svg);
-    background-size: 185px;
-    background-position-y: 10px;
 }
 
- .tab-calibration .step1.active, .tab-calibration .step1.finished {
+.tab-calibration .acc-calibration-step.active .step1,
+.tab-calibration .acc-calibration-step.finished .step1 {
     background-image: url(./../../../images/icons/pos1.svg);
 }
 
-.tab-calibration .step2 {
+.tab-calibration .acc-calibration-step .step2 {
     background-image: url(./../../../images/icons/pos2_grey.svg);
-    background-size: 185px;
-    background-position-y: 10px;
 }
 
- .tab-calibration .step2.active, .tab-calibration .step2.finished {
+.tab-calibration .acc-calibration-step.active .step2,
+.tab-calibration .acc-calibration-step.finished .step2 {
     background-image: url(./../../../images/icons/pos2.svg);
 }
 
- .tab-calibration .step3 {
+.tab-calibration .acc-calibration-step .step3 {
     background-image: url(./../../../images/icons/pos3_grey.svg);
 }
 
- .tab-calibration .step3.active, .tab-calibration .step3.finished {
+.tab-calibration .acc-calibration-step.active .step3,
+.tab-calibration .acc-calibration-step.finished .step3 {
     background-image: url(./../../../images/icons/pos3.svg);
 }
 
- .tab-calibration .step4 {
+.tab-calibration .acc-calibration-step .step4 {
     background-image: url(./../../../images/icons/pos4_grey.svg);
 }
 
-.tab-calibration .step4.active, .tab-calibration .step4.finished {
+.tab-calibration .acc-calibration-step.active .step4,
+.tab-calibration .acc-calibration-step.finished .step4 {
     background-image: url(./../../../images/icons/pos4.svg);
 }
 
-.tab-calibration .step5 {
+.tab-calibration .acc-calibration-step .step5 {
     background-image: url(./../../../images/icons/pos5_grey.svg);
 }
 
-.tab-calibration .step5.active, .tab-calibration .step5.finished {
+.tab-calibration .acc-calibration-step.active .step5,
+.tab-calibration .acc-calibration-step.finished .step5 {
     background-image: url(./../../../images/icons/pos5.svg);
 }
 
-.tab-calibration .step6 {
+.tab-calibration .acc-calibration-step .step6 {
     background-image: url(./../../../images/icons/pos6_grey.svg);
 }
 
- .tab-calibration .step6.active, .tab-calibration .step6.finished {
+.tab-calibration .acc-calibration-step.active .step6,
+.tab-calibration .acc-calibration-step.finished .step6 {
     background-image: url(./../../../images/icons/pos6.svg);
 }
-
- .tab-calibration .note {
-    margin-bottom: 20px;
-    width: calc(100% - 20px);
-    margin-top: 5px;
-    padding:5px;
-    min-height: 45px;
-}
-
-#calib_btn {
-    margin-top: 5px;
-    margin-left: 5px;
-}
-    
-#calib_btn a {
-    height:30px;
-    padding-top: 20px;
-    width: calc(100% - 5px);
- }
-
- #calib_btn a.resetCalibration {
- }
-
- #calib_btn a.resetCalibration:hover {
-    background-color: var(--inav-danger);
-    border: var(--inav-border-width) var(--inav-danger) solid;
-    color: #ffffff;
- }
- 
-.tab-calibration input {
-    width: 57px;
-}
-
-.tab-calibration .spacer_box div input {
-    margin-right: 0px;
-    }
-
-.tab-calibration #mag_btn {
-    margin-top: 10px;
-    }
-
-.tab-calibration #level_btn {
-    margin-top: 10px;
-    }
-
-.tab-calibration .acc tr td {
-    width: 25%;
-    }
-    
-.tab-calibration .acc tr td:nth-child(1){
-    width: 34%;
-    }
