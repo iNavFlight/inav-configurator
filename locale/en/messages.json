@@ -2712,6 +2712,12 @@
     "failsafeMinDistanceProcedureHelp": {
         "message": "This is the failsafe procedure that will be followed when the craft is closer than the Failsafe Minimum Distance from Home."
     },
+    "failsafeProcedureVisualizationHeaderText": {
+        "message": "Procedure visualization"
+    },
+    "failsafeProcedureNothingVisualizationText": {
+        "message": "No visualization."
+    },
     "mainHelpArmed": {
         "message": "Motor Arming"
     },
