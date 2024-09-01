@@ -19,6 +19,14 @@
   }
 }
 
+// .h-1r, .h-2r ... .h-20r
+@for $i from 1 through 20 {
+  .h-#{$i}r {
+    height: #{$i}rem;
+  }
+}
+
+
 [data-bs-theme="light"] .d-none-dark {
   display: none !important;
 }
