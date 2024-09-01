@@ -2227,3 +2227,19 @@ ol li {
 .bold {
     font-weight: bold;
 }
+
+/* TEMPORARY */
+.tab-configuration {
+    position: relative;
+}
+
+.tab-configuration .leftWrapper {
+    float: left;
+    width: calc(50% - 20px);
+}
+
+.tab-configuration .rightWrapper {
+    float: left;
+    width: calc(50% - 0px);
+    margin: 0 0 10px 20px;
+}
