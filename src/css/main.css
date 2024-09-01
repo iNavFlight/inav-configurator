@@ -2179,7 +2179,7 @@ ol li {
 .unit_wrapper::after {
     position: absolute;
     /*top: 2px;*/
-    bottom: -2px;
+    bottom: -3px;
     height: 100%;
     right: .5em;
     transition: all .05s ease-in-out;
@@ -2187,17 +2187,17 @@ ol li {
 
 /* Move unit more to the left on hover or focus within
      for arrow buttons will appear to the right of number inputs */
-.unit_wrapper:hover::after,
-.unit_wrapper:focus-within::after {
-    right: 1.0em;
-}
+/*.unit_wrapper:hover::after,*/
+/*.unit_wrapper:focus-within::after {*/
+/*    right: 1.0em;*/
+/*}*/
 
 /* Handle Firefox (arrows always shown) */
-@supports (-moz-appearance:none) {
-    .unit_wrapper::after {
-        right: 1.0em;
-    }
-}
+/*@supports (-moz-appearance:none) {*/
+/*    .unit_wrapper::after {*/
+/*        right: 1.0em;*/
+/*    }*/
+/*}*/
 
 /* Set the unit abbreviation for each unit class */
 .unit::after {

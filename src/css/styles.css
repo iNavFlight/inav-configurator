@@ -11,7 +11,6 @@
 @import 'defaults_dialog.css';
 @import './../../node_modules/openlayers/dist/ol.css';
 @import 'tabs/adjustments.css';
-@import 'tabs/advanced_tuning.css';
 @import 'tabs/auxiliary.css';
 @import 'tabs/calibration.css';
 @import 'tabs/cli.css';

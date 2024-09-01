@@ -81,7 +81,7 @@ TABS.advanced_tuning.initialize = function (callback) {
         TABS.advanced_tuning.checkRequirements_IdleThrottle();
         TABS.advanced_tuning.checkRequirements_LinearDescent();
 
-        $('a.save').on('click', function () {
+        $('#save-btn').on('click', function () {
             Settings.saveInputs(save_to_eeprom);
         });
         GUI.content_ready(callback);
