@@ -72,7 +72,7 @@
     width: 14px;
     transition: none;
     background-color: var(--inav-secondary);
-    mask: url("./../../images/icons/cf_icon_info_grey.svg");
+    mask: url("./../../images/icons/cf_icon_info_grey.svg") no-repeat;
 }
 
 .helpicon:hover {
@@ -1906,7 +1906,9 @@ dialog {
         float: right;
         margin-top: 5px;
         height: 14px;
+        min-height: 14px;
         width: 14px;
+        min-width: 14px;
         transition: none;
     }
 
