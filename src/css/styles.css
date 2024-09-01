@@ -20,7 +20,6 @@
 @import 'tabs/failsafe.css';
 @import 'tabs/firmware_flasher.css';
 @import 'tabs/gps.css';
-@import 'tabs/landing.css';
 @import 'tabs/led_strip.css';
 @import 'tabs/logging.css';
 @import 'tabs/magnetometer.css';
@@ -31,7 +30,6 @@
 @import 'tabs/onboard_logging.css';
 @import 'tabs/osd.css';
 @import 'tabs/pid_tuning.css';
-@import 'tabs/ports.css';
 @import 'tabs/profiles.css';
 @import 'tabs/programming.css';
 @import 'tabs/receiver.css';
