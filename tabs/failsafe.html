@@ -1,76 +1,72 @@
-<div class="tab-failsafe toolbar_fixed_bottom">
-    <div class="content_wrapper">
-        <div class="tab_title" data-i18n="tabFailsafe">Failsafe</div>
-        <div class="gui_box grey">
-            <div class="gui_box_titlebar">
-                <div class="spacer_box_title" data-i18n="failsafeStageTwoSettingsTitle"></div>
-            </div>
-            <div class="spacer_box">
-                <div class="number">
-                    <input id="failsafeDelay" type="number" name="failsafe_delay" data-unit="dsec" data-setting="failsafe_delay" min="0" max="200" />
-                    <label><span data-i18n="failsafeDelayItem"></span></label>
-                    <div for="failsafeDelay" class="helpicon cf_tip" data-i18n_title="failsafeDelayHelp"></div>
-                </div>
-                <!-- radio buttons  -->
-                <div class="subline" data-i18n="failsafeSubTitle1"></div>
-                <div class="radioarea pro1">
-                    <div class="radiobuttons"><input class="procedure" id="drop" name="group1" type="radio" />
-                        <label for="drop" data-i18n="failsafeProcedureItemSelect2"></label>
-                    </div>
-                </div>
-                <div class="radioarea pro2">
-                    <div class="radiobuttons"><input class="procedure" id="land" name="group1" type="radio" checked/>
-                        <label for="land" data-i18n="failsafeProcedureItemSelect1"></label>
-                    </div>
-                    <div class="proceduresettings">
-                        <div class="number">
-                            <input type="number" name="failsafe_throttle" data-setting="failsafe_throttle" data-unit="us" min="0" max="2000" />
+<div id="tab-configuration" class="page">
+    <div class="page-header">
+        <span data-i18n="tabFailsafe"></span>
+    </div>
+
+    <div class="row">
+        <div class="col">
+            <div class="card">
+                <div class="card-header" data-i18n="failsafeStageTwoSettingsTitle"></div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item hstack">
+                            <input id="failsafeDelay" class="form-control w-10r" type="number" name="failsafe_delay" data-unit="dsec" data-setting="failsafe_delay" min="0" max="200" />
+                            <label><span data-i18n="failsafeDelayItem"></span></label>
+                            <div for="failsafeDelay" class="helpicon cf_tip" data-i18n_title="failsafeDelayHelp"></div>
+                        </li>
+
+                        <li class="list-group-item hstack">
+                            <select id="procedure" class="form-select w-10r" data-setting="">
+                                <option value="land" data-i18n="failsafeProcedureItemSelect1"></option>
+                                <option value="drop" data-i18n="failsafeProcedureItemSelect2"></option>
+                                <option value="rth" data-i18n="failsafeProcedureItemSelect3"></option>
+                                <option value="nothing" data-i18n="failsafeProcedureItemSelect4"></option>
+                            </select>
+                            <label for="failsafe_min_distance_procedure" data-i18n="failsafeSubTitle1"></label>
+                        </li>
+                        <li class="list-group-item hstack">
+                            <input type="number" class="form-control w-10r" name="failsafe_throttle" data-setting="failsafe_throttle" data-unit="us" min="0" max="2000" />
                             <label><span data-i18n="failsafeThrottleItem"></span></label>
-                        </div>
-                        <div class="number">
-                            <input id="failsafeOffDelay" type="number" name="failsafe_off_delay" data-setting="failsafe_off_delay" data-unit="dsec" min="0" max="200" />
+                        </li>
+                        <li class="list-group-item hstack">
+                            <input id="failsafeOffDelay" class="form-control w-10r" type="number" name="failsafe_off_delay" data-setting="failsafe_off_delay" data-unit="dsec" min="0" max="200" />
                             <label><span data-i18n="failsafeOffDelayItem"></span></label>
                             <div for="failsafeOffDelay" class="helpicon cf_tip" data-i18n_title="failsafeOffDelayHelp"></div>
-                        </div>
-                    </div>
-                </div>
-                <div class="radioarea pro4">
-                    <div class="radiobuttons"><input class="procedure" id="rth" name="group1" type="radio" />
-                        <label for="rth" data-i18n="failsafeProcedureItemSelect3"></label>
-                    </div>
-                </div>
-                <div class="radioarea pro5">
-                    <div class="radiobuttons"><input class="procedure" id="nothing" name="group1" type="radio" />
-                        <label for="nothing" data-i18n="failsafeProcedureItemSelect4"></label>
-                    </div>
-                </div>
-                <!-- Minimum Failsafe Distance controls -->
-                <div class="checkbox">
-                    <div class="numberspacer">
-                        <input type="checkbox" name="failsafe_use_minimum_distance" class="toggle" id="failsafe_use_minimum_distance" />
-                    </div>
-                    <label for="failsafe_use_minimum_distance"><span data-i18n="failsafeUseMinimumDistanceItem"></span>
-                    </label>
-                    <div for="failsafe_use_minimum_distance" class="helpicon cf_tip" data-i18n_title="failsafeUseMinimumDistanceHelp"></div>
-                </div>
+                        </li>
 
-                <div class="number" id="failsafe_min_distance_elements">
-                    <input class="minimumDistance" id="failsafe_min_distance" type="number" data-unit="cm" data-setting="failsafe_min_distance" data-setting-multiplier="1" step="1" min="0" max="65000" />
-                    <label for="failsafe_min_distance"><span data-i18n="failsafeMinDistanceItem"></span></label>
-                    <div for="failsafe_min_distance" class="helpicon cf_tip" data-i18n_title="failsafeMinDistanceHelp"></div>
+                        <!-- Minimum Failsafe Distance controls -->
+                        <li class="list-group-item hstack">
+                            <input type="checkbox" name="failsafe_use_minimum_distance" class="toggle" id="failsafe_use_minimum_distance" />
+                            <label for="failsafe_use_minimum_distance"><span data-i18n="failsafeUseMinimumDistanceItem"></span></label>
+                            <div for="failsafe_use_minimum_distance" class="helpicon cf_tip" data-i18n_title="failsafeUseMinimumDistanceHelp"></div>
+                        </li>
+                        <li class="list-group-item hstack" id="failsafe_min_distance_elements">
+                            <input class="form-control w-10r minimumDistance" id="failsafe_min_distance"  type="number" data-unit="cm" data-setting="failsafe_min_distance" data-setting-multiplier="1" step="1" min="0" max="65000" />
+                            <label for="failsafe_min_distance"><span data-i18n="failsafeMinDistanceItem"></span></label>
+                            <div for="failsafe_min_distance" class="helpicon cf_tip" data-i18n_title="failsafeMinDistanceHelp"></div>
+                        </li>
+                        <li class="list-group-item hstack" id="failsafe_min_distance_procedure_elements">
+                            <select id="failsafe_min_distance_procedure" class="form-select w-10r minimumDistance" data-setting="failsafe_min_distance_procedure"></select>
+                            <label for="failsafe_min_distance_procedure"> <span data-i18n="failsafeMinDistanceProcedureItem"></span></label>
+                            <div for="failsafe_min_distance_procedure" class="helpicon cf_tip" data-i18n_title="failsafeMinDistanceProcedureHelp"></div>
+                        </li>
+                    </ul>
                 </div>
-
-                <div class="select" id="failsafe_min_distance_procedure_elements">
-                    <select id="failsafe_min_distance_procedure" class="minimumDistance" data-setting="failsafe_min_distance_procedure"></select>
-                    <label for="failsafe_min_distance_procedure"> <span data-i18n="failsafeMinDistanceProcedureItem"></span></label>
-                    <div for="failsafe_min_distance_procedure" class="helpicon cf_tip" data-i18n_title="failsafeMinDistanceProcedureHelp"></div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card h-100">
+                <div class="card-header" data-i18n="failsafeProcedureVisualizationHeaderText"></div>
+                <div class="card-body">
+                    <div id="procedure-visualization" class="h-100 mx-auto procedure-visualization">
+                        <div class="procedure-nothing-text d-none text-center fs-4" data-i18n="failsafeProcedureNothingVisualizationText"></div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-    <div class="content_toolbar">
-        <div class="btn save_btn">
-            <a class="save" href="#" data-i18n="configurationButtonSave"></a>
-        </div>
+
+    <div class="page-footer">
+        <button id="save-btn" class="btn btn-primary" data-i18n="configurationButtonSave"></button>
     </div>
 </div>
