@@ -1046,13 +1046,23 @@ li.active .ic_mag {
     height: 100%;
     background: url('./../../images/loading-bars.svg') no-repeat center 45%;
     background-color: var(--inav-body-bg);
+    animation: .25s fadeIn;
+    animation-fill-mode: forwards;
+    opacity: 0;
 }
 
-
-
-#content.loading .data-loading {
-    opacity: 1;
+@keyframes fadeIn {
+    50% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
 }
+
+/*#content.loading .data-loading {*/
+/*    opacity: 1;*/
+/*}*/
 
 .data-loading p {
     position: relative;

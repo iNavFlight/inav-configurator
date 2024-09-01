@@ -205,10 +205,8 @@ GUI_control.prototype.content_ready = function (callback) {
         });
     });
 
-    const duration = content.data('empty') ? 0 : 400;
-    $('#content .data-loading:first').fadeOut(duration, function() {
-        $(this).remove();
-    });
+    $('#content .data-loading:first').remove();
+
     if (callback) {
         callback();
     }
