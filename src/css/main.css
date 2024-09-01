@@ -1129,7 +1129,7 @@ dialog {
 .content_toolbar {
     /*  content toolbar panel */
     width: 100%;
-    height: 30px;
+    height: 60px;
     background-color: var(--inav-tertiary-bg);
     padding: 10px 0;
     overflow: hidden;
