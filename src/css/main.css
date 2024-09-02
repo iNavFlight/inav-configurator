@@ -1614,18 +1614,18 @@ dialog {
 }
 
 /* fixing logging tab*/
-.properties {
-    width: 800px;
-}
+/*.properties {*/
+/*    width: 800px;*/
+/*}*/
 
-.properties dl {
-    width: 200px;
-}
+/*.properties dl {*/
+/*    width: 200px;*/
+/*}*/
 
-.properties dd {
-    width: 400px;
-    height: auto;
-}
+/*.properties dd {*/
+/*    width: 400px;*/
+/*    height: auto;*/
+/*}*/
 
 /* GPS Fix styling*/
 .fix3d {

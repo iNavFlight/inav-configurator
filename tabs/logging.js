@@ -49,9 +49,9 @@ TABS.logging.initialize = function (callback) {
         i18n.localize();;
 
         // UI hooks
-        $('a.log_file').on('click', prepare_file);
+        $('#log-file-btn').on('click', prepare_file);
 
-        $('a.logging').on('click', function () {
+        $('#logging-btn').on('click', function () {
             if (GUI.connected_to) {
                 if (readyToWrite) {
                     var clicks = $(this).data('clicks');
