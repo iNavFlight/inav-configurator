@@ -1,186 +1,176 @@
-<div class="tab-gps toolbar_fixed_bottom">
-    <div class="content_wrapper">
-        <div class="tab_title" data-i18n="tabGPS">GPS</div>
-        <div class="cf_column third_left">
-            <div class="spacer_right">
+<div class="page tab-gps">
+    <div class="page-header">
+        <span data-i18n="tabGPS"></span>
+    </div>
 
-                <div class="config-section gui_box grey">
-                    <div class="gui_box_titlebar">
-                        <div class="spacer_box_title" data-i18n="configurationGPS"></div>
-                    </div>
-                    <div class="spacer_box">
-                        <div class="checkbox">
+    <div class="row">
+        <div class="col col-lg-4">
+            <div class="card mb-3">
+                <div class="card-header" data-i18n="configurationGPS"></div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item hstack">
                             <input type="checkbox" data-bit="7" class="feature toggle" name="GPS" title="GPS" id="feature-7">
                             <label for="feature-7"><span data-i18n="featureGPS"></span></label>
-                            <div for="feature-7" class="helpicon cf_tip" data-i18n_title="featureGPSTip"></div>
-                        </div>
-                        <div class="select">
-                            <select id="gps_port" class="gps_port"></select>
+                            <span class="helpicon cf_tip" data-i18n_title="featureGPSTip"></span>
+                        </li>
+                        <li class="list-group-item hstack">
+                            <select id="gps_port" class="form-select w-10r"></select>
                             <label for="gps_port"><span data-i18n="gpsPort"></span></label>
-                        </div>
-                        <div class="select">
-                            <select id="gps_baud" class="gps_baud"></select>
+                        </li>
+                        <li class="list-group-item hstack">
+                            <select id="gps_baud" class="form-select w-10r"></select>
                             <label for="gps_baud"><span data-i18n="gpsBaud"></span></label>
-                        </div>
-                        <div class="select">
-                            <select id="gps_protocol" class="gps_protocol">
+                        </li>
+                        <li class="list-group-item hstack">
+                            <select id="gps_protocol" class="form-select w-10r">
                                 <!-- list generated here -->
                             </select>
                             <label for="gps_protocol"><span data-i18n="configurationGPSProtocol"></span></label>
-                        </div>
-                        <div class="select">
-                            <select id="gps_ubx_sbas" class="gps_ubx_sbas">
+                        </li>
+                        <li class="list-group-item hstack">
+                            <select id="gps_ubx_sbas" class="form-select w-10r">
                                 <!-- list generated here -->
                             </select>
                             <label for="gps_ubx_sbas"><span data-i18n="configurationGPSubxSbas"></span></label>
-                        </div>
-                        <div class="number is-hidden">
-                            <input type="number" id="mag_declination" name="mag_declination" step="0.1" min="-180" max="180" />
+                        </li>
+                        <li class="list-group-item is-hidden">
+                            <input class="form-control w-10r" type="number" id="mag_declination" name="mag_declination" step="0.1" min="-180" max="180" />
                             <label for="mag_declination"><span data-i18n="configurationMagDeclination"></span></label>
-                        </div>
-                        <div class="checkbox">
+                        </li>
+                        <li class="list-group-item hstack">
                             <input type="checkbox" class="toggle update_preview" data-setting="gps_ublox_use_galileo" data-live="true">
                             <label for="gps_use_galileo"><span data-i18n="configurationGPSUseGalileo"></span></label>
-                        </div>
-                        <div class="checkbox">
+                        </li>
+                        <li class="list-group-item hstack">
                             <input type="checkbox" class="toggle update_preview" data-setting="gps_ublox_use_beidou" data-live="true">
                             <label for="gps_use_beidou"><span data-i18n="configurationGPSUseBeidou"></span></label>
-                        </div>
-                        <div class="checkbox">
+                        </li>
+                        <li class="list-group-item hstack">
                             <input type="checkbox" class="toggle update_preview" data-setting="gps_ublox_use_glonass" data-live="true">
                             <label for="gps_use_glonass"><span data-i18n="configurationGPSUseGlonass"></span></label>
-                        </div>
-                        <div class="number">
-                            <input type="number" id="tzOffset" data-setting="tz_offset" data-unit="tzmins" data-setting-multiplier="1" step="1" min="-1440" max="1440" />
+                        </li>
+                        <li class="list-group-item hstack">
+                            <input class="form-control w-10r" type="number" id="tzOffset" data-setting="tz_offset" data-unit="tzmins" data-setting-multiplier="1" step="1" min="-1440" max="1440" />
                             <label for="tzOffset"><span data-i18n="tzOffset"></span></label>
                             <div for="tzOffset" class="helpicon cf_tip" data-i18n_title="tzOffsetHelp"></div>
-                        </div>
-                        <div class="select">
-                            <select id="tzAutomaticDST" data-setting="tz_automatic_dst"></select>
+                        </li>
+                        <li class="list-group-item hstack">
+                            <select class="form-select w-10r" id="tzAutomaticDST" data-setting="tz_automatic_dst"></select>
                             <label for="tzAutomaticDST"><span data-i18n="tzAutomaticDST"></span></label>
-                            <div for="tzAutomaticDST" class="helpicon cf_tip" data-i18n_title="tzAutomaticDSTHelp"></div>
-                        </div>
-                    </div>
+                            <span class="helpicon cf_tip" data-i18n_title="tzAutomaticDSTHelp"></span>
+                        </li>
+                    </ul>
                 </div>
+            </div>
 
+            <div class="card mb-3">
+                <div class="card-header" data-i18n="gpsHead"></div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush GPS_info">
+                        <li class="list-group-item hstack justify-content-between">
+                            <span data-i18n="gpsFix"></span>
+                            <span class="fix" data-i18n="gpsFixNone"></span>
+                        </li>
+                        <li class="list-group-item hstack justify-content-between">
+                            <span data-i18n="gpsAltitude"></span>
+                            <span class="alt">0 m</span>
+                        </li>
+                        <li class="list-group-item hstack justify-content-between">
+                            <span data-i18n="gpsLat"></span>
+                            <span class="lat">0.0000 deg</span>
+                        </li>
+                        <li class="list-group-item hstack justify-content-between">
+                            <span data-i18n="gpsLon"></span>
+                            <span class="lon">0.0000 deg</span>
+                        </li>
+                        <li class="list-group-item hstack justify-content-between">
+                            <span data-i18n="gpsSpeed"></span>
+                            <span class="speed">0 cm/s</span>
+                        </li>
+                        <li class="list-group-item hstack justify-content-between">
+                            <span data-i18n="gpsSats"></span>
+                            <span class="sats">0</span>
+                        </li>
+                        <li class="list-group-item hstack justify-content-between">
+                            <span data-i18n="gpsDistToHome"></span>
+                            <span class="distToHome"></span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
 
-                <div class="gui_box grey">
-                    <div class="gui_box_titlebar">
-                        <div class="spacer_box_title" data-i18n="gpsHead"></div>
-                    </div>
-                    <div class="spacer_box GPS_info">
-                        <table class="cf_table">
-                            <tr>
-                                <td style="width: 85px" data-i18n="gpsFix"></td>
-                                <td class="fix" data-i18n="gpsFixNone"></td>
-                            </tr>
-                            <tr>
-                                <td data-i18n="gpsAltitude"></td>
-                                <td class="alt">0 m</td>
-                            </tr>
-                            <tr>
-                                <td data-i18n="gpsLat"></td>
-                                <td class="lat">0.0000 deg</td>
-                            </tr>
-                            <tr>
-                                <td data-i18n="gpsLon"></td>
-                                <td class="lon">0.0000 deg</td>
-                            </tr>
-                            <tr>
-                                <td data-i18n="gpsSpeed"></td>
-                                <td class="speed">0 cm/s</td>
-                            </tr>
-                            <tr>
-                                <td data-i18n="gpsSats"></td>
-                                <td class="sats">0</td>
-                            </tr>
-                            <tr class="noboarder">
-                                <td data-i18n="gpsDistToHome"></td>
-                                <td class="distToHome"></td>
-                            </tr>
-                        </table>
-                    </div>
+            <div class="card mb-3">
+                <div class="card-header" data-i18n="gpsStatHead"></div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush GPS_stat">
+                        <li class="list-group-item hstack justify-content-between">
+                            <span data-i18n="gpsHDOP"></span>
+                            <span class="hdop"></span>
+                        </li>
+                        <li class="list-group-item hstack justify-content-between">
+                            <span data-i18n="gpsEPH"></span>
+                            <span class="eph">0</span>
+                        </li>
+                        <li class="list-group-item hstack justify-content-between">
+                            <span data-i18n="gpsEPV"></span>
+                            <span class="epv">0</span>
+                        </li>
+                        <li class="list-group-item hstack justify-content-between">
+                            <span data-i18n="gpsMessageRate"></span>
+                            <span class="rate">0</span>
+                        </li>
+                        <li class="list-group-item hstack justify-content-between">
+                            <span style="width: 85px" data-i18n="gpsTotalMessages"></span>
+                            <span class="messages">0</span>
+                        </li>
+                        <li class="list-group-item hstack justify-content-between">
+                            <span data-i18n="gpsErrors"></span>
+                            <span class="errors">0</span>
+                        </li>
+                        <li class="list-group-item hstack justify-content-between">
+                            <span data-i18n="gpsTimeouts"></span>
+                            <span class="timeouts">0</span>
+                        </li>
+                    </ul>
                 </div>
-                <div class="gui_box grey">
-                    <div class="gui_box_titlebar">
-                        <div class="spacer_box_title" data-i18n="gpsStatHead"></div>
-                    </div>
-                    <div class="spacer_box GPS_stat">
-                        <table class="cf_table">
-                            <tr>
-                                <td data-i18n="gpsHDOP"></td>
-                                <td class="hdop"></td>
-                            </tr>
-                            <tr>
-                                <td data-i18n="gpsEPH"></td>
-                                <td class="eph">0</td>
-                            </tr>
-                            <tr>
-                                <td data-i18n="gpsEPV"></td>
-                                <td class="epv">0</td>
-                            </tr>
-                            <tr>
-                                <td data-i18n="gpsMessageRate"></td>
-                                <td class="rate">0</td>
-                            </tr>
-                            <tr>
-                                <td style="width: 85px" data-i18n="gpsTotalMessages"></td>
-                                <td class="messages">0</td>
-                            </tr>
-                            <tr>
-                                <td data-i18n="gpsErrors"></td>
-                                <td class="errors">0</td>
-                            </tr>
-                            <tr class="noboarder">
-                                <td data-i18n="gpsTimeouts"></td>
-                                <td class="timeouts">0</td>
-                            </tr>
-                        </table>
-                    </div>
-                </div>
-                <div class="gui_box grey adsb_info_block">
-                    <div class="gui_box_titlebar">
-                        <div class="spacer_box_title">ADSB</div>
-                    </div>
-                    <div class="spacer_box GPS_stat">
-                        <table class="cf_table">
-                            <tr>
-                                <td style="width: 85px" data-i18n="adsbVehicleTotalMessages"></td>
-                                <td class="adsbVehicleTotalMessages">0</td>
-                            </tr>
-                            <tr>
-                                <td style="width: 85px" data-i18n="adsbHeartbeatTotalMessages"></td>
-                                <td class="adsbHeartbeatTotalMessages">0</td>
-                            </tr>
-                        </table>
-                    </div>
+            </div>
+
+            <div class="card mb-3 adsb_info_block">
+                <div class="card-header">ADSB</div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush GPS_stat">
+                        <li class="list-group-item hstack justify-content-between">
+                            <span data-i18n="adsbVehicleTotalMessages"></span>
+                            <span class="adsbVehicleTotalMessages">0</span>
+                        </li>
+                        <li class="list-group-item hstack justify-content-between">
+                            <span data-i18n="adsbHeartbeatTotalMessages"></span>
+                            <span class="adsbHeartbeatTotalMessages">0</span>
+                        </li>
+                    </ul>
                 </div>
             </div>
         </div>
-
-        <div class="cf_column twothird">
-            <div class="gui_box grey gps_map">
-                <div class="gui_box_titlebar" style="margin-bottom: 0;">
-                    <div class="spacer_box_title" data-i18n="gpsMapHead"></div>
-                </div>
-                <div id="loadmap">
-                    <div style="height:100%" id="gps-map">
+        <div class="col col-lg-8">
+            <div class="card mb-3">
+                <div class="card-header" data-i18n="gpsMapHead"></div>
+                <div>
+                    <div id="gps-map" style="height: 500px;">
                         <button class="map-button" id="center_button" data-i18n="gps_map_center"></button>
                     </div>
                 </div>
             </div>
-
         </div>
     </div>
-    <div class="content_toolbar">
-        <div class="btn save_btn">
-            <a class="save" href="#" data-i18n="configurationButtonSave"></a>
+
+    <div class="page-footer justify-content-between gap-2">
+        <div>
+            <button id="loadAssistnowOffline-btn" class="btn btn-primary" data-i18n="gpsLoadAssistnowOfflineButton"></button>
+            <button id="loadAssistnowOnline-btn" class="btn btn-primary" data-i18n="gpsLoadAssistnowOnlineButton"></button>
         </div>
-        <div class="btn save_btn">
-            <a class="loadAssistnowOnline" href="#" data-i18n="gpsLoadAssistnowOnlineButton"></a>
-        </div>
-        <div class="btn save_btn">
-            <a class="loadAssistnowOffline" href="#" data-i18n="gpsLoadAssistnowOfflineButton"></a>
+        <div>
+            <button id="save-btn" class="btn btn-primary" data-i18n="configurationButtonSave"></button>
         </div>
     </div>
 </div>
