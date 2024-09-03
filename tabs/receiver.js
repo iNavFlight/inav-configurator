@@ -13,6 +13,19 @@ const Settings = require('./../js/settings');
 const i18n = require('./../js/localization');
 const interval = require('./../js/intervals');
 
+const channelColors = [
+    '#f1453d', '#673fb4', '#2b98f0', '#1fbcd2',
+    '#159588', '#50ae55', '#cdda49', '#fdc02f',
+    '#fc5830', '#785549', '#9e9e9e', '#617d8a',
+    '#cf267d', '#7a1464', '#3a7a14', '#14407a',
+    '#e36b4b', '#7d54b8', '#349ae3', '#1ac8e6',
+    '#18a399', '#5cb766', '#d7e35b', '#ffc945',
+    '#ff7f48', '#90694e', '#acacac', '#738b9c',
+    '#d4398c', '#8c1b72', '#46891b', '#1655a0',
+    '#f28571', '#8360c6', '#3fb0ff', '#33d1ff',
+    '#1bbca1', '#67c574'
+];
+
 TABS.receiver = {
     rateChartHeight: 117
 };
@@ -94,8 +107,8 @@ TABS.receiver.initialize = function (callback) {
                 i18n.getMessage('controlAxisPitch'),
                 i18n.getMessage('controlAxisYaw'),
                 i18n.getMessage('controlAxisThrottle')
-            ],
-            bar_container = $('.tab-receiver .bars');
+            ];
+        let channelsWrapper = $('#channels-wrapper');
 
         for (var i = 0; i < FC.RC.active_channels; i++) {
             var name;
@@ -105,19 +118,16 @@ TABS.receiver.initialize = function (callback) {
                 name = i18n.getMessage("radioChannelShort") + (i + 1);
             }
 
-            bar_container.append('\
-                <ul>\
-                    <li class="name">' + name + '</li>\
-                    <li class="meter">\
-                        <div class="meter-bar">\
-                            <div class="label"></div>\
-                            <div class="fill">\
-                                <div class="label"></div>\
-                            </div>\
-                        </div>\
-                    </li>\
-                </ul>\
-            ');
+            channelsWrapper.append(`
+                <div data-channel-name="${name}" class="hstack py-1">
+                    <div class="w-6r">${name}</div>
+                    <div class="progress position-relative flex-fill"
+                        style="--inav-progress-height: 1.5rem; --inav-progress-bar-transition: none; --inav-progress-bar-bg: ${channelColors[i]};">
+                        <div class="progress-label position-absolute w-100 h-100 text-center fw-bold fs-6" style="line-height: var(--inav-progress-height); ">1500</div>
+                        <div class="progress-bar"></div>
+                    </div>
+                </div>
+            `);
         }
 
         // we could probably use min and max throttle for the range, will see
@@ -126,28 +136,10 @@ TABS.receiver.initialize = function (callback) {
             'max': 2200
         };
 
-        var meter_fill_array = [];
-        $('.meter .fill', bar_container).each(function () {
-            meter_fill_array.push($(this));
+        let channelList = [];
+        $('#channels-wrapper .hstack .progress').each(function () {
+            channelList.push($(this));
         });
-
-        var meter_label_array = [];
-        $('.meter', bar_container).each(function () {
-            meter_label_array.push($('.label', this));
-        });
-
-        // correct inner label margin on window resize (i don't know how we could do this in css)
-        self.resize = function () {
-            var containerWidth = $('.meter:first', bar_container).width(),
-                labelWidth = $('.meter .label:first', bar_container).width(),
-                margin = (containerWidth / 2) - (labelWidth / 2);
-
-            for (var i = 0; i < meter_label_array.length; i++) {
-                meter_label_array[i].css('margin-left', margin);
-            }
-        };
-
-        $(window).on('resize', self.resize).resize(); // trigger so labels get correctly aligned on creation
 
         // handle rcmap & rssi aux channel
         var strBuffer = [], rcMapLetters = FC.getRcMapLetters();
@@ -243,7 +235,7 @@ TABS.receiver.initialize = function (callback) {
             }, 0);
         }).trigger('input');
 
-        $('a.update').on('click', function () {
+        $('#save-btn').on('click', function () {
             // catch RC_tuning changes
             FC.RC_tuning.throttle_MID = parseFloat($('.tunings .throttle input[name="mid"]').val());
             FC.RC_tuning.throttle_EXPO = parseFloat($('.tunings .throttle input[name="expo"]').val());
@@ -295,7 +287,7 @@ TABS.receiver.initialize = function (callback) {
             MSP.send_message(MSPCodes.MSPV2_INAV_SET_RATE_PROFILE, mspHelper.crunch(MSPCodes.MSPV2_INAV_SET_RATE_PROFILE), false, save_rc_map);
         });
 
-        $("a.sticks").on('click', function () {
+        $("#sticks-btn").on('click', function () {
             var mspWin = window.open("tabs/receiver_msp.html", "receiver_msp", "width=420,height=760,menubar=no,contextIsolation=no,nodeIntegration=yes");
             
             mspWin.window.setRawRx = function (channels) {
@@ -311,7 +303,7 @@ TABS.receiver.initialize = function (callback) {
         // Only show the MSP control sticks if the MSP Rx feature is enabled
         mspHelper.getSetting("receiver_type").then(function (s) {
             if (s && s.setting.table && s.setting.table.values) {
-                $(".sticks_btn").toggle(s.setting.table.values[s.value] == 'MSP');
+                $("#sticks-btn").toggle(s.setting.table.values[s.value] == 'MSP');
             }
         });
 
@@ -322,10 +314,9 @@ TABS.receiver.initialize = function (callback) {
         function update_ui() {
             // update bars with latest data
             for (let i = 0; i < FC.RC.active_channels; i++) {
-                meter_fill_array[i].css('width', ((FC.RC.channels[i] - meter_scale.min) / (meter_scale.max - meter_scale.min) * 100).clamp(0, 100) + '%');
-                meter_label_array[i].text(FC.RC.channels[i]);
+                $('.progress-bar', channelList[i]).css('width', ((FC.RC.channels[i] - meter_scale.min) / (meter_scale.max - meter_scale.min) * 100).clamp(0, 100) + '%');
+                $('.progress-label', channelList[i]).text(FC.RC.channels[i]);
             }
-
         }
 
         interval.add('receiver_pull', get_rc_data, 25);
