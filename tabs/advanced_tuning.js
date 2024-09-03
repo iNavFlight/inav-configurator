@@ -27,7 +27,7 @@ TABS.advanced_tuning.initialize = function (callback) {
             GUI.tab_switch_cleanup(function () {
                 MSP.send_message(MSPCodes.MSP_SET_REBOOT, false, false, function () {
                     GUI.log(i18n.getMessage('deviceRebooting'));
-                    GUI.handleReconnect($('.tab_advanced_tuning a'));
+                    GUI.handleReconnect($('[data-tab="advanced_tuning"] > a'));
                 });
             });
         });
