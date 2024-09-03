@@ -239,35 +239,19 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         $('#battery_capacity_critical').val(isNaN(batCapWarnCrit) ? "" : batCapWarnCrit);
         $('#battery_capacity_unit').val(FC.MISC.battery_capacity_unit);
 
-        let $i2cSpeed = $('#i2c_speed'),
-            $i2cSpeedInfo = $('#i2c_speed-info');
+        let $i2cSpeed = $('#i2c_speed');
 
         $i2cSpeed.on('change', function () {
-            let $this = $(this),
-                value = $this.children("option:selected").text();
+            let value = $(this).find(":selected").text();
 
-            if (value == "400KHZ") {
-
-                $i2cSpeedInfo.removeClass('ok-box');
-                $i2cSpeedInfo.addClass('info-box');
-                $i2cSpeedInfo.removeClass('warning-box');
-
-                $i2cSpeedInfo.html(i18n.getMessage('i2cSpeedSuggested800khz'));
-                $i2cSpeedInfo.show();
-
-            } else if (value == "800KHZ") {
-                $i2cSpeedInfo.removeClass('ok-box');
-                $i2cSpeedInfo.removeClass('info-box');
-                $i2cSpeedInfo.removeClass('warning-box');
-                $i2cSpeedInfo.hide();
+            $('#i2c-speed-info, #i2c-speed-too-slow').addClass('d-none')
+            if (value === "400KHZ") {
+                $('#i2c-speed-info').removeClass('d-none')
+            } else if (value === "800KHZ") {
+                $('#i2c-speed-info').addClass('d-none')
             } else {
-                $i2cSpeedInfo.removeClass('ok-box');
-                $i2cSpeedInfo.removeClass('info-box');
-                $i2cSpeedInfo.addClass('warning-box');
-                $i2cSpeedInfo.html(i18n.getMessage('i2cSpeedTooLow'));
-                $i2cSpeedInfo.show();
+                $('#i2c-speed-too-slow').removeClass('d-none')
             }
-
         });
 
         $i2cSpeed.trigger('change');

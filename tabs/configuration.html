@@ -38,7 +38,12 @@
                             <label for="sensor-opflow" data-i18n="sensorOpflow"></label>
                         </li>
                         <li class="list-group-item vstack">
-                            <div class="alert alert-info" id="i2c_speed-info"></div>
+                            <div class="alert alert-info mb-2 d-none" id="i2c-speed-info">
+                                <div data-i18n="i2cSpeedSuggested800khz"></div>
+                            </div>
+                            <div class="alert alert-danger mb-2 d-none" id="i2c-speed-too-slow">
+                                <div data-i18n="i2cSpeedTooLow"></div>
+                            </div>
                             <div class="hstack">
                                 <select id="i2c_speed" data-setting="i2c_speed" class="form-select w-10r"></select>
                                 <label for="i2c_speed" data-i18n="configurationI2cSpeed"></label>
