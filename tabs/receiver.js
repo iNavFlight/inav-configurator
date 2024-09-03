@@ -27,7 +27,7 @@ const channelColors = [
 ];
 
 TABS.receiver = {
-    rateChartHeight: 117
+    rateChartHeight: 137
 };
 
 TABS.receiver.initialize = function (callback) {

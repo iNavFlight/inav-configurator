@@ -81,38 +81,30 @@
             <div class="card mb-3">
                 <div class="card-body">
                     <div class="hstack gap-3">
-                        <div class="throttle_curve border rounded ">
-                            <canvas width="200" height="117"></canvas>
+                        <div class="throttle_curve border rounded flex-grow-0">
+                            <canvas width="200" height="137"></canvas>
                         </div>
-                        <div class="tunings">
-                            <table class="throttle table">
-                                <tr>
-                                    <th data-i18n="receiverThrottleMid"></th>
-                                    <th data-i18n="receiverThrottleExpo"></th>
-                                </tr>
-                                <tr>
-                                    <td><input class="controlProfileHighlight form-control w-5r" type="number" name="mid" step="0.01" min="0" max="1" /></td>
-                                    <td><input class="controlProfileHighlight form-control w-5r" type="number" name="expo" step="0.01" min="0" max="1" /></td>
-                                </tr>
-                            </table>
-                            <table class="deadband table">
-                                <tr>
-                                    <th data-i18n="receiverDeadband"></th>
-                                    <th data-i18n="receiverYawDeadband"></th>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <div class="cf_tip" data-i18n_title="receiverHelpDeadband">
-                                            <input class="form-control w-5r" type="number" name="deadband" step="1" min="0" max="32" />
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div class="cf_tip" data-i18n_title="receiverHelpYawDeadband">
-                                            <input class="form-control w-5r" type="number" name="yaw_deadband" step="1" min="0" max="100" />
-                                        </div>
-                                    </td>
-                                </tr>
-                            </table>
+                        <div class="tunings hstack flex-grow-1">
+                            <ul class="list-group list-group-flush w-100 throttle deadband">
+                                <li class="list-group-item hstack">
+                                    <input class="controlProfileHighlight form-control w-5r" type="number" name="mid" step="0.01" min="0" max="1" />
+                                    <label data-i18n="receiverThrottleMid"></label>
+                                </li>
+                                <li class="list-group-item hstack">
+                                    <input class="controlProfileHighlight form-control w-5r" type="number" name="expo" step="0.01" min="0" max="1" />
+                                    <label data-i18n="receiverThrottleExpo"></label>
+                                </li>
+                                <li class="list-group-item hstack">
+                                    <input class="form-control w-5r" type="number" name="deadband" step="1" min="0" max="32" />
+                                    <label data-i18n="receiverDeadband"></label>
+                                    <div class="helpicon cf_tip" data-i18n_title="receiverHelpDeadband"></div>
+                                </li>
+                                <li class="list-group-item hstack">
+                                    <input class="form-control w-5r" type="number" name="yaw_deadband" step="1" min="0" max="100" />
+                                    <label data-i18n="receiverYawDeadband"></label>
+                                    <div class="helpicon cf_tip" data-i18n_title="receiverHelpYawDeadband"></div>
+                                </li>
+                            </ul>
                         </div>
                     </div>
                 </div>
