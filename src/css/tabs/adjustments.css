@@ -39,64 +39,12 @@
     box-shadow: none;
 }
 
-.tab-adjustments .adjustments {
-    width: 100%;
-    border-spacing: 0;
-}
-
-.tab-adjustments td {
-}
-
 .tab-adjustments .range:first-child {
     border-top: 0;
 }
 
 .tab-adjustments .range:last-child {
     border-bottom: 0;
-}
-
-.tab-adjustments .adjustments thead td {
-    text-align: center;
-    white-space: nowrap;
-    padding: 10px 10px;
-    background-color: rgba(var(--inav-emphasis-color-rgb), 0.05);
-}
-
-.tab-adjustments .adjustments thead td:first-child {
-    border-top-left-radius: 5px;
-}
-
-.tab-adjustments .adjustments thead td:last-child {
-    border-top-right-radius: 5px;
-}
-
-.tab-adjustments .adjustment:nth-child(even) {
-    background-color: rgba(var(--inav-emphasis-color-rgb), 0.05);
-}
-
-.tab-adjustments .adjustments {
-}
-
-.tab-adjustments .adjustment td {
-    text-align: center;
-}
-
-.tab-adjustments .adjustment .info {
-    width: 5%;
-    height: 80px;
-}
-
-.tab-adjustments .adjustment .info .enabling {
-    white-space: nowrap;
-}
-
-.tab-adjustments .adjustment .channelInfo {
-    width: 5%;
-    padding: 0 10px;
-}
-
-.tab-adjustments .adjustment .channelInfo .limits {
-    padding: 5px 0;
 }
 
 .tab-adjustments .adjustment .range {
@@ -116,16 +64,4 @@
     width: 6px;
     margin-left: -3px;
     border-radius: 3px;
-}
-
-.tab-adjustments .adjustment .functionSelection {
-    width: 5%;
-}
-
-.tab-adjustments .adjustment .adjustmentSlot {
-    width: 5%;
-}
-
-.tab-adjustments .adjustment .functionSwitchChannel {
-    width: 5%;
 }

@@ -1,36 +1,36 @@
-<div class="tab-adjustments toolbar_fixed_bottom">
-    <div class="content_wrapper">
-        <div class="tab_title" i18n="tabAdjustments"></div>
-        <div class="note spacebottom">
-            <div class="note_spacer">
-                <p i18n="adjustmentsHelp"></p>
-                <p i18n="adjustmentsExamples"></p>
-                <ul>
-                    <li i18n="adjustmentsExample1"></li>
-                    <li i18n="adjustmentsExample2"></li>
-                </ul>
-            </div>
-        </div>
+<div class="page tab-adjustments">
+    <div class="page-header">
+        <span data-i18n="tabAdjustments"></span>
+    </div>
 
-        <table class="adjustments">
+    <div class="alert alert-warning">
+        <p i18n="adjustmentsHelp"></p>
+        <div><span i18n="adjustmentsExamples"></span>:</div>
+        <ul>
+            <li i18n="adjustmentsExample1"></li>
+            <li i18n="adjustmentsExample2"></li>
+        </ul>
+    </div>
+
+    <div class="mb-3">
+        <table class="adjustments table table-bordered table-striped align-middle">
             <thead>
-                <tr>
-                    <td class="column-enable" i18n="adjustmentsColumnEnable"></td>
-                    <td i18n="adjustmentsColumnWhenChannel"></td>
-                    <td i18n="adjustmentsColumnIsInRange"></td>
-                    <td i18n="adjustmentsColumnThenApplyFunction"></td>
-                    <td i18n="adjustmentsColumnUsingSlot"></td>
-                    <td i18n="adjustmentsColumnViaChannel"></td>
-                </tr>
+            <tr class="table-active">
+                <td class="column-enable w-6r min-w-6r" i18n="adjustmentsColumnEnable"></td>
+                <td class="w-10r min-w-7r" i18n="adjustmentsColumnWhenChannel"></td>
+                <td i18n="adjustmentsColumnIsInRange"></td>
+                <td class="w-1r" i18n="adjustmentsColumnThenApplyFunction"></td>
+                <td class="w-7r min-w-7r" i18n="adjustmentsColumnUsingSlot"></td>
+                <td class="w-7r min-w-7r" i18n="adjustmentsColumnViaChannel"></td>
+            </tr>
             </thead>
             <tbody>
             </tbody>
         </table>
     </div>
-    <div class="content_toolbar">
-        <div class="btn save_btn">
-            <a class="save" href="#" i18n="adjustmentsSave"></a>
-        </div>
+
+    <div class="page-footer">
+        <button id="save-btn" class="btn btn-primary" data-i18n="adjustmentsSave"></button>
     </div>
 </div>
 
@@ -44,18 +44,18 @@
                     </div>
                 </td>
                 <td class="channelInfo">
-                    <div>
-                        <select class="channel">
+                    <div class="vstack">
+                        <select class="channel form-select">
                             <option value=""></option>
                         </select>
                     </div>
                     <div class="limits">
-                        <p class="lowerLimit">
+                        <div class="lowerLimit">
                             <span i18n="adjustmentsMin"></span>: <span class="lowerLimitValue"></span>
-                        </p>
-                        <p class="upperLimit">
+                        </div>
+                        <div class="upperLimit">
                             <span i18n="adjustmentsMax"></span>: <span class="upperLimitValue"></span>
-                        </p>
+                        </div>
                     </div>
                 </td>
                 <td class="range">
@@ -63,7 +63,8 @@
                         <div class="marker"></div>
                     </div>
                 </td>
-                <td class="functionSelection"><select class="function">
+                <td class="functionSelection">
+                    <select class="function form-select w-12r">
                         <option value="0" i18n="adjustmentsFunction0"></option>   <!-- No Changes-->
                         <optgroup i18n_label="adjustmentsGroupRates">
                             <option value="1" i18n="adjustmentsFunction1"></option>   <!-- RC Rate -->
@@ -135,16 +136,21 @@
                             <option value="53" i18n="adjustmentsFunction53"></option> <!-- VTX Power -->
                             <option value="59" i18n="adjustmentsFunction59"></option> <!-- WP Mission Index -->
                         </optgroup>
-                    </select></td>
-                <td class="adjustmentSlot"><select class="slot">
+                    </select>
+                </td>
+                <td class="adjustmentSlot">
+                    <select class="slot form-select">
                         <option value="0" i18n="adjustmentsSlot0"></option>
                         <option value="1" i18n="adjustmentsSlot1"></option>
                         <option value="2" i18n="adjustmentsSlot2"></option>
                         <option value="3" i18n="adjustmentsSlot3"></option>
-                </select></td>
-                <td class="functionSwitchChannel"><select class="channel">
+                    </select>
+                </td>
+                <td class="functionSwitchChannel">
+                    <select class="channel form-select">
                         <option value=""></option>
-                </select></td>
+                    </select>
+                </td>
             </tr>
         </tbody>
     </table>
