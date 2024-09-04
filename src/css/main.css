@@ -1039,7 +1039,7 @@ li.active .ic_mag {
 }
 
 .data-loading {
-    z-index: 10000;
+    z-index: 2001;
     position: absolute;
     top: 0;
     width: 100%;
