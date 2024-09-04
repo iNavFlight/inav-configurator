@@ -3395,7 +3395,7 @@
         "message": "Waypoint Tracking Accuracy"
     },
     "wpTrackingAccuracyHelp": {
-        "message": "How precise the craft tries to follow a waypoint track. Lower values means higher precision but can cause overshoots. 6 is a good starting point [0-10]."
+        "message": "Tracking deadband - how closely the craft follows a waypoint track in meters. Lower values track more closely but cause more control corrections. 2 is a good starting point [0-10]."
     },
     "wpTrackingAngle": {
         "message": "Waypoint Tracking Angle"
