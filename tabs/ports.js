@@ -94,7 +94,13 @@ TABS.ports.initialize = function (callback) {
                         var select_e;
                         if (column !== 'telemetry' && column !== 'peripherals' && column !== 'sensors') {
                             var checkboxId = 'functionCheckbox-' + portIndex + '-' + columnIndex + '-' + i;
-                            functions_e.children().first().prepend('<span class="function min-w-7r"><input type="checkbox" class="togglemedium" id="' + checkboxId + '" value="' + functionName + '" /><label for="' + checkboxId + '"> ' + functionRule.displayName + '</label></span>');
+                            functions_e.children().first().prepend(`
+                                <div class="form-check form-switch mb-0">
+                                    <input id="${checkboxId}" value="${functionName}" class="form-check-input" type="checkbox">
+                                    <label class="form-check-label" for="${checkboxId}">${functionRule.displayName}</label>
+                                </div>
+                            `);
+
 
                             if (serialPort.functions.indexOf(functionName) >= 0) {
                                 var checkbox_e = functions_e.find('#' + checkboxId);
