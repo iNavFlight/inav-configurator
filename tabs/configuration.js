@@ -103,16 +103,18 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             }
 
             let checkboxHtml = `
-            <li class="list-group-item hstack gap-2">
-                <input type="checkbox" class="feature toggle"
-                    id="feature-${fcFeatures[i].bit}"
-                    name="${fcFeatures[i].name}"
-                    title="${fcFeatures[i].name}"
-                    data-bit="${fcFeatures[i].bit}"
-                />
-                <label for="feature-${fcFeatures[i].bit}"><span data-i18n="feature${fcFeatures[i].name}"></span></label>
-                ${feature_tip_html}
-            </li>
+                <li class="list-group-item hstack gap-2">
+                    <div class="form-check form-switch">
+                        <input 
+                            id="feature-${fcFeatures[i].bit}" 
+                            name="${fcFeatures[i].name}"
+                            title="${fcFeatures[i].name}"
+                            data-bit="${fcFeatures[i].bit}"
+                            class="form-check-input feature" type="checkbox" role="switch" >
+                        <label for="feature-${fcFeatures[i].bit}" class="form-check-label" data-i18n="feature${fcFeatures[i].name}"></label>
+                    </div>
+                    ${feature_tip_html}
+                </li>
             `;
 
             row_e = $(checkboxHtml);
