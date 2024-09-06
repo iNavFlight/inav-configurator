@@ -23,7 +23,7 @@
         "message": "Send anonymous usage data to the developer team"
     },
     "options_showProfileParameters": {
-        "message": "Highlight parameters that change when switching battery or control profiles"
+        "message": "Highlight parameters that change when switching profiles"
     },
     "options_cliAutocomplete": {
         "message": "Advanced CLI AutoComplete"
