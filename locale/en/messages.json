@@ -59,13 +59,13 @@
         "message": "Auto-Connect: Disabled - User needs to select the correct serial port and click \"Connect\" button on its own"
     },
     "deviceRebooting": {
-        "message": "Device - <span style=\"color: red\">Rebooting</span>"
+        "message": "Device - <span class='text-danger'>Rebooting</span>"
     },
     "deviceReady": {
-        "message": "Device - <span style=\"color: var(--inav-primary)\">Ready</span>"
+        "message": "Device - <span class='text-primary'>Ready</span>"
     },
     "savingDefaults": {
-        "message": "Device - <span style=\"color: red\">Saving default settings</span>"
+        "message": "Device - <span class='text-danger'>Saving default settings</span>"
     },
     "fcNotConnected": {
         "message": "Not connected"
@@ -263,7 +263,7 @@
         "message": "SITL (Software in the loop) allows to run INAV completely in software on the PC without using a flight controller and simulate complete FPV flights. For this, INAV is compiled with a normal PC compiler. The sensors are replaced by data provided by a simulator.<br/>Currently supported are:<br/><ul><li><a href=\"https://www.realflight.com\" target=\"_blank\">RealFlight</a><br/></li><li><a href=\"https://www.x-plane.com\" target=\"_blank\">X-Plane</a></li></ul>"
     },
     "sitlProfilesHelp": {
-        "message": "Profiles are saved locally. The profiles contain not only all data of this tab, but also the configuration file (\"EEPROM\") of INAV itself. <br><span style=\"color: red\">Note:</span><br>Standard profiles can't be overwriten. To save your changes, create a new profile. "
+        "message": "Profiles are saved locally. The profiles contain not only all data of this tab, but also the configuration file (\"EEPROM\") of INAV itself. <br><span class='text-danger'>Note:</span><br>Standard profiles can't be overwriten. To save your changes, create a new profile. "
     },
     "sitlEnableSimulatorHelp": {
         "message": "If this option is deactivated, only UARTS (MSP/Configurator) can be used. Useful to configure INAV without having to start the simulator."
@@ -284,19 +284,19 @@
         "message": "ACRO"
     },
     "serialPortOpened": {
-        "message": "MSP connection <span style=\"color: var(--inav-primary)\">successfully</span> opened with ID: $1"
+        "message": "MSP connection <span class='text-primary'>successfully</span> opened with ID: $1"
     },
     "serialPortOpenFail": {
-        "message": "<span style=\"color: red\">Failed</span> to open MSP connection"
+        "message": "<span class='text-danger'>Failed</span> to open MSP connection"
     },
     "serialPortClosedOk": {
-        "message": "MSP connection <span style=\"color: var(--inav-primary)\">successfully</span> closed"
+        "message": "MSP connection <span class='text-primary'>successfully</span> closed"
     },
     "serialPortClosedFail": {
-        "message": "<span style=\"color: red\">Failed</span> to close MSP connection"
+        "message": "<span class='text-danger'>Failed</span> to close MSP connection"
     },
     "serialPortUnrecoverable": {
-        "message": "Unrecoverable <span style=\"color: red\">failure</span> of serial connection, disconnecting...'"
+        "message": "Unrecoverable <span class='text-danger'>failure</span> of serial connection, disconnecting...'"
     },
     "connectionConnected": {
         "message": "Connected to: $1"
@@ -305,7 +305,7 @@
         "message": "BLE device type: $1"
     },
     "connectionBleNotSupported": {
-        "message": "<span style=\"color: red\">Connection error:</span> Firmware doesn't support BLE connections. Abort."
+        "message": "<span class='text-danger'>Connection error:</span> Firmware doesn't support BLE connections. Abort."
     },
     "connectionBleInterrupted": {
         "message": "The connection was unexpectedly interrupted."
@@ -320,16 +320,16 @@
         "message": "UDP connection timed out."
     },
     "usbDeviceOpened": {
-        "message": "USB device <span style=\"color: var(--inav-primary)\">successfully</span> opened"
+        "message": "USB device <span class='text-primary'>successfully</span> opened"
     },
     "usbDeviceOpenFail": {
-        "message": "<span style=\"color: red\">Failed</span> to open USB device!"
+        "message": "<span class='text-danger'>Failed</span> to open USB device!"
     },
     "usbDeviceClosed": {
-        "message": "USB device <span style=\"color: var(--inav-primary)\">successfully</span> closed"
+        "message": "USB device <span class='text-primary'>successfully</span> closed"
     },
     "usbDeviceCloseFail": {
-        "message": "<span style=\"color: red\">Failed</span> to close USB device"
+        "message": "<span class='text-danger'>Failed</span> to close USB device"
     },
     "usbDeviceUdevNotice": {
         "message": "Are <strong>udev rules</strong> installed correctly? See docs for instructions"
@@ -417,20 +417,20 @@
     },
 
     "noConfigurationReceived": {
-        "message": "No configuration received within <span style=\"color: red\">10 seconds</span>, communication <span style=\"color: red\">failed</span>"
+        "message": "No configuration received within <span class='text-danger'>10 seconds</span>, communication <span class='text-danger'>failed</span>"
     },
     "firmwareVersionNotSupported": {
-        "message": "This firmware version is <span style=\"color: red\">not supported</span>. This version of Configurator supports firmware from $1 to $2 (excluded)"
+        "message": "This firmware version is <span class='text-danger'>not supported</span>. This version of Configurator supports firmware from $1 to $2 (excluded)"
     },
     "firmwareVariantNotSupported": {
-        "message": "This firmware variant is <span style=\"color: red\">not supported</span>. Please upgrade to INAV firmware. Use CLI for backup before flashing.  CLI backup/restore procedure is in the documention."
+        "message": "This firmware variant is <span class='text-danger'>not supported</span>. Please upgrade to INAV firmware. Use CLI for backup before flashing.  CLI backup/restore procedure is in the documention."
     },
 
     "tabSwitchConnectionRequired": {
         "message": "You need to <strong>connect</strong> before you can view any of the tabs."
     },
     "tabSwitchWaitForOperation": {
-        "message": "You <span style=\"color: red\">can't</span> do this right now, please wait for current operation to finish ..."
+        "message": "You <span class='text-danger'>can't</span> do this right now, please wait for current operation to finish ..."
     },
 
     "tabSwitchUpgradeRequired": {
@@ -440,10 +440,10 @@
         "message": "Firmware Version: <strong>$1</strong>"
     },
     "apiVersionReceived": {
-        "message": "MultiWii API version <span style=\"color: var(--inav-primary)\">received</span> - <strong>$1</strong>"
+        "message": "MultiWii API version <span class='text-primary'>received</span> - <strong>$1</strong>"
     },
     "uniqueDeviceIdReceived": {
-        "message": "Unique device ID <span style=\"color: var(--inav-primary)\">received</span> - <strong>0x$1</strong>"
+        "message": "Unique device ID <span class='text-primary'>received</span> - <strong>0x$1</strong>"
     },
     "boardInfoReceived": {
         "message": "Board: <strong>$1</strong>, version: <strong>$2</strong>"
@@ -491,17 +491,17 @@
         "message": "Please use the Firmware Flasher to access DFU devices"
     },
     "dfu_erased_kilobytes": {
-        "message": "Erased $1 kB of flash <span style=\"color: var(--inav-primary)\">successfully</span>"
+        "message": "Erased $1 kB of flash <span class='text-primary'>successfully</span>"
     },
     "dfu_device_flash_info": {
         "message": "Detected device with total flash size $1 kiB"
     },
     "dfu_error_image_size": {
-        "message": "<span style=\"color: red; font-weight: bold\">Error</span>: Supplied image is larger then flash available on the chip! Image: $1 kiB, limit = $2 kiB"
+        "message": "<b class='text-danger'>Error</b>: Supplied image is larger then flash available on the chip! Image: $1 kiB, limit = $2 kiB"
     },
 
     "eeprom_saved_ok": {
-        "message": "EEPROM <span style=\"color: var(--inav-primary)\">saved</span>"
+        "message": "EEPROM <span class='text-primary'>saved</span>"
     },
 
     "defaultWelcomeIntro": {
@@ -556,7 +556,7 @@
         "message": "Facebook Group"
     },
     "initialSetupBackupAndRestoreApiVersion": {
-        "message": "<span style=\"color: red\">Backup and restore functionality disabled.</span>  You have firmware with API version <span style=\"color: red\">$1</span>, backup and restore requires <span style=\"color: var(--inav-primary)\">$2</span>.  Please backup your settings via the CLI, see INAV documentation for procedure."
+        "message": "<span class='text-danger'>Backup and restore functionality disabled.</span>  You have firmware with API version <span class='text-danger'>$1</span>, backup and restore requires <span class='text-primary'>$2</span>.  Please backup your settings via the CLI, see INAV documentation for procedure."
     },
     "initialSetupButtonCalibrateAccel": {
         "message": "Calibrate Accelerometer"
@@ -583,13 +583,13 @@
         "message": "Restore"
     },
     "initialSetupBackupRestoreText": {
-        "message": "<strong>Backup</strong> your configuration in case of an accident, <strong>CLI</strong> settings are <span style=\"color: red\">not</span> included - See 'dump' cli command"
+        "message": "<strong>Backup</strong> your configuration in case of an accident, <strong>CLI</strong> settings are <span class='text-danger'>not</span> included - See 'dump' cli command"
     },
     "initialSetupBackupSuccess": {
-        "message": "Backup saved <span style=\"color: var(--inav-primary)\">successfully</span>"
+        "message": "Backup saved <span class='text-primary'>successfully</span>"
     },
     "initialSetupRestoreSuccess": {
-        "message": "Configuration restored <span style=\"color: var(--inav-primary)\">successfully</span>"
+        "message": "Configuration restored <span class='text-primary'>successfully</span>"
     },
     "initialSetupButtonResetZaxis": {
         "message": "Reset Z axis, offset: 0 deg"
@@ -730,25 +730,25 @@
         "message": "Accelerometer calibration started"
     },
     "initialSetupAccelCalibEnded": {
-        "message": "Accelerometer calibration <span style=\"color: var(--inav-primary)\">finished</span>"
+        "message": "Accelerometer calibration <span class='text-primary'>finished</span>"
     },
     "initialSetupMagCalibStarted": {
         "message": "Magnetometer calibration started"
     },
     "initialSetupMagCalibEnded": {
-        "message": "Magnetometer calibration <span style=\"color: var(--inav-primary)\">finished</span>"
+        "message": "Magnetometer calibration <span class='text-primary'>finished</span>"
     },
     "initialSetupOpflowCalibStarted": {
         "message": "Optic flow calibration started"
     },
     "initialSetupOpflowCalibEnded": {
-        "message": "Optic flow calibration <span style=\"color: var(--inav-primary)\">finished</span>"
+        "message": "Optic flow calibration <span class='text-primary'>finished</span>"
     },
     "initialSetupSettingsRestored": {
         "message": "Settings restored to <strong>default</strong>"
     },
     "initialSetupEepromSaved": {
-        "message": "EEPROM <span style=\"color: var(--inav-primary)\">saved</span>: Setup"
+        "message": "EEPROM <span class='text-primary'>saved</span>: Setup"
     },
 
     "RX_PPM": {
@@ -1194,7 +1194,7 @@
         "message": "RX SPI protocol"
     },
     "configurationEepromSaved": {
-        "message": "EEPROM <span style=\"color: var(--inav-primary)\">saved</span>: Configuration"
+        "message": "EEPROM <span class='text-primary'>saved</span>: Configuration"
     },
     "configurationButtonSave": {
         "message": "Save and Reboot"
@@ -1272,7 +1272,7 @@
         "message": "<b>Note:</b> Do <b class='text-danger'>NOT</b> disable MSP on the first serial port unless you know what you are doing.  You may have to reflash and erase your configuration if you do."
     },
     "portsFirmwareUpgradeRequired": {
-        "message": "Firmware upgrade <span style=\"color: red\">required</span>."
+        "message": "Firmware upgrade <span class='text-danger'>required</span>."
     },
     "portsButtonSave": {
         "message": "Save and Reboot"
@@ -1665,7 +1665,7 @@
         "message": "Profile"
     },
     "pidTuning_LoadedProfile": {
-        "message": "Loaded Profile: <strong style=\"color: var(--inav-primary)\">$1</strong>"
+        "message": "Loaded Profile: <strong class='text-primary'>$1</strong>"
     },
     "pidTuning_Manual_Rates": {
         "message": "Manual Rates"
@@ -1701,20 +1701,20 @@
         "message": "Defines the gyro LPF cutoff frequency at maximum throttle. When throttle is decreased, LPF cutoff frequency is decreased as well, down to the minimum cutoff frequency."
     },
     "loadedMixerProfile": {
-        "message": "Loaded Mixer Profile: <strong style=\"color: var(--inav-primary)\">$1</strong>, Check modes tab: MIXER PROFILE 2 if you don't see the changes"
+        "message": "Loaded Mixer Profile: <strong class='text-primary'>$1</strong>, Check modes tab: MIXER PROFILE 2 if you don't see the changes"
     },
     "loadedBatteryProfile": {
-        "message": "Loaded Battery Profile: <strong style=\"color: var(--inav-primary)\">$1</strong>"
+        "message": "Loaded Battery Profile: <strong class='text-primary'>$1</strong>"
     },
     "pidTuningDataRefreshed": {
         "message": "PID data <strong>refreshed</strong>"
     },
     "pidTuningEepromSaved": {
-        "message": "EEPROM <span style=\"color: var(--inav-primary)\">saved</span>: PID Tuning"
+        "message": "EEPROM <span class='text-primary'>saved</span>: PID Tuning"
     },
 
     "receiverHelp": {
-        "message": "Please read receiver chapter of the documentation.  Configure serial port (if required), receiver mode (serial/ppm/pwm), provider (for serial receivers), bind receiver, set channel map, configure channel endpoints/range on TX so that all channels go from ~1000 to ~2000.  Set midpoint (default 1500), trim channels to 1500, configure stick deadband, verify behaviour when TX is off or out of range. Make sure that the channel values all increase when you push the sticks up and to the right. If not, reverse the channel in the TX. Do not apply any other mixing in the TX.<br /><span style=\"color: red\">IMPORTANT:</span> Before flying read failsafe chapter of documentation and configure failsafe."
+        "message": "Please read receiver chapter of the documentation.  Configure serial port (if required), receiver mode (serial/ppm/pwm), provider (for serial receivers), bind receiver, set channel map, configure channel endpoints/range on TX so that all channels go from ~1000 to ~2000.  Set midpoint (default 1500), trim channels to 1500, configure stick deadband, verify behaviour when TX is off or out of range. Make sure that the channel values all increase when you push the sticks up and to the right. If not, reverse the channel in the TX. Do not apply any other mixing in the TX.<br /><span class='text-danger'>IMPORTANT:</span> Before flying read failsafe chapter of documentation and configure failsafe."
     },
     "receiverThrottleMid": {
         "message": "Throttle MID"
@@ -1774,7 +1774,7 @@
         "message": "RC Tuning data <strong>refreshed</strong>"
     },
     "receiverEepromSaved": {
-        "message": "EEPROM <span style=\"color: var(--inav-primary)\">saved</span>: Receiver"
+        "message": "EEPROM <span class='text-primary'>saved</span>: Receiver"
     },
 
     "auxiliaryHelp": {
@@ -1799,10 +1799,10 @@
         "message": "Save"
     },
     "auxiliaryEepromSaved": {
-        "message": "EEPROM <span style=\"color: var(--inav-primary)\">saved</span>"
+        "message": "EEPROM <span class='text-primary'>saved</span>"
     },
     "eepromSaved": {
-        "message": "EEPROM <span style=\"color: var(--inav-primary)\">saved</span>"
+        "message": "EEPROM <span class='text-primary'>saved</span>"
     },
     "adjustmentsHelp": {
         "message": "Configure adjustment switches.  See the 'in-flight adjustments' section of the manual for details.  The changes that adjustment functions make are not saved automatically.  There are 4 slots.  Each switch used to concurrently make adjustments requires exclusive use of a slot."
@@ -2048,10 +2048,10 @@
         "message": "Save"
     },
     "adjustmentsEepromSaved": {
-        "message": "EEPROM <span style=\"color: var(--inav-primary)\">saved</span>: Adjustments"
+        "message": "EEPROM <span class='text-primary'>saved</span>: Adjustments"
     },
     "programmingEepromSaved": {
-        "message": "EEPROM <span style=\"color: var(--inav-primary)\">saved</span>: Programming"
+        "message": "EEPROM <span class='text-primary'>saved</span>: Programming"
     },
     "servosChangeDirection": {
         "message": "Change Direction in TX To Match"
@@ -2090,10 +2090,10 @@
         "message": "No servos configured. Add them using the Mixer tab."
     },
     "servosEepromSave": {
-        "message": "EEPROM <span style=\"color: var(--inav-primary)\">saved</span>"
+        "message": "EEPROM <span class='text-primary'>saved</span>"
     },
     "mixerSaved": {
-        "message": "Mixer <span style=\"color: var(--inav-primary)\">saved</span>"
+        "message": "Mixer <span class='text-primary'>saved</span>"
     },
     "mixerWizard": {
         "message": "Motor Mixer Wizard"
@@ -2228,7 +2228,7 @@
         "message": "Master"
     },
     "motorsNotice": {
-        "message": "<strong>Motor Test Mode Notice:</strong><br />Moving the sliders will cause the motors to <strong>spin up</strong>.<br />In order to prevent injury <strong style=\"color: red\">remove ALL propellers</strong> before using this feature.<br />"
+        "message": "<strong>Motor Test Mode Notice:</strong><br />Moving the sliders will cause the motors to <strong>spin up</strong>.<br />In order to prevent injury <strong class='text-danger'>remove ALL propellers</strong> before using this feature.<br />"
     },
     "motorsEnableControl": {
         "message": "I understand the risks, propellers are removed - Enable motor control."
@@ -2245,7 +2245,7 @@
     },
 
     "cliInfo": {
-        "message": "<strong>Note</strong>: Leaving CLI tab or pressing Disconnect will <strong>automatically</strong> send \"<strong>exit</strong>\" to the board.  With the latest firmware this will make the controller <span style=\"color: red\">restart</span> and unsaved changes will be <span style=\"color: red\">lost</span>."
+        "message": "<strong>Note</strong>: Leaving CLI tab or pressing Disconnect will <strong>automatically</strong> send \"<strong>exit</strong>\" to the board.  With the latest firmware this will make the controller <span class='text-danger'>restart</span> and unsaved changes will be <span class='text-danger'>lost</span>."
     },
     "cliInputPlaceholder": {
         "message": "Write your command here"
@@ -2309,7 +2309,7 @@
     },
 
     "loggingNote": {
-        "message": "Data will be logged in this tab <span style=\"color: red\">only</span>, leaving the tab will <span style=\"color: red\">cancel</span> logging and application will return to its normal <strong>\"configurator\"</strong> state.<br /> You are free to select the global update period, data will be written into the log file every <strong>1</strong> second for performance reasons."
+        "message": "Data will be logged in this tab <span class='text-danger'>only</span>, leaving the tab will <span class='text-danger'>cancel</span> logging and application will return to its normal <strong>\"configurator\"</strong> state.<br /> You are free to select the global update period, data will be written into the log file every <strong>1</strong> second for performance reasons."
     },
     "loggingSamplesSaved": {
         "message": "Samples Saved:"
@@ -2365,6 +2365,12 @@
     },
     "sdcardNote": {
         "message": "Flight logs can be recorded to your flight controller's onboard SD card slot."
+    },
+    "sdcardMemoryUsedOf": {
+        "message": "used of"
+    },
+    "sdcardMemoryAvailable": {
+        "message": "Available space"
     },
 
     "dataflashNote": {
@@ -2441,13 +2447,13 @@
         "message": "Binary:"
     },
     "firmwareFlasherReleaseStatusReleaseCandidate": {
-        "message": "<span style=\"color: red\">IMPORTANT: This firmware release is currently marked as a release candidate.  Please report any issues immediately.</span>"
+        "message": "<span class='text-danger'>IMPORTANT: This firmware release is currently marked as a release candidate.  Please report any issues immediately.</span>"
     },
     "firmwareFlasherReleaseFileUrl": {
         "message": "Download manually."
     },
     "firmwareFlasherTargetWarning": {
-        "message": "<span style=\"color: red\">IMPORTANT</span>: Ensure you flash a file appropriate for your target.  Flashing a binary for the wrong target can cause <span style=\"color: red\">bad</span> things to happen."
+        "message": "<span class='text-danger'>IMPORTANT</span>: Ensure you flash a file appropriate for your target.  Flashing a binary for the wrong target can cause <span class='text-danger'>bad</span> things to happen."
     },
 
     "firmwareFlasherPath": {
@@ -2499,7 +2505,7 @@
         "message": "Manual baud rate"
     },
     "firmwareFlasherManualBaudDescription": {
-        "message": "Manual selection of baud rate for boards that don't support the default speed or for flashing via bluetooth.<br /><span style=\"color: red\">Note:</span> Not used when flashing via USB DFU"
+        "message": "Manual selection of baud rate for boards that don't support the default speed or for flashing via bluetooth.<br /><span class='text-danger'>Note:</span> Not used when flashing via USB DFU"
     },
     "firmwareFlasherShowDevelopmentReleases": {
         "message": "Show unstable releases"
@@ -2556,7 +2562,7 @@
         "message": "Warning"
     },
     "firmwareFlasherWarningText": {
-        "message": "Please do <span style=\"color: red\">not</span> try to flash <strong>non-iNAV</strong> hardware with this firmware flasher.<br />Do <span style=\"color: red\">not</span> <strong>disconnect</strong> the board or <strong>turn off</strong> your computer while flashing.<br /><br /><strong>Note: </strong>STM32 bootloader is stored in ROM, it cannot be bricked.<br /><!--strong>Note: </strong><span style=\"color: red\">Auto-Connect</span> is always disabled while you are inside firmware flasher.<br / --><strong>Note: </strong>Make sure you have a backup; some upgrades/downgrades will wipe your configuration.<br /><strong>Note:</strong> If you have problems flashing try disconnecting all cables from your FC first, try rebooting, upgrade chrome, upgrade drivers.<br /><strong>Note:</strong> When flashing boards that have directly connected USB sockets (Matek H743-SLIM, Holybro Kakute etc) ensure you have read the USB Flashing section of the INAV manual and have the correct software and drivers installed"
+        "message": "Please do <span class='text-danger'>not</span> try to flash <strong>non-iNAV</strong> hardware with this firmware flasher.<br />Do <span class='text-danger'>not</span> <strong>disconnect</strong> the board or <strong>turn off</strong> your computer while flashing.<br /><br /><strong>Note: </strong>STM32 bootloader is stored in ROM, it cannot be bricked.<br /><!--strong>Note: </strong><span class='text-danger'>Auto-Connect</span> is always disabled while you are inside firmware flasher.<br / --><strong>Note: </strong>Make sure you have a backup; some upgrades/downgrades will wipe your configuration.<br /><strong>Note:</strong> If you have problems flashing try disconnecting all cables from your FC first, try rebooting, upgrade chrome, upgrade drivers.<br /><strong>Note:</strong> When flashing boards that have directly connected USB sockets (Matek H743-SLIM, Holybro Kakute etc) ensure you have read the USB Flashing section of the INAV manual and have the correct software and drivers installed"
     },
     "firmwareFlasherRecoveryHead": {
         "message": "<strong>Recovery / Lost communication<strong>"
@@ -2574,7 +2580,7 @@
         "message": "HEX file appears to be corrupted"
     },
     "firmwareFlasherRemoteFirmwareLoaded": {
-        "message": "<span style=\"color: #37a8db\">Remote Firmware loaded, ready for flashing</span>"
+        "message": "<span class='text-primary'>Remote Firmware loaded, ready for flashing</span>"
     },
     "firmwareFlasherFailedToLoadOnlineFirmware": {
         "message": "Failed to load remote firmware"
@@ -2587,7 +2593,7 @@
         "message": "Save"
     },
     "ledStripEepromSaved": {
-        "message": "EEPROM <span style=\"color: #37a8db\">saved</span>: LED"
+        "message": "EEPROM <span class='text-primary'>saved</span>: LED"
     },
     "controlAxisRoll": {
         "message": "Roll [A]"
@@ -2623,7 +2629,7 @@
         "message": "Failsafe Throttle"
     },
     "failsafeFeaturesHelpNew": {
-        "message": "Failsafe has two stages. <strong>Stage 1</strong> is entered when a flightchannel has an invalid pulse duration, the receiver reports failsafe mode or there is no signal from the receiver at all, the channel fallback settings are applied to <span style=\"color: red\">all channels</span> and a short amount of time is provided to allow for recovery. <strong>Stage 2</strong> is entered when the error condition takes longer than the configured guard time while the craft is <span style=\"color: red\">armed</span>, all channels will remain at the applied channel fallback setting unless overruled by the chosen procedure. <br /><strong>Note:</strong> Prior to entering stage 1, channel fallback settings are also applied to individual radio channels that have invalid pulses."
+        "message": "Failsafe has two stages. <strong>Stage 1</strong> is entered when a flightchannel has an invalid pulse duration, the receiver reports failsafe mode or there is no signal from the receiver at all, the channel fallback settings are applied to <span class='text-danger'>all channels</span> and a short amount of time is provided to allow for recovery. <strong>Stage 2</strong> is entered when the error condition takes longer than the configured guard time while the craft is <span class='text-danger'>armed</span>, all channels will remain at the applied channel fallback setting unless overruled by the chosen procedure. <br /><strong>Note:</strong> Prior to entering stage 1, channel fallback settings are also applied to individual radio channels that have invalid pulses."
     },
     "failsafePulsrangeTitle": {
         "message": "Valid Pulse Range Settings"
@@ -3005,7 +3011,7 @@
         "message": "Warning"
     },
     "presetApplyDescription": {
-        "message": "<p style='color: darkred;'>Make sure that <strong>mixer</strong> was configured before applying any Presets!</p><p>Preset overwrites selected configuration values including mixer, filtering, PIDs and other. Settings like: flight modes, radio settings, failsafe and OSD are not changed. Applied values should <strong>NOT</strong> treated as final values, but entry points for final tuning. <br> Always check new configuration before flying!</p>"
+        "message": "<p class='text-danger'>Make sure that <strong>mixer</strong> was configured before applying any Presets!</p><p>Preset overwrites selected configuration values including mixer, filtering, PIDs and other. Settings like: flight modes, radio settings, failsafe and OSD are not changed. Applied values should <strong>NOT</strong> treated as final values, but entry points for final tuning. <br> Always check new configuration before flying!</p>"
     },
     "OK": {
         "message": "OK"
@@ -3611,7 +3617,7 @@
         "message": "AHI & HUD offset"
     },
     "osd_horizon_offset_help": {
-        "message": "Move the HUD and AHI up or down on the OSD to get it level with the actual horizon. The AHI can appear high or low depending on the camera angle in flight. <span style='color:red;'>NOTE: </span> This does not work with the Pixel OSD. For that use the `osd_ahi_vertical_offset` command in the CLI."
+        "message": "Move the HUD and AHI up or down on the OSD to get it level with the actual horizon. The AHI can appear high or low depending on the camera angle in flight. <span class='text-danger'>NOTE: </span> This does not work with the Pixel OSD. For that use the `osd_ahi_vertical_offset` command in the CLI."
     },
     "osd_left_sidebar_scroll": {
         "message": "Left Sidebar Scroll"
@@ -4664,7 +4670,7 @@
         "message": "Use stand-alone application.<br> Please visit the <a href=\"https://github.com/iNavFlight/inav-configurator/releases\" target=\"_blank\">website</a> to read the release notes and download."
     },
     "eeprom_load_ok": {
-        "message": "EEPROM <span style=\"color: #37a8db\">loaded</span>"
+        "message": "EEPROM <span class='text-primary'>loaded</span>"
     },
     "confirm_delete_all_points": {
         "message": "Do you really want to delete all points?"
@@ -5697,7 +5703,7 @@
         "message": "Send time: "
     },
     "ErrorWritingFile": {
-        "message": "<span style=\"color: red\">Error writing file</span>"
+        "message": "<span class='text-danger'>Error writing file</span>"
     },
     "FileSaved": {
         "message": "File saved"
@@ -5712,10 +5718,10 @@
         "message": "<b>No firmware selected to load</b>"
     },
     "selectValidSerialPort": {
-        "message": "<span style=\"color: red\">Please select valid serial port</span>'"
+        "message": "<span class='text-danger'>Please select valid serial port</span>'"
     },
     "writePermissionsForFile": {
-        "message": "You don\\'t have <span style=\"color: red\">write permissions</span> for this file"
+        "message": "You don\\'t have <span class='text-danger'>write permissions</span> for this file"
     },
     "automaticTargetSelect": {
         "message": "Attempting automatic target selection"
@@ -5742,19 +5748,19 @@
         "message": "Start send point"
     },
     "errorReadingFileXml2jsNotFound": {
-        "message": "<span style=\"color: red\">Error reading file (xml2js not found)</span>'"
+        "message": "<span class='text-danger'>Error reading file (xml2js not found)</span>'"
     },
     "errorReadingFile": {
-        "message": "<span style=\"color: red\">Error reading file</span>"
+        "message": "<span class='text-danger'>Error reading file</span>"
     },
     "errorParsingFile": {
-        "message": "<span style=\"color: red\">Error parsing file</span>"
+        "message": "<span class='text-danger'>Error parsing file</span>"
     },
     "loadedSuccessfully": {
         "message": " has been loaded successfully !"
     },
     "errorWritingFileXml2jsNotFound": {
-        "message": "<span style=\"color: red\">Error writing file (xml2js not found)</span>"
+        "message": "<span class='text-danger'>Error writing file (xml2js not found)</span>"
     },
     "savedSuccessfully": {
         "message": " has been saved successfully !"
@@ -5778,10 +5784,10 @@
         "message": "Layout has been cleared"
     },
     "failedToOpenSerialPort": {
-        "message": "<span style=\"color: red\">Failed</span> to open serial port"
+        "message": "<span class='text-danger'>Failed</span> to open serial port"
     },
     "failedToFlash": {
-        "message": "<span style=\"color: red\">Failed</span> to flash"
+        "message": "<span class='text-danger'>Failed</span> to flash"
     },
     "targetPrefetchsuccessful": {
         "message": "Target prefetch successful: "
