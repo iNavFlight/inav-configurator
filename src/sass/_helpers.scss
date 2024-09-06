@@ -34,38 +34,3 @@
 [data-bs-theme="dark"] .d-none-light {
   display: none !important;
 }
-
-.form-switch .form-check-input,
-[data-bs-theme=dark] .form-switch .form-check-input {
-  --inav-form-switch-bg: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'><circle r='3' fill='white'/></svg>") !important;
-}
-
-.form-switch {
-  text-wrap: nowrap;
-  padding-left: 3.75rem;
-}
-
-.form-switch .form-check-input {
-  cursor: pointer;
-  width: 3.5rem;
-  margin-left: -3.75em;
-  height: 1.4rem;
-  margin-top: 0;
-  border: none;
-}
-
-.form-check-input {
-  background-color: var(--inav-gray);
-}
-
-.form-switch-sm {
-  text-wrap: nowrap;
-  padding-left: 2.75rem;
-}
-
-.form-switch-sm .form-check-input {
-  width: 2.25rem;
-  height: 1rem;
-  margin-left: -2.75em;
-  margin-top: .25rem;
-}

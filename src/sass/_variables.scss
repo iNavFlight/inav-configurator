@@ -20,16 +20,19 @@ $min-contrast-ratio: 2;
 $spacer: .75rem;
 $input-btn-padding-y: .25rem;
 
-$nav-link-padding-y: .33rem !default;
-$nav-link-padding-x: .5rem !default;
+$nav-link-padding-y: .33rem;
+$nav-link-padding-x: .5rem;
 
 $tooltip-padding-x: .75rem;
 
 // Forms, Form Inputs
-$form-switch-width: 2.25em;
+$form-switch-width: 3.5em;
+$form-switch-bg-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'><circle r='3' fill='white'/></svg>");
+$form-switch-checked-bg-image: $form-switch-bg-image;
+$form-switch-bg-image-dark: $form-switch-bg-image;
 
 // Card
-$card-bg: rgba(var(--#{$prefix}body-color-rgb), .025) !default;
+$card-bg: rgba(var(--#{$prefix}body-color-rgb), .025);
 
 // List Groups
 $list-group-bg: trasparent;
