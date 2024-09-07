@@ -1071,15 +1071,19 @@ li.active .ic_mag {
     font-weight: 600;
 }
 
+dialog::backdrop {
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
 dialog {
-    background-color: white;
-    padding: 1em;
-    height: auto;
-    margin: auto auto;
-    position: absolute;
+    background-color: var(--inav-body-bg);
+    border: var(--inav-border-width) solid var(--inav-border-color);
+    border-radius: var(--inav-border-radius);
+    /*padding: 1rem;*/
+    /*height: auto;*/
+    /*margin: auto auto;*/
+    /*position: absolute;*/
     width: 50%;
-    border-radius: 3px;
-    border: 1px solid silver;
 }
 
 /* Border of the Tab */
