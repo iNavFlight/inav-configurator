@@ -511,14 +511,14 @@ GUI_control.prototype.update_dataflash_global = function () {
         });
 
         $(".dataflash-contents_global").css({
-        display: 'block'
+            display: 'flex'
         });
 
         $(".dataflash-free_global").css({
         width: (100-(FC.DATAFLASH.totalSize - FC.DATAFLASH.usedSize) / FC.DATAFLASH.totalSize * 100) + "%",
         display: 'block'
         });
-        $(".dataflash-free_global div").text('Dataflash: free ' + formatFilesize(FC.DATAFLASH.totalSize - FC.DATAFLASH.usedSize));
+        $("#dataflash-free-space").text('Dataflash: free ' + formatFilesize(FC.DATAFLASH.totalSize - FC.DATAFLASH.usedSize));
     } else {
         $(".noflash_global").css({
         display: 'block'

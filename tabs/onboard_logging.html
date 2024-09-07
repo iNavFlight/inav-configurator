@@ -1,167 +1,167 @@
-<!--suppress HtmlFormInputWithoutLabel -->
-<div class="tab-onboard_logging toolbar_fixed_bottom">
-    <div class="content_wrapper">
-        <div class="tab_title" data-i18n="tabOnboardLogging"></div>
-        <div class="require-blackbox-unsupported">
+<div class="page tab-onboard-logging">
+    <div class="page-header">
+        <span data-i18n="tabOnboardLogging"></span>
+    </div>
 
-            <div class="gui_box grey require-blackbox-config-supported">
-                <div class="gui_box_titlebar">
-                    <div class="spacer_box_title" data-i18n="blackboxConfiguration"></div>
-                </div>
-                <div class="spacer_box config-section">
-                    <div class="note note_spacer mb1em">
-                        <p data-i18n="blackboxNotSupported"></p>
-                    </div>
-                    <div class="checkbox">
-                        <input type="checkbox" data-bit="19" class="feature toggle" name="BLACKBOX" title="BLACKBOX" id="feature-19-1">
-                        <label for="feature-19-1">
-                            <span data-i18n="featureBLACKBOX"></span>
-                        </label>
-                    </div>
-                    <div class="line">
-                        <a href="#" class="save-blackbox-feature regular-button" data-i18n="blackboxButtonSave"></a>
-                    </div>
+    <div class="require-blackbox-unsupported">
+        <div class="alert alert-info">
+            <div class="fw-bold" data-i18n="blackboxNotSupported"></div>
+            <div class="hstack py-4">
+                <div class="form-check form-switch">
+                    <input class="form-check-input feature" type="checkbox" data-bit="19" name="BLACKBOX" title="BLACKBOX" id="feature-19-1"/>
+                    <label for="feature-19-1" class="form-check-label" data-i18n="featureBLACKBOX"></label>
                 </div>
             </div>
-        </div>
-        <div class="require-blackbox-supported">
-            <div class="leftWrapper">
-                <div class="config-section gui_box grey">
-                    <div class="gui_box_titlebar">
-                        <div class="spacer_box_title" data-i18n="blackboxConfiguration"></div>
-                    </div>
-                    <div class="spacer_box">
-                        <div class="checkbox">
-                            <input checked type="checkbox" data-bit="19" class="feature toggle" name="BLACKBOX" title="BLACKBOX" id="feature-19-2">
-                            <label for="feature-19-2">
-                                <span data-i18n="featureBLACKBOX"></span>
-                            </label>
-                        </div>
-                        <div class="select line blackboxDevice">
-                            <select name="blackbox_device">
-                        </select>
-                            <span i18n="onboardLoggingBlackbox"></span>
-                        </div>
-                        <div class="select line blackboxRate">
-                            <select name="blackbox_rate">
-                        </select>
-                            <span i18n="onboardLoggingBlackboxRate"></span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="rightWrapper">
-                <div class="config-section gui_box grey">
-                    <div class="gui_box_titlebar">
-                        <div class="spacer_box_title" data-i18n="blackboxFields"></div>
-                    </div>
-                    <div id="blackBoxFlagsDiv" class="spacer_box config-section">
-                    </div>
-                </div>
-            </div>
-
-            <div class="gui_box grey">
-                <div class="gui_box_titlebar" align="left">
-                    <div class="spacer_box_title" data-i18n="serialLogging">
-                    </div>
-                </div>
-                <div class="spacer_box">
-                    <p data-i18n="serialLoggingSupportedNote"></p>
-                </div>
-            </div>
-
-            <div class="gui_box grey require-dataflash-supported">
-                <div class="gui_box_titlebar" align="left">
-                    <div class="spacer_box_title" data-i18n="onboardLoggingFlashLogger">
-                    </div>
-                </div>
-                <div class="spacer_box">
-                    <div class="require-dataflash-supported">
-                        <p data-i18n="dataflashNote"></p>
-
-                        <dialog class="dataflash-confirm-erase">
-                            <h3 data-i18n="dataflashConfirmEraseTitle"></h3>
-                            <div class="dataflash-confirm-erase-note" data-i18n="dataflashConfirmEraseNote"></div>
-                            <div class="dataflash-erase-progress">
-                                <div class="data-loading">
-                                    <p data-i18n="dataflashEraseing"></p>
-                                </div>
-                            </div>
-                            <div class="buttons">
-                                <a href="#" class="erase-flash-confirm regular-button" data-i18n="dataflashButtonEraseConfirm"></a>
-                                <a href="#" class="erase-flash-cancel regular-button" data-i18n="dataflashButtonEraseCancel"></a>
-                            </div>
-                        </dialog>
-
-                        <dialog class="dataflash-saving">
-                            <h3 data-i18n="dataflashSavingTitle"></h3>
-                            <div class="dataflash-saving-before">
-                                <div data-i18n="dataflashSavingNote"></div>
-                                <progress value="0" min="0" max="100"></progress>
-                                <div class="buttons">
-                                    <a href="#" class="save-flash-cancel regular-button" data-i18n="dataflashButtonSaveCancel"></a>
-                                </div>
-                            </div>
-                            <div class="dataflash-saving-after">
-                                <div data-i18n="dataflashSavingNoteAfter"></div>
-                                <div class="buttons">
-                                    <a href="#" class="save-flash-dismiss regular-button" data-i18n="dataflashButtonSaveDismiss"></a>
-                                </div>
-                            </div>
-                        </dialog>
-
-                        <ul class="dataflash-contents">
-                            <li class="dataflash-used">
-                                <div class="legend"></div>
-                            </li>
-                            <li class="dataflash-free">
-                                <div class="legend"></div>
-                            </li>
-                        </ul>
-
-                        <div>
-                            <a class="regular-button erase-flash" href="#" data-i18n="dataflashButtonErase"></a>
-                            <a class="regular-button save-flash" href="#" data-i18n="dataflashButtonSaveFile"></a>
-                        </div>
-                    </div>
-
-                    <p class="require-dataflash-not-present" data-i18n="dataflashNotPresentNote"></p>
-                    <p class="require-dataflash-unsupported" data-i18n="dataflashFirmwareUpgradeRequired"></p>
-                </div>
-            </div>
-            <div class="require-sdcard-supported">
-                <div class="gui_box grey">
-                    <div class="gui_box_titlebar" align="left">
-                        <div class="spacer_box_title" data-i18n="OnboardSDCard">
-                        </div>
-                    </div>
-                    <div class="spacer_box">
-                        <div class="sdcard">
-                            <div class="sdcard-icon"></div>
-                            <div class="sdcard-status"></div>
-                        </div>
-
-                        <p data-i18n="sdcardNote"></p>
-
-                        <div class="require-sdcard-ready">
-                            <ul class="sdcard-contents">
-                                <li class="sdcard-free">
-                                    <div class="legend"></div>
-                                </li>
-                                <li class="sdcard-other">
-                                    <div class="legend"></div>
-                                </li>
-                            </ul><bbr />
-                            <a class="require-msc-ready regular-button onboardLoggingRebootMsc" href="#" i18n="cliMscBtn"></a>
-                        </div>
-                    </div>
-                </div>
+            <div>
+                <button id="save-blackbox-feature" class="btn btn-primary" data-i18n="blackboxButtonSave"></button>
             </div>
         </div>
     </div>
-    <div class="content_toolbar">
-        <div class="btn save_btn">
-            <a href="#" class="save-settings regular-button" data-i18n="blackboxButtonSave"></a>
+
+    <div class="require-blackbox-supported">
+        <div class="row">
+            <div class="col">
+                <div class="card mb-3">
+                    <div class="card-header" data-i18n="blackboxConfiguration"></div>
+                    <div class="card-body">
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item hstack">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input feature" checked type="checkbox" data-bit="19" name="BLACKBOX" title="BLACKBOX" id="feature-19-2"/>
+                                    <label for="feature-19-2" class="form-check-label" data-i18n="featureBLACKBOX"></label>
+                                </div>
+                            </li>
+                            <li class="list-group-item hstack line blackboxDevice">
+                                <select class="form-select w-10r" name="blackbox_device"></select>
+                                <label i18n="onboardLoggingBlackbox"></label>
+                            </li>
+                            <li class="list-group-item hstack line blackboxRate">
+                                <select class="form-select w-10r" name="blackbox_rate"></select>
+                                <label i18n="onboardLoggingBlackboxRate"></label>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="card mb-3">
+                    <div class="card-header" data-i18n="serialLogging"></div>
+                    <div class="card-body">
+                        <div data-i18n="serialLoggingSupportedNote"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card mb-3">
+                    <div class="card-header" data-i18n="blackboxFields"></div>
+                    <div class="card-body">
+                        <ul id="blackBoxFlagsDiv" class="list-group list-group-flush"></ul>
+                    </div>
+                </div>
+            </div>
         </div>
+
+        <div class="card mb-3 require-dataflash-supported">
+            <div class="card-header" data-i18n="onboardLoggingFlashLogger"></div>
+            <div class="card-body">
+                <div class="require-dataflash-supported">
+                    <p data-i18n="dataflashNote"></p>
+
+                    <div class="progress h-2r">
+                        <div id="dataflash-used-memory-percent" class="progress-bar"></div>
+                    </div>
+                    <div class="d-flex justify-content-between pt-2 pb-3">
+                        <div>
+                            <span id="dataflash-used-memory"></span>
+                            <span data-i18n="sdcardMemoryUsedOf"></span>
+                            <span id="dataflash-all-memory"></span>
+                        </div>
+                        <div>
+                            <span data-i18n="sdcardMemoryAvailable"></span>: <span id="dataflash-available-memory"></span>
+                        </div>
+                    </div>
+                    <div>
+                        <button id="btn-erase-flash" class="btn btn-outline-danger" data-i18n="dataflashButtonErase"></button>
+                        <button id="btn-save-flash" class="btn btn-outline-primary" data-i18n="dataflashButtonSaveFile"></button>
+                    </div>
+
+
+
+                    <dialog class="dataflash-confirm-erase">
+                        <h3 data-i18n="dataflashConfirmEraseTitle"></h3>
+                        <p class="dataflash-confirm-erase-note" data-i18n="dataflashConfirmEraseNote"></p>
+                        <div class="dataflash-erase-progress">
+                            <div class="data-loading">
+                                <p data-i18n="dataflashEraseing"></p>
+                            </div>
+                        </div>
+                        <div>
+                            <button id="btn-erase-flash-confirm" class="btn btn-danger erase-flash-confirm" data-i18n="dataflashButtonEraseConfirm"></button>
+                            <button id="btn-erase-flash-cancel" class="btn btn-primary erase-flash-cancel" data-i18n="dataflashButtonEraseCancel"></button>
+                        </div>
+                    </dialog>
+
+                    <dialog class="dataflash-saving">
+                        <h3 data-i18n="dataflashSavingTitle"></h3>
+                        <div class="dataflash-saving-before">
+                            <p data-i18n="dataflashSavingNote"></p>
+
+                            <div class="progress mb-3" style=" --inav-progress-bar-transition: width 0.15s ease;">
+                                <div id="dataflash-saving-progress" class="progress-bar" style="width: 0%"></div>
+                            </div>
+
+                            <div>
+                                <button id="btn-save-flash-cancel" class="btn btn-primary" data-i18n="dataflashButtonSaveCancel"></button>
+                            </div>
+                        </div>
+                        <div class="dataflash-saving-after">
+                            <p data-i18n="dataflashSavingNoteAfter"></p>
+                            <div>
+                                <button id="btn-save-flash-dismiss" class="btn btn-primary" data-i18n="dataflashButtonSaveDismiss"></button>
+                            </div>
+                        </div>
+                    </dialog>
+                </div>
+
+                <p class="require-dataflash-not-present" data-i18n="dataflashNotPresentNote"></p>
+                <p class="require-dataflash-unsupported" data-i18n="dataflashFirmwareUpgradeRequired"></p>
+            </div>
+        </div>
+
+        <div class="card mb-3 require-sdcard-supported">
+            <div class="card-header" data-i18n="OnboardSDCard"></div>
+            <div class="card-body">
+                <div class="hstack gap-3">
+                    <div class="sdcard p-3 vstack flex-grow-0 align-items-center gap-2">
+                        <div class="sdcard-icon rounded-circle bg-secondary"></div>
+                        <div class="sdcard-status text-center"></div>
+                    </div>
+                    <div class="flex-grow-1">
+                        <p data-i18n="sdcardNote"></p>
+                        <div class="require-sdcard-ready">
+                            <div class="progress h-2r">
+                                <div id="sdcard-used-memory-percent" class="progress-bar"></div>
+                            </div>
+                            <div class="d-flex justify-content-between pt-2 pb-3">
+                                <div>
+                                    <span id="sdcard-used-memory"></span>
+                                    <span data-i18n="sdcardMemoryUsedOf"></span>
+                                    <span id="sdcard-all-memory"></span>
+                                </div>
+                                <div>
+                                    <span data-i18n="sdcardMemoryAvailable"></span>: <span id="sdcard-available-memory"></span>
+                                </div>
+                            </div>
+                            <div>
+                                <button class="btn btn-primary" i18n="cliMscBtn" disabled></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="page-footer">
+        <button id="save-btn" class="btn btn-primary" data-i18n="blackboxButtonSave"></button>
     </div>
 </div>
