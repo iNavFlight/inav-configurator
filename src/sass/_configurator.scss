@@ -419,13 +419,22 @@ $tabIcons: (
 }
 
 [data-highlight-profile-params="true"] {
+  --highlighted-param-border-width: .25rem;
+  --highlighted-param-padding-left: calc(#{$input-padding-x} + #{$input-border-width} - var(--highlighted-param-border-width));
+
   .profile-input-battery {
     border-color: var(--inav-warning-border-subtle);
+    border-left-width: var(--highlighted-param-border-width);
+    padding-left: var(--highlighted-param-padding-left);
   }
   .profile-input-mixer {
     border-color: var(--inav-primary-border-subtle);
+    border-left-width: var(--highlighted-param-border-width);
+    padding-left: var(--highlighted-param-padding-left);
   }
   .profile-input-control {
     border-color: var(--inav-success-border-subtle);
+    border-left-width: var(--highlighted-param-border-width);
+    padding-left: var(--highlighted-param-padding-left);
   }
 }
