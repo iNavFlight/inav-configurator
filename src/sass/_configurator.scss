@@ -417,3 +417,15 @@ $tabIcons: (
     }
   }
 }
+
+[data-highlight-profile-params="true"] {
+  .profile-input-battery {
+    border-color: var(--inav-warning-border-subtle);
+  }
+  .profile-input-mixer {
+    border-color: var(--inav-primary-border-subtle);
+  }
+  .profile-input-control {
+    border-color: var(--inav-success-border-subtle);
+  }
+}

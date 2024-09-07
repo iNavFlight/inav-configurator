@@ -1667,32 +1667,32 @@ dialog {
 
 /*}*/
 
-#profile_change {
-    color: white;
-    margin-top: 16px;
-    width: 110px;
-    float: left;
-    margin-right: 10px;
-    line-height: 12px;
-}
+/*#profile_change {*/
+/*    color: white;*/
+/*    margin-top: 16px;*/
+/*    width: 110px;*/
+/*    float: left;*/
+/*    margin-right: 10px;*/
+/*    line-height: 12px;*/
+/*}*/
 
-#mixer_profile_change {
-    color: white;
-    margin-top: 16px;
-    width: 110px;
-    float: left;
-    margin-right: 0;
-    line-height: 12px;
-}
+/*#mixer_profile_change {*/
+/*    color: white;*/
+/*    margin-top: 16px;*/
+/*    width: 110px;*/
+/*    float: left;*/
+/*    margin-right: 0;*/
+/*    line-height: 12px;*/
+/*}*/
 
-#battery_profile_change {
-    color: white;
-    margin-top: 16px;
-    width: 110px;
-    float: right;
-    margin-right: 0;
-    line-height: 12px;
-}
+/*#battery_profile_change {*/
+/*    color: white;*/
+/*    margin-top: 16px;*/
+/*    width: 110px;*/
+/*    float: right;*/
+/*    margin-right: 0;*/
+/*    line-height: 12px;*/
+/*}*/
 
 .dataflash-contents_global {
     /*margin-top: 18px;*/
@@ -2220,21 +2220,21 @@ ol li {
     content: attr(data-unit) ;
 }
 
-.batteryProfileHighlight {
-    background-color: none;
-}
+/*.batteryProfileHighlight {*/
+/*    background-color: none;*/
+/*}*/
 
-.batteryProfileHighlightActive {
-    background-color: var(--inav-warning-bg-subtle);
-}
+/*.batteryProfileHighlightActive {*/
+/*    background-color: var(--inav-warning-bg-subtle);*/
+/*}*/
 
-.controlProfileHighlight {
-    background-color: none;
-}
+/*.controlProfileHighlight {*/
+/*    background-color: none;*/
+/*}*/
 
-.controlProfileHighlightActive {
-    background-color: var(--inav-info-bg-subtle) !important ;
-}
+/*.controlProfileHighlightActive {*/
+/*    background-color: var(--inav-info-bg-subtle) !important ;*/
+/*}*/
 
 .no-border {
     border: none !important;

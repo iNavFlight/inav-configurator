@@ -225,11 +225,6 @@ $(function() {
 
                         // Update CSS on select boxes
                         updateProfilesHighlightColours();
-
-                        // Horrible way to reload the tab
-                        const activeTab = $('#tabs li.active');
-                        activeTab.removeClass('active');
-                        activeTab.find('a').trigger( "click" );
                     });
 
                     $('#use-advanced-cli-autocomplete').on('change', function () {
@@ -463,33 +458,7 @@ function get_osd_settings() {
 
 // TODO
 function updateProfilesHighlightColours() {
-    if (globalSettings.showProfileParameters) {
-        $('.dropdown-dark #profilechange').addClass('showProfileParams');
-        $('.dropdown-dark #batteryprofilechange').addClass('showProfileParams');
-
-        $('.batteryProfileHighlight').each(function () {
-            $(this).addClass('batteryProfileHighlightActive');
-            $(this).removeClass('batteryProfileHighlight');
-        });
-
-        $('.controlProfileHighlight').each(function () {
-            $(this).addClass('controlProfileHighlightActive');
-            $(this).removeClass('controlProfileHighlight');
-        });
-    } else {
-        $('.dropdown-dark #profilechange').removeClass('showProfileParams');
-        $('.dropdown-dark #batteryprofilechange').removeClass('showProfileParams');
-
-        $('.batteryProfileHighlightActive').each(function () {
-            $(this).addClass('batteryProfileHighlight');
-            $(this).removeClass('batteryProfileHighlightActive');
-        });
-
-        $('.controlProfileHighlightActive').each(function () {
-            $(this).addClass('controlProfileHighlight');
-            $(this).removeClass('controlProfileHighlightActive');
-        });
-    }
+    document.documentElement.setAttribute('data-highlight-profile-params', globalSettings.showProfileParameters)
 }
 
 Number.prototype.clamp = function (min, max) {
