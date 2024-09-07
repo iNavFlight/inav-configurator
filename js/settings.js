@@ -63,14 +63,12 @@ var Settings = (function () {
                 }
             }
 
-            if (globalSettings.showProfileParameters) {
-                if (FC.isBatteryProfileParameter(settingName)) {
-                    input.addClass("profile-input-battery");
-                }
+            if (FC.isBatteryProfileParameter(settingName)) {
+                input.addClass("profile-input-battery");
+            }
 
-                if (FC.isControlProfileParameter(settingName)) {
-                    input.addClass("profile-input-control");
-                }
+            if (FC.isControlProfileParameter(settingName)) {
+                input.addClass("profile-input-control");
             }
 
             return mspHelper.getSetting(settingName).then(function (s) {
