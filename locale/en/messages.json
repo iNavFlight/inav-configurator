@@ -2719,7 +2719,7 @@
         "message": "This is the failsafe procedure that will be followed when the craft is closer than the Failsafe Minimum Distance from Home."
     },
     "failsafeProcedureVisualizationHeaderText": {
-        "message": "Procedure visualization"
+        "message": "Current procedure visualization"
     },
     "failsafeProcedureNothingVisualizationText": {
         "message": "No visualization."
