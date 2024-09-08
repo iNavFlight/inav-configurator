@@ -153,12 +153,20 @@ html, body {
   .logs-toggle {
     font-weight: 600;
     position: absolute;
+    z-index: 1;
     right: 0;
     cursor: pointer;
   }
 
-  .log-row {
-    color: var(--inav-body-color);
+  .logs-stream {
+    opacity: .4;
+    transition: .25s all;
+  }
+
+  &.open {
+    .logs-stream {
+      opacity: 1;
+    }
   }
 }
 
