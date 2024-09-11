@@ -554,6 +554,7 @@ OSD.DjiElements =  {
         "Timers",
         "VTX",
         "CRSF",
+        "SwitchIndicators",
         "OSDCustomElements",
         "GVars",
         "PIDs",
@@ -1850,6 +1851,35 @@ OSD.constants = {
             ]
         },
         {
+            name: 'osdGroupSwitchIndicators',
+            items: [
+                {
+                    name: 'SWITCH_INDICATOR_0',
+                    id: 130,
+                    positionable: true,
+                    preview: 'SWI1' + FONT.symbol(SYM.SWITCH_INDICATOR_HIGH)
+                },
+                {
+                    name: 'SWITCH_INDICATOR_1',
+                    id: 131,
+                    positionable: true,
+                    preview: 'SWI2' + FONT.symbol(SYM.SWITCH_INDICATOR_HIGH)
+                },
+                {
+                    name: 'SWITCH_INDICATOR_2',
+                    id: 132,
+                    positionable: true,
+                    preview: 'SWI3' + FONT.symbol(SYM.SWITCH_INDICATOR_HIGH)
+                },
+                {
+                    name: 'SWITCH_INDICATOR_3',
+                    id: 133,
+                    positionable: true,
+                    preview: 'SWI4' + FONT.symbol(SYM.SWITCH_INDICATOR_HIGH)
+                }
+            ]
+        },
+        {
             name: 'osdGroupOSDCustomElements',
             items: [
                 {
@@ -1875,35 +1905,35 @@ OSD.constants = {
                 },
                 {
                     name: 'CUSTOM_ELEMENT_4',
-                    id: 130,
+                    id: 154,
                     min_version: '8.0.0',
                     positionable: true,
                     preview: "CE_4",
                 },
                 {
                     name: 'CUSTOM_ELEMENT_5',
-                    id: 131,
+                    id: 155,
                     min_version: '8.0.0',
                     positionable: true,
                     preview: "CE_5",
                 },
                 {
                     name: 'CUSTOM_ELEMENT_6',
-                    id: 132,
+                    id: 156,
                     min_version: '8.0.0',
                     positionable: true,
                     preview: "CE_6",
                 },
                 {
                     name: 'CUSTOM_ELEMENT_7',
-                    id: 133,
+                    id: 157,
                     min_version: '8.0.0',
                     positionable: true,
                     preview: "CE_7",
                 },
                 {
                     name: 'CUSTOM_ELEMENT_8',
-                    id: 154,
+                    id: 158,
                     min_version: '8.0.0',
                     positionable: true,
                     preview: "CE_8",
@@ -2824,6 +2854,7 @@ OSD.GUI.updateFields = function() {
     GUI.switchery();
 
     // Update the OSD preview
+    refreshOSDSwitchIndicators();
     updatePilotAndCraftNames();
     updatePanServoPreview();
 };
@@ -3340,6 +3371,31 @@ TABS.osd.initialize = function (callback) {
     
             // Initialise guides checkbox
             isGuidesChecked = store.get('showOSDGuides', false); 
+
+            // Setup switch indicators
+            $(".osdSwitchInd_channel option").each(function() {
+                $(this).text("Ch " + $(this).text());
+            });
+
+            // Function when text for switch indicators change
+            $('.osdSwitchIndName').on('keyup', function() {
+                // Make sure that the switch hint only contains A to Z
+                let testExp = new RegExp('^[A-Za-z0-9]');
+                let testText = $(this).val();
+                if (testExp.test(testText.slice(-1))) {
+                    $(this).val(testText.toUpperCase().slice(0, 4));
+                } else {
+                    $(this).val(testText.slice(0, -1));
+                }
+
+                // Update the OSD preview
+                refreshOSDSwitchIndicators();
+            });
+
+            // Function to update the OSD layout when the switch text alignment changes
+            $("#switchIndicators_alignLeft").on('change', function() {
+                refreshOSDSwitchIndicators();
+            });
     
             // Functions for when pan servo settings change
             $('#osdPanServoIndicatorShowDegrees').on('change', function() {
@@ -3881,6 +3937,29 @@ function getLCoptions(){
         }
     }
     return result;
+}
+
+function refreshOSDSwitchIndicators() {
+    let group = OSD.constants.ALL_DISPLAY_GROUPS.filter(function(e) {
+        return e.name == "osdGroupSwitchIndicators";
+      })[0];
+    for (let si = 0; si < group.items.length; si++) {
+        let item = group.items[si];
+        if ($("#osdSwitchInd" + si +"_name").val() != undefined) {
+            let switchIndText = $("#osdSwitchInd" + si +"_name").val();
+            if (switchIndText == "") {
+                item.preview = FONT.symbol(SYM.SWITCH_INDICATOR_HIGH);
+            } else {
+                if ($("#switchIndicators_alignLeft").prop('checked')) {
+                    item.preview = switchIndText + FONT.symbol(SYM.SWITCH_INDICATOR_HIGH);
+                } else {
+                    item.preview = FONT.symbol(SYM.SWITCH_INDICATOR_HIGH) + switchIndText;
+                }
+            }
+        }
+    }
+
+    OSD.GUI.updatePreviews();
 }
 
 function updatePilotAndCraftNames() {
