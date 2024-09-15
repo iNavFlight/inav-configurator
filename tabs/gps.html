@@ -10,8 +10,10 @@
                 <div class="card-body">
                     <ul class="list-group list-group-flush">
                         <li class="list-group-item hstack">
-                            <input type="checkbox" data-bit="7" class="feature toggle" name="GPS" title="GPS" id="feature-7">
-                            <label for="feature-7"><span data-i18n="featureGPS"></span></label>
+                            <div class="form-check form-switch">
+                                <input type="checkbox" data-bit="7" class="feature form-check-input" name="GPS" title="GPS" id="feature-7">
+                                <label for="feature-7" class="form-check-label" data-i18n="featureGPS"></label>
+                            </div>
                             <span class="helpicon cf_tip" data-i18n_title="featureGPSTip"></span>
                         </li>
                         <li class="list-group-item hstack">
@@ -39,16 +41,22 @@
                             <label for="mag_declination"><span data-i18n="configurationMagDeclination"></span></label>
                         </li>
                         <li class="list-group-item hstack">
-                            <input type="checkbox" class="toggle update_preview" data-setting="gps_ublox_use_galileo" data-live="true">
-                            <label for="gps_use_galileo"><span data-i18n="configurationGPSUseGalileo"></span></label>
+                            <div class="form-check form-switch">
+                                <input type="checkbox" class="form-check-input update_preview" id="gps_use_galileo" data-setting="gps_ublox_use_galileo" data-live="true">
+                                <label for="gps_use_galileo" class="form-check-label" data-i18n="configurationGPSUseGalileo"></label>
+                            </div>
                         </li>
                         <li class="list-group-item hstack">
-                            <input type="checkbox" class="toggle update_preview" data-setting="gps_ublox_use_beidou" data-live="true">
-                            <label for="gps_use_beidou"><span data-i18n="configurationGPSUseBeidou"></span></label>
+                            <div class="form-check form-switch">
+                                <input type="checkbox" class="form-check-input update_preview" id="gps_use_beidou" data-setting="gps_ublox_use_beidou" data-live="true">
+                                <label for="gps_use_beidou" class="form-check-label" data-i18n="configurationGPSUseBeidou"></label>
+                            </div>
                         </li>
                         <li class="list-group-item hstack">
-                            <input type="checkbox" class="toggle update_preview" data-setting="gps_ublox_use_glonass" data-live="true">
-                            <label for="gps_use_glonass"><span data-i18n="configurationGPSUseGlonass"></span></label>
+                            <div class="form-check form-switch">
+                                <input type="checkbox" class="form-check-input update_preview" id="gps_use_glonass" data-setting="gps_ublox_use_glonass" data-live="true">
+                                <label for="gps_use_glonass" class="form-check-label" data-i18n="configurationGPSUseGlonass"></label>
+                            </div>
                         </li>
                         <li class="list-group-item hstack">
                             <input class="form-control w-10r" type="number" id="tzOffset" data-setting="tz_offset" data-unit="tzmins" data-setting-multiplier="1" step="1" min="-1440" max="1440" />
