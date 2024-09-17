@@ -1175,37 +1175,6 @@ helper.defaultsDialog = (function () {
         
         let settingsChainer = MSPChainerClass();
         let miscChain = [];
-    
-        for (let ps = 0; ps < 3; ps++) {
-            profileChain[ps].push(function (callback) {
-                MSP.send_message(MSPCodes.MSP_SELECT_SETTING, [ps], false, callback);
-            });
-
-            profileChain[ps].push(function (callback) {
-                MSP.send_message(MSPCodes.MSP2_INAV_SELECT_BATTERY_PROFILE, [ps], false, callback);
-            });
-
-            controlProfileSettings.forEach(input => {
-                profileChain[ps].push(function (callback) {
-                    mspHelper.setSetting(input.key, input.value, callback);
-                });
-            }); 
-
-            batterySettings.forEach(input => {
-                profileChain[ps].push(function (callback) {
-                    mspHelper.setSetting(input.key, input.value, callback);
-                });
-            });
-        }
-
-        // Resetting profile at end of profile 3
-        profileChain[2].push(function (callback) {
-            MSP.send_message(MSPCodes.MSP_SELECT_SETTING, [currentControlProfile], false, callback);
-        });
-            
-        profileChain[2].push(function (callback) {
-            MSP.send_message(MSPCodes.MSP2_INAV_SELECT_BATTERY_PROFILE, [currentBatteryProfile], false, callback);
-        });
 
         miscSettings.forEach(input => {
             miscChain.push(function (callback) {
@@ -1237,19 +1206,56 @@ helper.defaultsDialog = (function () {
             ]);
         }
 
+        settingsChainer.setChain(miscChain);
+        settingsChainer.execute();
+
+        // Set profiles
+
+        for (let ps = 0; ps < 3; ps++) {
+            profileChain[ps].push(function (callback) {
+                MSP.send_message(MSPCodes.MSP_SELECT_SETTING, [ps], false, callback);
+            });
+
+            profileChain[ps].push(function (callback) {
+                MSP.send_message(MSPCodes.MSP2_INAV_SELECT_BATTERY_PROFILE, [ps], false, callback);
+            });
+
+            controlProfileSettings.forEach(input => {
+                profileChain[ps].push(function (callback) {
+                    mspHelper.setSetting(input.key, input.value, callback);
+                });
+            }); 
+
+            batterySettings.forEach(input => {
+                profileChain[ps].push(function (callback) {
+                    mspHelper.setSetting(input.key, input.value, callback);
+                });
+            });
+        }
+
+        // Resetting profile at end of profile 3
+        profileChain[2].push(function (callback) {
+            MSP.send_message(MSPCodes.MSP_SELECT_SETTING, [currentControlProfile], false, callback);
+        });
+            
+        profileChain[2].push(function (callback) {
+            MSP.send_message(MSPCodes.MSP2_INAV_SELECT_BATTERY_PROFILE, [currentBatteryProfile], false, callback);
+        });
+
         for (let pc = 0; pc < 3; pc++) {
             profileChainer[pc].setChain(profileChain[pc]);
         }
-        
-        settingsChainer.setChain(miscChain);
-        settingsChainer.setExitPoint(function () {
+
+        profileChainer[2].setExitPoint(function () {
             privateScope.finalize(selectedDefaultPreset);
         });
-        
-        let timeOut0 = setTimeout(profileChainer[0].execute, 4000);
-        let timeOut1 = setTimeout(profileChainer[1].execute, 14000);
-        let timeOut2 = setTimeout(profileChainer[2].execute, 24000);
-        let timeOut3 = setTimeout(settingsChainer.execute, 34000);
+
+        let timeout = (miscChain.length * 150) + 2000;    
+        let timeOut0 = setTimeout(profileChainer[0].execute, timeout);
+        timeout+= (profileChain[0].length * 150) + 4000;
+        let timeOut1 = setTimeout(profileChainer[1].execute, timeout);
+        timeout+= (profileChain[1].length * 150) + 4000;
+        let timeOut2 = setTimeout(profileChainer[2].execute, timeout);
     }
 
     privateScope.onPresetClick = function (event) {
