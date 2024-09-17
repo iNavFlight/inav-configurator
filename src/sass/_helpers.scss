@@ -31,6 +31,14 @@
   display: none !important;
 }
 
+[data-bs-theme="light"] .d-none-light {
+  display: unset !important;
+}
+
 [data-bs-theme="dark"] .d-none-light {
   display: none !important;
+}
+
+[data-bs-theme="dark"] .d-none-dark {
+  display: unset !important;
 }
