@@ -5,14 +5,24 @@
     <div class="card mb-3">
         <div class="card-header" data-i18n="configuratorTheme"></div>
         <div class="card-body">
-            <div class="hstack">
-                <select id="configurator-theme-select" class="form-select w-10r">
-                    <option value="auto" data-i18n="configuratorThemeSystem"></option>
-                    <option value="light" data-i18n="configuratorThemeLight"></option>
-                    <option value="dark" data-i18n="configuratorThemeDark"></option>
-                </select>
-                <label><span data-i18n="toogleConfiguratorTheme"></span></label>
-            </div>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item hstack">
+                    <select id="configurator-theme-select" class="form-select w-10r">
+                        <option value="auto" data-i18n="configuratorThemeSystem"></option>
+                        <option value="light" data-i18n="configuratorThemeLight"></option>
+                        <option value="dark" data-i18n="configuratorThemeDark"></option>
+                    </select>
+                    <label data-i18n="toogleConfiguratorTheme"></label>
+                </li>
+                <li class="list-group-item hstack">
+                    <select id="configurator-theme-header-navbar-select" class="form-select w-10r">
+                        <option value="dark" data-i18n="configuratorThemeHeaderNavbarDefault"></option>
+                        <option value="light" data-i18n="configuratorThemeHeaderNavbarInverted"></option>
+                    </select>
+                    <label data-i18n="toogleConfiguratorThemeHeaderNavbar"></label>
+                    <div class="helpicon cf_tip" data-i18n_title="configurationVoltageSourceHelp"></div>
+                </li>
+            </ul>
         </div>
     </div>
 
