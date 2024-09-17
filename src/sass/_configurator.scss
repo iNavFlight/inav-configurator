@@ -80,7 +80,6 @@ html, body {
   }
 
   .logo {
-    width: 150px;
     img {
       height: 100%;
     }
@@ -304,10 +303,10 @@ $tabIcons: (
   }
 
   li.active a {
-    color: var(--inav-body-color);
+    color: var(--inav-white);
     background-color: var(--inav-primary);
     &:before {
-      background-color: var(--inav-body-color);
+      background-color: var(--inav-white);
     }
   }
 
