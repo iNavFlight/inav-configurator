@@ -1246,10 +1246,10 @@ helper.defaultsDialog = (function () {
             privateScope.finalize(selectedDefaultPreset);
         });
         
-        let timeOut0 = setTimeout(profileChainer[0].execute, 2000);
-        let timeOut1 = setTimeout(profileChainer[1].execute, 11000);
-        let timeOut2 = setTimeout(profileChainer[2].execute, 20000);
-        let timeOut3 = setTimeout(settingsChainer.execute, 29000);
+        let timeOut0 = setTimeout(profileChainer[0].execute, 4000);
+        let timeOut1 = setTimeout(profileChainer[1].execute, 14000);
+        let timeOut2 = setTimeout(profileChainer[2].execute, 24000);
+        let timeOut3 = setTimeout(settingsChainer.execute, 34000);
     }
 
     privateScope.onPresetClick = function (event) {
