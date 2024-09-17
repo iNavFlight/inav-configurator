@@ -1544,51 +1544,54 @@ var mspHelper = (function () {
                 break;
 
             case MSPCodes.MSP2_INAV_CUSTOM_OSD_ELEMENTS:
-                FC.OSD_CUSTOM_ELEMENTS .items = [];
+                FC.OSD_CUSTOM_ELEMENTS.items = [];
 
-                var index = 0;
+                let settingsIdx = 0;
 
-                if(data.byteLength == 0){
-                    FC.OSD_CUSTOM_ELEMENTS .settings.customElementsCount = 0;
-                    FC.OSD_CUSTOM_ELEMENTS .settings.customElementTextSize = 0;
+                if(data.byteLength == 0) {
+                    FC.OSD_CUSTOM_ELEMENTS.settings.customElementsCount = 0;
+                    FC.OSD_CUSTOM_ELEMENTS.settings.customElementTextSize = 0;
+                    FC.OSD_CUSTOM_ELEMENTS.settings.customElementParts = 0;
                     return;
                 }
 
-                FC.OSD_CUSTOM_ELEMENTS .settings.customElementsCount = data.getUint8(index++);
-                FC.OSD_CUSTOM_ELEMENTS .settings.customElementTextSize = data.getUint8(index++);
+                FC.OSD_CUSTOM_ELEMENTS.settings.customElementsCount = data.getUint8(settingsIdx++);
+                FC.OSD_CUSTOM_ELEMENTS.settings.customElementTextSize = data.getUint8(settingsIdx++);
+                FC.OSD_CUSTOM_ELEMENTS.settings.customElementParts = data.getUint8(settingsIdx++);
+                break;
+            case MSPCodes.MSP2_INAV_CUSTOM_OSD_ELEMENT:        
+                var customElement = {
+                    customElementItems: [],
+                    customElementVisibility: {type: 0, value: 0},
+                    customElementText: [],
+                };
 
-                for (i = 0; i < FC.OSD_CUSTOM_ELEMENTS .settings.customElementsCount; i++){
-                    var customElement = {
-                        customElementItems: [],
-                        customElementVisibility: {type: 0, value: 0},
-                        customElementText: [],
-                    };
+                let index = 0;
 
-                    for (let ii = 0; ii < FC.OSD_CUSTOM_ELEMENTS .settings.customElementsCount; ii++){
-                        var customElementPart = {type: 0,  value: 0,};
-                        customElementPart.type = data.getUint8(index++);
-                        customElementPart.value = data.getUint16(index, true);
-                        index += 2;
-                        customElement.customElementItems.push(customElementPart);
-                    }
-
-                    customElement.customElementVisibility.type = data.getUint8(index++);
-                    customElement.customElementVisibility.value = data.getUint16(index, true);
+                for (let ii = 0; ii < FC.OSD_CUSTOM_ELEMENTS.settings.customElementParts; ii++) {
+                    var customElementPart = {type: 0,  value: 0,};
+                    customElementPart.type = data.getUint8(index++);
+                    customElementPart.value = data.getUint16(index, true);
                     index += 2;
-
-                    for (let ii = 0; ii < FC.OSD_CUSTOM_ELEMENTS .settings.customElementTextSize; ii++){
-                        var char = data.getUint8(index++);
-                        if(char === 0){
-                            index += (FC.OSD_CUSTOM_ELEMENTS .settings.customElementTextSize - 1) - ii;
-                            break;
-                        }
-                        customElement.customElementText[ii] = char;
-                    }
-
-                    customElement.customElementText = String.fromCharCode(...customElement.customElementText);
-
-                    FC.OSD_CUSTOM_ELEMENTS .items.push(customElement)
+                    customElement.customElementItems.push(customElementPart);
                 }
+
+                customElement.customElementVisibility.type = data.getUint8(index++);
+                customElement.customElementVisibility.value = data.getUint16(index, true);
+                index += 2;
+
+                for (let ii = 0; ii < FC.OSD_CUSTOM_ELEMENTS.settings.customElementTextSize; ii++) {
+                    var char = data.getUint8(index++);
+                    if(char === 0) {
+                        index += (FC.OSD_CUSTOM_ELEMENTS.settings.customElementTextSize - 1) - ii;
+                        break;
+                    }
+                    customElement.customElementText[ii] = char;
+                }
+
+                customElement.customElementText = String.fromCharCode(...customElement.customElementText);
+
+                FC.OSD_CUSTOM_ELEMENTS.items.push(customElement);
                 break;
             case MSPCodes.MSP2_INAV_GPS_UBLOX_COMMAND:
                 // Just and ACK from the fc.
@@ -2475,7 +2478,17 @@ var mspHelper = (function () {
     };
 
     self.loadOsdCustomElements = function (callback) {
-        MSP.send_message(MSPCodes.MSP2_INAV_CUSTOM_OSD_ELEMENTS, false, false, callback);
+        MSP.send_message(MSPCodes.MSP2_INAV_CUSTOM_OSD_ELEMENTS, false, false, nextCustomOSDElement);
+
+        var cosdeIdx = 0;
+
+        function nextCustomOSDElement() {
+            if (cosdeIdx < FC.OSD_CUSTOM_ELEMENTS .settings.customElementsCount - 1) {
+                MSP.send_message(MSPCodes.MSP2_INAV_CUSTOM_OSD_ELEMENT, [cosdeIdx++], false, nextCustomOSDElement);
+            } else {
+                MSP.send_message(MSPCodes.MSP2_INAV_CUSTOM_OSD_ELEMENT, [cosdeIdx++], false, callback);
+            }
+        }
     }
 
     self.sendModeRanges = function (onCompleteCallback) {
