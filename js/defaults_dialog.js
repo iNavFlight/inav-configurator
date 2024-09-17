@@ -1247,9 +1247,9 @@ helper.defaultsDialog = (function () {
         });
         
         let timeOut0 = setTimeout(profileChainer[0].execute, 2000);
-        let timeOut1 = setTimeout(profileChainer[1].execute, 6000);
-        let timeOut2 = setTimeout(profileChainer[2].execute, 12000);
-        let timeOut3 = setTimeout(settingsChainer.execute, 18000);
+        let timeOut1 = setTimeout(profileChainer[1].execute, 9000);
+        let timeOut2 = setTimeout(profileChainer[2].execute, 16000);
+        let timeOut3 = setTimeout(settingsChainer.execute, 23000);
     }
 
     privateScope.onPresetClick = function (event) {
