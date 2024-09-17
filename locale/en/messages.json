@@ -5966,6 +5966,15 @@
     "toogleConfiguratorTheme": {
         "message": "Toggle configurator theme"
     },
+    "toogleConfiguratorThemeHeaderNavbar": {
+        "message": "Header & Navbar appearance"
+    },
+    "configuratorThemeHeaderNavbarDefault": {
+        "message": "Default"
+    },
+    "configuratorThemeHeaderNavbarInverted": {
+        "message": "Inverted"
+    },
     "adsbVehicleTotalMessages": {
         "message": "Vehicle msgs"
     },
