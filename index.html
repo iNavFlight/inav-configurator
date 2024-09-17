@@ -21,12 +21,13 @@
 <body>
 
 <div class="app-container">
-    <div class="app-header p-3" data-bs-theme="dark">
+    <div class="app-header p-3" data-theme-override data-bs-theme="dark">
         <div class="logotype d-flex">
             <div class="logo">
-                <img src="./images/light-wide-2.svg" alt="Logo">
+                <img src="images/cf_logo_white.svg" class="d-none-dark" alt="Logo"/>
+                <img src="images/cf_logo_black.svg" class="d-none-light" alt="Logo"/>
             </div>
-            <div class="versions text-muted d-flex flex-column justify-content-end lh-1">
+            <div class="versions text-muted d-flex flex-column justify-content-end lh-1 ms-1">
                 <div>
 <!--                    <small i18n="mainLogoText"></small>-->
                     <small data-configurator-version-info></small>
@@ -220,11 +221,11 @@
         </div>
 
     </div>
-    <div id="logs" class="app-logs lh-lg" data-bs-theme="dark">
+    <div id="logs" class="app-logs lh-lg" data-theme-override data-bs-theme="dark">
         <span id="logs-toggle" class="logs-toggle px-2 text-muted lh-lg bg-body-tertiary" i18n="mainShowLog"></span>
-        <div id="logs-stream" class="px-3"></div>
+        <div id="logs-stream" class="logs-stream px-3"></div>
     </div>
-    <div class="app-sidebar" data-bs-theme="dark">
+    <div class="app-sidebar" data-theme-override data-bs-theme="dark">
 
         <div id="tabs">
             <ul class="mode-disconnected sidebar-nav nav flex-column">

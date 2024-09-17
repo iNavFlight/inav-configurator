@@ -2,60 +2,75 @@
 
 const darkMode = {};
 
-function getPreferredTheme() {
+function setTheme(theme, override = true) {
+    if (override) {
+        localStorage.setItem('theme', theme); // auto, dark, light
+    }
+
+    let currentTheme = getCurrentTheme();
+    setThemeAttr(currentTheme);
+    setThemeAppearance(localStorage.getItem('theme-appearance'), false);
+}
+
+function setThemeAppearance(theme, override = true) {
+    if (override) {
+        localStorage.setItem('theme-appearance', theme);
+    }
+
+    let currentTheme = getCurrentTheme();
+    if (currentTheme === 'dark') {
+        theme = 'dark';
+    }
+
+    let elementsWithCustomTheme = document.querySelectorAll('[data-theme-override]');
+    setThemeAttr(theme, elementsWithCustomTheme);
+}
+
+function getCurrentTheme() {
     const storedTheme = localStorage.getItem('theme')
-    if (storedTheme) {
-        return storedTheme
+    if (storedTheme === 'auto' || (storedTheme !== 'dark' && storedTheme !== 'light')) {
+        return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
     }
-    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+    return storedTheme;
 }
 
-function setTheme(theme) {
-    if (theme === 'auto') {
-        document.documentElement.setAttribute('data-bs-theme', (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'))
-    } else {
-        document.documentElement.setAttribute('data-bs-theme', theme)
-    }
+function setThemeAttr(theme, elements = [document.documentElement]) {
+    elements.forEach(el => el.setAttribute('data-bs-theme', theme))
 }
 
-function showActiveTheme(theme) {
-    const themeSwitcher = document.getElementById('configurator-theme-select')
-    if (!themeSwitcher) {
-        return
+function setDefaults() {
+    let storedTheme = localStorage.getItem('theme')
+    let storedThemeAppearance = localStorage.getItem('theme-appearance')
+    if (!['auto', 'dark', 'light'].includes(storedTheme)) {
+        localStorage.setItem('theme', 'auto')
     }
-    themeSwitcher.value = theme
-}
-
-function setConfiguratorTheme(theme) {
-    localStorage.setItem('theme', theme)
-    setTheme(theme)
-    showActiveTheme(theme)
+    if (!['dark', 'light'].includes(storedThemeAppearance)) {
+        localStorage.setItem('theme-appearance', 'dark')
+    }
 }
 
 darkMode.init = function () {
-    setConfiguratorTheme(getPreferredTheme())
+    setDefaults();
+    setTheme(localStorage.getItem('theme'));
 
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
         const storedTheme = localStorage.getItem('theme')
         if (storedTheme !== 'light' && storedTheme !== 'dark') {
-            setTheme(getPreferredTheme())
+            setTheme(getCurrentTheme(), false)
         }
     })
-
-    window.addEventListener('DOMContentLoaded', () => {
-        showActiveTheme(getPreferredTheme())
-        document.getElementById('configurator-theme-select').addEventListener('change', (event) => {
-            setConfiguratorTheme(event.target.value)
-        })
-    })
 }
 
-darkMode.getPreferredTheme = function () {
-    return getPreferredTheme();
+darkMode.setTheme = function (theme) {
+    return setTheme(theme)
 }
 
-darkMode.setConfiguratorTheme = function (theme) {
-    setConfiguratorTheme(theme)
+darkMode.setThemeAppearance = function (theme) {
+    return setThemeAppearance(theme)
+}
+
+darkMode.getCurrentTheme = function () {
+    return getCurrentTheme()
 }
 
 module.exports = darkMode

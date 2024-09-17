@@ -197,13 +197,15 @@ $(function() {
                 el.addClass('active');
                 el.after('<div id="options-window" class="mh-100 shadow overflow-auto"></div>');
 
-                $('div#options-window').load('./tabs/options.html', function () {
-                    // Set current value of configurator theme
-                    darkMode.setConfiguratorTheme(darkMode.getPreferredTheme());
-                    document.getElementById('options-window').setAttribute('data-bs-theme', darkMode.getPreferredTheme())
-
+                $('#options-window').load('./tabs/options.html', function () {
                     // translate to user-selected language
                     i18n.localize();
+
+                    // Set current value of configurator theme
+                    $('#options-window').attr('data-bs-theme', darkMode.getCurrentTheme())
+                    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+                        $('#options-window').attr('data-bs-theme', darkMode.getCurrentTheme())
+                    })
 
                     // if notifications are enabled, or wasn't set, check the notifications checkbox
                     if (store.get('update_notify', true)) {
@@ -234,6 +236,8 @@ $(function() {
                         CliAutoComplete.setEnabled($(this).is(':checked'));
                     });
 
+                    $('#configurator-theme-select').val(localStorage.getItem('theme'));
+                    $('#configurator-theme-header-navbar-select').val(localStorage.getItem('theme-appearance'));
                     $('#ui-unit-type').val(globalSettings.unitType);
                     $('#map-provider-type').val(globalSettings.mapProviderType);
                     $('#map-api-key').val(globalSettings.mapApiKey);
@@ -270,8 +274,11 @@ $(function() {
                         activeTab.find('a').trigger( "click" );
                     });
                     $('#configurator-theme-select').on('change', function () {
-                        darkMode.setConfiguratorTheme($(this).val());
-                        document.getElementById('options-window').setAttribute('data-bs-theme', darkMode.getPreferredTheme())
+                        darkMode.setTheme($(this).val())
+                        $('#options-window').attr('data-bs-theme', darkMode.getCurrentTheme())
+                    });
+                    $('#configurator-theme-header-navbar-select').on('change', function () {
+                        darkMode.setThemeAppearance($(this).val());
                     });
                     $('#map-provider-type').on('change', function () {
                         store.set('map_provider_type', $(this).val());
