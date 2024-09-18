@@ -1250,11 +1250,11 @@ helper.defaultsDialog = (function () {
             privateScope.finalize(selectedDefaultPreset);
         });
 
-        let timeout = (miscChain.length * 150) + 2000;    
+        let timeout = (miscChain.length * 250) + 7000;    
         let timeOut0 = setTimeout(profileChainer[0].execute, timeout);
-        timeout+= (profileChain[0].length * 150) + 4000;
+        timeout+= (profileChain[0].length * 250) + 5000;
         let timeOut1 = setTimeout(profileChainer[1].execute, timeout);
-        timeout+= (profileChain[1].length * 150) + 4000;
+        timeout+= (profileChain[1].length * 250) + 5000;
         let timeOut2 = setTimeout(profileChainer[2].execute, timeout);
     }
 
