@@ -88,10 +88,10 @@
     border-radius: 4px;
 }
 
-.tab-osd ul li {
-    list-style: circle;
-    margin-left: 30px;
-}
+/*.tab-osd ul li {*/
+/*    list-style: circle;*/
+/*    margin-left: 30px;*/
+/*}*/
 
 .tab-osd .options {
     position: relative;
@@ -359,10 +359,10 @@
     top: .8em;
 }
 
-.tab-osd .display-field {
-    padding: 4px;
-    border-bottom: var(--inav-border-width) var(--inav-border-color) solid;
-}
+/*.tab-osd .display-field {*/
+/*    padding: 4px;*/
+/*    border-bottom: var(--inav-border-width) var(--inav-border-color) solid;*/
+/*}*/
 
 .tab-osd .display-field.mouseover {
     background: #fff;
@@ -381,20 +381,20 @@
 
 }
 
-.tab-osd .display-field label {
-    margin-left: 5px;
+/*.tab-osd .display-field label {*/
+/*    margin-left: 5px;*/
 
-}
+/*}*/
 
-.tab-osd .display-fields {
-    float: left;
-    margin-top: 5px;
-    margin-bottom: 8px;
-    width: 100%;
-}
+/*.tab-osd .display-fields {*/
+/*    float: left;*/
+/*    margin-top: 5px;*/
+/*    margin-bottom: 8px;*/
+/*    width: 100%;*/
+/*}*/
 
-.spacer_box_title span {
-}
+/*.spacer_box_title span {*/
+/*}*/
 
 .spacer_box div input[type="radio"] {
     margin-right: 5px;
@@ -672,7 +672,7 @@
 
 .no-bottom {
     border-bottom: none !important;
-    padding-bottom: 0 i !important;
+    /*padding-bottom: 0 i !important;*/
 }
 
 @media only screen and (max-width: 1055px) , only screen and (max-device-width: 1055px) {
@@ -681,21 +681,21 @@
     }
 }
 
-.osd__elements {
-    margin-bottom: 3em;
-}
+/*.osd__elements {*/
+/*    margin-bottom: 3em;*/
+/*}*/
 
-.osd_layouts {
-    display: inline-block;
-    margin-bottom: 1em;
-    width: auto !important;
-}
+/*.osd_layouts {*/
+/*    display: inline-block;*/
+/*    margin-bottom: 1em;*/
+/*    width: auto !important;*/
+/*}*/
 
-.osd_search {
-    float: right;
-    width: auto !important;
-    margin-right: 0 !important;
-}
+/*.osd_search {*/
+/*    float: right;*/
+/*    width: auto !important;*/
+/*    margin-right: 0 !important;*/
+/*}*/
 
 .tab-osd label > .i18n-replaced {
     display: inline-block;
