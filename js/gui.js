@@ -261,20 +261,22 @@ GUI_control.prototype.updateStatusBar = function() {
 };
 
 GUI_control.prototype.updateProfileChange = function(refresh) {
-    $('#mixerprofilechange').val(CONFIG.mixer_profile);
-    $('#profilechange').val(CONFIG.profile);
-    $('#batteryprofilechange').val(CONFIG.battery_profile);
-    if (refresh > 0) {
-        if (refresh & mspHelper.PROFILES_CHANGED.MIXER) {
-            GUI.log(chrome.i18n.getMessage('loadedMixerProfile', [CONFIG.mixer_profile + 1]));
+    if ((processingDefaults != undefined && processingDefaults === true) === false) {
+        $('#mixerprofilechange').val(CONFIG.mixer_profile);
+        $('#profilechange').val(CONFIG.profile);
+        $('#batteryprofilechange').val(CONFIG.battery_profile);
+        if (refresh > 0) {
+            if (refresh & mspHelper.PROFILES_CHANGED.MIXER) {
+                GUI.log(chrome.i18n.getMessage('loadedMixerProfile', [CONFIG.mixer_profile + 1]));
+            }
+            if (refresh & mspHelper.PROFILES_CHANGED.CONTROL) {
+                GUI.log(chrome.i18n.getMessage('pidTuning_LoadedProfile', [CONFIG.profile + 1]));
+            }
+            if (refresh & mspHelper.PROFILES_CHANGED.BATTERY) {
+                GUI.log(chrome.i18n.getMessage('loadedBatteryProfile', [CONFIG.battery_profile + 1]));
+            }
+            updateActivatedTab();
         }
-        if (refresh & mspHelper.PROFILES_CHANGED.CONTROL) {
-            GUI.log(chrome.i18n.getMessage('pidTuning_LoadedProfile', [CONFIG.profile + 1]));
-        }
-        if (refresh & mspHelper.PROFILES_CHANGED.BATTERY) {
-            GUI.log(chrome.i18n.getMessage('loadedBatteryProfile', [CONFIG.battery_profile + 1]));
-        }
-        updateActivatedTab();
     }
 };
 
