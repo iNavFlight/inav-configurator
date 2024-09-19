@@ -137,7 +137,8 @@ SYM.ALERT = 0xDD;
 SYM.CROSS_TRACK_ERROR = 0xFC;
 SYM.ADSB = 0xFD;
 SYM.PAN_SERVO_IS_OFFSET_L = 0x1C7;
-SYM.ODOMETER = 0X168;
+SYM.ODOMETER = 0x168;
+SYM.BLACKBOX = 0xFE;
 SYM.PILOT_LOGO_SML_L = 0x1D5;
 SYM.PILOT_LOGO_SML_C = 0x1D6;
 SYM.PILOT_LOGO_SML_R = 0x1D7;
@@ -1066,7 +1067,15 @@ OSD.constants = {
                     id: 144,
                     min_version: '6.0.0',
                     preview: '0 WARNINGS'
-                }
+                },
+                {
+                    name: 'BLACKBOX',
+                    id: 149,
+                    min_version: '8.0.0',
+                    preview: function(osd_data) {
+                        return FONT.symbol(SYM.BLACKBOX) + FONT.embed_dot('000123');
+                    }
+                },
             ]
         },
         {
