@@ -3,6 +3,7 @@
 
 var helper = helper || {};
 var savingDefaultsModal;
+var processingDefaults = false;
 
 helper.defaultsDialog = (function () {
 
@@ -1130,6 +1131,7 @@ helper.defaultsDialog = (function () {
     };
 
     privateScope.finalize = function (selectedDefaultPreset) {
+        processingDefaults = false;
         mspHelper.saveToEeprom(function () {
             //noinspection JSUnresolvedVariable
             GUI.log(chrome.i18n.getMessage('configurationEepromSaved'));
@@ -1206,9 +1208,6 @@ helper.defaultsDialog = (function () {
             ]);
         }
 
-        settingsChainer.setChain(miscChain);
-        settingsChainer.execute();
-
         // Set profiles
 
         for (let ps = 0; ps < 3; ps++) {
@@ -1242,20 +1241,29 @@ helper.defaultsDialog = (function () {
             MSP.send_message(MSPCodes.MSP2_INAV_SELECT_BATTERY_PROFILE, [currentBatteryProfile], false, callback);
         });
 
+
         for (let pc = 0; pc < 3; pc++) {
             profileChainer[pc].setChain(profileChain[pc]);
+
+            if (pc < 2) {
+                profileChainer[pc].setExitPoint(function () {
+                    profileChainer[pc+1].execute();
+                });
+            }
         }
 
+        processingDefaults = true;
+        settingsChainer.setChain(miscChain);
+        settingsChainer.setExitPoint(function () {
+            updateActivatedTab();
+            profileChainer[0].execute();
+        });
+        settingsChainer.execute();
+
         profileChainer[2].setExitPoint(function () {
+            updateActivatedTab();
             privateScope.finalize(selectedDefaultPreset);
         });
-
-        let timeout = (miscChain.length * 150) + 2000;    
-        let timeOut0 = setTimeout(profileChainer[0].execute, timeout);
-        timeout+= (profileChain[0].length * 150) + 4000;
-        let timeOut1 = setTimeout(profileChainer[1].execute, timeout);
-        timeout+= (profileChain[1].length * 150) + 4000;
-        let timeOut2 = setTimeout(profileChainer[2].execute, timeout);
     }
 
     privateScope.onPresetClick = function (event) {

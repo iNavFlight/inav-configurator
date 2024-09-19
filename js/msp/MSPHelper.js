@@ -4,6 +4,12 @@
 var mspHelper = (function (gui) {
     var self = {};
 
+    self.PROFILES_CHANGED = {
+        'CONTROL' : 1,
+        'BATTERY' : 2,
+        'MIXER'   : 4
+    };
+
     self.BAUD_RATES_post1_6_3 = [
         'AUTO',
         '1200',
@@ -69,7 +75,7 @@ var mspHelper = (function (gui) {
             color;
         if (!dataHandler.unsupported || dataHandler.unsupported) switch (dataHandler.code) {
             case MSPCodes.MSPV2_INAV_STATUS:
-                let profile_changed = false;
+                let profile_changed = 0;
                 CONFIG.cycleTime = data.getUint16(offset, true);
                 offset += 2;
                 CONFIG.i2cError = data.getUint16(offset, true);
@@ -81,11 +87,15 @@ var mspHelper = (function (gui) {
 
                 profile_byte = data.getUint8(offset++)
                 let profile = profile_byte & 0x0F;
-                profile_changed |= (profile !== CONFIG.profile) && (CONFIG.profile !==-1);
+                if ((profile !== CONFIG.profile) && (CONFIG.profile !==-1)) {
+                    profile_changed |= this.PROFILES_CHANGED.CONTROL;
+                }
                 CONFIG.profile = profile;
 
                 let battery_profile = (profile_byte & 0xF0) >> 4;
-                profile_changed |= (battery_profile !== CONFIG.battery_profile) && (CONFIG.battery_profile !==-1);
+                if ((battery_profile !== CONFIG.battery_profile) && (CONFIG.battery_profile !==-1)) {
+                    profile_changed |= this.PROFILES_CHANGED.BATTERY;
+                }
                 CONFIG.battery_profile = battery_profile;
 
                 CONFIG.armingFlags = data.getUint32(offset, true);
@@ -95,7 +105,9 @@ var mspHelper = (function (gui) {
                 //read mixer profile as the last byte in the the message
                 profile_byte = data.getUint8(dataHandler.message_length_expected - 1);
                 let mixer_profile = profile_byte & 0x0F;
-                profile_changed |= (mixer_profile !== CONFIG.mixer_profile) && (CONFIG.mixer_profile !==-1);
+                if ((mixer_profile !== CONFIG.mixer_profile) && (CONFIG.mixer_profile !==-1)) {
+                    profile_changed |= this.PROFILES_CHANGED.MIXER;
+                }
                 CONFIG.mixer_profile = mixer_profile;
 
                 gui.updateStatusBar();
