@@ -3395,7 +3395,7 @@
         "message": "Waypoint Tracking Accuracy"
     },
     "wpTrackingAccuracyHelp": {
-        "message": "How precise the craft tries to follow a waypoint track. Lower values means higher precision but can cause overshoots. 6 is a good starting point [0-10]."
+        "message": "Tracking deadband - how closely the craft follows a waypoint track in meters. Lower values track more closely but cause more control corrections. 2 is a good starting point [0-10]."
     },
     "wpTrackingAngle": {
         "message": "Waypoint Tracking Angle"
@@ -3627,6 +3627,9 @@
     },
     "osd_custom_element_settings": {
         "message": "Custom OSD elements"
+    },
+    "osd_custom_element_settings_HELP": {
+        "message": "You can find the icon numbers by clicking this help button."
     },
     "custom_element": {
         "message": "Custom element"
@@ -4243,6 +4246,9 @@
     "osdPanServoOffcentreWarning_HELP": {
         "message": "Degrees either side of the pan servo centre; where it is assumed camera is wanted to be facing forwards, but isn't at 0. If in this range and not 0 for longer than 10 seconds, the pan servo offset OSD element will blink. 0 means the warning is disabled."
     },
+    "osdGroupOSDCustomElements": {
+        "message": "OSD Custom Elements"
+    },
     "osdGroupGVars": {
         "message": "Global Variables"
     },
@@ -4332,6 +4338,9 @@
     },
     "osd_switch_indicator_settings": {
         "message": "Switch Indicator Settings"
+    },
+    "osd_switch_indicator_settings_HELP": {
+        "message": "It is recommended to use the Custom OSD Elements as a replacemtent for switch indicators. They are much more powerful. Click to see an example."
     },
     "osd_switch_indicators_align_left": {
         "message": "Align switch names to left of switches"
