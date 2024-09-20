@@ -10,6 +10,10 @@
         "message": "English",
         "_comment": "Don't translate!"
     },
+    "language_uk": {
+        "message": "українська",
+        "_comment": "Don't translate!"
+    },
     "language": {
         "message": "Language"
     },
