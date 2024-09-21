@@ -20,6 +20,7 @@ $min-contrast-ratio: 2;
 $spacer: .75rem;
 $input-btn-padding-y: .25rem;
 $input-btn-padding-x: .5rem;
+$form-select-bg-position: right #{$input-btn-padding-x / 2} center !default;
 
 $nav-link-padding-y: .33rem;
 $nav-link-padding-x: .5rem;
