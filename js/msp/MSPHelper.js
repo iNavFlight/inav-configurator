@@ -73,7 +73,7 @@ var mspHelper = (function () {
             color;
         if (!dataHandler.unsupported || dataHandler.unsupported) switch (dataHandler.code) {
             case MSPCodes.MSPV2_INAV_STATUS:
-                let profile_changed = false;
+                let profile_changed = 0;
                 FC.CONFIG.cycleTime = data.getUint16(offset, true);
                 offset += 2;
                 FC.CONFIG.i2cError = data.getUint16(offset, true);
@@ -85,11 +85,15 @@ var mspHelper = (function () {
 
                 let profile_byte = data.getUint8(offset++)
                 let profile = profile_byte & 0x0F;
-                profile_changed |= (profile !== FC.CONFIG.profile) && (FC.CONFIG.profile !==-1);
+                if (profile !== FC.CONFIG.profile) {
+                    profile_changed |= GUI.PROFILES_CHANGED.CONTROL;
+                }
                 FC.CONFIG.profile = profile;
 
                 let battery_profile = (profile_byte & 0xF0) >> 4;
-                profile_changed |= (battery_profile !== FC.CONFIG.battery_profile) && (FC.CONFIG.battery_profile !==-1);
+                if (battery_profile !== FC.CONFIG.battery_profile) {
+                    profile_changed |= GUI.PROFILES_CHANGED.BATTERY;
+                }
                 FC.CONFIG.battery_profile = battery_profile;
 
                 FC.CONFIG.armingFlags = data.getUint32(offset, true);
@@ -99,11 +103,14 @@ var mspHelper = (function () {
                 //read mixer profile as the last byte in the the message
                 profile_byte = data.getUint8(dataHandler.message_length_expected - 1);
                 let mixer_profile = profile_byte & 0x0F;
-                profile_changed |= (mixer_profile !== FC.CONFIG.mixer_profile) && (FC.CONFIG.mixer_profile !==-1);
+                if (mixer_profile !== FC.CONFIG.mixer_profile) {
+                    profile_changed |= GUI.PROFILES_CHANGED.MIXER;
+                }
                 FC.CONFIG.mixer_profile = mixer_profile;
-
                 GUI.updateStatusBar();
-                GUI.updateProfileChange(profile_changed);
+                if (profile_changed > 0) {
+                    GUI.updateProfileChange(profile_changed);
+                }
                 break;
 
             case MSPCodes.MSP_ACTIVEBOXES:

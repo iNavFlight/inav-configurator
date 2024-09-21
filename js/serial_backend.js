@@ -97,7 +97,6 @@ var SerialBackend = (function () {
 
                 }, 7000);
             } else {
-
                 timeout.add('waiting_for_bootup', function waiting_for_bootup() {
                     MSP.send_message(MSPCodes.MSPV2_INAV_STATUS, false, false, function () {
                         //noinspection JSUnresolvedVariable
