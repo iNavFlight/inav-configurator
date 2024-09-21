@@ -26,6 +26,13 @@
   }
 }
 
+// .h-1r, .h-2r ... .h-20r
+@for $i from 1 through 25 {
+  .min-h-#{$i}r {
+    min-height: #{$i}rem;
+  }
+}
+
 
 [data-bs-theme="light"] .d-none-dark {
   display: none !important;
