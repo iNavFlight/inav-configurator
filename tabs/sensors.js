@@ -147,67 +147,11 @@ TABS.sensors.initialize = function (callback) {
         lines.attr('d', graphHelpers.line);
     }
 
-    function plot_gyro(enable) {
+    function plotDataSensor(sensor, enable) {
         if (enable) {
-            $('.wrapper.gyro').show();
+            $(`#data-graph-${sensor}`).show();
         } else {
-            $('.wrapper.gyro').hide();
-        }
-    }
-
-    function plot_accel(enable) {
-        if (enable) {
-            $('.wrapper.accel').show();
-        } else {
-            $('.wrapper.accel').hide();
-        }
-    }
-
-    function plot_mag(enable) {
-        if (enable) {
-            $('.wrapper.mag').show();
-        } else {
-            $('.wrapper.mag').hide();
-        }
-    }
-
-    function plot_altitude(enable) {
-        if (enable) {
-            $('.wrapper.altitude').show();
-        } else {
-            $('.wrapper.altitude').hide();
-        }
-    }
-
-    function plot_sonar(enable) {
-        if (enable) {
-            $('.wrapper.sonar').show();
-        } else {
-            $('.wrapper.sonar').hide();
-        }
-    }
-
-    function plot_airspeed(enable) {
-        if (enable) {
-            $('.wrapper.airspeed').show();
-        } else {
-            $('.wrapper.airspeed').hide();
-        }
-    }
-
-    function plot_temperature(enable) {
-        if (enable) {
-            $('.wrapper.temperature').show();
-        } else {
-            $('.wrapper.temperature').hide();
-        }
-    }
-
-    function plot_debug(enable) {
-        if (enable) {
-            $('.wrapper.debug').show();
-        } else {
-            $('.wrapper.debug').hide();
+            $(`#data-graph-${sensor}`).hide();
         }
     }
 
@@ -233,35 +177,10 @@ TABS.sensors.initialize = function (callback) {
         }
 
         $('.tab-sensors .info .checkboxes input').on('change', function () {
-            var enable = $(this).prop('checked');
-            var index = $(this).parent().index();
+            let enable = $(this).prop('checked');
+            let sensorName = $(this).attr('id').replace('-checkbox', '');
 
-            switch (index) {
-                case 0:
-                    plot_gyro(enable);
-                    break;
-                case 1:
-                    plot_accel(enable);
-                    break;
-                case 2:
-                    plot_mag(enable);
-                    break;
-                case 3:
-                    plot_altitude(enable);
-                    break;
-                case 4:
-                    plot_sonar(enable);
-                    break;
-                case 5:
-                    plot_airspeed(enable);
-                    break;
-                case 6:
-                    plot_temperature(enable);
-                    break;
-                case 7:
-                    plot_debug(enable);
-                    break;
-            }
+            plotDataSensor(sensorName, enable);
 
             var checkboxes = [];
             $('.tab-sensors .info .checkboxes input').each(function () {
@@ -555,7 +474,7 @@ TABS.sensors.initialize = function (callback) {
             }
         }
 
-        $("a.debug-trace").on('click', function () {
+        $("#open-debug-trace").on('click', function () {
            var debugWin = window.open("tabs/debug_trace.html", "receiver_msp", "width=500,height=510,menubar=no,contextIsolation=no,nodeIntegration=yes");
            debugWin.window.getDebugTrace = function () { return FC.DEBUG_TRACE || ''; };
         });
