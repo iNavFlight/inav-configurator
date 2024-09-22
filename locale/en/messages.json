@@ -1706,6 +1706,15 @@
     "loadedBatteryProfile": {
         "message": "Loaded Battery Profile: <strong class='text-primary'>$1</strong>"
     },
+    "setControlProfile" : {
+        "message": "Set Control Profile: <strong style=\"color: #37a8db\">$1</strong>"
+    },
+    "setMixerProfile": {
+        "message": "Setting Mixer Profile: <strong style=\"color: #37a8db\">$1</strong>"
+    },
+    "setBatteryProfile": {
+        "message": "Setting Battery Profile: <strong style=\"color: #37a8db\">$1</strong>"
+    },
     "pidTuningDataRefreshed": {
         "message": "PID data <strong>refreshed</strong>"
     },

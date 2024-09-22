@@ -415,7 +415,7 @@ $(function() {
         mixerprofile_e.on('change', function () {
             var mixerprofile = parseInt($(this).val());
             MSP.send_message(MSPCodes.MSP2_INAV_SELECT_MIXER_PROFILE, [mixerprofile], false, function () {
-                GUI.log(i18n.getMessage('loadedMixerProfile', [mixerprofile + 1]));
+                GUI.log(i18n.getMessage('setMixerProfile', [mixerprofile + 1]));
                 MSP.send_message(MSPCodes.MSP_SET_REBOOT, false, false, function () {
                     GUI.log(i18n.getMessage('deviceRebooting'));
                     GUI.handleReconnect();
@@ -428,7 +428,7 @@ $(function() {
         profile_e.on('change', function () {
             var profile = parseInt($(this).val());
             MSP.send_message(MSPCodes.MSP_SELECT_SETTING, [profile], false, function () {
-                GUI.log(i18n.getMessage('pidTuning_LoadedProfile', [profile + 1]));
+                GUI.log(i18n.getMessage('setControlProfile', [profile + 1]));
             });
         });
 
@@ -437,7 +437,7 @@ $(function() {
         batteryprofile_e.on('change', function () {
             var batteryprofile = parseInt($(this).val());
             MSP.send_message(MSPCodes.MSP2_INAV_SELECT_BATTERY_PROFILE, [batteryprofile], false, function () {
-                GUI.log(i18n.getMessage('loadedBatteryProfile', [batteryprofile + 1]));
+                GUI.log(i18n.getMessage('setBatteryProfile', [batteryprofile + 1]));
             });
         });
 

@@ -114,6 +114,10 @@ const mspQueue = require('./serial_queue');
         stoppped = true;
     }
 
+    publicScope.resume = function() {
+        stoppped = false;
+    }
+
     return publicScope;
 })();
 
