@@ -36,18 +36,22 @@ TABS.failsafe.initialize = function (callback, scrollPosition) {
             $('#content').scrollTop((scrollPosition) ? scrollPosition : 0);
 
             // set stage 2 failsafe procedure
+            let isFirstInit = true;
             $('#procedure').on('change', function() {
                 let procedure = $('#procedure').val();
                 if (procedure === 'land') {
+                    $('#land-procedure-adjustments').slideDown(isFirstInit ? 0 : 125);
                     $('input[name="failsafe_throttle"]').prop("disabled", false);
                     $('input[name="failsafe_off_delay"]').prop("disabled", false);
                 } else {
+                    $('#land-procedure-adjustments').slideUp(isFirstInit ? 0 : 125);
                     $('input[name="failsafe_throttle"]').prop("disabled", true);
                     $('input[name="failsafe_off_delay"]').prop("disabled", true);
                 }
                 $('#procedure-visualization')
                     .removeClass('procedure-land procedure-drop procedure-rth procedure-nothing')
                     .addClass('procedure-' + procedure);
+                isFirstInit = false;
             })
 
             // switch (MSPHelper.getSetting('failsafe_procedure')) {  // Use once #7734 is merged
@@ -73,25 +77,29 @@ TABS.failsafe.initialize = function (callback, scrollPosition) {
             $('#failsafe_use_minimum_distance').on('change', function () {
                 if ($(this).is(':checked')) {
                     // No default distance added due to conversions
-                    $('#failsafe_min_distance_elements').show();
-                    $('#failsafe_min_distance_procedure_elements').show();
+                    $('#alternate-procedure-adjustments').slideDown(125);
+                    // $('#failsafe_min_distance_elements').show();
+                    // $('#failsafe_min_distance_procedure_elements').show();
                 } else {
                     // If they uncheck it, clear the distance to 0, which disables this feature
+                    $('#alternate-procedure-adjustments').slideUp(125);
                     $('#failsafe_min_distance').val(0);
-                    $('#failsafe_min_distance_elements').hide();
-                    $('#failsafe_min_distance_procedure_elements').hide();
+                    // $('#failsafe_min_distance_elements').hide();
+                    // $('#failsafe_min_distance_procedure_elements').hide();
                 }
             });
 
             // Set initial state of controls according to data
             if ( $('#failsafe_min_distance').val() > 0) {
                 $('#failsafe_use_minimum_distance').prop('checked', true);
-                $('#failsafe_min_distance_elements').show();
-                $('#failsafe_min_distance_procedure_elements').show();
+                $('#alternate-procedure-adjustments').show(0);
+                // $('#failsafe_min_distance_elements').show();
+                // $('#failsafe_min_distance_procedure_elements').show();
             } else {
                 $('#failsafe_use_minimum_distance').prop('checked', false);
-                $('#failsafe_min_distance_elements').hide();
-                $('#failsafe_min_distance_procedure_elements').hide();
+                $('#alternate-procedure-adjustments').hide(0);
+                // $('#failsafe_min_distance_elements').hide();
+                // $('#failsafe_min_distance_procedure_elements').hide();
             }
 
             $('#save-btn').on('click', function () {
