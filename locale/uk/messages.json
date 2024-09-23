@@ -1697,6 +1697,15 @@
     "loadedBatteryProfile": {
         "message": "Завантажений профіль акумулятора: <strong style=\"color: #37a8db\">$1</strong>"
     },
+    "setControlProfile": {
+        "message": "Встановити профіль керування: <strong style=\"color: #37a8db\">$1</strong>"
+    },
+    "setMixerProfile": {
+        "message": "Встановлення профілю мікшера: <strong style=\"color: #37a8db\">$1</strong>"
+    },
+    "setBatteryProfile": {
+        "message": "Встановлення профілю батареї: <strong style=\"color: #37a8db\">$1</strong>"
+    },
     "pidTuningDataRefreshed": {
         "message": "Дані ПІД <strong>оновлено</strong>"
     },
