@@ -576,7 +576,7 @@
         "message": "Відновити"
     },
     "initialSetupBackupRestoreText": {
-        "message": "<strong>Зробіть резервну копію</strong> вашої конфігурації на випадок аварії, налаштування <strong>CLI</strong> <span style=\"color: red\">не</span> включені - Дивіться команду 'dump' в CLI"
+        "message": "<strong>Зробіть резервну копію</strong> вашої конфігурації на випадок аварії, налаштування <strong>CLI</strong> <span style=\"color: red\">не</span> включені - Дивіться команду командного рядка 'dump'"
     },
     "initialSetupBackupSuccess": {
         "message": "Резервну копію збережено <span style=\"color: #37a8db\">успішно</span>"
@@ -789,7 +789,7 @@
         "message": "Автоматично компенсувати падіння напруги, коли розряджається батарея, щоб стабілізувати тягу"
     },
     "featureSOFTSERIAL": {
-        "message": "Увімкнути послідовні порти на основі CPU"
+        "message": "Увімкнути послідовні порти на основі ЦП"
     },
     "featureSOFTSERIALTip": {
         "message": "Після включення налаштуйте порти у вкладці Порти."
@@ -2232,7 +2232,7 @@
         "message": "Масштаб:"
     },
     "cliInfo": {
-        "message": "<strong>Примітка</strong>: Вихід із вкладки CLI або натискання кнопки Відключити <strong>автоматично</strong> відправить команду <strong>exit</strong> на плату. З останньою версією прошивки це змусить контролер <span style=\"color: red\">перезавантажитися</span>, і незбережені зміни будуть <span style=\"color: red\">втрачені</span>."
+        "message": "<strong>Примітка</strong>: Вихід із вкладки \"Командний рядок\" або натискання кнопки Відключити <strong>автоматично</strong> відправить команду <strong>exit</strong> на плату. З останньою версією прошивки це змусить контролер <span style=\"color: red\">перезавантажитися</span>, і незбережені зміни будуть <span style=\"color: red\">втрачені</span>."
     },
     "cliInputPlaceholder": {
         "message": "Введіть вашу команду тут"
