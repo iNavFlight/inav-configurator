@@ -277,7 +277,7 @@ input[type="number"]::-webkit-inner-spin-button {
 #sensor-status li {
     float: left;
     height: 67px;
-    width: 35px;
+    min-width: 33px;
     line-height: 18px;
     text-align: center;
     border: 1px solid #373737;
@@ -297,9 +297,7 @@ input[type="number"]::-webkit-inner-spin-button {
 #sensor-status li .opflowicon,
 #sensor-status li .sonaricon,
 #sensor-status li .airspeedicon {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    background-position-x: center;
 }
 
 .gyroicon {
