@@ -59,10 +59,10 @@
 /*}*/
 
 /* Help-Icon  */
-.gui_box_titlebar .helpicon {
-    margin-right: 10px;
-    margin-top: 5px !important;
-}
+/*.gui_box_titlebar .helpicon {*/
+/*    margin-right: 10px;*/
+/*    margin-top: 5px !important;*/
+/*}*/
 
 .helpicon {
     float: right;
@@ -73,13 +73,22 @@
     min-width: 14px;
     transition: none;
     background-color: var(--inav-secondary);
-    mask: url("./../../images/icons/cf_icon_info_grey.svg") no-repeat;
+    mask-image: url("./../../images/icons/cf_icon_info.svg");
+    mask-repeat: no-repeat;
+    mask-size: cover;
 }
 
 .helpicon:hover {
     background-color: var(--inav-primary);
     transition: none;
 }
+
+a.helpicon:hover,
+a.helpicon:hover .helpicon {
+    mask-image: url("./../../images/icons/cf_icon_info_external.svg");
+}
+
+
 
 .inputRequiredWarning {
     border: 3px solid var(--inav-danger) !important;
@@ -1634,11 +1643,14 @@ dialog {
 
 /* GPS Fix styling*/
 .fix3d {
-    background-color: #56ac1d;
+    background-color: var(--inav-success);
+    color: var(--inav-white);
+    border-radius: var(--inav-border-radius);
     padding: 2px 5px;
-    border-radius: 3px;
-    color: #fff;
-    font-size: 10px;
+    font-size: .9rem;
+    /*border-radius: 3px;*/
+    /*color: #fff;*/
+    /*font-size: 10px;*/
 }
 
 .fix2d {
