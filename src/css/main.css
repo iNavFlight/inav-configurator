@@ -83,8 +83,7 @@
     transition: none;
 }
 
-a.helpicon:hover,
-a.helpicon:hover .helpicon {
+a.helpiconLink:hover .helpicon {
     mask-image: url("./../../images/icons/cf_icon_info_external.svg");
 }
 
