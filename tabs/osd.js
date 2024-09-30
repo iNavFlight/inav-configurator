@@ -533,7 +533,7 @@ OSD.DjiElements =  {
         "FLYMODE",
         "ESC_TEMPERATURE",
         "ALTITUDE",
-        "VARIO_NUM",
+        "VERTICAL_SPEED_INDICATOR",
         "CROSSHAIRS",
         "HORIZON_SIDEBARS",
         "PITCH_ANGLE",
@@ -1242,7 +1242,7 @@ OSD.constants = {
                         FONT.symbol(SYM.VARIO_UP_2A) + '\n'
                 },
                 {
-                    name: 'VARIO_NUM',
+                    name: 'VERTICAL_SPEED_INDICATOR',
                     id: 26,
                     preview: function(osd_data) {
                         switch (OSD.data.preferences.units) {
