@@ -130,6 +130,13 @@ INAV Configurator is shipped **WITHOUT** API key for Bing Maps. That means: ever
 
 ### How to get the Bing Maps API key
 
+> On May 21, 2024 Microsoft announced that Bing Maps for Enterprise is deprecated and will be retired. Starting from that date
+> new users are unable to get api keys in Bing Maps Dev Center. 
+> 
+> Enterprise account customers can continue to use Bing Maps for Enterprise services until **June 30th, 2028**.
+> 
+> Free (Basic) account customers can continue to use Bing Maps for Enterprise services until **June 30th, 2025**.
+
 1. Go to the Bing Maps Dev Center at [https://www.bingmapsportal.com/](https://www.bingmapsportal.com/).
     * If you have a Bing Maps account, sign in with the Microsoft account that you used to create the account or create a new one. For new accounts, follow the instructions in [Creating a Bing Maps Account](https://msdn.microsoft.com/library/gg650598.aspx).
 1. Select **My keys** under **My Account**.
