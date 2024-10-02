@@ -120,7 +120,7 @@ TABS.receiver.initialize = function (callback) {
 
             channelsWrapper.append(`
                 <div data-channel-name="${name}" class="hstack py-1">
-                    <div class="w-6r">${name}</div>
+                    <div class="w-7r">${name}</div>
                     <div class="progress position-relative flex-fill"
                         style="--inav-progress-height: 1.5rem; --inav-progress-bar-transition: none; --inav-progress-bar-bg: ${channelColors[i]};">
                         <div class="progress-label position-absolute w-100 h-100 text-center fw-bold fs-6" style="line-height: var(--inav-progress-height); ">1500</div>
