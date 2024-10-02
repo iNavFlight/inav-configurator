@@ -634,6 +634,9 @@
     "initialSetupAccelTrimsHead": {
         "message": "Accelerometer trims"
     },
+    "initialSetupHeading": {
+        "message": "Heading:"
+    },
     "initialSetupPitch": {
         "message": "Pitch:"
     },
@@ -5529,28 +5532,28 @@
         "message": "Dataflash: free space"
     },
     "mixerProfile1": {
-        "message": "Mixer Profile 1"
+        "message": "Mixer 1"
     },
     "mixerProfile2": {
-        "message": "Mixer Profile 2"
+        "message": "Mixer 2"
     },
     "sensorProfile1": {
-        "message": "Control Profile 1"
+        "message": "Control 1"
     },
     "sensorProfile2": {
-        "message": "Control Profile 2"
+        "message": "Control 2"
     },
     "sensorProfile3": {
-        "message": "Control Profile 3"
+        "message": "Control 3"
     },
     "sensorBatteryProfile1": {
-        "message": "Battery Profile 1"
+        "message": "Battery 1"
     },
     "sensorBatteryProfile2": {
-        "message": "Battery Profile 2"
+        "message": "Battery 2"
     },
     "sensorBatteryProfile3": {
-        "message": "Battery Profile 3"
+        "message": "Battery 3"
     },
     "sensorStatusGyro": {
         "message": "Gyroscope"
