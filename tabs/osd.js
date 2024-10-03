@@ -2309,24 +2309,6 @@ OSD.updateDisplaySize = function () {
         }
     }
 
-    // set the preview size based on the video type
-    // -- AVATAR
-    $('.third_left').toggleClass('preview_avatar_side', (video_type == 'AVATAR'))
-    $('.preview').toggleClass('preview_avatar cut43_left', (video_type == 'AVATAR'))
-    $('.third_right').toggleClass('preview_avatar_side', (video_type == 'AVATAR'))
-    // -- DJI WTF
-    $('.third_left').toggleClass('preview_dji_hd_side', video_type == 'DJIWTF')
-    $('.preview').toggleClass('preview_dji_hd cut43_left', video_type == 'DJIWTF')
-    $('.third_right').toggleClass('preview_dji_hd_side', video_type == 'DJIWTF')
-    // -- HD ZERO
-    $('.third_left').toggleClass('preview_hdzero_side', (video_type == 'HDZERO'))
-    $('.preview').toggleClass('preview_hdzero cut43_left', (video_type == 'HDZERO'))
-    $('.third_right').toggleClass('preview_hdzero_side', (video_type == 'HDZERO'))
-    // -- BFHDCOMPAT
-    $('.third_left').toggleClass('preview_bfhdcompat_side', (video_type == 'BFHDCOMPAT'))
-    $('.preview').toggleClass('preview_bfhdcompat cut43_left', (video_type == 'BFHDCOMPAT'))
-    $('.third_right').toggleClass('preview_bfhdcompat_side', (video_type == 'BFHDCOMPAT'))
-
     OSD.GUI.updateGuidesView($('#videoGuides').find('input').is(':checked'));
 };
 
@@ -2733,15 +2715,14 @@ OSD.GUI.updateFields = function() {
         }
         var groupContainer = $tmpl.clone().addClass('osd_group').show();
         groupContainer.attr('id', group.name);
-        var groupTitleContainer = groupContainer.find('.spacer_box_title');
+        var groupTitleContainer = groupContainer.find('.card-header');
         var groupTitle = i18n.getMessage(group.name);
         groupTitleContainer.text(groupTitle);
         var groupHelp = i18n.getMessage(group.name + '_HELP');
         if (groupHelp) {
             $('<div class="helpicon cf_tip"></div>')
-                .css('margin-top', '1px')
                 .attr('title', groupHelp)
-                .appendTo(groupTitleContainer.parent())
+                .appendTo(groupTitleContainer)
                 .jBox('Tooltip', {
                     delayOpen: 100,
                     delayClose: 100,
@@ -2757,7 +2738,7 @@ OSD.GUI.updateFields = function() {
             var item = groupItems[jj];
             var itemData = OSD.data.items[item.id];
             var checked = itemData.isVisible ? 'checked' : '';
-            var $field = $('<div class="display-field field-' + item.id + '"/>');
+            var $field = $('<li class="list-group-item hstack display-field field-' + item.id + '"/>');
             var name = item.name;
             var nameKey = 'osdElement_' + name;
             var nameMessage = i18n.getMessage(nameKey);
@@ -2770,24 +2751,18 @@ OSD.GUI.updateFields = function() {
             if (searchTerm.length > 0 && !name.toLowerCase().includes(searchTerm.toLowerCase())) {
                 continue;
             }
-            var help = i18n.getMessage(nameKey + '_HELP');
-            if (help) {
-                $('<div class="helpicon cf_tip"></div>')
-                    .css('margin-top', '1px')
-                    .attr('title', help)
-                    .appendTo($field)
-                    .jBox('Tooltip', {
-                        delayOpen: 100,
-                        delayClose: 100,
-                        position: {
-                            x: 'right',
-                            y: 'center'
-                        },
-                        outside: 'x'
-                    });
-            }
-            $field.append(
-                $('<input type="checkbox" name="' + item.name + '" class="togglesmall"></input>')
+
+            let $switchInputContainer = $(`<div class="form-check form-switch form-switch-sm">`);
+            let $switchInputCheckbox = $(`
+                <input 
+                    name="${item.name}" 
+                    id="${item.name}"
+                    class="form-check-input" 
+                    type="checkbox">
+            `);
+            let $switchInputLabel = $(`<label for="${item.name}" class="form-check-label">${name}</label>`);
+
+            $switchInputCheckbox
                     .data('item', item)
                     .attr('checked', itemData.isVisible)
                     .on('change', function () {
@@ -2811,9 +2786,29 @@ OSD.GUI.updateFields = function() {
 
                         OSD.GUI.saveItem(item);
                     })
-            );
 
-            $field.append('<label for="' + item.name + '" class="char-label">' + name + '</label>');
+            $switchInputContainer.append($switchInputCheckbox);
+            $switchInputContainer.append($switchInputLabel);
+
+            $field.append($switchInputContainer);
+
+            var help = i18n.getMessage(nameKey + '_HELP');
+            if (help) {
+                $('<div class="helpicon cf_tip"></div>')
+                    .css('margin-top', '1px')
+                    .attr('title', help)
+                    .appendTo($field)
+                    .jBox('Tooltip', {
+                        delayOpen: 100,
+                        delayClose: 100,
+                        position: {
+                            x: 'right',
+                            y: 'center'
+                        },
+                        outside: 'x'
+                    });
+            }
+
             if (item.positionable !== false) {
                 $field.append(
                     $('<input type="number" class="' + item.id + ' position"></input>')
@@ -2831,30 +2826,30 @@ OSD.GUI.updateFields = function() {
             $displayFields.append($field);
         }
         if (groupContainer.find('.display-fields').children().length > 0) {
-            $tmpl.parent().append(groupContainer);
+            $('#osd-groups-container').append(groupContainer);
         }
     }
 
     if ($('#videoGuidesToggle').length == false) {
         $('#videoGuides').prepend(
-            $('<input id="videoGuidesToggle" type="checkbox" class="toggle" />')
-            .attr('checked', isGuidesChecked)
-            .on('change', function () {
-                OSD.GUI.updateGuidesView(this.checked);
-                store.set('showOSDGuides', this.checked);
-                OSD.GUI.updatePreviews();
-            })
+            $('<input id="videoGuidesToggle" type="checkbox" class="form-check-input" />')
+                .attr('checked', isGuidesChecked)
+                .on('change', function () {
+                    OSD.GUI.updateGuidesView(this.checked);
+                    store.set('showOSDGuides', this.checked);
+                    OSD.GUI.updatePreviews();
+                })
         );
     }
 
     if ($('#djiUnsupportedElementsToggle').length == false) {
         $('#djiUnsupportedElements').prepend(
-            $('<input id="djiUnsupportedElementsToggle" type="checkbox" class="toggle" />')
-            .attr('checked', HARDWARE.capabilities.isDjiHdFpv && !HARDWARE.capabilities.isMspDisplay)
-            .on('change', function () {
-                OSD.GUI.updateDjiView(this.checked);
-                OSD.GUI.updatePreviews();
-            })
+            $('<input id="djiUnsupportedElementsToggle" type="checkbox" class="form-check-input" />')
+                .attr('checked', HARDWARE.capabilities.isDjiHdFpv && !HARDWARE.capabilities.isMspDisplay)
+                .on('change', function () {
+                    OSD.GUI.updateDjiView(this.checked);
+                    OSD.GUI.updatePreviews();
+                })
         );
     }
 
@@ -2866,23 +2861,6 @@ OSD.GUI.updateFields = function() {
     refreshOSDSwitchIndicators();
     updatePilotAndCraftNames();
     updatePanServoPreview();
-};
-
-OSD.GUI.removeBottomLines = function(){
-    // restore
-    $('.display-field').removeClass('no-bottom');
-    $('.gui_box').each(function(index, gui_box){
-        var elements = $(gui_box).find('.display-fields, .settings').children();
-        var lastVisible = false;
-        elements.each(function(index, element){
-            if ($(element).is(':visible')) {
-                lastVisible = $(element);
-            }
-        });
-        if (lastVisible) {
-            lastVisible.addClass('no-bottom');
-        }
-    });
 };
 
 OSD.GUI.updateDjiMessageElements = function(on) {
@@ -2902,39 +2880,13 @@ OSD.GUI.updateDjiMessageElements = function(on) {
             $(element).removeClass('blue');
         }
     });
-    OSD.GUI.removeBottomLines();
 };
 
 OSD.GUI.updateGuidesView = function(on) {
-    let isHdZero = OSD.constants.VIDEO_TYPES[OSD.data.preferences.video_system] == 'HDZERO';
-    $('.hd_43_margin_left').toggleClass('hdzero_43_left', (isHdZero && on))
-    $('.hd_43_margin_right').toggleClass('hdzero_43_right', (isHdZero && on))
-    $('.hd_3016_box_top').toggleClass('hd_3016_top', (isHdZero && on))
-    $('.hd_3016_box_bottom').toggleClass('hd_3016_bottom', (isHdZero && on))
-    $('.hd_3016_box_left').toggleClass('hd_3016_left', (isHdZero && on))
-    $('.hd_3016_box_right').toggleClass('hd_3016_right', (isHdZero && on))
-
-    let isDJIWTF = OSD.constants.VIDEO_TYPES[OSD.data.preferences.video_system] == 'DJIWTF';
-    $('.hd_43_margin_left').toggleClass('dji_hd_43_left', (isDJIWTF && on))
-    $('.hd_43_margin_right').toggleClass('dji_hd_43_right', (isDJIWTF && on))
-
-    let isAvatar = OSD.constants.VIDEO_TYPES[OSD.data.preferences.video_system] == 'AVATAR';
-    $('.hd_43_margin_left').toggleClass('hd_avatar_43_left', (isAvatar && on))
-    $('.hd_43_margin_right').toggleClass('hd_avatar_43_right', (isAvatar && on))
-    $('.hd_avatar_bottom_bar').toggleClass('hd_avatar_bottom', (isAvatar && on))
-    $('.hd_avatar_storage_box_top').toggleClass('hd_avatar_storagebox_t', (isAvatar && on))
-    $('.hd_avatar_storage_box_bottom').toggleClass('hd_avatar_storagebox_b', (isAvatar && on))
-    $('.hd_avatar_storage_box_left').toggleClass('hd_avatar_storagebox_l', (isAvatar && on))
-    $('.hd_avatar_storage_box_right').toggleClass('hd_avatar_storagebox_r', (isAvatar && on))
-
-    let isBfHdCompat = OSD.constants.VIDEO_TYPES[OSD.data.preferences.video_system] == 'BFHDCOMPAT';
-    $('.hd_43_margin_left').toggleClass('hd_bfhdcompat_43_left', (isBfHdCompat && on));
-    $('.hd_43_margin_right').toggleClass('hd_bfhdcompat_43_right', (isBfHdCompat && on));
-    $('.hd_bfhdcompat_bottom_box').toggleClass('hd_bfhdcompat_bottom', (isBfHdCompat && on));
-    $('.hd_bfhdcompat_storage_box').toggleClass('hd_bfhdcompat_storagebox', (isBfHdCompat && on));
-
-    let isPAL = OSD.constants.VIDEO_TYPES[OSD.data.preferences.video_system] == 'PAL' || OSD.constants.VIDEO_TYPES[OSD.data.preferences.video_system] == 'AUTO';
-    $('.pal_ntsc_box_bottom').toggleClass('ntsc_bottom', (isPAL && on))
+    $('#preview-container').attr({
+        'data-video-format': OSD.constants.VIDEO_TYPES[OSD.data.preferences.video_system],
+        'data-show-guides': on
+    });
 };
 
 OSD.GUI.updateDjiView = function(on) {
@@ -3132,7 +3084,7 @@ OSD.GUI.updatePreviews = function() {
 
         // render
         var $preview = $('.display-layout .preview').empty();
-        var $row = $('<div class="row"/>');
+        var $row = $('<div class="preview-row"/>');
         for (let i = 0; i < OSD.data.display_size.total;) {
             var charCode = OSD.data.preview[i];
             var colorStyle = '';
@@ -3174,7 +3126,7 @@ OSD.GUI.updatePreviews = function() {
             $row.append($img);
             if (++i % OSD.data.display_size.x == 0) {
                 $preview.append($row);
-                $row = $('<div class="row"/>');
+                $row = $('<div class="preview-row"/>');
             }
         }
     }
@@ -3266,7 +3218,7 @@ OSD.GUI.updateAll = function() {
     $('.osd_search').on('input', function() {
         OSD.GUI.updateFields();
     });
-    $('.supported').fadeIn();
+    $('.supported').css('display', 'flex');
     OSD.GUI.updateVideoMode();
     OSD.GUI.updateUnits();
     OSD.GUI.updateFields();
@@ -3363,8 +3315,8 @@ TABS.osd.initialize = function (callback) {
     
             // Open modal window
             OSD.GUI.jbox = new jBox('Modal', {
-                width: 750, 
-                height: 300,
+                width: 750,
+                height: 'auto',
                 position: {y:'bottom'},
                 offset: {y:-50},
                 closeButton: 'title',
@@ -3373,8 +3325,8 @@ TABS.osd.initialize = function (callback) {
                 title: 'OSD Font Manager',
                 content: $('#fontmanagercontent')
             });
-    
-            $('a.save').on('click', function () {
+
+            $('#save-btn').on('click', function () {
                 Settings.saveInputs(save_to_eeprom);
             });
     
@@ -3491,14 +3443,13 @@ TABS.osd.initialize = function (callback) {
             });
     
             // font upload
-            $('a.flash_font').on('click', function () {
+            $('#flash_font').on('click', function () {
                 if (!GUI.connect_lock) { // button disabled while flashing is in progress
                     var progressLabel = $('.progressLabel');
-                    var progressBar = $('.progress');
                     var uploading = i18n.getMessage('uploadingCharacters');
                     progressLabel.text(uploading);
                     var progressCallback = function(done, total, percentage) {
-                        progressBar.val(percentage);
+                        $('#font-progress-bar').css('width', `${percentage}%`);
                         if (done == total) {
                             progressLabel.text(i18n.getMessage('uploadedCharacters'), [total]);
                         } else {
@@ -3544,9 +3495,9 @@ function createCustomElements(){
     var customElementsContainer = $('#osdCustomElements');
 
     for(var i = 0; i < FC.OSD_CUSTOM_ELEMENTS.settings.customElementsCount; i++){
-        var label = $('<label>');
+        var tableContainer = $('<div>');
 
-        var customElementTable = $('<table>').addClass('osdCustomElement_main_table');
+        var customElementTable = $('<table>');
         var customElementRowType = $('<tr>').data('row', i);
         var customElementRowValue = $('<tr>').data('row', i);
         
@@ -3554,7 +3505,7 @@ function createCustomElements(){
         customElementLabel.append($('<td>').attr('colspan', 2).append($('<span>').html(i18n.getMessage("custom_element") + ' ' + (i + 1))));
 
         for(var ii = 0; ii < FC.OSD_CUSTOM_ELEMENTS.settings.customElementParts; ii++){
-            var select = $('<select>').addClass('osdCustomElement-' + i + '-part-' + ii + '-type').data('valueCellClass', 'osdCustomElement-' + i + '-part-' + ii + '-value').html(`
+            var select = $('<select>').addClass('form-select osdCustomElement-' + i + '-part-' + ii + '-type').data('valueCellClass', 'osdCustomElement-' + i + '-part-' + ii + '-value').html(`
                         <option value="0">none</option>
                         <option data-value="text" value="1">Text</option>
                         <option data-value="ico" value="2">Icon Static</option>
@@ -3586,12 +3537,12 @@ function createCustomElements(){
 
             customElementRowType.append($('<td>').append(select));
             customElementRowValue.append($('<td>').addClass('osdCustomElement-' + i + '-part-' + ii + '-value').append(
-                $('<input>').addClass('value').addClass('text').attr('type', 'text').attr('maxlength', FC.OSD_CUSTOM_ELEMENTS.settings.customElementTextSize).hide()).append(
-                $('<input>').addClass('value').addClass('ico').attr('min', 1).attr('max', 255).hide()).append(
-                $('<select>').addClass('value').addClass('ico_gv').html(getGVoptions()).hide()).append(
-                $('<select>').addClass('value').addClass('ico_lc').html(getLCoptions()).hide()).append(
-                $('<select>').addClass('value').addClass('gv').html(getGVoptions()).hide()).append(
-                $('<select>').addClass('value').addClass('lc').html(getLCoptions()).hide()
+                $('<input>').addClass('form-control value').addClass('text').attr('type', 'text').attr('maxlength', FC.OSD_CUSTOM_ELEMENTS.settings.customElementTextSize).hide()).append(
+                $('<input>').addClass('form-control value').addClass('ico').attr('min', 1).attr('max', 255).hide()).append(
+                $('<select>').addClass('form-select value').addClass('ico_gv').html(getGVoptions()).hide()).append(
+                $('<select>').addClass('form-select value').addClass('ico_lc').html(getLCoptions()).hide()).append(
+                $('<select>').addClass('form-select value').addClass('gv').html(getGVoptions()).hide()).append(
+                $('<select>').addClass('form-select value').addClass('lc').html(getLCoptions()).hide()
             ));
 
             select.change(function(){
@@ -3603,16 +3554,16 @@ function createCustomElements(){
             });
         }
 
-        var selectVisibility = $('<select>').addClass('osdCustomElement-' + i + '-visibility-type').data('valueCellClass', 'osdCustomElement-' + i + '-visibility-value').html(`
+        var selectVisibility = $('<select>').addClass('form-select osdCustomElement-' + i + '-visibility-type').data('valueCellClass', 'osdCustomElement-' + i + '-visibility-value').html(`
             <option value="0">always</option>
             <option data-value="gv" value="1">Global Variable</option>
             <option data-value="lc" value="2">Logic Condition</option>
         `);
         customElementRowType.append($('<td>').append(selectVisibility));
         customElementRowValue.append($('<td>').addClass('osdCustomElement-' + i + '-visibility-value').append(
-            $('<select>').addClass('value').addClass('gv').html(getGVoptions()).hide()
+            $('<select>').addClass('form-select value').addClass('gv').html(getGVoptions()).hide()
         ).append(
-            $('<select>').addClass('value').addClass('lc').html(getLCoptions()).hide()
+            $('<select>').addClass('form-select value').addClass('lc').html(getLCoptions()).hide()
         ));
 
         selectVisibility.change(function(){
@@ -3623,8 +3574,8 @@ function createCustomElements(){
         });
 
         customElementTable.append(customElementLabel).append(customElementRowType).append(customElementRowValue);
-        label.append(customElementTable);
-        customElementsContainer.append(label);
+        tableContainer.append(customElementTable);
+        customElementsContainer.append(tableContainer);
     }
 
     fillCustomElementsValues();
@@ -3734,7 +3685,7 @@ function fillCustomElementsValues() {
             var valueCell = $('.osdCustomElement-' + i + '-part-' + ii + '-value');
             switch (FC.OSD_CUSTOM_ELEMENTS.items[i].customElementItems[ii].type){
                 case 1:
-                    valueCell.find('.text').val(FC.OSD_CUSTOM_ELEMENTS .items[i].customElementText).trigger('change');
+                    valueCell.find('.text').val(FC.OSD_CUSTOM_ELEMENTS.items[i].customElementText).trigger('change');
                     break;
                 case 2:
                     valueCell.find('.ico').val(FC.OSD_CUSTOM_ELEMENTS.items[i].customElementItems[ii].value).trigger('change');
@@ -3774,14 +3725,14 @@ function fillCustomElementsValues() {
             }
         }
 
-        $('.osdCustomElement-' + i + '-visibility-type').val(FC.OSD_CUSTOM_ELEMENTS .items[i].customElementVisibility.type).trigger('change');
+        $('.osdCustomElement-' + i + '-visibility-type').val(FC.OSD_CUSTOM_ELEMENTS.items[i].customElementVisibility.type).trigger('change');
         var valueVisibilityCell = $('.osdCustomElement-' + i + '-visibility-value');
         switch (FC.OSD_CUSTOM_ELEMENTS .items[i].customElementVisibility.type){
             case 1:
-                valueVisibilityCell.find('.gv').val(FC.OSD_CUSTOM_ELEMENTS .items[i].customElementVisibility.value).trigger('change');
+                valueVisibilityCell.find('.gv').val(FC.OSD_CUSTOM_ELEMENTS.items[i].customElementVisibility.value).trigger('change');
                 break;
             case 2:
-                valueVisibilityCell.find('.lc').val(FC.OSD_CUSTOM_ELEMENTS .items[i].customElementVisibility.value).trigger('change');
+                valueVisibilityCell.find('.lc').val(FC.OSD_CUSTOM_ELEMENTS.items[i].customElementVisibility.value).trigger('change');
                 break;
         }
 
@@ -4015,11 +3966,9 @@ function updatePilotAndCraftNames() {
 function updatePanServoPreview() {
     // Show or hide the settings, based on of the feature is active.
     if ($('#panServoOutput').val() === "0") {
-        $('#osd_pan_settings').hide();
-        $('#panServoOutput').parent().addClass('no-bottom');
+        $('.osd_pan_settings').hide();
     } else {
-        $('#osd_pan_settings').show();
-        $('#panServoOutput').parent().removeClass('no-bottom');
+        $('.osd_pan_settings').show();
     }
 
     // Update the panServoOutput select to be visibly easier to use
