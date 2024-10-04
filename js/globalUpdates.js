@@ -15,7 +15,7 @@ var update = {
 
     firmwareVersion: function() {
         if (CONFIGURATOR.connectionValid) {
-            $('[data-firmware-version-info]').text(FC.CONFIG.flightControllerVersion + " [" + FC.CONFIG.target + "]");
+            $('[data-firmware-version-info]').text(`[${FC.CONFIG.target}] ${FC.CONFIG.flightControllerVersion}`);
             globalSettings.docsTreeLocation = 'https://github.com/iNavFlight/inav/blob/' + FC.CONFIG.flightControllerVersion + '/docs/';
 
             // If this is a master branch firmware, this will find a 404 as there is no tag tree. So default to master for docs.

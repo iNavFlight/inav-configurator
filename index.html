@@ -29,16 +29,6 @@
                 <img src="images/cf_logo_white.svg" class="d-none-dark" alt="Logo"/>
                 <img src="images/cf_logo_black.svg" class="d-none-light" alt="Logo"/>
             </div>
-            <div class="versions text-muted d-flex flex-column justify-content-end lh-1 ms-1">
-                <div>
-<!--                    <small i18n="mainLogoText"></small>-->
-                    <small data-configurator-version-info></small>
-                </div>
-                <div>
-                    <small i18n="mainLogoTextFirmware"></small>
-                    <small class="text-nowrap" data-firmware-version-info></small>
-                </div>
-            </div>
         </div>
         <div class="widget-group-1 header-gap d-flex mode-connected">
             <div class="uav-status d-flex align-items-center">
@@ -351,21 +341,28 @@
         <div class="status-bar-item">
             <span id="msp-version"></span>
         </div>
-        <div class="status-bar-item">
+        <div class="status-bar-item d-inline-block text-truncate">
             <span id="msp-load"></span>
         </div>
-        <div class="status-bar-item">
+        <div class="status-bar-item d-inline-block text-truncate">
             <span id="msp-roundtrip"></span>
         </div>
-        <div class="status-bar-item">
+        <div class="status-bar-item d-inline-block text-truncate">
             <span id="hardware-roundtrip"></span>
         </div>
         <div class="status-bar-item d-inline-block text-truncate arming-flags-title">
             <span class="arming-flags-title" data-i18n="statusbar_arming_flags"></span>
             <span class="arming-flags-title arming-flags">-</span>
         </div>
-        <div class="status-bar-item version">
-            <!-- configuration version generated here -->
+        <div class="ms-auto d-flex">
+            <div class="status-bar-item">
+                <span data-firmware-version-info></span>
+            </div>
+            <div class="status-bar-item">
+                <span class="version">
+                     <!-- configuration version generated here -->
+                </span>
+            </div>
         </div>
     </div>
 </div>
