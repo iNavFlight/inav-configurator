@@ -1,7 +1,6 @@
 window.$ = window.jQuery =  require('jquery'), 
                             require('jquery-ui-dist/jquery-ui'),
                             require('jquery-textcomplete'),
-                            require('./libraries/jquery.flightindicators'),
                             require('./libraries/jquery.nouislider.all.min'),
                             require('./libraries/jquery.ba-throttle-debounce');
 
