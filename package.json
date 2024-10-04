@@ -20,6 +20,7 @@
   "dependencies": {
     "@electron/remote": "^2.1.1",
     "bootstrap": "^5.3.3",
+    "d3": "^3.5.17",
     "electron-squirrel-startup": "^1.0.0",
     "electron-store": "^8.1.0",
     "electron-window-state": "^5.0.3",

@@ -6,7 +6,7 @@ window.$ = window.jQuery =  require('jquery'),
 
 const { app } = require('@electron/remote');
 const darkMode = require('./darkMode');
-const d3 = require('./libraries/d3.min');
+const d3 = require('d3');
 const Store = require('electron-store');
 const store = new Store();
 

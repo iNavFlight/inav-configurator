@@ -13,6 +13,7 @@ const CONFIGURATOR = require('./../js/data_storage');
 const interval = require('./../js/intervals');
 const i18n = require('./../js/localization');
 const BitHelper = require('./../js/bitHelper');
+const d3 = require('d3');
 
 TABS.sensors = {};
 TABS.sensors.initialize = function (callback) {
