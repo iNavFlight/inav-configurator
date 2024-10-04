@@ -20,13 +20,28 @@ html, body {
 .app-header {
   grid-area: app-header;
   display: grid;
-  grid-template-columns: 1fr auto auto auto;
+  grid-template-columns: 1fr auto auto auto auto;
   grid-template-rows: 40px 1fr;
   gap: 0px 0px;
   grid-auto-flow: row;
   grid-template-areas:
-    "logotype widget-group-1 widget-group-2 connections"
-    ". . . .";
+    "logotype widget-group-1 widget-group-2 connections windows-buttons"
+    ". . . . .";
+
+  -webkit-user-select: none;
+  -webkit-app-region: drag;
+}
+
+.app-header button,
+.app-header a,
+.app-header .form-check,
+.app-header input,
+.app-header select {
+  -webkit-app-region: no-drag;
+}
+
+[data-os="MacOS"] .app-header .logotype {
+  margin-left: 64px !important;
 }
 
 .logotype {
@@ -43,6 +58,59 @@ html, body {
 
 .connections {
   grid-area: connections;
+}
+
+.windows-buttons {
+  grid-area: windows-buttons;
+  text-wrap: nowrap;
+  margin-left: .5rem;
+}
+
+.windows-buttons > .btn {
+  display: inline-flex;
+  border: none !important;
+}
+
+.windows-buttons > .btn .icon {
+  width: 1.8rem;
+  height: 1.8rem;
+  display: inline-block;
+  background: #dee2e6;
+  mask-position: center center;
+  mask-size: contain;
+  mask-repeat: no-repeat;
+}
+
+.windows-buttons > .btn:not(.btn-outline-danger):hover {
+  --inav-btn-hover-bg: var(--inav-tertiary-bg);
+}
+
+.windows-buttons > .btn .icon.options {
+  mask-image: url(images/three-dots-vertical.svg);
+}
+
+.windows-buttons > .btn .icon.close {
+  mask-image: url(images/window-close.svg);
+}
+
+.windows-buttons > .btn .icon.minimize {
+  mask-image: url(images/window-minimize.svg);
+}
+
+.windows-buttons > .btn .icon.maximize {
+  mask-image: url(images/window-maximize.svg);
+}
+
+.windows-buttons > .btn .icon.restore {
+  mask-image: url(images/window-restore.svg);
+}
+
+[data-os="MacOS"] .windows-buttons > .btn.options {
+  padding: .65rem 0 !important;
+}
+
+[data-os="MacOS"] .windows-buttons > .btn:not(.options) {
+  display: none !important;
 }
 
 .app-logs {
@@ -155,6 +223,7 @@ html, body {
     z-index: 1;
     right: 0;
     cursor: pointer;
+    padding-right: 1rem;
   }
 
   .logs-stream {
@@ -380,8 +449,8 @@ $tabIcons: (
     gap: 0 0;
     grid-auto-flow: row;
     grid-template-areas:
-    "logotype widget-group-1 connections"
-    "widget-group-2 widget-group-2 widget-group-2";
+    "logotype widget-group-1 connections windows-buttons"
+    "widget-group-2 widget-group-2 widget-group-2 widget-group-2";
 
     .widget-group-2 {
       margin-top: .5rem;
@@ -423,6 +492,11 @@ $tabIcons: (
       padding: .5rem;
     }
   }
+}
+
+[data-bs-theme="dark"] .ol-unselectable {
+  // TODO: implement it only for openstreetsmap
+  //filter: invert(1) hue-rotate(180deg) grayscale(0.5);
 }
 
 [data-highlight-profile-params="true"] {

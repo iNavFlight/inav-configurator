@@ -102,7 +102,6 @@
             <div class="vr"></div>
 
         </div>
-
         <div class="widget-group-2 header-gap d-flex mode-connected">
             <div class="sensors d-flex">
                 <ul id="sensors" class="list-group list-group-horizontal">
@@ -216,15 +215,24 @@
                 </div>
 
             </div>
-
-            <div class="vstack justify-content-center">
-                <a id="options" href="#" data-i18n_title="options_title"></a>
-            </div>
         </div>
-
+        <div class="windows-buttons">
+            <button id="options" class="btn options" data-i18n_title="options_title">
+                <span class="icon options"></span>
+            </button>
+            <button id="minimize-window" class="btn">
+                <span class="icon minimize"></span>
+            </button>
+            <button id="maximize-window" class="btn">
+                <span class="icon maximize"></span>
+            </button>
+            <button id="close-window" class="btn btn-outline-danger">
+                <span class="icon close"></span>
+            </button>
+        </div>
     </div>
     <div id="logs" class="app-logs lh-lg" data-theme-override data-bs-theme="dark">
-        <span id="logs-toggle" class="logs-toggle px-2 text-muted lh-lg bg-body-tertiary" i18n="mainShowLog"></span>
+        <span id="logs-toggle" class="logs-toggle ps-2 text-muted lh-lg bg-body-tertiary" i18n="mainShowLog"></span>
         <div id="logs-stream" class="logs-stream px-3"></div>
     </div>
     <div class="app-sidebar" data-theme-override data-bs-theme="dark">

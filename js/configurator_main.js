@@ -5,6 +5,7 @@ window.$ = window.jQuery =  require('jquery'),
                             require('./libraries/jquery.ba-throttle-debounce');
 
 const { app } = require('@electron/remote');
+const { ipcRenderer } = require('electron');
 const darkMode = require('./darkMode');
 const d3 = require('d3');
 const Store = require('electron-store');
@@ -47,6 +48,27 @@ $(function() {
         MSP.init();
         mspHelper.init();
         SerialBackend.init();
+
+        $('#minimize-window').click(() => {
+            ipcRenderer.send('minimize-window');
+        });
+
+        $('#maximize-window').click(() => {
+            ipcRenderer.send('maximize-window');
+        });
+
+        $('#close-window').click(() => {
+            ipcRenderer.send('close-window');
+        });
+
+        ipcRenderer.on('onmaximize', () => {
+            $('#maximize-window .icon').removeClass('restore maximize').addClass('restore');
+        })
+
+        ipcRenderer.on('onminimize', () => {
+            $('#maximize-window .icon').removeClass('restore maximize').addClass('maximize');
+        })
+
 
         GUI.updateEzTuneTabVisibility = function(loadMixerConfig) {
             let useEzTune = true;
@@ -194,7 +216,7 @@ $(function() {
 
             if (!el.hasClass('active')) {
                 el.addClass('active');
-                el.after('<div id="options-window" class="mh-100 shadow overflow-auto"></div>');
+                el.after('<div id="options-window" class="shadow overflow-auto"></div>');
 
                 $('#options-window').load('./tabs/options.html', function () {
                     // translate to user-selected language

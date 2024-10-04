@@ -74,7 +74,12 @@ function createWindow() {
       nodeIntegration: true,
       contextIsolation: false
     },
+    backgroundColor: '#212529',
+    titleBarStyle: 'hidden',
+    trafficLightPosition: {x: 10, y: 22 }
   });
+
+  mainWindow.setWindowButtonVisibility(false)
 
   mainWindow.webContents.on('context-menu', (_, props) => {
     const menu = new Menu()  ;
@@ -93,6 +98,36 @@ function createWindow() {
       } 
     });
   });
+
+  ipcMain.on('minimize-window', () => {
+    mainWindow.minimize();
+  })
+
+  ipcMain.on('maximize-window', () => {
+    if(mainWindow.isMaximized()) {
+      mainWindow.restore();
+      mainWindow.unmaximize();
+    }
+    else {
+      mainWindow.maximize();
+    }
+  })
+
+  ipcMain.on('close-window', () => {
+    mainWindow.close();
+  })
+
+  mainWindow.on('maximize', () => {
+    mainWindow.webContents.send('onmaximize');
+  })
+
+  mainWindow.on('minimize', () => {
+    mainWindow.webContents.send('onminimize');
+  })
+
+  mainWindow.on('unmaximize', () => {
+    mainWindow.webContents.send('onminimize');
+  })
 
   mainWindow.webContents.on('select-bluetooth-device', (event, deviceList, callback) => {
     event.preventDefault();

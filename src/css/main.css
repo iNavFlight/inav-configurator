@@ -462,17 +462,17 @@ input[type="number"]::-webkit-inner-spin-button {
 #sensor-status .on {
 }
 
-#options {
-    display: inline-block;
-    /*float: right;*/
-    width: 1.5rem;
-    height: 2rem;
-    /*margin-top: 7px;*/
-    margin-left: .5rem;
-    background: url('./../../images/three-dots-vertical.svg') no-repeat center;
-    background-size: cover;
-    opacity: 0.75;
-}
+/*#options {*/
+/*    display: inline-block;*/
+/*    !*float: right;*!*/
+/*    width: 1.5rem;*/
+/*    height: 2rem;*/
+/*    !*margin-top: 7px;*!*/
+/*    margin-left: .5rem;*/
+/*    background: url('./../../images/three-dots-vertical.svg') no-repeat center;*/
+/*    background-size: cover;*/
+/*    opacity: 0.75;*/
+/*}*/
 
 #options:hover {
     opacity: 1;
@@ -489,12 +489,13 @@ input[type="number"]::-webkit-inner-spin-button {
 #options-window {
     display: none;
     position: fixed;
+    max-height: calc(100vh - 5rem);
     border: var(--inav-border-width) solid var(--inav-border-color);
     background-color: var(--inav-body-bg);
     border-radius: var(--inav-border-radius);
-    right: 42px;
-    top: 10px;
-    z-index: 10000;
+    right: 1rem;
+    top: 4rem;
+    z-index: 1003;
 }
 
 /* options modified GUI BOX */
