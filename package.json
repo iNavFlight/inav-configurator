@@ -19,6 +19,7 @@
   "license": "GPL-3.0",
   "dependencies": {
     "@electron/remote": "^2.1.1",
+    "@fortawesome/fontawesome-free": "^6.6.0",
     "bootstrap": "^5.3.3",
     "d3": "^3.5.17",
     "electron-squirrel-startup": "^1.0.0",
