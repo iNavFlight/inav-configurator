@@ -72,8 +72,8 @@ html, body {
 }
 
 .windows-buttons > .btn .icon {
-  width: 1.8rem;
-  height: 1.8rem;
+  width: 1.5rem;
+  height: 1.5rem;
   display: inline-block;
   background: #dee2e6;
   mask-position: center center;
@@ -107,6 +107,11 @@ html, body {
 
 [data-os="MacOS"] .windows-buttons > .btn.options {
   padding: .65rem 0 !important;
+}
+
+[data-os="MacOS"] .windows-buttons > .btn.options .icon {
+  width: 1.8rem;
+  height: 1.8rem;
 }
 
 [data-os="MacOS"] .windows-buttons > .btn:not(.options) {
