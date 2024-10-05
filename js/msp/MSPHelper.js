@@ -73,7 +73,7 @@ var mspHelper = (function () {
             color;
         if (!dataHandler.unsupported || dataHandler.unsupported) switch (dataHandler.code) {
             case MSPCodes.MSPV2_INAV_STATUS:
-                let profile_changed = false;
+                let profile_changed = 0;
                 FC.CONFIG.cycleTime = data.getUint16(offset, true);
                 offset += 2;
                 FC.CONFIG.i2cError = data.getUint16(offset, true);
@@ -85,11 +85,15 @@ var mspHelper = (function () {
 
                 let profile_byte = data.getUint8(offset++)
                 let profile = profile_byte & 0x0F;
-                profile_changed |= (profile !== FC.CONFIG.profile) && (FC.CONFIG.profile !==-1);
+                if (profile !== FC.CONFIG.profile) {
+                    profile_changed |= GUI.PROFILES_CHANGED.CONTROL;
+                }
                 FC.CONFIG.profile = profile;
 
                 let battery_profile = (profile_byte & 0xF0) >> 4;
-                profile_changed |= (battery_profile !== FC.CONFIG.battery_profile) && (FC.CONFIG.battery_profile !==-1);
+                if (battery_profile !== FC.CONFIG.battery_profile) {
+                    profile_changed |= GUI.PROFILES_CHANGED.BATTERY;
+                }
                 FC.CONFIG.battery_profile = battery_profile;
 
                 FC.CONFIG.armingFlags = data.getUint32(offset, true);
@@ -99,11 +103,14 @@ var mspHelper = (function () {
                 //read mixer profile as the last byte in the the message
                 profile_byte = data.getUint8(dataHandler.message_length_expected - 1);
                 let mixer_profile = profile_byte & 0x0F;
-                profile_changed |= (mixer_profile !== FC.CONFIG.mixer_profile) && (FC.CONFIG.mixer_profile !==-1);
+                if (mixer_profile !== FC.CONFIG.mixer_profile) {
+                    profile_changed |= GUI.PROFILES_CHANGED.MIXER;
+                }
                 FC.CONFIG.mixer_profile = mixer_profile;
-
                 GUI.updateStatusBar();
-                GUI.updateProfileChange(profile_changed);
+                if (profile_changed > 0) {
+                    GUI.updateProfileChange(profile_changed);
+                }
                 break;
 
             case MSPCodes.MSP_ACTIVEBOXES:
@@ -1544,51 +1551,54 @@ var mspHelper = (function () {
                 break;
 
             case MSPCodes.MSP2_INAV_CUSTOM_OSD_ELEMENTS:
-                FC.OSD_CUSTOM_ELEMENTS .items = [];
+                FC.OSD_CUSTOM_ELEMENTS.items = [];
 
-                var index = 0;
+                let settingsIdx = 0;
 
-                if(data.byteLength == 0){
-                    FC.OSD_CUSTOM_ELEMENTS .settings.customElementsCount = 0;
-                    FC.OSD_CUSTOM_ELEMENTS .settings.customElementTextSize = 0;
+                if(data.byteLength == 0) {
+                    FC.OSD_CUSTOM_ELEMENTS.settings.customElementsCount = 0;
+                    FC.OSD_CUSTOM_ELEMENTS.settings.customElementTextSize = 0;
+                    FC.OSD_CUSTOM_ELEMENTS.settings.customElementParts = 0;
                     return;
                 }
 
-                FC.OSD_CUSTOM_ELEMENTS .settings.customElementsCount = data.getUint8(index++);
-                FC.OSD_CUSTOM_ELEMENTS .settings.customElementTextSize = data.getUint8(index++);
+                FC.OSD_CUSTOM_ELEMENTS.settings.customElementsCount = data.getUint8(settingsIdx++);
+                FC.OSD_CUSTOM_ELEMENTS.settings.customElementTextSize = data.getUint8(settingsIdx++);
+                FC.OSD_CUSTOM_ELEMENTS.settings.customElementParts = data.getUint8(settingsIdx++);
+                break;
+            case MSPCodes.MSP2_INAV_CUSTOM_OSD_ELEMENT:        
+                var customElement = {
+                    customElementItems: [],
+                    customElementVisibility: {type: 0, value: 0},
+                    customElementText: [],
+                };
 
-                for (i = 0; i < FC.OSD_CUSTOM_ELEMENTS .settings.customElementsCount; i++){
-                    var customElement = {
-                        customElementItems: [],
-                        customElementVisibility: {type: 0, value: 0},
-                        customElementText: [],
-                    };
+                let index = 0;
 
-                    for (let ii = 0; ii < FC.OSD_CUSTOM_ELEMENTS .settings.customElementsCount; ii++){
-                        var customElementPart = {type: 0,  value: 0,};
-                        customElementPart.type = data.getUint8(index++);
-                        customElementPart.value = data.getUint16(index, true);
-                        index += 2;
-                        customElement.customElementItems.push(customElementPart);
-                    }
-
-                    customElement.customElementVisibility.type = data.getUint8(index++);
-                    customElement.customElementVisibility.value = data.getUint16(index, true);
+                for (let ii = 0; ii < FC.OSD_CUSTOM_ELEMENTS.settings.customElementParts; ii++) {
+                    var customElementPart = {type: 0,  value: 0,};
+                    customElementPart.type = data.getUint8(index++);
+                    customElementPart.value = data.getUint16(index, true);
                     index += 2;
-
-                    for (let ii = 0; ii < FC.OSD_CUSTOM_ELEMENTS .settings.customElementTextSize; ii++){
-                        var char = data.getUint8(index++);
-                        if(char === 0){
-                            index += (FC.OSD_CUSTOM_ELEMENTS .settings.customElementTextSize - 1) - ii;
-                            break;
-                        }
-                        customElement.customElementText[ii] = char;
-                    }
-
-                    customElement.customElementText = String.fromCharCode(...customElement.customElementText);
-
-                    FC.OSD_CUSTOM_ELEMENTS .items.push(customElement)
+                    customElement.customElementItems.push(customElementPart);
                 }
+
+                customElement.customElementVisibility.type = data.getUint8(index++);
+                customElement.customElementVisibility.value = data.getUint16(index, true);
+                index += 2;
+
+                for (let ii = 0; ii < FC.OSD_CUSTOM_ELEMENTS.settings.customElementTextSize; ii++) {
+                    var char = data.getUint8(index++);
+                    if(char === 0) {
+                        index += (FC.OSD_CUSTOM_ELEMENTS.settings.customElementTextSize - 1) - ii;
+                        break;
+                    }
+                    customElement.customElementText[ii] = char;
+                }
+
+                customElement.customElementText = String.fromCharCode(...customElement.customElementText);
+
+                FC.OSD_CUSTOM_ELEMENTS.items.push(customElement);
                 break;
             case MSPCodes.MSP2_INAV_GPS_UBLOX_COMMAND:
                 // Just and ACK from the fc.
@@ -2475,7 +2485,17 @@ var mspHelper = (function () {
     };
 
     self.loadOsdCustomElements = function (callback) {
-        MSP.send_message(MSPCodes.MSP2_INAV_CUSTOM_OSD_ELEMENTS, false, false, callback);
+        MSP.send_message(MSPCodes.MSP2_INAV_CUSTOM_OSD_ELEMENTS, false, false, nextCustomOSDElement);
+
+        var cosdeIdx = 0;
+
+        function nextCustomOSDElement() {
+            if (cosdeIdx < FC.OSD_CUSTOM_ELEMENTS .settings.customElementsCount - 1) {
+                MSP.send_message(MSPCodes.MSP2_INAV_CUSTOM_OSD_ELEMENT, [cosdeIdx++], false, nextCustomOSDElement);
+            } else {
+                MSP.send_message(MSPCodes.MSP2_INAV_CUSTOM_OSD_ELEMENT, [cosdeIdx++], false, callback);
+            }
+        }
     }
 
     self.sendModeRanges = function (onCompleteCallback) {
