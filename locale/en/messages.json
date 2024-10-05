@@ -4026,10 +4026,10 @@
         "message": "Shows vertical speed using up or down arrows. Each arrow represents 10cm (~4 inches) per second."
     },
     "osdElement_VERTICAL_SPEED_INDICATOR": {
-        "message": "Numeric vario"
+        "message": "Vertical Speed Indicator"
     },
     "osdElement_VERTICAL_SPEED_INDICATOR_HELP": {
-        "message": "Shows vertical speed using a number"
+        "message": "Shows vertical speed variometer using a number"
     },
     "osdElement_G_FORCE": {
         "message": "g force"

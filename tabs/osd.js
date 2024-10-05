@@ -1268,6 +1268,21 @@ OSD.constants = {
                     }
                 },
                 {
+                    name: 'TOTAL_ENERGY_VARIO',
+                    id: 159,
+                    preview: function(osd_data) {
+                        switch (OSD.data.preferences.units) {
+                            case 0: // Imperial
+                            case 3: // UK
+                                return FONT.embed_dot('-1.6') + FONT.symbol(SYM.FT_S);
+                            case 4: // GA
+                                return FONT.embed_dot('-2.6') + FONT.symbol(SYM.HUND_FTM);
+                            default: // Metric
+                                return FONT.embed_dot('-0.5') + FONT.symbol(SYM.M_S);
+                        }
+                    }
+                },
+                {
                     name: 'OSD_RANGEFINDER',
                     id: 120,
                     preview: function(osd_data) {
