@@ -2148,10 +2148,10 @@
         "message": "Altitude:"
     },
     "gpsLat": {
-        "message": "Latitude:"
+        "message": "Latitude"
     },
     "gpsLon": {
-        "message": "Longitude:"
+        "message": "Longitude"
     },
     "gpsSpeed": {
         "message": "Speed:"
@@ -4509,13 +4509,19 @@
         "message": "Mission valid"
     },
     "missionDefaultPointAlt": {
-        "message": "Alt (cm): "
+        "message": "Alt (cm)"
     },
     "missionDefaultPointSpeed": {
-        "message": "Speed (cm/s): "
+        "message": "Speed (cm/s)"
     },
     "missionDefaultSafeRangeSH": {
-        "message": "Radius (m): "
+        "message": "Radius (m)"
+    },
+    "missionDefaultFwApproachAlt": {
+        "message": "FW Approach Alt (m)"
+    },
+    "missionDefaultLandAlt": {
+        "message": "FW Land Alt (m)"
     },
     "missionMultiMissionsInfo": {
         "message": "Missions Info:"
@@ -4533,7 +4539,7 @@
         "message": "Add New Mission"
     },
     "missionEllipsoidEarthDEMModel": {
-        "message": "Use Ellipsoid instead of SL DEM: "
+        "message": "Use Ellipsoid instead of SL DEM"
     },
     "SafehomeLegend": {
         "message": "Legend : "
@@ -4611,19 +4617,19 @@
         "message": "Altitude below min land altitude. Change ignored"
     },
     "missionWpType": {
-        "message": "Type:"
+        "message": "Type"
     },
     "missionWpLat": {
-        "message": "Lat:"
+        "message": "Lat"
     },
     "missionWpLon": {
-        "message": "Lon:"
+        "message": "Lon"
     },
     "missionSeaLevelRef": {
-        "message": "Sea level Ref: "
+        "message": "Sea level Ref"
     },
     "missionElevation": {
-        "message": "Elevation (m):"
+        "message": "Elevation (m)"
     },
     "missionNA": {
         "message": "N/A"
@@ -4644,19 +4650,19 @@
         "message": "Fixed Wing landing settings:"
     },
     "missionFwApproachAlt": {
-        "message": "Approach Alt: (cm):"
+        "message": "Approach Alt: (cm)"
     },
     "missionFwLandAlt": {
-        "message": "Land Alt: (cm):"
+        "message": "Land Alt: (cm)"
     },
     "missionFwApproachDir": {
-        "message": "Approach direction:"
+        "message": "Approach direction"
     },
     "missionFwLandHeading1": {
-        "message": "Heading 1: (deg):"
+        "message": "Heading 1: (deg)"
     },
     "missionFwLandHeading2": {
-        "message": "Heading 2: (deg):"
+        "message": "Heading 2: (deg)"
     },
     "missionExclusive": {
         "message": "Excl."
