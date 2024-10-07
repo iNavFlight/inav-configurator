@@ -1,19 +1,23 @@
-.checkspass {
-    margin-top: 3px;
-    height: 15px;
-    width: 15px;
-    background-image:url(./../../../images/icons/pass.svg);
-    background-size:contain;
-    background-position:center;
-    background-repeat:no-repeat;
-    }
-    
-.checksfail {
-    margin-top: 3px;
-    height: 15px;
-    width: 15px;
-    background-image:url(./../../../images/icons/nopass.svg);
-    background-size:contain;
-    background-position:center;
-    background-repeat:no-repeat;
+.checkspass::after,
+.checksfail::after {
+    display: inline-block;
+    font-family: bootstrap-icons !important;
+    font-style: normal;
+    font-weight: 400 !important;
+    font-variant: normal;
+    text-transform: none;
+    line-height: 1;
+    vertical-align: -0.125em;
+    -webkit-font-smoothing: antialiased;
+    font-size: 1.15rem;
+}
+
+.checkspass::after {
+    content: "\F26A";
+    color: var(--inav-success);
+}
+
+.checksfail::after {
+    content: "\F622";
+    color: var(--inav-danger);
 }
