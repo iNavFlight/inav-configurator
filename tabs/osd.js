@@ -3165,22 +3165,26 @@ OSD.GUI.updateAll = function() {
             }
         });
 
-        paste.on('click', function() {
+        paste.on('click',  async function() {
             if(layout_clipboard.filled == true){
 
                 var oldLayout = JSON.parse(JSON.stringify(OSD.data.layouts[OSD.data.selected_layout]))
                 OSD.data.layouts[OSD.data.selected_layout] = JSON.parse(JSON.stringify(layout_clipboard.layout));
                 layouts.trigger('change');
-                OSD.data.layouts[OSD.data.selected_layout].forEach(function(item, index){
+
+                for(var index in OSD.data.layouts[OSD.data.selected_layout])
+                {
+                    var item = OSD.data.layouts[OSD.data.selected_layout][index];
                     if(!(item.isVisible === false && oldLayout[index].isVisible === false) && (oldLayout[index].x !== item.x || oldLayout[index].y !== item.y || oldLayout[index].position !== item.position || oldLayout[index].isVisible !== item.isVisible)){
-                        OSD.saveItem({id: index});
+                        await OSD.saveItem({id: index});
                     }
-                });
+                }
+
                 GUI.log(i18n.getMessage('osdLayoutPasteFromClipboard'));
             }
         });
 
-        clear.on('click', function() {
+        clear.on('click', async function() {
             var oldLayout = JSON.parse(JSON.stringify(OSD.data.layouts[OSD.data.selected_layout]));
 
             var clearedLayout = [];
@@ -3192,12 +3196,15 @@ OSD.GUI.updateAll = function() {
 
             OSD.data.layouts[OSD.data.selected_layout] = clearedLayout;
             layouts.trigger('change');
-            OSD.data.layouts[OSD.data.selected_layout].forEach(function(item, index){
+
+            for(var index in OSD.data.layouts[OSD.data.selected_layout]) {
+                var item = OSD.data.layouts[OSD.data.selected_layout][index];
                 if(oldLayout[index].isVisible === true){
-                    OSD.saveItem({id: index});
+                    await OSD.saveItem({id: index});
                 }
-            });
-            GUI.log(chrome.i18n.getMessage('osdClearLayout'));
+            }
+
+            GUI.log(i18n.getMessage('osdClearLayout'));
         });
 
 
