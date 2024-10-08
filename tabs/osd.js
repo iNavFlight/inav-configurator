@@ -1070,7 +1070,7 @@ OSD.constants = {
                 },
                 {
                     name: 'BLACKBOX',
-                    id: 149,
+                    id: 152,
                     min_version: '8.0.0',
                     preview: function(osd_data) {
                         return FONT.symbol(SYM.BLACKBOX) + FONT.embed_dot('000123');
