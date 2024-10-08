@@ -32,7 +32,8 @@ TABS.firmware_flasher.initialize = function (callback) {
     }
 
     var intel_hex = false, // standard intel hex in string format
-        parsed_hex = false; // parsed raw hex in array format
+        parsed_hex = false, // parsed raw hex in array format
+        file_name = 'inav.hex'; // default suggested filename of locally saved file
 
     GUI.load(path.join(__dirname, "firmware_flasher.html"), function () {
         // translate to user-selected language
@@ -450,6 +451,7 @@ TABS.firmware_flasher.initialize = function (callback) {
                         $('div.release_info .date').text(summary.date);
                         $('div.release_info .status').text(summary.status);
                         $('div.release_info .file').text(summary.file).prop('href', summary.url);
+                        file_name = summary.file;
 
                         var formattedNotes = marked.parse(summary.notes);
                         $('div.release_info .notes').html(formattedNotes);
@@ -538,49 +540,19 @@ TABS.firmware_flasher.initialize = function (callback) {
             }
         });
 
-        $(document).on('click', 'span.progressLabel a.save_firmware', function () {
-            chrome.fileSystem.chooseEntry({type: 'saveFile', suggestedName: 'inav', accepts: [{extensions: ['hex']}]}, function (fileEntry) {
-                if (chrome.runtime.lastError) {
-                    console.error(chrome.runtime.lastError.message);
-                    return;
-                }
-
-                chrome.fileSystem.getDisplayPath(fileEntry, function (path) {
-                    console.log('Saving firmware to: ' + path);
-
-                    // check if file is writable
-                    chrome.fileSystem.isWritableEntry(fileEntry, function (isWritable) {
-                        if (isWritable) {
-                            var blob = new Blob([intel_hex], {type: 'text/plain'});
-
-                            fileEntry.createWriter(function (writer) {
-                                var truncated = false;
-
-                                writer.onerror = function (e) {
-                                    console.error(e);
-                                };
-
-                                writer.onwriteend = function() {
-                                    if (!truncated) {
-                                        // onwriteend will be fired again when truncation is finished
-                                        truncated = true;
-                                        writer.truncate(blob.size);
-
-                                        return;
-                                    }
-                                };
-
-                                writer.write(blob);
-                            }, function (e) {
-                                console.error(e);
-                            });
-                        } else {
-                            console.log('You don\'t have write permissions for this file, sorry.');
-                            GUI.log(i18n.getMessage('writePermissionsForFile'));
-                        }
-                    });
-                });
+        $(document).on('click', 'span.progressLabel a.save_firmware', async function () {
+            const result = await dialog.showSaveDialog({
+                defaultPath: file_name,
             });
+
+            try {
+                fs.writeFileSync(result.filePath, intel_hex);
+                GUI.log('Saved firmware to: ' + result.filePath);
+            }
+            catch(e) {
+                console.error(e);
+                GUI.log('Failed to save the file !');
+            }
         });
 
         
