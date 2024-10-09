@@ -1148,6 +1148,11 @@ var mspHelper = (function () {
                     // Ignore wether the VTX is ready for now
                     offset++;
                     FC.VTX_CONFIG.low_power_disarm = data.getUint8(offset++);
+                    // Assume we got a vtx table
+                    offset++;
+                    FC.VTX_CONFIG.band_count = data.getUint8(offset++);
+                    FC.VTX_CONFIG.channel_count = data.getUint8(offset++);
+                    FC.VTX_CONFIG.power_count = data.getUint8(offset++);
                 }
                 break;
             case MSPCodes.MSP_ADVANCED_CONFIG:

@@ -354,6 +354,9 @@ var FC = {
             power: 0,
             pitmode: 0,
             low_power_disarm: 0,
+            band_count: 0,
+            channel_count: 0,
+            power_count: 0,
         };
 
         this.ADVANCED_CONFIG = {
