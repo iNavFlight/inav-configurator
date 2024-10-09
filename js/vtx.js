@@ -31,7 +31,7 @@ var VTX = (function() {
         if ((vtxDev == self.DEV_SMARTAUDIO) || (vtxDev == self.DEV_TRAMP)) {
             return 5;
         } else if (vtxDev == self.DEV_MSP) {
-            return 4
+            return 4;
         }
         return 3;
     }
