@@ -10,7 +10,9 @@
 .tab-onboard-logging .sdcard-icon {
     width: 6rem;
     height: 6rem;
-    background: url(./../../../images/icons/cf_icon_sdcard.svg) no-repeat center;
+    line-height: 6rem;
+    color: var(--inav-white);
+    font-size: 3rem;
     background-size: 45%;
 }
 
