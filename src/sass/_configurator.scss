@@ -86,23 +86,23 @@ html, body {
 }
 
 .windows-buttons > .btn .icon.options {
-  mask-image: url(images/three-dots-vertical.svg);
+  mask-image: url(../images/three-dots-vertical.svg);
 }
 
 .windows-buttons > .btn .icon.close {
-  mask-image: url(images/window-close.svg);
+  mask-image: url(../images/window-close.svg);
 }
 
 .windows-buttons > .btn .icon.minimize {
-  mask-image: url(images/window-minimize.svg);
+  mask-image: url(../images/window-minimize.svg);
 }
 
 .windows-buttons > .btn .icon.maximize {
-  mask-image: url(images/window-maximize.svg);
+  mask-image: url(../images/window-maximize.svg);
 }
 
 .windows-buttons > .btn .icon.restore {
-  mask-image: url(images/window-restore.svg);
+  mask-image: url(../images/window-restore.svg);
 }
 
 [data-os="MacOS"] .windows-buttons > .btn.options {
@@ -310,32 +310,32 @@ html, body {
 
 
 $tabIcons: (
-  'welcome': url(./images/icons/cf_icon_welcome_white.svg),
-  'help': url(./images/icons/cf_icon_help_white.svg),
-  'mission-control': url(./images/icons/cf_icon_mission_white.svg),
-  'firmware-flasher': url(./images/icons/cf_icon_flasher_white.svg),
-  'sitl': url(./images/icons/cf_icon_sitl_white.svg),
-  'setup': url(./images/icons/cf_icon_setup_white.svg),
-  'calibration': url(./images/icons/cf_icon_cal_white.svg),
-  'mixer': url(./images/icons/cf_icon_mixer_white.svg),
-  'outputs': url(./images/icons/cf_icon_motor_white.svg),
-  'ports': url(./images/icons/cf_icon_ports_white.svg),
-  'configuration': url(./images/icons/cf_icon_config_white.svg),
-  'failsafe': url(./images/icons/cf_icon_failsafe_white.svg),
-  'pid-tuning': url(./images/icons/cf_icon_pid_white.svg),
-  'advanced-tuning': url(./images/icons/cf_icon_advanced_grey.svg),
-  'programming': url(./images/icons/cf_icon_config_grey.svg),
-  'receiver': url(./images/icons/cf_icon_rx_white.svg),
-  'adjustments': url(./images/icons/cf_icon_adjust_white.svg),
-  'auxiliary': url(./images/icons/cf_icon_modes_white.svg),
-  'gps': url(./images/icons/cf_icon_gps_white.svg),
-  'magnetometer': url(./images/icons/cf_icon_mag_white.svg),
-  'osd': url(./images/icons/icon_osd.svg),
-  'led-strip': url(./images/icons/cf_icon_led_white.svg),
-  'sensors': url(./images/icons/cf_icon_sensors_white.svg),
-  'logging': url(./images/icons/cf_icon_log_white.svg),
-  'onboard-logging': url(./images/icons/cf_icon_data_white.svg),
-  'cli': url(./images/icons/cf_icon_cli_white.svg),
+  'welcome': url(../images/icons/cf_icon_welcome_white.svg),
+  'help': url(../images/icons/cf_icon_help_white.svg),
+  'mission-control': url(../images/icons/cf_icon_mission_white.svg),
+  'firmware-flasher': url(../images/icons/cf_icon_flasher_white.svg),
+  'sitl': url(../images/icons/cf_icon_sitl_white.svg),
+  'setup': url(../images/icons/cf_icon_setup_white.svg),
+  'calibration': url(../images/icons/cf_icon_cal_white.svg),
+  'mixer': url(../images/icons/cf_icon_mixer_white.svg),
+  'outputs': url(../images/icons/cf_icon_motor_white.svg),
+  'ports': url(../images/icons/cf_icon_ports_white.svg),
+  'configuration': url(../images/icons/cf_icon_config_white.svg),
+  'failsafe': url(../images/icons/cf_icon_failsafe_white.svg),
+  'pid-tuning': url(../images/icons/cf_icon_pid_white.svg),
+  'advanced-tuning': url(../images/icons/cf_icon_advanced_grey.svg),
+  'programming': url(../images/icons/cf_icon_config_grey.svg),
+  'receiver': url(../images/icons/cf_icon_rx_white.svg),
+  'adjustments': url(../images/icons/cf_icon_adjust_white.svg),
+  'auxiliary': url(../images/icons/cf_icon_modes_white.svg),
+  'gps': url(../images/icons/cf_icon_gps_white.svg),
+  'magnetometer': url(../images/icons/cf_icon_mag_white.svg),
+  'osd': url(../images/icons/icon_osd.svg),
+  'led-strip': url(../images/icons/cf_icon_led_white.svg),
+  'sensors': url(../images/icons/cf_icon_sensors_white.svg),
+  'logging': url(../images/icons/cf_icon_log_white.svg),
+  'onboard-logging': url(../images/icons/cf_icon_data_white.svg),
+  'cli': url(../images/icons/cf_icon_cli_white.svg),
 );
 
 
