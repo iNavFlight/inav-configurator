@@ -55,6 +55,6 @@
     "@electron/packager": "^18.3.3",
     "electron": "28.1.4",
     "node-gyp": "^10.1.0",
-    "sass": "^1.77.8"
+    "sass-embedded": "^1.79.5"
   }
 }
