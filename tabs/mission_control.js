@@ -426,7 +426,7 @@ TABS.mission_control.initialize = function (callback) {
         $('#pointP2').val('');
         $('#pointP3Alt').val('');
         $('#missionDistance').text(0);
-        $('#MPeditPoint').fadeOut(300);
+        $('#MPeditPoint').hide();
     }
 
     function clearFilename() {
@@ -787,10 +787,10 @@ TABS.mission_control.initialize = function (callback) {
         }
 
         if (globalSettings.mapProviderType == 'bing') {
-            $('#elevationEarthModelclass').fadeIn(300);
+            $('#elevationEarthModelclass').show();
             changeSwitchery($('#elevationEarthModel'), settings.bingDemModel);
         } else {
-            $('#elevationEarthModelclass').fadeOut(300);
+            $('#elevationEarthModelclass').hide();
         }
     }
 
@@ -1094,11 +1094,11 @@ TABS.mission_control.initialize = function (callback) {
         if (enabled) {
             $("#addOptionsPointButton").addClass('disabled');
             $("#removePointButton").addClass('disabled');
-            $("#waypointOptionsTableBody").fadeOut();
+            $("#waypointOptionsTableBody").hide();
         } else {
             $("#addOptionsPointButton").removeClass('disabled');
             $("#removePointButton").removeClass('disabled');
-            $("#waypointOptionsTableBody").fadeIn();
+            $("#waypointOptionsTableBody").show();
         }
     }
 
@@ -1390,7 +1390,7 @@ TABS.mission_control.initialize = function (callback) {
 
             lockShExclHeading = true;
             if (!$('#missionPlannerSafehome').is(':visible')) {
-                $('#missionPlannerSafehome').fadeIn(300);
+                $('#missionPlannerSafehome').show();
             }
 
             $('#SafehomeContentBox').show();
@@ -1435,18 +1435,20 @@ TABS.mission_control.initialize = function (callback) {
          */
         $waypointOptionsTableBody.empty();
         mission.getAttachedFromWaypoint(waypoint).forEach(function (element) {
-            $waypointOptionsTableBody.append('\
-                <tr>\
-                <td><div id="deleteOptionsPoint" class="btnTable btnTableIcon btnTable-danger"> \
-                        <a class="ic_cancel" data-role="waypointOptions-delete" href="#" style="float: center" title="Delete"></a> \
-                    </div>\
-                </td> \
-                <td><span class="waypointOptions-number"/></td>\
-                <td><select class="waypointOptions-action"></select></td>\
-                <td><input type="number" class="waypointOptions-p1" /></td>\
-                <td><input type="number" class="waypointOptions-p2" /></td>\
-                </tr>\
-            ');
+            $waypointOptionsTableBody.append(`
+                <tr>
+                    <td><span class="waypointOptions-number"/></td>
+                    <td><select class="waypointOptions-action form-select"></select></td>
+                    <td><input type="number" class="waypointOptions-p1 form-control" /></td>
+                    <td><input type="number" class="waypointOptions-p2 form-control" /></td>
+                    <td>
+                        <button class="btn btn-danger px-2" data-role="waypointOptions-delete" title="Delete">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </td> 
+                </tr>
+            `);
+
 
             const $row = $waypointOptionsTableBody.find('tr:last');
 
@@ -1613,7 +1615,7 @@ TABS.mission_control.initialize = function (callback) {
             button.style = 'background: url(\'./images/CF_settings_white.svg\') no-repeat 1px -1px;background-color: rgba(0,60,136,.5);';
 
             var handleShowSettings = function () {
-                $('#missionPlannerSettings').fadeIn(300);
+                $('#missionPlannerSettings').show();
             };
 
             button.addEventListener('click', handleShowSettings, false);
@@ -1645,7 +1647,7 @@ TABS.mission_control.initialize = function (callback) {
             button.style = 'background: url(\'./images/icons/cf_icon_safehome_white.svg\') no-repeat 1px -1px;background-color: rgba(0,60,136,.5);';
 
             var handleShowSafehome = function () {
-                $('#missionPlannerSafehome').fadeIn(300);
+                $('#missionPlannerSafehome').show();
                 cleanSafehomeLayers();
                 renderSafehomesOnMap();
                 $('#safeHomeMaxDistance').text(settings.maxDistSH);
@@ -1680,11 +1682,11 @@ TABS.mission_control.initialize = function (callback) {
             button.style = 'background: url(\'./images/icons/cf_icon_elevation_white.svg\') no-repeat 1px -1px;background-color: rgba(0,60,136,.5);';
 
             var handleShowSettings = function () {
-                $('#missionPlannerHome').fadeIn(300);
+                $('#missionPlannerHome').show();
                 cleanHomeLayers();
                 renderHomeTable();
                 renderHomeOnMap();
-                $('#missionPlannerElevation').fadeIn(300);
+                $('#missionPlannerElevation').show();
                 plotElevation();
             };
 
@@ -1717,7 +1719,7 @@ TABS.mission_control.initialize = function (callback) {
             button.style = 'background: url(\'./images/icons/cf_icon_multimission_white.svg\') no-repeat 1px -1px;background-color: rgba(0,60,136,.5);';
 
             var handleShowSettings = function () {
-                $('#missionPlannerMultiMission').fadeIn(300);
+                $('#missionPlannerMultiMission').show();
             };
 
             button.addEventListener('click', handleShowSettings, false);
@@ -2044,9 +2046,9 @@ TABS.mission_control.initialize = function (callback) {
                 var altitudeMeters = app.ConvertCentimetersToMeters(selectedMarker.getAlt());
 
                 if (selectedMarker.getAction() == MWNP.WPTYPE.LAND) {
-                    $('#wpFwLanding').fadeIn(300);
+                    $('#wpFwLanding').show();
                 } else  {
-                    $('#wpFwLanding').fadeOut(300);
+                    $('#wpFwLanding').hide();
                 }
 
                 if (tempSelectedMarkerIndex == null || tempSelectedMarkerIndex != selectedMarker.getLayerNumber()) {
@@ -2074,8 +2076,8 @@ TABS.mission_control.initialize = function (callback) {
                         plotElevation();
                     })()
                 }
-                $('#elevationAtWP').fadeIn();
-                $('#groundClearanceAtWP').fadeIn();
+                $('#elevationAtWP').show();
+                $('#groundClearanceAtWP').show();
 
                 $('#altitudeInMeters').text(` ${altitudeMeters}m`);
                 $('#pointLon').val(Math.round(coord[0] * 10000000) / 10000000);
@@ -2106,15 +2108,15 @@ TABS.mission_control.initialize = function (callback) {
                 // Selection box update depending on choice of type of waypoint
                 for (var j in dictOfLabelParameterPoint[selectedMarker.getAction()]) {
                     if (dictOfLabelParameterPoint[selectedMarker.getAction()][j] != '') {
-                        $('#pointP'+String(j).slice(-1)+'class').fadeIn(300);
+                        $('#pointP'+String(j).slice(-1)+'class').show();
                         $('label[for=pointP'+String(j).slice(-1)+']').html(dictOfLabelParameterPoint[selectedMarker.getAction()][j]);
                     }
-                    else {$('#pointP'+String(j).slice(-1)+'class').fadeOut(300);}
+                    else {$('#pointP'+String(j).slice(-1)+'class').hide();}
                 }
                 selectedMarker = renderWaypointOptionsTable(selectedMarker);
                 $('#EditPointNumber').text("Edit point "+String(selectedMarker.getLayerNumber()+1));
-                $('#MPeditPoint').fadeIn(300);
-                $('#pointP3UserActionClass').fadeIn();
+                $('#MPeditPoint').show();
+                $('#pointP3UserActionClass').show();
                 redrawLayer();
             }
             else if (selectedFeature && tempMarker.kind == "line" && tempMarker.selection && !disableMarkerEdit) {
@@ -2202,15 +2204,6 @@ TABS.mission_control.initialize = function (callback) {
         });
 
         //////////////////////////////////////////////////////////////////////////
-        // handle map size on container resize
-        //////////////////////////////////////////////////////////////////////////
-        setInterval(function () {
-            let width = $("#missionMap canvas").width(), height = $("#missionMap canvas").height();
-            if ((map.width_ != width) || (map.height_ != height)) map.updateSize();
-            map.width_ = width; map.height_ = height;
-        }, 200);
-
-        //////////////////////////////////////////////////////////////////////////
         // Update Alt display in meters on ALT field keypress up
         //////////////////////////////////////////////////////////////////////////
         $('#pointAlt').on('keyup', () => {
@@ -2221,83 +2214,20 @@ TABS.mission_control.initialize = function (callback) {
         /////////////////////////////////////////////
         // Callback to show/hide menu boxes
         /////////////////////////////////////////////
-        $('#showHideActionButton').on('click', function () {
-            var src = ($(this).children().attr('class') === 'ic_hide')
-                ? 'ic_show'
-                : 'ic_hide';
-            $(this).children().attr('class', src);
-            if ($(this).children().attr('class') === 'ic_hide') {
-                $('#ActionContent').fadeIn(300);
-            }
-            else {
-                $('#ActionContent').fadeOut(300);
-            }
-        });
+        function toggleCardBody(triggerId, bodyId) {
+            $(triggerId).on('click', function () {
+                let hasChevronDownClass = $(this).hasClass('chevron-down');
+                $(this).removeClass('chevron-down chevron-up').addClass(hasChevronDownClass ? 'chevron-up' : 'chevron-down');
+                $(bodyId).toggle(hasChevronDownClass);
+            });
+        }
 
-        $('#showHideInfoButton').on('click', function () {
-            var src = ($(this).children().attr('class') === 'ic_hide')
-                ? 'ic_show'
-                : 'ic_hide';
-            $(this).children().attr('class', src);
-            if ($(this).children().attr('class') === 'ic_hide') {
-                $('#InfoContent').fadeIn(300);
-            }
-            else {
-                $('#InfoContent').fadeOut(300);
-            }
-        });
-
-        $('#showHideSafehomeButton').on('click', function () {
-            var src = ($(this).children().attr('class') === 'ic_hide')
-                ? 'ic_show'
-                : 'ic_hide';
-            $(this).children().attr('class', src);
-            if ($(this).children().attr('class') === 'ic_hide') {
-                $('#SafehomeContent').fadeIn(300);
-            }
-            else {
-                $('#SafehomeContent').fadeOut(300);
-            }
-        });
-
-        $('#showHideHomeButton').on('click', function () {
-            var src = ($(this).children().attr('class') === 'ic_hide')
-                ? 'ic_show'
-                : 'ic_hide';
-            $(this).children().attr('class', src);
-            if ($(this).children().attr('class') === 'ic_hide') {
-                $('#HomeContent').fadeIn(300);
-            }
-            else {
-                $('#HomeContent').fadeOut(300);
-            }
-        });
-
-        $('#showHideWPeditButton').on('click', function () {
-            var src = ($(this).children().attr('class') === 'ic_hide')
-                ? 'ic_show'
-                : 'ic_hide';
-            $(this).children().attr('class', src);
-            if ($(this).children().attr('class') === 'ic_hide') {
-                $('#WPeditContent').fadeIn(300);
-            }
-            else {
-                $('#WPeditContent').fadeOut(300);
-            }
-        });
-
-        $('#showHideMultimissionButton').on('click', function () {
-            var src = ($(this).children().attr('class') === 'ic_hide')
-                ? 'ic_show'
-                : 'ic_hide';
-            $(this).children().attr('class', src);
-            if ($(this).children().attr('class') === 'ic_hide') {
-                $('#multimissionContent').fadeIn(300);
-            }
-            else {
-                $('#multimissionContent').fadeOut(300);
-            }
-        });
+        toggleCardBody('#showHideActionButton', '#ActionContent');
+        toggleCardBody('#showHideInfoButton', '#InfoContent');
+        toggleCardBody('#showHideSafehomeButton', '#SafehomeContent');
+        toggleCardBody('#showHideHomeButton', '#HomeContent');
+        toggleCardBody('#showHideWPeditButton', '#WPeditContent');
+        toggleCardBody('#showHideMultimissionButton', '#multimissionContent');
 
         /////////////////////////////////////////////
         // Callback for Waypoint edition
@@ -2315,11 +2245,11 @@ TABS.mission_control.initialize = function (callback) {
                     });
 
                     if (!found) {
-                        $('#wpFwLanding').fadeIn(300);
+                        $('#wpFwLanding').show();
                     }
 
                 } else  {
-                    $('#wpFwLanding').fadeOut(300);
+                    $('#wpFwLanding').hide();
                 }
 
                 selectedMarker.setAction(Number($('#pointType').val()));
@@ -2329,10 +2259,10 @@ TABS.mission_control.initialize = function (callback) {
                 }
                 for (var j in dictOfLabelParameterPoint[selectedMarker.getAction()]) {
                     if (dictOfLabelParameterPoint[selectedMarker.getAction()][j] != '') {
-                        $('#pointP'+String(j).slice(-1)+'class').fadeIn(300);
+                        $('#pointP'+String(j).slice(-1)+'class').show();
                         $('label[for=pointP'+String(j).slice(-1)+']').html(dictOfLabelParameterPoint[selectedMarker.getAction()][j]);
                     }
-                    else {$('#pointP'+String(j).slice(-1)+'class').fadeOut(300);}
+                    else {$('#pointP'+String(j).slice(-1)+'class').hide();}
                 }
                 mission.updateWaypoint(selectedMarker);
                 mission.update(singleMissionActive());
@@ -2988,7 +2918,7 @@ TABS.mission_control.initialize = function (callback) {
         });
 
         $('#cancelMultimission').on('click', function () {
-            $('#missionPlannerMultiMission').fadeOut(300);
+            $('#missionPlannerMultiMission').hide();
         });
 
         $('#setActiveMissionButton').on('click', function () {
@@ -3011,7 +2941,7 @@ TABS.mission_control.initialize = function (callback) {
             }
         });
 
-        $('#removePoint').on('click', function () {
+        $('#removePointButton').on('click', function () {
             if (selectedMarker) {
                 if (mission.isJumpTargetAttached(selectedMarker)) {
                     GUI.alert(i18n.getMessage('MissionPlannerJumpTargetRemoval'));
@@ -3304,7 +3234,7 @@ TABS.mission_control.initialize = function (callback) {
                         multimission.reinit();
                         multimission.copy(mission);
                         renderMultimissionTable();
-                        $('#missionPlannerMultiMission').fadeIn(300);
+                        $('#missionPlannerMultiMission').show();
                     }
                 } else {
                     // update Attached Waypoints (i.e non Map Markers)
@@ -3456,7 +3386,7 @@ TABS.mission_control.initialize = function (callback) {
             multimission.reinit();
             if (multimissionCount > 1) {
                 multimission.copy(mission);
-                $('#missionPlannerMultiMission').fadeIn(300);
+                $('#missionPlannerMultiMission').show();
             }
             renderMultimissionTable();
             setView(16);
@@ -3494,7 +3424,7 @@ TABS.mission_control.initialize = function (callback) {
                 mission.copy(FC.MISSION_PLANNER);
                 mission.update(false, true);
                 refreshLayers();
-                $('#MPeditPoint').fadeOut(300);
+                $('#MPeditPoint').hide();
             }
         ]);
         saveChainer.execute();

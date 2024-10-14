@@ -52,7 +52,7 @@ const groundstation = (function () {
         privateScope.$viewport.find('#content').hide();
         privateScope.$viewport.find('#status-bar').hide();
         privateScope.$viewport.find('#connectbutton a.connect_state').text(i18n.getMessage('disconnect'));
-        privateScope.$viewport.find('#connectbutton a.connect').addClass('active');
+        privateScope.$viewport.find('#connect-btn').addClass('active');
 
         privateScope.$gsViewport = $viewport.find('#view-groundstation');
         privateScope.$gsViewport.show();

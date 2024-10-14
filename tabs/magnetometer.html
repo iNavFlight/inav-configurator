@@ -1,270 +1,212 @@
-<div class="tab-magnetometer toolbar_fixed_bottom">
-    <div class="content_wrapper">
-        <div class="tab_title" data-i18n="tabMAGNETOMETER">Magnetometer</div>
-        <div class="note spacebottom">
-            <div class="note_spacer">
-                <p i18n="magnetometerHelp"></p>
-            </div>
-        </div>
-        <div class="cf_column tab-magnetometer-left-wrapper">
-            <div class="model-and-info">
-                <div id="interactive_block">
-                    <div id="canvas_wrapper">
-                        <canvas id="canvas"></canvas>
-                            <div class="attitude_info">
-                            <dl>
-                                <dt>Heading:</dt>
-                                <dd class="heading">&nbsp;</dd>
-                                <dt>Pitch:</dt>
-                                <dd class="pitch">&nbsp;</dd>
-                                <dt>Roll:</dt>
-                                <dd class="roll">&nbsp;</dd>
-                            </dl>
+<div class="page tab-magnetometer">
+    <div class="page-header">
+        <span data-i18n="tabMAGNETOMETER"></span>
+    </div>
+
+    <div class="alert alert-warning" data-i18n="magnetometerHelp"></div>
+
+    <div class="row">
+        <div class="col">
+            <div id="canvas_wrapper" class="border rounded bg-grid position-relative" style="height: 50vh;">
+                <canvas id="canvas" class="position-absolute"></canvas>
+                <div class="position-absolute top-0 w-100 d-flex align-items-start p-3">
+                    <div class="position-absolute vstack">
+                        <div>(Values according to <b>saved</b> settings)</div>
+                        <div>(North: 0, East: 90, South: 180, West: 270)</div>
+                        <div class="w-12r">
+                            <div class="d-flex justify-content-between">
+                                <b>Heading:</b>
+                                <span class="heading"></span>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <b>Pitch:</b>
+                                <span class="pitch"></span>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <b>Roll:</b>
+                                <span class="roll"></span>
+                            </div>
                         </div>
-                        <div class="attitude_note1" >(Values according to <b>saved</b> settings)</div>
-                        <div class="attitude_note2" >(North: 0, East: 90, South: 180, West: 270)</div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="cf_column tab-magnetometer-right-wrapper">
-            <div class="config-section gui_box grey">
-                <div class="spacer_box">
-                    <div id="board-alignment-info" class="info-box">
-                        <span data-i18n="boardInfo"></span>
-                    </div>
+        <div class="col">
 
-                    <table class="axis-table">
+            <div class="card mb-3">
+                <div class="card-body">
+                    <div class="alert alert-info" data-i18n="boardInfo"></div>
+                    <table class="table table-borderless">
                         <thead>
-                            <tr>
-                                <td style="width: 5%; padding-bottom: 10px;">
-                                    <p class="table-title">
-                                        <span data-i18n="axisTableTitleAxis"></span>
-                                    </p>
-                                </td>
-                                <td style="width: 90%; padding-bottom: 10px;">
-                                    <p class="table-title">
-                                        <span style="font-weight:normal;">align_board_roll, align_board_pitch, align_board_yaw</span>
-                                    </p>
-                                </td>
-                                <td style="width: 5%; padding-bottom: 10px;">
-                                    <a class="table-title">
-                                        <span data-i18n="axisTableTitleValue"></span>
-                                    </a>
-
-                                </td>
-                            </tr>
+                        <tr>
+                            <td style="width: 5%; padding-bottom: 10px;">
+                                <span data-i18n="axisTableTitleAxis"></span>
+                            </td>
+                            <td style="width: 90%; padding-bottom: 10px;">
+                                <span>align_board_roll, align_board_pitch, align_board_yaw</span>
+                            </td>
+                            <td style="width: 5%; padding-bottom: 10px;">
+                                <span data-i18n="axisTableTitleValue"></span>
+                            </td>
+                        </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td class="info">
-                                    <p class="title" data-i18n="configurationSensorAlignmentMagRoll"></p>
-                                </td>
-                                <td>
-                                    <div id="board_roll_slider" class="slider"></div>
-                                </td>
-                                <td>
-                                    <input type="number" id="boardAlignRoll" class="tab-magnetometer" data-setting="tz_offset" data-setting-multiplier="1" step="1" min="-180" max="360" />
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="info">
-                                    <p class="title" data-i18n="configurationSensorAlignmentMagPitch" style="margin: 5px"></p>
-                                </td>
-                                <td>
-                                    <div id="board_pitch_slider" class="slider"></div>
-                                </td>
-                                <td>
-                                    <input type="number" id="boardAlignPitch" class="tab-magnetometer" data-setting="tz_offset" data-setting-multiplier="1" step="1" min="-180" max="360" />
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="info">
-                                    <p class="title" data-i18n="configurationSensorAlignmentMagYaw"></p>
-                                </td>
-                                <td>
-                                    <div id="board_yaw_slider" class="slider"></div>
-                                </td>
-                                <td>
-                                    <input type="number" id="boardAlignYaw" class="tab-magnetometer" data-setting="tz_offset" data-setting-multiplier="1" step="1" min="-180" max="360" />
-                                </td>
-                            </tr>
+                        <tr>
+                            <td>
+                                <div data-i18n="configurationSensorAlignmentMagRoll"></div>
+                            </td>
+                            <td class="px-4 pb-5">
+                                <div id="board_roll_slider" class="mb-4"></div>
+                            </td>
+                            <td>
+                                <input type="number" id="boardAlignRoll" class="form-control" data-setting="tz_offset" data-setting-multiplier="1" step="1" min="-180" max="360" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="title" data-i18n="configurationSensorAlignmentMagPitch"></div>
+                            </td>
+                            <td class="px-4 pb-5">
+                                <div id="board_pitch_slider" class="mb-4"></div>
+                            </td>
+                            <td>
+                                <input type="number" id="boardAlignPitch" class="form-control" data-setting="tz_offset" data-setting-multiplier="1" step="1" min="-180" max="360" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div data-i18n="configurationSensorAlignmentMagYaw"></div>
+                            </td>
+                            <td class="px-4 pb-5">
+                                <div id="board_yaw_slider" class="mb-4"></div>
+                            </td>
+                            <td>
+                                <input type="number" id="boardAlignYaw" class="form-control" data-setting="tz_offset" data-setting-multiplier="1" step="1" min="-180" max="360" />
+                            </td>
+                        </tr>
                         </tbody>
                     </table>
-                    <div class="cli-box">
-                        <span class="cli-settings-title">CLI:&nbsp;</span><span id="cli_settings_fc"></span>
+
+                    <div class="text-center pt-3 border-top">
+                        <span>CLI:&nbsp;</span><span id="cli_settings_fc"></span>
                     </div>
                 </div>
             </div>
 
-            <div class="config-section gui_box grey">
-                <div class="spacer_box">
-                    <div id="alignment-info" class="info-box">
-                        <span data-i18n="magnetometerInfo"></span>
-                    </div>
-                    <div class="select" style="display: flex; justify-content: left;">
-                        <select id="magalign" class="magalign" style="width: 210px; flex-grow: 0; flex-shrink: 0">
-                            <option value="0">Default</option>
-                            <!-- list generated here -->
-                        </select>
-                        <label for="magalign" data-i18n="magnetometerOrientationPreset"></label>
-                    </div>
-                    <div class="select" style="display: flex; justify-content: left;">
-                        <select id="element_to_show" style="width: 210px; flex-grow: 0; flex-shrink: 0">
-                            <option value="0" selected data-i18n="magnetometerAxes"></option>
-                            <option value="1">AK8963C</option>
-                            <option value="2">AK8963N</option>
-                            <option value="3">AK8975</option>
-                            <option value="4">AK8975C</option>
-                            <option value="5">BN-880</option>
-                            <option value="6">DIATONE Mamba M10 PRO</option>
-                            <option value="7">FLYWOO GOKU M10 PRO V3</option>
-                            <option value="8">FOXEER-M10Q-120</option>
-                            <option value="9">FOXEER-M10Q-180</option>
-                            <option value="10">FOXEER-M10Q-250</option>
-                            <option value="11">GEPRC GEP-M10-DQ</option>
-                            <option value="12">GY-271</option>
-                            <option value="13">GY-273</option>
-                            <option value="14">HGLRC-M100-5883</option>
-                            <option value="15">HMC5833</option>
-                            <option value="16">HOLYBRO Micro M9N IST8310</option>
-                            <option value="17">HOLYBRO Micro M10 IST8310</option>
-                            <option value="18">IST8308</option>
-                            <option value="19">IST8310</option>
-                            <option value="20">LIS3MDL</option>
-                            <option value="21">MAG3110</option>
-                            <option value="22">MATEK M8Q-5833</option>
-                            <option value="23">MATEK M9N-5833</option>
-                            <option value="24">MATEK M10Q-5833</option>
-                            <option value="25">MLX90393</option>
-                            <option value="26">MP9250</option>
-                            <option value="27">QMC5833</option>
-                            <option value="28">SPEEDYEBEE BZ-251</option>
-                            <option value="29">WS-M181</option>
-                            <!-- list generated here -->
-                        </select>
-                        <label for="element_to_show" data-i18n="magnetometerElementToShow"></label>
-                    </div>
+            <div class="card mb-3">
+                <div class="card-body">
+                    <div class="alert alert-info" data-i18n="magnetometerInfo"></div>
 
-                    <table class="axis-table">
+                    <ul class="list-group list-group-flush mb-3">
+                        <li class="list-group-item hstack">
+                            <select id="magalign" class="magalign form-select w-10r">
+                                <option value="0">Default</option>
+                                <!-- list generated here -->
+                            </select>
+                            <label for="magalign" data-i18n="magnetometerOrientationPreset"></label>
+                        </li>
+                        <li class="list-group-item hstack">
+                            <select id="element_to_show" class="form-select w-10r">
+                                <option value="0" selected data-i18n="magnetometerAxes"></option>
+                                <option value="1">AK8963C</option>
+                                <option value="2">AK8963N</option>
+                                <option value="3">AK8975</option>
+                                <option value="4">AK8975C</option>
+                                <option value="5">BN-880</option>
+                                <option value="6">DIATONE Mamba M10 PRO</option>
+                                <option value="7">FLYWOO GOKU M10 PRO V3</option>
+                                <option value="8">FOXEER-M10Q-120</option>
+                                <option value="9">FOXEER-M10Q-180</option>
+                                <option value="10">FOXEER-M10Q-250</option>
+                                <option value="11">GEPRC GEP-M10-DQ</option>
+                                <option value="12">GY-271</option>
+                                <option value="13">GY-273</option>
+                                <option value="14">HGLRC-M100-5883</option>
+                                <option value="15">HMC5833</option>
+                                <option value="16">HOLYBRO Micro M9N IST8310</option>
+                                <option value="17">HOLYBRO Micro M10 IST8310</option>
+                                <option value="18">IST8308</option>
+                                <option value="19">IST8310</option>
+                                <option value="20">LIS3MDL</option>
+                                <option value="21">MAG3110</option>
+                                <option value="22">MATEK M8Q-5833</option>
+                                <option value="23">MATEK M9N-5833</option>
+                                <option value="24">MATEK M10Q-5833</option>
+                                <option value="25">MLX90393</option>
+                                <option value="26">MP9250</option>
+                                <option value="27">QMC5833</option>
+                                <option value="28">SPEEDYEBEE BZ-251</option>
+                                <option value="29">WS-M181</option>
+                                <!-- list generated here -->
+                            </select>
+                            <label for="element_to_show" data-i18n="magnetometerElementToShow"></label>
+                        </li>
+                    </ul>
+
+                    <table class="table table-borderless">
                         <thead>
-                            <tr>
-                                <td style="width: 5%; padding-bottom: 10px;">
-                                    <p class="table-title">
-                                        <span data-i18n="axisTableTitleAxis"></span>
-                                    </p>
-                                </td>
-                                <td style="width: 90%; padding-bottom: 10px;">
-                                    <p class="table-title">
-                                        <span id="align_mag_xxx">align_mag_roll, align_mag_pitch, align_mag_yaw</span>
-                                    </p>
-                                </td>
-                                <td style="width: 5%; padding-bottom: 10px;">
-                                    <a class="table-title">
-                                        <span data-i18n="axisTableTitleValue"></span>
-                                    </a>
-
-                                </td>
-                            </tr>
+                        <tr>
+                            <td style="width: 5%;">
+                                <span data-i18n="axisTableTitleAxis"></span>
+                            </td>
+                            <td style="width: 90%;">
+                                <span id="align_mag_xxx">align_mag_roll, align_mag_pitch, align_mag_yaw</span>
+                            </td>
+                            <td style="width: 5%;">
+                                <span data-i18n="axisTableTitleValue"></span>
+                            </td>
+                        </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td class="info">
-                                    <p class="title" data-i18n="configurationSensorAlignmentMagRoll"></p>
-                                </td>
-                                <td>
-                                    <div id="roll_slider" class="slider"></div>
-                                </td>
-                                <td>
-                                    <input type="number" id="alignRoll" class="tab-magnetometer" data-setting="tz_offset" data-setting-multiplier="1" step="1" min="-180" max="360" />
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="info">
-                                    <p class="title" data-i18n="configurationSensorAlignmentMagPitch" style="margin: 5px"></p>
-                                </td>
-                                <td>
-                                    <div id="pitch_slider" class="slider"></div>
-                                </td>
-                                <td>
-                                    <input type="number" id="alignPitch" class="tab-magnetometer" data-setting="tz_offset" data-setting-multiplier="1" step="1" min="-180" max="360" />
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="info">
-                                    <p class="title" data-i18n="configurationSensorAlignmentMagYaw"></p>
-                                </td>
-                                <td>
-                                    <div id="yaw_slider" class="slider"></div>
-                                </td>
-                                <td>
-                                    <input type="number" id="alignYaw" class="tab-magnetometer" data-setting="tz_offset" data-setting-multiplier="1" step="1" min="-180" max="360" />
-                                </td>
-                            </tr>
+                        <tr>
+                            <td>
+                                <div data-i18n="configurationSensorAlignmentMagRoll"></div>
+                            </td>
+                            <td class="px-4 pb-5">
+                                <div id="roll_slider" class="mb-4"></div>
+                            </td>
+                            <td>
+                                <input type="number" id="alignRoll" class="form-control" data-setting="tz_offset" data-setting-multiplier="1" step="1" min="-180" max="360" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div data-i18n="configurationSensorAlignmentMagPitch"></div>
+                            </td>
+                            <td class="px-4 pb-5">
+                                <div id="pitch_slider" class="mb-4"></div>
+                            </td>
+                            <td>
+                                <input type="number" id="alignPitch" class="form-control" data-setting="tz_offset" data-setting-multiplier="1" step="1" min="-180" max="360" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div data-i18n="configurationSensorAlignmentMagYaw"></div>
+                            </td>
+                            <td class="px-4 pb-5">
+                                <div id="yaw_slider" class="mb-4"></div>
+                            </td>
+                            <td>
+                                <input type="number" id="alignYaw" class="form-control" data-setting="tz_offset" data-setting-multiplier="1" step="1" min="-180" max="360" />
+                            </td>
+                        </tr>
                         </tbody>
                     </table>
-                    <div class="cli-box">
-                        <span class="cli-settings-title">CLI:&nbsp;</span><span id="cli_settings_mag"></span>
+                    <div class="text-center pt-3 border-top">
+                        <span>CLI:&nbsp;</span><span id="cli_settings_mag"></span>
                     </div>
-                    <div class="cli-box" style="font-style:normal;">
+                    <div class="text-center">
                         <span id="comment_sensor_mag_preset" data-i18n="configurationSensorMagPreset"></span>
                         <span id="comment_sensor_mag_angles" data-i18n="configurationSensorMagAngles"></span>
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="clear-both"></div>
-    </div>
-    <div class="content_toolbar supported hide">
-        <div class="btn save_btn">
-            <a class="save" href="#" data-i18n="configurationButtonSave"></a>
+
         </div>
     </div>
 
-</div>
-
-<div id="tab-auxiliary-templates">
-    <table class="modes">
-        <tbody>
-            <tr class="mode">
-                <td class="info">
-                    <p class="name"></p>
-                    <div class="buttons">
-                        <a class="addRange" href="#" i18n="auxiliaryAddRange"></a>
-                    </div>
-                </td>
-                <td class="ranges"></td>
-            </tr>
-        </tbody>
-    </table>
-    <div class="range">
-        <div class="channelInfo">
-            <select class="channel">
-                <option value=""></option>
-            </select>
-            <div class="limits">
-                <p class="lowerLimit">
-                    <span i18n="auxiliaryMin"></span>: <span class="lowerLimitValue"></span>
-                </p>
-                <p class="upperLimit">
-                    <span i18n="auxiliaryMax"></span>: <span class="upperLimitValue"></span>
-                </p>
-            </div>
-        </div>
-        <div class="channel-slider pips-channel-range">
-            <div class="marker"></div>
-        </div>
-        <div class="delete">
-            <a class="deleteRange" href="#">&nbsp;</a>
-        </div>
+    <div class="page-footer">
+        <button id="save-btn" class="btn btn-primary" data-i18n="configurationButtonSave"></button>
     </div>
-    <table>
-        <tr class="modeSection">
-            <td colspan="2">
-                <div class="modeSectionArea">
-                    <p class="modeSectionName"></p>
-                </div>
-            </td>
-        </tr>
-    </table>
 </div>

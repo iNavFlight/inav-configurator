@@ -1,488 +1,543 @@
-<div class="tab-mission-control">
-    <div style="padding-top: 20px;padding-left: 20px; padding-right: 20px;position: relative;">
-        <div class="tab_title" data-i18n="tabMissionControl"></div>
+<div class="page tab-mission-control">
+    <div class="page-header">
+        <span data-i18n="tabMissionControl"></span>
     </div>
-    <div class="content_wrapper">
-        <div class="cf_column fourth" id="missionControls">
-            <div class="spacer_right">
-                <div id="missionPlannerAction" class="gui_box grey">
-                    <div class="gui_box_titlebar">
-                        <div class="spacer_box_title" data-i18n="missionActionMenuHead"></div>
-                        <div class="btnMenu btnMenuIcon show_btn"  id="showHideActionButton">
-                            <a class="ic_hide" href="#" i18n_title="missionTitleHide"></a>
-                        </div>
-                    </div>
-                    <div class="spacer" id="ActionContent">
 
-                        <div class="btn save_btn">
-                            <a id="loadFileMissionButton" class="btnicon ic_loadFromFile" href="#" i18n_title="missionTitleLoadMissionFile"></a>
-                            <a id="saveFileMissionButton" class="btnicon ic_save2File" href="#" i18n_title="missionTitleSaveMissionFile"></a>
-                        </div>
-                        <div class="btn save_btn">
-                            <a id="loadMissionButton" class="btnicon ic_loadFromFC" href="#" i18n_title="missionTitleLoadMissionFromFC"> </a>
-                                <a id="saveMissionButton" class="btnicon ic_save2FC" href="#" i18n_title="missionTitleSaveMissionToFC"> </a>
-                                    <a id="loadEepromMissionButton" class="btnicon ic_loadFromEprom" href="#" i18n_title="missionTitleLoadEepromMission"></a>
-                                    <a id="saveEepromMissionButton" class="btnicon ic_save2Eprom" href="#" i18n_title="missionTitleSaveEepromMission"></a>
-                        </div>
-                        <hr>
-                        <!-- <div class="btn">
-                            <a id="playMissionButton" class="btnicon ic_play" href="#" title="Play mission"></a>
-                            <div class="btn-danger">
-                                <a id="stopMissionButton" class="btnicon ic_stop" href="#" title="Stop mission"></a>
-                            </div>
-                        </div>
-                        <hr> -->
-                        <div id="removeAllPoints" class="btn btn-danger" style="padding-top: 1px; display: inline-block">
-                            <a class="btnicon ic_removeAll" href="#" i18n_title="missionTitleRemoveAll"></a>
-                        </div>
-                    </div>
+    <div class="row">
+        <div id="missionControls" class="col-3">
+            <div class="card mb-3">
+                <div class="card-header d-flex justify-content-between">
+                    <span data-i18n="missionActionMenuHead"></span>
+                    <button id="showHideActionButton" class="btn chevron-up" i18n_title="missionTitleHide">
+                        <span class="bi bi-chevron-down"></span>
+                        <span class="bi bi-chevron-up"></span>
+                    </button>
                 </div>
+                <div id="ActionContent" class="card-body vstack gap-3">
+                    <div class="d-flex gap-2 flex-wrap">
+                        <button id="loadFileMissionButton" class="btn btn-primary">
+                            <img src="./images/icons/cf_icon_MP_loadFile_grey.svg" alt="Load file" style="width: 1.25rem;">
+                            <span i18n="missionTitleLoadMissionFile"></span>
+                        </button>
+                        <button id="saveFileMissionButton" class="btn btn-primary">
+                            <img src="./images/icons/cf_icon_MP_saveFile_grey.svg" alt="Save file" style="width: 1.25rem;">
+                            <span i18n="missionTitleSaveMissionFile"></span>
+                        </button>
+                    </div>
 
-                <div id="missionPlannerTotalInfo" class="gui_box grey">
-                    <div class="gui_box_titlebar">
-                        <div class="spacer_box_title" data-i18n="missionTotalInformationHead"></div>
-                        <div class="btnMenu btnMenuIcon show_btn"  id="showHideInfoButton">
-                            <a class="ic_hide" href="#" i18n_title="missionTitleHide"></a>
-                        </div>
+                    <div class="d-flex gap-2 flex-wrap mode-connected">
+                        <button id="loadMissionButton" class="btn btn-primary">
+                            <img src="./images/icons/cf_icon_MP_loadFromFC_grey.svg" alt="Load from FC" style="width: 1.25rem;">
+                            <span i18n="missionTitleLoadMissionFromFC"></span>
+                        </button>
+                        <button id="saveMissionButton" class="btn btn-primary">
+                            <img src="./images/icons/cf_icon_MP_save2FC_grey.svg" alt="Save to FC" style="width: 1.25rem;">
+                            <span i18n="missionTitleSaveMissionToFC"></span>
+                        </button>
                     </div>
-                    <div class="spacer"  id="InfoContent">
-                        <div id="infoMissionFilename" style="padding-bottom: 2px;">
-                            <span data-i18n="missionTotalInfoFilenameLoaded"></span>
-                            <span id="missionFilename" style="color: #3394b5"></span>
-                        </div>
-                        <div id="infoMissionDistance" style="padding-bottom: 2px;">
-                            <span data-i18n="missionTotalInfoDistance"></span>
-                            <span id="missionDistance"></span>
-                        </div>
-                        <div id="infoAvailablePoints" style="padding-bottom: 2px;">
-                            <span data-i18n="missionTotalInfoAvailablePoints"></span>
-                            <span id="availablePoints">0/0</span>
-                        </div>
-                        <div id="infoMissionValid" style="padding-bottom: 2px;">
-                            <span data-i18n="missionTotalInfoMissionValid"></span>
-                            <div id="missionValid" style="display: inline-block"></div>
-                        </div>
-                    </div>
-                </div>
 
-                <div id="missionPlannerSettings" class="gui_box grey" style="display: none">
-                    <div class="gui_box_titlebar">
-                        <div class="spacer_box_title" data-i18n="missionDefaultSettingsHead"></div>
-                        <div class="btnMenu btnMenuIcon  save_btn">
-                            <a id="cancelSettings" class="ic_cancel" href="#" i18n_title="missionTitleCancel"></a>
-                            <a id="saveSettings" class="ic_save" href="#" i18n_title="missionTitleSave"></a>
-                        </div>
+                    <div class="d-flex gap-2 flex-wrap mode-connected">
+                        <button id="loadEepromMissionButton" class="btn btn-primary">
+                            <img src="./images/icons/cf_icon_MP_loadFromEprom_grey.svg" alt="Load from Eprom" style="width: 1.25rem;">
+                            <span i18n="missionTitleLoadEepromMission"></span>
+                        </button>
+                        <button id="saveEepromMissionButton" class="btn btn-primary">
+                            <img src="./images/icons/cf_icon_MP_save2Eprom_grey.svg" alt="Save to Eprom" style="width: 1.25rem;">
+                            <span i18n="missionTitleSaveEepromMission"></span>
+                        </button>
                     </div>
-                    <div class="spacer">
-                        <div class="point">
-                            <label class="point-label" for="MPdefaultPointAlt" data-i18n="missionDefaultPointAlt"></label>
-                            <input id="MPdefaultPointAlt" type="text" value="0" required>
-                        </div>
-                        <div class="point">
-                            <label class="point-label" for="MPdefaultPointSpeed" data-i18n="missionDefaultPointSpeed"></label>
-                            <input id="MPdefaultPointSpeed" type="text" value="0" required>
-                        </div>
-                        <div class="point">
-                            <label class="point-label" for="MPdefaultSafeRangeSH" data-i18n="missionDefaultSafeRangeSH"></label>
-                            <input id="MPdefaultSafeRangeSH" type="text" value="0" required>
-                        </div>
-                        <div class="point">
-                            <label class="point-label" for="MPdefaultFwApproachAlt">FW Approach Alt (m): </label>
-                            <input id="MPdefaultFwApproachAlt" type="text" value="0" required>
-                        </div>
-                        <div class="point">
-                            <label class="point-label" for="MPdefaultLandAlt">FW Land Alt (m): </label>
-                            <input id="MPdefaultLandAlt" type="text" value="0" required>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="missionPlannerMultiMission" class="gui_box grey" style="display: none">
-                    <div class="gui_box_titlebar">
-                        <div class="spacer_box_title" data-i18n="missionMultiMissionHead"></div>
-                        <div class="btnMenu btnMenuIcon save_btn">
-                            <div id="showHideMultimissionButton">
-                                <a class="ic_hide" href="#" i18n_title="missionTitleHide"></a>
-                            </div>
-                            <a id="cancelMultimission" class="ic_cancel" href="#" i18n_title="missionTitleCancel"></a>
-                        </div>
-                    </div>
-                    <div class="spacer" id="multimissionContent">
-                        <div class="btn btnTable btnTableIcon save_btn">
-                            <div>
-                                <span data-i18n="missionMultiMissionsInfo"></span>
-                                <span id="multimissionInfo">None</span>
-                            </div>
-                            <div style="margin-top: 5px">
-                                <span data-i18n="missionMultiActiveMission"></span>
-                                <span id="activeNissionIndex">1</span>
-                                <a class="ic_save disabled" id="setActiveMissionButton" href="#" i18n_title="missionTitleSetActive"></a>
-                            </div>
-                            <hr>
-                            <div style="display: inline-block">
-                                <label for="multimissionOptionList" data-i18n="missionMultiMissionNo."></label>
-                                <select name="Number" id="multimissionOptionList" style="width: 50px">
-                                    <option value="0">ALL</option>
-                                </select>
-                                <div style="float: right">
-                                    <span data-i18n="missionMultiUpdateAll"></span>
-                                    <a class="ic_save disabled" id="updateMultimissionButton" href="#" i18n_title="missionTitleUpdateAll"></a>
-                                </div>
-                                <div style="margin-bottom: 5px; margin-top: 5px">
-                                    <label for="addMultimissionButton" data-i18n="missionMultiAddNewMission"></label>
-                                    <a class="ic_add disabled" id="addMultimissionButton" href="#" i18n_title="missionTitleAdd"></a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="missionPlannerHome" class="gui_box grey" style="display: none">
-                    <div class="gui_box_titlebar">
-                        <div class="spacer_box_title" data-i18n="missionHomeHead"></div>
-                        <div class="btnMenu btnMenuIcon  save_btn">
-                            <div id="showHideHomeButton">
-                                <a class="ic_hide" href="#" i18n_title="missionTitleHide"></a>
-                            </div>
-                            <a id="cancelHome" class="ic_cancel" href="#" i18n_title="missionTitleCancel"></a>
-                        </div>
-                    </div>
-                    <div class="spacer" id="HomeContent">
-                        <div>
-                            <table class="safehomesTable">
-                                <thead>
-                                    <tr>
-                                        <th style="width: 40px" data-i18n="SafehomeSelected"></th>
-                                        <th style="width: 140px" data-i18n="SafehomeLat"></th>
-                                        <th style="width: 140px" data-i18n="SafehomeLon"></th>
-                                        <th style="width: 100px" data-i18n="SafehomeAlt"></th>
-                                    </tr>
-                                </thead>
-                                <tbody id="homeTableBody">
-                                    <tr>
-                                        <td>
-                                            <div id="viewHomePoint" class="btnTable btnTableIcon">
-                                                <a class="ic_center" data-role="home-center" href="#" i18n_title="missionTitleMoveToCenterView"></a>
-                                            </div>
-                                        </td>
-                                        <td><input type="number" class="home-lat" /></td>
-                                        <td><input type="number" class="home-lon" /></td>
-                                        <td><span id="elevationValueAtHome">N/A</span></td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                    <div class="point" id="elevationEarthModelclass" style="display: none">
-                        <label class="spacer_box_title" for="elevationEarthModel" data-i18n="missionEllipsoidEarthDEMModel"></label>
-                        <input id="elevationEarthModel" type="checkbox" value="0" class="togglemedium" checked required>
-                    </div>
-                </div>
-
-                <div id="missionPlannerSafehome" class="gui_box grey" style="display: none">
-                    <div class="gui_box_titlebar">
-                        <div class="spacer_box_title" data-i18n="missionSafehomeHead"></div>
-                        <div class="btnMenu btnMenuIcon  save_btn">
-                            <div id="showHideSafehomeButton">
-                                <a class="ic_hide" href="#" i18n_title="missionTitleHide"></a>
-                            </div>
-                            <a id="cancelSafehome" class="ic_cancel" href="#" title="Cancel"></a>
-                            <a id="addSafehome" class="ic_add" href="#" i18n_title="missionTitleAdd"></a>
-                            <a id="saveEepromSafehomeButton" class="ic_save2Eprom" href="#" i18n_title="missionTitleSaveEepromSafehome"></a>
-                            <a id="loadEepromSafehomeButton" class="ic_loadFromEprom" href="#" i18n_title="missionTitleLoadEepromSafehome"></a>
-                        </div>
-                    </div>
-                    <div class="spacer" id="SafehomeContent">
-                            <div style="padding-bottom: 2px;">
-                                <span data-i18n="missionSafehomeAvailableSafehomes"></span>
-                                <span id="availableSafehomes"></span>
-                            </div>
-                            <div id="SafehomeContentBox" style="display: none;">
-                                <div class="gui_box grey missionPlannerSafehomeBox">
-                                    <div class="gui_box_titlebar">
-                                        <div class="spacer_box_title" data-i18n="safehomeEdit"></div>
-                                        <div class="btnMenu btnMenuIcon">
-                                            <div class="btnMenu-danger">
-                                                <a id="deleteSafehome" class="ic_removeAll" href="#" i18n_title="missionTitleDelete"></a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="spacer" id="safehomeSingelContent">
-                                        <div class="point">
-                                            <label class="point-label-safehome" for="safeHomeLatitude" data-i18n="gpsLat"></label>
-                                            <input type="number" id="safehomeLatitude"></input>
-                                        </div>
-                                        <div class="point">
-                                            <label class="point-label-safehome" for="safehomeLongitude" data-i18n="gpsLon"></label>
-                                            <input type="number" id="safehomeLongitude"></input>
-                                        </div>
-                                        <div class="point">
-                                            <span style="font-weight: bold" data-i18n="missionFwLandingSettings"></span>
-                                        </div>
-                                        <div class="point">
-                                            <label class="point-label-safehome" for="safehomeSeaLevelRef" data-i18n="missionSeaLevelRef"></label>
-                                            <input id="safehomeSeaLevelRef" type="checkbox" value="0" class="togglemedium" required>
-                                        </div>
-                                        <div class="point">
-                                            <label class="point-label-safehome" for="safehomeApproachAlt" data-i18n="missionFwApproachAlt"></label>
-                                            <input type="number" id="safehomeApproachAlt"></input>
-                                            <span id="safehomeApproachAltM"></span>
-                                        </div>
-                                        <div class="point">
-                                            <label class="point-label-safehome" for="safehomeLandAlt" data-i18n="missionFwLandAlt"></label>
-                                            <input type="number" id="safehomeLandAlt"></input>
-                                            <span id="safehomeLandAltM"></span>
-                                        </div>
-                                        <div class="point">
-                                            <label class="point-label-safehome" for="safehomeElevation" data-i18n="missionElevation"></label>
-                                            <span id="safehomeElevation"></span>
-                                        </div>
-                                        <div class="point">
-                                            <label class="point-label-safehome" for="geozoneApproachDirection" data-i18n="missionFwApproachDir"></label>
-                                            <select name="zoneAction" id="geozoneApproachDirection">
-                                                <option value="0">Left</option>
-                                                <option value="1">Right</option>
-                                            </select>
-                                        </div>
-                                        <div class="point">
-                                            <label class="point-label-safehome" for="safehomeLandHeading1" data-i18n="missionFwLandHeading1"></label>
-                                            <input type="number" id="safehomeLandHeading1"></input>
-                                            <input id="safehomeLandHeading1Excl" type="checkbox" value="0" class="togglemedium" required>
-                                            <span data-i18n="missionExclusive"></span>
-                                        </div>
-                                        <div class="point">
-                                            <label class="point-label-safehome" for="safehomeLandHeading2" data-i18n="missionFwLandHeading2"></label>
-                                            <input type="number" id="safehomeLandHeading2"></input>
-                                            <input id="safehomeLandHeading2Excl" type="checkbox" value="0" class="togglemedium" required>
-                                            <span data-i18n="missionExclusive"></span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <hr>
-                            <div class="spacer"  id="safehomeLegend">
-                                <span><b data-i18n="SafehomeLegend"></b></span>
-                                <div class="legendItem">
-                                    <span class="fill" style="border-bottom:5px dotted #900C3F;"></span>
-                                    <span class="textLegend" data-i18n="SafehomeMaxDistance"></span>
-                                    <span id="safeHomeMaxDistance"></span>
-                                </div>
-                                <div class="legendItem">
-                                    <span class="fill" style="border-bottom:5px dotted #88CC3E;"></span>
-                                    <span class="textLegend" data-i18n="SafehomeSafeRadius"></span>
-                                    <span id="SafeHomeSafeDistance"></span>
-                                </div>
-                                <div class="legendItem">
-                                    <span class="fill" style="border-bottom:5px solid #f78a05;border-top:5px solid #0025a1;"></span>
-                                    <span class="textLegend" data-i18n="SafehomeFwAppraoch"></span>
-                                    <span id="SafeHomeSafeDistance"></span>
-                                </div>
-                            </div>
-                    </div>
-                </div>
-
-                <div class="gui_box grey" id="MPeditPoint" style="display: none">
-                    <div class="gui_box_titlebar">
-                        <div class="spacer_box_title" data-i18n="editPointHead" id="EditPointNumber"></div>
-                        <div class="btnMenu btnMenuIcon">
-                            <div id="showHideWPeditButton"   class="save_btn">
-                                <a class="ic_hide" href="#" i18n_title="missionTitleHide"></a>
-                            </div>
-                            <div id="removePoint" class="btn btnMenu-danger">
-                                <a id="removePointButton" class="ic_removeAll" href="#" i18n_title="missionTitlRemove"></a>
-                            </div>
-                            <div id="editMission" class="save_btn" style="display: none">
-                                <a id="editMissionButton" class="ic_setup" href="#" i18n_title="missionTitlEditMission"></a>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="spacer" id="WPeditContent">
-                        <input type="hidden" name="pointNumber" value="">
-                        <div class="point">
-                            <label class="point-label" for="pointType" data-i18n="missionWpType"></label>
-                            <select name="type" id="pointType">
-                                <!--<option value="1">Home</option>-->
-                                <option value="1">Waypoint</option>
-								<!-- <option value="2">PH_UNLIM</option> -->
-								<option value="3">PH_TIME</option>
-								<!--<option value="4">RTH</option>-->
-								<option value="5">POI</option>
-								<!--<option value="6">Jump</option>
-								<option value="7">Heading lock</option>-->
-								<option value="8">Land</option>
-                            </select>
-                        </div>
-                        <div class="point">
-                            <label class="point-label" for="pointLat" data-i18n="missionWpLat"></label>
-                            <input id="pointLat" type="text" value="0.0" required>
-                        </div>
-                        <div class="point">
-                            <label class="point-label" for="pointLon" data-i18n="missionWpLon"></label>
-                            <input id="pointLon" type="text" value="0.0" required>
-                        </div>
-                        <div class="point">
-                            <label class="point-label" for="pointAlt" data-i18n="missionDefaultPointAlt"></label>
-                            <input id="pointAlt" type="text" value="0" required><span id="altitudeInMeters"></span>
-                        </div>
-                        <div class="point" id="pointP3class" style="display: none">
-                            <label class="point-label" for="pointP3Alt" data-i18n="missionSeaLevelRef"></label>
-                            <input id="pointP3Alt" type="checkbox" value="0" class="togglemedium" checked required>
-                        </div>
-                        <div class="point" id="elevationAtWP" style="display: none">
-                            <label class="point-label" data-i18n="missionElevation"></label>
-                            <span id="elevationValueAtWP" data-i18n="missionNA"></span>
-                        </div>
-                        <div class="point" id="groundClearanceAtWP" style="display: none">
-                            <label class="point-label" data-i18n="missionGroundDist"></label>
-                            <span id="groundClearanceValueAtWP" data-i18n="missionNA"></span>
-                        </div>
-                        <div class="point" id="pointP1class" style="display: none">
-                            <label class="point-label" for="pointP1" data-i18n="missionParameter1"></label>
-                            <input id="pointP1" type="text" value="0" required>
-                        </div>
-                        <div class="point" id="pointP2class" style="display: none">
-                            <label class="point-label" for="pointP2" data-i18n="missionParameter1"></label>
-                            <input id="pointP2" type="text" value="0" required>
-                        </div>
-                        <div class="point" id="pointP3UserActionClass" style="display: none">
-                            <label class="point-label" for="pointP3UserAction" data-i18n="missionUserActions"></label>
-                            <div class="userActionContainer">1 <input id="pointP3UserAction1" type="checkbox" value="0" class="togglemedium" checked required></div>
-                            <div class="userActionContainer">2 <input id="pointP3UserAction2" type="checkbox" value="0" class="togglemedium" checked required></div>
-                            <div class="userActionContainer">3 <input id="pointP3UserAction3" type="checkbox" value="0" class="togglemedium" checked required></div>
-                            <div class="userActionContainer">4 <input id="pointP3UserAction4" type="checkbox" value="0" class="togglemedium" checked required></div>
-                        </div>
-                        <div>
-                            <table class="waypointOptionsTable">
-                                <thead>
-                                    <tr>
-                                        <th style="width: 30px">
-                                            <div id="addOptionsPoint" class="btn btnTable btnTableIcon btnTable-success">
-                                                <a id="addOptionsPointButton" class="ic_add" data-role="waypointOptions-add" href="#" style="float: center" title="Add"></a>
-                                            </div>
-                                        </th>
-                                        <th style="width: 50px" data-i18n="WaypointOptionId"></th>
-                                        <th style="width: 80px" data-i18n="WaypointOptionAction"></th>
-                                        <th style="width: 120px" data-i18n="WaypointOptionP1"></th>
-                                        <th style="width: 120px" data-i18n="WaypointOptionP2"></th>
-                                    </tr>
-                                </thead>
-                                <tbody id="waypointOptionsTableBody">
-                                </tbody>
-                            </table>
-                        </div>
-                        <div id="wpFwLanding" style="display: none;">
-                            <div class="point">
-                                <span style="font-weight: bold" data-i18n="missionFwLandingSettings"></span>
-                            </div>
-                            <div class="point">
-                                <label class="point-label-safehome" for="wpApproachAlt" data-i18n="missionFwApproachAlt"></label>
-                                <input type="number" id="wpApproachAlt"></input>
-                                <span id="wpApproachAltM"></span>
-                            </div>
-                            <div class="point">
-                                <label class="point-label-safehome" for="wpLandAlt" data-i18n="missionFwLandAlt"></label>
-                                <input type="number" id="wpLandAlt"></input>
-                                <span id="wpLandAltM"></span>
-                            </div>
-                            <div class="point">
-                                <label class="point-label-safehome" for="wpApproachDirection" data-i18n="missionFwApproachDir"></label>
-                                <select name="wpApproachDirection" id="wpApproachDirection">
-                                    <option value="0">Left</option>
-                                    <option value="1">Right</option>
-                                </select>
-                            </div> 
-                            <div class="point">
-                                <label class="point-label-safehome" for="wpLandHeading1" data-i18n="missionFwLandHeading1"></label>
-                                <input type="number" id="wpLandHeading1"></input>
-                                <input id="wpLandHeading1Excl" type="checkbox" value="0" class="togglemedium" checked required>
-                                <span data-i18n="missionExclusive"></span>
-                            </div>
-                            <div class="point">
-                                <label class="point-label-safehome" for="wpLandHeading2" data-i18n="missionFwLandHeading1"></label>
-                                <input type="number" id="wpLandHeading2"></input>
-                                <input id="wpLandHeading2Excl" type="checkbox" value="0" class="togglemedium" checked required>
-                                <span data-i18n="missionExclusive"></span>
-                            </div>
-                        </div>
-                        <div id="wpFwLanding" style="display: none;">
-                            <div class="point">
-                                <span style="font-weight: bold" data-i18n="missionFwLandingSettings"></span>
-                            </div>
-                            <div class="point">
-                                <label class="point-label-safehome" for="wpApproachAlt" data-i18n="missionFwApproachAlt"></label>
-                                <input type="number" id="wpApproachAlt"></input>
-                                <span id="wpApproachAltM"></span>
-                            </div>
-                            <div class="point">
-                                <label class="point-label-safehome" for="wpLandAlt" data-i18n="missionFwLandAlt"></label>
-                                <input type="number" id="wpLandAlt"></input>
-                                <span id="wpLandAltM"></span>
-                            </div>
-                            <div class="point">
-                                <label class="point-label-safehome" for="wpApproachDirection" data-i18n="missionFwApproachDir"></label>
-                                <select name="wpApproachDirection" id="wpApproachDirection">
-                                    <option value="0">Left</option>
-                                    <option value="1">Right</option>
-                                </select>
-                            </div> 
-                            <div class="point">
-                                <label class="point-label-safehome" for="wpLandHeading1" data-i18n="missionFwLandHeading1"></label>
-                                <input type="number" id="wpLandHeading1"></input>
-                                <input id="wpLandHeading1Excl" type="checkbox" value="0" class="togglemedium" checked required>
-                                <span data-i18n="missionExclusive"></span>
-                            </div>
-                            <div class="point">
-                                <label class="point-label-safehome" for="wpLandHeading2" data-i18n="missionFwLandHeading1"></label>
-                                <input type="number" id="wpLandHeading2"></input>
-                                <input id="wpLandHeading2Excl" type="checkbox" value="0" class="togglemedium" checked required>
-                                <span data-i18n="missionExclusive"></span>
-                            </div>
-                        </div>
-                        <!-- <div class="point-radio" id="pointOptionclass" style="display: none">
-							<div class="radio-line">
-								<input type="radio" id="Options_None" name="Options" value="None" checked>
-								<label class="radio-options" for="Options_None">None</label><br>
-							</div>
-							<div class="radio-line">
-								<input type="radio" id="Options_RTH" name="Options" value="RTH">
-								<label class="radio-options" for="Options_RTH">RTH</label>
-								<input type="checkbox" id="Options_LandRTH">
-								<label for="Options_LandRTH">Land after RTH</label><br>
-							</div>
-							<div class="radio-line">
-								<input type="radio" id="Options_JUMP" name="Options" value="JUMP">
-								<label class="radio-options" for="Options_JUMP">JUMP</label>
-								<label for="Options_TargetJUMP">Target WP: </label>
-								<input id="Options_TargetJUMP" type="text" value="0" required>
-								<label for="Options_NumberJUMP">Repeat: </label>
-								<input id="Options_NumberJUMP" type="text" value="0" required><br>
-							</div>
-							<div class="radio-line">
-								<input type="radio" id="Options_HEAD" name="Options" value="SET_HEAD">
-								<label class="radio-options" for="Options_HEAD">HEAD</label>
-								<label for="Options_HeadingHead">Heading: </label>
-								<input id="Options_HeadingHead" type="text" value="-1" required><br>
-							</div>
-                        </div> -->
+                    <hr class="m-0">
+                    <div>
+                        <button id="removeAllPoints" class="btn btn-danger" i18n_title="missionTitleRemoveAll">
+                            <i class="bi bi-trash"></i>
+                            <span>Delete all points</span>
+                        </button>
                     </div>
                 </div>
             </div>
+
+            <div class="card mb-3">
+                <div class="card-header d-flex justify-content-between">
+                    <span data-i18n="missionTotalInformationHead"></span>
+                    <button id="showHideInfoButton" class="btn chevron-up" i18n_title="missionTitleHide">
+                        <span class="bi bi-chevron-down"></span>
+                        <span class="bi bi-chevron-up"></span>
+                    </button>
+                </div>
+                <div id="InfoContent" class="card-body">
+                    <div id="infoMissionFilename" class="hstack justify-content-between">
+                        <span data-i18n="missionTotalInfoFilenameLoaded"></span>
+                        <span id="missionFilename" class="text-primary"></span>
+                    </div>
+                    <div id="infoMissionDistance" class="hstack justify-content-between">
+                        <span data-i18n="missionTotalInfoDistance"></span>
+                        <span id="missionDistance"></span>
+                    </div>
+                    <div id="infoAvailablePoints" class="hstack justify-content-between">
+                        <span data-i18n="missionTotalInfoAvailablePoints"></span>
+                        <span id="availablePoints">0/0</span>
+                    </div>
+                    <div id="infoMissionValid" class="hstack justify-content-between">
+                        <span data-i18n="missionTotalInfoMissionValid"></span>
+                        <div id="missionValid" style="display: inline-block;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-3" id="missionPlannerSettings" style="display: none;">
+                <div class="card-header d-flex justify-content-between">
+                    <span data-i18n="missionDefaultSettingsHead"></span>
+                    <div>
+                        <button id="saveSettings" class="btn" i18n_title="missionTitleSave">
+                            <span class="bi bi-floppy"></span>
+                        </button>
+                        <button id="cancelSettings" class="btn" i18n_title="missionTitleCancel">
+                            <span class="bi bi-x-lg"></span>
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item hstack">
+                            <input id="MPdefaultPointAlt" type="text" class="form-control w-7r" value="0" required>
+                            <label class="point-label" for="MPdefaultPointAlt" data-i18n="missionDefaultPointAlt"></label>
+                        </li>
+                        <li class="list-group-item hstack">
+                            <input id="MPdefaultPointSpeed" type="text" class="form-control w-7r" value="0" required>
+                            <label class="point-label" for="MPdefaultPointSpeed" data-i18n="missionDefaultPointSpeed"></label>
+                        </li>
+                        <li class="list-group-item hstack">
+                            <input id="MPdefaultSafeRangeSH" type="text" class="form-control w-7r" value="0" required>
+                            <label class="point-label" for="MPdefaultSafeRangeSH" data-i18n="missionDefaultSafeRangeSH"></label>
+                        </li>
+                        <li class="list-group-item hstack">
+                            <input id="MPdefaultFwApproachAlt" type="text" class="form-control w-7r" value="0" required>
+                            <label class="point-label" for="MPdefaultFwApproachAlt" data-i18n="missionDefaultFwApproachAlt"></label>
+                        </li>
+                        <li class="list-group-item hstack">
+                            <input id="MPdefaultLandAlt" type="text" class="form-control w-7r" value="0" required>
+                            <label class="point-label" for="MPdefaultLandAlt" data-i18n="missionDefaultLandAlt"></label>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card mb-3" id="missionPlannerMultiMission" style="display: none;">
+                <div class="card-header d-flex justify-content-between">
+                    <span data-i18n="missionMultiMissionHead"></span>
+                    <div>
+                        <button id="showHideMultimissionButton" class="btn chevron-up" i18n_title="missionTitleHide">
+                            <span class="bi bi-chevron-down"></span>
+                            <span class="bi bi-chevron-up"></span>
+                        </button>
+                        <button id="cancelMultimission" class="btn" i18n_title="missionTitleCancel">
+                            <span class="bi bi-x-lg"></span>
+                        </button>
+                    </div>
+                </div>
+
+                <div id="multimissionContent" class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item hstack justify-content-between">
+                            <span data-i18n="missionMultiMissionsInfo"></span>
+                            <span id="multimissionInfo">None</span>
+                        </li>
+                        <li class="list-group-item hstack justify-content-between">
+                            <span data-i18n="missionMultiActiveMission"></span>
+                            <div>
+                                <span id="activeNissionIndex">1</span>
+                                <a class="ic_save disabled" id="setActiveMissionButton" href="#" i18n="missionTitleSetActive">SAVE</a>
+                            </div>
+                        </li>
+                        <li class="list-group-item hstack">
+                            <select name="Number" id="multimissionOptionList" class="form-select w-7r">
+                                <option value="0">ALL</option>
+                            </select>
+                            <label for="multimissionOptionList" data-i18n="missionMultiMissionNo"></label>
+
+                            <button id="updateMultimissionButton" class="btn btn-outline-primary ms-auto">
+                                <span data-i18n="missionMultiUpdateAll"></span>
+                            </button>
+                        </li>
+                        <li class="list-group-item d-grid">
+                            <button id="addMultimissionButton" class="btn btn-primary" i18n_title="missionTitleAdd">
+                                <span i18n="missionMultiAddNewMission"></span>
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+
+            </div>
+
+            <div class="card mb-3" id="missionPlannerHome" style="display: none;">
+                <div class="card-header d-flex justify-content-between">
+                    <span data-i18n="missionHomeHead"></span>
+                    <div>
+                        <button id="showHideHomeButton" class="btn chevron-up" i18n_title="missionTitleHide">
+                            <span class="bi bi-chevron-down"></span>
+                            <span class="bi bi-chevron-up"></span>
+                        </button>
+                        <button id="cancelHome" class="btn" i18n_title="missionTitleCancel">
+                            <span class="bi bi-x-lg"></span>
+                        </button>
+                    </div>
+                </div>
+                <div id="HomeContent" class="card-body">
+
+                    <div>
+                        <table class="table table-sm mb-0">
+                            <thead>
+                            <tr>
+                                <th style="width: 140px" data-i18n="SafehomeLat"></th>
+                                <th style="width: 140px" data-i18n="SafehomeLon"></th>
+                                <th style="width: 100px" data-i18n="SafehomeAlt"></th>
+                                <th style="width: 40px" data-i18n="SafehomeSelected"></th>
+                            </tr>
+                            </thead>
+                            <tbody id="homeTableBody">
+                            <tr>
+                                <td><input type="number" class="home-lat form-control form-select-sm" /></td>
+                                <td><input type="number" class="home-lon form-control form-select-sm" /></td>
+                                <td><span id="elevationValueAtHome">N/A</span></td>
+                                <td>
+                                    <button id="viewHomePoint" data-role="home-center" class="btn btn-primary btn-sm" i18n_title="missionTitleMoveToCenterView">
+                                        <i class="bi bi-crosshair"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="mt-3" id="elevationEarthModelclass" style="display: none">
+                        <div class="form-check form-switch">
+                            <input id="elevationEarthModel" type="checkbox" value="0" class="form-check-input" checked required>
+                            <label class="form-check-label" for="elevationEarthModel" i18n="missionEllipsoidEarthDEMModel"></label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-3" id="missionPlannerSafehome" style="display: none;">
+                <div class="card-header d-flex justify-content-between">
+                    <span data-i18n="missionSafehomeHead"></span>
+                    <div>
+                        <button id="addSafehome" class="btn" i18n_title="missionTitleAdd"><span class="bi bi-plus-lg"></span></button>
+                        <button id="saveEepromSafehomeButton" class="btn" i18n_title="missionTitleSaveEepromSafehome"><span class="bi bi-floppy"></span></button>
+                        <button id="loadEepromSafehomeButton" class="btn" i18n_title="missionTitleLoadEepromSafehome"><span class="bi bi-upload"></span></button>
+                        <button id="showHideSafehomeButton" class="btn chevron-up" i18n_title="missionTitleHide">
+                            <span class="bi bi-chevron-down"></span>
+                            <span class="bi bi-chevron-up"></span>
+                        </button>
+                        <button id="cancelSafehome" class="btn" title="Cancel"><span class="bi bi-x-lg"></span></button>
+                    </div>
+                </div>
+
+                <div class="card-body" id="SafehomeContent">
+                    <div style="padding-bottom: 2px;">
+                        <span data-i18n="missionSafehomeAvailableSafehomes"></span>
+                        <span id="availableSafehomes"></span>
+                    </div>
+
+                    <div id="SafehomeContentBox" style="display: none;">
+
+                        <div class="card missionPlannerSafehomeBox">
+
+                            <div class="card-header d-flex justify-content-between">
+                                <div class="spacer_box_title" data-i18n="safehomeEdit"></div>
+                                <div>
+                                    <button id="deleteSafehome" class="btn btn-danger" i18n_title="missionTitleDelete"><span class="bi bi-trash"></span></button>
+                                </div>
+                            </div>
+
+                            <div class="card-body" id="safehomeSingelContent">
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item hstack">
+                                        <input type="number" id="safehomeLatitude" class="form-control w-9r"/>
+                                        <label for="safeHomeLatitude" data-i18n="gpsLat"></label>
+                                    </li>
+                                    <li class="list-group-item hstack">
+                                        <input type="number" id="safehomeLongitude" class="form-control w-9r"/>
+                                        <label for="safehomeLongitude" data-i18n="gpsLon"></label>
+                                    </li>
+                                </ul>
+                                <ul class="list-group list-group-flush mt-4">
+                                    <li class="list-group-item hstack">
+                                        <b data-i18n="missionFwLandingSettings"></b>
+                                    </li>
+                                    <li class="list-group-item hstack">
+                                        <div class="form-check form-switch">
+                                            <input id="safehomeSeaLevelRef" type="checkbox" value="0" class="form-check-input" required>
+                                            <label class="form-check-label" for="safehomeSeaLevelRef" data-i18n="missionSeaLevelRef"></label>
+                                        </div>
+                                    </li>
+                                    <li class="list-group-item hstack">
+                                        <input type="number" id="safehomeApproachAlt" class="form-control w-7r"/>
+                                        <label for="safehomeApproachAlt" data-i18n="missionFwApproachAlt"></label>
+                                        <span id="safehomeApproachAltM" class="ms-auto"></span>
+                                    </li>
+                                    <li class="list-group-item hstack">
+                                        <input type="number" id="safehomeLandAlt" class="form-control w-7r"/>
+                                        <label for="safehomeLandAlt" data-i18n="missionFwLandAlt"></label>
+                                        <span id="safehomeLandAltM" class="ms-auto"></span>
+                                    </li>
+                                    <li class="list-group-item hstack">
+                                        <span id="safehomeElevation"></span>
+                                        <label for="safehomeElevation" class="ms-2" data-i18n="missionElevation"></label>
+                                    </li>
+                                    <li class="list-group-item hstack">
+                                        <select name="zoneAction" id="geozoneApproachDirection" class="form-select w-7r">
+                                            <option value="0">Left</option>
+                                            <option value="1">Right</option>
+                                        </select>
+                                        <label for="geozoneApproachDirection" data-i18n="missionFwApproachDir"></label>
+                                    </li>
+                                    <li class="list-group-item hstack">
+                                        <input type="number" id="safehomeLandHeading1" class="form-control w-7r"/>
+                                        <label for="safehomeLandHeading1" data-i18n="missionFwLandHeading1"></label>
+                                        <div class="form-check form-switch ms-auto">
+                                            <input id="safehomeLandHeading1Excl" type="checkbox" value="0" class="form-check-input" required>
+                                            <label class="form-check-label" for="safehomeLandHeading1Excl" data-i18n="missionExclusive"></label>
+                                        </div>
+                                    </li>
+                                    <li class="list-group-item hstack">
+                                        <input type="number" id="safehomeLandHeading2" class="form-control w-7r"/>
+                                        <label for="safehomeLandHeading2" data-i18n="missionFwLandHeading2"></label>
+                                        <div class="form-check form-switch ms-auto">
+                                            <input id="safehomeLandHeading2Excl" type="checkbox" value="0" class="form-check-input" required>
+                                            <label class="form-check-label" for="safehomeLandHeading2Excl" data-i18n="missionExclusive"></label>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <hr>
+
+                    <div id="safehomeLegend">
+                        <span><b data-i18n="SafehomeLegend"></b></span>
+                        <div>
+                            <span class="d-inline-block" style="border-bottom: 5px dotted #900C3F; width: 20px;"></span>
+                            <span class="ms-2" data-i18n="SafehomeMaxDistance"></span>
+                            <span id="safeHomeMaxDistance"></span>
+                        </div>
+                        <div>
+                            <span class="d-inline-block" style="border-bottom: 5px dotted #88CC3E; width: 20px;"></span>
+                            <span class="ms-2" data-i18n="SafehomeSafeRadius"></span>
+                            <span id="SafeHomeSafeDistance"></span>
+                        </div>
+                        <div>
+                            <span class="d-inline-block" style="border-bottom: 5px solid #f78a05; border-top: 5px solid #0025a1; width: 20px;"></span>
+                            <span class="ms-2" data-i18n="SafehomeFwAppraoch"></span>
+                            <span id="SafeHomeSafeDistance"></span>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="card mt-3" id="MPeditPoint" style="display: none;">
+
+                <div class="card-header d-flex justify-content-between">
+                    <span id="EditPointNumber" data-i18n="editPointHead"></span>
+                    <div>
+                        <button id="showHideWPeditButton" class="btn chevron-up" i18n_title="missionTitleHide">
+                            <span class="bi bi-chevron-down"></span>
+                            <span class="bi bi-chevron-up"></span>
+                        </button>
+                        <button id="removePointButton" class="btn" i18n_title="missionTitlRemove">
+                            <span class="bi bi-trash"></span>
+                        </button>
+                        <button id="editMission" class="btn" i18n_title="missionTitlEditMission" style="display: none;">
+                            <span class="bi bi-pencil-square"></span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card-body" id="WPeditContent">
+                    <input type="hidden" name="pointNumber" value="">
+
+                    <ul class="list-group list-group-flush mb-3">
+                        <li class="list-group-item hstack">
+                            <select name="type" id="pointType" class="form-select w-7r">
+                                <!--<option value="1">Home</option>-->
+                                <option value="1">Waypoint</option>
+                                <!-- <option value="2">PH_UNLIM</option> -->
+                                <option value="3">PH_TIME</option>
+                                <!--<option value="4">RTH</option>-->
+                                <option value="5">POI</option>
+                                <!--<option value="6">Jump</option>
+                                <option value="7">Heading lock</option>-->
+                                <option value="8">Land</option>
+                            </select>
+                            <label for="pointType" data-i18n="missionWpType"></label>
+                        </li>
+                        <li class="list-group-item hstack">
+                            <input id="pointLat" class="form-control w-7r" type="text" value="0.0" required>
+                            <label for="pointLat" data-i18n="missionWpLat"></label>
+                        </li>
+                        <li class="list-group-item hstack">
+                            <input id="pointLon" class="form-control w-7r" type="text" value="0.0" required>
+                            <label for="pointLon" data-i18n="missionWpLon"></label>
+                        </li>
+                        <li class="list-group-item hstack">
+                            <input id="pointAlt" class="form-control w-7r" type="text" value="0" required>
+                            <label for="pointAlt" data-i18n="missionDefaultPointAlt"></label>
+                            <span id="altitudeInMeters" class="ms-auto"></span>
+                        </li>
+                        <li class="list-group-item hstack" id="pointP3class" style="display: none;">
+                            <div class="form-check form-switch">
+                                <input id="pointP3Alt" type="checkbox" value="0" class="form-check-input" checked required>
+                                <label class="form-check-label" for="pointP3Alt" data-i18n="missionSeaLevelRef"></label>
+                            </div>
+                        </li>
+                        <li class="list-group-item hstack" id="elevationAtWP" style="display: none;">
+                            <label class="me-2" data-i18n="missionElevation"></label>
+                            <span id="elevationValueAtWP" data-i18n="missionNA"></span>
+                        </li>
+                        <li class="list-group-item hstack" id="groundClearanceAtWP" style="display: none;">
+                            <label class="me-2" data-i18n="missionGroundDist"></label>
+                            <span id="groundClearanceValueAtWP" data-i18n="missionNA"></span>
+                        </li>
+                        <li class="list-group-item hstack" id="pointP1class" style="display: none;">
+                            <input id="pointP1" class="form-control w-7r" type="text" value="0" required/>
+                            <label for="pointP1" data-i18n="missionParameter1"></label>
+                        </li>
+                        <li class="list-group-item hstack" id="pointP2class" style="display: none;">
+                            <input id="pointP2" class="form-control w-7r" type="text" value="0" required>
+                            <label for="pointP2" data-i18n="missionParameter1"></label>
+                        </li>
+                        <li class="list-group-item vstack" id="pointP3UserActionClass" style="display: none;">
+                            <div data-i18n="missionUserActions"></div>
+                            <div class="hstack flex-wrap column-gap-4">
+                                <div class="form-check form-switch">
+                                    <input id="pointP3UserAction1" type="checkbox" value="0" class="form-check-input" checked required>
+                                    <label for="pointP3UserAction1" class="ms-0">1</label>
+                                </div>
+                                <div class="form-check form-switch">
+                                    <input id="pointP3UserAction2" type="checkbox" value="0" class="form-check-input" checked required>
+                                    <label for="pointP3UserAction2" class="ms-0">2</label>
+                                </div>
+                                <div class="form-check form-switch">
+                                    <input id="pointP3UserAction3" type="checkbox" value="0" class="form-check-input" checked required>
+                                    <label for="pointP3UserAction3" class="ms-0">3</label>
+                                </div>
+                                <div class="form-check form-switch">
+                                    <input id="pointP3UserAction4" type="checkbox" value="0" class="form-check-input" checked required>
+                                    <label for="pointP3UserAction4" class="ms-0">4</label>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+
+
+                    <div>
+                        <table class="table table-sm table-striped">
+                            <thead>
+                            <tr class="table-active">
+                                <th style="width: 50px;" data-i18n="WaypointOptionId"></th>
+                                <th style="width: 120px;" data-i18n="WaypointOptionAction"></th>
+                                <th style="width: 120px;" data-i18n="WaypointOptionP1"></th>
+                                <th style="width: 120px;" data-i18n="WaypointOptionP2"></th>
+                                <th style="width: 30px;">
+                                    <button id="addOptionsPointButton" data-role="waypointOptions-add" class="btn btn-success px-2" title="Add">
+                                        <i class="bi bi-plus-circle"></i>
+                                    </button>
+                                </th>
+                            </tr>
+                            </thead>
+                            <tbody id="waypointOptionsTableBody">
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div id="wpFwLanding" class="card" style="display: none;">
+                        <div class="card-header" data-i18n="missionFwLandingSettings"></div>
+                        <div class="card-body">
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item hstack">
+                                    <input type="number" id="wpApproachAlt" class="form-control w-7r" data-unit="cm"/>
+                                    <label for="wpApproachAlt" data-i18n="missionFwApproachAlt"></label>
+                                    <span id="wpApproachAltM" class="ms-auto"></span>
+                                </li>
+                                <li class="list-group-item hstack">
+                                    <input type="number" id="wpLandAlt" class="form-control w-7r"/>
+                                    <label for="wpLandAlt" data-i18n="missionFwLandAlt"></label>
+                                    <span id="wpLandAltM" class="ms-auto"></span>
+                                </li>
+                                <li class="list-group-item hstack">
+                                    <select name="wpApproachDirection" id="wpApproachDirection" class="form-select w-7r">
+                                        <option value="0">Left</option>
+                                        <option value="1">Right</option>
+                                    </select>
+                                    <label for="wpApproachDirection" data-i18n="missionFwApproachDir"></label>
+                                </li>
+                                <li class="list-group-item hstack">
+                                    <input type="number" id="wpLandHeading1" class="form-control w-7r"/>
+                                    <label for="wpLandHeading1" data-i18n="missionFwLandHeading1"></label>
+                                    <div class="form-check form-switch ms-auto">
+                                        <input id="wpLandHeading1Excl" type="checkbox" value="0" class="form-check-input" checked required>
+                                        <label for="wpLandHeading1Excl" data-i18n="missionExclusive" class="ms-0"></label>
+                                    </div>
+                                </li>
+                                <li class="list-group-item hstack">
+                                    <input type="number" id="wpLandHeading2" class="form-control w-7r"/>
+                                    <label for="wpLandHeading2" data-i18n="missionFwLandHeading1"></label>
+                                    <div class="form-check form-switch ms-auto">
+                                        <input id="wpLandHeading2Excl" type="checkbox" value="0" class="form-check-input" checked required>
+                                        <label for="wpLandHeading2Excl" data-i18n="missionExclusive" class="ms-0"></label>
+                                    </div>
+                                </li>
+                            </ul>
+
+                        </div>
+
+
+                    </div>
+
+                    <!-- <div class="point-radio" id="pointOptionclass" style="display: none">
+                        <div class="radio-line">
+                            <input type="radio" id="Options_None" name="Options" value="None" checked>
+                            <label class="radio-options" for="Options_None">None</label><br>
+                        </div>
+                        <div class="radio-line">
+                            <input type="radio" id="Options_RTH" name="Options" value="RTH">
+                            <label class="radio-options" for="Options_RTH">RTH</label>
+                            <input type="checkbox" id="Options_LandRTH">
+                            <label for="Options_LandRTH">Land after RTH</label><br>
+                        </div>
+                        <div class="radio-line">
+                            <input type="radio" id="Options_JUMP" name="Options" value="JUMP">
+                            <label class="radio-options" for="Options_JUMP">JUMP</label>
+                            <label for="Options_TargetJUMP">Target WP: </label>
+                            <input id="Options_TargetJUMP" type="text" value="0" required>
+                            <label for="Options_NumberJUMP">Repeat: </label>
+                            <input id="Options_NumberJUMP" type="text" value="0" required><br>
+                        </div>
+                        <div class="radio-line">
+                            <input type="radio" id="Options_HEAD" name="Options" value="SET_HEAD">
+                            <label class="radio-options" for="Options_HEAD">HEAD</label>
+                            <label for="Options_HeadingHead">Heading: </label>
+                            <input id="Options_HeadingHead" type="text" value="-1" required><br>
+                        </div>
+                    </div> -->
+                </div>
+            </div>
         </div>
-        <div class="cf_column threefourth_left" style="height: 100%;">
-            <div id="missionMap"></div>
-            <div id="missionPlannerElevation" class="gui_box grey" style="display: none">
-                <div class="gui_box_titlebar">
-                    <div class="spacer_box_title" data-i18n="missionDefaultElevationHead"></div>
-                    <div class="btnMenu btnMenuIcon  save_btn">
-                        <a id="cancelPlot" class="ic_cancel" href="#" i18n_title="missionTitleCancel"></a>
-                    </div>
+
+        <div class="col-9">
+            <div id="missionMap" class="mb-3" style="height: 75vh;"></div>
+            <div id="missionPlannerElevation" class="card mb-3" style="display: none;">
+                <div class="card-header d-flex justify-content-between">
+                    <span data-i18n="missionDefaultElevationHead"></span>
+                    <button id="cancelPlot" type="button" class="btn-close" aria-label="Close"></button>
                 </div>
-                <div class="spacer">
-                    <div id="elevationDiv">
-                    </div>
-                </div>
+                <div id="elevationDiv"></div>
             </div>
             <div id="notLoadMap" data-i18n="useOnlyStandalone" style="display: none;"></div>
         </div>
     </div>
+
 </div>

@@ -1,0 +1,46 @@
+html {
+  font-size: 13px; // The only one place where devs should use pixels for font-size
+}
+
+$prefix: 'inav-';
+
+$font-family-sans-serif: "Open Sans", Helvetica, Arial, sans-serif;
+
+// Override standard colors
+$primary: #37a8db;
+$secondary: #969fa6;
+$success: #2fb344;
+$warning: #f79507;
+$danger: #da4c4c;
+$info: #4299e1;
+
+$min-contrast-ratio: 2;
+
+// Spacers
+$spacer: .75rem;
+$input-btn-padding-y: .25rem;
+$input-btn-padding-x: .5rem;
+$form-select-bg-position: right #{$input-btn-padding-x / 2} center !default;
+
+$nav-link-padding-y: .33rem;
+$nav-link-padding-x: .5rem;
+
+$tooltip-padding-x: .75rem;
+
+// Forms, Form Inputs
+$form-switch-width: 3.5em;
+$form-switch-bg-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'><circle r='3' fill='white'/></svg>");
+$form-switch-checked-bg-image: $form-switch-bg-image;
+$form-switch-bg-image-dark: $form-switch-bg-image;
+
+// Card
+$card-bg: rgba(var(--#{$prefix}body-color-rgb), .025);
+
+// List Groups
+$list-group-bg: trasparent;
+
+// Table
+$table-bg: transparent;
+
+// Tooltip
+$tooltip-font-size: 1rem;

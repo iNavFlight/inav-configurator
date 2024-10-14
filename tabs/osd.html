@@ -1,476 +1,481 @@
-<div class="tab-osd toolbar_fixed_bottom">
-    <div class="content_wrapper">
-        <h1 class="tab_title" data-i18n="tabOSD"></h1>
-        <div class="unsupported hide">
-            <p data-i18n="osd_unsupported_msg1" class="note"></p>
-            <p data-i18n="osd_unsupported_msg2" class="note"></p>
-        </div>
-        <div class="supported hide">
-            <div class="cf_column third_left osd__elements">
-                <div class="settings spacer_right">
-                    <select class="osd_layouts">
-                    </select>
-                    <span class="btn btn_blue">
-                        <a class="active osd_copy" href="#" data-i18n="copy"></a>
-                    </span>
-                    <span class="btn btn_blue">
-                        <a class="active osd_paste" href="#" data-i18n="paste"></a>
-                    </span>
-                    <span class="btn btn_danger">
-                        <a class="active osd_clear" href="#" data-i18n="clear"></a>
-                    </span>
-                    <input class="osd_search" placeholder="Search...">
-                </div>
-                <div class="spacer_right">
-                    <div id="osd_group_template" class="gui_box grey">
-                        <div
-                            class="gui_box_titlebar"
-                            style="margin-bottom: 0">
-                            <div class="spacer_box_title" data-i18n="osd_elements"></div>
-                        </div>
-                        <div class="spacer_box">
-                            <div class="display-fields"></div>
-                        </div>
-                    </div>
+<div class="page tab-osd">
+    <div class="page-header">
+        <span data-i18n="tabOSD"></span>
+    </div>
+
+    <div class="unsupported hide">
+        <div class="alert alert-warning" data-i18n="osd_unsupported_msg1"></div>
+        <div class="alert alert-warning" data-i18n="osd_unsupported_msg2"></div>
+    </div>
+
+    <div class="row supported hide d-flex position-sticky" style="top: 1rem;">
+        <div class="col-6 offset-xl-3 position-absolute">
+            <div id="preview-container" data-video-format data-show-guides>
+                <div class="display-layout position-relative mx-auto">
+                    <div class="hd43"></div>
+                    <div class="ntsc_bottom"></div>
+                    <div class="hdzero_box"></div>
+                    <div class="bfhdcompat_storage_box"></div>
+                    <div class="bfhdcompat_bottom_box"></div>
+                    <div class="avatar_storage_box"></div>
+                    <div class="avatar_bottom_bar"></div>
+                    <div class="preview position-relative z-1"></div>
                 </div>
             </div>
-            <div class="gui_box preview" style="float: left; position: fixed;">
-                <div class="gui_box_titlebar">
-                    <div class="spacer_box_title" data-i18n="osd_preview_title"></div>
-                </div>
-                <div class="display-layout">
-                    <div class="col right">
-                        <div class="hd_43_margin_left"></div>
-                        <div class="hd_43_margin_right"></div>
-                        <div class="hd_3016_box_top"></div>
-                        <div class="hd_3016_box_bottom"></div>
-                        <div class="hd_3016_box_left"></div>
-                        <div class="hd_3016_box_right"></div>
-                        <div class="pal_ntsc_box_bottom"></div>
-                        <div class="hd_avatar_storage_box_top"></div>
-                        <div class="hd_avatar_storage_box_bottom"></div>
-                        <div class="hd_avatar_storage_box_left"></div>
-                        <div class="hd_avatar_storage_box_right"></div>
-                        <div class="hd_avatar_bottom_bar"></div>
-                        <div class="hd_bfhdcompat_storage_box"></div>
-                        <div class="hd_bfhdcompat_bottom_box"></div>
-                        <div class="preview"></div>
-                    </div>
-                </div>
-            </div>
-            <div class="cf_column third_right osd_settings">
-                <div class="gui_box grey">
-                    <div class="gui_box_titlebar">
-                        <div class="spacer_box_title" data-i18n="osd_video_format"></div>
-                    </div>
-                    <div class="spacer_box">
-                        <select class="video-types"></select>
-                    </div>
-                    <div class="spacer_box settings">
-                        <div for="osd_video_show_guides" class="helpicon cf_tip" data-i18n_title="osd_video_HELP"></div>
-                        <label id="videoGuides">
-                           <span data-i18n="osd_video_show_guides"></span>
-                        </label>
-                    </div>
-                </div>
-                <div class="gui_box grey settings-container">
-                    <div class="gui_box_titlebar">
-                        <div class="spacer_box_title" data-i18n="settings"></div>
-                    </div>
-                    <div class="spacer_box">
-                        <div class="settings">
-                            <label class="pilot_name">
-                                <input type="text" id="pilot_name" data-setting="pilot_name" data-live="true" />
-                                <span data-i18n="osd_pilot_name"></span>
-                            </label>
-                            <div for="usePilotLogo" class="helpicon cf_tip osd_use_large_pilot_logo" data-i18n_title="osd_use_large_pilot_logo_help"></div>
-                            <label>
-                                <input type="checkbox" id="usePilotLogo" class="toggle update_preview" data-setting="osd_use_pilot_logo" data-live="true">
-                                <span data-i18n="osd_use_pilot_logo"></span>
-                            </label>
-                            <label class="craft_name">
-                                <input type="text" id="craft_name" data-setting="name" data-live="true" />
-                                <span data-i18n="osd_craft_name"></span>
-                            </label>
-                            <label class="units">
-                                <select id="unit_mode" name="unit_mode" data-setting-placeholder="osd_units"></select>
-                                <span data-i18n="osd_units"></span>
-                                <div for="unit_mode" class="helpicon cf_tip" style="margin-top: 2px"></div>
-                            </label>
-                            <label>
-                                <select class="update_preview" data-setting="osd_main_voltage_decimals" data-live="true"></select>
-                                <span data-i18n="osd_main_voltage_decimals"></span>
-                            </label>
-                            <label>
-                                <select class="update_preview" data-setting="osd_mah_precision" data-live="true"></select>
-                                <span data-i18n="osd_mah_precision"></span>
-                            </label>
-                            <label>
-                                <select class="update_preview" data-setting="osd_coordinate_digits" data-live="true"></select>
-                                <span data-i18n="osd_coordinate_digits"></span>
-                            </label>
-                            <div for="plusCodeDigits" class="helpicon cf_tip" data-i18n_title="osdSettingPLUS_CODE_DIGITS_HELP"></div>
-                            <label>
-                                <select id="plusCodeDigits" class="update_preview" data-setting="osd_plus_code_digits" data-live="true"></select>
-                                <span data-i18n="osd_plus_code_digits"></span>
-                            </label>
-                            <div for="plusCodeShort" class="helpicon cf_tip" data-i18n_title="osdSettingPLUS_CODE_SHORT_HELP"></div>
-                            <label>
-                                <select id="plusCodeShort" class="update_preview" data-setting="osd_plus_code_short" data-live="true"></select>
-                                <span data-i18n="osd_plus_code_short"></span>
-                            </label>
-                            <div for="rpmPrecision" class="helpicon cf_tip osd_use_esc_telemetry" data-i18n_title="osd_esc_rpm_precision_help"></div>
-                            <label class="osd_use_esc_telemetry">
-                                <select id="rpmPrecision" class="update_preview" data-setting="osd_esc_rpm_precision" data-live="true"></select>
-                                <span data-i18n="osd_esc_rpm_precision"></span>
-                            </label>
-                            <label>
-                                <select class="update_preview" data-setting="osd_crosshairs_style" data-live="true"></select>
-                                <span data-i18n="osd_crosshairs_style"></span>
-                            </label>
-                            <label>
-                                <select class="update_preview" data-setting="osd_left_sidebar_scroll" data-live="true"></select>
-                                <span data-i18n="osd_left_sidebar_scroll"></span>
-                            </label>
-                            <label>
-                                <select class="update_preview" data-setting="osd_right_sidebar_scroll" data-live="true"></select>
-                                <span data-i18n="osd_right_sidebar_scroll"></span>
-                            </label>
-                            <div for="crsfLQFormat" class="helpicon cf_tip osd_use_crsf" data-i18n_title="osdSettingCRSF_LQ_FORMAT_HELP"></div>
-                            <label class="osd_use_crsf">
-                                <select id="crsfLQFormat" class="update_preview" data-setting="osd_crsf_lq_format" data-live="true"></select>
-                                <span data-i18n="osd_crsf_lq_format"></span>
-                            </label>
-                            <label>
-                                <input type="checkbox" class="toggle update_preview" data-setting="osd_sidebar_scroll_arrows" data-live="true">
-                                <span data-i18n="osd_sidebar_scroll_arrows"></span>
-                            </label>
-                            <label>
-                                <input type="checkbox" class="toggle update_preview" data-setting="osd_home_position_arm_screen" data-live="true">
-                                <span data-i18n="osd_home_position_arm_screen"></span>
-                            </label>
-                        </div>
-                    </div>
-                </div>
-                <div class="gui_box grey alarms-container">
-                    <div class="gui_box_titlebar">
-                        <div class="spacer_box_title" data-i18n="osd_alarms"></div>
-                    </div>
-                    <div class="spacer_box settings">
-                        <label for="rssi_alarm">
-                            <input id="osd_rssi_alarm" data-setting="osd_rssi_alarm" data-setting-multiplier="1" type="number" data-step="1" />
-                            <span data-i18n="osd_rssi_alarm"></span>
-                        </label>
-                        <div for="link_quality_alarm" class="helpicon cf_tip osd_use_crsf" data-i18n_title="osdalarmLQ_HELP"></div>
-                        <label for="link_quality_alarm" class="osd_use_crsf">
-                            <input id="link_quality_alarm" data-setting="osd_link_quality_alarm" data-setting-multiplier="1" type="number" data-step="1" />
-                            <span data-i18n="osd_link_quality_alarm"></span>
-                        </label>
-                        <div for="rssi_dbm_alarm" class="helpicon cf_tip osd_use_crsf" data-i18n_title="osd_rssi_dbm_alarm_HELP"></div>
-                        <label for="rssi_dbm_alarm" class="osd_use_crsf">
-                            <input id="rssi_dbm_alarm" data-setting="osd_rssi_dbm_alarm" data-setting-multiplier="1" type="number" data-step="1" />
-                            <span data-i18n="osd_rssi_dbm_alarm"></span>
-                        </label>
-                        <div for="snr_alarm" class="helpicon cf_tip osd_use_crsf" data-i18n_title="osdalarmSNR_HELP"></div>
-                        <label for="snr_alarm" class="osd_use_crsf">
-                            <input id="snr_alarm" data-setting="osd_snr_alarm" data-setting-multiplier="1" type="number" data-step="1" />
-                            <span data-i18n="osd_snr_alarm"></span>
-                        </label>
-
-                        <label for="osd_alt_alarm">
-                            <input id="osd_alt_alarm" data-setting="osd_alt_alarm" data-unit="m" data-setting-multiplier="1" type="number" data-step="1" />
-                            <span data-i18n="osd_alt_alarm"></span>
-                        </label>
-                        <div for="osd_neg_alt_alarm" class="helpicon cf_tip" data-i18n_title="osdAlarmMAX_NEG_ALTITUDE_HELP"></div>
-                        <label for="osd_neg_alt_alarm">
-                            <input id="osd_neg_alt_alarm" data-setting="osd_neg_alt_alarm" data-unit="m" data-setting-multiplier="1" type="number" data-step="1" />
-                            <span data-i18n="osd_neg_alt_alarm"></span>
-                        </label>
-                        <div for="osd_dist_alarm" class="helpicon cf_tip" data-i18n_title="osdAlarmDIST_HELP"></div>
-                        <label for="osd_dist_alarm">
-                            <input id="osd_dist_alarm" data-setting="osd_dist_alarm" data-unit="m-lrg" data-setting-multiplier="1" type="number" data-step="1" />
-                            <span data-i18n="osd_dist_alarm"></span>
-                        </label>
-                        <div for="osd_airspeed_min_alarm" class="helpicon cf_tip osd_use_airspeed_alarm" data-i18n_title="osd_airspeed_min_alarm_HELP"></div>
-                        <label for="osd_airspeed_min_alarm" class="osd_use_airspeed_alarm">
-                            <input id="osd_airspeed_min_alarm" data-setting="osd_airspeed_alarm_min" data-unit="cms" data-setting-multiplier="1" type="number" data-step="1" />
-                            <span data-i18n="osd_airspeed_min_alarm"></span>
-                        </label>
-                        <div for="osd_airspeed_max_alarm" class="helpicon cf_tip osd_use_airspeed_alarm" data-i18n_title="osd_airspeed_max_alarm_HELP"></div>
-                        <label for="osd_airspeed_max_alarm" class="osd_use_airspeed_alarm">
-                            <input id="osd_airspeed_max_alarm" data-setting="osd_airspeed_alarm_max" data-unit="cms" data-setting-multiplier="1" type="number" data-step="1" />
-                            <span data-i18n="osd_airspeed_max_alarm"></span>
-                        </label>
-                        <div for="osd_current_alarm" class="helpicon cf_tip" data-i18n_title="osdAlarmCURRENT_HELP"></div>
-                        <label for="osd_current_alarm">
-                            <input id="osd_current_alarm" data-setting="osd_current_alarm" data-setting-multiplier="1" type="number" data-step="1" />
-                            <span data-i18n="osd_current_alarm"></span>
-                        </label>
-                        <label for="time_alarm">
-                            <input id="osd_time_alarm" data-setting="osd_time_alarm" data-setting-multiplier="1" type="number" data-step="1" />
-                            <span data-i18n="osd_time_alarm"></span>
-                        </label>
-
-                        <label for="imu_temp_alarm_min">
-                            <input id="imu_temp_alarm_min" data-setting="osd_imu_temp_alarm_min" data-unit="decidegc" data-setting-multiplier="1" type="number" data-step="0.5" />
-                            <span data-i18n="osd_imu_temp_alarm_min"></span>
-                        </label>
-                        <label for="imu_temp_alarm_max">
-                            <input id="imu_temp_alarm_max" data-setting="osd_imu_temp_alarm_max" data-unit="decidegc" data-setting-multiplier="1" type="number" data-step="0.5" />
-                            <span data-i18n="osd_imu_temp_alarm_max"></span>
-                        </label>
-                        <label for="baro_temp_alarm_min" class="osd_use_baro_temp_alarm">
-                            <input id="baro_temp_alarm_min" data-setting="osd_baro_temp_alarm_min" data-unit="decidegc" data-setting-multiplier="1" type="number" data-step="0.5" />
-                            <span data-i18n="osd_baro_temp_alarm_min"></span>
-                        </label>
-                        <label for="baro_temp_alarm_max" class="osd_use_baro_temp_alarm">
-                            <input id="baro_temp_alarm_max" data-setting="osd_baro_temp_alarm_max" data-unit="decidegc" data-setting-multiplier="1" type="number" data-step="0.5" />
-                            <span data-i18n="osd_baro_temp_alarm_max"></span>
-                        </label>
-                        <label for="esc_temp_alarm_min" class="osd_use_esc_telemetry">
-                            <input id="esc_temp_alarm_min" data-setting="osd_esc_temp_alarm_min" data-unit="decidegc" data-setting-multiplier="1" type="number" data-step="0.5" />
-                            <span data-i18n="osd_esc_temp_alarm_min"></span>
-                        </label>
-                        <label for="esc_temp_alarm_max" class="osd_use_esc_telemetry">
-                            <input id="esc_temp_alarm_max" data-setting="osd_esc_temp_alarm_max" data-unit="decidegc" data-setting-multiplier="1" type="number" data-step="0.5" />
-                            <span data-i18n="osd_esc_temp_alarm_max"></span>
-                        </label>
-
-                        <div for="osd_gforce_alarm" class="helpicon cf_tip" data-i18n_title="osdAlarmGFORCE_HELP"></div>
-                        <label for="osd_gforce_alarm">
-                            <input id="osd_gforce_alarm" data-setting="osd_gforce_alarm" data-setting-multiplier="1" type="number" data-step="0.1" />
-                            <span data-i18n="osd_gforce_alarm"></span>
-                        </label>
-                        <div for="osd_gforce_axis_alarm_min" class="helpicon cf_tip" data-i18n_title="osdAlarmGFORCE_AXIS_MIN_HELP"></div>
-                        <label for="osd_gforce_axis_alarm_min">
-                            <input id="osd_gforce_axis_alarm_min" data-setting="osd_gforce_axis_alarm_min" data-setting-multiplier="1" type="number" data-step="0.1" />
-                            <span data-i18n="osd_gforce_axis_alarm_min"></span>
-                        </label>
-                        <div for="osd_gforce_axis_alarm_max" class="helpicon cf_tip" data-i18n_title="osdAlarmGFORCE_AXIS_MAX_HELP"></div>
-                        <label for="osd_gforce_axis_alarm_max">
-                            <input id="osd_gforce_axis_alarm_max" data-setting="osd_gforce_axis_alarm_max" data-setting-multiplier="1" type="number" data-step="0.1" />
-                            <span data-i18n="osd_gforce_axis_alarm_max"></span>
-                        </label>
-                        <div for="adsb_distance_warning" class="helpicon cf_tip" data-i18n_title="osdAlarmADSB_MAX_DISTANCE_WARNING"></div>
-                        <label for="adsb_distance_warning">
-                            <input id="adsb_distance_warning" data-setting="osd_adsb_distance_warning" data-unit="m" data-setting-multiplier="1" type="number" data-step="1" />
-                            <span data-i18n="osd_adsb_distance_warning"></span>
-                        </label>
-                        <div for="adsb_distance_alert" class="helpicon cf_tip" data-i18n_title="osdAlarmADSB_MAX_DISTANCE_ALERT"></div>
-                        <label for="adsb_distance_alert">
-                            <input id="adsb_distance_alert" data-setting="osd_adsb_distance_alert" data-unit="m" data-setting-multiplier="1" type="number" data-step="1" />
-                            <span data-i18n="osd_adsb_distance_alert"></span>
-                        </label>
-                    </div>
-                </div>
-                <div class="gui_box grey dji-hd-container" id="dji_settings">
-                    <div class="gui_box_titlebar">
-                        <div class="spacer_box_title" data-i18n="osd_dji_HD_FPV"></div>
-                    </div>
-                    <div class="spacer_box settings">
-                        <label id="djiUnsupportedElements">
-                           <span data-i18n="osd_dji_hide_unsupported"></span>
-                        </label>
-                        <label>
-                            <select id="djiEscTempSource" data-setting="dji_esc_temp_source" data-live="true"></select>
-                            <span data-i18n="osd_dji_ESC_temp"></span>
-                        </label>
-                        <label>
-                            <select id="djiRssiSource" data-setting="dji_rssi_source" data-live="true"></select>
-                            <span data-i18n="osd_dji_RSSI_source"></span>
-                        </label>
-                        <label>
-                            <select data-setting="osd_speed_source" data-live="true"></select>
-                            <span data-i18n="osd_dji_GPS_source"></span>
-                        </label>
-                        <label>
-                            <select data-setting="dji_message_speed_source" data-live="true"></select>
-                            <span data-i18n="osd_dji_speed_source"></span>
-                        </label>
-                        <label class="djiCraftNameElements">
-                                <input type="checkbox" id="useCraftnameForMessages" data-setting="dji_use_name_for_messages" data-live="true" class="toggle"/>
-                                <span data-i18n="osd_dji_use_craft_name_elements"></span>
-                        </label>
-                        <label>
-                            <input type="checkbox" id="djiAdjustments" data-setting="dji_use_adjustments" data-live="true" class="toggle"></select>
-                            <span data-i18n="osd_dji_adjustments"></span>
-                        </label>
-                        <label for="cn_alternating_duration">
-                            <input id="cn_alternating_duration" data-setting="dji_cn_alternating_duration" data-setting-multiplier="1" type="number" data-step="1"></input>
-                            <span data-i18n="osd_dji_cn_alternating_duration"></span>
-                        </label>
-                    </div>
-                </div>
-
-                <div class="gui_box grey switch-indicator-container">
-                    <div class="gui_box_titlebar">
-                        <a href="https://github.com/iNavFlight/inav/wiki/OSD-custom-messages" target="_blank"></a><div for="osd_switch_indicator_settings" class="helpicon cf_tip" data-i18n_title="osd_switch_indicator_settings_HELP"></div></a>
-                        <div class="spacer_box_title" data-i18n="osd_switch_indicator_settings"></div>
-                    </div>
-                    <div class="spacer_box settings">
-                        <label>
-                            <input type="checkbox" id="switchIndicators_alignLeft" data-setting="osd_switch_indicators_align_left" data-live="true" class="toggle"></select>
-                            <span data-i18n="osd_switch_indicators_align_left"></span>
-                        </label>
-                        <label>
-                            <input type="text" class="osdSwitchIndName" id="osdSwitchInd0_name" data-setting="osd_switch_indicator_zero_name" />
-                            <select class="osdSwitchInd_channel" data-setting="osd_switch_indicator_zero_channel" data-live="true"></select>
-                            <span data-i18n="osdSwitchInd0"></span>
-                        </label>
-
-                        <label>
-                            <input type="text" class="osdSwitchIndName" id="osdSwitchInd1_name" data-setting="osd_switch_indicator_one_name" />
-                            <select class="osdSwitchInd_channel" data-setting="osd_switch_indicator_one_channel" data-live="true"></select>
-                            <span data-i18n="osdSwitchInd1"></span>
-                        </label>
-
-                        <label>
-                            <input type="text" class="osdSwitchIndName" id="osdSwitchInd2_name" data-setting="osd_switch_indicator_two_name" />
-                            <select class="osdSwitchInd_channel" data-setting="osd_switch_indicator_two_channel" data-live="true"></select>
-                            <span data-i18n="osdSwitchInd2"></span>
-                        </label>
-
-                        <label>
-                            <input type="text" class="osdSwitchIndName" id="osdSwitchInd3_name" data-setting="osd_switch_indicator_three_name" />
-                            <select class="osdSwitchInd_channel" data-setting="osd_switch_indicator_three_channel" data-live="true"></select>
-                            <span data-i18n="osdSwitchInd3"></span>
-                        </label>
-                    </div>
-                </div>
-
-                <div class="gui_box grey custom-element-container">
-                    <div class="gui_box_titlebar">
-                        <a href="https://github.com/iNavFlight/inav-configurator/resources/osd/INAV%20Character%20Map.md" target="_blank"><div for="osd_custom_element_settings" class="helpicon cf_tip" data-i18n_title="osd_custom_element_settings_HELP"></div></a>
-                        <div class="spacer_box_title" data-i18n="osd_custom_element_settings"></div>
-                    </div>
-                    <div class="spacer_box settings" id="osdCustomElements"></div>
-                </div>
-
-
-                <div class="gui_box grey pan-servo-container">
-                    <div class="gui_box_titlebar">
-                        <div for="osd_pan_servo_settings" class="helpicon cf_tip" data-i18n_title="osd_pan_servo_settings_HELP"></div>
-                        <div class="spacer_box_title" data-i18n="osd_pan_servo_settings"></div>
-                    </div>
-                    <div class="spacer_box settings">
-                        <div for="panServoOutput" class="helpicon cf_tip" data-i18n_title="osdPanServoIndex_HELP"></div>
-                        <label>
-                            <select id="panServoOutput" data-setting="osd_pan_servo_index" data-live="true"></select>
-                            <span data-i18n="osdPanServoIndex"></span>
-                        </label>
-
-                        <div id="osd_pan_settings">
-                            <div for="osdPanServoPwm2centideg" class="helpicon cf_tip" data-i18n_title="osdPanServoPwm2centideg_HELP"></div>
-                            <label for="osdPanServoPwm2centideg">
-                                <input id="osdPanServoPwm2centideg" data-setting="osd_pan_servo_pwm2centideg" data-unit="centideg-deg" data-setting-multiplier="1" type="number" data-step="1" />
-                                <span data-i18n="osdPanServoPwm2centideg"></span>
-                            </label>
-                            <label for="osdPanServoIndicatorShowDegrees">
-                                <input type="checkbox" id="osdPanServoIndicatorShowDegrees" data-setting="osd_pan_servo_indicator_show_degrees" data-live="true" class="toggle"></select>
-                                <span data-i18n="osdPanServoIndicatorShowDegrees"></span>
-                            </label>
-                            <div for="osdPanServoOffcentreWarning" class="helpicon cf_tip" data-i18n_title="osdPanServoOffcentreWarning_HELP"></div>
-                            <label for="osdPanServoOffcentreWarning">
-                                <input id="osdPanServoOffcentreWarning" data-setting="osd_pan_servo_offcentre_warning" data-unit="deg" data-setting-multiplier="1" type="number" data-step="1" />
-                                <span data-i18n="osdPanServoOffcentreWarning"></span>
-                            </label>
-                        </div>
-                    </div>
-                </div>
-                <div class="gui_box grey hud-settings-container"> 
-                    <div class="gui_box_titlebar">
-                        <div for="osd_hud_settings" class="helpicon cf_tip" data-i18n_title="osd_hud_settings_HELP"></div>
-                        <div class="spacer_box_title" data-i18n="osd_hud_settings"></div>
-                    </div>
-                    <div class="spacer_box settings">
-                        <div id="osd_hud_settings">
-                            <div for="osd_horizon_offset" class="helpicon cf_tip" data-i18n_title="osd_horizon_offset_help"></div>
-                            <label>
-                                <select class="update_preview" id="osd_horizon_offset" data-setting="osd_horizon_offset" data-setting-invert-select="true" data-live="true"></select>
-                                <span data-i18n="osd_horizon_offset"></span>
-                            </label>
-                            <div for="osd_hud_wp_disp" class="helpicon cf_tip" data-i18n_title="osd_hud_wp_disp_help"></div>
-                            <label>
-                                <input type="number" data-step="1" data-setting-multiplier="1" data-setting="osd_hud_wp_disp" class="toggle update_preview" data-live="true">
-                                <span data-i18n="osd_hud_wp_disp"></span>
-                            </label>
-                            <div for="osd_hud_radar_disp" class="helpicon cf_tip" data-i18n_title="osd_hud_radar_disp_help"></div>
-                            <label>
-                                <input type="number" data-step="1" data-setting-multiplier="1" data-setting="osd_hud_radar_disp" class="toggle update_preview" data-live="true">
-                                <span data-i18n="osd_hud_radar_disp"></span>
-                            </label>
-
-                            <div for="osd_hud_radar_range_min" class="helpicon cf_tip" data-i18n_title="osd_hud_radar_range_min_help"></div>
-                            <label>
-                                <input type="number" data-step="1" data-unit="m" data-setting-multiplier="1" data-setting="osd_hud_radar_range_min" class="toggle update_preview" data-live="true">
-                                <span data-i18n="osd_hud_radar_range_min"></span>
-                            </label>
-                            <div for="osd_hud_radar_range_max" class="helpicon cf_tip" data-i18n_title="osd_hud_radar_range_max_help"></div>
-                            <label>
-                                <input type="number" data-step="1" data-unit="m" data-setting-multiplier="1" data-setting="osd_hud_radar_range_max" class="toggle update_preview" data-live="true">
-                                <span data-i18n="osd_hud_radar_range_max"></span>
-                            </label>
-
-                            <div for="osd_camera_fov_h" class="helpicon cf_tip" data-i18n_title="osd_camera_fov_h_help"></div>
-                            <label>
-                                <input type="number" data-step="1" data-setting-multiplier="1" data-setting="osd_camera_fov_h" class="toggle update_preview" data-live="true">
-                                <span data-i18n="osd_camera_fov_h"></span>
-                            </label>
-                            <div for="osd_camera_fov_v" class="helpicon cf_tip" data-i18n_title="osd_camera_fov_v_help"></div>
-                            <label>
-                                <input type="number" data-step="1" data-setting-multiplier="1" data-setting="osd_camera_fov_v" class="toggle update_preview" data-live="true">
-                                <span data-i18n="osd_camera_fov_v"></span>
-                            </label>
-                            <div for="osd_camera_uptilt" class="helpicon cf_tip" data-i18n_title="osd_camera_uptilt_help"></div>
-                            <label>
-                                <input type="number" data-step="1" data-setting-multiplier="1" data-setting="osd_camera_uptilt" class="toggle update_preview" data-live="true">
-                                <span data-i18n="osd_camera_uptilt"></span>
-                            </label>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-            <div id="fontmanagercontent" style="display:none; width:712px;">
-                <div class="font-picker" style="margin-bottom: 10px;">
-                    <h1 class="tab_title">Font:</h1>
-                    <div class="content_wrapper font-preview"></div>
-                    <div class="fontbuttons">
-                        <button data-font-file="default" data-i18n="osd_font_default"></button>
-                        <button data-font-file="bold" data-i18n="osd_font_bold"></button>
-                        <button data-font-file="clarity" data-i18n="osd_font_clarity"></button>
-                        <button data-font-file="clarity_medium" data-i18n="osd_font_clarity_medium"></button>
-                        <button data-font-file="impact" data-i18n="osd_font_impact"></button>
-                        <button data-font-file="impact_mini" data-i18n="osd_font_impact_mini"></button>
-                        <button data-font-file="large" data-i18n="osd_font_large"></button>
-                        <button data-font-file="vision" data-i18n="osd_font_vision"></button>
-                        <button class="load_font_file" data-i18n="osd_font_load_file"></button>
-                    </div>
-                    <div class="info">
-                        <a name="progressbar"></a>
-                        <progress class="progress" value="0" min="0" max="100"></progress>
-                        <div class="progressLabel" style="margin-top: -21px; width: 95%; text-align: center; color: white; position: absolute;"></div>
-                    </div>
-                </div>
-                <div class="default_btn green" style="width:100%; float:left; margin-bottom: 0;">
-                    <a class="flash_font active" data-i18n="osd_font_upload"></a>
-                </div>
-            </div>
-            <div id="fonttypeselectorcontent" style="display:none; width:712px;">
-                <div class="font-picker" style="margin-bottom: 10px;">
-                    <h1 class="tab_title">Font:</h1>
-                    <div class="content_wrapper font-preview"></div>
-                </div>
-            </div>
-            <div class="clear-both"></div>
         </div>
     </div>
-    <div class="content_toolbar supported hide">
-        <div class="btn">
-            <a class="active save" href="#" data-i18n="save"></a>
+
+    <div class="row supported hide" id="asd">
+        <div class="col-6 offset-6 col-xl-3 offset-xl-0">
+            <div class="hstack gap-2 mb-3">
+                <select class="osd_layouts form-select w-100"></select>
+                <button class="osd_copy btn btn-outline-primary" data-i18n="copy"></button>
+                <button class="osd_paste btn btn-outline-primary" data-i18n="paste"></button>
+                <button class="osd_clear btn btn-outline-danger" data-i18n="clear"></button>
+            </div>
+            <div class="mb-3">
+                <input class="osd_search form-control" placeholder="Search...">
+            </div>
+            <div id="osd-groups-container">
+                <div id="osd_group_template" class="card mb-3">
+                    <div class="card-header hstack justify-content-between" data-i18n="osd_elements"></div>
+                    <div class="card-body">
+                        <ul class="list-group list-group-flush display-fields">
+                        </ul>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="btn">
-            <a class="fonts" id="fontmanager" href="#" data-i18n="osd_font_manager"></a>
+        <div class="col-6 offset-6 col-xl-3 offset-xl-6">
+            <div class="card mb-3">
+                <div class="card-header" data-i18n="osd_video_format"></div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item hstack">
+                            <select class="video-types form-select w-10r"></select>
+                        </li>
+                        <li class="list-group-item hstack">
+                            <div id="videoGuides" class="form-check form-switch">
+                                <!-- checkbox will be inserted here -->
+                                <label class="form-check-label" data-i18n="osd_video_show_guides"></label>
+                            </div>
+                            <div for="osd_video_show_guides" class="helpicon cf_tip" data-i18n_title="osd_video_HELP"></div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="card mb-3 settings-container">
+                <div class="card-header" data-i18n="settings"></div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item hstack">
+                            <input type="text" id="pilot_name" class="form-control w-7r" data-setting="pilot_name" data-live="true" />
+                            <label for="pilot_name" data-i18n="osd_pilot_name"></label>
+                            <div for="usePilotLogo" class="helpicon cf_tip osd_use_large_pilot_logo" data-i18n_title="osd_use_large_pilot_logo_help"></div>
+                        </li>
+                        <li class="list-group-item hstack">
+                            <div class="form-check form-switch">
+                                <input id="usePilotLogo" class="form-check-input update_preview" type="checkbox" data-setting="osd_use_pilot_logo" data-live="true">
+                                <label for="usePilotLogo" class="form-check-label" data-i18n="osd_use_pilot_logo"></label>
+                            </div>
+                            <div class="helpicon cf_tip" data-i18n_title="osd_use_large_pilot_logo_help"></div>
+                        </li>
+                        <li class="list-group-item hstack">
+                            <input type="text" id="craft_name" class="form-control w-7r" data-setting="name" data-live="true" />
+                            <label for="craft_name" data-i18n="osd_craft_name"></label>
+                        </li>
+                        <li class="list-group-item hstack units">
+                            <select id="unit_mode" class="form-select w-7r" name="unit_mode" data-setting-placeholder="osd_units"></select>
+                            <label data-i18n="osd_units"></label>
+                            <div for="unit_mode" class="helpicon cf_tip"></div>
+                        </li>
+                        <li class="list-group-item hstack">
+                            <select class="update_preview form-select w-7r" data-setting="osd_main_voltage_decimals" data-live="true"></select>
+                            <label data-i18n="osd_main_voltage_decimals"></label>
+                        </li>
+                        <li class="list-group-item hstack">
+                            <select class="update_preview form-select w-7r" data-setting="osd_mah_precision" data-live="true"></select>
+                            <label data-i18n="osd_mah_precision"></label>
+                        </li>
+                        <li class="list-group-item hstack">
+                            <select class="update_preview form-select w-7r" data-setting="osd_coordinate_digits" data-live="true"></select>
+                            <label data-i18n="osd_coordinate_digits"></label>
+                        </li>
+                        <li class="list-group-item hstack">
+                            <select id="plusCodeDigits" class="update_preview form-select w-7r" data-setting="osd_plus_code_digits" data-live="true"></select>
+                            <label for="plusCodeDigits" data-i18n="osd_plus_code_digits"></label>
+                            <div for="plusCodeDigits" class="helpicon cf_tip" data-i18n_title="osdSettingPLUS_CODE_DIGITS_HELP"></div>
+                        </li>
+                        <li class="list-group-item hstack">
+                            <select id="plusCodeShort" class="update_preview form-select w-7r" data-setting="osd_plus_code_short" data-live="true"></select>
+                            <label for="plusCodeShort" data-i18n="osd_plus_code_short"></label>
+                            <div for="plusCodeShort" class="helpicon cf_tip" data-i18n_title="osdSettingPLUS_CODE_SHORT_HELP"></div>
+                        </li>
+                        <li class="list-group-item hstack osd_use_esc_telemetry">
+                            <select id="rpmPrecision" class="update_preview form-select w-7r" data-setting="osd_esc_rpm_precision" data-live="true"></select>
+                            <label for="rpmPrecision" data-i18n="osd_esc_rpm_precision"></label>
+                            <div for="rpmPrecision" class="helpicon cf_tip" data-i18n_title="osd_esc_rpm_precision_help"></div>
+                        </li>
+                        <li class="list-group-item hstack">
+                            <select class="update_preview form-select w-7r" data-setting="osd_crosshairs_style" data-live="true"></select>
+                            <label data-i18n="osd_crosshairs_style"></label>
+                        </li>
+                        <li class="list-group-item hstack">
+                            <select class="update_preview form-select w-7r" data-setting="osd_left_sidebar_scroll" data-live="true"></select>
+                            <label data-i18n="osd_left_sidebar_scroll"></label>
+                        </li>
+                        <li class="list-group-item hstack">
+                            <select class="update_preview form-select w-7r" data-setting="osd_right_sidebar_scroll" data-live="true"></select>
+                            <label data-i18n="osd_right_sidebar_scroll"></label>
+                        </li>
+                        <li class="list-group-item hstack osd_use_crsf">
+                            <select id="crsfLQFormat" class="update_preview form-select w-7r" data-setting="osd_crsf_lq_format" data-live="true"></select>
+                            <label for="crsfLQFormat" data-i18n="osd_crsf_lq_format"></label>
+                            <div for="crsfLQFormat" class="helpicon cf_tip " data-i18n_title="osdSettingCRSF_LQ_FORMAT_HELP"></div>
+                        </li>
+                        <li class="list-group-item hstack">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input update_preview" type="checkbox" data-setting="osd_sidebar_scroll_arrows" data-live="true">
+                                <label class="form-check-label" data-i18n="osd_sidebar_scroll_arrows"></label>
+                            </div>
+                        </li>
+                        <li class="list-group-item hstack">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input update_preview" type="checkbox" data-setting="osd_home_position_arm_screen" data-live="true">
+                                <label class="form-check-label" data-i18n="osd_home_position_arm_screen"></label>
+                            </div>
+                        </li>
+                    </ul>
+
+                    <div class="settings">
+                    </div>
+                </div>
+            </div>
+            <div class="card mb-3 alarms-container">
+                <div class="card-header" data-i18n="osd_alarms"></div>
+                <div class="card-body settings">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item hstack">
+                            <input id="osd_rssi_alarm" class="form-control w-7r" data-setting="osd_rssi_alarm" data-setting-multiplier="1" type="number" data-step="1" />
+                            <label for="osd_rssi_alarm" data-i18n="osd_rssi_alarm"></label>
+                        </li>
+                        <li class="list-group-item hstack osd_use_crsf">
+                            <input id="link_quality_alarm" class="form-control w-7r" data-setting="osd_link_quality_alarm" data-setting-multiplier="1" type="number" data-step="1" />
+                            <label for="link_quality_alarm" data-i18n="osd_link_quality_alarm"></label>
+                            <div for="link_quality_alarm" class="helpicon cf_tip" data-i18n_title="osdalarmLQ_HELP"></div>
+                        </li>
+                        <li class="list-group-item hstack osd_use_crsf">
+                            <input id="rssi_dbm_alarm" class="form-control w-7r" data-setting="osd_rssi_dbm_alarm" data-setting-multiplier="1" type="number" data-step="1" />
+                            <label for="rssi_dbm_alarm" data-i18n="osd_rssi_dbm_alarm"></label>
+                            <div for="rssi_dbm_alarm" class="helpicon cf_tip" data-i18n_title="osd_rssi_dbm_alarm_HELP"></div>
+                        </li>
+                        <li class="list-group-item hstack osd_use_crsf">
+                            <input id="snr_alarm" class="form-control w-7r" data-setting="osd_snr_alarm" data-setting-multiplier="1" type="number" data-step="1" />
+                            <label for="snr_alarm" data-i18n="osd_snr_alarm"></label>
+                            <div for="snr_alarm" class="helpicon cf_tip" data-i18n_title="osdalarmSNR_HELP"></div>
+                        </li>
+                        <li class="list-group-item hstack">
+                            <input id="osd_alt_alarm" class="form-control w-7r" data-setting="osd_alt_alarm" data-unit="m" data-setting-multiplier="1" type="number" data-step="1" />
+                            <label for="osd_alt_alarm" data-i18n="osd_alt_alarm"></label>
+                        </li>
+                        <li class="list-group-item hstack">
+                            <input id="osd_neg_alt_alarm" class="form-control w-7r" data-setting="osd_neg_alt_alarm" data-unit="m" data-setting-multiplier="1" type="number" data-step="1" />
+                            <label for="osd_neg_alt_alarm" data-i18n="osd_neg_alt_alarm"></label>
+                            <div for="osd_neg_alt_alarm" class="helpicon cf_tip" data-i18n_title="osdAlarmMAX_NEG_ALTITUDE_HELP"></div>
+                        </li>
+                        <li class="list-group-item hstack">
+                            <input id="osd_dist_alarm" class="form-control w-7r" data-setting="osd_dist_alarm" data-unit="m-lrg" data-setting-multiplier="1" type="number" data-step="1" />
+                            <label for="osd_dist_alarm" data-i18n="osd_dist_alarm"></label>
+                            <div for="osd_dist_alarm" class="helpicon cf_tip" data-i18n_title="osdAlarmDIST_HELP"></div>
+                        </li>
+                        <li class="list-group-item hstack osd_use_airspeed_alarm">
+                            <input id="osd_airspeed_min_alarm" class="form-control w-7r" data-setting="osd_airspeed_alarm_min" data-unit="cms" data-setting-multiplier="1" type="number" data-step="1" />
+                            <label for="osd_airspeed_min_alarm" data-i18n="osd_airspeed_min_alarm"></label>
+                            <div for="osd_airspeed_min_alarm" class="helpicon cf_tip" data-i18n_title="osd_airspeed_min_alarm_HELP"></div>
+                        </li>
+                        <li class="list-group-item hstack osd_use_airspeed_alarm">
+                            <input id="osd_airspeed_max_alarm" class="form-control w-7r" data-setting="osd_airspeed_alarm_max" data-unit="cms" data-setting-multiplier="1" type="number" data-step="1" />
+                            <label for="osd_airspeed_max_alarm" data-i18n="osd_airspeed_max_alarm"></label>
+                            <div for="osd_airspeed_max_alarm" class="helpicon cf_tip" data-i18n_title="osd_airspeed_max_alarm_HELP"></div>
+                        </li>
+                        <li class="list-group-item hstack">
+                            <input id="osd_current_alarm" class="form-control w-7r" data-setting="osd_current_alarm" data-setting-multiplier="1" type="number" data-step="1" />
+                            <label for="osd_current_alarm" data-i18n="osd_current_alarm"></label>
+                            <div for="osd_current_alarm" class="helpicon cf_tip" data-i18n_title="osdAlarmCURRENT_HELP"></div>
+                        </li>
+                        <li class="list-group-item hstack">
+                            <input id="osd_time_alarm" class="form-control w-7r" data-setting="osd_time_alarm" data-setting-multiplier="1" type="number" data-step="1" />
+                            <label for="osd_time_alarm" data-i18n="osd_time_alarm"></label>
+                        </li>
+                        <li class="list-group-item hstack">
+                            <input id="imu_temp_alarm_min" class="form-control w-7r" data-setting="osd_imu_temp_alarm_min" data-unit="decidegc" data-setting-multiplier="1" type="number" data-step="0.5" />
+                            <label for="imu_temp_alarm_min" data-i18n="osd_imu_temp_alarm_min"></label>
+                        </li>
+                        <li class="list-group-item hstack">
+                            <input id="imu_temp_alarm_max" class="form-control w-7r" data-setting="osd_imu_temp_alarm_max" data-unit="decidegc" data-setting-multiplier="1" type="number" data-step="0.5" />
+                            <label for="imu_temp_alarm_max" data-i18n="osd_imu_temp_alarm_max"></label>
+                        </li>
+                        <li class="list-group-item hstack osd_use_baro_temp_alarm">
+                            <input id="baro_temp_alarm_min" class="form-control w-7r" data-setting="osd_baro_temp_alarm_min" data-unit="decidegc" data-setting-multiplier="1" type="number" data-step="0.5" />
+                            <label for="baro_temp_alarm_min" data-i18n="osd_baro_temp_alarm_min"></label>
+                        </li>
+                        <li class="list-group-item hstack osd_use_baro_temp_alarm">
+                            <input id="baro_temp_alarm_max" class="form-control w-7r" data-setting="osd_baro_temp_alarm_max" data-unit="decidegc" data-setting-multiplier="1" type="number" data-step="0.5" />
+                            <label for="baro_temp_alarm_max" data-i18n="osd_baro_temp_alarm_max"></label>
+                        </li>
+                        <li class="list-group-item hstack osd_use_esc_telemetry">
+                            <input id="esc_temp_alarm_min" class="form-control w-7r" data-setting="osd_esc_temp_alarm_min" data-unit="decidegc" data-setting-multiplier="1" type="number" data-step="0.5" />
+                            <label for="esc_temp_alarm_min" data-i18n="osd_esc_temp_alarm_min"></label>
+                        </li>
+                        <li class="list-group-item hstack osd_use_esc_telemetry">
+                            <input id="esc_temp_alarm_max" class="form-control w-7r" data-setting="osd_esc_temp_alarm_max" data-unit="decidegc" data-setting-multiplier="1" type="number" data-step="0.5" />
+                            <label for="esc_temp_alarm_max" data-i18n="osd_esc_temp_alarm_max"></label>
+                        </li>
+                        <li class="list-group-item hstack">
+                            <input id="osd_gforce_alarm" class="form-control w-7r" data-setting="osd_gforce_alarm" data-setting-multiplier="1" type="number" data-step="0.1" />
+                            <label for="osd_gforce_alarm" data-i18n="osd_gforce_alarm"></label>
+                            <div for="osd_gforce_alarm" class="helpicon cf_tip" data-i18n_title="osdAlarmGFORCE_HELP"></div>
+                        </li>
+                        <li class="list-group-item hstack">
+                            <input id="osd_gforce_axis_alarm_min" class="form-control w-7r" data-setting="osd_gforce_axis_alarm_min" data-setting-multiplier="1" type="number" data-step="0.1" />
+                            <label for="osd_gforce_axis_alarm_min" data-i18n="osd_gforce_axis_alarm_min"></label>
+                            <div for="osd_gforce_axis_alarm_min" class="helpicon cf_tip" data-i18n_title="osdAlarmGFORCE_AXIS_MIN_HELP"></div>
+                        </li>
+                        <li class="list-group-item hstack">
+                            <input id="osd_gforce_axis_alarm_max" class="form-control w-7r" data-setting="osd_gforce_axis_alarm_max" data-setting-multiplier="1" type="number" data-step="0.1" />
+                            <label for="osd_gforce_axis_alarm_max" data-i18n="osd_gforce_axis_alarm_max"></label>
+                            <div for="osd_gforce_axis_alarm_max" class="helpicon cf_tip" data-i18n_title="osdAlarmGFORCE_AXIS_MAX_HELP"></div>
+                        </li>
+                        <li class="list-group-item hstack">
+                            <input id="adsb_distance_warning" class="form-control w-7r" data-setting="osd_adsb_distance_warning" data-unit="m" data-setting-multiplier="1" type="number" data-step="1" />
+                            <label for="adsb_distance_warning" data-i18n="osd_adsb_distance_warning"></label>
+                            <div for="adsb_distance_warning" class="helpicon cf_tip" data-i18n_title="osdAlarmADSB_MAX_DISTANCE_WARNING"></div>
+                        </li>
+                        <li class="list-group-item hstack">
+                            <input id="adsb_distance_alert" class="form-control w-7r" data-setting="osd_adsb_distance_alert" data-unit="m" data-setting-multiplier="1" type="number" data-step="1" />
+                            <label for="adsb_distance_alert" data-i18n="osd_adsb_distance_alert"></label>
+                            <div for="adsb_distance_alert" class="helpicon cf_tip" data-i18n_title="osdAlarmADSB_MAX_DISTANCE_ALERT"></div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="card mb-3 dji-hd-container" id="dji_settings">
+                <div class="card-header"  data-i18n="osd_dji_HD_FPV"></div>
+
+                <div class="card-body settings">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item hstack">
+                            <div id="djiUnsupportedElements" class="form-check form-switch">
+                                <!-- checkbox will be inserted here -->
+                                <label class="form-check-label" data-i18n="osd_dji_hide_unsupported"></label>
+                            </div>
+
+                        </li>
+                        <li class="list-group-item hstack">
+                            <select id="djiEscTempSource" class="form-select w-7r" data-setting="dji_esc_temp_source" data-live="true"></select>
+                            <label for="djiEscTempSource" data-i18n="osd_dji_ESC_temp"></label>
+                        </li>
+                        <li class="list-group-item hstack">
+                            <select id="djiRssiSource" class="form-select w-7r" data-setting="dji_rssi_source" data-live="true"></select>
+                            <label for="djiRssiSource" data-i18n="osd_dji_RSSI_source"></label>
+                        </li>
+                        <li class="list-group-item hstack">
+                            <select class="form-select w-7r"  data-setting="osd_speed_source" data-live="true"></select>
+                            <label data-i18n="osd_dji_GPS_source"></label>
+                        </li>
+                        <li class="list-group-item hstack">
+                            <select class="form-select w-7r"  data-setting="dji_message_speed_source" data-live="true"></select>
+                            <label data-i18n="osd_dji_speed_source"></label>
+                        </li>
+                        <li class="list-group-item hstack">
+                            <div class="form-check form-switch">
+                                <input id="useCraftnameForMessages" class="form-check-input" type="checkbox" data-setting="dji_use_name_for_messages" data-live="true">
+                                <label for="useCraftnameForMessages" class="form-check-label" data-i18n="osd_dji_adjustments"></label>
+                            </div>
+                        </li>
+                        <li class="list-group-item hstack">
+                            <div class="form-check form-switch">
+                                <input id="djiAdjustments" class="form-check-input" type="checkbox" data-setting="dji_use_adjustments" data-live="true">
+                                <label for="djiAdjustments" class="form-check-label" data-i18n="osd_dji_adjustments"></label>
+                            </div>
+                        </li>
+                        <li class="list-group-item hstack">
+                            <input id="cn_alternating_duration" class="form-control w-7r"  data-setting="dji_cn_alternating_duration" data-setting-multiplier="1" type="number" data-step="1"></input>
+                            <label for="cn_alternating_duration" data-i18n="osd_dji_cn_alternating_duration"></label>
+                        </li>
+                    </ul>
+
+                </div>
+            </div>
+            <div class="card mb-3 switch-indicator-container">
+                <div class="card-header hstack justify-content-between">
+                    <span data-i18n="osd_switch_indicator_settings"></span>
+                    <a href="https://github.com/iNavFlight/inav/wiki/OSD-custom-messages" class="helpiconLink" target="_blank">
+                        <span for="osd_switch_indicator_settings" class="helpicon cf_tip" data-i18n_title="osd_switch_indicator_settings_HELP"></span>
+                    </a>
+                </div>
+                <div class="card-body settings">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item hstack">
+                            <div class="form-check form-switch">
+                                <input id="switchIndicators_alignLeft" class="form-check-input" type="checkbox" data-setting="osd_switch_indicators_align_left" data-live="true">
+                                <label for="switchIndicators_alignLeft" class="form-check-label" data-i18n="osd_switch_indicators_align_left"></label>
+                            </div>
+                        </li>
+                        <li class="list-group-item hstack">
+                            <input type="text" class="osdSwitchIndName form-control w-5r me-2" id="osdSwitchInd0_name" data-setting="osd_switch_indicator_zero_name" />
+                            <select class="osdSwitchInd_channel form-select w-5r" data-setting="osd_switch_indicator_zero_channel" data-live="true"></select>
+                            <label for="osdSwitchInd0_name" data-i18n="osdSwitchInd0"></label>
+                        </li>
+                        <li class="list-group-item hstack">
+                            <input type="text" class="osdSwitchIndName form-control w-5r me-2" id="osdSwitchInd1_name" data-setting="osd_switch_indicator_one_name" />
+                            <select class="osdSwitchInd_channel form-select w-5r" data-setting="osd_switch_indicator_one_channel" data-live="true"></select>
+                            <label for="osdSwitchInd1_name" data-i18n="osdSwitchInd1"></label>
+                        </li>
+                        <li class="list-group-item hstack">
+                            <input type="text" class="osdSwitchIndName form-control w-5r me-2" id="osdSwitchInd2_name" data-setting="osd_switch_indicator_two_name" />
+                            <select class="osdSwitchInd_channel form-select w-5r" data-setting="osd_switch_indicator_two_channel" data-live="true"></select>
+                            <label for="osdSwitchInd2_name" data-i18n="osdSwitchInd2"></label>
+                        </li>
+                        <li class="list-group-item hstack">
+                            <input type="text" class="osdSwitchIndName form-control w-5r me-2" id="osdSwitchInd3_name" data-setting="osd_switch_indicator_three_name" />
+                            <select class="osdSwitchInd_channel form-select w-5r" data-setting="osd_switch_indicator_three_channel" data-live="true"></select>
+                            <label for="osdSwitchInd3_name" data-i18n="osdSwitchInd3"></label>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="card mb-3 custom-element-container">
+                <div class="card-header hstack justify-content-between">
+                    <span data-i18n="osd_custom_element_settings"></span>
+                    <a href="https://github.com/iNavFlight/inav-configurator/resources/osd/INAV%20Character%20Map.md" class="helpiconLink" target="_blank">
+                        <span for="osd_custom_element_settings" class="helpicon cf_tip" data-i18n_title="osd_custom_element_settings_HELP"></span>
+                    </a>
+                </div>
+                <div class="card-body" id="osdCustomElements">
+                </div>
+            </div>
+            <div class="card mb-3 pan-servo-container">
+                <div class="card-header hstack justify-content-between">
+                    <span data-i18n="osd_pan_servo_settings"></span>
+                    <div for="osd_pan_servo_settings" class="helpicon cf_tip" data-i18n_title="osd_pan_servo_settings_HELP"></div>
+                </div>
+
+                <div class="card-body settings">
+
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item hstack">
+                            <select id="panServoOutput" class="form-select w-7r" data-setting="osd_pan_servo_index" data-live="true"></select>
+                            <label for="panServoOutput" data-i18n="osdPanServoIndex"></label>
+                            <div for="panServoOutput" class="helpicon cf_tip" data-i18n_title="osdPanServoIndex_HELP"></div>
+                        </li>
+                        <li class="list-group-item hstack osd_pan_settings">
+                            <input id="osdPanServoPwm2centideg" class="form-control w-7r" data-setting="osd_pan_servo_pwm2centideg" data-unit="centideg-deg" data-setting-multiplier="1" type="number" data-step="1" />
+                            <label for="osdPanServoPwm2centideg" data-i18n="osdPanServoPwm2centideg"></label>
+                            <div for="osdPanServoPwm2centideg" class="helpicon cf_tip" data-i18n_title="osdPanServoPwm2centideg_HELP"></div>
+                        </li>
+                        <li class="list-group-item hstack osd_pan_settings">
+                            <div class="form-check form-switch">
+                                <input id="osdPanServoIndicatorShowDegrees" class="form-check-input" type="checkbox" data-setting="osd_pan_servo_indicator_show_degrees" data-live="true">
+                                <label for="osdPanServoIndicatorShowDegrees" class="form-check-label" data-i18n="osdPanServoIndicatorShowDegrees"></label>
+                            </div>
+                        </li>
+                        <li class="list-group-item hstack osd_pan_settings">
+                            <input id="osdPanServoOffcentreWarning" class="form-control w-7r" data-setting="osd_pan_servo_offcentre_warning" data-unit="deg" data-setting-multiplier="1" type="number" data-step="1" />
+                            <label for="osdPanServoOffcentreWarning" data-i18n="osdPanServoOffcentreWarning"></label>
+                            <div for="osdPanServoOffcentreWarning" class="helpicon cf_tip" data-i18n_title="osdPanServoOffcentreWarning_HELP"></div>
+                        </li>
+                    </ul>
+
+                </div>
+            </div>
+            <div class="card mb-3 hud-settings-container">
+                <div class="card-header hstack justify-content-between">
+                    <div data-i18n="osd_hud_settings"></div>
+                    <div for="osd_hud_settings" class="helpicon cf_tip" data-i18n_title="osd_hud_settings_HELP"></div>
+                </div>
+
+                <div class="card-body settings">
+                    <ul id="osd_hud_settings" class="list-group list-group-flush">
+                        <li class="list-group-item hstack">
+                            <select class="form-select w-7r update_preview" id="osd_horizon_offset" data-setting="osd_horizon_offset" data-setting-invert-select="true" data-live="true"></select>
+                            <label for="osd_horizon_offset" data-i18n="osd_horizon_offset"></label>
+                            <div for="osd_horizon_offset" class="helpicon cf_tip" data-i18n_title="osd_horizon_offset_help"></div>
+                        </li>
+                        <li class="list-group-item hstack">
+                            <input type="number" data-step="1" data-setting-multiplier="1" data-setting="osd_hud_wp_disp" class="form-control w-7r update_preview" data-live="true">
+                            <label data-i18n="osd_hud_wp_disp"></label>
+                            <div for="osd_hud_wp_disp" class="helpicon cf_tip" data-i18n_title="osd_hud_wp_disp_help"></div>
+                        </li>
+                        <li class="list-group-item hstack">
+                            <input type="number" data-step="1" data-setting-multiplier="1" data-setting="osd_hud_radar_disp" class="form-control w-7r update_preview" data-live="true">
+                            <label data-i18n="osd_hud_radar_disp"></label>
+                            <div for="osd_hud_radar_disp" class="helpicon cf_tip" data-i18n_title="osd_hud_radar_disp_help"></div>
+                        </li>
+                        <li class="list-group-item hstack">
+                            <input type="number" data-step="1" data-unit="m" data-setting-multiplier="1" data-setting="osd_hud_radar_range_min" class="form-control w-7r update_preview" data-live="true">
+                            <label data-i18n="osd_hud_radar_range_min"></label>
+                            <div for="osd_hud_radar_range_min" class="helpicon cf_tip" data-i18n_title="osd_hud_radar_range_min_help"></div>
+                        </li>
+                        <li class="list-group-item hstack">
+                            <input type="number" data-step="1" data-unit="m" data-setting-multiplier="1" data-setting="osd_hud_radar_range_max" class="form-control w-7r update_preview" data-live="true">
+                            <label data-i18n="osd_hud_radar_range_max"></label>
+                            <div for="osd_hud_radar_range_max" class="helpicon cf_tip" data-i18n_title="osd_hud_radar_range_max_help"></div>
+                        </li>
+                        <li class="list-group-item hstack">
+                            <input type="number" data-step="1" data-setting-multiplier="1" data-setting="osd_camera_fov_h" class="form-control w-7r update_preview" data-live="true">
+                            <label data-i18n="osd_camera_fov_h"></label>
+                            <div for="osd_camera_fov_h" class="helpicon cf_tip" data-i18n_title="osd_camera_fov_h_help"></div>
+                        </li>
+                        <li class="list-group-item hstack">
+                            <input type="number" data-step="1" data-setting-multiplier="1" data-setting="osd_camera_fov_v" class="form-control w-7r update_preview" data-live="true">
+                            <label data-i18n="osd_camera_fov_v"></label>
+                            <div for="osd_camera_fov_v" class="helpicon cf_tip" data-i18n_title="osd_camera_fov_v_help"></div>
+                        </li>
+                        <li class="list-group-item hstack">
+                            <input type="number" data-step="1" data-setting-multiplier="1" data-setting="osd_camera_uptilt" class="form-control w-7r update_preview" data-live="true">
+                            <label data-i18n="osd_camera_uptilt"></label>
+                            <div for="osd_camera_uptilt" class="helpicon cf_tip" data-i18n_title="osd_camera_uptilt_help"></div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
         </div>
+    </div>
+
+    <div class="page-footer justify-content-between gap-2">
+        <button id="fontmanager" class="btn btn-outline-primary" data-i18n="osd_font_manager"></button>
+        <button id="save-btn" class="btn btn-primary" data-i18n="save"></button>
+    </div>
+</div>
+
+<div id="fontmanagercontent" style="display:none;">
+    <div class="font-picker" style="margin-bottom: 10px;">
+        <div class="fontbuttons d-flex gap-2 mb-3 flex-wrap">
+            <button class="btn btn-outline-primary" data-font-file="default" data-i18n="osd_font_default"></button>
+            <button class="btn btn-outline-primary" data-font-file="bold" data-i18n="osd_font_bold"></button>
+            <button class="btn btn-outline-primary" data-font-file="clarity" data-i18n="osd_font_clarity"></button>
+            <button class="btn btn-outline-primary" data-font-file="clarity_medium" data-i18n="osd_font_clarity_medium"></button>
+            <button class="btn btn-outline-primary" data-font-file="impact" data-i18n="osd_font_impact"></button>
+            <button class="btn btn-outline-primary" data-font-file="impact_mini" data-i18n="osd_font_impact_mini"></button>
+            <button class="btn btn-outline-primary" data-font-file="large" data-i18n="osd_font_large"></button>
+            <button class="btn btn-outline-primary" data-font-file="vision" data-i18n="osd_font_vision"></button>
+            <button class="btn btn-primary ms-auto load_font_file" data-i18n="osd_font_load_file"></button>
+        </div>
+        <hr/>
+        <div class="font-preview mb-3"></div>
+        <div class="progress position-relative h-2r mb-3" style="--inav-progress-bar-transition: width 0.15s ease;line-height: 2rem;">
+            <span class="progressLabel position-absolute w-100 h-100 fs-6 text-center"></span>
+            <div id="font-progress-bar" class="progress-bar bg-warning" style="width: 0%"></div>
+        </div>
+    </div>
+    <div class="d-grid">
+        <button id="flash_font" class="btn btn-primary" data-i18n="osd_font_upload"></button>
+    </div>
+</div>
+<div id="fonttypeselectorcontent" style="display:none; width:712px;">
+    <div class="font-picker" style="margin-bottom: 10px;">
+        <h1 class="tab_title">Font:</h1>
+        <div class="content_wrapper font-preview"></div>
     </div>
 </div>
