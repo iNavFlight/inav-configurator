@@ -1,4 +1,6 @@
 .gvar__container {
+    display: flex;
+    gap: 1rem;
     width: 100%;
     margin: 1em 0 1em 0;
     padding: 0;
@@ -14,19 +16,19 @@
 }
 
 .gvar__cell {
-    margin: 1em;
-    padding: 1em;
-    background-color: rgb(55, 168, 219);
+    padding: .5rem 1rem;
+    background-color: var(--inav-primary-bg-subtle);
+    border-radius: var(--inav-border-radius);
+    border: var(--inav-border-width) var(--inav-primary-border-subtle) solid;
 }
 
 .gvar__cell h2 {
-    font-size: 1em;
-    color: #eee;
+    font-size: 1rem;
+    color: var(--inav-primary-text-emphasis);
 }
 
 .gvar__value {
-    font-size: 2em;
-    color:#fff;
+    font-size: 1.5rem;
     font-weight: bold;
 }
 
@@ -36,5 +38,5 @@
     margin: 0;
     padding: 2px;
     margin-right: 1em;
-    font-size: 13px;
+    /*font-size: 13px;*/
 }

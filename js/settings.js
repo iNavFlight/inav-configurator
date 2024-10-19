@@ -63,14 +63,12 @@ var Settings = (function () {
                 }
             }
 
-            if (globalSettings.showProfileParameters) {
-                if (FC.isBatteryProfileParameter(settingName)) {
-                    input.css("background-color","#fef2d5");
-                }
+            if (FC.isBatteryProfileParameter(settingName)) {
+                input.addClass("profile-input-battery");
+            }
 
-                if (FC.isControlProfileParameter(settingName)) {
-                    input.css("background-color","#d5ebfe");
-                }
+            if (FC.isControlProfileParameter(settingName)) {
+                input.addClass("profile-input-control");
             }
 
             return mspHelper.getSetting(settingName).then(function (s) {

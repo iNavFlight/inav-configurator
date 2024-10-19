@@ -1,49 +1,51 @@
-<div class="tab-cli">
-    <div class="content_wrapper">
-        <div class="note">
-            <div class="note_spacer">
-                <p i18n="cliInfo"></p>
-            </div>
-        </div>
-
-        <div class="backdrop">
-            <div class="window">
-                <div class="wrapper"></div>
-            </div>
-        </div>
-        <div style="display:flex;align-items:center;">
-            <textarea name="commands" i18n_placeholder="cliInputPlaceholder" rows="1" cols="0"></textarea>
-            <a class="helpiconLink" style="margin-left:5px;margin-right:5px;" href="https://github.com/iNavFlight/inav/blob/master/docs/Cli.md" target="_blank">
-                <div class="helpicon cf_tip" style="float:none;" data-i18n_title="cliCommandsHelp"></div>
-            </a>            
-        </div>
-    </div>
-    <div class="content_toolbar">
-        <div class="btn save_btn" style="float: left; padding-left: 15px">
-            <a class="msc" href="#" i18n="cliMscBtn"></a>
-            <a class="savecmd" href="#" i18n="cliSaveSettingsBtn"></a>
-            <a class="exit" href="#" i18n="cliExitBtn"></a>
-        </div>
-        <div class="btn save_btn pull-right">
-            <a class="cliDocsBtn" href="#" i18n="cliDocsBtn" target="_blank"></a>
-            <a class="save" href="#" i18n="cliSaveToFileBtn"></a>
-            <a class="load" href="#" i18n="cliLoadFromFileBtn"></a>
-            <a class="copy" href="#" i18n="cliCopyToClipboardBtn"></a>            
-            <a class="clear" href="#" i18n="cliClearOutputHistoryBtn"></a>     
-            <a class="diffall" href="#" i18n="cliDiffAllBtn"></a>  
-        </div>
+<div class="page">
+    <div class="page-header">
+        <span data-i18n="tabCLI"></span>
     </div>
 
-    <!-- Snippet preview dialog -->
-    <div id="snippetpreviewcontent" style="display: none">
-        <div class="note">
-            <div class="note_spacer">
-                <p i18n="cliConfirmSnippetNote"></p>
-            </div>
+    <div class="alert alert-warning">
+        <div data-i18n="cliInfo"></div>
+    </div>
+
+    <div data-bs-theme="dark" class="bg-dark-subtle mb-3 flex-fill border text-light font-monospace p-3 rounded overflow-y-auto h-10r">
+        <div id="cli-window" style="white-space: pre-wrap;"></div>
+    </div>
+
+    <div class="mb-3 mt-auto hstack gap-2">
+        <textarea id="cli-input" name="commands" class="form-control h-2r" style="resize: none" i18n_placeholder="cliInputPlaceholder" rows="1" cols="0"></textarea>
+        <a class="helpiconLink" href="https://github.com/iNavFlight/inav/blob/master/docs/Cli.md" target="_blank">
+            <div class="helpicon cf_tip" style="float:none;" data-i18n_title="cliCommandsHelp"></div>
+        </a>
+    </div>
+
+    <div class="page-footer gap-2 justify-content-between">
+        <div>
+            <button id="cli-msc" class="btn btn-primary mb-1" i18n="cliMscBtn"></button>
+            <button id="cli-savecmd" class="btn btn-primary mb-1" i18n="cliSaveSettingsBtn"></button>
+            <button id="cli-exit" class="btn btn-primary mb-1" i18n="cliExitBtn"></button>
         </div>
-        <textarea id="preview" cols="120" rows="20"></textarea>
-        <div class="default_btn">
-            <a class="confirm" href="#" i18n="cliConfirmSnippetBtn"></a>
+        <div class="text-end">
+            <button id="cli-dif-fall" class="btn btn-primary mb-1" i18n="cliDiffAllBtn"></button>
+            <button id="cli-clear" class="btn btn-primary mb-1" i18n="cliClearOutputHistoryBtn"></button>
+            <button id="cli-copy" class="btn btn-primary mb-1" i18n="cliCopyToClipboardBtn"></button>
+            <button id="cli-load" class="btn btn-primary mb-1" i18n="cliLoadFromFileBtn"></button>
+            <button id="cli-save" class="btn btn-primary mb-1" i18n="cliSaveToFileBtn"></button>
+            <a class="btn btn-primary cliDocsBtn mb-1" i18n="cliDocsBtn" target="_blank"></a>
         </div>
+    </div>
+</div>
+
+<!-- Snippet preview dialog -->
+<div id="snippetpreviewcontent" style="display: none">
+    <div class="alert alert-info">
+        <div i18n="cliConfirmSnippetNote"></div>
+    </div>
+    <textarea
+            id="preview" cols="120" rows="20"
+            class="form-control bg-dark mb-3 text-light font-monospace p-3 rounded overflow-y-scroll"
+            style="resize: none"
+    ></textarea>
+    <div class="d-grid">
+        <button class="btn btn-primary confirm" i18n="cliConfirmSnippetBtn"></button>
     </div>
 </div>

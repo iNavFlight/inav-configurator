@@ -55,7 +55,7 @@ PortHandler.check = function () {
             if (GUI.connected_to) {
                 for (var i = 0; i < removed_ports.length; i++) {
                     if (removed_ports[i] == GUI.connected_to) {
-                        $('div#port-picker a.connect').trigger( "click" );
+                        $('#connect-btn').trigger("click");
                     }
                 }
             }
@@ -133,9 +133,9 @@ PortHandler.check = function () {
 
             // select / highlight new port, if connected -> select connected port
             if (!GUI.connected_to) {
-                $('div#port-picker #port').val(new_ports[0]);
+                $('#port').val(new_ports[0]);
             } else {
-                $('div#port-picker #port').val(GUI.connected_to);
+                $('#port').val(GUI.connected_to);
             }
 
             // trigger callbacks
@@ -180,13 +180,13 @@ PortHandler.check_usb_devices = function (callback) {
         });
 
         if (self.dfu_available) {
-            if (!$("div#port-picker #port [value='DFU']").length) {
-                $('div#port-picker #port').append($('<option/>', {value: "DFU", text: "DFU", data: {isDFU: true}}));
-                $('div#port-picker #port').val('DFU');
+            if (!$("#port [value='DFU']").length) {
+                $('#port').append($('<option/>', {value: "DFU", text: "DFU", data: {isDFU: true}}));
+                $('#port').val('DFU');
             }
         } else {
-            if ($("div#port-picker #port [value='DFU']").length) {
-                $("div#port-picker #port [value='DFU']").remove();
+            if ($("#port [value='DFU']").length) {
+                $("#port [value='DFU']").remove();
             }
         }
     
@@ -196,18 +196,20 @@ PortHandler.check_usb_devices = function (callback) {
 }
 
 PortHandler.update_port_select = function (ports) {
-    $('div#port-picker #port').html(''); // drop previous one
+    let $port = $('#port');
 
-    for (var i = 0; i < ports.length; i++) {
-        $('div#port-picker #port').append($("<option/>", {value: ports[i], text: ports[i], data: {isManual: false}}));
+    $port.html(''); // drop previous one
+
+    for (let i = 0; i < ports.length; i++) {
+        $('#port').append($("<option/>", {value: ports[i], text: ports[i], data: {isManual: false}}));
     }
 
-    $('div#port-picker #port').append($("<option/>", {value: 'manual', text: 'Manual Selection', data: {isManual: true}}));
-    $('div#port-picker #port').append($("<option/>", {value: 'ble', text: 'BLE', data: {isBle: true}}));
-    $('div#port-picker #port').append($("<option/>", {value: 'tcp', text: 'TCP', data: {isTcp: true}}));
-    $('div#port-picker #port').append($("<option/>", {value: 'udp', text: 'UDP', data: {isUdp: true}}));
-    $('div#port-picker #port').append($("<option/>", {value: 'sitl', text: 'SITL', data: {isSitl: true}}));
-    $('div#port-picker #port').append($("<option/>", {value: 'sitl-demo', text: 'Demo mode', data: {isSitl: true}}));
+    $port.append($("<option/>", {value: 'manual', text: 'Manual Selection', data: {isManual: true}}));
+    $port.append($("<option/>", {value: 'ble', text: 'BLE', data: {isBle: true}}));
+    $port.append($("<option/>", {value: 'tcp', text: 'TCP', data: {isTcp: true}}));
+    $port.append($("<option/>", {value: 'udp', text: 'UDP', data: {isUdp: true}}));
+    $port.append($("<option/>", {value: 'sitl', text: 'SITL', data: {isSitl: true}}));
+    $port.append($("<option/>", {value: 'sitl-demo', text: 'Demo mode', data: {isSitl: true}}));
 };
 
 PortHandler.port_detected = function(name, code, timeout, ignore_timeout) {

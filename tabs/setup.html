@@ -1,180 +1,155 @@
-<div class="tab-setup">
-    <div class="content_wrapper initialstyle">
-        <!-- should be the first DIV on each tab -->
-        <div class="cf_column full spacerbottom">
-            <div class="tab_title" data-i18n="tabSetup">Setup</div>
-            <div class="cf_column fourth buttonarea">
-                <div class="spacer_right">
-                    <div class="default_btn">
-                        <a class="resetSettings" href="#" data-i18n="initialSetupButtonReset"></a>
+<div class="page">
+
+    <div class="page-header">
+        <span data-i18n="tabSetup"></span>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-lg-9 col-md-6">
+            <div class="border rounded bg-grid position-relative mb-4" style="height: 65vh;">
+                <canvas id="3d-uav"></canvas>
+                <div class="position-absolute top-0 w-100 d-flex justify-content-between align-items-start p-3">
+                    <div class="w-12r">
+                        <div class="d-flex justify-content-between">
+                            <b i18n="initialSetupHeading"></b>
+                            <span class="heading"></span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <b i18n="initialSetupPitch"></b>
+                            <span class="pitch"></span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <b i18n="initialSetupRoll"></b>
+                            <span class="roll"></span>
+                        </div>
                     </div>
+                    <button id="reset-axis" class="btn btn-outline-primary" data-i18n="initialSetupButtonResetZaxis"></button>
                 </div>
             </div>
-            <div class="threefourth_right setupinfo">
-                <div class="cell_setup">
+            <div class="row">
+                <div class="col col-lg-3 d-grid">
+                    <button id="resetSettings" class="btn btn-outline-danger" data-i18n="initialSetupButtonReset"></button>
+                </div>
+                <div class="col col-lg-9 d-flex align-items-center">
                     <span data-i18n="initialSetupResetText"></span>
                 </div>
             </div>
         </div>
-        <div class="modelwrapper"></div>
-        <div class="cf_column threefourth_left">
-            <div class="spacer_right">
-                <div class="model-and-info">
-                    <div id="interactive_block">
-                        <div id="canvas_wrapper">
-                            <canvas id="canvas"></canvas>
-                            <div class="attitude_info">
-                                <dl>
-                                    <dt>Heading:</dt>
-                                    <dd class="heading">&nbsp;</dd>
-                                    <dt>Pitch:</dt>
-                                    <dd class="pitch">&nbsp;</dd>
-                                    <dt>Roll:</dt>
-                                    <dd class="roll">&nbsp;</dd>
-                                </dl>
-                            </div>
-                        </div>
-                        <a class="reset" href="#" data-i18n="initialSetupButtonResetZaxis"></a>
-                    </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="card mb-3">
+                <div class="card-header" data-i18n="armingFailureReasonTitle"></div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span data-i18n="BLOCKED_UAV_NOT_LEVEL"></span>
+                            <span id="reason-BLOCKED_UAV_NOT_LEVEL"></span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span data-i18n="BLOCKED_SENSORS_CALIBRATING"></span>
+                            <span id="reason-BLOCKED_SENSORS_CALIBRATING"></span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span data-i18n="BLOCKED_SYSTEM_OVERLOADED"></span>
+                            <span id="reason-BLOCKED_SYSTEM_OVERLOADED"></span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span data-i18n="BLOCKED_NAVIGATION_SAFETY"></span>
+                            <span id="reason-BLOCKED_NAVIGATION_SAFETY"></span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span data-i18n="BLOCKED_COMPASS_NOT_CALIBRATED"></span>
+                            <span id="reason-BLOCKED_COMPASS_NOT_CALIBRATED"></span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span data-i18n="BLOCKED_ACCELEROMETER_NOT_CALIBRATED"></span>
+                            <span id="reason-BLOCKED_ACCELEROMETER_NOT_CALIBRATED"></span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span data-i18n="BLOCKED_INVALID_SETTING"></span>
+                            <span id="reason-BLOCKED_INVALID_SETTING"></span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span data-i18n="BLOCKED_HARDWARE_FAILURE"></span>
+                            <span id="reason-BLOCKED_HARDWARE_FAILURE"></span>
+                        </li>
+                    </ul>
                 </div>
             </div>
-        </div>
-        <div class="cf_column fourth">
-            <div class="spacer_left">
-
-                <div class="gui_box grey">
-                    <div class="gui_box_titlebar">
-                        <div class="spacer_box_title" data-i18n="armingFailureReasonTitle"></div>
-                    </div>
-                    <div class="spacer_box">
-                        <table width="100%" border="0" cellpadding="0" cellspacing="0" class="cf_table">
-                            <tbody>
-                                <tr>
-                                    <td data-i18n="BLOCKED_UAV_NOT_LEVEL"></td><td id="reason-BLOCKED_UAV_NOT_LEVEL"></td>
-                                </tr>
-                                <tr>
-                                    <td data-i18n="BLOCKED_SENSORS_CALIBRATING"></td><td id="reason-BLOCKED_SENSORS_CALIBRATING"></td>
-                                </tr>
-                                <tr>
-                                    <td data-i18n="BLOCKED_SYSTEM_OVERLOADED"></td><td id="reason-BLOCKED_SYSTEM_OVERLOADED"></td>
-                                </tr>
-                                <tr>
-                                    <td data-i18n="BLOCKED_NAVIGATION_SAFETY"></td><td id="reason-BLOCKED_NAVIGATION_SAFETY"></td>
-                                </tr>
-                                <tr>
-                                    <td data-i18n="BLOCKED_COMPASS_NOT_CALIBRATED"></td><td id="reason-BLOCKED_COMPASS_NOT_CALIBRATED"></td>
-                                </tr>
-                                <tr>
-                                    <td data-i18n="BLOCKED_ACCELEROMETER_NOT_CALIBRATED"></td><td id="reason-BLOCKED_ACCELEROMETER_NOT_CALIBRATED"></td>
-                                </tr>
-                                <tr>
-                                    <td data-i18n="BLOCKED_INVALID_SETTING"></td><td id="reason-BLOCKED_INVALID_SETTING"></td>
-                                </tr>
-                                <tr class="noboarder">
-                                    <td data-i18n="BLOCKED_HARDWARE_FAILURE"></td><td id="reason-BLOCKED_HARDWARE_FAILURE"></td>
-                                </tr>
-                            </tbody>
-                        </table>
-
-                        <ul id="armingFailuresList">
-
-                        </ul>
-                    </div>
-                </div>
-
-                <div class="gui_box grey">
-                    <div class="gui_box_titlebar">
-                        <div class="spacer_box_title" data-i18n="initialSetupInfoHead"></div>
-                    </div>
-                    <div class="spacer_box">
-                        <table width="100%" border="0" cellpadding="0" cellspacing="0" class="cf_table">
-                            <tbody>
-                                <tr>
-                                    <td data-i18n="initialSetupBatteryDetectedCells"></td>
-                                    <td class="bat-cells">0</td>
-                                </tr>
-                                <tr>
-                                    <td data-i18n="initialSetupBatteryVoltage"></td>
-                                    <td class="bat-voltage">0 V</td>
-                                </tr>
-                                <tr>
-                                    <td data-i18n="initialSetupBatteryPercentage"></td>
-                                    <td class="bat-percent">0 %</td>
-                                </tr>
-                                <tr>
-                                    <td data-i18n="initialSetupBatteryRemainingCapacity"></td>
-                                    <td class="bat-remain-cap">NA</td>
-                                </tr>
-                                <tr>
-                                    <td data-i18n="initialSetupBatteryFull"></td>
-                                    <td class="bat-full">0</td>
-                                </tr>
-                                <tr>
-                                    <td data-i18n="initialSetupBatteryThresholds"></td>
-                                    <td class="bat-thresh">0</td>
-                                </tr>
-                                <tr>
-                                    <td data-i18n="initialSetupCurrentDraw"></td>
-                                    <td class="bat-current-draw">0.00 A</td>
-                                </tr>
-                                <tr>
-                                    <td data-i18n="initialSetupPowerDraw"></td>
-                                    <td class="bat-power-draw">0.00 W</td>
-                                </tr>
-                                <tr>
-                                    <td data-i18n="initialSetupDrawn"></td>
-                                    <td class="bat-mah-drawn">0 mAh</td>
-                                </tr>
-                                <tr>
-                                    <td data-i18n="initialSetup_Wh_drawn"></td>
-                                    <td class="bat-mwh-drawn">0 Wh</td>
-                                </tr>
-                                <tr class="noboarder">
-                                    <td data-i18n="initialSetupRSSI"></td>
-                                    <td class="rssi">0 %</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+            <div class="card mb-3">
+                <div class="card-header" data-i18n="initialSetupInfoHead"></div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span data-i18n="initialSetupBatteryDetectedCells"></span>
+                            <span class="bat-cells"></span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span data-i18n="initialSetupBatteryVoltage"></span>
+                            <span class="bat-voltage"></span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span data-i18n="initialSetupBatteryPercentage"></span>
+                            <span class="bat-percent"></span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span data-i18n="initialSetupBatteryRemainingCapacity"></span>
+                            <span class="bat-remain-cap"></span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span data-i18n="initialSetupBatteryFull"></span>
+                            <span class="bat-full"></span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span data-i18n="initialSetupBatteryThresholds"></span>
+                            <span class="bat-thresh"></span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span data-i18n="initialSetupCurrentDraw"></span>
+                            <span class="bat-current-draw"></span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span data-i18n="initialSetupPowerDraw"></span>
+                            <span class="bat-power-draw"></span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span data-i18n="initialSetupDrawn"></span>
+                            <span class="bat-mah-drawn"></span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span data-i18n="initialSetup_Wh_drawn"></span>
+                            <span class="bat-mwh-drawn"></span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span data-i18n="initialSetupRSSI"></span>
+                            <span class="rssi"></span>
+                        </li>
+                    </ul>
                 </div>
             </div>
-            <div class="spacer_left">
-                <div class="gui_box grey">
-                    <div class="gui_box_titlebar">
-                        <div class="spacer_box_title" data-i18n="initialSetupGPSHead"></div>
-                    </div>
-                    <div class="spacer_box">
-                        <table width="100%" border="0" cellpadding="0" cellspacing="0" class="cf_table">
-                            <tbody>
-                                <tr>
-                                    <td data-i18n="gpsFix"></td>
-                                    <td class="gpsFixType"></td>
-                                </tr>
-                                <tr>
-                                    <td data-i18n="gpsSats"></td>
-                                    <td class="gpsSats"></td>
-                                </tr>
-                                <tr>
-                                    <td data-i18n="gpsLat"></td>
-                                    <td class="gpsLat"></td>
-                                </tr>
-                                <tr class="noboarder">
-                                    <td data-i18n="gpsLon"></td>
-                                    <td class="gpsLon"></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-            <div class="spacer_left" style="display:none;">
-                <div class="gui_box grey instrumentsbox" align="center">
-                    <div class="gui_box_titlebar" align="left">
-                        <div class="spacer_box_title" data-i18n="initialSetupInstrumentsHead"></div>
-                    </div>
-                    <span id="attitude"></span> <span id="heading"></span>
+            <div class="card mb-3">
+                <div class="card-header" data-i18n="initialSetupGPSHead"></div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span data-i18n="gpsFix"></span>
+                            <span class="gpsFixType"></span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span data-i18n="gpsSats"></span>
+                            <span class="gpsSats"></span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span data-i18n="gpsLat"></span>
+                            <span class="gpsLat"></span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span data-i18n="gpsLon"></span>
+                            <span class="gpsLon"></span>
+                        </li>
+                    </ul>
                 </div>
             </div>
         </div>
     </div>
+
 </div>

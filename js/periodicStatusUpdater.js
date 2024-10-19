@@ -65,11 +65,6 @@ const mspQueue = require('./serial_queue');
             var max = FC.MISC.vbatmaxcellvoltage * nbCells;
             var warn = FC.MISC.vbatwarningcellvoltage * nbCells;
 
-            $(".battery-status").css({
-                width: FC.ANALOG.battery_percentage + "%",
-                display: 'inline-block'
-            });
-        
             if (active) {
                 $(".linkicon").css({
                     'background-image': 'url("./images/icons/cf_icon_link_active.svg")'
@@ -80,13 +75,18 @@ const mspQueue = require('./serial_queue');
                 });
             }
 
+
+            $("#battery-indicator").css({
+                width: FC.ANALOG.battery_percentage + "%",
+            });
+
             if (((FC.ANALOG.use_capacity_thresholds && FC.ANALOG.battery_remaining_capacity <= FC.MISC.battery_capacity_warning - FC.MISC.battery_capacity_critical) || (!FC.ANALOG.use_capacity_thresholds && FC.ANALOG.voltage < warn)) || FC.ANALOG.voltage < min) {
-                $(".battery-status").css('background-color', '#D42133');
+                $("#battery-indicator").addClass("bg-danger").removeClass("bg-success");
             } else {
-                $(".battery-status").css('background-color', '#59AA29');
+                $("#battery-indicator").addClass("bg-success").removeClass("bg-danger");
             }
 
-            $(".battery-legend").text(FC.ANALOG.voltage + " V");
+            $("#battery-voltage").text(FC.ANALOG.voltage + "V");
         }
 
         $('#quad-status_wrapper').show();
@@ -97,10 +97,6 @@ const mspQueue = require('./serial_queue');
         if (!CONFIGURATOR.connectionValid) {
             return;
         }
-
-        $(".quad-status-contents").css({
-            display: 'inline-block'
-        });
 
         if (!stoppped && GUI.active_tab != 'cli') {
 

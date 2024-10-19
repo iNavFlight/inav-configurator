@@ -70,7 +70,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
     function reinitialize() {
         //noinspection JSUnresolvedVariable
         GUI.log(i18n.getMessage('deviceRebooting'));
-        GUI.handleReconnect($('.tab_configuration a'));
+        GUI.handleReconnect($('[data-tab="configuration"] > a'));
     }
 
     function load_html() {
@@ -102,15 +102,22 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
                 feature_tip_html = '<div class="helpicon cf_tip" title="' + tips.join("<br><br>") + '"></div>';
             }
 
-            row_e = $('<div class="checkbox">' +
-                '<input type="checkbox" data-bit="' + fcFeatures[i].bit + '" class="feature toggle" name="' + fcFeatures[i].name + '" title="' + fcFeatures[i].name + '"' +
-                ' id="feature-' + fcFeatures[i].bit + '" ' +
-                '>' +
-                '<label for="feature-' + fcFeatures[i].bit + '">' +
-                '<span data-i18n="feature' + fcFeatures[i].name + '"></span>' +
-                '</label>' +
-                feature_tip_html +
-                '</div>');
+            let checkboxHtml = `
+                <li class="list-group-item hstack gap-2">
+                    <div class="form-check form-switch">
+                        <input 
+                            id="feature-${fcFeatures[i].bit}" 
+                            name="${fcFeatures[i].name}"
+                            title="${fcFeatures[i].name}"
+                            data-bit="${fcFeatures[i].bit}"
+                            class="form-check-input feature" type="checkbox" role="switch" >
+                        <label for="feature-${fcFeatures[i].bit}" class="form-check-label" data-i18n="feature${fcFeatures[i].name}"></label>
+                    </div>
+                    ${feature_tip_html}
+                </li>
+            `;
+
+            row_e = $(checkboxHtml);
 
             features_e.each(function () {
                 if ($(this).hasClass(fcFeatures[i].group)) {
@@ -119,10 +126,10 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             });
         }
 
-        features.updateUI($('.tab-configuration'), FC.FEATURES);
+        features.updateUI($('#tab-configuration'), FC.FEATURES);
 
         // translate to user-selected language
-       i18n.localize();;
+       i18n.localize();
 
         // VTX
         var config_vtx = $('.config-vtx');
@@ -234,40 +241,24 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         $('#battery_capacity_critical').val(isNaN(batCapWarnCrit) ? "" : batCapWarnCrit);
         $('#battery_capacity_unit').val(FC.MISC.battery_capacity_unit);
 
-        let $i2cSpeed = $('#i2c_speed'),
-            $i2cSpeedInfo = $('#i2c_speed-info');
+        let $i2cSpeed = $('#i2c_speed');
 
         $i2cSpeed.on('change', function () {
-            let $this = $(this),
-                value = $this.children("option:selected").text();
+            let value = $(this).find(":selected").text();
 
-            if (value == "400KHZ") {
-
-                $i2cSpeedInfo.removeClass('ok-box');
-                $i2cSpeedInfo.addClass('info-box');
-                $i2cSpeedInfo.removeClass('warning-box');
-
-                $i2cSpeedInfo.html(i18n.getMessage('i2cSpeedSuggested800khz'));
-                $i2cSpeedInfo.show();
-
-            } else if (value == "800KHZ") {
-                $i2cSpeedInfo.removeClass('ok-box');
-                $i2cSpeedInfo.removeClass('info-box');
-                $i2cSpeedInfo.removeClass('warning-box');
-                $i2cSpeedInfo.hide();
+            $('#i2c-speed-info, #i2c-speed-too-slow').addClass('d-none')
+            if (value === "400KHZ") {
+                $('#i2c-speed-info').removeClass('d-none')
+            } else if (value === "800KHZ") {
+                $('#i2c-speed-info').addClass('d-none')
             } else {
-                $i2cSpeedInfo.removeClass('ok-box');
-                $i2cSpeedInfo.removeClass('info-box');
-                $i2cSpeedInfo.addClass('warning-box');
-                $i2cSpeedInfo.html(i18n.getMessage('i2cSpeedTooLow'));
-                $i2cSpeedInfo.show();
+                $('#i2c-speed-too-slow').removeClass('d-none')
             }
-
         });
 
         $i2cSpeed.trigger('change');
 
-        $('a.save').on('click', function () {
+        $('#save-btn').on('click', function () {
             //UPDATE: moved to GPS tab and hidden
             //FC.MISC.mag_declination = parseFloat($('#mag_declination').val());
 
@@ -285,7 +276,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             FC.MISC.battery_capacity_unit = $('#battery_capacity_unit').val();
 
             features.reset();
-            features.fromUI($('.tab-configuration'));
+            features.fromUI($('#tab-configuration'));
             features.execute(function () {
                 FC.CURRENT_METER_CONFIG.scale = parseInt($('#currentscale').val());
                 FC.CURRENT_METER_CONFIG.offset = Math.round(parseFloat($('#currentoffset').val()) * 10);

@@ -25,13 +25,16 @@
 }
 
 .defaults-dialog__content, .defaults-dialog__wizard {
-    background-color: #efefef;
-    border-radius: 2px;
+    border: var(--inav-border-width) var(--inav-border-color) solid;
+    border-radius: var(--inav-border-radius);
+    background-color: var(--inav-body-bg);
+    color: var(--inav-body-color);
+
     z-index: 2002;
     position: absolute;
     width: 500px;
     height: 535px;
-    overflow: none;
+    overflow: hidden;
     top: 0;
     bottom: 0;
     left: 0;
@@ -65,7 +68,7 @@
 
 .defaults-dialog__info {
     font-size: 1.3em;
-    margin-bottom: 1em;
+    /*margin-bottom: 1em;*/
 }
 
 .defaults_btn {

@@ -6,9 +6,9 @@
 }
 
 .tab-led-strip .section {
-    color: #565656;
+    color: var(--inav-body-color);
     margin: 20px 0 5px 0;
-    border-bottom: 1px solid silver;
+    border-bottom: var(--inav-border-width) var(--inav-border-color) solid;
 }
 
 .tab-led-strip .mainGrid {
@@ -16,19 +16,19 @@
     height: calc((24px + 7px) * 16);
     float: left;
     margin-right: 10px;
-    border-radius: 3px;
-    background-color: #dcdcdc;
-    border: silver;
+    border-radius: var(--inav-border-radius);
+    background-color: var(--inav-tertiary-bg);
+    border: var(--inav-border-width) var(--inav-border-color) solid;
 }
 
 .tab-led-strip .mainGrid .gPoint {
     float: left;
-    border: solid 1px #ADADAD;
+    border: var(--inav-border-width) var(--inav-border-color) solid;
     width: 23px;
     height: 23px;
     margin: 3px;
-    border-radius: 7px;
-    background: #ececec;
+    border-radius: var(--inav-border-radius-lg);
+    background: var(--inav-tertiary-bg);
     cursor: pointer;
 }
 
@@ -177,16 +177,18 @@
 
 .tab-led-strip button {
     text-align: center;
-    font-weight: bold;
-    border: 1px solid silver;
-    background-color: #ececec;
-    border-radius: 3px;
+    /*font-weight: bold;*/
+    border: var(--inav-border-width) var(--inav-primary) solid;
+    background-color: transparent;
+    color: var(--inav-primary);
+    border-radius: var(--inav-border-radius);
     padding: 7px 6px;
     margin: 3px 0;
 }
 
 .tab-led-strip button:hover {
-    background-color: #acacac;
+    background-color: var(--inav-primary);
+    color: white;
 }
 
 .tab-led-strip .funcWire.btnOn {
@@ -204,7 +206,9 @@
 
 /* Drop-down boxes */
 
-.tab-led-strip .select {    background: white;}
+.tab-led-strip .select {
+    /*background: white;*/
+}
 .tab-led-strip .select .function-c {
     background: linear-gradient( to bottom right, rgba(255, 0, 0, .5) 0%, rgba(255, 255, 0, 0.5) 15%, rgba(0, 255, 0, .5) 30%, rgba(0, 255, 255, .5) 50%, rgba(0, 0, 255, .5) 65%, rgba(255, 0, 255, .5) 80%, rgba(255, 0, 0, .5) 100%);
 }
@@ -401,7 +405,7 @@
     position: absolute;
     z-index: -1;
     width: 496px;
-    border: 1px solid rgb(236, 236, 236);
+    /*border: 1px solid rgb(236, 236, 236);*/
     margin-top: -1px;
     margin-left: -1px;
     border-radius: 3px;
@@ -411,7 +415,7 @@
     width: 122px;
     height: 122px;
     float: left;
-    border: solid 1px rgb(236, 236, 236);
+    /*border: solid 1px rgb(236, 236, 236);*/
 }
 
 

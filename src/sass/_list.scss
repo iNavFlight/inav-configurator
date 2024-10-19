@@ -1,0 +1,51 @@
+.card {
+  .card-header {
+    font-size: 1.1rem;
+    font-weight: 600;
+
+    .btn {
+      --#{$prefix}btn-active-border-color: var(--#{$prefix}border-color);
+      padding: 0 .25rem;
+
+      &:hover {
+        --#{$prefix}btn-hover-bg: var(--#{$prefix}border-color);
+      }
+
+      &.chevron-up {
+        .bi-chevron-down {
+          display: unset;
+        }
+        .bi-chevron-up {
+          display: none;
+        }
+      }
+      &.chevron-down {
+        .bi-chevron-down {
+          display: none;
+        }
+        .bi-chevron-up {
+          display: unset;
+        }
+      }
+    }
+  }
+  .card-body {
+    .list-group-flush {
+      .list-group-item {
+        background-color: transparent;
+        padding-left: 0;
+        padding-right: 0;
+        &:first-child {
+          padding-top: 0;
+        }
+        &:last-child {
+          padding-bottom: 0;
+        }
+        .helpicon,
+        .helpiconLink {
+          margin-left: auto;
+        }
+      }
+    }
+  }
+}

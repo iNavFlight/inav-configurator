@@ -8,13 +8,13 @@ var OutputMappingCollection = function () {
         timerOverrides = {};
 
     const colorTable = [
-            "#8ecae6",
-            "#2a9d8f",
-            "#e9c46a",
-            "#f4a261",
-            "#e76f51",
-            "#ef476f",
-            "#ffc300"
+            "#8ecae680",
+            "#2a9d8f80",
+            "#e9c46a80",
+            "#f4a26180",
+            "#e76f5180",
+            "#ef476f80",
+            "#ffc30080"
         ];
 
     const TIM_USE_ANY = 0;

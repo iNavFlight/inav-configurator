@@ -1,5 +1,6 @@
 const path = require('path');
 const fs = require('fs');
+const sass = require('sass-embedded');
 
 module.exports = {
   packagerConfig: {
@@ -20,6 +21,12 @@ module.exports = {
     ]
   },
   hooks: {
+    generateAssets: () => {
+      const result = sass.compile('./src/sass/app.scss', {style: "compressed"});
+      fs.mkdirSync('./dist', { recursive: true });
+      fs.writeFileSync('./dist/output.css', result.css);
+      console.log('generateAssets hook');
+    },
     // Uniform artifact file names
     postMake: async (config, makeResults) => {
       makeResults.forEach(result => {

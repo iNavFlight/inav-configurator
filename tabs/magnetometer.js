@@ -366,9 +366,9 @@ TABS.magnetometer.initialize = function (callback) {
         self.pageElements.comment_sensor_mag_preset = $('#comment_sensor_mag_preset');
         self.pageElements.comment_sensor_mag_angles = $('#comment_sensor_mag_angles');
 
-        self.roll_e = $('dd.roll'),
-        self.pitch_e = $('dd.pitch'),
-        self.heading_e = $('dd.heading');
+        self.roll_e = $('.roll'),
+        self.pitch_e = $('.pitch'),
+        self.heading_e = $('.heading');
 
         for (let i = 0; i < alignments.length; i++) {
             self.pageElements.orientation_mag_e.append('<option value="' + (i + 1) + '">' + alignments[i] + '</option>');
@@ -494,7 +494,7 @@ TABS.magnetometer.initialize = function (callback) {
             updateYawAxis(clamp(this, -180, 360));
         });
 
-        $('a.save').on('click', function () {
+        $('#save-btn').on('click', function () {
             saveChainer.execute()
         });
 
@@ -596,8 +596,8 @@ TABS.magnetometer.initialize3D = function () {
         fc,
         useWebGlRenderer = false;
 
-    canvas = $('.model-and-info #canvas');
-    wrapper = $('.model-and-info #canvas_wrapper');
+    canvas = $('#canvas');
+    wrapper = $('#canvas_wrapper');
 
     // webgl capability detector
     // it would seem the webgl "enabling" through advanced settings will be ignored in the future
@@ -611,7 +611,7 @@ TABS.magnetometer.initialize3D = function () {
         renderer = new THREE.CanvasRenderer({canvas: canvas.get(0), alpha: true});
     }
     // initialize render size for current canvas size
-    renderer.setSize(wrapper.width() * 2, wrapper.height() * 2);
+    renderer.setSize(wrapper.width(), wrapper.height());
 
 
     // modelWrapper adds an extra axis of rotation to avoid gimbal lock with the euler angles
@@ -621,7 +621,7 @@ TABS.magnetometer.initialize3D = function () {
     if (useWebGlRenderer) {
         if (FC.MIXER_CONFIG.appliedMixerPreset === -1) {
             model_file = 'custom';
-            GUI_control.prototype.log("<span style='color: red; font-weight: bolder'><strong>" + i18n.getMessage("mixerNotConfigured") + "</strong></span>");
+            GUI_control.prototype.log("<span style='color: var(--inav-danger); font-weight: bolder'><strong>" + i18n.getMessage("mixerNotConfigured") + "</strong></span>");
         }
         else {
             model_file = mixer.getById(FC.MIXER_CONFIG.appliedMixerPreset).model;
@@ -665,7 +665,7 @@ TABS.magnetometer.initialize3D = function () {
 
     // handle canvas resize
     this.resize3D = function () {
-        renderer.setSize(wrapper.width() * 2, wrapper.height() * 2);
+        renderer.setSize(wrapper.width(), wrapper.height());
         camera.aspect = wrapper.width() / wrapper.height();
         camera.updateProjectionMatrix();
 

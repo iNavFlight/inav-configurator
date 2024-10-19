@@ -88,7 +88,7 @@ TABS.gps.initialize = function (callback) {
             MSP.send_message(MSPCodes.MSP_SET_REBOOT, false, false, function () {
                 //noinspection JSUnresolvedVariable
                 GUI.log(i18n.getMessage('deviceRebooting'));
-                GUI.handleReconnect($('.tab_gps a'));
+                GUI.handleReconnect($('[data-tab="gps"] > a'));
             });
         });
     }
@@ -276,26 +276,26 @@ TABS.gps.initialize = function (callback) {
                 gpsFixType = i18n.getMessage('gpsFix2D');
             }
 
-            $('.GPS_info td.fix').html(gpsFixType);
-            $('.GPS_info td.alt').text(FC.GPS_DATA.alt + ' m');
-            $('.GPS_info td.lat').text(lat.toFixed(4) + ' deg');
-            $('.GPS_info td.lon').text(lon.toFixed(4) + ' deg');
-            $('.GPS_info td.speed').text(FC.GPS_DATA.speed + ' cm/s');
-            $('.GPS_info td.sats').text(FC.GPS_DATA.numSat);
-            $('.GPS_info td.distToHome').text(FC.GPS_DATA.distanceToHome + ' m');
+            $('.GPS_info .fix').html(gpsFixType);
+            $('.GPS_info .alt').text(FC.GPS_DATA.alt + ' m');
+            $('.GPS_info .lat').text(lat.toFixed(4) + ' deg');
+            $('.GPS_info .lon').text(lon.toFixed(4) + ' deg');
+            $('.GPS_info .speed').text(FC.GPS_DATA.speed + ' cm/s');
+            $('.GPS_info .sats').text(FC.GPS_DATA.numSat);
+            $('.GPS_info .distToHome').text(FC.GPS_DATA.distanceToHome + ' m');
 
             let gpsRate = 0;
             if (FC.GPS_DATA.messageDt > 0) {
                 gpsRate = 1000 / FC.GPS_DATA.messageDt;
             }
 
-            $('.GPS_stat td.messages').text(FC.GPS_DATA.packetCount);
-            $('.GPS_stat td.rate').text(gpsRate.toFixed(1) + ' Hz');
-            $('.GPS_stat td.errors').text(FC.GPS_DATA.errors);
-            $('.GPS_stat td.timeouts').text(FC.GPS_DATA.timeouts);
-            $('.GPS_stat td.eph').text((FC.GPS_DATA.eph / 100).toFixed(2) + ' m');
-            $('.GPS_stat td.epv').text((FC.GPS_DATA.epv / 100).toFixed(2) + ' m');
-            $('.GPS_stat td.hdop').text((FC.GPS_DATA.hdop / 100).toFixed(2));
+            $('.GPS_stat .messages').text(FC.GPS_DATA.packetCount);
+            $('.GPS_stat .rate').text(gpsRate.toFixed(1) + ' Hz');
+            $('.GPS_stat .errors').text(FC.GPS_DATA.errors);
+            $('.GPS_stat .timeouts').text(FC.GPS_DATA.timeouts);
+            $('.GPS_stat .eph').text((FC.GPS_DATA.eph / 100).toFixed(2) + ' m');
+            $('.GPS_stat .epv').text((FC.GPS_DATA.epv / 100).toFixed(2) + ' m');
+            $('.GPS_stat .hdop').text((FC.GPS_DATA.hdop / 100).toFixed(2));
 
             //Update map
             if (FC.GPS_DATA.fix >= 2) {
@@ -428,7 +428,7 @@ TABS.gps.initialize = function (callback) {
             });
         }
 
-        $('a.save').on('click', function () {
+        $('#save-btn').on('click', function () {
             serialPortHelper.set($port.val(), 'GPS', $baud.val());
             features.reset();
             features.fromUI($('.tab-gps'));
@@ -479,7 +479,7 @@ TABS.gps.initialize = function (callback) {
             }
         }
 
-        $('a.loadAssistnowOnline').on('click', function () {
+        $('#loadAssistnowOnline-btn').on('click', function () {
             if(globalSettings.assistnowApiKey != null && globalSettings.assistnowApiKey != '') {
                 ublox.loadAssistnowOnline(processUbloxData);
            } else {
@@ -487,7 +487,7 @@ TABS.gps.initialize = function (callback) {
             }
         });
 
-        $('a.loadAssistnowOffline').on('click', function () {
+        $('#loadAssistnowOffline-btn').on('click', function () {
             if(globalSettings.assistnowApiKey != null && globalSettings.assistnowApiKey != '') {
                 ublox.loadAssistnowOffline(processUbloxData);
             } else {
