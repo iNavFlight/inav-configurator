@@ -3564,6 +3564,7 @@ function createCustomElements(){
     }
 
     var customElementsContainer = $('#osdCustomElements');
+    var init = true;
 
     for(var i = 0; i < FC.OSD_CUSTOM_ELEMENTS.settings.customElementsCount; i++){
         var label = $('<label>');
@@ -3621,7 +3622,9 @@ function createCustomElements(){
                 var valueBlock = $('.' + $(this).data('valueCellClass'))
                 valueBlock.find('.value').hide();
                 valueBlock.find('.' + dataValue).show();
-                updateOSDCustomElementsDisplay();
+                if(!init){
+                    updateOSDCustomElementsDisplay();
+                }
             });
         }
 
@@ -3651,6 +3654,7 @@ function createCustomElements(){
 
     fillCustomElementsValues();
     customElementsInitCallback();
+    init = false;
 }
 
 function updateOSDCustomElementsDisplay() {
