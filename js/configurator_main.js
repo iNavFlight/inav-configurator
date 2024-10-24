@@ -10,6 +10,7 @@ const darkMode = require('./darkMode');
 const d3 = require('d3');
 const Store = require('electron-store');
 const store = new Store();
+const bootstrap = require('bootstrap');
 
 const { GUI, TABS } = require('./gui');
 const CONFIGURATOR = require('./data_storage');
