@@ -1,139 +1,120 @@
 <!--suppress ALL -->
 <div id="content-watermark"></div>
-<div class="tab-pid_tuning toolbar_fixed_bottom">
-    <div id="tuning-wrapper" class="content_wrapper">
-        <div class="tab_title subtab__header">
-            <span class="subtab__header_label subtab__header_label--current" for="subtab-pid" data-i18n="pidTuning_PIDmain"></span>
-            <span class="subtab__header_label" for="subtab-pid-other" data-i18n="pidTuning_PIDother"></span>
-            <span class="subtab__header_label" for="subtab-rates" data-i18n="pidTuning_RatesAndExpo"></span>
-            <span class="subtab__header_label" for="subtab-filters" data-i18n="pidTuning_Filters"></span>
-            <span class="subtab__header_label" for="subtab-mechanics" data-i18n="pidTuning_Mechanics"></span>
+
+<div class="page">
+
+    <nav>
+        <div class="nav nav-tabs" id="nav-tab" role="tablist">
+            <button class="nav-link active fs-5 px-3" id="pid-main-tab" data-bs-toggle="tab" data-bs-target="#pid-main" type="button" role="tab" data-i18n="pidTuning_PIDmain"></button>
+            <button class="nav-link fs-5 px-3" id="pid-other-tab" data-bs-toggle="tab" data-bs-target="#pid-other" type="button" role="tab" data-i18n="pidTuning_PIDother"></button>
+            <button class="nav-link fs-5 px-3" id="rates-expo-tab" data-bs-toggle="tab" data-bs-target="#rates-expo" type="button" role="tab" data-i18n="pidTuning_RatesAndExpo"></button>
+            <button class="nav-link fs-5 px-3" id="filters-tab" data-bs-toggle="tab" data-bs-target="#filters" type="button" role="tab" data-i18n="pidTuning_Filters"></button>
+            <button class="nav-link fs-5 px-3" id="mechanics-tab" data-bs-toggle="tab" data-bs-target="#mechanics" type="button" role="tab" data-i18n="pidTuning_Mechanics"></button>
         </div>
-        <div id="subtab-pid" class="subtab__content subtab__content--current">
-            <div class="cf_column right" style="margin-top: -6px;">
-                <div class="default_btn resetbt">
-                    <a href="#" class="action-resetDefaults" data-i18n="pidTuning_SelectNewDefaults"></a>
-                </div>
-                <div class="default_btn resetbt">
-                    <a href="#" class="action-resetPIDs" data-i18n="pidTuning_ResetPIDController"></a>
+    </nav>
+
+    <div class="tab-content mt-3" id="nav-tabContent">
+        <div class="tab-pane show active" id="pid-main" role="tabpanel" tabindex="0">
+            <div class="alert alert-success">
+                <div data-i18n="ezTuneEnabledTips"></div>
+                <div class="form-check form-switch mt-2">
+                    <input id="ez_tune_enabled" type="checkbox" class="ez-element form-check-input" />
+                    <label for="ez_tune_enabled" class="form-check-label" data-i18n="configurationFeatureEnabled"></label>
                 </div>
             </div>
-            <div class="clear-both"></div>
 
-            <div id="" class="cf_column">
-                <div class="pid-sliders-axis" style="background-color: #2a9d8f;">
-                    <div style="padding: 1em;" data-i18n="ezTuneEnabledTips"></div>
-                    <div class="pid-switch-row">
-                        <span data-i18n="configurationFeatureEnabled" class="bold label"></span>
-                        <div class="checkbox no-border">
-                            <input id="ez_tune_enabled" type="checkbox" class="ez-element toggle" />
+            <div class="for-ez-tune row">
+                <div class="col-lg-8">
+
+                    <div class="card mb-3 pid-sliders-axis" data-axis="roll">
+                        <div class="card-body vstack gap-2 pid-slider-row">
+                            <div class="hstack">
+                                <b data-i18n="ezTuneFilterHz" class="w-8r"></b>
+                                <input id="ez_tune_filter_hz" type="number" class="ez-element form-control w-10r" />
+                            </div>
+                            <div data-i18n="ezTuneFilterHzTips"></div>
                         </div>
                     </div>
-                    <div class="clear-both"></div>
+
+                    <div class="card mb-3 pid-sliders-axis" data-axis="pitch">
+                        <div class="card-body">
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item vstack gap-2 pid-slider-row">
+                                    <div class="hstack">
+                                        <b data-i18n="ezTuneAxisRatio" class="w-8r"></b>
+                                        <input id="ez_tune_axis_ratio" type="number" class="ez-element form-control w-10r" />
+                                    </div>
+                                    <div data-i18n="ezTuneAxisRatioTips"></div>
+                                </li>
+                                <li class="list-group-item vstack gap-2 pid-slider-row">
+                                    <div class="hstack">
+                                        <b data-i18n="ezTuneResponse" class="w-8r"></b>
+                                        <input id="ez_tune_response" type="number" class="ez-element form-control w-10r" />
+                                    </div>
+                                    <div data-i18n="ezTuneResponseTips"></div>
+                                </li>
+                                <li class="list-group-item vstack gap-2 pid-slider-row">
+                                    <div class="hstack">
+                                        <b data-i18n="ezTuneDamping" class="w-8r"></b>
+                                        <input id="ez_tune_damping" type="number" class="ez-element form-control w-10r" />
+                                    </div>
+                                    <div data-i18n="ezTuneDampingTips"></div>
+                                </li>
+                                <li class="list-group-item vstack gap-2 pid-slider-row">
+                                    <div class="hstack">
+                                        <b data-i18n="ezTuneStability" class="w-8r"></b>
+                                        <input id="ez_tune_stability" type="number" class="ez-element form-control w-10r" />
+                                    </div>
+                                    <div data-i18n="ezTuneStabilityTips"></div>
+                                </li>
+                                <li class="list-group-item vstack gap-2 pid-slider-row">
+                                    <div class="hstack">
+                                        <b data-i18n="ezTuneAggressiveness" class="w-8r"></b>
+                                        <input id="ez_tune_aggressiveness" type="number" class="ez-element form-control w-10r" />
+                                    </div>
+                                    <div data-i18n="ezTuneAggressivenessTips"></div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="card mb-3 pid-sliders-axis" data-axis="yaw">
+                        <div class="card-body">
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item vstack gap-2 pid-slider-row">
+                                    <div class="hstack">
+                                        <b data-i18n="ezTuneRate" class="w-8r"></b>
+                                        <input id="ez_tune_rate" type="number" class="ez-element form-control w-10r" />
+                                    </div>
+                                    <div data-i18n="ezTuneRateTips"></div>
+                                </li>
+                                <li class="list-group-item vstack gap-2 pid-slider-row">
+                                    <div class="hstack">
+                                        <b data-i18n="ezTuneExpo" class="w-8r"></b>
+                                        <input id="ez_tune_expo" type="number" class="ez-element form-control w-10r" />
+                                    </div>
+                                    <div data-i18n="ezTuneExpoTips"></div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="card mb-3 pid-sliders-axis" data-axis="3">
+                        <div class="card-body vstack gap-2 pid-slider-row">
+                            <div class="hstack">
+                                <b data-i18n="ezTuneSnappiness" class="w-8r"></b>
+                                <input id="ez_tune_snappiness" type="number" class="ez-element form-control w-10r" />
+                            </div>
+                            <div data-i18n="ezTuneSnappinessTips"></div>
+                        </div>
+                    </div>
+
                 </div>
-
-            </div>
-
-            <div class="for-ez-tune">
-                <div style="display: flex;">
-
-                    <div>
-                        <div class="pid-sliders-axis" data-axis="roll">
-                            <div style="padding: 1em;" data-i18n="ezTuneFilterHzTips"></div>
-                            <div class="pid-slider-row">
-                                <span data-i18n="ezTuneFilterHz" class="bold"></span>
-                                <div class="number no-border">
-                                    <input id="ez_tune_filter_hz" type="number" class="ez-element" />
-                                </div>
-                            </div>
-                            <div class="clear-both"></div>
-                        </div>
-        
-                        <div class="pid-sliders-axis" data-axis="pitch">
-                            <div style="padding: 1em;" data-i18n="ezTuneAxisRatioTips"></div>
-                            <div class="pid-slider-row">
-        
-                                <span data-i18n="ezTuneAxisRatio" class="bold"></span>
-                                <div class="number no-border">
-                                    <input id="ez_tune_axis_ratio" type="number" class="ez-element" />
-                                </div>
-                                <div class="clear-both"></div>
-                            </div>
-        
-                            <div style="padding: 1em;" data-i18n="ezTuneResponseTips"></div>
-                            <div class="pid-slider-row">
-                                <span data-i18n="ezTuneResponse" class="bold"></span>
-                                <div class="number no-border">
-                                    <input id="ez_tune_response" type="number" class="ez-element" />
-                                </div>
-                                <div class="clear-both"></div>
-                            </div>
-        
-                            <div style="padding: 1em;" data-i18n="ezTuneDampingTips"></div>
-                            <div class="pid-slider-row">
-                                <span data-i18n="ezTuneDamping" class="bold"></span>
-                                <div class="number no-border">
-                                    <input id="ez_tune_damping" type="number" class="ez-element" />
-                                </div>
-                                <div class="clear-both"></div>
-                            </div>
-        
-                            <div style="padding: 1em;" data-i18n="ezTuneStabilityTips"></div>
-                            <div class="pid-slider-row">
-                                <span data-i18n="ezTuneStability" class="bold"></span>
-                                <div class="number no-border">
-                                    <input id="ez_tune_stability" type="number" class="ez-element" />
-                                </div>
-                                <div class="clear-both"></div>
-                            </div>
-        
-                            <div style="padding: 1em;" data-i18n="ezTuneAggressivenessTips"></div>
-                            <div class="pid-slider-row">
-                                <span data-i18n="ezTuneAggressiveness" class="bold"></span>
-                                <div class="number no-border">
-                                    <input id="ez_tune_aggressiveness" type="number" class="ez-element" />
-                                </div>
-                                <div class="clear-both"></div>
-                            </div>
-        
-                        </div>
-        
-                        <div class="pid-sliders-axis" data-axis="yaw">
-                            <div style="padding: 1em;" data-i18n="ezTuneRateTips"></div>
-                            <div class="pid-slider-row">
-                                <span data-i18n="ezTuneRate" class="bold"></span>
-                                <div class="number no-border">
-                                    <input id="ez_tune_rate" type="number" class="ez-element" />
-                                </div>
-                                <div class="clear-both"></div>
-                            </div>
-        
-                            <div style="padding: 1em;" data-i18n="ezTuneExpoTips"></div>
-                            <div class="pid-slider-row">
-                                <span data-i18n="ezTuneExpo" class="bold"></span>
-                                <div class="number no-border">
-                                    <input id="ez_tune_expo" type="number" class="ez-element" />
-                                </div>
-                                <div class="clear-both"></div>
-                            </div>
-                        </div>
-        
-                        <div class="pid-sliders-axis" data-axis="3">
-                            <div style="padding: 1em;" data-i18n="ezTuneSnappinessTips"></div>
-                            <div class="pid-slider-row">
-                                <span data-i18n="ezTuneSnappiness" class="bold"></span>
-                                <div class="number no-border">
-                                    <input id="ez_tune_snappiness" type="number" class="ez-element" />
-                                </div>
-                                <div class="clear-both"></div>
-                            </div>
-                        </div>
-                    </div>
-        
-                    <div class="ez-tune-preview">
-                        <h2 data-i18n="ezTunePidPreview"></h2>
-                        <table>
-                            <tr>
+                <div class="ez-tune-preview col-lg-4">
+                    <div class="card mb-3">
+                        <div class="card-header" data-i18n="ezTunePidPreview"></div>
+                        <table class="table table-sm">
+                            <tr class="table-active">
                                 <th>&nbsp;</th>
                                 <th>P</th>
                                 <th>I</th>
@@ -141,788 +122,754 @@
                                 <th>FF</th>
                             </tr>
                             <tr>
-                                <th data-i18n="axisRoll"></th>
+                                <th data-i18n="axisRoll" class="ps-3"></th>
                                 <td id="preview-roll-p"></td>
                                 <td id="preview-roll-i"></td>
                                 <td id="preview-roll-d"></td>
                                 <td id="preview-roll-ff"></td>
                             </tr>
                             <tr>
-                                <th data-i18n="axisPitch"></th>
+                                <th data-i18n="axisPitch" class="ps-3"></th>
                                 <td id="preview-pitch-p"></td>
                                 <td id="preview-pitch-i"></td>
                                 <td id="preview-pitch-d"></td>
                                 <td id="preview-pitch-ff"></td>
                             </tr>
                             <tr>
-                                <th data-i18n="axisYaw"></th>
+                                <th data-i18n="axisYaw" class="ps-3"></th>
                                 <td id="preview-yaw-p"></td>
                                 <td id="preview-yaw-i"></td>
                                 <td id="preview-yaw-d"></td>
                                 <td id="preview-yaw-ff"></td>
                             </tr>
                         </table>
-                        <h2 data-i18n="ezTuneRatePreview"></h2>
-                        <table>
-                            <tr>
-                                <th data-i18n="ezTuneRatePreviewAxis"></th>
+                    </div>
+
+                    <div class="card mb-3">
+                        <div class="card-header" data-i18n="ezTuneRatePreview"></div>
+                        <table class="table table-sm">
+                            <tr class="table-active">
+                                <th data-i18n="ezTuneRatePreviewAxis" class="ps-3"></th>
                                 <th data-i18n="ezTuneRatePreviewRate"></th>
                                 <th data-i18n="ezTuneRatePreviewExpo"></th>
                             </tr>
                             <tr>
-                                <th data-i18n="axisRoll"></th>
+                                <th data-i18n="axisRoll" class="ps-3"></th>
                                 <td id="preview-roll-rate"></td>
                                 <td id="preview-roll-expo"></td>
                             </tr>
                             <tr>
-                                <th data-i18n="axisPitch"></th>
+                                <th data-i18n="axisPitch" class="ps-3"></th>
                                 <td id="preview-pitch-rate"></td>
                                 <td id="preview-pitch-expo"></td>
                             </tr>
                             <tr>
-                                <th data-i18n="axisYaw"></th>
+                                <th data-i18n="axisYaw" class="ps-3"></th>
                                 <td id="preview-yaw-rate"></td>
                                 <td id="preview-yaw-expo"></td>
                             </tr>
                         </table>
-                        <div style="margin-top: 1em;">
-                            <div id="ez_tune_expo_curve" class="expo-chart" style="width: 250px; height: 200px; margin: auto;">
-                                <canvas width="250" height="200"></canvas>
+                    </div>
+
+                    <div class="card bg-body">
+                        <div id="ez_tune_expo_curve" class="card-body bg-grid d-flex justify-content-center">
+                            <canvas width="250" height="200"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row not-for-ez-tune" id="pid-sliders">
+                <div class="col-12 col-xl-4 mb-3" >
+                    <div class="card pid-sliders-axis" data-axis="roll">
+                        <div class="card-header" data-i18n="axisRoll"></div>
+                        <div class="card-body vstack gap-2">
+                            <div class="pid-slider-row d-flex">
+                                <span class="w-9r" data-i18n="pidTuning_Proportional"></span>
+                                <input type="number" name="value-input" value="42" min="0" max="255" step="1" class="profile-input-control form-control w-4r me-3">
+                                <input class="flex-grow-1" type="range" name="value-slider" value="42" min="0" max="1000" step="1" data-normal-max="110">
+                            </div>
+                            <div class="pid-slider-row d-flex">
+                                <span class="w-9r" data-i18n="pidTuning_Integral"></span>
+                                <input type="number" name="value-input" value="42" min="0" max="255" step="1" class="profile-input-control form-control w-4r me-3">
+                                <input class="flex-grow-1" type="range" name="value-slider" value="42" min="0" max="1000" step="1" data-normal-max="110">
+                            </div>
+                            <div class="pid-slider-row d-flex">
+                                <span class="w-9r" data-i18n="pidTuning_Derivative"></span>
+                                <input type="number" name="value-input" value="42" min="0" max="255" step="1" class="profile-input-control form-control w-4r me-3">
+                                <input class="flex-grow-1" type="range" name="value-slider" value="42" min="0" max="1000" step="1"  data-normal-max="60">
+                            </div>
+                            <div class="pid-slider-row d-flex">
+                                <span class="w-9r" data-i18n="pidTuning_FeedForward"></span>
+                                <input type="number" name="value-input" value="42" min="0" max="255" step="1" class="profile-input-control form-control w-4r me-3">
+                                <input class="flex-grow-1" type="range" name="value-slider" value="42" min="0" max="1000" step="1"  data-normal-max="150">
                             </div>
                         </div>
                     </div>
-        
+                </div>
+                <div class="col-12 col-xl-4 mb-3">
+                    <div class="card pid-sliders-axis" data-axis="pitch">
+                        <div class="card-header" data-i18n="axisPitch"></div>
+                        <div class="card-body vstack gap-2">
+                            <div class="pid-slider-row d-flex">
+                                <span class="w-9r" data-i18n="pidTuning_Proportional"></span>
+                                <input type="number" name="value-input" value="42" min="0" max="255" step="1" class="profile-input-control form-control w-4r me-3">
+                                <input class="flex-grow-1" type="range" name="value-slider" value="42" min="0" max="1000" step="1" data-normal-max="110">
+                            </div>
+                            <div class="pid-slider-row d-flex">
+                                <span class="w-9r" data-i18n="pidTuning_Integral"></span>
+                                <input type="number" name="value-input" value="42" min="0" max="255" step="1" class="profile-input-control form-control w-4r me-3">
+                                <input class="flex-grow-1" type="range" name="value-slider" value="42" min="0" max="1000" step="1" data-normal-max="110">
+                            </div>
+                            <div class="pid-slider-row d-flex">
+                                <span class="w-9r" data-i18n="pidTuning_Derivative"></span>
+                                <input type="number" name="value-input" value="42" min="0" max="255" step="1" class="profile-input-control form-control w-4r me-3">
+                                <input class="flex-grow-1" type="range" name="value-slider" value="42" min="0" max="1000" step="1" data-normal-max="60">
+                            </div>
+                            <div class="pid-slider-row d-flex">
+                                <span class="w-9r" data-i18n="pidTuning_FeedForward"></span>
+                                <input type="number" name="value-input" value="42" min="0" max="255" step="1" class="profile-input-control form-control w-4r me-3">
+                                <input class="flex-grow-1" type="range" name="value-slider" value="42" min="0" max="1000" step="1" data-normal-max="150">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-xl-4 mb-3">
+                    <div class="card pid-sliders-axis" data-axis="yaw">
+                        <div class="card-header" data-i18n="axisYaw"></div>
+                        <div class="card-body vstack gap-2">
+                            <div class="pid-slider-row d-flex">
+                                <span class="w-9r" data-i18n="pidTuning_Proportional"></span>
+                                <input type="number" name="value-input" value="42" min="0" max="255" step="1" class="profile-input-control form-control w-4r me-3">
+                                <input class="flex-grow-1" type="range" name="value-slider" value="42" min="0" max="1000" step="1" data-normal-max="110">
+                            </div>
+
+                            <div class="pid-slider-row d-flex">
+                                <span class="w-9r" data-i18n="pidTuning_Integral"></span>
+                                <input type="number" name="value-input" value="42" min="0" max="255" step="1" class="profile-input-control form-control w-4r me-3">
+                                <input class="flex-grow-1" type="range" name="value-slider" value="42" min="0" max="1000" step="1" data-normal-max="110">
+                            </div>
+
+                            <div class="pid-slider-row d-flex">
+                                <span class="w-9r" data-i18n="pidTuning_Derivative"></span>
+                                <input type="number" name="value-input" value="42" min="0" max="255" step="1" class="profile-input-control form-control w-4r me-3">
+                                <input class="flex-grow-1" type="range" name="value-slider" value="42" min="0" max="1000" step="1" data-normal-max="60">
+                            </div>
+
+                            <div class="pid-slider-row d-flex">
+                                <span class="w-9r" data-i18n="pidTuning_FeedForward"></span>
+                                <input type="number" name="value-input" value="42" min="0" max="255" step="1" class="profile-input-control form-control w-4r me-3">
+                                <input class="flex-grow-1" type="range" name="value-slider" value="42" min="0" max="1000" step="1" data-normal-max="150">
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <div class="cf_column not-for-ez-tune" id="pid-sliders">
-                <div class="pid-sliders-axis" data-axis="roll">
-                    <h3 data-i18n="axisRoll"></h3>
-                    <div class="pid-slider-row">
-                        <span data-i18n="pidTuning_Proportional"></span>
-                        <input type="number" name="value-input" value="42" min="0" max="255" step="1" class="profile-input-control">
-                        <input type="range" name="value-slider" value="42" min="0" max="1000" step="1" data-normal-max="110">
+        </div>
+        <div class="tab-pane" id="pid-other" role="tabpanel" tabindex="0">
+
+            <div class="row">
+                <div class="col-12 col-lg-6">
+
+                    <div class="card mb-3 is-hidden">
+                        <div class="card-header" i18n="pidTuning_Basic"></div>
+                        <div class="table-responsive">
+                            <table class="table table-sm align-middle">
+                                <thead>
+                                <tr>
+                                    <th class="w-12r ps-3" data-i18n="pidTuning_Name"></th>
+                                    <th data-i18n="pidTuning_Proportional"></th>
+                                    <th data-i18n="pidTuning_Integral"></th>
+                                    <th data-i18n="pidTuning_Derivative"></th>
+                                    <th data-i18n="pidTuning_FeedForward"></th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr class="is-hidden ROLL" data-pid-bank-position="0">
+                                    <!-- 0 -->
+                                    <td class="ps-3"></td>
+                                    <td><input class="profile-input-control form-control w-4r" type="number" name="p" step="1" min="0" max="255" /></td>
+                                    <td><input class="profile-input-control form-control w-4r" type="number" name="i" step="1" min="0" max="255" /></td>
+                                    <td><input type="number" class="profile-input-control form-control w-4r rpy_d" name="d" step="1" min="0" max="255" /></td>
+                                    <td><input type="number" class="profile-input-control form-control w-4r rpy_ff" name="ff" step="1" min="0" max="255" /></td>
+                                </tr>
+                                <tr class="is-hidden PITCH" data-pid-bank-position="1">
+                                    <!-- 1 -->
+                                    <td class="ps-3"></td>
+                                    <td><input class="profile-input-control form-control w-4r" type="number" name="p" step="1" min="0" max="255" /></td>
+                                    <td><input class="profile-input-control form-control w-4r" type="number" name="i" step="1" min="0" max="255" /></td>
+                                    <td><input type="number" class="rpy_d profile-input-control form-control w-4r" name="d" step="1" min="0" max="255" /></td>
+                                    <td><input type="number" class="rpy_ff profile-input-control form-control w-4r" name="ff" step="1" min="0" max="255" /></td>
+                                </tr>
+                                <tr class="is-hidden YAW" data-pid-bank-position="2">
+                                    <!-- 2 -->
+                                    <td class="ps-3"></td>
+                                    <td><input class="profile-input-control form-control w-4r" type="number" name="p" step="1" min="0" max="255" /></td>
+                                    <td><input class="profile-input-control form-control w-4r" type="number" name="i" step="1" min="0" max="255" /></td>
+                                    <td><input type="number" class="profile-input-control form-control w-4r rpy_d" name="d" step="1" min="0" max="255" /></td>
+                                    <td><input type="number" class="profile-input-control form-control w-4r rpy_ff" name="ff" step="1" min="0" max="255" /></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
 
-                    <div class="pid-slider-row">
-                        <span data-i18n="pidTuning_Integral"></span>
-                        <input type="number" name="value-input" value="42" min="0" max="255" step="1" class="profile-input-control">
-                        <input type="range" name="value-slider" value="42" min="0" max="1000" step="1" data-normal-max="110">
+                    <div class="card mb-3">
+                        <div class="card-header" data-i18n="pidTuning_Mag"></div>
+                        <div class="table-responsive">
+                            <table id="pid_mag" class="table table-sm align-middle">
+                                <thead>
+                                <tr>
+                                    <th class="w-12r ps-3" data-i18n="pidTuning_Name"></th>
+                                    <th data-i18n="pidTuning_Proportional"></th>
+                                    <th data-i18n="pidTuning_Integral"></th>
+                                    <th data-i18n="pidTuning_Derivative"></th>
+                                    <th data-i18n="pidTuning_FeedForward"></th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr class="MAG" data-pid-bank-position="8">
+                                    <!-- 8 -->
+                                    <td class="ps-3"></td>
+                                    <td><input class="profile-input-control form-control w-4r" type="number" name="p" step="1" min="0" max="255" /></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                <tr class="HEADING" data-pid-bank-position="10">
+                                    <!-- 8 -->
+                                    <td class="ps-3"></td>
+                                    <td><input class="profile-input-control form-control w-4r" type="number" name="p" step="1" min="0" max="255" /></td>
+                                    <td><input class="profile-input-control form-control w-4r" type="number" name="i" step="1" min="0" max="255" /></td>
+                                    <td><input class="profile-input-control form-control w-4r" type="number" name="d" step="1" min="0" max="255" /></td>
+                                    <td></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
 
-                    <div class="pid-slider-row">
-                        <span data-i18n="pidTuning_Derivative"></span>
-                        <input type="number" name="value-input" value="42" min="0" max="255" step="1" class="profile-input-control">
-                        <input type="range" name="value-slider" value="42" min="0" max="1000" step="1"  data-normal-max="60">
-                    </div>
-
-                    <div class="pid-slider-row">
-                        <span data-i18n="pidTuning_FeedForward"></span>
-                        <input type="number" name="value-input" value="42" min="0" max="255" step="1" class="profile-input-control">
-                        <input type="range" name="value-slider" value="42" min="0" max="1000" step="1"  data-normal-max="150">
+                    <div class="card mb-3">
+                        <div class="card-header" data-i18n="pidTuning_GPS"></div>
+                        <div class="table-responsive">
+                            <table id="pid_gps" class="table table-sm align-middle">
+                                <thead>
+                                <tr>
+                                    <th class="w-12r ps-3" data-i18n="pidTuning_Name"></th>
+                                    <th data-i18n="pidTuning_Proportional"></th>
+                                    <th data-i18n="pidTuning_Integral"></th>
+                                    <th data-i18n="pidTuning_Derivative"></th>
+                                    <th data-i18n="pidTuning_FeedForward"></th>
+                                </tr>
+                                </thead>
+                                <tr class="Pos" data-pid-bank-position="4">
+                                    <!-- 4 -->
+                                    <td class="ps-3"></td>
+                                    <td><input class="profile-input-control form-control w-4r" type="number" name="p" step="1" min="0" max="255" /></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                <tr class="PosR" data-pid-bank-position="5">
+                                    <!-- 5 -->
+                                    <td class="ps-3"></td>
+                                    <td><input class="profile-input-control form-control w-4r" type="number" name="p" step="1" min="0" max="255" /></td>
+                                    <td><input class="profile-input-control form-control w-4r" type="number" name="i" step="1" min="0" max="255" /></td>
+                                    <td><input class="profile-input-control form-control w-4r" type="number" name="d" step="1" min="0" max="255" /></td>
+                                    <td><input class="profile-input-control form-control w-4r" type="number" name="ff" step="1" min="0" max="255" /></td>
+                                </tr>
+                                <tr class="NavR" data-pid-bank-position="6">
+                                    <!-- 6 -->
+                                    <td class="ps-3"></td>
+                                    <td><input class="profile-input-control form-control w-4r" type="number" name="p" step="1" min="0" max="255" /></td>
+                                    <td><input class="profile-input-control form-control w-4r" type="number" name="i" step="1" min="0" max="255" /></td>
+                                    <td><input class="profile-input-control form-control w-4r" type="number" name="d" step="1" min="0" max="255" /></td>
+                                    <td></td>
+                                </tr>
+                            </table>
+                        </div>
                     </div>
 
                 </div>
+                <div class="col-12 col-lg-6">
 
-                <div class="pid-sliders-axis" data-axis="pitch">
-                    <h3 data-i18n="axisPitch"></h3>
-                    <div class="pid-slider-row">
-                        <span data-i18n="pidTuning_Proportional"></span>
-                        <input type="number" name="value-input" value="42" min="0" max="255" step="1" class="profile-input-control">
-                        <input type="range" name="value-slider" value="42" min="0" max="1000" step="1" data-normal-max="110">
+                    <div class="card mb-3">
+                        <div class="card-header hstack justify-content-between">
+                            <span data-i18n="pidTuning_Level"></span>
+                            <span class="helpicon cf_tip" data-i18n_title="pidTuning_LevelHelp"></span>
+                        </div>
+                        <div class="table-responsive">
+                            <table id="pid_accel" class="table table-sm align-middle">
+                                <thead>
+                                <tr>
+                                    <th class="w-12r ps-3" data-i18n="pidTuning_Name"></th>
+                                    <th data-i18n="pidTuning_Proportional"></th>
+                                    <th data-i18n="pidTuning_Integral"></th>
+                                    <th data-i18n="pidTuning_Derivative"></th>
+                                    <th data-i18n="pidTuning_FeedForward"></th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr class="LEVEL" data-pid-bank-position="7">
+                                    <!-- 7 -->
+                                    <td class="ps-3"></td>
+                                    <td><input class="profile-input-control form-control w-4r" type="number" name="p" step="1" min="0" max="255" /></td>
+                                    <td><input class="profile-input-control form-control w-4r" type="number" name="i" step="1" min="0" max="255" /></td>
+                                    <td><input class="profile-input-control form-control w-4r" type="number" name="d" step="1" min="0" max="255" /></td>
+                                    <td></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
 
-                    <div class="pid-slider-row">
-                        <span data-i18n="pidTuning_Integral"></span>
-                        <input type="number" name="value-input" value="42" min="0" max="255" step="1" class="profile-input-control">
-                        <input type="range" name="value-slider" value="42" min="0" max="1000" step="1" data-normal-max="110">
-                    </div>
-
-                    <div class="pid-slider-row">
-                        <span data-i18n="pidTuning_Derivative"></span>
-                        <input type="number" name="value-input" value="42" min="0" max="255" step="1" class="profile-input-control">
-                        <input type="range" name="value-slider" value="42" min="0" max="1000" step="1" data-normal-max="60">
-                    </div>
-
-                    <div class="pid-slider-row">
-                        <span data-i18n="pidTuning_FeedForward"></span>
-                        <input type="number" name="value-input" value="42" min="0" max="255" step="1" class="profile-input-control">
-                        <input type="range" name="value-slider" value="42" min="0" max="1000" step="1" data-normal-max="150">
-                    </div>
-
-                </div>
-
-                <div class="pid-sliders-axis" data-axis="yaw">
-                    <h3 data-i18n="axisYaw"></h3>
-                    <div class="pid-slider-row">
-                        <span data-i18n="pidTuning_Proportional"></span>
-                        <input type="number" name="value-input" value="42" min="0" max="255" step="1" class="profile-input-control">
-                        <input type="range" name="value-slider" value="42" min="0" max="1000" step="1" data-normal-max="110">
-                    </div>
-
-                    <div class="pid-slider-row">
-                        <span data-i18n="pidTuning_Integral"></span>
-                        <input type="number" name="value-input" value="42" min="0" max="255" step="1" class="profile-input-control">
-                        <input type="range" name="value-slider" value="42" min="0" max="1000" step="1" data-normal-max="110">
-                    </div>
-
-                    <div class="pid-slider-row">
-                        <span data-i18n="pidTuning_Derivative"></span>
-                        <input type="number" name="value-input" value="42" min="0" max="255" step="1" class="profile-input-control">
-                        <input type="range" name="value-slider" value="42" min="0" max="1000" step="1" data-normal-max="60">
-                    </div>
-
-                    <div class="pid-slider-row">
-                        <span data-i18n="pidTuning_FeedForward"></span>
-                        <input type="number" name="value-input" value="42" min="0" max="255" step="1" class="profile-input-control">
-                        <input type="range" name="value-slider" value="42" min="0" max="1000" step="1" data-normal-max="150">
+                    <div class="card mb-3">
+                        <div class="card-header" data-i18n="pidTuning_Altitude"></div>
+                        <div class="table-responsive">
+                            <table id="pid_baro" class="table table-sm align-middle">
+                                <thead>
+                                <tr>
+                                    <th class="w-12r ps-3" data-i18n="pidTuning_Name"></th>
+                                    <th data-i18n="pidTuning_Proportional"></th>
+                                    <th data-i18n="pidTuning_Integral"></th>
+                                    <th data-i18n="pidTuning_Derivative"></th>
+                                    <th data-i18n="pidTuning_FeedForward"></th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr class="ALT" data-pid-bank-position="3">
+                                    <!-- 3 -->
+                                    <td class="ps-3"></td>
+                                    <td><input class="profile-input-control form-control w-4r" type="number" name="p" step="1" min="0" max="255" /></td>
+                                    <td><input class="profile-input-control form-control w-4r" type="number" name="i" step="1" min="0" max="255" /></td>
+                                    <td><input class="profile-input-control form-control w-4r" type="number" name="d" step="1" min="0" max="255" /></td>
+                                    <td></td>
+                                </tr>
+                                <tr class="Vario" data-pid-bank-position="9">
+                                    <!-- 9 -->
+                                    <td class="ps-3">VEL</td>
+                                    <td><input class="profile-input-control form-control w-4r" type="number" name="p" step="1" min="0" max="255" /></td>
+                                    <td><input class="profile-input-control form-control w-4r" type="number" name="i" step="1" min="0" max="255" /></td>
+                                    <td><input class="profile-input-control form-control w-4r" type="number" name="d" step="1" min="0" max="255" /></td>
+                                    <td></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
 
                 </div>
             </div>
         </div>
+        <div class="tab-pane" id="rates-expo" role="tabpanel" tabindex="0">
 
-        <div id="subtab-pid-other" class="subtab__content">
-            <div class="cf_column right" style="margin-top: -6px;">
-                <div class="default_btn resetbt">
-                    <a href="#" id="resetDefaults" class="action-resetDefaults" data-i18n="pidTuning_SelectNewDefaults"></a>
-                </div>
-                <div class="default_btn resetbt">
-                    <a href="#" class="action-resetPIDs" data-i18n="pidTuning_ResetPIDController"></a>
-                </div>
-            </div>
-            <div class="clear-both"></div>
+            <h4 data-i18n="pidTuning_RatesAndExpo"></h4>
+            <hr class="mt-0 mb-3">
 
-            <div class="cf_column pid-section" id="the-other-pids">
-                <div class="gui_box grey">
-                    <table class="pid_titlebar">
-                        <tr>
-                            <th class="name" data-i18n="pidTuning_Name"></th>
-                            <th class="proportional" data-i18n="pidTuning_Proportional"></th>
-                            <th class="integral" data-i18n="pidTuning_Integral"></th>
-                            <th class="derivative" data-i18n="pidTuning_Derivative"></th>
-                            <th class="feedforward" data-i18n="pidTuning_FeedForward"></th>
-                        </tr>
-                    </table>
-                    <table id="pid_main" class="pid_tuning">
-                        <tr class="is-hidden">
-                            <th colspan="5">
-                                <div class="pid_mode" data-i18n="pidTuning_Basic"></div>
-                            </th>
-                        </tr>
-                        <tr class="is-hidden ROLL" data-pid-bank-position="0">
-                            <!-- 0 -->
-                            <td></td>
-                            <td><input class="profile-input-control" type="number" name="p" step="1" min="0" max="255" /></td>
-                            <td><input class="profile-input-control" type="number" name="i" step="1" min="0" max="255" /></td>
-                            <td><input type="number" class="profile-input-control rpy_d" name="d" step="1" min="0" max="255" /></td>
-                            <td><input type="number" class="profile-input-control rpy_ff" name="ff" step="1" min="0" max="255" /></td>
-                        </tr>
-                        <tr class="is-hidden PITCH" data-pid-bank-position="1">
-                            <!-- 1 -->
-                            <td></td>
-                            <td><input class="profile-input-control" type="number" name="p" step="1" min="0" max="255" /></td>
-                            <td><input class="profile-input-control" type="number" name="i" step="1" min="0" max="255" /></td>
-                            <td><input type="number" class="rpy_d profile-input-control" name="d" step="1" min="0" max="255" /></td>
-                            <td><input type="number" class="rpy_ff profile-input-control" name="ff" step="1" min="0" max="255" /></td>
-                        </tr>
-                        <tr class="is-hidden YAW" data-pid-bank-position="2">
-                            <!-- 2 -->
-                            <td></td>
-                            <td><input class="profile-input-control" type="number" name="p" step="1" min="0" max="255" /></td>
-                            <td><input class="profile-input-control" type="number" name="i" step="1" min="0" max="255" /></td>
-                            <td><input type="number" class="profile-input-control rpy_d" name="d" step="1" min="0" max="255" /></td>
-                            <td><inputtype="number" class="profile-input-control rpy_ff" name="ff" step="1" min="0" max="255" /></td>
-                        </tr>
-                    </table>
-                    <table id="pid_baro" class="pid_tuning">
-                        <tr>
-                            <th colspan="5">
-                                <div class="pid_mode" data-i18n="pidTuning_Altitude"></div>
-                            </th>
-                        </tr>
-                        <tr class="ALT" data-pid-bank-position="3">
-                            <!-- 3 -->
-                            <td></td>
-                            <td><input class="profile-input-control" type="number" name="p" step="1" min="0" max="255" /></td>
-                            <td><input class="profile-input-control" type="number" name="i" step="1" min="0" max="255" /></td>
-                            <td><input class="profile-input-control" type="number" name="d" step="1" min="0" max="255" /></td>
-                            <td></td>
-                        </tr>
-                        <tr class="Vario" data-pid-bank-position="9">
-                            <!-- 9 -->
-                            <td>VEL</td>
-                            <td><input class="profile-input-control" type="number" name="p" step="1" min="0" max="255" /></td>
-                            <td><input class="profile-input-control" type="number" name="i" step="1" min="0" max="255" /></td>
-                            <td><input class="profile-input-control" type="number" name="d" step="1" min="0" max="255" /></td>
-                            <td></td>
-                        </tr>
-                    </table>
-                    <table id="pid_mag" class="pid_tuning">
-                        <tr>
-                            <th colspan="5">
-                                <div class="pid_mode" data-i18n="pidTuning_Mag"></div>
-                            </th>
-                        </tr>
-                        <tr class="MAG" data-pid-bank-position="8">
-                            <!-- 8 -->
-                            <td></td>
-                            <td><input class="profile-input-control" type="number" name="p" step="1" min="0" max="255" /></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                        <tr class="HEADING" data-pid-bank-position="10">
-                            <!-- 8 -->
-                            <td></td>
-                            <td><input class="profile-input-control" type="number" name="p" step="1" min="0" max="255" /></td>
-                            <td><input class="profile-input-control" type="number" name="i" step="1" min="0" max="255" /></td>
-                            <td><input class="profile-input-control" type="number" name="d" step="1" min="0" max="255" /></td>
-                            <td></td>
-                        </tr>
-                    </table>
-                    <table id="pid_gps" class="pid_tuning">
-                        <tr>
-                            <th colspan="5">
-                                <div class="pid_mode" data-i18n="pidTuning_GPS"></div>
-                            </th>
-                        </tr>
-                        <tr class="Pos" data-pid-bank-position="4">
-                            <!-- 4 -->
-                            <td></td>
-                            <td><input class="profile-input-control" type="number" name="p" step="1" min="0" max="255" /></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                        <tr class="PosR" data-pid-bank-position="5">
-                            <!-- 5 -->
-                            <td></td>
-                            <td><input class="profile-input-control" type="number" name="p" step="1" min="0" max="255" /></td>
-                            <td><input class="profile-input-control" type="number" name="i" step="1" min="0" max="255" /></td>
-                            <td><input class="profile-input-control" type="number" name="d" step="1" min="0" max="255" /></td>
-                            <td><input class="profile-input-control" type="number" name="ff" step="1" min="0" max="255" /></td>
-                        </tr>
-                        <tr class="NavR" data-pid-bank-position="6">
-                            <!-- 6 -->
-                            <td></td>
-                            <td><input type="number" name="p" step="1" min="0" max="255" /></td>
-                            <td><input type="number" name="i" step="1" min="0" max="255" /></td>
-                            <td><input type="number" name="d" step="1" min="0" max="255" /></td>
-                            <td></td>
-                        </tr>
-                    </table>
+            <div class="not-for-ez-tune">
+
+                <div class="card mb-3 pid-sliders-axis" data-axis="roll">
+                    <div class="card-header" data-i18n="pidTuning_Rates_Stabilized"></div>
+                    <div class="card-body">
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item hstack pid-slider-row">
+                                <label data-i18n="pidTuning_Rates_Roll" class="w-12r"></label>
+                                <input id="rate_roll_rate" class="profile-input-control form-control w-7r" type="number"/>
+                            </li>
+                            <li class="list-group-item hstack pid-slider-row">
+                                <label data-i18n="pidTuning_Rates_Pitch" class="w-12r"></label>
+                                <input id="rate_pitch_rate" class="profile-input-control form-control w-7r" type="number"/>
+                            </li>
+                            <li class="list-group-item hstack pid-slider-row">
+                                <label data-i18n="pidTuning_Rates_Yaw" class="w-12r"></label>
+                                <input id="rate_yaw_rate" class="profile-input-control form-control w-7r" type="number"/>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
-                <div class="gui_box grey topspacer">
-                    <table id="pid_accel" class="pid_tuning">
-                        <tr>
-                            <th colspan="4">
-                                <div class="pid_mode borderleft">
-                                    <div class="textleft">
-                                        <div class="pidTuningLevel" data-i18n="pidTuning_Level"></div>
-                                        <div class="helpicon cf_tip" data-i18n_title="pidTuning_LevelHelp"></div>
+
+                <div class="card mb-3 pid-sliders-axis" data-axis="pitch">
+                    <div class="card-header" data-i18n="pidTuning_Rates_Stabilized"></div>
+                    <div class="card-body">
+                        <div class="d-flex">
+                            <div class="flex-grow-1">
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item hstack pid-slider-row">
+                                        <label data-i18n="pidTuning_Expo_RollPitch" class="w-12r"></label>
+                                        <input id="rate_rollpitch_expo" class="profile-input-control form-control w-7r" type="number"/>
+                                    </li>
+                                    <li class="list-group-item hstack pid-slider-row">
+                                        <label data-i18n="pidTuning_Expo_Yaw" class="w-12r"></label>
+                                        <input id="rate_yaw_expo" class="profile-input-control form-control w-7r" type="number"/>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="ps-3">
+                                <div class="card bg-body">
+                                    <div class="bg-grid">
+                                        <div class="pitch_roll_curve">
+                                            <canvas width="200" height="117"></canvas>
+                                        </div>
                                     </div>
-                                    <div class="pids" data-i18n="pidTuning_LevelP"></div>
-                                    <div class="pids" data-i18n="pidTuning_LevelI"></div>
-                                    <div class="pids" data-i18n="pidTuning_LevelD"></div>
                                 </div>
-                            </th>
-                        </tr>
-                        <tr class="LEVEL" data-pid-bank-position="7">
-                            <!-- 7 -->
-                            <td></td>
-                            <td><input class="profile-input-control" type="number" name="p" step="1" min="0" max="255" /></td>
-                            <td><input class="profile-input-control" type="number" name="i" step="1" min="0" max="255" /></td>
-                            <td><input class="profile-input-control" type="number" name="d" step="1" min="0" max="255" /></td>
-                        </tr>
-                    </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="card mb-3 pid-sliders-axis not-for-multirotor" data-axis="yaw">
+                <div class="card-header" data-i18n="pidTuning_Manual_Rates"></div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item hstack pid-slider-row">
+                            <label data-i18n="pidTuning_Manual_Roll" class="w-12r"></label>
+                            <input id="rate_manual_roll" class="profile-input-control form-control w-7r" type="number"/>
+                        </li>
+                        <li class="list-group-item hstack pid-slider-row">
+                            <label data-i18n="pidTuning_Manual_Pitch" class="w-12r"></label>
+                            <input id="rate_manual_pitch" class="profile-input-control form-control w-7r" type="number"/>
+                        </li>
+                        <li class="list-group-item hstack pid-slider-row">
+                            <label data-i18n="pidTuning_Manual_Yaw" class="w-12r"></label>
+                            <input id="rate_manual_yaw" class="profile-input-control form-control w-7r" type="number"/>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card mb-3 pid-sliders-axis not-for-multirotor" data-axis="3">
+                <div class="card-header" data-i18n="pidTuning_Expo_Manual"></div>
+                <div class="card-body">
+                    <div class="d-flex">
+                        <div class="flex-grow-1">
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item hstack pid-slider-row">
+                                    <label data-i18n="pidTuning_Expo_RollPitch" class="w-12r"></label>
+                                    <input id="manual_rollpitch_expo" class="profile-input-control form-control w-7r" type="number"/>
+                                </li>
+                                <li class="list-group-item hstack pid-slider-row">
+                                    <label data-i18n="pidTuning_Expo_Yaw" class="w-12r"></label>
+                                    <input id="manual_yaw_expo" class="profile-input-control form-control w-7r" type="number"/>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="ps-3">
+                            <div class="card bg-body">
+                                <div class="bg-grid">
+                                    <div class="manual_expo_curve">
+                                        <canvas width="200" height="117"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-3 pid-sliders-axis only-for-multirotor" data-axis="3">
+                <div class="card-header" data-i18n="pidTuning_Other"></div>
+                <div class="card-body pid-sliders-axis">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item hstack pid-slider-row">
+                            <label data-i18n="pidTuning_HeadingHold_Rate" class="w-12r"></label>
+                            <input id="heading_hold_rate_limit" class="profile-input-control form-control w-7r" data-setting="heading_hold_rate_limit" type="number" data-presentation="range" />
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <h4 class="pt-3" data-i18n="pidTuning_Limits"></h4>
+            <hr class="mt-0 mb-3">
+
+            <div class="card mb-3 pid-sliders-axis" data-axis="roll">
+                <div class="card-header" data-i18n="pidTuning_Max_Inclination_Angle"></div>
+                <div class="card-body pid-sliders-axis">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item hstack pid-slider-row">
+                            <label data-i18n="pidTuning_Max_Roll" class="w-12r"></label>
+                            <input id="max_angle_inclination_rll" class="profile-input-control w-7r form-control" data-setting="max_angle_inclination_rll" type="number" data-presentation="range" />
+                        </li>
+                        <li class="list-group-item hstack pid-slider-row">
+                            <label data-i18n="pidTuning_Max_Pitch" class="w-12r"></label>
+                            <input id="max_angle_inclination_pit" class="profile-input-control w-7r form-control" data-setting="max_angle_inclination_pit" type="number" data-presentation="range" />
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="pt-3 hstack justify-content-between">
+                <h4 data-i18n="pidTuning_RateDynamics"></h4>
+                <a class="btn btn-primary" href="https://github.com/iNavFlight/inav/wiki/Rate-Dynamics" target="_blank" style="margin-top: -10px;">Rate Dynamics Documentation <i class="bi bi-box-arrow-up-right"></i></a>
+            </div>
+            <hr class="mt-0 mb-3">
+
+            <div class="row">
+                <div class="col-xl-4">
+                    <div class="card mb-3 pid-sliders-axis" data-axis="roll">
+                        <div class="card-header" data-i18n="pidTuning_RateDynamics_Sensitivity"></div>
+                        <div class="card-body pid-sliders-axis">
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item hstack pid-slider-row">
+                                    <label data-i18n="pidTuning_RateDynamics_Center" class="w-9r"></label>
+                                    <input id="rate_dynamics_center_sensitivity" type="number" class="form-control w-7r"/>
+                                </li>
+                                <li class="list-group-item hstack pid-slider-row">
+                                    <label data-i18n="pidTuning_RateDynamics_End" class="w-9r"></label>
+                                    <input id="rate_dynamics_end_sensitivity" type="number" class="form-control w-7r"/>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-4">
+                    <div class="card mb-3 pid-sliders-axis" data-axis="pitch">
+                        <div class="card-header" data-i18n="pidTuning_RateDynamics_Correction"></div>
+                        <div class="card-body pid-sliders-axis">
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item hstack pid-slider-row">
+                                    <label data-i18n="pidTuning_RateDynamics_Center" class="w-9r"></label>
+                                    <input id="rate_dynamics_center_correction" type="number" class="form-control w-7r"/>
+                                </li>
+                                <li class="list-group-item hstack pid-slider-row">
+                                    <label data-i18n="pidTuning_RateDynamics_End" class="w-9r"></label>
+                                    <input id="rate_dynamics_end_correction" type="number" class="form-control w-7r"/>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-4">
+                    <div class="card mb-3 pid-sliders-axis" data-axis="yaw">
+                        <div class="card-header" data-i18n="pidTuning_RateDynamics_Weight"></div>
+                        <div class="card-body pid-sliders-axis">
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item hstack pid-slider-row">
+                                    <label data-i18n="pidTuning_RateDynamics_Center" class="w-9r"></label>
+                                    <input id="rate_dynamics_center_weight" type="number" class="form-control w-7r"/>
+                                </li>
+                                <li class="list-group-item hstack pid-slider-row">
+                                    <label data-i18n="pidTuning_RateDynamics_End" class="w-9r"></label>
+                                    <input id="rate_dynamics_end_weight" type="number" class="form-control w-7r"/>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
+        <div class="tab-pane" id="filters" role="tabpanel" tabindex="0">
 
-        <div id="subtab-rates" class="subtab__content">
-
-            <div class="clear-both"></div>
-            <div class="tab_subtitle" style="margin-top: 1em;" data-i18n="pidTuning_RatesAndExpo"></div>
-
-            <div class="pid-sliders-axis not-for-ez-tune" data-axis="roll">
-                <h3 data-i18n="pidTuning_Rates_Stabilized"></h3>
-                <div class="pid-slider-row">
-                    <span data-i18n="pidTuning_Rates_Roll"></span>
-                    <div class="number no-border">
-                        <input id="rate_roll_rate" class="profile-input-control" type="number"/>
-                    </div>
-                    <div class="clear-both"></div>
-                </div>
-                <div class="pid-slider-row">
-                    <span data-i18n="pidTuning_Rates_Pitch"></span>
-                    <div class="number no-border">
-                        <input id="rate_pitch_rate" class="profile-input-control" type="number"/>
-                    </div>
-                    <div class="clear-both"></div>
-                </div>
-
-                <div class="pid-slider-row">
-                    <span data-i18n="pidTuning_Rates_Yaw"></span>
-                    <div class="number no-border">
-                        <input id="rate_yaw_rate" class="profile-input-control" type="number"/>
-                    </div>
-                    <div class="clear-both"></div>
+            <div class="card mb-3">
+                <div class="card-header" data-i18n="pidTuning_rpmFilters"></div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item hstack">
+                            <span class="w-20r" data-i18n="pidTuning_rpm_gyro_filter_enabled"></span>
+                            <div class="form-check form-switch pidTuning_number">
+                                <input class="form-check-input update_preview" data-setting="rpm_gyro_filter_enabled" type="checkbox" >
+                            </div>
+                        </li>
+                        <li class="list-group-item hstack">
+                            <span class="w-20r min-w-20r" data-i18n="pidTuning_rpm_gyro_min_hz"></span>
+                            <div class="pidTuning_number">
+                                <input data-setting="rpm_gyro_min_hz" type="number" class="form-control w-10r rate-tpa_input" data-presentation="range" />
+                            </div>
+                        </li>
+                    </ul>
                 </div>
             </div>
 
-            <div class="pid-sliders-axis not-for-ez-tune" data-axis="pitch">
-                <div style="float: right">
-                    <div class="pitch_roll_curve expo-chart">
-                        <canvas width="200" height="117"></canvas>
+            <div class="not-for-ez-tune">
+
+                <div class="card mb-3">
+                    <div class="card-header" data-i18n="pidTuning_mainFilters"></div>
+                    <div class="card-body vstack gap-2">
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item hstack">
+                                <span class="w-20r" data-i18n="pidTuning_gyro_use_dyn_lpf"></span>
+                                <input id="gyro_use_dyn_lpf" type="checkbox" class="toggle update_preview" data-setting="gyro_use_dyn_lpf"/>
+                                <div for="gyro_use_dyn_lpf" class="helpicon cf_tip" data-i18n_title="pidTuning_gyro_use_dyn_lpf_help"></div>
+                            </li>
+                            <li class="list-group-item hstack for_static_gyro_lpf">
+                                <span class="w-20r" data-i18n="pidTuning_gyro_main_lpf_hz"></span>
+                                <input id="gyroLPFHz" data-setting="gyro_main_lpf_hz" type="number" data-presentation="range" class="form-control w-7r" data-normal-max="250" />
+                                <div for="gyroLPFHz" class="helpicon cf_tip" data-i18n_title="pidTuning_gyro_main_lpf_hz_help"></div>
+                            </li>
+                            <li class="list-group-item hstack for_dynamic_gyro_lpf">
+                                <span class="w-20r" data-i18n="pidTuning_gyro_main_lpf_hz"></span>
+                                <input id="gyro_dyn_lpf_min_hz" data-setting="gyro_dyn_lpf_min_hz" type="number" data-presentation="range" class="form-control w-7r" data-normal-max="150" />
+                                <div for="gyro_dyn_lpf_min_hz" class="helpicon cf_tip" data-i18n_title="pidTuning_gyro_dyn_lpf_min_hz_help"></div>
+                            </li>
+                            <li class="list-group-item hstack for_dynamic_gyro_lpf">
+                                <span class="w-20r" data-i18n="pidTuning_gyro_dyn_lpf_max_hz"></span>
+                                <input id="gyro_dyn_lpf_max_hz" data-setting="gyro_dyn_lpf_max_hz" type="number" data-presentation="range" class="form-control w-7r" data-normal-max="500" />
+                                <div for="gyro_dyn_lpf_max_hz" class="helpicon cf_tip" data-i18n_title="pidTuning_gyro_dyn_lpf_man_hz_help"></div>
+                            </li>
+                            <li class="list-group-item hstack for_dynamic_gyro_lpf">
+                                <span class="w-20r min-w-20r" data-i18n="pidTuning_gyro_dyn_lpf_curve_expo"></span>
+                                <input id="gyro_dyn_lpf_curve_expo" data-setting="gyro_dyn_lpf_curve_expo" type="number" data-presentation="range" class="form-control w-7r" />
+                                <!-- <div for="gyro_dyn_lpf_curve_expo" class="helpicon cf_tip" data-i18n_title="pidTuning_gyro_dyn_lpf_curve_expo_help"></div> -->
+                            </li>
+                        </ul>
                     </div>
                 </div>
-                <h3 data-i18n="pidTuning_Expo_Stabilized"></h3>
-                <div class="pid-slider-row">
-                    <span data-i18n="pidTuning_Expo_RollPitch"></span>
-                    <div class="number no-border">
-                        <input id="rate_rollpitch_expo" class="profile-input-control" type="number"/>
-                    </div>
-                    <div class="clear-both"></div>
-                </div>
-                <div class="pid-slider-row">
-                    <span data-i18n="pidTuning_Expo_Yaw"></span>
-                    <div class="number no-border">
-                        <input id="rate_yaw_expo" class="profile-input-control" type="number"/>
-                    </div>
-                    <div class="clear-both"></div>
-                </div>
-            </div>
 
-            <div class="pid-sliders-axis not-for-multirotor" data-axis="yaw">
-                <h3 data-i18n="pidTuning_Manual_Rates"></h3>
-                <div class="pid-slider-row">
-                    <span data-i18n="pidTuning_Manual_Roll"></span>
-                    <div class="number no-border">
-                        <input id="rate_manual_roll" class="profile-input-control" type="number"/>
-                    </div>
-                    <div class="clear-both"></div>
-                </div>
-                <div class="pid-slider-row">
-                    <span data-i18n="pidTuning_Manual_Pitch"></span>
-                    <div class="number no-border">
-                        <input id="rate_manual_pitch" class="profile-input-control" type="number"/>
-                    </div>
-                    <div class="clear-both"></div>
-                </div>
-                <div class="pid-slider-row">
-                    <span data-i18n="pidTuning_Manual_Yaw"></span>
-                    <div class="number no-border">
-                        <input id="rate_manual_yaw" class="profile-input-control" type="number"/>
-                    </div>
-                    <div class="clear-both"></div>
-                </div>
-                
-            </div>
-
-            <div class="pid-sliders-axis not-for-multirotor" data-axis="3">
-                <div style="float: right">
-                    <div class="manual_expo_curve expo-chart">
-                        <canvas width="200" height="117"></canvas>
+                <div class="card mb-3">
+                    <div class="card-header" data-i18n="pidTuning_advancedFilters"></div>
+                    <div class="card-body vstack gap-2">
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item hstack">
+                                <span class="w-20r min-w-20r" data-i18n="pidTuning_MatrixFilterType"></span>
+                                <select id="matrixFilterType" data-setting="dynamic_gyro_notch_mode" class="form-select w-7r"></select>
+                                <div for="matrixFilterType" class="helpicon cf_tip" data-i18n_title="pidTuning_MatrixFilterTypeHelp"></div>
+                            </li>
+                            <li class="list-group-item hstack">
+                                <span class="w-20r min-w-20r" data-i18n="pidTuning_MatrixFilterMinFrequency"></span>
+                                <input id="gyroNotchMinHz" data-setting="dynamic_gyro_notch_min_hz" data-presentation="range" type="number" class="form-control w-7r" data-normal-max="150" />
+                                <div for="gyroNotchMinHz" class="helpicon cf_tip" data-i18n_title="pidTuning_MatrixFilterMinFrequencyHelp"></div>
+                            </li>
+                            <li class="list-group-item hstack">
+                                <span class="w-20r min-w-20r" data-i18n="pidTuning_MatrixFilterQFactor"></span>
+                                <input id="gyroNotchQ" data-setting="dynamic_gyro_notch_q" data-presentation="range" type="number" class="form-control w-7r" data-normal-max="300" />
+                                <div for="gyroNotchQ" class="helpicon cf_tip" title=""></div>
+                            </li>
+                            <li class="list-group-item hstack">
+                                <span class="w-20r min-w-20r" data-i18n="pidTuning_UnicornFilterQFactor"></span>
+                                <input data-setting="setpoint_kalman_q" data-presentation="range" type="number" class="form-control w-7r" data-normal-max="500" />
+                            </li>
+                        </ul>
                     </div>
                 </div>
-                <h3 data-i18n="pidTuning_Expo_Manual"></h3>
-                <div class="pid-slider-row">
-                    <span data-i18n="pidTuning_Expo_RollPitch"></span>
-                    <div class="number no-border">
-                        <input id="manual_rollpitch_expo" class="profile-input-control" type="number"/>
+
+                <div class="card mb-3">
+                    <div class="card-header" data-i18n="pidTuning_dtermFilters"></div>
+                    <div class="card-body">
+                        <div class="d-flex hstack">
+                            <span class="w-20r min-w-20r" data-i18n="pidTuning_dtermLpfCutoffFrequency"></span>
+                            <div class="pidTuning_number flex-grow-1">
+                                <input id="dTermLPFHz" data-setting="dterm_lpf_hz" type="number" data-presentation="range" class="form-control w-10r rate-tpa_input" data-normal-max="200" />
+                            </div>
+                            <span for="dTermLPFHz" class="helpicon cf_tip" data-i18n_title="pidTuning_dtermLpfCutoffFrequencyHelp"></span>
+                        </div>
                     </div>
-                    <div class="clear-both"></div>
                 </div>
-                <div class="pid-slider-row">
-                    <span data-i18n="pidTuning_Expo_Yaw"></span>
-                    <div class="number no-border">
-                        <input id="manual_yaw_expo" class="profile-input-control" type="number"/>
-                    </div>
-                    <div class="clear-both"></div>
-                </div>
-            </div>
-
-            <div class="pid-sliders-axis only-for-multirotor" data-axis="3">
-                <h3 data-i18n="pidTuning_Other"></h3>
-                <div class="pid-slider-row">
-                    <span data-i18n="pidTuning_HeadingHold_Rate"></span>
-                    <div class="number no-border">
-                        <input id="heading_hold_rate_limit" class="profile-input-control rate-tpa_input" data-setting="heading_hold_rate_limit" type="number" data-presentation="range" />
-                    </div>
-                    <div class="clear-both"></div>
-                </div>       
-            </div>
-
-            <div class="tab_subtitle" style="margin-top: 1em;" data-i18n="pidTuning_Limits"></div>
-
-            <div class="pid-sliders-axis" data-axis="roll">
-                <h3 data-i18n="pidTuning_Max_Inclination_Angle"></h3>
-                <div class="pid-slider-row">
-                    <span data-i18n="pidTuning_Max_Roll"></span>
-                    <div class="number no-border">
-                        <input id="max_angle_inclination_rll" class="profile-input-control rate-tpa_input" data-setting="max_angle_inclination_rll" type="number" data-presentation="range" />
-                    </div>
-                    <div class="clear-both"></div>
-                </div>   
-                <div class="pid-slider-row">
-                    <span data-i18n="pidTuning_Max_Pitch"></span>
-                    <div class="number no-border">
-                        <input id="max_angle_inclination_pit" class="profile-input-control rate-tpa_input" data-setting="max_angle_inclination_pit" type="number" data-presentation="range" />
-                    </div>
-                    <div class="clear-both"></div>
-                </div>       
-            </div>
-
-            <div class="clear-both"></div>
-            <div class="tab_subtitle" style="margin-top: 1em;" data-i18n="pidTuning_RateDynamics"></div>
-            <div class="clear-both"></div>
-            <div class="cf_doc_version_bt"><a href="https://github.com/iNavFlight/inav/wiki/Rate-Dynamics" target="_blank" style="margin-top: -35px;">Rate Dynamics Documentation</a></div>
-
-            <div class="pid-sliders-axis" data-axis="roll">
-                <h3 data-i18n="pidTuning_RateDynamics_Sensitivity"></h3>
-                <div class="pid-slider-row">
-                    <span data-i18n="pidTuning_RateDynamics_Center"></span>
-                    <div class="number no-border">
-                        <input id="rate_dynamics_center_sensitivity" type="number"/>
-                    </div>
-                    <div class="clear-both"></div>
-                </div>
-
-                <div class="pid-slider-row">
-                    <span data-i18n="pidTuning_RateDynamics_End"></span>
-                    <div class="number no-border">
-                        <input id="rate_dynamics_end_sensitivity" type="number"/>
-                    </div>
-                    <div class="clear-both"></div>
-                </div>
-
-            </div>
-
-            <div class="pid-sliders-axis" data-axis="pitch">
-                <h3 data-i18n="pidTuning_RateDynamics_Correction"></h3>
-                <div class="pid-slider-row">
-                    <span data-i18n="pidTuning_RateDynamics_Center"></span>
-                    <div class="number no-border">
-                        <input id="rate_dynamics_center_correction" type="number"/>
-                    </div>
-                    <div class="clear-both"></div>
-                </div>
-
-                <div class="pid-slider-row">
-                    <span data-i18n="pidTuning_RateDynamics_End"></span>
-                    <div class="number no-border">
-                        <input id="rate_dynamics_end_correction" type="number"/>
-                    </div>
-                    <div class="clear-both"></div>
-                </div>
-
-            </div>
-
-            <div class="pid-sliders-axis" data-axis="yaw">
-                <h3 data-i18n="pidTuning_RateDynamics_Weight"></h3>
-                <div class="pid-slider-row">
-                    <span data-i18n="pidTuning_RateDynamics_Center"></span>
-                    <div class="number no-border">
-                        <input id="rate_dynamics_center_weight" type="number"/>
-                    </div>
-                    <div class="clear-both"></div>
-                </div>
-
-                <div class="pid-slider-row">
-                    <span data-i18n="pidTuning_RateDynamics_End"></span>
-                    <div class="number no-border">
-                        <input id="rate_dynamics_end_weight" type="number"/>
-                    </div>
-                    <div class="clear-both"></div>
-                </div>
-
             </div>
 
         </div>
+        <div class="tab-pane" id="mechanics" role="tabpanel" tabindex="0">
 
-        <div id="subtab-filters" class="subtab__content">
-            <div class="tab_subtitle not-for-ez-tune" data-i18n="pidTuning_mainFilters" style="margin-top: 1em;"></div>
-            <div class="clear-both not-for-ez-tune"></div>
-            <div class="cf_column not-for-ez-tune">
-                <table class="settings-table settings-table--filtering not-for-ez-tune">
-                    <tbody>
-                        <tr>
-                            <th data-i18n="pidTuning_gyro_use_dyn_lpf" style="height: 24px;"></th>
-                            <td>
-                                <div class="pidTuning_select">
-                                    <input id="gyro_use_dyn_lpf" type="checkbox" class="toggle update_preview" data-setting="gyro_use_dyn_lpf"/>
-                                    <div for="gyro_use_dyn_lpf" class="helpicon cf_tip" data-i18n_title="pidTuning_gyro_use_dyn_lpf_help"></div>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr class="for_static_gyro_lpf">
-                            <th data-i18n="pidTuning_gyro_main_lpf_hz"></th>
-                            <td>
-                                <div class="pidTuning_number">
-                                    <input id="gyroLPFHz" data-setting="gyro_main_lpf_hz" type="number" data-presentation="range" class="rate-tpa_input" data-normal-max="250" />
-                                    <div for="gyroLPFHz" class="helpicon cf_tip" data-i18n_title="pidTuning_gyro_main_lpf_hz_help"></div>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr class="for_dynamic_gyro_lpf">
-                            <th data-i18n="pidTuning_gyro_dyn_lpf_min_hz"></th>
-                            <td>
-                                <div class="pidTuning_number">
-                                    <input id="gyro_dyn_lpf_min_hz" data-setting="gyro_dyn_lpf_min_hz" type="number" data-presentation="range" class="rate-tpa_input" data-normal-max="150" />
-                                    <div for="gyro_dyn_lpf_min_hz" class="helpicon cf_tip" data-i18n_title="pidTuning_gyro_dyn_lpf_min_hz_help"></div>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr class="for_dynamic_gyro_lpf">
-                            <th data-i18n="pidTuning_gyro_dyn_lpf_max_hz"></th>
-                            <td>
-                                <div class="pidTuning_number">
-                                    <input id="gyro_dyn_lpf_max_hz" data-setting="gyro_dyn_lpf_max_hz" type="number" data-presentation="range" class="rate-tpa_input" data-normal-max="500" />
-                                    <div for="gyro_dyn_lpf_max_hz" class="helpicon cf_tip" data-i18n_title="pidTuning_gyro_dyn_lpf_man_hz_help"></div>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr class="for_dynamic_gyro_lpf">
-                            <th data-i18n="pidTuning_gyro_dyn_lpf_curve_expo"></th>
-                            <td>
-                                <div class="pidTuning_number">
-                                    <input id="gyro_dyn_lpf_curve_expo" data-setting="gyro_dyn_lpf_curve_expo" type="number" data-presentation="range" class="rate-tpa_input" />
-                                    <!-- <div for="gyro_dyn_lpf_curve_expo" class="helpicon cf_tip" data-i18n_title="pidTuning_gyro_dyn_lpf_curve_expo_help"></div> -->
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-            
-            <div class="clear-both not-for-ez-tune"></div>
-            <div class="tab_subtitle not-for-ez-tune" data-i18n="pidTuning_advancedFilters" style="margin-top: 1em;"></div>
-            <div class="clear-both not-for-ez-tune"></div>
-            <div class="cf_column not-for-ez-tune">
-                <table class="settings-table settings-table--filtering">
-                    <tbody>
-                        <tr>
-                            <th data-i18n="pidTuning_MatrixFilterType"></th>
-                            <td>
-                                <div class="pidTuning_select">
-                                    <select id="matrixFilterType" data-setting="dynamic_gyro_notch_mode" />
-                                    <div for="matrixFilterType" class="helpicon cf_tip" data-i18n_title="pidTuning_MatrixFilterTypeHelp"></div>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th data-i18n="pidTuning_MatrixFilterMinFrequency"></th>
-                            <td>
-                                <div class="pidTuning_number">
-                                    <input id="gyroNotchMinHz" data-setting="dynamic_gyro_notch_min_hz" data-presentation="range" type="number" class="rate-tpa_input" data-normal-max="150" />
-                                    <div for="gyroNotchMinHz" class="helpicon cf_tip" data-i18n_title="pidTuning_MatrixFilterMinFrequencyHelp"></div>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th data-i18n="pidTuning_MatrixFilterQFactor"></th>
-                            <td>
-                                <div class="pidTuning_number">
-                                    <input id="gyroNotchQ" data-setting="dynamic_gyro_notch_q" data-presentation="range" type="number" class="rate-tpa_input" data-normal-max="300" />
-                                    <div for="gyroNotchQ" class="helpicon cf_tip" title=""></div>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th data-i18n="pidTuning_UnicornFilterQFactor"></th>
-                            <td>
-                                <div class="pidTuning_number">
-                                    <input data-setting="setpoint_kalman_q" data-presentation="range" type="number" class="rate-tpa_input" data-normal-max="500" />
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+            <div class="not-for-ez-tune">
 
-            <div class="clear-both not-for-ez-tune"></div>
-            <div class="tab_subtitle not-for-ez-tune" data-i18n="pidTuning_dtermFilters" style="margin-top: 1em;"></div>
-            <div class="cf_column not-for-ez-tune">
-                <table class="settings-table settings-table--filtering">
-                    <tbody>
-                        <tr>
-                            <th data-i18n="pidTuning_dtermLpfCutoffFrequency"></th>
-                            <td>
-                                <div class="pidTuning_number">
-                                    <input id="dTermLPFHz" data-setting="dterm_lpf_hz" type="number" data-presentation="range" class="rate-tpa_input" data-normal-max="200" />
-                                    <div for="dTermLPFHz" class="helpicon cf_tip" data-i18n_title="pidTuning_dtermLpfCutoffFrequencyHelp"></div>
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+                <div class="card mb-3">
+                    <div class="card-header" data-i18n="pidTuning_ITermMechanics"></div>
+                    <div class="card-body">
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item hstack">
+                                <label data-i18n="pidTuning_itermRelaxCutoff" class="w-20r"></label>
+                                <input id="mcITermRelaxCutoff" type="number" data-setting="mc_iterm_relax_cutoff" class="form-control w-7r"  data-presentation="range" />
+                                <div for="mcITermRelaxCutoff" class="helpicon cf_tip" data-i18n_title="pidTuning_itermRelaxCutoffHelp"></div>
+                            </li>
+                            <li class="list-group-item hstack">
+                                <label data-i18n="pidTuning_antigravityGain" class="w-20r"></label>
+                                <input type="number" class="form-control w-7r" data-setting="antigravity_gain" data-step="0.001" />
+                            </li>
+                            <li class="list-group-item hstack">
+                                <label data-i18n="pidTuning_antigravityAccelerator" class="w-20r"></label>
+                                <input type="number" class="form-control w-7r" data-setting="antigravity_accelerator" data-step="0.001" />
+                            </li>
+                            <li class="list-group-item hstack">
+                                <label data-i18n="pidTuning_antigravityCutoff" class="w-20r"></label>
+                                <input type="number" class="form-control w-7r" data-setting="antigravity_cutoff_lpf_hz" />
+                            </li>
+                        </ul>
+                    </div>
+                </div>
 
-            <div class="clear-both"></div>
-            <div class="tab_subtitle" data-i18n="pidTuning_rpmFilters" style="margin-top: 1em;"></div>
-            <div class="cf_column">
-                <table class="settings-table settings-table--filtering">
-                    <tbody>
-                        <tr>
-                            <th data-i18n="pidTuning_rpm_gyro_filter_enabled"></th>
-                            <td>
-                                <div class="pidTuning_number"><input type="checkbox" class="toggle update_preview" data-setting="rpm_gyro_filter_enabled" /></div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th data-i18n="pidTuning_rpm_gyro_min_hz"></th>
-                            <td>
-                                <div class="pidTuning_number">
-                                    <input data-setting="rpm_gyro_min_hz" type="number" class="rate-tpa_input" data-presentation="range" />
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <div id="subtab-mechanics" class="subtab__content">
-            <div class="clear-both not-for-ez-tune"></div>
-            <div class="tab_subtitle not-for-ez-tune" data-i18n="pidTuning_ITermMechanics" style="margin-top: 1em;"></div>
-            <div class="cf_column not-for-ez-tune">
-                <table class="settings-table settings-table--filtering">
-                    <tbody>
-                        <tr>
-                            <th data-i18n="pidTuning_itermRelaxCutoff"></th>
-                            <td>
-                                <div class="pidTuning_number">
-                                    <input id="mcITermRelaxCutoff" type="number" data-setting="mc_iterm_relax_cutoff" class="rate-tpa_input"  data-presentation="range" />
-                                    <div for="mcITermRelaxCutoff" class="helpicon cf_tip" data-i18n_title="pidTuning_itermRelaxCutoffHelp"></div>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th data-i18n="pidTuning_antigravityGain"></th>
-                            <td>
-                                <div class="pidTuning_number"><input type="number" class="rate-tpa_input" data-setting="antigravity_gain" data-step="0.001" /></div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th data-i18n="pidTuning_antigravityAccelerator"></th>
-                            <td>
-                                <div class="pidTuning_number"><input type="number" class="rate-tpa_input" data-setting="antigravity_accelerator" data-step="0.001" /></div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th data-i18n="pidTuning_antigravityCutoff"></th>
-                            <td>
-                                <div class="pidTuning_number"><input type="number" class="rate-tpa_input" data-setting="antigravity_cutoff_lpf_hz" /></div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <div class="clear-both not-for-ez-tune"></div>
-            <div class="tab_subtitle not-for-ez-tune" data-i18n="pidTuning_dTermMechanics" style="margin-top: 1em;"></div>
-            <div class="cf_column not-for-ez-tune">
-                <table class="settings-table settings-table--filtering">
-                    <tbody>
-                        <tr>
-                            <th data-i18n="pidTuning_d_boost_min"></th>
-                            <td>
-                                <div class="pidTuning_number"><input id="dBoostMin" type="number" class="rate-tpa_input" data-setting="d_boost_min" data-step="0.001" /></div>
+                <div class="card mb-3">
+                    <div class="card-header" data-i18n="pidTuning_dTermMechanics"></div>
+                    <div class="card-body">
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item hstack">
+                                <label data-i18n="pidTuning_d_boost_min" class="w-20r"></label>
+                                <div class="pidTuning_number"><input id="dBoostMin" type="number" class="form-control w-7r" data-setting="d_boost_min" data-step="0.001" /></div>
                                 <div for="dBoostMin" class="helpicon cf_tip" data-i18n_title="pidTuning_d_boost_min_help"></div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th data-i18n="pidTuning_d_boost_max"></th>
-                            <td>
-                                <div class="pidTuning_number"><input id="dBoostMax" type="number" class="rate-tpa_input" data-setting="d_boost_max" data-step="0.001" /></div>
+                            </li>
+                            <li class="list-group-item hstack">
+                                <label data-i18n="pidTuning_d_boost_max" class="w-20r"></label>
+                                <div class="pidTuning_number"><input id="dBoostMax" type="number" class="form-control w-7r" data-setting="d_boost_max" data-step="0.001" /></div>
                                 <div for="dBoostMax" class="helpicon cf_tip" data-i18n_title="pidTuning_d_boost_max_help"></div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th data-i18n="pidTuning_d_boost_max_at_acceleration"></th>
-                            <td>
-                                <div class="pidTuning_number"><input id="dBoostMaxAccel" type="number" class="rate-tpa_input" data-setting="d_boost_max_at_acceleration" /></div>
+                            </li>
+                            <li class="list-group-item hstack">
+                                <label data-i18n="pidTuning_d_boost_max_at_acceleration" class="w-20r"></label>
+                                <div class="pidTuning_number"><input id="dBoostMaxAccel" type="number" class="form-control w-7r" data-setting="d_boost_max_at_acceleration" /></div>
                                 <div for="dBoostMaxAccel" class="helpicon cf_tip" data-i18n_title="pidTuning_d_boost_max_at_acceleration_help"></div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th data-i18n="pidTuning_d_boost_gyro_delta_lpf_hz"></th>
-                            <td>
-                                <div class="pidTuning_number">
-                                    <input id="dBoostGyroDelta" type="number" class="rate-tpa_input" data-setting="d_boost_gyro_delta_lpf_hz" data-presentation="range" data-normal-max="160" />
-                                    <div for="dBoostGyroDelta" class="helpicon cf_tip" data-i18n_title="pidTuning_d_boost_gyro_delta_lpf_hz_help"></div>
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+                            </li>
+                            <li class="list-group-item hstack">
+                                <label data-i18n="pidTuning_d_boost_gyro_delta_lpf_hz" class="w-20r"></label>
+                                <input id="dBoostGyroDelta" type="number" class="form-control w-7r" data-setting="d_boost_gyro_delta_lpf_hz" data-presentation="range" data-normal-max="160" />
+                                <div for="dBoostGyroDelta" class="helpicon cf_tip" data-i18n_title="pidTuning_d_boost_gyro_delta_lpf_hz_help"></div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
             </div>
 
-            <div class="clear-both"></div>
-            <div class="tab_subtitle" data-i18n="pidTuning_tpaMechanics" style="margin-top: 1em;"></div>
-            <div class="cf_column" style="margin-top:1em;">
-                <table class="settings-table settings-table--misc">
-                    <tr>
-                        <th data-i18n="pidTuning_TPA"></th>
-                        <td>
-                            <div class="pidTuning_number">
-                                <input id="tpaRate" type="number" class="rate-tpa_input" data-setting="tpa_rate" data-unit="percent"  data-presentation="range" />
-                                <div for="tpaRate" class="helpicon cf_tip" data-i18n_title="pidTuningTPAHelp"></div>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th data-i18n="pidTuning_TPABreakPoint"></th>
-                        <td>
-                            <div class="pidTuning_number">
-                                <input id="tpaBreakpoint" type="number" class="rate-tpa_input" data-setting="tpa_breakpoint" data-presentation="range" data-step="5" />
-                                <div for="tpaBreakpoint" class="helpicon cf_tip" data-i18n_title="pidTuningTPABreakPointHelp"></div>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th data-i18n="pidTuning_FW_TPATimeConstant"></th>
-                        <td>
-                            <div class="pidTuning_number"><input id="tpaTimeConstant" type="number" class="rate-tpa_input" data-setting="fw_tpa_time_constant" data-unit="msec" /></div>
+            <div class="card mb-3">
+                <div class="card-header" data-i18n="pidTuning_tpaMechanics"></div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item hstack">
+                            <label data-i18n="pidTuning_TPA" class="w-20r"></label>
+                            <input id="tpaRate" type="number" class="form-control w-7r" data-setting="tpa_rate" data-unit="percent"  data-presentation="range" />
+                            <div for="tpaRate" class="helpicon cf_tip" data-i18n_title="pidTuningTPAHelp"></div>
+                        </li>
+                        <li class="list-group-item hstack">
+                            <label data-i18n="pidTuning_TPABreakPoint" class="w-20r"></label>
+                            <input id="tpaBreakpoint" type="number" class="form-control w-7r" data-setting="tpa_breakpoint" data-presentation="range" data-step="5" />
+                            <div for="tpaBreakpoint" class="helpicon cf_tip" data-i18n_title="pidTuningTPABreakPointHelp"></div>
+                        </li>
+                        <li class="list-group-item hstack">
+                            <label data-i18n="pidTuning_FW_TPATimeConstant" class="w-20r"></label>
+                            <input id="tpaTimeConstant" type="number" class="form-control w-7r" data-setting="fw_tpa_time_constant" data-unit="msec" />
                             <div for="tpaTimeConstant" class="helpicon cf_tip" data-i18n_title="pidTuning_FW_TPATimeConstantHelp"></div>
-                        </td>
-                    </tr>
-                </table>
+                        </li>
+                    </ul>
+                </div>
             </div>
-            <div class="clear-both"></div>
-            <div class="tab_subtitle" data-i18n="pidTuning_fwLevelTrimMechanics" style="margin-top: 1em;"></div>
-            <div class="cf_column">
-                <table class="settings-table settings-table--filtering">
-                    <tbody>
-                        <tr>
-                            <th data-i18n="pidTuning_fw_level_pitch_trim"></th>
-                            <td>
-                                <div class="pidTuning_number"><input id="fwLevelTrim" class="rate-tpa_input" data-setting="fw_level_pitch_trim" data-unit="deg" /></div>
-                                <div for="fwLevelTrim" class="helpicon cf_tip" data-i18n_title="pidTuning_fw_level_pitch_trim_help"></div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th data-i18n="pidTuning_itermBankAngleFreeze"></th>
-                            <td>
-                                <div class="pidTuning_number">
-                                    <input id="fwYawItermFreeze" type="number" class="rate-tpa_input" data-setting="fw_yaw_iterm_freeze_bank_angle" data-presentation="range" />
-                                    <div for="fwYawItermFreeze" class="helpicon cf_tip" data-i18n_title="pidTuning_itermBankAngleFreezeHelp"></div>
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+
+            <div class="card mb-3">
+                <div class="card-header" data-i18n="pidTuning_fwLevelTrimMechanics"></div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item hstack">
+                            <label class="w-20r" data-i18n="pidTuning_fw_level_pitch_trim"></label>
+                            <input id="fwLevelTrim" class="form-control w-7r" data-setting="fw_level_pitch_trim" data-unit="deg"/>
+                            <span for="fwLevelTrim" class="helpicon cf_tip ms-3" data-i18n_title="pidTuning_fw_level_pitch_trim_help"></span>
+                        </li>
+                        <li class="list-group-item hstack">
+                            <label class="w-20r" data-i18n="pidTuning_itermBankAngleFreeze"></label>
+                            <input id="fwYawItermFreeze" type="number" class="form-control w-7r" data-setting="fw_yaw_iterm_freeze_bank_angle" data-presentation="range" />
+                            <span for="fwYawItermFreeze" class="helpicon cf_tip ms-auto" data-i18n_title="pidTuning_itermBankAngleFreezeHelp"></span>
+                        </li>
+                    </ul>
+                </div>
             </div>
+
         </div>
     </div>
-    <div class="clear-both"></div>
-    <div id="tuning-footer" class="content_toolbar">
-        <div class="btn save_btn">
-            <a class="update" href="#" data-i18n="pidTuning_ButtonSave"></a>
+
+    <div class="page-footer gap-2 justify-content-between">
+        <div class="d-flex gap-2">
+            <button id="reset-to-defaults-btn" class="btn btn-outline-primary" data-i18n="pidTuning_ResetPIDController"></button>
+            <button id="select-new-defaults-btn" class="btn btn-outline-primary" data-i18n="pidTuning_SelectNewDefaults"></button>
         </div>
-        <div class="btn refresh_btn">
-            <a class="refresh" href="#" data-i18n="pidTuning_ButtonRefresh"></a>
+        <div class="d-flex gap-2">
+            <button id="refresh-btn" class="btn btn-primary" data-i18n="pidTuning_ButtonRefresh"></button>
+            <button id="update-btn" class="btn btn-primary" data-i18n="pidTuning_ButtonSave"></button>
         </div>
     </div>
 </div>
