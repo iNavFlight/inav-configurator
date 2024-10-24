@@ -1,63 +1,61 @@
-<div class="tab-configuration tab-programming toolbar_fixed_bottom">
-    <div class="content_wrapper" id="programming-main-content">
-
-
-        <div class="tab_title subtab__header">
-            <span class="subtab__header_label subtab__header_label--current" for="subtab-lc" data-i18n="LogicConditions"></span>
-            <span class="subtab__header_label" for="subtab-pid" data-i18n="PIDControllers"></span>
+<div class="page tab-programming">
+    <nav>
+        <div class="nav nav-tabs" id="nav-tab" role="tablist">
+            <button class="nav-link active fs-5 px-3" id="pid-main-tab" data-bs-toggle="tab" data-bs-target="#subtab-lc" type="button" role="tab" data-i18n="LogicConditions"></button>
+            <button class="nav-link fs-5 px-3" id="pid-other-tab" data-bs-toggle="tab" data-bs-target="#subtab-pid" type="button" role="tab" data-i18n="PIDControllers"></button>
         </div>
+    </nav>
 
-        <div class="gvar__container">
-            <div class="gvar__wrapper">
-                <div class="gvar__cell">
-                    <h2>GVAR 0</h2>
-                    <label class="gvar__value" data-gvar-index="0">0</label>
-                </div>
+    <div class="gvar__container d-flex gap-3 mt-3">
+        <div class="gvar__wrapper card bg-primary-subtle border-primary-subtle text-primary-emphasis">
+            <div class="gvar__cell card-body">
+                <h3>GVAR 0</h3>
+                <label class="gvar__value fs-5" data-gvar-index="0">0</label>
             </div>
         </div>
+    </div>
 
-        <div id="subtab-lc" class="subtab__content subtab__content--current">
-            <table class="mixer-table logic__table">
+    <div class="tab-content mt-3" id="nav-tabContent">
+        <div class="tab-pane show active" id="subtab-lc" role="tabpanel" tabindex="0">
+            <table class="logic__table table table-striped align-middle">
                 <thead>
-                    <tr>
-                        <th style="width: 50px" data-i18n="logicId"></th>
-                        <th style="width: 80px" data-i18n="logicEnabled"></th>
-                        <th style="width: 120px" data-i18n="logicOperation"></th>
-                        <th data-i18n="logicOperandA"></th>
-                        <th data-i18n="logicOperandB"></th>
-                        <th data-i18n="logicActivator"></th>
-                        <th style="width: 40px" data-i18n="logicFlags"></th>
-                        <th style="width: 50px" data-i18n="logicStatus"></th>
-                    </tr>
+                <tr class="table-active">
+                    <th style="width: 1%;" data-i18n="logicId"></th>
+                    <th style="width: 5%;" data-i18n="logicEnabled"></th>
+                    <th style="width: 12%;" data-i18n="logicOperation"></th>
+                    <th style="width: 25%;" data-i18n="logicOperandA"></th>
+                    <th style="width: 25%;" data-i18n="logicOperandB"></th>
+                    <th style="width: 10%;" data-i18n="logicActivator"></th>
+                    <th style="width: 7%;" data-i18n="logicFlags"></th>
+                    <th style="width: 3%;" data-i18n="logicStatus"></th>
+                </tr>
                 </thead>
                 <tbody>
                 </tbody>
             </table>
         </div>
-
-        <div id="subtab-pid" class="subtab__content">
-            <table class="mixer-table pid__table">
+        <div class="tab-pane" id="subtab-pid" role="tabpanel" tabindex="0">
+            <table class="pid__table table table-striped align-middle">
                 <thead>
-                    <tr>
-                        <th style="width: 50px" data-i18n="pidId"></th>
-                        <th style="width: 80px" data-i18n="pidEnabled"></th>
-                        <th data-i18n="pidSetpoint"></th>
-                        <th data-i18n="pidMeasurement"></th>
-                        <th style="width: 80px" data-i18n="pidP"></th>
-                        <th style="width: 80px" data-i18n="pidI"></th>
-                        <th style="width: 80px" data-i18n="pidD"></th>
-                        <th style="width: 80px" data-i18n="pidFF"></th>
-                        <th style="width: 80px" data-i18n="pidOutput"></th>
-                    </tr>
+                <tr class="table-active">
+                    <th style="width: 2rem;" data-i18n="pidId"></th>
+                    <th style="width: 80px" data-i18n="pidEnabled"></th>
+                    <th data-i18n="pidSetpoint"></th>
+                    <th data-i18n="pidMeasurement"></th>
+                    <th style="width: 80px" data-i18n="pidP"></th>
+                    <th style="width: 80px" data-i18n="pidI"></th>
+                    <th style="width: 80px" data-i18n="pidD"></th>
+                    <th style="width: 80px" data-i18n="pidFF"></th>
+                    <th style="width: 80px" data-i18n="pidOutput"></th>
+                </tr>
                 </thead>
                 <tbody>
                 </tbody>
             </table>
         </div>
     </div>
-    <div class="content_toolbar">
-        <div class="btn save_btn">
-            <a id="save-button" class="save" href="#" data-i18n="save"></a>
-        </div>
+
+    <div class="page-footer">
+        <button id="save-button" class="btn btn-primary" data-i18n="save"></button>
     </div>
 </div>

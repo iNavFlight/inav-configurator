@@ -338,11 +338,11 @@ GUI_control.prototype.renderOperandValue = function ($container, operandMetadata
 
     switch (operandMetadata.type) {
         case "value":
-            $container.append('<input type="number" class="logic_element__operand--value" data-operand="' + operand + '" step="' + operandMetadata.step + '" min="' + operandMetadata.min + '" max="' + operandMetadata.max + '" value="' + value + '" />');
+            $container.append('<input type="number" class="logic_element__operand--value form-control" data-operand="' + operand + '" step="' + operandMetadata.step + '" min="' + operandMetadata.min + '" max="' + operandMetadata.max + '" value="' + value + '" />');
             break;
         case "range":
         case "dictionary":
-            $container.append('<select class="logic_element__operand--value" data-operand="' + operand + '"></select>');
+            $container.append('<select class="logic_element__operand--value form-select" data-operand="' + operand + '"></select>');
             let $t = $container.find('.logic_element__operand--value');
             
             if (operandMetadata.type == "range") {
@@ -389,7 +389,7 @@ GUI_control.prototype.renderOperandValue = function ($container, operandMetadata
  */
 GUI_control.prototype.renderLogicConditionSelect = function ($container, logicConditions, current, onChange, withAlways, onlyEnabled) {
 
-    let $select = $container.append('<select class="mix-rule-condition">').find("select"),
+    let $select = $container.append('<select class="mix-rule-condition form-select">').find("select"),
         lcCount = logicConditions.getCount(),
         option  = "";
 
