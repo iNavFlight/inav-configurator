@@ -264,7 +264,7 @@
         "message": "Enable"
     },
     "sitlHelp": {
-        "message": "SITL (Software in the loop) allows to run INAV completely in software on the PC without using a flight controller and simulate complete FPV flights. For this, INAV is compiled with a normal PC compiler. The sensors are replaced by data provided by a simulator.<br/>Currently supported are:<br/><ul><li><a href=\"https://www.realflight.com\" target=\"_blank\">RealFlight</a><br/></li><li><a href=\"https://www.x-plane.com\" target=\"_blank\">X-Plane</a></li></ul>"
+        "message": "SITL (Software in the loop) allows to run INAV completely in software on the PC without using a flight controller and simulate complete FPV flights. For this, INAV is compiled with a normal PC compiler. The sensors are replaced by data provided by a simulator.<br/>Currently supported are:<br/><ul class=\"mb-0\"><li><a href=\"https://www.realflight.com\" target=\"_blank\">RealFlight</a><br/></li><li><a href=\"https://www.x-plane.com\" target=\"_blank\">X-Plane</a></li></ul>"
     },
     "sitlProfilesHelp": {
         "message": "Profiles are saved locally. The profiles contain not only all data of this tab, but also the configuration file (\"EEPROM\") of INAV itself. <br><span class='text-danger'>Note:</span><br>Standard profiles can't be overwriten. To save your changes, create a new profile. "

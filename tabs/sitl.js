@@ -116,11 +116,11 @@ TABS.sitl.initialize = (callback) => {
     var parity_e = $('#serialParity');
     
     if (SITLProcess.isRunning) {
-        $('.sitlStart').addClass('disabled');
-        $('.sitlStop').removeClass('disabled');
+        $('#start-btn').addClass('disabled');
+        $('#stop-btn').removeClass('disabled');
     } else {
-        $('.sitlStop').addClass('disabled');
-        $('.sitlStart').removeClass('disabled');
+        $('#stop-btn').addClass('disabled');
+        $('#start-btn').removeClass('disabled');
     }
 
     var $sitlLog = $('#sitlLog');
@@ -176,9 +176,9 @@ TABS.sitl.initialize = (callback) => {
         currentProfile.useImu = useImu_e.is(':checked');
     });
 
-    $('.sitlStart').on('click', ()=> {
-        $('.sitlStart').addClass('disabled');
-        $('.sitlStop').removeClass('disabled');
+    $('#start-btn').on('click', ()=> {
+        $('#start-btn').addClass('disabled');
+        $('#stop-btn').removeClass('disabled');
 
         var sim, simPort, simIp, channelMap = "";
 
@@ -243,9 +243,9 @@ TABS.sitl.initialize = (callback) => {
         });
     });
 
-    $('.sitlStop').on('click', ()=> {
-        $('.sitlStop').addClass('disabled');
-        $('.sitlStart').removeClass('disabled');
+    $('#stop-btn').on('click', ()=> {
+        $('#stop-btn').addClass('disabled');
+        $('#start-btn').removeClass('disabled');
         SITLProcess.stop();
         appendLog(i18n.getMessage('sitlStopped'));
     });
@@ -482,8 +482,7 @@ TABS.sitl.initialize = (callback) => {
             } else {
                 output = i + 1;
             }
-            
-            mapTableBody.append("<tr><td>" + output + "</td><td><select data-out=\"" + i + "\" class=\"inavChannel\"\"></select></td></td>");
+            mapTableBody.append(`<tr><td>${output}</td><td><select data-out="${i}" class="inavChannel form-select"></select></td></tr> `);
             const row = mapTableBody.find('tr:last');
             GUI.fillSelect(row.find(".inavChannel"), getInavChannels(), mapping[i]);
 
