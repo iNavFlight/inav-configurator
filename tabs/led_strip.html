@@ -1,201 +1,205 @@
-<div class="tab-led-strip toolbar_fixed_bottom">
-    <div class="content_wrapper">
-        <div class="tab_title" i18n="tabLedStrip"></div>
-        <div class="note spacebottom">
-            <div class="note_spacer">
-                <p i18n="ledStripHelp"></p>
-            </div>
-        </div>
-        <div class="mainGrid"></div>
-        <div class="gridSections">
-            <div class="block"></div>
-            <div class="block"></div>
-            <div class="block"></div>
-            <div class="block"></div>
-            <div class="block"></div>
-            <div class="block"></div>
-            <div class="block"></div>
-            <div class="block"></div>
-            <div class="block"></div>
-            <div class="block"></div>
-            <div class="block"></div>
-            <div class="block"></div>
-            <div class="block"></div>
-            <div class="block"></div>
-            <div class="block"></div>
-            <div class="block"></div>
-        </div>
-        <div class="colorDefineSliders">
-            <div class="" i18n="ledStripColorSetupTitle"></div>
-            <div class="colorDefineSliderContainer">
-                <Label class="colorDefineSliderLabel" i18n="ledStripH"></Label>
-                <input class="sliderHSV" type="range" min="0" max="359" value="0">
-                <Label class="colorDefineSliderValue Hvalue">0</Label>
-            </div>
-            <div class="colorDefineSliderContainer">
-                <Label class="colorDefineSliderLabel" i18n="ledStripS"></Label>
-                <input class="sliderHSV" type="range" min="0" max="255" value="0">
-                <Label class="colorDefineSliderValue Svalue">0</Label>
-            </div>
-            <div class="colorDefineSliderContainer">
-                <Label class="colorDefineSliderLabel" i18n="ledStripV"></Label>
-                <input class="sliderHSV" type="range" min="0" max="255" value="0">
-                <Label class="colorDefineSliderValue Vvalue">0</Label>
-            </div>
-        </div>
-        <div class="controls">
-            <div class="wires-remaining">
-                <div></div>
-                <span i18n="ledStripRemainingText"></span>
-            </div>
-            <button class="funcClear" i18n="ledStripClearSelectedButton"></button>
-            <button class="funcClearAll" i18n="ledStripClearAllButton"></button>
-
-            <div class="section" i18n="ledStripFunctionSection"></div>
-
-
-            <div class="select">
-                <span class="color_section" i18n="ledStripFunctionTitle"></span>
-                <select class="functionSelect">
-                    <option value="" i18n="ledStripFunctionNoneOption"></option>
-                    <option value="function-c" class="" i18n="ledStripFunctionColorOption"></option>
-                    <option value="function-f" class="" i18n="ledStripFunctionModesOption"></option>
-                    <option value="function-a" class="" i18n="ledStripFunctionArmOption"></option>
-                    <option value="function-l" class="extra_functions20" i18n="ledStripFunctionBatteryOption"></option>
-                    <option value="function-s" class="extra_functions20" i18n="ledStripFunctionRSSIOption"></option>
-                    <option value="function-g" class="extra_functions20" i18n="ledStripFunctionGPSOption"></option>
-                    <option value="function-r" class="" i18n="ledStripFunctionRingOption"></option>
-                    <option value="function-h" class="channel_info" i18n="ledStripFunctionChannelOption"></option>
-                </select>
-            </div>
-
-
-            <div class="modifiers">
-                <span class="color_section" i18n="ledStripColorModifierTitle"></span>
-                <div class="checkbox">
-                    <input type="checkbox" name="ThrottleHue" class="toggle function-t" />
-                    <label> <span i18n="ledStripThrottleText"></span></label>
-                </div>
-                <div class="checkbox extra_functions20">
-                    <input type="checkbox" name="LarsonScanner" class="toggle function-o" />
-                    <label> <span i18n="ledStripLarsonscannerText"></span></label>
-                </div>
-            </div>
-
-            <div class="blinkers extra_functions20">
-                <span class="color_section" i18n="ledStripBlinkTitle"></span>
-                <div class="checkbox blinkOverlay">
-                    <input type="checkbox" name="blink" class="toggle function-b" />
-                    <label> <span i18n="ledStripBlinkAlwaysOverlay"></span></label>
-                </div>
-                <div class="checkbox landingBlinkOverlay">
-                    <input type="checkbox" name="landingBlink" class="toggle function-n" />
-                    <label> <span i18n="ledStripBlinkLandingOverlay"></span></label>
-                </div>
-                <span class="color_section" i18n="ledStripStrobeText"></span>
-                <div class="checkbox strobeOverlay">
-                    <input type="checkbox" name="strobe" class="toggle function-e" />
-                    <label> <span i18n="ledStripEnableStrobeLightEffectText"></span></label>
-                </div>
-            </div>
-
-            <div class="overlays">
-                <span class="color_section" i18n="ledStripOverlayTitle"></span>
-                <div class="checkbox warningOverlay">
-                    <input type="checkbox" name="Warnings" class="toggle function-w" />
-                    <label> <span i18n="ledStripWarningsOverlay"></span></label>
-                </div>
-                <div class="checkbox indicatorOverlay">
-                    <input type="checkbox" name="Indicator" class="toggle function-i" />
-                    <label> <span i18n="ledStripIndecatorOverlay"></span></label>
-                </div>
-            </div>
-
-            <div class="channel_info">
-                <span class="color_section" i18n="ledStripSelectChannelFromColorList"></span>
-            </div>
-
-            <div class="mode_colors">
-                <div class="section" i18n="ledStripModeColorsTitle"></div>
-
-                <select id="ledStripModeColorsModeSelect" class="modeSelect">
-                    <option value="0" i18n="ledStripModeColorsModeOrientation"></option>
-                    <option value="1" i18n="ledStripModeColorsModeHeadfree"></option>
-                    <option value="2" i18n="ledStripModeColorsModeHorizon"></option>
-                    <option value="3" i18n="ledStripModeColorsModeAngle"></option>
-                    <option value="4" i18n="ledStripModeColorsModeMag"></option>
-                    <option value="5" i18n="ledStripModeColorsModeBaro"></option>
-                </select>
-
-                <button class="mode_color-0-0 dir-n" i18n="ledStripDirN"></button>
-                <button class="mode_color-0-1 dir-e" i18n="ledStripDirE"></button>
-                <button class="mode_color-0-2 dir-s" i18n="ledStripDirS"></button>
-                <button class="mode_color-0-3 dir-w" i18n="ledStripDirW"></button>
-                <button class="mode_color-0-4 dir-u" i18n="ledStripDirU"></button>
-                <button class="mode_color-0-5 dir-d" i18n="ledStripDirD"></button>
-            </div>
-
-            <div class="section" i18n="ledStripModesOrientationTitle"></div>
-            <div class="directions">
-                <button class="dir-n" i18n="ledStripDirN"></button>
-                <button class="dir-e" i18n="ledStripDirE"></button>
-                <button class="dir-s" i18n="ledStripDirS"></button>
-                <button class="dir-w" i18n="ledStripDirW"></button>
-                <button class="dir-u" i18n="ledStripDirU"></button>
-                <button class="dir-d" i18n="ledStripDirD"></button>
-            </div>
-
-            <div class="colors">
-                <button class="color-0" i18n_title="colorBlack">0</button>
-                <button class="color-1" i18n_title="colorWhite">1</button>
-                <button class="color-2" i18n_title="colorRed">2</button>
-                <button class="color-3" i18n_title="colorOrange">3</button>
-                <button class="color-4" i18n_title="colorYellow">4</button>
-                <button class="color-5" i18n_title="colorLimeGreen">5</button>
-                <button class="color-6" i18n_title="colorGreen">6</button>
-                <button class="color-7" i18n_title="colorMintGreen">7</button>
-                <button class="color-8" i18n_title="colorCyan">8</button>
-                <button class="color-9" i18n_title="colorLightBlue">9</button>
-                <button class="color-10" i18n_title="colorBlue">10</button>
-                <button class="color-11" i18n_title="colorDarkViolet">11</button>
-                <button class="color-12" i18n_title="colorMagenta">12</button>
-                <button class="color-13" i18n_title="colorDeepPink">13</button>
-                <button class="color-14" i18n_title="colorBlack">14</button>
-                <button class="color-15" i18n_title="colorBlack">15</button>
-            </div>
-
-            <div class="special_colors mode_colors">
-                <div class="section" i18n="ledStripModesSpecialColorsTitle"></div>
-                <button class="mode_color-6-0" i18n_title="colorGreen" i18n="ledStripModeColorsModeDisarmed"></button>
-                <button class="mode_color-6-1" i18n_title="colorBlue" i18n="ledStripModeColorsModeArmed"></button>
-                <button class="mode_color-6-2" i18n_title="colorWhite" i18n="ledStripModeColorsModeAnimation"></button>
-                <!-- button class="mode_color-6-3" i18n_title="colorBlack">Background</button -->
-                <button class="mode_color-6-4" i18n_title="colorBlack" i18n="ledStripModeColorsModeBlinkBg"></button>
-                <button class="mode_color-6-5" i18n_title="colorRed" i18n="ledStripModeColorsModeGPSNoSats"></button>
-                <button class="mode_color-6-6" i18n_title="colorOrange" i18n="ledStripModeColorsModeGPSNoLock"></button>
-                <button class="mode_color-6-7" i18n_title="colorGreen" i18n="ledStripModeColorsModeGPSLocked"></button>
-            </div>
-
-            <div class="section" i18n="ledStripWiring"></div>
-            <div class="wiringMode">
-                <button class="funcWire w100" i18n="ledStripWiringMode"></button>
-            </div>
-            <div class="wiringControls">
-                <button class="funcWireClearSelect w50" i18n="ledStripWiringClearControl"></button>
-                <button class="funcWireClear w50" i18n="ledStripWiringClearAllControl"></button>
-            </div>
-            <p i18n="ledStripWiringMessage"></p>
-        </div>
-
-        <div class="colorControls">
-
-        </div>
-
-        <div class="clear-both"></div>
+<div class="page tab-led-strip">
+    <div class="page-header">
+        <span data-i18n="tabLedStrip"></span>
     </div>
-    <div class="content_toolbar">
-        <div class="btn save_btn">
-            <a class="save" href="#" i18n="ledStripButtonSave"></a>
+
+    <div class="alert alert-warning">
+        <div data-i18n="ledStripHelp"></div>
+    </div>
+
+    <div class="row">
+        <div class="col-xl-2 col-xxl-3">
+            <h4 i18n="ledStripWiring"></h4>
+            <hr class="mt-0">
+            <div class="mb-2 d-grid">
+                <button class="btn btn-outline-primary funcWire" i18n="ledStripWiringMode"></button>
+            </div>
+            <div class="d-flex mb-3 justify-content-between gap-2">
+                <button class="btn btn-outline-primary flex-grow-1 funcWireClearSelect" i18n="ledStripWiringClearControl"></button>
+                <button class="btn btn-outline-danger flex-grow-1 funcWireClear" i18n="ledStripWiringClearAllControl"></button>
+            </div>
+            <div class="alert alert-info" i18n="ledStripWiringMessage"></div>
         </div>
+        <div class="col-xl-7 col-xxl-6">
+            <div class="d-flex justify-content-between">
+                <div>
+                    <h4 class="d-inline-block mb-0">LED Matrix</h4>
+                    <span class="wires-remaining fs-4">
+                        (<span id="remaining-led"></span>
+                        <span i18n="ledStripRemainingText"></span>)
+                    </span>
+                </div>
+                <div>
+                    <button class="btn btn-sm btn-outline-primary funcClear" i18n="ledStripClearSelectedButton"></button>
+                    <button class="btn btn-sm btn-outline-danger funcClearAll" i18n="ledStripClearAllButton"></button>
+                </div>
+            </div>
+            <hr class="mt-0">
+
+            <div>
+                <div class="card mb-3 m-auto" style="max-width: 600px;">
+                    <div class="mainGrid p-2 d-grid gap-2" style="grid-template-columns: repeat(16, 1fr);"></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-xxl-3">
+            <div class="card colorDefineSliders">
+                <div class="card-body">
+                    <div i18n="ledStripColorSetupTitle"></div>
+                    <div class="colorDefineSliderContainer">
+                        <label class="colorDefineSliderLabel" i18n="ledStripH"></label>
+                        <input class="sliderHSV" type="range" min="0" max="359" value="0">
+                        <label class="colorDefineSliderValue Hvalue">0</label>
+                    </div>
+                    <div class="colorDefineSliderContainer">
+                        <label class="colorDefineSliderLabel" i18n="ledStripS"></label>
+                        <input class="sliderHSV" type="range" min="0" max="255" value="0">
+                        <label class="colorDefineSliderValue Svalue">0</label>
+                    </div>
+                    <div class="colorDefineSliderContainer">
+                        <label class="colorDefineSliderLabel" i18n="ledStripV"></label>
+                        <input class="sliderHSV" type="range" min="0" max="255" value="0">
+                        <label class="colorDefineSliderValue Vvalue">0</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="controls">
+                <h4 i18n="ledStripFunctionSection"></h4>
+                <hr class="mt-0">
+
+                <div class="select mb-3">
+                    <b i18n="ledStripFunctionTitle"></b>
+                    <select class="functionSelect form-select">
+                        <option value="" i18n="ledStripFunctionNoneOption"></option>
+                        <option value="function-c" class="" i18n="ledStripFunctionColorOption"></option>
+                        <option value="function-f" class="" i18n="ledStripFunctionModesOption"></option>
+                        <option value="function-a" class="" i18n="ledStripFunctionArmOption"></option>
+                        <option value="function-l" class="extra_functions20" i18n="ledStripFunctionBatteryOption"></option>
+                        <option value="function-s" class="extra_functions20" i18n="ledStripFunctionRSSIOption"></option>
+                        <option value="function-g" class="extra_functions20" i18n="ledStripFunctionGPSOption"></option>
+                        <option value="function-r" class="" i18n="ledStripFunctionRingOption"></option>
+                        <option value="function-h" class="channel_info" i18n="ledStripFunctionChannelOption"></option>
+                    </select>
+                </div>
+
+                <div class="modifiers mb-3">
+                    <b i18n="ledStripColorModifierTitle"></b>
+                    <div class="form-check form-switch checkbox">
+                        <input type="checkbox" name="ThrottleHue" class="form-check-input function-t" />
+                        <label class="form-check-label" i18n="ledStripThrottleText"></label>
+                    </div>
+                    <div class="form-check form-switch checkbox extra_functions20">
+                        <input type="checkbox" name="LarsonScanner" class="form-check-input function-o" />
+                        <label class="form-check-label" i18n="ledStripLarsonscannerText"></label>
+                    </div>
+                </div>
+
+                <div class="blinkers extra_functions20 mb-3">
+                    <b i18n="ledStripBlinkTitle"></b>
+                    <div class="form-check form-switch checkbox blinkOverlay">
+                        <input type="checkbox" name="blink" class="form-check-input function-b" />
+                        <label class="form-check-label" i18n="ledStripBlinkAlwaysOverlay"></label>
+                    </div>
+                    <div class="form-check form-switch checkbox landingBlinkOverlay mb-3">
+                        <input type="checkbox" name="landingBlink" class="form-check-input function-n" />
+                        <label class="form-check-label" i18n="ledStripBlinkLandingOverlay"></label>
+                    </div>
+                    <b i18n="ledStripStrobeText"></b>
+                    <div class="form-check form-switch checkbox strobeOverlay">
+                        <input type="checkbox" name="strobe" class="form-check-input function-e" />
+                        <label class="form-check-label" i18n="ledStripEnableStrobeLightEffectText"></label>
+                    </div>
+                </div>
+
+                <div class="overlays mb-3">
+                    <b i18n="ledStripOverlayTitle"></b>
+                    <div class="form-check form-switch checkbox warningOverlay">
+                        <input type="checkbox" name="Warnings" class="form-check-input function-w" />
+                        <label class="form-check-label" i18n="ledStripWarningsOverlay"></label>
+                    </div>
+                    <div class="form-check form-switch checkbox indicatorOverlay">
+                        <input type="checkbox" name="Indicator" class="form-check-input function-i" />
+                        <label class="form-check-label" i18n="ledStripIndecatorOverlay"></label>
+                    </div>
+                </div>
+
+                <div class="channel_info">
+                    <span i18n="ledStripSelectChannelFromColorList"></span>
+                </div>
+
+                <div class="mode_colors mb-3">
+                    <h5 i18n="ledStripModeColorsTitle"></h5>
+                    <hr class="mt-0">
+
+                    <select id="ledStripModeColorsModeSelect" class="modeSelect form-select mb-2">
+                        <option value="0" i18n="ledStripModeColorsModeOrientation"></option>
+                        <option value="1" i18n="ledStripModeColorsModeHeadfree"></option>
+                        <option value="2" i18n="ledStripModeColorsModeHorizon"></option>
+                        <option value="3" i18n="ledStripModeColorsModeAngle"></option>
+                        <option value="4" i18n="ledStripModeColorsModeMag"></option>
+                        <option value="5" i18n="ledStripModeColorsModeBaro"></option>
+                    </select>
+
+                    <button class="btn btn-outline-primary mode_color-0-0 dir-n" i18n="ledStripDirN"></button>
+                    <button class="btn btn-outline-primary mode_color-0-1 dir-e" i18n="ledStripDirE"></button>
+                    <button class="btn btn-outline-primary mode_color-0-2 dir-s" i18n="ledStripDirS"></button>
+                    <button class="btn btn-outline-primary mode_color-0-3 dir-w" i18n="ledStripDirW"></button>
+                    <button class="btn btn-outline-primary mode_color-0-4 dir-u" i18n="ledStripDirU"></button>
+                    <button class="btn btn-outline-primary mode_color-0-5 dir-d" i18n="ledStripDirD"></button>
+                </div>
+
+                <h5 i18n="ledStripModesOrientationTitle"></h5>
+                <hr class="mt-0">
+
+                <div class="directions">
+                    <button class="btn btn-outline-primary dir-n" i18n="ledStripDirN"></button>
+                    <button class="btn btn-outline-primary dir-e" i18n="ledStripDirE"></button>
+                    <button class="btn btn-outline-primary dir-s" i18n="ledStripDirS"></button>
+                    <button class="btn btn-outline-primary dir-w" i18n="ledStripDirW"></button>
+                    <button class="btn btn-outline-primary dir-u" i18n="ledStripDirU"></button>
+                    <button class="btn btn-outline-primary dir-d" i18n="ledStripDirD"></button>
+                </div>
+
+                <div class="colors">
+                    <button class="btn mb-2 color-0" i18n_title="colorBlack">0</button>
+                    <button class="btn mb-2 color-1" i18n_title="colorWhite">1</button>
+                    <button class="btn mb-2 color-2" i18n_title="colorRed">2</button>
+                    <button class="btn mb-2 color-3" i18n_title="colorOrange">3</button>
+                    <button class="btn mb-2 color-4" i18n_title="colorYellow">4</button>
+                    <button class="btn mb-2 color-5" i18n_title="colorLimeGreen">5</button>
+                    <button class="btn mb-2 color-6" i18n_title="colorGreen">6</button>
+                    <button class="btn mb-2 color-7" i18n_title="colorMintGreen">7</button>
+                    <button class="btn mb-2 color-8" i18n_title="colorCyan">8</button>
+                    <button class="btn mb-2 color-9" i18n_title="colorLightBlue">9</button>
+                    <button class="btn mb-2 color-10" i18n_title="colorBlue">10</button>
+                    <button class="btn mb-2 color-11" i18n_title="colorDarkViolet">11</button>
+                    <button class="btn mb-2 color-12" i18n_title="colorMagenta">12</button>
+                    <button class="btn mb-2 color-13" i18n_title="colorDeepPink">13</button>
+                    <button class="btn mb-2 color-14" i18n_title="colorBlack">14</button>
+                    <button class="btn mb-2 color-15" i18n_title="colorBlack">15</button>
+                </div>
+
+                <div class="special_colors mode_colors">
+                    <h5 i18n="ledStripModesSpecialColorsTitle"></h5>
+                    <hr class="mt-0">
+                    <button class="btn btn-outline-primary mode_color-6-0" i18n_title="colorGreen" i18n="ledStripModeColorsModeDisarmed"></button>
+                    <button class="btn btn-outline-primary mode_color-6-1" i18n_title="colorBlue" i18n="ledStripModeColorsModeArmed"></button>
+                    <button class="btn btn-outline-primary mode_color-6-2" i18n_title="colorWhite" i18n="ledStripModeColorsModeAnimation"></button>
+                    <!-- button class="mode_color-6-3" i18n_title="colorBlack">Background</button -->
+                    <button class="btn btn-outline-primary mode_color-6-4" i18n_title="colorBlack" i18n="ledStripModeColorsModeBlinkBg"></button>
+                    <button class="btn btn-outline-primary mode_color-6-5" i18n_title="colorRed" i18n="ledStripModeColorsModeGPSNoSats"></button>
+                    <button class="btn btn-outline-primary mode_color-6-6" i18n_title="colorOrange" i18n="ledStripModeColorsModeGPSNoLock"></button>
+                    <button class="btn btn-outline-primary mode_color-6-7" i18n_title="colorGreen" i18n="ledStripModeColorsModeGPSLocked"></button>
+                </div>
+
+            </div>
+
+            <div class="colorControls"></div>
+        </div>
+    </div>
+
+    <div class="page-footer">
+        <button id="save-btn" class="btn btn-primary" data-i18n="save"></button>
     </div>
 </div>
