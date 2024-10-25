@@ -45,7 +45,6 @@
 }
 
 .tab-led-strip .gPoint.function-r { /* Ring */
-    color: var(--inav-white);
     background: radial-gradient(ellipse at center, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 60%, white 60%,white 70%,black 70%, black 100%);
     box-shadow: inset 0 0 30px rgba(0, 0, 0, .7);
     border-color: black;
@@ -69,6 +68,9 @@
     height: calc(100% - calc(2 * var(--cell-padding)));
     width: calc(100% - calc(2 * var(--cell-padding)));
     border-radius: 4px;
+}
+.tab-led-strip .gPoint.function-r .overlay-color {
+    border-radius: 50%;
 }
 
 .tab-led-strip .gPoint.function-s .overlay-s,
@@ -135,6 +137,11 @@
     width: calc(100% - calc(2 * var(--cell-padding)));
     text-align: center;
     align-self: center;
+}
+
+.tab-led-strip .function-r.color-0 .wire
+{
+    color: var(--inav-white);
 }
 
 .gridWire {
@@ -290,6 +297,10 @@
 .tab-led-strip .colors button {
     color: var(--inav-black);
     width: 23%;
+}
+
+.tab-led-strip .colors button.border {
+    color: var(--inav-body-color);
 }
 
 
