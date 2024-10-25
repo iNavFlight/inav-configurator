@@ -452,7 +452,7 @@ function altitude_alarm_display_function(fn) {
     }
 }
 
-function osdMainBatteryPreview() {
+function osdDecimalsMainBatteryPreview() {
     var s = '16.8';
     if (Settings.getInputValue('osd_main_voltage_decimals') == 2) {
         s += '3';
@@ -460,6 +460,47 @@ function osdMainBatteryPreview() {
 
     s += FONT.symbol(SYM.VOLT);
     return FONT.symbol(SYM.BATT) + FONT.embed_dot(s);
+}
+
+function osdDecimalsAltitudePreview() {
+    var s = ' 114';
+    if (Settings.getInputValue('osd_decimals_altitude') == 4) {
+        s += '3';
+    } if (Settings.getInputValue('osd_decimals_altitude') == 5) {
+        s += '38';
+    }
+
+    switch (OSD.data.preferences.units) {
+        case 0: // Imperial
+        case 3: // UK
+        case 4: // GA
+            s += FONT.symbol(SYM.ALT_FT);
+        default: // Metric
+            s += FONT.symbol(SYM.ALT_M);
+    }
+
+    return s;
+}
+
+function osdDecimalsDistancePreview() {
+    var s = '11.5';
+    if (Settings.getInputValue('osd_decimals_distance') == 4) {
+        s+= '3';
+    } if (Settings.getInputValue('osd_decimals_distance') == 5) {
+        s = '1' + s + '7';
+    }
+
+    switch (OSD.data.preferences.units) {
+        case 0: // Imperial
+        case 3: // UK
+            s += FONT.symbol(SYM.DIST_MI);
+        case 4: // GA
+            s += FONT.symbol(SYM.DIST_NM);
+        default: // Metric
+            s += FONT.symbol(SYM.DIST_KM);
+    }
+
+    return s;
 }
 
 function osdmAhPrecisionPreview() {
@@ -849,12 +890,12 @@ OSD.constants = {
                 {
                     name: 'MAIN_BATT_VOLTAGE',
                     id: 1,
-                    preview: osdMainBatteryPreview,
+                    preview: osdDecimalsMainBatteryPreview,
                 },
                 {
                     name: 'SAG_COMP_MAIN_BATT_VOLTAGE',
                     id: 53,
-                    preview: osdMainBatteryPreview,
+                    preview: osdDecimalsMainBatteryPreview,
                 },
                 {
                     name: 'MAIN_BATT_CELL_VOLTAGE',
@@ -884,17 +925,7 @@ OSD.constants = {
                 {
                     name: 'REMAINING_FLIGHT_DISTANCE',
                     id: 49,
-                    preview: function(osd_data) {
-                        switch (OSD.data.preferences.units) {
-                            case 0: // Imperial
-                            case 3: // UK
-                                return FONT.symbol(SYM.FLIGHT_DIST_REMAINING) + FONT.embed_dot('0.98') + FONT.symbol(SYM.DIST_MI);
-                            case 4: // GA
-                                return FONT.symbol(SYM.FLIGHT_DIST_REMAINING) + FONT.embed_dot('0.85') + FONT.symbol(SYM.DIST_NM);
-                            default: // Metric
-                                return FONT.symbol(SYM.FLIGHT_DIST_REMAINING) + FONT.embed_dot('1.73') + FONT.symbol(SYM.DIST_KM);
-                        }
-                    }
+                    preview: osdDecimalsDistancePreview,
                 },
                 {
                     name: 'THROTTLE_POSITION',
@@ -1232,16 +1263,7 @@ OSD.constants = {
                 {
                     name: 'ALTITUDE',
                     id: 15,
-                    preview: function () {
-                        switch (OSD.data.preferences.units) {
-                            case 0: // Imperial
-                            case 3: // UK
-                            case 4: // GA
-                                return ' 375' + FONT.symbol(SYM.ALT_FT);
-                            default: // Metric
-                                return ' 114' + FONT.symbol(SYM.ALT_M);
-                        }
-                    }
+                    preview: osdDecimalsAltitudePreview,
                 },
                 {
                     name: 'VARIO',
@@ -1606,33 +1628,13 @@ OSD.constants = {
                 {
                     name: 'DISTANCE_TO_HOME',
                     id: 23,
-                    preview: function(osd_data) {
-                        switch (OSD.data.preferences.units) {
-                            case 0: // Imperial
-                            case 3: // UK
-                                return FONT.symbol(SYM.HOME) + FONT.embed_dot('0.98') + FONT.symbol(SYM.DIST_MI);
-                            case 4: // GA
-                                return FONT.symbol(SYM.HOME) + FONT.embed_dot('0.85') + FONT.symbol(SYM.DIST_NM);
-                            default: // Metric
-                                return FONT.symbol(SYM.HOME) + FONT.embed_dot('1.57') + FONT.symbol(SYM.DIST_KM);
-                        }
-                    }
+                    preview: osdDecimalsDistancePreview,
                 },
                 {
                     name: 'TRIP_DIST',
                     id: 40,
                     min_version: '1.9.1',
-                    preview: function(osd_data) {
-                        switch (OSD.data.preferences.units) {
-                            case 0: // Imperial
-                            case 3: // UK
-                                return FONT.symbol(SYM.TRIP_DIST) + FONT.embed_dot('0.98') + FONT.symbol(SYM.DIST_MI);
-                            case 4: // GA
-                                return FONT.symbol(SYM.TRIP_DIST) + FONT.embed_dot('0.85') + FONT.symbol(SYM.DIST_NM);
-                            default: // Metric
-                                return FONT.symbol(SYM.TRIP_DIST) + FONT.embed_dot('1.57') + FONT.symbol(SYM.DIST_KM);
-                        }
-                    }
+                    preview: osdDecimalsDistancePreview,
                 },
                 {
                     name: 'ODOMETER',
@@ -2959,6 +2961,15 @@ OSD.GUI.updateDjiView = function(on) {
             }
         });
 
+        var settings = $('.decimals-container').find('.settings').children();
+        settings.each(function(index, element) {
+            var name = $(element).attr('class');
+            if (!OSD.DjiElements.supportedSettings.includes(name)) {
+                $(element).hide();
+            }
+        });
+
+
         var alarms = $('.alarms-container').find('.settings').children();
         alarms.each(function(index, element) {
             var name = $(element).attr('for');
@@ -2977,7 +2988,7 @@ OSD.GUI.updateDjiView = function(on) {
             .show()
             .removeClass('no-bottom');
 
-        $('.settings-container, .alarms-container').find('.settings').children()
+        $('.settings-container, .decimals-container, .alarms-container').find('.settings').children()
             .show()
             .removeClass('no-bottom');
 
