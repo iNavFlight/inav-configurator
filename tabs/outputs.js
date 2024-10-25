@@ -119,14 +119,12 @@ TABS.outputs.initialize = function (callback) {
                 $('.hide-for-shot').hide();
                 if ($idlePercent.val() > 7.0) {
                     $idleInfoBox.html(i18n.getMessage('throttleIdleDigitalInfo'));
-                    $idleInfoBox.addClass('ok-box');
                     $idleInfoBox.show();
                 }
             } else {
                 $('.hide-for-shot').show();
                 if ($idlePercent.val() > 10.0) {
                     $idleInfoBox.html(i18n.getMessage('throttleIdleAnalogInfo'));
-                    $idleInfoBox.addClass('ok-box');
                     $idleInfoBox.show();
                 }
             }
@@ -264,7 +262,7 @@ TABS.outputs.initialize = function (callback) {
         let $tabServos = $(".tab-servos"),
             $servoEmptyTableInfo = $('#servoEmptyTableInfo'),
             $servoConfigTableContainer = $('#servo-config-table-container'),
-            $servoConfigTable = $('#servo-config-table');
+            $servoConfigTable = $('#servo-config-table tbody');
 
         if (FC.SERVO_CONFIG.length == 0) {
             $tabServos.addClass("is-hidden");
@@ -276,9 +274,9 @@ TABS.outputs.initialize = function (callback) {
             $servoConfigTable.append('\
                 <tr> \
                     <td class="text-center">' + name + '</td>\
-                    <td class="middle"><input type="number" min="500" max="2500" value="' + FC.SERVO_CONFIG[obj].middle + '" /></td>\
-                    <td class="min"><input type="number" min="500" max="2500" value="' + FC.SERVO_CONFIG[obj].min + '" /></td>\
-                    <td class="max"><input type="number" min="500" max="2500" value="' + FC.SERVO_CONFIG[obj].max + '" /></td>\
+                    <td class="middle"><input class="form-control text-end" type="number" min="500" max="2500" value="' + FC.SERVO_CONFIG[obj].middle + '" /></td>\
+                    <td class="min"><input class="form-control text-end" type="number" min="500" max="2500" value="' + FC.SERVO_CONFIG[obj].min + '" /></td>\
+                    <td class="max"><input class="form-control text-end" type="number" min="500" max="2500" value="' + FC.SERVO_CONFIG[obj].max + '" /></td>\
                     <td class="text-center rate">\
                     <td class="text-center reverse">\
                     </td>\
@@ -289,12 +287,14 @@ TABS.outputs.initialize = function (callback) {
 
             // adding select box and generating options
             $currentRow.find('td.rate').append(
-                '<input class="rate-input" type="number" min="' + FC.MIN_SERVO_RATE + '" max="' + FC.MAX_SERVO_RATE + '" value="' + Math.abs(FC.SERVO_CONFIG[obj].rate) + '" />'
+                '<input class="rate-input form-control text-end" type="number" min="' + FC.MIN_SERVO_RATE + '" max="' + FC.MAX_SERVO_RATE + '" value="' + Math.abs(FC.SERVO_CONFIG[obj].rate) + '" />'
             );
 
-            $currentRow.find('td.reverse').append(
-                '<input type="checkbox" class="reverse-input togglemedium" ' + (FC.SERVO_CONFIG[obj].rate < 0 ? ' checked ' : '') + '/>'
-            );
+            $currentRow.find('td.reverse').append(`
+                <div class="form-check form-switch">
+                    <input type="checkbox" class="form-check-input reverse-input" ${(FC.SERVO_CONFIG[obj].rate < 0 ? ' checked ' : '')}/>
+                </div>
+            `);
 
             $currentRow.data('info', { 'obj': obj });
 
@@ -377,12 +377,12 @@ TABS.outputs.initialize = function (callback) {
             }
         });
 
-        $('a.update').on('click', function () {
+        $('#update-btn').on('click', function () {
             features.reset();
             features.fromUI($('.tab-motors'));
             features.execute(servos_update);
         });
-        $('a.save').on('click', function () {
+        $('#save-btn').on('click', function () {
             saveChainer.setExitPoint(function () {
                 //noinspection JSUnresolvedVariable
                 GUI.log(i18n.getMessage('configurationEepromSaved'));
@@ -473,33 +473,30 @@ TABS.outputs.initialize = function (callback) {
             }
         }
 
-        let motors_wrapper = $('.motors .bar-wrapper'),
-            servos_wrapper = $('.servos .bar-wrapper'),
-            $motorTitles = $('.motor-titles'),
-            $motorSliders = $('.motor-sliders'),
-            $motorValues = $('.motor-values');
+        let motorsWrapper = $('#motors-wrapper');
+        let servosWrapper = $('#servos-wrapper');
 
         for (let i = 0; i < FC.MOTOR_RULES.getNumberOfConfiguredMotors(); i++) {
-            const motorNumber = i + 1;
-            motors_wrapper.append('\
-                <div class="m-block motor-' + i + '">\
-                    <div class="meter-bar">\
-                        <div class="label"></div>\
-                        <div class="indicator">\
-                            <div class="label">\
-                                <div class="label"></div>\
-                            </div>\
-                        </div>\
-                    </div>\
-                </div>\
-            ');
-            $motorTitles.append('<li title="Motor - ' + motorNumber + '">' + motorNumber + '</li>');
-            $motorSliders.append('<div class="motor-slider-container"><input type="range" min="1000" max="2000" value="1000" disabled="disabled"/></div>');
-            $motorValues.append('<li>0%</li>');
+            motorsWrapper.append(`
+                <div class="motor-${i} vstack gap-2 mw-4r text-center">
+                    <label class="motor-label">${i + 1}</label>
+                    <div class="progress align-items-end position-relative" style="--inav-progress-height: 10rem;">
+                        <span class="progress-label position-absolute w-100 h-100 fs-6" style="line-height: var(--inav-progress-height)">50%</span>
+                        <div class="progress-bar w-100" style="height: 50%"></div>
+                    </div>
+                    <input class="h-6r" type="range" min="1000" max="2000" value="1000" disabled style="-webkit-appearance: slider-vertical;">
+                    <label class="progress-label">50%</label>
+                </div>
+            `);
         }
 
-        $motorSliders.append('<div class="motor-slider-container"><input type="range" min="1000" max="2000" value="1000" disabled="disabled" class="master"/></div>');
-        $motorValues.append('<li style="font-weight: bold" data-i18n="motorsMaster"></li>');
+
+        motorsWrapper.append(`
+        <div class="vstack gap-2 mw-4r text-center justify-content-end">
+            <input class="master h-6r" type="range" min="1000" max="2000" value="1000" disabled style="-webkit-appearance: slider-vertical;">
+            <label>All</label>
+        </div>
+        `);
 
         for (let i = 0; i < FC.SERVO_RULES.getServoCount(); i++) {
 
@@ -508,18 +505,19 @@ TABS.outputs.initialize = function (callback) {
                 opacity = ' style="opacity: 0.2"';
             }
 
-            servos_wrapper.append('\
-                <div class="m-block servo-' + (15 - i) + '" ' + opacity + '>\
-                    <div class="meter-bar">\
-                        <div class="label"></div>\
-                        <div class="indicator">\
-                            <div class="label">\
-                                <div class="label"></div>\
-                            </div>\
-                        </div>\
-                    </div>\
-                </div>\
-            ');
+            if (15 - i < 0) {
+                continue;
+            };
+
+            servosWrapper.append(`
+                <div class="servo-indicator servo-${15 - i} vstack gap-2 mw-4r text-center" ${opacity}>
+                    <label class="motor-label">${15 - i}</label>
+                    <div class="progress align-items-end position-relative" style="--inav-progress-height: 7rem;">
+                        <span class="progress-label position-absolute w-100 h-100 fs-6" style="line-height: var(--inav-progress-height)">1500</span>
+                        <div class="progress-bar w-100" style="height: 50%"></div>
+                    </div>
+                </div>
+            `);
         }
 
         var $slidersInput = $('div.sliders input');
@@ -662,7 +660,7 @@ TABS.outputs.initialize = function (callback) {
 
         function update_ui() {
             var previousArmState = self.armed,
-                block_height = $('div.m-block:first').height(),
+                block_height = $('.servo-indicator:first').height(),
                 data,
                 margin_top,
                 height,
@@ -675,8 +673,8 @@ TABS.outputs.initialize = function (callback) {
                 height = (data * (block_height / full_block_scale)).clamp(0, block_height);
                 color = parseInt(data * 0.009);
 
-                $('.motor-' + i + ' .label', motors_wrapper).text(getMotorOutputValue(FC.MOTOR_DATA[i]));
-                $('.motor-' + i + ' .indicator', motors_wrapper).css({ 'margin-top': margin_top + 'px', 'height': height + 'px', 'background-color': 'var(--inav-primary)' + color + ')' });
+                $('.motor-' + i + ' .progress-label', motorsWrapper).text(getMotorOutputValue(FC.MOTOR_DATA[i]));
+                $('.motor-' + i + ' .progress-bar', motorsWrapper).css({'height': height + '%'});
             }
 
             // servo indicators are still using old (not flexible block scale), it will be changed in the future accordingly
@@ -686,8 +684,8 @@ TABS.outputs.initialize = function (callback) {
                 height = (data * (block_height / 1000)).clamp(0, block_height);
                 color = parseInt(data * 0.009);
 
-                $('.servo-' + i + ' .label', servos_wrapper).text(FC.SERVO_DATA[i]);
-                $('.servo-' + i + ' .indicator', servos_wrapper).css({ 'margin-top': margin_top + 'px', 'height': height + 'px', 'background-color': 'var(--inav-primary)' + color + ')' });
+                $('.servo-' + i + ' .progress-label', servosWrapper).text(FC.SERVO_DATA[i]);
+                $('.servo-' + i + ' .progress-bar', servosWrapper).css({'height': height + '%'});
             }
             //keep the following here so at least we get a visual cue of our motor setup
             update_arm_status();
