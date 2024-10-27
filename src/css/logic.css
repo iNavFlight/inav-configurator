@@ -11,14 +11,14 @@
 
 .logic__content {
     position: fixed;
-    top: 2em;
+    top: 4em;
     bottom: 2em;
-    left: 4em;
-    right: 4em;
-    background-color: #efefef;
+    left: 6em;
+    right: 6em;
+    background-color: var(--inav-body-bg);
     border-radius: 2px;
     z-index: 2002;
-    padding: 2em;
+    /*padding: 1em;*/
 }
 
 .logic__content--wrapper {

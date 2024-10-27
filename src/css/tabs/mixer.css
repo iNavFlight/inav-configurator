@@ -1,98 +1,3 @@
-.mixer-load-button {
-    position: absolute;
-    right: 0;
-    bottom: 1em;
-    margin-left: 185px;
-    width: calc(100% - 175px);
-}
-
-.mixer-load-button > div {
-    margin-left: 1em;
-}
-
-.mixer-table {
-    width: 100%;
-    text-align: center;
-}
-
-.mixer-table thead {
-    display: table-header-group !important;
-}
-
-.mixer-table input {
-    width: 80%;
-    margin: 0 5px;
-}
-
-.mixer-table .delete {
-    width: 75px;
-}
-
-.mixer-table .btn {
-    float: none;
-}
-
-/* .mixer-table tbody tr:first-child, */
-.mixer-table thead tr {
-    border-left: var(--inav-border-width) var(--inav-border-color) solid;
-    border-right: var(--inav-border-width) var(--inav-border-color) solid;
-    background-color: rgba(var(--inav-emphasis-color-rgb), 0.05);
-    color: var(--inav-body-color);
-}
-
-.mixer-table td,
-.mixer-table th {
-    padding: 2px;
-    height: 2.5em;
-}
-
-.mixer-table tr:nth-child(even) td,
-.mixer-table tr:nth-child(even) th {
-    background-color: rgba(var(--inav-emphasis-color-rgb), 0.05);;
-}
-
-.tab-mixer .rightWrapper {
-    margin-bottom: 0 !important;
-}
-
-.output-table {
-    width: 100%;
-    border-spacing: 1px;
-    border-collapse: separate;
-}
-
-.output-table th {
-    background-color: var(--inav-tertiary-bg);
-    text-align: left;
-    padding-left: 1rem;
-}
-
-.output-table td {
-    text-align: center;
-    padding: 2px;
-}
-
-.output-table td, .output-table th {
-    height: 2.2em;
-}
-
-.output-table #output-row td {
-    font-weight: bold;
-}
-
-.output-table #function-row td {
-}
-
-.mixer_btn_add {
-    float: right;
-    margin: 15px 0 10px;
-}
-
-.mixer_btn_logic {
-    float: left;
-    margin: 15px 0 10px;
-}
-
 .mixer-fixed-value-col {
     display: none;
 }
@@ -102,20 +7,22 @@
 }
 
 .outputImageNumber {
+    text-align: center;
+    line-height: 1.25rem;
     position: absolute;
     background-color: #FFF;
-    font-family: 'open_sansbold', Arial, serif;
-    width: 18px;
-    height: 18px;
-    border: 2.5px solid #ff00ff;
+    color: black;
+    width: 2rem;
+    height: 1.5rem;
+    border: 2px solid #ff00ff;
     border-radius: 4px;
 }
 
 .outputImageNumber.isMotor {
-    width: 29px;
-    height: 29px;
-    line-height: 27px;
-    border-radius: 20px;
+    width: 2.5rem;
+    height: 2.5rem;
+    line-height: 2.25rem;
+    border-radius: 50%;
 }
 
 
