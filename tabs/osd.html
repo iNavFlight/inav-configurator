@@ -98,33 +98,6 @@
                                 <div for="unit_mode" class="helpicon cf_tip" style="margin-top: 2px"></div>
                             </label>
                             <label>
-                                <select class="update_preview" data-setting="osd_main_voltage_decimals" data-live="true"></select>
-                                <span data-i18n="osd_main_voltage_decimals"></span>
-                            </label>
-                            <label>
-                                <select class="update_preview" data-setting="osd_mah_precision" data-live="true"></select>
-                                <span data-i18n="osd_mah_precision"></span>
-                            </label>
-                            <label>
-                                <select class="update_preview" data-setting="osd_coordinate_digits" data-live="true"></select>
-                                <span data-i18n="osd_coordinate_digits"></span>
-                            </label>
-                            <div for="plusCodeDigits" class="helpicon cf_tip" data-i18n_title="osdSettingPLUS_CODE_DIGITS_HELP"></div>
-                            <label>
-                                <select id="plusCodeDigits" class="update_preview" data-setting="osd_plus_code_digits" data-live="true"></select>
-                                <span data-i18n="osd_plus_code_digits"></span>
-                            </label>
-                            <div for="plusCodeShort" class="helpicon cf_tip" data-i18n_title="osdSettingPLUS_CODE_SHORT_HELP"></div>
-                            <label>
-                                <select id="plusCodeShort" class="update_preview" data-setting="osd_plus_code_short" data-live="true"></select>
-                                <span data-i18n="osd_plus_code_short"></span>
-                            </label>
-                            <div for="rpmPrecision" class="helpicon cf_tip osd_use_esc_telemetry" data-i18n_title="osd_esc_rpm_precision_help"></div>
-                            <label class="osd_use_esc_telemetry">
-                                <select id="rpmPrecision" class="update_preview" data-setting="osd_esc_rpm_precision" data-live="true"></select>
-                                <span data-i18n="osd_esc_rpm_precision"></span>
-                            </label>
-                            <label>
                                 <select class="update_preview" data-setting="osd_crosshairs_style" data-live="true"></select>
                                 <span data-i18n="osd_crosshairs_style"></span>
                             </label>
@@ -148,6 +121,50 @@
                             <label>
                                 <input type="checkbox" class="toggle update_preview" data-setting="osd_home_position_arm_screen" data-live="true">
                                 <span data-i18n="osd_home_position_arm_screen"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="gui_box grey decimals-container">
+                    <div class="gui_box_titlebar">
+                        <div class="spacer_box_title" data-i18n="decimals"></div>
+                    </div>
+                    <div class="spacer_box">
+                        <div class="settings">
+                            <label>
+                                <select class="update_preview" data-setting="osd_main_voltage_decimals" data-live="true"></select>
+                                <span data-i18n="osd_main_voltage_decimals"></span>
+                            </label>
+                            <label>
+                                <select class="update_preview" data-setting="osd_decimals_altitude" data-live="true"></select>
+                                <span data-i18n="osd_decimals_altitude"></span>
+                            </label>
+                            <label>
+                                <select class="update_preview" data-setting="osd_decimals_distance" data-live="true"></select>
+                                <span data-i18n="osd_decimals_distance"></span>
+                            </label>
+                            <label>
+                                <select class="update_preview" data-setting="osd_mah_precision" data-live="true"></select>
+                                <span data-i18n="osd_mah_precision"></span>
+                            </label>
+                            <label>
+                                <select class="update_preview" data-setting="osd_coordinate_digits" data-live="true"></select>
+                                <span data-i18n="osd_coordinate_digits"></span>
+                            </label>
+                            <div for="plusCodeDigits" class="helpicon cf_tip" data-i18n_title="osdSettingPLUS_CODE_DIGITS_HELP"></div>
+                            <label>
+                                <select id="plusCodeDigits" class="update_preview" data-setting="osd_plus_code_digits" data-live="true"></select>
+                                <span data-i18n="osd_plus_code_digits"></span>
+                            </label>
+                            <div for="plusCodeShort" class="helpicon cf_tip" data-i18n_title="osdSettingPLUS_CODE_SHORT_HELP"></div>
+                            <label>
+                                <select id="plusCodeShort" class="update_preview" data-setting="osd_plus_code_short" data-live="true"></select>
+                                <span data-i18n="osd_plus_code_short"></span>
+                            </label>
+                            <div for="rpmPrecision" class="helpicon cf_tip osd_use_esc_telemetry" data-i18n_title="osd_esc_rpm_precision_help"></div>
+                            <label class="osd_use_esc_telemetry">
+                                <select id="rpmPrecision" class="update_preview" data-setting="osd_esc_rpm_precision" data-live="true"></select>
+                                <span data-i18n="osd_esc_rpm_precision"></span>
                             </label>
                         </div>
                     </div>
@@ -251,15 +268,16 @@
                             <input id="osd_gforce_axis_alarm_max" data-setting="osd_gforce_axis_alarm_max" data-setting-multiplier="1" type="number" data-step="0.1" />
                             <span data-i18n="osd_gforce_axis_alarm_max"></span>
                         </label>
-                        <div for="adsb_distance_warning" class="helpicon cf_tip" data-i18n_title="osdAlarmADSB_MAX_DISTANCE_WARNING"></div>
-                        <label for="adsb_distance_warning">
-                            <input id="adsb_distance_warning" data-setting="osd_adsb_distance_warning" data-unit="m" data-setting-multiplier="1" type="number" data-step="1" />
-                            <span data-i18n="osd_adsb_distance_warning"></span>
-                        </label>
+        
                         <div for="adsb_distance_alert" class="helpicon cf_tip" data-i18n_title="osdAlarmADSB_MAX_DISTANCE_ALERT"></div>
                         <label for="adsb_distance_alert">
                             <input id="adsb_distance_alert" data-setting="osd_adsb_distance_alert" data-unit="m" data-setting-multiplier="1" type="number" data-step="1" />
                             <span data-i18n="osd_adsb_distance_alert"></span>
+                        </label>
+                        <div for="adsb_distance_warning" class="helpicon cf_tip" data-i18n_title="osdAlarmADSB_MAX_DISTANCE_WARNING"></div>
+                        <label for="adsb_distance_warning">
+                            <input id="adsb_distance_warning" data-setting="osd_adsb_distance_warning" data-unit="m" data-setting-multiplier="1" type="number" data-step="1" />
+                            <span data-i18n="osd_adsb_distance_warning"></span>
                         </label>
                     </div>
                 </div>
