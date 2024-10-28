@@ -530,3 +530,21 @@ input::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
+
+.battery-wrapper {
+  --element-width: .25rem;
+  --element-height: .75rem;
+  position: relative;
+  border-radius: 2px;
+  width: 3rem;
+  height: 1.5rem;
+  margin-right: var(--element-width);
+}
+.battery-element {
+  width: var(--element-width);
+  height: var(--element-height);
+  background: var(--inav-secondary-border-subtle);
+  position: absolute;
+  right: calc(-2px - var(--element-width));
+  top: calc(50% - var(--element-height) / 2);
+}
