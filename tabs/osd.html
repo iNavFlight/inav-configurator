@@ -90,33 +90,6 @@
                             <div for="unit_mode" class="helpicon cf_tip"></div>
                         </li>
                         <li class="list-group-item hstack">
-                            <select class="update_preview form-select w-7r" data-setting="osd_main_voltage_decimals" data-live="true"></select>
-                            <label data-i18n="osd_main_voltage_decimals"></label>
-                        </li>
-                        <li class="list-group-item hstack">
-                            <select class="update_preview form-select w-7r" data-setting="osd_mah_precision" data-live="true"></select>
-                            <label data-i18n="osd_mah_precision"></label>
-                        </li>
-                        <li class="list-group-item hstack">
-                            <select class="update_preview form-select w-7r" data-setting="osd_coordinate_digits" data-live="true"></select>
-                            <label data-i18n="osd_coordinate_digits"></label>
-                        </li>
-                        <li class="list-group-item hstack">
-                            <select id="plusCodeDigits" class="update_preview form-select w-7r" data-setting="osd_plus_code_digits" data-live="true"></select>
-                            <label for="plusCodeDigits" data-i18n="osd_plus_code_digits"></label>
-                            <div for="plusCodeDigits" class="helpicon cf_tip" data-i18n_title="osdSettingPLUS_CODE_DIGITS_HELP"></div>
-                        </li>
-                        <li class="list-group-item hstack">
-                            <select id="plusCodeShort" class="update_preview form-select w-7r" data-setting="osd_plus_code_short" data-live="true"></select>
-                            <label for="plusCodeShort" data-i18n="osd_plus_code_short"></label>
-                            <div for="plusCodeShort" class="helpicon cf_tip" data-i18n_title="osdSettingPLUS_CODE_SHORT_HELP"></div>
-                        </li>
-                        <li class="list-group-item hstack osd_use_esc_telemetry">
-                            <select id="rpmPrecision" class="update_preview form-select w-7r" data-setting="osd_esc_rpm_precision" data-live="true"></select>
-                            <label for="rpmPrecision" data-i18n="osd_esc_rpm_precision"></label>
-                            <div for="rpmPrecision" class="helpicon cf_tip" data-i18n_title="osd_esc_rpm_precision_help"></div>
-                        </li>
-                        <li class="list-group-item hstack">
                             <select class="update_preview form-select w-7r" data-setting="osd_crosshairs_style" data-live="true"></select>
                             <label data-i18n="osd_crosshairs_style"></label>
                         </li>
@@ -146,9 +119,48 @@
                             </div>
                         </li>
                     </ul>
-
-                    <div class="settings">
-                    </div>
+                </div>
+            </div>
+            <div class="card mb-3 decimals-container">
+                <div class="card-header" data-i18n="decimals"></div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush settings">
+                        <li class="list-group-item hstack">
+                            <select class="update_preview form-select w-7r" data-setting="osd_main_voltage_decimals" data-live="true"></select>
+                            <label data-i18n="osd_main_voltage_decimals"></label>
+                        </li>
+                        <li class="list-group-item hstack">
+                            <select class="update_preview form-select w-7r" data-setting="osd_decimals_altitude" data-live="true"></select>
+                            <label data-i18n="osd_decimals_altitude"></label>
+                        </li>
+                        <li class="list-group-item hstack">
+                            <select class="update_preview form-select w-7r" data-setting="osd_decimals_distance" data-live="true"></select>
+                            <label data-i18n="osd_decimals_distance"></label>
+                        </li>
+                        <li class="list-group-item hstack">
+                            <select class="update_preview form-select w-7r" data-setting="osd_mah_precision" data-live="true"></select>
+                            <label data-i18n="osd_mah_precision"></label>
+                        </li>
+                        <li class="list-group-item hstack">
+                            <select class="update_preview form-select w-7r" data-setting="osd_coordinate_digits" data-live="true"></select>
+                            <label data-i18n="osd_coordinate_digits"></label>
+                        </li>
+                        <li class="list-group-item hstack">
+                            <select id="plusCodeDigits" class="update_preview form-select w-7r" data-setting="osd_plus_code_digits" data-live="true"></select>
+                            <label for="plusCodeDigits" data-i18n="osd_plus_code_digits"></label>
+                            <div for="plusCodeDigits" class="helpicon cf_tip" data-i18n_title="osdSettingPLUS_CODE_DIGITS_HELP"></div>
+                        </li>
+                        <li class="list-group-item hstack">
+                            <select id="plusCodeShort" class="update_preview form-select w-7r" data-setting="osd_plus_code_short" data-live="true"></select>
+                            <label for="plusCodeShort" data-i18n="osd_plus_code_short"></label>
+                            <div for="plusCodeShort" class="helpicon cf_tip" data-i18n_title="osdSettingPLUS_CODE_SHORT_HELP"></div>
+                        </li>
+                        <li class="list-group-item hstack osd_use_esc_telemetry">
+                            <select id="rpmPrecision" class="update_preview form-select w-7r" data-setting="osd_esc_rpm_precision" data-live="true"></select>
+                            <label for="rpmPrecision" data-i18n="osd_esc_rpm_precision"></label>
+                            <div for="rpmPrecision" class="helpicon cf_tip" data-i18n_title="osd_esc_rpm_precision_help"></div>
+                        </li>
+                    </ul>
                 </div>
             </div>
             <div class="card mb-3 alarms-container">
@@ -247,14 +259,14 @@
                             <div for="osd_gforce_axis_alarm_max" class="helpicon cf_tip" data-i18n_title="osdAlarmGFORCE_AXIS_MAX_HELP"></div>
                         </li>
                         <li class="list-group-item hstack">
-                            <input id="adsb_distance_warning" class="form-control w-7r" data-setting="osd_adsb_distance_warning" data-unit="m" data-setting-multiplier="1" type="number" data-step="1" />
-                            <label for="adsb_distance_warning" data-i18n="osd_adsb_distance_warning"></label>
-                            <div for="adsb_distance_warning" class="helpicon cf_tip" data-i18n_title="osdAlarmADSB_MAX_DISTANCE_WARNING"></div>
-                        </li>
-                        <li class="list-group-item hstack">
                             <input id="adsb_distance_alert" class="form-control w-7r" data-setting="osd_adsb_distance_alert" data-unit="m" data-setting-multiplier="1" type="number" data-step="1" />
                             <label for="adsb_distance_alert" data-i18n="osd_adsb_distance_alert"></label>
                             <div for="adsb_distance_alert" class="helpicon cf_tip" data-i18n_title="osdAlarmADSB_MAX_DISTANCE_ALERT"></div>
+                        </li>
+                        <li class="list-group-item hstack">
+                            <input id="adsb_distance_warning" class="form-control w-7r" data-setting="osd_adsb_distance_warning" data-unit="m" data-setting-multiplier="1" type="number" data-step="1" />
+                            <label for="adsb_distance_warning" data-i18n="osd_adsb_distance_warning"></label>
+                            <div for="adsb_distance_warning" class="helpicon cf_tip" data-i18n_title="osdAlarmADSB_MAX_DISTANCE_WARNING"></div>
                         </li>
                     </ul>
                 </div>

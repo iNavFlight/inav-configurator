@@ -3608,6 +3608,12 @@
     "osd_main_voltage_decimals": {
         "message": "Voltage Decimals"
     },
+    "osd_decimals_altitude": {
+        "message": "Altitude Decimals"
+    },
+    "osd_decimals_distance": {
+        "message": "Distance Decimals"
+    },
     "osd_mah_precision": {
         "message": "mAh Precision"
     },
@@ -4795,6 +4801,9 @@
     },
     "settings": {
         "message": "Settings"
+    },
+    "decimals": {
+        "message": "Decimals"
     },
     "motorMixer": {
         "message": "Motor Mixer"
