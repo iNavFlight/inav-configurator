@@ -631,7 +631,8 @@ OSD.constants = {
         'DJIWTF',
         'AVATAR',
         'BF43COMPAT',
-        'BFHDCOMPAT'
+        'BFHDCOMPAT',
+		'DJINEW'
     ],
     VIDEO_LINES: {
         PAL: 16,
@@ -640,7 +641,8 @@ OSD.constants = {
         DJIWTF: 22,
         AVATAR: 20,
         BF43COMPAT: 16,
-        BFHDCOMPAT: 20
+        BFHDCOMPAT: 20,
+        DJINEW: 20
     },
     VIDEO_COLS: {
         PAL: 30,
@@ -649,7 +651,8 @@ OSD.constants = {
         DJIWTF: 60,
         AVATAR: 53,
         BF43COMPAT: 30,
-        BFHDCOMPAT: 53
+        BFHDCOMPAT: 53,
+        DJINEW: 53,
     },
     VIDEO_BUFFER_CHARS: {
         PAL: 480,
@@ -659,6 +662,7 @@ OSD.constants = {
         AVATAR: 1060,
         BF43COMPAT: 480,
         BFHDCOMPAT: 1060
+        DJINEW: 1060
     },
     UNIT_TYPES: [
         {name: 'osdUnitImperial', value: 0},
@@ -2325,9 +2329,9 @@ OSD.updateDisplaySize = function () {
     $('.preview').toggleClass('preview_hdzero cut43_left', (video_type == 'HDZERO'))
     $('.third_right').toggleClass('preview_hdzero_side', (video_type == 'HDZERO'))
     // -- BFHDCOMPAT
-    $('.third_left').toggleClass('preview_bfhdcompat_side', (video_type == 'BFHDCOMPAT'))
-    $('.preview').toggleClass('preview_bfhdcompat cut43_left', (video_type == 'BFHDCOMPAT'))
-    $('.third_right').toggleClass('preview_bfhdcompat_side', (video_type == 'BFHDCOMPAT'))
+    $('.third_left').toggleClass('preview_bfhdcompat_side', (video_type == 'BFHDCOMPAT' || video_type == 'DJINEW'))
+    $('.preview').toggleClass('preview_bfhdcompat cut43_left', (video_type == 'BFHDCOMPAT' || video_type == 'DJINEW'))
+    $('.third_right').toggleClass('preview_bfhdcompat_side', (video_type == 'BFHDCOMPAT' || video_type == 'DJINEW'))
 
     OSD.GUI.updateGuidesView($('#videoGuides').find('input').is(':checked'));
 };
@@ -2616,7 +2620,7 @@ OSD.GUI.checkAndProcessSymbolPosition = function(pos, charCode) {
     }
 };
 
-const mspVideoSystem = [1,3,4,5,6,7];   // indexes of PAL, HDZERO, DJIWTF, AVATAR, BF43COMPAT & BFHDCOMPAT
+const mspVideoSystem = [1,3,4,5,6,7,8];   // indexes of PAL, HDZERO, DJIWTF, AVATAR, BF43COMPAT, BFHDCOMPAT & DJINEW
 const analogVideoSystem = [0,1,2];  // indexes of AUTO, PAL, & NTSC
 
 OSD.GUI.updateVideoMode = function() {
@@ -2929,7 +2933,7 @@ OSD.GUI.updateGuidesView = function(on) {
     $('.hd_avatar_storage_box_left').toggleClass('hd_avatar_storagebox_l', (isAvatar && on))
     $('.hd_avatar_storage_box_right').toggleClass('hd_avatar_storagebox_r', (isAvatar && on))
 
-    let isBfHdCompat = OSD.constants.VIDEO_TYPES[OSD.data.preferences.video_system] == 'BFHDCOMPAT';
+    let isBfHdCompat = OSD.constants.VIDEO_TYPES[OSD.data.preferences.video_system] == 'BFHDCOMPAT' || OSD.constants.VIDEO_TYPES[OSD.data.preferences.video_system] == 'DJINEW';
     $('.hd_43_margin_left').toggleClass('hd_bfhdcompat_43_left', (isBfHdCompat && on));
     $('.hd_43_margin_right').toggleClass('hd_bfhdcompat_43_right', (isBfHdCompat && on));
     $('.hd_bfhdcompat_bottom_box').toggleClass('hd_bfhdcompat_bottom', (isBfHdCompat && on));
