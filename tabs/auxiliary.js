@@ -141,7 +141,7 @@ TABS.auxiliary.initialize = function (callback) {
         $(newMode).data('modeName', LOCAL_AUX_CONFIG[modeIndex]);
 
         $(newMode).find('.name').data('modeElement', newMode);
-        $(newMode).find('a.addRange').data('modeElement', newMode);
+        $(newMode).find('.addRange').data('modeElement', newMode);
 
         return newMode;
     }
@@ -286,7 +286,7 @@ TABS.auxiliary.initialize = function (callback) {
             return auxChannelIndexCandidates[0];
         }
 
-        $('a.addRange').on('click', function () {
+        $('.addRange').on('click', function () {
             var modeElement = $(this).data('modeElement');
 
             var firstUnusedChannel = findFirstUnusedChannel(modeElement);
@@ -295,10 +295,10 @@ TABS.auxiliary.initialize = function (callback) {
         });
 
         // translate to user-selected language
-       i18n.localize();;
+       i18n.localize();
 
         // UI Hooks
-        $('a.save').on('click', function () {
+        $('#save-btn').on('click', function () {
 
             // update internal data structures based on current UI elements
 
@@ -499,7 +499,7 @@ TABS.auxiliary.initialize = function (callback) {
 
         let hideUnusedModes = false;
         let hideUnusedModesStore =  store.get('hideUnusedModes', false);
-        $("input#switch-toggle-unused")
+        $("#switch-toggle-unused")
             .on('change', function () {
                 hideUnusedModes = $(this).prop("checked");
                 store.set('hideUnusedModes', hideUnusedModes);
@@ -514,8 +514,6 @@ TABS.auxiliary.initialize = function (callback) {
         // enable data pulling
         interval.add('aux_data_pull', get_rc_data, 50);
 
-        $(".tab-auxiliary .acroEnabled").width($("#mode-0 .info").width());
-
         GUI.content_ready(callback);
     }
 };
@@ -523,7 +521,3 @@ TABS.auxiliary.initialize = function (callback) {
 TABS.auxiliary.cleanup = function (callback) {
     if (callback) callback();
 };
-
-$(window).on('resize', function(){
-    $(".tab-auxiliary .acroEnabled").width($("#mode-0 .info").width());
-});

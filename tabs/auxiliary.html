@@ -1,72 +1,67 @@
-<div class="tab-auxiliary toolbar_fixed_bottom">
-    <div class="content_wrapper">
-        <div class="tab_title" i18n="tabAuxiliary">tabAuxiliary</div>
-        <div class="note spacebottom">
-            <div class="note_spacer">
-                <p i18n="auxiliaryHelp"></p>
-            </div>
-        </div>
-        <div class="toolbox">
-            <form>
-                <input type="checkbox" id="switch-toggle-unused" name="switch-toggle-unused" class="toggle" />
-                <span i18n="auxiliaryToggleUnused"></span>
-            </form>
-        </div>
-        <table class="modes">
+<div class="page tab-auxiliary ">
+    <div class="page-header">
+        <span data-i18n="tabAuxiliary"></span>
+    </div>
+
+    <div class="alert alert-warning" i18n="auxiliaryHelp"></div>
+
+    <div class="form-check form-switch mb-2">
+        <input id="switch-toggle-unused" class="form-check-input" type="checkbox">
+        <label class="form-check-label" for="switch-toggle-unused" i18n="auxiliaryToggleUnused"></label>
+    </div>
+
+    <div class="mb-3">
+        <table class="modes table">
             <tbody>
             </tbody>
         </table>
     </div>
-    <div class="content_toolbar">
-        <div class="btn save_btn">
-            <a class="save" href="#" i18n="auxiliaryButtonSave"></a>
+
+    <div class="page-footer justify-content-between">
+        <div class="acroEnabled w-10r">
+            <span i18n="auxiliaryAcroEnabled"></span>
         </div>
-    </div>
-    <div class="acroEnabled">
-        <span i18n="auxiliaryAcroEnabled"></span>
+        <button id="save-btn" class="btn btn-primary" data-i18n="auxiliaryButtonSave"></button>
     </div>
 </div>
-<div id="tab-auxiliary-templates">
+
+<div id="tab-auxiliary-templates" class="d-none">
     <table class="modes">
         <tbody>
-            <tr class="mode">
-                <td class="info">
-                    <p class="name"></p>
-                    <div class="buttons">
-                        <a class="addRange" href="#" i18n="auxiliaryAddRange"></a>
-                    </div>
+            <tr class="mode border-bottom">
+                <td class="info w-10r h-8r vstack p-3 text-center justify-content-between bg-secondary-subtle">
+                    <span class="name"></span>
+                    <button class="addRange btn btn-light" href="#" i18n="auxiliaryAddRange"></button>
                 </td>
-                <td class="ranges"></td>
+                <td class="ranges w-100 border-end"></td>
             </tr>
         </tbody>
     </table>
-    <div class="range">
-        <div class="channelInfo">
-            <select class="channel">
+    <div class="range d-flex gap-3">
+        <div class="vstack min-w-7r mw-10r p-3 gap-2 text-center">
+            <select class="channel form-select form-select-sm">
                 <option value=""></option>
             </select>
             <div class="limits">
-                <p class="lowerLimit">
-                    <span i18n="auxiliaryMin"></span>: <span class="lowerLimitValue"></span>
-                </p>
-                <p class="upperLimit">
-                    <span i18n="auxiliaryMax"></span>: <span class="upperLimitValue"></span>
-                </p>
+                <div class="lowerLimit">
+                    <small i18n="auxiliaryMin"></small>: <small class="lowerLimitValue"></small>
+                </div>
+                <div class="upperLimit">
+                    <small i18n="auxiliaryMax"></small>: <small class="upperLimitValue"></small>
+                </div>
             </div>
         </div>
-        <div class="channel-slider pips-channel-range">
+        <div class="channel-slider pips-channel-range w-100 mt-3">
             <div class="marker"></div>
         </div>
-        <div class="delete">
-            <a class="deleteRange" href="#">&nbsp;</a>
+        <div class="delete p-3">
+            <a class="deleteRange mt-1" href="#">&nbsp;</a>
         </div>
     </div>
     <table>
         <tr class="modeSection">
-            <td colspan="2">
-                <div class="modeSectionArea">
-                    <p class="modeSectionName"></p>
-                </div>
+            <td class="p-0 pt-3" colspan="2">
+                <div class="modeSectionName bg-primary p-3 rounded-top text-white fw-bold"></div>
             </td>
         </tr>
     </table>

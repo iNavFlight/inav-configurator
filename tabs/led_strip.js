@@ -532,7 +532,7 @@ TABS.led_strip.initialize = function (callback, scrollPosition) {
 
         });
 
-        $('a.save').on('click', function () {
+        $('#save-btn').on('click', function () {
 
             mspHelper.sendLedStripConfig(send_led_strip_colors);
 
@@ -658,7 +658,7 @@ TABS.led_strip.initialize = function (callback, scrollPosition) {
 
         var remaining = FC.LED_STRIP.length - usedWireNumbers.length;
 
-        $('.wires-remaining div').html(remaining);
+        $('#remaining-led').html(remaining);
     }
 
     // refresh mode color buttons

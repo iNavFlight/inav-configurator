@@ -39,7 +39,7 @@ TABS.firmware_flasher.initialize = function (callback) {
         i18n.localize();
 
         function enable_load_online_button() {
-            $(".load_remote_file").text(i18n.getMessage('firmwareFlasherButtonLoadOnline')).removeClass('disabled');
+            $("#load_remote_file").text(i18n.getMessage('firmwareFlasherButtonLoadOnline')).removeClass('disabled');
         }
 
         function parse_hex(str, callback) {
@@ -284,7 +284,7 @@ TABS.firmware_flasher.initialize = function (callback) {
             }
             $('select[name="board"]').empty().append('<option value="0">Offline</option>');
             $('select[name="firmware_version"]').empty().append('<option value="0">Offline</option>');
-            $('a.auto_select_target').addClass('disabled');
+            $('#auto_select_target').addClass('disabled');
         });
 
 
@@ -295,15 +295,15 @@ TABS.firmware_flasher.initialize = function (callback) {
             // bind events
             $('select[name="board"]').on('change', function () {
 
-                $("a.load_remote_file").addClass('disabled');
+                $("#load_remote_file").addClass('disabled');
                 var target = $(this).children("option:selected").text();
 
                 if (!GUI.connect_lock) {
-                    $('.progress').val(0).removeClass('valid invalid');
+                    $('.progress').removeClass('valid invalid');
                     $('span.progressLabel').text(i18n.getMessage('firmwareFlasherLoadFirmwareFile'));
                     $('div.git_info').slideUp();
                     $('div.release_info').slideUp();
-                    $('a.flash_firmware').addClass('disabled');
+                    $('#flash_firmware').addClass('disabled');
 
                     var versions_e = $('select[name="firmware_version"]').empty();
                     if(target == 0) {
@@ -326,7 +326,7 @@ TABS.firmware_flasher.initialize = function (callback) {
                 }
             });
 
-            $('a.auto_select_target').removeClass('disabled');
+            $('#auto_select_target').removeClass('disabled');
             TABS.firmware_flasher.getTarget();
         }).fail(function (data){
             if (data["responseJSON"]){
@@ -334,10 +334,10 @@ TABS.firmware_flasher.initialize = function (callback) {
             }
             $('select[name="board"]').empty().append('<option value="0">Offline</option>');
             $('select[name="firmware_version"]').empty().append('<option value="0">Offline</option>');
-            $('a.auto_select_target').addClass('disabled');
+            $('#auto_select_target').addClass('disabled');
         });
 
-        $('a.load_file').on('click', function () {
+        $('#load_file').on('click', function () {
 
             var options = {
                 filters: [ { name: "HEX file", extensions: ['hex'] } ]
@@ -369,7 +369,7 @@ TABS.firmware_flasher.initialize = function (callback) {
                         parsed_hex = data;
 
                         if (parsed_hex) {
-                            $('a.flash_firmware').removeClass('disabled');
+                            $('#flash_firmware').removeClass('disabled');
 
                             $('span.progressLabel').text('Loaded Local Firmware: (' + parsed_hex.bytes_total + ' bytes)');
                         } else {
@@ -387,16 +387,16 @@ TABS.firmware_flasher.initialize = function (callback) {
          */
         $('select[name="firmware_version"]').on('change', function(evt){
             $('div.release_info').slideUp();
-            $('a.flash_firmware').addClass('disabled');
+            $('#flash_firmware').addClass('disabled');
             if (evt.target.value=="0") {
-                $("a.load_remote_file").addClass('disabled');
+                $("#load_remote_file").addClass('disabled');
             }
             else {
                 enable_load_online_button();
             }
         });
 
-        $('a.load_remote_file').on('click', function () {
+        $('#load_remote_file').on('click', function () {
 
             if ($('select[name="firmware_version"]').val() == "0") {
                 GUI.log(i18n.getMessage('noFirmwareSelectedToLoad'));
@@ -414,7 +414,7 @@ TABS.firmware_flasher.initialize = function (callback) {
 
                         $('span.progressLabel').html('<a class="save_firmware" href="#" title="Save Firmware">Loaded Online Firmware: (' + parsed_hex.bytes_total + ' bytes)</a>');
 
-                        $('a.flash_firmware').removeClass('disabled');
+                        $('#flash_firmware').removeClass('disabled');
 
                         if (summary.commit) {
                             $.get('https://api.github.com/repos/iNavFlight/inav/commits/' + summary.commit, function (data) {
@@ -468,13 +468,13 @@ TABS.firmware_flasher.initialize = function (callback) {
 
             function failed_to_load() {
                 $('span.progressLabel').text(i18n.getMessage('firmwareFlasherFailedToLoadOnlineFirmware'));
-                $('a.flash_firmware').addClass('disabled');
+                $('#flash_firmware').addClass('disabled');
                 enable_load_online_button();
             }
 
             var summary = $('select[name="firmware_version"] option:selected').data('summary');
             if (summary) { // undefined while list is loading or while running offline
-                $(".load_remote_file").text(i18n.getMessage('firmwareFlasherButtonLoading')).addClass('disabled');
+                $("#load_remote_file").text(i18n.getMessage('firmwareFlasherButtonLoading')).addClass('disabled');
                 $.get(summary.url, function (data) {
                     enable_load_online_button();
                     process_hex(data, summary);
@@ -484,9 +484,13 @@ TABS.firmware_flasher.initialize = function (callback) {
             }
         });
 
-        $('a.flash_firmware').on('click', function () {
+        $('#flash_firmware').on('click', function () {
             if (!$(this).hasClass('disabled')) {
                 if (!GUI.connect_lock) { // button disabled while flashing is in progress
+                    $('.app-content').animate({
+                        scrollTop: $("#flasher-progress-bar").offset().top
+                    }, 250);
+
                     if (parsed_hex != false) {
                         var options = {};
 
@@ -494,9 +498,9 @@ TABS.firmware_flasher.initialize = function (callback) {
                             options.erase_chip = true;
                         }
 
-                        if (String($('div#port-picker #port').val()) != 'DFU') {
-                            if (String($('div#port-picker #port').val()) != '0') {
-                                var port = String($('div#port-picker #port').val()),
+                        if (String($('#port').val()) != 'DFU') {
+                            if (String($('#port').val()) != '0') {
+                                var port = String($('#port').val()),
                                     baud;
 
                                 switch (GUI.operating_system) {
@@ -515,7 +519,7 @@ TABS.firmware_flasher.initialize = function (callback) {
                                 if ($('input.updating').is(':checked')) {
                                     options.no_reboot = true;
                                 } else {
-                                    options.reboot_baud = parseInt($('div#port-picker #baud').val());
+                                    options.reboot_baud = parseInt($('#baud').val());
                                 }
 
                                 if ($('input.flash_manual_baud').is(':checked')) {
@@ -656,7 +660,7 @@ TABS.firmware_flasher.initialize = function (callback) {
 
                             // Trigger regular Flashing sequence
                             timeout.add('initialization_timeout', function () {
-                                $('a.flash_firmware').trigger( "click" );
+                                $('#flash_firmware').trigger( "click" );
                             }, 100); // timeout so bus have time to initialize after being detected by the system
                         } else {
                             GUI.log('Detected <strong>' + port + '</strong> - previous device still flashing, please replug to try again');
@@ -695,11 +699,11 @@ TABS.firmware_flasher.initialize = function (callback) {
         $(document).keypress(function (e) {
             if (e.which == 13) { // enter
                 // Trigger regular Flashing sequence
-                $('a.flash_firmware').trigger( "click" );
+                $('#flash_firmware').trigger( "click" );
             }
         });
 
-        $('a.auto_select_target').on('click', function () {
+        $('#auto_select_target').on('click', function () {
             TABS.firmware_flasher.getTarget();
         });
 
@@ -742,8 +746,7 @@ TABS.firmware_flasher.flashingMessage = function(message, type) {
 };
 
 TABS.firmware_flasher.flashProgress = function(value) {
-    $('.progress').val(value);
-
+    $('#flasher-progress-bar').css('width', `${value}%`);
     return this;
 };
 
@@ -823,7 +826,7 @@ TABS.firmware_flasher.onOpen = function(openInfo) {
         MSP.send_message(MSPCodes.MSP_API_VERSION, false, false, function () {
             
             if (FC.CONFIG.apiVersion === "0.0.0") {
-                GUI_control.prototype.log("Cannot prefetch target: <span style='color: red; font-weight: bolder'><strong>" + i18n.getMessage("illegalStateRestartRequired") + "</strong></span>");
+                GUI_control.prototype.log("Cannot prefetch target: <span style='color: var(--inav-danger); font-weight: bolder'><strong>" + i18n.getMessage("illegalStateRestartRequired") + "</strong></span>");
                 FC.restartRequired = true;
                 return;
             }

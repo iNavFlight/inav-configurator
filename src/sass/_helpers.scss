@@ -1,0 +1,51 @@
+// .w-1r, .w-2r ... .w-20r
+@for $i from 1 through 25 {
+  .w-#{$i}r {
+    width: #{$i}rem;
+  }
+}
+
+// .mw-1r, .mw-2r ... .mw-20r
+@for $i from 1 through 25 {
+  .mw-#{$i}r {
+    max-width: #{$i}rem;
+  }
+}
+
+// .min-w-1r, .min-w-2r ... .min-w-20r
+@for $i from 1 through 25 {
+  .min-w-#{$i}r {
+    min-width: #{$i}rem;
+  }
+}
+
+// .h-1r, .h-2r ... .h-20r
+@for $i from 1 through 25 {
+  .h-#{$i}r {
+    height: #{$i}rem;
+  }
+}
+
+// .h-1r, .h-2r ... .h-20r
+@for $i from 1 through 25 {
+  .min-h-#{$i}r {
+    min-height: #{$i}rem;
+  }
+}
+
+
+[data-bs-theme="light"] .d-none-dark {
+  display: none !important;
+}
+
+[data-bs-theme="light"] .d-none-light {
+  display: unset !important;
+}
+
+[data-bs-theme="dark"] .d-none-light {
+  display: none !important;
+}
+
+[data-bs-theme="dark"] .d-none-dark {
+  display: unset !important;
+}

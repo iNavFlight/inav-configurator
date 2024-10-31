@@ -1,34 +1,17 @@
-
-.tab-led-strip .help {
-    padding: 10px;
-    background-color: #ffcb18;
-    margin-bottom: 10px;
-}
-
-.tab-led-strip .section {
-    color: #565656;
-    margin: 20px 0 5px 0;
-    border-bottom: 1px solid silver;
-}
-
-.tab-led-strip .mainGrid {
-    width: calc((24px + 7px) * 16);
-    height: calc((24px + 7px) * 16);
-    float: left;
-    margin-right: 10px;
-    border-radius: 3px;
-    background-color: #dcdcdc;
-    border: silver;
+.tab-led-strip {
+    --cell-padding: 3px;
+    --overlay-indicator-size: 8px;
 }
 
 .tab-led-strip .mainGrid .gPoint {
-    float: left;
-    border: solid 1px #ADADAD;
-    width: 23px;
-    height: 23px;
-    margin: 3px;
-    border-radius: 7px;
-    background: #ececec;
+    aspect-ratio: 1;
+    color: var(--inav-black);
+    position: relative;
+    display: flex;
+    padding: var(--cell-padding);
+    border: var(--inav-border-width) var(--inav-border-color) solid;
+    border-radius: var(--inav-border-radius-lg);
+    background: var(--inav-tertiary-bg);
     cursor: pointer;
 }
 
@@ -40,7 +23,6 @@
 
 .tab-led-strip .gPoint.function-c { /* Color */
     background: linear-gradient( to bottom right, rgba(255, 0, 0, .5) 0%, rgba(255, 255, 0, 0.5) 15%, rgba(0, 255, 0, .5) 30%, rgba(0, 255, 255, .5) 50%, rgba(0, 0, 255, .5) 65%, rgba(255, 0, 255, .5) 80%, rgba(255, 0, 0, .5) 100%);
-    box-shadow: inset 0 0 30px rgba(0, 0, 0, .7);
     border-color: grey;
 }
 
@@ -82,12 +64,13 @@
 
 .tab-led-strip .gPoint.function-c .overlay-color,
 .tab-led-strip .gPoint.function-r .overlay-color {
-    float: left;
-    height: 15px;
-    width: 15px;
-    margin-top: -23px;
-    margin-left: 4px;
+    position: absolute;
+    height: calc(100% - calc(2 * var(--cell-padding)));
+    width: calc(100% - calc(2 * var(--cell-padding)));
     border-radius: 4px;
+}
+.tab-led-strip .gPoint.function-r .overlay-color {
+    border-radius: 50%;
 }
 
 .tab-led-strip .gPoint.function-s .overlay-s,
@@ -97,150 +80,104 @@
 .tab-led-strip .gPoint.function-o .overlay-o,
 .tab-led-strip .gPoint.function-b .overlay-b,
 .tab-led-strip .gPoint.function-n .overlay-n {
-    float: left;
-    height: 6px;
-    width: 16px;
+    position: absolute;
+    z-index: 2;
+    height: var(--overlay-indicator-size);
+    width: var(--overlay-indicator-size);
+    border-radius: 50%;
+    box-shadow: inset 0 0 1px rgba(0, 0, 0, .75);
 }
 
 .tab-led-strip .gPoint.function-w .overlay-w {
-    background-image: radial-gradient(1px at 8px 50% , red 0%, red 2px, rgba(0, 0, 0, 0.3) 3px, rgba(0, 0, 0, 0) 4px);
-    margin-top: -30px;
-    margin-left: -9px;
+    background-color: red;
+    top: 0;
+    left: 0;
 }
 
 .tab-led-strip .gPoint.function-i .overlay-i {
-    background-image: radial-gradient(1px at 8px 50% , yellow 0%, yellow 2px, rgba(0, 0, 0, 0.3) 3px, rgba(0, 0, 0, 0) 4px);
-    margin-top: -30px;
-    margin-left: 16px;
+    background-color: yellow;
+    top: 0;
+    right: 0;
 }
 
 .tab-led-strip .gPoint.function-t .overlay-t {
-    background-image: radial-gradient(1px at 8px 50% , orange 0%, orange 2px, rgba(0, 0, 0, 0.3) 3px, rgba(0, 0, 0, 0) 4px);
-    margin-top: -6px;
-    margin-left: -9px;
+    background-color: orange;
+    left: 0;
+    bottom: 0;
 }
 
 .tab-led-strip .gPoint.function-s .overlay-s {
-    background-image: radial-gradient(1px at 8px 50% , brown 0%, brown 2px, rgba(0, 0, 0, 0.3) 3px, rgba(0, 0, 0, 0) 4px);
-    margin-top: -6px;
+    background-color: brown;
+    margin-top: 6px;
     margin-left: 16px;
 }
 
 .tab-led-strip .gPoint.function-o .overlay-o {
-    background-image: radial-gradient(1px at 8px 50% , brown 0%, brown 2px, rgba(0, 0, 0, 0.3) 3px, rgba(0, 0, 0, 0) 4px);
-    margin-top: -6px;
-    margin-left: 16px;
+    background-color: brown;
+    right: 0;
+    bottom: 0;
 }
 
 .tab-led-strip .gPoint.function-b .overlay-b {
-    background-image: radial-gradient(1px at 8px 50% , rgb(52, 155, 255) 0%, rgb(52, 155, 255) 2px, rgba(0, 0, 0, 0.3) 3px, rgba(0, 0, 0, 0) 4px);
-    margin-top: -18px;
-    margin-left: -9px;
+    background-color: rgb(52, 155, 255);
+    top: calc(50% - calc(var(--overlay-indicator-size) / 2));
+    left: 0;
 }
 
 .tab-led-strip .gPoint.function-n .overlay-n {
-    background-image: radial-gradient(1px at 8px 50% , blue 0%, blue 2px, rgba(0, 0, 0, 0.3) 3px, rgba(0, 0, 0, 0) 4px);
-    margin-top: -18px;
-    margin-left: 16px;
-}
-
-
-.tab-led-strip .gPoint select {
-    background: #000;
-    width: 13px;
-    height: 13px;
+    background-color: blue;
+    top: calc(50% - calc(var(--overlay-indicator-size) / 2));
+    right: 0;
 }
 
 .tab-led-strip .wire {
-    color: rgba(255,255,255,.5);
+    color: inherit;
+    position: absolute;
+    z-index: 1;
+    width: calc(100% - calc(2 * var(--cell-padding)));
     text-align: center;
-    font-size: 12px;
-    text-shadow: 1px 1px rgba(0,0,0,.4);
-    padding-top: 0;
-    display: block;
-    /* font-family: monospace; */
-    margin-left: -1px;
-    margin-top: -21px;
-    width: 24px;
-    height: 24px;
+    align-self: center;
 }
 
-.gridWire .wire {
-    color: rgba(255,255,255,1);
+.tab-led-strip .function-r.color-0 .wire
+{
+    color: var(--inav-white);
 }
 
 .gridWire {
-    background: rgba(15, 171, 22, .5) !important;
+    background: var(--inav-success-bg-subtle);
 }
 
 /*function buttons*/
-
-.tab-led-strip button {
-    text-align: center;
-    font-weight: bold;
-    border: 1px solid silver;
-    background-color: #ececec;
-    border-radius: 3px;
-    padding: 7px 6px;
-    margin: 3px 0;
-}
-
-.tab-led-strip button:hover {
-    background-color: #acacac;
-}
-
 .tab-led-strip .funcWire.btnOn {
-    background: rgb(15, 171, 22);
-}
-
-
-.tab-led-strip .w100 {
-    width: 100%;
-}
-
-.tab-led-strip .w50 {
-    width: 49%;
+    background: var(--inav-primary-bg-subtle);
 }
 
 /* Drop-down boxes */
-
-.tab-led-strip .select {    background: white;}
 .tab-led-strip .select .function-c {
     background: linear-gradient( to bottom right, rgba(255, 0, 0, .5) 0%, rgba(255, 255, 0, 0.5) 15%, rgba(0, 255, 0, .5) 30%, rgba(0, 255, 255, .5) 50%, rgba(0, 0, 255, .5) 65%, rgba(255, 0, 255, .5) 80%, rgba(255, 0, 0, .5) 100%);
 }
 
-.tab-led-strip .select .function-f {    background: rgb(50, 205, 50);}
-.tab-led-strip .select .function-a {    background: rgb(52, 155, 255);}
-.tab-led-strip .select .function-l {    background: magenta;}
-.tab-led-strip .select .function-s {    background: brown;}
-.tab-led-strip .select .function-g {    background: green;}
+.tab-led-strip .select .function-f {    background-color: rgb(50, 205, 50);}
+.tab-led-strip .select .function-a {    background-color: rgb(52, 155, 255);}
+.tab-led-strip .select .function-l {    background-color: magenta;}
+.tab-led-strip .select .function-s {    background-color: brown;}
+.tab-led-strip .select .function-g {    background-color: green;}
 /* .tab-led-strip .select .function-b {    background: white;    color:black;} */
-.tab-led-strip .select .function-r {    background: #acacac;}
-.tab-led-strip .select .function-h {    background: skyblue;}
+.tab-led-strip .select .function-r {    background-color: #acacac;}
+.tab-led-strip .select .function-h {    background-color: skyblue;}
 
 .tab-led-strip .select .functionSelect option {
     background: white;
     color: black;
 }
 
-
-.tab-led-strip .overlays,
-.tab-led-strip .blinkers,
-.tab-led-strip .modifiers {
-    display: inline-block;
-}
-
 .tab-led-strip .colorDefineSliders {
     display: inline-block;
     position: absolute;
     z-index: 10000;
-    background: white;
-    padding: 5px;
+    background: var(--inav-body-bg);
     margin: 10px;
-    border-color: #565656;
-    border-style: solid;
-    border-radius: 6px;
-    border-width: 2px;
 }
 
 .tab-led-strip .color-1 {background: white;}
@@ -257,26 +194,10 @@
 .tab-led-strip .color-12 {background: magenta;}
 .tab-led-strip .color-13 {background: deeppink;}
 
-
-.tab-led-strip .directions button.btnOn,
-.tab-led-strip .colors .btnOn,
-.tab-led-strip .special_colors button.btnOn,
-.tab-led-strip .mode_colors button.btnOn {
-    border-color: #000;
-}
-
-.tab-led-strip .colors button:hover {
-    border-color: inherit;
-    border-style: solid;
-}
-
-.tab-led-strip .directions .btnOn {
-    background: #FFF; color: #000;
-}
-
 .tab-led-strip .indicators {
     position: relative;
-    height: 24px
+    height: 24px;
+    width: 100%;
 }
 
 .tab-led-strip .indicators span {
@@ -289,59 +210,60 @@
 }
 
 .tab-led-strip .indicators .north {
-    top: -9px;
-    left: 4px;
+    top: -8px;
+    left: calc(50% - 7px);
     border-left: 7px solid transparent;
     border-right: 7px solid transparent;
-    border-bottom: 7px solid rgba(0,0,0,.8);
+    border-bottom: 7px solid var(--inav-body-color);
 }
 
 .tab-led-strip .indicators .south {
     bottom: -8px;
-    left: 4px;
+    left: calc(50% - 7px);
     border-left: 7px solid transparent;
     border-right: 7px solid transparent;
-    border-top: 7px solid rgba(0,0,0,.8);
+    border-top: 7px solid var(--inav-body-color);
 }
 
 .tab-led-strip .indicators .east {
-    bottom: 7px;
-    right: -9px;
+    bottom: calc(50% - 7px);
+    right: -8px;
     border-top: 7px solid transparent;
     border-bottom: 7px solid transparent;
-    border-left: 7px solid rgba(0,0,0,.8);
+    border-left: 7px solid var(--inav-body-color);
 }
 
 .tab-led-strip .indicators .west {
-    bottom: 7px;
-    left: -9px;
+    bottom: calc(50% - 7px);
+    left: -8px;
     border-top: 7px solid transparent;
     border-bottom: 7px solid transparent;
-    border-right: 7px solid rgba(0,0,0,.8);
+    border-right: 7px solid var(--inav-body-color);
 }
 
 .tab-led-strip .indicators .up {
+    color: var(--inav-black);
     top: 0;
     left: 2px;
 }
 
 .tab-led-strip .indicators .down {
-    bottom: 17px;
-    right: 10px;
+    color: var(--inav-black);
+    bottom: 1rem;
+    left: 2px;
 }
 
 .tab-led-strip .dir-n .north {display: inline;}
 .tab-led-strip .dir-s .south {display: inline;}
 .tab-led-strip .dir-e .east {display: inline;}
 .tab-led-strip .dir-w .west {display: inline;}
-.tab-led-strip .dir-u .up {display: inline;}
-.tab-led-strip .dir-d .down {display: inline;}
-
-.tab-led-strip .controls {
-    position: relative;
-    float: left;
-    width: 285px;
-    margin-right: 10px;
+.tab-led-strip .dir-u .up {
+    display: inline;
+    z-index: 3;
+}
+.tab-led-strip .dir-d .down {
+    display: inline;
+    z-index: 3;
 }
 
 .colorDefineSliderValue,
@@ -373,52 +295,27 @@
 .tab-led-strip .directions .dir-d {right: 10px; top: 54px;}
 
 .tab-led-strip .colors button {
+    color: var(--inav-black);
     width: 23%;
 }
 
-.tab-led-strip .wires-remaining {
-    float: right;
-    text-align: center;
-    font-size: 14px;
+.tab-led-strip .colors button.border {
+    color: var(--inav-body-color);
 }
 
-.tab-led-strip .wires-remaining div {
-    font-size: 40px;
-    color: #ffbb00;
-    margin-bottom: -5px;
-    margin-top: -10px;
+
+.tab-led-strip .wires-remaining #remaining-led {
+    color: var(--inav-warning);
 }
 
-.tab-led-strip .wires-remaining.error div {
-    color: #FF5700;
+.tab-led-strip .wires-remaining.error #remaining-led {
+    color: var(--inav-danger);
 }
-
-.tab-led-strip > .buttons {
-    margin-top: 10px;
-}
-
-.gridSections {
-    position: absolute;
-    z-index: -1;
-    width: 496px;
-    border: 1px solid rgb(236, 236, 236);
-    margin-top: -1px;
-    margin-left: -1px;
-    border-radius: 3px;
-}
-
-.gridSections .block {
-    width: 122px;
-    height: 122px;
-    float: left;
-    border: solid 1px rgb(236, 236, 236);
-}
-
 
 /*******JQUERYUI**********/
 
 .tab-led-strip .ui-selected {
-    box-shadow: inset 0 0 8px rgba(255, 0, 255, 1) !important;
+    box-shadow: inset 0 0 2px 4px rgba(255, 0, 255, 1) !important;
     border: solid 1px #000 !important;
 }
 

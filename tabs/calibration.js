@@ -89,7 +89,7 @@ TABS.calibration.initialize = function (callback) {
     function reinitialize() {
         //noinspection JSUnresolvedVariable
         GUI.log(i18n.getMessage('deviceRebooting'));
-        GUI.handleReconnect($('.tab_calibration a'));
+        GUI.handleReconnect($('[data-tab="calibration"] > a'));
     }
 
     function loadHtml() {
@@ -223,19 +223,19 @@ TABS.calibration.initialize = function (callback) {
     }
 
     function processHtml() {
-        $('#calibrateButtonSave').on('click', function () {
+        $('#save-btn').on('click', function () {
             FC.CALIBRATION_DATA.opflow.Scale = parseFloat($('[name=OpflowScale]').val());
             saveChainer.execute();
         });
 
         if (FC.SENSOR_CONFIG.magnetometer === 0) {
-            //Comment for test
-            $('#mag_btn, #mag-calibrated-data').css('pointer-events', 'none').css('opacity', '0.4');
+            $('#mag-calibrated-data').css('opacity', '0.5');
+            $('#mag-calibrated-data button, #mag-calibrated-data input').attr('disabled', 'disabled');
         }
 
         if (FC.SENSOR_CONFIG.opflow === 0) {
-            //Comment for test
-            $('#opflow_btn, #opflow-calibrated-data').css('pointer-events', 'none').css('opacity', '0.4');
+            $('#opflow-calibrated-data').css('opacity', '0.5');
+            $('#opflow-calibrated-data button, #opflow-calibrated-data input').attr('disabled', 'disabled');
         }
 
         $('#mag_btn').on('click', function () {

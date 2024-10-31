@@ -1,0 +1,29 @@
+// Form Switch overrides
+.form-switch {
+  --switch-height: 1.4rem;
+  --switch-width-sm: 2.25rem;
+  --switch-height-sm: 1rem;
+
+  .form-check-input {
+    background-color: var(--inav-gray);
+    height: var(--switch-height);
+    cursor: pointer;
+    margin-top: 0;
+    border: none;
+
+    &:checked {
+      background-color: var(--inav-primary);
+    }
+  }
+
+  &.form-switch-sm {
+    padding-left: calc(var(--switch-width-sm) + .5rem);
+
+    .form-check-input {
+      width: var(--switch-width-sm);
+      height: var(--switch-height-sm);
+      margin-left: calc(calc(var(--switch-width-sm) + .5rem) * -1);
+      margin-top: .25rem;
+    }
+  }
+}

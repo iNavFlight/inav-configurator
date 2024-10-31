@@ -1,285 +1,300 @@
-<div class="tab-configuration tab-mixer toolbar_fixed_bottom">
-    <div class="content_wrapper" id="mixer-main-content">
-        <div class="tab_title" data-i18n="tabMixer">Mixer</div>
-        <!-- Top row -->
-        <div>
-            <div class="leftWrapper">
-                <div class="platform-type gui_box grey">
-                    <div class="gui_box_titlebar">
-                        <div class="spacer_box_title" data-i18n="platformConfiguration"></div>
-                    </div>
-                    <div class="spacer_box">
-                        <div class="select">
-                            <select id="platform-type"></select>
-                            <label for="platform-type">
-                                <span data-i18n="platformType"></span>
-                            </label>
-                        </div>
-                        <div class="radio">
-                            <fieldset>
-                            <legend>Motor direction</legend>
-                            <label for="motor_direction_normal">
-                                <input id="motor_direction_normal" name="motor_direction_inverted" type="radio"
-                                        value="0" data-setting="motor_direction_inverted" class="left" />
-                                <span data-i18n="motor_direction_inverted"></span>
-                            </label><br class="clear-both"/>
+<div class="page tab-motors">
+    <div class="page-header">
+        <span data-i18n="tabMixer"></span>
+    </div>
 
-                            <label class="checkbox-inline">
-                                <input id="motor_direction_inverted" name="motor_direction_inverted" type="radio"
-                                        value="1" data-setting="motor_direction_inverted" class="left"/>
-                                <span data-i18n="motor_direction_isInverted"></span>
-                            </span></label>
-
+    <div class="row">
+        <div class="col">
+            <div class="card mb-3">
+                <div class="card-header" data-i18n="platformConfiguration"></div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item hstack">
+                            <select id="platform-type" class="form-select w-12r"></select>
+                            <label for="platform-type" data-i18n="platformType"></label>
+                        </li>
+                        <li class="list-group-item hstack justify-content-between">
+                            <div>
+                                <h5>Motor direction</h5>
+                                <div class="form-check">
+                                    <input id="motor_direction_normal" class="form-check-input" name="motor_direction_inverted" type="radio" value="0" data-setting="motor_direction_inverted"  />
+                                    <label class="form-check-label" for="motor_direction_normal" data-i18n="motor_direction_inverted"></label>
+                                </div>
+                                <div class="form-check">
+                                    <input id="motor_direction_inverted" class="form-check-input" name="motor_direction_inverted" type="radio" value="1" data-setting="motor_direction_inverted"  />
+                                    <label class="form-check-label" for="motor_direction_inverted" data-i18n="motor_direction_isInverted"></label>
+                                </div>
+                            </div>
                             <div class="helpicon cf_tip" data-i18n_title="motor_direction_inverted_hint"></div>
-                          </fieldset>
-                        </div>
-
-
-                        <div class="checkbox">
-                            <input id="mixer_pid_profile_linking" type="checkbox" class="toggle" data-setting="mixer_pid_profile_linking" />
-                            <label for="mixer_pid_profile_linking"><span data-i18n="mixer_pid_profile_linking"></span></label>
+                        </li>
+                        <li class="list-group-item hstack justify-content-between">
+                            <div class="form-check form-switch">
+                                <input type="checkbox" class="form-check-input" id="mixer_pid_profile_linking" data-setting="mixer_pid_profile_linking"/>
+                                <label for="mixer_pid_profile_linking" class="form-check-label" data-i18n="mixer_pid_profile_linking"></label>
+                            </div>
                             <div class="helpicon cf_tip" data-i18n_title="mixer_pid_profile_linking_hint"></div>
-                        </div>
-                    </div>
+                        </li>
+                    </ul>
                 </div>
-            
-                <div class="platform-type gui_box grey">
-                    <div class="gui_box_titlebar">
-                        <div class="spacer_box_title" data-i18n="timerOutputs"></div>
-                    </div>
-                    <div class="spacer_box" id="timerOutputsList" style="padding: 0; width: calc(100% - 12px)"></div>
-                </div>
-
             </div>
-            <div class="rightWrapper">
-                <div class="platform-type gui_box grey">
-                    <div class="gui_box_titlebar">
-                        <div class="spacer_box_title" data-i18n="mixerPresetTitle"></div>
-                    </div>
-                    <div class="spacer_box">
-                        <div class="select position-relative">
-                            <div class="mixerPreview" style="max-width: 175px">
-                                <img src="./resources/motor_order/custom.svg" id="motor-mixer-preview-img"/>
+
+            <div class="card mb-3">
+                <div class="card-header" data-i18n="timerOutputs"></div>
+                <div id="timerOutputsList"></div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card mb-3">
+                <div class="card-header" data-i18n="mixerPresetTitle"></div>
+                <div class="card-body">
+                    <div class="d-flex gap-3">
+                        <div style="width: 180px;">
+                            <div class="mixerPreview card position-relative bg-body bg-grid mb-3" style="width: 180px; padding: 5px;">
+                                <img src="./resources/motor_order/custom.svg" style="width: 168px;" id="motor-mixer-preview-img"/>
                                 <div class="motorNumber is-hidden" id="motorNumber1">1</div>
                                 <div class="motorNumber is-hidden" id="motorNumber2">2</div>
                                 <div class="motorNumber is-hidden" id="motorNumber3">3</div>
                                 <div class="motorNumber is-hidden" id="motorNumber4">4</div>
                             </div>
-                            <div class="half" style="width: calc(50% - 10px); margin-left: 10px;">
-                                <select id="mixer-preset"></select>
-                            </div>
+                            <select id="mixer-preset" class="form-select"></select>
+                        </div>
+                        <div class="flex-grow-1">
+                            <div id="needToUpdateMixerMessage" class="is-hidden alert alert-warning" data-i18n="mixerNotLoaded"></div>
 
-                            <div class="mixer-load-button">
-                                <div id="needToUpdateMixerMessage" class="is-hidden" data-i18n="mixerNotLoaded"></div>
-                                <div class="btn default_btn narrow red">
-                                    <a id="load-and-apply-mixer-button" href="#" data-i18n="mixerLoadAndApplyPresetRules"></a>
-                                </div>
-                                <div class="btn default_btn narrow">
-                                    <a id="load-mixer-button" href="#" data-i18n="mixerLoadPresetRules"></a>
-                                </div>
-                                <div class="btn default_btn narrow is-hidden">
-                                    <a id="refresh-mixer-button" href="#" data-i18n="mixerRefreshCurrentRules"></a>
-                                </div>
-                            </div>
+                            <button class="btn btn-outline-danger" id="load-and-apply-mixer-button"  data-i18n="mixerLoadAndApplyPresetRules"></button>
+                            <button class="btn btn-outline-primary" id="load-mixer-button" data-i18n="mixerLoadPresetRules"></button>
+                            <button class="btn btn-outline-primary" id="refresh-mixer-button" data-i18n="mixerRefreshCurrentRules"></button>
                         </div>
                     </div>
                 </div>
-                <div class="platform-type gui_box grey" id="mixer-wizard-gui_box" is-hidden>
-                    <div class="gui_box_titlebar">
-                        <div class="spacer_box_title" data-i18n="mixerWizard"></div>
-                    </div>
-                
-                    <div class="spacer_box">
-                        <div class="btn default_btn narrow green">
-                            <a id="mixer-wizard" href="#" data-i18n="mixerWizard"></a>
-                        </div>
-                    </div>
+            </div>
+
+<!--            <div class="platform-type gui_box grey">-->
+<!--                <div class="gui_box_titlebar">-->
+<!--                    <div class="spacer_box_title" data-i18n="mixerPresetTitle"></div>-->
+<!--                </div>-->
+<!--                <div class="spacer_box">-->
+<!--                    <div class="select position-relative">-->
+<!--                        <div class="mixerPreview" style="max-width: 175px">-->
+<!--                            <img src="./resources/motor_order/custom.svg" style="max-width: 175px;" id="motor-mixer-preview-img"/>-->
+<!--                            <div class="motorNumber is-hidden" id="motorNumber1">1</div>-->
+<!--                            <div class="motorNumber is-hidden" id="motorNumber2">2</div>-->
+<!--                            <div class="motorNumber is-hidden" id="motorNumber3">3</div>-->
+<!--                            <div class="motorNumber is-hidden" id="motorNumber4">4</div>-->
+<!--                        </div>-->
+<!--                        <div class="half" style="width: calc(50% - 10px); margin-left: 10px;">-->
+<!--                            <select id="mixer-preset"></select>-->
+<!--                        </div>-->
+
+<!--                        <div class="mixer-load-button">-->
+<!--                            <div id="needToUpdateMixerMessage" class="is-hidden" data-i18n="mixerNotLoaded"></div>-->
+<!--                            <div class="btn default_btn narrow red">-->
+<!--                                <a id="load-and-apply-mixer-button" href="#" data-i18n="mixerLoadAndApplyPresetRules"></a>-->
+<!--                            </div>-->
+<!--                            <div class="btn default_btn narrow">-->
+<!--                                <a id="load-mixer-button" href="#" data-i18n="mixerLoadPresetRules"></a>-->
+<!--                            </div>-->
+<!--                            <div class="btn default_btn narrow is-hidden">-->
+<!--                                <a id="refresh-mixer-button" href="#" data-i18n="mixerRefreshCurrentRules"></a>-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
+
+            <div class="card mb-3" id="mixer-wizard-gui_box">
+                <div class="card-header" data-i18n="mixerWizard"></div>
+                <div class="card-body d-grid">
+                    <button id="mixer-wizard" class="btn btn-outline-primary" data-i18n="mixerWizard"></button>
                 </div>
+            </div>
+
+
+<!--            <div class="platform-type gui_box grey" id="mixer-wizard-gui_box" is-hidden>-->
+<!--                <div class="gui_box_titlebar">-->
+<!--                    <div class="spacer_box_title" data-i18n="mixerWizard"></div>-->
+<!--                </div>-->
+
+<!--                <div class="spacer_box">-->
+<!--                    <div class="btn default_btn narrow green">-->
+<!--                        <a id="mixer-wizard" href="#" data-i18n="mixerWizard"></a>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
+        </div>
+    </div>
+
+    <div class="card mb-3">
+        <div class="card-header" data-i18n="mappingTableTitle"></div>
+        <table class="table table-bordered table-striped align-middle">
+            <tr id="output-row"></tr>
+            <tr id="function-row"></tr>
+        </table>
+    </div>
+
+    <div class="card mb-3">
+        <div class="card-header" data-i18n="motorMixer"></div>
+        <table id="motor-mix-table" class="table table-bordered table-striped align-middle">
+            <thead>
+            <tr>
+                <th style="width: 75px" data-i18n="controlAxisMotor"></th>
+                <th data-i18n="controlAxisThrottle"></th>
+                <th data-i18n="controlAxisRoll"></th>
+                <th data-i18n="controlAxisPitch"></th>
+                <th data-i18n="controlAxisYaw"></th>
+                <th style="width: 1%;" class="delete"></th>
+            </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+        <div class="d-flex justify-content-end p-3 pt-0">
+            <button class="btn btn-primary" data-role="role-motor-add" data-i18n="servoMixerAdd"></button>
+        </div>
+    </div>
+
+    <div class="card mb-3">
+        <div class="card-header" data-i18n="servoMixer"></div>
+        <table id="servo-mix-table" class="table table-bordered table-striped align-middle">
+            <thead>
+            <tr>
+                <th style="width: 75px" data-i18n="servo"></th>
+                <th data-i18n="input"></th>
+                <th data-i18n="fixedValue" class="mixer-fixed-value-col"></th>
+                <th data-i18n="weight"></th>
+                <th data-i18n="speed"></th>
+                <th data-i18n="active"></th>
+                <th style="width: 1%;" class="delete"></th>
+            </tr>
+            </thead>
+            <tbody>
+
+            </tbody>
+        </table>
+
+        <div class="d-flex justify-content-between p-3 pt-0">
+            <button class="btn btn-outline-primary" data-role="role-logic-conditions-open" data-i18n="tabLogicConditions"></button>
+            <button class="btn btn-primary" data-role="role-servo-add" data-i18n="servoMixerAdd"></button>
+        </div>
+
+    </div>
+
+    <div class="page-footer gap-2">
+        <button id="save-btn" class="btn btn-primary" data-i18n="configurationButtonSave"></button>
+    </div>
+</div>
+
+<div id="logic-wrapper" style="display: none;">
+    <div class="logic__background"></div>
+    <div class="logic__content">
+
+        <div class="page">
+<!--            <div class="tab_title" data-i18n="tabLogicConditions"></div>-->
+
+            <div class="page-header">
+                <span data-i18n="tabLogicConditions"></span>
+            </div>
+
+            <div class="logic__content--wrapper">
+                <table class="table table-striped align-middle logic__table">
+                    <thead>
+                    <tr>
+                        <th style="width: 50px" data-i18n="logicId"></th>
+                        <th style="width: 80px" data-i18n="logicEnabled"></th>
+                        <th style="width: 120px" data-i18n="logicOperation"></th>
+                        <th data-i18n="logicOperandA"></th>
+                        <th data-i18n="logicOperandB"></th>
+                        <th data-i18n="logicActivator"></th>
+                        <th data-i18n="logicFlags"></th>
+                        <th data-i18n="logicStatus"></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="page-footer gap-2">
+                <button id="logic-close-btn" class="logic__close btn btn-outline-primary" data-i18n="logicClose"></button>
+                <button id="logic-save-btn" class="logic__save btn btn-primary" data-i18n="logicSave"></button>
             </div>
         </div>
-        <div class="clear-both"></div>
 
-        <div class="gui_box grey">
-            <div class="gui_box_titlebar">
-                <div class="spacer_box_title" data-i18n="mappingTableTitle"></div>
-            </div>
-            <table class="output-table">
-                <tr id="output-row">
+    </div>
+</div>
 
+
+<div id="mixerApplyContent" class="is-hidden">
+    <div class="modal__content">
+        <div class="alert alert-warning">
+            <h3 data-i18n="presetsApplyHeader"></h3>
+            <div data-i18n="mixerApplyDescription"></div>
+        </div>
+    </div>
+    <div class="d-grid">
+        <button id="execute-button" class="btn btn-primary" data-i18n="mixerButtonSaveAndReboot"></button>
+    </div>
+</div>
+
+<div id="mixerWizardContent" class="is-hidden">
+    <div class="modal__content">
+        <div class="modal__text">
+            <div class="alert alert-warning" data-i18n="mixerWizardInfo"></div>
+            <table style="margin-top: 1em;" class="table">
+                <thead>
+                <th data-i18n="mixerWizardMotorPosition"></th>
+                <th data-i18n="mixerWizardMotorIndex"></th>
+                </thead>
+                <tbody>
+                <tr>
+                    <th data-i18n="motorWizard0"></th>
+                    <td>
+                        <select class="wizard-motor-select form-select" data-motor="0">
+                            <option id="0" selected="selected">Motor #1</option>
+                            <option id="1">Motor #2</option>
+                            <option id="2">Motor #3</option>
+                            <option id="3">Motor #4</option>
+                        </select>
+                    </td>
                 </tr>
-                <tr id="function-row">
-
+                <tr>
+                    <th data-i18n="motorWizard1"></th>
+                    <td>
+                        <select class="wizard-motor-select form-select" data-motor="1">
+                            <option id="0">Motor #1</option>
+                            <option id="1" selected="selected">Motor #2</option>
+                            <option id="2">Motor #3</option>
+                            <option id="3">Motor #4</option>
+                        </select>
+                    </td>
                 </tr>
+                <tr>
+                    <th data-i18n="motorWizard2"></th>
+                    <td>
+                        <select class="wizard-motor-select form-select" data-motor="2">
+                            <option id="0">Motor #1</option>
+                            <option id="1">Motor #2</option>
+                            <option id="2" selected="selected">Motor #3</option>
+                            <option id="3">Motor #4</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <th data-i18n="motorWizard3"></th>
+                    <td>
+                        <select class="wizard-motor-select form-select" data-motor="3">
+                            <option id="0">Motor #1</option>
+                            <option id="1">Motor #2</option>
+                            <option id="2">Motor #3</option>
+                            <option id="3" selected="selected">Motor #4</option>
+                        </select>
+                    </td>
+                </tr>
+                </tbody>
             </table>
         </div>
-
-        <!-- middle row -->
-        <div class="clear-both"></div>
-        <!-- bottom row -->
-        <div class="motor-mixer gui_box grey">
-            <div class="gui_box_titlebar">
-                <div class="spacer_box_title" data-i18n="motorMixer"></div>
-            </div>
-            <div class="spacer_box">
-                <table id="motor-mix-table" class="mixer-table">
-                    <thead>
-                        <tr>
-                            <th style="width: 75px" data-i18n="controlAxisMotor"></th>
-                            <th data-i18n="controlAxisThrottle"></th>
-                            <th data-i18n="controlAxisRoll"></th>
-                            <th data-i18n="controlAxisPitch"></th>
-                            <th data-i18n="controlAxisYaw"></th>
-                            <th class="delete"></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-
-                    </tbody>
-                </table>
-                <div class="btn default_btn narrow pull-right green mixer_btn_add">
-                    <a href="#" data-role="role-motor-add" data-i18n="servoMixerAdd"></a>
-                </div>
-            </div>
-        </div>
-        <div class="motor-mixer gui_box grey">
-            <div class="gui_box_titlebar">
-                <div class="spacer_box_title" data-i18n="servoMixer"></div>
-            </div>
-            <div class="spacer_box">
-                <table id="servo-mix-table" class="mixer-table">
-                    <thead>
-                        <tr>
-                            <th style="width: 75px" data-i18n="servo"></th>
-                            <th data-i18n="input"></th>
-                            <th data-i18n="fixedValue" class="mixer-fixed-value-col"></th>
-                            <th data-i18n="weight"></th>
-                            <th data-i18n="speed"></th>
-                            <th data-i18n="active"></th>
-                            <th class="delete"></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-
-                    </tbody>
-                </table>
-                <div class="btn default_btn narrow pull-right green mixer_btn_add">
-                    <a href="#" data-role="role-servo-add" data-i18n="servoMixerAdd"></a>
-                </div>
-                <div class="btn default_btn narrow pull-left mixer_btn_logic">
-                    <a href="#" data-role="role-logic-conditions-open" data-i18n="tabLogicConditions"></a>
-                </div>
-            </div>
-        </div>
-
-        <div id="logic-wrapper" style="display: none">
-            <div class="logic__background"></div>
-            <div class="logic__content">
-                <div class="tab_title" data-i18n="tabLogicConditions"></div>
-                <div class="logic__content--wrapper">
-                    <table class="mixer-table logic__table">
-                        <thead>
-                            <tr>
-                                <th style="width: 50px" data-i18n="logicId"></th>
-                                <th style="width: 80px" data-i18n="logicEnabled"></th>
-                                <th style="width: 120px" data-i18n="logicOperation"></th>
-                                <th data-i18n="logicOperandA"></th>
-                                <th data-i18n="logicOperandB"></th>
-                                <th data-i18n="logicActivator"></th>
-                                <th data-i18n="logicFlags"></th>
-                                <th data-i18n="logicStatus"></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        </tbody>
-                    </table>
-                </div>
-                <div class="logic__content--buttons content_toolbar">
-                    <div class="btn save_btn">
-                        <a href="#" class="logic__save" data-i18n="logicSave"></a>
-                    </div>
-                    <div class="btn save_btn red">
-                        <a href="#" class="logic__close" data-i18n="logicClose"></a>
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
-    <div id="mixerApplyContent" class="is-hidden">
-        <div class="modal__content">
-            <h1 class="modal__title modal__title--warning" data-i18n="presetsApplyHeader"></h1>
-            <div class="modal__text" data-i18n="mixerApplyDescription"></div>
-        </div>
-        <div class="modal__buttons">
-            <a id="execute-button" class="modal__button modal__button--main" data-i18n="mixerButtonSaveAndReboot"></a>
-        </div>
-    </div>
-    <div id="mixerWizardContent" class="is-hidden">
-        <div class="modal__content">
-            <h1 class="modal__title modal__title--warning" data-i18n="mixerWizardModalTitle"></h1>
-            <div class="modal__text">
-                <p data-i18n="mixerWizardInfo"></p>
-                <table style="margin-top: 1em;" class="mixer-table">
-                    <thead>
-                        <th data-i18n="mixerWizardMotorPosition"></th>
-                        <th data-i18n="mixerWizardMotorIndex"></th>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <th data-i18n="motorWizard0"></th>
-                            <td>
-                                <select class="wizard-motor-select" data-motor="0">
-                                    <option id="0" selected="selected">Motor #1</option>
-                                    <option id="1">Motor #2</option>
-                                    <option id="2">Motor #3</option>
-                                    <option id="3">Motor #4</option>
-                                </select>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th data-i18n="motorWizard1"></th>
-                            <td>
-                                <select class="wizard-motor-select" data-motor="1">
-                                    <option id="0">Motor #1</option>
-                                    <option id="1" selected="selected">Motor #2</option>
-                                    <option id="2">Motor #3</option>
-                                    <option id="3">Motor #4</option>
-                                </select>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th data-i18n="motorWizard2"></th>
-                            <td>
-                                <select class="wizard-motor-select" data-motor="2">
-                                    <option id="0">Motor #1</option>
-                                    <option id="1">Motor #2</option>
-                                    <option id="2" selected="selected">Motor #3</option>
-                                    <option id="3">Motor #4</option>
-                                </select>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th data-i18n="motorWizard3"></th>
-                            <td>
-                                <select class="wizard-motor-select" data-motor="3">
-                                    <option id="0">Motor #1</option>
-                                    <option id="1">Motor #2</option>
-                                    <option id="2">Motor #3</option>
-                                    <option id="3" selected="selected">Motor #4</option>
-                                </select>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
 
-        <div class="modal__buttons--upbottom">
-            <a id="wizard-execute-button" class="modal__button modal__button--main" data-i18n="mixerWizardModalApply"></a>
-        </div>
-    </div>
-    <div class="content_toolbar">
-        <div class="btn save_btn">
-            <a id="save-button" class="save" href="#" data-i18n="configurationButtonSave"></a>
-        </div>
+    <div class="d-grid">
+        <button id="wizard-execute-button" class="btn btn-primary" data-i18n="mixerWizardModalApply"></button>
     </div>
 </div>

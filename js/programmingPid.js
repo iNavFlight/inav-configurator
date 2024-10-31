@@ -134,7 +134,11 @@ let ProgrammingPid = function (enabled, setpointType, setpointValue, measurement
         $row = $container.find('tr:last');
 
         $row.find('.pid_cell__index').html(index);
-        $row.find('.pid_cell__enabled').html("<input type='checkbox' class='toggle logic_element__enabled' />");
+        $row.find('.pid_cell__enabled').html(`
+            <div class="form-check form-switch">
+                <input class="form-check-input logic_element__enabled" type="checkbox" />
+            </div>
+        `);
         $row.find('.logic_element__enabled').
             prop('checked', self.getEnabled()).
             change(self.onEnabledChange);
@@ -142,16 +146,16 @@ let ProgrammingPid = function (enabled, setpointType, setpointValue, measurement
         self.renderOperand(0);
         self.renderOperand(1);
 
-        $row.find(".pid_cell__p").html('<input type="number" class="pid_cell__p-gain" step="1" min="0" max="32767" value="0">');
+        $row.find(".pid_cell__p").html('<input type="number" class="pid_cell__p-gain form-control" step="1" min="0" max="32767" value="0">');
         $row.find(".pid_cell__p-gain").val(self.getGainP()).on('change', self.onGainPChange);
 
-        $row.find(".pid_cell__i").html('<input type="number" class="pid_cell__i-gain" step="1" min="0" max="32767" value="0">');
+        $row.find(".pid_cell__i").html('<input type="number" class="pid_cell__i-gain form-control" step="1" min="0" max="32767" value="0">');
         $row.find(".pid_cell__i-gain").val(self.getGainI()).on('change', self.onGainIChange);
 
-        $row.find(".pid_cell__d").html('<input type="number" class="pid_cell__d-gain" step="1" min="0" max="32767" value="0">');
+        $row.find(".pid_cell__d").html('<input type="number" class="pid_cell__d-gain form-control" step="1" min="0" max="32767" value="0">');
         $row.find(".pid_cell__d-gain").val(self.getGainD()).on('change', self.onGainDChange);
 
-        $row.find(".pid_cell__ff").html('<input type="number" class="pid_cell__ff-gain" step="1" min="0" max="32767" value="0">');
+        $row.find(".pid_cell__ff").html('<input type="number" class="pid_cell__ff-gain form-control" step="1" min="0" max="32767" value="0">');
         $row.find(".pid_cell__ff-gain").val(self.getGainFF()).on('change', self.onGainFFChange);
 
     }
@@ -186,8 +190,11 @@ let ProgrammingPid = function (enabled, setpointType, setpointValue, measurement
         }
 
         $container.html('');
+
+        $container.append('<div class="operands-container d-flex gap-2"></div>');
+        $container = $container.find('.operands-container');
             
-        $container.append('<select class="logic_element__operand--type" data-operand="' + operand + '"></select>');
+        $container.append('<select class="logic_element__operand--type form-select" data-operand="' + operand + '"></select>');
         let $t = $container.find('.logic_element__operand--type');
 
         for (let k in OPERAND_TYPES) {

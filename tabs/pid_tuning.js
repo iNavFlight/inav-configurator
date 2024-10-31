@@ -297,15 +297,14 @@ TABS.pid_tuning.initialize = function (callback) {
 
         tabs.init($('.tab-pid_tuning'));
 
-        $('.action-resetPIDs').on('click', function() {
-
+        $('#select-new-defaults-btn').on('click', function() {
             if (confirm(i18n.getMessage('confirm_reset_pid'))) {
                 MSP.send_message(MSPCodes.MSP_SET_RESET_CURR_PID, false, false, false);
                 GUI.updateActivatedTab();
             }
         });
 
-        $('.action-resetDefaults').on('click', function() {
+        $('#reset-to-defaults-btn').on('click', function() {
 
             if (confirm(i18n.getMessage('confirm_select_defaults'))) {
                 mspHelper.setSetting("applied_defaults", 0, function() { 
@@ -395,7 +394,7 @@ TABS.pid_tuning.initialize = function (callback) {
 
         // UI Hooks
 
-        $('a.refresh').on('click', function () {
+        $('#refresh-btn').on('click', function () {
             $("#content-watermark").remove();
             $(".tab-pid_tuning").remove();
 
@@ -406,7 +405,7 @@ TABS.pid_tuning.initialize = function (callback) {
         });
 
         // update == save.
-        $('a.update').on('click', function () {
+        $('#update-btn').on('click', function () {
             form_to_pid_and_rc();
 
             if ($("#ez_tune_enabled").is(":checked")) {

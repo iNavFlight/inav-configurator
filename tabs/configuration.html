@@ -1,308 +1,264 @@
-<div class="tab-configuration toolbar_fixed_bottom">
-    <div class="content_wrapper">
-        <div class="tab_title" data-i18n="tabConfiguration">Configuration</div>
-        <div class="note" style="margin-bottom: 20px;">
-            <div class="note_spacer">
-                <p data-i18n="configurationFeaturesHelp"></p>
-            </div>
-        </div>
-        <div class="leftWrapper">
-            <div class="config-section sensors gui_box grey">
-                <div class="gui_box_titlebar">
-                    <div class="spacer_box_title" data-i18n="configurationSensors"></div>
-                </div>
-                <div class="spacer_box">
-
-                    <div class="select">
-                        <select id="sensor-acc" data-setting="acc_hardware"></select>
-                        <label for="sensor-acc"> <span data-i18n="sensorAccelerometer"></span></label>
-                    </div>
-
-                    <div class="select">
-                        <select id="sensor-mag" data-setting="mag_hardware"></select>
-                        <label for="sensor-mag"> <span data-i18n="sensorMagnetometer"></span></label>
-                    </div>
-
-                    <div class="select">
-                        <select id="sensor-baro" data-setting="baro_hardware"></select>
-                        <label for="sensor-baro"> <span data-i18n="sensorBarometer"></span></label>
-                    </div>
-
-                    <div class="select">
-                        <select id="sensor-pitot" data-setting="pitot_hardware"></select>
-                        <label for="sensor-pitot"> <span data-i18n="sensorPitot"></span></label>
-                    </div>
-
-                    <div class="select">
-                        <select id="sensor-rangefinder" data-setting="rangefinder_hardware"></select>
-                        <label for="sensor-rangefinder"> <span data-i18n="sensorRangefinder"></span></label>
-                    </div>
-
-                    <div class="select">
-                        <select id="sensor-opflow" data-setting="opflow_hardware"></select>
-                        <label for="sensor-opflow"> <span data-i18n="sensorOpflow"></span></label>
-                    </div>
-
-                    <div id="i2c_speed-info" class="info-box"></div>
-                    <div class="select">
-                        <select id="i2c_speed" data-setting="i2c_speed"></select>
-                        <label for="i2c_speed">
-                            <span data-i18n="configurationI2cSpeed"></span>
-                        </label>
-                        <div for="i2c_speed" class="helpicon cf_tip" data-i18n_title="configurationI2cSpeedHelp"></div>
-                    </div>
-
-                </div>
-            </div>
-
-            <div class="config-section gui_box grey other">
-                <div class="gui_box_titlebar">
-                    <div class="spacer_box_title" data-i18n="configurationFeatures"></div>
-                </div>
-
-                <div class="spacer_box">
-                    <div class="features other"></div>
-                    <!--feature list generated content-->
-                </div>
-            </div>
-
-        </div>
-
-        <!--Right column begins here-->
-
-        <div class="rightWrapper">
-            <div class="config-section gui_box grey">
-                <div class="gui_box_titlebar">
-                    <div class="spacer_box_title" data-i18n="configurationVoltageCurrentSensor"></div>
-                </div>
-                <div class="spacer_box">
-                    <div class="features batteryVoltage"></div>
-                    <div class="select">
-                        <select id="vbat_meter_type" data-setting="vbat_meter_type"></select>
-                        <label for="vbat_meter_type">
-                            <span data-i18n="configurationVoltageMeterType"></span>
-                        </label>
-                    </div>
-                    <div class="select">
-                        <select id="voltagesource" class="voltagesource" data-setting-placeholder="bat_voltage_src">
-                            <option value="0">Raw</option>
-                            <option value="1">Sag compensated</option>
-                        </select>
-                        <label for="voltagesource">
-                            <span data-i18n="configurationVoltageSource"></span>
-                        </label>
-                        <div for="voltagesource" class="helpicon cf_tip" data-i18n_title="configurationVoltageSourceHelp"></div>
-                    </div>
-                    
-                    <div class="number">
-                        <input type="number" id="voltagescale" name="voltagescale" step="1" min="10" max="65535" />
-                        <label for="voltagescale">
-                            <span data-i18n="configurationBatteryScale"></span>
-                        </label>
-                    </div>
-                    <div class="number">
-                        <input type="text" id="batteryvoltage" name="batteryvoltage" readonly class="disabled" />
-                        <label for="batteryvoltage">
-                            <span data-i18n="configurationBatteryVoltage"></span>
-                        </label>
-                    </div>
-                    <div class="features batteryCurrent"></div>
-                    <div class="select">
-                        <select id="current_meter_type" data-setting="current_meter_type"></select>
-                        <label for="current_meter_type">
-                            <span data-i18n="configurationCurrentMeterType"></span>
-                        </label>
-                    </div>
-                    <div class="number">
-                        <input type="number" id="currentscale" name="currentscale" step="1" min="-10000" max="10000" data-setting-placeholder="current_meter_scale" />
-                        <label for="currentscale">
-                            <span data-i18n="configurationCurrentScale"></span>
-                        </label>
-                        <div for="currentscale" class="helpicon cf_tip" data-i18n_title="configurationCurrentScaleHelp"></div>
-                    </div>
-                    <div class="number">
-                        <input type="number" id="currentoffset" name="currentoffset" step="0.1" min="-3276.8" max="3276.7" />
-                        <label for="currentoffset">
-                            <span data-i18n="configurationCurrentOffset"></span>
-                        </label>
-                    </div>
-                    <div class="number">
-                        <input type="text" id="batterycurrent" name="batterycurrent" readonly class="disabled" />
-                        <label for="batterycurrent">
-                            <span data-i18n="configurationBatteryCurrent"></span>
-                        </label>
-                    </div>
-                </div>
-            </div>
-            <div class="config-section gui_box grey">
-                <div class="gui_box_titlebar">
-                    <div class="spacer_box_title" data-i18n="configurationBatterySettings"></div>
-                    <div class="helpicon cf_tip" data-i18n_title="configurationBatterySettingsHelp"></div>
-                </div>
-                <div class="spacer_box">
-                    <div class="number">
-                        <input type="number" class="batteryProfileHighlight" id="cells" name="cells" step="1" min="0" max="12" data-setting-placeholder="bat_cells" />
-                        <label for="cells"><span data-i18n="configurationBatteryCells"></span></label>
-                        <div for="cells" class="helpicon cf_tip" data-i18n_title="configurationBatteryCellsHelp"></div>
-                    </div>
-                    <div class="number">
-                        <input type="number" class="batteryProfileHighlight" id="celldetectvoltage" name="celldetectvoltage" step="0.01" min="1" max="5" data-setting-placeholder="vbat_cell_detect_voltage" />
-                        <label for="celldetectvoltage"><span data-i18n="configurationBatteryCellDetectVoltage"></span></label>
-                        <div for="celldetectvoltage" class="helpicon cf_tip" data-i18n_title="configurationBatteryCellDetectVoltageHelp"></div>
-                    </div>
-                    <div class="number">
-                        <input type="number" class="batteryProfileHighlight" id="mincellvoltage" name="mincellvoltage" step="0.01" min="1" max="5" />
-                        <label for="mincellvoltage"><span data-i18n="configurationBatteryMinimum"></span></label>
-                    </div>
-                    <div class="number">
-                        <input type="number" class="batteryProfileHighlight" id="maxcellvoltage" name="maxcellvoltage" step="0.01" min="1" max="5" />
-                        <label for="maxcellvoltage">
-                            <span data-i18n="configurationBatteryMaximum"></span>
-                        </label>
-                    </div>
-                    <div class="number">
-                        <input type="number" class="batteryProfileHighlight" id="warningcellvoltage" name="warningcellvoltage" step="0.01" min="1" max="5" />
-                        <label for="warningcellvoltage">
-                            <span data-i18n="configurationBatteryWarning"></span>
-                        </label>
-                    </div>
-                    <div class="select">
-                        <select id="battery_capacity_unit">
-                            <option value="mAh">mAh</option>
-                            <option value="mWh">mWh</option>
-                        </select>
-                        <label for="warningcellvoltage">
-                            <span data-i18n="configurationBatteryCapacityUnit"></span>
-                        </label>
-                    </div>
-                    <div class="number">
-                        <input type="number" class="batteryProfileHighlight" id="battery_capacity" name="battery_capacity" step="1" min="0" max="4294967296" />
-                        <label for="battery_capacity">
-                            <span data-i18n="configurationBatteryCapacityValue"></span>
-                        </label>
-                    </div>
-                    <div class="number">
-                        <input type="number" class="batteryProfileHighlight" id="battery_capacity_warning" name="battery_capacity_warning" step="1" min="0" max="100" />
-                        <label for="battery_capacity_warning">
-                            <span data-i18n="configurationBatteryCapacityWarning"></span>
-                        </label>
-                    </div>
-                    <div class="number">
-                        <input type="number" class="batteryProfileHighlight" id="battery_capacity_critical" name="battery_capacity_critical" step="1" min="0" max="100" />
-                        <label for="battery_capacity_critical">
-                            <span data-i18n="configurationBatteryCapacityCritical"></span>
-                        </label>
-                    </div>
-                </div>
-            </div>
-
-            <div class="config-section gui_box grey config-vtx">
-                <div class="gui_box_titlebar">
-                    <div class="spacer_box_title" data-i18n="configurationVTX"></div>
-                </div>
-                <div class="spacer_box">
-                    <div class="info-box" data-i18n="vtxDisclaimer"></div>
-                    <div class="note" id="vtx_no_band">
-                        <div class="note_spacer">
-                            <p data-i18n="configurationVTXNoBandHelp"></p>
-                        </div>
-                    </div>
-
-                    <div class="select vtx_band_wrapper">
-                        <select id="vtx_band"></select>
-                        <label for="vtx_band">
-                            <span data-i18n="configurationVTXBand"></span>
-                        </label>
-                    </div>
-
-                    <div class="select vtx_channel_wrapper">
-                        <select id="vtx_channel"></select>
-                        <label for="vtx_channel"> <span data-i18n="configurationVTXChannel"></span></label>
-                    </div>
-
-                    <div class="select">
-                        <select id="vtx_power" data-setting-placeholder="vtx_power"></select>
-                        <label for="vtx_power"><span data-i18n="configurationVTXPower"></span></label>
-                        <div for="vtx_power" class="helpicon cf_tip" data-i18n_title="configurationVTXPowerHelp"></div>
-                    </div>
-
-                    <div class="select">
-                        <select id="vtx_low_power_disarm" data-setting-placeholder="vtx_low_power_disarm"></select>
-                        <label for="vtx_low_power_disarm"><span data-i18n="configurationVTXLowerPowerDisarm"></span></label>
-                        <div for="vtx_low_power_disarm" class="helpicon cf_tip" data-i18n_title="configurationVTXLowerPowerDisarmHelp"></div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="config-section gui_box grey config-gimbal">
-                <div class="gui_box_titlebar">
-                    <div class="spacer_box_title" data-i18n="configurationGimbal"></div>
-                </div>
-                    <div class="number gimbal_sensitivity_wrapper">
-                        <input type="number" id="gimbal_sensitivity" name="gimbal_sensitivity" data-setting="gimbal_sensitivity" />
-                        <label for="gimbal_sensitivity">
-                            <span data-i18n="configurationGimbalSensitivity"></span>
-                        </label>
-                    </div>
-                    <div class="number gimbal_pan_channel_wrapper">
-                        <input type="number" id="gimbal_pan_channel" name="gimbal_pan_channel" data-setting="gimbal_pan_channel" />
-                        <label for="gimbal_pan_channel">
-                            <span data-i18n="configurationGimbalPanChannel"></span>
-                        </label>
-                    </div>
-                    <div class="number gimbal_tilt_channel_wrapper">
-                        <input type="number" id="gimbal_tilt_channel" name="gimbal_tilt_channel" data-setting="gimbal_tilt_channel" />
-                        <label for="gimbal_tilt_channel">
-                            <span data-i18n="configurationGimbalTiltChannel"></span>
-                        </label>
-                    </div>
-                    <div class="number gimbal_roll_channel_wrapper">
-                        <input type="number" id="gimbal_roll_channel" name="gimbal_roll_channel" data-setting="gimbal_roll_channel" />
-                        <label for="gimbal_roll_channel">
-                            <span data-i18n="configurationGimbalRollChannel"></span>
-                        </label>
-                    </div>
-            </div>
-
-            <div class="config-section gui_box grey config-headtracker">
-                <div class="gui_box_titlebar">
-                    <div class="spacer_box_title" data-i18n="configurationHeadtracker"></div>
-                </div>
-                    <div class="select headtracker_type_wrapper">
-                        <select id="headtracker-type" data-setting="headtracker_type"></select>
-                        <label for="headtrack-type">
-                            <span data-i18n="configurationHeadtrackerType"></span>
-                        </label>
-                    </div>
-
-                    <div class="number headtracker_pan_ratio_wrapper">
-                        <input type="number" data-step="0.01" min="0" max="5" id="headtracker_pan_ratio" data-setting="headtracker_pan_ratio">
-                        <label for="headtracker_pan_ratio">
-                            <span data-i18n="configurationHeadtrackerPanRatio"></span>
-                        </label>
-                    </div>
-                    <div class="number headtracker_tilt_ratio_wrapper">
-                        <input type="number" data-step="0.01" min="0" max="5" id="headtracker_tilt_ratio" data-setting="headtracker_tilt_ratio">
-                        <label for="headtracker_tilt_ratio">
-                            <span data-i18n="configurationHeadtrackerTiltRatio"></span>
-                        </label>
-                    </div>
-                    <div class="number headtracker_roll_ratio_wrapper">
-                        <input type="number" data-step="0.01" id="headtracker_roll_ratio" data-setting="headtracker_roll_ratio">
-                        <label for="headtracker_roll_ratio">
-                            <span data-i18n="configurationHeadtrackerRollRatio"></span>
-                        </label>
-                    </div>
-            </div>
-        </div>
-
-        </div>
-
-        <div class="clear-both"></div>
+<div id="tab-configuration" class="page">
+    <div class="page-header">
+        <span data-i18n="tabConfiguration"></span>
     </div>
-    <div class="content_toolbar">
-        <div class="btn save_btn">
-            <a class="save" href="#" data-i18n="configurationButtonSave"></a>
+
+    <div class="alert alert-warning">
+        <div data-i18n="configurationFeaturesHelp"></div>
+    </div>
+
+    <div class="row">
+        <div class="col">
+            <div class="card mb-3">
+                <div class="card-header" data-i18n="configurationSensors"></div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item hstack">
+                            <select id="sensor-acc" data-setting="acc_hardware" class="form-select w-10r"></select>
+                            <label for="sensor-acc" data-i18n="sensorAccelerometer"></label>
+                        </li>
+                        <li class="list-group-item hstack">
+                            <select id="sensor-mag" data-setting="mag_hardware" class="form-select w-10r"></select>
+                            <label for="sensor-mag" data-i18n="sensorMagnetometer"></label>
+                        </li>
+                        <li class="list-group-item hstack">
+                            <select id="sensor-baro" data-setting="baro_hardware" class="form-select w-10r"></select>
+                            <label for="sensor-baro" data-i18n="sensorBarometer"></label>
+                        </li>
+                        <li class="list-group-item hstack">
+                            <select id="sensor-pitot" data-setting="pitot_hardware" class="form-select w-10r"></select>
+                            <label for="sensor-pitot" data-i18n="sensorPitot"></label>
+                        </li>
+                        <li class="list-group-item hstack">
+                            <select id="sensor-rangefinder" data-setting="rangefinder_hardware" class="form-select w-10r"></select>
+                            <label for="sensor-rangefinder" data-i18n="sensorRangefinder"></label>
+                        </li>
+                        <li class="list-group-item hstack">
+                            <select id="sensor-opflow" data-setting="opflow_hardware" class="form-select w-10r"></select>
+                            <label for="sensor-opflow" data-i18n="sensorOpflow"></label>
+                        </li>
+                        <li class="list-group-item vstack">
+                            <div class="alert alert-info mb-2 d-none" id="i2c-speed-info">
+                                <div data-i18n="i2cSpeedSuggested800khz"></div>
+                            </div>
+                            <div class="alert alert-danger mb-2 d-none" id="i2c-speed-too-slow">
+                                <div data-i18n="i2cSpeedTooLow"></div>
+                            </div>
+                            <div class="hstack">
+                                <select id="i2c_speed" data-setting="i2c_speed" class="form-select w-10r"></select>
+                                <label for="i2c_speed" data-i18n="configurationI2cSpeed"></label>
+                                <span for="i2c_speed" class="helpicon cf_tip ms-auto" data-i18n_title="configurationI2cSpeedHelp"></span>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="card mb-3">
+                <div class="card-header" data-i18n="configurationFeatures"></div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="d-none features other"></li>
+                    </ul>
+                </div>
+            </div>
         </div>
+        <div class="col">
+            <div class="card mb-3">
+                <div class="card-header" data-i18n="configurationVoltageCurrentSensor"></div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="d-none features batteryVoltage"></li>
+                        <li class="list-group-item hstack">
+                            <select id="vbat_meter_type" data-setting="vbat_meter_type" class="form-select w-10r"></select>
+                            <label for="vbat_meter_type" data-i18n="configurationVoltageMeterType"></label>
+                        </li>
+                        <li class="list-group-item hstack">
+                            <select id="voltagesource" class="form-select w-10r voltagesource" data-setting-placeholder="bat_voltage_src">
+                                <option value="0">Raw</option>
+                                <option value="1">Sag compensated</option>
+                            </select>
+                            <label for="voltagesource" data-i18n="configurationVoltageSource"></label>
+                            <div for="voltagesource" class="helpicon cf_tip" data-i18n_title="configurationVoltageSourceHelp"></div>
+                        </li>
+                        <li class="list-group-item hstack">
+                            <input type="number" id="voltagescale" class="form-control w-10r" name="voltagescale" step="1" min="10" max="65535" />
+                            <label for="voltagescale" data-i18n="configurationBatteryScale"></label>
+                        </li>
+                        <li class="list-group-item hstack">
+                            <input type="text" id="batteryvoltage" class="form-control w-10r disabled" name="batteryvoltage" readonly />
+                            <label for="batteryvoltage" data-i18n="configurationBatteryVoltage"></label>
+                        </li>
+                        <li class="d-none features batteryCurrent"></li>
+                        <li class="list-group-item hstack">
+                            <select id="current_meter_type" class="form-select w-10r" data-setting="current_meter_type"></select>
+                            <label for="current_meter_type" data-i18n="configurationCurrentMeterType"></label>
+                        </li>
+                        <li class="list-group-item hstack">
+                            <input type="number" id="currentscale" class="form-control w-10r" name="currentscale" step="1" min="-10000" max="10000" data-setting-placeholder="current_meter_scale" />
+                            <label for="currentscale" data-i18n="configurationCurrentScale"></label>
+                            <div for="currentscale" class="helpicon cf_tip" data-i18n_title="configurationCurrentScaleHelp"></div>
+                        </li>
+                        <li class="list-group-item hstack">
+                            <input type="number" id="currentoffset" class="form-control w-10r" name="currentoffset" step="0.1" min="-3276.8" max="3276.7" />
+                            <label for="currentoffset" data-i18n="configurationCurrentOffset"></label>
+                        </li>
+                        <li class="list-group-item hstack">
+                            <input type="text" id="batterycurrent" class="form-control w-10r disabled" name="batterycurrent" readonly />
+                            <label for="batterycurrent" data-i18n="configurationBatteryCurrent"></label>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="card mb-3">
+                <div class="card-header hstack">
+                    <span data-i18n="configurationBatterySettings"></span>
+                    <span class="helpicon cf_tip ms-auto" data-i18n_title="configurationBatterySettingsHelp"></span>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item hstack">
+                            <input type="number" class="form-control w-10r profile-input-battery" id="cells" name="cells" step="1" min="0" max="12" data-setting-placeholder="bat_cells" />
+                            <label for="cells" data-i18n="configurationBatteryCells"></label>
+                            <div for="cells" class="helpicon cf_tip" data-i18n_title="configurationBatteryCellsHelp"></div>
+                        </li>
+                        <li class="list-group-item hstack">
+                            <input type="number" class="form-control w-10r profile-input-battery" id="celldetectvoltage" name="celldetectvoltage" step="0.01" min="1" max="5" data-setting-placeholder="vbat_cell_detect_voltage" />
+                            <label for="celldetectvoltage" data-i18n="configurationBatteryCellDetectVoltage"></label>
+                            <div class="helpicon cf_tip" data-i18n_title="configurationBatteryCellDetectVoltageHelp"></div>
+                        </li>
+                        <li class="list-group-item hstack">
+                            <input type="number" class="form-control w-10r profile-input-battery" id="mincellvoltage" name="mincellvoltage" step="0.01" min="1" max="5" />
+                            <label for="mincellvoltage" data-i18n="configurationBatteryMinimum"></label>
+                        </li>
+                        <li class="list-group-item hstack">
+                            <input type="number" class="form-control w-10r profile-input-battery" id="maxcellvoltage" name="maxcellvoltage" step="0.01" min="1" max="5" />
+                            <label for="maxcellvoltage" data-i18n="configurationBatteryMaximum"></label>
+                        </li>
+                        <li class="list-group-item hstack">
+                            <input type="number" class="form-control w-10r profile-input-battery" id="warningcellvoltage" name="warningcellvoltage" step="0.01" min="1" max="5" />
+                            <label for="warningcellvoltage" data-i18n="configurationBatteryWarning"></label>
+                        </li>
+                        <li class="list-group-item hstack">
+                            <select class="form-select w-10r" id="battery_capacity_unit">
+                                <option value="mAh">mAh</option>
+                                <option value="mWh">mWh</option>
+                            </select>
+                            <label for="battery_capacity_unit" data-i18n="configurationBatteryCapacityUnit"></label>
+                        </li>
+                        <li class="list-group-item hstack">
+                            <input type="number" class="form-control w-10r profile-input-battery" id="battery_capacity" name="battery_capacity" step="1" min="0" max="4294967296" />
+                            <label for="battery_capacity" data-i18n="configurationBatteryCapacityValue"></label>
+                        </li>
+                        <li class="list-group-item hstack">
+                            <input type="number" class="form-control w-10r profile-input-battery" id="battery_capacity_warning" name="battery_capacity_warning" step="1" min="0" max="100" />
+                            <label for="battery_capacity_warning" data-i18n="configurationBatteryCapacityWarning"></label>
+                        </li>
+                        <li class="list-group-item hstack">
+                            <input type="number" class="form-control w-10r profile-input-battery" id="battery_capacity_critical" name="battery_capacity_critical" step="1" min="0" max="100" />
+                            <label for="battery_capacity_critical" data-i18n="configurationBatteryCapacityCritical"></label>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="card mb-3 config-vtx">
+                <div class="card-header" data-i18n="configurationVTX"></div>
+                <div class="card-body">
+                    <div class="alert alert-danger">
+                        <div data-i18n="vtxDisclaimer"></div>
+                    </div>
+                    <div id="vtx_no_band" class="alert alert-warning">
+                        <div data-i18n="configurationVTXNoBandHelp"></div>
+                    </div>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item hstack">
+                            <select id="vtx_band" class="form-select w-10r"></select>
+                            <label for="vtx_band">
+                                <span data-i18n="configurationVTXBand"></span>
+                            </label>
+                        </li>
+                        <li class="list-group-item hstack">
+                            <select id="vtx_channel" class="form-select w-10r"></select>
+                            <label for="vtx_channel" data-i18n="configurationVTXChannel"></label>
+                        </li>
+                        <li class="list-group-item hstack">
+                            <select id="vtx_power" class="form-select w-10r" data-setting-placeholder="vtx_power"></select>
+                            <label for="vtx_power" data-i18n="configurationVTXPower"></label>
+                            <div for="vtx_power" class="helpicon cf_tip" data-i18n_title="configurationVTXPowerHelp"></div>
+                        </li>
+                        <li class="list-group-item hstack">
+                            <select id="vtx_low_power_disarm" class="form-select w-10r" data-setting-placeholder="vtx_low_power_disarm"></select>
+                            <label for="vtx_low_power_disarm" data-i18n="configurationVTXLowerPowerDisarm"></label>
+                            <div for="vtx_low_power_disarm" class="helpicon cf_tip" data-i18n_title="configurationVTXLowerPowerDisarmHelp"></div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="card mb-3">
+                <div class="card-header" data-i18n="configurationGimbal"></div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item hstack">
+                            <input type="number" id="gimbal_sensitivity" class="form-control w-10r" name="gimbal_sensitivity" data-setting="gimbal_sensitivity" />
+                            <label for="gimbal_sensitivity">
+                                <span data-i18n="configurationGimbalSensitivity"></span>
+                            </label>
+                        </li>
+                        <li class="list-group-item hstack">
+                            <input type="number" id="gimbal_pan_channel" class="form-control w-10r" name="gimbal_pan_channel" data-setting="gimbal_pan_channel" />
+                            <label for="gimbal_pan_channel">
+                                <span data-i18n="configurationGimbalPanChannel"></span>
+                            </label>
+                        </li>
+                        <li class="list-group-item hstack">
+                            <input type="number" id="gimbal_tilt_channel" class="form-control w-10r" name="gimbal_tilt_channel" data-setting="gimbal_tilt_channel" />
+                            <label for="gimbal_tilt_channel">
+                                <span data-i18n="configurationGimbalTiltChannel"></span>
+                            </label>
+                        </li>
+                        <li class="list-group-item hstack">
+                            <input type="number" id="gimbal_roll_channel" class="form-control w-10r" name="gimbal_roll_channel" data-setting="gimbal_roll_channel" />
+                            <label for="gimbal_roll_channel">
+                                <span data-i18n="configurationGimbalRollChannel"></span>
+                            </label>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="card mb-3 config-headtracker">
+                <div class="card-header" data-i18n="configurationHeadtracker"></div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item hstack headtracker_type_wrapper">
+                            <select id="headtracker-type" class="form-select w-10r" data-setting="headtracker_type"></select>
+                            <label for="headtracker-type">
+                                <span data-i18n="configurationHeadtrackerType"></span>
+                            </label>
+                        </li>
+                        <li class="list-group-item hstack headtracker_pan_ratio_wrapper">
+                            <input type="number" class="form-control w-10r" data-step="0.01" min="0" max="5" id="headtracker_pan_ratio" data-setting="headtracker_pan_ratio">
+                            <label for="headtracker_pan_ratio">
+                                <span data-i18n="configurationHeadtrackerPanRatio"></span>
+                            </label>
+                        </li>
+                        <li class="list-group-item hstack headtracker_tilt_ratio_wrapper">
+                            <input type="number" class="form-control w-10r" data-step="0.01" min="0" max="5" id="headtracker_tilt_ratio" data-setting="headtracker_tilt_ratio">
+                            <label for="headtracker_tilt_ratio">
+                                <span data-i18n="configurationHeadtrackerTiltRatio"></span>
+                            </label>
+                        </li>
+                        <li class="list-group-item hstack headtracker_roll_ratio_wrapper">
+                            <input type="number" class="form-control w-10r" data-step="0.01" id="headtracker_roll_ratio" data-setting="headtracker_roll_ratio">
+                            <label for="headtracker_roll_ratio">
+                                <span data-i18n="configurationHeadtrackerRollRatio"></span>
+                            </label>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="page-footer">
+        <button id="save-btn" class="btn btn-primary" data-i18n="configurationButtonSave"></button>
     </div>
 </div>

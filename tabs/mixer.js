@@ -96,8 +96,8 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
             let color = FC.OUTPUT_MAPPING.getOutputTimerColor(i - 1);
             let isLed = FC.OUTPUT_MAPPING.isLedPin(i - 1);
 
-            $outputRow.append('<td style="background-color: ' + color + '">S' + i + (isLed ? '/LED' : '') + ' (Timer&nbsp;' + (timerId + 1) + ')</td>');
-            $functionRow.append('<td id="function-' + i +'">-</td>');
+            $outputRow.append('<td class="text-center fw-bold" style="background-color: ' + color + '">S' + i + (isLed ? '/LED' : '') + ' (Timer&nbsp;' + (timerId + 1) + ')</td>');
+            $functionRow.append('<td class="text-center fw-bold" id="function-' + i +'">-</td>');
         }
 
         $outputRow.find('td').css('width', 100 / (outputCount + 1) + '%');
@@ -127,8 +127,8 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
         for (let t of usedTimers) {
             var usageMode = FC.OUTPUT_MAPPING.getTimerOverride(t);
             $container.append(
-                        '<div class="select" style="padding: 5px; margin: 1px; background-color: ' + FC.OUTPUT_MAPPING.getTimerColor(t) + '">' +
-                            '<select id="timer-output-' + t + '">' +
+                        '<div class="select hstack" style="padding: 5px; margin: 1px; background-color: ' + FC.OUTPUT_MAPPING.getTimerColor(t) + '">' +
+                            '<select class="form-select w-7r" id="timer-output-' + t + '">' +
                                 '<option value=' + FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_AUTO + '' + (usageMode == FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_AUTO ? ' selected' : '')+ '>AUTO</option>'+
                                 '<option value=' + FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_MOTORS + '' + (usageMode == FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_MOTORS ? ' selected' : '')+ '>MOTORS</option>'+
                                 '<option value=' + FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_SERVOS + '' + (usageMode == FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_SERVOS ? ' selected' : '')+ '>SERVOS</option>'+
@@ -344,13 +344,13 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
 
                 $servoMixTableBody.append('\
                     <tr>\
-                    <td><input type="number" class="mix-rule-servo" step="1" min="0" max="15" /></td>\
-                    <td><select class="mix-rule-input"></select></td>\
-                    <td class="mixer-fixed-value-col"><input type="number" class="mix-rule-fixed-value" min="875" max="2125" disabled /></td> \
-                    <td><input type="number" class="mix-rule-rate" step="1" min="-125" max="125" /></td>\
-                    <td><input type="number" class="mix-rule-speed" step="1" min="0" max="255" /></td>\
+                    <td><input type="number" class="mix-rule-servo form-control" step="1" min="0" max="15" /></td>\
+                    <td><select class="mix-rule-input form-select"></select></td>\
+                    <td class="mixer-fixed-value-col"><input type="number" class="mix-rule-fixed-value form-control" min="875" max="2125" disabled /></td> \
+                    <td><input type="number" class="mix-rule-rate form-control" step="1" min="-125" max="125" /></td>\
+                    <td><input type="number" class="mix-rule-speed form-control" step="1" min="0" max="255" /></td>\
                     <td class="mixer-table__condition"></td>\
-                    <td><span class="btn default_btn narrow red"><a href="#" data-role="role-servo-delete" data-i18n="servoMixerDelete"></a></span></td>\
+                    <td><button class="btn btn-outline-danger" data-role="role-servo-delete" data-i18n="servoMixerDelete"></button></td>\
                     </tr>\
                 ');
 
@@ -494,19 +494,39 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
                 const rule = rules[i];
                 index++;
 
-                $motorMixTableBody.append('\
-                    <tr>\
-                    <td><span class="mix-rule-motor"></span></td>\
-                    <td>\
-                        <input type="number" class="mix-rule-throttle" step="0.001" min="-2" max="2" />\
-                        <div class="throttle-warning-text" data-i18n="mixerThrottleWarning" ></div>\
-                    </td>\
-                    <td><input type="number" class="mix-rule-roll" step="0.001" min="-2" max="2" /></td>\
-                    <td><input type="number" class="mix-rule-pitch" step="0.001" min="-2" max="2" /></td>\
-                    <td><input type="number" class="mix-rule-yaw" step="0.001" min="-2" max="2" /></td>\
-                    <td><span class="btn default_btn narrow red"><a href="#" data-role="role-motor-delete" data-i18n="servoMixerDelete"></a></span></td>\
-                    </tr>\
-                ');
+                // $motorMixTableBody.append('\
+                //     <tr>\
+                //     <td><span class="mix-rule-motor"></span></td>\
+                //     <td>\
+                //         <input type="number" class="mix-rule-throttle form-control" step="0.001" min="-2" max="2" />\
+                //         <div class="throttle-warning-text" data-i18n="mixerThrottleWarning" ></div>\
+                //     </td>\
+                //     <td><input type="number" class="mix-rule-roll form-control" step="0.001" min="-2" max="2" /></td>\
+                //     <td><input type="number" class="mix-rule-pitch form-control" step="0.001" min="-2" max="2" /></td>\
+                //     <td><input type="number" class="mix-rule-yaw form-control" step="0.001" min="-2" max="2" /></td>\
+                //     <td>\
+                //     \
+                //     \
+                //     <span class="btn default_btn narrow red"><a href="#" data-role="role-motor-delete" data-i18n="servoMixerDelete"></a></span>\
+                //     </td>\
+                //     </tr>\
+                // ');
+
+                $motorMixTableBody.append(`
+                    <tr>
+                        <td><span class="mix-rule-motor"></span></td>
+                        <td>
+                            <input type="number" class="mix-rule-throttle form-control" step="0.001" min="-2" max="2" />
+                            <div class="throttle-warning-text" data-i18n="mixerThrottleWarning" ></div>
+                        </td>
+                        <td><input type="number" class="mix-rule-roll form-control" step="0.001" min="-2" max="2" /></td>
+                        <td><input type="number" class="mix-rule-pitch form-control" step="0.001" min="-2" max="2" /></td>
+                        <td><input type="number" class="mix-rule-yaw form-control" step="0.001" min="-2" max="2" /></td>
+                        <td>
+                            <button class="btn btn-outline-danger" data-role="role-motor-delete" data-i18n="servoMixerDelete"></button>
+                        </td>
+                    </tr>
+                `);
 
                 const $row = $motorMixTableBody.find('tr:last');
 
@@ -588,7 +608,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
 
         motorWizardModal = new jBox('Modal', {
             width: 480,
-            height: 410,
+            height: 'auto',
             closeButton: 'title',
             animation: false,
             attach: $wizardButton,
@@ -735,7 +755,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
 
         modal = new jBox('Modal', {
             width: 480,
-            height: 240,
+            height: 'auto',
             closeButton: 'title',
             animation: false,
             attach: $('#load-and-apply-mixer-button'),
@@ -816,7 +836,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
             FC.LOGIC_CONDITIONS.open();
         });
 
-        $('#save-button').on('click', saveAndReboot);
+        $('#save-btn').on('click', saveAndReboot);
 
         renderServoMixRules();
         renderMotorMixRules();

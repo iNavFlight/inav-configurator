@@ -143,8 +143,10 @@ let LogicCondition = function (enabled, activatorId, operation, operandAType, op
 
         $container.html('');
         if (self.hasOperand(operand)) {
+            $container.append('<div class="operands-container d-flex gap-2"></div>');
+            $container = $container.find('.operands-container');
             
-            $container.append('<select class="logic_element__operand--type" data-operand="' + operand + '"></select>');
+            $container.append('<select class="logic_element__operand--type form-select" data-operand="' + operand + '"></select>');
             let $t = $container.find('.logic_element__operand--type');
 
             for (let k in OPERAND_TYPES) {
@@ -243,14 +245,18 @@ let LogicCondition = function (enabled, activatorId, operation, operandAType, op
                 <td class="logic_cell__operandB"></td>\
                 <td class="logic_cell__activator"></div></td>\
                 <td class="logic_cell__flags"></div></td>\
-                <td class="logic_cell__status"></td>\
+                <td class="logic_cell__status text-center"></td>\
             </tr>\
         ');
 
         $row = $container.find('tr:last');
 
         $row.find('.logic_cell__index').html(index);
-        $row.find('.logic_cell__enabled').html("<input type='checkbox' class='toggle logic_element__enabled' />");
+        $row.find('.logic_cell__enabled').html(`
+            <div class="form-check form-switch">
+                <input class="form-check-input logic_element__enabled" type="checkbox" />
+            </div>    
+        `);
         $row.find('.logic_element__enabled').
             prop('checked', self.getEnabled()).
             change(self.onEnabledChange);
@@ -258,7 +264,7 @@ let LogicCondition = function (enabled, activatorId, operation, operandAType, op
         /*
          * Operator select
          */
-        $row.find('.logic_cell__operation').html("<select class='logic_element__operation' ></select>");
+        $row.find('.logic_cell__operation').html("<select class='logic_element__operation form-select' ></select>");
         let $t = $row.find('.logic_element__operation');
         
         let lcOperators = [];

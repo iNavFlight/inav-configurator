@@ -48,7 +48,7 @@ TABS.setup.initialize = function (callback) {
        i18n.localize();
 
         if (!FC.isMotorOutputEnabled()) {
-            GUI.log("<span style='color: red; font-weight: bolder'><strong>" + i18n.getMessage("logPwmOutputDisabled") + "</strong></span>");
+            GUI.log("<span style='color: var(--inav-danger); font-weight: bolder'><strong>" + i18n.getMessage("logPwmOutputDisabled") + "</strong></span>");
         }
 
         // initialize 3D
@@ -68,9 +68,7 @@ TABS.setup.initialize = function (callback) {
             $('default_btn').addClass('disabled');
         }
 
-        self.initializeInstruments();
-
-        $('a.resetSettings').on('click', function () {
+        $('#resetSettings').on('click', function () {
             if (confirm(i18n.getMessage('confirm_reset_settings'))) {
                 MSP.send_message(MSPCodes.MSP_RESET_CONF, false, false, function () {
                     GUI.log(i18n.getMessage('initialSetupSettingsRestored'));
@@ -86,10 +84,10 @@ TABS.setup.initialize = function (callback) {
         });
 
         // display current yaw fix value (important during tab re-initialization)
-        $('div#interactive_block > a.reset').text(i18n.getMessage('initialSetupButtonResetZaxisValue', [self.yaw_fix]));
+        $('#reset-axis').text(i18n.getMessage('initialSetupButtonResetZaxisValue', [self.yaw_fix]));
 
         // reset yaw button hook
-        $('div#interactive_block > a.reset').on('click', function () {
+        $('#reset-axis').on('click', function () {
             self.yaw_fix = FC.SENSOR_DATA.kinematics[2] * - 1.0;
             $(this).text(i18n.getMessage('initialSetupButtonResetZaxisValue', [self.yaw_fix]));
 
@@ -112,9 +110,9 @@ TABS.setup.initialize = function (callback) {
             gpsSats_e = $('.gpsSats'),
             gpsLat_e = $('.gpsLat'),
             gpsLon_e = $('.gpsLon'),
-            roll_e = $('dd.roll'),
-            pitch_e = $('dd.pitch'),
-            heading_e = $('dd.heading');
+            roll_e = $('.roll'),
+            pitch_e = $('.pitch'),
+            heading_e = $('.heading');
 
         function get_slow_data() {
             if (SerialBackend.have_sensor(FC.CONFIG.activeSensors, 'gps')) {
@@ -138,7 +136,6 @@ TABS.setup.initialize = function (callback) {
 	            pitch_e.text(i18n.getMessage('initialSetupAttitude', [FC.SENSOR_DATA.kinematics[1]]));
                 heading_e.text(i18n.getMessage('initialSetupAttitude', [FC.SENSOR_DATA.kinematics[2]]));
                 self.render3D();
-                self.updateInstruments();
             });
         }
 
@@ -186,18 +183,6 @@ TABS.setup.initialize = function (callback) {
     }
 };
 
-TABS.setup.initializeInstruments = function() {
-    var options = {size:90, showBox : false, img_directory: path.join(__dirname, '/../images/flightindicators/')};
-    var attitude = $.flightIndicator('#attitude', 'attitude', options);
-    var heading = $.flightIndicator('#heading', 'heading', options);
-
-    this.updateInstruments = function() {
-        attitude.setRoll(FC.SENSOR_DATA.kinematics[0]);
-        attitude.setPitch(FC.SENSOR_DATA.kinematics[1]);
-        heading.setHeading(FC.SENSOR_DATA.kinematics[2]);
-    };
-};
-
 TABS.setup.initialize3D = function () {
     var self = this,
         loader,
@@ -213,8 +198,10 @@ TABS.setup.initialize3D = function () {
         model_file,
         useWebGlRenderer = false;
 
-    canvas = $('.model-and-info #canvas');
-    wrapper = $('.model-and-info #canvas_wrapper');
+    canvas = $('#3d-uav');
+    wrapper = canvas.parent();
+    console.log('wrapper', wrapper)
+    // wrapper = $('.model-and-info #canvas_wrapper');
 
     // webgl capability detector
     // it would seem the webgl "enabling" through advanced settings will be ignored in the future
@@ -227,7 +214,7 @@ TABS.setup.initialize3D = function () {
         renderer = new THREE.CanvasRenderer({canvas: canvas.get(0), alpha: true});
     }
     // initialize render size for current canvas size
-    renderer.setSize(wrapper.width()*2, wrapper.height()*2);
+    renderer.setSize(wrapper.width(), wrapper.height());
 
 
     // modelWrapper adds an extra axis of rotation to avoid gimbal lock with the euler angles
@@ -237,7 +224,7 @@ TABS.setup.initialize3D = function () {
     if (useWebGlRenderer) {
         if (FC.MIXER_CONFIG.appliedMixerPreset === -1) {
             model_file = 'custom';
-            GUI.log("<span style='color: red; font-weight: bolder'><strong>" + i18n.getMessage("mixerNotConfigured") + "</strong></span>");
+            GUI.log("<span style='color: var(--inav-danger); font-weight: bolder'><strong>" + i18n.getMessage("mixerNotConfigured") + "</strong></span>");
         } else {
             model_file = mixer.getById(FC.MIXER_CONFIG.appliedMixerPreset).model;
         }
@@ -264,7 +251,7 @@ TABS.setup.initialize3D = function () {
     camera = new THREE.PerspectiveCamera(50, wrapper.width() / wrapper.height(), 1, 10000);
 
     // some light
-    light = new THREE.AmbientLight(0x404040);
+    light = new THREE.AmbientLight();
     light2 = new THREE.DirectionalLight(new THREE.Color(1, 1, 1), 1.5);
     light2.position.set(0, 1, 0);
 
@@ -293,7 +280,7 @@ TABS.setup.initialize3D = function () {
 
     // handle canvas resize
     this.resize3D = function () {
-        renderer.setSize(wrapper.width()*2, wrapper.height()*2);
+        renderer.setSize(wrapper.width(), wrapper.height());
         camera.aspect = wrapper.width() / wrapper.height();
         camera.updateProjectionMatrix();
 

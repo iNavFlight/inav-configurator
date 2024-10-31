@@ -318,15 +318,13 @@ var defaultsDialog = (function () {
         for (let i in defaultsDialogData) {
             if (defaultsDialogData.hasOwnProperty(i)) {
                 let preset = defaultsDialogData[i];
-                let $element = $("<div class='default_btn defaults_btn'>\
-                        <a class='confirm' href='#'></a>\
-                    </div>")
+                let $element = $('<button class="btn btn-lg btn-outline-primary mb-3"></button>');
 
                 if (preset.notRecommended) {
-                    $element.addClass("defaults_btn--not-recommended");
+                   $element.addClass("btn-warning").removeClass("btn-outline-primary");
                 }
 
-                $element.find("a").html(preset.title);
+                $element.html(preset.title);
                 $element.data("index", i).on('click', privateScope.onPresetClick)
                 $element.appendTo($place);
             }

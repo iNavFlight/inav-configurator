@@ -28,7 +28,7 @@ TABS.failsafe.initialize = function (callback, scrollPosition) {
             GUI.simpleBind();
 
             // translate to user-selected language
-           i18n.localize();;
+           i18n.localize();
 
             // for some odd reason chrome 38+ changes scroll according to the touched select element
             // i am guessing this is a bug, since this wasn't happening on 37
@@ -36,85 +36,82 @@ TABS.failsafe.initialize = function (callback, scrollPosition) {
             $('#content').scrollTop((scrollPosition) ? scrollPosition : 0);
 
             // set stage 2 failsafe procedure
-            $('input[type="radio"].procedure').on('change', function () {
-                var element = $(this),
-                    checked = element.is(':checked'),
-                    id = element.attr('id');
-                switch (id) {
-                    case 'drop':
-                        if (checked) {
-                            $('input[name="failsafe_throttle"]').prop("disabled", true);
-                            $('input[name="failsafe_off_delay"]').prop("disabled", true);
-                        }
-                        break;
-
-                    case 'land':
-                        if (checked) {
-                            $('input[name="failsafe_throttle"]').prop("disabled", false);
-                            $('input[name="failsafe_off_delay"]').prop("disabled", false);
-                        }
-                        break;
+            let isFirstInit = true;
+            $('#procedure').on('change', function() {
+                let procedure = $('#procedure').val();
+                if (procedure === 'land') {
+                    $('#land-procedure-adjustments').slideDown(isFirstInit ? 0 : 125);
+                    $('input[name="failsafe_throttle"]').prop("disabled", false);
+                    $('input[name="failsafe_off_delay"]').prop("disabled", false);
+                } else {
+                    $('#land-procedure-adjustments').slideUp(isFirstInit ? 0 : 125);
+                    $('input[name="failsafe_throttle"]').prop("disabled", true);
+                    $('input[name="failsafe_off_delay"]').prop("disabled", true);
                 }
-            });
+                $('#procedure-visualization')
+                    .removeClass('procedure-land procedure-drop procedure-rth procedure-nothing')
+                    .addClass('procedure-' + procedure);
+                isFirstInit = false;
+            })
 
             // switch (MSPHelper.getSetting('failsafe_procedure')) {  // Use once #7734 is merged
             switch (FC.FAILSAFE_CONFIG.failsafe_procedure) {
-                default:
                 case 0:
-                    var element = $('input[id="land"]');
-                    element.prop('checked', true);
-                    element.trigger('change');
+                    $('#procedure').val('land').trigger('change');
                     break;
                 case 1:
-                    var element = $('input[id="drop"]');
-                    element.prop('checked', true);
-                    element.trigger('change');
+                    $('#procedure').val('drop').trigger('change');
                     break;
                 case 2:
-                    var element = $('input[id="rth"]');
-                    element.prop('checked', true);
-                    element.trigger('change');
+                    $('#procedure').val('rth').trigger('change');
                     break;
                 case 3:
-                    var element = $('input[id="nothing"]');
-                    element.prop('checked', true);
-                    element.trigger('change');
+                    $('#procedure').val('nothing').trigger('change');
+                    break;
+                default:
                     break;
             }
+
 
             // Adjust Minimum Distance values when checkbox is checked/unchecked
             $('#failsafe_use_minimum_distance').on('change', function () {
                 if ($(this).is(':checked')) {
                     // No default distance added due to conversions
-                    $('#failsafe_min_distance_elements').show();
-                    $('#failsafe_min_distance_procedure_elements').show();
+                    $('#alternate-procedure-adjustments').slideDown(125);
+                    // $('#failsafe_min_distance_elements').show();
+                    // $('#failsafe_min_distance_procedure_elements').show();
                 } else {
                     // If they uncheck it, clear the distance to 0, which disables this feature
+                    $('#alternate-procedure-adjustments').slideUp(125);
                     $('#failsafe_min_distance').val(0);
-                    $('#failsafe_min_distance_elements').hide();
-                    $('#failsafe_min_distance_procedure_elements').hide();
+                    // $('#failsafe_min_distance_elements').hide();
+                    // $('#failsafe_min_distance_procedure_elements').hide();
                 }
             });
 
             // Set initial state of controls according to data
             if ( $('#failsafe_min_distance').val() > 0) {
                 $('#failsafe_use_minimum_distance').prop('checked', true);
-                $('#failsafe_min_distance_elements').show();
-                $('#failsafe_min_distance_procedure_elements').show();
+                $('#alternate-procedure-adjustments').show(0);
+                // $('#failsafe_min_distance_elements').show();
+                // $('#failsafe_min_distance_procedure_elements').show();
             } else {
                 $('#failsafe_use_minimum_distance').prop('checked', false);
-                $('#failsafe_min_distance_elements').hide();
-                $('#failsafe_min_distance_procedure_elements').hide();
+                $('#alternate-procedure-adjustments').hide(0);
+                // $('#failsafe_min_distance_elements').hide();
+                // $('#failsafe_min_distance_procedure_elements').hide();
             }
 
-            $('a.save').on('click', function () {
-                if ($('input[id="land"]').is(':checked')) {
+            $('#save-btn').on('click', function () {
+                let procedure = $('#procedure').val();
+
+                if (procedure === 'land') {
                     FC.FAILSAFE_CONFIG.failsafe_procedure = 0;
-                } else if ($('input[id="drop"]').is(':checked')) {
+                } else if (procedure === 'drop') {
                     FC.FAILSAFE_CONFIG.failsafe_procedure = 1;
-                } else if ($('input[id="rth"]').is(':checked')) {
+                } else if (procedure === 'rth') {
                     FC.FAILSAFE_CONFIG.failsafe_procedure = 2;
-                } else if ($('input[id="nothing"]').is(':checked')) {
+                } else if (procedure === 'nothing') {
                     FC.FAILSAFE_CONFIG.failsafe_procedure = 3;
                 }
         
@@ -135,7 +132,7 @@ TABS.failsafe.initialize = function (callback, scrollPosition) {
             GUI.tab_switch_cleanup(function () {
                 MSP.send_message(MSPCodes.MSP_SET_REBOOT, false, false, function () {
                     GUI.log(i18n.getMessage('deviceRebooting'));
-                    GUI.handleReconnect($('.tab_failsafe a'));
+                    GUI.handleReconnect($('[data-tab="failsafe"] > a'));
                 });
             });
         });

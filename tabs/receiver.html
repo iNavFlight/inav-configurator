@@ -1,133 +1,119 @@
-<!--suppress HtmlFormInputWithoutLabel -->
-<div class="tab-receiver toolbar_fixed_bottom">
-    <div class="content_wrapper">
-        <div class="tab_title" data-i18n="tabReceiver"></div>
-        <div class="note" style="margin-bottom: 20px;">
-            <div class="note_spacer">
-                <p data-i18n="receiverHelp"></p>
+<div class="page">
+    <div class="page-header">
+        <span data-i18n="tabReceiver"></span>
+    </div>
+
+    <div class="alert alert-warning">
+        <div data-i18n="receiverHelp"></div>
+    </div>
+
+    <div class="row">
+        <div class="col">
+            <div class="card mb-3">
+                <div class="card-header">Channel Settings</div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item hstack">
+                            <input class="form-control w-7r border-0 rounded-end-0 position-absolute ms-1" type="text" name="rcmap" spellcheck="false" />
+                            <select class="hybrid_helper form-select w-10r" name="rcmap_helper" style="color: transparent;">
+                                <option value="AETR">Default</option>
+                                <option value="AETR">Futaba / Hitec</option>
+                                <option value="TAER">JR / Spektrum / Graupner</option>
+                            </select>
+                            <label data-i18n="receiverChannelMap"></label>
+                            <div class="helpicon cf_tip" data-i18n_title="receiverChannelMapTitle"></div>
+                        </li>
+                        <li class="list-group-item hstack">
+                            <select class="form-select w-10r" name="rssi_channel">
+                                <!-- list generated here -->
+                            </select>
+                            <label data-i18n="receiverRssiChannel"></label>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="card mb-3">
+                <div class="card-body" id="channels-wrapper">
+                    <!-- list of channels generated here -->
+                </div>
             </div>
         </div>
-        <div class="bars">
-            <div class="rssi_channel_wrapper">
-                <div class="head" data-i18n="receiverRssiChannel"></div>
-                <select name="rssi_channel">
-                    <!-- list generated here -->
-                </select>
-            </div>
-            <div class="rcmap_wrapper">
-                <div class="head">
-                    <span data-i18n="receiverChannelMap" data-i18n_title="receiverChannelMapTitle"></span>
-                </div>
-                <div class="hybrid_element">
-                    <input type="text" name="rcmap" spellcheck="false" /> 
-                    <select class="hybrid_helper"
-                        name="rcmap_helper">
-                        <option value="AETR">Default</option>
-                        <option value="AETR">Futaba / Hitec</option>
-                        <option value="TAER">JR / Spektrum / Graupner</option>
-                    </select>
-                </div>
-            </div>
-        </div>
-        <div class="fc_column half" style="margin-left: 20px;">
-            
-            <div class="gui_box grey config-section">
-                <div class="gui_box_titlebar">
-                    <div class="spacer_box_title" data-i18n="configurationReceiver"></div>
-                </div>
-                <div class="spacer_box">
-                    <div class="select">
-                        <select id="receiver_type" data-setting="receiver_type"></select>
-                        <label for="receiver_type">
-                            <span data-i18n="receiverType"></span>
-                        </label>
-                    </div>
-                    <div id="serialrx_provider-wrapper">
-                        <div class="info-box ok-box" data-i18n="configurationSerialRXHelp"></div>
-                        <div class="select">
-                            <select id="serialrx_provider" data-setting="serialrx_provider"></select>
-                            <label for="serialrx_provider">
-                                <span data-i18n="configurationSerialRX"></span>
-                            </label>
-                        </div>
-                        <div class="select">
-                            <select id="serialrx_inverted" data-setting="serialrx_inverted"></select>
-                            <label for="serialrx_inverted">
-                                <span data-i18n="serialrx_inverted"></span>
-                            </label>
-                        </div><div class="select">
-                            <select id="serialrx_halfduplex" data-setting="serialrx_halfduplex"></select>
-                            <label for="serialrx_halfduplex">
-                                <span data-i18n="serialrx_halfduplex"></span>
-                            </label>
-                        </div>
-                    </div>
-
+        <div class="col">
+            <div class="card mb-3">
+                <div class="card-header" data-i18n="configurationReceiver"></div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item hstack">
+                            <select id="receiver_type" class="form-select w-10r" data-setting="receiver_type"></select>
+                            <label for="receiver_type" data-i18n="receiverType"></label>
+                        </li>
+                        <li class="list-group-item vstack">
+                            <div class="alert alert-info mb-2">
+                                <div data-i18n="configurationSerialRXHelp"></div>
+                            </div>
+                            <div class="hstack">
+                                <select id="serialrx_provider" class="form-select w-10r" data-setting="serialrx_provider"></select>
+                                <label for="serialrx_provider" data-i18n="configurationSerialRX"></label>
+                            </div>
+                        </li>
+                        <li class="list-group-item hstack">
+                            <select id="serialrx_inverted" class="form-select w-10r" data-setting="serialrx_inverted"></select>
+                            <label for="serialrx_inverted" data-i18n="serialrx_inverted"></label>
+                        </li>
+                        <li class="list-group-item hstack">
+                            <select id="serialrx_halfduplex" class="form-select w-10r" data-setting="serialrx_halfduplex"></select>
+                            <label for="serialrx_halfduplex" data-i18n="serialrx_halfduplex"></label>
+                        </li>
+                    </ul>
                 </div>
             </div>
 
-            <div class="gui_box grey config-section config-section--full-width">
-                <div class="gui_box_titlebar">
-                    <div class="spacer_box_title" data-i18n="rcSmoothing"></div>
-                </div>
-                <div class="spacer_box">                   
-                    <div class="number">
-                        <input id="rc_filter_smoothing_factor" data-setting="rc_filter_smoothing_factor" type="number" data-presentation="range" />
-                        <label for="rc_filter_smoothing_factor">
-                            <span data-i18n="rc_filter_smoothing_factor"></span>
-                        </label>
+            <div class="card mb-3">
+                <div class="card-header" data-i18n="rcSmoothing"></div>
+                <div class="card-body">
+                    <div class="hstack">
+                        <input id="rc_filter_smoothing_factor" class="form-control w-6r" data-setting="rc_filter_smoothing_factor" type="number" data-presentation="range" />
+                        <label for="rc_filter_smoothing_factor" data-i18n="rc_filter_smoothing_factor"></label>
                     </div>
                 </div>
             </div>
 
-            <div class="gui_box grey">
-                <div class="spacer" style="margin-top: 10px; margin-bottom: 10px;">
-                    <div class="cf_column curves" style="width: calc(55% - 10px); min-width: 200px;">
-                        <div class="throttle_curve">
-                            <canvas width="200" height="117"></canvas>
+            <div class="card mb-3">
+                <div class="card-body">
+                    <div class="hstack gap-3">
+                        <div class="throttle_curve card bg-grid bg-body flex-grow-0">
+                            <canvas width="200" height="137"></canvas>
                         </div>
-                    </div>
-                    <div class="fc_column half tunings">
-                        <table class="throttle">
-                            <tr>
-                                <th data-i18n="receiverThrottleMid"></th>
-                                <th data-i18n="receiverThrottleExpo"></th>
-                            </tr>
-                            <tr>
-                                <td><input class="controlProfileHighlight" type="number" name="mid" step="0.01" min="0" max="1" /></td>
-                                <td><input class="controlProfileHighlight" type="number" name="expo" step="0.01" min="0" max="1" /></td>
-                            </tr>
-                        </table>
-                        <table class="deadband">
-                            <tr>
-                                <th data-i18n="receiverDeadband"></th>
-                                <th data-i18n="receiverYawDeadband"></th>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div class="cf_tip" data-i18n_title="receiverHelpDeadband">
-                                        <input type="number" name="deadband" step="1" min="0" max="32" />
-                                    </div>
-                                </td>
-                                <td>
-                                    <div class="cf_tip" data-i18n_title="receiverHelpYawDeadband">
-                                        <input type="number" name="yaw_deadband" step="1" min="0" max="100" />
-                                    </div>
-                                </td>
-                            </tr>
-                        </table>
+                        <div class="tunings hstack flex-grow-1">
+                            <ul class="list-group list-group-flush w-100 throttle deadband">
+                                <li class="list-group-item hstack">
+                                    <input class="profile-input-control form-control w-5r" type="number" name="mid" step="0.01" min="0" max="1" />
+                                    <label data-i18n="receiverThrottleMid"></label>
+                                </li>
+                                <li class="list-group-item hstack">
+                                    <input class="profile-input-control form-control w-5r" type="number" name="expo" step="0.01" min="0" max="1" />
+                                    <label data-i18n="receiverThrottleExpo"></label>
+                                </li>
+                                <li class="list-group-item hstack">
+                                    <input class="form-control w-5r" type="number" name="deadband" step="1" min="0" max="32" />
+                                    <label data-i18n="receiverDeadband"></label>
+                                    <div class="helpicon cf_tip" data-i18n_title="receiverHelpDeadband"></div>
+                                </li>
+                                <li class="list-group-item hstack">
+                                    <input class="form-control w-5r" type="number" name="yaw_deadband" step="1" min="0" max="100" />
+                                    <label data-i18n="receiverYawDeadband"></label>
+                                    <div class="helpicon cf_tip" data-i18n_title="receiverHelpYawDeadband"></div>
+                                </li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>
-            
         </div>
     </div>
-    <div class="content_toolbar">
-        <div class="btn update_btn">
-            <a class="update" href="#" data-i18n="configurationButtonSave"></a>
-        </div>
-        <div class="btn sticks_btn">
-            <a class="sticks" href="#" data-i18n="receiverButtonSticks"></a>
-        </div>
+
+    <div class="page-footer gap-2">
+        <button id="sticks-btn" class="btn btn-primary" data-i18n="receiverButtonSticks"></button>
+        <button id="save-btn" class="btn btn-primary" data-i18n="configurationButtonSave"></button>
     </div>
 </div>

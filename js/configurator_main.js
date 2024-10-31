@@ -1,14 +1,16 @@
 window.$ = window.jQuery =  require('jquery'), 
                             require('jquery-ui-dist/jquery-ui'),
                             require('jquery-textcomplete'),
-                            require('./libraries/jquery.flightindicators'),
                             require('./libraries/jquery.nouislider.all.min'),
                             require('./libraries/jquery.ba-throttle-debounce');
 
 const { app } = require('@electron/remote');
-const d3 = require('./libraries/d3.min');
+const { ipcRenderer } = require('electron');
+const darkMode = require('./darkMode');
+const d3 = require('d3');
 const Store = require('electron-store');
 const store = new Store();
+const bootstrap = require('bootstrap');
 
 const { GUI, TABS } = require('./gui');
 const CONFIGURATOR = require('./data_storage');
@@ -31,7 +33,7 @@ process.on('uncaughtException', function (error) {
         GUI.log(i18n.getMessage('unexpectedError', error.message));
         if (GUI.connected_to || GUI.connecting_to) {
             GUI.log(i18n.getMessage('disconnecting'));
-            $('a.connect').trigger('click');
+            $('#connect-btn').trigger('click');
         } 
     } else {
         throw error;
@@ -40,12 +42,34 @@ process.on('uncaughtException', function (error) {
 
 // Set how the units render on the configurator only
 $(function() {
+    darkMode.init();
     i18n.init( () => {
         i18n.localize();
 
         MSP.init();
         mspHelper.init();
         SerialBackend.init();
+
+        $('#minimize-window').click(() => {
+            ipcRenderer.send('minimize-window');
+        });
+
+        $('#maximize-window').click(() => {
+            ipcRenderer.send('maximize-window');
+        });
+
+        $('#close-window').click(() => {
+            ipcRenderer.send('close-window');
+        });
+
+        ipcRenderer.on('onmaximize', () => {
+            $('#maximize-window .icon').removeClass('restore maximize').addClass('restore');
+        })
+
+        ipcRenderer.on('onminimize', () => {
+            $('#maximize-window .icon').removeClass('restore maximize').addClass('maximize');
+        })
+
 
         GUI.updateEzTuneTabVisibility = function(loadMixerConfig) {
             let useEzTune = true;
@@ -106,7 +130,7 @@ $(function() {
             i18n.getMessage('getConfiguratorVersion') + app.getVersion() + '</strong>');
 
         $('#status-bar .version').text(app.getVersion());
-        $('#logo .version').text(app.getVersion());
+        $('[data-configurator-version-info]').text('v' + app.getVersion());
         update.firmwareVersion();
 
         if (store.get('logopen', false)) {
@@ -124,20 +148,19 @@ $(function() {
         var ui_tabs = $('#tabs > ul');
         $('a', ui_tabs).on('click', function() {
 
-            if ($(this).parent().hasClass("tab_help")) {
+            let tab = $(this).parent();
+            let tabName = tab.attr('data-tab');
+            let isActiveTab = tab.hasClass('active');
+            let requireConnectedMode = tab.parent().hasClass('mode-connected');
+
+            if (tabName === 'help') {
                 return;
             }
 
-            if ($(this).parent().hasClass('active') == false && !GUI.tab_switch_in_progress) { // only initialize when the tab isn't already active
-                var self = this,
-                    tabClass = $(self).parent().prop('class');
+            if (isActiveTab === false && !GUI.tab_switch_in_progress) { // only initialize when the tab isn't already active
+                console.log('tabName', tabName)
 
-                var tabRequiresConnection = $(self).parent().hasClass('mode-connected');
-
-                var tab = tabClass.substring(4);
-                var tabName = $(self).text();
-
-                if (tabRequiresConnection && !CONFIGURATOR.connectionValid) {
+                if (requireConnectedMode && !CONFIGURATOR.connectionValid) {
                     GUI.log(i18n.getMessage('tabSwitchConnectionRequired'));
                     return;
                 }
@@ -147,7 +170,7 @@ $(function() {
                     return;
                 }
 
-                if (GUI.allowedTabs.indexOf(tab) < 0) {
+                if (GUI.allowedTabs.indexOf(tabName) < 0) {
                     GUI.log(i18n.getMessage('tabSwitchUpgradeRequired', [tabName]));
                     return;
                 }
@@ -159,7 +182,7 @@ $(function() {
                     $('li', ui_tabs).removeClass('active');
 
                     // Highlight selected tab
-                    $(self).parent().addClass('active');
+                    tab.addClass('active');
 
                     // detach listeners and remove element data
                     var content = $('#content');
@@ -168,127 +191,25 @@ $(function() {
 
                     // display loading screen
                     $('#cache .data-loading').clone().appendTo(content);
+                    // $('#loading').clone().appendTo(content);
 
-                    function content_ready() {
+                    function contentReady() {
                         GUI.tab_switch_in_progress = false;
-
-                        // Update CSS on to show highlighing or not
-                        updateProfilesHighlightColours();
+                        updateProfilesHighlightColours(); // Update CSS on to show highlighting or not
                     }
 
-                    switch (tab) {
-                        case 'landing':
-                            require('./../tabs/landing')
-                            TABS.landing.initialize(content_ready);
-                            break;
-                        case 'firmware_flasher':
-                            require('./../tabs/firmware_flasher')
-                            TABS.firmware_flasher.initialize(content_ready);
-                            break;
-                        case 'sitl':
-                            require('./../tabs/sitl')
-                            TABS.sitl.initialize(content_ready);
-                            break;
-                        case 'auxiliary':
-                            require('./../tabs/auxiliary')
-                            TABS.auxiliary.initialize(content_ready);
-                            break;
-                        case 'adjustments':
-                            require('./../tabs/adjustments')
-                            TABS.adjustments.initialize(content_ready);
-                            break;
-                        case 'ports':
-                            require('./../tabs/ports');
-                            TABS.ports.initialize(content_ready);
-                            break;
-                        case 'led_strip':
-                            require('./../tabs/led_strip');
-                            TABS.led_strip.initialize(content_ready);
-                            break;
-                        case 'failsafe':
-                            require('./../tabs/failsafe');
-                            TABS.failsafe.initialize(content_ready);
-                            break;
-                        case 'setup':
-                            require('./../tabs/setup');
-                            TABS.setup.initialize(content_ready);
-                            break;
-                        case 'calibration':
-                            require('./../tabs/calibration');
-                            TABS.calibration.initialize(content_ready);
-                            break;
-                        case 'configuration':
-                            require('./../tabs/configuration');
-                            TABS.configuration.initialize(content_ready);
-                            break;
-                        case 'pid_tuning':
-                            require('./../tabs/pid_tuning');
-                            TABS.pid_tuning.initialize(content_ready);
-                            break;
-                        case 'receiver':
-                            require('./../tabs/receiver');
-                            TABS.receiver.initialize(content_ready);
-                            break;
-                        case 'gps':
-                            require('./../tabs/gps');
-                            TABS.gps.initialize(content_ready);
-                            break;
-                        case 'magnetometer':
-                            require('./../tabs/magnetometer');
-                            TABS.magnetometer.initialize(content_ready);
-                            break;
-                        case 'mission_control':
-                            require('./../tabs/mission_control');
-                            TABS.mission_control.initialize(content_ready);
-                            break;
-                        case 'mixer':
-                            require('./../tabs/mixer');
-                            TABS.mixer.initialize(content_ready);
-                            break;
-                        case 'outputs':
-                            require('./../tabs/outputs');
-                            TABS.outputs.initialize(content_ready);
-                            break;
-                        case 'osd':
-                            require('./../tabs/osd');
-                            TABS.osd.initialize(content_ready);
-                            break;
-                        case 'sensors':
-                            require('./../tabs/sensors');
-                            TABS.sensors.initialize(content_ready);
-                            break;
-                        case 'logging':
-                            require('./../tabs/logging');
-                            TABS.logging.initialize(content_ready);
-                            break;
-                        case 'onboard_logging':
-                            require('./../tabs/onboard_logging');
-                            TABS.onboard_logging.initialize(content_ready);
-                            break;
-                        case 'advanced_tuning':
-                            require('./../tabs/advanced_tuning');
-                            TABS.advanced_tuning.initialize(content_ready);
-                            break;
-                        case 'programming':
-                            require('./../tabs/programming');
-                            TABS.programming.initialize(content_ready);
-                            break;
-                        case 'cli':
-                            require('./../tabs/cli');
-                            TABS.cli.initialize(content_ready);
-                            break;
-                        case 'ez_tune':
-                            require('./../tabs/ez_tune');
-                            TABS.ez_tune.initialize(content_ready);
-                            break;
-                        default:
-                            console.log('Tab not found:' + tab);
+                    try {
+                        require('./../tabs/' + tabName);
+                        TABS[tabName].initialize(contentReady);
+                    } catch (e) {
+                        console.log('Tab not found:' + tab);
                     }
                 });
             }
+
         });
 
-        $('#tabs ul.mode-disconnected li a:first').trigger( "click" );
+        $('[data-tab="landing"] > a').trigger( "click" );
 
         // options
         $('#options').on('click', function() {
@@ -296,54 +217,56 @@ $(function() {
 
             if (!el.hasClass('active')) {
                 el.addClass('active');
-                el.after('<div id="options-window"></div>');
+                el.after('<div id="options-window" class="shadow overflow-auto"></div>');
 
-                $('div#options-window').load('./tabs/options.html', function () {
-
+                $('#options-window').load('./tabs/options.html', function () {
                     // translate to user-selected language
                     i18n.localize();
 
+                    // Set current value of configurator theme
+                    $('#options-window').attr('data-bs-theme', darkMode.getCurrentTheme())
+                    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+                        $('#options-window').attr('data-bs-theme', darkMode.getCurrentTheme())
+                    })
+
                     // if notifications are enabled, or wasn't set, check the notifications checkbox
                     if (store.get('update_notify', true)) {
-                        $('div.notifications input').prop('checked', true);
+                        $('#receive-desktop-notifications').prop('checked', true);
                     }
 
-                    $('div.notifications input').on('change', function () {
-                        var check = $(this).is(':checked');
+                    $('#receive-desktop-notifications').on('change', function () {
+                        let check = $(this).is(':checked');
                         store.set('update_notify', check);
                     });
 
-                    $('div.statistics input').on('change', function () {
-                        var check = $(this).is(':checked');
+                    $('#send-anonymous-data').on('change', function () {
+                        let check = $(this).is(':checked');
                     });
 
-                    $('div.show_profile_parameters input').on('change', function () {
+                    $('#show-profile-parameters').on('change', function () {
                         globalSettings.showProfileParameters = $(this).is(':checked');
                         store.set('show_profile_parameters', globalSettings.showProfileParameters);
 
                         // Update CSS on select boxes
                         updateProfilesHighlightColours();
-
-                        // Horrible way to reload the tab
-                        const activeTab = $('#tabs li.active');
-                        activeTab.removeClass('active');
-                        activeTab.find('a').trigger( "click" );
                     });
 
-                    $('div.cli_autocomplete input').on('change', function () {
+                    $('#use-advanced-cli-autocomplete').on('change', function () {
                         globalSettings.cliAutocomplete = $(this).is(':checked');
                         store.set('cli_autocomplete', globalSettings.cliAutocomplete);
 
                         CliAutoComplete.setEnabled($(this).is(':checked'));
                     });
 
+                    $('#configurator-theme-select').val(localStorage.getItem('theme'));
+                    $('#configurator-theme-header-navbar-select').val(localStorage.getItem('theme-appearance'));
                     $('#ui-unit-type').val(globalSettings.unitType);
                     $('#map-provider-type').val(globalSettings.mapProviderType);
                     $('#map-api-key').val(globalSettings.mapApiKey);
                     $('#proxyurl').val(globalSettings.proxyURL);
                     $('#proxylayer').val(globalSettings.proxyLayer);
-                    $('#showProfileParameters').prop('checked', globalSettings.showProfileParameters);
-                    $('#cliAutocomplete').prop('checked', globalSettings.cliAutocomplete);
+                    $('#show-profile-parameters').prop('checked', globalSettings.showProfileParameters);
+                    $('#use-advanced-cli-autocomplete').prop('checked', globalSettings.cliAutocomplete);
                     $('#assistnow-api-key').val(globalSettings.assistnowApiKey);
                     
                     i18n.getLanguages().forEach(lng => {
@@ -371,6 +294,13 @@ $(function() {
                         const activeTab = $('#tabs li.active');
                         activeTab.removeClass('active');
                         activeTab.find('a').trigger( "click" );
+                    });
+                    $('#configurator-theme-select').on('change', function () {
+                        darkMode.setTheme($(this).val())
+                        $('#options-window').attr('data-bs-theme', darkMode.getCurrentTheme())
+                    });
+                    $('#configurator-theme-header-navbar-select').on('change', function () {
+                        darkMode.setThemeAppearance($(this).val());
                     });
                     $('#map-provider-type').on('change', function () {
                         store.set('map_provider_type', $(this).val());
@@ -403,7 +333,7 @@ $(function() {
                         if (e.type == 'click' && !$.contains($('div#options-window')[0], e.target) || e.type == 'keyup' && e.keyCode == 27) {
                             $(document).unbind('click keyup', close_and_cleanup);
 
-                            $('div#options-window').slideUp(250, function () {
+                            $('div#options-window').slideUp(125, function () {
                                 el.removeClass('active');
                                 $(this).empty().remove();
                             });
@@ -412,7 +342,7 @@ $(function() {
 
                     $(document).bind('click keyup', close_and_cleanup);
 
-                    $(this).slideDown(250);
+                    $(this).slideDown(125);
                 });
             }
         });
@@ -494,37 +424,12 @@ $(function() {
             }
         });
 
-        $("#showlog").on('click', function() {
-        var state = $(this).data('state'),
-            $log = $("#log");
 
-        if (state) {
-            $log.animate({height: 27}, 200, function() {
-                var command_log = $('div#log');
-                //noinspection JSValidateTypes
-                command_log.scrollTop($('div.wrapper', command_log).height());
-            });
-            $log.removeClass('active');
-            $("#content").removeClass('logopen');
-            $(".tab_container").removeClass('logopen');
-            $("#scrollicon").removeClass('active');
-            store.set('logopen', false);
+        $("#logs-toggle").on('click', function() {
 
-            state = false;
-        }else{
-            $log.animate({height: 111}, 200);
-            $log.addClass('active');
-            $("#content").addClass('logopen');
-            $(".tab_container").addClass('logopen');
-            $("#scrollicon").addClass('active');
-            store.set('logopen', true);
+            $('#logs').toggleClass('open');
 
-            state = true;
-        }
-        
-        $(this).html(state ? i18n.getMessage("mainHideLog") : i18n.getMessage("mainShowLog"));
-        $(this).data('state', state);
-
+            $(this).html($('#logs').hasClass('open') ? i18n.getMessage("mainHideLog") : i18n.getMessage("mainShowLog"))
         });
 
         var mixerprofile_e = $('#mixerprofilechange');
@@ -580,34 +485,9 @@ function get_osd_settings() {
     });
 }
 
+// TODO
 function updateProfilesHighlightColours() {
-    if (globalSettings.showProfileParameters) {
-        $('.dropdown-dark #profilechange').addClass('showProfileParams');
-        $('.dropdown-dark #batteryprofilechange').addClass('showProfileParams');
-
-        $('.batteryProfileHighlight').each(function () {
-            $(this).addClass('batteryProfileHighlightActive');
-            $(this).removeClass('batteryProfileHighlight');
-        });
-
-        $('.controlProfileHighlight').each(function () {
-            $(this).addClass('controlProfileHighlightActive');
-            $(this).removeClass('controlProfileHighlight');
-        });
-    } else {
-        $('.dropdown-dark #profilechange').removeClass('showProfileParams');
-        $('.dropdown-dark #batteryprofilechange').removeClass('showProfileParams');
-
-        $('.batteryProfileHighlightActive').each(function () {
-            $(this).addClass('batteryProfileHighlight');
-            $(this).removeClass('batteryProfileHighlightActive');
-        });
-
-        $('.controlProfileHighlightActive').each(function () {
-            $(this).addClass('controlProfileHighlight');
-            $(this).removeClass('controlProfileHighlightActive');
-        });
-    }
+    document.documentElement.setAttribute('data-highlight-profile-params', globalSettings.showProfileParameters)
 }
 
 Number.prototype.clamp = function (min, max) {

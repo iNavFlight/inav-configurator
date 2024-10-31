@@ -11,14 +11,14 @@
 
 .logic__content {
     position: fixed;
-    top: 2em;
+    top: 4em;
     bottom: 2em;
-    left: 4em;
-    right: 4em;
-    background-color: #efefef;
+    left: 6em;
+    right: 6em;
+    background-color: var(--inav-body-bg);
     border-radius: 2px;
     z-index: 2002;
-    padding: 2em;
+    /*padding: 1em;*/
 }
 
 .logic__content--wrapper {
@@ -31,37 +31,25 @@
     bottom: 35px;
 }
 
-input.logic_element__operand--value {
-    float: none;
-    width: 9em;
-}
 
-.logic__content--buttons {
-    left: 0;
-    right: 0;
-}
 
-.function_cell__action,
-.function_cell__operand,
-.logic_cell__operandA,
-.logic_cell__operandB,
-.pid_cell__setpoint,
-.pid_cell__measurement {
-    text-align: left;
-}
+
+
 
 .logic_cell__active_marker {
-    border: 1px solid #aaa;
-    width: 12px;
-    height: 12px;
-    border-radius: 6px;
+    margin-top: .5rem;
+    border: var(--inav-border-width) var(--inav-border-color) solid;
+    width: 1.33rem;
+    height: 1.33rem;
+    border-radius: 50%;
     display: inline-block;
 }
 
 .logic_cell__active_marker--active {
-    background-color:rgb(55, 168, 219);
+    border: none;
+    background-color: var(--inav-primary);
 }
 
 .logic_cell__active_marker--inactive {
-    background-color:transparent;
+    background-color: var(--inav-body-bg);
 }

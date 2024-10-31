@@ -1,64 +1,85 @@
-<!--suppress HtmlFormInputWithoutLabel -->
-<div class="tab-ports toolbar_fixed_bottom">
-    <div class="content_wrapper">
-        <div class="tab_title" data-i18n="tabPorts">Ports</div>
-        <div class="require-support">
-            <div class="note spacebottom">
-                <div class="note_spacer">
-                    <p data-i18n="portsHelp"></p>
-                    <p data-i18n="portsMSPHelp"></p>
-                </div>
+<div class="page">
+    <div class="page-header">
+        <span data-i18n="tabPorts"></span>
+    </div>
+
+    <div class="row">
+        <div class="col">
+            <div class="alert alert-warning">
+                <div data-i18n="portsHelp"></div>
+                <div data-i18n="portsMSPHelp"></div>
             </div>
-            <table class="ports spacebottom">
+
+<!--            <div class="note require-upgrade">-->
+<!--                <div class="note_spacer">-->
+<!--                    <p data-i18n="portsFirmwareUpgradeRequired"></p>-->
+<!--                </div>-->
+<!--            </div>-->
+
+            <table id="ports-table" class="table table-bordered table-striped align-middle">
                 <thead>
-                    <tr>
-                        <td i18n="portsIdentifier"></td>
-                        <td i18n="portsConfiguration"></td>
-                        <td i18n="portsTelemetryOut"></td>
-                        <td i18n="portsSerialRx"></td>
-                        <td data-i18n="portColumnSensors"></td>
-                        <td class='peripherls-column' i18n="portsPeripherals"></td>
-                    </tr>
+                <tr class="table-active">
+                    <th i18n="portsIdentifier"></th>
+                    <th i18n="portsConfiguration"></th>
+                    <th i18n="portsTelemetryOut"></th>
+                    <th i18n="portsSerialRx"></th>
+                    <th data-i18n="portColumnSensors"></th>
+                    <th class='peripherls-column' i18n="portsPeripherals"></th>
+                </tr>
                 </thead>
                 <tbody>
                 </tbody>
             </table>
-            <div class="clear-both"></div>
-        </div>
-        <div class="note require-upgrade">
-            <div class="note_spacer">
-                <p data-i18n="portsFirmwareUpgradeRequired"></p>
-            </div>
+
         </div>
     </div>
-    <div class="content_toolbar">
-        <div class="btn save_btn">
-            <a class="save" href="#" data-i18n="configurationButtonSave"></a>
-        </div>
+
+    <div class="page-footer">
+        <button id="save-btn" class="btn btn-primary" data-i18n="configurationButtonSave"></button>
     </div>
 </div>
-<div id="tab-ports-templates">
+
+<div id="tab-ports-templates" class="d-none">
     <table class="ports">
-        <thead>
-        </thead>
         <tbody>
             <tr class="portConfiguration">
                 <td class="identifierCell">
-                    <p><div class="identifier"/> <div class="softSerialWarning"><img src="./images/icons/cf_icon_armed_active.svg" height="16" width="16" data-i18n_title="softSerialWarning"/></div></p>
+                    <div class="hstack">
+                        <div class="identifier"/>
+                        <div class="softSerialWarning">
+                            <img src="./images/icons/cf_icon_armed_active.svg" height="16" width="16" data-i18n_title="softSerialWarning"/>
+                        </div>
+                    </div>
                 </td>
-                <td class="functionsCell-data"><select class="msp_baudrate">
-                        
-                </select></td>
-                <td class="functionsCell-telemetry"><select class="telemetry_baudrate">
-                        <!-- list generated here -->
-                </select></td>
-                <td class="functionsCell-rx"></td>
-                <td class="functionsCell-sensors"><select class="sensors_baudrate">
-                        <!-- list generated here -->
-                </select></td>
-                <td class="functionsCell-peripherals"><select class="peripherals_baudrate">
-                        <!-- list generated here -->r
-                </select></td>
+                <td class="functionsCell-data">
+                    <div class="hstack gap-2">
+                        <select class="form-select msp_baudrate"></select>
+                    </div>
+                </td>
+                <td class="functionsCell-telemetry">
+                    <div class="hstack gap-2">
+                        <select class="form-select mw-10r telemetry_baudrate">
+                            <!-- list generated here -->
+                        </select>
+                    </div>
+                </td>
+                <td class="functionsCell-rx text-nowrap">
+                    <div class="hstack gap-2"></div>
+                </td>
+                <td class="functionsCell-sensors">
+                    <div class="hstack gap-2">
+                        <select class="form-select mw-10r sensors_baudrate">
+                            <!-- list generated here -->
+                        </select>
+                    </div>
+                </td>
+                <td class="functionsCell-peripherals">
+                    <div class="hstack gap-2">
+                        <select class="form-select mw-10r peripherals_baudrate">
+                            <!-- list generated here -->r
+                        </select>
+                    </div>
+                </td>
             </tr>
         </tbody>
     </table>

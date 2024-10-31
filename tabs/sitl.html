@@ -1,108 +1,106 @@
-<div class="tab-sitl toolbar_fixed_bottom">
-    <div class="content_wrapper">
-        <div class="tab_title" data-i18n="tabSitl">SITL</div>
-        <div class="note" style="margin-bottom: 20px;">
-            <div class="note_spacer">
-                <p data-i18n="sitlHelp"></p>
-            </div>
-        </div>
-        <div class="leftWrapper">
-            <div class="gui_box grey">
-                <div class="gui_box_titlebar">
-                    <div class="spacer_box_title" data-i18n="sitlProfiles"></div>
+<div class="page tab-led-strip">
+    <div class="page-header">
+        <span data-i18n="tabSitl"></span>
+    </div>
+
+    <div class="alert alert-warning" data-i18n="sitlHelp"></div>
+
+    <div class="row">
+        <div class="col-6">
+            <div class="card mb-3">
+                <div class="card-header hstack justify-content-between">
+                    <span data-i18n="sitlProfiles"></span>
                     <div class="helpicon cf_tip" data-i18n_title="sitlProfilesHelp"></div>
                 </div>
-                <div class="sitlProfile_box">
-                    <div class="sitlProfile_select">
-                        <select id="sitlProfile"></select>
-                    </div>
-                    <div class="default_btn sitlnarrow">
-                        <a id="sitlProfileNew" href="#" i18n="sitlNew"></a>
-                    </div>
-                    <div class="default_btn sitlnarrow">
-                        <a id="sitlProfileSave" href="#" i18n="sitlSave"></a>
-                    </div>
-                    <div class="default_btn sitlnarrow">
-                        <a id="sitlProfileDelete" href="#" i18n="sitlDelete"></a>
+                <div class="card-body">
+                    <div class="hstack gap-2">
+                        <select class="form-select w-12r" id="sitlProfile"></select>
+                        <button id="sitlProfileNew" class="btn btn-outline-primary" i18n="sitlNew"></button>
+                        <button id="sitlProfileSave" class="btn btn-outline-primary" i18n="sitlSave"></button>
+                        <button id="sitlProfileDelete" class="btn btn-outline-primary" i18n="sitlDelete"></button>
                     </div>
                 </div>
             </div>
-            <div class="config-section gui_box grey">
-                <div class="gui_box_titlebar">
-                    <div class="spacer_box_title" data-i18n="sitlOptions"></div>
-                </div>
-                <div class="spacer_box">
-                    <div class="checkbox">
-                        <input type="checkbox" id="sitlEnableSim" class="toggle" data-live="true">
-                        <label for="enableSim"><span data-i18n="sitlEnableSim"></span></label>
-                        <div class="helpicon cf_tip" data-i18n_title="sitlEnableSimulatorHelp"></div>
-                    </div>
-                    <div class="select">
-                        <select id="simulator"></select>
-                        <label for="simulator"> <span data-i18n="sitlSimulator"></span></label>
-                    </div>
-                    <div class="number">    
-                        <input type="text" id="simIP" data-setting="simip" data-live="true" />
-                        <label for="simIP" class="sitlNumber"><span data-i18n="sitlSimIP"></span></label>
-                        <div class="helpicon cf_tip" data-i18n_title="sitlIpHelp"></div>
-                    </div>
-                    <div class="number">
-                        <input type="number" id="simPort" data-setting-multiplier="1" step="1" min="1" max="64500" />
-                        <label for="sitlPort" class="sitlNumber"><span data-i18n="sitlPort"></span></label>
-                        <div class="helpicon cf_tip" data-i18n_title="sitlPortHelp"></div>
-                    </div>
-                    <div class="checkbox">
-                        <input type="checkbox" id="sitlUseImu" class="sitlUseImu toggle" data-live="true">
-                        <label for="sitlUseImu"><span data-i18n="sitlUseImu"></span></label>
-                        <div class="helpicon cf_tip" data-i18n_title="sitlUseImuHelp"></div>
-                    </div>
-                </div>
-            </div>
-            <div class="gui_box grey">
-                <div class="gui_box_titlebar">
-                    <div class="spacer_box_title" data-i18n="sitlLog"></div>
-                </div>
-                <div class="spacer_box">
-                    <textarea readonly id="sitlLog" rows="25"></textarea>
-                </div>
-            </div>
-        </div>
-        <div class="rightWrapper">
-            <div class="gui_box grey">
-                <div class="gui_box_titlebar">
-                    <div class="spacer_box_title" data-i18n="sitlChannelMap"></div>
-                </div>
-                <div class="spacer_box">
-                    <table id="channelMap-table" class="map-table">
-                        <thead>
-                            <tr>
-                                <th style="width: 100px" data-i18n="sitlSimInput"></th>
-                                <th style="width: 100px" data-i18n="sitlInavOutput"></th>
-                            </tr>
-                        </thead>
-                        <tbody class="mapTableBody">
 
-                        </tbody>
-                    </table>
+            <div class="card mb-3">
+                <div class="card-header" data-i18n="sitlOptions"></div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item hstack justify-content-between">
+                            <div class="form-check form-switch">
+                                <input id="sitlEnableSim" type="checkbox" class="form-check-input" data-live="true"/>
+                                <label for="sitlEnableSim" class="form-check-label" data-i18n="sitlEnableSim"></label>
+                            </div>
+                            <div class="helpicon cf_tip" data-i18n_title="sitlEnableSimulatorHelp"></div>
+                        </li>
+                        <li class="list-group-item hstack">
+                            <select id="simulator" class="form-select w-12r"></select>
+                            <label for="simulator" data-i18n="sitlSimulator"></label>
+                        </li>
+                        <li class="list-group-item hstack">
+                            <input type="text" id="simIP" class="form-control w-12r" data-setting="simip" data-live="true" />
+                            <label for="simIP" data-i18n="sitlSimIP"></label>
+                            <div class="helpicon cf_tip ms-auto" data-i18n_title="sitlIpHelp"></div>
+                        </li>
+                        <li class="list-group-item hstack">
+                            <input type="number" class="form-control w-12r" id="simPort" data-setting-multiplier="1" step="1" min="1" max="64500" />
+                            <label for="simPort" data-i18n="sitlPort"></label>
+                            <div class="helpicon cf_tip ms-auto" data-i18n_title="sitlPortHelp"></div>
+                        </li>
+                        <li class="list-group-item hstack">
+                            <div class="form-check form-switch">
+                                <input id="sitlUseImu" type="checkbox" class="form-check-input" data-live="true"/>
+                                <label for="sitlUseImu" class="form-check-label" data-i18n="sitlUseImu"></label>
+                            </div>
+                            <div class="helpicon cf_tip" data-i18n_title="sitlUseImuHelp"></div>
+                        </li>
+                    </ul>
                 </div>
             </div>
-            <div class="config-section gui_box grey">
-                <div class="gui_box_titlebar">
-                    <div class="spacer_box_title" data-i18n="serialReceiver"></div>
+
+            <div class="card mb-3">
+                <div class="card-header" data-i18n="sitlLog"></div>
+                <div class="card-body">
+                    <textarea class="form-control" readonly id="sitlLog" rows="25"></textarea>
+                </div>
+            </div>
+
+        </div>
+        <div class="col-6">
+            <div class="card mb-3">
+                <div class="card-header" data-i18n="sitlChannelMap"></div>
+                <table id="channelMap-table" class="table">
+                    <thead>
+                    <tr class="table-active">
+                        <th style="width: 100px" data-i18n="sitlSimInput"></th>
+                        <th style="width: 100px" data-i18n="sitlInavOutput"></th>
+                    </tr>
+                    </thead>
+                    <tbody class="mapTableBody">
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="card mb-3">
+                <div class="card-header hstack justify-content-between">
+                    <div data-i18n="serialReceiver"></div>
                     <div class="helpicon cf_tip" data-i18n_title="sitlSerialReceiverHelp"></div>
                 </div>
-                <div class="spacer_box">
-                    <div class="checkbox">
-                        <input type="checkbox" id="serialReceiverEnable" class="toggle" data-live="true">
-                        <label for="serialReceiverEnable"><span data-i18n="sitlSerialReceiverEnable"></span></label>
-                    </div>
-                    <span id="serialTcpOptions"> 
-                        <div class="select">
-                            <select id="sitlSerialPort"></select>
-                            <label for="sitlSerialPort"> <span data-i18n="sitlSerialPort"></span></label>
-                        </div>
-                        <div class="select">
-                            <select id="sitlSerialUART">
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item hstack justify-content-between">
+                            <div class="form-check form-switch">
+                                <input id="serialReceiverEnable" type="checkbox" class="form-check-input" data-live="true"/>
+                                <label for="serialReceiverEnable" class="form-check-label" data-i18n="sitlSerialReceiverEnable"></label>
+                            </div>
+                            <div class="helpicon cf_tip" data-i18n_title="sitlEnableSimulatorHelp"></div>
+                        </li>
+                        <li class="list-group-item hstack">
+                            <select id="sitlSerialPort" class="form-select w-12r"></select>
+                            <label for="sitlSerialPort" data-i18n="sitlSerialPort"></label>
+                        </li>
+                        <li class="list-group-item hstack">
+                            <select id="sitlSerialUART" class="form-select w-12r">
                                 <option value="1">UART1</option>
                                 <option value="2">UART2</option>
                                 <option value="3">UART3</option>
@@ -112,43 +110,41 @@
                                 <option value="7">UART7</option>
                                 <option value="8">UART8</option>
                             </select>
-                            <label for="sitlSerialUART"> <span data-i18n="sitlSerialUART"></span></label>
-                        </div>
-                        <div class="select">
-                            <select id="serialProtocoll"></select>
-                            <label for="serialProtocoll"> <span data-i18n="sitlSerialProtocoll"></span></label>
-                        </div>
-                        <div class="number">
-                            <input type="number" id="sitlBaud" class="sitlBaud" data-setting-multiplier="1" step="1" min="1" max="921600" />
-                            <label for="sitlBaud" class="sitlNumber"><span data-i18n="configurationGPSBaudrate"></span></label>
-                        </div>
-                        <div class="select">
-                            <select id="serialStopbits">
+                            <label for="sitlSerialUART" data-i18n="sitlSerialUART"></label>
+                        </li>
+                        <li class="list-group-item hstack">
+                            <select id="serialProtocoll" class="form-select w-12r"></select>
+                            <label for="serialProtocoll" data-i18n="sitlSerialProtocoll"></label>
+                        </li>
+                        <li class="list-group-item hstack">
+                            <input type="number" id="sitlBaud" class="form-control w-12r" data-setting-multiplier="1" step="1" min="1" max="921600" />
+                            <label for="sitlBaud" data-i18n="configurationGPSBaudrate"></label>
+                        </li>
+                        <li class="list-group-item hstack">
+                            <select id="serialStopbits" class="form-select w-12r">
                                 <option value="None">None</option>
                                 <option value="One">One</option>
                                 <option value="Two">Two</option>
                             </select>
-                            <label for="serialStopbits"> <span data-i18n="sitlSerialStopbits"></span></label>
-                        </div>
-                        <div class="select">
-                            <select id="serialParity">
+                            <label for="serialStopbits" data-i18n="sitlSerialStopbits"></label>
+                        </li>
+                        <li class="list-group-item hstack">
+                            <select id="serialParity" class="form-select w-12r">
                                 <option value="None">None</option>
                                 <option value="Even">Even</option>
                                 <option value="Odd">Odd</option>
                             </select>
-                            <label for="serialParity"> <span data-i18n="sitlSerialParity"></span></label>
-                        </div>
-                    </span>
+                            <label for="serialParity" data-i18n="sitlSerialParity"></label>
+                        </li>
+                    </ul>
                 </div>
             </div>
+
         </div>
     </div>
-    <div class="content_toolbar" style="position: unset;">
-        <div class="btn">
-            <a class="sitlStop disabled" href="#" i18n="sitlStop"></a>
-        </div>
-        <div class="btn">
-            <a class="sitlStart" href="#" i18n="sitlStart"></a>
-        </div>
+
+    <div class="page-footer gap-2">
+        <button id="stop-btn" class="btn btn-outline-danger disabled" data-i18n="sitlStop"></button>
+        <button id="start-btn" class="btn btn-primary" data-i18n="sitlStart"></button>
     </div>
 </div>

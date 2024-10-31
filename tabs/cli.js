@@ -64,7 +64,7 @@ function getCliCommand(command, cliBuffer) {
 
 function copyToClipboard(text) {
     function onCopySuccessful() {
-        const button = $('.tab-cli .copy');
+        const button = $('#cli-copy');
         const origText = button.text();
         const origWidth = button.css("width");
         button.text(i18n.getMessage("cliCopySuccessful"));
@@ -146,7 +146,7 @@ TABS.cli.initialize = function (callback) {
 
         CONFIGURATOR.cliActive = true;
 
-        var textarea = $('.tab-cli textarea[name="commands"]');
+        var textarea = $('#cli-input');
         CliAutoComplete.initialize(textarea, self.sendLine.bind(self), writeToOutput);
         $(CliAutoComplete).on('build:start', function() {
             textarea
@@ -161,7 +161,7 @@ TABS.cli.initialize = function (callback) {
                 .focus();
         });
 
-        $('.tab-cli .save').on('click', function () {
+        $('#cli-save').on('click', function () {
             var prefix = 'cli';
             var suffix = 'txt';
             var filename = generateFilename(FC.CONFIG, prefix, suffix);
@@ -191,38 +191,38 @@ TABS.cli.initialize = function (callback) {
             });
         });
 
-        $('.tab-cli .exit').on('click', function () {
+        $('#cli-exit').on('click', function () {
             self.send(getCliCommand('exit\n', TABS.cli.cliBuffer));
         });
 
-        $('.tab-cli .savecmd').on('click', function () {
+        $('#cli-savecmd').on('click', function () {
             self.send(getCliCommand('save\n', TABS.cli.cliBuffer));
         });
 
-        $('.tab-cli .msc').on('click', function () {
+        $('#cli-msc').on('click', function () {
             self.send(getCliCommand('msc\n', TABS.cli.cliBuffer));
         });
 
-        $('.tab-cli .diffall').on('click', function () {
+        $('#cli-dif-fall').on('click', function () {
             self.outputHistory = "";
-            $('.tab-cli .window .wrapper').empty();
+            $('#cli-window').empty();
             self.send(getCliCommand('diff all\n', TABS.cli.cliBuffer));
         });
 
-        $('.tab-cli .clear').on('click', function () {
+        $('#cli-clear').on('click', function () {
             self.outputHistory = "";
-            $('.tab-cli .window .wrapper').empty();
+            $('#cli-window').empty();
         });
 
         if (clipboardCopySupport) {
-            $('.tab-cli .copy').on('click', function () {
+            $('#cli-copy').on('click', function () {
                 copyToClipboard(self.outputHistory);
             });
         } else {
-            $('.tab-cli .copy').hide();
+            $('#cli-copy').hide();
         }
 
-        $('.tab-cli .load').on('click', function () {
+        $('#cli-load').on('click', function () {
             var options = {
                 filters: [
                     { name: 'CLI/TXT', extensions: ['cli', 'txt'] },
@@ -254,7 +254,7 @@ TABS.cli.initialize = function (callback) {
                             isolateScroll: false,
                             title: i18n.getMessage("cliConfirmSnippetDialogTitle"),
                             content: $('#snippetpreviewcontent'),
-                            onCreated: () => $("#snippetpreviewcontent a.confirm").on('click', executeSnippet),
+                            onCreated: () => $("#snippetpreviewcontent .confirm").on('click', executeSnippet),
                         });
                     }
                     previewArea.val(result);
@@ -313,7 +313,7 @@ TABS.cli.initialize = function (callback) {
 
                 if (out_string.trim().toLowerCase() == "cls" || out_string.trim().toLowerCase() == "clear") {
                     self.outputHistory = "";
-                    $('.tab-cli .window .wrapper').empty();
+                    $('#cli-window').empty();
                 } else {
                     executeCommands(out_string);
                 }
@@ -395,8 +395,8 @@ const lineFeedCode = 10;
 const carriageReturnCode = 13;
 
 function writeToOutput(text) {
-    $('.tab-cli .window .wrapper').append(text);
-    $('.tab-cli .window').scrollTop($('.tab-cli .window .wrapper').height());
+    $('#cli-window').append(text);
+    $('#cli-window').parent().scrollTop($('#cli-window').height());
 }
 
 function writeLineToOutput(text) {
@@ -406,14 +406,14 @@ function writeLineToOutput(text) {
     }
 
     if (text.startsWith("### ERROR: ")) {
-        writeToOutput('<span class="error_message">' + text + '</span><br>');
+        writeToOutput('<span class="text-danger">' + text + '</span><br>');
     } else {
         writeToOutput(text + "<br>");
     }
 }
 
 function setPrompt(text) {
-    $('.tab-cli textarea').val(text);
+    $('#cli-input').val(text);
 }
 
 TABS.cli.read = function (readInfo) {

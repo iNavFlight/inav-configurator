@@ -68,11 +68,12 @@ var GUI_control = function () {
     else if (navigator.appVersion.indexOf("X11") != -1)     this.operating_system = "UNIX";
     else this.operating_system = "Unknown";
 
+    document.documentElement.setAttribute('data-os', this.operating_system);
 };
 
 // message = string
 GUI_control.prototype.log = function (message) {
-    var command_log = $('div#log');
+    var command_log = $('#logs');
     var d = new Date();
     var year = d.getFullYear();
     var month = ((d.getMonth() < 9) ? '0' + (d.getMonth() + 1) : (d.getMonth() + 1));
@@ -87,8 +88,8 @@ GUI_control.prototype.log = function (message) {
                                 date,
                                 ' @ ' + time
                             );
-    $('div.wrapper', command_log).append('<p>' + formattedDate + ' -- ' + message + '</p>');
-    command_log.scrollTop($('div.wrapper', command_log).height());
+    $('#logs-stream').append('<div class="text-muted lh-lg">' + formattedDate + ' -- ' + message + '</div>');
+    $('#logs').scrollTop($('#logs-stream').height());
 };
 
 // Method is called every time a valid tab change event is received
@@ -111,8 +112,8 @@ GUI_control.prototype.switchery = function() {
     $('.togglesmall').each(function(index, elem) {
         var switchery = new Switchery(elem, {
             size: 'small',
-            color: '#37a8db',
-            secondaryColor: '#c4c4c4'
+            color: 'var(--inav-primary)',
+            secondaryColor: 'var(--inav-gray)'
         });
         $(elem).on("change", function (evt) {
             switchery.setPosition();
@@ -122,8 +123,8 @@ GUI_control.prototype.switchery = function() {
 
     $('.toggle').each(function(index, elem) {
         var switchery = new Switchery(elem, {
-            color: '#37a8db',
-            secondaryColor: '#c4c4c4'
+            color: 'var(--inav-primary)',
+            secondaryColor: 'var(--inav-gray)'
         });
         $(elem).on("change", function (evt) {
             switchery.setPosition();
@@ -134,8 +135,8 @@ GUI_control.prototype.switchery = function() {
     $('.togglemedium').each(function(index, elem) {
         var switchery = new Switchery(elem, {
             className: 'switcherymid',
-            color: '#37a8db',
-            secondaryColor: '#c4c4c4'
+            color: 'var(--inav-primary)',
+            secondaryColor: 'var(--inav-gray)'
         });
         $(elem).on("change", function (evt) {
             switchery.setPosition();
@@ -149,9 +150,9 @@ GUI_control.prototype.content_ready = function (callback) {
     const content = $('#content').removeClass('loading');
     $('.togglesmall').each(function(index, elem) {
         var switchery = new Switchery(elem, {
-          size: 'small',
-          color: '#37a8db',
-          secondaryColor: '#c4c4c4'
+            size: 'small',
+            color: 'var(--inav-primary)',
+            secondaryColor: 'var(--inav-gray)'
         });
         $(elem).on("change", function (evt) {
             switchery.setPosition();
@@ -161,8 +162,8 @@ GUI_control.prototype.content_ready = function (callback) {
 
     $('.toggle').each(function(index, elem) {
         var switchery = new Switchery(elem, {
-            color: '#37a8db',
-            secondaryColor: '#c4c4c4'
+            color: 'var(--inav-primary)',
+            secondaryColor: 'var(--inav-gray)'
         });
         $(elem).on("change", function (evt) {
             switchery.setPosition();
@@ -173,8 +174,8 @@ GUI_control.prototype.content_ready = function (callback) {
     $('.togglemedium').each(function(index, elem) {
         var switchery = new Switchery(elem, {
             className: 'switcherymid',
-            color: '#37a8db',
-            secondaryColor: '#c4c4c4'
+            color: 'var(--inav-primary)',
+            secondaryColor: 'var(--inav-gray)'
          });
          $(elem).on("change", function (evt) {
              switchery.setPosition();
@@ -183,6 +184,7 @@ GUI_control.prototype.content_ready = function (callback) {
     });
 
     // Insert a documentation button next to the tab title
+    // TODO
     const tabTitle = $('div#content .tab_title').first();
     const documentationDiv = $('<div>').addClass('cf_doc_version_bt');
     $('<a>').attr('href', 'https://github.com/iNavFlight/inav/wiki')
@@ -209,10 +211,8 @@ GUI_control.prototype.content_ready = function (callback) {
         });
     });
 
-    const duration = content.data('empty') ? 0 : 400;
-    $('#content .data-loading:first').fadeOut(duration, function() {
-        $(this).remove();
-    });
+    $('#content .data-loading:first').remove();
+
     if (callback) {
         callback();
     }
@@ -262,6 +262,7 @@ GUI_control.prototype.updateStatusBar = function() {
     $('span.cycle-time').text(FC.CONFIG.cycleTime);
     $('span.cpu-load').text(i18n.getMessage('statusbar_cpu_load', [FC.CONFIG.cpuload]));
     $('span.arming-flags').text(activeArmFlags.length ? activeArmFlags.join(', ') : '-');
+    $('.arming-flags-title').prop('title', activeArmFlags.length ? activeArmFlags.join(', ') : '-');
 };
 
 GUI_control.prototype.updateProfileChange = function(refresh) {
@@ -337,11 +338,11 @@ GUI_control.prototype.renderOperandValue = function ($container, operandMetadata
 
     switch (operandMetadata.type) {
         case "value":
-            $container.append('<input type="number" class="logic_element__operand--value" data-operand="' + operand + '" step="' + operandMetadata.step + '" min="' + operandMetadata.min + '" max="' + operandMetadata.max + '" value="' + value + '" />');
+            $container.append('<input type="number" class="logic_element__operand--value form-control" data-operand="' + operand + '" step="' + operandMetadata.step + '" min="' + operandMetadata.min + '" max="' + operandMetadata.max + '" value="' + value + '" />');
             break;
         case "range":
         case "dictionary":
-            $container.append('<select class="logic_element__operand--value" data-operand="' + operand + '"></select>');
+            $container.append('<select class="logic_element__operand--value form-select" data-operand="' + operand + '"></select>');
             let $t = $container.find('.logic_element__operand--value');
             
             if (operandMetadata.type == "range") {
@@ -388,7 +389,7 @@ GUI_control.prototype.renderOperandValue = function ($container, operandMetadata
  */
 GUI_control.prototype.renderLogicConditionSelect = function ($container, logicConditions, current, onChange, withAlways, onlyEnabled) {
 
-    let $select = $container.append('<select class="mix-rule-condition">').find("select"),
+    let $select = $container.append('<select class="mix-rule-condition form-select">').find("select"),
         lcCount = logicConditions.getCount(),
         option  = "";
 
@@ -522,14 +523,14 @@ GUI_control.prototype.update_dataflash_global = function () {
         });
 
         $(".dataflash-contents_global").css({
-        display: 'block'
+            display: 'flex'
         });
 
         $(".dataflash-free_global").css({
         width: (100-(FC.DATAFLASH.totalSize - FC.DATAFLASH.usedSize) / FC.DATAFLASH.totalSize * 100) + "%",
         display: 'block'
         });
-        $(".dataflash-free_global div").text('Dataflash: free ' + formatFilesize(FC.DATAFLASH.totalSize - FC.DATAFLASH.usedSize));
+        $("#dataflash-free-space").text('Dataflash: free ' + formatFilesize(FC.DATAFLASH.totalSize - FC.DATAFLASH.usedSize));
     } else {
         $(".noflash_global").css({
         display: 'block'

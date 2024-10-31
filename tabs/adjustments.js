@@ -174,7 +174,7 @@ TABS.adjustments.initialize = function (callback) {
        i18n.localize();;
 
         // UI Hooks
-        $('a.save').on('click', function () {
+        $('#save-btn').on('click', function () {
 
             // update internal data structures based on current UI elements
             var requiredAdjustmentRangeCount = FC.ADJUSTMENT_RANGES.length;
