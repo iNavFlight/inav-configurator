@@ -1016,7 +1016,7 @@ li.active .ic_mag {
     /*  (port picker 105px, log CLOSED 25px, status bar: 20px + padding) - was: calc(100% - 171px)*/
     background-color: white;
     overflow-x: hidden;
-    overflow-y: auto;
+    overflow-y: hidden;
     border: 0 solid #848484;
     -webkit-transform: rotateX(0deg); /* DO NOT REMOVE! this fixes the UI freezing bug on MAC OS X */
     transition: all 0.3s;
