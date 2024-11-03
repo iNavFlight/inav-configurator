@@ -4288,6 +4288,15 @@
     "osdElement_OSD_RANGEFINDER": {
         "message": "Rangefinder distance"
     },
+    "osdElement_COURSE_NEXT_GEOZONE": {
+        "message": "Course to next Geozone"
+    },
+    "osdElement_HOR_DIST_TO_NEXT_GEOZONE": {
+        "message": "Horizontal distance to the next geozone"
+    },
+    "osdElement_VERT_DIST_TO_NEXT_GEOZONE": {
+        "message": "Vertical distance to the next geozone"
+    },
     "osdSettingPLUS_CODE_DIGITS_HELP": {
         "message": "Precision at the equator: 10=13.9x13.9m; 11=2.8x3.5m; 12=56x87cm; 13=11x22cm."
     },
@@ -4644,6 +4653,147 @@
     },
     "missionSafehomeMaxSafehomesReached": {
         "message": "Maximum number of safehomes reached."
+    },
+    "missionGeozoneHead": {
+        "message": "Geozones"
+    },
+    "missionGeozoneEdit": {
+        "message": "Edit Geozone $1"
+    },
+    "missionGeozoneSaveAndReboot": {
+        "message": "Save Eeprom Geozones and reboot"
+    },
+    "missionGeozoneLoad": {
+        "message": "Load Eeprom Geozones"
+    },
+    "missionGeozone": {
+        "message": "-Geozone "
+    },
+    "missionGezoneType": {
+        "message": "Type"
+    },
+    "missionGezoneShape": {
+        "message": "Shape"
+    },
+    "missionGeozoneTypePolygon": {
+        "message": "Polygon"
+    },
+    "missionGeozoneTypeCircular": {
+        "message": "Circular"
+    },
+    "missionGeozoneMaxZonesReached": {
+        "message": "Maximum number of geozones reached."
+    },
+    "missionGeozoneMaxVerticesReached": {
+        "message": "Maximum number of geozone vertices reached."
+    },
+    "missionGeozoneWarning": {
+        "message": "At least one mission and one geozone are configured, please ensure that the mission does not violate the geozone."
+    },
+    "geozoneEdit": {
+        "message": "Edit Geozone "
+    },
+    "geozoneShape": {
+        "message": "Shape"
+    },
+    "geozoneInclusive": {
+        "message": "Inclusive"
+    },
+    "geozoneExcusive": {
+        "message": "Exclusive"
+    },
+    "geozoneMinAlt": {
+        "message": "Min. Alt (cm):"
+    },
+    "geozoneMaxAlt": {
+        "message": "Max. Alt (cm):"
+    },
+    "geozoneInfiniteAlt": {
+        "message": "0 = Infinite altitude"
+    },
+    "geozoneAction": {
+        "message": "Action:"
+    },
+    "geozoneActionNone": {
+        "message": "None"
+    },
+    "geozoneActionAvoid": {
+        "message": "Avoid"
+    },
+    "geozoneActionPosHold": {
+        "message": "Pos. Hold"
+    },
+    "geozoneActionRTH": {
+        "message": "RTH"
+    },
+    "geozoneRadius": {
+        "message": "Radius (cm):"
+    },
+    "geozoneVerices": {
+        "message": "Vertices:"
+    },
+    "": {
+        "message": ""
+    },
+    "featureGEOZONE": {
+        "message": "Geozone"
+    },
+    "featureGEOZONETip": {
+        "message": "Virtual perimeters for geographical areas (also called geofence) with automatically triggered actions when the perimeters are violated."
+    },
+    "GeozoneSettings": {
+        "message": "Geozone Settings"
+    },
+    "geozoneDetectionDistance": {
+        "message": "Detection distance"
+    },
+    "geozoneDetectionDistanceHelp": {
+        "message": "Distance from which a geozone is detected"
+    },
+    "geozoneAvoidAltitudeRange": {
+        "message": "Avoid altitude range"
+    },
+    "geozoneAvoidAltitudeRangeHelp": {
+        "message": "Altitude range in which an attempt is made to avoid a geozone upwards"
+    },
+    "geozoneSafeAltitudeDistance": {
+        "message": "Safe altitude distance"
+    },
+    "geozoneSafeAltitudeDistanceHelp": {
+        "message": "Vertical distance that must be maintained to the upper and lower limits of the zone."
+    },
+    "geozoneSafehomeAsInclusive": {
+        "message": "Safehome as inclusive"
+    },
+    "geozoneSafehomeAsInclusiveHelp": {
+        "message": "Treat nearest safehome as inclusive geozone"
+    },
+    "geozoneSafehomeZoneAction": {
+        "message": "Safehome zone action"
+    },
+    "geozoneSafehomeZoneActionHelp": {
+        "message": "Fence action for safehome zone"
+    },
+    "geozoneMrStopDistance": {
+        "message" : "Multirotor stop distance"
+    },
+    "geozoneMrStopDistanceHelp": {
+        "message" : "Distance in which multirotors stops before the border"
+    },
+    "geozoneNoWayHomeAction": {
+        "message": "No way home action"
+    },
+    "geozoneNoWayHomeActionHelp": {
+        "message": "Action if RTH with active geozones is unable to calculate a course to home. RTH: Return to home and ignore any geozones."
+    },
+    "missionGeozoneReboot": {
+        "message": "Do you want to save and reboot?"
+    },
+    "missionGeozoneAvailableZones": {
+        "message": "Available Geozones:"
+    },
+    "missionGeozoneAvailableVertices": {
+        "message": "Available Vertices:"
     },
     "missionMultiMissionHead": {
         "message": "Multi Missions"

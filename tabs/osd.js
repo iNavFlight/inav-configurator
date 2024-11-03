@@ -1731,7 +1731,51 @@ OSD.constants = {
                                 return FONT.symbol(SYM.CROSS_TRACK_ERROR) + FONT.embed_dot('1.57') + FONT.symbol(SYM.DIST_KM);
                         }
                     }
+                },{
+                    name: 'COURSE_NEXT_GEOZONE',
+                    id: 154,
+                    min_version: '8.0.0',
+                    enabled: function() {
+                        return FC.isFeatureEnabled('GEOZONE');
+                    },
+                    preview: FONT.symbol(SYM.DIR_TO_HOME)
+                }, {
+                    name: 'HOR_DIST_TO_NEXT_GEOZONE',
+                    id: 155,
+                    min_version: '8.0.0',
+                    enabled: function() {
+                        return FC.isFeatureEnabled('GEOZONE');
+                    },
+                    preview: function(osd_data) {
+                        switch (OSD.data.preferences.units) {
+                            case 0: // Imperial
+                            case 3: // UK
+                                return 'FD  ' + FONT.embed_dot('0.88') + FONT.symbol(SYM.DIST_MI);
+                            case 4: // GA
+                                return 'FD  ' + FONT.embed_dot('0.78') + FONT.symbol(SYM.DIST_NM);
+                            default: // Metric
+                                return 'FD  ' + FONT.embed_dot('1.42') + FONT.symbol(SYM.DIST_KM);
+                        }
+                    }
                 },
+                {
+                    name: 'VERT_DIST_TO_NEXT_GEOZONE',
+                    id: 156,
+                    min_version: '8.0.0',
+                    enabled: function() {
+                        return FC.isFeatureEnabled('GEOZONE');
+                    },
+                    preview: function(osd_data) {
+                        switch (OSD.data.preferences.units) {
+                            case 0: // Imperial
+                            case 3: // UK
+                            case 4: // GA
+                                return 'FD  466' + FONT.symbol(SYM.ALT_FT) + FONT.symbol(SYM.DIR_TO_HOME);
+                            default: // Metric
+                                return 'FD  142'  + FONT.symbol(SYM.ALT_M) + FONT.symbol(SYM.DIR_TO_HOME);
+                        }
+                    }
+                }
             ]
         },
         {
