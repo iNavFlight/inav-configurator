@@ -482,7 +482,19 @@ function osdDecimalsAltitudePreview() {
     return s;
 }
 
-function osdDecimalsDistancePreview() {
+function osdDecimalsRemainingFlightDistancePreview() {
+    return osdDecimalsDistancePreview(SYM.FLIGHT_DIST_REMAINING);
+}
+
+function osdDecimalsHomeDistancePreview() {
+    return osdDecimalsDistancePreview(SYM.HOME);
+}
+
+function osdDecimalsTripDistancePreview() {
+    return osdDecimalsDistancePreview(SYM.TRIP_DIST);
+}
+
+function osdDecimalsDistancePreview(prependedSymbol) {
     var s = '11.5';
     if (Settings.getInputValue('osd_decimals_distance') == 4) {
         s+= '3';
@@ -499,6 +511,8 @@ function osdDecimalsDistancePreview() {
         default: // Metric
             s += FONT.symbol(SYM.DIST_KM);
     }
+
+    s = FONT.symbol(prependedSymbol) + s;
 
     return s;
 }
@@ -925,7 +939,7 @@ OSD.constants = {
                 {
                     name: 'REMAINING_FLIGHT_DISTANCE',
                     id: 49,
-                    preview: osdDecimalsDistancePreview,
+                    preview: osdDecimalsRemainingFlightDistancePreview,
                 },
                 {
                     name: 'THROTTLE_POSITION',
@@ -1628,13 +1642,13 @@ OSD.constants = {
                 {
                     name: 'DISTANCE_TO_HOME',
                     id: 23,
-                    preview: osdDecimalsDistancePreview,
+                    preview: osdDecimalsHomeDistancePreview,
                 },
                 {
                     name: 'TRIP_DIST',
                     id: 40,
                     min_version: '1.9.1',
-                    preview: osdDecimalsDistancePreview,
+                    preview: osdDecimalsTripDistancePreview,
                 },
                 {
                     name: 'ODOMETER',
