@@ -33,6 +33,7 @@ SYM.AH_LEFT = 0x12C;
 SYM.THR = 0x95;
 SYM.VOLT = 0x1F;
 SYM.AH_DECORATION_UP = 0x15;
+SYM.AH_DECORATION_DOWN = 0x16;
 SYM.WIND_SPEED_HORIZONTAL = 0x86;
 SYM.WIND_SPEED_VERTICAL = 0x87;
 SYM.FLY_M = 0x9F;
@@ -142,8 +143,6 @@ SYM.BLACKBOX = 0xFE;
 SYM.PILOT_LOGO_SML_L = 0x1D5;
 SYM.PILOT_LOGO_SML_C = 0x1D6;
 SYM.PILOT_LOGO_SML_R = 0x1D7;
-
-SYM.ARROW_DOWN = 0x144;
 
 SYM.AH_AIRCRAFT0 = 0x1A2;
 SYM.AH_AIRCRAFT1 = 0x1A3;
@@ -1853,7 +1852,7 @@ OSD.constants = {
                     name: 'LQ_DOWNLINK',
                     id: 159,
                     positionable: true,
-                    preview: FONT.symbol(SYM.LQ) + '100' + FONT.symbol(SYM.ARROW_DOWN)
+                    preview: FONT.symbol(SYM.LQ) + '100' + FONT.symbol(SYM.AH_DECORATION_DOWN)
                 },
                 {
                     name: 'SNR_DB',
@@ -1871,7 +1870,7 @@ OSD.constants = {
                     name: 'RX_POWER_DOWNLINK',
                     id: 160,
                     positionable: true,
-                    preview: '  10' + FONT.symbol(SYM.MW) + FONT.symbol(SYM.ARROW_DOWN)
+                    preview: '  10' + FONT.symbol(SYM.MW) + FONT.symbol(SYM.AH_DECORATION_DOWN)
                 },
             ]
         },
