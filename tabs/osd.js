@@ -152,6 +152,8 @@ SYM.AH_AIRCRAFT4 = 0x1A6;
 
 SYM.SYM_HUD_SIGNAL_3 = 0x163;
 SYM.SYM_HUD_CARDINAL = 0x1BA;
+SYM.RX_BAND = 0x169;
+SYM.RX_MODE = 0x16A;
 
 SYM.AH_CROSSHAIRS = new Array(0x166, 0x1A4, new Array(0x190, 0x191, 0x192), new Array(0x193, 0x194, 0x195), new Array(0x196, 0x197, 0x198), new Array(0x199, 0x19A, 0x19B), new Array (0x19C, 0x19D, 0x19E), new Array (0x19F, 0x1A0, 0x1A1));
 
@@ -1871,6 +1873,18 @@ OSD.constants = {
                     id: 160,
                     positionable: true,
                     preview: '  10' + FONT.symbol(SYM.MW) + FONT.symbol(SYM.AH_DECORATION_DOWN)
+                },
+                {
+                    name: 'RX_BAND',
+                    id: 161,
+                    positionable: true,
+                    preview: FONT.symbol(SYM.RX_BAND) + '2.4G'
+                },
+                {
+                    name: 'RX_MODE',
+                    id: 162,
+                    positionable: true,
+                    preview: FONT.symbol(SYM.RX_MODE) + '150HZ '
                 },
             ]
         },
