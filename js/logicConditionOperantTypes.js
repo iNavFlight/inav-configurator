@@ -65,6 +65,7 @@ const OPERAND_TYPES = {
             42: "Active Battery Profile",
             43: "Flown Loiter Radius [m]",
             44: "Downlink LQ",
+            45: "Uplink RSSI dBm",
         }
     },
     3: {
