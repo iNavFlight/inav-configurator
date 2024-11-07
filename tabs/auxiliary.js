@@ -289,9 +289,10 @@ TABS.auxiliary.initialize = function (callback) {
         $('a.addRange').on('click', function () {
             var modeElement = $(this).data('modeElement');
 
-            var firstUnusedChannel = findFirstUnusedChannel(modeElement);
+            //var firstUnusedChannel = findFirstUnusedChannel(modeElement);
 
-            addRangeToMode(modeElement, firstUnusedChannel);
+            //addRangeToMode(modeElement, firstUnusedChannel);
+            addRangeToMode(modeElement, -1);
         });
 
         // translate to user-selected language
@@ -382,7 +383,7 @@ TABS.auxiliary.initialize = function (callback) {
         function update_ui() {
             let hasUsedMode = false;
             let acroEnabled = true;
-            let acroFail = ["ANGLE", "HORIZON", "MANUAL", "NAV RTH", "NAV POSHOLD", "NAV CRUISE", "NAV COURSE HOLD", "NAV WP", "GCS NAV"];
+            let acroFail = ["ANGLE", "HORIZON", "MANUAL", "ANGLE HOLD", "NAV RTH", "NAV POSHOLD", "NAV CRUISE", "NAV COURSE HOLD", "NAV WP", "GCS NAV"];
 
             var auxChannelCount = FC.RC.active_channels - 4;
 
