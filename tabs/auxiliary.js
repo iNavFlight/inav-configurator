@@ -288,10 +288,6 @@ TABS.auxiliary.initialize = function (callback) {
 
         $('a.addRange').on('click', function () {
             var modeElement = $(this).data('modeElement');
-
-            //var firstUnusedChannel = findFirstUnusedChannel(modeElement);
-
-            //addRangeToMode(modeElement, firstUnusedChannel);
             addRangeToMode(modeElement, -1);
         });
 
