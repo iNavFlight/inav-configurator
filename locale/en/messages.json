@@ -3688,7 +3688,7 @@
         "message": "Camera uptilt"
     },
     "osd_camera_uptilt_help": {
-        "message": "Set the camera uptilt for the FPV camera in degres, positive is up, negative is down, relative to the horizontal. Used for correct display of HUD items and AHI (when enabled)."
+        "message": "Set the camera uptilt for the FPV camera in degres, positive is up, negative is down, relative to the horizontal. Used for correct display of HUD items and AHI (when enabled with osd_ahi_camera_uptilt_comp=ON)."
     },
     "osd_camera_fov_h": {
         "message": "Camera Horizontal FOV"
