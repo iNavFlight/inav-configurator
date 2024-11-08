@@ -1630,8 +1630,8 @@ var mspHelper = (function () {
                         vertexId,
                         new GeozoneVertex(
                             vertexId,
-                            data.getUint32(2, true),
-                            data.getUint32(6, true),
+                            data.getInt32(2, true),
+                            data.getInt32(6, true),
                         )
                     );
                     if (geozone.getShape() == GeozoneShapes.CIRCULAR) {
