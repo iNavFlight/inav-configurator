@@ -602,7 +602,7 @@ var FC = {
         this.GEOZONES = new GeozoneCollection();
 
         this.OSD_CUSTOM_ELEMENTS = {
-           settings: {customElementsCount: 0, customElementTextSize: 0},
+           settings: {customElementsCount: 0, customElementTextSize: 0, customElementParts: 0},
            items: [],
         };
 

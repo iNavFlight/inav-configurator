@@ -1,7 +1,6 @@
 'use strict';
 const { dialog } = require("@electron/remote");
 
-
 const CONFIGURATOR = require('./data_storage');
 const Switchery = require('./libraries/switchery/switchery')
 const MSP = require('./msp');
@@ -54,6 +53,12 @@ var GUI_control = function () {
         'ez_tune'
     ];
     this.allowedTabs = this.defaultAllowedTabsWhenDisconnected;
+
+    this.PROFILES_CHANGED = {
+        'CONTROL' : 1,
+        'BATTERY' : 2,
+        'MIXER'   : 4
+    };
 
     // check which operating system is user running
     if (navigator.appVersion.indexOf("Win") != -1)          this.operating_system = "Windows";
@@ -263,10 +268,16 @@ GUI_control.prototype.updateProfileChange = function(refresh) {
     $('#mixerprofilechange').val(FC.CONFIG.mixer_profile);
     $('#profilechange').val(FC.CONFIG.profile);
     $('#batteryprofilechange').val(FC.CONFIG.battery_profile);
-    if (refresh) {
-        GUI.log(i18n.getMessage('loadedMixerProfile', [FC.CONFIG.mixer_profile + 1]));
-        GUI.log(i18n.getMessage('pidTuning_LoadedProfile', [FC.CONFIG.profile + 1]));
-        GUI.log(i18n.getMessage('loadedBatteryProfile', [FC.CONFIG.battery_profile + 1]));
+    if (refresh > 0) {
+        if (refresh & GUI.PROFILES_CHANGED.CONTROL) {
+            GUI.log(i18n.getMessage('pidTuning_LoadedProfile', [FC.CONFIG.profile + 1]));
+        }
+        if (refresh & GUI.PROFILES_CHANGED.MIXER) {
+            GUI.log(i18n.getMessage('loadedMixerProfile', [FC.CONFIG.mixer_profile + 1]));
+        }
+        if (refresh & GUI.PROFILES_CHANGED.BATTERY) {
+            GUI.log(i18n.getMessage('loadedBatteryProfile', [FC.CONFIG.battery_profile + 1]));
+        }
         GUI.updateActivatedTab();
     }
 };

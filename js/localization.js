@@ -10,7 +10,7 @@ const i18nextXHRBackend = require('i18next-xhr-backend');
 const Store = require('electron-store');
 const store = new Store();
 
-const availableLanguages = ['en'];
+const availableLanguages = ['en', 'uk'];
 
 const i18n = {};
   
