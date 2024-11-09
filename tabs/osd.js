@@ -3573,6 +3573,8 @@ function createCustomElements(){
         return;
     }
 
+    $('#INAVCharacterMapDocURL').attr('href', globalSettings.configuratorTreeLocation + 'resources/osd/INAV%20Character%20Map.md');
+
     var customElementsContainer = $('#osdCustomElements');
     var init = true;
 
