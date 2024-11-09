@@ -225,7 +225,7 @@
     float: right;
     margin: 0px 0px 20px 0;
     border-left: 0;
-    width: 30%;
+    width: 25%;
     border-top-right-radius: 5px;
     border-bottom-right-radius: 5px;
     background-color: #DEDEDE;
@@ -261,7 +261,7 @@
     float: right;
     position: relative;
     margin: 0px 0px 20px 0;
-    width: calc(70% - 0px);
+    width: calc(50% - 0px);
     border-top-left-radius: 5px;
     border-bottom-left-radius: 5px;
     background-color: #DEDEDE;
