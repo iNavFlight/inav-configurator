@@ -49,8 +49,8 @@ const OPERAND_TYPES = {
             26: "Stabilized Pitch",
             27: "Stabilized Yaw",
             28: "3D home distance [m]",
-            29: "CRSF LQ",
-            30: "CRSF SNR",
+            29: "Uplink LQ",
+            30: "SNR",
             31: "GPS Valid Fix",
             32: "Loiter Radius [cm]",
             33: "Active Control Profile",
@@ -64,6 +64,8 @@ const OPERAND_TYPES = {
             41: "FW Land State",
             42: "Active Battery Profile",
             43: "Flown Loiter Radius [m]",
+            44: "Downlink LQ",
+            45: "Uplink RSSI dBm",
         }
     },
     3: {

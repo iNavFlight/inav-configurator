@@ -33,6 +33,7 @@ SYM.AH_LEFT = 0x12C;
 SYM.THR = 0x95;
 SYM.VOLT = 0x1F;
 SYM.AH_DECORATION_UP = 0x15;
+SYM.AH_DECORATION_DOWN = 0x16;
 SYM.WIND_SPEED_HORIZONTAL = 0x86;
 SYM.WIND_SPEED_VERTICAL = 0x87;
 SYM.FLY_M = 0x9F;
@@ -151,6 +152,8 @@ SYM.AH_AIRCRAFT4 = 0x1A6;
 
 SYM.SYM_HUD_SIGNAL_3 = 0x163;
 SYM.SYM_HUD_CARDINAL = 0x1BA;
+SYM.RX_BAND = 0x169;
+SYM.RX_MODE = 0x16A;
 
 SYM.AH_CROSSHAIRS = new Array(0x166, 0x1A4, new Array(0x190, 0x191, 0x192), new Array(0x193, 0x194, 0x195), new Array(0x196, 0x197, 0x198), new Array(0x199, 0x19A, 0x19B), new Array (0x19C, 0x19D, 0x19E), new Array (0x19F, 0x1A0, 0x1A1));
 
@@ -609,7 +612,7 @@ OSD.DjiElements =  {
         "GForce",
         "Timers",
         "VTX",
-        "CRSF",
+        "RX",
         "SwitchIndicators",
         "OSDCustomElements",
         "GVars",
@@ -1834,44 +1837,68 @@ OSD.constants = {
             ]
         },
         {
-            name: 'osdGroupCRSF',
+            name: 'osdGroupRx',
             enabled: function() {
-                return HARDWARE.capabilities.useCRSFRx;
+                return HARDWARE.capabilities.useRx;
             },
             items: [
                 {
-                    name: 'CRSF_RSSI_DBM',
+                    name: 'RSSI_DBM',
                     id: 109,
                     positionable: true,
                     preview: FONT.symbol(SYM.RSSI) + '-100' + FONT.symbol(SYM.DBM)
                 },
                 {
-                    name: 'CRSF_LQ',
+                    name: 'LQ_UPLINK',
                     id: 110,
                     positionable: true,
                     preview: function(osd_data) {
-                        var crsflqformat;
-                        if (Settings.getInputValue('osd_crsf_lq_format') == 0) {
-                            crsflqformat = FONT.symbol(SYM.LQ) + '100';
-                        } else if (Settings.getInputValue('osd_crsf_lq_format') == 1){
-                            crsflqformat = FONT.symbol(SYM.LQ) + '2:100';
+                        var lqFormat;
+                        if (HARDWARE.capabilities.useCRSF && Settings.getInputValue('osd_crsf_lq_format') == 1){
+                            lqFormat = FONT.symbol(SYM.LQ) + '2:100';
+                        } else if (HARDWARE.capabilities.useCRSF && Settings.getInputValue('osd_crsf_lq_format') == 2) {
+                            lqFormat = FONT.symbol(SYM.LQ) + '300';
                         } else {
-                            crsflqformat = FONT.symbol(SYM.LQ) + '300';
+                            lqFormat = FONT.symbol(SYM.LQ) + '100';
                         }
-                        return crsflqformat;
+                        return lqFormat;
                     }
                 },
                 {
-                    name: 'CRSF_SNR_DB',
+                    name: 'LQ_DOWNLINK',
+                    id: 159,
+                    positionable: true,
+                    preview: FONT.symbol(SYM.LQ) + '100' + FONT.symbol(SYM.AH_DECORATION_DOWN)
+                },
+                {
+                    name: 'SNR_DB',
                     id: 111,
                     positionable: true,
                     preview: FONT.symbol(SYM.SNR) + '-12' + FONT.symbol(SYM.DB)
                 },
                 {
-                    name: 'CRSF_TX_POWER',
+                    name: 'TX_POWER_UPLINK',
                     id: 112,
                     positionable: true,
                     preview: '  10' + FONT.symbol(SYM.MW)
+                },
+                {
+                    name: 'RX_POWER_DOWNLINK',
+                    id: 160,
+                    positionable: true,
+                    preview: '  10' + FONT.symbol(SYM.MW) + FONT.symbol(SYM.AH_DECORATION_DOWN)
+                },
+                {
+                    name: 'RX_BAND',
+                    id: 161,
+                    positionable: true,
+                    preview: FONT.symbol(SYM.RX_BAND) + '2.4G'
+                },
+                {
+                    name: 'RX_MODE',
+                    id: 162,
+                    positionable: true,
+                    preview: FONT.symbol(SYM.RX_MODE) + '150HZ '
                 },
             ]
         },
@@ -3015,7 +3042,8 @@ OSD.GUI.updateAlarms = function() {
     $(".osd_use_airspeed_alarm").toggle(HARDWARE.capabilities.usePitot);
     $(".osd_use_baro_temp_alarm").toggle(HARDWARE.capabilities.useBaro);
     $(".osd_use_esc_telemetry").toggle(HARDWARE.capabilities.useESCTelemetry);
-    $(".osd_use_crsf").toggle(HARDWARE.capabilities.useCRSFRx);
+    $(".osd_use_rx").toggle(HARDWARE.capabilities.useRx);
+    $(".osd_use_crsf").toggle(HARDWARE.capabilities.useCRSF);
 };
 
 OSD.GUI.updateMapPreview = function(mapCenter, name, directionSymbol, centerSymbol) {
@@ -3332,7 +3360,8 @@ HARDWARE.init = function() {
         isDjiHdFpv: false,
         isMspDisplay: false,
         useESCTelemetry: false,
-        useCRSFRx: false,
+        useRx: false,
+        useCRSF: false,
         useBaro: false,
         usePitot: false
     };
@@ -3357,7 +3386,8 @@ HARDWARE.update = function(callback) {
 
         // Update RX data for Crossfire detection
         mspHelper.loadRxConfig(function() {
-            HARDWARE.capabilities.useCRSFRx = (FC.RX_CONFIG.serialrx_provider == 6);
+            HARDWARE.capabilities.useCRSF = (FC.RX_CONFIG.serialrx_provider == 6); // CRSF
+            HARDWARE.capabilities.useRx = (FC.RX_CONFIG.serialrx_provider == 6 || FC.RX_CONFIG.receiver_type == 2); // CRSF or MSP
 
             mspHelper.loadSensorConfig(function () {
                 HARDWARE.capabilities.useBaro  = (FC.SENSOR_CONFIG.barometer != 0);
