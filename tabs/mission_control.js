@@ -31,6 +31,7 @@ const Plotly = require('./../js/libraries/plotly-latest.min');
 const interval = require('./../js/intervals');
 const { Geozone, GeozoneVertex, GeozoneType, GeozoneShapes, GeozoneFenceAction }  = require('./../js/geozone');
 const GeozoneCollection = require('./../js/geozoneCollection');
+const { event } = require('jquery');
 
 var MAX_NEG_FW_LAND_ALT = -2000; // cm
 
@@ -978,7 +979,7 @@ TABS.mission_control.initialize = function (callback) {
         let mapCenter = map.getView().getCenter();
         let midLon = Math.round(ol.proj.toLonLat(mapCenter)[0] * 1e7);
         let midLat = Math.round(ol.proj.toLonLat(mapCenter)[1] * 1e7);        
-        FC.GEOZONES.put(new Geozone(GeozoneType.INCLUSIVE, GeozoneShapes.CIRCULAR, 0, 10000, 20000, GeozoneFenceAction.NONE, [ new GeozoneVertex(0, midLat, midLon) ]));
+        FC.GEOZONES.put(new Geozone(GeozoneType.INCLUSIVE, GeozoneShapes.CIRCULAR, 0, 10000, false, 20000, GeozoneFenceAction.NONE, [ new GeozoneVertex(0, midLat, midLon) ]));
 
         selectedGeozone = FC.GEOZONES.last();
         renderGeozoneOptions();
@@ -1689,6 +1690,9 @@ TABS.mission_control.initialize = function (callback) {
             $('#geozoneType').val(selectedGeozone.getType());
             $('#geozoneMinAlt').val(selectedGeozone.getMinAltitude());
             $('#geozoneMaxAlt').val(selectedGeozone.getMaxAltitude());
+            $('#geozoneMinAltM').text(selectedGeozone.getMinAltitude() / 100 + " m");
+            $('#geozoneMaxAltM').text(selectedGeozone.getMaxAltitude()  / 100 + " m");
+            changeSwitchery($('#geozoneSeaLevelRef'), selectedGeozone.getSealevelRef());
             $('#geozoneAction').val(selectedGeozone.getFenceAction());
             $('#geozoneRadius').val(selectedGeozone.getRadius);
             if (selectedGeozone.getShape() == GeozoneShapes.CIRCULAR) {
@@ -3414,20 +3418,39 @@ TABS.mission_control.initialize = function (callback) {
         $('#geozoneMinAlt').on('change', event => {
             if (selectedGeozone) {
                 selectedGeozone.setMinAltitude($(event.currentTarget).val());
-                renderGeozonesOnMap();
+                renderGeozoneOptions();
             }
         });
         $('#geozoneMaxAlt').on('change', event => {
             if (selectedGeozone) {
                 selectedGeozone.setMaxAltitude($(event.currentTarget).val());
-                renderGeozonesOnMap();
+                renderGeozoneOptions();
+            }
+        });
+
+        $('#geozoneSeaLevelRef').on('change', event => {
+            if (selectedGeozone) {
+                const isChecked = $(event.currentTarget).prop('checked') ? 1 : 0;
+                selectedGeozone.setSealevelRef(isChecked);
+                (async () => {
+                    const vertex = selectedGeozone.getVertex(0);
+                    const elevation = await selectedGeozone.getElevationFromServer(vertex.getLonMap(), vertex.getLatMap(), globalSettings);
+
+                    if (isChecked) {
+                        selectedGeozone.setMinAltitude(Number(selectedGeozone.getMinAltitude()) + elevation * 100);
+                        selectedGeozone.setMaxAltitude(Number(selectedGeozone.getMaxAltitude()) + elevation * 100);
+                    } else {
+                        selectedGeozone.setMinAltitude(Number(selectedGeozone.getMinAltitude()) - elevation * 100);
+                        selectedGeozone.setMaxAltitude(Number(selectedGeozone.getMaxAltitude()) - elevation * 100);
+                    }
+                    renderGeozoneOptions();
+                })();
             }
         });
 
         $('#geozoneAction').on('change', event => {
             if (selectedGeozone) {
                 selectedGeozone.setFenceAction($(event.currentTarget).val());
-                renderGeozonesOnMap();
             }
         });
 

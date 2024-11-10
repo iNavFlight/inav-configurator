@@ -55,7 +55,7 @@ let GeozoneVertex = function (number, lat, lon) {
     return self;
 }
 
-let Geozone = function (type, shape, minAltitude, maxAltitude, radius, fenceAction, vertices, number = 0) {
+let Geozone = function (type, shape, minAltitude, maxAltitude, sealevelRef, radius, fenceAction, vertices, number = 0) {
     var self = {};
 
     self.setNumber = (data) => {
@@ -96,6 +96,14 @@ let Geozone = function (type, shape, minAltitude, maxAltitude, radius, fenceActi
 
     self.getMaxAltitude = () => {
         return maxAltitude;
+    }
+
+    self.setSealevelRef = (data) => {
+        sealevelRef = data;
+    }
+
+    self.getSealevelRef = () => {
+        return sealevelRef;
     }
 
     self.setRadius = (data) => {
@@ -167,6 +175,27 @@ let Geozone = function (type, shape, minAltitude, maxAltitude, radius, fenceActi
     self.resetVertices = () => {
         vertices = [];
     }
+
+    self.getElevationFromServer = async function (lon, lat, globalSettings) {
+        let elevation = "N/A";
+        if (globalSettings.mapProviderType == 'bing') {
+            let elevationEarthModel = $('#elevationEarthModel').prop("checked") ? "ellipsoid" : "sealevel";
+
+            const response = await fetch('http://dev.virtualearth.net/REST/v1/Elevation/List?points='+lat+','+lon+'&heights='+elevationEarthModel+'&key='+globalSettings.mapApiKey);
+            const myJson = await response.json();
+            elevation = myJson.resourceSets[0].resources[0].elevations[0];
+        }
+        else {
+            const response = await fetch('https://api.opentopodata.org/v1/aster30m?locations='+lat+','+lon);
+            const myJson = await response.json();
+            if (myJson.status == "OK" && myJson.results[0].elevation != null) {
+                elevation = myJson.results[0].elevation;
+            }
+        }
+        return elevation;
+    }
+
+    return self;
 
     return self;
 }

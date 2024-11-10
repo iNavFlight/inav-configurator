@@ -132,6 +132,7 @@ let GeozoneCollection = function() {
             buffer.push(BitHelper.specificByte(zone.getMaxAltitude(), 1));
             buffer.push(BitHelper.specificByte(zone.getMaxAltitude(), 2));
             buffer.push(BitHelper.specificByte(zone.getMaxAltitude(), 3));
+            buffer.push(zone.getSealevelRef());
             buffer.push(zone.getFenceAction());
             if (zone.getShape() == GeozoneShapes.CIRCULAR) { 
                 buffer.push(2);

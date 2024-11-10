@@ -1608,16 +1608,17 @@ var mspHelper = (function () {
             
             case MSPCodes.MSP2_INAV_GEOZONE:
                 var geozone = new Geozone(
-                    data.getUint8(0),
                     data.getUint8(1),
-                    data.getInt32(2, true),
-                    data.getInt32(6, true),
+                    data.getUint8(2),
+                    data.getInt32(3, true),
+                    data.getInt32(4, true),
+                    data.getUint8(11),
                     0,
-                    data.getInt8(10, true),
+                    data.getInt8(12, true),
                     null,
-                    data.getUint8(12, true),
+                    data.getUint8(14, true),
                 );
-                let verticesCount = data.getUint8(11, true);
+                let verticesCount = data.getUint8(13, true);
                 if (verticesCount == 0) {
                     break;
                 }

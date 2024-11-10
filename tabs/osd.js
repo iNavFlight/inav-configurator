@@ -1760,7 +1760,7 @@ OSD.constants = {
                     }
                 },{
                     name: 'COURSE_NEXT_GEOZONE',
-                    id: 159,
+                    id: 163,
                     min_version: '8.0.0',
                     enabled: function() {
                         return FC.isFeatureEnabled('GEOZONE');
@@ -1768,7 +1768,7 @@ OSD.constants = {
                     preview: FONT.symbol(SYM.DIR_TO_HOME)
                 }, {
                     name: 'HOR_DIST_TO_NEXT_GEOZONE',
-                    id: 160,
+                    id: 164,
                     min_version: '8.0.0',
                     enabled: function() {
                         return FC.isFeatureEnabled('GEOZONE');
@@ -1787,7 +1787,7 @@ OSD.constants = {
                 },
                 {
                     name: 'VERT_DIST_TO_NEXT_GEOZONE',
-                    id: 161,
+                    id: 165,
                     min_version: '8.0.0',
                     enabled: function() {
                         return FC.isFeatureEnabled('GEOZONE');
