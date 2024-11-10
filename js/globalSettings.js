@@ -20,6 +20,7 @@ var globalSettings = {
     showProfileParameters: null,
     // tree target for documents
     docsTreeLocation: 'master',
+    configuratorTreeLocation: 'master',
     cliAutocomplete: true,
     assistnowApiKey: null,
     assistnowOfflineData: [],

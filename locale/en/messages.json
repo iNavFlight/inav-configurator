@@ -3825,19 +3825,19 @@
         "message": "Maximum ESC temperature"
     },
     "osd_snr_alarm": {
-        "message": "CRSF SNR Alarm Level"
+        "message": "SNR Alarm Level"
     },
     "osdalarmSNR_HELP": {
         "message": "SNR is only shown below this value. 0dB (1:1 ratio), indicates that received signal equals noise floor."
     },
     "osd_link_quality_alarm": {
-        "message": "CRSF Link Quality Alarm"
+        "message": "Link Quality Alarm"
     },
     "osdalarmLQ_HELP": {
         "message": "For Crossfire use 70%. For Tracer use 50%."
     },
     "osd_rssi_dbm_alarm": {
-        "message": "CRSF RSSI dBm Alarm"
+        "message": "RSSI dBm Alarm"
     },
     "osd_adsb_distance_warning": {
         "message": "ADSB distance warning"
@@ -3884,8 +3884,8 @@
     "osdGroupVTX": {
         "message": "VTX"
     },
-    "osdGroupCRSF": {
-        "message": "CRSF RX Statistics"
+    "osdGroupRx": {
+        "message": "RX Statistics"
     },
     "osdGroupMapsAndRadars": {
         "message": "Maps & Radars"
@@ -4112,23 +4112,29 @@
     "osdElement_VTX_CHANNEL_HELP": {
         "message": "Shows the current band and channel of the VTX. Requires either a VTX with SmartAudio or Tramp or either a VTX integrated in the flight controller."
     },
-    "osdElement_CRSF_RSSI_DBM": {
+    "osdElement_RSSI_DBM": {
         "message": "RX RSSI in dBm"
     },
-    "osdElement_CRSF_LQ": {
-        "message": "RX Link Quality %"
+    "osdElement_LQ_UPLINK": {
+        "message": "RX Uplink Quality %"
     },
-    "osdElement_CRSF_LQ_HELP": {
-        "message": "Use Crossfire LQ Format setting to select format type."
+    "osdElement_LQ_UPLINK_HELP": {
+        "message": "If using CRSF, use Crossfire LQ Format setting to select format type."
     },
-    "osdElement_CRSF_SNR_DB": {
+    "osdElement_LQ_DOWNLINK": {
+        "message": "RX Downlink Quality %"
+    },
+    "osdElement_SNR_DB": {
         "message": "RX Uplink SNR in dB"
     },
-    "osdElement_CRSF_SNR_DB_HELP": {
+    "osdElement_SNR_DB_HELP": {
         "message": "Shown only when SNR goes below alarm level. At 0dB, received signal level equals noise floor level."
     },
-    "osdElement_CRSF_TX_POWER": {
+    "osdElement_TX_POWER_UPLINK": {
         "message": "TX power in mW"
+    },
+    "osdElement_OSD_RX_POWER_DOWNLINK": {
+        "message": "RX power in mW"
     },
     "osdElement_MAP_NORTH": {
         "message": "Map (Up is north)"
