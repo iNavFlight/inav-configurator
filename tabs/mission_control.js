@@ -31,7 +31,6 @@ const Plotly = require('./../js/libraries/plotly-latest.min');
 const interval = require('./../js/intervals');
 const { Geozone, GeozoneVertex, GeozoneType, GeozoneShapes, GeozoneFenceAction }  = require('./../js/geozone');
 const GeozoneCollection = require('./../js/geozoneCollection');
-const { event } = require('jquery');
 
 var MAX_NEG_FW_LAND_ALT = -2000; // cm
 
@@ -3429,8 +3428,8 @@ TABS.mission_control.initialize = function (callback) {
         });
 
         $('#geozoneSeaLevelRef').on('change', event => {
-            if (selectedGeozone) {
-                const isChecked = $(event.currentTarget).prop('checked') ? 1 : 0;
+            const isChecked = $(event.currentTarget).prop('checked') ? 1 : 0;
+            if (selectedGeozone && isChecked != selectedGeozone.getSealevelRef()) {    
                 selectedGeozone.setSealevelRef(isChecked);
                 (async () => {
                     const vertex = selectedGeozone.getVertex(0);

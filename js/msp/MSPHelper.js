@@ -1611,12 +1611,12 @@ var mspHelper = (function () {
                     data.getUint8(1),
                     data.getUint8(2),
                     data.getInt32(3, true),
-                    data.getInt32(4, true),
+                    data.getInt32(7, true),
                     data.getUint8(11),
                     0,
                     data.getInt8(12, true),
                     null,
-                    data.getUint8(14, true),
+                    data.getUint8(0, true),
                 );
                 let verticesCount = data.getUint8(13, true);
                 if (verticesCount == 0) {
