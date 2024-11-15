@@ -317,6 +317,58 @@
     top: 140px;
 }
 
+.geozone-settings {
+    top: 165px;
+    left: .5em;
+}
+.ol-touch .geozone-settings {
+    top: 165px;
+}
+
+.tab-mission-control .geozoneVerticesTable {
+    width: 100%;
+    text-align: center;
+    font-size: 12px;
+}
+
+.tab-mission-control .geozoneVerticesTable input[type="text"] {
+    font-size: 8px;
+    width: 100%;
+}
+
+.tab-mission-control .geozoneVerticesTable input[type="number"] {
+    font-size: 10px;
+    width: 100%;
+    -moz-appearance: textfield;
+}
+
+/* Chrome, Safari, Edge, Opera */
+.tab-mission-control .geozoneVerticesTable input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.tab-mission-control .geozoneVerticesTable thead {
+    display: table-header-group !important;
+}
+
+.tab-mission-control .geozoneVerticesTable thead tr {
+    border-left: 1px solid #e4e4e4;
+    border-right: 1px solid #e4e4e4;
+    background-color: #828885;
+    color: #FFF;
+}
+.tab-mission-control .geozoneVerticesTable td,
+.tab-mission-control .geozoneVerticesTable th {
+    padding: 2px;
+    /* height: 2.5em; */
+}
+
+.tab-mission-control .geozoneVerticesTable tr:nth-child(even) td,
+.tab-mission-control .geozoneVerticesTable tr:nth-child(even) th {
+    background-color: #ebe7e7;
+}
+
 .mission-control-template {
     top: 140px;
     left: .5em;

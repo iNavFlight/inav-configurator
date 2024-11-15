@@ -62,6 +62,15 @@
                             <span data-i18n="missionTotalInfoMissionValid"></span>
                             <div id="missionValid" style="display: inline-block"></div>
                         </div>
+                        <div id="infoGeozoneMissionWarning" style="padding-bottom: 2px;">
+                            <span style="color: red" i18n-replaced data-i18n="warning"></span>
+                            <div id="geozoneMissionWarning" style="display: inline-block" data-i18n="missionGeozoneWarning"></div>
+                        </div>
+                        <div id="infoGeozoneInvalid" style="padding-bottom: 2px;">
+                            <span style="color: red" i18n-replaced data-i18n="warning"></span>
+                            <div style="display: inline-block" data-i18n="geozoneInvalidzone"></div>
+                            <span id="geozoneInvalidContent"></span>
+                        </div>
                     </div>
                 </div>
 
@@ -278,6 +287,102 @@
                                     <span id="SafeHomeSafeDistance"></span>
                                 </div>
                             </div>
+                    </div>
+                </div>
+
+                <div id="missionPlannerGeozones" class="gui_box grey" style="display: none">
+                    <div class="gui_box_titlebar">
+                        <div class="spacer_box_title" data-i18n="missionGeozoneHead"></div>
+                        <div class="btnMenu btnMenuIcon save_btn">
+                            <div id="showHideGeozonesButton">
+                                <a class="ic_hide" href="#" title="Hide"></a>
+                            </div>
+                            <a id="cancelGeozone" class="ic_cancel" href="#" title="Cancel"></a>
+                            <a id="addGeozone" class="ic_add" href="#" title="Add Geozone"></a>  
+                            <a id="saveEepromGeozoneButton" class="ic_save2Eprom" href="#" i18n_title="missionGeozoneSaveAndReboot"></a>
+                            <a id="loadEepromGeozoneButton" class="ic_loadFromEprom" href="#" i18n_title="missionGeozoneLoad"></a> 
+                        </div>
+                    </div>
+                    <div class="spacer" id="geozoneContent">
+                        <div style="padding-bottom: 2px;">
+                            <span data-i18n="missionGeozoneAvailableZones"></span>
+                            <span id="availableGeozones"></span>
+                        </div>
+                        <div id="infoAvailableVeritces" style="padding-bottom: 2px;">
+                            <span data-i18n="missionGeozoneAvailableVertices"></span>
+                            <span id="availableVertices"></span>
+                        </div>
+                        <div id="geozoneContentBox" style="display: none;" >
+                            <div class="gui_box grey missionPlannerGeozone">
+                                <div class="gui_box_titlebar">
+                                    <div class="spacer_box_title" data-i18n="geozoneEdit"></div>
+                                    <div class="btnMenu btnMenuIcon">
+                                        <div class="btnMenu-danger">
+                                            <a id="deleteGeozone" class="ic_removeAll" href="#" title="Delete"></a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="spacer" id="geozoneSingelContent">
+                                    <div class="point">
+                                        <label class="point-label" for="zoneType" data-i18n="geozoneShape"></label>
+                                        <select name="zoneShape" id="geozoneShape">
+                                            <option value="1" data-i18n="missionGeozoneTypePolygon"></option>
+                                            <option value="0" data-i18n="missionGeozoneTypeCircular"></option>
+                                        </select>
+                                    </div>
+                                    <div class="point">
+                                        <label class="point-label" for="zoneType" data-i18n="missionGezoneType"></label>
+                                        <select name="zoneType" id="geozoneType">
+                                            <option value="1" data-i18n="geozoneInclusive"></option>
+                                            <option value="0" data-i18n="geozoneExcusive"></option>
+                                        </select>
+                                    </div>
+                                    <div class="point">
+                                        <label class="point-label" for="zoneMinAlt" data-i18n="geozoneMinAlt"></label>
+                                        <input type="number" id="geozoneMinAlt"></input>
+                                        <span id="geozoneMinAltM"></span>
+                                    </div>
+                                    <div class="point">
+                                        <label class="point-label" for="zoneMaxAlt" data-i18n="geozoneMaxAlt"></label>
+                                        <input type="number" id="geozoneMaxAlt"></input>
+                                        <span id="geozoneMaxAltM"></span><br/>
+                                        <span data-i18n="geozoneInfiniteAlt"></span>
+                                    </div>
+                                    <div class="point">
+                                        <label class="point-label" for="geozoneSeaLevelRef" data-i18n="missionSeaLevelRef"></label>
+                                        <input id="geozoneSeaLevelRef" type="checkbox" value="0" class="togglemedium" required>
+                                    </div>
+                                    <div class="point">
+                                        <label class="point-label" for="zoneAction" data-i18n="geozoneAction">Action:</label>
+                                        <select name="zoneAction" id="geozoneAction">
+                                            <option value="0" data-i18n="geozoneActionNone"></option>
+                                            <option value="1" data-i18n="geozoneActionAvoid"></option>
+                                            <option value="2" data-i18n="geozoneActionPosHold"></option>
+                                            <option value="3" data-i18n="geozoneActionRTH"></option>
+                                        </select>
+                                    </div>
+                                    <div class="point">
+                                        <label class="point-label" for="raduis" data-i18n="geozoneRadius"></label>
+                                        <input type="number" id="geozoneRadius"></input>
+                                    </div>
+                                    <div class="point">
+                                        <label class="point-label" for="verticesTable" data-i18n="geozoneVerices"></label>
+                                        <table class="geozoneVerticesTable" id="verticesTable">
+                                            <thead>
+                                                <tr>
+                                                    <th style="width: 20px">&nbsp;</th>
+                                                    <th style="width: 40px">#</th>
+                                                    <th style="width: 120px" data-i18n="gpsLat"></th>
+                                                    <th style="width: 120px" data-i18n="gpsLon"></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="geozoneVerticesTableBody">
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 

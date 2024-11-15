@@ -21,6 +21,7 @@ const Waypoint = require('./../waypoint');
 const mspDeduplicationQueue = require('./mspDeduplicationQueue');
 const mspStatistics = require('./mspStatistics');
 const settingsCache = require('./../settingsCache');
+const {Geozone, GeozoneVertex, GeozoneShapes } = require('./../geozone');
 
 var mspHelper = (function () {
     var self = {};
@@ -1600,9 +1601,63 @@ var mspHelper = (function () {
 
                 FC.OSD_CUSTOM_ELEMENTS.items.push(customElement);
                 break;
+
             case MSPCodes.MSP2_INAV_GPS_UBLOX_COMMAND:
                 // Just and ACK from the fc.
                 break;
+            
+            case MSPCodes.MSP2_INAV_GEOZONE:
+                var geozone = new Geozone(
+                    data.getUint8(1),
+                    data.getUint8(2),
+                    data.getInt32(3, true),
+                    data.getInt32(7, true),
+                    data.getUint8(11),
+                    0,
+                    data.getInt8(12, true),
+                    null,
+                    data.getUint8(0, true),
+                );
+                let verticesCount = data.getUint8(13, true);
+                if (verticesCount == 0) {
+                    break;
+                }
+                if (geozone.getShape() == GeozoneShapes.POLYGON) {
+                    geozone.setVertices(new Array(verticesCount));
+                } else {
+                    geozone.setVertices(new Array(1));
+                }                
+                FC.GEOZONES.put(geozone);
+                break;
+            case MSPCodes.MSP2_INAV_GEOZONE_VERTEX:
+                if (data.buffer.byteLength == 0) {
+                    break;
+                }
+                var zoneID = data.getUint8(0);
+                var vertexId = data.getUint8(1);
+                var geozone = FC.GEOZONES.at(zoneID);
+                if (zoneID < FC.GEOZONES.geozoneCount()) {
+                    geozone.setVertex(
+                        vertexId,
+                        new GeozoneVertex(
+                            vertexId,
+                            data.getInt32(2, true),
+                            data.getInt32(6, true),
+                        )
+                    );
+                    if (geozone.getShape() == GeozoneShapes.CIRCULAR) {
+                        geozone.setRadius(data.getUint32(10, true));
+                    }
+                }
+                break;
+            
+            case MSPCodes.MSP2_INAV_SET_GEOZONE_VERTICE:
+                console.log("Geozone vertex saved")
+                break; 
+            
+            case MSPCodes.MSP2_INAV_SET_GEOZONE:
+                console.log("Geozone saved")
+                break;    
 
             default:
                 console.log('Unknown code detected: 0x' + dataHandler.code.toString(16));
@@ -3090,6 +3145,68 @@ var mspHelper = (function () {
             }
         };
     };
+
+    self.loadGeozones = function (callback) {
+        FC.GEOZONES.flush();
+        let geozoneID = -1;
+        let vertexID = -1;
+        nextGeozone();
+
+        function nextVertex() {
+            vertexID++;
+            let zone = FC.GEOZONES.at(geozoneID);
+            if (!zone || zone.getVerticesCount() == 0) {
+                nextGeozone();
+                return;
+            }
+            if (vertexID < FC.GEOZONES.at(geozoneID).getVerticesCount() - 1 && zone.getShape() == GeozoneShapes.POLYGON) {
+                MSP.send_message(MSPCodes.MSP2_INAV_GEOZONE_VERTEX, [geozoneID, vertexID], false, nextVertex); 
+            } else {
+                MSP.send_message(MSPCodes.MSP2_INAV_GEOZONE_VERTEX, [geozoneID, vertexID], false, nextGeozone); 
+            }
+        }
+
+        function nextGeozone() {
+            geozoneID++;
+            vertexID = -1;
+            if (geozoneID < FC.GEOZONES.getMaxZones() - 1) {
+                MSP.send_message(MSPCodes.MSP2_INAV_GEOZONE, [geozoneID], false, nextVertex);
+            } else {
+                MSP.send_message(MSPCodes.MSP2_INAV_GEOZONE, [geozoneID], false, callback);
+            }
+        }
+    };
+
+    self.saveGeozones = function (callback) {
+        let geozoneID = -1;
+        let vertexID = -1;
+        nextGeozone()
+
+        function nextVertex() {
+            vertexID++;
+
+            let zone = FC.GEOZONES.at(geozoneID);
+            if (!zone || zone.getVerticesCount() == 0) {
+                nextGeozone();
+                return;
+            }
+            if (vertexID < FC.GEOZONES.at(geozoneID).getVerticesCount() - 1) {
+                MSP.send_message(MSPCodes.MSP2_INAV_SET_GEOZONE_VERTICE, FC.GEOZONES.extractBufferVertices(geozoneID, vertexID), false, nextVertex); 
+            } else {
+                MSP.send_message(MSPCodes.MSP2_INAV_SET_GEOZONE_VERTICE, FC.GEOZONES.extractBufferVertices(geozoneID, vertexID), false, nextGeozone); 
+            }
+        }
+
+        function nextGeozone() {
+            geozoneID++;
+            vertexID = -1;
+            if (geozoneID < FC.GEOZONES.getMaxZones() - 1) {
+                MSP.send_message(MSPCodes.MSP2_INAV_SET_GEOZONE, FC.GEOZONES.extractBufferZone(geozoneID), false, nextVertex);
+            } else {
+                MSP.send_message(MSPCodes.MSP2_INAV_SET_GEOZONE, FC.GEOZONES.extractBufferZone(geozoneID), false, callback);
+            }
+        }
+    }
 
     self._getSetting = function (name) {
 
