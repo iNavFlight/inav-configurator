@@ -1,5 +1,7 @@
 'use strict'
 
+const { Shape } = require("three");
+
 const GeozoneType = Object.freeze({
     EXCULSIVE: 0,
     INCLUSIVE: 1,
@@ -174,6 +176,71 @@ let Geozone = function (type, shape, minAltitude, maxAltitude, sealevelRef, radi
 
     self.resetVertices = () => {
         vertices = [];
+    }
+
+    self.isCounterClockwise = () => {
+        
+        if (shape == GeozoneShapes.CIRCULAR) {
+            return true;
+        }
+        
+        let area = 0;
+        for (let i = 0; i < vertices.length; i++) {
+            const x1 =  vertices[i].getLat();
+            const y1 = vertices[i].getLon();
+            const next = vertices[(i + 1) % vertices.length];
+            const x2 = next.getLat();
+            const  y2 = next.getLon();
+            area += x1 * y2 - y1 * x2;
+        }
+        return area < 0;
+    }
+
+    self.isComplex = () => {
+        if (shape == GeozoneShapes.CIRCULAR) {
+            return false;
+        }
+
+        // Intersection of two lines https://en.wikipedia.org/wiki/Line-line_intersection
+        function doLinesIntersect(line1Start, line1End, line2Start, line2End)
+        {
+            const s1 = line1End.x - line1Start.x;
+            const t1 = -(line2End.x - line2Start.x);
+            const r1 = line2Start.x - line1Start.x;
+
+            const s2 = line1End.y - line1Start.y;
+            const t2 = -(line2End.y - line2Start.y);
+            const r2 = line2Start.y - line1Start.y;
+
+            // Use Cramer's rule for the solution of the system of linear equations
+            const determ = s1 * t2 - t1 * s2;
+            if (determ == 0) { // No solution
+                return false;
+            }
+
+            const s0 = (r1 * t2 - t1 * r2) / determ;
+            const t0 = (s1 * r2 - r1 * s2) / determ;
+
+            if (s0 == 0 && t0 == 0) {
+                return false;
+            }
+            return !(s0 <= 0 || s0 >= 1 || t0 <= 0 || t0 >= 1)	
+        }
+        
+        for (var i = 0; i < vertices.length; i++) {
+            const a = {x: vertices[i].getLat(), y: vertices[i].getLon()};
+            const next = vertices[(i + 1) % vertices.length];
+            const b = {x: next.getLat(), y: next.getLon()};
+            for (var j = i + 2; j < vertices.length; j++) {
+                const c = {x: vertices[j].getLat(), y: vertices[j].getLon()};;
+                const next2 = vertices[(j + 1) % vertices.length];
+                const d = {x: next2.getLat(), y: next2.getLon()};
+                if (doLinesIntersect(a, b, c, d)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     self.getElevationFromServer = async function (lon, lat, globalSettings) {

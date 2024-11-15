@@ -140,7 +140,7 @@ let GeozoneCollection = function() {
                 buffer.push(zone.getVerticesCount());
             }
         } else {
-            buffer = [id, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ];
+            buffer = [id, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
         }
 
         return buffer;

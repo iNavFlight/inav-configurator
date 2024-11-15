@@ -76,6 +76,7 @@ TABS.mission_control.initialize = function (callback) {
     let $waypointOptionsTableBody;
     let selectedGeozone;
     let $geozoneContent;
+    let invalidGeoZones = false;
     let isGeozoneEnabeld = false;
     let settings = {speed: 0, alt: 5000, safeRadiusSH: 50, fwApproachAlt: 60, fwLandAlt: 5, maxDistSH: 0, fwApproachLength: 0, fwLoiterRadius: 0, bingDemModel: false};
 
@@ -152,6 +153,7 @@ TABS.mission_control.initialize = function (callback) {
         }
 
         $('#infoGeozoneMissionWarning').hide();
+        $('#infoGeozoneInvalid').hide();
         $safehomeContentBox = $('#SafehomeContentBox');
         $waypointOptionsTableBody = $('#waypointOptionsTableBody');
         $geozoneContent = $('#geozoneContent');
@@ -919,7 +921,7 @@ TABS.mission_control.initialize = function (callback) {
         cleanGeozoneLayers();
         if (!selectedGeozone) {
             cleanGeozoneLines();
-            geozoneMissionWarning();
+            geozoneWarning();
             return;
         }
         
@@ -931,7 +933,7 @@ TABS.mission_control.initialize = function (callback) {
                 });
             }            
         });
-        geozoneMissionWarning();
+        geozoneWarning();
     }
 
     function cleanGeozoneLines() {
@@ -949,12 +951,44 @@ TABS.mission_control.initialize = function (callback) {
         geozoneMarkers = [];
     }
 
-    function geozoneMissionWarning() {
+    function geozoneWarning() {
 
         if (markers.length >= 1 && geozoneMarkers.length >= 1) {
             $('#infoGeozoneMissionWarning').show();
         } else {
             $('#infoGeozoneMissionWarning').hide();
+        }
+        
+        $('#geozoneInvalidContent').empty();
+        invalidGeoZones = false;
+        for (var i = 0; i < FC.GEOZONES.geozoneCount(); i++) {
+            const zone = FC.GEOZONES.at(i);
+
+            var reasons = []
+            if (!zone.isCounterClockwise()) {
+                reasons.push(i18n.getMessage("gezoneInvalidReasonNotCC"));
+            }
+
+            if (zone.isComplex()) {
+                reasons.push(i18n.getMessage("gezoneInvalidReasonComplex"));
+            }
+
+            if (zone.getMaxAltitude() <= zone.getMinAltitude()) {
+                reasons.push(i18n.getMessage("gezoneInvalidReasonMinMaxAlt"));
+            }
+
+
+
+            if (reasons.length > 0) {
+                $('#geozoneInvalidContent').append(`<div style="display: inline-block">${i18n.getMessage("geozone")} ${zone.getNumber() + 1}: ${reasons.join(", ")}</div><br/>`);
+                invalidGeoZones = true;
+            }
+        }
+
+        if (invalidGeoZones) {
+            $('#infoGeozoneInvalid').show();
+        } else {
+            $('#infoGeozoneInvalid').hide();
         }
     }
 
@@ -1621,7 +1655,7 @@ TABS.mission_control.initialize = function (callback) {
             });
 
         }
-        geozoneMissionWarning();
+        geozoneWarning();
     }
 
     function redrawLayer() {
@@ -1734,7 +1768,7 @@ TABS.mission_control.initialize = function (callback) {
                     }
                 });
             });
-
+            geozoneWarning();
         } else  {
             $('#geozoneContentBox').hide();
         }
@@ -1992,6 +2026,9 @@ TABS.mission_control.initialize = function (callback) {
             
             var handleShowGeozoneSettings = function () {
                 $('#missionPlannerGeozones').fadeIn(300);
+                if (!selectedGeozone) {
+                    selectedGeozone = FC.GEOZONES.first();
+                } 
                 renderGeozoneOptions();
                 renderGeozonesOnMap();
             };
@@ -3363,6 +3400,12 @@ TABS.mission_control.initialize = function (callback) {
         });
 
         $('#saveEepromGeozoneButton').on('click', event => {
+            
+            if (invalidGeoZones) {
+                GUI.alert(i18n.getMessage("geozoneUnableToSave"));
+                return;
+            }
+            
             if (confirm(i18n.getMessage("missionGeozoneReboot"))) {            
                 $(event.currentTarget).addClass('disabled');
                 GUI.log('Start of sending Geozones');

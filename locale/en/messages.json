@@ -4772,6 +4772,9 @@
     "featureGEOZONE": {
         "message": "Geozone"
     },
+    "geozone": {
+        "message": "Geozone"
+    },
     "featureGEOZONETip": {
         "message": "Virtual perimeters for geographical areas (also called geofence) with automatically triggered actions when the perimeters are violated."
     },
@@ -4828,6 +4831,21 @@
     },
     "missionGeozoneAvailableVertices": {
         "message": "Available Vertices:"
+    },
+    "geozoneInvalidzone": {
+        "message": "Invalid Geozone(s) detected:"
+    },
+    "gezoneInvalidReasonNotCC": {
+        "message": "Not counter clockwise"
+    },
+    "gezoneInvalidReasonComplex": {
+        "message": "Complex"
+    },
+    "gezoneInvalidReasonMinMaxAlt": {
+        "message": "Max. Alt <= Min. Alt"
+    },
+    "geozoneUnableToSave": {
+        "message": "Unable to save geozones: Invalid zones"
     },
     "missionMultiMissionHead": {
         "message": "Multi Missions"
