@@ -262,7 +262,7 @@ TABS.pid_tuning.initialize = function (callback) {
 
         $("#ez_tune_enabled").prop('checked', FC.EZ_TUNE.enabled).trigger('change');
 
-        GUI.sliderize($('#ez_tune_filter_hz'), FC.EZ_TUNE.filterHz, 10, 300);
+        GUI.sliderize($('#ez_tune_filter_hz'), FC.EZ_TUNE.filterHz, 20, 300);
         GUI.sliderize($('#ez_tune_axis_ratio'), FC.EZ_TUNE.axisRatio, 25, 175);
         GUI.sliderize($('#ez_tune_response'), FC.EZ_TUNE.response, 0, 200);
         GUI.sliderize($('#ez_tune_damping'), FC.EZ_TUNE.damping, 0, 200);
