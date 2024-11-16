@@ -4835,6 +4835,12 @@
     "geozoneInvalidzone": {
         "message": "Invalid Geozone(s) detected:"
     },
+    "geozoneInvalidLat": {
+        "message": "Invalid latitude"
+    },
+    "geozoneInvalidLon": {
+        "message": "Invalid longitude"
+    },
     "gezoneInvalidReasonNotCC": {
         "message": "Not counter clockwise"
     },

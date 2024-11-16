@@ -1607,7 +1607,11 @@ var mspHelper = (function () {
                 break;
             
             case MSPCodes.MSP2_INAV_GEOZONE:
-                var geozone = new Geozone(
+                
+                if (data.buffer.byteLength == 0) {
+                    break;
+                }
+                var geozone = new Geozone(        
                     data.getUint8(1),
                     data.getUint8(2),
                     data.getInt32(3, true),

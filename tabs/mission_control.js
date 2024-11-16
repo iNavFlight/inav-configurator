@@ -892,11 +892,11 @@ TABS.mission_control.initialize = function (callback) {
                                     width: 3,
                                 })
                             })
-                        ]                    
+                        ],                                  
                     });
 
-                    vectorLayer.kind = "geozoneline";
-                    vectorLayer.selection = false;
+                    vectorLayer.kind = "geozonecircle";
+                    vectorLayer.selection = true;
 
                     geozoneLines.push(vectorLayer);
                     map.addLayer(vectorLayer);
@@ -1748,17 +1748,49 @@ TABS.mission_control.initialize = function (callback) {
                             <span class="vertexNumber"></span> \
                         </td> \
                         <td> \
-                            <input type="number" class="vertexLat" readonly/> \
+                            <input type="number" class="vertexLat"/> \
                         </td> \
                         <td> \
-                            <input type="number" class="vertexLon" readonly/> \
+                            <input type="number" class="vertexLon"/> \
                         </td> \
                     </tr> \
                 ');
                 const $row = $verticesTable.find('tr:last');
                 $row.find('.vertexNumber').text(vertex.getNumber() + 1);
-                $row.find('.vertexLat').val((vertex.getLatMap()).toLocaleString(['en-US'], {minimumFractionDigits: 7}));
-                $row.find('.vertexLon').val((vertex.getLonMap()).toLocaleString(['en-US'], {minimumFractionDigits: 7}));
+                
+                $row.find('.vertexLat')
+                    .val((vertex.getLatMap())
+                    .toLocaleString(['en-US'], {minimumFractionDigits: 7}))
+                    .on('change', event => {
+                        const lat = $(event.currentTarget).val();
+                        if (isNaN(lat) || lat < -90 || lat > 90) {
+                            GUI.alert(i18n.getMessage("geozoneInvalidLat"));
+                            $(event.currentTarget).val(vertex.getLatMap());
+                            return;
+                        }
+                        vertex.setLat(lat * 1e7);
+                        renderGeozoneOptions();
+                        renderGeozonesOnMap();
+                        updateGeozoneInfo();
+                        
+                });
+                
+                $row.find('.vertexLon')
+                    .val((vertex.getLonMap())
+                    .toLocaleString(['en-US'], {minimumFractionDigits: 7}))
+                    .on('change', event => {
+                        const lat = $(event.currentTarget).val();
+                        if (isNaN(lat) || lat < -180 || lat > 180) {
+                            GUI.alert(i18n.getMessage("geozoneInvalidLon"));
+                            $(event.currentTarget).val(vertex.getLonMap());
+                            return;
+                        }
+                        vertex.setLon(lat * 1e7);
+                        renderGeozoneOptions();
+                        renderGeozonesOnMap();
+                        updateGeozoneInfo();
+                });
+                
                 $row.find('#removeVertex').on('click', event => {
                     if (selectedGeozone.getVerticesCount() > 3) {   
                         selectedGeozone.dropVertex(vertex.getNumber());
@@ -2150,7 +2182,7 @@ TABS.mission_control.initialize = function (callback) {
          */
         app.Drag.prototype.handleDragEvent = function (evt) {
             
-            if (tempMarker.kind == "safehomecircle") {
+            if (tempMarker.kind == "safehomecircle" || tempMarker.kind == "geozonecircle") {
                 return;
             }
 
@@ -2213,7 +2245,7 @@ TABS.mission_control.initialize = function (callback) {
                 renderGeozoneOptions();
                 renderGeozonesOnMap();
                 updateGeozoneInfo();
-            }
+            } 
         };
 
         /**

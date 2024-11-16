@@ -56,6 +56,10 @@ TABS.advanced_tuning.initialize = function (callback) {
             $('.notFixedWingTuning').show();
         }
 
+        if (!FC.isFeatureEnabled('GEOZONE')) {
+            $('#geozoneSettings').hide();
+        }
+
         GUI.simpleBind();
 
         i18n.localize();;
