@@ -1771,6 +1771,9 @@
     "receiverRssiChannel": {
         "message": "RSSI Channel"
     },
+    "receiverRssiSource": {
+        "message": "RSSI Source"
+    },
     "receiverRefreshRateTitle": {
         "message": "Graph refresh rate"
     },
