@@ -193,10 +193,6 @@ var defaultsDialogData = [
             Dynamic gyro LPF
             */
             {
-                key: "gyro_use_dyn_lpf",
-                value: "ON"
-            },
-            {
                 key: "gyro_dyn_lpf_min_hz",
                 value: 85
             },

@@ -1683,12 +1683,6 @@
     "pidTuning_Manual_Yaw": {
         "message": "Yaw (%)"
     },
-    "pidTuning_gyro_use_dyn_lpf": {
-        "message": "Dynamic gyro LPF"
-    },
-    "pidTuning_gyro_use_dyn_lpf_help": {
-        "message": "When enabled, main gyro LPF frequency is automatically adjusted based on the current throttle position. When disabled, static LPF cutoff frequency is used."
-    },
     "pidTuning_gyro_dyn_lpf_min_hz": {
         "message": "Dynamic gyro LPF min. cutoff"
     },
