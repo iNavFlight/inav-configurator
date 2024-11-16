@@ -122,7 +122,9 @@ TABS.cli.initialize = function (callback) {
                 new Promise((resolve) => {
                     timeout.add('CLI_send_slowly', () => {
                         let processingDelay = TABS.cli.lineDelayMs;
-                        if (line.toLowerCase().startsWith('control_profile')) {
+                        if (line.toLowerCase().startsWith('control_profile') || 
+                            line.toLowerCase().startsWith('battery_profile') ||
+                            line.toLowerCase().startsWith('mixer_profile')) {
                             processingDelay = TABS.cli.profileSwitchDelayMs;
                         }
                         const isLastCommand = outputArray.length === index + 1;
