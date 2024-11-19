@@ -548,6 +548,10 @@ GUI_control.prototype.alert = function(message) {
     dialog.showMessageBoxSync({ message: message, icon: "./images/inav_icon_128.png" });
 }
 
+GUI_control.prototype.confirm = function(message) {
+    return dialog.showMessageBoxSync({ message: message, icon: "./images/inav_icon_128.png", buttons: ["Yes", "No"]}) == 0;
+}
+
 // initialize object into GUI variable
 var GUI = new GUI_control();
 

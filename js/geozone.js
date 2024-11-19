@@ -85,7 +85,11 @@ let Geozone = function (type, shape, minAltitude, maxAltitude, sealevelRef, radi
     }
 
     self.setMinAltitude = (data) => {
-        minAltitude = data;
+        if (!isNaN(data)){
+            minAltitude = parseInt(data);
+        } else {
+            minAltitude = data;
+        }
     }
 
     self.getMinAltitude = () => {
@@ -93,7 +97,11 @@ let Geozone = function (type, shape, minAltitude, maxAltitude, sealevelRef, radi
     }
 
     self.setMaxAltitude = (data) => {
-        maxAltitude = data;
+        if (!isNaN(data)){
+            maxAltitude = parseInt(data);
+        } else {
+            maxAltitude = data;
+        }
     }
 
     self.getMaxAltitude = () => {
