@@ -36,7 +36,7 @@
     "minimist": "^1.2.0",
     "openlayers": "^4.6.5",
     "temp": "^0.8.3",
-    "xml2js": "^0.4.19",
+    "xml2js": "^0.6.2",
     "i18next": "^23.8.3",
     "i18next-xhr-backend": "^3.2.2",
     "wnumb": "^1.2.0"
