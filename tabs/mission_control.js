@@ -977,8 +977,6 @@ TABS.mission_control.initialize = function (callback) {
                 reasons.push(i18n.getMessage("gezoneInvalidReasonMinMaxAlt"));
             }
 
-
-
             if (reasons.length > 0) {
                 $('#geozoneInvalidContent').append(`<div style="display: inline-block">${i18n.getMessage("geozone")} ${zone.getNumber() + 1}: ${reasons.join(", ")}</div><br/>`);
                 invalidGeoZones = true;
@@ -1748,10 +1746,10 @@ TABS.mission_control.initialize = function (callback) {
                             <span class="vertexNumber"></span> \
                         </td> \
                         <td> \
-                            <input type="number" class="vertexLat"/> \
+                            <input type="number" step="0.0000001" class="vertexLat"/> \
                         </td> \
                         <td> \
-                            <input type="number" class="vertexLon"/> \
+                            <input type="number" step="0.0000001" class="vertexLon"/> \
                         </td> \
                     </tr> \
                 ');
