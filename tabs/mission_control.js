@@ -3436,7 +3436,7 @@ TABS.mission_control.initialize = function (callback) {
                 return;
             }
             
-            if (confirm(i18n.getMessage("missionGeozoneReboot"))) {            
+            if (GUI.confirm(i18n.getMessage("missionGeozoneReboot"))) {            
                 $(event.currentTarget).addClass('disabled');
                 GUI.log('Start of sending Geozones');
                 mspHelper.saveGeozones();
