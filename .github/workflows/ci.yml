@@ -39,7 +39,7 @@ jobs:
               with:
                 node-version: 20
                 check-latest: true
-                cache: 'npm'
+                #cache: 'npm'
             - name: Install dependencies
               run: sudo apt-get update && sudo apt-get -y install dpkg fakeroot rpm build-essential libudev-dev
             - name: Remove stale files
@@ -94,12 +94,12 @@ jobs:
           with:
             node-version: 20
             check-latest: true
-            cache: 'npm'
+            #cache: 'npm'
         # Workaround due to a bug in node-gyp: https://github.com/electron/rebuild/issues/1116
         - name: Install Setuptools
           run: python3 -m pip install --break-system-packages setuptools
         - name: Remove stale files
-          run: rm -rfv node_modules
+          run: rm -rfv node_modules/???*
         - name: Install deps
           uses: nick-fields/retry@v3
           with:
@@ -144,7 +144,7 @@ jobs:
           with:
             node-version: 20
             check-latest: true
-            cache: 'npm'
+            #cache: 'npm'
         # Workaround due to a bug in node-gyp: https://github.com/electron/rebuild/issues/1116
         - name: Install Setuptools
           run: python3 -m pip install --break-system-packages setuptools
@@ -197,7 +197,7 @@ jobs:
             - uses: actions/setup-node@v4
               with:
                 node-version: 20
-                cache: 'npm'
+                #cache: 'npm'
             - uses: engineerd/configurator@v0.0.10
               with: 
                 name: "Wix Toolset 3.1.4"
@@ -250,7 +250,7 @@ jobs:
             - uses: actions/setup-node@v4
               with:
                 node-version: 20
-                cache: 'npm'
+                #cache: 'npm'
             - uses: engineerd/configurator@v0.0.10
               with: 
                 name: "Wix Toolset 3.1.4"
