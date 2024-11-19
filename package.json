@@ -19,7 +19,7 @@
   "license": "GPL-3.0",
   "dependencies": {
     "electron-squirrel-startup": "^1.0.0",
-    "electron-store": "^8.1.0",
+    "electron-store": "^10.0.0",
     "electron-window-state": "^5.0.3",
     "@electron/remote": "^2.1.1",
     "usb": "^2.14.0",
