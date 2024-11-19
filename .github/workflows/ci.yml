@@ -48,7 +48,7 @@ jobs:
                 max_attempts: 3
                 retry_on: error
                 command: npm install
-                timeout_minutes: 10
+                #timeout_minutes: 10
                 on_retry_command: rm -rfv node_modules
             - name: Build Linux
               run: npm run make
@@ -103,7 +103,7 @@ jobs:
             max_attempts: 3
             retry_on: error
             command: npm install
-            timeout_minutes: 10
+            #timeout_minutes: 10
             on_retry_command: rm -rfv node_modules
         - name: Build MacOS arm64
           run: npm run make -- --arch="arm64"
@@ -152,7 +152,7 @@ jobs:
             max_attempts: 3
             retry_on: error
             command: npm install
-            timeout_minutes: 10
+            #timeout_minutes: 10
             on_retry_command: rm -rfv node_modules
         - name: Build MacOS x64
           run: npm run make -- --arch="x64"
@@ -206,7 +206,7 @@ jobs:
                 max_attempts: 3
                 retry_on: error
                 command: npm install
-                timeout_minutes: 10
+                #timeout_minutes: 10
                 on_retry_command: rm -rfv node_modules
             - name: Build Win x64
               run: npm run make -- --arch="x64"
@@ -260,7 +260,7 @@ jobs:
                 max_attempts: 3
                 retry_on: error
                 command: npm install
-                timeout_minutes: 10
+                #timeout_minutes: 10
                 on_retry_command: rm -rfv node_modules
             - name: Build Win32
               run: npm run make -- --arch="ia32"
