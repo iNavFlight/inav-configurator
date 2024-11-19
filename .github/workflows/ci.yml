@@ -18,6 +18,8 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v4
+            - name: Remove stale files
+              run: rm -rfv node_modules
             - name: Setup environment
               env:
                 ACTIONS_ALLOW_UNSECURE_COMMANDS: true
@@ -72,6 +74,8 @@ jobs:
         runs-on: macos-13
         steps:
         - uses: actions/checkout@v4
+        - name: Remove stale files
+          run: rm -rfv node_modules
         - name: Setup environment
           env:
             ACTIONS_ALLOW_UNSECURE_COMMANDS: true
@@ -120,6 +124,8 @@ jobs:
         runs-on: macos-13
         steps:
         - uses: actions/checkout@v4
+        - name: Remove stale files
+          run: rm -rfv node_modules
         - name: Setup environment
           env:
             ACTIONS_ALLOW_UNSECURE_COMMANDS: true
