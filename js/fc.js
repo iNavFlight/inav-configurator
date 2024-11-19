@@ -976,7 +976,7 @@ var FC = {
 
         let mode = FLIGHT_MODES.find( mode => mode.boxName === name );
         if (mode) {
-            return mode.permanentId;
+            return mode.boxId;
         } else {
             return -1;
         }
