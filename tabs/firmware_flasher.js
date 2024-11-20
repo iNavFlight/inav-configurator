@@ -543,7 +543,7 @@ TABS.firmware_flasher.initialize = function (callback) {
         $(document).on('click', 'span.progressLabel a.save_firmware', function () {
             var options = {
                 defaultPath: fileName,
-                filters: [ {name: "Intel-Hex", extensions: ['hex'] } ]
+                filters: [ {name: "HEX File", extensions: ['hex'] } ]
             };
             dialog.showSaveDialog(options).then(result => {
                 if (result.canceled) {
