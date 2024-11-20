@@ -2373,6 +2373,11 @@ OSD.updateDisplaySize = function () {
     $('.third_left').toggleClass('preview_bfhdcompat_side', (video_type == 'BFHDCOMPAT'))
     $('.preview').toggleClass('preview_bfhdcompat cut43_left', (video_type == 'BFHDCOMPAT'))
     $('.third_right').toggleClass('preview_bfhdcompat_side', (video_type == 'BFHDCOMPAT'))
+    // -- AUTOHD
+    $('.third_left').toggleClass('preview_autohd_side', video_type == 'AUTOHD')
+    $('.preview').toggleClass('preview_autohd cut43_left', video_type == 'AUTOHD')
+    $('.third_right').toggleClass('preview_autohd_side', video_type == 'AUTOHD')
+ 
 
     OSD.GUI.updateGuidesView($('#videoGuides').find('input').is(':checked'));
 };

@@ -503,6 +503,29 @@ button {
 	width: calc(50% - 317px) !important;
 }
 
+.tab-osd .preview_autohd {
+    width: 720px !important;
+    left: calc(50% - 377px) !important;
+}
+
+.tab-osd .preview_autohd_side {
+	width: calc(50% - 377px) !important;
+}
+
+.tab-osd .autohd_43_left {
+	border-left: 2px solid red;
+	position: absolute;
+	left: 84px;
+	height: calc(100% - 27px);
+}
+
+.tab-osd .autohd_43_right {
+	border-right: 2px solid red;
+	position: absolute;
+	right: 84px;
+	height: calc(100% - 27px);
+}
+
 .tab-osd .preview_dji_hd {
     width: 720px !important;
     left: calc(50% - 377px) !important;
