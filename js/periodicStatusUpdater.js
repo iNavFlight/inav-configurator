@@ -40,6 +40,12 @@ const mspQueue = require('./serial_queue');
 
         var active = ((Date.now() - MSP.analog_last_received_timestamp) < publicScope.getUpdateInterval(CONFIGURATOR.connection.bitrate) * 3);
 
+        if (FC.AUX_CONFIG.length == 0) {
+            MSP.send_message(MSPCodes.MSP_BOXIDS, false, false, function () {
+                FC.generateAuxConfig();
+            });
+        }
+
         if (FC.isModeEnabled('ARM'))
             $(".armedicon").css({
                 'background-image': 'url("./images/icons/cf_icon_armed_active.svg")'
