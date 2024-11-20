@@ -4029,10 +4029,10 @@ TABS.mission_control.initialize = function (callback) {
                 GUI.log(i18n.getMessage('ErrorWritingFile'));
                 return console.error(err);
             }
-            let sFilename = String(filename.split('\\').pop().split('/').pop());
-            GUI.log(sFilename + i18n.getMessage('savedSuccessfully'));
-            updateFilename(sFilename);
         });
+        let sFilename = String(filename.split('\\').pop().split('/').pop());
+        GUI.log(sFilename + i18n.getMessage('savedSuccessfully'));
+        updateFilename(sFilename);
     }
 
     /////////////////////////////////////////////
