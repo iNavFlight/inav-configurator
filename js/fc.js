@@ -606,6 +606,9 @@ var FC = {
            items: [],
         };
 
+        this.OSD_DISARM_STATS = {
+            stats:[],
+        };
     },
     getOutputUsages: function() {
         return {

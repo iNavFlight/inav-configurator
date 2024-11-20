@@ -4340,6 +4340,9 @@
     "osd_video_HELP": {
         "message": "For HD: red lines show 4:3 screen, HDZero: keep within the blue box for a higher refresh rate, AUTO/PAL: green line is NTSC limit."
     },
+    "osd_disarm_stats": {
+        "message": "Disarm stats screen"
+    },
     "osd_dji_HD_FPV": {
         "message": "DJI HD FPV"
     },

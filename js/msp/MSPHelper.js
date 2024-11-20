@@ -1400,8 +1400,13 @@ var mspHelper = (function () {
                 console.log('Mixer config saved');
             case MSPCodes.MSP2_INAV_OSD_LAYOUTS:
                 break;
+            case MSPCodes.MSP2_INAV_OSD_DISARM_STATS:
+                break;
             case MSPCodes.MSP2_INAV_OSD_SET_LAYOUT_ITEM:
                 console.log('OSD layout item saved');
+                break;
+            case MSPCodes.MSP2_INAV_SET_OSD_DISARM_STAT:
+                console.log('OSD disarm stats saved');
                 break;
             case MSPCodes.MSP2_INAV_OSD_ALARMS:
                 break;
@@ -1601,6 +1606,8 @@ var mspHelper = (function () {
 
                 FC.OSD_CUSTOM_ELEMENTS.items.push(customElement);
                 break;
+
+            case MSPCodes.MSP2_INAV
 
             case MSPCodes.MSP2_INAV_GPS_UBLOX_COMMAND:
                 // Just and ACK from the fc.

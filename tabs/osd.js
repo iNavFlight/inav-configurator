@@ -20,6 +20,7 @@ const { PortHandler } = require('./../js/port_handler');
 const i18n = require('./../js/localization');
 const jBox = require('./../js/libraries/jBox/jBox.min');
 const { Console } = require('console');
+const { or } = require('three/webgpu');
 
 
 var SYM = SYM || {};
@@ -2345,6 +2346,21 @@ OSD.reload = function(callback) {
         });
     });
 
+    MSP.promise(MSPCodes.MSP2_INAV_OSD_DISARM_STATS).then(function (resp) {
+        var totalDisarmStats = resp.data.readU8();
+        var disarmStats = mapSeries(totalDisarmStats, function (statIndex, ii) {
+            var data = [];
+            data.push8(statIndex);
+            return MSP.promise(MSPCodes.MSP2_INAV_OSD_DISARM_STATS, data).then(function (resp) {
+                FC.OSD_DISARM_STATS.stats[statIndex] = {
+                    order: resp.data.readU8(),
+                    enabled: resp.data.readU8() == 1,
+                }
+                OSD.msp.decodeDisarmStat(statIndex, resp);
+            });
+        });
+    });
+
     if(semver.gte(FC.CONFIG.flightControllerVersion, '7.1.0'))
     {
         MSP.send_message(MSPCodes.MSP2_INAV_CUSTOM_OSD_ELEMENTS);
@@ -2433,6 +2449,15 @@ OSD.saveItem = function(item, callback) {
     let pos = OSD.data.items[item.id];
     let data = OSD.msp.encodeLayoutItem(OSD.data.selected_layout, item, pos);
     return MSP.promise(MSPCodes.MSP2_INAV_OSD_SET_LAYOUT_ITEM, data).then(callback);
+};
+
+OSD.saveDisarmStat = function(stat, callback) {
+    let data = [];
+    data.push8(stat.id);
+    data.push8(stats.order);
+    data.push8(stats.enabled ? 1 : 0);
+
+    return MSP.promise(MSPCodes.MSP2_INAV_SET_OSD_DISARM_STAT, data).then(callback);
 };
 
 //noinspection JSUnusedLocalSymbols
@@ -3640,6 +3665,13 @@ TABS.osd.initialize = function (callback) {
         }));
     });
 };
+
+function createDisarmStats() {
+    var disarmStatsContainer = $('#osdDisarmStatsSettings');
+    disarmStatsContainer.empty();
+
+    
+}
 
 function createCustomElements(){
     if(FC.OSD_CUSTOM_ELEMENTS.settings.customElementsCount == 0){
