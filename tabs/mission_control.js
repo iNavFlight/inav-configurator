@@ -1002,7 +1002,7 @@ TABS.mission_control.initialize = function (callback) {
             return;
         }
 
-        if (FC.GEOZONES.getUsedVerticesCount() + 2 > FC.GEOZONES.getMaxVertices()) {FC.
+        if (FC.GEOZONES.getUsedVerticesCount() + 2 > FC.GEOZONES.getMaxVertices()) {
             GUI.alert(i18n.getMessage('missionGeozoneMaxVerticesReached'));
             return;
         }
@@ -2585,7 +2585,7 @@ TABS.mission_control.initialize = function (callback) {
             }
             else if (selectedFeature && tempMarker.kind == "geozoneline" && tempMarker.selection) {
                 
-                if (FC.GEOZONES.getUsedVerticesCount() + 1 >= FC.GEOZONES.getMaxVertices()) {
+                if (FC.GEOZONES.getUsedVerticesCount() + 1 > FC.GEOZONES.getMaxVertices()) {
                     GUI.alert(i18n.getMessage('missionGeozoneMaxVerticesReached'));
                     return;
                 }
@@ -3450,16 +3450,15 @@ TABS.mission_control.initialize = function (callback) {
 
         $('#geozoneShape').on('change', event => {
             if (selectedGeozone) {
-                selectedGeozone.setShape($(event.currentTarget).val());
-                
                 if ($(event.currentTarget).val() == GeozoneShapes.CIRCULAR) {
                     $('#geozoneRadius').prop('disabled', false);
                     let tmpVertex = selectedGeozone.getFirstVertex();
                     selectedGeozone.resetVertices();
                     selectedGeozone.setVertices([tmpVertex]);
                 } else {
-                    if (FC.GEOZONES.getUsedVerticesCount() + 3 > FC.GEOZONES.getMaxVertices()) {
+                    if (FC.GEOZONES.getUsedVerticesCount() + 2 > FC.GEOZONES.getMaxVertices()) {
                         GUI.alert(i18n.getMessage('missionGeozoneMaxVerticesReached'));
+                        renderGeozoneOptions();
                         return;                
                     }
                     $('#geozoneRadius').prop('disabled', true);
@@ -3474,7 +3473,8 @@ TABS.mission_control.initialize = function (callback) {
                         ];
                         selectedGeozone.setVertices(vertices);
                     };
-                }               
+                }
+                selectedGeozone.setShape($(event.currentTarget).val());
                 renderGeozonesOnMap();
             }
         });
