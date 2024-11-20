@@ -156,7 +156,7 @@ var SITLProcess = {
             });
  
         } else {
-            alert(GUI.operating_system);
+            GUI.alert(GUI.operating_system);
             return;
         }
 
