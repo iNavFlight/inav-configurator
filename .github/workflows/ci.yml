@@ -38,8 +38,8 @@ jobs:
             - uses: actions/setup-node@v4
               with:
                 node-version: 20
-                check-latest: true
-                cache: 'npm'
+                #check-latest: true
+                #cache: 'npm'
             - name: Install dependencies
               run: sudo apt-get update && sudo apt-get -y install dpkg fakeroot rpm build-essential libudev-dev
             - name: Install deps
@@ -47,8 +47,9 @@ jobs:
               with:
                 max_attempts: 3
                 retry_on: error
-                command: npm install
+                command: npm install --foreground-scripts
                 timeout_minutes: 10
+                on_retry_command: rm -rfv node_modules
             - name: Build Linux
               run: npm run make
             - name: Upload Linux deb
@@ -91,8 +92,8 @@ jobs:
         - uses: actions/setup-node@v4
           with:
             node-version: 20
-            check-latest: true
-            cache: 'npm'
+            #check-latest: true
+            #cache: 'npm'
         # Workaround due to a bug in node-gyp: https://github.com/electron/rebuild/issues/1116
         - name: Install Setuptools
           run: python3 -m pip install --break-system-packages setuptools
@@ -101,8 +102,9 @@ jobs:
           with:
             max_attempts: 3
             retry_on: error
-            command: npm install
+            command: npm install --foreground-scripts
             timeout_minutes: 10
+            on_retry_command: rm -rfv node_modules
         - name: Build MacOS arm64
           run: npm run make -- --arch="arm64"
         - name: Upload MacOS arm64 zip
@@ -139,8 +141,8 @@ jobs:
         - uses: actions/setup-node@v4
           with:
             node-version: 20
-            check-latest: true
-            cache: 'npm'
+            #check-latest: true
+            #cache: 'npm'
         # Workaround due to a bug in node-gyp: https://github.com/electron/rebuild/issues/1116
         - name: Install Setuptools
           run: python3 -m pip install --break-system-packages setuptools
@@ -149,8 +151,9 @@ jobs:
           with:
             max_attempts: 3
             retry_on: error
-            command: npm install
+            command: npm install --foreground-scripts
             timeout_minutes: 10
+            on_retry_command: rm -rfv node_modules
         - name: Build MacOS x64
           run: npm run make -- --arch="x64"
         - name: Upload MacOS x64 zip
@@ -191,7 +194,7 @@ jobs:
             - uses: actions/setup-node@v4
               with:
                 node-version: 20
-                cache: 'npm'
+                #cache: 'npm'
             - uses: engineerd/configurator@v0.0.10
               with: 
                 name: "Wix Toolset 3.1.4"
@@ -202,8 +205,9 @@ jobs:
               with:
                 max_attempts: 3
                 retry_on: error
-                command: npm install
+                command: npm install --foreground-scripts
                 timeout_minutes: 10
+                on_retry_command: rm -rfv node_modules
             - name: Build Win x64
               run: npm run make -- --arch="x64"
             - name: Upload Windows x64 zip
@@ -244,7 +248,7 @@ jobs:
             - uses: actions/setup-node@v4
               with:
                 node-version: 20
-                cache: 'npm'
+                #cache: 'npm'
             - uses: engineerd/configurator@v0.0.10
               with: 
                 name: "Wix Toolset 3.1.4"
@@ -255,8 +259,9 @@ jobs:
               with:
                 max_attempts: 3
                 retry_on: error
-                command: npm install
+                command: npm install --foreground-scripts
                 timeout_minutes: 10
+                on_retry_command: rm -rfv node_modules
             - name: Build Win32
               run: npm run make -- --arch="ia32"
             - name: Upload Windows ia32 zip
