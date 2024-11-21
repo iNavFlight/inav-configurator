@@ -182,9 +182,9 @@ TABS.cli.initialize = function (callback) {
                     if (err) {
                         GUI.log(i18n.getMessage('ErrorWritingFile'));
                         return console.error(err);
-                    }
-                    GUI.log(i18n.getMessage('FileSaved'));
+                    }    
                 });
+                GUI.log(i18n.getMessage('FileSaved'));
 
             }).catch (err => {
                 console.log(err);

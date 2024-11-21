@@ -33,7 +33,7 @@ TABS.firmware_flasher.initialize = function (callback) {
 
     var intel_hex = false, // standard intel hex in string format
         parsed_hex = false, // parsed raw hex in array format
-        file_name = 'inav.hex'; // default suggested filename of locally saved file
+        fileName = "inav.hex";
 
     GUI.load(path.join(__dirname, "firmware_flasher.html"), function () {
         // translate to user-selected language
@@ -451,7 +451,6 @@ TABS.firmware_flasher.initialize = function (callback) {
                         $('div.release_info .date').text(summary.date);
                         $('div.release_info .status').text(summary.status);
                         $('div.release_info .file').text(summary.file).prop('href', summary.url);
-                        file_name = summary.file;
 
                         var formattedNotes = marked.parse(summary.notes);
                         $('div.release_info .notes').html(formattedNotes);
@@ -476,6 +475,7 @@ TABS.firmware_flasher.initialize = function (callback) {
 
             var summary = $('select[name="firmware_version"] option:selected').data('summary');
             if (summary) { // undefined while list is loading or while running offline
+                fileName = summary.file;
                 $(".load_remote_file").text(i18n.getMessage('firmwareFlasherButtonLoading')).addClass('disabled');
                 $.get(summary.url, function (data) {
                     enable_load_online_button();
@@ -540,19 +540,24 @@ TABS.firmware_flasher.initialize = function (callback) {
             }
         });
 
-        $(document).on('click', 'span.progressLabel a.save_firmware', async function () {
-            const result = await dialog.showSaveDialog({
-                defaultPath: file_name,
+        $(document).on('click', 'span.progressLabel a.save_firmware', function () {
+            var options = {
+                defaultPath: fileName,
+                filters: [ {name: "HEX File", extensions: ['hex'] } ]
+            };
+            dialog.showSaveDialog(options).then(result => {
+                if (result.canceled) {
+                    return;
+                }
+                fs.writeFileSync(result.filePath, intel_hex, (err) => {
+                    if (err) {
+                        GUI.log(i18n.getMessage('ErrorWritingFile'));
+                        return console.error(err);
+                    }
+                });
+                let sFilename = String(result.filePath.split('\\').pop().split('/').pop());
+                GUI.log(sFilename + i18n.getMessage('savedSuccessfully'));
             });
-
-            try {
-                fs.writeFileSync(result.filePath, intel_hex);
-                GUI.log('Saved firmware to: ' + result.filePath);
-            }
-            catch(e) {
-                console.error(e);
-                GUI.log('Failed to save the file !');
-            }
         });
 
         

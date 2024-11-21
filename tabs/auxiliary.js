@@ -464,6 +464,7 @@ TABS.auxiliary.initialize = function (callback) {
         function auto_select_channel(RC_channels, activeChannels, RSSI_channel) {
             const auto_option = $('.tab-auxiliary select.channel option[value="-1"]:selected');
             if (auto_option.length === 0) {
+                prevChannelsValues = null;
                 return;
             }
 
