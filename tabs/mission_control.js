@@ -3414,8 +3414,7 @@ TABS.mission_control.initialize = function (callback) {
         $('#loadEepromGeozoneButton').on('click', event => {
             $(event.currentTarget).addClass('disabled');
             GUI.log('Start of getting Geozones');
-            mspHelper.loadGeozones();
-            setTimeout( () => {
+            mspHelper.loadGeozones(() => {
                  if (FC.GEOZONES.geozoneCount() >= 1) {
                     selectedGeozone = FC.GEOZONES.first();
                 } else {
@@ -3439,12 +3438,11 @@ TABS.mission_control.initialize = function (callback) {
             if (GUI.confirm(i18n.getMessage("missionGeozoneReboot"))) {            
                 $(event.currentTarget).addClass('disabled');
                 GUI.log('Start of sending Geozones');
-                mspHelper.saveGeozones();
-                setTimeout(() => {
+                mspHelper.saveGeozones(() => {
                     mspHelper.saveToEeprom();
                     GUI.log('End of sending Geozones');
                     reboot();
-                }, 1000);
+                });
             }
         });
 
@@ -3476,6 +3474,7 @@ TABS.mission_control.initialize = function (callback) {
                 }
                 selectedGeozone.setShape($(event.currentTarget).val());
                 renderGeozonesOnMap();
+                updateGeozoneInfo();
             }
         });
 
