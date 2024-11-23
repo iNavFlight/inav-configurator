@@ -501,6 +501,8 @@ TABS.outputs.initialize = function (callback) {
         $motorSliders.append('<div class="motor-slider-container"><input type="range" min="1000" max="2000" value="1000" disabled="disabled" class="master"/></div>');
         $motorValues.append('<li style="font-weight: bold" data-i18n="motorsMaster"></li>');
 
+        labelMotorNumbers();
+
         for (let i = 0; i < FC.SERVO_RULES.getServoCount(); i++) {
 
             let opacity = "";
@@ -716,6 +718,39 @@ TABS.outputs.initialize = function (callback) {
        i18n.localize();;
         GUI.content_ready(callback);
     }
+
+   function labelMotorNumbers() {
+        let index = 0;
+        var rules = FC.MOTOR_RULES.get();
+
+        for (const i in rules) {
+            if (rules.hasOwnProperty(i)) {
+                const rule = rules[i];
+                index++;
+
+                /*
+                if (currentMixerPreset.image != 'quad_x') {
+                    $("#motorNumber"+index).css("visibility", "hidden");
+                    continue;
+                }
+                */
+
+                let top_px = 30;
+                let left_px = 28;
+                if (rule.getRoll() < -0.5) {
+                  left_px = $("#motor-mixer-preview-img").width() - 20;
+                }
+
+                if (rule.getPitch() > 0.5) {
+                  top_px = $("#motor-mixer-preview-img").height() - 20;
+                }
+                $("#motorNumber"+index).css("left", left_px + "px");
+                $("#motorNumber"+index).css("top", top_px + "px");
+                $("#motorNumber"+index).css("visibility", "visible");
+            }
+        }
+    }
+
 
 };
 
