@@ -542,10 +542,14 @@ GUI_control.prototype.update_dataflash_global = function () {
 };
 
 /**
-* Don't use alert() in Electron, it has a nasty bug: https://github.com/electron/electron/issues/31917
+* Don't use alert() or confirm() in Electron, it has a nasty bug: https://github.com/electron/electron/issues/31917
 */ 
 GUI_control.prototype.alert = function(message) {
     dialog.showMessageBoxSync({ message: message, icon: "./images/inav_icon_128.png" });
+}
+
+GUI_control.prototype.confirm = function(message) {
+    return dialog.showMessageBoxSync({ message: message, icon: "./images/inav_icon_128.png", buttons: ["Yes", "No"]}) == 0;
 }
 
 // initialize object into GUI variable

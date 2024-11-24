@@ -453,6 +453,11 @@ var SerialBackend = (function () {
         $('.mode-disconnected').hide();
         $('.mode-connected').show();
 
+        
+        MSP.send_message(MSPCodes.MSP_BOXIDS, false, false, function () {
+            FC.generateAuxConfig();
+        });
+
         MSP.send_message(MSPCodes.MSP_DATAFLASH_SUMMARY, false, false, function () {
             $('#sensor-status').show();
             $('#portsinput').hide();

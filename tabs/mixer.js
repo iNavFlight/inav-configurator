@@ -381,7 +381,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
                 });
 
                 $row.find(".mix-rule-servo").val(servoRule.getTarget()).on('change', function () {
-                    servoRule.setTarget($(this).val());
+                    servoRule.setTarget(Number($(this).val()));
                 });
 
                 $row.find(".mix-rule-rate").val(servoRule.getRate()).on('change', function () {
