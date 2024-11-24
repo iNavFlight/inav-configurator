@@ -73,7 +73,11 @@
         "message": "デバイス - <span style=\"color: #37a8db\">準備完了</span>"
     },
     "savingDefaults": {
+<<<<<<< HEAD
         "message": "デバイス - <span style=\"color: red\">デフォルト設定を保存しています</span>"
+=======
+        "message": "デバイス-  <span style=\"color: red\">デフォルト設定を保存します</span>"
+>>>>>>> 978be571 (Localization: Add Japanese Translation)
     },
     "fcNotConnected": {
         "message": "接続できませんでした"
@@ -88,7 +92,11 @@
         "message": "Configuratorによって作られた設定ファイルの移行: $1"
     },
     "configMigratedTo": {
+<<<<<<< HEAD
         "message": "設定をConfiguratorへ移行: $1"
+=======
+        "message": "設定をConfiguratorへ移行します: $1"
+>>>>>>> 978be571 (Localization: Add Japanese Translation)
     },
     "configMigrationSuccessful": {
         "message": "設定の移行成功、適用します: $1"
