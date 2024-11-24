@@ -1400,7 +1400,7 @@ var mspHelper = (function () {
                 console.log('Mixer config saved');
             case MSPCodes.MSP2_INAV_OSD_LAYOUTS:
                 break;
-            case MSPCodes.MSP2_INAV_OSD_DISARM_STATS:
+            case MSPCodes.MSP2_INAV_SET_OSD_DISARM_STAT:
                 break;
             case MSPCodes.MSP2_INAV_OSD_SET_LAYOUT_ITEM:
                 console.log('OSD layout item saved');
@@ -1607,7 +1607,21 @@ var mspHelper = (function () {
                 FC.OSD_CUSTOM_ELEMENTS.items.push(customElement);
                 break;
 
-            case MSPCodes.MSP2_INAV
+            case MSPCodes.MSP2_INAV_OSD_DISARM_STATS:
+                if (data.buffer.byteLength == 1) {
+                    FC.OSD_DISARM_STATS.total = data.readU8();
+                } else if (data.buffer.byteLength > 1) {
+                    let disarmStatsIdx = data.readU8();
+                    let statOrder = data.readU8();
+                    let statEnabled = (data.readU8() == 1);
+                    FC.OSD_DISARM_STATS.stats[disarmStatsIdx] = {
+                        id: disarmStatsIdx,
+                        order: statOrder,
+                        enabled: statEnabled,
+                    };
+                }
+
+                break;
 
             case MSPCodes.MSP2_INAV_GPS_UBLOX_COMMAND:
                 // Just and ACK from the fc.
@@ -2560,6 +2574,24 @@ var mspHelper = (function () {
                 MSP.send_message(MSPCodes.MSP2_INAV_CUSTOM_OSD_ELEMENT, [cosdeIdx++], false, nextCustomOSDElement);
             } else {
                 MSP.send_message(MSPCodes.MSP2_INAV_CUSTOM_OSD_ELEMENT, [cosdeIdx++], false, callback);
+            }
+        }
+    }
+
+    self.loadOSDDisarmStats = function (callback) {
+        var disarmStatsIdx = 0;
+
+        MSP.send_message(MSPCodes.MSP2_INAV_OSD_DISARM_STATS, false, false, processTotalDisarmStats);
+
+        function processTotalDisarmStats() {
+            MSP.send_message(MSPCodes.MSP2_INAV_OSD_DISARM_STATS, [disarmStatsIdx++], false, nextDisarmStat);
+        }
+
+        function nextDisarmStat() {
+            if (disarmStatsIdx < FC.OSD_DISARM_STATS.total - 1) {
+                MSP.send_message(MSPCodes.MSP2_INAV_OSD_DISARM_STATS, [disarmStatsIdx++], false, nextDisarmStat);
+            } else {
+                MSP.send_message(MSPCodes.MSP2_INAV_OSD_DISARM_STATS, [disarmStatsIdx++], false, callback);
             }
         }
     }

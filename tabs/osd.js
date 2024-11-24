@@ -20,8 +20,6 @@ const { PortHandler } = require('./../js/port_handler');
 const i18n = require('./../js/localization');
 const jBox = require('./../js/libraries/jBox/jBox.min');
 const { Console } = require('console');
-const { or } = require('three/webgpu');
-
 
 var SYM = SYM || {};
 SYM.LAST_CHAR = 225; // For drawing the font preview
@@ -157,6 +155,8 @@ SYM.RX_BAND = 0x169;
 SYM.RX_MODE = 0x16A;
 
 SYM.AH_CROSSHAIRS = new Array(0x166, 0x1A4, new Array(0x190, 0x191, 0x192), new Array(0x193, 0x194, 0x195), new Array(0x196, 0x197, 0x198), new Array(0x199, 0x19A, 0x19B), new Array (0x19C, 0x19D, 0x19E), new Array (0x19F, 0x1A0, 0x1A1));
+
+var DISARM_STATS = new Array("Flight Time", "Flight Distance", "Max Distance", "Speed", "Max Altitude", "Battery Voltage", "Max Power/Current", "Used Energy Wh", "Used Energy mAh", "Average Efficiency Wh", "Averaeg Efficiency mAh", "GPS", "Receiver", "ESC Temperature", "GForce", "Blackbox", "Stats");
 
 var video_type = null;
 var isGuidesChecked = false;
@@ -2346,21 +2346,6 @@ OSD.reload = function(callback) {
         });
     });
 
-    MSP.promise(MSPCodes.MSP2_INAV_OSD_DISARM_STATS).then(function (resp) {
-        var totalDisarmStats = resp.data.readU8();
-        var disarmStats = mapSeries(totalDisarmStats, function (statIndex, ii) {
-            var data = [];
-            data.push8(statIndex);
-            return MSP.promise(MSPCodes.MSP2_INAV_OSD_DISARM_STATS, data).then(function (resp) {
-                FC.OSD_DISARM_STATS.stats[statIndex] = {
-                    order: resp.data.readU8(),
-                    enabled: resp.data.readU8() == 1,
-                }
-                OSD.msp.decodeDisarmStat(statIndex, resp);
-            });
-        });
-    });
-
     if(semver.gte(FC.CONFIG.flightControllerVersion, '7.1.0'))
     {
         MSP.send_message(MSPCodes.MSP2_INAV_CUSTOM_OSD_ELEMENTS);
@@ -2451,11 +2436,15 @@ OSD.saveItem = function(item, callback) {
     return MSP.promise(MSPCodes.MSP2_INAV_OSD_SET_LAYOUT_ITEM, data).then(callback);
 };
 
-OSD.saveDisarmStat = function(stat, callback) {
+OSD.saveDisarmStat = function(statID, callback) {
+    let statEnabled = $('#disarmStat_' + statID).is(':checked');
+
+    FC.OSD_DISARM_STATS.stats[statID].enabled = statEnabled;
+    
     let data = [];
-    data.push8(stat.id);
-    data.push8(stats.order);
-    data.push8(stats.enabled ? 1 : 0);
+    data.push8(parseInt(statID));
+    data.push8(parseInt(FC.OSD_DISARM_STATS.stats[statID].order));
+    data.push8(FC.OSD_DISARM_STATS.stats[statID].enabled ? 1 : 0);
 
     return MSP.promise(MSPCodes.MSP2_INAV_SET_OSD_DISARM_STAT, data).then(callback);
 };
@@ -3417,6 +3406,12 @@ OSD.GUI.saveItem = function(item) {
     });
 };
 
+OSD.GUI.saveDisarmStat = function(statID) {
+    OSD.saveDisarmStat(statID, function() {
+        MSP.send_message(MSPCodes.MSP_EEPROM_WRITE, false, false, null);
+    });
+};
+
 OSD.GUI.saveConfig = function() {
     OSD.saveConfig(function() {
         OSD.GUI.updatePreviews();
@@ -3661,6 +3656,10 @@ TABS.osd.initialize = function (callback) {
                 mspHelper.loadOsdCustomElements(createCustomElements);
             }
 
+            if (semver.gte(FC.CONFIG.flightControllerVersion, '8.0.0')) {
+                mspHelper.loadOSDDisarmStats(createDisarmStats);
+            }
+
             GUI.content_ready(callback);
         }));
     });
@@ -3670,7 +3669,29 @@ function createDisarmStats() {
     var disarmStatsContainer = $('#osdDisarmStatsSettings');
     disarmStatsContainer.empty();
 
-    
+    //var orderedStats = [FC.OSD_DISARM_STATS.total];
+
+    for (let i = 0; i < FC.OSD_DISARM_STATS.total; i++) {
+   /*     orderedStats[FC.OSD_DISARM_STATS.stats[i].order] = FC.OSD_DISARM_STATS.stats[i];
+    }
+        
+    for (let i = 0; i < orderedStats.length; i++) {*/
+        let statsLable = $('<label>');
+        let statsName = $('<span>').text(DISARM_STATS[FC.OSD_DISARM_STATS.stats[i].id]);
+        let statsOption = $('<input>');
+        statsOption.attr('type', 'checkbox');
+        statsOption.attr('id', 'disarmStat_' + FC.OSD_DISARM_STATS.stats[i].id);
+        statsOption.attr('checked', FC.OSD_DISARM_STATS.stats[i].enabled);
+        statsOption.addClass('toggle');
+        statsOption.on('change', $.debounce(250, function (e) {OSD.GUI.saveDisarmStat(FC.OSD_DISARM_STATS.stats[i].id);}));
+
+        statsLable.append(statsOption);
+        statsLable.append(statsName);
+
+        disarmStatsContainer.append(statsLable);
+    }
+
+    GUI.switchery();
 }
 
 function createCustomElements(){

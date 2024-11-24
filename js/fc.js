@@ -607,6 +607,7 @@ var FC = {
         };
 
         this.OSD_DISARM_STATS = {
+            total: 0,
             stats:[],
         };
     },
