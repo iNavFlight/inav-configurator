@@ -73,11 +73,7 @@
         "message": "デバイス - <span style=\"color: #37a8db\">準備完了</span>"
     },
     "savingDefaults": {
-<<<<<<< HEAD
-        "message": "デバイス - <span style=\"color: red\">デフォルト設定を保存しています</span>"
-=======
         "message": "デバイス-  <span style=\"color: red\">デフォルト設定を保存します</span>"
->>>>>>> 978be571 (Localization: Add Japanese Translation)
     },
     "fcNotConnected": {
         "message": "接続できませんでした"
@@ -92,11 +88,7 @@
         "message": "Configuratorによって作られた設定ファイルの移行: $1"
     },
     "configMigratedTo": {
-<<<<<<< HEAD
-        "message": "設定をConfiguratorへ移行: $1"
-=======
         "message": "設定をConfiguratorへ移行します: $1"
->>>>>>> 978be571 (Localization: Add Japanese Translation)
     },
     "configMigrationSuccessful": {
         "message": "設定の移行成功、適用します: $1"
@@ -1681,12 +1673,6 @@
     },
     "pidTuning_Manual_Yaw": {
         "message": "ヨー (%)"
-    },
-    "pidTuning_gyro_use_dyn_lpf": {
-        "message": "動的ジャイロLPF"
-    },
-    "pidTuning_gyro_use_dyn_lpf_help": {
-        "message": "有効にすると、主要ジャイロLPF周波数が現在のスロットル位置に基づいて自動調整されます。無効の場合、静的LPFカットオフ周波数が使用されます。"
     },
     "pidTuning_gyro_dyn_lpf_min_hz": {
         "message": "動的ジャイロLPF最小カットオフ"
@@ -3866,9 +3852,6 @@
     "osdGroupVTX": {
         "message": "VTX"
     },
-    "osdGroupCRSF": {
-        "message": "CRSF 受信統計情報"
-    },
     "osdGroupMapsAndRadars": {
         "message": "マップ & レーダー"
     },
@@ -4093,24 +4076,6 @@
     },
     "osdElement_VTX_CHANNEL_HELP": {
         "message": "現在のVTXのバンドとチャンネルを表示します。SmartAudioまたはTrampを搭載したVTX、またはフライトコントローラにオンボードされたVTXが必要です。"
-    },
-    "osdElement_CRSF_RSSI_DBM": {
-        "message": "RX RSSI (dBm)"
-    },
-    "osdElement_CRSF_LQ": {
-        "message": "受信リンク品質 (%)"
-    },
-    "osdElement_CRSF_LQ_HELP": {
-        "message": "Crossfire LQフォーマット設定を使用してフォーマットタイプを選択します。"
-    },
-    "osdElement_CRSF_SNR_DB": {
-        "message": "RXアップリンクSNR (dB)"
-    },
-    "osdElement_CRSF_SNR_DB_HELP": {
-        "message": "SNRがアラームレベルを下回った場合にのみ表示されます。[0]dBでは受信信号レベルとノイズレベルとが等しいことを示します。"
-    },
-    "osdElement_CRSF_TX_POWER": {
-        "message": "送信出力 (mW)"
     },
     "osdElement_MAP_NORTH": {
         "message": "マップ (上位が北)"
@@ -5008,7 +4973,7 @@
     },
     "tabFilteringAdvanced": {
         "message": "その他のフィルター"
-    },    
+    },
     "gps_map_center": {
         "message": "中央"
     },
@@ -5953,5 +5918,209 @@
     },
     "adsbHeartbeatTotalMessages": {
         "message": "ハートビートメッセージ"
+    },
+    "receiverRssiSource": {
+        "message": "RSSIソース値"
+    },
+    "osdGroupRx": {
+        "message": "受信 統計情報"
+    },
+    "osdElement_RSSI_DBM": {
+        "message": "受信RSSI値 (dBm)"
+    },
+    "osdElement_LQ_UPLINK": {
+        "message": "受信アップリンク品質 %"
+    },
+    "osdElement_LQ_UPLINK_HELP": {
+        "message": "CRSFを使用する場合は、Crossfire LQフォーマット設定でフォーマットタイプを選択します。"
+    },
+    "osdElement_LQ_DOWNLINK": {
+        "message": "受信ダウンリンク品質 %"
+    },
+    "osdElement_SNR_DB": {
+        "message": "受信アップリンクSNR (dB)"
+    },
+    "osdElement_SNR_DB_HELP": {
+        "message": "SNRがアラームレベルを下回った場合のみ表示します。[0]dBの場合、受信信号レベルはノイズフロアレベルに等しいことを示します。"
+    },
+    "osdElement_TX_POWER_UPLINK": {
+        "message": "送信出力 (mW)"
+    },
+    "osdElement_OSD_RX_POWER_DOWNLINK": {
+        "message": "受信出力 (mW)"
+    },
+    "osdElement_COURSE_NEXT_GEOZONE": {
+        "message": "次のジオゾーンへのコース"
+    },
+    "osdElement_HOR_DIST_TO_NEXT_GEOZONE": {
+        "message": "次のジオゾーンまでの水平距離"
+    },
+    "osdElement_VERT_DIST_TO_NEXT_GEOZONE": {
+        "message": "次のジオゾーンまでの垂直距離"
+    },
+    "missionGeozoneHead": {
+        "message": "ジオゾーン"
+    },
+    "missionGeozoneEdit": {
+        "message": "ジオゾーン $1 を編集"
+    },
+    "missionGeozoneSaveAndReboot": {
+        "message": "EEPROMへジオゾーンを保存して再起動"
+    },
+    "missionGeozoneLoad": {
+        "message": "EEPROMのジオゾーンを読み込む"
+    },
+    "missionGeozone": {
+        "message": "-ジオゾーン "
+    },
+    "missionGezoneType": {
+        "message": "タイプ"
+    },
+    "missionGezoneShape": {
+        "message": "形状"
+    },
+    "missionGeozoneTypePolygon": {
+        "message": "多角形"
+    },
+    "missionGeozoneTypeCircular": {
+        "message": "円形"
+    },
+    "missionGeozoneMaxZonesReached": {
+        "message": "ジオゾーンの最大数に達しました。"
+    },
+    "missionGeozoneMaxVerticesReached": {
+        "message": "ジオゾーン頂点の最大数に達しました。"
+    },
+    "missionGeozoneWarning": {
+        "message": "少なくとも1つのミッションと1つのジオゾーンが設定されています。ミッションがジオゾーンを侵害しないことを確認してください。"
+    },
+    "geozoneEdit": {
+        "message": "ジオゾーンを編集"
+    },
+    "geozoneShape": {
+        "message": "形状"
+    },
+    "geozoneInclusive": {
+        "message": "包含"
+    },
+    "geozoneExcusive": {
+        "message": "排他的"
+    },
+    "geozoneMinAlt": {
+        "message": "最小高度 (cm):"
+    },
+    "geozoneMaxAlt": {
+        "message": "最大高度 (cm):"
+    },
+    "geozoneInfiniteAlt": {
+        "message": "0 = 高度制限なし"
+    },
+    "geozoneAction": {
+        "message": "処理:"
+    },
+    "geozoneActionNone": {
+        "message": "なし"
+    },
+    "geozoneActionAvoid": {
+        "message": "回避"
+    },
+    "geozoneActionPosHold": {
+        "message": "ポジションホールド"
+    },
+    "geozoneActionRTH": {
+        "message": "RTH"
+    },
+    "geozoneRadius": {
+        "message": "半径 (cm):"
+    },
+    "geozoneVerices": {
+        "message": "頂点:"
+    },
+    "": {
+        "message": ""
+    },
+    "featureGEOZONE": {
+        "message": "ジオゾーン"
+    },
+    "geozone": {
+        "message": "ジオゾーン"
+    },
+    "featureGEOZONETip": {
+        "message": "地理的エリアの仮想境界線 (ジオフェンス) は、境界線が侵害されたときに自動的に処理を開始します。"
+    },
+    "GeozoneSettings": {
+        "message": "ジオゾーン設定"
+    },
+    "geozoneDetectionDistance": {
+        "message": "検出距離"
+    },
+    "geozoneDetectionDistanceHelp": {
+        "message": "ジオゾーンが検出される距離"
+    },
+    "geozoneAvoidAltitudeRange": {
+        "message": "回避高度範囲"
+    },
+    "geozoneAvoidAltitudeRangeHelp": {
+        "message": "ジオゾーンを上方に回避する際の高度範囲"
+    },
+    "geozoneSafeAltitudeDistance": {
+        "message": "安全高度距離"
+    },
+    "geozoneSafeAltitudeDistanceHelp": {
+        "message": "ゾーンの上限および下限に維持する必要がある垂直距離"
+    },
+    "geozoneSafehomeAsInclusive": {
+        "message": "セーフホームを包含ゾーンとして扱う"
+    },
+    "geozoneSafehomeAsInclusiveHelp": {
+        "message": "最寄りのセーフホームを包含的なジオゾーンとして扱う"
+    },
+    "geozoneSafehomeZoneAction": {
+        "message": "セーフホームゾーン処理"
+    },
+    "geozoneSafehomeZoneActionHelp": {
+        "message": "セーフホームゾーンのフェンス処理"
+    },
+    "geozoneMrStopDistance": {
+        "message": "マルチローター停止距離"
+    },
+    "geozoneMrStopDistanceHelp": {
+        "message": "マルチローターが境界の手前で停止する距離"
+    },
+    "geozoneNoWayHomeAction": {
+        "message": "帰還不可能時の処理"
+    },
+    "geozoneNoWayHomeActionHelp": {
+        "message": "有効なジオゾーンでRTH (ホーム位置へ帰還) がコースを計算できない場合の処理。RTH: ホーム位置へ戻り、ジオゾーンを無視します。"
+    },
+    "missionGeozoneReboot": {
+        "message": "保存して再起動しますか？"
+    },
+    "missionGeozoneAvailableZones": {
+        "message": "使用可能なジオゾーン:"
+    },
+    "missionGeozoneAvailableVertices": {
+        "message": "使用可能な頂点:"
+    },
+    "geozoneInvalidzone": {
+        "message": "無効なジオゾーンを検出:"
+    },
+    "geozoneInvalidLat": {
+        "message": "無効な緯度"
+    },
+    "geozoneInvalidLon": {
+        "message": "無効な経度"
+    },
+    "gezoneInvalidReasonNotCC": {
+        "message": "反時計回りではない"
+    },
+    "gezoneInvalidReasonComplex": {
+        "message": "複合"
+    },
+    "gezoneInvalidReasonMinMaxAlt": {
+        "message": "最大高度 <= 最小高度"
+    },
+    "geozoneUnableToSave": {
+        "message": "ジオゾーンを保存できません: 無効なゾーン"
     }
 }
