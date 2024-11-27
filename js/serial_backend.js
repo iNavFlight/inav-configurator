@@ -482,6 +482,8 @@ var SerialBackend = (function () {
             interval.add('global_data_refresh', periodicStatusUpdater.run, periodicStatusUpdater.getUpdateInterval(CONFIGURATOR.connection.bitrate), false);
         });
 
+        $('#profiles_wrapper_global').show();
+
     }
 
     privateScope.onClosed = function (result) {
@@ -497,6 +499,7 @@ var SerialBackend = (function () {
         $('#sensor-status').hide();
         $('#portsinput').show();
         $('#dataflash_wrapper_global').hide();
+        $('#profiles_wrapper_global').hide();
         $('#quad-status_wrapper').hide();
 
         //updateFirmwareVersion();
