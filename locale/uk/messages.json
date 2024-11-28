@@ -5475,7 +5475,7 @@
         "message": "Чіп пам'яті <br>не знайдено"
     },
     "sensorDataFlashFreeSpace": {
-        "message": "Доступна пам'ять"
+        "message": "Пам'ять: <br/>Доступна"
     },
     "mixerProfile1": {
         "message": "Профіль мікшера 1"

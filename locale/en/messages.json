@@ -5700,7 +5700,7 @@
         "message": "No dataflash <br>chip found"
     },
     "sensorDataFlashFreeSpace": {
-        "message": "Dataflash: free space"
+        "message": "Dataflash: <br />free "
     },
     "mixerProfile1": {
         "message": "Mixer Profile 1"
