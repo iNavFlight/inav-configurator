@@ -1769,7 +1769,7 @@ dialog {
 }
 
 .dataflash-contents_global {
-    margin-top: 18px;
+    margin-top: 30px;
     border: 1px solid #4A4A4A;
     background-color: #4A4A4A;
     display: flex;
@@ -1800,7 +1800,7 @@ dialog {
 
 .dataflash-contents_global li div {
     position: absolute;
-    top: -18px;
+    top: -30px;
     margin-top: 0;
     left: 0;
     right: 0;
