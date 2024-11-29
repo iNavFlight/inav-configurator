@@ -257,6 +257,7 @@ TABS.outputs.initialize = function (callback) {
         const path = './resources/motor_order/'
             + mixer.getById(val).image + (isReversed ? "_reverse" : "") + '.svg';
         $('.mixerPreview img').attr('src', path);
+        labelMotorNumbers();
     }
 
     function process_servos() {
@@ -501,8 +502,6 @@ TABS.outputs.initialize = function (callback) {
         $motorSliders.append('<div class="motor-slider-container"><input type="range" min="1000" max="2000" value="1000" disabled="disabled" class="master"/></div>');
         $motorValues.append('<li style="font-weight: bold" data-i18n="motorsMaster"></li>');
 
-        labelMotorNumbers();
-
         for (let i = 0; i < FC.SERVO_RULES.getServoCount(); i++) {
 
             let opacity = "";
@@ -720,6 +719,12 @@ TABS.outputs.initialize = function (callback) {
     }
 
    function labelMotorNumbers() {
+
+       if (mixer.getById(FC.MIXER_CONFIG.appliedMixerPreset).image != 'quad_x') {
+           return;
+       }
+
+
         let index = 0;
         var rules = FC.MOTOR_RULES.get();
 
@@ -727,13 +732,6 @@ TABS.outputs.initialize = function (callback) {
             if (rules.hasOwnProperty(i)) {
                 const rule = rules[i];
                 index++;
-
-                /*
-                if (currentMixerPreset.image != 'quad_x') {
-                    $("#motorNumber"+index).css("visibility", "hidden");
-                    continue;
-                }
-                */
 
                 let top_px = 30;
                 let left_px = 28;
