@@ -661,7 +661,6 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
             const path = './resources/motor_order/'
                 + currentMixerPreset.image + (isReversed ? "_reverse" : "") + '.svg';
             $('.mixerPreview img').attr('src', path);
-            // labelMotorNumbers();
             renderServoOutputImage();
         };
 
