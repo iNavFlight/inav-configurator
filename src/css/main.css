@@ -1696,11 +1696,11 @@ dialog {
     color: white;
     font-size: 10px;
     margin-top: 20px;
-    width: 410px;
+    width: 100px;
     float: right;
-    margin-right: 10px;
+    margin-right: 20px;
     line-height: 12px;
-    height: 33px;
+    height: 64px;
     border-radius: 5px;
     border: 1px solid #272727;
     box-shadow: 0 1px 0 rgba(92, 92, 92, 0.5);
@@ -1708,38 +1708,68 @@ dialog {
     padding-top: 5px;
     display: none;
     text-shadow: 0 1px rgba(0, 0, 0, 1.0);
+}
 
+@media screen and (max-width: 1060px) {
+    #dataflash_wrapper_global {
+        display: none !important;
+    }
+}
+
+/* Profile selector styling*/
+
+#profiles_wrapper_global {
+    color: white;
+    font-size: 10px;
+    margin-top: 20px;
+    width: 130px;
+    float: right;
+    margin-right: 10px;
+    line-height: 12px;
+    height: 64px;
+    padding: 0px;
+    display: none;
+    text-shadow: 0 1px rgba(0, 0, 0, 1.0);
 }
 
 #profile_change {
     color: white;
-    margin-top: 16px;
+    margin: 0px;
     width: 130px;
     float: left;
-    margin-right: 10px;
     line-height: 12px;
+}
+
+#profile_change > .dropdown {
+    margin: 0px;
 }
 
 #mixer_profile_change {
     color: white;
-    margin-top: 16px;
+    margin: 0px;
     width: 130px;
     float: left;
-    margin-right: 0;
     line-height: 12px;
+}
+
+#mixer_profile_change > .dropdown {
+    margin: 0px;
 }
 
 #battery_profile_change {
     color: white;
-    margin-top: 16px;
+    margin: 0px;
     width: 130px;
     float: right;
-    margin-right: 0;
     line-height: 12px;
 }
 
+#battery_profile_change > .dropdown {
+    margin: 0px;
+}
+
 .dataflash-contents_global {
-    margin-top: 18px;
+    margin-top: 30px;
     border: 1px solid #4A4A4A;
     background-color: #4A4A4A;
     display: flex;
@@ -1770,7 +1800,7 @@ dialog {
 
 .dataflash-contents_global li div {
     position: absolute;
-    top: -18px;
+    top: -30px;
     margin-top: 0;
     left: 0;
     right: 0;
