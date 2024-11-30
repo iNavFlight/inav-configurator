@@ -3202,7 +3202,7 @@ var mspHelper = (function () {
                 nextGeozone();
                 return;
             }
-            if (vertexID < FC.GEOZONES.at(geozoneID).getVerticesCount() - 1 && zone.getShape() == GeozoneShapes.POLYGON) {
+            if (vertexID < FC.GEOZONES.at(geozoneID).getVerticesCount() && zone.getShape() == GeozoneShapes.POLYGON) {
                 MSP.send_message(MSPCodes.MSP2_INAV_GEOZONE_VERTEX, [geozoneID, vertexID], false, nextVertex); 
             } else {
                 MSP.send_message(MSPCodes.MSP2_INAV_GEOZONE_VERTEX, [geozoneID, vertexID], false, nextGeozone); 
@@ -3212,7 +3212,7 @@ var mspHelper = (function () {
         function nextGeozone() {
             geozoneID++;
             vertexID = -1;
-            if (geozoneID < FC.GEOZONES.getMaxZones() - 1) {
+            if (geozoneID < FC.GEOZONES.getMaxZones()) {
                 MSP.send_message(MSPCodes.MSP2_INAV_GEOZONE, [geozoneID], false, nextVertex);
             } else {
                 MSP.send_message(MSPCodes.MSP2_INAV_GEOZONE, [geozoneID], false, callback);
@@ -3243,7 +3243,7 @@ var mspHelper = (function () {
         function nextGeozone() {
             geozoneID++;
             vertexID = -1;
-            if (geozoneID < FC.GEOZONES.getMaxZones() - 1) {
+            if (geozoneID < FC.GEOZONES.getMaxZones()) {
                 MSP.send_message(MSPCodes.MSP2_INAV_SET_GEOZONE, FC.GEOZONES.extractBufferZone(geozoneID), false, nextVertex);
             } else {
                 MSP.send_message(MSPCodes.MSP2_INAV_SET_GEOZONE, FC.GEOZONES.extractBufferZone(geozoneID), false, callback);

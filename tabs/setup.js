@@ -71,7 +71,7 @@ TABS.setup.initialize = function (callback) {
         self.initializeInstruments();
 
         $('a.resetSettings').on('click', function () {
-            if (confirm(i18n.getMessage('confirm_reset_settings'))) {
+            if (GUI.confirm(i18n.getMessage('confirm_reset_settings'))) {
                 MSP.send_message(MSPCodes.MSP_RESET_CONF, false, false, function () {
                     GUI.log(i18n.getMessage('initialSetupSettingsRestored'));
     

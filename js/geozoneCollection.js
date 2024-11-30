@@ -7,7 +7,7 @@ let GeozoneCollection = function() {
     let self = {},
         data = [],
         maxVertices = 126,
-        maxZones = 62;
+        maxZones = 63;
 
     self.getMaxVertices = () => {
         return maxVertices;

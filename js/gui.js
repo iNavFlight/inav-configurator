@@ -529,7 +529,7 @@ GUI_control.prototype.update_dataflash_global = function () {
         width: (100-(FC.DATAFLASH.totalSize - FC.DATAFLASH.usedSize) / FC.DATAFLASH.totalSize * 100) + "%",
         display: 'block'
         });
-        $(".dataflash-free_global div").text('Dataflash: free ' + formatFilesize(FC.DATAFLASH.totalSize - FC.DATAFLASH.usedSize));
+        $(".dataflash-free_global div").html(i18n.getMessage('sensorDataFlashFreeSpace') + formatFilesize(FC.DATAFLASH.totalSize - FC.DATAFLASH.usedSize));
     } else {
         $(".noflash_global").css({
         display: 'block'
@@ -542,7 +542,7 @@ GUI_control.prototype.update_dataflash_global = function () {
 };
 
 /**
-* Don't use alert() in Electron, it has a nasty bug: https://github.com/electron/electron/issues/31917
+* Don't use alert() or confirm() in Electron, it has a nasty bug: https://github.com/electron/electron/issues/31917
 */ 
 GUI_control.prototype.alert = function(message) {
     dialog.showMessageBoxSync({ message: message, icon: "./images/inav_icon_128.png" });
