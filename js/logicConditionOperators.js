@@ -332,7 +332,13 @@ const LOGIC_OPERATORS = {
         operandType: "Set Flight Parameter",
         hasOperand: [false, false],
         output: "boolean"
-    }
+    },
+    55: {
+        name: "Gimbal sensitivity",
+        operandType: "Set Flight Parameter",
+        hasOperand: [true, false],
+        output: "boolean"
+    },
 };
 
 module.exports = { LOGIC_OPERATORS };
