@@ -476,7 +476,6 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
                 $("#motorNumber"+index).css("left", left_px + "px");
                 $("#motorNumber"+index).css("top", top_px + "px");
                 $("#motorNumber"+index).removeClass("is-hidden");
-                $("#motorNumber"+index).css("visibility", "visible");
             }
         }
     }
@@ -545,7 +544,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
             }
 
         }
-       labelMotorNumbers();
+        labelMotorNumbers();
        i18n.localize();;
     }
 
@@ -611,6 +610,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
                 }
 
             }
+
             return (errorCount == 0);
         }
 
@@ -661,6 +661,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
             const path = './resources/motor_order/'
                 + currentMixerPreset.image + (isReversed ? "_reverse" : "") + '.svg';
             $('.mixerPreview img').attr('src', path);
+
             renderServoOutputImage();
         };
 
