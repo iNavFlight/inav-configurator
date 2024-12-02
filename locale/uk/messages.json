@@ -5926,5 +5926,8 @@
     },
     "adsbHeartbeatTotalMessages": {
         "message": "Повід. сигналів перевірки"
+    },
+    "currentLanguage": {
+        "message": "uk"
     }
 }
