@@ -3,12 +3,6 @@
 
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <link type="text/css" rel="stylesheet" href="./src/css/styles.css" media="all" />    
-    <script type="text/javascript">require('./js/configurator_main.js');</script>
-    <!-- TODO: Update to newer Versions and use proper modules (require) -->
-    <script type="text/javascript" src="./js/libraries/three/three.min.js"></script>
-    <script type="text/javascript" src="./js/libraries/three/OrbitControls.js"></script>
-    <script type="text/javascript" src="./js/libraries/three/GLTFLoader.js"></script>
     <title>INAV Configurator</title>
 </head>
 
@@ -167,9 +161,9 @@
                     </div>
                     <div class="battery-legend" i18n="sensorBatteryVoltage"></div>
                     <div class="bottomStatusIcons">
-                        <div class="armedicon cf_tip" data-i18n_title="mainHelpArmed"></div>
-                        <div class="failsafeicon cf_tip" data-i18n_title="mainHelpFailsafe"></div>
-                        <div class="linkicon cf_tip" data-i18n_title="mainHelpLink"></div>
+                        <div id="armedIcon" class="statusicon armed cf_tip" data-i18n_title="mainHelpArmed"></div>
+                        <div id="failsafeicon" class="statusicon failsafe cf_tip" data-i18n_title="mainHelpFailsafe"></div>
+                        <div id="linkicon" class="statusicon link cf_tip" data-i18n_title="mainHelpLink"></div>
                     </div>
                 </div>
             </div>

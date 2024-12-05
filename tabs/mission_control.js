@@ -1,36 +1,36 @@
 'use strict';
 
-const path = require('path');
-const fs = require('fs');
-const ol = require('openlayers');
-const xml2js = require('xml2js');
-const Store = require('electron-store');
-const store = new Store();
-const { dialog } = require("@electron/remote");
+import xml2js from 'xml2js';
 
-const MSPChainerClass = require('./../js/msp/MSPchainer');
-const mspHelper = require('./../js/msp/MSPHelper');
-const MSPCodes = require('./../js/msp/MSPCodes');
-const MSP = require('./../js/msp');
-const mspQueue = require('./../js/serial_queue');
-const { GUI, TABS } = require('./../js/gui');
-const FC = require('./../js/fc');
-const CONFIGURATOR = require('./../js/data_storage');
-const i18n = require('./../js/localization');
-const { globalSettings } = require('./../js/globalSettings');
-const MWNP = require('./../js/mwnp');
-const Waypoint = require('./../js/waypoint')
-const WaypointCollection = require('./../js/waypointCollection');
-const Safehome = require('./../js/safehome');
-const SafehomeCollection = require('./../js/safehomeCollection');
-const { ApproachDirection, FwApproach } = require('./../js/fwApproach');
-const FwApproachCollection = require('./../js/fwApproachCollection');
-const SerialBackend = require('./../js/serial_backend');
-const { distanceOnLine, wrap_360, calculate_new_cooridatnes } = require('./../js/helpers');
-const Plotly = require('./../js/libraries/plotly-latest.min');
-const interval = require('./../js/intervals');
-const { Geozone, GeozoneVertex, GeozoneType, GeozoneShapes, GeozoneFenceAction }  = require('./../js/geozone');
-const GeozoneCollection = require('./../js/geozoneCollection');
+import Map from 'ol/Map.js';
+import OSM from 'ol/source/OSM.js';
+import TileLayer from 'ol/layer/Tile.js';
+import View from 'ol/View.js';
+
+import MSPChainerClass from './../js/msp/MSPchainer';
+import mspHelper from './../js/msp/MSPHelper';
+import MSPCodes from './../js/msp/MSPCodes';
+import MSP from './../js/msp';
+import mspQueue from './../js/serial_queue';
+import { GUI, TABS } from './../js/gui';
+import FC from './../js/fc';
+import CONFIGURATOR from './../js/data_storage';
+import i18n from './../js/localization';
+import { globalSettings } from './../js/globalSettings';
+import MWNP from './../js/mwnp';
+import Waypoint from './../js/waypoint';
+import WaypointCollection from './../js/waypointCollection';
+import Safehome from './../js/safehome';
+import SafehomeCollection from './../js/safehomeCollection';
+import { ApproachDirection, FwApproach } from './../js/fwApproach';
+import FwApproachCollection from './../js/fwApproachCollection';
+import SerialBackend from './../js/serial_backend';
+import { distanceOnLine, wrap_360, calculate_new_cooridatnes } from './../js/helpers';
+import Plotly from './../js/libraries/plotly-latest.min';
+import interval from './../js/intervals';
+import { Geozone, GeozoneVertex, GeozoneType, GeozoneShapes, GeozoneFenceAction }  from './../js/geozone';
+import store from './../js/store';
+
 
 var MAX_NEG_FW_LAND_ALT = -2000; // cm
 
@@ -136,7 +136,7 @@ TABS.mission_control.initialize = function (callback) {
     }
 
     function loadHtml() {
-        GUI.load(path.join(__dirname, "mission_control.html"), process_html);
+        import('./mission_control.html').then(({default: html}) => GUI.load(html, process_html));
     }
 
     function process_html() {
@@ -466,7 +466,7 @@ TABS.mission_control.initialize = function (callback) {
     //
     /////////////////////////////////////////////
     function loadSettings() {
-        var missionPlannerSettings = store.get('missionPlannerSettings', false);
+        const missionPlannerSettings = store.get('missionPlannerSettings', false);
         if (missionPlannerSettings) {
             if (!missionPlannerSettings.fwApproachLength && settings.fwApproachLength) {
                 missionPlannerSettings.fwApproachLength = settings.fwApproachLength;
@@ -2413,11 +2413,12 @@ TABS.mission_control.initialize = function (callback) {
         //////////////////////////////////////////////////////////////////////////
         // load map view settings on startup
         //////////////////////////////////////////////////////////////////////////
-        var missionPlannerLastValues = store.get('missionPlannerLastValues', false);
-        if (missionPlannerLastValues && missionPlannerLastValues.zoom && missionPlannerLastValues.center) {
-            map.getView().setCenter(ol.proj.fromLonLat(missionPlannerLastValues.center));
-            map.getView().setZoom(missionPlannerLastValues.zoom);
-        }
+        store.get('missionPlannerLastValues', false).then(missionPlannerLastValues => {;
+            if (missionPlannerLastValues && missionPlannerLastValues.zoom && missionPlannerLastValues.center) {
+                map.getView().setCenter(ol.proj.fromLonLat(missionPlannerLastValues.center));
+                map.getView().setZoom(missionPlannerLastValues.zoom);
+            }
+            });
 
 
         //////////////////////////////////////////////////////////////////////////

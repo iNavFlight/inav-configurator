@@ -165,4 +165,4 @@ let Waypoint = function (number, action, lat, lon, alt=0, p1=0, p2=0, p3=0, endM
     return self;
 };
 
-module.exports = Waypoint;
+export default Waypoint;

@@ -251,4 +251,4 @@ var MSPCodes = {
 
 };
 
-module.exports = MSPCodes;
+export default MSPCodes;

@@ -1,13 +1,9 @@
 'use strict';
 
-const semver = require('semver');
-
-require('./../injected_methods');
-const jBox = require('./../libraries/jBox/jBox.min');
-const i18n = require('./../localization');
-const { GUI } = require('./../gui');
-const { globalSettings } = require('../globalSettings');
-const Store = require('electron-store');
+import './../injected_methods';
+import i18n from './../localization';
+import { GUI } from './../gui';
+import { globalSettings } from '../globalSettings';
 
 
 var ublox = (function () {
@@ -236,4 +232,4 @@ var ublox = (function () {
 })();
 
 
-module.exports = ublox;
+export default ublox;

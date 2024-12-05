@@ -9,7 +9,7 @@
 @import '../../js/libraries/jBox/jBox.css';
 @import 'logic.css';
 @import 'defaults_dialog.css';
-@import './../../node_modules/openlayers/dist/ol.css';
+@import '../../node_modules/ol/ol.css';
 @import 'tabs/adjustments.css';
 @import 'tabs/advanced_tuning.css';
 @import 'tabs/auxiliary.css';

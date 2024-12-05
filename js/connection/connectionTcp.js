@@ -1,10 +1,8 @@
 'use strict'
 
-const net = require('net')
-
-const { GUI } = require('./../gui');
-const  { ConnectionType, Connection } = require('./connection')
-const i18n = require('./../localization');
+import { GUI } from './../gui';
+import  { ConnectionType, Connection } from './connection';
+import i18n from './../localization';
 
 const STANDARD_TCP_PORT = 5761;
 
@@ -13,7 +11,6 @@ class ConnectionTcp extends Connection {
     constructor() {
         super();
         
-        this._socket = null;
         this._connectionIP =  "";
         this.connectionPort =  0;
         this._onReceiveListeners = [];
@@ -31,25 +28,23 @@ class ConnectionTcp extends Connection {
             this._connectionPort = STANDARD_TCP_PORT;
         } 
 
-        try {
-            this._socket = net.connect({ host: this._connectionIP, port: this._connectionPort }, () => {
-                this._socket.setNoDelay(true);
+        window.electronAPI.tcpConnect(this._connectionIP, this._connectionPort).then(respose => {
+            if (!respose.error) {
                 GUI.log(i18n.getMessage('connectionConnected', ["tcp://" + this._connectionIP + ":" + this._connectionPort]));
-                
+                this._connectionId = respose.id;
                 if (callback) {
                     callback({
                         bitrate: 115200,
-                        connectionId: ++this._connectionId
+                        connectionId: this._connectionId
                     });
-                }
+                } 
+            } else {
+                console.log(respose.errorMsg);
+                callback(false);
+            }
+        });
 
-            });
-        } catch (error) {
-            console.log(error);
-            callback(false);
-        }
-
-        this._socket.on('data', buffer => {
+        window.electronAPI.onTcpData(buffer => {
             this._onReceiveListeners.forEach(listener => {
                 listener({
                     connectionId: this._connectionId,
@@ -58,18 +53,19 @@ class ConnectionTcp extends Connection {
             });
         })
 
-        this._socket.on('end', () => {
+       window.electronAPI.onTcpEnd(() => {
             console.log("TCP Remote has closed the connection");
-            if (this._socket) {
+            if (this._connectionId) {
                 this.abort();
+                this.close
             }
         });
 
-        this._socket.on('error', (error) => {
+        window.electronAPI.onTcpError(error => {
             GUI.log(error);
             console.log(error);
             
-            if (this._socket) {
+            if (this._connectionId) {
                 this.abort();
             }               
             this._onReceiveErrorListeners.forEach(listener => {
@@ -80,31 +76,31 @@ class ConnectionTcp extends Connection {
 
     disconnectImplementation(callback) {
         
-        if (this._socket && !this._socket.destroyed) {
-            this._socket.end();
+        if (this._connectionId >= 0) {
+            window.electronAPI.tcpClose();
         }
 
         this._connectionIP = "";
         this._connectionPort = 0;
-        this._socket = null;
+        this._connectionId = -1;
 
        if (callback) {
            callback(true);
        }
     }
 
-   sendImplementation(data, callback) {;
-        if (this._socket && !this._socket.destroyed) {
-            this._socket.write(Buffer.from(data), () => {
+   sendImplementation(data, callback) {;      
+        if (this._connectionId) {
+            window.electronAPI.tcpSend(this._connectionId, data).then(bytesSend => {
                 if (callback) {
                     callback({
-                        bytesSent: data.byteLength,
+                        bytesSent: bytesSend,
                         resultCode: 0
                     });
                 }
-            })
+            });
         }
-   }
+    }
 
     addOnReceiveCallback(callback){
         this._onReceiveErrorListeners.push(callback);
@@ -123,4 +119,4 @@ class ConnectionTcp extends Connection {
     }
 }
 
-module.exports = ConnectionTcp;
+export default ConnectionTcp;

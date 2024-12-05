@@ -140,4 +140,4 @@ var interval = function () {
     return publicScope;
 }();
 
-module.exports = interval;
+export default interval;

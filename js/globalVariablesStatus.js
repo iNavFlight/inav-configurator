@@ -52,4 +52,4 @@ var GlobalVariablesStatus = function () {
     return self;
 };
 
-module.exports = GlobalVariablesStatus;
+export default GlobalVariablesStatus;

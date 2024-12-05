@@ -1,12 +1,10 @@
 'use strict'
 
-const { GUI } = require('./../gui');
+import { GUI } from './../gui';
 
-const { ConnectionType, Connection } = require('./connection')
-const { SerialPort } = require('serialport');
-const { SerialPortStream } = require('@serialport/stream');
-const { autoDetect } = require('@serialport/bindings-cpp')
-const binding = autoDetect();
+import { ConnectionType, Connection } from './connection';
+
+//const binding = window.electronAPI.autoDetect();
 
 class ConnectionSerial extends Connection {
     constructor() {
@@ -20,7 +18,7 @@ class ConnectionSerial extends Connection {
 
     connectImplementation(path, options, callback) {
         try {
-            this._serialport = new SerialPortStream({binding, path: path, baudRate: options.bitrate, autoOpen: true}, () => {
+            this._serialport = window.electronAPI.serialPortStream({binding, path: path, baudRate: options.bitrate, autoOpen: true}, () => {
                 if (callback) {
                     callback({
                         connectionId: ++this._connectionId,
@@ -103,31 +101,11 @@ class ConnectionSerial extends Connection {
 
     removeOnReceiveErrorCallback(callback) {
         this._onReceiveErrorListeners = this._onReceiveErrorListeners.filter(listener => listener !== callback);
-    }
+    } 
 
     static async getDevices(callback) {
-        SerialPort.list().then((ports, error) => {
-            var devices = [];
-            if (error) {
-                GUI.log("Unable to list serial ports.");
-            } else {
-                ports.forEach(port => {
-                    if (GUI.operating_system == 'Linux') {
-			/* Limit to: USB serial, RFCOMM (BT), 6 legacy devices */
-			if (port.pnpId ||
-			    port.path.match(/rfcomm\d*/) ||
-			    port.path.match(/ttyS[0-5]$/)) {
-			    devices.push(port.path);
-                        }
-		    } else {
-			devices.push(port.path);
-		    }
-                });
-            }
-            if (callback)
-                callback(devices);
-        });
+        return window.electronAPI.listSerialDevices();
     }
 }
 
-module.exports = ConnectionSerial;
+export default ConnectionSerial;

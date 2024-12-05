@@ -1,20 +1,18 @@
 'use strict';
 
-const path = require('path');
-
-const MSPChainerClass = require('./../js/msp/MSPchainer');
-const mspHelper = require('./../js/msp/MSPHelper');
-const MSPCodes = require('./../js/msp/MSPCodes');
-const MSP = require('./../js/msp');
-const { GUI, TABS } = require('./../js/gui');
-const FC = require('./../js/fc');
-const i18n = require('./../js/localization');
-const { mixer, platform, PLATFORM, INPUT, STABILIZED } = require('./../js/model');
-const Settings = require('./../js/settings');
-const jBox = require('../js/libraries/jBox/jBox.min');
-const interval = require('./../js/intervals');
-const ServoMixRule = require('./../js/servoMixRule');
-const MotorMixRule = require('./../js/motorMixRule');
+import MSPChainerClass from './../js/msp/MSPchainer';
+import mspHelper from './../js/msp/MSPHelper';
+import MSPCodes from './../js/msp/MSPCodes';
+import MSP from './../js/msp';
+import { GUI, TABS } from './../js/gui';
+import FC from './../js/fc';
+import i18n from './../js/localization';
+import { mixer, platform, PLATFORM, INPUT, STABILIZED } from './../js/model';
+import Settings from './../js/settings';
+import jBox from '../js/libraries/jBox/jBox.min';
+import interval from './../js/intervals';
+import ServoMixRule from './../js/servoMixRule';
+import MotorMixRule from './../js/motorMixRule';
 
 TABS.mixer = {};
 
@@ -79,7 +77,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
     }
 
     function loadHtml() {
-        GUI.load(path.join(__dirname, "mixer.html"), Settings.processHtml(processHtml));
+        import('./mixer.html').then(({default: html}) => GUI.load(html, Settings.processHtml(process_html)));
     }
 
     function renderOutputTable() {

@@ -1,13 +1,13 @@
 'use strict';
 
-const path = require('path');
-const ol = require('openlayers');
+import path from 'path';
+//const ol = require('openlayers');
 
-const { GUI } = require('./gui');
-const ltmDecoder = require('./ltmDecoder');
-const interval = require('./intervals');
-const { globalSettings } = require('./globalSettings');
-const i18n = require('./localization');
+import { GUI } from './gui';
+import ltmDecoder from './ltmDecoder';
+import interval from './intervals';
+import { globalSettings } from './globalSettings';
+import i18n from './localization';
 
 const groundstation = (function () {
 
@@ -201,4 +201,4 @@ const groundstation = (function () {
     return publicScope;
 })();
 
-module.exports = groundstation;
+export default groundstation;

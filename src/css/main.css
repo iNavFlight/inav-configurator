@@ -1868,9 +1868,7 @@ dialog {
     background-size: contain;
 }
 
-.armedicon,
-.failsafeicon,
-.linkicon {
+.statusicon {
     float: left;
     margin-left: 8px;
     margin-right: 2px;
@@ -1884,16 +1882,28 @@ dialog {
     transition: none;
 }
 
-.armedicon {
+.armed {
     background-image: url("./../../images/icons/cf_icon_armed_grey.svg");
 }
 
-.failsafeicon {
+.armed-active{
+    background-image: url("./../../images/icons/cf_icon_armed_active.svg");
+}
+
+.failsafe {
     background-image: url("./../../images/icons/cf_icon_failsafe_grey.svg");
 }
 
-.linkicon {
+.failsafe-active {
+    background-image: url("./../../images/icons/cf_icon_failsafe_active.svg");
+}
+
+.link {
     background-image: url("./../../images/icons/cf_icon_link_grey.svg");
+}
+
+.linkicon-active{
+    background-image: url("./../../images/icons/cf_icon_link_active.svg");
 }
 
 .bottomStatusIcons {
@@ -2302,4 +2312,21 @@ ol li {
 
 .bold {
     font-weight: bold;
+}
+
+#optionsClose {
+    position: absolute;
+    text-align: center;
+    width: 20px;
+    height: 20px;
+    right: 20px;
+    top: 10px;
+    font-weight: bold;
+    margin: 5px;
+    border: 2px solid transparent;
+}
+#optionsClose:hover {
+    cursor: pointer;
+    border-radius: 3px;
+    border: 1px solid #000000;
 }

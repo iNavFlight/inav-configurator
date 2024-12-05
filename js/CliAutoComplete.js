@@ -5,9 +5,9 @@
  * Check out the docs at https://github.com/yuku/jquery-textcomplete/tree/v1/doc
  */
 
-const FC = require('./fc')
-const CONFIGURATOR = require('./data_storage');
-const timeout = require('./timeouts');
+import FC from './fc';
+import CONFIGURATOR from './data_storage';
+import timeout from './timeouts';
 
 const CliAutoComplete = {
     configEnabled: false,
@@ -558,4 +558,4 @@ CliAutoComplete._initTextcomplete = function() {
     ]);
 };
 
-module.exports = CliAutoComplete;
+export default CliAutoComplete;

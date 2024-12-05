@@ -1,20 +1,16 @@
 'use strict';
 
-const path = require('path');
-const Store = require('electron-store');
-const store = new Store()
-
-const MSPChainerClass = require('./../js/msp/MSPchainer');
-const mspHelper = require('./../js/msp/MSPHelper');
-const MSPCodes = require('./../js/msp/MSPCodes');
-const MSP = require('./../js/msp');
-const { GUI, TABS } = require('./../js/gui');
-const tabs = require('./../js/tabs');
-const FC = require('./../js/fc');
-const Settings = require('./../js/settings');
-const i18n = require('./../js/localization');
-const { scaleRangeInt } = require('./../js/helpers');
-const interval = require('./../js/intervals');
+import MSPChainerClass from './../js/msp/MSPchainer';
+import mspHelper from './../js/msp/MSPHelper';
+import MSPCodes from './../js/msp/MSPCodes';
+import MSP from './../js/msp';
+import { GUI, TABS } from './../js/gui';
+import tabs from './../js/tabs';
+import FC from './../js/fc';
+import Settings from './../js/settings';
+import i18n from './../js/localization';
+import { scaleRangeInt } from './../js/helpers';
+import interval from './../js/intervals';
 
 TABS.pid_tuning = {
     rateChartHeight: 117
@@ -44,7 +40,7 @@ TABS.pid_tuning.initialize = function (callback) {
     }
 
     function load_html() {
-        GUI.load(path.join(__dirname, "pid_tuning.html"), Settings.processHtml(process_html));
+        import('./pid_tuning.html').then(({default: html}) => GUI.load(html, Settings.processHtml(process_html)));
     }
 
     function drawExpoCanvas(value, $element, color, width, height, clear) {

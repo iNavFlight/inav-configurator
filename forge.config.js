@@ -1,11 +1,13 @@
 const path = require('path');
 const fs = require('fs');
+const spawn = require('child_process')
 
 module.exports = {
   packagerConfig: {
     executableName: "inav-configurator",
     asar: false,
     icon: 'images/inav',
+    /*
     ignore: [
       "^(\/\.vscode$)",
       "^(\/support$)",
@@ -18,7 +20,30 @@ module.exports = {
       "README.md",
       "inav_icon_128.psd",
     ]
+      */
   },
+  plugins: [
+    {
+      name: '@electron-forge/plugin-webpack',
+      config: {
+        mainConfig: './webpack.main.config.js',
+        devContentSecurityPolicy: `default-src * self blob: data: gap:; style-src * self 'unsafe-inline' blob: data: gap:; script-src * 'self' 'unsafe-eval' 'unsafe-inline' blob: data: gap:; object-src * 'self' blob: data: gap:; img-src * self 'unsafe-inline' blob: data: gap:; connect-src self * 'unsafe-inline' blob: data: gap:; frame-src * self blob: data: gap:;`,
+        renderer: {
+          config: './webpack.renderer.config.js',
+          entryPoints: [
+            {
+              html: './index.html',
+              js: './js/configurator_main.js',
+              name: 'main window',
+              preload: {
+                js: './js/preload.js',
+              },
+            },
+          ],
+        },
+      },
+    },
+  ],
   hooks: {
     // Uniform artifact file names
     postMake: async (config, makeResults) => {
@@ -31,7 +56,71 @@ module.exports = {
           console.log('Artifact: ' + newPath);
         });
       });
-    }
+    },
+    packageAfterPrune: async (_, buildPath, __, platform) => {
+      const commands = [
+        "install",
+        "--no-package-lock",
+        "--no-save",
+        "serialport",
+      ];
+
+      return new Promise((resolve, reject) => {
+        const oldPckgJson = path.join(buildPath, "package.json");
+        const newPckgJson = path.join(buildPath, "_package.json");
+
+        fs.renameSync(oldPckgJson, newPckgJson);
+
+        const npmInstall = spawn("npm", commands, {
+          cwd: buildPath,
+          stdio: "inherit",
+          shell: true,
+        });
+
+        npmInstall.on("close", (code) => {
+          if (code === 0) {
+            fs.renameSync(newPckgJson, oldPckgJson);
+
+            /**
+             * On windows code signing fails for ARM binaries etc.,
+             * we remove them here
+             */
+            if (platform === "win32") {
+              const problematicPaths = [
+                "android-arm",
+                "android-arm64",
+                "darwin-x64+arm64",
+                "linux-arm",
+                "linux-arm64",
+                "linux-x64",
+              ];
+
+              problematicPaths.forEach((binaryFolder) => {
+                fs.rmSync(
+                  path.join(
+                    buildPath,
+                    "node_modules",
+                    "@serialport",
+                    "bindings-cpp",
+                    "prebuilds",
+                    binaryFolder
+                  ),
+                  { recursive: true, force: true }
+                );
+              });
+            }
+
+            resolve();
+          } else {
+            reject(new Error("process finished with error code " + code));
+          }
+        });
+
+        npmInstall.on("error", (error) => {
+          reject(error);
+        });
+      });
+    },
   },
   rebuildConfig: {},
   makers: [

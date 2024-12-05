@@ -1,7 +1,5 @@
 "use strict";
 
-window.$ = window.jQuery = require('jquery');
-
 var
     CHANNEL_MIN_VALUE = 1000,
     CHANNEL_MID_VALUE = 1500,

@@ -12,8 +12,8 @@
 */
 'use strict';
 
-const { GUI, TABS } = require('./../gui');
-const i18n = require('./../localization');
+import { GUI, TABS } from './../gui';
+import i18n from './../localization';
 
 var STM32DFU_protocol = function () {
     this.callback = null;
@@ -1074,4 +1074,4 @@ STM32DFU_protocol.prototype.cleanup = function () {
 
 // initialize object
 var STM32DFU = new STM32DFU_protocol();
-module.exports = STM32DFU;
+export default STM32DFU;

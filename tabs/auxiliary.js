@@ -1,19 +1,17 @@
 'use strict';
 
 
-const path = require('path');
-const wNumb = require('wnumb/wNumb')
-const Store = require('electron-store');
-const store = new Store();
+import wNumb from 'wnumb/wNumb';
 
-const mspHelper = require('./../js/msp/MSPHelper');
-const MSPCodes = require('./../js/msp/MSPCodes');
-const MSP = require('./../js/msp');
-const { GUI, TABS } = require('./../js/gui');
-const FC = require('./../js/fc');
-const adjustBoxNameIfPeripheralWithModeID = require('./../js/peripherals');
-const i18n = require('./../js/localization');
-const interval = require('./../js/intervals');
+import  mspHelper from './../js/msp/MSPHelper';
+import  MSPCodes from './../js/msp/MSPCodes';
+import  MSP from './../js/msp';
+import  { GUI, TABS } from './../js/gui';
+import  FC from './../js/fc';
+import  adjustBoxNameIfPeripheralWithModeID from './../js/peripherals';
+import  i18n from './../js/localization';
+import  interval from './../js/intervals';
+
 
 var ORIG_AUX_CONFIG_IDS = [];
 
@@ -47,7 +45,7 @@ TABS.auxiliary.initialize = function (callback) {
 
     function load_html() {
         sort_modes_for_display();
-        GUI.load(path.join(__dirname, "auxiliary.html"), process_html);
+        import('./auxiliary.html').then(({default: html}) => GUI.load(html, process_html));
     }
 
     // This object separates out the dividers. This is also used to order the modes
@@ -496,7 +494,7 @@ TABS.auxiliary.initialize = function (callback) {
         }
 
         let hideUnusedModes = false;
-        let hideUnusedModesStore =  store.get('hideUnusedModes', false);
+        let hideUnusedModesStore = store.get('hideUnusedModes', false);
         $("input#switch-toggle-unused")
             .on('change', function () {
                 hideUnusedModes = $(this).prop("checked");

@@ -1,13 +1,13 @@
 'use strict'
 
-const  { ConnectionType, Connection } = require('./connection')
-const dgram = require('node:dgram');
-const socket = dgram.createSocket('udp4');
+import  { ConnectionType, Connection } from './connection';
 
-const { GUI } = require('./../gui');
-const i18n = require('./../localization');
+import { GUI } from './../gui';
+import i18n from './../localization';
 
 const STANDARD_UDP_PORT = 5761;
+
+//const socket = window.electronAPI.dgramCreateSocket('udp4');
 class ConnectionUdp extends Connection {
     
     constructor() {
@@ -122,4 +122,4 @@ class ConnectionUdp extends Connection {
     }
 }
 
-module.exports = ConnectionUdp;
+export default ConnectionUdp;

@@ -1,27 +1,27 @@
 'use strict';
 
-const semver = require('semver');
+import semver from 'semver';
 
-require('./../injected_methods');
-const { GUI } = require('./../gui');
-const MSP = require('./../msp');
-const MSPCodes = require('./MSPCodes');
-const FC = require('./../fc');
-const VTX = require('./../vtx');
-const mspQueue = require('./../serial_queue');
-const ServoMixRule = require('./../servoMixRule');
-const MotorMixRule = require('./../motorMixRule');
-const LogicCondition = require('./../logicCondition');
-const BitHelper = require('../bitHelper');
-const serialPortHelper = require('./../serialPortHelper');
-const ProgrammingPid = require('./../programmingPid');
-const Safehome = require('./../safehome');
-const { FwApproach } = require('./../fwApproach');
-const Waypoint = require('./../waypoint');
-const mspDeduplicationQueue = require('./mspDeduplicationQueue');
-const mspStatistics = require('./mspStatistics');
-const settingsCache = require('./../settingsCache');
-const {Geozone, GeozoneVertex, GeozoneShapes } = require('./../geozone');
+import './../injected_methods';
+import { GUI } from './../gui';
+import MSP from './../msp';
+import MSPCodes from './MSPCodes';
+import FC from './../fc';
+import VTX from './../vtx';
+import mspQueue from './../serial_queue';
+import ServoMixRule from './../servoMixRule';
+import MotorMixRule from './../motorMixRule';
+import LogicCondition from './../logicCondition';
+import BitHelper from '../bitHelper';
+import serialPortHelper from './../serialPortHelper';
+import ProgrammingPid from './../programmingPid';
+import Safehome from './../safehome';
+import { FwApproach } from './../fwApproach';
+import Waypoint from './../waypoint';
+import mspDeduplicationQueue from './mspDeduplicationQueue';
+import mspStatistics from './mspStatistics';
+import settingsCache from './../settingsCache';
+import {Geozone, GeozoneVertex, GeozoneShapes } from './../geozone';
 
 var mspHelper = (function () {
     var self = {};
@@ -3536,4 +3536,4 @@ var mspHelper = (function () {
     return self;
 })();
 
-module.exports = mspHelper;
+export default mspHelper;

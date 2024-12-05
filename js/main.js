@@ -1,10 +1,11 @@
-const { app, BrowserWindow, ipcMain, Menu, MenuItem, shell } = require('electron');
-const windowStateKeeper = require('electron-window-state');
-const path = require('path');
-const Store = require('electron-store');
-Store.initRenderer();
+import { app, BrowserWindow, ipcMain, Menu, MenuItem, shell, dialog } from 'electron';
+import windowStateKeeper from 'electron-window-state';
+import Store from "electron-store";
+import path from 'path';
+import started from 'electron-squirrel-startup';
+import { SerialPort } from 'serialport';
 
-require('@electron/remote/main').initialize();
+import tcp from './main/tcp';
 
 const usbBootloaderIds =  [
   { vendorId: 1155, productId: 57105}, 
@@ -12,7 +13,7 @@ const usbBootloaderIds =  [
 ];
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
-if (require('electron-squirrel-startup')) {
+if (started) {
   app.quit();
 }
 
@@ -20,6 +21,8 @@ let mainWindow = null;
 let bluetoothDeviceChooser = null;
 let btDeviceList = null;
 let selectBluetoothCallback = null;
+
+const store = new Store();
 
 // In Electron the bluetooth device chooser didn't exist, so we have to build our own
 function createDeviceChooser() {
@@ -71,8 +74,10 @@ function createWindow() {
     autoHideMenuBar: true,
     icon: "images/inav_icon_128.png",
     webPreferences: {
+      preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
       nodeIntegration: true,
-      contextIsolation: false
+      webSecurity: false
+      //contextIsolation: true
     },
   });
 
@@ -170,10 +175,10 @@ function createWindow() {
 
   app.commandLine.appendSwitch("enable-web-bluetooth", true);
 
-  require("@electron/remote/main").enable(mainWindow.webContents);
   mainWindow.removeMenu();
   mainWindow.setMinimumSize(800, 600);
-  mainWindow.loadFile('./index.html');
+
+  mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
   
   mainWindowState.manage(mainWindow);
 
@@ -191,7 +196,65 @@ app.on('window-all-closed', () => {
   console.log("We're closing...");
 });
 
-app.on('activate', () => {
+async function getDevices() {
+  const ports = await SerialPort.list();
+  var devices = [];
+  ports.forEach(port => {
+    if (process.platform == 'Linux') {
+      /* Limit to: USB serial, RFCOMM (BT), 6 legacy devices */
+      if (port.pnpId || port.path.match(/rfcomm\d*/) || port.path.match(/ttyS[0-5]$/)) {
+        devices.push(port.path);
+      }
+    } else {
+      devices.push(port.path);
+    }
+  });
+  return devices
+  }
+
+app.whenReady().then(() => {
+  
+   ipcMain.handle('listSerialDevices', (event) => {
+    return getDevices()
+  });
+
+  ipcMain.on('storeGet', (event, key, defaultVale) => {
+    event.returnValue = store.get(key, defaultVale);
+  });
+
+  ipcMain.on('storeSet', (_event, key, value) => {
+    store.set(key, value);
+  });
+
+  ipcMain.on('appGetPath', (event, name) => {
+    event.returnValue = app.getPath(name);
+  });
+
+  ipcMain.on('appGetVersion', (event) => {
+    event.returnValue = app.getVersion();
+  });
+
+  ipcMain.on('appGetLocale', (event) => {
+    event.returnValue = app.getLocale();
+  });
+
+  ipcMain.handle('dialog.showOpenDialog', (event, options, callback) => {
+    return dialog.showOpenDialog(options);
+  }),
+
+  ipcMain.handle('tcpConnect', (_event, host, port) => {
+    return tcp.connect(host, port, mainWindow);
+  });
+
+  ipcMain.handle('tcpSend', (_event, id, data) => {
+    return tcp.send(id, data);
+  });
+
+  ipcMain.on('tcpClose', (_event, id) => {
+    tcp.close(id);
+  });
+
+
   // On OS X it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
   if (BrowserWindow.getAllWindows().length === 0) {

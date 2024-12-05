@@ -1,28 +1,23 @@
 'use strict';
 
-const { marked } = require('marked');
-const fs = require('fs');
-const path = require('path');
-const semver = require('semver');
-const { dialog } = require('@electron/remote');
-const Store = require('electron-store');
-const store = new Store();
+import { marked } from 'marked';
+import semver from 'semver';
 
-const i18n = require('./../js/localization');
-const { GUI, TABS } = require('./../js/gui');
-const MSP = require('./../js/msp');
-const MSPCodes = require('./../js/msp/MSPCodes')
-const FC = require('./../js/fc');
-const { usbDevices, PortHandler } = require('./../js/port_handler');
-const CONFIGURATOR = require('./../js/data_storage');
-const SerialBackend = require('./../js/serial_backend');
-const timeout = require('./../js/timeouts');
-const interval = require('./../js/intervals');
-const mspQueue = require('./../js/serial_queue');
-const mspHelper = require('./../js/msp/MSPHelper');
-const STM32 = require('./../js/protocols/stm32');
-const STM32DFU = require('./../js/protocols/stm32usbdfu');
-const mspDeduplicationQueue = require('./../js/msp/mspDeduplicationQueue');
+import i18n from './../js/localization';
+import { GUI, TABS } from './../js/gui';
+import MSP from './../js/msp';
+import MSPCodes from './../js/msp/MSPCodes';
+import FC from './../js/fc';
+import { usbDevices, PortHandler } from './../js/port_handler';
+import CONFIGURATOR from './../js/data_storage';
+import SerialBackend from './../js/serial_backend';
+import timeout from './../js/timeouts';
+import interval from './../js/intervals';
+import mspQueue from './../js/serial_queue';
+import mspHelper from './../js/msp/MSPHelper';
+import STM32 from './../js/protocols/stm32';
+import STM32DFU from './../js/protocols/stm32usbdfu';
+import mspDeduplicationQueue from './../js/msp/mspDeduplicationQueue';
 
 TABS.firmware_flasher = {};
 TABS.firmware_flasher.initialize = function (callback) {
@@ -35,7 +30,7 @@ TABS.firmware_flasher.initialize = function (callback) {
         parsed_hex = false, // parsed raw hex in array format
         fileName = "inav.hex";
 
-    GUI.load(path.join(__dirname, "firmware_flasher.html"), function () {
+    import('./firmware_flasher.html').then(({default: html}) => GUI.load(html, function () {
         // translate to user-selected language
         i18n.localize();
 
@@ -584,22 +579,20 @@ TABS.firmware_flasher.initialize = function (callback) {
 
         $('input.updating').trigger('change');
         
+        if (store.get('flash_manual_baud', false)) {
+            $('input.flash_manual_baud').prop('checked', true);
+        } else {
+            $('input.flash_manual_baud').prop('checked', false);
+        }
 
-        store.get('flash_manual_baud', function (result) {
-            if (result.flash_manual_baud) {
-                $('input.flash_manual_baud').prop('checked', true);
-            } else {
-                $('input.flash_manual_baud').prop('checked', false);
-            }
-
-            // bind UI hook so the status is saved on change
-            $('input.flash_manual_baud').on('change', function () {
-                var status = $(this).is(':checked');
-                store.set('flash_manual_baud', status);
-            });
-
-            $('input.flash_manual_baud').trigger('change');
+        // bind UI hook so the status is saved on change
+        $('input.flash_manual_baud').on('change', function () {
+            var status = $(this).is(':checked');
+            store.set('flash_manual_baud', status);
         });
+
+        $('input.flash_manual_baud').trigger('change');
+        
 
         var flash_manual_baud_rate = store.get('flash_manual_baud_rate', '');
         $('#flash_manual_baud_rate').val(flash_manual_baud_rate);
@@ -661,7 +654,7 @@ TABS.firmware_flasher.initialize = function (callback) {
         }
 
         // bind UI hook so the status is saved on change
-        $('input.erase_chip').on('change', function () {
+        $('input.erase_chip').on('change', async function () {
             store.set('erase_chip', $(this).is(':checked'));
         });
 
@@ -681,7 +674,7 @@ TABS.firmware_flasher.initialize = function (callback) {
         });
 
         GUI.content_ready(callback);
-    });
+    }));
 };
 
 TABS.firmware_flasher.FLASH_MESSAGE_TYPES = {NEUTRAL : 'NEUTRAL',
@@ -758,7 +751,7 @@ TABS.firmware_flasher.getTarget = function() {
     }
 };
 
-TABS.firmware_flasher.onOpen = function(openInfo) {
+TABS.firmware_flasher.onOpen = async function(openInfo) {
     if (openInfo) {
         GUI.connected_to = GUI.connecting_to;
 

@@ -1,10 +1,10 @@
 'use strict';
 
-const semver = require('semver');
+import semver from 'semver';
 
-const { GUI } = require('./gui');
-const jBox = require('./libraries/jBox/jBox.min');
-const i18n = require('./localization');
+import { GUI } from './gui';
+import jBox from './libraries/jBox/jBox.min';
+import i18n from './localization';
 
 var appUpdater = appUpdater || {};
 
@@ -17,18 +17,21 @@ appUpdater.checkRelease = function (currVersion) {
         let newPrerelase = releaseData.prerelease;
 
         if (newPrerelase == false && semver.gt(newVersion, currVersion)) {
-            GUI.log(newVersion, app.getVersion());
-            GUI.log(currVersion);
+            
+            window.electronAPI.appGetVersion().then(currentVersion => {
+                GUI.log(newVersion, currentVersion);
+                GUI.log(currVersion);
 
-            GUI.log(i18n.getMessage('newVersionAvailable'));
-            modalStart = new jBox('Modal', {
-                width: 400,
-                height: 200,
-                animation: false,
-                closeOnClick: false,
-                closeOnEsc: true,
-                content: $('#appUpdateNotification')
-            }).open();
+                GUI.log(i18n.getMessage('newVersionAvailable'));
+                modalStart = new jBox('Modal', {
+                    width: 400,
+                    height: 200,
+                    animation: false,
+                    closeOnClick: false,
+                    closeOnEsc: true,
+                    content: $('#appUpdateNotification')
+                }).open();
+            });
         }
     });
 
@@ -40,4 +43,4 @@ appUpdater.checkRelease = function (currVersion) {
     });
 };
 
-module.exports = appUpdater;
+export default appUpdater;

@@ -1,13 +1,11 @@
 'use strict';
 
-const path = require('path');
-
-const mspHelper = require('./../js/msp/MSPHelper');
-const MSPCodes = require('./../js/msp/MSPCodes');
-const MSP = require('./../js/msp');
-const { GUI, TABS } = require('./../js/gui');
-const FC = require('./../js/fc');
-const i18n = require('./../js/localization');
+import mspHelper from './../js/msp/MSPHelper';
+import MSPCodes from './../js/msp/MSPCodes';
+import MSP from './../js/msp';
+import { GUI, TABS } from './../js/gui';
+import FC from './../js/fc';
+import i18n from './../js/localization';
 
 TABS.led_strip = {
     wireMode: false,
@@ -43,7 +41,7 @@ TABS.led_strip.initialize = function (callback, scrollPosition) {
     }
 
     function load_html() {
-        GUI.load(path.join(__dirname, "led_strip.html"), process_html);
+        import('./led_strip.html').then(({default: html}) => GUI.load(html, process_html));
     }
 
     load_led_config();

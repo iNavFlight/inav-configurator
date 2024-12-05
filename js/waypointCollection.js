@@ -1,10 +1,10 @@
 'use strict';
 
-const ol = require('openlayers');
+//import {ol} from 'openlayers';
 
-const MWNP = require('./mwnp');
-const Waypoint = require('./waypoint');
-const BitHelper = require('./bitHelper');
+import MWNP from './mwnp';
+import Waypoint from './waypoint';
+import BitHelper from './bitHelper';
 
 let WaypointCollection = function () {
 
@@ -486,5 +486,5 @@ let WaypointCollection = function () {
     return self;
 };
 
-module.exports = WaypointCollection;
+export default WaypointCollection;
 

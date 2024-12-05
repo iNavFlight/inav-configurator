@@ -1,40 +1,39 @@
 'use strict';
 
 // Thanks to Betaflight :)
+import i18next from 'i18next';
 
-window.$ = window.jQuery =  require('jquery');
-const { app } = require('@electron/remote');
-const path = require('path');
-const i18next = require('i18next');
-const i18nextXHRBackend = require('i18next-xhr-backend');
-const Store = require('electron-store');
-const store = new Store();
+import store from './store'
 
 const availableLanguages = ['en', 'uk'];
 
 const i18n = {};
   
 i18n.init = function (callback) {
-        
-    i18next.use(i18nextXHRBackend);
+    const locale = window.electronAPI.appGetLocale();
+    const userLanguage = store.get('userLanguage', locale);
+    var resources = {};
+    availableLanguages.forEach(lng => {
+        var msg = require(`./../locale/${lng}/messages.json`).default;
+        resources[lng] = {
+            messages: this.parseInputFile(msg)
+        }
+    });
     i18next.init({
-        lng: store.get('userLanguage', app.getLocale()),
+        lng: userLanguage,
         getAsync: false,
         debug: true,
         ns: ['messages'],
         defaultNS:['messages'],
         fallbackLng: 'en',
-        backend: {
-            loadPath: path.join(__dirname, "./../locale/{{lng}}/{{ns}}.json"),
-            parse: i18n.parseInputFile,
-        },
+        resources: resources
     }, function(err) {
-        if (err !== undefined) {
+        if (err) {
             console.error(`Error loading i18n: ${err}`);
         } else {
             console.log('i18n system loaded');
             const detectedLanguage = i18n.getMessage(`language_${i18n.getValidLocale("DEFAULT")}`);
-            i18next.addResourceBundle('en', 'messages', {"detectedLanguage": detectedLanguage }, true, true);
+            i18next.addResourceBundle('en', 'messages', { "detectedLanguage": detectedLanguage }, true, true);
             i18next.on('languageChanged', function () {
                 i18n.localize(true);
             });
@@ -64,10 +63,10 @@ i18n.parseInputFile = function (data) {
     return jsonData;
 }
 
-i18n.getValidLocale = function(userLocale) {
+i18n.getValidLocale = async function(userLocale) {
     let validUserLocale = userLocale;
     if (validUserLocale === 'DEFAULT') {
-        validUserLocale = app.getLocale();
+        validUserLocale = await window.electronAPI.appGetLocale();
         console.log(`Detected locale ${validUserLocale}`);
     }
 
@@ -239,4 +238,4 @@ i18n.localize = function (reTranslate = false) {
     return localized;
 }
  
-module.exports = i18n;
+export default i18n;

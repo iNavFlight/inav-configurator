@@ -1,9 +1,9 @@
 'use strict';
 
-const MSPCodes = require('./msp/MSPCodes')
-const mspQueue = require('./serial_queue');
-const eventFrequencyAnalyzer = require('./eventFrequencyAnalyzer');
-const timeout = require('./timeouts');
+import MSPCodes from './msp/MSPCodes';
+import mspQueue from './serial_queue';
+import eventFrequencyAnalyzer from './eventFrequencyAnalyzer';
+import timeout from './timeouts';
 
 /**
  *
@@ -413,4 +413,4 @@ var MSP = {
     }
 };
 
-module.exports = MSP;
+export default MSP;

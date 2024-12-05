@@ -1,16 +1,14 @@
 'use strict';
 
-const path = require('path');
-
-const MSPChainerClass = require('./../js/msp/MSPchainer');
-const MSP = require('./../js/msp');
-const MSPCodes = require('./../js/msp/MSPCodes');
-const mspHelper = require('./../js/msp/MSPHelper');
-const FC = require('./../js/fc');
-const { GUI, TABS } = require('./../js/gui');
-const i18n = require('./../js/localization');
-const { mixer } = require('./../js/model');
-const interval = require('./../js/intervals');
+import MSPChainerClass from './../js/msp/MSPchainer';
+import MSP from './../js/msp';
+import MSPCodes from './../js/msp/MSPCodes';
+import mspHelper from './../js/msp/MSPHelper';
+import FC from './../js/fc';
+import { GUI, TABS } from './../js/gui';
+import i18n from './../js/localization';
+import { mixer } from './../js/model';
+import interval from './../js/intervals';
 
 TABS.magnetometer = {};
 
@@ -149,7 +147,7 @@ TABS.magnetometer.initialize = function (callback) {
     }
 
     function load_html() {
-        GUI.load(path.join(__dirname, "magnetometer.html"), process_html);
+        import('./magnetometer.html').then(({default: html}) => GUI.load(html, process_html));
     }
 
     function generateRange(min, max, step) {
@@ -607,9 +605,7 @@ TABS.magnetometer.initialize3D = function () {
         renderer = new THREE.WebGLRenderer({canvas: canvas.get(0), alpha: true, antialias: true});
         useWebGlRenderer = true;
     }
-    else {
-        renderer = new THREE.CanvasRenderer({canvas: canvas.get(0), alpha: true});
-    }
+    
     // initialize render size for current canvas size
     renderer.setSize(wrapper.width() * 2, wrapper.height() * 2);
 

@@ -1,6 +1,6 @@
 'use strict';
 
-const { GUI } = require('./../gui');
+import { GUI } from './../gui';
 
 const ConnectionType = {
     Serial: 0,
@@ -263,4 +263,4 @@ class Connection {
     }
 }
 
-module.exports = { ConnectionType, Connection};
+export  { ConnectionType, Connection};

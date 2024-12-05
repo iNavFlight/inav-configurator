@@ -1,32 +1,31 @@
 'use strict';
 
-const semver = require('semver');
-const Store = require('electron-store');
-const store = new Store();
+import semver from 'semver';
 
-const { GUI, TABS } = require('./gui');
-const MSP = require('./msp');
-const FC = require('./fc');
-const MSPCodes = require('./msp/MSPCodes');
-const mspHelper = require('./msp/MSPHelper');
-const { ConnectionType, Connection } = require('./connection/connection');
-const connectionFactory = require('./connection/connectionFactory');
-const CONFIGURATOR = require('./data_storage');
-const  { PortHandler } = require('./port_handler');
-const i18n = require('./../js/localization');
-const interval = require('./intervals');
-const periodicStatusUpdater = require('./periodicStatusUpdater');
-const mspQueue = require('./serial_queue');
-const timeout = require('./timeouts');
-const defaultsDialog = require('./defaults_dialog');
-const { SITLProcess } = require('./sitl');
-const update = require('./globalUpdates');
-const BitHelper = require('./bitHelper');
-const BOARD = require('./boards');
-const jBox = require('./libraries/jBox/jBox.min');
-const groundstation = require('./groundstation');
-const ltmDecoder = require('./ltmDecoder');
-const mspDeduplicationQueue = require('./msp/mspDeduplicationQueue');
+import { GUI, TABS } from './gui';
+import MSP from './msp';
+import FC from './fc';
+import MSPCodes from './msp/MSPCodes';
+import mspHelper from './msp/MSPHelper';
+import { ConnectionType, Connection } from './connection/connection';
+import connectionFactory from './connection/connectionFactory';
+import CONFIGURATOR from './data_storage';
+import  { PortHandler } from './port_handler';
+import i18n from './../js/localization';
+import interval from './intervals';
+import periodicStatusUpdater from './periodicStatusUpdater';
+import mspQueue from './serial_queue';
+import timeout from './timeouts';
+import defaultsDialog from './defaults_dialog';
+import { SITLProcess } from './sitl';
+import update from './globalUpdates';
+import BitHelper from './bitHelper';
+import BOARD from './boards';
+import jBox from './libraries/jBox/jBox.min';
+import groundstation from './groundstation';
+import ltmDecoder from './ltmDecoder';
+import mspDeduplicationQueue from './msp/mspDeduplicationQueue';
+import store from './store';
 
 var SerialBackend = (function () {
 
@@ -154,9 +153,8 @@ var SerialBackend = (function () {
         publicScope.$portOverride.on('change', function () {
             store.set('portOverride', publicScope.$portOverride.val());
         });
-
-        publicScope.$portOverride.val(store.get('portOverride', ''));
         
+        publicScope.$portOverride.val(store.get('portOverride', ''));        
 
         privateScope.$port.on('change', function (target) {
             GUI.updateManualPortVisibility();
@@ -618,4 +616,4 @@ var SerialBackend = (function () {
 
 })();
 
-module.exports = SerialBackend;
+export default SerialBackend;

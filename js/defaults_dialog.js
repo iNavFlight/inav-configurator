@@ -1,20 +1,20 @@
 'use strict';
 
-const { GUI } = require('./../js/gui');
-const FC = require('./fc');
-const MSP = require('./msp');
-const MSPCodes = require('./../js/msp/MSPCodes');
-const mspHelper = require('./msp/MSPHelper');
-const MSPChainerClass = require('./msp/MSPchainer');
-const features = require('./feature_framework');
-const periodicStatusUpdater = require('./periodicStatusUpdater');
-const { mixer } = require('./model');
-const jBox = require('./libraries/jBox/jBox.min');
-const i18n = require('./localization');
-const defaultsDialogData = require('./defaults_dialog_entries.js');
-const Settings = require('./settings.js');
-const wizardUiBindings = require('./wizard_ui_bindings');
-const wizardSaveFramework = require('./wizard_save_framework');
+import { GUI } from './../js/gui';
+import FC from './fc';
+import MSP from './msp';
+import MSPCodes from './../js/msp/MSPCodes';
+import mspHelper from './msp/MSPHelper';
+import MSPChainerClass from './msp/MSPchainer';
+import features from './feature_framework';
+import periodicStatusUpdater from './periodicStatusUpdater';
+import { mixer } from './model';
+import jBox from './libraries/jBox/jBox.min';
+import i18n from './localization';
+import defaultsDialogData from './defaults_dialog_entries.js';
+import Settings from './settings.js';
+import wizardUiBindings from './wizard_ui_bindings';
+import wizardSaveFramework from './wizard_save_framework';
 
 var savingDefaultsModal;
 
@@ -346,4 +346,4 @@ var defaultsDialog = (function () {
     return publicScope;
 })();
 
-module.exports = defaultsDialog;
+export default defaultsDialog;

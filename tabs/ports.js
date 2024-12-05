@@ -1,14 +1,12 @@
 'use strict';
 
-const path = require('path');
-
-const mspHelper = require('./../js/msp/MSPHelper');
-const MSPCodes = require('./../js/msp/MSPCodes');
-const MSP = require('./../js/msp');
-const { GUI, TABS } = require('./../js/gui');
-const FC = require('./../js/fc');
-const i18n = require('./../js/localization');
-const serialPortHelper = require('./../js/serialPortHelper');
+import mspHelper from './../js/msp/MSPHelper';
+import MSPCodes from './../js/msp/MSPCodes';
+import MSP from './../js/msp';
+import { GUI, TABS } from './../js/gui';
+import FC from './../js/fc';
+import i18n from './../js/localization';
+import serialPortHelper from './../js/serialPortHelper';
 
 TABS.ports = {};
 
@@ -21,7 +19,7 @@ TABS.ports.initialize = function (callback) {
     }
 
     mspHelper.loadSerialPorts(function () {
-        GUI.load(path.join(__dirname, "ports.html"), on_tab_loaded_handler)
+        import('./ports.html').then(({default: html}) => GUI.load(html, on_tab_loaded_handler));
     });
 
     function update_ui() {

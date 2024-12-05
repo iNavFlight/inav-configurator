@@ -1,18 +1,13 @@
 'use strict';
 
-const path = require('path');
-const Store = require('electron-store');
-const store = new Store();
-
-const MSPCodes = require('./../js/msp/MSPCodes');
-const MSP = require('./../js/msp');
-const mspQueue = require('./../js/serial_queue');
-const { GUI, TABS } = require('./../js/gui');
-const FC = require('./../js/fc');
-const CONFIGURATOR = require('./../js/data_storage');
-const interval = require('./../js/intervals');
-const i18n = require('./../js/localization');
-const BitHelper = require('./../js/bitHelper');
+import MSPCodes from './../js/msp/MSPCodes';
+import MSP from './../js/msp';
+import { GUI, TABS } from './../js/gui';
+import FC from './../js/fc';
+import CONFIGURATOR from './../js/data_storage';
+import interval from './../js/intervals';
+import i18n from './../js/localization';
+import BitHelper from './../js/bitHelper';
 
 TABS.sensors = {};
 TABS.sensors.initialize = function (callback) {
@@ -210,8 +205,7 @@ TABS.sensors.initialize = function (callback) {
             $('.wrapper.debug').hide();
         }
     }
-
-    GUI.load(path.join(__dirname, "sensors.html"), function load_html() {
+    import('./sensors.html').then(({default: html}) => GUI.load(html, function load_html() {
         // translate to user-selected language
        i18n.localize();;
 
@@ -273,7 +267,7 @@ TABS.sensors.initialize = function (callback) {
             store.set('graphs_enabled', checkboxes);
         });
 
-        var graphs_enabled = store.get('graphs_enabled', false);
+        const graphs_enabled = store.get('graphs_enabled', false);
         if (graphs_enabled) {
             var checkboxes = $('.tab-sensors .info .checkboxes input');
             for (var i = 0; i < graphs_enabled.length; i++) {
@@ -282,6 +276,7 @@ TABS.sensors.initialize = function (callback) {
         } else {
             $('.tab-sensors .info input:lt(4):not(:disabled)').prop('checked', true).trigger('change');
         }
+        
         
 
         // Always start with default/empty sensor data array, clean slate all
@@ -367,7 +362,7 @@ TABS.sensors.initialize = function (callback) {
         });
 
         // set refresh speeds according to configuration saved in storage
-        var sensor_settings = store.get('sensor_settings', false) 
+        const sensor_settings = store.get('sensor_settings', false);
         if (sensor_settings) {
             $('.tab-sensors select[name="gyro_refresh_rate"]').val(sensor_settings.rates.gyro);
             $('.tab-sensors select[name="gyro_scale"]').val(sensor_settings.scales.gyro);
@@ -561,7 +556,7 @@ TABS.sensors.initialize = function (callback) {
         });
 
         GUI.content_ready(callback);
-    });
+    }));
 };
 
 TABS.sensors.cleanup = function (callback) {

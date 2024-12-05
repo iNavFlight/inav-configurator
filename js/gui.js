@@ -1,14 +1,13 @@
 'use strict';
-const { dialog } = require("@electron/remote");
+// import { dialog }  from "@electron/remote";
 
-const CONFIGURATOR = require('./data_storage');
-const Switchery = require('./libraries/switchery/switchery')
-const MSP = require('./msp');
-const FC = require('./fc');
-const interval = require('./intervals');
-const { scaleRangeInt } = require('./helpers');
-const i18n = require('./localization');
-const mspDeduplicationQueue = require("./msp/mspDeduplicationQueue");
+import Switchery from './libraries/switchery/switchery';
+import MSP from './msp';
+import FC from './fc';
+import interval from './intervals';
+import { scaleRangeInt } from './helpers';
+import i18n from './localization';
+import mspDeduplicationQueue from "./msp/mspDeduplicationQueue";
 
 var TABS = {}; // filled by individual tab js file
 
@@ -321,14 +320,12 @@ GUI_control.prototype.simpleBind = function () {
     });
 };
 
-GUI_control.prototype.load = function(rel, callback) {
+GUI_control.prototype.load = function(html, callback) {
     const content = $('#content').addClass('loading');
-    $.get(rel, function(data) {
-        $(data).appendTo(content);
-        if (callback) {
-            callback();
-        }
-    });
+    content.html(html);
+    if (callback) {
+        callback();
+    }
 }
 
 GUI_control.prototype.renderOperandValue = function ($container, operandMetadata, operand, value, onChange) {
@@ -555,4 +552,4 @@ GUI_control.prototype.confirm = function(message) {
 // initialize object into GUI variable
 var GUI = new GUI_control();
 
-module.exports = { GUI, TABS };
+export { GUI, TABS };

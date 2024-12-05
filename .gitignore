@@ -6,6 +6,7 @@ npm-debug.log
 npm-debug.log
 inav-configurator.iml
 /out
+/.webpack
 .eslintrc.json
 /.project
 /cache/

@@ -1,24 +1,22 @@
 'use strict';
 
-const path = require('path')
-const ol = require('openlayers')
-const semver = require('semver');
+import semver from 'semver';
 
-const MSPChainerClass = require('./../js/msp/MSPchainer');
-const mspHelper = require('./../js/msp/MSPHelper');
-const MSPCodes = require('./../js/msp/MSPCodes');
-const MSP = require('./../js/msp');
-const interval = require('./../js/intervals');
-const { GUI, TABS } = require('./../js/gui');
-const FC = require('./../js/fc');
-const i18n = require('./../js/localization');
-const Settings = require('./../js/settings');
-const serialPortHelper = require('./../js/serialPortHelper');
-const features = require('./../js/feature_framework');
-const { globalSettings } = require('./../js/globalSettings');
-const jBox = require('./../js/libraries/jBox/jBox.min');
-const SerialBackend = require('../js/serial_backend');
-const ublox = require('../js/ublox/UBLOX');
+import MSPChainerClass from './../js/msp/MSPchainer';
+import mspHelper from './../js/msp/MSPHelper';
+import MSPCodes from './../js/msp/MSPCodes';
+import MSP from './../js/msp';
+import interval from './../js/intervals';
+import { GUI, TABS } from './../js/gui';
+import FC from './../js/fc';
+import i18n from './../js/localization';
+import Settings from './../js/settings';
+import serialPortHelper from './../js/serialPortHelper';
+import features from './../js/feature_framework';
+import { globalSettings } from './../js/globalSettings';
+import jBox from './../js/libraries/jBox/jBox.min';
+import SerialBackend from '../js/serial_backend';
+import ublox from '../js/ublox/UBLOX';
 
 
 TABS.gps = {};
@@ -94,7 +92,7 @@ TABS.gps.initialize = function (callback) {
     }
 
     function load_html() {
-        GUI.load(path.join(__dirname, "gps.html"), Settings.processHtml(process_html));
+        import('./gps.html').then(({default: html}) => GUI.load(html, Settings.processHtml(process_html)));
     }
 
     let cursorInitialized = false;

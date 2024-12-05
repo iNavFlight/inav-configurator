@@ -1,26 +1,20 @@
 'use strict';
 
-const inflection = require( 'inflection' );
-const fs = require('fs');
-const path = require('path');
-const semver = require('semver');
-const mapSeries = require('promise-map-series');
-const { dialog } = require("@electron/remote");
-const Store = require('electron-store');
-const store = new Store();
+import inflection from  'inflection';
+import semver from 'semver';
+import mapSeries from 'promise-map-series';
+// import { dialog }  from "@electron/remote";
 
-const FC = require('./../js/fc');
-const { GUI, TABS } = require('./../js/gui');
-const MSP = require('./../js/msp');
-const MSPCodes = require('./../js/msp/MSPCodes');
-const mspHelper = require('./../js/msp/MSPHelper');
-const Settings = require('./../js/settings');
-const { globalSettings } = require('./../js/globalSettings');
-const { PortHandler } = require('./../js/port_handler');
-const i18n = require('./../js/localization');
-const jBox = require('./../js/libraries/jBox/jBox.min');
-const { Console } = require('console');
-
+import FC from './../js/fc';
+import { GUI, TABS } from './../js/gui';
+import MSP from './../js/msp';
+import MSPCodes from './../js/msp/MSPCodes';
+import mspHelper from './../js/msp/MSPHelper';
+import Settings from './../js/settings';
+import { globalSettings } from './../js/globalSettings';
+import { PortHandler } from './../js/port_handler';
+import i18n from './../js/localization';
+import jBox from './../js/libraries/jBox/jBox.min';
 
 var SYM = SYM || {};
 SYM.LAST_CHAR = 225; // For drawing the font preview
@@ -3463,7 +3457,7 @@ TABS.osd.initialize = function (callback) {
     }
 
     HARDWARE.update(function () {
-        GUI.load(path.join(__dirname, "osd.html"), Settings.processHtml(function () {
+        import('./osd.html').then(({default: html}) => GUI.load(html, Settings.processHtml(function() {
             // translate to user-selected language
            i18n.localize();
     
@@ -3637,7 +3631,7 @@ TABS.osd.initialize = function (callback) {
             }
 
             GUI.content_ready(callback);
-        }));
+        })));
     });
 };
 

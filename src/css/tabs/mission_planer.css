@@ -86,7 +86,7 @@
 }
 
 .tab-mission-control .ic_play {
-    background-image: url(../..//images/icons/cf_icon_MP_play_grey.svg);
+    background-image: url(./../../../images/icons/cf_icon_MP_play_grey.svg);
 }
 
 .tab-mission-control .ic_stop {

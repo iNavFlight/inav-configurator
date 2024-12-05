@@ -55,4 +55,4 @@ var ProgrammingPidCollection = function () {
     return self;
 };
 
-module.exports = ProgrammingPidCollection;
+export default ProgrammingPidCollection;
