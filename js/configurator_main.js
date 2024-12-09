@@ -1,10 +1,6 @@
 import '../src/css/styles.css'
 
 import 'jquery-ui-dist/jquery-ui';
-import 'jquery-textcomplete';
-import './libraries/jquery.flightindicators';
-//import './libraries/jquery.nouislider.all.min';
-import './libraries/jquery.ba-throttle-debounce';
 import * as THREE from 'three'
 
 import { GUI, TABS } from './gui';

@@ -18,6 +18,24 @@ class ConnectionUdp extends Connection {
         this._onReceiveListeners = [];
         this._onErrorListener = [];
         super._type = ConnectionType.UDP;
+
+        window.electronAPI.onUdpMessage(message => {
+            this._onReceiveListeners.forEach(listener => {
+                listener({
+                    connectionId: this._connectionId,
+                    data: message
+                });
+            });
+        });
+
+        window.electronAPI.onUdpError(error => {
+            GUI.log(error);
+            console.log(error);
+            this.abort();                         
+            this._onReceiveErrorListeners.forEach(listener => {
+                listener(error);    
+            });
+        });
     }
 
     connectImplementation(address, options, callback) {     
@@ -30,80 +48,59 @@ class ConnectionUdp extends Connection {
             this._connectionPort = STANDARD_UDP_PORT;
         } 
 
-        try {
-            socket.bind(this._connectionPort, () => {
+        window.electronAPI.udpConnect(this._connectionIP, this._connectionPort).then(response => {
+            if (!response.error) {
                 GUI.log(i18n.getMessage('connectionConnected', ["udp://" + this._connectionIP + ":" + this._connectionPort]));
+                this._connectionId = response.id;
                 if (callback) {
                     callback({
                         bitrate: 115200,
-                        connectionId: ++this._connectionId
+                        connectionId: this._connectionId
                     });
+                } 
+            } else {
+                console.log("UDP error: " + response.msg);
+                if (callback) {
+                    callback(false);
                 }
-
-            });
-        } catch (error) {
-            console.log(error);
-            callback(false);
-        }
-
-        socket.on('message', (msg, _rinfo) => {
-            this._onReceiveListeners.forEach(listener => {
-                listener({
-                    connectionId: ++this._connectionId,
-                    data: msg
-                });
-            });
-        })
-
-       socket.on('error', (error) => {
-            GUI.log("UDP error: " + error);
-            console.log("UDP error: " + error);
-            this.abort();              
-            this._onReceiveErrorListeners.forEach(listener => {
-                listener(error);    
-            });
+            }
         });
     }
 
     disconnectImplementation(callback) {
-        var ret = true;
-        try {
-            socket.disconnect();
-        } catch (error) {
-            console.log("Disconecct error: " + error)
-            ret = false;
+        if (this._connectionId) {
+            window.electronAPI.udpClose().then(response => {
+                var ok = true;
+                if (response.error) {
+                    console.log("Unable to close UDP: " + response.msg);
+                    ok = false;
+                }            
+                if (callback) {
+                    callback(ok);
+                }
+            });  
+        }  
+    }
+
+   sendImplementation(data, callback) {    
+        if (this._connectionId) {
+            window.electronAPI.udpSend(data).then(response => {
+                var result = 0;
+                var sent = response.bytesWritten;
+                if (response.error) {
+                    console.log("Serial write error: " + response.msg);
+                    result = 1;
+                    sent = 0;
+                }
+                if (callback) {
+                    callback({
+                        bytesSent: sent,
+                        resultCode: result
+                    });
+                }
+            });
         }
-
-        this._connectionIP = "";
-        this._connectionPort = 0;
-
-       if (callback) {
-           callback(ret);
-       }
     }
-
-   sendImplementation(data, callback) {;
-    
-    try {
-        socket.send(Buffer.from(data), this._connectionPort, this._connectionIP, (error) => {  
-            var result = 0;
-            var sent = data.byteLength;
-            if (error) {
-                result = 1;
-                sent = 0;
-                console.log("Serial wrire error: " + error)
-            }
-            if (callback) {
-                callback({
-                    bytesSent: sent,
-                    resultCode: result
-                });
-            }
-        });
-    } catch (error) {
-        console.log("UDP write error: " +  error)
-    }
-   }
 
     addOnReceiveCallback(callback){
         this._onReceiveErrorListeners.push(callback);

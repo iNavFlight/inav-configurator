@@ -21,7 +21,7 @@ import { SITLProcess } from './sitl';
 import update from './globalUpdates';
 import BitHelper from './bitHelper';
 import BOARD from './boards';
-import jBox from './libraries/jBox/jBox.min';
+import jBox from 'jbox';
 import groundstation from './groundstation';
 import ltmDecoder from './ltmDecoder';
 import mspDeduplicationQueue from './msp/mspDeduplicationQueue';
@@ -470,6 +470,7 @@ var SerialBackend = (function () {
                 FC.PIDs.push(new Array(4));
             }
 
+            
             interval.add('msp-load-update', function () {
                 $('#msp-version').text("MSP version: " + MSP.protocolVersion.toFixed(0));
                 $('#msp-load').text("MSP load: " + mspQueue.getLoad().toFixed(1));

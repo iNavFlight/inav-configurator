@@ -1,3 +1,5 @@
+import './style.css'
+
 document.addEventListener("DOMContentLoaded", () => {
     window.electronAPI.bleScan(data => {
         data.forEach(device => {

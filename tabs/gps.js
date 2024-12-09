@@ -1,6 +1,21 @@
 'use strict';
 
 import semver from 'semver';
+import Map from 'ol/Map.js';
+import OSM from 'ol/source/OSM.js';
+import TileWMS from 'ol/source/TileWMS'
+import BingMaps from 'ol/source/BingMaps'
+import TileLayer from 'ol/layer/Tile.js';
+import View from 'ol/View.js'
+import { fromLonLat } from 'ol/proj';
+import Style from 'ol/style/Style'
+import Icon from 'ol/style/Icon';
+import Text from 'ol/style/Text';
+import Fill from 'ol/style/Fill';
+import Point from 'ol/geom/Point.js';
+import Feature from 'ol/format/Feature';
+import VectorSource from 'ol/source/Vector.js';
+import VectorLayer from 'ol/layer/Vector.js';
 
 import MSPChainerClass from './../js/msp/MSPchainer';
 import mspHelper from './../js/msp/MSPHelper';
@@ -14,9 +29,10 @@ import Settings from './../js/settings';
 import serialPortHelper from './../js/serialPortHelper';
 import features from './../js/feature_framework';
 import { globalSettings } from './../js/globalSettings';
-import jBox from './../js/libraries/jBox/jBox.min';
+import jBox from 'jbox';
 import SerialBackend from '../js/serial_backend';
 import ublox from '../js/ublox/UBLOX';
+import dialog from '../js/dialog';
 
 
 TABS.gps = {};
@@ -174,39 +190,39 @@ TABS.gps.initialize = function (callback) {
 
         gps_ubx_sbas_e.val(FC.MISC.gps_ubx_sbas);
 
-        let mapView = new ol.View({
-            center: ol.proj.fromLonLat([0, 0]),
+        let mapView = new View({
+            center: [0, 0],
             zoom: 15
         });
 
         let mapLayer;
 
         if (globalSettings.mapProviderType == 'bing') {
-            mapLayer = new ol.source.BingMaps({
+            mapLayer = new BingMaps({
                 key: globalSettings.mapApiKey,
                 imagerySet: 'AerialWithLabels',
                 maxZoom: 19
             });
         } else if (globalSettings.mapProviderType == 'mapproxy') {
-            mapLayer = new ol.source.TileWMS({
+            mapLayer = new TileWMS({
                 url: globalSettings.proxyURL,
                 params: { 'LAYERS': globalSettings.proxyLayer }
             })
         } else {
-            mapLayer = new ol.source.OSM();
+            mapLayer = new OSM();
         }
 
         $("#center_button").on('click', function () {
             let lat = FC.GPS_DATA.lat / 10000000;
             let lon = FC.GPS_DATA.lon / 10000000;
-            let center = ol.proj.fromLonLat([lon, lat]);
+            let center = fromLonLat([lon, lat]);
             mapView.setCenter(center);
         });
 
-        mapHandler = new ol.Map({
-            target: document.getElementById('gps-map'),
+        mapHandler = new Map({
+            target: 'gps-map',
             layers: [
-                new ol.layer.Tile({
+                new TileLayer({
                     source: mapLayer
                 })
             ],
@@ -243,7 +259,7 @@ TABS.gps.initialize = function (callback) {
             }
         });
 
-        let center = ol.proj.fromLonLat([0, 0]);
+        let center = fromLonLat([0, 0]);
         mapView.setCenter(center);
         mapView.setZoom(2);
 
@@ -298,32 +314,32 @@ TABS.gps.initialize = function (callback) {
             //Update map
             if (FC.GPS_DATA.fix >= 2) {
 
-                let center = ol.proj.fromLonLat([lon, lat]);
+                let center = fromLonLat([lon, lat]);
 
                 if (!cursorInitialized) {
                     cursorInitialized = true;
 
-                    iconStyle = new ol.style.Style({
-                        image: new ol.style.Icon(({
+                    iconStyle = new Style({
+                        image: new Icon(({
                             anchor: [0.5, 1],
                             opacity: 1,
                             scale: 0.5,
-                            src: path.join(__dirname, './../images/icons/cf_icon_position.png')
+                            src: require('./../images/icons/map/cf_icon_position.png').default
                         }))
                     });
 
                     let currentPositionLayer;
-                    iconGeometry = new ol.geom.Point(ol.proj.fromLonLat([0, 0]));
-                    iconFeature = new ol.Feature({
+                    iconGeometry = new Point(fromLonLat([0, 0]));
+                    iconFeature = new Feature({
                         geometry: iconGeometry
                     });
 
                     iconFeature.setStyle(iconStyle);
 
-                    let vectorSource = new ol.source.Vector({
+                    let vectorSource = new VectorSource({
                         features: [iconFeature]
                     });
-                    currentPositionLayer = new ol.layer.Vector({
+                    currentPositionLayer = new VectorLayer ({
                         source: vectorSource
                     });
 
@@ -353,9 +369,9 @@ TABS.gps.initialize = function (callback) {
                 if (!vehiclesCursorInitialized) {
                     vehiclesCursorInitialized = true;
 
-                    vehicleVectorSource = new ol.source.Vector({});
+                    vehicleVectorSource = new VectorSource({});
 
-                    let vehicleLayer = new ol.layer.Vector({
+                    let vehicleLayer = new VectorLayer({
                         source: vehicleVectorSource
                     });
 
@@ -363,28 +379,28 @@ TABS.gps.initialize = function (callback) {
                 }
 
                 if (vehicle.lat != 0 && vehicle.lon != 0 && vehicle.ttl > 0) {
-                    let vehicleIconStyle = new ol.style.Style({
-                        image: new ol.style.Icon(({
+                    let vehicleIconStyle = new Style({
+                        image: new Icon(({
                             opacity: 1,
                             rotation: vehicle.headingDegrees * (Math.PI / 180),
                             scale: 0.8,
                             anchor: [0.5, 0.5],
-                            src: path.join(__dirname, './../resources/adsb/' + ADSB_VEHICLE_TYPE[vehicle.emitterType].icon),
+                            src: require('./../resources/adsb/' + ADSB_VEHICLE_TYPE[vehicle.emitterType].icon).default,
                         })),
-                        text: new ol.style.Text(({
+                        text: new Text(({
                             text: vehicle.callsign,
                             textAlign: 'center',
                             textBaseline: "bottom",
                             offsetY: +40,
                             padding: [2, 2, 2, 2],
                             backgroundFill: '#444444',
-                            fill: new ol.style.Fill({color: '#ffffff'}),
+                            fill: new Fill({color: '#ffffff'}),
                         })),
                     });
 
 
-                    let iconGeometry = new ol.geom.Point(ol.proj.fromLonLat([vehicle.lon / 10000000, vehicle.lat / 10000000]));
-                    let iconFeature = new ol.Feature({
+                    let iconGeometry = new Point(fromLonLat([vehicle.lon / 10000000, vehicle.lat / 10000000]));
+                    let iconFeature = new Feature({
                         geometry: iconGeometry,
                         name: vehicle.callsign,
                         type: 'adsb',
@@ -481,7 +497,7 @@ TABS.gps.initialize = function (callback) {
             if(globalSettings.assistnowApiKey != null && globalSettings.assistnowApiKey != '') {
                 ublox.loadAssistnowOnline(processUbloxData);
            } else {
-                GUI.alert("Assistnow Token not set!");
+                dialog.alert("Assistnow Token not set!");
             }
         });
 
@@ -489,7 +505,7 @@ TABS.gps.initialize = function (callback) {
             if(globalSettings.assistnowApiKey != null && globalSettings.assistnowApiKey != '') {
                 ublox.loadAssistnowOffline(processUbloxData);
             } else {
-                GUI.alert("Assistnow Token not set!");
+                dialog.alert("Assistnow Token not set!");
             }
         });
 

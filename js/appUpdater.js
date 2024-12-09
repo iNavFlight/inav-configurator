@@ -3,7 +3,7 @@
 import semver from 'semver';
 
 import { GUI } from './gui';
-import jBox from './libraries/jBox/jBox.min';
+import jBox from 'jbox';
 import i18n from './localization';
 
 var appUpdater = appUpdater || {};

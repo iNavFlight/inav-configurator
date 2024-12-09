@@ -5,6 +5,7 @@
  * Check out the docs at https://github.com/yuku/jquery-textcomplete/tree/v1/doc
  */
 
+import 'jquery-textcomplete';
 import FC from './fc';
 import CONFIGURATOR from './data_storage';
 import timeout from './timeouts';

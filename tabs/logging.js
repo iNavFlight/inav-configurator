@@ -8,6 +8,7 @@ import CONFIGURATOR from './../js/data_storage';
 import interval from './../js/intervals';
 import i18n from './../js/localization';
 import { zeroPad } from './../js/helpers';
+import dialog from '../js/dialog';
 
 
 TABS.logging = {};

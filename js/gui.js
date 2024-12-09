@@ -322,7 +322,7 @@ GUI_control.prototype.simpleBind = function () {
 
 GUI_control.prototype.load = function(html, callback) {
     const content = $('#content').addClass('loading');
-    content.html(html);
+    $(html).appendTo(content);
     if (callback) {
         callback();
     }
@@ -538,16 +538,6 @@ GUI_control.prototype.update_dataflash_global = function () {
     }
 };
 
-/**
-* Don't use alert() or confirm() in Electron, it has a nasty bug: https://github.com/electron/electron/issues/31917
-*/ 
-GUI_control.prototype.alert = function(message) {
-    dialog.showMessageBoxSync({ message: message, icon: "./images/inav_icon_128.png" });
-}
-
-GUI_control.prototype.confirm = function(message) {
-    return dialog.showMessageBoxSync({ message: message, icon: "./images/inav_icon_128.png", buttons: ["Yes", "No"]}) == 0;
-}
 
 // initialize object into GUI variable
 var GUI = new GUI_control();

@@ -11,6 +11,7 @@ import Settings from './../js/settings';
 import i18n from './../js/localization';
 import { scaleRangeInt } from './../js/helpers';
 import interval from './../js/intervals';
+import dialog from '../js/dialog';
 
 TABS.pid_tuning = {
     rateChartHeight: 117
@@ -295,7 +296,7 @@ TABS.pid_tuning.initialize = function (callback) {
 
         $('.action-resetPIDs').on('click', function() {
 
-            if (GUI.confirm(i18n.getMessage('confirm_reset_pid'))) {
+            if (dialog.confirm(i18n.getMessage('confirm_reset_pid'))) {
                 MSP.send_message(MSPCodes.MSP_SET_RESET_CURR_PID, false, false, false);
                 GUI.updateActivatedTab();
             }
@@ -303,7 +304,7 @@ TABS.pid_tuning.initialize = function (callback) {
 
         $('.action-resetDefaults').on('click', function() {
 
-            if (GUI.confirm(i18n.getMessage('confirm_select_defaults'))) {
+            if (dialog.confirm(i18n.getMessage('confirm_select_defaults'))) {
                 mspHelper.setSetting("applied_defaults", 0, function() { 
                     mspHelper.saveToEeprom( function () {
                         GUI.log(i18n.getMessage('configurationEepromSaved'));

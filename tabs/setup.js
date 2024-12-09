@@ -2,6 +2,7 @@
 
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
+import './../js/libraries/jquery.flightindicators';
 
 import MSPChainerClass from './../js/msp/MSPchainer';
 import FC from './../js/fc';
@@ -14,6 +15,7 @@ import interval from './../js/intervals';
 import SerialBackend from './../js/serial_backend';
 import { mixer } from './../js/model';
 import BitHelper from './../js/bitHelper';
+import dialog from '../js/dialog';
 
 TABS.setup = {
     yaw_fix: 0.0
@@ -72,7 +74,7 @@ TABS.setup.initialize = function (callback) {
         self.initializeInstruments();
 
         $('a.resetSettings').on('click', function () {
-            if (GUI.confirm(i18n.getMessage('confirm_reset_settings'))) {
+            if (dialog.confirm(i18n.getMessage('confirm_reset_settings'))) {
                 MSP.send_message(MSPCodes.MSP_RESET_CONF, false, false, function () {
                     GUI.log(i18n.getMessage('initialSetupSettingsRestored'));
     
@@ -188,7 +190,7 @@ TABS.setup.initialize = function (callback) {
 };
 
 TABS.setup.initializeInstruments = function() {
-    var options = {size:90, showBox : false, img_directory: '/../images/flightindicators/'};
+    var options = {size:90, showBox : false, img_directory: './../../images/flightindicators/', webpack: true};
     var attitude = $.flightIndicator('#attitude', 'attitude', options);
     var heading = $.flightIndicator('#heading', 'heading', options);
 

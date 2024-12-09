@@ -251,9 +251,9 @@ TABS.outputs.initialize = function (callback) {
         const isMotorInverted = self.motorDirectionInverted;
         const isReversed = isMotorInverted && (FC.MIXER_CONFIG.platformType == PLATFORM.MULTIROTOR || FC.MIXER_CONFIG.platformType == PLATFORM.TRICOPTER);
 
-        const path = './resources/motor_order/'
-            + mixer.getById(val).image + (isReversed ? "_reverse" : "") + '.svg';
-        $('.mixerPreview img').attr('src', path);
+        import('./../resources/motor_order/' + mixer.getById(val).image + (isReversed ? "_reverse" : "") + '.svg').then(({default: path}) => {
+            $('.mixerPreview img').attr('src', path);
+        });
     }
 
     function process_servos() {

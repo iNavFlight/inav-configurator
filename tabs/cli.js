@@ -9,10 +9,11 @@ import i18n from './../js/localization';
 import { globalSettings } from './../js/globalSettings';
 import CliAutoComplete from './../js/CliAutoComplete';
 import { ConnectionType } from './../js/connection/connection';
-import jBox from './../js/libraries/jBox/jBox.min';
+import jBox from 'jbox';
 import mspDeduplicationQueue from './../js/msp/mspDeduplicationQueue';
 import FC from './../js/fc';
 import { generateFilename } from './../js/helpers';
+import dialog from '../js/dialog';
 
 TABS.cli = {
     lineDelayMs: 50,
@@ -169,7 +170,7 @@ TABS.cli.initialize = function (callback) {
                     return;
                 }
 
-                fs.writeFile(result.filePath, self.outputHistory, (err) => {
+                window.electronAPI.writeFile(result.filePath, self.outputHistory).then(err => {
                     if (err) {
                         GUI.log(i18n.getMessage('ErrorWritingFile'));
                         return console.error(err);
@@ -253,13 +254,13 @@ TABS.cli.initialize = function (callback) {
                 }
 
                 if (result.filePaths.length == 1) {
-                    fs.readFile(result.filePaths[0], (err, data) => {
-                        if (err) {
+                    window.electronAPI.readFile(result.filePaths[0]).then(response => {
+                        if (response.error) {
                             GUI.log(i18n.getMessage('ErrorReadingFile'));
-                            return console.error(err);
-                        }
+                            console.error(response.error);
+                            return;                        }
 
-                        previewCommands(data);
+                        previewCommands(response.data);
                     });
                 }
             }).catch (err => {

@@ -18,6 +18,8 @@ import mspHelper from './../js/msp/MSPHelper';
 import STM32 from './../js/protocols/stm32';
 import STM32DFU from './../js/protocols/stm32usbdfu';
 import mspDeduplicationQueue from './../js/msp/mspDeduplicationQueue';
+import store from './../js/store';
+import dialog from '../js/dialog.js';
 
 TABS.firmware_flasher = {};
 TABS.firmware_flasher.initialize = function (callback) {
@@ -40,15 +42,18 @@ TABS.firmware_flasher.initialize = function (callback) {
 
         function parse_hex(str, callback) {
             // parsing hex in different thread
-            var worker = new Worker('./js/workers/hex_parser.js');
+            import('./../js/workers/hex_parser.js').then(({default: code}) => {
+                const blob = new Blob([code], {type: 'application/javascript'})
+                const worker = new Worker(URL.createObjectURL(blob))
 
-            // "callback"
-            worker.onmessage = function (event) {
-                callback(event.data);
-            };
+                // "callback"
+                worker.onmessage = function (event) {
+                    callback(event.data);
+                };
 
-            // send data/string over for processing
-            worker.postMessage(str);
+                // send data/string over for processing
+                worker.postMessage(str);
+            });
         }
 
         function parseDevFilename(filename) {
@@ -352,16 +357,16 @@ TABS.firmware_flasher.initialize = function (callback) {
 
                 console.log('Loading file from: ' + filename);
 
-                fs.readFile(filename, (err, data) => {
+                window.electronAPI.readFile(filename).then(response => {
 
-                    if (err) {
-                        console.log("Error loading local file", err);
+                    if (response.error) {
+                        console.log("Error loading local file", response.erroe);
                         return;
                     }
 
                     console.log('File loaded');
 
-                    parse_hex(data.toString(), function (data) {
+                    parse_hex(response.data.toString(), function (data) {
                         parsed_hex = data;
 
                         if (parsed_hex) {

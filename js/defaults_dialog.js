@@ -9,7 +9,7 @@ import MSPChainerClass from './msp/MSPchainer';
 import features from './feature_framework';
 import periodicStatusUpdater from './periodicStatusUpdater';
 import { mixer } from './model';
-import jBox from './libraries/jBox/jBox.min';
+import jBox from 'jbox';
 import i18n from './localization';
 import defaultsDialogData from './defaults_dialog_entries.js';
 import Settings from './settings.js';
@@ -118,11 +118,11 @@ var defaultsDialog = (function () {
 
             $content.unbind();
 
-            $.get("./wizard/" + stepName + ".html", function (data) {
+            import('./../wizard/' + stepName + '.html').then(({default: data}) => {
                 $content.html("");
                 $(data).appendTo($content);
 
-                $.get("./wizard/buttons.html", function (data) {
+                import('./../wizard/buttons.html').then(({default: data}) => {
                     $(data).appendTo($content);
 
                     $content.on('click', '#wizard-next', function () {

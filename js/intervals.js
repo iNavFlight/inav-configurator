@@ -40,7 +40,7 @@ var interval = function () {
             code();
             data.fired++;
         }, interval);
-
+        
         privateScope.intervals.push(data);
 
         return data;

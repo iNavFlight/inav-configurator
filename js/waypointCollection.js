@@ -1,6 +1,8 @@
 'use strict';
 
-//import {ol} from 'openlayers';
+import { getLength } from 'ol/sphere';
+import { LineString } from 'ol/geom';
+import { fromLonLat } from 'ol/proj';
 
 import MWNP from './mwnp';
 import Waypoint from './waypoint';
@@ -361,7 +363,7 @@ let WaypointCollection = function () {
                     point2measure.push([self.getWaypoint(nStart).getLatMap(), self.getWaypoint(nStart).getLonMap()]);
                 }
                 else {
-                    point2measure.push(ol.proj.fromLonLat([self.getWaypoint(nStart).getLonMap(), self.getWaypoint(nStart).getLatMap()]));
+                    point2measure.push(fromLonLat([self.getWaypoint(nStart).getLonMap(), self.getWaypoint(nStart).getLatMap()]));
                 }
                 altPoint2measure.push(self.getWaypoint(nStart).getAlt());
                 namePoint2measure.push(self.getWaypoint(nStart).getLayerNumber()+1);
@@ -410,7 +412,7 @@ let WaypointCollection = function () {
             let oldCoord = [];
             point2measure.forEach(function (coord) {
                 if (oldCoord != 'undefined' && oldCoord != []) {
-                    lengthLine.push(ol.Sphere.getLength(new ol.geom.LineString([oldCoord, coord])));
+                    lengthLine.push(getLength(new LineString([oldCoord, coord])));
                 }
                 oldCoord = coord;
             });

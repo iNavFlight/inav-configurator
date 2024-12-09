@@ -270,7 +270,5 @@ let Geozone = function (type, shape, minAltitude, maxAltitude, sealevelRef, radi
     }
 
     return self;
-
-    return self;
 }
 export { Geozone, GeozoneVertex, GeozoneType, GeozoneShapes, GeozoneFenceAction };

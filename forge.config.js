@@ -1,6 +1,6 @@
 const path = require('path');
 const fs = require('fs');
-const spawn = require('child_process')
+const spawn = require('child_process');
 
 module.exports = {
   packagerConfig: {
@@ -36,9 +36,17 @@ module.exports = {
               js: './js/configurator_main.js',
               name: 'main window',
               preload: {
-                js: './js/preload.js',
+                js: './js/main/preload.js',
               },
             },
+            {
+              html: './js/libraries/bluetooth-device-chooser/index.html',
+              js: './js/libraries/bluetooth-device-chooser/renderer.js',
+              name: 'bt device chooser',
+              preload: {
+                js: './js/libraries/bluetooth-device-chooser/preload.js',
+              }
+            }
           ],
         },
       },

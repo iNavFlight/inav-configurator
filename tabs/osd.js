@@ -1,9 +1,10 @@
 'use strict';
 
-import inflection from  'inflection';
+import { titleize } from  'inflection';
 import semver from 'semver';
 import mapSeries from 'promise-map-series';
-// import { dialog }  from "@electron/remote";
+import jBox from 'jbox';
+import { debounce } from 'throttle-debounce';
 
 import FC from './../js/fc';
 import { GUI, TABS } from './../js/gui';
@@ -14,7 +15,8 @@ import Settings from './../js/settings';
 import { globalSettings } from './../js/globalSettings';
 import { PortHandler } from './../js/port_handler';
 import i18n from './../js/localization';
-import jBox from './../js/libraries/jBox/jBox.min';
+import store from './../js/store';
+import dialog from './../js/dialog';
 
 var SYM = SYM || {};
 SYM.LAST_CHAR = 225; // For drawing the font preview
@@ -267,9 +269,16 @@ FONT.openFontFile = function ($preview) {
             }
             
             if (result.filePaths.length == 1) {
-                const fontData = fs.readFileSync(result.filePaths[0], {flag: "r"});
-                FONT.parseMCMFontFile(fontData.toString());
-                resolve();
+                    window.electronAPI.readFile(result.filePaths[0]).then(response => {
+                    if (response.error) {
+                        GUI.log(i18n.getMessage('ErrorReadingFile'));
+                        console.log(response.error);
+                        return;
+                    }
+
+                    FONT.parseMCMFontFile(response.data.toString());
+                    resolve();
+                });
             }
         }).catch (err => {
             console.log(err);
@@ -2333,16 +2342,19 @@ OSD.reload = function(callback) {
                 MSP.promise(MSPCodes.MSP2_INAV_OSD_PREFERENCES).then(function (resp) {
                     OSD.data.supported = true;
                     OSD.msp.decodePreferences(resp);
-                    done();
+                    
+                    MSP.promise(MSPCodes.MSP2_INAV_CUSTOM_OSD_ELEMENTS).then(() => { 
+                        mspHelper.loadOsdCustomElements(() => {
+                            createCustomElements();
+                            done();
+                        });
+                    });
                 });
             });
         });
     });
 
-    if(semver.gte(FC.CONFIG.flightControllerVersion, '7.1.0'))
-    {
-        MSP.send_message(MSPCodes.MSP2_INAV_CUSTOM_OSD_ELEMENTS);
-    }
+    
 };
 
 OSD.updateSelectedLayout = function(new_layout) {
@@ -2845,7 +2857,7 @@ OSD.GUI.updateFields = function() {
             if (nameMessage) {
                 name = nameMessage;
             } else {
-                name = inflection.titleize(name);
+                name = titleize(name);
             }
             var searchTerm = $('.osd_search').val();
             if (searchTerm.length > 0 && !name.toLowerCase().includes(searchTerm.toLowerCase())) {
@@ -2900,7 +2912,7 @@ OSD.GUI.updateFields = function() {
                     $('<input type="number" class="' + item.id + ' position"></input>')
                         .data('item', item)
                         .val(itemData.position)
-                        .on('change', $.debounce(250, function (e) {
+                        .on('change', debounce(250, function (e) {
                             var item = $(this).data('item');
                             var itemData = OSD.data.items[item.id];
                             itemData.position = parseInt($(this).val());
@@ -3252,7 +3264,7 @@ OSD.GUI.updatePreviews = function() {
                 var nameMessage = i18n.getMessage(nameKey);
 
                 if (!nameMessage) {
-                    nameMessage = inflection.titleize(item.name);
+                    nameMessage = titleize(item.name);
                 }
 
                 $img.addClass('field-' + item.id)
@@ -3559,12 +3571,14 @@ TABS.osd.initialize = function (callback) {
                 }
                 $fontPicker.removeClass('active');
                 $(this).addClass('active');
-                $.get('./resources/osd/analogue/' + $(this).data('font-file') + '.mcm', function (data) {
+                store.set('osd_font', $(this).data('font-file'));
+                
+                import('./../resources/osd/analogue/' + $(this).data('font-file') + '.mcm').then(({default: data}) => {
                     FONT.parseMCMFontFile(data);
                     FONT.preview($preview);
                     OSD.GUI.update();
                 });
-                store.set('osd_font', $(this).data('font-file'));
+                
             });
     
             // load the last selected font when we change tabs
@@ -3625,10 +3639,6 @@ TABS.osd.initialize = function (callback) {
             $('#useCraftnameForMessages').on('change', function() {
                 OSD.GUI.updateDjiMessageElements(this.checked);
             });
-    
-            if(semver.gte(FC.CONFIG.flightControllerVersion, '7.1.0')) {
-                mspHelper.loadOsdCustomElements(createCustomElements);
-            }
 
             GUI.content_ready(callback);
         })));

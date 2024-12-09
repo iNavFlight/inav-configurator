@@ -4,6 +4,7 @@ import './../injected_methods';
 import i18n from './../localization';
 import { GUI } from './../gui';
 import { globalSettings } from '../globalSettings';
+import dialog from '../dialog';
 
 
 var ublox = (function () {
@@ -165,7 +166,7 @@ var ublox = (function () {
 
 
     function loadError(event) {
-        GUI.alert(i18n.getMessage("gpsAssistnowLoadDataError"));
+        dialog.alert(i18n.getMessage("gpsAssistnowLoadDataError"));
         console.log(i18n.getMessage("gpsAssistnowLoadDataError") + ':' + event.toString());
     }
 
@@ -191,7 +192,7 @@ var ublox = (function () {
         }
 
         getBinaryData(url, processOfflineData, loadError);
-        //$.get(url, processOfflineData).fail(function() {GUI.alert("Error loading Offline data")});
+        //$.get(url, processOfflineData).fail(async function() {dialog.alert("Error loading Offline data")});
     };
 
     self.loadAssistnowOnline = function(callback) {

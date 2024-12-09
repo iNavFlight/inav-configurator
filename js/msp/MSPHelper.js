@@ -2859,7 +2859,6 @@ var mspHelper = (function () {
     };
 
     self.loadOutputMapping = function (callback) {
-        alert('Obsolete MSPHelper.loadOutputMapping call');
         MSP.send_message(MSPCodes.MSPV2_INAV_OUTPUT_MAPPING, false, false, callback);
     };
 

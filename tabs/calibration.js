@@ -9,7 +9,7 @@ import FC from './../js/fc';
 import timeout from './../js/timeouts';
 import interval from './../js/intervals';
 import i18n from './../js/localization';
-import jBox from './../js/libraries/jBox/jBox.min';
+import jBox from 'jbox';
 
 TABS.calibration = {};
 

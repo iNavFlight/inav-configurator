@@ -51,7 +51,7 @@ var SitlSerialPortUtils = {
     },
 
     getDevices: function(callback) {
-        window.electronAPI.listSerialDevices.then(devices => callback(devices));
+        window.electronAPI.listSerialDevices().then(devices => callback(devices));
     },
 
     pollSerialPorts: function(callback) {
@@ -131,7 +131,6 @@ var SITLProcess = {
             });
  
         } else {
-            GUI.alert(GUI.operating_system);
             return;
         }
 

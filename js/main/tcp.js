@@ -1,50 +1,55 @@
 // Runs in main thread
 
-import net from 'node:net'
+import net from 'net'
 
 const tcp = {
-    _sockets: [],
+    _socket: null,
     _id: 1,
     connect: function(host, port, window, setNoDelay = true) {
-        return new Promise(resolve => {        
+        return new Promise(resolve => {     
             try {
-                const socket = net.connect({host: host, port: port}, () =>  {
-                    socket.setNoDelay(setNoDelay);
-                });
-                this._sockets[this._id] = socket;
-
-                socket.on('error', error => {
-                    window.webContents.send('tcpError', error); 
+                this._socket = net.connect({host: host, port: port}, () => {    
+                    this._socket.setNoDelay(setNoDelay); 
                 });
 
-                socket.on('end', () => {
-                    window.webContents.send('tcpEnd'); 
+                this._socket.on('error', error => {
+                    if (!window.isDestroyed()) {
+                        window.webContents.send('tcpError', error); 
+                    }
                 });
 
-                socket.on('data', buffer => {
-                    window.webContents.send('tcpData', buffer); 
+                this._socket.on('end', () => {
+                    if (!window.isDestroyed()) {
+                        window.webContents.send('tcpEnd');
+                    }
                 });
 
-                resolve ({error: false, id: this._id++});
+                this._socket.on('data', buffer => {
+                    if (!window.isDestroyed()) {
+                        window.webContents.send('tcpData', buffer);
+                    }
+                });
+                resolve({error: false, id: this._id++});  
+                
             } catch (err) {
                 resolve ({error: true, errorMsg: err});
             }
         });
     },
-    close: function(id) {
-        const socket = this._sockets[id];
-        if (socket && !socket.destroyed) {
-            socket.end();
+    close: function() {
+        if (this._socket && !this._socket.destroyed) {
+            this._socket.end();
         }
-        this._sockets[id - 1] = undefined;
+        this._socket = null;
     },
-    send: function(id, data) {
+    send: function(data) {
         return new Promise(resolve => {  
-            const socket = this._sockets[id];
-            if (socket && !socket.destroyed) {
-                socket.write(Buffer.from(data), () => {
-                    resolve(data.length);
+            if (this._socket && !this._socket.destroyed) {
+                this._socket.write(Buffer.from(data), () => {
+                    resolve({error: false, bytesWritten: data.byteLength});
                 });
+            } else {
+                resolve({error: true, msg: "Socket closed or invalid"});
             }
         });
     }

@@ -1,3 +1,5 @@
+const { image } = require("d3");
+
 /*
 * jQuery Flight Indicators plugin
 * By Sébastien Matton (seb_matton@hotmail.com)
@@ -5,8 +7,26 @@
 *
 * https://github.com/sebmatton/jQuery-Flight-Indicators
 */
+
+const imageNames = [
+	'altitude_pressure.svg',
+	'altitude_ticks.svg',
+	'fi_box.svg',
+	'fi_circle.svg',
+	'fi_needle_small.svg',
+	'fi_tc_airplane.svg',
+	'heading_mechanics.svg',
+	'heading_yaw.svg',
+	'horizon_back.svg',
+	'horizon_ball.svg',
+	'horizon_circle.svg',
+	'horizon_mechanics.svg',
+	'turn_coordinator.svg',
+	'vertical_mechanics.svg'
+];
+
 (function($) {
-	function FlightIndicator( placeholder, type, options ) {
+	function FlightIndicator( placeholder, type, options, images ) {
 		// Initial configuration
 		var attitude = this;
 		var settings = $.extend({
@@ -20,7 +40,7 @@
 			altitude: 0,
 			pressure: 1000,
 			showBox : true,
-			img_directory : 'img/'
+			img_directory : 'img/',
 		}, options );
 
 		var constants = {
@@ -28,34 +48,34 @@
 			vario_bound : 1.95,
 			airspeed_bound_l : 0,
 			airspeed_bound_h : 160
-		}
+		}	
 
 		// Creation of the instrument
 		placeholder.each(function(){
 			switch(type){
 				case 'heading':
-					$(this).html('<div class="instrument heading"><img src="' + settings.img_directory + 'fi_box.svg" class="background box" alt="" /><div class="heading box"><img src="' + settings.img_directory + 'heading_yaw.svg" class="box" alt="" /></div><div class="mechanics box"><img src="' + settings.img_directory + 'heading_mechanics.svg" class="box" alt="" /><img src="' + settings.img_directory + 'fi_circle.svg" class="box" alt="" /></div></div>');
+					$(this).html('<div class="instrument heading"><img src="' + images.fi_box + '" class="background box" alt="" /><div class="heading box"><img src="' + images.heading_yaw + '" class="box" alt="" /></div><div class="mechanics box"><img src="' + images.heading_mechanics + '" class="box" alt="" /><img src="' + images.fi_circle + '" class="box" alt="" /></div></div>');
 					_setHeading(settings.heading);
 				break;
 				case 'variometer':
-					$(this).html('<div class="instrument vario"><img src="' + settings.img_directory + 'fi_box.svg" class="background box" alt="" /><img src="' + settings.img_directory + 'vertical_mechanics.svg" class="box" alt="" /><div class="vario box"><img src="' + settings.img_directory + 'fi_needle.svg" class="box" alt="" /></div><div class="mechanics box"><img src="' + settings.img_directory + 'fi_circle.svg" class="box" alt="" /></div></div>');
+					$(this).html('<div class="instrument vario"><img src="' + images.fi_box + '" class="background box" alt="" /><img src="' + images.vertical_mechanics + '" class="box" alt="" /><div class="vario box"><img src="' + images.fi_needle + '" class="box" alt="" /></div><div class="mechanics box"><img src="' + images.fi_circle + '" class="box" alt="" /></div></div>');
 					_setVario(settings.vario);
 				break;
 				case 'turn_coordinator':
-					$(this).html('<div class="instrument turn_coordinator"><img src="' + settings.img_directory + 'fi_box.svg" class="background box" alt="" /><img src="' + settings.img_directory + 'turn_coordinator.svg" class="box" alt="" /><div class="turn box"><img src="' + settings.img_directory + 'fi_tc_airplane.svg" class="box" alt="" /></div><div class="mechanics box"><img src="' + settings.img_directory + 'fi_circle.svg" class="box" alt="" /></div></div>');
+					$(this).html('<div class="instrument turn_coordinator"><img src="' + images.fi_box + '" class="background box" alt="" /><img src="' + images.turn_coordinator + '" class="box" alt="" /><div class="turn box"><img src="' + images.fi_tc_airplane + '" class="box" alt="" /></div><div class="mechanics box"><img src="' + images.fi_circle + '" class="box" alt="" /></div></div>');
 					_setTurn(settings.turn);
 				break;
 				case 'airspeed':
-					$(this).html('<div class="instrument airspeed"><img src="' + settings.img_directory + 'fi_box.svg" class="background box" alt="" /><img src="' + settings.img_directory + 'speed_mechanics.svg" class="box" alt="" /><div class="speed box"><img src="' + settings.img_directory + 'fi_needle.svg" class="box" alt="" /></div><div class="mechanics box"><img src="' + settings.img_directory + 'fi_circle.svg" class="box" alt="" /></div></div>');
+					$(this).html('<div class="instrument airspeed"><img src="' + images.fi_box + '" class="background box" alt="" /><img src="' + images.speed_mechanics + '" class="box" alt="" /><div class="speed box"><img src="' + images.fi_needle + '" class="box" alt="" /></div><div class="mechanics box"><img src="' + images.fi_circle + '" class="box" alt="" /></div></div>');
 					_setAirSpeed(settings.airspeed);
 				break
 				case 'altimeter':
-					$(this).html('<div class="instrument altimeter"><img src="' + settings.img_directory + 'fi_box.svg" class="background box" alt="" /><div class="pressure box"><img src="' + settings.img_directory + 'altitude_pressure.svg" class="box" alt="" /></div><img src="' + settings.img_directory + 'altitude_ticks.svg" class="box" alt="" /><div class="needleSmall box"><img src="' + settings.img_directory + 'fi_needle_small.svg" class="box" alt="" /></div><div class="needle box"><img src="' + settings.img_directory + 'fi_needle.svg" class="box" alt="" /></div><div class="mechanics box"><img src="' + settings.img_directory + 'fi_circle.svg" class="box" alt="" /></div></div>');
+					$(this).html('<div class="instrument altimeter"><img src="' + images.fi_box + '" class="background box" alt="" /><div class="pressure box"><img src="' + images.altitude_pressure + '" class="box" alt="" /></div><img src="' + images.altitude_ticks + '" class="box" alt="" /><div class="needleSmall box"><img src="' + images.fi_needle_small + '" class="box" alt="" /></div><div class="needle box"><img src="' + images.fi_needle + '" class="box" alt="" /></div><div class="mechanics box"><img src="' + images.fi_circle + '" class="box" alt="" /></div></div>');
 					_setAltitude(settings.altitude);
 					_setPressure(settings.pressure);
 				break;
 				default:
-					$(this).html('<div class="instrument attitude"><img src="' + settings.img_directory + 'fi_box.svg" class="background box" alt="" /><div class="roll box"><img src="' + settings.img_directory + 'horizon_back.svg" class="box" alt="" /><div class="pitch box"><img src="' + settings.img_directory + 'horizon_ball.svg" class="box" alt="" /></div><img src="' + settings.img_directory + 'horizon_circle.svg" class="box" alt="" /></div><div class="mechanics box"><img src="' + settings.img_directory + 'horizon_mechanics.svg" class="box" alt="" /><img src="' + settings.img_directory + 'fi_circle.svg" class="box" alt="" /></div></div>');
+					$(this).html('<div class="instrument attitude"><img src="' + images.fi_box + '" class="background box" alt="" /><div class="roll box"><img src="' + images.horizon_back + '" class="box" alt="" /><div class="pitch box"><img src="' + images.horizon_ball + '" class="box" alt="" /></div><img src="' + images.horizon_circle + '" class="box" alt="" /></div><div class="mechanics box"><img src="' + images.horizon_mechanics + '" class="box" alt="" /><img src="' + images.fi_circle + '" class="box" alt="" /></div></div>');
 					_setRoll(settings.roll);
 					_setPitch(settings.pitch);
 			}
@@ -162,7 +182,18 @@
 
 	// Extension to jQuery
 	$.flightIndicator = function(placeholder, type, options){
-		var flightIndicator = new FlightIndicator($(placeholder), type, options)
+		var images = {};
+		imageNames.forEach(image => {
+			const name = image.split('.')[0];
+			if (options.webpack) {	
+				const svg = require(`./../../images/flightindicators/${image}`).default;
+				images[name] = svg;
+			} else {
+				images[name] = `${options.img_directory}${image}`
+			}
+		});
+
+		var flightIndicator = new FlightIndicator($(placeholder), type, options, images)
 		return flightIndicator;
 	}
 
