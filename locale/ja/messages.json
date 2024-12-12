@@ -6122,5 +6122,8 @@
     },
     "geozoneUnableToSave": {
         "message": "ジオゾーンを保存できません: 無効なゾーン"
+    },
+    "currentLanguage": {
+        "message": "ja"
     }
 }
