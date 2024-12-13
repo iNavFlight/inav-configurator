@@ -6156,5 +6156,8 @@
     },
     "adsbHeartbeatTotalMessages": {
         "message": "Heartbeat msgs"
+    },
+    "currentLanguage": {
+        "message": "en"
     }
 }
