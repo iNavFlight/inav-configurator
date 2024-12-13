@@ -173,6 +173,11 @@ i18n.localize = function (reTranslate = false) {
             const element = $(this);
             element.attr('placeholder', translate(element.attr('i18n_placeholder')));
         });
+
+        $('[i18n_lang]').each(function() {
+            const element = $(this);
+            element.attr('lang', translate(element.attr('i18n_lang')));
+        });
     } else {
 
         $('[i18n]:not(.i18n-replaced)').each(function() {
@@ -234,6 +239,13 @@ i18n.localize = function (reTranslate = false) {
             element.attr('placeholder', translate(element.attr('i18n_placeholder')));
             element.addClass('i18n_placeholder-replaced');
         });
+
+        $('[i18n_lang]:not(.i18n_lang-replaced)').each(function() {
+            const element = $(this);
+            element.attr('lang', translate(element.attr('i18n_lang')));
+            element.addClass('i18n_lang-replaced');
+        });
+
     }
 
     return localized;
