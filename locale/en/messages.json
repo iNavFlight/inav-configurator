@@ -18,6 +18,10 @@
         "message": "日本語",
         "_comment": "Don't translate!"
     },    
+    "language_zh_CN": {
+        "message": "简体中文",
+        "_comment": "Don't translate!"
+    },
     "language": {
         "message": "Language"
     },
@@ -5704,7 +5708,7 @@
         "message": "No dataflash <br>chip found"
     },
     "sensorDataFlashFreeSpace": {
-        "message": "Dataflash: free space"
+        "message": "Dataflash: <br />free "
     },
     "mixerProfile1": {
         "message": "Mixer Profile 1"
@@ -6156,5 +6160,8 @@
     },
     "adsbHeartbeatTotalMessages": {
         "message": "Heartbeat msgs"
+    },
+    "currentLanguage": {
+        "message": "en"
     }
 }

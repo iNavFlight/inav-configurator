@@ -462,6 +462,7 @@ var SerialBackend = (function () {
             $('#sensor-status').show();
             $('#portsinput').hide();
             $('#dataflash_wrapper_global').show();
+            $('#profiles_wrapper_global').show();
 
             /*
             * Init PIDs bank with a length that depends on the version
@@ -481,7 +482,6 @@ var SerialBackend = (function () {
 
             interval.add('global_data_refresh', periodicStatusUpdater.run, periodicStatusUpdater.getUpdateInterval(CONFIGURATOR.connection.bitrate), false);
         });
-
     }
 
     privateScope.onClosed = function (result) {
@@ -497,6 +497,7 @@ var SerialBackend = (function () {
         $('#sensor-status').hide();
         $('#portsinput').show();
         $('#dataflash_wrapper_global').hide();
+        $('#profiles_wrapper_global').hide();
         $('#quad-status_wrapper').hide();
 
         //updateFirmwareVersion();

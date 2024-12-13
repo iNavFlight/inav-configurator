@@ -16,6 +16,10 @@
     },
     "language_ja": {
         "message": "日本語",
+         "_comment": "Don't translate!"
+      },
+    "language_zh_CN": {
+        "message": "简体中文",
         "_comment": "Don't translate!"
     },
     "language": {
@@ -565,7 +569,7 @@
         "message": "Калібрувати Магнітометр"
     },
     "initialSetupCalibrateMagText": {
-        "message": "Покрутіть мультиротор принаймні <strong>360</strong> градусів по всіх 3-х осях обертання, у вас є 30 секунд, щоб виконати це завдання"
+        "message": "Покрутіть мультикоптер принаймні <strong>360</strong> градусів по всіх 3-х осях обертання, у вас є 30 секунд, щоб виконати це завдання"
     },
     "initialSetupButtonReset": {
         "message": "Скинути налаштування"
@@ -1153,7 +1157,7 @@
         "message": "Протокол"
     },
     "configurationGPSUseGalileo": {
-        "message": "Використовувати супутники Galileo(ЄС)"
+        "message": "Використовувати супутники Galileo (ЄС)"
     },
     "configurationGPSUseBeidou": {
         "message": "Використовувати супутники BeiDou (Китай)"
@@ -1754,6 +1758,9 @@
     },
     "receiverRssiChannel": {
         "message": "Канал RSSI"
+    },
+    "receiverRssiSource": {
+        "message": "Джерело RSSI"
     },
     "receiverRefreshRateTitle": {
         "message": "Частота оновлення графіків"
@@ -2365,10 +2372,10 @@
         "message": "У вашому польотному контролері відсутній сумісний чіп пам'яті для зберігання даних."
     },
     "dataflashFirmwareUpgradeRequired": {
-        "message": "Для використання флеш-пам'яті польотника необхідна прошивка &gt;= 1.8.0."
+        "message": "Для використання флешпам'яті польотника необхідна прошивка &gt;= 1.8.0."
     },
     "dataflashButtonSaveFile": {
-        "message": "Зберегти флеш-пам'ять в файл..."
+        "message": "Зберегти флешпам'ять в файл..."
     },
     "dataflashButtonErase": {
         "message": "Стерти флешпамять"
@@ -2551,7 +2558,7 @@
         "message": "<strong>Відновлення / Втрата зв'язку<strong>"
     },
     "firmwareFlasherRecoveryText": {
-        "message": "Якщо ви втратили зв'язок з вашою платою, дотримуйтесь цих кроків, щоб відновити зв'язок: <ul><li>Вимкніть живлення</li><li>Увімкніть 'Польотник уже в режимі завантажувача', увімкніть 'Повне стирання чипа'.</li><li>З'єднайте контакти BOOT або утримуйте кнопку BOOT.</li><li>Увімкніть живлення (індикатор активності НЕ буде блимати, якщо все зроблено правильно).</li><li>Встановіть усі драйвери STM32 і Zadig, якщо це необхідно (див. розділ <a href=\"https://github.com/iNavFlight/inav/blob/master/docs/USB%20Flashing.md\"target=\"_blank\">Прошивка через USB</a> в документації INAV).</li><li>Закрийте конфігуратор, закрийте всі запущені екземпляри Chrome, закрийте всі програми Chrome, перезапустіть конфігуратор.</li><li>Відпустіть кнопку BOOT, якщо вона є на вашому польотному контролері.</li><li>Прошивайте правильною прошивкою (використовуючи ручну швидкість передачі даних, якщо це вказано в керівництві до вашого польотного контролера).</li><li>Вимкніть живлення.</li><li>Видаліть перемичку BOOT.</li><li>Увімкніть живлення (індикатор активності має блимати).</li><li>Під'єднайте як зазвичай.</li></ul>"
+        "message": "Якщо ви втратили зв'язок з вашою платою, дотримуйтесь цих кроків, щоб відновити його: <ul><li>Вимкніть живлення</li><li>Увімкніть 'Польотник уже в режимі завантажувача', увімкніть 'Повністю очистити мікроконтролер'.</li><li>З'єднайте контакти BOOT або утримуйте кнопку BOOT.</li><li>Увімкніть живлення (індикатор активності НЕ буде блимати, якщо все зроблено правильно).</li><li>Встановіть усі драйвери STM32 і Zadig, якщо це необхідно (див. розділ <a href=\"https://github.com/iNavFlight/inav/blob/master/docs/USB%20Flashing.md\"target=\"_blank\">Прошивка через USB</a> в документації INAV).</li><li>Закрийте конфігуратор, закрийте всі запущені екземпляри Chrome, закрийте всі програми Chrome, перезапустіть конфігуратор.</li><li>Відпустіть кнопку BOOT, якщо вона є на вашому польотному контролері.</li><li>Прошивайте правильною прошивкою (використовуючи ручну швидкість передачі даних, якщо це вказано в керівництві до вашого польотного контролера).</li><li>Вимкніть живлення.</li><li>Видаліть перемичку BOOT.</li><li>Увімкніть живлення (індикатор активності має блимати).</li><li>Під'єднайте як зазвичай.</li></ul>"
     },
     "firmwareFlasherButtonLeave": {
         "message": "Вийти з програматора"
@@ -3067,7 +3074,7 @@
         "message": "Визначає смугу фільтра. <br><br>Повинно бути нижче частоти режекторного фільтра."
     },
     "multiRotorNavigationConfiguration": {
-        "message": "Налаштування навігації мультиротора"
+        "message": "Налаштування навігації мультикоптера"
     },
     "userControlMode": {
         "message": "Режим керування користувачем"
@@ -3567,6 +3574,12 @@
     "osd_main_voltage_decimals": {
         "message": "Десяткові розряди напруги"
     },
+    "osd_decimals_altitude": {
+        "message": "Десяткові знаки висоти"
+    },
+    "osd_decimals_distance": {
+        "message": "Десяткові знаки відстані"
+    },
     "osd_mah_precision": {
         "message": "Точність мАг"
     },
@@ -3652,7 +3665,7 @@
         "message": "Нахил камери догори"
     },
     "osd_camera_uptilt_help": {
-        "message": "Встановіть кут підйому FPV камери в градусах, позитивний - вгору, негативний - вниз, відносно горизонталі. Використовується для коректного відображення елементів HUD та індикатора штучного горизонту (коли увімкнено)."
+        "message": "Встановіть кут підйому FPV камери в градусах відносно горизонталі, позитивний - вгору, негативний - вниз. Використовується для коректного відображення елементів HUD та індикатора штучного горизонту (коли увімкнено osd_ahi_camera_uptilt_comp=ON)."
     },
     "osd_camera_fov_h": {
         "message": "Кут горизонтального поля зору камери"
@@ -3787,19 +3800,19 @@
         "message": "Максимальна температура регулятора обертів"
     },
     "osd_snr_alarm": {
-        "message": "Рівень сигналізації CRSF SNR"
+        "message": "Рівень сигналізації SNR"
     },
     "osdalarmSNR_HELP": {
         "message": "SNR відображається лише нижче цього значення. 0dB (співвідношення 1:1) означає, що отриманий сигнал дорівнює рівню шумів."
     },
     "osd_link_quality_alarm": {
-        "message": "Сигналізація якості зв'язку CRSF"
+        "message": "Сигналізація якості зв'язку"
     },
     "osdalarmLQ_HELP": {
         "message": "Для Crossfire використовуйте 70%. Для Tracer використовуйте 50%."
     },
     "osd_rssi_dbm_alarm": {
-        "message": "Cигналізація CRSF RSSI dBm"
+        "message": "Cигналізація RSSI в дБм"
     },
     "osd_adsb_distance_warning": {
         "message": "Попередження про відстань ADSB"
@@ -3846,8 +3859,8 @@
     "osdGroupVTX": {
         "message": "Відеопередавач"
     },
-    "osdGroupCRSF": {
-        "message": "Статистика приймача CRSF"
+    "osdGroupRx": {
+        "message": "Статистика приймача RX"
     },
     "osdGroupMapsAndRadars": {
         "message": "Карти та радарні системи"
@@ -4074,23 +4087,29 @@
     "osdElement_VTX_CHANNEL_HELP": {
         "message": "Показує поточний діапазон і канал відеопередавача. Потребує або відеопередавач зі SmartAudio чи Tramp, або відеопередавач, інтегрований у польотний контролер."
     },
-    "osdElement_CRSF_RSSI_DBM": {
-        "message": "RX RSSI у дБм"
+    "osdElement_RSSI_DBM": {
+        "message": "Значення RX RSSI в дБм"
     },
-    "osdElement_CRSF_LQ": {
-        "message": "RX Якість з'єднання %"
+    "osdElement_LQ_UPLINK": {
+        "message": "Якість з'єднання від RX до TX %"
     },
-    "osdElement_CRSF_LQ_HELP": {
-        "message": "Використовуйте налаштування Формату Crossfire LQ для вибору типу формату."
+    "osdElement_LQ_UPLINK_HELP": {
+        "message": "Якщо використовується CRSF, використовуйте налаштування формату LQ Crossfire для вибору типу формату."
     },
-    "osdElement_CRSF_SNR_DB": {
-        "message": "RX Uplink SNR в дБ"
+    "osdElement_LQ_DOWNLINK": {
+        "message": "Якість каналу від TX до RX %"
     },
-    "osdElement_CRSF_SNR_DB_HELP": {
-        "message": "Показується лише при зниженні SNR нижче рівня попередження. При 0 дБ рівень прийнятого сигналу дорівнює рівню шуму."
+    "osdElement_SNR_DB": {
+        "message": "SNR каналу від RX до TX у дБ"
     },
-    "osdElement_CRSF_TX_POWER": {
-        "message": "Потужність TX у мВт"
+    "osdElement_SNR_DB_HELP": {
+        "message": "Показується лише коли SNR (співвідношення сигнал/шум) опускається нижче рівня попередження. При 0 дБ рівень прийнятого сигналу дорівнює рівню шуму."
+    },
+    "osdElement_TX_POWER_UPLINK": {
+        "message": "Потужність передавача в мВт"
+    },
+    "osdElement_OSD_RX_POWER_DOWNLINK": {
+        "message": "Потужність приймача в мВт"
     },
     "osdElement_MAP_NORTH": {
         "message": "Карта (північ вгорі)"
@@ -4156,16 +4175,16 @@
         "message": "Результати ПІД регулятора положення FW"
     },
     "osdElement_MC_VEL_X_PID_OUTPUTS": {
-        "message": "Результати ПІД регулятора швидкості мультиротора по осі X"
+        "message": "Результати ПІД регулятора швидкості мультикоптера по осі X"
     },
     "osdElement_MC_VEL_Y_PID_OUTPUTS": {
-        "message": "Результати ПІД регулятора швидкості мультиротора по осі Y"
+        "message": "Результати ПІД регулятора швидкості мультикоптера по осі Y"
     },
     "osdElement_MC_VEL_Z_PID_OUTPUTS": {
-        "message": "Результати ПІД регулятора швидкості мультиротора по осі Z"
+        "message": "Результати ПІД регулятора швидкості мультикоптера по осі Z"
     },
     "osdElement_MC_POS_XYZ_P_OUTPUTS": {
-        "message": "Результати П регулятора положення XYZ мультиротора"
+        "message": "Результати П регулятора положення XYZ мультикоптера"
     },
     "osdElement_IMU_TEMPERATURE": {
         "message": "Температура ІВП"
@@ -4274,6 +4293,15 @@
     },
     "osdElement_OSD_RANGEFINDER": {
         "message": "Відстань далекоміра"
+    },
+    "osdElement_COURSE_NEXT_GEOZONE": {
+        "message": "Курс до наступної геозони"
+    },
+    "osdElement_HOR_DIST_TO_NEXT_GEOZONE": {
+        "message": "Горизонтальна відстань до наступної геозони"
+    },
+    "osdElement_VERT_DIST_TO_NEXT_GEOZONE": {
+        "message": "Вертикальна відстань до наступної геозони"
     },
     "osdSettingPLUS_CODE_DIGITS_HELP": {
         "message": "Точність на екваторі: 10=13,9x13,9м; 11=2,8x3,5м; 12=56x87см; 13=11x22см."
@@ -4635,6 +4663,171 @@
     "missionSafehomeMaxSafehomesReached": {
         "message": "Максимальна кількість безпечних точок досягнута."
     },
+    "missionGeozoneHead": {
+        "message": "Геозони"
+    },
+    "missionGeozoneEdit": {
+        "message": "Редагувати геозону $1"
+    },
+    "missionGeozoneSaveAndReboot": {
+        "message": "Записати Геозони в Eeprom та перезавантажити"
+    },
+    "missionGeozoneLoad": {
+        "message": "Завантажити геозони з Eeprom"
+    },
+    "missionGeozone": {
+        "message": "-Геозона "
+    },
+    "missionGezoneType": {
+        "message": "Тип"
+    },
+    "missionGezoneShape": {
+        "message": "Форма"
+    },
+    "missionGeozoneTypePolygon": {
+        "message": "Багатокутна"
+    },
+    "missionGeozoneTypeCircular": {
+        "message": "Кругова"
+    },
+    "missionGeozoneMaxZonesReached": {
+        "message": "Досягнуто максимальної кількості геозон."
+    },
+    "missionGeozoneMaxVerticesReached": {
+        "message": "Досягнуто максимальної кількості вершин геозони."
+    },
+    "missionGeozoneWarning": {
+        "message": "Щонайменше одна місія та одна геозона налаштовані, будь ласка, переконайтеся, що місія не порушує межі геозони."
+    },
+    "geozoneEdit": {
+        "message": "Редагувати геозону "
+    },
+    "geozoneShape": {
+        "message": "Форма"
+    },
+    "geozoneInclusive": {
+        "message": "Інклюзивна"
+    },
+    "geozoneExcusive": {
+        "message": "Ексклюзивна"
+    },
+    "geozoneMinAlt": {
+        "message": "Мін. вис. (см):"
+    },
+    "geozoneMaxAlt": {
+        "message": "Макс. вис. (см):"
+    },
+    "geozoneInfiniteAlt": {
+        "message": "0 = висота не обмежена"
+    },
+    "geozoneAction": {
+        "message": "Дія:"
+    },
+    "geozoneActionNone": {
+        "message": "Відсутня"
+    },
+    "geozoneActionAvoid": {
+        "message": "Уникати"
+    },
+    "geozoneActionPosHold": {
+        "message": "Утримувати позицію"
+    },
+    "geozoneActionRTH": {
+        "message": "Повернення додому"
+    },
+    "geozoneRadius": {
+        "message": "Радіус (см):"
+    },
+    "geozoneVerices": {
+        "message": "Вершини:"
+    },
+    "": {
+        "message": ""
+    },
+    "featureGEOZONE": {
+        "message": "Геозона"
+    },
+    "geozone": {
+        "message": "Геозона"
+    },
+    "featureGEOZONETip": {
+        "message": "Віртуальні периметри для географічних зон (також називаються гео-огорожами) з автоматичною активацією дій у разі порушення цих периметрів."
+    },
+    "GeozoneSettings": {
+        "message": "Налаштування геозони"
+    },
+    "geozoneDetectionDistance": {
+        "message": "Відстань виявлення"
+    },
+    "geozoneDetectionDistanceHelp": {
+        "message": "Відстань, з якої виявляється геозона"
+    },
+    "geozoneAvoidAltitudeRange": {
+        "message": "Уникати діапазон висот"
+    },
+    "geozoneAvoidAltitudeRangeHelp": {
+        "message": "Діапазон висот, в межах якого здійснюється спроба обійти геозону зверху"
+    },
+    "geozoneSafeAltitudeDistance": {
+        "message": "Безпечна відстань по висоті"
+    },
+    "geozoneSafeAltitudeDistanceHelp": {
+        "message": "Вертикальна відстань, яку необхідно утримувати до верхньої та нижньої межі зони."
+    },
+    "geozoneSafehomeAsInclusive": {
+        "message": "Безпечна зона повернення інклюзивна"
+    },
+    "geozoneSafehomeAsInclusiveHelp": {
+        "message": "Сприймати найближчу безпечну точку повернення як інклюзивну геозону"
+    },
+    "geozoneSafehomeZoneAction": {
+        "message": "Дія зони безпечного повернення"
+    },
+    "geozoneSafehomeZoneActionHelp": {
+        "message": "Межа дії для зони безпечної точки повернення"
+    },
+    "geozoneMrStopDistance": {
+        "message": "Відстань зупинки мультикоптера"
+    },
+    "geozoneMrStopDistanceHelp": {
+        "message": "Відстань до межі, на якій мультикоптер зупиняється"
+    },
+    "geozoneNoWayHomeAction": {
+        "message": "Дія в разі відсутності можливості повернення додому"
+    },
+    "geozoneNoWayHomeActionHelp": {
+        "message": "Дія, якщо Повернення додому RTH з активними геозонами не може розрахувати маршрут додому: \nRTH: Повернутися додому і ігнорувати всі геозони."
+    },
+    "missionGeozoneReboot": {
+        "message": "Бажаєте зберегти та перезавантажити?"
+    },
+    "missionGeozoneAvailableZones": {
+        "message": "Доступні геозони:"
+    },
+    "missionGeozoneAvailableVertices": {
+        "message": "Доступні вершини:"
+    },
+    "geozoneInvalidzone": {
+        "message": "Виявлено недійсні геозони:"
+    },
+    "geozoneInvalidLat": {
+        "message": "Неприпустима широта"
+    },
+    "geozoneInvalidLon": {
+        "message": "Неприпустима довгота"
+    },
+    "gezoneInvalidReasonNotCC": {
+        "message": "Не проти годинникової стрілки"
+    },
+    "gezoneInvalidReasonComplex": {
+        "message": "Складна"
+    },
+    "gezoneInvalidReasonMinMaxAlt": {
+        "message": "Макс. вис. <= Мін. вис."
+    },
+    "geozoneUnableToSave": {
+        "message": "Неможливо зберегти геозони: недійсні зони"
+    },
     "missionMultiMissionHead": {
         "message": "Мультимісії"
     },
@@ -4742,6 +4935,9 @@
     },
     "settings": {
         "message": "Налаштування"
+    },
+    "decimals": {
+        "message": "Десяткові знаки"
     },
     "motorMixer": {
         "message": "Мікшер моторів"
@@ -4897,7 +5093,7 @@
         "message": "Цикл ПІД може бути нестабільним, якщо використовуються GPS"
     },
     "gyroLpfSuggestedMessage": {
-        "message": "Це рекомендоване налаштування для всіх мультироторів із розміром пропелерів менше 8 дюймів. Завжди перевіряйте температуру мотора після першого польоту"
+        "message": "Це рекомендоване налаштування для всіх мультикоптерів із розміром пропелерів менше 8 дюймів. Завжди перевіряйте температуру мотора після першого польоту"
     },
     "gyroLpfNotAdvisedMessage": {
         "message": "Рекомендується вибрати вищу частоту зрізу"
@@ -5050,7 +5246,7 @@
         "message": "Швидкість I2C"
     },
     "configurationI2cSpeedHelp": {
-        "message": "Швидкість I2C слід підтримувати на найвищому рівні, який дозволяє всім підключеним пристроям працювати. Значення за замовчуванням 400 кГц є безпечним, і рекомендується перемикати на 800 кГц у випадку з мультироторами."
+        "message": "Швидкість I2C слід підтримувати на найвищому рівні, який дозволяє всім підключеним пристроям працювати. Значення за замовчуванням 400 кГц є безпечним, і рекомендується перемикати на 800 кГц у випадку з мультикоптерами."
     },
     "i2cSpeedSuggested800khz": {
         "message": "Будь ласка, перемкніть на 800 кГц, якщо підключене апаратне забезпечення це дозволяє"
@@ -5479,7 +5675,7 @@
         "message": "Чіп пам'яті <br>не знайдено"
     },
     "sensorDataFlashFreeSpace": {
-        "message": "Доступна пам'ять"
+        "message": "Флешпам'ять: <br />вільно "
     },
     "mixerProfile1": {
         "message": "Профіль мікшера 1"
@@ -5930,5 +6126,8 @@
     },
     "adsbHeartbeatTotalMessages": {
         "message": "Повід. сигналів перевірки"
+    },
+    "currentLanguage": {
+        "message": "uk"
     }
 }
