@@ -151,7 +151,11 @@ var ublox = (function () {
 
         if (successCallback != null) {
             req.onload = (event) => {
-                successCallback(req.response);
+                if(req.status == 200) {
+                    successCallback(req.response);
+                } else {
+                    failCallback(event);
+                }
             };
         }
 
@@ -161,7 +165,12 @@ var ublox = (function () {
             }
         }
           
-        req.send(null);
+        try {
+            req.send(null);
+        } catch(error) {
+            GUI.alert(i18n.getMessage("gpsAssistnowLoadDataError"));
+            console.log(i18n.getMessage("gpsAssistnowLoadDataError") + ':' + error.toString());
+        }
     }
 
 

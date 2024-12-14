@@ -254,6 +254,7 @@ TABS.outputs.initialize = function (callback) {
         import(`./../resources/motor_order/${mixer.getById(val).image}${isReversed ? "_reverse" : ""}.svg`).then(({default: path}) => {
             $('.mixerPreview img').attr('src', path);
         });
+        labelMotorNumbers();
     }
 
     function process_servos() {
@@ -713,6 +714,38 @@ TABS.outputs.initialize = function (callback) {
        i18n.localize();;
         GUI.content_ready(callback);
     }
+
+   function labelMotorNumbers() {
+
+       if (mixer.getById(FC.MIXER_CONFIG.appliedMixerPreset).image != 'quad_x') {
+           return;
+       }
+
+
+        let index = 0;
+        var rules = FC.MOTOR_RULES.get();
+
+        for (const i in rules) {
+            if (rules.hasOwnProperty(i)) {
+                const rule = rules[i];
+                index++;
+
+                let top_px = 30;
+                let left_px = 28;
+                if (rule.getRoll() < -0.5) {
+                  left_px = $("#motor-mixer-preview-img").width() - 20;
+                }
+
+                if (rule.getPitch() > 0.5) {
+                  top_px = $("#motor-mixer-preview-img").height() - 20;
+                }
+                $("#motorNumber"+index).css("left", left_px + "px");
+                $("#motorNumber"+index).css("top", top_px + "px");
+                $("#motorNumber"+index).css("visibility", "visible");
+            }
+        }
+    }
+
 
 };
 

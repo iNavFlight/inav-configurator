@@ -464,3 +464,17 @@
 .tab-motors .config-section .number input {
     margin-right: 4px;
 }
+
+.tab-motors .mixerPreview {
+  position: relative;
+}
+
+.tab-motors .motorNumber {
+    position: absolute;
+    font-size: 1.4em;
+    visibility: hidden;
+}
+
+.tab-motors .mixer-preview-image-numbers {
+    width: fit-content;
+}

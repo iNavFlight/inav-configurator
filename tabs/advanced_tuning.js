@@ -69,6 +69,10 @@ TABS.advanced_tuning.initialize = function (callback) {
             TABS.advanced_tuning.checkRequirements_IdleThrottle();
         });
 
+        $('#wiggleWakeIdle').on('change', function () {
+            TABS.advanced_tuning.checkRequirements_IdleThrottle();
+        });
+
         $('#rthHomeAltitude').on('keyup', () => {
             TABS.advanced_tuning.checkRequirements_LinearDescent();
         });
@@ -91,7 +95,7 @@ TABS.advanced_tuning.initialize = function (callback) {
 
 TABS.advanced_tuning.checkRequirements_IdleThrottle = function() {
     let idleThrottle = $('#launchIdleThr');
-    if ($('#launchIdleDelay').val() > 0 && (idleThrottle.val() == "" || idleThrottle.val() < "1150")) {
+    if (($('#launchIdleDelay').val() > 0 || $('#wiggleWakeIdle').find(":selected").val() > 0) && (idleThrottle.val() == "" || idleThrottle.val() < "1150")) {
         idleThrottle.addClass('inputRequiredWarning');
     } else {
         idleThrottle.removeClass('inputRequiredWarning');
