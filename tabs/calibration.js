@@ -91,7 +91,7 @@ TABS.calibration.initialize = function (callback) {
     }
 
     function loadHtml() {
-        import('./calibration.html').then(({default: html}) => GUI.load(html, processHtml));
+        import('./calibration.html?raw').then(({default: html}) => GUI.load(html, processHtml));
     }
 
     function updateCalibrationSteps() {

@@ -118,11 +118,11 @@ var defaultsDialog = (function () {
 
             $content.unbind();
 
-            import('./../wizard/' + stepName + '.html').then(({default: data}) => {
+            import(`./../wizard/step-${stepName}.html?raw`).then(({default: data}) => {
                 $content.html("");
                 $(data).appendTo($content);
 
-                import('./../wizard/buttons.html').then(({default: data}) => {
+                import('./../wizard/step-buttons.html?raw').then(({default: data}) => {
                     $(data).appendTo($content);
 
                     $content.on('click', '#wizard-next', function () {

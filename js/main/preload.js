@@ -1,6 +1,5 @@
 
-const { ipcMain } = require('electron');
-const { contextBridge, ipcRenderer } = require('electron/renderer');
+import { contextBridge, ipcRenderer } from 'electron';
 
 contextBridge.exposeInMainWorld('electronAPI', {
   listSerialDevices: () => ipcRenderer.invoke('listSerialDevices'),

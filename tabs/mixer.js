@@ -77,7 +77,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
     }
 
     function loadHtml() {
-        import('./mixer.html').then(({default: html}) => GUI.load(html, Settings.processHtml(processHtml)));
+        import('./mixer.html?raw').then(({default: html}) => GUI.load(html, Settings.processHtml(processHtml)));
     }
 
     function renderOutputTable() {
@@ -656,7 +656,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
             let motorDirectionCheckbox = $('input[name=motor_direction_inverted]:checked');
             const isReversed = motorDirectionCheckbox.val() == 1 && (FC.MIXER_CONFIG.platformType == PLATFORM.MULTIROTOR || FC.MIXER_CONFIG.platformType == PLATFORM.TRICOPTER);
 
-            import('./../resources/motor_order/' + currentMixerPreset.image + (isReversed ? "_reverse" : "") + '.svg').then(({default: path}) => {
+            import(`./../resources/motor_order/${currentMixerPreset.image}${isReversed ? "_reverse" : ""}.svg`).then(({default: path}) => {
                 $('.mixerPreview img').attr('src', path);
             });
             

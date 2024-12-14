@@ -108,7 +108,7 @@ TABS.gps.initialize = function (callback) {
     }
 
     function load_html() {
-        import('./gps.html').then(({default: html}) => GUI.load(html, Settings.processHtml(process_html)));
+        import('./gps.html?raw').then(({default: html}) => GUI.load(html, Settings.processHtml(process_html)));
     }
 
     let cursorInitialized = false;

@@ -42,7 +42,7 @@ TABS.programming.initialize = function (callback, scrollPosition) {
     statusChainer.setExitPoint(onStatusPullDone);
 
     function loadHtml() {
-        import('./programming.html').then(({default: html}) => GUI.load(html, processHtml));
+        import('./programming.html?raw').then(({default: html}) => GUI.load(html, processHtml));
     }
 
     function processHtml() {

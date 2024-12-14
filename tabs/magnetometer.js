@@ -152,7 +152,7 @@ TABS.magnetometer.initialize = function (callback) {
     }
 
     function load_html() {
-        import('./magnetometer.html').then(({default: html}) => GUI.load(html, process_html));
+        import('./magnetometer.html?raw').then(({default: html}) => GUI.load(html, process_html));
     }
 
     function generateRange(min, max, step) {
@@ -738,7 +738,7 @@ TABS.magnetometer.initialize3D = function () {
         'mag3110', 'matek_m8q', 'matek_m9n', 'matek_m10q', 'mlx90393', 'mp9250', 'qmc5883', 'flywoo_goku_m10_pro_v3', 'ws_m181'];
     magModels = [];
     //Load the UAV model
-    import('./../resources/models/' + model_file + '.gltf').then(({default: model}) => {
+    import(`./../resources/models/model_${model_file}.gltf`).then(({default: model}) => {
     loader.load(model, (obj) => {
             const model = obj.scene;
             const scaleFactor = 15;
@@ -749,7 +749,7 @@ TABS.magnetometer.initialize3D = function () {
 
             magModelNames.forEach( (name, i) => 
             {
-                import('./../resources/models/' + name + '.glb').then(({default: magModel}) => {
+                import(`./../resources/models/model_${name}.glb`).then(({default: magModel}) => {
                     loader.load(magModel, (obj) => {
                         const gps = obj.scene;
                         const scaleFactor = i==0 ? 0.03 : 0.04;
@@ -767,7 +767,7 @@ TABS.magnetometer.initialize3D = function () {
             });
 
             //Load the FC model
-            import('./../resources/models/fc.gltf').then(({default: fcModel}) => {
+            import('./../resources/models/model_fc.gltf').then(({default: fcModel}) => {
                 loader.load(fcModel, (obj) => {
                     fc = obj.scene;
                     const scaleFactor = 0.04;

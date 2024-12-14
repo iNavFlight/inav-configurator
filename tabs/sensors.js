@@ -204,7 +204,7 @@ TABS.sensors.initialize = function (callback) {
             $('.wrapper.debug').hide();
         }
     }
-    import('./sensors.html').then(({default: html}) => GUI.load(html, function load_html() {
+    import('./sensors.html?raw').then(({default: html}) => GUI.load(html, function load_html() {
         // translate to user-selected language
        i18n.localize();;
 

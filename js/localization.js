@@ -8,40 +8,44 @@ import store from './store'
 const availableLanguages = ['en', 'uk'];
 
 const i18n = {};
-  
+
+i18n.loadMessages = async function(languages) {
+    var resources = {};
+    for (const lng of languages) {
+        var msg = (await import(`./../locale/${lng}/messages.json?raw`)).default;
+        resources[lng] = { messages: this.parseInputFile(msg) };  
+    } 
+    return resources;
+}
+
 i18n.init = function (callback) {
     const locale = window.electronAPI.appGetLocale();
     const userLanguage = store.get('userLanguage', locale);
-    var resources = {};
-    availableLanguages.forEach(lng => {
-        var msg = require(`./../locale/${lng}/messages.json`).default;
-        resources[lng] = {
-            messages: this.parseInputFile(msg)
-        }
-    });
-    i18next.init({
-        lng: userLanguage,
-        getAsync: false,
-        debug: true,
-        ns: ['messages'],
-        defaultNS:['messages'],
-        fallbackLng: 'en',
-        resources: resources
-    }, function(err) {
-        if (err) {
-            console.error(`Error loading i18n: ${err}`);
-        } else {
-            console.log('i18n system loaded');
-            const detectedLanguage = i18n.getMessage(`language_${i18n.getValidLocale("DEFAULT")}`);
-            i18next.addResourceBundle('en', 'messages', { "detectedLanguage": detectedLanguage }, true, true);
-            i18next.on('languageChanged', function () {
-                i18n.localize(true);
-            });
-        }
+    this.loadMessages(availableLanguages).then(resources => {
+        i18next.init({
+            lng: userLanguage,
+            getAsync: false,
+            debug: true,
+            ns: ['messages'],
+            defaultNS:['messages'],
+            fallbackLng: 'en',
+            resources: resources
+        }, function(err) {
+            if (err) {
+                console.error(`Error loading i18n: ${err}`);
+            } else {
+                console.log('i18n system loaded');
+                const detectedLanguage = i18n.getMessage(`language_${i18n.getValidLocale("DEFAULT")}`);
+                i18next.addResourceBundle('en', 'messages', { "detectedLanguage": detectedLanguage }, true, true);
+                i18next.on('languageChanged', function () {
+                    i18n.localize(true);
+                });
+            }
 
-        if (callback) {
-            callback();
-        }
+            if (callback) {
+                callback();
+            }
+        });
     });
 }
 

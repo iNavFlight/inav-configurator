@@ -22,7 +22,7 @@ TABS.failsafe.initialize = function (callback, scrollPosition) {
     }
 
     function load_html() {
-        import('./failsafe.html').then(({default: html}) => GUI.load(html, Settings.processHtml(function () {
+        import('./failsafe.html?raw').then(({default: html}) => GUI.load(html, Settings.processHtml(function () {
             GUI.simpleBind();
 
             // translate to user-selected language

@@ -76,7 +76,7 @@ TABS.onboard_logging.initialize = function (callback) {
     }
 
     function load_html() {
-        import('./onboard_logging.html').then(({default: html}) => GUI.load(html, function() {
+        import('./onboard_logging.html?raw').then(({default: html}) => GUI.load(html, function() {
             // translate to user-selected language
            i18n.localize();;
 

@@ -50,8 +50,7 @@ import { Geozone, GeozoneVertex, GeozoneType, GeozoneShapes, GeozoneFenceAction 
 import store from './../js/store';
 import dialog from '../js/dialog';
 
-import html from'./mission_control.html';
-
+import html from'./mission_control.html?raw';
 
 var MAX_NEG_FW_LAND_ALT = -2000; // cm
 
@@ -68,6 +67,33 @@ var dictOfLabelParameterPoint = {
 };
 
 var waypointOptions = ['JUMP','SET_HEAD','RTH'];
+
+const iconNames = [
+    'icon_mission_airplane.png',
+    'icon_RTH.png',
+    'icon_safehome.png',
+    'icon_safehome_used.png',
+    'icon_geozone_excl.png',
+    'icon_geozone_incl.png',
+    'icon_home.png',
+    'icon_position_edit.png',
+    'icon_position_head.png',
+    'icon_position_LDG_edit.png',
+    'icon_position_LDG.png',
+    'icon_position_PH_edit.png',
+    'icon_position_PH.png',
+    'icon_position_POI.png',
+    'icon_position_POI_edit.png',
+    'icon_position_WP_edit.png',
+    'icon_position_WP.png',
+    'icon_position_edit.png',
+    'icon_arrow.png',
+    'settings_white.svg',
+    'icon_safehome_white.svg',
+    'icon_geozone_white.svg',
+    'icon_elevation_white.svg',
+    'icon_multimission_white.svg'    
+];
 
 ////////////////////////////////////
 //
@@ -100,6 +126,7 @@ TABS.mission_control.initialize = function (callback) {
     let invalidGeoZones = false;
     let isGeozoneEnabeld = false;
     let settings = {speed: 0, alt: 5000, safeRadiusSH: 50, fwApproachAlt: 60, fwLandAlt: 5, maxDistSH: 0, fwApproachLength: 0, fwLoiterRadius: 0, bingDemModel: false};
+    let icons = {};
 
     if (GUI.active_tab != 'mission_control') {
         GUI.active_tab = 'mission_control';
@@ -155,9 +182,25 @@ TABS.mission_control.initialize = function (callback) {
             FC.FW_APPROACH.put(new FwApproach(i));
         }
     }
+    
+    async function loadIcons() {
+        for (const icon of iconNames) {
+            const nameSplit = icon.split('.');
+            // Vites packager needs a bit help
+            var iconUrl;
+            if (nameSplit[1] == 'png') {
+                iconUrl = (await import(`./../images/icons/map/cf_${nameSplit[0]}.png?inline`)).default;
+            } else if (nameSplit[1] == 'svg') {
+                iconUrl = (await import(`./../images/icons/map/cf_${nameSplit[0]}.svg?inline`)).default;
+            }
+            if (iconUrl) {
+                icons[nameSplit[0]] = iconUrl;
+            }
+        }
+    }
 
     function loadHtml() {
-        GUI.load(html, process_html);
+        GUI.load(html, () => loadIcons().then(process_html));
     }
 
     function process_html() {
@@ -240,7 +283,7 @@ TABS.mission_control.initialize = function (callback) {
                           anchor: [0.5, 0.5],
                           opacity: 1,
                           scale: 0.6,
-                          src: require('./../images/icons/map/icon_mission_airplane.png').default
+                          src: icons.icon_mission_airplane
                       }))
                   });
 
@@ -267,7 +310,7 @@ TABS.mission_control.initialize = function (callback) {
                           anchor: [0.5, 1.0],
                           opacity: 1,
                           scale: 0.5,
-                          src: require('./../images/icons/map/cf_icon_RTH.png').default
+                          src: icons.icon_RTH
                       }))
                   });
 
@@ -580,7 +623,7 @@ TABS.mission_control.initialize = function (callback) {
                 anchor: [0.5, 1],
                 opacity: 1,
                 scale: 0.5,
-                src: require('./../images/icons/map/cf_icon_safehome' + (safehome.isUsed() ? '_used' : '')+ '.png').default
+                src: safehome.isUsed() ? icons.icon_safehome_used : icons.icon_safehome
             })),
             text: new Text(({
                 text: String(Number(safehome.getNumber())+1),
@@ -794,20 +837,13 @@ TABS.mission_control.initialize = function (callback) {
     //
     /////////////////////////////////////////////
     function getGeozoneIcon(geozone, number) {
-        
-        var img;
-        if (geozone.getType() == GeozoneType.EXCULSIVE) {
-            img = 'cf_icon_geozone_excl.png';
-        } else {
-            img = 'cf_icon_geozone_incl.png';
-        }
-        
+    
         return new Style({
             image: new Icon(({
                 anchor: [0.5, 1],
                 opacity: 1,
                 scale: 0.5,
-                src: require(`./../images/icons/map/${img}`).default
+                src: geozone.getType() == GeozoneType.EXCULSIVE ? icons.icon_geozone_excl : icons.icon_geozone_incl
             })),
             text: new Text(({
                 text: String(number + 1),
@@ -1151,7 +1187,7 @@ TABS.mission_control.initialize = function (callback) {
                 anchor: [0.5, 1],
                 opacity: 1,
                 scale: 0.5,
-                src: require('./../images/icons/map/cf_icon_home.png').default
+                src: icons.icon_home
             })),
         });
     }
@@ -1465,7 +1501,7 @@ TABS.mission_control.initialize = function (callback) {
                 anchor: [0.5, 1],
                 opacity: 1,
                 scale: 0.5,
-                src: require('./../images/icons/map/cf_icon_position' + (dictofPointIcon[waypoint.getAction()] != '' ? '_'+dictofPointIcon[waypoint.getAction()] : '') + (isEdit ? '_edit' : '')+ '.png').default
+                src: icons['icon_position' + (dictofPointIcon[waypoint.getAction()] != '' ? '_' + dictofPointIcon[waypoint.getAction()] : '') + (isEdit ? '_edit' : '')]
             })),
             text: new Text(({
                 text: String(Number(waypoint.getLayerNumber()+1)),
@@ -1614,7 +1650,7 @@ TABS.mission_control.initialize = function (callback) {
             featureArrow.setStyle(
                 new Style({
                     image: new Icon({
-                        src: require('./../images/icons/map/cf_icon_arrow.png').default,
+                        src: icons.icon_arrow,
                         scale: 0.3,
                         anchor: [0.5, 0.5],
                         rotateWithView: true,
@@ -2007,7 +2043,7 @@ TABS.mission_control.initialize = function (callback) {
                 var button = document.createElement('button');
 
                 button.innerHTML = ' ';
-                button.style = `background: url(\'${require('./../images/icons/map/CF_settings_white.svg').default}\') no-repeat 1px -1px;background-color: rgba(0,60,136,.5);`;
+                button.style = `background: url("${icons.settings_white}") no-repeat 1px -1px;background-color: rgba(0,60,136,.5);`;
                 
 
                 var handleShowSettings = function () {
@@ -2036,7 +2072,7 @@ TABS.mission_control.initialize = function (callback) {
                 var button = document.createElement('button');
 
                 button.innerHTML = ' ';
-                button.style = `background: url(\'${require('./../images/icons/map/cf_icon_safehome_white.svg').default}\') no-repeat 1px -1px;background-color: rgba(0,60,136,.5);`;
+                button.style = `background: url("${icons.icon_safehome_white}") no-repeat 1px -1px;background-color: rgba(0,60,136,.5);`;
                 
                 var handleShowSafehome = function () {
                     $('#missionPlannerSafehome').fadeIn(300);
@@ -2068,7 +2104,7 @@ TABS.mission_control.initialize = function (callback) {
                 var button = document.createElement('button');
 
                 button.innerHTML = ' ';
-                button.style = `background: url(\'${require('./../images/icons/map/cf_icon_geozone_white.svg').default}\') no-repeat 1px -1px;background-color: rgba(0,60,136,.5);`;
+                button.style = `background: url("${icons.icon_geozone_white}") no-repeat 1px -1px;background-color: rgba(0,60,136,.5);`;
                 
                 var handleShowGeozoneSettings = function () {
                     $('#missionPlannerGeozones').fadeIn(300);
@@ -2101,7 +2137,7 @@ TABS.mission_control.initialize = function (callback) {
                 var button = document.createElement('button');
 
                 button.innerHTML = ' ';
-                button.style = `background: url(\'${require('./../images/icons/map/cf_icon_elevation_white.svg').default}\') no-repeat 1px -1px;background-color: rgba(0,60,136,.5);`;
+                button.style = `background: url("${icons.icon_elevation_white}") no-repeat 1px -1px;background-color: rgba(0,60,136,.5);`;
 
                 var handleShowSettings = function () {
                     $('#missionPlannerHome').fadeIn(300);
@@ -2134,7 +2170,7 @@ TABS.mission_control.initialize = function (callback) {
                 var button = document.createElement('button');
 
                 button.innerHTML = ' ';
-                button.style = `background: url(\'${require('./../images/icons/map/cf_icon_multimission_white.svg').default}\') no-repeat 1px -1px;background-color: rgba(0,60,136,.5);`;
+                button.style = `background: url("${icons.icon_multimission_white}") no-repeat 1px -1px;background-color: rgba(0,60,136,.5);`;
 
                 var handleShowSettings = function () {
                     $('#missionPlannerMultiMission').fadeIn(300);
@@ -3151,8 +3187,8 @@ TABS.mission_control.initialize = function (callback) {
             }
 
             let mapCenter = map.getView().getCenter();
-            let midLon = Math.round(ol.proj.toLonLat(mapCenter)[0] * 1e7);
-            let midLat = Math.round(ol.proj.toLonLat(mapCenter)[1] * 1e7);
+            let midLon = Math.round(toLonLat(mapCenter)[0] * 1e7);
+            let midLat = Math.round(toLonLat(mapCenter)[1] * 1e7);
             FC.SAFEHOMES.put(new Safehome(FC.SAFEHOMES.safehomeCount(), 1, midLat, midLon));
             updateSelectedShAndFwAp(FC.SAFEHOMES.safehomeCount() - 1);
             renderSafeHomeOptions();

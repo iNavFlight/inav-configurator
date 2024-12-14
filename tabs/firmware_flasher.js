@@ -32,7 +32,7 @@ TABS.firmware_flasher.initialize = function (callback) {
         parsed_hex = false, // parsed raw hex in array format
         fileName = "inav.hex";
 
-    import('./firmware_flasher.html').then(({default: html}) => GUI.load(html, function () {
+    import('./firmware_flasher.html?raw').then(({default: html}) => GUI.load(html, function () {
         // translate to user-selected language
         i18n.localize();
 
@@ -42,18 +42,16 @@ TABS.firmware_flasher.initialize = function (callback) {
 
         function parse_hex(str, callback) {
             // parsing hex in different thread
-            import('./../js/workers/hex_parser.js').then(({default: code}) => {
-                const blob = new Blob([code], {type: 'application/javascript'})
-                const worker = new Worker(URL.createObjectURL(blob))
+            const worker = new Worker(new URL('./../js/workers/hex_parser.js', import.meta.url));
+            
+            // "callback"
+            worker.onmessage = function (event) {
+                callback(event.data);
+            };
 
-                // "callback"
-                worker.onmessage = function (event) {
-                    callback(event.data);
-                };
-
-                // send data/string over for processing
-                worker.postMessage(str);
-            });
+            // send data/string over for processing
+            worker.postMessage(str);
+            
         }
 
         function parseDevFilename(filename) {

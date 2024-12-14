@@ -1,4 +1,3 @@
-const { image } = require("d3");
 
 /*
 * jQuery Flight Indicators plugin
@@ -9,20 +8,20 @@ const { image } = require("d3");
 */
 
 const imageNames = [
-	'altitude_pressure.svg',
-	'altitude_ticks.svg',
-	'fi_box.svg',
-	'fi_circle.svg',
-	'fi_needle_small.svg',
-	'fi_tc_airplane.svg',
-	'heading_mechanics.svg',
-	'heading_yaw.svg',
-	'horizon_back.svg',
-	'horizon_ball.svg',
-	'horizon_circle.svg',
-	'horizon_mechanics.svg',
-	'turn_coordinator.svg',
-	'vertical_mechanics.svg'
+	'altitude_pressure',
+	'altitude_ticks',
+	'fi_box',
+	'fi_circle',
+	'fi_needle_small',
+	'fi_tc_airplane',
+	'heading_mechanics',
+	'heading_yaw',
+	'horizon_back',
+	'horizon_ball',
+	'horizon_circle',
+	'horizon_mechanics',
+	'turn_coordinator',
+	'vertical_mechanics'
 ];
 
 (function($) {
@@ -180,19 +179,19 @@ const imageNames = [
 		return attitude;
 	};
 
-	// Extension to jQuery
-	$.flightIndicator = function(placeholder, type, options){
+	async function getImages()  {
 		var images = {};
-		imageNames.forEach(image => {
+		for (const image of imageNames) {
+			const svg = (await import(`./../../images/flightindicators/fi_${image}.svg`)).default;
 			const name = image.split('.')[0];
-			if (options.webpack) {	
-				const svg = require(`./../../images/flightindicators/${image}`).default;
-				images[name] = svg;
-			} else {
-				images[name] = `${options.img_directory}${image}`
-			}
-		});
+			images[name] = svg;
+		}
+		return images;
+	}
 
+	// Extension to jQuery
+	$.flightIndicator = async function(placeholder, type, options){
+		var images = await getImages();
 		var flightIndicator = new FlightIndicator($(placeholder), type, options, images)
 		return flightIndicator;
 	}

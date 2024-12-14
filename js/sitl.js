@@ -1,5 +1,5 @@
 'use strict'
-import { chmod, rm } from 'fs';
+//import { chmod, rm } from 'fs';
 import { GUI } from './gui';
 
 const serialRXProtocolls = [

@@ -190,11 +190,11 @@ input[type="number"]::-webkit-inner-spin-button {
 
 #portsinput .portsinput__top-element {
     display: inline-block;
-    width: 125px;
+    width: 130px;
 }
 
 #portsinput .portsinput__top-element .dropdown-select {
-    width: 122px;
+    width: 127px;
 }
 
 .portsinput__top-element--inline {

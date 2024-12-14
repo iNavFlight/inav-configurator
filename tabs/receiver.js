@@ -38,7 +38,7 @@ TABS.receiver.initialize = function (callback) {
     loadChainer.execute();
 
     function load_html() {
-        import('./receiver.html').then(({default: html}) => GUI.load(html, Settings.processHtml(process_html)));
+        import('./receiver.html?raw').then(({default: html}) => GUI.load(html, Settings.processHtml(process_html)));
     }
 
     function saveSettings(onComplete) {

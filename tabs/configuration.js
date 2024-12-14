@@ -72,7 +72,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
     }
 
     function load_html() {
-        import('./configuration.html').then(({default: html}) => GUI.load(html, Settings.processHtml(process_html)));
+        import('./configuration.html?raw').then(({default: html}) => GUI.load(html, Settings.processHtml(process_html)));
     }
 
     function process_html() {

@@ -1,7 +1,5 @@
 'use strict';
-// import { dialog }  from "@electron/remote";
 
-import Switchery from './libraries/switchery/switchery';
 import MSP from './msp';
 import FC from './fc';
 import interval from './intervals';
@@ -9,7 +7,10 @@ import { scaleRangeInt } from './helpers';
 import i18n from './localization';
 import mspDeduplicationQueue from "./msp/mspDeduplicationQueue";
 
+//import * as Switchery from './libraries/switchery/switchery.cjs';
+
 var TABS = {}; // filled by individual tab js file
+
 
 var GUI_control = function () {
     this.connecting_to = false;
@@ -107,38 +108,22 @@ GUI_control.prototype.tab_switch_cleanup = function (callback) {
 };
 
 GUI_control.prototype.switchery = function() {
+   
     $('.togglesmall').each(function(index, elem) {
-        var switchery = new Switchery(elem, {
-            size: 'small',
-            color: '#37a8db',
-            secondaryColor: '#c4c4c4'
-        });
-        $(elem).on("change", function (evt) {
-            switchery.setPosition();
-        });
+        $(elem).wrapAll('<label class="ios7-switch" style="font-size: 15px"/>');
+        $(elem).after('<span></span>')
         $(elem).removeClass('togglesmall');
     });
 
     $('.toggle').each(function(index, elem) {
-        var switchery = new Switchery(elem, {
-            color: '#37a8db',
-            secondaryColor: '#c4c4c4'
-        });
-        $(elem).on("change", function (evt) {
-            switchery.setPosition();
-        });
+        $(elem).wrapAll('<label class="ios7-switch" style="font-size: 17px"/>');
+        $(elem).after('<span></span>')
         $(elem).removeClass('toggle');
     });
 
     $('.togglemedium').each(function(index, elem) {
-        var switchery = new Switchery(elem, {
-            className: 'switcherymid',
-            color: '#37a8db',
-            secondaryColor: '#c4c4c4'
-        });
-        $(elem).on("change", function (evt) {
-            switchery.setPosition();
-        });
+        $(elem).wrapAll('<label class="ios7-switch" style="font-size: 15px"/>');
+        $(elem).after('<span></span>')
         $(elem).removeClass('togglemedium');
     });
 };
@@ -146,40 +131,8 @@ GUI_control.prototype.switchery = function() {
 
 GUI_control.prototype.content_ready = function (callback) {
     const content = $('#content').removeClass('loading');
-    $('.togglesmall').each(function(index, elem) {
-        var switchery = new Switchery(elem, {
-          size: 'small',
-          color: '#37a8db',
-          secondaryColor: '#c4c4c4'
-        });
-        $(elem).on("change", function (evt) {
-            switchery.setPosition();
-        });
-        $(elem).removeClass('togglesmall');
-    });
-
-    $('.toggle').each(function(index, elem) {
-        var switchery = new Switchery(elem, {
-            color: '#37a8db',
-            secondaryColor: '#c4c4c4'
-        });
-        $(elem).on("change", function (evt) {
-            switchery.setPosition();
-        });
-        $(elem).removeClass('toggle');
-    });
-
-    $('.togglemedium').each(function(index, elem) {
-        var switchery = new Switchery(elem, {
-            className: 'switcherymid',
-            color: '#37a8db',
-            secondaryColor: '#c4c4c4'
-         });
-         $(elem).on("change", function (evt) {
-             switchery.setPosition();
-         });
-         $(elem).removeClass('togglemedium');
-    });
+    
+    this.switchery();
 
     // Insert a documentation button next to the tab title
     const tabTitle = $('div#content .tab_title').first();

@@ -1,4 +1,4 @@
-const { contextBridge, ipcRenderer } = require('electron/renderer');
+import { contextBridge, ipcRenderer } from 'electron';
 
 contextBridge.exposeInMainWorld('electronAPI', {
     bleScan: (callback) => ipcRenderer.on('ble-scan', (_event, data) => callback(data)),

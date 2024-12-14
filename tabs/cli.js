@@ -130,7 +130,7 @@ TABS.cli.initialize = function (callback) {
             ), Promise.resolve(0),
         );
     }
-    import('./cli.html').then(({default: html}) => GUI.load(html, function () {
+    import('./cli.html?raw').then(({default: html}) => GUI.load(html, function () {
         // translate to user-selected language
        i18n.localize();
 

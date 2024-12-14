@@ -9,7 +9,7 @@ landing.initialize = function (callback) {
     if (GUI.active_tab != 'landing') {
         GUI.active_tab = 'landing';
     }
-    import('./landing.html').then(({default: html}) => {
+    import('./landing.html?raw').then(({default: html}) => {
         GUI.load(html, () => {
             i18n.localize();
             GUI.content_ready(callback);

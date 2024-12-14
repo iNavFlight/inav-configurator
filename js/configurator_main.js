@@ -1,5 +1,6 @@
 import '../src/css/styles.css'
 
+import $ from 'jquery';
 import 'jquery-ui-dist/jquery-ui';
 import * as THREE from 'three'
 
@@ -20,17 +21,8 @@ import { SITLProcess } from './sitl';
 import settingsCache from './settingsCache';
 import store from './store';
 
-process.on('uncaughtException', function (error) {   
-    if (process.env.NODE_ENV !== 'development') {
-        GUI.log(i18n.getMessage('unexpectedError', error.message));
-        if (GUI.connected_to || GUI.connecting_to) {
-            GUI.log(i18n.getMessage('disconnecting'));
-            $('a.connect').trigger('click');
-        } 
-    } else {
-        throw error;
-    }
-});
+
+window.$ = $;
 
 // Set how the units render on the configurator only
 $(function() {
@@ -92,8 +84,6 @@ $(function() {
         if (!CONFIGURATOR.connectionValid) {
             globalSettings.osdUnits = null;
         }
-
-        console.log(process);
 
         const version = window.electronAPI.appGetVersion();
         // alternative - window.navigator.appVersion.match(/Chrome\/([0-9.]*)/)[1];
@@ -275,7 +265,7 @@ $(function() {
                 el.addClass('active');
                 el.after('<div id="options-window"></div>');
 
-                import('./../tabs/options.html').then(({default: html}) => {
+                import('./../tabs/options.html?raw').then(({default: html}) => {
                     $('div#options-window').html(html);
                     // translate to user-selected language
                     i18n.localize();

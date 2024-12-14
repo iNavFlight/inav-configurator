@@ -1,8 +1,6 @@
 // Runs in main thread
 
-import { resolve } from 'path';
-
-const dgram = require('dgram');
+import dgram from 'dgram';
 const socket = dgram.createSocket('udp4');
 
 const udp = {

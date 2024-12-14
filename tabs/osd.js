@@ -3469,7 +3469,7 @@ TABS.osd.initialize = function (callback) {
     }
 
     HARDWARE.update(function () {
-        import('./osd.html').then(({default: html}) => GUI.load(html, Settings.processHtml(function() {
+        import('./osd.html?raw').then(({default: html}) => GUI.load(html, Settings.processHtml(function() {
             // translate to user-selected language
            i18n.localize();
     
@@ -3573,7 +3573,7 @@ TABS.osd.initialize = function (callback) {
                 $(this).addClass('active');
                 store.set('osd_font', $(this).data('font-file'));
                 
-                import('./../resources/osd/analogue/' + $(this).data('font-file') + '.mcm').then(({default: data}) => {
+                import(`./../resources/osd/analogue/${$(this).data('font-file')}.mcm?raw`).then(({default: data}) => {
                     FONT.parseMCMFontFile(data);
                     FONT.preview($preview);
                     OSD.GUI.update();

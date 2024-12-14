@@ -3,7 +3,18 @@
 import { GUI } from './../gui';
 import { ConnectionType, Connection } from './connection';
 import i18n from './../localization';
-import { data } from 'jquery';
+
+const serialDevices = [
+    { vendorId: 1027, productId: 24577 }, // FT232R USB UART
+    { vendorId: 1155, productId: 12886 }, // STM32 in HID mode
+    { vendorId: 1155, productId: 14158 }, // 0483:374e STM Electronics STLink Virtual COM Port (NUCLEO boards)
+    { vendorId: 1155, productId: 22336 }, // STM Electronics Virtual COM Port
+    { vendorId: 4292, productId: 60000 }, // CP210x
+    { vendorId: 4292, productId: 60001 }, // CP210x
+    { vendorId: 4292, productId: 60002 }, // CP210x
+    { vendorId: 11836, productId: 22336 }, // AT32 VCP
+    { vendorId: 12619, productId: 22336 }, // APM32 VCP
+];
 
 class ConnectionSerial extends Connection {
     constructor() {
@@ -11,6 +22,7 @@ class ConnectionSerial extends Connection {
         this._errorListeners = [];
         this._onReceiveListeners = [];
         this._onErrorListener = [];
+        this.ports = [];
         super._type = ConnectionType.Serial;
 
         window.electronAPI.onSerialData(buffer => {

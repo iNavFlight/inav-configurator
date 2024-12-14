@@ -41,7 +41,7 @@ TABS.led_strip.initialize = function (callback, scrollPosition) {
     }
 
     function load_html() {
-        import('./led_strip.html').then(({default: html}) => GUI.load(html, process_html));
+        import('./led_strip.html?raw').then(({default: html}) => GUI.load(html, process_html));
     }
 
     load_led_config();

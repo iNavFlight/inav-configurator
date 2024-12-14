@@ -15,7 +15,7 @@ TABS.advanced_tuning.initialize = function (callback) {
         GUI.active_tab = 'advanced_tuning';
     }
 
-    import('./advanced_tuning.html').then(({default: html}) => GUI.load(html, loadHtml));
+    import('./advanced_tuning.html?raw').then(({default: html}) => GUI.load(html, Settings.processHtml(processHtml)));
 
     function save_to_eeprom() {
         console.log('save_to_eeprom');
@@ -31,63 +31,60 @@ TABS.advanced_tuning.initialize = function (callback) {
         });
     }
 
-    function loadHtml() {
-        Settings.processHtml(function () {
-            if (FC.isAirplane()) {
-                $('.airplaneTuning').show();
-                $('.airplaneTuningTitle').show();
-                $('.multirotorTuning').hide();
-                $('.multirotorTuningTitle').hide();
-                $('.notFixedWingTuning').hide();
-            } else if (FC.isMultirotor()) {
-                $('.airplaneTuning').hide();
-                $('.airplaneTuningTitle').hide();
-                $('.multirotorTuning').show();
-                $('.multirotorTuningTitle').show();
-                $('.notFixedWingTuning').show();
-            } else {
-                $('.airplaneTuning').show();
-                $('.airplaneTuningTitle').hide();
-                $('.multirotorTuning').show();
-                $('.multirotorTuningTitle').hide();
-                $('.notFixedWingTuning').show();
-            }
+    function processHtml() {
+        if (FC.isAirplane()) {
+            $('.airplaneTuning').show();
+            $('.airplaneTuningTitle').show();
+            $('.multirotorTuning').hide();
+            $('.multirotorTuningTitle').hide();
+            $('.notFixedWingTuning').hide();
+        } else if (FC.isMultirotor()) {
+            $('.airplaneTuning').hide();
+            $('.airplaneTuningTitle').hide();
+            $('.multirotorTuning').show();
+            $('.multirotorTuningTitle').show();
+            $('.notFixedWingTuning').show();
+        } else {
+            $('.airplaneTuning').show();
+            $('.airplaneTuningTitle').hide();
+            $('.multirotorTuning').show();
+            $('.multirotorTuningTitle').hide();
+            $('.notFixedWingTuning').show();
+        }
 
-            if (!FC.isFeatureEnabled('GEOZONE')) {
-                $('#geozoneSettings').hide();
-            }
+        if (!FC.isFeatureEnabled('GEOZONE')) {
+            $('#geozoneSettings').hide();
+        }
 
-            GUI.simpleBind();
+        GUI.simpleBind();
 
-            i18n.localize();;
-            
-            // Set up required field warnings
-            $('#launchIdleThr').on('keyup', () => {
-                TABS.advanced_tuning.checkRequirements_IdleThrottle();
-            });
-
-            $('#launchIdleDelay').on('keyup', () => {
-                TABS.advanced_tuning.checkRequirements_IdleThrottle();
-            });
-
-            $('#rthHomeAltitude').on('keyup', () => {
-                TABS.advanced_tuning.checkRequirements_LinearDescent();
-            });
-
-            $('#rthUseLinearDescent').on('change', function () {
-                TABS.advanced_tuning.checkRequirements_LinearDescent();
-            });
-
-            // Preload required field warnings
+        i18n.localize();;
+        
+        // Set up required field warnings
+        $('#launchIdleThr').on('keyup', () => {
             TABS.advanced_tuning.checkRequirements_IdleThrottle();
-            TABS.advanced_tuning.checkRequirements_LinearDescent();
-
-            $('a.save').on('click', function () {
-                Settings.saveInputs(save_to_eeprom);
-            });
-            GUI.content_ready(callback);
-
         });
+
+        $('#launchIdleDelay').on('keyup', () => {
+            TABS.advanced_tuning.checkRequirements_IdleThrottle();
+        });
+
+        $('#rthHomeAltitude').on('keyup', () => {
+            TABS.advanced_tuning.checkRequirements_LinearDescent();
+        });
+
+        $('#rthUseLinearDescent').on('change', function () {
+            TABS.advanced_tuning.checkRequirements_LinearDescent();
+        });
+
+        // Preload required field warnings
+        TABS.advanced_tuning.checkRequirements_IdleThrottle();
+        TABS.advanced_tuning.checkRequirements_LinearDescent();
+
+        $('a.save').on('click', function () {
+            Settings.saveInputs(save_to_eeprom);
+        });
+        GUI.content_ready(callback);
     }
 };
 

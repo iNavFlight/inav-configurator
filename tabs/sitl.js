@@ -91,7 +91,7 @@ TABS.sitl.initialize = (callback) => {
         GUI.active_tab = 'sitl';
     }
 
-    import('./sitl.html').then(({default: html}) => GUI.load(html, function () {
+    import('./sitl.html?raw').then(({default: html}) => GUI.load(html, function () {
         
         i18n.localize();
     

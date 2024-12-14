@@ -47,7 +47,7 @@ TABS.auxiliary.initialize = function (callback) {
 
     function load_html() {
         sort_modes_for_display();
-        import('./auxiliary.html').then(({default: html}) => GUI.load(html, process_html));
+        import('./auxiliary.html?raw').then(({default: html}) => GUI.load(html, process_html));
     }
 
     // This object separates out the dividers. This is also used to order the modes

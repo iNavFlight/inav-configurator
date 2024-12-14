@@ -33,7 +33,7 @@ TABS.logging.initialize = function (callback) {
         }
 
         var load_html = function () {
-            import('./logging.html').then(({default: html}) => GUI.load(html, process_html));
+            import('./logging.html?raw').then(({default: html}) => GUI.load(html, process_html));
         }
 
         MSP.send_message(MSPCodes.MSP_RC, false, false, get_motor_data);

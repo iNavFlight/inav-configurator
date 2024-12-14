@@ -41,7 +41,7 @@ TABS.pid_tuning.initialize = function (callback) {
     }
 
     function load_html() {
-        import('./pid_tuning.html').then(({default: html}) => GUI.load(html, Settings.processHtml(process_html)));
+        import('./pid_tuning.html?raw').then(({default: html}) => GUI.load(html, Settings.processHtml(process_html)));
     }
 
     function drawExpoCanvas(value, $element, color, width, height, clear) {

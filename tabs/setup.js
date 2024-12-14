@@ -42,9 +42,27 @@ TABS.setup.initialize = function (callback) {
     loadChainer.setExitPoint(load_html);
     loadChainer.execute();
 
+    let attitudeInstrument;
+    let headingnstrument;
+
     function load_html() {
-        import('./setup.html').then(({default: html}) => GUI.load(html, process_html));
+        import('./setup.html?raw').then(({default: html}) => GUI.load(html, process_html));
     }
+
+    function updateInstruments () {
+        if (headingnstrument && attitudeInstrument) {
+            attitudeInstrument.setRoll(FC.SENSOR_DATA.kinematics[0]);
+            attitudeInstrument.setPitch(FC.SENSOR_DATA.kinematics[1]);
+            headingnstrument.setHeading(FC.SENSOR_DATA.kinematics[2]);
+        }
+    };
+
+    async function initializeInstruments() {
+        var options = {size:90, showBox : false, img_directory: './../../images/flightindicators/'};
+        
+        attitudeInstrument = await $.flightIndicator('#attitude', 'attitude', options);
+        headingnstrument = await $.flightIndicator('#heading', 'heading', options);
+    };
 
     function process_html() {
         // translate to user-selected language
@@ -71,7 +89,7 @@ TABS.setup.initialize = function (callback) {
             $('default_btn').addClass('disabled');
         }
 
-        self.initializeInstruments();
+        initializeInstruments();
 
         $('a.resetSettings').on('click', function () {
             if (dialog.confirm(i18n.getMessage('confirm_reset_settings'))) {
@@ -141,7 +159,7 @@ TABS.setup.initialize = function (callback) {
 	            pitch_e.text(i18n.getMessage('initialSetupAttitude', [FC.SENSOR_DATA.kinematics[1]]));
                 heading_e.text(i18n.getMessage('initialSetupAttitude', [FC.SENSOR_DATA.kinematics[2]]));
                 self.render3D();
-                self.updateInstruments();
+                updateInstruments();
             });
         }
 
@@ -187,18 +205,6 @@ TABS.setup.initialize = function (callback) {
 
         GUI.content_ready(callback);
     }
-};
-
-TABS.setup.initializeInstruments = function() {
-    var options = {size:90, showBox : false, img_directory: './../../images/flightindicators/', webpack: true};
-    var attitude = $.flightIndicator('#attitude', 'attitude', options);
-    var heading = $.flightIndicator('#heading', 'heading', options);
-
-    this.updateInstruments = function() {
-        attitude.setRoll(FC.SENSOR_DATA.kinematics[0]);
-        attitude.setPitch(FC.SENSOR_DATA.kinematics[1]);
-        heading.setHeading(FC.SENSOR_DATA.kinematics[2]);
-    };
 };
 
 TABS.setup.initialize3D = function () {
@@ -255,7 +261,7 @@ TABS.setup.initialize3D = function () {
     scene = new THREE.Scene();
     const manager = new THREE.LoadingManager();
     loader = new GLTFLoader(manager);
-    import('./../resources/models/' + model_file + '.gltf').then(({default: gltf}) => {
+    import(`./../resources/models/model_${model_file}.gltf`).then(({default: gltf}) => {
         loader.load(gltf,  (obj) =>{
             model = obj.scene;
             model.scale.set(15, 15, 15);

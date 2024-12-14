@@ -1,4 +1,4 @@
-import './style.css'
+import './bt-device-chooser-style.css'
 
 document.addEventListener("DOMContentLoaded", () => {
     window.electronAPI.bleScan(data => {

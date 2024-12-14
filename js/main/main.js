@@ -1,7 +1,8 @@
 import { app, BrowserWindow, ipcMain, Menu, MenuItem, shell, dialog } from 'electron';
 import windowStateKeeper from 'electron-window-state';
 import Store from "electron-store";
-import path, { resolve } from 'path';
+import path from 'path';
+import { fileURLToPath } from 'node:url';
 import started from 'electron-squirrel-startup';
 import { SerialPort } from 'serialport';
 import { writeFile, readFile } from 'node:fs/promises';
@@ -9,7 +10,8 @@ import { writeFile, readFile } from 'node:fs/promises';
 import tcp from './tcp';
 import udp from './udp';
 import serial from './serial';
-import { event } from 'jquery';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const usbBootloaderIds =  [
   { vendorId: 1155, productId: 57105}, 
@@ -32,14 +34,20 @@ const store = new Store();
 function createDeviceChooser() {
   bluetoothDeviceChooser = new BrowserWindow({
     parent: mainWindow,
-    width: 400,
+    width: 410,
     height: 400,
     webPreferences: {
-      preload: BT_DEVICE_CHOOSER_PRELOAD_WEBPACK_ENTRY,
+      preload: path.join(__dirname, 'bt-device-chooser-preload.mjs'),
     }
   });
-  //bluetoothDeviceChooser.removeMenu();
-  bluetoothDeviceChooser.loadURL(BT_DEVICE_CHOOSER_WEBPACK_ENTRY);
+  bluetoothDeviceChooser.removeMenu();
+  
+  if (BT_DEVICE_CHOOSER_VITE_DEV_SERVER_URL) {
+    bluetoothDeviceChooser.loadURL(`${BT_DEVICE_CHOOSER_VITE_DEV_SERVER_URL}/js/libraries/bluetooth-device-chooser/bt-device-chooser-index.html`);
+  } else {
+    bluetoothDeviceChooser.loadFile(path.join(__dirname, `../renderer/${BT_DEVICE_CHOOSER_VITE_NAME}/js/libraries/bluetooth-device-chooser/bt-device-chooser-index.html`));
+  }
+  
 
   bluetoothDeviceChooser.on('closed', () => {
     btDeviceList = null;
@@ -78,7 +86,7 @@ function createWindow() {
     autoHideMenuBar: true,
     icon: "images/inav_icon_128.png",
     webPreferences: {
-      preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
+      preload: path.join(__dirname, 'preload.mjs'),
       nodeIntegration: true,
       webSecurity: false
       //contextIsolation: true
@@ -183,13 +191,19 @@ function createWindow() {
   mainWindow.removeMenu();
   mainWindow.setMinimumSize(800, 600);
 
-  mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
+  if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
+    mainWindow.loadURL(MAIN_WINDOW_VITE_DEV_SERVER_URL);
+  } else {
+    mainWindow.loadFile(path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`));
+  }
   
   mainWindowState.manage(mainWindow);
 
   // Open the DevTools.
   if (process.env.NODE_ENV === 'development') {
-    mainWindow.webContents.openDevTools();
+    mainWindow.on("ready-to-show", () => {
+      mainWindow.webContents.openDevTools();
+    });
   }
 };
 

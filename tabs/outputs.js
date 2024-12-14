@@ -72,7 +72,7 @@ TABS.outputs.initialize = function (callback) {
     });
 
     function load_html() {
-        import('./outputs.html').then(({default: html}) => GUI.load(html, Settings.processHtml(onLoad)));
+        import('./outputs.html?raw').then(({default: html}) => GUI.load(html, Settings.processHtml(onLoad)));
     }
 
     function saveSettings(onComplete) {
@@ -251,7 +251,7 @@ TABS.outputs.initialize = function (callback) {
         const isMotorInverted = self.motorDirectionInverted;
         const isReversed = isMotorInverted && (FC.MIXER_CONFIG.platformType == PLATFORM.MULTIROTOR || FC.MIXER_CONFIG.platformType == PLATFORM.TRICOPTER);
 
-        import('./../resources/motor_order/' + mixer.getById(val).image + (isReversed ? "_reverse" : "") + '.svg').then(({default: path}) => {
+        import(`./../resources/motor_order/${mixer.getById(val).image}${isReversed ? "_reverse" : ""}.svg`).then(({default: path}) => {
             $('.mixerPreview img').attr('src', path);
         });
     }

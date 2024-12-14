@@ -24,7 +24,7 @@ TABS.adjustments.initialize = function (callback) {
     }
 
     function load_html() {
-        import('./adjustments.html').then(({default: html}) => GUI.load(html, process_html));
+        import('./adjustments.html?raw').then(({default: html}) => GUI.load(html, process_html));
     }
 
     function addAdjustment(adjustmentIndex, adjustmentRange, auxChannelCount) {
