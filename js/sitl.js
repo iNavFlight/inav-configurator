@@ -1,5 +1,5 @@
 'use strict'
-//import { chmod, rm } from 'fs';
+import { error } from 'jquery';
 import { GUI } from './gui';
 
 const serialRXProtocolls = [
@@ -95,12 +95,12 @@ var SITLProcess = {
 
     spawn : null,
     isRunning: false,
-    process: null,
+    processHandle: null,
 
     deleteEepromFile(filename) {
-        rm(`${window.electronAPI.getPath('userData')}/${filename}`, error => {
+        window.electronAPI.rm(`${window.electronAPI.appGetPath('userData')}/${filename}`).then(error => {
             if (error) {
-                GUI.log(`Unable to reset Demo mode: ${error.message}`);
+                GUI.log(`Unable to reset Demo mode: ${error}`);
             }
         });
     },
@@ -111,21 +111,21 @@ var SITLProcess = {
             this.stop();
 
         var sitlExePath, eepromPath;
-        var path = window.electronAPI.getPath('userData');
+        var path = window.electronAPI.appGetPath('userData');
         if (GUI.operating_system == 'Windows') {
-            sitlExePath = path.join(__dirname, './../resources/sitl/windows/inav_SITL.exe');
+            sitlExePath = '/windows/inav_SITL.exe';
             eepromPath = `${path}\\${eepromFileName}`
         } else if (GUI.operating_system == 'Linux') {
-            sitlExePath = path.join(__dirname, './../resources/sitl/linux/inav_SITL');
+            sitlExePath = '/linux/inav_SITL';
             eepromPath = `${path}/${eepromFileName}`
-            chmod(sitlExePath, 0o755, err => {
+            window.electronAPI.chmod(sitlExePath, 0o755).then(err => {
                 if (err)
                     console.log(err);
             });
         } else if (GUI.operating_system == 'MacOS') {
-            sitlExePath = path.join(__dirname, './../resources/sitl/macos/inav_SITL');
+            sitlExePath = 'macos/inav_SITL';
             eepromPath = `${path}/${eepromFileName}`
-            chmod(sitlExePath, 0o755, err => {
+            window.electronAPI.chmod(sitlExePath, 0o755).then(err => {
                 if (err)
                     console.log(err);
             });
@@ -176,7 +176,9 @@ var SITLProcess = {
             }
         }
 
-        callback( sitlExePath + " " + args.join(" ") + "\n");
+        if (callback) {
+            callback( sitlExePath + " " + args.join(" ") + "\n");
+        }
         this.spawn(sitlExePath, args, callback);
     },
 
@@ -186,20 +188,26 @@ var SITLProcess = {
         if (GUI.operating_system == 'Linux')
             opts = { useShell: true };
 
-        this.process = window.electronAPI.spawn(path, args, opts);
+        this.processHandle = window.electronAPI.startChildProcess(path, args, opts);
+
+        if (this.processHandle == -1) {
+            this.isRunning = false;
+            return;
+        }
+
         this.isRunning = true;
 
-        this.process.stdout.on('data', (data) => {
+        window.electronAPI.onChildProcessStdout(data => {
             if (callback)
                 callback(data);
         });
 
-        this.process.stderr.on('data', (data) => {
+        window.electronAPI.onChildProcessStderr(data => {
             if (callback)
                 callback(data);
         });
 
-        this.process.on('error', (error) => {
+        window.electronAPI.onChildProcessError(error => {
             if (callback)
                 callback(error);
             this.isRunning = false;
@@ -209,7 +217,8 @@ var SITLProcess = {
     stop: function() {
         if (this.isRunning) {
             this.isRunning = false;
-            this.process.kill();
+            window.electronAPI.killChildProcess(this.processHandle);
+            this.processHandle = null;
         }
     }
 };

@@ -3,8 +3,6 @@ import pkg from './package.json';
 
 export const builtins = ['electron', ...builtinModules.map((m) => [m, `node:${m}`]).flat()];
 
-export const external = [...builtins, ...Object.keys(pkg.dependencies || {})];
-
 export const esmodule = pkg.type === 'module';
 
 /** @type {(env: import('vite').ConfigEnv<'build'>) => import('vite').UserConfig} */

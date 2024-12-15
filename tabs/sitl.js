@@ -254,38 +254,39 @@ TABS.sitl.initialize = (callback) => {
         });
 
         profileNewBtn_e.on('click', function () {
-            var name = prompt(i18n.getMessage('sitlNewProfile'), i18n.getMessage('sitlEnterName'));
-            if (!name)
-                return;
+            window.electronAPI.prompt(i18n.getMessage('sitlNewProfile'), i18n.getMessage('sitlEnterName')).then(name => {
+                if (!name)
+                    return;
 
-            if (profiles.find(e => { return e.name == name })) {
-                dialog.alert(i18n.getMessage('sitlProfileExists'));
-                return;
-            }
-            var eerpromName = name.replace(/[^a-z0-9]/gi, '_').toLowerCase() + ".bin";
-            var profile = {
-                    name: name,
-                    sim: "RealFlight",
-                    isStdProfile: false,
-                    simEnabled: false,
-                    eepromFileName: eerpromName,
-                    port: 49001,
-                    ip: "127.0.0.1",
-                    useImu: false,
-                    channelMap: [ 1, 13, 14, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                    useSerialReceiver: true,
-                    serialPort: serialPorts_e.val(),
-                    serialUart: 3,
-                    serialProtocol: "SBus",
-                    baudRate: false,
-                    stopBits: false,
-                    parity: false
-            }
-            profiles.push(profile);
-            profiles_e.append(`<option value="${name}">${name}</option>`)
-            profiles_e.val(name);
-            updateCurrentProfile();
-            saveProfiles();
+                if (profiles.find(e => { return e.name == name })) {
+                    dialog.alert(i18n.getMessage('sitlProfileExists'));
+                    return;
+                }
+                var eerpromName = name.replace(/[^a-z0-9]/gi, '_').toLowerCase() + ".bin";
+                var profile = {
+                        name: name,
+                        sim: "RealFlight",
+                        isStdProfile: false,
+                        simEnabled: false,
+                        eepromFileName: eerpromName,
+                        port: 49001,
+                        ip: "127.0.0.1",
+                        useImu: false,
+                        channelMap: [ 1, 13, 14, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                        useSerialReceiver: true,
+                        serialPort: serialPorts_e.val(),
+                        serialUart: 3,
+                        serialProtocol: "SBus",
+                        baudRate: false,
+                        stopBits: false,
+                        parity: false
+                }
+                profiles.push(profile);
+                profiles_e.append(`<option value="${name}">${name}</option>`)
+                profiles_e.val(name);
+                updateCurrentProfile();
+                saveProfiles();
+            });
         });
 
         profileDeleteBtn_e.on('click', function () {

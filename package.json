@@ -25,6 +25,7 @@
     "electron-squirrel-startup": "^1.0.0",
     "electron-store": "^10.0.0",
     "electron-window-state": "^5.0.3",
+    "electron-prompt": "^1.7.0",
     "fs": "0.0.1-security",
     "i18next": "^24.0.5",
     "inflection": "3.0.0",

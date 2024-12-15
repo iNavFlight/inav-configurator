@@ -1,6 +1,5 @@
 import path from 'path';
 import { defineConfig } from 'vite';
-import inject from "@rollup/plugin-inject";
 import { pluginExposeRenderer } from './vite.base.config';
 
 export default defineConfig((env) => {

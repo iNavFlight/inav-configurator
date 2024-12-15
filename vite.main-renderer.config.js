@@ -14,10 +14,10 @@ export default defineConfig((env) => {
     mode,
     base: './',
     assetsInclude: ['**/*.gltf', '**/*.glb'],
-    publicDir: './resources/sitl',
     build: {
       outDir: `.vite/renderer/${name}`,
       assetsInlineLimit: Number.MAX_SAFE_INTEGER,
+      chunkSizeWarningLimit: 10240
     },
     plugins: [
       inject({

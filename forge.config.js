@@ -1,7 +1,10 @@
-const path = require('path');
-const fs = require('fs');
+import path from 'node:path';
+import fs from 'node:fs';
+import { fileURLToPath } from 'node:url';
 
-module.exports = {
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+export default {
   packagerConfig: {
     executableName: "inav-configurator",
     asar: false,
@@ -29,7 +32,7 @@ module.exports = {
         renderer: [
           {
             name: 'bt_device_chooser',
-            config: 'vite.bt-renderer.config.js',
+            config: 'vite.bt-dc-renderer.config.js',
           },
           {
             name: 'main_window',
@@ -67,7 +70,7 @@ module.exports = {
         appUserModelId: "com.inav.configurator",
         icon: path.join(__dirname, "./assets/windows/inav_installer_icon.ico"),
         upgradeCode: "13606ff3-b0bc-4dde-8fac-805bc8aed2f8",
-        ui : {
+        ui: {
           enabled: false,
           chooseDirectory: true,
           images: {

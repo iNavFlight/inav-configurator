@@ -12,6 +12,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   showSaveDialog: (options) => ipcRenderer.invoke('dialog.showSaveDialog', options),
   alertDialog: (message) => ipcRenderer.sendSync('dialog.alert', message),
   confirmDialog: (message) => ipcRenderer.sendSync('dialog.confirm', message),
+  prompt: (title, message) => ipcRenderer.invoke('dialog.prompt', title, message),
   tcpConnect: (host, port) => ipcRenderer.invoke('tcpConnect', host, port),
   tcpClose: () => ipcRenderer.send('tcpClose'),
   tcpSend: (data) => ipcRenderer.invoke('tcpSend', data),
@@ -30,5 +31,12 @@ contextBridge.exposeInMainWorld('electronAPI', {
   onUdpError: (callback) => ipcRenderer.on('udpError', (_event, error) => callback(error)),
   onUdpMessage: (callback) => ipcRenderer.on('udpMessage', (_event, data) => callback(data)),
   writeFile: (filename, data) => ipcRenderer.invoke('writeFile', filename, data),
-  readFile: (filename, encoding = 'utf8') => ipcRenderer.invoke('readFile', filename, encoding)
+  readFile: (filename, encoding = 'utf8') => ipcRenderer.invoke('readFile', filename, encoding),
+  rm: (path) => ipcRenderer.invoke('rm', path),
+  chmod: (path, mode) => ipcRenderer.invoke('chmod', path, mode),
+  startChildProcess: (command, args, opts) => ipcRenderer.sendSync('startChildProcess', command, args, opts),
+  killChildProcess: (handle) => ipcRenderer.send('killChildProcess', handle),
+  onChildProcessStdout: (callback) => ipcRenderer.on('onChildProcessStdout', (_event, data) => callback(data)),
+  onChildProcessStderr: (callback) => ipcRenderer.on('onChildProcessStderr', (_event, data) => callback(data)),
+  onChildProcessError: (callback) => ipcRenderer.on('onChildProcessError', (_event, error) => callback(error)),
 });

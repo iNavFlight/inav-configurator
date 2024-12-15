@@ -1,6 +1,6 @@
 
 import { defineConfig, mergeConfig } from 'vite';
-import { getBuildConfig, external, esmodule, pluginHotRestart } from './vite.base.config';
+import { getBuildConfig, esmodule, pluginHotRestart } from './vite.base.config';
 
 // https://vitejs.dev/config
 export default defineConfig((env) => {
@@ -12,7 +12,6 @@ export default defineConfig((env) => {
   const config = {
     build: {
       rollupOptions: {
-        external,
         // Preload scripts may contain Web assets, so use the `build.rollupOptions.input` instead `build.lib.entry`.
         input: forgeConfigSelf.entry,
         output: {

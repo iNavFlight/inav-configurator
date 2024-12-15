@@ -44,26 +44,26 @@ TABS.gps.initialize = function (callback) {
 
     // mavlink ADSB_EMITTER_TYPE
     const ADSB_VEHICLE_TYPE = {
-        0: {icon: 'adsb_14.png', name: 'No info'}, // ADSB_EMITTER_TYPE_NO_INFO
-        1: {icon: 'adsb_1.png', name: 'Light'}, // ADSB_EMITTER_TYPE_LIGHT
-        2: {icon: 'adsb_1.png', name: 'Small'}, // ADSB_EMITTER_TYPE_SMALL
-        3: {icon: 'adsb_2.png', name: 'Large'}, // ADSB_EMITTER_TYPE_LARGE
-        4: {icon: 'adsb_14.png', name: 'High vortex large'}, // ADSB_EMITTER_TYPE_HIGH_VORTEX_LARGE
-        5: {icon: 'adsb_5.png', name: 'Heavy'}, // ADSB_EMITTER_TYPE_HEAVY
-        6: {icon: 'adsb_14.png', name: 'Manuv'}, // ADSB_EMITTER_TYPE_HIGHLY_MANUV
-        7: {icon: 'adsb_13.png', name: 'Rotorcraft'}, // ADSB_EMITTER_TYPE_ROTOCRAFT
-        8: {icon: 'adsb_14.png', name: 'Unassigned'}, // ADSB_EMITTER_TYPE_UNASSIGNED
-        9: {icon: 'adsb_6.png', name: 'Glider'}, // ADSB_EMITTER_TYPE_GLIDER
-        10:{icon:  'adsb_7.png', name: 'Lighter air'}, // ADSB_EMITTER_TYPE_LIGHTER_AIR
-        11:{icon:  'adsb_15.png', name: 'Parachute'}, // ADSB_EMITTER_TYPE_PARACHUTE
-        12:{icon:  'adsb_1.png', name: 'Ultra light'}, // ADSB_EMITTER_TYPE_ULTRA_LIGHT
-        13:{icon:  'adsb_14.png', name: 'Unassigned 2'}, // ADSB_EMITTER_TYPE_UNASSIGNED2
-        14:{icon:  'adsb_8.png', name: 'UAV'}, // ADSB_EMITTER_TYPE_UAV
-        15:{icon:  'adsb_14.png', name: 'Space'}, // ADSB_EMITTER_TYPE_SPACE
-        16:{icon:  'adsb_14.png', name: 'Unassigned 3'}, // ADSB_EMITTER_TYPE_UNASSGINED3
-        17:{icon:  'adsb_9.png', name: 'Surface'}, // ADSB_EMITTER_TYPE_EMERGENCY_SURFACE
-        18:{icon:  'adsb_10.png', name: 'Service surface'}, // ADSB_EMITTER_TYPE_SERVICE_SURFACE
-        19:{icon:  'adsb_12.png', name: 'Pint obstacle'}, // ADSB_EMITTER_TYPE_POINT_OBSTACLE
+        0: {iconNum: 14, name: 'No info'}, // ADSB_EMITTER_TYPE_NO_INFO
+        1: {iconNum: 1,  name: 'Light'}, // ADSB_EMITTER_TYPE_LIGHT
+        2: {iconNum: 1,  name: 'Small'}, // ADSB_EMITTER_TYPE_SMALL
+        3: {iconNum: 2,  name: 'Large'}, // ADSB_EMITTER_TYPE_LARGE
+        4: {iconNum: 14, name: 'High vortex large'}, // ADSB_EMITTER_TYPE_HIGH_VORTEX_LARGE
+        5: {iconNum: 5,  name: 'Heavy'}, // ADSB_EMITTER_TYPE_HEAVY
+        6: {iconNum: 14, name: 'Manuv'}, // ADSB_EMITTER_TYPE_HIGHLY_MANUV
+        7: {iconNum: 13, name: 'Rotorcraft'}, // ADSB_EMITTER_TYPE_ROTOCRAFT
+        8: {iconNum: 14, name: 'Unassigned'}, // ADSB_EMITTER_TYPE_UNASSIGNED
+        9: {iconNum: 6,  name: 'Glider'}, // ADSB_EMITTER_TYPE_GLIDER
+        10:{iconNum: 7,  name: 'Lighter air'}, // ADSB_EMITTER_TYPE_LIGHTER_AIR
+        11:{iconNum: 15, name: 'Parachute'}, // ADSB_EMITTER_TYPE_PARACHUTE
+        12:{iconNum: 1,  name: 'Ultra light'}, // ADSB_EMITTER_TYPE_ULTRA_LIGHT
+        13:{iconNum: 14, name: 'Unassigned 2'}, // ADSB_EMITTER_TYPE_UNASSIGNED2
+        14:{iconNum: 8,  name: 'UAV'}, // ADSB_EMITTER_TYPE_UAV
+        15:{iconNum: 14, name: 'Space'}, // ADSB_EMITTER_TYPE_SPACE
+        16:{iconNum: 14, name: 'Unassigned 3'}, // ADSB_EMITTER_TYPE_UNASSGINED3
+        17:{iconNum: 9,  name: 'Surface'}, // ADSB_EMITTER_TYPE_EMERGENCY_SURFACE
+        18:{iconNum: 10, name: 'Service surface'}, // ADSB_EMITTER_TYPE_SERVICE_SURFACE
+        19:{iconNum: 12, name: 'Pint obstacle'}, // ADSB_EMITTER_TYPE_POINT_OBSTACLE
     };
 
     var loadChainer = new MSPChainerClass();
@@ -106,9 +106,16 @@ TABS.gps.initialize = function (callback) {
             });
         });
     }
+    
+    async function loadIcons() {
+        for (let i = 0; i <= 19; i++) {
+            ADSB_VEHICLE_TYPE[i].icon = (await import(`./../resources/adsb/adsb_${ADSB_VEHICLE_TYPE[i].iconNum}.png?inline`)).default;
+        }
+        arrowIcon = (await import('./../images/icons/map/cf_icon_position.png?inline')).default;
+    }
 
     function load_html() {
-        import('./gps.html?raw').then(({default: html}) => GUI.load(html, Settings.processHtml(process_html)));
+        import('./gps.html?raw').then(({default: html}) => GUI.load(html, Settings.processHtml(loadIcons().then(process_html))));
     }
 
     let cursorInitialized = false;
@@ -119,9 +126,10 @@ TABS.gps.initialize = function (callback) {
 
     let vehicleVectorSource;
     let vehiclesCursorInitialized = false;
+    let arrowIcon;
 
     function process_html() {
-       i18n.localize();;
+        i18n.localize();
 
         var fcFeatures = FC.getFeatures();
 
@@ -324,7 +332,7 @@ TABS.gps.initialize = function (callback) {
                             anchor: [0.5, 1],
                             opacity: 1,
                             scale: 0.5,
-                            src: require('./../images/icons/map/cf_icon_position.png').default
+                            src: arrowIcon
                         }))
                     });
 
@@ -385,7 +393,7 @@ TABS.gps.initialize = function (callback) {
                             rotation: vehicle.headingDegrees * (Math.PI / 180),
                             scale: 0.8,
                             anchor: [0.5, 0.5],
-                            src: require('./../resources/adsb/' + ADSB_VEHICLE_TYPE[vehicle.emitterType].icon).default,
+                            src: ADSB_VEHICLE_TYPE[vehicle.emitterType].icon,
                         })),
                         text: new Text(({
                             text: vehicle.callsign,

@@ -1,6 +1,8 @@
+import { chmod, rm } from 'node:fs';
 import { app, BrowserWindow, ipcMain, Menu, MenuItem, shell, dialog } from 'electron';
 import windowStateKeeper from 'electron-window-state';
 import Store from "electron-store";
+import prompt from 'electron-prompt';
 import path from 'path';
 import { fileURLToPath } from 'node:url';
 import started from 'electron-squirrel-startup';
@@ -10,6 +12,7 @@ import { writeFile, readFile } from 'node:fs/promises';
 import tcp from './tcp';
 import udp from './udp';
 import serial from './serial';
+import child_process from './child_process';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -210,6 +213,7 @@ function createWindow() {
 app.on('before-quit', async () => {
   await tcp.close();
   await serial.close();
+  child_process.stopAll();
 });
 
 app.on('window-all-closed', async () => {
@@ -273,11 +277,21 @@ app.whenReady().then(() => {
   }),
 
   ipcMain.on('dialog.alert', (event, message) => {
-    event.returnValue = dialog.showMessageBoxSync({ message: message, icon: path.join(__dirname, './../../images/inav_icon_128.png')});
+    event.returnValue = dialog.showMessageBoxSync({ message: message, icon: path.join(__dirname, 'inav_icon_128.png')});
   });
 
   ipcMain.on('dialog.confirm', (event, message) => {
-    event.returnValue = (dialog.showMessageBoxSync({ message: message, icon: path.join(__dirname, './../../images/inav_icon_128.png'), buttons: ["Yes", "No"]}) == 0);
+    event.returnValue = (dialog.showMessageBoxSync({ message: message, icon: path.join(__dirname, 'inav_icon_128.png'), buttons: ["Yes", "No"]}) == 0);
+  });
+
+  ipcMain.handle('dialog.prompt', (_event, title, message) => {
+    return prompt({
+      title: title,
+      label: message,
+      width: 450,
+      height: 200,
+      icon: path.join(__dirname, 'inav_icon_128.png'),
+    }, mainWindow);
   });
 
   ipcMain.handle('tcpConnect', (_event, host, port) => {
@@ -337,6 +351,38 @@ app.whenReady().then(() => {
         resolve({error: err});
       }
     });
+  });
+
+  ipcMain.handle('chmod', (_event, path, mode) => {
+    return new Promise(resolve => {
+      chmod(path, mode, error => {
+        if (error) {
+          resolve(error.message)
+        } else {
+          resolve(false)
+        }
+      });
+    });
+  });
+
+  ipcMain.handle('rm', (_event, path) => {
+    return new Promise(resolve => {
+      rm(path, error => {
+        if (error) {
+          resolve(error.message)
+        } else {
+          resolve(false)
+        }
+      });
+    });
+  });
+
+  ipcMain.on('startChildProcess', (event, command, args, opts) => {
+    event.returnValue = child_process.start(path.join(__dirname, 'sitl', command), args, opts, mainWindow);
+  });
+
+  ipcMain.on('killChildProcess', (_event, handle) => {
+    child_process.stop(handle);
   });
 
   // On OS X it's common to re-create a window in the app when the
