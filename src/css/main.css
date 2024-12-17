@@ -1932,9 +1932,11 @@ dialog {
     background-image: url("./../../images/icons/cf_icon_link_grey.svg");
 }
 
-.linkicon-active{
+.link-active {
     background-image: url("./../../images/icons/cf_icon_link_active.svg");
 }
+
+
 
 .bottomStatusIcons {
     background-color: #272727;

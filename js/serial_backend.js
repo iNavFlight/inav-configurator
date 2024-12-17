@@ -191,10 +191,8 @@ var SerialBackend = (function () {
                         } else if (selected_port == 'sitl') {
                             CONFIGURATOR.connection.connect("127.0.0.1:5760", {}, privateScope.onOpen);
                         } else if (selected_port == 'sitl-demo') {
-                            if (SITLProcess.isRunning) {
-                                SITLProcess.stop();
-                            }
-                            SITLProcess.start("demo.bin"), 1000;                        
+                            SITLProcess.stop();
+                            SITLProcess.start("demo.bin");                        
                             this.isDemoRunning = true;
 
                             // Wait 1 sec until SITL is ready

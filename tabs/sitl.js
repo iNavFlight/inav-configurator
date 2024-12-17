@@ -1,5 +1,7 @@
 'use strict'
 
+import smalltalk from 'smalltalk';
+
 import { GUI, TABS } from './../js/gui';
 import i18n from './../js/localization';
 import { SITLProcess, SitlSerialPortUtils } from './../js/sitl';
@@ -127,10 +129,10 @@ TABS.sitl.initialize = (callback) => {
         $sitlLog.val(SITL_LOG);
         if ($sitlLog && $sitlLog.length == 1) {
             $sitlLog.val(SITL_LOG);
-            $sitlLog.animate({scrollTop: $sitlLog[0].scrollHeight -  $sitlLog.height()}, "fast");
+            $sitlLog.animate({scrollTop: $sitlLog[0].scrollHeight -  $sitlLog.height()}, 1);
         }
 
-        profiles = stdProfiles.slice(0);
+        profiles = structuredClone(stdProfiles);
         const sitlProfiles = store.get('sitlProfiles', false);
         if (sitlProfiles) {
             profiles.push(...sitlProfiles);
@@ -254,7 +256,7 @@ TABS.sitl.initialize = (callback) => {
         });
 
         profileNewBtn_e.on('click', function () {
-            window.electronAPI.prompt(i18n.getMessage('sitlNewProfile'), i18n.getMessage('sitlEnterName')).then(name => {
+            smalltalk.prompt(i18n.getMessage('sitlNewProfile'), i18n.getMessage('sitlEnterName')).then(name => {
                 if (!name)
                     return;
 
@@ -286,7 +288,7 @@ TABS.sitl.initialize = (callback) => {
                 profiles_e.val(name);
                 updateCurrentProfile();
                 saveProfiles();
-            });
+            }).catch(() => {} );
         });
 
         profileDeleteBtn_e.on('click', function () {
@@ -305,7 +307,6 @@ TABS.sitl.initialize = (callback) => {
             profiles_e.find('*').remove();
             
             initElements(false);
-            saveProfiles();
         });
 
         serialReceiverEnable_e.on('change', () => {
@@ -408,7 +409,7 @@ TABS.sitl.initialize = (callback) => {
             simulators.forEach(simulator => {
                 if (simulator.name == sim_e.find(':selected').text()) {         
                     currentSim = simulator;
-                    currentProfile.sim = currentSim.name;
+                    //currentProfile.sim = currentSim.name;
                     if (currentSim.isPortFixed) {
                     port_e.val(currentSim.port).trigger('change');
                     } else {
@@ -426,8 +427,8 @@ TABS.sitl.initialize = (callback) => {
         }
 
         function updateCurrentProfile() {
-        var selected = profiles_e.find(':selected').val(); 
-        var selectedIndex = profiles.findIndex(element => {     
+            var selected = profiles_e.find(':selected').val(); 
+            var selectedIndex = profiles.findIndex(element => {     
                 return element.name == selected;
             });
             currentProfile = profiles[selectedIndex];
@@ -517,7 +518,7 @@ TABS.sitl.initialize = (callback) => {
             var $sitlLog = $('#sitlLog');
             if ($sitlLog && $sitlLog.length == 1) {
                 $sitlLog.val(SITL_LOG);
-                $sitlLog.animate({scrollTop: $sitlLog[0].scrollHeight -  $sitlLog.height()}, "fast");
+                $sitlLog.animate({scrollTop: $sitlLog[0].scrollHeight -  $sitlLog.height()}, 1);
             }
         }
 

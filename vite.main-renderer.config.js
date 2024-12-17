@@ -1,6 +1,6 @@
 import { defineConfig } from 'vite';
 import { pluginExposeRenderer } from './vite.base.config';
-import inject from "@rollup/plugin-inject";
+import inject from '@rollup/plugin-inject';
 
 export default defineConfig((env) => {
   /** @type {import('vite').ConfigEnv<'renderer'>} */
@@ -17,12 +17,12 @@ export default defineConfig((env) => {
     build: {
       outDir: `.vite/renderer/${name}`,
       assetsInlineLimit: Number.MAX_SAFE_INTEGER,
-      chunkSizeWarningLimit: 10240
+      chunkSizeWarningLimit: 10240,
     },
     plugins: [
       inject({
         $: 'jquery',
-        jQuery: 'jquery'
+        jQuery: 'jquery',        
       }),
       pluginExposeRenderer(name)],
     resolve: {

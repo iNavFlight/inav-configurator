@@ -2,17 +2,16 @@ import { chmod, rm } from 'node:fs';
 import { app, BrowserWindow, ipcMain, Menu, MenuItem, shell, dialog } from 'electron';
 import windowStateKeeper from 'electron-window-state';
 import Store from "electron-store";
-import prompt from 'electron-prompt';
 import path from 'path';
 import { fileURLToPath } from 'node:url';
 import started from 'electron-squirrel-startup';
-import { SerialPort } from 'serialport';
 import { writeFile, readFile } from 'node:fs/promises';
 
 import tcp from './tcp';
 import udp from './udp';
 import serial from './serial';
 import child_process from './child_process';
+import { mode } from 'd3';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -91,8 +90,8 @@ function createWindow() {
     webPreferences: {
       preload: path.join(__dirname, 'preload.mjs'),
       nodeIntegration: true,
-      webSecurity: false
-      //contextIsolation: true
+      webSecurity: false,
+      contextIsolation: true
     },
   });
 
@@ -158,9 +157,7 @@ function createWindow() {
     } else {
       callback();
     }
-  
   });
-  
 
   mainWindow.webContents.session.setDevicePermissionHandler((details) => {
     if (details.deviceType === 'usb') {     
@@ -205,7 +202,7 @@ function createWindow() {
   // Open the DevTools.
   if (process.env.NODE_ENV === 'development') {
     mainWindow.on("ready-to-show", () => {
-      mainWindow.webContents.openDevTools();
+      mainWindow.webContents.openDevTools({mode: process.env.DEV_TOOLS_MODE});
     });
   }
 };
@@ -217,35 +214,16 @@ app.on('before-quit', async () => {
 });
 
 app.on('window-all-closed', async () => {
-  
-  
   if (process.platform !== 'darwin') {
     app.quit();
-  }
-  
+  }  
   console.log("We're closing...");
 });
 
-async function getDevices() {
-  const ports = await SerialPort.list();
-  var devices = [];
-  ports.forEach(port => {
-    if (process.platform == 'Linux') {
-      /* Limit to: USB serial, RFCOMM (BT), 6 legacy devices */
-      if (port.pnpId || port.path.match(/rfcomm\d*/) || port.path.match(/ttyS[0-5]$/)) {
-        devices.push(port.path);
-      }
-    } else {
-      devices.push(port.path);
-    }
-  });
-  return devices
-  }
-
 app.whenReady().then(() => {
   
-   ipcMain.handle('listSerialDevices', (event) => {
-    return getDevices()
+   ipcMain.handle('listSerialDevices', (_event) => {
+    return serial.getDevices()
   });
 
   ipcMain.on('storeGet', (event, key, defaultVale) => {
@@ -254,6 +232,9 @@ app.whenReady().then(() => {
 
   ipcMain.on('storeSet', (_event, key, value) => {
     store.set(key, value);
+  });
+  ipcMain.on('storeDelete', (_event, key) => {
+    store.delete(key);
   });
 
   ipcMain.on('appGetPath', (event, name) => {
@@ -282,16 +263,6 @@ app.whenReady().then(() => {
 
   ipcMain.on('dialog.confirm', (event, message) => {
     event.returnValue = (dialog.showMessageBoxSync({ message: message, icon: path.join(__dirname, 'inav_icon_128.png'), buttons: ["Yes", "No"]}) == 0);
-  });
-
-  ipcMain.handle('dialog.prompt', (_event, title, message) => {
-    return prompt({
-      title: title,
-      label: message,
-      width: 450,
-      height: 200,
-      icon: path.join(__dirname, 'inav_icon_128.png'),
-    }, mainWindow);
   });
 
   ipcMain.handle('tcpConnect', (_event, host, port) => {
@@ -377,12 +348,12 @@ app.whenReady().then(() => {
     });
   });
 
-  ipcMain.on('startChildProcess', (event, command, args, opts) => {
-    event.returnValue = child_process.start(path.join(__dirname, 'sitl', command), args, opts, mainWindow);
+  ipcMain.on('startChildProcess', (_event, command, args, opts) => {
+    child_process.start(path.join(__dirname, 'sitl', command), args, opts, mainWindow);
   });
 
-  ipcMain.on('killChildProcess', (_event, handle) => {
-    child_process.stop(handle);
+  ipcMain.on('killChildProcess', (_event) => {
+    child_process.stop();
   });
 
   // On OS X it's common to re-create a window in the app when the

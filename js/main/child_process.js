@@ -2,7 +2,6 @@ import { spawn } from 'node:child_process'
 
 const child_process = {
     _processes: [],
-    _id: 0,
 
     start: function (command, args, opts, window) {        
         var process;
@@ -13,7 +12,7 @@ const child_process = {
             return -1;
         }
         
-        this._processes[this._id] = process;
+        this._processes.push(process);
         
         process.stdout.on('data', (data) => {
             if (!window.isDestroyed()) {
@@ -32,26 +31,16 @@ const child_process = {
                 window.webContents.send('onChildProcessError', error);
             }
         });
-
-        return this._id++;
     },
 
-    stop: function(handle) {
-        var process = this._processes[handle];
-        if (process) {
-            try {
-                process.kill();
-            } catch (err) {
-                console.log(err);
-            }
-            this._processes[handle] = null;
-        }
-    },
-
-    stopAll: function() {
-        for (const process in this._processes) {
+    stop: function() {
+        for (const process of this._processes) {
             if (process) {
-                process.kill();
+                try {
+                    process.kill();
+                } catch (err) {
+                    console.log(err);
+                }
             }
         }
         this._processes = [];

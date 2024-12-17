@@ -317,7 +317,9 @@ $(function() {
                         $('#languageOption').append("<option value='{0}'>{1}</option>".format(lng, i18n.getMessage("language_" + lng)));
                     });
 
+                                        
                     $('#languageOption').val(i18n.getCurrentLanguage());
+                    
                     $('#languageOption').on('change', () => {
                         i18n.changeLanguage($('#languageOption').val());
                     });

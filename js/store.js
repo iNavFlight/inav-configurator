@@ -4,6 +4,9 @@ const store = {
     },
     set: (key, value) => {
         window.electronAPI.storeSet(key, value);
+    },
+    delete: (key) => {
+        window.electronAPI.storeDelete(key);
     }
 }   
 

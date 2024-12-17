@@ -44,7 +44,6 @@ import { ApproachDirection, FwApproach } from './../js/fwApproach';
 import FwApproachCollection from './../js/fwApproachCollection';
 import SerialBackend from './../js/serial_backend';
 import { distanceOnLine, wrap_360, calculate_new_cooridatnes } from './../js/helpers';
-import Plotly from 'plotly';
 import interval from './../js/intervals';
 import { Geozone, GeozoneVertex, GeozoneType, GeozoneShapes, GeozoneFenceAction }  from './../js/geozone';
 import store from './../js/store';
@@ -1133,7 +1132,7 @@ TABS.mission_control.initialize = function (callback) {
 
         if (globalSettings.mapProviderType == 'bing') {
             $('#elevationEarthModelclass').fadeIn(300);
-            changeSwitchery($('#elevationEarthModel'), settings.bingDemModel);
+            changeSwitch($('#elevationEarthModel'), settings.bingDemModel);
         } else {
             $('#elevationEarthModelclass').fadeOut(300);
         }
@@ -1756,14 +1755,14 @@ TABS.mission_control.initialize = function (callback) {
 
             $('#safehomeLatitude').val(selectedSafehome.getLatMap());
             $('#safehomeLongitude').val(selectedSafehome.getLonMap());
-            changeSwitchery($('#safehomeSeaLevelRef'), selectedFwApproachSh.getIsSeaLevelRef());
+            changeSwitch($('#safehomeSeaLevelRef'), selectedFwApproachSh.getIsSeaLevelRef());
             $('#safehomeApproachAlt').val(selectedFwApproachSh.getApproachAltAsl());
             $('#safehomeLandAlt').val(selectedFwApproachSh.getLandAltAsl());
             $('#geozoneApproachDirection').val(selectedFwApproachSh.getApproachDirection());
             $('#safehomeLandHeading1').val(Math.abs(selectedFwApproachSh.getLandHeading1()));
-            changeSwitchery($('#safehomeLandHeading1Excl'), selectedFwApproachSh.getLandHeading1() < 0);
+            changeSwitch($('#safehomeLandHeading1Excl'), selectedFwApproachSh.getLandHeading1() < 0);
             $('#safehomeLandHeading2').val(Math.abs(selectedFwApproachSh.getLandHeading2()));
-            changeSwitchery($('#safehomeLandHeading2Excl'), selectedFwApproachSh.getLandHeading2() < 0);
+            changeSwitch($('#safehomeLandHeading2Excl'), selectedFwApproachSh.getLandHeading2() < 0);
             $('#safehomeLandAltM').text(selectedFwApproachSh.getLandAltAsl() / 100 + " m");
             $('#safehomeApproachAltM').text(selectedFwApproachSh.getApproachAltAsl() / 100 + " m");
             lockShExclHeading = false;
@@ -1788,7 +1787,7 @@ TABS.mission_control.initialize = function (callback) {
             $('#geozoneMaxAlt').val(selectedGeozone.getMaxAltitude());
             $('#geozoneMinAltM').text(selectedGeozone.getMinAltitude() / 100 + " m");
             $('#geozoneMaxAltM').text(selectedGeozone.getMaxAltitude()  / 100 + " m");
-            changeSwitchery($('#geozoneSeaLevelRef'), selectedGeozone.getSealevelRef());
+            changeSwitch($('#geozoneSeaLevelRef'), selectedGeozone.getSealevelRef());
             $('#geozoneAction').val(selectedGeozone.getFenceAction());
             $('#geozoneRadius').val(selectedGeozone.getRadius);
             if (selectedGeozone.getShape() == GeozoneShapes.CIRCULAR) {
@@ -2503,11 +2502,11 @@ TABS.mission_control.initialize = function (callback) {
 
                 let P3Value = selectedMarker.getP3();
 
-                changeSwitchery($('#pointP3Alt'), TABS.mission_control.isBitSet(P3Value, MWNP.P3.ALT_TYPE));
-                changeSwitchery($('#pointP3UserAction1'), TABS.mission_control.isBitSet(P3Value, MWNP.P3.USER_ACTION_1));
-                changeSwitchery($('#pointP3UserAction2'), TABS.mission_control.isBitSet(P3Value, MWNP.P3.USER_ACTION_2));
-                changeSwitchery($('#pointP3UserAction3'), TABS.mission_control.isBitSet(P3Value, MWNP.P3.USER_ACTION_3));
-                changeSwitchery($('#pointP3UserAction4'), TABS.mission_control.isBitSet(P3Value, MWNP.P3.USER_ACTION_4));
+                changeSwitch($('#pointP3Alt'), TABS.mission_control.isBitSet(P3Value, MWNP.P3.ALT_TYPE));
+                changeSwitch($('#pointP3UserAction1'), TABS.mission_control.isBitSet(P3Value, MWNP.P3.USER_ACTION_1));
+                changeSwitch($('#pointP3UserAction2'), TABS.mission_control.isBitSet(P3Value, MWNP.P3.USER_ACTION_2));
+                changeSwitch($('#pointP3UserAction3'), TABS.mission_control.isBitSet(P3Value, MWNP.P3.USER_ACTION_3));
+                changeSwitch($('#pointP3UserAction4'), TABS.mission_control.isBitSet(P3Value, MWNP.P3.USER_ACTION_4));
 
                 var altitudeMeters = app.ConvertCentimetersToMeters(selectedMarker.getAlt());
 
@@ -2559,17 +2558,17 @@ TABS.mission_control.initialize = function (callback) {
 
                 $('#wpApproachDirection').val(selectedFwApproachWp.getApproachDirection());
                 $('#wpLandHeading1').val(Math.abs(selectedFwApproachWp.getLandHeading1()));
-                changeSwitchery($('#wpLandHeading1Excl'), selectedFwApproachWp.getLandHeading1() < 0);
+                changeSwitch($('#wpLandHeading1Excl'), selectedFwApproachWp.getLandHeading1() < 0);
                 $('#wpLandHeading2').val(Math.abs(selectedFwApproachWp.getLandHeading2()));
-                changeSwitchery($('#wpLandHeading2Excl'), selectedFwApproachWp.getLandHeading2() < 0);
+                changeSwitch($('#wpLandHeading2Excl'), selectedFwApproachWp.getLandHeading2() < 0);
 
 
 
                 $('#wpApproachDirection').val(selectedFwApproachWp.getApproachDirection());
                 $('#wpLandHeading1').val(Math.abs(selectedFwApproachWp.getLandHeading1()));
-                changeSwitchery($('#wpLandHeading1Excl'), selectedFwApproachWp.getLandHeading1() < 0);
+                changeSwitch($('#wpLandHeading1Excl'), selectedFwApproachWp.getLandHeading1() < 0);
                 $('#wpLandHeading2').val(Math.abs(selectedFwApproachWp.getLandHeading2()));
-                changeSwitchery($('#wpLandHeading2Excl'), selectedFwApproachWp.getLandHeading2() < 0);
+                changeSwitch($('#wpLandHeading2Excl'), selectedFwApproachWp.getLandHeading2() < 0);
 
                 // Selection box update depending on choice of type of waypoint
                 for (var j in dictOfLabelParameterPoint[selectedMarker.getAction()]) {
@@ -2899,7 +2898,7 @@ TABS.mission_control.initialize = function (callback) {
                 var P3Value = selectedMarker.getP3();
 
                 if (disableMarkerEdit) {
-                    changeSwitchery($('#pointP3Alt'), TABS.mission_control.isBitSet(P3Value, MWNP.P3.ALT_TYPE));
+                    changeSwitch($('#pointP3Alt'), TABS.mission_control.isBitSet(P3Value, MWNP.P3.ALT_TYPE));
                 }
 
                 P3Value = TABS.mission_control.setBit(P3Value, MWNP.P3.ALT_TYPE, $('#pointP3Alt').prop("checked"));
@@ -2986,7 +2985,7 @@ TABS.mission_control.initialize = function (callback) {
         $('#pointP3UserAction1').on('change', function(event){
             if (selectedMarker) {
                 if (disableMarkerEdit) {
-                    changeSwitchery($('#pointP3UserAction1'), TABS.mission_control.isBitSet(selectedMarker.getP3(), MWNP.P3.USER_ACTION_1));
+                    changeSwitch($('#pointP3UserAction1'), TABS.mission_control.isBitSet(selectedMarker.getP3(), MWNP.P3.USER_ACTION_1));
                 }
 
                 var P3Value = TABS.mission_control.setBit(selectedMarker.getP3(), MWNP.P3.USER_ACTION_1, $('#pointP3UserAction1').prop("checked"));
@@ -3001,7 +3000,7 @@ TABS.mission_control.initialize = function (callback) {
         $('#pointP3UserAction2').on('change', function(event){
             if (selectedMarker) {
                 if (disableMarkerEdit) {
-                    changeSwitchery($('#pointP3UserAction2'), TABS.mission_control.isBitSet(selectedMarker.getP3(), MWNP.P3.USER_ACTION_2));
+                    changeSwitch($('#pointP3UserAction2'), TABS.mission_control.isBitSet(selectedMarker.getP3(), MWNP.P3.USER_ACTION_2));
                 }
 
                 var P3Value = TABS.mission_control.setBit(selectedMarker.getP3(), MWNP.P3.USER_ACTION_2, $('#pointP3UserAction2').prop("checked"));
@@ -3016,7 +3015,7 @@ TABS.mission_control.initialize = function (callback) {
         $('#pointP3UserAction3').on('change', function(event){
             if (selectedMarker) {
                 if (disableMarkerEdit) {
-                    changeSwitchery($('#pointP3UserAction3'), TABS.mission_control.isBitSet(selectedMarker.getP3(), MWNP.P3.USER_ACTION_3));
+                    changeSwitch($('#pointP3UserAction3'), TABS.mission_control.isBitSet(selectedMarker.getP3(), MWNP.P3.USER_ACTION_3));
                 }
 
                 var P3Value = TABS.mission_control.setBit(selectedMarker.getP3(), MWNP.P3.USER_ACTION_3, $('#pointP3UserAction3').prop("checked"));
@@ -3031,7 +3030,7 @@ TABS.mission_control.initialize = function (callback) {
         $('#pointP3UserAction4').on('change', function(event){
             if (selectedMarker) {
                 if (disableMarkerEdit) {
-                    changeSwitchery($('#pointP3UserAction4'), TABS.mission_control.isBitSet(selectedMarker.getP3(), MWNP.P3.USER_ACTION_4));
+                    changeSwitch($('#pointP3UserAction4'), TABS.mission_control.isBitSet(selectedMarker.getP3(), MWNP.P3.USER_ACTION_4));
                 }
 
                 var P3Value = TABS.mission_control.setBit(selectedMarker.getP3(), MWNP.P3.USER_ACTION_4, $('#pointP3UserAction4').prop("checked"));
@@ -3095,7 +3094,7 @@ TABS.mission_control.initialize = function (callback) {
 
             if (selectedMarker && selectedFwApproachWp) {
                 if (disableMarkerEdit) {
-                    changeSwitchery($('#wpLandHeading1Excl'), selectedFwApproachWp.getLandHeading1() < 0);
+                    changeSwitch($('#wpLandHeading1Excl'), selectedFwApproachWp.getLandHeading1() < 0);
                     return;
                 }
 
@@ -3133,7 +3132,7 @@ TABS.mission_control.initialize = function (callback) {
         $('#wpLandHeading2Excl').on('change', (event) => {
             if (selectedMarker && selectedFwApproachWp) {
                 if (disableMarkerEdit) {
-                    changeSwitchery($('#wpLandHeading2Excl'), selectedFwApproachWp.getLandHeading2() < 0);
+                    changeSwitch($('#wpLandHeading2Excl'), selectedFwApproachWp.getLandHeading2() < 0);
                     return;
                 }
                 if ($('#wpLandHeading2Excl').prop('checked')) {
@@ -3577,8 +3576,8 @@ TABS.mission_control.initialize = function (callback) {
         /////////////////////////////////////////////
         $('#homeTableBody').on('click', "[data-role='home-center']", function (event) {
             let mapCenter = map.getView().getCenter();
-            HOME.setLon(Math.round(ol.proj.toLonLat(mapCenter)[0] * 1e7));
-            HOME.setLat(Math.round(ol.proj.toLonLat(mapCenter)[1] * 1e7));
+            HOME.setLon(Math.round(toLonLat(mapCenter)[0] * 1e7));
+            HOME.setLat(Math.round(toLonLat(mapCenter)[1] * 1e7));
             updateHome();
         });
 
@@ -4185,10 +4184,8 @@ TABS.mission_control.initialize = function (callback) {
         $('#infoMissionFilename').show();
     }
 
-    function changeSwitchery(element, checked) {
-        if ( ( element.is(':checked') && checked == false ) || ( !element.is(':checked') && checked == true ) ) {
-            element.parent().find('.switcherymid').trigger('click');
-        }
+    function changeSwitch(element, checked) {
+        element.prop('checked', checked);
     }
 
     function updateSelectedShAndFwAp(index) {
@@ -4240,6 +4237,7 @@ TABS.mission_control.initialize = function (callback) {
     }
 
     function plotElevation() {
+        /*
         if ($('#missionPlannerElevation').is(":visible") && !disableMarkerEdit) {
             if (mission.isEmpty()) {
                 var data = [[0], [0]];
@@ -4259,7 +4257,38 @@ TABS.mission_control.initialize = function (callback) {
                               },
                               height: 300,
                               }
-                Plotly.newPlot('elevationDiv', data, layout);
+                //Plotly.newPlot('elevationDiv', data, layout);
+
+                var ctx = $("#elevationChart").get(0);
+
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                      labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+                      datasets: [
+                        {
+                        label: 'One',
+                        data: [12, 19, 3, 5, 2, 3],
+                        borderWidth: 1,
+                        fill: 'start',
+                        },
+                        {
+                            label: 'Two',
+                            data: [13, 21, 7, 7, 3, 6],
+                            borderWidth: 2,
+                            radius: 0
+                        }
+                    ]
+                    },
+                    options: {
+                        maintainAspectRatio: false,
+                        scales: {
+                        y: {
+                          beginAtZero: true
+                        }
+                      }
+                    }
+                  });
             }
             else {
                 (async () => {
@@ -4300,8 +4329,9 @@ TABS.mission_control.initialize = function (callback) {
                             color: '#1f77b4',
                         },
                     };
-                    /* Show multi mission number in plot title when single mission displayed
-                     * Not updated when ALL multi missions displayed since plot disabled */
+                     Show multi mission number in plot title when single mission displayed
+                     * Not updated when ALL multi missions displayed since plot disabled 
+                    
                     let missionNumber = '';
                     if (multimissionCount) {
                         missionNumber = ' ' + ($('#multimissionOptionList').val());
@@ -4326,10 +4356,11 @@ TABS.mission_control.initialize = function (callback) {
 
                     var data = [trace_WGS84, trace_missionHeight];
 
-                    Plotly.newPlot('elevationDiv', data, layout);
+                    //Plotly.newPlot('elevationDiv', data, layout);
                 })()
             }
         }
+        */
     }
 
     function parseBooleans (str) {

@@ -581,3 +581,15 @@
 .tab-mission-control .userActionContainer {
     display: inline-block;
 }
+
+.tab-mission-control #elevationDiv {
+    position: relative;
+    width: 100%;
+    height: 310px;
+}
+
+.tab-mission-control #elevationChart {
+    width: 90%;
+    height: 90%;
+    padding-bottom: 5px;
+}

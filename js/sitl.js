@@ -95,7 +95,6 @@ var SITLProcess = {
 
     spawn : null,
     isRunning: false,
-    processHandle: null,
 
     deleteEepromFile(filename) {
         window.electronAPI.rm(`${window.electronAPI.appGetPath('userData')}/${filename}`).then(error => {
@@ -188,7 +187,7 @@ var SITLProcess = {
         if (GUI.operating_system == 'Linux')
             opts = { useShell: true };
 
-        this.processHandle = window.electronAPI.startChildProcess(path, args, opts);
+        window.electronAPI.startChildProcess(path, args, opts);
 
         if (this.processHandle == -1) {
             this.isRunning = false;
@@ -217,8 +216,7 @@ var SITLProcess = {
     stop: function() {
         if (this.isRunning) {
             this.isRunning = false;
-            window.electronAPI.killChildProcess(this.processHandle);
-            this.processHandle = null;
+            window.electronAPI.killChildProcess();
         }
     }
 };

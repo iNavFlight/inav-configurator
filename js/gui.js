@@ -7,8 +7,6 @@ import { scaleRangeInt } from './helpers';
 import i18n from './localization';
 import mspDeduplicationQueue from "./msp/mspDeduplicationQueue";
 
-//import * as Switchery from './libraries/switchery/switchery.cjs';
-
 var TABS = {}; // filled by individual tab js file
 
 
@@ -110,7 +108,7 @@ GUI_control.prototype.tab_switch_cleanup = function (callback) {
 GUI_control.prototype.switchery = function() {
    
     $('.togglesmall').each(function(index, elem) {
-        $(elem).wrapAll('<label class="ios7-switch" style="font-size: 15px"/>');
+        $(elem).wrapAll('<label class="ios7-switch" style="font-size: 12px"/>');
         $(elem).after('<span></span>')
         $(elem).removeClass('togglesmall');
     });

@@ -5,7 +5,7 @@ import i18next from 'i18next';
 
 import store from './store'
 
-const availableLanguages = ['en', 'uk','zh_CN'];
+const availableLanguages = ['en', 'uk', 'zh_CN'];
 
 const i18n = {};
 
@@ -67,10 +67,10 @@ i18n.parseInputFile = function (data) {
     return jsonData;
 }
 
-i18n.getValidLocale = async function(userLocale) {
+i18n.getValidLocale = function(userLocale) {
     let validUserLocale = userLocale;
     if (validUserLocale === 'DEFAULT') {
-        validUserLocale = await window.electronAPI.appGetLocale();
+        validUserLocale = window.electronAPI.appGetLocale();
         console.log(`Detected locale ${validUserLocale}`);
     }
 
@@ -109,7 +109,7 @@ i18n.getMessage = function(messageID, parameters) {
 };
 
 i18n.getCurrentLanguage = function() {
-    return i18next.language;
+    return i18next.resolvedLanguage;
 };
 
 i18n.getLanguages = function() {
@@ -119,7 +119,6 @@ i18n.getLanguages = function() {
 i18n.changeLanguage = function(languageSelected) {
     store.set('userLanguage', languageSelected);
     i18next.changeLanguage(i18n.getValidLocale(languageSelected));
-    //i18n.selectedLanguage = languageSelected;
 };
 
 i18n.localize = function (reTranslate = false) {

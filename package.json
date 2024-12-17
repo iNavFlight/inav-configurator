@@ -25,7 +25,6 @@
     "electron-squirrel-startup": "^1.0.0",
     "electron-store": "^10.0.0",
     "electron-window-state": "^5.0.3",
-    "electron-prompt": "^1.7.0",
     "fs": "0.0.1-security",
     "i18next": "^24.0.5",
     "inflection": "3.0.0",
@@ -37,7 +36,6 @@
     "minimist": "^1.2.0",
     "nouislider": "^15.8.1",
     "ol": "^10.3.0",
-    "plotly": "^1.0.6",
     "promise-map-series": "^0.3.0",
     "semver": "^7.6.0",
     "serialport": "^12.0.0",
@@ -46,7 +44,8 @@
     "throttle-debounce": "^5.0.2",
     "usb": "^2.11.0",
     "wnumb": "^1.2.0",
-    "xml2js": "^0.6.2"
+    "xml2js": "^0.6.2",
+    "smalltalk": "^4.1.2"
   },
   "devDependencies": {
     "@electron-forge/cli": "^7.6.0",
@@ -62,6 +61,5 @@
     "vite": "^6.0.3",
     "vite-plugin-native": "^2.2.2",
     "process": "^0.11.10"
-
   }
 }

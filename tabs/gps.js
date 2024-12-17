@@ -13,7 +13,7 @@ import Icon from 'ol/style/Icon';
 import Text from 'ol/style/Text';
 import Fill from 'ol/style/Fill';
 import Point from 'ol/geom/Point.js';
-import Feature from 'ol/format/Feature';
+import Feature from 'ol/Feature';
 import VectorSource from 'ol/source/Vector.js';
 import VectorLayer from 'ol/layer/Vector.js';
 

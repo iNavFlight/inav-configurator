@@ -1,7 +1,18 @@
 'use strict';
 
-import path from 'path';
-//const ol = require('openlayers');
+import Map from 'ol/Map.js';
+import OSM from 'ol/source/OSM.js';
+import TileWMS from 'ol/source/TileWMS'
+import BingMaps from 'ol/source/BingMaps'
+import TileLayer from 'ol/layer/Tile.js';
+import { fromLonLat } from 'ol/proj';
+import View from 'ol/View.js'
+import Style from 'ol/style/Style'
+import Icon from 'ol/style/Icon';
+import Point from 'ol/geom/Point.js';
+import Feature from 'ol/format/Feature';
+import VectorSource from 'ol/source/Vector.js';
+import VectorLayer from 'ol/layer/Vector.js';
 
 import { GUI } from './gui';
 import ltmDecoder from './ltmDecoder';
@@ -68,31 +79,31 @@ const groundstation = (function () {
 
         //initialte layers
         if (globalSettings.mapProviderType == 'bing') {
-            privateScope.mapLayer = new ol.source.BingMaps({
+            privateScope.mapLayer = new BingMaps({
                 key: globalSettings.mapApiKey,
                 imagerySet: 'AerialWithLabels',
                 maxZoom: 19
             });
         } else if (globalSettings.mapProviderType == 'mapproxy') {
-            privateScope.mapLayer = new ol.source.TileWMS({
+            privateScope.mapLayer = new TileWMS({
                 url: globalSettings.proxyURL,
                 params: { 'LAYERS': globalSettings.proxyLayer }
             })
         } else {
-            privateScope.mapLayer = new ol.source.OSM();
+            privateScope.mapLayer = new OSM();
         }
 
         //initiate view
-        privateScope.mapView = new ol.View({
-            center: ol.proj.fromLonLat([0, 0]),
+        privateScope.mapView = new View({
+            center: fromLonLat([0, 0]),
             zoom: 3
         });
 
         //initiate map handler
-        privateScope.mapHandler = new ol.Map({
-            target: document.getElementById('groundstation-map'),
+        privateScope.mapHandler = new Map({
+            target: 'groundstation-map',
             layers: [
-                new ol.layer.Tile({
+                new TileLayer({
                     source: privateScope.mapLayer
                 })
             ],
@@ -135,26 +146,26 @@ const groundstation = (function () {
             if (!privateScope.mapInitiated) {
 
                 //Place UAV on the map
-                privateScope.cursorStyle = new ol.style.Style({
-                    image: new ol.style.Icon(({
+                privateScope.cursorStyle = new Style({
+                    image: new Icon(({
                         anchor: [0.5, 0.5],
                         opacity: 1,
                         scale: 0.6,
                         src: path.join(__dirname, './../images/icons/icon_mission_airplane.png')
                     }))
                 });
-                privateScope.cursorPosition = new ol.geom.Point(ol.proj.fromLonLat([lon, lat]));
+                privateScope.cursorPosition = new Point(fromLonLat([lon, lat]));
 
-                privateScope.cursorFeature = new ol.Feature({
+                privateScope.cursorFeature = new Feature({
                     geometry: privateScope.cursorPosition
                 });
 
                 privateScope.cursorFeature.setStyle(privateScope.cursorStyle);
 
-                privateScope.cursorVector = new ol.source.Vector({
+                privateScope.cursorVector = new VectorSource({
                     features: [privateScope.cursorFeature]
                 });
-                privateScope.cursorLayer = new ol.layer.Vector({
+                privateScope.cursorLayer = new VectorLayer({
                     source: privateScope.cursorVector
                 });
 
@@ -166,7 +177,7 @@ const groundstation = (function () {
             }
 
             //Update map center
-            let position = ol.proj.fromLonLat([lon, lat]);
+            let position = fromLonLat([lon, lat]);
             privateScope.mapView.setCenter(position);
 
             //Update position of cursor

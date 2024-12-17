@@ -47,8 +47,8 @@ import MSPCodes from './msp/MSPCodes';
             $("#armedicon").addClass('armed');
         }
         if (FC.isModeEnabled('FAILSAFE')) {
-            $("#failsafeicon").removeClass('failsafe-active');
-            $("#failsafeicon").addClass('failsafe');
+            $("#failsafeicon").removeClass('failsafe');
+            $("#failsafeicon").addClass('failsafe-active');
         } else {
             $("#failsafeicon").removeClass('failsafe-active');
             $("#failsafeicon").addClass('failsafe');
@@ -68,13 +68,11 @@ import MSPCodes from './msp/MSPCodes';
             });
         
             if (active) {
-                $(".linkicon").css({
-                    'background-image': 'url("./images/icons/cf_icon_link_active.svg")'
-                });
+                $("#linkicon").removeClass('link');
+                $("#linkicon").addClass('link-active');
             } else {
-                $(".linkicon").css({
-                    'background-image': 'url("./images/icons/cf_icon_link_grey.svg")'
-                });
+                $("#linkicon").removeClass('link-active');
+                $("#linkicon").addClass('link');
             }
 
             if (((FC.ANALOG.use_capacity_thresholds && FC.ANALOG.battery_remaining_capacity <= FC.MISC.battery_capacity_warning - FC.MISC.battery_capacity_critical) || (!FC.ANALOG.use_capacity_thresholds && FC.ANALOG.voltage < warn)) || FC.ANALOG.voltage < min) {

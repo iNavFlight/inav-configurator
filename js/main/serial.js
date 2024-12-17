@@ -1,4 +1,5 @@
 
+import { SerialPort } from 'serialport';
 import { SerialPortStream } from '@serialport/stream';
 import { autoDetect } from '@serialport/bindings-cpp';
 
@@ -65,7 +66,22 @@ const serial = {
                 resolve({error: true, msg: "Invalid serial port or port closed"});
             }
         });
-    }
+    },
+    getDevices: async function () {
+      const ports = await SerialPort.list();
+      var devices = [];
+      ports.forEach(port => {
+        if (process.platform == 'Linux') {
+          /* Limit to: USB serial, RFCOMM (BT), 6 legacy devices */
+          if (port.pnpId || port.path.match(/rfcomm\d*/) || port.path.match(/ttyS[0-5]$/)) {
+            devices.push(port.path);
+          }
+        } else {
+          devices.push(port.path);
+        }
+      });
+      return devices
+      }
 };
 
 export default serial;
