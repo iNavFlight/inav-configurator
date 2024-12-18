@@ -32,6 +32,11 @@ let selectBluetoothCallback = null;
 
 const store = new Store();
 
+// Workaround for some Linux systems: https://github.com/electron/electron/issues/32760 
+if (process.platform === 'linux') {
+  app.disableHardwareAcceleration();
+}
+
 // In Electron the bluetooth device chooser didn't exist, so we have to build our own
 function createDeviceChooser() {
   bluetoothDeviceChooser = new BrowserWindow({
@@ -180,7 +185,7 @@ function createWindow() {
     }
   });
 
-  app.commandLine.appendSwitch('disable-features', 'OutOfBlinkCors')
+  app.commandLine.appendSwitch('disable-features', 'OutOfBlinkCors');
   
   if (process.platform === "linux"){
     app.commandLine.appendSwitch("enable-experimental-web-platform-features", true);
@@ -210,7 +215,7 @@ function createWindow() {
 app.on('before-quit', async () => {
   await tcp.close();
   await serial.close();
-  child_process.stopAll();
+  child_process.stop();
 });
 
 app.on('window-all-closed', async () => {
