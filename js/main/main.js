@@ -324,9 +324,9 @@ app.whenReady().then(() => {
     });
   });
 
-  ipcMain.handle('chmod', (_event, path, mode) => {
+  ipcMain.handle('chmod', (_event, pathName, mode) => {
     return new Promise(resolve => {
-      chmod(path, mode, error => {
+      chmod(path.join(__dirname, 'sitl', pathName), mode, error => {
         if (error) {
           resolve(error.message)
         } else {
