@@ -1,13 +1,11 @@
 'use strict';
 
-const path = require('path');
-
-const MSPCodes = require('./../js/msp/MSPCodes');
-const MSP = require('./../js/msp');
-const { GUI, TABS } = require('./../js/gui');
-const FC = require('./../js/fc');
-const Settings = require('./../js/settings');
-const i18n = require('./../js/localization');
+import MSPCodes from './../js/msp/MSPCodes';
+import MSP from './../js/msp';
+import { GUI, TABS } from './../js/gui';
+import FC from './../js/fc';
+import Settings from './../js/settings';
+import i18n from './../js/localization';
 
 TABS.advanced_tuning = {};
 
@@ -17,7 +15,7 @@ TABS.advanced_tuning.initialize = function (callback) {
         GUI.active_tab = 'advanced_tuning';
     }
 
-    loadHtml();
+    import('./advanced_tuning.html?raw').then(({default: html}) => GUI.load(html, Settings.processHtml(processHtml)));
 
     function save_to_eeprom() {
         console.log('save_to_eeprom');
@@ -33,9 +31,7 @@ TABS.advanced_tuning.initialize = function (callback) {
         });
     }
 
-    function loadHtml() {
-        GUI.load(path.join(__dirname, "advanced_tuning.html"), Settings.processHtml(function () {
-
+    function processHtml() {
         if (FC.isAirplane()) {
             $('.airplaneTuning').show();
             $('.airplaneTuningTitle').show();
@@ -93,8 +89,6 @@ TABS.advanced_tuning.initialize = function (callback) {
             Settings.saveInputs(save_to_eeprom);
         });
         GUI.content_ready(callback);
-
-        }));
     }
 };
 

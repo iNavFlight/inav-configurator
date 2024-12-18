@@ -1,10 +1,10 @@
 'use strict';
 
-const CONFIGURATOR = require('./data_storage');
-const MSPCodes = require('./msp/MSPCodes');
-const SimpleSmoothFilter = require('./simple_smooth_filter');
-const eventFrequencyAnalyzer = require('./eventFrequencyAnalyzer');
-const mspDeduplicationQueue = require('./msp/mspDeduplicationQueue');
+import CONFIGURATOR from './data_storage';
+import MSPCodes from './msp/MSPCodes';
+import SimpleSmoothFilter from './simple_smooth_filter';
+import eventFrequencyAnalyzer from './eventFrequencyAnalyzer';
+import mspDeduplicationQueue from './msp/mspDeduplicationQueue';
 
 var mspQueue = function () {
 
@@ -316,4 +316,4 @@ var mspQueue = function () {
     return publicScope;
 }();
 
-module.exports = mspQueue;
+export default mspQueue;

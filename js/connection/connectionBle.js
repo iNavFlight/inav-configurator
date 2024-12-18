@@ -1,9 +1,9 @@
 'use strict'
 
-const { GUI } = require('./../gui');
+import { GUI } from './../gui';
 
-const  { ConnectionType, Connection } = require('./connection');
-const i18n = require('./../localization');
+import  { ConnectionType, Connection } from './connection';
+import i18n from './../localization';
 
 // BLE 20 bytes buffer
 const BLE_WRITE_BUFFER_LENGTH = 20;
@@ -266,4 +266,4 @@ class ConnectionBle extends Connection {
     }
 }
 
-module.exports = ConnectionBle;
+export default ConnectionBle;

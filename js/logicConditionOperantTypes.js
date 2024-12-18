@@ -132,4 +132,4 @@ const OPERAND_TYPES = {
     },
 };
 
-module.exports = { OPERAND_TYPES };
+export { OPERAND_TYPES };
