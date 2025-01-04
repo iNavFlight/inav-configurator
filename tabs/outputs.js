@@ -1,21 +1,18 @@
 'use strict';
 
-const path = require('path');
-
-const MSPChainerClass = require('./../js/msp/MSPchainer');
-const mspHelper = require('./../js/msp/MSPHelper');
-const MSPCodes = require('./../js/msp/MSPCodes');
-const mspQueue = require('./../js/serial_queue')
-const MSP = require('./../js/msp');
-const { GUI, TABS } = require('./../js/gui');
-const FC = require('./../js/fc');
-const i18n = require('./../js/localization');
-const BitHelper = require('../js/bitHelper');
-const Settings = require('./../js/settings');
-const features = require('./../js/feature_framework');
-const { mixer, PLATFORM } = require('./../js/model');
-const timeout = require('./../js/timeouts')
-const interval = require('./../js/intervals');
+import MSPChainerClass from './../js/msp/MSPchainer';
+import mspHelper from './../js/msp/MSPHelper';
+import MSPCodes from './../js/msp/MSPCodes';
+import MSP from './../js/msp';
+import { GUI, TABS } from './../js/gui';
+import FC from './../js/fc';
+import i18n from './../js/localization';
+import BitHelper from '../js/bitHelper';
+import Settings from './../js/settings';
+import features from './../js/feature_framework';
+import { mixer, PLATFORM } from './../js/model';
+import timeout from './../js/timeouts';
+import interval from './../js/intervals';
 
 TABS.outputs = {
     allowTestMode: false,
@@ -75,7 +72,7 @@ TABS.outputs.initialize = function (callback) {
     });
 
     function load_html() {
-        GUI.load(path.join(__dirname, "outputs.html"), Settings.processHtml(onLoad));
+        import('./outputs.html?raw').then(({default: html}) => GUI.load(html, Settings.processHtml(onLoad)));
     }
 
     function saveSettings(onComplete) {
@@ -254,9 +251,9 @@ TABS.outputs.initialize = function (callback) {
         const isMotorInverted = self.motorDirectionInverted;
         const isReversed = isMotorInverted && (FC.MIXER_CONFIG.platformType == PLATFORM.MULTIROTOR || FC.MIXER_CONFIG.platformType == PLATFORM.TRICOPTER);
 
-        const path = './resources/motor_order/'
-            + mixer.getById(val).image + (isReversed ? "_reverse" : "") + '.svg';
-        $('.mixerPreview img').attr('src', path);
+        import(`./../resources/motor_order/${mixer.getById(val).image}${isReversed ? "_reverse" : ""}.svg`).then(({default: path}) => {
+            $('.mixerPreview img').attr('src', path);
+        });
         labelMotorNumbers();
     }
 

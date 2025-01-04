@@ -150,7 +150,6 @@ hr {
     font-family: 'open_sansregular', Arial, serif;
     line-height: 19px;
     color: #4F4F4F;
-    font-size: 12px;
 }
 
 .tab-configuration .alignicon {
@@ -228,11 +227,6 @@ hr {
     cursor: pointer;
 }
 
-.config-section label {
-    display: inline-block;
-    width: calc(100% - 162px);
-}
-
 .config-section--full-width label {
     display: block;
     width: auto;
@@ -270,8 +264,7 @@ hr {
     vertical-align: top;
 }
 
-.config-section .checkbox .switchery {
+.config-section .checkbox .ios7-switch {
     margin-right: 72px;
     vertical-align: top;
-    margin-top: 3px;
 }

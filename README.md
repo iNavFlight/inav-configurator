@@ -81,8 +81,8 @@ sudo mv inav-configurator.desktop /usr/share/applications/
 For local development, the **node.js** build system is used.
 
 1. Install node.js
-1. From the project folder run `yarn install` and then `npm install`
-1. To build the  and start the configurator:
+1. From the project folder run `npm install` and then `npm install`
+1. To build the and start the configurator:
     - Run `npm start`.
 
 To build the App run `npm run make` to build for your platform.
@@ -114,7 +114,9 @@ To be able to open Inspector, set environment variable `NODE_ENV` to `developmen
 
 ```NODE_ENV=development npm start``` or ```$env:NODE_ENV="development" | npm start``` for Windows PowerShell
 
-Or use vscode and start a debug session `Debug Configurator` (Just hit F5!)
+Or use VScode and start a debug session `Debug Configurator` (Just hit F5!)
+
+To debug the main thread (source files in `js/main`), just set a breakpoint in VScode.
 
 ## Different map providers
 
