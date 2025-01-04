@@ -498,11 +498,11 @@ function osdDecimalsTripDistancePreview() {
 }
 
 function osdDecimalsDistancePreview(prependedSymbol) {
-    var s = '11.5';
+    var s = '24.9';
     if (Settings.getInputValue('osd_decimals_distance') == 4) {
         s+= '3';
     } if (Settings.getInputValue('osd_decimals_distance') == 5) {
-        s = '1' + s + '7';
+        s = '1' + s + '6';
     }
 
     s = FONT.embed_dot(s);
