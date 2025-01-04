@@ -515,7 +515,7 @@ function osdDecimalsDistancePreview(prependedSymbol) {
             s += FONT.symbol(SYM.DIST_KM);
     }
 
-    s = FONT.symbol(prependedSymbol) + s;
+    s = FONT.symbol(prependedSymbol) + FONT.embed_dot(s);
 
     return s;
 }
