@@ -505,6 +505,8 @@ function osdDecimalsDistancePreview(prependedSymbol) {
         s = '1' + s + '7';
     }
 
+    s = FONT.embed_dot(s);
+
     switch (OSD.data.preferences.units) {
         case 0: // Imperial
         case 3: // UK
@@ -515,7 +517,7 @@ function osdDecimalsDistancePreview(prependedSymbol) {
             s += FONT.symbol(SYM.DIST_KM);
     }
 
-    s = FONT.symbol(prependedSymbol) + FONT.embed_dot(s);
+    s = FONT.symbol(prependedSymbol) + s;
 
     return s;
 }
