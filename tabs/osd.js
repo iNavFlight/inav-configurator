@@ -262,7 +262,7 @@ FONT.parseMCMFontFile = function (data) {
 FONT.openFontFile = function ($preview) {
     return new Promise(function (resolve) {
         var options = {
-            filters: [ 
+            filters: [
                 { name: 'Font file', extensions: ['mcm'] }
             ],
         };
@@ -271,7 +271,7 @@ FONT.openFontFile = function ($preview) {
                 console.log('No file selected');
                 return;
             }
-            
+
             if (result.filePaths.length == 1) {
                 const fontData = fs.readFileSync(result.filePaths[0], {flag: "r"});
                 FONT.parseMCMFontFile(fontData.toString());
@@ -2227,6 +2227,11 @@ OSD.constants = {
                     id: 139,
                     preview: 'WP NO 7'
                 },
+                {
+                    name: 'FW_ALT_CONTROL_RESPONSE',
+                    id: 166,
+                    preview: 'ACR 40'
+                },
             ]
         },
         {
@@ -3447,7 +3452,7 @@ HARDWARE.update = function(callback) {
                     callback();
                 }
             });
-        });        
+        });
     });
 };
 
@@ -3472,10 +3477,10 @@ TABS.osd.initialize = function (callback) {
         GUI.load(path.join(__dirname, "osd.html"), Settings.processHtml(function () {
             // translate to user-selected language
            i18n.localize();
-    
+
             // Open modal window
             OSD.GUI.jbox = new jBox('Modal', {
-                width: 750, 
+                width: 750,
                 height: 300,
                 position: {y:'bottom'},
                 offset: {y:-50},
@@ -3485,13 +3490,13 @@ TABS.osd.initialize = function (callback) {
                 title: 'OSD Font Manager',
                 content: $('#fontmanagercontent')
             });
-    
+
             $('a.save').on('click', function () {
                 Settings.saveInputs(save_to_eeprom);
             });
-    
+
             // Initialise guides checkbox
-            isGuidesChecked = store.get('showOSDGuides', false); 
+            isGuidesChecked = store.get('showOSDGuides', false);
 
             // Setup switch indicators
             $(".osdSwitchInd_channel option").each(function() {
@@ -3517,18 +3522,18 @@ TABS.osd.initialize = function (callback) {
             $("#switchIndicators_alignLeft").on('change', function() {
                 refreshOSDSwitchIndicators();
             });
-    
+
             // Functions for when pan servo settings change
             $('#osdPanServoIndicatorShowDegrees').on('change', function() {
                 // Update the OSD preview
                 updatePanServoPreview();
             });
-    
+
             $('#panServoOutput').on('change', function() {
                 // Update the OSD preview
                 updatePanServoPreview();
             });
-    
+
             // Function for when text for craft name changes
             $('#craft_name').on('keyup', function() {
                 // Make sure that the craft name only contains A to Z, 0-9, spaces, and basic ASCII symbols
@@ -3539,11 +3544,11 @@ TABS.osd.initialize = function (callback) {
                 } else {
                     $(this).val(testText.slice(0, -1));
                 }
-    
+
                 // Update the OSD preview
                 updatePilotAndCraftNames();
             });
-    
+
             $('#pilot_name').on('keyup', function() {
                 // Make sure that the pilot name only contains A to Z, 0-9, spaces, and basic ASCII symbols
                 let testExp = new RegExp('^[A-Za-z0-9 !_,:;=@#\\%\\&\\-\\*\\^\\(\\)\\.\\+\\<\\>\\[\\]]');
@@ -3553,17 +3558,17 @@ TABS.osd.initialize = function (callback) {
                 } else {
                     $(this).val(testText.slice(0, -1));
                 }
-    
+
                 // Update the OSD preview
                 updatePilotAndCraftNames();
             });
-    
+
             // font preview window
             var $preview = $('.font-preview');
-    
+
             //  init structs once, also clears current font
             FONT.initData();
-    
+
             var $fontPicker = $('.fontbuttons button');
             $fontPicker.on('click', function () {
                 if (!$(this).data('font-file')) {
@@ -3578,7 +3583,7 @@ TABS.osd.initialize = function (callback) {
                 });
                 store.set('osd_font', $(this).data('font-file'));
             });
-    
+
             // load the last selected font when we change tabs
             var osd_font = store.get('osd_font', false);
             var previous_font_button;
@@ -3586,14 +3591,14 @@ TABS.osd.initialize = function (callback) {
                 previous_font_button = $('.fontbuttons button[data-font-file="' + osd_font + '"]');
                 if (previous_font_button.attr('data-font-file') == undefined) previous_font_button = undefined;
             }
-    
+
             if (typeof previous_font_button == "undefined") {
                 $fontPicker.first().trigger( "click" );
             } else {
                 previous_font_button.trigger( "click" );
             }
-            
-    
+
+
             $('button.load_font_file').on('click', function () {
                 $fontPicker.removeClass('active');
                 FONT.openFontFile().then(function () {
@@ -3601,7 +3606,7 @@ TABS.osd.initialize = function (callback) {
                     OSD.GUI.update();
                 });
             });
-    
+
             // font upload
             $('a.flash_font').on('click', function () {
                 if (!GUI.connect_lock) { // button disabled while flashing is in progress
@@ -3620,7 +3625,7 @@ TABS.osd.initialize = function (callback) {
                     FONT.upload(progressCallback);
                 }
             });
-    
+
             $('.update_preview').on('change', function () {
                 if (OSD.data) {
                     // Force an OSD redraw by saving any element
@@ -3633,11 +3638,11 @@ TABS.osd.initialize = function (callback) {
                     }, 100);
                 }
             });
-    
+
             $('#useCraftnameForMessages').on('change', function() {
                 OSD.GUI.updateDjiMessageElements(this.checked);
             });
-    
+
             if(semver.gte(FC.CONFIG.flightControllerVersion, '7.1.0')) {
                 mspHelper.loadOsdCustomElements(createCustomElements);
             }
@@ -3664,7 +3669,7 @@ function createCustomElements(){
         var customElementTable = $('<table>').addClass('osdCustomElement_main_table');
         var customElementRowType = $('<tr>').data('row', i);
         var customElementRowValue = $('<tr>').data('row', i);
-        
+
         var customElementLabel = $('<tr>');
         customElementLabel.append($('<td>').attr('colspan', 2).append($('<span>').html(i18n.getMessage("custom_element") + ' ' + (i + 1))));
 
