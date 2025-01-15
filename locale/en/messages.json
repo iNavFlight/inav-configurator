@@ -6178,5 +6178,8 @@
     },
     "currentLanguage": {
         "message": "en"
+    },
+   "search": {
+        "message": "Search"
     }
 }
