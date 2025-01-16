@@ -88,7 +88,7 @@ jobs:
                 VERSION=$(grep version package.json | sed 's/.*"\([0-9][0-9]*.[0-9]*.[0-9]*\)".*/\1/g')
                 echo "ACTIONS_STEP_DEBUG=true" >> $GITHUB_ENV
                 echo "BUILD_SUFFIX=${BUILD_SUFFIX}" >> $GITHUB_ENV
-                echo "BUILD_NAME=inav-configurator_linux_arm64_${VERSION}_${BUILD_SUFFIX}" >> $GITHUB_ENV
+                echo "BUILD_NAME=inav-configurator_linux_aarch64_${VERSION}_${BUILD_SUFFIX}" >> $GITHUB_ENV
             - uses: actions/setup-node@v4
               with:
                 node-version: 20
@@ -104,6 +104,8 @@ jobs:
                 command: npm install --foreground-scripts
                 timeout_minutes: 10
                 on_retry_command: rm -rfv node_modules
+            - name: Remove SITL binary
+              run: rm -v resources/sitl/linux/inav_SITL
             - name: Build Linux
               run: npm run make
             - name: Upload Linux deb
@@ -111,11 +113,11 @@ jobs:
               with:
                 name: ${{ env.BUILD_NAME }}_DEB
                 path: ./out/make/deb/*/*.deb
-            #- name: Upload Linux rpm
-            #  uses: actions/upload-artifact@v4
-            #  with:
-            #    name: ${{ env.BUILD_NAME }}_RPM
-            #    path: ./out/make/rpm/*/*.rpm
+            - name: Upload Linux rpm
+              uses: actions/upload-artifact@v4
+              with:
+                name: ${{ env.BUILD_NAME }}_RPM
+                path: ./out/make/rpm/*/*.rpm
             - name: Upload Linux zip
               uses: actions/upload-artifact@v4
               with:
