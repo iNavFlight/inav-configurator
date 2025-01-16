@@ -68,7 +68,7 @@ jobs:
                 name: ${{ env.BUILD_NAME }}_ZIP
                 path: ./out/make/zip/linux/x64/*.zip
 
-    build-linux-arm64:
+    build-linux-aarch64:
         runs-on: ubuntu-24.04-arm
         steps:
             - uses: actions/checkout@v4
@@ -112,17 +112,17 @@ jobs:
               uses: actions/upload-artifact@v4
               with:
                 name: ${{ env.BUILD_NAME }}_DEB
-                path: ./out/make/deb/*/*.deb
+                path: ./out/make/deb/arm64/*.deb
             - name: Upload Linux rpm
               uses: actions/upload-artifact@v4
               with:
                 name: ${{ env.BUILD_NAME }}_RPM
-                path: ./out/make/rpm/*/*.rpm
+                path: ./out/make/rpm/arm54/*.rpm
             - name: Upload Linux zip
               uses: actions/upload-artifact@v4
               with:
                 name: ${{ env.BUILD_NAME }}_ZIP
-                path: ./out/make/zip/linux/*/*.zip
+                path: ./out/make/zip/linux/arm64/*.zip
 
     build-mac-arm64:
         runs-on: macos-13
