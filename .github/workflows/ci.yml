@@ -117,7 +117,7 @@ jobs:
               uses: actions/upload-artifact@v4
               with:
                 name: ${{ env.BUILD_NAME }}_RPM
-                path: ./out/make/rpm/arm54/*.rpm
+                path: ./out/make/rpm/arm64/*.rpm
             - name: Upload Linux zip
               uses: actions/upload-artifact@v4
               with:
