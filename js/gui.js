@@ -19,6 +19,7 @@ var GUI_control = function () {
     this.active_tab;
     this.tab_switch_in_progress = false;
     this.operating_system;
+    this.extra_platform = "";
     this.defaultAllowedTabsWhenDisconnected = [
         'landing',
         'firmware_flasher',
@@ -60,13 +61,22 @@ var GUI_control = function () {
         'MIXER'   : 4
     };
 
+
     // check which operating system is user running
     if (navigator.appVersion.indexOf("Win") != -1)          this.operating_system = "Windows";
     else if (navigator.appVersion.indexOf("Mac") != -1)     this.operating_system = "MacOS";
     else if (navigator.appVersion.indexOf("CrOS") != -1)    this.operating_system = "ChromeOS";
-    else if (navigator.appVersion.indexOf("Linux") != -1)   this.operating_system = "Linux";
+    else if (navigator.appVersion.indexOf("Linux") != -1) {
+        this.operating_system = "Linux";
+        if(navigator.platform.indexOf('aarch64') != -1)
+        {
+            this.extra_platform = 'arm64';
+        }
+    }
     else if (navigator.appVersion.indexOf("X11") != -1)     this.operating_system = "UNIX";
     else this.operating_system = "Unknown";
+
+    this.platform = navigator.platform;
 
 };
 

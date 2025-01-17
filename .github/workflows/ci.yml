@@ -104,7 +104,7 @@ jobs:
                 command: npm install --foreground-scripts
                 timeout_minutes: 10
                 on_retry_command: rm -rfv node_modules
-            - name: Remove SITL binary
+            - name: Remove other SITL binary
               run: rm -v resources/sitl/linux/inav_SITL
             - name: Build Linux
               run: npm run make
