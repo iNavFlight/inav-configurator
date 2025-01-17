@@ -60,7 +60,6 @@ var GUI_control = function () {
         'MIXER'   : 4
     };
 
-
     // check which operating system is user running
     if (navigator.appVersion.indexOf("Win") != -1)          this.operating_system = "Windows";
     else if (navigator.appVersion.indexOf("Mac") != -1)     this.operating_system = "MacOS";
