@@ -141,11 +141,7 @@ var SITLProcess = {
             sitlExePath = path.join(__dirname, './../resources/sitl/windows/inav_SITL.exe');
             eepromPath = `${app.getPath('userData')}\\${eepromFileName}`
         } else if (GUI.operating_system == 'Linux') {
-            if(GUI.extra_platform != '') {
-                sitlExePath = path.join(__dirname, './../resources/sitl/linux/', GUI.extra_platform, '/inav_SITL');
-            } else {
-                sitlExePath = path.join(__dirname, './../resources/sitl/linux/inav_SITL');
-            }
+            sitlExePath = path.join(__dirname, './../resources/sitl/linux/inav_SITL');
             eepromPath = `${app.getPath('userData')}/${eepromFileName}`
             chmod(sitlExePath, 0o755, err => {
                 if (err)
