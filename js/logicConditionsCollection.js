@@ -1,6 +1,5 @@
 'use strict';
 
-
 var LogicConditionsCollection = function () {
 
     let self = {},

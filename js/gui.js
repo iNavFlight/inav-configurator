@@ -69,8 +69,6 @@ var GUI_control = function () {
     else if (navigator.appVersion.indexOf("X11") != -1)     this.operating_system = "UNIX";
     else this.operating_system = "Unknown";
 
-    this.platform = navigator.platform;
-
 };
 
 // message = string
