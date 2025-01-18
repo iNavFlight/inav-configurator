@@ -3775,7 +3775,7 @@ function updateOSDCustomElementsDisplay() {
 
                         switch (parseInt(typeCell.val())) {
                             case 1:
-                                preview += valueCell.find('.text').val();
+                                preview += valueCell.find('.text').val().trim();
                                 break;
                             case 2:
                                 preview += FONT.symbol("0x" + parseInt(valueCell.find('.ico').val()).toString(16).toUpperCase());
@@ -3788,56 +3788,54 @@ function updateOSDCustomElementsDisplay() {
                                 break;
                             case 5:
                             case 17:
-                                preview += " 2";
+                                preview += FONT.symbol(SYM.BLANK) + "2";
                                 break;
                             case 6:
                             case 18:
-                                preview += " 57";
+                                preview += FONT.symbol(SYM.BLANK) + "57";
                                 break;
                             case 7:
                             case 19:
-                                preview += " 316";
+                                preview += FONT.symbol(SYM.BLANK) + "316";
                                 break;
                             case 8:
                             case 20:
-                                preview += " 6926";
+                                preview += FONT.symbol(SYM.BLANK) + "6926";
                                 break;
                             case 9:
                             case 21:
-                                preview += " 36520";
+                                preview += FONT.symbol(SYM.BLANK) + "36520";
                                 break;
                             case 10:
                             case 22:
-                                preview += " " + FONT.embed_dot("1.6");
+                                preview += FONT.symbol(SYM.BLANK) + FONT.embed_dot("1.6");
                                 break;
                             case 11:
                             case 23:
-                                preview += " " + FONT.embed_dot("2.64");
+                                preview += FONT.symbol(SYM.BLANK) + FONT.embed_dot("2.64");
                                 break;
                             case 12:
                             case 24:
-                                preview += " " + FONT.embed_dot("21.4");
+                                preview += FONT.symbol(SYM.BLANK) + FONT.embed_dot("21.4");
                                 break;
                             case 13:
                             case 25:
-                                preview += " " + FONT.embed_dot("34.26");
+                                preview += FONT.symbol(SYM.BLANK) + FONT.embed_dot("34.26");
                                 break;
                             case 14:
                             case 26:
-                                preview += " " + FONT.embed_dot("315.7");
+                                preview += FONT.symbol(SYM.BLANK) + FONT.embed_dot("315.7");
                                 break;
                             case 15:
                             case 27:
-                                preview += " " + FONT.embed_dot("562.46");
+                                preview += FONT.symbol(SYM.BLANK) + FONT.embed_dot("562.46");
                                 break;
                             case 16:
                             case 28:
-                                preview += " " + FONT.embed_dot("4629.1");
+                                preview += FONT.symbol(SYM.BLANK) + FONT.embed_dot("4629.1");
                                 break;
                         }
                     }
-
-                    preview = preview.trim();
 
                     if (preview == "") {
                         preview = "CE_" + (i + 1);
