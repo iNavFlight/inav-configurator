@@ -466,7 +466,7 @@ function osdDecimalsMainBatteryPreview() {
 }
 
 function osdDecimalsAltitudePreview() {
-    var s = ' 114';
+    var s = FONT.symbol(SYM.BLANK) + '114';
     if (Settings.getInputValue('osd_decimals_altitude') == 4) {
         s += '3';
     } if (Settings.getInputValue('osd_decimals_altitude') == 5) {
