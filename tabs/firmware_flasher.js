@@ -59,17 +59,19 @@ TABS.firmware_flasher.initialize = function (callback) {
         function parseDevFilename(filename) {
             //var targetFromFilenameExpression = /inav_([\d.]+)?_?([^.]+)\.(.*)/;
             // inav_8.0.0_TUNERCF405_dev-20240617-88fb1d0.hex
-            var targetFromFilenameExpression = /^inav_([\d.]+)_([A-Z0-9_]+)_dev-(\d{4})(\d{2})(\d{2})-(\w+)\.(hex)$/;
+            // inav_8.0.0_TUNERCF405_ci-20240617-88fb1d0.hex
+            var targetFromFilenameExpression = /^inav_([\d.]+)_([A-Z0-9_]+)_(ci|dev)-(\d{4})(\d{2})(\d{2})-(\w+)\.(hex)$/;
             var match = targetFromFilenameExpression.exec(filename);
 
             if (!match) {
+                console.log(filename + " not matched");
                 return null;
             }
 
             return {
                 raw_target: match[2],
                 target: match[2].replace("_", " "),
-                format: match[7],
+                format: match[8],
             };
         }
 

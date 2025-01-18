@@ -17,7 +17,7 @@
     "language_ja": {
         "message": "日本語",
         "_comment": "Don't translate!"
-    },    
+    },
     "language_zh_CN": {
         "message": "简体中文",
         "_comment": "Don't translate!"
@@ -2068,6 +2068,9 @@
     "adjustmentsFunction59": {
         "message": "Multi Mission Index Adjustment"
     },
+    "adjustmentsFunction60": {
+        "message": "Fixed Wing Alt Control Response Adjustment"
+    },
     "adjustmentsSave": {
         "message": "Save"
     },
@@ -3504,6 +3507,12 @@
     },
     "soarPitchDeadbandHelp": {
         "message": "Pitch Angle deadband when soaring mode enabled (deg). Angle mode inactive within deadband allowing pitch to free float whilst soaring."
+    },
+    "altControlResponse": {
+        "message": "Altitude Control Response Factor"
+    },
+    "altControlResponseHelp": {
+        "message": "Adjusts the response of fixed wing altitude control as the target altitude is approached. Higher values will sharpen altitude control response but may also cause excessive overshoot or pitch instability if set too high."
     },
     "waypointRadiusHelp": {
         "message": "This sets the distance away from a waypoint that triggers the waypoint as reached."

@@ -21,10 +21,6 @@ var defaultsDialogData = [
                 value: "256HZ"
             },
             {
-                key: "looptime",
-                value: 500
-            },
-            {
                 key: "motor_pwm_protocol",
                 value: "DSHOT300"
             },
@@ -141,10 +137,6 @@ var defaultsDialogData = [
             {
                 key: "gyro_hardware_lpf",
                 value: "256HZ"
-            },
-            {
-                key: "looptime",
-                value: 500
             },
             {
                 key: "motor_pwm_protocol",
@@ -278,10 +270,6 @@ var defaultsDialogData = [
             {
                 key: "gyro_hardware_lpf",
                 value: "256HZ"
-            },
-            {
-                key: "looptime",
-                value: 500
             },
             {
                 key: "motor_pwm_protocol",
