@@ -76,6 +76,8 @@ function createWindow() {
     },
   });
 
+  //mainWindow.webContents.openDevTools()
+
   mainWindow.webContents.on('context-menu', (_, props) => {
     const menu = new Menu()  ;
     menu.append(new MenuItem({ label: "Undo", role: "undo", accelerator: 'CmdOrCtrl+Z', visible: props.isEditable }));
