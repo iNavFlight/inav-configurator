@@ -3686,22 +3686,24 @@ function createCustomElements(){
                         <option data-value="gv" value="8">Global Variable 0000</option>
                         <option data-value="gv" value="9">Global Variable 00000</option>
                         <option data-value="gv" value="10">Global Variable 0.0</option>
-                        <option data-value="gv" value="11">Global Variable 00.0</option>
-                        <option data-value="gv" value="12">Global Variable 00.00</option>
-                        <option data-value="gv" value="13">Global Variable 000.0</option>
-                        <option data-value="gv" value="14">Global Variable 000.00</option>
-                        <option data-value="gv" value="15">Global Variable 0000.0</option>
-                        <option data-value="lc" value="16">Logic Condition 0</option>
-                        <option data-value="lc" value="17">Logic Condition 00</option>
-                        <option data-value="lc" value="18">Logic Condition 000</option>
-                        <option data-value="lc" value="19">Logic Condition 0000</option>
-                        <option data-value="lc" value="20">Logic Condition 00000</option>
-                        <option data-value="lc" value="21">Logic Condition 0.0</option>
-                        <option data-value="lc" value="22">Logic Condition 00.0</option>
-                        <option data-value="lc" value="23">Logic Condition 00.00</option>
-                        <option data-value="lc" value="24">Logic Condition 000.0</option>
-                        <option data-value="lc" value="25">Logic Condition 000.00</option>
-                        <option data-value="lc" value="26">Logic Condition 0000.0</option>
+                        <option data-value="gv" value="11">Global Variable 0.00</option>
+                        <option data-value="gv" value="12">Global Variable 00.0</option>
+                        <option data-value="gv" value="13">Global Variable 00.00</option>
+                        <option data-value="gv" value="14">Global Variable 000.0</option>
+                        <option data-value="gv" value="15">Global Variable 000.00</option>
+                        <option data-value="gv" value="16">Global Variable 0000.0</option>
+                        <option data-value="lc" value="17">Logic Condition 0</option>
+                        <option data-value="lc" value="18">Logic Condition 00</option>
+                        <option data-value="lc" value="19">Logic Condition 000</option>
+                        <option data-value="lc" value="20">Logic Condition 0000</option>
+                        <option data-value="lc" value="21">Logic Condition 00000</option>
+                        <option data-value="lc" value="22">Logic Condition 0.0</option>
+                        <option data-value="lc" value="23">Logic Condition 0.00</option>
+                        <option data-value="lc" value="24">Logic Condition 00.0</option>
+                        <option data-value="lc" value="25">Logic Condition 00.00</option>
+                        <option data-value="lc" value="26">Logic Condition 000.0</option>
+                        <option data-value="lc" value="27">Logic Condition 000.00</option>
+                        <option data-value="lc" value="28">Logic Condition 0000.0</option>
                         `);
 
             customElementRowType.append($('<td>').append(select));
@@ -3773,7 +3775,7 @@ function updateOSDCustomElementsDisplay() {
 
                         switch (parseInt(typeCell.val())) {
                             case 1:
-                                preview += valueCell.find('.text').val();
+                                preview += valueCell.find('.text').val().trim();
                                 break;
                             case 2:
                                 preview += FONT.symbol("0x" + parseInt(valueCell.find('.ico').val()).toString(16).toUpperCase());
@@ -3785,53 +3787,55 @@ function updateOSDCustomElementsDisplay() {
                                 preview += FONT.symbol(SYM.HOME);
                                 break;
                             case 5:
-                            case 16:
-                                preview += " 2";
+                            case 17:
+                                preview += FONT.symbol(SYM.BLANK) + "2";
                                 break;
                             case 6:
-                            case 17:
-                                preview += " 57";
+                            case 18:
+                                preview += FONT.symbol(SYM.BLANK) + "57";
                                 break;
                             case 7:
-                            case 18:
-                                preview += " 316";
+                            case 19:
+                                preview += FONT.symbol(SYM.BLANK) + "316";
                                 break;
                             case 8:
-                            case 19:
-                                preview += " 6926";
+                            case 20:
+                                preview += FONT.symbol(SYM.BLANK) + "6926";
                                 break;
                             case 9:
-                            case 20:
-                                preview += " 36520";
+                            case 21:
+                                preview += FONT.symbol(SYM.BLANK) + "36520";
                                 break;
                             case 10:
-                            case 21:
-                                preview += " " + FONT.embed_dot("1.6");
+                            case 22:
+                                preview += FONT.symbol(SYM.BLANK) + FONT.embed_dot("1.6");
                                 break;
                             case 11:
-                            case 22:
-                                preview += " " + FONT.embed_dot("21.4");
+                            case 23:
+                                preview += FONT.symbol(SYM.BLANK) + FONT.embed_dot("2.64");
                                 break;
                             case 12:
-                            case 23:
-                                preview += " " + FONT.embed_dot("34.26");
+                            case 24:
+                                preview += FONT.symbol(SYM.BLANK) + FONT.embed_dot("21.4");
                                 break;
                             case 13:
-                            case 24:
-                                preview += " " + FONT.embed_dot("315.7");
+                            case 25:
+                                preview += FONT.symbol(SYM.BLANK) + FONT.embed_dot("34.26");
                                 break;
                             case 14:
-                            case 25:
-                                preview += " " + FONT.embed_dot("562.46");
+                            case 26:
+                                preview += FONT.symbol(SYM.BLANK) + FONT.embed_dot("315.7");
                                 break;
                             case 15:
-                            case 26:
-                                preview += " " + FONT.embed_dot("4629.1");
+                            case 27:
+                                preview += FONT.symbol(SYM.BLANK) + FONT.embed_dot("562.46");
+                                break;
+                            case 16:
+                            case 28:
+                                preview += FONT.symbol(SYM.BLANK) + FONT.embed_dot("4629.1");
                                 break;
                         }
                     }
-
-                    preview = preview.trim();
 
                     if (preview == "") {
                         preview = "CE_" + (i + 1);
@@ -3879,9 +3883,9 @@ function fillCustomElementsValues() {
                 case 13:
                 case 14:
                 case 15:
+                case 16:
                     valueCell.find('.gv').val(FC.OSD_CUSTOM_ELEMENTS.items[i].customElementItems[ii].value).trigger('change');
                     break;
-                case 16:
                 case 17:
                 case 18:
                 case 19:
@@ -3892,6 +3896,8 @@ function fillCustomElementsValues() {
                 case 24:
                 case 25:
                 case 26:
+                case 27:
+                case 28:
                     valueCell.find('.lc').val(FC.OSD_CUSTOM_ELEMENTS.items[i].customElementItems[ii].value).trigger('change');
                     break;
             }
@@ -4004,9 +4010,9 @@ function customElementGetDataForRow(row){
             case 13:
             case 14:
             case 15:
+            case 16:
                 partValue = parseInt(valueCell.find('.gv').find(':selected').val());
                 break;
-            case 16:
             case 17:
             case 18:
             case 19:
@@ -4017,6 +4023,8 @@ function customElementGetDataForRow(row){
             case 24:
             case 25:
             case 26:
+            case 27:
+            case 28:
                 partValue = parseInt(valueCell.find('.lc').find(':selected').val());
                 break;
         }
