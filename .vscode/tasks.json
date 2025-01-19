@@ -11,6 +11,19 @@
 				"kind": "build",
 				"isDefault": true
 			}
+		},
+		{
+			"label": "Build analogue fonts",
+			"type": "shell",
+			"command": "max7456tool -f generate fonts.yaml",
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"problemMatcher": [],
+			"options": {
+				"cwd": "${workspaceFolder}/resources/osd/analogue"
+			}
 		}
 	]
 }
