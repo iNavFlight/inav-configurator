@@ -41,7 +41,7 @@ jobs:
                 #check-latest: true
                 #cache: 'npm'
             - name: Install dependencies
-              run: sudo apt-get update && sudo apt-get -y install dpkg fakeroot rpm build-essential libudev-dev
+              run: sudo apt-get update && sudo apt-get -y install dpkg fakeroot rpm build-essential libudev-dev flatpak
             - name: Install deps
               uses: nick-fields/retry@v3
               with:
@@ -69,6 +69,13 @@ jobs:
               with:
                 name: ${{ env.BUILD_NAME }}_ZIP
                 path: ./out/make/zip/linux/x64/*.zip
+            - name: Upload Linux flatpak
+              uses: actions/upload-artifact@v4
+              with:
+                name: ${{ env.BUILD_NAME }}_ZIP
+                path: ./out/make/zip/linux/x64/*.flatpak
+
+
 
     build-linux-aarch64:
         runs-on: ubuntu-24.04-arm
@@ -127,6 +134,11 @@ jobs:
               with:
                 name: ${{ env.BUILD_NAME }}_ZIP
                 path: ./out/make/zip/linux/arm64/*.zip
+            - name: Upload Linux flatpak
+              uses: actions/upload-artifact@v4
+              with:
+                name: ${{ env.BUILD_NAME }}_ZIP
+                path: ./out/make/zip/linux/arm64/*.flatpak
 
     build-mac-arm64:
         runs-on: macos-13
