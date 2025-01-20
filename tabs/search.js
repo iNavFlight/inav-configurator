@@ -67,8 +67,19 @@ tabNames = [
         }
       }
     }
+
+    for (const [key, value] of this.setting2page) {
+    // for (const [key, value] of Object.entries(this.setting2page)) {
+      if ( key.toLowerCase().includes(keyword) ) {
+        for (const page of value) {
+          var rHTML = "<li><button class=\"searchResult\" tabName=\"{0}\">{1} tab</button>: {2}</li>".format(page, page, key);
+          resultsDiv.innerHTML= resultsDiv.innerHTML.concat(rHTML);
+        }
+      }
+    }
+
     for ( result of document.getElementsByClassName("searchResult") ) {
-        result.addEventListener('click', simClick, false);
+      result.addEventListener('click', simClick, false);
     }
   }
   
@@ -104,6 +115,15 @@ tabNames = [
         this.key2page.set( key, new Set() );
       }
       this.key2page.get(key).add(filename);
+    }
+
+    settings = htmlDoc.querySelectorAll('[data-setting]:not([data-setting=""])');
+    for (const element of settings) {
+      key = element.getAttribute('data-setting');
+      if (! this.setting2page.has(key) ) {
+        this.setting2page.set( key, new Set() );
+      }
+      this.setting2page.get(key).add(filename);
     }
 
   }
@@ -149,6 +169,7 @@ tabNames = [
 TABS.search.initialize = function (callback) {
     var self = this;
     this.key2page = new Map();
+    this.setting2page = new Map();
     this.messages;
 
     if (GUI.active_tab != 'search') {
