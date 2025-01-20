@@ -1009,6 +1009,16 @@ li.active .ic_mag {
     background-image: url("./../../images/icons/cf_icon_mag_white.svg");
 }
 
+.ic_search {
+    background-image: url("./../../images/icons/search-gray.svg");
+}
+
+.ic_search:hover {
+    background-image: url("./../../images/icons/search-white.svg");
+}
+
+
+
 #content {
     margin-top: 0;
     padding: 0;

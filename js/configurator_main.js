@@ -281,6 +281,10 @@ $(function() {
                             require('./../tabs/ez_tune');
                             TABS.ez_tune.initialize(content_ready);
                             break;
+                        case 'search':
+                            require('./../tabs/search');
+                            TABS.search.initialize(content_ready);
+                            break;
                         default:
                             console.log('Tab not found:' + tab);
                     }
