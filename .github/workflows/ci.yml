@@ -41,7 +41,7 @@ jobs:
                 #check-latest: true
                 #cache: 'npm'
             - name: Install dependencies
-              run: sudo apt-get update && sudo apt-get -y install dpkg fakeroot rpm build-essential libudev-dev flatpak
+              run: sudo apt-get update && sudo apt-get -y install dpkg fakeroot rpm build-essential libudev-dev flatpak flatpak-builder eu-strip
             - name: Install deps
               uses: nick-fields/retry@v3
               with:
@@ -104,7 +104,7 @@ jobs:
                 #check-latest: true
                 #cache: 'npm'
             - name: Install dependencies
-              run: sudo apt-get update && sudo apt-get -y install dpkg fakeroot rpm build-essential libudev-dev
+              run: sudo apt-get update && sudo apt-get -y install dpkg fakeroot rpm build-essential libudev-dev flatpak flatpak-builder eu-strip
             - name: Install deps
               uses: nick-fields/retry@v3
               with:
