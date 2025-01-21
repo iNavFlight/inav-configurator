@@ -110,5 +110,19 @@ module.exports = {
         }
       },
     },
+    {
+      name: '@electron-forge/maker-flatpak',
+      config: {
+        options: {
+          name: "inav-configurator",
+          productName: "INAV Configurator",
+          license: "GPL-3.0",
+          categories: ["Utility"],
+          icon: "./assets/linux/icon/inav_icon_128.png",
+          description: "Configurator for the open source flight controller software INAV.",
+          homepage: "https://github.com/inavflight/",
+        }
+      },
+    },
   ],
 };
