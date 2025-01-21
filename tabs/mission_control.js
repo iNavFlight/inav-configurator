@@ -3224,8 +3224,8 @@ TABS.mission_control.initialize = function (callback) {
         });
 
         $('#safehomeLatitude').on('change', event => {
-            if (selectedFwApproachSh) {
-                selectedFwApproachSh.setLat(Math.round(Number($(event.currentTarget).val()) * 1e7));
+            if (selectedSafehome && selectedFwApproachSh) {
+                selectedSafehome.setLat(Math.round(Number($(event.currentTarget).val()) * 1e7));
                 renderSafeHomeOptions();
                 cleanSafehomeLayers();
                 renderSafehomesOnMap();
@@ -3234,8 +3234,8 @@ TABS.mission_control.initialize = function (callback) {
 
 
         $('#safehomeLongitude').on('change', event => {
-            if (selectedFwApproachSh) {
-                selectedFwApproachSh.setLon(Math.round(Number($(event.currentTarget).val()) * 1e7));
+            if (selectedSafehome && selectedFwApproachSh) {
+                selectedSafehome.setLon(Math.round(Number($(event.currentTarget).val()) * 1e7));
                 renderSafeHomeOptions();
                 cleanSafehomeLayers();
                 renderSafehomesOnMap();
@@ -4154,6 +4154,7 @@ TABS.mission_control.initialize = function (callback) {
     function updateSelectedShAndFwAp(index) {
         selectedSafehome = FC.SAFEHOMES.get()[index];
         selectedFwApproachSh = FC.FW_APPROACH.get()[index];
+        console.log("Select safe home/approach: " + index)
     }
 
     /* resetAltitude = true : For selected WPs only. Changes WP Altitude value back to previous value if setting below ground level.
