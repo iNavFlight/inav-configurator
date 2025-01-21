@@ -44,6 +44,7 @@ jobs:
               run: |
                 sudo apt-get update && sudo apt-get -y install dpkg fakeroot rpm build-essential libudev-dev flatpak flatpak-builder elfutils
                  flatpak remote-add --user --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+                 npm install --save-dev @electron-forge/maker-flatpak
             - name: Install deps
               uses: nick-fields/retry@v3
               with:
