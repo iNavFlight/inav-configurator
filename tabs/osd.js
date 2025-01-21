@@ -262,7 +262,7 @@ FONT.parseMCMFontFile = function (data) {
 FONT.openFontFile = function ($preview) {
     return new Promise(function (resolve) {
         var options = {
-            filters: [ 
+            filters: [
                 { name: 'Font file', extensions: ['mcm'] }
             ],
         };
@@ -271,7 +271,7 @@ FONT.openFontFile = function ($preview) {
                 console.log('No file selected');
                 return;
             }
-            
+
             if (result.filePaths.length == 1) {
                 const fontData = fs.readFileSync(result.filePaths[0], {flag: "r"});
                 FONT.parseMCMFontFile(fontData.toString());
@@ -466,7 +466,7 @@ function osdDecimalsMainBatteryPreview() {
 }
 
 function osdDecimalsAltitudePreview() {
-    var s = ' 114';
+    var s = FONT.symbol(SYM.BLANK) + '114';
     if (Settings.getInputValue('osd_decimals_altitude') == 4) {
         s += '3';
     } if (Settings.getInputValue('osd_decimals_altitude') == 5) {
@@ -498,12 +498,14 @@ function osdDecimalsTripDistancePreview() {
 }
 
 function osdDecimalsDistancePreview(prependedSymbol) {
-    var s = '11.5';
+    var s = '24.9';
     if (Settings.getInputValue('osd_decimals_distance') == 4) {
         s+= '3';
     } if (Settings.getInputValue('osd_decimals_distance') == 5) {
-        s = '1' + s + '7';
+        s = '1' + s + '6';
     }
+
+    s = FONT.embed_dot(s);
 
     switch (OSD.data.preferences.units) {
         case 0: // Imperial
@@ -2225,6 +2227,11 @@ OSD.constants = {
                     id: 139,
                     preview: 'WP NO 7'
                 },
+                {
+                    name: 'FW_ALT_CONTROL_RESPONSE',
+                    id: 166,
+                    preview: 'ACR 40'
+                },
             ]
         },
         {
@@ -2799,7 +2806,7 @@ OSD.GUI.updateUnits = function() {
     });
 };
 
-OSD.GUI.updateFields = function() {
+OSD.GUI.updateFields = function(event) {
     // display fields on/off and position
     var $tmpl = $('#osd_group_template').hide();
     // Clear previous groups, if any
@@ -2840,6 +2847,7 @@ OSD.GUI.updateFields = function() {
                 });
         }
         var $displayFields = groupContainer.find('.display-fields');
+        var osdSearch = $('.osd_search');
         for (var jj = 0; jj < groupItems.length; jj++) {
             var item = groupItems[jj];
             var itemData = OSD.data.items[item.id];
@@ -2853,7 +2861,7 @@ OSD.GUI.updateFields = function() {
             } else {
                 name = inflection.titleize(name);
             }
-            var searchTerm = $('.osd_search').val();
+            var searchTerm = osdSearch.val();
             if (searchTerm.length > 0 && !name.toLowerCase().includes(searchTerm.toLowerCase())) {
                 continue;
             }
@@ -2949,10 +2957,13 @@ OSD.GUI.updateFields = function() {
     // needs to be called after all of them have been set up
     GUI.switchery();
 
-    // Update the OSD preview
-    refreshOSDSwitchIndicators();
-    updatePilotAndCraftNames();
-    updatePanServoPreview();
+    if(event != null && event.currentTarget !== osdSearch[0])
+    {
+        // Update the OSD preview
+        refreshOSDSwitchIndicators();
+        updatePilotAndCraftNames();
+        updatePanServoPreview();
+    }
 };
 
 OSD.GUI.removeBottomLines = function(){
@@ -3367,8 +3378,8 @@ OSD.GUI.updateAll = function() {
         clear.off('change');
     }
 
-    $('.osd_search').on('input', function() {
-        OSD.GUI.updateFields();
+    $('.osd_search').on('input', function(event) {
+        OSD.GUI.updateFields(event);
     });
     $('.supported').fadeIn();
     OSD.GUI.updateVideoMode();
@@ -3431,7 +3442,7 @@ HARDWARE.update = function(callback) {
         // Update RX data for Crossfire detection
         mspHelper.loadRxConfig(function() {
             HARDWARE.capabilities.useCRSF = (FC.RX_CONFIG.serialrx_provider == 6); // CRSF
-            HARDWARE.capabilities.useRx = (FC.RX_CONFIG.serialrx_provider == 6 || FC.RX_CONFIG.receiver_type == 2); // CRSF or MSP
+            HARDWARE.capabilities.useRx = (FC.RX_CONFIG.serialrx_provider == 6 || FC.RX_CONFIG.receiver_type == 2 || FC.RX_CONFIG.serialrx_provider == 12); // CRSF or MSP or MAVLINK
 
             mspHelper.loadSensorConfig(function () {
                 HARDWARE.capabilities.useBaro  = (FC.SENSOR_CONFIG.barometer != 0);
@@ -3441,7 +3452,7 @@ HARDWARE.update = function(callback) {
                     callback();
                 }
             });
-        });        
+        });
     });
 };
 
@@ -3466,10 +3477,10 @@ TABS.osd.initialize = function (callback) {
         GUI.load(path.join(__dirname, "osd.html"), Settings.processHtml(function () {
             // translate to user-selected language
            i18n.localize();
-    
+
             // Open modal window
             OSD.GUI.jbox = new jBox('Modal', {
-                width: 750, 
+                width: 750,
                 height: 300,
                 position: {y:'bottom'},
                 offset: {y:-50},
@@ -3479,13 +3490,13 @@ TABS.osd.initialize = function (callback) {
                 title: 'OSD Font Manager',
                 content: $('#fontmanagercontent')
             });
-    
+
             $('a.save').on('click', function () {
                 Settings.saveInputs(save_to_eeprom);
             });
-    
+
             // Initialise guides checkbox
-            isGuidesChecked = store.get('showOSDGuides', false); 
+            isGuidesChecked = store.get('showOSDGuides', false);
 
             // Setup switch indicators
             $(".osdSwitchInd_channel option").each(function() {
@@ -3511,18 +3522,18 @@ TABS.osd.initialize = function (callback) {
             $("#switchIndicators_alignLeft").on('change', function() {
                 refreshOSDSwitchIndicators();
             });
-    
+
             // Functions for when pan servo settings change
             $('#osdPanServoIndicatorShowDegrees').on('change', function() {
                 // Update the OSD preview
                 updatePanServoPreview();
             });
-    
+
             $('#panServoOutput').on('change', function() {
                 // Update the OSD preview
                 updatePanServoPreview();
             });
-    
+
             // Function for when text for craft name changes
             $('#craft_name').on('keyup', function() {
                 // Make sure that the craft name only contains A to Z, 0-9, spaces, and basic ASCII symbols
@@ -3533,11 +3544,11 @@ TABS.osd.initialize = function (callback) {
                 } else {
                     $(this).val(testText.slice(0, -1));
                 }
-    
+
                 // Update the OSD preview
                 updatePilotAndCraftNames();
             });
-    
+
             $('#pilot_name').on('keyup', function() {
                 // Make sure that the pilot name only contains A to Z, 0-9, spaces, and basic ASCII symbols
                 let testExp = new RegExp('^[A-Za-z0-9 !_,:;=@#\\%\\&\\-\\*\\^\\(\\)\\.\\+\\<\\>\\[\\]]');
@@ -3547,17 +3558,17 @@ TABS.osd.initialize = function (callback) {
                 } else {
                     $(this).val(testText.slice(0, -1));
                 }
-    
+
                 // Update the OSD preview
                 updatePilotAndCraftNames();
             });
-    
+
             // font preview window
             var $preview = $('.font-preview');
-    
+
             //  init structs once, also clears current font
             FONT.initData();
-    
+
             var $fontPicker = $('.fontbuttons button');
             $fontPicker.on('click', function () {
                 if (!$(this).data('font-file')) {
@@ -3572,7 +3583,7 @@ TABS.osd.initialize = function (callback) {
                 });
                 store.set('osd_font', $(this).data('font-file'));
             });
-    
+
             // load the last selected font when we change tabs
             var osd_font = store.get('osd_font', false);
             var previous_font_button;
@@ -3580,14 +3591,14 @@ TABS.osd.initialize = function (callback) {
                 previous_font_button = $('.fontbuttons button[data-font-file="' + osd_font + '"]');
                 if (previous_font_button.attr('data-font-file') == undefined) previous_font_button = undefined;
             }
-    
+
             if (typeof previous_font_button == "undefined") {
                 $fontPicker.first().trigger( "click" );
             } else {
                 previous_font_button.trigger( "click" );
             }
-            
-    
+
+
             $('button.load_font_file').on('click', function () {
                 $fontPicker.removeClass('active');
                 FONT.openFontFile().then(function () {
@@ -3595,7 +3606,7 @@ TABS.osd.initialize = function (callback) {
                     OSD.GUI.update();
                 });
             });
-    
+
             // font upload
             $('a.flash_font').on('click', function () {
                 if (!GUI.connect_lock) { // button disabled while flashing is in progress
@@ -3614,7 +3625,7 @@ TABS.osd.initialize = function (callback) {
                     FONT.upload(progressCallback);
                 }
             });
-    
+
             $('.update_preview').on('change', function () {
                 if (OSD.data) {
                     // Force an OSD redraw by saving any element
@@ -3627,11 +3638,11 @@ TABS.osd.initialize = function (callback) {
                     }, 100);
                 }
             });
-    
+
             $('#useCraftnameForMessages').on('change', function() {
                 OSD.GUI.updateDjiMessageElements(this.checked);
             });
-    
+
             if(semver.gte(FC.CONFIG.flightControllerVersion, '7.1.0')) {
                 mspHelper.loadOsdCustomElements(createCustomElements);
             }
@@ -3658,7 +3669,7 @@ function createCustomElements(){
         var customElementTable = $('<table>').addClass('osdCustomElement_main_table');
         var customElementRowType = $('<tr>').data('row', i);
         var customElementRowValue = $('<tr>').data('row', i);
-        
+
         var customElementLabel = $('<tr>');
         customElementLabel.append($('<td>').attr('colspan', 2).append($('<span>').html(i18n.getMessage("custom_element") + ' ' + (i + 1))));
 
@@ -3675,22 +3686,24 @@ function createCustomElements(){
                         <option data-value="gv" value="8">Global Variable 0000</option>
                         <option data-value="gv" value="9">Global Variable 00000</option>
                         <option data-value="gv" value="10">Global Variable 0.0</option>
-                        <option data-value="gv" value="11">Global Variable 00.0</option>
-                        <option data-value="gv" value="12">Global Variable 00.00</option>
-                        <option data-value="gv" value="13">Global Variable 000.0</option>
-                        <option data-value="gv" value="14">Global Variable 000.00</option>
-                        <option data-value="gv" value="15">Global Variable 0000.0</option>
-                        <option data-value="lc" value="16">Logic Condition 0</option>
-                        <option data-value="lc" value="17">Logic Condition 00</option>
-                        <option data-value="lc" value="18">Logic Condition 000</option>
-                        <option data-value="lc" value="19">Logic Condition 0000</option>
-                        <option data-value="lc" value="20">Logic Condition 00000</option>
-                        <option data-value="lc" value="21">Logic Condition 0.0</option>
-                        <option data-value="lc" value="22">Logic Condition 00.0</option>
-                        <option data-value="lc" value="23">Logic Condition 00.00</option>
-                        <option data-value="lc" value="24">Logic Condition 000.0</option>
-                        <option data-value="lc" value="25">Logic Condition 000.00</option>
-                        <option data-value="lc" value="26">Logic Condition 0000.0</option>
+                        <option data-value="gv" value="11">Global Variable 0.00</option>
+                        <option data-value="gv" value="12">Global Variable 00.0</option>
+                        <option data-value="gv" value="13">Global Variable 00.00</option>
+                        <option data-value="gv" value="14">Global Variable 000.0</option>
+                        <option data-value="gv" value="15">Global Variable 000.00</option>
+                        <option data-value="gv" value="16">Global Variable 0000.0</option>
+                        <option data-value="lc" value="17">Logic Condition 0</option>
+                        <option data-value="lc" value="18">Logic Condition 00</option>
+                        <option data-value="lc" value="19">Logic Condition 000</option>
+                        <option data-value="lc" value="20">Logic Condition 0000</option>
+                        <option data-value="lc" value="21">Logic Condition 00000</option>
+                        <option data-value="lc" value="22">Logic Condition 0.0</option>
+                        <option data-value="lc" value="23">Logic Condition 0.00</option>
+                        <option data-value="lc" value="24">Logic Condition 00.0</option>
+                        <option data-value="lc" value="25">Logic Condition 00.00</option>
+                        <option data-value="lc" value="26">Logic Condition 000.0</option>
+                        <option data-value="lc" value="27">Logic Condition 000.00</option>
+                        <option data-value="lc" value="28">Logic Condition 0000.0</option>
                         `);
 
             customElementRowType.append($('<td>').append(select));
@@ -3762,7 +3775,7 @@ function updateOSDCustomElementsDisplay() {
 
                         switch (parseInt(typeCell.val())) {
                             case 1:
-                                preview += valueCell.find('.text').val();
+                                preview += valueCell.find('.text').val().trim();
                                 break;
                             case 2:
                                 preview += FONT.symbol("0x" + parseInt(valueCell.find('.ico').val()).toString(16).toUpperCase());
@@ -3774,53 +3787,55 @@ function updateOSDCustomElementsDisplay() {
                                 preview += FONT.symbol(SYM.HOME);
                                 break;
                             case 5:
-                            case 16:
-                                preview += " 2";
+                            case 17:
+                                preview += FONT.symbol(SYM.BLANK) + "2";
                                 break;
                             case 6:
-                            case 17:
-                                preview += " 57";
+                            case 18:
+                                preview += FONT.symbol(SYM.BLANK) + "57";
                                 break;
                             case 7:
-                            case 18:
-                                preview += " 316";
+                            case 19:
+                                preview += FONT.symbol(SYM.BLANK) + "316";
                                 break;
                             case 8:
-                            case 19:
-                                preview += " 6926";
+                            case 20:
+                                preview += FONT.symbol(SYM.BLANK) + "6926";
                                 break;
                             case 9:
-                            case 20:
-                                preview += " 36520";
+                            case 21:
+                                preview += FONT.symbol(SYM.BLANK) + "36520";
                                 break;
                             case 10:
-                            case 21:
-                                preview += " " + FONT.embed_dot("1.6");
+                            case 22:
+                                preview += FONT.symbol(SYM.BLANK) + FONT.embed_dot("1.6");
                                 break;
                             case 11:
-                            case 22:
-                                preview += " " + FONT.embed_dot("21.4");
+                            case 23:
+                                preview += FONT.symbol(SYM.BLANK) + FONT.embed_dot("2.64");
                                 break;
                             case 12:
-                            case 23:
-                                preview += " " + FONT.embed_dot("34.26");
+                            case 24:
+                                preview += FONT.symbol(SYM.BLANK) + FONT.embed_dot("21.4");
                                 break;
                             case 13:
-                            case 24:
-                                preview += " " + FONT.embed_dot("315.7");
+                            case 25:
+                                preview += FONT.symbol(SYM.BLANK) + FONT.embed_dot("34.26");
                                 break;
                             case 14:
-                            case 25:
-                                preview += " " + FONT.embed_dot("562.46");
+                            case 26:
+                                preview += FONT.symbol(SYM.BLANK) + FONT.embed_dot("315.7");
                                 break;
                             case 15:
-                            case 26:
-                                preview += " " + FONT.embed_dot("4629.1");
+                            case 27:
+                                preview += FONT.symbol(SYM.BLANK) + FONT.embed_dot("562.46");
+                                break;
+                            case 16:
+                            case 28:
+                                preview += FONT.symbol(SYM.BLANK) + FONT.embed_dot("4629.1");
                                 break;
                         }
                     }
-
-                    preview = preview.trim();
 
                     if (preview == "") {
                         preview = "CE_" + (i + 1);
@@ -3868,9 +3883,9 @@ function fillCustomElementsValues() {
                 case 13:
                 case 14:
                 case 15:
+                case 16:
                     valueCell.find('.gv').val(FC.OSD_CUSTOM_ELEMENTS.items[i].customElementItems[ii].value).trigger('change');
                     break;
-                case 16:
                 case 17:
                 case 18:
                 case 19:
@@ -3881,6 +3896,8 @@ function fillCustomElementsValues() {
                 case 24:
                 case 25:
                 case 26:
+                case 27:
+                case 28:
                     valueCell.find('.lc').val(FC.OSD_CUSTOM_ELEMENTS.items[i].customElementItems[ii].value).trigger('change');
                     break;
             }
@@ -3993,9 +4010,9 @@ function customElementGetDataForRow(row){
             case 13:
             case 14:
             case 15:
+            case 16:
                 partValue = parseInt(valueCell.find('.gv').find(':selected').val());
                 break;
-            case 16:
             case 17:
             case 18:
             case 19:
@@ -4006,6 +4023,8 @@ function customElementGetDataForRow(row){
             case 24:
             case 25:
             case 26:
+            case 27:
+            case 28:
                 partValue = parseInt(valueCell.find('.lc').find(':selected').val());
                 break;
         }

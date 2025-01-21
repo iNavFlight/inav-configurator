@@ -1002,7 +1002,7 @@ TABS.mission_control.initialize = function (callback) {
             return;
         }
 
-        if (FC.GEOZONES.getUsedVerticesCount() + 2 > FC.GEOZONES.getMaxVertices()) {FC.
+        if (FC.GEOZONES.getUsedVerticesCount() + 2 > FC.GEOZONES.getMaxVertices()) {
             GUI.alert(i18n.getMessage('missionGeozoneMaxVerticesReached'));
             return;
         }
@@ -1343,7 +1343,7 @@ TABS.mission_control.initialize = function (callback) {
     function fileLoadMultiMissionCheck() {
         if (singleMissionActive()) {
             return true;
-        } else if (confirm(i18n.getMessage('confirm_overwrite_multimission_file_load_option'))) {
+        } else if (GUI.confirm(i18n.getMessage('confirm_overwrite_multimission_file_load_option'))) {
             var options = {
                 filters: [ { name: "Mission file", extensions: ['mission'] } ]
             };
@@ -2585,7 +2585,7 @@ TABS.mission_control.initialize = function (callback) {
             }
             else if (selectedFeature && tempMarker.kind == "geozoneline" && tempMarker.selection) {
                 
-                if (FC.GEOZONES.getUsedVerticesCount() + 1 >= FC.GEOZONES.getMaxVertices()) {
+                if (FC.GEOZONES.getUsedVerticesCount() + 1 > FC.GEOZONES.getMaxVertices()) {
                     GUI.alert(i18n.getMessage('missionGeozoneMaxVerticesReached'));
                     return;
                 }
@@ -3224,8 +3224,8 @@ TABS.mission_control.initialize = function (callback) {
         });
 
         $('#safehomeLatitude').on('change', event => {
-            if (selectedFwApproachSh) {
-                selectedFwApproachSh.setLat(Math.round(Number($(event.currentTarget).val()) * 1e7));
+            if (selectedSafehome && selectedFwApproachSh) {
+                selectedSafehome.setLat(Math.round(Number($(event.currentTarget).val()) * 1e7));
                 renderSafeHomeOptions();
                 cleanSafehomeLayers();
                 renderSafehomesOnMap();
@@ -3234,8 +3234,8 @@ TABS.mission_control.initialize = function (callback) {
 
 
         $('#safehomeLongitude').on('change', event => {
-            if (selectedFwApproachSh) {
-                selectedFwApproachSh.setLon(Math.round(Number($(event.currentTarget).val()) * 1e7));
+            if (selectedSafehome && selectedFwApproachSh) {
+                selectedSafehome.setLon(Math.round(Number($(event.currentTarget).val()) * 1e7));
                 renderSafeHomeOptions();
                 cleanSafehomeLayers();
                 renderSafehomesOnMap();
@@ -3414,8 +3414,7 @@ TABS.mission_control.initialize = function (callback) {
         $('#loadEepromGeozoneButton').on('click', event => {
             $(event.currentTarget).addClass('disabled');
             GUI.log('Start of getting Geozones');
-            mspHelper.loadGeozones();
-            setTimeout( () => {
+            mspHelper.loadGeozones(() => {
                  if (FC.GEOZONES.geozoneCount() >= 1) {
                     selectedGeozone = FC.GEOZONES.first();
                 } else {
@@ -3439,27 +3438,25 @@ TABS.mission_control.initialize = function (callback) {
             if (GUI.confirm(i18n.getMessage("missionGeozoneReboot"))) {            
                 $(event.currentTarget).addClass('disabled');
                 GUI.log('Start of sending Geozones');
-                mspHelper.saveGeozones();
-                setTimeout(() => {
+                mspHelper.saveGeozones(() => {
                     mspHelper.saveToEeprom();
                     GUI.log('End of sending Geozones');
                     reboot();
-                }, 1000);
+                });
             }
         });
 
         $('#geozoneShape').on('change', event => {
             if (selectedGeozone) {
-                selectedGeozone.setShape($(event.currentTarget).val());
-                
                 if ($(event.currentTarget).val() == GeozoneShapes.CIRCULAR) {
                     $('#geozoneRadius').prop('disabled', false);
                     let tmpVertex = selectedGeozone.getFirstVertex();
                     selectedGeozone.resetVertices();
                     selectedGeozone.setVertices([tmpVertex]);
                 } else {
-                    if (FC.GEOZONES.getUsedVerticesCount() + 3 > FC.GEOZONES.getMaxVertices()) {
+                    if (FC.GEOZONES.getUsedVerticesCount() + 2 > FC.GEOZONES.getMaxVertices()) {
                         GUI.alert(i18n.getMessage('missionGeozoneMaxVerticesReached'));
+                        renderGeozoneOptions();
                         return;                
                     }
                     $('#geozoneRadius').prop('disabled', true);
@@ -3474,8 +3471,10 @@ TABS.mission_control.initialize = function (callback) {
                         ];
                         selectedGeozone.setVertices(vertices);
                     };
-                }               
+                }
+                selectedGeozone.setShape($(event.currentTarget).val());
                 renderGeozonesOnMap();
+                updateGeozoneInfo();
             }
         });
 
@@ -3620,7 +3619,7 @@ TABS.mission_control.initialize = function (callback) {
         // Callback for Remove buttons
         /////////////////////////////////////////////
         $('#removeAllPoints').on('click', function () {
-            if (markers.length && confirm(i18n.getMessage('confirm_delete_all_points'))) {
+            if (markers.length && GUI.confirm(i18n.getMessage('confirm_delete_all_points'))) {
                 if (removeAllMultiMissionCheck()) {
                     removeAllWaypoints();
                     updateMultimissionState();
@@ -3638,7 +3637,7 @@ TABS.mission_control.initialize = function (callback) {
                     GUI.alert(i18n.getMessage('MissionPlannerJumpTargetRemoval'));
                 }
                 else if (mission.getAttachedFromWaypoint(selectedMarker) && mission.getAttachedFromWaypoint(selectedMarker).length != 0) {
-                    if (confirm(i18n.getMessage('confirm_delete_point_with_options'))) {
+                    if (GUI.confirm(i18n.getMessage('confirm_delete_point_with_options'))) {
                         mission.getAttachedFromWaypoint(selectedMarker).forEach(function (element) {
 
                             if (element.getAction() == MWNP.WPTYPE.LAND) {
@@ -3677,7 +3676,7 @@ TABS.mission_control.initialize = function (callback) {
         $('#loadFileMissionButton').on('click', function () {
             if (!fileLoadMultiMissionCheck()) return;
 
-            if (markers.length && !confirm(i18n.getMessage('confirm_delete_all_points'))) return;
+            if (markers.length && !GUI.confirm(i18n.getMessage('confirm_delete_all_points'))) return;
             var options = {
                 filters: [ { name: "Mission file", extensions: ['mission'] } ]
             };
@@ -3706,7 +3705,7 @@ TABS.mission_control.initialize = function (callback) {
 
         $('#loadMissionButton').on('click', function () {
             let message = multimissionCount ? 'confirm_overwrite_multimission_file_load_option' : 'confirm_delete_all_points';
-            if ((markers.length || multimissionCount) && !confirm(i18n.getMessage(message))) return;
+            if ((markers.length || multimissionCount) && !GUI.confirm(i18n.getMessage(message))) return;
             removeAllWaypoints();
             $(this).addClass('disabled');
             GUI.log(i18n.getMessage('startGetPoint'));
@@ -3725,7 +3724,7 @@ TABS.mission_control.initialize = function (callback) {
 
         $('#loadEepromMissionButton').on('click', function () {
             let message = multimissionCount ? 'confirm_overwrite_multimission_file_load_option' : 'confirm_delete_all_points';
-            if ((markers.length || multimissionCount) && !confirm(i18n.getMessage(message))) return;
+            if ((markers.length || multimissionCount) && !GUI.confirm(i18n.getMessage(message))) return;
             removeAllWaypoints();
             $(this).addClass('disabled');
             GUI.log(i18n.getMessage('startGetPoint'));
@@ -3909,7 +3908,7 @@ TABS.mission_control.initialize = function (callback) {
                 }
 
                 if (missionEndFlagCount > 1) {
-                    if (multimissionCount && !confirm(i18n.getMessage('confirm_multimission_file_load'))) {
+                    if (multimissionCount && !GUI.confirm(i18n.getMessage('confirm_multimission_file_load'))) {
                         mission.flush();
                         return;
                     } else {
@@ -4029,10 +4028,10 @@ TABS.mission_control.initialize = function (callback) {
                 GUI.log(i18n.getMessage('ErrorWritingFile'));
                 return console.error(err);
             }
-            let sFilename = String(filename.split('\\').pop().split('/').pop());
-            GUI.log(sFilename + i18n.getMessage('savedSuccessfully'));
-            updateFilename(sFilename);
         });
+        let sFilename = String(filename.split('\\').pop().split('/').pop());
+        GUI.log(sFilename + i18n.getMessage('savedSuccessfully'));
+        updateFilename(sFilename);
     }
 
     /////////////////////////////////////////////

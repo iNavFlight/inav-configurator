@@ -14,6 +14,14 @@
         "message": "українська",
         "_comment": "Don't translate!"
     },
+    "language_ja": {
+        "message": "日本語",
+        "_comment": "Don't translate!"
+    },
+    "language_zh_CN": {
+        "message": "简体中文",
+        "_comment": "Don't translate!"
+    },
     "language": {
         "message": "Language"
     },
@@ -1089,6 +1097,12 @@
     "configurationLaunchIdleDelayHelp": {
         "message": "Set a time delay between raising the throttle for the launch, and the motor starting at idle throttle. Default: 0 [0-60000]"
     },
+    "configurationWiggleWakeIdle": {
+        "message": "Wiggle to Wake Idle"
+    },
+    "configurationWiggleWakeIdleHelp": {
+        "message": "If enabled, this feature allows a yaw wiggle of the aircraft to wake up the motors from idle.<br />0: Disabled (default)<br />1: 1 wiggle - This setting has a higher detection point, for airplanes without a tail that can be moved easily<br />2: 2 wiggles - This setting has a lower detection point, but requires the repeated action. This is intended for larger models and airplanes with tails"
+    },
     "configurationLaunchMotorDelay": {
         "message": "Motor Delay"
     },
@@ -2053,6 +2067,9 @@
     },
     "adjustmentsFunction59": {
         "message": "Multi Mission Index Adjustment"
+    },
+    "adjustmentsFunction60": {
+        "message": "Fixed Wing Alt Control Response Adjustment"
     },
     "adjustmentsSave": {
         "message": "Save"
@@ -3491,6 +3508,12 @@
     "soarPitchDeadbandHelp": {
         "message": "Pitch Angle deadband when soaring mode enabled (deg). Angle mode inactive within deadband allowing pitch to free float whilst soaring."
     },
+    "altControlResponse": {
+        "message": "Altitude Control Response Factor"
+    },
+    "altControlResponseHelp": {
+        "message": "Adjusts the response of fixed wing altitude control as the target altitude is approached. Higher values will sharpen altitude control response but may also cause excessive overshoot or pitch instability if set too high."
+    },
     "waypointRadiusHelp": {
         "message": "This sets the distance away from a waypoint that triggers the waypoint as reached."
     },
@@ -4419,7 +4442,7 @@
         "message": "Upload Font"
     },
     "osd_font_manager": {
-        "message": "Font Manager"
+        "message": "Analogue Font Manager"
     },
     "uploadingCharacters": {
         "message": "Uploading..."
@@ -5700,7 +5723,7 @@
         "message": "No dataflash <br>chip found"
     },
     "sensorDataFlashFreeSpace": {
-        "message": "Dataflash: free space"
+        "message": "Dataflash: <br />free "
     },
     "mixerProfile1": {
         "message": "Mixer Profile 1"
@@ -6152,5 +6175,8 @@
     },
     "adsbHeartbeatTotalMessages": {
         "message": "Heartbeat msgs"
+    },
+    "currentLanguage": {
+        "message": "en"
     }
 }

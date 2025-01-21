@@ -20,6 +20,11 @@
                             <label for="launchIdleDelay"><span data-i18n="configurationLaunchIdleDelay"></span></label>
                             <div for="launchIdleDelay" class="helpicon cf_tip" data-i18n_title="configurationLaunchIdleDelayHelp"></div>
                         </div>
+                        <div class="select">
+                            <select id="wiggleWakeIdle" data-setting="nav_fw_launch_wiggle_to_wake_idle"></select>
+                            <label for="wiggleWakeIdle"><span data-i18n="configurationWiggleWakeIdle"></span></label>
+                            <div for="wiggleWakeIdle" class="helpicon cf_tip" data-i18n_title="configurationWiggleWakeIdleHelp"></div>
+                        </div>
                         <div class="number">
                             <input type="number" id="launchMaxAngle" data-unit="deg" data-setting="nav_fw_launch_max_angle" data-setting-multiplier="1" step="1" min="5" max="180" />
                             <label for="launchMaxAngle"><span data-i18n="configurationLaunchMaxAngle"></span></label>
@@ -248,6 +253,12 @@
                             <input type="number" id="soarPitchDeadband" data-unit="deg" data-setting="nav_fw_soaring_pitch_deadband" data-setting-multiplier="1" step="1" min="0" max="15" />
                             <label for="soarPitchDeadband"><span data-i18n="soarPitchDeadband"></span></label>
                             <div for="soarPitchDeadband" class="helpicon cf_tip" data-i18n_title="soarPitchDeadbandHelp"></div>
+                        </div>
+
+                        <div class="number">
+                            <input type="number" id="altControlResponse" data-unit="deg" data-setting="nav_fw_alt_control_response" data-setting-multiplier="1" step="1" min="5" max="100" />
+                            <label for="altControlResponse"><span data-i18n="altControlResponse"></span></label>
+                            <div for="altControlResponse" class="helpicon cf_tip" data-i18n_title="altControlResponseHelp"></div>
                         </div>
 
                     </div>
@@ -504,7 +515,7 @@
                             <label for="fsMissionDelay"><span data-i18n="fsMissionDelay"></span></label>
                             <div for="fsMissionDelay" class="helpicon cf_tip" data-i18n_title="fsMissionDelayHelp"></div>
                         </div>
-                        <!-- 
+                        <!--
                         <div class="checkbox">
                             <input type="checkbox" class="toggle update_preview" id="drNavigation" data-setting="inav_allow_dead_reckoning" data-live="true" />
                             <label for="drNavigation"><span data-i18n="drNavigation"></span></label>
@@ -552,7 +563,7 @@
                             <select id="geozoneNoWayHomeAction" data-setting="geozone_no_way_home_action"></select>
                             <label for="geozoneNoWayHomeAction"><span data-i18n="geozoneNoWayHomeAction"></span></label>
                             <div for="geozoneNoWayHomeAction" class="helpicon cf_tip" data-i18n_title="geozoneNoWayHomeActionHelp"></div>
-                        </div>                        
+                        </div>
                     </div>
                 </div>
 

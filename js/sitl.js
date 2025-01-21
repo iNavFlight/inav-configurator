@@ -156,7 +156,7 @@ var SITLProcess = {
             });
  
         } else {
-            alert(GUI.operating_system);
+            GUI.alert(GUI.operating_system);
             return;
         }
 
@@ -202,7 +202,9 @@ var SITLProcess = {
             }
         }
 
-        callback( sitlExePath + " " + args.join(" ") + "\n");
+	if (callback) {
+            callback( sitlExePath + " " + args.join(" ") + "\n");
+	}
         this.spawn(sitlExePath, args, callback);
     },
 
