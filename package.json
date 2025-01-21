@@ -42,14 +42,13 @@
     "wnumb": "^1.2.0"
   },
   "devDependencies": {
-	"@electron/packager":"^18.3.3",
+    "@electron/packager":"^18.3.3",
     "@electron-forge/cli": "^7.2.0",
     "@electron-forge/maker-deb": "^7.2.0",
     "@electron-forge/maker-rpm": "^7.2.0",
     "@electron-forge/maker-zip": "^7.2.0",
     "@electron-forge/maker-dmg": "^7.2.0",
     "@electron-forge/maker-wix": "^7.2.0",
-    "@electron-forge/maker-flatpak": "^7.2.0",
     "electron": "28.1.4",
     "node-gyp": "^10.1.0"
   }
