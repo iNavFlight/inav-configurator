@@ -4154,7 +4154,6 @@ TABS.mission_control.initialize = function (callback) {
     function updateSelectedShAndFwAp(index) {
         selectedSafehome = FC.SAFEHOMES.get()[index];
         selectedFwApproachSh = FC.FW_APPROACH.get()[index];
-        console.log("Select safe home/approach: " + index)
     }
 
     /* resetAltitude = true : For selected WPs only. Changes WP Altitude value back to previous value if setting below ground level.
