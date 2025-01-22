@@ -32,11 +32,11 @@ jobs:
               id: version
               run: |
                 VERSION=$(grep version package.json | cut -d: -f2 | cut -d\" -f2)
-                echo "version=${VERSION}" >> $GITHUB_OUTPUT
+                echo "VERSION=${VERSION}" >> $GITHUB_ENV
             - name: Upload release artifacts
               uses: softprops/action-gh-release@v2
               with:
-                name: inav-configurator-${{ steps.version.version }}-dev-${{ steps.date.outputs.today }}-${{ github.run_number }}-${{ github.sha }}
+                name: inav-configurator-${{ env.VERSION }}-dev-${{ steps.date.outputs.today }}-${{ github.run_number }}-${{ github.sha }}
                 tag_name: v${{ steps.date.outputs.today }}.${{ github.run_number }}
                 # To create release on a different repo, we need a token setup
                 token: ${{ secrets.NIGHTLY_TOKEN }}
