@@ -56,11 +56,25 @@ TABS.firmware_flasher.initialize = function (callback) {
             worker.postMessage(str);
         }
 
+        function getReleaseMajor(releaseName) {
+            // "name":"inav-9.0.0-dev-20250124-28-d1ef85e82d8aa5bb8b85e518893c8e4f6ab61d6e"
+            var releaseNameExpression = /^inav-(\d+)([\d.]+)-(ci|dev)-(\d{4})(\d{2})(\d{2})-(\d+)-(\w+)$/;
+            var match = releaseNameExpression.exec(releaseName);
+
+            if(!match) {
+                console.log(releaseName + " not matched");
+                //alert(releaseName);
+                return 0;
+            }
+
+            return match[1];
+        }
+
         function parseDevFilename(filename) {
             //var targetFromFilenameExpression = /inav_([\d.]+)?_?([^.]+)\.(.*)/;
             // inav_8.0.0_TUNERCF405_dev-20240617-88fb1d0.hex
             // inav_8.0.0_TUNERCF405_ci-20240617-88fb1d0.hex
-            var targetFromFilenameExpression = /^inav_([\d.]+)_([A-Z0-9_]+)_(ci|dev)-(\d{4})(\d{2})(\d{2})-(\w+)\.(hex)$/;
+            var targetFromFilenameExpression = /^inav_(\d+)([\d.]+)_([A-Za-z0-9_]+)_(ci|dev)-(\d{4})(\d{2})(\d{2})-(\w+)\.(hex)$/;
             var match = targetFromFilenameExpression.exec(filename);
 
             if (!match) {
@@ -69,9 +83,11 @@ TABS.firmware_flasher.initialize = function (callback) {
             }
 
             return {
-                raw_target: match[2],
-                target: match[2].replace("_", " "),
-                format: match[8],
+                raw_target: match[3],
+                target: match[3].replace("_", " "),
+                format: match[9],
+                version: match[1]+match[2],
+                major: match[1]
             };
         }
 
@@ -151,14 +167,12 @@ TABS.firmware_flasher.initialize = function (callback) {
             });
 
             if (showDevReleases) {
+                var majorCount = {};
                 TABS.firmware_flasher.devReleasesData.forEach(function (release) {
                     release.assets.forEach(function (asset) {
                         var result = parseDevFilename(asset.name);
 
-                        if ((!showDevReleases && release.prerelease) || !result) {
-                            return;
-                        }
-                        if ($.inArray(result.target, unsortedTargets) == -1) {
+                        if (result && $.inArray(result.target, unsortedTargets) == -1) {
                             unsortedTargets.push(result.target);
                         }
                     });
@@ -212,8 +226,20 @@ TABS.firmware_flasher.initialize = function (callback) {
                 });
             });
 
-            if(showDevReleases) {
+            if(showDevReleases && TABS.firmware_flasher.devReleasesData) {
+                var majorCount = {};
                 TABS.firmware_flasher.devReleasesData.forEach(function(release){
+                    var major = getReleaseMajor(release.name);
+
+                    if (!(major in majorCount)) {
+                        majorCount[major] = 0;
+                    }
+
+                    if(majorCount[major] >= 10) {
+                        return;
+                    }
+
+                    majorCount[major]++;
 
                     var versionFromTagExpression = /v?(.*)/;
                     var matchVersionFromTag = versionFromTagExpression.exec(release.tag_name);
@@ -278,7 +304,7 @@ TABS.firmware_flasher.initialize = function (callback) {
             return;
         };
 
-        $.get('https://api.github.com/repos/iNavFlight/inav-nightly/releases?per_page=10', function(releasesData) {
+        $.get('https://api.github.com/repos/iNavFlight/inav-nightly/releases?per_page=50', function(releasesData) {
             TABS.firmware_flasher.devReleasesData = releasesData;
         }).fail(function (data){
             TABS.firmware_flasher.devReleasesData = {};
