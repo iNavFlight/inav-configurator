@@ -632,7 +632,7 @@ OSD.constants = {
         'AVATAR',
         'BF43COMPAT',
         'BFHDCOMPAT',
-		'DJI_NATIVE'
+        'DJI_NATIVE'
     ],
     VIDEO_LINES: {
         PAL: 16,
