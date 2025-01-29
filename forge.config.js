@@ -27,9 +27,9 @@ module.exports = {
         result.artifacts.forEach(artifact => {
           var artifactStr = artifact.toString();
           var newPath = path.join(path.dirname(artifactStr), baseName + path.extname(artifactStr));
-		  newPath.replace('win32_ia32', 'Win32');
-		  newPath.replace('win32_x64', 'Win64');
-		  newPath.replace('darwin', 'MacOS');
+          newPath = newPath.replace('win32_ia32', 'Win32');
+          newPath = newPath.replace('win32_x64', 'Win64');
+          newPath = newPath.replace('darwin', 'MacOS');
           fs.renameSync(artifactStr, newPath);
           console.log('Artifact: ' + newPath);
         });
