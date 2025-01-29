@@ -11,6 +11,8 @@ module.exports = {
       "^(\/support$)",
       ".gitattributes",
       ".gitignore",
+      ".github",
+      ".git",
       "3D_model_creation.md",
       "LICENSE",
       "MAPPROXY.md",
@@ -27,9 +29,9 @@ module.exports = {
         result.artifacts.forEach(artifact => {
           var artifactStr = artifact.toString();
           var newPath = path.join(path.dirname(artifactStr), baseName + path.extname(artifactStr));
-          newPath = newPath.replace('win32_ia32', 'Win32');
-          newPath = newPath.replace('win32_x64', 'Win64');
-          newPath = newPath.replace('darwin', 'MacOS');
+          newPath = newPath.replace('Configurator_win32_ia32', 'Configurator_Win32');
+          newPath = newPath.replace('Configurator_win32_x64', 'Configurator_Win64');
+          newPath = newPath.replace('Configurator_darwin', 'Configurator_MacOS');
           fs.renameSync(artifactStr, newPath);
           console.log('Artifact: ' + newPath);
         });
