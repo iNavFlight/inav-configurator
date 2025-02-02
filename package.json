@@ -49,6 +49,6 @@
     "@electron-forge/maker-dmg": "^7.5.0",
     "@electron-forge/maker-wix": "^7.5.0",
     "electron": "28.1.4",
-    "node-gyp": "^10.2.0"
+    "node-gyp": "^11.0.0"
   }
 }
