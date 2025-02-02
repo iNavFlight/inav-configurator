@@ -24,7 +24,7 @@
     "@electron/remote": "^2.1.1",
     "usb": "^2.14.0",
     "promise-map-series": "^0.3.0",
-    "serialport": "^12.0.0",
+    "serialport": "^13.0.0",
     "semver": "^7.6.3",
     "three": "0.170.0",
     "inflection": "3.0.0",
@@ -48,7 +48,7 @@
     "@electron-forge/maker-zip": "^7.5.0",
     "@electron-forge/maker-dmg": "^7.5.0",
     "@electron-forge/maker-wix": "^7.5.0",
-    "electron": "28.1.4",
+    "electron": "34.0.2",
     "node-gyp": "^11.0.0"
   }
 }
