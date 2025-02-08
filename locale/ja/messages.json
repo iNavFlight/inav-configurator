@@ -1273,9 +1273,6 @@
     "portsHelp": {
         "message": "<strong>注:</strong> すべての組み合わせが有効であるとは限りません。フライトコントローラのファームウェアがこれらを検出すると、シリアルポートの設定がリセットされます。"
     },
-    "portsMSPHelp": {
-        "message": "<strong>注:</strong> 確実に設定内容を把握しない限り、最初のシリアルポートのMSPを<span style=\"color: red\">無効にしないでください。</span>設定した場合、ファームウェアの再フラッシュが必要になり、すべての設定が消去される場合があります。"
-    },
     "portsFirmwareUpgradeRequired": {
         "message": "ファームウェアの更新が<span style=\"color: red\">必要です</span>。"
     },
