@@ -5461,6 +5461,9 @@
     "showAdvancedPIDs": {
         "message": "Show advanced PID controllers"
     },
+    "filterPresets": {
+        "message": "Filter presets"
+    },
     "rc_filter_lpf_hz": {
         "message": "Manual LPF Hz"
     },
