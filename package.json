@@ -2,7 +2,7 @@
   "name": "inav-configurator",
   "productName": "INAV Configurator",
   "description": "Configurator for the open source flight controller software INAV.",
-  "version": "9.0.0",
+  "version": "8.1.0",
   "main": "js/main.js",
   "scripts": {
     "start": "electron-forge start",
