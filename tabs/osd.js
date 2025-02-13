@@ -661,7 +661,7 @@ OSD.constants = {
         DJIWTF: 1320,
         AVATAR: 1060,
         BF43COMPAT: 480,
-        BFHDCOMPAT: 1060
+        BFHDCOMPAT: 1060,
         DJI_NATIVE: 1060
     },
     UNIT_TYPES: [
