@@ -37,7 +37,7 @@ jobs:
                 echo "BUILD_NAME=inav-configurator_linux_x64_${VERSION}_${BUILD_SUFFIX}" >> $GITHUB_ENV
             - uses: actions/setup-node@v4
               with:
-                node-version: 20
+                node-version: 22
                 #check-latest: true
                 #cache: 'npm'
             - name: Install dependencies
@@ -93,7 +93,7 @@ jobs:
                 echo "BUILD_NAME=inav-configurator_linux_aarch64_${VERSION}_${BUILD_SUFFIX}" >> $GITHUB_ENV
             - uses: actions/setup-node@v4
               with:
-                node-version: 20
+                node-version: 22
                 #check-latest: true
                 #cache: 'npm'
             - name: Install dependencies
@@ -150,7 +150,7 @@ jobs:
             echo "BUILD_NAMEarm64=inav-configurator_MacOS_arm64_${VERSION}_${BUILD_SUFFIX}" >> $GITHUB_ENV
         - uses: actions/setup-node@v4
           with:
-            node-version: 20
+            node-version: 22
             #check-latest: true
             #cache: 'npm'
         # Workaround due to a bug in node-gyp: https://github.com/electron/rebuild/issues/1116
@@ -199,7 +199,7 @@ jobs:
             echo "BUILD_NAMEx64=inav-configurator_MacOS_x64_${VERSION}_${BUILD_SUFFIX}" >> $GITHUB_ENV
         - uses: actions/setup-node@v4
           with:
-            node-version: 20
+            node-version: 22
             #check-latest: true
             #cache: 'npm'
         # Workaround due to a bug in node-gyp: https://github.com/electron/rebuild/issues/1116
@@ -252,7 +252,7 @@ jobs:
               shell: bash
             - uses: actions/setup-node@v4
               with:
-                node-version: 20
+                node-version: 22
                 #cache: 'npm'
             - uses: engineerd/configurator@v0.0.10
               with: 
@@ -306,7 +306,7 @@ jobs:
               shell: bash
             - uses: actions/setup-node@v4
               with:
-                node-version: 20
+                node-version: 22
                 #cache: 'npm'
             - uses: engineerd/configurator@v0.0.10
               with: 
