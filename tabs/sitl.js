@@ -28,7 +28,7 @@ const simulators = [
 
 const stdProfiles = [
     {
-        name: "[Standard] Confgurator",
+        name: "[Standard] Configurator",
         sim: "X-Plane",
         eepromFileName: "standard-configurator.bin",
         isStdProfile: true,
