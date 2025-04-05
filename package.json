@@ -24,7 +24,7 @@
     "@electron/remote": "^2.1.1",
     "usb": "^2.14.0",
     "promise-map-series": "^0.3.0",
-    "serialport": "^12.0.0",
+    "serialport": "^13.0.0",
     "semver": "^7.6.3",
     "three": "0.170.0",
     "inflection": "3.0.0",
