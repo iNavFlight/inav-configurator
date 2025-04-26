@@ -1653,7 +1653,8 @@ TABS.mission_control.initialize = function (callback) {
             });
 
         }
-        geozoneWarning();
+
+        if (!isOffline) geozoneWarning();
     }
 
     function redrawLayer() {
@@ -1840,8 +1841,7 @@ TABS.mission_control.initialize = function (callback) {
 
             $row.find(".waypointOptions-action").val(waypointOptions.indexOf(MWNP.WPTYPE.REV[element.getAction()])).on('change', function () {
                 element.setAction(MWNP.WPTYPE[waypointOptions[$(this).val()]]);
-                element.setP1(0);
-                $row.find(".waypointOptions-p1").val(MWNP.WPTYPE.REV[element.getAction()] == "JUMP" ? element.getP1()+ 1 : element.getP1());
+                $row.find(".waypointOptions-p1").val(MWNP.WPTYPE.REV[element.getAction()] == "JUMP" ? 1 : 0);
                 for (var i = 1; i <= 3; i++) {
                     if (dictOfLabelParameterPoint[element.getAction()]['parameter'+String(i)] != '') {
                         $row.find(".waypointOptions-p"+String(i)).prop("disabled", false);
