@@ -1841,7 +1841,15 @@ TABS.mission_control.initialize = function (callback) {
 
             $row.find(".waypointOptions-action").val(waypointOptions.indexOf(MWNP.WPTYPE.REV[element.getAction()])).on('change', function () {
                 element.setAction(MWNP.WPTYPE[waypointOptions[$(this).val()]]);
-                $row.find(".waypointOptions-p1").val(MWNP.WPTYPE.REV[element.getAction()] == "JUMP" ? 1 : 0);
+                let P1Value = 0;
+                if (waypointOptions[$(this).val()] == "JUMP") {
+                    P1Value = 1;
+                } else if (waypointOptions[$(this).val()] == "RTH" && !isOffline) {
+                    if (FC.isMultirotor()) P1Value = 1;
+                }
+                $row.find(".waypointOptions-p1").val(P1Value);
+                element.setP1(P1Value);
+
                 for (var i = 1; i <= 3; i++) {
                     if (dictOfLabelParameterPoint[element.getAction()]['parameter'+String(i)] != '') {
                         $row.find(".waypointOptions-p"+String(i)).prop("disabled", false);
@@ -1859,7 +1867,7 @@ TABS.mission_control.initialize = function (callback) {
 
             $row.find(".waypointOptions-number").text(element.getAttachedNumber()+1);
 
-            $row.find(".waypointOptions-p1").val((MWNP.WPTYPE.REV[element.getAction()] == "JUMP" ? element.getP1()+1 : element.getP1())).on('change', function () {
+            $row.find(".waypointOptions-p1").val((MWNP.WPTYPE.REV[element.getAction()] == "JUMP" ? mission.convertWaypointToJumpNumber(element.getP1()) + 1 : element.getP1())).on('change', function () {
                 if (MWNP.WPTYPE.REV[element.getAction()] == "SET_HEAD") {
                     if ($(this).val() >= 360 || ($(this).val() < 0 && $(this).val() != -1))
                     {
