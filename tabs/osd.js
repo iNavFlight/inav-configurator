@@ -557,7 +557,7 @@ OSD.initData = function () {
             right_sidebar_scroll: null,
             sidebar_scroll_arrows: null,
             units: null,
-            stats_energy_unit: null,
+            adsb_warning_style: null,
         },
         alarms: {
             rssi: null,
@@ -693,6 +693,11 @@ OSD.constants = {
     AHISIDEBARWIDTHPOSITION: 7,
     AHISIDEBARHEIGHTPOSITION: 3,
 
+    ADSB_WARNING_STYLE: {
+        'COMPACT' : 0,
+        'EXTENDED' : 1,
+    },
+
     ALL_ALARMS: [
         {
             name: 'RSSI',
@@ -733,6 +738,7 @@ OSD.constants = {
             min: 0,
             max: altitude_alarm_max
         },
+
         {
             name: 'DIST',
             field: 'dist',
@@ -1744,7 +1750,43 @@ OSD.constants = {
                     name: 'ADSB_WARNING_MESSAGE',
                     id: 150,
                     min_version: '7.1.0',
-                    preview: FONT.symbol(SYM.ADSB) + FONT.embed_dot('9.28') + FONT.symbol(SYM.DIST_KM) + FONT.symbol(SYM.DIR_TO_HOME+1) + FONT.embed_dot('-423') + FONT.symbol(SYM.M),
+                    preview: function(osd_data) {
+
+                        var distanceSymbol;
+                        var distanceSymbolSmaller;
+                        var velocitySymbol;
+
+                        switch (OSD.data.preferences.units) {
+                            case 0: // Imperial
+                            case 2: // Metric + MPH
+                                distanceSymbol = SYM.KM;
+                                distanceSymbolSmaller = SYM.M;
+                                velocitySymbol = SYM.MPH;
+                                break;
+                            case 3: // UK
+                                distanceSymbol = SYM.MI;
+                                distanceSymbolSmaller = SYM.ALT_FT;
+                                velocitySymbol = SYM.MPH;
+                                break;
+                            case 4: // GA
+                                distanceSymbol = SYM.MI;
+                                distanceSymbolSmaller = SYM.ALT_FT;
+                                velocitySymbol = SYM.KT;
+                                break;
+                            default: // Metric
+                                distanceSymbol = SYM.KM;
+                                distanceSymbolSmaller = SYM.M;
+                                velocitySymbol = SYM.KMH;
+                                break;
+                        }
+
+                        var el =  FONT.symbol(SYM.ADSB) + FONT.embed_dot('9.28') + FONT.symbol(distanceSymbol) + FONT.symbol(SYM.SYM_HUD_CARDINAL+5) + FONT.embed_dot('-423') + FONT.symbol(distanceSymbolSmaller);
+                        if (OSD.data.preferences.adsb_warning_style !== null && OSD.data.preferences.adsb_warning_style === OSD.constants.ADSB_WARNING_STYLE.EXTENDED){
+                            el +=  "\n" + "HEAVY " + FONT.symbol(SYM.DIR_TO_HOME+1)+FONT.embed_dot('653') + FONT.symbol(velocitySymbol);
+                        }
+
+                        return el;
+                    },
                 },
                 {
                     name: 'ADSB_INFO',
@@ -2536,7 +2578,8 @@ OSD.msp = {
         result.push8(p.right_sidebar_scroll);
         result.push8(p.sidebar_scroll_arrows);
         result.push8(p.units);
-        result.push8(p.stats_energy_unit)
+        result.push8(p.stats_energy_unit);
+        result.push8(p.adsb_warning_style)
         return result;
     },
 
@@ -2553,6 +2596,7 @@ OSD.msp = {
         p.sidebar_scroll_arrows = prefs.readU8();
         p.units = prefs.readU8();
         p.stats_energy_unit = prefs.readU8();
+        p.adsb_warning_style = prefs.readU8();
     },
 
     encodeLayoutItem: function(layout, item, pos) {
