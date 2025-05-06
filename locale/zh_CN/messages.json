@@ -61,10 +61,10 @@
         "message": "自动连接"
     },
     "autoConnectEnabled": {
-        "message": "自动连接:已开启 - 配置器会自动连接新发现的端口"
+        "message": "自动连接: 已开启 - 地面站会自动连接新插入的串口"
     },
     "autoConnectDisabled": {
-        "message": "自动连接: 已禁用 - 用户需要选择正确的串行端口，然后单击\"连接\"按钮"
+        "message": "自动连接: 已禁用 - 你需要自己选择串口，然后单击\"连接\"按钮"
     },
     "deviceRebooting": {
         "message": "设备 - <span style=\"color: red\">重启中</span>"
@@ -154,7 +154,7 @@
         "message": "传感器"
     },
     "tabCLI": {
-        "message": "CLI命令行"
+        "message": "CLI(命令行)"
     },
     "tabLogging": {
         "message": "日志"
@@ -247,7 +247,7 @@
         "message": "SITL标准配置文件不能被覆盖。请创建一个新的。"
     },
     "serialReceiver": {
-        "message": "串串行接收器"
+        "message": "串行接收器"
     },
     "sitlSerialProtocoll": {
         "message": "预设RX协议"
@@ -591,7 +591,7 @@
         "message": "恢复"
     },
     "initialSetupBackupRestoreText": {
-        "message": "<strong>备份</strong>你的设置以防意外丢失, 注意<strong>CLI命令行</strong> 设置 <span style=\"color: red\">没有</span> 包括在内- 参见 'dump' 命令"
+        "message": "<strong>备份</strong>你的设置以防意外丢失, 注意<strong>CLI(命令行)</strong> 设置 <span style=\"color: red\">没有</span> 包括在内- 参见 'dump' 命令"
     },
     "initialSetupBackupSuccess": {
         "message": "备份保存 <span style=\"color: #37a8db\">成功</span>"
@@ -869,7 +869,7 @@
         "message": "转发 Aux 通道信号到舵机输出"
     },
     "featureSOFTSPI": {
-        "message": "CPU串列周边界面（SPI）"
+        "message": "启用软SPI"
     },
     "featurePWM_SERVO_DRIVER": {
         "message": "外置 PWM 伺服设备"
@@ -1773,7 +1773,7 @@
         "message": "RSSI通道"
     },
     "receiverRssiSource": {
-        "message": "RSSI Source"
+        "message": "RSSI来源"
     },
     "receiverRefreshRateTitle": {
         "message": "图像刷新率"
@@ -1795,7 +1795,7 @@
     },
 
     "auxiliaryHelp": {
-        "message": "设置遥控器上的开关范围并且配置相应的功能，当接收机通道信号介于范围内时将启动改功能，请记住使用保存键来保存你的设置"
+        "message": "定义遥控器上开关的功能，当接收机通道信号介于范围内时将启动该功能，请记得按下保存键"
     },
     "auxiliaryToggleUnused": {
         "message": "隐藏未使用的模式"
@@ -2262,7 +2262,7 @@
     },
 
     "cliInfo": {
-        "message": "<strong>注意</strong>: 离开CLI界面或点击 断开连接 会 <strong>自动</strong> 发送 \"<strong>exit</strong>\" 指令到飞控板。新版固件将会 <span style=\"color: red\">重新启动</span> 飞控板并且 <span style=\"color: red\">不会存储</span>已变更的设置。"
+        "message": "<strong>注意</strong>: 离开CLI界面或点击 断开连接 会<strong>自动</strong>发送 \"<strong>exit</strong>\" 命令到飞控板。最新固件将会<span style=\"color: red\">重新启动</span>飞控板并且<span style=\"color: red\">不会保存</span>你所做的更改，请使用 \"<strong>save</strong>\" 命令来保存你的更改！"
     },
     "cliInputPlaceholder": {
         "message": "在这里输入你的命令。按 Tab 可以进行自动填充。"
@@ -2286,7 +2286,7 @@
         "message": "将CLI输出保存到文件失败"
     },
     "cliSaveToFileCompleted": {
-        "message": "命令行输出成功保存到文件"
+        "message": "CLI输出成功保存到文件"
     },
     "cliClearOutputHistoryBtn": {
         "message": "清除输出历史记录"
@@ -2326,7 +2326,7 @@
     },
 
     "loggingNote": {
-        "message": "数据<span style=\"color: red\">仅会</span>在此页面记录,关闭此页面将会 <span style=\"color: red\">取消</span> 数据记录，并且应用将会返回<strong>\"普通配置\"</strong> 状态。<br />你可以选择合适的全局刷新率，飞控出于性能考虑，只会每<strong>1</strong> 秒写入一次日志。"
+        "message": "数据<span style=\"color: red\">仅会</span>在此页面记录,关闭此页面将会 <span style=\"color: red\">取消</span> 数据记录，并且应用将会返回<strong>\"普通配置\"</strong>状态。<br />你可以选择合适的全局刷新率，飞控出于性能考虑，只会每<strong>1</strong>秒写入一次日志。"
     },
     "loggingSamplesSaved": {
         "message": "采样已保存"
@@ -2371,21 +2371,21 @@
         "message": "外接串行日志记录设备"
     },
     "serialLoggingSupportedNote": {
-        "message": "你可以使用串口外接记录设备来记录日志（例如 OpenLager）。需要在串口设置页设置相应的串口。"
+        "message": "你可以使用串口外接记录设备来记录日志(例如OpenLog)。需要在串口设置页设置相应的串口。"
     },
 
     "onboardLoggingFlashLogger": {
-        "message": "板载存储芯片"
+        "message": "板载闪存"
     },
     "OnboardSDCard": {
         "message": "板载SD卡"
     },
     "sdcardNote": {
-        "message": "飞行数据可以保存到板载的SD卡槽。"
+        "message": "飞行数据可以保存到板载SD卡。"
     },
 
     "dataflashNote": {
-        "message": "飞行数据可以保存到板载的闪存内。"
+        "message": "飞行数据可以保存到板载闪存内。"
     },
     "dataflashNotPresentNote": {
         "message": "你的飞控没有可用的闪存芯片。"
@@ -2449,13 +2449,13 @@
         "message": "日期："
     },
     "firmwareFlasherReleaseStatus": {
-        "message": "日期："
+        "message": "状态："
     },
     "firmwareFlasherReleaseTarget": {
         "message": "飞控目标："
     },
     "firmwareFlasherReleaseFile": {
-        "message": "二进制"
+        "message": "二进制文件："
     },
     "firmwareFlasherReleaseStatusReleaseCandidate": {
         "message": "<span style=\"color: red\">重要提示:此固件版本目前被标记为发布候选版本。</span>"
@@ -2486,10 +2486,10 @@
         "message": "无重启序列"
     },
     "firmwareFlasherOnlineSelectBoardDescription": {
-        "message": "选择您的飞控板以便查看线上固件 - 选择适合您的飞控板固件。请注意<strong>自动选择目标</strong>仅适用于INAV固件5.0及更新版本。"
+        "message": "选择您的飞控板以便查看线上固件 - 选择适合您的飞控板固件。请注意<strong>自动选择目标</strong>仅适用于INAV 5.0及更高版本。"
     },
     "firmwareFlasherOnlineSelectFirmwareVersionDescription": {
-        "message": "选择您的飞控板固件版本。<br />注意:即使你可以使用这个配置器刷新不同版本的固件。在设置飞行控制器时，您应该匹配固件和配置器的主版本号和次版本号。"
+        "message": "选择您的飞控板固件版本。<br />注意:即使你可以使用这个配置器刷写不同版本的固件。在设置飞控时，您应该匹配固件和配置器的主版本号和次版本号。"
     },
     "firmwareFlasherNoRebootDescription": {
         "message": "如果通电时已经将 BootLoader 脚位短路，或者已按下飞控板上的 Boot 键，请开启此选项"
@@ -2507,7 +2507,7 @@
         "message": "清空目前所有在飞控板上的配置资料"
     },
     "firmwareFlasherFlashDevelopmentFirmware": {
-        "message": "使用测试版本固件"
+        "message": "使用测试版固件"
     },
     "firmwareFlasherFlashDevelopmentFirmwareDescription": {
         "message": "烧录最新（没有经过测试）的固件"
@@ -2516,7 +2516,7 @@
         "message": "手动波特率"
     },
     "firmwareFlasherManualBaudDescription": {
-        "message": "当飞控板不支援默认的波特率或者透过蓝牙连线时，手动选择波特率。<br /><span style=\"color: red\">注意:</span> 当透过 USB DFU 模式烧写时不要使用"
+        "message": "当飞控板不支持默认的波特率或者通过蓝牙连接时，请手动选择波特率。<br /><span style=\"color: red\">注意:</span> 当通过 USB DFU 模式烧写时不要打开此开关"
     },
     "firmwareFlasherShowDevelopmentReleases": {
         "message": "显示不稳定的版本"
@@ -2573,13 +2573,13 @@
         "message": "警告"
     },
     "firmwareFlasherWarningText": {
-        "message": "<span style=\"color: red\">不要</span> 尝试把固件烧写到不适用 INAV 的硬件上.<br /><span style=\"color: red\">不要</span> 在烧写时中断飞控板的连接或是关闭您的电脑.<br /><br /><strong>注意: </strong>STM32 BootLoader 储存在 ROM 中，它不会导致烧写失败.<br /><!--strong>注意: </strong>烧写固件时 <span style=\"color: red\">自动连线</span> 功能会关闭<br /--><strong>注意: </strong>确认您已做好备份，烧写固件时可能会清空您先前的配置<br /><strong>注意:</strong> 如果烧写有问题时，请先尝试断开和飞控的连接，尝试重启、更新 Chrome、更新驱动程序<br /><strong>注意:</strong> 当直接透过 USB 烧写时(Matek H743-SLIM, Holybro Kakute, etc)，请确保您已阅读 iNav 文档中有关于 USB 烧写的部份，并且确认已安装正确的软件和驱动程序"
+        "message": "<span style=\"color: red\">不要</span> 尝试把固件烧写到不适用 INAV 的硬件上.<br /><span style=\"color: red\">不要</span> 在烧写时断开飞控板的连接或是关闭您的电脑.<br /><br /><strong>注意: </strong>STM32 BootLoader 固化在芯片内，它不会被覆写(也就是说，不管怎么搞都不会变砖，只要操作正确，都可以救回来)<br /><!--strong>注意: </strong>烧写固件时 <span style=\"color: red\">自动连接</span> 功能会关闭<br /--><strong>注意: </strong>确认您已做好备份，烧写固件时可能会清空您先前的配置<br /><strong>注意:</strong> 如果烧写有问题时，请先尝试断开和飞控的连接，尝试重启、更新 Chrome、更新驱动程序<br /><strong>注意:</strong> 当直接通过 USB 烧写时(Matek H743-SLIM, Holybro Kakute, etc)，请确保您已阅读 iNav 文档中有关于 USB 烧写的部分，并且确认已安装正确的软件和驱动程序"
     },
     "firmwareFlasherRecoveryHead": {
         "message": "<strong> 恢复/丢失通信 </strong>"
     },
     "firmwareFlasherRecoveryText": {
-        "message": "如果您和飞控板失去通信，请依照以下步骤恢复通信 :: <ul><li>关闭电源</li><li>开启选项 : 无重启程序 & 清空所有资料</li><li>将 Boot 脚位短路或是按住 Boot 键</li><li>开启电源(如果正确的话，LED 指示灯不会闪烁)</li><li>如果有需要请安装 STM32 驱动程序以及 Zadig 软件(在 iNav 文档中参阅<a href=\"https://github.com/iNavFlight/inav/blob/master/docs/USB%20Flashing.md\"target=\"_blank\">USB刷写</a> 的部分)</li><li>关闭 iNav Configurator，关闭所有 Chrome，关闭所有 Chrome 外挂程序，重新启动 iNav Configurator</li><li>松开 Boot 键，如果您的飞控板有Boot键的话</li><li>烧写正确的固件(手动选择波特率，如果您的飞控手册有指定)</li><li>关闭电源</li><li>移除 Boot 短路脚位</li><li>开启电源(LED 指示灯应该会闪烁)</li><li>正常连线</li></ul>"
+        "message": "如果您和飞控板失去通信，请依照以下步骤恢复通信 :: <ul><li>关闭电源</li><li>开启选项 : 无重启序列 & 清空所有资料</li><li>将 Boot 脚位短路或是按住 Boot 键</li><li>开启电源(如果正确的话，LED 指示灯不会闪烁)</li><li>如果有需要请安装 STM32 驱动程序以及 Zadig 软件(在 iNav 文档中参阅<a href=\"https://github.com/iNavFlight/inav/blob/master/docs/USB%20Flashing.md\"target=\"_blank\">USB刷写</a> 的部分)</li><li>关闭 iNav Configurator，关闭所有 Chrome，关闭所有 Chrome 外挂程序，重新启动 iNav Configurator</li><li>松开 Boot 键，如果您的飞控板有Boot键的话</li><li>烧写正确的固件(手动选择波特率，如果您的飞控手册有指定)</li><li>关闭电源</li><li>移除 Boot 短路脚位</li><li>开启电源(LED 指示灯应该会闪烁)</li><li>正常连线</li></ul>"
     },
     "firmwareFlasherButtonLeave": {
         "message": "关闭固件烧写"
@@ -2628,7 +2628,7 @@
         "message": "任意旋转飞控板角度，允许侧装/倒装/旋转等。当运行外部传感器时，使用传感器校准(陀螺仪，加速度计, 罗盘)来定义传感器位置，而不依赖于飞控板的方向。 "
     },
     "failsafeFeaturesHelpOld": {
-        "message": "s失控保护配置已经发生了很大的变化。请使用最新的INAV"
+        "message": "失控保护配置已经发生了很大的变化。请使用最新的INAV"
     },
     "failsafePaneTitleOld": {
         "message": "接收机失控保护"
@@ -2757,10 +2757,10 @@
         "message": "舵机刷新率"
     },
     "servoRefreshRatelHelp": {
-        "message": "舵机所支持的更新速率,如果您知道舵机的参数时才变更,太高的更新速率可能会损坏舵机！"
+        "message": "舵机所支持的刷新率,如果您知道舵机的参数时才变更,太高的刷新率可能会损坏舵机！"
     },
     "logPwmOutputDisabled": {
-        "message": "PWM 输出已禁用. 电机和舵机无法工做，到 <u>输出</u> 选项卡中开启!"
+        "message": "PWM 输出已禁用. 电机和舵机无法工作，请到 <u>输出</u> 选项卡中开启!"
     },
     "configurationGyroSyncTitle": {
         "message": "与陀螺仪同步循环时间"
@@ -4105,7 +4105,7 @@
         "message": "每单位失去的高度所经过的水平距离"
     },
     "osdElement_PAN_SERVO_CENTRED": {
-        "message": "PAN伺服中心"
+        "message": "PAN伺服中心(云台舵机角度)"
     },
     "osdElement_PAN_SERVO_CENTRED_HELP": {
         "message": "显示平移伺服是否居中(0)或偏移(箭头)。 检查配置PAN伺服的 <b>osd_pan_servo_</b> 设置。"
@@ -4453,7 +4453,7 @@
         "message": "外设"
     },
     "appUpdateNotificationHeader": {
-        "message": "有新的配置器版本。"
+        "message": "有新的INAV地面站版本可供下载"
     },
     "appUpdateNotificationDescription": {
         "message": "请访问 <a href=\"https://github.com/iNavFlight/inav-configurator/releases\" target=\"_blank\">网站</a> 阅读发布说明并下载。"
@@ -4474,10 +4474,10 @@
         "message": "保存航点到飞控中"
     },
     "loadEepromMissionButton": {
-        "message": "从Eeprom中加载航点"
+        "message": "从EEPROM中加载航点"
     },
     "saveEepromMissionButton": {
-        "message": "保存航点到Eeprom"
+        "message": "保存航点到EEPROM"
     },
     "loadFileMissionButton": {
         "message": "载入文件"
@@ -4585,10 +4585,10 @@
         "message": "保存航点到飞控中(断电丢失)"
     },
     "missionTitleLoadEepromMission": {
-        "message": "从 Eeprom 中加载航点"
+        "message": "从EEPROM中加载航点"
     },
     "missionTitleSaveEepromMission": {
-        "message": "保存航点到 Eeprom 中(断电不丢失)"
+        "message": "保存航点到EEPROM中(断电不丢失)"
     },
     "missionTitleDelete": {
         "message": "删除"
@@ -4609,10 +4609,10 @@
         "message": "移动到视图中心"
     },
     "missionTitleSaveEepromSafehome": {
-        "message": "保存安全着陆点到Eeprom"
+        "message": "保存安全着陆点到EEPROM"
     },
     "missionTitleLoadEepromSafehome": {
-        "message": "从Eeprom中加载安全着陆点"
+        "message": "从EEPROM中加载安全着陆点"
     },
     "missionTitlEditMission": {
         "message": "编辑任务"
@@ -4699,10 +4699,10 @@
         "message": "编辑地理区域 $1"
     },
     "missionGeozoneSaveAndReboot": {
-        "message": "保存地理区域到 Eeprom 并重启"
+        "message": "保存地理区域到EEPROM并重启"
     },
     "missionGeozoneLoad": {
-        "message": "从 Eeprom 加载地理区域"
+        "message": "从EEPROM加载地理区域"
     },
     "missionGeozone": {
         "message": "-地理区域 "
@@ -4987,7 +4987,7 @@
         "message": "飞控固件必须更新到最新版本才能使用此功能"
     },
     "mixerNotConfigured": {
-        "message": "混控没有配置，到 <u>混控</u> 界面去设置！"
+        "message": "混控没有配置，请到 <u>混控</u> 界面去设置！"
     },
     "confirm_reset_settings": {
         "message": "您真的要重置所有设置吗?\n注意: 所有设置都会重置了!你必须在这个操作后重新设置整个飞控!"
@@ -5891,7 +5891,7 @@
         "message": "从GitHub中加载发布信息"
     },
     "newVersionAvailable": {
-        "message": "有新的配置器新版本!"
+        "message": "有INAV地面站的新版本!"
     },
     "ReceiveTime": {
         "message": "接收时间: "
@@ -6119,7 +6119,7 @@
         "message": "速度"
     },
     "maintenance": {
-    "message": "维护"
+        "message": "维护"
     },
     "maintenanceFlushSettingsCache": {
         "message": "清除设置缓存"
@@ -6149,10 +6149,13 @@
         "message": "加载 AssistNow 数据时出错。"
     },
     "adsbVehicleTotalMessages": {
-        "message": "车辆消息"
+        "message": "载具消息"
     },
     "adsbHeartbeatTotalMessages": {
         "message": "心跳消息"
+    },
+    "search": {
+        "message": "搜索"
     },
     "currentLanguage": {
         "message": "zh-CN"
