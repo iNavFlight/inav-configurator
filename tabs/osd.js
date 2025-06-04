@@ -143,6 +143,7 @@ SYM.BLACKBOX = 0xFE;
 SYM.PILOT_LOGO_SML_L = 0x1D5;
 SYM.PILOT_LOGO_SML_C = 0x1D6;
 SYM.PILOT_LOGO_SML_R = 0x1D7;
+SYM.MIN_GND_SPEED = 0x16B;
 
 SYM.AH_AIRCRAFT0 = 0x1A2;
 SYM.AH_AIRCRAFT1 = 0x1A3;
@@ -1022,6 +1023,28 @@ OSD.constants = {
                         }
 
                         return FONT.symbol(SYM.AIR) + speed;
+                    }
+                },
+                {
+                    name: 'MIN_GROUND_SPEED',
+                    id: 167,
+                    preview: function(osd_data) {
+                        var speed;
+                        switch (OSD.data.preferences.units) {
+                            case 0: // Imperial
+                            case 2: // Metric + MPH
+                            case 3: // UK
+                                speed = ' 22' + FONT.symbol(SYM.MPH);
+                                break;
+                            case 4: // GA
+                                speed = ' 19' + FONT.symbol(SYM.KT);
+                                break;
+                            default: // Metric
+                                speed = ' 35' + FONT.symbol(SYM.KMH);
+                                break;
+                        }
+
+                        return FONT.symbol(SYM.MIN_GND_SPEED) + speed;
                     }
                 },
                 {
