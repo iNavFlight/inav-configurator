@@ -25,6 +25,7 @@ TABS.auxiliary.initialize = function (callback) {
 
     let LOCAL_AUX_CONFIG = [];
     let LOCAL_AUX_CONFIG_IDS = [];
+    let prevChannelsValues = null;
 
     MSP.send_message(MSPCodes.MSP_MODE_RANGES, false, false, get_box_ids);
 
@@ -288,10 +289,7 @@ TABS.auxiliary.initialize = function (callback) {
 
         $('a.addRange').on('click', function () {
             var modeElement = $(this).data('modeElement');
-
-            var firstUnusedChannel = findFirstUnusedChannel(modeElement);
-
-            addRangeToMode(modeElement, firstUnusedChannel);
+            addRangeToMode(modeElement, -1);
         });
 
         // translate to user-selected language
@@ -382,7 +380,7 @@ TABS.auxiliary.initialize = function (callback) {
         function update_ui() {
             let hasUsedMode = false;
             let acroEnabled = true;
-            let acroFail = ["ANGLE", "HORIZON", "MANUAL", "NAV RTH", "NAV POSHOLD", "NAV CRUISE", "NAV COURSE HOLD", "NAV WP", "GCS NAV"];
+            let acroFail = ["ANGLE", "HORIZON", "MANUAL", "ANGLE HOLD", "NAV RTH", "NAV POSHOLD", "NAV CRUISE", "NAV COURSE HOLD", "NAV WP", "GCS NAV"];
 
             var auxChannelCount = FC.RC.active_channels - 4;
 
@@ -465,8 +463,8 @@ TABS.auxiliary.initialize = function (callback) {
          */
         function auto_select_channel(RC_channels, activeChannels, RSSI_channel) {
             const auto_option = $('.tab-auxiliary select.channel option[value="-1"]:selected');
-            var prevChannelsValues = null;
             if (auto_option.length === 0) {
+                prevChannelsValues = null;
                 return;
             }
 

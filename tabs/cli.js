@@ -122,7 +122,7 @@ TABS.cli.initialize = function (callback) {
                 new Promise((resolve) => {
                     timeout.add('CLI_send_slowly', () => {
                         let processingDelay = TABS.cli.lineDelayMs;
-                        if (line.toLowerCase().startsWith('profile')) {
+                        if (line.toLowerCase().includes('_profile')) {
                             processingDelay = TABS.cli.profileSwitchDelayMs;
                         }
                         const isLastCommand = outputArray.length === index + 1;
@@ -182,9 +182,9 @@ TABS.cli.initialize = function (callback) {
                     if (err) {
                         GUI.log(i18n.getMessage('ErrorWritingFile'));
                         return console.error(err);
-                    }
-                    GUI.log(i18n.getMessage('FileSaved'));
+                    }    
                 });
+                GUI.log(i18n.getMessage('FileSaved'));
 
             }).catch (err => {
                 console.log(err);

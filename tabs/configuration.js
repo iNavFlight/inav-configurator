@@ -175,7 +175,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
                 option.appendTo(vtx_power);
             }
             vtx_power.on('change', function () {
-                FC.FC.VTX_CONFIG.power = parseInt($(this).val());
+                FC.VTX_CONFIG.power = parseInt($(this).val());
             });
 
             var vtx_low_power_disarm = $('#vtx_low_power_disarm');

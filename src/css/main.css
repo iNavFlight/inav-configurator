@@ -277,7 +277,7 @@ input[type="number"]::-webkit-inner-spin-button {
 #sensor-status li {
     float: left;
     height: 67px;
-    width: 33px;
+    min-width: 33px;
     line-height: 18px;
     text-align: center;
     border: 1px solid #373737;
@@ -287,6 +287,17 @@ input[type="number"]::-webkit-inner-spin-button {
     padding-left: 5px;
     padding-right: 5px;
     text-shadow: 0 1px rgba(0, 0, 0, 1.0);
+}
+
+#sensor-status li .gyroicon,
+#sensor-status li .accicon,
+#sensor-status li .magicon,
+#sensor-status li .baroicon,
+#sensor-status li .gpsicon,
+#sensor-status li .opflowicon,
+#sensor-status li .sonaricon,
+#sensor-status li .airspeedicon {
+    background-position-x: center;
 }
 
 .gyroicon {
@@ -501,6 +512,8 @@ input[type="number"]::-webkit-inner-spin-button {
     background-color: white;
     border-radius: 5px;
     z-index: 10000;
+    max-height: 90%;
+    overflow-y: auto;
 }
 
 /* options modified GUI BOX */
@@ -997,6 +1010,16 @@ li.active .ic_mixer {
 li.active .ic_mag {
     background-image: url("./../../images/icons/cf_icon_mag_white.svg");
 }
+
+.ic_search {
+    background-image: url("./../../images/icons/search-gray.svg");
+}
+
+.ic_search:hover {
+    background-image: url("./../../images/icons/search-white.svg");
+}
+
+
 
 #content {
     margin-top: 0;
@@ -1685,11 +1708,11 @@ dialog {
     color: white;
     font-size: 10px;
     margin-top: 20px;
-    width: 410px;
+    width: 100px;
     float: right;
-    margin-right: 10px;
+    margin-right: 20px;
     line-height: 12px;
-    height: 33px;
+    height: 64px;
     border-radius: 5px;
     border: 1px solid #272727;
     box-shadow: 0 1px 0 rgba(92, 92, 92, 0.5);
@@ -1697,38 +1720,68 @@ dialog {
     padding-top: 5px;
     display: none;
     text-shadow: 0 1px rgba(0, 0, 0, 1.0);
+}
 
+@media screen and (max-width: 1060px) {
+    #dataflash_wrapper_global {
+        display: none !important;
+    }
+}
+
+/* Profile selector styling*/
+
+#profiles_wrapper_global {
+    color: white;
+    font-size: 10px;
+    margin-top: 20px;
+    width: 130px;
+    float: right;
+    margin-right: 10px;
+    line-height: 12px;
+    height: 64px;
+    padding: 0px;
+    display: none;
+    text-shadow: 0 1px rgba(0, 0, 0, 1.0);
 }
 
 #profile_change {
     color: white;
-    margin-top: 16px;
+    margin: 0px;
     width: 130px;
     float: left;
-    margin-right: 10px;
     line-height: 12px;
+}
+
+#profile_change > .dropdown {
+    margin: 0px;
 }
 
 #mixer_profile_change {
     color: white;
-    margin-top: 16px;
+    margin: 0px;
     width: 130px;
     float: left;
-    margin-right: 0;
     line-height: 12px;
+}
+
+#mixer_profile_change > .dropdown {
+    margin: 0px;
 }
 
 #battery_profile_change {
     color: white;
-    margin-top: 16px;
+    margin: 0px;
     width: 130px;
     float: right;
-    margin-right: 0;
     line-height: 12px;
 }
 
+#battery_profile_change > .dropdown {
+    margin: 0px;
+}
+
 .dataflash-contents_global {
-    margin-top: 18px;
+    margin-top: 30px;
     border: 1px solid #4A4A4A;
     background-color: #4A4A4A;
     display: flex;
@@ -1759,7 +1812,7 @@ dialog {
 
 .dataflash-contents_global li div {
     position: absolute;
-    top: -18px;
+    top: -30px;
     margin-top: 0;
     left: 0;
     right: 0;
@@ -1952,7 +2005,6 @@ dialog {
         height: 24px;
         padding-bottom: 0;
         margin-bottom: 5px;
-        float: left;
     }
 
     .spacer_box_title {
@@ -2291,4 +2343,8 @@ ol li {
 
 .bold {
     font-weight: bold;
+}
+
+*:lang(ja) {
+  font-family:"ヒラギノ角ゴ Pro W3", "Hiragino Kaku Gothic Pro",Osaka, "メイリオ", Meiryo, "ＭＳ Ｐゴシック", "MS PGothic", sans-serif;
 }

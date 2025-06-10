@@ -98,33 +98,6 @@
                                 <div for="unit_mode" class="helpicon cf_tip" style="margin-top: 2px"></div>
                             </label>
                             <label>
-                                <select class="update_preview" data-setting="osd_main_voltage_decimals" data-live="true"></select>
-                                <span data-i18n="osd_main_voltage_decimals"></span>
-                            </label>
-                            <label>
-                                <select class="update_preview" data-setting="osd_mah_precision" data-live="true"></select>
-                                <span data-i18n="osd_mah_precision"></span>
-                            </label>
-                            <label>
-                                <select class="update_preview" data-setting="osd_coordinate_digits" data-live="true"></select>
-                                <span data-i18n="osd_coordinate_digits"></span>
-                            </label>
-                            <div for="plusCodeDigits" class="helpicon cf_tip" data-i18n_title="osdSettingPLUS_CODE_DIGITS_HELP"></div>
-                            <label>
-                                <select id="plusCodeDigits" class="update_preview" data-setting="osd_plus_code_digits" data-live="true"></select>
-                                <span data-i18n="osd_plus_code_digits"></span>
-                            </label>
-                            <div for="plusCodeShort" class="helpicon cf_tip" data-i18n_title="osdSettingPLUS_CODE_SHORT_HELP"></div>
-                            <label>
-                                <select id="plusCodeShort" class="update_preview" data-setting="osd_plus_code_short" data-live="true"></select>
-                                <span data-i18n="osd_plus_code_short"></span>
-                            </label>
-                            <div for="rpmPrecision" class="helpicon cf_tip osd_use_esc_telemetry" data-i18n_title="osd_esc_rpm_precision_help"></div>
-                            <label class="osd_use_esc_telemetry">
-                                <select id="rpmPrecision" class="update_preview" data-setting="osd_esc_rpm_precision" data-live="true"></select>
-                                <span data-i18n="osd_esc_rpm_precision"></span>
-                            </label>
-                            <label>
                                 <select class="update_preview" data-setting="osd_crosshairs_style" data-live="true"></select>
                                 <span data-i18n="osd_crosshairs_style"></span>
                             </label>
@@ -152,6 +125,50 @@
                         </div>
                     </div>
                 </div>
+                <div class="gui_box grey decimals-container">
+                    <div class="gui_box_titlebar">
+                        <div class="spacer_box_title" data-i18n="decimals"></div>
+                    </div>
+                    <div class="spacer_box">
+                        <div class="settings">
+                            <label>
+                                <select class="update_preview" data-setting="osd_main_voltage_decimals" data-live="true"></select>
+                                <span data-i18n="osd_main_voltage_decimals"></span>
+                            </label>
+                            <label>
+                                <select class="update_preview" data-setting="osd_decimals_altitude" data-live="true"></select>
+                                <span data-i18n="osd_decimals_altitude"></span>
+                            </label>
+                            <label>
+                                <select class="update_preview" data-setting="osd_decimals_distance" data-live="true"></select>
+                                <span data-i18n="osd_decimals_distance"></span>
+                            </label>
+                            <label>
+                                <select class="update_preview" data-setting="osd_mah_precision" data-live="true"></select>
+                                <span data-i18n="osd_mah_precision"></span>
+                            </label>
+                            <label>
+                                <select class="update_preview" data-setting="osd_coordinate_digits" data-live="true"></select>
+                                <span data-i18n="osd_coordinate_digits"></span>
+                            </label>
+                            <div for="plusCodeDigits" class="helpicon cf_tip" data-i18n_title="osdSettingPLUS_CODE_DIGITS_HELP"></div>
+                            <label>
+                                <select id="plusCodeDigits" class="update_preview" data-setting="osd_plus_code_digits" data-live="true"></select>
+                                <span data-i18n="osd_plus_code_digits"></span>
+                            </label>
+                            <div for="plusCodeShort" class="helpicon cf_tip" data-i18n_title="osdSettingPLUS_CODE_SHORT_HELP"></div>
+                            <label>
+                                <select id="plusCodeShort" class="update_preview" data-setting="osd_plus_code_short" data-live="true"></select>
+                                <span data-i18n="osd_plus_code_short"></span>
+                            </label>
+                            <div for="rpmPrecision" class="helpicon cf_tip osd_use_esc_telemetry" data-i18n_title="osd_esc_rpm_precision_help"></div>
+                            <label class="osd_use_esc_telemetry">
+                                <select id="rpmPrecision" class="update_preview" data-setting="osd_esc_rpm_precision" data-live="true"></select>
+                                <span data-i18n="osd_esc_rpm_precision"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
                 <div class="gui_box grey alarms-container">
                     <div class="gui_box_titlebar">
                         <div class="spacer_box_title" data-i18n="osd_alarms"></div>
@@ -161,18 +178,18 @@
                             <input id="osd_rssi_alarm" data-setting="osd_rssi_alarm" data-setting-multiplier="1" type="number" data-step="1" />
                             <span data-i18n="osd_rssi_alarm"></span>
                         </label>
-                        <div for="link_quality_alarm" class="helpicon cf_tip osd_use_crsf" data-i18n_title="osdalarmLQ_HELP"></div>
-                        <label for="link_quality_alarm" class="osd_use_crsf">
+                        <div for="link_quality_alarm" class="helpicon cf_tip osd_use_rx" data-i18n_title="osdalarmLQ_HELP"></div>
+                        <label for="link_quality_alarm" class="osd_use_rx">
                             <input id="link_quality_alarm" data-setting="osd_link_quality_alarm" data-setting-multiplier="1" type="number" data-step="1" />
                             <span data-i18n="osd_link_quality_alarm"></span>
                         </label>
-                        <div for="rssi_dbm_alarm" class="helpicon cf_tip osd_use_crsf" data-i18n_title="osd_rssi_dbm_alarm_HELP"></div>
-                        <label for="rssi_dbm_alarm" class="osd_use_crsf">
+                        <div for="rssi_dbm_alarm" class="helpicon cf_tip osd_use_rx" data-i18n_title="osd_rssi_dbm_alarm_HELP"></div>
+                        <label for="rssi_dbm_alarm" class="osd_use_rx">
                             <input id="rssi_dbm_alarm" data-setting="osd_rssi_dbm_alarm" data-setting-multiplier="1" type="number" data-step="1" />
                             <span data-i18n="osd_rssi_dbm_alarm"></span>
                         </label>
-                        <div for="snr_alarm" class="helpicon cf_tip osd_use_crsf" data-i18n_title="osdalarmSNR_HELP"></div>
-                        <label for="snr_alarm" class="osd_use_crsf">
+                        <div for="snr_alarm" class="helpicon cf_tip osd_use_rx" data-i18n_title="osdalarmSNR_HELP"></div>
+                        <label for="snr_alarm" class="osd_use_rx">
                             <input id="snr_alarm" data-setting="osd_snr_alarm" data-setting-multiplier="1" type="number" data-step="1" />
                             <span data-i18n="osd_snr_alarm"></span>
                         </label>
@@ -251,15 +268,16 @@
                             <input id="osd_gforce_axis_alarm_max" data-setting="osd_gforce_axis_alarm_max" data-setting-multiplier="1" type="number" data-step="0.1" />
                             <span data-i18n="osd_gforce_axis_alarm_max"></span>
                         </label>
-                        <div for="adsb_distance_warning" class="helpicon cf_tip" data-i18n_title="osdAlarmADSB_MAX_DISTANCE_WARNING"></div>
-                        <label for="adsb_distance_warning">
-                            <input id="adsb_distance_warning" data-setting="osd_adsb_distance_warning" data-unit="m" data-setting-multiplier="1" type="number" data-step="1" />
-                            <span data-i18n="osd_adsb_distance_warning"></span>
-                        </label>
+        
                         <div for="adsb_distance_alert" class="helpicon cf_tip" data-i18n_title="osdAlarmADSB_MAX_DISTANCE_ALERT"></div>
                         <label for="adsb_distance_alert">
                             <input id="adsb_distance_alert" data-setting="osd_adsb_distance_alert" data-unit="m" data-setting-multiplier="1" type="number" data-step="1" />
                             <span data-i18n="osd_adsb_distance_alert"></span>
+                        </label>
+                        <div for="adsb_distance_warning" class="helpicon cf_tip" data-i18n_title="osdAlarmADSB_MAX_DISTANCE_WARNING"></div>
+                        <label for="adsb_distance_warning">
+                            <input id="adsb_distance_warning" data-setting="osd_adsb_distance_warning" data-unit="m" data-setting-multiplier="1" type="number" data-step="1" />
+                            <span data-i18n="osd_adsb_distance_warning"></span>
                         </label>
                     </div>
                 </div>
@@ -301,8 +319,10 @@
                         </label>
                     </div>
                 </div>
+
                 <div class="gui_box grey switch-indicator-container">
                     <div class="gui_box_titlebar">
+                        <a href="https://github.com/iNavFlight/inav/wiki/OSD-custom-messages" target="_blank"></a><div for="osd_switch_indicator_settings" class="helpicon cf_tip" data-i18n_title="osd_switch_indicator_settings_HELP"></div></a>
                         <div class="spacer_box_title" data-i18n="osd_switch_indicator_settings"></div>
                     </div>
                     <div class="spacer_box settings">
@@ -336,9 +356,9 @@
                     </div>
                 </div>
 
-
                 <div class="gui_box grey custom-element-container">
                     <div class="gui_box_titlebar">
+                        <a href="https://github.com/iNavFlight/inav-configurator/tree/master/resources/osd/INAV%20Character%20Map.md" id="INAVCharacterMapDocURL" target="_blank"><div for="osd_custom_element_settings" class="helpicon cf_tip" data-i18n_title="osd_custom_element_settings_HELP"></div></a>
                         <div class="spacer_box_title" data-i18n="osd_custom_element_settings"></div>
                     </div>
                     <div class="spacer_box settings" id="osdCustomElements"></div>
@@ -389,39 +409,39 @@
                             </label>
                             <div for="osd_hud_wp_disp" class="helpicon cf_tip" data-i18n_title="osd_hud_wp_disp_help"></div>
                             <label>
-                                <input type="number" data-step="1" data-setting-multiplier="1" data-setting="osd_hud_wp_disp" class="toggle update_preview" data-live="true">
+                                <input type="number" data-step="1" data-setting-multiplier="1" data-setting="osd_hud_wp_disp" class="update_preview" data-live="true">
                                 <span data-i18n="osd_hud_wp_disp"></span>
                             </label>
                             <div for="osd_hud_radar_disp" class="helpicon cf_tip" data-i18n_title="osd_hud_radar_disp_help"></div>
                             <label>
-                                <input type="number" data-step="1" data-setting-multiplier="1" data-setting="osd_hud_radar_disp" class="toggle update_preview" data-live="true">
+                                <input type="number" data-step="1" data-setting-multiplier="1" data-setting="osd_hud_radar_disp" class="update_preview" data-live="true">
                                 <span data-i18n="osd_hud_radar_disp"></span>
                             </label>
 
                             <div for="osd_hud_radar_range_min" class="helpicon cf_tip" data-i18n_title="osd_hud_radar_range_min_help"></div>
                             <label>
-                                <input type="number" data-step="1" data-unit="m" data-setting-multiplier="1" data-setting="osd_hud_radar_range_min" class="toggle update_preview" data-live="true">
+                                <input type="number" data-step="1" data-unit="m" data-setting-multiplier="1" data-setting="osd_hud_radar_range_min" class="update_preview" data-live="true">
                                 <span data-i18n="osd_hud_radar_range_min"></span>
                             </label>
                             <div for="osd_hud_radar_range_max" class="helpicon cf_tip" data-i18n_title="osd_hud_radar_range_max_help"></div>
                             <label>
-                                <input type="number" data-step="1" data-unit="m" data-setting-multiplier="1" data-setting="osd_hud_radar_range_max" class="toggle update_preview" data-live="true">
+                                <input type="number" data-step="1" data-unit="m" data-setting-multiplier="1" data-setting="osd_hud_radar_range_max" class="update_preview" data-live="true">
                                 <span data-i18n="osd_hud_radar_range_max"></span>
                             </label>
 
                             <div for="osd_camera_fov_h" class="helpicon cf_tip" data-i18n_title="osd_camera_fov_h_help"></div>
                             <label>
-                                <input type="number" data-step="1" data-setting-multiplier="1" data-setting="osd_camera_fov_h" class="toggle update_preview" data-live="true">
+                                <input type="number" data-step="1" data-setting-multiplier="1" data-setting="osd_camera_fov_h" class="update_preview" data-live="true">
                                 <span data-i18n="osd_camera_fov_h"></span>
                             </label>
                             <div for="osd_camera_fov_v" class="helpicon cf_tip" data-i18n_title="osd_camera_fov_v_help"></div>
                             <label>
-                                <input type="number" data-step="1" data-setting-multiplier="1" data-setting="osd_camera_fov_v" class="toggle update_preview" data-live="true">
+                                <input type="number" data-step="1" data-setting-multiplier="1" data-setting="osd_camera_fov_v" class="update_preview" data-live="true">
                                 <span data-i18n="osd_camera_fov_v"></span>
                             </label>
                             <div for="osd_camera_uptilt" class="helpicon cf_tip" data-i18n_title="osd_camera_uptilt_help"></div>
                             <label>
-                                <input type="number" data-step="1" data-setting-multiplier="1" data-setting="osd_camera_uptilt" class="toggle update_preview" data-live="true">
+                                <input type="number" data-step="1" data-setting-multiplier="1" data-setting="osd_camera_uptilt" class="update_preview" data-live="true">
                                 <span data-i18n="osd_camera_uptilt"></span>
                             </label>
                         </div>

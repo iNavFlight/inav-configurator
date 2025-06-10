@@ -32,7 +32,8 @@ TABS.firmware_flasher.initialize = function (callback) {
     }
 
     var intel_hex = false, // standard intel hex in string format
-        parsed_hex = false; // parsed raw hex in array format
+        parsed_hex = false, // parsed raw hex in array format
+        fileName = "inav.hex";
 
     GUI.load(path.join(__dirname, "firmware_flasher.html"), function () {
         // translate to user-selected language
@@ -55,20 +56,38 @@ TABS.firmware_flasher.initialize = function (callback) {
             worker.postMessage(str);
         }
 
+        function getReleaseMajor(releaseName) {
+            // "name":"inav-9.0.0-dev-20250124-28-d1ef85e82d8aa5bb8b85e518893c8e4f6ab61d6e"
+            var releaseNameExpression = /^inav-(\d+)([\d.]+)-(ci|dev)-(\d{4})(\d{2})(\d{2})-(\d+)-(\w+)$/;
+            var match = releaseNameExpression.exec(releaseName);
+
+            if(!match) {
+                console.log(releaseName + " not matched");
+                //alert(releaseName);
+                return 0;
+            }
+
+            return match[1];
+        }
+
         function parseDevFilename(filename) {
             //var targetFromFilenameExpression = /inav_([\d.]+)?_?([^.]+)\.(.*)/;
             // inav_8.0.0_TUNERCF405_dev-20240617-88fb1d0.hex
-            var targetFromFilenameExpression = /^inav_([\d.]+)_([A-Z0-9_]+)_dev-(\d{4})(\d{2})(\d{2})-(\w+)\.(hex)$/;
+            // inav_8.0.0_TUNERCF405_ci-20240617-88fb1d0.hex
+            var targetFromFilenameExpression = /^inav_(\d+)([\d.]+)_([A-Za-z0-9_]+)_(ci|dev)-(\d{4})(\d{2})(\d{2})-(\w+)\.(hex)$/;
             var match = targetFromFilenameExpression.exec(filename);
 
             if (!match) {
+                console.log(filename + " not matched");
                 return null;
             }
 
             return {
-                raw_target: match[2],
-                target: match[2].replace("_", " "),
-                format: match[7],
+                raw_target: match[3],
+                target: match[3].replace("_", " "),
+                format: match[9],
+                version: match[1]+match[2],
+                major: match[1]
             };
         }
 
@@ -148,14 +167,12 @@ TABS.firmware_flasher.initialize = function (callback) {
             });
 
             if (showDevReleases) {
+                var majorCount = {};
                 TABS.firmware_flasher.devReleasesData.forEach(function (release) {
                     release.assets.forEach(function (asset) {
                         var result = parseDevFilename(asset.name);
 
-                        if ((!showDevReleases && release.prerelease) || !result) {
-                            return;
-                        }
-                        if ($.inArray(result.target, unsortedTargets) == -1) {
+                        if (result && $.inArray(result.target, unsortedTargets) == -1) {
                             unsortedTargets.push(result.target);
                         }
                     });
@@ -209,8 +226,20 @@ TABS.firmware_flasher.initialize = function (callback) {
                 });
             });
 
-            if(showDevReleases) {
+            if(showDevReleases && TABS.firmware_flasher.devReleasesData) {
+                var majorCount = {};
                 TABS.firmware_flasher.devReleasesData.forEach(function(release){
+                    var major = getReleaseMajor(release.name);
+
+                    if (!(major in majorCount)) {
+                        majorCount[major] = 0;
+                    }
+
+                    if(majorCount[major] >= 10) {
+                        return;
+                    }
+
+                    majorCount[major]++;
 
                     var versionFromTagExpression = /v?(.*)/;
                     var matchVersionFromTag = versionFromTagExpression.exec(release.tag_name);
@@ -275,7 +304,7 @@ TABS.firmware_flasher.initialize = function (callback) {
             return;
         };
 
-        $.get('https://api.github.com/repos/iNavFlight/inav-nightly/releases?per_page=10', function(releasesData) {
+        $.get('https://api.github.com/repos/iNavFlight/inav-nightly/releases?per_page=50', function(releasesData) {
             TABS.firmware_flasher.devReleasesData = releasesData;
         }).fail(function (data){
             TABS.firmware_flasher.devReleasesData = {};
@@ -474,6 +503,7 @@ TABS.firmware_flasher.initialize = function (callback) {
 
             var summary = $('select[name="firmware_version"] option:selected').data('summary');
             if (summary) { // undefined while list is loading or while running offline
+                fileName = summary.file;
                 $(".load_remote_file").text(i18n.getMessage('firmwareFlasherButtonLoading')).addClass('disabled');
                 $.get(summary.url, function (data) {
                     enable_load_online_button();
@@ -539,47 +569,22 @@ TABS.firmware_flasher.initialize = function (callback) {
         });
 
         $(document).on('click', 'span.progressLabel a.save_firmware', function () {
-            chrome.fileSystem.chooseEntry({type: 'saveFile', suggestedName: 'inav', accepts: [{extensions: ['hex']}]}, function (fileEntry) {
-                if (chrome.runtime.lastError) {
-                    console.error(chrome.runtime.lastError.message);
+            var options = {
+                defaultPath: fileName,
+                filters: [ {name: "HEX File", extensions: ['hex'] } ]
+            };
+            dialog.showSaveDialog(options).then(result => {
+                if (result.canceled) {
                     return;
                 }
-
-                chrome.fileSystem.getDisplayPath(fileEntry, function (path) {
-                    console.log('Saving firmware to: ' + path);
-
-                    // check if file is writable
-                    chrome.fileSystem.isWritableEntry(fileEntry, function (isWritable) {
-                        if (isWritable) {
-                            var blob = new Blob([intel_hex], {type: 'text/plain'});
-
-                            fileEntry.createWriter(function (writer) {
-                                var truncated = false;
-
-                                writer.onerror = function (e) {
-                                    console.error(e);
-                                };
-
-                                writer.onwriteend = function() {
-                                    if (!truncated) {
-                                        // onwriteend will be fired again when truncation is finished
-                                        truncated = true;
-                                        writer.truncate(blob.size);
-
-                                        return;
-                                    }
-                                };
-
-                                writer.write(blob);
-                            }, function (e) {
-                                console.error(e);
-                            });
-                        } else {
-                            console.log('You don\'t have write permissions for this file, sorry.');
-                            GUI.log(i18n.getMessage('writePermissionsForFile'));
-                        }
-                    });
+                fs.writeFileSync(result.filePath, intel_hex, (err) => {
+                    if (err) {
+                        GUI.log(i18n.getMessage('ErrorWritingFile'));
+                        return console.error(err);
+                    }
                 });
+                let sFilename = String(result.filePath.split('\\').pop().split('/').pop());
+                GUI.log(sFilename + i18n.getMessage('savedSuccessfully'));
             });
         });
 

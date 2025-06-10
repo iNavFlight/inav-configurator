@@ -381,7 +381,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
                 });
 
                 $row.find(".mix-rule-servo").val(servoRule.getTarget()).on('change', function () {
-                    servoRule.setTarget($(this).val());
+                    servoRule.setTarget(Number($(this).val()));
                 });
 
                 $row.find(".mix-rule-rate").val(servoRule.getRate()).on('change', function () {
@@ -476,6 +476,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
                 $("#motorNumber"+index).css("left", left_px + "px");
                 $("#motorNumber"+index).css("top", top_px + "px");
                 $("#motorNumber"+index).removeClass("is-hidden");
+                $("#motorNumber"+index).css("visibility", "visible");
             }
         }
     }
@@ -544,7 +545,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
             }
 
         }
-        labelMotorNumbers();
+       labelMotorNumbers();
        i18n.localize();;
     }
 
@@ -610,7 +611,6 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
                 }
 
             }
-
             return (errorCount == 0);
         }
 
@@ -661,7 +661,6 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
             const path = './resources/motor_order/'
                 + currentMixerPreset.image + (isReversed ? "_reverse" : "") + '.svg';
             $('.mixerPreview img').attr('src', path);
-
             renderServoOutputImage();
         };
 
@@ -696,9 +695,9 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
             FC.MIXER_CONFIG.appliedMixerPreset = presetId;
 
             if (currentMixerPreset.id == 3) {
-                $wizardButton.parent().removeClass("is-hidden");
+                $("#mixer-wizard-gui_box").removeClass("is-hidden");
             } else {
-                $wizardButton.parent().addClass("is-hidden");
+                $("#mixer-wizard-gui_box").addClass("is-hidden");
             }
 
             if (FC.MIXER_CONFIG.platformType == PLATFORM.AIRPLANE && currentMixerPreset.id != loadedMixerPresetID) {

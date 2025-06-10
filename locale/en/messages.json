@@ -18,6 +18,18 @@
         "message": "English",
         "comment": "Don't translate!"
     },
+    "language_uk": {
+        "message": "українська",
+        "_comment": "Don't translate!"
+    },
+    "language_ja": {
+        "message": "日本語",
+        "_comment": "Don't translate!"
+    },
+    "language_zh_CN": {
+        "message": "简体中文",
+        "_comment": "Don't translate!"
+    },
     "language": {
         "message": "Language"
     },
@@ -1093,6 +1105,12 @@
     "configurationLaunchIdleDelayHelp": {
         "message": "Set a time delay between raising the throttle for the launch, and the motor starting at idle throttle. Default: 0 [0-60000]"
     },
+    "configurationWiggleWakeIdle": {
+        "message": "Wiggle to Wake Idle"
+    },
+    "configurationWiggleWakeIdleHelp": {
+        "message": "If enabled, this feature allows a yaw wiggle of the aircraft to wake up the motors from idle.<br />0: Disabled (default)<br />1: 1 wiggle - This setting has a higher detection point, for airplanes without a tail that can be moved easily<br />2: 2 wiggles - This setting has a lower detection point, but requires the repeated action. This is intended for larger models and airplanes with tails"
+    },
     "configurationLaunchMotorDelay": {
         "message": "Motor Delay"
     },
@@ -1246,16 +1264,16 @@
     "configurationGimbal": {
         "message": "Serial Gimbal"
     },
-    "configurationGimbalSensitivity": { 
+    "configurationGimbalSensitivity": {
         "message":"Gimbal sensitivity"
     },
-    "configurationGimbalPanChannel": { 
+    "configurationGimbalPanChannel": {
         "message":"Pan channel (yaw)"
     },
-    "configurationGimbalTiltChannel": { 
+    "configurationGimbalTiltChannel": {
         "message":"Tilt channel (pitch)"
     },
-    "configurationGimbalRollChannel": { 
+    "configurationGimbalRollChannel": {
         "message":"Roll channel"
     },
     "configurationHeadtracker": {
@@ -1275,9 +1293,6 @@
     },
     "portsHelp": {
         "message": "<strong>Note:</strong> not all combinations are valid.  When the flight controller firmware detects this the serial port configuration will be reset."
-    },
-    "portsMSPHelp": {
-        "message": "<strong>Note:</strong> Do <span style=\"color: red\">NOT</span> disable MSP on the first serial port unless you know what you are doing.  You may have to reflash and erase your configuration if you do."
     },
     "portsFirmwareUpgradeRequired": {
         "message": "Firmware upgrade <span style=\"color: red\">required</span>."
@@ -1687,12 +1702,6 @@
     "pidTuning_Manual_Yaw": {
         "message": "Yaw (%)"
     },
-    "pidTuning_gyro_use_dyn_lpf": {
-        "message": "Dynamic gyro LPF"
-    },
-    "pidTuning_gyro_use_dyn_lpf_help": {
-        "message": "When enabled, main gyro LPF frequency is automatically adjusted based on the current throttle position. When disabled, static LPF cutoff frequency is used."
-    },
     "pidTuning_gyro_dyn_lpf_min_hz": {
         "message": "Dynamic gyro LPF min. cutoff"
     },
@@ -1713,6 +1722,15 @@
     },
     "loadedBatteryProfile": {
         "message": "Loaded Battery Profile: <strong style=\"color: #37a8db\">$1</strong>"
+    },
+    "setControlProfile" : {
+        "message": "Set Control Profile: <strong style=\"color: #37a8db\">$1</strong>"
+    },
+    "setMixerProfile": {
+        "message": "Setting Mixer Profile: <strong style=\"color: #37a8db\">$1</strong>"
+    },
+    "setBatteryProfile": {
+        "message": "Setting Battery Profile: <strong style=\"color: #37a8db\">$1</strong>"
     },
     "pidTuningDataRefreshed": {
         "message": "PID data <strong>refreshed</strong>"
@@ -1765,6 +1783,9 @@
     },
     "receiverRssiChannel": {
         "message": "RSSI Channel"
+    },
+    "receiverRssiSource": {
+        "message": "RSSI Source"
     },
     "receiverRefreshRateTitle": {
         "message": "Graph refresh rate"
@@ -2052,6 +2073,9 @@
     "adjustmentsFunction59": {
         "message": "Multi Mission Index Adjustment"
     },
+    "adjustmentsFunction60": {
+        "message": "Fixed Wing Alt Control Response Adjustment"
+    },
     "adjustmentsSave": {
         "message": "Save"
     },
@@ -2104,7 +2128,7 @@
         "message": "Mixer <span style=\"color: #37a8db\">saved</span>"
     },
     "mixerWizard": {
-        "message": "Mixer wizard"
+        "message": "Motor Mixer Wizard"
     },
     "mixerWizardInfo": {
         "message": "<ol><li>Remove propellers</li><li>Connect LiPo and use Outputs Tab to test all motors</li><li>Note the position of each motor (motor #1 - Left Top and so on)</li><li>Fill the table below</li></ol>"
@@ -3403,7 +3427,7 @@
         "message": "Waypoint Tracking Accuracy"
     },
     "wpTrackingAccuracyHelp": {
-        "message": "How precise the craft tries to follow a waypoint track. Lower values means higher precision but can cause overshoots. 6 is a good starting point [0-10]."
+        "message": "Tracking deadband - how closely the craft follows a waypoint track in meters. Lower values track more closely but cause more control corrections. 2 is a good starting point [0-10]."
     },
     "wpTrackingAngle": {
         "message": "Waypoint Tracking Angle"
@@ -3488,6 +3512,12 @@
     },
     "soarPitchDeadbandHelp": {
         "message": "Pitch Angle deadband when soaring mode enabled (deg). Angle mode inactive within deadband allowing pitch to free float whilst soaring."
+    },
+    "altControlResponse": {
+        "message": "Altitude Control Response Factor"
+    },
+    "altControlResponseHelp": {
+        "message": "Adjusts the response of fixed wing altitude control as the target altitude is approached. Higher values will sharpen altitude control response but may also cause excessive overshoot or pitch instability if set too high."
     },
     "waypointRadiusHelp": {
         "message": "This sets the distance away from a waypoint that triggers the waypoint as reached."
@@ -3588,6 +3618,12 @@
     "osd_main_voltage_decimals": {
         "message": "Voltage Decimals"
     },
+    "osd_decimals_altitude": {
+        "message": "Altitude Decimals"
+    },
+    "osd_decimals_distance": {
+        "message": "Distance Decimals"
+    },
     "osd_mah_precision": {
         "message": "mAh Precision"
     },
@@ -3636,6 +3672,9 @@
     "osd_custom_element_settings": {
         "message": "Custom OSD elements"
     },
+    "osd_custom_element_settings_HELP": {
+        "message": "You can find the icon numbers by clicking this help button."
+    },
     "custom_element": {
         "message": "Custom element"
     },
@@ -3674,7 +3713,7 @@
         "message": "Camera uptilt"
     },
     "osd_camera_uptilt_help": {
-        "message": "Set the camera uptilt for the FPV camera in degres, positive is up, negative is down, relative to the horizontal. Used for correct display of HUD items and AHI (when enabled)."
+        "message": "Set the camera uptilt for the FPV camera in degrees, positive is up, negative is down, relative to the horizontal. Used for correct display of HUD items and AHI (when enabled with osd_ahi_camera_uptilt_comp=ON)."
     },
     "osd_camera_fov_h": {
         "message": "Camera Horizontal FOV"
@@ -3811,19 +3850,19 @@
         "message": "Maximum ESC temperature"
     },
     "osd_snr_alarm": {
-        "message": "CRSF SNR Alarm Level"
+        "message": "SNR Alarm Level"
     },
     "osdalarmSNR_HELP": {
         "message": "SNR is only shown below this value. 0dB (1:1 ratio), indicates that received signal equals noise floor."
     },
     "osd_link_quality_alarm": {
-        "message": "CRSF Link Quality Alarm"
+        "message": "Link Quality Alarm"
     },
     "osdalarmLQ_HELP": {
         "message": "For Crossfire use 70%. For Tracer use 50%."
     },
     "osd_rssi_dbm_alarm": {
-        "message": "CRSF RSSI dBm Alarm"
+        "message": "RSSI dBm Alarm"
     },
     "osd_adsb_distance_warning": {
         "message": "ADSB distance warning"
@@ -3870,8 +3909,8 @@
     "osdGroupVTX": {
         "message": "VTX"
     },
-    "osdGroupCRSF": {
-        "message": "CRSF RX Statistics"
+    "osdGroupRx": {
+        "message": "RX Statistics"
     },
     "osdGroupMapsAndRadars": {
         "message": "Maps & Radars"
@@ -4098,23 +4137,29 @@
     "osdElement_VTX_CHANNEL_HELP": {
         "message": "Shows the current band and channel of the VTX. Requires either a VTX with SmartAudio or Tramp or either a VTX integrated in the flight controller."
     },
-    "osdElement_CRSF_RSSI_DBM": {
+    "osdElement_RSSI_DBM": {
         "message": "RX RSSI in dBm"
     },
-    "osdElement_CRSF_LQ": {
-        "message": "RX Link Quality %"
+    "osdElement_LQ_UPLINK": {
+        "message": "RX Uplink Quality %"
     },
-    "osdElement_CRSF_LQ_HELP": {
-        "message": "Use Crossfire LQ Format setting to select format type."
+    "osdElement_LQ_UPLINK_HELP": {
+        "message": "If using CRSF, use Crossfire LQ Format setting to select format type."
     },
-    "osdElement_CRSF_SNR_DB": {
+    "osdElement_LQ_DOWNLINK": {
+        "message": "RX Downlink Quality %"
+    },
+    "osdElement_SNR_DB": {
         "message": "RX Uplink SNR in dB"
     },
-    "osdElement_CRSF_SNR_DB_HELP": {
+    "osdElement_SNR_DB_HELP": {
         "message": "Shown only when SNR goes below alarm level. At 0dB, received signal level equals noise floor level."
     },
-    "osdElement_CRSF_TX_POWER": {
+    "osdElement_TX_POWER_UPLINK": {
         "message": "TX power in mW"
+    },
+    "osdElement_OSD_RX_POWER_DOWNLINK": {
+        "message": "RX power in mW"
     },
     "osdElement_MAP_NORTH": {
         "message": "Map (Up is north)"
@@ -4251,6 +4296,9 @@
     "osdPanServoOffcentreWarning_HELP": {
         "message": "Degrees either side of the pan servo centre; where it is assumed camera is wanted to be facing forwards, but isn't at 0. If in this range and not 0 for longer than 10 seconds, the pan servo offset OSD element will blink. 0 means the warning is disabled."
     },
+    "osdGroupOSDCustomElements": {
+        "message": "OSD Custom Elements"
+    },
     "osdGroupGVars": {
         "message": "Global Variables"
     },
@@ -4296,6 +4344,15 @@
     "osdElement_OSD_RANGEFINDER": {
         "message": "Rangefinder distance"
     },
+    "osdElement_COURSE_NEXT_GEOZONE": {
+        "message": "Course to next Geozone"
+    },
+    "osdElement_HOR_DIST_TO_NEXT_GEOZONE": {
+        "message": "Horizontal distance to the next geozone"
+    },
+    "osdElement_VERT_DIST_TO_NEXT_GEOZONE": {
+        "message": "Vertical distance to the next geozone"
+    },
     "osdSettingPLUS_CODE_DIGITS_HELP": {
         "message": "Precision at the equator: 10=13.9x13.9m; 11=2.8x3.5m; 12=56x87cm; 13=11x22cm."
     },
@@ -4340,6 +4397,9 @@
     },
     "osd_switch_indicator_settings": {
         "message": "Switch Indicator Settings"
+    },
+    "osd_switch_indicator_settings_HELP": {
+        "message": "It is recommended to use the Custom OSD Elements as a replacemtent for switch indicators. They are much more powerful. Click to see an example."
     },
     "osd_switch_indicators_align_left": {
         "message": "Align switch names to left of switches"
@@ -4387,7 +4447,7 @@
         "message": "Upload Font"
     },
     "osd_font_manager": {
-        "message": "Font Manager"
+        "message": "Analogue Font Manager"
     },
     "uploadingCharacters": {
         "message": "Uploading..."
@@ -4653,6 +4713,171 @@
     "missionSafehomeMaxSafehomesReached": {
         "message": "Maximum number of safehomes reached."
     },
+    "missionGeozoneHead": {
+        "message": "Geozones"
+    },
+    "missionGeozoneEdit": {
+        "message": "Edit Geozone $1"
+    },
+    "missionGeozoneSaveAndReboot": {
+        "message": "Save Eeprom Geozones and reboot"
+    },
+    "missionGeozoneLoad": {
+        "message": "Load Eeprom Geozones"
+    },
+    "missionGeozone": {
+        "message": "-Geozone "
+    },
+    "missionGezoneType": {
+        "message": "Type"
+    },
+    "missionGezoneShape": {
+        "message": "Shape"
+    },
+    "missionGeozoneTypePolygon": {
+        "message": "Polygon"
+    },
+    "missionGeozoneTypeCircular": {
+        "message": "Circular"
+    },
+    "missionGeozoneMaxZonesReached": {
+        "message": "Maximum number of geozones reached."
+    },
+    "missionGeozoneMaxVerticesReached": {
+        "message": "Maximum number of geozone vertices reached."
+    },
+    "missionGeozoneWarning": {
+        "message": "At least one mission and one geozone are configured, please ensure that the mission does not violate the geozone."
+    },
+    "geozoneEdit": {
+        "message": "Edit Geozone "
+    },
+    "geozoneShape": {
+        "message": "Shape"
+    },
+    "geozoneInclusive": {
+        "message": "Inclusive"
+    },
+    "geozoneExcusive": {
+        "message": "Exclusive"
+    },
+    "geozoneMinAlt": {
+        "message": "Min. Alt (cm):"
+    },
+    "geozoneMaxAlt": {
+        "message": "Max. Alt (cm):"
+    },
+    "geozoneInfiniteAlt": {
+        "message": "0 = Infinite altitude"
+    },
+    "geozoneAction": {
+        "message": "Action:"
+    },
+    "geozoneActionNone": {
+        "message": "None"
+    },
+    "geozoneActionAvoid": {
+        "message": "Avoid"
+    },
+    "geozoneActionPosHold": {
+        "message": "Pos. Hold"
+    },
+    "geozoneActionRTH": {
+        "message": "RTH"
+    },
+    "geozoneRadius": {
+        "message": "Radius (cm):"
+    },
+    "geozoneVerices": {
+        "message": "Vertices:"
+    },
+    "": {
+        "message": ""
+    },
+    "featureGEOZONE": {
+        "message": "Geozone"
+    },
+    "geozone": {
+        "message": "Geozone"
+    },
+    "featureGEOZONETip": {
+        "message": "Virtual perimeters for geographical areas (also called geofence) with automatically triggered actions when the perimeters are violated."
+    },
+    "GeozoneSettings": {
+        "message": "Geozone Settings"
+    },
+    "geozoneDetectionDistance": {
+        "message": "Detection distance"
+    },
+    "geozoneDetectionDistanceHelp": {
+        "message": "Distance from which a geozone is detected"
+    },
+    "geozoneAvoidAltitudeRange": {
+        "message": "Avoid altitude range"
+    },
+    "geozoneAvoidAltitudeRangeHelp": {
+        "message": "Altitude range in which an attempt is made to avoid a geozone upwards"
+    },
+    "geozoneSafeAltitudeDistance": {
+        "message": "Safe altitude distance"
+    },
+    "geozoneSafeAltitudeDistanceHelp": {
+        "message": "Vertical distance that must be maintained to the upper and lower limits of the zone."
+    },
+    "geozoneSafehomeAsInclusive": {
+        "message": "Safehome as inclusive"
+    },
+    "geozoneSafehomeAsInclusiveHelp": {
+        "message": "Treat nearest safehome as inclusive geozone"
+    },
+    "geozoneSafehomeZoneAction": {
+        "message": "Safehome zone action"
+    },
+    "geozoneSafehomeZoneActionHelp": {
+        "message": "Fence action for safehome zone"
+    },
+    "geozoneMrStopDistance": {
+        "message" : "Multirotor stop distance"
+    },
+    "geozoneMrStopDistanceHelp": {
+        "message" : "Distance in which multirotors stops before the border"
+    },
+    "geozoneNoWayHomeAction": {
+        "message": "No way home action"
+    },
+    "geozoneNoWayHomeActionHelp": {
+        "message": "Action if RTH with active geozones is unable to calculate a course to home. RTH: Return to home and ignore any geozones."
+    },
+    "missionGeozoneReboot": {
+        "message": "Do you want to save and reboot?"
+    },
+    "missionGeozoneAvailableZones": {
+        "message": "Available Geozones:"
+    },
+    "missionGeozoneAvailableVertices": {
+        "message": "Available Vertices:"
+    },
+    "geozoneInvalidzone": {
+        "message": "Invalid Geozone(s) detected:"
+    },
+    "geozoneInvalidLat": {
+        "message": "Invalid latitude"
+    },
+    "geozoneInvalidLon": {
+        "message": "Invalid longitude"
+    },
+    "gezoneInvalidReasonNotCC": {
+        "message": "Not counter clockwise"
+    },
+    "gezoneInvalidReasonComplex": {
+        "message": "Complex"
+    },
+    "gezoneInvalidReasonMinMaxAlt": {
+        "message": "Max. Alt <= Min. Alt"
+    },
+    "geozoneUnableToSave": {
+        "message": "Unable to save geozones: Invalid zones"
+    },
     "missionMultiMissionHead": {
         "message": "Multi Missions"
     },
@@ -4760,6 +4985,9 @@
     },
     "settings": {
         "message": "Settings"
+    },
+    "decimals": {
+        "message": "Decimals"
     },
     "motorMixer": {
         "message": "Motor Mixer"
@@ -5226,6 +5454,9 @@
     "BLACKBOX_FEATURE_GYRO_PEAKS_YAW": {
         "message": "Gyro Noise peak freq. Yaw"
     },
+    "BLACKBOX_FEATURE_SERVOS": {
+        "message": "Servos output"
+    },
     "axisRoll": {
         "message": "Roll"
     },
@@ -5497,7 +5728,7 @@
         "message": "No dataflash <br>chip found"
     },
     "sensorDataFlashFreeSpace": {
-        "message": "Dataflash: free space"
+        "message": "Dataflash: <br />free "
     },
     "mixerProfile1": {
         "message": "Mixer Profile 1"
@@ -5943,5 +6174,17 @@
     },
     "gpsAssistnowLoadDataError": {
         "message": "Error loading AssistNow data."
+    },
+    "adsbVehicleTotalMessages": {
+        "message": "Vehicle msgs"
+    },
+    "adsbHeartbeatTotalMessages": {
+        "message": "Heartbeat msgs"
+    },
+    "currentLanguage": {
+        "message": "en"
+    },
+   "search": {
+        "message": "Search"
     }
 }

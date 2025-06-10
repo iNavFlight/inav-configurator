@@ -71,9 +71,6 @@
 
                             <div class="mixer-load-button">
                                 <div id="needToUpdateMixerMessage" class="is-hidden" data-i18n="mixerNotLoaded"></div>
-                                <div class="btn default_btn narrow green is-hidden">
-                                    <a id="mixer-wizard" href="#" data-i18n="mixerWizard"></a>
-                                </div>
                                 <div class="btn default_btn narrow red">
                                     <a id="load-and-apply-mixer-button" href="#" data-i18n="mixerLoadAndApplyPresetRules"></a>
                                 </div>
@@ -84,6 +81,17 @@
                                     <a id="refresh-mixer-button" href="#" data-i18n="mixerRefreshCurrentRules"></a>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="platform-type gui_box grey" id="mixer-wizard-gui_box" is-hidden>
+                    <div class="gui_box_titlebar">
+                        <div class="spacer_box_title" data-i18n="mixerWizard"></div>
+                    </div>
+                
+                    <div class="spacer_box">
+                        <div class="btn default_btn narrow green">
+                            <a id="mixer-wizard" href="#" data-i18n="mixerWizard"></a>
                         </div>
                     </div>
                 </div>
@@ -264,7 +272,8 @@
                 </table>
             </div>
         </div>
-        <div class="modal__buttons">
+
+        <div class="modal__buttons--upbottom">
             <a id="wizard-execute-button" class="modal__button modal__button--main" data-i18n="mixerWizardModalApply"></a>
         </div>
     </div>

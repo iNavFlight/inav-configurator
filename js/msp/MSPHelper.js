@@ -21,6 +21,7 @@ const Waypoint = require('./../waypoint');
 const mspDeduplicationQueue = require('./mspDeduplicationQueue');
 const mspStatistics = require('./mspStatistics');
 const settingsCache = require('./../settingsCache');
+const {Geozone, GeozoneVertex, GeozoneShapes } = require('./../geozone');
 
 var mspHelper = (function () {
     var self = {};
@@ -73,7 +74,7 @@ var mspHelper = (function () {
             color;
         if (!dataHandler.unsupported || dataHandler.unsupported) switch (dataHandler.code) {
             case MSPCodes.MSPV2_INAV_STATUS:
-                let profile_changed = false;
+                let profile_changed = 0;
                 FC.CONFIG.cycleTime = data.getUint16(offset, true);
                 offset += 2;
                 FC.CONFIG.i2cError = data.getUint16(offset, true);
@@ -85,11 +86,15 @@ var mspHelper = (function () {
 
                 let profile_byte = data.getUint8(offset++)
                 let profile = profile_byte & 0x0F;
-                profile_changed |= (profile !== FC.CONFIG.profile) && (FC.CONFIG.profile !==-1);
+                if (profile !== FC.CONFIG.profile) {
+                    profile_changed |= GUI.PROFILES_CHANGED.CONTROL;
+                }
                 FC.CONFIG.profile = profile;
 
                 let battery_profile = (profile_byte & 0xF0) >> 4;
-                profile_changed |= (battery_profile !== FC.CONFIG.battery_profile) && (FC.CONFIG.battery_profile !==-1);
+                if (battery_profile !== FC.CONFIG.battery_profile) {
+                    profile_changed |= GUI.PROFILES_CHANGED.BATTERY;
+                }
                 FC.CONFIG.battery_profile = battery_profile;
 
                 FC.CONFIG.armingFlags = data.getUint32(offset, true);
@@ -99,11 +104,14 @@ var mspHelper = (function () {
                 //read mixer profile as the last byte in the the message
                 profile_byte = data.getUint8(dataHandler.message_length_expected - 1);
                 let mixer_profile = profile_byte & 0x0F;
-                profile_changed |= (mixer_profile !== FC.CONFIG.mixer_profile) && (FC.CONFIG.mixer_profile !==-1);
+                if (mixer_profile !== FC.CONFIG.mixer_profile) {
+                    profile_changed |= GUI.PROFILES_CHANGED.MIXER;
+                }
                 FC.CONFIG.mixer_profile = mixer_profile;
-
                 GUI.updateStatusBar();
-                GUI.updateProfileChange(profile_changed);
+                if (profile_changed > 0) {
+                    GUI.updateProfileChange(profile_changed);
+                }
                 break;
 
             case MSPCodes.MSP_ACTIVEBOXES:
@@ -196,6 +204,8 @@ var mspHelper = (function () {
                 FC.ADSB_VEHICLES.vehicles = [];
                 FC.ADSB_VEHICLES.vehiclesCount = data.getUint8(byteOffsetCounter++);
                 FC.ADSB_VEHICLES.callsignLength = data.getUint8(byteOffsetCounter++);
+                FC.ADSB_VEHICLES.vehiclePacketCount = data.getUint32(byteOffsetCounter, true); byteOffsetCounter += 4;
+                FC.ADSB_VEHICLES.heartbeatPacketCount = data.getUint32(byteOffsetCounter, true); byteOffsetCounter += 4;
 
                 for(i = 0; i < FC.ADSB_VEHICLES.vehiclesCount; i++){
 
@@ -1542,55 +1552,116 @@ var mspHelper = (function () {
                 break;
 
             case MSPCodes.MSP2_INAV_CUSTOM_OSD_ELEMENTS:
-                FC.OSD_CUSTOM_ELEMENTS .items = [];
+                FC.OSD_CUSTOM_ELEMENTS.items = [];
 
-                var index = 0;
+                let settingsIdx = 0;
 
-                if(data.byteLength == 0){
-                    FC.OSD_CUSTOM_ELEMENTS .settings.customElementsCount = 0;
-                    FC.OSD_CUSTOM_ELEMENTS .settings.customElementTextSize = 0;
+                if(data.byteLength == 0) {
+                    FC.OSD_CUSTOM_ELEMENTS.settings.customElementsCount = 0;
+                    FC.OSD_CUSTOM_ELEMENTS.settings.customElementTextSize = 0;
+                    FC.OSD_CUSTOM_ELEMENTS.settings.customElementParts = 0;
                     return;
                 }
 
-                FC.OSD_CUSTOM_ELEMENTS .settings.customElementsCount = data.getUint8(index++);
-                FC.OSD_CUSTOM_ELEMENTS .settings.customElementTextSize = data.getUint8(index++);
-
-                for (i = 0; i < FC.OSD_CUSTOM_ELEMENTS .settings.customElementsCount; i++){
-                    var customElement = {
-                        customElementItems: [],
-                        customElementVisibility: {type: 0, value: 0},
-                        customElementText: [],
-                    };
-
-                    for (let ii = 0; ii < FC.OSD_CUSTOM_ELEMENTS .settings.customElementsCount; ii++){
-                        var customElementPart = {type: 0,  value: 0,};
-                        customElementPart.type = data.getUint8(index++);
-                        customElementPart.value = data.getUint16(index, true);
-                        index += 2;
-                        customElement.customElementItems.push(customElementPart);
-                    }
-
-                    customElement.customElementVisibility.type = data.getUint8(index++);
-                    customElement.customElementVisibility.value = data.getUint16(index, true);
-                    index += 2;
-
-                    for (let ii = 0; ii < FC.OSD_CUSTOM_ELEMENTS .settings.customElementTextSize; ii++){
-                        var char = data.getUint8(index++);
-                        if(char === 0){
-                            index += (FC.OSD_CUSTOM_ELEMENTS .settings.customElementTextSize - 1) - ii;
-                            break;
-                        }
-                        customElement.customElementText[ii] = char;
-                    }
-
-                    customElement.customElementText = String.fromCharCode(...customElement.customElementText);
-
-                    FC.OSD_CUSTOM_ELEMENTS .items.push(customElement)
-                }
+                FC.OSD_CUSTOM_ELEMENTS.settings.customElementsCount = data.getUint8(settingsIdx++);
+                FC.OSD_CUSTOM_ELEMENTS.settings.customElementTextSize = data.getUint8(settingsIdx++);
+                FC.OSD_CUSTOM_ELEMENTS.settings.customElementParts = data.getUint8(settingsIdx++);
                 break;
+            case MSPCodes.MSP2_INAV_CUSTOM_OSD_ELEMENT:        
+                var customElement = {
+                    customElementItems: [],
+                    customElementVisibility: {type: 0, value: 0},
+                    customElementText: [],
+                };
+
+                let index = 0;
+
+                for (let ii = 0; ii < FC.OSD_CUSTOM_ELEMENTS.settings.customElementParts; ii++) {
+                    var customElementPart = {type: 0,  value: 0,};
+                    customElementPart.type = data.getUint8(index++);
+                    customElementPart.value = data.getUint16(index, true);
+                    index += 2;
+                    customElement.customElementItems.push(customElementPart);
+                }
+
+                customElement.customElementVisibility.type = data.getUint8(index++);
+                customElement.customElementVisibility.value = data.getUint16(index, true);
+                index += 2;
+
+                for (let ii = 0; ii < FC.OSD_CUSTOM_ELEMENTS.settings.customElementTextSize; ii++) {
+                    var char = data.getUint8(index++);
+                    if(char === 0) {
+                        index += (FC.OSD_CUSTOM_ELEMENTS.settings.customElementTextSize - 1) - ii;
+                        break;
+                    }
+                    customElement.customElementText[ii] = char;
+                }
+
+                customElement.customElementText = String.fromCharCode(...customElement.customElementText);
+
+                FC.OSD_CUSTOM_ELEMENTS.items.push(customElement);
+                break;
+
             case MSPCodes.MSP2_INAV_GPS_UBLOX_COMMAND:
                 // Just and ACK from the fc.
                 break;
+            
+            case MSPCodes.MSP2_INAV_GEOZONE:
+                
+                if (data.buffer.byteLength == 0) {
+                    break;
+                }
+                var geozone = new Geozone(        
+                    data.getUint8(1),
+                    data.getUint8(2),
+                    data.getInt32(3, true),
+                    data.getInt32(7, true),
+                    data.getUint8(11),
+                    0,
+                    data.getInt8(12, true),
+                    null,
+                    data.getUint8(0, true),
+                );
+                let verticesCount = data.getUint8(13, true);
+                if (verticesCount == 0) {
+                    break;
+                }
+                if (geozone.getShape() == GeozoneShapes.POLYGON) {
+                    geozone.setVertices(new Array(verticesCount));
+                } else {
+                    geozone.setVertices(new Array(1));
+                }                
+                FC.GEOZONES.put(geozone);
+                break;
+            case MSPCodes.MSP2_INAV_GEOZONE_VERTEX:
+                if (data.buffer.byteLength == 0) {
+                    break;
+                }
+                var zoneID = data.getUint8(0);
+                var vertexId = data.getUint8(1);
+                var geozone = FC.GEOZONES.at(zoneID);
+                if (zoneID < FC.GEOZONES.geozoneCount()) {
+                    geozone.setVertex(
+                        vertexId,
+                        new GeozoneVertex(
+                            vertexId,
+                            data.getInt32(2, true),
+                            data.getInt32(6, true),
+                        )
+                    );
+                    if (geozone.getShape() == GeozoneShapes.CIRCULAR) {
+                        geozone.setRadius(data.getUint32(10, true));
+                    }
+                }
+                break;
+            
+            case MSPCodes.MSP2_INAV_SET_GEOZONE_VERTICE:
+                console.log("Geozone vertex saved")
+                break; 
+            
+            case MSPCodes.MSP2_INAV_SET_GEOZONE:
+                console.log("Geozone saved")
+                break;    
 
             default:
                 console.log('Unknown code detected: 0x' + dataHandler.code.toString(16));
@@ -1726,8 +1797,8 @@ var mspHelper = (function () {
                 break;
 
             case MSPCodes.MSP_SET_RX_MAP:
-                for (let i = 0; i < FC.SENSOR_ALIGNMENT.length; i++) {
-                    buffer.push(FC.SENSOR_ALIGNMENT[i]);
+                for (let i = 0; i < FC.RC_MAP.length; i++) {
+                    buffer.push(FC.RC_MAP[i]);
                 }
                 break;
             case MSPCodes.MSP_SET_ACC_TRIM:
@@ -2473,7 +2544,17 @@ var mspHelper = (function () {
     };
 
     self.loadOsdCustomElements = function (callback) {
-        MSP.send_message(MSPCodes.MSP2_INAV_CUSTOM_OSD_ELEMENTS, false, false, callback);
+        MSP.send_message(MSPCodes.MSP2_INAV_CUSTOM_OSD_ELEMENTS, false, false, nextCustomOSDElement);
+
+        var cosdeIdx = 0;
+
+        function nextCustomOSDElement() {
+            if (cosdeIdx < FC.OSD_CUSTOM_ELEMENTS .settings.customElementsCount - 1) {
+                MSP.send_message(MSPCodes.MSP2_INAV_CUSTOM_OSD_ELEMENT, [cosdeIdx++], false, nextCustomOSDElement);
+            } else {
+                MSP.send_message(MSPCodes.MSP2_INAV_CUSTOM_OSD_ELEMENT, [cosdeIdx++], false, callback);
+            }
+        }
     }
 
     self.sendModeRanges = function (onCompleteCallback) {
@@ -3068,6 +3149,68 @@ var mspHelper = (function () {
             }
         };
     };
+
+    self.loadGeozones = function (callback) {
+        FC.GEOZONES.flush();
+        let geozoneID = -1;
+        let vertexID = -1;
+        nextGeozone();
+
+        function nextVertex() {
+            vertexID++;
+            let zone = FC.GEOZONES.at(geozoneID);
+            if (!zone || zone.getVerticesCount() == 0) {
+                nextGeozone();
+                return;
+            }
+            if (vertexID < FC.GEOZONES.at(geozoneID).getVerticesCount() && zone.getShape() == GeozoneShapes.POLYGON) {
+                MSP.send_message(MSPCodes.MSP2_INAV_GEOZONE_VERTEX, [geozoneID, vertexID], false, nextVertex); 
+            } else {
+                MSP.send_message(MSPCodes.MSP2_INAV_GEOZONE_VERTEX, [geozoneID, vertexID], false, nextGeozone); 
+            }
+        }
+
+        function nextGeozone() {
+            geozoneID++;
+            vertexID = -1;
+            if (geozoneID < FC.GEOZONES.getMaxZones()) {
+                MSP.send_message(MSPCodes.MSP2_INAV_GEOZONE, [geozoneID], false, nextVertex);
+            } else {
+                MSP.send_message(MSPCodes.MSP2_INAV_GEOZONE, [geozoneID], false, callback);
+            }
+        }
+    };
+
+    self.saveGeozones = function (callback) {
+        let geozoneID = -1;
+        let vertexID = -1;
+        nextGeozone()
+
+        function nextVertex() {
+            vertexID++;
+
+            let zone = FC.GEOZONES.at(geozoneID);
+            if (!zone || zone.getVerticesCount() == 0) {
+                nextGeozone();
+                return;
+            }
+            if (vertexID < FC.GEOZONES.at(geozoneID).getVerticesCount() - 1) {
+                MSP.send_message(MSPCodes.MSP2_INAV_SET_GEOZONE_VERTICE, FC.GEOZONES.extractBufferVertices(geozoneID, vertexID), false, nextVertex); 
+            } else {
+                MSP.send_message(MSPCodes.MSP2_INAV_SET_GEOZONE_VERTICE, FC.GEOZONES.extractBufferVertices(geozoneID, vertexID), false, nextGeozone); 
+            }
+        }
+
+        function nextGeozone() {
+            geozoneID++;
+            vertexID = -1;
+            if (geozoneID < FC.GEOZONES.getMaxZones()) {
+                MSP.send_message(MSPCodes.MSP2_INAV_SET_GEOZONE, FC.GEOZONES.extractBufferZone(geozoneID), false, nextVertex);
+            } else {
+                MSP.send_message(MSPCodes.MSP2_INAV_SET_GEOZONE, FC.GEOZONES.extractBufferZone(geozoneID), false, callback);
+            }
+        }
+    }
 
     self._getSetting = function (name) {
 

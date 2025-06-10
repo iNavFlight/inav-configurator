@@ -31,7 +31,7 @@ var wizardSaveFramework = (function () {
 
                 serialPortHelper.set(config.value.port, 'GPS', config.value.baud);
                 mspHelper.saveSerialPorts(function () {
-                    features.execute(callback);
+                    features.execute(self.enableVirtulaPitot(config, callback));
                 });
                 break;
             case 'gpsProtocol':
@@ -40,6 +40,14 @@ var wizardSaveFramework = (function () {
             default:
                 callback();
                 break;
+        }
+    };
+
+    self.enableVirtulaPitot = function (config, callback) {
+        if (config.value.port != '-1') {
+            mspHelper.setSetting('pitot_hardware', "VIRTUAL", callback);
+        } else {
+            callback();
         }
     };
 

@@ -21,10 +21,6 @@ var defaultsDialogData = [
                 value: "256HZ"
             },
             {
-                key: "looptime",
-                value: 500
-            },
-            {
                 key: "motor_pwm_protocol",
                 value: "DSHOT300"
             },
@@ -143,10 +139,6 @@ var defaultsDialogData = [
                 value: "256HZ"
             },
             {
-                key: "looptime",
-                value: 500
-            },
-            {
                 key: "motor_pwm_protocol",
                 value: "DSHOT300"
             },
@@ -192,10 +184,6 @@ var defaultsDialogData = [
             /*
             Dynamic gyro LPF
             */
-            {
-                key: "gyro_use_dyn_lpf",
-                value: "ON"
-            },
             {
                 key: "gyro_dyn_lpf_min_hz",
                 value: 85
@@ -282,10 +270,6 @@ var defaultsDialogData = [
             {
                 key: "gyro_hardware_lpf",
                 value: "256HZ"
-            },
-            {
-                key: "looptime",
-                value: 500
             },
             {
                 key: "motor_pwm_protocol",

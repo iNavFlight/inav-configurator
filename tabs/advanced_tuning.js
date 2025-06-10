@@ -56,6 +56,10 @@ TABS.advanced_tuning.initialize = function (callback) {
             $('.notFixedWingTuning').show();
         }
 
+        if (!FC.isFeatureEnabled('GEOZONE')) {
+            $('#geozoneSettings').hide();
+        }
+
         GUI.simpleBind();
 
         i18n.localize();;
@@ -66,6 +70,10 @@ TABS.advanced_tuning.initialize = function (callback) {
         });
 
         $('#launchIdleDelay').on('keyup', () => {
+            TABS.advanced_tuning.checkRequirements_IdleThrottle();
+        });
+
+        $('#wiggleWakeIdle').on('change', function () {
             TABS.advanced_tuning.checkRequirements_IdleThrottle();
         });
 
@@ -93,7 +101,7 @@ TABS.advanced_tuning.initialize = function (callback) {
 
 TABS.advanced_tuning.checkRequirements_IdleThrottle = function() {
     let idleThrottle = $('#launchIdleThr');
-    if ($('#launchIdleDelay').val() > 0 && (idleThrottle.val() == "" || idleThrottle.val() < "1150")) {
+    if (($('#launchIdleDelay').val() > 0 || $('#wiggleWakeIdle').find(":selected").val() > 0) && (idleThrottle.val() == "" || idleThrottle.val() < "1150")) {
         idleThrottle.addClass('inputRequiredWarning');
     } else {
         idleThrottle.removeClass('inputRequiredWarning');

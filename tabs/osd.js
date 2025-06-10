@@ -19,6 +19,7 @@ const { globalSettings } = require('./../js/globalSettings');
 const { PortHandler } = require('./../js/port_handler');
 const i18n = require('./../js/localization');
 const jBox = require('./../js/libraries/jBox/jBox.min');
+const { Console } = require('console');
 
 
 var SYM = SYM || {};
@@ -32,6 +33,7 @@ SYM.AH_LEFT = 0x12C;
 SYM.THR = 0x95;
 SYM.VOLT = 0x1F;
 SYM.AH_DECORATION_UP = 0x15;
+SYM.AH_DECORATION_DOWN = 0x16;
 SYM.WIND_SPEED_HORIZONTAL = 0x86;
 SYM.WIND_SPEED_VERTICAL = 0x87;
 SYM.FLY_M = 0x9F;
@@ -136,7 +138,8 @@ SYM.ALERT = 0xDD;
 SYM.CROSS_TRACK_ERROR = 0xFC;
 SYM.ADSB = 0xFD;
 SYM.PAN_SERVO_IS_OFFSET_L = 0x1C7;
-SYM.ODOMETER = 0X168;
+SYM.ODOMETER = 0x168;
+SYM.BLACKBOX = 0xFE;
 SYM.PILOT_LOGO_SML_L = 0x1D5;
 SYM.PILOT_LOGO_SML_C = 0x1D6;
 SYM.PILOT_LOGO_SML_R = 0x1D7;
@@ -149,6 +152,8 @@ SYM.AH_AIRCRAFT4 = 0x1A6;
 
 SYM.SYM_HUD_SIGNAL_3 = 0x163;
 SYM.SYM_HUD_CARDINAL = 0x1BA;
+SYM.RX_BAND = 0x169;
+SYM.RX_MODE = 0x16A;
 
 SYM.AH_CROSSHAIRS = new Array(0x166, 0x1A4, new Array(0x190, 0x191, 0x192), new Array(0x193, 0x194, 0x195), new Array(0x196, 0x197, 0x198), new Array(0x199, 0x19A, 0x19B), new Array (0x19C, 0x19D, 0x19E), new Array (0x19F, 0x1A0, 0x1A1));
 
@@ -257,7 +262,7 @@ FONT.parseMCMFontFile = function (data) {
 FONT.openFontFile = function ($preview) {
     return new Promise(function (resolve) {
         var options = {
-            filters: [ 
+            filters: [
                 { name: 'Font file', extensions: ['mcm'] }
             ],
         };
@@ -266,7 +271,7 @@ FONT.openFontFile = function ($preview) {
                 console.log('No file selected');
                 return;
             }
-            
+
             if (result.filePaths.length == 1) {
                 const fontData = fs.readFileSync(result.filePaths[0], {flag: "r"});
                 FONT.parseMCMFontFile(fontData.toString());
@@ -450,7 +455,7 @@ function altitude_alarm_display_function(fn) {
     }
 }
 
-function osdMainBatteryPreview() {
+function osdDecimalsMainBatteryPreview() {
     var s = '16.8';
     if (Settings.getInputValue('osd_main_voltage_decimals') == 2) {
         s += '3';
@@ -458,6 +463,63 @@ function osdMainBatteryPreview() {
 
     s += FONT.symbol(SYM.VOLT);
     return FONT.symbol(SYM.BATT) + FONT.embed_dot(s);
+}
+
+function osdDecimalsAltitudePreview() {
+    var s = FONT.symbol(SYM.BLANK) + '114';
+    if (Settings.getInputValue('osd_decimals_altitude') == 4) {
+        s += '3';
+    } if (Settings.getInputValue('osd_decimals_altitude') == 5) {
+        s += '38';
+    }
+
+    switch (OSD.data.preferences.units) {
+        case 0: // Imperial
+        case 3: // UK
+        case 4: // GA
+            s += FONT.symbol(SYM.ALT_FT);
+        default: // Metric
+            s += FONT.symbol(SYM.ALT_M);
+    }
+
+    return s;
+}
+
+function osdDecimalsRemainingFlightDistancePreview() {
+    return osdDecimalsDistancePreview(SYM.FLIGHT_DIST_REMAINING);
+}
+
+function osdDecimalsHomeDistancePreview() {
+    return osdDecimalsDistancePreview(SYM.HOME);
+}
+
+function osdDecimalsTripDistancePreview() {
+    return osdDecimalsDistancePreview(SYM.TRIP_DIST);
+}
+
+function osdDecimalsDistancePreview(prependedSymbol) {
+    var s = '24.9';
+    if (Settings.getInputValue('osd_decimals_distance') == 4) {
+        s+= '3';
+    } if (Settings.getInputValue('osd_decimals_distance') == 5) {
+        s = '1' + s + '6';
+    }
+
+    s = FONT.embed_dot(s);
+
+    switch (OSD.data.preferences.units) {
+        case 0: // Imperial
+        case 3: // UK
+            s += FONT.symbol(SYM.DIST_MI);
+        case 4: // GA
+            s += FONT.symbol(SYM.DIST_NM);
+        default: // Metric
+            s += FONT.symbol(SYM.DIST_KM);
+    }
+
+    s = FONT.symbol(prependedSymbol) + s;
+
+    return s;
 }
 
 function osdmAhPrecisionPreview() {
@@ -552,8 +614,9 @@ OSD.DjiElements =  {
         "GForce",
         "Timers",
         "VTX",
-        "CRSF",
+        "RX",
         "SwitchIndicators",
+        "OSDCustomElements",
         "GVars",
         "PIDs",
         "PIDOutputs",
@@ -846,12 +909,12 @@ OSD.constants = {
                 {
                     name: 'MAIN_BATT_VOLTAGE',
                     id: 1,
-                    preview: osdMainBatteryPreview,
+                    preview: osdDecimalsMainBatteryPreview,
                 },
                 {
                     name: 'SAG_COMP_MAIN_BATT_VOLTAGE',
                     id: 53,
-                    preview: osdMainBatteryPreview,
+                    preview: osdDecimalsMainBatteryPreview,
                 },
                 {
                     name: 'MAIN_BATT_CELL_VOLTAGE',
@@ -881,17 +944,7 @@ OSD.constants = {
                 {
                     name: 'REMAINING_FLIGHT_DISTANCE',
                     id: 49,
-                    preview: function(osd_data) {
-                        switch (OSD.data.preferences.units) {
-                            case 0: // Imperial
-                            case 3: // UK
-                                return FONT.symbol(SYM.FLIGHT_DIST_REMAINING) + FONT.embed_dot('0.98') + FONT.symbol(SYM.DIST_MI);
-                            case 4: // GA
-                                return FONT.symbol(SYM.FLIGHT_DIST_REMAINING) + FONT.embed_dot('0.85') + FONT.symbol(SYM.DIST_NM);
-                            default: // Metric
-                                return FONT.symbol(SYM.FLIGHT_DIST_REMAINING) + FONT.embed_dot('1.73') + FONT.symbol(SYM.DIST_KM);
-                        }
-                    }
+                    preview: osdDecimalsRemainingFlightDistancePreview,
                 },
                 {
                     name: 'THROTTLE_POSITION',
@@ -1064,7 +1117,15 @@ OSD.constants = {
                     id: 144,
                     min_version: '6.0.0',
                     preview: '0 WARNINGS'
-                }
+                },
+                {
+                    name: 'BLACKBOX',
+                    id: 152,
+                    min_version: '8.0.0',
+                    preview: function(osd_data) {
+                        return FONT.symbol(SYM.BLACKBOX) + FONT.embed_dot('000123');
+                    }
+                },
             ]
         },
         {
@@ -1221,16 +1282,7 @@ OSD.constants = {
                 {
                     name: 'ALTITUDE',
                     id: 15,
-                    preview: function () {
-                        switch (OSD.data.preferences.units) {
-                            case 0: // Imperial
-                            case 3: // UK
-                            case 4: // GA
-                                return ' 375' + FONT.symbol(SYM.ALT_FT);
-                            default: // Metric
-                                return ' 114' + FONT.symbol(SYM.ALT_M);
-                        }
-                    }
+                    preview: osdDecimalsAltitudePreview,
                 },
                 {
                     name: 'VARIO',
@@ -1595,33 +1647,13 @@ OSD.constants = {
                 {
                     name: 'DISTANCE_TO_HOME',
                     id: 23,
-                    preview: function(osd_data) {
-                        switch (OSD.data.preferences.units) {
-                            case 0: // Imperial
-                            case 3: // UK
-                                return FONT.symbol(SYM.HOME) + FONT.embed_dot('0.98') + FONT.symbol(SYM.DIST_MI);
-                            case 4: // GA
-                                return FONT.symbol(SYM.HOME) + FONT.embed_dot('0.85') + FONT.symbol(SYM.DIST_NM);
-                            default: // Metric
-                                return FONT.symbol(SYM.HOME) + FONT.embed_dot('1.57') + FONT.symbol(SYM.DIST_KM);
-                        }
-                    }
+                    preview: osdDecimalsHomeDistancePreview,
                 },
                 {
                     name: 'TRIP_DIST',
                     id: 40,
                     min_version: '1.9.1',
-                    preview: function(osd_data) {
-                        switch (OSD.data.preferences.units) {
-                            case 0: // Imperial
-                            case 3: // UK
-                                return FONT.symbol(SYM.TRIP_DIST) + FONT.embed_dot('0.98') + FONT.symbol(SYM.DIST_MI);
-                            case 4: // GA
-                                return FONT.symbol(SYM.TRIP_DIST) + FONT.embed_dot('0.85') + FONT.symbol(SYM.DIST_NM);
-                            default: // Metric
-                                return FONT.symbol(SYM.TRIP_DIST) + FONT.embed_dot('1.57') + FONT.symbol(SYM.DIST_KM);
-                        }
-                    }
+                    preview: osdDecimalsTripDistancePreview,
                 },
                 {
                     name: 'ODOMETER',
@@ -1731,7 +1763,51 @@ OSD.constants = {
                                 return FONT.symbol(SYM.CROSS_TRACK_ERROR) + FONT.embed_dot('1.57') + FONT.symbol(SYM.DIST_KM);
                         }
                     }
+                },{
+                    name: 'COURSE_NEXT_GEOZONE',
+                    id: 163,
+                    min_version: '8.0.0',
+                    enabled: function() {
+                        return FC.isFeatureEnabled('GEOZONE');
+                    },
+                    preview: FONT.symbol(SYM.DIR_TO_HOME)
+                }, {
+                    name: 'HOR_DIST_TO_NEXT_GEOZONE',
+                    id: 164,
+                    min_version: '8.0.0',
+                    enabled: function() {
+                        return FC.isFeatureEnabled('GEOZONE');
+                    },
+                    preview: function(osd_data) {
+                        switch (OSD.data.preferences.units) {
+                            case 0: // Imperial
+                            case 3: // UK
+                                return 'FD  ' + FONT.embed_dot('0.88') + FONT.symbol(SYM.DIST_MI);
+                            case 4: // GA
+                                return 'FD  ' + FONT.embed_dot('0.78') + FONT.symbol(SYM.DIST_NM);
+                            default: // Metric
+                                return 'FD  ' + FONT.embed_dot('1.42') + FONT.symbol(SYM.DIST_KM);
+                        }
+                    }
                 },
+                {
+                    name: 'VERT_DIST_TO_NEXT_GEOZONE',
+                    id: 165,
+                    min_version: '8.0.0',
+                    enabled: function() {
+                        return FC.isFeatureEnabled('GEOZONE');
+                    },
+                    preview: function(osd_data) {
+                        switch (OSD.data.preferences.units) {
+                            case 0: // Imperial
+                            case 3: // UK
+                            case 4: // GA
+                                return 'FD  466' + FONT.symbol(SYM.ALT_FT) + FONT.symbol(SYM.DIR_TO_HOME);
+                            default: // Metric
+                                return 'FD  142'  + FONT.symbol(SYM.ALT_M) + FONT.symbol(SYM.DIR_TO_HOME);
+                        }
+                    }
+                }
             ]
         },
         {
@@ -1807,44 +1883,68 @@ OSD.constants = {
             ]
         },
         {
-            name: 'osdGroupCRSF',
+            name: 'osdGroupRx',
             enabled: function() {
-                return HARDWARE.capabilities.useCRSFRx;
+                return HARDWARE.capabilities.useRx;
             },
             items: [
                 {
-                    name: 'CRSF_RSSI_DBM',
+                    name: 'RSSI_DBM',
                     id: 109,
                     positionable: true,
                     preview: FONT.symbol(SYM.RSSI) + '-100' + FONT.symbol(SYM.DBM)
                 },
                 {
-                    name: 'CRSF_LQ',
+                    name: 'LQ_UPLINK',
                     id: 110,
                     positionable: true,
                     preview: function(osd_data) {
-                        var crsflqformat;
-                        if (Settings.getInputValue('osd_crsf_lq_format') == 0) {
-                            crsflqformat = FONT.symbol(SYM.LQ) + '100';
-                        } else if (Settings.getInputValue('osd_crsf_lq_format') == 1){
-                            crsflqformat = FONT.symbol(SYM.LQ) + '2:100';
+                        var lqFormat;
+                        if (HARDWARE.capabilities.useCRSF && Settings.getInputValue('osd_crsf_lq_format') == 1){
+                            lqFormat = FONT.symbol(SYM.LQ) + '2:100';
+                        } else if (HARDWARE.capabilities.useCRSF && Settings.getInputValue('osd_crsf_lq_format') == 2) {
+                            lqFormat = FONT.symbol(SYM.LQ) + '300';
                         } else {
-                            crsflqformat = FONT.symbol(SYM.LQ) + '300';
+                            lqFormat = FONT.symbol(SYM.LQ) + '100';
                         }
-                        return crsflqformat;
+                        return lqFormat;
                     }
                 },
                 {
-                    name: 'CRSF_SNR_DB',
+                    name: 'LQ_DOWNLINK',
+                    id: 159,
+                    positionable: true,
+                    preview: FONT.symbol(SYM.LQ) + '100' + FONT.symbol(SYM.AH_DECORATION_DOWN)
+                },
+                {
+                    name: 'SNR_DB',
                     id: 111,
                     positionable: true,
                     preview: FONT.symbol(SYM.SNR) + '-12' + FONT.symbol(SYM.DB)
                 },
                 {
-                    name: 'CRSF_TX_POWER',
+                    name: 'TX_POWER_UPLINK',
                     id: 112,
                     positionable: true,
                     preview: '  10' + FONT.symbol(SYM.MW)
+                },
+                {
+                    name: 'RX_POWER_DOWNLINK',
+                    id: 160,
+                    positionable: true,
+                    preview: '  10' + FONT.symbol(SYM.MW) + FONT.symbol(SYM.AH_DECORATION_DOWN)
+                },
+                {
+                    name: 'RX_BAND',
+                    id: 161,
+                    positionable: true,
+                    preview: FONT.symbol(SYM.RX_BAND) + '2.4G'
+                },
+                {
+                    name: 'RX_MODE',
+                    id: 162,
+                    positionable: true,
+                    preview: FONT.symbol(SYM.RX_MODE) + '150HZ '
                 },
             ]
         },
@@ -1878,6 +1978,67 @@ OSD.constants = {
             ]
         },
         {
+            name: 'osdGroupOSDCustomElements',
+            items: [
+                {
+                    name: 'CUSTOM_ELEMENT_1',
+                    id: 147,
+                    min_version: '7.1.0',
+                    positionable: true,
+                    preview: "CE_1",
+                },
+                {
+                    name: 'CUSTOM_ELEMENT_2',
+                    id: 148,
+                    min_version: '7.1.0',
+                    positionable: true,
+                    preview: "CE_2",
+                },
+                {
+                    name: 'CUSTOM_ELEMENT_3',
+                    id: 149,
+                    min_version: '7.1.0',
+                    positionable: true,
+                    preview: "CE_3",
+                },
+                {
+                    name: 'CUSTOM_ELEMENT_4',
+                    id: 154,
+                    min_version: '8.0.0',
+                    positionable: true,
+                    preview: "CE_4",
+                },
+                {
+                    name: 'CUSTOM_ELEMENT_5',
+                    id: 155,
+                    min_version: '8.0.0',
+                    positionable: true,
+                    preview: "CE_5",
+                },
+                {
+                    name: 'CUSTOM_ELEMENT_6',
+                    id: 156,
+                    min_version: '8.0.0',
+                    positionable: true,
+                    preview: "CE_6",
+                },
+                {
+                    name: 'CUSTOM_ELEMENT_7',
+                    id: 157,
+                    min_version: '8.0.0',
+                    positionable: true,
+                    preview: "CE_7",
+                },
+                {
+                    name: 'CUSTOM_ELEMENT_8',
+                    id: 158,
+                    min_version: '8.0.0',
+                    positionable: true,
+                    preview: "CE_8",
+                },
+            ]
+        },
+        {
             name: 'osdGroupGVars',
             items: [
                 {
@@ -1903,27 +2064,6 @@ OSD.constants = {
                     id: 116,
                     positionable: true,
                     preview: 'G3:30126'
-                },
-                {
-                    name: 'CUSTOM ELEMENT 1',
-                    id: 147,
-                    min_version: '7.1.0',
-                    positionable: true,
-                    preview: "CE_1",
-                },
-                {
-                    name: 'CUSTOM ELEMENT 2',
-                    id: 148,
-                    min_version: '7.1.0',
-                    positionable: true,
-                    preview: "CE_2",
-                },
-                {
-                    name: 'CUSTOM ELEMENT 3',
-                    id: 149,
-                    min_version: '7.1.0',
-                    positionable: true,
-                    preview: "CE_3",
                 }
             ]
         },
@@ -2086,6 +2226,11 @@ OSD.constants = {
                     name: 'MISSION_INDEX',
                     id: 139,
                     preview: 'WP NO 7'
+                },
+                {
+                    name: 'FW_ALT_CONTROL_RESPONSE',
+                    id: 166,
+                    preview: 'ACR 40'
                 },
             ]
         },
@@ -2661,7 +2806,7 @@ OSD.GUI.updateUnits = function() {
     });
 };
 
-OSD.GUI.updateFields = function() {
+OSD.GUI.updateFields = function(event) {
     // display fields on/off and position
     var $tmpl = $('#osd_group_template').hide();
     // Clear previous groups, if any
@@ -2702,6 +2847,7 @@ OSD.GUI.updateFields = function() {
                 });
         }
         var $displayFields = groupContainer.find('.display-fields');
+        var osdSearch = $('.osd_search');
         for (var jj = 0; jj < groupItems.length; jj++) {
             var item = groupItems[jj];
             var itemData = OSD.data.items[item.id];
@@ -2715,7 +2861,7 @@ OSD.GUI.updateFields = function() {
             } else {
                 name = inflection.titleize(name);
             }
-            var searchTerm = $('.osd_search').val();
+            var searchTerm = osdSearch.val();
             if (searchTerm.length > 0 && !name.toLowerCase().includes(searchTerm.toLowerCase())) {
                 continue;
             }
@@ -2811,10 +2957,13 @@ OSD.GUI.updateFields = function() {
     // needs to be called after all of them have been set up
     GUI.switchery();
 
-    // Update the OSD preview
-    refreshOSDSwitchIndicators();
-    updatePilotAndCraftNames();
-    updatePanServoPreview();
+    if(event != null && event.currentTarget !== osdSearch[0])
+    {
+        // Update the OSD preview
+        refreshOSDSwitchIndicators();
+        updatePilotAndCraftNames();
+        updatePanServoPreview();
+    }
 };
 
 OSD.GUI.removeBottomLines = function(){
@@ -2908,6 +3057,15 @@ OSD.GUI.updateDjiView = function(on) {
             }
         });
 
+        var settings = $('.decimals-container').find('.settings').children();
+        settings.each(function(index, element) {
+            var name = $(element).attr('class');
+            if (!OSD.DjiElements.supportedSettings.includes(name)) {
+                $(element).hide();
+            }
+        });
+
+
         var alarms = $('.alarms-container').find('.settings').children();
         alarms.each(function(index, element) {
             var name = $(element).attr('for');
@@ -2926,7 +3084,7 @@ OSD.GUI.updateDjiView = function(on) {
             .show()
             .removeClass('no-bottom');
 
-        $('.settings-container, .alarms-container').find('.settings').children()
+        $('.settings-container, .decimals-container, .alarms-container').find('.settings').children()
             .show()
             .removeClass('no-bottom');
 
@@ -2939,7 +3097,8 @@ OSD.GUI.updateAlarms = function() {
     $(".osd_use_airspeed_alarm").toggle(HARDWARE.capabilities.usePitot);
     $(".osd_use_baro_temp_alarm").toggle(HARDWARE.capabilities.useBaro);
     $(".osd_use_esc_telemetry").toggle(HARDWARE.capabilities.useESCTelemetry);
-    $(".osd_use_crsf").toggle(HARDWARE.capabilities.useCRSFRx);
+    $(".osd_use_rx").toggle(HARDWARE.capabilities.useRx);
+    $(".osd_use_crsf").toggle(HARDWARE.capabilities.useCRSF);
 };
 
 OSD.GUI.updateMapPreview = function(mapCenter, name, directionSymbol, centerSymbol) {
@@ -2953,176 +3112,178 @@ OSD.GUI.updatePreviews = function() {
     // buffer the preview;
     OSD.data.preview = [];
 
-    // clear the buffer
-    for (let i = 0; i < OSD.data.display_size.total; i++) {
-        OSD.data.preview.push([null, ' '.charCodeAt(0)]);
-    };
+    if (OSD.data.display_size != undefined) {
+        // clear the buffer
+        for (let i = 0; i < OSD.data.display_size.total; i++) {
+            OSD.data.preview.push([null, ' '.charCodeAt(0)]);
+        };
 
-    // draw all the displayed items and the drag and drop preview images
-    for (var ii = 0; ii < OSD.data.items.length; ii++) {
-        var item = OSD.get_item(ii);
-        if (!item || !OSD.is_item_displayed(item, OSD.data.groups[item.id])) {
-            continue;
-        }
-        var itemData = OSD.data.items[ii];
-        if (!itemData.isVisible) {
-            continue;
-        }
-
-		if (itemData.x >= OSD.data.display_size.x)
-		{
-			continue;
-		}
-
-        // DJI HD FPV: Hide elements that only appear in craft name
-        if (OSD.DjiElements.craftNameElements.includes(item.name) &&
-        $('#djiUnsupportedElements').find('input').is(':checked')) {
-            continue;
-        }
-        var j = (itemData.position >= 0) ? itemData.position : itemData.position + OSD.data.display_size.total;
-        // create the preview image
-        item.preview_img = new Image();
-        var canvas = document.createElement('canvas');
-        var ctx = canvas.getContext("2d");
-        // fill the screen buffer
-        var preview = OSD.get_item_preview(item);
-        if (!preview) {
-            continue;
-        }
-        var x = 0;
-        var y = 0;
-        for (let i = 0; i < preview.length; i++) {
-            var charCode = preview.charCodeAt(i);
-            if (charCode == '\n'.charCodeAt(0)) {
-                x = 0;
-                y++;
+        // draw all the displayed items and the drag and drop preview images
+        for (var ii = 0; ii < OSD.data.items.length; ii++) {
+            var item = OSD.get_item(ii);
+            if (!item || !OSD.is_item_displayed(item, OSD.data.groups[item.id])) {
                 continue;
             }
-            var previewPos = j + x + (y * OSD.data.display_size.x);
-            if (previewPos >= OSD.data.preview.length) {
-                // Character is outside the viewport
+            var itemData = OSD.data.items[ii];
+            if (!itemData.isVisible) {
+                continue;
+            }
+
+            if (itemData.x >= OSD.data.display_size.x)
+            {
+                continue;
+            }
+
+            // DJI HD FPV: Hide elements that only appear in craft name
+            if (OSD.DjiElements.craftNameElements.includes(item.name) &&
+            $('#djiUnsupportedElements').find('input').is(':checked')) {
+                continue;
+            }
+            var j = (itemData.position >= 0) ? itemData.position : itemData.position + OSD.data.display_size.total;
+            // create the preview image
+            item.preview_img = new Image();
+            var canvas = document.createElement('canvas');
+            var ctx = canvas.getContext("2d");
+            // fill the screen buffer
+            var preview = OSD.get_item_preview(item);
+            if (!preview) {
+                continue;
+            }
+            var x = 0;
+            var y = 0;
+            for (let i = 0; i < preview.length; i++) {
+                var charCode = preview.charCodeAt(i);
+                if (charCode == '\n'.charCodeAt(0)) {
+                    x = 0;
+                    y++;
+                    continue;
+                }
+                var previewPos = j + x + (y * OSD.data.display_size.x);
+                if (previewPos >= OSD.data.preview.length) {
+                    // Character is outside the viewport
+                    x++;
+                    continue;
+                }
+                // test if this position already has a character placed
+                if (OSD.data.preview[previewPos][0] !== null) {
+                    // if so set background color to red to show user double usage of position
+                    OSD.data.preview[previewPos] = [item, charCode, 'red'];
+                } else {
+                    OSD.data.preview[previewPos] = [item, charCode];
+                }
+                // draw the preview
+                var img = new Image();
+                img.src = FONT.draw(charCode);
+                ctx.drawImage(img, x*FONT.constants.SIZES.CHAR_WIDTH, y*FONT.constants.SIZES.CHAR_HEIGHT);
                 x++;
-                continue;
             }
-            // test if this position already has a character placed
-            if (OSD.data.preview[previewPos][0] !== null) {
-                // if so set background color to red to show user double usage of position
-                OSD.data.preview[previewPos] = [item, charCode, 'red'];
+            item.preview_img.src = canvas.toDataURL('image/png');
+            // Required for NW.js - Otherwise the <img /> will
+            // consume drag/drop events.
+            item.preview_img.style.pointerEvents = 'none';
+        }
+
+
+        var centerPosition = (OSD.data.display_size.x * OSD.data.display_size.y / 2);
+        if (OSD.data.display_size.y % 2 == 0) {
+            centerPosition += Math.floor(OSD.data.display_size.x / 2);
+        }
+
+        let hudCenterPosition = centerPosition - (OSD.constants.VIDEO_COLS[video_type] * $('#osd_horizon_offset').val());
+
+        // artificial horizon
+        if ($('input[name="ARTIFICIAL_HORIZON"]').prop('checked')) {
+            for (let i = 0; i < 9; i++) {
+                OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition - 4 + i, SYM.AH_BAR9_0 + 4);
+            }
+        }
+
+        // crosshairs
+        if ($('input[name="CROSSHAIRS"]').prop('checked')) {
+            let crsHNumber = Settings.getInputValue('osd_crosshairs_style');
+            if (crsHNumber == 1) {
+                // AIRCRAFT style
+                OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition - 2, SYM.AH_AIRCRAFT0);
+                OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition - 1, SYM.AH_AIRCRAFT1);
+                OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition, SYM.AH_AIRCRAFT2);
+                OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition + 1, SYM.AH_AIRCRAFT3);
+                OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition + 2, SYM.AH_AIRCRAFT4);
+            } else if ((crsHNumber > 1) && (crsHNumber < 8)) {
+                // TYPES 3 to 8 (zero indexed)
+                OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition - 1, SYM.AH_CROSSHAIRS[crsHNumber][0]);
+                OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition, SYM.AH_CROSSHAIRS[crsHNumber][1]);
+                OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition + 1, SYM.AH_CROSSHAIRS[crsHNumber][2]);
             } else {
-                OSD.data.preview[previewPos] = [item, charCode];
-            }
-            // draw the preview
-            var img = new Image();
-            img.src = FONT.draw(charCode);
-            ctx.drawImage(img, x*FONT.constants.SIZES.CHAR_WIDTH, y*FONT.constants.SIZES.CHAR_HEIGHT);
-            x++;
-        }
-        item.preview_img.src = canvas.toDataURL('image/png');
-        // Required for NW.js - Otherwise the <img /> will
-        // consume drag/drop events.
-        item.preview_img.style.pointerEvents = 'none';
-    }
-
-
-    var centerPosition = (OSD.data.display_size.x * OSD.data.display_size.y / 2);
-    if (OSD.data.display_size.y % 2 == 0) {
-        centerPosition += Math.floor(OSD.data.display_size.x / 2);
-    }
-
-    let hudCenterPosition = centerPosition - (OSD.constants.VIDEO_COLS[video_type] * $('#osd_horizon_offset').val());
-
-    // artificial horizon
-    if ($('input[name="ARTIFICIAL_HORIZON"]').prop('checked')) {
-        for (let i = 0; i < 9; i++) {
-            OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition - 4 + i, SYM.AH_BAR9_0 + 4);
-        }
-    }
-
-    // crosshairs
-    if ($('input[name="CROSSHAIRS"]').prop('checked')) {
-        let crsHNumber = Settings.getInputValue('osd_crosshairs_style');
-        if (crsHNumber == 1) {
-            // AIRCRAFT style
-            OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition - 2, SYM.AH_AIRCRAFT0);
-            OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition - 1, SYM.AH_AIRCRAFT1);
-            OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition, SYM.AH_AIRCRAFT2);
-            OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition + 1, SYM.AH_AIRCRAFT3);
-            OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition + 2, SYM.AH_AIRCRAFT4);
-        } else if ((crsHNumber > 1) && (crsHNumber < 8)) {
-            // TYPES 3 to 8 (zero indexed)
-            OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition - 1, SYM.AH_CROSSHAIRS[crsHNumber][0]);
-            OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition, SYM.AH_CROSSHAIRS[crsHNumber][1]);
-            OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition + 1, SYM.AH_CROSSHAIRS[crsHNumber][2]);
-        } else {
-            // DEFAULT or unknown style
-            OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition - 1, SYM.AH_CENTER_LINE);
-            OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition, SYM.AH_CROSSHAIRS[crsHNumber]);
-            OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition + 1, SYM.AH_CENTER_LINE_RIGHT);
-        }
-    }
-
-    // sidebars
-    if ($('input[name="HORIZON_SIDEBARS"]').prop('checked')) {
-        var hudwidth = OSD.constants.AHISIDEBARWIDTHPOSITION;
-        var hudheight = OSD.constants.AHISIDEBARHEIGHTPOSITION;
-        for (let i = -hudheight; i <= hudheight; i++) {
-            OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition - hudwidth + (i * FONT.constants.SIZES.LINE), SYM.AH_DECORATION);
-            OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition + hudwidth + (i * FONT.constants.SIZES.LINE), SYM.AH_DECORATION);
-        }
-        // AH level indicators
-        OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition - hudwidth + 1, SYM.AH_LEFT);
-        OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition + hudwidth - 1, SYM.AH_RIGHT);
-    }
-
-    OSD.GUI.updateMapPreview(centerPosition, 'MAP_NORTH', 'N', SYM.HOME);
-    OSD.GUI.updateMapPreview(centerPosition, 'MAP_TAKEOFF', 'T', SYM.HOME);
-    OSD.GUI.updateMapPreview(centerPosition, 'RADAR', null, SYM.DIR_TO_HOME);
-
-    // render
-    var $preview = $('.display-layout .preview').empty();
-    var $row = $('<div class="row"/>');
-    for (let i = 0; i < OSD.data.display_size.total;) {
-        var charCode = OSD.data.preview[i];
-        var colorStyle = '';
-
-        if (typeof charCode === 'object') {
-            var item = OSD.data.preview[i][0];
-            charCode = OSD.data.preview[i][1];
-            if (OSD.data.preview[i][2] !== undefined) {
-                // if third field is set it contains a background color
-                colorStyle = 'style="background-color: ' + OSD.data.preview[i][2] + ';"';
+                // DEFAULT or unknown style
+                OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition - 1, SYM.AH_CENTER_LINE);
+                OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition, SYM.AH_CROSSHAIRS[crsHNumber]);
+                OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition + 1, SYM.AH_CENTER_LINE_RIGHT);
             }
         }
-        var $img = $('<div class="char"' + colorStyle + '><img src=' + FONT.draw(charCode) + '></img></div>')
-            .on('mouseenter', OSD.GUI.preview.onMouseEnter)
-            .on('mouseleave', OSD.GUI.preview.onMouseLeave)
-            .on('dragover', OSD.GUI.preview.onDragOver)
-            .on('dragleave', OSD.GUI.preview.onDragLeave)
-            .on('drop', OSD.GUI.preview.onDrop)
-            .data('item', item)
-            .data('position', i);
-        // Required for NW.js - Otherwise the <img /> will
-        // consume drag/drop events.
-        $img.find('img').css('pointer-events', 'none');
-        if (item && item.positionable !== false) {
-            var nameKey = 'osdElement_' + item.name;
-            var nameMessage = i18n.getMessage(nameKey);
 
-            if (!nameMessage) {
-                nameMessage = inflection.titleize(item.name);
+        // sidebars
+        if ($('input[name="HORIZON_SIDEBARS"]').prop('checked')) {
+            var hudwidth = OSD.constants.AHISIDEBARWIDTHPOSITION;
+            var hudheight = OSD.constants.AHISIDEBARHEIGHTPOSITION;
+            for (let i = -hudheight; i <= hudheight; i++) {
+                OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition - hudwidth + (i * FONT.constants.SIZES.LINE), SYM.AH_DECORATION);
+                OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition + hudwidth + (i * FONT.constants.SIZES.LINE), SYM.AH_DECORATION);
             }
+            // AH level indicators
+            OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition - hudwidth + 1, SYM.AH_LEFT);
+            OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition + hudwidth - 1, SYM.AH_RIGHT);
+        }
 
-            $img.addClass('field-' + item.id)
+        OSD.GUI.updateMapPreview(centerPosition, 'MAP_NORTH', 'N', SYM.HOME);
+        OSD.GUI.updateMapPreview(centerPosition, 'MAP_TAKEOFF', 'T', SYM.HOME);
+        OSD.GUI.updateMapPreview(centerPosition, 'RADAR', null, SYM.DIR_TO_HOME);
+
+        // render
+        var $preview = $('.display-layout .preview').empty();
+        var $row = $('<div class="row"/>');
+        for (let i = 0; i < OSD.data.display_size.total;) {
+            var charCode = OSD.data.preview[i];
+            var colorStyle = '';
+
+            if (typeof charCode === 'object') {
+                var item = OSD.data.preview[i][0];
+                charCode = OSD.data.preview[i][1];
+                if (OSD.data.preview[i][2] !== undefined) {
+                    // if third field is set it contains a background color
+                    colorStyle = 'style="background-color: ' + OSD.data.preview[i][2] + ';"';
+                }
+            }
+            var $img = $('<div class="char"' + colorStyle + '><img src=' + FONT.draw(charCode) + '></img></div>')
+                .on('mouseenter', OSD.GUI.preview.onMouseEnter)
+                .on('mouseleave', OSD.GUI.preview.onMouseLeave)
+                .on('dragover', OSD.GUI.preview.onDragOver)
+                .on('dragleave', OSD.GUI.preview.onDragLeave)
+                .on('drop', OSD.GUI.preview.onDrop)
                 .data('item', item)
-                .prop('draggable', true)
-                .on('dragstart', OSD.GUI.preview.onDragStart)
-                .prop('title', nameMessage);
-        }
+                .data('position', i);
+            // Required for NW.js - Otherwise the <img /> will
+            // consume drag/drop events.
+            $img.find('img').css('pointer-events', 'none');
+            if (item && item.positionable !== false) {
+                var nameKey = 'osdElement_' + item.name;
+                var nameMessage = i18n.getMessage(nameKey);
 
-        $row.append($img);
-        if (++i % OSD.data.display_size.x == 0) {
-            $preview.append($row);
-            $row = $('<div class="row"/>');
+                if (!nameMessage) {
+                    nameMessage = inflection.titleize(item.name);
+                }
+
+                $img.addClass('field-' + item.id)
+                    .data('item', item)
+                    .prop('draggable', true)
+                    .on('dragstart', OSD.GUI.preview.onDragStart)
+                    .prop('title', nameMessage);
+            }
+
+            $row.append($img);
+            if (++i % OSD.data.display_size.x == 0) {
+                $preview.append($row);
+                $row = $('<div class="row"/>');
+            }
         }
     }
 };
@@ -3160,22 +3321,26 @@ OSD.GUI.updateAll = function() {
             }
         });
 
-        paste.on('click', function() {
+        paste.on('click',  async function() {
             if(layout_clipboard.filled == true){
 
                 var oldLayout = JSON.parse(JSON.stringify(OSD.data.layouts[OSD.data.selected_layout]))
                 OSD.data.layouts[OSD.data.selected_layout] = JSON.parse(JSON.stringify(layout_clipboard.layout));
                 layouts.trigger('change');
-                OSD.data.layouts[OSD.data.selected_layout].forEach(function(item, index){
+
+                for(var index in OSD.data.layouts[OSD.data.selected_layout])
+                {
+                    var item = OSD.data.layouts[OSD.data.selected_layout][index];
                     if(!(item.isVisible === false && oldLayout[index].isVisible === false) && (oldLayout[index].x !== item.x || oldLayout[index].y !== item.y || oldLayout[index].position !== item.position || oldLayout[index].isVisible !== item.isVisible)){
-                        OSD.saveItem({id: index});
+                        await OSD.saveItem({id: index});
                     }
-                });
+                }
+
                 GUI.log(i18n.getMessage('osdLayoutPasteFromClipboard'));
             }
         });
 
-        clear.on('click', function() {
+        clear.on('click', async function() {
             var oldLayout = JSON.parse(JSON.stringify(OSD.data.layouts[OSD.data.selected_layout]));
 
             var clearedLayout = [];
@@ -3187,12 +3352,15 @@ OSD.GUI.updateAll = function() {
 
             OSD.data.layouts[OSD.data.selected_layout] = clearedLayout;
             layouts.trigger('change');
-            OSD.data.layouts[OSD.data.selected_layout].forEach(function(item, index){
+
+            for(var index in OSD.data.layouts[OSD.data.selected_layout]) {
+                var item = OSD.data.layouts[OSD.data.selected_layout][index];
                 if(oldLayout[index].isVisible === true){
-                    OSD.saveItem({id: index});
+                    await OSD.saveItem({id: index});
                 }
-            });
-            GUI.log(chrome.i18n.getMessage('osdClearLayout'));
+            }
+
+            GUI.log(i18n.getMessage('osdClearLayout'));
         });
 
 
@@ -3210,8 +3378,8 @@ OSD.GUI.updateAll = function() {
         clear.off('change');
     }
 
-    $('.osd_search').on('input', function() {
-        OSD.GUI.updateFields();
+    $('.osd_search').on('input', function(event) {
+        OSD.GUI.updateFields(event);
     });
     $('.supported').fadeIn();
     OSD.GUI.updateVideoMode();
@@ -3247,7 +3415,8 @@ HARDWARE.init = function() {
         isDjiHdFpv: false,
         isMspDisplay: false,
         useESCTelemetry: false,
-        useCRSFRx: false,
+        useRx: false,
+        useCRSF: false,
         useBaro: false,
         usePitot: false
     };
@@ -3272,7 +3441,8 @@ HARDWARE.update = function(callback) {
 
         // Update RX data for Crossfire detection
         mspHelper.loadRxConfig(function() {
-            HARDWARE.capabilities.useCRSFRx = (FC.RX_CONFIG.serialrx_provider == 6);
+            HARDWARE.capabilities.useCRSF = (FC.RX_CONFIG.serialrx_provider == 6); // CRSF
+            HARDWARE.capabilities.useRx = (FC.RX_CONFIG.serialrx_provider == 6 || FC.RX_CONFIG.receiver_type == 2 || FC.RX_CONFIG.serialrx_provider == 12); // CRSF or MSP or MAVLINK
 
             mspHelper.loadSensorConfig(function () {
                 HARDWARE.capabilities.useBaro  = (FC.SENSOR_CONFIG.barometer != 0);
@@ -3282,7 +3452,7 @@ HARDWARE.update = function(callback) {
                     callback();
                 }
             });
-        });        
+        });
     });
 };
 
@@ -3290,6 +3460,7 @@ TABS.osd = {};
 TABS.osd.initialize = function (callback) {
 
     mspHelper.loadServoMixRules();
+    mspHelper.loadLogicConditions();
 
     if (GUI.active_tab != 'osd') {
         GUI.active_tab = 'osd';
@@ -3306,10 +3477,10 @@ TABS.osd.initialize = function (callback) {
         GUI.load(path.join(__dirname, "osd.html"), Settings.processHtml(function () {
             // translate to user-selected language
            i18n.localize();
-    
+
             // Open modal window
             OSD.GUI.jbox = new jBox('Modal', {
-                width: 750, 
+                width: 750,
                 height: 300,
                 position: {y:'bottom'},
                 offset: {y:-50},
@@ -3319,50 +3490,50 @@ TABS.osd.initialize = function (callback) {
                 title: 'OSD Font Manager',
                 content: $('#fontmanagercontent')
             });
-    
+
             $('a.save').on('click', function () {
                 Settings.saveInputs(save_to_eeprom);
             });
-    
+
             // Initialise guides checkbox
-            isGuidesChecked = store.get('showOSDGuides', false); 
-            
+            isGuidesChecked = store.get('showOSDGuides', false);
+
             // Setup switch indicators
             $(".osdSwitchInd_channel option").each(function() {
                 $(this).text("Ch " + $(this).text());
             });
-    
+
             // Function when text for switch indicators change
             $('.osdSwitchIndName').on('keyup', function() {
                 // Make sure that the switch hint only contains A to Z
                 let testExp = new RegExp('^[A-Za-z0-9]');
                 let testText = $(this).val();
                 if (testExp.test(testText.slice(-1))) {
-                    $(this).val(testText.toUpperCase());
+                    $(this).val(testText.toUpperCase().slice(0, 4));
                 } else {
                     $(this).val(testText.slice(0, -1));
                 }
-    
+
                 // Update the OSD preview
                 refreshOSDSwitchIndicators();
             });
-    
+
             // Function to update the OSD layout when the switch text alignment changes
             $("#switchIndicators_alignLeft").on('change', function() {
                 refreshOSDSwitchIndicators();
             });
-    
+
             // Functions for when pan servo settings change
             $('#osdPanServoIndicatorShowDegrees').on('change', function() {
                 // Update the OSD preview
                 updatePanServoPreview();
             });
-    
+
             $('#panServoOutput').on('change', function() {
                 // Update the OSD preview
                 updatePanServoPreview();
             });
-    
+
             // Function for when text for craft name changes
             $('#craft_name').on('keyup', function() {
                 // Make sure that the craft name only contains A to Z, 0-9, spaces, and basic ASCII symbols
@@ -3373,11 +3544,11 @@ TABS.osd.initialize = function (callback) {
                 } else {
                     $(this).val(testText.slice(0, -1));
                 }
-    
+
                 // Update the OSD preview
                 updatePilotAndCraftNames();
             });
-    
+
             $('#pilot_name').on('keyup', function() {
                 // Make sure that the pilot name only contains A to Z, 0-9, spaces, and basic ASCII symbols
                 let testExp = new RegExp('^[A-Za-z0-9 !_,:;=@#\\%\\&\\-\\*\\^\\(\\)\\.\\+\\<\\>\\[\\]]');
@@ -3387,17 +3558,17 @@ TABS.osd.initialize = function (callback) {
                 } else {
                     $(this).val(testText.slice(0, -1));
                 }
-    
+
                 // Update the OSD preview
                 updatePilotAndCraftNames();
             });
-    
+
             // font preview window
             var $preview = $('.font-preview');
-    
+
             //  init structs once, also clears current font
             FONT.initData();
-    
+
             var $fontPicker = $('.fontbuttons button');
             $fontPicker.on('click', function () {
                 if (!$(this).data('font-file')) {
@@ -3412,7 +3583,7 @@ TABS.osd.initialize = function (callback) {
                 });
                 store.set('osd_font', $(this).data('font-file'));
             });
-    
+
             // load the last selected font when we change tabs
             var osd_font = store.get('osd_font', false);
             var previous_font_button;
@@ -3420,14 +3591,14 @@ TABS.osd.initialize = function (callback) {
                 previous_font_button = $('.fontbuttons button[data-font-file="' + osd_font + '"]');
                 if (previous_font_button.attr('data-font-file') == undefined) previous_font_button = undefined;
             }
-    
+
             if (typeof previous_font_button == "undefined") {
                 $fontPicker.first().trigger( "click" );
             } else {
                 previous_font_button.trigger( "click" );
             }
-            
-    
+
+
             $('button.load_font_file').on('click', function () {
                 $fontPicker.removeClass('active');
                 FONT.openFontFile().then(function () {
@@ -3435,7 +3606,7 @@ TABS.osd.initialize = function (callback) {
                     OSD.GUI.update();
                 });
             });
-    
+
             // font upload
             $('a.flash_font').on('click', function () {
                 if (!GUI.connect_lock) { // button disabled while flashing is in progress
@@ -3454,7 +3625,7 @@ TABS.osd.initialize = function (callback) {
                     FONT.upload(progressCallback);
                 }
             });
-    
+
             $('.update_preview').on('change', function () {
                 if (OSD.data) {
                     // Force an OSD redraw by saving any element
@@ -3467,11 +3638,11 @@ TABS.osd.initialize = function (callback) {
                     }, 100);
                 }
             });
-    
+
             $('#useCraftnameForMessages').on('change', function() {
                 OSD.GUI.updateDjiMessageElements(this.checked);
             });
-    
+
             if(semver.gte(FC.CONFIG.flightControllerVersion, '7.1.0')) {
                 mspHelper.loadOsdCustomElements(createCustomElements);
             }
@@ -3487,7 +3658,10 @@ function createCustomElements(){
         return;
     }
 
+    $('#INAVCharacterMapDocURL').attr('href', globalSettings.configuratorTreeLocation + 'resources/osd/INAV%20Character%20Map.md');
+
     var customElementsContainer = $('#osdCustomElements');
+    var init = true;
 
     for(var i = 0; i < FC.OSD_CUSTOM_ELEMENTS.settings.customElementsCount; i++){
         var label = $('<label>');
@@ -3495,30 +3669,51 @@ function createCustomElements(){
         var customElementTable = $('<table>').addClass('osdCustomElement_main_table');
         var customElementRowType = $('<tr>').data('row', i);
         var customElementRowValue = $('<tr>').data('row', i);
+
         var customElementLabel = $('<tr>');
+        customElementLabel.append($('<td>').attr('colspan', 2).append($('<span>').html(i18n.getMessage("custom_element") + ' ' + (i + 1))));
 
-        for(var ii = 0; ii < 3; ii++){
-
+        for(var ii = 0; ii < FC.OSD_CUSTOM_ELEMENTS.settings.customElementParts; ii++){
             var select = $('<select>').addClass('osdCustomElement-' + i + '-part-' + ii + '-type').data('valueCellClass', 'osdCustomElement-' + i + '-part-' + ii + '-value').html(`
                         <option value="0">none</option>
                         <option data-value="text" value="1">Text</option>
                         <option data-value="ico" value="2">Icon Static</option>
-                        <option data-value="ico_gv" value="3">Icon Global Variable</option>
-                        <option data-value="gv" value="4">Global Variable 00000</option>
-                        <option data-value="gv" value="5">Global Variable 000.00</option>
-                        <option data-value="gv" value="6">Global Variable 000</option>
-                        <option data-value="gv" value="7">Global Variable 0.0</option>
+                        <option data-value="ico_gv" value="3">Icon from Global Variable</option>
+                        <option data-value="ico_lc" value="4">Icon from Logic Condition</option>
+                        <option data-value="gv" value="5">Global Variable 0</option>
+                        <option data-value="gv" value="6">Global Variable 00</option>
+                        <option data-value="gv" value="7">Global Variable 000</option>
+                        <option data-value="gv" value="8">Global Variable 0000</option>
+                        <option data-value="gv" value="9">Global Variable 00000</option>
+                        <option data-value="gv" value="10">Global Variable 0.0</option>
+                        <option data-value="gv" value="11">Global Variable 0.00</option>
+                        <option data-value="gv" value="12">Global Variable 00.0</option>
+                        <option data-value="gv" value="13">Global Variable 00.00</option>
+                        <option data-value="gv" value="14">Global Variable 000.0</option>
+                        <option data-value="gv" value="15">Global Variable 000.00</option>
+                        <option data-value="gv" value="16">Global Variable 0000.0</option>
+                        <option data-value="lc" value="17">Logic Condition 0</option>
+                        <option data-value="lc" value="18">Logic Condition 00</option>
+                        <option data-value="lc" value="19">Logic Condition 000</option>
+                        <option data-value="lc" value="20">Logic Condition 0000</option>
+                        <option data-value="lc" value="21">Logic Condition 00000</option>
+                        <option data-value="lc" value="22">Logic Condition 0.0</option>
+                        <option data-value="lc" value="23">Logic Condition 0.00</option>
+                        <option data-value="lc" value="24">Logic Condition 00.0</option>
+                        <option data-value="lc" value="25">Logic Condition 00.00</option>
+                        <option data-value="lc" value="26">Logic Condition 000.0</option>
+                        <option data-value="lc" value="27">Logic Condition 000.00</option>
+                        <option data-value="lc" value="28">Logic Condition 0000.0</option>
                         `);
 
             customElementRowType.append($('<td>').append(select));
             customElementRowValue.append($('<td>').addClass('osdCustomElement-' + i + '-part-' + ii + '-value').append(
-                $('<input>').addClass('value').addClass('text').attr('type', 'text').attr('maxlength', FC.OSD_CUSTOM_ELEMENTS.settings.customElementTextSize).hide()
-            ).append(
-                $('<input>').addClass('value').addClass('ico').attr('min', 1).attr('max', 255).hide()
-            ).append(
-                $('<select>').addClass('value').addClass('ico_gv').html(getGVoptions()).hide()
-            ).append(
-                $('<select>').addClass('value').addClass('gv').html(getGVoptions()).hide()
+                $('<input>').addClass('value').addClass('text').attr('type', 'text').attr('maxlength', FC.OSD_CUSTOM_ELEMENTS.settings.customElementTextSize).hide()).append(
+                $('<input>').addClass('value').addClass('ico').attr('min', 1).attr('max', 255).hide()).append(
+                $('<select>').addClass('value').addClass('ico_gv').html(getGVoptions()).hide()).append(
+                $('<select>').addClass('value').addClass('ico_lc').html(getLCoptions()).hide()).append(
+                $('<select>').addClass('value').addClass('gv').html(getGVoptions()).hide()).append(
+                $('<select>').addClass('value').addClass('lc').html(getLCoptions()).hide()
             ));
 
             select.change(function(){
@@ -3526,6 +3721,9 @@ function createCustomElements(){
                 var valueBlock = $('.' + $(this).data('valueCellClass'))
                 valueBlock.find('.value').hide();
                 valueBlock.find('.' + dataValue).show();
+                if(!init){
+                    updateOSDCustomElementsDisplay();
+                }
             });
         }
 
@@ -3548,38 +3746,159 @@ function createCustomElements(){
             valueBlock.find('.' + dataValue).show();
         });
 
-        customElementLabel.append($('<td>').attr('colspan', 2).append($('<span>').html(i18n.getMessage("custom_element") + ' ' + (i + 1))));
-
-        customElementTable.append(customElementRowType).append(customElementRowValue).append(customElementLabel);
+        customElementTable.append(customElementLabel).append(customElementRowType).append(customElementRowValue);
         label.append(customElementTable);
         customElementsContainer.append(label);
     }
 
     fillCustomElementsValues();
     customElementsInitCallback();
+    init = false;
+}
+
+function updateOSDCustomElementsDisplay() {
+    let foundOSDCustomElements = 0;
+    let generalGroup = OSD.constants.ALL_DISPLAY_GROUPS.filter(function(e) {
+        return e.name == "osdGroupOSDCustomElements";
+    })[0];
+
+    for (var i = 0; i < FC.OSD_CUSTOM_ELEMENTS.settings.customElementsCount; i++) {
+        if ($('.osdCustomElement-' + i + '-part-0-type').val() != undefined) {
+            for (let si = 0; si < generalGroup.items.length; si++) {
+                if (generalGroup.items[si].name == "CUSTOM_ELEMENT_" + (i + 1)) {
+                    let preview = "";
+                    foundOSDCustomElements++;
+
+                    for (let ii = 0; ii < FC.OSD_CUSTOM_ELEMENTS.settings.customElementParts; ii++) {
+                        var typeCell = $('.osdCustomElement-' + i + '-part-' + ii + '-type');
+                        var valueCell = $('.osdCustomElement-' + i + '-part-' + ii + '-value');
+
+                        switch (parseInt(typeCell.val())) {
+                            case 1:
+                                preview += valueCell.find('.text').val().trim();
+                                break;
+                            case 2:
+                                preview += FONT.symbol("0x" + parseInt(valueCell.find('.ico').val()).toString(16).toUpperCase());
+                                break;
+                            case 3:
+                                preview += FONT.symbol(SYM.HOME);
+                                break;
+                            case 4:
+                                preview += FONT.symbol(SYM.HOME);
+                                break;
+                            case 5:
+                            case 17:
+                                preview += FONT.symbol(SYM.BLANK) + "2";
+                                break;
+                            case 6:
+                            case 18:
+                                preview += FONT.symbol(SYM.BLANK) + "57";
+                                break;
+                            case 7:
+                            case 19:
+                                preview += FONT.symbol(SYM.BLANK) + "316";
+                                break;
+                            case 8:
+                            case 20:
+                                preview += FONT.symbol(SYM.BLANK) + "6926";
+                                break;
+                            case 9:
+                            case 21:
+                                preview += FONT.symbol(SYM.BLANK) + "36520";
+                                break;
+                            case 10:
+                            case 22:
+                                preview += FONT.symbol(SYM.BLANK) + FONT.embed_dot("1.6");
+                                break;
+                            case 11:
+                            case 23:
+                                preview += FONT.symbol(SYM.BLANK) + FONT.embed_dot("2.64");
+                                break;
+                            case 12:
+                            case 24:
+                                preview += FONT.symbol(SYM.BLANK) + FONT.embed_dot("21.4");
+                                break;
+                            case 13:
+                            case 25:
+                                preview += FONT.symbol(SYM.BLANK) + FONT.embed_dot("34.26");
+                                break;
+                            case 14:
+                            case 26:
+                                preview += FONT.symbol(SYM.BLANK) + FONT.embed_dot("315.7");
+                                break;
+                            case 15:
+                            case 27:
+                                preview += FONT.symbol(SYM.BLANK) + FONT.embed_dot("562.46");
+                                break;
+                            case 16:
+                            case 28:
+                                preview += FONT.symbol(SYM.BLANK) + FONT.embed_dot("4629.1");
+                                break;
+                        }
+                    }
+
+                    if (preview == "") {
+                        preview = "CE_" + (i + 1);
+                    }
+
+                    generalGroup.items[si].preview = preview;
+                }
+            }
+        }
+
+        if (foundOSDCustomElements >= FC.OSD_CUSTOM_ELEMENTS.settings.customElementsCount) {
+            break;
+        }
+    }
+    OSD.GUI.updatePreviews();
 }
 
 function fillCustomElementsValues() {
     for (var i = 0; i < FC.OSD_CUSTOM_ELEMENTS.settings.customElementsCount; i++) {
-        for (var ii = 0; ii < 3; ii++) {
+        for (var ii = 0; ii < FC.OSD_CUSTOM_ELEMENTS.settings.customElementParts; ii++) {
             $('.osdCustomElement-' + i + '-part-' + ii + '-type').val(FC.OSD_CUSTOM_ELEMENTS.items[i].customElementItems[ii].type).trigger('change');
 
             var valueCell = $('.osdCustomElement-' + i + '-part-' + ii + '-value');
-            switch (FC.OSD_CUSTOM_ELEMENTS .items[i].customElementItems[ii].type){
+            switch (FC.OSD_CUSTOM_ELEMENTS.items[i].customElementItems[ii].type){
                 case 1:
                     valueCell.find('.text').val(FC.OSD_CUSTOM_ELEMENTS .items[i].customElementText).trigger('change');
                     break;
                 case 2:
-                    valueCell.find('.ico').val(FC.OSD_CUSTOM_ELEMENTS .items[i].customElementItems[ii].value).trigger('change');
+                    valueCell.find('.ico').val(FC.OSD_CUSTOM_ELEMENTS.items[i].customElementItems[ii].value).trigger('change');
                     break;
                 case 3:
-                    valueCell.find('.ico_gv').val(FC.OSD_CUSTOM_ELEMENTS .items[i].customElementItems[ii].value).trigger('change');
+                    valueCell.find('.ico_gv').val(FC.OSD_CUSTOM_ELEMENTS.items[i].customElementItems[ii].value).trigger('change');
                     break;
                 case 4:
+                    valueCell.find('.ico_lc').val(FC.OSD_CUSTOM_ELEMENTS.items[i].customElementItems[ii].value).trigger('change');
+                    break;
                 case 5:
                 case 6:
                 case 7:
-                    valueCell.find('.gv').val(FC.OSD_CUSTOM_ELEMENTS .items[i].customElementItems[ii].value).trigger('change');
+                case 8:
+                case 9:
+                case 10:
+                case 11:
+                case 12:
+                case 13:
+                case 14:
+                case 15:
+                case 16:
+                    valueCell.find('.gv').val(FC.OSD_CUSTOM_ELEMENTS.items[i].customElementItems[ii].value).trigger('change');
+                    break;
+                case 17:
+                case 18:
+                case 19:
+                case 20:
+                case 21:
+                case 22:
+                case 23:
+                case 24:
+                case 25:
+                case 26:
+                case 27:
+                case 28:
+                    valueCell.find('.lc').val(FC.OSD_CUSTOM_ELEMENTS.items[i].customElementItems[ii].value).trigger('change');
                     break;
             }
         }
@@ -3617,7 +3936,7 @@ function customElementsInitCallback() {
 }
 
 function customElementNormaliseRow(row){
-    for(var i = 0; i < 3; i++){
+    for(var i = 0; i < FC.OSD_CUSTOM_ELEMENTS.settings.customElementParts; i++){
         var elementType = $('.osdCustomElement-' + row + '-part-' + i + '-type');
         var valueCell = $('.' + elementType.data('valueCellClass'));
 
@@ -3628,15 +3947,15 @@ function customElementNormaliseRow(row){
                 break;
             case 2:
                 valueCell.find('.ico').val(valueCell.find('.ico').val() > 255 ? 255 : valueCell.find('.ico').val());
-                valueCell.find('.ico').val(valueCell.find('.ico').val() < 1 ? 1 : valueCell.find('.ico').val());
+                valueCell.find('.ico').val((valueCell.find('.ico').val() != '' && valueCell.find('.ico').val() < 1 )? 1 : valueCell.find('.ico').val());
         }
     }
+    updateOSDCustomElementsDisplay();
 }
 
-function customElementDisableNonValidOptionsRow(row){
-
+function customElementDisableNonValidOptionsRow(row) {
     var selectedTextIndex = false;
-    for(let i = 0; i < 3; i++){
+    for(let i = 0; i < FC.OSD_CUSTOM_ELEMENTS.settings.customElementParts; i++){
         let elementType = $('.osdCustomElement-' + row + '-part-' + i + '-type');
 
         if(parseInt(elementType.val()) === 1)
@@ -3646,7 +3965,7 @@ function customElementDisableNonValidOptionsRow(row){
         }
     }
 
-    for(let i = 0; i < 3; i++){
+    for(let i = 0; i < FC.OSD_CUSTOM_ELEMENTS.settings.customElementParts; i++){
         let elementType = $('.osdCustomElement-' + row + '-part-' + i + '-type');
         if(i !== selectedTextIndex && selectedTextIndex !== false){
             elementType.find('option[value="1"]').attr('disabled', 'disabled');
@@ -3657,13 +3976,12 @@ function customElementDisableNonValidOptionsRow(row){
 }
 
 function customElementGetDataForRow(row){
-
     var data = [];
     data.push8(row);
 
     var text = "";
 
-    for(var ii = 0; ii < 3; ii++){
+    for(var ii = 0; ii < FC.OSD_CUSTOM_ELEMENTS.settings.customElementParts; ii++){
         var elementType = $('.osdCustomElement-' + row + '-part-' + ii + '-type');
         var valueCell = $('.' + elementType.data('valueCellClass'));
         var partValue = 0;
@@ -3679,10 +3997,35 @@ function customElementGetDataForRow(row){
                 partValue = parseInt(valueCell.find('.ico_gv').find(':selected').val());
                 break;
             case 4:
+                partValue = parseInt(valueCell.find('.ico_lc').find(':selected').val());
+                break;
             case 5:
             case 6:
             case 7:
+            case 8:
+            case 9:
+            case 10:
+            case 11:
+            case 12:
+            case 13:
+            case 14:
+            case 15:
+            case 16:
                 partValue = parseInt(valueCell.find('.gv').find(':selected').val());
+                break;
+            case 17:
+            case 18:
+            case 19:
+            case 20:
+            case 21:
+            case 22:
+            case 23:
+            case 24:
+            case 25:
+            case 26:
+            case 27:
+            case 28:
+                partValue = parseInt(valueCell.find('.lc').find(':selected').val());
                 break;
         }
 
@@ -3705,7 +4048,9 @@ function customElementGetDataForRow(row){
     data.push8(parseInt(elementVisibilityType.val()));
     data.push16(visibilityValue);
 
-    for(var i = 0; i < FC.OSD_CUSTOM_ELEMENTS .settings.customElementTextSize; i++){
+    console.log("Saving osd custom data for number " + row + " | data: " + data);
+
+    for(var i = 0; i < FC.OSD_CUSTOM_ELEMENTS.settings.customElementTextSize; i++){
         if(i < text.length){
             data.push8(text.charCodeAt(i))
         }else{
@@ -3718,20 +4063,21 @@ function customElementGetDataForRow(row){
 
 function getGVoptions(){
     var result = '';
-    for(var i = 0; i < 8; i++){
-        result += `<option value="` + i + `">GV `+i+`</option>`;
+    for(var i = 0; i < 8; i++) {
+        result += `<option value="` + i + `">GV ` + i + `</option>`;
     }
     return result;
 }
 
 function getLCoptions(){
     var result = '';
-    for(var i = 0; i < 64; i++){
-        result += `<option value="` + i + `">LC `+i+`</option>`;
+    for(var i = 0; i < FC.LOGIC_CONDITIONS.getMaxLogicConditionCount(); i++) {
+        if (FC.LOGIC_CONDITIONS.isEnabled(i)) {
+            result += `<option value="` + i + `">LC ` + i + `</option>`;
+        }
     }
     return result;
 }
-
 
 function refreshOSDSwitchIndicators() {
     let group = OSD.constants.ALL_DISPLAY_GROUPS.filter(function(e) {

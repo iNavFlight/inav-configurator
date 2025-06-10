@@ -271,7 +271,7 @@
 | ![Vario 1 down](/resources/osd/digital/default/24x36/343.png)     | SYM_VARIO_DOWN_1A          |                              | Vario down                            | 343        | 0x157         |
 | ![Vario 2 down](/resources/osd/digital/default/24x36/344.png)     | SYM_VARIO_DOWN_2A          |                              | Vario down down                       | 344        | 0x158         |
 | ![Altitude](/resources/osd/digital/default/24x36/345.png)         | SYM_ALT                    |                              | Altitude symbol                       | 345        | 0x159         |
-| ![Vertical AHI](/resources/osd/digital/default/24x36/346.png)     | SYM_AH_V_START             |                              | Vertical AHI                          | 346 - 351  | 0x15A - 0x159 |
+| ![Vertical AHI](/resources/osd/digital/default/24x36/346.png)     | SYM_AH_V_START             |                              | Vertical AHI                          | 346 - 351  | 0x15A - 0x15F |
 | ![Vertical AHI](/resources/osd/digital/default/24x36/347.png)     |                            |                              |                                       | 347        | 0x15B         |
 | ![Vertical AHI](/resources/osd/digital/default/24x36/348.png)     |                            |                              |                                       | 348        | 0x15C         |
 | ![Vertical AHI](/resources/osd/digital/default/24x36/349.png)     |                            |                              |                                       | 349        | 0x15D         |
@@ -286,6 +286,8 @@
 | ![Crosshair centre](/resources/osd/digital/default/24x36/358.png) | SYM_AH_CH_CENTER           | SYM.AH_CROSSHAIRS            | Default crosshair centre              | 358        | 0x166         |
 | ![Flight dist rem](/resources/osd/digital/default/24x36/359.png)  | SYM_FLIGHT_DIST_REMAINING  | SYM.FLIGHT_DIST_REMAINING    | Flight distance remaining             | 359        | 0x167         |
 | ![Odometer](/resources/osd/digital/default/24x36/360.png)         | SYM_ODOMETER               | SYM.ODOMETER                 | Odometer (total aircraft distance)    | 360        | 0x168         |
+| ![RX Band](/resources/osd/digital/default/24x36/361.png)          | SYM_RX_BAND                | SYM.RX_BAND                  | Frequency band used by RX             | 361        | 0x169         |
+| ![RX Mode](/resources/osd/digital/default/24x36/362.png)          | SYM_RX_MODE                | SYM.RX_MODE                  | Mode used by RX (150HZ for example)   | 362        | 0x16A         |
 | ![Crosshair 3](/resources/osd/digital/default/24x36/400_402.png)  | SYM_AH_CH_TYPE3            | SYM.AH_CROSSHAIRS            | Crosshair type 3                      | 400 - 402  | 0x190 - 0x192 |
 | ![Crosshair 4](/resources/osd/digital/default/24x36/403_405.png)  | SYM_AH_CH_TYPE4            | SYM.AH_CROSSHAIRS            | Crosshair type 4                      | 403 - 405  | 0x193 - 0x195 |
 | ![Crosshair 5](/resources/osd/digital/default/24x36/406_408.png)  | SYM_AH_CH_TYPE5            | SYM.AH_CROSSHAIRS            | Crosshair type 5                      | 406 - 408  | 0x196 - 0x198 |

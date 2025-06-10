@@ -1,7 +1,6 @@
 'use strict';
 const { dialog } = require("@electron/remote");
 
-
 const CONFIGURATOR = require('./data_storage');
 const Switchery = require('./libraries/switchery/switchery')
 const MSP = require('./msp');
@@ -51,9 +50,16 @@ var GUI_control = function () {
         'mission_control',
         'mixer',
         'programming',
-        'ez_tune'
+        'ez_tune',
+        'search'
     ];
     this.allowedTabs = this.defaultAllowedTabsWhenDisconnected;
+
+    this.PROFILES_CHANGED = {
+        'CONTROL' : 1,
+        'BATTERY' : 2,
+        'MIXER'   : 4
+    };
 
     // check which operating system is user running
     if (navigator.appVersion.indexOf("Win") != -1)          this.operating_system = "Windows";
@@ -219,6 +225,7 @@ GUI_control.prototype.updateStatusBar = function() {
         'ARMED':(1 << 2),
         //'WAS_EVER_ARMED':(1 << 3),
         'SIMULATOR_MODE':(1 << 4),
+        'ARMING_DISABLED_GEOZONE':(1 << 6),
         'ARMING_DISABLED_FAILSAFE_SYSTEM':(1 << 7),
         'ARMING_DISABLED_NOT_LEVEL':(1 << 8),
         'ARMING_DISABLED_SENSORS_CALIBRATING':(1 << 9),
@@ -229,7 +236,7 @@ GUI_control.prototype.updateStatusBar = function() {
         'ARMING_DISABLED_ARM_SWITCH':(1 << 14),
         'ARMING_DISABLED_HARDWARE_FAILURE':(1 << 15),
         'ARMING_DISABLED_BOXFAILSAFE':(1 << 16),
-        'ARMING_DISABLED_BOXKILLSWITCH':(1 << 17),
+        //'ARMING_DISABLED_BOXKILLSWITCH':(1 << 17),
         'ARMING_DISABLED_RC_LINK':(1 << 18),
         'ARMING_DISABLED_THROTTLE':(1 << 19),
         'ARMING_DISABLED_CLI':(1 << 20),
@@ -263,10 +270,16 @@ GUI_control.prototype.updateProfileChange = function(refresh) {
     $('#mixerprofilechange').val(FC.CONFIG.mixer_profile);
     $('#profilechange').val(FC.CONFIG.profile);
     $('#batteryprofilechange').val(FC.CONFIG.battery_profile);
-    if (refresh) {
-        GUI.log(i18n.getMessage('loadedMixerProfile', [FC.CONFIG.mixer_profile + 1]));
-        GUI.log(i18n.getMessage('pidTuning_LoadedProfile', [FC.CONFIG.profile + 1]));
-        GUI.log(i18n.getMessage('loadedBatteryProfile', [FC.CONFIG.battery_profile + 1]));
+    if (refresh > 0) {
+        if (refresh & GUI.PROFILES_CHANGED.CONTROL) {
+            GUI.log(i18n.getMessage('pidTuning_LoadedProfile', [FC.CONFIG.profile + 1]));
+        }
+        if (refresh & GUI.PROFILES_CHANGED.MIXER) {
+            GUI.log(i18n.getMessage('loadedMixerProfile', [FC.CONFIG.mixer_profile + 1]));
+        }
+        if (refresh & GUI.PROFILES_CHANGED.BATTERY) {
+            GUI.log(i18n.getMessage('loadedBatteryProfile', [FC.CONFIG.battery_profile + 1]));
+        }
         GUI.updateActivatedTab();
     }
 };
@@ -518,7 +531,7 @@ GUI_control.prototype.update_dataflash_global = function () {
         width: (100-(FC.DATAFLASH.totalSize - FC.DATAFLASH.usedSize) / FC.DATAFLASH.totalSize * 100) + "%",
         display: 'block'
         });
-        $(".dataflash-free_global div").text('Dataflash: free ' + formatFilesize(FC.DATAFLASH.totalSize - FC.DATAFLASH.usedSize));
+        $(".dataflash-free_global div").html(i18n.getMessage('sensorDataFlashFreeSpace') + formatFilesize(FC.DATAFLASH.totalSize - FC.DATAFLASH.usedSize));
     } else {
         $(".noflash_global").css({
         display: 'block'
@@ -531,10 +544,14 @@ GUI_control.prototype.update_dataflash_global = function () {
 };
 
 /**
-* Don't use alert() in Electron, it has a nasty bug: https://github.com/electron/electron/issues/31917
+* Don't use alert() or confirm() in Electron, it has a nasty bug: https://github.com/electron/electron/issues/31917
 */ 
 GUI_control.prototype.alert = function(message) {
     dialog.showMessageBoxSync({ message: message, icon: "./images/inav_icon_128.png" });
+}
+
+GUI_control.prototype.confirm = function(message) {
+    return dialog.showMessageBoxSync({ message: message, icon: "./images/inav_icon_128.png", buttons: ["Yes", "No"]}) == 0;
 }
 
 // initialize object into GUI variable
