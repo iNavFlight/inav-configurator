@@ -11,7 +11,7 @@ const Store = require('electron-store');
 const store = new Store();
 
 
-const availableLanguages = ['en', 'ja', 'uk','zh_CN'];
+const availableLanguages = ['en', 'ja', 'uk' , 'zh_CN' , 'el'];
 
 const i18n = {};
   
