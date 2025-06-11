@@ -78,7 +78,7 @@ TABS.mission_control.initialize = function (callback) {
     let $geozoneContent;
     let invalidGeoZones = false;
     let isGeozoneEnabeld = false;
-    let settings = {speed: 0, alt: 5000, safeRadiusSH: 50, fwApproachAlt: 60, fwLandAlt: 5, maxDistSH: 0, fwApproachLength: 0, fwLoiterRadius: 0, bingDemModel: false};
+    let settings = {speed: 0, alt: 5000, safeRadiusSH: 50, fwApproachAlt: 60, fwLandAlt: 5, maxDistSH: 0, fwApproachLength: 0, fwLoiterRadius: 0};
 
     if (GUI.active_tab != 'mission_control') {
         GUI.active_tab = 'mission_control';
@@ -1061,13 +1061,6 @@ TABS.mission_control.initialize = function (callback) {
                 $('#elevationValueAtHome').text(elevationAtHome+' m');
                 HOME.setAlt(elevationAtHome);
             })()
-        }
-
-        if (globalSettings.mapProviderType == 'bing') {
-            $('#elevationEarthModelclass').fadeIn(300);
-            changeSwitchery($('#elevationEarthModel'), settings.bingDemModel);
-        } else {
-            $('#elevationEarthModelclass').fadeOut(300);
         }
     }
 
@@ -2343,22 +2336,40 @@ TABS.mission_control.initialize = function (callback) {
         var lat = (FC.GPS_DATA ? (FC.GPS_DATA.lat / 10000000) : 0);
         var lon = (FC.GPS_DATA ? (FC.GPS_DATA.lon / 10000000) : 0);
 
-        let mapLayer;
+        let mapLayers = [];
         let control_list;
 
-        if (globalSettings.mapProviderType == 'bing') {
-            mapLayer = new ol.source.BingMaps({
-                key: globalSettings.mapApiKey,
-                imagerySet: 'AerialWithLabels',
-                maxZoom: 19
-            });
+        if (globalSettings.mapProviderType == 'esri') {
+            mapLayers.push(new ol.layer.Tile({
+                source: new ol.source.XYZ({
+                            url: 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+                            attributions: 'Source: <a href="https://www.esri.com/" target="_blank">Esri</a>, Maxar, Earthstar Geographics, and the GIS User Community',
+                            maxZoom: 19
+                        })
+            }));
+            mapLayers.push(new ol.layer.Tile({
+                    source: new ol.source.XYZ({
+                                url: 'https://services.arcgisonline.com/arcgis/rest/services/Reference/World_Transportation/MapServer/tile/{z}/{y}/{x}',
+                                maxZoom: 19
+                            })
+            }));
+            mapLayers.push(new ol.layer.Tile({
+                source: new ol.source.XYZ({
+                            url: 'https://services.arcgisonline.com/arcgis/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}',
+                            maxZoom: 19
+                        })
+            }));
         } else if ( globalSettings.mapProviderType == 'mapproxy' ) {
-            mapLayer = new ol.source.TileWMS({
-                url: globalSettings.proxyURL,
-                params: {'LAYERS':globalSettings.proxyLayer}
-            })
+            mapLayers.push(new ol.layer.Tile({
+                source: new ol.source.TileWMS({
+                            url: globalSettings.proxyURL,
+                            params: {'LAYERS':globalSettings.proxyLayer}
+                        })
+            }));
         } else {
-            mapLayer = new ol.source.OSM();
+            mapLayers.push(new ol.layer.Tile({
+                source: new ol.source.OSM()
+            }));
         }
 
         if (CONFIGURATOR.connectionValid) {
@@ -2392,11 +2403,7 @@ TABS.mission_control.initialize = function (callback) {
                 }
             }).extend(control_list),
             interactions: ol.interaction.defaults().extend([new app.Drag()]),
-            layers: [
-                new ol.layer.Tile({
-                    source: mapLayer
-                })
-            ],
+            layers: mapLayers,
             target: document.getElementById('missionMap'),
             view: new ol.View({
                 center: ol.proj.fromLonLat([lon, lat]),
@@ -3559,30 +3566,6 @@ TABS.mission_control.initialize = function (callback) {
 
         $('#cancelPlot').on('click', function () {
             closeHomePanel();
-        });
-
-        $('#elevationEarthModel').on('change', function (event) {
-            if (globalSettings.mapProviderType == 'bing') {
-                (async () => {
-                    const elevationAtHome = await HOME.getElevation(globalSettings);
-                    $('#elevationValueAtHome').text(elevationAtHome+' m');
-                    HOME.setAlt(elevationAtHome);
-
-                    if (selectedMarker) {
-                        const elevationAtWP = await selectedMarker.getElevation(globalSettings);
-                        $('#elevationValueAtWP').text(elevationAtWP);
-                        const returnAltitude = checkAltElevSanity(false, selectedMarker.getAlt(), elevationAtWP, selectedMarker.getP3());
-                        selectedMarker.setAlt(returnAltitude);
-                        mission.updateWaypoint(selectedMarker);
-                    }
-
-                    redrawLayer();
-                    plotElevation();
-                })()
-
-                settings.bingDemModel = $('#elevationEarthModel').prop("checked") ? true : false;
-                saveSettings();
-            }
         });
 
         /////////////////////////////////////////////
