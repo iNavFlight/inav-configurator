@@ -13,7 +13,6 @@ var globalSettings = {
     osdUnits: null,
     // Map  
     mapProviderType: null,
-    mapApiKey: null,
     proxyURL: null,
     proxyLayer: null,
     // Show colours for profiles
