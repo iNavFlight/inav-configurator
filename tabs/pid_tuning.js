@@ -15,6 +15,8 @@ const Settings = require('./../js/settings');
 const i18n = require('./../js/localization');
 const { scaleRangeInt } = require('./../js/helpers');
 const interval = require('./../js/intervals');
+const presetFramework = require('../js/presetFramework');
+const jBox = require('./../js/libraries/jBox/jBox.min');
 
 TABS.pid_tuning = {
     rateChartHeight: 117
@@ -24,6 +26,7 @@ TABS.pid_tuning.initialize = function (callback) {
 
     var loadChainer = new MSPChainerClass();
 
+    let filterPresetWizard;
     let EZ_TUNE_PID_RP_DEFAULT = [40, 75, 23, 100];
     let EZ_TUNE_PID_YAW_DEFAULT = [45, 80, 0, 100];
 
@@ -387,6 +390,39 @@ TABS.pid_tuning.initialize = function (callback) {
             $('.rpy_d').prop('disabled', 'disabled');
         }
 
+        let $wizardButton = $('#filter-presets');
+
+        /*
+        * generate all the presets in the wizard
+        */
+        let $presetContent = $('#filterPresetContent .filterPresetContent_wrapper');
+        let presets = presetFramework.getByType('filter');
+
+        for (let i = 0; i < presets.length; i++) {
+            let preset = presets[i];
+
+            let html = "<div data-preset='" + preset.id + "'>" +
+                "<div class='filterPresetContent_title'>" + preset.name + "</div>" +
+                "<div class='filterPresetContent_description'>" + preset.description + "</div>" +
+                "</div>";
+
+            $presetContent.append(html);
+        }
+
+        filterPresetWizard = new jBox('Modal', {
+            width: 480,
+            height: 410,
+            closeButton: 'title',
+            animation: false,
+            attach: $wizardButton,
+            title: i18n.getMessage("mixerWizardModalTitle"),
+            content: $('#filterPresetContent')
+        });
+
+        $('#filter-presets').on('click', function (event) {
+            event.preventDefault();
+        });
+        
         interval.add("drawRollPitchYawExpo", function () {
             drawRollPitchYawExpo();
         }, 100);
@@ -455,6 +491,7 @@ TABS.pid_tuning.initialize = function (callback) {
 };
 
 TABS.pid_tuning.cleanup = function (callback) {
+    $('.jBox-wrapper').remove();
     if (callback) {
         callback();
     }
