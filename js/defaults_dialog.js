@@ -192,8 +192,9 @@ var defaultsDialog = (function () {
     };
 
     privateScope.setSettings = function (selectedDefaultPreset) {
-        
-        periodicStatusUpdater.stop();
+        if(selectedDefaultPreset.reboot) {
+            periodicStatusUpdater.stop();
+        }
         
         var currentControlProfile = parseInt($("#profilechange").val());
         var currentBatteryProfile = parseInt($("#batteryprofilechange").val());
