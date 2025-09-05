@@ -49,8 +49,6 @@ jobs:
                 command: yarn install --foreground-scripts
                 timeout_minutes: 10
                 on_retry_command: rm -rfv node_modules
-            - name: Remove other SITL binary
-              run: rm -v resources/sitl/linux/arm64/inav_SITL
             - name: Build Linux
               run: yarn run make
             - name: Upload Linux deb
@@ -104,10 +102,6 @@ jobs:
                 command: yarn install --foreground-scripts
                 timeout_minutes: 10
                 on_retry_command: rm -rfv node_modules
-            - name: Remove other SITL binary
-              run: |
-                mv -fv resources/sitl/linux/arm64/inav_SITL resources/sitl/linux/inav_SITL
-                rmdir -v resources/sitl/linux/arm64
             - name: Build Linux
               run: yarn run make
             - name: Upload Linux deb
