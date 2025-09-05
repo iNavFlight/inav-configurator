@@ -17,4 +17,3 @@ inav-configurator.iml
 *.swp
 *.bak
 eeprom.bin
-yarn.lock
