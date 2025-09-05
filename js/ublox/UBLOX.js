@@ -181,9 +181,9 @@ var ublox = (function () {
     }
 
 
-    function loadError(event) {
+    function loadError(e) {
         dialog.alert(i18n.getMessage("gpsAssistnowLoadDataError"));
-        console.log(i18n.getMessage("gpsAssistnowLoadDataError") + ':' + event.toString());
+        console.log(JSON.stringify(e));
     }
 
     // For more info on assistnow, check:
