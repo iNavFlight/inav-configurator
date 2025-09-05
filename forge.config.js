@@ -50,6 +50,9 @@ export default {
         result.artifacts.forEach(artifact => {
           var artifactStr = artifact.toString();
           var newPath = path.join(path.dirname(artifactStr), baseName + path.extname(artifactStr));
+          newPath = newPath.replace('Configurator_win32_ia32', 'Configurator_Win32');
+          newPath = newPath.replace('Configurator_win32_x64', 'Configurator_Win64');
+          newPath = newPath.replace('Configurator_darwin', 'Configurator_MacOS');
           fs.renameSync(artifactStr, newPath);
           console.log('Artifact: ' + newPath);
         });

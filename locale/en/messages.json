@@ -17,7 +17,7 @@
     "language_ja": {
         "message": "日本語",
         "_comment": "Don't translate!"
-    },    
+    },
     "language_zh_CN": {
         "message": "简体中文",
         "_comment": "Don't translate!"
@@ -1286,9 +1286,6 @@
     "portsHelp": {
         "message": "<strong>Note:</strong> not all combinations are valid.  When the flight controller firmware detects this the serial port configuration will be reset."
     },
-    "portsMSPHelp": {
-        "message": "<strong>Note:</strong> Do <span style=\"color: red\">NOT</span> disable MSP on the first serial port unless you know what you are doing.  You may have to reflash and erase your configuration if you do."
-    },
     "portsFirmwareUpgradeRequired": {
         "message": "Firmware upgrade <span style=\"color: red\">required</span>."
     },
@@ -2067,6 +2064,9 @@
     },
     "adjustmentsFunction59": {
         "message": "Multi Mission Index Adjustment"
+    },
+    "adjustmentsFunction60": {
+        "message": "Fixed Wing Alt Control Response Adjustment"
     },
     "adjustmentsSave": {
         "message": "Save"
@@ -3505,6 +3505,12 @@
     "soarPitchDeadbandHelp": {
         "message": "Pitch Angle deadband when soaring mode enabled (deg). Angle mode inactive within deadband allowing pitch to free float whilst soaring."
     },
+    "altControlResponse": {
+        "message": "Altitude Control Response Factor"
+    },
+    "altControlResponseHelp": {
+        "message": "Adjusts the response of fixed wing altitude control as the target altitude is approached. Higher values will sharpen altitude control response but may also cause excessive overshoot or pitch instability if set too high."
+    },
     "waypointRadiusHelp": {
         "message": "This sets the distance away from a waypoint that triggers the waypoint as reached."
     },
@@ -4433,7 +4439,7 @@
         "message": "Upload Font"
     },
     "osd_font_manager": {
-        "message": "Font Manager"
+        "message": "Analogue Font Manager"
     },
     "uploadingCharacters": {
         "message": "Uploading..."
@@ -6169,5 +6175,8 @@
     },
     "currentLanguage": {
         "message": "en"
+    },
+   "search": {
+        "message": "Search"
     }
 }

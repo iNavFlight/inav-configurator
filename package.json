@@ -2,7 +2,7 @@
   "name": "inav-configurator",
   "productName": "INAV Configurator",
   "description": "Configurator for the open source flight controller software INAV.",
-  "version": "8.0.0",
+  "version": "9.0.0",
   "main": ".vite/build/main.js",
   "type": "module",
   "scripts": {
@@ -30,6 +30,7 @@
     "inflection": "3.0.0",
     "jbox": "^1.3.3",
     "jquery": "3.7.1",
+    "jquery-ui-dist": "1.13.3",
     "jquery-textcomplete": "^1.8.5",
     "jquery-ui-dist": "1.13.3",
     "marked": "^15.0.3",

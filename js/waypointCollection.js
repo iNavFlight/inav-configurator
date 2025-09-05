@@ -322,6 +322,16 @@ let WaypointCollection = function () {
         return outputNumber;
     }
 
+    self.convertWaypointToJumpNumber = function(jumpId) {
+        let outputNumber = 0;
+        self.getNonAttachedList().forEach(function (element) {
+            if (element.getNumber() == jumpId) {
+                outputNumber = element.getLayerNumber();
+            }
+        });
+        return outputNumber;
+    }
+
     self.isJumpTargetAttached = function(waypoint) {
         let lJumptTargetAttached = [];
         data.forEach(function (element) {

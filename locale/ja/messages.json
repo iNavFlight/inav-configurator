@@ -18,6 +18,10 @@
         "message": "日本語",
         "_comment": "Don't translate!"
     },
+    "language_zh_CN": {
+        "message": "简体中文",
+        "_comment": "Don't translate!"
+    },
     "language": {
         "message": "言語選択"
     },
@@ -919,7 +923,7 @@
         "message": "シリアル受信機 半二重"
     },
     "configurationFeaturesHelp": {
-        "message": "<strong>注:</strong> 機能のすべての組み合わせが有効な訳ではありません。 フライトコントローラファームウェアが無効な機能の組み合わせを検出すると、競合する機能が無効になります。<br /><strong>注:</strong> ポートを使用する機能を<span style=\"color: red\">有効にする前に</span>シリアルポートを設定してください。"
+        "message": "<strong>注:</strong> 機能のすべての組み合わせが有効であるとは限りません。フライトコントローラのファームウェアが無効な機能の組み合わせを検出すると、競合する機能が無効になります。<br /><strong>注:</strong> ポートを使用する機能を<span style=\"color: red\">有効にする前に</span>シリアルポートを設定してください。"
     },
     "configurationSerialRXHelp": {
         "message": "<strong>注:</strong> シリアル受信機用にシリアルポート([ポート]タブ内)を忘れずに設定してください。"
@@ -946,7 +950,7 @@
         "message": "加速度センサー ピッチトリム"
     },
     "configurationMagDeclination": {
-        "message": "コンパス偏角値 [dig]"
+        "message": "コンパス偏角値 [度]"
     },
     "configurationAutoDisarmDelay": {
         "message": "THR低下によるディスアームまでの秒数"
@@ -1079,6 +1083,12 @@
     },
     "configurationLaunchIdleDelayHelp": {
         "message": "ローンチ(射出)のためにスロットル上昇し、モーターがアイドルスロットル値で始動するまでの遅延時間を設定します。デフォルト: 0 [0～60000]"
+    },
+    "configurationWiggleWakeIdle": {
+        "message": "振動でモーター起動"
+    },
+    "configurationWiggleWakeIdleHelp": {
+        "message": "有効にすると、この機能は機体のヨー操作でアイドル状態のモーターを起動させることができます。<br />0: 無効 (デフォルト))<br />1: 1回振動 - 検出しきい値が高く、尾部を簡単に動かせない固定翼機向けの設定<br />2: 2回振動 - 検出しきい値が低いが繰り返しの動作が必要。大型モデルや尾部がある固定翼機向けの設定"
     },
     "configurationLaunchMotorDelay": {
         "message": "モーター遅延"
@@ -1237,13 +1247,13 @@
         "message": "ジンバル感度"
     },
     "configurationGimbalPanChannel": {
-        "message": "パン・チャンネル(ヨー)"
+        "message": "パン・チャンネル (Yaw)"
     },
     "configurationGimbalTiltChannel": {
-        "message": "チルト・チャンネル(ピッチ)"
+        "message": "チルト・チャンネル (Pitch)"
     },
     "configurationGimbalRollChannel": {
-        "message": "ロール・チャンネル"
+        "message": "Roll・チャンネル"
     },
     "configurationHeadtracker": {
         "message": "ヘッドトラッカー"
@@ -1255,16 +1265,13 @@
         "message": "ヘッドトラッカー パン動作比率"
     },
     "configurationHeadtrackerTiltRatio": {
-        "message": "ヘッドつラッカー チルト動作比率"
+        "message": "ヘッドトラッカー チルト動作比率"
     },
     "configurationHeadtrackerRollRatio": {
-        "message": "ヘッドトラッカー ロール動作比率"
+        "message": "ヘッドトラッカー Roll動作比率"
     },
     "portsHelp": {
-        "message": "<strong>注:</strong> すべての組み合わせが有効であるとは限りません。フライトコントローラのファームウェアがこれを検出すると、シリアルポートの設定がリセットされます。"
-    },
-    "portsMSPHelp": {
-        "message": "<strong>注:</strong> 確実に設定内容を把握しない限り、最初のシリアルポートのMSPを<span style=\"color: red\">無効にしないで</span>ください。行った場合、ファームウェアの再フラッシュが必要になり、すべての設定が消去される場合があります。"
+        "message": "<strong>注:</strong> すべての組み合わせが有効であるとは限りません。フライトコントローラのファームウェアがこれらを検出すると、シリアルポートの設定がリセットされます。"
     },
     "portsFirmwareUpgradeRequired": {
         "message": "ファームウェアの更新が<span style=\"color: red\">必要です</span>。"
@@ -1645,10 +1652,10 @@
         "message": "固定翼メカニクス"
     },
     "pidTuning_fw_level_pitch_trim": {
-        "message": "レベルトリム [dig]"
+        "message": "レベルトリム [度]"
     },
     "pidTuning_fw_level_pitch_trim_help": {
-        "message": "自立安定飛行モードのピッチトリム[dig]です。[+5]は機体の機首をレベルから5度上げることを意味します。"
+        "message": "自立安定飛行モードのピッチトリム[度]です。[+5]は機体の機首をレベルから5度上げることを意味します。"
     },
     "pidTuning_ButtonSave": {
         "message": "保存"
@@ -1732,7 +1739,7 @@
         "message": "この値は、設定値とRC入力がどのくらい差異を許容するかの (自身の) 値です。出力ジッターがある送信機の場合、RC入力がアイドル状態で揺らぎがある場合、この値を大きくしていきます。<strong>この設定はヨー専用です。</strong>"
     },
     "receiverYawDeadband": {
-        "message": "ヨー デッドバンド"
+        "message": "Yaw デッドバンド"
     },
     "receiverRcExpo": {
         "message": "RC Expo"
@@ -1755,6 +1762,9 @@
     "receiverRssiChannel": {
         "message": "RSSI チャンネル"
     },
+    "receiverRssiSource": {
+        "message": "RSSI ソース値"
+    },
     "receiverRefreshRateTitle": {
         "message": "グラフ更新頻度"
     },
@@ -1774,7 +1784,7 @@
         "message": "EEPROMに[受信機設定]を<span style=\"color: #37a8db\">保存しました</span>"
     },
     "auxiliaryHelp": {
-        "message": "送信機にあるスイッチと、対応するモード割り当てを定義するには【範囲】を使用してください。受信機側チャンネルが指定した範囲にて最小 /最大範囲の間で反応を示す場合は、そのモードが有効となるでしょう。設定を保存するには『保存』ボタンを忘れずに使用してください。"
+        "message": "送信機のスイッチと対応するモードの割り当てを【範囲追加】ボタンを押して設定してください。受信機側チャンネルが設定した最小～最大値の範囲内の値を示した場合、そのモードが有効になります。設定を保存する際は、必ず『保存』ボタンを押してください。"
     },
     "auxiliaryToggleUnused": {
         "message": "未使用なモードは非表示"
@@ -1801,7 +1811,7 @@
         "message": "EEPROM <span style=\"color: #37a8db\">saved</span>"
     },
     "adjustmentsHelp": {
-        "message": "調整スイッチを設定します。詳細については、マニュアルの『in-flight adjustment(飛行中調整)』の項目を参照してください。『調整』機能による変更は自動的には保存されません。スロットは4つあります。同時に調整を行うために使用される各スイッチは、専用のスロットを必要とします。"
+        "message": "調整スイッチを設定します。詳細については、マニュアルの『in-flight adjustment (飛行中調整)』の項目を参照してください。『調整』機能による変更は自動的には保存されません。スロットは4つあります。同時に調整を行うために使用される各スイッチは、専用のスロットを必要とします。"
     },
     "adjustmentsExamples": {
         "message": "例"
@@ -2197,7 +2207,7 @@
         "message": "軸"
     },
     "axisTableTitleValue": {
-        "message": "値 [dig]"
+        "message": "値 [度]"
     },
     "configurationSensorMagPreset": {
         "message": "向きは以下で設定されています: プリセット (align_mag)"
@@ -2578,16 +2588,16 @@
         "message": "EEPROMに[LED設定]を<span style=\"color: #37a8db\">保存しました</span>"
     },
     "controlAxisRoll": {
-        "message": "ロール [A]"
+        "message": "Roll [A]"
     },
     "controlAxisPitch": {
-        "message": "ピッチ [E]"
+        "message": "Pitch [E]"
     },
     "controlAxisYaw": {
-        "message": "ヨー [R]"
+        "message": "Yaw [R]"
     },
     "controlAxisThrottle": {
-        "message": "スロットル [T]"
+        "message": "Throttle [T]"
     },
     "controlAxisMotor": {
         "message": "モーター"
@@ -2632,7 +2642,7 @@
         "message": "これらの設定は、無効な個別の送受信チャンネル、またはステージ1に入る際に、すべてのチャンネルに適用されます。<strong>注:</strong> 値は[25usec]単位で保存されるため、小さな変化は反映されません。"
     },
     "failsafeChannelFallbackSettingsAuto": {
-        "message": "<strong>自動</strong>は、ロール、ピッチ、ヨーを中央値にし、スロットルを低く設定することを意味します。 <strong>ホールド</strong>は、最後に受信した良好な値を保持することを意味します。"
+        "message": "<strong>自動</strong> は、ロール、ピッチ、ヨーを中央値にし、スロットルを低く設定することを意味します。 <strong>ホールド</strong> は、最後に受信した良好な値を保持することを意味します。"
     },
     "failsafeChannelFallbackSettingsHold": {
         "message": "<strong>ホールド</strong>は、最後に受信した良好な値を保持することを意味します。 <strong>セット</strong>は、ここで指定された値が使用されることを意味します。"
@@ -2908,7 +2918,7 @@
         "message": "オプティカルフロー キャリブレーション"
     },
     "OpflowCalText": {
-        "message": "ボタンを押した後、機体を空中に持ち上げて水平方向に動かさずに横に [30秒] ほど傾ける時間が必要です。オプティカルフローセンサーは常に地表を実測している必要があることに注意してください。"
+        "message": "ボタンを押した後、機体を空中に持ち上げ、水平方向に動かさずに各面に傾ける操作を [30秒] 以内に行ってください。なお、オプティカルフローセンサーは常に地表を実測している必要がありますのでご注意ください。"
     },
     "OpflowCalBtn": {
         "message": "オプティカルフローセンサー キャリブレーション"
@@ -2920,7 +2930,7 @@
         "message": "加速度 ゲイン"
     },
     "NoteCalibration": {
-        "message": "注: IMUが異なる角度やフライトコントローラの裏側に取り付けられている場合、写真に示されるようにIMUを表に向けた状態でキャリブレーション手順を行ってください。機体の向きではありません。(そうしないとキャリブレーションが機能しません。)"
+        "message": "注: IMUが異なる角度やフライトコントローラの裏側に取り付けられている場合は、下図に示されるようにIMUを表に向けた状態でキャリブレーション手順を行ってください。機体の向きを基準としない点にご注意ください。 (正しくキャリブレーションが行われない可能性があります。)"
     },
     "AccBtn": {
         "message": "水平キャリブレーション"
@@ -2968,7 +2978,7 @@
         "message": "水平キャリブレーション リセット"
     },
     "MagCalText": {
-        "message": "ボタンを押した後、機体を空中に持ち上げ、各面 (前、後ろ、左、右、上、下) が地面を向くように [30秒] ほど回転させる時間が必要です。キャリブレーションや取り付け時には、磁石や電磁のあるものをコンパスに近づけないようにしてください。"
+        "message": "ボタンを押した後、機体を空中に持ち上げ、[30秒] 以内に各面 (前、後ろ、左、右、上、下) が地面を向くように回転させてください。機体へのコンパスの取り付けやキャリブレーションを行う際は、コンパスの近くに磁石や電磁波を発生させるものを置かないようにしてください。"
     },
     "MagBtn": {
         "message": "コンパス キャリブレーション"
@@ -3265,22 +3275,22 @@
         "message": "これはホーム位置からの距離で、線形下降を開始します。[0] に設定すると、線形下降は即座に開始されます。"
     },
     "landMaxAltVspd": {
-        "message": "ホーム位置に到達すると、この速度で下降を開始します。"
+        "message": "ホーム位置に到達すると、指定速度で下降を開始"
     },
     "landMaxAltVspdHelp": {
         "message": "RTH後に自動着陸が有効であれば、機体はこの速度で下降を開始し、<strong>減速高度</strong>に達します。"
     },
     "landSlowdownMaxAlt": {
-        "message": "機体が<i>指定高度</i>まで下降したら、着陸のために減速を開始します。"
+        "message": "機体が <i>指定高度</i> まで下降したら、着陸のために減速を開始"
     },
     "landSlowdownMaxAltHelp": {
         "message": "機体が指定高度に達すると、<strong>初期着陸速度</strong>と<strong>最終着陸速度</strong>の間で線形に減速し、<strong>最終進入高度</strong>に達します。"
     },
     "landSlowdownMinAlt": {
-        "message": "機体が<i>指定高度</i>まで下降すると、着地速度まで減速します。"
+        "message": "機体が <i>指定高度</i> まで下降すると、着地速度まで減速"
     },
     "landMinAltVspd": {
-        "message": "これが着陸速度です。"
+        "message": "着陸速度"
     },
     "landMinAltVspdHelp": {
         "message": "機体が<strong>減速高度</strong>から<strong>初期着陸速度</strong>で線形に減速した後、<strong>最終進入高度</strong>に達したときに、この値が垂直速度の目安となります。"
@@ -3418,10 +3428,10 @@
         "message": "ホーム位置到達に必要となるエネルギーマージン。(バッテリー容量の割合) 残り飛行時間 / 距離の推定計算に使用します。"
     },
     "generalNavigationSettings": {
-        "message": "ナビゲーション一般設定"
+        "message": "ナビゲーション 一般設定"
     },
     "waypointConfiguration": {
-        "message": "ウェイポイントナビゲーション設定"
+        "message": "ウェイポイント ナビゲーション設定"
     },
     "wpLoadBoot": {
         "message": "起動時にウェイポイントを読み込み"
@@ -3664,13 +3674,13 @@
         "message": "カメラ水平FOV"
     },
     "osd_camera_fov_h_help": {
-        "message": "HUDディスプレイ内の要素の位置を計算するために使用されるカメラの水平視野角[dig]です。"
+        "message": "HUDディスプレイ内の要素の位置を計算するために使用されるカメラの水平視野角[度]です。"
     },
     "osd_camera_fov_v": {
         "message": "カメラ垂直FOV"
     },
     "osd_camera_fov_v_help": {
-        "message": "HUDディスプレイ内の要素の位置を計算するために使用されるカメラの垂直視野角[dig]です。"
+        "message": "HUDディスプレイ内の要素の位置を計算するために使用されるカメラの垂直視野角[度]です。"
     },
     "osd_alarms": {
         "message": "アラーム"
@@ -3772,7 +3782,7 @@
         "message": "電流 (A)"
     },
     "osdAlarmCURRENT_HELP": {
-        "message": "消費電流がこの値を超えると、点滅を開始します。[0]でこのアラームは無効になります。"
+        "message": "消費電流がこの値を超えると、電流表示が点滅を開始します。[0]でこのアラームは無効になります。"
     },
     "osd_imu_temp_alarm_min": {
         "message": "IMU温度 最小"
@@ -3851,6 +3861,9 @@
     },
     "osdGroupVTX": {
         "message": "VTX"
+    },
+    "osdGroupRx": {
+        "message": "受信 統計情報"
     },
     "osdGroupMapsAndRadars": {
         "message": "マップ & レーダー"
@@ -4066,16 +4079,40 @@
         "message": "高度を1単位失うごとに進む水平距離の量"
     },
     "osdElement_PAN_SERVO_CENTRED": {
-        "message": "パンサーボが中央値にあるか"
+        "message": "パン・サーボが中央値にあるか"
     },
     "osdElement_PAN_SERVO_CENTRED_HELP": {
-        "message": "パンサーボが中央値[0]かオフセットされているか (矢印) を表示します。パンサーボの設定には<b>osd_pan_servo_</b>設定を確認してください。"
+        "message": "パン・サーボが中央値[0]かオフセットされているか (矢印) を表示します。パン・サーボの設定には<b>osd_pan_servo_</b>設定を確認してください。"
     },
     "osdElement_VTX_CHANNEL": {
         "message": "VTXバンドとチャンネル"
     },
     "osdElement_VTX_CHANNEL_HELP": {
         "message": "現在のVTXのバンドとチャンネルを表示します。SmartAudioまたはTrampを搭載したVTX、またはフライトコントローラにオンボードされたVTXが必要です。"
+    },
+    "osdElement_RSSI_DBM": {
+        "message": "受信 RSSI値 (dBm)"
+    },
+    "osdElement_LQ_UPLINK": {
+        "message": "受信 アップリンク品質 %"
+    },
+    "osdElement_LQ_UPLINK_HELP": {
+        "message": "CRSFを使用する場合は、Crossfire LQフォーマット設定でフォーマットタイプを選択します。"
+    },
+    "osdElement_LQ_DOWNLINK": {
+        "message": "受信ダウンリンク品質 %"
+    },
+    "osdElement_SNR_DB": {
+        "message": "受信アップリンクSNR (dB)"
+    },
+    "osdElement_SNR_DB_HELP": {
+        "message": "SNRがアラームレベルを下回った場合のみ表示します。[0]dBの場合、受信信号レベルはノイズフロアレベルに等しいことを示します。"
+    },
+    "osdElement_TX_POWER_UPLINK": {
+        "message": "送信出力 (mW)"
+    },
+    "osdElement_OSD_RX_POWER_DOWNLINK": {
+        "message": "受信出力 (mW)"
     },
     "osdElement_MAP_NORTH": {
         "message": "マップ (上位が北)"
@@ -4186,31 +4223,31 @@
         "message": "スイッチインジケータ 4"
     },
     "osd_pan_servo_settings": {
-        "message": "パンサーボOSD設定"
+        "message": "パン・サーボ OSD設定"
     },
     "osd_pan_servo_settings_HELP": {
-        "message": "このセクションでは、パンサーボオフセット機能を有効にして設定します。カメラを回転させた際にもOSD要素 (ホームアローやPOIなど) が正しい方向を指すように保持します。"
+        "message": "このセクションでは、パン・サーボオフセット機能を有効にして設定します。カメラを回転させた際にもOSD要素 (ホームアローやPOIなど) が正しい方向を指すように保持します。"
     },
     "osdPanServoIndex": {
-        "message": "パンサーボ出力"
+        "message": "パン・サーボ 出力"
     },
     "osdPanServoIndex_HELP": {
-        "message": "ミキサー出力テーブルに表示されるパンサーボの出力番号を設定します (例: 出力S6)。"
+        "message": "ミキサー出力テーブルに表示されるパン・サーボの出力番号を設定します (例: 出力S6)。"
     },
     "osdPanServoPwm2centideg": {
-        "message": "パンサーボの全移動角度"
+        "message": "パン・サーボの全移動角度"
     },
     "osdPanServoPwm2centideg_HELP": {
-        "message": "パンサーボの回転角度です。1000〜2000usのPWMで180度回転するサーボの場合、通常この設定に180を入力します。方向を逆にするには値をマイナスにします。"
+        "message": "パン・サーボの回転角度です。1000〜2000usのPWMで180度回転するサーボの場合、通常この設定に180を入力します。方向を逆にするには値をマイナスにします。"
     },
     "osdPanServoIndicatorShowDegrees": {
-        "message": "パンインジケータの横にオフセット角度を表示"
+        "message": "パン・インジケータの横にオフセット角度を表示"
     },
     "osdPanServoOffcentreWarning": {
         "message": "センターオフ警告"
     },
     "osdPanServoOffcentreWarning_HELP": {
-        "message": "パンサーボの中心からの角度です。10秒以上この範囲内で[0]でない場合、パンサーボオフセットOSD要素が点滅します。[0]に設定すると警告が無効になります。"
+        "message": "パン・サーボの中心からの角度です。10秒以上この範囲内で[0]でない場合、パン・サーボ オフセットOSD要素が点滅します。[0]に設定すると警告が無効になります。"
     },
     "osdGroupOSDCustomElements": {
         "message": "OSDカスタム要素"
@@ -4259,6 +4296,15 @@
     },
     "osdElement_OSD_RANGEFINDER": {
         "message": "レンジファインダー距離"
+    },
+    "osdElement_COURSE_NEXT_GEOZONE": {
+        "message": "次のジオゾーンへのコース"
+    },
+    "osdElement_HOR_DIST_TO_NEXT_GEOZONE": {
+        "message": "次のジオゾーンまでの水平距離"
+    },
+    "osdElement_VERT_DIST_TO_NEXT_GEOZONE": {
+        "message": "次のジオゾーンまでの垂直距離"
     },
     "osdSettingPLUS_CODE_DIGITS_HELP": {
         "message": "赤道での精度: 10=13.9x13.9m、11=2.8x3.5m、12=56x87cm、13=11x22cm"
@@ -4591,10 +4637,10 @@
         "message": "進入方向: "
     },
     "missionFwLandHeading1": {
-        "message": "方位 1 (dig): "
+        "message": "方位 1 (度): "
     },
     "missionFwLandHeading2": {
-        "message": "方位 2 (dig): "
+        "message": "方位 2 (度): "
     },
     "missionExclusive": {
         "message": "排他"
@@ -4619,6 +4665,171 @@
     },
     "missionSafehomeMaxSafehomesReached": {
         "message": "セーフホームの最大数に達しました。"
+    },
+    "missionGeozoneHead": {
+        "message": "ジオゾーン"
+    },
+    "missionGeozoneEdit": {
+        "message": "ジオゾーン $1 を編集"
+    },
+    "missionGeozoneSaveAndReboot": {
+        "message": "EEPROMへジオゾーンを保存して再起動"
+    },
+    "missionGeozoneLoad": {
+        "message": "EEPROMのジオゾーンを読み込む"
+    },
+    "missionGeozone": {
+        "message": "-ジオゾーン "
+    },
+    "missionGezoneType": {
+        "message": "タイプ"
+    },
+    "missionGezoneShape": {
+        "message": "形状"
+    },
+    "missionGeozoneTypePolygon": {
+        "message": "多角形"
+    },
+    "missionGeozoneTypeCircular": {
+        "message": "円形"
+    },
+    "missionGeozoneMaxZonesReached": {
+        "message": "ジオゾーンの最大数に達しました。"
+    },
+    "missionGeozoneMaxVerticesReached": {
+        "message": "ジオゾーン頂点の最大数に達しました。"
+    },
+    "missionGeozoneWarning": {
+        "message": "少なくとも1つのミッションと1つのジオゾーンが設定されています。ミッションがジオゾーンを侵害しないことを確認してください。"
+    },
+    "geozoneEdit": {
+        "message": "ジオゾーンを編集"
+    },
+    "geozoneShape": {
+        "message": "形状"
+    },
+    "geozoneInclusive": {
+        "message": "包含"
+    },
+    "geozoneExcusive": {
+        "message": "排他的"
+    },
+    "geozoneMinAlt": {
+        "message": "最小高度 (cm):"
+    },
+    "geozoneMaxAlt": {
+        "message": "最大高度 (cm):"
+    },
+    "geozoneInfiniteAlt": {
+        "message": "0 = 高度制限なし"
+    },
+    "geozoneAction": {
+        "message": "処理:"
+    },
+    "geozoneActionNone": {
+        "message": "なし"
+    },
+    "geozoneActionAvoid": {
+        "message": "回避"
+    },
+    "geozoneActionPosHold": {
+        "message": "ポジションホールド"
+    },
+    "geozoneActionRTH": {
+        "message": "RTH"
+    },
+    "geozoneRadius": {
+        "message": "半径 (cm):"
+    },
+    "geozoneVerices": {
+        "message": "頂点:"
+    },
+    "": {
+        "message": ""
+    },
+    "featureGEOZONE": {
+        "message": "ジオゾーン"
+    },
+    "geozone": {
+        "message": "ジオゾーン"
+    },
+    "featureGEOZONETip": {
+        "message": "地理的エリアの仮想境界線 (ジオフェンス) は、境界線が侵害されたときに自動的に処理を開始します。"
+    },
+    "GeozoneSettings": {
+        "message": "ジオゾーン設定"
+    },
+    "geozoneDetectionDistance": {
+        "message": "検出距離"
+    },
+    "geozoneDetectionDistanceHelp": {
+        "message": "ジオゾーンが検出される距離"
+    },
+    "geozoneAvoidAltitudeRange": {
+        "message": "回避高度範囲"
+    },
+    "geozoneAvoidAltitudeRangeHelp": {
+        "message": "ジオゾーンを上方に回避する際の高度範囲"
+    },
+    "geozoneSafeAltitudeDistance": {
+        "message": "安全高度距離"
+    },
+    "geozoneSafeAltitudeDistanceHelp": {
+        "message": "ゾーンの上限および下限に維持する必要がある垂直距離"
+    },
+    "geozoneSafehomeAsInclusive": {
+        "message": "セーフホームを包含ゾーンとして扱う"
+    },
+    "geozoneSafehomeAsInclusiveHelp": {
+        "message": "最寄りのセーフホームを包含的なジオゾーンとして扱う"
+    },
+    "geozoneSafehomeZoneAction": {
+        "message": "セーフホームゾーン処理"
+    },
+    "geozoneSafehomeZoneActionHelp": {
+        "message": "セーフホームゾーンのフェンス処理"
+    },
+    "geozoneMrStopDistance": {
+        "message": "マルチローター停止距離"
+    },
+    "geozoneMrStopDistanceHelp": {
+        "message": "マルチローターが境界の手前で停止する距離"
+    },
+    "geozoneNoWayHomeAction": {
+        "message": "帰還不可能時の処理"
+    },
+    "geozoneNoWayHomeActionHelp": {
+        "message": "有効なジオゾーンでRTH (ホーム位置へ帰還) がコースを計算できない場合の処理。RTH: ホーム位置へ戻り、ジオゾーンを無視します。"
+    },
+    "missionGeozoneReboot": {
+        "message": "保存して再起動しますか？"
+    },
+    "missionGeozoneAvailableZones": {
+        "message": "使用可能なジオゾーン:"
+    },
+    "missionGeozoneAvailableVertices": {
+        "message": "使用可能な頂点:"
+    },
+    "geozoneInvalidzone": {
+        "message": "無効なジオゾーンを検出:"
+    },
+    "geozoneInvalidLat": {
+        "message": "無効な緯度"
+    },
+    "geozoneInvalidLon": {
+        "message": "無効な経度"
+    },
+    "gezoneInvalidReasonNotCC": {
+        "message": "反時計回りではない"
+    },
+    "gezoneInvalidReasonComplex": {
+        "message": "複合"
+    },
+    "gezoneInvalidReasonMinMaxAlt": {
+        "message": "最大高度 <= 最小高度"
+    },
+    "geozoneUnableToSave": {
+        "message": "ジオゾーンを保存できません: 無効なゾーン"
     },
     "missionMultiMissionHead": {
         "message": "マルチミッション"
@@ -5200,13 +5411,13 @@
         "message": "サーボ出力"
     },
     "axisRoll": {
-        "message": "ロール"
+        "message": "Roll"
     },
     "axisPitch": {
-        "message": "ピッチ"
+        "message": "Pitch"
     },
     "axisYaw": {
-        "message": "ヨー"
+        "message": "Yaw"
     },
     "showAdvancedPIDs": {
         "message": "PIDコントローラ詳細表示"
@@ -5233,7 +5444,7 @@
         "message": "マトリックスフィルタータイプ"
     },
     "pidTuning_MatrixFilterTypeHelp": {
-        "message": "マトリックスフィルターの種類を定義します。デフォルトの2Dフィルターはほとんどのユーザーに推奨されます。7インチ以上のクワッドコプターは3Dフィルターの恩恵を受ける可能性があります。"
+        "message": "マトリックスフィルターの種類を定義します。デフォルトの2Dフィルターはほとんどのユーザーに推奨されます。7インチ以上のクアッドコプターは3Dフィルターの恩恵を受ける可能性があります。"
     },
     "softSerialWarning": {
         "message": "GPSやレシーバーのような飛行に重要なデバイス、またはMSP ディスプレイポートのような高トラフィックデバイスに、ソフトシリアルポートを使用することは推奨されません。"
@@ -5464,7 +5675,7 @@
         "message": "手動"
     },
     "sensorDataFlashNotFound": {
-        "message": "ログデータ保存用の<br>メモリが見つかりません"
+        "message": "データ書込みチップが<br>見つかりません"
     },
     "sensorDataFlashFreeSpace": {
         "message": "ログデータ: 空き領域"
@@ -5498,35 +5709,35 @@
     },
     "sensorStatusGyroShort": {
         "message": "Gyro",
-        "description": "上部センサーアイコンのテキスト。短くしてください。"
+        "description": "上部センサーアイコンのテキストのため、短くしてください。"
     },
     "sensorStatusAccel": {
         "message": "加速度センサー"
     },
     "sensorStatusAccelShort": {
         "message": "Accel",
-        "description": "上部センサーアイコンのテキスト。短くしてください。"
+        "description": "上部センサーアイコンのテキストのため、短くしてください。"
     },
     "sensorStatusMag": {
         "message": "コンパス"
     },
     "sensorStatusMagShort": {
         "message": "Mag",
-        "description": "上部センサーアイコンのテキスト。短くしてください。"
+        "description": "上部センサーアイコンのテキストのため、短くしてください。"
     },
     "sensorStatusBaro": {
         "message": "気圧センサー"
     },
     "sensorStatusBaroShort": {
         "message": "Baro",
-        "description": "上部センサーアイコンのテキスト。短くしてください。"
+        "description": "上部センサーアイコンのテキストのため、短くしてください。"
     },
     "sensorStatusGPS": {
         "message": "GPS"
     },
     "sensorStatusGPSShort": {
         "message": "GPS",
-        "description": "上部センサーアイコンのテキスト。短くしてください。"
+        "description": "上部センサーアイコンのテキストのため、短くしてください。"
     },
     "sensorOpticalFlow": {
         "message": "オプティカルフロー"
@@ -5539,7 +5750,7 @@
     },
     "sensorStatusSonarShort": {
         "message": "Sonar",
-        "description": "上部センサーアイコンのテキスト。短くしてください。"
+        "description": "上部センサーアイコンのテキストのため、短くしてください。"
     },
     "sensorAirspeed": {
         "message": "Airspeed"
@@ -5797,40 +6008,40 @@
         "message": "Expo"
     },
     "ezTuneSnappiness": {
-        "message": "キビキビ性"
+        "message": "俊敏性"
     },
     "ezTuneSnappinessTips": {
-        "message": "キビキビ性のあるスティックの感触を得るための設定です。素早いスティック操作を行うと、高いキビキビ性のある設定によりドローンが迅速に反応します。開始と終了の両方で効果があります。自分に合った値を見つけてください。"
+        "message": "スティック操作の感触をより俊敏なものにするための設定です。スティックを素早く動かした際、高い『俊敏性』の値は、操作開始時と終了時の両方でドローンの反応を加速させます。さまざまな値を試して、自分に最適な設定を見つけてください。"
     },
     "ezTuneFilterHzTips": {
-        "message": "INAVのジャイロおよびD値フィルタの基本カットオフ周波数を設定します。高い値はフィルター遅延を減少させ、より良い安定化をもたらしますが、ノイズが多くなりモーターが熱くなり、機体が振動して飛行が不安定になることもあります。マイナスの影響が現れる直前までこの値を上げるのが目標です。始めの推奨値は、<strong>3インチプロペラ</strong>: 90, <strong>5インチプロペラ</strong>: 110, <strong>7インチプロペラ</strong>: 90, <strong>10インチプロペラ</strong>: 75, <strong>12インチプロペラ</strong>: 60 です。Blackboxと常識を使って適切な値を見つけてください。"
+        "message": "すべてのINAVのジャイロおよびD値フィルターの基本的なカットオフ周波数を設定します。値を高く設定するほど、フィルター遅延が減少し、安定性が向上しますが、より多くのノイズがフィルターされ、モーターが過熱したり、機体が振動して飛行不能になる場合があります。マイナスの影響が現れる直前まで、この値をできるだけ高く設定することが目標です。マイナスの影響には、モーターの過熱、聞き取れる振動音、機体の急激な振動、意図しない高度上昇などが含まれます。『フィルター Hz』の一般的な初期設定値は以下の値 <strong>3インチプロペラ</strong> : 90、<strong>5インチプロペラ</strong> : 110、<strong>7インチプロペラ</strong> : 90、<strong>10インチプロペラ</strong> : 75、<strong>12インチプロペラ</strong> : 60 となります。Blackboxとそれら常識を活用して、あなたの機体に最も適した値を見つけてください。"
     },
     "ezTuneAxisRatioTips": {
-        "message": "機体の重量 / 慣性モーメント分布を示します。フレームが長いほど、つまり前後軸に質量が多いほど、軸比率の値が大きくなります。完全なXフレームは比率[100]です。現代のほとんどのフレームは[110～130]の間に収まります。デフォルトの[110]が良い出発点です。"
+        "message": "機体の重量 / 慣性モーメント分布を示す設定です。フレームが長く、前後軸に重量が集中する場合が、より大きい『軸比率』が必要です。完全なX型フレームの場合は、比率は[100]となります。ほとんどの現代的なフレームは[110～130]の範囲に収まるはずです。デフォルト値である[110]は良い開始値となります。"
     },
     "ezTuneResponseTips": {
-        "message": "機体がスティック操作およびジャイロ信号にどれだけ速く反応するかを定義します。高い値は速い反応を引き出しますが、オーバーシュートや振動も増加します。機体が遅く感じたり、ゆっくりした振動がある場合はレスポンスを上げてください。モーターが熱くなる、聞こえるくらいの振動がある、オーバーシュートや過剰に敏感である場合はレスポンスを下げてください。ほとんどの現代的なクアッドコプターは、レスポンスを[80]以下で最適に飛行します。減衰と共に調整する必要があります。これはP値相当となります。"
+        "message": "機体がスティック操作やジャイロ信号にどれだけ素早く反応するかを定義する設定です。値を高く設定すると、反応速度が速くなりますが、オーバーシュートや振動も増加する可能性があります。機体が鈍く感じたり、ゆっくりした揺れがある場合は、『レスポンス』を増やしてください。一方、モーターが熱くなったり、聞き取れるほどの振動音があったり、オーバーシュートや機体が過剰に敏感に感じる場合は、『レスポンス』を減らしてください。多くの最新型クアッドコプターで強力なモーターを持つものは、『レスポンス』を[80]未満に設定すると最適に飛行する傾向があります。この設定は減衰と共に調整する必要があります。これはP値に相当する設定です。"
     },
     "ezTuneDampingTips": {
-        "message": "回転速度の変化に対抗する力の強さを示します。ロールとピッチの加速度を減衰させ、滑らかで安定した飛行を実現します。チューニング中に見つけるべき要因は、モーターが熱くなる、聞こえるくらいの振動、オーバーシュートなどのマイナスの症状が現れる直前まで減衰を上げることです。ほとんどの現代的なクアッドは、減衰を[150〜180]まで受け入れます。これはD値相当となります。"
+        "message": "回転速度の変化に対抗する力の強さを定義する設定です。ロールやピッチの加速を抑え、より滑らかで安定した飛行を実現します。チューニング時の目標は、モーターが熱くなる、聞き取れるほどの振動音が発生する、オーバーシュートが起こる等のマイナスの影響が現れる前の最適なポイントを見つけることです。多くの最新型クアッドコプターでは、『減衰』を[150～180]の範囲まで設定しても問題なく動作します。この設定はD値に相当する設定です。"
     },
     "ezTuneStabilityTips": {
-        "message": "長期間の安定化強度を定義します。ほとんどの現代的なクアッドコプターは、『安定性』を[120～130]まで許容します。通常、調整の必要はありません。垂直降下中にプロップウォッシュの影響を受ける場合、『安定性』を下げると改善されることがあります。これはI値相当です。"
+        "message": "長期的な安定性の強さを定義する設定です。多くの最新型クアッドコプターでは、『安定性』を[120～130]まで設定しても問題なく動作します。通常、この設定を調整する必要はありませんが、機体が垂直降下中にプロップウォッシュによる不安定さに悩まされる場合、安定性を下げることで改善する可能性があります。この設定はI値に相当する設定です。"
     },
     "ezTuneAggressivenessTips": {
-        "message": "機体がスティック操作に対してどれだけ速く反応するかを定義します。高い『アグレッシブ性』設定は、素早い操作に対してよりキビキビ性のある反応をもたらします。これは安定化には影響せず、スティックの感触にのみ関係します。FF値相当です。"
+        "message": "機体が急なスティック操作にどれだけ素早く反応するかを定義する設定です。『アグレッシブ性』の値を高くすると、素早い機動がより俊敏なものになります。この設定は安定性には影響せず、スティックの操作感のみに影響を与えます。これはFF値に相当する設定です。"
     },
     "ezTuneRateTips": {
-        "message": "機体がロール、ピッチ、ヨー軸周りにどれだけ速く回転するかを定義します。高い『レート』値はより速い回転をもたらします。[0]は300度/秒、[100]は600度/秒、[200]は900度/秒に相当します。"
+        "message": "機体がロール、ピッチ、ヨーの各軸でどれだけ速く回転するかを定義する設定です。『レート』の値を高くすると、より速い回転が可能になります。値が[0]の場合は回転速度は300度/秒、値が[100]の場合は回転速度は600度/秒、値が[200]の場合は回転速度は900度/秒に相当する設定です。"
     },
     "ezTuneExpoTips": {
-        "message": "RC入力のExpo値を定義します。低い値はスティックの中央がより敏感になり、高い値は中央が鈍くなり、スティックの端で急速な反応が得られます。[0]はExpo 0、[100]はExpo 0.7、[200]はExpo 1.0に相当します。"
+        "message": "RC入力のExpo値を定義する設定です。値を低く設定すると、スティック中央付近での感度が高くなります。値を高く設定すると、スティック中央付近での感度が低くなり、スティックの端に近づくにつれて急激な反応になります。値が[0]の場合はExpo 0、[100]の場合はExpo 0.7、[200]の場合はExpo 1.0に相当する設定です。"
     },
     "ezTunePidPreview": {
-        "message": "PIDプレビュー"
+        "message": "PID プレビュー"
     },
     "ezTuneRatePreview": {
-        "message": "レートプレビュー"
+        "message": "レート プレビュー"
     },
     "ezTuneRatePreviewAxis": {
         "message": "軸"
@@ -5842,7 +6053,7 @@
         "message": "Expo"
     },
     "ezTuneEnabledTips": {
-        "message": "有効にすると、<strong>Ez Tune</strong>が複数のINAV設定を上書きして、チューニングプロセスを簡略化します。PIDやフィルター設定を独立して設定する代わりに、7つのスライダーで調整するだけで済みます。Ez Tuneは自動的に他の設定を調整してニーズに合わせます。新しいユーザや新しい機体の迅速なチューニングに最適ですが、高度な機体には推奨されません。PID調整タブの設定はEz Tuneによって上書きされます。"
+        "message": "『有効』にすると、 <strong>Ez Tune</strong> は複数のINAV設定を上書きし、チューニングプロセスを簡素化します。各PIDやフィルタリング設定を個別に設定する代わりに、7つのスライダーだけを操作すればよくなります。Ez Tuneは他のすべての設定を自動的に調整し、ニーズに合った設定を行います。Ez Tuneは、新しいユーザにとって優れた開始点であり、新しい機体を迅速にチューニングするための便利な方法です。ただし、高度な構成の機体に対しては使用を推奨しません。なぜなら、すべての設定が上書きされるため、機体を細かく調整することができなくなるからです。Ez Tuneが有効になっている場合、PIDチューニングタブの設定はEz Tuneによって上書きされますのでご注意ください。"
     },
     "ezTuneDisclaimer": {
         "message": "<strong>免責事項:</strong> Ez Tuneは実験的な機能です。すべての機体で動作が保証されているわけではありません。また、すべてのフレームタイプ、すべてのプロペラに対応しているわけでもありません。INAVの将来のバージョンでは計算値やチューニング結果が変更される可能性があります。是非 <strong>#ez-tune</strong> チャネルでの体験の共有をお願いします。"
@@ -5918,210 +6129,6 @@
     },
     "adsbHeartbeatTotalMessages": {
         "message": "ハートビートメッセージ"
-    },
-    "receiverRssiSource": {
-        "message": "RSSIソース値"
-    },
-    "osdGroupRx": {
-        "message": "受信 統計情報"
-    },
-    "osdElement_RSSI_DBM": {
-        "message": "受信RSSI値 (dBm)"
-    },
-    "osdElement_LQ_UPLINK": {
-        "message": "受信アップリンク品質 %"
-    },
-    "osdElement_LQ_UPLINK_HELP": {
-        "message": "CRSFを使用する場合は、Crossfire LQフォーマット設定でフォーマットタイプを選択します。"
-    },
-    "osdElement_LQ_DOWNLINK": {
-        "message": "受信ダウンリンク品質 %"
-    },
-    "osdElement_SNR_DB": {
-        "message": "受信アップリンクSNR (dB)"
-    },
-    "osdElement_SNR_DB_HELP": {
-        "message": "SNRがアラームレベルを下回った場合のみ表示します。[0]dBの場合、受信信号レベルはノイズフロアレベルに等しいことを示します。"
-    },
-    "osdElement_TX_POWER_UPLINK": {
-        "message": "送信出力 (mW)"
-    },
-    "osdElement_OSD_RX_POWER_DOWNLINK": {
-        "message": "受信出力 (mW)"
-    },
-    "osdElement_COURSE_NEXT_GEOZONE": {
-        "message": "次のジオゾーンへのコース"
-    },
-    "osdElement_HOR_DIST_TO_NEXT_GEOZONE": {
-        "message": "次のジオゾーンまでの水平距離"
-    },
-    "osdElement_VERT_DIST_TO_NEXT_GEOZONE": {
-        "message": "次のジオゾーンまでの垂直距離"
-    },
-    "missionGeozoneHead": {
-        "message": "ジオゾーン"
-    },
-    "missionGeozoneEdit": {
-        "message": "ジオゾーン $1 を編集"
-    },
-    "missionGeozoneSaveAndReboot": {
-        "message": "EEPROMへジオゾーンを保存して再起動"
-    },
-    "missionGeozoneLoad": {
-        "message": "EEPROMのジオゾーンを読み込む"
-    },
-    "missionGeozone": {
-        "message": "-ジオゾーン "
-    },
-    "missionGezoneType": {
-        "message": "タイプ"
-    },
-    "missionGezoneShape": {
-        "message": "形状"
-    },
-    "missionGeozoneTypePolygon": {
-        "message": "多角形"
-    },
-    "missionGeozoneTypeCircular": {
-        "message": "円形"
-    },
-    "missionGeozoneMaxZonesReached": {
-        "message": "ジオゾーンの最大数に達しました。"
-    },
-    "missionGeozoneMaxVerticesReached": {
-        "message": "ジオゾーン頂点の最大数に達しました。"
-    },
-    "missionGeozoneWarning": {
-        "message": "少なくとも1つのミッションと1つのジオゾーンが設定されています。ミッションがジオゾーンを侵害しないことを確認してください。"
-    },
-    "geozoneEdit": {
-        "message": "ジオゾーンを編集"
-    },
-    "geozoneShape": {
-        "message": "形状"
-    },
-    "geozoneInclusive": {
-        "message": "包含"
-    },
-    "geozoneExcusive": {
-        "message": "排他的"
-    },
-    "geozoneMinAlt": {
-        "message": "最小高度 (cm):"
-    },
-    "geozoneMaxAlt": {
-        "message": "最大高度 (cm):"
-    },
-    "geozoneInfiniteAlt": {
-        "message": "0 = 高度制限なし"
-    },
-    "geozoneAction": {
-        "message": "処理:"
-    },
-    "geozoneActionNone": {
-        "message": "なし"
-    },
-    "geozoneActionAvoid": {
-        "message": "回避"
-    },
-    "geozoneActionPosHold": {
-        "message": "ポジションホールド"
-    },
-    "geozoneActionRTH": {
-        "message": "RTH"
-    },
-    "geozoneRadius": {
-        "message": "半径 (cm):"
-    },
-    "geozoneVerices": {
-        "message": "頂点:"
-    },
-    "": {
-        "message": ""
-    },
-    "featureGEOZONE": {
-        "message": "ジオゾーン"
-    },
-    "geozone": {
-        "message": "ジオゾーン"
-    },
-    "featureGEOZONETip": {
-        "message": "地理的エリアの仮想境界線 (ジオフェンス) は、境界線が侵害されたときに自動的に処理を開始します。"
-    },
-    "GeozoneSettings": {
-        "message": "ジオゾーン設定"
-    },
-    "geozoneDetectionDistance": {
-        "message": "検出距離"
-    },
-    "geozoneDetectionDistanceHelp": {
-        "message": "ジオゾーンが検出される距離"
-    },
-    "geozoneAvoidAltitudeRange": {
-        "message": "回避高度範囲"
-    },
-    "geozoneAvoidAltitudeRangeHelp": {
-        "message": "ジオゾーンを上方に回避する際の高度範囲"
-    },
-    "geozoneSafeAltitudeDistance": {
-        "message": "安全高度距離"
-    },
-    "geozoneSafeAltitudeDistanceHelp": {
-        "message": "ゾーンの上限および下限に維持する必要がある垂直距離"
-    },
-    "geozoneSafehomeAsInclusive": {
-        "message": "セーフホームを包含ゾーンとして扱う"
-    },
-    "geozoneSafehomeAsInclusiveHelp": {
-        "message": "最寄りのセーフホームを包含的なジオゾーンとして扱う"
-    },
-    "geozoneSafehomeZoneAction": {
-        "message": "セーフホームゾーン処理"
-    },
-    "geozoneSafehomeZoneActionHelp": {
-        "message": "セーフホームゾーンのフェンス処理"
-    },
-    "geozoneMrStopDistance": {
-        "message": "マルチローター停止距離"
-    },
-    "geozoneMrStopDistanceHelp": {
-        "message": "マルチローターが境界の手前で停止する距離"
-    },
-    "geozoneNoWayHomeAction": {
-        "message": "帰還不可能時の処理"
-    },
-    "geozoneNoWayHomeActionHelp": {
-        "message": "有効なジオゾーンでRTH (ホーム位置へ帰還) がコースを計算できない場合の処理。RTH: ホーム位置へ戻り、ジオゾーンを無視します。"
-    },
-    "missionGeozoneReboot": {
-        "message": "保存して再起動しますか？"
-    },
-    "missionGeozoneAvailableZones": {
-        "message": "使用可能なジオゾーン:"
-    },
-    "missionGeozoneAvailableVertices": {
-        "message": "使用可能な頂点:"
-    },
-    "geozoneInvalidzone": {
-        "message": "無効なジオゾーンを検出:"
-    },
-    "geozoneInvalidLat": {
-        "message": "無効な緯度"
-    },
-    "geozoneInvalidLon": {
-        "message": "無効な経度"
-    },
-    "gezoneInvalidReasonNotCC": {
-        "message": "反時計回りではない"
-    },
-    "gezoneInvalidReasonComplex": {
-        "message": "複合"
-    },
-    "gezoneInvalidReasonMinMaxAlt": {
-        "message": "最大高度 <= 最小高度"
-    },
-    "geozoneUnableToSave": {
-        "message": "ジオゾーンを保存できません: 無効なゾーン"
     },
     "currentLanguage": {
         "message": "ja"

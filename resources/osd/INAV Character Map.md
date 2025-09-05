@@ -271,7 +271,7 @@
 | ![Vario 1 down](/resources/osd/digital/default/24x36/343.png)     | SYM_VARIO_DOWN_1A          |                              | Vario down                            | 343        | 0x157         |
 | ![Vario 2 down](/resources/osd/digital/default/24x36/344.png)     | SYM_VARIO_DOWN_2A          |                              | Vario down down                       | 344        | 0x158         |
 | ![Altitude](/resources/osd/digital/default/24x36/345.png)         | SYM_ALT                    |                              | Altitude symbol                       | 345        | 0x159         |
-| ![Vertical AHI](/resources/osd/digital/default/24x36/346.png)     | SYM_AH_V_START             |                              | Vertical AHI                          | 346 - 351  | 0x15A - 0x159 |
+| ![Vertical AHI](/resources/osd/digital/default/24x36/346.png)     | SYM_AH_V_START             |                              | Vertical AHI                          | 346 - 351  | 0x15A - 0x15F |
 | ![Vertical AHI](/resources/osd/digital/default/24x36/347.png)     |                            |                              |                                       | 347        | 0x15B         |
 | ![Vertical AHI](/resources/osd/digital/default/24x36/348.png)     |                            |                              |                                       | 348        | 0x15C         |
 | ![Vertical AHI](/resources/osd/digital/default/24x36/349.png)     |                            |                              |                                       | 349        | 0x15D         |

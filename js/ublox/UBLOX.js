@@ -154,14 +154,20 @@ var ublox = (function () {
                 if(req.status == 200) {
                     successCallback(req.response);
                 } else {
-                    failCallback(event);
+                    if(failCallback != null) {
+                        var dec = new TextDecoder('utf-8');
+                        GUI.log(`http status: ${req.status}: ${dec.decode(req.response)}`)
+                        failCallback(req.response);
+                    }
                 }
             };
         }
 
         if (failCallback != null) {
             req.onerror = (event) => {
-                failCallback(event);
+                var dec = new TextDecoder('utf-8');
+                GUI.log(i18n.getMessage("gpsAssistnowLoadDataError") + ": Received an unkonwn error when trying to download data.")
+                failCallback("Unknown error.");
             }
         }
           
@@ -169,7 +175,8 @@ var ublox = (function () {
             req.send(null);
         } catch(error) {
             GUI.alert(i18n.getMessage("gpsAssistnowLoadDataError"));
-            console.log(i18n.getMessage("gpsAssistnowLoadDataError") + ':' + error.toString());
+            GUI.log(i18n.getMessage("gpsAssistnowLoadDataError") + ':' + error.toString());
+            console.log(i18n.getMessage("gpsAssistnowLoadDataError") + ':' + JSON.stringify(error));
         }
     }
 

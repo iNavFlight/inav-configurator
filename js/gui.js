@@ -48,7 +48,8 @@ var GUI_control = function () {
         'mission_control',
         'mixer',
         'programming',
-        'ez_tune'
+        'ez_tune',
+        'search'
     ];
     this.allowedTabs = this.defaultAllowedTabsWhenDisconnected;
 
@@ -174,6 +175,7 @@ GUI_control.prototype.updateStatusBar = function() {
         'ARMED':(1 << 2),
         //'WAS_EVER_ARMED':(1 << 3),
         'SIMULATOR_MODE':(1 << 4),
+        'ARMING_DISABLED_GEOZONE':(1 << 6),
         'ARMING_DISABLED_FAILSAFE_SYSTEM':(1 << 7),
         'ARMING_DISABLED_NOT_LEVEL':(1 << 8),
         'ARMING_DISABLED_SENSORS_CALIBRATING':(1 << 9),
@@ -184,7 +186,7 @@ GUI_control.prototype.updateStatusBar = function() {
         'ARMING_DISABLED_ARM_SWITCH':(1 << 14),
         'ARMING_DISABLED_HARDWARE_FAILURE':(1 << 15),
         'ARMING_DISABLED_BOXFAILSAFE':(1 << 16),
-        'ARMING_DISABLED_BOXKILLSWITCH':(1 << 17),
+        //'ARMING_DISABLED_BOXKILLSWITCH':(1 << 17),
         'ARMING_DISABLED_RC_LINK':(1 << 18),
         'ARMING_DISABLED_THROTTLE':(1 << 19),
         'ARMING_DISABLED_CLI':(1 << 20),

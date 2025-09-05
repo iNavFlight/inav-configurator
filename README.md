@@ -58,7 +58,7 @@ mv /tmp/INAV\ Configurator /opt/inav/inav-configurator
 8. Update the application icon.
 ```
 sudo mkdir /opt/inav/inav-configurator/icon
-sudo cp /opt/inav/inav-configurator/images/inav_icon_128.png /opt/inav/inav-configurator/icon
+sudo cp /opt/inav/inav-configurator/resources/app/images/inav_icon_128.png /opt/inav/inav-configurator/icon
 ```
 9. As a one-off, move the desktop file into the applications directory 
 ```

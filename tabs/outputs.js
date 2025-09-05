@@ -567,7 +567,7 @@ TABS.outputs.initialize = function (callback) {
 
                         buffering_set_motor = [];
                         buffer_delay = false;
-                    }, 10);
+                    }, 100);
                 }
             });
         }

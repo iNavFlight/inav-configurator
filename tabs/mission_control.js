@@ -855,7 +855,7 @@ TABS.mission_control.initialize = function (callback) {
                 stroke: new Stroke({
                     color: '#FFFFFF'
                 }),
-            })) 
+            }))
         });
     }
 
@@ -887,7 +887,7 @@ TABS.mission_control.initialize = function (callback) {
         return vectorLayer;
     }
 
-    function paintGeozoneLine(pos1, pos2, color, number, zoneNum) 
+    function paintGeozoneLine(pos1, pos2, color, number, zoneNum)
     {
         var line = new LineString([pos1, pos2]);
 
@@ -917,7 +917,7 @@ TABS.mission_control.initialize = function (callback) {
          var vectorSource = new VectorSource({
             features: [feature]
         });
-        
+
 
         var vectorLayer = new VectorLayer({
             source: vectorSource
@@ -934,9 +934,9 @@ TABS.mission_control.initialize = function (callback) {
 
     function repaintGeozoneLines() {
         cleanGeozoneLines();
-        
+
         FC.GEOZONES.get().forEach(zone => {
-            if (zone.getVerticesCount() != 0) { 
+            if (zone.getVerticesCount() != 0) {
                 if (zone.getShape() == GeozoneShapes.CIRCULAR) {
                     var circleFeature = new Feature({
                         geometry: new Circle(fromLonLat([zone.getFirstVertex().getLonMap(), zone.getFirstVertex().getLatMap()]), getProjectedRadius(zone.getRadius() / 100)), 
@@ -955,7 +955,7 @@ TABS.mission_control.initialize = function (callback) {
                                     width: 3,
                                 })
                             })
-                        ],                                  
+                        ],
                     });
 
                     vectorLayer.kind = "geozonecircle";
@@ -974,27 +974,27 @@ TABS.mission_control.initialize = function (callback) {
                         paintGeozoneLine(pos1, pos2, zone.getType() == GeozoneType.EXCULSIVE ? '#E62121' : '#1DBE0A', prev.getNumber(), zone.getNumber());
                         prev = current;
                     }
-                } 
+                }
             }
         });
     }
 
     function renderGeozonesOnMap()
-    {   
+    {
         cleanGeozoneLayers();
         if (!selectedGeozone) {
             cleanGeozoneLines();
             geozoneWarning();
             return;
         }
-        
+
         repaintGeozoneLines();
-        FC.GEOZONES.get().forEach(zone => {        
+        FC.GEOZONES.get().forEach(zone => {
             if (zone.getVerticesCount() > 0) {
                 zone.getVertices().forEach(vertex => {
                     map.addLayer(addZoneVertex(zone, vertex));
                 });
-            }            
+            }
         });
         geozoneWarning();
     }
@@ -1025,7 +1025,7 @@ TABS.mission_control.initialize = function (callback) {
         } else {
             $('#infoGeozoneMissionWarning').hide();
         }
-        
+
         $('#geozoneInvalidContent').empty();
         invalidGeoZones = false;
         for (var i = 0; i < FC.GEOZONES.geozoneCount(); i++) {
@@ -1062,7 +1062,7 @@ TABS.mission_control.initialize = function (callback) {
         $('#availableVertices').text((FC.GEOZONES.getMaxVertices() - FC.GEOZONES.getUsedVerticesCount()) + '/' + FC.GEOZONES.getMaxVertices());
     }
 
-    function addGeozone() {       
+    function addGeozone() {
 
         if (FC.GEOZONES.geozoneCount() + 1 > FC.GEOZONES.getMaxZones()) {
             dialog.alert(i18n.getMessage('missionGeozoneMaxZonesReached'));
@@ -1717,7 +1717,8 @@ TABS.mission_control.initialize = function (callback) {
             });
 
         }
-        geozoneWarning();
+
+        if (!isOffline) geozoneWarning();
     }
 
     function redrawLayer() {
@@ -1780,7 +1781,7 @@ TABS.mission_control.initialize = function (callback) {
             $('#geozoneContentBox').show();
             const $geozonContent = $geozoneContent.find('.missionPlannerGeozone:last-child');
             $geozonContent.find('.spacer_box_title').text(i18n.getMessage('missionGeozoneEdit', selectedGeozone.getNumber() + 1));
-            
+
             $('#geozoneShape').val(selectedGeozone.getShape());
             $('#geozoneType').val(selectedGeozone.getType());
             $('#geozoneMinAlt').val(selectedGeozone.getMinAltitude());
@@ -1819,7 +1820,7 @@ TABS.mission_control.initialize = function (callback) {
                 ');
                 const $row = $verticesTable.find('tr:last');
                 $row.find('.vertexNumber').text(vertex.getNumber() + 1);
-                
+
                 $row.find('.vertexLat')
                     .val((vertex.getLatMap())
                     .toLocaleString(['en-US'], {minimumFractionDigits: 7}))
@@ -1834,9 +1835,9 @@ TABS.mission_control.initialize = function (callback) {
                         renderGeozoneOptions();
                         renderGeozonesOnMap();
                         updateGeozoneInfo();
-                        
+
                 });
-                
+
                 $row.find('.vertexLon')
                     .val((vertex.getLonMap())
                     .toLocaleString(['en-US'], {minimumFractionDigits: 7}))
@@ -1852,9 +1853,9 @@ TABS.mission_control.initialize = function (callback) {
                         renderGeozonesOnMap();
                         updateGeozoneInfo();
                 });
-                
+
                 $row.find('#removeVertex').on('click', event => {
-                    if (selectedGeozone.getVerticesCount() > 3) {   
+                    if (selectedGeozone.getVerticesCount() > 3) {
                         selectedGeozone.dropVertex(vertex.getNumber());
                         renderGeozoneOptions();
                         renderGeozonesOnMap();
@@ -1904,6 +1905,15 @@ TABS.mission_control.initialize = function (callback) {
 
             $row.find(".waypointOptions-action").val(waypointOptions.indexOf(MWNP.WPTYPE.REV[element.getAction()])).on('change', function () {
                 element.setAction(MWNP.WPTYPE[waypointOptions[$(this).val()]]);
+                let P1Value = 0;
+                if (waypointOptions[$(this).val()] == "JUMP") {
+                    P1Value = 1;
+                } else if (waypointOptions[$(this).val()] == "RTH" && !isOffline) {
+                    if (FC.isMultirotor()) P1Value = 1;
+                }
+                $row.find(".waypointOptions-p1").val(P1Value);
+                element.setP1(P1Value);
+
                 for (var i = 1; i <= 3; i++) {
                     if (dictOfLabelParameterPoint[element.getAction()]['parameter'+String(i)] != '') {
                         $row.find(".waypointOptions-p"+String(i)).prop("disabled", false);
@@ -1921,7 +1931,7 @@ TABS.mission_control.initialize = function (callback) {
 
             $row.find(".waypointOptions-number").text(element.getAttachedNumber()+1);
 
-            $row.find(".waypointOptions-p1").val((MWNP.WPTYPE.REV[element.getAction()] == "JUMP" ? element.getP1()+1 : element.getP1())).on('change', function () {
+            $row.find(".waypointOptions-p1").val((MWNP.WPTYPE.REV[element.getAction()] == "JUMP" ? mission.convertWaypointToJumpNumber(element.getP1()) + 1 : element.getP1())).on('change', function () {
                 if (MWNP.WPTYPE.REV[element.getAction()] == "SET_HEAD") {
                     if ($(this).val() >= 360 || ($(this).val() < 0 && $(this).val() != -1))
                     {
@@ -2286,7 +2296,7 @@ TABS.mission_control.initialize = function (callback) {
                 renderGeozoneOptions();
                 renderGeozonesOnMap();
                 updateGeozoneInfo();
-            } 
+            }
         };
 
         /**
@@ -2622,7 +2632,7 @@ TABS.mission_control.initialize = function (callback) {
                 renderGeozoneOptions();
             }
             else if (selectedFeature && tempMarker.kind == "geozoneline" && tempMarker.selection) {
-                
+
                 if (FC.GEOZONES.getUsedVerticesCount() + 1 > FC.GEOZONES.getMaxVertices()) {
                     dialog.alert(i18n.getMessage('missionGeozoneMaxVerticesReached'));
                     return;
@@ -2635,7 +2645,7 @@ TABS.mission_control.initialize = function (callback) {
                 renderGeozoneOptions();
                 renderGeozonesOnMap();
                 updateGeozoneInfo();
-            }    
+            }
             else if (!disableMarkerEdit) {
                 let tempWpCoord = toLonLat(evt.coordinate);
                 let tempWp = new Waypoint(mission.get().length, MWNP.WPTYPE.WAYPOINT, Math.round(tempWpCoord[1] * 10000000), Math.round(tempWpCoord[0] * 10000000), Number(settings.alt), Number(settings.speed));
@@ -3262,8 +3272,8 @@ TABS.mission_control.initialize = function (callback) {
         });
 
         $('#safehomeLatitude').on('change', event => {
-            if (selectedFwApproachSh) {
-                selectedFwApproachSh.setLat(Math.round(Number($(event.currentTarget).val()) * 1e7));
+            if (selectedSafehome && selectedFwApproachSh) {
+                selectedSafehome.setLat(Math.round(Number($(event.currentTarget).val()) * 1e7));
                 renderSafeHomeOptions();
                 cleanSafehomeLayers();
                 renderSafehomesOnMap();
@@ -3272,8 +3282,8 @@ TABS.mission_control.initialize = function (callback) {
 
 
         $('#safehomeLongitude').on('change', event => {
-            if (selectedFwApproachSh) {
-                selectedFwApproachSh.setLon(Math.round(Number($(event.currentTarget).val()) * 1e7));
+            if (selectedSafehome && selectedFwApproachSh) {
+                selectedSafehome.setLon(Math.round(Number($(event.currentTarget).val()) * 1e7));
                 renderSafeHomeOptions();
                 cleanSafehomeLayers();
                 renderSafehomesOnMap();
@@ -3429,7 +3439,7 @@ TABS.mission_control.initialize = function (callback) {
             GUI.log(i18n.getMessage('deviceRebooting'));
             GUI.handleReconnect($('.tab_mission_control a'));
         }
-        
+
         $('#cancelGeozone').on('click', function() {
             $('#missionPlannerGeozones').hide();
             cleanGeozoneLayers();
@@ -3446,7 +3456,7 @@ TABS.mission_control.initialize = function (callback) {
             selectedGeozone = FC.GEOZONES.last();
             renderGeozoneOptions();
             renderGeozonesOnMap();
-            updateGeozoneInfo();            
+            updateGeozoneInfo();
         });
 
         $('#loadEepromGeozoneButton').on('click', event => {
@@ -3457,7 +3467,7 @@ TABS.mission_control.initialize = function (callback) {
                     selectedGeozone = FC.GEOZONES.first();
                 } else {
                     selectedGeozone = null;
-                } 
+                }
                 renderGeozoneOptions();
                 renderGeozonesOnMap();
                 updateGeozoneInfo();
@@ -3467,7 +3477,7 @@ TABS.mission_control.initialize = function (callback) {
         });
 
         $('#saveEepromGeozoneButton').on('click', event => {
-            
+
             if (invalidGeoZones) {
                 dialog.alert(i18n.getMessage("geozoneUnableToSave"));
                 return;
@@ -3495,7 +3505,7 @@ TABS.mission_control.initialize = function (callback) {
                     if (FC.GEOZONES.getUsedVerticesCount() + 2 > FC.GEOZONES.getMaxVertices()) {
                         dialog.alert(i18n.getMessage('missionGeozoneMaxVerticesReached'));
                         renderGeozoneOptions();
-                        return;                
+                        return;
                     }
                     $('#geozoneRadius').prop('disabled', true);
                     if (selectedGeozone.getVerticesCount() < 3) {
@@ -3516,7 +3526,7 @@ TABS.mission_control.initialize = function (callback) {
             }
         });
 
-        
+
         $('#geozoneType').on('change', event => {
             if (selectedGeozone) {
                 selectedGeozone.setType($(event.currentTarget).val());
@@ -3539,7 +3549,7 @@ TABS.mission_control.initialize = function (callback) {
 
         $('#geozoneSeaLevelRef').on('change', event => {
             const isChecked = $(event.currentTarget).prop('checked') ? 1 : 0;
-            if (selectedGeozone && isChecked != selectedGeozone.getSealevelRef()) {    
+            if (selectedGeozone && isChecked != selectedGeozone.getSealevelRef()) {
                 selectedGeozone.setSealevelRef(isChecked);
                 (async () => {
                     const vertex = selectedGeozone.getVertex(0);
@@ -3569,7 +3579,7 @@ TABS.mission_control.initialize = function (callback) {
                 renderGeozonesOnMap();
             }
         });
-        
+
 
         /////////////////////////////////////////////
         // Callback for HOME Table
