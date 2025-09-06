@@ -15,7 +15,7 @@ on:
 
 jobs:
     build-linux:
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-24.04
         steps:
             - uses: actions/checkout@v4
             - name: Setup environment
@@ -46,7 +46,7 @@ jobs:
               with:
                 max_attempts: 3
                 retry_on: error
-                command: yarn install --foreground-scripts
+                command: yarn install
                 timeout_minutes: 10
                 on_retry_command: rm -rfv node_modules
             - name: Build Linux
@@ -68,7 +68,7 @@ jobs:
                 path: ./out/make/zip/linux/x64/*.zip
 
     build-linux-aarch64:
-        runs-on: ubuntu-24.04-arm
+        runs-on: ubuntu-24.04
         steps:
             - uses: actions/checkout@v4
             - name: Setup environment
@@ -99,11 +99,11 @@ jobs:
               with:
                 max_attempts: 3
                 retry_on: error
-                command: yarn install --foreground-scripts
+                command: yarn install
                 timeout_minutes: 10
                 on_retry_command: rm -rfv node_modules
             - name: Build Linux
-              run: yarn run make
+              run: yarn run make -- --arch="arm64"
             - name: Upload Linux deb
               uses: actions/upload-artifact@v4
               with:
