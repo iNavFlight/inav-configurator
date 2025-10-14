@@ -2614,10 +2614,7 @@ OSD.msp = {
         result.push8(p.sidebar_scroll_arrows);
         result.push8(p.units);
         result.push8(p.stats_energy_unit);
-
-        if (semver.gte(FC.CONFIG.flightControllerVersion, "8.1.0")) {
-            result.push8(p.adsb_warning_style);
-        }
+        result.push8(p.adsb_warning_style);
 
         return result;
     },
@@ -2635,9 +2632,7 @@ OSD.msp = {
         p.sidebar_scroll_arrows = prefs.readU8();
         p.units = prefs.readU8();
         p.stats_energy_unit = prefs.readU8();
-        if (semver.gte(FC.CONFIG.flightControllerVersion, "8.1.0")) {
-            p.adsb_warning_style = prefs.readU8();
-        }
+        p.adsb_warning_style = prefs.readU8();
     },
 
     encodeLayoutItem: function(layout, item, pos) {
