@@ -4264,7 +4264,7 @@
         "message": "云台舵机的总运动角度"
     },
     "osdPanServoPwm2centideg_HELP": {
-        "message": "云台舵机旋转的度数。一个具有从1000到2000微秒PWM的180度旋转伺服通常需要此设置的180度。将该值变为负数可反转方向。"
+        "message": "云台舵机旋转的度数。一个具有从1000到2000微秒PWM的90度旋转伺服通常需要此设置的180度。将该值变为负数可反转方向。"
     },
     "osdPanServoIndicatorShowDegrees": {
         "message": "在云台指示器旁显示偏移度数"

@@ -4277,7 +4277,7 @@
         "message": "Total degrees of movement of the pan servo"
     },
     "osdPanServoPwm2centideg_HELP": {
-        "message": "Degrees of pan servo rotation. A servo with 180 degrees of rotation from 1000 to 2000 us PWM typically needs 180 for this setting. Make the value negative to inverse the direction."
+        "message": "Degrees of pan servo rotation. A servo with 180 degrees of rotation from 1000 to 2000 us PWM typically needs 90 for this setting. If you find the home arrow or other features turn the wrong way when paining. Make the value negative to invert the direction."
     },
     "osdPanServoIndicatorShowDegrees": {
         "message": "Show degrees of offset next to pan indicator"
