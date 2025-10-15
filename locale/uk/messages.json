@@ -4243,10 +4243,10 @@
     "osdPanServoIndex_HELP": {
         "message": "Встановіть номер виходу сервоприводу панорамування відповідно до таблиці виходів мікшера. Наприклад, вихід S6."
     },
-    "osdPanServoPwm2decadeg": {
+    "osdPanServoRangeDecadegrees": {
         "message": "Загальна кількість градусів руху сервоприводу панорамування"
     },
-    "osdPanServoPwm2decadeg_HELP": {
+    "osdPanServoRangeDecadegrees_HELP": {
         "message": "Кут обертання сервопривода панорамування. Для сервопривода з діапазоном обертання 180 градусів зазвичай потрібно встановити значення 180. Задайте від’ємне значення, щоб змінити напрям обертання."
     },
     "osdPanServoIndicatorShowDegrees": {
