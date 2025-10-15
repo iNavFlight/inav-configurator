@@ -4260,11 +4260,11 @@
     "osdPanServoIndex_HELP": {
         "message": "将其设置为云台舵机的输出编号；如混合器输出表中所示。例如输出S6。"
     },
-    "osdPanServoPwm2centideg": {
+    "osdPanServoPwm2decadeg": {
         "message": "云台舵机的总运动角度"
     },
-    "osdPanServoPwm2centideg_HELP": {
-        "message": "云台舵机旋转的度数。一个具有从1000到2000微秒PWM的180度旋转伺服通常需要此设置的180度。将该值变为负数可反转方向。"
+    "osdPanServoPwm2decadeg_HELP": {
+        "message": "云台舵机的旋转角度。一个具有180度旋转范围的舵机，通常此设置需要设为180。将该数值设为负数可反转旋转方向。"
     },
     "osdPanServoIndicatorShowDegrees": {
         "message": "在云台指示器旁显示偏移度数"
