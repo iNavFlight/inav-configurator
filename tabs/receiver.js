@@ -66,8 +66,22 @@ TABS.receiver.initialize = function (callback) {
                 return 0;
             }
         });
-        $("#serialrx_provider").empty().append(serialRxProviders);
-        $('#serialrx_provider').val(selectedRxProvider);
+
+        let $serialRxProvider = $("#serialrx_provider");
+        $serialRxProvider.empty().append(serialRxProviders);
+        $serialRxProvider.val(selectedRxProvider);
+
+        $serialRxProvider.on('change', function() {
+            const frSkyRXProviders = ["SBUS", "FPORT", "FPORT2", "FBUS"];
+            
+            if (frSkyRXProviders.includes($(this).find("option:selected").text())) {
+                $("#frSkyOptions").show();
+            } else {
+                $("#frSkyOptions").hide();
+            }
+        });
+
+        $serialRxProvider.trigger("change");
 
         $receiverMode.on('change', function () {
             if ($(this).find("option:selected").text() == "SERIAL") {

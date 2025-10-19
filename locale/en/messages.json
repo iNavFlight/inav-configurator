@@ -935,11 +935,26 @@
     "serialrx_halfduplex": {
         "message": "Serial receiver half-duplex"
     },
+    "serialrx_frSkyPitchRollLabel": {
+        "message": "Use Pitch & Roll sensors in telemetry"
+    },
+    "serialrx_frSkyPitchRollHelp": {
+        "message": "This sends pitch and roll angle telemetry sensors instead of the standard raw acellerometer data sensors. This should be turned <strong>on</strong> if using the INAV OpenTX/EdgeTX or ETHOS telemetry dashboard LUA scripts."
+    },
+    "serialrx_frSkyFuelUnitLabel": {
+        "message": "SmartPort Fuel units"
+    },
+    "serialrx_frSkyFuelUnitHelp": {
+        "message": "Select the data that you want sent to the <strong>fuel</strong> telemetry sensor."
+    },
     "configurationFeaturesHelp": {
         "message": "<strong>Note:</strong> Not all combinations of features are valid.  When the flight controller firmware detects invalid feature combinations conflicting features will be disabled.<br /><strong>Note:</strong> Configure serial ports <span style=\"color: red\">before</span> enabling the features that will use the ports."
     },
     "configurationSerialRXHelp": {
         "message": "<strong>Note:</strong> Remember to configure a Serial Port (via Ports tab) for the serial receiver"
+    },
+    "configurationFrSkyRXHelp": {
+        "message": "FrSky Options"
     },
     "configurationSensorAlignmentMag": {
         "message": "MAG Alignment"
