@@ -86,9 +86,11 @@ TABS.receiver.initialize = function (callback) {
         $receiverMode.on('change', function () {
             if ($(this).find("option:selected").text() == "SERIAL") {
                 $serialWrapper.show();
+                $serialRxProvider.trigger("change");
                 $receiverMode.parent().removeClass("no-bottom-border");
             } else {
                 $serialWrapper.hide();
+                $("#frSkyOptions").hide();
                 $receiverMode.parent().addClass("no-bottom-border");
             }
         });
