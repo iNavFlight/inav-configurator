@@ -644,6 +644,9 @@
         <div id="subtab-filters" class="subtab__content">
             <div class="tab_subtitle not-for-ez-tune" data-i18n="pidTuning_mainFilters" style="margin-top: 1em;"></div>
             <div class="clear-both not-for-ez-tune"></div>
+            <div class="btn default_btn narrow red" style="float: right; top: -7px;">
+                <a id="filter-presets" href="" data-i18n="filterPresets"></a>
+            </div>
             <div class="cf_column not-for-ez-tune">
                 <table class="settings-table settings-table--filtering not-for-ez-tune">
                     <tbody>
@@ -908,6 +911,22 @@
         </div>
     </div>
     <div class="clear-both"></div>
+
+    <div id="filterPresetContent" class="is-hidden">
+        <div class="modal__content">
+            <h1 class="modal__title modal__title--warning" data-i18n="mixerWizardModalTitle"></h1>
+            <div class="modal__text">
+                <p data-i18n="mixerWizardInfo"></p>
+                <div class="filterPresetContent_wrapper">
+
+                </div>
+            </div>
+        </div>
+        <div class="modal__buttons">
+            <a id="wizard-execute-button" class="modal__button modal__button--main" data-i18n="mixerWizardModalApply"></a>
+        </div>
+    </div>
+
     <div id="tuning-footer" class="content_toolbar">
         <div class="btn save_btn">
             <a class="update" href="#" data-i18n="pidTuning_ButtonSave"></a>
