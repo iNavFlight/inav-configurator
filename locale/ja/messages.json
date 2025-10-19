@@ -940,8 +940,11 @@
     "configurationSerialRXHelp": {
         "message": "<strong>注:</strong> シリアル受信機用にシリアルポート([ポート]タブ内)を忘れずに設定してください。"
     },
-    "configurationFrSkyRXHelp": {
+    "configurationFrSkyOptions": {
         "message": "FrSky のオプション"
+    },
+    "configurationFrSkyOptions_HELP": {
+        "message": "これらのオプションは、SmartPort テレメトリセンサーを OpenTX/EdgeTX および ETHOS テレメトリ LUA スクリプトで動作させるための設定に、素早くアクセスできるようにします。SBUS を使用している場合は、別のシリアルポートで SmartPort テレメトリを設定する必要があることに注意してください。"
     },
     "configurationSensorAlignmentMag": {
         "message": "コンパス アライメント"
@@ -3647,6 +3650,9 @@
         "message": "カスタムOSD要素"
     },
     "osd_custom_element_settings_HELP": {
+        "message": "カスタム OSD 要素の使用方法の詳細については、こちらをクリック ?"
+    },
+    "osd_custom_element_settings_icons_HELP": {
         "message": "このヘルプボタンをクリックするとアイコン番号が表示されます。"
     },
     "custom_element": {

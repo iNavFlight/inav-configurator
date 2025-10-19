@@ -940,8 +940,11 @@
     "configurationSerialRXHelp": {
         "message": "<strong>Примітка:</strong> Не забудьте налаштувати послідовний порт (через вкладку портів) для послідовного приймача"
     },
-    "configurationFrSkyRXHelp": {
+    "configurationFrSkyOptions": {
         "message": "Параметри FrSky"
+    },
+    "configurationFrSkyOptions_HELP": {
+        "message": "Ці параметри забезпечують швидкий доступ до налаштування телеметричних сенсорів SmartPort для роботи з LUA-скриптами телеметрії OpenTX/EdgeTX та ETHOS. Зверніть увагу, що якщо ви використовуєте SBUS, вам потрібно налаштувати телеметрію SmartPort на окремому серійному порту."
     },
     "configurationSensorAlignmentMag": {
         "message": "Вирівнювання магнітометра"
@@ -3656,6 +3659,9 @@
         "message": "Користувацькі елементи OSD"
     },
     "osd_custom_element_settings_HELP": {
+        "message": "Для отримання повної інформації про використання користувацьких елементів OSD натисніть тут ?"
+    },
+    "osd_custom_element_settings_icons_HELP": {
         "message": "Номери іконок можна знайти, натиснувши цю кнопку допомоги."
     },
     "custom_element": {

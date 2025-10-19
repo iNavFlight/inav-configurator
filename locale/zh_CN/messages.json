@@ -949,8 +949,11 @@
     "configurationSerialRXHelp": {
         "message": "<strong>注意:</strong> 使用 RX_SERIAL 功能时记得配置串行端口(端口界面) 并且选择接收机协议"
     },
-    "configurationFrSkyRXHelp": {
+    "configurationFrSkyOptions": {
         "message": "FrSky 选项"
+    },
+    "configurationFrSkyOptions_HELP": {
+        "message": "这些选项提供快速访问，用于配置 SmartPort 遥测传感器，使其能够与 OpenTX/EdgeTX 和 ETHOS 遥测 LUA 脚本配合使用。请注意，如果您使用的是 SBUS，则需要在独立的串口上设置 SmartPort 遥测。"
     },
     "configurationSensorAlignmentMag": {
         "message": "罗盘方向"
@@ -3667,6 +3670,9 @@
         "message": "自定义OSD元素"
     },
     "osd_custom_element_settings_HELP": {
+        "message": "有关如何使用自定义 OSD 元素的详细说明，请点击此处 ?"
+    },
+    "osd_custom_element_settings_icons_HELP": {
         "message": "您可以通过点击此帮助按钮找到图标编号。"
     },
     "custom_element": {
