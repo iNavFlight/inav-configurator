@@ -922,11 +922,29 @@
     "serialrx_halfduplex": {
         "message": "Послідовний приймач напівдуплексний"
     },
+    "serialrx_frSkyPitchRollLabel": {
+        "message": "Використовуйте датчики тангажу та крену у телеметрії"
+    },
+    "serialrx_frSkyPitchRollHelp": {
+        "message": "Це надсилає дані телеметрії кутів тангажу та крену замість стандартних датчиків сирих прискорень. Якщо ви використовуєте LUA-скрипти панелі телеметрії INAV OpenTX/EdgeTX або ETHOS, це слід увімкнути <strong>on</strong>."
+    },
+    "serialrx_frSkyFuelUnitLabel": {
+        "message": "Паливні одиниці SmartPort"
+    },
+    "serialrx_frSkyFuelUnitHelp": {
+        "message": "Виберіть дані, які потрібно надіслати на телеметричний сенсор <strong>палива</strong>."
+    },
     "configurationFeaturesHelp": {
         "message": "<strong>Примітка:</strong> Не всі комбінації функцій є дійсними. Коли прошивка польотного контролера виявляє недійсні комбінації, конфліктуючі функції будуть вимкнені. <br /> <strong>Примітка:</strong> Налаштуйте послідовні порти <span style=\"color: red\">перед</span> активацією функцій, які будуть використовувати ці порти."
     },
     "configurationSerialRXHelp": {
         "message": "<strong>Примітка:</strong> Не забудьте налаштувати послідовний порт (через вкладку портів) для послідовного приймача"
+    },
+    "configurationFrSkyOptions": {
+        "message": "Параметри FrSky"
+    },
+    "configurationFrSkyOptions_HELP": {
+        "message": "Ці параметри забезпечують швидкий доступ до налаштування телеметричних сенсорів SmartPort для роботи з LUA-скриптами телеметрії OpenTX/EdgeTX та ETHOS. Зверніть увагу, що якщо ви використовуєте SBUS, вам потрібно налаштувати телеметрію SmartPort на окремому серійному порту."
     },
     "configurationSensorAlignmentMag": {
         "message": "Вирівнювання магнітометра"
@@ -3641,6 +3659,9 @@
         "message": "Користувацькі елементи OSD"
     },
     "osd_custom_element_settings_HELP": {
+        "message": "Для отримання повної інформації про використання користувацьких елементів OSD натисніть тут ?"
+    },
+    "osd_custom_element_settings_icons_HELP": {
         "message": "Номери іконок можна знайти, натиснувши цю кнопку допомоги."
     },
     "custom_element": {
