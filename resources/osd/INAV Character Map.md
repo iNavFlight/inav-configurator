@@ -225,6 +225,7 @@
 | ![Flight hours rem](/resources/osd/digital/default/24x36/219.png)  | SYM_FLIGHT_HOURS_REMAINING |                              | Flight time (hours) remaining         | 219        | 0xDB         |
 | ![Ground course](/resources/osd/digital/default/24x36/220.png)     | SYM_GROUND_COURSE          | SYM.GROUND_COURSE            | Ground course                         | 220        | 0xDC         |
 | ![Alert](/resources/osd/digital/default/24x36/221.png)             | SYM_ALERT                  | SYM.ALERT                    | General Alert                         | 221        | 0xDD         |
+| ![Min Ground Speed](/resources/osd/digital/default/24x36/222.png)  | SYM_MIN_GROUND_SPEED       | SYM.MIN_GND_SPEED            | Minimum ground speed                  | 222        | 0xDE         |
 | ![Terrain follow](/resources/osd/digital/default/24x36/251.png)    | SYM_TERRAIN_FOLLOWING      | SYM.TERRAIN_FOLLOWING        | Terrain following                     | 251        | 0xFB         |
 | ![Cross track err](/resources/osd/digital/default/24x36/252.png)   | SYM_CROSS_TRACK_ERROR      | SYM.CROSS_TRACK_ERROR        | Cross track error                     | 252        | 0xFC         |
 | ![ADSB](/resources/osd/digital/default/24x36/253.png)              | SYM_ADSB                   | SYM.ADSB                     | ADSB                                  | 253        | 0xFD         |
