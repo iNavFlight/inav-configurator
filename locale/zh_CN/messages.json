@@ -4056,10 +4056,10 @@
     "osdElement_VARIO_HELP": {
         "message": "使用向上或向下箭头显示垂直速度。每个箭头代表每秒10cm(~4英寸)。"
     },
-    "osdElement_VARIO_NUM": {
-        "message": "数字式垂直速度表"
+    "osdElement_VERTICAL_SPEED_INDICATOR": {
+        "message": "垂直速度指示器"
     },
-    "osdElement_VARIO_NUM_HELP": {
+    "osdElement_VERTICAL_SPEED_INDICATOR_HELP": {
         "message": "使用数字显示垂直速度"
     },
     "osdElement_G_FORCE": {

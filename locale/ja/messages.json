@@ -4030,10 +4030,10 @@
     "osdElement_VARIO_HELP": {
         "message": "矢印を使用して垂直速度を表示します。各矢印は毎秒約10cm (約4インチ) を表します。"
     },
-    "osdElement_VARIO_NUM": {
-        "message": "バリオ数値"
+    "osdElement_VERTICAL_SPEED_INDICATOR": {
+        "message": "昇降速度計"
     },
-    "osdElement_VARIO_NUM_HELP": {
+    "osdElement_VERTICAL_SPEED_INDICATOR_HELP": {
         "message": "数値で垂直速度を表示します"
     },
     "osdElement_G_FORCE": {
