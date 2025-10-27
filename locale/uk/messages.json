@@ -4039,10 +4039,10 @@
     "osdElement_VARIO_HELP": {
         "message": "Показує вертикальну швидкість за допомогою стрілок вгору або вниз. Кожна стрілка представляє 10 см (~4 дюйми) на секунду."
     },
-    "osdElement_VARIO_NUM": {
-        "message": "Значення варіометра"
+    "osdElement_VERTICAL_SPEED_INDICATOR": {
+        "message": "Вказівник вертикальної швидкості"
     },
-    "osdElement_VARIO_NUM_HELP": {
+    "osdElement_VERTICAL_SPEED_INDICATOR_HELP": {
         "message": "Показує числом вертикальну швидкість"
     },
     "osdElement_G_FORCE": {
