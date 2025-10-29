@@ -271,7 +271,7 @@
 }
 
 .tab-motors .motor_testing .sliders input {
-    -webkit-appearance: slider-vertical;
+    writing-mode: vertical-lr; direction: rtl;
     width: 100%;
     height: 73px;
 }

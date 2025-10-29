@@ -348,7 +348,7 @@
     margin-right: 1em;
 }
 
-button {
+.tab-osd button {
     padding: 4px 10px !important;
     font-family: 'open_sanssemibold', Arial, serif;
     font-size: 9pt !important;

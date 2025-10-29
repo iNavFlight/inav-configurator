@@ -1,6 +1,5 @@
 'use strict'
 
-const { Shape } = require("three");
 
 const GeozoneType = Object.freeze({
     EXCULSIVE: 0,
@@ -271,8 +270,5 @@ let Geozone = function (type, shape, minAltitude, maxAltitude, sealevelRef, radi
     }
 
     return self;
-
-    return self;
 }
-
-module.exports = { Geozone, GeozoneVertex, GeozoneType, GeozoneShapes, GeozoneFenceAction };
+export { Geozone, GeozoneVertex, GeozoneType, GeozoneShapes, GeozoneFenceAction };
