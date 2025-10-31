@@ -1394,6 +1394,7 @@ dialog {
     padding-top: 4px;
     margin-bottom: 0;
     float: left;
+    font-weight: bold;
 }
 
 /* Fixed area at the Bottom */
