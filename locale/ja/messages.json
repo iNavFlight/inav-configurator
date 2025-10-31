@@ -5080,9 +5080,6 @@
     "mapProvider": {
         "message": "地図プロバイダ"
     },
-    "mapApiKey": {
-        "message": "地図APIキー"
-    },
     "proxyURL": {
         "message": "MapProxy URL"
     },

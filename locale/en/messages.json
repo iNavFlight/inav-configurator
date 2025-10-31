@@ -5119,9 +5119,6 @@
     "mapProvider": {
         "message": "Map Provider"
     },
-    "mapApiKey": {
-        "message": "Map API key"
-    },
     "proxyURL": {
         "message": "MapProxy URL"
     },

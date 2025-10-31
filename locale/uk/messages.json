@@ -5089,9 +5089,6 @@
     "mapProvider": {
         "message": "Постачальник мапи"
     },
-    "mapApiKey": {
-        "message": "Ключ API карти"
-    },
     "proxyURL": {
         "message": "MapProxy URL"
     },

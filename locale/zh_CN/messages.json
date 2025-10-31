@@ -5100,9 +5100,6 @@
     "mapProvider": {
         "message": "地图提供商"
     },
-    "mapApiKey": {
-        "message": "地图 API 密钥"
-    },
     "proxyURL": {
         "message": "地图代理 URL"
     },
