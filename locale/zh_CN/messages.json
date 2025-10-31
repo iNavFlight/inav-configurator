@@ -931,11 +931,29 @@
     "serialrx_halfduplex": {
         "message": "串口接收机 半双工模式"
     },
+    "serialrx_frSkyPitchRollLabel": {
+        "message": "在遥测中使用俯仰和横滚传感器"
+    },
+    "serialrx_frSkyPitchRollHelp": {
+        "message": "这会发送俯仰和横滚角度遥测传感器的数据，而不是标准的原始加速度计传感器数据。 如果使用 INAV OpenTX/EdgeTX 或 ETHOS 遥测仪表 LUA 脚本，应该将其<strong>开启</strong>。"
+    },
+    "serialrx_frSkyFuelUnitLabel": {
+        "message": "SmartPort 燃油单位"
+    },
+    "serialrx_frSkyFuelUnitHelp": {
+        "message": "选择要发送到 <strong>燃油</strong> 遥测传感器的数据。"
+    },
     "configurationFeaturesHelp": {
         "message": "<strong>注意:</strong>并非所有组合功能都有效，当飞控固件侦测到端口有无效的配置时将会复位设置。<br /><strong>注意:</strong><span style=\"color: red\">不要</span> 关闭第一个端口的 MSP 功能，除非您确定知道这样做的目的，否则您可能需要重新更新固件并且清空配置"
     },
     "configurationSerialRXHelp": {
         "message": "<strong>注意:</strong> 使用 RX_SERIAL 功能时记得配置串行端口(端口界面) 并且选择接收机协议"
+    },
+    "configurationFrSkyOptions": {
+        "message": "FrSky 选项"
+    },
+    "configurationFrSkyOptions_HELP": {
+        "message": "这些选项提供快速访问，用于配置 SmartPort 遥测传感器，使其能够与 OpenTX/EdgeTX 和 ETHOS 遥测 LUA 脚本配合使用。请注意，如果您使用的是 SBUS，则需要在独立的串口上设置 SmartPort 遥测。"
     },
     "configurationSensorAlignmentMag": {
         "message": "罗盘方向"
@@ -3652,6 +3670,9 @@
         "message": "自定义OSD元素"
     },
     "osd_custom_element_settings_HELP": {
+        "message": "有关如何使用自定义 OSD 元素的详细说明，请点击此处 ?"
+    },
+    "osd_custom_element_settings_icons_HELP": {
         "message": "您可以通过点击此帮助按钮找到图标编号。"
     },
     "custom_element": {
@@ -4035,10 +4056,10 @@
     "osdElement_VARIO_HELP": {
         "message": "使用向上或向下箭头显示垂直速度。每个箭头代表每秒10cm(~4英寸)。"
     },
-    "osdElement_VARIO_NUM": {
-        "message": "数字式垂直速度表"
+    "osdElement_VERTICAL_SPEED_INDICATOR": {
+        "message": "垂直速度指示器"
     },
-    "osdElement_VARIO_NUM_HELP": {
+    "osdElement_VERTICAL_SPEED_INDICATOR_HELP": {
         "message": "使用数字显示垂直速度"
     },
     "osdElement_G_FORCE": {
@@ -5078,9 +5099,6 @@
     },
     "mapProvider": {
         "message": "地图提供商"
-    },
-    "mapApiKey": {
-        "message": "地图 API 密钥"
     },
     "proxyURL": {
         "message": "地图代理 URL"

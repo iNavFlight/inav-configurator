@@ -18,7 +18,7 @@ const groundstation = (function () {
     privateScope.$viewport = null;
     privateScope.$gsViewport = null;
     privateScope.mapHandler = null;
-    privateScope.mapLayer = null;
+    privateScope.mapLayers =  [];
     privateScope.mapView = null;
 
     privateScope.cursorStyle = null;
@@ -67,19 +67,37 @@ const groundstation = (function () {
     privateScope.initMap = function () {
 
         //initialte layers
-        if (globalSettings.mapProviderType == 'bing') {
-            privateScope.mapLayer = new ol.source.BingMaps({
-                key: globalSettings.mapApiKey,
-                imagerySet: 'AerialWithLabels',
-                maxZoom: 19
-            });
-        } else if (globalSettings.mapProviderType == 'mapproxy') {
-            privateScope.mapLayer = new ol.source.TileWMS({
-                url: globalSettings.proxyURL,
-                params: { 'LAYERS': globalSettings.proxyLayer }
-            })
+        if (globalSettings.mapProviderType == 'esri') {
+            privateScope.mapLayers.push(new ol.layer.Tile({
+                source: new ol.source.XYZ({
+                    url: 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+                    attributions: 'Source: Esri, Maxar, Earthstar Geographics, and the GIS User Community',
+                    maxZoom: 19
+                })
+            }));
+            privateScope.mapLayers.push(new ol.layer.Tile({
+                source: new ol.source.XYZ({
+                    url: 'https://services.arcgisonline.com/arcgis/rest/services/Reference/World_Transportation/MapServer/tile/{z}/{y}/{x}',
+                    maxZoom: 19
+                })
+            }));
+            privateScope.mapLayers.push(new ol.layer.Tile({
+                source: new ol.source.XYZ({
+                    url: 'https://services.arcgisonline.com/arcgis/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}',
+                    maxZoom: 19
+                })
+            }));
+        } else if ( globalSettings.mapProviderType == 'mapproxy' ) {
+            privateScope.mapLayers.push(new ol.layer.Tile({
+                source: new ol.source.TileWMS({
+                            url: globalSettings.proxyURL,
+                            params: {'LAYERS':globalSettings.proxyLayer}
+                        })
+            }));
         } else {
-            privateScope.mapLayer = new ol.source.OSM();
+            privateScope.mapLayers.push(new ol.layer.Tile({
+                source: new ol.source.OSM()
+            }));
         }
 
         //initiate view
@@ -91,11 +109,7 @@ const groundstation = (function () {
         //initiate map handler
         privateScope.mapHandler = new ol.Map({
             target: document.getElementById('groundstation-map'),
-            layers: [
-                new ol.layer.Tile({
-                    source: privateScope.mapLayer
-                })
-            ],
+            layers: privateScope.mapLayers,
             view: privateScope.mapView
         });
     };

@@ -81,7 +81,6 @@ $(function() {
         globalSettings.store = store;
         globalSettings.unitType = store.get('unit_type', UnitType.none);
         globalSettings.mapProviderType = store.get('map_provider_type', 'osm'); 
-        globalSettings.mapApiKey = store.get('map_api_key', '');
         globalSettings.assistnowApiKey = store.get('assistnow_api_key', '');
         globalSettings.proxyURL = store.get('proxyurl', 'http://192.168.1.222/mapproxy/service?');
         globalSettings.proxyLayer = store.get('proxylayer', 'your_proxy_layer_name');
@@ -343,7 +342,6 @@ $(function() {
 
                     $('#ui-unit-type').val(globalSettings.unitType);
                     $('#map-provider-type').val(globalSettings.mapProviderType);
-                    $('#map-api-key').val(globalSettings.mapApiKey);
                     $('#proxyurl').val(globalSettings.proxyURL);
                     $('#proxylayer').val(globalSettings.proxyLayer);
                     $('#showProfileParameters').prop('checked', globalSettings.showProfileParameters);
@@ -379,10 +377,6 @@ $(function() {
                     $('#map-provider-type').on('change', function () {
                         store.set('map_provider_type', $(this).val());
                         globalSettings.mapProviderType = $(this).val();
-                    });
-                    $('#map-api-key').on('change', function () {
-                        store.set('map_api_key', $(this).val());
-                        globalSettings.mapApiKey = $(this).val();
                     });
                     $('#proxyurl').on('change', function () {
                         store.set('proxyurl', $(this).val());
