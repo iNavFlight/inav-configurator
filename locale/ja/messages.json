@@ -4255,11 +4255,11 @@
     "osdPanServoIndex_HELP": {
         "message": "ミキサー出力テーブルに表示されるパン・サーボの出力番号を設定します (例: 出力S6)。"
     },
-    "osdPanServoPwm2centideg": {
+    "osdPanServoRangeDecadegrees": {
         "message": "パン・サーボの全移動角度"
     },
-    "osdPanServoPwm2centideg_HELP": {
-        "message": "パン・サーボの回転角度です。1000〜2000usのPWMで180度回転するサーボの場合、通常この設定に180を入力します。方向を逆にするには値をマイナスにします。"
+    "osdPanServoRangeDecadegrees_HELP": {
+        "message": "パン・サーボの回転角度。回転範囲が180度のサーボの場合、通常この設定には180を指定します。値をマイナスにすると、回転方向が反転します。"
     },
     "osdPanServoIndicatorShowDegrees": {
         "message": "パン・インジケータの横にオフセット角度を表示"
