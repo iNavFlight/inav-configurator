@@ -6,9 +6,17 @@
         "message": "Deutsch",
         "comment": "Don't translate!"
     },
+    "language_el": {
+        "message": "Ελληνικά",
+        "comment": "Don't translate!"
+    },
+    "language_uk": {
+        "message": "Українські",
+        "comment": "Don't translate!"
+    },
     "language_en": {
         "message": "English",
-        "_comment": "Don't translate!"
+        "comment": "Don't translate!"
     },
     "language_uk": {
         "message": "українська",
