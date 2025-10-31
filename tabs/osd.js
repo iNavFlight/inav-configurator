@@ -514,10 +514,13 @@ function osdDecimalsDistancePreview(prependedSymbol) {
         case 0: // Imperial
         case 3: // UK
             s += FONT.symbol(SYM.DIST_MI);
+            break;
         case 4: // GA
             s += FONT.symbol(SYM.DIST_NM);
+            break;
         default: // Metric
             s += FONT.symbol(SYM.DIST_KM);
+            break;
     }
 
     s = FONT.symbol(prependedSymbol) + s;
@@ -959,7 +962,7 @@ OSD.constants = {
                 },
                 {
                     name: 'THROTTLE_GAUGE',
-                    id: 167,
+                    id: 168,
                     preview: FONT.symbol(SYM.THROTTLE_GAUGE_EMPTY) + '\n' +
                         FONT.symbol(SYM.THROTTLE_GAUGE_EMPTY) + '\n' +
                         FONT.symbol(SYM.THROTTLE_GAUGE_FULL) + '\n' +
@@ -3733,6 +3736,7 @@ TABS.osd.initialize = function (callback) {
                 mspHelper.loadOsdCustomElements(createCustomElements);
             }
 
+            updatePilotAndCraftNames();
             GUI.content_ready(callback);
         }));
     });
