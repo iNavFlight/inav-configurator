@@ -4069,10 +4069,10 @@
     "osdElement_VARIO_HELP": {
         "message": "Shows vertical speed using up or down arrows. Each arrow represents 10cm (~4 inches) per second."
     },
-    "osdElement_VARIO_NUM": {
-        "message": "Numeric vario"
+    "osdElement_VERTICAL_SPEED_INDICATOR": {
+        "message": "Vertical Speed Indicator"
     },
-    "osdElement_VARIO_NUM_HELP": {
+    "osdElement_VERTICAL_SPEED_INDICATOR_HELP": {
         "message": "Shows vertical speed using a number"
     },
     "osdElement_G_FORCE": {
@@ -5118,9 +5118,6 @@
     },
     "mapProvider": {
         "message": "Map Provider"
-    },
-    "mapApiKey": {
-        "message": "Map API key"
     },
     "proxyURL": {
         "message": "MapProxy URL"
