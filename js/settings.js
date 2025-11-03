@@ -119,12 +119,9 @@ var Settings = (function () {
                     input.val(s.value);
                     input.attr('maxlength', s.setting.max);
                 } else if (input.data('presentation') == 'range') {
-                    
                     GUI.sliderize(input, s.value, s.setting.min, s.setting.max);
-
                 } else if (s.setting.type == 'float') {
                     input.attr('type', 'number');
-
                     let dataStep = input.data("step");
 
                     if (typeof dataStep === 'undefined') {
@@ -153,7 +150,7 @@ var Settings = (function () {
                 }
 
                 // If data is defined, We want to convert this value into 
-                // something matching the units        
+                // something matching the units
                 self.convertToUnitSetting(input, inputUnit);
 
                 input.data('setting-info', s.setting);
@@ -313,40 +310,40 @@ var Settings = (function () {
         //unitConversionTable[toUnit][fromUnit] -> factor
         const unitRatioTable = {
             'cm' : {
-                'm' : 100, 
+                'm' : 100.0, 
                 'ft' : 30.48
             },
             'm' : {
-                'm' : 1,
+                'm' : 1.0,
                 'ft' : 0.3048
             },
             'm-lrg' : {
-                'km' : 1000,
+                'km' : 1000.0,
                 'mi' : 1609.344,
-                'nm' : 1852
+                'nm' : 1852.0
             },
             'cms' : { // Horizontal speed
                 'kmh' : 27.77777777777778, 
                 'kt': 51.44444444444457, 
                 'mph' : 44.704,
-                'ms' : 100
+                'ms' : 100.0
             },
             'v-cms' : { // Vertical speed
-                'ms' : 100,
+                'ms' : 100.0,
                 'hftmin' : 50.8,
                 'fts' : 30.48
             },
             'msec-nc' : {
-                'msec-nc' : 1
+                'msec-nc' : 1.0
             },
             'msec' : {
-                'sec' : 1000
+                'sec' : 1000.0
             },
             'dsec' : {
-                'sec' : 10
+                'sec' : 10.0
             },
             'mins' : {
-                'hours' : 60
+                'hours' : 60.0
             },
             'tzmins' : {
                 'tzhours' : 'TZHOURS'
@@ -358,16 +355,16 @@ var Settings = (function () {
                 'deg' : 0.1
             },
             'decideg' : {
-                'deg' : 10
+                'deg' : 10.0
             },
             'decideg-lrg' : {
-                'deg' : 10
+                'deg' : 10.0
             },
             'decadegps' : {
                 'degps' : 0.1
             },
             'decidegc' : {
-                'degc' : 10,
+                'degc' : 10.0,
                 'degf' : 'FAHREN'
             },
         };
@@ -491,8 +488,8 @@ var Settings = (function () {
         let decimalPlaces = 0;
         // Update the step, min, and max; as we have the multiplier here.
         if (element.attr('type') == 'number') {
-            let step = parseFloat(element.attr('step')) || 1;
-            
+            let step = parseFloat(element.data("step")) || parseFloat(element.attr('step')) || 1;
+
             if (multiplier !== 1) { 
                 decimalPlaces = Math.min(Math.ceil(multiplier / 100), 3);
                 // Add extra decimal place for non-integer conversions.
@@ -500,6 +497,8 @@ var Settings = (function () {
                     decimalPlaces++;
                 }
                 step = 1 / Math.pow(10, decimalPlaces);
+            } else { 
+                decimalPlaces = this.countDecimals(step);
             }
             element.attr('step', step.toFixed(decimalPlaces));
 
@@ -603,8 +602,8 @@ var Settings = (function () {
         // verify if number 0.000005 is represented as "5e-6"
         if (text.indexOf('e-') > -1) {
           let [base, trail] = text.split('e-');
-          let deg = parseInt(trail, 10);
-          return deg;
+          let decimals = parseInt(trail, 10);
+          return decimals;
         }
         // count decimals for number in representation like "0.123456"
         if (Math.floor(value) !== value) {
