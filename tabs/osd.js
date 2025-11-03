@@ -88,6 +88,8 @@ SYM.HEADING_W = 0xCB;
 SYM.HEADING_DIVIDED_LINE = 0xCC;
 SYM.HEADING_LINE = 0xCD;
 SYM.VARIO_UP_2A = 0x155;
+SYM.THROTTLE_GAUGE_EMPTY = 0x16B;
+SYM.THROTTLE_GAUGE_FULL = 0x16D;
 SYM.M_S = 0x8F;
 SYM.FT_S = 0x8D;
 SYM.CLOCK = 0xA0;
@@ -512,10 +514,13 @@ function osdDecimalsDistancePreview(prependedSymbol) {
         case 0: // Imperial
         case 3: // UK
             s += FONT.symbol(SYM.DIST_MI);
+            break;
         case 4: // GA
             s += FONT.symbol(SYM.DIST_NM);
+            break;
         default: // Metric
             s += FONT.symbol(SYM.DIST_KM);
+            break;
     }
 
     s = FONT.symbol(prependedSymbol) + s;
@@ -634,6 +639,7 @@ OSD.DjiElements =  {
     ],
     craftNameElements: [
         "MESSAGES",
+        "THROTTLE_GAUGE",
         "THROTTLE_POSITION",
         "SCALED_THROTTLE_POSITION",
         "3D_SPEED",
@@ -953,6 +959,15 @@ OSD.constants = {
                     name: 'REMAINING_FLIGHT_DISTANCE',
                     id: 49,
                     preview: osdDecimalsRemainingFlightDistancePreview,
+                },
+                {
+                    name: 'THROTTLE_GAUGE',
+                    id: 168,
+                    preview: FONT.symbol(SYM.THROTTLE_GAUGE_EMPTY) + '\n' +
+                        FONT.symbol(SYM.THROTTLE_GAUGE_EMPTY) + '\n' +
+                        FONT.symbol(SYM.THROTTLE_GAUGE_FULL) + '\n' +
+                        FONT.symbol(SYM.THROTTLE_GAUGE_FULL) + '\n' +
+                        FONT.symbol(SYM.THROTTLE_GAUGE_FULL) + '\n'
                 },
                 {
                     name: 'THROTTLE_POSITION',
@@ -3721,6 +3736,7 @@ TABS.osd.initialize = function (callback) {
                 mspHelper.loadOsdCustomElements(createCustomElements);
             }
 
+            updatePilotAndCraftNames();
             GUI.content_ready(callback);
         }));
     });
