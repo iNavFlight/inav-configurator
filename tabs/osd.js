@@ -3736,8 +3736,8 @@ TABS.osd.initialize = function (callback) {
                 mspHelper.loadOsdCustomElements(createCustomElements);
             }
 
-            updatePilotAndCraftNames();
             GUI.content_ready(callback);
+            updatePilotAndCraftNames();
         }));
     });
 };
