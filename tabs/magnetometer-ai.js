@@ -21,17 +21,24 @@ function accComputeYaw(changed, upside) {
     // Normalize to 0-360 range
     yaw = (yaw + 360) % 360;
     
-    // Round to nearest 45 degrees (or 22.5 for corner mounting)
-    let corner_raised = (Math.abs(pitch_change) > 13 && Math.abs(pitch_change) < 30 &&
-                        Math.abs(roll_change) > 13 && Math.abs(roll_change) < 30);
-    
+    // Check for 45° mounting (25.5mm boards)
+    let corner_raised = false;
+    let pitch_change = Math.abs(raw_changed[0]);
+    let roll_change = Math.abs(raw_changed[1]);
+
+    if (pitch_change > 20 && pitch_change < 40 &&
+        roll_change > 20 && roll_change < 40 &&
+        Math.abs(pitch_change - roll_change) < 15) {  
+            corner_raised = true;
+    }
+
     if (corner_raised) {
         yaw = Math.round(yaw / 22.5) * 22.5;
     } else {
         yaw = Math.round(yaw / 45) * 45;
     }
     
-    return yaw % 360;
+    return yaw + 360 % 360;
 }
 
 function accAutoAlignCompass() {
@@ -54,9 +61,9 @@ function accAutoAlignCompass() {
     
     // Determine yaw correction needed
     if ( (Math.abs(this.heading_flat % 45) < 15) && Math.abs(correction_needed % 45) < 15 ) {
-        yaw_correction_needed = ( Math.round(correction_needed / 45) * 45 ) % 360;
+        yaw_correction_needed = ( Math.round(correction_needed / 45) * 45 + 360 ) % 360;
     } else {
-        yaw_correction_needed = ( Math.round(correction_needed / 90) * 90 ) % 360;
+        yaw_correction_needed = ( Math.round(correction_needed / 90) * 90 + 360 ) % 360;
     }
 
     console.log("heading_flat: " + this.heading_flat + ", change: " + heading_change + ", correction: " + correction_needed % 360);

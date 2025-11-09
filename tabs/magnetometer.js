@@ -547,7 +547,7 @@ TABS.magnetometer.initialize = function (callback) {
    
 
     function rad2degrees(radians) {
-        return Math.round(radians * (180/Math.PI)) % 360;
+        return Math.round(radians * (180/Math.PI) + 360) % 360;
     }
 
 
@@ -629,8 +629,9 @@ TABS.magnetometer.initialize = function (callback) {
 
 
 
-        let roll = ( Math.atan2(acc_g_flat[1], acc_g_flat[2]) * 180/Math.PI ) % 360;
-        let pitch = ( Math.atan2(-1 * acc_g_flat[0], Math.sqrt(acc_g_flat[1] ** 2 + acc_g_flat[2] ** 2)) * 180/Math.PI ) % 360;
+        let roll = (Math.atan2(acc_g_flat[1], acc_g_flat[2]) * 180/Math.PI + 360) % 360;
+        let pitch = ( Math.atan2(-1 * acc_g_flat[0], Math.sqrt(acc_g_flat[1] ** 2 + acc_g_flat[2] ** 2)) * 180/Math.PI +
+        360) % 360;
         self.acc_flat_xyz = new Array(pitch, roll, 0);
         console.log("pitch: " + pitch + ", roll: " + roll);
 
@@ -646,6 +647,10 @@ TABS.magnetometer.initialize = function (callback) {
     }
 
 
+
+    function normalizeAngle(angle) {
+        return (angle + 360) % 360;
+    }
 
     function accAutoAlignRead45() {
         var changed = [0, 0, 0];
@@ -668,14 +673,16 @@ TABS.magnetometer.initialize = function (callback) {
  
         // Check for 45° mounting (25.5mm boards)
         let corner_raised = false;
-        if (
-               Math.abs(raw_changed[0]) > 13 &&  Math.abs(raw_changed[0]) < 30 &&
-               Math.abs(raw_changed[1]) > 13 &&  Math.abs(raw_changed[1]) < 30
-        ) {
-            corner_raised = true;
+        let pitch_change = Math.abs(raw_changed[0]);
+        let roll_change = Math.abs(raw_changed[1]);
+
+        if (pitch_change > 20 && pitch_change < 40 &&
+            roll_change > 20 && roll_change < 40 &&
+            Math.abs(pitch_change - roll_change) < 15) {
+                corner_raised = true;
         }
 
-        for (i = 0; i < acc_g_45.length; i++) {
+        for (i = 0; i < 2; i++) {
             if (corner_raised) {
                 changed[i] = ( 360 + Math.round(raw_changed[i] / 22) * 22 ) % 360;
             } else {
@@ -708,30 +715,29 @@ TABS.magnetometer.initialize = function (callback) {
        	// planet.position.applyQuaternion(quaternion);
         
         let upside = 'up';
-        // If the board is reading as upside down, fix that.
-        if ( roll > 120 ) {
-            // self.acc_flat_xyz[1] = (self.acc_flat_xyz[1] + 180) % 360;
+        if (acc_g_45 < 0) {  // Z acceleration is negative when upside down
             upside = 'down';
         }
-    
+
         console.log("changed:");
         console.log(changed);
         console.log("upside: " + upside);
     
-        acc_yaw = accComputeYaw(changed, upside);
+        let acc_yaw = accComputeYaw(changed, upside);
         self.acc_flat_xyz[2] = acc_yaw;
     
     
         // Ray TODO rotate based on current board alignment (board) and new board alignment (compass)
         // The acc readings are relative to the current settings. :(
         // Alternatively, set alignments to 0,0,0, save and reboot, then finish the wizard.
-        let newPitch = ( self.boardAlignmentConfig.saved_pitch + (Math.round(self.acc_flat_xyz[0] / 45) * 45) ) % 360;
-        let newRoll  = ( self.boardAlignmentConfig.saved_roll  + (Math.round(self.acc_flat_xyz[1] / 45) * 45) ) % 360;
-        let newYaw   = ( self.boardAlignmentConfig.saved_yaw   + acc_yaw ) % 360;
-    
-        updateBoardPitchAxis(newPitch % 360 );
-        updateBoardRollAxis (newRoll  % 360 );
-        updateBoardYawAxis(newYaw % 360);
+
+        let newPitch = normalizeAngle(self.boardAlignmentConfig.saved_pitch + (Math.round(self.acc_flat_xyz[0] / 45) * 45));
+        let newRoll  = normalizeAngle(self.boardAlignmentConfig.saved_roll  + (Math.round(self.acc_flat_xyz[1] / 45) * 45));
+        let newYaw   = normalizeAngle(self.boardAlignmentConfig.saved_yaw   + acc_yaw);
+
+        updateBoardPitchAxis(newPitch);
+        updateBoardRollAxis (newRoll);
+        updateBoardYawAxis(newYaw);
     
     
         const quaternion = new THREE.Quaternion();
@@ -760,7 +766,7 @@ TABS.magnetometer.initialize = function (callback) {
         let pitch = Math.atan2(-1 * acc_g_45[0], Math.sqrt(acc_g_45[1] ** 2 + acc_g_45[2] ** 2)) * 180/Math.PI;
         let acc_45_xyz = new Array(pitch, roll, 0);
 
-        for (i = 0; i < acc_g_45.length; i++) {
+        for (i = 0; i < 2; i++) {
             self.acc_flat_xyz[i] = Math.round( self.acc_flat_xyz[i] / 45 ) * 45;
             // acc_45_xyz[i] = rad2degrees(acc_45_xyz[i]);
             changed[i] = ( 360 + Math.round((self.acc_flat_xyz[i] - acc_45_xyz[i]) / 45) * 45 ) % 360;
