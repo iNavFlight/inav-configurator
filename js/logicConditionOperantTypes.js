@@ -69,6 +69,7 @@ const OPERAND_TYPES = {
             46: "Minimum Ground Speed [m/s]",
             47: "Horizontal Wind Speed [cm/s]",
             48: "Wind Direction [deg]",
+            49: "Relative Wind Offset [deg]",
         }
     },
     3: {
