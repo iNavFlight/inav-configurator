@@ -38,7 +38,7 @@ function accComputeYaw(changed, upside) {
         yaw = Math.round(yaw / 45) * 45;
     }
     
-    return yaw + 360 % 360;
+    return (yaw + 360) % 360;
 }
 
 function accAutoAlignCompass() {
