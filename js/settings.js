@@ -222,9 +222,10 @@ var Settings = (function () {
             // Angles
             'centideg'      : 'centi&deg;',
             'centideg-deg'  : 'centi&deg;', // Centidegrees, but always converted to degrees by default
-            'deg'           : '&deg;',
             'decideg'       : 'deci&deg;',
             'decideg-lrg'   : 'deci&deg;', // Decidegrees, but always converted to degrees by default
+            'deg'           : '&deg;',
+            'decadeg'       : 'deca&deg;',
             // Rotational speed
             'degps'     : '&deg; per second',
             'decadegps' : 'deca&deg; per second',
@@ -270,9 +271,10 @@ var Settings = (function () {
             // Angles
             'centideg'      : 'CentiDegrees',
             'centideg-deg'  : 'CentiDegrees',
-            'deg'           : 'Degrees',
             'decideg'       : 'DeciDegrees',
             'decideg-lrg'   : 'DeciDegrees',
+            'deg'           : 'Degrees',
+            'decadeg'       : 'DecaDegrees',
             // Rotational speed
             'degps'     : 'Degrees per second',
             'decadegps' : 'DecaDegrees per second',
@@ -349,16 +351,19 @@ var Settings = (function () {
                 'tzhours' : 'TZHOURS'
             },
             'centideg' : {
-                'deg' : 0.1
+                'deg' : 100
             },
             'centideg-deg' : {
-                'deg' : 0.1
+                'deg' : 100
             },
             'decideg' : {
                 'deg' : 10.0
             },
             'decideg-lrg' : {
                 'deg' : 10.0
+            },
+            'decadeg' : {
+                'deg' : 0.1
             },
             'decadegps' : {
                 'degps' : 0.1
@@ -386,6 +391,7 @@ var Settings = (function () {
                 'centideg-deg' : 'deg',
                 'decideg' : 'deg',
                 'decideg-lrg' : 'deg',
+                'decadeg' : 'deg',
                 'decidegc' : 'degf',
             },
             1: { //metric
@@ -403,6 +409,7 @@ var Settings = (function () {
                 'centideg-deg' : 'deg',
                 'decideg' : 'deg',
                 'decideg-lrg' : 'deg',
+                'decadeg' : 'deg',
                 'decidegc' : 'degc',
             },
             2: { //metric with MPH
@@ -416,6 +423,7 @@ var Settings = (function () {
                 'centideg-deg' : 'deg',
                 'decideg' : 'deg',
                 'decideg-lrg' : 'deg',
+                'decadeg' : 'deg',
                 'msec' : 'sec',
                 'dsec' : 'sec',
                 'mins' : 'hours',
@@ -433,6 +441,7 @@ var Settings = (function () {
                 'centideg-deg' : 'deg',
                 'decideg' : 'deg',
                 'decideg-lrg' : 'deg',
+                'decadeg' : 'deg',
                 'msec' : 'sec',
                 'dsec' : 'sec',
                 'mins' : 'hours',
@@ -450,6 +459,7 @@ var Settings = (function () {
                 'centideg-deg' : 'deg',
                 'decideg' : 'deg',
                 'decideg-lrg' : 'deg',
+                'decadeg' : 'deg',
                 'msec' : 'sec',
                 'dsec' : 'sec',
                 'mins' : 'hours',
@@ -461,6 +471,7 @@ var Settings = (function () {
                 'decideg-lrg' : 'deg',
                 'centideg' : 'deg',
                 'centideg-deg' : 'deg',
+                'decadeg' : 'deg',
                 'tzmins' : 'tzhours',
             }
         };
