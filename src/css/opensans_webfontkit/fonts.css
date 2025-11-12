@@ -99,20 +99,20 @@ em {
 em strong {
     font-family: 'open_sansbold_italic';
     font-style:normal;
-    font-weight: normal;
+    font-weight: bold;
 }
 
 /*noinspection CssNoGenericFontName*/
 strong em {
     font-family: 'open_sansbold_italic';
     font-style:normal;
-    font-weight: normal;
+    font-weight: bold;
 }
 
 /*noinspection CssNoGenericFontName*/
 strong {
     font-family: 'open_sansbold';
-    font-weight: normal;
+    font-weight: bold;
     font-style: normal;
 }
 
