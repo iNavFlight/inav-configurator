@@ -935,11 +935,29 @@
     "serialrx_halfduplex": {
         "message": "Serial receiver half-duplex"
     },
+    "serialrx_frSkyPitchRollLabel": {
+        "message": "Use Pitch & Roll sensors in telemetry"
+    },
+    "serialrx_frSkyPitchRollHelp": {
+        "message": "This sends pitch and roll angle telemetry sensors instead of the standard raw acellerometer data sensors. This should be turned <strong>on</strong> if using the INAV OpenTX/EdgeTX or ETHOS telemetry dashboard LUA scripts."
+    },
+    "serialrx_frSkyFuelUnitLabel": {
+        "message": "SmartPort Fuel units"
+    },
+    "serialrx_frSkyFuelUnitHelp": {
+        "message": "Select the data that you want sent to the <strong>fuel</strong> telemetry sensor."
+    },
     "configurationFeaturesHelp": {
         "message": "<strong>Note:</strong> Not all combinations of features are valid.  When the flight controller firmware detects invalid feature combinations conflicting features will be disabled.<br /><strong>Note:</strong> Configure serial ports <span style=\"color: red\">before</span> enabling the features that will use the ports."
     },
     "configurationSerialRXHelp": {
         "message": "<strong>Note:</strong> Remember to configure a Serial Port (via Ports tab) for the serial receiver"
+    },
+    "configurationFrSkyOptions": {
+        "message": "FrSky Options"
+    },
+    "configurationFrSkyOptions_HELP": {
+        "message": "These options provide quick access to configure the SmartPort telemetry sensors to work with the OpenTX/EdgeTX and ETHOS telemetry LUA scripts. Please note that if you are using SBUS. You will need to set up SmartPort telemetry on a separate serial port."
     },
     "configurationSensorAlignmentMag": {
         "message": "MAG Alignment"
@@ -1285,9 +1303,6 @@
     },
     "portsHelp": {
         "message": "<strong>Note:</strong> not all combinations are valid.  When the flight controller firmware detects this the serial port configuration will be reset."
-    },
-    "portsMSPHelp": {
-        "message": "<strong>Note:</strong> Do <span style=\"color: red\">NOT</span> disable MSP on the first serial port unless you know what you are doing.  You may have to reflash and erase your configuration if you do."
     },
     "portsFirmwareUpgradeRequired": {
         "message": "Firmware upgrade <span style=\"color: red\">required</span>."
@@ -3668,6 +3683,9 @@
         "message": "Custom OSD elements"
     },
     "osd_custom_element_settings_HELP": {
+        "message": "For comprehensive details on how to use Custom OSD elements. Click this ?"
+    },
+    "osd_custom_element_settings_icons_HELP": {
         "message": "You can find the icon numbers by clicking this help button."
     },
     "custom_element": {
@@ -4051,10 +4069,10 @@
     "osdElement_VARIO_HELP": {
         "message": "Shows vertical speed using up or down arrows. Each arrow represents 10cm (~4 inches) per second."
     },
-    "osdElement_VARIO_NUM": {
-        "message": "Numeric vario"
+    "osdElement_VERTICAL_SPEED_INDICATOR": {
+        "message": "Vertical Speed Indicator"
     },
-    "osdElement_VARIO_NUM_HELP": {
+    "osdElement_VERTICAL_SPEED_INDICATOR_HELP": {
         "message": "Shows vertical speed using a number"
     },
     "osdElement_G_FORCE": {
@@ -4276,11 +4294,11 @@
     "osdPanServoIndex_HELP": {
         "message": "Set the is to the output number of the pan servo; as shown in the mixer outputs table. For example output S6."
     },
-    "osdPanServoPwm2centideg": {
+    "osdPanServoRangeDecadegrees": {
         "message": "Total degrees of movement of the pan servo"
     },
-    "osdPanServoPwm2centideg_HELP": {
-        "message": "Degrees of pan servo rotation. A servo with 180 degrees of rotation from 1000 to 2000 us PWM typically needs 180 for this setting. Make the value negative to inverse the direction."
+    "osdPanServoRangeDecadegrees_HELP": {
+        "message": "Degrees of pan servo rotation. A servo with 180 degrees of rotation typically needs 180 for this setting. Make the value negative to inverse the direction."
     },
     "osdPanServoIndicatorShowDegrees": {
         "message": "Show degrees of offset next to pan indicator"
@@ -5100,9 +5118,6 @@
     },
     "mapProvider": {
         "message": "Map Provider"
-    },
-    "mapApiKey": {
-        "message": "Map API key"
     },
     "proxyURL": {
         "message": "MapProxy URL"
