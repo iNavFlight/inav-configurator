@@ -84,6 +84,8 @@ SYM.HEADING_W = 0xCB;
 SYM.HEADING_DIVIDED_LINE = 0xCC;
 SYM.HEADING_LINE = 0xCD;
 SYM.VARIO_UP_2A = 0x155;
+SYM.THROTTLE_GAUGE_EMPTY = 0x16B;
+SYM.THROTTLE_GAUGE_FULL = 0x16D;
 SYM.M_S = 0x8F;
 SYM.FT_S = 0x8D;
 SYM.CLOCK = 0xA0;
@@ -139,6 +141,7 @@ SYM.BLACKBOX = 0xFE;
 SYM.PILOT_LOGO_SML_L = 0x1D5;
 SYM.PILOT_LOGO_SML_C = 0x1D6;
 SYM.PILOT_LOGO_SML_R = 0x1D7;
+SYM.MIN_GND_SPEED = 0xDE;
 
 SYM.AH_AIRCRAFT0 = 0x1A2;
 SYM.AH_AIRCRAFT1 = 0x1A3;
@@ -514,10 +517,13 @@ function osdDecimalsDistancePreview(prependedSymbol) {
         case 0: // Imperial
         case 3: // UK
             s += FONT.symbol(SYM.DIST_MI);
+            break;
         case 4: // GA
             s += FONT.symbol(SYM.DIST_NM);
+            break;
         default: // Metric
             s += FONT.symbol(SYM.DIST_KM);
+            break;
     }
 
     s = FONT.symbol(prependedSymbol) + s;
@@ -561,6 +567,7 @@ OSD.initData = function () {
             sidebar_scroll_arrows: null,
             units: null,
             stats_energy_unit: null,
+            adsb_warning_style: null,
         },
         alarms: {
             rssi: null,
@@ -598,7 +605,7 @@ OSD.DjiElements =  {
         "FLYMODE",
         "ESC_TEMPERATURE",
         "ALTITUDE",
-        "VARIO_NUM",
+        "VERTICAL_SPEED_INDICATOR",
         "CROSSHAIRS",
         "HORIZON_SIDEBARS",
         "PITCH_ANGLE",
@@ -635,6 +642,7 @@ OSD.DjiElements =  {
     ],
     craftNameElements: [
         "MESSAGES",
+        "THROTTLE_GAUGE",
         "THROTTLE_POSITION",
         "SCALED_THROTTLE_POSITION",
         "3D_SPEED",
@@ -692,6 +700,11 @@ OSD.constants = {
     AHISIDEBARWIDTHPOSITION: 7,
     AHISIDEBARHEIGHTPOSITION: 3,
 
+    ADSB_WARNING_STYLE: {
+        'COMPACT' : 0,
+        'EXTENDED' : 1,
+    },
+
     ALL_ALARMS: [
         {
             name: 'RSSI',
@@ -732,6 +745,7 @@ OSD.constants = {
             min: 0,
             max: altitude_alarm_max
         },
+
         {
             name: 'DIST',
             field: 'dist',
@@ -950,6 +964,15 @@ OSD.constants = {
                     preview: osdDecimalsRemainingFlightDistancePreview,
                 },
                 {
+                    name: 'THROTTLE_GAUGE',
+                    id: 168,
+                    preview: FONT.symbol(SYM.THROTTLE_GAUGE_EMPTY) + '\n' +
+                        FONT.symbol(SYM.THROTTLE_GAUGE_EMPTY) + '\n' +
+                        FONT.symbol(SYM.THROTTLE_GAUGE_FULL) + '\n' +
+                        FONT.symbol(SYM.THROTTLE_GAUGE_FULL) + '\n' +
+                        FONT.symbol(SYM.THROTTLE_GAUGE_FULL) + '\n'
+                },
+                {
                     name: 'THROTTLE_POSITION',
                     id: 9,
                     preview: ' ' + FONT.symbol(SYM.THR) + ' 69'
@@ -1025,6 +1048,28 @@ OSD.constants = {
                         }
 
                         return FONT.symbol(SYM.AIR) + speed;
+                    }
+                },
+                {
+                    name: 'MIN_GROUND_SPEED',
+                    id: 167,
+                    preview: function(osd_data) {
+                        var speed;
+                        switch (OSD.data.preferences.units) {
+                            case 0: // Imperial
+                            case 2: // Metric + MPH
+                            case 3: // UK
+                                speed = ' 22' + FONT.symbol(SYM.MPH);
+                                break;
+                            case 4: // GA
+                                speed = ' 19' + FONT.symbol(SYM.KT);
+                                break;
+                            default: // Metric
+                                speed = ' 35' + FONT.symbol(SYM.KMH);
+                                break;
+                        }
+
+                        return FONT.symbol(SYM.MIN_GND_SPEED) + speed;
                     }
                 },
                 {
@@ -1297,7 +1342,7 @@ OSD.constants = {
                         FONT.symbol(SYM.VARIO_UP_2A) + '\n'
                 },
                 {
-                    name: 'VARIO_NUM',
+                    name: 'VERTICAL_SPEED_INDICATOR',
                     id: 26,
                     preview: function(osd_data) {
                         switch (OSD.data.preferences.units) {
@@ -1743,7 +1788,43 @@ OSD.constants = {
                     name: 'ADSB_WARNING_MESSAGE',
                     id: 150,
                     min_version: '7.1.0',
-                    preview: FONT.symbol(SYM.ADSB) + '19.25' + FONT.symbol(SYM.DIR_TO_HOME+1) + '2.75',
+                    preview: function(osd_data) {
+
+                        var distanceSymbol;
+                        var distanceSymbolSmaller;
+                        var velocitySymbol;
+
+                        switch (OSD.data.preferences.units) {
+                            case 0: // Imperial
+                            case 2: // Metric + MPH
+                                distanceSymbol = SYM.KM;
+                                distanceSymbolSmaller = SYM.M;
+                                velocitySymbol = SYM.MPH;
+                                break;
+                            case 3: // UK
+                                distanceSymbol = SYM.MI;
+                                distanceSymbolSmaller = SYM.ALT_FT;
+                                velocitySymbol = SYM.MPH;
+                                break;
+                            case 4: // GA
+                                distanceSymbol = SYM.MI;
+                                distanceSymbolSmaller = SYM.ALT_FT;
+                                velocitySymbol = SYM.KT;
+                                break;
+                            default: // Metric
+                                distanceSymbol = SYM.KM;
+                                distanceSymbolSmaller = SYM.M;
+                                velocitySymbol = SYM.KMH;
+                                break;
+                        }
+
+                        var el =  FONT.symbol(SYM.ADSB) + FONT.embed_dot('9.28') + FONT.symbol(distanceSymbol) + FONT.symbol(SYM.SYM_HUD_CARDINAL+5) + FONT.embed_dot('-423') + FONT.symbol(distanceSymbolSmaller);
+                        if (OSD.data.preferences.adsb_warning_style !== null && OSD.data.preferences.adsb_warning_style === OSD.constants.ADSB_WARNING_STYLE.EXTENDED){
+                            el +=  "\n" + "HEAVY " + FONT.symbol(SYM.DIR_TO_HOME+1)+FONT.embed_dot('653') + FONT.symbol(velocitySymbol);
+                        }
+
+                        return el;
+                    },
                 },
                 {
                     name: 'ADSB_INFO',
@@ -2538,7 +2619,9 @@ OSD.msp = {
         result.push8(p.right_sidebar_scroll);
         result.push8(p.sidebar_scroll_arrows);
         result.push8(p.units);
-        result.push8(p.stats_energy_unit)
+        result.push8(p.stats_energy_unit);
+        result.push8(p.adsb_warning_style);
+
         return result;
     },
 
@@ -2555,6 +2638,7 @@ OSD.msp = {
         p.sidebar_scroll_arrows = prefs.readU8();
         p.units = prefs.readU8();
         p.stats_energy_unit = prefs.readU8();
+        p.adsb_warning_style = prefs.readU8();
     },
 
     encodeLayoutItem: function(layout, item, pos) {
@@ -3656,7 +3740,8 @@ TABS.osd.initialize = function (callback) {
             }
 
             GUI.content_ready(callback);
-        })));
+            updatePilotAndCraftNames();
+        }));
     });
 };
 

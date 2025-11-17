@@ -439,13 +439,9 @@ let WaypointCollection = function () {
         let sampleMaxNum;
         let sampleDistance;
 
-        if (globalSettings.mapProviderType == 'bing') {
-            sampleMaxNum = 1024;
-            sampleDistance = 30;
-        } else {    // use opentopodata.org instead
-            sampleMaxNum = 99;
-            sampleDistance = 60;
-        }
+        sampleMaxNum = 99;
+        sampleDistance = 60;
+        
 
         if (point2measure.length <= 2){
             samples = 1;
@@ -458,39 +454,23 @@ let WaypointCollection = function () {
         }
 
         let elevation = "N/A";
-        if (globalSettings.mapProviderType == 'bing') {
-            let elevationEarthModel = $('#elevationEarthModel').prop("checked") ? "ellipsoid" : "sealevel";
+        let coordList = "";
+        point2measure.forEach(function (item) {
+            coordList += item + '|';
+        });
+        const response = await fetch('https://api.opentopodata.org/v1/aster30m?locations='+coordList+'&samples='+String(samples+1));
+        const myJson = await response.json();
 
-            if (point2measure.length >1) {
-                const response = await fetch('http://dev.virtualearth.net/REST/v1/Elevation/Polyline?points='+point2measure+'&heights='+elevationEarthModel+'&samples='+String(samples+1)+'&key='+globalSettings.mapApiKey);
-                const myJson = await response.json();
-                elevation = myJson.resourceSets[0].resources[0].elevations;
-            }
-            else {
-                const response = await fetch('http://dev.virtualearth.net/REST/v1/Elevation/List?points='+point2measure+'&heights='+elevationEarthModel+'&key='+globalSettings.mapApiKey);
-                const myJson = await response.json();
-                elevation = myJson.resourceSets[0].resources[0].elevations;
-            }
-        }
-        else {
-            let coordList = "";
-            point2measure.forEach(function (item) {
-                coordList += item + '|';
-            });
-            const response = await fetch('https://api.opentopodata.org/v1/aster30m?locations='+coordList+'&samples='+String(samples+1));
-            const myJson = await response.json();
-
-            if (myJson.status == "OK") {
-                elevation = [];
-                for (var i = 0; i < myJson.results.length; i++){
-                    if (myJson.results[i].elevation == null) {
-                        elevation[i] = 0;
-                    } else {
-                        elevation[i] = myJson.results[i].elevation;
-                    }
+        if (myJson.status == "OK") {
+            elevation = [];
+            for (var i = 0; i < myJson.results.length; i++){
+                if (myJson.results[i].elevation == null) {
+                    elevation[i] = 0;
+                } else {
+                    elevation[i] = myJson.results[i].elevation;
                 }
             }
-        }
+        }        
         //console.log("elevation ", elevation);
         return [lengthMission, totalMissionDistance, samples, elevation, altPoint2measure, namePoint2measure, refPoint2measure];
     }

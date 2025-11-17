@@ -85,20 +85,11 @@ let FwApproach = function (number, approachAltAsl = 0, landAltAsl = 0, approachD
 
     self.getElevationFromServer = async function (lon, lat, globalSettings) {
         let elevation = "N/A";
-        if (globalSettings.mapProviderType == 'bing') {
-            let elevationEarthModel = $('#elevationEarthModel').prop("checked") ? "ellipsoid" : "sealevel";
-
-            const response = await fetch('http://dev.virtualearth.net/REST/v1/Elevation/List?points='+lat+','+lon+'&heights='+elevationEarthModel+'&key='+globalSettings.mapApiKey);
-            const myJson = await response.json();
-            elevation = myJson.resourceSets[0].resources[0].elevations[0];
-        }
-        else {
-            const response = await fetch('https://api.opentopodata.org/v1/aster30m?locations='+lat+','+lon);
-            const myJson = await response.json();
-            if (myJson.status == "OK" && myJson.results[0].elevation != null) {
-                elevation = myJson.results[0].elevation;
-            }
-        }
+        const response = await fetch('https://api.opentopodata.org/v1/aster30m?locations='+lat+','+lon);
+        const myJson = await response.json();
+        if (myJson.status == "OK" && myJson.results[0].elevation != null) {
+            elevation = myJson.results[0].elevation;
+        }    
         return elevation;
     }
 

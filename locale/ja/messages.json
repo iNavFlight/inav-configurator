@@ -922,11 +922,29 @@
     "serialrx_halfduplex": {
         "message": "シリアル受信機 半二重"
     },
+    "serialrx_frSkyPitchRollLabel": {
+        "message": "Use Pitch & Roll sensors in telemetry"
+    },
+    "serialrx_frSkyPitchRollHelp": {
+        "message": "これは標準の生加速度計センサーのデータではなく、ピッチおよびロール角度のテレメトリセンサーを送信します。 INAV OpenTX/EdgeTX または ETHOS テレメトリダッシュボードの LUA スクリプトを使用する場合、これを<strong>オン</strong>にする必要があります。"
+    },
+    "serialrx_frSkyFuelUnitLabel": {
+        "message": "SmartPort 燃料単位"
+    },
+    "serialrx_frSkyFuelUnitHelp": {
+        "message": "<strong>燃料</strong> テレメトリセンサーに送信するデータを選択してください。"
+    },
     "configurationFeaturesHelp": {
         "message": "<strong>注:</strong> 機能のすべての組み合わせが有効であるとは限りません。フライトコントローラのファームウェアが無効な機能の組み合わせを検出すると、競合する機能が無効になります。<br /><strong>注:</strong> ポートを使用する機能を<span style=\"color: red\">有効にする前に</span>シリアルポートを設定してください。"
     },
     "configurationSerialRXHelp": {
         "message": "<strong>注:</strong> シリアル受信機用にシリアルポート([ポート]タブ内)を忘れずに設定してください。"
+    },
+    "configurationFrSkyOptions": {
+        "message": "FrSky のオプション"
+    },
+    "configurationFrSkyOptions_HELP": {
+        "message": "これらのオプションは、SmartPort テレメトリセンサーを OpenTX/EdgeTX および ETHOS テレメトリ LUA スクリプトで動作させるための設定に、素早くアクセスできるようにします。SBUS を使用している場合は、別のシリアルポートで SmartPort テレメトリを設定する必要があることに注意してください。"
     },
     "configurationSensorAlignmentMag": {
         "message": "コンパス アライメント"
@@ -3632,6 +3650,9 @@
         "message": "カスタムOSD要素"
     },
     "osd_custom_element_settings_HELP": {
+        "message": "カスタム OSD 要素の使用方法の詳細については、こちらをクリック ?"
+    },
+    "osd_custom_element_settings_icons_HELP": {
         "message": "このヘルプボタンをクリックするとアイコン番号が表示されます。"
     },
     "custom_element": {
@@ -4009,10 +4030,10 @@
     "osdElement_VARIO_HELP": {
         "message": "矢印を使用して垂直速度を表示します。各矢印は毎秒約10cm (約4インチ) を表します。"
     },
-    "osdElement_VARIO_NUM": {
-        "message": "バリオ数値"
+    "osdElement_VERTICAL_SPEED_INDICATOR": {
+        "message": "昇降速度計"
     },
-    "osdElement_VARIO_NUM_HELP": {
+    "osdElement_VERTICAL_SPEED_INDICATOR_HELP": {
         "message": "数値で垂直速度を表示します"
     },
     "osdElement_G_FORCE": {
@@ -4234,11 +4255,11 @@
     "osdPanServoIndex_HELP": {
         "message": "ミキサー出力テーブルに表示されるパン・サーボの出力番号を設定します (例: 出力S6)。"
     },
-    "osdPanServoPwm2centideg": {
+    "osdPanServoRangeDecadegrees": {
         "message": "パン・サーボの全移動角度"
     },
-    "osdPanServoPwm2centideg_HELP": {
-        "message": "パン・サーボの回転角度です。1000〜2000usのPWMで180度回転するサーボの場合、通常この設定に180を入力します。方向を逆にするには値をマイナスにします。"
+    "osdPanServoRangeDecadegrees_HELP": {
+        "message": "パン・サーボの回転角度。回転範囲が180度のサーボの場合、通常この設定には180を指定します。値をマイナスにすると、回転方向が反転します。"
     },
     "osdPanServoIndicatorShowDegrees": {
         "message": "パン・インジケータの横にオフセット角度を表示"
@@ -5058,9 +5079,6 @@
     },
     "mapProvider": {
         "message": "地図プロバイダ"
-    },
-    "mapApiKey": {
-        "message": "地図APIキー"
     },
     "proxyURL": {
         "message": "MapProxy URL"

@@ -255,6 +255,12 @@ const LOGIC_OPERATORS = {
         hasOperand: [true, false],
         output: "boolean"
     },
+    56: {
+        name: "Override Minimum Ground Speed",
+        operandType: "Set Flight Parameter",
+        hasOperand: [true, false],
+        output: "boolean"
+    },
     42: {
         name: "Set Control Profile",
         operandType: "Set Flight Parameter",
