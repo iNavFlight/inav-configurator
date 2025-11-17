@@ -7,6 +7,7 @@ import { GUI, TABS } from './../js/gui';
 import FC from './../js/fc';
 import i18n from './../js/localization';
 import serialPortHelper from './../js/serialPortHelper';
+import jBox from 'jbox';
 
 TABS.ports = {};
 

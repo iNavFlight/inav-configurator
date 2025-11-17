@@ -3,7 +3,7 @@
 import Map from 'ol/Map.js';
 import OSM from 'ol/source/OSM.js';
 import TileWMS from 'ol/source/TileWMS'
-import BingMaps from 'ol/source/BingMaps'
+import XYZ from 'ol/source/XYZ.js';
 import TileLayer from 'ol/layer/Tile.js';
 import { fromLonLat } from 'ol/proj';
 import View from 'ol/View.js'
@@ -79,35 +79,35 @@ const groundstation = (function () {
 
         //initialte layers
         if (globalSettings.mapProviderType == 'esri') {
-            privateScope.mapLayers.push(new ol.layer.Tile({
-                source: new ol.source.XYZ({
+            privateScope.mapLayers.push(new TileLayer({
+                source: new XYZ({
                     url: 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
                     attributions: 'Source: Esri, Maxar, Earthstar Geographics, and the GIS User Community',
                     maxZoom: 19
                 })
             }));
-            privateScope.mapLayers.push(new ol.layer.Tile({
-                source: new ol.source.XYZ({
+            privateScope.mapLayers.push(new TileLayer({
+                source: new XYZ({
                     url: 'https://services.arcgisonline.com/arcgis/rest/services/Reference/World_Transportation/MapServer/tile/{z}/{y}/{x}',
                     maxZoom: 19
                 })
             }));
-            privateScope.mapLayers.push(new ol.layer.Tile({
-                source: new ol.source.XYZ({
+            privateScope.mapLayers.push(new TileLayer({
+                source: new XYZ({
                     url: 'https://services.arcgisonline.com/arcgis/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}',
                     maxZoom: 19
                 })
             }));
         } else if ( globalSettings.mapProviderType == 'mapproxy' ) {
-            privateScope.mapLayers.push(new ol.layer.Tile({
-                source: new ol.source.TileWMS({
+            privateScope.mapLayers.push(new TileLayer({
+                source: new oTileWMS({
                             url: globalSettings.proxyURL,
                             params: {'LAYERS':globalSettings.proxyLayer}
                         })
             }));
         } else {
-            privateScope.mapLayers.push(new ol.layer.Tile({
-                source: new ol.source.OSM()
+            privateScope.mapLayers.push(new TileLayer({
+                source: new OSM()
             }));
         }
 
@@ -118,8 +118,8 @@ const groundstation = (function () {
         });
 
         //initiate map handler
-        privateScope.mapHandler = new ol.Map({
-            target: document.getElementById('groundstation-map'),
+        privateScope.mapHandler = new Map({
+            target: 'groundstation-map',
             layers: privateScope.mapLayers,
             view: privateScope.mapView
         });

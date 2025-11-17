@@ -3,9 +3,9 @@
 import xml2js from 'xml2js';
 
 import Map from 'ol/Map.js';
+import XYZ from 'ol/source/XYZ.js';
 import OSM from 'ol/source/OSM.js';
 import TileWMS from 'ol/source/TileWMS'
-import BingMaps from 'ol/source/BingMaps'
 import TileLayer from 'ol/layer/Tile.js';
 import View from 'ol/View.js'
 import { fromLonLat, toLonLat, getPointResolution, METERS_PER_UNIT } from 'ol/proj';
@@ -93,7 +93,7 @@ const iconNames = [
     'icon_elevation_white.svg',
     'icon_multimission_white.svg'    
 ];
-
+var icons = {};
 ////////////////////////////////////
 //
 // Tab mission control block
@@ -2382,35 +2382,35 @@ TABS.mission_control.initialize = function (callback) {
         let control_list;
 
         if (globalSettings.mapProviderType == 'esri') {
-            mapLayers.push(new ol.layer.Tile({
-                source: new ol.source.XYZ({
+            mapLayers.push(new TileLayer({
+                source: new XYZ({
                             url: 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
                             attributions: 'Source: <a href="https://www.esri.com/" target="_blank">Esri</a>, Maxar, Earthstar Geographics, and the GIS User Community',
                             maxZoom: 19
                         })
             }));
-            mapLayers.push(new ol.layer.Tile({
-                    source: new ol.source.XYZ({
+            mapLayers.push(new TileLayer({
+                    source: new XYZ({
                                 url: 'https://services.arcgisonline.com/arcgis/rest/services/Reference/World_Transportation/MapServer/tile/{z}/{y}/{x}',
                                 maxZoom: 19
                             })
             }));
-            mapLayers.push(new ol.layer.Tile({
-                source: new ol.source.XYZ({
+            mapLayers.push(new TileLayer({
+                source: new XYZ({
                             url: 'https://services.arcgisonline.com/arcgis/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}',
                             maxZoom: 19
                         })
             }));
         } else if ( globalSettings.mapProviderType == 'mapproxy' ) {
-            mapLayers.push(new ol.layer.Tile({
-                source: new ol.source.TileWMS({
+            mapLayers.push(new TileLayer({
+                source: new TileWMS({
                             url: globalSettings.proxyURL,
                             params: {'LAYERS':globalSettings.proxyLayer}
                         })
             }));
         } else {
-            mapLayers.push(new ol.layer.Tile({
-                source: new ol.source.OSM()
+            mapLayers.push(new TileLayer({
+                source: new OSM()
             }));
         }
 
@@ -2438,17 +2438,17 @@ TABS.mission_control.initialize = function (callback) {
         //////////////////////////////////////////////////////////////////////////////////////////////
         // Map object definition
         //////////////////////////////////////////////////////////////////////////////////////////////
-        map = new ol.Map({
-            controls: ol.control.defaults({
+        map = new Map({
+            controls: defaultControls({
                 attributionOptions: {
                     collapsible: false
                 }
             }).extend(control_list),
-            interactions: ol.interaction.defaults().extend([new app.Drag()]),
+            interactions: defaultInteractions().extend([new Drag()]),
             layers: mapLayers,
-            target: document.getElementById('missionMap'),
-            view: new ol.View({
-                center: ol.proj.fromLonLat([lon, lat]),
+            target: 'missionMap',
+            view: new View({
+                center: fromLonLat([lon, lat]),
                 zoom: 2
             })
         });

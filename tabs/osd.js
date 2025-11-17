@@ -3741,7 +3741,7 @@ TABS.osd.initialize = function (callback) {
 
             GUI.content_ready(callback);
             updatePilotAndCraftNames();
-        }));
+        })));
     });
 };
 
