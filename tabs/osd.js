@@ -658,7 +658,8 @@ OSD.constants = {
         'DJIWTF',
         'AVATAR',
         'BF43COMPAT',
-        'BFHDCOMPAT'
+        'BFHDCOMPAT',
+        'AUTOHD'
     ],
     VIDEO_LINES: {
         PAL: 16,
@@ -667,7 +668,8 @@ OSD.constants = {
         DJIWTF: 22,
         AVATAR: 20,
         BF43COMPAT: 16,
-        BFHDCOMPAT: 20
+        BFHDCOMPAT: 20,
+        AUTOHD:22,
     },
     VIDEO_COLS: {
         PAL: 30,
@@ -676,7 +678,8 @@ OSD.constants = {
         DJIWTF: 60,
         AVATAR: 53,
         BF43COMPAT: 30,
-        BFHDCOMPAT: 53
+        BFHDCOMPAT: 53,
+        AUTOHD:60
     },
     VIDEO_BUFFER_CHARS: {
         PAL: 480,
@@ -685,7 +688,8 @@ OSD.constants = {
         DJIWTF: 1320,
         AVATAR: 1060,
         BF43COMPAT: 480,
-        BFHDCOMPAT: 1060
+        BFHDCOMPAT: 1060,
+        AUTOHD: 1320
     },
     UNIT_TYPES: [
         {name: 'osdUnitImperial', value: 0},
@@ -2501,6 +2505,11 @@ OSD.updateDisplaySize = function () {
     $('.third_left').toggleClass('preview_bfhdcompat_side', (video_type == 'BFHDCOMPAT'))
     $('.preview').toggleClass('preview_bfhdcompat cut43_left', (video_type == 'BFHDCOMPAT'))
     $('.third_right').toggleClass('preview_bfhdcompat_side', (video_type == 'BFHDCOMPAT'))
+    // -- AUTOHD
+    $('.third_left').toggleClass('preview_autohd_side', video_type == 'AUTOHD')
+    $('.preview').toggleClass('preview_autohd cut43_left', video_type == 'AUTOHD')
+    $('.third_right').toggleClass('preview_autohd_side', video_type == 'AUTOHD')
+ 
 
     OSD.GUI.updateGuidesView($('#videoGuides').find('input').is(':checked'));
 };
@@ -2792,7 +2801,7 @@ OSD.GUI.checkAndProcessSymbolPosition = function(pos, charCode) {
     }
 };
 
-const mspVideoSystem = [1,3,4,5,6,7];   // indexes of PAL, HDZERO, DJIWTF, AVATAR, BF43COMPAT & BFHDCOMPAT
+const mspVideoSystem = [1,3,4,5,6,7,8];   // indexes of PAL, HDZERO, DJIWTF, AVATAR, BF43COMPAT,  BFHDCOMPAT, AUTOHD
 const analogVideoSystem = [0,1,2];  // indexes of AUTO, PAL, & NTSC
 
 OSD.GUI.updateVideoMode = function() {
