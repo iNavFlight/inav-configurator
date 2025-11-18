@@ -1,5 +1,5 @@
 'use strict'
-import { error } from 'jquery';
+
 import { GUI } from './gui';
 
 const serialRXProtocolls = [
@@ -122,7 +122,7 @@ var SITLProcess = {
                     console.log(err);
             });
         } else if (GUI.operating_system == 'MacOS') {
-            sitlExePath = 'macos/inav_SITL';
+            sitlExePath = '/macos/inav_SITL';
             eepromPath = `${path}/${eepromFileName}`
             window.electronAPI.chmod(sitlExePath, 0o755).then(err => {
                 if (err)

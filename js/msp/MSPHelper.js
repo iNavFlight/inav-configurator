@@ -2859,6 +2859,7 @@ var mspHelper = (function () {
     };
 
     self.loadOutputMapping = function (callback) {
+        console.warn('Warning: self.loadOutputMapping is obsolete and may be removed in future versions. Please update usage.');
         MSP.send_message(MSPCodes.MSPV2_INAV_OUTPUT_MAPPING, false, false, callback);
     };
 

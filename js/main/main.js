@@ -11,7 +11,6 @@ import tcp from './tcp';
 import udp from './udp';
 import serial from './serial';
 import child_process from './child_process';
-import { mode } from 'd3';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 

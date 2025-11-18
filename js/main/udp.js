@@ -15,13 +15,13 @@ const udp = {
                     this._port = port;
                 });
 
-                this._socket.on('error', error => {
+                socket.on('error', error => {
                     if (!window.isDestroyed()) {
                         window.webContents.send('udpError', error); 
                     }
                 });
 
-                this._socket.on('message', (message, _rinfo) => {
+                socket.on('message', (message, _rinfo) => {
                     if (!window.isDestroyed()) {
                         window.webContents.send('udpMessage', message);
                     }

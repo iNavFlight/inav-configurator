@@ -5,7 +5,6 @@ contextBridge.exposeInMainWorld('electronAPI', {
   listSerialDevices: () => ipcRenderer.invoke('listSerialDevices'),
   storeGet: (key, defaultValue) => ipcRenderer.sendSync('storeGet', key, defaultValue),
   storeSet: (key, value) => ipcRenderer.send('storeSet', key, value),
-  storeSet: (key, value) => ipcRenderer.send('storeSet', key, value),
   storeDelete: (key) => ipcRenderer.send('storeDelete', key),
   appGetPath: (name) => ipcRenderer.sendSync('appGetPath', name),
   appGetVersion: () => ipcRenderer.sendSync('appGetVersion'),
