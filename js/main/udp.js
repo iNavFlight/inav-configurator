@@ -5,30 +5,30 @@ const socket = dgram.createSocket('udp4');
 
 const udp = {
     _id: 1,
-    _ip: false,
-    _port: false,
+    _ip: null,
+    _port: null,
     connect: function(ip, port, window = true) {
         return new Promise(resolve => {     
             try {
                 socket.bind(port, () => {
                     this._ip = ip;
                     this._port = port;
+                    resolve({ error: false, id: this._id++ });
                 });
 
                 socket.on('error', error => {
-                    if (!window.isDestroyed()) {
+                    if (window && typeof window.isDestroyed === 'function' && !window.isDestroyed()) {
                         window.webContents.send('udpError', error); 
                     }
                 });
 
                 socket.on('message', (message, _rinfo) => {
-                    if (!window.isDestroyed()) {
+                    if (window && typeof window.isDestroyed === 'function' && !window.isDestroyed()) {
                         window.webContents.send('udpMessage', message);
                     }
-                });
-                resolve({error: false, id: this._id++});                   
+                });                   
             } catch (err) {
-                resolve ({error: true, errorMsg: err});
+                resolve({error: true, errorMsg: err});
             }
         });
     },

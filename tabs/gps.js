@@ -114,8 +114,10 @@ TABS.gps.initialize = function (callback) {
         arrowIcon = (await import('./../images/icons/map/cf_icon_position.png?inline')).default;
     }
 
-    function load_html() {
-        import('./gps.html?raw').then(({default: html}) => GUI.load(html, Settings.processHtml(loadIcons().then(process_html))));
+    async function load_html() {
+        const { default: html } = await import('./gps.html?raw');
+        await loadIcons();
+        GUI.load(html, Settings.processHtml(process_html));
     }
 
     let cursorInitialized = false;

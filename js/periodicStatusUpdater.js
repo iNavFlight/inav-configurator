@@ -40,11 +40,11 @@ import MSPCodes from './msp/MSPCodes';
         var active = ((Date.now() - MSP.analog_last_received_timestamp) < publicScope.getUpdateInterval(CONFIGURATOR.connection.bitrate) * 3);
 
         if (FC.isModeEnabled('ARM')) {
-            $("#armedicon").removeClass('armed');
-            $("#armedicon").addClass('armed-active');
+            $("#armedIcon").removeClass('armed');
+            $("#armedIcon").addClass('armed-active');
         } else {
-            $("#armedicon").removeClass('armed-active');
-            $("#armedicon").addClass('armed');
+            $("#armedIcon").removeClass('armed-active');
+            $("#armedIcon").addClass('armed');
         }
         if (FC.isModeEnabled('FAILSAFE')) {
             $("#failsafeicon").removeClass('failsafe');

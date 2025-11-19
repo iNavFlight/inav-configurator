@@ -93,7 +93,9 @@ const iconNames = [
     'icon_elevation_white.svg',
     'icon_multimission_white.svg'    
 ];
-var icons = {};
+
+const icons = Object.create(null)
+
 ////////////////////////////////////
 //
 // Tab mission control block
@@ -181,19 +183,26 @@ TABS.mission_control.initialize = function (callback) {
         }
     }
     
+function iconKey(filename) {
+    // drop extension, keep base name (e.g., "icon_RTH")
+    return filename.replace(/\.(png|svg)$/i, '');
+}
+
     async function loadIcons() {
-        for (const icon of iconNames) {
-            const nameSplit = icon.split('.');
+        for (const fname of iconNames) {
             // Vites packager needs a bit help
-            var iconUrl;
-            if (nameSplit[1] == 'png') {
-                iconUrl = (await import(`./../images/icons/map/cf_${nameSplit[0]}.png?inline`)).default;
-            } else if (nameSplit[1] == 'svg') {
-                iconUrl = (await import(`./../images/icons/map/cf_${nameSplit[0]}.svg?inline`)).default;
+            const base = iconKey(fname);
+            const ext = fname.split('.').pop();
+            let iconUrl;
+            if (ext === 'png') {
+                iconUrl = (await import(`./../images/icons/map/cf_${base}.png?inline`)).default;
+            } else if (ext === 'svg') {
+                iconUrl = (await import(`./../images/icons/map/cf_${base}.svg?inline`)).default;
             }
-            if (iconUrl) {
-                icons[nameSplit[0]] = iconUrl;
+            if (!iconUrl) {
+               throw new Error(`Missing icon URL for ${fname}`);
             }
+            icons[base] = iconUrl;
         }
     }
 
@@ -281,7 +290,7 @@ TABS.mission_control.initialize = function (callback) {
                           anchor: [0.5, 0.5],
                           opacity: 1,
                           scale: 0.6,
-                          src: icons.icon_mission_airplane
+                          src: icons['icon_mission_airplane']
                       }))
                   });
 
@@ -308,7 +317,7 @@ TABS.mission_control.initialize = function (callback) {
                           anchor: [0.5, 1.0],
                           opacity: 1,
                           scale: 0.5,
-                          src: icons.icon_RTH
+                          src: icons['icon_RTH']
                       }))
                   });
 
@@ -621,7 +630,7 @@ TABS.mission_control.initialize = function (callback) {
                 anchor: [0.5, 1],
                 opacity: 1,
                 scale: 0.5,
-                src: safehome.isUsed() ? icons.icon_safehome_used : icons.icon_safehome
+                src: safehome.isUsed() ? icons['icon_safehome_used'] : icons['icon_safehome']
             })),
             text: new Text(({
                 text: String(Number(safehome.getNumber())+1),
@@ -841,7 +850,7 @@ TABS.mission_control.initialize = function (callback) {
                 anchor: [0.5, 1],
                 opacity: 1,
                 scale: 0.5,
-                src: geozone.getType() == GeozoneType.EXCULSIVE ? icons.icon_geozone_excl : icons.icon_geozone_incl
+                src: geozone.getType() == GeozoneType.EXCULSIVE ? icons['icon_geozone_excl'] : icons['icon_geozone_incl']
             })),
             text: new Text(({
                 text: String(number + 1),
@@ -1178,7 +1187,7 @@ TABS.mission_control.initialize = function (callback) {
                 anchor: [0.5, 1],
                 opacity: 1,
                 scale: 0.5,
-                src: icons.icon_home
+                src: icons['icon_home']
             })),
         });
     }
@@ -1641,7 +1650,7 @@ TABS.mission_control.initialize = function (callback) {
             featureArrow.setStyle(
                 new Style({
                     image: new Icon({
-                        src: icons.icon_arrow,
+                        src: icons['icon_arrow'],
                         scale: 0.3,
                         anchor: [0.5, 0.5],
                         rotateWithView: true,
@@ -1997,7 +2006,7 @@ TABS.mission_control.initialize = function (callback) {
         //      Drag behavior definition
         //////////////////////////////////////////////////////////////////////////////////////////////
 
-        class Drag extends PointerInteraction{
+        class Drag extends PointerInteraction {
             constructor() {
                 super ({
                     handleDownEvent: app.handleDownEvent,
@@ -2006,32 +2015,12 @@ TABS.mission_control.initialize = function (callback) {
                     handleUpEvent: app.handleUpEvent
                 });
 
-                /**
-                 * @type {ol.Pixel}
-                 * @private
-                 */
                 this.coordinate_ = null;
-
-                /**
-                 * @type {string|undefined}
-                 * @private
-                 */
                 this.cursor_ = 'pointer';
-
-                /**
-                 * @type {Feature}
-                 * @private
-                 */
                 this.feature_ = null;
-
-                /**
-                 * @type {string|undefined}
-                 * @private
-                 */
                 this.previousCursor_ = undefined;
             }
-        };
-
+        }
 
         app.ConvertCentimetersToMeters = function (val) {
             return parseInt(val) / 100;
@@ -2044,7 +2033,7 @@ TABS.mission_control.initialize = function (callback) {
                 var button = document.createElement('button');
 
                 button.innerHTML = ' ';
-                button.style = `background: url("${icons.settings_white}") no-repeat 1px -1px;background-color: rgba(0,60,136,.5);`;
+                button.style = `background: url("${icons['settings_white']}") no-repeat 1px -1px;background-color: rgba(0,60,136,.5);`;
                 
 
                 var handleShowSettings = function () {
@@ -2073,7 +2062,7 @@ TABS.mission_control.initialize = function (callback) {
                 var button = document.createElement('button');
 
                 button.innerHTML = ' ';
-                button.style = `background: url("${icons.icon_safehome_white}") no-repeat 1px -1px;background-color: rgba(0,60,136,.5);`;
+                button.style = `background: url("${icons['icon_safehome_white']}") no-repeat 1px -1px;background-color: rgba(0,60,136,.5);`;
                 
                 var handleShowSafehome = function () {
                     $('#missionPlannerSafehome').fadeIn(300);
@@ -2105,7 +2094,7 @@ TABS.mission_control.initialize = function (callback) {
                 var button = document.createElement('button');
 
                 button.innerHTML = ' ';
-                button.style = `background: url("${icons.icon_geozone_white}") no-repeat 1px -1px;background-color: rgba(0,60,136,.5);`;
+                button.style = `background: url("${icons['icon_geozone_white']}") no-repeat 1px -1px;background-color: rgba(0,60,136,.5);`;
                 
                 var handleShowGeozoneSettings = function () {
                     $('#missionPlannerGeozones').fadeIn(300);
@@ -2138,7 +2127,7 @@ TABS.mission_control.initialize = function (callback) {
                 var button = document.createElement('button');
 
                 button.innerHTML = ' ';
-                button.style = `background: url("${icons.icon_elevation_white}") no-repeat 1px -1px;background-color: rgba(0,60,136,.5);`;
+                button.style = `background: url("${icons['icon_elevation_white']}") no-repeat 1px -1px;background-color: rgba(0,60,136,.5);`;
 
                 var handleShowSettings = function () {
                     $('#missionPlannerHome').fadeIn(300);
@@ -2171,7 +2160,7 @@ TABS.mission_control.initialize = function (callback) {
                 var button = document.createElement('button');
 
                 button.innerHTML = ' ';
-                button.style = `background: url("${icons.icon_multimission_white}") no-repeat 1px -1px;background-color: rgba(0,60,136,.5);`;
+                button.style = `background: url("${icons['icon_multimission_white']}") no-repeat 1px -1px;background-color: rgba(0,60,136,.5);`;
 
                 var handleShowSettings = function () {
                     $('#missionPlannerMultiMission').fadeIn(300);

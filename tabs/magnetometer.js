@@ -739,11 +739,11 @@ TABS.magnetometer.initialize3D = function () {
     magModels = [];
     //Load the UAV model
     import(`./../resources/models/model_${model_file}.gltf`).then(({default: model}) => {
-    loader.load(model, (obj) => {
-            const model = obj.scene;
+    loader.load(modelUrl, (obj) => {
+            const modelScene = obj.scene;
             const scaleFactor = 15;
-            model.scale.set(scaleFactor, scaleFactor, scaleFactor);
-            modelWrapper.add(model);
+            modelScene.scale.set(scaleFactor, scaleFactor, scaleFactor);
+            modelWrapper.add(modelScene);
 
             const gpsOffset = getDistanceByModelName(model_file);
 

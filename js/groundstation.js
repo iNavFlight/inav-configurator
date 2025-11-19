@@ -10,7 +10,7 @@ import View from 'ol/View.js'
 import Style from 'ol/style/Style'
 import Icon from 'ol/style/Icon';
 import Point from 'ol/geom/Point.js';
-import Feature from 'ol/format/Feature';
+import Feature from 'ol/Feature';
 import VectorSource from 'ol/source/Vector.js';
 import VectorLayer from 'ol/layer/Vector.js';
 
