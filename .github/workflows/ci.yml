@@ -129,7 +129,7 @@ jobs:
                 path: ./out/make/zip/linux/arm64/*.zip
 
     build-mac-arm64:
-        runs-on: macos-13
+        runs-on: macos-15
         steps:
         - uses: actions/checkout@v4
         - name: Setup environment
@@ -178,7 +178,7 @@ jobs:
             path: ./out/make/*arm64*.dmg
 
     build-mac:
-        runs-on: macos-13
+        runs-on: macos-15-intel
         steps:
         - uses: actions/checkout@v4
         - name: Setup environment
