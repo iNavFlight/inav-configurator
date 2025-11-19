@@ -2009,10 +2009,10 @@ function iconKey(filename) {
         class Drag extends PointerInteraction {
             constructor() {
                 super ({
-                    handleDownEvent: app.handleDownEvent,
-                    handleDragEvent: app.handleDragEvent,
-                    handleMoveEvent: app.handleMoveEvent,
-                    handleUpEvent: app.handleUpEvent
+                    handleDownEvent: (evt) => app.handleDownEvent(evt),
+                    handleDragEvent: (evt) => app.handleDragEvent(evt),
+                    handleMoveEvent: (evt) => app.handleMoveEvent(evt),
+                    handleUpEvent: (evt) => app.handleUpEvent(evt)
                 });
 
                 this.coordinate_ = null;
