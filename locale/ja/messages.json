@@ -5377,11 +5377,11 @@
     "motor_direction_inverted_hint": {
         "message": "モーターの回転方向が逆で、プロペラが反対方向に取り付けられている場合に有効にします。"
     },
-    "mixer_pid_profile_linking": {
+    "mixer_control_profile_linking": {
         "message": "Control Profileは、Mixer Profileのインデックスと同じインデックスを使用します"
     },
-    "mixer_pid_profile_linking_hint": {
-        "message": "mixer_pid_profile_linking: Control Profileの切り替えをMixer Profileの切り替えで処理したい場合は、両方のMixer Profileで有効にします。(VTOL / 混合プラットフォームタイプの設定で推奨)"
+    "mixer_control_profile_linking_hint": {
+        "message": "mixer_control_profile_linking: Control Profileの切り替えをMixer Profileの切り替えで処理したい場合は、両方のMixer Profileで有効にします。(VTOL / 混合プラットフォームタイプの設定で推奨)"
     },
     "blackboxFields": {
         "message": "Blackboxフィールド"

@@ -997,7 +997,7 @@ var FC = {
             'battery_capacity_warning',
             'battery_capacity_critical',
             'battery_capacity_unit',
-            'controlrate_profile',
+            'use_control_profile',
             'throttle_scale',
             'throttle_idle',
             'turtle_mode_power_factor',
