@@ -1,4 +1,6 @@
 /**
+'use strict';
+
  * INAV Transpiler Diagnostics Provider
  * 
  * Location: tabs/programming/transpiler/editor/diagnostics.js
@@ -7,12 +9,12 @@
  * Integrates with Monaco Editor to show errors, warnings, and hints inline.
  */
 
-import { getDefinition, isWritable } from '../api/definitions/index.js';
+const { getDefinition, isWritable  } = require('../api/definitions/index.js');
 
 /**
  * Severity levels for diagnostics
  */
-export const DiagnosticSeverity = {
+const DiagnosticSeverity = {
   Error: 8,      // Red squiggly - code won't transpile
   Warning: 4,    // Yellow squiggly - might not work as expected
   Info: 2,       // Blue squiggly - suggestion
@@ -24,7 +26,7 @@ export const DiagnosticSeverity = {
  * @param {Object} monaco - Monaco editor instance
  * @returns {Object} Diagnostics provider
  */
-export function createDiagnosticsProvider(monaco) {
+function createDiagnosticsProvider(monaco) {
   return {
     /**
      * Validate code and return diagnostics
@@ -498,7 +500,7 @@ function getQuickFixesForCode(code, model, range) {
  * @param {Object} monaco - Monaco editor instance
  * @param {Object} editor - Monaco editor instance
  */
-export function setupDiagnostics(monaco, editor) {
+function setupDiagnostics(monaco, editor) {
   const diagnosticsProvider = createDiagnosticsProvider(monaco);
   
   // Validate on content change
@@ -518,3 +520,9 @@ export function setupDiagnostics(monaco, editor) {
   const diagnostics = diagnosticsProvider.validate(model);
   monaco.editor.setModelMarkers(model, 'inav-transpiler', diagnostics);
 }
+
+module.exports = {
+    DiagnosticSeverity,
+    createDiagnosticsProvider,
+    setupDiagnostics
+};

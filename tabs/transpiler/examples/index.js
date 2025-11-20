@@ -1,4 +1,6 @@
 /**
+'use strict';
+
  * INAV Example Scripts
  * 
  * Location: tabs/programming/transpiler/examples/index.js
@@ -6,7 +8,7 @@
  * Collection of example scripts demonstrating INAV JavaScript API
  */
 
-export const examples = {
+const examples = {
   'vtx-distance': {
     name: 'VTX Power by Distance',
     description: 'Increase VTX power automatically when far from home',
@@ -142,14 +144,14 @@ when(() => rc[8].high && flight.gpsValid && flight.gpsSats > 8, () => {
 /**
  * Get example by ID
  */
-export function getExample(id) {
+function getExample(id) {
   return examples[id];
 }
 
 /**
  * Get all examples in a category
  */
-export function getExamplesByCategory(category) {
+function getExamplesByCategory(category) {
   return Object.entries(examples)
     .filter(([_, ex]) => ex.category === category)
     .map(([id, ex]) => ({ id, ...ex }));
@@ -158,8 +160,15 @@ export function getExamplesByCategory(category) {
 /**
  * Get all categories
  */
-export function getCategories() {
+function getCategories() {
   const categories = new Set();
   Object.values(examples).forEach(ex => categories.add(ex.category));
   return Array.from(categories).sort();
 }
+
+module.exports = {
+    examples,
+    getExample,
+    getExamplesByCategory,
+    getCategories
+};

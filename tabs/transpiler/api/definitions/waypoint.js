@@ -1,4 +1,6 @@
 /**
+'use strict';
+
  * INAV Waypoint Definitions
  * 
  * Location: tabs/programming/transpiler/api/definitions/waypoint.js
@@ -6,7 +8,7 @@
  * Waypoint mission parameters (all read-only)
  */
 
-export const waypointDefinitions = {
+const waypointDefinitions = {
   
   isActive: {
     type: 'boolean',
@@ -145,3 +147,5 @@ export const waypointDefinitions = {
     }
   }
 };
+
+module.exports = { waypointDefinitions };

@@ -1,4 +1,6 @@
 /**
+'use strict';
+
  * INAV API Definitions Aggregator
  * 
  * Location: tabs/programming/transpiler/api/definitions/index.js
@@ -8,16 +10,16 @@
  */
 
 // Import all definition modules (same directory, relative paths)
-import { flightDefinitions } from './flight.js';
-import { overrideDefinitions } from './override.js';
-import { waypointDefinitions } from './waypoint.js';
-import { rcDefinitions } from './rc.js';
+const { flightDefinitions  } = require('./flight.js');
+const { overrideDefinitions  } = require('./override.js');
+const { waypointDefinitions  } = require('./waypoint.js');
+const { rcDefinitions  } = require('./rc.js');
 
 /**
  * Complete INAV API definitions
  * Single source of truth for all INAV JavaScript API
  */
-export const apiDefinitions = {
+const apiDefinitions = {
   flight: flightDefinitions,
   override: overrideDefinitions,
   waypoint: waypointDefinitions,
@@ -92,7 +94,7 @@ export const apiDefinitions = {
  * @param {string} path - Dot-separated path (e.g., "flight.altitude")
  * @returns {Object|null} Definition object or null if not found
  */
-export function getDefinition(path) {
+function getDefinition(path) {
   const parts = path.split('.');
   let current = apiDefinitions;
   
@@ -112,7 +114,7 @@ export function getDefinition(path) {
  * @param {string} path - Dot-separated path (e.g., "flight")
  * @returns {string[]} Array of property names
  */
-export function getProperties(path) {
+function getProperties(path) {
   const def = path ? getDefinition(path) : apiDefinitions;
   if (!def || typeof def !== 'object') {
     return [];
@@ -125,7 +127,7 @@ export function getProperties(path) {
  * @param {string} path - Dot-separated path
  * @returns {boolean} True if writable
  */
-export function isWritable(path) {
+function isWritable(path) {
   // Only override, gvar, and pid properties are writable
   return path.startsWith('override.') || 
          path.startsWith('gvar') || 
@@ -137,7 +139,7 @@ export function isWritable(path) {
  * @param {string} path - Dot-separated path
  * @returns {Object|null} {type, value} or null
  */
-export function getINAVOperand(path) {
+function getINAVOperand(path) {
   const def = getDefinition(path);
   return def?.inavOperand || null;
 }
@@ -147,7 +149,16 @@ export function getINAVOperand(path) {
  * @param {string} path - Dot-separated path
  * @returns {number|null} Operation ID or null
  */
-export function getINAVOperation(path) {
+function getINAVOperation(path) {
   const def = getDefinition(path);
   return def?.inavOperation || null;
 }
+
+module.exports = {
+    apiDefinitions,
+    getDefinition,
+    getProperties,
+    isWritable,
+    getINAVOperand,
+    getINAVOperation
+};

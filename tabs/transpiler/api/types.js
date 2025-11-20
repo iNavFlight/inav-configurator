@@ -1,4 +1,6 @@
 /**
+'use strict';
+
  * INAV API Type Definitions
  * JSDoc type definitions for IDE support
  * 
@@ -26,7 +28,7 @@
  * @param {Object} apiDefinitions - Complete API definitions object
  * @returns {string} TypeScript definition string for Monaco
  */
-export function generateTypeDefinitions(apiDefinitions) {
+function generateTypeDefinitions(apiDefinitions) {
   let dts = `
 /**
  * INAV JavaScript API
@@ -150,3 +152,5 @@ function mapJSTypeToTS(jsType) {
 function capitalize(str) {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
+
+module.exports = { generateTypeDefinitions };

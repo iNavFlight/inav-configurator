@@ -1,20 +1,19 @@
 /**
  * INAV JavaScript Programming Tab
  * 
- * Location: tabs/javascript_programming/javascript_programming.js
- * 
  * Integrates Monaco Editor with INAV transpiler and MSP communication.
- * Based on the existing tabs/programming.js structure.
  */
 
 'use strict';
 
-// Import transpiler (adjust path as needed)
-// In production, this would be: import { Transpiler } from './transpiler/index.js';
-// For now, we'll assume it's available as a global or via script tag
+const { GUI, TABS } = require('./../js/gui');
+const path = require('path');
+const i18n = require('./../js/localization');
+// import { Transpiler } from './transpiler/index.js';
+const Transpiler = require('./transpiler/index.js');
 
 TABS.javascript_programming = {
-    
+
     currentProgrammingPIDProfile: null,
     isDirty: false,
     editor: null,
@@ -31,7 +30,7 @@ TABS.javascript_programming = {
         }
         
         // Load HTML
-        $('#content').load("./tabs/javascript_programming/javascript_programming.html", function () {
+        $('#content').load("./tabs/javascript_programming.html", function () {
             
             // Initialize transpiler
             self.initTranspiler();
@@ -72,9 +71,24 @@ TABS.javascript_programming = {
     },
     
     /**
-     * Load Monaco Editor from CDN
+     * Load Monaco Editor
      */
     loadMonacoEditor: function(callback) {
+        const loader = require('@monaco-editor/loader');
+        const monaco = require('monaco-editor');
+        const self = this;
+
+        if (typeof monaco !== 'undefined') {
+            self.setupMonaco();
+            callback();
+        }
+    },
+
+/**
+ * Load Monaco Editor from CDN
+ */
+    // Ray TODO - Remvoe this function if we load it locally
+    loadMonacoEditorCDN: function(callback) {
         const self = this;
         
         // Check if Monaco is already loaded
@@ -84,19 +98,46 @@ TABS.javascript_programming = {
             return;
         }
         
-        // Load Monaco from CDN
-        require.config({ 
-            paths: { 
-                'vs': 'https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs' 
-            }
-        });
+        // Save Node.js require
+        const nodeRequire = window.require;
         
-        require(['vs/editor/editor.main'], function() {
-            self.setupMonaco();
+        // Load Monaco Editor loader script
+        const loaderScript = document.createElement('script');
+        loaderScript.src = 'https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs/loader.js';
+        
+        loaderScript.onload = function() {
+            // Now window.require is RequireJS's require (AMD)
+            window.require.config({ 
+                paths: { 
+                    'vs': 'https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs' 
+                }
+            });
+            
+            // Load Monaco editor main module
+            window.require(['vs/editor/editor.main'], function() {
+                // Restore Node.js require after Monaco loads
+                window.require = nodeRequire;
+                
+                self.setupMonaco();
+                callback();
+            });
+        };
+        
+        loaderScript.onerror = function() {
+            console.error('Failed to load Monaco Editor');
+            GUI.log('Failed to load Monaco Editor from CDN');
+            
+            // Restore Node.js require even on error
+            window.require = nodeRequire;
+            
+            // Fallback: show a basic textarea
+            self.createFallbackEditor();
             callback();
-        });
+        };
+        
+        document.head.appendChild(loaderScript);
     },
-    
+
     /**
      * Set up Monaco Editor with INAV JavaScript support
      */
@@ -149,6 +190,45 @@ TABS.javascript_programming = {
         this.editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () => {
             self.transpileCode();
         });
+    },
+
+    /**
+     * Create a fallback basic editor if Monaco fails to load
+     */
+    createFallbackEditor: function() {
+        const container = document.getElementById('monaco-editor');
+        container.innerHTML = '';
+        
+        const textarea = document.createElement('textarea');
+        textarea.style.width = '100%';
+        textarea.style.height = '100%';
+        textarea.style.fontFamily = 'monospace';
+        textarea.style.fontSize = '13px';
+        textarea.style.border = 'none';
+        textarea.style.outline = 'none';
+        textarea.style.padding = '10px';
+        textarea.style.backgroundColor = '#1e1e1e';
+        textarea.style.color = '#d4d4d4';
+        textarea.value = this.getDefaultCode();
+        
+        container.appendChild(textarea);
+        
+        // Create a simple editor interface
+        const self = this;
+        this.editor = {
+            getValue: () => textarea.value,
+            setValue: (value) => { textarea.value = value; },
+            onDidChangeModelContent: (cb) => { textarea.addEventListener('input', cb); },
+            addCommand: () => {},
+            dispose: () => {}
+        };
+        
+        textarea.addEventListener('input', function() {
+            self.isDirty = true;
+            self.currentCode = textarea.value;
+        });
+        
+        GUI.log('Using fallback text editor (Monaco failed to load)');
     },
     
     /**

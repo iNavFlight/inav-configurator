@@ -1,4 +1,6 @@
 /**
+'use strict';
+
  * INAV Code Generator
  * 
  * Location: tabs/programming/transpiler/transpiler/codegen.js
@@ -7,13 +9,13 @@
  * This file rarely needs changes - new features are added to definitions only!
  */
 
-import { getDefinition, getINAVOperand, getINAVOperation } from '../api/definitions/index.js';
+const { getDefinition, getINAVOperand, getINAVOperation  } = require('../api/definitions/index.js');
 
 /**
  * INAV Code Generator
  * Converts analyzed AST to INAV CLI commands
  */
-export class INAVCodeGenerator {
+class INAVCodeGenerator {
   constructor() {
     this.logicConditions = [];
     this.lcIndex = 0;
@@ -358,3 +360,5 @@ export class INAVCodeGenerator {
     }
   }
 }
+
+module.exports = { INAVCodeGenerator };

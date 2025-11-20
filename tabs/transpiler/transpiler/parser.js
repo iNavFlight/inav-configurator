@@ -1,4 +1,6 @@
 /**
+'use strict';
+
  * INAV JavaScript Parser
  * 
  * Location: tabs/programming/transpiler/transpiler/parser.js
@@ -11,7 +13,7 @@
  * Simple JavaScript Parser for INAV subset
  * Parses JavaScript code into a simple AST
  */
-export class JavaScriptParser {
+class JavaScriptParser {
   /**
    * Parse JavaScript code
    * @param {string} code - JavaScript source code
@@ -296,3 +298,6 @@ export class JavaScriptParser {
     return str;
   }
 }
+
+
+module.exports = { JavaScriptParser };

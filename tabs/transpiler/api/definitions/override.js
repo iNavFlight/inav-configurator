@@ -1,4 +1,6 @@
 /**
+'use strict';
+
  * INAV Override Definitions (Enhanced)
  * 
  * Location: tabs/programming/transpiler/api/definitions/override.js
@@ -21,7 +23,7 @@ function standardLogic(lcIndex, activator, operation, operandA, operandB = 0) {
   return `logic ${lcIndex} 1 ${activator} ${operation} 0 ${operandA} 0 ${operandB} 0`;
 }
 
-export const overrideDefinitions = {
+const overrideDefinitions = {
   
   // === Safety Overrides ===
   
@@ -479,7 +481,7 @@ export const overrideDefinitions = {
  * @param {string} category - Category name
  * @returns {Object} Filtered overrides
  */
-export function getOverridesByCategory(category) {
+function getOverridesByCategory(category) {
   const result = {};
   
   function traverse(obj, path = '') {
@@ -502,7 +504,7 @@ export function getOverridesByCategory(category) {
  * Get all categories
  * @returns {string[]} List of unique categories
  */
-export function getCategories() {
+function getCategories() {
   const categories = new Set();
   
   function traverse(obj) {
@@ -518,3 +520,9 @@ export function getCategories() {
   traverse(overrideDefinitions);
   return Array.from(categories).sort();
 }
+
+module.exports = {
+    overrideDefinitions,
+    getOverridesByCategory,
+    getCategories
+};

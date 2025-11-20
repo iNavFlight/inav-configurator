@@ -1,4 +1,6 @@
 /**
+'use strict';
+
  * INAV Flight Parameter Definitions
  * 
  * Location: tabs/programming/transpiler/api/definitions/flight.js
@@ -7,7 +9,7 @@
  * Maps JavaScript property names to INAV operand types/values.
  */
 
-export const flightDefinitions = {
+const flightDefinitions = {
   // === Telemetry Parameters ===
   
   armTimer: {
@@ -456,3 +458,5 @@ export const flightDefinitions = {
     }
   }
 };
+
+module.exports = { flightDefinitions };

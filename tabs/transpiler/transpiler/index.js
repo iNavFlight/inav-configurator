@@ -1,4 +1,6 @@
 /**
+'use strict';
+
  * INAV Transpiler Main Entry Point
  * 
  * Location: tabs/programming/transpiler/transpiler/index.js
@@ -6,15 +8,15 @@
  * Coordinates parsing, analysis, optimization, and code generation.
  */
 
-import { JavaScriptParser } from './parser.js';
-import { INAVCodeGenerator } from './codegen.js';
-import { Optimizer } from './optimizer.js';
+const { JavaScriptParser  } = require('./parser.js');
+const { INAVCodeGenerator  } = require('./codegen.js');
+const { Optimizer  } = require('./optimizer.js');
 
 /**
  * Main Transpiler Class
  * Converts JavaScript to INAV CLI commands
  */
-export class Transpiler {
+class Transpiler {
   constructor() {
     this.parser = new JavaScriptParser();
     this.codegen = new INAVCodeGenerator();
@@ -130,3 +132,5 @@ export class Transpiler {
     return output;
   }
 }
+
+module.exports = { Transpiler };

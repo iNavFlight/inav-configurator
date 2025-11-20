@@ -1,4 +1,6 @@
 /**
+'use strict';
+
  * INAV Logic Condition Optimizer
  * 
  * Location: tabs/programming/transpiler/transpiler/optimizer.js
@@ -12,7 +14,7 @@
  * 5. Boolean Simplification
  */
 
-export class Optimizer {
+class Optimizer {
   constructor() {
     this.stats = {
       cseEliminated: 0,
@@ -431,3 +433,5 @@ export class Optimizer {
     return lines.join('\n');
   }
 }
+
+module.exports = { Optimizer };

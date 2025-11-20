@@ -1,4 +1,6 @@
 /**
+'use strict';
+
  * INAV RC Channel Definitions
  * 
  * Location: tabs/programming/transpiler/api/definitions/rc.js
@@ -7,7 +9,7 @@
  * Accessed as: rc[1].value, rc[5].high, etc.
  */
 
-export const rcDefinitions = {
+const rcDefinitions = {
   // RC channels are accessed as array: rc[1], rc[2], etc.
   // Each channel has these properties:
   
@@ -60,3 +62,5 @@ export const rcDefinitions = {
     category: 'position'
   }
 };
+
+module.exports = { rcDefinitions };
