@@ -1,16 +1,19 @@
 'use strict';
 
-const path = require('path');
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import noUiSlider from 'nouislider';
 
-const MSPChainerClass = require('./../js/msp/MSPchainer');
-const MSP = require('./../js/msp');
-const MSPCodes = require('./../js/msp/MSPCodes');
-const mspHelper = require('./../js/msp/MSPHelper');
-const FC = require('./../js/fc');
-const { GUI, TABS } = require('./../js/gui');
-const i18n = require('./../js/localization');
-const { mixer } = require('./../js/model');
-const interval = require('./../js/intervals');
+import MSPChainerClass from './../js/msp/MSPchainer';
+import MSP from './../js/msp';
+import MSPCodes from './../js/msp/MSPCodes';
+import mspHelper from './../js/msp/MSPHelper';
+import FC from './../js/fc';
+import { GUI, TABS } from './../js/gui';
+import i18n from './../js/localization';
+import { mixer } from './../js/model';
+import interval from './../js/intervals';
 
 TABS.magnetometer = {};
 
@@ -149,7 +152,7 @@ TABS.magnetometer.initialize = function (callback) {
     }
 
     function load_html() {
-        GUI.load(path.join(__dirname, "magnetometer.html"), process_html);
+        import('./magnetometer.html?raw').then(({default: html}) => GUI.load(html, process_html));
     }
 
     function generateRange(min, max, step) {
@@ -206,10 +209,10 @@ TABS.magnetometer.initialize = function (callback) {
         //degree[1] - roll
         //degree[2] - yaw
         //-(pitch-180), -180 - yaw, roll
-        var magRotation = new THREE.Euler(-THREE.Math.degToRad(degree[0]-180), THREE.Math.degToRad(-180 - degree[2]), THREE.Math.degToRad(degree[1]), 'YXZ'); 
+        var magRotation = new THREE.Euler(-THREE.MathUtils.degToRad(degree[0]-180), THREE.MathUtils.degToRad(-180 - degree[2]), THREE.MathUtils.degToRad(degree[1]), 'YXZ'); 
         var matrix = (new THREE.Matrix4()).makeRotationFromEuler(magRotation);
 
-        var boardRotation = new THREE.Euler( THREE.Math.degToRad( self.boardAlignmentConfig.pitch ), THREE.Math.degToRad( -self.boardAlignmentConfig.yaw ), THREE.Math.degToRad( self.boardAlignmentConfig.roll ), 'YXZ');
+        var boardRotation = new THREE.Euler( THREE.MathUtils.degToRad( self.boardAlignmentConfig.pitch ), THREE.MathUtils.degToRad( -self.boardAlignmentConfig.yaw ), THREE.MathUtils.degToRad( self.boardAlignmentConfig.roll ), 'YXZ');
         var matrix1 = (new THREE.Matrix4()).makeRotationFromEuler(boardRotation);
 
         matrix.premultiply(matrix1);  
@@ -217,9 +220,9 @@ TABS.magnetometer.initialize = function (callback) {
         var euler = new THREE.Euler();
         euler.setFromRotationMatrix(matrix, 'YXZ');
 
-        var pitch = toUpperRange( Math.round( THREE.Math.radToDeg(-euler.x)) + 180, 180 );
-        var yaw = toUpperRange( Math.round( -180 - THREE.Math.radToDeg(euler.y)), 359 );
-        var roll = toUpperRange( Math.round( THREE.Math.radToDeg(euler.z)), 180 );
+        var pitch = toUpperRange( Math.round( THREE.MathUtils.radToDeg(-euler.x)) + 180, 180 );
+        var yaw = toUpperRange( Math.round( -180 - THREE.MathUtils.radToDeg(euler.y)), 359 );
+        var roll = toUpperRange( Math.round( THREE.MathUtils.radToDeg(euler.z)), 180 );
 
         return [pitch, roll, yaw];
     }
@@ -401,61 +404,62 @@ TABS.magnetometer.initialize = function (callback) {
             updateBoardYawAxis(clamp(this, -180, 360));
         });
 
-        self.pageElements.board_roll_slider.noUiSlider({
+        noUiSlider.create(self.pageElements.board_roll_slider[0], {
             start: [self.boardAlignmentConfig.roll],
             range: {
                 'min': [-180],
                 'max': [360]
             },
             step: 1,
-        });
-        self.pageElements.board_roll_slider.noUiSlider_pips({
-            mode: 'values',
-            values: generateRange(-180, 360, 45),
-            density: 4,
-            stepped: true
+            pips: {
+                mode: 'values',
+                values: generateRange(-180, 360, 45),
+                density: 4,
+                stepped: true
+            }
         });
 
-        self.pageElements.board_pitch_slider.noUiSlider({
+        noUiSlider.create(self.pageElements.board_pitch_slider[0], {
             start: [self.boardAlignmentConfig.pitch],
             range: {
                 'min': [-180],
                 'max': [360]
             },
             step: 1,
-        });
-        self.pageElements.board_pitch_slider.noUiSlider_pips({
-            mode: 'values',
-            values: generateRange(-180, 360, 45),
-            density: 4,
-            stepped: true
+            pips: {
+                mode: 'values',
+                values: generateRange(-180, 360, 45),
+                density: 4,
+                stepped: true
+            }
         });
 
-        self.pageElements.board_yaw_slider.noUiSlider({
+        noUiSlider.create(self.pageElements.board_yaw_slider[0], {
             start: [self.boardAlignmentConfig.yaw],
             range: {
                 'min': [-180],
                 'max': [360]
             },
             step: 1,
-        });
-        self.pageElements.board_yaw_slider.noUiSlider_pips({
-            mode: 'values',
-            values: generateRange(-180, 360, 45),
-            density: 4,
-            stepped: true
+            pips: {
+                 mode: 'values',
+                values: generateRange(-180, 360, 45),
+                density: 4,
+                stepped: true
+            }
         });
 
-
-        self.pageElements.board_pitch_slider.Link('lower').to((e) => {
-            updateBoardPitchAxis(e);
+        
+        self.pageElements.board_pitch_slider[0].noUiSlider.on('update', (values, handle) =>  {
+            updateBoardPitchAxis(values[handle]);
         });
-        self.pageElements.board_roll_slider.Link('lower').to((e) => {
-            updateBoardRollAxis(e);
+        self.pageElements.board_roll_slider[0].noUiSlider.on('update', (values, handle) =>  {
+            updateBoardRollAxis(values[handle]);
         });
-        self.pageElements.board_yaw_slider.Link('lower').to((e) => {
-            updateBoardYawAxis(e);
+        self.pageElements.board_yaw_slider[0].noUiSlider.on('update', (values, handle) =>  {
+            updateBoardYawAxis(values[handle]);
         });
+        
 
         const elementToShow = $("#element_to_show");
         elementToShow.on('change', function () {
@@ -498,71 +502,72 @@ TABS.magnetometer.initialize = function (callback) {
             saveChainer.execute()
         });
 
-        self.pageElements.roll_slider.noUiSlider({
+        noUiSlider.create(self.pageElements.roll_slider[0], {
             start: [self.alignmentConfig.roll],
             range: {
                 'min': [-180],
                 'max': [360]
             },
             step: 1,
-        });
-        self.pageElements.roll_slider.noUiSlider_pips({
-            mode: 'values',
-            values: generateRange(-180, 360, 45),
-            density: 4,
-            stepped: true
+            pips: {
+                mode: 'values',
+                values: generateRange(-180, 360, 45),
+                density: 4,
+                stepped: true
+                }
         });
 
-        self.pageElements.pitch_slider.noUiSlider({
+        noUiSlider.create(self.pageElements.pitch_slider[0], {
             start: [self.alignmentConfig.pitch],
             range: {
                 'min': [-180],
                 'max': [360]
             },
             step: 1,
-        });
-        self.pageElements.pitch_slider.noUiSlider_pips({
-            mode: 'values',
-            values: generateRange(-180, 360, 45),
-            density: 4,
-            stepped: true
+            pips: {
+                mode: 'values',
+                values: generateRange(-180, 360, 45),
+                density: 4,
+                stepped: true
+            }
         });
 
-        self.pageElements.yaw_slider.noUiSlider({
+        noUiSlider.create(self.pageElements.yaw_slider[0], {
             start: [self.alignmentConfig.yaw],
             range: {
                 'min': [-180],
                 'max': [360]
             },
             step: 1,
-        });
-        self.pageElements.yaw_slider.noUiSlider_pips({
-            mode: 'values',
-            values: generateRange(-180, 360, 45),
-            density: 4,
-            stepped: true
-        });
-
-
-        self.pageElements.pitch_slider.Link('lower').to((e) => {
-            updatePitchAxis(e);
-        });
-        self.pageElements.roll_slider.Link('lower').to((e) => {
-            updateRollAxis(e);
-        });
-        self.pageElements.yaw_slider.Link('lower').to((e) => {
-            updateYawAxis(e);
+            pips: {
+                mode: 'values',
+                values: generateRange(-180, 360, 45),
+                density: 4,
+                stepped: true
+            }
         });
 
-        self.pageElements.pitch_slider.on('slide', (e) => {
+        
+        self.pageElements.pitch_slider[0].noUiSlider.on('update', (values, handle) =>  {
+            updatePitchAxis(values[handle]);
+        });
+        self.pageElements.roll_slider[0].noUiSlider.on('update', (values, handle) =>  {
+            updateRollAxis(values[handle]);
+        });
+        self.pageElements.yaw_slider[0].noUiSlider.on('update', (values, handle) =>  {
+            updateYawAxis(values[handle]);
+        });
+
+        self.pageElements.pitch_slider[0].noUiSlider.on('slide', () => {
             disableSavePreset();
         });
-        self.pageElements.roll_slider.on('slide', (e) => {
+        self.pageElements.roll_slider[0].noUiSlider.on('slide', () => {
             disableSavePreset();
         });
-        self.pageElements.yaw_slider.on('slide', (e) => {
+        self.pageElements.yaw_slider[0].noUiSlider.on('slide', () => {
             disableSavePreset();
         });
+        
 
         function get_fast_data() {
 
@@ -607,9 +612,7 @@ TABS.magnetometer.initialize3D = function () {
         renderer = new THREE.WebGLRenderer({canvas: canvas.get(0), alpha: true, antialias: true});
         useWebGlRenderer = true;
     }
-    else {
-        renderer = new THREE.CanvasRenderer({canvas: canvas.get(0), alpha: true});
-    }
+    
     // initialize render size for current canvas size
     renderer.setSize(wrapper.width() * 2, wrapper.height() * 2);
 
@@ -644,10 +647,10 @@ TABS.magnetometer.initialize3D = function () {
         magModels.forEach( (m,i) => m.visible = i == self.elementToShow );
         fc.visible = true;
 
-        var magRotation = new THREE.Euler(-THREE.Math.degToRad(self.alignmentConfig.pitch-180), THREE.Math.degToRad(-180 - self.alignmentConfig.yaw), THREE.Math.degToRad(self.alignmentConfig.roll), 'YXZ'); 
+        var magRotation = new THREE.Euler(-THREE.MathUtils.degToRad(self.alignmentConfig.pitch-180), THREE.MathUtils.degToRad(-180 - self.alignmentConfig.yaw), THREE.MathUtils.degToRad(self.alignmentConfig.roll), 'YXZ'); 
         var matrix = (new THREE.Matrix4()).makeRotationFromEuler(magRotation);
 
-        var boardRotation = new THREE.Euler( THREE.Math.degToRad( self.boardAlignmentConfig.pitch), THREE.Math.degToRad( -self.boardAlignmentConfig.yaw ), THREE.Math.degToRad( self.boardAlignmentConfig.roll ), 'YXZ');
+        var boardRotation = new THREE.Euler( THREE.MathUtils.degToRad( self.boardAlignmentConfig.pitch), THREE.MathUtils.degToRad( -self.boardAlignmentConfig.yaw ), THREE.MathUtils.degToRad( self.boardAlignmentConfig.roll ), 'YXZ');
         var matrix1 = (new THREE.Matrix4()).makeRotationFromEuler(boardRotation);
 
 /*
@@ -708,7 +711,7 @@ TABS.magnetometer.initialize3D = function () {
     // stationary camera
     camera = new THREE.PerspectiveCamera(50, wrapper.width() / wrapper.height(), 1, 10000);
     camera.position.set(-95, 82, 50);
-    let controls = new THREE.OrbitControls(camera, renderer.domElement);
+    let controls = new OrbitControls(camera, renderer.domElement);
     controls.update();
     controls.addEventListener( 'change', this.render3D );
 
@@ -728,53 +731,58 @@ TABS.magnetometer.initialize3D = function () {
 
     //Load the models
     const manager = new THREE.LoadingManager();
-    const loader = new THREE.GLTFLoader(manager);
+    const loader = new GLTFLoader(manager);
 
     const magModelNames = ['xyz', 'ak8963c', 'ak8963n', 'ak8975', 'ak8975c', 'bn_880', 'diatone_mamba_m10_pro', 'flywoo_goku_m10_pro_v3', 'foxeer_m10q_120', 'foxeer_m10q_180', 'foxeer_m10q_250', 
         'geprc_gep_m10_dq', 'gy271', 'gy273', 'hglrc_m100', 'qmc5883', 'holybro_m9n_micro', 'holybro_m9n_micro', 'ist8308', 'ist8310', 'lis3mdl', 
         'mag3110', 'matek_m8q', 'matek_m9n', 'matek_m10q', 'mlx90393', 'mp9250', 'qmc5883', 'flywoo_goku_m10_pro_v3', 'ws_m181'];
     magModels = [];
-
     //Load the UAV model
-    loader.load('./resources/models/' + model_file + '.gltf', (obj) => {
-        const model = obj.scene;
-        const scaleFactor = 15;
-        model.scale.set(scaleFactor, scaleFactor, scaleFactor);
-        modelWrapper.add(model);
+    import(`./../resources/models/model_${model_file}.gltf`).then(({default: model}) => {
+    loader.load(modelUrl, (obj) => {
+            const modelScene = obj.scene;
+            const scaleFactor = 15;
+            modelScene.scale.set(scaleFactor, scaleFactor, scaleFactor);
+            modelWrapper.add(modelScene);
 
-        const gpsOffset = getDistanceByModelName(model_file);
+            const gpsOffset = getDistanceByModelName(model_file);
 
-        magModelNames.forEach( (name, i) => 
-        {
-            loader.load('./resources/models/' + name + '.gltf', (obj) => {
-                const gps = obj.scene;
-                const scaleFactor = i==0 ? 0.03 : 0.04;
-                gps.scale.set(scaleFactor, scaleFactor, scaleFactor);
-                gps.position.set(gpsOffset[0], gpsOffset[1] + 0.5, gpsOffset[2]);
-                gps.traverse(child => {
-                   if (child.material) child.material.metalness = 0;
+            magModelNames.forEach( (name, i) => 
+            {
+                import(`./../resources/models/model_${name}.glb`).then(({default: magModel}) => {
+                    loader.load(magModel, (obj) => {
+                        const gps = obj.scene;
+                        const scaleFactor = i==0 ? 0.03 : 0.04;
+                        gps.scale.set(scaleFactor, scaleFactor, scaleFactor);
+                        gps.position.set(gpsOffset[0], gpsOffset[1] + 0.5, gpsOffset[2]);
+                        gps.traverse(child => {
+                        if (child.material) child.material.metalness = 0;
+                        });
+                        gps.rotation.y = 3 * Math.PI / 2;
+                        model.add(gps);
+                        magModels[i]=gps;
+                        this.resize3D();
+                    });
                 });
-                gps.rotation.y = 3 * Math.PI / 2;
-                model.add(gps);
-                magModels[i]=gps;
-                this.resize3D();
             });
-       });
 
-        //Load the FC model
-        loader.load('./resources/models/fc.gltf', (obj) => {
-            fc = obj.scene;
-            const scaleFactor = 0.04;
-            fc.scale.set(scaleFactor, scaleFactor, scaleFactor);
-            fc.position.set(gpsOffset[0], gpsOffset[1] - 0.5, gpsOffset[2]);
-            fc.rotation.y = 3 * Math.PI / 2;
-            model.add(fc);
-            this.render3D();
+            //Load the FC model
+            import('./../resources/models/model_fc.gltf').then(({default: fcModel}) => {
+                loader.load(fcModel, (obj) => {
+                    fc = obj.scene;
+                    const scaleFactor = 0.04;
+                    fc.scale.set(scaleFactor, scaleFactor, scaleFactor);
+                    fc.position.set(gpsOffset[0], gpsOffset[1] - 0.5, gpsOffset[2]);
+                    fc.rotation.y = 3 * Math.PI / 2;
+                    model.add(fc);
+                    this.render3D();
+                });
+            });
+
         });
-
+        this.render3D();
+        this.resize3D();
     });
-    this.render3D();
-    this.resize3D();
 };
 
 

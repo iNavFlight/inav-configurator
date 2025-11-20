@@ -1,39 +1,31 @@
 'use strict'
 
-const { GUI } = require('./../gui');
+import { GUI } from './../gui';
+import { ConnectionType, Connection } from './connection';
+import i18n from './../localization';
 
-const { ConnectionType, Connection } = require('./connection')
-const { SerialPort } = require('serialport');
-const { SerialPortStream } = require('@serialport/stream');
-const { autoDetect } = require('@serialport/bindings-cpp')
-const binding = autoDetect();
+const serialDevices = [
+    { vendorId: 1027, productId: 24577 }, // FT232R USB UART
+    { vendorId: 1155, productId: 12886 }, // STM32 in HID mode
+    { vendorId: 1155, productId: 14158 }, // 0483:374e STM Electronics STLink Virtual COM Port (NUCLEO boards)
+    { vendorId: 1155, productId: 22336 }, // STM Electronics Virtual COM Port
+    { vendorId: 4292, productId: 60000 }, // CP210x
+    { vendorId: 4292, productId: 60001 }, // CP210x
+    { vendorId: 4292, productId: 60002 }, // CP210x
+    { vendorId: 11836, productId: 22336 }, // AT32 VCP
+    { vendorId: 12619, productId: 22336 }, // APM32 VCP
+];
 
 class ConnectionSerial extends Connection {
     constructor() {
         super();
-        this._serialport = null;
         this._errorListeners = [];
         this._onReceiveListeners = [];
         this._onErrorListener = [];
+        this.ports = [];
         super._type = ConnectionType.Serial;
-    }
 
-    connectImplementation(path, options, callback) {
-        try {
-            this._serialport = new SerialPortStream({binding, path: path, baudRate: options.bitrate, autoOpen: true}, () => {
-                if (callback) {
-                    callback({
-                        connectionId: ++this._connectionId,
-                        bitrate: options.bitrate
-                    });
-                }
-            });
-        } catch (error) {
-            console.log(error);
-            callback(false);
-        }
-
-        this._serialport.on('data', buffer => {
+        window.electronAPI.onSerialData(buffer => {
             this._onReceiveListeners.forEach(listener => {
                 listener({
                     connectionId: this._connectionId,
@@ -42,42 +34,67 @@ class ConnectionSerial extends Connection {
             });
         });
 
-        this._serialport.on('close', error => {
+        window.electronAPI.serialClose(() => {
+            console.log("Serial conenection closed");
             this.abort();
         });
 
-        this._serialport.on('error', error => {
-            this.abort();
-            console.log("Serial error: " + error);
+        window.electronAPI.onSerialError(error => {
+            GUI.log(error);
+            console.log(error);
+            this.abort()
+        
             this._onReceiveErrorListeners.forEach(listener => {
                 listener(error);
             });
         });
     }
 
-    disconnectImplementation(callback) {
-        if (this._serialport && this._serialport.isOpen) {
-            this._serialport.close(error => {
-                if (error) {
-                    console.log("Unable to close serial: " + error)
+    connectImplementation(path, options, callback) {
+        
+        window.electronAPI.serialConnect(path, options).then(response => {
+            if (!response.error) {
+                GUI.log(i18n.getMessage('connectionConnected', [`${path} @ ${options.bitrate} baud`]));
+                this._connectionId = response.id;
+                if (callback) {
+                    callback({
+                        bitrate: options.bitrate,
+                        connectionId: this._connectionId
+                    });
+                } 
+            } else {
+                console.log("Serial connection error: " + response.msg);
+                if (callback) {
+                    callback(false);
                 }
-            });
-        }
-
-        if (callback) {
-            callback(true);
-        }
+            }
+        });
     }
 
-    sendImplementation(data, callback) {
-        if (this._serialport && this._serialport.isOpen) {
-            this._serialport.write(Buffer.from(data), error => {
+    disconnectImplementation(callback) {   
+        if (this._connectionId) {
+            window.electronAPI.serialClose().then(response => {
+                var ok = true;
+                if (response.error) {
+                    console.log("Unable to close serial: " + response.msg);
+                    ok = false;
+                }            
+                if (callback) {
+                    callback(ok);
+                }
+            });  
+        }  
+    }
+
+    sendImplementation(data, callback) {        
+        if (this._connectionId) {
+            window.electronAPI.serialSend(data).then(response => {
                 var result = 0;
-                var sent = data.byteLength;
-                if (error) {
+                var sent = response.bytesWritten;
+                if (response.error) {
+                    console.log("Serial write error: " + response.msg);
                     result = 1;
                     sent = 0;
-                    console.log("Serial write error: " + error)
                 }
                 if (callback) {
                     callback({
@@ -103,31 +120,11 @@ class ConnectionSerial extends Connection {
 
     removeOnReceiveErrorCallback(callback) {
         this._onReceiveErrorListeners = this._onReceiveErrorListeners.filter(listener => listener !== callback);
-    }
+    } 
 
-    static async getDevices(callback) {
-        SerialPort.list().then((ports, error) => {
-            var devices = [];
-            if (error) {
-                GUI.log("Unable to list serial ports.");
-            } else {
-                ports.forEach(port => {
-                    if (GUI.operating_system == 'Linux') {
-			/* Limit to: USB serial, RFCOMM (BT), 6 legacy devices */
-			if (port.pnpId ||
-			    port.path.match(/rfcomm\d*/) ||
-			    port.path.match(/ttyS[0-5]$/)) {
-			    devices.push(port.path);
-                        }
-		    } else {
-			devices.push(port.path);
-		    }
-                });
-            }
-            if (callback)
-                callback(devices);
-        });
+    static async getDevices() {
+        return window.electronAPI.listSerialDevices();
     }
 }
 
-module.exports = ConnectionSerial;
+export default ConnectionSerial;

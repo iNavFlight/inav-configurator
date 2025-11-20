@@ -7,13 +7,13 @@
 */
 'use strict';
 
-const CONFIGURATOR = require('./../data_storage');
-const { GUI } = require('./../gui');
-const interval = require('./../intervals');
-const { usbDevices, PortHandler } = require('./../port_handler');
-const ConnectionSerial = require('./../connection/connectionSerial');
-const STM32DFU = require('./stm32usbdfu');
-const i18n = require('./../localization');
+import CONFIGURATOR from './../data_storage';
+import { GUI }from './../gui';
+import interval from './../intervals';
+import { usbDevices, PortHandler } from './../port_handler';
+import ConnectionSerial from './../connection/connectionSerial';
+import STM32DFU from './stm32usbdfu';
+import i18n from './../localization';
 
 var STM32_protocol = function () {
     this.baud;
@@ -799,4 +799,4 @@ STM32_protocol.prototype.upload_procedure = function (step) {
 // initialize object
 var STM32 = new STM32_protocol();
 
-module.exports = STM32;
+export default STM32;

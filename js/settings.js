@@ -1,12 +1,12 @@
 'use strict';
 
-const mapSeries = require('promise-map-series')
+import mapSeries from 'promise-map-series';
 
-const mspHelper = require('./../js/msp/MSPHelper');
-const { GUI } = require('./gui');
-const FC = require('./fc');
-const { globalSettings, UnitType } = require('./globalSettings');
-const i18n = require('./localization');
+import mspHelper from './../js/msp/MSPHelper';
+import { GUI } from './gui';
+import FC from './fc';
+import { globalSettings, UnitType } from './globalSettings';
+import i18n from './localization';
 
 function padZeros(val, length) {
     let str = val.toString();
@@ -684,4 +684,4 @@ var Settings = (function () {
     return self;
 })();
 
-module.exports = Settings;
+export default  Settings;

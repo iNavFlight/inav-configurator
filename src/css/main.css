@@ -190,11 +190,11 @@ input[type="number"]::-webkit-inner-spin-button {
 
 #portsinput .portsinput__top-element {
     display: inline-block;
-    width: 125px;
+    width: 130px;
 }
 
 #portsinput .portsinput__top-element .dropdown-select {
-    width: 122px;
+    width: 127px;
 }
 
 .portsinput__top-element--inline {
@@ -1911,9 +1911,7 @@ dialog {
     background-size: contain;
 }
 
-.armedicon,
-.failsafeicon,
-.linkicon {
+.statusicon {
     float: left;
     margin-left: 8px;
     margin-right: 2px;
@@ -1927,17 +1925,31 @@ dialog {
     transition: none;
 }
 
-.armedicon {
+.armed {
     background-image: url("./../../images/icons/cf_icon_armed_grey.svg");
 }
 
-.failsafeicon {
+.armed-active{
+    background-image: url("./../../images/icons/cf_icon_armed_active.svg");
+}
+
+.failsafe {
     background-image: url("./../../images/icons/cf_icon_failsafe_grey.svg");
 }
 
-.linkicon {
+.failsafe-active {
+    background-image: url("./../../images/icons/cf_icon_failsafe_active.svg");
+}
+
+.link {
     background-image: url("./../../images/icons/cf_icon_link_grey.svg");
 }
+
+.link-active {
+    background-image: url("./../../images/icons/cf_icon_link_active.svg");
+}
+
+
 
 .bottomStatusIcons {
     background-color: #272727;
@@ -2348,4 +2360,22 @@ ol li {
 
 *:lang(ja) {
   font-family:"ヒラギノ角ゴ Pro W3", "Hiragino Kaku Gothic Pro",Osaka, "メイリオ", Meiryo, "ＭＳ Ｐゴシック", "MS PGothic", sans-serif;
+}
+
+
+#optionsClose {
+    position: absolute;
+    text-align: center;
+    width: 20px;
+    height: 20px;
+    right: 20px;
+    top: 10px;
+    font-weight: bold;
+    margin: 5px;
+    border: 2px solid transparent;
+}
+#optionsClose:hover {
+    cursor: pointer;
+    border-radius: 3px;
+    border: 1px solid #000000;
 }

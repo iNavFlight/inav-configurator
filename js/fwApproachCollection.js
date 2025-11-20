@@ -1,6 +1,6 @@
 'use strict';
 
-const BitHelper = require('./bitHelper');
+import BitHelper from './bitHelper';
 
 let FwApproachCollection = function () {
 
@@ -93,4 +93,4 @@ let FwApproachCollection = function () {
     return self;
 };
 
-module.exports = FwApproachCollection;
+export default FwApproachCollection;

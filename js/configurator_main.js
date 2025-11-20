@@ -1,42 +1,28 @@
-window.$ = window.jQuery =  require('jquery'), 
-                            require('jquery-ui-dist/jquery-ui'),
-                            require('jquery-textcomplete'),
-                            require('./libraries/jquery.flightindicators'),
-                            require('./libraries/jquery.nouislider.all.min'),
-                            require('./libraries/jquery.ba-throttle-debounce');
+import '../src/css/styles.css'
 
-const { app } = require('@electron/remote');
-const d3 = require('./libraries/d3.min');
-const Store = require('electron-store');
-const store = new Store();
+import $ from 'jquery';
+import 'jquery-ui-dist/jquery-ui';
+import * as THREE from 'three'
 
-const { GUI, TABS } = require('./gui');
-const CONFIGURATOR = require('./data_storage');
-const FC = require('./fc');
-const { globalSettings, UnitType } = require('./globalSettings');
-const { PLATFORM } = require('./model')
-const i18n = require('./localization');
-const SerialBackend = require('./serial_backend');
-const MSP = require('./msp');
-const MSPCodes = require('./../js/msp/MSPCodes');
-const mspHelper = require('./msp/MSPHelper');
-const update = require('./globalUpdates');
-const appUpdater = require('./appUpdater');
-const CliAutoComplete = require('./CliAutoComplete');
-const { SITLProcess } = require('./sitl');
-const settingsCache = require('./settingsCache');
+import { GUI, TABS } from './gui';
+import CONFIGURATOR from './data_storage';
+import FC  from './fc';
+import { globalSettings, UnitType } from './globalSettings';
+import { PLATFORM } from './model'
+import i18n from './localization';
+import SerialBackend from './serial_backend';
+import MSP from './msp';
+import MSPCodes  from './../js/msp/MSPCodes';
+import mspHelper  from './msp/MSPHelper';
+import update from './globalUpdates';
+import appUpdater from './appUpdater';
+import CliAutoComplete from './CliAutoComplete'; 
+import { SITLProcess } from './sitl';
+import settingsCache from './settingsCache';
+import store from './store';
 
-process.on('uncaughtException', function (error) {   
-    if (process.env.NODE_ENV !== 'development') {
-        GUI.log(i18n.getMessage('unexpectedError', error.message));
-        if (GUI.connected_to || GUI.connecting_to) {
-            GUI.log(i18n.getMessage('disconnecting'));
-            $('a.connect').trigger('click');
-        } 
-    } else {
-        throw error;
-    }
-});
+
+window.$ = $;
 
 // Set how the units render on the configurator only
 $(function() {
@@ -78,7 +64,6 @@ $(function() {
             $('a', activeTab).trigger('click');
         }
 
-        globalSettings.store = store;
         globalSettings.unitType = store.get('unit_type', UnitType.none);
         globalSettings.mapProviderType = store.get('map_provider_type', 'osm'); 
         globalSettings.assistnowApiKey = store.get('assistnow_api_key', '');
@@ -99,13 +84,14 @@ $(function() {
             globalSettings.osdUnits = null;
         }
 
+        const version = window.electronAPI.appGetVersion();
         // alternative - window.navigator.appVersion.match(/Chrome\/([0-9.]*)/)[1];
         GUI.log(i18n.getMessage('getRunningOS') + GUI.operating_system + '</strong>, ' +
-            'Chrome: <strong>' + process.versions['chrome'] + '</strong>, ' +
-            i18n.getMessage('getConfiguratorVersion') + app.getVersion() + '</strong>');
+            'Electron: <strong>' + navigator.userAgent.match(/Electron\/([\d\.]+\d+)/)[1] + '</strong>, ' +
+            i18n.getMessage('getConfiguratorVersion') + version + '</strong>');
 
-        $('#status-bar .version').text(app.getVersion());
-        $('#logo .version').text(app.getVersion());
+        $('#status-bar .version').text(version);
+        $('#logo .version').text(version);
         update.firmwareVersion();
 
         if (store.get('logopen', false)) {
@@ -113,11 +99,12 @@ $(function() {
         }
 
         if (store.get('update_notify', true)) { 
-            appUpdater.checkRelease(app.getVersion());
+            appUpdater.checkRelease(version);
         }
+        
 
         // log library versions in console to make version tracking easier
-        console.log('Libraries: jQuery - ' + $.fn.jquery + ', d3 - ' + d3.version + ', three.js - ' + THREE.REVISION);
+        console.log('Libraries: jQuery - ' + $.fn.jquery + ', three.js - ' + THREE.REVISION);
 
         // Tabs
         var ui_tabs = $('#tabs > ul');
@@ -177,108 +164,79 @@ $(function() {
 
                     switch (tab) {
                         case 'landing':
-                            require('./../tabs/landing')
-                            TABS.landing.initialize(content_ready);
+                            import('./../tabs/landing').then(() => TABS.landing.initialize(content_ready));
                             break;
                         case 'firmware_flasher':
-                            require('./../tabs/firmware_flasher')
-                            TABS.firmware_flasher.initialize(content_ready);
+                            import('./../tabs/firmware_flasher').then(() => TABS.firmware_flasher.initialize(content_ready));
                             break;
                         case 'sitl':
-                            require('./../tabs/sitl')
-                            TABS.sitl.initialize(content_ready);
+                            import('./../tabs/sitl').then(() => TABS.sitl.initialize(content_ready));
                             break;
                         case 'auxiliary':
-                            require('./../tabs/auxiliary')
-                            TABS.auxiliary.initialize(content_ready);
+                            import('./../tabs/auxiliary').then(() => TABS.auxiliary.initialize(content_ready));
                             break;
                         case 'adjustments':
-                            require('./../tabs/adjustments')
-                            TABS.adjustments.initialize(content_ready);
+                            import('./../tabs/adjustments').then(() => TABS.adjustments.initialize(content_ready));
                             break;
                         case 'ports':
-                            require('./../tabs/ports');
-                            TABS.ports.initialize(content_ready);
+                            import('./../tabs/ports').then(() => TABS.ports.initialize(content_ready));
                             break;
                         case 'led_strip':
-                            require('./../tabs/led_strip');
-                            TABS.led_strip.initialize(content_ready);
+                            import('./../tabs/led_strip').then(() => TABS.led_strip.initialize(content_ready));
                             break;
                         case 'failsafe':
-                            require('./../tabs/failsafe');
-                            TABS.failsafe.initialize(content_ready);
+                            import('./../tabs/failsafe').then(() => TABS.failsafe.initialize(content_ready));
                             break;
                         case 'setup':
-                            require('./../tabs/setup');
-                            TABS.setup.initialize(content_ready);
+                            import('./../tabs/setup').then(() => TABS.setup.initialize(content_ready));
                             break;
                         case 'calibration':
-                            require('./../tabs/calibration');
-                            TABS.calibration.initialize(content_ready);
+                            import('./../tabs/calibration').then(() => TABS.calibration.initialize(content_ready));
                             break;
                         case 'configuration':
-                            require('./../tabs/configuration');
-                            TABS.configuration.initialize(content_ready);
+                            import('./../tabs/configuration').then(() => TABS.configuration.initialize(content_ready));
                             break;
                         case 'pid_tuning':
-                            require('./../tabs/pid_tuning');
-                            TABS.pid_tuning.initialize(content_ready);
+                            import('./../tabs/pid_tuning').then(() => TABS.pid_tuning.initialize(content_ready));
                             break;
                         case 'receiver':
-                            require('./../tabs/receiver');
-                            TABS.receiver.initialize(content_ready);
+                            import('./../tabs/receiver').then(() => TABS.receiver.initialize(content_ready));
                             break;
                         case 'gps':
-                            require('./../tabs/gps');
-                            TABS.gps.initialize(content_ready);
+                            import('./../tabs/gps').then(() => TABS.gps.initialize(content_ready));
                             break;
                         case 'magnetometer':
-                            require('./../tabs/magnetometer');
-                            TABS.magnetometer.initialize(content_ready);
+                            import('./../tabs/magnetometer').then(() => TABS.magnetometer.initialize(content_ready));
                             break;
                         case 'mission_control':
-                            require('./../tabs/mission_control');
-                            TABS.mission_control.initialize(content_ready);
+                            import('./../tabs/mission_control').then(() => TABS.mission_control.initialize(content_ready));
                             break;
                         case 'mixer':
-                            require('./../tabs/mixer');
-                            TABS.mixer.initialize(content_ready);
+                            import('./../tabs/mixer').then(() => TABS.mixer.initialize(content_ready));
                             break;
                         case 'outputs':
-                            require('./../tabs/outputs');
-                            TABS.outputs.initialize(content_ready);
+                            import('./../tabs/outputs').then(() => TABS.outputs.initialize(content_ready));
                             break;
                         case 'osd':
-                            require('./../tabs/osd');
-                            TABS.osd.initialize(content_ready);
+                            import('./../tabs/osd').then(() => TABS.osd.initialize(content_ready));
                             break;
                         case 'sensors':
-                            require('./../tabs/sensors');
-                            TABS.sensors.initialize(content_ready);
+                            import('./../tabs/sensors').then(() => TABS.sensors.initialize(content_ready));
                             break;
                         case 'logging':
-                            require('./../tabs/logging');
-                            TABS.logging.initialize(content_ready);
+                            import('./../tabs/logging').then(() => TABS.logging.initialize(content_ready));
                             break;
                         case 'onboard_logging':
-                            require('./../tabs/onboard_logging');
-                            TABS.onboard_logging.initialize(content_ready);
+                            import('./../tabs/onboard_logging').then(() => TABS.onboard_logging.initialize(content_ready));
                             break;
                         case 'advanced_tuning':
-                            require('./../tabs/advanced_tuning');
-                            TABS.advanced_tuning.initialize(content_ready);
+                            import('./../tabs/advanced_tuning').then(() => TABS.advanced_tuning.initialize(content_ready));
                             break;
                         case 'programming':
-                            require('./../tabs/programming');
-                            TABS.programming.initialize(content_ready);
+                            import('./../tabs/programming').then(() => TABS.programming.initialize(content_ready));
                             break;
                         case 'cli':
-                            require('./../tabs/cli');
-                            TABS.cli.initialize(content_ready);
-                            break;
-                        case 'ez_tune':
-                            require('./../tabs/ez_tune');
-                            TABS.ez_tune.initialize(content_ready);
+                            import('./../tabs/cli').then(() => TABS.cli.initialize(content_ready));
                             break;
                         case 'search':
                             require('./../tabs/search');
@@ -293,16 +251,25 @@ $(function() {
 
         $('#tabs ul.mode-disconnected li a:first').trigger( "click" );
 
+    
+
         // options
         $('#options').on('click', function() {
             var el = $(this);
+
+            function closeOptions() {
+                $('div#options-window').slideUp(250, function () {
+                    el.removeClass('active');
+                    $(this).empty().remove();
+                });
+            }
 
             if (!el.hasClass('active')) {
                 el.addClass('active');
                 el.after('<div id="options-window"></div>');
 
-                $('div#options-window').load('./tabs/options.html', function () {
-
+                import('./../tabs/options.html?raw').then(({default: html}) => {
+                    $('div#options-window').html(html);
                     // translate to user-selected language
                     i18n.localize();
 
@@ -352,7 +319,9 @@ $(function() {
                         $('#languageOption').append("<option value='{0}'>{1}</option>".format(lng, i18n.getMessage("language_" + lng)));
                     });
 
+                                        
                     $('#languageOption').val(i18n.getCurrentLanguage());
+                    
                     $('#languageOption').on('change', () => {
                         i18n.changeLanguage($('#languageOption').val());
                     });
@@ -397,21 +366,17 @@ $(function() {
                     $('#maintenanceFlushSettingsCache').on('click', function () {
                         settingsCache.flush();
                     });
-                    function close_and_cleanup(e) {
-                        if (e.type == 'click' && !$.contains($('div#options-window')[0], e.target) || e.type == 'keyup' && e.keyCode == 27) {
-                            $(document).unbind('click keyup', close_and_cleanup);
 
-                            $('div#options-window').slideUp(250, function () {
-                                el.removeClass('active');
-                                $(this).empty().remove();
-                            });
+                    $('#optionsClose').on('click', () => {
+                        if ($('#options').hasClass('active')) {
+                            closeOptions();
                         }
-                    }
-
-                    $(document).bind('click keyup', close_and_cleanup);
-
-                    $(this).slideDown(250);
+                    })
+        
+                    $('div#options-window').slideDown(250);
                 });
+            } else {
+                closeOptions();
             }
         });
 
