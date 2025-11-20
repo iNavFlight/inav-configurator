@@ -178,10 +178,10 @@ var SITLProcess = {
         if (callback) {
             callback( sitlExePath + " " + args.join(" ") + "\n");
         }
-        this.spawn(sitlExePath, args, callback);
+        this.spawn(sitlExePath, args);
     },
 
-    spawn: function(path, args, callback) {
+    spawn: function(path, args) {
 
         var opts = undefined;
         if (GUI.operating_system == 'Linux')
@@ -195,22 +195,6 @@ var SITLProcess = {
         }
 
         this.isRunning = true;
-
-        window.electronAPI.onChildProcessStdout(data => {
-            if (callback)
-                callback(data);
-        });
-
-        window.electronAPI.onChildProcessStderr(data => {
-            if (callback)
-                callback(data);
-        });
-
-        window.electronAPI.onChildProcessError(error => {
-            if (callback)
-                callback(error);
-            this.isRunning = false;
-        });
     },
 
     stop: function() {

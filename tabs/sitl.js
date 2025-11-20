@@ -239,9 +239,10 @@ TABS.sitl.initialize = (callback) => {
 
             appendLog("\n");
             
-            SITLProcess.start(currentProfile.eepromFileName, sim, useImu_e.is(':checked'), simIp, simPort, channelMap, serialOptions,result => {
+            SITLProcess.start(currentProfile.eepromFileName, sim, useImu_e.is(':checked'), simIp, simPort, channelMap, serialOptions, result => {
                 appendLog(result);
             });
+
         });
 
         $('.sitlStop').on('click', ()=> {
@@ -360,6 +361,19 @@ TABS.sitl.initialize = (callback) => {
 
         parity_e.on('change', () => {
             currentProfile.parity = parity_e.val();
+        });
+
+        window.electronAPI.onChildProcessStdout(data => {
+            appendLog(data);
+        });
+
+        window.electronAPI.onChildProcessStderr(data => {
+            appendLog(data);
+        });
+
+        window.electronAPI.onChildProcessError(error => {
+            SITLProcess.stop();
+            appendLog(error);
         });
 
         function initElements(init)
@@ -525,7 +539,7 @@ TABS.sitl.initialize = (callback) => {
         }
 
         GUI.content_ready(callback);
-    }));
+    }));  
 };
 
 TABS.sitl.cleanup = (callback) => {
