@@ -5201,7 +5201,7 @@
         "message": "Close"
     },
     "logicActivator": {
-        "message": "Active"
+        "message": "Active when"
     },
     "save": {
         "message": "Save"

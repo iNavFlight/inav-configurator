@@ -439,10 +439,10 @@ var mspHelper = (function () {
                 if (data.byteLength % 6 === 0) {
                     for (let i = 0; i < data.byteLength; i += 6) {
                         FC.SERVO_RULES.put(new ServoMixRule(
-                            data.getInt8(i),
-                            data.getInt8(i + 1),
+                            data.getUint8(i),
+                            data.getUint8(i + 1),
                             data.getInt16(i + 2, true),
-                            data.getInt8(i + 4),
+                            data.getUint8(i + 4),
                             data.getInt8(i + 5)
                         ));
                     }

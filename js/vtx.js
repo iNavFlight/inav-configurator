@@ -29,7 +29,7 @@ var VTX = (function() {
 
     self.getMaxPower = function(vtxDev) {
         if ((vtxDev == self.DEV_SMARTAUDIO) || (vtxDev == self.DEV_TRAMP)) {
-            return 5;
+            return 8;
         }     
         if (vtxDev == self.DEV_MSP) {
             return 4;
