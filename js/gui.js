@@ -50,6 +50,7 @@ var GUI_control = function () {
         'mission_control',
         'mixer',
         'programming',
+        'javascript_programming',
         'ez_tune',
         'search'
     ];

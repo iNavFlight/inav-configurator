@@ -284,6 +284,11 @@ $(function() {
                             require('./../tabs/search');
                             TABS.search.initialize(content_ready);
                             break;
+
+                       case 'javascript_programming':
+                           require('./../tabs/javascript_programming');
+                           TABS.javascript_programming.initialize(content_ready);
+                           break;
                         default:
                             console.log('Tab not found:' + tab);
                     }
