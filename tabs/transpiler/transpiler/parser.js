@@ -1,39 +1,66 @@
 /**
-'use strict';
-
- * INAV JavaScript Parser
+ * INAV JavaScript Parser (Production Version - Fixed)
  * 
  * Location: tabs/programming/transpiler/transpiler/parser.js
  * 
- * Simple JavaScript parser for INAV subset.
- * For production, would use Acorn or similar, but this demonstrates the concept.
+ * Uses Acorn for robust parsing with proper error handling.
  */
 
+'use strict';
+
+const acorn = require('acorn');
+
 /**
- * Simple JavaScript Parser for INAV subset
- * Parses JavaScript code into a simple AST
+ * Production JavaScript Parser for INAV subset
+ * Uses Acorn for robust parsing, transforms to simplified AST
  */
 class JavaScriptParser {
+  constructor() {
+    this.warnings = [];
+  }
+  
   /**
    * Parse JavaScript code
    * @param {string} code - JavaScript source code
-   * @returns {Object} Simple AST
+   * @returns {Object} Simple AST with statements and warnings
    */
   parse(code) {
-    // Remove comments and normalize whitespace
-    code = this.removeComments(code);
+    this.warnings = [];
     
+    try {
+      // Parse with Acorn
+      const acornAST = acorn.parse(code, {
+        ecmaVersion: 2020,
+        sourceType: 'module',
+        locations: true,
+        ranges: true
+      });
+      
+      // Transform to our simplified format
+      const result = this.transformAST(acornAST);
+      result.warnings = this.warnings;
+      return result;
+    } catch (error) {
+      // Enhance error message with location info
+      if (error.loc) {
+        throw new Error(
+          `Parse error at line ${error.loc.line}, column ${error.loc.column}: ${error.message}`
+        );
+      }
+      throw new Error(`Parse error: ${error.message}`);
+    }
+  }
+  
+  /**
+   * Transform Acorn AST to simplified format
+   */
+  transformAST(acornAST) {
     const statements = [];
-    const lines = code.split('\n').filter(line => line.trim());
     
-    let i = 0;
-    while (i < lines.length) {
-      const result = this.parseStatement(lines, i);
-      if (result) {
-        statements.push(result.statement);
-        i = result.nextIndex;
-      } else {
-        i++;
+    for (const node of acornAST.body) {
+      const stmt = this.transformNode(node);
+      if (stmt) {
+        statements.push(stmt);
       }
     }
     
@@ -41,232 +68,305 @@ class JavaScriptParser {
   }
   
   /**
-   * Remove comments from code
+   * Transform individual AST node
    */
-  removeComments(code) {
-    // Remove single-line comments
-    code = code.replace(/\/\/.*$/gm, '');
-    // Remove multi-line comments
-    code = code.replace(/\/\*[\s\S]*?\*\//g, '');
-    return code;
+  transformNode(node) {
+    if (!node) return null;
+    
+    switch (node.type) {
+      case 'VariableDeclaration':
+        return this.transformVariableDeclaration(node);
+      case 'ExpressionStatement':
+        return this.transformExpressionStatement(node);
+      default:
+        return null;
+    }
   }
   
   /**
-   * Parse a single statement
+   * Transform variable declaration (const { flight } = inav)
    */
-  parseStatement(lines, startIndex) {
-    const line = lines[startIndex].trim();
-    
-    // Skip empty lines
-    if (!line) {
-      return { statement: null, nextIndex: startIndex + 1 };
-    }
-    
-    // Destructuring: const { flight, override } = inav;
-    if (line.includes('const {') && line.includes('} = inav')) {
-      return { statement: { type: 'Destructuring' }, nextIndex: startIndex + 1 };
-    }
-    
-    // on.arm({ delay: 1 }, () => {
-    if (line.startsWith('on.arm(')) {
-      return this.parseEventHandler(lines, startIndex, 'on.arm');
-    }
-    
-    // when(() => condition, () => {
-    if (line.startsWith('when(')) {
-      return this.parseWhenStatement(lines, startIndex);
-    }
-    
-    // Simple assignment: gvar[0] = 100;
-    if (line.includes('=') && line.endsWith(';')) {
-      return { 
-        statement: this.parseAssignment(line), 
-        nextIndex: startIndex + 1 
-      };
-    }
-    
-    return { statement: null, nextIndex: startIndex + 1 };
-  }
-  
-  /**
-   * Parse event handler (on.arm, on.always)
-   */
-  parseEventHandler(lines, startIndex, handler) {
-    const line = lines[startIndex];
-    
-    // Extract config: on.arm({ delay: 1 }, () => {
-    const configMatch = line.match(/\{([^}]+)\}/);
-    const config = {};
-    
-    if (configMatch) {
-      const configStr = configMatch[1];
-      const delayMatch = configStr.match(/delay:\s*(\d+)/);
-      if (delayMatch) {
-        config.delay = parseInt(delayMatch[1]);
-      }
-    }
-    
-    // Find matching closing brace
-    const body = [];
-    let braceCount = 1;
-    let i = startIndex + 1;
-    
-    while (i < lines.length && braceCount > 0) {
-      const bodyLine = lines[i].trim();
-      
-      if (bodyLine.includes('{')) braceCount++;
-      if (bodyLine.includes('}')) braceCount--;
-      
-      if (braceCount > 0 && bodyLine && !bodyLine.startsWith('//')) {
-        const stmt = this.parseBodyStatement(bodyLine);
-        if (stmt) body.push(stmt);
-      }
-      
-      i++;
-    }
-    
-    return {
-      statement: {
-        type: 'EventHandler',
-        handler,
-        config,
-        body
-      },
-      nextIndex: i
-    };
-  }
-  
-  /**
-   * Parse when statement
-   */
-  parseWhenStatement(lines, startIndex) {
-    const line = lines[startIndex];
-    
-    // Extract condition: when(() => flight.homeDistance > 100, () => {
-    const conditionMatch = line.match(/when\(\(\)\s*=>\s*([^,]+),/);
-    if (!conditionMatch) {
-      return { statement: null, nextIndex: startIndex + 1 };
-    }
-    
-    const conditionStr = conditionMatch[1].trim();
-    const condition = this.parseCondition(conditionStr);
-    
-    // Find body
-    const body = [];
-    let braceCount = 1;
-    let i = startIndex + 1;
-    
-    while (i < lines.length && braceCount > 0) {
-      const bodyLine = lines[i].trim();
-      
-      if (bodyLine.includes('{')) braceCount++;
-      if (bodyLine.includes('}')) braceCount--;
-      
-      if (braceCount > 0 && bodyLine && !bodyLine.startsWith('//')) {
-        const stmt = this.parseBodyStatement(bodyLine);
-        if (stmt) body.push(stmt);
-      }
-      
-      i++;
-    }
-    
-    return {
-      statement: {
-        type: 'EventHandler',
-        handler: 'when',
-        condition,
-        body
-      },
-      nextIndex: i
-    };
-  }
-  
-  /**
-   * Parse condition expression
-   */
-  parseCondition(conditionStr) {
-    // Handle logical OR: a || b
-    if (conditionStr.includes('||')) {
-      const parts = conditionStr.split('||').map(p => p.trim());
-      return {
-        type: 'LogicalExpression',
-        operator: '||',
-        left: this.parseCondition(parts[0]),
-        right: this.parseCondition(parts[1])
-      };
-    }
-    
-    // Handle logical AND: a && b
-    if (conditionStr.includes('&&')) {
-      const parts = conditionStr.split('&&').map(p => p.trim());
-      return {
-        type: 'LogicalExpression',
-        operator: '&&',
-        left: this.parseCondition(parts[0]),
-        right: this.parseCondition(parts[1])
-      };
-    }
-    
-    // Handle comparison: a > b, a < b, a === b
-    const operators = ['===', '==', '>', '<', '>=', '<='];
-    for (const op of operators) {
-      if (conditionStr.includes(op)) {
-        const parts = conditionStr.split(op).map(p => p.trim());
-        return {
-          type: 'BinaryExpression',
-          operator: op,
-          left: parts[0],
-          right: this.parseValue(parts[1])
+  transformVariableDeclaration(node) {
+    // Look for: const { ... } = inav
+    if (node.declarations.length === 1) {
+      const decl = node.declarations[0];
+      if (decl.id && decl.id.type === 'ObjectPattern' && 
+          decl.init && 
+          decl.init.type === 'Identifier' && 
+          decl.init.name === 'inav') {
+        return { 
+          type: 'Destructuring',
+          loc: node.loc,
+          range: node.range
         };
       }
     }
-    
-    // Simple boolean property: flight.mode.failsafe
-    return {
-      type: 'MemberExpression',
-      value: conditionStr
-    };
+    return null;
   }
   
   /**
-   * Parse statement in event handler body
+   * Transform expression statement
    */
-  parseBodyStatement(line) {
-    // Remove trailing semicolon
-    line = line.replace(/;$/, '').trim();
+  transformExpressionStatement(node) {
+    const expr = node.expression;
+    if (!expr) return null;
     
-    // Assignment: gvar[0] = value;
-    if (line.includes('=')) {
-      return this.parseAssignment(line);
+    // Look for function calls: on.arm(...), when(...)
+    if (expr.type === 'CallExpression') {
+      return this.transformCallExpression(expr, node.loc, node.range);
+    }
+    
+    // Look for assignments
+    if (expr.type === 'AssignmentExpression') {
+      return this.transformAssignment(expr, node.loc, node.range);
     }
     
     return null;
   }
   
   /**
-   * Parse assignment statement
+   * Transform call expression (event handlers)
    */
-  parseAssignment(line) {
-    // Remove semicolon
-    line = line.replace(/;$/, '').trim();
+  transformCallExpression(expr, loc, range) {
+    if (!expr.callee) return null;
     
-    const parts = line.split('=').map(p => p.trim());
-    if (parts.length !== 2) return null;
+    // on.arm(...), on.always(...)
+    if (expr.callee.type === 'MemberExpression' &&
+        expr.callee.object && expr.callee.object.name === 'on' &&
+        expr.callee.property) {
+      const handler = `on.${expr.callee.property.name}`;
+      return this.transformEventHandler(handler, expr.arguments, loc, range);
+    }
     
-    const target = parts[0];
-    const valueStr = parts[1];
+    // when(...)
+    if (expr.callee.type === 'Identifier' && expr.callee.name === 'when') {
+      return this.transformWhenStatement(expr.arguments, loc, range);
+    }
     
-    // Check if it's arithmetic: heading = flight.mixerProfile + 180
-    const arithmeticOps = ['+', '-', '*', '/', '%'];
-    for (const op of arithmeticOps) {
-      if (valueStr.includes(op)) {
-        const operands = valueStr.split(op).map(p => p.trim());
+    return null;
+  }
+  
+  /**
+   * Transform event handler: on.arm({ delay: 1 }, () => { ... })
+   */
+  transformEventHandler(handler, args, loc, range) {
+    // Validate argument count
+    if (!args || args.length < 1 || args.length > 2) {
+      this.warnings.push({
+        type: 'warning',
+        message: `${handler} expects 1-2 arguments, got ${args ? args.length : 0}`,
+        line: loc ? loc.start.line : 0
+      });
+      return null;
+    }
+    
+    const config = {};
+    let bodyFunc = null;
+    
+    // Parse arguments
+    if (args.length === 2) {
+      // First arg: config object
+      if (args[0].type === 'ObjectExpression') {
+        for (const prop of args[0].properties) {
+          if (prop.key && prop.key.name === 'delay' && 
+              prop.value && prop.value.type === 'Literal') {
+            config.delay = prop.value.value;
+          }
+        }
+      }
+      bodyFunc = args[1];
+    } else if (args.length === 1) {
+      bodyFunc = args[0];
+    }
+    
+    // Validate body function
+    if (!bodyFunc || bodyFunc.type !== 'ArrowFunctionExpression') {
+      this.warnings.push({
+        type: 'warning',
+        message: `${handler} body must be an arrow function`,
+        line: loc ? loc.start.line : 0
+      });
+      return null;
+    }
+    
+    // Extract body from arrow function
+    const body = [];
+    const bodyNode = bodyFunc.body;
+    if (bodyNode && bodyNode.type === 'BlockStatement' && bodyNode.body) {
+      for (const stmt of bodyNode.body) {
+        const transformed = this.transformBodyStatement(stmt);
+        if (transformed) body.push(transformed);
+      }
+    }
+    
+    return {
+      type: 'EventHandler',
+      handler,
+      config,
+      body,
+      loc,
+      range
+    };
+  }
+  
+  /**
+   * Transform when statement: when(() => condition, () => { ... })
+   */
+  transformWhenStatement(args, loc, range) {
+    if (!args || args.length !== 2) {
+      this.warnings.push({
+        type: 'warning',
+        message: `when() expects exactly 2 arguments, got ${args ? args.length : 0}`,
+        line: loc ? loc.start.line : 0
+      });
+      return null;
+    }
+    
+    const conditionFunc = args[0];
+    const bodyFunc = args[1];
+    
+    // Validate condition function
+    if (!conditionFunc || conditionFunc.type !== 'ArrowFunctionExpression') {
+      this.warnings.push({
+        type: 'warning',
+        message: 'when() condition must be an arrow function',
+        line: loc ? loc.start.line : 0
+      });
+      return null;
+    }
+    
+    // Extract condition
+    const condition = this.transformCondition(conditionFunc.body);
+    
+    // Validate body function
+    if (!bodyFunc || bodyFunc.type !== 'ArrowFunctionExpression') {
+      this.warnings.push({
+        type: 'warning',
+        message: 'when() body must be an arrow function',
+        line: loc ? loc.start.line : 0
+      });
+      return null;
+    }
+    
+    // Extract body
+    const body = [];
+    const bodyNode = bodyFunc.body;
+    if (bodyNode && bodyNode.type === 'BlockStatement' && bodyNode.body) {
+      for (const stmt of bodyNode.body) {
+        const transformed = this.transformBodyStatement(stmt);
+        if (transformed) body.push(transformed);
+      }
+    }
+    
+    return {
+      type: 'EventHandler',
+      handler: 'when',
+      condition,
+      body,
+      loc,
+      range
+    };
+  }
+  
+  /**
+   * Transform condition expression
+   */
+  transformCondition(expr) {
+    if (!expr) return null;
+    
+    // Handle unary expressions: !condition
+    if (expr.type === 'UnaryExpression') {
+      return {
+        type: 'UnaryExpression',
+        operator: expr.operator,
+        argument: this.transformCondition(expr.argument)
+      };
+    }
+    
+    // Handle logical expressions: a && b, a || b
+    if (expr.type === 'LogicalExpression') {
+      return {
+        type: 'LogicalExpression',
+        operator: expr.operator,
+        left: this.transformCondition(expr.left),
+        right: this.transformCondition(expr.right)
+      };
+    }
+    
+    // Handle binary expressions: a > b, a === b
+    if (expr.type === 'BinaryExpression') {
+      return {
+        type: 'BinaryExpression',
+        operator: expr.operator,
+        left: this.extractIdentifier(expr.left),
+        right: this.extractValue(expr.right)
+      };
+    }
+    
+    // Handle member expressions: flight.mode.failsafe
+    if (expr.type === 'MemberExpression') {
+      return {
+        type: 'MemberExpression',
+        value: this.extractIdentifier(expr)
+      };
+    }
+    
+    // Handle identifiers and literals
+    if (expr.type === 'Identifier') {
+      return {
+        type: 'Identifier',
+        value: expr.name
+      };
+    }
+    
+    if (expr.type === 'Literal') {
+      return {
+        type: 'Literal',
+        value: expr.value
+      };
+    }
+    
+    return null;
+  }
+  
+  /**
+   * Transform body statement
+   */
+  transformBodyStatement(stmt) {
+    if (!stmt) return null;
+    
+    if (stmt.type === 'ExpressionStatement') {
+      const expr = stmt.expression;
+      if (expr && expr.type === 'AssignmentExpression') {
+        return this.transformAssignment(expr, stmt.loc, stmt.range);
+      }
+    }
+    return null;
+  }
+  
+  /**
+   * Transform assignment: gvar[0] = value
+   */
+  transformAssignment(expr, loc, range) {
+    if (!expr.left || !expr.right) return null;
+    
+    const target = this.extractIdentifier(expr.left);
+    const rightExpr = expr.right;
+    
+    // Check if right side is binary expression (could be arithmetic or comparison)
+    if (rightExpr.type === 'BinaryExpression') {
+      const operator = rightExpr.operator;
+      const arithmeticOps = ['+', '-', '*', '/', '%'];
+      
+      if (arithmeticOps.includes(operator)) {
         return {
           type: 'Assignment',
           target,
-          operation: op,
-          left: operands[0],
-          right: this.parseValue(operands[1])
+          operation: operator,
+          left: this.extractIdentifier(rightExpr.left),
+          right: this.extractValue(rightExpr.right),
+          loc,
+          range
         };
       }
     }
@@ -275,29 +375,66 @@ class JavaScriptParser {
     return {
       type: 'Assignment',
       target,
-      value: this.parseValue(valueStr)
+      value: this.extractValue(rightExpr),
+      loc,
+      range
     };
   }
   
   /**
-   * Parse a value (number, string, or identifier)
+   * Extract identifier/property path from expression
    */
-  parseValue(str) {
-    str = str.trim();
+  extractIdentifier(expr) {
+    if (!expr) return '';
     
-    // Number
-    if (/^-?\d+$/.test(str)) {
-      return parseInt(str);
+    if (expr.type === 'Identifier') {
+      return expr.name;
     }
     
-    // Boolean
-    if (str === 'true') return true;
-    if (str === 'false') return false;
+    if (expr.type === 'MemberExpression') {
+      const object = this.extractIdentifier(expr.object);
+      
+      if (expr.computed) {
+        // Computed access: gvar[0] or obj[prop]
+        const property = this.extractValue(expr.property);
+        return `${object}[${property}]`;
+      } else {
+        // Dot access: flight.altitude
+        const property = expr.property && expr.property.name ? 
+          expr.property.name : '';
+        return property ? `${object}.${property}` : object;
+      }
+    }
     
-    // String (identifier, property access, etc.)
-    return str;
+    return '';
+  }
+  
+  /**
+   * Extract value from expression
+   */
+  extractValue(expr) {
+    if (!expr) return null;
+    
+    if (expr.type === 'Literal') {
+      return expr.value;
+    }
+    
+    if (expr.type === 'Identifier') {
+      return expr.name;
+    }
+    
+    if (expr.type === 'MemberExpression') {
+      return this.extractIdentifier(expr);
+    }
+    
+    if (expr.type === 'UnaryExpression' && expr.operator === '-') {
+      // Handle negative numbers
+      const val = this.extractValue(expr.argument);
+      return typeof val === 'number' ? -val : val;
+    }
+    
+    return null;
   }
 }
-
 
 module.exports = { JavaScriptParser };
