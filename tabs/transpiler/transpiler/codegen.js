@@ -1,363 +1,474 @@
 /**
-'use strict';
-
  * INAV Code Generator
  * 
  * Location: tabs/programming/transpiler/transpiler/codegen.js
  * 
- * Generic code generator that reads from API definitions.
- * This file rarely needs changes - new features are added to definitions only!
+ * Generates INAV logic condition CLI commands from AST.
+ * Supports if statements, edge(), sticky(), delay(), and on.* handlers.
  */
 
-const { getDefinition, getINAVOperand, getINAVOperation  } = require('../api/definitions/index.js');
+'use strict';
+
+const {
+  OPERAND_TYPE,
+  OPERATION,
+  getOperationName
+} = require('./inav_constants.js');
+const apiDefinitions = require('./../api/definitions/index.js');
 
 /**
  * INAV Code Generator
- * Converts analyzed AST to INAV CLI commands
+ * Converts AST to INAV logic condition commands
  */
 class INAVCodeGenerator {
   constructor() {
-    this.logicConditions = [];
-    this.lcIndex = 0;
-    this.lcMap = new Map(); // Track variable names to LC indices
+    this.lcIndex = 0; // Current logic condition index
+    this.commands = [];
+    this.operandMapping = this.buildOperandMapping(apiDefinitions);
   }
   
   /**
-   * Generate INAV CLI commands from analyzed code
-   * @param {Object} analyzed - Analyzed AST
-   * @returns {string[]} Array of CLI command strings
+   * Build operand mapping from API definitions
    */
-  generate(analyzed) {
-    this.logicConditions = [];
-    this.lcIndex = 0;
-    this.lcMap.clear();
+  buildOperandMapping(definitions) {
+    const mapping = {};
     
-    // Process each top-level statement
-    for (const statement of analyzed.statements) {
-      this.processStatement(statement);
-    }
-    
-    return this.logicConditions;
-  }
-  
-  /**
-   * Process a single statement
-   */
-  processStatement(statement) {
-    switch (statement.type) {
-      case 'EventHandler':
-        return this.processEventHandler(statement);
-      case 'Assignment':
-        return this.processAssignment(statement);
-      default:
-        console.warn(`Unknown statement type: ${statement.type}`);
-    }
-  }
-  
-  /**
-   * Process event handler (on.arm, when, etc.)
-   */
-  processEventHandler(statement) {
-    const { handler, config, body } = statement;
-    
-    let activatorLC = -1; // -1 means always active
-    
-    // Create activator condition
-    if (handler === 'on.arm') {
-      const delay = config.delay || 1;
-      activatorLC = this.createArmTimerCondition(delay);
-    } else if (handler === 'when') {
-      activatorLC = this.createCondition(statement.condition);
-    }
-    
-    // Process body statements with this activator
-    for (const bodyStatement of body) {
-      this.processBodyStatement(bodyStatement, activatorLC);
-    }
-  }
-  
-  /**
-   * Process statement inside event handler body
-   */
-  processBodyStatement(statement, activator) {
-    if (statement.type === 'Assignment') {
-      return this.processAssignment(statement, activator);
-    } else if (statement.type === 'Expression') {
-      return this.processExpression(statement.expression, activator);
-    }
-  }
-  
-  /**
-   * Process assignment (gvar[0] = value, override.vtx.power = 3, etc.)
-   */
-  processAssignment(statement, activator = -1) {
-    const { target, value } = statement;
-    
-    // Handle GVAR assignment
-    if (target.startsWith('gvar[')) {
-      const index = this.extractArrayIndex(target);
-      const valueLC = this.resolveValue(value, activator);
+    for (const [objName, objDef] of Object.entries(definitions)) {
+      if (!objDef || typeof objDef !== 'object') continue;
       
-      // Operation 18 = GVAR_SET
-      this.addLogicCondition(
-        activator,
-        18, // GVAR_SET
-        0, index, // Operand A: value (GVAR index)
-        4, valueLC // Operand B: LC result
-      );
+      for (const [propName, propDef] of Object.entries(objDef)) {
+        if (!propDef || typeof propDef !== 'object') continue;
+        
+        // Direct property
+        if (propDef.inavOperand) {
+          const path = `${objName}.${propName}`;
+          mapping[path] = propDef.inavOperand;
+        }
+        
+        // Nested object
+        if (propDef.type === 'object' && propDef.properties) {
+          for (const [nestedName, nestedDef] of Object.entries(propDef.properties)) {
+            if (nestedDef && nestedDef.inavOperand) {
+              const path = `${objName}.${propName}.${nestedName}`;
+              mapping[path] = nestedDef.inavOperand;
+            }
+          }
+        }
+        
+        // Operation mapping for writable properties
+        if (propDef.inavOperation) {
+          const path = `${objName}.${propName}`;
+          if (!mapping[path]) mapping[path] = {};
+          mapping[path].operation = propDef.inavOperation;
+        }
+      }
+    }
+    
+    return mapping;
+  }
+  
+  /**
+   * Generate INAV CLI commands from AST
+   * @param {Object} ast - Abstract syntax tree
+   * @returns {string[]} Array of CLI commands
+   */
+  generate(ast) {
+    this.lcIndex = 0;
+    this.commands = [];
+    
+    if (!ast || !ast.statements) {
+      throw new Error('Invalid AST');
+    }
+    
+    for (const stmt of ast.statements) {
+      this.generateStatement(stmt);
+    }
+    
+    return this.commands;
+  }
+  
+  /**
+   * Generate logic condition for a statement
+   */
+  generateStatement(stmt) {
+    if (!stmt) return;
+    
+    switch (stmt.type) {
+      case 'EventHandler':
+        this.generateEventHandler(stmt);
+        break;
+      case 'Destructuring':
+        // Ignore - just used for parser
+        break;
+      default:
+        console.warn(`Unknown statement type: ${stmt.type}`);
+    }
+  }
+  
+  /**
+   * Generate event handler (if statement, edge, sticky, delay, on.*)
+   */
+  generateEventHandler(stmt) {
+    const handler = stmt.handler;
+    
+    if (handler === 'on.arm') {
+      this.generateOnArm(stmt);
+    } else if (handler === 'on.always') {
+      this.generateOnAlways(stmt);
+    } else if (handler.startsWith('if')) {
+      // If statement - generates conditional logic
+      this.generateConditional(stmt);
+    } else if (handler === 'edge') {
+      this.generateEdge(stmt);
+    } else if (handler === 'sticky') {
+      this.generateSticky(stmt);
+    } else if (handler === 'delay') {
+      this.generateDelay(stmt);
+    } else {
+      // Default: treat as conditional
+      this.generateConditional(stmt);
+    }
+  }
+  
+  /**
+   * Generate on.arm handler
+   */
+  generateOnArm(stmt) {
+    const delay = stmt.config.delay || 0;
+    const delayMs = delay * 1000; // Convert to milliseconds
+    
+    // Create activator: armTimer > delayMs
+    const activatorId = this.lcIndex;
+    this.commands.push(
+      `logic ${this.lcIndex} 1 -1 ${OPERATION.GREATER_THAN} ${OPERAND_TYPE.FLIGHT} 0 ${OPERAND_TYPE.VALUE} ${delayMs} 0`
+    );
+    this.lcIndex++;
+    
+    // Generate body actions
+    for (const action of stmt.body) {
+      this.generateAction(action, activatorId);
+    }
+  }
+  
+  /**
+   * Generate on.always handler
+   */
+  generateOnAlways(stmt) {
+    // Create activator: always true
+    const activatorId = this.lcIndex;
+    this.commands.push(
+      `logic ${this.lcIndex} 1 -1 ${OPERATION.TRUE} ${OPERAND_TYPE.VALUE} 0 ${OPERAND_TYPE.VALUE} 0 0`
+    );
+    this.lcIndex++;
+    
+    // Generate body actions
+    for (const action of stmt.body) {
+      this.generateAction(action, activatorId);
+    }
+  }
+  
+  /**
+   * Generate conditional (if statement)
+   */
+  generateConditional(stmt) {
+    if (!stmt.condition) return;
+    
+    // Generate condition logic condition
+    const conditionId = this.lcIndex;
+    this.generateCondition(stmt.condition, -1);
+    
+    // Generate body actions
+    for (const action of stmt.body) {
+      this.generateAction(action, conditionId);
+    }
+  }
+  
+  /**
+   * Generate edge handler
+   */
+  generateEdge(stmt) {
+    // Edge detection requires:
+    // 1. Condition LC
+    // 2. Timer check
+    // 3. Action
+    
+    const conditionId = this.lcIndex;
+    this.generateCondition(stmt.condition, -1);
+    
+    // TODO: Implement edge with duration
+    // For now, simple edge without debounce
+    for (const action of stmt.body) {
+      this.generateAction(action, conditionId);
+    }
+  }
+  
+  /**
+   * Generate sticky handler
+   */
+  generateSticky(stmt) {
+    // Sticky requires:
+    // 1. On condition LC
+    // 2. Off condition LC
+    // 3. State variable (gvar)
+    // 4. Action
+    
+    // TODO: Implement sticky pattern
+    // For now, treat as simple conditional
+    const conditionId = this.lcIndex;
+    this.generateCondition(stmt.onCondition, -1);
+    
+    for (const action of stmt.body) {
+      this.generateAction(action, conditionId);
+    }
+  }
+  
+  /**
+   * Generate delay handler
+   */
+  generateDelay(stmt) {
+    // Delay requires:
+    // 1. Condition LC
+    // 2. Timer check
+    // 3. Action
+    
+    // TODO: Implement delay pattern
+    // For now, treat as simple conditional
+    const conditionId = this.lcIndex;
+    this.generateCondition(stmt.condition, -1);
+    
+    for (const action of stmt.body) {
+      this.generateAction(action, conditionId);
+    }
+  }
+  
+  /**
+   * Generate condition logic condition
+   */
+  generateCondition(condition, activatorId) {
+    if (!condition) return this.lcIndex;
+    
+    const startIndex = this.lcIndex;
+    
+    switch (condition.type) {
+      case 'BinaryExpression': {
+        const left = this.getOperand(condition.left);
+        const right = this.getOperand(condition.right);
+        const op = this.getOperation(condition.operator);
+        
+        this.commands.push(
+          `logic ${this.lcIndex} 1 ${activatorId} ${op} ${left.type} ${left.value} ${right.type} ${right.value} 0`
+        );
+        this.lcIndex++;
+        break;
+      }
+      
+      case 'LogicalExpression': {
+        // Generate left condition
+        const leftId = this.lcIndex;
+        this.generateCondition(condition.left, activatorId);
+        
+        // Generate right condition
+        const rightId = this.lcIndex;
+        this.generateCondition(condition.right, activatorId);
+        
+        // Combine with logical operator
+        const op = condition.operator === '&&' ? OPERATION.AND : OPERATION.OR;
+        this.commands.push(
+          `logic ${this.lcIndex} 1 ${activatorId} ${op} ${OPERAND_TYPE.GET_LC_VALUE} ${leftId} ${OPERAND_TYPE.GET_LC_VALUE} ${rightId} 0`
+        );
+        this.lcIndex++;
+        break;
+      }
+      
+      case 'UnaryExpression': {
+        // Generate argument
+        const argId = this.lcIndex;
+        this.generateCondition(condition.argument, activatorId);
+        
+        // Apply NOT
+        this.commands.push(
+          `logic ${this.lcIndex} 1 ${activatorId} ${OPERATION.NOT} ${OPERAND_TYPE.GET_LC_VALUE} ${argId} ${OPERAND_TYPE.VALUE} 0 0`
+        );
+        this.lcIndex++;
+        break;
+      }
+      
+      case 'MemberExpression': {
+        // Boolean property access (e.g., flight.mode.failsafe)
+        const operand = this.getOperand(condition.value);
+        
+        // Check if true
+        this.commands.push(
+          `logic ${this.lcIndex} 1 ${activatorId} ${OPERATION.EQUAL} ${operand.type} ${operand.value} ${OPERAND_TYPE.VALUE} 1 0`
+        );
+        this.lcIndex++;
+        break;
+      }
+      
+      case 'Literal': {
+        // Literal true/false
+        if (condition.value === true) {
+          this.commands.push(
+            `logic ${this.lcIndex} 1 ${activatorId} ${OPERATION.TRUE} ${OPERAND_TYPE.VALUE} 0 ${OPERAND_TYPE.VALUE} 0 0`
+          );
+        } else {
+          this.commands.push(
+            `logic ${this.lcIndex} 1 ${activatorId} ${OPERATION.NOT} ${OPERAND_TYPE.VALUE} 1 ${OPERAND_TYPE.VALUE} 0 0`
+          );
+        }
+        this.lcIndex++;
+        break;
+      }
+      
+      default:
+        console.warn(`Unknown condition type: ${condition.type}`);
+    }
+    
+    return startIndex;
+  }
+  
+  /**
+   * Generate action logic condition
+   */
+  generateAction(action, activatorId) {
+    if (!action || action.type !== 'Assignment') return;
+    
+    const target = action.target;
+    const value = action.value;
+    
+    // Handle gvar assignment
+    if (target.startsWith('gvar[')) {
+      const index = parseInt(target.match(/\d+/)[0]);
+      
+      if (action.operation) {
+        // Arithmetic: gvar[0] = gvar[0] + 10
+        const left = this.getOperand(action.left);
+        const right = this.getOperand(action.right);
+        const op = this.getArithmeticOperation(action.operation);
+        
+        // First compute the result
+        const resultId = this.lcIndex;
+        this.commands.push(
+          `logic ${this.lcIndex} 1 ${activatorId} ${op} ${left.type} ${left.value} ${right.type} ${right.value} 0`
+        );
+        this.lcIndex++;
+        
+        // Then assign to gvar
+        this.commands.push(
+          `logic ${this.lcIndex} 1 ${activatorId} ${OPERATION.SET_GVAR} ${OPERAND_TYPE.GVAR} ${index} ${OPERAND_TYPE.GET_LC_VALUE} ${resultId} 0`
+        );
+        this.lcIndex++;
+      } else {
+        // Simple assignment: gvar[0] = 100
+        const valueOperand = this.getOperand(value);
+        this.commands.push(
+          `logic ${this.lcIndex} 1 ${activatorId} ${OPERATION.SET_GVAR} ${OPERAND_TYPE.GVAR} ${index} ${valueOperand.type} ${valueOperand.value} 0`
+        );
+        this.lcIndex++;
+      }
       return;
     }
     
-    // Handle override assignment
+    // Handle override operations
     if (target.startsWith('override.')) {
-      const path = target.replace('override.', '');
-      const def = getDefinition(`override.${path}`);
+      const operation = this.getOverrideOperation(target);
+      const valueOperand = this.getOperand(value);
       
-      if (!def) {
-        throw new Error(`Unknown override: ${target}`);
-      }
-      
-      // Use custom codegen if available
-      if (def.codegen) {
-        const code = def.codegen(value, activator, this.lcIndex);
-        this.logicConditions.push(code);
-        this.logicConditions.push(`# ${target} = ${value}`);
-        this.lcIndex++;
-        return;
-      }
-      
-      // Use standard template
-      if (def.inavOperation) {
-        this.addLogicCondition(
-          activator,
-          def.inavOperation,
-          0, value, // Operand A: value
-          0, 0      // Operand B: unused
-        );
-        this.logicConditions.push(`# ${target} = ${value}`);
-        return;
-      }
-      
-      throw new Error(`No code generation strategy for ${target}`);
+      this.commands.push(
+        `logic ${this.lcIndex} 1 ${activatorId} ${operation} ${OPERAND_TYPE.VALUE} 0 ${valueOperand.type} ${valueOperand.value} 0`
+      );
+      this.lcIndex++;
+      return;
     }
     
-    // Handle variable assignment (arithmetic)
-    if (statement.operation) {
-      const resultLC = this.processArithmetic(statement, activator);
-      this.lcMap.set(target, resultLC);
-      return resultLC;
-    }
+    console.warn(`Unknown assignment target: ${target}`);
   }
   
   /**
-   * Process arithmetic expression
+   * Get operand from value
    */
-  processArithmetic(statement, activator) {
-    const { operation, left, right } = statement;
+  getOperand(value) {
+    if (typeof value === 'number') {
+      return { type: OPERAND_TYPE.VALUE, value };
+    }
     
-    const leftValue = this.resolveValue(left, activator);
-    const rightValue = this.resolveValue(right, activator);
+    if (typeof value === 'boolean') {
+      return { type: OPERAND_TYPE.VALUE, value: value ? 1 : 0 };
+    }
     
-    const operationMap = {
-      '+': 14, // ADD
-      '-': 15, // SUB
-      '*': 16, // MUL
-      '/': 17, // DIV
-      '%': 40  // MODULUS
+    if (typeof value === 'string') {
+      // Check for gvar
+      if (value.startsWith('gvar[')) {
+        const index = parseInt(value.match(/\d+/)[0]);
+        return { type: OPERAND_TYPE.GVAR, value: index };
+      }
+      
+      // Check for rc channel
+      if (value.startsWith('rc[')) {
+        const index = parseInt(value.match(/\d+/)[0]);
+        return { type: OPERAND_TYPE.RC_CHANNEL, value: index };
+      }
+      
+      // Check in operand mapping
+      if (this.operandMapping[value]) {
+        return this.operandMapping[value];
+      }
+      
+      console.warn(`Unknown operand: ${value}`);
+      return { type: OPERAND_TYPE.VALUE, value: 0 };
+    }
+    
+    return { type: OPERAND_TYPE.VALUE, value: 0 };
+  }
+  
+  /**
+   * Get operation from operator
+   */
+  getOperation(operator) {
+    const ops = {
+      '===': OPERATION.EQUAL,
+      '==': OPERATION.EQUAL,
+      '>': OPERATION.GREATER_THAN,
+      '<': OPERATION.LOWER_THAN,
+      '>=': OPERATION.GREATER_THAN, // Note: INAV doesn't have >=, use >
+      '<=': OPERATION.LOWER_THAN,   // Note: INAV doesn't have <=, use <
+      '!==': OPERATION.NOT,
+      '!=': OPERATION.NOT
     };
     
-    const opCode = operationMap[operation];
-    if (!opCode) {
-      throw new Error(`Unsupported operation: ${operation}`);
-    }
-    
-    const resultLC = this.lcIndex;
-    this.addLogicCondition(
-      activator,
-      opCode,
-      this.getOperandType(left), leftValue,
-      this.getOperandType(right), rightValue
-    );
-    this.logicConditions.push(`# Arithmetic: ${left} ${operation} ${right}`);
-    
-    return resultLC;
+    return ops[operator] || OPERATION.EQUAL;
   }
   
   /**
-   * Create ARM timer condition
+   * Get arithmetic operation
    */
-  createArmTimerCondition(delay) {
-    const lcIndex = this.lcIndex;
+  getArithmeticOperation(operator) {
+    const ops = {
+      '+': OPERATION.ADD,
+      '-': OPERATION.SUB,
+      '*': OPERATION.MUL,
+      '/': OPERATION.DIV,
+      '%': OPERATION.MOD
+    };
     
-    // Operation 1 = EQUAL
-    // Operand A: flight.armTimer (type 2, value 0)
-    // Operand B: delay value (type 0, value delay)
-    this.addLogicCondition(
-      -1, // Always active
-      1,  // EQUAL
-      2, 0,   // Operand A: armTimer
-      0, delay // Operand B: delay value
-    );
-    this.logicConditions.push(`# Trigger ${delay}s after arming`);
-    
-    return lcIndex;
+    return ops[operator] || OPERATION.ADD;
   }
   
   /**
-   * Create condition from expression
+   * Get override operation for target
    */
-  createCondition(condition) {
-    const lcIndex = this.lcIndex;
+  getOverrideOperation(target) {
+    const operations = {
+      'override.throttleScale': OPERATION.OVERRIDE_THROTTLE_SCALE,
+      'override.throttle': OPERATION.OVERRIDE_THROTTLE,
+      'override.vtx.power': OPERATION.OVERRIDE_VTX_POWER,
+      'override.vtx.band': OPERATION.OVERRIDE_VTX_BAND,
+      'override.vtx.channel': OPERATION.OVERRIDE_VTX_CHANNEL,
+      'override.armSafety': OPERATION.OVERRIDE_ARM_SAFETY,
+      'override.armingDisabled': OPERATION.OVERRIDE_ARMING_DISABLED
+    };
     
-    // Simple comparison: flight.homeDistance > 100
-    if (condition.type === 'BinaryExpression') {
-      const { operator, left, right } = condition;
-      
-      const operatorMap = {
-        '>': 2,  // GREATER_THAN
-        '<': 3,  // LOWER_THAN
-        '===': 1, // EQUAL
-        '==': 1   // EQUAL
-      };
-      
-      const opCode = operatorMap[operator];
-      if (!opCode) {
-        throw new Error(`Unsupported operator: ${operator}`);
-      }
-      
-      const leftValue = this.resolveValue(left);
-      const rightValue = this.resolveValue(right);
-      
-      this.addLogicCondition(
-        -1, // Always active
-        opCode,
-        this.getOperandType(left), leftValue,
-        this.getOperandType(right), rightValue
-      );
-      this.logicConditions.push(`# Condition: ${left} ${operator} ${right}`);
-    }
-    
-    // Logical OR: a || b
-    else if (condition.type === 'LogicalExpression' && condition.operator === '||') {
-      const leftLC = this.createCondition(condition.left);
-      const rightLC = this.createCondition(condition.right);
-      
-      // Create OR operation
-      this.addLogicCondition(
-        -1, // Always active
-        8,  // OR
-        4, leftLC,  // Operand A: left condition result
-        4, rightLC  // Operand B: right condition result
-      );
-      this.logicConditions.push(`# OR condition`);
-    }
-    
-    // Logical AND: a && b
-    else if (condition.type === 'LogicalExpression' && condition.operator === '&&') {
-      const leftLC = this.createCondition(condition.left);
-      const rightLC = this.createCondition(condition.right);
-      
-      // Create AND operation
-      this.addLogicCondition(
-        -1, // Always active
-        7,  // AND
-        4, leftLC,  // Operand A: left condition result
-        4, rightLC  // Operand B: right condition result
-      );
-      this.logicConditions.push(`# AND condition`);
-    }
-    
-    return lcIndex;
-  }
-  
-  /**
-   * Resolve a value to its operand representation
-   */
-  resolveValue(value, activator = -1) {
-    // Literal number
-    if (typeof value === 'number') {
-      return value;
-    }
-    
-    // Variable reference
-    if (this.lcMap.has(value)) {
-      return this.lcMap.get(value);
-    }
-    
-    // Flight parameter: flight.homeDistance
-    if (value.startsWith('flight.')) {
-      const path = value.replace('flight.', '');
-      const def = getDefinition(`flight.${path}`);
-      if (def && def.inavOperand) {
-        return def.inavOperand.value;
-      }
-    }
-    
-    // RC channel: rc[5].high (already resolved in parser)
-    if (typeof value === 'object' && value.channel) {
-      return value.channel;
-    }
-    
-    return value;
-  }
-  
-  /**
-   * Get operand type for a value
-   */
-  getOperandType(value) {
-    // Literal number
-    if (typeof value === 'number') {
-      return 0; // VALUE
-    }
-    
-    // Variable reference (logic condition result)
-    if (this.lcMap.has(value)) {
-      return 4; // LC
-    }
-    
-    // Flight parameter
-    if (typeof value === 'string' && value.startsWith('flight.')) {
-      return 2; // FLIGHT
-    }
-    
-    // RC channel
-    if (typeof value === 'string' && value.startsWith('rc[')) {
-      return 1; // RC_CHANNEL
-    }
-    
-    // Default to value
-    return 0;
-  }
-  
-  /**
-   * Extract array index from string like "gvar[0]"
-   */
-  extractArrayIndex(str) {
-    const match = str.match(/\[(\d+)\]/);
-    return match ? parseInt(match[1]) : 0;
-  }
-  
-  /**
-   * Add logic condition in INAV CLI format
-   */
-  addLogicCondition(activator, operation, operandAType, operandAValue, operandBType = 0, operandBValue = 0) {
-    const enabled = 1;
-    const flags = 0;
-    
-    const cmd = `logic ${this.lcIndex} ${enabled} ${activator} ${operation} ${operandAType} ${operandAValue} ${operandBType} ${operandBValue} ${flags}`;
-    
-    this.logicConditions.push(cmd);
-    this.lcIndex++;
-  }
-  
-  /**
-   * Process expression (function call, etc.)
-   */
-  processExpression(expression, activator) {
-    // Handle function calls like override methods
-    if (expression.type === 'CallExpression') {
-      // Could handle pid[0].configure() here
-    }
+    return operations[target] || OPERATION.SET_OVERRIDE;
   }
 }
 

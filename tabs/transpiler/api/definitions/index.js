@@ -1,164 +1,36 @@
 /**
+ * INAV API Definitions - Main Export
+ * 
+ * Location: tabs/transpiler/api/definitions/index.js
+ * 
+ * Exports all API definitions as a single object.
+ * This is the SINGLE SOURCE OF TRUTH for INAV JavaScript API.
+ */
+
 'use strict';
 
- * INAV API Definitions Aggregator
- * 
- * Location: tabs/programming/transpiler/api/definitions/index.js
- * 
- * Imports and exports all API definitions from a single location.
- * This file uses relative imports from the same directory.
- */
-
-// Import all definition modules (same directory, relative paths)
-const { flightDefinitions  } = require('./flight.js');
-const { overrideDefinitions  } = require('./override.js');
-const { waypointDefinitions  } = require('./waypoint.js');
-const { rcDefinitions  } = require('./rc.js');
-
-/**
- * Complete INAV API definitions
- * Single source of truth for all INAV JavaScript API
- */
-const apiDefinitions = {
-  flight: flightDefinitions,
-  override: overrideDefinitions,
-  waypoint: waypointDefinitions,
-  rc: rcDefinitions,
+module.exports = {
+  // Read-only telemetry and state
+  flight: require('./flight.js'),
   
-  // Global variables (array-like)
-  gvar: {
-    type: 'array',
-    desc: 'Global variables (0-7)',
-    inavOperand: { type: 5, value: 0 }
-  },
+  // Writable overrides
+  override: require('./override.js'),
+  
+  // RC receiver channels
+  rc: require('./rc.js'),
+  
+  // Global variables (read/write)
+  gvar: require('./gvar.js'),
+  
+  // Waypoint navigation
+  waypoint: require('./waypoint.js'),
   
   // Programming PID controllers
-  pid: {
-    configure: {
-      type: 'function',
-      desc: 'Configure PID controller parameters'
-    },
-    output: {
-      type: 'number',
-      desc: 'PID controller output value',
-      inavOperand: { type: 6, value: 0 }
-    }
-  },
+  pid: require('./pid.js'),
   
-  // Event handlers
-  on: {
-    arm: {
-      type: 'function',
-      desc: 'Execute callback after arming with optional delay'
-    },
-    always: {
-      type: 'function',
-      desc: 'Execute callback continuously'
-    }
-  },
+  // Helper functions (min, max, abs, sin, cos, etc.)
+  helpers: require('./helpers.js'),
   
-  // Conditional execution
-  when: {
-    type: 'function',
-    desc: 'Execute callback when condition is true'
-  },
-  
-  sticky: {
-    type: 'function',
-    desc: 'Sticky condition - latches on until off condition'
-  },
-  
-  edge: {
-    type: 'function',
-    desc: 'Edge detection - momentary trigger'
-  },
-  
-  delay: {
-    type: 'function',
-    desc: 'Delay execution until condition stays true'
-  },
-  
-  timer: {
-    type: 'function',
-    desc: 'Timer - on/off cycles'
-  },
-  
-  whenChanged: {
-    type: 'function',
-    desc: 'Trigger when value changes by threshold'
-  }
-};
-
-/**
- * Get definition for a specific property path
- * @param {string} path - Dot-separated path (e.g., "flight.altitude")
- * @returns {Object|null} Definition object or null if not found
- */
-function getDefinition(path) {
-  const parts = path.split('.');
-  let current = apiDefinitions;
-  
-  for (const part of parts) {
-    if (current && current[part]) {
-      current = current[part];
-    } else {
-      return null;
-    }
-  }
-  
-  return current;
-}
-
-/**
- * Get all property names for a path
- * @param {string} path - Dot-separated path (e.g., "flight")
- * @returns {string[]} Array of property names
- */
-function getProperties(path) {
-  const def = path ? getDefinition(path) : apiDefinitions;
-  if (!def || typeof def !== 'object') {
-    return [];
-  }
-  return Object.keys(def);
-}
-
-/**
- * Check if a path represents a writable property
- * @param {string} path - Dot-separated path
- * @returns {boolean} True if writable
- */
-function isWritable(path) {
-  // Only override, gvar, and pid properties are writable
-  return path.startsWith('override.') || 
-         path.startsWith('gvar') || 
-         path === 'ioPort';
-}
-
-/**
- * Get INAV operand type and value for a property
- * @param {string} path - Dot-separated path
- * @returns {Object|null} {type, value} or null
- */
-function getINAVOperand(path) {
-  const def = getDefinition(path);
-  return def?.inavOperand || null;
-}
-
-/**
- * Get INAV operation ID for an override
- * @param {string} path - Dot-separated path
- * @returns {number|null} Operation ID or null
- */
-function getINAVOperation(path) {
-  const def = getDefinition(path);
-  return def?.inavOperation || null;
-}
-
-module.exports = {
-    apiDefinitions,
-    getDefinition,
-    getProperties,
-    isWritable,
-    getINAVOperand,
-    getINAVOperation
+  // Event handlers (on, when, sticky, etc.)
+  events: require('./events.js')
 };

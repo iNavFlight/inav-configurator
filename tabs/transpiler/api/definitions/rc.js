@@ -1,66 +1,58 @@
 /**
-'use strict';
-
- * INAV RC Channel Definitions
+ * INAV RC Channels API Definition
  * 
- * Location: tabs/programming/transpiler/api/definitions/rc.js
+ * Location: tabs/transpiler/api/definitions/rc.js
  * 
- * RC channel access (all read-only)
- * Accessed as: rc[1].value, rc[5].high, etc.
+ * RC receiver channel values and states.
+ * INAV supports up to 18 RC channels.
  */
 
-const rcDefinitions = {
-  // RC channels are accessed as array: rc[1], rc[2], etc.
-  // Each channel has these properties:
-  
-  value: {
-    type: 'number',
-    desc: 'Raw RC channel value (1000-2000μs)',
-    inavOperand: { type: 1, value: 0 }, // value is channel index
-    readonly: true,
-    example: 'const throttle = rc[3].value; // Raw throttle value',
-    note: 'Channel index is 1-based (rc[1] = first channel)',
-    category: 'raw'
-  },
-  
-  low: {
-    type: 'boolean',
-    desc: 'RC channel is LOW (< 1333μs)',
-    inavOperand: { type: 1, value: 0 },
-    readonly: true,
-    codegen: (channel, activator, lcIndex) => {
-      // Operation 4 = LOW check
-      return `logic ${lcIndex} 1 ${activator} 4 1 ${channel} 0 0 0`;
-    },
-    example: 'if (rc[5].low) { /* Switch is down */ }',
-    category: 'position'
-  },
-  
-  mid: {
-    type: 'boolean',
-    desc: 'RC channel is MID (1333-1666μs)',
-    inavOperand: { type: 1, value: 0 },
-    readonly: true,
-    codegen: (channel, activator, lcIndex) => {
-      // Operation 5 = MID check
-      return `logic ${lcIndex} 1 ${activator} 5 1 ${channel} 0 0 0`;
-    },
-    example: 'if (rc[5].mid) { /* Switch is middle */ }',
-    category: 'position'
-  },
-  
-  high: {
-    type: 'boolean',
-    desc: 'RC channel is HIGH (> 1666μs)',
-    inavOperand: { type: 1, value: 0 },
-    readonly: true,
-    codegen: (channel, activator, lcIndex) => {
-      // Operation 6 = HIGH check
-      return `logic ${lcIndex} 1 ${activator} 6 1 ${channel} 0 0 0`;
-    },
-    example: 'if (rc[5].high) { /* Switch is up */ }',
-    category: 'position'
-  }
-};
+'use strict';
 
-module.exports = { rcDefinitions };
+// Generate RC channel definitions
+// RC channels are accessed as rc[0] through rc[17] (or rc[1] through rc[18] in 1-indexed)
+// Each channel has: value, low, mid, high properties
+
+const rcChannels = {};
+
+// Generate 18 RC channels
+for (let i = 0; i < 18; i++) {
+  rcChannels[i] = {
+    type: 'object',
+    desc: `RC channel ${i + 1}`,
+    readonly: true,
+    properties: {
+      value: {
+        type: 'number',
+        unit: 'us',
+        desc: `Channel ${i + 1} value in microseconds (1000-2000)`,
+        readonly: true,
+        range: [1000, 2000],
+        inavOperand: { type: 4, value: i } // OPERAND_RC_CHANNEL
+      },
+      
+      low: {
+        type: 'boolean',
+        desc: `Channel ${i + 1} is in low position (< 1333us)`,
+        readonly: true,
+        inavOperand: { type: 4, value: i }
+      },
+      
+      mid: {
+        type: 'boolean',
+        desc: `Channel ${i + 1} is in middle position (1333-1666us)`,
+        readonly: true,
+        inavOperand: { type: 4, value: i }
+      },
+      
+      high: {
+        type: 'boolean',
+        desc: `Channel ${i + 1} is in high position (> 1666us)`,
+        readonly: true,
+        inavOperand: { type: 4, value: i }
+      }
+    }
+  };
+}
+
+module.exports = rcChannels;
