@@ -6,11 +6,14 @@
 
 'use strict';
 
+const MSPChainerClass = require('./../js/msp/MSPchainer');
+const mspHelper = require('./../js/msp/MSPHelper');
 const { GUI, TABS } = require('./../js/gui');
+const FC = require('./../js/fc');
 const path = require('path');
 const i18n = require('./../js/localization');
-// import { Transpiler } from './transpiler/index.js';
-const Transpiler = require('./transpiler/index.js');
+const { Transpiler } = require('./transpiler/index.js');
+const { Decompiler } = require('./transpiler/decompiler.js');
 
 TABS.javascript_programming = {
 
@@ -18,21 +21,22 @@ TABS.javascript_programming = {
     isDirty: false,
     editor: null,
     transpiler: null,
+    decompiler: null,
     currentCode: '',
     
     analyticsChanges: {},
-    
+
     initialize: function (callback) {
         const self = this;
         
         if (GUI.active_tab !== 'javascript_programming') {
             GUI.active_tab = 'javascript_programming';
         }
-        
+
         // Load HTML
         $('#content').load("./tabs/javascript_programming.html", function () {
             
-            // Initialize transpiler
+            // Initialize transpiler and decompiler
             self.initTranspiler();
             
             // Load Monaco Editor
@@ -57,92 +61,55 @@ TABS.javascript_programming = {
     },
     
     /**
-     * Initialize the transpiler
+     * Initialize transpiler and decompiler
      */
     initTranspiler: function() {
-        // In production, import the transpiler module
-        // For now, assume it's available globally
         if (typeof Transpiler !== 'undefined') {
             this.transpiler = new Transpiler();
         } else {
             console.error('Transpiler not loaded');
-            GUI.log('JavaScript transpiler not available');
+            GUI.log(i18n.getMessage('transpilerNotAvailable') || 'JavaScript transpiler not available');
+        }
+    
+        if (typeof Decompiler !== 'undefined') {
+            this.decompiler = new Decompiler();
+        } else {
+            console.error('Decompiler not loaded');
+            GUI.log(i18n.getMessage('decompilerNotAvailable') || 'JavaScript decompiler not available');
         }
     },
-    
+
     /**
      * Load Monaco Editor
      */
     loadMonacoEditor: function(callback) {
-        const loader = require('@monaco-editor/loader');
-        const monaco = require('monaco-editor');
         const self = this;
 
-        if (typeof monaco !== 'undefined') {
-            self.setupMonaco();
-            callback();
-        }
-    },
-
-/**
- * Load Monaco Editor from CDN
- */
-    // Ray TODO - Remvoe this function if we load it locally
-    loadMonacoEditorCDN: function(callback) {
-        const self = this;
-        
-        // Check if Monaco is already loaded
-        if (typeof monaco !== 'undefined') {
-            self.setupMonaco();
-            callback();
-            return;
-        }
-        
-        // Save Node.js require
-        const nodeRequire = window.require;
-        
-        // Load Monaco Editor loader script
-        const loaderScript = document.createElement('script');
-        loaderScript.src = 'https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs/loader.js';
-        
-        loaderScript.onload = function() {
-            // Now window.require is RequireJS's require (AMD)
-            window.require.config({ 
-                paths: { 
-                    'vs': 'https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs' 
-                }
-            });
+        // Try to load Monaco Editor
+        try {
+            const monaco = window.monaco || require('monaco-editor');
             
-            // Load Monaco editor main module
-            window.require(['vs/editor/editor.main'], function() {
-                // Restore Node.js require after Monaco loads
-                window.require = nodeRequire;
-                
-                self.setupMonaco();
+            if (monaco) {
+                self.setupMonaco(monaco);
                 callback();
-            });
-        };
-        
-        loaderScript.onerror = function() {
-            console.error('Failed to load Monaco Editor');
-            GUI.log('Failed to load Monaco Editor from CDN');
-            
-            // Restore Node.js require even on error
-            window.require = nodeRequire;
-            
-            // Fallback: show a basic textarea
+            } else {
+                throw new Error('Monaco not found');
+            }
+        } catch (error) {
+            console.error('Failed to load Monaco Editor:', error);
             self.createFallbackEditor();
             callback();
-        };
-        
-        document.head.appendChild(loaderScript);
+        }
     },
 
     /**
      * Set up Monaco Editor with INAV JavaScript support
      */
-    setupMonaco: function() {
+    setupMonaco: function(monaco) {
         const self = this;
+        
+        // Store monaco reference
+        window.monacoInstance = monaco;
         
         // Configure JavaScript defaults
         monaco.languages.typescript.javascriptDefaults.setDiagnosticsOptions({
@@ -156,7 +123,7 @@ TABS.javascript_programming = {
         });
         
         // Add INAV API type definitions
-        this.addINAVTypeDefinitions();
+        this.addINAVTypeDefinitions(monaco);
         
         // Create editor
         this.editor = monaco.editor.create(document.getElementById('monaco-editor'), {
@@ -234,7 +201,7 @@ TABS.javascript_programming = {
     /**
      * Add INAV API type definitions for autocomplete
      */
-    addINAVTypeDefinitions: function() {
+    addINAVTypeDefinitions: function(monaco) {
         // Type definitions for INAV API
         const inavTypes = `
 declare namespace inav {
@@ -294,6 +261,7 @@ declare namespace inav {
     
     namespace on {
         function arm(config: { delay: number }, callback: () => void): void;
+        function always(callback: () => void): void;
     }
     
     function when(condition: () => boolean, action: () => void): void;
@@ -405,7 +373,6 @@ when(() => flight.homeDistance > 100, () => {
      * Load an example into the editor
      */
     loadExample: function(exampleId) {
-        // Example code (in production, import from examples/index.js)
         const examples = {
             'vtx-distance': `// Auto VTX power based on distance
 const { flight, override, when } = inav;
@@ -473,11 +440,11 @@ when(() => flight.mode.failsafe || rc[5].high, () => {
         const code = this.editor.getValue();
         
         if (!this.transpiler) {
-            GUI.log('Transpiler not available');
+            GUI.log(i18n.getMessage('transpilerNotAvailable') || 'Transpiler not available');
             return;
         }
         
-        GUI.log('Transpiling JavaScript...');
+        GUI.log(i18n.getMessage('transpiling') || 'Transpiling JavaScript...');
         
         try {
             const result = this.transpiler.transpile(code);
@@ -486,6 +453,7 @@ when(() => flight.mode.failsafe || rc[5].high, () => {
                 // Display output
                 const formattedOutput = this.transpiler.formatOutput(
                     result.commands,
+                    result.warnings,
                     result.optimizations
                 );
                 $('#transpiler-output').val(formattedOutput);
@@ -501,8 +469,13 @@ when(() => flight.mode.failsafe || rc[5].high, () => {
                     $('#optimization-stats').hide();
                 }
                 
-                // Clear warnings
-                $('#transpiler-warnings').hide();
+                // Show warnings if any
+                if (result.warnings && (result.warnings.errors.length > 0 || 
+                    result.warnings.warnings.length > 0)) {
+                    this.showWarnings(result.warnings);
+                } else {
+                    $('#transpiler-warnings').hide();
+                }
                 
                 GUI.log(`Transpiled successfully: ${result.logicConditionCount}/64 logic conditions`);
                 
@@ -543,7 +516,7 @@ when(() => flight.mode.failsafe || rc[5].high, () => {
             <div class="note error">
                 <div class="note_spacer">
                     <strong>Transpilation Error:</strong><br>
-                    ${message}
+                    ${this.escapeHtml(message)}
                 </div>
             </div>
         `);
@@ -551,56 +524,207 @@ when(() => flight.mode.failsafe || rc[5].high, () => {
     },
     
     /**
+     * Show transpilation/decompilation warnings
+     */
+    showWarnings: function(warnings) {
+        const warningsDiv = $('#transpiler-warnings');
+        let html = '';
+        
+        if (warnings.errors && warnings.errors.length > 0) {
+            html += '<div class="note error"><div class="note_spacer">';
+            html += '<strong>Errors:</strong><ul style="margin: 5px 0; padding-left: 20px;">';
+            warnings.errors.forEach(w => {
+                html += `<li>${this.escapeHtml(w.message)} ${w.line ? `(line ${w.line})` : ''}</li>`;
+            });
+            html += '</ul></div></div>';
+        }
+        
+        if (warnings.warnings && warnings.warnings.length > 0) {
+            html += '<div class="note warning"><div class="note_spacer">';
+            html += '<strong>Warnings:</strong><ul style="margin: 5px 0; padding-left: 20px;">';
+            warnings.warnings.forEach(w => {
+                html += `<li>${this.escapeHtml(w.message)} ${w.line ? `(line ${w.line})` : ''}</li>`;
+            });
+            html += '</ul></div></div>';
+        }
+        
+        warningsDiv.html(html);
+        warningsDiv.show();
+    },
+    
+    /**
+     * Show decompiler warnings
+     */
+    showDecompilerWarnings: function(warnings) {
+        const warningsDiv = $('#transpiler-warnings');
+        
+        let html = '<div class="note warning"><div class="note_spacer">';
+        html += '<strong>Decompilation Warnings:</strong><br>';
+        html += '<ul style="margin: 5px 0; padding-left: 20px;">';
+        
+        for (const warning of warnings) {
+            html += `<li>${this.escapeHtml(warning)}</li>`;
+        }
+        
+        html += '</ul>';
+        html += '<p style="margin-top: 10px;"><em>Please review the generated code carefully and test before using.</em></p>';
+        html += '</div></div>';
+        
+        warningsDiv.html(html);
+        warningsDiv.show();
+    },
+    
+    /**
+     * Escape HTML to prevent XSS
+     */
+    escapeHtml: function(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    },
+    
+    /**
      * Load logic conditions from FC and decompile to JavaScript
+     * Uses MSP chaining pattern from programming.js
      */
     loadFromFC: function(callback) {
         const self = this;
         
-        GUI.log('Loading logic conditions from flight controller...');
+        if (!this.decompiler) {
+            GUI.log(i18n.getMessage('decompilerNotAvailable') || 'Decompiler not available');
+            if (callback) callback();
+            return;
+        }
         
-        // Request logic conditions from FC (same as programming.js)
-        MSP.send_message(MSPCodes.MSP_LOGIC_CONDITIONS, false, false, function() {
+        GUI.log(i18n.getMessage('loadingFromFC') || 'Loading logic conditions from flight controller...');
+        
+        // Create MSP chainer for loading logic conditions
+        const loadChainer = new MSPChainerClass();
+        
+        loadChainer.setChain([
+            mspHelper.loadLogicConditions
+        ]);
+        
+        loadChainer.setExitPoint(function() {
+            self.onLogicConditionsLoaded(callback);
+        });
+        
+        loadChainer.execute();
+    },
+    
+    /**
+     * Called after logic conditions are loaded from FC
+     */
+    onLogicConditionsLoaded: function(callback) {
+        const self = this;
+        
+        // Get logic conditions from FC object
+        const logicConditions = self.getLogicConditionsArray();
+        
+        if (!logicConditions || logicConditions.length === 0) {
+            GUI.log(i18n.getMessage('noLogicConditions') || 'No logic conditions found on FC');
+            self.editor.setValue(self.getDefaultCode());
+            self.isDirty = false;
+            if (callback) callback();
+            return;
+        }
+        
+        GUI.log(`Found ${logicConditions.length} logic conditions, decompiling...`);
+        
+        // Decompile to JavaScript
+        try {
+            const result = self.decompiler.decompile(logicConditions);
             
-            // For now, just clear the editor as decompiler isn't implemented
-            // In production, would decompile LOGIC_CONDITIONS to JavaScript
-            
-            if (LOGIC_CONDITIONS.getLogicConditionsCount() === 0) {
-                GUI.log('No logic conditions found on FC');
-                self.editor.setValue(self.getDefaultCode());
+            if (result.success) {
+                // Set the decompiled code
+                self.editor.setValue(result.code);
+                
+                // Show stats
+                if (result.stats) {
+                    GUI.log(
+                        `Decompiled ${result.stats.enabledConditions}/${result.stats.totalConditions} ` +
+                        `logic conditions into ${result.stats.groups} handler(s)`
+                    );
+                }
+                
+                // Show warnings if any
+                if (result.warnings && result.warnings.length > 0) {
+                    self.showDecompilerWarnings(result.warnings);
+                } else {
+                    $('#transpiler-warnings').hide();
+                }
+                
+                self.isDirty = false;
             } else {
-                GUI.log(`Loaded ${LOGIC_CONDITIONS.getLogicConditionsCount()} logic conditions`);
-                
-                // TODO: Implement decompiler
-                // For now, show a message
-                const message = `// ${LOGIC_CONDITIONS.getLogicConditionsCount()} logic conditions found on FC
-// JavaScript decompiler not yet implemented
-// Please write your JavaScript code manually
-
-${self.getDefaultCode()}`;
-                
-                self.editor.setValue(message);
+                // Decompilation failed
+                GUI.log('Decompilation failed: ' + result.error);
+                self.showError('Decompilation failed: ' + result.error);
+                self.editor.setValue(result.code || self.getDefaultCode());
+                self.isDirty = false;
             }
             
+        } catch (error) {
+            console.error('Decompilation error:', error);
+            GUI.log('Decompilation error: ' + error.message);
+            self.showError('Decompilation error: ' + error.message);
+            self.editor.setValue(self.getDefaultCode());
             self.isDirty = false;
-            
-            if (callback) callback();
-        });
+        }
+        
+        if (callback) callback();
+    },
+    
+    /**
+     * Get logic conditions array from FC.LOGIC_CONDITIONS
+     */
+    getLogicConditionsArray: function() {
+        const conditions = [];
+        
+        // FC.LOGIC_CONDITIONS stores logic conditions
+        if (!FC.LOGIC_CONDITIONS || !FC.LOGIC_CONDITIONS.get) {
+            console.error('FC.LOGIC_CONDITIONS not available');
+            return conditions;
+        }
+        
+        // Get count of logic conditions
+        const count = FC.LOGIC_CONDITIONS.getCount ? 
+            FC.LOGIC_CONDITIONS.getCount() : 64; // Max 64 logic conditions
+        
+        for (let i = 0; i < count; i++) {
+            const lc = FC.LOGIC_CONDITIONS.get(i);
+            if (lc) {
+                conditions.push({
+                    index: i,
+                    enabled: lc.enabled,
+                    activatorId: lc.activatorId,
+                    operation: lc.operation,
+                    operandAType: lc.operandAType,
+                    operandAValue: lc.operandAValue,
+                    operandBType: lc.operandBType,
+                    operandBValue: lc.operandBValue,
+                    flags: lc.flags || 0
+                });
+            }
+        }
+        
+        return conditions;
     },
     
     /**
      * Save transpiled logic conditions to FC
+     * Uses MSP chaining pattern from programming.js
      */
     saveToFC: function() {
         const self = this;
         const code = this.editor.getValue();
         
         if (!this.transpiler) {
-            GUI.log('Transpiler not available');
+            GUI.log(i18n.getMessage('transpilerNotAvailable') || 'Transpiler not available');
             return;
         }
         
         // First transpile
-        GUI.log('Transpiling before save...');
+        GUI.log(i18n.getMessage('transpilingBeforeSave') || 'Transpiling before save...');
         const result = this.transpiler.transpile(code);
         
         if (!result.success) {
@@ -614,23 +738,23 @@ ${self.getDefaultCode()}`;
         }
         
         // Confirm save
-        if (!confirm(`Save ${result.logicConditionCount} logic conditions to flight controller?`)) {
+        const confirmMsg = i18n.getMessage('confirmSaveLogicConditions') || 
+            `Save ${result.logicConditionCount} logic conditions to flight controller?`;
+        if (!confirm(confirmMsg)) {
             return;
         }
         
-        GUI.log('Saving to flight controller...');
+        GUI.log(i18n.getMessage('savingToFC') || 'Saving to flight controller...');
         
         // Clear existing logic conditions
-        LOGIC_CONDITIONS.flush();
+        FC.LOGIC_CONDITIONS.flush();
         
         // Parse and load transpiled commands
-        // Commands are in format: logic <index> <enabled> <activator> <operation> ...
         for (const cmd of result.commands) {
             if (cmd.startsWith('logic ')) {
                 const parts = cmd.split(' ');
                 if (parts.length >= 9) {
                     const lc = {
-                        index: parseInt(parts[1]),
                         enabled: parseInt(parts[2]),
                         activatorId: parseInt(parts[3]),
                         operation: parseInt(parts[4]),
@@ -641,26 +765,42 @@ ${self.getDefaultCode()}`;
                         flags: parts[9] ? parseInt(parts[9]) : 0
                     };
                     
-                    LOGIC_CONDITIONS.put(lc);
+                    FC.LOGIC_CONDITIONS.put(lc);
                 }
             }
         }
         
-        // Send to FC (same as programming.js)
-        LOGIC_CONDITIONS.sendLogicConditions(function() {
+        // Create save chainer (same pattern as programming.js)
+        const saveChainer = new MSPChainerClass();
+        
+        saveChainer.setChain([
+            mspHelper.sendLogicConditions,
+            mspHelper.saveToEeprom
+        ]);
+        
+        saveChainer.setExitPoint(function() {
+            GUI.log(i18n.getMessage('logicConditionsSaved') || 'Logic conditions saved successfully');
+            self.isDirty = false;
             
-            // Save configuration
-            MSP.send_message(MSPCodes.MSP_EEPROM_WRITE, false, false, function() {
-                GUI.log('Logic conditions saved successfully');
-                self.isDirty = false;
-                
-                GUI.log('Rebooting...');
-                GUI.tab_switch_cleanup(function() {
-                    MSP.send_message(MSPCodes.MSP_SET_REBOOT, false, false, function() {
-                        GUI.log('Reboot complete');
-                        reinitialize();
-                    });
-                });
+            // Optionally reboot (commented out for safety - user can reboot manually)
+            // const shouldReboot = confirm('Reboot flight controller to apply changes?');
+            // if (shouldReboot) {
+            //     self.rebootFC();
+            // }
+        });
+        
+        saveChainer.execute();
+    },
+    
+    /**
+     * Reboot flight controller
+     */
+    rebootFC: function() {
+        GUI.log(i18n.getMessage('rebooting') || 'Rebooting...');
+        
+        GUI.tab_switch_cleanup(function() {
+            MSP.send_message(MSPCodes.MSP_SET_REBOOT, false, false, function() {
+                GUI.log(i18n.getMessage('rebootComplete') || 'Reboot complete');
             });
         });
     },
@@ -670,14 +810,16 @@ ${self.getDefaultCode()}`;
         
         // Check for unsaved changes
         if (this.isDirty) {
-            if (!confirm('You have unsaved changes. Leave anyway?')) {
+            const confirmMsg = i18n.getMessage('unsavedChanges') || 
+                'You have unsaved changes. Leave anyway?';
+            if (!confirm(confirmMsg)) {
                 // Cancel navigation
                 return;
             }
         }
         
         // Dispose Monaco editor
-        if (this.editor) {
+        if (this.editor && this.editor.dispose) {
             this.editor.dispose();
             this.editor = null;
         }
@@ -686,4 +828,4 @@ ${self.getDefaultCode()}`;
     }
 };
 
-TABS.javascript_programming.initialize();
+module.exports = TABS.javascript_programming;
