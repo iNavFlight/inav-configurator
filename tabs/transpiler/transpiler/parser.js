@@ -11,7 +11,6 @@
 const acorn = require('acorn');
 
 /**
- * Production JavaScript Parser for INAV subset
  * Uses Acorn for robust parsing, transforms to simplified AST
  */
 class JavaScriptParser {

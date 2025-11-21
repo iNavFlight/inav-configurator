@@ -1,5 +1,5 @@
 /**
- * INAV Transpiler Main Entry Point (Fixed Production Version)
+ * INAV Transpiler Main Entry Point
  * 
  * Location: tabs/programming/transpiler/transpiler/index.js
  * 
