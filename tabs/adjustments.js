@@ -1,15 +1,15 @@
 'use strict';
 
-const path = require('path');
-const wNumb = require('wnumb/wNumb')
+import wNumb from 'wnumb/wNumb';
+import noUiSlider from 'nouislider';
 
-const mspHelper = require('./../js/msp/MSPHelper');
-const MSPCodes = require('./../js/msp/MSPCodes');
-const MSP = require('./../js/msp');
-const { GUI, TABS } = require('./../js/gui');
-const FC = require('./../js/fc');
-const i18n = require('./../js/localization');
-const interval = require('./../js/intervals');
+import mspHelper from './../js/msp/MSPHelper';
+import MSPCodes from './../js/msp/MSPCodes';
+import MSP from './../js/msp';
+import { GUI, TABS } from './../js/gui';
+import FC from './../js/fc';
+import i18n from './../js/localization';
+import interval from './../js/intervals';
 
 TABS.adjustments = {};
 
@@ -24,7 +24,7 @@ TABS.adjustments.initialize = function (callback) {
     }
 
     function load_html() {
-        GUI.load(path.join(__dirname, "adjustments.html"), process_html);
+        import('./adjustments.html?raw').then(({default: html}) => GUI.load(html, process_html));
     }
 
     function addAdjustment(adjustmentIndex, adjustmentRange, auxChannelCount) {
@@ -104,9 +104,9 @@ TABS.adjustments.initialize = function (callback) {
             rangeValues = [adjustmentRange.range.start, adjustmentRange.range.end];
         }
 
-        var rangeElement = $(newAdjustment).find('.range');
+        var slider = $(newAdjustment).find('.channel-slider')[0];
 
-        $(rangeElement).find('.channel-slider').noUiSlider({
+        noUiSlider.create(slider, {
             start: rangeValues,
             behaviour: 'snap-drag',
             margin: 50,
@@ -115,17 +115,18 @@ TABS.adjustments.initialize = function (callback) {
             range: channel_range,
             format: wNumb({
                 decimals: 0
-            })
+            }),
+            pips: {
+                mode: 'values',
+                values: [900, 1000, 1200, 1400, 1500, 1600, 1800, 2000, 2100],
+                density: 4,
+                stepped: true
+            }
         });
 
-        $(newAdjustment).find('.channel-slider').Link('lower').to($(newAdjustment).find('.lowerLimitValue'));
-        $(newAdjustment).find('.channel-slider').Link('upper').to($(newAdjustment).find('.upperLimitValue'));
-
-        $(rangeElement).find(".pips-channel-range").noUiSlider_pips({
-            mode: 'values',
-            values: [900, 1000, 1200, 1400, 1500, 1600, 1800, 2000, 2100],
-            density: 4,
-            stepped: true
+        slider.noUiSlider.on('update', values => {
+            $(newAdjustment).find('.lowerLimitValue').text(values[0]);
+            $(newAdjustment).find('.upperLimitValue').text(values[1]);
         });
 
         //
@@ -196,7 +197,7 @@ TABS.adjustments.initialize = function (callback) {
                 var adjustmentElement = $(this);
 
                 if ($(adjustmentElement).find('.enable').prop("checked")) {
-                    var rangeValues = $(this).find('.range .channel-slider').val();
+                    var rangeValues = $(this).find('.range .channel-slider')[0].noUiSlider.get(true);
                     var adjustmentRange = {
                         slotIndex: parseInt($(this).find('.adjustmentSlot .slot').val()),
                         auxChannelIndex: parseInt($(this).find('.channelInfo .channel').val()),

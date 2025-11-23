@@ -96,4 +96,4 @@ let FwApproach = function (number, approachAltAsl = 0, landAltAsl = 0, approachD
     return self;
 };
 
-module.exports = { ApproachDirection, FwApproach };
+export { ApproachDirection, FwApproach };

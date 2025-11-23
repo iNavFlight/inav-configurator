@@ -102,4 +102,4 @@ function calculate_new_cooridatnes(coord, bearing, distance)
     }
 }
 
-module.exports = { constrain, zeroPad, generateFilename, scaleRangeInt, distanceOnLine, wrap_360, rad2Deg, calculate_new_cooridatnes }
+export  { constrain, zeroPad, generateFilename, scaleRangeInt, distanceOnLine, wrap_360, rad2Deg, calculate_new_cooridatnes }

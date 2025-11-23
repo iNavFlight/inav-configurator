@@ -862,4 +862,4 @@ var defaultsDialogData = [
     }
 ];
 
-module.exports = defaultsDialogData;
+export default defaultsDialogData;

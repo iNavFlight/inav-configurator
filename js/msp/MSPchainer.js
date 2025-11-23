@@ -34,4 +34,4 @@ var MSPChainerClass = function () {
     return self;
 };
 
-module.exports = MSPChainerClass;
+export default MSPChainerClass;

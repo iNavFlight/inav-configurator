@@ -31,4 +31,4 @@ var globalSettings = {
     }
 };
 
-module.exports = { globalSettings, UnitType };
+export { globalSettings, UnitType };

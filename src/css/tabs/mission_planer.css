@@ -86,7 +86,7 @@
 }
 
 .tab-mission-control .ic_play {
-    background-image: url(../..//images/icons/cf_icon_MP_play_grey.svg);
+    background-image: url(./../../../images/icons/cf_icon_MP_play_grey.svg);
 }
 
 .tab-mission-control .ic_stop {
@@ -580,4 +580,16 @@
 
 .tab-mission-control .userActionContainer {
     display: inline-block;
+}
+
+.tab-mission-control #elevationDiv {
+    position: relative;
+    width: 100%;
+    height: 310px;
+}
+
+.tab-mission-control #elevationChart {
+    width: 90%;
+    height: 90%;
+    padding-bottom: 5px;
 }

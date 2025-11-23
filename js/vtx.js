@@ -45,4 +45,4 @@ var VTX = (function() {
     return self;
 })();
 
-module.exports = VTX;
+export default VTX;

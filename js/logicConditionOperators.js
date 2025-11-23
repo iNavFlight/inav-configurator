@@ -347,4 +347,4 @@ const LOGIC_OPERATORS = {
     },
 };
 
-module.exports = { LOGIC_OPERATORS };
+export { LOGIC_OPERATORS };

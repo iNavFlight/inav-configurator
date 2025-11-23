@@ -1,21 +1,21 @@
 'use strict';
 
-const ServoMixerRuleCollection = require('./servoMixerRuleCollection');
-const MotorMixerRuleCollection = require('./motorMixerRuleCollection');
-const LogicConditionsCollection = require('./logicConditionsCollection');
-const LogicConditionsStatus = require('./logicConditionsStatus');
-const GlobalVariablesStatus = require('./globalVariablesStatus');
-const ProgrammingPidCollection = require('./programmingPidCollection');
-const ProgrammingPidStatus = require('./programmingPidStatus');
-const WaypointCollection = require('./waypointCollection');
-const OutputMappingCollection = require('./outputMapping');
-const SafehomeCollection = require('./safehomeCollection');
-const FwApproachCollection = require('./fwApproachCollection');
-const GeozoneCollection = require('./geozoneCollection');
-const { PLATFORM } = require('./model')
-const VTX = require('./vtx');
-const BitHelper = require('./bitHelper');
-const { FLIGHT_MODES } = require('./flightModes');
+import ServoMixerRuleCollection from './servoMixerRuleCollection';
+import MotorMixerRuleCollection from './motorMixerRuleCollection';
+import LogicConditionsCollection from './logicConditionsCollection';
+import LogicConditionsStatus from './logicConditionsStatus';
+import GlobalVariablesStatus from './globalVariablesStatus';
+import ProgrammingPidCollection from './programmingPidCollection';
+import ProgrammingPidStatus from './programmingPidStatus';
+import WaypointCollection from './waypointCollection';
+import OutputMappingCollection from './outputMapping';
+import SafehomeCollection from './safehomeCollection';
+import FwApproachCollection from './fwApproachCollection';
+import GeozoneCollection from './geozoneCollection';
+import { PLATFORM } from './model';
+import VTX from './vtx';
+import BitHelper from './bitHelper';
+import { FLIGHT_MODES } from './flightModes';
 
 
 var FC = {
@@ -1141,4 +1141,4 @@ var FC = {
     }
 };
 
-module.exports = FC;
+export default FC;

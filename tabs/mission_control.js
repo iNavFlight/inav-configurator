@@ -1,36 +1,55 @@
 'use strict';
 
-const path = require('path');
-const fs = require('fs');
-const ol = require('openlayers');
-const xml2js = require('xml2js');
-const Store = require('electron-store');
-const store = new Store();
-const { dialog } = require("@electron/remote");
+import xml2js from 'xml2js';
 
-const MSPChainerClass = require('./../js/msp/MSPchainer');
-const mspHelper = require('./../js/msp/MSPHelper');
-const MSPCodes = require('./../js/msp/MSPCodes');
-const MSP = require('./../js/msp');
-const mspQueue = require('./../js/serial_queue');
-const { GUI, TABS } = require('./../js/gui');
-const FC = require('./../js/fc');
-const CONFIGURATOR = require('./../js/data_storage');
-const i18n = require('./../js/localization');
-const { globalSettings } = require('./../js/globalSettings');
-const MWNP = require('./../js/mwnp');
-const Waypoint = require('./../js/waypoint')
-const WaypointCollection = require('./../js/waypointCollection');
-const Safehome = require('./../js/safehome');
-const SafehomeCollection = require('./../js/safehomeCollection');
-const { ApproachDirection, FwApproach } = require('./../js/fwApproach');
-const FwApproachCollection = require('./../js/fwApproachCollection');
-const SerialBackend = require('./../js/serial_backend');
-const { distanceOnLine, wrap_360, calculate_new_cooridatnes } = require('./../js/helpers');
-const Plotly = require('./../js/libraries/plotly-latest.min');
-const interval = require('./../js/intervals');
-const { Geozone, GeozoneVertex, GeozoneType, GeozoneShapes, GeozoneFenceAction }  = require('./../js/geozone');
-const GeozoneCollection = require('./../js/geozoneCollection');
+import Map from 'ol/Map.js';
+import XYZ from 'ol/source/XYZ.js';
+import OSM from 'ol/source/OSM.js';
+import TileWMS from 'ol/source/TileWMS'
+import TileLayer from 'ol/layer/Tile.js';
+import View from 'ol/View.js'
+import { fromLonLat, toLonLat, getPointResolution, METERS_PER_UNIT } from 'ol/proj';
+import Style from 'ol/style/Style'
+import Icon from 'ol/style/Icon';
+import Text from 'ol/style/Text';
+import Fill from 'ol/style/Fill';
+import Point from 'ol/geom/Point.js';
+import Feature from 'ol/Feature';
+import VectorSource from 'ol/source/Vector.js';
+import VectorLayer from 'ol/layer/Vector.js';
+import { LineString } from 'ol/geom';
+import Stroke from 'ol/style/Stroke';
+import RegularShape from 'ol/style/RegularShape';
+import Circle from 'ol/geom/Circle';
+import PointerInteraction from 'ol/interaction/Pointer.js';
+import {defaults as defaultInteractions} from 'ol/interaction/defaults';
+import {Control, defaults as defaultControls} from 'ol/control.js';
+
+import MSPChainerClass from './../js/msp/MSPchainer';
+import mspHelper from './../js/msp/MSPHelper';
+import MSPCodes from './../js/msp/MSPCodes';
+import MSP from './../js/msp';
+import mspQueue from './../js/serial_queue';
+import { GUI, TABS } from './../js/gui';
+import FC from './../js/fc';
+import CONFIGURATOR from './../js/data_storage';
+import i18n from './../js/localization';
+import { globalSettings } from './../js/globalSettings';
+import MWNP from './../js/mwnp';
+import Waypoint from './../js/waypoint';
+import WaypointCollection from './../js/waypointCollection';
+import Safehome from './../js/safehome';
+import SafehomeCollection from './../js/safehomeCollection';
+import { ApproachDirection, FwApproach } from './../js/fwApproach';
+import FwApproachCollection from './../js/fwApproachCollection';
+import SerialBackend from './../js/serial_backend';
+import { distanceOnLine, wrap_360, calculate_new_cooridatnes } from './../js/helpers';
+import interval from './../js/intervals';
+import { Geozone, GeozoneVertex, GeozoneType, GeozoneShapes, GeozoneFenceAction }  from './../js/geozone';
+import store from './../js/store';
+import dialog from '../js/dialog';
+
+import html from'./mission_control.html?raw';
 
 var MAX_NEG_FW_LAND_ALT = -2000; // cm
 
@@ -47,6 +66,35 @@ var dictOfLabelParameterPoint = {
 };
 
 var waypointOptions = ['JUMP','SET_HEAD','RTH'];
+
+const iconNames = [
+    'icon_mission_airplane.png',
+    'icon_RTH.png',
+    'icon_safehome.png',
+    'icon_safehome_used.png',
+    'icon_geozone_excl.png',
+    'icon_geozone_incl.png',
+    'icon_home.png',
+    'icon_position_edit.png',
+    'icon_position_head.png',
+    'icon_position_LDG_edit.png',
+    'icon_position_LDG.png',
+    'icon_position_PH_edit.png',
+    'icon_position_PH.png',
+    'icon_position_POI.png',
+    'icon_position_POI_edit.png',
+    'icon_position_WP_edit.png',
+    'icon_position_WP.png',
+    'icon_position_edit.png',
+    'icon_arrow.png',
+    'settings_white.svg',
+    'icon_safehome_white.svg',
+    'icon_geozone_white.svg',
+    'icon_elevation_white.svg',
+    'icon_multimission_white.svg'    
+];
+
+const icons = Object.create(null)
 
 ////////////////////////////////////
 //
@@ -134,9 +182,32 @@ TABS.mission_control.initialize = function (callback) {
             FC.FW_APPROACH.put(new FwApproach(i));
         }
     }
+    
+function iconKey(filename) {
+    // drop extension, keep base name (e.g., "icon_RTH")
+    return filename.replace(/\.(png|svg)$/i, '');
+}
+
+    async function loadIcons() {
+        for (const fname of iconNames) {
+            // Vites packager needs a bit help
+            const base = iconKey(fname);
+            const ext = fname.split('.').pop();
+            let iconUrl;
+            if (ext === 'png') {
+                iconUrl = (await import(`./../images/icons/map/cf_${base}.png?inline`)).default;
+            } else if (ext === 'svg') {
+                iconUrl = (await import(`./../images/icons/map/cf_${base}.svg?inline`)).default;
+            }
+            if (!iconUrl) {
+               throw new Error(`Missing icon URL for ${fname}`);
+            }
+            icons[base] = iconUrl;
+        }
+    }
 
     function loadHtml() {
-        GUI.load(path.join(__dirname, "mission_control.html"), process_html);
+        GUI.load(html, () => loadIcons().then(process_html));
     }
 
     function process_html() {
@@ -158,7 +229,7 @@ TABS.mission_control.initialize = function (callback) {
         $waypointOptionsTableBody = $('#waypointOptionsTableBody');
         $geozoneContent = $('#geozoneContent');
 
-        if (typeof require !== "undefined") {
+       
             loadSettings();
             // let the dom load finish, avoiding the resizing of the map
             setTimeout(initMap, 200);
@@ -173,16 +244,15 @@ TABS.mission_control.initialize = function (callback) {
                     renderSafehomesOnMap();
                     updateSafehomeInfo();
                 }, 500);
-                setTimeout(() => {
-                    selectedGeozone = FC.GEOZONES.last();
-                    renderGeozonesOnMap();
-                    updateGeozoneInfo();
-                }, 500);
+                if (isGeozoneEnabeld) {
+                    setTimeout(() => {
+                        selectedGeozone = FC.GEOZONES.last();
+                        renderGeozonesOnMap();
+                        updateGeozoneInfo();
+                    }, 500);
+                }
             }
-        } else {
-            $('#missionMap, #missionControls').hide();
-            $('#notLoadMap').show();
-        }
+    
         i18n.localize();
 
         function get_raw_gps_data() {
@@ -215,112 +285,112 @@ TABS.mission_control.initialize = function (callback) {
 
                   /////////////////////////////////////
                   //create layer for current position
-                  curPosStyle = new ol.style.Style({
-                      image: new ol.style.Icon(({
+                  curPosStyle = new Style({
+                      image: new Icon(({
                           anchor: [0.5, 0.5],
                           opacity: 1,
                           scale: 0.6,
-                          src: './images/icons/icon_mission_airplane.png'
+                          src: icons['icon_mission_airplane']
                       }))
                   });
 
                   let currentPositionLayer;
-                  curPosGeo = new ol.geom.Point(ol.proj.fromLonLat([lon, lat]));
+                  curPosGeo = new Point(fromLonLat([lon, lat]));
 
-                  let curPosFeature = new ol.Feature({
+                  let curPosFeature = new Feature({
                       geometry: curPosGeo
                   });
 
                   curPosFeature.setStyle(curPosStyle);
 
-                  let vectorSource = new ol.source.Vector({
+                  let vectorSource = new VectorSource({
                       features: [curPosFeature]
                   });
-                  currentPositionLayer = new ol.layer.Vector({
+                  currentPositionLayer = new VectorLayer({
                       source: vectorSource
                   });
 
                   ///////////////////////////
                   //create layer for RTH Marker
-                  let rthStyle = new ol.style.Style({
-                      image: new ol.style.Icon(({
+                  let rthStyle = new Style({
+                      image: new Icon(({
                           anchor: [0.5, 1.0],
                           opacity: 1,
                           scale: 0.5,
-                          src: './images/icons/cf_icon_RTH.png'
+                          src: icons['icon_RTH']
                       }))
                   });
 
-                  rthGeo = new ol.geom.Point(ol.proj.fromLonLat([90, 0]));
+                  rthGeo = new Point(fromLonLat([90, 0]));
 
-                  let rthFeature = new ol.Feature({
+                  let rthFeature = new Feature({
                       geometry: rthGeo
                   });
 
                   rthFeature.setStyle(rthStyle);
 
-                  let rthVector = new ol.source.Vector({
+                  let rthVector = new VectorSource({
                       features: [rthFeature]
                   });
-                  let rthLayer = new ol.layer.Vector({
+                  let rthLayer = new VectorLayer({
                       source: rthVector
                   });
 
                   //////////////////////////////
                   //create layer for bread crumbs
-                  breadCrumbLS = new ol.geom.LineString([ol.proj.fromLonLat([lon, lat]), ol.proj.fromLonLat([lon, lat])]);
+                  breadCrumbLS = new LineString([fromLonLat([lon, lat]), fromLonLat([lon, lat])]);
 
-                  breadCrumbStyle = new ol.style.Style({
-                    stroke: new ol.style.Stroke({
+                  breadCrumbStyle = new Style({
+                    stroke: new Stroke({
                       color: '#ffcc33',
                       width: 6
                     })
                   });
 
-                  breadCrumbFeature = new ol.Feature({
+                  breadCrumbFeature = new Feature({
                     geometry: breadCrumbLS
                   });
 
                   breadCrumbFeature.setStyle(breadCrumbStyle);
 
-                  breadCrumbSource = new ol.source.Vector({
+                  breadCrumbSource = new VectorSource({
                     features: [breadCrumbFeature]
                   });
 
-                  breadCrumbVector = new ol.layer.Vector({
+                  breadCrumbVector = new VectorLayer({
                     source: breadCrumbSource
                   });
 
                   /////////////////////////////
                   //create layer for heading, alt, groundspeed
-                  textGeom = new ol.geom.Point([0,0]);
+                  textGeom = new Point([0,0]);
 
-                  textStyle = new ol.style.Style({
-                    text: new ol.style.Text({
+                  textStyle = new Style({
+                    text: new Text({
                       font: 'bold 35px Calibri,sans-serif',
-                      fill: new ol.style.Fill({ color: '#fff' }),
+                      fill: new Fill({ color: '#fff' }),
                       offsetX: map.getSize()[0]-260,
                       offsetY: 80,
                       textAlign: 'left',
-                      backgroundFill: new ol.style.Fill({ color: '#000' }),
-                      stroke: new ol.style.Stroke({
+                      backgroundFill: new Fill({ color: '#000' }),
+                      stroke: new Stroke({
                         color: '#fff', width: 2
                       }),
                       text: 'H: XXX\nAlt: XXXm\nSpeed: XXXcm/s'
                     })
                   });
 
-                  textFeature = new ol.Feature({
+                  textFeature = new Feature({
                     geometry: textGeom
                   });
 
                   textFeature.setStyle(textStyle);
 
-                  var textSource = new ol.source.Vector({
+                  var textSource = new VectorSource({
                     features: [textFeature]
                   });
 
-                  var textVector = new ol.layer.Vector({
+                  var textVector = new VectorLayer({
                     source: textSource
                   });
 
@@ -330,7 +400,7 @@ TABS.mission_control.initialize = function (callback) {
                   map.addControl(textVector);
               }
 
-              let gpsPos = ol.proj.fromLonLat([lon, lat]);
+              let gpsPos = fromLonLat([lon, lat]);
               curPosGeo.setCoordinates(gpsPos);
 
               breadCrumbLS.appendCoordinate(gpsPos);
@@ -466,7 +536,7 @@ TABS.mission_control.initialize = function (callback) {
     //
     /////////////////////////////////////////////
     function loadSettings() {
-        var missionPlannerSettings = store.get('missionPlannerSettings', false);
+        const missionPlannerSettings = store.get('missionPlannerSettings', false);
         if (missionPlannerSettings) {
             if (!missionPlannerSettings.fwApproachLength && settings.fwApproachLength) {
                 missionPlannerSettings.fwApproachLength = settings.fwApproachLength;
@@ -505,10 +575,10 @@ TABS.mission_control.initialize = function (callback) {
         cleanSafehomeLayers();
     }
 
-    function checkApproachAltitude(altitude, isSeaLevelRef, sealevel) {
+    async function checkApproachAltitude(altitude, isSeaLevelRef, sealevel) {
 
         if (altitude - (isSeaLevelRef ? sealevel * 100 : 0 ) < 0) {
-            GUI.alert(i18n.getMessage('MissionPlannerAltitudeChangeReset'));
+            dialog.alert(i18n.getMessage('MissionPlannerAltitudeChangeReset'));
             return false;
         }
 
@@ -518,7 +588,7 @@ TABS.mission_control.initialize = function (callback) {
     function checkLandingAltitude(altitude, isSeaLevelRef, sealevel) {
 
         if (altitude - (isSeaLevelRef ? sealevel * 100 : 0 ) < MAX_NEG_FW_LAND_ALT) {
-            GUI.alert(i18n.getMessage('MissionPlannerFwLAndingAltitudeChangeReset'));
+            dialog.alert(i18n.getMessage('MissionPlannerFwLAndingAltitudeChangeReset'));
             return false;
         }
 
@@ -555,22 +625,22 @@ TABS.mission_control.initialize = function (callback) {
         /*
          * Process Safehome Icon
          */
-        return new ol.style.Style({
-            image: new ol.style.Icon(({
+        return new Style({
+            image: new Icon(({
                 anchor: [0.5, 1],
                 opacity: 1,
                 scale: 0.5,
-                src: './images/icons/cf_icon_safehome' + (safehome.isUsed() ? '_used' : '')+ '.png'
+                src: safehome.isUsed() ? icons['icon_safehome_used'] : icons['icon_safehome']
             })),
-            text: new ol.style.Text(({
+            text: new Text(({
                 text: String(Number(safehome.getNumber())+1),
                 font: '12px sans-serif',
                 offsetY: -15,
                 offsetX: -2,
-                fill: new ol.style.Fill({
+                fill: new Fill({
                     color: '#FFFFFF'
                 }),
-                stroke: new ol.style.Stroke({
+                stroke: new Stroke({
                     color: '#FFFFFF'
                 }),
             }))
@@ -579,14 +649,14 @@ TABS.mission_control.initialize = function (callback) {
 
     function paintApproachLine(pos1, pos2, color, layers)
     {
-        var line = new ol.geom.LineString([ol.proj.fromLonLat([pos1.lon, pos1.lat]), ol.proj.fromLonLat([pos2.lon, pos2.lat])]);
+        var line = new LineString([fromLonLat([pos1.lon, pos1.lat]), fromLonLat([pos2.lon, pos2.lat])]);
 
-        var feature = new ol.Feature({
+        var feature = new Feature({
             geometry: line
         });
 
-        var styles = [  new ol.style.Style({
-                stroke: new ol.style.Stroke({
+        var styles = [  new Style({
+                stroke: new Stroke({
                     color: color,
                     width: 3,
                 }),
@@ -599,10 +669,10 @@ TABS.mission_control.initialize = function (callback) {
             var dy = end[1] - start[1];
             var rotation = Math.atan2(dy, dx);
 
-            styles.push(new ol.style.Style({
-              geometry: new ol.geom.Point(distanceOnLine(start, end, -8)),
-              image: new ol.style.RegularShape({
-                fill: new ol.style.Fill({color}),
+            styles.push(new Style({
+              geometry: new Point(distanceOnLine(start, end, -8)),
+              image: new RegularShape({
+                fill: new Fill({color}),
                 points: 3,
                 radius: 8,
                 rotation: -rotation,
@@ -613,12 +683,12 @@ TABS.mission_control.initialize = function (callback) {
 
         feature.setStyle(styles);
 
-        var vectorSource = new ol.source.Vector({
+        var vectorSource = new VectorSource({
                 features: [feature]
         });
 
 
-        var vectorLayer = new ol.layer.Vector({
+        var vectorLayer = new VectorLayer({
             source: vectorSource
         });
 
@@ -681,45 +751,45 @@ TABS.mission_control.initialize = function (callback) {
         /*
          * add safehome on Map
          */
-        let coord = ol.proj.fromLonLat([safehome.getLonMap(), safehome.getLatMap()]);
-        var iconFeature = new ol.Feature({
-            geometry: new ol.geom.Point(coord),
+        let coord = fromLonLat([safehome.getLonMap(), safehome.getLatMap()]);
+        var iconFeature = new Feature({
+            geometry: new Point(coord),
             name: 'safehome'
         });
 
         //iconFeature.setStyle(getSafehomeIcon(safehome, safehome.isUsed()));
 
-        let circleStyle = new ol.style.Style({
-            stroke: new ol.style.Stroke({
+        let circleStyle = new Style({
+            stroke: new Stroke({
                 color: 'rgba(144, 12, 63, 0.5)',
                 width: 3,
                 lineDash : [10]
             }),
-            // fill: new ol.style.Fill({
+            // fill: new Fill({
                 // color: 'rgba(251, 225, 155, 0.1)'
             // })
         });
 
-        let circleSafeStyle = new ol.style.Style({
-            stroke: new ol.style.Stroke({
+        let circleSafeStyle = new Style({
+            stroke: new Stroke({
                 color: 'rgba(136, 204, 62, 1)',
                 width: 3,
                 lineDash : [10]
             }),
-            /* fill: new ol.style.Fill({
+            /* fill: new Fill({
                 color: 'rgba(136, 204, 62, 0.1)'
             }) */
         });
 
-        var vectorLayer = new ol.layer.Vector({
-            source: new ol.source.Vector({
+        var vectorLayer = new VectorLayer({
+            source: new VectorSource({
                         features: [iconFeature]
                     }),
             style : function(iconFeature) {
                 let styles = [getSafehomeIcon(safehome)];
                 if (safehome.isUsed()) {
-                    circleStyle.setGeometry(new ol.geom.Circle(iconFeature.getGeometry().getCoordinates(), getProjectedRadius(settings.maxDistSH)));
-                    circleSafeStyle.setGeometry(new ol.geom.Circle(iconFeature.getGeometry().getCoordinates(), getProjectedRadius(Number(settings.safeRadiusSH))));
+                    circleStyle.setGeometry(new Circle(iconFeature.getGeometry().getCoordinates(), getProjectedRadius(settings.maxDistSH)));
+                    circleSafeStyle.setGeometry(new Circle(iconFeature.getGeometry().getCoordinates(), getProjectedRadius(Number(settings.safeRadiusSH))));
                     styles.push(circleSafeStyle);
                     styles.push(circleStyle);
                 }
@@ -737,14 +807,14 @@ TABS.mission_control.initialize = function (callback) {
 
     function addSafeHomeMarker(safehome) {
 
-        let coord = ol.proj.fromLonLat([safehome.getLonMap(), safehome.getLatMap()]);
-        var iconFeature = new ol.Feature({
-            geometry: new ol.geom.Point(coord),
+        let coord = fromLonLat([safehome.getLonMap(), safehome.getLatMap()]);
+        var iconFeature = new Feature({
+            geometry: new Point(coord),
             name: 'safehome'
         });
 
-        var vectorLayer = new ol.layer.Vector({
-            source: new ol.source.Vector({
+        var vectorLayer = new VectorLayer({
+            source: new VectorSource({
                         features: [iconFeature]
                     }),
             style : function(iconFeature) {
@@ -763,8 +833,8 @@ TABS.mission_control.initialize = function (callback) {
     function getProjectedRadius(radius) {
         let projection = map.getView().getProjection();
         let resolutionAtEquator = map.getView().getResolution();
-        let resolutionRate = resolutionAtEquator / ol.proj.getPointResolution(projection, resolutionAtEquator, map.getView().getCenter());
-        let radiusProjected = (radius / ol.proj.METERS_PER_UNIT.m) * resolutionRate;
+        let resolutionRate = resolutionAtEquator / getPointResolution(projection, resolutionAtEquator, map.getView().getCenter());
+        let radiusProjected = (radius / METERS_PER_UNIT.m) * resolutionRate;
         return radiusProjected;
     }
 
@@ -774,22 +844,23 @@ TABS.mission_control.initialize = function (callback) {
     //
     /////////////////////////////////////////////
     function getGeozoneIcon(geozone, number) {
-        return new ol.style.Style({
-            image: new ol.style.Icon(({
+    
+        return new Style({
+            image: new Icon(({
                 anchor: [0.5, 1],
                 opacity: 1,
                 scale: 0.5,
-                src: geozone.getType() == GeozoneType.EXCULSIVE ? './images/icons/cf_icon_geozone_excl.png' : './images/icons/cf_icon_geozone_incl.png'
+                src: geozone.getType() == GeozoneType.EXCULSIVE ? icons['icon_geozone_excl'] : icons['icon_geozone_incl']
             })),
-            text: new ol.style.Text(({
+            text: new Text(({
                 text: String(number + 1),
                 font: '12px sans-serif',
                 offsetY: -15,
                 offsetX: -2,
-                fill: new ol.style.Fill({
+                fill: new Fill({
                     color: '#FFFFFF'
                 }),
-                stroke: new ol.style.Stroke({
+                stroke: new Stroke({
                     color: '#FFFFFF'
                 }),
             }))
@@ -797,15 +868,15 @@ TABS.mission_control.initialize = function (callback) {
     }
 
     function addZoneVertex(zone, vertex) {
-
-        let coord = ol.proj.fromLonLat([vertex.getLonMap(), vertex.getLatMap()]);
-        var iconFeature = new ol.Feature({
-            geometry: new ol.geom.Point(coord),
+        
+        let coord = fromLonLat([vertex.getLonMap(), vertex.getLatMap()]);
+        var iconFeature = new Feature({
+            geometry: new Point(coord),
             name: 'geozone'
         });
-
-        var vectorLayer = new ol.layer.Vector({
-            source: new ol.source.Vector({
+        
+        var vectorLayer = new VectorLayer({
+            source: new VectorSource({
                         features: [iconFeature]
                     }),
             style : function(iconFeature) {
@@ -826,37 +897,37 @@ TABS.mission_control.initialize = function (callback) {
 
     function paintGeozoneLine(pos1, pos2, color, number, zoneNum)
     {
-        var line = new ol.geom.LineString([pos1, pos2]);
+        var line = new LineString([pos1, pos2]);
 
-        var feature = new ol.Feature({
+        var feature = new Feature({
             geometry: line
         });
 
         feature.setStyle(
-            new ol.style.Style({
-                stroke: new ol.style.Stroke({
+            new Style({
+                stroke: new Stroke({
                     color: color,
                     width: 3,
                 }),
-                text: new ol.style.Text({
+                text: new Text({
                     text: String(zoneNum + 1),
                     font: '14px sans-serif',
                     placement : 'line',
                     textBaseline: 'ideographic',
-                    stroke: new ol.style.Stroke({
+                    stroke: new Stroke({
                         color: color
                     }),
                 }),
             }),
         );
 
-
-         var vectorSource = new ol.source.Vector({
+        
+         var vectorSource = new VectorSource({
             features: [feature]
         });
 
 
-        var vectorLayer = new ol.layer.Vector({
+        var vectorLayer = new VectorLayer({
             source: vectorSource
         });
 
@@ -875,19 +946,19 @@ TABS.mission_control.initialize = function (callback) {
         FC.GEOZONES.get().forEach(zone => {
             if (zone.getVerticesCount() != 0) {
                 if (zone.getShape() == GeozoneShapes.CIRCULAR) {
-                    var circleFeature = new ol.Feature({
-                        geometry: new ol.geom.Circle(ol.proj.fromLonLat([zone.getFirstVertex().getLonMap(), zone.getFirstVertex().getLatMap()]), getProjectedRadius(zone.getRadius() / 100)),
+                    var circleFeature = new Feature({
+                        geometry: new Circle(fromLonLat([zone.getFirstVertex().getLonMap(), zone.getFirstVertex().getLatMap()]), getProjectedRadius(zone.getRadius() / 100)), 
                         name: "geozoneCircle",
                     });
-
-                    var vectorSource = new ol.source.Vector();
+                    
+                    var vectorSource = new VectorSource();
                     vectorSource.addFeatures([circleFeature]);
 
-                    var vectorLayer = new ol.layer.Vector({
+                    var vectorLayer = new VectorLayer({
                         source: vectorSource,
                         style : [
-                            new ol.style.Style({
-                                stroke: new ol.style.Stroke({
+                            new Style({
+                                stroke: new Stroke({
                                     color: zone.getType() == GeozoneType.EXCULSIVE ? '#E62121' : '#1DBE0A',
                                     width: 3,
                                 })
@@ -906,8 +977,8 @@ TABS.mission_control.initialize = function (callback) {
                     var current;
                     for (let i = 0; i < verticesCount; i++) {
                         current = zone.getVertex(i);
-                        let pos1 = ol.proj.fromLonLat([prev.getLonMap(), prev.getLatMap()]);
-                        let pos2 = ol.proj.fromLonLat([current.getLonMap(), current.getLatMap()]);
+                        let pos1 = fromLonLat([prev.getLonMap(), prev.getLatMap()]);
+                        let pos2 = fromLonLat([current.getLonMap(), current.getLatMap()]);
                         paintGeozoneLine(pos1, pos2, zone.getType() == GeozoneType.EXCULSIVE ? '#E62121' : '#1DBE0A', prev.getNumber(), zone.getNumber());
                         prev = current;
                     }
@@ -952,6 +1023,10 @@ TABS.mission_control.initialize = function (callback) {
     }
 
     function geozoneWarning() {
+
+        if (!isGeozoneEnabeld) {
+            return;
+        }
 
         if (markers.length >= 1 && geozoneMarkers.length >= 1) {
             $('#infoGeozoneMissionWarning').show();
@@ -998,18 +1073,18 @@ TABS.mission_control.initialize = function (callback) {
     function addGeozone() {
 
         if (FC.GEOZONES.geozoneCount() + 1 > FC.GEOZONES.getMaxZones()) {
-            GUI.alert(i18n.getMessage('missionGeozoneMaxZonesReached'));
+            dialog.alert(i18n.getMessage('missionGeozoneMaxZonesReached'));
             return;
         }
 
         if (FC.GEOZONES.getUsedVerticesCount() + 2 > FC.GEOZONES.getMaxVertices()) {
-            GUI.alert(i18n.getMessage('missionGeozoneMaxVerticesReached'));
+            dialog.alert(i18n.getMessage('missionGeozoneMaxVerticesReached'));
             return;
         }
 
         let mapCenter = map.getView().getCenter();
-        let midLon = Math.round(ol.proj.toLonLat(mapCenter)[0] * 1e7);
-        let midLat = Math.round(ol.proj.toLonLat(mapCenter)[1] * 1e7);
+        let midLon = Math.round(toLonLat(mapCenter)[0] * 1e7);
+        let midLat = Math.round(toLonLat(mapCenter)[1] * 1e7);        
         FC.GEOZONES.put(new Geozone(GeozoneType.INCLUSIVE, GeozoneShapes.CIRCULAR, 0, 10000, false, 20000, GeozoneFenceAction.NONE, [ new GeozoneVertex(0, midLat, midLon) ]));
 
         selectedGeozone = FC.GEOZONES.last();
@@ -1076,16 +1151,16 @@ TABS.mission_control.initialize = function (callback) {
         /*
          * add safehome on Map
          */
-        let coord = ol.proj.fromLonLat([home.getLonMap(), home.getLatMap()]);
-        var iconFeature = new ol.Feature({
-            geometry: new ol.geom.Point(coord),
+        let coord = fromLonLat([home.getLonMap(), home.getLatMap()]);
+        var iconFeature = new Feature({
+            geometry: new Point(coord),
             name: 'home'
         });
 
         //iconFeature.setStyle(getSafehomeIcon(safehome, safehome.isUsed()));
 
-        var vectorLayer = new ol.layer.Vector({
-            source: new ol.source.Vector({
+        var vectorLayer = new VectorLayer({
+            source: new VectorSource({
                         features: [iconFeature]
                     }),
             style : function(iconFeature) {
@@ -1107,12 +1182,12 @@ TABS.mission_control.initialize = function (callback) {
         /*
          * Process Safehome Icon
          */
-        return new ol.style.Style({
-            image: new ol.style.Icon(({
+        return new Style({
+            image: new Icon(({
                 anchor: [0.5, 1],
                 opacity: 1,
                 scale: 0.5,
-                src: './images/icons/cf_icon_home.png'
+                src: icons['icon_home']
             })),
         });
     }
@@ -1336,7 +1411,7 @@ TABS.mission_control.initialize = function (callback) {
     function fileLoadMultiMissionCheck() {
         if (singleMissionActive()) {
             return true;
-        } else if (GUI.confirm(i18n.getMessage('confirm_overwrite_multimission_file_load_option'))) {
+        } else if (dialog.confirm(i18n.getMessage('confirm_overwrite_multimission_file_load_option'))) {
             var options = {
                 filters: [ { name: "Mission file", extensions: ['mission'] } ]
             };
@@ -1387,19 +1462,19 @@ TABS.mission_control.initialize = function (callback) {
     }
 
     function addWaypointMarker(waypoint, isEdit=false) {
-        let coord = ol.proj.fromLonLat([waypoint.getLonMap(), waypoint.getLatMap()]);
-        var iconFeature = new ol.Feature({
-            geometry: new ol.geom.Point(coord),
+        let coord = fromLonLat([waypoint.getLonMap(), waypoint.getLatMap()]);
+        var iconFeature = new Feature({
+            geometry: new Point(coord),
             name: 'Null Island',
             population: 4000,
             rainfall: 500
         });
         iconFeature.setStyle(getWaypointIcon(waypoint, isEdit));
-        var vectorSource = new ol.source.Vector({
+        var vectorSource = new VectorSource({
             features: [iconFeature]
         });
 
-        var vectorLayer = new ol.layer.Vector({
+        var vectorLayer = new VectorLayer({
             source: vectorSource
         });
 
@@ -1421,22 +1496,22 @@ TABS.mission_control.initialize = function (callback) {
             8:    'LDG'
         };
 
-        return new ol.style.Style({
-            image: new ol.style.Icon(({
+        return new Style({
+            image: new Icon(({
                 anchor: [0.5, 1],
                 opacity: 1,
                 scale: 0.5,
-                src: './images/icons/cf_icon_position' + (dictofPointIcon[waypoint.getAction()] != '' ? '_'+dictofPointIcon[waypoint.getAction()] : '') + (isEdit ? '_edit' : '')+ '.png'
+                src: icons['icon_position' + (dictofPointIcon[waypoint.getAction()] != '' ? '_' + dictofPointIcon[waypoint.getAction()] : '') + (isEdit ? '_edit' : '')]
             })),
-            text: new ol.style.Text(({
+            text: new Text(({
                 text: String(Number(waypoint.getLayerNumber()+1)),
                 font: '12px sans-serif',
                 offsetY: -15,
                 offsetX: -2,
-                fill: new ol.style.Fill({
+                fill: new Fill({
                     color: '#FFFFFF'
                 }),
-                stroke: new ol.style.Stroke({
+                stroke: new Stroke({
                     color: '#FFFFFF'
                 }),
             }))
@@ -1455,7 +1530,7 @@ TABS.mission_control.initialize = function (callback) {
         cleanLines();
         mission.get().forEach(function (element) {
             if (!element.isAttached()) {
-                let coord = ol.proj.fromLonLat([element.getLonMap(), element.getLatMap()]);
+                let coord = fromLonLat([element.getLonMap(), element.getLatMap()]);
                 if (element.getAction() == 5) {
                     // If action is Set_POI, increment counter of POI
                     poiList.push(element.getNumber());
@@ -1494,7 +1569,7 @@ TABS.mission_control.initialize = function (callback) {
             else if (element.isAttached()) {
                 if (element.getAction() == MWNP.WPTYPE.JUMP) {
                     let jumpWPIndex = multiMissionWPNum + element.getP1();
-                    let coord = ol.proj.fromLonLat([mission.getWaypoint(jumpWPIndex).getLonMap(), mission.getWaypoint(jumpWPIndex).getLatMap()]);
+                    let coord = fromLonLat([mission.getWaypoint(jumpWPIndex).getLonMap(), mission.getWaypoint(jumpWPIndex).getLatMap()]);
                     paintLine(oldPos, coord, element.getNumber(), '#e935d6', 5, "Repeat x"+(element.getP2() == -1 ? " infinite" : String(element.getP2())), false, true);
                 }
                 // If classic WPs is defined with a heading = -1, change Boolean for POI to false. If it is defined with a value different from -1, activate Heading boolean
@@ -1540,25 +1615,25 @@ TABS.mission_control.initialize = function (callback) {
     }
 
     function paintLine(pos1, pos2, pos2ID, color='#1497f1', lineDash=0, lineText="", selection=true, arrow=false) {
-        var line = new ol.geom.LineString([pos1, pos2]);
+        var line = new LineString([pos1, pos2]);
 
-        var feature = new ol.Feature({
+        var feature = new Feature({
             geometry: line
         });
 
         feature.setStyle(
-            new ol.style.Style({
-                stroke: new ol.style.Stroke({
+            new Style({
+                stroke: new Stroke({
                     color: color,
                     width: 3,
                     lineDash: [lineDash]
                 }),
-                text: new ol.style.Text({
+                text: new Text({
                     text: lineText,
                     font: '14px sans-serif',
                     placement : 'line',
                     textBaseline: 'ideographic',
-                    stroke: new ol.style.Stroke({
+                    stroke: new Stroke({
                         color: color
                     }),
                 }),
@@ -1569,13 +1644,13 @@ TABS.mission_control.initialize = function (callback) {
             let dx = pos2[0] - pos1[0];
             let dy = pos2[1] - pos1[1];
             let rotation = Math.atan2(dx, dy);
-            var featureArrow = new ol.Feature({
-                geometry: new ol.geom.Point([pos1[0]+dx/2, pos1[1]+dy/2])
+            var featureArrow = new Feature({
+                geometry: new Point([pos1[0]+dx/2, pos1[1]+dy/2])
             });
             featureArrow.setStyle(
-                new ol.style.Style({
-                    image: new ol.style.Icon({
-                        src: './images/icons/cf_icon_arrow.png',
+                new Style({
+                    image: new Icon({
+                        src: icons['icon_arrow'],
                         scale: 0.3,
                         anchor: [0.5, 0.5],
                         rotateWithView: true,
@@ -1586,17 +1661,17 @@ TABS.mission_control.initialize = function (callback) {
         }
 
         if (arrow) {
-            var vectorSource = new ol.source.Vector({
+            var vectorSource = new VectorSource({
                 features: [feature, featureArrow]
             });
         }
         else {
-            var vectorSource = new ol.source.Vector({
+            var vectorSource = new VectorSource({
                 features: [feature]
             });
         }
 
-        var vectorLayer = new ol.layer.Vector({
+        var vectorLayer = new VectorLayer({
             source: vectorSource
         });
 
@@ -1605,9 +1680,6 @@ TABS.mission_control.initialize = function (callback) {
         vectorLayer.number = pos2ID;
 
         lines.push(vectorLayer);
-
-/*         var length = ol.Sphere.getLength(line) + parseFloat($('#missionDistance').text());
-        $('#missionDistance').text(length.toFixed(3)); */
 
         map.addLayer(vectorLayer);
     }
@@ -1685,14 +1757,14 @@ TABS.mission_control.initialize = function (callback) {
 
             $('#safehomeLatitude').val(selectedSafehome.getLatMap());
             $('#safehomeLongitude').val(selectedSafehome.getLonMap());
-            changeSwitchery($('#safehomeSeaLevelRef'), selectedFwApproachSh.getIsSeaLevelRef());
+            changeSwitch($('#safehomeSeaLevelRef'), selectedFwApproachSh.getIsSeaLevelRef());
             $('#safehomeApproachAlt').val(selectedFwApproachSh.getApproachAltAsl());
             $('#safehomeLandAlt').val(selectedFwApproachSh.getLandAltAsl());
             $('#geozoneApproachDirection').val(selectedFwApproachSh.getApproachDirection());
             $('#safehomeLandHeading1').val(Math.abs(selectedFwApproachSh.getLandHeading1()));
-            changeSwitchery($('#safehomeLandHeading1Excl'), selectedFwApproachSh.getLandHeading1() < 0);
+            changeSwitch($('#safehomeLandHeading1Excl'), selectedFwApproachSh.getLandHeading1() < 0);
             $('#safehomeLandHeading2').val(Math.abs(selectedFwApproachSh.getLandHeading2()));
-            changeSwitchery($('#safehomeLandHeading2Excl'), selectedFwApproachSh.getLandHeading2() < 0);
+            changeSwitch($('#safehomeLandHeading2Excl'), selectedFwApproachSh.getLandHeading2() < 0);
             $('#safehomeLandAltM').text(selectedFwApproachSh.getLandAltAsl() / 100 + " m");
             $('#safehomeApproachAltM').text(selectedFwApproachSh.getApproachAltAsl() / 100 + " m");
             lockShExclHeading = false;
@@ -1717,7 +1789,7 @@ TABS.mission_control.initialize = function (callback) {
             $('#geozoneMaxAlt').val(selectedGeozone.getMaxAltitude());
             $('#geozoneMinAltM').text(selectedGeozone.getMinAltitude() / 100 + " m");
             $('#geozoneMaxAltM').text(selectedGeozone.getMaxAltitude()  / 100 + " m");
-            changeSwitchery($('#geozoneSeaLevelRef'), selectedGeozone.getSealevelRef());
+            changeSwitch($('#geozoneSeaLevelRef'), selectedGeozone.getSealevelRef());
             $('#geozoneAction').val(selectedGeozone.getFenceAction());
             $('#geozoneRadius').val(selectedGeozone.getRadius);
             if (selectedGeozone.getShape() == GeozoneShapes.CIRCULAR) {
@@ -1756,7 +1828,7 @@ TABS.mission_control.initialize = function (callback) {
                     .on('change', event => {
                         const lat = $(event.currentTarget).val();
                         if (isNaN(lat) || lat < -90 || lat > 90) {
-                            GUI.alert(i18n.getMessage("geozoneInvalidLat"));
+                            dialog.alert(i18n.getMessage("geozoneInvalidLat"));
                             $(event.currentTarget).val(vertex.getLatMap());
                             return;
                         }
@@ -1773,7 +1845,7 @@ TABS.mission_control.initialize = function (callback) {
                     .on('change', event => {
                         const lat = $(event.currentTarget).val();
                         if (isNaN(lat) || lat < -180 || lat > 180) {
-                            GUI.alert(i18n.getMessage("geozoneInvalidLon"));
+                            dialog.alert(i18n.getMessage("geozoneInvalidLon"));
                             $(event.currentTarget).val(vertex.getLonMap());
                             return;
                         }
@@ -1865,14 +1937,14 @@ TABS.mission_control.initialize = function (callback) {
                     if ($(this).val() >= 360 || ($(this).val() < 0 && $(this).val() != -1))
                     {
                       $(this).val(-1);
-                      GUI.alert(i18n.getMessage('MissionPlannerHeadSettingsCheck'));
+                      dialog.alert(i18n.getMessage('MissionPlannerHeadSettingsCheck'));
                     }
                 }
                 else if (MWNP.WPTYPE.REV[element.getAction()] == "RTH") {
                     if ($(this).val() != 0 && $(this).val() != 1)
                     {
                       $(this).val(0);
-                      GUI.alert(i18n.getMessage('MissionPlannerRTHSettingsCheck'));
+                      dialog.alert(i18n.getMessage('MissionPlannerRTHSettingsCheck'));
                     }
                 }
                 else if (MWNP.WPTYPE.REV[element.getAction()] == "JUMP") {
@@ -1884,7 +1956,7 @@ TABS.mission_control.initialize = function (callback) {
                     else if (mission.getPoiList().length != 0 && mission.getPoiList()) {
                         if (mission.getPoiList().includes(mission.convertJumpNumberToWaypoint(Number($(this).val())-1))) {
                             $(this).val(1);
-                            GUI.alert(i18n.getMessage('MissionPlannerJump3SettingsCheck'));
+                            dialog.alert(i18n.getMessage('MissionPlannerJump3SettingsCheck'));
                         }
                     }
                 }
@@ -1899,7 +1971,7 @@ TABS.mission_control.initialize = function (callback) {
                     if ($(this).val() > 10 || ($(this).val() < 0 && $(this).val() != -1))
                     {
                       $(this).val(0);
-                      GUI.alert(i18n.getMessage('MissionPlannerJump2SettingsCheck'));
+                      dialog.alert(i18n.getMessage('MissionPlannerJump2SettingsCheck'));
                     }
                 }
                 element.setP2(Number($(this).val()));
@@ -1917,7 +1989,7 @@ TABS.mission_control.initialize = function (callback) {
     }
 
     function setView(zoom) {
-        var coord = ol.proj.fromLonLat([mission.getWaypoint(0).getLonMap(), mission.getWaypoint(0).getLatMap()]);
+        var coord = fromLonLat([mission.getWaypoint(0).getLonMap(), mission.getWaypoint(0).getLatMap()]);
         map.getView().setCenter(coord);
         map.getView().setZoom(zoom);
     }
@@ -1934,227 +2006,186 @@ TABS.mission_control.initialize = function (callback) {
         //      Drag behavior definition
         //////////////////////////////////////////////////////////////////////////////////////////////
 
-        /**
-         * @constructor
-         * @extends {ol.interaction.Pointer}
-         */
-        app.Drag = function () {
+        class Drag extends PointerInteraction {
+            constructor() {
+                super ({
+                    handleDownEvent: (evt) => app.handleDownEvent(evt),
+                    handleDragEvent: (evt) => app.handleDragEvent(evt),
+                    handleMoveEvent: (evt) => app.handleMoveEvent(evt),
+                    handleUpEvent: (evt) => app.handleUpEvent(evt)
+                });
 
-            ol.interaction.Pointer.call(this, {
-                handleDownEvent: app.Drag.prototype.handleDownEvent,
-                handleDragEvent: app.Drag.prototype.handleDragEvent,
-                handleMoveEvent: app.Drag.prototype.handleMoveEvent,
-                handleUpEvent: app.Drag.prototype.handleUpEvent
-            });
-
-            /**
-             * @type {ol.Pixel}
-             * @private
-             */
-            this.coordinate_ = null;
-
-            /**
-             * @type {string|undefined}
-             * @private
-             */
-            this.cursor_ = 'pointer';
-
-            /**
-             * @type {ol.Feature}
-             * @private
-             */
-            this.feature_ = null;
-
-            /**
-             * @type {string|undefined}
-             * @private
-             */
-            this.previousCursor_ = undefined;
-
-        };
-        ol.inherits(app.Drag, ol.interaction.Pointer);
+                this.coordinate_ = null;
+                this.cursor_ = 'pointer';
+                this.feature_ = null;
+                this.previousCursor_ = undefined;
+            }
+        }
 
         app.ConvertCentimetersToMeters = function (val) {
             return parseInt(val) / 100;
         };
 
-        /**
-         * @constructor
-         * @extends {ol.control.Control}
-         * @param {Object=} opt_options Control options.
-         */
-        app.PlannerSettingsControl = function (opt_options) {
-            var options = opt_options || {};
-            var button = document.createElement('button');
+        class PlannerSettingsControl extends Control {
+            
+            constructor(opt_options) {
+                var options = opt_options || {};
+                var button = document.createElement('button');
 
-            button.innerHTML = ' ';
-            button.style = 'background: url(\'./images/CF_settings_white.svg\') no-repeat 1px -1px;background-color: rgba(0,60,136,.5);';
+                button.innerHTML = ' ';
+                button.style = `background: url("${icons['settings_white']}") no-repeat 1px -1px;background-color: rgba(0,60,136,.5);`;
+                
 
-            var handleShowSettings = function () {
-                $('#missionPlannerSettings').fadeIn(300);
-            };
+                var handleShowSettings = function () {
+                    $('#missionPlannerSettings').fadeIn(300);
+                };
 
-            button.addEventListener('click', handleShowSettings, false);
-            button.addEventListener('touchstart', handleShowSettings, false);
+                button.addEventListener('click', handleShowSettings, false);
+                button.addEventListener('touchstart', handleShowSettings, false);
 
-            var element = document.createElement('div');
-            element.className = 'mission-control-settings ol-unselectable ol-control';
-            element.appendChild(button);
-            element.title = 'MP Settings';
+                var element = document.createElement('div');
+                element.className = 'mission-control-settings ol-unselectable ol-control';
+                element.appendChild(button);
+                element.title = 'MP Settings';
 
-            ol.control.Control.call(this, {
-                element: element,
-                target: options.target
-            });
-
+                super({
+                    element: element,
+                    target: options.target
+                })
+            }
         };
-        ol.inherits(app.PlannerSettingsControl, ol.control.Control);
 
-        /**
-         * @constructor
-         * @extends {ol.control.Control}
-         * @param {Object=} opt_options Control options.
-         */
-        app.PlannerSafehomeControl = function (opt_options) {
-            var options = opt_options || {};
-            var button = document.createElement('button');
+        class PlannerSafehomeControl extends Control {
+            
+            constructor(opt_options) {
+                var options = opt_options || {};
+                var button = document.createElement('button');
 
-            button.innerHTML = ' ';
-            button.style = 'background: url(\'./images/icons/cf_icon_safehome_white.svg\') no-repeat 1px -1px;background-color: rgba(0,60,136,.5);';
+                button.innerHTML = ' ';
+                button.style = `background: url("${icons['icon_safehome_white']}") no-repeat 1px -1px;background-color: rgba(0,60,136,.5);`;
+                
+                var handleShowSafehome = function () {
+                    $('#missionPlannerSafehome').fadeIn(300);
+                    cleanSafehomeLayers();
+                    renderSafehomesOnMap();
+                    $('#safeHomeMaxDistance').text(settings.maxDistSH);
+                    $('#SafeHomeSafeDistance').text(settings.safeRadiusSH);
+                };
 
-            var handleShowSafehome = function () {
-                $('#missionPlannerSafehome').fadeIn(300);
-                cleanSafehomeLayers();
-                renderSafehomesOnMap();
-                $('#safeHomeMaxDistance').text(settings.maxDistSH);
-                $('#SafeHomeSafeDistance').text(settings.safeRadiusSH);
-            };
+                button.addEventListener('click', handleShowSafehome, false);
+                button.addEventListener('touchstart', handleShowSafehome, false);
 
-            button.addEventListener('click', handleShowSafehome, false);
-            button.addEventListener('touchstart', handleShowSafehome, false);
+                var element = document.createElement('div');
+                element.className = 'mission-control-safehome ol-unselectable ol-control';
+                element.appendChild(button);
+                element.title = 'MP Safehome';
 
-            var element = document.createElement('div');
-            element.className = 'mission-control-safehome ol-unselectable ol-control';
-            element.appendChild(button);
-            element.title = 'MP Safehome';
-
-            ol.control.Control.call(this, {
-                element: element,
-                target: options.target
-            });
+                super({
+                    element: element,
+                    target: options.target
+                });
+            }
         };
-        ol.inherits(app.PlannerSafehomeControl, ol.control.Control);
 
-        /**
-         * @constructor
-         * @extends {ol.control.Control}
-         * @param {Object=} opt_options Control options.
-         */
-        app.GeozonesControl = function(opt_options)  {
-            var options = opt_options || {};
-            var button = document.createElement('button');
+        class GeozonesControl extends Control {
+            
+            constructor(opt_options) {
+                var options = opt_options || {};
+                var button = document.createElement('button');
 
-            button.innerHTML = ' ';
-            button.style = 'background: url(\'./images/icons/cf_icon_geozone_white.svg\') no-repeat 1px -1px;background-color: rgba(0,60,136,.5);';
+                button.innerHTML = ' ';
+                button.style = `background: url("${icons['icon_geozone_white']}") no-repeat 1px -1px;background-color: rgba(0,60,136,.5);`;
+                
+                var handleShowGeozoneSettings = function () {
+                    $('#missionPlannerGeozones').fadeIn(300);
+                    if (!selectedGeozone) {
+                        selectedGeozone = FC.GEOZONES.first();
+                    } 
+                    renderGeozoneOptions();
+                    renderGeozonesOnMap();
+                };
 
-            var handleShowGeozoneSettings = function () {
-                $('#missionPlannerGeozones').fadeIn(300);
-                if (!selectedGeozone) {
-                    selectedGeozone = FC.GEOZONES.first();
-                }
-                renderGeozoneOptions();
-                renderGeozonesOnMap();
-            };
+                button.addEventListener('click', handleShowGeozoneSettings, false);
+                button.addEventListener('touchstart', handleShowGeozoneSettings, false);
 
-            button.addEventListener('click', handleShowGeozoneSettings, false);
-            button.addEventListener('touchstart', handleShowGeozoneSettings, false);
+                var element = document.createElement('div');
+                element.className = 'geozone-settings ol-unselectable ol-control';
+                element.appendChild(button);
+                element.title = 'Geozone';
 
-            var element = document.createElement('div');
-            element.className = 'geozone-settings ol-unselectable ol-control';
-            element.appendChild(button);
-            element.title = 'Geozone';
-
-            ol.control.Control.call(this, {
-                element: element,
-                target: options.target
-            });
-
+                super({
+                    element: element,
+                    target: options.target
+                });
+            }
         };
-        ol.inherits(app.GeozonesControl, ol.control.Control);
 
-        /**
-         * @constructor
-         * @extends {ol.control.Control}
-         * @param {Object=} opt_options Control options.
-         */
-        app.PlannerElevationControl = function (opt_options) {
-            var options = opt_options || {};
-            var button = document.createElement('button');
+        class PlannerElevationControl extends Control {
+            
+            constructor(opt_options) {
+                var options = opt_options || {};
+                var button = document.createElement('button');
 
-            button.innerHTML = ' ';
-            button.style = 'background: url(\'./images/icons/cf_icon_elevation_white.svg\') no-repeat 1px -1px;background-color: rgba(0,60,136,.5);';
+                button.innerHTML = ' ';
+                button.style = `background: url("${icons['icon_elevation_white']}") no-repeat 1px -1px;background-color: rgba(0,60,136,.5);`;
 
-            var handleShowSettings = function () {
-                $('#missionPlannerHome').fadeIn(300);
-                cleanHomeLayers();
-                renderHomeTable();
-                renderHomeOnMap();
-                $('#missionPlannerElevation').fadeIn(300);
-                plotElevation();
-            };
+                var handleShowSettings = function () {
+                    $('#missionPlannerHome').fadeIn(300);
+                    cleanHomeLayers();
+                    renderHomeTable();
+                    renderHomeOnMap();
+                    $('#missionPlannerElevation').fadeIn(300);
+                    plotElevation();
+                };
 
-            button.addEventListener('click', handleShowSettings, false);
-            button.addEventListener('touchstart', handleShowSettings, false);
+                button.addEventListener('click', handleShowSettings, false);
+                button.addEventListener('touchstart', handleShowSettings, false);
 
-            var element = document.createElement('div');
-            element.className = 'mission-control-elevation ol-unselectable ol-control';
-            element.appendChild(button);
-            element.title = 'MP Elevation';
+                var element = document.createElement('div');
+                element.className = 'mission-control-elevation ol-unselectable ol-control';
+                element.appendChild(button);
+                element.title = 'MP Elevation';
 
-            ol.control.Control.call(this, {
-                element: element,
-                target: options.target
-            });
+                super({
+                    element: element,
+                    target: options.target
+                });
+            }
         };
-        ol.inherits(app.PlannerElevationControl, ol.control.Control);
 
-        // /**
-         // * @constructor
-         // * @extends {ol.control.Control}
-         // * @param {Object=} opt_options Control options.
-         // */
-        app.PlannerMultiMissionControl = function (opt_options) {
+        class PlannerMultiMissionControl extends Control {
 
-            var options = opt_options || {};
-            var button = document.createElement('button');
+            constructor(opt_options) {
+                var options = opt_options || {};
+                var button = document.createElement('button');
 
-            button.innerHTML = ' ';
-            button.style = 'background: url(\'./images/icons/cf_icon_multimission_white.svg\') no-repeat 1px -1px;background-color: rgba(0,60,136,.5);';
+                button.innerHTML = ' ';
+                button.style = `background: url("${icons['icon_multimission_white']}") no-repeat 1px -1px;background-color: rgba(0,60,136,.5);`;
 
-            var handleShowSettings = function () {
-                $('#missionPlannerMultiMission').fadeIn(300);
-            };
+                var handleShowSettings = function () {
+                    $('#missionPlannerMultiMission').fadeIn(300);
+                };
 
-            button.addEventListener('click', handleShowSettings, false);
-            button.addEventListener('touchstart', handleShowSettings, false);
+                button.addEventListener('click', handleShowSettings, false);
+                button.addEventListener('touchstart', handleShowSettings, false);
 
-            var element = document.createElement('div');
-            element.className = 'mission-control-multimission ol-unselectable ol-control';
-            element.appendChild(button);
-            element.title = 'MP MultiMission';
+                var element = document.createElement('div');
+                element.className = 'mission-control-multimission ol-unselectable ol-control';
+                element.appendChild(button);
+                element.title = 'MP MultiMission';
 
-            ol.control.Control.call(this, {
-                element: element,
-                target: options.target
-            });
+                super({
+                    element: element,
+                    target: options.target
+                });
+            }
         };
-        ol.inherits(app.PlannerMultiMissionControl, ol.control.Control);
 
         /**
          * @param {ol.MapBrowserEvent} evt Map browser event.
          * @return {boolean} `true` to start the drag sequence.
          */
-        app.Drag.prototype.handleDownEvent = function (evt) {
+        app.handleDownEvent = function (evt) {
             if (disableMarkerEdit) return false;
 
             var map = evt.map;
@@ -2181,8 +2212,8 @@ TABS.mission_control.initialize = function (callback) {
         /**
          * @param {ol.MapBrowserEvent} evt Map browser event.
          */
-        app.Drag.prototype.handleDragEvent = function (evt) {
-
+        app.handleDragEvent = function (evt) {
+            
             if (tempMarker.kind == "safehomecircle" || tempMarker.kind == "geozonecircle") {
                 return;
             }
@@ -2205,7 +2236,7 @@ TABS.mission_control.initialize = function (callback) {
                 this.coordinate_[1] = evt.coordinate[1];
             }
 
-            let coord = ol.proj.toLonLat(geometry.getCoordinates());
+            let coord = toLonLat(geometry.getCoordinates());
             if (tempMarker.kind == "waypoint") {
                 let tempWp = mission.getWaypoint(tempMarker.number);
                 tempWp.setLon(Math.round(coord[0] * 10000000));
@@ -2252,7 +2283,7 @@ TABS.mission_control.initialize = function (callback) {
         /**
          * @param {ol.MapBrowserEvent} evt Event.
          */
-        app.Drag.prototype.handleMoveEvent = function (evt) {
+        app.handleMoveEvent = function (evt) {
             if (this.cursor_) {
                 var map = evt.map;
                 var feature = map.forEachFeatureAtPixel(evt.pixel,
@@ -2276,7 +2307,7 @@ TABS.mission_control.initialize = function (callback) {
          * @param {ol.MapBrowserEvent} evt Map browser event.
          * @return {boolean} `false` to stop the drag sequence.
          */
-        app.Drag.prototype.handleUpEvent = function (evt) {
+        app.handleUpEvent = function (evt) {
             if (tempMarker.kind == "waypoint") {
                 if (selectedMarker != null && tempMarker.number == selectedMarker.getLayerNumber()) {
                     (async () => {
@@ -2340,55 +2371,55 @@ TABS.mission_control.initialize = function (callback) {
         let control_list;
 
         if (globalSettings.mapProviderType == 'esri') {
-            mapLayers.push(new ol.layer.Tile({
-                source: new ol.source.XYZ({
+            mapLayers.push(new TileLayer({
+                source: new XYZ({
                             url: 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
                             attributions: 'Source: <a href="https://www.esri.com/" target="_blank">Esri</a>, Maxar, Earthstar Geographics, and the GIS User Community',
                             maxZoom: 19
                         })
             }));
-            mapLayers.push(new ol.layer.Tile({
-                    source: new ol.source.XYZ({
+            mapLayers.push(new TileLayer({
+                    source: new XYZ({
                                 url: 'https://services.arcgisonline.com/arcgis/rest/services/Reference/World_Transportation/MapServer/tile/{z}/{y}/{x}',
                                 maxZoom: 19
                             })
             }));
-            mapLayers.push(new ol.layer.Tile({
-                source: new ol.source.XYZ({
+            mapLayers.push(new TileLayer({
+                source: new XYZ({
                             url: 'https://services.arcgisonline.com/arcgis/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}',
                             maxZoom: 19
                         })
             }));
         } else if ( globalSettings.mapProviderType == 'mapproxy' ) {
-            mapLayers.push(new ol.layer.Tile({
-                source: new ol.source.TileWMS({
+            mapLayers.push(new TileLayer({
+                source: new TileWMS({
                             url: globalSettings.proxyURL,
                             params: {'LAYERS':globalSettings.proxyLayer}
                         })
             }));
         } else {
-            mapLayers.push(new ol.layer.Tile({
-                source: new ol.source.OSM()
+            mapLayers.push(new TileLayer({
+                source: new OSM()
             }));
         }
 
         if (CONFIGURATOR.connectionValid) {
             control_list = [
-                new app.PlannerSettingsControl(),
-                new app.PlannerMultiMissionControl(),
-                new app.PlannerSafehomeControl(),
-                new app.PlannerElevationControl(),
+                new PlannerSettingsControl(),
+                new PlannerMultiMissionControl(),
+                new PlannerSafehomeControl(),
+                new PlannerElevationControl(),
             ]
 
             if (isGeozoneEnabeld) {
-                control_list.push(new app.GeozonesControl());
+                control_list.push(new GeozonesControl());
             }
         }
         else {
             control_list = [
-                new app.PlannerSettingsControl(),
-                new app.PlannerMultiMissionControl(),
-                new app.PlannerElevationControl(),
+                new PlannerSettingsControl(),
+                new PlannerMultiMissionControl(),
+                new PlannerElevationControl(),
                 //new app.PlannerSafehomeControl() // TO COMMENT FOR RELEASE : DECOMMENT FOR DEBUG
             ]
         }
@@ -2396,17 +2427,17 @@ TABS.mission_control.initialize = function (callback) {
         //////////////////////////////////////////////////////////////////////////////////////////////
         // Map object definition
         //////////////////////////////////////////////////////////////////////////////////////////////
-        map = new ol.Map({
-            controls: ol.control.defaults({
+        map = new Map({
+            controls: defaultControls({
                 attributionOptions: {
                     collapsible: false
                 }
             }).extend(control_list),
-            interactions: ol.interaction.defaults().extend([new app.Drag()]),
+            interactions: defaultInteractions().extend([new Drag()]),
             layers: mapLayers,
-            target: document.getElementById('missionMap'),
-            view: new ol.View({
-                center: ol.proj.fromLonLat([lon, lat]),
+            target: 'missionMap',
+            view: new View({
+                center: fromLonLat([lon, lat]),
                 zoom: 2
             })
         });
@@ -2423,19 +2454,18 @@ TABS.mission_control.initialize = function (callback) {
         //////////////////////////////////////////////////////////////////////////
         map.on('moveend', function (evt) {
             store.set('missionPlannerLastValues', {
-                center: ol.proj.toLonLat(map.getView().getCenter()),
+                center: toLonLat(map.getView().getCenter()),
                 zoom: map.getView().getZoom()
             });
         });
         //////////////////////////////////////////////////////////////////////////
         // load map view settings on startup
         //////////////////////////////////////////////////////////////////////////
-        var missionPlannerLastValues = store.get('missionPlannerLastValues', false);
+        const missionPlannerLastValues = store.get('missionPlannerLastValues', false);
         if (missionPlannerLastValues && missionPlannerLastValues.zoom && missionPlannerLastValues.center) {
-            map.getView().setCenter(ol.proj.fromLonLat(missionPlannerLastValues.center));
+            map.getView().setCenter(fromLonLat(missionPlannerLastValues.center));
             map.getView().setZoom(missionPlannerLastValues.zoom);
-        }
-
+        }         
 
         //////////////////////////////////////////////////////////////////////////
         // Map on-click behavior definition
@@ -2475,17 +2505,17 @@ TABS.mission_control.initialize = function (callback) {
                 }
 
                 var geometry = selectedFeature.getGeometry();
-                var coord = ol.proj.toLonLat(geometry.getCoordinates());
+                var coord = toLonLat(geometry.getCoordinates());
 
                 selectedFeature.setStyle(getWaypointIcon(selectedMarker, true));
 
                 let P3Value = selectedMarker.getP3();
 
-                changeSwitchery($('#pointP3Alt'), TABS.mission_control.isBitSet(P3Value, MWNP.P3.ALT_TYPE));
-                changeSwitchery($('#pointP3UserAction1'), TABS.mission_control.isBitSet(P3Value, MWNP.P3.USER_ACTION_1));
-                changeSwitchery($('#pointP3UserAction2'), TABS.mission_control.isBitSet(P3Value, MWNP.P3.USER_ACTION_2));
-                changeSwitchery($('#pointP3UserAction3'), TABS.mission_control.isBitSet(P3Value, MWNP.P3.USER_ACTION_3));
-                changeSwitchery($('#pointP3UserAction4'), TABS.mission_control.isBitSet(P3Value, MWNP.P3.USER_ACTION_4));
+                changeSwitch($('#pointP3Alt'), TABS.mission_control.isBitSet(P3Value, MWNP.P3.ALT_TYPE));
+                changeSwitch($('#pointP3UserAction1'), TABS.mission_control.isBitSet(P3Value, MWNP.P3.USER_ACTION_1));
+                changeSwitch($('#pointP3UserAction2'), TABS.mission_control.isBitSet(P3Value, MWNP.P3.USER_ACTION_2));
+                changeSwitch($('#pointP3UserAction3'), TABS.mission_control.isBitSet(P3Value, MWNP.P3.USER_ACTION_3));
+                changeSwitch($('#pointP3UserAction4'), TABS.mission_control.isBitSet(P3Value, MWNP.P3.USER_ACTION_4));
 
                 var altitudeMeters = app.ConvertCentimetersToMeters(selectedMarker.getAlt());
 
@@ -2537,17 +2567,17 @@ TABS.mission_control.initialize = function (callback) {
 
                 $('#wpApproachDirection').val(selectedFwApproachWp.getApproachDirection());
                 $('#wpLandHeading1').val(Math.abs(selectedFwApproachWp.getLandHeading1()));
-                changeSwitchery($('#wpLandHeading1Excl'), selectedFwApproachWp.getLandHeading1() < 0);
+                changeSwitch($('#wpLandHeading1Excl'), selectedFwApproachWp.getLandHeading1() < 0);
                 $('#wpLandHeading2').val(Math.abs(selectedFwApproachWp.getLandHeading2()));
-                changeSwitchery($('#wpLandHeading2Excl'), selectedFwApproachWp.getLandHeading2() < 0);
+                changeSwitch($('#wpLandHeading2Excl'), selectedFwApproachWp.getLandHeading2() < 0);
 
 
 
                 $('#wpApproachDirection').val(selectedFwApproachWp.getApproachDirection());
                 $('#wpLandHeading1').val(Math.abs(selectedFwApproachWp.getLandHeading1()));
-                changeSwitchery($('#wpLandHeading1Excl'), selectedFwApproachWp.getLandHeading1() < 0);
+                changeSwitch($('#wpLandHeading1Excl'), selectedFwApproachWp.getLandHeading1() < 0);
                 $('#wpLandHeading2').val(Math.abs(selectedFwApproachWp.getLandHeading2()));
-                changeSwitchery($('#wpLandHeading2Excl'), selectedFwApproachWp.getLandHeading2() < 0);
+                changeSwitch($('#wpLandHeading2Excl'), selectedFwApproachWp.getLandHeading2() < 0);
 
                 // Selection box update depending on choice of type of waypoint
                 for (var j in dictOfLabelParameterPoint[selectedMarker.getAction()]) {
@@ -2564,7 +2594,7 @@ TABS.mission_control.initialize = function (callback) {
                 redrawLayer();
             }
             else if (selectedFeature && tempMarker.kind == "line" && tempMarker.selection && !disableMarkerEdit) {
-                let tempWpCoord = ol.proj.toLonLat(evt.coordinate);
+                let tempWpCoord = toLonLat(evt.coordinate);
                 let tempWp = new Waypoint(tempMarker.number, MWNP.WPTYPE.WAYPOINT, Math.round(tempWpCoord[1] * 10000000), Math.round(tempWpCoord[0] * 10000000), Number(settings.alt), Number(settings.speed));
                 tempWp.setMultiMissionIdx(mission.getWaypoint(0).getMultiMissionIdx());
 
@@ -2592,7 +2622,7 @@ TABS.mission_control.initialize = function (callback) {
             else if (selectedFeature && tempMarker.kind == "home" && tempMarker.selection) {
                 selectedMarker = HOME;
                 var geometry = selectedFeature.getGeometry();
-                var coord = ol.proj.toLonLat(geometry.getCoordinates());
+                var coord = toLonLat(geometry.getCoordinates());
                 $('.home-lon').val(Math.round(coord[0] * 10000000) / 10000000);
                 $('.home-lat').val(Math.round(coord[1] * 10000000) / 10000000);
             }
@@ -2603,11 +2633,11 @@ TABS.mission_control.initialize = function (callback) {
             else if (selectedFeature && tempMarker.kind == "geozoneline" && tempMarker.selection) {
 
                 if (FC.GEOZONES.getUsedVerticesCount() + 1 > FC.GEOZONES.getMaxVertices()) {
-                    GUI.alert(i18n.getMessage('missionGeozoneMaxVerticesReached'));
+                    dialog.alert(i18n.getMessage('missionGeozoneMaxVerticesReached'));
                     return;
                 }
-
-                let tempCoord = ol.proj.toLonLat(evt.coordinate);
+                
+                let tempCoord = toLonLat(evt.coordinate);
                 let tmpVertex = new GeozoneVertex(tempMarker.number + 1, Math.round(tempCoord[1] * 1e7), Math.round(tempCoord[0] * 1e7));
                 FC.GEOZONES.at(tempMarker.layerNumber).insertVertex(tempMarker.number + 1, tmpVertex);
                 selectedGeozone = FC.GEOZONES.at(tempMarker.layerNumber);
@@ -2616,7 +2646,7 @@ TABS.mission_control.initialize = function (callback) {
                 updateGeozoneInfo();
             }
             else if (!disableMarkerEdit) {
-                let tempWpCoord = ol.proj.toLonLat(evt.coordinate);
+                let tempWpCoord = toLonLat(evt.coordinate);
                 let tempWp = new Waypoint(mission.get().length, MWNP.WPTYPE.WAYPOINT, Math.round(tempWpCoord[1] * 10000000), Math.round(tempWpCoord[0] * 10000000), Number(settings.alt), Number(settings.speed));
 
                 if (mission.get().length == 0) {
@@ -2660,9 +2690,9 @@ TABS.mission_control.initialize = function (callback) {
                 return true;
             });
             if (hit && name != "safehomeDist" && name != "safehomeSafe" && name != "geozoneCircle") {
-                map.getTarget().style.cursor = 'pointer';
+                map.getTargetElement().style.cursor = 'pointer';
             } else {
-                map.getTarget().style.cursor = '';
+                map.getTargetElement().style.cursor = '';
             }
         });
 
@@ -2780,13 +2810,13 @@ TABS.mission_control.initialize = function (callback) {
         /////////////////////////////////////////////
         // Callback for Waypoint edition
         /////////////////////////////////////////////
-        $('#pointType').on('change', (event) => {
+        $('#pointType').on('change', async (event) => {
             if (selectedMarker) {
                 if (Number($('#pointType').val()) == MWNP.WPTYPE.LAND) {
                     let found = false;
                     mission.get().forEach(wp => {
                         if (wp.getAction() == MWNP.WPTYPE.LAND) {
-                            GUI.alert(i18n.getMessage('MissionPlannerOnlyOneLandWp'));
+                            dialog.alert(i18n.getMessage('MissionPlannerOnlyOneLandWp'));
                             found = true;
                             $(event.currentTarget).val(selectedMarker.getAction());
                         }
@@ -2877,7 +2907,7 @@ TABS.mission_control.initialize = function (callback) {
                 var P3Value = selectedMarker.getP3();
 
                 if (disableMarkerEdit) {
-                    changeSwitchery($('#pointP3Alt'), TABS.mission_control.isBitSet(P3Value, MWNP.P3.ALT_TYPE));
+                    changeSwitch($('#pointP3Alt'), TABS.mission_control.isBitSet(P3Value, MWNP.P3.ALT_TYPE));
                 }
 
                 P3Value = TABS.mission_control.setBit(P3Value, MWNP.P3.ALT_TYPE, $('#pointP3Alt').prop("checked"));
@@ -2964,7 +2994,7 @@ TABS.mission_control.initialize = function (callback) {
         $('#pointP3UserAction1').on('change', function(event){
             if (selectedMarker) {
                 if (disableMarkerEdit) {
-                    changeSwitchery($('#pointP3UserAction1'), TABS.mission_control.isBitSet(selectedMarker.getP3(), MWNP.P3.USER_ACTION_1));
+                    changeSwitch($('#pointP3UserAction1'), TABS.mission_control.isBitSet(selectedMarker.getP3(), MWNP.P3.USER_ACTION_1));
                 }
 
                 var P3Value = TABS.mission_control.setBit(selectedMarker.getP3(), MWNP.P3.USER_ACTION_1, $('#pointP3UserAction1').prop("checked"));
@@ -2979,7 +3009,7 @@ TABS.mission_control.initialize = function (callback) {
         $('#pointP3UserAction2').on('change', function(event){
             if (selectedMarker) {
                 if (disableMarkerEdit) {
-                    changeSwitchery($('#pointP3UserAction2'), TABS.mission_control.isBitSet(selectedMarker.getP3(), MWNP.P3.USER_ACTION_2));
+                    changeSwitch($('#pointP3UserAction2'), TABS.mission_control.isBitSet(selectedMarker.getP3(), MWNP.P3.USER_ACTION_2));
                 }
 
                 var P3Value = TABS.mission_control.setBit(selectedMarker.getP3(), MWNP.P3.USER_ACTION_2, $('#pointP3UserAction2').prop("checked"));
@@ -2994,7 +3024,7 @@ TABS.mission_control.initialize = function (callback) {
         $('#pointP3UserAction3').on('change', function(event){
             if (selectedMarker) {
                 if (disableMarkerEdit) {
-                    changeSwitchery($('#pointP3UserAction3'), TABS.mission_control.isBitSet(selectedMarker.getP3(), MWNP.P3.USER_ACTION_3));
+                    changeSwitch($('#pointP3UserAction3'), TABS.mission_control.isBitSet(selectedMarker.getP3(), MWNP.P3.USER_ACTION_3));
                 }
 
                 var P3Value = TABS.mission_control.setBit(selectedMarker.getP3(), MWNP.P3.USER_ACTION_3, $('#pointP3UserAction3').prop("checked"));
@@ -3009,7 +3039,7 @@ TABS.mission_control.initialize = function (callback) {
         $('#pointP3UserAction4').on('change', function(event){
             if (selectedMarker) {
                 if (disableMarkerEdit) {
-                    changeSwitchery($('#pointP3UserAction4'), TABS.mission_control.isBitSet(selectedMarker.getP3(), MWNP.P3.USER_ACTION_4));
+                    changeSwitch($('#pointP3UserAction4'), TABS.mission_control.isBitSet(selectedMarker.getP3(), MWNP.P3.USER_ACTION_4));
                 }
 
                 var P3Value = TABS.mission_control.setBit(selectedMarker.getP3(), MWNP.P3.USER_ACTION_4, $('#pointP3UserAction4').prop("checked"));
@@ -3073,7 +3103,7 @@ TABS.mission_control.initialize = function (callback) {
 
             if (selectedMarker && selectedFwApproachWp) {
                 if (disableMarkerEdit) {
-                    changeSwitchery($('#wpLandHeading1Excl'), selectedFwApproachWp.getLandHeading1() < 0);
+                    changeSwitch($('#wpLandHeading1Excl'), selectedFwApproachWp.getLandHeading1() < 0);
                     return;
                 }
 
@@ -3111,7 +3141,7 @@ TABS.mission_control.initialize = function (callback) {
         $('#wpLandHeading2Excl').on('change', (event) => {
             if (selectedMarker && selectedFwApproachWp) {
                 if (disableMarkerEdit) {
-                    changeSwitchery($('#wpLandHeading2Excl'), selectedFwApproachWp.getLandHeading2() < 0);
+                    changeSwitch($('#wpLandHeading2Excl'), selectedFwApproachWp.getLandHeading2() < 0);
                     return;
                 }
                 if ($('#wpLandHeading2Excl').prop('checked')) {
@@ -3160,13 +3190,13 @@ TABS.mission_control.initialize = function (callback) {
 
         $('#addSafehome').on('click', () => {
             if (FC.SAFEHOMES.safehomeCount() + 1 > FC.SAFEHOMES.getMaxSafehomeCount()){
-                GUI.alert(i18n.getMessage('missionSafehomeMaxSafehomesReached'));
+                dialog.alert(i18n.getMessage('missionSafehomeMaxSafehomesReached'));
                 return;
             }
 
             let mapCenter = map.getView().getCenter();
-            let midLon = Math.round(ol.proj.toLonLat(mapCenter)[0] * 1e7);
-            let midLat = Math.round(ol.proj.toLonLat(mapCenter)[1] * 1e7);
+            let midLon = Math.round(toLonLat(mapCenter)[0] * 1e7);
+            let midLat = Math.round(toLonLat(mapCenter)[1] * 1e7);
             FC.SAFEHOMES.put(new Safehome(FC.SAFEHOMES.safehomeCount(), 1, midLat, midLon));
             updateSelectedShAndFwAp(FC.SAFEHOMES.safehomeCount() - 1);
             renderSafeHomeOptions();
@@ -3448,11 +3478,11 @@ TABS.mission_control.initialize = function (callback) {
         $('#saveEepromGeozoneButton').on('click', event => {
 
             if (invalidGeoZones) {
-                GUI.alert(i18n.getMessage("geozoneUnableToSave"));
+                dialog.alert(i18n.getMessage("geozoneUnableToSave"));
                 return;
             }
-
-            if (GUI.confirm(i18n.getMessage("missionGeozoneReboot"))) {
+            
+            if (dialog.confirm(i18n.getMessage("missionGeozoneReboot"))) {            
                 $(event.currentTarget).addClass('disabled');
                 GUI.log('Start of sending Geozones');
                 mspHelper.saveGeozones(() => {
@@ -3472,7 +3502,7 @@ TABS.mission_control.initialize = function (callback) {
                     selectedGeozone.setVertices([tmpVertex]);
                 } else {
                     if (FC.GEOZONES.getUsedVerticesCount() + 2 > FC.GEOZONES.getMaxVertices()) {
-                        GUI.alert(i18n.getMessage('missionGeozoneMaxVerticesReached'));
+                        dialog.alert(i18n.getMessage('missionGeozoneMaxVerticesReached'));
                         renderGeozoneOptions();
                         return;
                     }
@@ -3555,8 +3585,8 @@ TABS.mission_control.initialize = function (callback) {
         /////////////////////////////////////////////
         $('#homeTableBody').on('click', "[data-role='home-center']", function (event) {
             let mapCenter = map.getView().getCenter();
-            HOME.setLon(Math.round(ol.proj.toLonLat(mapCenter)[0] * 1e7));
-            HOME.setLat(Math.round(ol.proj.toLonLat(mapCenter)[1] * 1e7));
+            HOME.setLon(Math.round(toLonLat(mapCenter)[0] * 1e7));
+            HOME.setLat(Math.round(toLonLat(mapCenter)[1] * 1e7));
             updateHome();
         });
 
@@ -3612,7 +3642,7 @@ TABS.mission_control.initialize = function (callback) {
         // Callback for Remove buttons
         /////////////////////////////////////////////
         $('#removeAllPoints').on('click', function () {
-            if (markers.length && GUI.confirm(i18n.getMessage('confirm_delete_all_points'))) {
+            if (markers.length && dialog.confirm(i18n.getMessage('confirm_delete_all_points'))) {
                 if (removeAllMultiMissionCheck()) {
                     removeAllWaypoints();
                     updateMultimissionState();
@@ -3627,10 +3657,10 @@ TABS.mission_control.initialize = function (callback) {
         $('#removePoint').on('click', function () {
             if (selectedMarker) {
                 if (mission.isJumpTargetAttached(selectedMarker)) {
-                    GUI.alert(i18n.getMessage('MissionPlannerJumpTargetRemoval'));
+                    dialog.alert(i18n.getMessage('MissionPlannerJumpTargetRemoval'));
                 }
                 else if (mission.getAttachedFromWaypoint(selectedMarker) && mission.getAttachedFromWaypoint(selectedMarker).length != 0) {
-                    if (GUI.confirm(i18n.getMessage('confirm_delete_point_with_options'))) {
+                    if (dialog.confirm(i18n.getMessage('confirm_delete_point_with_options'))) {
                         mission.getAttachedFromWaypoint(selectedMarker).forEach(function (element) {
 
                             if (element.getAction() == MWNP.WPTYPE.LAND) {
@@ -3669,7 +3699,7 @@ TABS.mission_control.initialize = function (callback) {
         $('#loadFileMissionButton').on('click', function () {
             if (!fileLoadMultiMissionCheck()) return;
 
-            if (markers.length && !GUI.confirm(i18n.getMessage('confirm_delete_all_points'))) return;
+            if (markers.length && !dialog.confirm(i18n.getMessage('confirm_delete_all_points'))) return;
             var options = {
                 filters: [ { name: "Mission file", extensions: ['mission'] } ]
             };
@@ -3698,7 +3728,7 @@ TABS.mission_control.initialize = function (callback) {
 
         $('#loadMissionButton').on('click', function () {
             let message = multimissionCount ? 'confirm_overwrite_multimission_file_load_option' : 'confirm_delete_all_points';
-            if ((markers.length || multimissionCount) && !GUI.confirm(i18n.getMessage(message))) return;
+            if ((markers.length || multimissionCount) && !dialog.confirm(i18n.getMessage(message))) return;
             removeAllWaypoints();
             $(this).addClass('disabled');
             GUI.log(i18n.getMessage('startGetPoint'));
@@ -3707,7 +3737,7 @@ TABS.mission_control.initialize = function (callback) {
 
         $('#saveMissionButton').on('click', function () {
             if (mission.isEmpty()) {
-                GUI.alert(i18n.getMessage('no_waypoints_to_save'));
+                dialog.alert(i18n.getMessage('no_waypoints_to_save'));
                 return;
             }
             $(this).addClass('disabled');
@@ -3717,7 +3747,7 @@ TABS.mission_control.initialize = function (callback) {
 
         $('#loadEepromMissionButton').on('click', function () {
             let message = multimissionCount ? 'confirm_overwrite_multimission_file_load_option' : 'confirm_delete_all_points';
-            if ((markers.length || multimissionCount) && !GUI.confirm(i18n.getMessage(message))) return;
+            if ((markers.length || multimissionCount) && !dialog.confirm(i18n.getMessage(message))) return;
             removeAllWaypoints();
             $(this).addClass('disabled');
             GUI.log(i18n.getMessage('startGetPoint'));
@@ -3726,7 +3756,7 @@ TABS.mission_control.initialize = function (callback) {
 
         $('#saveEepromMissionButton').on('click', function () {
             if (mission.isEmpty()) {
-                GUI.alert(i18n.getMessage('no_waypoints_to_save'));
+                dialog.alert(i18n.getMessage('no_waypoints_to_save'));
                 return;
             }
             $(this).addClass('disabled');
@@ -3776,13 +3806,14 @@ TABS.mission_control.initialize = function (callback) {
             FC.FW_APPROACH.clean(i);
         }
 
-        fs.readFile(filename, (err, data) => {
-            if (err) {
+        window.electronAPI.readFile(filename).then(response => {
+            if (response.error) {
                 GUI.log(i18n.getMessage('errorReadingFile'));
-                return console.error(err);
+                console.error(response.error);
+                return;
             }
 
-            xml2js.Parser({ 'explicitChildren': true, 'preserveChildrenOrder': true }).parseString(data, (err, result) => {
+            xml2js.Parser({ 'explicitChildren': true, 'preserveChildrenOrder': true }).parseString(response.data, (err, result) => {
                 if (err) {
                     GUI.log(i18n.getMessage('errorParsingFile'));
                     return console.error(err);
@@ -3901,7 +3932,7 @@ TABS.mission_control.initialize = function (callback) {
                 }
 
                 if (missionEndFlagCount > 1) {
-                    if (multimissionCount && !GUI.confirm(i18n.getMessage('confirm_multimission_file_load'))) {
+                    if (multimissionCount && ! dialog.confirm(i18n.getMessage('confirm_multimission_file_load'))) {
                         mission.flush();
                         return;
                     } else {
@@ -3926,7 +3957,7 @@ TABS.mission_control.initialize = function (callback) {
                 updateMultimissionState();
 
                 if (Object.keys(mission.getCenter()).length !== 0) {
-                    var coord = ol.proj.fromLonLat([mission.getCenter().lon / 10000000 , mission.getCenter().lat / 10000000]);
+                    var coord = fromLonLat([mission.getCenter().lon / 10000000 , mission.getCenter().lat / 10000000]);
                     map.getView().setCenter(coord);
                     if (mission.getCenter().zoom) {
                         map.getView().setZoom(mission.getCenter().zoom);
@@ -3952,7 +3983,7 @@ TABS.mission_control.initialize = function (callback) {
     }
 
     function saveMissionFile(filename) {
-        var center = ol.proj.toLonLat(map.getView().getCenter());
+        var center = toLonLat(map.getView().getCenter());
         var zoom = map.getView().getZoom();
         let multimission = multimissionCount && !singleMissionActive();
         let version = multimission ? '4.0.0' : '2.3-pre8';
@@ -4050,7 +4081,7 @@ TABS.mission_control.initialize = function (callback) {
                 $('#loadMissionButton').removeClass('disabled');
             }
             if (!FC.MISSION_PLANNER.getCountBusyPoints()) {
-                GUI.alert(i18n.getMessage('no_waypoints_to_load'));
+                dialog.alert(i18n.getMessage('no_waypoints_to_load'));
                 return;
             }
             mission.reinit();
@@ -4138,10 +4169,8 @@ TABS.mission_control.initialize = function (callback) {
         $('#infoMissionFilename').show();
     }
 
-    function changeSwitchery(element, checked) {
-        if ( ( element.is(':checked') && checked == false ) || ( !element.is(':checked') && checked == true ) ) {
-            element.parent().find('.switcherymid').trigger('click');
-        }
+    function changeSwitch(element, checked) {
+        element.prop('checked', checked);
     }
 
     function updateSelectedShAndFwAp(index) {
@@ -4160,7 +4189,7 @@ TABS.mission_control.initialize = function (callback) {
         if (AbsAltCheck) {
             if (checkAltitude < 100 * elevation) {
                 if (resetAltitude) {
-                    GUI.alert(i18n.getMessage('MissionPlannerAltitudeChangeReset'));
+                    dialog.alert(i18n.getMessage('MissionPlannerAltitudeChangeReset'));
                     altitude = selectedMarker.getAlt();
                 } else {
                     altitude = settings.alt + 100 * elevation;
@@ -4171,7 +4200,7 @@ TABS.mission_control.initialize = function (callback) {
             let elevationAtHome = HOME.getAlt();
             if ((checkAltitude / 100 + elevationAtHome) < elevation) {
                 if (resetAltitude) {
-                    GUI.alert(i18n.getMessage('MissionPlannerAltitudeChangeReset'));
+                    dialog.alert(i18n.getMessage('MissionPlannerAltitudeChangeReset'));
                     altitude = selectedMarker.getAlt();
                 } else {
                     let currentGroundClearance = 100 * Number($('#groundClearanceValueAtWP').text());
@@ -4193,6 +4222,7 @@ TABS.mission_control.initialize = function (callback) {
     }
 
     function plotElevation() {
+        /*
         if ($('#missionPlannerElevation').is(":visible") && !disableMarkerEdit) {
             if (mission.isEmpty()) {
                 var data = [[0], [0]];
@@ -4212,7 +4242,38 @@ TABS.mission_control.initialize = function (callback) {
                               },
                               height: 300,
                               }
-                Plotly.newPlot('elevationDiv', data, layout);
+                //Plotly.newPlot('elevationDiv', data, layout);
+
+                var ctx = $("#elevationChart").get(0);
+
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                      labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+                      datasets: [
+                        {
+                        label: 'One',
+                        data: [12, 19, 3, 5, 2, 3],
+                        borderWidth: 1,
+                        fill: 'start',
+                        },
+                        {
+                            label: 'Two',
+                            data: [13, 21, 7, 7, 3, 6],
+                            borderWidth: 2,
+                            radius: 0
+                        }
+                    ]
+                    },
+                    options: {
+                        maintainAspectRatio: false,
+                        scales: {
+                        y: {
+                          beginAtZero: true
+                        }
+                      }
+                    }
+                  });
             }
             else {
                 (async () => {
@@ -4253,8 +4314,9 @@ TABS.mission_control.initialize = function (callback) {
                             color: '#1f77b4',
                         },
                     };
-                    /* Show multi mission number in plot title when single mission displayed
-                     * Not updated when ALL multi missions displayed since plot disabled */
+                     Show multi mission number in plot title when single mission displayed
+                     * Not updated when ALL multi missions displayed since plot disabled 
+                    
                     let missionNumber = '';
                     if (multimissionCount) {
                         missionNumber = ' ' + ($('#multimissionOptionList').val());
@@ -4279,10 +4341,11 @@ TABS.mission_control.initialize = function (callback) {
 
                     var data = [trace_WGS84, trace_missionHeight];
 
-                    Plotly.newPlot('elevationDiv', data, layout);
+                    //Plotly.newPlot('elevationDiv', data, layout);
                 })()
             }
         }
+        */
     }
 
     function parseBooleans (str) {

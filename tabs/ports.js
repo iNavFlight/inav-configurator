@@ -1,15 +1,13 @@
 'use strict';
 
-const path = require('path');
-
-const mspHelper = require('./../js/msp/MSPHelper');
-const MSPCodes = require('./../js/msp/MSPCodes');
-const MSP = require('./../js/msp');
-const { GUI, TABS } = require('./../js/gui');
-const FC = require('./../js/fc');
-const i18n = require('./../js/localization');
-const serialPortHelper = require('./../js/serialPortHelper');
-const jBox = require('../js/libraries/jBox/jBox.min');
+import mspHelper from './../js/msp/MSPHelper';
+import MSPCodes from './../js/msp/MSPCodes';
+import MSP from './../js/msp';
+import { GUI, TABS } from './../js/gui';
+import FC from './../js/fc';
+import i18n from './../js/localization';
+import serialPortHelper from './../js/serialPortHelper';
+import jBox from 'jbox';
 
 TABS.ports = {};
 
@@ -23,36 +21,8 @@ TABS.ports.initialize = function (callback) {
     }
 
     mspHelper.loadSerialPorts(function () {
-        GUI.load(path.join(__dirname, "ports.html"), on_tab_loaded_handler)
+        import('./ports.html?raw').then(({default: html}) => GUI.load(html, on_tab_loaded_handler));
     });
-
-    function checkMSPPortCount(excludeCheckbox) {
-        let mspCount = 0;
-
-        $('.tab-ports .portConfiguration').each(function () {
-            const $portConfig = $(this);
-
-            // Check each MSP checkbox in this port configuration
-            $portConfig.find('input:checkbox[value="MSP"]').each(function() {
-                const $checkbox = $(this);
-                // Skip the checkbox we're currently changing (to get "before" count)
-                if (excludeCheckbox && $checkbox.is(excludeCheckbox)) {
-                    return;
-                }
-                if ($checkbox.is(':checked')) {
-                    mspCount++;
-                }
-            });
-        });
-
-        return mspCount;
-    }
-
-    function showMSPWarning() {
-        if (mspWarningModal) {
-            mspWarningModal.open();
-        }
-    }
 
     function update_ui() {
 

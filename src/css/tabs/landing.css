@@ -74,9 +74,13 @@
     font-family: 'open_sanslight', Arial,serif;
 }
 
-.tab-landing .logowrapper img {
+.tab-landing .inavLogo {
     width: 700px;
+    height: 110px;
     margin: 10px;
+    background-image: url('./../../../images/cf_logo_white.svg');
+    background-position: center;
+    background-repeat: no-repeat;
 }
 
 

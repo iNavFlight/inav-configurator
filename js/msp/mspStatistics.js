@@ -36,4 +36,4 @@ var mspStatistics = function() {
 
 }();
 
-module.exports = mspStatistics;
+export default mspStatistics;

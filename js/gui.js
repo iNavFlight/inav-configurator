@@ -1,16 +1,14 @@
 'use strict';
-const { dialog } = require("@electron/remote");
 
-const CONFIGURATOR = require('./data_storage');
-const Switchery = require('./libraries/switchery/switchery')
-const MSP = require('./msp');
-const FC = require('./fc');
-const interval = require('./intervals');
-const { scaleRangeInt } = require('./helpers');
-const i18n = require('./localization');
-const mspDeduplicationQueue = require("./msp/mspDeduplicationQueue");
+import MSP from './msp';
+import FC from './fc';
+import interval from './intervals';
+import { scaleRangeInt } from './helpers';
+import i18n from './localization';
+import mspDeduplicationQueue from "./msp/mspDeduplicationQueue";
 
 var TABS = {}; // filled by individual tab js file
+
 
 var GUI_control = function () {
     this.connecting_to = false;
@@ -109,38 +107,22 @@ GUI_control.prototype.tab_switch_cleanup = function (callback) {
 };
 
 GUI_control.prototype.switchery = function() {
+   
     $('.togglesmall').each(function(index, elem) {
-        var switchery = new Switchery(elem, {
-            size: 'small',
-            color: '#37a8db',
-            secondaryColor: '#c4c4c4'
-        });
-        $(elem).on("change", function (evt) {
-            switchery.setPosition();
-        });
+        $(elem).wrapAll('<label class="ios7-switch" style="font-size: 12px"/>');
+        $(elem).after('<span></span>')
         $(elem).removeClass('togglesmall');
     });
 
     $('.toggle').each(function(index, elem) {
-        var switchery = new Switchery(elem, {
-            color: '#37a8db',
-            secondaryColor: '#c4c4c4'
-        });
-        $(elem).on("change", function (evt) {
-            switchery.setPosition();
-        });
+        $(elem).wrapAll('<label class="ios7-switch" style="font-size: 17px"/>');
+        $(elem).after('<span></span>')
         $(elem).removeClass('toggle');
     });
 
     $('.togglemedium').each(function(index, elem) {
-        var switchery = new Switchery(elem, {
-            className: 'switcherymid',
-            color: '#37a8db',
-            secondaryColor: '#c4c4c4'
-        });
-        $(elem).on("change", function (evt) {
-            switchery.setPosition();
-        });
+        $(elem).wrapAll('<label class="ios7-switch" style="font-size: 15px"/>');
+        $(elem).after('<span></span>')
         $(elem).removeClass('togglemedium');
     });
 };
@@ -148,40 +130,8 @@ GUI_control.prototype.switchery = function() {
 
 GUI_control.prototype.content_ready = function (callback) {
     const content = $('#content').removeClass('loading');
-    $('.togglesmall').each(function(index, elem) {
-        var switchery = new Switchery(elem, {
-          size: 'small',
-          color: '#37a8db',
-          secondaryColor: '#c4c4c4'
-        });
-        $(elem).on("change", function (evt) {
-            switchery.setPosition();
-        });
-        $(elem).removeClass('togglesmall');
-    });
-
-    $('.toggle').each(function(index, elem) {
-        var switchery = new Switchery(elem, {
-            color: '#37a8db',
-            secondaryColor: '#c4c4c4'
-        });
-        $(elem).on("change", function (evt) {
-            switchery.setPosition();
-        });
-        $(elem).removeClass('toggle');
-    });
-
-    $('.togglemedium').each(function(index, elem) {
-        var switchery = new Switchery(elem, {
-            className: 'switcherymid',
-            color: '#37a8db',
-            secondaryColor: '#c4c4c4'
-         });
-         $(elem).on("change", function (evt) {
-             switchery.setPosition();
-         });
-         $(elem).removeClass('togglemedium');
-    });
+    
+    this.switchery();
 
     // Insert a documentation button next to the tab title
     const tabTitle = $('div#content .tab_title').first();
@@ -323,14 +273,12 @@ GUI_control.prototype.simpleBind = function () {
     });
 };
 
-GUI_control.prototype.load = function(rel, callback) {
+GUI_control.prototype.load = function(html, callback) {
     const content = $('#content').addClass('loading');
-    $.get(rel, function(data) {
-        $(data).appendTo(content);
-        if (callback) {
-            callback();
-        }
-    });
+    $(html).appendTo(content);
+    if (callback) {
+        callback();
+    }
 }
 
 GUI_control.prototype.renderOperandValue = function ($container, operandMetadata, operand, value, onChange) {
@@ -543,18 +491,8 @@ GUI_control.prototype.update_dataflash_global = function () {
     }
 };
 
-/**
-* Don't use alert() or confirm() in Electron, it has a nasty bug: https://github.com/electron/electron/issues/31917
-*/ 
-GUI_control.prototype.alert = function(message) {
-    dialog.showMessageBoxSync({ message: message, icon: "./images/inav_icon_128.png" });
-}
-
-GUI_control.prototype.confirm = function(message) {
-    return dialog.showMessageBoxSync({ message: message, icon: "./images/inav_icon_128.png", buttons: ["Yes", "No"]}) == 0;
-}
 
 // initialize object into GUI variable
 var GUI = new GUI_control();
 
-module.exports = { GUI, TABS };
+export { GUI, TABS };
