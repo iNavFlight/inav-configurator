@@ -5397,11 +5397,11 @@
     "motor_direction_inverted_hint": {
         "message": "在混控功能中反转电机的转向，注意该功能只是改变了程序中电机的逻辑转向，还需要另外更改电机的实际转向。"
     },
-    "mixer_pid_profile_linking": {
+    "mixer_control_profile_linking": {
         "message": "PID配置文件将使用与混合配置文件索引相同的索引。"
     },
-    "mixer_pid_profile_linking_hint": {
-        "message": "mixer_pid_profile_linking: 如果您希望PID配置文件切换由混合配置文件切换处理，请在两者的混合配置文件上启用此选项（建议在垂直/混合平台类型设置中使用）。"
+    "mixer_control_profile_linking_hint": {
+        "message": "mixer_control_profile_linking: 如果您希望PID配置文件切换由混合配置文件切换处理，请在两者的混合配置文件上启用此选项（建议在垂直/混合平台类型设置中使用）。"
     },
     "blackboxFields": {
         "message": "黑匣子字段"
