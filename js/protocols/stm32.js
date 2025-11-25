@@ -57,14 +57,7 @@ var STM32_protocol = function () {
     this.useExtendedErase = false;
 };
 
-/**
- * Polls for reboot completion by checking for DFU device or serial port
- * @param {string} port - Serial port name
- * @param {object} hex - Hex firmware data
- * @param {object} options - Flash options
- * @param {function} onSuccess - Callback when device is ready (DFU or serial)
- * @param {function} onTimeout - Callback when polling times out
- */
+// Polls for reboot completion by checking for DFU device or serial port
 STM32_protocol.prototype.pollForRebootCompletion = function(port, hex, options, onSuccess, onTimeout) {
     var self = this;
     var intervalMs = 200;
@@ -105,12 +98,7 @@ STM32_protocol.prototype.pollForRebootCompletion = function(port, hex, options, 
     }, intervalMs);
 };
 
-/**
- * Waits for a specific response from the serial connection with timeout
- * @param {string} expectedString - String to wait for in the response
- * @param {number} timeoutMs - Timeout in milliseconds
- * @param {function} callback - Called with (success, receivedData)
- */
+ // Waits for a specific response from the serial connection with timeout
 STM32_protocol.prototype.waitForResponse = function(expectedString, timeoutMs, callback) {
     var receivedData = '';
     var timeoutHandle = null;
@@ -162,13 +150,12 @@ STM32_protocol.prototype.sendRebootCommand = function(callback) {
     console.log('Entering CLI to send DFU command');
 
     var cleanupAndDisconnect = function(success) {
-        // Note: waitForResponse has its own cleanup, but we'll ensure disconnect happens
         CONFIGURATOR.connection.disconnect(function(result) {
             callback(success);
         });
     };
 
-    // Step 1: Set up response listener BEFORE sending # (to avoid missing the response)
+    // Step 1: Set up response listener before sending # (to avoid missing the response)
     self.waitForResponse('CLI', 2000, function(success, receivedData) {
         if (!success) {
             console.log('Failed to enter CLI mode, timeout waiting for prompt');
