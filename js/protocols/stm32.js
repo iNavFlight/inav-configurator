@@ -143,7 +143,6 @@ STM32_protocol.prototype.waitForResponse = function(expectedString, timeoutMs, c
         // Check if we received the expected string
         if (receivedData.includes(expectedString)) {
             cleanup();
-            console.log('Received expected response:', expectedString);
             callback(true, receivedData);
         }
     };
@@ -158,44 +157,52 @@ STM32_protocol.prototype.waitForResponse = function(expectedString, timeoutMs, c
  */
 STM32_protocol.prototype.sendRebootCommand = function(callback) {
     var self = this;
+    var responseWaiter = null; // Store reference to cleanup later
+
     console.log('Entering CLI to send DFU command');
 
-    // Step 1: Send '#' to enter CLI
-    var cliEnterBuffer = new ArrayBuffer(1);
+    var cleanupAndDisconnect = function(success) {
+        // Note: waitForResponse has its own cleanup, but we'll ensure disconnect happens
+        CONFIGURATOR.connection.disconnect(function(result) {
+            callback(success);
+        });
+    };
+
+    // Step 1: Set up response listener BEFORE sending # (to avoid missing the response)
+    self.waitForResponse('CLI', 2000, function(success, receivedData) {
+        if (!success) {
+            console.log('Failed to enter CLI mode, timeout waiting for prompt');
+            console.log('Received data:', receivedData);
+            cleanupAndDisconnect(false);
+            return;
+        }
+
+        console.log('CLI mode entered, sending dfu command');
+
+        // Step 3: Send 'dfu\r\n' command
+        var dfuCommandStr = 'dfu\r\n';
+        var dfuBuffer = new ArrayBuffer(dfuCommandStr.length);
+        var dfuView = new Uint8Array(dfuBuffer);
+        for (var i = 0; i < dfuCommandStr.length; i++) {
+            dfuView[i] = dfuCommandStr.charCodeAt(i);
+        }
+
+        CONFIGURATOR.connection.send(dfuBuffer, function() {
+            console.log('DFU command sent, disconnecting');
+            cleanupAndDisconnect(true);
+        });
+    });
+
+    // Step 2: Send '####\r\n' to enter CLI (listener is already set up above)
+    var cliEnterStr = '####\r\n';
+    var cliEnterBuffer = new ArrayBuffer(cliEnterStr.length);
     var cliEnterView = new Uint8Array(cliEnterBuffer);
-    cliEnterView[0] = 0x23; // ASCII '#'
+    for (var i = 0; i < cliEnterStr.length; i++) {
+        cliEnterView[i] = cliEnterStr.charCodeAt(i);
+    }
 
     CONFIGURATOR.connection.send(cliEnterBuffer, function() {
-        console.log('Sent # to enter CLI, waiting for prompt...');
-
-        // Step 2: Wait for CLI prompt response (either "CLI" or "Entering CLI Mode")
-        self.waitForResponse('CLI', 2000, function(success, receivedData) {
-            if (!success) {
-                console.log('Failed to enter CLI mode, timeout waiting for prompt');
-                console.log('Received data:', receivedData);
-                CONFIGURATOR.connection.disconnect(function() {
-                    callback(false);
-                });
-                return;
-            }
-
-            console.log('CLI mode entered, sending dfu command');
-
-            // Step 3: Send 'dfu\r\n' command
-            var dfuCommandStr = 'dfu\r\n';
-            var dfuBuffer = new ArrayBuffer(dfuCommandStr.length);
-            var dfuView = new Uint8Array(dfuBuffer);
-            for (var i = 0; i < dfuCommandStr.length; i++) {
-                dfuView[i] = dfuCommandStr.charCodeAt(i);
-            }
-
-            CONFIGURATOR.connection.send(dfuBuffer, function() {
-                console.log('DFU command sent, disconnecting');
-
-                // Step 4: Disconnect
-                CONFIGURATOR.connection.disconnect(callback);
-            });
-        });
+        console.log('Sent #### to enter CLI, waiting for prompt...');
     });
 };
 

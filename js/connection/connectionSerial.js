@@ -107,11 +107,11 @@ class ConnectionSerial extends Connection {
     }
 
     addOnReceiveCallback(callback){
-        this._onReceiveErrorListeners.push(callback);
+        this._onReceiveListeners.push(callback);
     }
 
     removeOnReceiveCallback(callback){
-        this._onReceiveListeners = this._onReceiveErrorListeners.filter(listener => listener !== callback);
+        this._onReceiveListeners = this._onReceiveListeners.filter(listener => listener !== callback);
     }
 
     addOnReceiveErrorCallback(callback) {
