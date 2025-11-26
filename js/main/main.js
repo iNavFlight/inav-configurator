@@ -5,7 +5,7 @@ import Store from "electron-store";
 import path from 'path';
 import { fileURLToPath } from 'node:url';
 import started from 'electron-squirrel-startup';
-import { writeFile, readFile } from 'node:fs/promises';
+import { writeFile, readFile, appendFile } from 'node:fs/promises';
 
 import tcp from './tcp';
 import udp from './udp';
@@ -312,7 +312,18 @@ app.whenReady().then(() => {
         resolve(false)
       } catch (err) {
         resolve(err);
-      } 
+      }
+    });
+  });
+
+  ipcMain.handle('appendFile', (_event, filename, data) => {
+    return new Promise(async resolve => {
+      try {
+        await appendFile(filename, data);
+        resolve(false)
+      } catch (err) {
+        resolve(err);
+      }
     });
   });
 

@@ -31,6 +31,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   onUdpError: (callback) => ipcRenderer.on('udpError', (_event, error) => callback(error)),
   onUdpMessage: (callback) => ipcRenderer.on('udpMessage', (_event, data) => callback(data)),
   writeFile: (filename, data) => ipcRenderer.invoke('writeFile', filename, data),
+  appendFile: (filename, data) => ipcRenderer.invoke('appendFile', filename, data),
   readFile: (filename, encoding = 'utf8') => ipcRenderer.invoke('readFile', filename, encoding),
   rm: (path) => ipcRenderer.invoke('rm', path),
   chmod: (path, mode) => ipcRenderer.invoke('chmod', path, mode),

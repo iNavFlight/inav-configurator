@@ -1,6 +1,5 @@
-const { GUI, TABS } = require('./../js/gui');
-const path = require('path');
-const i18n = require('./../js/localization');
+import { GUI, TABS } from './../js/gui.js';
+import i18n from './../js/localization.js';
 
 
 
@@ -185,12 +184,12 @@ TABS.search.initialize = function (callback) {
         TABS.search.searchMessages(document.getElementById('search-keyword').value);
       }
     }
-    GUI.load(path.join(__dirname, "search.html"), function () {
+    import('./search.html?raw').then(({default: html}) => GUI.load(html, function () {
         i18n.localize();
         document.getElementById('search-label').addEventListener('click', searchKeyword, false);
         document.getElementById('search-keyword').addEventListener('keyup', searchKeywordTyping, false);
         GUI.content_ready(callback);
-    } );
+    }));
     self.getMessages();
     for (let tab of tabNames) {
         self.indexTab(tab);
