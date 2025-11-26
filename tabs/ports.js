@@ -47,7 +47,7 @@ TABS.ports.initialize = function (callback) {
     }
 
     function showMSPWarning() {
-        if (mspWarningModal) {
+        if (mspWarningModal && typeof mspWarningModal.open === 'function') {
             mspWarningModal.open();
         }
     }
