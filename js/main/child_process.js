@@ -1,6 +1,8 @@
 import { spawn } from 'node:child_process'
 import { app } from 'electron';
 import path from 'path';
+import fs from 'node:fs'
+import os from 'os';
 
 const child_process = {
     _processes: [],
@@ -8,7 +10,18 @@ const child_process = {
     start: function (command, args, opts, window) {        
         var process;        
         try {
-            process = spawn(path.join(app.getPath('userData'), 'sitl', command), args, opts);
+            const path = path.join(app.getPath('userData'), 'sitl', command);
+
+            if (os.platform() != 'win32')
+            {
+                const stats = fs.statSync(commandPath);
+                const permission = stats.mode & 0o777;
+                if (permission != 0o755) {
+                    fs.chmodSync(commandPath, 0o755);
+                }
+            }
+    
+            process = spawn(path, args, opts);
         } catch (err) {
             console.log(err);
             return -1;

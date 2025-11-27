@@ -23,34 +23,7 @@ TABS.ports.initialize = function (callback) {
     mspHelper.loadSerialPorts(function () {
         import('./ports.html?raw').then(({default: html}) => GUI.load(html, on_tab_loaded_handler));
     });
-
-    function checkMSPPortCount(excludeCheckbox) {
-        let mspCount = 0;
-
-        $('.tab-ports .portConfiguration').each(function () {
-            const $portConfig = $(this);
-
-            // Check each MSP checkbox in this port configuration
-            $portConfig.find('input:checkbox[value="MSP"]').each(function() {
-                const $checkbox = $(this);
-                // Skip the checkbox we're currently changing (to get "before" count)
-                if (excludeCheckbox && $checkbox.is(excludeCheckbox)) {
-                    return;
-                }
-                if ($checkbox.is(':checked')) {
-                    mspCount++;
-                }
-            });
-        });
-
-        return mspCount;
-    }
-
-    function showMSPWarning() {
-        if (mspWarningModal) {
-            mspWarningModal.open();
-        }
-    }
+    
 
     function update_ui() {
 

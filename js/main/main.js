@@ -330,18 +330,6 @@ app.whenReady().then(() => {
     });
   });
 
-  ipcMain.handle('chmod', (_event, pathName, mode) => {
-    return new Promise(resolve => {
-      chmod(path.join(__dirname, 'sitl', pathName), mode, error => {
-        if (error) {
-          resolve(error.message)
-        } else {
-          resolve(false)
-        }
-      });
-    });
-  });
-
   ipcMain.handle('rm', (_event, path) => {
     return new Promise(resolve => {
       rm(path, error => {

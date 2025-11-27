@@ -116,10 +116,6 @@ var SITLProcess = {
         } else {
             sitlExe = 'inav_SITL';
             eepromPath = `${window.electronAPI.appGetPath('userData')}/sitl/${eepromFileName}`;
-            window.electronAPI.chmod(sitlExe, 0o755).then(err => {
-                if (err)
-                    console.log(err);
-            });
         } 
 
         var args = [];

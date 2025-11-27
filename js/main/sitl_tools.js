@@ -117,12 +117,19 @@ const sitlTools = {
                 throw new Error(`Failed to extract SITL resources: ${err.message}`);
             }
 
+            const sitlAppDataDir = path.join(app.getPath('userData'), 'sitl');
+            try {
+                await mkdir(sitlAppDataDir, { recursive: true });
+            } catch (err) {
+                throw new Error(`Failed to create sitl app data directory: ${err.message}`);
+            }
+
             const arch = os.arch();
             const platform = os.platform();
 
             try {
                 if (platform === 'win32' && arch === 'x64') {
-                    await copyFile(path.join(tempDir, 'resources', 'sitl', 'windows', 'inav_SITL.exe'), path.join(app.getPath('userData'), 'sitl', 'inav_SITL.exe'));
+                    await copyFile(path.join(tempDir, 'resources', 'sitl', 'windows', 'inav_SITL.exe'), path.join(sitlAppDataDir, 'inav_SITL.exe'));
                     
                     const cygwin1Path = path.join(tempDir, 'resources', 'sitl', 'windows', 'cygwin1.dll');
                     const installedCygwin1Path = path.join(app.getPath('userData'), 'sitl', 'cygwin1.dll');
@@ -134,11 +141,11 @@ const sitlTools = {
                     }
                     
                 } else if (platform === 'linux' && arch === 'x64') {
-                    await copyFile(path.join(tempDir, 'resources', 'sitl', 'linux', 'inav_SITL'), path.join(app.getPath('userData'), 'sitl', 'inav_SITL'));
+                    await copyFile(path.join(tempDir, 'resources', 'sitl', 'linux', 'inav_SITL'), path.join(sitlAppDataDir, 'inav_SITL'));
                 } else if (platform === 'linux' && arch === 'arm64') {
-                    await copyFile(path.join(tempDir, 'resources', 'sitl', 'linux', 'arm64', 'inav_SITL'), path.join(app.getPath('userData'), 'sitl', 'inav_SITL'));
+                    await copyFile(path.join(tempDir, 'resources', 'sitl', 'linux', 'arm64', 'inav_SITL'), path.join(sitlAppDataDir, 'inav_SITL'));
                 } else if (platform === 'darwin' && (arch === 'x64' || arch === 'arm64')) {
-                    await copyFile(path.join(tempDir, 'resources', 'sitl', 'macos', 'inav_SITL'), path.join(app.getPath('userData'), 'sitl', 'inav_SITL'));
+                    await copyFile(path.join(tempDir, 'resources', 'sitl', 'macos', 'inav_SITL'), path.join(sitlAppDataDir, 'inav_SITL'));
                 }
                 await writeFile(path.join(app.getPath('userData'), 'sitl', 'version'), version);
             } catch (err) {
