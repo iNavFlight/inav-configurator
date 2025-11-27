@@ -36,6 +36,31 @@
     background-color: #ebe7e7;
 }
 
+.tab-sitl .cf_table td {
+    text-align: left;
+}
+
+.tab-sitl .cf_table td:last-child {
+    text-align: left;
+    margin-left: 6px;
+}
+
+
+.tab-sitl .cf_table label span {
+    font-weight: bold;
+    margin-left: 6px;
+}
+
+.tab-sitl .cf_table .description {
+    position: relative;
+    left: 0;
+    font-style: italic;
+    color: #818181;
+}
+
+.tab-sitl .sitl_version {
+    font-weight: bold;
+}
 
 .sitlNumber {
     margin-left: 14px;

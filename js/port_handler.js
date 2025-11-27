@@ -206,7 +206,10 @@ PortHandler.update_port_select = function (ports) {
     $('div#port-picker #port').append($("<option/>", {value: 'tcp', text: 'TCP', data: {isTcp: true}}));
     $('div#port-picker #port').append($("<option/>", {value: 'udp', text: 'UDP', data: {isUdp: true}}));
     $('div#port-picker #port').append($("<option/>", {value: 'sitl', text: 'SITL', data: {isSitl: true}}));
-    $('div#port-picker #port').append($("<option/>", {value: 'sitl-demo', text: 'Demo mode', data: {isSitl: true}}));
+
+    if (!(window.electronAPI.getPlatform() == 'win32' && window.electronAPI.getArch() == 'ia32')) {
+        $('div#port-picker #port').append($("<option/>", {value: 'sitl-demo', text: 'Demo mode', data: {isSitl: true}}));
+    }
 };
 
 PortHandler.port_detected = function(name, code, timeout, ignore_timeout) {

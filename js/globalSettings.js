@@ -24,6 +24,7 @@ var globalSettings = {
     assistnowApiKey: null,
     assistnowOfflineData: [],
     assistnowOfflineDate: 0,
+    disableSitlUpdateCheck: false,
     store: null,
     saveAssistnowData:  function() {
         this.store.set('assistnow_offline_data', this.assistnowOfflineData);

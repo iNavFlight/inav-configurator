@@ -23,6 +23,7 @@ TABS.ports.initialize = function (callback) {
     mspHelper.loadSerialPorts(function () {
         import('./ports.html?raw').then(({default: html}) => GUI.load(html, on_tab_loaded_handler));
     });
+    
 
     function checkMSPPortCount(excludeCheckbox) {
         let mspCount = 0;

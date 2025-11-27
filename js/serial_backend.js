@@ -26,6 +26,7 @@ import groundstation from './groundstation';
 import ltmDecoder from './ltmDecoder';
 import mspDeduplicationQueue from './msp/mspDeduplicationQueue';
 import store from './store';
+import dialog from './dialog';
 
 var SerialBackend = (function () {
 
@@ -136,6 +137,7 @@ var SerialBackend = (function () {
             } else {
                 $('.tab_firmware_flasher').show();
             }
+
             var type = ConnectionType.Serial;
             if (selected_port.data().isBle) {
                 type = ConnectionType.BLE;
@@ -160,7 +162,18 @@ var SerialBackend = (function () {
             GUI.updateManualPortVisibility();
         });
 
-    $('div.connect_controls a.connect').click(function () {
+    function startDemoMode() {
+        SITLProcess.stop();
+        SITLProcess.start("demo.bin");                        
+        privateScope.isDemoRunning = true;
+
+        // Wait 1 sec until SITL is ready
+        setTimeout(() => {
+            CONFIGURATOR.connection.connect("127.0.0.1:5760", {}, privateScope.onOpen);
+        }, 1000);
+    }
+
+    $('div.connect_controls a.connect').on('click', function () {
 
         if (groundstation.isActivated()) {
             groundstation.deactivate();
@@ -191,21 +204,43 @@ var SerialBackend = (function () {
                         } else if (selected_port == 'sitl') {
                             CONFIGURATOR.connection.connect("127.0.0.1:5760", {}, privateScope.onOpen);
                         } else if (selected_port == 'sitl-demo') {
-                            SITLProcess.stop();
-                            SITLProcess.start("demo.bin");                        
-                            this.isDemoRunning = true;
-
-                            // Wait 1 sec until SITL is ready
-                            setTimeout(() => {
-                                CONFIGURATOR.connection.connect("127.0.0.1:5760", {}, privateScope.onOpen);
-                            }, 1000);
+                            window.electronAPI.getCurretSITLVersion().then(version => {
+                                if (version == null) {
+                                    if (dialog.confirm(i18n.getMessage('demoModeNoSitlInstalled'))) {
+                                        GUI.log(i18n.getMessage("sitlDownloadStarted"));
+                                        window.electronAPI.getSitlReleases(false, true).then((data) =>  {
+                                            if (data.error || data.response.length != 1) {
+                                                GUI.log(`${i18n.getMessage('sitlErrorGithub')} ${data.error}`);
+                                            } else {        
+                                                window.electronAPI.downloadSitlBinary(data.response[0].url, data.response[0].version).then((error) => {
+                                                    if (!error) {
+                                                        GUI.log(i18n.getMessage('sitlUpdateSuccsess', data.response[0].version));
+                                                        startDemoMode();
+                                                    } else {
+                                                        GUI.log(`${i18n.getMessage('sitlErrorDownload')} ${error}`);
+                                                    }
+                                                });
+                                            }                                            
+                                            
+                                        });
+                                    } else {
+                                        // reset connect / disconnect button
+                                        $('div.connect_controls a.connect').removeClass('active');
+                                        $('#port, #baud, #delay').prop('disabled', false);
+                                        $('div.connect_controls a.connect_state').text(i18n.getMessage('connect'));
+                                        $('a.connect').trigger( "click" );
+                                    }
+                                } else {
+                                    startDemoMode();
+                                }
+                            });
                         } else {
                             CONFIGURATOR.connection.connect(selected_port, {bitrate: selected_baud}, privateScope.onOpen);
                         }
                     } else {
-                        if (this.isDemoRunning) {
+                        if (privateScope.isDemoRunning) {
                             SITLProcess.stop();
-                            this.isDemoRunning = false;
+                            this.privateScope = false;
                         }
                         
                         var wasConnected = CONFIGURATOR.connectionValid;

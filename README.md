@@ -106,13 +106,13 @@ To build deb and rpm packages for Linux, you have to install the following packa
 - OpenSuse/Fedora: `dpkg, fakeroot, rpmbuild, systemd-devel, devel-basis (zypper install -t pattern devel_basis), zip`
 
 Example (note the double -- ):
-```npm run make -- --arch="x64"```
+```yarn run make -- --arch="x64"```
 
 ### Running with debug | Inspector
 
-To be able to open Inspector, set environment variable `NODE_ENV` to `development` or set the flag directly when run `npm start`:
+To be able to open Inspector, set environment variable `NODE_ENV` to `development` or set the flag directly when run `yarn start`:
 
-```NODE_ENV=development npm start``` or ```$env:NODE_ENV="development" | npm start``` for Windows PowerShell
+```NODE_ENV=development yarn start``` or ```$env:NODE_ENV="development" | yarn start``` for Windows PowerShell
 
 Or use VScode and start a debug session `Debug Configurator` (Just hit F5!)
 

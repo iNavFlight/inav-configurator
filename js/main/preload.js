@@ -33,10 +33,19 @@ contextBridge.exposeInMainWorld('electronAPI', {
   writeFile: (filename, data) => ipcRenderer.invoke('writeFile', filename, data),
   readFile: (filename, encoding = 'utf8') => ipcRenderer.invoke('readFile', filename, encoding),
   rm: (path) => ipcRenderer.invoke('rm', path),
-  chmod: (path, mode) => ipcRenderer.invoke('chmod', path, mode),
   startChildProcess: (command, args, opts) => ipcRenderer.send('startChildProcess', command, args, opts),
   killChildProcess: () => ipcRenderer.send('killChildProcess'),
   onChildProcessStdout: (callback) => ipcRenderer.on('onChildProcessStdout', (_event, data) => callback(data)),
   onChildProcessStderr: (callback) => ipcRenderer.on('onChildProcessStderr', (_event, data) => callback(data)),
   onChildProcessError: (callback) => ipcRenderer.on('onChildProcessError', (_event, error) => callback(error)),
+  removeChildProcessEvents: () => { 
+    ipcRenderer.removeAllListeners('onChildProcessStdout');
+    ipcRenderer.removeAllListeners('onChildProcessStderr');
+    ipcRenderer.removeAllListeners('onChildProcessError');
+  },
+  downloadSitlBinary: (url, version) => ipcRenderer.invoke('downloadSitlBinary', url, version),
+  getCurretSITLVersion: () => ipcRenderer.invoke('getCurretSITLVersion'),
+  getSitlReleases: (devRelease, latest) => ipcRenderer.invoke('getSitlReleases', devRelease, latest),
+  getPlatform: ()=> ipcRenderer.sendSync('getPlatform'),
+  getArch: ()=> ipcRenderer.sendSync('getArch'),
 });

@@ -165,7 +165,7 @@ const groundstation = (function () {
                         anchor: [0.5, 0.5],
                         opacity: 1,
                         scale: 0.6,
-                        src: path.join(__dirname, './../images/icons/icon_mission_airplane.png')
+                        //src: path.join('./../images/icons/icon_mission_airplane.png')
                     }))
                 });
                 privateScope.cursorPosition = new Point(fromLonLat([lon, lat]));
