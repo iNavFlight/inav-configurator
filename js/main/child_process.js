@@ -10,7 +10,7 @@ const child_process = {
     start: function (command, args, opts, window) {        
         var process;        
         try {
-            const path = path.join(app.getPath('userData'), 'sitl', command);
+            const commandPath = path.join(app.getPath('userData'), 'sitl', command);
 
             if (os.platform() != 'win32')
             {
