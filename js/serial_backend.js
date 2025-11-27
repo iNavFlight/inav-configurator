@@ -214,7 +214,7 @@ var SerialBackend = (function () {
                                             } else {        
                                                 window.electronAPI.downloadSitlBinary(data.response[0].url, data.response[0].version).then((error) => {
                                                     if (!error) {
-                                                        GUI.log(i18n.getMessage('sitlUpdateSuccsess', data.response.version));
+                                                        GUI.log(i18n.getMessage('sitlUpdateSuccsess', data.response[0].version));
                                                         startDemoMode();
                                                     } else {
                                                         GUI.log(`${i18n.getMessage('sitlErrorDownload')} ${error}`);

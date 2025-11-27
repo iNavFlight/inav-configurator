@@ -131,35 +131,36 @@ TABS.sitl.initialize = (callback) => {
             $('.sitlStart').removeClass('disabled');
         }
         
-        window.electronAPI.getSitlReleases(false, false).then(data => {
-            if (!data.error && data.response.length >= 1) {
-                sitlReleases = data.response;
-                
-                window.electronAPI.getSitlReleases(true, false).then(data => {
-                    if (!data.error && data.response.length >= 1) {
-                        sitlDevReleses = data.response;
-                    }
-                });
-                
-                upddateSitlReleases();
+       Promise.all([
+            window.electronAPI.getSitlReleases(false, false),
+            window.electronAPI.getSitlReleases(true, false)
+        ]).then(([stableData, devData]) => {
+            if (!stableData.error && stableData.response.length >= 1) {
+                sitlReleases = stableData.response;
             } else {
                 sitlReleases = null;
-                GUI.log(`${i18n.getMessage("sitlErrorGithub")} ${data.message}`);
-                sitlBinaries_e.empty().append(`<option value="0">${i18n.getMessage('sitlOffline')}</option>`);
+                if (stableData.message) {
+                    GUI.log(`${i18n.getMessage("sitlErrorGithub")} ${stableData.message}`);
+                }
             }
-        });
 
-        window.electronAPI.getSitlReleases(true, false).then(data => {
-            if (!data.error && data.response.length >= 1) {
-                sitlDevReleses = data.response;
+            if (!devData.error && devData.response.length >= 1) {
+                sitlDevReleses = devData.response;
             } else {
                 sitlDevReleses = null;
-                GUI.log(i18n.getMessage('sitlErrorGithub'));
+                if (devData.message) {
+                    GUI.log(`${i18n.getMessage("sitlErrorGithub")} ${devData.message}`);
+                }
+            }
+
+            if (sitlReleases) {
+                upddateSitlReleases();
+            } else {
                 sitlBinaries_e.empty().append(`<option value="0">${i18n.getMessage('sitlOffline')}</option>`);
             }
         });
-        
-        window.electronAPI.getCurretSITLVersion().then(version => {
+                
+       window.electronAPI.getCurretSITLVersion().then(version => {
             if (version) {
                 currentSitlVersion_e.text(`${i18n.getMessage('sitl_current')}${version}`);
             } else {
@@ -630,25 +631,33 @@ TABS.sitl.initialize = (callback) => {
         
         function upddateSitlReleases(isDevRelease) {
             
-            if (!sitlReleases || sitlReleases.length == 0) {
-                return
+            sitlBinaries_e.find('option').remove();
+
+            let isRelease = false;
+            if (sitlReleases && sitlReleases.length >= 1) {
+
+                const releases = isDevRelease ? sitlReleases : sitlReleases.filter(release => !release.rc && !release.nightly);
+                releases.forEach(release => {
+                    const option = $(`<option value="${release.version}">${getReleaseName(release)}</option>`).data('asset', release);
+                    sitlBinaries_e.append(option);
+                });
+                isRelease = true;
             }
 
-            sitlBinaries_e.find('option').remove();
-            sitlBinaries_e.append(`<option value="0">${i18n.getMessage('sitlSelectVersion')}</option>`);
             
-            const releases = isDevRelease ? sitlReleases : sitlReleases.filter(release => !release.rc && !release.nightly);
-
-            releases.forEach(release => {
-                const option = $(`<option value="${release.version}">${getReleaseName(release)}</option>`).data('asset', release);
-                sitlBinaries_e.append(option);
-            });
-
             if (isDevRelease && sitlDevReleses && sitlDevReleses.length > 0) {
                 sitlDevReleses.forEach(devRelease => {
                     const option = $(`<option value="${devRelease.version}">${getReleaseName(devRelease)}</option>`).data('asset', devRelease);
                     sitlBinaries_e.append(option);
                 });
+                isRelease = true;
+            }
+            
+            if (isRelease) {
+                sitlBinaries_e.prepend(`<option value="0">${i18n.getMessage('sitlSelectVersion')}</option>`);
+                sitlBinaries_e.val('0');
+            } else {
+                sitlBinaries_e.empty().append(`<option value="0">${i18n.getMessage('sitlOffline')}</option>`);
             }
         }
 

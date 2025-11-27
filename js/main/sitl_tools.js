@@ -18,7 +18,21 @@ const sitlTools = {
             
         }
         const release = await response.json();
-        const releases = release.filter(release => semver.gte(release.tag_name, CONFIGURATOR.minfirmwareVersionAccepted) && semver.lt(release.tag_name, CONFIGURATOR.maxFirmwareVersionAccepted));
+        const releases = release.filter(release => {
+            
+            let version = release.tag_name;
+
+            if (devRelease)
+            {
+                const match = version.match(/^v((\d+).(\d+).(\d+))-(\d{8}).(\d{3,})$/);
+                if (match && match.length == 7)
+                {
+                    version = match[1];
+                }
+            }
+            
+            return semver.gte(version, CONFIGURATOR.minfirmwareVersionAccepted) && semver.lt(version, CONFIGURATOR.maxFirmwareVersionAccepted)
+        });
 
         if (!release || releases.length == 0)
         {
@@ -57,19 +71,6 @@ const sitlTools = {
         } catch {
             return false;
         }
-    },
-    
-    // Fixme: Remove this when next major version is released and cygwin1.dll is included in release. 
-    // Until then, we at least have working nightly builds.
-    downloadCygwinDll: async function (path) {
-        
-        const responseDll = await fetch('https://raw.githubusercontent.com/Scavanger/cygwin-test/main/cygwin1.dll');
-
-        if (!responseDll.ok) {
-            throw new Error(`Failed to download cygwin1.dll: ${reponse.statusText}`);
-        }
-        const buffer = await responseDll.arrayBuffer();
-        await writeFile(path, Buffer.from(buffer)); 
     },
 
     getCurretSITLVersion: async function () {
@@ -137,7 +138,7 @@ const sitlTools = {
                     if (await this.fileExists(cygwin1Path)) {
                         await copyFile(cygwin1Path, installedCygwin1Path);
                     } else if (!await this.fileExists(installedCygwin1Path)) {  
-                        await this.downloadCygwinDll(installedCygwin1Path); // <-- Fixme!
+                       throw new Error(`Missing 'cygwin1.dll'. Please ensure you are using a release that includes it, or copy 'cygwin1.dll' to "${path.join(app.getPath('userData'), 'sitl')}" and try again.`);
                     }
                     
                 } else if (platform === 'linux' && arch === 'x64') {

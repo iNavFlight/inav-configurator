@@ -8,20 +8,19 @@ const child_process = {
     _processes: [],
 
     start: function (command, args, opts, window) {        
-        var process;        
+        let process;        
         try {
             const commandPath = path.join(app.getPath('userData'), 'sitl', command);
 
-            if (os.platform() != 'win32')
-            {
+            if (os.platform() !== 'win32') {
                 const stats = fs.statSync(commandPath);
                 const permission = stats.mode & 0o777;
-                if (permission != 0o755) {
+                if (permission !== 0o755) {
                     fs.chmodSync(commandPath, 0o755);
                 }
             }
     
-            process = spawn(path, args, opts);
+            process = spawn(commandPath, args, opts);
         } catch (err) {
             console.log(err);
             return -1;

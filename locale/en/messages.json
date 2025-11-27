@@ -204,7 +204,7 @@
         "message": "Error downloading SITL binary:"
     },
     "sitlOffline": {
-        "message": "Offline"
+        "message": "Offline or no SITL for this Version avaiable"
     },
     "sitlUnknown": {
         "message": "No SITL binary installed, please select a version to download."
