@@ -7,7 +7,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 export default {
   packagerConfig: {
     executableName: "inav-configurator",
-    asar: false,
+    asar: true,
     icon: 'images/inav',
   },
   rebuildConfig: {},

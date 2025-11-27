@@ -97,7 +97,7 @@ var SITLProcess = {
     isRunning: false,
 
     deleteEepromFile(filename) {
-        window.electronAPI.rm(`${window.electronAPI.appGetPath('userData')}/${filename}`).then(error => {
+        window.electronAPI.rm(`${window.electronAPI.appGetPath('userData')}/sitl/${filename}`).then(error => {
             if (error) {
                 GUI.log(`Unable to reset Demo mode: ${error}`);
             }
@@ -109,29 +109,18 @@ var SITLProcess = {
         if (this.isRunning)
             this.stop();
 
-        var sitlExePath, eepromPath;
-        var path = window.electronAPI.appGetPath('userData');
+        var sitlExe, eepromPath;
         if (GUI.operating_system == 'Windows') {
-            sitlExePath = '/windows/inav_SITL.exe';
-            eepromPath = `${path}\\${eepromFileName}`
-        } else if (GUI.operating_system == 'Linux') {
-            sitlExePath = '/linux/inav_SITL';
-            eepromPath = `${path}/${eepromFileName}`
-            window.electronAPI.chmod(sitlExePath, 0o755).then(err => {
-                if (err)
-                    console.log(err);
-            });
-        } else if (GUI.operating_system == 'MacOS') {
-            sitlExePath = '/macos/inav_SITL';
-            eepromPath = `${path}/${eepromFileName}`
-            window.electronAPI.chmod(sitlExePath, 0o755).then(err => {
-                if (err)
-                    console.log(err);
-            });
- 
+            sitlExe ='inav_SITL.exe';
+            eepromPath = `${window.electronAPI.appGetPath('userData')}\\sitl\\${eepromFileName}`;
         } else {
-            return;
-        }
+            sitlExe = 'inav_SITL';
+            eepromPath = `${window.electronAPI.appGetPath('userData')}/sitl/${eepromFileName}`;
+            window.electronAPI.chmod(sitlExe, 0o755).then(err => {
+                if (err)
+                    console.log(err);
+            });
+        } 
 
         var args = [];
         args.push(`--path=${eepromPath}`);
@@ -176,9 +165,9 @@ var SITLProcess = {
         }
 
         if (callback) {
-            callback( sitlExePath + " " + args.join(" ") + "\n");
+            callback(sitlExe + " " + args.join(" ") + "\n");
         }
-        this.spawn(sitlExePath, args);
+        this.spawn(sitlExe, args);
     },
 
     spawn: function(path, args) {

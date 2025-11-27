@@ -6,6 +6,41 @@
                 <p data-i18n="sitlHelp"></p>
             </div>
         </div>
+        <div class="options gui_box">
+            <div class="gui_box_titlebar">
+                <div class="spacer_box_title" i18n="sitl_binary_head">
+                </div>
+            </div>
+            <div class="spacer">
+                 <table class="cf_table" style="margin-top: 10px;">
+                    <tr>
+                        <td><span class="sitl_version" id="currentSitlVersion" data-i18n="sitl_current"></span></td>
+                        <td><span class="description" data-i18n="sitl_current_description"></span></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <select id="sitlBinaries" name="sitlBinaries" style="width: 250px; height: 25px; border: 1px solid silver;">
+                                <option value="0">Loading ...</option>
+                            </select>
+                        </td>
+                        <td>
+                            <span class="description" i18n="sitl_version_description"></span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <label> 
+                                <input id="sitl_unstable" class="toggle" type="checkbox" /> 
+                                <span i18n="sitl_use_unstable"></span>
+                            </label>
+                        </td>
+                        <td>
+                            <span class="description" i18n="firmwareFlasherShowDevelopmentReleasesDescription"></span>
+                        </td>
+                    </tr>
+                 </table>                
+            </div>
+        </div>
         <div class="leftWrapper">
             <div class="gui_box grey">
                 <div class="gui_box_titlebar">

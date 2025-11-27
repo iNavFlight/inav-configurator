@@ -40,6 +40,10 @@
     "options_cliAutocomplete": {
         "message": "Advanced CLI AutoComplete"
     },
+    "options_DisableSitlUpdateCheck": 
+    {
+        "message": "Disable SITL update check on startup"
+    },
     "options_unit_type": {
         "message": "Set how the units render on the configurator only"
     },
@@ -174,6 +178,55 @@
     },
     "tabSitl": {
         "message" : "SITL"
+    },
+    "sitlSelectVersion": {
+        "message": "Select SITL Version"
+    },
+    "sitl_binary_head": {
+        "message": "SITL Binaries"
+    },
+    "sitl_current_description": {
+        "message": "The currently installed SITL binary. This binary is also used for the demo mode."
+    },
+    "sitl_current": {
+        "message": "Version: "
+    },
+    "sitl_use_unstable" : {
+        "message": "Show unstable releases"
+    },
+    "sitl_version_description": {
+        "message": "Select the SITL version to use. It will be downloaded from the INAV Github repository."
+    },
+    "sitlErrorGithub" : {
+        "message": "Could not fetch SITL releases from GitHub."
+    },
+    "sitlErrorDownload" : {
+        "message": "Error downloading SITL binary:"
+    },
+    "sitlOffline": {
+        "message": "Offline"
+    },
+    "sitlUnknown": {
+        "message": "No SITL binary installed, please select a version to download."
+    },
+    "sitlVersionMismatch": {
+        "message": "SITL binary version mismatch. Please update in SITL Tab."
+    },
+    "demoModeNoSitlInstalled": {
+        "message": "The demo mode requires an installed SITL binary, but none was found.\nDownload and install latest SITL binary to proceed?"
+    },
+    "sitlUpdateAvailable": {
+        "message": "SITL binary Update ($1) avilable. Download and install?"
+    },
+    "sitlUpdateSuccsess" : {
+        "message": "Succsesfully downloaded and installed SITL binary V $1"
+    },
+    "sitlUpdateError": {
+        "message": "Error during download or installation of SITL binary: $1"
+    },
+    "sitlDownloadStarted":
+    {
+        "message": "SITL binary download started..."
     },
     "sitlDemoMode": {
         "message": "Demo Mode"

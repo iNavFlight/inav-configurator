@@ -1,12 +1,14 @@
 import { spawn } from 'node:child_process'
+import { app } from 'electron';
+import path from 'path';
 
 const child_process = {
     _processes: [],
 
     start: function (command, args, opts, window) {        
-        var process;
+        var process;        
         try {
-            process = spawn(command, args, opts);
+            process = spawn(path.join(app.getPath('userData'), 'sitl', command), args, opts);
         } catch (err) {
             console.log(err);
             return -1;

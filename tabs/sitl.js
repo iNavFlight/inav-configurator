@@ -1,8 +1,10 @@
 'use strict'
 
 import smalltalk from 'smalltalk';
+import semver  from 'semver';
 
 import { GUI, TABS } from './../js/gui';
+import CONFIGURATOR from '../js/data_storage';
 import i18n from './../js/localization';
 import { SITLProcess, SitlSerialPortUtils } from './../js/sitl';
 import store from './../js/store';
@@ -38,7 +40,7 @@ const stdProfiles = [
         ip: "127.0.0.1",
         useImu: false,
         channelMap: [ 1, 15, 13, 16],
-        useSerialReceiver: true,
+        useSerialReceiver: false,
         serialPort: "",
         serialUart: 3,
         serialProtocol: "SBus",
@@ -56,7 +58,7 @@ const stdProfiles = [
         ip: "127.0.0.1",
         useImu: false,
         channelMap: [ 1, 15, 13, 16],
-        useSerialReceiver: true,
+        useSerialReceiver: false,
         serialPort: "",
         serialUart: 3,
         serialProtocol: "SBus",
@@ -74,7 +76,7 @@ const stdProfiles = [
         ip: "127.0.0.1",
         useImu: false,
         channelMap: [ 1, 13, 14, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        useSerialReceiver: true,
+        useSerialReceiver: false,
         serialPort: "",
         serialUart: 3,
         serialProtocol: "SBus",
@@ -96,8 +98,8 @@ TABS.sitl.initialize = (callback) => {
     import('./sitl.html?raw').then(({default: html}) => GUI.load(html, function () {
         
         i18n.localize();
-    
-        var currentSim, currentProfile, profiles;
+
+        var currentSim, currentProfile, profiles, sitlReleases, sitlDevReleses;
         var mapping = new Array(28).fill(0);
         var serialProtocolls = SitlSerialPortUtils.getProtocolls();
         var sim_e = $('#simulator');
@@ -116,14 +118,55 @@ TABS.sitl.initialize = (callback) => {
         var baudRate_e = $('#sitlBaud');
         var stopBits_e = $('#serialStopbits');
         var parity_e = $('#serialParity');
+        var sitlBinaries_e = $('#sitlBinaries');
+        var sitl_unstable_e = $('#sitl_unstable');
+        var currentSitlVersion_e = $('#currentSitlVersion');
         
         if (SITLProcess.isRunning) {
             $('.sitlStart').addClass('disabled');
             $('.sitlStop').removeClass('disabled');
+            sitlBinaries_e.prop('disabled', true);
         } else {
             $('.sitlStop').addClass('disabled');
             $('.sitlStart').removeClass('disabled');
         }
+        
+        window.electronAPI.getSitlReleases(false, false).then(data => {
+            if (!data.error && data.response.length >= 1) {
+                sitlReleases = data.response;
+                
+                window.electronAPI.getSitlReleases(true, false).then(data => {
+                    if (!data.error && data.response.length >= 1) {
+                        sitlDevReleses = data.response;
+                    }
+                });
+                
+                upddateSitlReleases();
+            } else {
+                sitlReleases = null;
+                GUI.log(`${i18n.getMessage("sitlErrorGithub")} ${data.message}`);
+                sitlBinaries_e.empty().append(`<option value="0">${i18n.getMessage('sitlOffline')}</option>`);
+            }
+        });
+
+        window.electronAPI.getSitlReleases(true, false).then(data => {
+            if (!data.error && data.response.length >= 1) {
+                sitlDevReleses = data.response;
+            } else {
+                sitlDevReleses = null;
+                GUI.log(i18n.getMessage('sitlErrorGithub'));
+                sitlBinaries_e.empty().append(`<option value="0">${i18n.getMessage('sitlOffline')}</option>`);
+            }
+        });
+        
+        window.electronAPI.getCurretSITLVersion().then(version => {
+            if (version) {
+                currentSitlVersion_e.text(`${i18n.getMessage('sitl_current')}${version}`);
+            } else {
+                currentSitlVersion_e.text(i18n.getMessage('sitlUnknown'));
+                $('.sitlStart').addClass('disabled');
+            }
+        });
 
         var $sitlLog = $('#sitlLog');
         $sitlLog.val(SITL_LOG);
@@ -146,6 +189,26 @@ TABS.sitl.initialize = (callback) => {
                 serialPorts_e.append(`<option value="${port}">${port}</option>`)
             });
 
+        });
+
+        sitlBinaries_e.on('change', () => {
+            const asset = sitlBinaries_e.find(':selected').data('asset');
+            if (asset) {
+                GUI.log(i18n.getMessage("sitlDownloadStarted"));
+                window.electronAPI.downloadSitlBinary(asset.url, asset.version).then(error => { 
+                    if (!error) {
+                        GUI.log(i18n.getMessage('sitlUpdateSuccsess', asset.version));
+                        $('.sitlStart').removeClass('disabled');
+                    } else {
+                        GUI.log(`${i18n.getMessage('sitlErrorDownload')} ${error}`);
+                        
+                    }
+                });
+            };
+        });
+
+        sitl_unstable_e.on('change', () => {
+           upddateSitlReleases(sitl_unstable_e.is(':checked'));
         });
         
         enableSim_e.on('change', () => {
@@ -238,7 +301,9 @@ TABS.sitl.initialize = (callback) => {
             }
 
             appendLog("\n");
-            
+
+           
+            sitlBinaries_e.prop('disabled', true);
             SITLProcess.start(currentProfile.eepromFileName, sim, useImu_e.is(':checked'), simIp, simPort, channelMap, serialOptions, result => {
                 appendLog(result);
             });
@@ -246,10 +311,7 @@ TABS.sitl.initialize = (callback) => {
         });
 
         $('.sitlStop').on('click', ()=> {
-            $('.sitlStop').addClass('disabled');
-            $('.sitlStart').removeClass('disabled');
-            SITLProcess.stop();
-            appendLog(i18n.getMessage('sitlStopped'));
+            sitlStop();
         });
 
         profileSaveBtn_e.on('click', function () {
@@ -313,7 +375,7 @@ TABS.sitl.initialize = (callback) => {
         });
 
         serialReceiverEnable_e.on('change', () => {
-        currentProfile.useSerialReceiver = serialReceiverEnable_e.is(':checked');
+            currentProfile.useSerialReceiver = serialReceiverEnable_e.is(':checked');
         });
 
         protocollPreset_e.on('change', () => {
@@ -372,9 +434,18 @@ TABS.sitl.initialize = (callback) => {
         });
 
         window.electronAPI.onChildProcessError(error => {
-            SITLProcess.stop();
+            sitlStop();
             appendLog(error);
         });
+
+        function sitlStop()
+        {
+            $('.sitlStop').addClass('disabled');
+            $('.sitlStart').removeClass('disabled');
+            sitlBinaries_e.prop('disabled', false);
+            SITLProcess.stop();
+            appendLog(i18n.getMessage('sitlStopped'));
+        }
 
         function initElements(init)
         {
@@ -538,12 +609,56 @@ TABS.sitl.initialize = (callback) => {
             }
         }
 
+        function getReleaseName(releaseInfo)
+        {
+            const date = new Date(releaseInfo.date)
+            const year = date.getFullYear();
+            const month = (date.getMonth() + 1).toString().padStart(2, '0');
+            const day = date.getDate().toString().padStart(2, '0');
+            const hour = date.getHours().toString().padStart(2, '0');
+            const min = date.getMinutes().toString().padStart(2, '0');
+
+            let type = 'Stable';
+            if (releaseInfo.nightly) {
+                type = 'Nightly'
+            } else if (releaseInfo.rc) {
+                type = 'Release candidate'
+            }
+
+            return `${releaseInfo.version} - ${year}-${month}-${day} ${hour}:${min} (${type})`;
+        }
+        
+        function upddateSitlReleases(isDevRelease) {
+            
+            if (!sitlReleases || sitlReleases.length == 0) {
+                return
+            }
+
+            sitlBinaries_e.find('option').remove();
+            sitlBinaries_e.append(`<option value="0">${i18n.getMessage('sitlSelectVersion')}</option>`);
+            
+            const releases = isDevRelease ? sitlReleases : sitlReleases.filter(release => !release.rc && !release.nightly);
+
+            releases.forEach(release => {
+                const option = $(`<option value="${release.version}">${getReleaseName(release)}</option>`).data('asset', release);
+                sitlBinaries_e.append(option);
+            });
+
+            if (isDevRelease && sitlDevReleses && sitlDevReleses.length > 0) {
+                sitlDevReleses.forEach(devRelease => {
+                    const option = $(`<option value="${devRelease.version}">${getReleaseName(devRelease)}</option>`).data('asset', devRelease);
+                    sitlBinaries_e.append(option);
+                });
+            }
+        }
+
         GUI.content_ready(callback);
     }));  
 };
 
 TABS.sitl.cleanup = (callback) => {
     SitlSerialPortUtils.stopPollSerialPorts();
+    window.electronAPI.removeChildProcessEvents();
     if (callback) 
         callback();
 };

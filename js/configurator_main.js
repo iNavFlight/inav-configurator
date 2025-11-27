@@ -2,7 +2,8 @@ import '../src/css/styles.css'
 
 import $ from 'jquery';
 import 'jquery-ui-dist/jquery-ui';
-import * as THREE from 'three'
+import * as THREE from 'three';
+import semver from 'semver';
 
 import { GUI, TABS } from './gui';
 import CONFIGURATOR from './data_storage';
@@ -20,6 +21,7 @@ import CliAutoComplete from './CliAutoComplete';
 import { SITLProcess } from './sitl';
 import settingsCache from './settingsCache';
 import store from './store';
+import dialog from './dialog';
 
 
 window.$ = $;
@@ -72,13 +74,45 @@ $(function() {
         globalSettings.showProfileParameters = store.get('show_profile_parameters', 1);
         globalSettings.assistnowOfflineData = store.get('assistnow_offline_data', []);
         globalSettings.assistnowOfflineDate = store.get('assistnow_offline_date', 0);
+        globalSettings.disableSitlUpdateCheck = store.get('disable_sitl_update_check', false);
         updateProfilesHighlightColours();
 
         var cliAutocomplete = store.get('cli_autocomplete', true);
         globalSettings.cliAutocomplete = cliAutocomplete;
         CliAutoComplete.setEnabled(cliAutocomplete);
-        
 
+        window.electronAPI.getCurretSITLVersion().then(currentVersion => {
+            
+            if (!currentVersion) {
+                return;
+            }
+            
+            if (semver.lt(currentVersion, CONFIGURATOR.minfirmwareVersionAccepted) || semver.gte(currentVersion, CONFIGURATOR.maxFirmwareVersionAccepted)) {
+                GUI.log(i18n.getMessage('sitlVersionMismatch'));
+            }
+
+            if (!globalSettings.disableSitlUpdateCheck)
+            {
+                window.electronAPI.getSitlReleases(false, true).then((data) =>  {
+                    if (data.error || data.response.length != 1) {
+                        GUI.log(`${i18n.getMessage("sitlErrorGithub")} ${data.message}`);
+                    } else {
+                        if (semver.lt(currentVersion, data.response[0].version)) {
+                            if (dialog.confirm(i18n.getMessage('sitlUpdateAvailable', data.response[0].version))) {
+                                window.electronAPI.downloadSitlBinary(data.response[0].url, data.response[0].version).then((error) => {
+                                    if (!error) {
+                                        GUI.log(i18n.getMessage('sitlUpdateSuccsess', data.response[0].version))
+                                    } else {
+                                        GUI.log(i18n.getMessage('sitlUpdateError', error))
+                                    }
+                                });
+                            }
+                        }
+                    }
+                });
+            }
+        });
+        
         // Resets the OSD units used by the unit coversion when the FC is disconnected.
         if (!CONFIGURATOR.connectionValid) {
             globalSettings.osdUnits = null;
@@ -102,6 +136,10 @@ $(function() {
             appUpdater.checkRelease(version);
         }
         
+        if (window.electronAPI.getPlatform() == 'win32'  && window.electronAPI.getArch() == 'ia32')
+        {
+            $('.tab_sitl').hide();
+        }
 
         // log library versions in console to make version tracking easier
         console.log('Libraries: jQuery - ' + $.fn.jquery + ', three.js - ' + THREE.REVISION);
@@ -307,12 +345,18 @@ $(function() {
                         CliAutoComplete.setEnabled($(this).is(':checked'));
                     });
 
+                    $('div.disable_SitlUpdateCheck input').on('change', function() {
+                        globalSettings.disableSitlUpdateCheck = $(this).is(':checked');
+                        store.set('disable_sitl_update_check', globalSettings.disableSitlUpdateCheck);
+                    });
+
                     $('#ui-unit-type').val(globalSettings.unitType);
                     $('#map-provider-type').val(globalSettings.mapProviderType);
                     $('#proxyurl').val(globalSettings.proxyURL);
                     $('#proxylayer').val(globalSettings.proxyLayer);
                     $('#showProfileParameters').prop('checked', globalSettings.showProfileParameters);
                     $('#cliAutocomplete').prop('checked', globalSettings.cliAutocomplete);
+                    $('#disableSitlUpdateCheck').prop('checked', globalSettings.disableSitlUpdateCheck);
                     $('#assistnow-api-key').val(globalSettings.assistnowApiKey);
                     
                     i18n.getLanguages().forEach(lng => {

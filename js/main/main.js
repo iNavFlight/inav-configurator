@@ -6,11 +6,13 @@ import path from 'path';
 import { fileURLToPath } from 'node:url';
 import started from 'electron-squirrel-startup';
 import { writeFile, readFile } from 'node:fs/promises';
+import os from 'os';
 
 import tcp from './tcp';
 import udp from './udp';
 import serial from './serial';
 import child_process from './child_process';
+import sitl_tools from './sitl_tools.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -353,11 +355,53 @@ app.whenReady().then(() => {
   });
 
   ipcMain.on('startChildProcess', (_event, command, args, opts) => {
-    child_process.start(path.join(__dirname, 'sitl', command), args, opts, mainWindow);
+    child_process.start(command, args, opts, mainWindow);
   });
 
   ipcMain.on('killChildProcess', (_event) => {
     child_process.stop();
+  });
+
+  
+  ipcMain.handle('downloadSitlBinary', (_event, url, version) => {
+    return new Promise(async resolve => {
+      try {
+        await sitl_tools.downloadSitlBinary(url, version);
+        resolve(false);
+      } catch (err) {
+        resolve(err.message);
+      }
+    });
+  });
+
+  ipcMain.handle('getCurretSITLVersion', (_event) => {
+    return new Promise(async resolve => {
+      try {
+        const version = await sitl_tools.getCurretSITLVersion();
+        resolve(version);
+      } catch (err) {
+        resolve(null);
+      }
+    }); 
+  });
+
+  ipcMain.handle('getSitlReleases', (_event, devRelease, latest) => {
+    return new Promise(async resolve => {
+      try {
+        const response = await sitl_tools.getSitlReleases(devRelease, latest);
+        resolve({error: false, response: response});
+      } catch (error) {
+        resolve({error: true, message: error.message});
+      }
+    });
+  });
+
+  ipcMain.on('getPlatform', (event) => {
+    event.returnValue = os.platform();
+  });
+
+  ipcMain.on('getArch', (event) => {
+    event.returnValue = os.arch();
   });
 
   // On OS X it's common to re-create a window in the app when the
