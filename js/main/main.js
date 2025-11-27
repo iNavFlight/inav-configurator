@@ -317,14 +317,13 @@ app.whenReady().then(() => {
   });
 
   ipcMain.handle('appendFile', (_event, filename, data) => {
-    return new Promise(async resolve => {
-      try {
-        await appendFile(filename, data);
-        resolve(false)
-      } catch (err) {
-        resolve(err);
-      }
-    });
+    try {
+      await appendFile(filename, data);
+      return false;
+    } catch (err) {
+      // Re-throwing the error will cause the promise on the renderer side to be rejected.
+      throw err;
+    }
   });
 
   ipcMain.handle('readFile', (_event, filename, encoding) => {
