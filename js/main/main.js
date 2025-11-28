@@ -5,7 +5,7 @@ import Store from "electron-store";
 import path from 'path';
 import { fileURLToPath } from 'node:url';
 import started from 'electron-squirrel-startup';
-import { writeFile, readFile } from 'node:fs/promises';
+import { writeFile, readFile, appendFile } from 'node:fs/promises';
 
 import tcp from './tcp';
 import udp from './udp';
@@ -312,8 +312,18 @@ app.whenReady().then(() => {
         resolve(false)
       } catch (err) {
         resolve(err);
-      } 
+      }
     });
+  });
+
+  ipcMain.handle('appendFile', async (_event, filename, data) => {
+    try {
+      await appendFile(filename, data);
+      return false;
+    } catch (err) {
+      // Re-throwing the error will cause the promise on the renderer side to be rejected.
+      throw err;
+    }
   });
 
   ipcMain.handle('readFile', (_event, filename, encoding) => {
