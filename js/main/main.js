@@ -316,7 +316,7 @@ app.whenReady().then(() => {
     });
   });
 
-  ipcMain.handle('appendFile', (_event, filename, data) => {
+  ipcMain.handle('appendFile', async (_event, filename, data) => {
     try {
       await appendFile(filename, data);
       return false;
