@@ -6199,5 +6199,13 @@
     },
    "search": {
         "message": "Search"
-    }
+    },
+  "tabJavaScriptProgramming": {
+    "message": "JavaScript Programming"
+  },
+  "javascriptTranspile": { "message": "Transpile to INAV" },
+  "javascriptLoad": { "message": "Load from FC" },
+  "javascriptSave": { "message": "Save to FC" },
+  "javascriptClear": { "message": "Clear Editor" }
+
 }

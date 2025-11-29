@@ -710,6 +710,18 @@ li.active .ic_ports {
     background-image: url("./../../images/icons/cf_icon_ports_white.svg");
 }
 
+.ic_javascript_programming {
+    background-image: url("./../../images/icons/icon_javascript_grey.svg");
+}
+
+.ic_javascript_programming:hover {
+    background-image: url("./../../images/icons/icon_javascript_white.svg");
+}
+
+li.active .ic_javascript_programming {
+    background-image: url("./../../images/icons/icon_javascript_white.svg");
+}
+
 .ic_config {
     background-image: url("./../../images/icons/cf_icon_config_grey.svg");
 }
