@@ -608,14 +608,14 @@ if (flight.homeDistance > 100) {
                 const parts = cmd.split(' ');
                 if (parts.length >= 9) {
                     const lc = {
-                        enabled: parseInt(parts[2]),
-                        activatorId: parseInt(parts[3]),
-                        operation: parseInt(parts[4]),
-                        operandAType: parseInt(parts[5]),
-                        operandAValue: parseInt(parts[6]),
-                        operandBType: parseInt(parts[7]),
-                        operandBValue: parseInt(parts[8]),
-                        flags: parts[9] ? parseInt(parts[9]) : 0,
+                        enabled: parseInt(parts[2], 10),
+                        activatorId: parseInt(parts[3], 10),
+                        operation: parseInt(parts[4], 10),
+                        operandAType: parseInt(parts[5], 10),
+                        operandAValue: parseInt(parts[6], 10),
+                        operandBType: parseInt(parts[7], 10),
+                        operandBValue: parseInt(parts[8], 10),
+                        flags: parts[9] ? parseInt(parts[9], 10) : 0,
 
                         // Add getter methods that MSPHelper expects
                         getEnabled: function() { return this.enabled; },
