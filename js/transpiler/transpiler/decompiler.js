@@ -106,14 +106,28 @@ class Decompiler {
       OPERATION.GVAR_SET,
       OPERATION.GVAR_INC,
       OPERATION.GVAR_DEC,
+      OPERATION.PORT_SET,
+      OPERATION.OVERRIDE_ARMING_SAFETY,
       OPERATION.OVERRIDE_THROTTLE_SCALE,
-      OPERATION.OVERRIDE_THROTTLE,
+      OPERATION.SWAP_ROLL_YAW,
       OPERATION.SET_VTX_POWER_LEVEL,
+      OPERATION.INVERT_ROLL,
+      OPERATION.INVERT_PITCH,
+      OPERATION.INVERT_YAW,
+      OPERATION.OVERRIDE_THROTTLE,
       OPERATION.SET_VTX_BAND,
       OPERATION.SET_VTX_CHANNEL,
-      OPERATION.OVERRIDE_ARMING_SAFETY,
-      OPERATION.SET_SERVO,
-      OPERATION.SET_OSD_LAYOUT
+      OPERATION.SET_OSD_LAYOUT,
+      OPERATION.RC_CHANNEL_OVERRIDE,
+      OPERATION.SET_HEADING_TARGET,
+      OPERATION.LOITER_OVERRIDE,
+      OPERATION.SET_PROFILE,
+      OPERATION.FLIGHT_AXIS_ANGLE_OVERRIDE,
+      OPERATION.FLIGHT_AXIS_RATE_OVERRIDE,
+      OPERATION.LED_PIN_PWM,
+      OPERATION.DISABLE_GPS_FIX,
+      OPERATION.RESET_MAG_CALIBRATION,
+      OPERATION.SET_GIMBAL_SENSITIVITY
     ];
     return actionOperations.includes(operation);
   }
@@ -406,6 +420,24 @@ class Decompiler {
   }
 
   /**
+   * Decompile a single logic condition that appears in an action context.
+   * If it's an action operation, decompile as action. Otherwise, it's a
+   * condition used for intermediate computation - decompile as a comment.
+   * @param {Object} lc - Logic condition
+   * @param {Array} allConditions - All conditions for recursive resolution
+   * @returns {string|null} JavaScript statement or null to skip
+   */
+  decompileActionOrCondition(lc, allConditions) {
+    if (this.isActionOperation(lc.operation)) {
+      return this.decompileAction(lc, allConditions);
+    }
+    // This is a condition operation with an activator - it computes an
+    // intermediate value that other LCs can reference. Skip it silently
+    // since it will be inlined when referenced.
+    return null;
+  }
+
+  /**
    * Decompile a group (activator + actions)
    * @param {Object} group - Group with activator and actions
    * @param {Array} allConditions - All enabled conditions for pattern detection
@@ -414,7 +446,7 @@ class Decompiler {
   decompileGroup(group, allConditions) {
     if (!group.activator) {
       // Unconditional actions or orphaned actions - just decompile them
-      const actions = group.actions.map(a => this.decompileAction(a, allConditions)).filter(Boolean);
+      const actions = group.actions.map(a => this.decompileActionOrCondition(a, allConditions)).filter(Boolean);
       // Don't warn for unconditional actions (var init, top-level assignments)
       if (!group.isUnconditional && actions.length === 0) {
         this.addWarning(`Group has no valid actions`);
@@ -426,8 +458,8 @@ class Decompiler {
     const pattern = this.detectSpecialPattern(group, allConditions);
 
     if (pattern) {
-      // Decompile actions
-      const actions = group.actions.map(a => this.decompileAction(a, allConditions)).filter(Boolean);
+      // Decompile actions (filter out conditions used as intermediate values)
+      const actions = group.actions.map(a => this.decompileActionOrCondition(a, allConditions)).filter(Boolean);
 
       if (actions.length === 0) {
         this.addWarning(`${pattern.type}() at index ${group.activator.index} has no actions`);
@@ -454,8 +486,8 @@ class Decompiler {
     // Normal if statement
     const condition = this.decompileCondition(group.activator, allConditions);
 
-    // Decompile actions
-    const actions = group.actions.map(a => this.decompileAction(a, allConditions)).filter(Boolean);
+    // Decompile actions (filter out conditions used as intermediate values)
+    const actions = group.actions.map(a => this.decompileActionOrCondition(a, allConditions)).filter(Boolean);
 
     if (actions.length === 0) {
       this.addWarning(`Condition at index ${group.activator.index} has no actions`);
