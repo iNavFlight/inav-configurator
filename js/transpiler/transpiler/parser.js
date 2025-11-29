@@ -140,12 +140,17 @@ class JavaScriptParser {
     }
 
     // Create logic condition for if block
-    if (thenBody.length > 0) {
+    // Even if body is empty (only comments), we still create the EventHandler
+    // because the condition itself may be useful as a "readable" logic condition
+    // that other logic conditions can reference. The decompiler generates:
+    //   if (condition) { // Condition can be read by logicCondition[N] }
+    // and we need to handle this round-trip correctly.
+    if (condition) {
       results.push({
         type: 'EventHandler',
         handler: 'ifthen',
         condition,
-        body: thenBody,
+        body: thenBody,  // May be empty, that's OK
         loc: node.loc,
         range: node.range,
         comment: 'Generated from if statement'
@@ -184,6 +189,8 @@ class JavaScriptParser {
       }
 
       // Create logic condition for else block with inverted condition
+      // Only create if there are actual body statements (else blocks with only
+      // comments are less common, and an empty else is typically omitted)
       if (elseBody.length > 0) {
         results.push({
           type: 'EventHandler',

@@ -29,6 +29,28 @@ class ConditionGenerator {
     this.validateFunctionArgs = context.validateFunctionArgs;
     this.errorHandler = context.errorHandler;
     this.getLcIndex = context.getLcIndex;
+
+    // Cache for generated conditions (CSE - Common Subexpression Elimination)
+    // Maps condition key -> LC index
+    this.conditionCache = new Map();
+  }
+
+  /**
+   * Reset the condition cache
+   * Should be called at the start of each transpilation
+   */
+  reset() {
+    this.conditionCache.clear();
+  }
+
+  /**
+   * Generate a unique key for a condition for caching purposes
+   * @param {string} type - Condition type (binary, logical, etc.)
+   * @param {*} params - Parameters that uniquely identify the condition
+   * @returns {string} Cache key
+   */
+  getCacheKey(type, ...params) {
+    return `${type}:${params.map(p => JSON.stringify(p)).join(':')}`;
   }
 
   /**
@@ -83,20 +105,38 @@ class ConditionGenerator {
       // Get the inverse operation
       const inverseOp = this.getInverseOperation(operator);
 
+      // Check cache for the synthesized condition (operator + operands)
+      const cacheKey = this.getCacheKey('binary_synth', operator, left, right, activatorId);
+      if (this.conditionCache.has(cacheKey)) {
+        return this.conditionCache.get(cacheKey);
+      }
+
       // Generate the inverse comparison first
       const comparisonId = this.pushLogicCommand(inverseOp, left, right, activatorId);
 
       // Then negate it with NOT
-      return this.pushLogicCommand(OPERATION.NOT,
+      const resultId = this.pushLogicCommand(OPERATION.NOT,
         { type: OPERAND_TYPE.LC, value: comparisonId },
         { type: OPERAND_TYPE.VALUE, value: 0 },
         activatorId
       );
+
+      this.conditionCache.set(cacheKey, resultId);
+      return resultId;
     }
 
     // Direct operations: >, <, ==, ===
     const op = this.getOperation(operator);
-    return this.pushLogicCommand(op, left, right, activatorId);
+
+    // Check cache for this exact condition
+    const cacheKey = this.getCacheKey('binary', op, left, right, activatorId);
+    if (this.conditionCache.has(cacheKey)) {
+      return this.conditionCache.get(cacheKey);
+    }
+
+    const resultId = this.pushLogicCommand(op, left, right, activatorId);
+    this.conditionCache.set(cacheKey, resultId);
+    return resultId;
   }
 
   /**
@@ -116,21 +156,39 @@ class ConditionGenerator {
   /**
    * Generate logical expression condition (&&, ||)
    * @private
+   *
+   * For AND (&&): Uses chained activators for efficiency.
+   *   a && b && c becomes:
+   *   - LC0: a (activator: parent)
+   *   - LC1: b (activator: LC0) - only evaluates when a is true
+   *   - LC2: c (activator: LC1) - only evaluates when a && b is true
+   *   Result: LC2 represents the full AND chain
+   *
+   * For OR (||): Uses explicit OR operation (chaining doesn't work for OR).
    */
   generateLogical(condition, activatorId) {
-    // Generate left condition
-    const leftId = this.generate(condition.left, activatorId);
+    if (condition.operator === '&&') {
+      // AND: Use chained activators
+      // Generate left condition with current activator
+      const leftId = this.generate(condition.left, activatorId);
 
-    // Generate right condition
-    const rightId = this.generate(condition.right, activatorId);
+      // Generate right condition with LEFT as its activator (chaining)
+      // This means the right condition only evaluates when left is true
+      const rightId = this.generate(condition.right, leftId);
 
-    // Combine with logical operator
-    const op = condition.operator === '&&' ? OPERATION.AND : OPERATION.OR;
-    return this.pushLogicCommand(op,
-      { type: OPERAND_TYPE.LC, value: leftId },
-      { type: OPERAND_TYPE.LC, value: rightId },
-      activatorId
-    );
+      // The rightmost condition in the chain represents the full AND result
+      return rightId;
+    } else {
+      // OR: Use explicit OR operation
+      const leftId = this.generate(condition.left, activatorId);
+      const rightId = this.generate(condition.right, activatorId);
+
+      return this.pushLogicCommand(OPERATION.OR,
+        { type: OPERAND_TYPE.LC, value: leftId },
+        { type: OPERAND_TYPE.LC, value: rightId },
+        activatorId
+      );
+    }
   }
 
   /**

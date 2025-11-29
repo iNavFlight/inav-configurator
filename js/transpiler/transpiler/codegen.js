@@ -63,6 +63,7 @@ class INAVCodeGenerator {
     this.lcIndex = 0;
     this.commands = [];
     this.errorHandler.reset(); // Clear any previous errors
+    this.conditionGenerator.reset(); // Clear condition cache for CSE
 
     if (!ast || !ast.statements) {
       throw new Error('Invalid AST');

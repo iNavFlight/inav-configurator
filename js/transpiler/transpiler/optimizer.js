@@ -174,10 +174,18 @@ class Optimizer {
         }
       }
 
-      // Remove empty event handlers (only for handlers with body, not args-based handlers like edge/sticky/delay)
+      // Remove empty event handlers ONLY if they have no useful condition
+      // Handlers with args (edge/sticky/delay/timer/whenChanged) are not removed here
+      // Handlers with a condition but empty body are "readable" conditions that
+      // other logic can reference - these must be preserved for round-trip capability
       if (statement.type === 'EventHandler' && statement.body && statement.body.length === 0) {
-        this.stats.deadCodeRemoved++;
-        continue;
+        // Only remove if there's no condition (truly dead code)
+        // Keep if there's a condition (readable logic condition)
+        if (!statement.condition) {
+          this.stats.deadCodeRemoved++;
+          continue;
+        }
+        // Has condition but empty body - this is a readable condition, keep it
       }
 
       statements.push(statement);

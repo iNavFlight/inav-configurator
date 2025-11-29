@@ -526,6 +526,7 @@ class Decompiler {
     // Build combined condition from activator and any chained conditions
     const conditionParts = [this.decompileCondition(group.activator, allConditions)];
     const actualActions = [];
+    const chainedConditions = []; // Track chained condition LCs to find terminal index
 
     // Separate chained conditions from actions
     for (const lc of group.actions) {
@@ -534,15 +535,22 @@ class Decompiler {
       } else {
         // This is a condition in the chain - add it to the compound condition
         conditionParts.push(this.decompileCondition(lc, allConditions));
+        chainedConditions.push(lc);
       }
     }
 
     const combinedCondition = conditionParts.join(' && ');
 
+    // The terminal condition is the last in the chain (or the activator if no chain)
+    // This is the index that holds the combined AND result
+    const terminalIndex = chainedConditions.length > 0
+      ? chainedConditions[chainedConditions.length - 1].index
+      : group.activator.index;
+
     if (actualActions.length === 0) {
       // No actions, but condition chains are still valid (can be read externally)
       // Output as a condition assignment or just the condition check
-      return `if (${combinedCondition}) {\n  // Condition can be read by logicCondition[${group.activator.index}]\n}`;
+      return `if (${combinedCondition}) {\n  // Condition can be read by logicCondition[${terminalIndex}]\n}`;
     }
 
     // Generate if statement with combined condition
