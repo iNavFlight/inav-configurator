@@ -594,15 +594,33 @@ class INAVCodeGenerator {
         }
       }
 
-      // Check for gvar
+      // Check for gvar with bounds validation
       if (value.startsWith('gvar[')) {
-        const index = parseInt(value.match(/\d+/)[0]);
+        const match = value.match(/^gvar\[(\d+)\]$/);
+        if (!match) {
+          this.errorHandler.addError(`Invalid gvar syntax '${value}'. Expected gvar[0-7].`, null, 'invalid_gvar');
+          return { type: OPERAND_TYPE.VALUE, value: 0 };
+        }
+        const index = parseInt(match[1], 10);
+        if (index < 0 || index > 7) {
+          this.errorHandler.addError(`Invalid gvar index ${index}. Must be 0-7.`, null, 'invalid_gvar_index');
+          return { type: OPERAND_TYPE.VALUE, value: 0 };
+        }
         return { type: OPERAND_TYPE.GVAR, value: index };
       }
 
-      // Check for rc channel
+      // Check for rc channel with bounds validation
       if (value.startsWith('rc[')) {
-        const index = parseInt(value.match(/\d+/)[0]);
+        const match = value.match(/^rc\[(\d+)\]$/);
+        if (!match) {
+          this.errorHandler.addError(`Invalid rc syntax '${value}'. Expected rc[1-18].`, null, 'invalid_rc');
+          return { type: OPERAND_TYPE.VALUE, value: 0 };
+        }
+        const index = parseInt(match[1], 10);
+        if (index < 1 || index > 18) {
+          this.errorHandler.addError(`Invalid rc channel ${index}. Must be 1-18.`, null, 'invalid_rc_index');
+          return { type: OPERAND_TYPE.VALUE, value: 0 };
+        }
         return { type: OPERAND_TYPE.RC_CHANNEL, value: index };
       }
 
