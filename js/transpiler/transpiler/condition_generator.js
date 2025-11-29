@@ -66,13 +66,51 @@ class ConditionGenerator {
   /**
    * Generate binary expression condition (>, <, ===, etc.)
    * @private
+   *
+   * Note: INAV Logic Conditions don't have native >=, <=, or != operations.
+   * These are synthesized using NOT:
+   *   a >= b  →  NOT(a < b)
+   *   a <= b  →  NOT(a > b)
+   *   a != b  →  NOT(a == b)
    */
   generateBinary(condition, activatorId) {
     const left = this.getOperand(condition.left);
     const right = this.getOperand(condition.right);
-    const op = this.getOperation(condition.operator);
+    const operator = condition.operator;
 
+    // Handle operators that need synthesis via NOT
+    if (operator === '>=' || operator === '<=' || operator === '!=' || operator === '!==') {
+      // Get the inverse operation
+      const inverseOp = this.getInverseOperation(operator);
+
+      // Generate the inverse comparison first
+      const comparisonId = this.pushLogicCommand(inverseOp, left, right, activatorId);
+
+      // Then negate it with NOT
+      return this.pushLogicCommand(OPERATION.NOT,
+        { type: OPERAND_TYPE.LC, value: comparisonId },
+        { type: OPERAND_TYPE.VALUE, value: 0 },
+        activatorId
+      );
+    }
+
+    // Direct operations: >, <, ==, ===
+    const op = this.getOperation(operator);
     return this.pushLogicCommand(op, left, right, activatorId);
+  }
+
+  /**
+   * Get the inverse operation for synthesis via NOT
+   * @private
+   */
+  getInverseOperation(operator) {
+    switch (operator) {
+      case '>=': return OPERATION.LOWER_THAN;   // NOT(a < b) = a >= b
+      case '<=': return OPERATION.GREATER_THAN; // NOT(a > b) = a <= b
+      case '!=':
+      case '!==': return OPERATION.EQUAL;       // NOT(a == b) = a != b
+      default: return OPERATION.EQUAL;
+    }
   }
 
   /**
@@ -251,19 +289,18 @@ class ConditionGenerator {
   }
 
   /**
-   * Get operation from comparison operator
+   * Get operation from comparison operator (for direct operations only)
    * @private
+   *
+   * Note: >=, <=, !=, !== are handled separately in generateBinary()
+   * via synthesis using NOT.
    */
   getOperation(operator) {
     const ops = {
       '===': OPERATION.EQUAL,
       '==': OPERATION.EQUAL,
       '>': OPERATION.GREATER_THAN,
-      '<': OPERATION.LOWER_THAN,
-      '>=': OPERATION.GREATER_THAN, // Note: INAV doesn't have >=, use >
-      '<=': OPERATION.LOWER_THAN,   // Note: INAV doesn't have <=, use <
-      '!==': OPERATION.NOT,
-      '!=': OPERATION.NOT
+      '<': OPERATION.LOWER_THAN
     };
 
     return ops[operator] || OPERATION.EQUAL;

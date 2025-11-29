@@ -117,12 +117,25 @@ class JavaScriptParser {
       if (node.consequent.type === 'BlockStatement') {
         for (const stmt of node.consequent.body) {
           const transformed = this.transformBodyStatement(stmt);
-          if (transformed) thenBody.push(transformed);
+          if (transformed) {
+            // Handle arrays (from nested if statements)
+            if (Array.isArray(transformed)) {
+              thenBody.push(...transformed);
+            } else {
+              thenBody.push(transformed);
+            }
+          }
         }
       } else {
         // Single statement without braces
         const transformed = this.transformBodyStatement(node.consequent);
-        if (transformed) thenBody.push(transformed);
+        if (transformed) {
+          if (Array.isArray(transformed)) {
+            thenBody.push(...transformed);
+          } else {
+            thenBody.push(transformed);
+          }
+        }
       }
     }
 
@@ -146,7 +159,13 @@ class JavaScriptParser {
       if (node.alternate.type === 'BlockStatement') {
         for (const stmt of node.alternate.body) {
           const transformed = this.transformBodyStatement(stmt);
-          if (transformed) elseBody.push(transformed);
+          if (transformed) {
+            if (Array.isArray(transformed)) {
+              elseBody.push(...transformed);
+            } else {
+              elseBody.push(transformed);
+            }
+          }
         }
       } else if (node.alternate.type === 'IfStatement') {
         // else if - recursively transform
@@ -155,7 +174,13 @@ class JavaScriptParser {
       } else {
         // Single statement
         const transformed = this.transformBodyStatement(node.alternate);
-        if (transformed) elseBody.push(transformed);
+        if (transformed) {
+          if (Array.isArray(transformed)) {
+            elseBody.push(...transformed);
+          } else {
+            elseBody.push(transformed);
+          }
+        }
       }
 
       // Create logic condition for else block with inverted condition
@@ -509,12 +534,11 @@ class JavaScriptParser {
       }
     }
 
-    // Support nested if statements in bodies
+    // Support nested if statements in bodies - recursively transform them
     if (stmt.type === 'IfStatement') {
-      // For nested ifs, we need to flatten them
-      this.addWarning('info', 'Nested if statement - will be flattened to multiple logic conditions', stmt.loc ? stmt.loc.start.line : 0);
-      // Return null here - nested ifs need special handling at a higher level
-      return null;
+      // Recursively transform the nested if statement
+      // This returns an array of EventHandlers which will be flattened by the caller
+      return this.transformIfStatement(stmt);
     }
 
     return null;

@@ -297,7 +297,36 @@ class INAVCodeGenerator {
 
     // Generate body actions
     for (const action of stmt.body) {
-      this.generateAction(action, conditionId);
+      if (action.type === 'EventHandler') {
+        // Nested if statement - recursively generate with current condition as parent
+        this.generateNestedConditional(action, conditionId);
+      } else {
+        this.generateAction(action, conditionId);
+      }
+    }
+  }
+
+  /**
+   * Generate nested conditional (nested if inside if body)
+   * The parent condition becomes the activator for the nested condition
+   */
+  generateNestedConditional(stmt, parentActivatorId) {
+    if (!stmt.condition) return;
+
+    // Generate the nested condition with parent as activator
+    const conditionId = this.generateCondition(stmt.condition, parentActivatorId);
+
+    // Store the LC index for potential reuse
+    stmt.conditionLcIndex = conditionId;
+
+    // Generate body actions with nested condition as activator
+    for (const action of stmt.body) {
+      if (action.type === 'EventHandler') {
+        // Further nesting - recurse
+        this.generateNestedConditional(action, conditionId);
+      } else {
+        this.generateAction(action, conditionId);
+      }
     }
   }
 

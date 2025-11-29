@@ -1,6 +1,4 @@
 /**
-'use strict';
-
  * INAV Logic Condition Optimizer
  *
  * Location: tabs/programming/transpiler/transpiler/optimizer.js
@@ -13,6 +11,8 @@
  * 4. GVAR Inlining
  * 5. Boolean Simplification
  */
+
+'use strict';
 
 class Optimizer {
   constructor() {
@@ -222,6 +222,8 @@ class Optimizer {
           case '<': return !(condition.left < condition.right);
           case '===': return !(condition.left === condition.right);
           case '==': return !(condition.left == condition.right);
+          case '>=': return !(condition.left >= condition.right);
+          case '<=': return !(condition.left <= condition.right);
         }
       }
     }

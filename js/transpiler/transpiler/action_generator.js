@@ -151,10 +151,11 @@ class ActionGenerator {
    * @private
    */
   generateRcAssignment(target, value, activatorId) {
-    const channelMatch = target.match(/rc\[(\d+)\]/);
+    // Match rc[N] or rc[N].value
+    const channelMatch = target.match(/rc\[(\d+)\](?:\.value)?/);
     if (!channelMatch) {
       this.errorHandler.addError(
-        `Invalid RC channel syntax: '${target}'. Expected format: rc[0] through rc[17]`,
+        `Invalid RC channel syntax: '${target}'. Expected format: rc[0] or rc[0].value`,
         null,
         'invalid_rc_syntax'
       );

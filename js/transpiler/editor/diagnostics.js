@@ -437,26 +437,28 @@ function checkAPIUsage(line, lineNumber, monaco) {
     }
   }
   
-  // Check for undefined API properties
-  const propertyAccess = line.matchAll(/inav\.(\w+)\.(\w+)/g);
-  for (const match of propertyAccess) {
-    const [full, category, property] = match;
-    const path = `${category}.${property}`;
-    const def = getDefinition(path);
-    
-    if (!def) {
-      diagnostics.push(createDiagnostic(
-        monaco,
-        lineNumber,
-        match.index,
-        full.length,
-        `Unknown property '${path}'. Check API documentation for valid properties.`,
-        DiagnosticSeverity.Error,
-        'UNKNOWN_PROPERTY',
-        'Did you mean one of the available properties?'
-      ));
-    }
-  }
+  // TODO: Check for undefined API properties
+  // Disabled: getDefinition() function not yet implemented
+  // See api/definitions/index.js for future implementation
+  // const propertyAccess = line.matchAll(/inav\.(\w+)\.(\w+)/g);
+  // for (const match of propertyAccess) {
+  //   const [full, category, property] = match;
+  //   const path = `${category}.${property}`;
+  //   const def = getDefinition(path);
+  //
+  //   if (!def) {
+  //     diagnostics.push(createDiagnostic(
+  //       monaco,
+  //       lineNumber,
+  //       match.index,
+  //       full.length,
+  //       `Unknown property '${path}'. Check API documentation for valid properties.`,
+  //       DiagnosticSeverity.Error,
+  //       'UNKNOWN_PROPERTY',
+  //       'Did you mean one of the available properties?'
+  //     ));
+  //   }
+  // }
   
   // Check for incorrect RC channel access
   if (line.match(/rc\[\d+\]/) && !line.match(/rc\[\d+\]\.(value|low|mid|high)/)) {

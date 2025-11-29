@@ -161,6 +161,24 @@ class Assertions {
     }
   }
 
+  toBeGreaterThanOrEqual(expected) {
+    if (this.actual < expected) {
+      throw new Error(`Expected ${this.actual} to be greater than or equal to ${expected}`);
+    }
+  }
+
+  toBeLessThan(expected) {
+    if (this.actual >= expected) {
+      throw new Error(`Expected ${this.actual} to be less than ${expected}`);
+    }
+  }
+
+  toBeLessThanOrEqual(expected) {
+    if (this.actual > expected) {
+      throw new Error(`Expected ${this.actual} to be less than or equal to ${expected}`);
+    }
+  }
+
   toContain(expected) {
     if (typeof this.actual === 'string') {
       if (!this.actual.includes(expected)) {
