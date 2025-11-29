@@ -641,18 +641,16 @@ class INAVCodeGenerator {
   }
 
   /**
-   * Get operation from operator
+   * Get operation from operator (for direct operations only)
+   * Note: >=, <=, !=, !== are handled by ConditionGenerator.generateBinary()
+   * via NOT synthesis, so they never reach this function.
    */
   getOperation(operator) {
     const ops = {
       '===': OPERATION.EQUAL,
       '==': OPERATION.EQUAL,
       '>': OPERATION.GREATER_THAN,
-      '<': OPERATION.LOWER_THAN,
-      '>=': OPERATION.GREATER_THAN, // Note: INAV doesn't have >=, use >
-      '<=': OPERATION.LOWER_THAN,   // Note: INAV doesn't have <=, use <
-      '!==': OPERATION.NOT,
-      '!=': OPERATION.NOT
+      '<': OPERATION.LOWER_THAN
     };
 
     return ops[operator] || OPERATION.EQUAL;

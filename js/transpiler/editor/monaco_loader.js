@@ -51,6 +51,13 @@ function loadMonacoEditor() {
  * @param {Function} reject - Promise reject function
  */
 function loadMonacoViaAMD(vsPath, resolve, reject) {
+    // Validate vsPath to prevent potential injection issues
+    // Only allow alphanumeric, forward slash, dash, dot, and underscore
+    if (!/^[\/a-zA-Z0-9._-]+$/.test(vsPath)) {
+        reject(new Error('Invalid Monaco base path'));
+        return;
+    }
+
     // Set global MonacoEnvironment before loading
     window.MonacoEnvironment = {
         getWorkerUrl: function(workerId, label) {

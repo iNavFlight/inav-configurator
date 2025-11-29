@@ -629,10 +629,19 @@ class Decompiler {
 
       case OPERAND_TYPE.LC:
         // Reference to another logic condition result
-        // If we have access to all conditions, recursively resolve
+        // If we have access to all conditions, try to resolve
         if (allConditions) {
           const referencedLC = allConditions.find(lc => lc.index === value);
           if (referencedLC) {
+            // Don't inline LCs that have activators - they're part of chains
+            // and inlining them would lose semantic meaning
+            if (referencedLC.activatorId !== -1) {
+              return `logicCondition[${value}]`;
+            }
+            // Don't inline action operations (they produce side effects)
+            if (this.isActionOperation(referencedLC.operation)) {
+              return `logicCondition[${value}]`;
+            }
             // Recursively decompile the referenced condition
             return this.decompileCondition(referencedLC, allConditions);
           }

@@ -216,6 +216,11 @@ class Optimizer {
       return true;
     }
 
+    // Handle numeric truthiness (non-zero numbers are truthy)
+    if (condition.type === 'Literal' && typeof condition.value === 'number') {
+      return condition.value !== 0;
+    }
+
     return false;
   }
 
@@ -238,6 +243,11 @@ class Optimizer {
 
     if (condition.value === 'false' || condition.value === false) {
       return true;
+    }
+
+    // Handle numeric falsiness (0 is falsy)
+    if (condition.type === 'Literal' && typeof condition.value === 'number') {
+      return condition.value === 0;
     }
 
     return false;
