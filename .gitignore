@@ -17,3 +17,8 @@ inav-configurator.iml
 *.swp
 *.bak
 eeprom.bin
+
+# Test artifacts
+/coverage/
+/playwright-report/
+/test-results/
