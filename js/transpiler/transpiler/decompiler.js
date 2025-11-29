@@ -369,12 +369,19 @@ class Decompiler {
         // Skip gap markers in first pass
         if (lc._gap) continue;
 
+        // Only record references when the operand type is LC
         if (lc.operation === OPERATION.EDGE ||
             lc.operation === OPERATION.DELAY) {
-            referencedBySpecialOps.add(lc.operandAValue); // operandA points to condition
+            if (lc.operandAType === OPERAND_TYPE.LC) {
+                referencedBySpecialOps.add(lc.operandAValue); // operandA points to condition
+            }
         } else if (lc.operation === OPERATION.STICKY) {
-            referencedBySpecialOps.add(lc.operandAValue); // ON condition
-            referencedBySpecialOps.add(lc.operandBValue); // OFF condition
+            if (lc.operandAType === OPERAND_TYPE.LC) {
+                referencedBySpecialOps.add(lc.operandAValue); // ON condition
+            }
+            if (lc.operandBType === OPERAND_TYPE.LC) {
+                referencedBySpecialOps.add(lc.operandBValue); // OFF condition
+            }
         }
 
         // Track LCs referenced as operands (operandType 4 = LC result)

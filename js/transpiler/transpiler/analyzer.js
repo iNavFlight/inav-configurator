@@ -259,8 +259,8 @@ class SemanticAnalyzer {
   checkEventHandler(stmt) {
     const line = stmt.loc ? stmt.loc.start.line : 0;
     
-    // Check if handler is supported
-    const validHandlers = ['on.arm', 'on.always', 'ifthen', 'edge', 'sticky', 'delay'];
+    // Check if handler is supported (must match parser-supported helpers)
+    const validHandlers = ['on.arm', 'on.always', 'ifthen', 'edge', 'sticky', 'delay', 'timer', 'whenChanged'];
 
     if (!validHandlers.includes(stmt.handler)) {
       this.addError(`Unknown event handler: ${stmt.handler}. Valid handlers: ${validHandlers.join(', ')}`, line);
