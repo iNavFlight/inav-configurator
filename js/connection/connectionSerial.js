@@ -25,7 +25,17 @@ class ConnectionSerial extends Connection {
         this.ports = [];
         super._type = ConnectionType.Serial;
 
-        window.electronAPI.onSerialData(buffer => {
+        this._ipcDataHandler = null;
+        this._ipcCloseHandler = null;
+        this._ipcErrorHandler = null;
+    }
+
+    registerIpcListeners() {
+        if (this._ipcDataHandler) {
+            return; // Already registered
+        }
+
+        this._ipcDataHandler = window.electronAPI.onSerialData(buffer => {
             this._onReceiveListeners.forEach(listener => {
                 listener({
                     connectionId: this._connectionId,
@@ -34,24 +44,40 @@ class ConnectionSerial extends Connection {
             });
         });
 
-        window.electronAPI.serialClose(() => {
-            console.log("Serial conenection closed");
+        this._ipcCloseHandler = window.electronAPI.onSerialClose(() => {
+            console.log("Serial connection closed");
             this.abort();
         });
 
-        window.electronAPI.onSerialError(error => {
+        this._ipcErrorHandler = window.electronAPI.onSerialError(error => {
             GUI.log(error);
             console.log(error);
-            this.abort()
-        
+            this.abort();
+
             this._onReceiveErrorListeners.forEach(listener => {
                 listener(error);
             });
         });
     }
 
+    removeIpcListeners() {
+        if (this._ipcDataHandler) {
+            window.electronAPI.offSerialData(this._ipcDataHandler);
+            this._ipcDataHandler = null;
+        }
+        if (this._ipcCloseHandler) {
+            window.electronAPI.offSerialClose(this._ipcCloseHandler);
+            this._ipcCloseHandler = null;
+        }
+        if (this._ipcErrorHandler) {
+            window.electronAPI.offSerialError(this._ipcErrorHandler);
+            this._ipcErrorHandler = null;
+        }
+    }
+
     connectImplementation(path, options, callback) {
-        
+        this.registerIpcListeners();
+
         window.electronAPI.serialConnect(path, options).then(response => {
             if (!response.error) {
                 GUI.log(i18n.getMessage('connectionConnected', [`${path} @ ${options.bitrate} baud`]));

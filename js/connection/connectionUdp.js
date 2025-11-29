@@ -9,17 +9,26 @@ const STANDARD_UDP_PORT = 5761;
 
 //const socket = window.electronAPI.dgramCreateSocket('udp4');
 class ConnectionUdp extends Connection {
-    
+
     constructor() {
         super();
-        
-        this._connectionIP =  "";
-        this._connectionPort =  0;
+
+        this._connectionIP = "";
+        this._connectionPort = 0;
         this._onReceiveListeners = [];
         this._onErrorListener = [];
         super._type = ConnectionType.UDP;
 
-        window.electronAPI.onUdpMessage(message => {
+        this._ipcMessageHandler = null;
+        this._ipcErrorHandler = null;
+    }
+
+    registerIpcListeners() {
+        if (this._ipcMessageHandler) {
+            return; // Already registered
+        }
+
+        this._ipcMessageHandler = window.electronAPI.onUdpMessage(message => {
             this._onReceiveListeners.forEach(listener => {
                 listener({
                     connectionId: this._connectionId,
@@ -28,17 +37,30 @@ class ConnectionUdp extends Connection {
             });
         });
 
-        window.electronAPI.onUdpError(error => {
+        this._ipcErrorHandler = window.electronAPI.onUdpError(error => {
             GUI.log(error);
             console.log(error);
-            this.abort();                         
+            this.abort();
             this._onReceiveErrorListeners.forEach(listener => {
-                listener(error);    
+                listener(error);
             });
         });
     }
 
-    connectImplementation(address, options, callback) {     
+    removeIpcListeners() {
+        if (this._ipcMessageHandler) {
+            window.electronAPI.offUdpMessage(this._ipcMessageHandler);
+            this._ipcMessageHandler = null;
+        }
+        if (this._ipcErrorHandler) {
+            window.electronAPI.offUdpError(this._ipcErrorHandler);
+            this._ipcErrorHandler = null;
+        }
+    }
+
+    connectImplementation(address, options, callback) {
+        this.registerIpcListeners();
+
         var addr = address.split(':');
         if (addr.length >= 2) {
             this._connectionIP = addr[0];

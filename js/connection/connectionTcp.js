@@ -6,17 +6,27 @@ import i18n from './../localization';
 
 const STANDARD_TCP_PORT = 5761;
 
-class ConnectionTcp extends Connection {    
+class ConnectionTcp extends Connection {
     constructor() {
         super();
-        
-        this._connectionIP =  "";
-        this.connectionPort =  0;
+
+        this._connectionIP = "";
+        this.connectionPort = 0;
         this._onReceiveListeners = [];
         this._onErrorListener = [];
         super._type = ConnectionType.TCP;
 
-        window.electronAPI.onTcpData(buffer => {
+        this._ipcDataHandler = null;
+        this._ipcEndHandler = null;
+        this._ipcErrorHandler = null;
+    }
+
+    registerIpcListeners() {
+        if (this._ipcDataHandler) {
+            return; // Already registered
+        }
+
+        this._ipcDataHandler = window.electronAPI.onTcpData(buffer => {
             this._onReceiveListeners.forEach(listener => {
                 listener({
                     connectionId: this._connectionId,
@@ -25,22 +35,39 @@ class ConnectionTcp extends Connection {
             });
         });
 
-       window.electronAPI.onTcpEnd(() => {
+        this._ipcEndHandler = window.electronAPI.onTcpEnd(() => {
             console.log("TCP Remote has closed the connection");
             this.abort();
         });
 
-        window.electronAPI.onTcpError(error => {
+        this._ipcErrorHandler = window.electronAPI.onTcpError(error => {
             GUI.log(error);
             console.log(error);
-            this.abort();                          
+            this.abort();
             this._onReceiveErrorListeners.forEach(listener => {
-                listener(error);    
+                listener(error);
             });
         });
     }
 
-    connectImplementation(address, options, callback) {     
+    removeIpcListeners() {
+        if (this._ipcDataHandler) {
+            window.electronAPI.offTcpData(this._ipcDataHandler);
+            this._ipcDataHandler = null;
+        }
+        if (this._ipcEndHandler) {
+            window.electronAPI.offTcpEnd(this._ipcEndHandler);
+            this._ipcEndHandler = null;
+        }
+        if (this._ipcErrorHandler) {
+            window.electronAPI.offTcpError(this._ipcErrorHandler);
+            this._ipcErrorHandler = null;
+        }
+    }
+
+    connectImplementation(address, options, callback) {
+        this.registerIpcListeners();
+
         var addr = address.split(':');
         if (addr.length >= 2) {
             this._connectionIP = addr[0];
