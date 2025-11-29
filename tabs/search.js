@@ -6,7 +6,7 @@ import i18n from './../js/localization.js';
 TABS.search = { };
 
 
-tabNames = [
+const tabNames = [
  "adjustments",
  "advanced_tuning",
  "auxiliary",
@@ -43,9 +43,9 @@ tabNames = [
     keyword = keyword.toLowerCase();
     resultsDiv.innerHTML = '';
 
-    simClick = function (evt) {
-      tabName = evt.currentTarget.getAttribute("tabName");
-      tabLink = document.getElementsByClassName("tab_".concat(tabName))[0].getElementsByTagName("a")[0];
+    const simClick = function (evt) {
+      const tabName = evt.currentTarget.getAttribute("tabName");
+      const tabLink = document.getElementsByClassName("tab_".concat(tabName))[0].getElementsByTagName("a")[0];
       tabLink.click();
     };
 
@@ -77,7 +77,7 @@ tabNames = [
       }
     }
 
-    for ( result of document.getElementsByClassName("searchResult") ) {
+    for ( const result of document.getElementsByClassName("searchResult") ) {
       result.addEventListener('click', simClick, false);
     }
   }
@@ -101,7 +101,7 @@ tabNames = [
     const htmlDoc = parser.parseFromString(filecontents, 'text/html');
     var hasDataI18n = htmlDoc.querySelectorAll('[data-i18n]:not([data-i18n=""])');
     for (const element of hasDataI18n) {
-      key = element.getAttribute('data-i18n');
+      const key = element.getAttribute('data-i18n');
       if (! this.key2page.has(key) ) {
         this.key2page.set( key, new Set() );
       }
@@ -109,16 +109,16 @@ tabNames = [
     }
     hasDataI18n = htmlDoc.querySelectorAll('[i18n]:not([i18n=""])');
     for (const element of hasDataI18n) {
-      key = element.getAttribute('i18n');
+      const key = element.getAttribute('i18n');
       if (! this.key2page.has(key) ) {
         this.key2page.set( key, new Set() );
       }
       this.key2page.get(key).add(filename);
     }
 
-    settings = htmlDoc.querySelectorAll('[data-setting]:not([data-setting=""])');
+    const settings = htmlDoc.querySelectorAll('[data-setting]:not([data-setting=""])');
     for (const element of settings) {
-      key = element.getAttribute('data-setting');
+      const key = element.getAttribute('data-setting');
       if (! this.setting2page.has(key) ) {
         this.setting2page.set( key, new Set() );
       }
@@ -131,8 +131,9 @@ tabNames = [
   TABS.search.geti18nJs = function (filename, filecontents) {
     var re = /(?:data-i18n=|i18n.getMessage\()["']([^"']*)['"]/g
  
-    while (match = re.exec(filecontents)) {
-      key = match[1];
+    let match;
+    while ((match = re.exec(filecontents))) {
+      const key = match[1];
       if (! this.key2page.has(key) ) {
         this.key2page.set( key, new Set() );
       }
