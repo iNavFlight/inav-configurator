@@ -174,7 +174,7 @@ class ActionDecompiler {
   }
 
   handleRcChannelOverride(lc, value) {
-    // operandA contains channel number (1-18)
+    // operandA contains channel number (1-based: 1-18)
     // Use cleaner array syntax instead of override.rcChannel()
     return `rc[${lc.operandAValue}] = ${value};`;
   }

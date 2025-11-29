@@ -155,6 +155,15 @@ class Assertions {
     }
   }
 
+  toHaveProperty(key) {
+    if (this.actual === null || this.actual === undefined) {
+      throw new Error(`Expected object to have property '${key}', but object is ${this.actual}`);
+    }
+    if (!(key in this.actual)) {
+      throw new Error(`Expected object to have property '${key}', but it doesn't. Keys: ${Object.keys(this.actual).join(', ')}`);
+    }
+  }
+
   toBeGreaterThan(expected) {
     if (this.actual <= expected) {
       throw new Error(`Expected ${this.actual} to be greater than ${expected}`);

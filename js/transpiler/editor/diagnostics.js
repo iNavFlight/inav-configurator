@@ -459,7 +459,24 @@ function checkAPIUsage(line, lineNumber, monaco) {
   //     ));
   //   }
   // }
-  
+
+  // Warn about rc[0] - INAV uses 1-based RC channel indexing
+  if (line.match(/rc\[0\]/)) {
+    const match = line.match(/rc\[0\]/);
+    if (match) {
+      diagnostics.push(createDiagnostic(
+        monaco,
+        lineNumber,
+        line.indexOf(match[0]),
+        match[0].length,
+        'RC channels use 1-based indexing. rc[0] is invalid - use rc[1] for the first channel.',
+        DiagnosticSeverity.Error,
+        'INVALID_RC_ZERO',
+        'INAV RC channels are numbered 1-18, not 0-17'
+      ));
+    }
+  }
+
   return diagnostics;
 }
 

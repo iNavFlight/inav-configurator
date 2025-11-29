@@ -20,7 +20,7 @@ When implementing a new operation, function, or syntax feature, you must update:
 - Update property access validation if needed
 - Add warnings for unsupported variations
 
-Example: For RC channel states, added validation for `rc[0-17]` with `.low/.mid/.high` properties
+Example: For RC channel states, added validation for `rc[1-18]` with `.low/.mid/.high` properties
 
 ### 2. Codegen (transpiler/codegen.js)
 - Add code generation for the new feature
@@ -139,12 +139,12 @@ Expected: Error with suggestion for correct property
 
 ### 3. Edge Cases
 ```javascript
-// Test boundary values
-if (rc[0].low) {  // Channel 0 (first)
+// Test boundary values (1-based indexing)
+if (rc[1].low) {  // Channel 1 (first)
   gvar[0] = 1;
 }
 
-if (rc[17].high) {  // Channel 17 (last valid)
+if (rc[18].high) {  // Channel 18 (last valid)
   gvar[1] = 1;
 }
 ```
@@ -153,7 +153,7 @@ Expected: Valid generation for both
 ### 4. Complex Combinations
 ```javascript
 // Test multiple operations together
-if (xor(rc[0].low, flight.armed)) {
+if (xor(rc[1].low, flight.armed)) {
   gvar[0] = Math.max(100, flight.altitude);
 }
 ```

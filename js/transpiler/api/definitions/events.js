@@ -94,17 +94,23 @@ export default {
         desc: 'Condition to watch for rising edge',
         returns: 'boolean'
       },
-      durationMs: {
-        type: 'number',
-        unit: 'ms',
-        desc: 'Minimum duration condition must be true (debounce)'
+      config: {
+        type: 'object',
+        properties: {
+          duration: {
+            type: 'number',
+            unit: 'ms',
+            desc: 'Minimum duration condition must be true (debounce)',
+            default: 0
+          }
+        }
       },
       action: {
         type: 'function',
         desc: 'Action to execute on rising edge'
       }
     },
-    example: 'edge(() => rc[5].high, 100, () => { gvar[0] = gvar[0] + 1; })'
+    example: 'edge(() => rc[5].high, { duration: 100 }, () => { gvar[0] = gvar[0] + 1; })'
   },
   
   delay: {
@@ -127,7 +133,7 @@ export default {
         desc: 'Action to execute after delay'
       }
     },
-    example: 'delay(() => flight.rssi < 10, 5000, () => { override.rcChannel[8] = 2000; })'
+    example: 'delay(() => flight.rssi < 10, 5000, () => { rc[8] = 2000; })'
   },
   
   timer: {

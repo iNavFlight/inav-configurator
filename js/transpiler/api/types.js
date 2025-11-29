@@ -74,7 +74,7 @@ declare namespace inav {
    * Note: For simple conditions, use standard JavaScript if/else statements
    */
   function sticky(onCondition: () => boolean, offCondition: () => boolean, action: () => void): void;
-  function edge(condition: () => boolean, durationMs: number, action: () => void): void;
+  function edge(condition: () => boolean, config: { duration?: number }, action: () => void): void;
   function delay(condition: () => boolean, delayMs: number, action: () => void): void;
   function timer(onMs: number, offMs: number, action: () => void): void;
   function whenChanged(value: number, threshold: number, action: () => void): void;

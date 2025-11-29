@@ -155,11 +155,11 @@ class ConditionGenerator {
    */
   generateMember(condition, activatorId) {
     // Check for RC channel LOW/MID/HIGH state detection
-    // e.g., rc[0].low, rc[1].mid, rc[2].high
+    // e.g., rc[1].low, rc[2].mid, rc[3].high (1-based, matching INAV firmware)
     if (typeof condition.value === 'string' && condition.value.startsWith('rc[')) {
       const match = condition.value.match(/^rc\[(\d+)\]\.(low|mid|high)$/);
       if (match) {
-        const channelIndex = parseInt(match[1]);
+        const channelIndex = parseInt(match[1]); // Already 1-based from user input
         const state = match[2]; // 'low', 'mid', or 'high'
 
         // Map state to operation

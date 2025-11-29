@@ -69,7 +69,7 @@ class ActionGenerator {
     }
 
     this.errorHandler.addError(
-      `Cannot assign to '${target}'. Only gvar[0-7], rc[0-17], and override.* are writable`,
+      `Cannot assign to '${target}'. Only gvar[0-7], rc[1-18], and override.* are writable`,
       null,
       'invalid_assignment_target'
     );
@@ -148,6 +148,7 @@ class ActionGenerator {
 
   /**
    * Generate RC channel assignment (rc[N] = value)
+   * Uses 1-based indexing to match INAV firmware (rc[1] through rc[18])
    * @private
    */
   generateRcAssignment(target, value, activatorId) {
@@ -155,7 +156,7 @@ class ActionGenerator {
     const channelMatch = target.match(/rc\[(\d+)\](?:\.value)?/);
     if (!channelMatch) {
       this.errorHandler.addError(
-        `Invalid RC channel syntax: '${target}'. Expected format: rc[0] or rc[0].value`,
+        `Invalid RC channel syntax: '${target}'. Expected format: rc[1] through rc[18]`,
         null,
         'invalid_rc_syntax'
       );
@@ -164,10 +165,10 @@ class ActionGenerator {
 
     const channel = parseInt(channelMatch[1]);
 
-    // Validate channel range
-    if (channel < 0 || channel > 17) {
+    // Validate channel range (1-based: 1-18)
+    if (channel < 1 || channel > 18) {
       this.errorHandler.addError(
-        `RC channel ${channel} out of range. INAV supports rc[0] through rc[17]`,
+        `RC channel ${channel} out of range. INAV supports rc[1] through rc[18]`,
         null,
         'rc_out_of_range'
       );
@@ -177,7 +178,7 @@ class ActionGenerator {
     const valueOperand = this.getOperand(value);
 
     // Generate RC_CHANNEL_OVERRIDE operation (38)
-    // operandA = channel number, operandB = value
+    // operandA = channel number (1-based), operandB = value
     this.pushLogicCommand(OPERATION.RC_CHANNEL_OVERRIDE,
       { type: OPERAND_TYPE.VALUE, value: channel },
       valueOperand,

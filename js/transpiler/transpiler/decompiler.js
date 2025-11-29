@@ -173,15 +173,23 @@ class Decompiler {
       };
     }
 
-    // Filter enabled conditions
+    // Filter enabled conditions, tracking gaps for formatting
     const enabled = [];
+    let consecutiveGaps = 0;
     for (const lc of logicConditions) {
-        // Stop at first unused slot (operation 0 = TRUE with no activator usually means unused)
+        // Track unused slots - consecutive gaps become line breaks for readability
         if (lc.enabled === 0 && lc.operation === 0 && lc.activatorId === -1) {
-            break;
+            consecutiveGaps++;
+            continue;
+        }
+        // Insert a gap marker if we had unused slots before this condition
+        if (consecutiveGaps > 0 && enabled.length > 0) {
+            enabled.push({ _gap: true });
+            consecutiveGaps = 0;
         }
         if (lc.enabled) {
             enabled.push(lc);
+            consecutiveGaps = 0;
         }
     }
 
@@ -201,6 +209,11 @@ class Decompiler {
     // Generate code for each group (pass enabled conditions for pattern detection)
     const codeBlocks = [];
     for (const group of groups) {
+      // Gap markers become empty strings (extra blank line when joined)
+      if (group._gap) {
+        codeBlocks.push('');
+        continue;
+      }
       const code = this.decompileGroup(group, enabled);
       if (code) {
         codeBlocks.push(code);
@@ -353,6 +366,9 @@ class Decompiler {
     // First pass: find conditions referenced by EDGE/STICKY/DELAY or as LC operands
     const referencedAsOperand = new Set();
     for (const lc of conditions) {
+        // Skip gap markers in first pass
+        if (lc._gap) continue;
+
         if (lc.operation === OPERATION.EDGE ||
             lc.operation === OPERATION.DELAY) {
             referencedBySpecialOps.add(lc.operandAValue); // operandA points to condition
@@ -372,6 +388,12 @@ class Decompiler {
 
 
     for (const lc of conditions) {
+      // Handle gap markers - insert blank line group
+      if (lc._gap) {
+        groups.push({ _gap: true });
+        continue;
+      }
+
       if (processed.has(lc.index)) continue;
 
       // Skip conditions only used by special operations

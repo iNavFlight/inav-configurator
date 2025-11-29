@@ -49,7 +49,7 @@ class PropertyAccessChecker {
       return;
     }
 
-    // Handle RC channel array access: rc[0].low, rc[1].mid, rc[2].high, rc[N].value
+    // Handle RC channel array access: rc[1].low, rc[2].mid, rc[3].high, rc[N].value (1-based)
     if (propPath.startsWith('rc[')) {
       this.checkRcChannelAccess(propPath, line);
       return;
@@ -74,20 +74,21 @@ class PropertyAccessChecker {
 
   /**
    * Check RC channel access validity
+   * Uses 1-based indexing to match INAV firmware (rc[1] through rc[18])
    * @private
    */
   checkRcChannelAccess(propPath, line) {
     const match = propPath.match(/^rc\[(\d+)\](?:\.(\w+))?$/);
     if (!match) {
-      this.addError(`Invalid RC channel syntax: '${propPath}'. Expected format: rc[0] through rc[17], optionally with .value, .low, .mid, or .high`, line);
+      this.addError(`Invalid RC channel syntax: '${propPath}'. Expected format: rc[1] through rc[18], optionally with .value, .low, .mid, or .high`, line);
       return;
     }
 
     const channelIndex = parseInt(match[1]);
     const property = match[2]; // may be undefined for rc[N] alone
 
-    if (channelIndex < 0 || channelIndex > 17) {
-      this.addError(`RC channel index ${channelIndex} out of range. INAV supports rc[0] through rc[17]`, line);
+    if (channelIndex < 1 || channelIndex > 18) {
+      this.addError(`RC channel index ${channelIndex} out of range. INAV supports rc[1] through rc[18]`, line);
       return;
     }
 
