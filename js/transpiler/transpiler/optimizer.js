@@ -128,28 +128,50 @@ class Optimizer {
 
   /**
    * Generate a unique key for a condition
+   * Uses prefixed format to prevent key collisions between different node types
    */
   getConditionKey(condition) {
-    if (condition.type === 'BinaryExpression') {
-      return `${condition.left}${condition.operator}${condition.right}`;
+    // Handle primitives and null
+    if (condition === null || condition === undefined) {
+      return 'null';
+    }
+    if (typeof condition === 'number' || typeof condition === 'boolean') {
+      return `lit:${JSON.stringify(condition)}`;
+    }
+    if (typeof condition === 'string') {
+      return `str:${condition}`;
     }
 
-    if (condition.type === 'LogicalExpression') {
-      const left = this.getConditionKey(condition.left);
-      const right = this.getConditionKey(condition.right);
-      return `${left}${condition.operator}${right}`;
+    // Handle AST nodes with type-prefixed keys
+    switch (condition.type) {
+      case 'BinaryExpression': {
+        const left = this.getConditionKey(condition.left);
+        const right = this.getConditionKey(condition.right);
+        return `bin:${condition.operator}(${left},${right})`;
+      }
+      case 'LogicalExpression': {
+        const left = this.getConditionKey(condition.left);
+        const right = this.getConditionKey(condition.right);
+        return `log:${condition.operator}(${left},${right})`;
+      }
+      case 'UnaryExpression': {
+        const arg = this.getConditionKey(condition.argument);
+        return `un:${condition.operator}(${arg})`;
+      }
+      case 'MemberExpression':
+        return `mem:${condition.value}`;
+      case 'Identifier':
+        return `id:${condition.name || condition.value}`;
+      case 'Literal':
+        return `lit:${JSON.stringify(condition.value)}`;
+      case 'CallExpression': {
+        const callee = condition.callee?.name || 'unknown';
+        const args = (condition.arguments || []).map(a => this.getConditionKey(a)).join(',');
+        return `call:${callee}(${args})`;
+      }
+      default:
+        return `other:${JSON.stringify(condition)}`;
     }
-
-    if (condition.type === 'UnaryExpression') {
-      const arg = this.getConditionKey(condition.argument);
-      return `${condition.operator}${arg}`;
-    }
-
-    if (condition.type === 'MemberExpression') {
-      return condition.value;
-    }
-
-    return JSON.stringify(condition);
   }
 
   /**

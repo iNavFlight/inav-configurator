@@ -653,7 +653,17 @@ class INAVCodeGenerator {
       '<': OPERATION.LOWER_THAN
     };
 
-    return ops[operator] || OPERATION.EQUAL;
+    if (ops[operator] !== undefined) {
+      return ops[operator];
+    }
+
+    // Fail explicitly rather than silently generating incorrect logic
+    this.errorHandler.addError(
+      `Unsupported comparison operator '${operator}'. Supported: ===, ==, >, <, >=, <=, !=, !==`,
+      null,
+      'unsupported_operator'
+    );
+    throw new Error(`Unsupported comparison operator '${operator}'`);
   }
 
   /**

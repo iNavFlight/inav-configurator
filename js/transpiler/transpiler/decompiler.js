@@ -564,10 +564,11 @@ class Decompiler {
    * Decompile a condition to JavaScript expression
    * @param {Object} lc - Logic condition
    * @param {Array} allConditions - All conditions for recursive resolution
+   * @param {Set} visited - Set of visited LC indices to prevent infinite recursion
    * @returns {string} JavaScript expression
    */
-  decompileCondition(lc, allConditions = null) {
-    return this.conditionDecompiler.decompile(lc, allConditions);
+  decompileCondition(lc, allConditions = null, visited = new Set()) {
+    return this.conditionDecompiler.decompile(lc, allConditions, visited);
   }
 
   /**
@@ -586,9 +587,10 @@ class Decompiler {
    * @param {number} type - Operand type
    * @param {number} value - Operand value
    * @param {Array} allConditions - All conditions for recursive resolution
+   * @param {Set} visited - Set of visited LC indices to prevent infinite recursion
    * @returns {string} JavaScript expression
    */
-  decompileOperand(type, value, allConditions = null) {
+  decompileOperand(type, value, allConditions = null, visited = new Set()) {
     switch (type) {
       case OPERAND_TYPE.VALUE:
         return value.toString();
@@ -631,6 +633,12 @@ class Decompiler {
         // Reference to another logic condition result
         // If we have access to all conditions, try to resolve
         if (allConditions) {
+          // Detect cyclic references to prevent infinite recursion
+          if (visited.has(value)) {
+            this.addWarning(`Cyclic LC reference detected at logicCondition[${value}]`);
+            return `logicCondition[${value}]`;
+          }
+
           const referencedLC = allConditions.find(lc => lc.index === value);
           if (referencedLC) {
             // Don't inline LCs that have activators - they're part of chains
@@ -642,8 +650,11 @@ class Decompiler {
             if (this.isActionOperation(referencedLC.operation)) {
               return `logicCondition[${value}]`;
             }
-            // Recursively decompile the referenced condition
-            return this.decompileCondition(referencedLC, allConditions);
+            // Recursively decompile the referenced condition with cycle detection
+            visited.add(value);
+            const result = this.decompileCondition(referencedLC, allConditions, visited);
+            visited.delete(value);
+            return result;
           }
         }
         // Fallback to reference notation if we can't resolve

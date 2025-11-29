@@ -32,11 +32,12 @@ class ConditionDecompiler {
    * Decompile a condition to JavaScript expression
    * @param {Object} lc - Logic condition
    * @param {Array} allConditions - All conditions for recursive resolution
+   * @param {Set} visited - Set of visited LC indices to prevent infinite recursion
    * @returns {string} JavaScript expression
    */
-  decompile(lc, allConditions = null) {
-    const left = this.decompileOperand(lc.operandAType, lc.operandAValue, allConditions);
-    const right = this.decompileOperand(lc.operandBType, lc.operandBValue, allConditions);
+  decompile(lc, allConditions = null, visited = new Set()) {
+    const left = this.decompileOperand(lc.operandAType, lc.operandAValue, allConditions, visited);
+    const right = this.decompileOperand(lc.operandBType, lc.operandBValue, allConditions, visited);
 
     switch (lc.operation) {
       case OPERATION.TRUE:
