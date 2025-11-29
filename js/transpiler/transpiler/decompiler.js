@@ -320,6 +320,27 @@ class Decompiler {
   }
 
   /**
+   * Recursively collect all descendants of a logic condition
+   * @param {number} parentIndex - Index of parent LC
+   * @param {Array} conditions - All conditions
+   * @param {Set} collected - Set of already collected indices
+   * @returns {Array} All descendant LCs
+   */
+  collectDescendants(parentIndex, conditions, collected) {
+    const descendants = [];
+    for (const lc of conditions) {
+      if (lc.activatorId === parentIndex && !collected.has(lc.index)) {
+        collected.add(lc.index);
+        descendants.push(lc);
+        // Recursively collect children of this LC
+        const children = this.collectDescendants(lc.index, conditions, collected);
+        descendants.push(...children);
+      }
+    }
+    return descendants;
+  }
+
+  /**
    * Group logic conditions by activator relationships
    * @param {Array} conditions - Enabled logic conditions
    * @returns {Array} Array of condition groups
@@ -392,13 +413,10 @@ class Decompiler {
 
         processed.add(lc.index);
 
-        // Find all actions that use this as activator
-        for (const action of conditions) {
-          if (action.activatorId === lc.index) {
-            group.actions.push(action);
-            processed.add(action.index);
-          }
-        }
+        // Recursively find ALL descendants (not just direct children)
+        // This handles chains like: LC0 → LC1 → LC2 → LC3
+        const descendants = this.collectDescendants(lc.index, conditions, processed);
+        group.actions = descendants;
 
         groups.push(group);
       }
@@ -483,22 +501,33 @@ class Decompiler {
       }
     }
 
-    // Normal if statement
-    const condition = this.decompileCondition(group.activator, allConditions);
+    // Build combined condition from activator and any chained conditions
+    const conditionParts = [this.decompileCondition(group.activator, allConditions)];
+    const actualActions = [];
 
-    // Decompile actions (filter out conditions used as intermediate values)
-    const actions = group.actions.map(a => this.decompileActionOrCondition(a, allConditions)).filter(Boolean);
-
-    if (actions.length === 0) {
-      this.addWarning(`Condition at index ${group.activator.index} has no actions`);
-      return `// Empty condition\nif (${condition}) {\n  // No actions\n}`;
+    // Separate chained conditions from actions
+    for (const lc of group.actions) {
+      if (this.isActionOperation(lc.operation)) {
+        actualActions.push(this.decompileAction(lc, allConditions));
+      } else {
+        // This is a condition in the chain - add it to the compound condition
+        conditionParts.push(this.decompileCondition(lc, allConditions));
+      }
     }
 
-    // Generate if statement
-    const indent = '  ';
-    const body = actions.map(a => indent + a).join('\n');
+    const combinedCondition = conditionParts.join(' && ');
 
-    return `if (${condition}) {\n${body}\n}`;
+    if (actualActions.length === 0) {
+      // No actions, but condition chains are still valid (can be read externally)
+      // Output as a condition assignment or just the condition check
+      return `if (${combinedCondition}) {\n  // Condition can be read by logicCondition[${group.activator.index}]\n}`;
+    }
+
+    // Generate if statement with combined condition
+    const indent = '  ';
+    const body = actualActions.map(a => indent + a).join('\n');
+
+    return `if (${combinedCondition}) {\n${body}\n}`;
   }
 
   /**
