@@ -489,7 +489,7 @@ if (flight.homeDistance > 100) {
                 // Show stats
                 if (result.stats) {
                     GUI.log(
-                        `Decompiled ${result.stats.enabledConditions}/${result.stats.totalConditions} ` +
+                        `Decompiled ${result.stats.enabled}/${result.stats.total} ` +
                         `logic conditions into ${result.stats.groups} handler(s)`
                     );
                 }

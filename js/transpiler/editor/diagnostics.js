@@ -460,23 +460,6 @@ function checkAPIUsage(line, lineNumber, monaco) {
   //   }
   // }
   
-  // Check for incorrect RC channel access
-  if (line.match(/rc\[\d+\]/) && !line.match(/rc\[\d+\]\.(value|low|mid|high)/)) {
-    const match = line.match(/rc\[(\d+)\]/);
-    if (match) {
-      diagnostics.push(createDiagnostic(
-        monaco,
-        lineNumber,
-        line.indexOf(match[0]),
-        match[0].length,
-        'RC channels must access .value, .low, .mid, or .high property',
-        DiagnosticSeverity.Error,
-        'INVALID_RC_ACCESS',
-        `Use rc[${match[1]}].high or rc[${match[1]}].value`
-      ));
-    }
-  }
-  
   return diagnostics;
 }
 

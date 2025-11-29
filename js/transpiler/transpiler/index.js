@@ -358,7 +358,7 @@ class Transpiler {
     }
 
     return warnings.map(warning => {
-      if (warning.line && typeof warning.line === 'number') {
+      if (typeof warning.line === 'number') {
         return {
           ...warning,
           line: Math.max(1, warning.line - lineOffset)
