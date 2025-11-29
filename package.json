@@ -19,6 +19,7 @@
   "author": "The INAV open source project",
   "license": "GPL-3.0",
   "dependencies": {
+    "acorn": "^8.14.0",
     "@electron/remote": "^2.1.3",
     "browserify-fs": "^1.0.0",
     "d3": "^7.9.0",
@@ -34,18 +35,19 @@
     "jquery-textcomplete": "^1.8.5",
     "marked": "^16.2.1",
     "minimist": "^1.2.8",
+    "monaco-editor": "^0.54.0",
     "nouislider": "^15.8.1",
     "ol": "^10.6.1",
     "promise-map-series": "^0.3.0",
     "semver": "^7.7.2",
     "serialport": "^13.0.0",
+    "smalltalk": "^4.1.2",
     "temp": "^0.9.4",
     "three": "^0.180.0",
     "throttle-debounce": "^5.0.2",
     "usb": "^2.16.0",
     "wnumb": "^1.2.0",
-    "xml2js": "^0.6.2",
-    "smalltalk": "^4.1.2"
+    "xml2js": "^0.6.2"
   },
   "devDependencies": {
     "@electron-forge/cli": "7.8.3",
@@ -58,8 +60,8 @@
     "@electron-forge/plugin-vite": "^7.8.3",
     "@rollup/plugin-inject": "^5.0.5",
     "electron": "^38.0.0",
+    "process": "^0.11.10",
     "vite": "^7.1.4",
-    "vite-plugin-native": "^2.2.2",
-    "process": "^0.11.10"
+    "vite-plugin-native": "^2.2.2"
   }
 }
