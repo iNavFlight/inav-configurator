@@ -99,6 +99,7 @@ export default {
       name: '@electron-forge/maker-dmg',
       config: {
         name: "INAV Configurator",
+        title: "INAV-Configurator",  // Volume name without spaces to avoid hdiutil detach issues
         background: "./assets/osx/dmg-background.png",
         icon: "./images/inav.icns"
       }
