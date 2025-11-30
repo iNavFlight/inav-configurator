@@ -205,12 +205,15 @@ jobs:
             on_retry_command: rm -rfv node_modules
         - name: Build MacOS x64
           run: yarn run make -- --arch="x64"
+          continue-on-error: true
         - name: Upload MacOS x64 zip
+          if: always()
           uses: actions/upload-artifact@v4
           with:
             name: ${{env.BUILD_NAMEx64}}_ZIP
             path: ./out/make/zip/darwin/x64/*.zip
         - name: Upload MacOS x64 dmg
+          if: always()
           uses: actions/upload-artifact@v4
           with:
             name: ${{env.BUILD_NAMEx64}}_DMG
