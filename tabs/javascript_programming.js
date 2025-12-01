@@ -39,40 +39,41 @@ TABS.javascript_programming = {
             GUI.active_tab = 'javascript_programming';
         }
 
-        $('#content').load("./tabs/javascript_programming.html", function () {
+        import('./javascript_programming.html?raw').then(({default: html}) => {
+            GUI.load(html, () => {
 
-        self.initTranspiler();
+                self.initTranspiler();
 
-        MonacoLoader.loadMonacoEditor()
-            .then(function(monaco) {
-                // Initialize editor with INAV configuration
-                self.editor = MonacoLoader.initializeMonacoEditor(monaco, 'monaco-editor');
+                MonacoLoader.loadMonacoEditor()
+                    .then(function(monaco) {
+                        // Initialize editor with INAV configuration
+                        self.editor = MonacoLoader.initializeMonacoEditor(monaco, 'monaco-editor');
 
-                // Add INAV type definitions
-                MonacoLoader.addINAVTypeDefinitions(monaco);
+                        // Add INAV type definitions
+                        MonacoLoader.addINAVTypeDefinitions(monaco);
 
-                // Set up linting
-                MonacoLoader.setupLinting(self.editor, function() {
-                    if (self.lintCode) {
-                        self.lintCode();
-                    }
-                });
+                        // Set up linting
+                        MonacoLoader.setupLinting(self.editor, function() {
+                            if (self.lintCode) {
+                                self.lintCode();
+                            }
+                        });
 
-                // Continue with initialization
-                self.setupEventHandlers();
-                self.loadExamples();
+                        // Continue with initialization
+                        self.setupEventHandlers();
+                        self.loadExamples();
 
-                self.loadFromFC(function() {
-                    self.isDirty = false;
-                    GUI.content_ready(callback);
-                });
-            })
-            .catch(function(error) {
-                console.error('Failed to load Monaco Editor:', error);
-                GUI.content_ready(callback);
+                        self.loadFromFC(function() {
+                            self.isDirty = false;
+                            GUI.content_ready(callback);
+                        });
+                    })
+                    .catch(function(error) {
+                        console.error('Failed to load Monaco Editor:', error);
+                        GUI.content_ready(callback);
+                    });
+
             });
-
-
         });
     },
 
