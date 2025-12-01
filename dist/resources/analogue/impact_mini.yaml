@@ -1,0 +1,9 @@
+45: # Width of the '-' character in pixels
+    metadata:
+        - s: s
+        - u8: 8 # it's actually 7, but we can't draw half pixels
+46: # Offset of the '.' character to align it with other digits
+    metadata:
+        - s: o
+        - i8: 1 # x offset
+        - i8: 0 # y offset

@@ -1,0 +1,32 @@
+# Generate preview a png file as a preview
+# for every generated font unless it comes
+# from a png already
+previews: true
+
+# Default font comes from from this directory
+# (could be a .png too). Missing characters
+# from other fonts will be filled from this one
+default: default
+
+# List of all fonts (no need to repeat the default one)
+# if nonext(font).yaml exist, it will be interpreted as
+# extra data for the font and added to it.
+fonts:
+  - source: bold
+    extra: true
+  - source: clarity
+    extra: true
+  - source: clarity_medium
+    extra: true
+  - source: default
+    extra:
+      - font_version.yaml # This gets inherited by all the fonts
+      - default.yaml
+  - source: impact
+    extra: true
+  - source: impact_mini
+    extra: true
+  - source: large
+    extra: true
+  - source: vision
+    extra: true
