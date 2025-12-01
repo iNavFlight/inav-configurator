@@ -60,6 +60,7 @@ TABS.magnetometer.initialize = function (callback) {
             mspHelper.getSetting("align_mag_roll").then(function (data) {
                 if (data == null) {
                     console.log("while settting align_mag_roll, data is null or undefined");
+                    return;
                 }
                 self.alignmentConfig.roll = parseInt(data.value, 10) / 10;
             }).then(callback)
@@ -68,6 +69,7 @@ TABS.magnetometer.initialize = function (callback) {
             mspHelper.getSetting("align_mag_pitch").then(function (data) {
                 if (data == null) {
                     console.log("while settting align_mag_pitch, data is null or undefined");
+                    return;
                 }
                 self.alignmentConfig.pitch = parseInt(data.value, 10) / 10;
             }).then(callback)
@@ -76,6 +78,7 @@ TABS.magnetometer.initialize = function (callback) {
             mspHelper.getSetting("align_mag_yaw").then(function (data) {
                 if (data == null) {
                     console.log("while settting align_mag_yaw, data is null or undefined");
+                    return;
                 }
                 self.alignmentConfig.yaw = parseInt(data.value, 10) / 10;
             }).then(callback)
@@ -253,6 +256,7 @@ TABS.magnetometer.initialize = function (callback) {
     function updateBoardRollAxis(value) {
         if (value == null) {
             console.log("in updateBoardRollAxis, value is null or undefined");
+            return;
         }
 
         self.boardAlignmentConfig.roll = Number(value);
