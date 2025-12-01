@@ -6,6 +6,7 @@
   "main": ".vite/build/main.js",
   "type": "module",
   "scripts": {
+    "pwm:dev": "vite",
     "start": "electron-forge start",
     "package": "electron-forge package",
     "make": "electron-forge make",
@@ -60,6 +61,7 @@
     "electron": "^38.0.0",
     "vite": "^7.1.4",
     "vite-plugin-native": "^2.2.2",
+    "vite-plugin-pwa": "^1.1.0",
     "process": "^0.11.10"
   }
 }

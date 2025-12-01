@@ -11,13 +11,11 @@ import tcp from './tcp';
 import udp from './udp';
 import serial from './serial';
 import child_process from './child_process';
+import bridge from '../bridge';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-const usbBootloaderIds =  [
-  { vendorId: 1155, productId: 57105}, 
-  { vendorId: 11836, productId: 57105}
-];
+
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (started) {
@@ -149,6 +147,7 @@ function createWindow() {
     let premittedDevice = null;
     if (details.deviceList) {
       details.deviceList.every((device, idx) => {
+        const usbBootloaderIds = bridge.bootloaderIds;
         if (device.productId == usbBootloaderIds[idx].productId && device.vendorId == usbBootloaderIds[idx].vendorId) {
           premittedDevice = device.deviceId;
           return;

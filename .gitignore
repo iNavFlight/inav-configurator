@@ -13,6 +13,7 @@ inav-configurator.iml
 /dist/
 /apps/
 /build/
+/dev-dist/
 *~
 *.swp
 *.bak

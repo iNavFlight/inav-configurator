@@ -4,6 +4,7 @@ import  { ConnectionType, Connection } from './connection';
 
 import { GUI } from './../gui';
 import i18n from './../localization';
+import bridge from '../bridge';
 
 const STANDARD_UDP_PORT = 5761;
 
@@ -19,16 +20,17 @@ class ConnectionUdp extends Connection {
         this._onErrorListener = [];
         super._type = ConnectionType.UDP;
 
-        window.electronAPI.onUdpMessage(message => {
+         bridge.udpEvents.addEventListener('data', event => {
             this._onReceiveListeners.forEach(listener => {
                 listener({
                     connectionId: this._connectionId,
-                    data: message
+                    data: event.detail
                 });
             });
         });
 
-        window.electronAPI.onUdpError(error => {
+        bridge.udpEvents.addEventListener('error', event => {
+            const error = event.detail;
             GUI.log(error);
             console.log(error);
             this.abort();                         
@@ -48,7 +50,7 @@ class ConnectionUdp extends Connection {
             this._connectionPort = STANDARD_UDP_PORT;
         } 
 
-        window.electronAPI.udpConnect(this._connectionIP, this._connectionPort).then(response => {
+        bridge.udpConnect(this._connectionIP, this._connectionPort).then(response => {
             if (!response.error) {
                 GUI.log(i18n.getMessage('connectionConnected', ["udp://" + this._connectionIP + ":" + this._connectionPort]));
                 this._connectionId = response.id;
@@ -69,7 +71,7 @@ class ConnectionUdp extends Connection {
 
     disconnectImplementation(callback) {
         if (this._connectionId) {
-            window.electronAPI.udpClose().then(response => {
+            bridge.udpClose().then(response => {
                 var ok = true;
                 if (response.error) {
                     console.log("Unable to close UDP: " + response.msg);
@@ -84,7 +86,7 @@ class ConnectionUdp extends Connection {
 
    sendImplementation(data, callback) {    
         if (this._connectionId) {
-            window.electronAPI.udpSend(data).then(response => {
+            bridge.udpSend(data).then(response => {
                 var result = 0;
                 var sent = response.bytesWritten;
                 if (response.error) {

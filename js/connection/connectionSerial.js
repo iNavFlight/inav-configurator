@@ -3,6 +3,7 @@
 import { GUI } from './../gui';
 import { ConnectionType, Connection } from './connection';
 import i18n from './../localization';
+import bridge from './../bridge';
 
 const serialDevices = [
     { vendorId: 1027, productId: 24577 }, // FT232R USB UART
@@ -25,21 +26,22 @@ class ConnectionSerial extends Connection {
         this.ports = [];
         super._type = ConnectionType.Serial;
 
-        window.electronAPI.onSerialData(buffer => {
+        bridge.serialEvents.addEventListener('data', event => {
             this._onReceiveListeners.forEach(listener => {
                 listener({
                     connectionId: this._connectionId,
-                    data: buffer
+                    data: event.detail
                 });
             });
         });
 
-        window.electronAPI.serialClose(() => {
+        bridge.serialEvents.addEventListener('close', event => {
             console.log("Serial conenection closed");
             this.abort();
         });
 
-        window.electronAPI.onSerialError(error => {
+        bridge.serialEvents.addEventListener('error', event => {
+            const error = event.detail;
             GUI.log(error);
             console.log(error);
             this.abort()
@@ -52,7 +54,7 @@ class ConnectionSerial extends Connection {
 
     connectImplementation(path, options, callback) {
         
-        window.electronAPI.serialConnect(path, options).then(response => {
+        bridge.serialConnect(path, options).then(response => {
             if (!response.error) {
                 GUI.log(i18n.getMessage('connectionConnected', [`${path} @ ${options.bitrate} baud`]));
                 this._connectionId = response.id;
@@ -73,7 +75,7 @@ class ConnectionSerial extends Connection {
 
     disconnectImplementation(callback) {   
         if (this._connectionId) {
-            window.electronAPI.serialClose().then(response => {
+            bridge.serialClose().then(response => {
                 var ok = true;
                 if (response.error) {
                     console.log("Unable to close serial: " + response.msg);
@@ -88,7 +90,7 @@ class ConnectionSerial extends Connection {
 
     sendImplementation(data, callback) {        
         if (this._connectionId) {
-            window.electronAPI.serialSend(data).then(response => {
+            bridge.serialSend(data).then(response => {
                 var result = 0;
                 var sent = response.bytesWritten;
                 if (response.error) {
@@ -123,7 +125,7 @@ class ConnectionSerial extends Connection {
     } 
 
     static async getDevices() {
-        return window.electronAPI.listSerialDevices();
+        return await bridge.listSerialDevices();
     }
 }
 

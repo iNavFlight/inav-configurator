@@ -246,8 +246,8 @@ TABS.logging.initialize = function (callback) {
             
             loggingFileName = result.filePath;
             readyToWrite = true;
-            store.set('logging_file_name', loggingFileName);
-            store.set('logging_file_ready', readyToWrite);
+            bridge.storeSet('logging_file_name', loggingFileName);
+            bridge.storeSet('logging_file_ready', readyToWrite);
                           
         });
     }

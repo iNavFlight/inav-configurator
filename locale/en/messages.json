@@ -298,6 +298,12 @@
     "serialPortOpened": {
         "message": "MSP connection <span style=\"color: #37a8db\">successfully</span> opened with ID: $1"
     },
+    "webSerialPermission" : {
+        "message": "Allow serial device"
+    },
+    "webDfuPermission": {
+        "message": "Allow DFU device"
+    },
     "serialPortOpenFail": {
         "message": "<span style=\"color: red\">Failed</span> to open MSP connection"
     },
