@@ -1,1 +1,0 @@
-import{G as a,_ as e,i as l,T as o}from"./index--BqaKNiR.js";const n={};n.initialize=function(t){a.active_tab!="landing"&&(a.active_tab="landing"),e(async()=>{const{default:i}=await import("./landing-B_YkJ40g.js");return{default:i}},[],import.meta.url).then(({default:i})=>{a.load(i,()=>{l.localize(),a.content_ready(t)})})};n.cleanup=function(t){t&&t()};o.landing=n;

@@ -1,1 +1,0 @@
-const o={showOpenDialog:async function(n){return window.electronAPI.showOpenDialog(n)},showSaveDialog:async function(n){return window.electronAPI.showSaveDialog(n)},alert:function(n){return window.electronAPI.alertDialog(n)},confirm:function(n){return window.electronAPI.confirmDialog(n)}};export{o as d};
