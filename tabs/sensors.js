@@ -10,7 +10,7 @@ import CONFIGURATOR from './../js/data_storage';
 import interval from './../js/intervals';
 import i18n from './../js/localization';
 import BitHelper from './../js/bitHelper';
-import store from '../js/store';
+import bridge from './../js/bridge';
 
 TABS.sensors = {};
 TABS.sensors.initialize = function (callback) {
@@ -263,10 +263,10 @@ TABS.sensors.initialize = function (callback) {
 
             startPolling();
 
-            store.set('graphs_enabled', checkboxes);
+            bridge.storeSet('graphs_enabled', checkboxes);
         });
 
-        const graphs_enabled = store.get('graphs_enabled', false);
+        const graphs_enabled = bridge.storeGet('graphs_enabled', false);
         if (graphs_enabled) {
             var checkboxes = $('.tab-sensors .info .checkboxes input');
             for (var i = 0; i < graphs_enabled.length; i++) {
@@ -361,7 +361,7 @@ TABS.sensors.initialize = function (callback) {
         });
 
         // set refresh speeds according to configuration saved in storage
-        const sensor_settings = store.get('sensor_settings', false);
+        const sensor_settings = bridge.storeGet('sensor_settings', false);
         if (sensor_settings) {
             $('.tab-sensors select[name="gyro_refresh_rate"]').val(sensor_settings.rates.gyro);
             $('.tab-sensors select[name="gyro_scale"]').val(sensor_settings.scales.gyro);
@@ -417,7 +417,7 @@ TABS.sensors.initialize = function (callback) {
             var fastest = d3.min([rates.gyro, rates.accel, rates.mag]);
 
             // store current/latest refresh rates in the storage
-            store.set('sensor_settings', {'rates': rates, 'scales': scales});
+            bridge.storeSet('sensor_settings', {'rates': rates, 'scales': scales});
 
             // re-initialize domains with new scales
             gyroHelpers = initGraphHelpers('#gyro', samples_gyro_i, [-scales.gyro, scales.gyro]);

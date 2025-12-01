@@ -5,8 +5,8 @@ import smalltalk from 'smalltalk';
 import { GUI, TABS } from './../js/gui';
 import i18n from './../js/localization';
 import { SITLProcess, SitlSerialPortUtils } from './../js/sitl';
-import store from './../js/store';
-import dialog from '../js/dialog';
+import dialog from './../js/dialog';
+import bridge from './../js/bridge';
 
 const localhost = "127.0.0.1"
 
@@ -133,7 +133,7 @@ TABS.sitl.initialize = (callback) => {
         }
 
         profiles = structuredClone(stdProfiles);
-        const sitlProfiles = store.get('sitlProfiles', false);
+        const sitlProfiles = bridge.storeGet('sitlProfiles', false);
         if (sitlProfiles) {
             profiles.push(...sitlProfiles);
         }
@@ -392,7 +392,7 @@ TABS.sitl.initialize = (callback) => {
                     protocollPreset_e.append(`<option value="${protocoll.name}">${protocoll.name}</option>`);
                 });
 
-                const sitlLastProfile = store.get('sitlLastProfile', false);
+                const sitlLastProfile = bridge.storeGet('sitlLastProfile', false);
                 if (sitlLastProfile) {    
                     var element = profiles.find(profile => {
                         return profile.name == sitlLastProfile;
@@ -417,7 +417,7 @@ TABS.sitl.initialize = (callback) => {
                     profilesToSave.push(profile);
             });
 
-            store.set('sitlProfiles', profilesToSave);
+            bridge.storeSet('sitlProfiles', profilesToSave);
         
         }
 
@@ -484,7 +484,7 @@ TABS.sitl.initialize = (callback) => {
             simIp_e.val(currentProfile.ip).trigger('change'); 
             useImu_e.prop('checked', currentProfile.useImu).trigger('change');
 
-            store.set('sitlLastProfile', selected);
+            bridge.storeSet('sitlLastProfile', selected);
         }
 
         function renderChanMapTable() 
@@ -506,7 +506,7 @@ TABS.sitl.initialize = (callback) => {
 
                 row.find(".inavChannel").val(mapping[i]).on('change', (sender) => {
                     mapping[$(sender.target).data('out')] = parseInt($(sender.target).val());
-                    store.set('sitlMapping', mapping);
+                    bridge.storeSet('sitlMapping', mapping);
                 });
             }
         }

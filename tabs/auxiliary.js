@@ -12,7 +12,7 @@ import FC from './../js/fc';
 import adjustBoxNameIfPeripheralWithModeID from './../js/peripherals';
 import i18n from './../js/localization';
 import interval from './../js/intervals';
-import store from './../js/store';
+import bridge from './../js/bridge';
 
 
 var ORIG_AUX_CONFIG_IDS = [];
@@ -498,11 +498,11 @@ TABS.auxiliary.initialize = function (callback) {
         }
 
         let hideUnusedModes = false;
-        let hideUnusedModesStore = store.get('hideUnusedModes', false);
+        let hideUnusedModesStore = bridge.storeGet('hideUnusedModes', false);
         $("input#switch-toggle-unused")
             .on('change', function () {
                 hideUnusedModes = $(this).prop("checked");
-                store.set('hideUnusedModes', hideUnusedModes);
+                bridge.storeSet('hideUnusedModes', hideUnusedModes);
                 update_ui();
             })
             .prop("checked", !!hideUnusedModesStore)

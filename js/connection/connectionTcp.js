@@ -3,6 +3,7 @@
 import { GUI } from './../gui';
 import  { ConnectionType, Connection } from './connection';
 import i18n from './../localization';
+import bridge from '../bridge';
 
 const STANDARD_TCP_PORT = 5761;
 
@@ -30,7 +31,7 @@ class ConnectionTcp extends Connection {
             this._onReceiveListeners.forEach(listener => {
                 listener({
                     connectionId: this._connectionId,
-                    data: buffer
+                    data: event.detail
                 });
             });
         });
@@ -77,7 +78,7 @@ class ConnectionTcp extends Connection {
             this._connectionPort = STANDARD_TCP_PORT;
         } 
 
-        window.electronAPI.tcpConnect(this._connectionIP, this._connectionPort).then(response => {
+        bridge.tcpConnect(this._connectionIP, this._connectionPort).then(response => {
             if (!response.error) {
                 GUI.log(i18n.getMessage('connectionConnected', ["tcp://" + this._connectionIP + ":" + this._connectionPort]));
                 this._connectionId = response.id;
@@ -99,7 +100,7 @@ class ConnectionTcp extends Connection {
     disconnectImplementation(callback) {
         
         if (this._connectionId) {
-            window.electronAPI.tcpClose();
+            bridge.tcpClose();
         }
 
         this._connectionIP = "";
@@ -112,7 +113,7 @@ class ConnectionTcp extends Connection {
 
    sendImplementation(data, callback) {     
         if (this._connectionId) {
-            window.electronAPI.tcpSend(data).then(response => {
+            bridge.tcpSend(data).then(response => {
                 var result = 0;
                 var sent = response.bytesWritten;
                 if (response.error) {

@@ -46,8 +46,8 @@ import SerialBackend from './../js/serial_backend';
 import { distanceOnLine, wrap_360, calculate_new_cooridatnes } from './../js/helpers';
 import interval from './../js/intervals';
 import { Geozone, GeozoneVertex, GeozoneType, GeozoneShapes, GeozoneFenceAction }  from './../js/geozone';
-import store from './../js/store';
 import dialog from '../js/dialog';
+import bridge from './../js/bridge';
 
 import html from'./mission_control.html?raw';
 
@@ -536,7 +536,7 @@ function iconKey(filename) {
     //
     /////////////////////////////////////////////
     function loadSettings() {
-        const missionPlannerSettings = store.get('missionPlannerSettings', false);
+        const missionPlannerSettings = bridge.storeGet('missionPlannerSettings', false);
         if (missionPlannerSettings) {
             if (!missionPlannerSettings.fwApproachLength && settings.fwApproachLength) {
                 missionPlannerSettings.fwApproachLength = settings.fwApproachLength;
@@ -550,7 +550,7 @@ function iconKey(filename) {
     }
 
     function saveSettings() {
-        store.set('missionPlannerSettings', settings);
+        bridge.storeSet('missionPlannerSettings', settings);
     }
 
     function refreshSettings() {
@@ -2453,7 +2453,7 @@ function iconKey(filename) {
         // save map view settings when user moves it
         //////////////////////////////////////////////////////////////////////////
         map.on('moveend', function (evt) {
-            store.set('missionPlannerLastValues', {
+            bridge.storeSet('missionPlannerLastValues', {
                 center: toLonLat(map.getView().getCenter()),
                 zoom: map.getView().getZoom()
             });
@@ -2461,7 +2461,7 @@ function iconKey(filename) {
         //////////////////////////////////////////////////////////////////////////
         // load map view settings on startup
         //////////////////////////////////////////////////////////////////////////
-        const missionPlannerLastValues = store.get('missionPlannerLastValues', false);
+        const missionPlannerLastValues = bridge.storeGet('missionPlannerLastValues', false);
         if (missionPlannerLastValues && missionPlannerLastValues.zoom && missionPlannerLastValues.center) {
             map.getView().setCenter(fromLonLat(missionPlannerLastValues.center));
             map.getView().setZoom(missionPlannerLastValues.zoom);

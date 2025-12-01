@@ -4,6 +4,7 @@ import $ from 'jquery';
 import 'jquery-ui-dist/jquery-ui';
 import * as THREE from 'three'
 
+import bridge from './bridge'
 import { GUI, TABS } from './gui';
 import CONFIGURATOR from './data_storage';
 import FC  from './fc';
@@ -19,7 +20,6 @@ import appUpdater from './appUpdater';
 import CliAutoComplete from './CliAutoComplete'; 
 import { SITLProcess } from './sitl';
 import settingsCache from './settingsCache';
-import store from './store';
 
 
 window.$ = $;
@@ -28,10 +28,12 @@ window.$ = $;
 $(function() {
     i18n.init( () => {
         i18n.localize();
-
+        
+        bridge.init();
         MSP.init();
         mspHelper.init();
         SerialBackend.init();
+        
 
         GUI.updateEzTuneTabVisibility = function(loadMixerConfig) {
             let useEzTune = true;
@@ -64,17 +66,17 @@ $(function() {
             $('a', activeTab).trigger('click');
         }
 
-        globalSettings.unitType = store.get('unit_type', UnitType.none);
-        globalSettings.mapProviderType = store.get('map_provider_type', 'osm'); 
-        globalSettings.assistnowApiKey = store.get('assistnow_api_key', '');
-        globalSettings.proxyURL = store.get('proxyurl', 'http://192.168.1.222/mapproxy/service?');
-        globalSettings.proxyLayer = store.get('proxylayer', 'your_proxy_layer_name');
-        globalSettings.showProfileParameters = store.get('show_profile_parameters', 1);
-        globalSettings.assistnowOfflineData = store.get('assistnow_offline_data', []);
-        globalSettings.assistnowOfflineDate = store.get('assistnow_offline_date', 0);
+        globalSettings.unitType = bridge.storeGet('unit_type', UnitType.none);
+        globalSettings.mapProviderType = bridge.storeGet('map_provider_type', 'osm'); 
+        globalSettings.assistnowApiKey = bridge.storeGet('assistnow_api_key', '');
+        globalSettings.proxyURL = bridge.storeGet('proxyurl', 'http://192.168.1.222/mapproxy/service?');
+        globalSettings.proxyLayer = bridge.storeGet('proxylayer', 'your_proxy_layer_name');
+        globalSettings.showProfileParameters = bridge.storeGet('show_profile_parameters', 1);
+        globalSettings.assistnowOfflineData = bridge.storeGet('assistnow_offline_data', []);
+        globalSettings.assistnowOfflineDate = bridge.storeGet('assistnow_offline_date', 0);
         updateProfilesHighlightColours();
 
-        var cliAutocomplete = store.get('cli_autocomplete', true);
+        var cliAutocomplete = bridge.storeGet('cli_autocomplete', true);
         globalSettings.cliAutocomplete = cliAutocomplete;
         CliAutoComplete.setEnabled(cliAutocomplete);
         
@@ -84,24 +86,30 @@ $(function() {
             globalSettings.osdUnits = null;
         }
 
-        const version = window.electronAPI.appGetVersion();
-        // alternative - window.navigator.appVersion.match(/Chrome\/([0-9.]*)/)[1];
+        const version = bridge.getAppVersion();
+        const runtimeInfo = bridge.isElectron ? 
+            'Electron: <strong>' + navigator.userAgent.match(/Electron\/([\d\.]+\d+)/)[1] + '</strong>, ' :
+            'Chrome: <strong>' + navigator.userAgent.match(/Chrome\/([0-9.]*)/)[1] + '</strong>, '
+
         GUI.log(i18n.getMessage('getRunningOS') + GUI.operating_system + '</strong>, ' +
-            'Electron: <strong>' + navigator.userAgent.match(/Electron\/([\d\.]+\d+)/)[1] + '</strong>, ' +
+            runtimeInfo +
             i18n.getMessage('getConfiguratorVersion') + version + '</strong>');
 
         $('#status-bar .version').text(version);
         $('#logo .version').text(version);
         update.firmwareVersion();
 
-        if (store.get('logopen', false)) {
+        if (bridge.storeGet('logopen', false)) {
             $("#showlog").trigger('click');
         }
 
-        if (store.get('update_notify', true)) { 
+        if (bridge.storeGet('update_notify', true)) { 
             appUpdater.checkRelease(version);
         }
         
+        if (!bridge.isElectron) {
+            $(`.tab_sitl`).hide();
+        }
 
         // log library versions in console to make version tracking easier
         console.log('Libraries: jQuery - ' + $.fn.jquery + ', three.js - ' + THREE.REVISION);
@@ -276,14 +284,18 @@ $(function() {
                     // translate to user-selected language
                     i18n.localize();
 
+                    if (!bridge.isElectron) {
+                        $('#resetSitl').hide();
+                    }
+
                     // if notifications are enabled, or wasn't set, check the notifications checkbox
-                    if (store.get('update_notify', true)) {
+                    if (bridge.storeGet('update_notify', true)) {
                         $('div.notifications input').prop('checked', true);
                     }
 
                     $('div.notifications input').on('change', function () {
                         var check = $(this).is(':checked');
-                        store.set('update_notify', check);
+                        bridge.storeSet('update_notify', check);
                     });
 
                     $('div.statistics input').on('change', function () {
@@ -292,7 +304,7 @@ $(function() {
 
                     $('div.show_profile_parameters input').on('change', function () {
                         globalSettings.showProfileParameters = $(this).is(':checked');
-                        store.set('show_profile_parameters', globalSettings.showProfileParameters);
+                        bridge.storeSet('show_profile_parameters', globalSettings.showProfileParameters);
 
                         // Update CSS on select boxes
                         updateProfilesHighlightColours();
@@ -305,7 +317,7 @@ $(function() {
 
                     $('div.cli_autocomplete input').on('change', function () {
                         globalSettings.cliAutocomplete = $(this).is(':checked');
-                        store.set('cli_autocomplete', globalSettings.cliAutocomplete);
+                        bridge.storeSet('cli_autocomplete', globalSettings.cliAutocomplete);
 
                         CliAutoComplete.setEnabled($(this).is(':checked'));
                     });
@@ -332,7 +344,7 @@ $(function() {
                     // Set the value of the unit type
                     // none, OSD, imperial, metric
                     $('#ui-unit-type').on('change', function () {
-                        store.set('unit_type', $(this).val());
+                        bridge.storeSet('unit_type', $(this).val());
                         globalSettings.unitType = $(this).val();
 
                         // Update the osd units in global settings
@@ -347,19 +359,19 @@ $(function() {
                         activeTab.find('a').trigger( "click" );
                     });
                     $('#map-provider-type').on('change', function () {
-                        store.set('map_provider_type', $(this).val());
+                        bridge.storeSet('map_provider_type', $(this).val());
                         globalSettings.mapProviderType = $(this).val();
                     });
                     $('#proxyurl').on('change', function () {
-                        store.set('proxyurl', $(this).val());
+                        bridge.storeSet('proxyurl', $(this).val());
                         globalSettings.proxyURL = $(this).val();
                     });
                     $('#proxylayer').on('change', function () {
-                        store.set('proxylayer', $(this).val());
+                        bridge.storeSet('proxylayer', $(this).val());
                         globalSettings.proxyLayer = $(this).val();
                     });
                     $('#assistnow-api-key').on('change', function () {
-                        store.set('assistnow_api_key', $(this).val());
+                        bridge.storeSet('assistnow_api_key', $(this).val());
                         globalSettings.assistnowApiKey = $(this).val();
                     });
  
@@ -474,7 +486,7 @@ $(function() {
             $("#content").removeClass('logopen');
             $(".tab_container").removeClass('logopen');
             $("#scrollicon").removeClass('active');
-            store.set('logopen', false);
+            bridge.storeSet('logopen', false);
 
             state = false;
         }else{
@@ -483,7 +495,7 @@ $(function() {
             $("#content").addClass('logopen');
             $(".tab_container").addClass('logopen');
             $("#scrollicon").addClass('active');
-            store.set('logopen', true);
+            bridge.storeSet('logopen', true);
 
             state = true;
         }

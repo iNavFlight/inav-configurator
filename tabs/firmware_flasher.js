@@ -18,8 +18,8 @@ import mspHelper from './../js/msp/MSPHelper';
 import STM32 from './../js/protocols/stm32';
 import STM32DFU from './../js/protocols/stm32usbdfu';
 import mspDeduplicationQueue from './../js/msp/mspDeduplicationQueue';
-import store from './../js/store';
-import dialog from '../js/dialog.js';
+import dialog from './../js/dialog.js';
+import bridge from './../js/bridge';
 
 TABS.firmware_flasher = {};
 TABS.firmware_flasher.initialize = function (callback) {
@@ -587,7 +587,7 @@ TABS.firmware_flasher.initialize = function (callback) {
         });
 
         
-        if (store.get('no_reboot_sequence', false)) {
+        if (bridge.storeGet('no_reboot_sequence', false)) {
             $('input.updating').prop('checked', true);
             $('.flash_on_connect_wrapper').show();
         } else {
@@ -605,12 +605,12 @@ TABS.firmware_flasher.initialize = function (callback) {
                 $('.flash_on_connect_wrapper').hide();
             }
 
-            store.set('no_reboot_sequence', status);
+            bridge.storeSet('no_reboot_sequence', status);
         });
 
         $('input.updating').trigger('change');
         
-        if (store.get('flash_manual_baud', false)) {
+        if (bridge.storeGet('flash_manual_baud', false)) {
             $('input.flash_manual_baud').prop('checked', true);
         } else {
             $('input.flash_manual_baud').prop('checked', false);
@@ -619,25 +619,25 @@ TABS.firmware_flasher.initialize = function (callback) {
         // bind UI hook so the status is saved on change
         $('input.flash_manual_baud').on('change', function () {
             var status = $(this).is(':checked');
-            store.set('flash_manual_baud', status);
+            bridge.storeSet('flash_manual_baud', status);
         });
 
         $('input.flash_manual_baud').trigger('change');
         
 
-        var flash_manual_baud_rate = store.get('flash_manual_baud_rate', '');
+        var flash_manual_baud_rate = bridge.storeGet('flash_manual_baud_rate', '');
         $('#flash_manual_baud_rate').val(flash_manual_baud_rate);
 
         // bind UI hook so the status is saved on change
         $('#flash_manual_baud_rate').on('change', function () {
             var baud = parseInt($('#flash_manual_baud_rate').val());
-            store.set('flash_manual_baud_rate', baud);
+            bridge.storeSet('flash_manual_baud_rate', baud);
         });
 
         $('input.flash_manual_baud_rate').trigger('change');
 
         
-        if (store.get('flash_on_connect', false)) {
+        if (bridge.storeGet('flash_on_connect', false)) {
             $('input.flash_on_connect').prop('checked', true);
         } else {
             $('input.flash_on_connect').prop('checked', false);
@@ -673,12 +673,12 @@ TABS.firmware_flasher.initialize = function (callback) {
                 PortHandler.flush_callbacks();
             }
 
-            store.set('flash_on_connect', status);
+            bridge.storeSet('flash_on_connect', status);
         }).trigger('change');
         
 
         
-        if (store.get('erase_chip', false)) {
+        if (bridge.storeGet('erase_chip', false)) {
             $('input.erase_chip').prop('checked', true);
         } else {
             $('input.erase_chip').prop('checked', false);
@@ -686,7 +686,7 @@ TABS.firmware_flasher.initialize = function (callback) {
 
         // bind UI hook so the status is saved on change
         $('input.erase_chip').on('change', async function () {
-            store.set('erase_chip', $(this).is(':checked'));
+            bridge.storeSet('erase_chip', $(this).is(':checked'));
         });
 
         $('input.erase_chip').trigger('change');
@@ -790,20 +790,20 @@ TABS.firmware_flasher.onOpen = async function(openInfo) {
         GUI.connecting_to = false;
 
         // save selected port with chrome.storage if the port differs
-        var last_used_port = store.get('last_used_port', '');
+        var last_used_port = bridge.storeGet('last_used_port', '');
         if (last_used_port) {
             if (last_used_port != GUI.connected_to) {
                 // last used port doesn't match the one found in local db, we will store the new one
-                store.set('last_used_port', GUI.connected_to);
+                bridge.storeSet('last_used_port', GUI.connected_to);
             }
         } else {
             // variable isn't stored yet, saving
-            store.set('last_used_port', GUI.connected_to);
+            bridge.storeSet('last_used_port', GUI.connected_to);
         }
         
 
-        store.set('last_used_bps', CONFIGURATOR.connection.bitrate);
-        store.set('wireless_mode_enabled', $('#wireless-mode').is(":checked"));
+        bridge.storeSet('last_used_bps', CONFIGURATOR.connection.bitrate);
+        bridge.storeSet('wireless_mode_enabled', $('#wireless-mode').is(":checked"));
 
         CONFIGURATOR.connection.addOnReceiveListener(SerialBackend.read_serial);
 
