@@ -1,5 +1,5 @@
-import { GUI, TABS } from './../js/gui.js';
-import i18n from './../js/localization.js';
+import { GUI, TABS } from './../js/gui';
+import i18n from './../js/localization';
 
 
 
@@ -84,15 +84,10 @@ const tabNames = [
   
   
   TABS.search.getMessages = function () {
-    const res_messages = fetch('locale/en/messages.json');
-    res_messages
-      .then (data => data.json())
-      .then (data => {
-         this.messages = data;
-      })
-      .catch((error) => {
-         console.error(error)
-      });
+    import(`../locale/en/messages.json`).then(({default: messages}) => {
+        this.messages = messages;
+    });
+
   }
   
   TABS.search.geti18nHTML = function (filename, filecontents) {
@@ -143,26 +138,14 @@ const tabNames = [
 
 
   TABS.search.indexTab =  async function indexTab(tabName) {
-    var response = fetch(`tabs/${tabName}.js`);
-    response
-      .then (data => data.text()) 
-      .then (data => {
-        this.geti18nJs(tabName, data);
-      })
-      .catch((error) => {
-        console.error(error)
-      });
+    import(`./${tabName}.js?raw`).then(({default: javascript}) => {
+        this.geti18nJs(tabName, javascript);
+    });
 
+    import(`./${tabName}.html?raw`).then(({default: html}) => {
+        this.geti18nHTML(tabName, html);
+    });
 
-    response = fetch(`tabs/${tabName}.html`);
-    response
-      .then (data => data.text())
-      .then (data => {
-        this.geti18nHTML(tabName, data);
-      })
-      .catch((error) => {
-        console.error(error)
-      });
   };
   
 
