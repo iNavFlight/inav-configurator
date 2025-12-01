@@ -86,6 +86,8 @@ const tabNames = [
   TABS.search.getMessages = function () {
     import(`../locale/en/messages.json`).then(({default: messages}) => {
         this.messages = messages;
+    }).catch(error => {
+        console.error('Failed to load messages.json:', error);
     });
 
   }
@@ -140,11 +142,11 @@ const tabNames = [
   TABS.search.indexTab =  async function indexTab(tabName) {
     import(`./${tabName}.js?raw`).then(({default: javascript}) => {
         this.geti18nJs(tabName, javascript);
-    });
+    }).catch(error => console.error(`Failed to index JS for tab ${tabName}:`, error));;
 
     import(`./${tabName}.html?raw`).then(({default: html}) => {
         this.geti18nHTML(tabName, html);
-    });
+    }).catch(error => console.error(`Failed to index HTML for tab ${tabName}:`, error));;
 
   };
   
