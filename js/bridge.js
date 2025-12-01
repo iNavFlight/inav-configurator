@@ -38,8 +38,13 @@ const bridge = {
     },
 
 
-    githubApiUrl: function(url) {
-        
+    proxy: function(url) {
+        if (this.isElectron) {
+            return url;
+        } else {
+            // Use a cloudflare worker as a proxy to bypass CORS policy  
+            return `https://proxy.inav.workers.dev/?url=${url}`
+        }
     },
 
     getAppLocale : function() {

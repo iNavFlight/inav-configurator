@@ -503,7 +503,10 @@ TABS.firmware_flasher.initialize = function (callback) {
             if (summary) { // undefined while list is loading or while running offline
                 fileName = summary.file;
                 $(".load_remote_file").text(i18n.getMessage('firmwareFlasherButtonLoading')).addClass('disabled');
-                $.get(summary.url, function (data) {
+                
+                const url = bridge.proxy(summary.url);
+                
+                $.get(url, function (data) {
                     enable_load_online_button();
                     process_hex(data, summary);
                 }).fail(failed_to_load);
