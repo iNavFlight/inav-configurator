@@ -27,7 +27,7 @@ const bridge = {
             window.electronAPI.onTcpEnd(() => this.tcpEvents.dispatchEvent(new CustomEvent('close')));
             window.electronAPI.onTcpError(error => this.tcpEvents.dispatchEvent(new CustomEvent('error', { detail: error })));
 
-            window.electronAPI.onUdpData(buffer => this.udpEvents.dispatchEvent(new CustomEvent('data', { detail: buffer })));
+            window.electronAPI.onUdpMessage(buffer => this.udpEvents.dispatchEvent(new CustomEvent('data', { detail: buffer })));
             window.electronAPI.onUdpError(error => this.udpEvents.dispatchEvent(new CustomEvent('error', { detail: error })));
 
         } else {
@@ -35,6 +35,11 @@ const bridge = {
             webSerial.events.addEventListener('close', () => this.serialEvents.dispatchEvent(new CustomEvent('close')));
             webSerial.events.addEventListener('error', event => this.serialEvents.dispatchEvent(new CustomEvent('error', { detail: event.detail })));
         }
+    },
+
+
+    githubApiUrl: function(url) {
+        
     },
 
     getAppLocale : function() {
