@@ -262,7 +262,8 @@ firmwareFlasherTab.initialize = function (callback) {
                         "releaseUrl": release.html_url,
                         "name"      : semver.clean(release.name),
                         "version"   : release.tag_name,
-                        "url"       : asset.browser_download_url,
+                        // Use GitHub Pages URL (has CORS headers) instead of GitHub Releases
+                        "url"       : `https://inavflight.github.io/firmware/${release.tag_name}/${asset.name}`,
                         "file"      : asset.name,
                         "target_id" : result.target_id,
                         "target"    : result.target,
@@ -319,7 +320,8 @@ firmwareFlasherTab.initialize = function (callback) {
                             "releaseUrl": release.html_url,
                             "name"      : semver.clean(release.name),
                             "version"   : release.tag_name,
-                            "url"       : asset.browser_download_url,
+                            // Use GitHub Pages URL (has CORS headers) instead of GitHub Releases
+                            "url"       : `https://inavflight.github.io/firmware/${release.tag_name}/${asset.name}`,
                             "file"      : asset.name,
                             "target_id" : result.target_id,
                             "target"    : result.target,
