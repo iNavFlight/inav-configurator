@@ -21,7 +21,7 @@ class ConnectionTcp extends Connection {
         this._ipcErrorHandler = null;
     }
 
-    registerIpcListeners() {
+    registerListeners() {
         if (this._ipcDataHandler) {
             return; // Already registered
         }
@@ -50,7 +50,7 @@ class ConnectionTcp extends Connection {
         });
     }
 
-    removeIpcListeners() {
+    removeListeners() {
         if (this._ipcDataHandler) {
             window.electronAPI.offTcpData(this._ipcDataHandler);
             this._ipcDataHandler = null;
@@ -66,7 +66,7 @@ class ConnectionTcp extends Connection {
     }
 
     connectImplementation(address, options, callback) {
-        this.registerIpcListeners();
+        this.registerListeners();
 
         var addr = address.split(':');
         if (addr.length >= 2) {

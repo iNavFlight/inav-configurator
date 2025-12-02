@@ -61,11 +61,11 @@ const bridge = {
          }
     },
 
-    writeFile: async function (filename, data) {
+    writeFile: async function (filename, data, binary = false) {
         if (this.isElectron) {
             return window.electronAPI.writeFile(filename, data);
         } else {
-            const blob = new Blob([data],  {type: 'text/plain'});
+            const blob = new Blob([data],  {type: binary ? 'application/octet-stream' : 'text/plain'});
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;

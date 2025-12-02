@@ -271,8 +271,8 @@ FONT.openFontFile = function ($preview) {
                 return;
             }
 
-            if (result.filePaths.length == 1) {
-                    window.electronAPI.readFile(result.filePaths[0]).then(response => {
+            if (result.files.length == 1) {
+                    bridge.readFile(result.files[0]).then(response => {
                     if (response.error) {
                         GUI.log(i18n.getMessage('ErrorReadingFile'));
                         console.log(response.error);

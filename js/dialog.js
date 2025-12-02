@@ -13,25 +13,32 @@ const dialog =  {
             try {
                 let filePickerOptions = {
                     types: [],
-                    excludeAcceptAllOption: true,
                     multiple: false,
+                    excludeAcceptAllOption: true,
                 }
 
+                let allOptions = true;
                 options.filters.forEach(filter => {
                     
                     let accept = {};
                     if (Array.isArray(filter.extensions) && filter.extensions.length >= 1) {
                         const type = filter.extensions[0];
-                        filter.extensions.forEach(extension => {
-                            accept[`text/${type}`] = [`.${extension}`]
-                        });
+                        if (type != '*') {
+                            filter.extensions.forEach(extension => {
+                                accept[`text/${type}`] = [`.${extension}`]
+                            });
+                            allOptions = false;
+                        }
                     }
                     
-                    filePickerOptions.types.push({
-                        description: filter.name,
-                        accept: accept
-                    })
+                    if (Object.keys(accept).length >= 1) {
+                        filePickerOptions.types.push({
+                            description: filter.name,
+                            accept: accept
+                        });
+                    }
                 });
+                filePickerOptions.excludeAcceptAllOption = allOptions;
 
                 const [fileHandle] = await window.showOpenFilePicker(filePickerOptions);
                 const file = await fileHandle.getFile();
@@ -61,10 +68,18 @@ const dialog =  {
        }
     },
     alert: function (message) {
-        return window.electronAPI.alertDialog(message);
+        if (bridge.isElectron) {
+            return window.electronAPI.alertDialog(message);
+        } else {
+            alert(message);
+        }
     },
     confirm: function (message) {
-        return window.electronAPI.confirmDialog(message);
+        if (bridge.isElectron) {
+            return window.electronAPI.confirmDialog(message);
+        } else {
+            return confirm(message);
+        }
     }
 };
 

@@ -24,7 +24,7 @@ class ConnectionUdp extends Connection {
         this._ipcErrorHandler = null;
     }
 
-    registerIpcListeners() {
+    registerListeners() {
         if (this._ipcMessageHandler) {
             return; // Already registered
         }
@@ -48,7 +48,7 @@ class ConnectionUdp extends Connection {
         });
     }
 
-    removeIpcListeners() {
+    removeListeners() {
         if (this._ipcMessageHandler) {
             window.electronAPI.offUdpMessage(this._ipcMessageHandler);
             this._ipcMessageHandler = null;
@@ -60,7 +60,7 @@ class ConnectionUdp extends Connection {
     }
 
     connectImplementation(address, options, callback) {
-        this.registerIpcListeners();
+        this.registerListeners();
 
         var addr = address.split(':');
         if (addr.length >= 2) {

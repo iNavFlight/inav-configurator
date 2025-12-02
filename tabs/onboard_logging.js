@@ -9,6 +9,7 @@ import CONFIGURATOR from './../js/data_storage';
 import features from './../js/feature_framework';
 import i18n from './../js/localization';
 import BitHelper from './../js/bitHelper';
+import bridge from '../js/bridge';
 
 var sdcardTimer;
 
@@ -358,6 +359,7 @@ TABS.onboard_logging.initialize = function (callback) {
                     let nextAddress = 0;
 
                     show_saving_dialog();
+                    let webBuffer = [];
 
                     function onChunkRead(chunkAddress, chunk) {
                         if (chunk != null) {
@@ -367,20 +369,28 @@ TABS.onboard_logging.initialize = function (callback) {
 
                                 $(".dataflash-saving progress").attr("value", nextAddress / maxBytes * 100);
 
-                                fs.writeFileSync(filename, new Uint8Array(chunk), {
-                                    "flag": "a"
-                                })
+                                if (bridge.isElectron) { 
+                                    window.electronAPI.appendFile(filename, new Uint8Array(chunk), {
+                                        "flag": "a"
+                                    });
+                                } else {
+                                    webBuffer.push(...chunk);
+                                }
 
+                                // Untested !
                                 if (saveCancelled) {
                                     dismiss_saving_dialog();
                                 } else if (nextAddress >= maxBytes) {
                                     mark_saving_dialog_done();
-                                }else {
+                                } else {
                                     mspHelper.dataflashRead(nextAddress, onChunkRead);
                                 }
 
                             } else {
                                 // A zero-byte block indicates end-of-file, so we're done
+                                if (!bridge.isElectron) {
+                                    bridge.writeFile(filename, new Uint8Array(webBuffer), true);
+                                }
                                 mark_saving_dialog_done();
                             }
                         } else {
