@@ -5425,7 +5425,7 @@ __metadata:
 
 "gh-pages@file:./modules/gh-pages::locator=inav-configurator%40workspace%3A.":
   version: 6.3.0
-  resolution: "gh-pages@file:./modules/gh-pages#./modules/gh-pages::hash=f651ef&locator=inav-configurator%40workspace%3A."
+  resolution: "gh-pages@file:./modules/gh-pages#./modules/gh-pages::hash=0875ca&locator=inav-configurator%40workspace%3A."
   dependencies:
     async: "npm:^3.2.4"
     commander: "npm:^13.0.0"
@@ -5437,7 +5437,7 @@ __metadata:
   bin:
     gh-pages: bin/gh-pages.js
     gh-pages-clean: bin/gh-pages-clean.js
-  checksum: 10c0/421409cec0f6567da86e0d90b4ce3d077c6e7a6f412aa05c93773209c37a3b9e4202bef90c83a28dc857136d51ad9d376638a73b3e1d50834c7f0261fda3a48f
+  checksum: 10c0/f2330ea3c134e9f1a65687efa5390c12d08c691f7f57b7736ed4313e7354da014b795302ad89945c70367cc8cc57f6e0aa36d8b8da2f4f369f3b9a46f9d1c771
   languageName: node
   linkType: hard
 
