@@ -158,7 +158,7 @@ jobs:
           with:
             max_attempts: 3
             retry_on: error
-            command: yarn install --foreground-scripts
+            command: yarn install
             timeout_minutes: 10
             on_retry_command: rm -rfv node_modules
         - name: Build MacOS arm64
@@ -208,7 +208,7 @@ jobs:
           with:
             max_attempts: 3
             retry_on: error
-            command: yarn install --foreground-scripts
+            command: yarn install
             timeout_minutes: 10
             on_retry_command: rm -rfv node_modules
         - name: Build MacOS x64
@@ -263,7 +263,7 @@ jobs:
               with:
                 max_attempts: 3
                 retry_on: error
-                command: yarn install --foreground-scripts
+                command: yarn install
                 timeout_minutes: 10
                 on_retry_command: rm -rfv node_modules
             - name: Build Win x64
@@ -318,7 +318,7 @@ jobs:
               with:
                 max_attempts: 3
                 retry_on: error
-                command: yarn install --foreground-scripts
+                command: yarn install 
                 timeout_minutes: 10
                 on_retry_command: rm -rfv node_modules
             - name: Build Win32
@@ -334,3 +334,4 @@ jobs:
                 name: ${{env.BUILD_NAMEia32}}_MSI
                 path: ./out/make/wix/ia32/*.msi
  
+                
