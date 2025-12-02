@@ -247,9 +247,12 @@ $(function() {
                             import('./../tabs/cli').then(() => TABS.cli.initialize(content_ready));
                             break;
                         case 'search':
-                            require('./../tabs/search');
-                            TABS.search.initialize(content_ready);
+                            import('./../tabs/search').then(() => TABS.search.initialize(content_ready));
                             break;
+
+                       case 'javascript_programming':
+                           import('./../tabs/javascript_programming').then(() => TABS.javascript_programming.initialize(content_ready));
+                           break;
                         default:
                             console.log('Tab not found:' + tab);
                     }

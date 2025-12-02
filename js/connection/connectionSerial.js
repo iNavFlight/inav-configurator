@@ -44,8 +44,8 @@ class ConnectionSerial extends Connection {
             const error = event.detail;
             GUI.log(error);
             console.log(error);
-            this.abort()
-        
+            this.abort();
+
             this._onReceiveErrorListeners.forEach(listener => {
                 listener(error);
             });
@@ -109,11 +109,11 @@ class ConnectionSerial extends Connection {
     }
 
     addOnReceiveCallback(callback){
-        this._onReceiveErrorListeners.push(callback);
+        this._onReceiveListeners.push(callback);
     }
 
     removeOnReceiveCallback(callback){
-        this._onReceiveListeners = this._onReceiveErrorListeners.filter(listener => listener !== callback);
+        this._onReceiveListeners = this._onReceiveListeners.filter(listener => listener !== callback);
     }
 
     addOnReceiveErrorCallback(callback) {

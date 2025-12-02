@@ -739,7 +739,7 @@ TABS.magnetometer.initialize3D = function () {
     magModels = [];
     //Load the UAV model
     import(`./../resources/models/model_${model_file}.gltf`).then(({default: model}) => {
-    loader.load(modelUrl, (obj) => {
+    loader.load(model, (obj) => {
             const modelScene = obj.scene;
             const scaleFactor = 15;
             modelScene.scale.set(scaleFactor, scaleFactor, scaleFactor);
@@ -759,7 +759,7 @@ TABS.magnetometer.initialize3D = function () {
                         if (child.material) child.material.metalness = 0;
                         });
                         gps.rotation.y = 3 * Math.PI / 2;
-                        model.add(gps);
+                        modelScene.add(gps);
                         magModels[i]=gps;
                         this.resize3D();
                     });
@@ -774,7 +774,7 @@ TABS.magnetometer.initialize3D = function () {
                     fc.scale.set(scaleFactor, scaleFactor, scaleFactor);
                     fc.position.set(gpsOffset[0], gpsOffset[1] - 0.5, gpsOffset[2]);
                     fc.rotation.y = 3 * Math.PI / 2;
-                    model.add(fc);
+                    modelScene.add(fc);
                     this.render3D();
                 });
             });

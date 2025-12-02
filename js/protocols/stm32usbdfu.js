@@ -444,6 +444,8 @@ STM32DFU_protocol.prototype.controlTransfer = function (direction, request, valu
             }
         }).catch(() => {
             console.log('USB controlTransfer IN failed for request ' + request + '!');
+            // Call callback with error to ensure cleanup happens
+            callback([], -1);
         });
     } else {
         // length is ignored

@@ -92,7 +92,15 @@ const webSerial = {
     },
 
     onDisconnect: function() {
-        this.close().then(() => { this.events.dispatchEvent(new CustomEvent('close'))});
+       try { 
+            this.close().then(() => { 
+                if (this.events) {
+                    this.events.dispatchEvent(new CustomEvent('close'));
+                }
+            });
+        } catch (error) {
+            console.log(`Unable to close port: ${error}`)
+        }
     },
 
     close: function() {

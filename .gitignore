@@ -19,3 +19,7 @@ inav-configurator.iml
 *.swp
 *.bak
 eeprom.bin
+
+# ctags
+tags
+TAGS

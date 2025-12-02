@@ -12,8 +12,6 @@ const bridge = {
     
     isElectron: false,
     serialEvents: new EventTarget(),
-    tcpEvents: new EventTarget(),
-    udpEvents: new EventTarget(),
     bootloaderIds: usbBootloaders,
 
     init: function() {
@@ -21,14 +19,7 @@ const bridge = {
         if (this.isElectron) {
             window.electronAPI.onSerialData(buffer => this.serialEvents.dispatchEvent(new CustomEvent('data', { detail: buffer })));
             window.electronAPI.serialClose(() => this.serialEvents.dispatchEvent(new CustomEvent('close')));
-            window.electronAPI.onSerialError(error => this.serialEvents.dispatchEvent(new CustomEvent('error', { detail: error })));
-
-            window.electronAPI.onTcpData(buffer => this.tcpEvents.dispatchEvent(new CustomEvent('data', { detail: buffer })));
-            window.electronAPI.onTcpEnd(() => this.tcpEvents.dispatchEvent(new CustomEvent('close')));
-            window.electronAPI.onTcpError(error => this.tcpEvents.dispatchEvent(new CustomEvent('error', { detail: error })));
-
-            window.electronAPI.onUdpMessage(buffer => this.udpEvents.dispatchEvent(new CustomEvent('data', { detail: buffer })));
-            window.electronAPI.onUdpError(error => this.udpEvents.dispatchEvent(new CustomEvent('error', { detail: error })));
+            window.electronAPI.onSerialError(error => this.serialEvents.dispatchEvent(new CustomEvent('error', { detail: error })))
 
         } else {
             webSerial.events.addEventListener('data', event => this.serialEvents.dispatchEvent(new CustomEvent('data', { detail: event.detail })));
@@ -44,6 +35,46 @@ const bridge = {
         } else {
             // Use a cloudflare worker as a proxy to bypass CORS policy  
             return `https://proxy.inav.workers.dev/?url=${url}`
+        }
+    },
+
+    readFile: async function(file) {
+         if (this.isElectron) {
+            const response = await window.electronAPI.readFile(file);
+            return {
+                error: response.error,
+                data: response.error ? null : response.toString()
+            }
+        } else {
+            try {
+                const text = await file.text();
+                return {
+                    error: false,
+                    data: text
+                }
+            } catch (error) {
+                return {
+                    error: error,
+                    data: null
+                }
+            }
+         }
+    },
+
+    writeFile: async function (filename, data) {
+        if (this.isElectron) {
+            return window.electronAPI.writeFile(filename, data);
+        } else {
+            const blob = new Blob([data],  {type: 'text/plain'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename,
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            return false;
         }
     },
 
@@ -109,42 +140,6 @@ const bridge = {
         } else {
             return webSerial.send(data);
         }
-    },
-
-    tcpConnect: function(host, port, window, setNoDelay) {
-        if (this.isElectron) {
-            return window.electronAPI.tcpConnect(host, port)
-        } 
-    },
-
-    tcpClose: function() {
-        if (this.isElectron) {
-            return window.electronAPI.tcpClose();
-        }
-    },
-
-    tcpSend: function(data) {
-        if (this.isElectron) {
-            return window.electronAPI.tcpSend(data);
-        } 
-    },
-
-    udpConnect: function(host, port, window, setNoDelay) {
-        if (this.isElectron) {
-            return window.electronAPI.udpConnect(host, port)
-        } 
-    },
-
-    udpClose: function() {
-        if (this.isElectron) {
-            return window.electronAPI.udpClose();
-        }
-    },
-
-    udpSend: function(data) {
-        if (this.isElectron) {
-            return window.electronAPI.udpSend(data);
-        } 
     },
 
     listSerialDevices: async function () {
