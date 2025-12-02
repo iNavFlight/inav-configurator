@@ -9,7 +9,7 @@ import interval from './../js/intervals';
 import i18n from './../js/localization';
 import { zeroPad } from './../js/helpers';
 import dialog from '../js/dialog';
-import store from './../js/store';
+import bridge from '../js/bridge'
 
 
 TABS.logging = {};
@@ -19,6 +19,11 @@ TABS.logging.initialize = function (callback) {
     let loggingFileName = null;
     let readyToWrite = false;
 
+    
+    const maxWebLogFileSize = 1024 * 1024; // 1 MB
+    let webFileBuffer = [];
+    let webFileCount = 1;
+
     if (GUI.active_tab != 'logging') {
         GUI.active_tab = 'logging';
     }
@@ -26,6 +31,7 @@ TABS.logging.initialize = function (callback) {
     var requested_properties = [],
         samples = 0,
         requests = 0,
+        totalSize = 0,
         log_buffer = [];
 
     if (CONFIGURATOR.connectionValid) {
@@ -45,6 +51,11 @@ TABS.logging.initialize = function (callback) {
         i18n.localize();;
 
         // UI hooks
+        if (!bridge.isElectron) {
+             $('a.log_file').hide();
+             prepare_file();
+        }
+
         $('a.log_file').on('click', prepare_file);
 
         $('a.logging').on('click', function () {
@@ -56,6 +67,8 @@ TABS.logging.initialize = function (callback) {
                         // reset some variables before start
                         samples = 0;
                         requests = 0;
+                        totalSize = 0;
+                        webFileCount = 1;
                         log_buffer = [];
                         requested_properties = [];
 
@@ -65,7 +78,7 @@ TABS.logging.initialize = function (callback) {
 
                         if (requested_properties.length) {
                             // print header for the csv file
-                            print_head();
+                            log_buffer.push(getHeader());
 
                             var log_data_poll = function () {
                                 if (requests) {
@@ -82,8 +95,24 @@ TABS.logging.initialize = function (callback) {
                             interval.add('log_data_poll', log_data_poll, parseInt($('select.speed').val()), true); // refresh rate goes here
                             interval.add('write_data', function write_data() {
                                 if (log_buffer.length && readyToWrite) { // only execute when there is actual data to write
-                                    window.electronAPI.appendFile(loggingFileName, log_buffer.join('\n') + '\n');
-                                    $('.samples').text(samples += log_buffer.length);
+                                    
+                                    if (bridge.isElectron) {
+                                        window.electronAPI.appendFile(loggingFileName, log_buffer.join('\n') + '\n');
+                                    } else {
+                                        // On PWA we can't acces local files nor append to a file.
+                                        // Instead collect logs and download 1 MB chunks
+                                        webFileBuffer.push(...log_buffer);
+                                        if (totalSize > maxWebLogFileSize) {
+                                            bridge.writeFile(`${loggingFileName}-${webFileCount++}`, webFileBuffer.join('\n') + '\n');
+                                            totalSize = 0;
+                                            webFileBuffer = [];
+                                            webFileBuffer.push(getHeader());
+                                        }
+                                    }
+                                    
+                                    $('.samples').text(samples += log_buffer.length);                
+                                    
+                                    $('.size').text(`${formatFileSize(totalSize)} ${!bridge.isElectron ? `(Chunk ${webFileCount})` : ''}`);
                                     log_buffer = [];
                                 }
                             }, 1000);
@@ -96,6 +125,11 @@ TABS.logging.initialize = function (callback) {
                         }
                     } else {
                         interval.killAll(['global_data_refresh', 'msp-load-update', 'ltm-connection-check']);
+
+                        if (!bridge.isElectron) { 
+                            bridge.writeFile(`${loggingFileName}-${webFileCount++}`, webFileBuffer.join('\n') + '\n');
+                            webFileBuffer = [];
+                        }
 
                         $('.speed').prop('disabled', false);
                         $(this).text(i18n.getMessage('loggingStart'));
@@ -111,8 +145,21 @@ TABS.logging.initialize = function (callback) {
 
         GUI.content_ready(callback);
     }
+    
+    function formatFileSize(bytes) {
+        if (bytes === 0) {
+            return '0 Bytes';
+        }
 
-    function print_head() {
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+
+        return `${parseFloat((bytes / Math.pow(k, i)).toFixed(2))} ${sizes[i]}`;    
+    }
+
+    function getHeader() {
         var head = "timestamp";
 
         for (var i = 0; i < requested_properties.length; i++) {
@@ -170,7 +217,7 @@ TABS.logging.initialize = function (callback) {
                     break;
             }
         }
-        log_buffer.push(head);
+        return head;
     }
 
     function crunch_data() {
@@ -219,7 +266,7 @@ TABS.logging.initialize = function (callback) {
                     break;
             }
         }
-
+        totalSize += sample.length + 1;
         log_buffer.push(sample);
     }
 

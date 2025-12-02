@@ -1421,8 +1421,8 @@ function iconKey(filename) {
                     return;
                 }
 
-                if (result.filePaths.length == 1) {
-                    loadMissionFile(result.filePaths[0]);
+                if (result.files.length == 1) {
+                    loadMissionFile(result.files[0]);
                     multimissionCount = 0;
                     multimission.flush();
                     renderMultimissionTable();
@@ -3708,14 +3708,15 @@ function iconKey(filename) {
                     console.log('No file selected');
                     return;
                 }
-                if (result.filePaths.length == 1) {
-                    loadMissionFile(result.filePaths[0]);
+                if (result.files.length == 1) {
+                    loadMissionFile(result.files[0]);
                 }
             })
         });
 
         $('#saveFileMissionButton').on('click', function () {
             var options = {
+                defaultPath: 'inav-mission.mission',
                 filters: [ { name: "Mission file", extensions: ['mission'] } ]
             };
             dialog.showSaveDialog(options).then(result =>  {
@@ -3806,7 +3807,7 @@ function iconKey(filename) {
             FC.FW_APPROACH.clean(i);
         }
 
-        window.electronAPI.readFile(filename).then(response => {
+        bridge.readFile(filename).then(response => {
             if (response.error) {
                 GUI.log(i18n.getMessage('errorReadingFile'));
                 console.error(response.error);
@@ -3975,7 +3976,14 @@ function iconKey(filename) {
                     updateHome();
                 }
                 updateTotalInfo();
-                let sFilename = String(filename.split('\\').pop().split('/').pop());
+                
+                let sFilename = '';
+                if (typeof filename === 'string'){
+                    sFilename = String(filename.split('\\').pop().split('/').pop());
+                } else {
+                    sFilename = filename.name
+                }
+
                 GUI.log(sFilename + i18n.getMessage('loadedSuccessfully'));
                 updateFilename(sFilename);
             });
@@ -4047,7 +4055,7 @@ function iconKey(filename) {
         var builder = new xml2js.Builder({ 'rootName': 'mission', 'renderOpts': { 'pretty': true, 'indent': '\t', 'newline': '\n' } });
         var xml = builder.buildObject(data);
         xml = xml.replace(/missionitem mission/g, 'meta mission');
-        fs.writeFile(filename, xml, (err) => {
+        bridge.writeFile(filename, xml, (err) => {
             if (err) {
                 GUI.log(i18n.getMessage('ErrorWritingFile'));
                 return console.error(err);

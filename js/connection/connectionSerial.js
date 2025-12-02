@@ -23,24 +23,31 @@ class ConnectionSerial extends Connection {
         this._errorListeners = [];
         this._onReceiveListeners = [];
         this._onErrorListener = [];
-        this.ports = [];
-        super._type = ConnectionType.Serial;
+        this._dataHandler = null;
+        this._closeHandler = null;
+        this._errorHandler = null;
+        super._type = ConnectionType.Serial;        
+    }
 
-        bridge.serialEvents.addEventListener('data', event => {
+    registerListeners() {
+        
+        this._dataHandler = event => {
             this._onReceiveListeners.forEach(listener => {
                 listener({
                     connectionId: this._connectionId,
                     data: event.detail
                 });
             });
-        });
+        };
+        bridge.serialEvents.addEventListener('data', this._dataHandler);
 
-        bridge.serialEvents.addEventListener('close', event => {
+        this._closeHandler = event => {
             console.log("Serial conenection closed");
             this.abort();
-        });
+        };
+        bridge.serialEvents.addEventListener('close', this._closeHandler);
 
-        bridge.serialEvents.addEventListener('error', event => {
+        this._errorHandler = event => {
             const error = event.detail;
             GUI.log(error);
             console.log(error);
@@ -49,7 +56,17 @@ class ConnectionSerial extends Connection {
             this._onReceiveErrorListeners.forEach(listener => {
                 listener(error);
             });
-        });
+        };
+        bridge.serialEvents.addEventListener('error', this._errorHandler);
+    }
+
+    removeListeners() {
+        bridge.serialEvents.removeEventListener('data', this._dataHandler);
+        this._dataHandler = null;
+        bridge.serialEvents.removeEventListener('close', this._closeHandler);
+        this._closeHandler = null;
+        bridge.serialEvents.removeEventListener('error', this._errorHandler);
+        this._errorHandler = null;
     }
 
     removeIpcListeners() {
@@ -68,7 +85,7 @@ class ConnectionSerial extends Connection {
     }
 
     connectImplementation(path, options, callback) {
-        
+        this.registerListeners();
         bridge.serialConnect(path, options).then(response => {
             if (!response.error) {
                 GUI.log(i18n.getMessage('connectionConnected', [`${path} @ ${options.bitrate} baud`]));

@@ -322,12 +322,15 @@ TABS.receiver.initialize = function (callback) {
             }
         });
 
+        /* Drop MSP control sticks for now, needs more work
         // Only show the MSP control sticks if the MSP Rx feature is enabled
         mspHelper.getSetting("receiver_type").then(function (s) {
             if (s && s.setting.table && s.setting.table.values) {
                 $(".sticks_btn").toggle(s.setting.table.values[s.value] == 'MSP');
             }
         });
+        */
+       $(".sticks_btn").hide();
 
         function get_rc_data() {
             MSP.send_message(MSPCodes.MSP_RC, false, false, update_ui);

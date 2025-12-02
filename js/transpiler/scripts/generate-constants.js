@@ -13,6 +13,7 @@
 const fs = require('fs');
 const path = require('path');
 
+
 /**
  * Parse C enum from header file
  * Handles both formats:

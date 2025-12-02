@@ -134,8 +134,8 @@ class Connection {
             this.removeAllListeners();
 
             // Clean up IPC listeners if the subclass implements this method
-            if (typeof this.removeIpcListeners === 'function') {
-                this.removeIpcListeners();
+            if (typeof this.removeListeners === 'function') {
+                this.removeListeners();
             }
 
             this.disconnectImplementation(result => {

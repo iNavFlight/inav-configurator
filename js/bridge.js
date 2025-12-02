@@ -47,6 +47,46 @@ const bridge = {
         }
     },
 
+    readFile: async function(file) {
+         if (this.isElectron) {
+            const response = await window.electronAPI.readFile(file);
+            return {
+                error: response.error,
+                data: response.error ? null : response.toString()
+            }
+        } else {
+            try {
+                const text = await file.text();
+                return {
+                    error: false,
+                    data: text
+                }
+            } catch (error) {
+                return {
+                    error: error,
+                    data: null
+                }
+            }
+         }
+    },
+
+    writeFile: async function (filename, data, binary = false) {
+        if (this.isElectron) {
+            return window.electronAPI.writeFile(filename, data);
+        } else {
+            const blob = new Blob([data],  {type: binary ? 'application/octet-stream' : 'text/plain'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename,
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            return false;
+        }
+    },
+
     getAppLocale : function() {
         if (this.isElectron) {
             return window.electronAPI.appGetLocale();

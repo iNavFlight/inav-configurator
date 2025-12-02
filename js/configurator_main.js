@@ -103,8 +103,10 @@ $(function() {
             $("#showlog").trigger('click');
         }
 
-        if (bridge.storeGet('update_notify', true)) { 
-            appUpdater.checkRelease(version);
+        if (bridge.isElectron) {
+            if (bridge.storeGet('update_notify', true)) { 
+                appUpdater.checkRelease(version);
+            }
         }
         
         if (!bridge.isElectron) {
@@ -286,6 +288,7 @@ $(function() {
 
                     if (!bridge.isElectron) {
                         $('#resetSitl').hide();
+                        $('#updateNotifications').hide();
                     }
 
                     // if notifications are enabled, or wasn't set, check the notifications checkbox
