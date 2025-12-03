@@ -375,25 +375,23 @@ firmwareFlasherTab.initialize = function (callback) {
                     return;
                 }
 
-                let filename;
-                if (result.filePaths.length == 1) {
-                    filename = result.filePaths[0];
+                let file;
+                if (result.files.length == 1) {
+                    file = result.files[0];
                 }
                 
                 $('div.git_info').slideUp();
 
-                console.log('Loading file from: ' + filename);
-
-                window.electronAPI.readFile(filename).then(response => {
+                bridge.readFile(file).then(response => {
 
                     if (response.error) {
-                        console.log("Error loading local file", response.erroe);
+                        console.log("Error loading local file", response.error);
                         return;
                     }
 
                     console.log('File loaded');
 
-                    parse_hex(response.data.toString(), function (data) {
+                    parse_hex(response.data, function (data) {
                         parsed_hex = data;
 
                         if (parsed_hex) {
@@ -579,10 +577,10 @@ firmwareFlasherTab.initialize = function (callback) {
                 if (result.canceled) {
                     return;
                 }
-                fs.writeFileSync(result.filePath, intel_hex, (err) => {
-                    if (err) {
+                bridge.writeFile(result.filePath, intel_hex).then(error => {
+                    if (error) {
                         GUI.log(i18n.getMessage('ErrorWritingFile'));
-                        return console.error(err);
+                        return console.error(error);
                     }
                 });
                 let sFilename = String(result.filePath.split('\\').pop().split('/').pop());

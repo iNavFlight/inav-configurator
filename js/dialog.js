@@ -1,3 +1,5 @@
+import bridge from "./bridge";
+
 const dialog =  {
     showOpenDialog: async function (options) {
         if (bridge.isElectron) {
@@ -55,7 +57,15 @@ const dialog =  {
         }
     },
     showSaveDialog: async function (options) {
-        return window.electronAPI.showSaveDialog(options);
+       if (bridge.isElectron){
+         return window.electronAPI.showSaveDialog(options);
+       } else {
+        // Just passthrou in PWA
+        return {
+            canceled: false,
+            filePath: options.defaultPath
+        };
+       }
     },
     alert: function (message) {
         if (bridge.isElectron) {

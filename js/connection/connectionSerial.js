@@ -69,21 +69,6 @@ class ConnectionSerial extends Connection {
         this._errorHandler = null;
     }
 
-    removeIpcListeners() {
-        if (this._ipcDataHandler) {
-            window.electronAPI.offSerialData(this._ipcDataHandler);
-            this._ipcDataHandler = null;
-        }
-        if (this._ipcCloseHandler) {
-            window.electronAPI.offSerialClose(this._ipcCloseHandler);
-            this._ipcCloseHandler = null;
-        }
-        if (this._ipcErrorHandler) {
-            window.electronAPI.offSerialError(this._ipcErrorHandler);
-            this._ipcErrorHandler = null;
-        }
-    }
-
     connectImplementation(path, options, callback) {
         this.registerListeners();
         bridge.serialConnect(path, options).then(response => {

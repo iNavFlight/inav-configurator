@@ -38,9 +38,12 @@ jobs:
             - uses: actions/setup-node@v4
               with:
                 node-version: 24
+                node-version: 24
                 #check-latest: true
             - name: Install dependencies
               run: sudo apt-get update && sudo apt-get -y install dpkg fakeroot rpm build-essential libudev-dev
+            - name: Setup Yarn with Corepack
+              run: corepack enable
             - name: Setup Yarn with Corepack
               run: corepack enable
             - name: Install deps
@@ -93,9 +96,12 @@ jobs:
             - uses: actions/setup-node@v4
               with:
                 node-version: 24
+                node-version: 24
                 #check-latest: true
             - name: Install dependencies
               run: sudo apt-get update && sudo apt-get -y install dpkg fakeroot rpm build-essential libudev-dev
+            - name: Setup Yarn with Corepack
+              run: corepack enable
             - name: Setup Yarn with Corepack
               run: corepack enable
             - name: Install deps
@@ -147,6 +153,7 @@ jobs:
         - uses: actions/setup-node@v4
           with:
             node-version: 24
+            node-version: 24
             #check-latest: true
         - name: Renstall X Code cli
           run: |
@@ -159,6 +166,7 @@ jobs:
           with:
             max_attempts: 3
             retry_on: error
+            command: yarn install
             command: yarn install
             timeout_minutes: 10
             on_retry_command: rm -rfv node_modules
@@ -198,6 +206,7 @@ jobs:
         - uses: actions/setup-node@v4
           with:
             node-version: 24
+            node-version: 24
             #check-latest: true
         - name: Reinstall X Code cli
           run: |
@@ -210,6 +219,7 @@ jobs:
           with:
             max_attempts: 3
             retry_on: error
+            command: yarn install
             command: yarn install
             timeout_minutes: 10
             on_retry_command: rm -rfv node_modules
@@ -253,6 +263,7 @@ jobs:
             - uses: actions/setup-node@v4
               with:
                 node-version: 24
+                node-version: 24
             - uses: engineerd/configurator@v0.0.10
               with: 
                 name: "Wix Toolset 3.1.4"
@@ -260,11 +271,14 @@ jobs:
                 pathInArchive: "/"
             - name: Setup Yarn with Corepack
               run: corepack enable
+            - name: Setup Yarn with Corepack
+              run: corepack enable
             - name: Install deps
               uses: nick-fields/retry@v3
               with:
                 max_attempts: 3
                 retry_on: error
+                command: yarn install
                 command: yarn install
                 timeout_minutes: 10
                 on_retry_command: rm -rfv node_modules
@@ -308,6 +322,7 @@ jobs:
             - uses: actions/setup-node@v4
               with:
                 node-version: 24
+                node-version: 24
             - uses: engineerd/configurator@v0.0.10
               with: 
                 name: "Wix Toolset 3.1.4"
@@ -315,11 +330,14 @@ jobs:
                 pathInArchive: "/"
             - name: Setup Yarn with Corepack
               run: corepack enable
+            - name: Setup Yarn with Corepack
+              run: corepack enable
             - name: Install deps
               uses: nick-fields/retry@v3
               with:
                 max_attempts: 3
                 retry_on: error
+                command: yarn install 
                 command: yarn install 
                 timeout_minutes: 10
                 on_retry_command: rm -rfv node_modules
