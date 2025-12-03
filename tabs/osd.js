@@ -7,7 +7,7 @@ import jBox from 'jbox';
 import { debounce } from 'throttle-debounce';
 
 import FC from './../js/fc';
-import { GUI, TABS } from './../js/gui';
+import GUI from './../js/gui';
 import MSP from './../js/msp';
 import MSPCodes from './../js/msp/MSPCodes';
 import mspHelper from './../js/msp/MSPHelper';
@@ -15,8 +15,8 @@ import Settings from './../js/settings';
 import { globalSettings } from './../js/globalSettings';
 import { PortHandler } from './../js/port_handler';
 import i18n from './../js/localization';
-import store from './../js/store';
 import dialog from './../js/dialog';
+import bridge from './../js/bridge';
 
 var SYM = SYM || {};
 SYM.LAST_CHAR = 225; // For drawing the font preview
@@ -271,8 +271,8 @@ FONT.openFontFile = function ($preview) {
                 return;
             }
 
-            if (result.filePaths.length == 1) {
-                    window.electronAPI.readFile(result.filePaths[0]).then(response => {
+            if (result.files.length == 1) {
+                    bridge.readFile(result.files[0]).then(response => {
                     if (response.error) {
                         GUI.log(i18n.getMessage('ErrorReadingFile'));
                         console.log(response.error);
@@ -3030,7 +3030,7 @@ OSD.GUI.updateFields = function(event) {
             .attr('checked', isGuidesChecked)
             .on('change', function () {
                 OSD.GUI.updateGuidesView(this.checked);
-                store.set('showOSDGuides', this.checked);
+                bridge.storeSet('showOSDGuides', this.checked);
                 OSD.GUI.updatePreviews();
             })
         );
@@ -3204,8 +3204,13 @@ OSD.GUI.updateMapPreview = function(mapCenter, name, directionSymbol, centerSymb
 
 OSD.GUI.updatePreviews = function() {
     // buffer the preview;
+   
+    if (!OSD.data) {
+        return;
+    }
+    
     OSD.data.preview = [];
-
+    
     if (OSD.data.display_size != undefined) {
         // clear the buffer
         for (let i = 0; i < OSD.data.display_size.total; i++) {
@@ -3550,14 +3555,14 @@ HARDWARE.update = function(callback) {
     });
 };
 
-TABS.osd = {};
-TABS.osd.initialize = function (callback) {
+const osdTab = {};
+osdTab.initialize = function (callback) {
 
     mspHelper.loadServoMixRules();
     mspHelper.loadLogicConditions();
 
-    if (GUI.active_tab != 'osd') {
-        GUI.active_tab = 'osd';
+    if (GUI.active_tab !== this) {
+        GUI.active_tab = this;
     }
 
     function save_to_eeprom() {
@@ -3590,7 +3595,7 @@ TABS.osd.initialize = function (callback) {
             });
 
             // Initialise guides checkbox
-            isGuidesChecked = store.get('showOSDGuides', false);
+            isGuidesChecked = bridge.storeGet('showOSDGuides', false);
 
             // Setup switch indicators
             $(".osdSwitchInd_channel option").each(function() {
@@ -3670,7 +3675,7 @@ TABS.osd.initialize = function (callback) {
                 }
                 $fontPicker.removeClass('active');
                 $(this).addClass('active');
-                store.set('osd_font', $(this).data('font-file'));
+                bridge.storeSet('osd_font', $(this).data('font-file'));
                 
                 import(`./../resources/osd/analogue/${$(this).data('font-file')}.mcm?raw`).then(({default: data}) => {
                     FONT.parseMCMFontFile(data);
@@ -3681,7 +3686,7 @@ TABS.osd.initialize = function (callback) {
             });
 
             // load the last selected font when we change tabs
-            var osd_font = store.get('osd_font', false);
+            var osd_font = bridge.storeGet('osd_font', false);
             var previous_font_button;
             if (osd_font) {
                 previous_font_button = $('.fontbuttons button[data-font-file="' + osd_font + '"]');
@@ -4289,7 +4294,7 @@ function updatePanServoPreview() {
     OSD.GUI.updatePreviews();
 }
 
-TABS.osd.cleanup = function (callback) {
+osdTab.cleanup = function (callback) {
     PortHandler.flush_callbacks();
 
     // unbind "global" events
@@ -4301,3 +4306,5 @@ TABS.osd.cleanup = function (callback) {
 
     if (callback) callback();
 };
+
+export default osdTab;

@@ -26,8 +26,8 @@ var globalSettings = {
     assistnowOfflineDate: 0,
     store: null,
     saveAssistnowData:  function() {
-        this.store.set('assistnow_offline_data', this.assistnowOfflineData);
-        this.store.set('assistnow_offline_date', this.assistnowOfflineDate);
+        this.bridge.storeSet('assistnow_offline_data', this.assistnowOfflineData);
+        this.bridge.storeSet('assistnow_offline_date', this.assistnowOfflineDate);
     }
 };
 

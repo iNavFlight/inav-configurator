@@ -10,19 +10,18 @@ import MSP from './../js/msp';
 import MSPCodes from './../js/msp/MSPCodes';
 import mspHelper from './../js/msp/MSPHelper';
 import FC from './../js/fc';
-import { GUI, TABS } from './../js/gui';
+import GUI from './../js/gui';
 import i18n from './../js/localization';
 import { mixer } from './../js/model';
 import interval from './../js/intervals';
 
-TABS.magnetometer = {};
+const magnetometerTab = {};
 
-
-TABS.magnetometer.initialize = function (callback) {
+magnetometerTab.initialize = function (callback) {
     var self = this;
 
-    if (GUI.active_tab != 'magnetometer') {
-        GUI.active_tab = 'magnetometer';
+    if (GUI.active_tab !== this) {
+        GUI.active_tab = this;
     }
 
     self.alignmentConfig = {
@@ -58,16 +57,28 @@ TABS.magnetometer.initialize = function (callback) {
         // Pitch and roll must be inverted
         function (callback) {
             mspHelper.getSetting("align_mag_roll").then(function (data) {
+                if (data == null) {
+                    console.log("while settting align_mag_roll, data is null or undefined");
+                    return;
+                }
                 self.alignmentConfig.roll = parseInt(data.value, 10) / 10;
             }).then(callback)
         },
         function (callback) {
             mspHelper.getSetting("align_mag_pitch").then(function (data) {
+                if (data == null) {
+                    console.log("while settting align_mag_pitch, data is null or undefined");
+                    return;
+                }
                 self.alignmentConfig.pitch = parseInt(data.value, 10) / 10;
             }).then(callback)
         },
         function (callback) {
             mspHelper.getSetting("align_mag_yaw").then(function (data) {
+                if (data == null) {
+                    console.log("while settting align_mag_yaw, data is null or undefined");
+                    return;
+                }
                 self.alignmentConfig.yaw = parseInt(data.value, 10) / 10;
             }).then(callback)
         }
@@ -242,6 +253,11 @@ TABS.magnetometer.initialize = function (callback) {
     }
 
     function updateBoardRollAxis(value) {
+        if (value == null) {
+            console.log("in updateBoardRollAxis, value is null or undefined");
+            return;
+        }
+
         self.boardAlignmentConfig.roll = Number(value);
         self.pageElements.board_roll_slider.val(self.boardAlignmentConfig.roll);
         self.pageElements.orientation_board_roll.val(self.boardAlignmentConfig.roll);
@@ -587,7 +603,7 @@ TABS.magnetometer.initialize = function (callback) {
 };
 
 
-TABS.magnetometer.initialize3D = function () {
+magnetometerTab.initialize3D = function () {
 
     var self = this,
         canvas,
@@ -786,8 +802,10 @@ TABS.magnetometer.initialize3D = function () {
 };
 
 
-TABS.magnetometer.cleanup = function (callback) {
+magnetometerTab.cleanup = function (callback) {
     $(window).off('resize', this.resize3D);
 
     if (callback) callback();
 };
+
+export default magnetometerTab;

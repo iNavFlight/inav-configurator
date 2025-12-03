@@ -2,7 +2,7 @@
 
 import semver from 'semver';
 
-import { GUI } from './gui';
+import GUI from './gui';
 import jBox from 'jbox';
 import i18n from './localization';
 

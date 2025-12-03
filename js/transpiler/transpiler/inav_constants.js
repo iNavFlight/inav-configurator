@@ -84,6 +84,7 @@ const OPERATION = {
   DISABLE_GPS_FIX: 53,
   RESET_MAG_CALIBRATION: 54,
   SET_GIMBAL_SENSITIVITY: 55,
+  OVERRIDE_MIN_GROUND_SPEED: 56,
 };
 
 /**
@@ -136,6 +137,10 @@ const FLIGHT_PARAM = {
   FLOWN_LOITER_RADIUS: 43,
   CRSF_LQ_DOWNLINK: 44,
   CRSF_RSSI_DBM: 45,
+  MIN_GROUND_SPEED: 46,
+  HORIZONTAL_WIND_SPEED: 47,
+  WIND_DIRECTION: 48,
+  RELATIVE_WIND_OFFSET: 49,
 };
 
 /**
@@ -319,6 +324,10 @@ const FLIGHT_PARAM_NAMES = {
   [43]: 'flownLoiterRadius',
   [44]: 'crsfLqDownlink',
   [45]: 'crsfRssiDbm',
+  [46]: 'minGroundSpeed',
+  [47]: 'horizontalWindSpeed',
+  [48]: 'windDirection',
+  [49]: 'relativeWindOffset',
 };
 
 /**

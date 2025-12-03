@@ -610,10 +610,11 @@ class INAVCodeGenerator {
       }
 
       // Check for rc channel with bounds validation
+      // Supports both rc[N] and rc[N].value (both are equivalent)
       if (value.startsWith('rc[')) {
-        const match = value.match(/^rc\[(\d+)\]$/);
+        const match = value.match(/^rc\[(\d+)\](?:\.value)?$/);
         if (!match) {
-          this.errorHandler.addError(`Invalid rc syntax '${value}'. Expected rc[1-18].`, null, 'invalid_rc');
+          this.errorHandler.addError(`Invalid rc syntax '${value}'. Expected rc[1-18] or rc[1-18].value`, null, 'invalid_rc');
           return { type: OPERAND_TYPE.VALUE, value: 0 };
         }
         const index = parseInt(match[1], 10);

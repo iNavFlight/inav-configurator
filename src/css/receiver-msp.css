@@ -1,4 +1,3 @@
 @import 'tabs/receiver_msp.css';
 @import './opensans_webfontkit/fonts.css';
-@import '../../js/libraries/jquery.nouislider.min.css';
-@import '../../js/libraries/jquery.nouislider.pips.min.css';
+@import '../../node_modules/nouislider/dist/nouislider.css';

@@ -6,7 +6,7 @@ import './../js/libraries/jquery.flightindicators';
 
 import MSPChainerClass from './../js/msp/MSPchainer';
 import FC from './../js/fc';
-import { GUI, TABS } from './../js/gui';
+import GUI from './../js/gui';
 import MSP from './../js/msp';
 import MSPCodes from './../js/msp/MSPCodes';
 import i18n from './../js/localization';
@@ -16,16 +16,17 @@ import SerialBackend from './../js/serial_backend';
 import { mixer } from './../js/model';
 import BitHelper from './../js/bitHelper';
 import dialog from '../js/dialog';
+import { set } from 'ol/transform';
 
-TABS.setup = {
-    yaw_fix: 0.0
-};
+const setupTab = {};
 
-TABS.setup.initialize = function (callback) {
+setupTab.yaw_fix = 0.0;
+
+setupTab.initialize = function (callback) {
     var self = this;
-
-    if (GUI.active_tab != 'setup') {
-        GUI.active_tab = 'setup';
+    
+    if (GUI.active_tab !== this) {
+        GUI.active_tab = this;
     }
 
     var loadChainer = new MSPChainerClass();
@@ -107,14 +108,14 @@ TABS.setup.initialize = function (callback) {
         });
 
         // display current yaw fix value (important during tab re-initialization)
-        $('div#interactive_block > a.reset').text(i18n.getMessage('initialSetupButtonResetZaxisValue', [self.yaw_fix]));
+        $('div#interactive_block > a.reset').text(i18n.getMessage('initialSetupButtonResetZaxisValue', [setupTab.yaw_fix]));
 
         // reset yaw button hook
         $('div#interactive_block > a.reset').on('click', function () {
-            self.yaw_fix = FC.SENSOR_DATA.kinematics[2] * - 1.0;
-            $(this).text(i18n.getMessage('initialSetupButtonResetZaxisValue', [self.yaw_fix]));
+            setupTab.yaw_fix = FC.SENSOR_DATA.kinematics[2] * - 1.0;
+            $(this).text(i18n.getMessage('initialSetupButtonResetZaxisValue', [setupTab.yaw_fix]));
 
-            console.log('YAW reset to 0 deg, fix: ' + self.yaw_fix + ' deg');
+            console.log('YAW reset to 0 deg, fix: ' + setupTab.yaw_fix + ' deg');
         });
 
         // cached elements
@@ -207,7 +208,7 @@ TABS.setup.initialize = function (callback) {
     }
 };
 
-TABS.setup.initialize3D = function () {
+setupTab.initialize3D = function () {
     var self = this,
         loader,
         canvas,
@@ -293,7 +294,7 @@ TABS.setup.initialize3D = function () {
 
         // compute the changes
         model.rotation.x = (FC.SENSOR_DATA.kinematics[1] * -1.0) * 0.017453292519943295;
-        modelWrapper.rotation.y = ((FC.SENSOR_DATA.kinematics[2] * -1.0) - self.yaw_fix) * 0.017453292519943295;
+        modelWrapper.rotation.y = ((FC.SENSOR_DATA.kinematics[2] * -1.0) -  setupTab.yaw_fix) * 0.017453292519943295;
         model.rotation.z = (FC.SENSOR_DATA.kinematics[0] * -1.0) * 0.017453292519943295;
 
         // draw
@@ -312,8 +313,10 @@ TABS.setup.initialize3D = function () {
     $(window).on('resize', this.resize3D);
 };
 
-TABS.setup.cleanup = function (callback) {
+setupTab.cleanup = function (callback) {
     $(window).off('resize', this.resize3D);
 
     if (callback) callback();
 };
+
+export default setupTab;

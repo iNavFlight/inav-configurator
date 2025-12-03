@@ -4,6 +4,7 @@ import CONFIGURATOR from './data_storage';
 import FC from './fc';
 import { globalSettings } from './globalSettings';
 import i18n from './localization';
+import bridge from './bridge';
 
 var update = {
 
@@ -21,7 +22,7 @@ var update = {
 
             // If this is a master branch firmware, this will find a 404 as there is no tag tree. So default to master for docs.
             $.ajax({
-                url: globalSettings.docsTreeLocation + 'Settings.md',
+                url: bridge.proxy(globalSettings.docsTreeLocation + 'Settings.md'),
                 method: "HEAD",
                 statusCode: {
                     404: function () {

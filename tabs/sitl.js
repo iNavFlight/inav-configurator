@@ -2,11 +2,11 @@
 
 import smalltalk from 'smalltalk';
 
-import { GUI, TABS } from './../js/gui';
+import GUI from './../js/gui';
 import i18n from './../js/localization';
 import { SITLProcess, SitlSerialPortUtils } from './../js/sitl';
-import store from './../js/store';
-import dialog from '../js/dialog';
+import dialog from './../js/dialog';
+import bridge from './../js/bridge';
 
 const localhost = "127.0.0.1"
 
@@ -86,11 +86,11 @@ const stdProfiles = [
 
 var SITL_LOG = "";
 
-TABS.sitl = {};
-TABS.sitl.initialize = (callback) => {
+const sitlTab = {};
+sitlTab.initialize = (callback) => {
  
-    if (GUI.active_tab != 'sitl') {
-        GUI.active_tab = 'sitl';
+    if (GUI.active_tab !== this) {
+        GUI.active_tab = this;
     }
 
     import('./sitl.html?raw').then(({default: html}) => GUI.load(html, function () {
@@ -133,7 +133,7 @@ TABS.sitl.initialize = (callback) => {
         }
 
         profiles = structuredClone(stdProfiles);
-        const sitlProfiles = store.get('sitlProfiles', false);
+        const sitlProfiles = bridge.storeGet('sitlProfiles', false);
         if (sitlProfiles) {
             profiles.push(...sitlProfiles);
         }
@@ -392,7 +392,7 @@ TABS.sitl.initialize = (callback) => {
                     protocollPreset_e.append(`<option value="${protocoll.name}">${protocoll.name}</option>`);
                 });
 
-                const sitlLastProfile = store.get('sitlLastProfile', false);
+                const sitlLastProfile = bridge.storeGet('sitlLastProfile', false);
                 if (sitlLastProfile) {    
                     var element = profiles.find(profile => {
                         return profile.name == sitlLastProfile;
@@ -417,7 +417,7 @@ TABS.sitl.initialize = (callback) => {
                     profilesToSave.push(profile);
             });
 
-            store.set('sitlProfiles', profilesToSave);
+            bridge.storeSet('sitlProfiles', profilesToSave);
         
         }
 
@@ -484,7 +484,7 @@ TABS.sitl.initialize = (callback) => {
             simIp_e.val(currentProfile.ip).trigger('change'); 
             useImu_e.prop('checked', currentProfile.useImu).trigger('change');
 
-            store.set('sitlLastProfile', selected);
+            bridge.storeSet('sitlLastProfile', selected);
         }
 
         function renderChanMapTable() 
@@ -506,7 +506,7 @@ TABS.sitl.initialize = (callback) => {
 
                 row.find(".inavChannel").val(mapping[i]).on('change', (sender) => {
                     mapping[$(sender.target).data('out')] = parseInt($(sender.target).val());
-                    store.set('sitlMapping', mapping);
+                    bridge.storeSet('sitlMapping', mapping);
                 });
             }
         }
@@ -542,8 +542,10 @@ TABS.sitl.initialize = (callback) => {
     }));  
 };
 
-TABS.sitl.cleanup = (callback) => {
+sitlTab.cleanup = (callback) => {
     SitlSerialPortUtils.stopPollSerialPorts();
     if (callback) 
         callback();
 };
+
+export default sitlTab;

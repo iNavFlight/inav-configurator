@@ -1,7 +1,7 @@
 'use strict';
 
 import FC from './fc';
-import store from './store';
+import bridge from './bridge';
 
 var settingsCache = (function() {
 
@@ -15,12 +15,12 @@ var settingsCache = (function() {
     }
 
     publicScope.flush = function() {
-        store.delete(SETTINGS_KEY);
+        bridge.storeDelete(SETTINGS_KEY);
         console.log('Settings cache flushed');
     };
 
     publicScope.get = function(settingName) {
-        let settings = store.get(SETTINGS_KEY, null);
+        let settings = bridge.storeGet(SETTINGS_KEY, null);
 
         if (settings === null) {
             return undefined;
@@ -30,14 +30,14 @@ var settingsCache = (function() {
     };
 
     publicScope.set = function(settingName, value) {
-        let settings = store.get(SETTINGS_KEY, null);
+        let settings = bridge.storeGet(SETTINGS_KEY, null);
 
         if (settings === null) {
             settings = {};
         }
 
         settings[privateScope.getSetingKey(settingName)] = value;
-        store.set(SETTINGS_KEY, settings);
+        bridge.storeSet(SETTINGS_KEY, settings);
     };
 
     return publicScope;
