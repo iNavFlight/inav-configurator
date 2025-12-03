@@ -34,6 +34,9 @@ export default defineConfig({
         devOptions: {
             enabled: true
         },
+        workbox: {
+          maximumFileSizeToCacheInBytes: 10 * 1024 * 1024, // 10 MB (for monaco editor)
+        },
         includeAssets: ['favicon.ico', 'apple-touch-icon.png'],
         manifest: {
           name: pkg.displayName,
