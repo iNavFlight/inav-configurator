@@ -161,6 +161,8 @@ jobs:
             command: yarn install
             timeout_minutes: 10
             on_retry_command: rm -rfv node_modules
+        - name: Rebuild Electron
+          run: npx electron-rebuild
         - name: Build MacOS arm64
           run: yarn run make -- --arch="arm64"
         - name: Upload MacOS arm64 zip
@@ -211,6 +213,8 @@ jobs:
             command: yarn install
             timeout_minutes: 10
             on_retry_command: rm -rfv node_modules
+        - name: Rebuild Electron
+          run: npx electron-rebuild
         - name: Build MacOS x64
           run: yarn run make -- --arch="x64"
         - name: Upload MacOS x64 zip
