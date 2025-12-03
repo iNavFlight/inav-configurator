@@ -7,7 +7,7 @@ import jBox from 'jbox';
 import { debounce } from 'throttle-debounce';
 
 import FC from './../js/fc';
-import { GUI, TABS } from './../js/gui';
+import GUI from './../js/gui';
 import MSP from './../js/msp';
 import MSPCodes from './../js/msp/MSPCodes';
 import mspHelper from './../js/msp/MSPHelper';
@@ -3204,8 +3204,13 @@ OSD.GUI.updateMapPreview = function(mapCenter, name, directionSymbol, centerSymb
 
 OSD.GUI.updatePreviews = function() {
     // buffer the preview;
+   
+    if (!OSD.data) {
+        return;
+    }
+    
     OSD.data.preview = [];
-
+    
     if (OSD.data.display_size != undefined) {
         // clear the buffer
         for (let i = 0; i < OSD.data.display_size.total; i++) {
@@ -3550,14 +3555,14 @@ HARDWARE.update = function(callback) {
     });
 };
 
-TABS.osd = {};
-TABS.osd.initialize = function (callback) {
+const osdTab = {};
+osdTab.initialize = function (callback) {
 
     mspHelper.loadServoMixRules();
     mspHelper.loadLogicConditions();
 
-    if (GUI.active_tab != 'osd') {
-        GUI.active_tab = 'osd';
+    if (GUI.active_tab !== this) {
+        GUI.active_tab = this;
     }
 
     function save_to_eeprom() {
@@ -4289,7 +4294,7 @@ function updatePanServoPreview() {
     OSD.GUI.updatePreviews();
 }
 
-TABS.osd.cleanup = function (callback) {
+osdTab.cleanup = function (callback) {
     PortHandler.flush_callbacks();
 
     // unbind "global" events
@@ -4301,3 +4306,5 @@ TABS.osd.cleanup = function (callback) {
 
     if (callback) callback();
 };
+
+export default osdTab;

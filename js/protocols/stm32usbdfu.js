@@ -12,8 +12,9 @@
 */
 'use strict';
 
-import { GUI, TABS } from './../gui';
+import GUI from './../gui';
 import i18n from './../localization';
+import firmwareFlasherTab from '../../tabs/firmware_flasher';
 
 var STM32DFU_protocol = function () {
     this.callback = null;
@@ -91,7 +92,7 @@ STM32DFU_protocol.prototype.connect = function (usbDevices, hex, options, callba
     self.verify_hex = [];
 
     // reset progress bar to initial state
-    TABS.firmware_flasher.flashingMessage(null, TABS.firmware_flasher.FLASH_MESSAGE_TYPES.NEUTRAL).flashProgress(0);
+    firmwareFlasherTab.flashingMessage(null, firmwareFlasherTab.FLASH_MESSAGE_TYPES.NEUTRAL).flashProgress(0);
 
     navigator.usb.getDevices().then(devices => {
         var dev = null;
@@ -626,7 +627,7 @@ STM32DFU_protocol.prototype.upload_procedure = function (step) {
                 console.log('Initiate read unprotect');
                 let messageReadProtected = i18n.getMessage('stm32ReadProtected');
                 GUI.log(messageReadProtected);
-                TABS.firmware_flasher.flashingMessage(messageReadProtected, TABS.firmware_flasher.FLASH_MESSAGE_TYPES.ACTION);
+                firmwareFlasherTab.flashingMessage(messageReadProtected, firmwareFlasherTab.FLASH_MESSAGE_TYPES.ACTION);
 
                 self.controlTransfer('out', self.request.DNLOAD, 0, 0, 0, [0x92], function () { // 0x92 initiates read unprotect
                     self.controlTransfer('in', self.request.GETSTATUS, 0, 0, 6, 0, function (data) {
@@ -637,7 +638,7 @@ STM32DFU_protocol.prototype.upload_procedure = function (step) {
                             var incr = 1000; // one sec increments
                             var waitForErase = setInterval(function () {
 
-                                TABS.firmware_flasher.flashProgress(Math.min(timeSpentWaiting / total_delay, 1) * 100);
+                                firmwareFlasherTab.flashProgress(Math.min(timeSpentWaiting / total_delay, 1) * 100);
 
                                 if(timeSpentWaiting < total_delay) {
                                     timeSpentWaiting += incr;
@@ -652,14 +653,14 @@ STM32DFU_protocol.prototype.upload_procedure = function (step) {
                                         let messageUnprotectUnplug = i18n.getMessage('stm32UnprotectUnplug');
                                         GUI.log(messageUnprotectUnplug);
 
-                                        TABS.firmware_flasher.flashingMessage(messageUnprotectUnplug, TABS.firmware_flasher.FLASH_MESSAGE_TYPES.ACTION)
+                                        firmwareFlasherTab.flashingMessage(messageUnprotectUnplug, firmwareFlasherTab.FLASH_MESSAGE_TYPES.ACTION)
                                                              .flashProgress(0);
 
                                     } else { // unprotecting the flight controller did not work. It did not reboot.
                                         console.log('Failed to execute unprotect memory command');
 
                                         GUI.log(i18n.getMessage('stm32UnprotectFailed'));
-                                        TABS.firmware_flasher.flashingMessage(i18n.getMessage('stm32UnprotectFailed'), TABS.firmware_flasher.FLASH_MESSAGE_TYPES.INVALID);
+                                        firmwareFlasherTab.flashingMessage(i18n.getMessage('stm32UnprotectFailed'), firmwareFlasherTab.FLASH_MESSAGE_TYPES.INVALID);
                                         console.log(data);
                                         self.cleanup();
                                     }
@@ -669,7 +670,7 @@ STM32DFU_protocol.prototype.upload_procedure = function (step) {
                                 console.log('Failed to initiate unprotect memory command');
                                 let messageUnprotectInitFailed = i18n.getMessage('stm32UnprotectInitFailed');
                                 GUI.log(messageUnprotectInitFailed);
-                                TABS.firmware_flasher.flashingMessage(messageUnprotectInitFailed, TABS.firmware_flasher.FLASH_MESSAGE_TYPES.INVALID);
+                                firmwareFlasherTab.flashingMessage(messageUnprotectInitFailed, firmwareFlasherTab.FLASH_MESSAGE_TYPES.INVALID);
                                 self.cleanup();
                         }
                     });
@@ -786,20 +787,20 @@ STM32DFU_protocol.prototype.upload_procedure = function (step) {
 
                 if (erase_pages.length === 0) {
                     console.log('Aborting, No flash pages to erase');
-                    TABS.firmware_flasher.flashingMessage(i18n.getMessage('stm32InvalidHex'), TABS.firmware_flasher.FLASH_MESSAGE_TYPES.INVALID);
+                    firmwareFlasherTab.flashingMessage(i18n.getMessage('stm32InvalidHex'), firmwareFlasherTab.FLASH_MESSAGE_TYPES.INVALID);
                     self.cleanup();
                     break;
                 }
 
 
-                TABS.firmware_flasher.flashingMessage(i18n.getMessage('stm32Erase'), TABS.firmware_flasher.FLASH_MESSAGE_TYPES.NEUTRAL);
+                firmwareFlasherTab.flashingMessage(i18n.getMessage('stm32Erase'), firmwareFlasherTab.FLASH_MESSAGE_TYPES.NEUTRAL);
                 console.log('Executing local chip erase', erase_pages);
 
                 var page = 0;
                 var total_erased = 0; // bytes
 
                 var erase_page_next = function() {
-                    TABS.firmware_flasher.flashProgress((page + 1) / erase_pages.length * 100);
+                    firmwareFlasherTab.flashProgress((page + 1) / erase_pages.length * 100);
                     page++;
 
                     if(page == erase_pages.length) {
@@ -874,7 +875,7 @@ STM32DFU_protocol.prototype.upload_procedure = function (step) {
             // upload
             // we dont need to clear the state as we are already using DFU_DNLOAD
             console.log('Writing data ...');
-            TABS.firmware_flasher.flashingMessage(i18n.getMessage('stm32Flashing'), TABS.firmware_flasher.FLASH_MESSAGE_TYPES.NEUTRAL);
+            firmwareFlasherTab.flashingMessage(i18n.getMessage('stm32Flashing'), firmwareFlasherTab.FLASH_MESSAGE_TYPES.NEUTRAL);
 
             var blocks = self.hex.data.length - 1;
             var flashing_block = 0;
@@ -903,7 +904,7 @@ STM32DFU_protocol.prototype.upload_procedure = function (step) {
                                     self.controlTransfer('in', self.request.GETSTATUS, 0, 0, 6, 0, function (data) {
                                         if (data[4] == self.state.dfuDNLOAD_IDLE) {
                                             // update progress bar
-                                            TABS.firmware_flasher.flashProgress(bytes_flashed_total / (self.hex.bytes_total * 2) * 100);
+                                            firmwareFlasherTab.flashProgress(bytes_flashed_total / (self.hex.bytes_total * 2) * 100);
 
                                             // flash another page
                                             write();
@@ -946,7 +947,7 @@ STM32DFU_protocol.prototype.upload_procedure = function (step) {
         case 5:
             // verify
             console.log('Verifying data ...');
-            TABS.firmware_flasher.flashingMessage(i18n.getMessage('stm32Verifying'), TABS.firmware_flasher.FLASH_MESSAGE_TYPES.NEUTRAL);
+            firmwareFlasherTab.flashingMessage(i18n.getMessage('stm32Verifying'), firmwareFlasherTab.FLASH_MESSAGE_TYPES.NEUTRAL);
 
             var blocks = self.hex.data.length - 1;
             var reading_block = 0;
@@ -982,7 +983,7 @@ STM32DFU_protocol.prototype.upload_procedure = function (step) {
                         bytes_verified_total += bytes_to_read;
 
                         // update progress bar
-                        TABS.firmware_flasher.flashProgress((self.hex.bytes_total + bytes_verified_total) / (self.hex.bytes_total * 2) * 100);
+                        firmwareFlasherTab.flashProgress((self.hex.bytes_total + bytes_verified_total) / (self.hex.bytes_total * 2) * 100);
 
                         // verify another page
                         read();
@@ -1014,14 +1015,14 @@ STM32DFU_protocol.prototype.upload_procedure = function (step) {
                         if (verify) {
                             console.log('Programming: SUCCESSFUL');
                             // update progress bar
-                            TABS.firmware_flasher.flashingMessage(i18n.getMessage('stm32ProgrammingSuccessful'), TABS.firmware_flasher.FLASH_MESSAGE_TYPES.VALID);
+                            firmwareFlasherTab.flashingMessage(i18n.getMessage('stm32ProgrammingSuccessful'), firmwareFlasherTab.FLASH_MESSAGE_TYPES.VALID);
 
                             // proceed to next step
                             self.leave();
                         } else {
                             console.log('Programming: FAILED');
                             // update progress bar
-                            TABS.firmware_flasher.flashingMessage(i18n.getMessage('stm32ProgrammingFailed'), TABS.firmware_flasher.FLASH_MESSAGE_TYPES.INVALID);
+                            firmwareFlasherTab.flashingMessage(i18n.getMessage('stm32ProgrammingFailed'), firmwareFlasherTab.FLASH_MESSAGE_TYPES.INVALID);
 
                             // disconnect
                             self.cleanup();

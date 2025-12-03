@@ -1,6 +1,6 @@
 'use strict';
 
-import { GUI } from './../js/gui';
+import GUI from './../js/gui';
 import i18n from './localization';
 import ConnectionSerial from './connection/connectionSerial';
 import bridge from './bridge';

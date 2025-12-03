@@ -2,7 +2,7 @@
 
 import  { ConnectionType, Connection } from './connection';
 
-import { GUI } from './../gui';
+import GUI from './../gui';
 import i18n from './../localization';
 import bridge from '../bridge';
 

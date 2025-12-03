@@ -3,7 +3,7 @@
 import semver from 'semver';
 
 import './../injected_methods';
-import { GUI } from './../gui';
+import GUI from './../gui';
 import MSP from './../msp';
 import MSPCodes from './MSPCodes';
 import FC from './../fc';

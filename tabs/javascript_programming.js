@@ -8,7 +8,7 @@
 
 import MSPChainerClass from './../js/msp/MSPchainer.js';
 import mspHelper from './../js/msp/MSPHelper.js';
-import { GUI, TABS } from './../js/gui.js';
+import GUI from './../js/gui.js';
 import FC from './../js/fc.js';
 import i18n from './../js/localization.js';
 import { Transpiler } from './../js/transpiler/index.js';
@@ -18,6 +18,7 @@ import examples from './../js/transpiler/examples/index.js';
 import settingsCache from './../js/settingsCache.js';
 import * as monaco from 'monaco-editor';
 import tsWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker'
+import cliTab from './cli.js';
 
 self.MonacoEnvironment = {
   getWorker(_, label) {
@@ -28,7 +29,7 @@ self.MonacoEnvironment = {
   }
 }
 
-TABS.javascript_programming = {
+const javascriptProgrammingTab = {
 
     currentProgrammingPIDProfile: null,
     isDirty: false,
@@ -42,8 +43,8 @@ TABS.javascript_programming = {
     initialize: function (callback) {
         const self = this;
 
-        if (GUI.active_tab !== 'javascript_programming') {
-            GUI.active_tab = 'javascript_programming';
+        if (GUI.active_tab !== this) {
+            GUI.active_tab = this;
         }
 
         import('./javascript_programming.html?raw').then(({default: html}) => {
@@ -694,3 +695,5 @@ if (flight.homeDistance > 100) {
         if (callback) callback();
     }
 };
+
+export default javascriptProgrammingTab;

@@ -1,6 +1,6 @@
 'use strict';
 
-import { GUI } from './../js/gui';
+import GUI from './../js/gui';
 import FC from './fc';
 import MSP from './msp';
 import MSPCodes from './../js/msp/MSPCodes';
