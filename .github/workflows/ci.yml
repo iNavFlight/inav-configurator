@@ -148,12 +148,6 @@ jobs:
           with:
             node-version: 24
             #check-latest: true
-        - name: Renstall X Code cli
-          run: |
-           sudo rm -rf /Library/Developer/CommandLineTools
-           xcode-select --install
-        - name: Setup Yarn with Corepack
-          run: corepack enable
         - name: Install deps
           uses: nick-fields/retry@v3
           with:
@@ -199,12 +193,6 @@ jobs:
           with:
             node-version: 24
             #check-latest: true
-        - name: Reinstall X Code cli
-          run: |
-           sudo rm -rf /Library/Developer/CommandLineTools
-           xcode-select --install
-        - name: Setup Yarn with Corepack
-          run: corepack enable
         - name: Install deps
           uses: nick-fields/retry@v3
           with:

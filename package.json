@@ -73,5 +73,6 @@
     "vite": "^7.1.4",
     "vite-plugin-native": "^2.2.2",
     "vite-plugin-pwa": "^1.1.0"
-  }
+  },
+  "packageManager": "yarn@1.22.1"
 }
