@@ -4,13 +4,12 @@
  *
  * Tests PID controller operand access.
  *
- * KNOWN BUG TO DETECT:
- * pid.js claims to expose many properties per PID:
- * - setpoint (i*10+0), measurement (i*10+1)
- * - P gain (i*10+2), I gain (i*10+3), D gain (i*10+4), FF gain (i*10+5)
- * - output (i*10+6), enabled (i*10+7)
+ * FIRMWARE DESIGN:
+ * The firmware intentionally exposes only PID output values via logic conditions,
+ * not the internal setpoint, measurement, or gain parameters. This is by design
+ * to keep the logic condition interface simple and focused on reading results.
  *
- * FIRMWARE REALITY: Only PID OUTPUT is exposed!
+ * Available PID operands:
  * - Operand 0 = PID 0 output
  * - Operand 1 = PID 1 output
  * - Operand 2 = PID 2 output
@@ -19,7 +18,7 @@
  * Source: logic_condition.c:1078-1082
  *   case LOGIC_CONDITION_OPERAND_TYPE_PID:
  *     if (operand >= 0 && operand < MAX_PROGRAMMING_PID_COUNT) {
- *       retVal = programmingPidGetOutput(operand);  // ONLY OUTPUT!
+ *       retVal = programmingPidGetOutput(operand);  // Only output exposed
  *     }
  *
  * Run with: node test_pid.js
