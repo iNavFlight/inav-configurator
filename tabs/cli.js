@@ -2,7 +2,7 @@
 
 import MSP from './../js/msp';
 import mspQueue from './../js/serial_queue';
-import { GUI, TABS } from './../js/gui';
+import GUI from './../js/gui';
 import CONFIGURATOR from './../js/data_storage';
 import timeout from './../js/timeouts';
 import i18n from './../js/localization';
@@ -16,15 +16,13 @@ import { generateFilename } from './../js/helpers';
 import dialog from '../js/dialog';
 import bridge from '../js/bridge';
 
-TABS.cli = {
-    lineDelayMs: 50,
-    profileSwitchDelayMs: 100,
-    outputHistory: "",
-    cliBuffer: "",
-    GUI: {
-        snippetPreviewWindow: null,
-    },
-};
+const cliTab = {};
+
+cliTab.lineDelayMs = 50;
+cliTab.profileSwitchDelayMs = 100;
+cliTab.outputHistory = "";
+cliTab.cliBuffer = "";
+cliTab.GUI = { snippetPreviewWindow: null };
 
 function removePromptHash(promptText) {
     return promptText.replace(/^# /, '');
@@ -87,11 +85,11 @@ function copyToClipboard(text) {
         .then(onCopySuccessful, onCopyFailed);
 }
 
-TABS.cli.initialize = function (callback) {
+cliTab.initialize = function (callback) {
     var self = this;
 
-    if (GUI.active_tab != 'cli') {
-        GUI.active_tab = 'cli';
+    if (GUI.active_tab !== this) {
+        GUI.active_tab = this;
     }
 
     // Flush MSP queue as well as all MSP registered callbacks
@@ -115,15 +113,15 @@ TABS.cli.initialize = function (callback) {
             p.then((delay) =>
                 new Promise((resolve) => {
                     timeout.add('CLI_send_slowly', () => {
-                        let processingDelay = TABS.cli.lineDelayMs;
+                        let processingDelay = cliTab.lineDelayMs;
                         if (line.toLowerCase().includes('_profile')) {
-                            processingDelay = TABS.cli.profileSwitchDelayMs;
+                            processingDelay = cliTab.profileSwitchDelayMs;
                         }
                         const isLastCommand = outputArray.length === index + 1;
-                        if (isLastCommand && TABS.cli.cliBuffer) {
-                            line = getCliCommand(line, TABS.cli.cliBuffer);
+                        if (isLastCommand && cliTab.cliBuffer) {
+                            line = getCliCommand(line, cliTab.cliBuffer);
                         }
-                        TABS.cli.sendLine(line, () => {
+                        cliTab.sendLine(line, () => {
                             resolve(processingDelay);
                         });
                     }, delay);
@@ -185,21 +183,21 @@ TABS.cli.initialize = function (callback) {
         });
 
         $('.tab-cli .exit').on('click', function () {
-            self.send(getCliCommand('exit\n', TABS.cli.cliBuffer));
+            self.send(getCliCommand('exit\n', cliTab.cliBuffer));
         });
 
         $('.tab-cli .savecmd').on('click', function () {
-            self.send(getCliCommand('save\n', TABS.cli.cliBuffer));
+            self.send(getCliCommand('save\n', cliTab.cliBuffer));
         });
 
         $('.tab-cli .msc').on('click', function () {
-            self.send(getCliCommand('msc\n', TABS.cli.cliBuffer));
+            self.send(getCliCommand('msc\n', cliTab.cliBuffer));
         });
 
         $('.tab-cli .diffall').on('click', function () {
             self.outputHistory = "";
             $('.tab-cli .window .wrapper').empty();
-            self.send(getCliCommand('diff all\n', TABS.cli.cliBuffer));
+            self.send(getCliCommand('diff all\n', cliTab.cliBuffer));
         });
 
         $('.tab-cli .clear').on('click', function () {
@@ -353,8 +351,8 @@ TABS.cli.initialize = function (callback) {
             let delay = CONFIGURATOR.connection.deviceDescription.delay;
             if (delay > 0) {
                 timeout.add('cli_delay', () =>  {
-                    self.send(getCliCommand("cli_delay " +  delay + '\n', TABS.cli.cliBuffer));
-                    self.send(getCliCommand('# ' + i18n.getMessage('connectionBleCliEnter') + '\n', TABS.cli.cliBuffer));
+                    self.send(getCliCommand("cli_delay " +  delay + '\n', cliTab.cliBuffer));
+                    self.send(getCliCommand('# ' + i18n.getMessage('connectionBleCliEnter') + '\n', cliTab.cliBuffer));
                 }, 400);
             }
         }
@@ -363,22 +361,22 @@ TABS.cli.initialize = function (callback) {
     }));
 };
 
-TABS.cli.history = {
+cliTab.history = {
     history: [],
     index:  0
 };
 
-TABS.cli.history.add = function (str) {
+cliTab.history.add = function (str) {
     this.history.push(str);
     this.index = this.history.length;
 };
 
-TABS.cli.history.prev = function () {
+cliTab.history.prev = function () {
     if (this.index > 0) this.index -= 1;
     return this.history[this.index];
 };
 
-TABS.cli.history.next = function () {
+cliTab.history.next = function () {
     if (this.index < this.history.length) this.index += 1;
     return this.history[this.index - 1];
 };
@@ -409,7 +407,7 @@ function setPrompt(text) {
     $('.tab-cli textarea').val(text);
 }
 
-TABS.cli.read = function (readInfo) {
+cliTab.read = function (readInfo) {
     /*  Some info about handling line feeds and carriage return
 
         line feed = LF = \n = 0x0A = 10
@@ -505,15 +503,15 @@ TABS.cli.read = function (readInfo) {
     setPrompt(removePromptHash(this.cliBuffer));
 };
 
-TABS.cli.sendLine = function (line, callback) {
+cliTab.sendLine = function (line, callback) {
     this.send(line + '\n', callback);
 };
 
-TABS.cli.sendAutoComplete = function (line, callback) {
+cliTab.sendAutoComplete = function (line, callback) {
     this.send(line + '\t', callback);
 };
 
-TABS.cli.send = function (line, callback) {
+cliTab.send = function (line, callback) {
     var bufferOut = new ArrayBuffer(line.length);
     var bufView = new Uint8Array(bufferOut);
 
@@ -524,7 +522,7 @@ TABS.cli.send = function (line, callback) {
     CONFIGURATOR.connection.send(bufferOut, callback);
 };
 
-TABS.cli.cleanup = function (callback) {
+cliTab.cleanup = function (callback) {
     if (!(CONFIGURATOR.connectionValid && CONFIGURATOR.cliValid && CONFIGURATOR.cliActive)) {
         if (callback) callback();
         return;
@@ -543,3 +541,5 @@ TABS.cli.cleanup = function (callback) {
         $(CliAutoComplete).off();
     });
 };
+
+export default cliTab;

@@ -2,7 +2,7 @@
 
 import MSPCodes from './../js/msp/MSPCodes';
 import MSP from './../js/msp';
-import { GUI, TABS } from './../js/gui';
+import GUI from './../js/gui';
 import FC from './../js/fc';
 import CONFIGURATOR from './../js/data_storage';
 import interval from './../js/intervals';
@@ -12,8 +12,8 @@ import dialog from '../js/dialog';
 import bridge from '../js/bridge'
 
 
-TABS.logging = {};
-TABS.logging.initialize = function (callback) {
+const loggingTab = {};
+loggingTab.initialize = function (callback) {
     var self = this;
 
     let loggingFileName = null;
@@ -24,8 +24,8 @@ TABS.logging.initialize = function (callback) {
     let webFileBuffer = [];
     let webFileCount = 1;
 
-    if (GUI.active_tab != 'logging') {
-        GUI.active_tab = 'logging';
+    if (GUI.active_tab !== this) {
+        GUI.active_tab = this;
     }
 
     var requested_properties = [],
@@ -300,6 +300,8 @@ TABS.logging.initialize = function (callback) {
     }
 };
 
-TABS.logging.cleanup = function (callback) {
+loggingTab.cleanup = function (callback) {
     if (callback) callback();
 };
+
+export default loggingTab;

@@ -10,19 +10,18 @@ import MSP from './../js/msp';
 import MSPCodes from './../js/msp/MSPCodes';
 import mspHelper from './../js/msp/MSPHelper';
 import FC from './../js/fc';
-import { GUI, TABS } from './../js/gui';
+import GUI from './../js/gui';
 import i18n from './../js/localization';
 import { mixer } from './../js/model';
 import interval from './../js/intervals';
 
-TABS.magnetometer = {};
+const magnetometerTab = {};
 
-
-TABS.magnetometer.initialize = function (callback) {
+magnetometerTab.initialize = function (callback) {
     var self = this;
 
-    if (GUI.active_tab != 'magnetometer') {
-        GUI.active_tab = 'magnetometer';
+    if (GUI.active_tab !== this) {
+        GUI.active_tab = this;
     }
 
     self.alignmentConfig = {
@@ -604,7 +603,7 @@ TABS.magnetometer.initialize = function (callback) {
 };
 
 
-TABS.magnetometer.initialize3D = function () {
+magnetometerTab.initialize3D = function () {
 
     var self = this,
         canvas,
@@ -803,8 +802,10 @@ TABS.magnetometer.initialize3D = function () {
 };
 
 
-TABS.magnetometer.cleanup = function (callback) {
+magnetometerTab.cleanup = function (callback) {
     $(window).off('resize', this.resize3D);
 
     if (callback) callback();
 };
+
+export default magnetometerTab;
