@@ -401,5 +401,39 @@ export default {
     desc: 'CRSF RSSI in dBm',
     readonly: true,
     inavOperand: { type: OPERAND_TYPE.FLIGHT, value: FLIGHT_PARAM.CRSF_RSSI_DBM }
+  },
+
+  // Wind parameters
+  minGroundSpeed: {
+    type: 'number',
+    unit: 'm/s',
+    desc: 'Minimum ground speed in m/s',
+    readonly: true,
+    inavOperand: { type: OPERAND_TYPE.FLIGHT, value: FLIGHT_PARAM.MIN_GROUND_SPEED }
+  },
+
+  horizontalWindSpeed: {
+    type: 'number',
+    unit: 'cm/s',
+    desc: 'Horizontal wind speed in cm/s',
+    readonly: true,
+    inavOperand: { type: OPERAND_TYPE.FLIGHT, value: FLIGHT_PARAM.HORIZONTAL_WIND_SPEED }
+  },
+
+  windDirection: {
+    type: 'number',
+    unit: 'deg',
+    desc: 'Wind direction in degrees (0-359)',
+    readonly: true,
+    range: [0, 359],
+    inavOperand: { type: OPERAND_TYPE.FLIGHT, value: FLIGHT_PARAM.WIND_DIRECTION }
+  },
+
+  relativeWindOffset: {
+    type: 'number',
+    unit: 'deg',
+    desc: 'Relative wind offset in degrees',
+    readonly: true,
+    inavOperand: { type: OPERAND_TYPE.FLIGHT, value: FLIGHT_PARAM.RELATIVE_WIND_OFFSET }
   }
 };

@@ -10,16 +10,23 @@ import MSPChainerClass from './../js/msp/MSPchainer.js';
 import mspHelper from './../js/msp/MSPHelper.js';
 import { GUI, TABS } from './../js/gui.js';
 import FC from './../js/fc.js';
-import path from 'node:path';
 import i18n from './../js/localization.js';
 import { Transpiler } from './../js/transpiler/index.js';
 import { Decompiler } from './../js/transpiler/transpiler/decompiler.js';
 import * as MonacoLoader from './../js/transpiler/editor/monaco_loader.js';
-import apiDefinitions from './../js/transpiler/api/definitions/index.js';
-import { generateTypeDefinitions } from './../js/transpiler/api/types.js';
 import examples from './../js/transpiler/examples/index.js';
 import settingsCache from './../js/settingsCache.js';
+import * as monaco from 'monaco-editor';
+import tsWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker'
 
+self.MonacoEnvironment = {
+  getWorker(_, label) {
+    if (label === 'typescript' || label === 'javascript') {
+      return new tsWorker()
+    }
+    return new editorWorker()
+  }
+}
 
 TABS.javascript_programming = {
 
@@ -39,40 +46,38 @@ TABS.javascript_programming = {
             GUI.active_tab = 'javascript_programming';
         }
 
-        $('#content').load("./tabs/javascript_programming.html", function () {
+        import('./javascript_programming.html?raw').then(({default: html}) => {
+            GUI.load(html, () => {
+                try {
+                    self.initTranspiler();
 
-        self.initTranspiler();
+                    // Initialize editor with INAV configuration
+                    self.editor = MonacoLoader.initializeMonacoEditor(monaco, 'monaco-editor');
 
-        MonacoLoader.loadMonacoEditor()
-            .then(function(monaco) {
-                // Initialize editor with INAV configuration
-                self.editor = MonacoLoader.initializeMonacoEditor(monaco, 'monaco-editor');
+                    // Add INAV type definitions
+                    MonacoLoader.addINAVTypeDefinitions(monaco);
 
-                // Add INAV type definitions
-                MonacoLoader.addINAVTypeDefinitions(monaco);
+                    // Set up linting
+                    MonacoLoader.setupLinting(self.editor, function() {
+                        if (self.lintCode) {
+                            self.lintCode();
+                        }
+                    });
 
-                // Set up linting
-                MonacoLoader.setupLinting(self.editor, function() {
-                    if (self.lintCode) {
-                        self.lintCode();
-                    }
-                });
+                    // Continue with initialization
+                    self.setupEventHandlers();
+                    self.loadExamples();
 
-                // Continue with initialization
-                self.setupEventHandlers();
-                self.loadExamples();
-
-                self.loadFromFC(function() {
-                    self.isDirty = false;
+                    self.loadFromFC(function() {
+                        self.isDirty = false;
+                        GUI.content_ready(callback);
+                    }); 
+                } catch (error) {
+                    console.error('Failed to load Monaco Editor:', error);
                     GUI.content_ready(callback);
-                });
-            })
-            .catch(function(error) {
-                console.error('Failed to load Monaco Editor:', error);
-                GUI.content_ready(callback);
+                }
+
             });
-
-
         });
     },
 
