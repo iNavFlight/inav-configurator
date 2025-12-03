@@ -10,7 +10,9 @@
 'use strict';
 
 import flight from './flight.js';
+import override from './override.js';
 import rc from './rc.js';
+import gvar from './gvar.js';
 import waypoint from './waypoint.js';
 import pid from './pid.js';
 import helpers from './helpers.js';
@@ -20,8 +22,14 @@ export default {
   // Read-only telemetry and state
   flight,
 
+  // Writable overrides
+  override,
+
   // RC receiver channels
   rc,
+
+  // Global variables (read/write)
+  gvar,
 
   // Waypoint navigation
   waypoint,
