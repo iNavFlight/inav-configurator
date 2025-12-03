@@ -476,6 +476,16 @@ if (flight.homeDistance > 100) {
 
         GUI.log(`Found ${logicConditions.length} logic conditions, decompiling...`);
 
+        // Track which slots were occupied before we modify them
+        // This is used when saving to clear stale conditions
+        self.previouslyOccupiedSlots = new Set();
+        const conditions = FC.LOGIC_CONDITIONS.get();
+        for (let i = 0; i < conditions.length; i++) {
+            if (conditions[i].getEnabled() !== 0) {
+                self.previouslyOccupiedSlots.add(i);
+            }
+        }
+
         // Retrieve variable map for name preservation
         const variableMap = settingsCache.get('javascript_variables') || {
             let_variables: {},
@@ -634,6 +644,44 @@ if (flight.homeDistance > 100) {
                     };
 
                     FC.LOGIC_CONDITIONS.put(lc);
+                }
+            }
+        }
+
+        // Clear previously-occupied slots that are NOT in the new script
+        const newlyOccupiedSlots = new Set();
+        const newConditions = FC.LOGIC_CONDITIONS.get();
+        for (let i = 0; i < newConditions.length; i++) {
+            newlyOccupiedSlots.add(i);
+        }
+
+        // Find slots that need to be cleared (were occupied, now aren't)
+        if (self.previouslyOccupiedSlots) {
+            for (const oldSlot of self.previouslyOccupiedSlots) {
+                if (!newlyOccupiedSlots.has(oldSlot)) {
+                    // This slot was occupied before but isn't in new script
+                    // Add a disabled/empty condition to clear it
+                    const emptyCondition = {
+                        enabled: 0,
+                        activatorId: -1,
+                        operation: 0,
+                        operandAType: 0,
+                        operandAValue: 0,
+                        operandBType: 0,
+                        operandBValue: 0,
+                        flags: 0,
+
+                        getEnabled: function() { return this.enabled; },
+                        getActivatorId: function() { return this.activatorId; },
+                        getOperation: function() { return this.operation; },
+                        getOperandAType: function() { return this.operandAType; },
+                        getOperandAValue: function() { return this.operandAValue; },
+                        getOperandBType: function() { return this.operandBType; },
+                        getOperandBValue: function() { return this.operandBValue; },
+                        getFlags: function() { return this.flags; }
+                    };
+
+                    FC.LOGIC_CONDITIONS.put(emptyCondition);
                 }
             }
         }
