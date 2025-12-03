@@ -2,24 +2,20 @@
 /**
  * Flight Parameters Test
  *
- * Tests flight telemetry operand access.
+ * Tests flight telemetry operand access including all 50 parameters (0-49).
  *
- * KNOWN ISSUE:
- * flight.js and inav_constants.js are missing parameters 46-49:
+ * Verifies all flight parameters from firmware including wind parameters:
  * - 46: MIN_GROUND_SPEED
  * - 47: HORIZONTAL_WIND_SPEED
  * - 48: WIND_DIRECTION
  * - 49: RELATIVE_WIND_OFFSET
- *
- * This test verifies existing params (0-45) work correctly and documents
- * what's missing.
  *
  * Run with: node test_flight.js
  */
 
 import { Transpiler } from '../index.js';
 import { Decompiler } from '../decompiler.js';
-import { OPERAND_TYPE, FLIGHT_PARAM } from '../inav_constants.js';
+import { OPERAND_TYPE, FLIGHT_PARAM, FLIGHT_PARAM_NAMES } from '../inav_constants.js';
 
 console.log('=== Flight Parameters Test ===\n');
 
@@ -178,9 +174,9 @@ if (outOfRange.length === 0) {
 console.log('\nCheck 4: Sample parameter mapping');
 const sampleParams = sortedParams.slice(0, 10);
 sampleParams.forEach(p => {
-  const paramName = Object.keys(FLIGHT_PARAM).find(key => FLIGHT_PARAM[key] === p);
+  const paramName = FLIGHT_PARAM_NAMES[p];
   if (paramName) {
-    console.log(`  Param ${p.toString().padStart(2)} → flight.${paramName.toLowerCase()}`);
+    console.log(`  Param ${p.toString().padStart(2)} → flight.${paramName}`);
   } else {
     console.log(`  Param ${p.toString().padStart(2)} → UNKNOWN`);
   }
