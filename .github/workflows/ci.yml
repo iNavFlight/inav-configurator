@@ -148,10 +148,10 @@ jobs:
           with:
             node-version: 24
             #check-latest: true
-        - name: Select Xcode version 16.4.0
-          uses: maxim-lobanov/setup-xcode@v1
-          with:
-           xcode-version: 16.4.0
+        - name: Renstall X Code cli
+          run: |
+           sudo rm -rf /Library/Developer/CommandLineTools
+           xcode-select --install
         - name: Setup Yarn with Corepack
           run: corepack enable
         - name: Install deps
@@ -199,10 +199,10 @@ jobs:
           with:
             node-version: 24
             #check-latest: true
-        - name: Select Xcode version 16.4.0
-          uses: maxim-lobanov/setup-xcode@v1
-          with:
-           xcode-version: 16.4.0
+        - name: Reinstall X Code cli
+          run: |
+           sudo rm -rf /Library/Developer/CommandLineTools
+           xcode-select --install
         - name: Setup Yarn with Corepack
           run: corepack enable
         - name: Install deps
