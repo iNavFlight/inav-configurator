@@ -148,6 +148,10 @@ jobs:
           with:
             node-version: 24
             #check-latest: true
+        - name: Select Xcode version 15.0
+          uses: maxim-lobanov/setup-xcode@v2
+          with:
+           xcode-version: 15.0
         - name: Setup Yarn with Corepack
           run: corepack enable
         - name: Install deps
@@ -195,6 +199,10 @@ jobs:
           with:
             node-version: 24
             #check-latest: true
+        - name: Select Xcode version 15.0
+          uses: maxim-lobanov/setup-xcode@v2
+          with:
+           xcode-version: 15.0
         - name: Setup Yarn with Corepack
           run: corepack enable
         - name: Install deps
