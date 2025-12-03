@@ -37,7 +37,7 @@ jobs:
                 echo "BUILD_NAME=inav-configurator_linux_x64_${VERSION}_${BUILD_SUFFIX}" >> $GITHUB_ENV
             - uses: actions/setup-node@v4
               with:
-                node-version: 22
+                node-version: 24
                 #check-latest: true
             - name: Install dependencies
               run: sudo apt-get update && sudo apt-get -y install dpkg fakeroot rpm build-essential libudev-dev
@@ -92,7 +92,7 @@ jobs:
                 echo "BUILD_NAME=inav-configurator_linux_aarch64_${VERSION}_${BUILD_SUFFIX}" >> $GITHUB_ENV
             - uses: actions/setup-node@v4
               with:
-                node-version: 22
+                node-version: 24
                 #check-latest: true
             - name: Install dependencies
               run: sudo apt-get update && sudo apt-get -y install dpkg fakeroot rpm build-essential libudev-dev
@@ -146,11 +146,8 @@ jobs:
             echo "BUILD_NAMEarm64=inav-configurator_MacOS_arm64_${VERSION}_${BUILD_SUFFIX}" >> $GITHUB_ENV
         - uses: actions/setup-node@v4
           with:
-            node-version: 22
+            node-version: 24
             #check-latest: true
-        # Workaround due to a bug in node-gyp: https://github.com/electron/rebuild/issues/1116
-        - name: Install Setuptools
-          run: python3 -m pip install --break-system-packages setuptools
         - name: Setup Yarn with Corepack
           run: corepack enable
         - name: Install deps
@@ -161,8 +158,6 @@ jobs:
             command: yarn install
             timeout_minutes: 10
             on_retry_command: rm -rfv node_modules
-        - name: Rebuild Electron
-          run: npx electron-rebuild
         - name: Build MacOS arm64
           run: yarn run make -- --arch="arm64"
         - name: Upload MacOS arm64 zip
@@ -198,11 +193,8 @@ jobs:
             echo "BUILD_NAMEx64=inav-configurator_MacOS_x64_${VERSION}_${BUILD_SUFFIX}" >> $GITHUB_ENV
         - uses: actions/setup-node@v4
           with:
-            node-version: 22
+            node-version: 24
             #check-latest: true
-        # Workaround due to a bug in node-gyp: https://github.com/electron/rebuild/issues/1116
-        - name: Install Setuptools
-          run: python3 -m pip install --break-system-packages setuptools
         - name: Setup Yarn with Corepack
           run: corepack enable
         - name: Install deps
@@ -213,8 +205,6 @@ jobs:
             command: yarn install
             timeout_minutes: 10
             on_retry_command: rm -rfv node_modules
-        - name: Rebuild Electron
-          run: npx electron-rebuild
         - name: Build MacOS x64
           run: yarn run make -- --arch="x64"
         - name: Upload MacOS x64 zip
@@ -254,7 +244,7 @@ jobs:
               shell: bash
             - uses: actions/setup-node@v4
               with:
-                node-version: 22
+                node-version: 24
             - uses: engineerd/configurator@v0.0.10
               with: 
                 name: "Wix Toolset 3.1.4"
@@ -309,7 +299,7 @@ jobs:
               shell: bash
             - uses: actions/setup-node@v4
               with:
-                node-version: 22
+                node-version: 24
             - uses: engineerd/configurator@v0.0.10
               with: 
                 name: "Wix Toolset 3.1.4"
