@@ -18,6 +18,7 @@ import examples from './../js/transpiler/examples/index.js';
 import settingsCache from './../js/settingsCache.js';
 import * as monaco from 'monaco-editor';
 import tsWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker'
+import editorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker'
 
 self.MonacoEnvironment = {
   getWorker(_, label) {
