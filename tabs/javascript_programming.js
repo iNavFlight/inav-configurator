@@ -8,7 +8,7 @@
 
 import MSPChainerClass from './../js/msp/MSPchainer.js';
 import mspHelper from './../js/msp/MSPHelper.js';
-import { GUI, TABS } from './../js/gui.js';
+import GUI from './../js/gui.js';
 import FC from './../js/fc.js';
 import path from 'node:path';
 import i18n from './../js/localization.js';
@@ -21,7 +21,7 @@ import examples from './../js/transpiler/examples/index.js';
 import settingsCache from './../js/settingsCache.js';
 
 
-TABS.javascript_programming = {
+const javascriptProgrammingTab= {
 
     currentProgrammingPIDProfile: null,
     isDirty: false,
@@ -35,9 +35,9 @@ TABS.javascript_programming = {
     initialize: function (callback) {
         const self = this;
 
-        if (GUI.active_tab !== 'javascript_programming') {
-            GUI.active_tab = 'javascript_programming';
-        }
+        if (GUI.active_tab !== this) {
+        GUI.active_tab = this;
+    }
 
         $('#content').load("./tabs/javascript_programming.html", function () {
 
@@ -689,3 +689,5 @@ if (flight.homeDistance > 100) {
         if (callback) callback();
     }
 };
+
+export default javascriptProgrammingTab;

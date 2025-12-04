@@ -1,10 +1,9 @@
-import { GUI, TABS } from './../js/gui.js';
+import GUI from './../js/gui.js';
 import i18n from './../js/localization.js';
 
 
 
-TABS.search = { };
-
+const searchTab = { };
 
 const tabNames = [
  "adjustments",
@@ -38,7 +37,7 @@ const tabNames = [
 ];
 
 
-  TABS.search.searchMessages = function (keyword) {
+searchTab.searchMessages = function (keyword) {
     var resultsDiv = document.getElementById('search-results');
     keyword = keyword.toLowerCase();
     resultsDiv.innerHTML = '';
@@ -83,7 +82,7 @@ const tabNames = [
   }
   
   
-  TABS.search.getMessages = function () {
+searchTab.getMessages = function () {
     const res_messages = fetch('locale/en/messages.json');
     res_messages
       .then (data => data.json())
@@ -95,7 +94,7 @@ const tabNames = [
       });
   }
   
-  TABS.search.geti18nHTML = function (filename, filecontents) {
+searchTab.geti18nHTML = function (filename, filecontents) {
   
     const parser = new DOMParser();
     const htmlDoc = parser.parseFromString(filecontents, 'text/html');
@@ -128,7 +127,7 @@ const tabNames = [
   }
 
 
-  TABS.search.geti18nJs = function (filename, filecontents) {
+searchTab.geti18nJs = function (filename, filecontents) {
     var re = /(?:data-i18n=|i18n.getMessage\()["']([^"']*)['"]/g
  
     let match;
@@ -142,7 +141,7 @@ const tabNames = [
   }
 
 
-  TABS.search.indexTab =  async function indexTab(tabName) {
+searchTab.indexTab =  async function indexTab(tabName) {
     var response = fetch(`tabs/${tabName}.js`);
     response
       .then (data => data.text()) 
@@ -164,25 +163,25 @@ const tabNames = [
         console.error(error)
       });
   };
-  
+ 
 
-TABS.search.initialize = function (callback) {
+searchTab.initialize = function (callback) {
     var self = this;
     this.key2page = new Map();
     this.setting2page = new Map();
     this.messages;
 
-    if (GUI.active_tab != 'search') {
-        GUI.active_tab = 'search';
+    if (GUI.active_tab !== this) {
+        GUI.active_tab = this;
     }
 
     function searchKeyword() {
-      TABS.search.searchMessages(document.getElementById('search-keyword').value);
+    searchTab.searchMessages(document.getElementById('search-keyword').value);
     }
 
     function searchKeywordTyping() {
       if (document.getElementById('search-keyword').value.length > 2) {
-        TABS.search.searchMessages(document.getElementById('search-keyword').value);
+      searchTab.searchMessages(document.getElementById('search-keyword').value);
       }
     }
     import('./search.html?raw').then(({default: html}) => GUI.load(html, function () {
@@ -198,7 +197,8 @@ TABS.search.initialize = function (callback) {
 }
 
 
-TABS.search.cleanup = function (callback) {
+searchTab.cleanup = function (callback) {
     if (callback) callback();
 };
 
+export default searchTab;

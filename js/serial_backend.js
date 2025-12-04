@@ -2,7 +2,7 @@
 
 import semver from 'semver';
 
-import { GUI, TABS } from './gui';
+import GUI from './gui';
 import MSP from './msp';
 import FC from './fc';
 import MSPCodes from './msp/MSPCodes';
@@ -26,6 +26,8 @@ import groundstation from './groundstation';
 import ltmDecoder from './ltmDecoder';
 import mspDeduplicationQueue from './msp/mspDeduplicationQueue';
 import store from './store';
+import configurationTab from '../tabs/configuration';
+import cliTab from '../tabs/cli';
 
 var SerialBackend = (function () {
 
@@ -101,7 +103,7 @@ var SerialBackend = (function () {
                         //noinspection JSUnresolvedVariable
                         GUI.log(i18n.getMessage('deviceReady'));
                         //noinspection JSValidateTypes
-                        TABS.configuration.initialize(false, $('#content').scrollTop());
+                        configurationTab.initialize(false, $('#content').scrollTop());
                     });
                 },1500); // 1500 ms seems to be just the right amount of delay to prevent data request timeouts
             }
@@ -294,7 +296,6 @@ var SerialBackend = (function () {
 
                 $('#tabs ul.mode-connected .tab_setup a').trigger( "click" );
 
-                GUI.updateEzTuneTabVisibility(true);
                 update.firmwareVersion();
             });
         });
@@ -504,7 +505,7 @@ var SerialBackend = (function () {
         if (!CONFIGURATOR.cliActive) {
             MSP.read(info);
         } else if (CONFIGURATOR.cliActive) {
-            TABS.cli.read(info);
+            cliTab.read(info);
         }
     }
 

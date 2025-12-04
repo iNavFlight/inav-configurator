@@ -1,13 +1,14 @@
 'use strict';
 
-import { GUI, TABS } from './../js/gui';
+import GUI from './../js/gui';
 import i18n from './../js/localization';
 
-const landing = {};
-landing.initialize = function (callback) {
+const landingTab = {};
 
-    if (GUI.active_tab != 'landing') {
-        GUI.active_tab = 'landing';
+landingTab.initialize = function (callback) {
+
+    if (GUI.active_tab !== this) {
+        GUI.active_tab = this;
     }
     import('./landing.html?raw').then(({default: html}) => {
         GUI.load(html, () => {
@@ -17,8 +18,8 @@ landing.initialize = function (callback) {
     });
 };
 
-landing.cleanup = function (callback) {
+landingTab.cleanup = function (callback) {
     if (callback) callback();
 };
 
-TABS.landing = landing;
+export default landingTab;
