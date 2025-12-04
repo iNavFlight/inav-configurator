@@ -111,8 +111,21 @@ class ConditionGenerator {
         return this.conditionCache.get(cacheKey);
       }
 
-      // Generate the inverse comparison first
-      const comparisonId = this.pushLogicCommand(inverseOp, left, right, activatorId);
+      // Check if the inverse comparison already exists in the cache
+      // This handles cases like:
+      //   if (x < 6) { ... }  // Creates cache entry for "binary:<:x:6:activator"
+      //   if (x >= 6) { ... } // Should reuse the existing "x < 6" condition
+      const inverseCacheKey = this.getCacheKey('binary', inverseOp, left, right, activatorId);
+      let comparisonId;
+
+      if (this.conditionCache.has(inverseCacheKey)) {
+        // Reuse existing inverse comparison
+        comparisonId = this.conditionCache.get(inverseCacheKey);
+      } else {
+        // Generate the inverse comparison and cache it
+        comparisonId = this.pushLogicCommand(inverseOp, left, right, activatorId);
+        this.conditionCache.set(inverseCacheKey, comparisonId);
+      }
 
       // Then negate it with NOT
       const resultId = this.pushLogicCommand(OPERATION.NOT,
