@@ -167,13 +167,18 @@ class PropertyAccessChecker {
       if (parts.length >= 2) {
         const apiObj = this.inavAPI['override'];
 
+        // Null check to prevent crash
+        if (!apiObj) {
+          return false;
+        }
+
         // Check direct properties
-        if (apiObj.targets.includes(parts[1])) {
+        if (apiObj.targets && apiObj.targets.includes(parts[1])) {
           return true;
         }
 
         // Check nested properties (e.g., override.vtx.power)
-        if (parts.length >= 3 && apiObj.nested[parts[1]]) {
+        if (parts.length >= 3 && apiObj.nested && apiObj.nested[parts[1]]) {
           return apiObj.nested[parts[1]].includes(parts[2]);
         }
       }
