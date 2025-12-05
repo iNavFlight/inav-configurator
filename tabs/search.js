@@ -1,4 +1,4 @@
-import { GUI, TABS } from './../js/gui';
+import GUI from './../js/gui';
 import i18n from './../js/localization';
 
 
@@ -82,7 +82,7 @@ searchTab.searchMessages = function (keyword) {
   }
   
   
-  TABS.search.getMessages = function () {
+searchTab.getMessages = function () {
     import(`../locale/en/messages.json`).then(({default: messages}) => {
         this.messages = messages;
     }).catch(error => {
@@ -138,7 +138,7 @@ searchTab.geti18nJs = function (filename, filecontents) {
   }
 
 
-  TABS.search.indexTab =  async function indexTab(tabName) {
+  searchTab.indexTab =  async function indexTab(tabName) {
     import(`./${tabName}.js?raw`).then(({default: javascript}) => {
         this.geti18nJs(tabName, javascript);
     }).catch(error => console.error(`Failed to index JS for tab ${tabName}:`, error));;
