@@ -1,5 +1,5 @@
-import GUI from './../js/gui.js';
-import i18n from './../js/localization.js';
+import { GUI, TABS } from './../js/gui';
+import i18n from './../js/localization';
 
 
 
@@ -82,16 +82,13 @@ searchTab.searchMessages = function (keyword) {
   }
   
   
-searchTab.getMessages = function () {
-    const res_messages = fetch('locale/en/messages.json');
-    res_messages
-      .then (data => data.json())
-      .then (data => {
-         this.messages = data;
-      })
-      .catch((error) => {
-         console.error(error)
-      });
+  TABS.search.getMessages = function () {
+    import(`../locale/en/messages.json`).then(({default: messages}) => {
+        this.messages = messages;
+    }).catch(error => {
+        console.error('Failed to load messages.json:', error);
+    });
+
   }
   
 searchTab.geti18nHTML = function (filename, filecontents) {
@@ -141,27 +138,15 @@ searchTab.geti18nJs = function (filename, filecontents) {
   }
 
 
-searchTab.indexTab =  async function indexTab(tabName) {
-    var response = fetch(`tabs/${tabName}.js`);
-    response
-      .then (data => data.text()) 
-      .then (data => {
-        this.geti18nJs(tabName, data);
-      })
-      .catch((error) => {
-        console.error(error)
-      });
+  TABS.search.indexTab =  async function indexTab(tabName) {
+    import(`./${tabName}.js?raw`).then(({default: javascript}) => {
+        this.geti18nJs(tabName, javascript);
+    }).catch(error => console.error(`Failed to index JS for tab ${tabName}:`, error));;
 
+    import(`./${tabName}.html?raw`).then(({default: html}) => {
+        this.geti18nHTML(tabName, html);
+    }).catch(error => console.error(`Failed to index HTML for tab ${tabName}:`, error));;
 
-    response = fetch(`tabs/${tabName}.html`);
-    response
-      .then (data => data.text())
-      .then (data => {
-        this.geti18nHTML(tabName, data);
-      })
-      .catch((error) => {
-        console.error(error)
-      });
   };
  
 

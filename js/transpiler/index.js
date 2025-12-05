@@ -20,7 +20,6 @@ import { INAVCodeGenerator } from './transpiler/codegen.js';
 // API definitions
 import apiDefinitions from './api/definitions/index.js';
 import flightDefinitions from './api/definitions/flight.js';
-import overrideDefinitions from './api/definitions/override.js';
 import waypointDefinitions from './api/definitions/waypoint.js';
 import rcDefinitions from './api/definitions/rc.js';
 
@@ -37,7 +36,6 @@ export {
   INAVCodeGenerator,
   apiDefinitions,
   flightDefinitions,
-  overrideDefinitions,
   waypointDefinitions,
   rcDefinitions,
   generateTypeDefinitions,
