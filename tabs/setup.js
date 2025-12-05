@@ -16,7 +16,6 @@ import SerialBackend from './../js/serial_backend';
 import { mixer } from './../js/model';
 import BitHelper from './../js/bitHelper';
 import dialog from '../js/dialog';
-import { set } from 'ol/transform';
 
 const setupTab = {};
 
