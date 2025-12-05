@@ -22,6 +22,7 @@ cliTab.lineDelayMs = 50;
 cliTab.profileSwitchDelayMs = 100;
 cliTab.outputHistory = "";
 cliTab.cliBuffer = "";
+cliTab.nextTab = null;
 cliTab.GUI = { snippetPreviewWindow: null };
 
 function removePromptHash(promptText) {
@@ -101,6 +102,7 @@ cliTab.initialize = function (callback) {
 
     self.outputHistory = "";
     self.cliBuffer = "";
+    self.nextTab = null;
 
     const clipboardCopySupport = (() => {
         return false;    
@@ -482,7 +484,8 @@ cliTab.read = function (readInfo) {
             CONFIGURATOR.cliValid = false;
             GUI.log(i18n.getMessage('cliReboot'));
             GUI.log(i18n.getMessage('deviceRebooting'));
-            GUI.handleReconnect();
+            GUI.handleReconnect(cliTab.nextTab || false);
+            cliTab.cleanup();
         }
 
     }
@@ -524,24 +527,22 @@ cliTab.send = function (line, callback) {
     CONFIGURATOR.connection.send(bufferOut, callback);
 };
 
+cliTab.exit = function(nextTab) {
+    this.nextTab = nextTab;
+    this.send(getCliCommand('exit\r', this.cliBuffer));
+};
+
 cliTab.cleanup = function (callback) {
     if (!(CONFIGURATOR.connectionValid && CONFIGURATOR.cliValid && CONFIGURATOR.cliActive)) {
-        if (callback) callback();
+        callback?.()
         return;
     }
-    this.send(getCliCommand('exit\r', this.cliBuffer), function (writeInfo) {
-        // we could handle this "nicely", but this will do for now
-        // (another approach is however much more complicated):
-        // we can setup an interval asking for data lets say every 200ms, when data arrives, callback will be triggered and tab switched
-        // we could probably implement this someday
-        timeout.add('waiting_for_bootup', function waiting_for_bootup() {
-            if (callback) callback();
-        }, 1000); // if we dont allow enough time to reboot, CRC of "first" command sent will fail, keep an eye for this one
-        CONFIGURATOR.cliActive = false;
-
-        CliAutoComplete.cleanup();
-        $(CliAutoComplete).off();
-    });
+    
+    CONFIGURATOR.cliActive = false;
+    CliAutoComplete.cleanup();
+    $(CliAutoComplete).off();
+    
+    callback?.()
 };
 
 export default cliTab;

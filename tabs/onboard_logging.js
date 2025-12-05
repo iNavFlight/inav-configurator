@@ -71,7 +71,7 @@ onboardLoggingTab.initialize = function (callback) {
 
     function reinitialize() {
         GUI.log(i18n.getMessage('deviceRebooting'));
-        GUI.handleReconnect($('.tab_onboard_logging a'));
+        GUI.handleReconnect(true);
     }
 
     function load_html() {

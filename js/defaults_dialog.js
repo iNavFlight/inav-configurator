@@ -26,11 +26,20 @@ var defaultsDialog = (function () {
     let $container;
 
     privateScope.wizardSettings = [];
+    privateScope.needsShow = false;
 
-    publicScope.init = function () {
-        mspHelper.getSetting("applied_defaults").then(privateScope.onInitSettingReturned);
+    // Ensure we're waiting until the setting is loaded.
+    publicScope.init = async function () {
+        const setting = await mspHelper.getSetting("applied_defaults")
+        if (setting.value > 0) {
+            return; //Defaults were applied, we can just ignore
+        }
+        
         $container = $("#defaults-wrapper");
+        privateScope.render();
+        $container.show();
     };
+
 
     privateScope.setFeaturesBits = function (selectedDefaultPreset) {
 
@@ -172,7 +181,7 @@ var defaultsDialog = (function () {
                     savingDefaultsModal.close();
                 }
                 GUI.log(i18n.getMessage('deviceRebooting'));
-                GUI.handleReconnect();
+                GUI.handleReconnect(false);
             });
         });
     };
@@ -332,16 +341,6 @@ var defaultsDialog = (function () {
                 $element.appendTo($place);
             }
         }
-    }
-
-    privateScope.onInitSettingReturned = function (promise) {
-
-        if (promise.value > 0) {
-            return; //Defaults were applied, we can just ignore
-        }
-
-        privateScope.render();
-        $container.show();
     }
 
     return publicScope;

@@ -49,6 +49,7 @@ import advancedTuningTab from './../tabs/advanced_tuning';
 import onboardLoggingTab from  './../tabs/onboard_logging';
 import cliTab from './../tabs/cli';
 import searchTab from './../tabs/search';
+import dialog from './dialog'
 
 window.$ = $;
 
@@ -62,9 +63,11 @@ $(function() {
         SerialBackend.init();
 
         GUI.updateActivatedTab = function() {
-            var activeTab = $('#tabs > ul li.active');
-            activeTab.removeClass('active');
-            $('a', activeTab).trigger('click');
+            if (!GUI.tab_switch_in_progress) {
+                const activeTab = $('#tabs > ul li.active');
+                activeTab.removeClass('active');
+                $('a', activeTab).trigger('click');
+            }
         }
 
         globalSettings.unitType = store.get('unit_type', UnitType.none);
@@ -118,6 +121,12 @@ $(function() {
             }
 
             if ($(this).parent().hasClass('active') == false && !GUI.tab_switch_in_progress) { // only initialize when the tab isn't already active
+                
+                if (CONFIGURATOR.cliActive) {
+                    cliTab.exit($(this).parent());
+                    return;
+                }
+                    
                 var self = this,
                     tabClass = $(self).parent().prop('class');
 
@@ -498,12 +507,20 @@ $(function() {
         var mixerprofile_e = $('#mixerprofilechange');
 
         mixerprofile_e.on('change', function () {
-            var mixerprofile = parseInt($(this).val());
+            if (!dialog.confirm(i18n.getMessage("changeMixerProfileReboot"))) 
+            {
+                $(this).val(FC.CONFIG.mixer_profile)
+                return;
+            }
+            
+            const mixerprofile = parseInt($(this).val());
             MSP.send_message(MSPCodes.MSP2_INAV_SELECT_MIXER_PROFILE, [mixerprofile], false, function () {
-                GUI.log(i18n.getMessage('setMixerProfile', [mixerprofile + 1]));
-                MSP.send_message(MSPCodes.MSP_SET_REBOOT, false, false, function () {
+                GUI.tab_switch_cleanup(function() {
+                    GUI.log(i18n.getMessage('setMixerProfile', [mixerprofile + 1]));
                     GUI.log(i18n.getMessage('deviceRebooting'));
-                    GUI.handleReconnect();
+                    GUI.handleReconnect(true);
+                    // This order! Why? ¯\_(ツ)_/¯
+                    MSP.send_message(MSPCodes.MSP_SET_REBOOT, false, false);
                 });
             });
         });

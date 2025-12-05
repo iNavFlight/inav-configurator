@@ -62,18 +62,14 @@ mixerTab.initialize = function (callback, scrollPosition) {
     }
 
     function reboot() {
-        //noinspection JSUnresolvedVariable
         GUI.log(i18n.getMessage('configurationEepromSaved'));
-
         GUI.tab_switch_cleanup(function() {
             MSP.send_message(MSPCodes.MSP_SET_REBOOT, false, false, reinitialize);
         });
     }
 
     function reinitialize() {
-        //noinspection JSUnresolvedVariable
-        GUI.log(i18n.getMessage('deviceRebooting'));
-        GUI.handleReconnect($('.tab_mixer a'));
+        GUI.handleReconnect(true);
     }
 
     function loadHtml() {
@@ -855,9 +851,6 @@ mixerTab.initialize = function (callback, scrollPosition) {
 };
 
 mixerTab.cleanup = function (callback) {
-    //delete modal;
-    //delete motorWizardModal;
-    $('.jBox-wrapper').remove();
     if (callback) callback();
 };
 

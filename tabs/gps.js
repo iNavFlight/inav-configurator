@@ -103,7 +103,7 @@ gpsTab.initialize = function (callback) {
             MSP.send_message(MSPCodes.MSP_SET_REBOOT, false, false, function () {
                 //noinspection JSUnresolvedVariable
                 GUI.log(i18n.getMessage('deviceRebooting'));
-                GUI.handleReconnect($('.tab_gps a'));
+                GUI.handleReconnect(true);
             });
         });
     }

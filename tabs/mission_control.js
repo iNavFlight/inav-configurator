@@ -3436,7 +3436,7 @@ function iconKey(filename) {
         function reinitialize() {
             //noinspection JSUnresolvedVariable
             GUI.log(i18n.getMessage('deviceRebooting'));
-            GUI.handleReconnect($('.tab_mission_control a'));
+            GUI.handleReconnect(true);
         }
 
         $('#cancelGeozone').on('click', function() {
