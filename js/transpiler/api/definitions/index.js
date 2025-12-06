@@ -1,8 +1,8 @@
 /**
  * INAV API Definitions - Main Export
- * 
+ *
  * Location: js/transpiler/api/definitions/index.js
- * 
+ *
  * Exports all API definitions as a single object.
  * This is the SINGLE SOURCE OF TRUTH for INAV JavaScript API.
  */

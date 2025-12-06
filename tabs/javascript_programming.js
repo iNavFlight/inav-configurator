@@ -71,6 +71,15 @@ TABS.javascript_programming = {
 
                     self.loadFromFC(function() {
                         self.isDirty = false;
+
+                        // Set up dirty tracking AFTER initial load to avoid marking as dirty during decompilation
+                        self.editor.onDidChangeModelContent(function() {
+                            if (!self.isDirty) {
+                                console.log('[JavaScript Programming] Editor marked as dirty (unsaved changes)');
+                            }
+                            self.isDirty = true;
+                        });
+
                         GUI.content_ready(callback);
                     }); 
                 } catch (error) {
@@ -724,19 +733,12 @@ if (flight.homeDistance > 100) {
     },
 
     cleanup: function (callback) {
-        const self = this;
-
-        // Check for unsaved changes
-        if (this.isDirty) {
-            const confirmMsg = i18n.getMessage('unsavedChanges') ||
-                'You have unsaved changes. Leave anyway?';
-            if (!confirm(confirmMsg)) {
-                // Cancel navigation
-                return;
-            }
-        }
+        console.log('[JavaScript Programming] cleanup() - disposing editor');
 
         // Dispose Monaco editor
+        // Note: Unsaved changes are checked BEFORE cleanup() is called:
+        // - For disconnect: in serial_backend.js
+        // - For tab switch: in configurator_main.js
         if (this.editor && this.editor.dispose) {
             this.editor.dispose();
             this.editor = null;

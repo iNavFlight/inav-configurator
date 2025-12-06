@@ -106,6 +106,7 @@ export default {
     readonly: false,
     range: [0, 150],
     inavOperation: OPERATION.OVERRIDE_MIN_GROUND_SPEED
+
   },
 
   // Flight Axis Overrides
@@ -178,4 +179,5 @@ export default {
       }
     }
   }
+
 };
