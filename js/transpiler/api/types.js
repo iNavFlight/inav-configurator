@@ -42,6 +42,7 @@ declare namespace inav {
   dts += generateInterfaceFromDefinition('flight', apiDefinitions.flight);
   dts += generateInterfaceFromDefinition('rc', apiDefinitions.rc);
   dts += generateInterfaceFromDefinition('waypoint', apiDefinitions.waypoint);
+  dts += generateInterfaceFromDefinition('override', apiDefinitions.override);
   
   // Add special types
   dts += `

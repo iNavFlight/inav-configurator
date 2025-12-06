@@ -60,7 +60,8 @@ function initializeMonacoEditor(monaco, containerId, options = {}) {
         noEmit: true,
         esModuleInterop: true,
         allowJs: true,
-        checkJs: false
+        checkJs: false,
+        lib: ['es2020']  // Only ES2020 core library (excludes DOM/browser APIs like navigator)
     });
     
     console.log('Monaco Editor initialized');
