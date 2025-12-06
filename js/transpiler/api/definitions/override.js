@@ -106,11 +106,78 @@ export default {
     readonly: false,
     range: [0, 150],
     inavOperation: OPERATION.OVERRIDE_MIN_GROUND_SPEED
+
+  },
+
+  // Flight Axis Overrides
+  flightAxis: {
+    type: 'object',
+    desc: 'Flight axis angle and rate overrides',
+    properties: {
+      roll: {
+        type: 'object',
+        desc: 'Roll axis overrides',
+        properties: {
+          angle: {
+            type: 'number',
+            unit: '°',
+            desc: 'Override roll angle target (degrees)',
+            readonly: false,
+            inavOperation: OPERATION.FLIGHT_AXIS_ANGLE_OVERRIDE
+          },
+          rate: {
+            type: 'number',
+            unit: '°/s',
+            desc: 'Override roll rate target (degrees per second)',
+            readonly: false,
+            range: [-2000, 2000],
+            inavOperation: OPERATION.FLIGHT_AXIS_RATE_OVERRIDE
+          }
+        }
+      },
+      pitch: {
+        type: 'object',
+        desc: 'Pitch axis overrides',
+        properties: {
+          angle: {
+            type: 'number',
+            unit: '°',
+            desc: 'Override pitch angle target (degrees)',
+            readonly: false,
+            inavOperation: OPERATION.FLIGHT_AXIS_ANGLE_OVERRIDE
+          },
+          rate: {
+            type: 'number',
+            unit: '°/s',
+            desc: 'Override pitch rate target (degrees per second)',
+            readonly: false,
+            range: [-2000, 2000],
+            inavOperation: OPERATION.FLIGHT_AXIS_RATE_OVERRIDE
+          }
+        }
+      },
+      yaw: {
+        type: 'object',
+        desc: 'Yaw axis overrides',
+        properties: {
+          angle: {
+            type: 'number',
+            unit: '°',
+            desc: 'Override yaw angle target (degrees)',
+            readonly: false,
+            inavOperation: OPERATION.FLIGHT_AXIS_ANGLE_OVERRIDE
+          },
+          rate: {
+            type: 'number',
+            unit: '°/s',
+            desc: 'Override yaw rate target (degrees per second)',
+            readonly: false,
+            range: [-2000, 2000],
+            inavOperation: OPERATION.FLIGHT_AXIS_RATE_OVERRIDE
+          }
+        }
+      }
+    }
   }
-  
-  // Note: Flight axis angle/rate overrides (operations 45, 46) would need
-  // special syntax since they require specifying the axis (0=roll, 1=pitch, 2=yaw)
-  // These should probably be exposed as:
-  // override.flightAxis.angle(axis, degrees)
-  // override.flightAxis.rate(axis, degreesPerSecond)
+
 };

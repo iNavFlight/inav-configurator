@@ -709,11 +709,22 @@ class INAVCodeGenerator {
         'override.vtx.power': OPERATION.SET_VTX_POWER_LEVEL,
         'override.vtx.band': OPERATION.SET_VTX_BAND,
         'override.vtx.channel': OPERATION.SET_VTX_CHANNEL,
-        'override.armSafety': OPERATION.OVERRIDE_ARMING_SAFETY
+        'override.armSafety': OPERATION.OVERRIDE_ARMING_SAFETY,
+        'override.osdLayout': OPERATION.SET_OSD_LAYOUT,
+        'override.loiterRadius': OPERATION.LOITER_OVERRIDE,
+        'override.minGroundSpeed': OPERATION.OVERRIDE_MIN_GROUND_SPEED
       };
 
       const operation = operations[target];
       if (!operation) {
+        // Check for flight axis overrides: override.flightAxis.roll.angle
+        const flightAxisMatch = target.match(/^override\.flightAxis\.(roll|pitch|yaw)\.(angle|rate)$/);
+        if (flightAxisMatch) {
+          const axis = flightAxisMatch[1];
+          const type = flightAxisMatch[2];
+          return type === 'angle' ? OPERATION.FLIGHT_AXIS_ANGLE_OVERRIDE : OPERATION.FLIGHT_AXIS_RATE_OVERRIDE;
+        }
+
         throw new Error(`Unknown override target: ${target}`);
       }
 

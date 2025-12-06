@@ -104,29 +104,51 @@ declare namespace inav {
  */
 function generateInterfaceFromDefinition(name, definitions) {
   let result = `\n  /** ${capitalize(name)} parameters */\n  interface ${capitalize(name)} {\n`;
-  
+
+  result += generateProperties(definitions, '    ', name);
+
+  result += `  }\n  const ${name}: ${capitalize(name)};\n`;
+  return result;
+}
+
+/**
+ * Recursively generate TypeScript properties from API definitions
+ * @param {Object} definitions - Definition object
+ * @param {string} indent - Current indentation level
+ * @param {string} parentName - Parent interface name for readonly check
+ * @returns {string} TypeScript properties string
+ */
+function generateProperties(definitions, indent, parentName) {
+  let result = '';
+
   for (const [key, def] of Object.entries(definitions)) {
-    if (typeof def.type !== 'undefined') {
-      // Simple property
-      const readonly = (name === 'flight' || name === 'waypoint') ? 'readonly ' : '';
+    if (typeof def.type !== 'undefined' && def.type !== 'object') {
+      // Simple property (leaf node)
+      const readonly = (parentName === 'flight' || parentName === 'waypoint') ? 'readonly ' : '';
       const tsType = mapJSTypeToTS(def.type);
       const comment = def.desc + (def.unit ? ` (${def.unit})` : '');
-      result += `    /** ${comment} */\n`;
-      result += `    ${readonly}${key}: ${tsType};\n`;
-    } else {
-      // Nested object
-      result += `    ${key}: {\n`;
+      result += `${indent}/** ${comment} */\n`;
+      result += `${indent}${readonly}${key}: ${tsType};\n`;
+    } else if (def.properties) {
+      // Nested object with properties field
+      result += `${indent}/** ${def.desc} */\n`;
+      result += `${indent}${key}: {\n`;
+      result += generateProperties(def.properties, indent + '  ', parentName);
+      result += `${indent}};\n`;
+    } else if (def.type === 'object') {
+      // Nested object (old style without explicit properties field)
+      result += `${indent}${key}: {\n`;
       for (const [subKey, subDef] of Object.entries(def)) {
+        if (subKey === 'type' || subKey === 'desc') continue;
         const tsType = mapJSTypeToTS(subDef.type);
         const comment = subDef.desc + (subDef.unit ? ` (${subDef.unit})` : '');
-        result += `      /** ${comment} */\n`;
-        result += `      ${subKey}: ${tsType};\n`;
+        result += `${indent}  /** ${comment} */\n`;
+        result += `${indent}  ${subKey}: ${tsType};\n`;
       }
-      result += `    };\n`;
+      result += `${indent}};\n`;
     }
   }
-  
-  result += `  }\n  const ${name}: ${capitalize(name)};\n`;
+
   return result;
 }
 
