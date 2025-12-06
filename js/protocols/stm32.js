@@ -8,7 +8,7 @@
 'use strict';
 
 import CONFIGURATOR from './../data_storage';
-import { GUI }from './../gui';
+import GUI from './../gui';
 import interval from './../intervals';
 import { usbDevices, PortHandler } from './../port_handler';
 import ConnectionSerial from './../connection/connectionSerial';

@@ -79,6 +79,9 @@
     "savingDefaults": {
         "message": "Device - <span style=\"color: red\">Saving default settings</span>"
     },
+    "changeMixerProfileReboot": {
+        "message": "Changing mixer profiles requires a reboot. Continue?"
+    },
     "fcNotConnected": {
         "message": "Not connected"
     },

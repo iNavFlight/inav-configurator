@@ -2,7 +2,7 @@
 
 import smalltalk from 'smalltalk';
 
-import { GUI, TABS } from './../js/gui';
+import GUI from './../js/gui';
 import i18n from './../js/localization';
 import { SITLProcess, SitlSerialPortUtils } from './../js/sitl';
 import store from './../js/store';
@@ -86,11 +86,12 @@ const stdProfiles = [
 
 var SITL_LOG = "";
 
-TABS.sitl = {};
-TABS.sitl.initialize = (callback) => {
+const sitlTab = {};
+
+sitlTab.initialize = (callback) => {
  
-    if (GUI.active_tab != 'sitl') {
-        GUI.active_tab = 'sitl';
+    if (GUI.active_tab !== this) {
+        GUI.active_tab = this;
     }
 
     import('./sitl.html?raw').then(({default: html}) => GUI.load(html, function () {
@@ -542,8 +543,10 @@ TABS.sitl.initialize = (callback) => {
     }));  
 };
 
-TABS.sitl.cleanup = (callback) => {
+sitlTab.cleanup = (callback) => {
     SitlSerialPortUtils.stopPollSerialPorts();
     if (callback) 
         callback();
 };
+
+export default sitlTab;

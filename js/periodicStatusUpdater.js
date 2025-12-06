@@ -1,6 +1,6 @@
 'use strict';
 
-import { GUI } from './gui';
+import GUI from './gui';
 import FC from './fc';
 import CONFIGURATOR from './data_storage';
 import MSP from './msp';

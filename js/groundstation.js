@@ -14,7 +14,7 @@ import Feature from 'ol/Feature';
 import VectorSource from 'ol/source/Vector.js';
 import VectorLayer from 'ol/layer/Vector.js';
 
-import { GUI } from './gui';
+import GUI from './gui';
 import ltmDecoder from './ltmDecoder';
 import interval from './intervals';
 import { globalSettings } from './globalSettings';
