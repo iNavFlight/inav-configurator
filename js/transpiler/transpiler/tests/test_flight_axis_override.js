@@ -56,7 +56,7 @@ if (flight.armed) {
 
   testCases.forEach((test, index) => {
     console.log(`Test ${index + 1}: ${test.name}`);
-    console.log('=' .repeat(60));
+    console.log('='.repeat(60));
 
     try {
       const transpiler = new Transpiler();
