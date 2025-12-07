@@ -203,11 +203,28 @@ var SerialBackend = (function () {
                             CONFIGURATOR.connection.connect(selected_port, {bitrate: selected_baud}, privateScope.onOpen);
                         }
                     } else {
+                        // Check for unsaved changes in JavaScript Programming tab
+                        if (GUI.active_tab === 'javascript_programming' &&
+                            TABS.javascript_programming &&
+                            TABS.javascript_programming.isDirty) {
+                            console.log('[Disconnect] Checking for unsaved changes in JavaScript Programming tab');
+                            const confirmMsg = i18n.getMessage('unsavedChanges') ||
+                                'You have unsaved changes. Leave anyway?';
+
+                            if (!confirm(confirmMsg)) {
+                                console.log('[Disconnect] User cancelled disconnect due to unsaved changes');
+                                return; // Cancel disconnect
+                            }
+                            console.log('[Disconnect] User confirmed, proceeding with disconnect');
+                            // Clear isDirty flag so tab switch during disconnect doesn't show warning again
+                            TABS.javascript_programming.isDirty = false;
+                        }
+
                         if (this.isDemoRunning) {
                             SITLProcess.stop();
                             this.isDemoRunning = false;
                         }
-                        
+
                         var wasConnected = CONFIGURATOR.connectionValid;
 
                         timeout.killAll();
