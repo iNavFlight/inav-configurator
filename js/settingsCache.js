@@ -21,11 +21,11 @@ var settingsCache = (function() {
 
     publicScope.get = function(settingName) {
         let settings = store.get(SETTINGS_KEY, null);
+
         if (settings === null) {
             return undefined;
         }
-        const key = privateScope.getSetingKey(settingName);
-        let setting = settings[key];
+        let setting = settings[privateScope.getSetingKey(settingName)];
         return setting;
     };
 

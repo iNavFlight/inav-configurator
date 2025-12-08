@@ -647,10 +647,11 @@ var Settings = (function () {
     self.processHtml = function(callback) {
         return function() {
             // Start loading settings in background - don't block rendering
-            self.configureInputs();
+            const settingsPromise = self.configureInputs();
             self.linkHelpIcons();
             // Call callback immediately so page can start rendering
-            callback();
+            // Pass settingsPromise so tabs can optionally await it if needed
+            callback(settingsPromise);
         };
     };
 
