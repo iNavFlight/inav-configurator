@@ -3958,7 +3958,7 @@ function updateOSDCustomElementsDisplay() {
 function fillCustomElementsValues() {
     for (var i = 0; i < FC.OSD_CUSTOM_ELEMENTS.settings.customElementsCount; i++) {
         // Safety check - items may not be loaded yet
-        if (!FC.OSD_CUSTOM_ELEMENTS.items[i]) {
+        if (!FC.OSD_CUSTOM_ELEMENTS.items[i] || !FC.OSD_CUSTOM_ELEMENTS.items[i].customElementItems) {
             continue;
         }
         for (var ii = 0; ii < FC.OSD_CUSTOM_ELEMENTS.settings.customElementParts; ii++) {
