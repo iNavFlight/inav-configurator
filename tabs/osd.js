@@ -3203,6 +3203,10 @@ OSD.GUI.updateMapPreview = function(mapCenter, name, directionSymbol, centerSymb
 };
 
 OSD.GUI.updatePreviews = function() {
+    // Guard against being called before OSD data is loaded
+    if (!OSD.data) {
+        return;
+    }
     // buffer the preview;
     OSD.data.preview = [];
 
@@ -3479,6 +3483,7 @@ OSD.GUI.updateAll = function() {
     OSD.GUI.updateVideoMode();
     OSD.GUI.updateUnits();
     OSD.GUI.updateFields();
+    updatePilotAndCraftNames();
     OSD.GUI.updatePreviews();
     OSD.GUI.updateGuidesView($('#videoGuides').find('input').is(':checked'));
     OSD.GUI.updateDjiView(HARDWARE.capabilities.isDjiHdFpv && !HARDWARE.capabilities.isMspDisplay);
@@ -3952,7 +3957,14 @@ function updateOSDCustomElementsDisplay() {
 
 function fillCustomElementsValues() {
     for (var i = 0; i < FC.OSD_CUSTOM_ELEMENTS.settings.customElementsCount; i++) {
+        // Safety check - items may not be loaded yet
+        if (!FC.OSD_CUSTOM_ELEMENTS.items[i]) {
+            continue;
+        }
         for (var ii = 0; ii < FC.OSD_CUSTOM_ELEMENTS.settings.customElementParts; ii++) {
+            if (!FC.OSD_CUSTOM_ELEMENTS.items[i].customElementItems[ii]) {
+                continue;
+            }
             $('.osdCustomElement-' + i + '-part-' + ii + '-type').val(FC.OSD_CUSTOM_ELEMENTS.items[i].customElementItems[ii].type).trigger('change');
 
             var valueCell = $('.osdCustomElement-' + i + '-part-' + ii + '-value');
@@ -4200,12 +4212,21 @@ function refreshOSDSwitchIndicators() {
 }
 
 function updatePilotAndCraftNames() {
+    // Guard against being called before OSD constants are initialized
+    if (!OSD.constants || !OSD.constants.ALL_DISPLAY_GROUPS) {
+        return;
+    }
+
     let foundPilotName = ($('#pilot_name').val() == undefined);
     let foundCraftName = ($('#craft_name').val() == undefined);
 
     let generalGroup = OSD.constants.ALL_DISPLAY_GROUPS.filter(function(e) {
         return e.name == "osdGroupGeneral";
     })[0];
+
+    if (!generalGroup || !generalGroup.items) {
+        return;
+    }
 
     if (($('#craft_name').val() != undefined) || ($('#pilot_name').val() != undefined)) {
         for (let si = 0; si < generalGroup.items.length; si++) {
