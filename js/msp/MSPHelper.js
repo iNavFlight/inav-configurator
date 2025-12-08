@@ -484,6 +484,14 @@ var mspHelper = (function () {
                 ));
                 break;
 
+            case MSPCodes.MSP2_INAV_LOGIC_CONDITIONS_CONFIGURED:
+                // 8-byte bitmask: lower 32 bits first, then upper 32 bits
+                FC.LOGIC_CONDITIONS_CONFIGURED_MASK = {
+                    lower: data.getUint32(0, true),
+                    upper: data.getUint32(4, true)
+                };
+                break;
+
             case MSPCodes.MSP2_INAV_LOGIC_CONDITIONS_STATUS:
                 if (data.byteLength % 4 === 0) {
                     let index = 0;
@@ -2432,15 +2440,62 @@ var mspHelper = (function () {
     self.loadLogicConditions = function (callback) {
         if (semver.gte(FC.CONFIG.flightControllerVersion, "5.0.0")) {
             FC.LOGIC_CONDITIONS.flush();
-            let idx = 0;
-            MSP.send_message(MSPCodes.MSP2_INAV_LOGIC_CONDITIONS_SINGLE, [idx], false, nextLogicCondition);
 
-            function nextLogicCondition() {
-                idx++;
-                if (idx < FC.LOGIC_CONDITIONS.getMaxLogicConditionCount() - 1) {
-                    MSP.send_message(MSPCodes.MSP2_INAV_LOGIC_CONDITIONS_SINGLE, [idx], false, nextLogicCondition);
-                } else {
-                    MSP.send_message(MSPCodes.MSP2_INAV_LOGIC_CONDITIONS_SINGLE, [idx], false, callback);
+            // Check if firmware supports the optimized CONFIGURED mask (9.0.0+)
+            if (semver.gte(FC.CONFIG.flightControllerVersion, "9.0.0")) {
+                // Optimized path: first get the configured mask, then only fetch configured conditions
+                MSP.send_message(MSPCodes.MSP2_INAV_LOGIC_CONDITIONS_CONFIGURED, false, false, function() {
+                    const mask = FC.LOGIC_CONDITIONS_CONFIGURED_MASK;
+                    const maxConditions = FC.LOGIC_CONDITIONS.getMaxLogicConditionCount();
+                    let idx = 0;
+
+                    function processNextCondition() {
+                        while (idx < maxConditions) {
+                            // Check if this condition is configured (non-default)
+                            const isConfigured = (idx < 32) ?
+                                (mask.lower & (1 << idx)) !== 0 :
+                                (mask.upper & (1 << (idx - 32))) !== 0;
+
+                            if (isConfigured) {
+                                // Fetch from firmware - handler will put() it
+                                MSP.send_message(MSPCodes.MSP2_INAV_LOGIC_CONDITIONS_SINGLE, [idx], false, function() {
+                                    idx++;
+                                    processNextCondition();
+                                });
+                                return; // Wait for async MSP response
+                            } else {
+                                // Not configured - put default directly and continue loop
+                                FC.LOGIC_CONDITIONS.put(new LogicCondition(
+                                    0,      // enabled
+                                    -1,     // activatorId
+                                    0,      // operation
+                                    0,      // operandAType
+                                    0,      // operandAValue
+                                    0,      // operandBType
+                                    0,      // operandBValue
+                                    0       // flags
+                                ));
+                                idx++;
+                            }
+                        }
+                        // All conditions processed
+                        if (callback) callback();
+                    }
+
+                    processNextCondition();
+                });
+            } else {
+                // Legacy path for 5.0.0 - 8.x: fetch all 64 conditions
+                let idx = 0;
+                MSP.send_message(MSPCodes.MSP2_INAV_LOGIC_CONDITIONS_SINGLE, [idx], false, nextLogicCondition);
+
+                function nextLogicCondition() {
+                    idx++;
+                    if (idx < FC.LOGIC_CONDITIONS.getMaxLogicConditionCount() - 1) {
+                        MSP.send_message(MSPCodes.MSP2_INAV_LOGIC_CONDITIONS_SINGLE, [idx], false, nextLogicCondition);
+                    } else {
+                        MSP.send_message(MSPCodes.MSP2_INAV_LOGIC_CONDITIONS_SINGLE, [idx], false, callback);
+                    }
                 }
             }
         } else {
