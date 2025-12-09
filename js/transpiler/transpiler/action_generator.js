@@ -23,6 +23,7 @@ class ActionGenerator {
    * @param {Function} context.getOverrideOperation - Function to get override operation
    * @param {Object} context.errorHandler - Error handler instance
    * @param {Object} context.variableHandler - Variable handler instance
+   * @param {Object} context.conditionGenerator - Condition generator for CSE cache invalidation
    */
   constructor(context) {
     this.pushLogicCommand = context.pushLogicCommand;
@@ -31,6 +32,7 @@ class ActionGenerator {
     this.getOverrideOperation = context.getOverrideOperation;
     this.errorHandler = context.errorHandler;
     this.variableHandler = context.variableHandler;
+    this.conditionGenerator = context.conditionGenerator;
   }
 
   /**
@@ -83,6 +85,13 @@ class ActionGenerator {
     const target = action.target;
     const value = action.value;
     const index = parseInt(target.match(/\d+/)[0]);
+
+    // Invalidate CSE cache for expressions referencing this gvar
+    // This is critical for correctness: after gvar[N] is mutated,
+    // any cached condition like "gvar[N] < 2" must be re-evaluated
+    if (this.conditionGenerator) {
+      this.conditionGenerator.invalidateCacheForVariable(target);
+    }
 
     if (action.operation) {
       // Arithmetic: gvar[0] = gvar[0] + 10
@@ -227,6 +236,11 @@ class ActionGenerator {
       // Resolve to gvar[N] and generate gvar assignment
       const gvarRef = resolution.gvarRef;
       const index = parseInt(gvarRef.match(/\d+/)[0]);
+
+      // Invalidate CSE cache for expressions referencing this gvar
+      if (this.conditionGenerator) {
+        this.conditionGenerator.invalidateCacheForVariable(gvarRef);
+      }
 
       if (action.operation) {
         // Arithmetic operation

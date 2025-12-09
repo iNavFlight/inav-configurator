@@ -539,6 +539,10 @@ class JavaScriptParser {
       if (expr && expr.type === 'AssignmentExpression') {
         return this.transformAssignment(expr, stmt.loc, stmt.range);
       }
+      // Handle update expressions (++, --) inside if bodies
+      if (expr && expr.type === 'UpdateExpression') {
+        return this.transformUpdateExpression(expr, stmt.loc, stmt.range);
+      }
     }
 
     // Support nested if statements in bodies - recursively transform them
