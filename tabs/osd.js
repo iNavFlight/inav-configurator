@@ -3203,7 +3203,6 @@ OSD.GUI.updateMapPreview = function(mapCenter, name, directionSymbol, centerSymb
 };
 
 OSD.GUI.updatePreviews = function() {
-    // Guard against being called before OSD data is loaded
     if (!OSD.data) {
         return;
     }
@@ -3744,12 +3743,7 @@ TABS.osd.initialize = function (callback) {
                 OSD.GUI.updateDjiMessageElements(this.checked);
             });
 
-            if(semver.gte(FC.CONFIG.flightControllerVersion, '7.1.0')) {
-                mspHelper.loadOsdCustomElements(createCustomElements);
-            }
-
             GUI.content_ready(callback);
-            updatePilotAndCraftNames();
         })));
     });
 };
