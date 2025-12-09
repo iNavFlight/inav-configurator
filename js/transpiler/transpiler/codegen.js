@@ -51,7 +51,13 @@ class INAVCodeGenerator {
 
     this.conditionGenerator = new ConditionGenerator(context);
     this.expressionGenerator = new ExpressionGenerator(context);
-    this.actionGenerator = new ActionGenerator(context);
+
+    // ActionGenerator needs conditionGenerator for CSE cache invalidation on mutation
+    const actionContext = {
+      ...context,
+      conditionGenerator: this.conditionGenerator
+    };
+    this.actionGenerator = new ActionGenerator(actionContext);
   }
 
   /**

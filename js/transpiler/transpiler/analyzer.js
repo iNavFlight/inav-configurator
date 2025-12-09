@@ -495,20 +495,26 @@ class SemanticAnalyzer {
   detectConflicts(ast) {
     // Track assignments by handler type and target
     const handlerAssignments = new Map();
-    
+
+    let stmtIndex = 0;
     for (const stmt of ast.statements) {
       if (stmt && stmt.type === 'EventHandler') {
-        const handlerKey = stmt.handler === 'ifthen' ? 
-          `ifthen:${this.serializeCondition(stmt.condition)}` : 
+        // Each if statement gets a unique key - we want to detect multiple
+        // assignments within the SAME if block, not across different if
+        // statements that happen to have the same condition
+        const handlerKey = stmt.handler === 'ifthen' ?
+          `ifthen:${stmtIndex}` :
           stmt.handler;
-        
+
         if (!handlerAssignments.has(handlerKey)) {
           handlerAssignments.set(handlerKey, new Map());
         }
-        
+
         if (stmt.body && Array.isArray(stmt.body)) {
           this.collectAssignments(stmt.body, handlerKey, handlerAssignments.get(handlerKey));
         }
+
+        stmtIndex++;
       }
     }
     

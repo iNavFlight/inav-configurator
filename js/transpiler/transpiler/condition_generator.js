@@ -44,6 +44,61 @@ class ConditionGenerator {
   }
 
   /**
+   * Invalidate cache entries that reference a specific variable
+   * Should be called when a variable is mutated (assigned, incremented, etc.)
+   * @param {string} varName - Variable name, e.g., 'gvar[1]'
+   */
+  invalidateCacheForVariable(varName) {
+    // Build a pattern that matches cache keys referencing this variable
+    // Cache keys look like: "binary:3:{type:5,value:1}:{type:0,value:2}:-1"
+    // For gvar[1], we need to match keys containing "type\":5,\"value\":1" (GVAR type=5)
+    // or containing the string "gvar[1]"
+
+    const keysToDelete = [];
+
+    for (const key of this.conditionCache.keys()) {
+      if (this.cacheKeyReferencesVariable(key, varName)) {
+        keysToDelete.push(key);
+      }
+    }
+
+    for (const key of keysToDelete) {
+      this.conditionCache.delete(key);
+    }
+  }
+
+  /**
+   * Check if a cache key references a specific variable
+   * @param {string} key - Cache key
+   * @param {string} varName - Variable name, e.g., 'gvar[1]'
+   * @returns {boolean} True if the key references the variable
+   * @private
+   */
+  cacheKeyReferencesVariable(key, varName) {
+    // Extract gvar index from varName like 'gvar[1]'
+    const gvarMatch = varName.match(/^gvar\[(\d+)\]$/);
+    if (gvarMatch) {
+      const gvarIndex = parseInt(gvarMatch[1]);
+      // GVAR operand type is 5, so look for {"type":5,"value":N} in the key
+      // Cache keys are JSON stringified, so patterns like:
+      // "type":5,"value":1  or  "type": 5, "value": 1
+      const pattern1 = `"type":5,"value":${gvarIndex}`;
+      const pattern2 = `"type": 5, "value": ${gvarIndex}`;
+
+      if (key.includes(pattern1) || key.includes(pattern2)) {
+        return true;
+      }
+    }
+
+    // Also check for direct string reference (for future variable types)
+    if (key.includes(varName)) {
+      return true;
+    }
+
+    return false;
+  }
+
+  /**
    * Generate a unique key for a condition for caching purposes
    * @param {string} type - Condition type (binary, logical, etc.)
    * @param {*} params - Parameters that uniquely identify the condition
