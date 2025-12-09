@@ -3558,7 +3558,10 @@ TABS.osd = {};
 TABS.osd.initialize = function (callback) {
 
     mspHelper.loadServoMixRules();
-    mspHelper.loadLogicConditions();
+    mspHelper.loadLogicConditions(function() {
+        // Refresh LC dropdowns now that conditions are loaded
+        $('select.lc, select.ico_lc').html(getLCoptions());
+    });
 
     if (GUI.active_tab != 'osd') {
         GUI.active_tab = 'osd';
@@ -4174,6 +4177,10 @@ function getGVoptions(){
 
 function getLCoptions(){
     var result = '';
+    // Return empty if conditions aren't fully loaded yet - callback will refresh
+    if (FC.LOGIC_CONDITIONS.getCount() < FC.LOGIC_CONDITIONS.getMaxLogicConditionCount()) {
+        return result;
+    }
     for(var i = 0; i < FC.LOGIC_CONDITIONS.getMaxLogicConditionCount(); i++) {
         if (FC.LOGIC_CONDITIONS.isEnabled(i)) {
             result += `<option value="` + i + `">LC ` + i + `</option>`;
