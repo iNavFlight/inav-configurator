@@ -564,17 +564,36 @@ class JavaScriptParser {
     const target = this.extractIdentifier(expr.left);
     const rightExpr = expr.right;
 
+    // Check if right side is sticky({on: ..., off: ...}) call
+    if (rightExpr.type === 'CallExpression' &&
+        rightExpr.callee && rightExpr.callee.type === 'Identifier' &&
+        rightExpr.callee.name === 'sticky') {
+      return {
+        type: 'StickyAssignment',
+        target,
+        args: rightExpr.arguments,
+        loc,
+        range
+      };
+    }
+
     // Check if right side is binary expression (could be arithmetic or comparison)
     if (rightExpr.type === 'BinaryExpression') {
       const operator = rightExpr.operator;
       const arithmeticOps = ['+', '-', '*', '/', '%'];
 
       if (arithmeticOps.includes(operator)) {
+        // For complex expressions (CallExpression, etc.), preserve the full AST node
+        // rather than trying to extract just an identifier string
+        const leftValue = rightExpr.left.type === 'CallExpression'
+          ? rightExpr.left  // Preserve full AST for function calls
+          : this.extractIdentifier(rightExpr.left);
+
         return {
           type: 'Assignment',
           target,
           operation: operator,
-          left: this.extractIdentifier(rightExpr.left),
+          left: leftValue,
           right: this.extractValue(rightExpr.right),
           loc,
           range

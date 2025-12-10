@@ -130,6 +130,15 @@ class ArrowFunctionHelper {
       };
     }
 
+    // Handle call expressions: edge(...), delta(...), xor(...), etc.
+    if (expr.type === 'CallExpression') {
+      return {
+        type: 'CallExpression',
+        callee: expr.callee,
+        arguments: expr.arguments.map(arg => this.transformCondition(arg) || arg)
+      };
+    }
+
     // Handle identifiers and literals
     if (expr.type === 'Identifier') {
       return {

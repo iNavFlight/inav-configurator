@@ -187,13 +187,14 @@ class ActionDecompiler {
   }
 
   /**
-   * Find the innermost function call (Math.round, Math.min, etc.) and its argument
+   * Find the innermost function call (Math.min, Math.max, etc.) and its argument
    * @param {string} expr - Expression to search
    * @returns {Object|null} {func, arg, start, end} or null if not found
    */
   findInnermostFunctionCall(expr) {
-    // Look for patterns like Math.round(...), Math.min(...), Math.max(...)
-    const funcPattern = /Math\.(round|min|max|floor|ceil|abs)\(/g;
+    // Look for patterns like Math.min(...), Math.max(...), Math.abs(...)
+    // Note: Math.round/floor/ceil are not supported by INAV logic conditions
+    const funcPattern = /Math\.(min|max|abs)\(/g;
     let match;
     let innermost = null;
     let innermostDepth = -1;
@@ -268,17 +269,15 @@ class ActionDecompiler {
 
   /**
    * Generate a readable variable name for a hoisted expression
-   * @param {string} funcName - The function being hoisted (e.g., "Math.round")
+   * @param {string} funcName - The function being hoisted (e.g., "Math.min")
    * @param {number} counter - Counter for uniqueness
    * @returns {string} Variable name
    */
   generateVarName(funcName, counter) {
+    // Note: Math.round/floor/ceil are not supported by INAV logic conditions
     const nameMap = {
-      'Math.round': 'rounded',
       'Math.min': 'clamped',
       'Math.max': 'bounded',
-      'Math.floor': 'floored',
-      'Math.ceil': 'ceiled',
       'Math.abs': 'absolute'
     };
     const baseName = nameMap[funcName] || 'temp';

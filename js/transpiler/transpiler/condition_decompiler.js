@@ -300,12 +300,14 @@ class ConditionDecompiler {
 
   handleMapInput(left, right) {
     // MAP_INPUT: scales A from [0:B] to [0:1000]
-    return `Math.min(1000, Math.max(0, Math.round(${left} * 1000 / ${right})))`;
+    // Note: INAV integer division truncates (floors), no rounding needed
+    return `Math.min(1000, Math.max(0, ${left} * 1000 / ${right}))`;
   }
 
   handleMapOutput(left, right) {
     // MAP_OUTPUT: scales A from [0:1000] to [0:B]
-    return `Math.min(${right}, Math.max(0, Math.round(${left} * ${right} / 1000)))`;
+    // Note: INAV integer division truncates (floors), no rounding needed
+    return `Math.min(${right}, Math.max(0, ${left} * ${right} / 1000))`;
   }
 
   handleTimer(left, right) {

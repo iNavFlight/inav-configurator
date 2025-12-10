@@ -597,7 +597,25 @@ class Decompiler {
         const actions = [];
         const nestedConditions = [];
 
+        // Find LC indices consumed by STICKY/EDGE/DELAY siblings (their operands)
+        const consumedBySpecial = new Set();
         for (const child of node.children) {
+          const op = child.lc.operation;
+          if (op === OPERATION.STICKY || op === OPERATION.EDGE || op === OPERATION.DELAY) {
+            if (child.lc.operandAType === OPERAND_TYPE.LC) {
+              consumedBySpecial.add(child.lc.operandAValue);
+            }
+            if (child.lc.operandBType === OPERAND_TYPE.LC) {
+              consumedBySpecial.add(child.lc.operandBValue);
+            }
+          }
+        }
+
+        for (const child of node.children) {
+          // Skip conditions that are consumed as operands by STICKY/EDGE/DELAY siblings
+          if (consumedBySpecial.has(child.lc.index)) {
+            continue;
+          }
           if (this.isActionOperation(child.lc.operation)) {
             actions.push(child);
           } else {
@@ -1227,9 +1245,19 @@ class Decompiler {
       return declarations;
     }
 
+    // Get existing var names from variableMap to avoid duplicates
+    const existingVars = new Set();
+    if (this.variableMap?.var_variables) {
+      for (const name of Object.keys(this.variableMap.var_variables)) {
+        existingVars.add(name);
+      }
+    }
+
     for (const [lcIndex, varName] of this.stickyVarNames) {
-      // Generate a var declaration with a comment showing which LC it represents
-      // Use 'var' because these are reassigned (let would cause compiler error)
+      // Skip if already declared in variableMap
+      if (existingVars.has(varName)) {
+        continue;
+      }
       declarations.push(`var ${varName}; // logicCondition[${lcIndex}] - sticky/timer state`);
     }
 
