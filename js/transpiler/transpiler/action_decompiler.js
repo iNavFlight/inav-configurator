@@ -53,7 +53,9 @@ class ActionDecompiler {
         return this.handleOverrideThrottleScale(value);
 
       case OPERATION.OVERRIDE_THROTTLE:
-        return this.handleOverrideThrottle(value);
+        // OVERRIDE_THROTTLE uses operandA for the throttle value, not operandB
+        const throttleValue = this.decompileOperand(lc.operandAType, lc.operandAValue, allConditions);
+        return this.handleOverrideThrottle(throttleValue);
 
       case OPERATION.SET_VTX_POWER_LEVEL:
         return this.handleSetVtxPowerLevel(value);

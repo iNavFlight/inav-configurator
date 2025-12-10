@@ -133,6 +133,38 @@ class Decompiler {
   }
 
   /**
+   * Check if an operation produces a boolean result (condition) vs a numeric value
+   * Boolean operations can be chained in if() conditions with &&
+   * Value operations (arithmetic, min/max, etc.) compute intermediate values
+   * @param {number} operation - Operation code
+   * @returns {boolean} True if this produces a boolean result
+   */
+  isBooleanOperation(operation) {
+    const booleanOperations = [
+      OPERATION.TRUE,
+      OPERATION.EQUAL,
+      OPERATION.GREATER_THAN,
+      OPERATION.LOWER_THAN,
+      OPERATION.LOW,
+      OPERATION.MID,
+      OPERATION.HIGH,
+      OPERATION.AND,
+      OPERATION.OR,
+      OPERATION.XOR,
+      OPERATION.NAND,
+      OPERATION.NOR,
+      OPERATION.NOT,
+      OPERATION.STICKY,
+      OPERATION.EDGE,
+      OPERATION.DELAY,
+      OPERATION.TIMER,
+      OPERATION.DELTA,
+      OPERATION.APPROX_EQUAL
+    ];
+    return booleanOperations.includes(operation);
+  }
+
+  /**
    * Check if a GVAR_SET logic condition is a var initialization from the variable map
    * These are already shown in the declarations section, so we skip them
    * @param {Object} lc - Logic condition
@@ -453,6 +485,9 @@ class Decompiler {
 
     // Handle orphaned actions (actions without root conditions)
     for (const lc of conditions) {
+      // Skip gap markers
+      if (lc._gap) continue;
+
       if (!processed.has(lc.index)) {
         this.addWarning(`Logic condition ${lc.index} has no valid activator`);
         groups.push({
@@ -530,20 +565,22 @@ class Decompiler {
       }
     }
 
-    // Build combined condition from activator and any chained conditions
+    // Build combined condition from activator and any chained boolean conditions
     const conditionParts = [this.decompileCondition(group.activator, allConditions)];
     const actualActions = [];
     const chainedConditions = []; // Track chained condition LCs to find terminal index
 
-    // Separate chained conditions from actions
+    // Separate chained conditions from actions and value computations
     for (const lc of group.actions) {
       if (this.isActionOperation(lc.operation)) {
         actualActions.push(this.decompileAction(lc, allConditions));
-      } else {
-        // This is a condition in the chain - add it to the compound condition
+      } else if (this.isBooleanOperation(lc.operation)) {
+        // This is a boolean condition in the chain - add it to the compound condition
         conditionParts.push(this.decompileCondition(lc, allConditions));
         chainedConditions.push(lc);
       }
+      // Value computations (ADD, SUB, MUL, etc.) are skipped - they're intermediate
+      // values that will be inlined when referenced by actions or other conditions
     }
 
     const combinedCondition = conditionParts.join(' && ');
@@ -648,13 +685,15 @@ class Decompiler {
 
           const referencedLC = allConditions.find(lc => lc.index === value);
           if (referencedLC) {
-            // Don't inline LCs that have activators - they're part of chains
-            // and inlining them would lose semantic meaning
-            if (referencedLC.activatorId !== -1) {
-              return `logicCondition[${value}]`;
-            }
             // Don't inline action operations (they produce side effects)
             if (this.isActionOperation(referencedLC.operation)) {
+              return `logicCondition[${value}]`;
+            }
+            // Don't inline boolean conditions that have activators - they're part of chains
+            // and inlining them would lose semantic meaning
+            // BUT value computations (ADD, MUL, etc.) can be inlined since they're just
+            // calculating intermediate values
+            if (referencedLC.activatorId !== -1 && this.isBooleanOperation(referencedLC.operation)) {
               return `logicCondition[${value}]`;
             }
             // Recursively decompile the referenced condition with cycle detection
