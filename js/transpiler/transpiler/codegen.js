@@ -426,7 +426,7 @@ class INAVCodeGenerator {
    * Generate sticky assignment: latch1 = sticky({on: () => cond1, off: () => cond2})
    * Creates the sticky LC and tracks the variable name -> LC index mapping
    */
-  generateStickyAssignment(stmt) {
+  generateStickyAssignment(stmt, activatorId = -1) {
     const { target, args } = stmt;
 
     if (!args || args.length < 1) {
@@ -463,16 +463,17 @@ class INAVCodeGenerator {
       return;
     }
 
-    // Generate ON condition LC
-    const onConditionId = this.generateCondition(onCondition, -1);
+    // Generate ON condition LC (inherits activator from parent)
+    const onConditionId = this.generateCondition(onCondition, activatorId);
 
-    // Generate OFF condition LC
+    // Generate OFF condition LC (runs unconditionally - uses -1)
     const offConditionId = this.generateCondition(offCondition, -1);
 
-    // Generate STICKY operation (13)
+    // Generate STICKY operation (13) - inherits activator from parent
     const stickyId = this.pushLogicCommand(OPERATION.STICKY,
       { type: OPERAND_TYPE.LC, value: onConditionId },
-      { type: OPERAND_TYPE.LC, value: offConditionId }
+      { type: OPERAND_TYPE.LC, value: offConditionId },
+      activatorId
     );
 
     // Track the variable name -> LC index mapping for use in conditions
@@ -637,7 +638,7 @@ class INAVCodeGenerator {
   generateAction(action, activatorId) {
     // Handle StickyAssignment specially - it creates LCs and tracks latch variables
     if (action && action.type === 'StickyAssignment') {
-      this.generateStickyAssignment(action);
+      this.generateStickyAssignment(action, activatorId);
       return;
     }
     this.actionGenerator.generate(action, activatorId);

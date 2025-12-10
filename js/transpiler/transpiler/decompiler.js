@@ -1227,7 +1227,19 @@ class Decompiler {
       return declarations;
     }
 
+    // Get latch variable names to skip (they're declared by generateStickyVarDeclarations)
+    const stickyVarNames = new Set();
+    if (this.stickyVarNames) {
+      for (const varName of this.stickyVarNames.values()) {
+        stickyVarNames.add(varName);
+      }
+    }
+
     for (const [name, info] of Object.entries(this.variableMap.var_variables)) {
+      // Skip latch variables - they're handled by sticky declarations
+      if (stickyVarNames.has(name)) {
+        continue;
+      }
       declarations.push(`var ${name} = ${info.expression};`);
     }
 

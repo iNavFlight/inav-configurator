@@ -614,5 +614,44 @@ describe('Duplicate Sticky and Empty Block Prevention', () => {
   });
 });
 
+describe('Round-trip Compilation', () => {
+  let decompiler;
+
+  beforeEach(() => {
+    decompiler = new Decompiler();
+  });
+
+  test('should compile var latch = sticky() inside if blocks correctly', async () => {
+    // This tests the fix for nested sticky compilation
+    // The decompiled code includes: if (flight.gpsValid === 1) { var latch1 = sticky({...}); if (latch1) {...} }
+    const { Transpiler } = await import('../index.js');
+
+    const code = `
+const { flight, rc, gvar, sticky } = inav;
+
+if (flight.gpsValid === 1) {
+  var latch1 = sticky({
+    on: () => flight.groundSpeed > 1000,
+    off: () => flight.isArmed === 0
+  });
+  if (latch1) {
+    gvar[0] = 1;
+  }
+}
+`;
+
+    const transpiler = new Transpiler();
+    const result = transpiler.transpile(code);
+
+    expect(result.success).toBe(true);
+    expect(result.commands.length).toBe(5);
+
+    // Verify the sticky has the correct activator (should be 0, not -1)
+    // LC 3 should be STICKY with activator 0 (the gpsValid check)
+    const stickyCmd = result.commands[3];
+    expect(stickyCmd).toContain('logic 3 1 0 13'); // activator 0, operation 13 (STICKY)
+  });
+});
+
 // Export the load function for the runner
 module.exports = { loadDecompiler };

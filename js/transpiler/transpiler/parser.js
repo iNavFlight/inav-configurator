@@ -245,6 +245,21 @@ class JavaScriptParser {
           range: node.range
         };
       }
+
+      // Check for: var latch1 = sticky({on: ..., off: ...})
+      if (decl.id && decl.id.type === 'Identifier' &&
+          decl.init &&
+          decl.init.type === 'CallExpression' &&
+          decl.init.callee && decl.init.callee.type === 'Identifier' &&
+          decl.init.callee.name === 'sticky') {
+        return {
+          type: 'StickyAssignment',
+          target: decl.id.name,
+          args: decl.init.arguments,
+          loc: node.loc,
+          range: node.range
+        };
+      }
     }
 
     // Handle let/var declarations via VariableHandler
@@ -543,6 +558,11 @@ class JavaScriptParser {
       if (expr && expr.type === 'UpdateExpression') {
         return this.transformUpdateExpression(expr, stmt.loc, stmt.range);
       }
+    }
+
+    // Support variable declarations in bodies (var latch1 = sticky({...}), let x = ...)
+    if (stmt.type === 'VariableDeclaration') {
+      return this.transformVariableDeclaration(stmt);
     }
 
     // Support nested if statements in bodies - recursively transform them

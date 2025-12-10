@@ -124,6 +124,33 @@ class VariableHandler {
   }
 
   /**
+   * Add 'latch' variable to symbol table (for sticky/timer state)
+   * These don't use gvar slots - they reference LC indices
+   *
+   * @param {string} name - Variable name (e.g., 'latch1')
+   * @param {Object} loc - Source location
+   */
+  addLatchVariable(name, loc) {
+    // Check for redeclaration
+    if (this.symbols.has(name)) {
+      this.errors.push({
+        message: `Variable '${name}' is already declared`,
+        line: loc ? loc.start.line : 0,
+        code: 'redeclaration'
+      });
+      return;
+    }
+
+    // Store as latch type - LC index assigned by codegen
+    this.symbols.set(name, {
+      name,
+      kind: 'latch',
+      lcIndex: null,  // Assigned by codegen when sticky LC is generated
+      loc
+    });
+  }
+
+  /**
    * Detect which gvar slots are explicitly used by user code
    * Scans AST for gvar[N] references
    *
