@@ -575,7 +575,11 @@ class Decompiler {
     } else if (this.isActionOperation(node.lc.operation)) {
       // This is an action - render it
       const action = this.decompileAction(node.lc, allConditions);
-      lines.push(indentStr + action);
+      // Handle multi-line actions (e.g., hoisted variables) - indent each line
+      const actionLines = action.split('\n');
+      for (const line of actionLines) {
+        lines.push(indentStr + line);
+      }
 
       // Actions can still have children (dependent actions)
       for (const child of node.children) {
@@ -1224,8 +1228,9 @@ class Decompiler {
     }
 
     for (const [lcIndex, varName] of this.stickyVarNames) {
-      // Generate a let declaration with a comment showing which LC it represents
-      declarations.push(`let ${varName}; // logicCondition[${lcIndex}] - sticky/timer state`);
+      // Generate a var declaration with a comment showing which LC it represents
+      // Use 'var' because these are reassigned (let would cause compiler error)
+      declarations.push(`var ${varName}; // logicCondition[${lcIndex}] - sticky/timer state`);
     }
 
     return declarations;
