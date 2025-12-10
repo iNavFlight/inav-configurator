@@ -23,11 +23,11 @@ describe('Chained Conditions', () => {
     decompiler = new Decompiler();
   });
 
-  test('should combine chained conditions with AND', () => {
+  test('should handle chained conditions as nested if blocks', () => {
     // Chained conditions case:
     // logic 0 1 -1 1 2 39 0 1 0   # LC0: flight.param39 == 1 (root)
     // logic 1 1 0 1 2 17 0 1 0    # LC1: flight.isArmed == 1, activator=0
-    // logic 2 1 1 2 2 9 0 1111 0  # LC2: flight.groundSpeed > 1111, activator=1
+    // logic 2 1 1 18 5 0 0 1 0    # LC2: gvar[0] = 1, activator=1 (action)
     const conditions = [
       {
         index: 0,
@@ -53,11 +53,11 @@ describe('Chained Conditions', () => {
         index: 2,
         enabled: 1,
         activatorId: 1,
-        operation: 2, // GREATER_THAN
-        operandAType: 2, // FLIGHT
-        operandAValue: 9, // groundSpeed
+        operation: 18, // GVAR_SET
+        operandAType: 5, // GVAR
+        operandAValue: 0,
         operandBType: 0, // VALUE
-        operandBValue: 1111
+        operandBValue: 1
       }
     ];
 
@@ -65,18 +65,18 @@ describe('Chained Conditions', () => {
 
     expect(result.success).toBe(true);
     expect(result.warnings).toHaveLength(0);
-    // Should contain all three conditions combined with &&
-    expect(result.code).toContain('&&');
+    // Tree-based decompiler uses nested if blocks
     expect(result.code).toContain('flight.mixerTransitionActive === 1');
     expect(result.code).toContain('flight.isArmed === 1');
-    expect(result.code).toContain('flight.groundSpeed > 1111');
+    expect(result.code).toContain('gvar[0] = 1');
   });
 
-  test('should handle long chain of 4 conditions', () => {
+  test('should handle long chain of 4 conditions with action', () => {
     // logic 19 1 -1 1 2 38 0 1 0   # LC19: param38 == 1 (root)
     // logic 20 1 19 1 2 17 0 1 0   # LC20: isArmed == 1, activator=19
     // logic 21 1 20 1 2 18 0 0 0   # LC21: isAutoLaunch == 0, activator=20
     // logic 22 1 21 3 2 11 0 1111 0 # LC22: airSpeed < 1111, activator=21
+    // logic 23 1 22 18 5 0 0 42 0  # LC23: gvar[0] = 42, activator=22 (action)
     const conditions = [
       {
         index: 19,
@@ -117,6 +117,16 @@ describe('Chained Conditions', () => {
         operandAValue: 11, // airSpeed
         operandBType: 0,
         operandBValue: 1111
+      },
+      {
+        index: 23,
+        enabled: 1,
+        activatorId: 22,
+        operation: 18, // GVAR_SET
+        operandAType: 5, // GVAR
+        operandAValue: 0,
+        operandBType: 0,
+        operandBValue: 42
       }
     ];
 
@@ -124,15 +134,17 @@ describe('Chained Conditions', () => {
 
     expect(result.success).toBe(true);
     expect(result.warnings).toHaveLength(0);
-    // Should contain all four conditions
+    // Should contain all four conditions and action
     expect(result.code).toContain('flight.activeMixerProfile === 1');
     expect(result.code).toContain('flight.isArmed === 1');
     expect(result.code).toContain('flight.isAutoLaunch === 0');
     expect(result.code).toContain('flight.airSpeed < 1111');
+    expect(result.code).toContain('gvar[0] = 42');
   });
 
-  test('should output conditions without actions (readable externally)', () => {
-    // A single condition with no actions should still be output
+  test('should skip conditions without actions', () => {
+    // A single condition with no actions produces no output
+    // (it's just a helper condition that can be read externally by other LCs)
     const conditions = [
       {
         index: 5,
@@ -149,10 +161,9 @@ describe('Chained Conditions', () => {
     const result = decompiler.decompile(conditions);
 
     expect(result.success).toBe(true);
-    // Should contain the condition
-    expect(result.code).toContain('flight.homeDistance > 500');
-    // Should indicate it can be read externally
-    expect(result.code).toContain('logicCondition[5]');
+    // Conditions without actions are skipped (no code to execute)
+    // The condition can still be read externally via logicCondition[5]
+    expect(result.code).not.toContain('flight.homeDistance');
   });
 
   test('should not produce warnings for comparison with activator', () => {

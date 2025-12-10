@@ -373,11 +373,11 @@ describe('Decompiler', () => {
     test('should warn about unsupported features', () => {
       decompiler.warnings = [];
 
-      // Use an unsupported operand type
-      decompiler.decompileOperand(6, 0); // PID
+      // Use an unsupported operand type (99 is not a valid type)
+      decompiler.decompileOperand(99, 0);
 
       expect(decompiler.warnings.length).toBeGreaterThan(0);
-      expect(decompiler.warnings[0]).toContain('PID');
+      expect(decompiler.warnings[0]).toContain('Unknown');
     });
 
     test('should include warnings in output', () => {
@@ -387,7 +387,7 @@ describe('Decompiler', () => {
           enabled: 1,
           activatorId: -1,
           operation: 2,
-          operandAType: 6, // PID (unsupported)
+          operandAType: 99, // Invalid operand type (unsupported)
           operandAValue: 0,
           operandBType: 0,
           operandBValue: 100

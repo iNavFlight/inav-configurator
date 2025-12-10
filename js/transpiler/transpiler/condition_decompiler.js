@@ -176,6 +176,10 @@ class ConditionDecompiler {
   }
 
   handleNot(left) {
+    // If the operand contains operators, wrap in parens for correct precedence
+    if (left.includes(' ') || left.includes('!') || left.includes('(')) {
+      return `!(${left})`;
+    }
     return `!${left}`;
   }
 
@@ -218,18 +222,43 @@ class ConditionDecompiler {
   }
 
   handleAdd(left, right) {
+    // Simplify x + 0 or 0 + x
+    if (right === '0') {
+      return left;
+    }
+    if (left === '0') {
+      return right;
+    }
     return `(${left} + ${right})`;
   }
 
   handleSub(left, right) {
+    // Simplify x - 0
+    if (right === '0') {
+      return left;
+    }
     return `(${left} - ${right})`;
   }
 
   handleMul(left, right) {
+    // Simplify x * 1 or 1 * x, x * 0 or 0 * x
+    if (right === '1') {
+      return left;
+    }
+    if (left === '1') {
+      return right;
+    }
+    if (right === '0' || left === '0') {
+      return '0';
+    }
     return `(${left} * ${right})`;
   }
 
   handleDiv(left, right) {
+    // Simplify x / 1
+    if (right === '1') {
+      return left;
+    }
     return `(${left} / ${right})`;
   }
 
@@ -288,9 +317,7 @@ class ConditionDecompiler {
 
   handleDelta(left, right) {
     // DELTA: true when A changes by B or more within 100ms
-    // This case shouldn't normally be hit because detectSpecialPattern handles it
-    // But include for completeness
-    return `/* delta(${left}, threshold ${right}) */ true`;
+    return `delta(${left}, ${right})`;
   }
 }
 

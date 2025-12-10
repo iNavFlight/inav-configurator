@@ -195,6 +195,7 @@ class Decompiler {
   decompile(logicConditions, variableMap = null) {
     this.warnings = [];
     this.variableMap = variableMap;
+    this.stickyVarNames = new Map(); // Map LC index -> generated variable name
 
     if (!logicConditions || !Array.isArray(logicConditions)) {
       return {
@@ -235,22 +236,8 @@ class Decompiler {
       };
     }
 
-    // Group conditions by their structure
-    const groups = this.groupConditions(enabled);
-
-    // Generate code for each group (pass enabled conditions for pattern detection)
-    const codeBlocks = [];
-    for (const group of groups) {
-      // Gap markers become empty strings (extra blank line when joined)
-      if (group._gap) {
-        codeBlocks.push('');
-        continue;
-      }
-      const code = this.decompileGroup(group, enabled);
-      if (code) {
-        codeBlocks.push(code);
-      }
-    }
+    // Use tree-based decompilation for proper nesting
+    const codeBlocks = this.decompileWithTrees(enabled);
 
     const code = this.generateBoilerplate(codeBlocks.join('\n\n'));
 
@@ -261,9 +248,130 @@ class Decompiler {
       stats: {
         total: logicConditions.length,
         enabled: enabled.length,
-        groups: groups.length
+        groups: codeBlocks.length
       }
     };
+  }
+
+  /**
+   * Decompile using tree-based approach for proper nesting
+   * @param {Array} conditions - Enabled logic conditions
+   * @returns {Array} Array of code blocks
+   */
+  decompileWithTrees(conditions) {
+    const codeBlocks = [];
+    const processed = new Set();
+
+    // Find LCs that are referenced by special operations (EDGE, STICKY, DELAY)
+    // These should not be rendered as standalone - they're part of the special op
+    const referencedBySpecialOps = new Set();
+    for (const lc of conditions) {
+      if (lc._gap) continue;
+
+      if (lc.operation === OPERATION.EDGE || lc.operation === OPERATION.DELAY) {
+        if (lc.operandAType === OPERAND_TYPE.LC) {
+          referencedBySpecialOps.add(lc.operandAValue);
+        }
+      } else if (lc.operation === OPERATION.STICKY) {
+        if (lc.operandAType === OPERAND_TYPE.LC) {
+          referencedBySpecialOps.add(lc.operandAValue);
+        }
+        if (lc.operandBType === OPERAND_TYPE.LC) {
+          referencedBySpecialOps.add(lc.operandBValue);
+        }
+      }
+    }
+
+    // Find LCs that are referenced as operands by other LCs
+    // These are helper/intermediate values that shouldn't be standalone blocks
+    const referencedAsOperand = new Set();
+
+    // Track LC references for referencedAsOperand
+    // Also track which STICKY/TIMERs are referenced (need to show their definition)
+    const referencedStickyLCs = new Set();
+    for (const lc of conditions) {
+      if (lc._gap) continue;
+      if (lc.operandAType === OPERAND_TYPE.LC) {
+        referencedAsOperand.add(lc.operandAValue);
+        const refLC = conditions.find(c => c.index === lc.operandAValue);
+        if (refLC && (refLC.operation === OPERATION.STICKY || refLC.operation === OPERATION.TIMER)) {
+          referencedStickyLCs.add(lc.operandAValue);
+        }
+      }
+      if (lc.operandBType === OPERAND_TYPE.LC) {
+        referencedAsOperand.add(lc.operandBValue);
+        const refLC = conditions.find(c => c.index === lc.operandBValue);
+        if (refLC && (refLC.operation === OPERATION.STICKY || refLC.operation === OPERATION.TIMER)) {
+          referencedStickyLCs.add(lc.operandBValue);
+        }
+      }
+    }
+    this.referencedStickyLCs = referencedStickyLCs;
+
+    // Generate variable names for ALL STICKY/TIMER LCs (not just referenced ones)
+    // This allows consistent rendering as variable + if block
+    let stickyVarCount = 1;
+    for (const lc of conditions) {
+      if (lc._gap) continue;
+      if (lc.operation === OPERATION.STICKY || lc.operation === OPERATION.TIMER) {
+        const varName = `latch${stickyVarCount++}`;
+        this.stickyVarNames.set(lc.index, varName);
+      }
+    }
+
+    // Find root conditions (activatorId === -1) that should be rendered
+    const roots = conditions.filter(lc => {
+      if (lc._gap) return false;
+      if (lc.activatorId !== -1) return false;
+
+      // Skip if only referenced by special ops
+      if (referencedBySpecialOps.has(lc.index)) return false;
+
+      // Skip if only used as operand by other LCs (helper conditions)
+      if (referencedAsOperand.has(lc.index) && !this.isActionOperation(lc.operation)) {
+        const hasChildren = conditions.some(c => c.activatorId === lc.index);
+        if (!hasChildren) return false;
+      }
+
+      // Skip pure value computations with no children that depend on them
+      if (!this.isBooleanOperation(lc.operation) &&
+          !this.isActionOperation(lc.operation)) {
+        const hasChildren = conditions.some(c => c.activatorId === lc.index);
+        if (!hasChildren) return false;
+      }
+
+      return true;
+    });
+
+    // Build and decompile tree for each root
+    for (const rootLc of roots) {
+      if (processed.has(rootLc.index)) continue;
+
+      const tree = this.buildConditionTree(rootLc, conditions, processed);
+      const code = this.decompileTree(tree, conditions, 0);
+      if (code && code.trim()) {
+        codeBlocks.push(code);
+      }
+    }
+
+    // Handle any orphaned conditions (with non-root activators that weren't processed)
+    for (const lc of conditions) {
+      if (lc._gap) continue;
+      if (processed.has(lc.index)) continue;
+      if (referencedBySpecialOps.has(lc.index)) continue;
+      if (referencedAsOperand.has(lc.index)) continue; // Skip helper conditions
+
+      // This condition has an activator that doesn't exist or wasn't processed
+      // Only warn if it's an action (helper conditions are expected to be unreferenced)
+      if (this.isActionOperation(lc.operation)) {
+        this.addWarning(`Logic condition ${lc.index} has unprocessed activator ${lc.activatorId}`);
+        const action = this.decompileAction(lc, conditions);
+        codeBlocks.push(`// Orphaned action (activator ${lc.activatorId} not found)\n${action}`);
+      }
+      processed.add(lc.index);
+    }
+
+    return codeBlocks;
   }
 
   /**
@@ -365,7 +473,7 @@ class Decompiler {
   }
 
   /**
-   * Recursively collect all descendants of a logic condition
+   * Recursively collect all descendants of a logic condition (flat list)
    * @param {number} parentIndex - Index of parent LC
    * @param {Array} conditions - All conditions
    * @param {Set} collected - Set of already collected indices
@@ -383,6 +491,286 @@ class Decompiler {
       }
     }
     return descendants;
+  }
+
+  /**
+   * Get direct children of a logic condition (not grandchildren)
+   * @param {number} parentIndex - Index of parent LC
+   * @param {Array} conditions - All conditions
+   * @returns {Array} Direct child LCs
+   */
+  getDirectChildren(parentIndex, conditions) {
+    return conditions.filter(lc => !lc._gap && lc.activatorId === parentIndex);
+  }
+
+  /**
+   * Build a tree structure from logic conditions
+   * @param {Object} rootLc - Root logic condition
+   * @param {Array} allConditions - All conditions
+   * @param {Set} processed - Set of processed indices
+   * @returns {Object} Tree node with children
+   */
+  buildConditionTree(rootLc, allConditions, processed) {
+    processed.add(rootLc.index);
+
+    const node = {
+      lc: rootLc,
+      children: []
+    };
+
+    // Get direct children
+    const directChildren = this.getDirectChildren(rootLc.index, allConditions);
+
+    for (const childLc of directChildren) {
+      if (processed.has(childLc.index)) continue;
+
+      // Recursively build subtree
+      const childNode = this.buildConditionTree(childLc, allConditions, processed);
+      node.children.push(childNode);
+    }
+
+    return node;
+  }
+
+  /**
+   * Decompile a condition tree to JavaScript with proper nesting
+   * @param {Object} node - Tree node
+   * @param {Array} allConditions - All conditions for resolution
+   * @param {number} indent - Current indentation level
+   * @returns {string} JavaScript code
+   */
+  decompileTree(node, allConditions, indent = 0) {
+    const indentStr = '  '.repeat(indent);
+    const lines = [];
+
+    // Check for special patterns (edge, sticky, delay, timer)
+    const pattern = this.detectSpecialPatternForNode(node, allConditions);
+
+    if (pattern) {
+      // Collect children code
+      const childCodes = [];
+      for (const child of node.children) {
+        const childCode = this.decompileTree(child, allConditions, indent + 1);
+        if (childCode && childCode.trim()) {
+          childCodes.push(childCode);
+        }
+      }
+
+      // Render pattern - stickys use variable + if style, others use callback style
+      if (pattern.type === 'sticky') {
+        const varName = this.stickyVarNames.get(node.lc.index);
+        const isReferenced = this.referencedStickyLCs && this.referencedStickyLCs.has(node.lc.index);
+        // Skip empty stickys unless they're referenced elsewhere
+        if (childCodes.length === 0 && !isReferenced) {
+          return '';
+        }
+        lines.push(...this.renderStickyWithLatch(pattern, childCodes, indent, varName));
+      } else {
+        // Skip empty patterns for non-sticky types
+        if (childCodes.length === 0) {
+          return '';
+        }
+        lines.push(...this.renderSpecialPatternWithCode(pattern, childCodes, indent));
+      }
+    } else if (this.isActionOperation(node.lc.operation)) {
+      // This is an action - render it
+      const action = this.decompileAction(node.lc, allConditions);
+      lines.push(indentStr + action);
+
+      // Actions can still have children (dependent actions)
+      for (const child of node.children) {
+        lines.push(this.decompileTree(child, allConditions, indent));
+      }
+    } else if (this.isBooleanOperation(node.lc.operation)) {
+      // This is a boolean condition - create if block
+      const condition = this.decompileCondition(node.lc, allConditions);
+
+      if (node.children.length === 0) {
+        // Condition with no children - skip it (it's a helper used elsewhere)
+        return '';
+      } else {
+        // Separate children into: actions, boolean conditions (same level), nested conditions
+        const actions = [];
+        const nestedConditions = [];
+
+        for (const child of node.children) {
+          if (this.isActionOperation(child.lc.operation)) {
+            actions.push(child);
+          } else {
+            nestedConditions.push(child);
+          }
+        }
+
+        // Build if statement
+        lines.push(indentStr + `if (${condition}) {`);
+
+        // First, output any actions at this level
+        for (const actionNode of actions) {
+          lines.push(this.decompileTree(actionNode, allConditions, indent + 1));
+        }
+
+        // Then, output nested conditions
+        for (const nestedNode of nestedConditions) {
+          lines.push(this.decompileTree(nestedNode, allConditions, indent + 1));
+        }
+
+        lines.push(indentStr + '}');
+      }
+    } else {
+      // Value computation - skip rendering but process children
+      // (the value will be inlined when referenced)
+      for (const child of node.children) {
+        lines.push(this.decompileTree(child, allConditions, indent));
+      }
+    }
+
+    return lines.filter(l => l).join('\n');
+  }
+
+  /**
+   * Detect special pattern for a tree node
+   * @param {Object} node - Tree node
+   * @param {Array} allConditions - All conditions
+   * @returns {Object|null} Pattern info or null
+   */
+  detectSpecialPatternForNode(node, allConditions) {
+    const lc = node.lc;
+
+    if (lc.operation === OPERATION.EDGE) {
+      const conditionId = lc.operandAValue;
+      const duration = lc.operandBValue;
+      // Use decompileOperand to handle action LCs properly
+      return {
+        type: 'edge',
+        condition: this.decompileOperand(OPERAND_TYPE.LC, conditionId, allConditions),
+        duration: duration
+      };
+    }
+
+    if (lc.operation === OPERATION.STICKY) {
+      const onConditionId = lc.operandAValue;
+      const offConditionId = lc.operandBValue;
+      // Use decompileOperand to handle action LCs properly
+      return {
+        type: 'sticky',
+        onCondition: this.decompileOperand(OPERAND_TYPE.LC, onConditionId, allConditions),
+        offCondition: this.decompileOperand(OPERAND_TYPE.LC, offConditionId, allConditions)
+      };
+    }
+
+    if (lc.operation === OPERATION.DELAY) {
+      const conditionId = lc.operandAValue;
+      const duration = lc.operandBValue;
+      // Use decompileOperand to handle action LCs properly
+      return {
+        type: 'delay',
+        condition: this.decompileOperand(OPERAND_TYPE.LC, conditionId, allConditions),
+        duration: duration
+      };
+    }
+
+    if (lc.operation === OPERATION.TIMER) {
+      return {
+        type: 'timer',
+        onMs: lc.operandAValue,
+        offMs: lc.operandBValue
+      };
+    }
+
+    if (lc.operation === OPERATION.DELTA) {
+      const valueOperand = this.decompileOperand(lc.operandAType, lc.operandAValue, allConditions);
+      return {
+        type: 'whenChanged',
+        value: valueOperand,
+        threshold: lc.operandBValue
+      };
+    }
+
+    return null;
+  }
+
+  /**
+   * Render a sticky that is referenced elsewhere as a latch variable
+   * Shows assignment to the variable so readers understand what sets it
+   * @param {Object} pattern - Pattern info (type: 'sticky')
+   * @param {Array} childCodes - Pre-computed child code strings
+   * @param {number} indent - Indentation level
+   * @param {string} varName - The latch variable name
+   * @returns {Array} Lines of code
+   */
+  renderStickyWithLatch(pattern, childCodes, indent, varName) {
+    const indentStr = '  '.repeat(indent);
+    const lines = [];
+
+    // Show the sticky with assignment to the latch variable
+    lines.push(indentStr + `${varName} = sticky({`);
+    lines.push(indentStr + `  on: () => ${pattern.onCondition},`);
+    lines.push(indentStr + `  off: () => ${pattern.offCondition}`);
+    lines.push(indentStr + `});`);
+
+    // If there are children, render them in an if block
+    if (childCodes.length > 0) {
+      lines.push(indentStr + `if (${varName}) {`);
+      for (const code of childCodes) {
+        lines.push(code);
+      }
+      lines.push(indentStr + `}`);
+    }
+
+    return lines;
+  }
+
+  /**
+   * Render a special pattern (edge, sticky, etc.) with its children
+   * @param {Object} pattern - Pattern info
+   * @param {Object} node - Tree node
+   * @param {Array} allConditions - All conditions
+   * @param {number} indent - Indentation level
+   * @returns {Array} Lines of code
+   */
+  renderSpecialPattern(pattern, node, allConditions, indent) {
+    // Collect children code
+    const childLines = [];
+    for (const child of node.children) {
+      const childCode = this.decompileTree(child, allConditions, indent + 1);
+      if (childCode) childLines.push(childCode);
+    }
+
+    return this.renderSpecialPatternWithCode(pattern, childLines, indent);
+  }
+
+  /**
+   * Render a special pattern with pre-computed child code
+   * @param {Object} pattern - Pattern info
+   * @param {Array} childCodes - Pre-computed child code strings
+   * @param {number} indent - Indentation level
+   * @returns {Array} Lines of code
+   */
+  renderSpecialPatternWithCode(pattern, childCodes, indent) {
+    const indentStr = '  '.repeat(indent);
+    const lines = [];
+
+    const body = childCodes.join('\n');
+
+    if (pattern.type === 'edge') {
+      lines.push(indentStr + `edge(${pattern.condition}, ${pattern.duration}, () => {`);
+      if (body) lines.push(body);
+      lines.push(indentStr + '});');
+    } else if (pattern.type === 'delay') {
+      lines.push(indentStr + `delay(${pattern.condition}, ${pattern.duration}, () => {`);
+      if (body) lines.push(body);
+      lines.push(indentStr + '});');
+    } else if (pattern.type === 'timer') {
+      lines.push(indentStr + `timer(${pattern.onMs}, ${pattern.offMs}, () => {`);
+      if (body) lines.push(body);
+      lines.push(indentStr + '});');
+    } else if (pattern.type === 'whenChanged') {
+      lines.push(indentStr + `delta(${pattern.value}, ${pattern.threshold}, () => {`);
+      if (body) lines.push(body);
+      lines.push(indentStr + '});');
+    }
+
+    return lines;
   }
 
   /**
@@ -553,15 +941,15 @@ class Decompiler {
 
       // Generate the appropriate syntax
       if (pattern.type === 'edge') {
-        return `edge(() => ${pattern.condition}, { duration: ${pattern.duration} }, () => {\n${body}\n});`;
+        return `edge(${pattern.condition}, ${pattern.duration}, () => {\n${body}\n});`;
       } else if (pattern.type === 'sticky') {
-        return `sticky(() => ${pattern.onCondition}, () => ${pattern.offCondition}, () => {\n${body}\n});`;
+        return `sticky({\n  on: () => ${pattern.onCondition},\n  off: () => ${pattern.offCondition}\n}, () => {\n${body}\n});`;
       } else if (pattern.type === 'delay') {
-        return `delay(() => ${pattern.condition}, { duration: ${pattern.duration} }, () => {\n${body}\n});`;
+        return `delay(${pattern.condition}, ${pattern.duration}, () => {\n${body}\n});`;
       } else if (pattern.type === 'timer') {
         return `timer(${pattern.onMs}, ${pattern.offMs}, () => {\n${body}\n});`;
       } else if (pattern.type === 'whenChanged') {
-        return `whenChanged(${pattern.value}, ${pattern.threshold}, () => {\n${body}\n});`;
+        return `delta(${pattern.value}, ${pattern.threshold}, () => {\n${body}\n});`;
       }
     }
 
@@ -685,18 +1073,41 @@ class Decompiler {
 
           const referencedLC = allConditions.find(lc => lc.index === value);
           if (referencedLC) {
-            // Don't inline action operations (they produce side effects)
+            // Don't inline action operations (they produce side effects, not boolean values)
+            // Instead, describe what the action does for clarity
             if (this.isActionOperation(referencedLC.operation)) {
+              const actionDesc = this.describeActionForCondition(referencedLC, allConditions);
+              if (actionDesc) {
+                return actionDesc;
+              }
               return `logicCondition[${value}]`;
             }
-            // Don't inline boolean conditions that have activators - they're part of chains
-            // and inlining them would lose semantic meaning
-            // BUT value computations (ADD, MUL, etc.) can be inlined since they're just
-            // calculating intermediate values
-            if (referencedLC.activatorId !== -1 && this.isBooleanOperation(referencedLC.operation)) {
-              return `logicCondition[${value}]`;
+            // Don't inline STICKY - its state is maintained internally
+            // Use generated variable name if available
+            if (referencedLC.operation === OPERATION.STICKY) {
+              const varName = this.stickyVarNames.get(value);
+              return varName || `logicCondition[${value}]`;
+            }
+            // Don't inline TIMER - it has no underlying condition to show
+            // Use generated variable name if available
+            if (referencedLC.operation === OPERATION.TIMER) {
+              const varName = this.stickyVarNames.get(value);
+              return varName || `logicCondition[${value}]`;
+            }
+            // EDGE: returns true on rising edge of condition for duration ms
+            // Just show the underlying condition - edge timing is implementation detail
+            if (referencedLC.operation === OPERATION.EDGE) {
+              const underlyingCond = this.decompileOperand(OPERAND_TYPE.LC, referencedLC.operandAValue, allConditions, visited);
+              return `edge(${underlyingCond}, ${referencedLC.operandBValue})`;
+            }
+            // DELAY: returns true after condition held for duration ms
+            if (referencedLC.operation === OPERATION.DELAY) {
+              const underlyingCond = this.decompileOperand(OPERAND_TYPE.LC, referencedLC.operandAValue, allConditions, visited);
+              return `delay(${underlyingCond}, ${referencedLC.operandBValue})`;
             }
             // Recursively decompile the referenced condition with cycle detection
+            // (even boolean conditions with activators - the activator controls when
+            // the LC is evaluated, but its result can still be referenced)
             visited.add(value);
             const result = this.decompileCondition(referencedLC, allConditions, visited);
             visited.delete(value);
@@ -717,6 +1128,31 @@ class Decompiler {
       default:
         this.addWarning(`Unknown operand type ${type}`);
         return `/* unknown operand type ${type}, value ${value} */`;
+    }
+  }
+
+  /**
+   * Describe an action operation when used as a condition reference
+   * In INAV, action LCs can be referenced as conditions (truthy when successful/non-zero)
+   * @param {Object} lc - Logic condition with action operation
+   * @param {Array} allConditions - All conditions for resolution
+   * @returns {string|null} Description or null to use default logicCondition[N]
+   */
+  describeActionForCondition(lc, allConditions) {
+    switch (lc.operation) {
+      case OPERATION.GVAR_SET:
+      case OPERATION.GVAR_INC:
+      case OPERATION.GVAR_DEC: {
+        // GVAR operations return the resulting value
+        // Return just the variable - JS truthiness handles non-zero check
+        const gvarIndex = lc.operandAValue;
+        return this.getVarNameForGvar(gvarIndex) || `gvar[${gvarIndex}]`;
+      }
+
+      // Other action operations don't have meaningful boolean values
+      // Return null to use default logicCondition[N] reference
+      default:
+        return null;
     }
   }
 
@@ -777,6 +1213,25 @@ class Decompiler {
   }
 
   /**
+   * Generate variable declarations for referenced STICKY/TIMER LCs
+   * @returns {string[]} Array of declaration strings
+   */
+  generateStickyVarDeclarations() {
+    const declarations = [];
+
+    if (!this.stickyVarNames || this.stickyVarNames.size === 0) {
+      return declarations;
+    }
+
+    for (const [lcIndex, varName] of this.stickyVarNames) {
+      // Generate a let declaration with a comment showing which LC it represents
+      declarations.push(`let ${varName}; // logicCondition[${lcIndex}] - sticky/timer state`);
+    }
+
+    return declarations;
+  }
+
+  /**
    * Generate boilerplate code with proper formatting
    * @param {string} body - Main code body
    * @returns {string} Complete JavaScript code
@@ -811,13 +1266,17 @@ class Decompiler {
     // Add variable declarations from variable map
     const letDeclarations = this.reconstructLetVariables();
     const varDeclarations = this.reconstructVarVariables();
+    const stickyDeclarations = this.generateStickyVarDeclarations();
 
-    if (letDeclarations.length > 0 || varDeclarations.length > 0) {
+    if (letDeclarations.length > 0 || varDeclarations.length > 0 || stickyDeclarations.length > 0) {
       code += '// Variable declarations\n';
       for (const decl of letDeclarations) {
         code += decl + '\n';
       }
       for (const decl of varDeclarations) {
+        code += decl + '\n';
+      }
+      for (const decl of stickyDeclarations) {
         code += decl + '\n';
       }
       code += '\n';
