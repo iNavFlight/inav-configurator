@@ -668,8 +668,12 @@ class Decompiler {
         return `logicCondition[${value}]`;
 
       case OPERAND_TYPE.PID:
-        this.addWarning(`PID operand (value ${value}) is not supported in JavaScript API`);
-        return `/* PID[${value}] */`;
+        // PID operands 0-3 map to pid[0].output through pid[3].output
+        if (value >= 0 && value < 4) {
+          return `pid[${value}].output`;
+        }
+        this.addWarning(`Invalid PID operand value ${value}. Valid range is 0-3.`);
+        return `pid[${value}].output /* invalid PID index */`;
 
       default:
         this.addWarning(`Unknown operand type ${type}`);
@@ -745,13 +749,14 @@ class Decompiler {
     code += '// INAV JavaScript Programming\n';
     code += '// Decompiled from logic conditions\n\n';
 
-    // Add destructuring - include edge, sticky, delay, timer, whenChanged if used
+    // Add destructuring - include edge, sticky, delay, timer, whenChanged, pid, waypoint if used
     const needsEdge = body.includes('edge(');
     const needsSticky = body.includes('sticky(');
     const needsDelay = body.includes('delay(');
     const needsTimer = body.includes('timer(');
     const needsWhenChanged = body.includes('whenChanged(');
     const needsWaypoint = body.includes('waypoint.');
+    const needsPid = /pid\[\d+\]/.test(body);
 
     const imports = ['flight', 'override', 'rc', 'gvar'];
     if (needsEdge) imports.push('edge');
@@ -760,6 +765,7 @@ class Decompiler {
     if (needsTimer) imports.push('timer');
     if (needsWhenChanged) imports.push('whenChanged');
     if (needsWaypoint) imports.push('waypoint');
+    if (needsPid) imports.push('pid');
 
     code += `const { ${imports.join(', ')} } = inav;\n\n`;
 

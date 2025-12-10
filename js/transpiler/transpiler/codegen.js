@@ -631,13 +631,29 @@ class INAVCodeGenerator {
         return { type: OPERAND_TYPE.RC_CHANNEL, value: index };
       }
 
+      // Check for PID controller with bounds validation
+      // Supports both pid[N] and pid[N].output (both are equivalent)
+      if (value.startsWith('pid[')) {
+        const match = value.match(/^pid\[(\d+)\](?:\.output)?$/);
+        if (!match) {
+          this.errorHandler.addError(`Invalid pid syntax '${value}'. Expected pid[0-3] or pid[0-3].output`, null, 'invalid_pid');
+          return { type: OPERAND_TYPE.VALUE, value: 0 };
+        }
+        const index = parseInt(match[1], 10);
+        if (index < 0 || index > 3) {
+          this.errorHandler.addError(`Invalid pid controller ${index}. Must be 0-3.`, null, 'invalid_pid_index');
+          return { type: OPERAND_TYPE.VALUE, value: 0 };
+        }
+        return { type: OPERAND_TYPE.PID, value: index };
+      }
+
       // Check in operand mapping
       if (this.operandMapping[value]) {
         return this.operandMapping[value];
       }
 
       this.errorHandler.addError(
-        `Unknown operand '${value}'. Available: flight.*, rc.*, gvar[0-7], waypoint.*, pid.*`,
+        `Unknown operand '${value}'. Available: flight.*, rc[1-18], gvar[0-7], waypoint.*, pid[0-3]`,
         null,
         'unknown_operand'
       );
