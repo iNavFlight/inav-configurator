@@ -1240,6 +1240,11 @@ class Decompiler {
       if (stickyVarNames.has(name)) {
         continue;
       }
+      // Skip any variable named latch* - these are reserved for sticky state
+      // and may be stale entries from a previous compilation
+      if (/^latch\d+$/.test(name)) {
+        continue;
+      }
       declarations.push(`var ${name} = ${info.expression};`);
     }
 

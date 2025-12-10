@@ -329,10 +329,28 @@ class ConditionGenerator {
       }
     }
 
-    // Boolean property access (e.g., flight.mode.failsafe)
+    // Boolean/truthy property access (e.g., gvar[0], flight.mode.failsafe)
     const operand = this.getOperand(condition.value);
 
-    // Check if true
+    // For gvar truthy checks, use != 0 (compiled as NOT(gvar === 0))
+    // This correctly handles any non-zero value as truthy
+    // For flight.mode.* booleans, === 1 is correct since they're 0 or 1
+    const valueStr = typeof condition.value === 'string' ? condition.value : '';
+    if (valueStr.startsWith('gvar[')) {
+      // Truthy check for gvar: NOT(gvar[N] === 0)
+      const equalZeroId = this.pushLogicCommand(OPERATION.EQUAL,
+        operand,
+        { type: OPERAND_TYPE.VALUE, value: 0 },
+        activatorId
+      );
+      return this.pushLogicCommand(OPERATION.NOT,
+        { type: OPERAND_TYPE.LC, value: equalZeroId },
+        { type: OPERAND_TYPE.VALUE, value: 0 },
+        activatorId
+      );
+    }
+
+    // For boolean properties (flight.mode.*, etc.), check === 1
     return this.pushLogicCommand(OPERATION.EQUAL,
       operand,
       { type: OPERAND_TYPE.VALUE, value: 1 },

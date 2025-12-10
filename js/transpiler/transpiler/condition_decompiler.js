@@ -176,6 +176,51 @@ class ConditionDecompiler {
   }
 
   handleNot(left) {
+    // Simplify double negation: !(!x) -> x
+    // But be careful: !(x === 0) is NOT the same as !x
+    // !(x === 0) = x !== 0 (truthy check)
+    // !x = x is falsy (zero)
+
+    // Handle "!(...)" pattern - extract inner and check if it's a simple identifier
+    if (left.startsWith('!(') && left.endsWith(')')) {
+      const inner = left.slice(2, -1);
+      // Double negation of simple identifier: !(!identifier) -> identifier
+      if (/^\w+(?:\[\d+\])?$/.test(inner)) {
+        return inner;
+      }
+      // Check if we can safely unwrap complex expressions
+      let depth = 0;
+      let safe = true;
+      for (const ch of inner) {
+        if (ch === '(') depth++;
+        else if (ch === ')') depth--;
+        else if (depth === 0 && (ch === '&' || ch === '|' || ch === '?')) {
+          safe = false;
+          break;
+        }
+      }
+      if (safe) {
+        return inner;
+      }
+    }
+
+    // Handle !!identifier pattern (e.g., NOT of !gvar[1])
+    // !(!identifier) -> identifier (double negation)
+    if (left.startsWith('!') && /^!\w+(?:\[\d+\])?$/.test(left)) {
+      return left.slice(1);  // Remove the leading ! to get just the identifier
+    }
+
+    // DON'T simplify "x === 0" to "!x" - they have DIFFERENT semantics!
+    // !(x === 0) means "x is NOT zero" (truthy)
+    // !x means "x is zero/falsy"
+    // Instead, simplify to "x !== 0" or just leave as "x"
+    const equalsZeroMatch = left.match(/^(\w+(?:\[\d+\])?) === 0$/);
+    if (equalsZeroMatch) {
+      // !(x === 0) is the same as x !== 0, which we can write as just the identifier
+      // for a truthy check
+      return equalsZeroMatch[1];
+    }
+
     // If the operand contains operators, wrap in parens for correct precedence
     if (left.includes(' ') || left.includes('!') || left.includes('(')) {
       return `!(${left})`;

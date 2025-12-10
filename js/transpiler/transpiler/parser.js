@@ -683,6 +683,36 @@ class JavaScriptParser {
       return typeof val === 'number' ? -val : val;
     }
 
+    // Handle binary expressions: (50 * 28), ((50 * 28) - flight.airSpeed)
+    if (expr.type === 'BinaryExpression') {
+      const left = this.extractValue(expr.left);
+      const right = this.extractValue(expr.right);
+
+      // If both are constants, compute the value at compile time
+      if (typeof left === 'number' && typeof right === 'number') {
+        switch (expr.operator) {
+          case '+': return left + right;
+          case '-': return left - right;
+          case '*': return left * right;
+          case '/': return Math.floor(left / right);
+          case '%': return left % right;
+        }
+      }
+
+      // Otherwise return a BinaryExpression node for codegen to process
+      return {
+        type: 'BinaryExpression',
+        operator: expr.operator,
+        left: left,
+        right: right
+      };
+    }
+
+    // Handle call expressions (e.g., Math.min, Math.max)
+    if (expr.type === 'CallExpression') {
+      return this.transformExpression(expr);
+    }
+
     return null;
   }
 }

@@ -246,6 +246,37 @@ class ArrowFunctionHelper {
       return typeof val === 'number' ? -val : val;
     }
 
+    // Handle binary expressions with constant values: (50 * 28), (100 + 50), etc.
+    if (expr.type === 'BinaryExpression') {
+      const left = this.extractValue(expr.left);
+      const right = this.extractValue(expr.right);
+
+      // If both sides are numbers, compute the constant value
+      if (typeof left === 'number' && typeof right === 'number') {
+        switch (expr.operator) {
+          case '+': return left + right;
+          case '-': return left - right;
+          case '*': return left * right;
+          case '/': return Math.floor(left / right); // INAV uses integer division
+          case '%': return left % right;
+        }
+      }
+
+      // If one or both sides are non-constant, return the full expression for later processing
+      // This handles cases like: flight.airSpeed + 100, gvar[0] * 2
+      return {
+        type: 'BinaryExpression',
+        operator: expr.operator,
+        left: left,
+        right: right
+      };
+    }
+
+    // Handle parenthesized expressions (they're just their inner expression)
+    if (expr.type === 'ParenthesizedExpression' || expr.extra?.parenthesized) {
+      return this.extractValue(expr.expression || expr);
+    }
+
     return null;
   }
 
