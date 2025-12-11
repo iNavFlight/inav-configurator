@@ -165,28 +165,6 @@ class Decompiler {
   }
 
   /**
-   * Check if a GVAR_SET logic condition is a var initialization from the variable map
-   * These are already shown in the declarations section, so we skip them
-   * @param {Object} lc - Logic condition
-   * @returns {boolean} True if this is a var initialization
-   */
-  isVarInitialization(lc) {
-    if (!this.variableMap || !this.variableMap.var_variables) {
-      return false;
-    }
-
-    const gvarIndex = lc.operandAValue;
-
-    for (const [name, info] of Object.entries(this.variableMap.var_variables)) {
-      if (info.gvar === gvarIndex) {
-        return true;
-      }
-    }
-
-    return false;
-  }
-
-  /**
    * Main decompilation function
    * @param {Array} logicConditions - Array of logic condition objects from FC
    * @param {Object} variableMap - Optional variable map for name preservation
@@ -372,104 +350,6 @@ class Decompiler {
     }
 
     return codeBlocks;
-  }
-
-  /**
-   * Detect if a group uses edge/sticky/delay pattern
-   * Returns { type: 'edge'|'sticky'|'delay', params } or null
-   * @param {Object} group - Group with activator and actions
-   * @param {Array} allConditions - All enabled conditions for lookups
-   * @returns {Object|null} Pattern detection result
-   */
-  detectSpecialPattern(group, allConditions) {
-    if (!group.activator) return null;
-
-    const activator = group.activator;
-
-    // Check for EDGE pattern
-    if (activator.operation === OPERATION.EDGE) {
-      // operandA points to the condition LC
-      // operandB is the duration
-      const conditionId = activator.operandAValue;
-      const duration = activator.operandBValue;
-
-      // Find the condition LC
-      const conditionLC = allConditions.find(lc => lc.index === conditionId);
-      if (conditionLC) {
-        return {
-          type: 'edge',
-          condition: this.decompileCondition(conditionLC, allConditions),
-          duration: duration
-        };
-      }
-    }
-
-    // Check for STICKY pattern
-    if (activator.operation === OPERATION.STICKY) {
-      // operandA points to ON condition LC
-      // operandB points to OFF condition LC
-      const onConditionId = activator.operandAValue;
-      const offConditionId = activator.operandBValue;
-
-      const onLC = allConditions.find(lc => lc.index === onConditionId);
-      const offLC = allConditions.find(lc => lc.index === offConditionId);
-
-      if (onLC && offLC) {
-        return {
-          type: 'sticky',
-          onCondition: this.decompileCondition(onLC, allConditions),
-          offCondition: this.decompileCondition(offLC, allConditions)
-        };
-      }
-    }
-
-    // Check for DELAY pattern
-    if (activator.operation === OPERATION.DELAY) {
-      // operandA points to the condition LC
-      // operandB is the duration
-      const conditionId = activator.operandAValue;
-      const duration = activator.operandBValue;
-
-      const conditionLC = allConditions.find(lc => lc.index === conditionId);
-      if (conditionLC) {
-        return {
-          type: 'delay',
-          condition: this.decompileCondition(conditionLC, allConditions),
-          duration: duration
-        };
-      }
-    }
-
-    // Check for TIMER pattern
-    if (activator.operation === OPERATION.TIMER) {
-      // operandA is ON duration (ms)
-      // operandB is OFF duration (ms)
-      // No condition - timer auto-toggles
-      const onMs = activator.operandAValue;
-      const offMs = activator.operandBValue;
-
-      return {
-        type: 'timer',
-        onMs: onMs,
-        offMs: offMs
-      };
-    }
-
-    // Check for DELTA (whenChanged) pattern
-    if (activator.operation === OPERATION.DELTA) {
-      // operandA is the value to monitor
-      // operandB is the threshold
-      const valueOperand = this.decompileOperand(activator.operandAType, activator.operandAValue, allConditions);
-      const threshold = activator.operandBValue;
-
-      return {
-        type: 'whenChanged',
-        value: valueOperand,
-        threshold: threshold
-      };
-    }
-
-    return null;
   }
 
   /**
@@ -987,7 +867,7 @@ class Decompiler {
       return declarations;
     }
 
-    // Get latch variable names to skip (they're declared by generateStickyVarDeclarations)
+    // Get latch variable names to skip (they're declared inline with sticky())
     const stickyVarNames = new Set();
     if (this.stickyVarNames) {
       for (const varName of this.stickyVarNames.values()) {
