@@ -833,12 +833,13 @@ class INAVCodeGenerator {
   /**
    * Build variable map from VariableHandler for storage and decompilation
    * This allows variable names to be preserved between sessions
-   * @returns {Object} Variable map with let_variables and var_variables
+   * @returns {Object} Variable map with let_variables, var_variables, and latch_variables
    */
   buildVariableMap() {
     const map = {
       let_variables: {},
-      var_variables: {}
+      var_variables: {},
+      latch_variables: {}  // Track latch variables structurally (for sticky/timer state)
     };
 
     if (!this.variableHandler || !this.variableHandler.symbols) {
@@ -855,6 +856,11 @@ class INAVCodeGenerator {
         map.var_variables[name] = {
           gvar: symbol.gvarIndex,
           expression: this.astToExpressionString(symbol.expressionAST)
+        };
+      } else if (symbol.kind === 'latch') {
+        // Latch variables reference LC indices, not gvar slots
+        map.latch_variables[name] = {
+          lcIndex: symbol.lcIndex
         };
       }
     }
