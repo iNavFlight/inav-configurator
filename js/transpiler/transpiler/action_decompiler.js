@@ -24,11 +24,13 @@ class ActionDecompiler {
    * @param {Function} context.decompileOperand - Function to decompile operands
    * @param {Function} context.getVarNameForGvar - Function to get variable name for gvar
    * @param {Function} context.addWarning - Function to add warnings
+   * @param {Function} context.getHoistedVarCounters - Function to get shared hoisted var counters
    */
   constructor(context) {
     this.decompileOperand = context.decompileOperand;
     this.getVarNameForGvar = context.getVarNameForGvar;
     this.addWarning = context.addWarning;
+    this.getHoistedVarCounters = context.getHoistedVarCounters;
   }
 
   /**
@@ -208,7 +210,7 @@ class ActionDecompiler {
       }
 
       // Hoist this sub-expression: decompile it fully and assign to a variable
-      const varName = this.generateHoistVarName(lc.operation, hoistedVars.size + 1);
+      const varName = this.generateHoistVarName(lc.operation);
       const fullExpr = this.decompileOperand(type, value, allConditions);
       statements.push(`let ${varName} = ${fullExpr};`);
       hoistedVars.set(value, varName);
@@ -231,11 +233,11 @@ class ActionDecompiler {
 
   /**
    * Generate a descriptive variable name for a hoisted expression.
+   * Uses shared counters from decompiler to ensure unique names across all assignments.
    * @param {number} operation - The LC operation type
-   * @param {number} counter - Counter for uniqueness
    * @returns {string} Variable name
    */
-  generateHoistVarName(operation, counter) {
+  generateHoistVarName(operation) {
     const nameMap = {
       [OPERATION.MIN]: 'min',
       [OPERATION.MAX]: 'max',
@@ -247,7 +249,13 @@ class ActionDecompiler {
       [OPERATION.MAP_OUTPUT]: 'scaled'
     };
     const baseName = nameMap[operation] || 'temp';
-    return counter === 1 ? baseName : `${baseName}${counter}`;
+
+    // Use shared counters from decompiler to ensure unique names across all hoisted expressions
+    const counters = this.getHoistedVarCounters?.() || new Map();
+    const currentCount = (counters.get(baseName) || 0) + 1;
+    counters.set(baseName, currentCount);
+
+    return currentCount === 1 ? baseName : `${baseName}${currentCount}`;
   }
 
   /**

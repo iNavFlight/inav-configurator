@@ -58,7 +58,8 @@ class Decompiler {
     const context = {
       decompileOperand: this.decompileOperand.bind(this),
       getVarNameForGvar: this.getVarNameForGvar.bind(this),
-      addWarning: this.addWarning.bind(this)
+      addWarning: this.addWarning.bind(this),
+      getHoistedVarCounters: () => this.hoistedVarCounters  // Shared counter for unique hoisted var names
     };
 
     this.conditionDecompiler = new ConditionDecompiler(context);
@@ -176,6 +177,7 @@ class Decompiler {
     this.stickyVarNames = new Map(); // Map LC index -> generated variable name
     this.usedFeatures = new Set();   // Track which imports are needed (structural, not string scanning)
     this.inlineDeclaredVars = new Set(); // Track let variables declared inline in body
+    this.hoistedVarCounters = new Map(); // Track counters for hoisted variable names (e.g., min, min2, min3)
 
     if (!logicConditions || !Array.isArray(logicConditions)) {
       return {
