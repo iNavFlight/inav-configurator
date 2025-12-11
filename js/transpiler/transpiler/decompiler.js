@@ -134,6 +134,20 @@ class Decompiler {
   }
 
   /**
+   * Check if an operation returns a value that could be externally referenced.
+   * External references include Global Functions that can source from LC results.
+   * Action operations (overrides, sets) put values somewhere explicitly, so they
+   * cannot be externally referenced - the value goes to a specific target.
+   * @param {number} operation - Operation code
+   * @returns {boolean} True if this operation's result could be read externally
+   */
+  couldBeExternallyReferenced(operation) {
+    // Action operations explicitly put values somewhere (override, set, gvar assignment)
+    // They cannot be externally referenced because the value goes to a target
+    return !this.isActionOperation(operation);
+  }
+
+  /**
    * Check if an operation produces a boolean result (condition) vs a numeric value
    * Boolean operations can be chained in if() conditions with &&
    * Value operations (arithmetic, min/max, etc.) compute intermediate values
@@ -306,18 +320,12 @@ class Decompiler {
       if (lc._gap) return false;
       if (lc.activatorId !== -1) return false;
 
-      // Skip if only referenced by special ops
+      // Skip if only referenced by special ops (EDGE, STICKY, DELAY operands)
       if (referencedBySpecialOps.has(lc.index)) return false;
 
       // Skip if only used as operand by other LCs (helper conditions)
+      // These are intermediate computations used by other LCs
       if (referencedAsOperand.has(lc.index) && !this.isActionOperation(lc.operation)) {
-        const hasChildren = conditions.some(c => c.activatorId === lc.index);
-        if (!hasChildren) return false;
-      }
-
-      // Skip pure value computations with no children that depend on them
-      if (!this.isBooleanOperation(lc.operation) &&
-          !this.isActionOperation(lc.operation)) {
         const hasChildren = conditions.some(c => c.activatorId === lc.index);
         if (!hasChildren) return false;
       }
@@ -330,6 +338,19 @@ class Decompiler {
       if (processed.has(rootLc.index)) continue;
 
       const tree = this.buildConditionTree(rootLc, conditions, processed);
+      const hasChildren = conditions.some(c => c.activatorId === rootLc.index);
+
+      // Check if this is a standalone condition that could be externally referenced
+      // (no children, not an action, could be read by Global Functions or other features)
+      if (!hasChildren &&
+          !this.isActionOperation(rootLc.operation) &&
+          this.couldBeExternallyReferenced(rootLc.operation)) {
+        const condStr = this.decompileCondition(rootLc, conditions);
+        codeBlocks.push(`if (${condStr}) { /* LC ${rootLc.index}: for external reference */ }`);
+        processed.add(rootLc.index);
+        continue;
+      }
+
       const code = this.decompileTree(tree, conditions, 0);
       if (code && code.trim()) {
         codeBlocks.push(code);
@@ -344,11 +365,15 @@ class Decompiler {
       if (referencedAsOperand.has(lc.index)) continue; // Skip helper conditions
 
       // This condition has an activator that doesn't exist or wasn't processed
-      // Only warn if it's an action (helper conditions are expected to be unreferenced)
       if (this.isActionOperation(lc.operation)) {
+        // Action with missing activator - warn and output as orphaned
         this.addWarning(`Logic condition ${lc.index} has unprocessed activator ${lc.activatorId}`);
         const action = this.decompileAction(lc, conditions);
         codeBlocks.push(`// Orphaned action (activator ${lc.activatorId} not found)\n${action}`);
+      } else if (this.couldBeExternallyReferenced(lc.operation)) {
+        // Non-action with missing activator - could be externally referenced
+        const condStr = this.decompileCondition(lc, conditions);
+        codeBlocks.push(`if (${condStr}) { /* LC ${lc.index}: for external reference */ }`);
       }
       processed.add(lc.index);
     }
