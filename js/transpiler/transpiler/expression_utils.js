@@ -111,7 +111,11 @@ function extractValue(expr, options = {}) {
 
   // Handle parenthesized expressions (they're just their inner expression)
   if (expr.type === 'ParenthesizedExpression' || expr.extra?.parenthesized) {
-    return extractValue(expr.expression || expr, options);
+    if (!expr.expression) {
+      // Malformed AST - parenthesized expression without inner expression
+      return null;
+    }
+    return extractValue(expr.expression, options);
   }
 
   // Handle call expressions (e.g., Math.min, Math.max) - parser-specific
