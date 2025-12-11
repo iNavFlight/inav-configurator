@@ -316,8 +316,9 @@ class Decompiler {
     }
 
     // Find root conditions (activatorId === -1) that should be rendered
+    // Include gap markers to preserve visual grouping from original LC layout
     const roots = conditions.filter(lc => {
-      if (lc._gap) return false;
+      if (lc._gap) return true;  // Keep gap markers for visual separation
       if (lc.activatorId !== -1) return false;
 
       // Skip if only referenced by special ops (EDGE, STICKY, DELAY operands)
@@ -335,6 +336,13 @@ class Decompiler {
 
     // Build and decompile tree for each root
     for (const rootLc of roots) {
+      // Gap markers insert extra blank line for visual separation
+      if (rootLc._gap) {
+        if (codeBlocks.length > 0) {
+          codeBlocks.push('');  // Empty string becomes extra blank line when joined
+        }
+        continue;
+      }
       if (processed.has(rootLc.index)) continue;
 
       const tree = this.buildConditionTree(rootLc, conditions, processed);
