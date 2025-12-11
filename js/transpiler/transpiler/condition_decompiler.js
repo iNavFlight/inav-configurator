@@ -210,15 +210,16 @@ class ConditionDecompiler {
       return left.slice(1);  // Remove the leading ! to get just the identifier
     }
 
-    // DON'T simplify "x === 0" to "!x" - they have DIFFERENT semantics!
-    // !(x === 0) means "x is NOT zero" (truthy)
-    // !x means "x is zero/falsy"
-    // Instead, simplify to "x !== 0" or just leave as "x"
+    // !(x === 0) means "x is NOT zero" - output as explicit comparison
     const equalsZeroMatch = left.match(/^(\w+(?:\[\d+\])?) === 0$/);
     if (equalsZeroMatch) {
-      // !(x === 0) is the same as x !== 0, which we can write as just the identifier
-      // for a truthy check
-      return equalsZeroMatch[1];
+      return `${equalsZeroMatch[1]} !== 0`;
+    }
+
+    // !(x !== 0) means "x IS zero" - output as explicit comparison
+    const notEqualsZeroMatch = left.match(/^(\w+(?:\[\d+\])?) !== 0$/);
+    if (notEqualsZeroMatch) {
+      return `${notEqualsZeroMatch[1]} === 0`;
     }
 
     // If the operand contains operators, wrap in parens for correct precedence
