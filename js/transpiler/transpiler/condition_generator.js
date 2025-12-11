@@ -177,13 +177,40 @@ class ConditionGenerator {
    *   a >= b  →  NOT(a < b)
    *   a <= b  →  NOT(a > b)
    *   a != b  →  NOT(a == b)
+   *
+   * Optimization: For constant comparisons, we normalize to avoid NOT synthesis:
+   *   a >= 5  →  a > 4   (saves 1 LC slot)
+   *   a <= 5  →  a < 6   (saves 1 LC slot)
    */
   generateBinary(condition, activatorId) {
-    const left = this.getOperand(condition.left);
-    const right = this.getOperand(condition.right);
     const operator = condition.operator;
 
-    // Handle operators that need synthesis via NOT
+    // Optimization: Normalize >= and <= with integer constants to > and <
+    // This saves 1 LC slot by avoiding NOT synthesis
+    // Only applies when RHS is a numeric literal (integer)
+    if ((operator === '>=' || operator === '<=') && this.isIntegerLiteral(condition.right)) {
+      const constValue = this.getIntegerValue(condition.right);
+      if (operator === '>=') {
+        // x >= 5 → x > 4
+        return this.generateBinary({
+          ...condition,
+          operator: '>',
+          right: constValue - 1
+        }, activatorId);
+      } else {
+        // x <= 5 → x < 6
+        return this.generateBinary({
+          ...condition,
+          operator: '<',
+          right: constValue + 1
+        }, activatorId);
+      }
+    }
+
+    const left = this.getOperand(condition.left);
+    const right = this.getOperand(condition.right);
+
+    // Handle operators that need synthesis via NOT (for non-constant cases)
     if (operator === '>=' || operator === '<=' || operator === '!=' || operator === '!==') {
       // Get the inverse operation
       const inverseOp = this.getInverseOperation(operator);
@@ -247,6 +274,32 @@ class ConditionGenerator {
       case '!==': return OPERATION.EQUAL;       // NOT(a == b) = a != b
       default: return OPERATION.EQUAL;
     }
+  }
+
+  /**
+   * Check if an AST node/value is an integer literal
+   * Handles both raw numbers and Literal AST nodes
+   * @private
+   */
+  isIntegerLiteral(node) {
+    // Handle raw number (from transformExpression)
+    if (typeof node === 'number') {
+      return Number.isInteger(node);
+    }
+    // Handle Literal AST node
+    return node &&
+           node.type === 'Literal' &&
+           typeof node.value === 'number' &&
+           Number.isInteger(node.value);
+  }
+
+  /**
+   * Get the integer value from a literal node/value
+   * @private
+   */
+  getIntegerValue(node) {
+    if (typeof node === 'number') return node;
+    return node.value;
   }
 
   /**
