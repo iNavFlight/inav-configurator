@@ -651,6 +651,57 @@ if (flight.gpsValid === 1) {
     const stickyCmd = result.commands[3];
     expect(stickyCmd).toContain('logic 3 1 0 13'); // activator 0, operation 13 (STICKY)
   });
+
+  test('should use inline var declarations for sticky (not separate declaration)', async () => {
+    // Decompiled sticky should use "var latch1 = sticky({...})" inline
+    // NOT separate "var latch1;" at top + "latch1 = sticky({...})" in body
+    const logicConditions = [
+      { index: 0, enabled: 1, activatorId: -1, operation: 1, operandAType: 2, operandAValue: 31, operandBType: 0, operandBValue: 1, flags: 0 },
+      { index: 1, enabled: 1, activatorId: 0, operation: 2, operandAType: 2, operandAValue: 9, operandBType: 0, operandBValue: 1000, flags: 0 },
+      { index: 2, enabled: 1, activatorId: -1, operation: 1, operandAType: 2, operandAValue: 17, operandBType: 0, operandBValue: 0, flags: 0 },
+      { index: 3, enabled: 1, activatorId: 0, operation: 13, operandAType: 4, operandAValue: 1, operandBType: 4, operandBValue: 2, flags: 0 },
+      { index: 4, enabled: 1, activatorId: 3, operation: 18, operandAType: 0, operandAValue: 1, operandBType: 0, operandBValue: 0, flags: 0 },
+    ];
+
+    const result = decompiler.decompile(logicConditions);
+
+    // Should have "var latch1 = sticky({" inline, not separate declaration
+    expect(result.code).toMatch(/var latch1 = sticky\(\{/);
+    // Should NOT have separate "var latch1;" declaration at top
+    expect(result.code).not.toMatch(/var latch1;\s*\/\//);
+  });
+
+  test('should not produce duplicate let declarations from variableMap and hoisting', async () => {
+    // When variableMap has a 'clamped' entry AND body generates 'let clamped' via hoisting,
+    // we should only have ONE 'let clamped' declaration
+    const { Transpiler } = await import('../index.js');
+
+    // Create LCs that will generate hoisted 'let clamped' from Math.min
+    const logicConditions = [
+      { index: 0, enabled: 1, activatorId: -1, operation: 1, operandAType: 2, operandAValue: 31, operandBType: 0, operandBValue: 1, flags: 0 },
+      { index: 1, enabled: 1, activatorId: 0, operation: 43, operandAType: 0, operandAValue: 500, operandBType: 5, operandBValue: 0, flags: 0 },
+      { index: 2, enabled: 1, activatorId: 0, operation: 44, operandAType: 4, operandAValue: 1, operandBType: 0, operandBValue: 1000, flags: 0 },
+      { index: 3, enabled: 1, activatorId: 0, operation: 43, operandAType: 0, operandAValue: 1800, operandBType: 4, operandBValue: 2, flags: 0 },
+      { index: 4, enabled: 1, activatorId: 0, operation: 29, operandAType: 4, operandAValue: 3, operandBType: 0, operandBValue: 0, flags: 0 },
+    ];
+
+    // Simulate stale variableMap from Configurator with 'clamped' entry
+    const variableMap = {
+      let_variables: { clamped: { expression: 'Math.min(1800, something)' } },
+      var_variables: {}
+    };
+
+    const result = decompiler.decompile(logicConditions, variableMap);
+
+    // Count 'let clamped' - should be exactly 1
+    const clampedMatches = result.code.match(/let clamped/g) || [];
+    expect(clampedMatches.length).toBeLessThanOrEqual(1);
+
+    // Should compile without "already declared" error
+    const transpiler = new Transpiler();
+    const compiled = transpiler.transpile(result.code);
+    expect(compiled.success).toBe(true);
+  });
 });
 
 // Export the load function for the runner

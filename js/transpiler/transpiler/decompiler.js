@@ -724,8 +724,8 @@ class Decompiler {
     const indentStr = '  '.repeat(indent);
     const lines = [];
 
-    // Show the sticky with assignment to the latch variable
-    lines.push(indentStr + `${varName} = sticky({`);
+    // Show the sticky with var declaration (declares the latch variable)
+    lines.push(indentStr + `var ${varName} = sticky({`);
     lines.push(indentStr + `  on: () => ${pattern.onCondition},`);
     lines.push(indentStr + `  off: () => ${pattern.offCondition}`);
     lines.push(indentStr + `});`);
@@ -1252,36 +1252,6 @@ class Decompiler {
   }
 
   /**
-   * Generate variable declarations for referenced STICKY/TIMER LCs
-   * @returns {string[]} Array of declaration strings
-   */
-  generateStickyVarDeclarations() {
-    const declarations = [];
-
-    if (!this.stickyVarNames || this.stickyVarNames.size === 0) {
-      return declarations;
-    }
-
-    // Get existing var names from variableMap to avoid duplicates
-    const existingVars = new Set();
-    if (this.variableMap?.var_variables) {
-      for (const name of Object.keys(this.variableMap.var_variables)) {
-        existingVars.add(name);
-      }
-    }
-
-    for (const [lcIndex, varName] of this.stickyVarNames) {
-      // Skip if already declared in variableMap
-      if (existingVars.has(varName)) {
-        continue;
-      }
-      declarations.push(`var ${varName}; // logicCondition[${lcIndex}] - sticky/timer state`);
-    }
-
-    return declarations;
-  }
-
-  /**
    * Generate boilerplate code with proper formatting
    * @param {string} body - Main code body
    * @returns {string} Complete JavaScript code
@@ -1314,19 +1284,27 @@ class Decompiler {
     code += `const { ${imports.join(', ')} } = inav;\n\n`;
 
     // Add variable declarations from variable map
-    const letDeclarations = this.reconstructLetVariables();
+    // Note: sticky/latch variables are declared inline with var latch = sticky({...})
+    // Note: Skip let variables that are already declared inline in the body (from expression hoisting)
+    const letDeclarations = this.reconstructLetVariables().filter(decl => {
+      // Extract variable name from "let varName = ..."
+      const match = decl.match(/^let\s+(\w+)\s*=/);
+      if (match) {
+        const varName = match[1];
+        // Check if body already contains "let varName =" declaration
+        const inlinePattern = new RegExp(`\\blet\\s+${varName}\\s*=`);
+        return !inlinePattern.test(body);
+      }
+      return true;
+    });
     const varDeclarations = this.reconstructVarVariables();
-    const stickyDeclarations = this.generateStickyVarDeclarations();
 
-    if (letDeclarations.length > 0 || varDeclarations.length > 0 || stickyDeclarations.length > 0) {
+    if (letDeclarations.length > 0 || varDeclarations.length > 0) {
       code += '// Variable declarations\n';
       for (const decl of letDeclarations) {
         code += decl + '\n';
       }
       for (const decl of varDeclarations) {
-        code += decl + '\n';
-      }
-      for (const decl of stickyDeclarations) {
         code += decl + '\n';
       }
       code += '\n';
