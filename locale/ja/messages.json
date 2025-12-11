@@ -22,6 +22,10 @@
         "message": "简体中文",
         "_comment": "Don't translate!"
     },
+    "language_ru": {
+        "message": "Русский",
+        "_comment": "Don't translate!"
+    },
     "language": {
         "message": "言語選択"
     },
