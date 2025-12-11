@@ -174,6 +174,8 @@ class Decompiler {
     this.warnings = [];
     this.variableMap = variableMap;
     this.stickyVarNames = new Map(); // Map LC index -> generated variable name
+    this.usedFeatures = new Set();   // Track which imports are needed (structural, not string scanning)
+    this.inlineDeclaredVars = new Set(); // Track let variables declared inline in body
 
     if (!logicConditions || !Array.isArray(logicConditions)) {
       return {
@@ -438,6 +440,11 @@ class Decompiler {
       const actionLines = action.split('\n');
       for (const line of actionLines) {
         lines.push(indentStr + line);
+        // Track inline let declarations structurally (for deduplication in generateBoilerplate)
+        const letMatch = line.match(/^let\s+(\w+)\s*=/);
+        if (letMatch) {
+          this.inlineDeclaredVars.add(letMatch[1]);
+        }
       }
 
       // Actions can still have children (dependent actions)
@@ -584,6 +591,7 @@ class Decompiler {
     const lines = [];
 
     // Show the sticky with var declaration (declares the latch variable)
+    this.usedFeatures.add('sticky');
     lines.push(indentStr + `var ${varName} = sticky({`);
     lines.push(indentStr + `  on: () => ${pattern.onCondition},`);
     lines.push(indentStr + `  off: () => ${pattern.offCondition}`);
@@ -634,18 +642,22 @@ class Decompiler {
     const body = childCodes.join('\n');
 
     if (pattern.type === 'edge') {
+      this.usedFeatures.add('edge');
       lines.push(indentStr + `edge(${pattern.condition}, ${pattern.duration}, () => {`);
       if (body) lines.push(body);
       lines.push(indentStr + '});');
     } else if (pattern.type === 'delay') {
+      this.usedFeatures.add('delay');
       lines.push(indentStr + `delay(${pattern.condition}, ${pattern.duration}, () => {`);
       if (body) lines.push(body);
       lines.push(indentStr + '});');
     } else if (pattern.type === 'timer') {
+      this.usedFeatures.add('timer');
       lines.push(indentStr + `timer(${pattern.onMs}, ${pattern.offMs}, () => {`);
       if (body) lines.push(body);
       lines.push(indentStr + '});');
     } else if (pattern.type === 'whenChanged') {
+      this.usedFeatures.add('whenChanged');
       lines.push(indentStr + `delta(${pattern.value}, ${pattern.threshold}, () => {`);
       if (body) lines.push(body);
       lines.push(indentStr + '});');
@@ -700,6 +712,10 @@ class Decompiler {
 
       case OPERAND_TYPE.FLIGHT:
       case OPERAND_TYPE.WAYPOINTS: {
+        // Track waypoint usage for imports
+        if (type === OPERAND_TYPE.WAYPOINTS) {
+          this.usedFeatures.add('waypoint');
+        }
         // Try to get property name from API definitions
         const prop = this.getPropertyFromOperand(type, value);
         if (prop) {
@@ -759,11 +775,13 @@ class Decompiler {
             // EDGE: returns true on rising edge of condition for duration ms
             // Just show the underlying condition - edge timing is implementation detail
             if (referencedLC.operation === OPERATION.EDGE) {
+              this.usedFeatures.add('edge');
               const underlyingCond = this.decompileOperand(OPERAND_TYPE.LC, referencedLC.operandAValue, allConditions, visited);
               return `edge(${underlyingCond}, ${referencedLC.operandBValue})`;
             }
             // DELAY: returns true after condition held for duration ms
             if (referencedLC.operation === OPERATION.DELAY) {
+              this.usedFeatures.add('delay');
               const underlyingCond = this.decompileOperand(OPERAND_TYPE.LC, referencedLC.operandAValue, allConditions, visited);
               return `delay(${underlyingCond}, ${referencedLC.operandBValue})`;
             }
@@ -781,6 +799,7 @@ class Decompiler {
 
       case OPERAND_TYPE.PID:
         // PID operands 0-3 map to pid[0].output through pid[3].output
+        this.usedFeatures.add('pid');
         if (value >= 0 && value < 4) {
           return `pid[${value}].output`;
         }
@@ -913,37 +932,28 @@ class Decompiler {
     code += '// INAV JavaScript Programming\n';
     code += '// Decompiled from logic conditions\n\n';
 
-    // Add destructuring - include edge, sticky, delay, timer, whenChanged, pid, waypoint if used
-    const needsEdge = body.includes('edge(');
-    const needsSticky = body.includes('sticky(');
-    const needsDelay = body.includes('delay(');
-    const needsTimer = body.includes('timer(');
-    const needsWhenChanged = body.includes('whenChanged(');
-    const needsWaypoint = body.includes('waypoint.');
-    const needsPid = /pid\[\d+\]/.test(body);
-
+    // Add destructuring - use structural tracking (usedFeatures) instead of string scanning
     const imports = ['flight', 'override', 'rc', 'gvar'];
-    if (needsEdge) imports.push('edge');
-    if (needsSticky) imports.push('sticky');
-    if (needsDelay) imports.push('delay');
-    if (needsTimer) imports.push('timer');
-    if (needsWhenChanged) imports.push('whenChanged');
-    if (needsWaypoint) imports.push('waypoint');
-    if (needsPid) imports.push('pid');
+    if (this.usedFeatures.has('edge')) imports.push('edge');
+    if (this.usedFeatures.has('sticky')) imports.push('sticky');
+    if (this.usedFeatures.has('delay')) imports.push('delay');
+    if (this.usedFeatures.has('timer')) imports.push('timer');
+    if (this.usedFeatures.has('whenChanged')) imports.push('whenChanged');
+    if (this.usedFeatures.has('waypoint')) imports.push('waypoint');
+    if (this.usedFeatures.has('pid')) imports.push('pid');
 
     code += `const { ${imports.join(', ')} } = inav;\n\n`;
 
     // Add variable declarations from variable map
     // Note: sticky/latch variables are declared inline with var latch = sticky({...})
-    // Note: Skip let variables that are already declared inline in the body (from expression hoisting)
+    // Note: Skip let variables that are already declared inline in the body (tracked in inlineDeclaredVars)
     const letDeclarations = this.reconstructLetVariables().filter(decl => {
       // Extract variable name from "let varName = ..."
       const match = decl.match(/^let\s+(\w+)\s*=/);
       if (match) {
         const varName = match[1];
-        // Check if body already contains "let varName =" declaration
-        const inlinePattern = new RegExp(`\\blet\\s+${varName}\\s*=`);
-        return !inlinePattern.test(body);
+        // Use structural tracking instead of regex scanning the body
+        return !this.inlineDeclaredVars.has(varName);
       }
       return true;
     });
