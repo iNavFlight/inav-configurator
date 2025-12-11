@@ -26,6 +26,9 @@ class ConditionDecompiler {
   constructor(context) {
     this.decompileOperand = context.decompileOperand;
     this.addWarning = context.addWarning;
+
+    // Operation constants for structural pattern matching
+    this.OPERAND_TYPE_LC = 4;  // OPERAND_TYPE.LC
   }
 
   /**
@@ -68,7 +71,7 @@ class ConditionDecompiler {
         return this.handleOr(left, right);
 
       case OPERATION.NOT:
-        return this.handleNot(left);
+        return this.handleNot(lc, allConditions, visited);
 
       case OPERATION.XOR:
         return this.handleXor(left, right);
@@ -175,58 +178,77 @@ class ConditionDecompiler {
     return `${left} || ${right}`;
   }
 
-  handleNot(left) {
-    // Simplify double negation: !(!x) -> x
-    // But be careful: !(x === 0) is NOT the same as !x
-    // !(x === 0) = x !== 0 (truthy check)
-    // !x = x is falsy (zero)
+  /**
+   * Handle NOT operation using structural pattern matching on LC data.
+   *
+   * Instead of parsing strings with regex, we inspect the referenced LC directly
+   * to determine the best output form. This is more robust and handles all cases.
+   *
+   * @param {Object} lc - The NOT logic condition
+   * @param {Array} allConditions - All conditions for resolving LC references
+   * @param {Set} visited - Visited set for cycle detection
+   * @returns {string} JavaScript expression
+   */
+  handleNot(lc, allConditions, visited) {
+    // If operandA is an LC reference, we can inspect the referenced LC directly
+    if (lc.operandAType === this.OPERAND_TYPE_LC && allConditions) {
+      const innerLcIndex = lc.operandAValue;
+      const innerLC = allConditions.find(c => c.index === innerLcIndex);
 
-    // Handle "!(...)" pattern - extract inner and check if it's a simple identifier
-    if (left.startsWith('!(') && left.endsWith(')')) {
-      const inner = left.slice(2, -1);
-      // Double negation of simple identifier: !(!identifier) -> identifier
-      if (/^\w+(?:\[\d+\])?$/.test(inner)) {
-        return inner;
-      }
-      // Check if we can safely unwrap complex expressions
-      let depth = 0;
-      let safe = true;
-      for (const ch of inner) {
-        if (ch === '(') depth++;
-        else if (ch === ')') depth--;
-        else if (depth === 0 && (ch === '&' || ch === '|' || ch === '?')) {
-          safe = false;
-          break;
+      if (innerLC) {
+        // Double negation: NOT(NOT(x)) -> x
+        if (innerLC.operation === OPERATION.NOT) {
+          // Recursively decompile the inner NOT's operand
+          return this.decompileOperand(innerLC.operandAType, innerLC.operandAValue, allConditions, visited);
+        }
+
+        // NOT(EQUAL(x, y)) -> x !== y
+        if (innerLC.operation === OPERATION.EQUAL) {
+          const left = this.decompileOperand(innerLC.operandAType, innerLC.operandAValue, allConditions, visited);
+          const right = this.decompileOperand(innerLC.operandBType, innerLC.operandBValue, allConditions, visited);
+          return `${left} !== ${right}`;
+        }
+
+        // NOT(GREATER_THAN(x, y)) -> x <= y
+        if (innerLC.operation === OPERATION.GREATER_THAN) {
+          const left = this.decompileOperand(innerLC.operandAType, innerLC.operandAValue, allConditions, visited);
+          const right = this.decompileOperand(innerLC.operandBType, innerLC.operandBValue, allConditions, visited);
+          return `${left} <= ${right}`;
+        }
+
+        // NOT(LOWER_THAN(x, y)) -> x >= y
+        if (innerLC.operation === OPERATION.LOWER_THAN) {
+          const left = this.decompileOperand(innerLC.operandAType, innerLC.operandAValue, allConditions, visited);
+          const right = this.decompileOperand(innerLC.operandBType, innerLC.operandBValue, allConditions, visited);
+          return `${left} >= ${right}`;
+        }
+
+        // NOT(AND(a, b)) -> !(a && b)
+        if (innerLC.operation === OPERATION.AND) {
+          const left = this.decompileOperand(innerLC.operandAType, innerLC.operandAValue, allConditions, visited);
+          const right = this.decompileOperand(innerLC.operandBType, innerLC.operandBValue, allConditions, visited);
+          return `!(${left} && ${right})`;
+        }
+
+        // NOT(OR(a, b)) -> !(a || b)
+        if (innerLC.operation === OPERATION.OR) {
+          const left = this.decompileOperand(innerLC.operandAType, innerLC.operandAValue, allConditions, visited);
+          const right = this.decompileOperand(innerLC.operandBType, innerLC.operandBValue, allConditions, visited);
+          return `!(${left} || ${right})`;
         }
       }
-      if (safe) {
-        return inner;
-      }
     }
 
-    // Handle !!identifier pattern (e.g., NOT of !gvar[1])
-    // !(!identifier) -> identifier (double negation)
-    if (left.startsWith('!') && /^!\w+(?:\[\d+\])?$/.test(left)) {
-      return left.slice(1);  // Remove the leading ! to get just the identifier
+    // Fallback: decompile operand and wrap with !
+    const inner = this.decompileOperand(lc.operandAType, lc.operandAValue, allConditions, visited);
+
+    // Simple identifier/subscript - no parens needed
+    if (/^\w+(?:\[\d+\])?$/.test(inner)) {
+      return `!${inner}`;
     }
 
-    // !(x === 0) means "x is NOT zero" - output as explicit comparison
-    const equalsZeroMatch = left.match(/^(\w+(?:\[\d+\])?) === 0$/);
-    if (equalsZeroMatch) {
-      return `${equalsZeroMatch[1]} !== 0`;
-    }
-
-    // !(x !== 0) means "x IS zero" - output as explicit comparison
-    const notEqualsZeroMatch = left.match(/^(\w+(?:\[\d+\])?) !== 0$/);
-    if (notEqualsZeroMatch) {
-      return `${notEqualsZeroMatch[1]} === 0`;
-    }
-
-    // If the operand contains operators, wrap in parens for correct precedence
-    if (left.includes(' ') || left.includes('!') || left.includes('(')) {
-      return `!(${left})`;
-    }
-    return `!${left}`;
+    // Complex expression - wrap in parens for precedence
+    return `!(${inner})`;
   }
 
   handleXor(left, right) {
