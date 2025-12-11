@@ -53,7 +53,9 @@ class ActionDecompiler {
         return this.handleOverrideThrottleScale(value);
 
       case OPERATION.OVERRIDE_THROTTLE:
-        return this.handleOverrideThrottle(value);
+        // OVERRIDE_THROTTLE uses operandA for the throttle value, not operandB
+        const throttleValue = this.decompileOperand(lc.operandAType, lc.operandAValue, allConditions);
+        return this.handleOverrideThrottle(throttleValue);
 
       case OPERATION.SET_VTX_POWER_LEVEL:
         return this.handleSetVtxPowerLevel(value);
@@ -132,7 +134,154 @@ class ActionDecompiler {
 
   handleGvarSet(lc, value) {
     const targetName = this.getVarNameForGvar(lc.operandAValue) || `gvar[${lc.operandAValue}]`;
-    return `${targetName} = ${value};`;
+    const cleanValue = this.stripOuterParens(value);
+
+    // Check if expression is deeply nested and should be simplified
+    const { statements, expr } = this.simplifyNestedExpr(cleanValue);
+    if (statements.length > 0) {
+      return statements.join('\n') + `\n${targetName} = ${expr};`;
+    }
+
+    return `${targetName} = ${cleanValue};`;
+  }
+
+  /**
+   * Remove unnecessary outer parentheses from an expression
+   * @param {string} expr - Expression that may have outer parens
+   * @returns {string} Expression without superfluous outer parens
+   */
+  stripOuterParens(expr) {
+    // Only strip if entire expression is wrapped in matching parens
+    if (expr.startsWith('(') && expr.endsWith(')')) {
+      // Check if these parens actually match (not nested like "(a) + (b)")
+      let depth = 0;
+      for (let i = 0; i < expr.length - 1; i++) {
+        if (expr[i] === '(') depth++;
+        else if (expr[i] === ')') depth--;
+        // If depth hits 0 before the end, the outer parens don't match
+        if (depth === 0) return expr;
+      }
+      // The outer parens match - strip them
+      return expr.slice(1, -1);
+    }
+    return expr;
+  }
+
+  /**
+   * Count the maximum nesting depth of function calls in an expression
+   * @param {string} expr - Expression to analyze
+   * @returns {number} Maximum nesting depth
+   */
+  countNestingDepth(expr) {
+    let maxDepth = 0;
+    let currentDepth = 0;
+    for (const char of expr) {
+      if (char === '(') {
+        currentDepth++;
+        maxDepth = Math.max(maxDepth, currentDepth);
+      } else if (char === ')') {
+        currentDepth--;
+      }
+    }
+    return maxDepth;
+  }
+
+  /**
+   * Find the innermost function call (Math.min, Math.max, etc.) and its argument
+   * @param {string} expr - Expression to search
+   * @returns {Object|null} {func, arg, start, end} or null if not found
+   */
+  findInnermostFunctionCall(expr) {
+    // Look for patterns like Math.min(...), Math.max(...), Math.abs(...)
+    // Note: Math.round/floor/ceil are not supported by INAV logic conditions
+    const funcPattern = /Math\.(min|max|abs)\(/g;
+    let match;
+    let innermost = null;
+    let innermostDepth = -1;
+
+    while ((match = funcPattern.exec(expr)) !== null) {
+      const funcStart = match.index;
+      const funcName = match[0].slice(0, -1); // Remove trailing '('
+      const argStart = funcStart + match[0].length;
+
+      // Find the matching closing paren
+      let depth = 1;
+      let argEnd = argStart;
+      while (argEnd < expr.length && depth > 0) {
+        if (expr[argEnd] === '(') depth++;
+        else if (expr[argEnd] === ')') depth--;
+        argEnd++;
+      }
+      argEnd--; // Back up to the closing paren
+
+      const arg = expr.slice(argStart, argEnd);
+      const argDepth = this.countNestingDepth(arg);
+
+      // We want the function whose argument has the LEAST nesting (i.e., innermost)
+      if (innermost === null || argDepth < innermostDepth) {
+        innermost = {
+          func: funcName,
+          arg: arg,
+          fullMatch: expr.slice(funcStart, argEnd + 1),
+          start: funcStart,
+          end: argEnd + 1
+        };
+        innermostDepth = argDepth;
+      }
+    }
+
+    return innermost;
+  }
+
+  /**
+   * Simplify a deeply nested expression by hoisting inner parts to variables
+   * @param {string} expr - Expression to simplify
+   * @param {number} maxDepth - Maximum allowed nesting depth (default 3)
+   * @returns {Object} {statements: string[], expr: string}
+   */
+  simplifyNestedExpr(expr, maxDepth = 3) {
+    const statements = [];
+    let simplified = expr;
+    let varCounter = 1;
+    const hoistedExprs = new Map(); // Map expression -> variable name (for deduplication)
+
+    while (this.countNestingDepth(simplified) > maxDepth) {
+      const innermost = this.findInnermostFunctionCall(simplified);
+      if (!innermost) break;
+
+      // Check if we've already hoisted this exact expression
+      let varName = hoistedExprs.get(innermost.fullMatch);
+      if (!varName) {
+        // Generate a descriptive variable name based on the function
+        varName = this.generateVarName(innermost.func, varCounter++);
+        hoistedExprs.set(innermost.fullMatch, varName);
+
+        // Create the hoisted statement
+        statements.push(`let ${varName} = ${innermost.fullMatch};`);
+      }
+
+      // Replace the function call with the variable
+      simplified = simplified.slice(0, innermost.start) + varName + simplified.slice(innermost.end);
+    }
+
+    return { statements, expr: simplified };
+  }
+
+  /**
+   * Generate a readable variable name for a hoisted expression
+   * @param {string} funcName - The function being hoisted (e.g., "Math.min")
+   * @param {number} counter - Counter for uniqueness
+   * @returns {string} Variable name
+   */
+  generateVarName(funcName, counter) {
+    // Note: Math.round/floor/ceil are not supported by INAV logic conditions
+    const nameMap = {
+      'Math.min': 'clamped',
+      'Math.max': 'bounded',
+      'Math.abs': 'absolute'
+    };
+    const baseName = nameMap[funcName] || 'temp';
+    return counter === 1 ? baseName : `${baseName}${counter}`;
   }
 
   handleGvarInc(lc, value) {
@@ -146,11 +295,21 @@ class ActionDecompiler {
   }
 
   handleOverrideThrottleScale(value) {
-    return `override.throttleScale = ${value};`;
+    const cleanValue = this.stripOuterParens(value);
+    const { statements, expr } = this.simplifyNestedExpr(cleanValue);
+    if (statements.length > 0) {
+      return statements.join('\n') + `\noverride.throttleScale = ${expr};`;
+    }
+    return `override.throttleScale = ${cleanValue};`;
   }
 
   handleOverrideThrottle(value) {
-    return `override.throttle = ${value};`;
+    const cleanValue = this.stripOuterParens(value);
+    const { statements, expr } = this.simplifyNestedExpr(cleanValue);
+    if (statements.length > 0) {
+      return statements.join('\n') + `\noverride.throttle = ${expr};`;
+    }
+    return `override.throttle = ${cleanValue};`;
   }
 
   handleSetVtxPowerLevel(value) {

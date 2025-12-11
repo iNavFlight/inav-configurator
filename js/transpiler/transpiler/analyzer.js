@@ -126,6 +126,9 @@ class SemanticAnalyzer {
       case 'VarDeclaration':
         this.handleVarDeclaration(stmt);
         break;
+      case 'StickyAssignment':
+        this.handleStickyAssignment(stmt);
+        break;
       case 'Assignment':
         this.checkAssignment(stmt);
         break;
@@ -147,6 +150,16 @@ class SemanticAnalyzer {
    */
   handleVarDeclaration(stmt) {
     this.variableHandler.addVarVariable(stmt.name, stmt.initExpr, stmt.loc);
+  }
+
+  /**
+   * Handle sticky assignment (var latch1 = sticky({...}))
+   * Registers the variable as a special "latch" type so it's recognized in conditions
+   */
+  handleStickyAssignment(stmt) {
+    // Register as a special latch variable - doesn't use gvar slots
+    // The codegen will map it to an LC index
+    this.variableHandler.addLatchVariable(stmt.target, stmt.loc);
   }
   
   /**
@@ -495,20 +508,26 @@ class SemanticAnalyzer {
   detectConflicts(ast) {
     // Track assignments by handler type and target
     const handlerAssignments = new Map();
-    
+
+    let stmtIndex = 0;
     for (const stmt of ast.statements) {
       if (stmt && stmt.type === 'EventHandler') {
-        const handlerKey = stmt.handler === 'ifthen' ? 
-          `ifthen:${this.serializeCondition(stmt.condition)}` : 
+        // Each if statement gets a unique key - we want to detect multiple
+        // assignments within the SAME if block, not across different if
+        // statements that happen to have the same condition
+        const handlerKey = stmt.handler === 'ifthen' ?
+          `ifthen:${stmtIndex}` :
           stmt.handler;
-        
+
         if (!handlerAssignments.has(handlerKey)) {
           handlerAssignments.set(handlerKey, new Map());
         }
-        
+
         if (stmt.body && Array.isArray(stmt.body)) {
           this.collectAssignments(stmt.body, handlerKey, handlerAssignments.get(handlerKey));
         }
+
+        stmtIndex++;
       }
     }
     

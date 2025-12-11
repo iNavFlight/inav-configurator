@@ -35,6 +35,7 @@ class INAVCodeGenerator {
     this.operandMapping = buildForwardMapping(apiDefinitions);
     this.arrowHelper = new ArrowFunctionHelper(this);
     this.variableHandler = variableHandler;
+    this.latchVariables = new Map(); // Map variable name -> LC index for sticky assignments
 
     // Initialize helper generators
     const context = {
@@ -46,12 +47,19 @@ class INAVCodeGenerator {
       errorHandler: this.errorHandler,
       arrowHelper: this.arrowHelper,
       variableHandler: this.variableHandler,
-      getLcIndex: () => this.lcIndex
+      getLcIndex: () => this.lcIndex,
+      latchVariables: this.latchVariables  // Share latch map with condition generator
     };
 
     this.conditionGenerator = new ConditionGenerator(context);
     this.expressionGenerator = new ExpressionGenerator(context);
-    this.actionGenerator = new ActionGenerator(context);
+
+    // ActionGenerator needs conditionGenerator for CSE cache invalidation on mutation
+    const actionContext = {
+      ...context,
+      conditionGenerator: this.conditionGenerator
+    };
+    this.actionGenerator = new ActionGenerator(actionContext);
   }
 
   /**
@@ -64,6 +72,7 @@ class INAVCodeGenerator {
     this.commands = [];
     this.errorHandler.reset(); // Clear any previous errors
     this.conditionGenerator.reset(); // Clear condition cache for CSE
+    this.latchVariables.clear(); // Clear latch variable mappings
 
     if (!ast || !ast.statements) {
       throw new Error('Invalid AST');
@@ -99,6 +108,10 @@ class INAVCodeGenerator {
       case 'Assignment':
         // Top-level assignment (e.g., gvar[0] = value) - runs unconditionally
         this.generateTopLevelAssignment(stmt);
+        break;
+      case 'StickyAssignment':
+        // latch1 = sticky({on: ..., off: ...})
+        this.generateStickyAssignment(stmt);
         break;
       case 'Destructuring':
       case 'LetDeclaration':
@@ -410,6 +423,64 @@ class INAVCodeGenerator {
   }
 
   /**
+   * Generate sticky assignment: latch1 = sticky({on: () => cond1, off: () => cond2})
+   * Creates the sticky LC and tracks the variable name -> LC index mapping
+   */
+  generateStickyAssignment(stmt, activatorId = -1) {
+    const { target, args } = stmt;
+
+    if (!args || args.length < 1) {
+      this.errorHandler.addError(
+        'sticky() requires at least 1 argument',
+        stmt,
+        'invalid_args'
+      );
+      return;
+    }
+
+    // Extract on/off conditions from named parameters: {on: () => ..., off: () => ...}
+    const configArg = args[0];
+    let onCondition = null;
+    let offCondition = null;
+
+    if (configArg.type === 'ObjectExpression') {
+      for (const prop of configArg.properties) {
+        const propName = prop.key.name || prop.key.value;
+        if (propName === 'on') {
+          onCondition = this.arrowHelper.extractExpression(prop.value);
+        } else if (propName === 'off') {
+          offCondition = this.arrowHelper.extractExpression(prop.value);
+        }
+      }
+    }
+
+    if (!onCondition || !offCondition) {
+      this.errorHandler.addError(
+        'sticky() requires {on: () => condition, off: () => condition} argument',
+        stmt,
+        'invalid_args'
+      );
+      return;
+    }
+
+    // Generate ON condition LC (inherits activator from parent)
+    const onConditionId = this.generateCondition(onCondition, activatorId);
+
+    // Generate OFF condition LC (runs unconditionally - uses -1)
+    const offConditionId = this.generateCondition(offCondition, -1);
+
+    // Generate STICKY operation (13) - inherits activator from parent
+    const stickyId = this.pushLogicCommand(OPERATION.STICKY,
+      { type: OPERAND_TYPE.LC, value: onConditionId },
+      { type: OPERAND_TYPE.LC, value: offConditionId },
+      activatorId
+    );
+
+    // Track the variable name -> LC index mapping for use in conditions
+    this.latchVariables.set(target, stickyId);
+  }
+
+  /**
    * Generate delay handler
    * delay(() => condition, { duration: ms }, () => { actions })
    */
@@ -565,6 +636,11 @@ class INAVCodeGenerator {
    * Delegates to ActionGenerator helper class
    */
   generateAction(action, activatorId) {
+    // Handle StickyAssignment specially - it creates LCs and tracks latch variables
+    if (action && action.type === 'StickyAssignment') {
+      this.generateStickyAssignment(action, activatorId);
+      return;
+    }
     this.actionGenerator.generate(action, activatorId);
   }
 
@@ -625,13 +701,29 @@ class INAVCodeGenerator {
         return { type: OPERAND_TYPE.RC_CHANNEL, value: index };
       }
 
+      // Check for PID controller with bounds validation
+      // Supports both pid[N] and pid[N].output (both are equivalent)
+      if (value.startsWith('pid[')) {
+        const match = value.match(/^pid\[(\d+)\](?:\.output)?$/);
+        if (!match) {
+          this.errorHandler.addError(`Invalid pid syntax '${value}'. Expected pid[0-3] or pid[0-3].output`, null, 'invalid_pid');
+          return { type: OPERAND_TYPE.VALUE, value: 0 };
+        }
+        const index = parseInt(match[1], 10);
+        if (index < 0 || index > 3) {
+          this.errorHandler.addError(`Invalid pid controller ${index}. Must be 0-3.`, null, 'invalid_pid_index');
+          return { type: OPERAND_TYPE.VALUE, value: 0 };
+        }
+        return { type: OPERAND_TYPE.PID, value: index };
+      }
+
       // Check in operand mapping
       if (this.operandMapping[value]) {
         return this.operandMapping[value];
       }
 
       this.errorHandler.addError(
-        `Unknown operand '${value}'. Available: flight.*, rc.*, gvar[0-7], waypoint.*, pid.*`,
+        `Unknown operand '${value}'. Available: flight.*, rc[1-18], gvar[0-7], waypoint.*, pid[0-3]`,
         null,
         'unknown_operand'
       );

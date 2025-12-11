@@ -55,6 +55,12 @@ class PropertyAccessChecker {
       return;
     }
 
+    // Handle PID controller array access: pid[0].output through pid[3].output
+    if (propPath.startsWith('pid[')) {
+      this.checkPidAccess(propPath, line);
+      return;
+    }
+
     // Handle API property access (flight.*, override.*, etc.)
     this.checkApiPropertyAccess(propPath, line);
   }
@@ -70,6 +76,37 @@ class PropertyAccessChecker {
     } else if (index >= this.gvarCount) {
       this.addError(`Invalid gvar index ${index}. INAV only has gvar[0] through gvar[${this.gvarCount - 1}]`, line);
     }
+  }
+
+  /**
+   * Check PID controller access validity
+   * INAV has 4 programming PID controllers (pid[0] through pid[3])
+   * Only the output property is readable via logic conditions
+   * pid[N] is treated as pid[N].output (similar to rc[N] being rc[N].value)
+   * @private
+   */
+  checkPidAccess(propPath, line) {
+    const match = propPath.match(/^pid\[(\d+)\](?:\.(\w+))?$/);
+    if (!match) {
+      this.addError(`Invalid PID syntax: '${propPath}'. Expected format: pid[0] through pid[3], optionally with .output`, line);
+      return;
+    }
+
+    const pidIndex = parseInt(match[1]);
+    const property = match[2]; // may be undefined for pid[N] alone
+
+    if (pidIndex < 0 || pidIndex > 3) {
+      this.addError(`PID controller index ${pidIndex} out of range. INAV supports pid[0] through pid[3]`, line);
+      return;
+    }
+
+    // Only .output is valid (or no property, which defaults to output)
+    if (property && property !== 'output') {
+      this.addError(`Unknown property '${property}' on PID controller. Only 'output' is available via logic conditions`, line);
+      return;
+    }
+
+    // Valid PID access: pid[N] or pid[N].output
   }
 
   /**

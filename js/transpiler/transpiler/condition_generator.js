@@ -29,6 +29,7 @@ class ConditionGenerator {
     this.validateFunctionArgs = context.validateFunctionArgs;
     this.errorHandler = context.errorHandler;
     this.getLcIndex = context.getLcIndex;
+    this.latchVariables = context.latchVariables; // Map variable name -> LC index for sticky/timer
 
     // Cache for generated conditions (CSE - Common Subexpression Elimination)
     // Maps condition key -> LC index
@@ -41,6 +42,61 @@ class ConditionGenerator {
    */
   reset() {
     this.conditionCache.clear();
+  }
+
+  /**
+   * Invalidate cache entries that reference a specific variable
+   * Should be called when a variable is mutated (assigned, incremented, etc.)
+   * @param {string} varName - Variable name, e.g., 'gvar[1]'
+   */
+  invalidateCacheForVariable(varName) {
+    // Build a pattern that matches cache keys referencing this variable
+    // Cache keys look like: "binary:3:{type:5,value:1}:{type:0,value:2}:-1"
+    // For gvar[1], we need to match keys containing "type\":5,\"value\":1" (GVAR type=5)
+    // or containing the string "gvar[1]"
+
+    const keysToDelete = [];
+
+    for (const key of this.conditionCache.keys()) {
+      if (this.cacheKeyReferencesVariable(key, varName)) {
+        keysToDelete.push(key);
+      }
+    }
+
+    for (const key of keysToDelete) {
+      this.conditionCache.delete(key);
+    }
+  }
+
+  /**
+   * Check if a cache key references a specific variable
+   * @param {string} key - Cache key
+   * @param {string} varName - Variable name, e.g., 'gvar[1]'
+   * @returns {boolean} True if the key references the variable
+   * @private
+   */
+  cacheKeyReferencesVariable(key, varName) {
+    // Extract gvar index from varName like 'gvar[1]'
+    const gvarMatch = varName.match(/^gvar\[(\d+)\]$/);
+    if (gvarMatch) {
+      const gvarIndex = parseInt(gvarMatch[1]);
+      // GVAR operand type is 5, so look for {"type":5,"value":N} in the key
+      // Cache keys are JSON stringified, so patterns like:
+      // "type":5,"value":1  or  "type": 5, "value": 1
+      const pattern1 = `"type":5,"value":${gvarIndex}`;
+      const pattern2 = `"type": 5, "value": ${gvarIndex}`;
+
+      if (key.includes(pattern1) || key.includes(pattern2)) {
+        return true;
+      }
+    }
+
+    // Also check for direct string reference (for future variable types)
+    if (key.includes(varName)) {
+      return true;
+    }
+
+    return false;
   }
 
   /**
@@ -75,6 +131,8 @@ class ConditionGenerator {
         return this.generateLiteral(condition, activatorId);
       case 'CallExpression':
         return this.generateCall(condition, activatorId);
+      case 'Identifier':
+        return this.generateIdentifier(condition, activatorId);
       default:
         this.errorHandler.addError(
           `Unsupported condition type: ${condition.type}. Use comparison operators (>, <, ===, etc.) and logical operators (&&, ||, !)`,
@@ -83,6 +141,31 @@ class ConditionGenerator {
         );
         return this.getLcIndex();
     }
+  }
+
+  /**
+   * Generate identifier condition (latch variable reference)
+   * Used for: if (latch1) where latch1 was assigned from sticky()
+   * @private
+   */
+  generateIdentifier(condition, activatorId) {
+    // Parser may produce {type: 'Identifier', name: 'x'} (Acorn style) or
+    // {type: 'Identifier', value: 'x'} (simplified style)
+    const varName = condition.name || condition.value;
+
+    // Check if this is a latch variable (from sticky assignment)
+    if (this.latchVariables && this.latchVariables.has(varName)) {
+      // Return the LC index directly - the sticky LC is already a boolean condition
+      return this.latchVariables.get(varName);
+    }
+
+    // Unknown identifier in condition context
+    this.errorHandler.addError(
+      `Unknown identifier '${varName}' in condition. Expected a latch variable from sticky() assignment.`,
+      condition,
+      'unknown_identifier'
+    );
+    return this.getLcIndex();
   }
 
   /**
@@ -246,10 +329,28 @@ class ConditionGenerator {
       }
     }
 
-    // Boolean property access (e.g., flight.mode.failsafe)
+    // Boolean/truthy property access (e.g., gvar[0], flight.mode.failsafe)
     const operand = this.getOperand(condition.value);
 
-    // Check if true
+    // For gvar truthy checks, use != 0 (compiled as NOT(gvar === 0))
+    // This correctly handles any non-zero value as truthy
+    // For flight.mode.* booleans, === 1 is correct since they're 0 or 1
+    const valueStr = typeof condition.value === 'string' ? condition.value : '';
+    if (valueStr.startsWith('gvar[')) {
+      // Truthy check for gvar: NOT(gvar[N] === 0)
+      const equalZeroId = this.pushLogicCommand(OPERATION.EQUAL,
+        operand,
+        { type: OPERAND_TYPE.VALUE, value: 0 },
+        activatorId
+      );
+      return this.pushLogicCommand(OPERATION.NOT,
+        { type: OPERAND_TYPE.LC, value: equalZeroId },
+        { type: OPERAND_TYPE.VALUE, value: 0 },
+        activatorId
+      );
+    }
+
+    // For boolean properties (flight.mode.*, etc.), check === 1
     return this.pushLogicCommand(OPERATION.EQUAL,
       operand,
       { type: OPERAND_TYPE.VALUE, value: 1 },
@@ -350,9 +451,54 @@ class ConditionGenerator {
       return this.pushLogicCommand(OPERATION.APPROX_EQUAL, left, right, activatorId, tolerance.value);
     }
 
+    // Handle edge(condition, duration) - Edge detection
+    if (funcName === 'edge') {
+      if (!this.validateFunctionArgs('edge', condition.arguments, 2, condition)) {
+        return this.getLcIndex();
+      }
+
+      // Generate the underlying condition
+      const conditionId = this.generate(condition.arguments[0], activatorId);
+
+      // Get duration value
+      const duration = condition.arguments[1];
+      const durationValue = duration?.type === 'Literal' ? duration.value : 0;
+
+      // Generate EDGE operation
+      return this.pushLogicCommand(OPERATION.EDGE,
+        { type: OPERAND_TYPE.LC, value: conditionId },
+        { type: OPERAND_TYPE.VALUE, value: durationValue },
+        activatorId
+      );
+    }
+
+    // Handle delta(value, threshold) - Change detection
+    if (funcName === 'delta') {
+      if (!this.validateFunctionArgs('delta', condition.arguments, 2, condition)) {
+        return this.getLcIndex();
+      }
+
+      // First argument can be MemberExpression with .value string, or raw AST
+      const firstArg = condition.arguments[0];
+      const valueToResolve = (firstArg.type === 'MemberExpression' && firstArg.value)
+        ? firstArg.value  // Use the extracted string value
+        : firstArg;
+      const valueOperand = this.getOperand(valueToResolve, activatorId);
+
+      const threshold = condition.arguments[1];
+      const thresholdValue = threshold?.type === 'Literal' ? threshold.value : 0;
+
+      // Generate DELTA operation
+      return this.pushLogicCommand(OPERATION.DELTA,
+        valueOperand,
+        { type: OPERAND_TYPE.VALUE, value: thresholdValue },
+        activatorId
+      );
+    }
+
     // Unsupported function in condition
     this.errorHandler.addError(
-      `Unsupported function in condition: ${funcName}(). Supported: xor, nand, nor, approxEqual`,
+      `Unsupported function in condition: ${funcName}(). Supported: xor, nand, nor, approxEqual, edge, delta`,
       condition,
       'unsupported_function'
     );
