@@ -107,6 +107,7 @@ class INAVCodeGenerator {
   generate(ast) {
     this.lcIndex = 0;
     this.commands = [];
+    this.lastStatementEndLine = 0;  // Track for blank line gap detection
     this.errorHandler.reset(); // Clear any previous errors
     this.conditionGenerator.reset(); // Clear condition cache for CSE
     this.latchVariables.clear(); // Clear latch variable mappings
@@ -124,7 +125,9 @@ class INAVCodeGenerator {
     }
 
     for (const stmt of ast.statements) {
+      this.maybeInsertGapLC(stmt);
       this.generateStatement(stmt);
+      this.updateLastStatementLine(stmt);
     }
 
     // Throw if any errors were collected during generation
@@ -239,6 +242,36 @@ class INAVCodeGenerator {
     );
     this.lcIndex++;
     return lcIndex;
+  }
+
+  /**
+   * Check if there's a significant gap (2+ blank lines) before a statement
+   * and insert a disabled placeholder LC to preserve visual grouping.
+   * @param {Object} stmt - Statement with loc info
+   */
+  maybeInsertGapLC(stmt) {
+    if (!stmt.loc || this.lastStatementEndLine === 0) return;
+
+    const stmtStartLine = stmt.loc.start.line;
+    const blankLines = stmtStartLine - this.lastStatementEndLine - 1;
+
+    // 2+ blank lines = visual separator, insert disabled LC
+    if (blankLines >= 2) {
+      this.commands.push(
+        `logic ${this.lcIndex} 0 -1 0 0 0 0 0 0`  // Disabled, no-op LC
+      );
+      this.lcIndex++;
+    }
+  }
+
+  /**
+   * Update tracking of last statement's end line.
+   * @param {Object} stmt - Statement with loc info
+   */
+  updateLastStatementLine(stmt) {
+    if (stmt.loc) {
+      this.lastStatementEndLine = stmt.loc.end.line;
+    }
   }
 
   /**
