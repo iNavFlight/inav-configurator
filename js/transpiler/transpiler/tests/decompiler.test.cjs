@@ -108,9 +108,9 @@ describe('Decompiler', () => {
           activatorId: 0,
           operation: 25, // SET_VTX_POWER_LEVEL
           operandAType: 0,
-          operandAValue: 0,
+          operandAValue: 3,  // Value in operandA per INAV firmware
           operandBType: 0,
-          operandBValue: 3
+          operandBValue: 0
         }
       ];
 
@@ -141,9 +141,9 @@ describe('Decompiler', () => {
           activatorId: 0,
           operation: 23, // OVERRIDE_THROTTLE_SCALE
           operandAType: 0,
-          operandAValue: 0,
+          operandAValue: 50,  // Value in operandA per INAV firmware
           operandBType: 0,
-          operandBValue: 50
+          operandBValue: 0
         },
         // Action 2: gvar[0] = 1
         {
@@ -255,9 +255,9 @@ describe('Decompiler', () => {
       const vtxPower = {
         operation: 25, // SET_VTX_POWER_LEVEL
         operandAType: 0,
-        operandAValue: 0,
+        operandAValue: 3,  // Value in operandA per INAV firmware
         operandBType: 0,
-        operandBValue: 3
+        operandBValue: 0
       };
 
       const action = decompiler.decompileAction(vtxPower);
@@ -268,9 +268,9 @@ describe('Decompiler', () => {
       const throttleScale = {
         operation: 23, // OVERRIDE_THROTTLE_SCALE
         operandAType: 0,
-        operandAValue: 0,
+        operandAValue: 50,  // Value in operandA per INAV firmware
         operandBType: 0,
-        operandBValue: 50
+        operandBValue: 0
       };
 
       const action = decompiler.decompileAction(throttleScale);
@@ -285,13 +285,13 @@ describe('Decompiler', () => {
         { index: 0, enabled: 1, activatorId: -1, operation: 2,
           operandAType: 2, operandAValue: 1, operandBType: 0, operandBValue: 100 },
         { index: 1, enabled: 1, activatorId: 0, operation: 25,
-          operandAType: 0, operandAValue: 0, operandBType: 0, operandBValue: 3 },
+          operandAType: 0, operandAValue: 3, operandBType: 0, operandBValue: 0 },  // Value in operandA
 
         // Second if: cellVoltage < 350
         { index: 2, enabled: 1, activatorId: -1, operation: 3,
           operandAType: 2, operandAValue: 5, operandBType: 0, operandBValue: 350 },
         { index: 3, enabled: 1, activatorId: 2, operation: 23,
-          operandAType: 0, operandAValue: 0, operandBType: 0, operandBValue: 50 }
+          operandAType: 0, operandAValue: 50, operandBType: 0, operandBValue: 0 }  // Value in operandA
       ];
 
       const result = decompiler.decompile(conditions);
@@ -427,9 +427,9 @@ describe('Decompiler Integration', () => {
         activatorId: 0,
         operation: 25, // SET_VTX_POWER_LEVEL
         operandAType: 0,
-        operandAValue: 0,
+        operandAValue: 3,  // Value in operandA per INAV firmware
         operandBType: 0,
-        operandBValue: 3
+        operandBValue: 0
       }
     ];
 
@@ -459,9 +459,9 @@ describe('Decompiler Integration', () => {
         activatorId: 0,
         operation: 23, // OVERRIDE_THROTTLE_SCALE
         operandAType: 0,
-        operandAValue: 0,
+        operandAValue: 50,  // Value in operandA per INAV firmware
         operandBType: 0,
-        operandBValue: 50
+        operandBValue: 0
       }
     ];
 
