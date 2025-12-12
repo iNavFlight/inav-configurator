@@ -5,6 +5,7 @@
  */
 
 import { Transpiler } from '../index.js';
+import { Decompiler } from '../decompiler.js';
 
 function testFlightAxisOverride() {
   console.log('Testing Flight Axis Override...\n');
@@ -45,7 +46,7 @@ if (flight.heading < 180) {
       code: `
 const { flight, override } = inav;
 
-if (flight.armed) {
+if (flight.isArmed) {
   override.flightAxis.roll.angle = 30;
   override.flightAxis.pitch.angle = -15;
   override.flightAxis.yaw.rate = 50;
@@ -77,16 +78,17 @@ if (flight.armed) {
         });
 
         // Test decompilation
-        const decompiled = transpiler.decompile(logicConditions);
+        const decompiler = new Decompiler();
+        const decompiled = decompiler.decompile(logicConditions);
         if (decompiled.success) {
           console.log('✓ Decompilation successful');
           console.log('Decompiled code:');
           console.log(decompiled.code);
         } else {
-          console.log('✗ Decompilation failed:', decompiled.errors);
+          console.log('✗ Decompilation failed:', decompiled.error || decompiled.errors);
         }
       } else {
-        console.log('✗ Compilation failed:', result.errors);
+        console.log('✗ Compilation failed:', result.error || result.errors);
       }
     } catch (error) {
       console.log('✗ Error:', error.message);
