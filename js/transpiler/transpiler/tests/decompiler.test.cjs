@@ -373,11 +373,11 @@ describe('Decompiler', () => {
     test('should warn about unsupported features', () => {
       decompiler.warnings = [];
 
-      // Use an unsupported operand type
-      decompiler.decompileOperand(6, 0); // PID
+      // Use an unsupported operand type (99 is not a valid type)
+      decompiler.decompileOperand(99, 0);
 
       expect(decompiler.warnings.length).toBeGreaterThan(0);
-      expect(decompiler.warnings[0]).toContain('PID');
+      expect(decompiler.warnings[0]).toContain('Unknown');
     });
 
     test('should include warnings in output', () => {
@@ -387,7 +387,7 @@ describe('Decompiler', () => {
           enabled: 1,
           activatorId: -1,
           operation: 2,
-          operandAType: 6, // PID (unsupported)
+          operandAType: 99, // Invalid operand type (unsupported)
           operandAValue: 0,
           operandBType: 0,
           operandBValue: 100
@@ -470,6 +470,237 @@ describe('Decompiler Integration', () => {
     expect(result.success).toBe(true);
     expect(result.code).toContain('if (flight.cellVoltage < 350)');
     expect(result.code).toContain('override.throttleScale = 50');
+  });
+});
+
+describe('Duplicate Sticky and Empty Block Prevention', () => {
+  let decompiler;
+
+  beforeEach(() => {
+    decompiler = new Decompiler();
+  });
+
+  test('should not produce duplicate sticky definitions or empty if blocks', () => {
+    // This is a simplified version of jetrell-logic that exposed the bug:
+    // - latch2 was appearing as a duplicate of latch1
+    // - Empty if blocks like: if (latch2) { if (flight.isAutoLaunch === 0) { } }
+    const conditions = [
+      // LC 0: flight.gpsValid === 1 (outer condition)
+      { index: 0, enabled: 1, activatorId: -1, operation: 1, operandAType: 2, operandAValue: 31, operandBType: 0, operandBValue: 1, flags: 0 },
+      // LC 1: flight.groundSpeed > 1000 (sticky ON condition)
+      { index: 1, enabled: 1, activatorId: 0, operation: 2, operandAType: 2, operandAValue: 9, operandBType: 0, operandBValue: 1000, flags: 0 },
+      // LC 2: STICKY(LC1, LC3) - the main sticky
+      { index: 2, enabled: 1, activatorId: 0, operation: 13, operandAType: 4, operandAValue: 1, operandBType: 4, operandBValue: 3, flags: 0 },
+      // LC 3: flight.isArmed === 0 (sticky OFF condition)
+      { index: 3, enabled: 1, activatorId: -1, operation: 1, operandAType: 2, operandAValue: 17, operandBType: 0, operandBValue: 0, flags: 0 },
+      // LC 4: flight.isAutoLaunch === 0 (nested condition)
+      { index: 4, enabled: 1, activatorId: 2, operation: 1, operandAType: 2, operandAValue: 18, operandBType: 0, operandBValue: 0, flags: 0 },
+      // LC 5: gvar[0] = 1 (action inside nested condition)
+      { index: 5, enabled: 1, activatorId: 4, operation: 18, operandAType: 0, operandAValue: 0, operandBType: 0, operandBValue: 1, flags: 0 }
+    ];
+
+    const result = decompiler.decompile(conditions);
+
+    expect(result.success).toBe(true);
+
+    // Should only have ONE latch variable declaration (with or without = 0)
+    const latchMatches = result.code.match(/var latch\d+/g) || [];
+    expect(latchMatches.length).toBe(1);
+
+    // Should only have ONE sticky assignment
+    const stickyMatches = result.code.match(/latch\d+ = sticky\(/g) || [];
+    expect(stickyMatches.length).toBe(1);
+
+    // Should NOT have empty if blocks (if followed by { with only whitespace/newlines then })
+    const emptyIfPattern = /if \([^)]+\) \{\s*\}/;
+    const hasEmptyIf = emptyIfPattern.test(result.code);
+    expect(hasEmptyIf).toBe(false);
+
+    // Should have the action inside proper nesting
+    expect(result.code).toContain('gvar[0] = 1');
+  });
+
+  test('should not produce duplicate sticky at end with empty if blocks (jetrell-logic bug)', () => {
+    // Full jetrell-logic conditions that exposed the bug:
+    // The decompiler was producing a duplicate latch2 at the end with empty if blocks
+    const conditions = [
+      { index: 0, enabled: 1, activatorId: -1, operation: 1, operandAType: 2, operandAValue: 31, operandBType: 0, operandBValue: 1, flags: 0 },
+      { index: 1, enabled: 1, activatorId: 0, operation: 2, operandAType: 2, operandAValue: 9, operandBType: 0, operandBValue: 1000, flags: 0 },
+      { index: 2, enabled: 1, activatorId: 0, operation: 13, operandAType: 4, operandAValue: 1, operandBType: 4, operandBValue: 3, flags: 0 },
+      { index: 3, enabled: 1, activatorId: -1, operation: 1, operandAType: 2, operandAValue: 17, operandBType: 0, operandBValue: 0, flags: 0 },
+      { index: 4, enabled: 1, activatorId: 2, operation: 14, operandAType: 2, operandAValue: 11, operandBType: 0, operandBValue: 0, flags: 0 },
+      { index: 5, enabled: 1, activatorId: 2, operation: 14, operandAType: 2, operandAValue: 10, operandBType: 0, operandBValue: 0, flags: 0 },
+      { index: 12, enabled: 1, activatorId: -1, operation: 1, operandAType: 2, operandAValue: 31, operandBType: 0, operandBValue: 0, flags: 0 },
+      { index: 20, enabled: 1, activatorId: -1, operation: 16, operandAType: 0, operandAValue: 50, operandBType: 0, operandBValue: 28, flags: 0 },
+      { index: 21, enabled: 1, activatorId: 33, operation: 2, operandAType: 4, operandAValue: 5, operandBType: 4, operandBValue: 4, flags: 0 },
+      { index: 22, enabled: 1, activatorId: 21, operation: 3, operandAType: 4, operandAValue: 4, operandBType: 4, operandBValue: 20, flags: 0 },
+      { index: 23, enabled: 1, activatorId: 22, operation: 15, operandAType: 4, operandAValue: 20, operandBType: 4, operandBValue: 4, flags: 0 },
+      { index: 24, enabled: 1, activatorId: 23, operation: 19, operandAType: 0, operandAValue: 0, operandBType: 4, operandBValue: 23, flags: 0 },
+      { index: 25, enabled: 1, activatorId: 27, operation: 13, operandAType: 4, operandAValue: 24, operandBType: 4, operandBValue: 26, flags: 0 },
+      { index: 26, enabled: 1, activatorId: 25, operation: 2, operandAType: 4, operandAValue: 4, operandBType: 4, operandBValue: 20, flags: 0 },
+      { index: 27, enabled: 1, activatorId: 53, operation: 2, operandAType: 1, operandAValue: 11, operandBType: 0, operandBValue: 1480, flags: 0 },
+      { index: 28, enabled: 1, activatorId: -1, operation: 47, operandAType: 4, operandAValue: 27, operandBType: 0, operandBValue: 100, flags: 0 },
+      { index: 29, enabled: 1, activatorId: -1, operation: 50, operandAType: 1, operandAValue: 4, operandBType: 0, operandBValue: 90, flags: 0 },
+      { index: 30, enabled: 1, activatorId: -1, operation: 1, operandAType: 2, operandAValue: 23, operandBType: 0, operandBValue: 1, flags: 0 },
+      { index: 31, enabled: 1, activatorId: -1, operation: 8, operandAType: 4, operandAValue: 12, operandBType: 4, operandBValue: 29, flags: 0 },
+      { index: 32, enabled: 1, activatorId: -1, operation: 8, operandAType: 4, operandAValue: 31, operandBType: 4, operandBValue: 30, flags: 0 },
+      { index: 33, enabled: 1, activatorId: 27, operation: 13, operandAType: 4, operandAValue: 28, operandBType: 4, operandBValue: 32, flags: 0 },
+      { index: 34, enabled: 1, activatorId: 33, operation: 12, operandAType: 4, operandAValue: 25, operandBType: 0, operandBValue: 0, flags: 0 },
+      { index: 35, enabled: 1, activatorId: 34, operation: 15, operandAType: 1, operandAValue: 12, operandBType: 0, operandBValue: 1000, flags: 0 },
+      { index: 36, enabled: 1, activatorId: 35, operation: 37, operandAType: 4, operandAValue: 35, operandBType: 0, operandBValue: 110, flags: 0 },
+      { index: 37, enabled: 1, activatorId: 36, operation: 16, operandAType: 4, operandAValue: 36, operandBType: 0, operandBValue: 28, flags: 0 },
+      { index: 38, enabled: 1, activatorId: 37, operation: 18, operandAType: 0, operandAValue: 0, operandBType: 4, operandBValue: 37, flags: 0 },
+      { index: 39, enabled: 1, activatorId: 33, operation: 14, operandAType: 6, operandAValue: 3, operandBType: 0, operandBValue: 3000, flags: 0 },
+      { index: 40, enabled: 1, activatorId: 33, operation: 17, operandAType: 4, operandAValue: 39, operandBType: 0, operandBValue: 2, flags: 0 },
+      { index: 41, enabled: 1, activatorId: 33, operation: 43, operandAType: 0, operandAValue: 1800, operandBType: 4, operandBValue: 40, flags: 0 },
+      { index: 42, enabled: 1, activatorId: 33, operation: 44, operandAType: 0, operandAValue: 1250, operandBType: 4, operandBValue: 41, flags: 0 },
+      { index: 43, enabled: 1, activatorId: 33, operation: 44, operandAType: 4, operandAValue: 41, operandBType: 4, operandBValue: 42, flags: 0 },
+      { index: 44, enabled: 1, activatorId: 33, operation: 29, operandAType: 4, operandAValue: 43, operandBType: 0, operandBValue: 0, flags: 0 },
+      { index: 45, enabled: 1, activatorId: 33, operation: 17, operandAType: 4, operandAValue: 43, operandBType: 0, operandBValue: 10, flags: 0 },
+      { index: 46, enabled: 1, activatorId: 33, operation: 15, operandAType: 4, operandAValue: 45, operandBType: 0, operandBValue: 100, flags: 0 },
+      { index: 47, enabled: 1, activatorId: -1, operation: 1, operandAType: 3, operandAValue: 3, operandBType: 0, operandBValue: 1, flags: 0 },
+      { index: 48, enabled: 1, activatorId: 33, operation: 6, operandAType: 1, operandAValue: 11, operandBType: 0, operandBValue: 0, flags: 0 },
+      { index: 49, enabled: 1, activatorId: 33, operation: 8, operandAType: 4, operandAValue: 47, operandBType: 4, operandBValue: 48, flags: 0 },
+      { index: 50, enabled: 1, activatorId: 49, operation: 18, operandAType: 0, operandAValue: 1, operandBType: 4, operandBValue: 4, flags: 0 },
+      { index: 51, enabled: 1, activatorId: 33, operation: 12, operandAType: 4, operandAValue: 50, operandBType: 0, operandBValue: 0, flags: 0 },
+      { index: 52, enabled: 1, activatorId: 51, operation: 18, operandAType: 0, operandAValue: 1, operandBType: 4, operandBValue: 5, flags: 0 },
+      { index: 53, enabled: 1, activatorId: 2, operation: 1, operandAType: 2, operandAValue: 18, operandBType: 0, operandBValue: 0, flags: 0 }
+    ];
+
+    const result = decompiler.decompile(conditions);
+
+    expect(result.success).toBe(true);
+
+    // Count latch variable declarations - should NOT have duplicates
+    // The bug was producing: latch1, latch2, latch3... latch2 (duplicate at end)
+    const latchDeclarations = result.code.match(/var latch\d+/g) || [];
+    const uniqueLatches = new Set(latchDeclarations);
+    expect(latchDeclarations.length).toBe(uniqueLatches.size); // No duplicates
+
+    // Should NOT have empty if blocks like: if (latch2) { if (flight.isAutoLaunch === 0) { } }
+    const emptyIfPattern = /if \([^)]+\) \{\s*\}/;
+    const hasEmptyIf = emptyIfPattern.test(result.code);
+    expect(hasEmptyIf).toBe(false);
+  });
+
+  test('should not produce orphan sticky when referenced by another LC', () => {
+    // Sticky that is referenced as an operand by another LC should not
+    // produce a separate top-level sticky block
+    const conditions = [
+      // LC 0: outer condition
+      { index: 0, enabled: 1, activatorId: -1, operation: 1, operandAType: 2, operandAValue: 31, operandBType: 0, operandBValue: 1, flags: 0 },
+      // LC 1: ON condition for sticky
+      { index: 1, enabled: 1, activatorId: -1, operation: 2, operandAType: 2, operandAValue: 9, operandBType: 0, operandBValue: 1000, flags: 0 },
+      // LC 2: OFF condition for sticky
+      { index: 2, enabled: 1, activatorId: -1, operation: 1, operandAType: 2, operandAValue: 17, operandBType: 0, operandBValue: 0, flags: 0 },
+      // LC 3: STICKY(LC1, LC2) - used as activator for LC4 AND referenced by LC5
+      { index: 3, enabled: 1, activatorId: 0, operation: 13, operandAType: 4, operandAValue: 1, operandBType: 4, operandBValue: 2, flags: 0 },
+      // LC 4: action activated by sticky
+      { index: 4, enabled: 1, activatorId: 3, operation: 18, operandAType: 0, operandAValue: 0, operandBType: 0, operandBValue: 1, flags: 0 },
+      // LC 5: another sticky references LC3 as operand (tests referencedAsOperand handling)
+      { index: 5, enabled: 1, activatorId: 0, operation: 13, operandAType: 4, operandAValue: 3, operandBType: 4, operandBValue: 2, flags: 0 },
+      // LC 6: action activated by LC5
+      { index: 6, enabled: 1, activatorId: 5, operation: 18, operandAType: 0, operandAValue: 1, operandBType: 0, operandBValue: 2, flags: 0 }
+    ];
+
+    const result = decompiler.decompile(conditions);
+
+    expect(result.success).toBe(true);
+
+    // Count sticky assignments - should have reasonable number (not duplicates)
+    const stickyMatches = result.code.match(/sticky\(/g) || [];
+    // We expect 2 stickys (LC3 and LC5), not duplicates
+    expect(stickyMatches.length).toBeLessThanOrEqual(2);
+  });
+});
+
+describe('Round-trip Compilation', () => {
+  let decompiler;
+
+  beforeEach(() => {
+    decompiler = new Decompiler();
+  });
+
+  test('should compile var latch = sticky() inside if blocks correctly', async () => {
+    // This tests the fix for nested sticky compilation
+    // The decompiled code includes: if (flight.gpsValid === 1) { var latch1 = sticky({...}); if (latch1) {...} }
+    const { Transpiler } = await import('../index.js');
+
+    const code = `
+const { flight, rc, gvar, sticky } = inav;
+
+if (flight.gpsValid === 1) {
+  var latch1 = sticky({
+    on: () => flight.groundSpeed > 1000,
+    off: () => flight.isArmed === 0
+  });
+  if (latch1) {
+    gvar[0] = 1;
+  }
+}
+`;
+
+    const transpiler = new Transpiler();
+    const result = transpiler.transpile(code);
+
+    expect(result.success).toBe(true);
+    expect(result.commands.length).toBe(5);
+
+    // Verify the sticky has the correct activator (should be 0, not -1)
+    // LC 3 should be STICKY with activator 0 (the gpsValid check)
+    const stickyCmd = result.commands[3];
+    expect(stickyCmd).toContain('logic 3 1 0 13'); // activator 0, operation 13 (STICKY)
+  });
+
+  test('should use inline var declarations for sticky (not separate declaration)', async () => {
+    // Decompiled sticky should use "var latch1 = sticky({...})" inline
+    // NOT separate "var latch1;" at top + "latch1 = sticky({...})" in body
+    const logicConditions = [
+      { index: 0, enabled: 1, activatorId: -1, operation: 1, operandAType: 2, operandAValue: 31, operandBType: 0, operandBValue: 1, flags: 0 },
+      { index: 1, enabled: 1, activatorId: 0, operation: 2, operandAType: 2, operandAValue: 9, operandBType: 0, operandBValue: 1000, flags: 0 },
+      { index: 2, enabled: 1, activatorId: -1, operation: 1, operandAType: 2, operandAValue: 17, operandBType: 0, operandBValue: 0, flags: 0 },
+      { index: 3, enabled: 1, activatorId: 0, operation: 13, operandAType: 4, operandAValue: 1, operandBType: 4, operandBValue: 2, flags: 0 },
+      { index: 4, enabled: 1, activatorId: 3, operation: 18, operandAType: 0, operandAValue: 1, operandBType: 0, operandBValue: 0, flags: 0 },
+    ];
+
+    const result = decompiler.decompile(logicConditions);
+
+    // Should have "var latch1 = sticky({" inline, not separate declaration
+    expect(result.code).toMatch(/var latch1 = sticky\(\{/);
+    // Should NOT have separate "var latch1;" declaration at top
+    expect(result.code).not.toMatch(/var latch1;\s*\/\//);
+  });
+
+  test('should not produce duplicate let declarations from variableMap and hoisting', async () => {
+    // When variableMap has a 'clamped' entry AND body generates 'let clamped' via hoisting,
+    // we should only have ONE 'let clamped' declaration
+    const { Transpiler } = await import('../index.js');
+
+    // Create LCs that will generate hoisted 'let clamped' from Math.min
+    const logicConditions = [
+      { index: 0, enabled: 1, activatorId: -1, operation: 1, operandAType: 2, operandAValue: 31, operandBType: 0, operandBValue: 1, flags: 0 },
+      { index: 1, enabled: 1, activatorId: 0, operation: 43, operandAType: 0, operandAValue: 500, operandBType: 5, operandBValue: 0, flags: 0 },
+      { index: 2, enabled: 1, activatorId: 0, operation: 44, operandAType: 4, operandAValue: 1, operandBType: 0, operandBValue: 1000, flags: 0 },
+      { index: 3, enabled: 1, activatorId: 0, operation: 43, operandAType: 0, operandAValue: 1800, operandBType: 4, operandBValue: 2, flags: 0 },
+      { index: 4, enabled: 1, activatorId: 0, operation: 29, operandAType: 4, operandAValue: 3, operandBType: 0, operandBValue: 0, flags: 0 },
+    ];
+
+    // Simulate stale variableMap from Configurator with 'clamped' entry
+    const variableMap = {
+      let_variables: { clamped: { expression: 'Math.min(1800, something)' } },
+      var_variables: {}
+    };
+
+    const result = decompiler.decompile(logicConditions, variableMap);
+
+    // Count 'let clamped' - should be exactly 1
+    const clampedMatches = result.code.match(/let clamped/g) || [];
+    expect(clampedMatches.length).toBeLessThanOrEqual(1);
+
+    // Should compile without "already declared" error
+    const transpiler = new Transpiler();
+    const compiled = transpiler.transpile(result.code);
+    expect(compiled.success).toBe(true);
   });
 });
 

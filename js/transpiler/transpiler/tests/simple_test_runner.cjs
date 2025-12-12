@@ -226,6 +226,16 @@ class Assertions {
     }
   }
 
+  toMatch(pattern) {
+    if (typeof this.actual !== 'string') {
+      throw new Error('toMatch requires a string');
+    }
+    const regex = pattern instanceof RegExp ? pattern : new RegExp(pattern);
+    if (!regex.test(this.actual)) {
+      throw new Error(`Expected "${this.actual.substring(0, 100)}..." to match ${pattern}`);
+    }
+  }
+
   get not() {
     return new NegatedAssertions(this.actual);
   }
@@ -257,6 +267,16 @@ class NegatedAssertions {
       if (this.actual.includes(expected)) {
         throw new Error(`Expected array not to contain ${JSON.stringify(expected)}`);
       }
+    }
+  }
+
+  toMatch(pattern) {
+    if (typeof this.actual !== 'string') {
+      throw new Error('toMatch requires a string');
+    }
+    const regex = pattern instanceof RegExp ? pattern : new RegExp(pattern);
+    if (regex.test(this.actual)) {
+      throw new Error(`Expected "${this.actual.substring(0, 100)}..." not to match ${pattern}`);
     }
   }
 }

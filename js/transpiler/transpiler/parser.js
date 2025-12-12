@@ -245,6 +245,21 @@ class JavaScriptParser {
           range: node.range
         };
       }
+
+      // Check for: var latch1 = sticky({on: ..., off: ...})
+      if (decl.id && decl.id.type === 'Identifier' &&
+          decl.init &&
+          decl.init.type === 'CallExpression' &&
+          decl.init.callee && decl.init.callee.type === 'Identifier' &&
+          decl.init.callee.name === 'sticky') {
+        return {
+          type: 'StickyAssignment',
+          target: decl.id.name,
+          args: decl.init.arguments,
+          loc: node.loc,
+          range: node.range
+        };
+      }
     }
 
     // Handle let/var declarations via VariableHandler
@@ -543,6 +558,12 @@ class JavaScriptParser {
       if (expr && expr.type === 'UpdateExpression') {
         return this.transformUpdateExpression(expr, stmt.loc, stmt.range);
       }
+
+    }
+
+    // Support variable declarations in bodies (var latch1 = sticky({...}), let x = ...)
+    if (stmt.type === 'VariableDeclaration') {
+      return this.transformVariableDeclaration(stmt);
     }
 
     // Support nested if statements in bodies - recursively transform them
@@ -564,17 +585,36 @@ class JavaScriptParser {
     const target = this.extractIdentifier(expr.left);
     const rightExpr = expr.right;
 
+    // Check if right side is sticky({on: ..., off: ...}) call
+    if (rightExpr.type === 'CallExpression' &&
+        rightExpr.callee && rightExpr.callee.type === 'Identifier' &&
+        rightExpr.callee.name === 'sticky') {
+      return {
+        type: 'StickyAssignment',
+        target,
+        args: rightExpr.arguments,
+        loc,
+        range
+      };
+    }
+
     // Check if right side is binary expression (could be arithmetic or comparison)
     if (rightExpr.type === 'BinaryExpression') {
       const operator = rightExpr.operator;
       const arithmeticOps = ['+', '-', '*', '/', '%'];
 
       if (arithmeticOps.includes(operator)) {
+        // For complex expressions (CallExpression, etc.), preserve the full AST node
+        // rather than trying to extract just an identifier string
+        const leftValue = rightExpr.left.type === 'CallExpression'
+          ? rightExpr.left  // Preserve full AST for function calls
+          : this.extractIdentifier(rightExpr.left);
+
         return {
           type: 'Assignment',
           target,
           operation: operator,
-          left: this.extractIdentifier(rightExpr.left),
+          left: leftValue,
           right: this.extractValue(rightExpr.right),
           loc,
           range
@@ -642,6 +682,36 @@ class JavaScriptParser {
       // Handle negative numbers
       const val = this.extractValue(expr.argument);
       return typeof val === 'number' ? -val : val;
+    }
+
+    // Handle binary expressions: (50 * 28), ((50 * 28) - flight.airSpeed)
+    if (expr.type === 'BinaryExpression') {
+      const left = this.extractValue(expr.left);
+      const right = this.extractValue(expr.right);
+
+      // If both are constants, compute the value at compile time
+      if (typeof left === 'number' && typeof right === 'number') {
+        switch (expr.operator) {
+          case '+': return left + right;
+          case '-': return left - right;
+          case '*': return left * right;
+          case '/': return Math.floor(left / right);
+          case '%': return left % right;
+        }
+      }
+
+      // Otherwise return a BinaryExpression node for codegen to process
+      return {
+        type: 'BinaryExpression',
+        operator: expr.operator,
+        left: left,
+        right: right
+      };
+    }
+
+    // Handle call expressions (e.g., Math.min, Math.max)
+    if (expr.type === 'CallExpression') {
+      return this.transformExpression(expr);
     }
 
     return null;

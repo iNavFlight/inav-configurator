@@ -49,6 +49,13 @@ class ExpressionGenerator {
         return this.generateCall(expr, activatorId);
       case 'BinaryExpression':
         return this.generateBinary(expr, activatorId);
+      case 'Literal':
+        // Direct literal value (number, boolean, etc.)
+        return { type: OPERAND_TYPE.VALUE, value: expr.value };
+      case 'Identifier':
+      case 'MemberExpression':
+        // Variable reference - delegate to getOperand
+        return this.getOperand(expr, activatorId);
       default:
         this.errorHandler.addError(
           `Unsupported expression type: ${expr.type}. Use arithmetic operators (+, -, *, /) or supported functions`,

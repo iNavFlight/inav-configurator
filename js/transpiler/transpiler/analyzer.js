@@ -126,6 +126,9 @@ class SemanticAnalyzer {
       case 'VarDeclaration':
         this.handleVarDeclaration(stmt);
         break;
+      case 'StickyAssignment':
+        this.handleStickyAssignment(stmt);
+        break;
       case 'Assignment':
         this.checkAssignment(stmt);
         break;
@@ -147,6 +150,16 @@ class SemanticAnalyzer {
    */
   handleVarDeclaration(stmt) {
     this.variableHandler.addVarVariable(stmt.name, stmt.initExpr, stmt.loc);
+  }
+
+  /**
+   * Handle sticky assignment (var latch1 = sticky({...}))
+   * Registers the variable as a special "latch" type so it's recognized in conditions
+   */
+  handleStickyAssignment(stmt) {
+    // Register as a special latch variable - doesn't use gvar slots
+    // The codegen will map it to an LC index
+    this.variableHandler.addLatchVariable(stmt.target, stmt.loc);
   }
   
   /**
