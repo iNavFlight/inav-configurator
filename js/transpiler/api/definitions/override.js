@@ -140,10 +140,10 @@ export default {
   // Navigation Overrides
   headingTarget: {
     type: 'number',
-    unit: 'cdeg',
-    desc: 'Override heading target in centidegrees',
+    unit: 'deg',
+    desc: 'Override heading target in degrees',
     readonly: false,
-    range: [0, 36000],
+    range: [0, 359],
     inavOperation: OPERATION.SET_HEADING_TARGET
   },
 
