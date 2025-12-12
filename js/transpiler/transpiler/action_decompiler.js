@@ -11,6 +11,7 @@
 
 import {
   OPERATION,
+  OPERAND_TYPE,
   getOperationName
 } from './inav_constants.js';
 
@@ -23,11 +24,13 @@ class ActionDecompiler {
    * @param {Function} context.decompileOperand - Function to decompile operands
    * @param {Function} context.getVarNameForGvar - Function to get variable name for gvar
    * @param {Function} context.addWarning - Function to add warnings
+   * @param {Function} context.getHoistedVarCounters - Function to get shared hoisted var counters
    */
   constructor(context) {
     this.decompileOperand = context.decompileOperand;
     this.getVarNameForGvar = context.getVarNameForGvar;
     this.addWarning = context.addWarning;
+    this.getHoistedVarCounters = context.getHoistedVarCounters;
   }
 
   /**
@@ -37,25 +40,27 @@ class ActionDecompiler {
    * @returns {string} JavaScript statement
    */
   decompile(lc, allConditions = null) {
+    // For operations that may have deep LC chains, check depth BEFORE stringifying
+    // to enable structural hoisting (avoiding string parsing)
+    switch (lc.operation) {
+      case OPERATION.GVAR_SET:
+        return this.handleGvarSet(lc, allConditions);
+      case OPERATION.OVERRIDE_THROTTLE_SCALE:
+        return this.handleOverrideThrottleScale(lc, allConditions);
+      case OPERATION.OVERRIDE_THROTTLE:
+        return this.handleOverrideThrottle(lc, allConditions);
+    }
+
     const value = this.decompileOperand(lc.operandBType, lc.operandBValue, allConditions);
 
     switch (lc.operation) {
-      case OPERATION.GVAR_SET:
-        return this.handleGvarSet(lc, value);
-
       case OPERATION.GVAR_INC:
         return this.handleGvarInc(lc, value);
 
       case OPERATION.GVAR_DEC:
         return this.handleGvarDec(lc, value);
 
-      case OPERATION.OVERRIDE_THROTTLE_SCALE:
-        return this.handleOverrideThrottleScale(value);
-
-      case OPERATION.OVERRIDE_THROTTLE:
-        // OVERRIDE_THROTTLE uses operandA for the throttle value, not operandB
-        const throttleValue = this.decompileOperand(lc.operandAType, lc.operandAValue, allConditions);
-        return this.handleOverrideThrottle(throttleValue);
+      // OVERRIDE_THROTTLE_SCALE and OVERRIDE_THROTTLE handled in first switch (structural hoisting)
 
       case OPERATION.SET_VTX_POWER_LEVEL:
         return this.handleSetVtxPowerLevel(value);
@@ -132,17 +137,160 @@ class ActionDecompiler {
     }
   }
 
-  handleGvarSet(lc, value) {
+  /**
+   * Handle GVAR_SET with structural hoisting.
+   * @param {Object} lc - Logic condition
+   * @param {Array} allConditions - All conditions for LC chain traversal
+   * @returns {string} JavaScript statement(s)
+   */
+  handleGvarSet(lc, allConditions) {
     const targetName = this.getVarNameForGvar(lc.operandAValue) || `gvar[${lc.operandAValue}]`;
-    const cleanValue = this.stripOuterParens(value);
+    return this.handleAssignmentWithHoisting(
+      targetName,
+      lc.operandBType, lc.operandBValue,
+      allConditions
+    );
+  }
 
-    // Check if expression is deeply nested and should be simplified
-    const { statements, expr } = this.simplifyNestedExpr(cleanValue);
-    if (statements.length > 0) {
-      return statements.join('\n') + `\n${targetName} = ${expr};`;
+  /**
+   * Calculate the depth of an LC chain (how many LC→LC references deep).
+   * @param {number} lcIndex - Starting LC index
+   * @param {Array} allConditions - All conditions
+   * @param {Set} visited - Visited set for cycle detection
+   * @returns {number} Chain depth (0 for leaf operands, 1+ for LC chains)
+   */
+  getLCChainDepth(lcIndex, allConditions, visited = new Set()) {
+    if (visited.has(lcIndex)) return 0; // Cycle detection
+    visited.add(lcIndex);
+
+    const lc = allConditions.find(c => c.index === lcIndex);
+    if (!lc) return 0;
+
+    let maxChildDepth = 0;
+    if (lc.operandAType === OPERAND_TYPE.LC) {
+      maxChildDepth = Math.max(maxChildDepth,
+        this.getLCChainDepth(lc.operandAValue, allConditions, new Set(visited)));
+    }
+    if (lc.operandBType === OPERAND_TYPE.LC) {
+      maxChildDepth = Math.max(maxChildDepth,
+        this.getLCChainDepth(lc.operandBValue, allConditions, new Set(visited)));
     }
 
-    return `${targetName} = ${cleanValue};`;
+    return 1 + maxChildDepth;
+  }
+
+  /**
+   * Decompile an operand, hoisting sub-expressions that exceed depth threshold.
+   * @param {number} type - Operand type
+   * @param {number} value - Operand value
+   * @param {Array} allConditions - All conditions
+   * @param {number} currentDepth - Current depth in the expression tree
+   * @param {number} maxDepth - Maximum depth before hoisting
+   * @param {Array} statements - Array to collect hoisted let statements
+   * @param {Map} hoistedVars - Map of lcIndex -> varName for deduplication
+   * @returns {string} Decompiled expression (possibly referencing hoisted vars)
+   */
+  decompileWithHoisting(type, value, allConditions, currentDepth, maxDepth, statements, hoistedVars) {
+    // Non-LC operands are always leaf nodes - just stringify
+    if (type !== OPERAND_TYPE.LC) {
+      return this.decompileOperand(type, value, allConditions);
+    }
+
+    const lc = allConditions.find(c => c.index === value);
+    if (!lc) {
+      return this.decompileOperand(type, value, allConditions);
+    }
+
+    // Check if this LC should be hoisted (depth exceeds threshold)
+    const subDepth = this.getLCChainDepth(value, allConditions);
+    if (currentDepth > 0 && subDepth > 0 && currentDepth + subDepth > maxDepth) {
+      // Check if already hoisted (deduplication)
+      if (hoistedVars.has(value)) {
+        return hoistedVars.get(value);
+      }
+
+      // Hoist this sub-expression: decompile it fully and assign to a variable
+      const varName = this.generateHoistVarName(lc.operation);
+      const fullExpr = this.decompileOperand(type, value, allConditions);
+      statements.push(`let ${varName} = ${fullExpr};`);
+      hoistedVars.set(value, varName);
+      return varName;
+    }
+
+    // Not hoisting - recursively decompile operands with hoisting enabled
+    const leftExpr = this.decompileWithHoisting(
+      lc.operandAType, lc.operandAValue, allConditions,
+      currentDepth + 1, maxDepth, statements, hoistedVars
+    );
+    const rightExpr = this.decompileWithHoisting(
+      lc.operandBType, lc.operandBValue, allConditions,
+      currentDepth + 1, maxDepth, statements, hoistedVars
+    );
+
+    // Build expression string for this LC operation
+    return this.buildOperationExpr(lc.operation, leftExpr, rightExpr);
+  }
+
+  /**
+   * Generate a descriptive variable name for a hoisted expression.
+   * Uses shared counters from decompiler to ensure unique names across all assignments.
+   * @param {number} operation - The LC operation type
+   * @returns {string} Variable name
+   */
+  generateHoistVarName(operation) {
+    const nameMap = {
+      [OPERATION.MIN]: 'min',
+      [OPERATION.MAX]: 'max',
+      [OPERATION.ADD]: 'sum',
+      [OPERATION.SUB]: 'diff',
+      [OPERATION.MUL]: 'product',
+      [OPERATION.DIV]: 'quotient',
+      [OPERATION.MAP_INPUT]: 'mapped',
+      [OPERATION.MAP_OUTPUT]: 'scaled'
+    };
+    const baseName = nameMap[operation] || 'temp';
+
+    // Use shared counters from decompiler to ensure unique names across all hoisted expressions
+    const counters = this.getHoistedVarCounters?.() || new Map();
+    const currentCount = (counters.get(baseName) || 0) + 1;
+    counters.set(baseName, currentCount);
+
+    return currentCount === 1 ? baseName : `${baseName}${currentCount}`;
+  }
+
+  /**
+   * Build expression string for an operation with given operand expressions.
+   * @param {number} operation - The LC operation type
+   * @param {string} left - Left operand expression string
+   * @param {string} right - Right operand expression string
+   * @returns {string} Combined expression string
+   */
+  buildOperationExpr(operation, left, right) {
+    switch (operation) {
+      case OPERATION.MIN:
+        return `Math.min(${left}, ${right})`;
+      case OPERATION.MAX:
+        return `Math.max(${left}, ${right})`;
+      case OPERATION.ADD:
+        return `(${left} + ${right})`;
+      case OPERATION.SUB:
+        return `(${left} - ${right})`;
+      case OPERATION.MUL:
+        return `(${left} * ${right})`;
+      case OPERATION.DIV:
+        return `(${left} / ${right})`;
+      case OPERATION.MODULUS:
+        return `(${left} % ${right})`;
+      case OPERATION.MAP_INPUT:
+        // MAP_INPUT: scales A from [0:B] to [0:1000]
+        return `Math.min(1000, Math.max(0, ${left} * 1000 / ${right}))`;
+      case OPERATION.MAP_OUTPUT:
+        // MAP_OUTPUT: scales A from [0:1000] to [0:B]
+        return `Math.min(${right}, Math.max(0, ${left} * ${right} / 1000))`;
+      default:
+        // Fallback to decompileOperand for unsupported operations
+        return `/* unsupported op ${operation} */ (${left}, ${right})`;
+    }
   }
 
   /**
@@ -167,122 +315,9 @@ class ActionDecompiler {
     return expr;
   }
 
-  /**
-   * Count the maximum nesting depth of function calls in an expression
-   * @param {string} expr - Expression to analyze
-   * @returns {number} Maximum nesting depth
-   */
-  countNestingDepth(expr) {
-    let maxDepth = 0;
-    let currentDepth = 0;
-    for (const char of expr) {
-      if (char === '(') {
-        currentDepth++;
-        maxDepth = Math.max(maxDepth, currentDepth);
-      } else if (char === ')') {
-        currentDepth--;
-      }
-    }
-    return maxDepth;
-  }
-
-  /**
-   * Find the innermost function call (Math.min, Math.max, etc.) and its argument
-   * @param {string} expr - Expression to search
-   * @returns {Object|null} {func, arg, start, end} or null if not found
-   */
-  findInnermostFunctionCall(expr) {
-    // Look for patterns like Math.min(...), Math.max(...), Math.abs(...)
-    // Note: Math.round/floor/ceil are not supported by INAV logic conditions
-    const funcPattern = /Math\.(min|max|abs)\(/g;
-    let match;
-    let innermost = null;
-    let innermostDepth = -1;
-
-    while ((match = funcPattern.exec(expr)) !== null) {
-      const funcStart = match.index;
-      const funcName = match[0].slice(0, -1); // Remove trailing '('
-      const argStart = funcStart + match[0].length;
-
-      // Find the matching closing paren
-      let depth = 1;
-      let argEnd = argStart;
-      while (argEnd < expr.length && depth > 0) {
-        if (expr[argEnd] === '(') depth++;
-        else if (expr[argEnd] === ')') depth--;
-        argEnd++;
-      }
-      argEnd--; // Back up to the closing paren
-
-      const arg = expr.slice(argStart, argEnd);
-      const argDepth = this.countNestingDepth(arg);
-
-      // We want the function whose argument has the LEAST nesting (i.e., innermost)
-      if (innermost === null || argDepth < innermostDepth) {
-        innermost = {
-          func: funcName,
-          arg: arg,
-          fullMatch: expr.slice(funcStart, argEnd + 1),
-          start: funcStart,
-          end: argEnd + 1
-        };
-        innermostDepth = argDepth;
-      }
-    }
-
-    return innermost;
-  }
-
-  /**
-   * Simplify a deeply nested expression by hoisting inner parts to variables
-   * @param {string} expr - Expression to simplify
-   * @param {number} maxDepth - Maximum allowed nesting depth (default 3)
-   * @returns {Object} {statements: string[], expr: string}
-   */
-  simplifyNestedExpr(expr, maxDepth = 3) {
-    const statements = [];
-    let simplified = expr;
-    let varCounter = 1;
-    const hoistedExprs = new Map(); // Map expression -> variable name (for deduplication)
-
-    while (this.countNestingDepth(simplified) > maxDepth) {
-      const innermost = this.findInnermostFunctionCall(simplified);
-      if (!innermost) break;
-
-      // Check if we've already hoisted this exact expression
-      let varName = hoistedExprs.get(innermost.fullMatch);
-      if (!varName) {
-        // Generate a descriptive variable name based on the function
-        varName = this.generateVarName(innermost.func, varCounter++);
-        hoistedExprs.set(innermost.fullMatch, varName);
-
-        // Create the hoisted statement
-        statements.push(`let ${varName} = ${innermost.fullMatch};`);
-      }
-
-      // Replace the function call with the variable
-      simplified = simplified.slice(0, innermost.start) + varName + simplified.slice(innermost.end);
-    }
-
-    return { statements, expr: simplified };
-  }
-
-  /**
-   * Generate a readable variable name for a hoisted expression
-   * @param {string} funcName - The function being hoisted (e.g., "Math.min")
-   * @param {number} counter - Counter for uniqueness
-   * @returns {string} Variable name
-   */
-  generateVarName(funcName, counter) {
-    // Note: Math.round/floor/ceil are not supported by INAV logic conditions
-    const nameMap = {
-      'Math.min': 'clamped',
-      'Math.max': 'bounded',
-      'Math.abs': 'absolute'
-    };
-    const baseName = nameMap[funcName] || 'temp';
-    return counter === 1 ? baseName : `${baseName}${counter}`;
-  }
+  // NOTE: Old string-parsing hoisting methods (countNestingDepth, findInnermostFunctionCall,
+  // simplifyNestedExpr, generateVarName) have been removed. Hoisting is now done structurally
+  // at the LC level in handleAssignmentWithHoisting/decompileWithHoisting.
 
   handleGvarInc(lc, value) {
     const targetName = this.getVarNameForGvar(lc.operandAValue) || `gvar[${lc.operandAValue}]`;
@@ -294,22 +329,68 @@ class ActionDecompiler {
     return `${targetName} = ${targetName} - ${value};`;
   }
 
-  handleOverrideThrottleScale(value) {
-    const cleanValue = this.stripOuterParens(value);
-    const { statements, expr } = this.simplifyNestedExpr(cleanValue);
-    if (statements.length > 0) {
-      return statements.join('\n') + `\noverride.throttleScale = ${expr};`;
-    }
-    return `override.throttleScale = ${cleanValue};`;
+  /**
+   * Handle OVERRIDE_THROTTLE_SCALE with structural hoisting.
+   * @param {Object} lc - Logic condition
+   * @param {Array} allConditions - All conditions for LC chain traversal
+   * @returns {string} JavaScript statement(s)
+   */
+  handleOverrideThrottleScale(lc, allConditions) {
+    return this.handleAssignmentWithHoisting(
+      'override.throttleScale',
+      lc.operandBType, lc.operandBValue,
+      allConditions
+    );
   }
 
-  handleOverrideThrottle(value) {
-    const cleanValue = this.stripOuterParens(value);
-    const { statements, expr } = this.simplifyNestedExpr(cleanValue);
-    if (statements.length > 0) {
-      return statements.join('\n') + `\noverride.throttle = ${expr};`;
+  /**
+   * Handle OVERRIDE_THROTTLE with structural hoisting.
+   * Note: OVERRIDE_THROTTLE uses operandA for the value, not operandB.
+   * @param {Object} lc - Logic condition
+   * @param {Array} allConditions - All conditions for LC chain traversal
+   * @returns {string} JavaScript statement(s)
+   */
+  handleOverrideThrottle(lc, allConditions) {
+    return this.handleAssignmentWithHoisting(
+      'override.throttle',
+      lc.operandAType, lc.operandAValue,  // Note: uses operandA
+      allConditions
+    );
+  }
+
+  /**
+   * Generic handler for assignments that may need structural hoisting.
+   * @param {string} targetName - Assignment target (e.g., 'override.throttle')
+   * @param {number} valueType - Operand type for the value
+   * @param {number} valueValue - Operand value
+   * @param {Array} allConditions - All conditions for LC chain traversal
+   * @returns {string} JavaScript statement(s)
+   */
+  handleAssignmentWithHoisting(targetName, valueType, valueValue, allConditions) {
+    const maxDepth = 3;
+
+    // Check if value operand is an LC reference with deep chain
+    if (valueType === OPERAND_TYPE.LC && allConditions) {
+      const depth = this.getLCChainDepth(valueValue, allConditions);
+      if (depth > maxDepth) {
+        // Hoist deep sub-expressions at LC level (structural, not string-based)
+        const statements = [];
+        const hoistedVars = new Map();
+        const expr = this.decompileWithHoisting(
+          valueType, valueValue, allConditions,
+          0, maxDepth, statements, hoistedVars
+        );
+        if (statements.length > 0) {
+          return statements.join('\n') + `\n${targetName} = ${expr};`;
+        }
+        return `${targetName} = ${expr};`;
+      }
     }
-    return `override.throttle = ${cleanValue};`;
+
+    // Simple case - no deep nesting
+    const value = this.decompileOperand(valueType, valueValue, allConditions);
+    const cleanValue = this.stripOuterParens(value);
+    return `${targetName} = ${cleanValue};`;
   }
 
   handleSetVtxPowerLevel(value) {

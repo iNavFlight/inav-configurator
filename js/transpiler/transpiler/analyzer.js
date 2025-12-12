@@ -562,15 +562,6 @@ class SemanticAnalyzer {
       }
     }
   }
-  
-  /**
-   * Serialize condition for comparison
-   */
-  serializeCondition(condition) {
-    if (!condition) return 'null';
-    return JSON.stringify(condition);
-  }
-  
   /**
    * Collect all assignments in body
    */

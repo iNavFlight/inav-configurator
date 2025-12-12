@@ -142,9 +142,9 @@ describe('Chained Conditions', () => {
     expect(result.code).toContain('gvar[0] = 42');
   });
 
-  test('should skip conditions without actions', () => {
-    // A single condition with no actions produces no output
-    // (it's just a helper condition that can be read externally by other LCs)
+  test('should output conditions without actions as external references', () => {
+    // A single condition with no actions could be read externally
+    // (by Global Functions or other firmware features via logicCondition[5])
     const conditions = [
       {
         index: 5,
@@ -161,9 +161,10 @@ describe('Chained Conditions', () => {
     const result = decompiler.decompile(conditions);
 
     expect(result.success).toBe(true);
-    // Conditions without actions are skipped (no code to execute)
-    // The condition can still be read externally via logicCondition[5]
-    expect(result.code).not.toContain('flight.homeDistance');
+    // Conditions without actions are output with external reference comment
+    // because they could be read by Global Functions or other features
+    expect(result.code).toContain('flight.homeDistance > 500');
+    expect(result.code).toContain('LC 5: for external reference');
   });
 
   test('should not produce warnings for comparison with activator', () => {

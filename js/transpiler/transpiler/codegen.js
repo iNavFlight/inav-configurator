@@ -24,6 +24,43 @@ import {
 import apiDefinitions from './../api/definitions/index.js';
 
 /**
+ * Declarative configuration for indexed operand types (gvar[], rc[], pid[])
+ * Each entry defines: regex pattern, OPERAND_TYPE, index bounds, and error messages
+ */
+const INDEXED_OPERAND_DEFS = {
+  'gvar[': {
+    regex: /^gvar\[(\d+)\]$/,
+    type: OPERAND_TYPE.GVAR,
+    min: 0,
+    max: 7,
+    syntaxError: (v) => `Invalid gvar syntax '${v}'. Expected gvar[0-7].`,
+    syntaxCode: 'invalid_gvar',
+    boundsError: (i) => `Invalid gvar index ${i}. Must be 0-7.`,
+    boundsCode: 'invalid_gvar_index'
+  },
+  'rc[': {
+    regex: /^rc\[(\d+)\](?:\.value)?$/,
+    type: OPERAND_TYPE.RC_CHANNEL,
+    min: 1,
+    max: 18,
+    syntaxError: (v) => `Invalid rc syntax '${v}'. Expected rc[1-18] or rc[1-18].value`,
+    syntaxCode: 'invalid_rc',
+    boundsError: (i) => `Invalid rc channel ${i}. Must be 1-18.`,
+    boundsCode: 'invalid_rc_index'
+  },
+  'pid[': {
+    regex: /^pid\[(\d+)\](?:\.output)?$/,
+    type: OPERAND_TYPE.PID,
+    min: 0,
+    max: 3,
+    syntaxError: (v) => `Invalid pid syntax '${v}'. Expected pid[0-3] or pid[0-3].output`,
+    syntaxCode: 'invalid_pid',
+    boundsError: (i) => `Invalid pid controller ${i}. Must be 0-3.`,
+    boundsCode: 'invalid_pid_index'
+  }
+};
+
+/**
  * INAV Code Generator
  * Converts AST to INAV logic condition commands
  */
@@ -70,6 +107,7 @@ class INAVCodeGenerator {
   generate(ast) {
     this.lcIndex = 0;
     this.commands = [];
+    this.lastStatementEndLine = 0;  // Track for blank line gap detection
     this.errorHandler.reset(); // Clear any previous errors
     this.conditionGenerator.reset(); // Clear condition cache for CSE
     this.latchVariables.clear(); // Clear latch variable mappings
@@ -87,7 +125,9 @@ class INAVCodeGenerator {
     }
 
     for (const stmt of ast.statements) {
+      this.maybeInsertGapLC(stmt);
       this.generateStatement(stmt);
+      this.updateLastStatementLine(stmt);
     }
 
     // Throw if any errors were collected during generation
@@ -202,6 +242,36 @@ class INAVCodeGenerator {
     );
     this.lcIndex++;
     return lcIndex;
+  }
+
+  /**
+   * Check if there's a significant gap (2+ blank lines) before a statement
+   * and insert a disabled placeholder LC to preserve visual grouping.
+   * @param {Object} stmt - Statement with loc info
+   */
+  maybeInsertGapLC(stmt) {
+    if (!stmt.loc || this.lastStatementEndLine === 0) return;
+
+    const stmtStartLine = stmt.loc.start.line;
+    const blankLines = stmtStartLine - this.lastStatementEndLine - 1;
+
+    // 2+ blank lines = visual separator, insert disabled LC
+    if (blankLines >= 2) {
+      this.commands.push(
+        `logic ${this.lcIndex} 0 -1 0 0 0 0 0 0`  // Disabled, no-op LC
+      );
+      this.lcIndex++;
+    }
+  }
+
+  /**
+   * Update tracking of last statement's end line.
+   * @param {Object} stmt - Statement with loc info
+   */
+  updateLastStatementLine(stmt) {
+    if (stmt.loc) {
+      this.lastStatementEndLine = stmt.loc.end.line;
+    }
   }
 
   /**
@@ -670,51 +740,21 @@ class INAVCodeGenerator {
         }
       }
 
-      // Check for gvar with bounds validation
-      if (value.startsWith('gvar[')) {
-        const match = value.match(/^gvar\[(\d+)\]$/);
-        if (!match) {
-          this.errorHandler.addError(`Invalid gvar syntax '${value}'. Expected gvar[0-7].`, null, 'invalid_gvar');
-          return { type: OPERAND_TYPE.VALUE, value: 0 };
+      // Check for indexed operands (gvar[], rc[], pid[]) using declarative config
+      for (const [prefix, def] of Object.entries(INDEXED_OPERAND_DEFS)) {
+        if (value.startsWith(prefix)) {
+          const match = value.match(def.regex);
+          if (!match) {
+            this.errorHandler.addError(def.syntaxError(value), null, def.syntaxCode);
+            return { type: OPERAND_TYPE.VALUE, value: 0 };
+          }
+          const index = parseInt(match[1], 10);
+          if (index < def.min || index > def.max) {
+            this.errorHandler.addError(def.boundsError(index), null, def.boundsCode);
+            return { type: OPERAND_TYPE.VALUE, value: 0 };
+          }
+          return { type: def.type, value: index };
         }
-        const index = parseInt(match[1], 10);
-        if (index < 0 || index > 7) {
-          this.errorHandler.addError(`Invalid gvar index ${index}. Must be 0-7.`, null, 'invalid_gvar_index');
-          return { type: OPERAND_TYPE.VALUE, value: 0 };
-        }
-        return { type: OPERAND_TYPE.GVAR, value: index };
-      }
-
-      // Check for rc channel with bounds validation
-      // Supports both rc[N] and rc[N].value (both are equivalent)
-      if (value.startsWith('rc[')) {
-        const match = value.match(/^rc\[(\d+)\](?:\.value)?$/);
-        if (!match) {
-          this.errorHandler.addError(`Invalid rc syntax '${value}'. Expected rc[1-18] or rc[1-18].value`, null, 'invalid_rc');
-          return { type: OPERAND_TYPE.VALUE, value: 0 };
-        }
-        const index = parseInt(match[1], 10);
-        if (index < 1 || index > 18) {
-          this.errorHandler.addError(`Invalid rc channel ${index}. Must be 1-18.`, null, 'invalid_rc_index');
-          return { type: OPERAND_TYPE.VALUE, value: 0 };
-        }
-        return { type: OPERAND_TYPE.RC_CHANNEL, value: index };
-      }
-
-      // Check for PID controller with bounds validation
-      // Supports both pid[N] and pid[N].output (both are equivalent)
-      if (value.startsWith('pid[')) {
-        const match = value.match(/^pid\[(\d+)\](?:\.output)?$/);
-        if (!match) {
-          this.errorHandler.addError(`Invalid pid syntax '${value}'. Expected pid[0-3] or pid[0-3].output`, null, 'invalid_pid');
-          return { type: OPERAND_TYPE.VALUE, value: 0 };
-        }
-        const index = parseInt(match[1], 10);
-        if (index < 0 || index > 3) {
-          this.errorHandler.addError(`Invalid pid controller ${index}. Must be 0-3.`, null, 'invalid_pid_index');
-          return { type: OPERAND_TYPE.VALUE, value: 0 };
-        }
-        return { type: OPERAND_TYPE.PID, value: index };
       }
 
       // Check in operand mapping
@@ -826,12 +866,13 @@ class INAVCodeGenerator {
   /**
    * Build variable map from VariableHandler for storage and decompilation
    * This allows variable names to be preserved between sessions
-   * @returns {Object} Variable map with let_variables and var_variables
+   * @returns {Object} Variable map with let_variables, var_variables, and latch_variables
    */
   buildVariableMap() {
     const map = {
       let_variables: {},
-      var_variables: {}
+      var_variables: {},
+      latch_variables: {}  // Track latch variables structurally (for sticky/timer state)
     };
 
     if (!this.variableHandler || !this.variableHandler.symbols) {
@@ -848,6 +889,11 @@ class INAVCodeGenerator {
         map.var_variables[name] = {
           gvar: symbol.gvarIndex,
           expression: this.astToExpressionString(symbol.expressionAST)
+        };
+      } else if (symbol.kind === 'latch') {
+        // Latch variables reference LC indices, not gvar slots
+        map.latch_variables[name] = {
+          lcIndex: symbol.lcIndex
         };
       }
     }

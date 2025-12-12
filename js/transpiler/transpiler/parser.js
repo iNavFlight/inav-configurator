@@ -10,6 +10,7 @@
 
 import * as acorn from 'acorn';
 import { VariableHandler } from './variable_handler.js';
+import { extractValue as sharedExtractValue, extractIdentifier as sharedExtractIdentifier } from './expression_utils.js';
 
 /**
  * JavaScript Parser for INAV subset
@@ -633,87 +634,21 @@ class JavaScriptParser {
 
   /**
    * Extract identifier/property path from expression
+   * Delegates to shared implementation in expression_utils.js
    */
   extractIdentifier(expr) {
-    if (!expr) return '';
-
-    if (expr.type === 'Identifier') {
-      return expr.name;
-    }
-
-    if (expr.type === 'MemberExpression') {
-      const object = this.extractIdentifier(expr.object);
-
-      if (expr.computed) {
-        // Computed access: gvar[0] or obj[prop]
-        const property = this.extractValue(expr.property);
-        return `${object}[${property}]`;
-      } else {
-        // Dot access: flight.altitude
-        const property = expr.property && expr.property.name ?
-          expr.property.name : '';
-        return property ? `${object}.${property}` : object;
-      }
-    }
-
-    return '';
+    return sharedExtractIdentifier(expr, (e) => this.extractValue(e));
   }
 
   /**
    * Extract value from expression
+   * Delegates to shared implementation in expression_utils.js
+   * Adds CallExpression handling specific to parser
    */
   extractValue(expr) {
-    if (!expr) return null;
-
-    if (expr.type === 'Literal') {
-      return expr.value;
-    }
-
-    if (expr.type === 'Identifier') {
-      return expr.name;
-    }
-
-    if (expr.type === 'MemberExpression') {
-      return this.extractIdentifier(expr);
-    }
-
-    if (expr.type === 'UnaryExpression' && expr.operator === '-') {
-      // Handle negative numbers
-      const val = this.extractValue(expr.argument);
-      return typeof val === 'number' ? -val : val;
-    }
-
-    // Handle binary expressions: (50 * 28), ((50 * 28) - flight.airSpeed)
-    if (expr.type === 'BinaryExpression') {
-      const left = this.extractValue(expr.left);
-      const right = this.extractValue(expr.right);
-
-      // If both are constants, compute the value at compile time
-      if (typeof left === 'number' && typeof right === 'number') {
-        switch (expr.operator) {
-          case '+': return left + right;
-          case '-': return left - right;
-          case '*': return left * right;
-          case '/': return Math.floor(left / right);
-          case '%': return left % right;
-        }
-      }
-
-      // Otherwise return a BinaryExpression node for codegen to process
-      return {
-        type: 'BinaryExpression',
-        operator: expr.operator,
-        left: left,
-        right: right
-      };
-    }
-
-    // Handle call expressions (e.g., Math.min, Math.max)
-    if (expr.type === 'CallExpression') {
-      return this.transformExpression(expr);
-    }
-
-    return null;
+    return sharedExtractValue(expr, {
+      onCallExpression: (e) => this.transformExpression(e)
+    });
   }
 }
 
