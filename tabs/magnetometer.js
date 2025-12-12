@@ -869,13 +869,10 @@ TABS.magnetometer.initialize = function (callback) {
     }
 
     function accAutoAlignCompass() {
-        let heading_change = (SENSOR_DATA.kinematics[2] - this.heading_flat + 360) % 360;
-        let yaw_correction_needed = (90 - SENSOR_DATA.kinematics[2]);
         let roll_correction_needed = 0;
 
-
-        var heading_change = (FC.SENSOR_DATA.kinematics[2] - heading_flat + 360) % 360;
-        correction_needed = (450 - FC.SENSOR_DATA.kinematics[2]) % 360;
+        let heading_change = (FC.SENSOR_DATA.kinematics[2] - heading_flat + 360) % 360;
+        let correction_needed = (450 - FC.SENSOR_DATA.kinematics[2]) % 360;
 
         heading_change = Math.round(heading_change / 90) * 90;
         if ( typeof modal != "undefined" ) {
@@ -901,7 +898,7 @@ TABS.magnetometer.initialize = function (callback) {
        // Adjust for what the NEW rotation of the FC will be
 
         var magAdjustment = new THREE.Euler(-THREE.Math.degToRad(self.mag_saved_pitch),
-                THREE.Math.degToRad(-180 - yaw_correction_needed), THREE.Math.degToRad(roll_corection_needed), 'YXZ');
+                THREE.Math.degToRad(-180 - yaw_correction_needed), THREE.Math.degToRad(roll_correction_needed), 'YXZ');
         var matrixMag = (new THREE.Matrix4()).makeRotationFromEuler(magAdjustment);
 
         var boardRotation = new THREE.Euler( THREE.Math.degToRad( -self.acc_flat_xyz[0] ),
