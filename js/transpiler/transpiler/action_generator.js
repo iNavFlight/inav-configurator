@@ -215,6 +215,7 @@ class ActionGenerator {
         activatorId
       );
     } else {
+      // Standard INAV pattern: operandA = value, operandB = 0 (matches firmware)
       this.pushLogicCommand(operation,
         valueOperand,
         { type: 0, value: 0 },

@@ -51,40 +51,50 @@ class ActionDecompiler {
         return this.handleOverrideThrottle(lc, allConditions);
     }
 
-    const value = this.decompileOperand(lc.operandBType, lc.operandBValue, allConditions);
+    // INAV operand pattern (confirmed by logic_condition.c):
+    // - Most overrides: operandA = value, operandB = 0
+    // - GVAR_INC/DEC: operandA = gvar index, operandB = increment/decrement
+    // - FLIGHT_AXIS: operandA = axis index, operandB = angle/rate
+    // - RC_CHANNEL: operandA = channel, operandB = value
+    // - PORT_SET: operandA = pin, operandB = value
+    const valueA = this.decompileOperand(lc.operandAType, lc.operandAValue, allConditions);
+    const valueB = this.decompileOperand(lc.operandBType, lc.operandBValue, allConditions);
 
     switch (lc.operation) {
+      // GVAR operations: operandA = index, operandB = value
       case OPERATION.GVAR_INC:
-        return this.handleGvarInc(lc, value);
+        return this.handleGvarInc(lc, valueB);
 
       case OPERATION.GVAR_DEC:
-        return this.handleGvarDec(lc, value);
+        return this.handleGvarDec(lc, valueB);
 
       // OVERRIDE_THROTTLE_SCALE and OVERRIDE_THROTTLE handled in first switch (structural hoisting)
 
+      // Override operations: operandA = value, operandB = 0
       case OPERATION.SET_VTX_POWER_LEVEL:
-        return this.handleSetVtxPowerLevel(value);
+        return this.handleSetVtxPowerLevel(valueA);
 
       case OPERATION.SET_VTX_BAND:
-        return this.handleSetVtxBand(value);
+        return this.handleSetVtxBand(valueA);
 
       case OPERATION.SET_VTX_CHANNEL:
-        return this.handleSetVtxChannel(value);
+        return this.handleSetVtxChannel(valueA);
 
       case OPERATION.OVERRIDE_ARMING_SAFETY:
         return this.handleOverrideArmingSafety();
 
       case OPERATION.SET_OSD_LAYOUT:
-        return this.handleSetOsdLayout(value);
+        return this.handleSetOsdLayout(valueA);
 
+      // RC_CHANNEL_OVERRIDE: operandA = channel, operandB = value
       case OPERATION.RC_CHANNEL_OVERRIDE:
-        return this.handleRcChannelOverride(lc, value);
+        return this.handleRcChannelOverride(lc, valueB);
 
       case OPERATION.LOITER_OVERRIDE:
-        return this.handleLoiterOverride(value);
+        return this.handleLoiterOverride(valueA);
 
       case OPERATION.OVERRIDE_MIN_GROUND_SPEED:
-        return this.handleOverrideMinGroundSpeed(value);
+        return this.handleOverrideMinGroundSpeed(valueA);
 
       case OPERATION.SWAP_ROLL_YAW:
         return this.handleSwapRollYaw();
@@ -99,25 +109,27 @@ class ActionDecompiler {
         return this.handleInvertYaw();
 
       case OPERATION.SET_HEADING_TARGET:
-        return this.handleSetHeadingTarget(value);
+        return this.handleSetHeadingTarget(valueA);
 
       case OPERATION.SET_PROFILE:
-        return this.handleSetProfile(value);
+        return this.handleSetProfile(valueA);
 
+      // FLIGHT_AXIS: operandA = axis, operandB = angle/rate
       case OPERATION.FLIGHT_AXIS_ANGLE_OVERRIDE:
-        return this.handleFlightAxisAngleOverride(lc, value);
+        return this.handleFlightAxisAngleOverride(lc, valueB);
 
       case OPERATION.FLIGHT_AXIS_RATE_OVERRIDE:
-        return this.handleFlightAxisRateOverride(lc, value);
+        return this.handleFlightAxisRateOverride(lc, valueB);
 
       case OPERATION.SET_GIMBAL_SENSITIVITY:
-        return this.handleSetGimbalSensitivity(value);
+        return this.handleSetGimbalSensitivity(valueA);
 
       case OPERATION.LED_PIN_PWM:
-        return this.handleLedPinPwm(lc, value);
+        return this.handleLedPinPwm(lc, valueA);
 
+      // PORT_SET: operandA = pin, operandB = value
       case OPERATION.PORT_SET:
-        return this.handlePortSet(lc, value);
+        return this.handlePortSet(lc, valueB);
 
       case OPERATION.DISABLE_GPS_FIX:
         return this.handleDisableGpsFix();
@@ -338,7 +350,7 @@ class ActionDecompiler {
   handleOverrideThrottleScale(lc, allConditions) {
     return this.handleAssignmentWithHoisting(
       'override.throttleScale',
-      lc.operandBType, lc.operandBValue,
+      lc.operandAType, lc.operandAValue,  // Value is in operandA (per logic_condition.c)
       allConditions
     );
   }
