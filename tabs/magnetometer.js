@@ -671,10 +671,13 @@ TABS.magnetometer.initialize = function (callback) {
                 }
             }
         };
-        if (typeof corrections[upside][changed[0]][changed[1]] != 'undefined') {
+        if (corrections[upside] &&
+            corrections[upside][changed[0]] &&
+            typeof corrections[upside][changed[0]][changed[1]] != 'undefined') {
             console.log(corrections[upside][changed[0]][changed[1]]);
             return (corrections[upside][changed[0]][changed[1]]);
         } else {
+            console.log("accComputeYaw: No match for upside=" + upside + ", changed=" + changed);
             return(-1);
         }
     }
