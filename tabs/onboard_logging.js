@@ -3,7 +3,7 @@
 import MSPCodes from './../js/msp/MSPCodes';
 import MSP from './../js/msp';
 import mspHelper from"./../js/msp/MSPHelper";
-import { GUI, TABS } from './../js/gui';
+import GUI from './../js/gui';
 import FC from './../js/fc';
 import CONFIGURATOR from './../js/data_storage';
 import features from './../js/feature_framework';
@@ -12,10 +12,9 @@ import BitHelper from './../js/bitHelper';
 
 var sdcardTimer;
 
-TABS.onboard_logging = {
-};
+const onboardLoggingTab = {};
 
-TABS.onboard_logging.initialize = function (callback) {
+onboardLoggingTab.initialize = function (callback) {
     let
         saveCancelled, eraseCancelled;
 
@@ -37,8 +36,8 @@ TABS.onboard_logging.initialize = function (callback) {
         "BLACKBOX_FEATURE_SERVOS",
     ];
 
-    if (GUI.active_tab != 'onboard_logging') {
-        GUI.active_tab = 'onboard_logging';
+    if (GUI.active_tab !== this) {
+        GUI.active_tab = this;
     }
 
     if (CONFIGURATOR.connectionValid) {
@@ -72,7 +71,7 @@ TABS.onboard_logging.initialize = function (callback) {
 
     function reinitialize() {
         GUI.log(i18n.getMessage('deviceRebooting'));
-        GUI.handleReconnect($('.tab_onboard_logging a'));
+        GUI.handleReconnect(true);
     }
 
     function load_html() {
@@ -457,7 +456,7 @@ TABS.onboard_logging.initialize = function (callback) {
     }
 };
 
-TABS.onboard_logging.cleanup = function (callback) {
+onboardLoggingTab.cleanup = function (callback) {
     if (sdcardTimer) {
         clearTimeout(sdcardTimer);
         sdcardTimer = false;
@@ -467,3 +466,5 @@ TABS.onboard_logging.cleanup = function (callback) {
         callback();
     }
 };
+
+export default onboardLoggingTab;
