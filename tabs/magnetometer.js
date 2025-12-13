@@ -54,12 +54,12 @@ TABS.magnetometer.initialize = function (callback) {
         mspHelper.loadMixerConfig,
         mspHelper.loadBoardAlignment,
         function (callback) {
-            self.boardAlignmentConfig.pitch = Math.round(BOARD_ALIGNMENT.pitch / 10);
-            self.boardAlignmentConfig.roll = Math.round(BOARD_ALIGNMENT.roll / 10);
-            self.boardAlignmentConfig.yaw = Math.round(BOARD_ALIGNMENT.yaw / 10);
-            self.boardAlignmentConfig.saved_pitch = Math.round(BOARD_ALIGNMENT.pitch / 10);
-            self.boardAlignmentConfig.saved_roll = Math.round(BOARD_ALIGNMENT.roll / 10);
-            self.boardAlignmentConfig.saved_yaw = Math.round(BOARD_ALIGNMENT.yaw / 10);
+            self.boardAlignmentConfig.pitch = Math.round(FC.BOARD_ALIGNMENT.pitch / 10);
+            self.boardAlignmentConfig.roll = Math.round(FC.BOARD_ALIGNMENT.roll / 10);
+            self.boardAlignmentConfig.yaw = Math.round(FC.BOARD_ALIGNMENT.yaw / 10);
+            self.boardAlignmentConfig.saved_pitch = Math.round(FC.BOARD_ALIGNMENT.pitch / 10);
+            self.boardAlignmentConfig.saved_roll = Math.round(FC.BOARD_ALIGNMENT.roll / 10);
+            self.boardAlignmentConfig.saved_yaw = Math.round(FC.BOARD_ALIGNMENT.yaw / 10);
             callback();
         },
         mspHelper.loadSensorAlignment,
@@ -622,8 +622,8 @@ TABS.magnetometer.initialize = function (callback) {
 
 
     function getMagHeading() {
-        // console.log(SENSOR_DATA.magnetometer);
-        let magADC = map1 = SENSOR_DATA.magnetometer.map((x) => x * 1090);
+        // console.log(FC.SENSOR_DATA.magnetometer);
+        let magADC = map1 = FC.SENSOR_DATA.magnetometer.map((x) => x * 1090);
         
         // The gain and scale are done by inav in compass.c right after the values are read, 
        
@@ -722,7 +722,7 @@ TABS.magnetometer.initialize = function (callback) {
         var acc_align;
         var i;
 
-        let acc_g_45 = [...SENSOR_DATA.accelerometer];
+        let acc_g_45 = [...FC.SENSOR_DATA.accelerometer];
 
         let roll = Math.atan2(acc_g_45[1], acc_g_45[2]) * 180/Math.PI;
         let pitch = Math.atan2(-1 * acc_g_45[0], Math.sqrt(acc_g_45[1] ** 2 + acc_g_45[2] ** 2)) * 180/Math.PI;
@@ -806,7 +806,7 @@ TABS.magnetometer.initialize = function (callback) {
         /*
         const quaternion = new THREE.Quaternion();
         // const axis = new THREE.Vector3(self.acc_flat_xyz).normalize();
-        const axis = new THREE.Vector3(...SENSOR_DATA.accelerometer).normalize();
+        const axis = new THREE.Vector3(...FC.SENSOR_DATA.accelerometer).normalize();
     
         console.debug("axis: " + axis);
         quaternion.setFromAxisAngle(axis, 0.05);
@@ -965,7 +965,7 @@ TABS.magnetometer.initialize = function (callback) {
         else if (step == "3") {
             var next_step;
             next_step = $('#modal-acc-align-east');
-            if (SENSOR_DATA.magnetometer[0] === 0 && SENSOR_DATA.magnetometer[2] === 0) {
+            if (FC.SENSOR_DATA.magnetometer[0] === 0 && FC.SENSOR_DATA.magnetometer[2] === 0) {
                 next_step = $('#modal-acc-align-done');
             }
 
