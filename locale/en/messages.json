@@ -38,6 +38,9 @@
     "options_improve_configurator": {
         "message": "Send anonymous usage data to the developer team"
     },
+    "options_disable3dAcceleration" : {
+        "message": "Disable 3D Acceleration. If the 3D models are not displayed. Needs app restart."
+    },
     "options_showProfileParameters": {
         "message": "Highlight parameters that change when switching battery or control profiles"
     },
