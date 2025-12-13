@@ -951,7 +951,7 @@ TABS.magnetometer.initialize = function (callback) {
                 content: $("#modal-acc-align-start")
             }).open();
             // self.imu_interval = setInterval( function() { MSP.send_message(MSPCodes.MSP_RAW_IMU, false, false) }, 200);
-            helper.mspBalancedInterval.add('imu_data', 40, 1, function() {MSP.send_message(MSPCodes.MSP_RAW_IMU, false, false)} );
+            interval.add('imu_data', function() { MSP.send_message(MSPCodes.MSP_RAW_IMU, false, false); }, 40);
 
         }
 
