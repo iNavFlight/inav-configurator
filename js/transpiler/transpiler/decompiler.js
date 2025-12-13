@@ -198,13 +198,8 @@ class Decompiler {
 
     // Create hoisting manager for activator-wrapped LCs
     this.hoistingManager = new ActivatorHoistingManager({
-      decompileCondition: this.decompileCondition.bind(this),
-      decompileOperand: this.decompileOperand.bind(this),
-      isActionOperation: this.isActionOperation.bind(this),
-      usedFeatures: this.usedFeatures
+      isActionOperation: this.isActionOperation.bind(this)
     });
-    // Expose hoistedActivatorVars for backward compatibility
-    this.hoistedActivatorVars = this.hoistingManager.hoistedActivatorVars;
 
     if (!logicConditions || !Array.isArray(logicConditions)) {
       return {
@@ -336,6 +331,19 @@ class Decompiler {
     // Identify which LCs should be hoisted to variables (via hoisting manager)
     this.hoistingManager.identifyHoistedVars(conditions, referencedAsOperand);
 
+    // Emit all hoisted vars at top in LC index order
+    // LC index order naturally handles dependencies (LC N can only reference LC 0..N-1)
+    const sortedHoisted = [...this.hoistingManager.hoistedActivatorVars.entries()]
+      .sort((a, b) => a[0] - b[0]);
+    for (const [lcIndex, varName] of sortedHoisted) {
+      const lc = conditions.find(c => c.index === lcIndex);
+      if (!lc) continue;
+      const innerExpr = this.decompileCondition(lc, conditions);
+      const activatorExpr = this.decompileOperand(OPERAND_TYPE.LC, lc.activatorId, conditions, new Set());
+      codeBlocks.push(`const ${varName} = ${activatorExpr} ? (${innerExpr}) : 0;`);
+      processed.add(lcIndex);
+    }
+
     // Find root conditions (activatorId === -1) that should be rendered
     // Include gap markers to preserve visual grouping from original LC layout
     const roots = conditions.filter(lc => {
@@ -358,9 +366,6 @@ class Decompiler {
       return true;
     });
 
-    // Initialize hoisting manager for lazy emission
-    this.hoistingManager.initLazyEmission(conditions, processed);
-
     // Pre-declare sticky variables that have activators
     // These are defined inside if-blocks but may be referenced from outside
     // Pre-declaration makes scope explicit: var latch1; ... if (cond) { latch1 = sticky({...}); }
@@ -382,9 +387,6 @@ class Decompiler {
       }
       if (processed.has(rootLc.index)) continue;
 
-      // Clear referenced vars before decompiling this tree
-      this.hoistingManager.clearReferences();
-
       const tree = this.buildConditionTree(rootLc, conditions, processed);
       const hasChildren = conditions.some(c => c.activatorId === rootLc.index);
 
@@ -394,11 +396,6 @@ class Decompiler {
           !this.isActionOperation(rootLc.operation) &&
           this.couldBeExternallyReferenced(rootLc.operation)) {
         const condStr = this.decompileCondition(rootLc, conditions);
-        // Emit any hoisted vars this condition referenced
-        const pendingVars = this.hoistingManager.emitPendingHoistedVars();
-        for (const decl of pendingVars) {
-          codeBlocks.push(decl);
-        }
         codeBlocks.push(`if (${condStr}) { /* LC ${rootLc.index}: for external reference */ }`);
         processed.add(rootLc.index);
         continue;
@@ -406,11 +403,6 @@ class Decompiler {
 
       const code = this.decompileTree(tree, conditions, 0);
       if (code && code.trim()) {
-        // Emit any hoisted vars this tree referenced (before the tree's code)
-        const pendingVars = this.hoistingManager.emitPendingHoistedVars();
-        for (const decl of pendingVars) {
-          codeBlocks.push(decl);
-        }
         codeBlocks.push(code);
       }
     }
@@ -853,8 +845,6 @@ class Decompiler {
             // If so, return the variable name instead of computing inline
             const hoistedVarName = this.hoistingManager?.getHoistedVarName(value);
             if (hoistedVarName) {
-              // Track that this var was referenced (for lazy emission)
-              this.hoistingManager.trackReference(hoistedVarName);
               return hoistedVarName;
             }
 
