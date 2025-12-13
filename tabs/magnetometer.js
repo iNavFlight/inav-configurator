@@ -684,7 +684,7 @@ TABS.magnetometer.initialize = function (callback) {
 
     function accAutoAlignReadFlat() {
 
-        let acc_g_flat = [FC.SENSOR_DATA.accelerometer];
+        let acc_g_flat = [...FC.SENSOR_DATA.accelerometer];
 
         let A = Math.sqrt(acc_g_flat[0] ** 2 + acc_g_flat[1] ** 2 + acc_g_flat[2] ** 2);
 
@@ -828,7 +828,7 @@ TABS.magnetometer.initialize = function (callback) {
         var acc_align;
         var i;
 
-        let accel_data_45 = [FC.SENSOR_DATA.accelerometer];
+        let accel_data_45 = [...FC.SENSOR_DATA.accelerometer];
 
         let roll = Math.atan2(acc_g_45[1], acc_g_45[2]) * 180/Math.PI;
         let pitch = Math.atan2(-1 * acc_g_45[0], Math.sqrt(acc_g_45[1] ** 2 + acc_g_45[2] ** 2)) * 180/Math.PI;
