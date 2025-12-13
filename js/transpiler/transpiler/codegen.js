@@ -73,6 +73,7 @@ class INAVCodeGenerator {
     this.arrowHelper = new ArrowFunctionHelper(this);
     this.variableHandler = variableHandler;
     this.latchVariables = new Map(); // Map variable name -> LC index for sticky assignments
+    this.constOperandCache = new Map(); // Cache operands for const variables (varName, activatorId) -> operand
 
     // Initialize helper generators
     // Note: variableHandler uses a getter because it's set after construction
@@ -811,8 +812,21 @@ class INAVCodeGenerator {
         const resolution = this.variableHandler.resolveVariable(value);
 
         if (resolution.type === 'let_expression') {
-          // Inline substitute the expression AST
-          return this.getOperand(resolution.ast, activatorId);
+          // Determine the appropriate activator for this const variable:
+          // - Pure expressions (no side effects) → root level (-1) for maximum reuse
+          // - Expressions with side effects → preserve activator context
+          const hasSideEffects = this.conditionGenerator.expressionHasSideEffects(resolution.ast);
+          const targetActivator = hasSideEffects ? activatorId : -1;
+
+          const cacheKey = `${value}:${targetActivator}`;
+          if (this.constOperandCache.has(cacheKey)) {
+            return this.constOperandCache.get(cacheKey);
+          }
+
+          // Generate with appropriate activator and cache the operand
+          const operand = this.getOperand(resolution.ast, targetActivator);
+          this.constOperandCache.set(cacheKey, operand);
+          return operand;
         } else if (resolution.type === 'var_gvar') {
           // Replace with gvar reference and continue
           value = resolution.gvarRef;

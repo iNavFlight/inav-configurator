@@ -175,8 +175,21 @@ class ConditionGenerator {
     if (this.variableHandler && this.variableHandler.isVariable(varName)) {
       const resolution = this.variableHandler.resolveVariable(varName);
       if (resolution && resolution.type === 'let_expression' && resolution.ast) {
-        // Inline substitute the expression AST and generate
-        return this.generate(resolution.ast, activatorId);
+        // Determine the appropriate activator for this const variable:
+        // - Pure expressions (no side effects) → root level (-1) for maximum reuse
+        // - Expressions with side effects → preserve activator context
+        const hasSideEffects = this.expressionHasSideEffects(resolution.ast);
+        const targetActivator = hasSideEffects ? activatorId : -1;
+
+        const cacheKey = this.getCacheKey('let_var', varName, targetActivator);
+        if (this.conditionCache.has(cacheKey)) {
+          return this.conditionCache.get(cacheKey);
+        }
+
+        // Generate with appropriate activator and cache the result
+        const resultId = this.generate(resolution.ast, targetActivator);
+        this.conditionCache.set(cacheKey, resultId);
+        return resultId;
       }
     }
 
@@ -187,6 +200,68 @@ class ConditionGenerator {
       'unknown_identifier'
     );
     return this.getLcIndex();
+  }
+
+  /**
+   * Check if an expression AST has side effects
+   *
+   * Side effects include:
+   * - Stateful operations: edge(), delay(), timer()
+   * - Mutations: GVAR_SET, GVAR_INC, GVAR_DEC, RC_OVERRIDE
+   *
+   * Pure operations (no side effects):
+   * - Arithmetic: +, -, *, /
+   * - Comparisons: <, >, ===
+   * - Boolean logic: &&, ||, !, xor, nand, nor
+   * - Data access: rc[N].low, flight.altitude, etc.
+   *
+   * @param {Object} ast - Expression AST to check
+   * @returns {boolean} True if expression has side effects
+   */
+  expressionHasSideEffects(ast) {
+    if (!ast || typeof ast !== 'object') {
+      return false;
+    }
+
+    // Check for stateful function calls
+    if (ast.type === 'CallExpression' && ast.callee) {
+      const funcName = ast.callee.name || ast.callee.value;
+      // These functions maintain internal state
+      if (funcName === 'edge' || funcName === 'delay' || funcName === 'timer') {
+        return true;
+      }
+      // Recursive check of arguments
+      if (ast.arguments) {
+        for (const arg of ast.arguments) {
+          if (this.expressionHasSideEffects(arg)) {
+            return true;
+          }
+        }
+      }
+    }
+
+    // Check for assignment operations (these would be rare in const expressions)
+    if (ast.type === 'AssignmentExpression') {
+      return true;
+    }
+
+    // Recursively check child expressions
+    if (ast.type === 'BinaryExpression' || ast.type === 'LogicalExpression') {
+      return this.expressionHasSideEffects(ast.left) || this.expressionHasSideEffects(ast.right);
+    }
+
+    if (ast.type === 'UnaryExpression') {
+      return this.expressionHasSideEffects(ast.argument);
+    }
+
+    if (ast.type === 'ConditionalExpression') {
+      return this.expressionHasSideEffects(ast.test) ||
+             this.expressionHasSideEffects(ast.consequent) ||
+             this.expressionHasSideEffects(ast.alternate);
+    }
+
+    // Literals, identifiers, member expressions are pure
+    return false;
   }
 
   /**
