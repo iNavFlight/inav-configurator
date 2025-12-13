@@ -652,9 +652,10 @@ if (flight.gpsValid === 1) {
     expect(stickyCmd).toContain('logic 3 1 0 13'); // activator 0, operation 13 (STICKY)
   });
 
-  test('should use inline var declarations for sticky (not separate declaration)', async () => {
-    // Decompiled sticky should use "var latch1 = sticky({...})" inline
-    // NOT separate "var latch1;" at top + "latch1 = sticky({...})" in body
+  test('should use pre-declaration for sticky with activator (scope fix)', async () => {
+    // When a sticky has an activator, it's defined inside an if-block.
+    // To avoid scope issues when referenced from outside, we pre-declare at top level.
+    // Pattern: "var latch1;" at top, "latch1 = sticky({...})" inside if-block
     const logicConditions = [
       { index: 0, enabled: 1, activatorId: -1, operation: 1, operandAType: 2, operandAValue: 31, operandBType: 0, operandBValue: 1, flags: 0 },
       { index: 1, enabled: 1, activatorId: 0, operation: 2, operandAType: 2, operandAValue: 9, operandBType: 0, operandBValue: 1000, flags: 0 },
@@ -665,10 +666,10 @@ if (flight.gpsValid === 1) {
 
     const result = decompiler.decompile(logicConditions);
 
-    // Should have "var latch1 = sticky({" inline, not separate declaration
-    expect(result.code).toMatch(/var latch1 = sticky\(\{/);
-    // Should NOT have separate "var latch1;" declaration at top
-    expect(result.code).not.toMatch(/var latch1;\s*\/\//);
+    // Should have pre-declaration "var latch1;" at top (before if blocks)
+    expect(result.code).toMatch(/^var latch1;$/m);
+    // Should have assignment "latch1 = sticky({" inside if-block (no var keyword)
+    expect(result.code).toMatch(/^\s+latch1 = sticky\(\{/m);
   });
 
   test('should not produce duplicate let declarations from variableMap and hoisting', async () => {

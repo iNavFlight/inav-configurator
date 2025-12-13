@@ -191,6 +191,7 @@ class Decompiler {
     this.warnings = [];
     this.variableMap = variableMap;
     this.stickyVarNames = new Map(); // Map LC index -> generated variable name
+    this.predeclaredStickyVars = new Set(); // Track stickys with activators that need pre-declaration
     this.usedFeatures = new Set();   // Track which imports are needed (structural, not string scanning)
     this.inlineDeclaredVars = new Set(); // Track let variables declared inline in body
     this.hoistedVarCounters = new Map(); // Track counters for hoisted variable names (e.g., min, min2, min3)
@@ -324,6 +325,11 @@ class Decompiler {
       if (lc.operation === OPERATION.STICKY || lc.operation === OPERATION.TIMER) {
         const varName = `latch${stickyVarCount++}`;
         this.stickyVarNames.set(lc.index, varName);
+        // Track stickys with activators for pre-declaration
+        // These are defined inside if blocks but may be referenced from outside
+        if (lc.activatorId !== -1) {
+          this.predeclaredStickyVars.add(lc.index);
+        }
       }
     }
 
@@ -354,6 +360,16 @@ class Decompiler {
 
     // Initialize hoisting manager for lazy emission
     this.hoistingManager.initLazyEmission(conditions, processed);
+
+    // Pre-declare sticky variables that have activators
+    // These are defined inside if-blocks but may be referenced from outside
+    // Pre-declaration makes scope explicit: var latch1; ... if (cond) { latch1 = sticky({...}); }
+    for (const lcIndex of this.predeclaredStickyVars) {
+      const varName = this.stickyVarNames.get(lcIndex);
+      if (varName) {
+        codeBlocks.push(`var ${varName};`);
+      }
+    }
 
     // Build and decompile tree for each root
     for (const rootLc of roots) {
@@ -494,7 +510,7 @@ class Decompiler {
         if (childCodes.length === 0 && !isReferenced) {
           return '';
         }
-        lines.push(...this.renderStickyWithLatch(pattern, childCodes, indent, varName));
+        lines.push(...this.renderStickyWithLatch(pattern, childCodes, indent, varName, node.lc.index));
       } else {
         // For edge/delay with no children, still output for external reference
         // (e.g., Global Functions may read these values for OSD display)
@@ -660,15 +676,21 @@ class Decompiler {
    * @param {Array} childCodes - Pre-computed child code strings
    * @param {number} indent - Indentation level
    * @param {string} varName - The latch variable name
+   * @param {number} lcIndex - The LC index (for checking pre-declaration)
    * @returns {Array} Lines of code
    */
-  renderStickyWithLatch(pattern, childCodes, indent, varName) {
+  renderStickyWithLatch(pattern, childCodes, indent, varName, lcIndex) {
     const indentStr = '  '.repeat(indent);
     const lines = [];
 
-    // Show the sticky with var declaration (declares the latch variable)
+    // Check if this sticky was pre-declared (has activator, defined inside if-block)
+    // If pre-declared, use assignment only; otherwise use var declaration
+    const isPredeclared = this.predeclaredStickyVars.has(lcIndex);
+    const declaration = isPredeclared ? `${varName}` : `var ${varName}`;
+
+    // Show the sticky with var declaration or assignment
     this.usedFeatures.add('sticky');
-    lines.push(indentStr + `var ${varName} = sticky({`);
+    lines.push(indentStr + `${declaration} = sticky({`);
     lines.push(indentStr + `  on: () => ${pattern.onCondition},`);
     lines.push(indentStr + `  off: () => ${pattern.offCondition}`);
     lines.push(indentStr + `});`);
