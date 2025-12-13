@@ -110,7 +110,7 @@ class ConditionDecompiler {
 
       // Special patterns (usually handled by detectSpecialPattern)
       case OPERATION.APPROX_EQUAL:
-        return this.handleApproxEqual(left, right);
+        return this.handleApproxEqual(left, right, lc.flags);
       case OPERATION.EDGE:
         return this.handleEdge(left, right);
       case OPERATION.STICKY:
@@ -212,10 +212,13 @@ class ConditionDecompiler {
 
   // NOTE: XOR, NAND, NOR are handled by SIMPLE_BINARY_OPS lookup table above.
 
-  handleApproxEqual(left, right) {
-    // APPROX_EQUAL: B is within 1% of A
-    this.addWarning(`APPROX_EQUAL operation decompiled as === (1% tolerance not preserved)`);
-    return `${left} === ${right}`;
+  handleApproxEqual(left, right, flags = 0) {
+    // APPROX_EQUAL: B is within 1% of A (default), or custom tolerance in flags
+    // flags field stores custom tolerance percentage (0 = default 1%)
+    if (flags > 0) {
+      return `approxEqual(${left}, ${right}, ${flags})`;
+    }
+    return `approxEqual(${left}, ${right})`;
   }
 
   handleEdge(left, right) {

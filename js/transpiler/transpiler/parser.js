@@ -489,6 +489,15 @@ class JavaScriptParser {
       };
     }
 
+    // Handle call expressions: approxEqual(), xor(), nand(), nor(), edge(), delta()
+    if (expr.type === 'CallExpression') {
+      return {
+        type: 'CallExpression',
+        callee: expr.callee,
+        arguments: expr.arguments.map(arg => this.transformExpression(arg))
+      };
+    }
+
     return null;
   }
 
