@@ -623,7 +623,7 @@ TABS.magnetometer.initialize = function (callback) {
 
     function getMagHeading() {
         // console.log(FC.SENSOR_DATA.magnetometer);
-        let magADC = map1 = FC.SENSOR_DATA.magnetometer.map((x) => x * 1090);
+        let magADC = FC.SENSOR_DATA.magnetometer.map((x) => x * 1090);
         
         // The gain and scale are done by inav in compass.c right after the values are read, 
        
