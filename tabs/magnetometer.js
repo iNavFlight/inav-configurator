@@ -909,7 +909,7 @@ TABS.magnetometer.initialize = function (callback) {
                 THREE.MathUtils.degToRad( -self.acc_flat_xyz[1] ), 'YXZ');
         var matrixBoard = (new THREE.Matrix4()).makeRotationFromEuler(boardRotation);
         // Ray TODO use the inverse of the board rotation. 
-        madAdjustment.premultiply(matrixBoard);
+        magAdjustment.premultiply(matrixBoard);
 
 
 
