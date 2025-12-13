@@ -338,7 +338,8 @@ class Decompiler {
     for (const [lcIndex, varName] of sortedHoisted) {
       const lc = conditions.find(c => c.index === lcIndex);
       if (!lc) continue;
-      const innerExpr = this.decompileCondition(lc, conditions);
+      // Pass activator context to prevent redundant wrapping
+      const innerExpr = this.decompileConditionInActivatorContext(lc, conditions, lc.activatorId);
       const activatorExpr = this.decompileOperand(OPERAND_TYPE.LC, lc.activatorId, conditions, new Set());
       codeBlocks.push(`const ${varName} = ${activatorExpr} ? (${innerExpr}) : 0;`);
       processed.add(lcIndex);
@@ -768,6 +769,28 @@ class Decompiler {
   }
 
   /**
+   * Decompile a condition within an activator context
+   * When inside an activator, operands that reference LCs with the same activator
+   * should not be re-wrapped with the activator check
+   */
+  decompileConditionInActivatorContext(lc, allConditions, activatorId) {
+    const visited = new Set();
+    // Decompile with activator context tracking
+    return this.decompileConditionWithActivatorContext(lc, allConditions, visited, activatorId);
+  }
+
+  /**
+   * Decompile condition with activator context to avoid redundant wrapping
+   */
+  decompileConditionWithActivatorContext(lc, allConditions, visited, currentActivator) {
+    // Use condition decompiler but track current activator for operand resolution
+    this._currentActivatorContext = currentActivator;
+    const result = this.conditionDecompiler.decompile(lc, allConditions, visited);
+    this._currentActivatorContext = null;
+    return result;
+  }
+
+  /**
    * Decompile an action to JavaScript statement
    * @param {Object} lc - Logic condition
    * @param {Array} allConditions - All conditions for recursive resolution
@@ -842,9 +865,21 @@ class Decompiler {
           const referencedLC = allConditions.find(lc => lc.index === value);
           if (referencedLC) {
             // Check if this LC was hoisted to a variable (has activator, referenced as operand)
-            // If so, return the variable name instead of computing inline
             const hoistedVarName = this.hoistingManager?.getHoistedVarName(value);
             if (hoistedVarName) {
+              // If we're in an activator context and the hoisted var has the SAME activator,
+              // inline its inner expression instead of using the var name
+              // This avoids redundant wrapping like: gpsValid ? (cond1 / 28) : 0
+              // where cond1 itself is: gpsValid ? airSpeed : 0
+              if (this._currentActivatorContext !== null &&
+                  referencedLC.activatorId === this._currentActivatorContext) {
+                // Inline the inner expression without the activator wrapper
+                visited.add(value);
+                const inlined = this.decompileCondition(referencedLC, allConditions, visited);
+                visited.delete(value);
+                return inlined;
+              }
+              // Otherwise use the hoisted var name
               return hoistedVarName;
             }
 
@@ -875,7 +910,8 @@ class Decompiler {
               const underlyingCond = this.decompileOperand(OPERAND_TYPE.LC, referencedLC.operandAValue, allConditions, visited);
               const edgeExpr = `edge(${underlyingCond}, ${referencedLC.operandBValue})`;
               // Wrap with activator check if LC has one
-              if (referencedLC.activatorId !== -1) {
+              // UNLESS we're already inside the same activator context
+              if (referencedLC.activatorId !== -1 && referencedLC.activatorId !== this._currentActivatorContext) {
                 const activatorExpr = this.decompileOperand(OPERAND_TYPE.LC, referencedLC.activatorId, allConditions, new Set(visited));
                 return `(${activatorExpr} ? ${edgeExpr} : 0)`;
               }
@@ -887,7 +923,8 @@ class Decompiler {
               const underlyingCond = this.decompileOperand(OPERAND_TYPE.LC, referencedLC.operandAValue, allConditions, visited);
               const delayExpr = `delay(${underlyingCond}, ${referencedLC.operandBValue})`;
               // Wrap with activator check if LC has one
-              if (referencedLC.activatorId !== -1) {
+              // UNLESS we're already inside the same activator context
+              if (referencedLC.activatorId !== -1 && referencedLC.activatorId !== this._currentActivatorContext) {
                 const activatorExpr = this.decompileOperand(OPERAND_TYPE.LC, referencedLC.activatorId, allConditions, new Set(visited));
                 return `(${activatorExpr} ? ${delayExpr} : 0)`;
               }
@@ -900,7 +937,8 @@ class Decompiler {
 
             // If the LC has an activator, wrap in conditional to preserve semantics
             // In INAV, when activator is false, the LC outputs 0
-            if (referencedLC.activatorId !== -1) {
+            // UNLESS we're already inside the same activator context (avoid redundant wrapping)
+            if (referencedLC.activatorId !== -1 && referencedLC.activatorId !== this._currentActivatorContext) {
               const activatorExpr = this.decompileOperand(OPERAND_TYPE.LC, referencedLC.activatorId, allConditions, new Set(visited));
               return `(${activatorExpr} ? (${result}) : 0)`;
             }
