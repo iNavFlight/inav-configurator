@@ -101,7 +101,7 @@ TABS.cli.initialize = function (callback) {
     self.outputHistory = "";
     self.cliBuffer = "";
 
-    const clipboardCopySupport = !!(navigator.clipboard && navigator.clipboard.writeText);
+    const clipboardCopySupport = !!(navigator.clipboard?.writeText) || document.queryCommandSupported?.('copy');
 
 
     function executeCommands(out_string) {
