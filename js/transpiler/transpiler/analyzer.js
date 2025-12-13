@@ -153,10 +153,19 @@ class SemanticAnalyzer {
   }
 
   /**
-   * Handle sticky assignment (var latch1 = sticky({...}))
+   * Handle sticky assignment (var latch1 = sticky({...}) or latch1 = sticky({...}))
    * Registers the variable as a special "latch" type so it's recognized in conditions
    */
   handleStickyAssignment(stmt) {
+    // Check if variable was pre-declared (e.g., var latch1;)
+    // This pattern is used by the decompiler when sticky has an activator
+    const existing = this.variableHandler.getVariable(stmt.target);
+    if (existing && existing.kind === 'var') {
+      // Convert from 'var' to 'latch' - update existing entry
+      this.variableHandler.convertToLatch(stmt.target);
+      return;
+    }
+
     // Register as a special latch variable - doesn't use gvar slots
     // The codegen will map it to an LC index
     this.variableHandler.addLatchVariable(stmt.target, stmt.loc);

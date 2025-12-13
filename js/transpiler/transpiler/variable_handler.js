@@ -403,6 +403,27 @@ class VariableHandler {
   }
 
   /**
+   * Alias for getSymbol (for clarity in analyzer)
+   */
+  getVariable(name) {
+    return this.symbols.get(name);
+  }
+
+  /**
+   * Convert a 'var' variable to 'latch' type
+   * Used when a pre-declared var is later assigned via sticky()
+   *
+   * @param {string} name - Variable name
+   */
+  convertToLatch(name) {
+    const symbol = this.symbols.get(name);
+    if (symbol) {
+      symbol.kind = 'latch';
+      symbol.lcIndex = null;  // Will be assigned by codegen
+    }
+  }
+
+  /**
    * Get allocation summary for debugging
    *
    * @returns {Object} Summary of variable allocations
