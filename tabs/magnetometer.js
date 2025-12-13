@@ -703,7 +703,7 @@ TABS.magnetometer.initialize = function (callback) {
         self.acc_flat_xyz = new Array(pitch, roll, 0);
         console.log("pitch: " + pitch + ", roll: " + roll);
 
-        this.heading_flat = getMagHeading();
+        heading_flat = getMagHeading();
 
         modal = new jBox('Modal', {
             width: 460,
@@ -885,13 +885,13 @@ TABS.magnetometer.initialize = function (callback) {
             // ? yaw_correction_needed = correction_needed + 180;
         }
         // Tinywhoop - If both headings are accurate along a 45° offset, use that. Otherwise round to nearest 90°
-        if ( (Math.abs(this.heading_flat % 45) < 15) && Math.abs(correction_needed % 45) < 15 ) {
+        if ( (Math.abs(heading_flat % 45) < 15) && Math.abs(correction_needed % 45) < 15 ) {
             yaw_correction_needed = ( Math.round(correction_needed / 45) * 45 ) % 360;
         } else {
             yaw_correction_needed = ( Math.round(correction_needed / 90) * 90 ) % 360;
         }
 
-        console.log("heading_flat: " + this.heading_flat + ", change: " + heading_change + ", correction: " + correction_needed % 360);
+        console.log("heading_flat: " + heading_flat + ", change: " + heading_change + ", correction: " + correction_needed % 360);
 
 
        // Adjust for what the NEW rotation of the FC will be
