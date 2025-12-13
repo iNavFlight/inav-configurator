@@ -128,6 +128,16 @@ function extractValue(expr, options = {}) {
     return options.onCallExpression(expr);
   }
 
+  // Handle ternary expressions: a ? b : c
+  if (expr.type === 'ConditionalExpression') {
+    return {
+      type: 'ConditionalExpression',
+      test: expr.test,   // Keep original AST for condition
+      consequent: extractValue(expr.consequent, options),
+      alternate: extractValue(expr.alternate, options)
+    };
+  }
+
   return null;
 }
 

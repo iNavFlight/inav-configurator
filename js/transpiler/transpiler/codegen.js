@@ -75,6 +75,8 @@ class INAVCodeGenerator {
     this.latchVariables = new Map(); // Map variable name -> LC index for sticky assignments
 
     // Initialize helper generators
+    // Note: variableHandler uses a getter because it's set after construction
+    const self = this;
     const context = {
       pushLogicCommand: this.pushLogicCommand.bind(this),
       getOperand: this.getOperand.bind(this),
@@ -83,13 +85,19 @@ class INAVCodeGenerator {
       getOverrideOperation: this.getOverrideOperation.bind(this),
       errorHandler: this.errorHandler,
       arrowHelper: this.arrowHelper,
-      variableHandler: this.variableHandler,
+      get variableHandler() { return self.variableHandler; },
       getLcIndex: () => this.lcIndex,
       latchVariables: this.latchVariables  // Share latch map with condition generator
     };
 
     this.conditionGenerator = new ConditionGenerator(context);
-    this.expressionGenerator = new ExpressionGenerator(context);
+
+    // ExpressionGenerator needs conditionGenerator for ternary expressions
+    const exprContext = {
+      ...context,
+      conditionGenerator: this.conditionGenerator
+    };
+    this.expressionGenerator = new ExpressionGenerator(exprContext);
 
     // ActionGenerator needs conditionGenerator for CSE cache invalidation on mutation
     const actionContext = {
@@ -552,14 +560,24 @@ class INAVCodeGenerator {
 
   /**
    * Generate delay handler
-   * delay(() => condition, { duration: ms }, () => { actions })
+   * delay(() => condition, duration_ms, () => { actions })
+   * Also supports: delay(() => condition, { duration: ms }, () => { actions })
    */
   generateDelay(stmt) {
     if (!this.validateFunctionArgs('delay', stmt.args, 3, stmt)) return;
 
     // Extract parts using helper
     const condition = this.arrowHelper.extractExpression(stmt.args[0]);
-    const duration = this.arrowHelper.extractDuration(stmt.args[1]);
+
+    // Duration can be a plain number or {duration: ms} object
+    let duration;
+    const durationArg = stmt.args[1];
+    if (durationArg && durationArg.type === 'Literal' && typeof durationArg.value === 'number') {
+      duration = durationArg.value;
+    } else {
+      duration = this.arrowHelper.extractDuration(durationArg);
+    }
+
     const actions = this.arrowHelper.extractBody(stmt.args[2]);
 
     if (!condition) {
@@ -580,10 +598,55 @@ class INAVCodeGenerator {
       { type: OPERAND_TYPE.VALUE, value: duration }
     );
 
-    // Generate actions
+    // Generate actions (can include if statements)
     for (const action of actions) {
-      this.generateAction(action, delayId);
+      if (action.type === 'IfStatement') {
+        // Convert IfStatement to EventHandlers and generate each
+        const handlers = this.convertIfToEventHandlers(action, delayId);
+        for (const handler of handlers) {
+          this.generateEventHandler(handler);
+        }
+      } else {
+        this.generateAction(action, delayId);
+      }
     }
+  }
+
+  /**
+   * Convert IfStatement from arrow helper to EventHandler format
+   * Returns array of EventHandlers (one for if, one for else if present)
+   */
+  convertIfToEventHandlers(ifStmt, activatorId) {
+    const handlers = [];
+
+    // Create EventHandler for if block
+    handlers.push({
+      type: 'EventHandler',
+      handler: 'ifthen',
+      condition: ifStmt.condition,
+      body: ifStmt.consequent,
+      activatorId  // Parent activator (delay LC)
+    });
+
+    // Create EventHandler for else block if present
+    if (ifStmt.alternate && ifStmt.alternate.length > 0) {
+      // Invert the condition for else block
+      const invertedCondition = {
+        type: 'UnaryExpression',
+        operator: '!',
+        argument: ifStmt.condition
+      };
+
+      handlers.push({
+        type: 'EventHandler',
+        handler: 'ifthen',
+        condition: invertedCondition,
+        body: ifStmt.alternate,
+        activatorId
+      });
+    }
+
+    return handlers;
   }
 
   /**
@@ -724,6 +787,22 @@ class INAVCodeGenerator {
 
     if (typeof value === 'boolean') {
       return { type: OPERAND_TYPE.VALUE, value: value ? 1 : 0 };
+    }
+
+    // Handle transformed AST nodes from parser
+    // These have {type: 'MemberExpression', value: 'rc[11]'} or {type: 'Literal', value: 123}
+    if (typeof value === 'object' && value !== null && value.type) {
+      if (value.type === 'Literal') {
+        return { type: OPERAND_TYPE.VALUE, value: value.value };
+      }
+      if (value.type === 'MemberExpression' && value.value) {
+        // Recursively process the string value
+        return this.getOperand(value.value, activatorId);
+      }
+      if (value.type === 'Identifier' && (value.name || value.value)) {
+        // Recursively process the identifier name
+        return this.getOperand(value.name || value.value, activatorId);
+      }
     }
 
     if (typeof value === 'string') {

@@ -489,12 +489,25 @@ class JavaScriptParser {
       };
     }
 
-    // Handle call expressions: approxEqual(), xor(), nand(), nor(), edge(), delta()
+    // Handle call expressions: approxEqual(), xor(), nand(), nor(), edge(), delay(), delta()
+    // Arguments need to be transformed as conditions (preserving AST structure)
+    // so condition_generator.generate() can properly dispatch on their types
     if (expr.type === 'CallExpression') {
       return {
         type: 'CallExpression',
         callee: expr.callee,
-        arguments: expr.arguments.map(arg => this.transformExpression(arg))
+        arguments: expr.arguments.map(arg => this.transformCondition(arg))
+      };
+    }
+
+    // Handle ternary expressions in conditions: a ? b : c
+    // Used for XOR pattern: (a) ? !(b) : (b)
+    if (expr.type === 'ConditionalExpression') {
+      return {
+        type: 'ConditionalExpression',
+        test: this.transformCondition(expr.test),
+        consequent: this.transformCondition(expr.consequent),
+        alternate: this.transformCondition(expr.alternate)
       };
     }
 
@@ -542,12 +555,39 @@ class JavaScriptParser {
       };
     }
 
-    // Handle unary expressions: -x
+    // Handle unary expressions: -x, !x
     if (expr.type === 'UnaryExpression') {
       if (expr.operator === '-') {
         const val = this.transformExpression(expr.argument);
         return typeof val === 'number' ? -val : { type: 'UnaryExpression', operator: '-', argument: expr.argument };
       }
+      if (expr.operator === '!') {
+        return {
+          type: 'UnaryExpression',
+          operator: '!',
+          argument: this.transformExpression(expr.argument)
+        };
+      }
+    }
+
+    // Handle logical expressions: a && b, a || b
+    if (expr.type === 'LogicalExpression') {
+      return {
+        type: 'LogicalExpression',
+        operator: expr.operator,
+        left: this.transformExpression(expr.left),
+        right: this.transformExpression(expr.right)
+      };
+    }
+
+    // Handle ternary expressions: a ? b : c
+    if (expr.type === 'ConditionalExpression') {
+      return {
+        type: 'ConditionalExpression',
+        test: this.transformCondition(expr.test),
+        consequent: this.transformExpression(expr.consequent),
+        alternate: this.transformExpression(expr.alternate)
+      };
     }
 
     return null;

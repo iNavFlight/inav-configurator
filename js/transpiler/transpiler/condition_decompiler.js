@@ -27,9 +27,9 @@ const SIMPLE_BINARY_OPS = {
   // Without parens: "a && b || c" parses as "(a && b) || c" - wrong!
   // With parens: "a && (b || c)" preserves intended logic
   [OPERATION.OR]: (l, r) => `(${l} || ${r})`,
-  [OPERATION.XOR]: (l, r) => `((${l}) ? !(${r}) : (${r}))`,
-  [OPERATION.NAND]: (l, r) => `!(${l} && ${r})`,
-  [OPERATION.NOR]: (l, r) => `!(${l} || ${r})`,
+  [OPERATION.XOR]: (l, r) => `xor(${l}, ${r})`,
+  [OPERATION.NAND]: (l, r) => `nand(${l}, ${r})`,
+  [OPERATION.NOR]: (l, r) => `nor(${l}, ${r})`,
   [OPERATION.MODULUS]: (l, r) => `(${l} % ${r})`,
   [OPERATION.MIN]: (l, r) => `Math.min(${l}, ${r})`,
   [OPERATION.MAX]: (l, r) => `Math.max(${l}, ${r})`,

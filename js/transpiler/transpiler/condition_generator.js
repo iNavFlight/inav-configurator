@@ -30,10 +30,18 @@ class ConditionGenerator {
     this.errorHandler = context.errorHandler;
     this.getLcIndex = context.getLcIndex;
     this.latchVariables = context.latchVariables; // Map variable name -> LC index for sticky/timer
+    this.context = context; // Store context for dynamic variableHandler access
 
     // Cache for generated conditions (CSE - Common Subexpression Elimination)
     // Maps condition key -> LC index
     this.conditionCache = new Map();
+  }
+
+  /**
+   * Get variableHandler (accessed dynamically because it's set after codegen construction)
+   */
+  get variableHandler() {
+    return this.context.variableHandler;
   }
 
   /**
@@ -133,6 +141,8 @@ class ConditionGenerator {
         return this.generateCall(condition, activatorId);
       case 'Identifier':
         return this.generateIdentifier(condition, activatorId);
+      case 'ConditionalExpression':
+        return this.generateConditional(condition, activatorId);
       default:
         this.errorHandler.addError(
           `Unsupported condition type: ${condition.type}. Use comparison operators (>, <, ===, etc.) and logical operators (&&, ||, !)`,
@@ -144,8 +154,10 @@ class ConditionGenerator {
   }
 
   /**
-   * Generate identifier condition (latch variable reference)
-   * Used for: if (latch1) where latch1 was assigned from sticky()
+   * Generate identifier condition (variable reference)
+   * Handles:
+   *   - latch variables from sticky() assignments
+   *   - let/const variables (inline substitution)
    * @private
    */
   generateIdentifier(condition, activatorId) {
@@ -159,9 +171,18 @@ class ConditionGenerator {
       return this.latchVariables.get(varName);
     }
 
+    // Check if this is a let/const variable
+    if (this.variableHandler && this.variableHandler.isVariable(varName)) {
+      const resolution = this.variableHandler.resolveVariable(varName);
+      if (resolution && resolution.type === 'let_expression' && resolution.ast) {
+        // Inline substitute the expression AST and generate
+        return this.generate(resolution.ast, activatorId);
+      }
+    }
+
     // Unknown identifier in condition context
     this.errorHandler.addError(
-      `Unknown identifier '${varName}' in condition. Expected a latch variable from sticky() assignment.`,
+      `Unknown identifier '${varName}' in condition. Expected a latch variable from sticky() assignment or a let/const variable.`,
       condition,
       'unknown_identifier'
     );
@@ -382,24 +403,158 @@ class ConditionGenerator {
   }
 
   /**
+   * Generate conditional (ternary) expression
+   * Recognizes patterns:
+   *   (a) ? !(b) : (b) → XOR(a, b)
+   *   cond ? val : 0   → val with cond as activator
+   *   a ? b : c        → general ternary (5 LCs)
+   * @private
+   */
+  generateConditional(condition, activatorId) {
+    const { test, consequent, alternate } = condition;
+
+    // Pattern: (a) ? !(b) : (b) → XOR
+    // Check if consequent is NOT(x) and alternate equals x
+    if (consequent.type === 'UnaryExpression' && consequent.operator === '!') {
+      const notArg = consequent.argument;
+      // Check if alternate matches the NOT argument
+      if (this.conditionsEqual(notArg, alternate)) {
+        // This is XOR pattern
+        const leftId = this.generate(test, activatorId);
+        const rightId = this.generate(alternate, activatorId);
+        return this.pushLogicCommand(OPERATION.XOR,
+          { type: OPERAND_TYPE.LC, value: leftId },
+          { type: OPERAND_TYPE.LC, value: rightId },
+          activatorId
+        );
+      }
+    }
+
+    // Pattern: cond ? val : 0 → val with cond as activator
+    // The alternate must be 0 (literal)
+    if (alternate.type === 'Literal' && alternate.value === 0) {
+      const condId = this.generate(test, activatorId);
+      // Generate consequent with the condition as its activator
+      const valId = this.generate(consequent, condId);
+      return valId;
+    }
+
+    // General ternary: a ? b : c
+    // Implemented as:
+    //   LC_COND: test condition
+    //   LC_CONS: consequent with LC_COND as activator (outputs b when true, 0 when false)
+    //   LC_NOT:  NOT(LC_COND)
+    //   LC_ALT:  alternate with LC_NOT as activator (outputs c when false, 0 when true)
+    //   LC_RES:  OR(LC_CONS, LC_ALT) - combines (one is always 0/false)
+    const condId = this.generate(test, activatorId);
+    const consequentId = this.generate(consequent, condId);
+
+    const notCondId = this.pushLogicCommand(OPERATION.NOT,
+      { type: OPERAND_TYPE.LC, value: condId },
+      { type: OPERAND_TYPE.VALUE, value: 0 },
+      activatorId
+    );
+
+    const alternateId = this.generate(alternate, notCondId);
+
+    // Combine with OR - exactly one of consequentId or alternateId will be non-zero
+    return this.pushLogicCommand(OPERATION.OR,
+      { type: OPERAND_TYPE.LC, value: consequentId },
+      { type: OPERAND_TYPE.LC, value: alternateId },
+      activatorId
+    );
+  }
+
+  /**
+   * Check if a conditional expression is an XOR pattern: (a) ? !(b) : (b)
+   * @private
+   */
+  isXorPattern(expr) {
+    if (expr.type !== 'ConditionalExpression') return false;
+    const { consequent, alternate } = expr;
+
+    // Check if consequent is !(something) and alternate is that something
+    if (consequent.type === 'UnaryExpression' && consequent.operator === '!') {
+      return this.conditionsEqual(consequent.argument, alternate);
+    }
+    return false;
+  }
+
+  /**
+   * Extract the right operand from an XOR pattern: (a) ? !(b) : (b) returns b
+   * Assumes isXorPattern(expr) is true
+   * @private
+   */
+  getXorRightOperand(expr) {
+    return expr.alternate;
+  }
+
+  /**
+   * Check if two condition ASTs are structurally equal
+   * @private
+   */
+  conditionsEqual(a, b) {
+    if (!a || !b) return false;
+    if (a.type !== b.type) return false;
+
+    switch (a.type) {
+      case 'Identifier':
+        return (a.name || a.value) === (b.name || b.value);
+      case 'Literal':
+        return a.value === b.value;
+      case 'MemberExpression':
+        return a.value === b.value;
+      case 'BinaryExpression':
+      case 'LogicalExpression':
+        return a.operator === b.operator &&
+               this.conditionsEqual(a.left, b.left) &&
+               this.conditionsEqual(a.right, b.right);
+      case 'UnaryExpression':
+        return a.operator === b.operator &&
+               this.conditionsEqual(a.argument, b.argument);
+      case 'CallExpression':
+        // For call expressions, compare callee name and arguments
+        const aCallee = a.callee.name || (a.callee.property && a.callee.property.name);
+        const bCallee = b.callee.name || (b.callee.property && b.callee.property.name);
+        if (aCallee !== bCallee) return false;
+        if (a.arguments.length !== b.arguments.length) return false;
+        return a.arguments.every((arg, i) => this.conditionsEqual(arg, b.arguments[i]));
+      case 'ConditionalExpression':
+        // Recursively compare ternary expressions
+        // Also recognize if both are semantically XOR patterns
+        if (this.isXorPattern(a) && this.isXorPattern(b)) {
+          // Both are XOR patterns - compare the operands
+          return this.conditionsEqual(a.test, b.test) &&
+                 this.conditionsEqual(this.getXorRightOperand(a), this.getXorRightOperand(b));
+        }
+        // Standard structural comparison
+        return this.conditionsEqual(a.test, b.test) &&
+               this.conditionsEqual(a.consequent, b.consequent) &&
+               this.conditionsEqual(a.alternate, b.alternate);
+      default:
+        return JSON.stringify(a) === JSON.stringify(b);
+    }
+  }
+
+  /**
    * Generate member expression condition (property access, RC channel states)
    * @private
    */
   generateMember(condition, activatorId) {
-    // Check for RC channel LOW/MID/HIGH state detection
-    // e.g., rc[1].low, rc[2].mid, rc[3].high (1-based, matching INAV firmware)
+    // RC channel LOW/MID/HIGH state detection: rc[1].low, rc[2].mid, rc[3].high
     if (typeof condition.value === 'string' && condition.value.startsWith('rc[')) {
       const match = condition.value.match(/^rc\[(\d+)\]\.(low|mid|high)$/);
       if (match) {
-        const channelIndex = parseInt(match[1]); // Already 1-based from user input
-        const state = match[2]; // 'low', 'mid', or 'high'
+        const channelIndex = parseInt(match[1]);
+        const state = match[2];
 
-        // Map state to operation
         const stateOp = state === 'low' ? OPERATION.LOW :
                        state === 'mid' ? OPERATION.MID :
                        OPERATION.HIGH;
 
-        return this.pushLogicCommand(stateOp,
+        return this.generateCachedFunctionCall(
+          `rc_${state}`,
+          stateOp,
           { type: OPERAND_TYPE.RC_CHANNEL, value: channelIndex },
           { type: OPERAND_TYPE.VALUE, value: 0 },
           activatorId
@@ -407,29 +562,35 @@ class ConditionGenerator {
       }
     }
 
-    // Boolean/truthy property access (e.g., gvar[0], flight.mode.failsafe)
     const operand = this.getOperand(condition.value);
-
-    // For gvar truthy checks, use != 0 (compiled as NOT(gvar === 0))
-    // This correctly handles any non-zero value as truthy
-    // For flight.mode.* booleans, === 1 is correct since they're 0 or 1
     const valueStr = typeof condition.value === 'string' ? condition.value : '';
+
+    // gvar truthy: use != 0 to handle any non-zero value (compiled as NOT(gvar === 0))
     if (valueStr.startsWith('gvar[')) {
-      // Truthy check for gvar: NOT(gvar[N] === 0)
+      const cacheKey = this.getCacheKey('gvar_truthy', operand, activatorId);
+      if (this.conditionCache.has(cacheKey)) {
+        return this.conditionCache.get(cacheKey);
+      }
+
       const equalZeroId = this.pushLogicCommand(OPERATION.EQUAL,
         operand,
         { type: OPERAND_TYPE.VALUE, value: 0 },
         activatorId
       );
-      return this.pushLogicCommand(OPERATION.NOT,
+      const resultId = this.pushLogicCommand(OPERATION.NOT,
         { type: OPERAND_TYPE.LC, value: equalZeroId },
         { type: OPERAND_TYPE.VALUE, value: 0 },
         activatorId
       );
+
+      this.conditionCache.set(cacheKey, resultId);
+      return resultId;
     }
 
-    // For boolean properties (flight.mode.*, etc.), check === 1
-    return this.pushLogicCommand(OPERATION.EQUAL,
+    // Boolean properties: flight.mode.*, etc. are 0 or 1, check === 1
+    return this.generateCachedFunctionCall(
+      'bool_check',
+      OPERATION.EQUAL,
       operand,
       { type: OPERAND_TYPE.VALUE, value: 1 },
       activatorId
@@ -542,8 +703,33 @@ class ConditionGenerator {
       const duration = condition.arguments[1];
       const durationValue = duration?.type === 'Literal' ? duration.value : 0;
 
-      // Generate EDGE operation
-      return this.pushLogicCommand(OPERATION.EDGE,
+      // Generate EDGE operation with caching
+      return this.generateCachedFunctionCall(
+        'edge',
+        OPERATION.EDGE,
+        { type: OPERAND_TYPE.LC, value: conditionId },
+        { type: OPERAND_TYPE.VALUE, value: durationValue },
+        activatorId
+      );
+    }
+
+    // Handle delay(condition, duration) - Delay pattern (condition must be true for duration ms)
+    if (funcName === 'delay') {
+      if (!this.validateFunctionArgs('delay', condition.arguments, 2, condition)) {
+        return this.getLcIndex();
+      }
+
+      // Generate the underlying condition
+      const conditionId = this.generate(condition.arguments[0], activatorId);
+
+      // Get duration value
+      const duration = condition.arguments[1];
+      const durationValue = duration?.type === 'Literal' ? duration.value : 0;
+
+      // Generate DELAY operation with caching
+      return this.generateCachedFunctionCall(
+        'delay',
+        OPERATION.DELAY,
         { type: OPERAND_TYPE.LC, value: conditionId },
         { type: OPERAND_TYPE.VALUE, value: durationValue },
         activatorId
@@ -566,8 +752,10 @@ class ConditionGenerator {
       const threshold = condition.arguments[1];
       const thresholdValue = threshold?.type === 'Literal' ? threshold.value : 0;
 
-      // Generate DELTA operation
-      return this.pushLogicCommand(OPERATION.DELTA,
+      // Generate DELTA operation with caching
+      return this.generateCachedFunctionCall(
+        'delta',
+        OPERATION.DELTA,
         valueOperand,
         { type: OPERAND_TYPE.VALUE, value: thresholdValue },
         activatorId
@@ -576,11 +764,49 @@ class ConditionGenerator {
 
     // Unsupported function in condition
     this.errorHandler.addError(
-      `Unsupported function in condition: ${funcName}(). Supported: xor, nand, nor, approxEqual, edge, delta`,
+      `Unsupported function in condition: ${funcName}(). Supported: xor, nand, nor, approxEqual, edge, delay, delta`,
       condition,
       'unsupported_function'
     );
     return this.getLcIndex();
+  }
+
+  /**
+   * Generate a cached function call operation (edge, delay, delta, etc.)
+   *
+   * This helper method implements the cache-check-generate-cache pattern
+   * used for special function operations to avoid generating duplicate LCs
+   * for semantically identical operations.
+   *
+   * Similar to how generateBinary() caches comparison operations, this ensures
+   * that repeated function calls like edge(rc[5].high, 5000) generate only one LC
+   * even if they appear multiple times in different branches.
+   *
+   * @param {string} funcName - Function name for cache key (e.g., 'edge', 'delay')
+   * @param {number} operation - OPERATION constant (e.g., OPERATION.EDGE)
+   * @param {Object} operandA - First operand {type, value}
+   * @param {Object} operandB - Second operand {type, value}
+   * @param {number} activatorId - Activator LC index
+   * @param {*} extraParam - Optional extra parameter (e.g., tolerance for approxEqual)
+   * @returns {number} The LC index of the cached or newly generated operation
+   * @private
+   */
+  generateCachedFunctionCall(funcName, operation, operandA, operandB, activatorId, extraParam) {
+    // Build cache key from function name, operation, and operands
+    const cacheKey = this.getCacheKey(funcName, operation, operandA, operandB, activatorId);
+
+    // Check if we've already generated this exact operation
+    if (this.conditionCache.has(cacheKey)) {
+      return this.conditionCache.get(cacheKey);
+    }
+
+    // Generate new LC
+    const resultId = this.pushLogicCommand(operation, operandA, operandB, activatorId, extraParam);
+
+    // Cache for future reuse
+    this.conditionCache.set(cacheKey, resultId);
+
+    return resultId;
   }
 
   /**
