@@ -20,6 +20,7 @@ import apiDefinitions from './../api/definitions/index.js';
 import { ConditionDecompiler } from './condition_decompiler.js';
 import { ActionDecompiler } from './action_decompiler.js';
 import { buildReverseMapping } from './api_mapping_utility.js';
+import { ActivatorHoistingManager } from './activator_hoisting.js';
 
 /**
  * Decompiler class
@@ -194,6 +195,16 @@ class Decompiler {
     this.inlineDeclaredVars = new Set(); // Track let variables declared inline in body
     this.hoistedVarCounters = new Map(); // Track counters for hoisted variable names (e.g., min, min2, min3)
 
+    // Create hoisting manager for activator-wrapped LCs
+    this.hoistingManager = new ActivatorHoistingManager({
+      decompileCondition: this.decompileCondition.bind(this),
+      decompileOperand: this.decompileOperand.bind(this),
+      isActionOperation: this.isActionOperation.bind(this),
+      usedFeatures: this.usedFeatures
+    });
+    // Expose hoistedActivatorVars for backward compatibility
+    this.hoistedActivatorVars = this.hoistingManager.hoistedActivatorVars;
+
     if (!logicConditions || !Array.isArray(logicConditions)) {
       return {
         success: false,
@@ -316,6 +327,9 @@ class Decompiler {
       }
     }
 
+    // Identify which LCs should be hoisted to variables (via hoisting manager)
+    this.hoistingManager.identifyHoistedVars(conditions, referencedAsOperand);
+
     // Find root conditions (activatorId === -1) that should be rendered
     // Include gap markers to preserve visual grouping from original LC layout
     const roots = conditions.filter(lc => {
@@ -338,6 +352,9 @@ class Decompiler {
       return true;
     });
 
+    // Initialize hoisting manager for lazy emission
+    this.hoistingManager.initLazyEmission(conditions, processed);
+
     // Build and decompile tree for each root
     for (const rootLc of roots) {
       // Gap markers insert extra blank line for visual separation
@@ -349,6 +366,9 @@ class Decompiler {
       }
       if (processed.has(rootLc.index)) continue;
 
+      // Clear referenced vars before decompiling this tree
+      this.hoistingManager.clearReferences();
+
       const tree = this.buildConditionTree(rootLc, conditions, processed);
       const hasChildren = conditions.some(c => c.activatorId === rootLc.index);
 
@@ -358,6 +378,11 @@ class Decompiler {
           !this.isActionOperation(rootLc.operation) &&
           this.couldBeExternallyReferenced(rootLc.operation)) {
         const condStr = this.decompileCondition(rootLc, conditions);
+        // Emit any hoisted vars this condition referenced
+        const pendingVars = this.hoistingManager.emitPendingHoistedVars();
+        for (const decl of pendingVars) {
+          codeBlocks.push(decl);
+        }
         codeBlocks.push(`if (${condStr}) { /* LC ${rootLc.index}: for external reference */ }`);
         processed.add(rootLc.index);
         continue;
@@ -365,6 +390,11 @@ class Decompiler {
 
       const code = this.decompileTree(tree, conditions, 0);
       if (code && code.trim()) {
+        // Emit any hoisted vars this tree referenced (before the tree's code)
+        const pendingVars = this.hoistingManager.emitPendingHoistedVars();
+        for (const decl of pendingVars) {
+          codeBlocks.push(decl);
+        }
         codeBlocks.push(code);
       }
     }
@@ -790,6 +820,15 @@ class Decompiler {
 
           const referencedLC = allConditions.find(lc => lc.index === value);
           if (referencedLC) {
+            // Check if this LC was hoisted to a variable (has activator, referenced as operand)
+            // If so, return the variable name instead of computing inline
+            const hoistedVarName = this.hoistingManager?.getHoistedVarName(value);
+            if (hoistedVarName) {
+              // Track that this var was referenced (for lazy emission)
+              this.hoistingManager.trackReference(hoistedVarName);
+              return hoistedVarName;
+            }
+
             // Don't inline action operations (they produce side effects, not boolean values)
             // Instead, describe what the action does for clarity
             if (this.isActionOperation(referencedLC.operation)) {
@@ -812,24 +851,40 @@ class Decompiler {
               return varName || `logicCondition[${value}]`;
             }
             // EDGE: returns true on rising edge of condition for duration ms
-            // Just show the underlying condition - edge timing is implementation detail
             if (referencedLC.operation === OPERATION.EDGE) {
               this.usedFeatures.add('edge');
               const underlyingCond = this.decompileOperand(OPERAND_TYPE.LC, referencedLC.operandAValue, allConditions, visited);
-              return `edge(${underlyingCond}, ${referencedLC.operandBValue})`;
+              const edgeExpr = `edge(${underlyingCond}, ${referencedLC.operandBValue})`;
+              // Wrap with activator check if LC has one
+              if (referencedLC.activatorId !== -1) {
+                const activatorExpr = this.decompileOperand(OPERAND_TYPE.LC, referencedLC.activatorId, allConditions, new Set(visited));
+                return `(${activatorExpr} ? ${edgeExpr} : 0)`;
+              }
+              return edgeExpr;
             }
             // DELAY: returns true after condition held for duration ms
             if (referencedLC.operation === OPERATION.DELAY) {
               this.usedFeatures.add('delay');
               const underlyingCond = this.decompileOperand(OPERAND_TYPE.LC, referencedLC.operandAValue, allConditions, visited);
-              return `delay(${underlyingCond}, ${referencedLC.operandBValue})`;
+              const delayExpr = `delay(${underlyingCond}, ${referencedLC.operandBValue})`;
+              // Wrap with activator check if LC has one
+              if (referencedLC.activatorId !== -1) {
+                const activatorExpr = this.decompileOperand(OPERAND_TYPE.LC, referencedLC.activatorId, allConditions, new Set(visited));
+                return `(${activatorExpr} ? ${delayExpr} : 0)`;
+              }
+              return delayExpr;
             }
             // Recursively decompile the referenced condition with cycle detection
-            // (even boolean conditions with activators - the activator controls when
-            // the LC is evaluated, but its result can still be referenced)
             visited.add(value);
             const result = this.decompileCondition(referencedLC, allConditions, visited);
             visited.delete(value);
+
+            // If the LC has an activator, wrap in conditional to preserve semantics
+            // In INAV, when activator is false, the LC outputs 0
+            if (referencedLC.activatorId !== -1) {
+              const activatorExpr = this.decompileOperand(OPERAND_TYPE.LC, referencedLC.activatorId, allConditions, new Set(visited));
+              return `(${activatorExpr} ? (${result}) : 0)`;
+            }
             return result;
           }
         }

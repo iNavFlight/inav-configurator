@@ -222,10 +222,9 @@ class ConditionDecompiler {
   }
 
   handleEdge(left, right) {
-    // Edge uses result of another LC as condition
-    // This case shouldn't normally be hit because detectSpecialPattern handles it
-    // But include for completeness
-    return `${left} /* edge with duration ${right}ms */`;
+    // Edge returns true on rising edge of condition for duration ms
+    // Note: usedFeatures tracking happens in main decompiler
+    return `edge(${left}, ${right})`;
   }
 
   handleSticky(left, right) {
@@ -234,8 +233,9 @@ class ConditionDecompiler {
   }
 
   handleDelay(left, right) {
-    // Delay uses result of another LC with timeout
-    return `${left} /* delay ${right}ms */`;
+    // Delay returns true after condition held for duration ms
+    // Note: usedFeatures tracking happens in main decompiler
+    return `delay(${left}, ${right})`;
   }
 
   handleAdd(left, right) {
