@@ -790,10 +790,10 @@ TABS.magnetometer.initialize = function (callback) {
         console.log(changed);
         console.log("upside: " + upside);
     
-        acc_yaw = accComputeYaw(changed, upside);
+        let acc_yaw = accComputeYaw(changed, upside);
         self.acc_flat_xyz[2] = acc_yaw;
-    
-    
+
+
         // Ray TODO rotate based on current board alignment (board) and new board alignment (compass)
         // The acc readings are relative to the current settings. :(
         // Alternatively, set alignments to 0,0,0, save and reboot, then finish the wizard.
@@ -853,7 +853,7 @@ TABS.magnetometer.initialize = function (callback) {
         console.log(changed);
         console.log("upside: " + upside);
 
-        acc_yaw = accComputeYaw(changed, upside);
+        let acc_yaw = accComputeYaw(changed, upside);
         self.acc_flat_xyz[2] = acc_yaw;
 
 
