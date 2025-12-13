@@ -14,8 +14,7 @@ import { GUI, TABS } from './../js/gui';
 import i18n from './../js/localization';
 import { mixer } from './../js/model';
 import interval from './../js/intervals';
-
-const jBox = require('../js/libraries/jBox/jBox.min');
+import jBox from 'jbox';
 
 TABS.magnetometer = {};
 
