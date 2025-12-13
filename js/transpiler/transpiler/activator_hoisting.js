@@ -52,23 +52,32 @@ export class ActivatorHoistingManager {
    * Identify which LCs should be hoisted to variables
    * @param {Array} conditions - All logic conditions
    * @param {Set} referencedAsOperand - Set of LC indices referenced as operands
+   * @param {Map} referenceCount - Map of LC index -> reference count
    * @returns {Map} Map of LC index -> variable name
    */
-  identifyHoistedVars(conditions, referencedAsOperand) {
+  identifyHoistedVars(conditions, referencedAsOperand, referenceCount) {
     this.hoistedActivatorVars.clear();
     let condVarCount = 1;
 
     for (const lc of conditions) {
       if (lc._gap) continue;
 
-      // Only hoist if: has activator, referenced as operand, not an action, not sticky/timer
-      if (lc.activatorId !== -1 &&
-          referencedAsOperand.has(lc.index) &&
-          !this.isActionOperation(lc.operation) &&
-          lc.operation !== OPERATION.STICKY &&
-          lc.operation !== OPERATION.TIMER) {
+      // Skip actions, sticky, and timer operations
+      if (this.isActionOperation(lc.operation) ||
+          lc.operation === OPERATION.STICKY ||
+          lc.operation === OPERATION.TIMER) {
+        continue;
+      }
+
+      // Hoist if:
+      // 1. Has activator AND referenced as operand (existing logic), OR
+      // 2. Root LC (no activator) AND referenced multiple times (new logic)
+      const hasActivatorAndReferenced = lc.activatorId !== -1 && referencedAsOperand.has(lc.index);
+      const isRootAndDuplicated = lc.activatorId === -1 && (referenceCount.get(lc.index) || 0) > 1;
+
+      if (hasActivatorAndReferenced || isRootAndDuplicated) {
         // Don't hoist if activator chain contains STICKY/TIMER - those need late binding
-        if (this.activatorChainHasSticky(lc.index, conditions)) {
+        if (lc.activatorId !== -1 && this.activatorChainHasSticky(lc.index, conditions)) {
           continue;
         }
         const varName = `cond${condVarCount++}`;

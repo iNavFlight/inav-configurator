@@ -290,6 +290,9 @@ class Decompiler {
     // These are helper/intermediate values that shouldn't be standalone blocks
     const referencedAsOperand = new Set();
 
+    // Count how many times each LC is referenced (for hoisting duplicates)
+    const referenceCount = new Map();
+
     // Track LC references for referencedAsOperand
     // Also track which STICKY/TIMERs are referenced (need to show their definition)
     const referencedStickyLCs = new Set();
@@ -297,6 +300,7 @@ class Decompiler {
       if (lc._gap) continue;
       if (lc.operandAType === OPERAND_TYPE.LC) {
         referencedAsOperand.add(lc.operandAValue);
+        referenceCount.set(lc.operandAValue, (referenceCount.get(lc.operandAValue) || 0) + 1);
         const refLC = conditions.find(c => c.index === lc.operandAValue);
         if (refLC && (refLC.operation === OPERATION.STICKY || refLC.operation === OPERATION.TIMER)) {
           referencedStickyLCs.add(lc.operandAValue);
@@ -304,6 +308,7 @@ class Decompiler {
       }
       if (lc.operandBType === OPERAND_TYPE.LC) {
         referencedAsOperand.add(lc.operandBValue);
+        referenceCount.set(lc.operandBValue, (referenceCount.get(lc.operandBValue) || 0) + 1);
         const refLC = conditions.find(c => c.index === lc.operandBValue);
         if (refLC && (refLC.operation === OPERATION.STICKY || refLC.operation === OPERATION.TIMER)) {
           referencedStickyLCs.add(lc.operandBValue);
@@ -329,7 +334,7 @@ class Decompiler {
     }
 
     // Identify which LCs should be hoisted to variables (via hoisting manager)
-    this.hoistingManager.identifyHoistedVars(conditions, referencedAsOperand);
+    this.hoistingManager.identifyHoistedVars(conditions, referencedAsOperand, referenceCount);
 
     // Emit all hoisted vars at top in LC index order
     // LC index order naturally handles dependencies (LC N can only reference LC 0..N-1)
@@ -338,11 +343,29 @@ class Decompiler {
     for (const [lcIndex, varName] of sortedHoisted) {
       const lc = conditions.find(c => c.index === lcIndex);
       if (!lc) continue;
-      // Pass activator context to prevent redundant wrapping
-      const innerExpr = this.decompileConditionInActivatorContext(lc, conditions, lc.activatorId);
-      const activatorExpr = this.decompileOperand(OPERAND_TYPE.LC, lc.activatorId, conditions, new Set());
-      codeBlocks.push(`const ${varName} = ${activatorExpr} ? (${innerExpr}) : 0;`);
-      processed.add(lcIndex);
+
+      // Check if this LC has children (other LCs using it as activator)
+      const hasChildren = conditions.some(c => !c._gap && c.activatorId === lcIndex);
+
+      // Root LCs (no activator) vs LCs with activators are emitted differently
+      if (lc.activatorId === -1) {
+        // Root LC - just decompile the expression directly
+        const expr = this.decompileCondition(lc, conditions, new Set());
+        codeBlocks.push(`const ${varName} = ${expr};`);
+        // If this root LC has children, DON'T mark as processed
+        // It needs to be rendered as an if-block later
+        if (!hasChildren) {
+          processed.add(lcIndex);
+        }
+      } else {
+        // LC with activator - wrap in ternary to preserve activator semantics
+        // Pass activator context to prevent redundant wrapping
+        const innerExpr = this.decompileConditionInActivatorContext(lc, conditions, lc.activatorId);
+        const activatorExpr = this.decompileOperand(OPERAND_TYPE.LC, lc.activatorId, conditions, new Set());
+        codeBlocks.push(`const ${varName} = ${activatorExpr} ? (${innerExpr}) : 0;`);
+        // LCs with activators are always fully handled by hoisting
+        processed.add(lcIndex);
+      }
     }
 
     // Find root conditions (activatorId === -1) that should be rendered
@@ -533,7 +556,9 @@ class Decompiler {
       }
     } else if (this.isBooleanOperation(node.lc.operation)) {
       // This is a boolean condition - create if block
-      const condition = this.decompileCondition(node.lc, allConditions);
+      // Check if this LC was hoisted to a variable - if so, use the variable name
+      const hoistedVarName = this.hoistingManager?.getHoistedVarName(node.lc.index);
+      const condition = hoistedVarName || this.decompileCondition(node.lc, allConditions);
 
       if (node.children.length === 0) {
         // Condition with no children - skip it (it's a helper used elsewhere)

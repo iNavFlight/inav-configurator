@@ -267,8 +267,10 @@ class JavaScriptParser {
     const varDecl = this.variableHandler.extractVariableDeclaration(node);
     if (varDecl) {
       // Transform the initExpr from Acorn AST to our format
+      // Use transformCondition() to preserve AST structure for condition generation
+      // (transformExpression() returns strings for simple values, which breaks const variable resolution)
       if (varDecl.initExpr) {
-        varDecl.initExpr = this.transformExpression(varDecl.initExpr);
+        varDecl.initExpr = this.transformCondition(varDecl.initExpr);
       }
       return varDecl;
     }
