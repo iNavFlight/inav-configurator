@@ -322,13 +322,16 @@ class Decompiler {
       if (lc._gap) return true;  // Keep gap markers for visual separation
       if (lc.activatorId !== -1) return false;
 
+      // Check if this LC has children (other LCs using it as activator)
+      const hasChildren = conditions.some(c => !c._gap && c.activatorId === lc.index);
+
       // Skip if only referenced by special ops (EDGE, STICKY, DELAY operands)
-      if (referencedBySpecialOps.has(lc.index)) return false;
+      // BUT keep if it has children that depend on it as activator
+      if (referencedBySpecialOps.has(lc.index) && !hasChildren) return false;
 
       // Skip if only used as operand by other LCs (helper conditions)
       // These are intermediate computations used by other LCs
       if (referencedAsOperand.has(lc.index) && !this.isActionOperation(lc.operation)) {
-        const hasChildren = conditions.some(c => c.activatorId === lc.index);
         if (!hasChildren) return false;
       }
 

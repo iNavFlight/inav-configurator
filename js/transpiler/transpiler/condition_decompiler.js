@@ -23,7 +23,10 @@ const SIMPLE_BINARY_OPS = {
   [OPERATION.GREATER_THAN]: (l, r) => `${l} > ${r}`,
   [OPERATION.LOWER_THAN]: (l, r) => `${l} < ${r}`,
   [OPERATION.AND]: (l, r) => `${l} && ${r}`,
-  [OPERATION.OR]: (l, r) => `${l} || ${r}`,
+  // OR wrapped in parentheses to preserve precedence when nested inside AND
+  // Without parens: "a && b || c" parses as "(a && b) || c" - wrong!
+  // With parens: "a && (b || c)" preserves intended logic
+  [OPERATION.OR]: (l, r) => `(${l} || ${r})`,
   [OPERATION.XOR]: (l, r) => `((${l}) ? !(${r}) : (${r}))`,
   [OPERATION.NAND]: (l, r) => `!(${l} && ${r})`,
   [OPERATION.NOR]: (l, r) => `!(${l} || ${r})`,
