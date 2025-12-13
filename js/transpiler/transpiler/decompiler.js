@@ -496,11 +496,13 @@ class Decompiler {
         }
         lines.push(...this.renderStickyWithLatch(pattern, childCodes, indent, varName));
       } else {
-        // Skip empty patterns for non-sticky types
+        // For edge/delay with no children, still output for external reference
+        // (e.g., Global Functions may read these values for OSD display)
         if (childCodes.length === 0) {
-          return '';
+          lines.push(indentStr + `/* LC ${node.lc.index}: ${pattern.type}(${pattern.condition || pattern.value}, ${pattern.duration || pattern.onMs}) for external reference */`);
+        } else {
+          lines.push(...this.renderSpecialPatternWithCode(pattern, childCodes, indent));
         }
-        lines.push(...this.renderSpecialPatternWithCode(pattern, childCodes, indent));
       }
     } else if (this.isActionOperation(node.lc.operation)) {
       // This is an action - render it
@@ -569,6 +571,11 @@ class Decompiler {
         // Then, output nested conditions
         for (const nestedNode of nestedConditions) {
           lines.push(this.decompileTree(nestedNode, allConditions, indent + 1));
+        }
+
+        // If body is empty, add comment with LC number for external reference
+        if (actions.length === 0 && nestedConditions.length === 0) {
+          lines.push(indentStr + `  /* LC ${node.lc.index}: for external reference */`);
         }
 
         lines.push(indentStr + '}');
