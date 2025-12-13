@@ -682,12 +682,12 @@ class Decompiler {
 
     if (pattern.type === 'edge') {
       this.usedFeatures.add('edge');
-      lines.push(indentStr + `edge(${pattern.condition}, ${pattern.duration}, () => {`);
+      lines.push(indentStr + `edge(() => ${pattern.condition}, ${pattern.duration}, () => {`);
       if (body) lines.push(body);
       lines.push(indentStr + '});');
     } else if (pattern.type === 'delay') {
       this.usedFeatures.add('delay');
-      lines.push(indentStr + `delay(${pattern.condition}, ${pattern.duration}, () => {`);
+      lines.push(indentStr + `delay(() => ${pattern.condition}, ${pattern.duration}, () => {`);
       if (body) lines.push(body);
       lines.push(indentStr + '});');
     } else if (pattern.type === 'timer') {
