@@ -342,13 +342,38 @@ class ConditionGenerator {
 
   /**
    * Generate unary expression condition (!)
+   * Recognizes patterns:
+   *   !(a && b) → NAND
+   *   !(a || b) → NOR
    * @private
    */
   generateUnary(condition, activatorId) {
-    // Generate argument
-    const argId = this.generate(condition.argument, activatorId);
+    const arg = condition.argument;
 
-    // Apply NOT
+    // Pattern: !(a && b) → NAND
+    if (arg.type === 'LogicalExpression' && arg.operator === '&&') {
+      const leftId = this.generate(arg.left, activatorId);
+      const rightId = this.generate(arg.right, activatorId);
+      return this.pushLogicCommand(OPERATION.NAND,
+        { type: OPERAND_TYPE.LC, value: leftId },
+        { type: OPERAND_TYPE.LC, value: rightId },
+        activatorId
+      );
+    }
+
+    // Pattern: !(a || b) → NOR
+    if (arg.type === 'LogicalExpression' && arg.operator === '||') {
+      const leftId = this.generate(arg.left, activatorId);
+      const rightId = this.generate(arg.right, activatorId);
+      return this.pushLogicCommand(OPERATION.NOR,
+        { type: OPERAND_TYPE.LC, value: leftId },
+        { type: OPERAND_TYPE.LC, value: rightId },
+        activatorId
+      );
+    }
+
+    // Default: generate argument, then apply NOT
+    const argId = this.generate(arg, activatorId);
     return this.pushLogicCommand(OPERATION.NOT,
       { type: OPERAND_TYPE.LC, value: argId },
       { type: OPERAND_TYPE.VALUE, value: 0 },
