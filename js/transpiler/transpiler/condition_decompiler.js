@@ -154,7 +154,10 @@ class ConditionDecompiler {
       const innerLcIndex = lc.operandAValue;
       const innerLC = allConditions.find(c => c.index === innerLcIndex);
 
-      if (innerLC) {
+      // Only do structural optimizations if inner LC has no activator
+      // If it has an activator, it may be hoisted and we should use decompileOperand
+      // to get the hoisted variable name (which preserves the activator relationship)
+      if (innerLC && innerLC.activatorId === -1) {
         // Double negation: NOT(NOT(x)) -> x
         if (innerLC.operation === OPERATION.NOT) {
           // Recursively decompile the inner NOT's operand
