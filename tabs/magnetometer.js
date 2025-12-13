@@ -755,7 +755,7 @@ TABS.magnetometer.initialize = function (callback) {
             }
         }
 
-        // var boardRotation = new THREE.Euler( THREE.Math.degToRad( -self.boardAlignmentConfig.pitch ), THREE.Math.degToRad( -self.boardAlignmentConfig.yaw ), THREE.Math.degToRad( -self.boardAlignmentConfig.roll ), 'YXZ');
+        // var boardRotation = new THREE.Euler( THREE.MathUtils.degToRad( -self.boardAlignmentConfig.pitch ), THREE.MathUtils.degToRad( -self.boardAlignmentConfig.yaw ), THREE.MathUtils.degToRad( -self.boardAlignmentConfig.roll ), 'YXZ');
         // var matrix1 = (new THREE.Matrix4()).makeRotationFromEuler(boardRotation);
 
         /*
@@ -872,6 +872,7 @@ TABS.magnetometer.initialize = function (callback) {
 
     function accAutoAlignCompass() {
         let roll_correction_needed = 0;
+        let yaw_correction_needed = 0;
 
         let heading_change = (FC.SENSOR_DATA.kinematics[2] - heading_flat + 360) % 360;
         let correction_needed = (450 - FC.SENSOR_DATA.kinematics[2]) % 360;
@@ -899,13 +900,13 @@ TABS.magnetometer.initialize = function (callback) {
 
        // Adjust for what the NEW rotation of the FC will be
 
-        var magAdjustment = new THREE.Euler(-THREE.Math.degToRad(self.mag_saved_pitch),
-                THREE.Math.degToRad(-180 - yaw_correction_needed), THREE.Math.degToRad(roll_correction_needed), 'YXZ');
+        var magAdjustment = new THREE.Euler(-THREE.MathUtils.degToRad(self.mag_saved_pitch),
+                THREE.MathUtils.degToRad(-180 - yaw_correction_needed), THREE.MathUtils.degToRad(roll_correction_needed), 'YXZ');
         var matrixMag = (new THREE.Matrix4()).makeRotationFromEuler(magAdjustment);
 
-        var boardRotation = new THREE.Euler( THREE.Math.degToRad( -self.acc_flat_xyz[0] ),
-                THREE.Math.degToRad( -self.acc_flat_xyz[2] ),
-                THREE.Math.degToRad( -self.acc_flat_xyz[1] ), 'YXZ');
+        var boardRotation = new THREE.Euler( THREE.MathUtils.degToRad( -self.acc_flat_xyz[0] ),
+                THREE.MathUtils.degToRad( -self.acc_flat_xyz[2] ),
+                THREE.MathUtils.degToRad( -self.acc_flat_xyz[1] ), 'YXZ');
         var matrixBoard = (new THREE.Matrix4()).makeRotationFromEuler(boardRotation);
         // Ray TODO use the inverse of the board rotation. 
         madAdjustment.premultiply(matrixBoard);
