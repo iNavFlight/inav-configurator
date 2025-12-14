@@ -22,6 +22,10 @@
         "message": "简体中文",
         "_comment": "Don't translate!"
     },
+    "language_ru": {
+        "message": "Русский",
+        "_comment": "Don't translate!"
+    },
     "language": {
         "message": "Language"
     },
@@ -33,6 +37,9 @@
     },
     "options_improve_configurator": {
         "message": "Send anonymous usage data to the developer team"
+    },
+    "options_disable3dAcceleration" : {
+        "message": "Disable 3D Acceleration. If the 3D models are not displayed. Needs app restart."
     },
     "options_showProfileParameters": {
         "message": "Highlight parameters that change when switching battery or control profiles"

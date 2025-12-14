@@ -32,7 +32,7 @@ let selectBluetoothCallback = null;
 const store = new Store();
 
 // Workaround for some Linux systems: https://github.com/electron/electron/issues/32760 
-if (process.platform === 'linux') {
+if (store.get('disable_3d_acceleration', false)) {
   app.disableHardwareAcceleration();
 }
 
