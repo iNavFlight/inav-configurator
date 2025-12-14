@@ -85,6 +85,9 @@ const OPERATION = {
   RESET_MAG_CALIBRATION: 54,
   SET_GIMBAL_SENSITIVITY: 55,
   OVERRIDE_MIN_GROUND_SPEED: 56,
+  ACOS: 57,
+  ASIN: 58,
+  ATAN2: 59,
 };
 
 /**
@@ -272,6 +275,10 @@ const OPERATION_NAMES = {
   [53]: 'Disable Gps Fix',
   [54]: 'Reset Mag Calibration',
   [55]: 'Set Gimbal Sensitivity',
+  [56]: 'Override Min Ground Speed',
+  [57]: 'Acos',
+  [58]: 'Asin',
+  [59]: 'Atan2',
 };
 
 /**

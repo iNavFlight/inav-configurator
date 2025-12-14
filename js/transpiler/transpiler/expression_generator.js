@@ -102,7 +102,7 @@ class ExpressionGenerator {
     // Not a recognized function
     const methodName = expr.callee?.property?.name || funcName || 'unknown';
     this.errorHandler.addError(
-      `Unsupported function: ${methodName}(). Supported: Math.abs/min/max/sin/cos/tan(), mapInput(), mapOutput()`,
+      `Unsupported function: ${methodName}(). Supported: Math.abs/min/max/sin/cos/tan/acos/asin/atan2(), mapInput(), mapOutput()`,
       expr,
       'unsupported_function'
     );
@@ -110,7 +110,7 @@ class ExpressionGenerator {
   }
 
   /**
-   * Generate Math method call (abs, min, max, sin, cos, tan)
+   * Generate Math method call (abs, min, max, sin, cos, tan, acos, asin, atan2)
    * @private
    */
   generateMathCall(expr, activatorId) {
@@ -150,9 +150,32 @@ class ExpressionGenerator {
       return this.generateMathTrig(mathMethod, expr, activatorId);
     }
 
+    // Handle inverse trigonometric functions
+    if (mathMethod === 'acos' || mathMethod === 'asin') {
+      if (!this.validateFunctionArgs(`Math.${mathMethod}`, expr.arguments, 1, expr)) {
+        return { type: OPERAND_TYPE.VALUE, value: 0 };
+      }
+
+      const arg = this.getOperand(this.arrowHelper.extractIdentifier(expr.arguments[0]) || expr.arguments[0], activatorId);
+      const operation = mathMethod === 'acos' ? OPERATION.ACOS : OPERATION.ASIN;
+      return { type: OPERAND_TYPE.LC, value: this.pushLogicCommand(operation, arg, { type: OPERAND_TYPE.VALUE, value: 0 }, activatorId) };
+    }
+
+    // Handle Math.atan2(y, x)
+    if (mathMethod === 'atan2') {
+      if (!this.validateFunctionArgs('Math.atan2', expr.arguments, 2, expr)) {
+        return { type: OPERAND_TYPE.VALUE, value: 0 };
+      }
+
+      const y = this.getOperand(this.arrowHelper.extractIdentifier(expr.arguments[0]) || expr.arguments[0], activatorId);
+      const x = this.getOperand(this.arrowHelper.extractIdentifier(expr.arguments[1]) || expr.arguments[1], activatorId);
+
+      return { type: OPERAND_TYPE.LC, value: this.pushLogicCommand(OPERATION.ATAN2, y, x, activatorId) };
+    }
+
     // Unsupported Math method
     this.errorHandler.addError(
-      `Unsupported Math method: Math.${mathMethod}(). Supported: abs, min, max, sin, cos, tan`,
+      `Unsupported Math method: Math.${mathMethod}(). Supported: abs, min, max, sin, cos, tan, acos, asin, atan2`,
       expr,
       'unsupported_function'
     );

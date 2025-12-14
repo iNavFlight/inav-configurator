@@ -9,6 +9,8 @@
 
 'use strict';
 
+import { OPERATION } from '../../transpiler/inav_constants.js';
+
 export default {
   // Math functions
   min: {
@@ -16,7 +18,7 @@ export default {
     desc: 'Return minimum of two values',
     params: ['a', 'b'],
     returns: 'number',
-    inavOperation: 30 // OPERATION.MIN
+    inavOperation: OPERATION.MIN
   },
   
   max: {
@@ -24,15 +26,14 @@ export default {
     desc: 'Return maximum of two values',
     params: ['a', 'b'],
     returns: 'number',
-    inavOperation: 31 // OPERATION.MAX
+    inavOperation: OPERATION.MAX
   },
   
   abs: {
     type: 'function',
     desc: 'Return absolute value',
     params: ['value'],
-    returns: 'number',
-    inavOperation: 32 // OPERATION.ABS
+    returns: 'number'
   },
   
   sin: {
@@ -41,7 +42,7 @@ export default {
     params: ['degrees'],
     returns: 'number',
     unit: '°',
-    inavOperation: 35 // OPERATION.SIN
+    inavOperation: OPERATION.SIN
   },
   
   cos: {
@@ -50,7 +51,7 @@ export default {
     params: ['degrees'],
     returns: 'number',
     unit: '°',
-    inavOperation: 36 // OPERATION.COS
+    inavOperation: OPERATION.COS
   },
   
   tan: {
@@ -59,7 +60,34 @@ export default {
     params: ['degrees'],
     returns: 'number',
     unit: '°',
-    inavOperation: 37 // OPERATION.TAN
+    inavOperation: OPERATION.TAN
+  },
+
+  acos: {
+    type: 'function',
+    desc: 'Arc cosine (returns degrees)',
+    params: ['ratio'],
+    returns: 'number',
+    unit: '°',
+    inavOperation: OPERATION.ACOS
+  },
+
+  asin: {
+    type: 'function',
+    desc: 'Arc sine (returns degrees)',
+    params: ['ratio'],
+    returns: 'number',
+    unit: '°',
+    inavOperation: OPERATION.ASIN
+  },
+
+  atan2: {
+    type: 'function',
+    desc: 'Arc tangent of y/x (returns degrees)',
+    params: ['y', 'x'],
+    returns: 'number',
+    unit: '°',
+    inavOperation: OPERATION.ATAN2
   },
   
   // Mapping functions
@@ -68,7 +96,7 @@ export default {
     desc: 'Map input value to normalized range',
     params: ['value', 'maxInput'],
     returns: 'number',
-    inavOperation: 38 // OPERATION.MAP_INPUT
+    inavOperation: OPERATION.MAP_INPUT
   },
   
   mapOutput: {
@@ -76,7 +104,7 @@ export default {
     desc: 'Map normalized value to output range',
     params: ['value', 'maxOutput'],
     returns: 'number',
-    inavOperation: 39 // OPERATION.MAP_OUTPUT
+    inavOperation: OPERATION.MAP_OUTPUT
   },
   
   // Arithmetic operations (built-in JavaScript, but documented for reference)
@@ -84,34 +112,34 @@ export default {
     type: 'operator',
     desc: 'Addition',
     operator: '+',
-    inavOperation: 14 // OPERATION.ADD
+    inavOperation: OPERATION.ADD
   },
   
   sub: {
     type: 'operator',
     desc: 'Subtraction',
     operator: '-',
-    inavOperation: 15 // OPERATION.SUB
+    inavOperation: OPERATION.SUB
   },
   
   mul: {
     type: 'operator',
     desc: 'Multiplication',
     operator: '*',
-    inavOperation: 16 // OPERATION.MUL
+    inavOperation: OPERATION.MUL
   },
   
   div: {
     type: 'operator',
     desc: 'Division',
     operator: '/',
-    inavOperation: 17 // OPERATION.DIV
+    inavOperation: OPERATION.DIV
   },
   
   mod: {
     type: 'operator',
     desc: 'Modulo (remainder)',
     operator: '%',
-    inavOperation: 18 // OPERATION.MOD
+    inavOperation: OPERATION.MODULUS
   }
 };
