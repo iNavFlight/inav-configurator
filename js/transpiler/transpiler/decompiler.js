@@ -1169,7 +1169,7 @@ class Decompiler {
     code += '// Decompiled from logic conditions\n\n';
 
     // Always include all INAV objects for user convenience
-    code += `const { flight, override, rc, gvar, waypoint, pid, edge, sticky, delay, timer, whenChanged, helpers, events } = inav;\n\n`;
+    code += `const {\n    flight, override, rc, gvar, waypoint, pid, edge\n    sticky, delay, timer, whenChanged, helpers, events \n} = inav;\n\n`;
 
     // Add variable declarations from variable map
     // Note: sticky/latch variables are declared inline with var latch = sticky({...})
