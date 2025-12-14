@@ -189,6 +189,12 @@ class ConditionGenerator {
         // Generate with appropriate activator and cache the result
         const resultId = this.generate(resolution.ast, targetActivator);
         this.conditionCache.set(cacheKey, resultId);
+
+        // Track LC index for this let variable (for variable map)
+        if (this.variableHandler && this.variableHandler.setLetVariableLCIndex) {
+          this.variableHandler.setLetVariableLCIndex(varName, resultId);
+        }
+
         return resultId;
       }
     }

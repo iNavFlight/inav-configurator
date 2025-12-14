@@ -116,15 +116,20 @@ describe('AND/OR Operator Precedence', () => {
 
     expect(result.success).toBe(true);
 
-    // The key test: OR result must be wrapped in parentheses
-    // Look for the pattern: && (something || something)
-    const hasCorrectPrecedence = result.code.includes('&& (') &&
+    // The key test: OR result must be either:
+    // 1. Wrapped in parentheses: && (something || something), OR
+    // 2. Hoisted to a variable: const cond1 = a || b; ... && cond1
+    const hasInlineParens = result.code.includes('&& (') &&
       result.code.includes('||') &&
       result.code.includes(')');
+    const hasHoistedOr = result.code.includes('const cond') &&
+      result.code.includes('||');
 
-    // More specific: should NOT have "&&" followed directly by a comparison without parens
+    const hasCorrectPrecedence = hasInlineParens || hasHoistedOr;
+
+    // More specific: should NOT have "&&" followed directly by a comparison without parens/hoisting
     // Bad: "rc[12].low && flight.throttlePos < 2 || flight.current < 300"
-    // Good: "rc[12].low && (flight.throttlePos < 2 || flight.current < 300)"
+    // Good: "rc[12].low && (flight.throttlePos < 2 || flight.current < 300)" or hoisted variable
     const badPattern = /\.low && flight\.\w+ < \d+ \|\|/;
     const hasBadPrecedence = badPattern.test(result.code);
 
@@ -215,10 +220,12 @@ describe('AND/OR Operator Precedence', () => {
     expect(orPattern.test(result.code)).toBe(true);
     expect(andPattern.test(result.code)).toBe(true);
 
-    // Check that we have parentheses around the OR
-    // The expression should contain "(&& (" or similar pattern showing parens after &&
+    // Check that we have either:
+    // 1. Parentheses around the OR: && (a || b)
+    // 2. Hoisted variable: const cond1 = a || b; ... && cond1
     const hasParensAroundOr = /&&\s*\([^)]*\|\|[^)]*\)/.test(result.code);
-    expect(hasParensAroundOr).toBe(true);
+    const hasHoistedOr = result.code.includes('const cond') && result.code.includes('||');
+    expect(hasParensAroundOr || hasHoistedOr).toBe(true);
   });
 
   test('standalone OR should work without extra parentheses in simple cases', () => {

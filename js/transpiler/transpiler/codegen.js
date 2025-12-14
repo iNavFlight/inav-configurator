@@ -826,6 +826,12 @@ class INAVCodeGenerator {
           // Generate with appropriate activator and cache the operand
           const operand = this.getOperand(resolution.ast, targetActivator);
           this.constOperandCache.set(cacheKey, operand);
+
+          // Track LC index for this let variable (for variable map)
+          if (this.variableHandler && this.variableHandler.setLetVariableLCIndex && operand.type === 4) {
+            this.variableHandler.setLetVariableLCIndex(value, operand.value);
+          }
+
           return operand;
         } else if (resolution.type === 'var_gvar') {
           // Replace with gvar reference and continue
@@ -955,10 +961,33 @@ class INAVCodeGenerator {
 
     for (const [name, symbol] of this.variableHandler.symbols.entries()) {
       if (symbol.kind === 'let') {
-        map.let_variables[name] = {
-          expression: this.astToExpressionString(symbol.expressionAST),
-          type: 'let'
-        };
+        const lcIndex = this.variableHandler.letVariableLCIndices.get(name);
+
+        // Only include variables that generated LCs (were actually used)
+        // Variables that were fully inlined or unused won't have LC indices
+        if (lcIndex === undefined) {
+          continue;
+        }
+
+        const expression = this.astToExpressionString(symbol.expressionAST);
+
+        // Skip expressions that contain invalid/unknown parts
+        // These happen when AST references other variables that were also inlined
+        if (expression.includes('undefined') || expression.includes('/* unknown expression */')) {
+          // Still store the variable, but with a placeholder expression
+          // The lcIndex is what matters for decompiler name matching
+          map.let_variables[name] = {
+            expression: '/* expression unavailable */',
+            lcIndex: lcIndex,
+            type: 'let'
+          };
+        } else {
+          map.let_variables[name] = {
+            expression: expression,
+            lcIndex: lcIndex,
+            type: 'let'
+          };
+        }
       } else if (symbol.kind === 'var') {
         map.var_variables[name] = {
           gvar: symbol.gvarIndex,
@@ -1033,6 +1062,12 @@ class INAVCodeGenerator {
         const args = (ast.arguments || []).map(arg => this.astToExpressionString(arg)).join(', ');
         return `${callee}(${args})`;
       }
+
+      case 'ConditionalExpression':
+        return `${this.astToExpressionString(ast.test)} ? (${this.astToExpressionString(ast.consequent)}) : ${this.astToExpressionString(ast.alternate)}`;
+
+      case 'LogicalExpression':
+        return `(${this.astToExpressionString(ast.left)} ${ast.operator} ${this.astToExpressionString(ast.right)})`;
 
       default:
         // Fallback: try to extract value property if available
