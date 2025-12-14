@@ -192,7 +192,7 @@ class Decompiler {
     this.variableMap = variableMap;
     this.stickyVarNames = new Map(); // Map LC index -> generated variable name
     this.predeclaredStickyVars = new Set(); // Track stickys with activators that need pre-declaration
-    this.usedFeatures = new Set();   // Track which imports are needed (structural, not string scanning)
+    // Note: All INAV objects are always imported for user convenience
     this.inlineDeclaredVars = new Set(); // Track let variables declared inline in body
     this.hoistedVarCounters = new Map(); // Track counters for hoisted variable names (e.g., min, min2, min3)
 
@@ -761,7 +761,6 @@ class Decompiler {
     const declaration = isPredeclared ? `${varName}` : `var ${varName}`;
 
     // Show the sticky with var declaration or assignment
-    this.usedFeatures.add('sticky');
     lines.push(indentStr + `${declaration} = sticky({`);
     lines.push(indentStr + `  on: () => ${pattern.onCondition},`);
     lines.push(indentStr + `  off: () => ${pattern.offCondition}`);
@@ -838,22 +837,18 @@ class Decompiler {
     const body = childCodes.join('\n');
 
     if (pattern.type === 'edge') {
-      this.usedFeatures.add('edge');
       lines.push(indentStr + `edge(() => ${pattern.condition}, ${pattern.duration}, () => {`);
       if (body) lines.push(body);
       lines.push(indentStr + '});');
     } else if (pattern.type === 'delay') {
-      this.usedFeatures.add('delay');
       lines.push(indentStr + `delay(() => ${pattern.condition}, ${pattern.duration}, () => {`);
       if (body) lines.push(body);
       lines.push(indentStr + '});');
     } else if (pattern.type === 'timer') {
-      this.usedFeatures.add('timer');
       lines.push(indentStr + `timer(${pattern.onMs}, ${pattern.offMs}, () => {`);
       if (body) lines.push(body);
       lines.push(indentStr + '});');
     } else if (pattern.type === 'whenChanged') {
-      this.usedFeatures.add('whenChanged');
       lines.push(indentStr + `delta(${pattern.value}, ${pattern.threshold}, () => {`);
       if (body) lines.push(body);
       lines.push(indentStr + '});');
@@ -930,10 +925,6 @@ class Decompiler {
 
       case OPERAND_TYPE.FLIGHT:
       case OPERAND_TYPE.WAYPOINTS: {
-        // Track waypoint usage for imports
-        if (type === OPERAND_TYPE.WAYPOINTS) {
-          this.usedFeatures.add('waypoint');
-        }
         // Try to get property name from API definitions
         const prop = this.getPropertyFromOperand(type, value);
         if (prop) {
@@ -1007,7 +998,6 @@ class Decompiler {
             }
             // EDGE: returns true on rising edge of condition for duration ms
             if (referencedLC.operation === OPERATION.EDGE) {
-              this.usedFeatures.add('edge');
               const underlyingCond = this.decompileOperand(OPERAND_TYPE.LC, referencedLC.operandAValue, allConditions, visited);
               const edgeExpr = `edge(${underlyingCond}, ${referencedLC.operandBValue})`;
               // Wrap with activator check if LC has one
@@ -1020,7 +1010,6 @@ class Decompiler {
             }
             // DELAY: returns true after condition held for duration ms
             if (referencedLC.operation === OPERATION.DELAY) {
-              this.usedFeatures.add('delay');
               const underlyingCond = this.decompileOperand(OPERAND_TYPE.LC, referencedLC.operandAValue, allConditions, visited);
               const delayExpr = `delay(${underlyingCond}, ${referencedLC.operandBValue})`;
               // Wrap with activator check if LC has one
@@ -1051,7 +1040,6 @@ class Decompiler {
 
       case OPERAND_TYPE.PID:
         // PID operands 0-3 map to pid[0].output through pid[3].output
-        this.usedFeatures.add('pid');
         if (value >= 0 && value < 4) {
           return `pid[${value}].output`;
         }
@@ -1180,17 +1168,8 @@ class Decompiler {
     code += '// INAV JavaScript Programming\n';
     code += '// Decompiled from logic conditions\n\n';
 
-    // Add destructuring - use structural tracking (usedFeatures) instead of string scanning
-    const imports = ['flight', 'override', 'rc', 'gvar'];
-    if (this.usedFeatures.has('edge')) imports.push('edge');
-    if (this.usedFeatures.has('sticky')) imports.push('sticky');
-    if (this.usedFeatures.has('delay')) imports.push('delay');
-    if (this.usedFeatures.has('timer')) imports.push('timer');
-    if (this.usedFeatures.has('whenChanged')) imports.push('whenChanged');
-    if (this.usedFeatures.has('waypoint')) imports.push('waypoint');
-    if (this.usedFeatures.has('pid')) imports.push('pid');
-
-    code += `const { ${imports.join(', ')} } = inav;\n\n`;
+    // Always include all INAV objects for user convenience
+    code += `const { flight, override, rc, gvar, waypoint, pid, edge, sticky, delay, timer, whenChanged, helpers, events } = inav;\n\n`;
 
     // Add variable declarations from variable map
     // Note: sticky/latch variables are declared inline with var latch = sticky({...})
