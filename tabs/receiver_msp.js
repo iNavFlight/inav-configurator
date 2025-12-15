@@ -130,7 +130,6 @@ function localizeAxisNames() {
 }
 
 $(function() {
-    console.log('receiver_msp.js loaded - check terminal for debug output');
 
     $("a.button-enable").on('click', function () {
 
@@ -163,8 +162,6 @@ $(function() {
             initialValue = stickValues["ch" + (sliderIndex + 5)],
             sliderElement = this;
 
-        console.log('Creating slider', sliderIndex, 'with initial value:', initialValue);
-
         try {
             noUiSlider.create(sliderElement, {
                 start: [initialValue],
@@ -185,7 +182,6 @@ $(function() {
             $(sliderElement).append('<div class="tooltip"></div>');
 
             $(".tooltip", sliderElement).text(initialValue);
-            console.log('Slider', sliderIndex, 'created successfully');
         } catch (err) {
             console.error('Failed to create slider', sliderIndex, ':', err);
         }
