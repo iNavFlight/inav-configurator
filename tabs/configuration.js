@@ -266,6 +266,8 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         // Wait for settings to load before triggering change event
         settingsPromise.then(function() {
             $i2cSpeed.trigger('change');
+        }).catch(function(error) {
+            console.error('Settings load failed, I2C speed change not triggered:', error);
         });
 
         $('a.save').on('click', function () {

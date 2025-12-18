@@ -92,8 +92,8 @@ TABS.receiver.initialize = function (callback) {
         });
 
         // Wait for settings to load before triggering change events
+        // Trigger receiverMode which will trigger serialRxProvider when mode is SERIAL
         settingsPromise.then(function() {
-            $serialRxProvider.trigger("change");
             $receiverMode.trigger("change");
         });
 
