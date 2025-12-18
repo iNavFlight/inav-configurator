@@ -45,7 +45,7 @@ TABS.receiver.initialize = function (callback) {
         Settings.saveInputs(onComplete);
     }
 
-    function process_html() {
+    function process_html(settingsPromise) {
         // translate to user-selected language
        i18n.localize();;
 
@@ -79,8 +79,6 @@ TABS.receiver.initialize = function (callback) {
             }
         });
 
-        $serialRxProvider.trigger("change");
-
         $receiverMode.on('change', function () {
             if ($(this).find("option:selected").text() == "SERIAL") {
                 $serialWrapper.show();
@@ -93,7 +91,11 @@ TABS.receiver.initialize = function (callback) {
             }
         });
 
-        $receiverMode.trigger("change");
+        // Wait for settings to load before triggering change events
+        settingsPromise.then(function() {
+            $serialRxProvider.trigger("change");
+            $receiverMode.trigger("change");
+        });
 
         // fill in data from RC_tuning
         $('.tunings .throttle input[name="mid"]').val(FC.RC_tuning.throttle_MID.toFixed(2));
