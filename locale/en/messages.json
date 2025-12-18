@@ -1099,13 +1099,13 @@
         "message": "Higher current allowed for short bursts (punch-outs, climbs). Example: 750 = 75A. Should be >= continuous limit."
     },
     "configurationLimitBurstCurrentTime": {
-        "message": "Burst Time (ds)"
+        "message": "Burst Current Time (ds)"
     },
     "configurationLimitBurstCurrentTimeHelp": {
         "message": "Duration burst current is allowed in deci-seconds (ds). Example: 100 = 10 seconds. After this time, limit falls to continuous."
     },
     "configurationLimitBurstCurrentFalldownTime": {
-        "message": "Burst Falldown Time (ds)"
+        "message": "Burst Current Falldown Time (ds)"
     },
     "configurationLimitBurstCurrentFalldownTimeHelp": {
         "message": "Smooth ramp-down time from burst to continuous limit in deci-seconds (ds). Example: 20 = 2 seconds."
@@ -1123,13 +1123,13 @@
         "message": "Higher power allowed for short bursts. Example: 10000 = 1000W. Should be >= continuous limit."
     },
     "configurationLimitBurstPowerTime": {
-        "message": "Burst Time (ds)"
+        "message": "Burst Power Time (ds)"
     },
     "configurationLimitBurstPowerTimeHelp": {
         "message": "Duration burst power is allowed in deci-seconds (ds). Example: 50 = 5 seconds."
     },
     "configurationLimitBurstPowerFalldownTime": {
-        "message": "Burst Falldown Time (ds)"
+        "message": "Burst Power Falldown Time (ds)"
     },
     "configurationLimitBurstPowerFalldownTimeHelp": {
         "message": "Smooth ramp-down time from burst to continuous power limit in deci-seconds (ds). Example: 10 = 1 second."
