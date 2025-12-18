@@ -31,9 +31,19 @@ let selectBluetoothCallback = null;
 
 const store = new Store();
 
-// Workaround for some Linux systems: https://github.com/electron/electron/issues/32760 
+// Workaround for some Linux systems: https://github.com/electron/electron/issues/32760
 if (store.get('disable_3d_acceleration', false)) {
   app.disableHardwareAcceleration();
+}
+
+// Enable remote debugging in development mode
+// This allows chrome://inspect and Playwright CDP connections
+if (!app.isPackaged) {  // Development mode (not packaged)
+  const port = process.env.CDP_PORT ?? '9222';
+  app.commandLine.appendSwitch('remote-debugging-port', port);
+  console.log(`[cdp] Remote debugging enabled on port ${port}`);
+  console.log(`   Chrome DevTools: chrome://inspect`);
+  console.log(`   CDP Endpoint: http://localhost:${port}`);
 }
 
 // In Electron the bluetooth device chooser didn't exist, so we have to build our own
