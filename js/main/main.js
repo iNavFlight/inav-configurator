@@ -41,7 +41,7 @@ if (store.get('disable_3d_acceleration', false)) {
 if (!app.isPackaged) {  // Development mode (not packaged)
   const port = '9222';
   app.commandLine.appendSwitch('remote-debugging-port', port);
-  console.log(`🔍 Remote debugging enabled on port ${port}`);
+  console.log(`[cdp] Remote debugging enabled on port ${port}`);
   console.log(`   Chrome DevTools: chrome://inspect`);
   console.log(`   CDP Endpoint: http://localhost:${port}`);
 }
