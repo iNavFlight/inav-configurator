@@ -39,7 +39,7 @@ if (store.get('disable_3d_acceleration', false)) {
 // Enable remote debugging in development mode
 // This allows chrome://inspect and Playwright CDP connections
 if (!app.isPackaged) {  // Development mode (not packaged)
-  const port = '9222';
+  const port = process.env.CDP_PORT ?? '9222';
   app.commandLine.appendSwitch('remote-debugging-port', port);
   console.log(`[cdp] Remote debugging enabled on port ${port}`);
   console.log(`   Chrome DevTools: chrome://inspect`);
