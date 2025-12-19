@@ -38,7 +38,7 @@ let passed = 0;
 let failed = 0;
 
 // Test 1: Basic throttle override still works
-passed += runTest('throttle override compiles', () => {
+if (runTest('throttle override compiles', () => {
   const code = `
 const { flight, override } = inav;
 if (flight.isArmed) {
@@ -51,10 +51,14 @@ if (flight.isArmed) {
   }
   assertEquals(result.success, true, 'Compilation should succeed');
   assertContains(result.commands.join(' '), '29', 'Should contain operation 29 (OVERRIDE_THROTTLE)');
-});
+})) {
+  passed++;
+} else {
+  failed++;
+}
 
 // Test 2: VTX override with nested object still works
-passed += runTest('vtx.power override compiles', () => {
+if (runTest('vtx.power override compiles', () => {
   const code = `
 const { flight, override } = inav;
 if (flight.homeDistance > 100) {
@@ -67,10 +71,14 @@ if (flight.homeDistance > 100) {
   }
   assertEquals(result.success, true, 'Compilation should succeed');
   assertContains(result.commands.join(' '), '25', 'Should contain operation 25 (SET_VTX_POWER_LEVEL)');
-});
+})) {
+  passed++;
+} else {
+  failed++;
+}
 
 // Test 3: VTX band override
-passed += runTest('vtx.band override compiles', () => {
+if (runTest('vtx.band override compiles', () => {
   const code = `
 const { override } = inav;
 override.vtx.band = 2;
@@ -81,10 +89,14 @@ override.vtx.band = 2;
     throw new Error(`Compilation failed: ${result.error}`);
   }
   assertContains(result.commands.join(' '), '30', 'Should contain operation 30 (SET_VTX_BAND)');
-});
+})) {
+  passed++;
+} else {
+  failed++;
+}
 
 // Test 4: VTX channel override
-passed += runTest('vtx.channel override compiles', () => {
+if (runTest('vtx.channel override compiles', () => {
   const code = `
 const { override } = inav;
 override.vtx.channel = 5;
@@ -95,10 +107,14 @@ override.vtx.channel = 5;
     throw new Error(`Compilation failed: ${result.error}`);
   }
   assertContains(result.commands.join(' '), '31', 'Should contain operation 31 (SET_VTX_CHANNEL)');
-});
+})) {
+  passed++;
+} else {
+  failed++;
+}
 
 // Test 5: Throttle scale override
-passed += runTest('throttleScale override compiles', () => {
+if (runTest('throttleScale override compiles', () => {
   const code = `
 const { override } = inav;
 override.throttleScale = 75;
@@ -109,10 +125,14 @@ override.throttleScale = 75;
     throw new Error(`Compilation failed: ${result.error}`);
   }
   assertContains(result.commands.join(' '), '23', 'Should contain operation 23 (OVERRIDE_THROTTLE_SCALE)');
-});
+})) {
+  passed++;
+} else {
+  failed++;
+}
 
 // Test 6: Arm safety override
-passed += runTest('armSafety override compiles', () => {
+if (runTest('armSafety override compiles', () => {
   const code = `
 const { override } = inav;
 override.armSafety = true;
@@ -123,10 +143,14 @@ override.armSafety = true;
     throw new Error(`Compilation failed: ${result.error}`);
   }
   assertContains(result.commands.join(' '), '22', 'Should contain operation 22 (OVERRIDE_ARMING_SAFETY)');
-});
+})) {
+  passed++;
+} else {
+  failed++;
+}
 
 // Test 7: OSD layout override
-passed += runTest('osdLayout override compiles', () => {
+if (runTest('osdLayout override compiles', () => {
   const code = `
 const { override } = inav;
 override.osdLayout = 2;
@@ -137,10 +161,14 @@ override.osdLayout = 2;
     throw new Error(`Compilation failed: ${result.error}`);
   }
   assertContains(result.commands.join(' '), '32', 'Should contain operation 32 (SET_OSD_LAYOUT)');
-});
+})) {
+  passed++;
+} else {
+  failed++;
+}
 
 // Test 8: Loiter radius override
-passed += runTest('loiterRadius override compiles', () => {
+if (runTest('loiterRadius override compiles', () => {
   const code = `
 const { override } = inav;
 override.loiterRadius = 5000;
@@ -151,10 +179,14 @@ override.loiterRadius = 5000;
     throw new Error(`Compilation failed: ${result.error}`);
   }
   assertContains(result.commands.join(' '), '41', 'Should contain operation 41 (LOITER_OVERRIDE)');
-});
+})) {
+  passed++;
+} else {
+  failed++;
+}
 
 // Test 9: Min ground speed override
-passed += runTest('minGroundSpeed override compiles', () => {
+if (runTest('minGroundSpeed override compiles', () => {
   const code = `
 const { override } = inav;
 override.minGroundSpeed = 10;
@@ -165,10 +197,14 @@ override.minGroundSpeed = 10;
     throw new Error(`Compilation failed: ${result.error}`);
   }
   assertContains(result.commands.join(' '), '56', 'Should contain operation 56 (OVERRIDE_MIN_GROUND_SPEED)');
-});
+})) {
+  passed++;
+} else {
+  failed++;
+}
 
 // Test 10: Multiple overrides in one block
-passed += runTest('multiple overrides in same block', () => {
+if (runTest('multiple overrides in same block', () => {
   const code = `
 const { flight, override } = inav;
 if (flight.isArmed) {
@@ -182,10 +218,14 @@ if (flight.isArmed) {
   }
   assertContains(result.commands.join(' '), '29', 'Should contain OVERRIDE_THROTTLE');
   assertContains(result.commands.join(' '), '25', 'Should contain SET_VTX_POWER_LEVEL');
-});
+})) {
+  passed++;
+} else {
+  failed++;
+}
 
 // Test 11: Flight axis override doesn't break other overrides
-passed += runTest('flight axis and regular overrides together', () => {
+if (runTest('flight axis and regular overrides together', () => {
   const code = `
 const { flight, override } = inav;
 if (flight.isArmed) {
@@ -201,10 +241,14 @@ if (flight.isArmed) {
   assertContains(result.commands.join(' '), '45', 'Should contain FLIGHT_AXIS_ANGLE_OVERRIDE');
   assertContains(result.commands.join(' '), '29', 'Should contain OVERRIDE_THROTTLE');
   assertContains(result.commands.join(' '), '25', 'Should contain SET_VTX_POWER_LEVEL');
-});
+})) {
+  passed++;
+} else {
+  failed++;
+}
 
 // Test 12: Invalid override target should fail gracefully
-passed += runTest('invalid override target produces error', () => {
+if (runTest('invalid override target produces error', () => {
   const code = `
 const { override } = inav;
 override.invalidProperty = 100;
@@ -212,10 +256,14 @@ override.invalidProperty = 100;
   const transpiler = new Transpiler();
   const result = transpiler.transpile(code);
   assertEquals(result.success, false, 'Compilation should fail');
-});
+})) {
+  passed++;
+} else {
+  failed++;
+}
 
 // Test 13: Decompile existing overrides
-passed += runTest('decompile throttle override', () => {
+if (runTest('decompile throttle override', () => {
   const decompiler = new Decompiler();
   const lcs = [
     {
@@ -234,10 +282,14 @@ passed += runTest('decompile throttle override', () => {
     throw new Error(`Decompilation failed: ${result.error || JSON.stringify(result)}`);
   }
   assertContains(result.code, 'override.throttle', 'Should contain override.throttle');
-});
+})) {
+  passed++;
+} else {
+  failed++;
+}
 
 // Test 14: Decompile VTX power
-passed += runTest('decompile vtx.power override', () => {
+if (runTest('decompile vtx.power override', () => {
   const decompiler = new Decompiler();
   const lcs = [
     {
@@ -256,7 +308,11 @@ passed += runTest('decompile vtx.power override', () => {
     throw new Error(`Decompilation failed: ${result.error || JSON.stringify(result)}`);
   }
   assertContains(result.code, 'override.vtx.power', 'Should contain override.vtx.power');
-});
+})) {
+  passed++;
+} else {
+  failed++;
+}
 
 console.log('\n==================================================');
 console.log(`📊 Test Results:`);
