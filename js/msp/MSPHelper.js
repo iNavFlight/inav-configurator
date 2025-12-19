@@ -1153,10 +1153,12 @@ var mspHelper = (function () {
                     // Check if firmware supports VTX table (INAV 9.0+)
                     if (offset < data.byteLength) {
                         const vtxtable_available = data.getUint8(offset++);
-                        if (vtxtable_available && offset + 2 < data.byteLength) {
-                            FC.VTX_CONFIG.band_count = data.getUint8(offset++);
-                            FC.VTX_CONFIG.channel_count = data.getUint8(offset++);
-                            FC.VTX_CONFIG.power_count = data.getUint8(offset++);
+                        if (vtxtable_available) {
+                            if (offset + 2 < data.byteLength) {
+                                FC.VTX_CONFIG.band_count = data.getUint8(offset++);
+                                FC.VTX_CONFIG.channel_count = data.getUint8(offset++);
+                                FC.VTX_CONFIG.power_count = data.getUint8(offset++);
+                            }
 
                             // Check if firmware sends powerMin (INAV 9.1+)
                             if (offset < data.byteLength) {
