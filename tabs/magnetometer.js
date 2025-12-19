@@ -621,12 +621,90 @@ TABS.magnetometer.initialize = function (callback) {
     }
 
 
+    /**
+     * Build rotation matrix matching INAV's rotationMatrixFromAngles()
+     * Source: inav/src/main/common/maths.c
+     *
+     * INAV uses ZYX rotation order (yaw -> pitch -> roll)
+     * This matrix is used to transform sensor data based on board alignment
+     *
+     * @param {number} roll_deg - Roll angle in degrees
+     * @param {number} pitch_deg - Pitch angle in degrees
+     * @param {number} yaw_deg - Yaw angle in degrees
+     * @returns {Array<Array<number>>} 3x3 rotation matrix
+     */
+    function buildRotationMatrix(roll_deg, pitch_deg, yaw_deg) {
+        const roll = roll_deg * Math.PI / 180;
+        const pitch = pitch_deg * Math.PI / 180;
+        const yaw = yaw_deg * Math.PI / 180;
+
+        const cosx = Math.cos(roll);
+        const sinx = Math.sin(roll);
+        const cosy = Math.cos(pitch);
+        const siny = Math.sin(pitch);
+        const cosz = Math.cos(yaw);
+        const sinz = Math.sin(yaw);
+
+        const coszcosx = cosz * cosx;
+        const sinzcosx = sinz * cosx;
+        const coszsinx = sinx * cosz;
+        const sinzsinx = sinx * sinz;
+
+        // INAV's rotation matrix (matches firmware exactly)
+        // This is the matrix R used in the transformation: transformed = R^T * raw
+        return [
+            [cosz * cosy,                      -cosy * sinz,                      siny                    ],
+            [sinzcosx + (coszsinx * siny),     coszcosx - (sinzsinx * siny),      -sinx * cosy            ],
+            [(sinzsinx) - (coszcosx * siny),   (coszsinx) + (sinzcosx * siny),    cosy * cosx             ]
+        ];
+    }
+
+    /**
+     * Apply rotation matrix to a vector using standard matrix multiplication
+     *
+     * IMPORTANT: INAV's rotationMatrixRotateVector uses R^T (columns): transformed = R^T * raw
+     * To invert this transformation: raw = R * transformed (apply R, NOT R^T)
+     *
+     * @param {Array<Array<number>>} R - 3x3 rotation matrix
+     * @param {Array<number>} vec - 3D vector [x, y, z]
+     * @returns {Array<number>} Rotated vector [x', y', z']
+     */
+    function applyRotation(R, vec) {
+        return [
+            R[0][0]*vec[0] + R[0][1]*vec[1] + R[0][2]*vec[2],  // Standard: use rows
+            R[1][0]*vec[0] + R[1][1]*vec[1] + R[1][2]*vec[2],
+            R[2][0]*vec[0] + R[2][1]*vec[1] + R[2][2]*vec[2]
+        ];
+    }
+
+    /**
+     * Calculate raw sensor data from MSP_RAW_IMU reading
+     *
+     * MSP_RAW_IMU is misnamed - it returns TRANSFORMED data (after board alignment)
+     * when board alignment is non-zero. This function reverses the transformation
+     * to get the actual raw sensor readings.
+     *
+     * @param {Array<number>} transformed - Accelerometer data from MSP_RAW_IMU [x, y, z] in g's
+     * @param {number} board_pitch - Current board alignment pitch in degrees
+     * @param {number} board_roll - Current board alignment roll in degrees
+     * @param {number} board_yaw - Current board alignment yaw in degrees
+     * @returns {Array<number>} Raw sensor data [x, y, z] in g's
+     */
+    function calculateRawFromTransformed(transformed, board_pitch, board_roll, board_yaw) {
+        // Build the rotation matrix used by INAV
+        const R = buildRotationMatrix(board_roll, board_pitch, board_yaw);
+
+        // INAV applies R^T to get transformed data: transformed = R^T * raw
+        // To invert: raw = R * transformed (apply R without transpose)
+        return applyRotation(R, transformed);
+    }
+
     function getMagHeading() {
         // console.log(FC.SENSOR_DATA.magnetometer);
         let magADC = FC.SENSOR_DATA.magnetometer.map((x) => x * 1090);
-        
-        // The gain and scale are done by inav in compass.c right after the values are read, 
-       
+
+        // The gain and scale are done by inav in compass.c right after the values are read,
+
         let magHeading = rad2degrees ( Math.atan2(-1 * magADC[1], magADC[0]) );
         console.log("magHeading (degrees): " + magHeading.toString());
         return magHeading;
@@ -683,12 +761,48 @@ TABS.magnetometer.initialize = function (callback) {
     }
 
     function accAutoAlignReadFlat() {
+        // Get accelerometer data from MSP_RAW_IMU
+        let acc_g_transformed = [...FC.SENSOR_DATA.accelerometer];
 
-        let acc_g_flat = [...FC.SENSOR_DATA.accelerometer];
+        // Check if board already has non-zero alignment
+        const hasAlignment = self.boardAlignmentConfig.pitch !== 0 ||
+                           self.boardAlignmentConfig.roll !== 0 ||
+                           self.boardAlignmentConfig.yaw !== 0;
 
+        let acc_g_flat;
+        if (hasAlignment) {
+            // MSP_RAW_IMU returns TRANSFORMED data when alignment is set
+            // Apply inverse transformation to get true raw sensor readings
+            console.log("Board has existing alignment - applying inverse transformation");
+            console.log("Current alignment: pitch=" + self.boardAlignmentConfig.pitch +
+                       "°, roll=" + self.boardAlignmentConfig.roll +
+                       "°, yaw=" + self.boardAlignmentConfig.yaw + "°");
+
+            acc_g_flat = calculateRawFromTransformed(
+                acc_g_transformed,
+                self.boardAlignmentConfig.pitch,
+                self.boardAlignmentConfig.roll,
+                self.boardAlignmentConfig.yaw
+            );
+            console.log("Transformed data: [" + acc_g_transformed.map(x => x.toFixed(3)).join(", ") + "] g");
+            console.log("Raw data (inverse): [" + acc_g_flat.map(x => x.toFixed(3)).join(", ") + "] g");
+        } else {
+            // No alignment set - data is already raw (INAV optimization at boardalignment.c:100-102)
+            acc_g_flat = acc_g_transformed;
+            console.log("No board alignment - data is raw: [" + acc_g_flat.map(x => x.toFixed(3)).join(", ") + "] g");
+        }
+
+        // Check gravity magnitude to ensure valid reading
         let A = Math.sqrt(acc_g_flat[0] ** 2 + acc_g_flat[1] ** 2 + acc_g_flat[2] ** 2);
+        console.log("Gravity magnitude: " + A.toFixed(3) + "g");
 
         if (A > 1.15 || A < 0.85) {
+            console.error("Gravity magnitude out of range: " + A.toFixed(3) + "g (expected 0.85-1.15g)");
+            console.error("This usually means:");
+            console.error("  - Board moved during reading");
+            console.error("  - Accelerometer needs calibration");
+            console.error("  - Board is on an unstable surface");
+
             modal = new jBox('Modal', {
                 width: 460,
                 height: 360,
@@ -699,12 +813,12 @@ TABS.magnetometer.initialize = function (callback) {
             return;
         }
 
-
-
+        // Calculate pitch and roll from raw accelerometer data
+        // Note: Using standard aerospace conventions
         let roll = ( Math.atan2(acc_g_flat[1], acc_g_flat[2]) * 180/Math.PI ) % 360;
         let pitch = ( Math.atan2(-1 * acc_g_flat[0], Math.sqrt(acc_g_flat[1] ** 2 + acc_g_flat[2] ** 2)) * 180/Math.PI ) % 360;
         self.acc_flat_xyz = new Array(pitch, roll, 0);
-        console.log("pitch: " + pitch + ", roll: " + roll);
+        console.log("Calculated attitude: pitch=" + pitch.toFixed(1) + "°, roll=" + roll.toFixed(1) + "°");
 
         heading_flat = getMagHeading();
 
@@ -725,11 +839,52 @@ TABS.magnetometer.initialize = function (callback) {
         var acc_align;
         var i;
 
-        let acc_g_45 = [...FC.SENSOR_DATA.accelerometer];
+        // Get accelerometer data from MSP_RAW_IMU
+        let acc_g_transformed = [...FC.SENSOR_DATA.accelerometer];
+
+        // Check if board already has non-zero alignment
+        const hasAlignment = self.boardAlignmentConfig.pitch !== 0 ||
+                           self.boardAlignmentConfig.roll !== 0 ||
+                           self.boardAlignmentConfig.yaw !== 0;
+
+        let acc_g_45;
+        if (hasAlignment) {
+            // Apply inverse transformation to get raw sensor data
+            console.log("Applying inverse transformation for 45° reading");
+            acc_g_45 = calculateRawFromTransformed(
+                acc_g_transformed,
+                self.boardAlignmentConfig.pitch,
+                self.boardAlignmentConfig.roll,
+                self.boardAlignmentConfig.yaw
+            );
+            console.log("Raw data (45°): [" + acc_g_45.map(x => x.toFixed(3)).join(", ") + "] g");
+        } else {
+            // No alignment - data is already raw
+            acc_g_45 = acc_g_transformed;
+        }
+
+        // Check gravity magnitude again
+        let A = Math.sqrt(acc_g_45[0] ** 2 + acc_g_45[1] ** 2 + acc_g_45[2] ** 2);
+        console.log("Gravity magnitude (45°): " + A.toFixed(3) + "g");
+
+        if (A > 1.15 || A < 0.85) {
+            console.error("Gravity magnitude out of range at 45°: " + A.toFixed(3) + "g");
+            console.error("Board may have moved between readings!");
+
+            modal = new jBox('Modal', {
+                width: 460,
+                height: 360,
+                animation: false,
+                closeOnClick: true,
+                content: $('#modal-acc-align-calibration-error')
+            }).open();
+            return;
+        }
 
         let roll = Math.atan2(acc_g_45[1], acc_g_45[2]) * 180/Math.PI;
         let pitch = Math.atan2(-1 * acc_g_45[0], Math.sqrt(acc_g_45[1] ** 2 + acc_g_45[2] ** 2)) * 180/Math.PI;
         let acc_45_xyz = new Array(pitch, roll, 0);
+        console.log("Calculated attitude (45°): pitch=" + pitch.toFixed(1) + "°, roll=" + roll.toFixed(1) + "°");
 
         for (i = 0; i < acc_g_45.length; i++) {
             self.acc_flat_xyz[i] = Math.round( self.acc_flat_xyz[i] / 45 ) * 45;
