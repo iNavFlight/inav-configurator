@@ -6,7 +6,7 @@ import './../js/libraries/jquery.flightindicators';
 
 import MSPChainerClass from './../js/msp/MSPchainer';
 import FC from './../js/fc';
-import { GUI, TABS } from './../js/gui';
+import GUI from './../js/gui';
 import MSP from './../js/msp';
 import MSPCodes from './../js/msp/MSPCodes';
 import i18n from './../js/localization';
@@ -17,15 +17,15 @@ import { mixer } from './../js/model';
 import BitHelper from './../js/bitHelper';
 import dialog from '../js/dialog';
 
-TABS.setup = {
-    yaw_fix: 0.0
-};
+const setupTab = {};
 
-TABS.setup.initialize = function (callback) {
+setupTab.yaw_fix = 0.0;
+
+setupTab.initialize = function (callback) {
     var self = this;
 
-    if (GUI.active_tab != 'setup') {
-        GUI.active_tab = 'setup';
+    if (GUI.active_tab !== this) {
+        GUI.active_tab = this;
     }
 
     var loadChainer = new MSPChainerClass();
@@ -99,7 +99,7 @@ TABS.setup.initialize = function (callback) {
                     GUI.tab_switch_cleanup(function () {
                         MSP.send_message(MSPCodes.MSP_SET_REBOOT, false, false, function() {
                             GUI.log(i18n.getMessage('deviceRebooting'));
-                            GUI.handleReconnect();
+                            GUI.handleReconnect(true);
                         });
                     });
                 });
@@ -207,7 +207,7 @@ TABS.setup.initialize = function (callback) {
     }
 };
 
-TABS.setup.initialize3D = function () {
+setupTab.initialize3D = function () {
     var self = this,
         loader,
         canvas,
@@ -312,8 +312,10 @@ TABS.setup.initialize3D = function () {
     $(window).on('resize', this.resize3D);
 };
 
-TABS.setup.cleanup = function (callback) {
+setupTab.cleanup = function (callback) {
     $(window).off('resize', this.resize3D);
 
     if (callback) callback();
 };
+
+export default setupTab;

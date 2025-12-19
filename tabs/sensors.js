@@ -4,7 +4,7 @@ import * as d3 from 'd3'
 
 import MSPCodes from './../js/msp/MSPCodes';
 import MSP from './../js/msp';
-import { GUI, TABS } from './../js/gui';
+import GUI from './../js/gui';
 import FC from './../js/fc';
 import CONFIGURATOR from './../js/data_storage';
 import interval from './../js/intervals';
@@ -12,12 +12,13 @@ import i18n from './../js/localization';
 import BitHelper from './../js/bitHelper';
 import store from '../js/store';
 
-TABS.sensors = {};
-TABS.sensors.initialize = function (callback) {
+const sensorsTab = {};
+
+sensorsTab.initialize = function (callback) {
     var self = this;
 
-    if (GUI.active_tab != 'sensors') {
-        GUI.active_tab = 'sensors';
+    if (GUI.active_tab !== this) {
+        GUI.active_tab = this;
     }
 
     function initSensorData(){
@@ -558,8 +559,10 @@ TABS.sensors.initialize = function (callback) {
     }));
 };
 
-TABS.sensors.cleanup = function (callback) {
+sensorsTab.cleanup = function (callback) {
     CONFIGURATOR.connection.emptyOutputBuffer();
 
     if (callback) callback();
 };
+
+export default sensorsTab;

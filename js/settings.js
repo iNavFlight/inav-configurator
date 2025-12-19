@@ -3,7 +3,7 @@
 import mapSeries from 'promise-map-series';
 
 import mspHelper from './../js/msp/MSPHelper';
-import { GUI } from './gui';
+import GUI from './gui';
 import FC from './fc';
 import { globalSettings, UnitType } from './globalSettings';
 import i18n from './localization';

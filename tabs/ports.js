@@ -3,21 +3,21 @@
 import mspHelper from './../js/msp/MSPHelper';
 import MSPCodes from './../js/msp/MSPCodes';
 import MSP from './../js/msp';
-import { GUI, TABS } from './../js/gui';
+import GUI from './../js/gui';
 import FC from './../js/fc';
 import i18n from './../js/localization';
 import serialPortHelper from './../js/serialPortHelper';
 import jBox from 'jbox';
 
-TABS.ports = {};
+const portsTab = {};
 
-TABS.ports.initialize = function (callback) {
+portsTab.initialize = function (callback) {
 
     var columns = ['data', 'logging', 'sensors', 'telemetry', 'rx', 'peripherals'];
     var mspWarningModal;
 
-    if (GUI.active_tab != 'ports') {
-        GUI.active_tab = 'ports';
+    if (GUI.active_tab !== this) {
+        GUI.active_tab = this;
     }
 
     mspHelper.loadSerialPorts(function () {
@@ -302,7 +302,7 @@ TABS.ports.initialize = function (callback) {
 
         function on_reboot_success_handler() {
             GUI.log(i18n.getMessage('deviceRebooting'));
-            GUI.handleReconnect($('.tab_ports a'));
+            GUI.handleReconnect(true);
         }
     }
 };
@@ -321,7 +321,8 @@ function updateDefaultBaud(baudSelect, column) {
     section.find("." + column + "_baudrate").children('[value=' + baudRate + ']').prop('selected', true);
 }
 
-TABS.ports.cleanup = function (callback) {
-    $('.jBox-wrapper').remove();
+portsTab.cleanup = function (callback) {
     if (callback) callback();
 };
+
+export default portsTab;

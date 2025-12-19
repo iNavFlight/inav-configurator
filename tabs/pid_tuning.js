@@ -4,7 +4,7 @@ import MSPChainerClass from './../js/msp/MSPchainer';
 import mspHelper from './../js/msp/MSPHelper';
 import MSPCodes from './../js/msp/MSPCodes';
 import MSP from './../js/msp';
-import { GUI, TABS } from './../js/gui';
+import GUI from './../js/gui';
 import tabs from './../js/tabs';
 import FC from './../js/fc';
 import Settings from './../js/settings';
@@ -13,11 +13,11 @@ import { scaleRangeInt } from './../js/helpers';
 import interval from './../js/intervals';
 import dialog from '../js/dialog';
 
-TABS.pid_tuning = {
-    rateChartHeight: 117
-};
+const pidTuningTab = { };
 
-TABS.pid_tuning.initialize = function (callback) {
+pidTuningTab.rateChartHeight = 117
+
+pidTuningTab.initialize = function (callback) {
 
     var loadChainer = new MSPChainerClass();
 
@@ -36,8 +36,8 @@ TABS.pid_tuning.initialize = function (callback) {
     loadChainer.setExitPoint(load_html);
     loadChainer.execute();
 
-    if (GUI.active_tab != 'pid_tuning') {
-        GUI.active_tab = 'pid_tuning';
+    if (GUI.active_tab !== this) {
+        GUI.active_tab = this;
     }
 
     function load_html() {
@@ -73,7 +73,7 @@ TABS.pid_tuning.initialize = function (callback) {
             pitch_roll_curve,
             '#a00000',
             200,
-            TABS.pid_tuning.rateChartHeight,
+            pidTuningTab.rateChartHeight,
             true
         );
         drawExpoCanvas(
@@ -81,7 +81,7 @@ TABS.pid_tuning.initialize = function (callback) {
             pitch_roll_curve,
             '#00a000',
             200,
-            TABS.pid_tuning.rateChartHeight,
+            pidTuningTab.rateChartHeight,
             false
         );
 
@@ -90,7 +90,7 @@ TABS.pid_tuning.initialize = function (callback) {
             manual_expo_curve,
             '#a00000',
             200,
-            TABS.pid_tuning.rateChartHeight,
+            pidTuningTab.rateChartHeight,
             true
         );
 
@@ -99,7 +99,7 @@ TABS.pid_tuning.initialize = function (callback) {
             manual_expo_curve,
             '#00a000',
             200,
-            TABS.pid_tuning.rateChartHeight,
+            pidTuningTab.rateChartHeight,
             false
         );
 
@@ -312,7 +312,7 @@ TABS.pid_tuning.initialize = function (callback) {
                         GUI.tab_switch_cleanup(function () {
                             MSP.send_message(MSPCodes.MSP_SET_REBOOT, false, false, function () {
                                 GUI.log(i18n.getMessage('deviceRebooting'));
-                                GUI.handleReconnect();
+                                GUI.handleReconnect(true);
                             });
                         });
                     });
@@ -398,7 +398,7 @@ TABS.pid_tuning.initialize = function (callback) {
 
             GUI.tab_switch_cleanup(function () {
                 GUI.log(i18n.getMessage('pidTuningDataRefreshed'));
-                TABS.pid_tuning.initialize();
+                pidTuningTab.initialize();
             });
         });
 
@@ -451,8 +451,11 @@ TABS.pid_tuning.initialize = function (callback) {
     }
 };
 
-TABS.pid_tuning.cleanup = function (callback) {
+pidTuningTab.cleanup = function (callback) {
     if (callback) {
         callback();
     }
 };
+
+export default pidTuningTab;
+

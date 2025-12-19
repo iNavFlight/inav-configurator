@@ -4,22 +4,22 @@ import MSPChainerClass from './../js/msp/MSPchainer';
 import mspHelper from './../js/msp/MSPHelper';
 import MSPCodes from './../js/msp/MSPCodes';
 import MSP from './../js/msp';
-import { GUI, TABS } from './../js/gui';
+import GUI from './../js/gui';
 import FC from './../js/fc';
 import CONFIGURATOR from './../js/data_storage';
 import Settings from './../js/settings';
 import i18n from './../js/localization';
 import interval from './../js/intervals';
 
-TABS.receiver = {
-    rateChartHeight: 117
-};
+const receiverTab = { };
+ 
+receiverTab.rateChartHeight = 117;
 
-TABS.receiver.initialize = function (callback) {
+receiverTab.initialize = function (callback) {
     var self = this;
 
-    if (GUI.active_tab != 'receiver') {
-        GUI.active_tab = 'receiver';
+    if (GUI.active_tab !== this) {
+        GUI.active_tab = this;
     }
 
     var loadChainer = new MSPChainerClass();
@@ -215,7 +215,7 @@ TABS.receiver.initialize = function (callback) {
 
         $('select[name="rssi_channel"]').val(FC.MISC.rssi_channel);
 
-        var rateHeight = TABS.receiver.rateChartHeight;
+        var rateHeight = receiverTab.rateChartHeight;
 
         // UI Hooks
         // curves
@@ -302,7 +302,7 @@ TABS.receiver.initialize = function (callback) {
                     GUI.tab_switch_cleanup(function () {
                         MSP.send_message(MSPCodes.MSP_SET_REBOOT, false, false, function () {
                             GUI.log(i18n.getMessage('deviceRebooting'));
-                            GUI.handleReconnect($('.tab_receiver a'));
+                            GUI.handleReconnect(true);
                         });
                     });
                 });
@@ -350,8 +350,10 @@ TABS.receiver.initialize = function (callback) {
     }
 };
 
-TABS.receiver.cleanup = function (callback) {
+receiverTab.cleanup = function (callback) {
     $(window).off('resize', this.resize);
 
     if (callback) callback();
 };
+
+export default receiverTab;

@@ -4,7 +4,7 @@ import MSPChainerClass from './../js/msp/MSPchainer';
 import mspHelper from './../js/msp/MSPHelper';
 import MSPCodes from './../js/msp/MSPCodes';
 import MSP from './../js/msp';
-import { GUI, TABS } from './../js/gui';
+import GUI from './../js/gui';
 import FC from './../js/fc';
 import i18n from './../js/localization';
 import { mixer, platform, PLATFORM, INPUT, STABILIZED } from './../js/model';
@@ -14,9 +14,9 @@ import interval from './../js/intervals';
 import ServoMixRule from './../js/servoMixRule';
 import MotorMixRule from './../js/motorMixRule';
 
-TABS.mixer = {};
+const mixerTab = {};
 
-TABS.mixer.initialize = function (callback, scrollPosition) {
+mixerTab.initialize = function (callback, scrollPosition) {
 
     let loadChainer = new MSPChainerClass(),
         saveChainer = new MSPChainerClass(),
@@ -30,8 +30,8 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
         modal,
         motorWizardModal;
 
-    if (GUI.active_tab != 'mixer') {
-        GUI.active_tab = 'mixer';
+    if (GUI.active_tab !== this) {
+        GUI.active_tab = this;
     }
 
     loadChainer.setChain([
@@ -62,18 +62,14 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
     }
 
     function reboot() {
-        //noinspection JSUnresolvedVariable
         GUI.log(i18n.getMessage('configurationEepromSaved'));
-
         GUI.tab_switch_cleanup(function() {
             MSP.send_message(MSPCodes.MSP_SET_REBOOT, false, false, reinitialize);
         });
     }
 
     function reinitialize() {
-        //noinspection JSUnresolvedVariable
-        GUI.log(i18n.getMessage('deviceRebooting'));
-        GUI.handleReconnect($('.tab_mixer a'));
+        GUI.handleReconnect(true);
     }
 
     function loadHtml() {
@@ -731,7 +727,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
                 $('#platform-type').parent('.select').addClass('no-bottom-border');
             }
 
-            if (!GUI.updateEzTuneTabVisibility(false)) {
+            if (!(FC.MIXER_CONFIG.platformType == PLATFORM.MULTIROTOR || FC.MIXER_CONFIG.platformType == PLATFORM.TRICOPTER)) {
                 FC.EZ_TUNE.enabled = 0;
                 mspHelper.saveEzTune();
             }
@@ -870,9 +866,8 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
 
 };
 
-TABS.mixer.cleanup = function (callback) {
-    //delete modal;
-    //delete motorWizardModal;
-    $('.jBox-wrapper').remove();
+mixerTab.cleanup = function (callback) {
     if (callback) callback();
 };
+
+export default mixerTab;

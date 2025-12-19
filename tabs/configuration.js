@@ -4,7 +4,7 @@ import MSPChainerClass from './../js/msp/MSPchainer';
 import mspHelper from './../js/msp/MSPHelper';
 import MSPCodes from './../js/msp/MSPCodes';
 import MSP from './../js/msp';
-import { GUI, TABS } from './../js/gui';
+import GUI from './../js/gui';
 import FC from './../js/fc';
 import interval from './../js/intervals';
 import VTX from './../js/vtx';
@@ -12,13 +12,12 @@ import i18n from './../js/localization';
 import Settings from './../js/settings';
 import features from './../js/feature_framework';
 
-TABS.configuration = {};
+const configurationTab = {};
 
-TABS.configuration.initialize = function (callback, scrollPosition) {
+configurationTab.initialize = function (callback, scrollPosition) {
 
-    if (GUI.active_tab != 'configuration') {
-        GUI.active_tab = 'configuration';
-
+    if (GUI.active_tab !== this) {
+        GUI.active_tab = this;
     }
 
     var loadChainer = new MSPChainerClass();
@@ -68,7 +67,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
     function reinitialize() {
         //noinspection JSUnresolvedVariable
         GUI.log(i18n.getMessage('deviceRebooting'));
-        GUI.handleReconnect($('.tab_configuration a'));
+        GUI.handleReconnect(true);
     }
 
     function load_html() {
@@ -304,6 +303,8 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
     }
 };
 
-TABS.configuration.cleanup = function (callback) {
+configurationTab.cleanup = function (callback) {
     if (callback) callback();
 };
+
+export default configurationTab;
