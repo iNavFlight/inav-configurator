@@ -17,11 +17,7 @@
                     <div class="note" style="margin-bottom: 10px;">
                         <div class="note_spacer">
                             <p i18n="javascriptProgrammingDescription"></p>
-                            <p>
-                                <strong>Write JavaScript, Get INAV Logic Conditions!</strong>
-                                Use familiar JavaScript syntax with full autocomplete and error checking.
-                                <strong>Currently in beta, for testing. Do not use for safety-critical applications!</strong>
-                            </p>
+                            <p i18n="javascriptBetaWarning"></p>
                         </div>
                     </div>
                 </div>
@@ -32,12 +28,12 @@
         <div class="section">
             <div class="gui_box grey">
                 <div class="gui_box_titlebar">
-                    <div class="spacer_box_title">JavaScript Editor (shift-ctrl-v to paste)</div>
+                    <div class="spacer_box_title" i18n="javascriptEditorTitle"></div>
                     <div class="spacer_box_title" style="margin-left: auto;">
                        <div class="examples-section" id="js-example-select">
-                           <label for="examples-select">Load Example:</label>
+                           <label for="examples-select" i18n="javascriptLoadExample"></label>
                            <select id="examples-select" class="select-example">
-                               <option value="">-- Select Example --</option>
+                               <option value="" i18n="javascriptSelectExample"></option>
                            </select>
                        </div>
 
@@ -69,7 +65,7 @@
         <div class="section">
             <div class="gui_box grey">
                 <div class="gui_box_titlebar">
-                    <div class="spacer_box_title">INAV Logic Conditions Output</div>
+                    <div class="spacer_box_title" i18n="javascriptOutputTitle"></div>
                     <div class="spacer_box_title" style="margin-left: auto;">
                         <span id="lc-count" class="lc-count">0/64 LCs</span>
                     </div>
@@ -85,7 +81,7 @@
                     <div id="optimization-stats" class="optimization-stats" style="display: none; margin-top: 10px;">
                         <div class="note">
                             <div class="note_spacer">
-                                <strong>Optimizations Applied:</strong>
+                                <strong i18n="javascriptOptimizationsApplied"></strong>
                                 <pre id="optimization-details" style="margin: 5px 0; font-size: 11px;"></pre>
                             </div>
                         </div>
@@ -100,16 +96,16 @@
                 <div class="gui_box_titlebar">
                     <div class="spacer_box_title">
                         <a href="#" id="api-reference-toggle" style="color: inherit; text-decoration: none;">
-                            ▶ API Reference & Examples
+                            <span>▶ </span><span i18n="javascriptApiReference"></span>
                         </a>
                     </div>
                 </div>
                 <div class="content_wrapper" id="api-reference-content" style="display: none;">
                     <div class="note">
                         <div class="note_spacer">
-                            <h4>Quick Reference</h4>
+                            <h4 i18n="javascriptQuickReference"></h4>
 
-                            <h5>Flight Parameters (Read-Only)</h5>
+                            <h5 i18n="javascriptFlightParameters"></h5>
                             <pre>flight.homeDistance  // meters
 flight.altitude      // cm
 flight.vbat          // centivolts
@@ -117,24 +113,24 @@ flight.cellVoltage   // centivolts
 flight.rssi          // 0-99
 flight.mode.failsafe // boolean</pre>
 
-                            <h5>RC Channels</h5>
+                            <h5 i18n="javascriptRcChannels"></h5>
                             <pre>rc[5].high   // boolean
 rc[5].mid    // boolean
 rc[5].low    // boolean
 rc[5].value  // 1000-2000</pre>
 
-                            <h5>Overrides (Write)</h5>
+                            <h5 i18n="javascriptOverrides"></h5>
                             <pre>override.vtx.power = 3;           // 0-4
 override.throttleScale = 50;      // 0-100%
 override.yaw.angle = 180;         // degrees
 override.rcChannel[8] = 2000;     // trigger switch</pre>
 
-                            <h5>Global Variables</h5>
+                            <h5 i18n="javascriptGlobalVariables"></h5>
                             <pre>gvar[0] = 100;     // write
 const x = gvar[0]; // read</pre>
 
 
-                            <h5>Complete Example</h5>
+                            <h5 i18n="javascriptCompleteExample"></h5>
                             <pre>const { flight, override } = inav;
 
 if (flight.homeDistance > 100) {

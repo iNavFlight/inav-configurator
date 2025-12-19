@@ -74,6 +74,7 @@ class ArrowFunctionHelper {
 
     // Process each statement in the block
     for (const stmt of body.body) {
+      // Handle assignment expressions
       if (stmt.type === 'ExpressionStatement' &&
           stmt.expression &&
           stmt.expression.type === 'AssignmentExpression') {
@@ -84,8 +85,64 @@ class ArrowFunctionHelper {
         );
         if (action) actions.push(action);
       }
+      // Handle if statements
+      else if (stmt.type === 'IfStatement') {
+        const ifAction = this.transformIfStatement(stmt);
+        if (ifAction) actions.push(ifAction);
+      }
     }
 
+    return actions;
+  }
+
+  /**
+   * Transform if statement from Acorn AST node
+   */
+  transformIfStatement(stmt) {
+    if (!stmt.test || !stmt.consequent) return null;
+
+    return {
+      type: 'IfStatement',
+      condition: this.transformCondition(stmt.test),
+      consequent: stmt.consequent.type === 'BlockStatement'
+        ? this.extractBlockActions(stmt.consequent)
+        : [],
+      alternate: stmt.alternate
+        ? (stmt.alternate.type === 'BlockStatement'
+            ? this.extractBlockActions(stmt.alternate)
+            : (stmt.alternate.type === 'IfStatement'
+                ? [this.transformIfStatement(stmt.alternate)]
+                : []))
+        : [],
+      loc: stmt.loc,
+      range: stmt.range
+    };
+  }
+
+  /**
+   * Extract actions from a block statement
+   */
+  extractBlockActions(block) {
+    if (!block || !block.body || !Array.isArray(block.body)) {
+      return [];
+    }
+
+    const actions = [];
+    for (const stmt of block.body) {
+      if (stmt.type === 'ExpressionStatement' &&
+          stmt.expression &&
+          stmt.expression.type === 'AssignmentExpression') {
+        const action = this.transformAssignment(
+          stmt.expression,
+          stmt.loc,
+          stmt.range
+        );
+        if (action) actions.push(action);
+      } else if (stmt.type === 'IfStatement') {
+        const ifAction = this.transformIfStatement(stmt);
+        if (ifAction) actions.push(ifAction);
+      }
+    }
     return actions;
   }
 
@@ -139,6 +196,21 @@ class ArrowFunctionHelper {
         callee: expr.callee,
         arguments: expr.arguments.map(arg => this.transformCondition(arg) || arg)
       };
+    }
+
+    // Handle ternary/conditional expressions: a ? b : c
+    if (expr.type === 'ConditionalExpression') {
+      return {
+        type: 'ConditionalExpression',
+        test: this.transformCondition(expr.test),
+        consequent: this.transformCondition(expr.consequent),
+        alternate: this.transformCondition(expr.alternate)
+      };
+    }
+
+    // Handle parenthesized expressions (unwrap)
+    if (expr.type === 'ParenthesizedExpression' || expr.extra?.parenthesized) {
+      return this.transformCondition(expr.expression || expr);
     }
 
     // Handle identifiers and literals

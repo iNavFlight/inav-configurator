@@ -6221,6 +6221,21 @@
     "tabJavaScriptProgramming": {
         "message": "Программирование (JavaScript)"
     },
+    "javascriptProgrammingDescription": {
+        "message": "Пишите код на JavaScript для управления летательным аппаратом. Транспилятор преобразует ваш код в логические условия INAV."
+    },
+    "javascriptBetaWarning": {
+        "message": "<strong>Пишите JavaScript, получайте логические условия INAV!</strong> Используйте привычный синтаксис JavaScript с полным автодополнением и проверкой ошибок. <strong>В настоящее время находится в стадии бета-тестирования. Не используйте для критически важных приложений!</strong>"
+    },
+    "javascriptEditorTitle": {
+        "message": "Редактор JavaScript (shift-ctrl-v для вставки, правый клик по переменной для переименования)"
+    },
+    "javascriptLoadExample": {
+        "message": "Загрузить пример:"
+    },
+    "javascriptSelectExample": {
+        "message": "-- Выберите пример --"
+    },
     "javascriptTranspile": {
         "message": "Транспилировать (преобразовать) для INAV"
     },
@@ -6232,5 +6247,35 @@
     },
     "javascriptClear": {
         "message": "Очистить редактор"
+    },
+    "javascriptOutputTitle": {
+        "message": "Выходные данные логических условий INAV"
+    },
+    "javascriptLcCount": {
+        "message": "$1 / $2 ЛУ"
+    },
+    "javascriptOptimizationsApplied": {
+        "message": "Применённые оптимизации:"
+    },
+    "javascriptApiReference": {
+        "message": "Справочник API и примеры"
+    },
+    "javascriptQuickReference": {
+        "message": "Краткий справочник"
+    },
+    "javascriptFlightParameters": {
+        "message": "Параметры полёта (только чтение)"
+    },
+    "javascriptRcChannels": {
+        "message": "Каналы RC"
+    },
+    "javascriptOverrides": {
+        "message": "Переопределения (запись)"
+    },
+    "javascriptGlobalVariables": {
+        "message": "Глобальные переменные"
+    },
+    "javascriptCompleteExample": {
+        "message": "Полный пример"
     }
 }

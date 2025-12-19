@@ -20,6 +20,7 @@ import apiDefinitions from './../api/definitions/index.js';
 import { ConditionDecompiler } from './condition_decompiler.js';
 import { ActionDecompiler } from './action_decompiler.js';
 import { buildReverseMapping } from './api_mapping_utility.js';
+import { ActivatorHoistingManager } from './activator_hoisting.js';
 
 /**
  * Decompiler class
@@ -122,6 +123,7 @@ class Decompiler {
       OPERATION.RC_CHANNEL_OVERRIDE,
       OPERATION.SET_HEADING_TARGET,
       OPERATION.LOITER_OVERRIDE,
+      OPERATION.OVERRIDE_MIN_GROUND_SPEED,
       OPERATION.SET_PROFILE,
       OPERATION.FLIGHT_AXIS_ANGLE_OVERRIDE,
       OPERATION.FLIGHT_AXIS_RATE_OVERRIDE,
@@ -189,9 +191,15 @@ class Decompiler {
     this.warnings = [];
     this.variableMap = variableMap;
     this.stickyVarNames = new Map(); // Map LC index -> generated variable name
-    this.usedFeatures = new Set();   // Track which imports are needed (structural, not string scanning)
+    this.predeclaredStickyVars = new Set(); // Track stickys with activators that need pre-declaration
+    // Note: All INAV objects are always imported for user convenience
     this.inlineDeclaredVars = new Set(); // Track let variables declared inline in body
     this.hoistedVarCounters = new Map(); // Track counters for hoisted variable names (e.g., min, min2, min3)
+
+    // Create hoisting manager for activator-wrapped LCs
+    this.hoistingManager = new ActivatorHoistingManager({
+      isActionOperation: this.isActionOperation.bind(this)
+    });
 
     if (!logicConditions || !Array.isArray(logicConditions)) {
       return {
@@ -235,7 +243,10 @@ class Decompiler {
     // Use tree-based decompilation for proper nesting
     const codeBlocks = this.decompileWithTrees(enabled);
 
-    const code = this.generateBoilerplate(codeBlocks.join('\n\n'));
+    let code = this.generateBoilerplate(codeBlocks.join('\n\n'));
+
+    // Apply custom variable names from variable map as a final rename pass
+    code = this.applyCustomVariableNames(code, enabled);
 
     return {
       success: true,
@@ -247,6 +258,50 @@ class Decompiler {
         groups: codeBlocks.length
       }
     };
+  }
+
+  /**
+   * Apply custom variable names from variable map as a final rename pass.
+   * This renames cond1, cond2, etc. to user-defined names if available.
+   * @param {string} code - The generated code with generic names
+   * @param {Array} conditions - All logic conditions
+   * @returns {string} Code with custom variable names applied
+   */
+  applyCustomVariableNames(code, conditions) {
+    if (!this.variableMap || !this.variableMap.let_variables) {
+      return code;
+    }
+
+    // Build mapping: LC index -> custom variable name
+    const lcIndexToCustomName = new Map();
+    for (const [customName, info] of Object.entries(this.variableMap.let_variables)) {
+      if (info.lcIndex !== null && info.lcIndex !== undefined) {
+        lcIndexToCustomName.set(info.lcIndex, customName);
+      }
+    }
+
+    // Build mapping: LC index -> generated name (cond1, cond2, etc.)
+    const lcIndexToGeneratedName = new Map();
+    for (const [lcIndex, generatedName] of this.hoistingManager.hoistedActivatorVars.entries()) {
+      lcIndexToGeneratedName.set(lcIndex, generatedName);
+    }
+
+    // For each LC that has both a custom name and a generated name, rename
+    const renames = new Map(); // generatedName -> customName
+    for (const [lcIndex, customName] of lcIndexToCustomName.entries()) {
+      const generatedName = lcIndexToGeneratedName.get(lcIndex);
+      if (generatedName) {
+        renames.set(generatedName, customName);
+      }
+    }
+
+    // Apply renames (use word boundaries to avoid partial matches)
+    for (const [generatedName, customName] of renames.entries()) {
+      const regex = new RegExp(`\\b${generatedName}\\b`, 'g');
+      code = code.replace(regex, customName);
+    }
+
+    return code;
   }
 
   /**
@@ -282,6 +337,9 @@ class Decompiler {
     // These are helper/intermediate values that shouldn't be standalone blocks
     const referencedAsOperand = new Set();
 
+    // Count how many times each LC is referenced (for hoisting duplicates)
+    const referenceCount = new Map();
+
     // Track LC references for referencedAsOperand
     // Also track which STICKY/TIMERs are referenced (need to show their definition)
     const referencedStickyLCs = new Set();
@@ -289,6 +347,7 @@ class Decompiler {
       if (lc._gap) continue;
       if (lc.operandAType === OPERAND_TYPE.LC) {
         referencedAsOperand.add(lc.operandAValue);
+        referenceCount.set(lc.operandAValue, (referenceCount.get(lc.operandAValue) || 0) + 1);
         const refLC = conditions.find(c => c.index === lc.operandAValue);
         if (refLC && (refLC.operation === OPERATION.STICKY || refLC.operation === OPERATION.TIMER)) {
           referencedStickyLCs.add(lc.operandAValue);
@@ -296,6 +355,7 @@ class Decompiler {
       }
       if (lc.operandBType === OPERAND_TYPE.LC) {
         referencedAsOperand.add(lc.operandBValue);
+        referenceCount.set(lc.operandBValue, (referenceCount.get(lc.operandBValue) || 0) + 1);
         const refLC = conditions.find(c => c.index === lc.operandBValue);
         if (refLC && (refLC.operation === OPERATION.STICKY || refLC.operation === OPERATION.TIMER)) {
           referencedStickyLCs.add(lc.operandBValue);
@@ -312,6 +372,46 @@ class Decompiler {
       if (lc.operation === OPERATION.STICKY || lc.operation === OPERATION.TIMER) {
         const varName = `latch${stickyVarCount++}`;
         this.stickyVarNames.set(lc.index, varName);
+        // Track stickys with activators for pre-declaration
+        // These are defined inside if blocks but may be referenced from outside
+        if (lc.activatorId !== -1) {
+          this.predeclaredStickyVars.add(lc.index);
+        }
+      }
+    }
+
+    // Identify which LCs should be hoisted to variables (via hoisting manager)
+    // Pass variable map to preserve custom variable names (expression match first, LC index fallback)
+    this.hoistingManager.identifyHoistedVars(conditions, referencedAsOperand, referenceCount, this.variableMap, this);
+
+    // Emit global-scoped hoisted vars at top (scopeLcIndex === -1)
+    // Scoped vars (scopeLcIndex !== -1) will be emitted inside their respective if-blocks
+    const globalHoisted = this.hoistingManager.getHoistedVarsInScope(-1);
+    for (const {lcIndex, varName} of globalHoisted) {
+      const lc = conditions.find(c => c.index === lcIndex);
+      if (!lc) continue;
+
+      // Check if this LC has children (other LCs using it as activator)
+      const hasChildren = conditions.some(c => !c._gap && c.activatorId === lcIndex);
+
+      // Root LCs (no activator) vs LCs with activators are emitted differently
+      if (lc.activatorId === -1) {
+        // Root LC - just decompile the expression directly
+        const expr = this.decompileCondition(lc, conditions, new Set());
+        codeBlocks.push(`const ${varName} = ${expr};`);
+        // If this root LC has children, DON'T mark as processed
+        // It needs to be rendered as an if-block later
+        if (!hasChildren) {
+          processed.add(lcIndex);
+        }
+      } else {
+        // LC with activator - wrap in ternary to preserve activator semantics
+        // Pass activator context to prevent redundant wrapping
+        const innerExpr = this.decompileConditionInActivatorContext(lc, conditions, lc.activatorId);
+        const activatorExpr = this.decompileOperand(OPERAND_TYPE.LC, lc.activatorId, conditions, new Set());
+        codeBlocks.push(`const ${varName} = ${activatorExpr} ? (${innerExpr}) : 0;`);
+        // LCs with activators are always fully handled by hoisting
+        processed.add(lcIndex);
       }
     }
 
@@ -321,18 +421,31 @@ class Decompiler {
       if (lc._gap) return true;  // Keep gap markers for visual separation
       if (lc.activatorId !== -1) return false;
 
+      // Check if this LC has children (other LCs using it as activator)
+      const hasChildren = conditions.some(c => !c._gap && c.activatorId === lc.index);
+
       // Skip if only referenced by special ops (EDGE, STICKY, DELAY operands)
-      if (referencedBySpecialOps.has(lc.index)) return false;
+      // BUT keep if it has children that depend on it as activator
+      if (referencedBySpecialOps.has(lc.index) && !hasChildren) return false;
 
       // Skip if only used as operand by other LCs (helper conditions)
       // These are intermediate computations used by other LCs
       if (referencedAsOperand.has(lc.index) && !this.isActionOperation(lc.operation)) {
-        const hasChildren = conditions.some(c => c.activatorId === lc.index);
         if (!hasChildren) return false;
       }
 
       return true;
     });
+
+    // Pre-declare sticky variables that have activators
+    // These are defined inside if-blocks but may be referenced from outside
+    // Pre-declaration makes scope explicit: var latch1; ... if (cond) { latch1 = sticky({...}); }
+    for (const lcIndex of this.predeclaredStickyVars) {
+      const varName = this.stickyVarNames.get(lcIndex);
+      if (varName) {
+        codeBlocks.push(`var ${varName};`);
+      }
+    }
 
     // Build and decompile tree for each root
     for (const rootLc of roots) {
@@ -460,13 +573,15 @@ class Decompiler {
         if (childCodes.length === 0 && !isReferenced) {
           return '';
         }
-        lines.push(...this.renderStickyWithLatch(pattern, childCodes, indent, varName));
+        lines.push(...this.renderStickyWithLatch(pattern, childCodes, indent, varName, node.lc.index, allConditions));
       } else {
-        // Skip empty patterns for non-sticky types
+        // For edge/delay with no children, still output for external reference
+        // (e.g., Global Functions may read these values for OSD display)
         if (childCodes.length === 0) {
-          return '';
+          lines.push(indentStr + `/* LC ${node.lc.index}: ${pattern.type}(${pattern.condition || pattern.value}, ${pattern.duration || pattern.onMs}) for external reference */`);
+        } else {
+          lines.push(...this.renderSpecialPatternWithCode(pattern, childCodes, indent));
         }
-        lines.push(...this.renderSpecialPatternWithCode(pattern, childCodes, indent));
       }
     } else if (this.isActionOperation(node.lc.operation)) {
       // This is an action - render it
@@ -488,7 +603,9 @@ class Decompiler {
       }
     } else if (this.isBooleanOperation(node.lc.operation)) {
       // This is a boolean condition - create if block
-      const condition = this.decompileCondition(node.lc, allConditions);
+      // Check if this LC was hoisted to a variable - if so, use the variable name
+      const hoistedVarName = this.hoistingManager?.getHoistedVarName(node.lc.index);
+      const condition = hoistedVarName || this.decompileCondition(node.lc, allConditions);
 
       if (node.children.length === 0) {
         // Condition with no children - skip it (it's a helper used elsewhere)
@@ -537,6 +654,11 @@ class Decompiler {
           lines.push(this.decompileTree(nestedNode, allConditions, indent + 1));
         }
 
+        // If body is empty, add comment with LC number for external reference
+        if (actions.length === 0 && nestedConditions.length === 0) {
+          lines.push(indentStr + `  /* LC ${node.lc.index}: for external reference */`);
+        }
+
         lines.push(indentStr + '}');
       }
     } else {
@@ -573,11 +695,18 @@ class Decompiler {
     if (lc.operation === OPERATION.STICKY) {
       const onConditionId = lc.operandAValue;
       const offConditionId = lc.operandBValue;
-      // Use decompileOperand to handle action LCs properly
+      // Set activator context to the sticky LC itself when decompiling callbacks
+      // This prevents redundant wrapping when on/off conditions have activator = this sticky
+      const previousContext = this._currentActivatorContext;
+      this._currentActivatorContext = lc.index;
+      const onCondition = this.decompileOperand(OPERAND_TYPE.LC, onConditionId, allConditions);
+      const offCondition = this.decompileOperand(OPERAND_TYPE.LC, offConditionId, allConditions);
+      this._currentActivatorContext = previousContext;
+
       return {
         type: 'sticky',
-        onCondition: this.decompileOperand(OPERAND_TYPE.LC, onConditionId, allConditions),
-        offCondition: this.decompileOperand(OPERAND_TYPE.LC, offConditionId, allConditions)
+        onCondition: onCondition,
+        offCondition: offCondition
       };
     }
 
@@ -619,15 +748,20 @@ class Decompiler {
    * @param {Array} childCodes - Pre-computed child code strings
    * @param {number} indent - Indentation level
    * @param {string} varName - The latch variable name
+   * @param {number} lcIndex - The LC index (for checking pre-declaration)
    * @returns {Array} Lines of code
    */
-  renderStickyWithLatch(pattern, childCodes, indent, varName) {
+  renderStickyWithLatch(pattern, childCodes, indent, varName, lcIndex, conditions) {
     const indentStr = '  '.repeat(indent);
     const lines = [];
 
-    // Show the sticky with var declaration (declares the latch variable)
-    this.usedFeatures.add('sticky');
-    lines.push(indentStr + `var ${varName} = sticky({`);
+    // Check if this sticky was pre-declared (has activator, defined inside if-block)
+    // If pre-declared, use assignment only; otherwise use var declaration
+    const isPredeclared = this.predeclaredStickyVars.has(lcIndex);
+    const declaration = isPredeclared ? `${varName}` : `var ${varName}`;
+
+    // Show the sticky with var declaration or assignment
+    lines.push(indentStr + `${declaration} = sticky({`);
     lines.push(indentStr + `  on: () => ${pattern.onCondition},`);
     lines.push(indentStr + `  off: () => ${pattern.offCondition}`);
     lines.push(indentStr + `});`);
@@ -635,6 +769,32 @@ class Decompiler {
     // If there are children, render them in an if block
     if (childCodes.length > 0) {
       lines.push(indentStr + `if (${varName}) {`);
+
+      // Emit scoped hoisted variables that belong to this sticky's scope
+      const scopedHoisted = this.hoistingManager.getHoistedVarsInScope(lcIndex);
+      if (scopedHoisted.length > 0) {
+        const childIndentStr = '  '.repeat(indent + 1);
+        for (const {lcIndex: hoistedLcIndex, varName: hoistedVarName} of scopedHoisted) {
+          const lc = conditions.find(c => c.index === hoistedLcIndex);
+          if (!lc) continue;
+
+          // Decompile the hoisted variable within this activator context
+          const innerExpr = this.decompileConditionInActivatorContext(lc, conditions, lcIndex);
+          lines.push(childIndentStr + `const ${hoistedVarName} = ${innerExpr};`);
+
+          // Mark this LC as processed so it doesn't get rendered elsewhere
+          // Note: We need to store processed set in the decompiler instance
+          if (this._currentlyProcessedLCs) {
+            this._currentlyProcessedLCs.add(hoistedLcIndex);
+          }
+        }
+
+        // Add blank line after hoisted vars for readability
+        if (childCodes.length > 0) {
+          lines.push('');
+        }
+      }
+
       for (const code of childCodes) {
         lines.push(code);
       }
@@ -677,22 +837,18 @@ class Decompiler {
     const body = childCodes.join('\n');
 
     if (pattern.type === 'edge') {
-      this.usedFeatures.add('edge');
-      lines.push(indentStr + `edge(${pattern.condition}, ${pattern.duration}, () => {`);
+      lines.push(indentStr + `edge(() => ${pattern.condition}, ${pattern.duration}, () => {`);
       if (body) lines.push(body);
       lines.push(indentStr + '});');
     } else if (pattern.type === 'delay') {
-      this.usedFeatures.add('delay');
-      lines.push(indentStr + `delay(${pattern.condition}, ${pattern.duration}, () => {`);
+      lines.push(indentStr + `delay(() => ${pattern.condition}, ${pattern.duration}, () => {`);
       if (body) lines.push(body);
       lines.push(indentStr + '});');
     } else if (pattern.type === 'timer') {
-      this.usedFeatures.add('timer');
       lines.push(indentStr + `timer(${pattern.onMs}, ${pattern.offMs}, () => {`);
       if (body) lines.push(body);
       lines.push(indentStr + '});');
     } else if (pattern.type === 'whenChanged') {
-      this.usedFeatures.add('whenChanged');
       lines.push(indentStr + `delta(${pattern.value}, ${pattern.threshold}, () => {`);
       if (body) lines.push(body);
       lines.push(indentStr + '});');
@@ -710,6 +866,28 @@ class Decompiler {
    */
   decompileCondition(lc, allConditions = null, visited = new Set()) {
     return this.conditionDecompiler.decompile(lc, allConditions, visited);
+  }
+
+  /**
+   * Decompile a condition within an activator context
+   * When inside an activator, operands that reference LCs with the same activator
+   * should not be re-wrapped with the activator check
+   */
+  decompileConditionInActivatorContext(lc, allConditions, activatorId) {
+    const visited = new Set();
+    // Decompile with activator context tracking
+    return this.decompileConditionWithActivatorContext(lc, allConditions, visited, activatorId);
+  }
+
+  /**
+   * Decompile condition with activator context to avoid redundant wrapping
+   */
+  decompileConditionWithActivatorContext(lc, allConditions, visited, currentActivator) {
+    // Use condition decompiler but track current activator for operand resolution
+    this._currentActivatorContext = currentActivator;
+    const result = this.conditionDecompiler.decompile(lc, allConditions, visited);
+    this._currentActivatorContext = null;
+    return result;
   }
 
   /**
@@ -747,10 +925,6 @@ class Decompiler {
 
       case OPERAND_TYPE.FLIGHT:
       case OPERAND_TYPE.WAYPOINTS: {
-        // Track waypoint usage for imports
-        if (type === OPERAND_TYPE.WAYPOINTS) {
-          this.usedFeatures.add('waypoint');
-        }
         // Try to get property name from API definitions
         const prop = this.getPropertyFromOperand(type, value);
         if (prop) {
@@ -786,6 +960,21 @@ class Decompiler {
 
           const referencedLC = allConditions.find(lc => lc.index === value);
           if (referencedLC) {
+            // Check if this LC was hoisted to a variable (has activator, referenced as operand)
+            const hoistedVarName = this.hoistingManager?.getHoistedVarName(value);
+            if (hoistedVarName) {
+              // If we're inside the same activator context, inline the expression
+              // to avoid redundant wrapping (e.g., latch3 ? (latch3 ? ... : 0) : 0)
+              if (this._currentActivatorContext !== null &&
+                  referencedLC.activatorId === this._currentActivatorContext) {
+                // Inline the expression while preserving activator context
+                // Use conditionDecompiler directly to stay within current context
+                return this.conditionDecompiler.decompile(referencedLC, allConditions, visited);
+              }
+              // Use the hoisted var name - the variable already includes the activator check
+              return hoistedVarName;
+            }
+
             // Don't inline action operations (they produce side effects, not boolean values)
             // Instead, describe what the action does for clarity
             if (this.isActionOperation(referencedLC.operation)) {
@@ -808,24 +997,41 @@ class Decompiler {
               return varName || `logicCondition[${value}]`;
             }
             // EDGE: returns true on rising edge of condition for duration ms
-            // Just show the underlying condition - edge timing is implementation detail
             if (referencedLC.operation === OPERATION.EDGE) {
-              this.usedFeatures.add('edge');
               const underlyingCond = this.decompileOperand(OPERAND_TYPE.LC, referencedLC.operandAValue, allConditions, visited);
-              return `edge(${underlyingCond}, ${referencedLC.operandBValue})`;
+              const edgeExpr = `edge(${underlyingCond}, ${referencedLC.operandBValue})`;
+              // Wrap with activator check if LC has one
+              // UNLESS we're already inside the same activator context
+              if (referencedLC.activatorId !== -1 && referencedLC.activatorId !== this._currentActivatorContext) {
+                const activatorExpr = this.decompileOperand(OPERAND_TYPE.LC, referencedLC.activatorId, allConditions, new Set(visited));
+                return `(${activatorExpr} ? ${edgeExpr} : 0)`;
+              }
+              return edgeExpr;
             }
             // DELAY: returns true after condition held for duration ms
             if (referencedLC.operation === OPERATION.DELAY) {
-              this.usedFeatures.add('delay');
               const underlyingCond = this.decompileOperand(OPERAND_TYPE.LC, referencedLC.operandAValue, allConditions, visited);
-              return `delay(${underlyingCond}, ${referencedLC.operandBValue})`;
+              const delayExpr = `delay(${underlyingCond}, ${referencedLC.operandBValue})`;
+              // Wrap with activator check if LC has one
+              // UNLESS we're already inside the same activator context
+              if (referencedLC.activatorId !== -1 && referencedLC.activatorId !== this._currentActivatorContext) {
+                const activatorExpr = this.decompileOperand(OPERAND_TYPE.LC, referencedLC.activatorId, allConditions, new Set(visited));
+                return `(${activatorExpr} ? ${delayExpr} : 0)`;
+              }
+              return delayExpr;
             }
             // Recursively decompile the referenced condition with cycle detection
-            // (even boolean conditions with activators - the activator controls when
-            // the LC is evaluated, but its result can still be referenced)
             visited.add(value);
             const result = this.decompileCondition(referencedLC, allConditions, visited);
             visited.delete(value);
+
+            // If the LC has an activator, wrap in conditional to preserve semantics
+            // In INAV, when activator is false, the LC outputs 0
+            // UNLESS we're already inside the same activator context (avoid redundant wrapping)
+            if (referencedLC.activatorId !== -1 && referencedLC.activatorId !== this._currentActivatorContext) {
+              const activatorExpr = this.decompileOperand(OPERAND_TYPE.LC, referencedLC.activatorId, allConditions, new Set(visited));
+              return `(${activatorExpr} ? (${result}) : 0)`;
+            }
             return result;
           }
         }
@@ -834,7 +1040,6 @@ class Decompiler {
 
       case OPERAND_TYPE.PID:
         // PID operands 0-3 map to pid[0].output through pid[3].output
-        this.usedFeatures.add('pid');
         if (value >= 0 && value < 4) {
           return `pid[${value}].output`;
         }
@@ -893,21 +1098,17 @@ class Decompiler {
 
   /**
    * Reconstruct let variable declarations from variable map
-   * @returns {string[]} Array of let variable declaration strings
+   * NOTE: The variable map is only used for NAMING variables, not CREATING them.
+   * All variable declarations should come from the actual LCs being decompiled.
+   * This method is kept for backwards compatibility but should return empty.
+   * @returns {string[]} Array of let variable declaration strings (always empty)
    */
   reconstructLetVariables() {
-    const declarations = [];
-
-    if (!this.variableMap || !this.variableMap.let_variables) {
-      return declarations;
-    }
-
-    for (const [name, info] of Object.entries(this.variableMap.let_variables)) {
-      const type = info.type || 'let';
-      declarations.push(`${type} ${name} = ${info.expression};`);
-    }
-
-    return declarations;
+    // Variable map is used only for naming hoisted variables.
+    // We don't emit declarations from the variable map because they might be stale
+    // (from old code that no longer exists in the current LCs).
+    // All declarations come from the LCs we're actually decompiling.
+    return [];
   }
 
   /**
@@ -967,17 +1168,8 @@ class Decompiler {
     code += '// INAV JavaScript Programming\n';
     code += '// Decompiled from logic conditions\n\n';
 
-    // Add destructuring - use structural tracking (usedFeatures) instead of string scanning
-    const imports = ['flight', 'override', 'rc', 'gvar'];
-    if (this.usedFeatures.has('edge')) imports.push('edge');
-    if (this.usedFeatures.has('sticky')) imports.push('sticky');
-    if (this.usedFeatures.has('delay')) imports.push('delay');
-    if (this.usedFeatures.has('timer')) imports.push('timer');
-    if (this.usedFeatures.has('whenChanged')) imports.push('whenChanged');
-    if (this.usedFeatures.has('waypoint')) imports.push('waypoint');
-    if (this.usedFeatures.has('pid')) imports.push('pid');
-
-    code += `const { ${imports.join(', ')} } = inav;\n\n`;
+    // Always include all INAV objects for user convenience
+    code += `const {\n    flight, override, rc, gvar, waypoint, pid, edge\n    sticky, delay, timer, whenChanged, helpers, events \n} = inav;\n\n`;
 
     // Add variable declarations from variable map
     // Note: sticky/latch variables are declared inline with var latch = sticky({...})

@@ -6166,5 +6166,65 @@
     },
     "search": {
         "message": "Пошук"
+    },
+    "tabJavaScriptProgramming": {
+        "message": "Програмування (JavaScript)"
+    },
+    "javascriptProgrammingDescription": {
+        "message": "Пишіть код на JavaScript для керування літальним апаратом. Транспілятор перетворює ваш код на логічні умови INAV."
+    },
+    "javascriptBetaWarning": {
+        "message": "<strong>Пишіть JavaScript, отримуйте логічні умови INAV!</strong> Використовуйте звичний синтаксис JavaScript з повним автодоповненням та перевіркою помилок. <strong>Наразі в стадії бета-тестування. Не використовуйте для критично важливих застосунків!</strong>"
+    },
+    "javascriptEditorTitle": {
+        "message": "Редактор JavaScript (shift-ctrl-v для вставки, правий клік по змінній для перейменування)"
+    },
+    "javascriptLoadExample": {
+        "message": "Завантажити приклад:"
+    },
+    "javascriptSelectExample": {
+        "message": "-- Оберіть приклад --"
+    },
+    "javascriptTranspile": {
+        "message": "Транспілювати для INAV"
+    },
+    "javascriptLoad": {
+        "message": "Завантажити з FC"
+    },
+    "javascriptSave": {
+        "message": "Зберегти на FC"
+    },
+    "javascriptClear": {
+        "message": "Очистити редактор"
+    },
+    "javascriptOutputTitle": {
+        "message": "Вихідні дані логічних умов INAV"
+    },
+    "javascriptLcCount": {
+        "message": "$1 / $2 ЛУ"
+    },
+    "javascriptOptimizationsApplied": {
+        "message": "Застосовані оптимізації:"
+    },
+    "javascriptApiReference": {
+        "message": "Довідник API та приклади"
+    },
+    "javascriptQuickReference": {
+        "message": "Короткий довідник"
+    },
+    "javascriptFlightParameters": {
+        "message": "Параметри польоту (тільки читання)"
+    },
+    "javascriptRcChannels": {
+        "message": "Канали RC"
+    },
+    "javascriptOverrides": {
+        "message": "Перевизначення (запис)"
+    },
+    "javascriptGlobalVariables": {
+        "message": "Глобальні змінні"
+    },
+    "javascriptCompleteExample": {
+        "message": "Повний приклад"
     }
 }

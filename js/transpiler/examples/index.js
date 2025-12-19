@@ -279,6 +279,64 @@ if (lowBatteryLatch) {
 }`
   },
 
+  'let-variables': {
+    name: 'Let/Const Variables',
+    description: 'Use named variables for cleaner code',
+    category: 'Advanced',
+    code: `// Named variables make code more readable
+const { flight, override } = inav;
+
+// Define thresholds as named constants
+let lowVoltage = 330;
+let criticalVoltage = 310;
+let farDistance = 500;
+let veryFarDistance = 1000;
+
+// Use in conditions
+if (flight.cellVoltage < lowVoltage) {
+  override.throttleScale = 50;
+}
+
+if (flight.cellVoltage < criticalVoltage) {
+  override.throttleScale = 25;
+}
+
+// Combine conditions with named variables
+let isFarAway = flight.homeDistance > farDistance;
+let isVeryFarAway = flight.homeDistance > veryFarDistance;
+
+if (isVeryFarAway) {
+  override.vtx.power = 4;
+} else if (isFarAway) {
+  override.vtx.power = 3;
+}`
+  },
+
+  'ternary-operator': {
+    name: 'Ternary Operator',
+    description: 'Conditional value assignment',
+    category: 'Advanced',
+    code: `// Use ternary operator for conditional values
+const { flight, override } = inav;
+
+// Choose throttle limit based on voltage
+let throttleLimit = flight.cellVoltage < 330 ? 25 : 50;
+
+if (flight.cellVoltage < 350) {
+  override.throttleScale = throttleLimit;
+}
+
+// Inline ternary in assignment
+override.vtx.power = flight.homeDistance > 500 ? 4 : 2;
+
+// Nested ternary for multiple conditions
+let powerLevel = flight.rssi < 30 ? 4 :
+                 flight.rssi < 50 ? 3 :
+                 flight.rssi < 70 ? 2 : 1;
+
+override.vtx.power = powerLevel;`
+  },
+
   'pid-output': {
     name: 'PID Controller Output',
     description: 'Read PID controller output values',
