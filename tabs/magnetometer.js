@@ -700,10 +700,40 @@ TABS.magnetometer.initialize = function (callback) {
     }
 
     function getMagHeading() {
-        // console.log(FC.SENSOR_DATA.magnetometer);
-        let magADC = FC.SENSOR_DATA.magnetometer.map((x) => x * 1090);
+        // Get magnetometer data from MSP
+        // NOTE: This data has BOTH compass alignment AND board alignment applied by firmware
+        let mag_transformed = [...FC.SENSOR_DATA.magnetometer];
+        console.log("Mag transformed: [" + mag_transformed.map(x => x.toFixed(3)).join(", ") + "]");
 
-        // The gain and scale are done by inav in compass.c right after the values are read,
+        // Check if board has alignment - if so, we need to remove board alignment transformation
+        // (We keep compass alignment since that's what we're trying to calibrate)
+        const hasAlignment = self.boardAlignmentConfig.pitch !== 0 ||
+                           self.boardAlignmentConfig.roll !== 0 ||
+                           self.boardAlignmentConfig.yaw !== 0;
+
+        let mag_after_compass_align;
+        if (hasAlignment) {
+            // Apply inverse of BOARD alignment only (keep compass alignment)
+            console.log("Removing board alignment from magnetometer data");
+            console.log("Board alignment: pitch=" + self.boardAlignmentConfig.pitch +
+                       "°, roll=" + self.boardAlignmentConfig.roll +
+                       "°, yaw=" + self.boardAlignmentConfig.yaw + "°");
+
+            const R = buildRotationMatrix(
+                self.boardAlignmentConfig.roll,
+                self.boardAlignmentConfig.pitch,
+                self.boardAlignmentConfig.yaw
+            );
+            mag_after_compass_align = applyRotation(R, mag_transformed);
+            console.log("Mag after removing board alignment: [" + mag_after_compass_align.map(x => x.toFixed(3)).join(", ") + "]");
+        } else {
+            // No board alignment - data only has compass alignment
+            mag_after_compass_align = mag_transformed;
+        }
+
+        // Apply scaling and calculate heading
+        // The gain and scale are done by inav in compass.c right after the values are read
+        let magADC = mag_after_compass_align.map((x) => x * 1090);
 
         let magHeading = rad2degrees ( Math.atan2(-1 * magADC[1], magADC[0]) );
         console.log("magHeading (degrees): " + magHeading.toString());

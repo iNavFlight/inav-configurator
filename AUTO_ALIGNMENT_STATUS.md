@@ -81,6 +81,11 @@ The Auto Alignment Tool is a wizard that automatically detects and sets FC board
     * Roll 90° (wrong initial setting) ✓
   - All tests correctly detected upside-down orientation
   - Inverse transformation accurately computed same raw data regardless of initial settings
+- ✅ **Updated magnetometer handling**
+  - Magnetometer data also gets board alignment + compass alignment transformations
+  - Modified `getMagHeading()` to apply inverse of board alignment
+  - Preserves compass alignment (which is what wizard calibrates)
+  - Ensures compass wizard works correctly regardless of initial board alignment
 
 ### Build Verification
 - ✅ **Code builds successfully**
