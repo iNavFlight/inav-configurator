@@ -1,24 +1,47 @@
-const path = require('path');
-const fs = require('fs');
+import path from 'node:path';
+import fs from 'node:fs';
+import { fileURLToPath } from 'node:url';
 
-module.exports = {
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+export default {
   packagerConfig: {
     executableName: "inav-configurator",
     asar: false,
     icon: 'images/inav',
-    ignore: [
-      "^(\/\.vscode$)",
-      "^(\/support$)",
-      ".gitattributes",
-      ".gitignore",
-      "3D_model_creation.md",
-      "LICENSE",
-      "MAPPROXY.md",
-      "package-lock.json",
-      "README.md",
-      "inav_icon_128.psd",
-    ]
   },
+  rebuildConfig: {},
+  plugins: [
+    {
+      name: '@electron-forge/plugin-vite',
+      config: {
+        build: [
+          {
+            entry: 'js/main/main.js',
+            config: 'vite.main.config.js',
+          },
+          {
+            entry: 'js/main/preload.js',
+            config: 'vite.preload.config.js',
+          },
+          {
+            entry: 'js/libraries/bluetooth-device-chooser/bt-device-chooser-preload.js',
+            config: 'vite.preload.config.js',
+          },
+        ],
+        renderer: [
+          {
+            name: 'bt_device_chooser',
+            config: 'vite.bt-dc-renderer.config.js',
+          },
+          {
+            name: 'main_window',
+            config: 'vite.main-renderer.config.js',
+          },
+        ],
+      },
+    },
+  ],
   hooks: {
     // Uniform artifact file names
     postMake: async (config, makeResults) => {
@@ -27,13 +50,15 @@ module.exports = {
         result.artifacts.forEach(artifact => {
           var artifactStr = artifact.toString();
           var newPath = path.join(path.dirname(artifactStr), baseName + path.extname(artifactStr));
+          newPath = newPath.replace('Configurator_win32_ia32', 'Configurator_Win32');
+          newPath = newPath.replace('Configurator_win32_x64', 'Configurator_Win64');
+          newPath = newPath.replace('Configurator_darwin', 'Configurator_MacOS');
           fs.renameSync(artifactStr, newPath);
           console.log('Artifact: ' + newPath);
         });
       });
-    }
+    },
   },
-  rebuildConfig: {},
   makers: [
     {
       name: '@electron-forge/maker-wix',
@@ -48,7 +73,7 @@ module.exports = {
         appUserModelId: "com.inav.configurator",
         icon: path.join(__dirname, "./assets/windows/inav_installer_icon.ico"),
         upgradeCode: "13606ff3-b0bc-4dde-8fac-805bc8aed2f8",
-        ui : {
+        ui: {
           enabled: false,
           chooseDirectory: true,
           images: {
@@ -74,6 +99,7 @@ module.exports = {
       name: '@electron-forge/maker-dmg',
       config: {
         name: "INAV Configurator",
+        title: "INAV-Configurator",  // Volume name without spaces to avoid hdiutil detach issues
         background: "./assets/osx/dmg-background.png",
         icon: "./images/inav.icns"
       }

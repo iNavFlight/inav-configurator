@@ -13,13 +13,13 @@ var globalSettings = {
     osdUnits: null,
     // Map  
     mapProviderType: null,
-    mapApiKey: null,
     proxyURL: null,
     proxyLayer: null,
     // Show colours for profiles
     showProfileParameters: null,
     // tree target for documents
     docsTreeLocation: 'master',
+    configuratorTreeLocation: 'master',
     cliAutocomplete: true,
     assistnowApiKey: null,
     assistnowOfflineData: [],
@@ -31,4 +31,4 @@ var globalSettings = {
     }
 };
 
-module.exports = { globalSettings, UnitType };
+export { globalSettings, UnitType };

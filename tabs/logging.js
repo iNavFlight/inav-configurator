@@ -1,19 +1,15 @@
 'use strict';
 
-const path = require('path');
-const fs = require('fs');
-const { dialog } = require("@electron/remote");
-const Store = require('electron-store');
-const store = new Store();
-
-const MSPCodes = require('./../js/msp/MSPCodes');
-const MSP = require('./../js/msp');
-const { GUI, TABS } = require('./../js/gui');
-const FC = require('./../js/fc');
-const CONFIGURATOR = require('./../js/data_storage');
-const interval = require('./../js/intervals');
-const i18n = require('./../js/localization');
-const { zeroPad } = require('./../js/helpers');
+import MSPCodes from './../js/msp/MSPCodes';
+import MSP from './../js/msp';
+import { GUI, TABS } from './../js/gui';
+import FC from './../js/fc';
+import CONFIGURATOR from './../js/data_storage';
+import interval from './../js/intervals';
+import i18n from './../js/localization';
+import { zeroPad } from './../js/helpers';
+import dialog from '../js/dialog';
+import store from './../js/store';
 
 
 TABS.logging = {};
@@ -38,7 +34,7 @@ TABS.logging.initialize = function (callback) {
         }
 
         var load_html = function () {
-            GUI.load(path.join(__dirname, "logging.html"), process_html);
+            import('./logging.html?raw').then(({default: html}) => GUI.load(html, process_html));
         }
 
         MSP.send_message(MSPCodes.MSP_RC, false, false, get_motor_data);
@@ -86,13 +82,8 @@ TABS.logging.initialize = function (callback) {
                             interval.add('log_data_poll', log_data_poll, parseInt($('select.speed').val()), true); // refresh rate goes here
                             interval.add('write_data', function write_data() {
                                 if (log_buffer.length && readyToWrite) { // only execute when there is actual data to write
-
-                                    fs.writeFileSync(loggingFileName, log_buffer.join('\n') + '\n', {
-                                        "flag": "a"
-                                    })
-
+                                    window.electronAPI.appendFile(loggingFileName, log_buffer.join('\n') + '\n');
                                     $('.samples').text(samples += log_buffer.length);
-
                                     log_buffer = [];
                                 }
                             }, 1000);

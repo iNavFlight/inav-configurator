@@ -1,12 +1,12 @@
 'use strict';
 
-const mapSeries = require('promise-map-series')
+import mapSeries from 'promise-map-series';
 
-const mspHelper = require('./../js/msp/MSPHelper');
-const { GUI } = require('./gui');
-const FC = require('./fc');
-const { globalSettings, UnitType } = require('./globalSettings');
-const i18n = require('./localization');
+import mspHelper from './../js/msp/MSPHelper';
+import { GUI } from './gui';
+import FC from './fc';
+import { globalSettings, UnitType } from './globalSettings';
+import i18n from './localization';
 
 function padZeros(val, length) {
     let str = val.toString();
@@ -119,12 +119,9 @@ var Settings = (function () {
                     input.val(s.value);
                     input.attr('maxlength', s.setting.max);
                 } else if (input.data('presentation') == 'range') {
-                    
                     GUI.sliderize(input, s.value, s.setting.min, s.setting.max);
-
                 } else if (s.setting.type == 'float') {
                     input.attr('type', 'number');
-
                     let dataStep = input.data("step");
 
                     if (typeof dataStep === 'undefined') {
@@ -153,7 +150,7 @@ var Settings = (function () {
                 }
 
                 // If data is defined, We want to convert this value into 
-                // something matching the units        
+                // something matching the units
                 self.convertToUnitSetting(input, inputUnit);
 
                 input.data('setting-info', s.setting);
@@ -225,9 +222,10 @@ var Settings = (function () {
             // Angles
             'centideg'      : 'centi&deg;',
             'centideg-deg'  : 'centi&deg;', // Centidegrees, but always converted to degrees by default
-            'deg'           : '&deg;',
             'decideg'       : 'deci&deg;',
             'decideg-lrg'   : 'deci&deg;', // Decidegrees, but always converted to degrees by default
+            'deg'           : '&deg;',
+            'decadeg'       : 'deca&deg;',
             // Rotational speed
             'degps'     : '&deg; per second',
             'decadegps' : 'deca&deg; per second',
@@ -273,9 +271,10 @@ var Settings = (function () {
             // Angles
             'centideg'      : 'CentiDegrees',
             'centideg-deg'  : 'CentiDegrees',
-            'deg'           : 'Degrees',
             'decideg'       : 'DeciDegrees',
             'decideg-lrg'   : 'DeciDegrees',
+            'deg'           : 'Degrees',
+            'decadeg'       : 'DecaDegrees',
             // Rotational speed
             'degps'     : 'Degrees per second',
             'decadegps' : 'DecaDegrees per second',
@@ -313,61 +312,64 @@ var Settings = (function () {
         //unitConversionTable[toUnit][fromUnit] -> factor
         const unitRatioTable = {
             'cm' : {
-                'm' : 100, 
+                'm' : 100.0, 
                 'ft' : 30.48
             },
             'm' : {
-                'm' : 1,
+                'm' : 1.0,
                 'ft' : 0.3048
             },
             'm-lrg' : {
-                'km' : 1000,
+                'km' : 1000.0,
                 'mi' : 1609.344,
-                'nm' : 1852
+                'nm' : 1852.0
             },
             'cms' : { // Horizontal speed
                 'kmh' : 27.77777777777778, 
                 'kt': 51.44444444444457, 
                 'mph' : 44.704,
-                'ms' : 100
+                'ms' : 100.0
             },
             'v-cms' : { // Vertical speed
-                'ms' : 100,
+                'ms' : 100.0,
                 'hftmin' : 50.8,
                 'fts' : 30.48
             },
             'msec-nc' : {
-                'msec-nc' : 1
+                'msec-nc' : 1.0
             },
             'msec' : {
-                'sec' : 1000
+                'sec' : 1000.0
             },
             'dsec' : {
-                'sec' : 10
+                'sec' : 10.0
             },
             'mins' : {
-                'hours' : 60
+                'hours' : 60.0
             },
             'tzmins' : {
                 'tzhours' : 'TZHOURS'
             },
             'centideg' : {
-                'deg' : 0.1
+                'deg' : 100
             },
             'centideg-deg' : {
-                'deg' : 0.1
+                'deg' : 100
             },
             'decideg' : {
-                'deg' : 10
+                'deg' : 10.0
             },
             'decideg-lrg' : {
-                'deg' : 10
+                'deg' : 10.0
+            },
+            'decadeg' : {
+                'deg' : 0.1
             },
             'decadegps' : {
                 'degps' : 0.1
             },
             'decidegc' : {
-                'degc' : 10,
+                'degc' : 10.0,
                 'degf' : 'FAHREN'
             },
         };
@@ -389,6 +391,7 @@ var Settings = (function () {
                 'centideg-deg' : 'deg',
                 'decideg' : 'deg',
                 'decideg-lrg' : 'deg',
+                'decadeg' : 'deg',
                 'decidegc' : 'degf',
             },
             1: { //metric
@@ -406,6 +409,7 @@ var Settings = (function () {
                 'centideg-deg' : 'deg',
                 'decideg' : 'deg',
                 'decideg-lrg' : 'deg',
+                'decadeg' : 'deg',
                 'decidegc' : 'degc',
             },
             2: { //metric with MPH
@@ -419,6 +423,7 @@ var Settings = (function () {
                 'centideg-deg' : 'deg',
                 'decideg' : 'deg',
                 'decideg-lrg' : 'deg',
+                'decadeg' : 'deg',
                 'msec' : 'sec',
                 'dsec' : 'sec',
                 'mins' : 'hours',
@@ -436,6 +441,7 @@ var Settings = (function () {
                 'centideg-deg' : 'deg',
                 'decideg' : 'deg',
                 'decideg-lrg' : 'deg',
+                'decadeg' : 'deg',
                 'msec' : 'sec',
                 'dsec' : 'sec',
                 'mins' : 'hours',
@@ -453,6 +459,7 @@ var Settings = (function () {
                 'centideg-deg' : 'deg',
                 'decideg' : 'deg',
                 'decideg-lrg' : 'deg',
+                'decadeg' : 'deg',
                 'msec' : 'sec',
                 'dsec' : 'sec',
                 'mins' : 'hours',
@@ -464,6 +471,7 @@ var Settings = (function () {
                 'decideg-lrg' : 'deg',
                 'centideg' : 'deg',
                 'centideg-deg' : 'deg',
+                'decadeg' : 'deg',
                 'tzmins' : 'tzhours',
             }
         };
@@ -491,8 +499,8 @@ var Settings = (function () {
         let decimalPlaces = 0;
         // Update the step, min, and max; as we have the multiplier here.
         if (element.attr('type') == 'number') {
-            let step = parseFloat(element.attr('step')) || 1;
-            
+            let step = parseFloat(element.data("step")) || parseFloat(element.attr('step')) || 1;
+
             if (multiplier !== 1) { 
                 decimalPlaces = Math.min(Math.ceil(multiplier / 100), 3);
                 // Add extra decimal place for non-integer conversions.
@@ -500,6 +508,8 @@ var Settings = (function () {
                     decimalPlaces++;
                 }
                 step = 1 / Math.pow(10, decimalPlaces);
+            } else { 
+                decimalPlaces = this.countDecimals(step);
             }
             element.attr('step', step.toFixed(decimalPlaces));
 
@@ -603,8 +613,8 @@ var Settings = (function () {
         // verify if number 0.000005 is represented as "5e-6"
         if (text.indexOf('e-') > -1) {
           let [base, trail] = text.split('e-');
-          let deg = parseInt(trail, 10);
-          return deg;
+          let decimals = parseInt(trail, 10);
+          return decimals;
         }
         // count decimals for number in representation like "0.123456"
         if (Math.floor(value) !== value) {
@@ -674,4 +684,4 @@ var Settings = (function () {
     return self;
 })();
 
-module.exports = Settings;
+export default  Settings;

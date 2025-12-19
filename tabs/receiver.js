@@ -1,17 +1,15 @@
 'use strict';
 
-const path = require('path');
-
-const MSPChainerClass = require('./../js/msp/MSPchainer');
-const mspHelper = require('./../js/msp/MSPHelper');
-const MSPCodes = require('./../js/msp/MSPCodes');
-const MSP = require('./../js/msp');
-const { GUI, TABS } = require('./../js/gui');
-const FC = require('./../js/fc');
-const CONFIGURATOR = require('./../js/data_storage');
-const Settings = require('./../js/settings');
-const i18n = require('./../js/localization');
-const interval = require('./../js/intervals');
+import MSPChainerClass from './../js/msp/MSPchainer';
+import mspHelper from './../js/msp/MSPHelper';
+import MSPCodes from './../js/msp/MSPCodes';
+import MSP from './../js/msp';
+import { GUI, TABS } from './../js/gui';
+import FC from './../js/fc';
+import CONFIGURATOR from './../js/data_storage';
+import Settings from './../js/settings';
+import i18n from './../js/localization';
+import interval from './../js/intervals';
 
 TABS.receiver = {
     rateChartHeight: 117
@@ -40,7 +38,7 @@ TABS.receiver.initialize = function (callback) {
     loadChainer.execute();
 
     function load_html() {
-        GUI.load(path.join(__dirname, "receiver.html"), Settings.processHtml(process_html));
+        import('./receiver.html?raw').then(({default: html}) => GUI.load(html, Settings.processHtml(process_html)));
     }
 
     function saveSettings(onComplete) {
@@ -66,15 +64,31 @@ TABS.receiver.initialize = function (callback) {
                 return 0;
             }
         });
-        $("#serialrx_provider").empty().append(serialRxProviders);
-        $('#serialrx_provider').val(selectedRxProvider);
+
+        let $serialRxProvider = $("#serialrx_provider");
+        $serialRxProvider.empty().append(serialRxProviders);
+        $serialRxProvider.val(selectedRxProvider);
+
+        $serialRxProvider.on('change', function() {
+            const frSkyRXProviders = ["SBUS", "FPORT", "FPORT2", "FBUS"];
+            
+            if (frSkyRXProviders.includes($(this).find("option:selected").text())) {
+                $("#frSkyOptions").show();
+            } else {
+                $("#frSkyOptions").hide();
+            }
+        });
+
+        $serialRxProvider.trigger("change");
 
         $receiverMode.on('change', function () {
             if ($(this).find("option:selected").text() == "SERIAL") {
                 $serialWrapper.show();
+                $serialRxProvider.trigger("change");
                 $receiverMode.parent().removeClass("no-bottom-border");
             } else {
                 $serialWrapper.hide();
+                $("#frSkyOptions").hide();
                 $receiverMode.parent().addClass("no-bottom-border");
             }
         });

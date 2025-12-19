@@ -3,6 +3,7 @@ var VTX = (function() {
 
     self.DEV_SMARTAUDIO = 3;
     self.DEV_TRAMP = 4;
+    self.DEV_MSP = 6;
     self.DEV_UNKNOWN = 0xFF;
 
     self.BANDS = [
@@ -18,7 +19,6 @@ var VTX = (function() {
 
     self.CHANNEL_MIN = 1;
     self.CHANNEL_MAX = 8;
-    self.POWER_MIN = 1;
 
     self.LOW_POWER_DISARM_MIN = 0;
     self.LOW_POWER_DISARM_MAX = 2;
@@ -28,4 +28,4 @@ var VTX = (function() {
     return self;
 })();
 
-module.exports = VTX;
+export default VTX;

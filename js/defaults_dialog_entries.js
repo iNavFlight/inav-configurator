@@ -21,10 +21,6 @@ var defaultsDialogData = [
                 value: "256HZ"
             },
             {
-                key: "looptime",
-                value: 500
-            },
-            {
                 key: "motor_pwm_protocol",
                 value: "DSHOT300"
             },
@@ -143,10 +139,6 @@ var defaultsDialogData = [
                 value: "256HZ"
             },
             {
-                key: "looptime",
-                value: 500
-            },
-            {
                 key: "motor_pwm_protocol",
                 value: "DSHOT300"
             },
@@ -192,10 +184,6 @@ var defaultsDialogData = [
             /*
             Dynamic gyro LPF
             */
-            {
-                key: "gyro_use_dyn_lpf",
-                value: "ON"
-            },
             {
                 key: "gyro_dyn_lpf_min_hz",
                 value: 85
@@ -282,10 +270,6 @@ var defaultsDialogData = [
             {
                 key: "gyro_hardware_lpf",
                 value: "256HZ"
-            },
-            {
-                key: "looptime",
-                value: 500
             },
             {
                 key: "motor_pwm_protocol",
@@ -470,9 +454,9 @@ var defaultsDialogData = [
                 key: "yaw_rate",
                 value: 3
             },
-            {
+                        {
                 key: "nav_fw_pos_z_p",
-                value: 25
+                value: 35
             },
             {
                 key: "nav_fw_pos_z_i",
@@ -480,7 +464,7 @@ var defaultsDialogData = [
             },
             {
                 key: "nav_fw_pos_z_d",
-                value: 8
+                value: 10
             },
             {
                 key: "nav_fw_pos_xy_p",
@@ -678,7 +662,7 @@ var defaultsDialogData = [
             },
             {
                 key: "nav_fw_pos_z_p",
-                value: 35
+                value: 25
             },
             {
                 key: "nav_fw_pos_z_i",
@@ -686,11 +670,11 @@ var defaultsDialogData = [
             },
             {
                 key: "nav_fw_pos_z_d",
-                value: 10
+                value: 8
             },
             {
                 key: "nav_fw_pos_xy_p",
-                value: 70
+                value: 75
             },
             {
                 key: "fw_turn_assist_pitch_gain",
@@ -878,4 +862,4 @@ var defaultsDialogData = [
     }
 ];
 
-module.exports = defaultsDialogData;
+export default defaultsDialogData;

@@ -257,4 +257,4 @@ const ltmDecoder = (function () {
     return publicScope;
 })();
 
-module.exports = ltmDecoder;
+export default ltmDecoder;

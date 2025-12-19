@@ -1,18 +1,16 @@
 'use strict';
 
-const path = require('path');
-
-const MSPChainerClass = require('./../js/msp/MSPchainer');
-const mspHelper = require('./../js/msp/MSPHelper');
-const MSPCodes = require('./../js/msp/MSPCodes');
-const MSP = require('./../js/msp');
-const { GUI, TABS } = require('./../js/gui');
-const FC = require('./../js/fc');
-const interval = require('./../js/intervals');
-const VTX = require('./../js/vtx');
-const i18n = require('./../js/localization');
-const Settings = require('./../js/settings');
-const features = require('./../js/feature_framework');
+import MSPChainerClass from './../js/msp/MSPchainer';
+import mspHelper from './../js/msp/MSPHelper';
+import MSPCodes from './../js/msp/MSPCodes';
+import MSP from './../js/msp';
+import { GUI, TABS } from './../js/gui';
+import FC from './../js/fc';
+import interval from './../js/intervals';
+import VTX from './../js/vtx';
+import i18n from './../js/localization';
+import Settings from './../js/settings';
+import features from './../js/feature_framework';
 
 TABS.configuration = {};
 
@@ -74,7 +72,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
     }
 
     function load_html() {
-        GUI.load(path.join(__dirname, "configuration.html"), Settings.processHtml(process_html));
+        import('./configuration.html?raw').then(({default: html}) => GUI.load(html, Settings.processHtml(process_html)));
     }
 
     function process_html() {
@@ -165,7 +163,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
 
             var vtx_power = $('#vtx_power');
             vtx_power.empty();
-            for (var ii = VTX.POWER_MIN; ii <= FC.VTX_CONFIG.power_count; ii++) {
+            for (var ii = FC.VTX_CONFIG.power_min; ii <= FC.VTX_CONFIG.power_count; ii++) {
                 var option = $('<option value="' + ii + '">' + ii + '</option>');
                 if (ii == FC.VTX_CONFIG.power) {
                     option.prop('selected', true);

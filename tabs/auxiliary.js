@@ -1,19 +1,19 @@
 'use strict';
 
 
-const path = require('path');
-const wNumb = require('wnumb/wNumb')
-const Store = require('electron-store');
-const store = new Store();
+import wNumb from 'wnumb/wNumb';
+import noUiSlider from 'nouislider';
 
-const mspHelper = require('./../js/msp/MSPHelper');
-const MSPCodes = require('./../js/msp/MSPCodes');
-const MSP = require('./../js/msp');
-const { GUI, TABS } = require('./../js/gui');
-const FC = require('./../js/fc');
-const adjustBoxNameIfPeripheralWithModeID = require('./../js/peripherals');
-const i18n = require('./../js/localization');
-const interval = require('./../js/intervals');
+import mspHelper from './../js/msp/MSPHelper';
+import MSPCodes from './../js/msp/MSPCodes';
+import MSP from './../js/msp';
+import { GUI, TABS } from './../js/gui';
+import FC from './../js/fc';
+import adjustBoxNameIfPeripheralWithModeID from './../js/peripherals';
+import i18n from './../js/localization';
+import interval from './../js/intervals';
+import store from './../js/store';
+
 
 var ORIG_AUX_CONFIG_IDS = [];
 
@@ -25,6 +25,7 @@ TABS.auxiliary.initialize = function (callback) {
 
     let LOCAL_AUX_CONFIG = [];
     let LOCAL_AUX_CONFIG_IDS = [];
+    let prevChannelsValues = null;
 
     MSP.send_message(MSPCodes.MSP_MODE_RANGES, false, false, get_box_ids);
 
@@ -46,7 +47,7 @@ TABS.auxiliary.initialize = function (callback) {
 
     function load_html() {
         sort_modes_for_display();
-        GUI.load(path.join(__dirname, "auxiliary.html"), process_html);
+        import('./auxiliary.html?raw').then(({default: html}) => GUI.load(html, process_html));
     }
 
     // This object separates out the dividers. This is also used to order the modes
@@ -188,7 +189,8 @@ TABS.auxiliary.initialize = function (callback) {
         rangeElement.attr('id', 'mode-' + modeIndex + '-range-' + rangeIndex);
         modeElement.find('.ranges').append(rangeElement);
 
-        $(rangeElement).find('.channel-slider').noUiSlider({
+        var channelSlider = $(rangeElement).find('.channel-slider')[0];
+        noUiSlider.create(channelSlider,{
             start: rangeValues,
             behaviour: 'snap-drag',
             margin: 50,
@@ -197,18 +199,19 @@ TABS.auxiliary.initialize = function (callback) {
             range: channel_range,
             format: wNumb({
                 decimals: 0
-            })
+            }),
+            pips: {
+                mode: 'values',
+                values: [900, 1000, 1200, 1400, 1500, 1600, 1800, 2000, 2100],
+                density: 4,
+                stepped: true
+            }
         });
 
-        var elementName =  '#mode-' + modeIndex + '-range-' + rangeIndex;
-        $(elementName + ' .channel-slider').Link('lower').to($(elementName + ' .lowerLimitValue'));
-        $(elementName + ' .channel-slider').Link('upper').to($(elementName + ' .upperLimitValue'));
-
-        $(rangeElement).find(".pips-channel-range").noUiSlider_pips({
-            mode: 'values',
-            values: [900, 1000, 1200, 1400, 1500, 1600, 1800, 2000, 2100],
-            density: 4,
-            stepped: true
+        channelSlider.noUiSlider.on('update', values =>  {
+            var elementName =  '#mode-' + modeIndex + '-range-' + rangeIndex;
+            $(elementName + ' .lowerLimitValue').text(values[0]);
+            $(elementName + ' .upperLimitValue').text(values[1]);
         });
 
         $(rangeElement).find('.deleteRange').data('rangeElement', rangeElement);
@@ -288,14 +291,11 @@ TABS.auxiliary.initialize = function (callback) {
 
         $('a.addRange').on('click', function () {
             var modeElement = $(this).data('modeElement');
-
-            var firstUnusedChannel = findFirstUnusedChannel(modeElement);
-
-            addRangeToMode(modeElement, firstUnusedChannel);
+            addRangeToMode(modeElement, -1);
         });
 
         // translate to user-selected language
-       i18n.localize();;
+       i18n.localize();
 
         // UI Hooks
         $('a.save').on('click', function () {
@@ -314,7 +314,7 @@ TABS.auxiliary.initialize = function (callback) {
                 var modeId = modeElement.data('id');
                 $(modeElement).find('.range').each(function() {
 
-                    var rangeValues = $(this).find('.channel-slider').val();
+                    var rangeValues = $(this).find('.channel-slider')[0].noUiSlider.get(true);
                     var modeRange = {
                         id: modeId,
                         auxChannelIndex: parseInt($(this).find('.channel').val()),
@@ -382,7 +382,7 @@ TABS.auxiliary.initialize = function (callback) {
         function update_ui() {
             let hasUsedMode = false;
             let acroEnabled = true;
-            let acroFail = ["ANGLE", "HORIZON", "MANUAL", "NAV RTH", "NAV POSHOLD", "NAV CRUISE", "NAV COURSE HOLD", "NAV WP", "GCS NAV"];
+            let acroFail = ["ANGLE", "HORIZON", "MANUAL", "ANGLE HOLD", "NAV RTH", "NAV POSHOLD", "NAV CRUISE", "NAV COURSE HOLD", "NAV WP", "GCS NAV"];
 
             var auxChannelCount = FC.RC.active_channels - 4;
 
@@ -465,8 +465,8 @@ TABS.auxiliary.initialize = function (callback) {
          */
         function auto_select_channel(RC_channels, activeChannels, RSSI_channel) {
             const auto_option = $('.tab-auxiliary select.channel option[value="-1"]:selected');
-            var prevChannelsValues = null;
             if (auto_option.length === 0) {
+                prevChannelsValues = null;
                 return;
             }
 
@@ -498,7 +498,7 @@ TABS.auxiliary.initialize = function (callback) {
         }
 
         let hideUnusedModes = false;
-        let hideUnusedModesStore =  store.get('hideUnusedModes', false);
+        let hideUnusedModesStore = store.get('hideUnusedModes', false);
         $("input#switch-toggle-unused")
             .on('change', function () {
                 hideUnusedModes = $(this).prop("checked");

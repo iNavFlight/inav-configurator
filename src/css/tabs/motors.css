@@ -271,7 +271,7 @@
 }
 
 .tab-motors .motor_testing .sliders input {
-    -webkit-appearance: slider-vertical;
+    writing-mode: vertical-lr; direction: rtl;
     width: 100%;
     height: 73px;
 }
@@ -463,4 +463,18 @@
 
 .tab-motors .config-section .number input {
     margin-right: 4px;
+}
+
+.tab-motors .mixerPreview {
+  position: relative;
+}
+
+.tab-motors .motorNumber {
+    position: absolute;
+    font-size: 1.4em;
+    visibility: hidden;
+}
+
+.tab-motors .mixer-preview-image-numbers {
+    width: fit-content;
 }

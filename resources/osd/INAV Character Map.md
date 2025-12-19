@@ -225,6 +225,7 @@
 | ![Flight hours rem](/resources/osd/digital/default/24x36/219.png)  | SYM_FLIGHT_HOURS_REMAINING |                              | Flight time (hours) remaining         | 219        | 0xDB         |
 | ![Ground course](/resources/osd/digital/default/24x36/220.png)     | SYM_GROUND_COURSE          | SYM.GROUND_COURSE            | Ground course                         | 220        | 0xDC         |
 | ![Alert](/resources/osd/digital/default/24x36/221.png)             | SYM_ALERT                  | SYM.ALERT                    | General Alert                         | 221        | 0xDD         |
+| ![Min Ground Speed](/resources/osd/digital/default/24x36/222.png)  | SYM_MIN_GROUND_SPEED       | SYM.MIN_GND_SPEED            | Minimum ground speed                  | 222        | 0xDE         |
 | ![Terrain follow](/resources/osd/digital/default/24x36/251.png)    | SYM_TERRAIN_FOLLOWING      | SYM.TERRAIN_FOLLOWING        | Terrain following                     | 251        | 0xFB         |
 | ![Cross track err](/resources/osd/digital/default/24x36/252.png)   | SYM_CROSS_TRACK_ERROR      | SYM.CROSS_TRACK_ERROR        | Cross track error                     | 252        | 0xFC         |
 | ![ADSB](/resources/osd/digital/default/24x36/253.png)              | SYM_ADSB                   | SYM.ADSB                     | ADSB                                  | 253        | 0xFD         |
@@ -271,7 +272,7 @@
 | ![Vario 1 down](/resources/osd/digital/default/24x36/343.png)     | SYM_VARIO_DOWN_1A          |                              | Vario down                            | 343        | 0x157         |
 | ![Vario 2 down](/resources/osd/digital/default/24x36/344.png)     | SYM_VARIO_DOWN_2A          |                              | Vario down down                       | 344        | 0x158         |
 | ![Altitude](/resources/osd/digital/default/24x36/345.png)         | SYM_ALT                    |                              | Altitude symbol                       | 345        | 0x159         |
-| ![Vertical AHI](/resources/osd/digital/default/24x36/346.png)     | SYM_AH_V_START             |                              | Vertical AHI                          | 346 - 351  | 0x15A - 0x159 |
+| ![Vertical AHI](/resources/osd/digital/default/24x36/346.png)     | SYM_AH_V_START             |                              | Vertical AHI                          | 346 - 351  | 0x15A - 0x15F |
 | ![Vertical AHI](/resources/osd/digital/default/24x36/347.png)     |                            |                              |                                       | 347        | 0x15B         |
 | ![Vertical AHI](/resources/osd/digital/default/24x36/348.png)     |                            |                              |                                       | 348        | 0x15C         |
 | ![Vertical AHI](/resources/osd/digital/default/24x36/349.png)     |                            |                              |                                       | 349        | 0x15D         |
@@ -286,6 +287,14 @@
 | ![Crosshair centre](/resources/osd/digital/default/24x36/358.png) | SYM_AH_CH_CENTER           | SYM.AH_CROSSHAIRS            | Default crosshair centre              | 358        | 0x166         |
 | ![Flight dist rem](/resources/osd/digital/default/24x36/359.png)  | SYM_FLIGHT_DIST_REMAINING  | SYM.FLIGHT_DIST_REMAINING    | Flight distance remaining             | 359        | 0x167         |
 | ![Odometer](/resources/osd/digital/default/24x36/360.png)         | SYM_ODOMETER               | SYM.ODOMETER                 | Odometer (total aircraft distance)    | 360        | 0x168         |
+| ![RX Band](/resources/osd/digital/default/24x36/361.png)          | SYM_RX_BAND                | SYM.RX_BAND                  | Frequency band used by RX             | 361        | 0x169         |
+| ![RX Mode](/resources/osd/digital/default/24x36/362.png)          | SYM_RX_MODE                | SYM.RX_MODE                  | Mode used by RX (150HZ for example)   | 362        | 0x16A
+| ![Throttle Gauge Empty](/resources/osd/digital/default/24x36/363.png) | SYM_THR_GAUGE_EMPTY    | SYM.THROTTLE_GAUGE_EMPTY     | Vertical throttle gauge empty         | 363        | 0x16B
+         |
+| ![Throttle Gauge Half](/resources/osd/digital/default/24x36/364.png)  | SYM_THR_GAUGE_HALF     | SYM.THROTTLE_GAUGE_HALF      | Vertical throttle gauge 1 bar         | 364        | 0x16C
+         |
+| ![Throttle Gauge Full](/resources/osd/digital/default/24x36/365.png)  | SYM_THR_GAUGE_FULL     | SYM.THROTTLE_GAUGE_FULL      | Vertical throttle gauge 2 bars        | 365        | 0x16D
+         |
 | ![Crosshair 3](/resources/osd/digital/default/24x36/400_402.png)  | SYM_AH_CH_TYPE3            | SYM.AH_CROSSHAIRS            | Crosshair type 3                      | 400 - 402  | 0x190 - 0x192 |
 | ![Crosshair 4](/resources/osd/digital/default/24x36/403_405.png)  | SYM_AH_CH_TYPE4            | SYM.AH_CROSSHAIRS            | Crosshair type 4                      | 403 - 405  | 0x193 - 0x195 |
 | ![Crosshair 5](/resources/osd/digital/default/24x36/406_408.png)  | SYM_AH_CH_TYPE5            | SYM.AH_CROSSHAIRS            | Crosshair type 5                      | 406 - 408  | 0x196 - 0x198 |

@@ -1,24 +1,38 @@
 'use strict';
 
-const path = require('path')
-const ol = require('openlayers')
-const semver = require('semver');
+import semver from 'semver';
+import Map from 'ol/Map.js';
+import XYZ from 'ol/source/XYZ.js';
+import OSM from 'ol/source/OSM.js';
+import TileWMS from 'ol/source/TileWMS'
+import TileLayer from 'ol/layer/Tile.js';
+import View from 'ol/View.js'
+import { fromLonLat } from 'ol/proj';
+import Style from 'ol/style/Style'
+import Icon from 'ol/style/Icon';
+import Text from 'ol/style/Text';
+import Fill from 'ol/style/Fill';
+import Point from 'ol/geom/Point.js';
+import Feature from 'ol/Feature';
+import VectorSource from 'ol/source/Vector.js';
+import VectorLayer from 'ol/layer/Vector.js';
 
-const MSPChainerClass = require('./../js/msp/MSPchainer');
-const mspHelper = require('./../js/msp/MSPHelper');
-const MSPCodes = require('./../js/msp/MSPCodes');
-const MSP = require('./../js/msp');
-const interval = require('./../js/intervals');
-const { GUI, TABS } = require('./../js/gui');
-const FC = require('./../js/fc');
-const i18n = require('./../js/localization');
-const Settings = require('./../js/settings');
-const serialPortHelper = require('./../js/serialPortHelper');
-const features = require('./../js/feature_framework');
-const { globalSettings } = require('./../js/globalSettings');
-const jBox = require('./../js/libraries/jBox/jBox.min');
-const SerialBackend = require('../js/serial_backend');
-const ublox = require('../js/ublox/UBLOX');
+import MSPChainerClass from './../js/msp/MSPchainer';
+import mspHelper from './../js/msp/MSPHelper';
+import MSPCodes from './../js/msp/MSPCodes';
+import MSP from './../js/msp';
+import interval from './../js/intervals';
+import { GUI, TABS } from './../js/gui';
+import FC from './../js/fc';
+import i18n from './../js/localization';
+import Settings from './../js/settings';
+import serialPortHelper from './../js/serialPortHelper';
+import features from './../js/feature_framework';
+import { globalSettings } from './../js/globalSettings';
+import jBox from 'jbox';
+import SerialBackend from '../js/serial_backend';
+import ublox from '../js/ublox/UBLOX';
+import dialog from '../js/dialog';
 
 
 TABS.gps = {};
@@ -30,26 +44,26 @@ TABS.gps.initialize = function (callback) {
 
     // mavlink ADSB_EMITTER_TYPE
     const ADSB_VEHICLE_TYPE = {
-        0: {icon: 'adsb_14.png', name: 'No info'}, // ADSB_EMITTER_TYPE_NO_INFO
-        1: {icon: 'adsb_1.png', name: 'Light'}, // ADSB_EMITTER_TYPE_LIGHT
-        2: {icon: 'adsb_1.png', name: 'Small'}, // ADSB_EMITTER_TYPE_SMALL
-        3: {icon: 'adsb_2.png', name: 'Large'}, // ADSB_EMITTER_TYPE_LARGE
-        4: {icon: 'adsb_14.png', name: 'High vortex large'}, // ADSB_EMITTER_TYPE_HIGH_VORTEX_LARGE
-        5: {icon: 'adsb_5.png', name: 'Heavy'}, // ADSB_EMITTER_TYPE_HEAVY
-        6: {icon: 'adsb_14.png', name: 'Manuv'}, // ADSB_EMITTER_TYPE_HIGHLY_MANUV
-        7: {icon: 'adsb_13.png', name: 'Rotorcraft'}, // ADSB_EMITTER_TYPE_ROTOCRAFT
-        8: {icon: 'adsb_14.png', name: 'Unassigned'}, // ADSB_EMITTER_TYPE_UNASSIGNED
-        9: {icon: 'adsb_6.png', name: 'Glider'}, // ADSB_EMITTER_TYPE_GLIDER
-        10:{icon:  'adsb_7.png', name: 'Lighter air'}, // ADSB_EMITTER_TYPE_LIGHTER_AIR
-        11:{icon:  'adsb_15.png', name: 'Parachute'}, // ADSB_EMITTER_TYPE_PARACHUTE
-        12:{icon:  'adsb_1.png', name: 'Ultra light'}, // ADSB_EMITTER_TYPE_ULTRA_LIGHT
-        13:{icon:  'adsb_14.png', name: 'Unassigned 2'}, // ADSB_EMITTER_TYPE_UNASSIGNED2
-        14:{icon:  'adsb_8.png', name: 'UAV'}, // ADSB_EMITTER_TYPE_UAV
-        15:{icon:  'adsb_14.png', name: 'Space'}, // ADSB_EMITTER_TYPE_SPACE
-        16:{icon:  'adsb_14.png', name: 'Unassigned 3'}, // ADSB_EMITTER_TYPE_UNASSGINED3
-        17:{icon:  'adsb_9.png', name: 'Surface'}, // ADSB_EMITTER_TYPE_EMERGENCY_SURFACE
-        18:{icon:  'adsb_10.png', name: 'Service surface'}, // ADSB_EMITTER_TYPE_SERVICE_SURFACE
-        19:{icon:  'adsb_12.png', name: 'Pint obstacle'}, // ADSB_EMITTER_TYPE_POINT_OBSTACLE
+        0: {iconNum: 14, name: 'No info'}, // ADSB_EMITTER_TYPE_NO_INFO
+        1: {iconNum: 1,  name: 'Light'}, // ADSB_EMITTER_TYPE_LIGHT
+        2: {iconNum: 1,  name: 'Small'}, // ADSB_EMITTER_TYPE_SMALL
+        3: {iconNum: 2,  name: 'Large'}, // ADSB_EMITTER_TYPE_LARGE
+        4: {iconNum: 14, name: 'High vortex large'}, // ADSB_EMITTER_TYPE_HIGH_VORTEX_LARGE
+        5: {iconNum: 5,  name: 'Heavy'}, // ADSB_EMITTER_TYPE_HEAVY
+        6: {iconNum: 14, name: 'Manuv'}, // ADSB_EMITTER_TYPE_HIGHLY_MANUV
+        7: {iconNum: 13, name: 'Rotorcraft'}, // ADSB_EMITTER_TYPE_ROTOCRAFT
+        8: {iconNum: 14, name: 'Unassigned'}, // ADSB_EMITTER_TYPE_UNASSIGNED
+        9: {iconNum: 6,  name: 'Glider'}, // ADSB_EMITTER_TYPE_GLIDER
+        10:{iconNum: 7,  name: 'Lighter air'}, // ADSB_EMITTER_TYPE_LIGHTER_AIR
+        11:{iconNum: 15, name: 'Parachute'}, // ADSB_EMITTER_TYPE_PARACHUTE
+        12:{iconNum: 1,  name: 'Ultra light'}, // ADSB_EMITTER_TYPE_ULTRA_LIGHT
+        13:{iconNum: 14, name: 'Unassigned 2'}, // ADSB_EMITTER_TYPE_UNASSIGNED2
+        14:{iconNum: 8,  name: 'UAV'}, // ADSB_EMITTER_TYPE_UAV
+        15:{iconNum: 14, name: 'Space'}, // ADSB_EMITTER_TYPE_SPACE
+        16:{iconNum: 14, name: 'Unassigned 3'}, // ADSB_EMITTER_TYPE_UNASSGINED3
+        17:{iconNum: 9,  name: 'Surface'}, // ADSB_EMITTER_TYPE_EMERGENCY_SURFACE
+        18:{iconNum: 10, name: 'Service surface'}, // ADSB_EMITTER_TYPE_SERVICE_SURFACE
+        19:{iconNum: 12, name: 'Pint obstacle'}, // ADSB_EMITTER_TYPE_POINT_OBSTACLE
     };
 
     var loadChainer = new MSPChainerClass();
@@ -92,9 +106,18 @@ TABS.gps.initialize = function (callback) {
             });
         });
     }
+    
+    async function loadIcons() {
+        for (let i = 0; i <= 19; i++) {
+            ADSB_VEHICLE_TYPE[i].icon = (await import(`./../resources/adsb/adsb_${ADSB_VEHICLE_TYPE[i].iconNum}.png?inline`)).default;
+        }
+        arrowIcon = (await import('./../images/icons/map/cf_icon_position.png?inline')).default;
+    }
 
-    function load_html() {
-        GUI.load(path.join(__dirname, "gps.html"), Settings.processHtml(process_html));
+    async function load_html() {
+        const { default: html } = await import('./gps.html?raw');
+        await loadIcons();
+        GUI.load(html, Settings.processHtml(process_html));
     }
 
     let cursorInitialized = false;
@@ -105,9 +128,10 @@ TABS.gps.initialize = function (callback) {
 
     let vehicleVectorSource;
     let vehiclesCursorInitialized = false;
+    let arrowIcon;
 
     function process_html() {
-       i18n.localize();;
+        i18n.localize();
 
         var fcFeatures = FC.getFeatures();
 
@@ -176,42 +200,56 @@ TABS.gps.initialize = function (callback) {
 
         gps_ubx_sbas_e.val(FC.MISC.gps_ubx_sbas);
 
-        let mapView = new ol.View({
-            center: ol.proj.fromLonLat([0, 0]),
+        let mapView = new View({
+            center: [0, 0],
             zoom: 15
         });
 
-        let mapLayer;
+        let mapLayers = [];
 
-        if (globalSettings.mapProviderType == 'bing') {
-            mapLayer = new ol.source.BingMaps({
-                key: globalSettings.mapApiKey,
-                imagerySet: 'AerialWithLabels',
-                maxZoom: 19
-            });
-        } else if (globalSettings.mapProviderType == 'mapproxy') {
-            mapLayer = new ol.source.TileWMS({
-                url: globalSettings.proxyURL,
-                params: { 'LAYERS': globalSettings.proxyLayer }
-            })
+        if (globalSettings.mapProviderType == 'esri') {
+            mapLayers.push(new TileLayer({
+                    source: new XYZ({
+                        url: 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+                        attributions: 'Source: <a href="https://www.esri.com/" target="_blank">Esri</a>, Maxar, Earthstar Geographics, and the GIS User Community',
+                        maxZoom: 19
+                    })
+            }));
+            mapLayers.push(new TileLayer({
+                    source: new XYZ({
+                        url: 'https://services.arcgisonline.com/arcgis/rest/services/Reference/World_Transportation/MapServer/tile/{z}/{y}/{x}',
+                        maxZoom: 19
+                    })
+            }));
+            mapLayers.push(new TileLayer({
+                    source: new XYZ({
+                        url: 'https://services.arcgisonline.com/arcgis/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}',
+                        maxZoom: 19
+                    })
+            }));
+        } else if (globalSettings.mapProviderType == 'mapproxy' ) {
+            mapLayers.push(new TileLayer({
+                source: new TileWMS({
+                            url: globalSettings.proxyURL,
+                            params: {'LAYERS':globalSettings.proxyLayer}
+                        })
+            }));
         } else {
-            mapLayer = new ol.source.OSM();
+            mapLayers.push(new TileLayer({
+                source: new OSM()
+            }));
         }
 
         $("#center_button").on('click', function () {
             let lat = FC.GPS_DATA.lat / 10000000;
             let lon = FC.GPS_DATA.lon / 10000000;
-            let center = ol.proj.fromLonLat([lon, lat]);
+            let center = fromLonLat([lon, lat]);
             mapView.setCenter(center);
         });
 
-        mapHandler = new ol.Map({
-            target: document.getElementById('gps-map'),
-            layers: [
-                new ol.layer.Tile({
-                    source: mapLayer
-                })
-            ],
+        mapHandler = new Map({
+            target: 'gps-map',
+            layers: mapLayers,
             view: mapView
         });
 
@@ -245,7 +283,7 @@ TABS.gps.initialize = function (callback) {
             }
         });
 
-        let center = ol.proj.fromLonLat([0, 0]);
+        let center = fromLonLat([0, 0]);
         mapView.setCenter(center);
         mapView.setZoom(2);
 
@@ -300,32 +338,32 @@ TABS.gps.initialize = function (callback) {
             //Update map
             if (FC.GPS_DATA.fix >= 2) {
 
-                let center = ol.proj.fromLonLat([lon, lat]);
+                let center = fromLonLat([lon, lat]);
 
                 if (!cursorInitialized) {
                     cursorInitialized = true;
 
-                    iconStyle = new ol.style.Style({
-                        image: new ol.style.Icon(({
+                    iconStyle = new Style({
+                        image: new Icon(({
                             anchor: [0.5, 1],
                             opacity: 1,
                             scale: 0.5,
-                            src: path.join(__dirname, './../images/icons/cf_icon_position.png')
+                            src: arrowIcon
                         }))
                     });
 
                     let currentPositionLayer;
-                    iconGeometry = new ol.geom.Point(ol.proj.fromLonLat([0, 0]));
-                    iconFeature = new ol.Feature({
+                    iconGeometry = new Point(fromLonLat([0, 0]));
+                    iconFeature = new Feature({
                         geometry: iconGeometry
                     });
 
                     iconFeature.setStyle(iconStyle);
 
-                    let vectorSource = new ol.source.Vector({
+                    let vectorSource = new VectorSource({
                         features: [iconFeature]
                     });
-                    currentPositionLayer = new ol.layer.Vector({
+                    currentPositionLayer = new VectorLayer ({
                         source: vectorSource
                     });
 
@@ -355,9 +393,9 @@ TABS.gps.initialize = function (callback) {
                 if (!vehiclesCursorInitialized) {
                     vehiclesCursorInitialized = true;
 
-                    vehicleVectorSource = new ol.source.Vector({});
+                    vehicleVectorSource = new VectorSource({});
 
-                    let vehicleLayer = new ol.layer.Vector({
+                    let vehicleLayer = new VectorLayer({
                         source: vehicleVectorSource
                     });
 
@@ -365,28 +403,28 @@ TABS.gps.initialize = function (callback) {
                 }
 
                 if (vehicle.lat != 0 && vehicle.lon != 0 && vehicle.ttl > 0) {
-                    let vehicleIconStyle = new ol.style.Style({
-                        image: new ol.style.Icon(({
+                    let vehicleIconStyle = new Style({
+                        image: new Icon(({
                             opacity: 1,
                             rotation: vehicle.headingDegrees * (Math.PI / 180),
                             scale: 0.8,
                             anchor: [0.5, 0.5],
-                            src: path.join(__dirname, './../resources/adsb/' + ADSB_VEHICLE_TYPE[vehicle.emitterType].icon),
+                            src: ADSB_VEHICLE_TYPE[vehicle.emitterType].icon,
                         })),
-                        text: new ol.style.Text(({
+                        text: new Text(({
                             text: vehicle.callsign,
                             textAlign: 'center',
                             textBaseline: "bottom",
                             offsetY: +40,
                             padding: [2, 2, 2, 2],
                             backgroundFill: '#444444',
-                            fill: new ol.style.Fill({color: '#ffffff'}),
+                            fill: new Fill({color: '#ffffff'}),
                         })),
                     });
 
 
-                    let iconGeometry = new ol.geom.Point(ol.proj.fromLonLat([vehicle.lon / 10000000, vehicle.lat / 10000000]));
-                    let iconFeature = new ol.Feature({
+                    let iconGeometry = new Point(fromLonLat([vehicle.lon / 10000000, vehicle.lat / 10000000]));
+                    let iconFeature = new Feature({
                         geometry: iconGeometry,
                         name: vehicle.callsign,
                         type: 'adsb',
@@ -483,7 +521,7 @@ TABS.gps.initialize = function (callback) {
             if(globalSettings.assistnowApiKey != null && globalSettings.assistnowApiKey != '') {
                 ublox.loadAssistnowOnline(processUbloxData);
            } else {
-                GUI.alert("Assistnow Token not set!");
+                dialog.alert("Assistnow Token not set!");
             }
         });
 
@@ -491,7 +529,7 @@ TABS.gps.initialize = function (callback) {
             if(globalSettings.assistnowApiKey != null && globalSettings.assistnowApiKey != '') {
                 ublox.loadAssistnowOffline(processUbloxData);
             } else {
-                GUI.alert("Assistnow Token not set!");
+                dialog.alert("Assistnow Token not set!");
             }
         });
 

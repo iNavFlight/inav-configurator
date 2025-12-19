@@ -1,20 +1,21 @@
 'use strict';
 
-const ServoMixerRuleCollection = require('./servoMixerRuleCollection');
-const MotorMixerRuleCollection = require('./motorMixerRuleCollection');
-const LogicConditionsCollection = require('./logicConditionsCollection');
-const LogicConditionsStatus = require('./logicConditionsStatus');
-const GlobalVariablesStatus = require('./globalVariablesStatus');
-const ProgrammingPidCollection = require('./programmingPidCollection');
-const ProgrammingPidStatus = require('./programmingPidStatus');
-const WaypointCollection = require('./waypointCollection');
-const OutputMappingCollection = require('./outputMapping');
-const SafehomeCollection = require('./safehomeCollection');
-const FwApproachCollection = require('./fwApproachCollection')
-const { PLATFORM } = require('./model')
-const VTX = require('./vtx');
-const BitHelper = require('./bitHelper');
-const { FLIGHT_MODES } = require('./flightModes');
+import ServoMixerRuleCollection from './servoMixerRuleCollection';
+import MotorMixerRuleCollection from './motorMixerRuleCollection';
+import LogicConditionsCollection from './logicConditionsCollection';
+import LogicConditionsStatus from './logicConditionsStatus';
+import GlobalVariablesStatus from './globalVariablesStatus';
+import ProgrammingPidCollection from './programmingPidCollection';
+import ProgrammingPidStatus from './programmingPidStatus';
+import WaypointCollection from './waypointCollection';
+import OutputMappingCollection from './outputMapping';
+import SafehomeCollection from './safehomeCollection';
+import FwApproachCollection from './fwApproachCollection';
+import GeozoneCollection from './geozoneCollection';
+import { PLATFORM } from './model';
+import VTX from './vtx';
+import BitHelper from './bitHelper';
+import { FLIGHT_MODES } from './flightModes';
 
 
 var FC = {
@@ -86,6 +87,7 @@ var FC = {
     RATE_DYNAMICS: null,
     EZ_TUNE: null,
     FLIGHT_MODES: null,
+    GEOZONES: null,
 
     restartRequired: false,
     MAX_SERVO_RATE: 125,
@@ -357,6 +359,7 @@ var FC = {
             band_count: 0,
             channel_count: 0,
             power_count: 0,
+            power_min: 1,
         };
 
         this.ADVANCED_CONFIG = {
@@ -600,6 +603,7 @@ var FC = {
 
 
         this.FW_APPROACH = new FwApproachCollection();
+        this.GEOZONES = new GeozoneCollection();
 
         this.OSD_CUSTOM_ELEMENTS = {
            settings: {customElementsCount: 0, customElementTextSize: 0, customElementParts: 0},
@@ -637,7 +641,8 @@ var FC = {
             {bit: 2, group: 'other', name: 'TX_PROF_SEL', haveTip: false, showNameInTip: false},
             {bit: 0, group: 'other', name: 'THR_VBAT_COMP', haveTip: true, showNameInTip: true},
             {bit: 3, group: 'other', name: 'BAT_PROFILE_AUTOSWITCH', haveTip: true, showNameInTip: true},
-            {bit: 31, group: 'other', name: "FW_AUTOTRIM", haveTip: true, showNameInTip: true}
+            {bit: 31, group: 'other', name: "FW_AUTOTRIM", haveTip: true, showNameInTip: true},
+            {bit: 4, group: 'other', name: "GEOZONE", haveTip: true, showNameInTip: true}
         ];
 
         return features.reverse();
@@ -973,12 +978,11 @@ var FC = {
     },
     getModeId: function (name) {
 
-        let mode = FLIGHT_MODES.find( mode => mode.boxName === name );
-        if (mode) {
-            return mode.permanentId;
-        } else {
-            return -1;
+        for (var i = 0; i < FC.AUX_CONFIG.length; i++) {
+            if (FC.AUX_CONFIG[i] == name)
+                return i;
         }
+        return -1;
     },
     isModeBitSet: function (i) {
         return BitHelper.bit_check(this.CONFIG.mode[Math.trunc(i / 32)], i % 32);
@@ -997,7 +1001,7 @@ var FC = {
             'battery_capacity_warning',
             'battery_capacity_critical',
             'battery_capacity_unit',
-            'controlrate_profile',
+            'use_control_profile',
             'throttle_scale',
             'throttle_idle',
             'turtle_mode_power_factor',
@@ -1141,4 +1145,4 @@ var FC = {
     }
 };
 
-module.exports = FC;
+export default FC;

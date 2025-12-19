@@ -244,6 +244,11 @@ var MSPCodes = {
     MSP2_INAV_SERVO_CONFIG:             0x2200,
     MSP2_INAV_SET_SERVO_CONFIG:         0x2201,
 
+    MSP2_INAV_GEOZONE:                  0x2210,
+    MSP2_INAV_SET_GEOZONE:              0x2211,
+    MSP2_INAV_GEOZONE_VERTEX:           0x2212,
+    MSP2_INAV_SET_GEOZONE_VERTICE:      0x2213
+
 };
 
-module.exports = MSPCodes;
+export default MSPCodes;

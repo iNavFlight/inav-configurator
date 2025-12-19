@@ -1,28 +1,25 @@
 'use strict';
 
-const { marked } = require('marked');
-const fs = require('fs');
-const path = require('path');
-const semver = require('semver');
-const { dialog } = require('@electron/remote');
-const Store = require('electron-store');
-const store = new Store();
+import { marked } from 'marked';
+import semver from 'semver';
 
-const i18n = require('./../js/localization');
-const { GUI, TABS } = require('./../js/gui');
-const MSP = require('./../js/msp');
-const MSPCodes = require('./../js/msp/MSPCodes')
-const FC = require('./../js/fc');
-const { usbDevices, PortHandler } = require('./../js/port_handler');
-const CONFIGURATOR = require('./../js/data_storage');
-const SerialBackend = require('./../js/serial_backend');
-const timeout = require('./../js/timeouts');
-const interval = require('./../js/intervals');
-const mspQueue = require('./../js/serial_queue');
-const mspHelper = require('./../js/msp/MSPHelper');
-const STM32 = require('./../js/protocols/stm32');
-const STM32DFU = require('./../js/protocols/stm32usbdfu');
-const mspDeduplicationQueue = require('./../js/msp/mspDeduplicationQueue');
+import i18n from './../js/localization';
+import { GUI, TABS } from './../js/gui';
+import MSP from './../js/msp';
+import MSPCodes from './../js/msp/MSPCodes';
+import FC from './../js/fc';
+import { usbDevices, PortHandler } from './../js/port_handler';
+import CONFIGURATOR from './../js/data_storage';
+import SerialBackend from './../js/serial_backend';
+import timeout from './../js/timeouts';
+import interval from './../js/intervals';
+import mspQueue from './../js/serial_queue';
+import mspHelper from './../js/msp/MSPHelper';
+import STM32 from './../js/protocols/stm32';
+import STM32DFU from './../js/protocols/stm32usbdfu';
+import mspDeduplicationQueue from './../js/msp/mspDeduplicationQueue';
+import store from './../js/store';
+import dialog from '../js/dialog.js';
 
 TABS.firmware_flasher = {};
 TABS.firmware_flasher.initialize = function (callback) {
@@ -32,9 +29,10 @@ TABS.firmware_flasher.initialize = function (callback) {
     }
 
     var intel_hex = false, // standard intel hex in string format
-        parsed_hex = false; // parsed raw hex in array format
+        parsed_hex = false, // parsed raw hex in array format
+        fileName = "inav.hex";
 
-    GUI.load(path.join(__dirname, "firmware_flasher.html"), function () {
+    import('./firmware_flasher.html?raw').then(({default: html}) => GUI.load(html, function () {
         // translate to user-selected language
         i18n.localize();
 
@@ -44,8 +42,8 @@ TABS.firmware_flasher.initialize = function (callback) {
 
         function parse_hex(str, callback) {
             // parsing hex in different thread
-            var worker = new Worker('./js/workers/hex_parser.js');
-
+            const worker = new Worker(new URL('./../js/workers/hex_parser.js', import.meta.url));
+            
             // "callback"
             worker.onmessage = function (event) {
                 callback(event.data);
@@ -53,22 +51,41 @@ TABS.firmware_flasher.initialize = function (callback) {
 
             // send data/string over for processing
             worker.postMessage(str);
+            
+        }
+
+        function getReleaseMajor(releaseName) {
+            // "name":"inav-9.0.0-dev-20250124-28-d1ef85e82d8aa5bb8b85e518893c8e4f6ab61d6e"
+            var releaseNameExpression = /^inav-(\d+)([\d.]+)-(ci|dev)-(\d{4})(\d{2})(\d{2})-(\d+)-(\w+)$/;
+            var match = releaseNameExpression.exec(releaseName);
+
+            if(!match) {
+                console.log(releaseName + " not matched");
+                //alert(releaseName);
+                return 0;
+            }
+
+            return match[1];
         }
 
         function parseDevFilename(filename) {
             //var targetFromFilenameExpression = /inav_([\d.]+)?_?([^.]+)\.(.*)/;
             // inav_8.0.0_TUNERCF405_dev-20240617-88fb1d0.hex
-            var targetFromFilenameExpression = /^inav_([\d.]+)_([A-Z0-9_]+)_dev-(\d{4})(\d{2})(\d{2})-(\w+)\.(hex)$/;
+            // inav_8.0.0_TUNERCF405_ci-20240617-88fb1d0.hex
+            var targetFromFilenameExpression = /^inav_(\d+)([\d.]+)_([A-Za-z0-9_]+)_(ci|dev)-(\d{4})(\d{2})(\d{2})-(\w+)\.(hex)$/;
             var match = targetFromFilenameExpression.exec(filename);
 
             if (!match) {
+                console.log(filename + " not matched");
                 return null;
             }
 
             return {
-                raw_target: match[2],
-                target: match[2].replace("_", " "),
-                format: match[7],
+                raw_target: match[3],
+                target: match[3].replace("_", " "),
+                format: match[9],
+                version: match[1]+match[2],
+                major: match[1]
             };
         }
 
@@ -148,14 +165,12 @@ TABS.firmware_flasher.initialize = function (callback) {
             });
 
             if (showDevReleases) {
+                var majorCount = {};
                 TABS.firmware_flasher.devReleasesData.forEach(function (release) {
                     release.assets.forEach(function (asset) {
                         var result = parseDevFilename(asset.name);
 
-                        if ((!showDevReleases && release.prerelease) || !result) {
-                            return;
-                        }
-                        if ($.inArray(result.target, unsortedTargets) == -1) {
+                        if (result && $.inArray(result.target, unsortedTargets) == -1) {
                             unsortedTargets.push(result.target);
                         }
                     });
@@ -209,8 +224,20 @@ TABS.firmware_flasher.initialize = function (callback) {
                 });
             });
 
-            if(showDevReleases) {
+            if(showDevReleases && TABS.firmware_flasher.devReleasesData) {
+                var majorCount = {};
                 TABS.firmware_flasher.devReleasesData.forEach(function(release){
+                    var major = getReleaseMajor(release.name);
+
+                    if (!(major in majorCount)) {
+                        majorCount[major] = 0;
+                    }
+
+                    if(majorCount[major] >= 10) {
+                        return;
+                    }
+
+                    majorCount[major]++;
 
                     var versionFromTagExpression = /v?(.*)/;
                     var matchVersionFromTag = versionFromTagExpression.exec(release.tag_name);
@@ -275,7 +302,7 @@ TABS.firmware_flasher.initialize = function (callback) {
             return;
         };
 
-        $.get('https://api.github.com/repos/iNavFlight/inav-nightly/releases?per_page=10', function(releasesData) {
+        $.get('https://api.github.com/repos/iNavFlight/inav-nightly/releases?per_page=50', function(releasesData) {
             TABS.firmware_flasher.devReleasesData = releasesData;
         }).fail(function (data){
             TABS.firmware_flasher.devReleasesData = {};
@@ -356,16 +383,16 @@ TABS.firmware_flasher.initialize = function (callback) {
 
                 console.log('Loading file from: ' + filename);
 
-                fs.readFile(filename, (err, data) => {
+                window.electronAPI.readFile(filename).then(response => {
 
-                    if (err) {
-                        console.log("Error loading local file", err);
+                    if (response.error) {
+                        console.log("Error loading local file", response.erroe);
                         return;
                     }
 
                     console.log('File loaded');
 
-                    parse_hex(data.toString(), function (data) {
+                    parse_hex(response.data.toString(), function (data) {
                         parsed_hex = data;
 
                         if (parsed_hex) {
@@ -474,6 +501,7 @@ TABS.firmware_flasher.initialize = function (callback) {
 
             var summary = $('select[name="firmware_version"] option:selected').data('summary');
             if (summary) { // undefined while list is loading or while running offline
+                fileName = summary.file;
                 $(".load_remote_file").text(i18n.getMessage('firmwareFlasherButtonLoading')).addClass('disabled');
                 $.get(summary.url, function (data) {
                     enable_load_online_button();
@@ -539,47 +567,22 @@ TABS.firmware_flasher.initialize = function (callback) {
         });
 
         $(document).on('click', 'span.progressLabel a.save_firmware', function () {
-            chrome.fileSystem.chooseEntry({type: 'saveFile', suggestedName: 'inav', accepts: [{extensions: ['hex']}]}, function (fileEntry) {
-                if (chrome.runtime.lastError) {
-                    console.error(chrome.runtime.lastError.message);
+            var options = {
+                defaultPath: fileName,
+                filters: [ {name: "HEX File", extensions: ['hex'] } ]
+            };
+            dialog.showSaveDialog(options).then(result => {
+                if (result.canceled) {
                     return;
                 }
-
-                chrome.fileSystem.getDisplayPath(fileEntry, function (path) {
-                    console.log('Saving firmware to: ' + path);
-
-                    // check if file is writable
-                    chrome.fileSystem.isWritableEntry(fileEntry, function (isWritable) {
-                        if (isWritable) {
-                            var blob = new Blob([intel_hex], {type: 'text/plain'});
-
-                            fileEntry.createWriter(function (writer) {
-                                var truncated = false;
-
-                                writer.onerror = function (e) {
-                                    console.error(e);
-                                };
-
-                                writer.onwriteend = function() {
-                                    if (!truncated) {
-                                        // onwriteend will be fired again when truncation is finished
-                                        truncated = true;
-                                        writer.truncate(blob.size);
-
-                                        return;
-                                    }
-                                };
-
-                                writer.write(blob);
-                            }, function (e) {
-                                console.error(e);
-                            });
-                        } else {
-                            console.log('You don\'t have write permissions for this file, sorry.');
-                            GUI.log(i18n.getMessage('writePermissionsForFile'));
-                        }
-                    });
+                fs.writeFileSync(result.filePath, intel_hex, (err) => {
+                    if (err) {
+                        GUI.log(i18n.getMessage('ErrorWritingFile'));
+                        return console.error(err);
+                    }
                 });
+                let sFilename = String(result.filePath.split('\\').pop().split('/').pop());
+                GUI.log(sFilename + i18n.getMessage('savedSuccessfully'));
             });
         });
 
@@ -607,22 +610,20 @@ TABS.firmware_flasher.initialize = function (callback) {
 
         $('input.updating').trigger('change');
         
+        if (store.get('flash_manual_baud', false)) {
+            $('input.flash_manual_baud').prop('checked', true);
+        } else {
+            $('input.flash_manual_baud').prop('checked', false);
+        }
 
-        store.get('flash_manual_baud', function (result) {
-            if (result.flash_manual_baud) {
-                $('input.flash_manual_baud').prop('checked', true);
-            } else {
-                $('input.flash_manual_baud').prop('checked', false);
-            }
-
-            // bind UI hook so the status is saved on change
-            $('input.flash_manual_baud').on('change', function () {
-                var status = $(this).is(':checked');
-                store.set('flash_manual_baud', status);
-            });
-
-            $('input.flash_manual_baud').trigger('change');
+        // bind UI hook so the status is saved on change
+        $('input.flash_manual_baud').on('change', function () {
+            var status = $(this).is(':checked');
+            store.set('flash_manual_baud', status);
         });
+
+        $('input.flash_manual_baud').trigger('change');
+        
 
         var flash_manual_baud_rate = store.get('flash_manual_baud_rate', '');
         $('#flash_manual_baud_rate').val(flash_manual_baud_rate);
@@ -684,7 +685,7 @@ TABS.firmware_flasher.initialize = function (callback) {
         }
 
         // bind UI hook so the status is saved on change
-        $('input.erase_chip').on('change', function () {
+        $('input.erase_chip').on('change', async function () {
             store.set('erase_chip', $(this).is(':checked'));
         });
 
@@ -704,7 +705,7 @@ TABS.firmware_flasher.initialize = function (callback) {
         });
 
         GUI.content_ready(callback);
-    });
+    }));
 };
 
 TABS.firmware_flasher.FLASH_MESSAGE_TYPES = {NEUTRAL : 'NEUTRAL',
@@ -781,7 +782,7 @@ TABS.firmware_flasher.getTarget = function() {
     }
 };
 
-TABS.firmware_flasher.onOpen = function(openInfo) {
+TABS.firmware_flasher.onOpen = async function(openInfo) {
     if (openInfo) {
         GUI.connected_to = GUI.connecting_to;
 

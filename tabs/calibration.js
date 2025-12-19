@@ -1,17 +1,15 @@
 'use strict';
 
-const path = require('path');
-
-const MSPChainerClass = require('./../js/msp/MSPchainer');
-const mspHelper = require('./../js/msp/MSPHelper');
-const MSPCodes = require('./../js/msp/MSPCodes');
-const MSP = require('./../js/msp');
-const { GUI, TABS } = require('./../js/gui');
-const FC = require('./../js/fc');
-const timeout = require('./../js/timeouts');
-const interval = require('./../js/intervals');
-const i18n = require('./../js/localization');
-const jBox = require('./../js/libraries/jBox/jBox.min');
+import MSPChainerClass from './../js/msp/MSPchainer';
+import mspHelper from './../js/msp/MSPHelper';
+import MSPCodes from './../js/msp/MSPCodes';
+import MSP from './../js/msp';
+import { GUI, TABS } from './../js/gui';
+import FC from './../js/fc';
+import timeout from './../js/timeouts';
+import interval from './../js/intervals';
+import i18n from './../js/localization';
+import jBox from 'jbox';
 
 TABS.calibration = {};
 
@@ -93,7 +91,7 @@ TABS.calibration.initialize = function (callback) {
     }
 
     function loadHtml() {
-        GUI.load(path.join(__dirname, "calibration.html"), processHtml);
+        import('./calibration.html?raw').then(({default: html}) => GUI.load(html, processHtml));
     }
 
     function updateCalibrationSteps() {

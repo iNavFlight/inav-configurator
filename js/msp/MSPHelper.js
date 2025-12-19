@@ -1,26 +1,27 @@
 'use strict';
 
-const semver = require('semver');
+import semver from 'semver';
 
-require('./../injected_methods');
-const { GUI } = require('./../gui');
-const MSP = require('./../msp');
-const MSPCodes = require('./MSPCodes');
-const FC = require('./../fc');
-const VTX = require('./../vtx');
-const mspQueue = require('./../serial_queue');
-const ServoMixRule = require('./../servoMixRule');
-const MotorMixRule = require('./../motorMixRule');
-const LogicCondition = require('./../logicCondition');
-const BitHelper = require('../bitHelper');
-const serialPortHelper = require('./../serialPortHelper');
-const ProgrammingPid = require('./../programmingPid');
-const Safehome = require('./../safehome');
-const { FwApproach } = require('./../fwApproach');
-const Waypoint = require('./../waypoint');
-const mspDeduplicationQueue = require('./mspDeduplicationQueue');
-const mspStatistics = require('./mspStatistics');
-const settingsCache = require('./../settingsCache');
+import './../injected_methods';
+import { GUI } from './../gui';
+import MSP from './../msp';
+import MSPCodes from './MSPCodes';
+import FC from './../fc';
+import VTX from './../vtx';
+import mspQueue from './../serial_queue';
+import ServoMixRule from './../servoMixRule';
+import MotorMixRule from './../motorMixRule';
+import LogicCondition from './../logicCondition';
+import BitHelper from '../bitHelper';
+import serialPortHelper from './../serialPortHelper';
+import ProgrammingPid from './../programmingPid';
+import Safehome from './../safehome';
+import { FwApproach } from './../fwApproach';
+import Waypoint from './../waypoint';
+import mspDeduplicationQueue from './mspDeduplicationQueue';
+import mspStatistics from './mspStatistics';
+import settingsCache from './../settingsCache';
+import {Geozone, GeozoneVertex, GeozoneShapes } from './../geozone';
 
 var mspHelper = (function () {
     var self = {};
@@ -438,10 +439,10 @@ var mspHelper = (function () {
                 if (data.byteLength % 6 === 0) {
                     for (let i = 0; i < data.byteLength; i += 6) {
                         FC.SERVO_RULES.put(new ServoMixRule(
-                            data.getInt8(i),
-                            data.getInt8(i + 1),
+                            data.getUint8(i),
+                            data.getUint8(i + 1),
                             data.getInt16(i + 2, true),
-                            data.getInt8(i + 4),
+                            data.getUint8(i + 4),
                             data.getInt8(i + 5)
                         ));
                     }
@@ -1145,14 +1146,28 @@ var mspHelper = (function () {
                     FC.VTX_CONFIG.channel = data.getUint8(offset++);
                     FC.VTX_CONFIG.power = data.getUint8(offset++);
                     FC.VTX_CONFIG.pitmode = data.getUint8(offset++);
-                    // Ignore wether the VTX is ready for now
+                    // Ignore whether the VTX is ready for now
                     offset++;
                     FC.VTX_CONFIG.low_power_disarm = data.getUint8(offset++);
-                    // Assume we got a vtx table
-                    offset++;
-                    FC.VTX_CONFIG.band_count = data.getUint8(offset++);
-                    FC.VTX_CONFIG.channel_count = data.getUint8(offset++);
-                    FC.VTX_CONFIG.power_count = data.getUint8(offset++);
+
+                    // Check if firmware supports VTX table (INAV 9.0+)
+                    if (offset < data.byteLength) {
+                        const vtxtable_available = data.getUint8(offset++);
+                        if (vtxtable_available && offset + 2 < data.byteLength) {
+                            FC.VTX_CONFIG.band_count = data.getUint8(offset++);
+                            FC.VTX_CONFIG.channel_count = data.getUint8(offset++);
+                            FC.VTX_CONFIG.power_count = data.getUint8(offset++);
+
+                            // Check if firmware sends powerMin (INAV 9.1+)
+                            if (offset < data.byteLength) {
+                                FC.VTX_CONFIG.power_min = data.getUint8(offset++);
+                            } else {
+                                // Firmware 9.0 doesn't send powerMin, use fallback
+                                // MSP VTX supports power off (index 0), others start at 1
+                                FC.VTX_CONFIG.power_min = (FC.VTX_CONFIG.device_type == VTX.DEV_MSP) ? 0 : 1;
+                            }
+                        }
+                    }
                 }
                 break;
             case MSPCodes.MSP_ADVANCED_CONFIG:
@@ -1605,9 +1620,67 @@ var mspHelper = (function () {
 
                 FC.OSD_CUSTOM_ELEMENTS.items.push(customElement);
                 break;
+
             case MSPCodes.MSP2_INAV_GPS_UBLOX_COMMAND:
                 // Just and ACK from the fc.
                 break;
+            
+            case MSPCodes.MSP2_INAV_GEOZONE:
+                
+                if (data.buffer.byteLength == 0) {
+                    break;
+                }
+                var geozone = new Geozone(        
+                    data.getUint8(1),
+                    data.getUint8(2),
+                    data.getInt32(3, true),
+                    data.getInt32(7, true),
+                    data.getUint8(11),
+                    0,
+                    data.getInt8(12, true),
+                    null,
+                    data.getUint8(0, true),
+                );
+                let verticesCount = data.getUint8(13, true);
+                if (verticesCount == 0) {
+                    break;
+                }
+                if (geozone.getShape() == GeozoneShapes.POLYGON) {
+                    geozone.setVertices(new Array(verticesCount));
+                } else {
+                    geozone.setVertices(new Array(1));
+                }                
+                FC.GEOZONES.put(geozone);
+                break;
+            case MSPCodes.MSP2_INAV_GEOZONE_VERTEX:
+                if (data.buffer.byteLength == 0) {
+                    break;
+                }
+                var zoneID = data.getUint8(0);
+                var vertexId = data.getUint8(1);
+                var geozone = FC.GEOZONES.at(zoneID);
+                if (zoneID < FC.GEOZONES.geozoneCount()) {
+                    geozone.setVertex(
+                        vertexId,
+                        new GeozoneVertex(
+                            vertexId,
+                            data.getInt32(2, true),
+                            data.getInt32(6, true),
+                        )
+                    );
+                    if (geozone.getShape() == GeozoneShapes.CIRCULAR) {
+                        geozone.setRadius(data.getUint32(10, true));
+                    }
+                }
+                break;
+            
+            case MSPCodes.MSP2_INAV_SET_GEOZONE_VERTICE:
+                console.log("Geozone vertex saved")
+                break; 
+            
+            case MSPCodes.MSP2_INAV_SET_GEOZONE:
+                console.log("Geozone saved")
+                break;    
 
             default:
                 console.log('Unknown code detected: 0x' + dataHandler.code.toString(16));
@@ -2805,7 +2878,7 @@ var mspHelper = (function () {
     };
 
     self.loadOutputMapping = function (callback) {
-        alert('Obsolete MSPHelper.loadOutputMapping call');
+        console.warn('Warning: self.loadOutputMapping is obsolete and may be removed in future versions. Please update usage.');
         MSP.send_message(MSPCodes.MSPV2_INAV_OUTPUT_MAPPING, false, false, callback);
     };
 
@@ -3095,6 +3168,68 @@ var mspHelper = (function () {
             }
         };
     };
+
+    self.loadGeozones = function (callback) {
+        FC.GEOZONES.flush();
+        let geozoneID = -1;
+        let vertexID = -1;
+        nextGeozone();
+
+        function nextVertex() {
+            vertexID++;
+            let zone = FC.GEOZONES.at(geozoneID);
+            if (!zone || zone.getVerticesCount() == 0) {
+                nextGeozone();
+                return;
+            }
+            if (vertexID < FC.GEOZONES.at(geozoneID).getVerticesCount() && zone.getShape() == GeozoneShapes.POLYGON) {
+                MSP.send_message(MSPCodes.MSP2_INAV_GEOZONE_VERTEX, [geozoneID, vertexID], false, nextVertex); 
+            } else {
+                MSP.send_message(MSPCodes.MSP2_INAV_GEOZONE_VERTEX, [geozoneID, vertexID], false, nextGeozone); 
+            }
+        }
+
+        function nextGeozone() {
+            geozoneID++;
+            vertexID = -1;
+            if (geozoneID < FC.GEOZONES.getMaxZones()) {
+                MSP.send_message(MSPCodes.MSP2_INAV_GEOZONE, [geozoneID], false, nextVertex);
+            } else {
+                MSP.send_message(MSPCodes.MSP2_INAV_GEOZONE, [geozoneID], false, callback);
+            }
+        }
+    };
+
+    self.saveGeozones = function (callback) {
+        let geozoneID = -1;
+        let vertexID = -1;
+        nextGeozone()
+
+        function nextVertex() {
+            vertexID++;
+
+            let zone = FC.GEOZONES.at(geozoneID);
+            if (!zone || zone.getVerticesCount() == 0) {
+                nextGeozone();
+                return;
+            }
+            if (vertexID < FC.GEOZONES.at(geozoneID).getVerticesCount() - 1) {
+                MSP.send_message(MSPCodes.MSP2_INAV_SET_GEOZONE_VERTICE, FC.GEOZONES.extractBufferVertices(geozoneID, vertexID), false, nextVertex); 
+            } else {
+                MSP.send_message(MSPCodes.MSP2_INAV_SET_GEOZONE_VERTICE, FC.GEOZONES.extractBufferVertices(geozoneID, vertexID), false, nextGeozone); 
+            }
+        }
+
+        function nextGeozone() {
+            geozoneID++;
+            vertexID = -1;
+            if (geozoneID < FC.GEOZONES.getMaxZones()) {
+                MSP.send_message(MSPCodes.MSP2_INAV_SET_GEOZONE, FC.GEOZONES.extractBufferZone(geozoneID), false, nextVertex);
+            } else {
+                MSP.send_message(MSPCodes.MSP2_INAV_SET_GEOZONE, FC.GEOZONES.extractBufferZone(geozoneID), false, callback);
+            }
+        }
+    }
 
     self._getSetting = function (name) {
 
@@ -3420,4 +3555,4 @@ var mspHelper = (function () {
     return self;
 })();
 
-module.exports = mspHelper;
+export default mspHelper;

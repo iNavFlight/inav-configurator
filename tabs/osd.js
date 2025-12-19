@@ -1,26 +1,22 @@
 'use strict';
 
-const inflection = require( 'inflection' );
-const fs = require('fs');
-const path = require('path');
-const semver = require('semver');
-const mapSeries = require('promise-map-series');
-const { dialog } = require("@electron/remote");
-const Store = require('electron-store');
-const store = new Store();
+import { titleize } from  'inflection';
+import semver from 'semver';
+import mapSeries from 'promise-map-series';
+import jBox from 'jbox';
+import { debounce } from 'throttle-debounce';
 
-const FC = require('./../js/fc');
-const { GUI, TABS } = require('./../js/gui');
-const MSP = require('./../js/msp');
-const MSPCodes = require('./../js/msp/MSPCodes');
-const mspHelper = require('./../js/msp/MSPHelper');
-const Settings = require('./../js/settings');
-const { globalSettings } = require('./../js/globalSettings');
-const { PortHandler } = require('./../js/port_handler');
-const i18n = require('./../js/localization');
-const jBox = require('./../js/libraries/jBox/jBox.min');
-const { Console } = require('console');
-
+import FC from './../js/fc';
+import { GUI, TABS } from './../js/gui';
+import MSP from './../js/msp';
+import MSPCodes from './../js/msp/MSPCodes';
+import mspHelper from './../js/msp/MSPHelper';
+import Settings from './../js/settings';
+import { globalSettings } from './../js/globalSettings';
+import { PortHandler } from './../js/port_handler';
+import i18n from './../js/localization';
+import store from './../js/store';
+import dialog from './../js/dialog';
 
 var SYM = SYM || {};
 SYM.LAST_CHAR = 225; // For drawing the font preview
@@ -33,6 +29,7 @@ SYM.AH_LEFT = 0x12C;
 SYM.THR = 0x95;
 SYM.VOLT = 0x1F;
 SYM.AH_DECORATION_UP = 0x15;
+SYM.AH_DECORATION_DOWN = 0x16;
 SYM.WIND_SPEED_HORIZONTAL = 0x86;
 SYM.WIND_SPEED_VERTICAL = 0x87;
 SYM.FLY_M = 0x9F;
@@ -87,6 +84,8 @@ SYM.HEADING_W = 0xCB;
 SYM.HEADING_DIVIDED_LINE = 0xCC;
 SYM.HEADING_LINE = 0xCD;
 SYM.VARIO_UP_2A = 0x155;
+SYM.THROTTLE_GAUGE_EMPTY = 0x16B;
+SYM.THROTTLE_GAUGE_FULL = 0x16D;
 SYM.M_S = 0x8F;
 SYM.FT_S = 0x8D;
 SYM.CLOCK = 0xA0;
@@ -142,6 +141,7 @@ SYM.BLACKBOX = 0xFE;
 SYM.PILOT_LOGO_SML_L = 0x1D5;
 SYM.PILOT_LOGO_SML_C = 0x1D6;
 SYM.PILOT_LOGO_SML_R = 0x1D7;
+SYM.MIN_GND_SPEED = 0xDE;
 
 SYM.AH_AIRCRAFT0 = 0x1A2;
 SYM.AH_AIRCRAFT1 = 0x1A3;
@@ -151,6 +151,8 @@ SYM.AH_AIRCRAFT4 = 0x1A6;
 
 SYM.SYM_HUD_SIGNAL_3 = 0x163;
 SYM.SYM_HUD_CARDINAL = 0x1BA;
+SYM.RX_BAND = 0x169;
+SYM.RX_MODE = 0x16A;
 
 SYM.AH_CROSSHAIRS = new Array(0x166, 0x1A4, new Array(0x190, 0x191, 0x192), new Array(0x193, 0x194, 0x195), new Array(0x196, 0x197, 0x198), new Array(0x199, 0x19A, 0x19B), new Array (0x19C, 0x19D, 0x19E), new Array (0x19F, 0x1A0, 0x1A1));
 
@@ -259,7 +261,7 @@ FONT.parseMCMFontFile = function (data) {
 FONT.openFontFile = function ($preview) {
     return new Promise(function (resolve) {
         var options = {
-            filters: [ 
+            filters: [
                 { name: 'Font file', extensions: ['mcm'] }
             ],
         };
@@ -268,11 +270,18 @@ FONT.openFontFile = function ($preview) {
                 console.log('No file selected');
                 return;
             }
-            
+
             if (result.filePaths.length == 1) {
-                const fontData = fs.readFileSync(result.filePaths[0], {flag: "r"});
-                FONT.parseMCMFontFile(fontData.toString());
-                resolve();
+                    window.electronAPI.readFile(result.filePaths[0]).then(response => {
+                    if (response.error) {
+                        GUI.log(i18n.getMessage('ErrorReadingFile'));
+                        console.log(response.error);
+                        return;
+                    }
+
+                    FONT.parseMCMFontFile(response.data.toString());
+                    resolve();
+                });
             }
         }).catch (err => {
             console.log(err);
@@ -452,7 +461,7 @@ function altitude_alarm_display_function(fn) {
     }
 }
 
-function osdMainBatteryPreview() {
+function osdDecimalsMainBatteryPreview() {
     var s = '16.8';
     if (Settings.getInputValue('osd_main_voltage_decimals') == 2) {
         s += '3';
@@ -460,6 +469,66 @@ function osdMainBatteryPreview() {
 
     s += FONT.symbol(SYM.VOLT);
     return FONT.symbol(SYM.BATT) + FONT.embed_dot(s);
+}
+
+function osdDecimalsAltitudePreview() {
+    var s = FONT.symbol(SYM.BLANK) + '114';
+    if (Settings.getInputValue('osd_decimals_altitude') == 4) {
+        s += '3';
+    } if (Settings.getInputValue('osd_decimals_altitude') == 5) {
+        s += '38';
+    }
+
+    switch (OSD.data.preferences.units) {
+        case 0: // Imperial
+        case 3: // UK
+        case 4: // GA
+            s += FONT.symbol(SYM.ALT_FT);
+        default: // Metric
+            s += FONT.symbol(SYM.ALT_M);
+    }
+
+    return s;
+}
+
+function osdDecimalsRemainingFlightDistancePreview() {
+    return osdDecimalsDistancePreview(SYM.FLIGHT_DIST_REMAINING);
+}
+
+function osdDecimalsHomeDistancePreview() {
+    return osdDecimalsDistancePreview(SYM.HOME);
+}
+
+function osdDecimalsTripDistancePreview() {
+    return osdDecimalsDistancePreview(SYM.TRIP_DIST);
+}
+
+function osdDecimalsDistancePreview(prependedSymbol) {
+    var s = '24.9';
+    if (Settings.getInputValue('osd_decimals_distance') == 4) {
+        s+= '3';
+    } if (Settings.getInputValue('osd_decimals_distance') == 5) {
+        s = '1' + s + '6';
+    }
+
+    s = FONT.embed_dot(s);
+
+    switch (OSD.data.preferences.units) {
+        case 0: // Imperial
+        case 3: // UK
+            s += FONT.symbol(SYM.DIST_MI);
+            break;
+        case 4: // GA
+            s += FONT.symbol(SYM.DIST_NM);
+            break;
+        default: // Metric
+            s += FONT.symbol(SYM.DIST_KM);
+            break;
+    }
+
+    s = FONT.symbol(prependedSymbol) + s;
+
+    return s;
 }
 
 function osdmAhPrecisionPreview() {
@@ -498,6 +567,7 @@ OSD.initData = function () {
             sidebar_scroll_arrows: null,
             units: null,
             stats_energy_unit: null,
+            adsb_warning_style: null,
         },
         alarms: {
             rssi: null,
@@ -535,7 +605,7 @@ OSD.DjiElements =  {
         "FLYMODE",
         "ESC_TEMPERATURE",
         "ALTITUDE",
-        "VARIO_NUM",
+        "VERTICAL_SPEED_INDICATOR",
         "CROSSHAIRS",
         "HORIZON_SIDEBARS",
         "PITCH_ANGLE",
@@ -554,7 +624,7 @@ OSD.DjiElements =  {
         "GForce",
         "Timers",
         "VTX",
-        "CRSF",
+        "RX",
         "SwitchIndicators",
         "OSDCustomElements",
         "GVars",
@@ -572,6 +642,7 @@ OSD.DjiElements =  {
     ],
     craftNameElements: [
         "MESSAGES",
+        "THROTTLE_GAUGE",
         "THROTTLE_POSITION",
         "SCALED_THROTTLE_POSITION",
         "3D_SPEED",
@@ -590,7 +661,8 @@ OSD.constants = {
         'DJIWTF',
         'AVATAR',
         'BF43COMPAT',
-        'BFHDCOMPAT'
+        'BFHDCOMPAT',
+        'DJI_NATIVE'
     ],
     VIDEO_LINES: {
         PAL: 16,
@@ -599,7 +671,8 @@ OSD.constants = {
         DJIWTF: 22,
         AVATAR: 20,
         BF43COMPAT: 16,
-        BFHDCOMPAT: 20
+        BFHDCOMPAT: 20,
+        DJI_NATIVE: 20
     },
     VIDEO_COLS: {
         PAL: 30,
@@ -608,7 +681,8 @@ OSD.constants = {
         DJIWTF: 60,
         AVATAR: 53,
         BF43COMPAT: 30,
-        BFHDCOMPAT: 53
+        BFHDCOMPAT: 53,
+        DJI_NATIVE: 53,
     },
     VIDEO_BUFFER_CHARS: {
         PAL: 480,
@@ -617,7 +691,8 @@ OSD.constants = {
         DJIWTF: 1320,
         AVATAR: 1060,
         BF43COMPAT: 480,
-        BFHDCOMPAT: 1060
+        BFHDCOMPAT: 1060,
+        DJI_NATIVE: 1060
     },
     UNIT_TYPES: [
         {name: 'osdUnitImperial', value: 0},
@@ -628,6 +703,11 @@ OSD.constants = {
     ],
     AHISIDEBARWIDTHPOSITION: 7,
     AHISIDEBARHEIGHTPOSITION: 3,
+
+    ADSB_WARNING_STYLE: {
+        'COMPACT' : 0,
+        'EXTENDED' : 1,
+    },
 
     ALL_ALARMS: [
         {
@@ -669,6 +749,7 @@ OSD.constants = {
             min: 0,
             max: altitude_alarm_max
         },
+
         {
             name: 'DIST',
             field: 'dist',
@@ -849,12 +930,12 @@ OSD.constants = {
                 {
                     name: 'MAIN_BATT_VOLTAGE',
                     id: 1,
-                    preview: osdMainBatteryPreview,
+                    preview: osdDecimalsMainBatteryPreview,
                 },
                 {
                     name: 'SAG_COMP_MAIN_BATT_VOLTAGE',
                     id: 53,
-                    preview: osdMainBatteryPreview,
+                    preview: osdDecimalsMainBatteryPreview,
                 },
                 {
                     name: 'MAIN_BATT_CELL_VOLTAGE',
@@ -884,17 +965,16 @@ OSD.constants = {
                 {
                     name: 'REMAINING_FLIGHT_DISTANCE',
                     id: 49,
-                    preview: function(osd_data) {
-                        switch (OSD.data.preferences.units) {
-                            case 0: // Imperial
-                            case 3: // UK
-                                return FONT.symbol(SYM.FLIGHT_DIST_REMAINING) + FONT.embed_dot('0.98') + FONT.symbol(SYM.DIST_MI);
-                            case 4: // GA
-                                return FONT.symbol(SYM.FLIGHT_DIST_REMAINING) + FONT.embed_dot('0.85') + FONT.symbol(SYM.DIST_NM);
-                            default: // Metric
-                                return FONT.symbol(SYM.FLIGHT_DIST_REMAINING) + FONT.embed_dot('1.73') + FONT.symbol(SYM.DIST_KM);
-                        }
-                    }
+                    preview: osdDecimalsRemainingFlightDistancePreview,
+                },
+                {
+                    name: 'THROTTLE_GAUGE',
+                    id: 168,
+                    preview: FONT.symbol(SYM.THROTTLE_GAUGE_EMPTY) + '\n' +
+                        FONT.symbol(SYM.THROTTLE_GAUGE_EMPTY) + '\n' +
+                        FONT.symbol(SYM.THROTTLE_GAUGE_FULL) + '\n' +
+                        FONT.symbol(SYM.THROTTLE_GAUGE_FULL) + '\n' +
+                        FONT.symbol(SYM.THROTTLE_GAUGE_FULL) + '\n'
                 },
                 {
                     name: 'THROTTLE_POSITION',
@@ -972,6 +1052,28 @@ OSD.constants = {
                         }
 
                         return FONT.symbol(SYM.AIR) + speed;
+                    }
+                },
+                {
+                    name: 'MIN_GROUND_SPEED',
+                    id: 167,
+                    preview: function(osd_data) {
+                        var speed;
+                        switch (OSD.data.preferences.units) {
+                            case 0: // Imperial
+                            case 2: // Metric + MPH
+                            case 3: // UK
+                                speed = ' 22' + FONT.symbol(SYM.MPH);
+                                break;
+                            case 4: // GA
+                                speed = ' 19' + FONT.symbol(SYM.KT);
+                                break;
+                            default: // Metric
+                                speed = ' 35' + FONT.symbol(SYM.KMH);
+                                break;
+                        }
+
+                        return FONT.symbol(SYM.MIN_GND_SPEED) + speed;
                     }
                 },
                 {
@@ -1070,7 +1172,7 @@ OSD.constants = {
                 },
                 {
                     name: 'BLACKBOX',
-                    id: 149,
+                    id: 152,
                     min_version: '8.0.0',
                     preview: function(osd_data) {
                         return FONT.symbol(SYM.BLACKBOX) + FONT.embed_dot('000123');
@@ -1232,16 +1334,7 @@ OSD.constants = {
                 {
                     name: 'ALTITUDE',
                     id: 15,
-                    preview: function () {
-                        switch (OSD.data.preferences.units) {
-                            case 0: // Imperial
-                            case 3: // UK
-                            case 4: // GA
-                                return ' 375' + FONT.symbol(SYM.ALT_FT);
-                            default: // Metric
-                                return ' 114' + FONT.symbol(SYM.ALT_M);
-                        }
-                    }
+                    preview: osdDecimalsAltitudePreview,
                 },
                 {
                     name: 'VARIO',
@@ -1253,7 +1346,7 @@ OSD.constants = {
                         FONT.symbol(SYM.VARIO_UP_2A) + '\n'
                 },
                 {
-                    name: 'VARIO_NUM',
+                    name: 'VERTICAL_SPEED_INDICATOR',
                     id: 26,
                     preview: function(osd_data) {
                         switch (OSD.data.preferences.units) {
@@ -1606,33 +1699,13 @@ OSD.constants = {
                 {
                     name: 'DISTANCE_TO_HOME',
                     id: 23,
-                    preview: function(osd_data) {
-                        switch (OSD.data.preferences.units) {
-                            case 0: // Imperial
-                            case 3: // UK
-                                return FONT.symbol(SYM.HOME) + FONT.embed_dot('0.98') + FONT.symbol(SYM.DIST_MI);
-                            case 4: // GA
-                                return FONT.symbol(SYM.HOME) + FONT.embed_dot('0.85') + FONT.symbol(SYM.DIST_NM);
-                            default: // Metric
-                                return FONT.symbol(SYM.HOME) + FONT.embed_dot('1.57') + FONT.symbol(SYM.DIST_KM);
-                        }
-                    }
+                    preview: osdDecimalsHomeDistancePreview,
                 },
                 {
                     name: 'TRIP_DIST',
                     id: 40,
                     min_version: '1.9.1',
-                    preview: function(osd_data) {
-                        switch (OSD.data.preferences.units) {
-                            case 0: // Imperial
-                            case 3: // UK
-                                return FONT.symbol(SYM.TRIP_DIST) + FONT.embed_dot('0.98') + FONT.symbol(SYM.DIST_MI);
-                            case 4: // GA
-                                return FONT.symbol(SYM.TRIP_DIST) + FONT.embed_dot('0.85') + FONT.symbol(SYM.DIST_NM);
-                            default: // Metric
-                                return FONT.symbol(SYM.TRIP_DIST) + FONT.embed_dot('1.57') + FONT.symbol(SYM.DIST_KM);
-                        }
-                    }
+                    preview: osdDecimalsTripDistancePreview,
                 },
                 {
                     name: 'ODOMETER',
@@ -1719,7 +1792,43 @@ OSD.constants = {
                     name: 'ADSB_WARNING_MESSAGE',
                     id: 150,
                     min_version: '7.1.0',
-                    preview: FONT.symbol(SYM.ADSB) + '19.25' + FONT.symbol(SYM.DIR_TO_HOME+1) + '2.75',
+                    preview: function(osd_data) {
+
+                        var distanceSymbol;
+                        var distanceSymbolSmaller;
+                        var velocitySymbol;
+
+                        switch (OSD.data.preferences.units) {
+                            case 0: // Imperial
+                            case 2: // Metric + MPH
+                                distanceSymbol = SYM.KM;
+                                distanceSymbolSmaller = SYM.M;
+                                velocitySymbol = SYM.MPH;
+                                break;
+                            case 3: // UK
+                                distanceSymbol = SYM.MI;
+                                distanceSymbolSmaller = SYM.ALT_FT;
+                                velocitySymbol = SYM.MPH;
+                                break;
+                            case 4: // GA
+                                distanceSymbol = SYM.MI;
+                                distanceSymbolSmaller = SYM.ALT_FT;
+                                velocitySymbol = SYM.KT;
+                                break;
+                            default: // Metric
+                                distanceSymbol = SYM.KM;
+                                distanceSymbolSmaller = SYM.M;
+                                velocitySymbol = SYM.KMH;
+                                break;
+                        }
+
+                        var el =  FONT.symbol(SYM.ADSB) + FONT.embed_dot('9.28') + FONT.symbol(distanceSymbol) + FONT.symbol(SYM.SYM_HUD_CARDINAL+5) + FONT.embed_dot('-423') + FONT.symbol(distanceSymbolSmaller);
+                        if (OSD.data.preferences.adsb_warning_style !== null && OSD.data.preferences.adsb_warning_style === OSD.constants.ADSB_WARNING_STYLE.EXTENDED){
+                            el +=  "\n" + "HEAVY " + FONT.symbol(SYM.DIR_TO_HOME+1)+FONT.embed_dot('653') + FONT.symbol(velocitySymbol);
+                        }
+
+                        return el;
+                    },
                 },
                 {
                     name: 'ADSB_INFO',
@@ -1742,7 +1851,51 @@ OSD.constants = {
                                 return FONT.symbol(SYM.CROSS_TRACK_ERROR) + FONT.embed_dot('1.57') + FONT.symbol(SYM.DIST_KM);
                         }
                     }
+                },{
+                    name: 'COURSE_NEXT_GEOZONE',
+                    id: 163,
+                    min_version: '8.0.0',
+                    enabled: function() {
+                        return FC.isFeatureEnabled('GEOZONE');
+                    },
+                    preview: FONT.symbol(SYM.DIR_TO_HOME)
+                }, {
+                    name: 'HOR_DIST_TO_NEXT_GEOZONE',
+                    id: 164,
+                    min_version: '8.0.0',
+                    enabled: function() {
+                        return FC.isFeatureEnabled('GEOZONE');
+                    },
+                    preview: function(osd_data) {
+                        switch (OSD.data.preferences.units) {
+                            case 0: // Imperial
+                            case 3: // UK
+                                return 'FD  ' + FONT.embed_dot('0.88') + FONT.symbol(SYM.DIST_MI);
+                            case 4: // GA
+                                return 'FD  ' + FONT.embed_dot('0.78') + FONT.symbol(SYM.DIST_NM);
+                            default: // Metric
+                                return 'FD  ' + FONT.embed_dot('1.42') + FONT.symbol(SYM.DIST_KM);
+                        }
+                    }
                 },
+                {
+                    name: 'VERT_DIST_TO_NEXT_GEOZONE',
+                    id: 165,
+                    min_version: '8.0.0',
+                    enabled: function() {
+                        return FC.isFeatureEnabled('GEOZONE');
+                    },
+                    preview: function(osd_data) {
+                        switch (OSD.data.preferences.units) {
+                            case 0: // Imperial
+                            case 3: // UK
+                            case 4: // GA
+                                return 'FD  466' + FONT.symbol(SYM.ALT_FT) + FONT.symbol(SYM.DIR_TO_HOME);
+                            default: // Metric
+                                return 'FD  142'  + FONT.symbol(SYM.ALT_M) + FONT.symbol(SYM.DIR_TO_HOME);
+                        }
+                    }
+                }
             ]
         },
         {
@@ -1818,44 +1971,68 @@ OSD.constants = {
             ]
         },
         {
-            name: 'osdGroupCRSF',
+            name: 'osdGroupRx',
             enabled: function() {
-                return HARDWARE.capabilities.useCRSFRx;
+                return HARDWARE.capabilities.useRx;
             },
             items: [
                 {
-                    name: 'CRSF_RSSI_DBM',
+                    name: 'RSSI_DBM',
                     id: 109,
                     positionable: true,
                     preview: FONT.symbol(SYM.RSSI) + '-100' + FONT.symbol(SYM.DBM)
                 },
                 {
-                    name: 'CRSF_LQ',
+                    name: 'LQ_UPLINK',
                     id: 110,
                     positionable: true,
                     preview: function(osd_data) {
-                        var crsflqformat;
-                        if (Settings.getInputValue('osd_crsf_lq_format') == 0) {
-                            crsflqformat = FONT.symbol(SYM.LQ) + '100';
-                        } else if (Settings.getInputValue('osd_crsf_lq_format') == 1){
-                            crsflqformat = FONT.symbol(SYM.LQ) + '2:100';
+                        var lqFormat;
+                        if (HARDWARE.capabilities.useCRSF && Settings.getInputValue('osd_crsf_lq_format') == 1){
+                            lqFormat = FONT.symbol(SYM.LQ) + '2:100';
+                        } else if (HARDWARE.capabilities.useCRSF && Settings.getInputValue('osd_crsf_lq_format') == 2) {
+                            lqFormat = FONT.symbol(SYM.LQ) + '300';
                         } else {
-                            crsflqformat = FONT.symbol(SYM.LQ) + '300';
+                            lqFormat = FONT.symbol(SYM.LQ) + '100';
                         }
-                        return crsflqformat;
+                        return lqFormat;
                     }
                 },
                 {
-                    name: 'CRSF_SNR_DB',
+                    name: 'LQ_DOWNLINK',
+                    id: 159,
+                    positionable: true,
+                    preview: FONT.symbol(SYM.LQ) + '100' + FONT.symbol(SYM.AH_DECORATION_DOWN)
+                },
+                {
+                    name: 'SNR_DB',
                     id: 111,
                     positionable: true,
                     preview: FONT.symbol(SYM.SNR) + '-12' + FONT.symbol(SYM.DB)
                 },
                 {
-                    name: 'CRSF_TX_POWER',
+                    name: 'TX_POWER_UPLINK',
                     id: 112,
                     positionable: true,
                     preview: '  10' + FONT.symbol(SYM.MW)
+                },
+                {
+                    name: 'RX_POWER_DOWNLINK',
+                    id: 160,
+                    positionable: true,
+                    preview: '  10' + FONT.symbol(SYM.MW) + FONT.symbol(SYM.AH_DECORATION_DOWN)
+                },
+                {
+                    name: 'RX_BAND',
+                    id: 161,
+                    positionable: true,
+                    preview: FONT.symbol(SYM.RX_BAND) + '2.4G'
+                },
+                {
+                    name: 'RX_MODE',
+                    id: 162,
+                    positionable: true,
+                    preview: FONT.symbol(SYM.RX_MODE) + '150HZ '
                 },
             ]
         },
@@ -2138,6 +2315,11 @@ OSD.constants = {
                     id: 139,
                     preview: 'WP NO 7'
                 },
+                {
+                    name: 'FW_ALT_CONTROL_RESPONSE',
+                    id: 166,
+                    preview: 'ACR 40'
+                },
             ]
         },
         {
@@ -2252,16 +2434,19 @@ OSD.reload = function(callback) {
                 MSP.promise(MSPCodes.MSP2_INAV_OSD_PREFERENCES).then(function (resp) {
                     OSD.data.supported = true;
                     OSD.msp.decodePreferences(resp);
-                    done();
+                    
+                    MSP.promise(MSPCodes.MSP2_INAV_CUSTOM_OSD_ELEMENTS).then(() => { 
+                        mspHelper.loadOsdCustomElements(() => {
+                            createCustomElements();
+                            done();
+                        });
+                    });
                 });
             });
         });
     });
 
-    if(semver.gte(FC.CONFIG.flightControllerVersion, '7.1.0'))
-    {
-        MSP.send_message(MSPCodes.MSP2_INAV_CUSTOM_OSD_ELEMENTS);
-    }
+    
 };
 
 OSD.updateSelectedLayout = function(new_layout) {
@@ -2323,9 +2508,9 @@ OSD.updateDisplaySize = function () {
     $('.preview').toggleClass('preview_hdzero cut43_left', (video_type == 'HDZERO'))
     $('.third_right').toggleClass('preview_hdzero_side', (video_type == 'HDZERO'))
     // -- BFHDCOMPAT
-    $('.third_left').toggleClass('preview_bfhdcompat_side', (video_type == 'BFHDCOMPAT'))
-    $('.preview').toggleClass('preview_bfhdcompat cut43_left', (video_type == 'BFHDCOMPAT'))
-    $('.third_right').toggleClass('preview_bfhdcompat_side', (video_type == 'BFHDCOMPAT'))
+    $('.third_left').toggleClass('preview_bfhdcompat_side', (video_type == 'BFHDCOMPAT' || video_type == 'DJI_NATIVE'))
+    $('.preview').toggleClass('preview_bfhdcompat cut43_left', (video_type == 'BFHDCOMPAT' || video_type == 'DJI_NATIVE'))
+    $('.third_right').toggleClass('preview_bfhdcompat_side', (video_type == 'BFHDCOMPAT' || video_type == 'DJI_NATIVE'))
 
     OSD.GUI.updateGuidesView($('#videoGuides').find('input').is(':checked'));
 };
@@ -2438,7 +2623,9 @@ OSD.msp = {
         result.push8(p.right_sidebar_scroll);
         result.push8(p.sidebar_scroll_arrows);
         result.push8(p.units);
-        result.push8(p.stats_energy_unit)
+        result.push8(p.stats_energy_unit);
+        result.push8(p.adsb_warning_style);
+
         return result;
     },
 
@@ -2455,6 +2642,7 @@ OSD.msp = {
         p.sidebar_scroll_arrows = prefs.readU8();
         p.units = prefs.readU8();
         p.stats_energy_unit = prefs.readU8();
+        p.adsb_warning_style = prefs.readU8();
     },
 
     encodeLayoutItem: function(layout, item, pos) {
@@ -2614,7 +2802,7 @@ OSD.GUI.checkAndProcessSymbolPosition = function(pos, charCode) {
     }
 };
 
-const mspVideoSystem = [1,3,4,5,6,7];   // indexes of PAL, HDZERO, DJIWTF, AVATAR, BF43COMPAT & BFHDCOMPAT
+const mspVideoSystem = [1,3,4,5,6,7,8];   // indexes of PAL, HDZERO, DJIWTF, AVATAR, BF43COMPAT, BFHDCOMPAT & DJI_NATIVE
 const analogVideoSystem = [0,1,2];  // indexes of AUTO, PAL, & NTSC
 
 OSD.GUI.updateVideoMode = function() {
@@ -2712,7 +2900,7 @@ OSD.GUI.updateUnits = function() {
     });
 };
 
-OSD.GUI.updateFields = function() {
+OSD.GUI.updateFields = function(event) {
     // display fields on/off and position
     var $tmpl = $('#osd_group_template').hide();
     // Clear previous groups, if any
@@ -2753,6 +2941,7 @@ OSD.GUI.updateFields = function() {
                 });
         }
         var $displayFields = groupContainer.find('.display-fields');
+        var osdSearch = $('.osd_search');
         for (var jj = 0; jj < groupItems.length; jj++) {
             var item = groupItems[jj];
             var itemData = OSD.data.items[item.id];
@@ -2764,9 +2953,9 @@ OSD.GUI.updateFields = function() {
             if (nameMessage) {
                 name = nameMessage;
             } else {
-                name = inflection.titleize(name);
+                name = titleize(name);
             }
-            var searchTerm = $('.osd_search').val();
+            var searchTerm = osdSearch.val();
             if (searchTerm.length > 0 && !name.toLowerCase().includes(searchTerm.toLowerCase())) {
                 continue;
             }
@@ -2819,7 +3008,7 @@ OSD.GUI.updateFields = function() {
                     $('<input type="number" class="' + item.id + ' position"></input>')
                         .data('item', item)
                         .val(itemData.position)
-                        .on('change', $.debounce(250, function (e) {
+                        .on('change', debounce(250, function (e) {
                             var item = $(this).data('item');
                             var itemData = OSD.data.items[item.id];
                             itemData.position = parseInt($(this).val());
@@ -2862,10 +3051,13 @@ OSD.GUI.updateFields = function() {
     // needs to be called after all of them have been set up
     GUI.switchery();
 
-    // Update the OSD preview
-    refreshOSDSwitchIndicators();
-    updatePilotAndCraftNames();
-    updatePanServoPreview();
+    if(event != null && event.currentTarget !== osdSearch[0])
+    {
+        // Update the OSD preview
+        refreshOSDSwitchIndicators();
+        updatePilotAndCraftNames();
+        updatePanServoPreview();
+    }
 };
 
 OSD.GUI.removeBottomLines = function(){
@@ -2927,7 +3119,7 @@ OSD.GUI.updateGuidesView = function(on) {
     $('.hd_avatar_storage_box_left').toggleClass('hd_avatar_storagebox_l', (isAvatar && on))
     $('.hd_avatar_storage_box_right').toggleClass('hd_avatar_storagebox_r', (isAvatar && on))
 
-    let isBfHdCompat = OSD.constants.VIDEO_TYPES[OSD.data.preferences.video_system] == 'BFHDCOMPAT';
+    let isBfHdCompat = OSD.constants.VIDEO_TYPES[OSD.data.preferences.video_system] == 'BFHDCOMPAT' || OSD.constants.VIDEO_TYPES[OSD.data.preferences.video_system] == 'DJI_NATIVE';
     $('.hd_43_margin_left').toggleClass('hd_bfhdcompat_43_left', (isBfHdCompat && on));
     $('.hd_43_margin_right').toggleClass('hd_bfhdcompat_43_right', (isBfHdCompat && on));
     $('.hd_bfhdcompat_bottom_box').toggleClass('hd_bfhdcompat_bottom', (isBfHdCompat && on));
@@ -2959,6 +3151,15 @@ OSD.GUI.updateDjiView = function(on) {
             }
         });
 
+        var settings = $('.decimals-container').find('.settings').children();
+        settings.each(function(index, element) {
+            var name = $(element).attr('class');
+            if (!OSD.DjiElements.supportedSettings.includes(name)) {
+                $(element).hide();
+            }
+        });
+
+
         var alarms = $('.alarms-container').find('.settings').children();
         alarms.each(function(index, element) {
             var name = $(element).attr('for');
@@ -2977,7 +3178,7 @@ OSD.GUI.updateDjiView = function(on) {
             .show()
             .removeClass('no-bottom');
 
-        $('.settings-container, .alarms-container').find('.settings').children()
+        $('.settings-container, .decimals-container, .alarms-container').find('.settings').children()
             .show()
             .removeClass('no-bottom');
 
@@ -2990,7 +3191,8 @@ OSD.GUI.updateAlarms = function() {
     $(".osd_use_airspeed_alarm").toggle(HARDWARE.capabilities.usePitot);
     $(".osd_use_baro_temp_alarm").toggle(HARDWARE.capabilities.useBaro);
     $(".osd_use_esc_telemetry").toggle(HARDWARE.capabilities.useESCTelemetry);
-    $(".osd_use_crsf").toggle(HARDWARE.capabilities.useCRSFRx);
+    $(".osd_use_rx").toggle(HARDWARE.capabilities.useRx);
+    $(".osd_use_crsf").toggle(HARDWARE.capabilities.useCRSF);
 };
 
 OSD.GUI.updateMapPreview = function(mapCenter, name, directionSymbol, centerSymbol) {
@@ -3161,7 +3363,7 @@ OSD.GUI.updatePreviews = function() {
                 var nameMessage = i18n.getMessage(nameKey);
 
                 if (!nameMessage) {
-                    nameMessage = inflection.titleize(item.name);
+                    nameMessage = titleize(item.name);
                 }
 
                 $img.addClass('field-' + item.id)
@@ -3213,22 +3415,26 @@ OSD.GUI.updateAll = function() {
             }
         });
 
-        paste.on('click', function() {
+        paste.on('click',  async function() {
             if(layout_clipboard.filled == true){
 
                 var oldLayout = JSON.parse(JSON.stringify(OSD.data.layouts[OSD.data.selected_layout]))
                 OSD.data.layouts[OSD.data.selected_layout] = JSON.parse(JSON.stringify(layout_clipboard.layout));
                 layouts.trigger('change');
-                OSD.data.layouts[OSD.data.selected_layout].forEach(function(item, index){
+
+                for(var index in OSD.data.layouts[OSD.data.selected_layout])
+                {
+                    var item = OSD.data.layouts[OSD.data.selected_layout][index];
                     if(!(item.isVisible === false && oldLayout[index].isVisible === false) && (oldLayout[index].x !== item.x || oldLayout[index].y !== item.y || oldLayout[index].position !== item.position || oldLayout[index].isVisible !== item.isVisible)){
-                        OSD.saveItem({id: index});
+                        await OSD.saveItem({id: index});
                     }
-                });
+                }
+
                 GUI.log(i18n.getMessage('osdLayoutPasteFromClipboard'));
             }
         });
 
-        clear.on('click', function() {
+        clear.on('click', async function() {
             var oldLayout = JSON.parse(JSON.stringify(OSD.data.layouts[OSD.data.selected_layout]));
 
             var clearedLayout = [];
@@ -3240,12 +3446,15 @@ OSD.GUI.updateAll = function() {
 
             OSD.data.layouts[OSD.data.selected_layout] = clearedLayout;
             layouts.trigger('change');
-            OSD.data.layouts[OSD.data.selected_layout].forEach(function(item, index){
+
+            for(var index in OSD.data.layouts[OSD.data.selected_layout]) {
+                var item = OSD.data.layouts[OSD.data.selected_layout][index];
                 if(oldLayout[index].isVisible === true){
-                    OSD.saveItem({id: index});
+                    await OSD.saveItem({id: index});
                 }
-            });
-            GUI.log(chrome.i18n.getMessage('osdClearLayout'));
+            }
+
+            GUI.log(i18n.getMessage('osdClearLayout'));
         });
 
 
@@ -3263,8 +3472,8 @@ OSD.GUI.updateAll = function() {
         clear.off('change');
     }
 
-    $('.osd_search').on('input', function() {
-        OSD.GUI.updateFields();
+    $('.osd_search').on('input', function(event) {
+        OSD.GUI.updateFields(event);
     });
     $('.supported').fadeIn();
     OSD.GUI.updateVideoMode();
@@ -3300,7 +3509,8 @@ HARDWARE.init = function() {
         isDjiHdFpv: false,
         isMspDisplay: false,
         useESCTelemetry: false,
-        useCRSFRx: false,
+        useRx: false,
+        useCRSF: false,
         useBaro: false,
         usePitot: false
     };
@@ -3325,7 +3535,8 @@ HARDWARE.update = function(callback) {
 
         // Update RX data for Crossfire detection
         mspHelper.loadRxConfig(function() {
-            HARDWARE.capabilities.useCRSFRx = (FC.RX_CONFIG.serialrx_provider == 6);
+            HARDWARE.capabilities.useCRSF = (FC.RX_CONFIG.serialrx_provider == 6); // CRSF
+            HARDWARE.capabilities.useRx = (FC.RX_CONFIG.serialrx_provider == 6 || FC.RX_CONFIG.receiver_type == 2 || FC.RX_CONFIG.serialrx_provider == 12); // CRSF or MSP or MAVLINK
 
             mspHelper.loadSensorConfig(function () {
                 HARDWARE.capabilities.useBaro  = (FC.SENSOR_CONFIG.barometer != 0);
@@ -3335,7 +3546,7 @@ HARDWARE.update = function(callback) {
                     callback();
                 }
             });
-        });        
+        });
     });
 };
 
@@ -3357,13 +3568,13 @@ TABS.osd.initialize = function (callback) {
     }
 
     HARDWARE.update(function () {
-        GUI.load(path.join(__dirname, "osd.html"), Settings.processHtml(function () {
+        import('./osd.html?raw').then(({default: html}) => GUI.load(html, Settings.processHtml(function() {
             // translate to user-selected language
            i18n.localize();
-    
+
             // Open modal window
             OSD.GUI.jbox = new jBox('Modal', {
-                width: 750, 
+                width: 750,
                 height: 300,
                 position: {y:'bottom'},
                 offset: {y:-50},
@@ -3373,13 +3584,13 @@ TABS.osd.initialize = function (callback) {
                 title: 'OSD Font Manager',
                 content: $('#fontmanagercontent')
             });
-    
+
             $('a.save').on('click', function () {
                 Settings.saveInputs(save_to_eeprom);
             });
-    
+
             // Initialise guides checkbox
-            isGuidesChecked = store.get('showOSDGuides', false); 
+            isGuidesChecked = store.get('showOSDGuides', false);
 
             // Setup switch indicators
             $(".osdSwitchInd_channel option").each(function() {
@@ -3405,18 +3616,18 @@ TABS.osd.initialize = function (callback) {
             $("#switchIndicators_alignLeft").on('change', function() {
                 refreshOSDSwitchIndicators();
             });
-    
+
             // Functions for when pan servo settings change
             $('#osdPanServoIndicatorShowDegrees').on('change', function() {
                 // Update the OSD preview
                 updatePanServoPreview();
             });
-    
+
             $('#panServoOutput').on('change', function() {
                 // Update the OSD preview
                 updatePanServoPreview();
             });
-    
+
             // Function for when text for craft name changes
             $('#craft_name').on('keyup', function() {
                 // Make sure that the craft name only contains A to Z, 0-9, spaces, and basic ASCII symbols
@@ -3427,11 +3638,11 @@ TABS.osd.initialize = function (callback) {
                 } else {
                     $(this).val(testText.slice(0, -1));
                 }
-    
+
                 // Update the OSD preview
                 updatePilotAndCraftNames();
             });
-    
+
             $('#pilot_name').on('keyup', function() {
                 // Make sure that the pilot name only contains A to Z, 0-9, spaces, and basic ASCII symbols
                 let testExp = new RegExp('^[A-Za-z0-9 !_,:;=@#\\%\\&\\-\\*\\^\\(\\)\\.\\+\\<\\>\\[\\]]');
@@ -3441,17 +3652,17 @@ TABS.osd.initialize = function (callback) {
                 } else {
                     $(this).val(testText.slice(0, -1));
                 }
-    
+
                 // Update the OSD preview
                 updatePilotAndCraftNames();
             });
-    
+
             // font preview window
             var $preview = $('.font-preview');
-    
+
             //  init structs once, also clears current font
             FONT.initData();
-    
+
             var $fontPicker = $('.fontbuttons button');
             $fontPicker.on('click', function () {
                 if (!$(this).data('font-file')) {
@@ -3459,14 +3670,16 @@ TABS.osd.initialize = function (callback) {
                 }
                 $fontPicker.removeClass('active');
                 $(this).addClass('active');
-                $.get('./resources/osd/analogue/' + $(this).data('font-file') + '.mcm', function (data) {
+                store.set('osd_font', $(this).data('font-file'));
+                
+                import(`./../resources/osd/analogue/${$(this).data('font-file')}.mcm?raw`).then(({default: data}) => {
                     FONT.parseMCMFontFile(data);
                     FONT.preview($preview);
                     OSD.GUI.update();
                 });
-                store.set('osd_font', $(this).data('font-file'));
+                
             });
-    
+
             // load the last selected font when we change tabs
             var osd_font = store.get('osd_font', false);
             var previous_font_button;
@@ -3474,14 +3687,14 @@ TABS.osd.initialize = function (callback) {
                 previous_font_button = $('.fontbuttons button[data-font-file="' + osd_font + '"]');
                 if (previous_font_button.attr('data-font-file') == undefined) previous_font_button = undefined;
             }
-    
+
             if (typeof previous_font_button == "undefined") {
                 $fontPicker.first().trigger( "click" );
             } else {
                 previous_font_button.trigger( "click" );
             }
-            
-    
+
+
             $('button.load_font_file').on('click', function () {
                 $fontPicker.removeClass('active');
                 FONT.openFontFile().then(function () {
@@ -3489,7 +3702,7 @@ TABS.osd.initialize = function (callback) {
                     OSD.GUI.update();
                 });
             });
-    
+
             // font upload
             $('a.flash_font').on('click', function () {
                 if (!GUI.connect_lock) { // button disabled while flashing is in progress
@@ -3508,7 +3721,7 @@ TABS.osd.initialize = function (callback) {
                     FONT.upload(progressCallback);
                 }
             });
-    
+
             $('.update_preview').on('change', function () {
                 if (OSD.data) {
                     // Force an OSD redraw by saving any element
@@ -3521,17 +3734,18 @@ TABS.osd.initialize = function (callback) {
                     }, 100);
                 }
             });
-    
+
             $('#useCraftnameForMessages').on('change', function() {
                 OSD.GUI.updateDjiMessageElements(this.checked);
             });
-    
+
             if(semver.gte(FC.CONFIG.flightControllerVersion, '7.1.0')) {
                 mspHelper.loadOsdCustomElements(createCustomElements);
             }
 
             GUI.content_ready(callback);
-        }));
+            updatePilotAndCraftNames();
+        })));
     });
 };
 
@@ -3541,7 +3755,10 @@ function createCustomElements(){
         return;
     }
 
+    $('#INAVCharacterMapDocURL').attr('href', globalSettings.configuratorTreeLocation + 'resources/osd/INAV%20Character%20Map.md');
+
     var customElementsContainer = $('#osdCustomElements');
+    var init = true;
 
     for(var i = 0; i < FC.OSD_CUSTOM_ELEMENTS.settings.customElementsCount; i++){
         var label = $('<label>');
@@ -3549,7 +3766,7 @@ function createCustomElements(){
         var customElementTable = $('<table>').addClass('osdCustomElement_main_table');
         var customElementRowType = $('<tr>').data('row', i);
         var customElementRowValue = $('<tr>').data('row', i);
-        
+
         var customElementLabel = $('<tr>');
         customElementLabel.append($('<td>').attr('colspan', 2).append($('<span>').html(i18n.getMessage("custom_element") + ' ' + (i + 1))));
 
@@ -3566,22 +3783,24 @@ function createCustomElements(){
                         <option data-value="gv" value="8">Global Variable 0000</option>
                         <option data-value="gv" value="9">Global Variable 00000</option>
                         <option data-value="gv" value="10">Global Variable 0.0</option>
-                        <option data-value="gv" value="11">Global Variable 00.0</option>
-                        <option data-value="gv" value="12">Global Variable 00.00</option>
-                        <option data-value="gv" value="13">Global Variable 000.0</option>
-                        <option data-value="gv" value="14">Global Variable 000.00</option>
-                        <option data-value="gv" value="15">Global Variable 0000.0</option>
-                        <option data-value="lc" value="16">Logic Condition 0</option>
-                        <option data-value="lc" value="17">Logic Condition 00</option>
-                        <option data-value="lc" value="18">Logic Condition 000</option>
-                        <option data-value="lc" value="19">Logic Condition 0000</option>
-                        <option data-value="lc" value="20">Logic Condition 00000</option>
-                        <option data-value="lc" value="21">Logic Condition 0.0</option>
-                        <option data-value="lc" value="22">Logic Condition 00.0</option>
-                        <option data-value="lc" value="23">Logic Condition 00.00</option>
-                        <option data-value="lc" value="24">Logic Condition 000.0</option>
-                        <option data-value="lc" value="25">Logic Condition 000.00</option>
-                        <option data-value="lc" value="26">Logic Condition 0000.0</option>
+                        <option data-value="gv" value="11">Global Variable 0.00</option>
+                        <option data-value="gv" value="12">Global Variable 00.0</option>
+                        <option data-value="gv" value="13">Global Variable 00.00</option>
+                        <option data-value="gv" value="14">Global Variable 000.0</option>
+                        <option data-value="gv" value="15">Global Variable 000.00</option>
+                        <option data-value="gv" value="16">Global Variable 0000.0</option>
+                        <option data-value="lc" value="17">Logic Condition 0</option>
+                        <option data-value="lc" value="18">Logic Condition 00</option>
+                        <option data-value="lc" value="19">Logic Condition 000</option>
+                        <option data-value="lc" value="20">Logic Condition 0000</option>
+                        <option data-value="lc" value="21">Logic Condition 00000</option>
+                        <option data-value="lc" value="22">Logic Condition 0.0</option>
+                        <option data-value="lc" value="23">Logic Condition 0.00</option>
+                        <option data-value="lc" value="24">Logic Condition 00.0</option>
+                        <option data-value="lc" value="25">Logic Condition 00.00</option>
+                        <option data-value="lc" value="26">Logic Condition 000.0</option>
+                        <option data-value="lc" value="27">Logic Condition 000.00</option>
+                        <option data-value="lc" value="28">Logic Condition 0000.0</option>
                         `);
 
             customElementRowType.append($('<td>').append(select));
@@ -3599,7 +3818,9 @@ function createCustomElements(){
                 var valueBlock = $('.' + $(this).data('valueCellClass'))
                 valueBlock.find('.value').hide();
                 valueBlock.find('.' + dataValue).show();
-                updateOSDCustomElementsDisplay();
+                if(!init){
+                    updateOSDCustomElementsDisplay();
+                }
             });
         }
 
@@ -3629,6 +3850,7 @@ function createCustomElements(){
 
     fillCustomElementsValues();
     customElementsInitCallback();
+    init = false;
 }
 
 function updateOSDCustomElementsDisplay() {
@@ -3650,7 +3872,7 @@ function updateOSDCustomElementsDisplay() {
 
                         switch (parseInt(typeCell.val())) {
                             case 1:
-                                preview += valueCell.find('.text').val();
+                                preview += valueCell.find('.text').val().trim();
                                 break;
                             case 2:
                                 preview += FONT.symbol("0x" + parseInt(valueCell.find('.ico').val()).toString(16).toUpperCase());
@@ -3662,53 +3884,55 @@ function updateOSDCustomElementsDisplay() {
                                 preview += FONT.symbol(SYM.HOME);
                                 break;
                             case 5:
-                            case 16:
-                                preview += " 2";
+                            case 17:
+                                preview += FONT.symbol(SYM.BLANK) + "2";
                                 break;
                             case 6:
-                            case 17:
-                                preview += " 57";
+                            case 18:
+                                preview += FONT.symbol(SYM.BLANK) + "57";
                                 break;
                             case 7:
-                            case 18:
-                                preview += " 316";
+                            case 19:
+                                preview += FONT.symbol(SYM.BLANK) + "316";
                                 break;
                             case 8:
-                            case 19:
-                                preview += " 6926";
+                            case 20:
+                                preview += FONT.symbol(SYM.BLANK) + "6926";
                                 break;
                             case 9:
-                            case 20:
-                                preview += " 36520";
+                            case 21:
+                                preview += FONT.symbol(SYM.BLANK) + "36520";
                                 break;
                             case 10:
-                            case 21:
-                                preview += " " + FONT.embed_dot("1.6");
+                            case 22:
+                                preview += FONT.symbol(SYM.BLANK) + FONT.embed_dot("1.6");
                                 break;
                             case 11:
-                            case 22:
-                                preview += " " + FONT.embed_dot("21.4");
+                            case 23:
+                                preview += FONT.symbol(SYM.BLANK) + FONT.embed_dot("2.64");
                                 break;
                             case 12:
-                            case 23:
-                                preview += " " + FONT.embed_dot("34.26");
+                            case 24:
+                                preview += FONT.symbol(SYM.BLANK) + FONT.embed_dot("21.4");
                                 break;
                             case 13:
-                            case 24:
-                                preview += " " + FONT.embed_dot("315.7");
+                            case 25:
+                                preview += FONT.symbol(SYM.BLANK) + FONT.embed_dot("34.26");
                                 break;
                             case 14:
-                            case 25:
-                                preview += " " + FONT.embed_dot("562.46");
+                            case 26:
+                                preview += FONT.symbol(SYM.BLANK) + FONT.embed_dot("315.7");
                                 break;
                             case 15:
-                            case 26:
-                                preview += " " + FONT.embed_dot("4629.1");
+                            case 27:
+                                preview += FONT.symbol(SYM.BLANK) + FONT.embed_dot("562.46");
+                                break;
+                            case 16:
+                            case 28:
+                                preview += FONT.symbol(SYM.BLANK) + FONT.embed_dot("4629.1");
                                 break;
                         }
                     }
-
-                    preview = preview.trim();
 
                     if (preview == "") {
                         preview = "CE_" + (i + 1);
@@ -3756,9 +3980,9 @@ function fillCustomElementsValues() {
                 case 13:
                 case 14:
                 case 15:
+                case 16:
                     valueCell.find('.gv').val(FC.OSD_CUSTOM_ELEMENTS.items[i].customElementItems[ii].value).trigger('change');
                     break;
-                case 16:
                 case 17:
                 case 18:
                 case 19:
@@ -3769,6 +3993,8 @@ function fillCustomElementsValues() {
                 case 24:
                 case 25:
                 case 26:
+                case 27:
+                case 28:
                     valueCell.find('.lc').val(FC.OSD_CUSTOM_ELEMENTS.items[i].customElementItems[ii].value).trigger('change');
                     break;
             }
@@ -3881,9 +4107,9 @@ function customElementGetDataForRow(row){
             case 13:
             case 14:
             case 15:
+            case 16:
                 partValue = parseInt(valueCell.find('.gv').find(':selected').val());
                 break;
-            case 16:
             case 17:
             case 18:
             case 19:
@@ -3894,6 +4120,8 @@ function customElementGetDataForRow(row){
             case 24:
             case 25:
             case 26:
+            case 27:
+            case 28:
                 partValue = parseInt(valueCell.find('.lc').find(':selected').val());
                 break;
         }

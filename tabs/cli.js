@@ -1,22 +1,19 @@
 'use strict';
 
-const path = require('path');
-const fs = require('fs');
-const { dialog } = require("@electron/remote");
-
-const MSP = require('./../js/msp');
-const mspQueue =  require('./../js/serial_queue');
-const { GUI, TABS } = require('./../js/gui');
-const CONFIGURATOR = require('./../js/data_storage');
-var timeout = require('./../js/timeouts');
-const i18n = require('./../js/localization');
-const { globalSettings } = require('./../js/globalSettings');
-const CliAutoComplete = require('./../js/CliAutoComplete');
-const { ConnectionType } = require('./../js/connection/connection');
-const jBox = require('./../js/libraries/jBox/jBox.min');
-const mspDeduplicationQueue = require('./../js/msp/mspDeduplicationQueue');
-const FC = require('./../js/fc');
-const { generateFilename } = require('./../js/helpers');
+import MSP from './../js/msp';
+import mspQueue from './../js/serial_queue';
+import { GUI, TABS } from './../js/gui';
+import CONFIGURATOR from './../js/data_storage';
+import timeout from './../js/timeouts';
+import i18n from './../js/localization';
+import { globalSettings } from './../js/globalSettings';
+import CliAutoComplete from './../js/CliAutoComplete';
+import { ConnectionType } from './../js/connection/connection';
+import jBox from 'jbox';
+import mspDeduplicationQueue from './../js/msp/mspDeduplicationQueue';
+import FC from './../js/fc';
+import { generateFilename } from './../js/helpers';
+import dialog from '../js/dialog';
 
 TABS.cli = {
     lineDelayMs: 50,
@@ -105,12 +102,8 @@ TABS.cli.initialize = function (callback) {
     self.cliBuffer = "";
 
     const clipboardCopySupport = (() => {
-        let nwGui = null;
-        try {
-            nwGui = require('nw.gui');
-        } catch (e) {}
-        return !(nwGui == null && !navigator.clipboard)
-        })();
+        return false;    
+    })();
 
 
     function executeCommands(out_string) {
@@ -122,7 +115,7 @@ TABS.cli.initialize = function (callback) {
                 new Promise((resolve) => {
                     timeout.add('CLI_send_slowly', () => {
                         let processingDelay = TABS.cli.lineDelayMs;
-                        if (line.toLowerCase().startsWith('profile')) {
+                        if (line.toLowerCase().includes('_profile')) {
                             processingDelay = TABS.cli.profileSwitchDelayMs;
                         }
                         const isLastCommand = outputArray.length === index + 1;
@@ -137,8 +130,7 @@ TABS.cli.initialize = function (callback) {
             ), Promise.resolve(0),
         );
     }
-
-    GUI.load(path.join(__dirname, "cli.html"), function () {
+    import('./cli.html?raw').then(({default: html}) => GUI.load(html, function () {
         // translate to user-selected language
        i18n.localize();
 
@@ -178,13 +170,13 @@ TABS.cli.initialize = function (callback) {
                     return;
                 }
 
-                fs.writeFile(result.filePath, self.outputHistory, (err) => {
+                window.electronAPI.writeFile(result.filePath, self.outputHistory).then(err => {
                     if (err) {
                         GUI.log(i18n.getMessage('ErrorWritingFile'));
                         return console.error(err);
-                    }
-                    GUI.log(i18n.getMessage('FileSaved'));
+                    }    
                 });
+                GUI.log(i18n.getMessage('FileSaved'));
 
             }).catch (err => {
                 console.log(err);
@@ -262,13 +254,13 @@ TABS.cli.initialize = function (callback) {
                 }
 
                 if (result.filePaths.length == 1) {
-                    fs.readFile(result.filePaths[0], (err, data) => {
-                        if (err) {
+                    window.electronAPI.readFile(result.filePaths[0]).then(response => {
+                        if (response.error) {
                             GUI.log(i18n.getMessage('ErrorReadingFile'));
-                            return console.error(err);
-                        }
+                            console.error(response.error);
+                            return;                        }
 
-                        previewCommands(data);
+                        previewCommands(response.data);
                     });
                 }
             }).catch (err => {
@@ -367,7 +359,7 @@ TABS.cli.initialize = function (callback) {
         }
 
         GUI.content_ready(callback);
-    });
+    }));
 };
 
 TABS.cli.history = {
