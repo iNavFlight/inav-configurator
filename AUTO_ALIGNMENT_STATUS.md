@@ -72,6 +72,15 @@ The Auto Alignment Tool is a wizard that automatically detects and sets FC board
 - ✅ **Code builds successfully**
   - All JavaScript compiles without errors
   - No runtime errors in modified code
+- ✅ **Hardware tested upside-down detection**
+  - Tested with board physically upside down (180° roll)
+  - Verified with 4 different initial alignments:
+    * No alignment (0,0,0) ✓
+    * Yaw 90° ✓
+    * Yaw 45° ✓
+    * Roll 90° (wrong initial setting) ✓
+  - All tests correctly detected upside-down orientation
+  - Inverse transformation accurately computed same raw data regardless of initial settings
 
 ### Build Verification
 - ✅ **Code builds successfully**
@@ -266,9 +275,10 @@ function accAutoAlignReadFlat() {
 | Build/Compile | N/A | N/A | ✅ PASS |
 | Board pitch/roll | N/A | ✅ Verified | ✅ READY |
 | Board yaw (0°, 90°, 180°, 270°) | N/A | ✅ Verified | ✅ READY |
+| Inverse transformation | ✅ 8 orientations | ✅ Verified | ✅ READY |
+| Upside-down detection (180° roll) | ✅ 4 alignments | ✅ Verified | ✅ READY |
 | Compass alignment math | ✅ 25 tests pass | ⏳ Needs testing | 🟡 NEEDS HW TEST |
 | 45° corner mount detection | N/A | ⏳ Needs testing | 🟡 NEEDS HW TEST |
-| Upside-down mount detection | N/A | ⏳ Needs testing | 🟡 NEEDS HW TEST |
 | UI/UX polish | N/A | ⏳ Needs review | 🟡 NEEDS REVIEW |
 
 ---
@@ -321,6 +331,8 @@ function accAutoAlignReadFlat() {
 - `tabs/alignment_hardware_test.js` - Hardware test helpers (Session 2)
 - `tabs/test_inverse_transform_multi.py` - Inverse transformation test (Session 4)
 - `tabs/test_inverse_transform_auto.py` - Auto-reboot test tool (Session 4)
+- `tabs/test_upside_down.py` - Single upside-down test (Session 4)
+- `tabs/test_upside_down_multi_alignment.py` - Multi-alignment upside-down test (Session 4)
 
 **Documentation (new):**
 - `tabs/AUTO_ALIGNMENT_ANALYSIS.md` - Code analysis (Session 1)

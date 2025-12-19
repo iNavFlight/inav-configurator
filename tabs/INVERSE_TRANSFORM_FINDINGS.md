@@ -133,6 +133,29 @@ The inverse transformation has been implemented in `tabs/magnetometer.js`:
 - Wizard works correctly regardless of current board alignment
 - Better error messages with gravity magnitude and diagnostic info
 
+## Hardware Testing - Upside Down Detection
+
+**Test Setup:**
+- Board physically mounted upside down (180° roll)
+- Tested with 4 different initial board alignment settings
+- Script: `tabs/test_upside_down_multi_alignment.py`
+
+**Results:**
+All 4 tests **PASSED** ✅
+
+| Initial Alignment | Transformed Data | Raw Data (after inverse) | Detected Roll | Result |
+|-------------------|------------------|--------------------------|---------------|--------|
+| 0,0,0 (none) | [0.015, 0.043, -0.991] g | [0.015, 0.043, -0.991] g | 177.5° | ✓ PASS |
+| Yaw 90° | [0.043, -0.016, -0.992] g | [0.016, 0.043, -0.992] g | 177.5° | ✓ PASS |
+| Yaw 45° | [0.041, 0.020, -0.992] g | [0.015, 0.043, -0.992] g | 177.5° | ✓ PASS |
+| Roll 90° (wrong) | [0.016, -0.992, -0.043] g | [0.016, 0.043, -0.992] g | 177.5° | ✓ PASS |
+
+**Key Findings:**
+1. ✅ Inverse transformation correctly computes same raw data regardless of initial alignment
+2. ✅ Wizard correctly detects upside-down orientation (177.5° ≈ 180°)
+3. ✅ Works even when initial alignment is completely wrong (e.g., Roll 90° when actually 180°)
+4. ✅ Gravity magnitude check passes in all cases (~0.99g)
+
 ---
 
 **Files**:
