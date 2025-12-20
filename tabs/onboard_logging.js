@@ -9,6 +9,7 @@ import CONFIGURATOR from './../js/data_storage';
 import features from './../js/feature_framework';
 import i18n from './../js/localization';
 import BitHelper from './../js/bitHelper';
+import dialog from './../js/dialog';
 
 var sdcardTimer;
 
@@ -367,17 +368,22 @@ TABS.onboard_logging.initialize = function (callback) {
 
                                 $(".dataflash-saving progress").attr("value", nextAddress / maxBytes * 100);
 
-                                fs.writeFileSync(filename, new Uint8Array(chunk), {
-                                    "flag": "a"
-                                })
+                                window.electronAPI.appendFile(filename, new Uint8Array(chunk)).then(err => {
+                                    if (err) {
+                                        console.error('Error writing blackbox data:', err);
+                                        GUI.log(i18n.getMessage('ErrorWritingFile'));
+                                        dismiss_saving_dialog();
+                                        return;
+                                    }
 
-                                if (saveCancelled) {
-                                    dismiss_saving_dialog();
-                                } else if (nextAddress >= maxBytes) {
-                                    mark_saving_dialog_done();
-                                }else {
-                                    mspHelper.dataflashRead(nextAddress, onChunkRead);
-                                }
+                                    if (saveCancelled) {
+                                        dismiss_saving_dialog();
+                                    } else if (nextAddress >= maxBytes) {
+                                        mark_saving_dialog_done();
+                                    } else {
+                                        mspHelper.dataflashRead(nextAddress, onChunkRead);
+                                    }
+                                });
 
                             } else {
                                 // A zero-byte block indicates end-of-file, so we're done
