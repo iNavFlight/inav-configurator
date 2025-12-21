@@ -6168,16 +6168,16 @@
         "message": "Пошук"
     },
     "tabJavaScriptProgramming": {
-        "message": "Програмування (JavaScript)"
+        "message": "Програмування на JavaScript"
     },
     "javascriptProgrammingDescription": {
         "message": "Пишіть код на JavaScript для керування літальним апаратом. Транспілятор перетворює ваш код на логічні умови INAV."
     },
     "javascriptBetaWarning": {
-        "message": "<strong>Пишіть JavaScript, отримуйте логічні умови INAV!</strong> Використовуйте звичний синтаксис JavaScript з повним автодоповненням та перевіркою помилок. <strong>Наразі в стадії бета-тестування. Не використовуйте для критично важливих застосунків!</strong>"
+        "message": "<strong>Пишіть на JavaScript, отримуйте логічні умови INAV!</strong> Використовуйте звичний синтаксис JavaScript з повним автодоповненням та перевіркою помилок. <strong>Наразі в стадії бета-тестування. Не використовуйте для критично важливих застосунків!</strong>"
     },
     "javascriptEditorTitle": {
-        "message": "Редактор JavaScript (shift-ctrl-v для вставки, правий клік по змінній для перейменування)"
+        "message": "Редактор JavaScript (shift-ctrl-v щоб вставити, правий клік по змінній для перейменування)"
     },
     "javascriptLoadExample": {
         "message": "Завантажити приклад:"
@@ -6186,7 +6186,7 @@
         "message": "-- Оберіть приклад --"
     },
     "javascriptTranspile": {
-        "message": "Транспілювати для INAV"
+        "message": "Транспілювати в INAV"
     },
     "javascriptLoad": {
         "message": "Завантажити з FC"
