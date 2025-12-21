@@ -54,7 +54,7 @@ class PropertyAccessChecker {
   }
 
   /**
-   * Check INAV-namespaced property access using dispatch table
+   * Check INAV-namespaced property access using namespace-based routing
    * @param {string} propPath - Full path including 'inav.' prefix
    * @param {number} line - Line number for error reporting
    * @private
@@ -62,25 +62,30 @@ class PropertyAccessChecker {
   checkInavProperty(propPath, line) {
     const inavPath = propPath.substring(5); // Strip 'inav.' prefix
 
-    // Dispatch table for different property types
-    const handlers = {
-      'gvar[': () => this.checkGvarAccess(inavPath, line),
-      'rc[': () => this.checkRcChannelAccess(inavPath, line),
-      'pid[': () => this.checkPidAccess(inavPath, line),
-      'events.': () => { /* events.edge(), events.sticky() - handled by parser */ },
-      'helpers.': () => { /* helpers.min/max/abs/etc - handled by parser */ }
-    };
-
-    // Find and execute matching handler
-    for (const [prefix, handler] of Object.entries(handlers)) {
-      if (inavPath.startsWith(prefix)) {
-        handler();
-        return;
-      }
+    // Extract namespace (part before . or [)
+    const namespaceMatch = inavPath.match(/^([a-zA-Z]+)/);
+    if (!namespaceMatch) {
+      this.addError(`Invalid property path 'inav.${inavPath}'`, line);
+      return;
     }
 
-    // Default: API property (flight.*, override.*, waypoint.*, etc.)
-    this.checkApiPropertyAccess(inavPath, line);
+    const namespace = namespaceMatch[1];
+
+    // Special handlers for array-based namespaces (need custom validation)
+    const specialHandlers = {
+      'gvar': () => this.checkGvarAccess(inavPath, line),
+      'rc': () => this.checkRcChannelAccess(inavPath, line),
+      'pid': () => this.checkPidAccess(inavPath, line)
+    };
+
+    // Route to namespace-specific handler
+    if (specialHandlers[namespace]) {
+      specialHandlers[namespace]();
+    } else {
+      // All other namespaces (flight, override, helpers, events, waypoint, etc.)
+      // are validated through the generic API property checker
+      this.checkApiPropertyAccess(inavPath, line);
+    }
   }
 
   /**
