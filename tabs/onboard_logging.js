@@ -368,22 +368,21 @@ TABS.onboard_logging.initialize = function (callback) {
 
                                 $(".dataflash-saving progress").attr("value", nextAddress / maxBytes * 100);
 
-                                window.electronAPI.appendFile(filename, new Uint8Array(chunk)).then(err => {
-                                    if (err) {
+                                window.electronAPI.appendFile(filename, new Uint8Array(chunk))
+                                    .then(() => {
+                                        if (saveCancelled) {
+                                            dismiss_saving_dialog();
+                                        } else if (nextAddress >= maxBytes) {
+                                            mark_saving_dialog_done();
+                                        } else {
+                                            mspHelper.dataflashRead(nextAddress, onChunkRead);
+                                        }
+                                    })
+                                    .catch(err => {
                                         console.error('Error writing blackbox data:', err);
                                         GUI.log(i18n.getMessage('ErrorWritingFile'));
                                         dismiss_saving_dialog();
-                                        return;
-                                    }
-
-                                    if (saveCancelled) {
-                                        dismiss_saving_dialog();
-                                    } else if (nextAddress >= maxBytes) {
-                                        mark_saving_dialog_done();
-                                    } else {
-                                        mspHelper.dataflashRead(nextAddress, onChunkRead);
-                                    }
-                                });
+                                    });
 
                             } else {
                                 // A zero-byte block indicates end-of-file, so we're done
