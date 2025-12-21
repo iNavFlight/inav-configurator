@@ -929,11 +929,11 @@ class Decompiler {
       case OPERAND_TYPE.GVAR: {
         // Check if we have a variable name for this gvar index
         const varName = this.getVarNameForGvar(value);
-        return varName || `gvar[${value}]`;
+        return varName || `inav.gvar[${value}]`;
       }
 
       case OPERAND_TYPE.RC_CHANNEL:
-        return `rc[${value}]`;
+        return `inav.rc[${value}]`;
 
       case OPERAND_TYPE.FLIGHT:
       case OPERAND_TYPE.WAYPOINTS: {
@@ -1053,10 +1053,10 @@ class Decompiler {
       case OPERAND_TYPE.PID:
         // PID operands 0-3 map to pid[0].output through pid[3].output
         if (value >= 0 && value < 4) {
-          return `pid[${value}].output`;
+          return `inav.pid[${value}].output`;
         }
         this.addWarning(`Invalid PID operand value ${value}. Valid range is 0-3.`);
-        return `pid[${value}].output /* invalid PID index */`;
+        return `inav.pid[${value}].output /* invalid PID index */`;
 
       default:
         this.addWarning(`Unknown operand type ${type}`);
