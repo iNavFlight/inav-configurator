@@ -121,6 +121,10 @@
 }
 
 
+.tab-mixer .mixerPreview {
+    position: relative;
+}
+
 .motorNumber {
     position: absolute;
     font-size: 1.4em;

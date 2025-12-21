@@ -22,6 +22,7 @@ class VariableHandler {
     this.symbols = new Map();           // varName -> SymbolInfo
     this.usedGvars = new Set();         // Explicitly used gvar slots (0-7)
     this.gvarAllocations = new Map();   // varName -> gvar index
+    this.letVariableLCIndices = new Map(); // varName -> LC index (for let/const variables)
     this.errors = [];                   // Collected errors
   }
 
@@ -92,6 +93,19 @@ class VariableHandler {
       gvarIndex: null,          // Not used for 'let'
       loc
     });
+  }
+
+  /**
+   * Track LC index for a let/const variable (called during code generation)
+   * This allows the decompiler to preserve custom variable names
+   *
+   * @param {string} name - Variable name
+   * @param {number} lcIndex - The LC index generated for this variable
+   */
+  setLetVariableLCIndex(name, lcIndex) {
+    if (this.symbols.has(name) && this.symbols.get(name).kind === 'let') {
+      this.letVariableLCIndices.set(name, lcIndex);
+    }
   }
 
   /**
@@ -400,6 +414,27 @@ class VariableHandler {
    */
   getSymbol(name) {
     return this.symbols.get(name);
+  }
+
+  /**
+   * Alias for getSymbol (for clarity in analyzer)
+   */
+  getVariable(name) {
+    return this.symbols.get(name);
+  }
+
+  /**
+   * Convert a 'var' variable to 'latch' type
+   * Used when a pre-declared var is later assigned via sticky()
+   *
+   * @param {string} name - Variable name
+   */
+  convertToLatch(name) {
+    const symbol = this.symbols.get(name);
+    if (symbol) {
+      symbol.kind = 'latch';
+      symbol.lcIndex = null;  // Will be assigned by codegen
+    }
   }
 
   /**

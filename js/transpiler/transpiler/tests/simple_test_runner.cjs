@@ -155,6 +155,18 @@ class Assertions {
     }
   }
 
+  toBeTruthy() {
+    if (!this.actual) {
+      throw new Error(`Expected truthy value, got ${JSON.stringify(this.actual)}`);
+    }
+  }
+
+  toBeFalsy() {
+    if (this.actual) {
+      throw new Error(`Expected falsy value, got ${JSON.stringify(this.actual)}`);
+    }
+  }
+
   toHaveProperty(key) {
     if (this.actual === null || this.actual === undefined) {
       throw new Error(`Expected object to have property '${key}', but object is ${this.actual}`);

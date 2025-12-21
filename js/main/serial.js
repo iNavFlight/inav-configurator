@@ -12,10 +12,16 @@ const serial = {
     connect: function(path, options, window) {
         return new Promise(resolve => {
             try {
+                var openPortResolved = false;
                 this._serialport = new SerialPortStream({binding, path: path, baudRate: options.bitrate, autoOpen: true});
                 this._serialport.on('error', error => {
                     if (!window.isDestroyed()) {
                         window.webContents.send('serialError', error); 
+                    }
+
+                    if(!openPortResolved) {
+                        openPortResolved = true;
+                        resolve({error: false, id: this._id++});
                     }
                 });
 
@@ -30,7 +36,12 @@ const serial = {
                         window.webContents.send('serialData', buffer);
                     }
                 });
-                resolve({error: false, id: this._id++});
+
+                this._serialport.on('open', () => {
+                    openPortResolved = true;
+                    resolve({error: false, id: this._id++});
+                });
+
             } catch (err) {
                 resolve ({error: true, errorMsg: err});
             }

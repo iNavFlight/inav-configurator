@@ -23,10 +23,13 @@ const SIMPLE_BINARY_OPS = {
   [OPERATION.GREATER_THAN]: (l, r) => `${l} > ${r}`,
   [OPERATION.LOWER_THAN]: (l, r) => `${l} < ${r}`,
   [OPERATION.AND]: (l, r) => `${l} && ${r}`,
-  [OPERATION.OR]: (l, r) => `${l} || ${r}`,
-  [OPERATION.XOR]: (l, r) => `((${l}) ? !(${r}) : (${r}))`,
-  [OPERATION.NAND]: (l, r) => `!(${l} && ${r})`,
-  [OPERATION.NOR]: (l, r) => `!(${l} || ${r})`,
+  // OR wrapped in parentheses to preserve precedence when nested inside AND
+  // Without parens: "a && b || c" parses as "(a && b) || c" - wrong!
+  // With parens: "a && (b || c)" preserves intended logic
+  [OPERATION.OR]: (l, r) => `(${l} || ${r})`,
+  [OPERATION.XOR]: (l, r) => `xor(${l}, ${r})`,
+  [OPERATION.NAND]: (l, r) => `nand(${l}, ${r})`,
+  [OPERATION.NOR]: (l, r) => `nor(${l}, ${r})`,
   [OPERATION.MODULUS]: (l, r) => `(${l} % ${r})`,
   [OPERATION.MIN]: (l, r) => `Math.min(${l}, ${r})`,
   [OPERATION.MAX]: (l, r) => `Math.max(${l}, ${r})`,
@@ -107,7 +110,7 @@ class ConditionDecompiler {
 
       // Special patterns (usually handled by detectSpecialPattern)
       case OPERATION.APPROX_EQUAL:
-        return this.handleApproxEqual(left, right);
+        return this.handleApproxEqual(left, right, lc.flags);
       case OPERATION.EDGE:
         return this.handleEdge(left, right);
       case OPERATION.STICKY:
@@ -151,7 +154,10 @@ class ConditionDecompiler {
       const innerLcIndex = lc.operandAValue;
       const innerLC = allConditions.find(c => c.index === innerLcIndex);
 
-      if (innerLC) {
+      // Only do structural optimizations if inner LC has no activator
+      // If it has an activator, it may be hoisted and we should use decompileOperand
+      // to get the hoisted variable name (which preserves the activator relationship)
+      if (innerLC && innerLC.activatorId === -1) {
         // Double negation: NOT(NOT(x)) -> x
         if (innerLC.operation === OPERATION.NOT) {
           // Recursively decompile the inner NOT's operand
@@ -209,17 +215,19 @@ class ConditionDecompiler {
 
   // NOTE: XOR, NAND, NOR are handled by SIMPLE_BINARY_OPS lookup table above.
 
-  handleApproxEqual(left, right) {
-    // APPROX_EQUAL: B is within 1% of A
-    this.addWarning(`APPROX_EQUAL operation decompiled as === (1% tolerance not preserved)`);
-    return `${left} === ${right}`;
+  handleApproxEqual(left, right, flags = 0) {
+    // APPROX_EQUAL: B is within 1% of A (default), or custom tolerance in flags
+    // flags field stores custom tolerance percentage (0 = default 1%)
+    if (flags > 0) {
+      return `approxEqual(${left}, ${right}, ${flags})`;
+    }
+    return `approxEqual(${left}, ${right})`;
   }
 
   handleEdge(left, right) {
-    // Edge uses result of another LC as condition
-    // This case shouldn't normally be hit because detectSpecialPattern handles it
-    // But include for completeness
-    return `${left} /* edge with duration ${right}ms */`;
+    // Edge returns true on rising edge of condition for duration ms
+    // Note: usedFeatures tracking happens in main decompiler
+    return `edge(${left}, ${right})`;
   }
 
   handleSticky(left, right) {
@@ -228,8 +236,9 @@ class ConditionDecompiler {
   }
 
   handleDelay(left, right) {
-    // Delay uses result of another LC with timeout
-    return `${left} /* delay ${right}ms */`;
+    // Delay returns true after condition held for duration ms
+    // Note: usedFeatures tracking happens in main decompiler
+    return `delay(${left}, ${right})`;
   }
 
   handleAdd(left, right) {
