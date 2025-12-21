@@ -136,6 +136,35 @@ class ExpressionGenerator {
   }
 
   /**
+   * Extract function name and validate namespace from callee
+   * Supports: funcName() or inav.helpers.funcName()
+   * @private
+   */
+  extractHelperFunctionName(callee) {
+    // Simple identifier: mapInput()
+    if (callee.type === 'Identifier') {
+      return { name: callee.name, valid: true };
+    }
+
+    // Member expression: inav.helpers.mapInput()
+    if (callee.type === 'MemberExpression') {
+      const funcName = callee.property?.name;
+
+      // Validate it's inav.helpers.*
+      if (callee.object?.type === 'MemberExpression' &&
+          callee.object.object?.name === 'inav' &&
+          callee.object.property?.name === 'helpers') {
+        return { name: funcName, valid: true };
+      }
+
+      // Invalid namespace (e.g., inav.pid[0].mapInput())
+      return { name: funcName, valid: false, invalidNamespace: true };
+    }
+
+    return { name: null, valid: false };
+  }
+
+  /**
    * Generate call expression (Math methods, mapInput, mapOutput)
    * @private
    */
@@ -146,8 +175,18 @@ class ExpressionGenerator {
       return this.generateMathCall(expr, activatorId);
     }
 
-    // Check for standalone functions (not Math methods)
-    const funcName = expr.callee?.name;
+    // Check for helper functions
+    const { name: funcName, valid, invalidNamespace } = this.extractHelperFunctionName(expr.callee);
+
+    if (invalidNamespace) {
+      this.errorHandler.addError(`Helper function '${funcName}' must be called as 'inav.helpers.${funcName}()' or '${funcName}()', not from other namespaces`);
+      return { type: OPERAND_TYPE.VALUE, value: 0 };
+    }
+
+    if (!funcName) {
+      this.errorHandler.addError('Invalid function call');
+      return { type: OPERAND_TYPE.VALUE, value: 0 };
+    }
 
     // Handle mapInput(value, maxValue) - MAP_INPUT
     // Scales value from [0:maxValue] to [0:1000]
