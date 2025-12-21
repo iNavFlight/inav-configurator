@@ -136,32 +136,31 @@ class ExpressionGenerator {
   }
 
   /**
-   * Extract function name and validate namespace from callee
-   * Supports: funcName() or inav.helpers.funcName()
+   * Extract function name if it's a valid helper function call
+   * Only recognizes: funcName() or inav.helpers.funcName()
+   * Returns null for other namespaces (not a helper function call)
    * @private
    */
   extractHelperFunctionName(callee) {
-    // Simple identifier: mapInput()
+    // Simple identifier: mapInput() (backward compat)
     if (callee.type === 'Identifier') {
-      return { name: callee.name, valid: true };
+      return callee.name;
     }
 
-    // Member expression: inav.helpers.mapInput()
+    // Member expression: only accept inav.helpers.*
     if (callee.type === 'MemberExpression') {
-      const funcName = callee.property?.name;
-
-      // Validate it's inav.helpers.*
+      // Check if it's inav.helpers.funcName()
       if (callee.object?.type === 'MemberExpression' &&
           callee.object.object?.name === 'inav' &&
           callee.object.property?.name === 'helpers') {
-        return { name: funcName, valid: true };
+        return callee.property?.name;
       }
 
-      // Invalid namespace (e.g., inav.pid[0].mapInput())
-      return { name: funcName, valid: false, invalidNamespace: true };
+      // Other namespace (e.g., inav.pid[0].mapInput()) - not a helper function
+      return null;
     }
 
-    return { name: null, valid: false };
+    return null;
   }
 
   /**
@@ -176,15 +175,11 @@ class ExpressionGenerator {
     }
 
     // Check for helper functions
-    const { name: funcName, valid, invalidNamespace } = this.extractHelperFunctionName(expr.callee);
+    const funcName = this.extractHelperFunctionName(expr.callee);
 
-    if (invalidNamespace) {
-      this.errorHandler.addError(`Helper function '${funcName}' must be called as 'inav.helpers.${funcName}()' or '${funcName}()', not from other namespaces`);
-      return { type: OPERAND_TYPE.VALUE, value: 0 };
-    }
-
+    // If not a recognized helper function, it's not handled here
     if (!funcName) {
-      this.errorHandler.addError('Invalid function call');
+      this.errorHandler.addError('Unknown function call');
       return { type: OPERAND_TYPE.VALUE, value: 0 };
     }
 
