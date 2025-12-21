@@ -67,8 +67,8 @@ describe('Comparison Operators Synthesis', () => {
 
   test('should normalize >= constant to > (constant-1)', () => {
     const code = `
-      if (flight.altitude >= 100) {
-        gvar[0] = 1;
+      if (inav.flight.altitude >= 100) {
+        inav.gvar[0] = 1;
       }
     `;
 
@@ -85,8 +85,8 @@ describe('Comparison Operators Synthesis', () => {
 
   test('should normalize <= constant to < (constant+1)', () => {
     const code = `
-      if (flight.altitude <= 500) {
-        gvar[0] = 1;
+      if (inav.flight.altitude <= 500) {
+        inav.gvar[0] = 1;
       }
     `;
 
@@ -103,8 +103,8 @@ describe('Comparison Operators Synthesis', () => {
 
   test('should synthesize != as NOT(EQUAL)', () => {
     const code = `
-      if (flight.gpsSats != 0) {
-        gvar[0] = 1;
+      if (inav.flight.gpsSats != 0) {
+        inav.gvar[0] = 1;
       }
     `;
 
@@ -125,8 +125,8 @@ describe('Comparison Operators Synthesis', () => {
 
   test('should synthesize !== as NOT(EQUAL)', () => {
     const code = `
-      if (gvar[0] !== 42) {
-        gvar[1] = 1;
+      if (inav.gvar[0] !== 42) {
+        inav.gvar[1] = 1;
       }
     `;
 
@@ -134,7 +134,7 @@ describe('Comparison Operators Synthesis', () => {
     expect(result.success).toBe(true);
     expect(result.commands.length).toBeGreaterThanOrEqual(2);
 
-    // First command should be EQUAL (1): gvar[0] == 42
+    // First command should be EQUAL (1): inav.gvar[0] == 42
     const eqCommand = result.commands[0];
     expect(eqCommand.operation).toBe(1); // EQUAL
 
@@ -145,15 +145,15 @@ describe('Comparison Operators Synthesis', () => {
 
   test('should handle >= with variable operands', () => {
     const code = `
-      if (gvar[0] >= gvar[1]) {
-        gvar[2] = 1;
+      if (inav.gvar[0] >= inav.gvar[1]) {
+        inav.gvar[2] = 1;
       }
     `;
 
     const result = transpile(code);
     expect(result.success).toBe(true);
 
-    // First command: gvar[0] < gvar[1]
+    // First command: inav.gvar[0] < inav.gvar[1]
     const ltCommand = result.commands[0];
     expect(ltCommand.operation).toBe(3); // LOWER_THAN
     expect(ltCommand.operandAType).toBe(5); // GVAR
@@ -168,17 +168,17 @@ describe('Comparison Operators Synthesis', () => {
 
   test('should normalize <= with RC channel constant', () => {
     const code = `
-      if (rc[5] <= 1500) {
-        gvar[0] = 1;
+      if (inav.rc[5] <= 1500) {
+        inav.gvar[0] = 1;
       }
     `;
 
     const result = transpile(code);
     expect(result.success).toBe(true);
-    // Normalized: rc[5] <= 1500 becomes rc[5] < 1501 (saves 1 LC)
+    // Normalized: inav.rc[5] <= 1500 becomes inav.rc[5] < 1501 (saves 1 LC)
     expect(result.commands.length).toBe(2); // condition + action
 
-    // First command: rc[5] < 1501
+    // First command: inav.rc[5] < 1501
     const ltCommand = result.commands[0];
     expect(ltCommand.operation).toBe(3); // LOWER_THAN
     expect(ltCommand.operandAType).toBe(1); // RC_CHANNEL

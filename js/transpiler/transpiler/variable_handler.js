@@ -177,16 +177,16 @@ class VariableHandler {
     const walk = (node) => {
       if (!node) return;
 
-      // Check for gvar[N] in assignment targets
+      // Check for gvar[N] or inav.gvar[N] in assignment targets
       if (node.type === 'Assignment' && node.target) {
-        const match = node.target.match(/^gvar\[(\d+)\]$/);
+        const match = node.target.match(/^(?:inav\.)?gvar\[(\d+)\]$/);
         if (match) {
           this.usedGvars.add(parseInt(match[1]));
         }
 
         // Check value side too
         if (typeof node.value === 'string') {
-          const valueMatch = node.value.match(/^gvar\[(\d+)\]$/);
+          const valueMatch = node.value.match(/^(?:inav\.)?gvar\[(\d+)\]$/);
           if (valueMatch) {
             this.usedGvars.add(parseInt(valueMatch[1]));
           }
@@ -194,14 +194,14 @@ class VariableHandler {
 
         // Check arithmetic operands
         if (node.left && typeof node.left === 'string') {
-          const leftMatch = node.left.match(/^gvar\[(\d+)\]$/);
+          const leftMatch = node.left.match(/^(?:inav\.)?gvar\[(\d+)\]$/);
           if (leftMatch) {
             this.usedGvars.add(parseInt(leftMatch[1]));
           }
         }
 
         if (node.right && typeof node.right === 'string') {
-          const rightMatch = node.right.match(/^gvar\[(\d+)\]$/);
+          const rightMatch = node.right.match(/^(?:inav\.)?gvar\[(\d+)\]$/);
           if (rightMatch) {
             this.usedGvars.add(parseInt(rightMatch[1]));
           }
@@ -244,7 +244,7 @@ class VariableHandler {
 
     // String check
     if (typeof expr === 'string') {
-      const match = expr.match(/^gvar\[(\d+)\]$/);
+      const match = expr.match(/^(?:inav\.)?gvar\[(\d+)\]$/);
       if (match) {
         this.usedGvars.add(parseInt(match[1]));
       }

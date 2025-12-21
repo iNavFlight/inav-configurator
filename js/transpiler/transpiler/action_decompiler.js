@@ -156,7 +156,7 @@ class ActionDecompiler {
    * @returns {string} JavaScript statement(s)
    */
   handleGvarSet(lc, allConditions) {
-    const targetName = this.getVarNameForGvar(lc.operandAValue) || `gvar[${lc.operandAValue}]`;
+    const targetName = this.getVarNameForGvar(lc.operandAValue) || `inav.gvar[${lc.operandAValue}]`;
     return this.handleAssignmentWithHoisting(
       targetName,
       lc.operandBType, lc.operandBValue,
@@ -332,12 +332,12 @@ class ActionDecompiler {
   // at the LC level in handleAssignmentWithHoisting/decompileWithHoisting.
 
   handleGvarInc(lc, value) {
-    const targetName = this.getVarNameForGvar(lc.operandAValue) || `gvar[${lc.operandAValue}]`;
+    const targetName = this.getVarNameForGvar(lc.operandAValue) || `inav.gvar[${lc.operandAValue}]`;
     return `${targetName} = ${targetName} + ${value};`;
   }
 
   handleGvarDec(lc, value) {
-    const targetName = this.getVarNameForGvar(lc.operandAValue) || `gvar[${lc.operandAValue}]`;
+    const targetName = this.getVarNameForGvar(lc.operandAValue) || `inav.gvar[${lc.operandAValue}]`;
     return `${targetName} = ${targetName} - ${value};`;
   }
 
@@ -428,7 +428,7 @@ class ActionDecompiler {
   handleRcChannelOverride(lc, value) {
     // operandA contains channel number (1-based: 1-18)
     // Use cleaner array syntax instead of override.rcChannel()
-    return `rc[${lc.operandAValue}] = ${value};`;
+    return `inav.rc[${lc.operandAValue}] = ${value};`;
   }
 
   handleLoiterOverride(value) {

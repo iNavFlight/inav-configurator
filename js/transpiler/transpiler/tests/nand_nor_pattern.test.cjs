@@ -31,8 +31,8 @@ describe('NAND/NOR Pattern Recognition', () => {
 
   test('!(a && b) should compile to NAND operation', () => {
     const code = `
-      if (!(flight.altitude > 100 && flight.groundSpeed > 50)) {
-        gvar[0] = 1;
+      if (!(inav.flight.altitude > 100 && inav.flight.groundSpeed > 50)) {
+        inav.gvar[0] = 1;
       }
     `;
 
@@ -51,8 +51,8 @@ describe('NAND/NOR Pattern Recognition', () => {
 
   test('!(a || b) should compile to NOR operation', () => {
     const code = `
-      if (!(flight.altitude > 100 || flight.groundSpeed > 50)) {
-        gvar[0] = 1;
+      if (!(inav.flight.altitude > 100 || inav.flight.groundSpeed > 50)) {
+        inav.gvar[0] = 1;
       }
     `;
 
@@ -73,8 +73,8 @@ describe('NAND/NOR Pattern Recognition', () => {
     // With pattern recognition: altitude > 100, groundSpeed > 50, NAND = 3 LCs
     // Without: altitude > 100, groundSpeed > 50, AND, NOT = 4 LCs
     const code = `
-      if (!(flight.altitude > 100 && flight.groundSpeed > 50)) {
-        gvar[0] = 1;
+      if (!(inav.flight.altitude > 100 && inav.flight.groundSpeed > 50)) {
+        inav.gvar[0] = 1;
       }
     `;
 
@@ -97,8 +97,8 @@ describe('NAND/NOR Pattern Recognition', () => {
     // With pattern recognition: altitude > 100, groundSpeed > 50, NOR = 3 LCs
     // Without: altitude > 100, groundSpeed > 50, OR, NOT = 4 LCs
     const code = `
-      if (!(flight.altitude > 100 || flight.groundSpeed > 50)) {
-        gvar[0] = 1;
+      if (!(inav.flight.altitude > 100 || inav.flight.groundSpeed > 50)) {
+        inav.gvar[0] = 1;
       }
     `;
 
@@ -120,8 +120,8 @@ describe('NAND/NOR Pattern Recognition', () => {
   test('simple NOT should still work', () => {
     // Plain NOT without AND/OR should still use NOT operation
     const code = `
-      if (!flight.gpsValid) {
-        gvar[0] = 1;
+      if (!inav.flight.gpsValid) {
+        inav.gvar[0] = 1;
       }
     `;
 
@@ -141,8 +141,8 @@ describe('NAND/NOR Pattern Recognition', () => {
   test('nand() function should still work', () => {
     // Explicit nand() call should still work
     const code = `
-      if (nand(flight.altitude > 100, flight.groundSpeed > 50)) {
-        gvar[0] = 1;
+      if (nand(inav.flight.altitude > 100, inav.flight.groundSpeed > 50)) {
+        inav.gvar[0] = 1;
       }
     `;
 
@@ -162,8 +162,8 @@ describe('NAND/NOR Pattern Recognition', () => {
   test('nor() function should still work', () => {
     // Explicit nor() call should still work
     const code = `
-      if (nor(flight.altitude > 100, flight.groundSpeed > 50)) {
-        gvar[0] = 1;
+      if (nor(inav.flight.altitude > 100, inav.flight.groundSpeed > 50)) {
+        inav.gvar[0] = 1;
       }
     `;
 

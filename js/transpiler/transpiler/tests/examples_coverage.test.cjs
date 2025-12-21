@@ -43,18 +43,18 @@ function parseCommands(commands) {
 }
 
 /**
- * Tests for edge() function (used by: arm-init, heading-tracking, simple-counter, edge-detection, debounce-edge)
+ * Tests for inav.events.edge() function (used by: arm-init, heading-tracking, simple-counter, edge-detection, debounce-edge)
  *
- * Note: edge() compiles to operation 47 (EDGE), not 11
+ * Note: inav.events.edge() compiles to operation 47 (EDGE), not 11
  */
-describe('edge() Function - Examples Coverage', () => {
+describe('inav.events.edge() Function - Examples Coverage', () => {
 
-  test('should compile basic edge() with action (arm-init example)', () => {
+  test('should compile basic inav.events.edge() with action (arm-init example)', () => {
     const code = `
       const { flight, gvar, edge } = inav;
 
-      edge(() => flight.armTimer > 1000, { duration: 0 }, () => {
-        gvar[0] = flight.yaw;
+      inav.events.edge(() => inav.flight.armTimer > 1000, { duration: 0 }, () => {
+        inav.gvar[0] = inav.flight.yaw;
       });
     `;
 
@@ -68,12 +68,12 @@ describe('edge() Function - Examples Coverage', () => {
     expect(hasEdge).toBe(true);
   });
 
-  test('should compile edge() with duration (debounce-edge example)', () => {
+  test('should compile inav.events.edge() with duration (debounce-edge example)', () => {
     const code = `
       const { flight, gvar, edge } = inav;
 
-      edge(() => flight.rssi < 40, { duration: 500 }, () => {
-        gvar[0] = gvar[0] + 1;
+      inav.events.edge(() => inav.flight.rssi < 40, { duration: 500 }, () => {
+        inav.gvar[0] = inav.gvar[0] + 1;
       });
     `;
 
@@ -88,16 +88,16 @@ describe('edge() Function - Examples Coverage', () => {
     expect(edgeCmd.operandBValue).toBe(500);
   });
 
-  test('should compile edge() with multiple gvar assignments (simple-counter example)', () => {
+  test('should compile inav.events.edge() with multiple gvar assignments (simple-counter example)', () => {
     const code = `
       const { flight, gvar, edge } = inav;
 
-      edge(() => flight.armTimer > 1000, { duration: 0 }, () => {
-        gvar[0] = 0;
+      inav.events.edge(() => inav.flight.armTimer > 1000, { duration: 0 }, () => {
+        inav.gvar[0] = 0;
       });
 
-      if (flight.altitude > 100) {
-        gvar[0] = gvar[0] + 1;
+      if (inav.flight.altitude > 100) {
+        inav.gvar[0] = inav.gvar[0] + 1;
       }
     `;
 
@@ -115,16 +115,16 @@ describe('edge() Function - Examples Coverage', () => {
 });
 
 /**
- * Tests for rc[n].high/mid/low (used by: rc-controlled)
+ * Tests for inav.rc[n].high/mid/low (used by: rc-controlled)
  */
 describe('RC Channel States - Examples Coverage', () => {
 
-  test('should compile rc[n].high condition (rc-controlled example)', () => {
+  test('should compile inav.rc[n].high condition (rc-controlled example)', () => {
     const code = `
       const { rc, override } = inav;
 
-      if (rc[5].high) {
-        override.vtx.power = 4;
+      if (inav.rc[5].high) {
+        inav.override.vtx.power = 4;
       }
     `;
 
@@ -139,12 +139,12 @@ describe('RC Channel States - Examples Coverage', () => {
     expect(highCmd.operandAValue).toBe(5);
   });
 
-  test('should compile rc[n].mid condition (rc-controlled example)', () => {
+  test('should compile inav.rc[n].mid condition (rc-controlled example)', () => {
     const code = `
       const { rc, override } = inav;
 
-      if (rc[5].mid) {
-        override.vtx.power = 2;
+      if (inav.rc[5].mid) {
+        inav.override.vtx.power = 2;
       }
     `;
 
@@ -159,12 +159,12 @@ describe('RC Channel States - Examples Coverage', () => {
     expect(midCmd.operandAValue).toBe(5);
   });
 
-  test('should compile rc[n].low condition (rc-controlled example)', () => {
+  test('should compile inav.rc[n].low condition (rc-controlled example)', () => {
     const code = `
       const { rc, override } = inav;
 
-      if (rc[5].low) {
-        override.vtx.power = 1;
+      if (inav.rc[5].low) {
+        inav.override.vtx.power = 1;
       }
     `;
 
@@ -183,16 +183,16 @@ describe('RC Channel States - Examples Coverage', () => {
     const code = `
       const { rc, override } = inav;
 
-      if (rc[5].high) {
-        override.vtx.power = 4;
+      if (inav.rc[5].high) {
+        inav.override.vtx.power = 4;
       }
 
-      if (rc[5].mid) {
-        override.vtx.power = 2;
+      if (inav.rc[5].mid) {
+        inav.override.vtx.power = 2;
       }
 
-      if (rc[5].low) {
-        override.vtx.power = 1;
+      if (inav.rc[5].low) {
+        inav.override.vtx.power = 1;
       }
     `;
 
@@ -208,16 +208,16 @@ describe('RC Channel States - Examples Coverage', () => {
 });
 
 /**
- * Tests for rc[n] = value (used by: override-rc)
+ * Tests for inav.rc[n] = value (used by: override-rc)
  */
 describe('RC Channel Override - Examples Coverage', () => {
 
-  test('should compile rc[n] = value assignment (override-rc example)', () => {
+  test('should compile inav.rc[n] = value assignment (override-rc example)', () => {
     const code = `
       const { flight, rc } = inav;
 
-      if (flight.groundSpeed > 1000) {
-        rc[9] = 1700;
+      if (inav.flight.groundSpeed > 1000) {
+        inav.rc[9] = 1700;
       }
     `;
 
@@ -235,10 +235,10 @@ describe('RC Channel Override - Examples Coverage', () => {
     const code = `
       const { flight, rc } = inav;
 
-      if (flight.groundSpeed > 1000) {
-        rc[9] = 1700;
+      if (inav.flight.groundSpeed > 1000) {
+        inav.rc[9] = 1700;
       } else {
-        rc[9] = 1500;
+        inav.rc[9] = 1500;
       }
     `;
 
@@ -272,8 +272,8 @@ describe('Math.abs() - Examples Coverage', () => {
     const code = `
       const { flight, gvar } = inav;
 
-      if (Math.abs(flight.yaw - gvar[0]) > 90) {
-        gvar[1] = 1;
+      if (Math.abs(inav.flight.yaw - inav.gvar[0]) > 90) {
+        inav.gvar[1] = 1;
       }
     `;
 
@@ -295,19 +295,19 @@ describe('Math.abs() - Examples Coverage', () => {
 });
 
 /**
- * Tests for sticky() function (used by: sticky-condition)
+ * Tests for inav.events.sticky() function (used by: sticky-condition)
  */
-describe('sticky() Function - Examples Coverage', () => {
+describe('inav.events.sticky() Function - Examples Coverage', () => {
 
-  test('should compile sticky() with on/off conditions (sticky-condition example)', () => {
+  test('should compile inav.events.sticky() with on/off conditions (sticky-condition example)', () => {
     const code = `
       const { flight, gvar, sticky, override } = inav;
 
-      sticky(
-        () => flight.rssi < 30,
-        () => flight.rssi > 70,
+      inav.events.sticky(
+        () => inav.flight.rssi < 30,
+        () => inav.flight.rssi > 70,
         () => {
-          override.vtx.power = 4;
+          inav.override.vtx.power = 4;
         }
       );
     `;
@@ -321,17 +321,17 @@ describe('sticky() Function - Examples Coverage', () => {
     expect(stickyCmd).toBeDefined();
   });
 
-  test('should compile sticky() with object syntax', () => {
+  test('should compile inav.events.sticky() with object syntax', () => {
     const code = `
       const { flight, gvar, sticky, override } = inav;
 
-      var latch = sticky({
-        on: () => flight.rssi < 30,
-        off: () => flight.rssi > 70
+      var latch = inav.events.sticky({
+        on: () => inav.flight.rssi < 30,
+        off: () => inav.flight.rssi > 70
       });
 
       if (latch) {
-        override.vtx.power = 4;
+        inav.override.vtx.power = 4;
       }
     `;
 
@@ -349,16 +349,16 @@ describe('sticky() Function - Examples Coverage', () => {
  */
 describe('Waypoint Operations - Examples Coverage', () => {
 
-  test('should compile waypoint.distance comparison (waypoint-arrival example)', () => {
+  test('should compile inav.waypoint.distance comparison (waypoint-arrival example)', () => {
     const code = `
-      const { waypoint, gvar } = inav;
+      
 
-      if (waypoint.distance < 10) {
-        gvar[0] = 1;
+      if (inav.waypoint.distance < 10) {
+        inav.gvar[0] = 1;
       }
 
-      if (waypoint.distance > 20) {
-        gvar[0] = 0;
+      if (inav.waypoint.distance > 20) {
+        inav.gvar[0] = 0;
       }
     `;
 
@@ -381,14 +381,14 @@ describe('Multiple Independent If Statements - Examples Coverage', () => {
 
   test('should compile multiple independent if statements (vtx-distance example)', () => {
     const code = `
-      const { flight, override } = inav;
+      
 
-      if (flight.homeDistance > 100) {
-        override.vtx.power = 3;
+      if (inav.flight.homeDistance > 100) {
+        inav.override.vtx.power = 3;
       }
 
-      if (flight.homeDistance > 500) {
-        override.vtx.power = 4;
+      if (inav.flight.homeDistance > 500) {
+        inav.override.vtx.power = 4;
       }
     `;
 
@@ -405,18 +405,18 @@ describe('Multiple Independent If Statements - Examples Coverage', () => {
 
   test('should compile three independent if statements (altitude-stages example)', () => {
     const code = `
-      const { flight, override } = inav;
+      
 
-      if (flight.altitude > 50) {
-        override.vtx.power = 3;
+      if (inav.flight.altitude > 50) {
+        inav.override.vtx.power = 3;
       }
 
-      if (flight.altitude > 100) {
-        override.vtx.power = 4;
+      if (inav.flight.altitude > 100) {
+        inav.override.vtx.power = 4;
       }
 
-      if (flight.altitude < 10) {
-        override.vtx.power = 1;
+      if (inav.flight.altitude < 10) {
+        inav.override.vtx.power = 1;
       }
     `;
 
@@ -440,10 +440,10 @@ describe('Combined Conditions (AND/OR) - Examples Coverage', () => {
 
   test('should compile && condition using chained activators (multi-condition example)', () => {
     const code = `
-      const { flight, override } = inav;
+      
 
-      if (flight.homeDistance > 200 && flight.altitude > 50) {
-        override.vtx.power = 4;
+      if (inav.flight.homeDistance > 200 && inav.flight.altitude > 50) {
+        inav.override.vtx.power = 4;
       }
     `;
 
@@ -465,10 +465,10 @@ describe('Combined Conditions (AND/OR) - Examples Coverage', () => {
 
   test('should compile || condition (multi-condition example)', () => {
     const code = `
-      const { flight, override } = inav;
+      
 
-      if (flight.cellVoltage < 350 || flight.rssi < 40) {
-        override.throttleScale = 60;
+      if (inav.flight.cellVoltage < 350 || inav.flight.rssi < 40) {
+        inav.override.throttleScale = 60;
       }
     `;
 
@@ -491,9 +491,9 @@ describe('Actual Examples Compilation', () => {
     const code = `
       const { flight, gvar, edge } = inav;
 
-      edge(() => flight.armTimer > 1000, { duration: 0 }, () => {
-        gvar[0] = flight.yaw;
-        gvar[1] = 0;
+      inav.events.edge(() => inav.flight.armTimer > 1000, { duration: 0 }, () => {
+        inav.gvar[0] = inav.flight.yaw;
+        inav.gvar[1] = 0;
       });
     `;
 
@@ -503,14 +503,14 @@ describe('Actual Examples Compilation', () => {
 
   test('should compile vtx-distance example', () => {
     const code = `
-      const { flight, override } = inav;
+      
 
-      if (flight.homeDistance > 100) {
-        override.vtx.power = 3;
+      if (inav.flight.homeDistance > 100) {
+        inav.override.vtx.power = 3;
       }
 
-      if (flight.homeDistance > 500) {
-        override.vtx.power = 4;
+      if (inav.flight.homeDistance > 500) {
+        inav.override.vtx.power = 4;
       }
     `;
 
@@ -520,14 +520,14 @@ describe('Actual Examples Compilation', () => {
 
   test('should compile battery-protection example', () => {
     const code = `
-      const { flight, override } = inav;
+      
 
-      if (flight.cellVoltage < 350) {
-        override.throttleScale = 50;
+      if (inav.flight.cellVoltage < 350) {
+        inav.override.throttleScale = 50;
       }
 
-      if (flight.cellVoltage < 330) {
-        override.throttleScale = 25;
+      if (inav.flight.cellVoltage < 330) {
+        inav.override.throttleScale = 25;
       }
     `;
 
@@ -539,16 +539,16 @@ describe('Actual Examples Compilation', () => {
     const code = `
       const { rc, override } = inav;
 
-      if (rc[5].high) {
-        override.vtx.power = 4;
+      if (inav.rc[5].high) {
+        inav.override.vtx.power = 4;
       }
 
-      if (rc[5].mid) {
-        override.vtx.power = 2;
+      if (inav.rc[5].mid) {
+        inav.override.vtx.power = 2;
       }
 
-      if (rc[5].low) {
-        override.vtx.power = 1;
+      if (inav.rc[5].low) {
+        inav.override.vtx.power = 1;
       }
     `;
 
@@ -560,10 +560,10 @@ describe('Actual Examples Compilation', () => {
     const code = `
       const { flight, rc } = inav;
 
-      if (flight.groundSpeed > 1000) {
-        rc[9] = 1700;
+      if (inav.flight.groundSpeed > 1000) {
+        inav.rc[9] = 1700;
       } else {
-        rc[9] = 1500;
+        inav.rc[9] = 1500;
       }
     `;
 
@@ -575,11 +575,11 @@ describe('Actual Examples Compilation', () => {
     const code = `
       const { flight, sticky, override } = inav;
 
-      sticky(
-        () => flight.rssi < 30,
-        () => flight.rssi > 70,
+      inav.events.sticky(
+        () => inav.flight.rssi < 30,
+        () => inav.flight.rssi > 70,
         () => {
-          override.vtx.power = 4;
+          inav.override.vtx.power = 4;
         }
       );
     `;
@@ -590,14 +590,14 @@ describe('Actual Examples Compilation', () => {
 
   test('should compile waypoint-arrival example', () => {
     const code = `
-      const { waypoint, gvar } = inav;
+      
 
-      if (waypoint.distance < 10) {
-        gvar[0] = 1;
+      if (inav.waypoint.distance < 10) {
+        inav.gvar[0] = 1;
       }
 
-      if (waypoint.distance > 20) {
-        gvar[0] = 0;
+      if (inav.waypoint.distance > 20) {
+        inav.gvar[0] = 0;
       }
     `;
 
