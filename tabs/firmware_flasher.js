@@ -339,7 +339,7 @@ TABS.firmware_flasher.initialize = function (callback) {
                         versions_e.append($("<option value='0'>{0} {1}</option>".format(i18n.getMessage('firmwareFlasherOptionLabelSelectFirmwareVersionFor'), target)));
                     }
 
-                    if (TABS.firmware_flasher.releases[target]) {
+                    if (typeof TABS.firmware_flasher.releases[target]?.forEach === 'function') {
                         TABS.firmware_flasher.releases[target].forEach(function(descriptor) {
                             var select_e =
                                     $("<option value='{0}'>{0} - {1} - {2} ({3})</option>".format(
