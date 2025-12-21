@@ -623,8 +623,9 @@ class ConditionGenerator {
    */
   generateMember(condition, activatorId) {
     // RC channel LOW/MID/HIGH state detection: rc[1].low, rc[2].mid, rc[3].high
-    if (typeof condition.value === 'string' && condition.value.startsWith('rc[')) {
-      const match = condition.value.match(/^rc\[(\d+)\]\.(low|mid|high)$/);
+    // Also handles namespaced version: inav.rc[1].low, inav.rc[2].mid, inav.rc[3].high
+    if (typeof condition.value === 'string' && (condition.value.startsWith('rc[') || condition.value.startsWith('inav.rc['))) {
+      const match = condition.value.match(/^(?:inav\.)?rc\[(\d+)\]\.(low|mid|high)$/);
       if (match) {
         const channelIndex = parseInt(match[1]);
         const state = match[2];
