@@ -701,48 +701,23 @@ class ConditionGenerator {
   }
 
   /**
-   * Extract function name and validate namespace from callee
-   * Supports: funcName() or inav.helpers.funcName()
-   * @private
-   */
-  extractHelperFunctionName(callee) {
-    // Simple identifier: xor()
-    if (callee.type === 'Identifier') {
-      return { name: callee.name, valid: true };
-    }
-
-    // Member expression: inav.helpers.xor()
-    if (callee.type === 'MemberExpression') {
-      const funcName = callee.property?.name;
-
-      // Validate it's inav.helpers.*
-      if (callee.object?.type === 'MemberExpression' &&
-          callee.object.object?.name === 'inav' &&
-          callee.object.property?.name === 'helpers') {
-        return { name: funcName, valid: true };
-      }
-
-      // Invalid namespace (e.g., inav.pid[0].xor())
-      return { name: funcName, valid: false, invalidNamespace: true };
-    }
-
-    return { name: null, valid: false };
-  }
-
-  /**
    * Generate call expression condition (xor, nand, nor, approxEqual)
    * @private
    */
   generateCall(condition, activatorId) {
-    const { name: funcName, valid, invalidNamespace } = this.extractHelperFunctionName(condition.callee);
-
-    if (invalidNamespace) {
-      this.errorHandler.addError(`Helper function '${funcName}' must be called as 'inav.helpers.${funcName}()' or '${funcName}()', not from other namespaces`);
-      return this.getLcIndex();
+    // Check for helper functions - backward compat: xor()
+    let funcName = null;
+    if (condition.callee.type === 'Identifier') {
+      funcName = condition.callee.name;
+    }
+    // Check for helper functions - new syntax: inav.helpers.xor()
+    else if (condition.callee.object?.property?.name === 'helpers') {
+      funcName = condition.callee.property?.name;
     }
 
+    // If not a helper function call, unknown function
     if (!funcName) {
-      this.errorHandler.addError('Invalid function call');
+      this.errorHandler.addError('Unknown function call');
       return this.getLcIndex();
     }
 

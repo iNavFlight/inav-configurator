@@ -136,34 +136,6 @@ class ExpressionGenerator {
   }
 
   /**
-   * Extract function name if it's a valid helper function call
-   * Only recognizes: funcName() or inav.helpers.funcName()
-   * Returns null for other namespaces (not a helper function call)
-   * @private
-   */
-  extractHelperFunctionName(callee) {
-    // Simple identifier: mapInput() (backward compat)
-    if (callee.type === 'Identifier') {
-      return callee.name;
-    }
-
-    // Member expression: only accept inav.helpers.*
-    if (callee.type === 'MemberExpression') {
-      // Check if it's inav.helpers.funcName()
-      if (callee.object?.type === 'MemberExpression' &&
-          callee.object.object?.name === 'inav' &&
-          callee.object.property?.name === 'helpers') {
-        return callee.property?.name;
-      }
-
-      // Other namespace (e.g., inav.pid[0].mapInput()) - not a helper function
-      return null;
-    }
-
-    return null;
-  }
-
-  /**
    * Generate call expression (Math methods, mapInput, mapOutput)
    * @private
    */
@@ -174,10 +146,17 @@ class ExpressionGenerator {
       return this.generateMathCall(expr, activatorId);
     }
 
-    // Check for helper functions
-    const funcName = this.extractHelperFunctionName(expr.callee);
+    // Check for helper functions - backward compat: mapInput()
+    let funcName = null;
+    if (expr.callee.type === 'Identifier') {
+      funcName = expr.callee.name;
+    }
+    // Check for helper functions - new syntax: inav.helpers.mapInput()
+    else if (expr.callee.object?.property?.name === 'helpers') {
+      funcName = expr.callee.property?.name;
+    }
 
-    // If not a recognized helper function, it's not handled here
+    // If not a helper function call, unknown function
     if (!funcName) {
       this.errorHandler.addError('Unknown function call');
       return { type: OPERAND_TYPE.VALUE, value: 0 };
