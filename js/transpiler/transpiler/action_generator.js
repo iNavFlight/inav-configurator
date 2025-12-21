@@ -46,26 +46,29 @@ class ActionGenerator {
     const target = action.target;
     const value = action.value;
 
-    // Handle gvar assignment
-    if (target.startsWith('gvar[')) {
+    // Normalize target (strip 'inav.' prefix if present for internal checks)
+    const normalizedTarget = target.startsWith('inav.') ? target.substring(5) : target;
+
+    // Handle gvar assignment (with or without inav. prefix)
+    if (normalizedTarget.startsWith('gvar[')) {
       this.generateGvarAssignment(action, activatorId);
       return;
     }
 
-    // Handle RC channel assignment: rc[5] = 1500
-    if (target.startsWith('rc[')) {
+    // Handle RC channel assignment: rc[5] = 1500 (with or without inav. prefix)
+    if (normalizedTarget.startsWith('rc[')) {
       this.generateRcAssignment(target, value, activatorId);
       return;
     }
 
-    // Handle override operations
-    if (target.startsWith('override.')) {
+    // Handle override operations (expects inav.override. prefix)
+    if (target.startsWith('inav.override.') || normalizedTarget.startsWith('override.')) {
       this.generateOverride(target, value, activatorId);
       return;
     }
 
     // Handle variable assignment (var variables resolve to gvar[N])
-    if (this.variableHandler && this.variableHandler.isVariable(target)) {
+    if (this.variableHandler && this.variableHandler.isVariable(normalizedTarget)) {
       this.generateVariableAssignment(action, activatorId);
       return;
     }
@@ -204,7 +207,7 @@ class ActionGenerator {
     const valueOperand = this.getOperand(value);
 
     // Check for flight axis overrides which need axis in operandA
-    const flightAxisMatch = target.match(/^override\.flightAxis\.(roll|pitch|yaw)\.(angle|rate)$/);
+    const flightAxisMatch = target.match(/^inav\.override\.flightAxis\.(roll|pitch|yaw)\.(angle|rate)$/);
     if (flightAxisMatch) {
       const axisMap = { 'roll': 0, 'pitch': 1, 'yaw': 2 };
       const axisIndex = axisMap[flightAxisMatch[1]];

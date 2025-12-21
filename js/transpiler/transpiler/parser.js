@@ -230,36 +230,35 @@ class JavaScriptParser {
   }
 
   /**
-   * Transform variable declaration (const { flight } = inav, let x = ..., var y = ...)
+   * Transform variable declaration (let x = ..., var y = sticky(...), etc.)
    */
   transformVariableDeclaration(node) {
-    // Look for: const { ... } = inav
+    // Check for: var latch1 = sticky({on: ..., off: ...}) or var latch1 = inav.events.sticky({on: ..., off: ...})
     if (node.declarations.length === 1) {
       const decl = node.declarations[0];
-      if (decl.id && decl.id.type === 'ObjectPattern' &&
-          decl.init &&
-          decl.init.type === 'Identifier' &&
-          decl.init.name === 'inav') {
-        return {
-          type: 'Destructuring',
-          loc: node.loc,
-          range: node.range
-        };
-      }
-
-      // Check for: var latch1 = sticky({on: ..., off: ...})
       if (decl.id && decl.id.type === 'Identifier' &&
           decl.init &&
           decl.init.type === 'CallExpression' &&
-          decl.init.callee && decl.init.callee.type === 'Identifier' &&
-          decl.init.callee.name === 'sticky') {
-        return {
-          type: 'StickyAssignment',
-          target: decl.id.name,
-          args: decl.init.arguments,
-          loc: node.loc,
-          range: node.range
-        };
+          decl.init.callee) {
+
+        // Check if callee is sticky() or inav.events.sticky()
+        const isStickyCall =
+          (decl.init.callee.type === 'Identifier' && decl.init.callee.name === 'sticky') ||
+          (decl.init.callee.type === 'MemberExpression' &&
+           decl.init.callee.object && decl.init.callee.object.type === 'MemberExpression' &&
+           decl.init.callee.object.object && decl.init.callee.object.object.name === 'inav' &&
+           decl.init.callee.object.property && decl.init.callee.object.property.name === 'events' &&
+           decl.init.callee.property && decl.init.callee.property.name === 'sticky');
+
+        if (isStickyCall) {
+          return {
+            type: 'StickyAssignment',
+            target: decl.id.name,
+            args: decl.init.arguments,
+            loc: node.loc,
+            range: node.range
+          };
+        }
       }
     }
 
@@ -338,6 +337,19 @@ class JavaScriptParser {
         expr.callee.property) {
       const handler = `on.${expr.callee.property.name}`;
       return this.transformEventHandler(handler, expr.arguments, loc, range);
+    }
+
+    // inav.events.edge(...), inav.events.sticky(...), etc.
+    if (expr.callee.type === 'MemberExpression' &&
+        expr.callee.object && expr.callee.object.type === 'MemberExpression' &&
+        expr.callee.object.object && expr.callee.object.object.name === 'inav' &&
+        expr.callee.object.property && expr.callee.object.property.name === 'events' &&
+        expr.callee.property) {
+      const fnName = expr.callee.property.name;
+      if (fnName === 'edge' || fnName === 'sticky' || fnName === 'delay' ||
+          fnName === 'timer' || fnName === 'whenChanged') {
+        return this.transformHelperFunction(fnName, expr.arguments, loc, range);
+      }
     }
 
     // edge(...), sticky(...), delay(...), timer(...), whenChanged(...)
@@ -636,17 +648,25 @@ class JavaScriptParser {
     const target = this.extractIdentifier(expr.left);
     const rightExpr = expr.right;
 
-    // Check if right side is sticky({on: ..., off: ...}) call
-    if (rightExpr.type === 'CallExpression' &&
-        rightExpr.callee && rightExpr.callee.type === 'Identifier' &&
-        rightExpr.callee.name === 'sticky') {
-      return {
-        type: 'StickyAssignment',
-        target,
-        args: rightExpr.arguments,
-        loc,
-        range
-      };
+    // Check if right side is sticky({on: ..., off: ...}) or inav.events.sticky({on: ..., off: ...}) call
+    if (rightExpr.type === 'CallExpression' && rightExpr.callee) {
+      const isStickyCall =
+        (rightExpr.callee.type === 'Identifier' && rightExpr.callee.name === 'sticky') ||
+        (rightExpr.callee.type === 'MemberExpression' &&
+         rightExpr.callee.object && rightExpr.callee.object.type === 'MemberExpression' &&
+         rightExpr.callee.object.object && rightExpr.callee.object.object.name === 'inav' &&
+         rightExpr.callee.object.property && rightExpr.callee.object.property.name === 'events' &&
+         rightExpr.callee.property && rightExpr.callee.property.name === 'sticky');
+
+      if (isStickyCall) {
+        return {
+          type: 'StickyAssignment',
+          target,
+          args: rightExpr.arguments,
+          loc,
+          range
+        };
+      }
     }
 
     // Check if right side is binary expression (could be arithmetic or comparison)
