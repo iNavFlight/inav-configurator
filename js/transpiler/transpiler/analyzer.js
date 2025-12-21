@@ -126,6 +126,9 @@ class SemanticAnalyzer {
       case 'VarDeclaration':
         this.handleVarDeclaration(stmt);
         break;
+      case 'StickyAssignment':
+        this.handleStickyAssignment(stmt);
+        break;
       case 'Assignment':
         this.checkAssignment(stmt);
         break;
@@ -147,6 +150,25 @@ class SemanticAnalyzer {
    */
   handleVarDeclaration(stmt) {
     this.variableHandler.addVarVariable(stmt.name, stmt.initExpr, stmt.loc);
+  }
+
+  /**
+   * Handle sticky assignment (var latch1 = sticky({...}) or latch1 = sticky({...}))
+   * Registers the variable as a special "latch" type so it's recognized in conditions
+   */
+  handleStickyAssignment(stmt) {
+    // Check if variable was pre-declared (e.g., var latch1;)
+    // This pattern is used by the decompiler when sticky has an activator
+    const existing = this.variableHandler.getVariable(stmt.target);
+    if (existing && existing.kind === 'var') {
+      // Convert from 'var' to 'latch' - update existing entry
+      this.variableHandler.convertToLatch(stmt.target);
+      return;
+    }
+
+    // Register as a special latch variable - doesn't use gvar slots
+    // The codegen will map it to an LC index
+    this.variableHandler.addLatchVariable(stmt.target, stmt.loc);
   }
   
   /**
@@ -495,20 +517,26 @@ class SemanticAnalyzer {
   detectConflicts(ast) {
     // Track assignments by handler type and target
     const handlerAssignments = new Map();
-    
+
+    let stmtIndex = 0;
     for (const stmt of ast.statements) {
       if (stmt && stmt.type === 'EventHandler') {
-        const handlerKey = stmt.handler === 'ifthen' ? 
-          `ifthen:${this.serializeCondition(stmt.condition)}` : 
+        // Each if statement gets a unique key - we want to detect multiple
+        // assignments within the SAME if block, not across different if
+        // statements that happen to have the same condition
+        const handlerKey = stmt.handler === 'ifthen' ?
+          `ifthen:${stmtIndex}` :
           stmt.handler;
-        
+
         if (!handlerAssignments.has(handlerKey)) {
           handlerAssignments.set(handlerKey, new Map());
         }
-        
+
         if (stmt.body && Array.isArray(stmt.body)) {
           this.collectAssignments(stmt.body, handlerKey, handlerAssignments.get(handlerKey));
         }
+
+        stmtIndex++;
       }
     }
     
@@ -543,15 +571,6 @@ class SemanticAnalyzer {
       }
     }
   }
-  
-  /**
-   * Serialize condition for comparison
-   */
-  serializeCondition(condition) {
-    if (!condition) return 'null';
-    return JSON.stringify(condition);
-  }
-  
   /**
    * Collect all assignments in body
    */

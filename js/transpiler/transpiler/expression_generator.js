@@ -23,6 +23,7 @@ class ExpressionGenerator {
    * @param {Function} context.getArithmeticOperation - Function to get arithmetic operation
    * @param {Object} context.errorHandler - Error handler instance
    * @param {Object} context.arrowHelper - Arrow helper instance for identifier extraction
+   * @param {Object} context.conditionGenerator - Condition generator for ternary expressions
    */
   constructor(context) {
     this.pushLogicCommand = context.pushLogicCommand;
@@ -31,6 +32,7 @@ class ExpressionGenerator {
     this.getArithmeticOperation = context.getArithmeticOperation;
     this.errorHandler = context.errorHandler;
     this.arrowHelper = context.arrowHelper;
+    this.conditionGenerator = context.conditionGenerator;
   }
 
   /**
@@ -49,6 +51,15 @@ class ExpressionGenerator {
         return this.generateCall(expr, activatorId);
       case 'BinaryExpression':
         return this.generateBinary(expr, activatorId);
+      case 'Literal':
+        // Direct literal value (number, boolean, etc.)
+        return { type: OPERAND_TYPE.VALUE, value: expr.value };
+      case 'Identifier':
+      case 'MemberExpression':
+        // Variable reference - delegate to getOperand
+        return this.getOperand(expr, activatorId);
+      case 'ConditionalExpression':
+        return this.generateConditional(expr, activatorId);
       default:
         this.errorHandler.addError(
           `Unsupported expression type: ${expr.type}. Use arithmetic operators (+, -, *, /) or supported functions`,
@@ -57,6 +68,71 @@ class ExpressionGenerator {
         );
         return { type: OPERAND_TYPE.VALUE, value: 0 };
     }
+  }
+
+  /**
+   * Generate conditional (ternary) expression as value
+   * Patterns:
+   *   cond ? val : 0   → val with cond as activator
+   *   a ? b : c        → general ternary using ADD to combine
+   * @private
+   */
+  generateConditional(expr, activatorId) {
+    const { test, consequent, alternate } = expr;
+
+    // Pattern: cond ? val : 0 → val with cond as activator
+    if (alternate === 0 || (alternate.type === 'Literal' && alternate.value === 0)) {
+      // Generate the condition using conditionGenerator
+      const condLcIndex = this.conditionGenerator.generate(test, activatorId);
+
+      // Generate the value with the condition as activator
+      return this.generate(consequent, condLcIndex);
+    }
+
+    // General ternary: a ? b : c
+    // Implemented as:
+    //   LC_COND: test condition
+    //   LC_CONS: consequent value with LC_COND as activator (value when true, 0 when false)
+    //   LC_NOT:  NOT(LC_COND)
+    //   LC_ALT:  alternate value with LC_NOT as activator (value when false, 0 when true)
+    //   LC_RES:  ADD(LC_CONS, LC_ALT) - combines (one is always 0)
+    const condLcIndex = this.conditionGenerator.generate(test, activatorId);
+
+    // Generate consequent value with condition as activator
+    const consequentOperand = this.generate(consequent, condLcIndex);
+    const consequentLcIndex = consequentOperand.type === OPERAND_TYPE.LC
+      ? consequentOperand.value
+      : this.pushLogicCommand(OPERATION.SET,
+          { type: OPERAND_TYPE.VALUE, value: 0 },
+          consequentOperand,
+          condLcIndex
+        );
+
+    // Generate NOT(condition)
+    const notCondLcIndex = this.pushLogicCommand(OPERATION.NOT,
+      { type: OPERAND_TYPE.LC, value: condLcIndex },
+      { type: OPERAND_TYPE.VALUE, value: 0 },
+      activatorId
+    );
+
+    // Generate alternate value with NOT(condition) as activator
+    const alternateOperand = this.generate(alternate, notCondLcIndex);
+    const alternateLcIndex = alternateOperand.type === OPERAND_TYPE.LC
+      ? alternateOperand.value
+      : this.pushLogicCommand(OPERATION.SET,
+          { type: OPERAND_TYPE.VALUE, value: 0 },
+          alternateOperand,
+          notCondLcIndex
+        );
+
+    // Combine with ADD - exactly one will be non-zero
+    const resultLcIndex = this.pushLogicCommand(OPERATION.ADD,
+      { type: OPERAND_TYPE.LC, value: consequentLcIndex },
+      { type: OPERAND_TYPE.LC, value: alternateLcIndex },
+      activatorId
+    );
+
+    return { type: OPERAND_TYPE.LC, value: resultLcIndex };
   }
 
   /**

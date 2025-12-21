@@ -18,6 +18,10 @@
         "message": "简体中文",
         "_comment": "Don't translate!"
     },
+    "language_ru": {
+        "message": "Русский",
+        "_comment": "Don't translate!"
+    },
     "language": {
         "message": "语言"
     },
@@ -6177,5 +6181,65 @@
     },
     "currentLanguage": {
         "message": "zh-CN"
+    },
+    "tabJavaScriptProgramming": {
+        "message": "JavaScript编程"
+    },
+    "javascriptProgrammingDescription": {
+        "message": "编写JavaScript代码来控制您的飞行器。转译器会将您的代码转换为INAV逻辑条件。"
+    },
+    "javascriptBetaWarning": {
+        "message": "<strong>编写JavaScript，获取INAV逻辑条件！</strong>使用熟悉的JavaScript语法，具有完整的自动补全和错误检查功能。<strong>目前处于测试阶段，请勿用于安全关键应用！</strong>"
+    },
+    "javascriptEditorTitle": {
+        "message": "JavaScript编辑器（shift-ctrl-v粘贴，右键单击变量可重命名）"
+    },
+    "javascriptLoadExample": {
+        "message": "加载示例："
+    },
+    "javascriptSelectExample": {
+        "message": "-- 选择示例 --"
+    },
+    "javascriptTranspile": {
+        "message": "转译为INAV"
+    },
+    "javascriptLoad": {
+        "message": "从FC加载"
+    },
+    "javascriptSave": {
+        "message": "保存到FC"
+    },
+    "javascriptClear": {
+        "message": "清空编辑器"
+    },
+    "javascriptOutputTitle": {
+        "message": "INAV逻辑条件输出"
+    },
+    "javascriptLcCount": {
+        "message": "$1 / $2 逻辑条件"
+    },
+    "javascriptOptimizationsApplied": {
+        "message": "已应用的优化："
+    },
+    "javascriptApiReference": {
+        "message": "API参考和示例"
+    },
+    "javascriptQuickReference": {
+        "message": "快速参考"
+    },
+    "javascriptFlightParameters": {
+        "message": "飞行参数（只读）"
+    },
+    "javascriptRcChannels": {
+        "message": "RC通道"
+    },
+    "javascriptOverrides": {
+        "message": "覆盖（写入）"
+    },
+    "javascriptGlobalVariables": {
+        "message": "全局变量"
+    },
+    "javascriptCompleteExample": {
+        "message": "完整示例"
     }
 }

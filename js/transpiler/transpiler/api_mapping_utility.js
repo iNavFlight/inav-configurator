@@ -40,14 +40,42 @@ export function buildForwardMapping(definitions) {
       // Nested object (e.g., flight.mode, override.vtx)
       if (propDef.type === 'object' && propDef.properties) {
         for (const [nestedName, nestedDef] of Object.entries(propDef.properties)) {
-          if (nestedDef && nestedDef.inavOperand) {
-            const path = `${objName}.${propName}.${nestedName}`;
-            mapping[path] = nestedDef.inavOperand;
+          if (!nestedDef || typeof nestedDef !== 'object') continue;
+
+          const path2 = `${objName}.${propName}.${nestedName}`;
+
+          // Extract inavOperand (for read operands)
+          if (nestedDef.inavOperand) {
+            mapping[path2] = nestedDef.inavOperand;
+          }
+
+          // Extract inavOperation (for write operations)
+          if (nestedDef.inavOperation) {
+            if (!mapping[path2]) mapping[path2] = {};
+            mapping[path2].operation = nestedDef.inavOperation;
+          }
+
+          // Handle 3rd level nesting (e.g., override.flightAxis.roll.angle)
+          if (nestedDef.type === 'object' && nestedDef.properties) {
+            for (const [deepName, deepDef] of Object.entries(nestedDef.properties)) {
+              if (!deepDef || typeof deepDef !== 'object') continue;
+
+              const path3 = `${path2}.${deepName}`;
+
+              if (deepDef.inavOperand) {
+                mapping[path3] = deepDef.inavOperand;
+              }
+
+              if (deepDef.inavOperation) {
+                if (!mapping[path3]) mapping[path3] = {};
+                mapping[path3].operation = deepDef.inavOperation;
+              }
+            }
           }
         }
       }
 
-      // Operation mapping for writable properties
+      // Operation mapping for writable properties (top-level)
       if (propDef.inavOperation) {
         const path = `${objName}.${propName}`;
         if (!mapping[path]) mapping[path] = {};

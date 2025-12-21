@@ -22,6 +22,10 @@
         "message": "简体中文",
         "_comment": "Don't translate!"
     },
+    "language_ru": {
+        "message": "Русский",
+        "_comment": "Don't translate!"
+    },
     "language": {
         "message": "Мова"
     },
@@ -6167,10 +6171,25 @@
         "message": "Пошук"
     },
     "tabJavaScriptProgramming": {
-        "message": "Програмування JavaScript"
+        "message": "Програмування на JavaScript"
+    },
+    "javascriptProgrammingDescription": {
+        "message": "Пишіть код на JavaScript для керування літальним апаратом. Транспілятор перетворює ваш код на логічні умови INAV."
+    },
+    "javascriptBetaWarning": {
+        "message": "<strong>Пишіть на JavaScript, отримуйте логічні умови INAV!</strong> Використовуйте звичний синтаксис JavaScript з повним автодоповненням та перевіркою помилок. <strong>Наразі в стадії бета-тестування. Не використовуйте для критично важливих застосунків!</strong>"
+    },
+    "javascriptEditorTitle": {
+        "message": "Редактор JavaScript (shift-ctrl-v щоб вставити, правий клік по змінній для перейменування)"
+    },
+    "javascriptLoadExample": {
+        "message": "Завантажити приклад:"
+    },
+    "javascriptSelectExample": {
+        "message": "-- Оберіть приклад --"
     },
     "javascriptTranspile": {
-        "message": "Конвертувати в INAV"
+        "message": "Транспілювати в INAV"
     },
     "javascriptLoad": {
         "message": "Завантажити з польотного контролера"
@@ -6180,5 +6199,35 @@
     },
     "javascriptClear": {
         "message": "Очистити редактор"
+    },
+    "javascriptOutputTitle": {
+        "message": "Вихідні дані логічних умов INAV"
+    },
+    "javascriptLcCount": {
+        "message": "$1 / $2 ЛУ"
+    },
+    "javascriptOptimizationsApplied": {
+        "message": "Застосовані оптимізації:"
+    },
+    "javascriptApiReference": {
+        "message": "Довідник з API та приклади"
+    },
+    "javascriptQuickReference": {
+        "message": "Короткий довідник"
+    },
+    "javascriptFlightParameters": {
+        "message": "Параметри польоту (тільки читання)"
+    },
+    "javascriptRcChannels": {
+        "message": "Канали пульта"
+    },
+    "javascriptOverrides": {
+        "message": "Перевизначення (запис)"
+    },
+    "javascriptGlobalVariables": {
+        "message": "Глобальні змінні"
+    },
+    "javascriptCompleteExample": {
+        "message": "Повний приклад"
     }
 }

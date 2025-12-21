@@ -245,16 +245,190 @@ edge(() => flight.rssi < 40, { duration: 500 }, () => {
     description: 'Condition that latches ON and needs reset',
     category: 'Advanced',
     code: `// Sticky condition - latches ON until reset
-const { flight, gvar, sticky } = inav;
+const { flight, gvar, sticky, override } = inav;
 
-// Latch ON when RSSI < 30, OFF when RSSI > 70
-sticky(
-  () => flight.rssi < 30,  // ON condition
-  () => flight.rssi > 70,  // OFF condition
-  () => {
-    override.vtx.power = 4; // Max power while latched
-  }
-);`
+// Create a latch: ON when RSSI < 30, OFF when RSSI > 70
+var rssiWarning = sticky({
+  on: () => flight.rssi < 30,
+  off: () => flight.rssi > 70
+});
+
+// Use the latch to control actions
+if (rssiWarning) {
+  override.vtx.power = 4; // Max power while latched
+}`
+  },
+
+  'sticky-variable': {
+    name: 'Sticky with Variable',
+    description: 'Assign sticky state to a variable for reuse',
+    category: 'Advanced',
+    code: `// Sticky condition stored in a variable
+const { flight, gvar, sticky, override } = inav;
+
+// Create a latch variable that can be referenced multiple times
+var lowBatteryLatch = sticky({
+  on: () => flight.cellVoltage < 330,
+  off: () => flight.cellVoltage > 350
+});
+
+// Use the latch variable to control multiple actions
+if (lowBatteryLatch) {
+  override.throttleScale = 50;
+  gvar[0] = 1;  // Warning flag
+}`
+  },
+
+  'let-variables': {
+    name: 'Let/Const Variables',
+    description: 'Use named variables for cleaner code',
+    category: 'Advanced',
+    code: `// Named variables make code more readable
+const { flight, override } = inav;
+
+// Define thresholds as named constants
+let lowVoltage = 330;
+let criticalVoltage = 310;
+let farDistance = 500;
+let veryFarDistance = 1000;
+
+// Use in conditions
+if (flight.cellVoltage < lowVoltage) {
+  override.throttleScale = 50;
+}
+
+if (flight.cellVoltage < criticalVoltage) {
+  override.throttleScale = 25;
+}
+
+// Combine conditions with named variables
+let isFarAway = flight.homeDistance > farDistance;
+let isVeryFarAway = flight.homeDistance > veryFarDistance;
+
+if (isVeryFarAway) {
+  override.vtx.power = 4;
+} else if (isFarAway) {
+  override.vtx.power = 3;
+}`
+  },
+
+  'ternary-operator': {
+    name: 'Ternary Operator',
+    description: 'Conditional value assignment',
+    category: 'Advanced',
+    code: `// Use ternary operator for conditional values
+const { flight, override } = inav;
+
+// Choose throttle limit based on voltage
+let throttleLimit = flight.cellVoltage < 330 ? 25 : 50;
+
+if (flight.cellVoltage < 350) {
+  override.throttleScale = throttleLimit;
+}
+
+// Inline ternary in assignment
+override.vtx.power = flight.homeDistance > 500 ? 4 : 2;
+
+// Nested ternary for multiple conditions
+let powerLevel = flight.rssi < 30 ? 4 :
+                 flight.rssi < 50 ? 3 :
+                 flight.rssi < 70 ? 2 : 1;
+
+override.vtx.power = powerLevel;`
+  },
+
+  'pid-output': {
+    name: 'PID Controller Output',
+    description: 'Read PID controller output values',
+    category: 'PID',
+    code: `// Read programming PID controller outputs
+const { pid, gvar, override } = inav;
+
+// PID controllers are configured in the Programming PID tab
+// Here we read the output and use it for control
+
+// Use PID 0 output to adjust throttle
+if (pid[0].output > 500) {
+  override.throttle = 1600;
+}
+
+// Store PID output in a gvar for OSD display
+gvar[0] = pid[0].output;
+
+// Combine multiple PID outputs
+gvar[1] = pid[0].output + pid[1].output;`
+  },
+
+  'flight-modes': {
+    name: 'Flight Mode Detection',
+    description: 'Check active flight modes and respond',
+    category: 'Flight Modes',
+    code: `// Check active flight modes
+const { flight, gvar, override } = inav;
+
+// Check if position hold is active
+if (flight.mode.poshold === 1) {
+  gvar[0] = 1;  // Flag: in poshold
+}
+
+// Check if RTH is active
+if (flight.mode.rth === 1) {
+  override.vtx.power = 4;  // Max power during RTH
+}
+
+// Check altitude hold
+if (flight.mode.althold === 1) {
+  gvar[1] = flight.altitude;  // Store altitude
+}
+
+// Check for failsafe
+if (flight.mode.failsafe === 1) {
+  gvar[7] = 1;  // Emergency flag
+}`
+  },
+
+  'pid-throttle-control': {
+    name: 'PID-based Throttle Control',
+    description: 'Use PID output to control throttle',
+    category: 'PID',
+    code: `// Use PID controller for custom throttle control
+const { pid, override } = inav;
+
+// PID 3 is configured to maintain altitude (set up in PID tab)
+// Map the output to throttle range
+
+// Clamp PID output to throttle range
+let throttleBase = 1500;
+let pidContribution = Math.min(300, Math.max(-300, pid[3].output));
+override.throttle = throttleBase + pidContribution;`
+  },
+
+  'mode-based-vtx': {
+    name: 'Mode-based VTX Control',
+    description: 'Adjust VTX power based on flight mode',
+    category: 'Flight Modes',
+    code: `// VTX power control based on flight mode
+const { flight, override } = inav;
+
+// Low power in manual/acro modes (close range)
+if (flight.mode.manual === 1) {
+  override.vtx.power = 1;
+}
+
+// Medium power in angle/horizon modes
+if (flight.mode.angle === 1 || flight.mode.horizon === 1) {
+  override.vtx.power = 2;
+}
+
+// High power during autonomous modes (may be far away)
+if (flight.mode.rth === 1 || flight.mode.poshold === 1) {
+  override.vtx.power = 4;
+}
+
+// Max power during waypoint mission
+if (flight.mode.waypointMission === 1) {
+  override.vtx.power = 4;
+}`
   }
 };
 
