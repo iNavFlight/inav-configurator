@@ -6189,10 +6189,10 @@
         "message": "Транспілювати в INAV"
     },
     "javascriptLoad": {
-        "message": "Завантажити з FC"
+        "message": "Завантажити з польотного контролера"
     },
     "javascriptSave": {
-        "message": "Зберегти на FC"
+        "message": "Зберегти до польотного контролера"
     },
     "javascriptClear": {
         "message": "Очистити редактор"
