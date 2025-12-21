@@ -206,8 +206,11 @@ class ActionGenerator {
     const operation = this.getOverrideOperation(target);
     const valueOperand = this.getOperand(value);
 
+    // Normalize target (strip 'inav.' prefix if present for consistent matching)
+    const normalizedTarget = target.startsWith('inav.') ? target.substring(5) : target;
+
     // Check for flight axis overrides which need axis in operandA
-    const flightAxisMatch = target.match(/^inav\.override\.flightAxis\.(roll|pitch|yaw)\.(angle|rate)$/);
+    const flightAxisMatch = normalizedTarget.match(/^override\.flightAxis\.(roll|pitch|yaw)\.(angle|rate)$/);
     if (flightAxisMatch) {
       const axisMap = { 'roll': 0, 'pitch': 1, 'yaw': 2 };
       const axisIndex = axisMap[flightAxisMatch[1]];

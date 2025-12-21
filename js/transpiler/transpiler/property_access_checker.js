@@ -228,23 +228,19 @@ class PropertyAccessChecker {
    * Uses dispatch table like check() method
    */
   isValidWritableProperty(target) {
-    // Must be namespaced
-    if (!target.startsWith('inav.')) {
-      return false;
-    }
-
-    const inavPath = target.substring(5); // Strip 'inav.' prefix
+    // Normalize target (strip 'inav.' prefix if present for backward compatibility)
+    const normalizedTarget = target.startsWith('inav.') ? target.substring(5) : target;
 
     // Dispatch table for writable properties
     const writableHandlers = {
       'gvar[': () => true,
       'rc[': () => true,
-      'override.': () => this.checkWritableOverride(inavPath)
+      'override.': () => this.checkWritableOverride(normalizedTarget)
     };
 
     // Find and execute matching handler
     for (const [prefix, handler] of Object.entries(writableHandlers)) {
-      if (inavPath.startsWith(prefix)) {
+      if (normalizedTarget.startsWith(prefix)) {
         return handler();
       }
     }

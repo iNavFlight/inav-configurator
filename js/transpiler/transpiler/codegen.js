@@ -949,8 +949,11 @@ class INAVCodeGenerator {
      * Get override operation for target
      */
     getOverrideOperation(target) {
+      // Normalize target (add 'inav.' prefix if not present for backward compatibility)
+      const normalizedTarget = target.startsWith('inav.') ? target : `inav.${target}`;
+
       // Use centralized API mapping instead of hardcoded values
-      const entry = this.operandMapping[target];
+      const entry = this.operandMapping[normalizedTarget];
       if (entry?.operation) {
         return entry.operation;
       }
