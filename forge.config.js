@@ -12,6 +12,16 @@ export default {
     extraResource: [
       'resources/public/sitl'
     ],
+    afterCopy: [
+      (buildPath, electronVersion, platform, arch) => {
+        if (platform === 'linux' && arch === 'x64') {
+          fs.rmSync(
+              path.join(buildPath, 'resources/public/sitl/linux/arm64'),
+              { recursive: true, force: true }
+          );
+        }
+      }
+    ]
   },
   rebuildConfig: {},
   plugins: [
