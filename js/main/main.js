@@ -211,6 +211,16 @@ function createWindow() {
   }
 };
 
+function getSitlBasePath() {
+  if (app.isPackaged) {
+    //npm run package
+    return path.join(process.resourcesPath, 'sitl');
+  } else {
+    //npm run start
+    return path.join(process.cwd(), 'resources', 'public', 'sitl');
+  }
+}
+
 app.on('before-quit', async () => {
   await tcp.close();
   await serial.close();
@@ -363,7 +373,7 @@ app.whenReady().then(() => {
   });
 
   ipcMain.on('startChildProcess', (_event, command, args, opts) => {
-    child_process.start(path.join(__dirname, 'sitl', command), args, opts, mainWindow);
+    child_process.start(path.join(getSitlBasePath(), command), args, opts, mainWindow);
   });
 
   ipcMain.on('killChildProcess', (_event) => {

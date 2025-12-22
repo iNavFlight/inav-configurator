@@ -9,6 +9,9 @@ export default {
     executableName: "inav-configurator",
     asar: false,
     icon: 'images/inav',
+    extraResource: [
+      'resources/public/sitl'
+    ],
   },
   rebuildConfig: {},
   plugins: [
