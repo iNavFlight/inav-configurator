@@ -18,8 +18,8 @@
  *
  * Example output:
  * {
- *   "flight.altitude": { type: 3, value: 1 },
- *   "override.throttle": { operation: 24 }
+ *   "inav.flight.altitude": { type: 3, value: 1 },
+ *   "inav.override.throttle": { operation: 24 }
  * }
  */
 export function buildForwardMapping(definitions) {
@@ -33,16 +33,16 @@ export function buildForwardMapping(definitions) {
 
       // Direct property with operand mapping
       if (propDef.inavOperand) {
-        const path = `${objName}.${propName}`;
+        const path = `inav.${objName}.${propName}`;
         mapping[path] = propDef.inavOperand;
       }
 
-      // Nested object (e.g., flight.mode, override.vtx)
+      // Nested object (e.g., inav.flight.mode, inav.override.vtx)
       if (propDef.type === 'object' && propDef.properties) {
         for (const [nestedName, nestedDef] of Object.entries(propDef.properties)) {
           if (!nestedDef || typeof nestedDef !== 'object') continue;
 
-          const path2 = `${objName}.${propName}.${nestedName}`;
+          const path2 = `inav.${objName}.${propName}.${nestedName}`;
 
           // Extract inavOperand (for read operands)
           if (nestedDef.inavOperand) {
@@ -77,7 +77,7 @@ export function buildForwardMapping(definitions) {
 
       // Operation mapping for writable properties (top-level)
       if (propDef.inavOperation) {
-        const path = `${objName}.${propName}`;
+        const path = `inav.${objName}.${propName}`;
         if (!mapping[path]) mapping[path] = {};
         mapping[path].operation = propDef.inavOperation;
       }
@@ -96,8 +96,8 @@ export function buildForwardMapping(definitions) {
  *
  * Example output:
  * {
- *   flight: { 1: "altitude", 2: "speed" },
- *   waypoint: { 0: "distance", 1: "bearing" }
+ *   flight: { 1: "inav.flight.altitude", 2: "inav.flight.speed" },
+ *   waypoint: { 0: "inav.waypoint.distance", 1: "inav.waypoint.bearing" }
  * }
  */
 export function buildReverseMapping(definitions) {
@@ -121,18 +121,18 @@ export function buildReverseMapping(definitions) {
         const { type, value } = propDef.inavOperand;
 
         if (typeof value !== 'undefined' && !mapping[objName][value]) {
-          mapping[objName][value] = propName;
+          mapping[objName][value] = `inav.${objName}.${propName}`;
         }
       }
 
-      // Nested object (e.g., flight.mode, override.vtx)
+      // Nested object (e.g., inav.flight.mode, inav.override.vtx)
       if (propDef.type === 'object' && propDef.properties) {
         for (const [nestedName, nestedDef] of Object.entries(propDef.properties)) {
           if (nestedDef && nestedDef.inavOperand) {
             const { type, value } = nestedDef.inavOperand;
 
             if (typeof value !== 'undefined' && !mapping[objName][value]) {
-              mapping[objName][value] = `${propName}.${nestedName}`;
+              mapping[objName][value] = `inav.${objName}.${propName}.${nestedName}`;
             }
           }
         }

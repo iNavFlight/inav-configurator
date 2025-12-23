@@ -14,11 +14,11 @@ const { INAVCodeGenerator } = require('../codegen.js');
 describe('Let Variable Integration', () => {
   test('Simple let with constant value', () => {
     const code = `
-      const { flight } = inav;
+      
       let maxAlt = 100;
 
       on.always(() => {
-        override.throttle = maxAlt;
+        inav.override.throttle = maxAlt;
       });
     `;
 
@@ -34,7 +34,7 @@ describe('Let Variable Integration', () => {
     // Debug: print commands
     // console.log('Commands:', commands);
 
-    // Should generate override.throttle = 100 (substituted)
+    // Should generate inav.override.throttle = 100 (substituted)
     // on.always generates an extra logic condition for the condition
     expect(commands.length).toBeGreaterThan(0);
     expect(commands[commands.length - 1]).toContain('100');
@@ -42,11 +42,11 @@ describe('Let Variable Integration', () => {
 
   test('Let with arithmetic expression', () => {
     const code = `
-      const { flight } = inav;
+      
       let maxAlt = 50 + 50;
 
       on.always(() => {
-        override.throttle = maxAlt;
+        inav.override.throttle = maxAlt;
       });
     `;
 
@@ -65,11 +65,11 @@ describe('Let Variable Integration', () => {
 
   test('Let with API property reference', () => {
     const code = `
-      const { flight } = inav;
-      let currentAlt = flight.altitude;
+      
+      let currentAlt = inav.flight.altitude;
 
       on.always(() => {
-        override.throttle = currentAlt;
+        inav.override.throttle = currentAlt;
       });
     `;
 
@@ -82,18 +82,18 @@ describe('Let Variable Integration', () => {
     const codegen = new INAVCodeGenerator(analyzer.variableHandler);
     const commands = codegen.generate(analyzed.ast);
 
-    // Should substitute with flight.altitude
+    // Should substitute with inav.flight.altitude
     expect(commands.length).toBeGreaterThan(0);
   });
 
   test('Multiple let declarations', () => {
     const code = `
-      const { flight } = inav;
+      
       let minAlt = 10;
       let maxAlt = 100;
 
       on.always(() => {
-        override.throttle = maxAlt;
+        inav.override.throttle = maxAlt;
       });
     `;
 
@@ -111,7 +111,7 @@ describe('Let Variable Integration', () => {
 
   test('Error: Let reassignment', () => {
     const code = `
-      const { flight } = inav;
+      
       let maxAlt = 100;
 
       on.always(() => {
@@ -131,7 +131,7 @@ describe('Let Variable Integration', () => {
 
   test('Error: Let redeclaration', () => {
     const code = `
-      const { flight } = inav;
+      
       let maxAlt = 100;
       let maxAlt = 200;  // ERROR: Redeclaration
     `;
@@ -148,7 +148,7 @@ describe('Let Variable Integration', () => {
 describe('Var Variable Integration', () => {
   test('Simple var with initialization', () => {
     const code = `
-      const { flight } = inav;
+      
       var counter = 0;
 
       on.always(() => {
@@ -175,7 +175,7 @@ describe('Var Variable Integration', () => {
 
   test('Var allocated to available gvar slot', () => {
     const code = `
-      const { flight } = inav;
+      
       var myVar = 42;
     `;
 
@@ -190,7 +190,7 @@ describe('Var Variable Integration', () => {
     expect(summary.varCount).toBe(1);
     expect(summary.allocatedGvars.length).toBe(1);
 
-    // Should allocate from high slots (gvar[7])
+    // Should allocate from high slots (inav.gvar[7])
     const [varName, gvarIndex] = summary.allocatedGvars[0];
     expect(varName).toBe('myVar');
     expect(gvarIndex).toBe(7);
@@ -198,7 +198,7 @@ describe('Var Variable Integration', () => {
 
   test('Multiple var declarations', () => {
     const code = `
-      const { flight } = inav;
+      
       var counter1 = 0;
       var counter2 = 10;
       var counter3 = 20;
@@ -214,18 +214,18 @@ describe('Var Variable Integration', () => {
     expect(summary.varCount).toBe(3);
     expect(summary.allocatedGvars.length).toBe(3);
 
-    // Should allocate gvar[7], gvar[6], gvar[5]
+    // Should allocate inav.gvar[7], inav.gvar[6], inav.gvar[5]
     const indices = summary.allocatedGvars.map(([_, idx]) => idx).sort((a, b) => b - a);
     expect(indices).toEqual([7, 6, 5]);
   });
 
   test('Var avoids explicitly used gvar slots', () => {
     const code = `
-      const { flight } = inav;
+      
       var myVar = 100;
 
       on.always(() => {
-        gvar[7] = 42;  // Explicitly use gvar[7]
+        inav.gvar[7] = 42;  // Explicitly use inav.gvar[7]
       });
     `;
 
@@ -237,18 +237,18 @@ describe('Var Variable Integration', () => {
 
     const summary = analyzer.variableHandler.getAllocationSummary();
 
-    // myVar should get gvar[6] (since gvar[7] is explicitly used)
+    // myVar should get inav.gvar[6] (since inav.gvar[7] is explicitly used)
     const [varName, gvarIndex] = summary.allocatedGvars[0];
     expect(varName).toBe('myVar');
     expect(gvarIndex).toBe(6);
 
-    // gvar[7] should be in used list
+    // inav.gvar[7] should be in used list
     expect(summary.usedGvars).toContain(7);
   });
 
   test('Error: Too many variables (gvar exhaustion)', () => {
     const code = `
-      const { flight } = inav;
+      
       var v1 = 1;
       var v2 = 2;
       var v3 = 3;
@@ -274,11 +274,11 @@ describe('Var Variable Integration', () => {
 describe('Let Variable Reuse', () => {
   test('Let variable used in multiple locations', () => {
     const code = `
-      const { flight } = inav;
-      let time = flight.armTimer;
+      
+      let time = inav.flight.armTimer;
 
       if (time > 1000) {
-        gvar[1] = time;
+        inav.gvar[1] = time;
       }
     `;
 
@@ -291,7 +291,7 @@ describe('Let Variable Reuse', () => {
     const codegen = new INAVCodeGenerator(analyzer.variableHandler);
     const commands = codegen.generate(analyzed.ast);
 
-    // Should substitute flight.armTimer in both condition and assignment
+    // Should substitute inav.flight.armTimer in both condition and assignment
     expect(commands.length).toBe(2);
 
     // Both commands should reference FLIGHT (type 2) ARM_TIMER (value 0)
@@ -303,13 +303,13 @@ describe('Let Variable Reuse', () => {
 describe('Let and Var Mixed Usage', () => {
   test('Let for constants, var for mutables', () => {
     const code = `
-      const { flight } = inav;
+      
       let maxAlt = 100;       // Constant
       var counter = 0;        // Mutable
 
       on.always(() => {
         counter = counter + 1;
-        override.throttle = maxAlt;
+        inav.override.throttle = maxAlt;
       });
     `;
 
@@ -332,7 +332,7 @@ describe('Let and Var Mixed Usage', () => {
 
   test('Let substitution does not use gvar slots', () => {
     const code = `
-      const { flight } = inav;
+      
       let const1 = 10;
       let const2 = 20;
       let const3 = 30;
@@ -344,7 +344,7 @@ describe('Let and Var Mixed Usage', () => {
       let const9 = 90;
       let const10 = 100;
 
-      var mutable = 0;  // Should still get gvar[7]
+      var mutable = 0;  // Should still get inav.gvar[7]
     `;
 
     const parser = new JavaScriptParser();
@@ -357,7 +357,7 @@ describe('Let and Var Mixed Usage', () => {
     expect(summary.letCount).toBe(10);  // 10 let variables
     expect(summary.varCount).toBe(1);   // 1 var variable
 
-    // var should still get gvar[7] (let doesn't use gvars)
+    // var should still get inav.gvar[7] (let doesn't use gvars)
     const [varName, gvarIndex] = summary.allocatedGvars[0];
     expect(varName).toBe('mutable');
     expect(gvarIndex).toBe(7);

@@ -177,26 +177,30 @@ class SemanticAnalyzer {
   checkAssignment(stmt) {
     const line = stmt.loc ? stmt.loc.start.line : 0;
 
+    // Normalize target (strip 'inav.' prefix if present)
+    let normalizedTarget = stmt.target.startsWith('inav.') ? stmt.target.substring(5) : stmt.target;
+
     // Check for let reassignment (error)
-    if (this.variableHandler.checkLetReassignment(stmt.target, stmt.loc)) {
+    if (this.variableHandler.checkLetReassignment(normalizedTarget, stmt.loc)) {
       return; // Error already added by variableHandler
     }
 
     // Check if target is valid
-    if (stmt.target.startsWith('gvar[')) {
-      const index = this.extractGvarIndex(stmt.target);
+    if (normalizedTarget.startsWith('gvar[')) {
+      const index = this.extractGvarIndex(normalizedTarget);
       if (index === -1) {
         this.addError(`Invalid gvar syntax: ${stmt.target}`, line);
       } else if (index >= this.gvarCount) {
         this.addError(`Invalid gvar index ${index}. INAV only has gvar[0] through gvar[${this.gvarCount - 1}]`, line);
       }
-    } else if (this.variableHandler.isVariable(stmt.target)) {
+    } else if (this.variableHandler.isVariable(normalizedTarget)) {
       // Variable assignment - allowed for var variables
       // (let reassignment already caught above)
     } else if (!this.isValidWritableProperty(stmt.target)) {
+      // Use original target (with inav. prefix) for writability check
       this.addError(`Cannot assign to '${stmt.target}'. Not a valid INAV writable property.`, line);
     }
-    
+
     // Check if value references are valid
     if (typeof stmt.value === 'string') {
       this.checkPropertyAccess(stmt.value, line);

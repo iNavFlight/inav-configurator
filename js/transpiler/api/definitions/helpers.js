@@ -62,6 +62,39 @@ export default {
     inavOperation: 37 // OPERATION.TAN
   },
   
+  // Logical functions
+  xor: {
+    type: 'function',
+    desc: 'Exclusive OR - true when exactly one argument is true',
+    params: ['a', 'b'],
+    returns: 'boolean',
+    inavOperation: 9 // OPERATION.XOR
+  },
+
+  nand: {
+    type: 'function',
+    desc: 'NOT AND - false when both arguments are true',
+    params: ['a', 'b'],
+    returns: 'boolean',
+    inavOperation: 10 // OPERATION.NAND
+  },
+
+  nor: {
+    type: 'function',
+    desc: 'NOT OR - true when both arguments are false',
+    params: ['a', 'b'],
+    returns: 'boolean',
+    inavOperation: 11 // OPERATION.NOR
+  },
+
+  approxEqual: {
+    type: 'function',
+    desc: 'Approximate equality with tolerance',
+    params: ['a', 'b', 'tolerance'],
+    returns: 'boolean',
+    inavOperation: 2 // OPERATION.APPROX_EQUAL
+  },
+
   // Mapping functions
   mapInput: {
     type: 'function',
@@ -70,7 +103,7 @@ export default {
     returns: 'number',
     inavOperation: 38 // OPERATION.MAP_INPUT
   },
-  
+
   mapOutput: {
     type: 'function',
     desc: 'Map normalized value to output range',

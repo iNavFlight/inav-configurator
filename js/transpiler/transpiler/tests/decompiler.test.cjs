@@ -55,7 +55,7 @@ describe('Decompiler', () => {
   describe('if statement with armTimer', () => {
     test('should decompile if armTimer > delay as simple if statement', () => {
       const conditions = [
-        // Condition: flight.armTimer > 1000
+        // Condition: inav.flight.armTimer > 1000
         {
           index: 0,
           enabled: 1,
@@ -66,7 +66,7 @@ describe('Decompiler', () => {
           operandBType: 0, // VALUE
           operandBValue: 1000
         },
-        // Action: gvar[0] = 100
+        // Action: inav.gvar[0] = 100
         {
           index: 1,
           enabled: 1,
@@ -82,15 +82,15 @@ describe('Decompiler', () => {
       const result = decompiler.decompile(conditions);
 
       expect(result.success).toBe(true);
-      expect(result.code).toContain('if (flight.armTimer > 1000)');
-      expect(result.code).toContain('gvar[0] = 100');
+      expect(result.code).toContain('if (inav.flight.armTimer > 1000)');
+      expect(result.code).toContain('inav.gvar[0] = 100');
     });
   });
 
   describe('if statement Handler', () => {
     test('should decompile simple if condition', () => {
       const conditions = [
-        // Condition: flight.homeDistance > 100
+        // Condition: inav.flight.homeDistance > 100
         {
           index: 0,
           enabled: 1,
@@ -101,7 +101,7 @@ describe('Decompiler', () => {
           operandBType: 0, // VALUE
           operandBValue: 100
         },
-        // Action: override.vtx.power = 3
+        // Action: inav.override.vtx.power = 3
         {
           index: 1,
           enabled: 1,
@@ -117,13 +117,13 @@ describe('Decompiler', () => {
       const result = decompiler.decompile(conditions);
 
       expect(result.success).toBe(true);
-      expect(result.code).toContain('if (flight.homeDistance > 100)');
-      expect(result.code).toContain('override.vtx.power = 3');
+      expect(result.code).toContain('if (inav.flight.homeDistance > 100)');
+      expect(result.code).toContain('inav.override.vtx.power = 3');
     });
 
     test('should decompile if with multiple actions', () => {
       const conditions = [
-        // Condition: flight.cellVoltage < 350
+        // Condition: inav.flight.cellVoltage < 350
         {
           index: 0,
           enabled: 1,
@@ -134,7 +134,7 @@ describe('Decompiler', () => {
           operandBType: 0, // VALUE
           operandBValue: 350
         },
-        // Action 1: override.throttleScale = 50
+        // Action 1: inav.override.throttleScale = 50
         {
           index: 1,
           enabled: 1,
@@ -145,7 +145,7 @@ describe('Decompiler', () => {
           operandBType: 0,
           operandBValue: 0
         },
-        // Action 2: gvar[0] = 1
+        // Action 2: inav.gvar[0] = 1
         {
           index: 2,
           enabled: 1,
@@ -161,21 +161,21 @@ describe('Decompiler', () => {
       const result = decompiler.decompile(conditions);
 
       expect(result.success).toBe(true);
-      expect(result.code).toContain('if (flight.cellVoltage < 350)');
-      expect(result.code).toContain('override.throttleScale = 50');
-      expect(result.code).toContain('gvar[0] = 1');
+      expect(result.code).toContain('if (inav.flight.cellVoltage < 350)');
+      expect(result.code).toContain('inav.override.throttleScale = 50');
+      expect(result.code).toContain('inav.gvar[0] = 1');
     });
   });
 
   describe('Operand Decompilation', () => {
     test('should decompile flight parameters', () => {
       const param = decompiler.decompileOperand(2, 1); // FLIGHT, homeDistance
-      expect(param).toBe('flight.homeDistance');
+      expect(param).toBe('inav.flight.homeDistance');
     });
 
     test('should decompile gvar references', () => {
       const param = decompiler.decompileOperand(5, 0); // GVAR[0] (type 5)
-      expect(param).toBe('gvar[0]');
+      expect(param).toBe('inav.gvar[0]');
     });
 
     test('should decompile literal values', () => {
@@ -235,7 +235,7 @@ describe('Decompiler', () => {
       };
 
       const action = decompiler.decompileAction(setGvar);
-      expect(action).toBe('gvar[0] = 100;');
+      expect(action).toBe('inav.gvar[0] = 100;');
     });
 
     test('should decompile increment/decrement', () => {
@@ -248,7 +248,7 @@ describe('Decompiler', () => {
       };
 
       const action = decompiler.decompileAction(incGvar);
-      expect(action).toContain('gvar[0] = gvar[0] + 1');
+      expect(action).toContain('inav.gvar[0] = inav.gvar[0] + 1');
     });
 
     test('should decompile override operations', () => {
@@ -261,7 +261,7 @@ describe('Decompiler', () => {
       };
 
       const action = decompiler.decompileAction(vtxPower);
-      expect(action).toBe('override.vtx.power = 3;');
+      expect(action).toBe('inav.override.vtx.power = 3;');
     });
 
     test('should decompile throttle scale override', () => {
@@ -274,7 +274,7 @@ describe('Decompiler', () => {
       };
 
       const action = decompiler.decompileAction(throttleScale);
-      expect(action).toBe('override.throttleScale = 50;');
+      expect(action).toBe('inav.override.throttleScale = 50;');
     });
   });
 
@@ -298,8 +298,8 @@ describe('Decompiler', () => {
 
       expect(result.success).toBe(true);
       expect(result.stats.groups).toBe(2);
-      expect(result.code).toContain('flight.homeDistance > 100');
-      expect(result.code).toContain('flight.cellVoltage < 350');
+      expect(result.code).toContain('inav.flight.homeDistance > 100');
+      expect(result.code).toContain('inav.flight.cellVoltage < 350');
     });
   });
 
@@ -309,7 +309,7 @@ describe('Decompiler', () => {
       // When a comparison operation (like LOWER_THAN) has an activator,
       // it should be treated as an intermediate condition, not an action
       const conditions = [
-        // LC 0: A condition (rc[8] > 1500)
+        // LC 0: A condition (inav.rc[8] > 1500)
         {
           index: 0,
           enabled: 1,
@@ -321,7 +321,7 @@ describe('Decompiler', () => {
           operandBValue: 1500
         },
         // LC 1: Another condition with activator (comparison, not action)
-        // This is: when LC0 is true, compute flight.altitude < 1000
+        // This is: when LC0 is true, compute inav.flight.altitude < 1000
         {
           index: 1,
           enabled: 1,
@@ -437,8 +437,8 @@ describe('Decompiler Integration', () => {
 
     expect(result.success).toBe(true);
     expect(result.code).toContain('if (');
-    expect(result.code).toContain('flight.homeDistance > 100');
-    expect(result.code).toContain('override.vtx.power = 3');
+    expect(result.code).toContain('inav.flight.homeDistance > 100');
+    expect(result.code).toContain('inav.override.vtx.power = 3');
   });
 
   test('should handle battery protection example', () => {
@@ -468,8 +468,8 @@ describe('Decompiler Integration', () => {
     const result = decompiler.decompile(conditions);
 
     expect(result.success).toBe(true);
-    expect(result.code).toContain('if (flight.cellVoltage < 350)');
-    expect(result.code).toContain('override.throttleScale = 50');
+    expect(result.code).toContain('if (inav.flight.cellVoltage < 350)');
+    expect(result.code).toContain('inav.override.throttleScale = 50');
   });
 });
 
@@ -483,19 +483,19 @@ describe('Duplicate Sticky and Empty Block Prevention', () => {
   test('should not produce duplicate sticky definitions or empty if blocks', () => {
     // This is a simplified version of jetrell-logic that exposed the bug:
     // - latch2 was appearing as a duplicate of latch1
-    // - Empty if blocks like: if (latch2) { if (flight.isAutoLaunch === 0) { } }
+    // - Empty if blocks like: if (latch2) { if (inav.flight.isAutoLaunch === 0) { } }
     const conditions = [
-      // LC 0: flight.gpsValid === 1 (outer condition)
+      // LC 0: inav.flight.gpsValid === 1 (outer condition)
       { index: 0, enabled: 1, activatorId: -1, operation: 1, operandAType: 2, operandAValue: 31, operandBType: 0, operandBValue: 1, flags: 0 },
-      // LC 1: flight.groundSpeed > 1000 (sticky ON condition)
+      // LC 1: inav.flight.groundSpeed > 1000 (sticky ON condition)
       { index: 1, enabled: 1, activatorId: 0, operation: 2, operandAType: 2, operandAValue: 9, operandBType: 0, operandBValue: 1000, flags: 0 },
       // LC 2: STICKY(LC1, LC3) - the main sticky
       { index: 2, enabled: 1, activatorId: 0, operation: 13, operandAType: 4, operandAValue: 1, operandBType: 4, operandBValue: 3, flags: 0 },
-      // LC 3: flight.isArmed === 0 (sticky OFF condition)
+      // LC 3: inav.flight.isArmed === 0 (sticky OFF condition)
       { index: 3, enabled: 1, activatorId: -1, operation: 1, operandAType: 2, operandAValue: 17, operandBType: 0, operandBValue: 0, flags: 0 },
-      // LC 4: flight.isAutoLaunch === 0 (nested condition)
+      // LC 4: inav.flight.isAutoLaunch === 0 (nested condition)
       { index: 4, enabled: 1, activatorId: 2, operation: 1, operandAType: 2, operandAValue: 18, operandBType: 0, operandBValue: 0, flags: 0 },
-      // LC 5: gvar[0] = 1 (action inside nested condition)
+      // LC 5: inav.gvar[0] = 1 (action inside nested condition)
       { index: 5, enabled: 1, activatorId: 4, operation: 18, operandAType: 0, operandAValue: 0, operandBType: 0, operandBValue: 1, flags: 0 }
     ];
 
@@ -517,7 +517,7 @@ describe('Duplicate Sticky and Empty Block Prevention', () => {
     expect(hasEmptyIf).toBe(false);
 
     // Should have the action inside proper nesting
-    expect(result.code).toContain('gvar[0] = 1');
+    expect(result.code).toContain('inav.gvar[0] = 1');
   });
 
   test('should not produce duplicate sticky at end with empty if blocks (jetrell-logic bug)', () => {
@@ -577,7 +577,7 @@ describe('Duplicate Sticky and Empty Block Prevention', () => {
     const uniqueLatches = new Set(latchDeclarations);
     expect(latchDeclarations.length).toBe(uniqueLatches.size); // No duplicates
 
-    // Should NOT have empty if blocks like: if (latch2) { if (flight.isAutoLaunch === 0) { } }
+    // Should NOT have empty if blocks like: if (latch2) { if (inav.flight.isAutoLaunch === 0) { } }
     const emptyIfPattern = /if \([^)]+\) \{\s*\}/;
     const hasEmptyIf = emptyIfPattern.test(result.code);
     expect(hasEmptyIf).toBe(false);
@@ -621,21 +621,21 @@ describe('Round-trip Compilation', () => {
     decompiler = new Decompiler();
   });
 
-  test('should compile var latch = sticky() inside if blocks correctly', async () => {
+  test('should compile var latch = inav.events.sticky() inside if blocks correctly', async () => {
     // This tests the fix for nested sticky compilation
-    // The decompiled code includes: if (flight.gpsValid === 1) { var latch1 = sticky({...}); if (latch1) {...} }
+    // The decompiled code includes: if (inav.flight.gpsValid === 1) { var latch1 = inav.events.sticky({...}); if (latch1) {...} }
     const { Transpiler } = await import('../index.js');
 
     const code = `
 const { flight, rc, gvar, sticky } = inav;
 
-if (flight.gpsValid === 1) {
-  var latch1 = sticky({
-    on: () => flight.groundSpeed > 1000,
-    off: () => flight.isArmed === 0
+if (inav.flight.gpsValid === 1) {
+  var latch1 = inav.events.sticky({
+    on: () => inav.flight.groundSpeed > 1000,
+    off: () => inav.flight.isArmed === 0
   });
   if (latch1) {
-    gvar[0] = 1;
+    inav.gvar[0] = 1;
   }
 }
 `;
@@ -655,7 +655,7 @@ if (flight.gpsValid === 1) {
   test('should use pre-declaration for sticky with activator (scope fix)', async () => {
     // When a sticky has an activator, it's defined inside an if-block.
     // To avoid scope issues when referenced from outside, we pre-declare at top level.
-    // Pattern: "var latch1;" at top, "latch1 = sticky({...})" inside if-block
+    // Pattern: "var latch1;" at top, "latch1 = inav.events.sticky({...})" inside if-block
     const logicConditions = [
       { index: 0, enabled: 1, activatorId: -1, operation: 1, operandAType: 2, operandAValue: 31, operandBType: 0, operandBValue: 1, flags: 0 },
       { index: 1, enabled: 1, activatorId: 0, operation: 2, operandAType: 2, operandAValue: 9, operandBType: 0, operandBValue: 1000, flags: 0 },
@@ -668,7 +668,7 @@ if (flight.gpsValid === 1) {
 
     // Should have pre-declaration "var latch1;" at top (before if blocks)
     expect(result.code).toMatch(/^var latch1;$/m);
-    // Should have assignment "latch1 = sticky({" inside if-block (no var keyword)
+    // Should have assignment "latch1 = inav.events.sticky({" inside if-block (no var keyword)
     expect(result.code).toMatch(/^\s+latch1 = sticky\(\{/m);
   });
 

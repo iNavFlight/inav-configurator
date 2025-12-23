@@ -89,9 +89,9 @@ class Decompiler {
     const objName = typeToObject[objectType];
     if (!objName) return null;
 
-    // Look up in mapping
+    // Look up in mapping (returns full path with inav. prefix)
     if (this.operandToProperty[objName] && this.operandToProperty[objName][operandValue]) {
-      return `${objName}.${this.operandToProperty[objName][operandValue]}`;
+      return this.operandToProperty[objName][operandValue];
     }
 
     return null;
@@ -825,6 +825,7 @@ class Decompiler {
 
   /**
    * Render a special pattern with pre-computed child code
+   * Uses dispatch table for pattern type rendering
    * @param {Object} pattern - Pattern info
    * @param {Array} childCodes - Pre-computed child code strings
    * @param {number} indent - Indentation level
@@ -833,25 +834,36 @@ class Decompiler {
   renderSpecialPatternWithCode(pattern, childCodes, indent) {
     const indentStr = '  '.repeat(indent);
     const lines = [];
-
     const body = childCodes.join('\n');
 
-    if (pattern.type === 'edge') {
-      lines.push(indentStr + `edge(() => ${pattern.condition}, ${pattern.duration}, () => {`);
-      if (body) lines.push(body);
-      lines.push(indentStr + '});');
-    } else if (pattern.type === 'delay') {
-      lines.push(indentStr + `delay(() => ${pattern.condition}, ${pattern.duration}, () => {`);
-      if (body) lines.push(body);
-      lines.push(indentStr + '});');
-    } else if (pattern.type === 'timer') {
-      lines.push(indentStr + `timer(${pattern.onMs}, ${pattern.offMs}, () => {`);
-      if (body) lines.push(body);
-      lines.push(indentStr + '});');
-    } else if (pattern.type === 'whenChanged') {
-      lines.push(indentStr + `delta(${pattern.value}, ${pattern.threshold}, () => {`);
-      if (body) lines.push(body);
-      lines.push(indentStr + '});');
+    // Dispatch table for pattern renderers
+    const patternRenderers = {
+      'edge': () => {
+        lines.push(indentStr + `edge(() => ${pattern.condition}, ${pattern.duration}, () => {`);
+        if (body) lines.push(body);
+        lines.push(indentStr + '});');
+      },
+      'delay': () => {
+        lines.push(indentStr + `delay(() => ${pattern.condition}, ${pattern.duration}, () => {`);
+        if (body) lines.push(body);
+        lines.push(indentStr + '});');
+      },
+      'timer': () => {
+        lines.push(indentStr + `timer(${pattern.onMs}, ${pattern.offMs}, () => {`);
+        if (body) lines.push(body);
+        lines.push(indentStr + '});');
+      },
+      'whenChanged': () => {
+        lines.push(indentStr + `delta(${pattern.value}, ${pattern.threshold}, () => {`);
+        if (body) lines.push(body);
+        lines.push(indentStr + '});');
+      }
+    };
+
+    // Lookup and execute pattern renderer
+    const renderer = patternRenderers[pattern.type];
+    if (renderer) {
+      renderer();
     }
 
     return lines;
@@ -917,11 +929,11 @@ class Decompiler {
       case OPERAND_TYPE.GVAR: {
         // Check if we have a variable name for this gvar index
         const varName = this.getVarNameForGvar(value);
-        return varName || `gvar[${value}]`;
+        return varName || `inav.gvar[${value}]`;
       }
 
       case OPERAND_TYPE.RC_CHANNEL:
-        return `rc[${value}]`;
+        return `inav.rc[${value}]`;
 
       case OPERAND_TYPE.FLIGHT:
       case OPERAND_TYPE.WAYPOINTS: {
@@ -1041,10 +1053,10 @@ class Decompiler {
       case OPERAND_TYPE.PID:
         // PID operands 0-3 map to pid[0].output through pid[3].output
         if (value >= 0 && value < 4) {
-          return `pid[${value}].output`;
+          return `inav.pid[${value}].output`;
         }
         this.addWarning(`Invalid PID operand value ${value}. Valid range is 0-3.`);
-        return `pid[${value}].output /* invalid PID index */`;
+        return `inav.pid[${value}].output /* invalid PID index */`;
 
       default:
         this.addWarning(`Unknown operand type ${type}`);
@@ -1168,8 +1180,9 @@ class Decompiler {
     code += '// INAV JavaScript Programming\n';
     code += '// Decompiled from logic conditions\n\n';
 
-    // Always include all INAV objects for user convenience
-    code += `const {\n    flight, override, rc, gvar, waypoint, pid, edge\n    sticky, delay, timer, whenChanged, helpers, events \n} = inav;\n\n`;
+    // No destructuring - prevents autocomplete pollution in Monaco editor
+    // Users access INAV API via namespaced paths: inav.flight.altitude, inav.override.vtx.power, etc.
+    code += `// INAV JavaScript Programming\n// Access API via: inav.flight.*, inav.override.*, inav.rc[n].*, inav.gvar[n], etc.\n\n`;
 
     // Add variable declarations from variable map
     // Note: sticky/latch variables are declared inline with var latch = sticky({...})

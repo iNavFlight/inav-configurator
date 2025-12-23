@@ -146,8 +146,21 @@ class ExpressionGenerator {
       return this.generateMathCall(expr, activatorId);
     }
 
-    // Check for standalone functions (not Math methods)
-    const funcName = expr.callee?.name;
+    // Check for helper functions - backward compat: mapInput()
+    let funcName = null;
+    if (expr.callee.type === 'Identifier') {
+      funcName = expr.callee.name;
+    }
+    // Check for helper functions - new syntax: inav.helpers.mapInput()
+    else if (expr.callee.object?.property?.name === 'helpers') {
+      funcName = expr.callee.property?.name;
+    }
+
+    // If not a helper function call, unknown function
+    if (!funcName) {
+      this.errorHandler.addError('Unknown function call');
+      return { type: OPERAND_TYPE.VALUE, value: 0 };
+    }
 
     // Handle mapInput(value, maxValue) - MAP_INPUT
     // Scales value from [0:maxValue] to [0:1000]

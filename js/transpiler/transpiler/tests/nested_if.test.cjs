@@ -35,11 +35,11 @@ describe('Nested If Statements', () => {
 
   test('should handle nested if inside if body', () => {
     const code = `
-      const { flight } = inav;
+      
 
-      if (flight.isArmed === 1) {
-        if (flight.altitude > 100) {
-          gvar[0] = 1;
+      if (inav.flight.isArmed === 1) {
+        if (inav.flight.altitude > 100) {
+          inav.gvar[0] = 1;
         }
       }
     `;
@@ -52,7 +52,7 @@ describe('Nested If Statements', () => {
     // Should generate at least 2 logic conditions:
     // 1. outer condition (isArmed === 1)
     // 2. inner condition (altitude > 100) with activator pointing to outer
-    // 3. action (gvar[0] = 1)
+    // 3. action (inav.gvar[0] = 1)
     expect(commands.length).toBeGreaterThanOrEqual(2);
 
     // Should contain both conditions
@@ -63,12 +63,12 @@ describe('Nested If Statements', () => {
 
   test('should handle deeply nested if statements (3 levels)', () => {
     const code = `
-      const { flight } = inav;
+      
 
-      if (flight.isArmed === 1) {
-        if (flight.altitude > 100) {
-          if (flight.groundSpeed > 500) {
-            gvar[0] = 1;
+      if (inav.flight.isArmed === 1) {
+        if (inav.flight.altitude > 100) {
+          if (inav.flight.groundSpeed > 500) {
+            inav.gvar[0] = 1;
           }
         }
       }
@@ -91,13 +91,13 @@ describe('Nested If Statements', () => {
 
   test('should handle nested if with else', () => {
     const code = `
-      const { flight } = inav;
+      
 
-      if (flight.isArmed === 1) {
-        if (flight.altitude > 100) {
-          gvar[0] = 1;
+      if (inav.flight.isArmed === 1) {
+        if (inav.flight.altitude > 100) {
+          inav.gvar[0] = 1;
         } else {
-          gvar[0] = 0;
+          inav.gvar[0] = 0;
         }
       }
     `;
@@ -113,14 +113,14 @@ describe('Nested If Statements', () => {
 
   test('should handle multiple nested ifs in sequence', () => {
     const code = `
-      const { flight } = inav;
+      
 
-      if (flight.isArmed === 1) {
-        if (flight.altitude > 100) {
-          gvar[0] = 1;
+      if (inav.flight.isArmed === 1) {
+        if (inav.flight.altitude > 100) {
+          inav.gvar[0] = 1;
         }
-        if (flight.groundSpeed > 500) {
-          gvar[1] = 1;
+        if (inav.flight.groundSpeed > 500) {
+          inav.gvar[1] = 1;
         }
       }
     `;

@@ -106,35 +106,33 @@
                             <h4 i18n="javascriptQuickReference"></h4>
 
                             <h5 i18n="javascriptFlightParameters"></h5>
-                            <pre>flight.homeDistance  // meters
-flight.altitude      // cm
-flight.vbat          // centivolts
-flight.cellVoltage   // centivolts
-flight.rssi          // 0-99
-flight.mode.failsafe // boolean</pre>
+                            <pre>inav.flight.homeDistance  // meters
+inav.flight.altitude      // cm
+inav.flight.vbat          // centivolts
+inav.flight.cellVoltage   // centivolts
+inav.flight.rssi          // 0-99
+inav.flight.mode.failsafe // boolean</pre>
 
                             <h5 i18n="javascriptRcChannels"></h5>
-                            <pre>rc[5].high   // boolean
-rc[5].mid    // boolean
-rc[5].low    // boolean
-rc[5].value  // 1000-2000</pre>
+                            <pre>inav.rc[5].high   // boolean
+inav.rc[5].mid    // boolean
+inav.rc[5].low    // boolean
+inav.rc[5].value  // 1000-2000</pre>
 
                             <h5 i18n="javascriptOverrides"></h5>
-                            <pre>override.vtx.power = 3;           // 0-4
-override.throttleScale = 50;      // 0-100%
-override.yaw.angle = 180;         // degrees
-override.rcChannel[8] = 2000;     // trigger switch</pre>
+                            <pre>inav.override.vtx.power = 3;           // 0-4
+inav.override.throttleScale = 50;      // 0-100%
+inav.override.yaw.angle = 180;         // degrees
+inav.override.rcChannel[8] = 2000;     // trigger switch</pre>
 
                             <h5 i18n="javascriptGlobalVariables"></h5>
-                            <pre>gvar[0] = 100;     // write
-const x = gvar[0]; // read</pre>
+                            <pre>inav.gvar[0] = 100;        // write
+const x = inav.gvar[0];    // read</pre>
 
 
                             <h5 i18n="javascriptCompleteExample"></h5>
-                            <pre>const { flight, override } = inav;
-
-if (flight.homeDistance > 100) {
-  override.vtx.power = 3;
+                            <pre>if (inav.flight.homeDistance > 100) {
+  inav.override.vtx.power = 3;
 }</pre>
                         </div>
                     </div>

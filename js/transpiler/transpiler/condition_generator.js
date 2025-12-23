@@ -623,8 +623,9 @@ class ConditionGenerator {
    */
   generateMember(condition, activatorId) {
     // RC channel LOW/MID/HIGH state detection: rc[1].low, rc[2].mid, rc[3].high
-    if (typeof condition.value === 'string' && condition.value.startsWith('rc[')) {
-      const match = condition.value.match(/^rc\[(\d+)\]\.(low|mid|high)$/);
+    // Also handles namespaced version: inav.rc[1].low, inav.rc[2].mid, inav.rc[3].high
+    if (typeof condition.value === 'string' && (condition.value.startsWith('rc[') || condition.value.startsWith('inav.rc['))) {
+      const match = condition.value.match(/^(?:inav\.)?rc\[(\d+)\]\.(low|mid|high)$/);
       if (match) {
         const channelIndex = parseInt(match[1]);
         const state = match[2];
@@ -704,7 +705,21 @@ class ConditionGenerator {
    * @private
    */
   generateCall(condition, activatorId) {
-    const funcName = condition.callee?.name;
+    // Check for helper functions - backward compat: xor()
+    let funcName = null;
+    if (condition.callee.type === 'Identifier') {
+      funcName = condition.callee.name;
+    }
+    // Check for helper functions - new syntax: inav.helpers.xor()
+    else if (condition.callee.object?.property?.name === 'helpers') {
+      funcName = condition.callee.property?.name;
+    }
+
+    // If not a helper function call, unknown function
+    if (!funcName) {
+      this.errorHandler.addError('Unknown function call');
+      return this.getLcIndex();
+    }
 
     // Handle xor(a, b) - Exclusive OR
     if (funcName === 'xor') {

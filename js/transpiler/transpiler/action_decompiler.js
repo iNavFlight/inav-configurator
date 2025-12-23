@@ -156,7 +156,7 @@ class ActionDecompiler {
    * @returns {string} JavaScript statement(s)
    */
   handleGvarSet(lc, allConditions) {
-    const targetName = this.getVarNameForGvar(lc.operandAValue) || `gvar[${lc.operandAValue}]`;
+    const targetName = this.getVarNameForGvar(lc.operandAValue) || `inav.gvar[${lc.operandAValue}]`;
     return this.handleAssignmentWithHoisting(
       targetName,
       lc.operandBType, lc.operandBValue,
@@ -332,12 +332,12 @@ class ActionDecompiler {
   // at the LC level in handleAssignmentWithHoisting/decompileWithHoisting.
 
   handleGvarInc(lc, value) {
-    const targetName = this.getVarNameForGvar(lc.operandAValue) || `gvar[${lc.operandAValue}]`;
+    const targetName = this.getVarNameForGvar(lc.operandAValue) || `inav.gvar[${lc.operandAValue}]`;
     return `${targetName} = ${targetName} + ${value};`;
   }
 
   handleGvarDec(lc, value) {
-    const targetName = this.getVarNameForGvar(lc.operandAValue) || `gvar[${lc.operandAValue}]`;
+    const targetName = this.getVarNameForGvar(lc.operandAValue) || `inav.gvar[${lc.operandAValue}]`;
     return `${targetName} = ${targetName} - ${value};`;
   }
 
@@ -349,7 +349,7 @@ class ActionDecompiler {
    */
   handleOverrideThrottleScale(lc, allConditions) {
     return this.handleAssignmentWithHoisting(
-      'override.throttleScale',
+      'inav.override.throttleScale',
       lc.operandAType, lc.operandAValue,  // Value is in operandA (per logic_condition.c)
       allConditions
     );
@@ -364,7 +364,7 @@ class ActionDecompiler {
    */
   handleOverrideThrottle(lc, allConditions) {
     return this.handleAssignmentWithHoisting(
-      'override.throttle',
+      'inav.override.throttle',
       lc.operandAType, lc.operandAValue,  // Note: uses operandA
       allConditions
     );
@@ -372,7 +372,7 @@ class ActionDecompiler {
 
   /**
    * Generic handler for assignments that may need structural hoisting.
-   * @param {string} targetName - Assignment target (e.g., 'override.throttle')
+   * @param {string} targetName - Assignment target (e.g., 'inav.override.throttle')
    * @param {number} valueType - Operand type for the value
    * @param {number} valueValue - Operand value
    * @param {Array} allConditions - All conditions for LC chain traversal
@@ -406,62 +406,62 @@ class ActionDecompiler {
   }
 
   handleSetVtxPowerLevel(value) {
-    return `override.vtx.power = ${value};`;
+    return `inav.override.vtx.power = ${value};`;
   }
 
   handleSetVtxBand(value) {
-    return `override.vtx.band = ${value};`;
+    return `inav.override.vtx.band = ${value};`;
   }
 
   handleSetVtxChannel(value) {
-    return `override.vtx.channel = ${value};`;
+    return `inav.override.vtx.channel = ${value};`;
   }
 
   handleOverrideArmingSafety() {
-    return `override.armSafety = true;`;
+    return `inav.override.armSafety = true;`;
   }
 
   handleSetOsdLayout(value) {
-    return `override.osdLayout = ${value};`;
+    return `inav.override.osdLayout = ${value};`;
   }
 
   handleRcChannelOverride(lc, value) {
     // operandA contains channel number (1-based: 1-18)
     // Use cleaner array syntax instead of override.rcChannel()
-    return `rc[${lc.operandAValue}] = ${value};`;
+    return `inav.rc[${lc.operandAValue}] = ${value};`;
   }
 
   handleLoiterOverride(value) {
-    return `override.loiterRadius = ${value};`;
+    return `inav.override.loiterRadius = ${value};`;
   }
 
   handleOverrideMinGroundSpeed(value) {
-    return `override.minGroundSpeed = ${value};`;
+    return `inav.override.minGroundSpeed = ${value};`;
   }
 
   handleSwapRollYaw() {
-    return `override.swapRollYaw = true;`;
+    return `inav.override.swapRollYaw = true;`;
   }
 
   handleInvertRoll() {
-    return `override.invertRoll = true;`;
+    return `inav.override.invertRoll = true;`;
   }
 
   handleInvertPitch() {
-    return `override.invertPitch = true;`;
+    return `inav.override.invertPitch = true;`;
   }
 
   handleInvertYaw() {
-    return `override.invertYaw = true;`;
+    return `inav.override.invertYaw = true;`;
   }
 
   handleSetHeadingTarget(value) {
     // Value is in centidegrees
-    return `override.headingTarget = ${value};`;
+    return `inav.override.headingTarget = ${value};`;
   }
 
   handleSetProfile(value) {
-    return `override.profile = ${value};`;
+    return `inav.override.profile = ${value};`;
   }
 
   handleFlightAxisAngleOverride(lc, value) {
@@ -469,7 +469,7 @@ class ActionDecompiler {
     const axisNames = ['roll', 'pitch', 'yaw'];
     const axisIndex = lc.operandAValue;
     const axisName = axisNames[axisIndex] || axisIndex;
-    return `override.flightAxis.${axisName}.angle = ${value};`;
+    return `inav.override.flightAxis.${axisName}.angle = ${value};`;
   }
 
   handleFlightAxisRateOverride(lc, value) {
@@ -477,31 +477,31 @@ class ActionDecompiler {
     const axisNames = ['roll', 'pitch', 'yaw'];
     const axisIndex = lc.operandAValue;
     const axisName = axisNames[axisIndex] || axisIndex;
-    return `override.flightAxis.${axisName}.rate = ${value};`;
+    return `inav.override.flightAxis.${axisName}.rate = ${value};`;
   }
 
   handleSetGimbalSensitivity(value) {
-    return `override.gimbalSensitivity = ${value};`;
+    return `inav.override.gimbalSensitivity = ${value};`;
   }
 
   handleLedPinPwm(lc, value) {
     // operandA is pin (0-7), operandB is PWM value
     this.addWarning(`LED_PIN_PWM may need verification - check API syntax`);
-    return `override.ledPin(${lc.operandAValue}, ${value});`;
+    return `inav.override.ledPin(${lc.operandAValue}, ${value});`;
   }
 
   handlePortSet(lc, value) {
     // operandA is port (0-7), operandB is value (0 or 1)
     this.addWarning(`PORT_SET may not be available in JavaScript API`);
-    return `/* override.port(${lc.operandAValue}, ${value}); */ // PORT_SET - may not be supported`;
+    return `/* inav.override.port(${lc.operandAValue}, ${value}); */ // PORT_SET - may not be supported`;
   }
 
   handleDisableGpsFix() {
-    return `override.disableGpsFix = true;`;
+    return `inav.override.disableGpsFix = true;`;
   }
 
   handleResetMagCalibration() {
-    return `override.resetMagCalibration = true;`;
+    return `inav.override.resetMagCalibration = true;`;
   }
 
   handleArithmeticOperation(lc, value, allConditions) {

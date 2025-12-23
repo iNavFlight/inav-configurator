@@ -31,7 +31,7 @@ class PropertyAccessChecker {
 
   /**
    * Check if property access is valid
-   * @param {string} propPath - Property path (e.g., "flight.altitude", "gvar[0]", "rc[1].low")
+   * @param {string} propPath - Property path (e.g., "inav.flight.altitude", "inav.gvar[0]", "inav.rc[1].low")
    * @param {number} line - Line number for error reporting
    */
   check(propPath, line) {
@@ -43,26 +43,49 @@ class PropertyAccessChecker {
       return;
     }
 
-    // Handle gvar access
-    if (propPath.startsWith('gvar[')) {
-      this.checkGvarAccess(propPath, line);
+    // Everything in INAV API must be namespaced
+    if (propPath.startsWith('inav.')) {
+      this.checkInavProperty(propPath, line);
       return;
     }
 
-    // Handle RC channel array access: rc[1].low, rc[2].mid, rc[3].high, rc[N].value (1-based)
-    if (propPath.startsWith('rc[')) {
-      this.checkRcChannelAccess(propPath, line);
+    // If it's not a variable and not inav.*, it's an error
+    this.addError(`Unknown identifier '${propPath}'. INAV properties must start with 'inav.'`, line);
+  }
+
+  /**
+   * Check INAV-namespaced property access using namespace-based routing
+   * @param {string} propPath - Full path including 'inav.' prefix
+   * @param {number} line - Line number for error reporting
+   * @private
+   */
+  checkInavProperty(propPath, line) {
+    const inavPath = propPath.substring(5); // Strip 'inav.' prefix
+
+    // Extract namespace (part before . or [)
+    const namespaceMatch = inavPath.match(/^([a-zA-Z]+)/);
+    if (!namespaceMatch) {
+      this.addError(`Invalid property path 'inav.${inavPath}'`, line);
       return;
     }
 
-    // Handle PID controller array access: pid[0].output through pid[3].output
-    if (propPath.startsWith('pid[')) {
-      this.checkPidAccess(propPath, line);
-      return;
-    }
+    const namespace = namespaceMatch[1];
 
-    // Handle API property access (flight.*, override.*, etc.)
-    this.checkApiPropertyAccess(propPath, line);
+    // Special handlers for array-based namespaces (need custom validation)
+    const specialHandlers = {
+      'gvar': () => this.checkGvarAccess(inavPath, line),
+      'rc': () => this.checkRcChannelAccess(inavPath, line),
+      'pid': () => this.checkPidAccess(inavPath, line)
+    };
+
+    // Route to namespace-specific handler
+    if (specialHandlers[namespace]) {
+      specialHandlers[namespace]();
+    } else {
+      // All other namespaces (flight, override, helpers, events, waypoint, etc.)
+      // are validated through the generic API property checker
+      this.checkApiPropertyAccess(inavPath, line);
+    }
   }
 
   /**
@@ -139,44 +162,53 @@ class PropertyAccessChecker {
 
   /**
    * Check API property access validity (flight.*, override.*, etc.)
+   * Note: This receives paths WITHOUT 'inav.' prefix (already stripped by caller)
    * @private
    */
   checkApiPropertyAccess(propPath, line) {
     const parts = propPath.split('.');
 
-    // Check first level (flight, override, rc, time, etc.)
-    if (!this.inavAPI[parts[0]]) {
-      this.addError(`Unknown API object '${parts[0]}' in '${propPath}'. Available: ${Object.keys(this.inavAPI).join(', ')}`, line);
+    if (parts.length < 1) {
+      this.addError(`Invalid property path '${propPath}'`, line);
       return;
     }
 
-    const apiObj = this.inavAPI[parts[0]];
+    const apiCategory = parts[0];
+    const startIndex = 1;
 
-    // For single-level access (e.g., "flight"), warn that it needs a property
-    if (parts.length === 1) {
+    // Check if category exists
+    if (!this.inavAPI[apiCategory]) {
+      this.addError(`Unknown API category '${apiCategory}' in 'inav.${propPath}'. Available: inav.${Object.keys(this.inavAPI).join(', inav.')}`, line);
+      return;
+    }
+
+    const apiObj = this.inavAPI[apiCategory];
+
+    // For category-only access (e.g., "flight"), warn that it needs a property
+    if (parts.length === startIndex) {
       if (apiObj.properties.length > 0 || Object.keys(apiObj.nested).length > 0) {
-        this.addWarning('incomplete-access', `'${propPath}' needs a property. Did you mean to access a specific property?`, line);
+        this.addWarning('incomplete-access', `'inav.${propPath}' needs a property. Did you mean to access a specific property?`, line);
       }
       return;
     }
 
-    // Check second level and beyond
-    if (parts.length > 1) {
-      const secondPart = parts[1];
+    // Check property level and beyond
+    if (parts.length > startIndex) {
+      const propertyPart = parts[startIndex];
 
       // Check if it's a valid property
-      if (apiObj.properties.includes(secondPart)) {
+      if (apiObj.properties.includes(propertyPart)) {
         return; // Valid property
       }
 
       // Check if it's a nested object
-      if (apiObj.nested[secondPart]) {
-        // Check third level if present
-        if (parts.length > 2) {
-          const thirdPart = parts[2];
-          const nestedProps = apiObj.nested[secondPart];
-          if (!nestedProps.includes(thirdPart)) {
-            this.addError(`Unknown property '${thirdPart}' in '${propPath}'. Available: ${nestedProps.join(', ')}`, line);
+      if (apiObj.nested[propertyPart]) {
+        // Check nested property if present
+        if (parts.length > startIndex + 1) {
+          const nestedPart = parts[startIndex + 1];
+          const nestedProps = apiObj.nested[propertyPart];
+          if (!nestedProps.includes(nestedPart)) {
+            this.addError(`Unknown property '${nestedPart}' in 'inav.${propPath}'. Available: ${nestedProps.join(', ')}`, line);
           }
         }
         return;
@@ -187,38 +219,60 @@ class PropertyAccessChecker {
         ...apiObj.properties,
         ...Object.keys(apiObj.nested)
       ];
-      this.addError(`Unknown property '${secondPart}' in '${propPath}'. Available: ${available.join(', ')}`, line);
+      this.addError(`Unknown property '${propertyPart}' in 'inav.${propPath}'. Available: ${available.join(', ')}`, line);
     }
   }
 
   /**
    * Check if property can be written to
+   * Uses dispatch table like check() method
    */
   isValidWritableProperty(target) {
-    // Only gvar, rc, and specific override properties can be assigned
-    if (target.startsWith('gvar[')) return true;
-    if (target.startsWith('rc[')) return true;
+    // Normalize target (strip 'inav.' prefix if present for backward compatibility)
+    const normalizedTarget = target.startsWith('inav.') ? target.substring(5) : target;
 
-    if (target.startsWith('override.')) {
-      const parts = target.split('.');
-      if (parts.length >= 2) {
-        const apiObj = this.inavAPI['override'];
+    // Dispatch table for writable properties
+    const writableHandlers = {
+      'gvar[': () => true,
+      'rc[': () => true,
+      'override.': () => this.checkWritableOverride(normalizedTarget)
+    };
 
-        // Null check to prevent crash
-        if (!apiObj) {
-          return false;
-        }
-
-        // Check direct properties
-        if (apiObj.targets && apiObj.targets.includes(parts[1])) {
-          return true;
-        }
-
-        // Check nested properties (e.g., override.vtx.power)
-        if (parts.length >= 3 && apiObj.nested && apiObj.nested[parts[1]]) {
-          return apiObj.nested[parts[1]].includes(parts[2]);
-        }
+    // Find and execute matching handler
+    for (const [prefix, handler] of Object.entries(writableHandlers)) {
+      if (normalizedTarget.startsWith(prefix)) {
+        return handler();
       }
+    }
+
+    return false;
+  }
+
+  /**
+   * Check if override property is writable
+   * @private
+   */
+  checkWritableOverride(inavPath) {
+    const parts = inavPath.split('.');
+    // parts = ['override', 'throttle'] or ['override', 'vtx', 'power']
+
+    if (parts.length < 2) {
+      return false;
+    }
+
+    const apiObj = this.inavAPI['override'];
+    if (!apiObj) {
+      return false;
+    }
+
+    // Check direct properties (e.g., override.throttle)
+    if (apiObj.targets && apiObj.targets.includes(parts[1])) {
+      return true;
+    }
+
+    // Check nested properties (e.g., override.vtx.power)
+    if (parts.length >= 3 && apiObj.nested && apiObj.nested[parts[1]]) {
+      return apiObj.nested[parts[1]].includes(parts[2]);
     }
 
     return false;

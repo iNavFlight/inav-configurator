@@ -162,7 +162,6 @@ class INAVCodeGenerator {
         // latch1 = sticky({on: ..., off: ...})
         this.generateStickyAssignment(stmt);
         break;
-      case 'Destructuring':
       case 'LetDeclaration':
       case 'VarDeclaration':
         // Skip - declarations handled separately
@@ -285,27 +284,32 @@ class INAVCodeGenerator {
 
   /**
    * Generate event handler (if statement, edge, sticky, delay, on.*)
+   * Uses dispatch table for clean handler routing
    */
   generateEventHandler(stmt) {
     const handler = stmt.handler;
 
-    if (handler === 'on.arm') {
-      this.generateOnArm(stmt);
-    } else if (handler === 'on.always') {
-      this.generateOnAlways(stmt);
-    } else if (handler.startsWith('if')) {
-      // If statement - generates conditional logic
+    // Dispatch table for handler types
+    const handlerMethods = {
+      'on.arm': 'generateOnArm',
+      'on.always': 'generateOnAlways',
+      'edge': 'generateEdge',
+      'sticky': 'generateSticky',
+      'delay': 'generateDelay',
+      'timer': 'generateTimer',
+      'whenChanged': 'generateWhenChanged'
+    };
+
+    // Special case: if starts with 'if'
+    if (handler.startsWith('if')) {
       this.generateConditional(stmt);
-    } else if (handler === 'edge') {
-      this.generateEdge(stmt);
-    } else if (handler === 'sticky') {
-      this.generateSticky(stmt);
-    } else if (handler === 'delay') {
-      this.generateDelay(stmt);
-    } else if (handler === 'timer') {
-      this.generateTimer(stmt);
-    } else if (handler === 'whenChanged') {
-      this.generateWhenChanged(stmt);
+      return;
+    }
+
+    // Lookup in dispatch table and call method
+    const methodName = handlerMethods[handler];
+    if (methodName) {
+      this[methodName](stmt);
     } else {
       // Default: treat as conditional
       this.generateConditional(stmt);
@@ -807,9 +811,12 @@ class INAVCodeGenerator {
     }
 
     if (typeof value === 'string') {
+      // Strip 'inav.' prefix if present (normalize to internal representation)
+      let normalizedValue = value.startsWith('inav.') ? value.substring(5) : value;
+
       // Check if it's a variable reference
-      if (this.variableHandler && this.variableHandler.isVariable(value)) {
-        const resolution = this.variableHandler.resolveVariable(value);
+      if (this.variableHandler && this.variableHandler.isVariable(normalizedValue)) {
+        const resolution = this.variableHandler.resolveVariable(normalizedValue);
 
         if (resolution.type === 'let_expression') {
           // Determine the appropriate activator for this const variable:
@@ -818,7 +825,7 @@ class INAVCodeGenerator {
           const hasSideEffects = this.conditionGenerator.expressionHasSideEffects(resolution.ast);
           const targetActivator = hasSideEffects ? activatorId : -1;
 
-          const cacheKey = `${value}:${targetActivator}`;
+          const cacheKey = `${normalizedValue}:${targetActivator}`;
           if (this.constOperandCache.has(cacheKey)) {
             return this.constOperandCache.get(cacheKey);
           }
@@ -829,20 +836,23 @@ class INAVCodeGenerator {
 
           // Track LC index for this let variable (for variable map)
           if (this.variableHandler && this.variableHandler.setLetVariableLCIndex && operand.type === 4) {
-            this.variableHandler.setLetVariableLCIndex(value, operand.value);
+            this.variableHandler.setLetVariableLCIndex(normalizedValue, operand.value);
           }
 
           return operand;
         } else if (resolution.type === 'var_gvar') {
-          // Replace with gvar reference and continue
-          value = resolution.gvarRef;
+          // Replace with gvar reference and continue (use normalized version)
+          normalizedValue = resolution.gvarRef;
         }
       }
 
+      // Use normalized value for all lookups (gvar[0], rc[5], flight.altitude, etc.)
+      const lookupValue = normalizedValue;
+
       // Check for indexed operands (gvar[], rc[], pid[]) using declarative config
       for (const [prefix, def] of Object.entries(INDEXED_OPERAND_DEFS)) {
-        if (value.startsWith(prefix)) {
-          const match = value.match(def.regex);
+        if (lookupValue.startsWith(prefix)) {
+          const match = lookupValue.match(def.regex);
           if (!match) {
             this.errorHandler.addError(def.syntaxError(value), null, def.syntaxCode);
             return { type: OPERAND_TYPE.VALUE, value: 0 };
@@ -857,12 +867,17 @@ class INAVCodeGenerator {
       }
 
       // Check in operand mapping
+      if (this.operandMapping[lookupValue]) {
+        return this.operandMapping[lookupValue];
+      }
+
+      // Try with original value (for backward compat during transition)
       if (this.operandMapping[value]) {
         return this.operandMapping[value];
       }
 
       this.errorHandler.addError(
-        `Unknown operand '${value}'. Available: flight.*, rc[1-18], gvar[0-7], waypoint.*, pid[0-3]`,
+        `Unknown operand '${value}'. Available: inav.flight.*, inav.rc[1-18], inav.gvar[0-7], inav.waypoint.*, inav.pid[0-3]`,
         null,
         'unknown_operand'
       );
@@ -934,8 +949,11 @@ class INAVCodeGenerator {
      * Get override operation for target
      */
     getOverrideOperation(target) {
+      // Normalize target (add 'inav.' prefix if not present for backward compatibility)
+      const normalizedTarget = target.startsWith('inav.') ? target : `inav.${target}`;
+
       // Use centralized API mapping instead of hardcoded values
-      const entry = this.operandMapping[target];
+      const entry = this.operandMapping[normalizedTarget];
       if (entry?.operation) {
         return entry.operation;
       }

@@ -61,9 +61,9 @@ describe('Override with Simple Condition Activator', () => {
 
     expect(result.success).toBe(true);
     // Should have the override in output
-    expect(result.code).toContain('rc[16] = 1750');
+    expect(result.code).toContain('inav.rc[16] = 1750');
     // Should be inside a condition block for rc[12].high
-    expect(result.code).toContain('rc[12].high');
+    expect(result.code).toContain('inav.rc[12].high');
   });
 
   test('should decompile override even when activator is also used in sticky operand', () => {
@@ -158,15 +158,15 @@ describe('Override with Simple Condition Activator', () => {
     expect(result.code).toContain('sticky(');
 
     // 2. The override should be present
-    expect(result.code).toContain('rc[16] = 1750');
+    expect(result.code).toContain('inav.rc[16] = 1750');
 
     // The override should NOT be orphaned - it should be in a proper if block
     expect(result.code).not.toContain('Orphaned');
     expect(result.code).not.toContain('unprocessed activator');
 
-    // The override should be nested inside if (rc[12].high) { ... }
-    // Check that rc[12].high appears as a condition (not just in sticky)
-    const hasHighCondition = /if\s*\(\s*rc\[12\]\.high\s*\)/.test(result.code);
+    // The override should be nested inside if (inav.rc[12].high) { ... }
+    // Check that inav.rc[12].high appears as a condition (not just in sticky)
+    const hasHighCondition = /if\s*\(\s*inav\.rc\[12\]\.high\s*\)/.test(result.code);
     expect(hasHighCondition).toBe(true);
   });
 
@@ -211,8 +211,8 @@ describe('Override with Simple Condition Activator', () => {
     const result = decompiler.decompile(conditions);
 
     expect(result.success).toBe(true);
-    expect(result.code).toContain('gvar[0] = 1');
-    expect(result.code).toContain('rc[16] = 1750');
+    expect(result.code).toContain('inav.gvar[0] = 1');
+    expect(result.code).toContain('inav.rc[16] = 1750');
   });
 });
 
