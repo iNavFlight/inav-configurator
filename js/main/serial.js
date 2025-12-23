@@ -9,7 +9,26 @@ const serial = {
     _serialport: null,
     _id: 1,
 
-    connect: function(path, options, window) {
+    connect: async function(path, options, window) {
+        // Clean up any existing serial port to prevent handle leaks
+        if (this._serialport) {
+            try {
+                const oldPort = this._serialport;
+                this._serialport = null;
+                oldPort.removeAllListeners();
+                if (oldPort.isOpen) {
+                    await new Promise(resolveClose => {
+                        oldPort.close(() => resolveClose());
+                    });
+                }
+                oldPort.destroy();
+                // Small delay to ensure OS releases the file handle
+                await new Promise(r => setTimeout(r, 100));
+            } catch (e) {
+                console.log('Cleanup error (ignored):', e.message);
+            }
+        }
+
         return new Promise(resolve => {
             try {
                 var openPortResolved = false;
@@ -18,6 +37,15 @@ const serial = {
                     console.log('Serial port error:', error.message);
                     if (!window.isDestroyed()) {
                         window.webContents.send('serialError', error);
+                    }
+
+                    // Clean up the serial port to prevent handle leaks
+                    // This prevents "Resource temporarily unavailable Cannot lock port" errors
+                    if (this._serialport) {
+                        const failedPort = this._serialport;
+                        this._serialport = null;
+                        failedPort.removeAllListeners();
+                        failedPort.destroy();
                     }
 
                     if(!openPortResolved) {
@@ -52,14 +80,24 @@ const serial = {
     close: function() {
         return new Promise(resolve => {
             if (this._serialport && this._serialport.isOpen) {
-                this._serialport.close(error => {
+                const port = this._serialport;
+                this._serialport = null;
+                port.close(error => {
                     if (error) {
                         resolve({error: true, msg: error})
                     } else {
                         resolve({error: false})
                     }
                 });
+            } else if (this._serialport) {
+                // Port exists but isn't open - destroy it to clean up
+                try {
+                    this._serialport.destroy();
+                } catch (e) {
+                    // Ignore cleanup errors
+                }
                 this._serialport = null;
+                resolve({error: false});
             } else {
                 resolve({error: false})
             }
