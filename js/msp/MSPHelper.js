@@ -1161,9 +1161,30 @@ var mspHelper = (function () {
                     FC.VTX_CONFIG.channel = data.getUint8(offset++);
                     FC.VTX_CONFIG.power = data.getUint8(offset++);
                     FC.VTX_CONFIG.pitmode = data.getUint8(offset++);
-                    // Ignore wether the VTX is ready for now
+                    // Ignore whether the VTX is ready for now
                     offset++;
                     FC.VTX_CONFIG.low_power_disarm = data.getUint8(offset++);
+
+                    // Check if firmware supports VTX table (INAV 9.0+)
+                    if (offset < data.byteLength) {
+                        const vtxtable_available = data.getUint8(offset++);
+                        if (vtxtable_available) {
+                            if (offset + 2 < data.byteLength) {
+                                FC.VTX_CONFIG.band_count = data.getUint8(offset++);
+                                FC.VTX_CONFIG.channel_count = data.getUint8(offset++);
+                                FC.VTX_CONFIG.power_count = data.getUint8(offset++);
+                            }
+
+                            // Check if firmware sends powerMin (INAV 9.1+)
+                            if (offset < data.byteLength) {
+                                FC.VTX_CONFIG.power_min = data.getUint8(offset++);
+                            } else {
+                                // Firmware 9.0 doesn't send powerMin, use fallback
+                                // MSP VTX supports power off (index 0), others start at 1
+                                FC.VTX_CONFIG.power_min = (FC.VTX_CONFIG.device_type == VTX.DEV_MSP) ? 0 : 1;
+                            }
+                        }
+                    }
                 }
                 break;
             case MSPCodes.MSP_ADVANCED_CONFIG:
