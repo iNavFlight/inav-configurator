@@ -375,6 +375,11 @@ var SerialBackend = (function () {
             store.set('last_used_bps', CONFIGURATOR.connection.bitrate);
             store.set('wireless_mode_enabled', $('#wireless-mode').is(":checked"));
 
+            // Reset state BEFORE adding receive listeners to ensure any
+            // garbage bytes or boot messages don't corrupt the MSP decoder
+            FC.resetState();
+            MSP.disconnect_cleanup();
+
             CONFIGURATOR.connection.addOnReceiveListener(publicScope.read_serial);
             CONFIGURATOR.connection.addOnReceiveListener(ltmDecoder.read);
 
@@ -401,8 +406,6 @@ var SerialBackend = (function () {
                     groundstation.activate($('#main-wrapper'));
                 }
             }, 1000);
-
-            FC.resetState();
 
             // request configuration data. Start with MSPv1 and
             // upgrade to MSPv2 if possible.

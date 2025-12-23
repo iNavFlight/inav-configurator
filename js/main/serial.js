@@ -15,13 +15,15 @@ const serial = {
                 var openPortResolved = false;
                 this._serialport = new SerialPortStream({binding, path: path, baudRate: options.bitrate, autoOpen: true});
                 this._serialport.on('error', error => {
+                    console.log('Serial port error:', error.message);
                     if (!window.isDestroyed()) {
-                        window.webContents.send('serialError', error); 
+                        window.webContents.send('serialError', error);
                     }
 
                     if(!openPortResolved) {
                         openPortResolved = true;
-                        resolve({error: false, id: this._id++});
+                        // Fixed: Report error correctly so connection handling works properly
+                        resolve({error: true, msg: error.message || 'Serial port error'});
                     }
                 });
 
