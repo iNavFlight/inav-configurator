@@ -12,36 +12,6 @@ export default {
     extraResource: [
       'resources/public/sitl'
     ],
-    afterCopy: [
-      (buildPath, electronVersion, platform, arch, callback) => {
-        // Remove SITL binaries for other platforms/architectures to reduce package size
-        const sitlPath = path.join(buildPath, 'resources', 'sitl');
-        if (platform === 'win32') {
-          fs.rmSync(path.join(sitlPath, 'linux'), { recursive: true, force: true });
-          fs.rmSync(path.join(sitlPath, 'macos'), { recursive: true, force: true });
-        } else if (platform === 'darwin') {
-          fs.rmSync(path.join(sitlPath, 'linux'), { recursive: true, force: true });
-          fs.rmSync(path.join(sitlPath, 'windows'), { recursive: true, force: true });
-        } else if (platform === 'linux') {
-          fs.rmSync(path.join(sitlPath, 'macos'), { recursive: true, force: true });
-          fs.rmSync(path.join(sitlPath, 'windows'), { recursive: true, force: true });
-          // Remove wrong architecture
-          if (arch === 'x64') {
-            fs.rmSync(path.join(sitlPath, 'linux', 'arm64'), { recursive: true, force: true });
-          } else if (arch === 'arm64') {
-            // Move arm64 binary to linux root and remove x64
-            const arm64Binary = path.join(sitlPath, 'linux', 'arm64', 'inav_SITL');
-            const destBinary = path.join(sitlPath, 'linux', 'inav_SITL');
-            if (fs.existsSync(arm64Binary)) {
-              fs.rmSync(destBinary, { force: true });
-              fs.renameSync(arm64Binary, destBinary);
-              fs.rmSync(path.join(sitlPath, 'linux', 'arm64'), { recursive: true, force: true });
-            }
-          }
-        }
-        callback();
-      }
-    ],
   },
   rebuildConfig: {},
   plugins: [
@@ -76,6 +46,37 @@ export default {
     },
   ],
   hooks: {
+    // Remove SITL binaries for other platforms/architectures to reduce package size
+    postPackage: async (forgeConfig, options) => {
+      for (const outputPath of options.outputPaths) {
+        const sitlPath = path.join(outputPath, 'resources', 'sitl');
+        if (!fs.existsSync(sitlPath)) continue;
+
+        if (options.platform === 'win32') {
+          fs.rmSync(path.join(sitlPath, 'linux'), { recursive: true, force: true });
+          fs.rmSync(path.join(sitlPath, 'macos'), { recursive: true, force: true });
+        } else if (options.platform === 'darwin') {
+          fs.rmSync(path.join(sitlPath, 'linux'), { recursive: true, force: true });
+          fs.rmSync(path.join(sitlPath, 'windows'), { recursive: true, force: true });
+        } else if (options.platform === 'linux') {
+          fs.rmSync(path.join(sitlPath, 'macos'), { recursive: true, force: true });
+          fs.rmSync(path.join(sitlPath, 'windows'), { recursive: true, force: true });
+          // Remove wrong architecture
+          if (options.arch === 'x64') {
+            fs.rmSync(path.join(sitlPath, 'linux', 'arm64'), { recursive: true, force: true });
+          } else if (options.arch === 'arm64') {
+            // Move arm64 binary to linux root and remove x64
+            const arm64Binary = path.join(sitlPath, 'linux', 'arm64', 'inav_SITL');
+            const destBinary = path.join(sitlPath, 'linux', 'inav_SITL');
+            if (fs.existsSync(arm64Binary)) {
+              fs.rmSync(destBinary, { force: true });
+              fs.renameSync(arm64Binary, destBinary);
+              fs.rmSync(path.join(sitlPath, 'linux', 'arm64'), { recursive: true, force: true });
+            }
+          }
+        }
+      }
+    },
     // Uniform artifact file names
     postMake: async (config, makeResults) => {
       makeResults.forEach(result => {
