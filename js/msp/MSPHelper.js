@@ -2495,12 +2495,11 @@ var mspHelper = (function () {
 
                         if (isConfigured) {
                             // Fetch from firmware - handler will put() it
-                            // Use same callback for success and error to ensure loading continues
                             const onComplete = function() {
                                 idx++;
                                 processNextCondition();
                             };
-                            MSP.send_message(MSPCodes.MSP2_INAV_LOGIC_CONDITIONS_SINGLE, [idx], false, onComplete, onComplete);
+                            MSP.send_message(MSPCodes.MSP2_INAV_LOGIC_CONDITIONS_SINGLE, [idx], false, onComplete);
                             return; // Wait for async MSP response
                         } else {
                             // Not configured - put default directly and continue loop
