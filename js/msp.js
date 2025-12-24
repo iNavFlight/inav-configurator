@@ -74,6 +74,7 @@ var MSP = {
     message_buffer:             null,
     message_buffer_uint8_view:  null,
     message_checksum:           0,
+    message_flag:               0,
     callbacks:                  [],
     packet_error:               0,
     unsupported:                0,
@@ -100,7 +101,13 @@ var MSP = {
     },
 
     read: function (readInfo) {
-        var data = new Uint8Array(readInfo.data);
+        var data;
+        try {
+            data = new Uint8Array(readInfo.data);
+        } catch (e) {
+            console.error('MSP read: Failed to create Uint8Array from readInfo.data:', e, 'readInfo:', readInfo);
+            return;
+        }
 
         for (var i = 0; i < data.length; i++) {
             switch (this.state) {
@@ -141,7 +148,8 @@ var MSP = {
                          this.decoder_states.FLAG_V2;
                     break;
                 case this.decoder_states.FLAG_V2:
-                    // Ignored for now
+                    // Store flag for CRC computation
+                    this.message_flag = data[i];
                     this.state = this.decoder_states.CODE_V2_LOW;
                     break;
                 case this.decoder_states.PAYLOAD_LENGTH_V1:
@@ -227,7 +235,7 @@ var MSP = {
                     break;
                 case this.decoder_states.CHECKSUM_V2:
                     this.message_checksum = 0;
-                    this.message_checksum = this._crc8_dvb_s2(this.message_checksum, 0); // flag
+                    this.message_checksum = this._crc8_dvb_s2(this.message_checksum, this.message_flag); // flag
                     this.message_checksum = this._crc8_dvb_s2(this.message_checksum, this.code & 0xFF);
                     this.message_checksum = this._crc8_dvb_s2(this.message_checksum, (this.code & 0xFF00) >> 8);
                     this.message_checksum = this._crc8_dvb_s2(this.message_checksum, this.message_length_expected & 0xFF);
@@ -254,26 +262,29 @@ var MSP = {
     },
 
     _dispatch_message(expected_checksum) {
-        if (this.message_checksum == expected_checksum) {
-            // message received, process
-            this.processData(this);
-            this.lastFrameReceivedMs = Date.now();
-        } else {
-            console.log('code: ' + this.code + ' - crc failed');
-            this.packet_error++;
-            $('span.packet-error').html(this.packet_error);
+        // Use try-finally to ensure state is ALWAYS reset, even if processData throws
+        try {
+            if (this.message_checksum == expected_checksum) {
+                // message received, process
+                this.processData(this);
+                this.lastFrameReceivedMs = Date.now();
+            } else {
+                console.log('code: ' + this.code + ' - crc failed');
+                this.packet_error++;
+                $('span.packet-error').html(this.packet_error);
+            }
+
+            /*
+             * Free port
+             */
+            timeout.add('delayedFreeHardLock', function() {
+                mspQueue.freeHardLock();
+            }, 10);
+        } finally {
+            // Reset variables - MUST happen even if an exception occurred
+            this.message_length_received = 0;
+            this.state = this.decoder_states.IDLE;
         }
-
-        /*
-         * Free port
-         */
-        timeout.add('delayedFreeHardLock', function() {
-            mspQueue.freeHardLock();
-        }, 10);
-
-        // Reset variables
-        this.message_length_received = 0;
-        this.state = this.decoder_states.IDLE;
     },
 
     /**
