@@ -300,6 +300,15 @@ $(function() {
                         var check = $(this).is(':checked');
                         store.set('update_notify', check);
                     });
+                    
+                    if (store.get('disable_3d_acceleration', false)) {
+                        $('div.disable_3d_acceleration input').prop('checked', true);
+                    }
+
+                     $('div.disable_3d_acceleration input').on('change', function () {
+                        var check = $(this).is(':checked');
+                        store.set('disable_3d_acceleration', check);
+                    });
 
                     $('div.statistics input').on('change', function () {
                         var check = $(this).is(':checked');

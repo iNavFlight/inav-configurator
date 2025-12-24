@@ -14,6 +14,19 @@ import child_process from './child_process';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
+/**
+ * Returns the base path for SITL binaries.
+ * - In packaged mode: uses Electron's resourcesPath (where extraResource files are placed)
+ * - In dev mode: uses the source location in resources/public/sitl
+ */
+function getSitlBasePath() {
+  if (app.isPackaged) {
+    return path.join(process.resourcesPath, 'sitl');
+  } else {
+    return path.join(app.getAppPath(), 'resources', 'public', 'sitl');
+  }
+}
+
 const usbBootloaderIds =  [
   { vendorId: 1155, productId: 57105}, 
   { vendorId: 11836, productId: 57105}
@@ -31,9 +44,19 @@ let selectBluetoothCallback = null;
 
 const store = new Store();
 
-// Workaround for some Linux systems: https://github.com/electron/electron/issues/32760 
-if (process.platform === 'linux') {
+// Workaround for some Linux systems: https://github.com/electron/electron/issues/32760
+if (store.get('disable_3d_acceleration', false)) {
   app.disableHardwareAcceleration();
+}
+
+// Enable remote debugging in development mode
+// This allows chrome://inspect and Playwright CDP connections
+if (!app.isPackaged) {  // Development mode (not packaged)
+  const port = process.env.CDP_PORT ?? '9222';
+  app.commandLine.appendSwitch('remote-debugging-port', port);
+  console.log(`[cdp] Remote debugging enabled on port ${port}`);
+  console.log(`   Chrome DevTools: chrome://inspect`);
+  console.log(`   CDP Endpoint: http://localhost:${port}`);
 }
 
 // In Electron the bluetooth device chooser didn't exist, so we have to build our own
@@ -340,7 +363,7 @@ app.whenReady().then(() => {
 
   ipcMain.handle('chmod', (_event, pathName, mode) => {
     return new Promise(resolve => {
-      chmod(path.join(__dirname, 'sitl', pathName), mode, error => {
+      chmod(path.join(getSitlBasePath(), pathName), mode, error => {
         if (error) {
           resolve(error.message)
         } else {
@@ -363,7 +386,7 @@ app.whenReady().then(() => {
   });
 
   ipcMain.on('startChildProcess', (_event, command, args, opts) => {
-    child_process.start(path.join(__dirname, 'sitl', command), args, opts, mainWindow);
+    child_process.start(path.join(getSitlBasePath(), command), args, opts, mainWindow);
   });
 
   ipcMain.on('killChildProcess', (_event) => {

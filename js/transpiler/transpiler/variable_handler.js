@@ -22,6 +22,7 @@ class VariableHandler {
     this.symbols = new Map();           // varName -> SymbolInfo
     this.usedGvars = new Set();         // Explicitly used gvar slots (0-7)
     this.gvarAllocations = new Map();   // varName -> gvar index
+    this.letVariableLCIndices = new Map(); // varName -> LC index (for let/const variables)
     this.errors = [];                   // Collected errors
   }
 
@@ -95,6 +96,19 @@ class VariableHandler {
   }
 
   /**
+   * Track LC index for a let/const variable (called during code generation)
+   * This allows the decompiler to preserve custom variable names
+   *
+   * @param {string} name - Variable name
+   * @param {number} lcIndex - The LC index generated for this variable
+   */
+  setLetVariableLCIndex(name, lcIndex) {
+    if (this.symbols.has(name) && this.symbols.get(name).kind === 'let') {
+      this.letVariableLCIndices.set(name, lcIndex);
+    }
+  }
+
+  /**
    * Add 'var' variable to symbol table (placeholder for now)
    * Gvar allocation happens later after detecting used slots
    *
@@ -124,6 +138,33 @@ class VariableHandler {
   }
 
   /**
+   * Add 'latch' variable to symbol table (for sticky/timer state)
+   * These don't use gvar slots - they reference LC indices
+   *
+   * @param {string} name - Variable name (e.g., 'latch1')
+   * @param {Object} loc - Source location
+   */
+  addLatchVariable(name, loc) {
+    // Check for redeclaration
+    if (this.symbols.has(name)) {
+      this.errors.push({
+        message: `Variable '${name}' is already declared`,
+        line: loc ? loc.start.line : 0,
+        code: 'redeclaration'
+      });
+      return;
+    }
+
+    // Store as latch type - LC index assigned by codegen
+    this.symbols.set(name, {
+      name,
+      kind: 'latch',
+      lcIndex: null,  // Assigned by codegen when sticky LC is generated
+      loc
+    });
+  }
+
+  /**
    * Detect which gvar slots are explicitly used by user code
    * Scans AST for gvar[N] references
    *
@@ -136,16 +177,16 @@ class VariableHandler {
     const walk = (node) => {
       if (!node) return;
 
-      // Check for gvar[N] in assignment targets
+      // Check for gvar[N] or inav.gvar[N] in assignment targets
       if (node.type === 'Assignment' && node.target) {
-        const match = node.target.match(/^gvar\[(\d+)\]$/);
+        const match = node.target.match(/^(?:inav\.)?gvar\[(\d+)\]$/);
         if (match) {
           this.usedGvars.add(parseInt(match[1]));
         }
 
         // Check value side too
         if (typeof node.value === 'string') {
-          const valueMatch = node.value.match(/^gvar\[(\d+)\]$/);
+          const valueMatch = node.value.match(/^(?:inav\.)?gvar\[(\d+)\]$/);
           if (valueMatch) {
             this.usedGvars.add(parseInt(valueMatch[1]));
           }
@@ -153,14 +194,14 @@ class VariableHandler {
 
         // Check arithmetic operands
         if (node.left && typeof node.left === 'string') {
-          const leftMatch = node.left.match(/^gvar\[(\d+)\]$/);
+          const leftMatch = node.left.match(/^(?:inav\.)?gvar\[(\d+)\]$/);
           if (leftMatch) {
             this.usedGvars.add(parseInt(leftMatch[1]));
           }
         }
 
         if (node.right && typeof node.right === 'string') {
-          const rightMatch = node.right.match(/^gvar\[(\d+)\]$/);
+          const rightMatch = node.right.match(/^(?:inav\.)?gvar\[(\d+)\]$/);
           if (rightMatch) {
             this.usedGvars.add(parseInt(rightMatch[1]));
           }
@@ -203,7 +244,7 @@ class VariableHandler {
 
     // String check
     if (typeof expr === 'string') {
-      const match = expr.match(/^gvar\[(\d+)\]$/);
+      const match = expr.match(/^(?:inav\.)?gvar\[(\d+)\]$/);
       if (match) {
         this.usedGvars.add(parseInt(match[1]));
       }
@@ -373,6 +414,27 @@ class VariableHandler {
    */
   getSymbol(name) {
     return this.symbols.get(name);
+  }
+
+  /**
+   * Alias for getSymbol (for clarity in analyzer)
+   */
+  getVariable(name) {
+    return this.symbols.get(name);
+  }
+
+  /**
+   * Convert a 'var' variable to 'latch' type
+   * Used when a pre-declared var is later assigned via sticky()
+   *
+   * @param {string} name - Variable name
+   */
+  convertToLatch(name) {
+    const symbol = this.symbols.get(name);
+    if (symbol) {
+      symbol.kind = 'latch';
+      symbol.lcIndex = null;  // Will be assigned by codegen
+    }
   }
 
   /**

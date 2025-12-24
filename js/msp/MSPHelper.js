@@ -472,16 +472,31 @@ var mspHelper = (function () {
                 break;
 
             case MSPCodes.MSP2_INAV_LOGIC_CONDITIONS_SINGLE:
-                FC.LOGIC_CONDITIONS.put(new LogicCondition(
-                    data.getInt8(0),
-                    data.getInt8(1),
-                    data.getUint8(2),
-                    data.getUint8(3),
-                    data.getInt32(4, true),
-                    data.getUint8(8),
-                    data.getInt32(9, true),
-                    data.getInt8(13)
-                ));
+                if (data.byteLength >= 14 && !dataHandler.unsupported) {
+                    FC.LOGIC_CONDITIONS.put(new LogicCondition(
+                        data.getInt8(0),
+                        data.getInt8(1),
+                        data.getUint8(2),
+                        data.getUint8(3),
+                        data.getInt32(4, true),
+                        data.getUint8(8),
+                        data.getInt32(9, true),
+                        data.getInt8(13)
+                    ));
+                } else {
+                    console.warn('MSP2_INAV_LOGIC_CONDITIONS_SINGLE: unexpected response (byteLength=' + data.byteLength + ', unsupported=' + dataHandler.unsupported + ')');
+                }
+                break;
+
+            case MSPCodes.MSP2_INAV_LOGIC_CONDITIONS_CONFIGURED:
+                // 8-byte bitmask: lower 32 bits first, then upper 32 bits
+                // Older firmware returns unsupported/empty - that's expected, mask stays null
+                if (data.byteLength >= 8 && !dataHandler.unsupported) {
+                    FC.LOGIC_CONDITIONS_CONFIGURED_MASK = {
+                        lower: data.getUint32(0, true),
+                        upper: data.getUint32(4, true)
+                    };
+                }
                 break;
 
             case MSPCodes.MSP2_INAV_LOGIC_CONDITIONS_STATUS:
@@ -2430,7 +2445,8 @@ var mspHelper = (function () {
     };
 
     self.loadLogicConditions = function (callback) {
-        if (semver.gte(FC.CONFIG.flightControllerVersion, "5.0.0")) {
+        // Helper function for legacy path: fetch all 64 conditions one by one
+        function loadAllConditionsLegacy() {
             FC.LOGIC_CONDITIONS.flush();
             let idx = 0;
             MSP.send_message(MSPCodes.MSP2_INAV_LOGIC_CONDITIONS_SINGLE, [idx], false, nextLogicCondition);
@@ -2443,9 +2459,74 @@ var mspHelper = (function () {
                     MSP.send_message(MSPCodes.MSP2_INAV_LOGIC_CONDITIONS_SINGLE, [idx], false, callback);
                 }
             }
-        } else {
-            MSP.send_message(MSPCodes.MSP2_INAV_LOGIC_CONDITIONS, false, false, callback);
         }
+
+        // Try to get the optimized CONFIGURED mask with timeout fallback
+        FC.LOGIC_CONDITIONS_CONFIGURED_MASK = null;
+        let maskResponseReceived = false;
+
+        // Set up timeout fallback - if no response in 500ms, use legacy path
+        const fallbackTimeout = setTimeout(function() {
+            if (!maskResponseReceived) {
+                maskResponseReceived = true;
+                loadAllConditionsLegacy();
+            }
+        }, 500);
+
+        MSP.send_message(MSPCodes.MSP2_INAV_LOGIC_CONDITIONS_CONFIGURED, false, false, function() {
+            if (maskResponseReceived) return; // Timeout already triggered legacy path
+            maskResponseReceived = true;
+            clearTimeout(fallbackTimeout);
+
+            const mask = FC.LOGIC_CONDITIONS_CONFIGURED_MASK;
+
+            if (mask) {
+                // Optimized path: use the configured mask to only fetch configured conditions
+                FC.LOGIC_CONDITIONS.flush();
+                const maxConditions = FC.LOGIC_CONDITIONS.getMaxLogicConditionCount();
+                let idx = 0;
+
+                function processNextCondition() {
+                    while (idx < maxConditions) {
+                        // Check if this condition is configured (non-default)
+                        const isConfigured = (idx < 32) ?
+                            (mask.lower & (1 << idx)) !== 0 :
+                            (mask.upper & (1 << (idx - 32))) !== 0;
+
+                        if (isConfigured) {
+                            // Fetch from firmware - handler will put() it
+                            // Use same callback for success and error to ensure loading continues
+                            const onComplete = function() {
+                                idx++;
+                                processNextCondition();
+                            };
+                            MSP.send_message(MSPCodes.MSP2_INAV_LOGIC_CONDITIONS_SINGLE, [idx], false, onComplete, onComplete);
+                            return; // Wait for async MSP response
+                        } else {
+                            // Not configured - put default directly and continue loop
+                            FC.LOGIC_CONDITIONS.put(new LogicCondition(
+                                0,      // enabled
+                                -1,     // activatorId
+                                0,      // operation
+                                0,      // operandAType
+                                0,      // operandAValue
+                                0,      // operandBType
+                                0,      // operandBValue
+                                0       // flags
+                            ));
+                            idx++;
+                        }
+                    }
+                    // All conditions processed
+                    if (callback) callback();
+                }
+
+                processNextCondition();
+            } else {
+                // Legacy path: mask not available, fetch all 64 conditions
+                loadAllConditionsLegacy();
+            }
+        });
     }
 
     self.sendLogicConditions = function (onCompleteCallback) {

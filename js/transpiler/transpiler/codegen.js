@@ -24,6 +24,43 @@ import {
 import apiDefinitions from './../api/definitions/index.js';
 
 /**
+ * Declarative configuration for indexed operand types (gvar[], rc[], pid[])
+ * Each entry defines: regex pattern, OPERAND_TYPE, index bounds, and error messages
+ */
+const INDEXED_OPERAND_DEFS = {
+  'gvar[': {
+    regex: /^gvar\[(\d+)\]$/,
+    type: OPERAND_TYPE.GVAR,
+    min: 0,
+    max: 7,
+    syntaxError: (v) => `Invalid gvar syntax '${v}'. Expected gvar[0-7].`,
+    syntaxCode: 'invalid_gvar',
+    boundsError: (i) => `Invalid gvar index ${i}. Must be 0-7.`,
+    boundsCode: 'invalid_gvar_index'
+  },
+  'rc[': {
+    regex: /^rc\[(\d+)\](?:\.value)?$/,
+    type: OPERAND_TYPE.RC_CHANNEL,
+    min: 1,
+    max: 18,
+    syntaxError: (v) => `Invalid rc syntax '${v}'. Expected rc[1-18] or rc[1-18].value`,
+    syntaxCode: 'invalid_rc',
+    boundsError: (i) => `Invalid rc channel ${i}. Must be 1-18.`,
+    boundsCode: 'invalid_rc_index'
+  },
+  'pid[': {
+    regex: /^pid\[(\d+)\](?:\.output)?$/,
+    type: OPERAND_TYPE.PID,
+    min: 0,
+    max: 3,
+    syntaxError: (v) => `Invalid pid syntax '${v}'. Expected pid[0-3] or pid[0-3].output`,
+    syntaxCode: 'invalid_pid',
+    boundsError: (i) => `Invalid pid controller ${i}. Must be 0-3.`,
+    boundsCode: 'invalid_pid_index'
+  }
+};
+
+/**
  * INAV Code Generator
  * Converts AST to INAV logic condition commands
  */
@@ -35,8 +72,12 @@ class INAVCodeGenerator {
     this.operandMapping = buildForwardMapping(apiDefinitions);
     this.arrowHelper = new ArrowFunctionHelper(this);
     this.variableHandler = variableHandler;
+    this.latchVariables = new Map(); // Map variable name -> LC index for sticky assignments
+    this.constOperandCache = new Map(); // Cache operands for const variables (varName, activatorId) -> operand
 
     // Initialize helper generators
+    // Note: variableHandler uses a getter because it's set after construction
+    const self = this;
     const context = {
       pushLogicCommand: this.pushLogicCommand.bind(this),
       getOperand: this.getOperand.bind(this),
@@ -45,13 +86,26 @@ class INAVCodeGenerator {
       getOverrideOperation: this.getOverrideOperation.bind(this),
       errorHandler: this.errorHandler,
       arrowHelper: this.arrowHelper,
-      variableHandler: this.variableHandler,
-      getLcIndex: () => this.lcIndex
+      get variableHandler() { return self.variableHandler; },
+      getLcIndex: () => this.lcIndex,
+      latchVariables: this.latchVariables  // Share latch map with condition generator
     };
 
     this.conditionGenerator = new ConditionGenerator(context);
-    this.expressionGenerator = new ExpressionGenerator(context);
-    this.actionGenerator = new ActionGenerator(context);
+
+    // ExpressionGenerator needs conditionGenerator for ternary expressions
+    const exprContext = {
+      ...context,
+      conditionGenerator: this.conditionGenerator
+    };
+    this.expressionGenerator = new ExpressionGenerator(exprContext);
+
+    // ActionGenerator needs conditionGenerator for CSE cache invalidation on mutation
+    const actionContext = {
+      ...context,
+      conditionGenerator: this.conditionGenerator
+    };
+    this.actionGenerator = new ActionGenerator(actionContext);
   }
 
   /**
@@ -62,8 +116,10 @@ class INAVCodeGenerator {
   generate(ast) {
     this.lcIndex = 0;
     this.commands = [];
+    this.lastStatementEndLine = 0;  // Track for blank line gap detection
     this.errorHandler.reset(); // Clear any previous errors
     this.conditionGenerator.reset(); // Clear condition cache for CSE
+    this.latchVariables.clear(); // Clear latch variable mappings
 
     if (!ast || !ast.statements) {
       throw new Error('Invalid AST');
@@ -78,7 +134,9 @@ class INAVCodeGenerator {
     }
 
     for (const stmt of ast.statements) {
+      this.maybeInsertGapLC(stmt);
       this.generateStatement(stmt);
+      this.updateLastStatementLine(stmt);
     }
 
     // Throw if any errors were collected during generation
@@ -100,7 +158,10 @@ class INAVCodeGenerator {
         // Top-level assignment (e.g., gvar[0] = value) - runs unconditionally
         this.generateTopLevelAssignment(stmt);
         break;
-      case 'Destructuring':
+      case 'StickyAssignment':
+        // latch1 = sticky({on: ..., off: ...})
+        this.generateStickyAssignment(stmt);
+        break;
       case 'LetDeclaration':
       case 'VarDeclaration':
         // Skip - declarations handled separately
@@ -192,28 +253,63 @@ class INAVCodeGenerator {
   }
 
   /**
+   * Check if there's a significant gap (2+ blank lines) before a statement
+   * and insert a disabled placeholder LC to preserve visual grouping.
+   * @param {Object} stmt - Statement with loc info
+   */
+  maybeInsertGapLC(stmt) {
+    if (!stmt.loc || this.lastStatementEndLine === 0) return;
+
+    const stmtStartLine = stmt.loc.start.line;
+    const blankLines = stmtStartLine - this.lastStatementEndLine - 1;
+
+    // 2+ blank lines = visual separator, insert disabled LC
+    if (blankLines >= 2) {
+      this.commands.push(
+        `logic ${this.lcIndex} 0 -1 0 0 0 0 0 0`  // Disabled, no-op LC
+      );
+      this.lcIndex++;
+    }
+  }
+
+  /**
+   * Update tracking of last statement's end line.
+   * @param {Object} stmt - Statement with loc info
+   */
+  updateLastStatementLine(stmt) {
+    if (stmt.loc) {
+      this.lastStatementEndLine = stmt.loc.end.line;
+    }
+  }
+
+  /**
    * Generate event handler (if statement, edge, sticky, delay, on.*)
+   * Uses dispatch table for clean handler routing
    */
   generateEventHandler(stmt) {
     const handler = stmt.handler;
 
-    if (handler === 'on.arm') {
-      this.generateOnArm(stmt);
-    } else if (handler === 'on.always') {
-      this.generateOnAlways(stmt);
-    } else if (handler.startsWith('if')) {
-      // If statement - generates conditional logic
+    // Dispatch table for handler types
+    const handlerMethods = {
+      'on.arm': 'generateOnArm',
+      'on.always': 'generateOnAlways',
+      'edge': 'generateEdge',
+      'sticky': 'generateSticky',
+      'delay': 'generateDelay',
+      'timer': 'generateTimer',
+      'whenChanged': 'generateWhenChanged'
+    };
+
+    // Special case: if starts with 'if'
+    if (handler.startsWith('if')) {
       this.generateConditional(stmt);
-    } else if (handler === 'edge') {
-      this.generateEdge(stmt);
-    } else if (handler === 'sticky') {
-      this.generateSticky(stmt);
-    } else if (handler === 'delay') {
-      this.generateDelay(stmt);
-    } else if (handler === 'timer') {
-      this.generateTimer(stmt);
-    } else if (handler === 'whenChanged') {
-      this.generateWhenChanged(stmt);
+      return;
+    }
+
+    // Lookup in dispatch table and call method
+    const methodName = handlerMethods[handler];
+    if (methodName) {
+      this[methodName](stmt);
     } else {
       // Default: treat as conditional
       this.generateConditional(stmt);
@@ -410,15 +506,83 @@ class INAVCodeGenerator {
   }
 
   /**
+   * Generate sticky assignment: latch1 = sticky({on: () => cond1, off: () => cond2})
+   * Creates the sticky LC and tracks the variable name -> LC index mapping
+   */
+  generateStickyAssignment(stmt, activatorId = -1) {
+    const { target, args } = stmt;
+
+    if (!args || args.length < 1) {
+      this.errorHandler.addError(
+        'sticky() requires at least 1 argument',
+        stmt,
+        'invalid_args'
+      );
+      return;
+    }
+
+    // Extract on/off conditions from named parameters: {on: () => ..., off: () => ...}
+    const configArg = args[0];
+    let onCondition = null;
+    let offCondition = null;
+
+    if (configArg.type === 'ObjectExpression') {
+      for (const prop of configArg.properties) {
+        const propName = prop.key.name || prop.key.value;
+        if (propName === 'on') {
+          onCondition = this.arrowHelper.extractExpression(prop.value);
+        } else if (propName === 'off') {
+          offCondition = this.arrowHelper.extractExpression(prop.value);
+        }
+      }
+    }
+
+    if (!onCondition || !offCondition) {
+      this.errorHandler.addError(
+        'sticky() requires {on: () => condition, off: () => condition} argument',
+        stmt,
+        'invalid_args'
+      );
+      return;
+    }
+
+    // Generate ON condition LC (inherits activator from parent)
+    const onConditionId = this.generateCondition(onCondition, activatorId);
+
+    // Generate OFF condition LC (runs unconditionally - uses -1)
+    const offConditionId = this.generateCondition(offCondition, -1);
+
+    // Generate STICKY operation (13) - inherits activator from parent
+    const stickyId = this.pushLogicCommand(OPERATION.STICKY,
+      { type: OPERAND_TYPE.LC, value: onConditionId },
+      { type: OPERAND_TYPE.LC, value: offConditionId },
+      activatorId
+    );
+
+    // Track the variable name -> LC index mapping for use in conditions
+    this.latchVariables.set(target, stickyId);
+  }
+
+  /**
    * Generate delay handler
-   * delay(() => condition, { duration: ms }, () => { actions })
+   * delay(() => condition, duration_ms, () => { actions })
+   * Also supports: delay(() => condition, { duration: ms }, () => { actions })
    */
   generateDelay(stmt) {
     if (!this.validateFunctionArgs('delay', stmt.args, 3, stmt)) return;
 
     // Extract parts using helper
     const condition = this.arrowHelper.extractExpression(stmt.args[0]);
-    const duration = this.arrowHelper.extractDuration(stmt.args[1]);
+
+    // Duration can be a plain number or {duration: ms} object
+    let duration;
+    const durationArg = stmt.args[1];
+    if (durationArg && durationArg.type === 'Literal' && typeof durationArg.value === 'number') {
+      duration = durationArg.value;
+    } else {
+      duration = this.arrowHelper.extractDuration(durationArg);
+    }
+
     const actions = this.arrowHelper.extractBody(stmt.args[2]);
 
     if (!condition) {
@@ -439,10 +603,55 @@ class INAVCodeGenerator {
       { type: OPERAND_TYPE.VALUE, value: duration }
     );
 
-    // Generate actions
+    // Generate actions (can include if statements)
     for (const action of actions) {
-      this.generateAction(action, delayId);
+      if (action.type === 'IfStatement') {
+        // Convert IfStatement to EventHandlers and generate each
+        const handlers = this.convertIfToEventHandlers(action, delayId);
+        for (const handler of handlers) {
+          this.generateEventHandler(handler);
+        }
+      } else {
+        this.generateAction(action, delayId);
+      }
     }
+  }
+
+  /**
+   * Convert IfStatement from arrow helper to EventHandler format
+   * Returns array of EventHandlers (one for if, one for else if present)
+   */
+  convertIfToEventHandlers(ifStmt, activatorId) {
+    const handlers = [];
+
+    // Create EventHandler for if block
+    handlers.push({
+      type: 'EventHandler',
+      handler: 'ifthen',
+      condition: ifStmt.condition,
+      body: ifStmt.consequent,
+      activatorId  // Parent activator (delay LC)
+    });
+
+    // Create EventHandler for else block if present
+    if (ifStmt.alternate && ifStmt.alternate.length > 0) {
+      // Invert the condition for else block
+      const invertedCondition = {
+        type: 'UnaryExpression',
+        operator: '!',
+        argument: ifStmt.condition
+      };
+
+      handlers.push({
+        type: 'EventHandler',
+        handler: 'ifthen',
+        condition: invertedCondition,
+        body: ifStmt.alternate,
+        activatorId
+      });
+    }
+
+    return handlers;
   }
 
   /**
@@ -565,6 +774,11 @@ class INAVCodeGenerator {
    * Delegates to ActionGenerator helper class
    */
   generateAction(action, activatorId) {
+    // Handle StickyAssignment specially - it creates LCs and tracks latch variables
+    if (action && action.type === 'StickyAssignment') {
+      this.generateStickyAssignment(action, activatorId);
+      return;
+    }
     this.actionGenerator.generate(action, activatorId);
   }
 
@@ -580,58 +794,90 @@ class INAVCodeGenerator {
       return { type: OPERAND_TYPE.VALUE, value: value ? 1 : 0 };
     }
 
+    // Handle transformed AST nodes from parser
+    // These have {type: 'MemberExpression', value: 'rc[11]'} or {type: 'Literal', value: 123}
+    if (typeof value === 'object' && value !== null && value.type) {
+      if (value.type === 'Literal') {
+        return { type: OPERAND_TYPE.VALUE, value: value.value };
+      }
+      if (value.type === 'MemberExpression' && value.value) {
+        // Recursively process the string value
+        return this.getOperand(value.value, activatorId);
+      }
+      if (value.type === 'Identifier' && (value.name || value.value)) {
+        // Recursively process the identifier name
+        return this.getOperand(value.name || value.value, activatorId);
+      }
+    }
+
     if (typeof value === 'string') {
+      // Strip 'inav.' prefix if present (normalize to internal representation)
+      let normalizedValue = value.startsWith('inav.') ? value.substring(5) : value;
+
       // Check if it's a variable reference
-      if (this.variableHandler && this.variableHandler.isVariable(value)) {
-        const resolution = this.variableHandler.resolveVariable(value);
+      if (this.variableHandler && this.variableHandler.isVariable(normalizedValue)) {
+        const resolution = this.variableHandler.resolveVariable(normalizedValue);
 
         if (resolution.type === 'let_expression') {
-          // Inline substitute the expression AST
-          return this.getOperand(resolution.ast, activatorId);
+          // Determine the appropriate activator for this const variable:
+          // - Pure expressions (no side effects) → root level (-1) for maximum reuse
+          // - Expressions with side effects → preserve activator context
+          const hasSideEffects = this.conditionGenerator.expressionHasSideEffects(resolution.ast);
+          const targetActivator = hasSideEffects ? activatorId : -1;
+
+          const cacheKey = `${normalizedValue}:${targetActivator}`;
+          if (this.constOperandCache.has(cacheKey)) {
+            return this.constOperandCache.get(cacheKey);
+          }
+
+          // Generate with appropriate activator and cache the operand
+          const operand = this.getOperand(resolution.ast, targetActivator);
+          this.constOperandCache.set(cacheKey, operand);
+
+          // Track LC index for this let variable (for variable map)
+          if (this.variableHandler && this.variableHandler.setLetVariableLCIndex && operand.type === 4) {
+            this.variableHandler.setLetVariableLCIndex(normalizedValue, operand.value);
+          }
+
+          return operand;
         } else if (resolution.type === 'var_gvar') {
-          // Replace with gvar reference and continue
-          value = resolution.gvarRef;
+          // Replace with gvar reference and continue (use normalized version)
+          normalizedValue = resolution.gvarRef;
         }
       }
 
-      // Check for gvar with bounds validation
-      if (value.startsWith('gvar[')) {
-        const match = value.match(/^gvar\[(\d+)\]$/);
-        if (!match) {
-          this.errorHandler.addError(`Invalid gvar syntax '${value}'. Expected gvar[0-7].`, null, 'invalid_gvar');
-          return { type: OPERAND_TYPE.VALUE, value: 0 };
-        }
-        const index = parseInt(match[1], 10);
-        if (index < 0 || index > 7) {
-          this.errorHandler.addError(`Invalid gvar index ${index}. Must be 0-7.`, null, 'invalid_gvar_index');
-          return { type: OPERAND_TYPE.VALUE, value: 0 };
-        }
-        return { type: OPERAND_TYPE.GVAR, value: index };
-      }
+      // Use normalized value for all lookups (gvar[0], rc[5], flight.altitude, etc.)
+      const lookupValue = normalizedValue;
 
-      // Check for rc channel with bounds validation
-      // Supports both rc[N] and rc[N].value (both are equivalent)
-      if (value.startsWith('rc[')) {
-        const match = value.match(/^rc\[(\d+)\](?:\.value)?$/);
-        if (!match) {
-          this.errorHandler.addError(`Invalid rc syntax '${value}'. Expected rc[1-18] or rc[1-18].value`, null, 'invalid_rc');
-          return { type: OPERAND_TYPE.VALUE, value: 0 };
+      // Check for indexed operands (gvar[], rc[], pid[]) using declarative config
+      for (const [prefix, def] of Object.entries(INDEXED_OPERAND_DEFS)) {
+        if (lookupValue.startsWith(prefix)) {
+          const match = lookupValue.match(def.regex);
+          if (!match) {
+            this.errorHandler.addError(def.syntaxError(value), null, def.syntaxCode);
+            return { type: OPERAND_TYPE.VALUE, value: 0 };
+          }
+          const index = parseInt(match[1], 10);
+          if (index < def.min || index > def.max) {
+            this.errorHandler.addError(def.boundsError(index), null, def.boundsCode);
+            return { type: OPERAND_TYPE.VALUE, value: 0 };
+          }
+          return { type: def.type, value: index };
         }
-        const index = parseInt(match[1], 10);
-        if (index < 1 || index > 18) {
-          this.errorHandler.addError(`Invalid rc channel ${index}. Must be 1-18.`, null, 'invalid_rc_index');
-          return { type: OPERAND_TYPE.VALUE, value: 0 };
-        }
-        return { type: OPERAND_TYPE.RC_CHANNEL, value: index };
       }
 
       // Check in operand mapping
+      if (this.operandMapping[lookupValue]) {
+        return this.operandMapping[lookupValue];
+      }
+
+      // Try with original value (for backward compat during transition)
       if (this.operandMapping[value]) {
         return this.operandMapping[value];
       }
 
       this.errorHandler.addError(
-        `Unknown operand '${value}'. Available: flight.*, rc.*, gvar[0-7], waypoint.*, pid.*`,
+        `Unknown operand '${value}'. Available: inav.flight.*, inav.rc[1-18], inav.gvar[0-7], inav.waypoint.*, inav.pid[0-3]`,
         null,
         'unknown_operand'
       );
@@ -703,43 +949,28 @@ class INAVCodeGenerator {
      * Get override operation for target
      */
     getOverrideOperation(target) {
-      const operations = {
-        'override.throttleScale': OPERATION.OVERRIDE_THROTTLE_SCALE,
-        'override.throttle': OPERATION.OVERRIDE_THROTTLE,
-        'override.vtx.power': OPERATION.SET_VTX_POWER_LEVEL,
-        'override.vtx.band': OPERATION.SET_VTX_BAND,
-        'override.vtx.channel': OPERATION.SET_VTX_CHANNEL,
-        'override.armSafety': OPERATION.OVERRIDE_ARMING_SAFETY,
-        'override.osdLayout': OPERATION.SET_OSD_LAYOUT,
-        'override.loiterRadius': OPERATION.LOITER_OVERRIDE,
-        'override.minGroundSpeed': OPERATION.OVERRIDE_MIN_GROUND_SPEED
-      };
+      // Normalize target (add 'inav.' prefix if not present for backward compatibility)
+      const normalizedTarget = target.startsWith('inav.') ? target : `inav.${target}`;
 
-      const operation = operations[target];
-      if (!operation) {
-        // Check for flight axis overrides: override.flightAxis.roll.angle
-        const flightAxisMatch = target.match(/^override\.flightAxis\.(roll|pitch|yaw)\.(angle|rate)$/);
-        if (flightAxisMatch) {
-          const axis = flightAxisMatch[1];
-          const type = flightAxisMatch[2];
-          return type === 'angle' ? OPERATION.FLIGHT_AXIS_ANGLE_OVERRIDE : OPERATION.FLIGHT_AXIS_RATE_OVERRIDE;
-        }
-
-        throw new Error(`Unknown override target: ${target}`);
+      // Use centralized API mapping instead of hardcoded values
+      const entry = this.operandMapping[normalizedTarget];
+      if (entry?.operation) {
+        return entry.operation;
       }
 
-      return operation;
+      throw new Error(`Unknown override target: ${target}`);
     }
 
   /**
    * Build variable map from VariableHandler for storage and decompilation
    * This allows variable names to be preserved between sessions
-   * @returns {Object} Variable map with let_variables and var_variables
+   * @returns {Object} Variable map with let_variables, var_variables, and latch_variables
    */
   buildVariableMap() {
     const map = {
       let_variables: {},
-      var_variables: {}
+      var_variables: {},
+      latch_variables: {}  // Track latch variables structurally (for sticky/timer state)
     };
 
     if (!this.variableHandler || !this.variableHandler.symbols) {
@@ -748,14 +979,42 @@ class INAVCodeGenerator {
 
     for (const [name, symbol] of this.variableHandler.symbols.entries()) {
       if (symbol.kind === 'let') {
-        map.let_variables[name] = {
-          expression: this.astToExpressionString(symbol.expressionAST),
-          type: 'let'
-        };
+        const lcIndex = this.variableHandler.letVariableLCIndices.get(name);
+
+        // Only include variables that generated LCs (were actually used)
+        // Variables that were fully inlined or unused won't have LC indices
+        if (lcIndex === undefined) {
+          continue;
+        }
+
+        const expression = this.astToExpressionString(symbol.expressionAST);
+
+        // Skip expressions that contain invalid/unknown parts
+        // These happen when AST references other variables that were also inlined
+        if (expression.includes('undefined') || expression.includes('/* unknown expression */')) {
+          // Still store the variable, but with a placeholder expression
+          // The lcIndex is what matters for decompiler name matching
+          map.let_variables[name] = {
+            expression: '/* expression unavailable */',
+            lcIndex: lcIndex,
+            type: 'let'
+          };
+        } else {
+          map.let_variables[name] = {
+            expression: expression,
+            lcIndex: lcIndex,
+            type: 'let'
+          };
+        }
       } else if (symbol.kind === 'var') {
         map.var_variables[name] = {
           gvar: symbol.gvarIndex,
           expression: this.astToExpressionString(symbol.expressionAST)
+        };
+      } else if (symbol.kind === 'latch') {
+        // Latch variables reference LC indices, not gvar slots
+        map.latch_variables[name] = {
+          lcIndex: symbol.lcIndex
         };
       }
     }
@@ -821,6 +1080,12 @@ class INAVCodeGenerator {
         const args = (ast.arguments || []).map(arg => this.astToExpressionString(arg)).join(', ');
         return `${callee}(${args})`;
       }
+
+      case 'ConditionalExpression':
+        return `${this.astToExpressionString(ast.test)} ? (${this.astToExpressionString(ast.consequent)}) : ${this.astToExpressionString(ast.alternate)}`;
+
+      case 'LogicalExpression':
+        return `(${this.astToExpressionString(ast.left)} ${ast.operator} ${this.astToExpressionString(ast.right)})`;
 
       default:
         // Fallback: try to extract value property if available

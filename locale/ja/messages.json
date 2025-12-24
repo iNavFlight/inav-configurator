@@ -22,6 +22,10 @@
         "message": "简体中文",
         "_comment": "Don't translate!"
     },
+    "language_ru": {
+        "message": "Русский",
+        "_comment": "Don't translate!"
+    },
     "language": {
         "message": "言語選択"
     },
@@ -6150,5 +6154,65 @@
     },
     "currentLanguage": {
         "message": "ja"
+    },
+    "tabJavaScriptProgramming": {
+        "message": "JavaScriptプログラミング"
+    },
+    "javascriptProgrammingDescription": {
+        "message": "JavaScriptコードを記述して機体を制御します。トランスパイラがコードをINAVロジックコンディションに変換します。"
+    },
+    "javascriptBetaWarning": {
+        "message": "<strong>JavaScriptを書いて、INAVロジックコンディションを取得！</strong>使い慣れたJavaScript構文を、完全なオートコンプリートとエラーチェック機能とともに使用できます。<strong>現在ベータテスト中です。安全性が重要なアプリケーションには使用しないでください！</strong>"
+    },
+    "javascriptEditorTitle": {
+        "message": "JavaScriptエディタ（shift-ctrl-vで貼り付け、右クリックで変数名変更）"
+    },
+    "javascriptLoadExample": {
+        "message": "サンプルを読み込む："
+    },
+    "javascriptSelectExample": {
+        "message": "-- サンプルを選択 --"
+    },
+    "javascriptTranspile": {
+        "message": "INAVにトランスパイル"
+    },
+    "javascriptLoad": {
+        "message": "FCから読み込む"
+    },
+    "javascriptSave": {
+        "message": "FCに保存"
+    },
+    "javascriptClear": {
+        "message": "エディタをクリア"
+    },
+    "javascriptOutputTitle": {
+        "message": "INAVロジックコンディション出力"
+    },
+    "javascriptLcCount": {
+        "message": "$1 / $2 LC"
+    },
+    "javascriptOptimizationsApplied": {
+        "message": "適用された最適化："
+    },
+    "javascriptApiReference": {
+        "message": "APIリファレンスと例"
+    },
+    "javascriptQuickReference": {
+        "message": "クイックリファレンス"
+    },
+    "javascriptFlightParameters": {
+        "message": "飛行パラメータ（読み取り専用）"
+    },
+    "javascriptRcChannels": {
+        "message": "RCチャンネル"
+    },
+    "javascriptOverrides": {
+        "message": "オーバーライド（書き込み）"
+    },
+    "javascriptGlobalVariables": {
+        "message": "グローバル変数"
+    },
+    "javascriptCompleteExample": {
+        "message": "完全な例"
     }
 }

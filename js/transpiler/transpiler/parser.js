@@ -10,6 +10,7 @@
 
 import * as acorn from 'acorn';
 import { VariableHandler } from './variable_handler.js';
+import { extractValue as sharedExtractValue, extractIdentifier as sharedExtractIdentifier } from './expression_utils.js';
 
 /**
  * JavaScript Parser for INAV subset
@@ -229,21 +230,35 @@ class JavaScriptParser {
   }
 
   /**
-   * Transform variable declaration (const { flight } = inav, let x = ..., var y = ...)
+   * Transform variable declaration (let x = ..., var y = sticky(...), etc.)
    */
   transformVariableDeclaration(node) {
-    // Look for: const { ... } = inav
+    // Check for: var latch1 = sticky({on: ..., off: ...}) or var latch1 = inav.events.sticky({on: ..., off: ...})
     if (node.declarations.length === 1) {
       const decl = node.declarations[0];
-      if (decl.id && decl.id.type === 'ObjectPattern' &&
+      if (decl.id && decl.id.type === 'Identifier' &&
           decl.init &&
-          decl.init.type === 'Identifier' &&
-          decl.init.name === 'inav') {
-        return {
-          type: 'Destructuring',
-          loc: node.loc,
-          range: node.range
-        };
+          decl.init.type === 'CallExpression' &&
+          decl.init.callee) {
+
+        // Check if callee is sticky() or inav.events.sticky()
+        const isStickyCall =
+          (decl.init.callee.type === 'Identifier' && decl.init.callee.name === 'sticky') ||
+          (decl.init.callee.type === 'MemberExpression' &&
+           decl.init.callee.object && decl.init.callee.object.type === 'MemberExpression' &&
+           decl.init.callee.object.object && decl.init.callee.object.object.name === 'inav' &&
+           decl.init.callee.object.property && decl.init.callee.object.property.name === 'events' &&
+           decl.init.callee.property && decl.init.callee.property.name === 'sticky');
+
+        if (isStickyCall) {
+          return {
+            type: 'StickyAssignment',
+            target: decl.id.name,
+            args: decl.init.arguments,
+            loc: node.loc,
+            range: node.range
+          };
+        }
       }
     }
 
@@ -251,8 +266,10 @@ class JavaScriptParser {
     const varDecl = this.variableHandler.extractVariableDeclaration(node);
     if (varDecl) {
       // Transform the initExpr from Acorn AST to our format
+      // Use transformCondition() to preserve AST structure for condition generation
+      // (transformExpression() returns strings for simple values, which breaks const variable resolution)
       if (varDecl.initExpr) {
-        varDecl.initExpr = this.transformExpression(varDecl.initExpr);
+        varDecl.initExpr = this.transformCondition(varDecl.initExpr);
       }
       return varDecl;
     }
@@ -320,6 +337,19 @@ class JavaScriptParser {
         expr.callee.property) {
       const handler = `on.${expr.callee.property.name}`;
       return this.transformEventHandler(handler, expr.arguments, loc, range);
+    }
+
+    // inav.events.edge(...), inav.events.sticky(...), etc.
+    if (expr.callee.type === 'MemberExpression' &&
+        expr.callee.object && expr.callee.object.type === 'MemberExpression' &&
+        expr.callee.object.object && expr.callee.object.object.name === 'inav' &&
+        expr.callee.object.property && expr.callee.object.property.name === 'events' &&
+        expr.callee.property) {
+      const fnName = expr.callee.property.name;
+      if (fnName === 'edge' || fnName === 'sticky' || fnName === 'delay' ||
+          fnName === 'timer' || fnName === 'whenChanged') {
+        return this.transformHelperFunction(fnName, expr.arguments, loc, range);
+      }
     }
 
     // edge(...), sticky(...), delay(...), timer(...), whenChanged(...)
@@ -473,6 +503,28 @@ class JavaScriptParser {
       };
     }
 
+    // Handle call expressions: approxEqual(), xor(), nand(), nor(), edge(), delay(), delta()
+    // Arguments need to be transformed as conditions (preserving AST structure)
+    // so condition_generator.generate() can properly dispatch on their types
+    if (expr.type === 'CallExpression') {
+      return {
+        type: 'CallExpression',
+        callee: expr.callee,
+        arguments: expr.arguments.map(arg => this.transformCondition(arg))
+      };
+    }
+
+    // Handle ternary expressions in conditions: a ? b : c
+    // Used for XOR pattern: (a) ? !(b) : (b)
+    if (expr.type === 'ConditionalExpression') {
+      return {
+        type: 'ConditionalExpression',
+        test: this.transformCondition(expr.test),
+        consequent: this.transformCondition(expr.consequent),
+        alternate: this.transformCondition(expr.alternate)
+      };
+    }
+
     return null;
   }
 
@@ -517,12 +569,39 @@ class JavaScriptParser {
       };
     }
 
-    // Handle unary expressions: -x
+    // Handle unary expressions: -x, !x
     if (expr.type === 'UnaryExpression') {
       if (expr.operator === '-') {
         const val = this.transformExpression(expr.argument);
         return typeof val === 'number' ? -val : { type: 'UnaryExpression', operator: '-', argument: expr.argument };
       }
+      if (expr.operator === '!') {
+        return {
+          type: 'UnaryExpression',
+          operator: '!',
+          argument: this.transformExpression(expr.argument)
+        };
+      }
+    }
+
+    // Handle logical expressions: a && b, a || b
+    if (expr.type === 'LogicalExpression') {
+      return {
+        type: 'LogicalExpression',
+        operator: expr.operator,
+        left: this.transformExpression(expr.left),
+        right: this.transformExpression(expr.right)
+      };
+    }
+
+    // Handle ternary expressions: a ? b : c
+    if (expr.type === 'ConditionalExpression') {
+      return {
+        type: 'ConditionalExpression',
+        test: this.transformCondition(expr.test),
+        consequent: this.transformExpression(expr.consequent),
+        alternate: this.transformExpression(expr.alternate)
+      };
     }
 
     return null;
@@ -539,6 +618,15 @@ class JavaScriptParser {
       if (expr && expr.type === 'AssignmentExpression') {
         return this.transformAssignment(expr, stmt.loc, stmt.range);
       }
+      // Handle update expressions (++, --) inside if bodies
+      if (expr && expr.type === 'UpdateExpression') {
+        return this.transformUpdateExpression(expr, stmt.loc, stmt.range);
+      }
+    }
+
+    // Support variable declarations in bodies (var latch1 = sticky({...}), let x = ...)
+    if (stmt.type === 'VariableDeclaration') {
+      return this.transformVariableDeclaration(stmt);
     }
 
     // Support nested if statements in bodies - recursively transform them
@@ -560,17 +648,44 @@ class JavaScriptParser {
     const target = this.extractIdentifier(expr.left);
     const rightExpr = expr.right;
 
+    // Check if right side is sticky({on: ..., off: ...}) or inav.events.sticky({on: ..., off: ...}) call
+    if (rightExpr.type === 'CallExpression' && rightExpr.callee) {
+      const isStickyCall =
+        (rightExpr.callee.type === 'Identifier' && rightExpr.callee.name === 'sticky') ||
+        (rightExpr.callee.type === 'MemberExpression' &&
+         rightExpr.callee.object && rightExpr.callee.object.type === 'MemberExpression' &&
+         rightExpr.callee.object.object && rightExpr.callee.object.object.name === 'inav' &&
+         rightExpr.callee.object.property && rightExpr.callee.object.property.name === 'events' &&
+         rightExpr.callee.property && rightExpr.callee.property.name === 'sticky');
+
+      if (isStickyCall) {
+        return {
+          type: 'StickyAssignment',
+          target,
+          args: rightExpr.arguments,
+          loc,
+          range
+        };
+      }
+    }
+
     // Check if right side is binary expression (could be arithmetic or comparison)
     if (rightExpr.type === 'BinaryExpression') {
       const operator = rightExpr.operator;
       const arithmeticOps = ['+', '-', '*', '/', '%'];
 
       if (arithmeticOps.includes(operator)) {
+        // For complex expressions (CallExpression, etc.), preserve the full AST node
+        // rather than trying to extract just an identifier string
+        const leftValue = rightExpr.left.type === 'CallExpression'
+          ? rightExpr.left  // Preserve full AST for function calls
+          : this.extractIdentifier(rightExpr.left);
+
         return {
           type: 'Assignment',
           target,
           operation: operator,
-          left: this.extractIdentifier(rightExpr.left),
+          left: leftValue,
           right: this.extractValue(rightExpr.right),
           loc,
           range
@@ -590,57 +705,21 @@ class JavaScriptParser {
 
   /**
    * Extract identifier/property path from expression
+   * Delegates to shared implementation in expression_utils.js
    */
   extractIdentifier(expr) {
-    if (!expr) return '';
-
-    if (expr.type === 'Identifier') {
-      return expr.name;
-    }
-
-    if (expr.type === 'MemberExpression') {
-      const object = this.extractIdentifier(expr.object);
-
-      if (expr.computed) {
-        // Computed access: gvar[0] or obj[prop]
-        const property = this.extractValue(expr.property);
-        return `${object}[${property}]`;
-      } else {
-        // Dot access: flight.altitude
-        const property = expr.property && expr.property.name ?
-          expr.property.name : '';
-        return property ? `${object}.${property}` : object;
-      }
-    }
-
-    return '';
+    return sharedExtractIdentifier(expr, (e) => this.extractValue(e));
   }
 
   /**
    * Extract value from expression
+   * Delegates to shared implementation in expression_utils.js
+   * Adds CallExpression handling specific to parser
    */
   extractValue(expr) {
-    if (!expr) return null;
-
-    if (expr.type === 'Literal') {
-      return expr.value;
-    }
-
-    if (expr.type === 'Identifier') {
-      return expr.name;
-    }
-
-    if (expr.type === 'MemberExpression') {
-      return this.extractIdentifier(expr);
-    }
-
-    if (expr.type === 'UnaryExpression' && expr.operator === '-') {
-      // Handle negative numbers
-      const val = this.extractValue(expr.argument);
-      return typeof val === 'number' ? -val : val;
-    }
-
-    return null;
+    return sharedExtractValue(expr, {
+      onCallExpression: (e) => this.transformExpression(e)
+    });
   }
 }
 
