@@ -854,7 +854,7 @@ class Decompiler {
         lines.push(indentStr + '});');
       },
       'whenChanged': () => {
-        lines.push(indentStr + `delta(${pattern.value}, ${pattern.threshold}, () => {`);
+        lines.push(indentStr + `whenChanged(${pattern.value}, ${pattern.threshold}, () => {`);
         if (body) lines.push(body);
         lines.push(indentStr + '});');
       }

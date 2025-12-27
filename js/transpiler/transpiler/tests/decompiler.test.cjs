@@ -705,5 +705,107 @@ if (inav.flight.gpsValid === 1) {
   });
 });
 
+describe('OPERAND_TYPE.LC in handleNot', () => {
+  let decompiler;
+
+  beforeEach(() => {
+    decompiler = new Decompiler();
+  });
+
+  test('should decompile NOT(EQUAL) as !== using LC reference', () => {
+    // This tests that OPERAND_TYPE.LC (value 4) is correctly used in handleNot
+    // to recognize when operandA references another Logic Condition
+    const conditions = [
+      // LC 0: flight.vbat === 100
+      {
+        index: 0,
+        enabled: 1,
+        activatorId: -1,
+        operation: 1, // EQUAL
+        operandAType: 2, // FLIGHT
+        operandAValue: 4, // VBAT
+        operandBType: 0, // VALUE
+        operandBValue: 100
+      },
+      // LC 1: NOT(LC 0) - should become flight.vbat !== 100
+      {
+        index: 1,
+        enabled: 1,
+        activatorId: -1,
+        operation: 12, // NOT
+        operandAType: 4, // OPERAND_TYPE.LC - this is what we're testing
+        operandAValue: 0, // Reference to LC 0
+        operandBType: 0,
+        operandBValue: 0
+      },
+      // LC 2: Action activated by the NOT condition
+      {
+        index: 2,
+        enabled: 1,
+        activatorId: 1,
+        operation: 18, // GVAR_SET
+        operandAType: 0,
+        operandAValue: 0,
+        operandBType: 0,
+        operandBValue: 1
+      }
+    ];
+
+    const result = decompiler.decompile(conditions);
+
+    expect(result.success).toBe(true);
+    // handleNot should recognize LC reference and optimize NOT(EQUAL) to !==
+    expect(result.code).toContain('!==');
+    expect(result.code).toContain('flight.vbat');
+    expect(result.code).toContain('100');
+  });
+});
+
+describe('whenChanged (DELTA operation)', () => {
+  let decompiler;
+
+  beforeEach(() => {
+    decompiler = new Decompiler();
+  });
+
+  test('should decompile DELTA operation as whenChanged()', () => {
+    // DELTA operation monitors a value and triggers when it changes by threshold
+    // whenChanged(flight.vbat, 100, () => { gvar[0] = 1; })
+    const conditions = [
+      // LC 0: DELTA operation - monitors vbat changes > 100
+      {
+        index: 0,
+        enabled: 1,
+        activatorId: -1,
+        operation: 50, // DELTA
+        operandAType: 2, // FLIGHT
+        operandAValue: 4, // FLIGHT_PARAM.VBAT
+        operandBType: 0, // VALUE
+        operandBValue: 100 // threshold
+      },
+      // LC 1: Action - set gvar[0] = 1 when delta triggers
+      {
+        index: 1,
+        enabled: 1,
+        activatorId: 0,
+        operation: 18, // GVAR_SET
+        operandAType: 0, // VALUE
+        operandAValue: 0, // gvar index
+        operandBType: 0, // VALUE
+        operandBValue: 1
+      }
+    ];
+
+    const result = decompiler.decompile(conditions);
+
+    expect(result.success).toBe(true);
+    // Should output whenChanged(), not delta()
+    expect(result.code).toContain('whenChanged(');
+    expect(result.code).not.toContain('delta(');
+    expect(result.code).toContain('flight.vbat');
+    expect(result.code).toContain('100');
+  });
+});
+
 // Export the load function for the runner
 module.exports = { loadDecompiler };
