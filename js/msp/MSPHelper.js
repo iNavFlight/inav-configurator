@@ -297,14 +297,14 @@ var mspHelper = (function () {
 
                 // stabilized
                 FC.RC_tuning.RC_EXPO = parseFloat((data.getUint8(offset++) / 100).toFixed(2));
-                FC.RC_tuning.RC_YAW_EXPO = parseFloat((data.getUint8(offset++) / 100).toFixed(2));
+                FC.RC_tuning.RC_YAW_EXPO = parseFloat((data.getInt8(offset++) / 100).toFixed(2));
                 FC.RC_tuning.roll_rate = data.getUint8(offset++) * 10;
                 FC.RC_tuning.pitch_rate = data.getUint8(offset++) * 10;
                 FC.RC_tuning.yaw_rate = data.getUint8(offset++) * 10;
 
                 // manual
                 FC.RC_tuning.manual_RC_EXPO = parseFloat((data.getUint8(offset++) / 100).toFixed(2));
-                FC.RC_tuning.manual_RC_YAW_EXPO = parseFloat((data.getUint8(offset++) / 100).toFixed(2));
+                FC.RC_tuning.manual_RC_YAW_EXPO = parseFloat((data.getInt8(offset++) / 100).toFixed(2));
                 FC.RC_tuning.manual_roll_rate = data.getUint8(offset++);
                 FC.RC_tuning.manual_pitch_rate = data.getUint8(offset++);
                 FC.RC_tuning.manual_yaw_rate = data.getUint8(offset++);
