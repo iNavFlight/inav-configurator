@@ -2117,7 +2117,8 @@
     },
     "language_de": {
         "message": "Deutsch",
-        "_comment": "Don't translate!"
+        "_comment": "Don't translate!",
+        "comment": "Don't translate!"
     },
     "motors": {
         "message": "Моторы"
@@ -6204,7 +6205,7 @@
         "message": "Индикатор вертикальной скорости"
     },
     "osdElement_VERTICAL_SPEED_INDICATOR_HELP": {
-        "message": "Отображает вертикальную скорость в виде числа."
+        "message": "Отображает вертикальную скорость в виде числа"
     },
     "osdPanServoRangeDecadegrees": {
         "message": "Общий угол поворота сервопривода панорамирования"
@@ -6216,25 +6217,10 @@
         "message": "Профиль управления будет использовать тот же индекс, что и индекс профиля микшера"
     },
     "mixer_control_profile_linking_hint": {
-        "message": "mixer_control_profile_linking: Включите эту опцию в обоих профилях микшера, если вы хотите, чтобы переключение профиля управления осуществлялось при переключении профиля микшера. (Рекомендуется для конфигураций VTOL или смешанных платформ)."
+        "message": "mixer_control_profile_linking: Включите эту опцию в обоих профилях микшера, если вы хотите, чтобы переключение профиля управления осуществлялось при переключении профиля микшера. (Рекомендуется для конфигураций VTOL или смешанных платформ)"
     },
     "tabJavaScriptProgramming": {
         "message": "Программирование (JavaScript)"
-    },
-    "javascriptProgrammingDescription": {
-        "message": "Пишите код на JavaScript для управления летательным аппаратом. Транспилятор преобразует ваш код в логические условия INAV."
-    },
-    "javascriptBetaWarning": {
-        "message": "<strong>Пишите JavaScript, получайте логические условия INAV!</strong> Используйте привычный синтаксис JavaScript с полным автодополнением и проверкой ошибок. <strong>В настоящее время находится в стадии бета-тестирования. Не используйте для критически важных приложений!</strong>"
-    },
-    "javascriptEditorTitle": {
-        "message": "Редактор JavaScript (shift-ctrl-v для вставки, правый клик по переменной для переименования)"
-    },
-    "javascriptLoadExample": {
-        "message": "Загрузить пример:"
-    },
-    "javascriptSelectExample": {
-        "message": "-- Выберите пример --"
     },
     "javascriptTranspile": {
         "message": "Транспилировать (преобразовать) для INAV"
@@ -6248,14 +6234,29 @@
     "javascriptClear": {
         "message": "Очистить редактор"
     },
+    "options_disable3dAcceleration": {
+        "message": "Отключить 3D-ускорение, если 3D-модели не отображаются. Для применения настроек требуется перезапуск приложения."
+    },
+    "javascriptProgrammingDescription": {
+        "message": "Используйте JavaScript-код для управления вашим летательным аппаратом. Транспилер преобразует ваш код в «Логические условия» прошивки INAV."
+    },
+    "javascriptBetaWarning": {
+        "message": "<strong>Пишите на JavaScript — получайте логические условия INAV!</strong> Используйте привычный синтаксис JavaScript с полной поддержкой автодополнения и проверки ошибок. <strong>На данный момент функция находится в режиме бета-тестирования. Не используйте её для задач, критически важных для безопасности полетов!</strong>"
+    },
+    "javascriptEditorTitle": {
+        "message": "Редактор JavaScript (Ctrl+Shift+V для вставки; чтобы переименовать переменную, щёлкните по ней правой кнопкой мыши)"
+    },
+    "javascriptLoadExample": {
+        "message": "Загрузить пример:"
+    },
+    "javascriptSelectExample": {
+        "message": "-- Выбрать пример --"
+    },
     "javascriptOutputTitle": {
-        "message": "Выходные данные логических условий INAV"
+        "message": "Результат: Логические условия"
     },
     "javascriptLcCount": {
-        "message": "$1 / $2 ЛУ"
-    },
-    "javascriptOptimizationsApplied": {
-        "message": "Применённые оптимизации:"
+        "message": "$1 / $2 логических условий"
     },
     "javascriptApiReference": {
         "message": "Справочник API и примеры"
@@ -6264,10 +6265,10 @@
         "message": "Краткий справочник"
     },
     "javascriptFlightParameters": {
-        "message": "Параметры полёта (только чтение)"
+        "message": "Параметры полёта (только для чтения)"
     },
     "javascriptRcChannels": {
-        "message": "Каналы RC"
+        "message": "RC-каналы"
     },
     "javascriptOverrides": {
         "message": "Переопределения (запись)"
@@ -6276,6 +6277,6 @@
         "message": "Глобальные переменные"
     },
     "javascriptCompleteExample": {
-        "message": "Полный пример"
+        "message": "Готовый пример"
     }
 }
