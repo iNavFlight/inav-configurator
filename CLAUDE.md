@@ -39,7 +39,7 @@ inav-configurator/
 │   └── transpiler/             # Logic conditions compiler
 ├── src/css/                # Stylesheets
 │   └── tabs/                   # Per-tab styles
-├── locale/                 # i18n translations (en, ja, uk, zh_CN)
+├── locale/                 # i18n translations (en, ja, ru, uk, zh_CN)
 ├── resources/              # 3D models, OSD fonts, SITL binaries
 ├── index.html              # Single-page app entry
 ├── forge.config.js         # Electron Forge build config
