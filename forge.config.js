@@ -49,11 +49,21 @@ export default {
     // Remove SITL binaries for other platforms/architectures to reduce package size
     postPackage: async (forgeConfig, options) => {
       for (const outputPath of options.outputPaths) {
-        // macOS has different app bundle structure: <app>/Contents/Resources/sitl
-        // Windows/Linux: <outputPath>/resources/sitl
-        const sitlPath = options.platform === 'darwin'
-          ? path.join(outputPath, 'Contents', 'Resources', 'sitl')
-          : path.join(outputPath, 'resources', 'sitl');
+        let sitlPath;
+
+        if (options.platform === 'darwin') {
+          // macOS app bundle structure: <outputDir>/<AppName>.app/Contents/Resources/sitl
+          // Find the .app directory
+          const appBundles = fs.readdirSync(outputPath).filter(f => f.endsWith('.app'));
+          if (appBundles.length === 0) {
+            console.log(`postPackage: No .app bundle found in ${outputPath}`);
+            continue;
+          }
+          sitlPath = path.join(outputPath, appBundles[0], 'Contents', 'Resources', 'sitl');
+        } else {
+          // Windows/Linux: <outputPath>/resources/sitl
+          sitlPath = path.join(outputPath, 'resources', 'sitl');
+        }
 
         console.log(`postPackage: Checking SITL path for ${options.platform}: ${sitlPath}`);
         if (!fs.existsSync(sitlPath)) {
