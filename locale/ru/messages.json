@@ -6278,5 +6278,8 @@
     },
     "javascriptCompleteExample": {
         "message": "Готовый пример"
+    },
+    "javascriptOptimizationsApplied": {
+        "message": "Применены оптимизации:"
     }
 }
