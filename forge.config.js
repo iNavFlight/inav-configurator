@@ -49,16 +49,28 @@ export default {
     // Remove SITL binaries for other platforms/architectures to reduce package size
     postPackage: async (forgeConfig, options) => {
       for (const outputPath of options.outputPaths) {
-        const sitlPath = path.join(outputPath, 'resources', 'sitl');
-        if (!fs.existsSync(sitlPath)) continue;
+        // macOS has different app bundle structure: <app>/Contents/Resources/sitl
+        // Windows/Linux: <outputPath>/resources/sitl
+        const sitlPath = options.platform === 'darwin'
+          ? path.join(outputPath, 'Contents', 'Resources', 'sitl')
+          : path.join(outputPath, 'resources', 'sitl');
+
+        console.log(`postPackage: Checking SITL path for ${options.platform}: ${sitlPath}`);
+        if (!fs.existsSync(sitlPath)) {
+          console.log(`postPackage: SITL path not found, skipping: ${sitlPath}`);
+          continue;
+        }
 
         if (options.platform === 'win32') {
+          console.log('postPackage: Removing non-Windows SITL binaries (linux, macos)');
           fs.rmSync(path.join(sitlPath, 'linux'), { recursive: true, force: true });
           fs.rmSync(path.join(sitlPath, 'macos'), { recursive: true, force: true });
         } else if (options.platform === 'darwin') {
+          console.log('postPackage: Removing non-macOS SITL binaries (linux, windows)');
           fs.rmSync(path.join(sitlPath, 'linux'), { recursive: true, force: true });
           fs.rmSync(path.join(sitlPath, 'windows'), { recursive: true, force: true });
         } else if (options.platform === 'linux') {
+          console.log('postPackage: Removing non-Linux SITL binaries (macos, windows)');
           fs.rmSync(path.join(sitlPath, 'macos'), { recursive: true, force: true });
           fs.rmSync(path.join(sitlPath, 'windows'), { recursive: true, force: true });
           // Remove wrong architecture
