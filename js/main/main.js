@@ -280,8 +280,35 @@ app.whenReady().then(() => {
     return dialog.showOpenDialog(options);
   }),
 
-  ipcMain.handle('dialog.showSaveDialog', (_event, options) => {
-    return dialog.showSaveDialog(options);
+  ipcMain.handle('dialog.showSaveDialog', async (_event, options) => {
+    const opts = options || {};
+    const LAST_SAVE_DIRECTORY_KEY = 'lastSaveDirectory';
+
+    // Get the last save directory from store
+    const lastDirectory = store.get(LAST_SAVE_DIRECTORY_KEY, null);
+
+    // If we have a last directory, combine it with the filename if one was provided
+    if (lastDirectory && opts.defaultPath) {
+      // If defaultPath is just a filename (no directory), prepend the last directory
+      if (!path.dirname(opts.defaultPath) || path.dirname(opts.defaultPath) === '.') {
+        opts.defaultPath = path.join(lastDirectory, opts.defaultPath);
+      }
+    } else if (lastDirectory && !opts.defaultPath) {
+      // No filename provided, just use the directory
+      opts.defaultPath = lastDirectory;
+    }
+
+    // Show the save dialog
+    const result = await dialog.showSaveDialog(opts);
+
+    // If user selected a file (didn't cancel), save the directory for next time
+    if (result && result.filePath && !result.canceled) {
+      // Extract directory from the full file path (path already imported at top)
+      const directory = path.dirname(result.filePath);
+      store.set(LAST_SAVE_DIRECTORY_KEY, directory);
+    }
+
+    return result;
   }),
 
   ipcMain.on('dialog.alert', (event, message) => {
