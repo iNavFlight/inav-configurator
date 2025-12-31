@@ -297,14 +297,14 @@ class ConditionGenerator {
         return this.generateBinary({
           ...condition,
           operator: '>',
-          right: constValue - 1
+          right: { type: 'Literal', value: constValue - 1 }
         }, activatorId);
       } else {
         // x <= 5 → x < 6
         return this.generateBinary({
           ...condition,
           operator: '<',
-          right: constValue + 1
+          right: { type: 'Literal', value: constValue + 1 }
         }, activatorId);
       }
     }

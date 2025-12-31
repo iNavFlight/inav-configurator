@@ -525,12 +525,9 @@ class SemanticAnalyzer {
     let stmtIndex = 0;
     for (const stmt of ast.statements) {
       if (stmt && stmt.type === 'EventHandler') {
-        // Each if statement gets a unique key - we want to detect multiple
-        // assignments within the SAME if block, not across different if
-        // statements that happen to have the same condition
-        const handlerKey = stmt.handler === 'ifthen' ?
-          `ifthen:${stmtIndex}` :
-          stmt.handler;
+        // Each handler gets a unique key - we want to detect multiple
+        // assignments within the SAME handler, not across different handlers
+        const handlerKey = `${stmt.handler}:${stmtIndex}`;
 
         if (!handlerAssignments.has(handlerKey)) {
           handlerAssignments.set(handlerKey, new Map());
