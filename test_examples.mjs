@@ -19,14 +19,16 @@ for (const [name, example] of Object.entries(examples)) {
     const transpiler = new Transpiler();
     const result = transpiler.transpile(example.code);
 
-    if (result.errors && result.errors.length > 0) {
+    // Check warnings.errors for semantic/validation errors
+    const errors = result.warnings?.errors ?? [];
+    if (errors.length > 0) {
       failCount++;
       failures.push({
         name,
-        errors: result.errors
+        errors: errors
       });
-      console.log(`❌ ${name}: ${result.errors.length} error(s)`);
-      result.errors.forEach(err => {
+      console.log(`❌ ${name}: ${errors.length} error(s)`);
+      errors.forEach(err => {
         console.log(`   Line ${err.line}: ${err.message}`);
       });
     } else {
