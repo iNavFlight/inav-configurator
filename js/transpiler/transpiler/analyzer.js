@@ -197,8 +197,14 @@ class SemanticAnalyzer {
       // Variable assignment - allowed for var variables
       // (let reassignment already caught above)
     } else if (!this.isValidWritableProperty(stmt.target)) {
-      // Use original target (with inav. prefix) for writability check
-      this.addError(`Cannot assign to '${stmt.target}'. Not a valid INAV writable property.`, line);
+      // Check if it's an intermediate object and provide helpful error
+      const betterError = this.getImprovedWritabilityError(stmt.target, line);
+      if (betterError) {
+        this.addError(betterError, line);
+      } else {
+        // Use original target (with inav. prefix) for writability check
+        this.addError(`Cannot assign to '${stmt.target}'. Not a valid INAV writable property.`, line);
+      }
     }
 
     // Check if value references are valid
@@ -368,7 +374,99 @@ class SemanticAnalyzer {
   extractGvarIndex(gvarStr) {
     return this.propertyAccessChecker.extractGvarIndex(gvarStr);
   }
-  
+
+  /**
+   * Generate improved error message for invalid writable property assignments
+   * Detects intermediate objects and suggests correct nested properties
+   * @param {string} target - Property path (e.g., "inav.override.flightAxis.yaw")
+   * @param {number} line - Line number for error reporting
+   * @returns {string|null} Improved error message or null if no improvement available
+   */
+  getImprovedWritabilityError(target, line) {
+    // Strip 'inav.' prefix if present
+    const normalizedTarget = target.startsWith('inav.') ? target.substring(5) : target;
+    const parts = normalizedTarget.split('.');
+
+    // Only applies to override namespace for now
+    if (parts[0] !== 'override') {
+      return null;
+    }
+
+    const apiObj = this.inavAPI['override'];
+    if (!apiObj) {
+      return null;
+    }
+
+    // Check if trying to assign to an intermediate object
+    // E.g., override.flightAxis.yaw (should be override.flightAxis.yaw.angle or .rate)
+    if (parts.length === 3 && apiObj.nested && apiObj.nested[parts[1]]) {
+      // Check if parts[2] is itself an object with nested properties
+      const overrideDef = this.getOverrideDefinition(parts[1], parts[2]);
+
+      if (overrideDef && overrideDef.properties) {
+        const availableProps = Object.keys(overrideDef.properties);
+        const suggestions = availableProps.map(p => `inav.override.${parts[1]}.${parts[2]}.${p}`).join('\n  - ');
+        return `Cannot assign to '${target}' - it's an object. Did you mean:\n  - ${suggestions}`;
+      }
+    }
+
+    // Check if trying to assign to a top-level intermediate object
+    // E.g., override.flightAxis (should be override.flightAxis.roll.angle, etc.)
+    if (parts.length === 2) {
+      const categoryDef = this.getOverrideCategoryDefinition(parts[1]);
+
+      if (categoryDef && categoryDef.properties) {
+        // It's a nested object category - list some examples
+        const firstProp = Object.keys(categoryDef.properties)[0];
+        const firstSubDef = categoryDef.properties[firstProp];
+
+        if (firstSubDef && firstSubDef.properties) {
+          const exampleProp = Object.keys(firstSubDef.properties)[0];
+          return `Cannot assign to '${target}' - it's an object. Did you mean something like:\n  - inav.override.${parts[1]}.${firstProp}.${exampleProp}`;
+        }
+      }
+    }
+
+    return null;
+  }
+
+  /**
+   * Get override definition for a specific property
+   * @private
+   */
+  getOverrideDefinition(category, property) {
+    try {
+      const overrideAPI = this.inavAPI['override'];
+      if (!overrideAPI) return null;
+
+      // Import override definitions dynamically
+      const overrideDefs = overrideAPI;
+
+      if (overrideDefs[category] && overrideDefs[category].properties) {
+        return overrideDefs[category].properties[property];
+      }
+
+      return null;
+    } catch (error) {
+      return null;
+    }
+  }
+
+  /**
+   * Get override category definition
+   * @private
+   */
+  getOverrideCategoryDefinition(category) {
+    try {
+      const overrideAPI = this.inavAPI['override'];
+      if (!overrideAPI) return null;
+
+      return overrideAPI[category];
+    } catch (error) {
+      return null;
+    }
+  }
+
   /**
    * Check for common unsupported JavaScript features
    */

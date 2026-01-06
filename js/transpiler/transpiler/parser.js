@@ -361,7 +361,44 @@ class JavaScriptParser {
       }
     }
 
+    // Unrecognized function call - generate error instead of silently dropping
+    const calleeName = this.extractCalleeNameForError(expr.callee);
+    const line = loc ? loc.start.line : 0;
+    this.addError(`Cannot call '${calleeName}' as a function. Not a valid INAV function.`, line);
+
     return null;
+  }
+
+  /**
+   * Extract callee name for error messages
+   * @private
+   */
+  extractCalleeNameForError(callee) {
+    if (callee.type === 'Identifier') {
+      return callee.name;
+    }
+    if (callee.type === 'MemberExpression') {
+      // Try to reconstruct the full path
+      const parts = [];
+      let current = callee;
+
+      while (current) {
+        if (current.type === 'MemberExpression') {
+          if (current.property) {
+            parts.unshift(current.property.name || current.property.value);
+          }
+          current = current.object;
+        } else if (current.type === 'Identifier') {
+          parts.unshift(current.name);
+          break;
+        } else {
+          break;
+        }
+      }
+
+      return parts.join('.');
+    }
+    return '<unknown>';
   }
 
   /**

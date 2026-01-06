@@ -203,12 +203,48 @@ class PropertyAccessChecker {
 
       // Check if it's a nested object
       if (apiObj.nested[propertyPart]) {
+        // Must have a nested property - can't use intermediate object directly
+        if (parts.length === startIndex + 1) {
+          // Accessing intermediate object without going deeper
+          const nestedProps = apiObj.nested[propertyPart];
+          const suggestions = nestedProps.slice(0, 3).map(p => `inav.${apiCategory}.${propertyPart}.${p}`).join(', ');
+          this.addError(
+            `Cannot use 'inav.${propPath}' - it's an object, not a property. ` +
+            `Available properties: ${suggestions}${nestedProps.length > 3 ? ', ...' : ''}`,
+            line
+          );
+          return;
+        }
+
         // Check nested property if present
         if (parts.length > startIndex + 1) {
           const nestedPart = parts[startIndex + 1];
           const nestedProps = apiObj.nested[propertyPart];
+
+          // Check if nested part is ALSO an object (3-level nesting like override.flightAxis.yaw)
+          // Need to check the API definition to see if this is a leaf or another object
           if (!nestedProps.includes(nestedPart)) {
             this.addError(`Unknown property '${nestedPart}' in 'inav.${propPath}'. Available: ${nestedProps.join(', ')}`, line);
+            return;
+          }
+
+          // Check if we stopped at a nested object (e.g., override.flightAxis.yaw instead of override.flightAxis.yaw.angle)
+          if (parts.length === startIndex + 2) {
+            // Need to check if nestedPart is itself an object
+            // This requires checking the actual API definition structure
+            const isNestedObject = this.isPropertyAnObject(apiCategory, propertyPart, nestedPart);
+            if (isNestedObject) {
+              const deeperProps = this.getNestedObjectProperties(apiCategory, propertyPart, nestedPart);
+              if (deeperProps && deeperProps.length > 0) {
+                const suggestions = deeperProps.slice(0, 3).map(p => `inav.${apiCategory}.${propertyPart}.${nestedPart}.${p}`).join(', ');
+                this.addError(
+                  `Cannot use 'inav.${propPath}' - it's an object, not a property. ` +
+                  `Available properties: ${suggestions}${deeperProps.length > 3 ? ', ...' : ''}`,
+                  line
+                );
+                return;
+              }
+            }
           }
         }
         return;
@@ -285,6 +321,59 @@ class PropertyAccessChecker {
   extractGvarIndex(gvarStr) {
     const match = gvarStr.match(/gvar\[(\d+)\]/);
     return match ? parseInt(match[1]) : -1;
+  }
+
+  /**
+   * Check if a property is itself an object (not a leaf value)
+   * Used to detect 3-level nested objects like override.flightAxis.yaw
+   * @param {string} category - API category (e.g., 'override')
+   * @param {string} parentProp - Parent property (e.g., 'flightAxis')
+   * @param {string} childProp - Child property (e.g., 'yaw')
+   * @returns {boolean} True if childProp is an object with more properties
+   * @private
+   */
+  isPropertyAnObject(category, parentProp, childProp) {
+    try {
+      const apiCategory = this.inavAPI[category];
+      if (!apiCategory) return false;
+
+      // Get the definition from the category
+      const categoryDef = apiCategory[parentProp];
+      if (!categoryDef || !categoryDef.properties) return false;
+
+      const childDef = categoryDef.properties[childProp];
+      if (!childDef) return false;
+
+      // Check if it has properties (making it an object)
+      return childDef.type === 'object' && childDef.properties;
+    } catch (error) {
+      return false;
+    }
+  }
+
+  /**
+   * Get properties of a nested object
+   * @param {string} category - API category (e.g., 'override')
+   * @param {string} parentProp - Parent property (e.g., 'flightAxis')
+   * @param {string} childProp - Child property (e.g., 'yaw')
+   * @returns {string[]|null} Array of property names or null
+   * @private
+   */
+  getNestedObjectProperties(category, parentProp, childProp) {
+    try {
+      const apiCategory = this.inavAPI[category];
+      if (!apiCategory) return null;
+
+      const categoryDef = apiCategory[parentProp];
+      if (!categoryDef || !categoryDef.properties) return null;
+
+      const childDef = categoryDef.properties[childProp];
+      if (!childDef || !childDef.properties) return null;
+
+      return Object.keys(childDef.properties);
+    } catch (error) {
+      return null;
+    }
   }
 }
 
