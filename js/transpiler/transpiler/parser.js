@@ -364,7 +364,7 @@ class JavaScriptParser {
     // Unrecognized function call - generate error instead of silently dropping
     const calleeName = this.extractCalleeNameForError(expr.callee);
     const line = loc ? loc.start.line : 0;
-    this.addError(`Cannot call '${calleeName}' as a function. Not a valid INAV function.`, line);
+    this.addWarning('error', `Cannot call '${calleeName}' as a function. Not a valid INAV function.`, line);
 
     return null;
   }
