@@ -60,23 +60,29 @@ class ConnectionBle extends Connection {
         return this._deviceDescription;
     }
 
-    async connectImplementation(path, options, callback) {      
-        console.log("Request BLE Device");    
+    async connectImplementation(path, options, callback) {
+        console.log("[BLE] === Starting BLE connection sequence ===");
+        console.log("[BLE] Path:", path);
+        console.log("[BLE] Options:", options);
         await this.openDevice()
             .then(() => {
+                console.log("[BLE] Device opened successfully");
                 this.addOnReceiveErrorListener(error => {
+                    console.error("[BLE] Receive error:", error);
                     GUI.log(i18n.getMessage('connectionBleInterrupted'));
                     this.abort();
                 });
 
+                console.log("[BLE] Connection complete, calling callback");
                 if (callback) {
                     callback({
                         // Dummy values
                         connectionId: 0xff,
-                        bitrate: 115200 
+                        bitrate: 115200
                     });
                 }
             }).catch(error => {
+                console.error("[BLE] Connection failed:", error);
                 GUI.log(i18n.getMessage('connectionBleError', [error]));
                 if (callback) {
                     callback(false);
@@ -87,10 +93,22 @@ class ConnectionBle extends Connection {
     }
 
     async openDevice(){
+        console.log("[BLE] Opening device (request → connect → start notifications)...");
         await this.request()
-            .then(device => this.connectBle(device))
-            .then(() => this.startNotification());
+            .then(device => {
+                console.log("[BLE] Device requested, now connecting to GATT...");
+                return this.connectBle(device);
+            })
+            .then(() => {
+                console.log("[BLE] GATT connected, starting notifications...");
+                return this.startNotification();
+            })
+            .catch(error => {
+                console.error("[BLE] openDevice failed:", error);
+                throw error;
+            });
 
+        console.log("[BLE] Device opened successfully");
         return Promise.resolve();
     };
 
@@ -99,72 +117,126 @@ class ConnectionBle extends Connection {
         BleDevices.forEach(device => {
             ids.push(device.serviceUuid)
         });
-        
+
+        console.log("[BLE] Requesting BLE device with optional services:", ids);
+
         return navigator.bluetooth.requestDevice({
             acceptAllDevices: true,
             optionalServices: ids
         }).then(device => {
-            console.log("Found BLE device: " + device.name);
+            console.log("[BLE] Found BLE device: " + device.name);
+            console.log("[BLE] Device ID: " + device.id);
+            console.log("[BLE] GATT connected: " + device.gatt.connected);
             this._device = device;
             this._handleDisconnect = event => {
+                console.log("[BLE] GATT server disconnected event fired", {
+                    deviceName: device.name,
+                    deviceId: device.id,
+                    timestamp: Date.now()
+                });
                 this._onDisconnectListeners.forEach(listener => {
                     listener("disconnected");
-                });      
+                });
             };
 
+            console.log("[BLE] Adding disconnect listener...");
             this._device.addEventListener('gattserverdisconnected', this._handleDisconnect);
             return this._device;
+        }).catch(error => {
+            console.error("[BLE] Device request failed:", {
+                message: error.message,
+                name: error.name,
+                code: error.code
+            });
+            throw error;
         });
     }
 
     connectBle(device) {
         if (device.gatt.connected && this._readCharacteristic && this._writeCharacteristic) {
+            console.log("[BLE] Already connected, reusing connection");
             return Promise.resolve();
         }
 
+        console.log("[BLE] Connecting to GATT server...");
         return device.gatt.connect()
             .then(server => {
-                console.log("Connect to: " + device.name);
+                console.log("[BLE] Connected to: " + device.name);
+                console.log("[BLE] GATT server connected:", server.connected);
                 GUI.log(i18n.getMessage('connectionConnected', [device.name]));
+                console.log("[BLE] Discovering primary services...");
                 return server.getPrimaryServices();
             }).then(services => {
+                console.log("[BLE] Found " + services.length + " services:");
+                services.forEach(service => {
+                    console.log("[BLE]   Service UUID: " + service.uuid);
+                });
+
                 let connectedService = services.find(service => {
                     this._deviceDescription = BleDevices.find(device => device.serviceUuid == service.uuid);
                     return this._deviceDescription;
                 });
 
                 if (!this._deviceDescription) {
+                    console.error("[BLE] No matching service found. Expected one of:", BleDevices.map(d => d.serviceUuid));
                     throw new Error("Unsupported device (service UUID mismatch).");
                 }
 
+                console.log("[BLE] Matched device type: " + this._deviceDescription.name);
+                console.log("[BLE] Expected write characteristic: " + this._deviceDescription.writeCharateristic);
+                console.log("[BLE] Expected read characteristic: " + this._deviceDescription.readCharateristic);
                 GUI.log(i18n.getMessage('connectionBleType', [this._deviceDescription.name]));
+
+                console.log("[BLE] Getting characteristics from service...");
                 return connectedService.getCharacteristics();
             }).then(characteristics => {
+                console.log("[BLE] Found " + characteristics.length + " characteristics:");
                 characteristics.forEach(characteristic => {
+                    console.log("[BLE]   Characteristic UUID: " + characteristic.uuid);
+                    console.log("[BLE]     Properties: read=" + characteristic.properties.read +
+                                ", write=" + characteristic.properties.write +
+                                ", writeWithoutResponse=" + characteristic.properties.writeWithoutResponse +
+                                ", notify=" + characteristic.properties.notify +
+                                ", indicate=" + characteristic.properties.indicate);
+
                     if (characteristic.uuid == this._deviceDescription.writeCharateristic) {
                         this._writeCharacteristic = characteristic;
+                        console.log("[BLE]     → This is the WRITE characteristic");
                     }
 
                     if (characteristic.uuid == this._deviceDescription.readCharateristic) {
                         this._readCharacteristic = characteristic;
+                        console.log("[BLE]     → This is the READ characteristic");
                     }
 
                     return this._writeCharacteristic && this._readCharacteristic;
                 });
 
                 if (!this._writeCharacteristic) {
+                    console.error("[BLE] Write characteristic not found! Expected: " + this._deviceDescription.writeCharateristic);
                     throw new Error("No or unexpected write charateristic found (should be " +  this._deviceDescription.writeCharateristic + ")");
                 }
 
                 if (!this._readCharacteristic) {
+                    console.error("[BLE] Read characteristic not found! Expected: " + this._deviceDescription.readCharateristic);
                     throw new Error("No or unexpected read charateristic found (should be " +  this._deviceDescription.readCharateristic + ")");
                 }
-                
+
+                console.log("[BLE] Setting up notification handler...");
                 this._handleOnCharateristicValueChanged = event => {
-                    let buffer = new Uint8Array(event.target.value.byteLength);
-                    for (var i = 0; i < event.target.value.byteLength; i++) {
-                        buffer[i] = event.target.value.getUint8(i);
+                    const value = event.target.value;
+                    let buffer = new Uint8Array(value.byteLength);
+                    for (var i = 0; i < value.byteLength; i++) {
+                        buffer[i] = value.getUint8(i);
                     }
+
+                    const hex = Array.from(buffer).map(b => b.toString(16).padStart(2, '0')).join(' ');
+                    const ascii = Array.from(buffer).map(b => (b >= 32 && b <= 126) ? String.fromCharCode(b) : '.').join('');
+
+                    console.log("[BLE] ← RECEIVED " + buffer.length + " bytes:");
+                    console.log("[BLE]   Hex:   " + hex);
+                    console.log("[BLE]   ASCII: " + ascii);
+                    console.log("[BLE]   Timestamp: " + Date.now());
 
                     this._onCharateristicValueChangedListeners.forEach(listener => {
                         listener({
@@ -174,40 +246,82 @@ class ConnectionBle extends Connection {
                     });
                 };
 
+                console.log("[BLE] Adding event listener for characteristicvaluechanged...");
                 this._readCharacteristic.addEventListener('characteristicvaluechanged', this._handleOnCharateristicValueChanged)
+                console.log("[BLE] Event listener added successfully");
                 return Promise.resolve();
-            });          
+            }).catch(error => {
+                console.error("[BLE] Connection error:", {
+                    message: error.message,
+                    name: error.name,
+                    code: error.code,
+                    stack: error.stack
+                });
+                throw error;
+            });
     }
 
     startNotification() {
         if (!this._readCharacteristic) {
+            console.error("[BLE] Cannot start notifications: No read characteristic");
             throw new Error("No read charateristic");
         }
 
+        console.log("[BLE] Starting notifications on characteristic: " + this._readCharacteristic.uuid);
+        console.log("[BLE] Characteristic properties:", {
+            canRead: this._readCharacteristic.properties.read,
+            canWrite: this._readCharacteristic.properties.write,
+            canWriteWithoutResponse: this._readCharacteristic.properties.writeWithoutResponse,
+            canNotify: this._readCharacteristic.properties.notify,
+            canIndicate: this._readCharacteristic.properties.indicate
+        });
+
         if (!this._readCharacteristic.properties.notify) {
+            console.error("[BLE] Read characteristic does not support notify!");
+            console.error("[BLE] Characteristic supports: " + JSON.stringify(this._readCharacteristic.properties));
             throw new Error("Read charateristic can't notify.");
         }
 
+        const startTime = Date.now();
         return this._readCharacteristic.startNotifications()
             .then(() => {
-                console.log("BLE notifications started.");
-        });
+                const duration = Date.now() - startTime;
+                console.log("[BLE] ✓ Notifications started successfully (took " + duration + "ms)");
+                console.log("[BLE] Ready to receive data on characteristic: " + this._readCharacteristic.uuid);
+            }).catch(error => {
+                console.error("[BLE] Failed to start notifications:", {
+                    message: error.message,
+                    name: error.name,
+                    code: error.code
+                });
+                throw error;
+            });
     }
 
     disconnectImplementation(callback) {
+        console.log("[BLE] Disconnecting...");
         if (this._device) {
+            console.log("[BLE] Removing event listeners...");
             this._device.removeEventListener('gattserverdisconnected', this._handleDisconnect);
             this._readCharacteristic.removeEventListener('characteristicvaluechanged', this._handleOnCharateristicValueChanged);
 
             if (this._device.gatt.connected) {
+                console.log("[BLE] GATT is connected, disconnecting...");
                 this._device.gatt.disconnect();
-            }        
+                console.log("[BLE] GATT disconnect() called");
+            } else {
+                console.log("[BLE] GATT already disconnected");
+            }
+            console.log("[BLE] Cleaning up device references...");
             this._device = false;
-            this._writeCharacteristic = false; 
+            this._writeCharacteristic = false;
             this._readCharacteristic = false;
-            this._deviceDescription = false; 
+            this._deviceDescription = false;
+        } else {
+            console.log("[BLE] No device to disconnect");
         }
 
+        console.log("[BLE] Disconnect complete");
         if (callback) {
             callback(true);
         }
@@ -215,11 +329,24 @@ class ConnectionBle extends Connection {
 
     async sendImplementation (data, callback) {;
         if (!this._writeCharacteristic) {
+            console.error("[BLE] Cannot send: No write characteristic");
             return;
         }
-        
+
         let sent = 0;
         let dataBuffer = new Uint8Array(data);
+        const totalBytes = dataBuffer.length;
+        const hex = Array.from(dataBuffer).map(b => b.toString(16).padStart(2, '0')).join(' ');
+        const ascii = Array.from(dataBuffer).map(b => (b >= 32 && b <= 126) ? String.fromCharCode(b) : '.').join('');
+
+        console.log("[BLE] → SENDING " + totalBytes + " bytes (will split into " + Math.ceil(totalBytes / BLE_WRITE_BUFFER_LENGTH) + " chunks of max " + BLE_WRITE_BUFFER_LENGTH + " bytes):");
+        console.log("[BLE]   Hex:   " + hex);
+        console.log("[BLE]   ASCII: " + ascii);
+        console.log("[BLE]   Writing to characteristic: " + this._writeCharacteristic.uuid);
+
+        const sendStartTime = Date.now();
+        let chunkCount = 0;
+
         for (var i = 0; i < dataBuffer.length; i += BLE_WRITE_BUFFER_LENGTH) {
             var length = BLE_WRITE_BUFFER_LENGTH;
 
@@ -228,9 +355,30 @@ class ConnectionBle extends Connection {
             }
 
             var outBuffer = dataBuffer.subarray(i, i + length);
-            sent += outBuffer.length;
-            await this._writeCharacteristic.writeValue(outBuffer);   
+            chunkCount++;
+            const chunkHex = Array.from(outBuffer).map(b => b.toString(16).padStart(2, '0')).join(' ');
+
+            try {
+                const writeStart = Date.now();
+                console.log("[BLE]   Chunk " + chunkCount + ": Writing " + outBuffer.length + " bytes: " + chunkHex);
+                await this._writeCharacteristic.writeValue(outBuffer);
+                const writeDuration = Date.now() - writeStart;
+                console.log("[BLE]   Chunk " + chunkCount + ": Write completed in " + writeDuration + "ms");
+                sent += outBuffer.length;
+            } catch (error) {
+                console.error("[BLE] Write failed on chunk " + chunkCount + ":", {
+                    message: error.message,
+                    name: error.name,
+                    code: error.code,
+                    chunkSize: outBuffer.length,
+                    bytesSentSoFar: sent
+                });
+                throw error;
+            }
         }
+
+        const totalDuration = Date.now() - sendStartTime;
+        console.log("[BLE] ✓ All data sent: " + sent + " bytes in " + chunkCount + " chunks (total time: " + totalDuration + "ms)");
 
         if (callback) {
             callback({
@@ -238,7 +386,7 @@ class ConnectionBle extends Connection {
                 resultCode: 0
             });
         }
-        
+
     }
 
     addOnReceiveCallback(callback){
