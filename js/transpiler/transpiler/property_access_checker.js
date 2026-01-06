@@ -9,13 +9,15 @@
 
 'use strict';
 
+import apiDefinitions from '../api/definitions/index.js';
+
 /**
  * Helper class for checking property access validity
  */
 class PropertyAccessChecker {
   /**
    * @param {Object} context - Context object containing dependencies
-   * @param {Object} context.inavAPI - INAV API definitions
+   * @param {Object} context.inavAPI - INAV API definitions (processed structure)
    * @param {Function} context.getVariableHandler - Getter for variable handler instance
    * @param {Function} context.addError - Function to add errors
    * @param {Function} context.addWarning - Function to add warnings
@@ -184,10 +186,18 @@ class PropertyAccessChecker {
 
     const apiObj = this.inavAPI[apiCategory];
 
-    // For category-only access (e.g., "flight"), warn that it needs a property
+    // For category-only access (e.g., "flight"), error that it needs a property
     if (parts.length === startIndex) {
       if (apiObj.properties.length > 0 || Object.keys(apiObj.nested).length > 0) {
-        this.addWarning('incomplete-access', `'inav.${propPath}' needs a property. Did you mean to access a specific property?`, line);
+        // Build helpful error message with available properties
+        const availableProps = [
+          ...apiObj.properties.slice(0, 3).map(p => `inav.${apiCategory}.${p}`),
+          ...Object.keys(apiObj.nested).slice(0, 2).map(p => `inav.${apiCategory}.${p}.*`)
+        ].join(', ');
+        this.addError(
+          `Cannot use 'inav.${propPath}' - it's an object, not a property. Examples: ${availableProps}`,
+          line
+        );
       }
       return;
     }
@@ -290,7 +300,7 @@ class PropertyAccessChecker {
    */
   checkWritableOverride(inavPath) {
     const parts = inavPath.split('.');
-    // parts = ['override', 'throttle'] or ['override', 'vtx', 'power']
+    // parts = ['override', 'throttle'] or ['override', 'vtx', 'power'] or ['override', 'flightAxis', 'yaw', 'angle']
 
     if (parts.length < 2) {
       return false;
@@ -306,9 +316,29 @@ class PropertyAccessChecker {
       return true;
     }
 
-    // Check nested properties (e.g., override.vtx.power)
+    // Check nested properties (e.g., override.vtx.power or override.flightAxis.yaw.angle)
     if (parts.length >= 3 && apiObj.nested && apiObj.nested[parts[1]]) {
-      return apiObj.nested[parts[1]].includes(parts[2]);
+      // Verify the property exists in the nested list
+      if (!apiObj.nested[parts[1]].includes(parts[2])) {
+        return false;
+      }
+
+      // For 3-level paths, need to check if parts[2] is itself an object (intermediate)
+      // If it has deeper nesting (like flightAxis.yaw.angle), the 3-level path is incomplete
+      if (parts.length === 3) {
+        // Check if this property is an intermediate object using the helper method
+        const isObject = this.isPropertyAnObject('override', parts[1], parts[2]);
+        if (isObject) {
+          // It's an intermediate object - need to go deeper (e.g., yaw.angle or yaw.rate)
+          return false;
+        }
+        // It's a leaf property - writable
+        return true;
+      }
+
+      // For 4+ level paths (e.g., override.flightAxis.yaw.angle), verify all levels exist
+      // This is handled by the broader validation in checkApiPropertyAccess
+      return true;
     }
 
     return false;
@@ -334,18 +364,18 @@ class PropertyAccessChecker {
    */
   isPropertyAnObject(category, parentProp, childProp) {
     try {
-      const apiCategory = this.inavAPI[category];
-      if (!apiCategory) return false;
+      // Use raw API definitions to preserve nested structure
+      const categoryDef = apiDefinitions[category];
+      if (!categoryDef) return false;
 
-      // Get the definition from the category
-      const categoryDef = apiCategory[parentProp];
-      if (!categoryDef || !categoryDef.properties) return false;
+      const parentDef = categoryDef[parentProp];
+      if (!parentDef || !parentDef.properties) return false;
 
-      const childDef = categoryDef.properties[childProp];
+      const childDef = parentDef.properties[childProp];
       if (!childDef) return false;
 
-      // Check if it has properties (making it an object)
-      return childDef.type === 'object' && childDef.properties;
+      // Simple check: typeof object with properties
+      return childDef.type === 'object' && childDef.properties && Object.keys(childDef.properties).length > 0;
     } catch (error) {
       return false;
     }
@@ -361,13 +391,14 @@ class PropertyAccessChecker {
    */
   getNestedObjectProperties(category, parentProp, childProp) {
     try {
-      const apiCategory = this.inavAPI[category];
-      if (!apiCategory) return null;
+      // Use raw API definitions
+      const categoryDef = apiDefinitions[category];
+      if (!categoryDef) return null;
 
-      const categoryDef = apiCategory[parentProp];
-      if (!categoryDef || !categoryDef.properties) return null;
+      const parentDef = categoryDef[parentProp];
+      if (!parentDef || !parentDef.properties) return null;
 
-      const childDef = categoryDef.properties[childProp];
+      const childDef = parentDef.properties[childProp];
       if (!childDef || !childDef.properties) return null;
 
       return Object.keys(childDef.properties);

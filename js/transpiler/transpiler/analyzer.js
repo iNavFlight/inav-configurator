@@ -392,37 +392,46 @@ class SemanticAnalyzer {
       return null;
     }
 
-    const apiObj = this.inavAPI['override'];
-    if (!apiObj) {
-      return null;
-    }
-
-    // Check if trying to assign to an intermediate object
+    // Check if trying to assign to a 3-level intermediate object
     // E.g., override.flightAxis.yaw (should be override.flightAxis.yaw.angle or .rate)
-    if (parts.length === 3 && apiObj.nested && apiObj.nested[parts[1]]) {
-      // Check if parts[2] is itself an object with nested properties
+    if (parts.length === 3) {
       const overrideDef = this.getOverrideDefinition(parts[1], parts[2]);
 
-      if (overrideDef && overrideDef.properties) {
+      if (overrideDef && overrideDef.type === 'object' && overrideDef.properties) {
         const availableProps = Object.keys(overrideDef.properties);
-        const suggestions = availableProps.map(p => `inav.override.${parts[1]}.${parts[2]}.${p}`).join('\n  - ');
-        return `Cannot assign to '${target}' - it's an object. Did you mean:\n  - ${suggestions}`;
+        const suggestions = availableProps.map(p => `inav.override.${parts[1]}.${parts[2]}.${p}`).join(', ');
+        return `Cannot assign to '${target}' - it's an object, not a property. Available properties: ${suggestions}`;
       }
     }
 
-    // Check if trying to assign to a top-level intermediate object
-    // E.g., override.flightAxis (should be override.flightAxis.roll.angle, etc.)
+    // Check if trying to assign to a 2-level intermediate object
+    // E.g., override.vtx (should be override.vtx.power, etc.)
+    // or override.flightAxis (should be override.flightAxis.roll.angle, etc.)
     if (parts.length === 2) {
       const categoryDef = this.getOverrideCategoryDefinition(parts[1]);
 
-      if (categoryDef && categoryDef.properties) {
-        // It's a nested object category - list some examples
-        const firstProp = Object.keys(categoryDef.properties)[0];
-        const firstSubDef = categoryDef.properties[firstProp];
+      if (categoryDef && categoryDef.type === 'object' && categoryDef.properties) {
+        const propKeys = Object.keys(categoryDef.properties);
 
-        if (firstSubDef && firstSubDef.properties) {
-          const exampleProp = Object.keys(firstSubDef.properties)[0];
-          return `Cannot assign to '${target}' - it's an object. Did you mean something like:\n  - inav.override.${parts[1]}.${firstProp}.${exampleProp}`;
+        // Check if properties are simple (like vtx.power) or nested (like flightAxis.roll.angle)
+        const firstProp = categoryDef.properties[propKeys[0]];
+
+        if (firstProp && firstProp.type === 'object' && firstProp.properties) {
+          // Deeply nested (like flightAxis.roll.angle)
+          const nestedPropKeys = Object.keys(firstProp.properties);
+          const suggestions = propKeys.slice(0, 2).flatMap(p => {
+            const nested = categoryDef.properties[p];
+            if (nested && nested.properties) {
+              const firstNestedProp = Object.keys(nested.properties)[0];
+              return [`inav.override.${parts[1]}.${p}.${firstNestedProp}`];
+            }
+            return [];
+          }).join(', ');
+          return `Cannot assign to '${target}' - it's an object, not a property. Examples: ${suggestions}, ...`;
+        } else {
+          // Simple properties (like vtx.power, vtx.band, vtx.channel)
+          const suggestions = propKeys.map(p => `inav.override.${parts[1]}.${p}`).join(', ');
+          return `Cannot assign to '${target}' - it's an object, not a property. Available properties: ${suggestions}`;
         }
       }
     }
@@ -436,12 +445,11 @@ class SemanticAnalyzer {
    */
   getOverrideDefinition(category, property) {
     try {
-      const overrideAPI = this.inavAPI['override'];
-      if (!overrideAPI) return null;
+      // Access raw API definitions, not processed structure
+      const overrideDefs = apiDefinitions.override;
+      if (!overrideDefs) return null;
 
-      // Import override definitions dynamically
-      const overrideDefs = overrideAPI;
-
+      // For nested objects like flightAxis, check if the property itself has properties
       if (overrideDefs[category] && overrideDefs[category].properties) {
         return overrideDefs[category].properties[property];
       }
@@ -458,10 +466,11 @@ class SemanticAnalyzer {
    */
   getOverrideCategoryDefinition(category) {
     try {
-      const overrideAPI = this.inavAPI['override'];
-      if (!overrideAPI) return null;
+      // Access raw API definitions, not processed structure
+      const overrideDefs = apiDefinitions.override;
+      if (!overrideDefs) return null;
 
-      return overrideAPI[category];
+      return overrideDefs[category];
     } catch (error) {
       return null;
     }
