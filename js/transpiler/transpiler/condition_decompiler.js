@@ -11,6 +11,7 @@
 
 import {
   OPERATION,
+  OPERAND_TYPE,
   getOperationName
 } from './inav_constants.js';
 
@@ -57,9 +58,6 @@ class ConditionDecompiler {
   constructor(context) {
     this.decompileOperand = context.decompileOperand;
     this.addWarning = context.addWarning;
-
-    // Operation constants for structural pattern matching
-    this.OPERAND_TYPE_LC = 4;  // OPERAND_TYPE.LC
   }
 
   /**
@@ -150,7 +148,7 @@ class ConditionDecompiler {
    */
   handleNot(lc, allConditions, visited) {
     // If operandA is an LC reference, we can inspect the referenced LC directly
-    if (lc.operandAType === this.OPERAND_TYPE_LC && allConditions) {
+    if (lc.operandAType === OPERAND_TYPE.LC && allConditions) {
       const innerLcIndex = lc.operandAValue;
       const innerLC = allConditions.find(c => c.index === innerLcIndex);
 
