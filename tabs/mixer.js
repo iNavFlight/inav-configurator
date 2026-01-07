@@ -611,16 +611,20 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
             isActive: false         // Is wizard in progress?
         };
 
+        function stopMotors() {
+            if (wizardState.locateInterval) {
+                clearInterval(wizardState.locateInterval);
+                wizardState.locateInterval = null;
+            }
+            mspHelper.sendMotorLocate(255, function() {});
+        }
+
         function resetWizard() {
             wizardState.currentMotor = 0;
             wizardState.motorPositions = {};
             wizardState.isActive = false;
 
-            // Stop any ongoing locate
-            if (wizardState.locateInterval) {
-                clearInterval(wizardState.locateInterval);
-                wizardState.locateInterval = null;
-            }
+            stopMotors();
 
             $('#wizard-intro').removeClass('is-hidden');
             $('#wizard-progress').addClass('is-hidden');
@@ -670,11 +674,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
         function onPositionClicked(positionIndex) {
             if (!wizardState.isActive) return;
 
-            // Stop the locate command
-            if (wizardState.locateInterval) {
-                clearInterval(wizardState.locateInterval);
-                wizardState.locateInterval = null;
-            }
+            stopMotors();
 
             // Record this motor's position
             wizardState.motorPositions[wizardState.currentMotor] = positionIndex;
@@ -729,6 +729,12 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
             startLocatingMotor(0);
         });
 
+        // Emergency stop button click handler
+        $('#wizard-stop-button').on('click', function() {
+            stopMotors();
+            motorWizardModal.close();
+        });
+
         // Apply button click handler
         $('#wizard-apply-button').on('click', function() {
             // Build motor rules from wizard results
@@ -768,10 +774,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
 
         // Clean up when modal closes
         motorWizardModal.options.onClose = function() {
-            if (wizardState.locateInterval) {
-                clearInterval(wizardState.locateInterval);
-                wizardState.locateInterval = null;
-            }
+            stopMotors();
             wizardState.isActive = false;
         };
 

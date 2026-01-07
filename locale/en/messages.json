@@ -5036,6 +5036,9 @@
     "mixerWizardStart": {
         "message": "Start Wizard"
     },
+    "mixerWizardStop": {
+        "message": "Emergency Stop"
+    },
     "settings": {
         "message": "Settings"
     },
