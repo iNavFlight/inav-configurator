@@ -574,6 +574,13 @@ var defaultsDialogData = [
                 key: "nav_fw_launch_climb_angle",
                 value: 25
             },
+            /*
+             * TPA
+             */
+            {
+                key: "tpa_rate",
+                value: 80
+            },
         ],
     },
     {
@@ -779,6 +786,13 @@ var defaultsDialogData = [
             {
                 key: "nav_fw_launch_climb_angle",
                 value: 25
+            },
+            /*
+             * TPA
+             */
+            {
+                key: "tpa_rate",
+                value: 80
             },
         ],
     },
