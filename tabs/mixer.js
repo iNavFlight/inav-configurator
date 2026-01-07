@@ -594,8 +594,8 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
             $wizardButton = $("#mixer-wizard");
 
         motorWizardModal = new jBox('Modal', {
-            width: 480,
-            height: 410,
+            width: 500,
+            height: 560,
             closeButton: 'title',
             animation: false,
             attach: $wizardButton,
@@ -603,45 +603,140 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
             content: $('#mixerWizardContent')
         });
 
-        function validateMixerWizard() {
-            let errorCount = 0;
-            for (let i = 0; i < 4; i++) {
-                const $elements = $('[data-motor] option:selected[id=' + i + ']'),
-                    assignedRulesCount = $elements.length;
+        // Motor Wizard State Machine
+        const wizardState = {
+            currentMotor: 0,        // Which motor we're currently locating (0-3)
+            motorPositions: {},     // Map: motorIndex -> positionIndex
+            locateInterval: null,   // Interval for repeating locate command
+            isActive: false         // Is wizard in progress?
+        };
 
-                if (assignedRulesCount != 1) {
-                    errorCount++;
-                    $elements.closest('tr').addClass("red-background");
-                } else {
-                    $elements.closest('tr').removeClass("red-background");
-                }
+        function resetWizard() {
+            wizardState.currentMotor = 0;
+            wizardState.motorPositions = {};
+            wizardState.isActive = false;
 
+            // Stop any ongoing locate
+            if (wizardState.locateInterval) {
+                clearInterval(wizardState.locateInterval);
+                wizardState.locateInterval = null;
             }
-            return (errorCount == 0);
+
+            $('#wizard-intro').removeClass('is-hidden');
+            $('#wizard-progress').addClass('is-hidden');
+            $('#wizard-complete').addClass('is-hidden');
+
+            // Reset position buttons
+            $('.wizard-position-btn').removeClass('waiting assigned');
+            $('.wizard-position-btn .position-label').text('');
+
+            // Reset progress steps
+            $('.wizard-progress-step').removeClass('active complete');
         }
 
-        $(".wizard-motor-select").on('change', validateMixerWizard);
+        function startLocatingMotor(motorIndex) {
+            // Update progress display
+            $('#wizard-current-motor').text(motorIndex + 1);
 
-        $("#wizard-execute-button").on('click', function () {
+            // Update progress bar
+            $('.wizard-progress-step').each(function() {
+                const step = parseInt($(this).attr('data-step'), 10);
+                $(this).removeClass('active complete');
+                if (step < motorIndex) {
+                    $(this).addClass('complete');
+                } else if (step === motorIndex) {
+                    $(this).addClass('active');
+                }
+            });
 
-            // Validate mixer settings
-            if (!validateMixerWizard()) {
-                return;
+            // Enable clicking on unassigned positions
+            $('.wizard-position-btn').each(function() {
+                const pos = parseInt($(this).attr('data-position'), 10);
+                const isAssigned = Object.values(wizardState.motorPositions).includes(pos);
+                if (!isAssigned) {
+                    $(this).addClass('waiting');
+                }
+            });
+
+            // Send locate command and repeat every 2 seconds
+            const sendLocate = function() {
+                mspHelper.sendMotorLocate(motorIndex, function() {});
+            };
+
+            sendLocate();  // Send immediately
+            wizardState.locateInterval = setInterval(sendLocate, 2000);
+        }
+
+        function onPositionClicked(positionIndex) {
+            if (!wizardState.isActive) return;
+
+            // Stop the locate command
+            if (wizardState.locateInterval) {
+                clearInterval(wizardState.locateInterval);
+                wizardState.locateInterval = null;
             }
 
+            // Record this motor's position
+            wizardState.motorPositions[wizardState.currentMotor] = positionIndex;
+
+            // Update the button to show the motor number
+            const $btn = $(`#wizardPos${positionIndex}`);
+            $btn.removeClass('waiting').addClass('assigned');
+            $btn.find('.position-label').text(wizardState.currentMotor + 1);
+
+            // Remove waiting state from all buttons
+            $('.wizard-position-btn').removeClass('waiting');
+
+            // Move to next motor or complete
+            wizardState.currentMotor++;
+
+            if (wizardState.currentMotor >= 4) {
+                // All motors identified
+                wizardComplete();
+            } else {
+                // Start locating next motor
+                startLocatingMotor(wizardState.currentMotor);
+            }
+        }
+
+        function wizardComplete() {
+            wizardState.isActive = false;
+
+            // Mark all progress steps complete
+            $('.wizard-progress-step').removeClass('active').addClass('complete');
+
+            $('#wizard-progress').addClass('is-hidden');
+            $('#wizard-complete').removeClass('is-hidden');
+        }
+
+        // Position button click handler
+        $('.wizard-position-btn').on('click', function() {
+            if (!$(this).hasClass('waiting')) return;
+            const positionIndex = parseInt($(this).attr('data-position'), 10);
+            onPositionClicked(positionIndex);
+        });
+
+        // Start button click handler
+        $('#wizard-start-button').on('click', function() {
+            wizardState.isActive = true;
+            wizardState.currentMotor = 0;
+            wizardState.motorPositions = {};
+
+            $('#wizard-intro').addClass('is-hidden');
+            $('#wizard-progress').removeClass('is-hidden');
+
+            // Start locating first motor
+            startLocatingMotor(0);
+        });
+
+        // Apply button click handler
+        $('#wizard-apply-button').on('click', function() {
+            // Build motor rules from wizard results
             FC.MOTOR_RULES.flush();
 
-            for (let i = 0; i < 4; i++) {
-                const $selects = $(".wizard-motor-select");
-                let rule = -1;
-
-                $selects.each(function () {
-                    if (parseInt($(this).find(":selected").attr("id"), 10) == i) {
-                        rule = parseInt($(this).attr("data-motor"), 10);
-                    }
-                });
-
-                const r = currentMixerPreset.motorMixer[rule];
+            for (let motorIndex = 0; motorIndex < 4; motorIndex++) {
+                const positionIndex = wizardState.motorPositions[motorIndex];
+                const r = currentMixerPreset.motorMixer[positionIndex];
 
                 FC.MOTOR_RULES.put(
                     new MotorMixRule(
@@ -651,7 +746,6 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
                         r.getYaw()
                     )
                 );
-
             }
 
             renderMotorMixRules();
@@ -659,6 +753,27 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
 
             motorWizardModal.close();
         });
+
+        // Reset wizard when modal opens
+        motorWizardModal.options.onOpen = function() {
+            resetWizard();
+
+            // Update preview image
+            const $wizardImg = $('#wizard-preview-img');
+            const $mainImg = $('#motor-mixer-preview-img');
+            if ($mainImg.attr('src')) {
+                $wizardImg.attr('src', $mainImg.attr('src'));
+            }
+        };
+
+        // Clean up when modal closes
+        motorWizardModal.options.onClose = function() {
+            if (wizardState.locateInterval) {
+                clearInterval(wizardState.locateInterval);
+                wizardState.locateInterval = null;
+            }
+            wizardState.isActive = false;
+        };
 
         const updateMotorDirection = function () {
             let motorDirectionCheckbox = $('input[name=motor_direction_inverted]:checked');

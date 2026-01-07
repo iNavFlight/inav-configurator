@@ -5006,6 +5006,36 @@
     "mixerWizardMotorIndex": {
         "message": "Motor index"
     },
+    "mixerWizardLocateInfo": {
+        "message": "Click a motor to identify it"
+    },
+    "mixerWizardLocateHint": {
+        "message": "Click to make this motor beep and twitch"
+    },
+    "mixerWizardIntro": {
+        "message": "This wizard will help you identify which motor is connected to each output. The wizard will activate each motor in turn - click where you see movement."
+    },
+    "mixerWizardStep1": {
+        "message": "Remove all propellers for safety"
+    },
+    "mixerWizardStep2": {
+        "message": "Connect a battery to power the ESCs"
+    },
+    "mixerWizardStep3": {
+        "message": "Make sure you can see/hear all motors"
+    },
+    "mixerWizardLocating": {
+        "message": "Motor"
+    },
+    "mixerWizardClickPosition": {
+        "message": "Click where you see this motor moving."
+    },
+    "mixerWizardComplete": {
+        "message": "All motors identified! Click Apply to save the motor mapping."
+    },
+    "mixerWizardStart": {
+        "message": "Start Wizard"
+    },
     "settings": {
         "message": "Settings"
     },
