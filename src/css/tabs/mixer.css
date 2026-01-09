@@ -133,3 +133,147 @@
 .mixer-preview-image-numbers {
     width: fit-content;
 }
+
+/* Motor Wizard Styles */
+
+/* Wizard sections */
+.wizard-section {
+    margin-bottom: 15px;
+}
+
+.wizard-checklist {
+    margin: 10px 0;
+    padding-left: 20px;
+}
+
+.wizard-checklist li {
+    margin: 5px 0;
+}
+
+.wizard-prompt {
+    font-size: 16px;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.wizard-prompt strong {
+    color: #e74c3c;
+    font-size: 18px;
+}
+
+/* Progress bar */
+.wizard-progress-bar {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin: 15px 0;
+}
+
+.wizard-progress-step {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background-color: #ddd;
+    color: #666;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+.wizard-progress-step.active {
+    background-color: #e74c3c;
+    color: white;
+    animation: pulse 0.5s infinite;
+}
+
+.wizard-progress-step.complete {
+    background-color: #27ae60;
+    color: white;
+}
+
+/* Motor preview area */
+.wizard-preview {
+    text-align: center;
+    margin: 20px auto;
+}
+
+.wizard-motor-preview {
+    position: relative;
+    width: 200px;
+    height: 200px;
+    margin: 0 auto;
+}
+
+.wizard-motor-preview img {
+    width: 200px;
+    height: 200px;
+}
+
+/* Position buttons - clickable circles at motor positions */
+.wizard-position-btn {
+    position: absolute;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background-color: #bdc3c7;
+    color: white;
+    border: 3px solid #95a5a6;
+    cursor: default;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 16px;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    pointer-events: none;
+}
+
+/* Position buttons when wizard is active and waiting for click */
+.wizard-position-btn.waiting {
+    background-color: #3498db;
+    border-color: #2980b9;
+    cursor: pointer;
+    pointer-events: auto;
+    animation: glow 1s infinite;
+}
+
+.wizard-position-btn.waiting:hover {
+    background-color: #2980b9;
+    transform: scale(1.15);
+}
+
+/* Position buttons when motor has been assigned */
+.wizard-position-btn.assigned {
+    background-color: #27ae60;
+    border-color: #1e8449;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.15); }
+}
+
+@keyframes glow {
+    0%, 100% { box-shadow: 0 0 5px rgba(52, 152, 219, 0.5); }
+    50% { box-shadow: 0 0 15px rgba(52, 152, 219, 0.8); }
+}
+
+/* Position buttons at quad corners (Quad X layout) */
+/* Position 0: Rear-Right */
+#wizardPos0 { bottom: 10px; right: 10px; }
+/* Position 1: Front-Right */
+#wizardPos1 { top: 10px; right: 10px; }
+/* Position 2: Rear-Left */
+#wizardPos2 { bottom: 10px; left: 10px; }
+/* Position 3: Front-Left */
+#wizardPos3 { top: 10px; left: 10px; }
+
+/* Wizard button container */
+.wizard-buttons {
+    margin-top: 1em;
+    text-align: center;
+}
