@@ -662,6 +662,12 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
                 }
             });
 
+            // Clear any existing interval to prevent overlaps
+            if (wizardState.locateInterval) {
+                clearInterval(wizardState.locateInterval);
+                wizardState.locateInterval = null;
+            }
+
             // Send locate command and repeat every 2 seconds
             const sendLocate = function() {
                 mspHelper.sendMotorLocate(motorIndex, function() {});
@@ -718,6 +724,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
 
         // Start button click handler
         $('#wizard-start-button').on('click', function() {
+            if (wizardState.isActive) return;
             wizardState.isActive = true;
             wizardState.currentMotor = 0;
             wizardState.motorPositions = {};
