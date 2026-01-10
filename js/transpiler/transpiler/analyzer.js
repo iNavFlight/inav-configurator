@@ -422,8 +422,11 @@ class SemanticAnalyzer {
           const suggestions = propKeys.slice(0, 2).flatMap(p => {
             const nested = categoryDef.properties[p];
             if (nested && nested.properties) {
-              const firstNestedProp = Object.keys(nested.properties)[0];
-              return [`inav.override.${parts[1]}.${p}.${firstNestedProp}`];
+              const nestedKeys = Object.keys(nested.properties);
+              if (nestedKeys.length > 0) {
+                const firstNestedProp = nestedKeys[0];
+                return [`inav.override.${parts[1]}.${p}.${firstNestedProp}`];
+              }
             }
             return [];
           }).join(', ');
