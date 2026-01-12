@@ -2340,6 +2340,9 @@ function iconKey(filename) {
 
                         plotElevation();
                     })()
+                } else {
+                    // Update elevation chart even for non-selected waypoints
+                    plotElevation();
                 }
             }
             else if (tempMarker.kind == "home" ) {
