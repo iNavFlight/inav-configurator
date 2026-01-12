@@ -1,6 +1,10 @@
 'use strict';
 
 import xml2js from 'xml2js';
+import { Chart, registerables } from 'chart.js';
+
+// Register Chart.js components
+Chart.register(...registerables);
 
 import Map from 'ol/Map.js';
 import XYZ from 'ol/source/XYZ.js';
@@ -4222,7 +4226,6 @@ function iconKey(filename) {
     }
 
     function plotElevation() {
-        /*
         if ($('#missionPlannerElevation').is(":visible") && !disableMarkerEdit) {
             if (mission.isEmpty()) {
                 var data = [[0], [0]];
@@ -4345,7 +4348,6 @@ function iconKey(filename) {
                 })()
             }
         }
-        */
     }
 
     function parseBooleans (str) {
