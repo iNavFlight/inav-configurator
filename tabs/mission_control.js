@@ -4317,9 +4317,9 @@ function iconKey(filename) {
                             color: '#1f77b4',
                         },
                     };
-                     Show multi mission number in plot title when single mission displayed
-                     * Not updated when ALL multi missions displayed since plot disabled 
-                    
+                    /* Show multi mission number in plot title when single mission displayed
+                     * Not updated when ALL multi missions displayed since plot disabled
+                     */
                     let missionNumber = '';
                     if (multimissionCount) {
                         missionNumber = ' ' + ($('#multimissionOptionList').val());
