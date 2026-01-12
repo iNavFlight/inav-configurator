@@ -4231,6 +4231,9 @@ function iconKey(filename) {
         return altitude;
     }
 
+    // Track elevation chart update sequence to prevent race conditions
+    let elevationUpdateSequence = 0;
+
     function plotElevation() {
         if ($('#missionPlannerElevation').is(":visible") && !disableMarkerEdit) {
             if (mission.isEmpty()) {
@@ -4307,8 +4310,17 @@ function iconKey(filename) {
             }
             else {
                 (async () => {
+                    // Capture current sequence number to detect stale updates
+                    const currentSequence = ++elevationUpdateSequence;
+
                     try {
                         const [lengthMission, totalMissionDistance, samples, elevation, altPoint2measure, namePoint2measure, refPoint2measure] = await mission.getElevation(globalSettings);
+
+                        // Check if a newer update has been triggered while we were fetching data
+                        if (currentSequence !== elevationUpdateSequence) {
+                            console.log('Ignoring stale elevation data');
+                            return;
+                        }
                         const x_elevation = Array.from(Array(samples+1), (_,i)=> i*totalMissionDistance/samples);
                         const y_missionElevation = altPoint2measure.map((x,i) => x / 100 + HOME.getAlt()*(1-refPoint2measure[i]));
 
@@ -4364,8 +4376,8 @@ function iconKey(filename) {
                             window.elevationChartInstance.options.plugins.title.text = chartTitle;
                             window.elevationChartInstance.options.scales.y.min = Math.floor(-10 + Math.min(minMission, minElevation));
                             window.elevationChartInstance.options.scales.y.max = Math.ceil(10 + Math.max(maxMission, maxElevation));
-                            // Trigger re-render
-                            window.elevationChartInstance.update();
+                            // Trigger re-render without animation for better performance during drag operations
+                            window.elevationChartInstance.update('none');
                         } else {
                             // Create new chart
                             window.elevationChartInstance = new Chart(ctx, {
