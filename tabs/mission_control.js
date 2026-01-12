@@ -6,6 +6,9 @@ import { Chart, registerables } from 'chart.js';
 // Register Chart.js components
 Chart.register(...registerables);
 
+// Make Chart available globally for plotElevation function
+window.Chart = Chart;
+
 import Map from 'ol/Map.js';
 import XYZ from 'ol/source/XYZ.js';
 import OSM from 'ol/source/OSM.js';
