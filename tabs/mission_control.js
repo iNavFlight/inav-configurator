@@ -4330,68 +4330,77 @@ function iconKey(filename) {
                             return;
                         }
 
-                        // Destroy existing chart if it exists
-                        if (window.elevationChartInstance) {
-                            window.elevationChartInstance.destroy();
-                        }
-
-                        window.elevationChartInstance = new Chart(ctx, {
-                            type: 'line',
-                            data: {
-                                labels: x_elevation,
-                                datasets: [
-                                    {
-                                        label: 'WGS84 elevation',
-                                        data: elevation.map((y, i) => ({x: x_elevation[i], y: y})),
-                                        borderColor: '#ff7f0e',
-                                        backgroundColor: 'rgba(255, 127, 14, 0.2)',
-                                        borderWidth: 2,
-                                        fill: true,
-                                        pointRadius: 0,
-                                    },
-                                    {
-                                        label: 'Mission altitude',
-                                        data: lengthMission.map((x, i) => ({x: x, y: y_missionElevation[i]})),
-                                        borderColor: '#1497f1',
-                                        backgroundColor: 'rgba(20, 151, 241, 0)',
-                                        borderWidth: 2,
-                                        pointRadius: 5,
-                                        pointBackgroundColor: '#1f77b4',
-                                    }
-                                ]
-                            },
-                            options: {
-                                responsive: true,
-                                maintainAspectRatio: false,
-                                plugins: {
-                                    title: {
-                                        display: true,
-                                        text: chartTitle
-                                    },
-                                    legend: {
-                                        display: true,
-                                        position: 'top',
-                                    }
+                        const newData = {
+                            labels: x_elevation,
+                            datasets: [
+                                {
+                                    label: 'WGS84 elevation',
+                                    data: elevation.map((y, i) => ({x: x_elevation[i], y: y})),
+                                    borderColor: '#ff7f0e',
+                                    backgroundColor: 'rgba(255, 127, 14, 0.2)',
+                                    borderWidth: 2,
+                                    fill: true,
+                                    pointRadius: 0,
                                 },
-                                scales: {
-                                    x: {
-                                        type: 'linear',
+                                {
+                                    label: 'Mission altitude',
+                                    data: lengthMission.map((x, i) => ({x: x, y: y_missionElevation[i]})),
+                                    borderColor: '#1497f1',
+                                    backgroundColor: 'rgba(20, 151, 241, 0)',
+                                    borderWidth: 2,
+                                    pointRadius: 5,
+                                    pointBackgroundColor: '#1f77b4',
+                                }
+                            ]
+                        };
+
+                        // Update existing chart if it exists, otherwise create new one
+                        if (window.elevationChartInstance) {
+                            // Update data
+                            window.elevationChartInstance.data = newData;
+                            window.elevationChartInstance.options.plugins.title.text = chartTitle;
+                            window.elevationChartInstance.options.scales.y.min = Math.floor(-10 + Math.min(minMission, minElevation));
+                            window.elevationChartInstance.options.scales.y.max = Math.ceil(10 + Math.max(maxMission, maxElevation));
+                            // Trigger re-render
+                            window.elevationChartInstance.update();
+                        } else {
+                            // Create new chart
+                            window.elevationChartInstance = new Chart(ctx, {
+                                type: 'line',
+                                data: newData,
+                                options: {
+                                    responsive: true,
+                                    maintainAspectRatio: false,
+                                    plugins: {
                                         title: {
                                             display: true,
-                                            text: 'Distance (m)'
+                                            text: chartTitle
+                                        },
+                                        legend: {
+                                            display: true,
+                                            position: 'top',
                                         }
                                     },
-                                    y: {
-                                        title: {
-                                            display: true,
-                                            text: 'Elevation (m)'
+                                    scales: {
+                                        x: {
+                                            type: 'linear',
+                                            title: {
+                                                display: true,
+                                                text: 'Distance (m)'
+                                            }
                                         },
-                                        min: Math.floor(-10 + Math.min(minMission, minElevation)),
-                                        max: Math.ceil(10 + Math.max(maxMission, maxElevation))
+                                        y: {
+                                            title: {
+                                                display: true,
+                                                text: 'Elevation (m)'
+                                            },
+                                            min: Math.floor(-10 + Math.min(minMission, minElevation)),
+                                            max: Math.ceil(10 + Math.max(maxMission, maxElevation))
+                                        }
                                     }
                                 }
-                            }
-                        });
+                            });
+                        }
                     } catch (error) {
                         console.error('Failed to plot elevation:', error);
                     }
