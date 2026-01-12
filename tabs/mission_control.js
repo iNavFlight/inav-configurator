@@ -4252,7 +4252,12 @@ function iconKey(filename) {
 
                 var ctx = $("#elevationChart").get(0);
 
-                new Chart(ctx, {
+                // Destroy existing chart if it exists
+                if (window.elevationChartInstance) {
+                    window.elevationChartInstance.destroy();
+                }
+
+                window.elevationChartInstance = new Chart(ctx, {
                     type: 'line',
                     data: {
                       labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
@@ -4348,6 +4353,73 @@ function iconKey(filename) {
                     var data = [trace_WGS84, trace_missionHeight];
 
                     //Plotly.newPlot('elevationDiv', data, layout);
+
+                    // Render with Chart.js
+                    var ctx = $("#elevationChart").get(0);
+                    if (ctx) {
+                        // Destroy existing chart if it exists
+                        if (window.elevationChartInstance) {
+                            window.elevationChartInstance.destroy();
+                        }
+
+                        window.elevationChartInstance = new Chart(ctx, {
+                            type: 'line',
+                            data: {
+                                labels: x_elevation,
+                                datasets: [
+                                    {
+                                        label: 'WGS84 elevation',
+                                        data: elevation.map((y, i) => ({x: x_elevation[i], y: y})),
+                                        borderColor: '#ff7f0e',
+                                        backgroundColor: 'rgba(255, 127, 14, 0.2)',
+                                        borderWidth: 2,
+                                        fill: true,
+                                        pointRadius: 0,
+                                    },
+                                    {
+                                        label: 'Mission altitude',
+                                        data: lengthMission.map((x, i) => ({x: x, y: y_missionElevation[i]})),
+                                        borderColor: '#1497f1',
+                                        backgroundColor: 'rgba(20, 151, 241, 0)',
+                                        borderWidth: 2,
+                                        pointRadius: 5,
+                                        pointBackgroundColor: '#1f77b4',
+                                    }
+                                ]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: {
+                                    title: {
+                                        display: true,
+                                        text: layout.title
+                                    },
+                                    legend: {
+                                        display: true,
+                                        position: 'top',
+                                    }
+                                },
+                                scales: {
+                                    x: {
+                                        type: 'linear',
+                                        title: {
+                                            display: true,
+                                            text: 'Distance (m)'
+                                        }
+                                    },
+                                    y: {
+                                        title: {
+                                            display: true,
+                                            text: 'Elevation (m)'
+                                        },
+                                        min: Math.floor(-10 + Math.min(Math.min(...y_missionElevation), Math.min(...elevation))),
+                                        max: Math.ceil(10 + Math.max(Math.max(...y_missionElevation), Math.max(...elevation)))
+                                    }
+                                }
+                            }
+                        });
+                    }
                 })()
             }
         }
