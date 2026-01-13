@@ -80,10 +80,15 @@ TABS.javascript_programming = {
                             self.isDirty = true;
                         });
 
+                        // Localize i18n strings
+                        i18n.localize();
+
                         GUI.content_ready(callback);
                     }); 
                 } catch (error) {
                     console.error('Failed to load Monaco Editor:', error);
+                    // Localize i18n strings even on error
+                    i18n.localize();
                     GUI.content_ready(callback);
                 }
 
