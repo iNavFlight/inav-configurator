@@ -6195,6 +6195,24 @@
     "gpsAssistnowLoadDataError": {
         "message": "Error loading AssistNow data."
     },
+    "layerManagementTitle": {
+        "message": "Map Layer Management"
+    },
+    "layerLoadGeoFile": {
+        "message": "Load GEO File"
+    },
+    "layerDragDropHint": {
+        "message": "or drag & drop GEO files onto the map"
+    },
+    "layerConfirmDelete": {
+        "message": "Are you sure you want to delete this layer?"
+    },
+    "layerLoadError": {
+        "message": "Error loading GEO file. Please check the file format."
+    },
+    "layerParseError": {
+        "message": "Error parsing GEO file. Unsupported format or corrupted data."
+    },
     "adsbVehicleTotalMessages": {
         "message": "Vehicle msgs"
     },
