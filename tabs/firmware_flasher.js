@@ -22,6 +22,13 @@ import store from './../js/store';
 import dialog from '../js/dialog.js';
 
 TABS.firmware_flasher = {};
+
+// Normalize target names by converting hyphens to underscores for consistent matching
+// This allows both TBS_LUCID_H7_WING and TBS-LUCID-H7-WING to match
+function normalizeTargetName(name) {
+    return name.replace(/-/g, '_');
+}
+
 TABS.firmware_flasher.initialize = function (callback) {
 
     if (GUI.active_tab != 'firmware_flasher') {
@@ -72,7 +79,7 @@ TABS.firmware_flasher.initialize = function (callback) {
             //var targetFromFilenameExpression = /inav_([\d.]+)?_?([^.]+)\.(.*)/;
             // inav_8.0.0_TUNERCF405_dev-20240617-88fb1d0.hex
             // inav_8.0.0_TUNERCF405_ci-20240617-88fb1d0.hex
-            var targetFromFilenameExpression = /^inav_(\d+)([\d.]+)_([A-Za-z0-9_]+)_(ci|dev)-(\d{4})(\d{2})(\d{2})-(\w+)\.(hex)$/;
+            var targetFromFilenameExpression = /^inav_(\d+)([\d.]+)_([A-Za-z0-9_-]+)_(ci|dev)-(\d{4})(\d{2})(\d{2})-(\w+)\.(hex)$/;
             var match = targetFromFilenameExpression.exec(filename);
 
             if (!match) {
@@ -82,7 +89,7 @@ TABS.firmware_flasher.initialize = function (callback) {
 
             return {
                 raw_target: match[3],
-                target: match[3].replace("_", " "),
+                target: match[3].replace(/_/g, " ").replace(/-/g, " "), // "/g" to replace all
                 format: match[9],
                 version: match[1]+match[2],
                 major: match[1]
@@ -102,7 +109,7 @@ TABS.firmware_flasher.initialize = function (callback) {
 
             return {
                 raw_target: match[2],
-                target: match[2].replace("_", " "),
+                target: match[2].replace(/_/g, " ").replace(/-/g, " "), // "/g" to replace all
                 format: match[3],
             };
         }
@@ -158,8 +165,9 @@ TABS.firmware_flasher.initialize = function (callback) {
                     if ((!showDevReleases && release.prerelease) || !result) {
                         return;
                     }
-                    if($.inArray(result.target, unsortedTargets) == -1) {
-                        unsortedTargets.push(result.target);
+                    var normalizedTarget = normalizeTargetName(result.raw_target);
+                    if($.inArray(normalizedTarget, unsortedTargets) == -1) {
+                        unsortedTargets.push(normalizedTarget);
                     }
                 });
             });
@@ -170,8 +178,11 @@ TABS.firmware_flasher.initialize = function (callback) {
                     release.assets.forEach(function (asset) {
                         var result = parseDevFilename(asset.name);
 
-                        if (result && $.inArray(result.target, unsortedTargets) == -1) {
-                            unsortedTargets.push(result.target);
+                        if (result) {
+                            var normalizedTarget = normalizeTargetName(result.raw_target);
+                            if ($.inArray(normalizedTarget, unsortedTargets) == -1) {
+                                unsortedTargets.push(normalizedTarget);
+                            }
                         }
                     });
                 });
@@ -220,7 +231,8 @@ TABS.firmware_flasher.initialize = function (callback) {
                         "notes"     : release.body,
                         "status"    : release.prerelease ? "release-candidate" : "stable"
                     };
-                    releases[result.target].push(descriptor);
+                    var normalizedTarget = normalizeTargetName(result.raw_target);
+                    releases[normalizedTarget].push(descriptor);
                 });
             });
 
@@ -274,7 +286,8 @@ TABS.firmware_flasher.initialize = function (callback) {
                             "notes"     : release.body,
                             "status"    : release.prerelease ? "nightly" : "stable"
                         };
-                        releases[result.target].push(descriptor);
+                        var normalizedTarget = normalizeTargetName(result.raw_target);
+                        releases[normalizedTarget].push(descriptor);
                     });
                 });
             }
@@ -287,9 +300,10 @@ TABS.firmware_flasher.initialize = function (callback) {
                     descriptors.forEach(function(descriptor){
                         if($.inArray(target, selectTargets) == -1) {
                             selectTargets.push(target);
+                            var normalizedTarget = normalizeTargetName(descriptor.raw_target);
                             var select_e =
                                     $("<option value='{0}'>{1}</option>".format(
-                                            descriptor.raw_target,
+                                            normalizedTarget,
                                             descriptor.target
                                     )).data('summary', descriptor);
                             boards_e.append(select_e);
@@ -339,8 +353,9 @@ TABS.firmware_flasher.initialize = function (callback) {
                         versions_e.append($("<option value='0'>{0} {1}</option>".format(i18n.getMessage('firmwareFlasherOptionLabelSelectFirmwareVersionFor'), target)));
                     }
 
-                    if (typeof TABS.firmware_flasher.releases[target]?.forEach === 'function') {
-                        TABS.firmware_flasher.releases[target].forEach(function(descriptor) {
+                    var normalizedTarget = normalizeTargetName(target);
+                    if (typeof TABS.firmware_flasher.releases[normalizedTarget]?.forEach === 'function') {
+                        TABS.firmware_flasher.releases[normalizedTarget].forEach(function(descriptor) {
                             var select_e =
                                     $("<option value='{0}'>{0} - {1} - {2} ({3})</option>".format(
                                             descriptor.version,
@@ -862,14 +877,15 @@ TABS.firmware_flasher.onValidFirmware = function() {
     MSP.send_message(MSPCodes.MSP_BUILD_INFO, false, false, function () {
         MSP.send_message(MSPCodes.MSP_BOARD_INFO, false, false, function () {
             var boardSelect = $('select[name="board"]');
-            boardSelect.val(FC.CONFIG.target);
+            var normalizedTarget = normalizeTargetName(FC.CONFIG.target);
+            boardSelect.val(normalizedTarget);
 
             GUI.log(i18n.getMessage('targetPrefetchsuccessful') + FC.CONFIG.target);
 
             TABS.firmware_flasher.closeTempConnection();
 
             // Only trigger change if the board was actually found and selected
-            if (boardSelect.val() === FC.CONFIG.target) {
+            if (boardSelect.val() === normalizedTarget) {
                 boardSelect.trigger('change');
             }
         });
