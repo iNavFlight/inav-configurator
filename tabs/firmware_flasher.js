@@ -23,8 +23,7 @@ import dialog from '../js/dialog.js';
 
 TABS.firmware_flasher = {};
 
-// Normalize target names by converting hyphens to underscores for consistent matching
-// This allows both TBS_LUCID_H7_WING and TBS-LUCID-H7-WING to match
+// Allow hyphens due to 9.0.0 patch
 function normalizeTargetName(name) {
     return name.replace(/-/g, '_');
 }
@@ -89,7 +88,7 @@ TABS.firmware_flasher.initialize = function (callback) {
 
             var rawMatch = match[3];  // e.g., "TBS-LUCID-H7-WING" or "TBS_LUCID_H7_WING"
             return {
-                target_id: normalizeTargetName(rawMatch),  // Normalized: "TBS_LUCID_H7_WING"
+                target_id: normalizeTargetName(rawMatch),
                 target: rawMatch.replace(/_/g, " ").replace(/-/g, " "),  // Display: "TBS LUCID H7 WING"
                 format: match[9],
                 version: match[1]+match[2],
@@ -110,7 +109,7 @@ TABS.firmware_flasher.initialize = function (callback) {
 
             var rawMatch = match[2];  // e.g., "MATEKF405" or "MATEK-F405"
             return {
-                target_id: normalizeTargetName(rawMatch),  // Normalized: "MATEKF405"
+                target_id: normalizeTargetName(rawMatch),
                 target: rawMatch.replace(/_/g, " ").replace(/-/g, " "),  // Display: "MATEKF405"
                 format: match[3],
             };
