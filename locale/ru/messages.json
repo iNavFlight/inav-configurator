@@ -6388,7 +6388,7 @@
         "message": "Широта"
     },
     "osdElement_DISTANCE_TO_HOME": {
-        "message": "Направление домой"
+        "message": "Расстояние до дома"
     },
     "osdElement_ODOMETER": {
         "message": "Одометр"
