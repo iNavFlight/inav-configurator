@@ -87,9 +87,10 @@ TABS.firmware_flasher.initialize = function (callback) {
                 return null;
             }
 
+            var rawMatch = match[3];  // e.g., "TBS-LUCID-H7-WING" or "TBS_LUCID_H7_WING"
             return {
-                raw_target: match[3],
-                target: match[3].replace(/_/g, " ").replace(/-/g, " "), // "/g" to replace all
+                target_id: normalizeTargetName(rawMatch),  // Normalized: "TBS_LUCID_H7_WING"
+                target: rawMatch.replace(/_/g, " ").replace(/-/g, " "),  // Display: "TBS LUCID H7 WING"
                 format: match[9],
                 version: match[1]+match[2],
                 major: match[1]
@@ -107,9 +108,10 @@ TABS.firmware_flasher.initialize = function (callback) {
 
             //GUI.log("non dev: match[2]: " + match[2] + " match[3]: " + match[3]);
 
+            var rawMatch = match[2];  // e.g., "MATEKF405" or "MATEK-F405"
             return {
-                raw_target: match[2],
-                target: match[2].replace(/_/g, " ").replace(/-/g, " "), // "/g" to replace all
+                target_id: normalizeTargetName(rawMatch),  // Normalized: "MATEKF405"
+                target: rawMatch.replace(/_/g, " ").replace(/-/g, " "),  // Display: "MATEKF405"
                 format: match[3],
             };
         }
@@ -165,9 +167,8 @@ TABS.firmware_flasher.initialize = function (callback) {
                     if ((!showDevReleases && release.prerelease) || !result) {
                         return;
                     }
-                    var normalizedTarget = normalizeTargetName(result.raw_target);
-                    if($.inArray(normalizedTarget, unsortedTargets) == -1) {
-                        unsortedTargets.push(normalizedTarget);
+                    if($.inArray(result.target_id, unsortedTargets) == -1) {
+                        unsortedTargets.push(result.target_id);
                     }
                 });
             });
@@ -179,9 +180,8 @@ TABS.firmware_flasher.initialize = function (callback) {
                         var result = parseDevFilename(asset.name);
 
                         if (result) {
-                            var normalizedTarget = normalizeTargetName(result.raw_target);
-                            if ($.inArray(normalizedTarget, unsortedTargets) == -1) {
-                                unsortedTargets.push(normalizedTarget);
+                            if ($.inArray(result.target_id, unsortedTargets) == -1) {
+                                unsortedTargets.push(result.target_id);
                             }
                         }
                     });
@@ -225,14 +225,13 @@ TABS.firmware_flasher.initialize = function (callback) {
                         "version"   : release.tag_name,
                         "url"       : asset.browser_download_url,
                         "file"      : asset.name,
-                        "raw_target": result.raw_target,
+                        "target_id" : result.target_id,
                         "target"    : result.target,
                         "date"      : formattedDate,
                         "notes"     : release.body,
                         "status"    : release.prerelease ? "release-candidate" : "stable"
                     };
-                    var normalizedTarget = normalizeTargetName(result.raw_target);
-                    releases[normalizedTarget].push(descriptor);
+                    releases[result.target_id].push(descriptor);
                 });
             });
 
@@ -280,14 +279,13 @@ TABS.firmware_flasher.initialize = function (callback) {
                             "version"   : release.tag_name,
                             "url"       : asset.browser_download_url,
                             "file"      : asset.name,
-                            "raw_target": result.raw_target,
+                            "target_id" : result.target_id,
                             "target"    : result.target,
                             "date"      : formattedDate,
                             "notes"     : release.body,
                             "status"    : release.prerelease ? "nightly" : "stable"
                         };
-                        var normalizedTarget = normalizeTargetName(result.raw_target);
-                        releases[normalizedTarget].push(descriptor);
+                        releases[result.target_id].push(descriptor);
                     });
                 });
             }
@@ -300,10 +298,9 @@ TABS.firmware_flasher.initialize = function (callback) {
                     descriptors.forEach(function(descriptor){
                         if($.inArray(target, selectTargets) == -1) {
                             selectTargets.push(target);
-                            var normalizedTarget = normalizeTargetName(descriptor.raw_target);
                             var select_e =
                                     $("<option value='{0}'>{1}</option>".format(
-                                            normalizedTarget,
+                                            descriptor.target_id,
                                             descriptor.target
                                     )).data('summary', descriptor);
                             boards_e.append(select_e);
@@ -353,9 +350,8 @@ TABS.firmware_flasher.initialize = function (callback) {
                         versions_e.append($("<option value='0'>{0} {1}</option>".format(i18n.getMessage('firmwareFlasherOptionLabelSelectFirmwareVersionFor'), target)));
                     }
 
-                    var normalizedTarget = normalizeTargetName(target);
-                    if (typeof TABS.firmware_flasher.releases[normalizedTarget]?.forEach === 'function') {
-                        TABS.firmware_flasher.releases[normalizedTarget].forEach(function(descriptor) {
+                    if (typeof TABS.firmware_flasher.releases[target]?.forEach === 'function') {
+                        TABS.firmware_flasher.releases[target].forEach(function(descriptor) {
                             var select_e =
                                     $("<option value='{0}'>{0} - {1} - {2} ({3})</option>".format(
                                             descriptor.version,
