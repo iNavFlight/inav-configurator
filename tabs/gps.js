@@ -218,10 +218,10 @@ TABS.gps.initialize = function (callback) {
                 name: "u-blox M9",
                 galileo: true,
                 glonass: true,
-                beidou: true,
+                beidou: false,
                 rate: 10,
                 description: [
-                    "4 GNSS constellations (16 satellites at 10Hz due to hardware limit)",
+                    "3 GNSS constellations (GPS+Galileo+Glonass)",
                     "10Hz update rate",
                     "Best for: General use, balanced accuracy and responsiveness"
                 ]
@@ -230,10 +230,10 @@ TABS.gps.initialize = function (callback) {
                 name: "u-blox M10",
                 galileo: true,
                 glonass: true,
-                beidou: true,
+                beidou: false,
                 rate: 6,
                 description: [
-                    "4 GNSS constellations for maximum satellites",
+                    "3 GNSS constellations (GPS+Galileo+Glonass)",
                     "6Hz update rate (safe for M10 default CPU clock)",
                     "Best for: Long-range, cruise, slower aircraft"
                 ]
@@ -242,10 +242,10 @@ TABS.gps.initialize = function (callback) {
                 name: "u-blox M10 (High-Performance)",
                 galileo: true,
                 glonass: true,
-                beidou: true,
+                beidou: false,
                 rate: 10,
                 description: [
-                    "4 GNSS constellations at full speed",
+                    "3 GNSS constellations (GPS+Galileo+Glonass)",
                     "10Hz update rate (requires high-performance CPU clock)",
                     "Only use if you KNOW your M10 has high-performance clock enabled"
                 ]
