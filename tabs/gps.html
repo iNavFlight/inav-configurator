@@ -38,16 +38,44 @@
                             <input type="number" id="mag_declination" name="mag_declination" step="0.1" min="-180" max="180" />
                             <label for="mag_declination"><span data-i18n="configurationMagDeclination"></span></label>
                         </div>
+                        <!-- GPS Optimization Preset -->
+                        <div class="select">
+                            <select id="gps_preset_mode">
+                                <option value="auto">Auto-detect GPS Type</option>
+                                <option value="manual" selected>Manual Settings</option>
+                                <option value="m8">u-blox M8</option>
+                                <option value="m9">u-blox M9</option>
+                                <option value="m10">u-blox M10</option>
+                                <option value="m10-highperf">u-blox M10 (High-Performance)</option>
+                            </select>
+                            <label for="gps_preset_mode">
+                                <span data-i18n="gpsPresetMode">GPS Configuration Preset</span>
+                            </label>
+                            <div for="gps_preset_mode" class="helpicon cf_tip" data-i18n_title="gpsPresetModeHelp"></div>
+                        </div>
+                        <!-- GPS Preset Info (shown when preset selected) -->
+                        <div class="preset-info" id="preset_info" style="display: none; padding: 5px; margin: 5px 0; background: #f0f0f0; border-radius: 3px;">
+                            <strong><span id="preset_name"></span></strong>
+                            <ul id="preset_details" style="margin: 5px 0; padding-left: 20px;"></ul>
+                        </div>
+                        <!-- GPS Update Rate -->
+                        <div class="number">
+                            <input type="number" id="gps_ublox_nav_hz" data-setting="gps_ublox_nav_hz" step="1" min="5" max="20" />
+                            <label for="gps_ublox_nav_hz">
+                                <span data-i18n="gpsUpdateRate">GPS Update Rate (Hz)</span>
+                            </label>
+                            <div for="gps_ublox_nav_hz" class="helpicon cf_tip" data-i18n_title="gpsUpdateRateHelp"></div>
+                        </div>
                         <div class="checkbox">
-                            <input type="checkbox" class="toggle update_preview" data-setting="gps_ublox_use_galileo" data-live="true">
+                            <input type="checkbox" id="gps_use_galileo" class="toggle update_preview preset-controlled" data-setting="gps_ublox_use_galileo" data-live="true">
                             <label for="gps_use_galileo"><span data-i18n="configurationGPSUseGalileo"></span></label>
                         </div>
                         <div class="checkbox">
-                            <input type="checkbox" class="toggle update_preview" data-setting="gps_ublox_use_beidou" data-live="true">
+                            <input type="checkbox" id="gps_use_beidou" class="toggle update_preview preset-controlled" data-setting="gps_ublox_use_beidou" data-live="true">
                             <label for="gps_use_beidou"><span data-i18n="configurationGPSUseBeidou"></span></label>
                         </div>
                         <div class="checkbox">
-                            <input type="checkbox" class="toggle update_preview" data-setting="gps_ublox_use_glonass" data-live="true">
+                            <input type="checkbox" id="gps_use_glonass" class="toggle update_preview preset-controlled" data-setting="gps_ublox_use_glonass" data-live="true">
                             <label for="gps_use_glonass"><span data-i18n="configurationGPSUseGlonass"></span></label>
                         </div>
                         <div class="number">
