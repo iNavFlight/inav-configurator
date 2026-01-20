@@ -310,11 +310,11 @@ TABS.gps.initialize = function (callback) {
             const preset = GPS_PRESETS[presetId];
             if (!preset) return;
 
-            // Apply preset values
-            $('#gps_use_galileo').prop('checked', preset.galileo);
-            $('#gps_use_glonass').prop('checked', preset.glonass);
-            $('#gps_use_beidou').prop('checked', preset.beidou);
-            $('#gps_ublox_nav_hz').val(preset.rate);
+            // Apply preset values (trigger change for state consistency)
+            $('#gps_use_galileo').prop('checked', preset.galileo).trigger('change');
+            $('#gps_use_glonass').prop('checked', preset.glonass).trigger('change');
+            $('#gps_use_beidou').prop('checked', preset.beidou).trigger('change');
+            $('#gps_ublox_nav_hz').val(preset.rate).trigger('change');
 
             // Disable controls (user can see but not edit)
             $('.preset-controlled').prop('disabled', true);
