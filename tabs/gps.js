@@ -281,16 +281,16 @@ TABS.gps.initialize = function (callback) {
         }
 
         function applyGPSPreset(presetId) {
-            const preset = GPS_PRESETS[presetId];
-
-            if (!preset) return;
-
+            // Handle special cases first (before checking GPS_PRESETS)
             if (presetId === 'manual') {
                 // Enable all controls
                 $('.preset-controlled').prop('disabled', false);
                 $('#gps_ublox_nav_hz').prop('disabled', false);
                 $('#preset_info').hide();
-            } else if (presetId === 'auto') {
+                return;
+            }
+
+            if (presetId === 'auto') {
                 // Try to auto-detect from FC
                 if (FC.GPS_DATA && FC.GPS_DATA.hwVersion) {
                     const detectedPreset = detectGPSPreset(FC.GPS_DATA.hwVersion);
@@ -303,22 +303,27 @@ TABS.gps.initialize = function (callback) {
                     $('#gps_preset_mode').val('manual');
                     GUI.log(i18n.getMessage('gpsAutoDetectFailed'));
                 }
-            } else {
-                // Apply preset values
-                $('#gps_use_galileo').prop('checked', preset.galileo);
-                $('#gps_use_glonass').prop('checked', preset.glonass);
-                $('#gps_use_beidou').prop('checked', preset.beidou);
-                $('#gps_ublox_nav_hz').val(preset.rate);
-
-                // Disable controls (user can see but not edit)
-                $('.preset-controlled').prop('disabled', true);
-                $('#gps_ublox_nav_hz').prop('disabled', true);
-
-                // Show preset info
-                $('#preset_name').text(preset.name);
-                $('#preset_details').html(preset.description.map(d => `<li>${d}</li>`).join(''));
-                $('#preset_info').show();
+                return;
             }
+
+            // Normal preset application
+            const preset = GPS_PRESETS[presetId];
+            if (!preset) return;
+
+            // Apply preset values
+            $('#gps_use_galileo').prop('checked', preset.galileo);
+            $('#gps_use_glonass').prop('checked', preset.glonass);
+            $('#gps_use_beidou').prop('checked', preset.beidou);
+            $('#gps_ublox_nav_hz').val(preset.rate);
+
+            // Disable controls (user can see but not edit)
+            $('.preset-controlled').prop('disabled', true);
+            $('#gps_ublox_nav_hz').prop('disabled', true);
+
+            // Show preset info
+            $('#preset_name').text(preset.name);
+            $('#preset_details').html(preset.description.map(d => `<li>${d}</li>`).join(''));
+            $('#preset_info').show();
         }
 
         // Set up preset mode handler
@@ -326,8 +331,16 @@ TABS.gps.initialize = function (callback) {
             applyGPSPreset($(this).val());
         });
 
-        // Initialize with manual mode (or auto-detect if available)
-        applyGPSPreset('manual');
+        // Initialize - try auto-detect if GPS data available, otherwise manual
+        if (FC.GPS_DATA && FC.GPS_DATA.hwVersion && FC.GPS_DATA.hwVersion > 0) {
+            // GPS data already available (e.g., from previous tab load)
+            const detectedPreset = detectGPSPreset(FC.GPS_DATA.hwVersion);
+            applyGPSPreset(detectedPreset);
+            $('#gps_preset_mode').val(detectedPreset);
+        } else {
+            // GPS data not yet available, default to manual
+            applyGPSPreset('manual');
+        }
 
         let mapView = new View({
             center: [0, 0],
