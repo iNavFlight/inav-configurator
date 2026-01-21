@@ -702,7 +702,10 @@ input[type="number"]::-webkit-inner-spin-button {
 }
 
 #tabs .group-header.active {
-    background-color: #3a3a3a;
+    background-color: transparent;
+    padding: 0;
+    min-height: 1px;
+    border-top: 1px solid rgba(55, 168, 219, 0.3);
 }
 
 #tabs .group-title {
@@ -710,16 +713,21 @@ input[type="number"]::-webkit-inner-spin-button {
     font-size: 12px;
     font-weight: 600;
     color: #b0b0b0;
+    transition: opacity 0.2s;
+}
+
+#tabs .group-header.active .group-title {
+    display: none;
 }
 
 #tabs .chevron {
     font-size: 10px;
-    transition: transform 0.2s;
+    transition: transform 0.2s, opacity 0.2s;
     color: #808080;
 }
 
 #tabs .group-header.active .chevron {
-    transform: rotate(90deg);
+    display: none;
 }
 
 #tabs .group-items {
@@ -746,6 +754,43 @@ input[type="number"]::-webkit-inner-spin-button {
 
 #tabs .group-items li a {
     padding-left: 40px;
+}
+
+/* Expand/Collapse All Toggle */
+#tabs .nav-toggle-all {
+    margin-top: 4px;
+    padding: 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+#tabs .nav-toggle-all a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 6px 12px;
+    color: #37a8db;
+    font-family: 'open_sanssemibold', Arial, serif;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    background-color: rgba(55, 168, 219, 0.05);
+    transition: background-color 0.2s, color 0.2s;
+}
+
+#tabs .nav-toggle-all a:hover {
+    background-color: rgba(55, 168, 219, 0.15);
+    color: #4db8eb;
+}
+
+#tabs .nav-toggle-all svg {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+}
+
+#tabs .nav-toggle-all .toggle-text {
+    display: none;
 }
 
 .tabicon {

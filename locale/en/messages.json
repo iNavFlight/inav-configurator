@@ -47,6 +47,12 @@
     "options_cliAutocomplete": {
         "message": "Advanced CLI AutoComplete"
     },
+    "navExpandAll": {
+        "message": "Expand All"
+    },
+    "navCollapseAll": {
+        "message": "Collapse All"
+    },
     "options_unit_type": {
         "message": "Set how the units render on the configurator only"
     },

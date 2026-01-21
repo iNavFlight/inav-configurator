@@ -278,11 +278,66 @@ $(function() {
             // Toggle this group
             header.toggleClass('active');
             items.toggleClass('expanded');
+
+            // Update the expand/collapse all button state
+            updateToggleAllButton();
         });
 
-        // Initialize: expand first group by default
-        $('#tabs ul.mode-connected .nav-group:first-child .group-header').addClass('active');
-        $('#tabs ul.mode-connected .nav-group:first-child .group-items').addClass('expanded');
+        // Function to update toggle all button state
+        function updateToggleAllButton() {
+            const allExpanded = $('.nav-group .group-header.active').length === $('.nav-group .group-header').length;
+            const $expandIcon = $('#toggleAllGroups .expand-icon');
+            const $collapseIcon = $('#toggleAllGroups .collapse-icon');
+            const $toggleText = $('#toggleAllGroups .toggle-text');
+
+            if (allExpanded) {
+                $expandIcon.hide();
+                $collapseIcon.show();
+                $toggleText.attr('data-i18n', 'navCollapseAll');
+                $toggleText.text(i18n.getMessage('navCollapseAll'));
+            } else {
+                $expandIcon.show();
+                $collapseIcon.hide();
+                $toggleText.attr('data-i18n', 'navExpandAll');
+                $toggleText.text(i18n.getMessage('navExpandAll'));
+            }
+        }
+
+        // Expand/Collapse All Toggle
+        $('#toggleAllGroups').on('click', function(e) {
+            e.preventDefault();
+            const allExpanded = $('.nav-group .group-header.active').length === $('.nav-group .group-header').length;
+
+            if (allExpanded) {
+                // Collapse all except first
+                $('.nav-group .group-header').removeClass('active');
+                $('.nav-group .group-items').removeClass('expanded');
+                $('#tabs ul.mode-connected .nav-group:first-child .group-header').addClass('active');
+                $('#tabs ul.mode-connected .nav-group:first-child .group-items').addClass('expanded');
+                store.set('expand_all_groups', false);
+            } else {
+                // Expand all
+                $('.nav-group .group-header').addClass('active');
+                $('.nav-group .group-items').addClass('expanded');
+                store.set('expand_all_groups', true);
+            }
+
+            updateToggleAllButton();
+        });
+
+        // Initialize: apply saved expand all preference or expand first group by default
+        if (store.get('expand_all_groups', false)) {
+            // Expand all groups
+            $('.nav-group .group-header').addClass('active');
+            $('.nav-group .group-items').addClass('expanded');
+        } else {
+            // Expand first group only
+            $('#tabs ul.mode-connected .nav-group:first-child .group-header').addClass('active');
+            $('#tabs ul.mode-connected .nav-group:first-child .group-items').addClass('expanded');
+        }
+
+        // Update button state on initialization
+        updateToggleAllButton();
 
 
         // options
