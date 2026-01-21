@@ -269,7 +269,21 @@ $(function() {
 
         $('#tabs ul.mode-disconnected li a:first').trigger( "click" );
 
-    
+        // Accordion Navigation Groups
+        $('.group-header').on('click', function(e) {
+            e.stopPropagation(); // Prevent triggering tab click
+            const header = $(this);
+            const items = header.next('.group-items');
+
+            // Toggle this group
+            header.toggleClass('active');
+            items.toggleClass('expanded');
+        });
+
+        // Initialize: expand first group by default
+        $('#tabs ul.mode-connected .nav-group:first-child .group-header').addClass('active');
+        $('#tabs ul.mode-connected .nav-group:first-child .group-items').addClass('expanded');
+
 
         // options
         $('#options').on('click', function() {

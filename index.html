@@ -244,83 +244,159 @@
                     </li>
                 </ul>
                 <ul class="mode-connected">
-                    <li class="tab_setup">
-                        <a href="#" data-i18n="tabSetup" class="tabicon ic_setup" data-i18n_title="tabSetup"></a>
-                    </li>
-                    <li class="tab_calibration">
-                        <a href="#" data-i18n="tabCalibration" class="tabicon ic_calibration" title="Calibration"></a>
-                    </li>
-                    <li class="tab_mixer">
-                        <a href="#" data-i18n="tabMixer" class="tabicon ic_mixer" title="Mixer"></a>
-                    </li>
-                    <li class="tab_outputs">
-                        <a href="#" data-i18n="tabOutputs" class="tabicon ic_motor" title="Outputs"></a>
-                    </li>
-                    <li class="tab_ports">
-                        <a href="#" data-i18n="tabPorts" class="tabicon ic_ports" title="Ports"></a>
-                    </li>
-                    <li class="tab_configuration">
-                        <a href="#" data-i18n="tabConfiguration" class="tabicon ic_config" title="Configuration"></a>
-                    </li>
-                    <li class="tab_failsafe">
-                        <a href="#" data-i18n="tabFailsafe" class="tabicon ic_failsafe" title="Failsafe"></a>
-                    </li>
-                    <li class="tab_pid_tuning">
-                        <a href="#" data-i18n="tabPidTuning" class="tabicon ic_pid" data-i18n_title="tabPidTuning"></a>
-                    </li>
-                    <li class="tab_advanced_tuning">
-                        <a href="#" data-i18n="tabAdvancedTuning" class="tabicon ic_advanced"
-                            title="Advanced Tuning"></a>
-                    </li>
-                    <li class="tab_programming">
-                        <a href="#" data-i18n="tabProgramming" class="tabicon ic_config" title="Programming"></a>
-                    </li>
-                    <li class="tab_javascript_programming">
-                        <a href="#" i18n="tabJavaScriptProgramming" class="tabicon ic_javascript_programming" title="Javascript Programming">></a>
-                    </li>
-                    <li class="tab_receiver">
-                        <a href="#" data-i18n="tabReceiver" class="tabicon ic_rx" title="Receiver"></a>
-                    </li>
-                    <li class="tab_auxiliary">
-                        <a href="#" data-i18n="tabAuxiliary" class="tabicon ic_modes" title="Modes"></a>
-                    </li>
-                    <li class="tab_adjustments">
-                        <a href="#" data-i18n="tabAdjustments" class="tabicon ic_adjust" title="Adjustments"></a>
-                    </li>
-                    <li class="tab_gps">
-                        <a href="#" data-i18n="tabGPS" class="tabicon ic_gps" title="GPS"></a>
-                    </li>
-                    <li class="tab_magnetometer">
-                        <a href="#" data-i18n="tabMAGNETOMETER" class="tabicon ic_mag" title="MAGNETOMETER"></a>
-                    </li>
-                    <li class="tab_mission_control">
-                        <a href="#" data-i18n="tabMissionControl" class="tabicon ic_mission"
-                            title="Mission Control"></a>
-                    </li>
-                    <li class="tab_osd">
-                        <a href="#" data-i18n="tabOSD" class="tabicon ic_osd" title="OSD"></a>
-                    </li>
-                    <li class="tab_led_strip">
-                        <a href="#" data-i18n="tabLedStrip" class="tabicon ic_led" title="LED Strip"></a>
-                    </li>
-                    <li class="tab_sensors">
-                        <a href="#" data-i18n="tabRawSensorData" class="tabicon ic_sensors" title="Sensors"></a>
-                    </li>
-                    <li class="tab_logging">
-                        <a href="#" data-i18n="tabLogging" class="tabicon ic_log" title="Tethered Logging"></a>
-                    </li>
-                    <li class="tab_onboard_logging">
-                        <a href="#" data-i18n="tabOnboardLogging" class="tabicon ic_data" title="Onboard Logging"></a>
-                    </li>
-                    <li class="tab_cli">
-                        <a href="#" data-i18n="tabCLI" class="tabicon ic_cli" title="CLI"></a>
-                    </li>
-                    <li class="tab_search">
-                        <a href="#" data-i18n="search" class="tabicon ic_search" title="Search"></a>
+                    <!-- Setup & Configuration -->
+                    <li class="nav-group">
+                        <div class="group-header">
+                            <span class="group-title" data-i18n="navGroupSetup">Setup & Configuration</span>
+                            <span class="chevron">▸</span>
+                        </div>
+                        <ul class="group-items">
+                            <li class="tab_setup">
+                                <a href="#" data-i18n="tabSetup" class="tabicon ic_setup" data-i18n_title="tabSetup"></a>
+                            </li>
+                            <li class="tab_calibration">
+                                <a href="#" data-i18n="tabCalibration" class="tabicon ic_calibration" title="Calibration"></a>
+                            </li>
+                            <li class="tab_magnetometer">
+                                <a href="#" data-i18n="tabMAGNETOMETER" class="tabicon ic_mag" title="MAGNETOMETER"></a>
+                            </li>
+                            <li class="tab_configuration">
+                                <a href="#" data-i18n="tabConfiguration" class="tabicon ic_config" title="Configuration"></a>
+                            </li>
+                            <li class="tab_ports">
+                                <a href="#" data-i18n="tabPorts" class="tabicon ic_ports" title="Ports"></a>
+                            </li>
+                        </ul>
                     </li>
 
+                    <!-- Flight Control -->
+                    <li class="nav-group">
+                        <div class="group-header">
+                            <span class="group-title" data-i18n="navGroupFlight">Flight Control</span>
+                            <span class="chevron">▸</span>
+                        </div>
+                        <ul class="group-items">
+                            <li class="tab_mixer">
+                                <a href="#" data-i18n="tabMixer" class="tabicon ic_mixer" title="Mixer"></a>
+                            </li>
+                            <li class="tab_outputs">
+                                <a href="#" data-i18n="tabOutputs" class="tabicon ic_motor" title="Outputs"></a>
+                            </li>
+                            <li class="tab_receiver">
+                                <a href="#" data-i18n="tabReceiver" class="tabicon ic_rx" title="Receiver"></a>
+                            </li>
+                            <li class="tab_auxiliary">
+                                <a href="#" data-i18n="tabAuxiliary" class="tabicon ic_modes" title="Modes"></a>
+                            </li>
+                            <li class="tab_failsafe">
+                                <a href="#" data-i18n="tabFailsafe" class="tabicon ic_failsafe" title="Failsafe"></a>
+                            </li>
+                        </ul>
+                    </li>
 
-                    <!-- <li class=""><a href="#" class="tabicon ic_advanced">Advanced (spare icon)</a></li> -->
+                    <!-- Tuning -->
+                    <li class="nav-group">
+                        <div class="group-header">
+                            <span class="group-title" data-i18n="navGroupTuning">Tuning</span>
+                            <span class="chevron">▸</span>
+                        </div>
+                        <ul class="group-items">
+                            <li class="tab_pid_tuning">
+                                <a href="#" data-i18n="tabPidTuning" class="tabicon ic_pid" data-i18n_title="tabPidTuning"></a>
+                            </li>
+                            <li class="tab_advanced_tuning">
+                                <a href="#" data-i18n="tabAdvancedTuning" class="tabicon ic_advanced"
+                                    title="Advanced Tuning"></a>
+                            </li>
+                            <li class="tab_adjustments">
+                                <a href="#" data-i18n="tabAdjustments" class="tabicon ic_adjust" title="Adjustments"></a>
+                            </li>
+                        </ul>
+                    </li>
+
+                    <!-- Navigation & Mission -->
+                    <li class="nav-group">
+                        <div class="group-header">
+                            <span class="group-title" data-i18n="navGroupNavigation">Navigation & Mission</span>
+                            <span class="chevron">▸</span>
+                        </div>
+                        <ul class="group-items">
+                            <li class="tab_gps">
+                                <a href="#" data-i18n="tabGPS" class="tabicon ic_gps" title="GPS"></a>
+                            </li>
+                            <li class="tab_mission_control">
+                                <a href="#" data-i18n="tabMissionControl" class="tabicon ic_mission"
+                                    title="Mission Control"></a>
+                            </li>
+                        </ul>
+                    </li>
+
+                    <!-- Sensors & Peripherals -->
+                    <li class="nav-group">
+                        <div class="group-header">
+                            <span class="group-title" data-i18n="navGroupSensors">Sensors & Peripherals</span>
+                            <span class="chevron">▸</span>
+                        </div>
+                        <ul class="group-items">
+                            <li class="tab_sensors">
+                                <a href="#" data-i18n="tabRawSensorData" class="tabicon ic_sensors" title="Sensors"></a>
+                            </li>
+                            <li class="tab_osd">
+                                <a href="#" data-i18n="tabOSD" class="tabicon ic_osd" title="OSD"></a>
+                            </li>
+                            <li class="tab_led_strip">
+                                <a href="#" data-i18n="tabLedStrip" class="tabicon ic_led" title="LED Strip"></a>
+                            </li>
+                        </ul>
+                    </li>
+
+                    <!-- Data Logging -->
+                    <li class="nav-group">
+                        <div class="group-header">
+                            <span class="group-title" data-i18n="navGroupLogging">Data Logging</span>
+                            <span class="chevron">▸</span>
+                        </div>
+                        <ul class="group-items">
+                            <li class="tab_onboard_logging">
+                                <a href="#" data-i18n="tabOnboardLogging" class="tabicon ic_data" title="Onboard Logging"></a>
+                            </li>
+                            <li class="tab_logging">
+                                <a href="#" data-i18n="tabLogging" class="tabicon ic_log" title="Tethered Logging"></a>
+                            </li>
+                        </ul>
+                    </li>
+
+                    <!-- Programming -->
+                    <li class="nav-group">
+                        <div class="group-header">
+                            <span class="group-title" data-i18n="navGroupProgramming">Programming</span>
+                            <span class="chevron">▸</span>
+                        </div>
+                        <ul class="group-items">
+                            <li class="tab_programming">
+                                <a href="#" data-i18n="tabProgramming" class="tabicon ic_config" title="Programming"></a>
+                            </li>
+                            <li class="tab_javascript_programming">
+                                <a href="#" i18n="tabJavaScriptProgramming" class="tabicon ic_javascript_programming" title="Javascript Programming">></a>
+                            </li>
+                        </ul>
+                    </li>
+
+                    <!-- Tools -->
+                    <li class="nav-group">
+                        <div class="group-header">
+                            <span class="group-title" data-i18n="navGroupTools">Tools</span>
+                            <span class="chevron">▸</span>
+                        </div>
+                        <ul class="group-items">
+                            <li class="tab_cli">
+                                <a href="#" data-i18n="tabCLI" class="tabicon ic_cli" title="CLI"></a>
+                            </li>
+                            <li class="tab_search">
+                                <a href="#" data-i18n="search" class="tabicon ic_search" title="Search"></a>
+                            </li>
+                        </ul>
+                    </li>
                 </ul>
             </div>
             <div class="clear-both"></div>

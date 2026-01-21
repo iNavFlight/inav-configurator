@@ -680,9 +680,82 @@ input[type="number"]::-webkit-inner-spin-button {
     background-color: #37a8db;
 }
 
+/* Accordion Navigation Groups */
+#tabs .nav-group {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.30);
+}
+
+#tabs .group-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    cursor: pointer;
+    background-color: #2d2d2d;
+    transition: background-color 0.2s;
+    user-select: none;
+    border-top: solid 1px rgba(255, 255, 255, 0.05);
+}
+
+#tabs .group-header:hover {
+    background-color: #353535;
+}
+
+#tabs .group-header.active {
+    background-color: #3a3a3a;
+}
+
+#tabs .group-title {
+    font-family: 'open_sanssemibold', Arial, serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: #b0b0b0;
+}
+
+#tabs .chevron {
+    font-size: 10px;
+    transition: transform 0.2s;
+    color: #808080;
+}
+
+#tabs .group-header.active .chevron {
+    transform: rotate(90deg);
+}
+
+#tabs .group-items {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+    background-color: #252525;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+#tabs .group-items.expanded {
+    max-height: 500px;
+}
+
+#tabs .group-items li {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.20);
+}
+
+#tabs .group-items li:last-child {
+    border-bottom: 0;
+}
+
+#tabs .group-items li a {
+    padding-left: 40px;
+}
+
 .tabicon {
     background: no-repeat 13px 7px;
     background-size: 15px;
+}
+
+/* Adjust icon position for accordion tabs */
+#tabs .group-items .tabicon {
+    background-position: 20px 7px;
 }
 
 /* Tab-Icons */
