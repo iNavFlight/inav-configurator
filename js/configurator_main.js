@@ -279,8 +279,19 @@ $(function() {
             header.toggleClass('active');
             items.toggleClass('expanded');
 
+            // Update aria-expanded for accessibility
+            header.attr('aria-expanded', header.hasClass('active'));
+
             // Update the expand/collapse all button state
             updateToggleAllButton();
+        });
+
+        // Keyboard accessibility for accordion headers
+        $('.group-header').on('keydown', function(e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                $(this).trigger('click');
+            }
         });
 
         // Function to update toggle all button state
@@ -310,14 +321,14 @@ $(function() {
 
             if (allExpanded) {
                 // Collapse all except first
-                $('.nav-group .group-header').removeClass('active');
+                $('.nav-group .group-header').removeClass('active').attr('aria-expanded', 'false');
                 $('.nav-group .group-items').removeClass('expanded');
-                $('#tabs ul.mode-connected .nav-group:first-child .group-header').addClass('active');
+                $('#tabs ul.mode-connected .nav-group:first-child .group-header').addClass('active').attr('aria-expanded', 'true');
                 $('#tabs ul.mode-connected .nav-group:first-child .group-items').addClass('expanded');
                 store.set('expand_all_groups', false);
             } else {
                 // Expand all
-                $('.nav-group .group-header').addClass('active');
+                $('.nav-group .group-header').addClass('active').attr('aria-expanded', 'true');
                 $('.nav-group .group-items').addClass('expanded');
                 store.set('expand_all_groups', true);
             }
@@ -328,11 +339,11 @@ $(function() {
         // Initialize: apply saved expand all preference or expand first group by default
         if (store.get('expand_all_groups', false)) {
             // Expand all groups
-            $('.nav-group .group-header').addClass('active');
+            $('.nav-group .group-header').addClass('active').attr('aria-expanded', 'true');
             $('.nav-group .group-items').addClass('expanded');
         } else {
             // Expand first group only
-            $('#tabs ul.mode-connected .nav-group:first-child .group-header').addClass('active');
+            $('#tabs ul.mode-connected .nav-group:first-child .group-header').addClass('active').attr('aria-expanded', 'true');
             $('#tabs ul.mode-connected .nav-group:first-child .group-items').addClass('expanded');
         }
 
