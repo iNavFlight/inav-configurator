@@ -454,18 +454,6 @@ var defaultsDialogData = [
                 key: "yaw_rate",
                 value: 3
             },
-                        {
-                key: "nav_fw_pos_z_p",
-                value: 35
-            },
-            {
-                key: "nav_fw_pos_z_i",
-                value: 5
-            },
-            {
-                key: "nav_fw_pos_z_d",
-                value: 10
-            },
             {
                 key: "nav_fw_pos_xy_p",
                 value: 55
