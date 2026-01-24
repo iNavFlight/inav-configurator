@@ -454,18 +454,6 @@ var defaultsDialogData = [
                 key: "yaw_rate",
                 value: 3
             },
-                        {
-                key: "nav_fw_pos_z_p",
-                value: 35
-            },
-            {
-                key: "nav_fw_pos_z_i",
-                value: 5
-            },
-            {
-                key: "nav_fw_pos_z_d",
-                value: 10
-            },
             {
                 key: "nav_fw_pos_xy_p",
                 value: 55
@@ -529,6 +517,26 @@ var defaultsDialogData = [
             {
                 key: "fw_ff_yaw",
                 value: 255
+            },
+            {
+                key: "set nav_fw_pos_z_p",
+                value: 22
+            },
+            {
+                key: "set nav_fw_pos_z_i",
+                value: 6
+            },
+            {
+                key: "set nav_fw_pos_z_d",
+                value: 2
+            },
+            {
+                key: "set nav_fw_pos_z_FF",
+                value: 25
+            },
+            {
+                key: "set nav_fw_alt_control_response",
+                value: 45
             },
             {
                 key: "airmode_type",
@@ -668,18 +676,6 @@ var defaultsDialogData = [
                 value: 3
             },
             {
-                key: "nav_fw_pos_z_p",
-                value: 25
-            },
-            {
-                key: "nav_fw_pos_z_i",
-                value: 5
-            },
-            {
-                key: "nav_fw_pos_z_d",
-                value: 8
-            },
-            {
                 key: "nav_fw_pos_xy_p",
                 value: 75
             },
@@ -742,6 +738,26 @@ var defaultsDialogData = [
             {
                 key: "fw_ff_yaw",
                 value: 100
+            },
+            {
+                key: "set nav_fw_pos_z_p",
+                value: 25
+            },
+            {
+                key: "set nav_fw_pos_z_i",
+                value: 6
+            },
+            {
+                key: "set nav_fw_pos_z_d",
+                value: 5
+            },
+            {
+                key: "set nav_fw_pos_z_FF",
+                value: 25
+            },
+            {
+                key: "set nav_fw_alt_control_response",
+                value: 45
             },
             {
                 key: "airmode_type",
