@@ -519,19 +519,19 @@ var defaultsDialogData = [
                 value: 255
             },
             {
-                key: "set nav_fw_pos_z_p",
+                key: "nav_fw_pos_z_p",
                 value: 22
             },
             {
-                key: "set nav_fw_pos_z_i",
+                key: "nav_fw_pos_z_i",
                 value: 6
             },
             {
-                key: "set nav_fw_pos_z_d",
+                key: "nav_fw_pos_z_d",
                 value: 2
             },
             {
-                key: "set nav_fw_pos_z_FF",
+                key: "nav_fw_pos_z_FF",
                 value: 25
             },
             {
@@ -740,19 +740,19 @@ var defaultsDialogData = [
                 value: 100
             },
             {
-                key: "set nav_fw_pos_z_p",
+                key: "nav_fw_pos_z_p",
                 value: 25
             },
             {
-                key: "set nav_fw_pos_z_i",
+                key: "nav_fw_pos_z_i",
                 value: 6
             },
             {
-                key: "set nav_fw_pos_z_d",
+                key: "nav_fw_pos_z_d",
                 value: 5
             },
             {
-                key: "set nav_fw_pos_z_FF",
+                key: "nav_fw_pos_z_FF",
                 value: 25
             },
             {
