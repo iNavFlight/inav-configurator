@@ -1,11 +1,30 @@
 /**
- * INAV Activator Hoisting Module
+ * INAV Logic Condition Hoisting Manager
  *
- * Location: js/transpiler/transpiler/activator_hoisting.js
+ * Extracts complex or multiply-referenced expressions into named const variables
+ * to improve readability and avoid redundancy in decompiled JavaScript.
  *
- * Identifies LCs with activators that should be hoisted to variables.
- * LCs with activators that are referenced as operands are extracted to const declarations
- * so the activator relationship is preserved and the code is more readable.
+ * Hoisting Criteria (all must be true):
+ * - Referenced as operand by other LCs
+ * - Complex (arithmetic, math, logic) OR multiply-referenced (used >1 times)
+ * - Not a stateful operation (STICKY, TIMER, DELAY, EDGE)
+ * - Not an action (GVAR_SET, overrides, etc.)
+ * - Not reading from GVARs that are written elsewhere
+ *
+ * GVAR Dependency Tracking:
+ * Prevents hoisting expressions that read from GVARs before those GVARs are written,
+ * which would cause the hoisted expression to use OLD values instead of NEW values.
+ * If a GVAR is only read (never written), hoisting is safe.
+ *
+ * Execution Order Preservation:
+ * - Hoisted variables emitted in LC index order (matches firmware evaluation order)
+ * - Activator scoping: variables hoisted to global or inside stateful operation blocks
+ * - LC operands always resolve correctly due to index-ordered declaration
+ *
+ * Example:
+ *   const cond1 = Math.min(1000, gvar[5] * 100);  // Complex, referenced 2x
+ *   if (trigger) { doA(cond1); }
+ *   if (other) { doB(cond1); }
  */
 
 'use strict';
