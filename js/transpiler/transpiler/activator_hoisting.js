@@ -99,7 +99,7 @@ export class ActivatorHoistingManager {
   }
 
   /**
-   * Check if an LC's activator chain contains stateful operations (STICKY/TIMER/DELAY)
+   * Check if an LC's activator chain contains stateful operations (STICKY/TIMER/DELAY/EDGE)
    * These need late binding and shouldn't be hoisted
    */
   activatorChainHasSticky(lcIndex, conditions, visited = new Set()) {
@@ -114,7 +114,8 @@ export class ActivatorHoistingManager {
 
     if (activator.operation === OPERATION.STICKY ||
         activator.operation === OPERATION.TIMER ||
-        activator.operation === OPERATION.DELAY) {
+        activator.operation === OPERATION.DELAY ||
+        activator.operation === OPERATION.EDGE) {
       return true;
     }
 
@@ -140,12 +141,13 @@ export class ActivatorHoistingManager {
     for (const lc of conditions) {
       if (lc._gap) continue;
 
-      // Skip actions and stateful operations (STICKY, TIMER, DELAY)
-      // These operations maintain state and should not be hoisted
+      // Skip actions and stateful operations (STICKY, TIMER, DELAY, EDGE)
+      // These operations maintain state across loop iterations and should not be hoisted
       if (this.isActionOperation(lc.operation) ||
           lc.operation === OPERATION.STICKY ||
           lc.operation === OPERATION.TIMER ||
-          lc.operation === OPERATION.DELAY) {
+          lc.operation === OPERATION.DELAY ||
+          lc.operation === OPERATION.EDGE) {
         continue;
       }
 
@@ -193,7 +195,7 @@ export class ActivatorHoistingManager {
     // - Arithmetic: ADD, SUB, MUL, DIV, MOD
     // - Math functions: MIN, MAX, ABS
     // - Logic: AND, OR, XOR, NAND, NOR, NOT
-    // - Stateful: EDGE (transitions), STICKY/TIMER (if referenced as operands)
+    // Note: EDGE, STICKY, TIMER, DELAY are stateful and excluded separately in identifyHoistedVars()
     const complexOps = [
       OPERATION.ADD,         // 14
       OPERATION.SUB,         // 15
@@ -209,14 +211,13 @@ export class ActivatorHoistingManager {
       OPERATION.NOR,         // 11
       OPERATION.NOT,         // 12
       OPERATION.MOD,         // 19
-      OPERATION.EDGE,        // 47 - stateful, activator relationship important
     ];
 
     return complexOps.includes(operation);
   }
 
   /**
-   * Find the first stateful operation (STICKY/TIMER/DELAY) in an LC's activator chain
+   * Find the first stateful operation (STICKY/TIMER/DELAY/EDGE) in an LC's activator chain
    * This determines the scope where the variable should be hoisted
    * @param {number} lcIndex - LC index to check
    * @param {Array} conditions - All conditions
@@ -232,10 +233,11 @@ export class ActivatorHoistingManager {
     const activator = conditions.find(c => c.index === lc.activatorId);
     if (!activator) return -1;
 
-    // If activator is stateful (STICKY/TIMER/DELAY), that's our scope
+    // If activator is stateful (STICKY/TIMER/DELAY/EDGE), that's our scope
     if (activator.operation === OPERATION.STICKY ||
         activator.operation === OPERATION.TIMER ||
-        activator.operation === OPERATION.DELAY) {
+        activator.operation === OPERATION.DELAY ||
+        activator.operation === OPERATION.EDGE) {
       return activator.index;
     }
 
