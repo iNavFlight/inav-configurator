@@ -99,7 +99,7 @@ export class ActivatorHoistingManager {
   }
 
   /**
-   * Check if an LC's activator chain contains STICKY/TIMER operations
+   * Check if an LC's activator chain contains stateful operations (STICKY/TIMER/DELAY)
    * These need late binding and shouldn't be hoisted
    */
   activatorChainHasSticky(lcIndex, conditions, visited = new Set()) {
@@ -112,7 +112,9 @@ export class ActivatorHoistingManager {
     const activator = conditions.find(c => c.index === lc.activatorId);
     if (!activator) return false;
 
-    if (activator.operation === OPERATION.STICKY || activator.operation === OPERATION.TIMER) {
+    if (activator.operation === OPERATION.STICKY ||
+        activator.operation === OPERATION.TIMER ||
+        activator.operation === OPERATION.DELAY) {
       return true;
     }
 
@@ -138,10 +140,12 @@ export class ActivatorHoistingManager {
     for (const lc of conditions) {
       if (lc._gap) continue;
 
-      // Skip actions, sticky, and timer operations
+      // Skip actions and stateful operations (STICKY, TIMER, DELAY)
+      // These operations maintain state and should not be hoisted
       if (this.isActionOperation(lc.operation) ||
           lc.operation === OPERATION.STICKY ||
-          lc.operation === OPERATION.TIMER) {
+          lc.operation === OPERATION.TIMER ||
+          lc.operation === OPERATION.DELAY) {
         continue;
       }
 
@@ -212,11 +216,11 @@ export class ActivatorHoistingManager {
   }
 
   /**
-   * Find the first STICKY/TIMER in an LC's activator chain
+   * Find the first stateful operation (STICKY/TIMER/DELAY) in an LC's activator chain
    * This determines the scope where the variable should be hoisted
    * @param {number} lcIndex - LC index to check
    * @param {Array} conditions - All conditions
-   * @returns {number} LC index of the STICKY/TIMER scope, or -1 for global scope
+   * @returns {number} LC index of the stateful operation scope, or -1 for global scope
    */
   findStickyInActivatorChain(lcIndex, conditions, visited = new Set()) {
     if (visited.has(lcIndex)) return -1;
@@ -228,8 +232,10 @@ export class ActivatorHoistingManager {
     const activator = conditions.find(c => c.index === lc.activatorId);
     if (!activator) return -1;
 
-    // If activator is STICKY/TIMER, that's our scope
-    if (activator.operation === OPERATION.STICKY || activator.operation === OPERATION.TIMER) {
+    // If activator is stateful (STICKY/TIMER/DELAY), that's our scope
+    if (activator.operation === OPERATION.STICKY ||
+        activator.operation === OPERATION.TIMER ||
+        activator.operation === OPERATION.DELAY) {
       return activator.index;
     }
 

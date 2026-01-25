@@ -549,6 +549,11 @@ class Decompiler {
    * @returns {string} JavaScript code
    */
   decompileTree(node, allConditions, indent = 0) {
+    // Defensive check: ensure node has required properties
+    if (!node?.lc || !Array.isArray(node.children)) {
+      return '';
+    }
+
     const indentStr = '  '.repeat(indent);
     const lines = [];
 

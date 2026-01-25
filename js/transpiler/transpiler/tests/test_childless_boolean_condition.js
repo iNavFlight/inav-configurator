@@ -15,6 +15,7 @@
  */
 
 import { Decompiler } from '../decompiler.js';
+import { OPERATION, OPERAND_TYPE } from '../inav_constants.js';
 
 function assertEquals(actual, expected, message) {
   if (actual !== expected) {
@@ -59,10 +60,10 @@ if (runTest('childless boolean condition at root level', () => {
       index: 0,
       enabled: 1,
       activatorId: -1,
-      operation: 3, // LOWER_THAN
-      operandAType: 2, // FLIGHT
+      operation: OPERATION.LOWER_THAN,
+      operandAType: OPERAND_TYPE.FLIGHT,
       operandAValue: 11, // AIR_SPEED
-      operandBType: 0, // VALUE
+      operandBType: OPERAND_TYPE.VALUE,
       operandBValue: 1111,
       flags: 0
     }
