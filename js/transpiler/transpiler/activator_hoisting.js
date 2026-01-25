@@ -28,6 +28,48 @@ export class ActivatorHoistingManager {
   }
 
   /**
+   * Check if an LC reads from any GVAR (recursively checking LC operands)
+   * LCs that read from GVARs should not be hoisted to global scope
+   * because GVAR values are dynamic and can be set at runtime
+   * @param {Object} lc - Logic condition to check
+   * @param {Array} conditions - All conditions (for recursive LC operand checks)
+   * @param {Set} visited - Set of visited LC indices to prevent infinite recursion
+   * @returns {boolean} True if this LC or any LC it references reads from GVAR
+   */
+  readsFromGvar(lc, conditions, visited = new Set()) {
+    if (!lc) return false;
+
+    // Prevent infinite recursion on circular LC references
+    if (visited.has(lc.index)) return false;
+    visited.add(lc.index);
+
+    const OPERAND_TYPE_GVAR = 5;  // From inav_constants.js
+    const OPERAND_TYPE_LC = 4;
+
+    // Direct GVAR read
+    if (lc.operandAType === OPERAND_TYPE_GVAR || lc.operandBType === OPERAND_TYPE_GVAR) {
+      return true;
+    }
+
+    // Recursive check: if operand is another LC, check if that LC reads from GVAR
+    // This handles cases like: LC_A uses LC_B as operand, and LC_B reads from GVAR
+    if (lc.operandAType === OPERAND_TYPE_LC) {
+      const refLc = conditions.find(c => c.index === lc.operandAValue);
+      if (refLc && this.readsFromGvar(refLc, conditions, visited)) {
+        return true;
+      }
+    }
+    if (lc.operandBType === OPERAND_TYPE_LC) {
+      const refLc = conditions.find(c => c.index === lc.operandBValue);
+      if (refLc && this.readsFromGvar(refLc, conditions, visited)) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  /**
    * Check if an LC's activator chain contains STICKY/TIMER operations
    * These need late binding and shouldn't be hoisted
    */
@@ -68,6 +110,13 @@ export class ActivatorHoistingManager {
       if (this.isActionOperation(lc.operation) ||
           lc.operation === OPERATION.STICKY ||
           lc.operation === OPERATION.TIMER) {
+        continue;
+      }
+
+      // Skip LCs that read from GVARs - they should not be hoisted to global scope
+      // because GVAR values are dynamic and can be set at runtime by other LCs.
+      // Hoisting would cause them to use OLD GVAR values instead of NEW values.
+      if (this.readsFromGvar(lc, conditions)) {
         continue;
       }
 
