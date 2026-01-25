@@ -28,15 +28,41 @@ export class ActivatorHoistingManager {
   }
 
   /**
-   * Check if an LC reads from any GVAR (recursively checking LC operands)
-   * LCs that read from GVARs should not be hoisted to global scope
-   * because GVAR values are dynamic and can be set at runtime
+   * Find which GVARs are being written by ANY enabled LC
+   * These are GVARs that could cause read-after-write dependencies if hoisted
+   * @param {Array} conditions - All logic conditions
+   * @returns {Set} Set of GVAR indices that are written
+   */
+  findWrittenGvars(conditions) {
+    const writtenGvars = new Set();
+    const OPERATION_GVAR_SET = 18;  // From inav_constants.js
+
+    for (const lc of conditions) {
+      if (lc._gap) continue;
+      if (!lc.enabled) continue;  // Skip disabled LCs
+
+      // Check if this is a GVAR_SET operation (regardless of activatorId)
+      // Even if the write is conditional (has activator), we still need to track it
+      // because hoisting a read BEFORE a conditional write breaks execution order
+      if (lc.operation === OPERATION_GVAR_SET) {
+        // operandAValue is the GVAR index being written
+        writtenGvars.add(lc.operandAValue);
+      }
+    }
+
+    return writtenGvars;
+  }
+
+  /**
+   * Check if an LC reads from any GVAR that is written at root level
+   * Only prevent hoisting if reading from a GVAR that is actually being set
    * @param {Object} lc - Logic condition to check
    * @param {Array} conditions - All conditions (for recursive LC operand checks)
+   * @param {Set} writtenGvars - Set of GVAR indices that are written at root level
    * @param {Set} visited - Set of visited LC indices to prevent infinite recursion
-   * @returns {boolean} True if this LC or any LC it references reads from GVAR
+   * @returns {boolean} True if this LC reads from a GVAR that is written
    */
-  readsFromGvar(lc, conditions, visited = new Set()) {
+  readsFromWrittenGvar(lc, conditions, writtenGvars, visited = new Set()) {
     if (!lc) return false;
 
     // Prevent infinite recursion on circular LC references
@@ -46,22 +72,25 @@ export class ActivatorHoistingManager {
     const OPERAND_TYPE_GVAR = 5;  // From inav_constants.js
     const OPERAND_TYPE_LC = 4;
 
-    // Direct GVAR read
-    if (lc.operandAType === OPERAND_TYPE_GVAR || lc.operandBType === OPERAND_TYPE_GVAR) {
+    // Direct GVAR read - check if it's a GVAR that's being written
+    if (lc.operandAType === OPERAND_TYPE_GVAR && writtenGvars.has(lc.operandAValue)) {
+      return true;
+    }
+    if (lc.operandBType === OPERAND_TYPE_GVAR && writtenGvars.has(lc.operandBValue)) {
       return true;
     }
 
-    // Recursive check: if operand is another LC, check if that LC reads from GVAR
-    // This handles cases like: LC_A uses LC_B as operand, and LC_B reads from GVAR
+    // Recursive check: if operand is another LC, check if that LC reads from written GVAR
+    // This handles cases like: LC_A uses LC_B as operand, and LC_B reads from a written GVAR
     if (lc.operandAType === OPERAND_TYPE_LC) {
       const refLc = conditions.find(c => c.index === lc.operandAValue);
-      if (refLc && this.readsFromGvar(refLc, conditions, visited)) {
+      if (refLc && this.readsFromWrittenGvar(refLc, conditions, writtenGvars, visited)) {
         return true;
       }
     }
     if (lc.operandBType === OPERAND_TYPE_LC) {
       const refLc = conditions.find(c => c.index === lc.operandBValue);
-      if (refLc && this.readsFromGvar(refLc, conditions, visited)) {
+      if (refLc && this.readsFromWrittenGvar(refLc, conditions, writtenGvars, visited)) {
         return true;
       }
     }
@@ -103,6 +132,9 @@ export class ActivatorHoistingManager {
     this.hoistedActivatorVars.clear();
     let condVarCount = 1;
 
+    // First pass: identify which GVARs are being written by root-level LCs
+    const writtenGvars = this.findWrittenGvars(conditions);
+
     for (const lc of conditions) {
       if (lc._gap) continue;
 
@@ -113,10 +145,10 @@ export class ActivatorHoistingManager {
         continue;
       }
 
-      // Skip LCs that read from GVARs - they should not be hoisted to global scope
-      // because GVAR values are dynamic and can be set at runtime by other LCs.
-      // Hoisting would cause them to use OLD GVAR values instead of NEW values.
-      if (this.readsFromGvar(lc, conditions)) {
+      // Skip LCs that read from GVARs that are written by root-level LCs
+      // Hoisting these would cause them to use OLD GVAR values instead of NEW values.
+      // But if a GVAR is only READ (never written), hoisting is safe.
+      if (this.readsFromWrittenGvar(lc, conditions, writtenGvars)) {
         continue;
       }
 
