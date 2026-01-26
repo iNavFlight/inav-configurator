@@ -217,5 +217,23 @@ const x = inav.gvar[0];    // read</pre>
 .note_spacer p {
     margin-bottom: 10px;
 }
+
+/* Active LC gutter marker - green checkmark for true conditions */
+.lc-active-true {
+    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><path fill="%234caf50" d="M6.5 12L2 7.5l1.5-1.5L6.5 9l6-6L14 4.5z"/></svg>') no-repeat center;
+    background-size: 14px 14px;
+    width: 16px;
+    margin-left: 3px;
+    cursor: pointer;
+}
+
+/* Monaco gutter margin styling */
+.monaco-editor .margin {
+    background-color: #f5f5f5;
+}
+
+.monaco-editor .margin-view-overlays .lc-active-true {
+    cursor: pointer;
+}
 </style>
 </html>
