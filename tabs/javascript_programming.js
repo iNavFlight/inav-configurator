@@ -786,19 +786,26 @@ if (inav.flight.homeDistance > 100) {
     updateActiveHighlighting: function() {
         const self = this;
 
+        console.log('[JavaScript Programming] updateActiveHighlighting called');
+
         // Don't highlight if code has been modified
         if (self.isDirty) {
+            console.log('[JavaScript Programming] Skipping highlighting - code is dirty');
             self.clearActiveHighlighting();
             return;
         }
 
         // Don't highlight if no mapping available
         if (!self.lcToLineMapping || Object.keys(self.lcToLineMapping).length === 0) {
+            console.log('[JavaScript Programming] Skipping highlighting - no mapping');
             return;
         }
 
+        console.log('[JavaScript Programming] LC-to-line mapping:', self.lcToLineMapping);
+
         // Check if FC data is available
         if (!FC.LOGIC_CONDITIONS_STATUS || !FC.LOGIC_CONDITIONS) {
+            console.log('[JavaScript Programming] Skipping highlighting - FC data not available');
             return;
         }
 
@@ -807,6 +814,7 @@ if (inav.flight.homeDistance > 100) {
 
         // Verify data is loaded (not null)
         if (!lcStatus || !lcConditions) {
+            console.log('[JavaScript Programming] Skipping highlighting - FC data is null');
             return;
         }
 
@@ -820,16 +828,23 @@ if (inav.flight.homeDistance > 100) {
             // Check if LC is enabled and has non-zero status (true)
             if (condition && condition.getEnabled && condition.getEnabled() !== 0 && status !== 0) {
                 trueLCs.push(lcIndex);
+                console.log(`[JavaScript Programming] LC${lcIndex} is TRUE (status: ${status})`);
             }
         }
+
+        console.log('[JavaScript Programming] True LCs:', trueLCs);
 
         // Map LC indices to line numbers
         const linesToHighlight = trueLCs
             .map(lcIndex => self.lcToLineMapping[lcIndex])
             .filter(line => line !== undefined);
 
+        console.log('[JavaScript Programming] Lines to highlight:', linesToHighlight);
+
         // Remove duplicates (multiple LCs on same line)
         const uniqueLines = [...new Set(linesToHighlight)];
+
+        console.log('[JavaScript Programming] Unique lines:', uniqueLines);
 
         // Create Monaco decorations
         const decorations = uniqueLines.map(lineNum => ({
@@ -841,6 +856,8 @@ if (inav.flight.homeDistance > 100) {
                 }
             }
         }));
+
+        console.log('[JavaScript Programming] Creating', decorations.length, 'decorations');
 
         // Apply decorations (Monaco efficiently handles diff)
         if (self.editor && self.editor.deltaDecorations) {
