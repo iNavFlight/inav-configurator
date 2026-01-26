@@ -491,7 +491,10 @@ if (inav.flight.homeDistance > 100) {
         if (!logicConditions || logicConditions.length === 0) {
             GUI.log(i18n.getMessage('noLogicConditions') || 'No logic conditions found on FC');
             self.editor.setValue(self.getDefaultCode());
-            self.isDirty = false;
+            // Clear isDirty flag AFTER setValue completes
+            setTimeout(() => {
+                self.isDirty = false;
+            }, 0);
             if (callback) callback();
             return;
         }
@@ -542,7 +545,11 @@ if (inav.flight.homeDistance > 100) {
                     $('#transpiler-warnings').hide();
                 }
 
-                self.isDirty = false;
+                // Clear isDirty flag AFTER setValue completes (setValue triggers onChange asynchronously)
+                setTimeout(() => {
+                    self.isDirty = false;
+                    console.log('[JavaScript Programming] isDirty cleared after load');
+                }, 0);
             } else {
                 // Decompilation failed
                 GUI.log('Decompilation failed: ' + result.error);
