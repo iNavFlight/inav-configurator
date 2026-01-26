@@ -790,10 +790,21 @@ if (inav.flight.homeDistance > 100) {
             return;
         }
 
-        // Find all LCs with true/non-zero status
-        const trueLCs = [];
+        // Check if FC data is available
+        if (!FC.LOGIC_CONDITIONS_STATUS || !FC.LOGIC_CONDITIONS) {
+            return;
+        }
+
         const lcStatus = FC.LOGIC_CONDITIONS_STATUS.get();
         const lcConditions = FC.LOGIC_CONDITIONS.get();
+
+        // Verify data is loaded (not null)
+        if (!lcStatus || !lcConditions) {
+            return;
+        }
+
+        // Find all LCs with true/non-zero status
+        const trueLCs = [];
 
         for (let lcIndex = 0; lcIndex < lcStatus.length; lcIndex++) {
             const status = lcStatus[lcIndex];
