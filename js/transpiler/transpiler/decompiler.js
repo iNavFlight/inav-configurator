@@ -196,6 +196,7 @@ class Decompiler {
     this.inlineDeclaredVars = new Set(); // Track let variables declared inline in body
     this.hoistedVarCounters = new Map(); // Track counters for hoisted variable names (e.g., min, min2, min3)
     this.lcToLineMapping = {}; // Track which LC maps to which line in final JavaScript (for active LC highlighting)
+    this._tempLcLines = []; // Temporary storage: [{lcIndex, relativeLineOffset}] during generation
 
     // Create hoisting manager for activator-wrapped LCs
     this.hoistingManager = new ActivatorHoistingManager({
@@ -251,7 +252,8 @@ class Decompiler {
     code = this.applyCustomVariableNames(code, enabled);
 
     // Build LC-to-line mapping for active highlighting feature
-    this.buildLineMapping(code, enabled);
+    // Convert tracked lines to actual line numbers in the final code
+    this.finalizeLcLineMapping(code, enabled);
 
     return {
       success: true,
@@ -648,7 +650,11 @@ class Decompiler {
         }
 
         // Build if statement
-        lines.push(indentStr + `if (${condition}) {`);
+        const ifLine = indentStr + `if (${condition}) {`;
+        lines.push(ifLine);
+
+        // Track this LC for line mapping (we'll calculate actual line numbers after boilerplate is added)
+        this._tempLcLines.push({ lcIndex: node.lc.index, lineContent: ifLine });
 
         // First, output any actions at this level
         for (const actionNode of actions) {
@@ -1187,41 +1193,55 @@ class Decompiler {
    * @param {string} code - Final generated JavaScript code
    * @param {Array} conditions - Enabled logic conditions
    */
-  buildLineMapping(code, conditions) {
+  /**
+   * Finalize LC-to-line mapping after code generation
+   * Converts tracked LC lines to actual line numbers in final code
+   * @param {string} code - Final generated code with boilerplate
+   * @param {Array} conditions - All logic conditions
+   */
+  finalizeLcLineMapping(code, conditions) {
     const lines = code.split('\n');
 
-    // First pass: Map LCs that appear explicitly in the code
+    // First pass: Find tracked if-statements in the final code
+    for (const tracked of this._tempLcLines) {
+      const { lcIndex, lineContent } = tracked;
+
+      // Find this line content in the final code
+      for (let lineIdx = 0; lineIdx < lines.length; lineIdx++) {
+        if (lines[lineIdx].trim() === lineContent.trim()) {
+          this.lcToLineMapping[lcIndex] = lineIdx + 1; // Monaco uses 1-based line numbers
+          break;
+        }
+      }
+    }
+
+    // Second pass: Handle hoisted variables (const declarations)
     for (const lc of conditions) {
       if (lc._gap) continue;
 
-      for (let lineIdx = 0; lineIdx < lines.length; lineIdx++) {
-        const line = lines[lineIdx];
-        const lineNumber = lineIdx + 1; // 1-based line numbers for Monaco
-
-        // Strategy 1: Look for LC index in comments (for external references)
-        const commentMatch = line.match(/\/\*\s*LC\s+(\d+)/);
-        if (commentMatch && parseInt(commentMatch[1]) === lc.index) {
-          this.lcToLineMapping[lc.index] = lineNumber;
-          break;
-        }
-
-        // Strategy 2: For hoisted variables, find their declaration line
-        const hoistedVarName = this.hoistingManager?.getHoistedVarName(lc.index);
-        if (hoistedVarName) {
-          const constMatch = line.match(new RegExp(`const\\s+${hoistedVarName}\\s*=`));
-          if (constMatch) {
-            this.lcToLineMapping[lc.index] = lineNumber;
+      const hoistedVarName = this.hoistingManager?.getHoistedVarName(lc.index);
+      if (hoistedVarName && !this.lcToLineMapping[lc.index]) {
+        for (let lineIdx = 0; lineIdx < lines.length; lineIdx++) {
+          const line = lines[lineIdx];
+          if (line.match(new RegExp(`const\\s+${hoistedVarName}\\s*=`))) {
+            this.lcToLineMapping[lc.index] = lineIdx + 1;
             break;
           }
         }
+      }
+    }
 
-        // Strategy 3: For sticky/timer LCs, find their variable assignment
-        if (lc.operation === OPERATION.STICKY || lc.operation === OPERATION.TIMER) {
-          const varName = this.stickyVarNames.get(lc.index);
-          if (varName) {
-            const stickyMatch = line.match(new RegExp(`${varName}\\s*=\\s*(?:sticky|timer)`));
-            if (stickyMatch) {
-              this.lcToLineMapping[lc.index] = lineNumber;
+    // Third pass: Handle sticky/timer variables
+    for (const lc of conditions) {
+      if (lc._gap) continue;
+
+      if ((lc.operation === OPERATION.STICKY || lc.operation === OPERATION.TIMER) && !this.lcToLineMapping[lc.index]) {
+        const varName = this.stickyVarNames.get(lc.index);
+        if (varName) {
+          for (let lineIdx = 0; lineIdx < lines.length; lineIdx++) {
+            const line = lines[lineIdx];
+            if (line.match(new RegExp(`${varName}\\s*=\\s*(?:sticky|timer)`))) {
+              this.lcToLineMapping[lc.index] = lineIdx + 1;
               break;
             }
           }
@@ -1229,30 +1249,24 @@ class Decompiler {
       }
     }
 
-    // Second pass: Map LCs based on their relationships
-    // For LCs with activators (child conditions), inherit the activator's line
-    // This handles compound conditions AND activator chains
+    // Fourth pass: Map LCs based on activator relationships
+    // For LCs with activators (child conditions/actions), inherit the activator's line
     for (const lc of conditions) {
       if (lc._gap) continue;
 
-      if (lc.activatorId !== -1) {
-        // This LC has an activator - it's part of a conditional chain
+      if (lc.activatorId !== -1 && !this.lcToLineMapping[lc.index]) {
         const activatorLine = this.lcToLineMapping[lc.activatorId];
         if (activatorLine) {
-          // Inherit the activator's line if we don't already have a mapping
-          if (!this.lcToLineMapping[lc.index]) {
-            this.lcToLineMapping[lc.index] = activatorLine;
-          }
+          this.lcToLineMapping[lc.index] = activatorLine;
         }
       }
     }
 
-    // Third pass: Handle LCs that are operands of other LCs (compound conditions)
-    // For example, in "if (a && b)", LC#0 (a) and LC#1 (b) are operands of LC#2 (AND)
+    // Fifth pass: Handle LCs that are operands of other LCs (compound conditions)
+    // For example, in "if (a && b)", LC#0 (a) and LC#1 (b) are operands of parent LC
     for (const lc of conditions) {
       if (lc._gap) continue;
 
-      // Check if this LC uses other LCs as operands
       const operandLCs = [];
       if (lc.operandAType === OPERAND_TYPE.LC) {
         operandLCs.push(lc.operandAValue);
@@ -1261,7 +1275,6 @@ class Decompiler {
         operandLCs.push(lc.operandBValue);
       }
 
-      // If this LC has a line mapping, share it with its operand LCs
       if (this.lcToLineMapping[lc.index]) {
         for (const operandLcIndex of operandLCs) {
           if (!this.lcToLineMapping[operandLcIndex]) {
