@@ -809,7 +809,7 @@ if (inav.flight.homeDistance > 100) {
             return;
         }
 
-        const lcStatus = FC.LOGIC_CONDITIONS_STATUS.get();
+        const lcStatus = FC.LOGIC_CONDITIONS_STATUS.getAll();
         const lcConditions = FC.LOGIC_CONDITIONS.get();
 
         // Verify data is loaded (not null)
