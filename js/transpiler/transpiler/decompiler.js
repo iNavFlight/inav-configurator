@@ -290,8 +290,8 @@ class Decompiler {
 
     // Build mapping: LC index -> generated name (cond1, cond2, etc.)
     const lcIndexToGeneratedName = new Map();
-    for (const [lcIndex, generatedName] of this.hoistingManager.hoistedActivatorVars.entries()) {
-      lcIndexToGeneratedName.set(lcIndex, generatedName);
+    for (const [lcIndex, entry] of this.hoistingManager.hoistedActivatorVars.entries()) {
+      lcIndexToGeneratedName.set(lcIndex, entry.varName);
     }
 
     // For each LC that has both a custom name and a generated name, rename
