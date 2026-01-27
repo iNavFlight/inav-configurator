@@ -198,8 +198,7 @@ if (inav.flight.homeDistance > 100) {
         });
     },
 
-    /*
-    **
+    /**
      * Load a specific example into the editor
      * @param {string} exampleId - The ID of the example to load
      */
