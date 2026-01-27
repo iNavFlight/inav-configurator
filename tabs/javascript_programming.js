@@ -15,6 +15,7 @@ import interval from './../js/intervals.js';
 import { Transpiler } from './../js/transpiler/index.js';
 import { Decompiler } from './../js/transpiler/transpiler/decompiler.js';
 import * as MonacoLoader from './../js/transpiler/editor/monaco_loader.js';
+import * as LCHighlighting from './../js/transpiler/lc_highlighting.js';
 import examples from './../js/transpiler/examples/index.js';
 import settingsCache from './../js/settingsCache.js';
 import * as monaco from 'monaco-editor';
@@ -57,6 +58,9 @@ TABS.javascript_programming = {
             GUI.load(html, () => {
                 try {
                     self.initTranspiler();
+
+                    // Store monaco reference for use in highlighting
+                    self.monaco = monaco;
 
                     // Initialize editor with INAV configuration
                     self.editor = MonacoLoader.initializeMonacoEditor(monaco, 'monaco-editor');
@@ -500,6 +504,9 @@ if (inav.flight.homeDistance > 100) {
             setTimeout(() => {
                 self.isDirty = false;
             }, 0);
+            // Clear stale mapping and decorations
+            self.lcToLineMapping = {};
+            self.clearActiveHighlighting();
             if (callback) callback();
             return;
         }
@@ -530,6 +537,9 @@ if (inav.flight.homeDistance > 100) {
             if (result.success) {
                 // Set the decompiled code
                 self.editor.setValue(result.code);
+
+                // Clear old decorations before setting new mapping
+                self.clearActiveHighlighting();
 
                 // Store LC-to-line mapping for active highlighting
                 self.lcToLineMapping = result.lcToLineMapping || {};
@@ -770,6 +780,12 @@ if (inav.flight.homeDistance > 100) {
     setupActiveHighlighting: function() {
         const self = this;
 
+        // Prevent duplicate polling loops if initialize/setup runs multiple times
+        interval.remove('js_programming_lc_highlight');
+
+        // In-flight guard to prevent overlapping MSP requests
+        self._lcPollInFlight = false;
+
         // Create MSP chainer for polling LC status
         self.statusChainer = new MSPChainerClass();
         self.statusChainer.setChain([
@@ -777,13 +793,14 @@ if (inav.flight.homeDistance > 100) {
         ]);
         self.statusChainer.setExitPoint(function() {
             self.updateActiveHighlighting();
+            self._lcPollInFlight = false;
         });
 
         // Start 500ms polling interval (2Hz - sufficient for debugging without saturating MSP)
         interval.add('js_programming_lc_highlight', function() {
-            if (self.statusChainer) {
-                self.statusChainer.execute();
-            }
+            if (!self.statusChainer || self._lcPollInFlight) return;
+            self._lcPollInFlight = true;
+            self.statusChainer.execute();
         }, 500);
     },
 
@@ -801,8 +818,8 @@ if (inav.flight.homeDistance > 100) {
         const lcStatus = FC.LOGIC_CONDITIONS_STATUS.getAll();
         const lcConditions = FC.LOGIC_CONDITIONS.get();
 
-        // Verify data is loaded (not null)
-        if (!lcStatus || !lcConditions) {
+        // Verify data is loaded and has expected types
+        if (!Array.isArray(lcStatus) || !Array.isArray(lcConditions)) {
             return;
         }
 
@@ -817,75 +834,29 @@ if (inav.flight.homeDistance > 100) {
             return;
         }
 
-        // Find all enabled LCs and categorize by status
-        const trueLCs = [];
-        const falseLCs = [];
+        // Categorize LCs by status (TRUE/FALSE)
+        const { trueLCs, falseLCs } = LCHighlighting.categorizeLCsByStatus(
+            lcStatus,
+            lcConditions,
+            self.lcToLineMapping
+        );
 
-        for (let lcIndex = 0; lcIndex < lcStatus.length; lcIndex++) {
-            const status = lcStatus[lcIndex];
-            const condition = lcConditions[lcIndex];
+        // Map LCs to editor line numbers with combined status
+        const lineStatus = LCHighlighting.mapLCsToLines(
+            trueLCs,
+            falseLCs,
+            self.lcToLineMapping
+        );
 
-            // Only process enabled LCs that are in our mapping (i.e., visible in the editor)
-            if (condition && condition.getEnabled && condition.getEnabled() !== 0 && self.lcToLineMapping[lcIndex] !== undefined) {
-                if (status !== 0) {
-                    trueLCs.push(lcIndex);
-                } else {
-                    falseLCs.push(lcIndex);
-                }
-            }
-        }
+        // Create Monaco decorations from line status
+        const decorations = LCHighlighting.createMonacoDecorations(lineStatus, self.monaco);
 
-        // Map LC indices to line numbers with their status
-        const lineStatus = {}; // { lineNum: 'true'|'false'|'mixed' }
-
-        for (const lcIndex of trueLCs) {
-            const line = self.lcToLineMapping[lcIndex];
-            if (line !== undefined) {
-                if (lineStatus[line] === 'false') {
-                    lineStatus[line] = 'mixed'; // Both true and false LCs on same line
-                } else if (lineStatus[line] !== 'mixed') {
-                    lineStatus[line] = 'true';
-                }
-            }
-        }
-
-        for (const lcIndex of falseLCs) {
-            const line = self.lcToLineMapping[lcIndex];
-            if (line !== undefined) {
-                if (lineStatus[line] === 'true') {
-                    lineStatus[line] = 'mixed'; // Both true and false LCs on same line
-                } else if (lineStatus[line] !== 'mixed') {
-                    lineStatus[line] = 'false';
-                }
-            }
-        }
-
-        // Create Monaco decorations
-        const decorations = Object.entries(lineStatus).map(([lineNum, status]) => {
-            // For mixed status, show green checkmark (at least one condition is true)
-            const className = (status === 'true' || status === 'mixed') ? 'lc-active-true' : 'lc-active-false';
-            const message = status === 'mixed'
-                ? 'Multiple logic conditions: at least one is TRUE'
-                : (status === 'true' ? 'Logic condition is TRUE' : 'Logic condition is FALSE');
-
-            return {
-                range: new monaco.Range(parseInt(lineNum), 1, parseInt(lineNum), 1),
-                options: {
-                    glyphMarginClassName: className,
-                    glyphMarginHoverMessage: {
-                        value: message
-                    }
-                }
-            };
-        });
-
-        // Apply decorations (Monaco efficiently handles diff)
-        if (self.editor && self.editor.deltaDecorations) {
-            self.activeDecorations = self.editor.deltaDecorations(
-                self.activeDecorations || [],
-                decorations
-            );
-        }
+        // Apply decorations to editor
+        self.activeDecorations = LCHighlighting.applyDecorations(
+            self.editor,
+            self.activeDecorations,
+            decorations
+        );
     },
 
     /**
@@ -893,13 +864,10 @@ if (inav.flight.homeDistance > 100) {
      */
     clearActiveHighlighting: function() {
         const self = this;
-
-        if (self.editor && self.editor.deltaDecorations && self.activeDecorations) {
-            self.activeDecorations = self.editor.deltaDecorations(
-                self.activeDecorations,
-                []
-            );
-        }
+        self.activeDecorations = LCHighlighting.clearDecorations(
+            self.editor,
+            self.activeDecorations
+        );
     },
 
     cleanup: function (callback) {
