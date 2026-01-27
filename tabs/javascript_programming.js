@@ -81,6 +81,7 @@ TABS.javascript_programming = {
 
                     self.loadFromFC(function() {
                         self.isDirty = false;
+                        self.updateSaveButtonState();
 
                         // Set up dirty tracking AFTER initial load to avoid marking as dirty during decompilation
                         self.editor.onDidChangeModelContent(function() {
@@ -88,6 +89,7 @@ TABS.javascript_programming = {
                                 console.log('[JavaScript Programming] Editor marked as dirty (unsaved changes)');
                             }
                             self.isDirty = true;
+                            self.updateSaveButtonState();
                         });
 
                         // Set up LC status polling for active highlighting
@@ -170,6 +172,7 @@ if (inav.flight.homeDistance > 100) {
             if (confirm('Clear editor? This cannot be undone.')) {
                 self.editor.setValue(self.getDefaultCode());
                 self.isDirty = false;
+                self.updateSaveButtonState();
             }
         });
 
@@ -233,6 +236,7 @@ if (inav.flight.homeDistance > 100) {
 
             // Mark as dirty since we changed the code
             self.isDirty = true;
+            self.updateSaveButtonState();
 
         } catch (error) {
             console.error('Failed to load example:', error);
@@ -301,6 +305,25 @@ if (inav.flight.homeDistance > 100) {
         }
     },
 
+    /**
+     * Update Save button state based on isDirty flag
+     * Disables Save button when code matches FC (isDirty = false)
+     */
+    updateSaveButtonState: function() {
+        const $saveButton = $('.tab-javascript_programming .save');
+
+        if (!$saveButton.length) {
+            return;
+        }
+
+        if (this.isDirty) {
+            // Code has been modified - enable Save button
+            $saveButton.removeClass('disabled').removeAttr('disabled');
+        } else {
+            // Code matches FC - disable Save button
+            $saveButton.addClass('disabled').attr('disabled', 'disabled');
+        }
+    },
 
     /**
      * Transpile JavaScript to INAV logic conditions
@@ -502,6 +525,7 @@ if (inav.flight.homeDistance > 100) {
             // Clear isDirty flag AFTER setValue completes
             setTimeout(() => {
                 self.isDirty = false;
+                self.updateSaveButtonState();
             }, 0);
             // Clear stale mapping and decorations
             self.lcToLineMapping = {};
@@ -561,6 +585,7 @@ if (inav.flight.homeDistance > 100) {
                 // Clear isDirty flag AFTER setValue completes (setValue triggers onChange asynchronously)
                 setTimeout(() => {
                     self.isDirty = false;
+                    self.updateSaveButtonState();
                     console.log('[JavaScript Programming] isDirty cleared after load');
                 }, 0);
             } else {
@@ -569,6 +594,7 @@ if (inav.flight.homeDistance > 100) {
                 self.showError('Decompilation failed: ' + result.error);
                 self.editor.setValue(result.code || self.getDefaultCode());
                 self.isDirty = false;
+                self.updateSaveButtonState();
             }
 
         } catch (error) {
@@ -577,6 +603,7 @@ if (inav.flight.homeDistance > 100) {
             self.showError('Decompilation error: ' + error.message);
             self.editor.setValue(self.getDefaultCode());
             self.isDirty = false;
+            self.updateSaveButtonState();
         }
 
         if (callback) callback();
@@ -749,6 +776,7 @@ if (inav.flight.homeDistance > 100) {
         saveChainer.setExitPoint(function() {
             GUI.log(i18n.getMessage('logicConditionsSaved') || 'Logic conditions saved successfully');
             self.isDirty = false;
+            self.updateSaveButtonState();
 
             // Optionally reboot (commented out for safety - user can reboot manually)
             // const shouldReboot = confirm('Reboot flight controller to apply changes?');
