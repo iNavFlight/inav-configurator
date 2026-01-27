@@ -814,8 +814,18 @@ if (inav.flight.homeDistance > 100) {
             mspHelper.loadGlobalVariablesStatus
         ]);
         self.statusChainer.setExitPoint(function() {
-            self.updateActiveHighlighting();
-            self.updateGvarDisplay();
+            try {
+                self.updateActiveHighlighting();
+            } catch (error) {
+                console.error('[JavaScript Programming] Active highlighting update failed:', error);
+            }
+
+            try {
+                self.updateGvarDisplay();
+            } catch (error) {
+                console.error('[JavaScript Programming] Gvar display update failed:', error);
+            }
+
             self._lcPollInFlight = false;
         });
 
@@ -933,9 +943,9 @@ if (inav.flight.homeDistance > 100) {
     cleanup: function (callback) {
         interval.remove('js_programming_lc_highlight');
         this.clearActiveHighlighting();
-        this.gvarDecorations = GvarDisplay.clearWidgets(
+        this.gvarWidgets = GvarDisplay.clearWidgets(
             this.editor,
-            this.gvarDecorations
+            this.gvarWidgets
         );
         this.statusChainer = null;
 

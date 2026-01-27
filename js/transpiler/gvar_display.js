@@ -116,19 +116,30 @@ export function createGvarWidgets(editor, gvarRefs, gvarValues) {
  * @returns {Array} New widget instances
  */
 export function applyWidgets(editor, oldWidgets, newWidgets) {
-    if (!editor) return [];
+    if (!editor) {
+        console.warn('[GvarDisplay] Cannot apply widgets - editor not initialized');
+        return [];
+    }
 
     // Remove old widgets
     if (oldWidgets && oldWidgets.length > 0) {
         oldWidgets.forEach(widget => {
-            editor.removeContentWidget(widget);
+            try {
+                editor.removeContentWidget(widget);
+            } catch (error) {
+                console.error('[GvarDisplay] Failed to remove widget:', widget.getId(), error);
+            }
         });
     }
 
     // Add new widgets
     if (newWidgets && newWidgets.length > 0) {
         newWidgets.forEach(widget => {
-            editor.addContentWidget(widget);
+            try {
+                editor.addContentWidget(widget);
+            } catch (error) {
+                console.error('[GvarDisplay] Failed to add widget at line', widget.line, ':', error);
+            }
         });
     }
 
@@ -142,11 +153,18 @@ export function applyWidgets(editor, oldWidgets, newWidgets) {
  * @returns {Array} Empty widget array
  */
 export function clearWidgets(editor, widgets) {
-    if (!editor) return [];
+    if (!editor) {
+        console.warn('[GvarDisplay] Cannot clear widgets - editor not initialized');
+        return [];
+    }
 
     if (widgets && widgets.length > 0) {
         widgets.forEach(widget => {
-            editor.removeContentWidget(widget);
+            try {
+                editor.removeContentWidget(widget);
+            } catch (error) {
+                console.error('[GvarDisplay] Failed to clear widget:', widget.getId(), error);
+            }
         });
     }
 
