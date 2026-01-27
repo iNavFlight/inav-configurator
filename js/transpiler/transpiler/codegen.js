@@ -68,6 +68,9 @@ class INAVCodeGenerator {
   constructor(variableHandler = null) {
     this.lcIndex = 0; // Current logic condition index
     this.commands = [];
+    this.lcToLineMapping = {}; // Map LC index -> source line number for highlighting
+    this.currentSourceLine = null; // Current source line being processed (for line tracking)
+    this.lineOffset = 0; // Line offset from auto-added imports (set by transpiler)
     this.errorHandler = new ErrorHandler(); // Error and warning collection
     this.operandMapping = buildForwardMapping(apiDefinitions);
     this.arrowHelper = new ArrowFunctionHelper(this);
@@ -150,28 +153,42 @@ class INAVCodeGenerator {
    */
   generateStatement(stmt) {
     if (!stmt) return;
-    switch (stmt.type) {
-      case 'EventHandler':
-        this.generateEventHandler(stmt);
-        break;
-      case 'Assignment':
-        // Top-level assignment (e.g., gvar[0] = value) - runs unconditionally
-        this.generateTopLevelAssignment(stmt);
-        break;
-      case 'StickyAssignment':
-        // latch1 = sticky({on: ..., off: ...})
-        this.generateStickyAssignment(stmt);
-        break;
-      case 'LetDeclaration':
-      case 'VarDeclaration':
-        // Skip - declarations handled separately
-        break;
-      default:
-        this.errorHandler.addError(
-          `Unsupported statement type: ${stmt.type}. Only assignments and event handlers are supported`,
-          stmt,
-          'unsupported_statement'
-        );
+
+    // Set current source line for LC-to-line tracking
+    const previousSourceLine = this.currentSourceLine;
+    if (stmt.loc && stmt.loc.start) {
+      // Acorn line numbers include auto-added import lines at the top
+      // Subtract lineOffset to match Monaco editor line numbers
+      this.currentSourceLine = stmt.loc.start.line - this.lineOffset;
+    }
+
+    try {
+      switch (stmt.type) {
+        case 'EventHandler':
+          this.generateEventHandler(stmt);
+          break;
+        case 'Assignment':
+          // Top-level assignment (e.g., gvar[0] = value) - runs unconditionally
+          this.generateTopLevelAssignment(stmt);
+          break;
+        case 'StickyAssignment':
+          // latch1 = sticky({on: ..., off: ...})
+          this.generateStickyAssignment(stmt);
+          break;
+        case 'LetDeclaration':
+        case 'VarDeclaration':
+          // Skip - declarations handled separately
+          break;
+        default:
+          this.errorHandler.addError(
+            `Unsupported statement type: ${stmt.type}. Only assignments and event handlers are supported`,
+            stmt,
+            'unsupported_statement'
+          );
+      }
+    } finally {
+      // Restore previous source line context
+      this.currentSourceLine = previousSourceLine;
     }
   }
 
@@ -248,6 +265,12 @@ class INAVCodeGenerator {
     this.commands.push(
       `logic ${lcIndex} 1 ${activatorId} ${operation} ${operandA.type} ${operandA.value} ${operandB.type} ${operandB.value} ${flags}`
     );
+
+    // Track source line mapping for transpiler-side highlighting
+    if (this.currentSourceLine !== null) {
+      this.lcToLineMapping[lcIndex] = this.currentSourceLine;
+    }
+
     this.lcIndex++;
     return lcIndex;
   }

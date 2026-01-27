@@ -346,6 +346,11 @@ if (inav.flight.homeDistance > 100) {
 
                 GUI.log(`Transpiled successfully: ${result.logicConditionCount}/64 logic conditions`);
 
+                // Store LC-to-line mapping for transpiler-side highlighting
+                if (result.lcToLineMapping) {
+                    self.lcToLineMapping = result.lcToLineMapping;
+                }
+
             } else {
                 // Show error
                 this.showError(result.error);
@@ -528,7 +533,6 @@ if (inav.flight.homeDistance > 100) {
 
                 // Store LC-to-line mapping for active highlighting
                 self.lcToLineMapping = result.lcToLineMapping || {};
-                console.log('[JavaScript Programming] Stored LC-to-line mapping:', self.lcToLineMapping);
 
                 // Show stats
                 if (result.stats) {
@@ -630,6 +634,11 @@ if (inav.flight.homeDistance > 100) {
         if (result.logicConditionCount > 64) {
             this.showError('Cannot save: Too many logic conditions (' + result.logicConditionCount + '/64)');
             return;
+        }
+
+        // Store LC-to-line mapping for transpiler-side highlighting
+        if (result.lcToLineMapping) {
+            self.lcToLineMapping = result.lcToLineMapping;
         }
 
         // Confirm save
@@ -770,14 +779,12 @@ if (inav.flight.homeDistance > 100) {
             self.updateActiveHighlighting();
         });
 
-        // Start 100ms polling interval
+        // Start 500ms polling interval (2Hz - sufficient for debugging without saturating MSP)
         interval.add('js_programming_lc_highlight', function() {
             if (self.statusChainer) {
                 self.statusChainer.execute();
             }
-        }, 100);
-
-        console.log('[JavaScript Programming] Active highlighting polling started');
+        }, 500);
     },
 
     /**
@@ -786,26 +793,8 @@ if (inav.flight.homeDistance > 100) {
     updateActiveHighlighting: function() {
         const self = this;
 
-        console.log('[JavaScript Programming] updateActiveHighlighting called');
-
-        // Don't highlight if code has been modified
-        if (self.isDirty) {
-            console.log('[JavaScript Programming] Skipping highlighting - code is dirty');
-            self.clearActiveHighlighting();
-            return;
-        }
-
-        // Don't highlight if no mapping available
-        if (!self.lcToLineMapping || Object.keys(self.lcToLineMapping).length === 0) {
-            console.log('[JavaScript Programming] Skipping highlighting - no mapping');
-            return;
-        }
-
-        console.log('[JavaScript Programming] LC-to-line mapping:', self.lcToLineMapping);
-
-        // Check if FC data is available
+        // Check if FC data is available first (short-circuit if disconnected)
         if (!FC.LOGIC_CONDITIONS_STATUS || !FC.LOGIC_CONDITIONS) {
-            console.log('[JavaScript Programming] Skipping highlighting - FC data not available');
             return;
         }
 
@@ -814,50 +803,81 @@ if (inav.flight.homeDistance > 100) {
 
         // Verify data is loaded (not null)
         if (!lcStatus || !lcConditions) {
-            console.log('[JavaScript Programming] Skipping highlighting - FC data is null');
             return;
         }
 
-        // Find all LCs with true/non-zero status
+        // Don't highlight if code has been modified
+        if (self.isDirty) {
+            self.clearActiveHighlighting();
+            return;
+        }
+
+        // Don't highlight if no mapping available
+        if (!self.lcToLineMapping || Object.keys(self.lcToLineMapping).length === 0) {
+            return;
+        }
+
+        // Find all enabled LCs and categorize by status
         const trueLCs = [];
+        const falseLCs = [];
 
         for (let lcIndex = 0; lcIndex < lcStatus.length; lcIndex++) {
             const status = lcStatus[lcIndex];
             const condition = lcConditions[lcIndex];
 
-            // Check if LC is enabled and has non-zero status (true)
-            if (condition && condition.getEnabled && condition.getEnabled() !== 0 && status !== 0) {
-                trueLCs.push(lcIndex);
-                console.log(`[JavaScript Programming] LC${lcIndex} is TRUE (status: ${status})`);
+            // Only process enabled LCs that are in our mapping (i.e., visible in the editor)
+            if (condition && condition.getEnabled && condition.getEnabled() !== 0 && self.lcToLineMapping[lcIndex] !== undefined) {
+                if (status !== 0) {
+                    trueLCs.push(lcIndex);
+                } else {
+                    falseLCs.push(lcIndex);
+                }
             }
         }
 
-        console.log('[JavaScript Programming] True LCs:', trueLCs);
+        // Map LC indices to line numbers with their status
+        const lineStatus = {}; // { lineNum: 'true'|'false'|'mixed' }
 
-        // Map LC indices to line numbers
-        const linesToHighlight = trueLCs
-            .map(lcIndex => self.lcToLineMapping[lcIndex])
-            .filter(line => line !== undefined);
-
-        console.log('[JavaScript Programming] Lines to highlight:', linesToHighlight);
-
-        // Remove duplicates (multiple LCs on same line)
-        const uniqueLines = [...new Set(linesToHighlight)];
-
-        console.log('[JavaScript Programming] Unique lines:', uniqueLines);
-
-        // Create Monaco decorations
-        const decorations = uniqueLines.map(lineNum => ({
-            range: new monaco.Range(lineNum, 1, lineNum, 1),
-            options: {
-                glyphMarginClassName: 'lc-active-true',
-                glyphMarginHoverMessage: {
-                    value: 'Logic condition is TRUE'
+        for (const lcIndex of trueLCs) {
+            const line = self.lcToLineMapping[lcIndex];
+            if (line !== undefined) {
+                if (lineStatus[line] === 'false') {
+                    lineStatus[line] = 'mixed'; // Both true and false LCs on same line
+                } else if (lineStatus[line] !== 'mixed') {
+                    lineStatus[line] = 'true';
                 }
             }
-        }));
+        }
 
-        console.log('[JavaScript Programming] Creating', decorations.length, 'decorations');
+        for (const lcIndex of falseLCs) {
+            const line = self.lcToLineMapping[lcIndex];
+            if (line !== undefined) {
+                if (lineStatus[line] === 'true') {
+                    lineStatus[line] = 'mixed'; // Both true and false LCs on same line
+                } else if (lineStatus[line] !== 'mixed') {
+                    lineStatus[line] = 'false';
+                }
+            }
+        }
+
+        // Create Monaco decorations
+        const decorations = Object.entries(lineStatus).map(([lineNum, status]) => {
+            // For mixed status, show green checkmark (at least one condition is true)
+            const className = (status === 'true' || status === 'mixed') ? 'lc-active-true' : 'lc-active-false';
+            const message = status === 'mixed'
+                ? 'Multiple logic conditions: at least one is TRUE'
+                : (status === 'true' ? 'Logic condition is TRUE' : 'Logic condition is FALSE');
+
+            return {
+                range: new monaco.Range(parseInt(lineNum), 1, parseInt(lineNum), 1),
+                options: {
+                    glyphMarginClassName: className,
+                    glyphMarginHoverMessage: {
+                        value: message
+                    }
+                }
+            };
+        });
 
         // Apply decorations (Monaco efficiently handles diff)
         if (self.editor && self.editor.deltaDecorations) {
