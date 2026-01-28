@@ -117,11 +117,11 @@ if (Math.abs(flight.yaw - gvar[0]) > 90) {
     code: `// Check GPS fix before allowing certain operations
 const { flight, gvar } = inav;
 
-if (flight.gpsNumSat < 6) {
+if (flight.gpsSats < 6) {
   gvar[0] = 0; // No GPS - flag it
 }
 
-if (flight.gpsNumSat >= 6) {
+if (flight.gpsSats >= 6) {
   gvar[0] = 1; // Good GPS
 }`
   },
@@ -182,11 +182,11 @@ edge(() => flight.rssi < 30, { duration: 100 }, () => {
     code: `// Detect waypoint arrival
 const { waypoint, gvar } = inav;
 
-if (waypoint.distanceToHome < 10) {
+if (waypoint.distance < 10) {
   gvar[0] = 1; // Arrived at waypoint
 }
 
-if (waypoint.distanceToHome > 20) {
+if (waypoint.distance > 20) {
   gvar[0] = 0; // Not at waypoint
 }`
   },

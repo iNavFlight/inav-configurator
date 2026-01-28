@@ -217,7 +217,6 @@ class ActionDecompiler {
     const axisNames = ['roll', 'pitch', 'yaw'];
     const axisIndex = lc.operandAValue;
     const axisName = axisNames[axisIndex] || axisIndex;
-    this.addWarning(`FLIGHT_AXIS_ANGLE_OVERRIDE may need verification - check API syntax`);
     return `override.flightAxis.${axisName}.angle = ${value};`;
   }
 
@@ -226,7 +225,6 @@ class ActionDecompiler {
     const axisNames = ['roll', 'pitch', 'yaw'];
     const axisIndex = lc.operandAValue;
     const axisName = axisNames[axisIndex] || axisIndex;
-    this.addWarning(`FLIGHT_AXIS_RATE_OVERRIDE may need verification - check API syntax`);
     return `override.flightAxis.${axisName}.rate = ${value};`;
   }
 

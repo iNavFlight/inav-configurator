@@ -261,6 +261,24 @@ const LOGIC_OPERATORS = {
         hasOperand: [true, false],
         output: "boolean"
     },
+    57: {
+        name: "Trigonometry: ACos",
+        operandType: "Maths",
+        hasOperand: [true, true],
+        output: "raw"
+    },
+    58: {
+        name: "Trigonometry: ASin",
+        operandType: "Maths",
+        hasOperand: [true, true],
+        output: "raw"
+    },
+    59: {
+        name: "Trigonometry: ATan2",
+        operandType: "Maths",
+        hasOperand: [true, true],
+        output: "raw"
+    },
     42: {
         name: "Set Control Profile",
         operandType: "Set Flight Parameter",

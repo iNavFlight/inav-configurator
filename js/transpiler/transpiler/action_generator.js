@@ -194,11 +194,24 @@ class ActionGenerator {
     const operation = this.getOverrideOperation(target);
     const valueOperand = this.getOperand(value);
 
-    this.pushLogicCommand(operation,
-      valueOperand,
-      { type: 0, value: 0 },
-      activatorId
-    );
+    // Check for flight axis overrides which need axis in operandA
+    const flightAxisMatch = target.match(/^override\.flightAxis\.(roll|pitch|yaw)\.(angle|rate)$/);
+    if (flightAxisMatch) {
+      const axisMap = { 'roll': 0, 'pitch': 1, 'yaw': 2 };
+      const axisIndex = axisMap[flightAxisMatch[1]];
+
+      this.pushLogicCommand(operation,
+        { type: 0, value: axisIndex },  // operandA = axis index
+        valueOperand,                    // operandB = angle/rate value
+        activatorId
+      );
+    } else {
+      this.pushLogicCommand(operation,
+        valueOperand,
+        { type: 0, value: 0 },
+        activatorId
+      );
+    }
   }
 
   /**
