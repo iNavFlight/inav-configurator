@@ -1077,6 +1077,63 @@
     "configurationBatteryCapacityUnit": {
         "message": "Battery Capacity Unit"
     },
+    "configurationPowerLimits": {
+        "message": "Power Limiting"
+    },
+    "configurationPowerLimitsHelp": {
+        "message": "Limit battery current and power draw to protect your battery and ESCs. Set to 0 to disable. Units: dA (deci-amps) = A×10, dW (deci-watts) = W×10, ds (deci-seconds) = s×10."
+    },
+    "configurationPowerLimitsNote": {
+        "message": "Protects battery from over-current by smoothly reducing throttle. Requires current sensor. Set continuous and burst limits per your battery specs."
+    },
+    "configurationLimitContCurrent": {
+        "message": "Continuous Current Limit (dA)"
+    },
+    "configurationLimitContCurrentHelp": {
+        "message": "Maximum sustained current draw in deci-amps (dA). Example: 500 = 50A. Set to 0 to disable current limiting."
+    },
+    "configurationLimitBurstCurrent": {
+        "message": "Burst Current Limit (dA)"
+    },
+    "configurationLimitBurstCurrentHelp": {
+        "message": "Higher current allowed for short bursts (punch-outs, climbs). Example: 750 = 75A. Should be >= continuous limit."
+    },
+    "configurationLimitBurstCurrentTime": {
+        "message": "Burst Current Time (ds)"
+    },
+    "configurationLimitBurstCurrentTimeHelp": {
+        "message": "Duration burst current is allowed in deci-seconds (ds). Example: 100 = 10 seconds. After this time, limit falls to continuous."
+    },
+    "configurationLimitBurstCurrentFalldownTime": {
+        "message": "Burst Current Falldown Time (ds)"
+    },
+    "configurationLimitBurstCurrentFalldownTimeHelp": {
+        "message": "Smooth ramp-down time from burst to continuous limit in deci-seconds (ds). Example: 20 = 2 seconds."
+    },
+    "configurationLimitContPower": {
+        "message": "Continuous Power Limit (dW)"
+    },
+    "configurationLimitContPowerHelp": {
+        "message": "Maximum sustained power draw in deci-watts (dW). Example: 8000 = 800W. Set to 0 to disable power limiting. Requires voltage measurement."
+    },
+    "configurationLimitBurstPower": {
+        "message": "Burst Power Limit (dW)"
+    },
+    "configurationLimitBurstPowerHelp": {
+        "message": "Higher power allowed for short bursts. Example: 10000 = 1000W. Should be >= continuous limit."
+    },
+    "configurationLimitBurstPowerTime": {
+        "message": "Burst Power Time (ds)"
+    },
+    "configurationLimitBurstPowerTimeHelp": {
+        "message": "Duration burst power is allowed in deci-seconds (ds). Example: 50 = 5 seconds."
+    },
+    "configurationLimitBurstPowerFalldownTime": {
+        "message": "Burst Power Falldown Time (ds)"
+    },
+    "configurationLimitBurstPowerFalldownTimeHelp": {
+        "message": "Smooth ramp-down time from burst to continuous power limit in deci-seconds (ds). Example: 10 = 1 second."
+    },
     "configurationLaunch": {
         "message": "Fixed Wing Auto Launch Settings"
     },
