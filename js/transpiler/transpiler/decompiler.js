@@ -195,6 +195,8 @@ class Decompiler {
     // Note: All INAV objects are always imported for user convenience
     this.inlineDeclaredVars = new Set(); // Track let variables declared inline in body
     this.hoistedVarCounters = new Map(); // Track counters for hoisted variable names (e.g., min, min2, min3)
+    this.lcToLineMapping = {}; // Track which LC maps to which line in final JavaScript (for active LC highlighting)
+    this._tempLcLines = []; // Temporary storage: [{lcIndex, relativeLineOffset}] during generation
 
     // Create hoisting manager for activator-wrapped LCs
     this.hoistingManager = new ActivatorHoistingManager({
@@ -235,6 +237,7 @@ class Decompiler {
       return {
         success: true,
         code: this.generateBoilerplate('// No logic conditions found'),
+        lcToLineMapping: {},
         warnings: this.warnings,
         stats: { total: logicConditions.length, enabled: 0, groups: 0 }
       };
@@ -248,9 +251,14 @@ class Decompiler {
     // Apply custom variable names from variable map as a final rename pass
     code = this.applyCustomVariableNames(code, enabled);
 
+    // Build LC-to-line mapping for active highlighting feature
+    // Convert tracked lines to actual line numbers in the final code
+    this.finalizeLcLineMapping(code, enabled);
+
     return {
       success: true,
       code,
+      lcToLineMapping: this.lcToLineMapping,
       warnings: this.warnings,
       stats: {
         total: logicConditions.length,
@@ -642,7 +650,11 @@ class Decompiler {
         }
 
         // Build if statement
-        lines.push(indentStr + `if (${condition}) {`);
+        const ifLine = indentStr + `if (${condition}) {`;
+        lines.push(ifLine);
+
+        // Track this LC for line mapping (we'll calculate actual line numbers after boilerplate is added)
+        this._tempLcLines.push({ lcIndex: node.lc.index, lineContent: ifLine });
 
         // First, output any actions at this level
         for (const actionNode of actions) {
@@ -1166,6 +1178,123 @@ class Decompiler {
     }
 
     return declarations;
+  }
+
+  /**
+   * Build mapping from LC indices to line numbers in the generated code
+   * This enables real-time highlighting of active logic conditions in JavaScript Programming tab
+   *
+   * For compound conditions like "if (a && b)", multiple LCs map to the same line:
+   * - LC#0 (a) → line N
+   * - LC#1 (b) → line N
+   * - LC#2 (AND(0,1)) → line N
+   * This is correct: when any of them is true, we highlight line N.
+   *
+   * @param {string} code - Final generated JavaScript code
+   * @param {Array} conditions - Enabled logic conditions
+   */
+  /**
+   * Finalize LC-to-line mapping after code generation
+   * Converts tracked LC lines to actual line numbers in final code
+   * @param {string} code - Final generated code with boilerplate
+   * @param {Array} conditions - All logic conditions
+   */
+  finalizeLcLineMapping(code, conditions) {
+    const lines = code.split('\n');
+
+    console.log('[Decompiler] finalizeLcLineMapping - tracked lines:', this._tempLcLines);
+    console.log('[Decompiler] finalizeLcLineMapping - total code lines:', lines.length);
+
+    // First pass: Find tracked if-statements in the final code
+    for (const tracked of this._tempLcLines) {
+      const { lcIndex, lineContent } = tracked;
+
+      console.log(`[Decompiler] Looking for LC${lcIndex}:`, lineContent.trim());
+
+      // Find this line content in the final code
+      for (let lineIdx = 0; lineIdx < lines.length; lineIdx++) {
+        if (lines[lineIdx].trim() === lineContent.trim()) {
+          this.lcToLineMapping[lcIndex] = lineIdx + 1; // Monaco uses 1-based line numbers
+          console.log(`[Decompiler] Found LC${lcIndex} at line ${lineIdx + 1}`);
+          break;
+        }
+      }
+
+      if (!this.lcToLineMapping[lcIndex]) {
+        console.warn(`[Decompiler] Could not find LC${lcIndex} in final code`);
+      }
+    }
+
+    console.log('[Decompiler] Final mapping:', this.lcToLineMapping);
+
+    // Second pass: Handle hoisted variables (const declarations)
+    for (const lc of conditions) {
+      if (lc._gap) continue;
+
+      const hoistedVarName = this.hoistingManager?.getHoistedVarName(lc.index);
+      if (hoistedVarName && !this.lcToLineMapping[lc.index]) {
+        for (let lineIdx = 0; lineIdx < lines.length; lineIdx++) {
+          const line = lines[lineIdx];
+          if (line.match(new RegExp(`const\\s+${hoistedVarName}\\s*=`))) {
+            this.lcToLineMapping[lc.index] = lineIdx + 1;
+            break;
+          }
+        }
+      }
+    }
+
+    // Third pass: Handle sticky/timer variables
+    for (const lc of conditions) {
+      if (lc._gap) continue;
+
+      if ((lc.operation === OPERATION.STICKY || lc.operation === OPERATION.TIMER) && !this.lcToLineMapping[lc.index]) {
+        const varName = this.stickyVarNames.get(lc.index);
+        if (varName) {
+          for (let lineIdx = 0; lineIdx < lines.length; lineIdx++) {
+            const line = lines[lineIdx];
+            if (line.match(new RegExp(`${varName}\\s*=\\s*(?:sticky|timer)`))) {
+              this.lcToLineMapping[lc.index] = lineIdx + 1;
+              break;
+            }
+          }
+        }
+      }
+    }
+
+    // Fourth pass: Map LCs based on activator relationships
+    // For LCs with activators (child conditions/actions), inherit the activator's line
+    for (const lc of conditions) {
+      if (lc._gap) continue;
+
+      if (lc.activatorId !== -1 && !this.lcToLineMapping[lc.index]) {
+        const activatorLine = this.lcToLineMapping[lc.activatorId];
+        if (activatorLine) {
+          this.lcToLineMapping[lc.index] = activatorLine;
+        }
+      }
+    }
+
+    // Fifth pass: Handle LCs that are operands of other LCs (compound conditions)
+    // For example, in "if (a && b)", LC#0 (a) and LC#1 (b) are operands of parent LC
+    for (const lc of conditions) {
+      if (lc._gap) continue;
+
+      const operandLCs = [];
+      if (lc.operandAType === OPERAND_TYPE.LC) {
+        operandLCs.push(lc.operandAValue);
+      }
+      if (lc.operandBType === OPERAND_TYPE.LC) {
+        operandLCs.push(lc.operandBValue);
+      }
+
+      if (this.lcToLineMapping[lc.index]) {
+        for (const operandLcIndex of operandLCs) {
+          if (!this.lcToLineMapping[operandLcIndex]) {
+            this.lcToLineMapping[operandLcIndex] = this.lcToLineMapping[lc.index];
+          }
+        }
+      }
+    }
   }
 
   /**
