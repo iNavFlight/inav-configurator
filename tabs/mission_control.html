@@ -74,6 +74,27 @@
                     </div>
                 </div>
 
+                <div id="missionPlannerLayers" class="gui_box grey" style="display: none">
+                    <div class="gui_box_titlebar">
+                        <div class="spacer_box_title" data-i18n="layerManagementTitle"></div>
+                        <div class="btnMenu btnMenuIcon save_btn">
+                            <a id="cancelLayers" class="ic_cancel" href="#" i18n_title="missionTitleCancel"></a>
+                        </div>
+                    </div>
+                    <div class="spacer" id="layerContent">
+                        <div class="btn save_btn" style="margin-bottom: 10px;">
+                            <a id="loadGeoFileButton" class="btnicon ic_loadFromFile" href="#" 
+                               title="Load GEO File (KML, GeoJSON, GPX)"></a>
+                        </div>
+                        <hr>
+                        <div id="layerListContainer" style="padding: 0 5px;"></div>
+                        <hr>
+                        <div style="text-align: center; color: #888; font-size: 0.9em; margin-top: 10px;">
+                            <span data-i18n="layerDragDropHint"></span>
+                        </div>
+                    </div>
+                </div>
+
                 <div id="missionPlannerSettings" class="gui_box grey" style="display: none">
                     <div class="gui_box_titlebar">
                         <div class="spacer_box_title" data-i18n="missionDefaultSettingsHead"></div>
@@ -570,6 +591,7 @@
             </div>
         </div>
         <div class="cf_column threefourth_left" style="height: 100%;">
+            <div id="geo_info" style="display: block; position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.7); color: white; padding: 5px 10px; border-radius: 4px; font-size: 0.9em; text-overflow: ellipsis; white-space: nowrap; overflow: hidden; max-width: 80%; pointer-events: none; z-index: 1000;">&nbsp;</div>
             <div id="missionMap"></div>
             <div id="missionPlannerElevation" class="gui_box grey" style="display: none">
                 <div class="gui_box_titlebar">
