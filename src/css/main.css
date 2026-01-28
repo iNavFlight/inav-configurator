@@ -2166,6 +2166,22 @@ select {
     display: inline;
 }
 
+.modal__button--warning {
+    background-color: #e74c3c;
+    text-shadow: 0 1px rgba(0, 0, 0, 0.25);
+    color: #fff;
+    border: 1px solid #c0392b;
+    transition: all ease 0.2s;
+}
+
+.modal__button--warning:hover {
+    background-color: #c0392b;
+}
+
+.modal__button--warning:active {
+    box-shadow: inset 0 1px 5px rgba(0, 0, 0, 0.35);
+}
+
 .modal__button--disabled {
     cursor: default;
     color: #fff;
