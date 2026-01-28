@@ -807,5 +807,102 @@ describe('whenChanged (DELTA operation)', () => {
   });
 });
 
+describe('LC Line Mapping - duplicate if-statements', () => {
+  let decompiler;
+  beforeEach(() => {
+    decompiler = new Decompiler();
+  });
+
+  test('should map duplicate if-conditions to separate lines', () => {
+    // Two identical HIGH conditions on rc[1], each with a different gvar action.
+    // Must produce two separate if-blocks mapped to different line numbers.
+    const conditions = [
+      { index: 0, enabled: 1, activatorId: -1, operation: 4, // HIGH
+        operandAType: 3, operandAValue: 1,  // RC_CHANNEL 1
+        operandBType: 0, operandBValue: 0, flags: 0 },
+      { index: 1, enabled: 1, activatorId: 0, operation: 18, // GVAR_SET
+        operandAType: 6, operandAValue: 0,  // GVAR 0
+        operandBType: 0, operandBValue: 1, flags: 0 },
+      { index: 2, enabled: 1, activatorId: -1, operation: 4, // HIGH (same as LC 0)
+        operandAType: 3, operandAValue: 1,  // RC_CHANNEL 1
+        operandBType: 0, operandBValue: 0, flags: 0 },
+      { index: 3, enabled: 1, activatorId: 2, operation: 18, // GVAR_SET
+        operandAType: 6, operandAValue: 1,  // GVAR 1
+        operandBType: 0, operandBValue: 2, flags: 0 },
+    ];
+
+    const result = decompiler.decompile(conditions);
+    expect(result.success).toBe(true);
+
+    // Both LCs must have mappings
+    expect(result.lcToLineMapping[0]).toBeDefined();
+    expect(result.lcToLineMapping[2]).toBeDefined();
+
+    // They must map to DIFFERENT lines (regression: used to both map to first occurrence)
+    expect(result.lcToLineMapping[0]).not.toBe(result.lcToLineMapping[2]);
+  });
+
+  test('should map triple duplicate if-conditions to three separate lines', () => {
+    const conditions = [
+      // First: if rc[1].high -> gvar[0] = 10
+      { index: 0, enabled: 1, activatorId: -1, operation: 4,
+        operandAType: 3, operandAValue: 1,
+        operandBType: 0, operandBValue: 0, flags: 0 },
+      { index: 1, enabled: 1, activatorId: 0, operation: 18,
+        operandAType: 6, operandAValue: 0,
+        operandBType: 0, operandBValue: 10, flags: 0 },
+      // Second: if rc[1].high -> gvar[1] = 20 (duplicate #1)
+      { index: 2, enabled: 1, activatorId: -1, operation: 4,
+        operandAType: 3, operandAValue: 1,
+        operandBType: 0, operandBValue: 0, flags: 0 },
+      { index: 3, enabled: 1, activatorId: 2, operation: 18,
+        operandAType: 6, operandAValue: 1,
+        operandBType: 0, operandBValue: 20, flags: 0 },
+      // Third: if rc[1].high -> gvar[2] = 30 (duplicate #2)
+      { index: 4, enabled: 1, activatorId: -1, operation: 4,
+        operandAType: 3, operandAValue: 1,
+        operandBType: 0, operandBValue: 0, flags: 0 },
+      { index: 5, enabled: 1, activatorId: 4, operation: 18,
+        operandAType: 6, operandAValue: 2,
+        operandBType: 0, operandBValue: 30, flags: 0 },
+    ];
+
+    const result = decompiler.decompile(conditions);
+    expect(result.success).toBe(true);
+
+    // All three must map to unique lines
+    const uniqueLines = new Set([
+      result.lcToLineMapping[0],
+      result.lcToLineMapping[2],
+      result.lcToLineMapping[4]
+    ]);
+    expect(uniqueLines.size).toBe(3);
+  });
+
+  test('should still map non-duplicate conditions correctly', () => {
+    // Control: two DIFFERENT conditions must map correctly (sanity check)
+    const conditions = [
+      { index: 0, enabled: 1, activatorId: -1, operation: 4, // HIGH
+        operandAType: 3, operandAValue: 1,  // RC_CHANNEL 1
+        operandBType: 0, operandBValue: 0, flags: 0 },
+      { index: 1, enabled: 1, activatorId: 0, operation: 18,
+        operandAType: 6, operandAValue: 0,
+        operandBType: 0, operandBValue: 1, flags: 0 },
+      { index: 2, enabled: 1, activatorId: -1, operation: 4, // HIGH
+        operandAType: 3, operandAValue: 2,  // RC_CHANNEL 2 (different!)
+        operandBType: 0, operandBValue: 0, flags: 0 },
+      { index: 3, enabled: 1, activatorId: 2, operation: 18,
+        operandAType: 6, operandAValue: 1,
+        operandBType: 0, operandBValue: 2, flags: 0 },
+    ];
+
+    const result = decompiler.decompile(conditions);
+    expect(result.success).toBe(true);
+    expect(result.lcToLineMapping[0]).toBeDefined();
+    expect(result.lcToLineMapping[2]).toBeDefined();
+    expect(result.lcToLineMapping[0]).not.toBe(result.lcToLineMapping[2]);
+  });
+});
+
 // Export the load function for the runner
 module.exports = { loadDecompiler };

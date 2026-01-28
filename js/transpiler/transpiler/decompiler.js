@@ -1206,15 +1206,18 @@ class Decompiler {
     console.log('[Decompiler] finalizeLcLineMapping - total code lines:', lines.length);
 
     // First pass: Find tracked if-statements in the final code
+    const usedLines = new Set();
     for (const tracked of this._tempLcLines) {
       const { lcIndex, lineContent } = tracked;
 
       console.log(`[Decompiler] Looking for LC${lcIndex}:`, lineContent.trim());
 
-      // Find this line content in the final code
+      // Find this line content in the final code, skipping lines already claimed by a previous LC
       for (let lineIdx = 0; lineIdx < lines.length; lineIdx++) {
+        if (usedLines.has(lineIdx)) continue;
         if (lines[lineIdx].trim() === lineContent.trim()) {
           this.lcToLineMapping[lcIndex] = lineIdx + 1; // Monaco uses 1-based line numbers
+          usedLines.add(lineIdx);
           console.log(`[Decompiler] Found LC${lcIndex} at line ${lineIdx + 1}`);
           break;
         }
