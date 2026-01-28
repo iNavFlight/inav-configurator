@@ -549,6 +549,11 @@ class Decompiler {
    * @returns {string} JavaScript code
    */
   decompileTree(node, allConditions, indent = 0) {
+    // Defensive check: ensure node has required properties
+    if (!node?.lc || !Array.isArray(node.children)) {
+      return '';
+    }
+
     const indentStr = '  '.repeat(indent);
     const lines = [];
 
@@ -608,8 +613,16 @@ class Decompiler {
       const condition = hoistedVarName || this.decompileCondition(node.lc, allConditions);
 
       if (node.children.length === 0) {
-        // Condition with no children - skip it (it's a helper used elsewhere)
-        return '';
+        // Only skip if this is a helper condition that can't be externally referenced
+        // Conditions that could be externally referenced (e.g., via Global Functions, OSD)
+        // should still be rendered even if they have no children
+        if (!this.couldBeExternallyReferenced(node.lc.operation)) {
+          return '';
+        }
+        // Render empty if block with comment for external reference
+        lines.push(indentStr + `if (${condition}) {`);
+        lines.push(indentStr + `  /* LC ${node.lc.index}: for external reference */`);
+        lines.push(indentStr + '}');
       } else {
         // Separate children into: actions, boolean conditions (same level), nested conditions
         const actions = [];
