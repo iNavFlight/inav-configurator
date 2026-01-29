@@ -14,7 +14,7 @@
 .tab-led-strip .gridColumn {
     display: inline-block;
     vertical-align: top;
-    margin-right: 10px;
+    margin-right: 2em;
 }
 
 .tab-led-strip .mainGrid {
@@ -412,7 +412,12 @@
     color: #4a90d9 !important;
     font-weight: bold !important;
     border-bottom-color: #4a90d9 !important;
-    font-size: 1.4em;
+    font-size: 1.3em;
+}
+
+.tab-led-strip .step-header .circle-number {
+    font-size: 1.6em;
+    font-weight: normal !important;
 }
 
 .tab-led-strip .step-instruction {

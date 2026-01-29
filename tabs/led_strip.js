@@ -345,8 +345,23 @@ TABS.led_strip.initialize = function (callback, scrollPosition) {
 
                 if ($(that).is('.color-' + colorIndex)) {
                     selectedColorIndex = colorIndex;
-                    if (selectedModeColor == undefined)
+                    if (selectedModeColor == undefined) {
                         $('.ui-selected').addClass('color-' + colorIndex);
+
+                        // Auto-add Color function if LED has no base function
+                        $('.ui-selected').each(function() {
+                            var hasBaseFunction = false;
+                            TABS.led_strip.baseFuncs.forEach(function(letter) {
+                                if ($(this).hasClass('function-' + letter)) {
+                                    hasBaseFunction = true;
+                                }
+                            }.bind(this));
+
+                            if (!hasBaseFunction) {
+                                $(this).addClass('function-c');
+                            }
+                        });
+                    }
                 }
             }
 
