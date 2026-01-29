@@ -27,8 +27,8 @@
                 <div class="block"></div>
             </div>
             <div class="wiringControls">
-                <button class="funcWireClearSelect w50" i18n="ledStripWiringClearControl"></button>
-                <button class="funcWireClear w50" i18n="ledStripWiringClearAllControl"></button>
+                <button class="funcWireClearSelect" i18n="ledStripWiringClearControl"></button>
+                <button class="funcWireClear" i18n="ledStripWiringClearAllControl"></button>
             </div>
         </div>
         <div class="colorDefineSliders">
@@ -50,25 +50,24 @@
             </div>
         </div>
         <div class="controls">
-            <!-- ① WIRE ORDERING (moved to top) -->
+            <div class="quick-layouts">
+                <span class="color_section">Quick Presets:</span>
+                <button class="quickLayout" data-layout="xframe">X-Frame Quad</button>
+                <button class="quickLayout" data-layout="crossframe">Cross-Frame Quad</button>
+                <button class="quickLayout" data-layout="wing">Wing</button>
+            </div>
+
             <div class="step-section" data-step-section="1">
-                <div class="section step-header">① Wire Ordering</div>
+                <div class="section step-header"><span class="circle-number">① </span>Wire Ordering</div>
                 <div class="step-instruction">Click Wire Ordering Mode, then click grid cells in the order LEDs are wired on your strip.</div>
-                <button class="funcWire w100" i18n="ledStripWiringMode"></button>
+                <button class="funcWire" i18n="ledStripWiringMode"></button>
                 <span class="wires-placed">
                     <span class="placed-count">0</span> / 128 placed
                 </span>
-                <div class="quick-layouts">
-                    <span class="color_section">Quick Layouts:</span>
-                    <button class="quickLayout" data-layout="xframe">X-Frame Quad</button>
-                    <button class="quickLayout" data-layout="crossframe">Cross-Frame Quad</button>
-                    <button class="quickLayout" data-layout="wing">Wing</button>
-                </div>
             </div>
 
-            <!-- ② POSITION & DIRECTION -->
             <div class="step-section" data-step-section="2">
-                <div class="section step-header">② Position &amp; Direction</div>
+                <div class="section step-header"><span class="circle-number">② </span>Position &amp; Direction</div>
                 <div class="step-instruction">Optionally, select wired LEDs on the grid and set their orientation using the compass buttons below.</div>
                 <div class="directions">
                     <button class="dir-n" i18n="ledStripDirN"></button>
@@ -80,9 +79,8 @@
                 </div>
             </div>
 
-            <!-- ③ FUNCTION -->
             <div class="step-section" data-step-section="3">
-                <div class="section step-header">③ Function</div>
+                <div class="section step-header"><span class="circle-number">③ </span>Function</div>
                 <div class="step-instruction">Select LEDs and assign their function (Flight Mode, Armed state, etc.) and overlays.</div>
                 <div class="select">
                     <span class="color_section" i18n="ledStripFunctionTitle"></span>
@@ -170,9 +168,8 @@
                 </div>
             </div>
 
-            <!-- ④ COLOR -->
             <div class="step-section" data-step-section="4">
-                <div class="section step-header">④ Color</div>
+                <div class="section step-header"><span class="circle-number">④ </span>Color</div>
                 <div class="step-instruction">Select LEDs and click a color to assign it (only applies to Color function LEDs).</div>
                 <div class="colors">
                     <button class="color-0" i18n_title="colorBlack">0</button>

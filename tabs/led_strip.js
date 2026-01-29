@@ -350,6 +350,9 @@ TABS.led_strip.initialize = function (callback, scrollPosition) {
 
                         // Auto-add Color function if LED has no base function
                         $('.ui-selected').each(function() {
+                            // Only apply to wired LEDs
+                            if ($(this).find('.wire').html() === '') return;
+
                             var hasBaseFunction = false;
                             TABS.led_strip.baseFuncs.forEach(function(letter) {
                                 if ($(this).hasClass('function-' + letter)) {

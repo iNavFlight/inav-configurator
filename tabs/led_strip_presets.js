@@ -64,27 +64,27 @@ const LED_STRIP_PRESETS = {
     ],
     wing: [
         // Left wing (first row at y=7) - 10 LEDs, ALL RED, facing west, center to tip
+        { x: 7,  y: 7,  directions: 'w',  functions: 'c',   color: 2 },
+        { x: 6,  y: 7,  directions: 'w',  functions: 'c',   color: 2 },
         { x: 5,  y: 7,  directions: 'w',  functions: 'c',   color: 2 },
         { x: 4,  y: 7,  directions: 'w',  functions: 'c',   color: 2 },
         { x: 3,  y: 7,  directions: 'w',  functions: 'c',   color: 2 },
         { x: 2,  y: 7,  directions: 'w',  functions: 'c',   color: 2 },
         { x: 1,  y: 7,  directions: 'w',  functions: 'c',   color: 2 },
         { x: 0,  y: 7,  directions: 'w',  functions: 'cwi', color: 2 },
-        { x: 6,  y: 7,  directions: 'w',  functions: 'c',   color: 2 },
-        { x: 7,  y: 7,  directions: 'w',  functions: 'c',   color: 2 },
         { x: 8,  y: 7,  directions: 'w',  functions: 'c',   color: 2 },
         { x: 9,  y: 7,  directions: 'w',  functions: 'cw',  color: 2 },
         // Right wing (second row at y=9) - 10 LEDs, ALL GREEN, facing east, center to tip
-        { x: 10, y: 9,  directions: 'e',  functions: 'c',   color: 6 },
-        { x: 9,  y: 9,  directions: 'e',  functions: 'c',   color: 6 },
         { x: 8,  y: 9,  directions: 'e',  functions: 'c',   color: 6 },
-        { x: 7,  y: 9,  directions: 'e',  functions: 'c',   color: 6 },
-        { x: 6,  y: 9,  directions: 'e',  functions: 'cwi', color: 6 },
+        { x: 9,  y: 9,  directions: 'e',  functions: 'c',   color: 6 },
+        { x: 10, y: 9,  directions: 'e',  functions: 'c',   color: 6 },
         { x: 11, y: 9,  directions: 'e',  functions: 'c',   color: 6 },
         { x: 12, y: 9,  directions: 'e',  functions: 'c',   color: 6 },
         { x: 13, y: 9,  directions: 'e',  functions: 'c',   color: 6 },
         { x: 14, y: 9,  directions: 'e',  functions: 'c',   color: 6 },
         { x: 15, y: 9,  directions: 'e',  functions: 'cw',  color: 6 },
+        { x: 7,  y: 9,  directions: 'e',  functions: 'c',   color: 6 },
+        { x: 6,  y: 9,  directions: 'e',  functions: 'cwi', color: 6 },
     ],
 };
 
