@@ -252,6 +252,9 @@ TABS.led_strip.initialize = function (callback, scrollPosition) {
             TABS.led_strip.directions.forEach(function(letter) {
                 classesToRemove.push('dir-' + letter);
             });
+            for (var c = 0; c < 16; c++) {
+                classesToRemove.push('color-' + c);
+            }
             $(element).removeClass(classesToRemove.join(' '));
         }
 
@@ -404,15 +407,21 @@ TABS.led_strip.initialize = function (callback, scrollPosition) {
                 var thisWire = $(this).find('.wire');
                 if (thisWire.html() != '') {
                     thisWire.html('');
+                    removeFunctionsAndDirections(this);
                 }
-                updateBulkCmd();
             });
+            updateBulkCmd();
+            updatePlacedCount();
         });
 
         $('.funcWireClear').on('click', function () {
             saveUndoState();
-            $('.gPoint .wire').html('');
+            $('.gPoint').each(function() {
+                $(this).find('.wire').html('');
+                removeFunctionsAndDirections(this);
+            });
             updateBulkCmd();
+            updatePlacedCount();
         });
 
         // Quick Layout presets
