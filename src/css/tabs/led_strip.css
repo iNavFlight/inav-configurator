@@ -405,7 +405,6 @@
 
 /*******JQUERYUI**********/
 
-/* === Proposal 2b: Step Progress & Guided Layout === */
 
 /* Step Section Headers */
 .tab-led-strip .step-header {
@@ -413,6 +412,7 @@
     font-weight: bold !important;
     border-bottom-color: #4a90d9 !important;
     font-size: 1.3em;
+    margin-top: 1em;
 }
 
 .tab-led-strip .step-header .circle-number {
@@ -423,11 +423,9 @@
 .tab-led-strip .step-instruction {
     font-size: 0.95em;
     color: #666;
-    font-style: italic;
     margin: 8px 0;
     padding: 6px 10px;
-    background: rgba(74, 144, 217, 0.08);
-    border-left: 3px solid #4a90d9;
+    font-size: 0.8em;
     border-radius: 3px;
 }
 

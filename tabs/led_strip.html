@@ -51,15 +51,16 @@
         </div>
         <div class="controls">
             <div class="quick-layouts">
-                <span class="color_section">Quick Presets:</span>
+                <div class="section step-header">Quick Presets:</div>
                 <button class="quickLayout" data-layout="xframe">X-Frame Quad</button>
                 <button class="quickLayout" data-layout="crossframe">Cross-Frame Quad</button>
                 <button class="quickLayout" data-layout="wing">Wing</button>
             </div>
 
             <div class="step-section" data-step-section="1">
-                <div class="section step-header"><span class="circle-number">① </span>Wire Ordering</div>
-                <div class="step-instruction">Click Wire Ordering Mode, then click grid cells in the order LEDs are wired on your strip.</div>
+                <div class="section step-header"><span class="circle-number">① </span>Wire Ordering
+                    <span class="step-instruction">Click Wire Ordering, then drag grid cells in the order LEDs are wired</span>
+                </div>
                 <button class="funcWire" i18n="ledStripWiringMode"></button>
                 <span class="wires-placed">
                     <span class="placed-count">0</span> / 128 placed
@@ -67,8 +68,9 @@
             </div>
 
             <div class="step-section" data-step-section="2">
-                <div class="section step-header"><span class="circle-number">② </span>Position &amp; Direction</div>
-                <div class="step-instruction">Optionally, select wired LEDs on the grid and set their orientation using the compass buttons below.</div>
+                <div class="section step-header"><span class="circle-number">② </span>Position &amp; Direction
+                    <span class="step-instruction">Optionally, select LEDs & set their orientation</span>
+                </div>
                 <div class="directions">
                     <button class="dir-n" i18n="ledStripDirN"></button>
                     <button class="dir-e" i18n="ledStripDirE"></button>
@@ -80,8 +82,9 @@
             </div>
 
             <div class="step-section" data-step-section="3">
-                <div class="section step-header"><span class="circle-number">③ </span>Function</div>
-                <div class="step-instruction">Select LEDs and assign their function (Flight Mode, Armed state, etc.) and overlays.</div>
+                <div class="section step-header"><span class="circle-number">③ </span>Function
+                    <span class="step-instruction">Select LEDs and assign their function (Flight Mode, Armed state, etc.) and overlays.</span>
+                </div>
                 <div class="select">
                     <span class="color_section" i18n="ledStripFunctionTitle"></span>
                     <select class="functionSelect">
@@ -169,8 +172,9 @@
             </div>
 
             <div class="step-section" data-step-section="4">
-                <div class="section step-header"><span class="circle-number">④ </span>Color</div>
-                <div class="step-instruction">Select LEDs and click a color to assign it (only applies to Color function LEDs).</div>
+                <div class="section step-header"><span class="circle-number">④ </span>Color
+                    <span class="step-instruction">Select LEDs and click a color to assign it</span>
+                </div>
                 <div class="colors">
                     <button class="color-0" i18n_title="colorBlack">0</button>
                     <button class="color-1" i18n_title="colorWhite">1</button>
