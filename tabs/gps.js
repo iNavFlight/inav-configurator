@@ -130,7 +130,13 @@ TABS.gps.initialize = function (callback) {
     let vehiclesCursorInitialized = false;
     let arrowIcon;
 
-    function process_html() {
+    async function process_html(settingsPromise) {
+        // Wait for settings to finish loading to avoid race conditions
+        // where user changes are overwritten by background setting loads
+        if (settingsPromise) {
+            await settingsPromise;
+        }
+
         i18n.localize();
 
         var fcFeatures = FC.getFeatures();
@@ -310,15 +316,11 @@ TABS.gps.initialize = function (callback) {
             const preset = GPS_PRESETS[presetId];
             if (!preset) return;
 
-            // Apply preset values (trigger change for state consistency)
-            $('#gps_use_galileo').prop('checked', preset.galileo).trigger('change');
-            $('#gps_use_glonass').prop('checked', preset.glonass).trigger('change');
-            $('#gps_use_beidou').prop('checked', preset.beidou).trigger('change');
-            $('#gps_ublox_nav_hz').val(preset.rate).trigger('change');
-
-            // Disable controls (user can see but not edit)
-            $('.preset-controlled').prop('disabled', true);
-            $('#gps_ublox_nav_hz').prop('disabled', true);
+            // Apply preset values (user can still adjust after applying)
+            $('#gps_use_galileo').prop('checked', preset.galileo);
+            $('#gps_use_glonass').prop('checked', preset.glonass);
+            $('#gps_use_beidou').prop('checked', preset.beidou);
+            $('#gps_ublox_nav_hz').val(preset.rate);
 
             // Show preset info
             $('#preset_name').text(preset.name);
@@ -331,16 +333,35 @@ TABS.gps.initialize = function (callback) {
             applyGPSPreset($(this).val());
         });
 
-        // Initialize - try auto-detect if GPS data available, otherwise manual
-        if (FC.GPS_DATA && FC.GPS_DATA.hwVersion && FC.GPS_DATA.hwVersion > 0) {
-            // GPS data already available (e.g., from previous tab load)
-            const detectedPreset = detectGPSPreset(FC.GPS_DATA.hwVersion);
-            applyGPSPreset(detectedPreset);
-            $('#gps_preset_mode').val(detectedPreset);
-        } else {
-            // GPS data not yet available, default to manual
-            applyGPSPreset('manual');
+        // Hardware detection status indicator
+        function updateHardwareStatus() {
+            if (FC.GPS_DATA && FC.GPS_DATA.hwVersion && FC.GPS_DATA.hwVersion > 0) {
+                const detectedPreset = detectGPSPreset(FC.GPS_DATA.hwVersion);
+                if (detectedPreset && detectedPreset !== 'manual' && GPS_PRESETS[detectedPreset]) {
+                    $('#gps_hardware_name').text(GPS_PRESETS[detectedPreset].name + ' detected');
+                    $('#gps_hardware_status').show();
+                }
+            }
         }
+
+        // Handler for "Use optimal settings" link
+        $('#gps_apply_optimal').on('click', function(e) {
+            e.preventDefault();
+            if (FC.GPS_DATA && FC.GPS_DATA.hwVersion) {
+                const detectedPreset = detectGPSPreset(FC.GPS_DATA.hwVersion);
+                if (detectedPreset && detectedPreset !== 'manual') {
+                    $('#gps_preset_mode').val(detectedPreset).trigger('change');
+                    GUI.log('Applied recommended settings for ' + GPS_PRESETS[detectedPreset].name);
+                }
+            }
+        });
+
+        // Initialize - default to manual mode to preserve user's existing settings
+        // User can explicitly select a preset or use "Auto-detect" if desired
+        applyGPSPreset('manual');
+
+        // Check for hardware detection after a short delay to allow GPS data to arrive
+        setTimeout(updateHardwareStatus, 500);
 
         let mapView = new View({
             center: [0, 0],
