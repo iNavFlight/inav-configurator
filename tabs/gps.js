@@ -328,8 +328,8 @@ TABS.gps.initialize = function (callback) {
             $('#preset_info').show();
         }
 
-        // Set up preset mode handler
-        $('#gps_preset_mode').on('change', function() {
+        // Set up preset mode handler (namespaced to prevent memory leaks)
+        $('#gps_preset_mode').on('change.gpsTab', function() {
             applyGPSPreset($(this).val());
         });
 
@@ -344,8 +344,8 @@ TABS.gps.initialize = function (callback) {
             }
         }
 
-        // Handler for "Use optimal settings" link
-        $('#gps_apply_optimal').on('click', function(e) {
+        // Handler for "Use optimal settings" link (namespaced)
+        $('#gps_apply_optimal').on('click.gpsTab', function(e) {
             e.preventDefault();
             if (FC.GPS_DATA && FC.GPS_DATA.hwVersion) {
                 const detectedPreset = detectGPSPreset(FC.GPS_DATA.hwVersion);
@@ -403,7 +403,7 @@ TABS.gps.initialize = function (callback) {
             }));
         }
 
-        $("#center_button").on('click', function () {
+        $("#center_button").on('click.gpsTab', function () {
             let lat = FC.GPS_DATA.lat / 10000000;
             let lon = FC.GPS_DATA.lon / 10000000;
             let center = fromLonLat([lon, lat]);
@@ -629,7 +629,7 @@ TABS.gps.initialize = function (callback) {
             });
         }
 
-        $('a.save').on('click', function () {
+        $('a.save').on('click.gpsTab', function () {
             serialPortHelper.set($port.val(), 'GPS', $baud.val());
             features.reset();
             features.fromUI($('.tab-gps'));
@@ -680,7 +680,7 @@ TABS.gps.initialize = function (callback) {
             }
         }
 
-        $('a.loadAssistnowOnline').on('click', function () {
+        $('a.loadAssistnowOnline').on('click.gpsTab', function () {
             if(globalSettings.assistnowApiKey != null && globalSettings.assistnowApiKey != '') {
                 ublox.loadAssistnowOnline(processUbloxData);
            } else {
@@ -688,7 +688,7 @@ TABS.gps.initialize = function (callback) {
             }
         });
 
-        $('a.loadAssistnowOffline').on('click', function () {
+        $('a.loadAssistnowOffline').on('click.gpsTab', function () {
             if(globalSettings.assistnowApiKey != null && globalSettings.assistnowApiKey != '') {
                 ublox.loadAssistnowOffline(processUbloxData);
             } else {
@@ -702,6 +702,14 @@ TABS.gps.initialize = function (callback) {
 };
 
 TABS.gps.cleanup = function (callback) {
+    // Remove all namespaced event handlers to prevent memory leaks
+    $('#gps_preset_mode').off('.gpsTab');
+    $('#gps_apply_optimal').off('.gpsTab');
+    $('#center_button').off('.gpsTab');
+    $('a.save').off('.gpsTab');
+    $('a.loadAssistnowOnline').off('.gpsTab');
+    $('a.loadAssistnowOffline').off('.gpsTab');
+
     if (callback) callback();
     if (TABS.gps.toolboxAdsbVehicle){
         TABS.gps.toolboxAdsbVehicle.close();
