@@ -10,9 +10,27 @@ h1 {
     color: white;
 }
 
-#id {
+#search {
+    width: 345px;
+    padding: 10px;
     margin: 5px;
+    font-size: 14px;
+    border: 1px solid whitesmoke;
+    background-color: #1a1a1a;
+    color: white;
+    box-sizing: border-box;
 }
+
+#search::placeholder {
+    color: #888;
+}
+
+#search:focus {
+    outline: none;
+    border-color: rgb(88, 88, 192);
+    background-color: #2a2a2a;
+}
+
 
 #list {
     color: white;
