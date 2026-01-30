@@ -650,7 +650,7 @@ TABS.magnetometer.initialize3D = function () {
     if (useWebGlRenderer) {
         if (FC.MIXER_CONFIG.appliedMixerPreset === -1) {
             model_file = 'custom';
-            GUI_control.prototype.log("<span style='color: red; font-weight: bolder'><strong>" + i18n.getMessage("mixerNotConfigured") + "</strong></span>");
+            GUI.log("<span style='color: red; font-weight: bolder'><strong>" + i18n.getMessage("mixerNotConfigured") + "</strong></span>");
         }
         else {
             model_file = mixer.getById(FC.MIXER_CONFIG.appliedMixerPreset).model;
