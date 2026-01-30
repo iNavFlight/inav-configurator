@@ -1,13 +1,15 @@
 /**
  * INAV Override API Definition
- * 
+ *
  * Location: js/transpiler/api/definitions/override.js
- * 
+ *
  * Writable override operations for flight control.
  * Source: src/main/programming/logic_condition.h
  */
 
 'use strict';
+
+import { OPERATION } from '../../transpiler/inav_constants.js';
 
 export default {
   // Throttle Control
@@ -17,7 +19,7 @@ export default {
     desc: 'Scale throttle output (0-100%)',
     readonly: false,
     range: [0, 100],
-    inavOperation: 23 // LOGIC_CONDITION_OVERRIDE_THROTTLE_SCALE
+    inavOperation: OPERATION.OVERRIDE_THROTTLE_SCALE
   },
   
   throttle: {
@@ -26,7 +28,7 @@ export default {
     desc: 'Direct throttle override in microseconds',
     readonly: false,
     range: [1000, 2000],
-    inavOperation: 29 // LOGIC_CONDITION_OVERRIDE_THROTTLE
+    inavOperation: OPERATION.OVERRIDE_THROTTLE
   },
   
   // VTX Control (nested object)
@@ -39,7 +41,7 @@ export default {
         desc: 'VTX power level (0-4)',
         readonly: false,
         range: [0, 4],
-        inavOperation: 25 // LOGIC_CONDITION_SET_VTX_POWER_LEVEL
+        inavOperation: OPERATION.SET_VTX_POWER_LEVEL
       },
       
       band: {
@@ -47,7 +49,7 @@ export default {
         desc: 'VTX frequency band (0-5)',
         readonly: false,
         range: [0, 5],
-        inavOperation: 30 // LOGIC_CONDITION_SET_VTX_BAND
+        inavOperation: OPERATION.SET_VTX_BAND
       },
       
       channel: {
@@ -55,7 +57,7 @@ export default {
         desc: 'VTX channel (1-8)',
         readonly: false,
         range: [1, 8],
-        inavOperation: 31 // LOGIC_CONDITION_SET_VTX_CHANNEL
+        inavOperation: OPERATION.SET_VTX_CHANNEL
       }
     }
   },
@@ -65,7 +67,7 @@ export default {
     type: 'boolean',
     desc: 'Override arm safety switch',
     readonly: false,
-    inavOperation: 22 // LOGIC_CONDITION_OVERRIDE_ARMING_SAFETY
+    inavOperation: OPERATION.OVERRIDE_ARMING_SAFETY
   },
   
   // OSD Override
@@ -74,7 +76,7 @@ export default {
     desc: 'Set OSD layout (0-3)',
     readonly: false,
     range: [0, 3],
-    inavOperation: 32 // LOGIC_CONDITION_SET_OSD_LAYOUT
+    inavOperation: OPERATION.SET_OSD_LAYOUT
   },
   
   // RC Channel Override
@@ -82,7 +84,7 @@ export default {
     type: 'function',
     desc: 'Override RC channel value. Usage: override.rcChannel(channel, value)',
     readonly: false,
-    inavOperation: 38 // LOGIC_CONDITION_RC_CHANNEL_OVERRIDE
+    inavOperation: OPERATION.RC_CHANNEL_OVERRIDE
     // Note: This requires special handling in codegen as it takes channel number as operandA
   },
   
@@ -93,7 +95,7 @@ export default {
     desc: 'Override loiter radius in centimeters',
     readonly: false,
     range: [0, 100000],
-    inavOperation: 41 // LOGIC_CONDITION_LOITER_OVERRIDE
+    inavOperation: OPERATION.LOITER_OVERRIDE
   },
   
   // Min Ground Speed Override
@@ -103,12 +105,151 @@ export default {
     desc: 'Override minimum ground speed',
     readonly: false,
     range: [0, 150],
-    inavOperation: 56 // LOGIC_CONDITION_OVERRIDE_MIN_GROUND_SPEED
+    inavOperation: OPERATION.OVERRIDE_MIN_GROUND_SPEED
+  },
+
+  // Axis Control Overrides
+  swapRollYaw: {
+    type: 'boolean',
+    desc: 'Swap roll and yaw control axes',
+    readonly: false,
+    inavOperation: OPERATION.SWAP_ROLL_YAW
+  },
+
+  invertRoll: {
+    type: 'boolean',
+    desc: 'Invert roll axis control',
+    readonly: false,
+    inavOperation: OPERATION.INVERT_ROLL
+  },
+
+  invertPitch: {
+    type: 'boolean',
+    desc: 'Invert pitch axis control',
+    readonly: false,
+    inavOperation: OPERATION.INVERT_PITCH
+  },
+
+  invertYaw: {
+    type: 'boolean',
+    desc: 'Invert yaw axis control',
+    readonly: false,
+    inavOperation: OPERATION.INVERT_YAW
+  },
+
+  // Navigation Overrides
+  headingTarget: {
+    type: 'number',
+    unit: 'deg',
+    desc: 'Override heading target in degrees',
+    readonly: false,
+    range: [0, 359],
+    inavOperation: OPERATION.SET_HEADING_TARGET
+  },
+
+  // Profile Override
+  profile: {
+    type: 'number',
+    desc: 'Override active profile (0-2)',
+    readonly: false,
+    range: [0, 2],
+    inavOperation: OPERATION.SET_PROFILE
+  },
+
+  // Gimbal Override
+  gimbalSensitivity: {
+    type: 'number',
+    desc: 'Override gimbal sensitivity',
+    readonly: false,
+    range: [0, 100],
+    inavOperation: OPERATION.SET_GIMBAL_SENSITIVITY
+  },
+
+  // GPS Overrides
+  disableGpsFix: {
+    type: 'boolean',
+    desc: 'Disable GPS fix (force no-fix state)',
+    readonly: false,
+    inavOperation: OPERATION.DISABLE_GPS_FIX
+  },
+
+  // Calibration Overrides
+  resetMagCalibration: {
+    type: 'boolean',
+    desc: 'Reset magnetometer calibration',
+    readonly: false,
+    inavOperation: OPERATION.RESET_MAG_CALIBRATION
+  },
+
+  // Flight Axis Overrides
+  flightAxis: {
+    type: 'object',
+    desc: 'Flight axis angle and rate overrides',
+    properties: {
+      roll: {
+        type: 'object',
+        desc: 'Roll axis overrides',
+        properties: {
+          angle: {
+            type: 'number',
+            unit: '°',
+            desc: 'Override roll angle target (degrees)',
+            readonly: false,
+            inavOperation: OPERATION.FLIGHT_AXIS_ANGLE_OVERRIDE
+          },
+          rate: {
+            type: 'number',
+            unit: '°/s',
+            desc: 'Override roll rate target (degrees per second)',
+            readonly: false,
+            range: [-2000, 2000],
+            inavOperation: OPERATION.FLIGHT_AXIS_RATE_OVERRIDE
+          }
+        }
+      },
+      pitch: {
+        type: 'object',
+        desc: 'Pitch axis overrides',
+        properties: {
+          angle: {
+            type: 'number',
+            unit: '°',
+            desc: 'Override pitch angle target (degrees)',
+            readonly: false,
+            inavOperation: OPERATION.FLIGHT_AXIS_ANGLE_OVERRIDE
+          },
+          rate: {
+            type: 'number',
+            unit: '°/s',
+            desc: 'Override pitch rate target (degrees per second)',
+            readonly: false,
+            range: [-2000, 2000],
+            inavOperation: OPERATION.FLIGHT_AXIS_RATE_OVERRIDE
+          }
+        }
+      },
+      yaw: {
+        type: 'object',
+        desc: 'Yaw axis overrides',
+        properties: {
+          angle: {
+            type: 'number',
+            unit: '°',
+            desc: 'Override yaw angle target (degrees)',
+            readonly: false,
+            inavOperation: OPERATION.FLIGHT_AXIS_ANGLE_OVERRIDE
+          },
+          rate: {
+            type: 'number',
+            unit: '°/s',
+            desc: 'Override yaw rate target (degrees per second)',
+            readonly: false,
+            range: [-2000, 2000],
+            inavOperation: OPERATION.FLIGHT_AXIS_RATE_OVERRIDE
+          }
+        }
+      }
+    }
   }
-  
-  // Note: Flight axis angle/rate overrides (operations 45, 46) would need
-  // special syntax since they require specifying the axis (0=roll, 1=pitch, 2=yaw)
-  // These should probably be exposed as:
-  // override.flightAxis.angle(axis, degrees)
-  // override.flightAxis.rate(axis, degreesPerSecond)
+
 };

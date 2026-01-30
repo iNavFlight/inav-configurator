@@ -22,6 +22,10 @@
         "message": "简体中文",
         "_comment": "Don't translate!"
     },
+    "language_ru": {
+        "message": "Русский",
+        "_comment": "Don't translate!"
+    },
     "language": {
         "message": "Language"
     },
@@ -33,6 +37,9 @@
     },
     "options_improve_configurator": {
         "message": "Send anonymous usage data to the developer team"
+    },
+    "options_disable3dAcceleration" : {
+        "message": "Disable 3D Acceleration. If the 3D models are not displayed. Needs app restart."
     },
     "options_showProfileParameters": {
         "message": "Highlight parameters that change when switching battery or control profiles"
@@ -6203,9 +6210,54 @@
   "tabJavaScriptProgramming": {
     "message": "JavaScript Programming"
   },
+  "javascriptProgrammingDescription": {
+    "message": "Write JavaScript code to control your aircraft. The transpiler converts your code into INAV Logic Conditions."
+  },
+  "javascriptBetaWarning": {
+    "message": "<strong>Currently in beta, for testing. Do not use for safety-critical applications!</strong>"
+  },
+  "javascriptEditorTitle": {
+    "message": "JavaScript Editor (shift-ctrl-v to paste, right-click a variable to rename)"
+  },
+  "javascriptLoadExample": {
+    "message": "Load Example:"
+  },
+  "javascriptSelectExample": {
+    "message": "-- Select Example --"
+  },
   "javascriptTranspile": { "message": "Transpile to INAV" },
   "javascriptLoad": { "message": "Load from FC" },
   "javascriptSave": { "message": "Save to FC" },
-  "javascriptClear": { "message": "Clear Editor" }
+  "javascriptClear": { "message": "Clear Editor" },
+  "javascriptOutputTitle": {
+    "message": "INAV Logic Conditions Output"
+  },
+  "javascriptLcCount": {
+    "message": "$1 / $2 LCs"
+  },
+  "javascriptOptimizationsApplied": {
+    "message": "Optimizations Applied:"
+  },
+  "javascriptApiReference": {
+    "message": "API Reference & Examples"
+  },
+  "javascriptQuickReference": {
+    "message": "Quick Reference"
+  },
+  "javascriptFlightParameters": {
+    "message": "Flight Parameters (Read-Only)"
+  },
+  "javascriptRcChannels": {
+    "message": "RC Channels"
+  },
+  "javascriptOverrides": {
+    "message": "Overrides (Write)"
+  },
+  "javascriptGlobalVariables": {
+    "message": "Global Variables"
+  },
+  "javascriptCompleteExample": {
+    "message": "Complete Example"
+  }
 
 }

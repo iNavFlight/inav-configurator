@@ -13,7 +13,7 @@
 
 'use strict';
 
-import { OPERAND_TYPE, FLIGHT_PARAM } from '../../transpiler/inav_constants.js';
+import { OPERAND_TYPE, FLIGHT_PARAM, FLIGHT_MODE } from '../../transpiler/inav_constants.js';
 
 export default {
   // Timing
@@ -401,5 +401,151 @@ export default {
     desc: 'CRSF RSSI in dBm',
     readonly: true,
     inavOperand: { type: OPERAND_TYPE.FLIGHT, value: FLIGHT_PARAM.CRSF_RSSI_DBM }
+  },
+
+  // Wind parameters
+  minGroundSpeed: {
+    type: 'number',
+    unit: 'm/s',
+    desc: 'Minimum ground speed in m/s',
+    readonly: true,
+    inavOperand: { type: OPERAND_TYPE.FLIGHT, value: FLIGHT_PARAM.MIN_GROUND_SPEED }
+  },
+
+  horizontalWindSpeed: {
+    type: 'number',
+    unit: 'cm/s',
+    desc: 'Horizontal wind speed in cm/s',
+    readonly: true,
+    inavOperand: { type: OPERAND_TYPE.FLIGHT, value: FLIGHT_PARAM.HORIZONTAL_WIND_SPEED }
+  },
+
+  windDirection: {
+    type: 'number',
+    unit: 'deg',
+    desc: 'Wind direction in degrees (0-359)',
+    readonly: true,
+    range: [0, 359],
+    inavOperand: { type: OPERAND_TYPE.FLIGHT, value: FLIGHT_PARAM.WIND_DIRECTION }
+  },
+
+  relativeWindOffset: {
+    type: 'number',
+    unit: 'deg',
+    desc: 'Relative wind offset in degrees',
+    readonly: true,
+    inavOperand: { type: OPERAND_TYPE.FLIGHT, value: FLIGHT_PARAM.RELATIVE_WIND_OFFSET }
+  },
+
+  // Flight Modes - nested object for checking active flight modes
+  // These use OPERAND_TYPE.FLIGHT_MODE instead of OPERAND_TYPE.FLIGHT
+  mode: {
+    type: 'object',
+    desc: 'Flight mode status flags',
+    readonly: true,
+    properties: {
+      failsafe: {
+        type: 'boolean',
+        desc: 'Failsafe mode is active',
+        readonly: true,
+        inavOperand: { type: OPERAND_TYPE.FLIGHT_MODE, value: FLIGHT_MODE.FAILSAFE }
+      },
+      manual: {
+        type: 'boolean',
+        desc: 'Manual mode is active',
+        readonly: true,
+        inavOperand: { type: OPERAND_TYPE.FLIGHT_MODE, value: FLIGHT_MODE.MANUAL }
+      },
+      rth: {
+        type: 'boolean',
+        desc: 'Return to home mode is active',
+        readonly: true,
+        inavOperand: { type: OPERAND_TYPE.FLIGHT_MODE, value: FLIGHT_MODE.RTH }
+      },
+      poshold: {
+        type: 'boolean',
+        desc: 'Position hold mode is active',
+        readonly: true,
+        inavOperand: { type: OPERAND_TYPE.FLIGHT_MODE, value: FLIGHT_MODE.POSHOLD }
+      },
+      cruise: {
+        type: 'boolean',
+        desc: 'Cruise mode is active',
+        readonly: true,
+        inavOperand: { type: OPERAND_TYPE.FLIGHT_MODE, value: FLIGHT_MODE.CRUISE }
+      },
+      althold: {
+        type: 'boolean',
+        desc: 'Altitude hold mode is active',
+        readonly: true,
+        inavOperand: { type: OPERAND_TYPE.FLIGHT_MODE, value: FLIGHT_MODE.ALTHOLD }
+      },
+      angle: {
+        type: 'boolean',
+        desc: 'Angle mode is active',
+        readonly: true,
+        inavOperand: { type: OPERAND_TYPE.FLIGHT_MODE, value: FLIGHT_MODE.ANGLE }
+      },
+      horizon: {
+        type: 'boolean',
+        desc: 'Horizon mode is active',
+        readonly: true,
+        inavOperand: { type: OPERAND_TYPE.FLIGHT_MODE, value: FLIGHT_MODE.HORIZON }
+      },
+      air: {
+        type: 'boolean',
+        desc: 'Air mode is active',
+        readonly: true,
+        inavOperand: { type: OPERAND_TYPE.FLIGHT_MODE, value: FLIGHT_MODE.AIR }
+      },
+      user1: {
+        type: 'boolean',
+        desc: 'User mode 1 is active',
+        readonly: true,
+        inavOperand: { type: OPERAND_TYPE.FLIGHT_MODE, value: FLIGHT_MODE.USER1 }
+      },
+      user2: {
+        type: 'boolean',
+        desc: 'User mode 2 is active',
+        readonly: true,
+        inavOperand: { type: OPERAND_TYPE.FLIGHT_MODE, value: FLIGHT_MODE.USER2 }
+      },
+      courseHold: {
+        type: 'boolean',
+        desc: 'Course hold mode is active',
+        readonly: true,
+        inavOperand: { type: OPERAND_TYPE.FLIGHT_MODE, value: FLIGHT_MODE.COURSE_HOLD }
+      },
+      user3: {
+        type: 'boolean',
+        desc: 'User mode 3 is active',
+        readonly: true,
+        inavOperand: { type: OPERAND_TYPE.FLIGHT_MODE, value: FLIGHT_MODE.USER3 }
+      },
+      user4: {
+        type: 'boolean',
+        desc: 'User mode 4 is active',
+        readonly: true,
+        inavOperand: { type: OPERAND_TYPE.FLIGHT_MODE, value: FLIGHT_MODE.USER4 }
+      },
+      acro: {
+        type: 'boolean',
+        desc: 'Acro mode is active',
+        readonly: true,
+        inavOperand: { type: OPERAND_TYPE.FLIGHT_MODE, value: FLIGHT_MODE.ACRO }
+      },
+      waypointMission: {
+        type: 'boolean',
+        desc: 'Waypoint mission mode is active',
+        readonly: true,
+        inavOperand: { type: OPERAND_TYPE.FLIGHT_MODE, value: FLIGHT_MODE.WAYPOINT_MISSION }
+      },
+      anglehold: {
+        type: 'boolean',
+        desc: 'Angle hold mode is active',
+        readonly: true,
+        inavOperand: { type: OPERAND_TYPE.FLIGHT_MODE, value: FLIGHT_MODE.ANGLEHOLD }
+      }
+    }
   }
 };

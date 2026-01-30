@@ -13,108 +13,6 @@ import apiDefinitions from '../api/definitions/index.js';
 import { generateTypeDefinitions } from '../api/types.js';
 
 /**
- * Load Monaco Editor
- * @returns {Promise<Object>} Promise that resolves with monaco object
- */
-function loadMonacoEditor() {
-    return new Promise((resolve, reject) => {
-        try {
-            // Check if already loaded
-            if (window.monaco) {
-                resolve(window.monaco);
-                return;
-            }
-
-            // In Vite/browser environment, use relative path to node_modules
-            // Vite will handle module resolution
-            const monacoBasePath = '/node_modules/monaco-editor';
-
-            // Use the min build which includes everything
-            const vsPath = monacoBasePath + '/min/vs';
-
-            console.log('Loading Monaco from:', vsPath);
-
-            // Monaco requires AMD loader, so use that directly
-            loadMonacoViaAMD(vsPath, resolve, reject);
-            
-        } catch (error) {
-            console.error('Failed to load Monaco Editor:', error);
-            reject(error);
-        }
-    });
-}
-
-/**
- * Load Monaco via AMD loader (fallback method)
- * @param {string} vsPath - Path to Monaco's vs directory
- * @param {Function} resolve - Promise resolve function
- * @param {Function} reject - Promise reject function
- */
-function loadMonacoViaAMD(vsPath, resolve, reject) {
-    // Validate vsPath to prevent potential injection issues
-    // Only allow alphanumeric, forward slash, dash, dot, and underscore
-    if (!/^[\/a-zA-Z0-9._-]+$/.test(vsPath)) {
-        reject(new Error('Invalid Monaco base path'));
-        return;
-    }
-
-    // Set global MonacoEnvironment before loading
-    window.MonacoEnvironment = {
-        getWorkerUrl: function(workerId, label) {
-            return `data:text/javascript;charset=utf-8,${encodeURIComponent(`
-                self.MonacoEnvironment = {
-                    baseUrl: '${vsPath}'
-                };
-                importScripts('${vsPath}/base/worker/workerMain.js');
-            `)}`;
-        }
-    };
-
-    const loaderScript = document.createElement('script');
-    loaderScript.src = vsPath + '/loader.js';
-    
-    loaderScript.onerror = () => {
-        reject(new Error('Failed to load Monaco loader.js'));
-    };
-    
-    loaderScript.onload = () => {
-        try {
-            // Configure the loader
-            window.require.config({
-                paths: {
-                    'vs': vsPath
-                },
-                'vs/nls': {
-                    availableLanguages: {}
-                }
-            });
-            
-            // Load the editor
-            window.require(['vs/editor/editor.main'], function() {
-                // Monaco is now available as a global
-                const monaco = window.monaco;
-                
-                if (!monaco || !monaco.editor) {
-                    console.error('Monaco object not properly initialized');
-                    reject(new Error('Monaco editor object not found'));
-                    return;
-                }
-                
-                console.log('Monaco loaded via AMD');
-                resolve(monaco);
-            }, function(err) {
-                console.error('AMD require error:', err);
-                reject(err);
-            });
-        } catch (err) {
-            reject(err);
-        }
-    };
-    
-    document.head.appendChild(loaderScript);
-}
-
-/**
  * Initialize Monaco Editor with INAV-specific configuration
  * @param {Object} monaco - Monaco editor instance
  * @param {string} containerId - ID of the container element
@@ -139,7 +37,12 @@ function initializeMonacoEditor(monaco, containerId, options = {}) {
         lineNumbers: 'on',
         renderWhitespace: 'selection',
         tabSize: 2,
-        insertSpaces: true
+        insertSpaces: true,
+        wordBasedSuggestions: 'off',  // Disable word-based suggestions (use string "off", not boolean)
+        suggest: {
+            showWords: false,
+            showVariables: false  // Don't show local variables in autocomplete (prevents pollution)
+        }
     };
     
     // Merge options
@@ -162,11 +65,12 @@ function initializeMonacoEditor(monaco, containerId, options = {}) {
         noEmit: true,
         esModuleInterop: true,
         allowJs: true,
-        checkJs: false
+        checkJs: false,
+        lib: ['es2020']  // Only ES2020 core library (excludes DOM/browser APIs like navigator)
     });
-    
+
     console.log('Monaco Editor initialized');
-    
+
     return editor;
 }
 
@@ -212,7 +116,6 @@ function setupLinting(editor, lintCallback, debounceMs = 500) {
 
 // Export functions
 export {
-    loadMonacoEditor,
     initializeMonacoEditor,
     addINAVTypeDefinitions,
     setupLinting

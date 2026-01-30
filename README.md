@@ -113,10 +113,20 @@ Example (note the double -- ):
 To be able to open Inspector, set environment variable `NODE_ENV` to `development` or set the flag directly when run `npm start`:
 
 ```NODE_ENV=development npm start``` or ```$env:NODE_ENV="development" | npm start``` for Windows PowerShell
+Chrome Devtools will be available on http://localhost:9222. This can also be used with an MCP plugin
 
 Or use VScode and start a debug session `Debug Configurator` (Just hit F5!)
 
 To debug the main thread (source files in `js/main`), just set a breakpoint in VScode.
+
+
+To capture a debug log from a packaged version (such as from a user), they can run it as:
+```.\inav-configurator.exe --enable-logging --log-file=inav-log.txt```
+or to log to the console:
+```.\inav-configurator.exe --enable-logging --log-file=inav-log.txt```
+
+
+
 
 ## Different map providers
 

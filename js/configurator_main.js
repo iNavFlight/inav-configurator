@@ -138,6 +138,21 @@ $(function() {
                     return;
                 }
 
+                // Check for unsaved changes in current tab before switching
+                if (GUI.active_tab === 'javascript_programming' &&
+                    TABS.javascript_programming &&
+                    TABS.javascript_programming.isDirty) {
+                    console.log('[Tab Switch] Checking for unsaved changes in JavaScript Programming tab');
+                    const confirmMsg = i18n.getMessage('unsavedChanges') ||
+                        'You have unsaved changes. Leave anyway?';
+
+                    if (!confirm(confirmMsg)) {
+                        console.log('[Tab Switch] User cancelled tab switch');
+                        return; // Cancel tab switch
+                    }
+                    console.log('[Tab Switch] User confirmed tab switch');
+                }
+
                 GUI.tab_switch_in_progress = true;
 
                 GUI.tab_switch_cleanup(function () {
@@ -284,6 +299,15 @@ $(function() {
                     $('div.notifications input').on('change', function () {
                         var check = $(this).is(':checked');
                         store.set('update_notify', check);
+                    });
+                    
+                    if (store.get('disable_3d_acceleration', false)) {
+                        $('div.disable_3d_acceleration input').prop('checked', true);
+                    }
+
+                     $('div.disable_3d_acceleration input').on('change', function () {
+                        var check = $(this).is(':checked');
+                        store.set('disable_3d_acceleration', check);
                     });
 
                     $('div.statistics input').on('change', function () {

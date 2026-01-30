@@ -203,11 +203,28 @@ var SerialBackend = (function () {
                             CONFIGURATOR.connection.connect(selected_port, {bitrate: selected_baud}, privateScope.onOpen);
                         }
                     } else {
+                        // Check for unsaved changes in JavaScript Programming tab
+                        if (GUI.active_tab === 'javascript_programming' &&
+                            TABS.javascript_programming &&
+                            TABS.javascript_programming.isDirty) {
+                            console.log('[Disconnect] Checking for unsaved changes in JavaScript Programming tab');
+                            const confirmMsg = i18n.getMessage('unsavedChanges') ||
+                                'You have unsaved changes. Leave anyway?';
+
+                            if (!confirm(confirmMsg)) {
+                                console.log('[Disconnect] User cancelled disconnect due to unsaved changes');
+                                return; // Cancel disconnect
+                            }
+                            console.log('[Disconnect] User confirmed, proceeding with disconnect');
+                            // Clear isDirty flag so tab switch during disconnect doesn't show warning again
+                            TABS.javascript_programming.isDirty = false;
+                        }
+
                         if (this.isDemoRunning) {
                             SITLProcess.stop();
                             this.isDemoRunning = false;
                         }
-                        
+
                         var wasConnected = CONFIGURATOR.connectionValid;
 
                         timeout.killAll();
@@ -358,6 +375,11 @@ var SerialBackend = (function () {
             store.set('last_used_bps', CONFIGURATOR.connection.bitrate);
             store.set('wireless_mode_enabled', $('#wireless-mode').is(":checked"));
 
+            // Reset state BEFORE adding receive listeners to ensure any
+            // garbage bytes or boot messages don't corrupt the MSP decoder
+            FC.resetState();
+            MSP.disconnect_cleanup();
+
             CONFIGURATOR.connection.addOnReceiveListener(publicScope.read_serial);
             CONFIGURATOR.connection.addOnReceiveListener(ltmDecoder.read);
 
@@ -384,8 +406,6 @@ var SerialBackend = (function () {
                     groundstation.activate($('#main-wrapper'));
                 }
             }, 1000);
-
-            FC.resetState();
 
             // request configuration data. Start with MSPv1 and
             // upgrade to MSPv2 if possible.

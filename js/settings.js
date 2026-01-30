@@ -149,7 +149,7 @@ var Settings = (function () {
                     }
                 }
 
-                // If data is defined, We want to convert this value into 
+                // If data is defined, We want to convert this value into
                 // something matching the units
                 self.convertToUnitSetting(input, inputUnit);
 
@@ -163,7 +163,6 @@ var Settings = (function () {
             });
         });
     };
-
 
     /**
      * 
@@ -647,8 +646,12 @@ var Settings = (function () {
 
     self.processHtml = function(callback) {
         return function() {
-            self.configureInputs().then(callback);
+            // Start loading settings in background - don't block rendering
+            const settingsPromise = self.configureInputs();
             self.linkHelpIcons();
+            // Call callback immediately so page can start rendering
+            // Pass settingsPromise so tabs can optionally await it if needed
+            callback(settingsPromise);
         };
     };
 

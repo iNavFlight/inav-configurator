@@ -10,16 +10,24 @@ import MSPChainerClass from './../js/msp/MSPchainer.js';
 import mspHelper from './../js/msp/MSPHelper.js';
 import { GUI, TABS } from './../js/gui.js';
 import FC from './../js/fc.js';
-import path from 'node:path';
 import i18n from './../js/localization.js';
 import { Transpiler } from './../js/transpiler/index.js';
 import { Decompiler } from './../js/transpiler/transpiler/decompiler.js';
 import * as MonacoLoader from './../js/transpiler/editor/monaco_loader.js';
-import apiDefinitions from './../js/transpiler/api/definitions/index.js';
-import { generateTypeDefinitions } from './../js/transpiler/api/types.js';
 import examples from './../js/transpiler/examples/index.js';
 import settingsCache from './../js/settingsCache.js';
+import * as monaco from 'monaco-editor';
+import tsWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker'
+import editorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker'
 
+self.MonacoEnvironment = {
+  getWorker(_, label) {
+    if (label === 'typescript' || label === 'javascript') {
+      return new tsWorker()
+    }
+    return new editorWorker()
+  }
+}
 
 TABS.javascript_programming = {
 
@@ -39,40 +47,52 @@ TABS.javascript_programming = {
             GUI.active_tab = 'javascript_programming';
         }
 
-        $('#content').load("./tabs/javascript_programming.html", function () {
+        import('./javascript_programming.html?raw').then(({default: html}) => {
+            GUI.load(html, () => {
+                try {
+                    self.initTranspiler();
 
-        self.initTranspiler();
+                    // Initialize editor with INAV configuration
+                    self.editor = MonacoLoader.initializeMonacoEditor(monaco, 'monaco-editor');
 
-        MonacoLoader.loadMonacoEditor()
-            .then(function(monaco) {
-                // Initialize editor with INAV configuration
-                self.editor = MonacoLoader.initializeMonacoEditor(monaco, 'monaco-editor');
+                    // Add INAV type definitions
+                    MonacoLoader.addINAVTypeDefinitions(monaco);
 
-                // Add INAV type definitions
-                MonacoLoader.addINAVTypeDefinitions(monaco);
+                    // Set up linting
+                    MonacoLoader.setupLinting(self.editor, function() {
+                        if (self.lintCode) {
+                            self.lintCode();
+                        }
+                    });
 
-                // Set up linting
-                MonacoLoader.setupLinting(self.editor, function() {
-                    if (self.lintCode) {
-                        self.lintCode();
-                    }
-                });
+                    // Continue with initialization
+                    self.setupEventHandlers();
+                    self.loadExamples();
 
-                // Continue with initialization
-                self.setupEventHandlers();
-                self.loadExamples();
+                    self.loadFromFC(function() {
+                        self.isDirty = false;
 
-                self.loadFromFC(function() {
-                    self.isDirty = false;
+                        // Set up dirty tracking AFTER initial load to avoid marking as dirty during decompilation
+                        self.editor.onDidChangeModelContent(function() {
+                            if (!self.isDirty) {
+                                console.log('[JavaScript Programming] Editor marked as dirty (unsaved changes)');
+                            }
+                            self.isDirty = true;
+                        });
+
+                        // Localize i18n strings
+                        i18n.localize();
+
+                        GUI.content_ready(callback);
+                    }); 
+                } catch (error) {
+                    console.error('Failed to load Monaco Editor:', error);
+                    // Localize i18n strings even on error
+                    i18n.localize();
                     GUI.content_ready(callback);
-                });
-            })
-            .catch(function(error) {
-                console.error('Failed to load Monaco Editor:', error);
-                GUI.content_ready(callback);
+                }
+
             });
-
-
         });
     },
 
@@ -102,11 +122,9 @@ TABS.javascript_programming = {
     return `// INAV JavaScript Programming
 // Write JavaScript, get INAV logic conditions!
 
-const { flight, override, rc, gvar, waypoint, pid, helpers, events } = inav;
-
 // Example: Increase VTX power when far from home
-if (flight.homeDistance > 100) {
-  override.vtx.power = 3;
+if (inav.flight.homeDistance > 100) {
+  inav.override.vtx.power = 3;
 }
 
 // Add your code here...
@@ -471,6 +489,16 @@ if (flight.homeDistance > 100) {
 
         GUI.log(`Found ${logicConditions.length} logic conditions, decompiling...`);
 
+        // Track which slots were occupied before we modify them
+        // This is used when saving to clear stale conditions
+        self.previouslyOccupiedSlots = new Set();
+        const conditions = FC.LOGIC_CONDITIONS.get();
+        for (let i = 0; i < conditions.length; i++) {
+            if (conditions[i].getEnabled() !== 0) {
+                self.previouslyOccupiedSlots.add(i);
+            }
+        }
+
         // Retrieve variable map for name preservation
         const variableMap = settingsCache.get('javascript_variables') || {
             let_variables: {},
@@ -602,11 +630,36 @@ if (flight.homeDistance > 100) {
         // Clear existing logic conditions
         FC.LOGIC_CONDITIONS.flush();
 
-        // Parse and load transpiled commands
+        // Create empty condition factory function
+        const createEmptyCondition = () => ({
+            enabled: 0,
+            activatorId: -1,
+            operation: 0,
+            operandAType: 0,
+            operandAValue: 0,
+            operandBType: 0,
+            operandBValue: 0,
+            flags: 0,
+
+            getEnabled: function() { return this.enabled; },
+            getActivatorId: function() { return this.activatorId; },
+            getOperation: function() { return this.operation; },
+            getOperandAType: function() { return this.operandAType; },
+            getOperandAValue: function() { return this.operandAValue; },
+            getOperandBType: function() { return this.operandBType; },
+            getOperandBValue: function() { return this.operandBValue; },
+            getFlags: function() { return this.flags; }
+        });
+
+        // Build a map of slot index -> condition from transpiler output
+        const conditionMap = new Map();
+
+        // Parse transpiled commands and build the condition map
         for (const cmd of result.commands) {
             if (cmd.startsWith('logic ')) {
                 const parts = cmd.split(' ');
                 if (parts.length >= 9) {
+                    const slotIndex = parseInt(parts[1], 10);
                     const lc = {
                         enabled: parseInt(parts[2], 10),
                         activatorId: parseInt(parts[3], 10),
@@ -617,7 +670,6 @@ if (flight.homeDistance > 100) {
                         operandBValue: parseInt(parts[8], 10),
                         flags: parts[9] ? parseInt(parts[9], 10) : 0,
 
-                        // Add getter methods that MSPHelper expects
                         getEnabled: function() { return this.enabled; },
                         getActivatorId: function() { return this.activatorId; },
                         getOperation: function() { return this.operation; },
@@ -628,9 +680,25 @@ if (flight.homeDistance > 100) {
                         getFlags: function() { return this.flags; }
                     };
 
-                    FC.LOGIC_CONDITIONS.put(lc);
+                    conditionMap.set(slotIndex, lc);
                 }
             }
+        }
+
+        // Add empty conditions for previously-occupied slots that aren't in the new script
+        if (self.previouslyOccupiedSlots) {
+            for (const oldSlot of self.previouslyOccupiedSlots) {
+                if (!conditionMap.has(oldSlot)) {
+                    // This slot was occupied before but isn't in new script - clear it
+                    conditionMap.set(oldSlot, createEmptyCondition());
+                }
+            }
+        }
+
+        // Sort by slot index and add to FC.LOGIC_CONDITIONS in order
+        const sortedSlots = Array.from(conditionMap.keys()).sort((a, b) => a - b);
+        for (const slotIndex of sortedSlots) {
+            FC.LOGIC_CONDITIONS.put(conditionMap.get(slotIndex));
         }
 
         const saveChainer = new MSPChainerClass();
@@ -668,19 +736,12 @@ if (flight.homeDistance > 100) {
     },
 
     cleanup: function (callback) {
-        const self = this;
-
-        // Check for unsaved changes
-        if (this.isDirty) {
-            const confirmMsg = i18n.getMessage('unsavedChanges') ||
-                'You have unsaved changes. Leave anyway?';
-            if (!confirm(confirmMsg)) {
-                // Cancel navigation
-                return;
-            }
-        }
+        console.log('[JavaScript Programming] cleanup() - disposing editor');
 
         // Dispose Monaco editor
+        // Note: Unsaved changes are checked BEFORE cleanup() is called:
+        // - For disconnect: in serial_backend.js
+        // - For tab switch: in configurator_main.js
         if (this.editor && this.editor.dispose) {
             this.editor.dispose();
             this.editor = null;
