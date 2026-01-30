@@ -170,14 +170,9 @@ class ConnectionBle extends Connection {
                         data: buffer
                     };
 
-                    // TODO: Remove debug logging after BLE fix is verified in testing
-                    console.log(`[BLE FIX] ← Received ${buffer.byteLength} bytes, ${this._onReceiveListeners.length} listener(s), counter at ${this._bytesReceived}`);
-
                     this._onReceiveListeners.forEach(listener => {
                         listener(info);
                     });
-
-                    console.log(`[BLE FIX] Byte counter after dispatch: ${this._bytesReceived}`);
                 };
 
                 this._readCharacteristic.addEventListener('characteristicvaluechanged', this._handleOnCharateristicValueChanged)
@@ -248,15 +243,11 @@ class ConnectionBle extends Connection {
     }
 
     addOnReceiveCallback(callback){
-        // TODO: Remove debug logging after BLE fix is verified in testing
-        console.log(`[BLE FIX] addOnReceiveCallback: listener count ${this._onReceiveListeners.length} → ${this._onReceiveListeners.length + 1}`);
         this._onReceiveListeners.push(callback);
     }
 
     removeOnReceiveCallback(callback){
         this._onReceiveListeners = this._onReceiveListeners.filter(listener => listener !== callback);
-        // TODO: Remove debug logging after BLE fix is verified in testing
-        console.log(`[BLE FIX] removeOnReceiveCallback: listener count now ${this._onReceiveListeners.length}`);
     }
 
     addOnReceiveErrorCallback(callback) {
