@@ -197,8 +197,14 @@ class SemanticAnalyzer {
       // Variable assignment - allowed for var variables
       // (let reassignment already caught above)
     } else if (!this.isValidWritableProperty(stmt.target)) {
-      // Use original target (with inav. prefix) for writability check
-      this.addError(`Cannot assign to '${stmt.target}'. Not a valid INAV writable property.`, line);
+      // Check if it's an intermediate object and provide helpful error
+      const betterError = this.getImprovedWritabilityError(stmt.target, line);
+      if (betterError) {
+        this.addError(betterError, line);
+      } else {
+        // Use original target (with inav. prefix) for writability check
+        this.addError(`Cannot assign to '${stmt.target}'. Not a valid INAV writable property.`, line);
+      }
     }
 
     // Check if value references are valid
@@ -368,7 +374,111 @@ class SemanticAnalyzer {
   extractGvarIndex(gvarStr) {
     return this.propertyAccessChecker.extractGvarIndex(gvarStr);
   }
-  
+
+  /**
+   * Generate improved error message for invalid writable property assignments
+   * Detects intermediate objects and suggests correct nested properties
+   * @param {string} target - Property path (e.g., "inav.override.flightAxis.yaw")
+   * @param {number} line - Line number for error reporting
+   * @returns {string|null} Improved error message or null if no improvement available
+   */
+  getImprovedWritabilityError(target, line) {
+    // Strip 'inav.' prefix if present
+    const normalizedTarget = target.startsWith('inav.') ? target.substring(5) : target;
+    const parts = normalizedTarget.split('.');
+
+    // Only applies to override namespace for now
+    if (parts[0] !== 'override') {
+      return null;
+    }
+
+    // Check if trying to assign to a 3-level intermediate object
+    // E.g., override.flightAxis.yaw (should be override.flightAxis.yaw.angle or .rate)
+    if (parts.length === 3) {
+      const overrideDef = this.getOverrideDefinition(parts[1], parts[2]);
+
+      if (overrideDef && overrideDef.type === 'object' && overrideDef.properties) {
+        const availableProps = Object.keys(overrideDef.properties);
+        const suggestions = availableProps.map(p => `inav.override.${parts[1]}.${parts[2]}.${p}`).join(', ');
+        return `Cannot assign to '${target}' - it's an object, not a property. Available properties: ${suggestions}`;
+      }
+    }
+
+    // Check if trying to assign to a 2-level intermediate object
+    // E.g., override.vtx (should be override.vtx.power, etc.)
+    // or override.flightAxis (should be override.flightAxis.roll.angle, etc.)
+    if (parts.length === 2) {
+      const categoryDef = this.getOverrideCategoryDefinition(parts[1]);
+
+      if (categoryDef && categoryDef.type === 'object' && categoryDef.properties) {
+        const propKeys = Object.keys(categoryDef.properties);
+
+        // Check if properties are simple (like vtx.power) or nested (like flightAxis.roll.angle)
+        const firstProp = categoryDef.properties[propKeys[0]];
+
+        if (firstProp && firstProp.type === 'object' && firstProp.properties) {
+          // Deeply nested (like flightAxis.roll.angle)
+          const nestedPropKeys = Object.keys(firstProp.properties);
+          const suggestions = propKeys.slice(0, 2).flatMap(p => {
+            const nested = categoryDef.properties[p];
+            if (nested && nested.properties) {
+              const nestedKeys = Object.keys(nested.properties);
+              if (nestedKeys.length > 0) {
+                const firstNestedProp = nestedKeys[0];
+                return [`inav.override.${parts[1]}.${p}.${firstNestedProp}`];
+              }
+            }
+            return [];
+          }).join(', ');
+          return `Cannot assign to '${target}' - it's an object, not a property. Examples: ${suggestions}, ...`;
+        } else {
+          // Simple properties (like vtx.power, vtx.band, vtx.channel)
+          const suggestions = propKeys.map(p => `inav.override.${parts[1]}.${p}`).join(', ');
+          return `Cannot assign to '${target}' - it's an object, not a property. Available properties: ${suggestions}`;
+        }
+      }
+    }
+
+    return null;
+  }
+
+  /**
+   * Get override definition for a specific property
+   * @private
+   */
+  getOverrideDefinition(category, property) {
+    try {
+      // Access raw API definitions, not processed structure
+      const overrideDefs = apiDefinitions.override;
+      if (!overrideDefs) return null;
+
+      // For nested objects like flightAxis, check if the property itself has properties
+      if (overrideDefs[category] && overrideDefs[category].properties) {
+        return overrideDefs[category].properties[property];
+      }
+
+      return null;
+    } catch (error) {
+      return null;
+    }
+  }
+
+  /**
+   * Get override category definition
+   * @private
+   */
+  getOverrideCategoryDefinition(category) {
+    try {
+      // Access raw API definitions, not processed structure
+      const overrideDefs = apiDefinitions.override;
+      if (!overrideDefs) return null;
+
+      return overrideDefs[category];
+    } catch (error) {
+      return null;
+    }
+  }
+
   /**
    * Check for common unsupported JavaScript features
    */
@@ -525,12 +635,9 @@ class SemanticAnalyzer {
     let stmtIndex = 0;
     for (const stmt of ast.statements) {
       if (stmt && stmt.type === 'EventHandler') {
-        // Each if statement gets a unique key - we want to detect multiple
-        // assignments within the SAME if block, not across different if
-        // statements that happen to have the same condition
-        const handlerKey = stmt.handler === 'ifthen' ?
-          `ifthen:${stmtIndex}` :
-          stmt.handler;
+        // Each handler gets a unique key - we want to detect multiple
+        // assignments within the SAME handler, not across different handlers
+        const handlerKey = `${stmt.handler}:${stmtIndex}`;
 
         if (!handlerAssignments.has(handlerKey)) {
           handlerAssignments.set(handlerKey, new Map());

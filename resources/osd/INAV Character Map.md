@@ -288,13 +288,10 @@
 | ![Flight dist rem](/resources/osd/digital/default/24x36/359.png)  | SYM_FLIGHT_DIST_REMAINING  | SYM.FLIGHT_DIST_REMAINING    | Flight distance remaining             | 359        | 0x167         |
 | ![Odometer](/resources/osd/digital/default/24x36/360.png)         | SYM_ODOMETER               | SYM.ODOMETER                 | Odometer (total aircraft distance)    | 360        | 0x168         |
 | ![RX Band](/resources/osd/digital/default/24x36/361.png)          | SYM_RX_BAND                | SYM.RX_BAND                  | Frequency band used by RX             | 361        | 0x169         |
-| ![RX Mode](/resources/osd/digital/default/24x36/362.png)          | SYM_RX_MODE                | SYM.RX_MODE                  | Mode used by RX (150HZ for example)   | 362        | 0x16A
-| ![Throttle Gauge Empty](/resources/osd/digital/default/24x36/363.png) | SYM_THR_GAUGE_EMPTY    | SYM.THROTTLE_GAUGE_EMPTY     | Vertical throttle gauge empty         | 363        | 0x16B
-         |
-| ![Throttle Gauge Half](/resources/osd/digital/default/24x36/364.png)  | SYM_THR_GAUGE_HALF     | SYM.THROTTLE_GAUGE_HALF      | Vertical throttle gauge 1 bar         | 364        | 0x16C
-         |
-| ![Throttle Gauge Full](/resources/osd/digital/default/24x36/365.png)  | SYM_THR_GAUGE_FULL     | SYM.THROTTLE_GAUGE_FULL      | Vertical throttle gauge 2 bars        | 365        | 0x16D
-         |
+| ![RX Mode](/resources/osd/digital/default/24x36/362.png)          | SYM_RX_MODE                | SYM.RX_MODE                  | Mode used by RX (150HZ for example)   | 362        | 0x16A         |
+| ![Throttle Gauge Empty](/resources/osd/digital/default/24x36/363.png) | SYM_THR_GAUGE_EMPTY    | SYM.THROTTLE_GAUGE_EMPTY     | Vertical throttle gauge empty         | 363        | 0x16B         |
+| ![Throttle Gauge Half](/resources/osd/digital/default/24x36/364.png)  | SYM_THR_GAUGE_HALF     | SYM.THROTTLE_GAUGE_HALF      | Vertical throttle gauge 1 bar         | 364        | 0x16C         |
+| ![Throttle Gauge Full](/resources/osd/digital/default/24x36/365.png)  | SYM_THR_GAUGE_FULL     | SYM.THROTTLE_GAUGE_FULL      | Vertical throttle gauge 2 bars        | 365        | 0x16D         |
 | ![Crosshair 3](/resources/osd/digital/default/24x36/400_402.png)  | SYM_AH_CH_TYPE3            | SYM.AH_CROSSHAIRS            | Crosshair type 3                      | 400 - 402  | 0x190 - 0x192 |
 | ![Crosshair 4](/resources/osd/digital/default/24x36/403_405.png)  | SYM_AH_CH_TYPE4            | SYM.AH_CROSSHAIRS            | Crosshair type 4                      | 403 - 405  | 0x193 - 0x195 |
 | ![Crosshair 5](/resources/osd/digital/default/24x36/406_408.png)  | SYM_AH_CH_TYPE5            | SYM.AH_CROSSHAIRS            | Crosshair type 5                      | 406 - 408  | 0x196 - 0x198 |

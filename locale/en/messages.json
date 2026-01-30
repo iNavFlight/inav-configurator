@@ -6214,7 +6214,7 @@
     "message": "Write JavaScript code to control your aircraft. The transpiler converts your code into INAV Logic Conditions."
   },
   "javascriptBetaWarning": {
-    "message": "<strong>Write JavaScript, Get INAV Logic Conditions!</strong> Use familiar JavaScript syntax with full autocomplete and error checking. <strong>Currently in beta, for testing. Do not use for safety-critical applications!</strong>"
+    "message": "<strong>Currently in beta, for testing. Do not use for safety-critical applications!</strong>"
   },
   "javascriptEditorTitle": {
     "message": "JavaScript Editor (shift-ctrl-v to paste, right-click a variable to rename)"
