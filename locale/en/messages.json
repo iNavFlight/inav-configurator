@@ -47,6 +47,12 @@
     "options_cliAutocomplete": {
         "message": "Advanced CLI AutoComplete"
     },
+    "navExpandAll": {
+        "message": "Expand All"
+    },
+    "navCollapseAll": {
+        "message": "Collapse All"
+    },
     "options_unit_type": {
         "message": "Set how the units render on the configurator only"
     },
@@ -118,6 +124,30 @@
     },
     "tabHelp": {
         "message": "Documentation & Support"
+    },
+    "navGroupSetup": {
+        "message": "Setup & Configuration"
+    },
+    "navGroupFlight": {
+        "message": "Flight Control"
+    },
+    "navGroupTuning": {
+        "message": "Tuning"
+    },
+    "navGroupNavigation": {
+        "message": "Navigation & Mission"
+    },
+    "navGroupSensors": {
+        "message": "Sensors & Peripherals"
+    },
+    "navGroupLogging": {
+        "message": "Data Logging"
+    },
+    "navGroupProgramming": {
+        "message": "Programming"
+    },
+    "navGroupTools": {
+        "message": "Tools"
     },
     "tabSetup": {
         "message": "Status"
