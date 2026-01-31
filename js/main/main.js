@@ -64,7 +64,7 @@ function createDeviceChooser() {
   bluetoothDeviceChooser = new BrowserWindow({
     parent: mainWindow,
     width: 410,
-    height: 400,
+    height: 600,
     webPreferences: {
       preload: path.join(__dirname, 'bt-device-chooser-preload.mjs'),
     }
