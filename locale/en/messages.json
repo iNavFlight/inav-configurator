@@ -1209,6 +1209,24 @@
     "configurationGPSUseGlonass": {
         "message": "Gps use Glonass Satellites (RU)"
     },
+    "gpsPresetMode": {
+        "message": "GPS Configuration Preset"
+    },
+    "gpsPresetModeHelp": {
+        "message": "Choose a preset optimized for your GPS module, or use Manual for custom configuration. Auto-detect will identify your GPS module if connected."
+    },
+    "gpsUpdateRate": {
+        "message": "GPS Update Rate (Hz)"
+    },
+    "gpsUpdateRateHelp": {
+        "message": "How often the GPS module sends position updates. Higher rates provide lower latency but may reduce accuracy with multiple constellations on M10 modules."
+    },
+    "gpsAutoDetectFailed": {
+        "message": "Could not auto-detect GPS module. Please connect flight controller or select manual preset."
+    },
+    "gpsAutoDetectSuccess": {
+        "message": "GPS module detected:"
+    },
     "tzOffset": {
         "message": "Timezone Offset"
     },

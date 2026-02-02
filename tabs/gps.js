@@ -130,7 +130,13 @@ TABS.gps.initialize = function (callback) {
     let vehiclesCursorInitialized = false;
     let arrowIcon;
 
-    function process_html() {
+    async function process_html(settingsPromise) {
+        // Wait for settings to finish loading to avoid race conditions
+        // where user changes are overwritten by background setting loads
+        if (settingsPromise) {
+            await settingsPromise;
+        }
+
         i18n.localize();
 
         var fcFeatures = FC.getFeatures();
@@ -200,6 +206,163 @@ TABS.gps.initialize = function (callback) {
 
         gps_ubx_sbas_e.val(FC.MISC.gps_ubx_sbas);
 
+        // GPS Preset Configuration
+        const GPS_PRESETS = {
+            m8: {
+                name: "u-blox M8",
+                galileo: true,
+                glonass: true,
+                beidou: true,
+                rate: 8,
+                description: [
+                    "4 GNSS constellations for maximum accuracy",
+                    "8Hz update rate (conservative for M8)",
+                    "Best for: Navigation, position hold, slower aircraft"
+                ]
+            },
+            'm9-precision': {
+                name: "u-blox M9 (Precision Mode)",
+                galileo: true,
+                glonass: false,
+                beidou: true,
+                rate: 5,
+                description: [
+                    "3 GNSS constellations (GPS+Galileo+Beidou) → 32 satellites",
+                    "5Hz update rate, HDOP ~1.0-1.3",
+                    "Best for: Long-range cruise, position hold, navigation missions"
+                ]
+            },
+            'm9-sport': {
+                name: "u-blox M9 (Sport Mode)",
+                galileo: true,
+                glonass: false,
+                beidou: true,
+                rate: 10,
+                description: [
+                    "3 GNSS constellations (GPS+Galileo+Beidou) → 16 satellites",
+                    "10Hz update rate (hardware limit), HDOP ~2.0-2.5",
+                    "Best for: Fast flying, racing, acrobatics, quick response"
+                ]
+            },
+            m10: {
+                name: "u-blox M10",
+                galileo: true,
+                glonass: false,
+                beidou: true,
+                rate: 8,
+                description: [
+                    "3 GNSS constellations (GPS+Galileo+Beidou)",
+                    "8Hz update rate (safe for M10 default CPU clock)",
+                    "Best for: General use, balanced performance"
+                ]
+            },
+            'm10-highperf': {
+                name: "u-blox M10 (High-Performance)",
+                galileo: true,
+                glonass: true,
+                beidou: true,
+                rate: 10,
+                description: [
+                    "4 GNSS constellations for maximum satellites",
+                    "10Hz update rate (requires high-performance CPU clock)",
+                    "Only use if you KNOW your M10 has high-performance clock enabled"
+                ]
+            },
+            manual: {
+                name: "Manual Settings",
+                description: [
+                    "Full control over constellation selection and update rate",
+                    "For advanced users and special requirements"
+                ]
+            }
+        };
+
+        function detectGPSPreset(hwVersion) {
+            switch(hwVersion) {
+                case 800:  return 'm8';
+                case 900:  return 'm9-precision';  // Default to precision mode for better accuracy
+                case 1000: return 'm10';
+                default:   return 'manual';
+            }
+        }
+
+        function applyGPSPreset(presetId) {
+            // Handle special cases first (before checking GPS_PRESETS)
+            if (presetId === 'manual') {
+                // Enable all controls
+                $('.preset-controlled').prop('disabled', false);
+                $('#gps_ublox_nav_hz').prop('disabled', false);
+                $('#preset_info').hide();
+                return;
+            }
+
+            if (presetId === 'auto') {
+                // Try to auto-detect from FC
+                if (FC.GPS_DATA && FC.GPS_DATA.hwVersion) {
+                    const detectedPreset = detectGPSPreset(FC.GPS_DATA.hwVersion);
+                    applyGPSPreset(detectedPreset);
+                    $('#gps_preset_mode').val(detectedPreset);
+                    GUI.log(i18n.getMessage('gpsAutoDetectSuccess') + ' ' + GPS_PRESETS[detectedPreset].name);
+                } else {
+                    // Fall back to manual if can't detect
+                    applyGPSPreset('manual');
+                    $('#gps_preset_mode').val('manual');
+                    GUI.log(i18n.getMessage('gpsAutoDetectFailed'));
+                }
+                return;
+            }
+
+            // Normal preset application
+            const preset = GPS_PRESETS[presetId];
+            if (!preset) return;
+
+            // Apply preset values (user can still adjust after applying)
+            $('#gps_use_galileo').prop('checked', preset.galileo);
+            $('#gps_use_glonass').prop('checked', preset.glonass);
+            $('#gps_use_beidou').prop('checked', preset.beidou);
+            $('#gps_ublox_nav_hz').val(preset.rate);
+
+            // Show preset info
+            $('#preset_name').text(preset.name);
+            $('#preset_details').html(preset.description.map(d => `<li>${d}</li>`).join(''));
+            $('#preset_info').show();
+        }
+
+        // Set up preset mode handler (namespaced to prevent memory leaks)
+        $('#gps_preset_mode').on('change.gpsTab', function() {
+            applyGPSPreset($(this).val());
+        });
+
+        // Hardware detection status indicator
+        function updateHardwareStatus() {
+            if (FC.GPS_DATA && FC.GPS_DATA.hwVersion && FC.GPS_DATA.hwVersion > 0) {
+                const detectedPreset = detectGPSPreset(FC.GPS_DATA.hwVersion);
+                if (detectedPreset && detectedPreset !== 'manual' && GPS_PRESETS[detectedPreset]) {
+                    $('#gps_hardware_name').text(GPS_PRESETS[detectedPreset].name + ' detected');
+                    $('#gps_hardware_status').show();
+                }
+            }
+        }
+
+        // Handler for "Use optimal settings" link (namespaced)
+        $('#gps_apply_optimal').on('click.gpsTab', function(e) {
+            e.preventDefault();
+            if (FC.GPS_DATA && FC.GPS_DATA.hwVersion) {
+                const detectedPreset = detectGPSPreset(FC.GPS_DATA.hwVersion);
+                if (detectedPreset && detectedPreset !== 'manual') {
+                    $('#gps_preset_mode').val(detectedPreset).trigger('change');
+                    GUI.log('Applied recommended settings for ' + GPS_PRESETS[detectedPreset].name);
+                }
+            }
+        });
+
+        // Initialize - default to manual mode to preserve user's existing settings
+        // User can explicitly select a preset or use "Auto-detect" if desired
+        applyGPSPreset('manual');
+
+        // Check for hardware detection after a short delay to allow GPS data to arrive
+        setTimeout(updateHardwareStatus, 500);
+
         let mapView = new View({
             center: [0, 0],
             zoom: 15
@@ -240,7 +403,7 @@ TABS.gps.initialize = function (callback) {
             }));
         }
 
-        $("#center_button").on('click', function () {
+        $("#center_button").on('click.gpsTab', function () {
             let lat = FC.GPS_DATA.lat / 10000000;
             let lon = FC.GPS_DATA.lon / 10000000;
             let center = fromLonLat([lon, lat]);
@@ -466,7 +629,7 @@ TABS.gps.initialize = function (callback) {
             });
         }
 
-        $('a.save').on('click', function () {
+        $('a.save').on('click.gpsTab', function () {
             serialPortHelper.set($port.val(), 'GPS', $baud.val());
             features.reset();
             features.fromUI($('.tab-gps'));
@@ -517,7 +680,7 @@ TABS.gps.initialize = function (callback) {
             }
         }
 
-        $('a.loadAssistnowOnline').on('click', function () {
+        $('a.loadAssistnowOnline').on('click.gpsTab', function () {
             if(globalSettings.assistnowApiKey != null && globalSettings.assistnowApiKey != '') {
                 ublox.loadAssistnowOnline(processUbloxData);
            } else {
@@ -525,7 +688,7 @@ TABS.gps.initialize = function (callback) {
             }
         });
 
-        $('a.loadAssistnowOffline').on('click', function () {
+        $('a.loadAssistnowOffline').on('click.gpsTab', function () {
             if(globalSettings.assistnowApiKey != null && globalSettings.assistnowApiKey != '') {
                 ublox.loadAssistnowOffline(processUbloxData);
             } else {
@@ -539,6 +702,14 @@ TABS.gps.initialize = function (callback) {
 };
 
 TABS.gps.cleanup = function (callback) {
+    // Remove all namespaced event handlers to prevent memory leaks
+    $('#gps_preset_mode').off('.gpsTab');
+    $('#gps_apply_optimal').off('.gpsTab');
+    $('#center_button').off('.gpsTab');
+    $('a.save').off('.gpsTab');
+    $('a.loadAssistnowOnline').off('.gpsTab');
+    $('a.loadAssistnowOffline').off('.gpsTab');
+
     if (callback) callback();
     if (TABS.gps.toolboxAdsbVehicle){
         TABS.gps.toolboxAdsbVehicle.close();
