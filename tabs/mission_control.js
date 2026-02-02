@@ -4057,15 +4057,15 @@ function iconKey(filename) {
         var builder = new xml2js.Builder({ 'rootName': 'mission', 'renderOpts': { 'pretty': true, 'indent': '\t', 'newline': '\n' } });
         var xml = builder.buildObject(data);
         xml = xml.replace(/missionitem mission/g, 'meta mission');
-        fs.writeFile(filename, xml, (err) => {
+        window.electronAPI.writeFile(filename, xml).then(err => {
             if (err) {
                 GUI.log(i18n.getMessage('ErrorWritingFile'));
                 return console.error(err);
             }
+            let sFilename = String(filename.split('\\').pop().split('/').pop());
+            GUI.log(sFilename + i18n.getMessage('savedSuccessfully'));
+            updateFilename(sFilename);
         });
-        let sFilename = String(filename.split('\\').pop().split('/').pop());
-        GUI.log(sFilename + i18n.getMessage('savedSuccessfully'));
-        updateFilename(sFilename);
     }
 
     /////////////////////////////////////////////
