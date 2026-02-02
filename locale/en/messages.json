@@ -3623,6 +3623,243 @@
     "osd_pilot_name": {
         "message": "Pilot's Name"
     },
+    "osdElement_POWER_SUPPLY_IMPEDANCE": {
+        "message": "Power Supply Impedance"
+    },
+    "osdElement_REMAINING_FLIGHT_TIME": {
+        "message": "Remaining Flight Time"
+    },
+    "osdElement_REMAINING_FLIGHT_DISTANCE": {
+        "message": "Remaining Flight Distance"
+    },
+    "osdElement_THROTTLE_GAUGE": {
+        "message": "Throttle Gauge"
+    },
+    "osdElement_THROTTLE_POSITION": {
+        "message": "Throttle Position"
+    },
+    "osdElement_SCALED_THROTTLE_POSITION": {
+        "message": "Scaled Throttle Position"
+    },
+    "osdElement_CRAFT_NAME": {
+        "message": "Craft Name"
+    },
+    "osdElement_PILOT_NAME": {
+        "message": "Pilot Name"
+    },
+    "osdElement_PILOT_LOGO": {
+        "message": "Pilot Logo"
+    },
+    "osdElement_FLYMODE": {
+        "message": "Flymode"
+    },
+    "osdElement_HEADING": {
+        "message": "Heading"
+    },
+    "osdElement_HEADING_GRAPH": {
+        "message": "Heading Graph"
+    },
+    "osdElement_AIR_SPEED": {
+        "message": "Air Speed"
+    },
+    "osdElement_MIN_GROUND_SPEED": {
+        "message": "Min Ground Speed"
+    },
+    "osdElement_GLIDE_TIME": {
+        "message": "Glide Time"
+    },
+    "osdElement_GLIDE_RANGE": {
+        "message": "Glide Range"
+    },
+    "osdElement_MISSION INFO": {
+        "message": "Mission Info"
+    },
+    "osdElement_VERSION": {
+        "message": "Version"
+    },
+    "osdElement_MULTI FUNCTION STATUS": {
+        "message": "Multi Function Status"
+    },
+    "osdElement_BLACKBOX": {
+        "message": "Blackbox"
+    },
+    "osdElement_ALTITUDE": {
+        "message": "Altitude"
+    },
+    "osdElement_VARIO": {
+        "message": "Vario"
+    },
+    "osdElement_ONTIME": {
+        "message": "Ontime"
+    },
+    "osdElement_FLYTIME": {
+        "message": "Flytime"
+    },
+    "osdElement_CROSSHAIRS": {
+        "message": "Crosshairs"
+    },
+    "osdElement_ARTIFICIAL_HORIZON": {
+        "message": "Artificial Horizon"
+    },
+    "osdElement_HORIZON_SIDEBARS": {
+        "message": "Horizon Sidebars"
+    },
+    "osdElement_PITCH_ANGLE": {
+        "message": "Pitch Angle"
+    },
+    "osdElement_ROLL_ANGLE": {
+        "message": "Roll Angle"
+    },
+    "osdElement_CURRENT_DRAW": {
+        "message": "Current Draw"
+    },
+    "osdElement_WH_DRAWN": {
+        "message": "Wh Drawn"
+    },
+    "osdElement_POWER": {
+        "message": "Power"
+    },
+    "osdElement_CLIMB_EFFICIENCY": {
+        "message": "Climb Efficiency"
+    },
+    "osdElement_LONGITUDE": {
+        "message": "Longitude"
+    },
+    "osdElement_LATITUDE": {
+        "message": "Latitude"
+    },
+    "osdElement_DIRECTION_TO_HOME": {
+        "message": "Direction to Home"
+    },
+    "osdElement_HOME_HEADING_ERROR": {
+        "message": "Home Heading Error"
+    },
+    "osdElement_DISTANCE_TO_HOME": {
+        "message": "Distance to Home"
+    },
+    "osdElement_ODOMETER": {
+        "message": "Odometer"
+    },
+    "osdElement_COURSE_HOLD_ERROR": {
+        "message": "Course Hold Error"
+    },
+    "osdElement_COURSE_HOLD_ADJUSTMENT": {
+        "message": "Course Hold Adjustment"
+    },
+    "osdElement_GROUND COURSE": {
+        "message": "Ground Course"
+    },
+    "osdElement_ADSB_WARNING_MESSAGE": {
+        "message": "Adsb Warning Message"
+    },
+    "osdElement_ADSB_INFO": {
+        "message": "Adsb Info"
+    },
+    "osdElement_CROSS TRACK ERROR": {
+        "message": "Cross Track Error"
+    },
+    "osdElement_RX_POWER_DOWNLINK": {
+        "message": "Rx Power Downlink"
+    },
+    "osdElement_RX_BAND": {
+        "message": "Rx Band"
+    },
+    "osdElement_RX_MODE": {
+        "message": "Rx Mode"
+    },
+    "osdElement_CUSTOM_ELEMENT_1": {
+        "message": "Custom Element 1"
+    },
+    "osdElement_CUSTOM_ELEMENT_2": {
+        "message": "Custom Element 2"
+    },
+    "osdElement_CUSTOM_ELEMENT_3": {
+        "message": "Custom Element 3"
+    },
+    "osdElement_CUSTOM_ELEMENT_4": {
+        "message": "Custom Element 4"
+    },
+    "osdElement_CUSTOM_ELEMENT_5": {
+        "message": "Custom Element 5"
+    },
+    "osdElement_CUSTOM_ELEMENT_6": {
+        "message": "Custom Element 6"
+    },
+    "osdElement_CUSTOM_ELEMENT_7": {
+        "message": "Custom Element 7"
+    },
+    "osdElement_CUSTOM_ELEMENT_8": {
+        "message": "Custom Element 8"
+    },
+    "osdElement_HEADING_P": {
+        "message": "Heading P"
+    },
+    "osdElement_BOARD_ALIGNMENT_ROLL": {
+        "message": "Board Alignment Roll"
+    },
+    "osdElement_BOARD_ALIGNMENT_PITCH": {
+        "message": "Board Alignment Pitch"
+    },
+    "osdElement_THROTTLE_EXPO": {
+        "message": "Throttle Expo"
+    },
+    "osdElement_STABILIZED.RC_EXPO": {
+        "message": "Stabilized.rc Expo"
+    },
+    "osdElement_STABILIZED.RC_YAW_EXPO": {
+        "message": "Stabilized.rc Yaw Expo"
+    },
+    "osdElement_STABILIZED.PITCH_RATE": {
+        "message": "Stabilized.pitch Rate"
+    },
+    "osdElement_STABILIZED.ROLL_RATE": {
+        "message": "Stabilized.roll Rate"
+    },
+    "osdElement_STABILIZED.YAW_RATE": {
+        "message": "Stabilized.yaw Rate"
+    },
+    "osdElement_MANUAL_RC_EXPO": {
+        "message": "Manual Rc Expo"
+    },
+    "osdElement_MANUAL_RC_YAW_EXPO": {
+        "message": "Manual Rc Yaw Expo"
+    },
+    "osdElement_MANUAL_PITCH_RATE": {
+        "message": "Manual Pitch Rate"
+    },
+    "osdElement_MANUAL_ROLL_RATE": {
+        "message": "Manual Roll Rate"
+    },
+    "osdElement_MANUAL_YAW_RATE": {
+        "message": "Manual Yaw Rate"
+    },
+    "osdElement_NAV_FW_CRUISE_THROTTLE": {
+        "message": "Nav Fw Cruise Throttle"
+    },
+    "osdElement_NAV_FW_PITCH_TO_THROTTLE": {
+        "message": "Nav Fw Pitch to Throttle"
+    },
+    "osdElement_FW_MIN_THROTTLE_DOWN_PITCH_ANGLE": {
+        "message": "Fw Min Throttle Down Pitch Angle"
+    },
+    "osdElement_THRUST_PID_ATTENUATION": {
+        "message": "Thrust Pid Attenuation"
+    },
+    "osdElement_CONTROL_SMOOTHNESS": {
+        "message": "Control Smoothness"
+    },
+    "osdElement_TPA_TIME_CONSTANT": {
+        "message": "Tpa Time Constant"
+    },
+    "osdElement_FW_LEVEL_TRIM": {
+        "message": "Fw Level Trim"
+    },
+    "osdElement_MISSION_INDEX": {
+        "message": "Mission Index"
+    },
+    "osdElement_FW_ALT_CONTROL_RESPONSE": {
+        "message": "Fw Alt Control Response"
+    },
     "osdElement_PILOT_LOGO_HELP": {
         "message": "Shows your small pilot logo in the OSD, where you position it. This requires a custom font with your pilot logo."
     },

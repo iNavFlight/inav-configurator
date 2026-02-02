@@ -6187,7 +6187,7 @@
         "message": "Единицы измерения расхода топлива (SmartPort)"
     },
     "serialrx_frSkyFuelUnitHelp": {
-        "message": "Выберите данные, которые вы хотите отправлять на сенсор телеметрии, отвечающий за <strong>«топливо»<strong> (расход/заряд)."
+        "message": "Выберите данные, которые вы хотите отправлять на сенсор телеметрии, отвечающий за <strong>«топливо»</strong> (расход/заряд)."
     },
     "configurationFrSkyOptions": {
         "message": "Опции FrSky"
@@ -6281,5 +6281,236 @@
     },
     "javascriptOptimizationsApplied": {
         "message": "Применены оптимизации:"
+    },
+    "osdElement_POWER_SUPPLY_IMPEDANCE": {
+        "message": "Внутреннее сопротивление источника питания"
+    },
+    "osdElement_REMAINING_FLIGHT_TIME": {
+        "message": "Оставшееся время полёта"
+    },
+    "osdElement_REMAINING_FLIGHT_DISTANCE": {
+        "message": "Оставшаяся расстояние полёта"
+    },
+    "osdElement_THROTTLE_GAUGE": {
+        "message": "Шкала газа"
+    },
+    "osdElement_THROTTLE_POSITION": {
+        "message": "Значение газа"
+    },
+    "osdElement_SCALED_THROTTLE_POSITION": {
+        "message": "Скорректированный газ"
+    },
+    "osdElement_CRAFT_NAME": {
+        "message": "Название аппарата"
+    },
+    "osdElement_PILOT_NAME": {
+        "message": "Имя пилота"
+    },
+    "osdElement_PILOT_LOGO": {
+        "message": "Лого пилота"
+    },
+    "osdElement_FLYMODE": {
+        "message": "Режим полёта"
+    },
+    "osdElement_HEADING": {
+        "message": "Курс"
+    },
+    "osdElement_HEADING_GRAPH": {
+        "message": "Лента компаса"
+    },
+    "osdElement_AIR_SPEED": {
+        "message": "Воздушная скорость"
+    },
+    "osdElement_MIN_GROUND_SPEED": {
+        "message": "Мин. путевая скорость"
+    },
+    "osdElement_GLIDE_TIME": {
+        "message": "Время планирования"
+    },
+    "osdElement_GLIDE_RANGE": {
+        "message": "Дистанция планирования"
+    },
+    "osdElement_MISSION INFO": {
+        "message": "Информация о миссии"
+    },
+    "osdElement_VERSION": {
+        "message": "Версия"
+    },
+    "osdElement_MULTI FUNCTION STATUS": {
+        "message": "Многофункциональный статус"
+    },
+    "osdElement_BLACKBOX": {
+        "message": "Чёрный ящик"
+    },
+    "osdElement_ALTITUDE": {
+        "message": "Высота"
+    },
+    "osdElement_VARIO": {
+        "message": "Вариометр"
+    },
+    "osdElement_ONTIME": {
+        "message": "Время работы"
+    },
+    "osdElement_FLYTIME": {
+        "message": "Время полёта"
+    },
+    "osdElement_CROSSHAIRS": {
+        "message": "Перекрестие"
+    },
+    "osdElement_ARTIFICIAL_HORIZON": {
+        "message": "Линия горизонта"
+    },
+    "osdElement_HORIZON_SIDEBARS": {
+        "message": "Боковые шкалы"
+    },
+    "osdElement_PITCH_ANGLE": {
+        "message": "Угол тангажа"
+    },
+    "osdElement_ROLL_ANGLE": {
+        "message": "Угол крена"
+    },
+    "osdElement_CURRENT_DRAW": {
+        "message": "Потребление тока"
+    },
+    "osdElement_WH_DRAWN": {
+        "message": "Израсходованная энергия (Вт*ч)"
+    },
+    "osdElement_POWER": {
+        "message": "Мощность"
+    },
+    "osdElement_CLIMB_EFFICIENCY": {
+        "message": "Эффективность набора высоты"
+    },
+    "osdElement_LONGITUDE": {
+        "message": "Долгота"
+    },
+    "osdElement_LATITUDE": {
+        "message": "Широта"
+    },
+    "osdElement_DISTANCE_TO_HOME": {
+        "message": "Расстояние до дома"
+    },
+    "osdElement_ODOMETER": {
+        "message": "Одометр"
+    },
+    "osdElement_COURSE_HOLD_ERROR": {
+        "message": "Ошибка удержания курса"
+    },
+    "osdElement_COURSE_HOLD_ADJUSTMENT": {
+        "message": "Коррекция курса"
+    },
+    "osdElement_GROUND COURSE": {
+        "message": "Путевой угол"
+    },
+    "osdElement_ADSB_WARNING_MESSAGE": {
+        "message": "Сообщение ADS-B"
+    },
+    "osdElement_ADSB_INFO": {
+        "message": "ADS-B инфо"
+    },
+    "osdElement_CROSS TRACK ERROR": {
+        "message": "Отклонение от пути"
+    },
+    "osdElement_RX_POWER_DOWNLINK": {
+        "message": "Мощность обратного канала связи"
+    },
+    "osdElement_RX_BAND": {
+        "message": "Диапазон Rx"
+    },
+    "osdElement_RX_MODE": {
+        "message": "Режим Rx"
+    },
+    "osdElement_CUSTOM_ELEMENT_1": {
+        "message": "Пользовательский элемент 1"
+    },
+    "osdElement_CUSTOM_ELEMENT_2": {
+        "message": "Пользовательский элемент 2"
+    },
+    "osdElement_CUSTOM_ELEMENT_3": {
+        "message": "Пользовательский элемент 3"
+    },
+    "osdElement_CUSTOM_ELEMENT_4": {
+        "message": "Пользовательский элемент 4"
+    },
+    "osdElement_CUSTOM_ELEMENT_5": {
+        "message": "Пользовательский элемент 5"
+    },
+    "osdElement_CUSTOM_ELEMENT_6": {
+        "message": "Пользовательский элемент 6"
+    },
+    "osdElement_CUSTOM_ELEMENT_7": {
+        "message": "Пользовательский элемент 7"
+    },
+    "osdElement_CUSTOM_ELEMENT_8": {
+        "message": "Пользовательский элемент 8"
+    },
+    "osdElement_HEADING_P": {
+        "message": "P-составляющая курса"
+    },
+    "osdElement_BOARD_ALIGNMENT_ROLL": {
+        "message": "Наклон платы (крен)"
+    },
+    "osdElement_BOARD_ALIGNMENT_PITCH": {
+        "message": "Наклон платы (тангаж)"
+    },
+    "osdElement_THROTTLE_EXPO": {
+        "message": "Экспонента газа"
+    },
+    "osdElement_STABILIZED.RC_EXPO": {
+        "message": "Стабилизированная экспонента"
+    },
+    "osdElement_STABILIZED.RC_YAW_EXPO": {
+        "message": "Экспонента рыскания в стабилизированном режиме"
+    },
+    "osdElement_STABILIZED.PITCH_RATE": {
+        "message": "Скорость тангажа (стабилизированная)"
+    },
+    "osdElement_STABILIZED.ROLL_RATE": {
+        "message": "Скорость крена (стабилизированная)"
+    },
+    "osdElement_STABILIZED.YAW_RATE": {
+        "message": "Скорость рыскания (стабилизированная)"
+    },
+    "osdElement_MANUAL_RC_EXPO": {
+        "message": "Экспонента ручного управления"
+    },
+    "osdElement_MANUAL_RC_YAW_EXPO": {
+        "message": "Экспонента ручного управления: рыскание"
+    },
+    "osdElement_MANUAL_PITCH_RATE": {
+        "message": "Скорость тангажа (ручное)"
+    },
+    "osdElement_MANUAL_ROLL_RATE": {
+        "message": "Скорость крена (ручное)"
+    },
+    "osdElement_MANUAL_YAW_RATE": {
+        "message": "Скорость рыскания (ручное)"
+    },
+    "osdElement_NAV_FW_CRUISE_THROTTLE": {
+        "message": "Крейсерская тяга (фиксированное крыло)"
+    },
+    "osdElement_NAV_FW_PITCH_TO_THROTTLE": {
+        "message": "Компенсация газа по тангажу"
+    },
+    "osdElement_FW_MIN_THROTTLE_DOWN_PITCH_ANGLE": {
+        "message": "Минимальный угол тангажа для снижения тяги"
+    },
+    "osdElement_THRUST_PID_ATTENUATION": {
+        "message": "Снижение усиления PID при тяге"
+    },
+    "osdElement_CONTROL_SMOOTHNESS": {
+        "message": "Плавность управления"
+    },
+    "osdElement_TPA_TIME_CONSTANT": {
+        "message": "Постоянная времени TPA"
+    },
+    "osdElement_FW_LEVEL_TRIM": {
+        "message": "Корректировка уровня"
+    },
+    "osdElement_MISSION_INDEX": {
+        "message": "Индекс миссии"
+    },
+    "osdElement_FW_ALT_CONTROL_RESPONSE": {
+        "message": "Отклик управления высотой (самолет)"
     }
 }
