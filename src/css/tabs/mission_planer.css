@@ -317,12 +317,20 @@
     top: 140px;
 }
 
-.geozone-settings {
+.mission-control-layers {
     top: 165px;
     left: .5em;
 }
-.ol-touch .geozone-settings {
+.ol-touch .mission-control-layers {
     top: 165px;
+}
+
+.geozone-settings {
+    top: 190px;
+    left: .5em;
+}
+.ol-touch .geozone-settings {
+    top: 190px;
 }
 
 .tab-mission-control .geozoneVerticesTable {
@@ -592,4 +600,16 @@
     width: 90%;
     height: 90%;
     padding-bottom: 5px;
+}
+
+.tab-mission-control .layer-item {
+    transition: background-color 0.2s;
+}
+
+.tab-mission-control .layer-item:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.tab-mission-control #geo_info {
+    transition: opacity 0.2s;
 }
