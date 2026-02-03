@@ -6,14 +6,14 @@ import * as THREE from 'three'
 
 import { GUI, TABS } from './gui';
 import CONFIGURATOR from './data_storage';
-import FC  from './fc';
+import FC from './fc';
 import { globalSettings, UnitType } from './globalSettings';
 import { PLATFORM } from './model'
 import i18n from './localization';
 import SerialBackend from './serial_backend';
 import MSP from './msp';
-import MSPCodes  from './../js/msp/MSPCodes';
-import mspHelper  from './msp/MSPHelper';
+import MSPCodes from './../js/msp/MSPCodes';
+import mspHelper from './msp/MSPHelper';
 import update from './globalUpdates';
 import CliAutoComplete from './CliAutoComplete';
 import settingsCache from './settingsCache';
@@ -23,15 +23,15 @@ import store from './store';
 window.$ = $;
 
 // Set how the units render on the configurator only
-$(function() {
-    i18n.init( async () => {
+$(function () {
+    i18n.init(async () => {
         i18n.localize();
 
         MSP.init();
         mspHelper.init();
         SerialBackend.init();
 
-        GUI.updateEzTuneTabVisibility = function(loadMixerConfig) {
+        GUI.updateEzTuneTabVisibility = function (loadMixerConfig) {
             let useEzTune = true;
             if (CONFIGURATOR.connectionValid) {
                 if (loadMixerConfig) {
@@ -56,7 +56,7 @@ $(function() {
             return useEzTune;
         };
 
-        GUI.updateActivatedTab = function() {
+        GUI.updateActivatedTab = function () {
             var activeTab = $('#tabs > ul li.active');
             activeTab.removeClass('active');
             $('a', activeTab).trigger('click');
@@ -75,7 +75,7 @@ $(function() {
         var cliAutocomplete = await store.get('cli_autocomplete', true);
         globalSettings.cliAutocomplete = cliAutocomplete;
         CliAutoComplete.setEnabled(cliAutocomplete);
-        
+
 
         // Resets the OSD units used by the unit coversion when the FC is disconnected.
         if (!CONFIGURATOR.connectionValid) {
@@ -100,14 +100,14 @@ $(function() {
 
         // Web 版本的更新由宿主 App 或浏览器缓存管理
         // appUpdater 已移除
-        
+
 
         // log library versions in console to make version tracking easier
         console.log('Libraries: jQuery - ' + $.fn.jquery + ', three.js - ' + THREE.REVISION);
 
         // Tabs
         var ui_tabs = $('#tabs > ul');
-        $('a', ui_tabs).on('click', function() {
+        $('a', ui_tabs).on('click', function () {
 
             if ($(this).parent().hasClass("tab_help")) {
                 return;
@@ -253,9 +253,9 @@ $(function() {
                             import('./../tabs/search').then(() => TABS.search.initialize(content_ready));
                             break;
 
-                       case 'javascript_programming':
-                           import('./../tabs/javascript_programming').then(() => TABS.javascript_programming.initialize(content_ready));
-                           break;
+                        case 'javascript_programming':
+                            import('./../tabs/javascript_programming').then(() => TABS.javascript_programming.initialize(content_ready));
+                            break;
                         default:
                             console.log('Tab not found:' + tab);
                     }
@@ -263,12 +263,12 @@ $(function() {
             }
         });
 
-        $('#tabs ul.mode-disconnected li a:first').trigger( "click" );
+        $('#tabs ul.mode-disconnected li a:first').trigger("click");
 
-    
+
 
         // options
-        $('#options').on('click', function() {
+        $('#options').on('click', function () {
             var el = $(this);
 
             function closeOptions() {
@@ -282,7 +282,7 @@ $(function() {
                 el.addClass('active');
                 el.after('<div id="options-window"></div>');
 
-                import('./../tabs/options.html?raw').then(async ({default: html}) => {
+                import('./../tabs/options.html?raw').then(async ({ default: html }) => {
                     $('div#options-window').html(html);
                     // translate to user-selected language
                     i18n.localize();
@@ -301,7 +301,7 @@ $(function() {
                         $('div.disable_3d_acceleration input').prop('checked', true);
                     }
 
-                     $('div.disable_3d_acceleration input').on('change', async function () {
+                    $('div.disable_3d_acceleration input').on('change', async function () {
                         var check = $(this).is(':checked');
                         await store.set('disable_3d_acceleration', check);
                     });
@@ -320,7 +320,7 @@ $(function() {
                         // Horrible way to reload the tab
                         const activeTab = $('#tabs li.active');
                         activeTab.removeClass('active');
-                        activeTab.find('a').trigger( "click" );
+                        activeTab.find('a').trigger("click");
                     });
 
                     $('div.cli_autocomplete input').on('change', async function () {
@@ -337,14 +337,14 @@ $(function() {
                     $('#showProfileParameters').prop('checked', globalSettings.showProfileParameters);
                     $('#cliAutocomplete').prop('checked', globalSettings.cliAutocomplete);
                     $('#assistnow-api-key').val(globalSettings.assistnowApiKey);
-                    
+
                     i18n.getLanguages().forEach(lng => {
                         $('#languageOption').append("<option value='{0}'>{1}</option>".format(lng, i18n.getMessage("language_" + lng)));
                     });
 
-                                        
+
                     $('#languageOption').val(i18n.getCurrentLanguage());
-                    
+
                     $('#languageOption').on('change', () => {
                         i18n.changeLanguage($('#languageOption').val());
                     });
@@ -364,7 +364,7 @@ $(function() {
                         // Horrible way to reload the tab
                         const activeTab = $('#tabs li.active');
                         activeTab.removeClass('active');
-                        activeTab.find('a').trigger( "click" );
+                        activeTab.find('a').trigger("click");
                     });
                     $('#map-provider-type').on('change', async function () {
                         await store.set('map_provider_type', $(this).val());
@@ -382,7 +382,7 @@ $(function() {
                         await store.set('assistnow_api_key', $(this).val());
                         globalSettings.assistnowApiKey = $(this).val();
                     });
- 
+
                     $('#demoModeReset').on('click', function () {
                         SITLProcess.deleteEepromFile('demo.bin');
                     });
@@ -395,7 +395,7 @@ $(function() {
                             closeOptions();
                         }
                     })
-        
+
                     $('div#options-window').slideDown(250);
                 });
             } else {
@@ -480,36 +480,36 @@ $(function() {
             }
         });
 
-        $("#showlog").on('click', function() {
-        var state = $(this).data('state'),
-            $log = $("#log");
+        $("#showlog").on('click', function () {
+            var state = $(this).data('state'),
+                $log = $("#log");
 
-        if (state) {
-            $log.animate({height: 27}, 200, function() {
-                var command_log = $('div#log');
-                //noinspection JSValidateTypes
-                command_log.scrollTop($('div.wrapper', command_log).height());
-            });
-            $log.removeClass('active');
-            $("#content").removeClass('logopen');
-            $(".tab_container").removeClass('logopen');
-            $("#scrollicon").removeClass('active');
-            store.set('logopen', false);
+            if (state) {
+                $log.animate({ height: 27 }, 200, function () {
+                    var command_log = $('div#log');
+                    //noinspection JSValidateTypes
+                    command_log.scrollTop($('div.wrapper', command_log).height());
+                });
+                $log.removeClass('active');
+                $("#content").removeClass('logopen');
+                $(".tab_container").removeClass('logopen');
+                $("#scrollicon").removeClass('active');
+                store.set('logopen', false);
 
-            state = false;
-        }else{
-            $log.animate({height: 111}, 200);
-            $log.addClass('active');
-            $("#content").addClass('logopen');
-            $(".tab_container").addClass('logopen');
-            $("#scrollicon").addClass('active');
-            store.set('logopen', true);
+                state = false;
+            } else {
+                $log.animate({ height: 111 }, 200);
+                $log.addClass('active');
+                $("#content").addClass('logopen');
+                $(".tab_container").addClass('logopen');
+                $("#scrollicon").addClass('active');
+                store.set('logopen', true);
 
-            state = true;
-        }
-        
-        $(this).html(state ? i18n.getMessage("mainHideLog") : i18n.getMessage("mainShowLog"));
-        $(this).data('state', state);
+                state = true;
+            }
+
+            $(this).html(state ? i18n.getMessage("mainHideLog") : i18n.getMessage("mainShowLog"));
+            $(this).data('state', state);
 
         });
 

@@ -3,7 +3,6 @@
 
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>INAV Configurator</title>
 </head>
 
@@ -45,7 +44,8 @@
                 </div>
                 <div id="portsinput">
                     <div class="portsinput__row">
-                        <div id="port-override-option" class="portsinput__top-element portsinput__top-element--port-override">
+                        <div id="port-override-option"
+                            class="portsinput__top-element portsinput__top-element--port-override">
                             <label id="port-override-label" for="port-override" i18n="mainPortOverrideLabel"></label>
                             <input id="port-override" type="text" value="/dev/rfcomm0" />
                         </div>
@@ -100,8 +100,8 @@
                         <div class="dropdown  dropdown-dark">
                             <form name="mixer-profile-change" id="mixer-profile-change">
                                 <select class="dropdown-select" id="mixerprofilechange">
-                                <option value="0" i18n="mixerProfile1"></option>
-                                <option value="1" i18n="mixerProfile2"></option>
+                                    <option value="0" i18n="mixerProfile1"></option>
+                                    <option value="1" i18n="mixerProfile2"></option>
                                 </select>
                             </form>
                         </div>
@@ -165,7 +165,8 @@
                     <div class="battery-legend" i18n="sensorBatteryVoltage"></div>
                     <div class="bottomStatusIcons">
                         <div id="armedIcon" class="statusicon armed cf_tip" data-i18n_title="mainHelpArmed"></div>
-                        <div id="failsafeicon" class="statusicon failsafe cf_tip" data-i18n_title="mainHelpFailsafe"></div>
+                        <div id="failsafeicon" class="statusicon failsafe cf_tip" data-i18n_title="mainHelpFailsafe">
+                        </div>
                         <div id="linkicon" class="statusicon link cf_tip" data-i18n_title="mainHelpLink"></div>
                     </div>
                 </div>
@@ -185,37 +186,44 @@
                 <h2 class="groundstation-telemetry__header" data-i18n="gsTelemetry"></h2>
 
                 <div class="groundstation-telemetry__row groundstation-telemetry__row--big">
-                    <label for="gs-telemetry-voltage" class="groundstation-telemetry__label" data-i18n="gsTelemetryVoltageShort"></label>
+                    <label for="gs-telemetry-voltage" class="groundstation-telemetry__label"
+                        data-i18n="gsTelemetryVoltageShort"></label>
                     <div class="groundstation-telemetry__value" id="gs-telemetry-voltage">-</div>
                 </div>
 
                 <div class="groundstation-telemetry__row groundstation-telemetry__row--big">
-                    <label for="gs-telemetry-altitude" class="groundstation-telemetry__label" data-i18n="gsTelemetryAltitudeShort"></label>
+                    <label for="gs-telemetry-altitude" class="groundstation-telemetry__label"
+                        data-i18n="gsTelemetryAltitudeShort"></label>
                     <div class="groundstation-telemetry__value" id="gs-telemetry-altitude">-</div>
                 </div>
 
                 <div class="groundstation-telemetry__row groundstation-telemetry__row--big">
-                    <label for="gs-telemetry-speed" class="groundstation-telemetry__label" data-i18n="gsTelemetrySpeed"></label>
+                    <label for="gs-telemetry-speed" class="groundstation-telemetry__label"
+                        data-i18n="gsTelemetrySpeed"></label>
                     <div class="groundstation-telemetry__value" id="gs-telemetry-speed">-</div>
                 </div>
 
                 <div class="groundstation-telemetry__row">
-                    <label for="gs-telemetry-latitude" class="groundstation-telemetry__label" data-i18n="gsTelemetryLatitude"></label>
+                    <label for="gs-telemetry-latitude" class="groundstation-telemetry__label"
+                        data-i18n="gsTelemetryLatitude"></label>
                     <div class="groundstation-telemetry__value" id="gs-telemetry-latitude">-</div>
                 </div>
 
                 <div class="groundstation-telemetry__row">
-                    <label class="groundstation-telemetry__label" for="gs-telemetry-longitude" data-i18n="gsTelemetryLongitude"></label>
+                    <label class="groundstation-telemetry__label" for="gs-telemetry-longitude"
+                        data-i18n="gsTelemetryLongitude"></label>
                     <div class="groundstation-telemetry__value" id="gs-telemetry-longitude">-</div>
                 </div>
 
                 <div class="groundstation-telemetry__row">
-                    <label class="groundstation-telemetry__label" for="gs-telemetry-longitude" data-i18n="gsTelemetrySats"></label>
+                    <label class="groundstation-telemetry__label" for="gs-telemetry-longitude"
+                        data-i18n="gsTelemetrySats"></label>
                     <div class="groundstation-telemetry__value" id="gs-telemetry-sats">-</div>
                 </div>
 
                 <div class="groundstation-telemetry__row">
-                    <label class="groundstation-telemetry__label" for="gs-telemetry-longitude" data-i18n="gsTelemetryFix"></label>
+                    <label class="groundstation-telemetry__label" for="gs-telemetry-longitude"
+                        data-i18n="gsTelemetryFix"></label>
                     <div class="groundstation-telemetry__value" id="gs-telemetry-fix">-</div>
                 </div>
 
@@ -274,7 +282,8 @@
                         <a href="#" data-i18n="tabProgramming" class="tabicon ic_config" title="Programming"></a>
                     </li>
                     <li class="tab_javascript_programming">
-                        <a href="#" i18n="tabJavaScriptProgramming" class="tabicon ic_javascript_programming" title="Javascript Programming">></a>
+                        <a href="#" i18n="tabJavaScriptProgramming" class="tabicon ic_javascript_programming"
+                            title="Javascript Programming">></a>
                     </li>
                     <li class="tab_receiver">
                         <a href="#" data-i18n="tabReceiver" class="tabicon ic_rx" title="Receiver"></a>
