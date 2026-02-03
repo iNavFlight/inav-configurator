@@ -20,9 +20,10 @@ i18n.loadMessages = async function(languages) {
 }
 
 i18n.init = function (callback) {
-    const locale = window.electronAPI.appGetLocale();
-    const userLanguage = store.get('userLanguage', locale);
-    this.loadMessages(availableLanguages).then(resources => {
+    // 获取浏览器语言（替代 Electron 的 appGetLocale）
+    const locale = navigator.language || navigator.userLanguage || 'en';
+    this.loadMessages(availableLanguages).then(async resources => {
+        const userLanguage = await store.get('userLanguage', locale);
         i18next.init({
             lng: userLanguage,
             getAsync: false,
@@ -71,7 +72,8 @@ i18n.parseInputFile = function (data) {
 i18n.getValidLocale = function(userLocale) {
     let validUserLocale = userLocale;
     if (validUserLocale === 'DEFAULT') {
-        validUserLocale = window.electronAPI.appGetLocale();
+        // 使用浏览器语言（替代 Electron 的 appGetLocale）
+        validUserLocale = navigator.language || navigator.userLanguage || 'en';
         console.log(`Detected locale ${validUserLocale}`);
     }
 

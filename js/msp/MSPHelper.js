@@ -3292,16 +3292,16 @@ var mspHelper = (function () {
         }
     }
 
-    self._getSetting = function (name) {
+    self._getSetting = async function (name) {
 
-        const storedSetting = settingsCache.get(name);
+        const storedSetting = await settingsCache.get(name);
         if (typeof storedSetting !== 'undefined') {
-            return Promise.resolve(storedSetting);
+            return storedSetting;
         }
 
         var data = [];
         self._encodeSettingReference(name, null, data);
-        return MSP.promise(MSPCodes.MSP2_COMMON_SETTING_INFO, data).then(function (result) {
+        return MSP.promise(MSPCodes.MSP2_COMMON_SETTING_INFO, data).then(async function (result) {
             const MODE_LOOKUP = 1 << 6;
             var settingTypes = {
                 0: "uint8_t",
@@ -3345,7 +3345,7 @@ var mspHelper = (function () {
                 }
                 setting.table = { values: values };
             }
-            settingsCache.set(name, setting);
+            await settingsCache.set(name, setting);
             return setting;
         });
     }

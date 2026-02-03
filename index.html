@@ -3,10 +3,24 @@
 
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <title>INAV Configurator</title>
 </head>
 
 <body>
+    <!-- 移动端汉堡菜单按钮 -->
+    <button id="mobile-menu-toggle" style="display: none;">
+        <span></span>
+        <span></span>
+        <span></span>
+    </button>
+
+    <!-- 移动端菜单遮罩层 -->
+    <div id="mobile-menu-overlay"></div>
+
     <div id="main-wrapper">
         <div id="appUpdateNotification" class="is-hidden">
             <div class="modal__content">
@@ -238,9 +252,6 @@
                     <li class="tab_firmware_flasher">
                         <a href="#" data-i18n="tabFirmwareFlasher" class="tabicon ic_flasher"
                             title="Firmware Flasher"></a>
-                    </li>
-                    <li class="tab_sitl">
-                        <a href="#" data-i18n="tabSitl" class="tabicon ic_sitl" title="SITL"></a>
                     </li>
                 </ul>
                 <ul class="mode-connected">

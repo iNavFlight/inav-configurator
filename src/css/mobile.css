@@ -1,0 +1,564 @@
+/**
+ * INAV Configurator - 移动端响应式样式
+ * 适配屏幕宽度 < 768px 的移动设备
+ */
+
+/* ========================================
+   1. 全局移动端优化
+   ======================================== */
+
+@media only screen and (max-width: 768px) {
+
+    /* 禁用文本选择，优化触摸体验 */
+    body {
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        -webkit-tap-highlight-color: transparent;
+        overflow-x: hidden;
+    }
+
+    /* 可编辑区域保留选择功能 */
+    input, textarea, [contenteditable="true"] {
+        -webkit-user-select: text;
+        -moz-user-select: text;
+        -ms-user-select: text;
+        user-select: text;
+    }
+
+    /* ========================================
+       2. 头部栏优化
+       ======================================== */
+
+    .headerbar {
+        flex-direction: column;
+        height: auto;
+        min-height: 50px;
+        padding: 0;
+    }
+
+    /* Logo 区域 */
+    #logo {
+        width: 100%;
+        height: 50px;
+        padding: 5px 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    #logo .logo_text {
+        font-size: 14px;
+        flex: 1;
+    }
+
+    #logo .logo_text .version {
+        font-size: 10px;
+    }
+
+    #logo .logo_text_firmware {
+        font-size: 12px;
+    }
+
+    #logo .firmware_version {
+        font-size: 10px;
+    }
+
+    /* 选项按钮 */
+    #options {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        width: 30px;
+        height: 30px;
+        background-size: 20px;
+    }
+
+    /* ========================================
+       3. 汉堡菜单（标签页导航）
+       ======================================== */
+
+    /* 汉堡菜单按钮 */
+    #mobile-menu-toggle {
+        display: block;
+        position: fixed;
+        top: 10px;
+        left: 10px;
+        width: 40px;
+        height: 40px;
+        background: var(--subtleAccent);
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        z-index: 1001;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    }
+
+    #mobile-menu-toggle span {
+        display: block;
+        width: 24px;
+        height: 2px;
+        background: #fff;
+        margin: 5px auto;
+        transition: all 0.3s ease;
+        border-radius: 2px;
+    }
+
+    /* 菜单打开时的动画 */
+    #mobile-menu-toggle.active span:nth-child(1) {
+        transform: translateY(7px) rotate(45deg);
+    }
+
+    #mobile-menu-toggle.active span:nth-child(2) {
+        opacity: 0;
+    }
+
+    #mobile-menu-toggle.active span:nth-child(3) {
+        transform: translateY(-7px) rotate(-45deg);
+    }
+
+    /* 标签页容器 - 侧边栏抽屉式 */
+    .tab_container {
+        position: fixed;
+        top: 0;
+        left: -100%;
+        width: 280px;
+        height: 100vh;
+        background: var(--sideBackground);
+        z-index: 1000;
+        transition: left 0.3s ease;
+        overflow-y: auto;
+        box-shadow: 2px 0 10px rgba(0,0,0,0.3);
+    }
+
+    .tab_container.mobile-menu-open {
+        left: 0;
+    }
+
+    /* 遮罩层 */
+    #mobile-menu-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100vh;
+        background: rgba(0,0,0,0.5);
+        z-index: 999;
+    }
+
+    #mobile-menu-overlay.active {
+        display: block;
+    }
+
+    /* 标签页列表 */
+    #tabs {
+        width: 100%;
+        padding-top: 60px;
+    }
+
+    #tabs ul {
+        display: block !important;
+        width: 100%;
+        padding: 0;
+    }
+
+    #tabs ul li {
+        display: block !important;
+        width: 100%;
+        height: auto;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+
+    #tabs ul li a {
+        display: flex;
+        align-items: center;
+        padding: 15px 20px;
+        min-height: 50px;
+        font-size: 16px;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    #tabs ul li a::before {
+        margin-right: 15px;
+        width: 24px;
+        height: 24px;
+    }
+
+    #tabs ul li.active a {
+        background: var(--subtleAccent);
+    }
+
+    /* ========================================
+       4. 端口选择器优化
+       ======================================== */
+
+    #port-picker {
+        width: 100%;
+        padding: 10px;
+        box-sizing: border-box;
+    }
+
+    .header-wrapper {
+        flex-direction: column;
+        width: 100%;
+        padding: 10px;
+    }
+
+    /* 连接按钮 */
+    .connect_controls {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+
+    .connect_b {
+        width: 50px;
+        height: 50px;
+    }
+
+    .connect_state {
+        font-size: 14px;
+        padding: 0 10px;
+    }
+
+    /* 端口输入 */
+    #portsinput {
+        width: 100%;
+    }
+
+    .portsinput__row {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .portsinput__top-element {
+        width: 100% !important;
+        margin: 5px 0 !important;
+    }
+
+    #port-override-option {
+        width: 100% !important;
+    }
+
+    #port-override {
+        width: 100%;
+        font-size: 14px;
+        padding: 10px;
+        box-sizing: border-box;
+    }
+
+    /* 下拉框 */
+    .dropdown {
+        width: 100% !important;
+    }
+
+    .dropdown-select {
+        width: 100%;
+        font-size: 14px;
+        padding: 10px;
+        min-height: 44px; /* iOS 推荐的最小触摸区域 */
+    }
+
+    /* ========================================
+       5. 配置文件选择器优化
+       ======================================== */
+
+    #profiles_wrapper_global {
+        flex-direction: column;
+        width: 100%;
+        margin-bottom: 10px;
+    }
+
+    #profile_change,
+    #mixer_profile_change,
+    #battery_profile_change {
+        width: 100% !important;
+        margin: 5px 0;
+    }
+
+    /* ========================================
+       6. 传感器状态优化
+       ======================================== */
+
+    #sensor-status {
+        width: 100%;
+        padding: 10px 0;
+    }
+
+    #sensor-status ul {
+        justify-content: space-around;
+        flex-wrap: wrap;
+    }
+
+    #sensor-status li {
+        margin: 5px;
+        min-width: 40px;
+    }
+
+    /* ========================================
+       7. 数据闪存状态优化
+       ======================================== */
+
+    #dataflash_wrapper_global {
+        width: 100%;
+        padding: 10px;
+    }
+
+    /* ========================================
+       8. 四轴状态优化
+       ======================================== */
+
+    #quad-status_wrapper {
+        flex-direction: column;
+        width: 100%;
+        padding: 10px;
+    }
+
+    .battery-icon {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+
+    .bottomStatusIcons {
+        justify-content: space-around;
+        width: 100%;
+    }
+
+    /* ========================================
+       9. 日志区域优化
+       ======================================== */
+
+    #log {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        z-index: 100;
+    }
+
+    #log .logswitch {
+        padding: 8px 15px;
+    }
+
+    #showlog {
+        font-size: 14px;
+    }
+
+    /* 日志展开时 */
+    #content.logopen {
+        padding-bottom: 120px;
+    }
+
+    /* ========================================
+       10. 内容区域优化
+       ======================================== */
+
+    #content {
+        width: 100%;
+        padding: 10px;
+        box-sizing: border-box;
+        margin-top: 0;
+    }
+
+    /* 表格响应式 */
+    table {
+        font-size: 12px;
+    }
+
+    table th,
+    table td {
+        padding: 8px 4px;
+    }
+
+    /* 输入框优化 */
+    input[type="text"],
+    input[type="number"],
+    textarea,
+    select {
+        font-size: 16px !important; /* 防止 iOS 自动缩放 */
+        min-height: 44px;
+        padding: 10px;
+    }
+
+    /* 按钮优化 */
+    button,
+    .button,
+    a.button {
+        min-height: 44px;
+        padding: 10px 20px;
+        font-size: 14px;
+        margin: 5px 0;
+    }
+
+    /* ========================================
+       11. 状态栏优化
+       ======================================== */
+
+    #status-bar {
+        flex-wrap: wrap;
+        padding: 5px;
+        font-size: 10px;
+    }
+
+    #status-bar > div {
+        padding: 2px 5px;
+        margin: 2px;
+    }
+
+    #status-bar .version {
+        display: none; /* 移动端隐藏版本号 */
+    }
+
+    /* ========================================
+       12. 模态框优化
+       ======================================== */
+
+    .modal__content,
+    .jBox-Modal {
+        width: 90% !important;
+        max-width: 400px;
+        margin: 0 auto;
+    }
+
+    /* ========================================
+       13. 3D 模型优化（Setup 标签页）
+       ======================================== */
+
+    .model-and-info {
+        flex-direction: column;
+    }
+
+    #canvas_wrapper {
+        width: 100% !important;
+        height: 300px !important;
+    }
+
+    /* ========================================
+       14. 图表优化（PID Tuning 等）
+       ======================================== */
+
+    .tab-pid_tuning .chart,
+    .tab-sensors .chart {
+        width: 100% !important;
+        height: 250px !important;
+    }
+
+    /* ========================================
+       15. 地图优化（GPS 标签页）
+       ======================================== */
+
+    #map {
+        width: 100% !important;
+        height: 300px !important;
+    }
+
+    /* ========================================
+       16. 辅助模式优化（Auxiliary 标签页）
+       ======================================== */
+
+    .range {
+        flex-direction: column;
+    }
+
+    /* ========================================
+       17. 触摸优化
+       ======================================== */
+
+    /* 滑块优化 */
+    input[type="range"] {
+        -webkit-appearance: none;
+        height: 40px;
+        padding: 15px 0;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+        width: 30px;
+        height: 30px;
+    }
+
+    /* 复选框优化 */
+    input[type="checkbox"] {
+        min-width: 20px;
+        min-height: 20px;
+    }
+
+    /* ========================================
+       18. 横屏优化
+       ======================================== */
+
+    @media only screen and (max-height: 500px) and (orientation: landscape) {
+        .headerbar {
+            min-height: 40px;
+        }
+
+        #logo {
+            height: 40px;
+        }
+
+        #mobile-menu-toggle {
+            top: 5px;
+            left: 5px;
+            width: 35px;
+            height: 35px;
+        }
+
+        #tabs ul li a {
+            padding: 10px 15px;
+            min-height: 40px;
+        }
+    }
+
+    /* ========================================
+       19. 小屏幕优化（< 480px）
+       ======================================== */
+
+    @media only screen and (max-width: 480px) {
+        #logo .logo_text {
+            font-size: 12px;
+        }
+
+        #logo .logo_text_firmware {
+            display: none;
+        }
+
+        #sensor-status li {
+            min-width: 35px;
+        }
+
+        table {
+            font-size: 11px;
+        }
+
+        .tab_container {
+            width: 100%;
+        }
+    }
+}
+
+/* ========================================
+   20. 平板优化（768px - 1024px）
+   ======================================== */
+
+@media only screen and (min-width: 768px) and (max-width: 1024px) {
+    .headerbar {
+        flex-wrap: wrap;
+    }
+
+    #port-picker {
+        width: 100%;
+        order: 2;
+    }
+
+    .header-wrapper {
+        width: 100%;
+        order: 3;
+    }
+
+    /* 标签页使用横向滚动 */
+    #tabs ul {
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+}

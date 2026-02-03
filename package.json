@@ -10,7 +10,10 @@
     "package": "electron-forge package",
     "make": "electron-forge make",
     "publish": "electron-forge publish",
-    "lint": "echo \"No linting configured\""
+    "lint": "echo \"No linting configured\"",
+    "dev:web": "vite -c vite.config.web.js",
+    "build:web": "vite build -c vite.config.web.js",
+    "preview:web": "vite preview -c vite.config.web.js"
   },
   "repository": {
     "type": "git",
@@ -29,6 +32,7 @@
     "electron-window-state": "^5.0.3",
     "fs": "0.0.1-security",
     "i18next": "^25.5.0",
+    "idb-keyval": "^6.2.1",
     "inflection": "^3.0.2",
     "jbox": "^1.3.3",
     "jquery": "^3.7.1",

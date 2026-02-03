@@ -25,9 +25,9 @@ var globalSettings = {
     assistnowOfflineData: [],
     assistnowOfflineDate: 0,
     store: null,
-    saveAssistnowData:  function() {
-        this.store.set('assistnow_offline_data', this.assistnowOfflineData);
-        this.store.set('assistnow_offline_date', this.assistnowOfflineDate);
+    saveAssistnowData: async function() {
+        await this.store.set('assistnow_offline_data', this.assistnowOfflineData);
+        await this.store.set('assistnow_offline_date', this.assistnowOfflineDate);
     }
 };
 

@@ -14,13 +14,13 @@ var settingsCache = (function() {
         return FC.CONFIG.target + '_' + FC.CONFIG.flightControllerVersion + '_' + FC.CONFIG.buildInfo + '_' + settingName;
     }
 
-    publicScope.flush = function() {
-        store.delete(SETTINGS_KEY);
+    publicScope.flush = async function() {
+        await store.delete(SETTINGS_KEY);
         console.log('Settings cache flushed');
     };
 
-    publicScope.get = function(settingName) {
-        let settings = store.get(SETTINGS_KEY, null);
+    publicScope.get = async function(settingName) {
+        let settings = await store.get(SETTINGS_KEY, null);
 
         if (settings === null) {
             return undefined;
@@ -29,15 +29,15 @@ var settingsCache = (function() {
         return setting;
     };
 
-    publicScope.set = function(settingName, value) {
-        let settings = store.get(SETTINGS_KEY, null);
+    publicScope.set = async function(settingName, value) {
+        let settings = await store.get(SETTINGS_KEY, null);
 
         if (settings === null) {
             settings = {};
         }
 
         settings[privateScope.getSetingKey(settingName)] = value;
-        store.set(SETTINGS_KEY, settings);
+        await store.set(SETTINGS_KEY, settings);
     };
 
     return publicScope;

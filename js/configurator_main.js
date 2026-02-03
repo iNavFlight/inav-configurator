@@ -15,9 +15,7 @@ import MSP from './msp';
 import MSPCodes  from './../js/msp/MSPCodes';
 import mspHelper  from './msp/MSPHelper';
 import update from './globalUpdates';
-import appUpdater from './appUpdater';
-import CliAutoComplete from './CliAutoComplete'; 
-import { SITLProcess } from './sitl';
+import CliAutoComplete from './CliAutoComplete';
 import settingsCache from './settingsCache';
 import store from './store';
 
@@ -26,7 +24,7 @@ window.$ = $;
 
 // Set how the units render on the configurator only
 $(function() {
-    i18n.init( () => {
+    i18n.init( async () => {
         i18n.localize();
 
         MSP.init();
@@ -54,7 +52,7 @@ $(function() {
                     }
                 }
             }
-        
+
             return useEzTune;
         };
 
@@ -64,17 +62,17 @@ $(function() {
             $('a', activeTab).trigger('click');
         }
 
-        globalSettings.unitType = store.get('unit_type', UnitType.none);
-        globalSettings.mapProviderType = store.get('map_provider_type', 'osm'); 
-        globalSettings.assistnowApiKey = store.get('assistnow_api_key', '');
-        globalSettings.proxyURL = store.get('proxyurl', 'http://192.168.1.222/mapproxy/service?');
-        globalSettings.proxyLayer = store.get('proxylayer', 'your_proxy_layer_name');
-        globalSettings.showProfileParameters = store.get('show_profile_parameters', 1);
-        globalSettings.assistnowOfflineData = store.get('assistnow_offline_data', []);
-        globalSettings.assistnowOfflineDate = store.get('assistnow_offline_date', 0);
+        globalSettings.unitType = await store.get('unit_type', UnitType.none);
+        globalSettings.mapProviderType = await store.get('map_provider_type', 'osm');
+        globalSettings.assistnowApiKey = await store.get('assistnow_api_key', '');
+        globalSettings.proxyURL = await store.get('proxyurl', 'http://192.168.1.222/mapproxy/service?');
+        globalSettings.proxyLayer = await store.get('proxylayer', 'your_proxy_layer_name');
+        globalSettings.showProfileParameters = await store.get('show_profile_parameters', 1);
+        globalSettings.assistnowOfflineData = await store.get('assistnow_offline_data', []);
+        globalSettings.assistnowOfflineDate = await store.get('assistnow_offline_date', 0);
         updateProfilesHighlightColours();
 
-        var cliAutocomplete = store.get('cli_autocomplete', true);
+        var cliAutocomplete = await store.get('cli_autocomplete', true);
         globalSettings.cliAutocomplete = cliAutocomplete;
         CliAutoComplete.setEnabled(cliAutocomplete);
         
@@ -84,23 +82,24 @@ $(function() {
             globalSettings.osdUnits = null;
         }
 
-        const version = window.electronAPI.appGetVersion();
+        // 获取应用版本（从 package.json）
+        const version = '9.0.0';  // Web 版本号
         // alternative - window.navigator.appVersion.match(/Chrome\/([0-9.]*)/)[1];
+        const chromeVersion = navigator.userAgent.match(/Chrome\/([\d\.]+\d+)/)?.[1] || 'Unknown';
         GUI.log(i18n.getMessage('getRunningOS') + GUI.operating_system + '</strong>, ' +
-            'Electron: <strong>' + navigator.userAgent.match(/Electron\/([\d\.]+\d+)/)[1] + '</strong>, ' +
+            'Chrome: <strong>' + chromeVersion + '</strong>, ' +
             i18n.getMessage('getConfiguratorVersion') + version + '</strong>');
 
         $('#status-bar .version').text(version);
         $('#logo .version').text(version);
         update.firmwareVersion();
 
-        if (store.get('logopen', false)) {
+        if (await store.get('logopen', false)) {
             $("#showlog").trigger('click');
         }
 
-        if (store.get('update_notify', true)) { 
-            appUpdater.checkRelease(version);
-        }
+        // Web 版本的更新由宿主 App 或浏览器缓存管理
+        // appUpdater 已移除
         
 
         // log library versions in console to make version tracking easier
@@ -183,9 +182,6 @@ $(function() {
                             break;
                         case 'firmware_flasher':
                             import('./../tabs/firmware_flasher').then(() => TABS.firmware_flasher.initialize(content_ready));
-                            break;
-                        case 'sitl':
-                            import('./../tabs/sitl').then(() => TABS.sitl.initialize(content_ready));
                             break;
                         case 'auxiliary':
                             import('./../tabs/auxiliary').then(() => TABS.auxiliary.initialize(content_ready));
@@ -286,37 +282,37 @@ $(function() {
                 el.addClass('active');
                 el.after('<div id="options-window"></div>');
 
-                import('./../tabs/options.html?raw').then(({default: html}) => {
+                import('./../tabs/options.html?raw').then(async ({default: html}) => {
                     $('div#options-window').html(html);
                     // translate to user-selected language
                     i18n.localize();
 
                     // if notifications are enabled, or wasn't set, check the notifications checkbox
-                    if (store.get('update_notify', true)) {
+                    if (await store.get('update_notify', true)) {
                         $('div.notifications input').prop('checked', true);
                     }
 
-                    $('div.notifications input').on('change', function () {
+                    $('div.notifications input').on('change', async function () {
                         var check = $(this).is(':checked');
-                        store.set('update_notify', check);
+                        await store.set('update_notify', check);
                     });
-                    
-                    if (store.get('disable_3d_acceleration', false)) {
+
+                    if (await store.get('disable_3d_acceleration', false)) {
                         $('div.disable_3d_acceleration input').prop('checked', true);
                     }
 
-                     $('div.disable_3d_acceleration input').on('change', function () {
+                     $('div.disable_3d_acceleration input').on('change', async function () {
                         var check = $(this).is(':checked');
-                        store.set('disable_3d_acceleration', check);
+                        await store.set('disable_3d_acceleration', check);
                     });
 
                     $('div.statistics input').on('change', function () {
                         var check = $(this).is(':checked');
                     });
 
-                    $('div.show_profile_parameters input').on('change', function () {
+                    $('div.show_profile_parameters input').on('change', async function () {
                         globalSettings.showProfileParameters = $(this).is(':checked');
-                        store.set('show_profile_parameters', globalSettings.showProfileParameters);
+                        await store.set('show_profile_parameters', globalSettings.showProfileParameters);
 
                         // Update CSS on select boxes
                         updateProfilesHighlightColours();
@@ -327,9 +323,9 @@ $(function() {
                         activeTab.find('a').trigger( "click" );
                     });
 
-                    $('div.cli_autocomplete input').on('change', function () {
+                    $('div.cli_autocomplete input').on('change', async function () {
                         globalSettings.cliAutocomplete = $(this).is(':checked');
-                        store.set('cli_autocomplete', globalSettings.cliAutocomplete);
+                        await store.set('cli_autocomplete', globalSettings.cliAutocomplete);
 
                         CliAutoComplete.setEnabled($(this).is(':checked'));
                     });
@@ -355,8 +351,8 @@ $(function() {
 
                     // Set the value of the unit type
                     // none, OSD, imperial, metric
-                    $('#ui-unit-type').on('change', function () {
-                        store.set('unit_type', $(this).val());
+                    $('#ui-unit-type').on('change', async function () {
+                        await store.set('unit_type', $(this).val());
                         globalSettings.unitType = $(this).val();
 
                         // Update the osd units in global settings
@@ -370,20 +366,20 @@ $(function() {
                         activeTab.removeClass('active');
                         activeTab.find('a').trigger( "click" );
                     });
-                    $('#map-provider-type').on('change', function () {
-                        store.set('map_provider_type', $(this).val());
+                    $('#map-provider-type').on('change', async function () {
+                        await store.set('map_provider_type', $(this).val());
                         globalSettings.mapProviderType = $(this).val();
                     });
-                    $('#proxyurl').on('change', function () {
-                        store.set('proxyurl', $(this).val());
+                    $('#proxyurl').on('change', async function () {
+                        await store.set('proxyurl', $(this).val());
                         globalSettings.proxyURL = $(this).val();
                     });
-                    $('#proxylayer').on('change', function () {
-                        store.set('proxylayer', $(this).val());
+                    $('#proxylayer').on('change', async function () {
+                        await store.set('proxylayer', $(this).val());
                         globalSettings.proxyLayer = $(this).val();
                     });
-                    $('#assistnow-api-key').on('change', function () {
-                        store.set('assistnow_api_key', $(this).val());
+                    $('#assistnow-api-key').on('change', async function () {
+                        await store.set('assistnow_api_key', $(this).val());
                         globalSettings.assistnowApiKey = $(this).val();
                     });
  

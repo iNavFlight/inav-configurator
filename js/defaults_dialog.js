@@ -336,7 +336,7 @@ var defaultsDialog = (function () {
 
     privateScope.onInitSettingReturned = function (promise) {
 
-        if (promise.value > 0) {
+        if (promise && promise.value > 0) {
             return; //Defaults were applied, we can just ignore
         }
 

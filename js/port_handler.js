@@ -26,7 +26,7 @@ PortHandler.initialize = function () {
 PortHandler.check = function () {
     var self = this;
 
-    ConnectionSerial.getDevices().then((all_ports) => {
+    ConnectionSerial.getDevices().then(async (all_ports) => {
         // filter out ports that are not serial
         let current_ports = [];
         for (var i = 0; i < all_ports.length; i++) {
@@ -78,7 +78,7 @@ PortHandler.check = function () {
 
             // auto-select last used port (only during initialization)
             if (!self.initial_ports) {
-                const last_used_port = store.get('last_used_port', false);
+                const last_used_port = await store.get('last_used_port', false);
                 // if last_used_port was set, we try to select it
                 if (last_used_port) {
                     if (last_used_port == "ble" || last_used_port == "tcp" || last_used_port == "udp" || last_used_port == "sitl" || last_used_port == "sitl-demo") {
@@ -94,13 +94,13 @@ PortHandler.check = function () {
                 } else {
                     console.log('Last used port wasn\'t saved "yet", auto-select disabled.');
                 }
-                
-                var last_used_bps = store.get('last_used_bps', false);
+
+                var last_used_bps = await store.get('last_used_bps', false);
                 if (last_used_bps) {
                     $('#baud').val(last_used_bps);
                 }
 
-                if (store.get('wireless_mode_enabled', false)) {
+                if (await store.get('wireless_mode_enabled', false)) {
                     $('#wireless-mode').prop('checked', true).trigger('change');
                 }
 

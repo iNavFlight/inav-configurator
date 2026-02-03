@@ -17,7 +17,6 @@ import periodicStatusUpdater from './periodicStatusUpdater';
 import mspQueue from './serial_queue';
 import timeout from './timeouts';
 import defaultsDialog from './defaults_dialog';
-import { SITLProcess } from './sitl';
 import update from './globalUpdates';
 import BitHelper from './bitHelper';
 import BOARD from './boards';
@@ -31,15 +30,13 @@ var SerialBackend = (function () {
 
     var publicScope = {},
         privateScope = {};
-        
-    privateScope.isDemoRunning = false;
 
     privateScope.isWirelessMode = false;
 
     /*
      * Handle "Wireless" mode with strict queueing of messages
      */
-    publicScope.init = function() {
+    publicScope.init = async function() {
         
         privateScope.$port = $('#port'),
         privateScope.$baud = $('#baud'),
@@ -139,22 +136,18 @@ var SerialBackend = (function () {
             var type = ConnectionType.Serial;
             if (selected_port.data().isBle) {
                 type = ConnectionType.BLE;
-            } else if (selected_port.data().isTcp || selected_port.data().isSitl) {
-                type = ConnectionType.TCP;
-            } else if (selected_port.data().isUdp) {
-                type = ConnectionType.UDP;
-            } 
+            }
             CONFIGURATOR.connection = connectionFactory(type, CONFIGURATOR.connection);
             
         };
 
         GUI.updateManualPortVisibility();
 
-        publicScope.$portOverride.on('change', function () {
-            store.set('portOverride', publicScope.$portOverride.val());
+        publicScope.$portOverride.on('change', async function () {
+            await store.set('portOverride', publicScope.$portOverride.val());
         });
-        
-        publicScope.$portOverride.val(store.get('portOverride', ''));        
+
+        publicScope.$portOverride.val( store.get('portOverride', ''));
 
         privateScope.$port.on('change', function (target) {
             GUI.updateManualPortVisibility();
@@ -186,20 +179,35 @@ var SerialBackend = (function () {
                         $('#port, #baud, #delay').prop('disabled', true);
                         $('div.connect_controls a.connect_state').text(i18n.getMessage('connecting'));
 
-                        if (selected_port == 'tcp' || selected_port == 'udp') {
-                            CONFIGURATOR.connection.connect(publicScope.$portOverride.val(), {}, privateScope.onOpen);
-                        } else if (selected_port == 'sitl') {
-                            CONFIGURATOR.connection.connect("127.0.0.1:5760", {}, privateScope.onOpen);
-                        } else if (selected_port == 'sitl-demo') {
-                            SITLProcess.stop();
-                            SITLProcess.start("demo.bin");                        
-                            this.isDemoRunning = true;
-
-                            // Wait 1 sec until SITL is ready
-                            setTimeout(() => {
-                                CONFIGURATOR.connection.connect("127.0.0.1:5760", {}, privateScope.onOpen);
-                            }, 1000);
+                        // Web Serial API: 在用户手势上下文中请求串口权限
+                        if (CONFIGURATOR.connection.type === ConnectionType.Serial) {
+                            // 检查是否有已授权的端口
+                            navigator.serial.getPorts().then(async ports => {
+                                if (ports.length > 0) {
+                                    // 使用已授权的端口
+                                    CONFIGURATOR.connection._port = ports[0];
+                                    CONFIGURATOR.connection.connect(selected_port, {bitrate: selected_baud}, privateScope.onOpen);
+                                } else {
+                                    // 没有已授权端口，请求用户选择（必须在同步用户手势上下文）
+                                    try {
+                                        const port = await navigator.serial.requestPort();
+                                        CONFIGURATOR.connection._port = port;
+                                        CONFIGURATOR.connection.connect(selected_port, {bitrate: selected_baud}, privateScope.onOpen);
+                                    } catch (error) {
+                                        console.error('Failed to request port:', error);
+                                        GUI.log(i18n.getMessage('serialPortOpenFail'));
+                                        $('#port, #baud, #delay').prop('disabled', false);
+                                        $('div.connect_controls a.connect_state').text(i18n.getMessage('connect'));
+                                    }
+                                }
+                            }).catch(error => {
+                                console.error('Failed to get ports:', error);
+                                GUI.log(i18n.getMessage('serialPortOpenFail'));
+                                $('#port, #baud, #delay').prop('disabled', false);
+                                $('div.connect_controls a.connect_state').text(i18n.getMessage('connect'));
+                            });
                         } else {
+                            // 蓝牙连接保持原有逻辑
                             CONFIGURATOR.connection.connect(selected_port, {bitrate: selected_baud}, privateScope.onOpen);
                         }
                     } else {
@@ -218,11 +226,6 @@ var SerialBackend = (function () {
                             console.log('[Disconnect] User confirmed, proceeding with disconnect');
                             // Clear isDirty flag so tab switch during disconnect doesn't show warning again
                             TABS.javascript_programming.isDirty = false;
-                        }
-
-                        if (this.isDemoRunning) {
-                            SITLProcess.stop();
-                            this.isDemoRunning = false;
                         }
 
                         var wasConnected = CONFIGURATOR.connectionValid;
@@ -342,7 +345,7 @@ var SerialBackend = (function () {
     }
 
 
-    privateScope.onOpen = function (openInfo) {
+    privateScope.onOpen = async function (openInfo) {
 
         if (FC.restartRequired) {
             GUI_control.prototype.log("<span style='color: red; font-weight: bolder'><strong>" + i18n.getMessage("illegalStateRestartRequired") + "</strong></span>");
@@ -360,20 +363,20 @@ var SerialBackend = (function () {
             GUI.log(i18n.getMessage('serialPortOpened', [openInfo.connectionId]));
 
             // save selected port if the port differs
-            var last_used_port = store.get('last_used_port', false);
+            var last_used_port = await store.get('last_used_port', false);
             if (last_used_port) {
                 if (last_used_port != GUI.connected_to) {
                     // last used port doesn't match the one found in local db, we will store the new one
-                    store.set('last_used_port', GUI.connected_to);
+                    await store.set('last_used_port', GUI.connected_to);
                 }
             } else {
                 // variable isn't stored yet, saving
-                store.set('last_used_port', GUI.connected_to);
+                await store.set('last_used_port', GUI.connected_to);
             }
-        
 
-            store.set('last_used_bps', CONFIGURATOR.connection.bitrate);
-            store.set('wireless_mode_enabled', $('#wireless-mode').is(":checked"));
+
+            await store.set('last_used_bps', CONFIGURATOR.connection.bitrate);
+            await store.set('wireless_mode_enabled', $('#wireless-mode').is(":checked"));
 
             // Reset state BEFORE adding receive listeners to ensure any
             // garbage bytes or boot messages don't corrupt the MSP decoder
