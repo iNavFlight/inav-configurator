@@ -20,6 +20,8 @@
 //   3. A valid ZTP token for AssistNow services. See https://developer.thingstream.io/guides/location-services/assistnow-user-guide to 
 //      create a device profile and obtain a required ZTP token. This token should then be entered in INAV Configurator settings for AssistNow or
 //      provided as a command line argument when running this script standalone.
+//   4. Node.js installed on your computer (for standalone use).
+//   5. When running, ensure your GNSS antenna has a clear view of the sky for best results.
 //
 // Code functionality:
 //   1. Poll UBX-SEC-UNIQID and UBX-MON-VER to get GNSS information and u-blox verification
@@ -48,6 +50,9 @@ import { parseArgs } from "node:util";
 import { Buffer } from "node:buffer";
 import { URLSearchParams } from "node:url";
 import fetch from "node-fetch";
+
+import { fileURLToPath } from 'node:url';
+import { resolve } from 'node:path';
 
 const { assistNow, parseArguments, VERSION } = (function () {
   // ─────────────────────────────────────────────────────────────────────────────
@@ -168,8 +173,8 @@ const { assistNow, parseArguments, VERSION } = (function () {
     _onData(chunk) {
       this.buffer = Buffer.concat([this.buffer, chunk]);
 
-      // Discard until we find possible UBX preamble
-      let start = this.buffer.indexOf(0xb5);
+      const preamble = Buffer.from([0xb5, 0x62]);
+      let start = this.buffer.indexOf(preamble);
       if (start === -1) {
         this.buffer = Buffer.alloc(0);
         return;
@@ -217,7 +222,7 @@ const { assistNow, parseArguments, VERSION } = (function () {
 
       await this.send(msg);
 
-      return new Promise((resolve) => {
+      return new Promise((resolve, reject) => {
         const start = Date.now();
         const interval = setInterval(() => {
           if (this.messageQueue.length > 0) {
@@ -226,10 +231,9 @@ const { assistNow, parseArguments, VERSION } = (function () {
           }
           if (Date.now() - start > timeoutMs) {
             clearInterval(interval);
-            console.warn("Timeout waiting for response");
-            resolve(null);
+            reject(new Error("Timeout waiting for response"));
           }
-        }, 50);
+        }, 1500);  // this was increased from 50 to reduce CPU usage, further testing may be needed
       });
     }
 
@@ -273,16 +277,22 @@ const { assistNow, parseArguments, VERSION } = (function () {
 
       let tries = 0;
       while (pending.size > 0 && tries < 3) {
-        const ack = await new Promise((r) => {
+        const ack = await new Promise((resolve) => {
+          let done = false;
+          const finalize = (value) => {
+            if (done) return;
+            done = true;
+            clearInterval(iv);
+            clearTimeout(to);
+            resolve(value);
+          };
           const iv = setInterval(() => {
             if (this.messageQueue.length > 0) {
-              clearInterval(iv);
-              r(this.messageQueue.shift());
+              finalize(this.messageQueue.shift());
             }
           }, 50);
-          setTimeout(() => {
-            clearInterval(iv);
-            r(null);
+          const to = setTimeout(() => {
+            finalize(null);
           }, SERIAL_TIMEOUT_MS);
         });
 
@@ -471,10 +481,11 @@ const { assistNow, parseArguments, VERSION } = (function () {
       }
 
       if (Date.now() - ttffStart >= 60000) {
-        console.warn("No fix within 60 seconds – check antenna / sky view");
+        console.warn("No fix within 60 seconds: Check antenna / Obtain unobstructed view of the sky.");
       }
     } catch (err) {
-      console.error("Error:", err.message);
+      console.error("Error:", err);
+      throw err;
     } finally {
       gnss.close();
     }
@@ -506,7 +517,8 @@ const { assistNow, parseArguments, VERSION } = (function () {
       process.exit(0);
     }
 
-    if (!values.port || !values.ztpToken) {
+    // if (!values.port || !values.ztpToken) {
+    if (!values.port || (!values.noAssist && !values.ztpToken)) {
       console.error("Missing required arguments: -P <port> -z <ZTP token>");
       console.error("Run with --help for usage");
       process.exit(1);
@@ -514,9 +526,13 @@ const { assistNow, parseArguments, VERSION } = (function () {
 
     // Mutually exclusive assist mode
     let useAssist = true;
+    if (values.predictive && values.live) {
+      console.error("Options --predictive and --live are mutually exclusive");
+      process.exit(1);
+    }
+    // Mutually exclusive assist mode
     if (values.noAssist) useAssist = false;
-    else if (values.predictive)
-      useAssist = true; // default anyway
+    else if (values.predictive) useAssist = true;
     else if (values.live) useAssist = true;
 
     return {
@@ -539,7 +555,9 @@ const { assistNow, parseArguments, VERSION } = (function () {
 // Entry point
 // ─────────────────────────────────────────────────────────────────────────────
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+// if (import.meta.url === `file://${process.argv[1]}`) {
+if (resolve(process.argv[1]) === resolve(fileURLToPath(import.meta.url))) {
+
   const args = parseArguments();
 
   console.log(`assistnow.js ${VERSION} – u-blox AssistNow using (ZTP)`);
@@ -556,11 +574,10 @@ if (import.meta.url === `file://${process.argv[1]}`) {
 
 export default assistNow;
 
-// export { runAssistNow, parseArguments, UBXReceiver };
-
 // ======================================================================
 // Example command lines (to be run in terminal):
 
-// node /Users/doug/Development/inav-configurator/js/ublox/assist-now.js -P /dev/cu.usbmodem0DAC28A114C41 -B 115200 -z <token> -p
-// node /Users/doug/Development/inav-configurator/js/ublox/assist-now.js -P /dev/cu.SLAB_USBtoUART  -B 9600 -z <token>>
-// ======================================================================
+/* 
+node /Users/doug/Development/inav-configurator/js/ublox/assist-now.js -P /dev/cu.usbmodem0DAC28A114C41 -B 115200 -z <token> -p
+node /Users/doug/Development/inav-configurator/js/ublox/assist-now.js -P /dev/cu.SLAB_USBtoUART  -B 9600 -z 4aca449b-d352-4592-b487-8f9053d00e6a
+*/
