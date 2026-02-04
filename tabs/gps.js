@@ -521,7 +521,7 @@ TABS.gps.initialize = function (callback) {
             if(globalSettings.assistnowApiKey != null && globalSettings.assistnowApiKey != '') {
                 ublox.loadAssistnowOnline(processUbloxData);
            } else {
-                dialog.alert("Assistnow Token not set!");
+                dialog.alert("AssistNow Token not set!");
             }
         });
 
@@ -529,7 +529,7 @@ TABS.gps.initialize = function (callback) {
             if(globalSettings.assistnowApiKey != null && globalSettings.assistnowApiKey != '') {
                 ublox.loadAssistnowOffline(processUbloxData);
             } else {
-                dialog.alert("Assistnow Token not set!");
+                dialog.alert("AssistNow Token not set!");
             }
         });
 
