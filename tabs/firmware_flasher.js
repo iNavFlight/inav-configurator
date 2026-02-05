@@ -22,6 +22,12 @@ import store from './../js/store';
 import dialog from '../js/dialog.js';
 
 TABS.firmware_flasher = {};
+
+// Allow hyphens due to 9.0.0 patch
+function normalizeTargetName(name) {
+    return name.replace(/-/g, '_');
+}
+
 TABS.firmware_flasher.initialize = function (callback) {
 
     if (GUI.active_tab != 'firmware_flasher') {
@@ -72,7 +78,7 @@ TABS.firmware_flasher.initialize = function (callback) {
             //var targetFromFilenameExpression = /inav_([\d.]+)?_?([^.]+)\.(.*)/;
             // inav_8.0.0_TUNERCF405_dev-20240617-88fb1d0.hex
             // inav_8.0.0_TUNERCF405_ci-20240617-88fb1d0.hex
-            var targetFromFilenameExpression = /^inav_(\d+)([\d.]+)_([A-Za-z0-9_]+)_(ci|dev)-(\d{4})(\d{2})(\d{2})-(\w+)\.(hex)$/;
+            var targetFromFilenameExpression = /^inav_(\d+)([\d.]+)_([A-Za-z0-9_-]+)_(ci|dev)-(\d{4})(\d{2})(\d{2})-(\w+)\.(hex)$/;
             var match = targetFromFilenameExpression.exec(filename);
 
             if (!match) {
@@ -80,9 +86,10 @@ TABS.firmware_flasher.initialize = function (callback) {
                 return null;
             }
 
+            var rawMatch = match[3];  // e.g., "TBS-LUCID-H7-WING" or "TBS_LUCID_H7_WING"
             return {
-                raw_target: match[3],
-                target: match[3].replace("_", " "),
+                target_id: normalizeTargetName(rawMatch),
+                target: rawMatch.replace(/_/g, " ").replace(/-/g, " "),  // Display: "TBS LUCID H7 WING"
                 format: match[9],
                 version: match[1]+match[2],
                 major: match[1]
@@ -100,9 +107,10 @@ TABS.firmware_flasher.initialize = function (callback) {
 
             //GUI.log("non dev: match[2]: " + match[2] + " match[3]: " + match[3]);
 
+            var rawMatch = match[2];  // e.g., "MATEKF405" or "MATEK-F405"
             return {
-                raw_target: match[2],
-                target: match[2].replace("_", " "),
+                target_id: normalizeTargetName(rawMatch),
+                target: rawMatch.replace(/_/g, " ").replace(/-/g, " "),  // Display: "MATEKF405"
                 format: match[3],
             };
         }
@@ -158,8 +166,8 @@ TABS.firmware_flasher.initialize = function (callback) {
                     if ((!showDevReleases && release.prerelease) || !result) {
                         return;
                     }
-                    if($.inArray(result.target, unsortedTargets) == -1) {
-                        unsortedTargets.push(result.target);
+                    if($.inArray(result.target_id, unsortedTargets) == -1) {
+                        unsortedTargets.push(result.target_id);
                     }
                 });
             });
@@ -170,8 +178,10 @@ TABS.firmware_flasher.initialize = function (callback) {
                     release.assets.forEach(function (asset) {
                         var result = parseDevFilename(asset.name);
 
-                        if (result && $.inArray(result.target, unsortedTargets) == -1) {
-                            unsortedTargets.push(result.target);
+                        if (result) {
+                            if ($.inArray(result.target_id, unsortedTargets) == -1) {
+                                unsortedTargets.push(result.target_id);
+                            }
                         }
                     });
                 });
@@ -214,13 +224,13 @@ TABS.firmware_flasher.initialize = function (callback) {
                         "version"   : release.tag_name,
                         "url"       : asset.browser_download_url,
                         "file"      : asset.name,
-                        "raw_target": result.raw_target,
+                        "target_id" : result.target_id,
                         "target"    : result.target,
                         "date"      : formattedDate,
                         "notes"     : release.body,
                         "status"    : release.prerelease ? "release-candidate" : "stable"
                     };
-                    releases[result.target].push(descriptor);
+                    releases[result.target_id].push(descriptor);
                 });
             });
 
@@ -268,13 +278,13 @@ TABS.firmware_flasher.initialize = function (callback) {
                             "version"   : release.tag_name,
                             "url"       : asset.browser_download_url,
                             "file"      : asset.name,
-                            "raw_target": result.raw_target,
+                            "target_id" : result.target_id,
                             "target"    : result.target,
                             "date"      : formattedDate,
                             "notes"     : release.body,
                             "status"    : release.prerelease ? "nightly" : "stable"
                         };
-                        releases[result.target].push(descriptor);
+                        releases[result.target_id].push(descriptor);
                     });
                 });
             }
@@ -289,7 +299,7 @@ TABS.firmware_flasher.initialize = function (callback) {
                             selectTargets.push(target);
                             var select_e =
                                     $("<option value='{0}'>{1}</option>".format(
-                                            descriptor.raw_target,
+                                            descriptor.target_id,
                                             descriptor.target
                                     )).data('summary', descriptor);
                             boards_e.append(select_e);
@@ -862,14 +872,15 @@ TABS.firmware_flasher.onValidFirmware = function() {
     MSP.send_message(MSPCodes.MSP_BUILD_INFO, false, false, function () {
         MSP.send_message(MSPCodes.MSP_BOARD_INFO, false, false, function () {
             var boardSelect = $('select[name="board"]');
-            boardSelect.val(FC.CONFIG.target);
+            var normalizedTarget = normalizeTargetName(FC.CONFIG.target);
+            boardSelect.val(normalizedTarget);
 
             GUI.log(i18n.getMessage('targetPrefetchsuccessful') + FC.CONFIG.target);
 
             TABS.firmware_flasher.closeTempConnection();
 
             // Only trigger change if the board was actually found and selected
-            if (boardSelect.val() === FC.CONFIG.target) {
+            if (boardSelect.val() === normalizedTarget) {
                 boardSelect.trigger('change');
             }
         });
