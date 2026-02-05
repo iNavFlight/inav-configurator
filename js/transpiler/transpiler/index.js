@@ -115,8 +115,9 @@ class Transpiler {
       const optimized = this.optimize(analyzed.ast);
 
       // Step 4: Generate INAV CLI commands
-      // Pass the analyzer's variableHandler to codegen
+      // Pass the analyzer's variableHandler and lineOffset to codegen
       this.codegen.variableHandler = this.analyzer.variableHandler;
+      this.codegen.lineOffset = lineOffset;
       const commands = this.codegen.generate(optimized);
 
       // Combine all warnings
@@ -153,6 +154,7 @@ class Transpiler {
         success: true,
         commands,
         logicConditionCount: this.codegen.lcIndex,
+        lcToLineMapping: this.codegen.lcToLineMapping,
         warnings: categorized,
         optimizations: this.optimizer.getStats(),
         gvarUsage: gvarSummary,
