@@ -217,65 +217,70 @@
         <div class="modal__content">
             <h1 class="modal__title modal__title--warning" data-i18n="mixerWizardModalTitle"></h1>
             <div class="modal__text">
-                <p data-i18n="mixerWizardInfo"></p>
-                <table style="margin-top: 1em;" class="mixer-table">
-                    <thead>
-                        <th data-i18n="mixerWizardMotorPosition"></th>
-                        <th data-i18n="mixerWizardMotorIndex"></th>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <th data-i18n="motorWizard0"></th>
-                            <td>
-                                <select class="wizard-motor-select" data-motor="0">
-                                    <option id="0" selected="selected">Motor #1</option>
-                                    <option id="1">Motor #2</option>
-                                    <option id="2">Motor #3</option>
-                                    <option id="3">Motor #4</option>
-                                </select>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th data-i18n="motorWizard1"></th>
-                            <td>
-                                <select class="wizard-motor-select" data-motor="1">
-                                    <option id="0">Motor #1</option>
-                                    <option id="1" selected="selected">Motor #2</option>
-                                    <option id="2">Motor #3</option>
-                                    <option id="3">Motor #4</option>
-                                </select>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th data-i18n="motorWizard2"></th>
-                            <td>
-                                <select class="wizard-motor-select" data-motor="2">
-                                    <option id="0">Motor #1</option>
-                                    <option id="1">Motor #2</option>
-                                    <option id="2" selected="selected">Motor #3</option>
-                                    <option id="3">Motor #4</option>
-                                </select>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th data-i18n="motorWizard3"></th>
-                            <td>
-                                <select class="wizard-motor-select" data-motor="3">
-                                    <option id="0">Motor #1</option>
-                                    <option id="1">Motor #2</option>
-                                    <option id="2">Motor #3</option>
-                                    <option id="3" selected="selected">Motor #4</option>
-                                </select>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+                <!-- Initial instructions (shown before wizard starts) -->
+                <div id="wizard-intro" class="wizard-section">
+                    <p data-i18n="mixerWizardIntro"></p>
+                    <ul class="wizard-checklist">
+                        <li data-i18n="mixerWizardStep1"></li>
+                        <li data-i18n="mixerWizardStep2"></li>
+                        <li data-i18n="mixerWizardStep3"></li>
+                    </ul>
+                    <div class="wizard-buttons">
+                        <a id="wizard-start-button" class="modal__button modal__button--main" data-i18n="mixerWizardStart"></a>
+                    </div>
+                </div>
+
+                <!-- Wizard in progress (shown during motor identification) -->
+                <div id="wizard-progress" class="wizard-section is-hidden">
+                    <p class="wizard-prompt">
+                        <span data-i18n="mixerWizardLocating"></span>
+                        <strong id="wizard-current-motor">1</strong>.
+                        <span data-i18n="mixerWizardClickPosition"></span>
+                    </p>
+                    <div class="wizard-progress-bar">
+                        <div class="wizard-progress-step" data-step="0">1</div>
+                        <div class="wizard-progress-step" data-step="1">2</div>
+                        <div class="wizard-progress-step" data-step="2">3</div>
+                        <div class="wizard-progress-step" data-step="3">4</div>
+                    </div>
+                    <div class="wizard-buttons">
+                        <a id="wizard-stop-button" class="modal__button modal__button--warning" data-i18n="mixerWizardStop"></a>
+                    </div>
+                </div>
+
+                <!-- Wizard complete (shown when all motors identified) -->
+                <div id="wizard-complete" class="wizard-section is-hidden">
+                    <p data-i18n="mixerWizardComplete"></p>
+                    <div class="wizard-buttons">
+                        <a id="wizard-apply-button" class="modal__button modal__button--main" data-i18n="mixerWizardModalApply"></a>
+                    </div>
+                </div>
+
+                <!-- Motor position preview - always visible -->
+                <div class="wizard-preview">
+                    <div class="wizard-motor-preview">
+                        <img src="./resources/motor_order/custom.svg" id="wizard-preview-img"/>
+                        <!-- Position 0: Rear-Right -->
+                        <div class="wizard-position-btn" id="wizardPos0" data-position="0">
+                            <span class="position-label"></span>
+                        </div>
+                        <!-- Position 1: Front-Right -->
+                        <div class="wizard-position-btn" id="wizardPos1" data-position="1">
+                            <span class="position-label"></span>
+                        </div>
+                        <!-- Position 2: Rear-Left -->
+                        <div class="wizard-position-btn" id="wizardPos2" data-position="2">
+                            <span class="position-label"></span>
+                        </div>
+                        <!-- Position 3: Front-Left -->
+                        <div class="wizard-position-btn" id="wizardPos3" data-position="3">
+                            <span class="position-label"></span>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <div class="modal__buttons--upbottom">
-            <a id="wizard-execute-button" class="modal__button modal__button--main" data-i18n="mixerWizardModalApply"></a>
-        </div>
     </div>
     <div class="content_toolbar">
         <div class="btn save_btn">
