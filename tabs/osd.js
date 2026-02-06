@@ -3203,6 +3203,9 @@ OSD.GUI.updateMapPreview = function(mapCenter, name, directionSymbol, centerSymb
 };
 
 OSD.GUI.updatePreviews = function() {
+    if (!OSD.data) {
+        return;
+    }
     // buffer the preview;
    
     if (!OSD.data) {
@@ -3484,6 +3487,7 @@ OSD.GUI.updateAll = function() {
     OSD.GUI.updateVideoMode();
     OSD.GUI.updateUnits();
     OSD.GUI.updateFields();
+    updatePilotAndCraftNames();
     OSD.GUI.updatePreviews();
     OSD.GUI.updateGuidesView($('#videoGuides').find('input').is(':checked'));
     OSD.GUI.updateDjiView(HARDWARE.capabilities.isDjiHdFpv && !HARDWARE.capabilities.isMspDisplay);
@@ -3559,7 +3563,10 @@ const osdTab = {};
 osdTab.initialize = function (callback) {
 
     mspHelper.loadServoMixRules();
-    mspHelper.loadLogicConditions();
+    mspHelper.loadLogicConditions(function() {
+        // Refresh LC dropdowns now that conditions are loaded
+        $('select.lc, select.ico_lc').html(getLCoptions());
+    });
 
     if (GUI.active_tab !== this) {
         GUI.active_tab = this;
@@ -3744,12 +3751,7 @@ osdTab.initialize = function (callback) {
                 OSD.GUI.updateDjiMessageElements(this.checked);
             });
 
-            if(semver.gte(FC.CONFIG.flightControllerVersion, '7.1.0')) {
-                mspHelper.loadOsdCustomElements(createCustomElements);
-            }
-
             GUI.content_ready(callback);
-            updatePilotAndCraftNames();
         })));
     });
 };
@@ -3957,7 +3959,14 @@ function updateOSDCustomElementsDisplay() {
 
 function fillCustomElementsValues() {
     for (var i = 0; i < FC.OSD_CUSTOM_ELEMENTS.settings.customElementsCount; i++) {
+        // Safety check - items may not be loaded yet
+        if (!FC.OSD_CUSTOM_ELEMENTS.items[i] || !FC.OSD_CUSTOM_ELEMENTS.items[i].customElementItems) {
+            continue;
+        }
         for (var ii = 0; ii < FC.OSD_CUSTOM_ELEMENTS.settings.customElementParts; ii++) {
+            if (!FC.OSD_CUSTOM_ELEMENTS.items[i].customElementItems[ii]) {
+                continue;
+            }
             $('.osdCustomElement-' + i + '-part-' + ii + '-type').val(FC.OSD_CUSTOM_ELEMENTS.items[i].customElementItems[ii].type).trigger('change');
 
             var valueCell = $('.osdCustomElement-' + i + '-part-' + ii + '-value');
@@ -4173,6 +4182,10 @@ function getGVoptions(){
 
 function getLCoptions(){
     var result = '';
+    // Return empty if conditions aren't fully loaded yet - callback will refresh
+    if (FC.LOGIC_CONDITIONS.getCount() < FC.LOGIC_CONDITIONS.getMaxLogicConditionCount()) {
+        return result;
+    }
     for(var i = 0; i < FC.LOGIC_CONDITIONS.getMaxLogicConditionCount(); i++) {
         if (FC.LOGIC_CONDITIONS.isEnabled(i)) {
             result += `<option value="` + i + `">LC ` + i + `</option>`;
@@ -4205,12 +4218,21 @@ function refreshOSDSwitchIndicators() {
 }
 
 function updatePilotAndCraftNames() {
+    // Guard against being called before OSD constants are initialized
+    if (!OSD.constants || !OSD.constants.ALL_DISPLAY_GROUPS) {
+        return;
+    }
+
     let foundPilotName = ($('#pilot_name').val() == undefined);
     let foundCraftName = ($('#craft_name').val() == undefined);
 
     let generalGroup = OSD.constants.ALL_DISPLAY_GROUPS.filter(function(e) {
         return e.name == "osdGroupGeneral";
     })[0];
+
+    if (!generalGroup || !generalGroup.items) {
+        return;
+    }
 
     if (($('#craft_name').val() != undefined) || ($('#pilot_name').val() != undefined)) {
         for (let si = 0; si < generalGroup.items.length; si++) {

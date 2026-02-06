@@ -1,6 +1,13 @@
 'use strict';
 
 import xml2js from 'xml2js';
+import { Chart, registerables } from 'chart.js';
+
+// Register Chart.js components
+Chart.register(...registerables);
+
+// Make Chart available globally for plotElevation function
+window.Chart = Chart;
 
 import Map from 'ol/Map.js';
 import XYZ from 'ol/source/XYZ.js';
@@ -50,6 +57,7 @@ import dialog from '../js/dialog';
 import bridge from './../js/bridge';
 
 import html from'./mission_control.html?raw';
+import { mul } from 'three/tsl';
 
 var MAX_NEG_FW_LAND_ALT = -2000; // cm
 
@@ -2333,6 +2341,9 @@ function iconKey(filename) {
 
                         plotElevation();
                     })()
+                } else {
+                    // Update elevation chart even for non-selected waypoints
+                    plotElevation();
                 }
             }
             else if (tempMarker.kind == "home" ) {
@@ -3642,15 +3653,19 @@ function iconKey(filename) {
         // Callback for Remove buttons
         /////////////////////////////////////////////
         $('#removeAllPoints').on('click', function () {
-            if (markers.length && dialog.confirm(i18n.getMessage('confirm_delete_all_points'))) {
-                if (removeAllMultiMissionCheck()) {
-                    removeAllWaypoints();
-                    updateMultimissionState();
-                }
-                for (let i = FC.SAFEHOMES.getMaxSafehomeCount(); i < FC.FW_APPROACH.getMaxFwApproachCount(); i++) {
-                    FC.FW_APPROACH.clean(i);
-                }
-                plotElevation();
+            if (markers.length){
+                dialog.confirm(i18n.getMessage('confirm_delete_all_points')).then(result => {
+                    if (result) {
+                        if (removeAllMultiMissionCheck()) {
+                            removeAllWaypoints();
+                            updateMultimissionState();
+                        }
+                        for (let i = FC.SAFEHOMES.getMaxSafehomeCount(); i < FC.FW_APPROACH.getMaxFwApproachCount(); i++) {
+                            FC.FW_APPROACH.clean(i);
+                        }
+                        plotElevation();
+                    }
+                });
             }
         });
 
@@ -3933,24 +3948,36 @@ function iconKey(filename) {
                 }
 
                 if (missionEndFlagCount > 1) {
-                    if (multimissionCount && ! dialog.confirm(i18n.getMessage('confirm_multimission_file_load'))) {
+                    
+                    let loadFile = false;
+                    if (multimissionCount) {
+                        dialog.confirm(i18n.getMessage('confirm_multimission_file_load').then(result => {
+                            if (!result) {
+                                return; 
+                            }
+
+                            loadFile = true;
+                            /* update Attached Waypoints (i.e non Map Markers)
+                            * Ensure WPs numbered sequentially across all missions */
+                            i = 1;
+                            mission.get().forEach(function (element) {
+                                element.setNumber(i);
+                                i++;
+                            });
+                            mission.update(false, true);
+                            multimissionCount = missionEndFlagCount;
+                            multimission.reinit();
+                            multimission.copy(mission);
+                            renderMultimissionTable();
+                            $('#missionPlannerMultiMission').fadeIn(300);
+                        }));
+                    }
+
+                    if (!loadFile) {
                         mission.flush();
                         return;
-                    } else {
-                        /* update Attached Waypoints (i.e non Map Markers)
-                         * Ensure WPs numbered sequentially across all missions */
-                        i = 1;
-                        mission.get().forEach(function (element) {
-                            element.setNumber(i);
-                            i++;
-                        });
-                        mission.update(false, true);
-                        multimissionCount = missionEndFlagCount;
-                        multimission.reinit();
-                        multimission.copy(mission);
-                        renderMultimissionTable();
-                        $('#missionPlannerMultiMission').fadeIn(300);
                     }
+
                 } else {
                     // update Attached Waypoints (i.e non Map Markers)
                     mission.update(true, true);
@@ -4229,131 +4256,197 @@ function iconKey(filename) {
         return altitude;
     }
 
+    // Track elevation chart update sequence to prevent race conditions
+    let elevationUpdateSequence = 0;
+
     function plotElevation() {
-        /*
         if ($('#missionPlannerElevation').is(":visible") && !disableMarkerEdit) {
             if (mission.isEmpty()) {
-                var data = [[0], [0]];
-                var layout = {showlegend: true,
-                              legend: {
-                                    "orientation": "h",
-                                    xanchor: "center",
-                                    y: 1.3,
-                                    x: 0.5
-                              },
-                              title: 'Mission Elevation Profile',
-                              xaxis: {
-                                title: 'Distance (m)'
-                              },
-                              yaxis: {
-                                title: 'Elevation (m)',
-                              },
-                              height: 300,
-                              }
-                //Plotly.newPlot('elevationDiv', data, layout);
+                const ctx = $("#elevationChart").get(0);
 
-                var ctx = $("#elevationChart").get(0);
+                if (!ctx || ctx.tagName !== 'CANVAS') {
+                    console.error('elevationChart canvas element not found');
+                    return;
+                }
 
-                new Chart(ctx, {
+                // Destroy existing chart if it exists
+                if (window.elevationChartInstance) {
+                    window.elevationChartInstance.destroy();
+                    window.elevationChartInstance = null;
+                }
+
+                // Create empty chart with message
+                window.elevationChartInstance = new Chart(ctx, {
                     type: 'line',
                     data: {
-                      labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
-                      datasets: [
-                        {
-                        label: 'One',
-                        data: [12, 19, 3, 5, 2, 3],
-                        borderWidth: 1,
-                        fill: 'start',
-                        },
-                        {
-                            label: 'Two',
-                            data: [13, 21, 7, 7, 3, 6],
-                            borderWidth: 2,
-                            radius: 0
-                        }
-                    ]
+                        labels: [0],
+                        datasets: [
+                            {
+                                label: 'WGS84 elevation',
+                                data: [{x: 0, y: 0}],
+                                borderColor: '#ff7f0e',
+                                backgroundColor: 'rgba(255, 127, 14, 0.2)',
+                                borderWidth: 2,
+                                fill: true,
+                                pointRadius: 0,
+                            },
+                            {
+                                label: 'Mission altitude',
+                                data: [{x: 0, y: 0}],
+                                borderColor: '#1497f1',
+                                backgroundColor: 'rgba(20, 151, 241, 0)',
+                                borderWidth: 2,
+                                pointRadius: 5,
+                                pointBackgroundColor: '#1f77b4',
+                            }
+                        ]
                     },
                     options: {
+                        responsive: true,
                         maintainAspectRatio: false,
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: 'Mission Elevation Profile'
+                            },
+                            legend: {
+                                display: true,
+                                position: 'top',
+                            }
+                        },
                         scales: {
-                        y: {
-                          beginAtZero: true
+                            x: {
+                                type: 'linear',
+                                title: {
+                                    display: true,
+                                    text: 'Distance (m)'
+                                }
+                            },
+                            y: {
+                                title: {
+                                    display: true,
+                                    text: 'Elevation (m)'
+                                },
+                                beginAtZero: true
+                            }
                         }
-                      }
                     }
-                  });
+                });
             }
             else {
                 (async () => {
-                    const [lengthMission, totalMissionDistance, samples, elevation, altPoint2measure, namePoint2measure, refPoint2measure] = await mission.getElevation(globalSettings);
-                    let x_elevation = Array.from(Array(samples+1), (_,i)=> i*totalMissionDistance/samples);
-                    var trace_WGS84 = {
-                        x: x_elevation,
-                        y: elevation,
-                        type: 'scatter',
-                        name: 'WGS84 elevation',
-                        hovertemplate: '<b>Elevation</b>: %{y} m',
-                        fill: 'tozeroy',
-                        line: {
-                            color: '#ff7f0e',
-                        },
-                    };
-                    let y_missionElevation = altPoint2measure.map((x,i) => x / 100 + HOME.getAlt()*(1-refPoint2measure[i]));
-                    let y_elevationReference = refPoint2measure.map((x,i) => (x == 1 ? "WGS84" : "Take-off Home"));
-                    var trace_missionHeight = {
-                        x: lengthMission,
-                        y: y_missionElevation ,
-                        type: 'scatter',
-                        mode: 'lines+markers+text',
-                        name: 'Mission altitude',
-                        text: namePoint2measure,
-                        textposition: 'top center',
-                        textfont: {
-                            family:  'Raleway, sans-serif'
-                        },
-                        customdata: y_elevationReference,
-                        hovertemplate: '<b>WP</b>: %{text}' +
-                                '<br><b>Elevation</b>: %{y} m<br>' +
-                                '<b>Reference</b>: %{customdata}',
-                        line: {
-                            color: '#1497f1',
-                        },
-                        marker: {
-                            color: '#1f77b4',
-                        },
-                    };
-                     Show multi mission number in plot title when single mission displayed
-                     * Not updated when ALL multi missions displayed since plot disabled 
-                    
-                    let missionNumber = '';
-                    if (multimissionCount) {
-                        missionNumber = ' ' + ($('#multimissionOptionList').val());
+                    // Capture current sequence number to detect stale updates
+                    const currentSequence = ++elevationUpdateSequence;
+
+                    try {
+                        const [lengthMission, totalMissionDistance, samples, elevation, altPoint2measure, namePoint2measure, refPoint2measure] = await mission.getElevation(globalSettings);
+
+                        // Check if a newer update has been triggered while we were fetching data
+                        if (currentSequence !== elevationUpdateSequence) {
+                            console.log('Ignoring stale elevation data');
+                            return;
+                        }
+                        const x_elevation = Array.from(Array(samples+1), (_,i)=> i*totalMissionDistance/samples);
+                        const y_missionElevation = altPoint2measure.map((x,i) => x / 100 + HOME.getAlt()*(1-refPoint2measure[i]));
+
+                        /* Show multi mission number in plot title when single mission displayed
+                         * Not updated when ALL multi missions displayed since plot disabled
+                         */
+                        let missionNumber = '';
+                        if (multimissionCount) {
+                            missionNumber = ' ' + ($('#multimissionOptionList').val());
+                        }
+                        const chartTitle = 'Mission' + missionNumber + ' Elevation Profile';
+
+                        // Calculate Y-axis range safely
+                        const minElevation = elevation.length > 0 ? Math.min(...elevation) : 0;
+                        const minMission = y_missionElevation.length > 0 ? Math.min(...y_missionElevation) : 0;
+                        const maxElevation = elevation.length > 0 ? Math.max(...elevation) : 100;
+                        const maxMission = y_missionElevation.length > 0 ? Math.max(...y_missionElevation) : 100;
+
+                        const ctx = $("#elevationChart").get(0);
+                        if (!ctx || ctx.tagName !== 'CANVAS') {
+                            console.error('elevationChart canvas element not found');
+                            return;
+                        }
+
+                        const newData = {
+                            labels: x_elevation,
+                            datasets: [
+                                {
+                                    label: 'WGS84 elevation',
+                                    data: elevation.map((y, i) => ({x: x_elevation[i], y: y})),
+                                    borderColor: '#ff7f0e',
+                                    backgroundColor: 'rgba(255, 127, 14, 0.2)',
+                                    borderWidth: 2,
+                                    fill: true,
+                                    pointRadius: 0,
+                                },
+                                {
+                                    label: 'Mission altitude',
+                                    data: lengthMission.map((x, i) => ({x: x, y: y_missionElevation[i]})),
+                                    borderColor: '#1497f1',
+                                    backgroundColor: 'rgba(20, 151, 241, 0)',
+                                    borderWidth: 2,
+                                    pointRadius: 5,
+                                    pointBackgroundColor: '#1f77b4',
+                                }
+                            ]
+                        };
+
+                        // Update existing chart if it exists, otherwise create new one
+                        if (window.elevationChartInstance) {
+                            // Update data
+                            window.elevationChartInstance.data = newData;
+                            window.elevationChartInstance.options.plugins.title.text = chartTitle;
+                            window.elevationChartInstance.options.scales.y.min = Math.floor(-10 + Math.min(minMission, minElevation));
+                            window.elevationChartInstance.options.scales.y.max = Math.ceil(10 + Math.max(maxMission, maxElevation));
+                            // Trigger re-render without animation for better performance during drag operations
+                            window.elevationChartInstance.update('none');
+                        } else {
+                            // Create new chart
+                            window.elevationChartInstance = new Chart(ctx, {
+                                type: 'line',
+                                data: newData,
+                                options: {
+                                    responsive: true,
+                                    maintainAspectRatio: false,
+                                    plugins: {
+                                        title: {
+                                            display: true,
+                                            text: chartTitle
+                                        },
+                                        legend: {
+                                            display: true,
+                                            position: 'top',
+                                        }
+                                    },
+                                    scales: {
+                                        x: {
+                                            type: 'linear',
+                                            title: {
+                                                display: true,
+                                                text: 'Distance (m)'
+                                            }
+                                        },
+                                        y: {
+                                            title: {
+                                                display: true,
+                                                text: 'Elevation (m)'
+                                            },
+                                            min: Math.floor(-10 + Math.min(minMission, minElevation)),
+                                            max: Math.ceil(10 + Math.max(maxMission, maxElevation))
+                                        }
+                                    }
+                                }
+                            });
+                        }
+                    } catch (error) {
+                        console.error('Failed to plot elevation:', error);
                     }
-                    var layout = {showlegend: true,
-                                  legend: {
-                                        "orientation": "h",
-                                        xanchor: "center",
-                                        y: 1.3,
-                                        x: 0.5
-                                  },
-                                  title: 'Mission' + missionNumber + ' Elevation Profile',
-                                  xaxis: {
-                                    title: 'Distance (m)'
-                                  },
-                                  yaxis: {
-                                    title: 'Elevation (m)',
-                                    range: [-10 + Math.min(Math.min(...y_missionElevation), Math.min(...elevation)), 10 + Math.max(Math.max(...y_missionElevation), Math.max(...elevation))],
-                                  },
-                                  height: 300,
-                                  }
-
-                    var data = [trace_WGS84, trace_missionHeight];
-
-                    //Plotly.newPlot('elevationDiv', data, layout);
                 })()
             }
         }
-        */
     }
 
     function parseBooleans (str) {

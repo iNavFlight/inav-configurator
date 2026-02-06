@@ -15,6 +15,7 @@ import FC from './../js/fc';
 import { generateFilename } from './../js/helpers';
 import dialog from '../js/dialog';
 import bridge from '../js/bridge';
+import interval from '../js/intervals';
 
 const cliTab = {};
 
@@ -92,6 +93,9 @@ cliTab.initialize = function (callback) {
         GUI.active_tab = this;
     }
 
+    timeout.killAll();
+    interval.killAll();
+
     // Flush MSP queue as well as all MSP registered callbacks
     mspQueue.flush();
     mspDeduplicationQueue.flush();
@@ -100,9 +104,7 @@ cliTab.initialize = function (callback) {
     self.outputHistory = "";
     self.cliBuffer = "";
 
-    const clipboardCopySupport = (() => {
-        return false;    
-    })();
+    const clipboardCopySupport = !!(navigator.clipboard?.writeText) || document.queryCommandSupported?.('copy');
 
 
     function executeCommands(out_string) {

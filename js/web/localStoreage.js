@@ -1,4 +1,3 @@
-import { storageElement } from "three/src/nodes/utils/StorageArrayElementNode.js";
 
 const webLocalStorage = {
     get: function (key, defaultValue) {

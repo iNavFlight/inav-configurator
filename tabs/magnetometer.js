@@ -58,29 +58,38 @@ magnetometerTab.initialize = function (callback) {
         function (callback) {
             mspHelper.getSetting("align_mag_roll").then(function (data) {
                 if (data == null) {
-                    console.log("while settting align_mag_roll, data is null or undefined");
-                    return;
+                    console.warn("while setting align_mag_roll, data is null or undefined");
+                    return Promise.resolve();
                 }
                 self.alignmentConfig.roll = parseInt(data.value, 10) / 10;
-            }).then(callback)
+            }).then(callback).catch(err => {
+                console.error('Failed to get align_mag_roll:', err);
+                callback();
+            });
         },
         function (callback) {
             mspHelper.getSetting("align_mag_pitch").then(function (data) {
                 if (data == null) {
-                    console.log("while settting align_mag_pitch, data is null or undefined");
-                    return;
+                    console.warn("while setting align_mag_pitch, data is null or undefined");
+                    return Promise.resolve();
                 }
                 self.alignmentConfig.pitch = parseInt(data.value, 10) / 10;
-            }).then(callback)
+            }).then(callback).catch(err => {
+                console.error('Failed to get align_mag_pitch:', err);
+                callback();
+            });
         },
         function (callback) {
             mspHelper.getSetting("align_mag_yaw").then(function (data) {
                 if (data == null) {
-                    console.log("while settting align_mag_yaw, data is null or undefined");
-                    return;
+                    console.warn("while setting align_mag_yaw, data is null or undefined");
+                    return Promise.resolve();
                 }
                 self.alignmentConfig.yaw = parseInt(data.value, 10) / 10;
-            }).then(callback)
+            }).then(callback).catch(err => {
+                console.error('Failed to get align_mag_yaw:', err);
+                callback();
+            });
         }
     ];
 

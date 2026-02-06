@@ -4,6 +4,7 @@ import GUI from './../js/gui';
 import i18n from './localization';
 import ConnectionSerial from './connection/connectionSerial';
 import bridge from './bridge';
+import browser from './web/browser';
 
 var usbDevices =  [
     { 'vendorId': 1155, 'productId': 57105}, 
@@ -26,6 +27,13 @@ PortHandler.initialize = function () {
 
 PortHandler.check = function () {
     var self = this;
+
+    if (!browser.isSerialSupported()) {
+        console.log('Serial API not supported in this browser.');
+        self.update_port_select(null);
+        GUI.updateManualPortVisibility();
+        return;
+    }
 
     ConnectionSerial.getDevices().then((all_ports) => {
         // filter out ports that are not serial
@@ -198,23 +206,34 @@ PortHandler.check_usb_devices = function (callback) {
 PortHandler.update_port_select = function (ports) {
     $('div#port-picker #port').html(''); // drop previous one
 
-    for (var i = 0; i < ports.length; i++) {
-        $('div#port-picker #port').append($("<option/>", {value: ports[i], text: ports[i], data: {isManual: false}}));
+    if (ports) {
+        for (var i = 0; i < ports.length; i++) {
+            $('div#port-picker #port').append($("<option/>", {value: ports[i], text: ports[i], data: {isManual: false}}));
+        }
+    }
+    
+    if (!bridge.isElectron) {
+        if (browser.isSerialSupported()) {
+            $('div#port-picker #port').append($("<option/>", {value: 'webPermission', text: i18n.getMessage('webSerialPermission'), data: {isWebPermission: true}}));
+        }
+
+        if (browser.isUsbSupported()) {
+            $('div#port-picker #port').append($("<option/>", {value: 'dfuPermission', text: i18n.getMessage('webDfuPermission'), data: {isDfuPermission: true}}));
+        }
+    } else {
+        $('div#port-picker #port').append($("<option/>", {value: 'manual', text: 'Manual Selection', data: {isManual: true}}));
     }
 
-    $('div#port-picker #port').append($("<option/>", {value: 'manual', text: 'Manual Selection', data: {isManual: true}}));
-    if (!bridge.isElectron) {
-        $('div#port-picker #port').append($("<option/>", {value: 'webPermission', text: i18n.getMessage('webSerialPermission'), data: {isWebPermission: true}}));
-         $('div#port-picker #port').append($("<option/>", {value: 'dfuPermission', text: i18n.getMessage('webDfuPermission'), data: {isDfuPermission: true}}));
+    if (browser.isBleSupported()) {
+        $('div#port-picker #port').append($("<option/>", {value: 'ble', text: 'BLE', data: {isBle: true}}));
     }
-    $('div#port-picker #port').append($("<option/>", {value: 'ble', text: 'BLE', data: {isBle: true}}));
     
     if (bridge.isElectron) {
         $('div#port-picker #port').append($("<option/>", {value: 'tcp', text: 'TCP', data: {isTcp: true}}));
-        $('div#port-picker #port').append($("<option/>", {value: 'udp', text: 'UDP', data: {isUdp: true}}));
-        $('div#port-picker #port').append($("<option/>", {value: 'sitl', text: 'SITL', data: {isSitl: true}}));
-        $('div#port-picker #port').append($("<option/>", {value: 'sitl-demo', text: 'Demo mode', data: {isSitl: true}}));
+        $('div#port-picker #port').append($("<option/>", {value: 'udp', text: 'UDP', data: {isUdp: true}}));    
     }
+    $('div#port-picker #port').append($("<option/>", {value: 'sitl', text: 'SITL', data: {isSitl: true}}));
+    $('div#port-picker #port').append($("<option/>", {value: 'sitl-demo', text: 'Demo mode', data: {isSitl: true}}));
 };
 
 PortHandler.port_detected = function(name, code, timeout, ignore_timeout) {

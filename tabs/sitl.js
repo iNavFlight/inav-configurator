@@ -7,6 +7,7 @@ import i18n from './../js/localization';
 import { SITLProcess, SitlSerialPortUtils } from './../js/sitl';
 import dialog from './../js/dialog';
 import bridge from './../js/bridge';
+import SITLWebAssembly from '../js/web/SITL-Webassembly';
 
 const localhost = "127.0.0.1"
 
@@ -96,8 +97,15 @@ sitlTab.initialize = (callback) => {
     import('./sitl.html?raw').then(({default: html}) => GUI.load(html, function () {
         
         i18n.localize();
+
+        if (!bridge.isElectron) {
+            $('#sitlWebAssemblyInfo').show();
+            $('#wasmProxy').removeClass('is-hidden');
+            $('#wasmProxyPort').removeClass('is-hidden');
+            $('#eepromFiles').removeClass('is-hidden');
+        }
     
-        var currentSim, currentProfile, profiles;
+        var currentSim, currentProfile, profiles, sitlWasmProxyEnabled, sitlWasmProxyPort;
         var mapping = new Array(28).fill(0);
         var serialProtocolls = SitlSerialPortUtils.getProtocolls();
         var sim_e = $('#simulator');
@@ -116,13 +124,27 @@ sitlTab.initialize = (callback) => {
         var baudRate_e = $('#sitlBaud');
         var stopBits_e = $('#serialStopbits');
         var parity_e = $('#serialParity');
+        var wasmProxy_e = $('#sitlEnableWasmProxy');
+        var wasmProxyPort_e = $('#sitlWasmProxyPort');
         
-        if (SITLProcess.isRunning) {
-            $('.sitlStart').addClass('disabled');
-            $('.sitlStop').removeClass('disabled');
+        if (bridge.isElectron) {
+            if (SITLProcess.isRunning) {
+                $('.sitlStart').addClass('disabled');
+                $('.sitlStop').removeClass('disabled');
+            } else {
+                $('.sitlStop').addClass('disabled');
+                $('.sitlStart').removeClass('disabled');
+            }
         } else {
-            $('.sitlStop').addClass('disabled');
-            $('.sitlStart').removeClass('disabled');
+            if (SITLWebAssembly.isRunning()) {
+                $('.sitlStart').addClass('disabled');
+                $('.sitlStop').removeClass('disabled');
+            } else {
+                $('.sitlStop').addClass('disabled');
+                $('.sitlStart').removeClass('disabled');
+            }
+             renderEepromFilesTable();
+
         }
 
         var $sitlLog = $('#sitlLog');
@@ -138,15 +160,27 @@ sitlTab.initialize = (callback) => {
             profiles.push(...sitlProfiles);
         }
         initElements(true);
-        
-        SitlSerialPortUtils.resetPortsList();
-        SitlSerialPortUtils.pollSerialPorts(ports => {
-            serialPorts_e.find('*').remove();
-            ports.forEach(port => {
-                serialPorts_e.append(`<option value="${port}">${port}</option>`)
-            });
 
-        });
+        sitlWasmProxyEnabled = bridge.storeGet('sitlWasmProxyEnabled', true);
+        wasmProxy_e.prop('checked', sitlWasmProxyEnabled);
+        wasmProxyPort_e.prop('disabled', !sitlWasmProxyEnabled);
+        
+
+        sitlWasmProxyPort = bridge.storeGet('sitlWasmProxyPort', 8081);
+        wasmProxyPort_e.val(sitlWasmProxyPort);
+
+        if (bridge.isElectron) {
+            SitlSerialPortUtils.resetPortsList();
+            SitlSerialPortUtils.pollSerialPorts(ports => {
+                serialPorts_e.find('*').remove();
+                ports.forEach(port => {
+                    serialPorts_e.append(`<option value="${port}">${port}</option>`)
+                });
+
+            });
+        } else {
+            $('#serialReceiver').hide();
+        }
         
         enableSim_e.on('change', () => {
             currentProfile.simEnabled = enableSim_e.is(':checked');
@@ -177,10 +211,28 @@ sitlTab.initialize = (callback) => {
             currentProfile.useImu = useImu_e.is(':checked');
         });
 
+        wasmProxy_e.on('change', () => {
+            sitlWasmProxyEnabled = wasmProxy_e.is(':checked');
+            bridge.storeSet('sitlWasmProxyEnabled', sitlWasmProxyEnabled);
+            wasmProxyPort_e.prop('disabled', !sitlWasmProxyEnabled);
+
+        });
+
+        wasmProxyPort_e.on('change', () => {
+            sitlWasmProxyPort = parseInt(wasmProxyPort_e.val());
+            if (sitlWasmProxyPort != NaN) {
+                bridge.storeSet('sitlWasmProxyPort', sitlWasmProxyPort);
+            }
+        });
+
         $('.sitlStart').on('click', ()=> {
             $('.sitlStart').addClass('disabled');
             $('.sitlStop').removeClass('disabled');
-
+            
+            if (!bridge.isElectron) {
+                $('.eepromActionButton').prop('disabled', true);
+            }
+   
             var sim, simPort, simIp, channelMap = "";
 
             if (enableSim_e.is(':checked')) {
@@ -215,40 +267,80 @@ sitlTab.initialize = (callback) => {
                 }
             }
             channelMap = channelMap.substring(0, channelMap.length - 1);
-            
-            var serialOptions = null;
-            if ( serialReceiverEnable_e.is(':checked') && !!serialPorts_e.val()) {
-                var selectedProtocoll = protocollPreset_e.find(':selected').val();
-                if (selectedProtocoll == "manual") {
-                    serialOptions = {
-                        protocollName: "manual",
-                        baudRate: baudRate_e.val() || currentProfile.baudRate || "115200",
-                        stopBits: stopBits_e.val() || currentProfile.stopBits || "One",
-                        parity: parity_e.val() || currentProfile.parity || "None",
-                        serialPort: serialPorts_e.val() || currentProfile.serialPort || "",
-                        serialUart: serialUart_e.val() || currentProfile.serialUart || -1
-                    }
-                } else {;
-                    serialOptions = {
-                        protocollName: selectedProtocoll || "SBus",
-                        serialPort: serialPorts_e.val() || currentProfile.serialPort || "" ,
-                        serialUart: serialUart_e.val() || currentProfile.serialUart || -1
+            if (bridge.isElectron) {
+                var serialOptions = null;
+                if ( serialReceiverEnable_e.is(':checked') && !!serialPorts_e.val()) {
+                    var selectedProtocoll = protocollPreset_e.find(':selected').val();
+                    if (selectedProtocoll == "manual") {
+                        serialOptions = {
+                            protocollName: "manual",
+                            baudRate: baudRate_e.val() || currentProfile.baudRate || "115200",
+                            stopBits: stopBits_e.val() || currentProfile.stopBits || "One",
+                            parity: parity_e.val() || currentProfile.parity || "None",
+                            serialPort: serialPorts_e.val() || currentProfile.serialPort || "",
+                            serialUart: serialUart_e.val() || currentProfile.serialUart || -1
+                        }
+                    } else {;
+                        serialOptions = {
+                            protocollName: selectedProtocoll || "SBus",
+                            serialPort: serialPorts_e.val() || currentProfile.serialPort || "" ,
+                            serialUart: serialUart_e.val() || currentProfile.serialUart || -1
+                        }
                     }
                 }
             }
 
             appendLog("\n");
             
-            SITLProcess.start(currentProfile.eepromFileName, sim, useImu_e.is(':checked'), simIp, simPort, channelMap, serialOptions, result => {
-                appendLog(result);
-            });
+            if (bridge.isElectron) {
+                SITLProcess.start(currentProfile.eepromFileName, sim, useImu_e.is(':checked'), simIp, simPort, channelMap, serialOptions, result => {
+                    appendLog(result);
+                });
+            } else {
+                SITLWebAssembly.reset();
+                SITLWebAssembly.start( 
+                    {
+                        eepromFile: currentProfile.eepromFileName,
+                        sim: sim,
+                        useIMU: useImu_e.is(':checked'),
+                        simIp: simIp,
+                        simPort: simPort,
+                        channelMap: channelMap,
+                        proxyPort: sitlWasmProxyEnabled ? sitlWasmProxyPort : 0
+                    },
+                    (error, commandLineArgs) => {
+                        if (error)
+                            appendLog(error);
+
+                        appendLog(`SITL started with args: ${commandLineArgs}\n`);
+                    }
+                );
+
+                setTimeout(() => {
+                    renderEepromFilesTable();
+                }, sitlWasmProxyEnabled ? 7500 : 2500);
+            }
 
         });
 
         $('.sitlStop').on('click', ()=> {
+               
+            if (bridge.isElectron) {
+                SITLProcess.stop();
+            } else {
+                try {
+                    SITLWebAssembly.stop();
+                } catch (e) {
+                    appendLog(e.message);
+                    return;
+                }
+            }
+            
             $('.sitlStop').addClass('disabled');
             $('.sitlStart').removeClass('disabled');
-            SITLProcess.stop();
+
+            $('.eepromActionButton').prop('disabled', false);
+            
             appendLog(i18n.getMessage('sitlStopped'));
         });
 
@@ -361,20 +453,31 @@ sitlTab.initialize = (callback) => {
 
         parity_e.on('change', () => {
             currentProfile.parity = parity_e.val();
-        });
+            });
+        
+        if (bridge.isElectron) {
+            window.electronAPI.onChildProcessStdout(data => {
+                appendLog(data);
+            });
 
-        window.electronAPI.onChildProcessStdout(data => {
-            appendLog(data);
-        });
+            window.electronAPI.onChildProcessStderr(data => {
+                appendLog(data);
+            });
 
-        window.electronAPI.onChildProcessStderr(data => {
-            appendLog(data);
-        });
+            window.electronAPI.onChildProcessError(error => {
+                SITLProcess.stop();
+                appendLog(error);
+            });
+        } else {
 
-        window.electronAPI.onChildProcessError(error => {
-            SITLProcess.stop();
-            appendLog(error);
-        });
+            SITLWebAssembly.onPrint((data) => {
+                appendLog(data);
+            });
+
+            SITLWebAssembly.onPrintErr((data) => {
+                appendLog(data);
+            });
+        }
 
         function initElements(init)
         {
@@ -431,6 +534,7 @@ sitlTab.initialize = (callback) => {
                     } else {
                         port_e.val(currentProfile.port);
                     }
+                    currentProfile.sim = currentSim.name;
                     sim_e.prop('disabled', !currentProfile.simEnabled);
                     simIp_e.prop('disabled', !currentProfile.simEnabled);
                     port_e.prop('disabled', simulator.isPortFixed || !currentProfile.simEnabled);
@@ -509,6 +613,57 @@ sitlTab.initialize = (callback) => {
                     bridge.storeSet('sitlMapping', mapping);
                 });
             }
+        }
+
+        async function renderEepromFilesTable()
+        {
+            var eepromFilesBody = $('.eepromFilesTableBody');
+            eepromFilesBody.find('*').remove();
+
+            const dirHandle = await navigator.storage.getDirectory();
+            const files = dirHandle.values();
+            for await (const handle of files) {
+                if (handle.kind === 'file' && handle.name.endsWith('.bin')) {
+                    const row = `<tr><td>${handle.name}</td>
+                                 <td>
+                                    <button title="${i18n.getMessage('sitlDeleteEeprom')}" class="button eepromActionButton deleteEepromFileBtn" data-filename="${handle.name}">🗑️</button> 
+                                    <button title="${i18n.getMessage('sitlDownloadEeprom')}" class="button eepromActionButton downloadEepromFileBtn" data-filename="${handle.name}">⬇️</button>
+                                 </td></tr>`;
+                    eepromFilesBody.append(row);
+                }
+            }
+
+            if (SITLWebAssembly.isRunning()) {
+                $('.eepromActionButton').prop('disabled', true);
+            } else {
+                $('.eepromActionButton').prop('disabled', false);
+            }
+
+        $('.downloadEepromFileBtn').on('click', async (event) => {
+            const filename = $(event.currentTarget).data('filename');
+            const dirHandle = await navigator.storage.getDirectory();
+            try {
+                const fileHandle = await dirHandle.getFileHandle(filename);
+                const file = await fileHandle.getFile();
+                const arrayBuffer = await file.arrayBuffer();
+                bridge.writeFile(filename, new Uint8Array(arrayBuffer), true);
+                appendLog(`EEPROM file '${filename}' downloaded.\n`);
+            } catch (e) {
+                appendLog(`Failed to download EEPROM file '${filename}': ${e.message}\n`);
+            }
+        });
+
+        $('.deleteEepromFileBtn').on('click', async (event) => {
+            const filename = $(event.currentTarget).data('filename');
+            const dirHandle = await navigator.storage.getDirectory();
+            try {
+                await dirHandle.removeEntry(filename);
+                appendLog(`EEPROM file '${filename}' deleted.\n`);
+                renderEepromFilesTable();
+            } catch (e) {
+                appendLog(`Failed to delete EEPROM file '${filename}': ${e.message}\n`);
+            }
+        });
         }
 
         function getInavChannels() {

@@ -20,6 +20,7 @@ import appUpdater from './appUpdater';
 import CliAutoComplete from './CliAutoComplete'; 
 import { SITLProcess } from './sitl';
 import settingsCache from './settingsCache';
+import browser from './web/browser';
 
 // "Preload" tabs
 import landingTab from './../tabs/landing';
@@ -49,6 +50,7 @@ import advancedTuningTab from './../tabs/advanced_tuning';
 import onboardLoggingTab from  './../tabs/onboard_logging';
 import cliTab from './../tabs/cli';
 import searchTab from './../tabs/search';
+import dialog from './dialog';
 
 window.$ = $;
 
@@ -60,7 +62,7 @@ $(function() {
         bridge.init();
         MSP.init();
         mspHelper.init();
-        SerialBackend.init();
+        SerialBackend.init();;
 
         GUI.updateActivatedTab = function() {
             var activeTab = $('#tabs > ul li.active');
@@ -89,12 +91,11 @@ $(function() {
         }
 
         const version = bridge.getAppVersion();
-        const runtimeInfo = bridge.isElectron ? 
-            'Electron: <strong>' + navigator.userAgent.match(/Electron\/([\d\.]+\d+)/)[1] + '</strong>, ' :
-            'Chrome: <strong>' + navigator.userAgent.match(/Chrome\/([0-9.]*)/)[1] + '</strong>, '
-
+        
+        // Detect browser and version
+       
         GUI.log(i18n.getMessage('getRunningOS') + GUI.operating_system + '</strong>, ' +
-            runtimeInfo +
+            browser.getBrowserInfo() +
             i18n.getMessage('getConfiguratorVersion') + version + '</strong>');
 
         $('#status-bar .version').text(version);
@@ -110,11 +111,14 @@ $(function() {
                 appUpdater.checkRelease(version);
             }
         }
-        
-        if (!bridge.isElectron) {
-            $(`.tab_sitl`).hide();
+
+        if (!browser.isUsbSupported()) {
+            $('.tab_firmware_flasher').remove();
         }
 
+        browser.registerSW();
+        browser.checkBrowserSupport();
+        
         // log library versions in console to make version tracking easier
         console.log('Libraries: jQuery - ' + $.fn.jquery + ', three.js - ' + THREE.REVISION);
 
@@ -148,6 +152,21 @@ $(function() {
                 if (GUI.allowedTabs.indexOf(tab) < 0) {
                     GUI.log(i18n.getMessage('tabSwitchUpgradeRequired', [tabName]));
                     return;
+                }
+
+                // Check for unsaved changes in current tab before switching
+                if (GUI.active_tab === 'javascript_programming' &&
+                    TABS.javascript_programming &&
+                    TABS.javascript_programming.isDirty) {
+                    console.log('[Tab Switch] Checking for unsaved changes in JavaScript Programming tab');
+                    const confirmMsg = i18n.getMessage('unsavedChanges') ||
+                        'You have unsaved changes. Leave anyway?';
+
+                    if (!confirm(confirmMsg)) {
+                        console.log('[Tab Switch] User cancelled tab switch');
+                        return; // Cancel tab switch
+                    }
+                    console.log('[Tab Switch] User confirmed tab switch');
                 }
 
                 GUI.tab_switch_in_progress = true;
@@ -265,8 +284,6 @@ $(function() {
 
         $('#tabs ul.mode-disconnected li a:first').trigger( "click" );
 
-    
-
         // options
         $('#options').on('click', function() {
             var el = $(this);
@@ -290,6 +307,7 @@ $(function() {
                     if (!bridge.isElectron) {
                         $('#resetSitl').hide();
                         $('#updateNotifications').hide();
+                        $('#disable3DAcceleration').hide();
                     }
 
                     // if notifications are enabled, or wasn't set, check the notifications checkbox
@@ -300,6 +318,15 @@ $(function() {
                     $('div.notifications input').on('change', function () {
                         var check = $(this).is(':checked');
                         bridge.storeSet('update_notify', check);
+                    });
+                    
+                    if (bridge.storeGet('disable_3d_acceleration', false)) {
+                        $('div.disable_3d_acceleration input').prop('checked', true);
+                    }
+
+                     $('div.disable_3d_acceleration input').on('change', function () {
+                        var check = $(this).is(':checked');
+                        bridge.storeSet('disable_3d_acceleration', check);
                     });
 
                     $('div.statistics input').on('change', function () {

@@ -74,7 +74,7 @@ configurationTab.initialize = function (callback, scrollPosition) {
         import('./configuration.html?raw').then(({default: html}) => GUI.load(html, Settings.processHtml(process_html)));
     }
 
-    function process_html() {
+    function process_html(settingsPromise) {
 
         let i;
 
@@ -262,7 +262,12 @@ configurationTab.initialize = function (callback, scrollPosition) {
 
         });
 
-        $i2cSpeed.trigger('change');
+        // Wait for settings to load before triggering change event
+        settingsPromise.then(function() {
+            $i2cSpeed.trigger('change');
+        }).catch(function(error) {
+            console.error('Settings load failed, I2C speed change not triggered:', error);
+        });
 
         $('a.save').on('click', function () {
             //UPDATE: moved to GPS tab and hidden

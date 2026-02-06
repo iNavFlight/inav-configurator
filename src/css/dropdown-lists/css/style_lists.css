@@ -7,9 +7,6 @@
  * http://www.opensource.org/licenses/mit-license.php
  */
 
-
-
-
 .dropdown {
 	
   display: inline-block;
@@ -28,12 +25,8 @@
   border: 1px solid;
    border-color: #ccc #ccc #ccc;
   border-radius: 3px;
-
-
-
-
-
 }
+
 .dropdown:before, .dropdown:after {
   content: '';
   position: absolute;
@@ -70,24 +63,19 @@
   font-size: 12px;
   color: #62717a;
   text-shadow: 0 1px white;
-  /* Fallback for IE 8 */
-  background: #f2f2f2;
   /* "transparent" doesn't work with Opera */
-  background: rgba(0, 0, 0, 0) !important;
+  background: rgba(145, 144, 144, 0) !important;
   border: 0;
   border-radius: 0;
-  -webkit-appearance: none;
-
-
+  appearance: none;
 }
 .dropdown-select:focus {
   z-index: 3;
   width: 90%;
-  color: #4fa619;
+  color: #37a8db;
   outline: 0px solid #49aff2;
   outline: 0px solid -webkit-focus-ring-color;
   outline-offset: 5px;
-
   height:25px;
 }
 .dropdown-select > option {
@@ -142,7 +130,7 @@
   color: #fff !important;
 }
 .dropdown-dark .dropdown-select > option {
-  background: #56ab1a;
+  background: rgba(0, 0, 0, 0.8);
   text-shadow: 0 1px rgba(0, 0, 0, 0.4);
 }
 

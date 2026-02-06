@@ -4,8 +4,8 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>INAV Configurator</title>
-    <link rel="icon" href="/favicon.ico" sizes="48x48" />
-    <link rel="apple-touch-icon" href="/apple-touch-icon-180x180.png" />
+    <link rel="icon" href="/images/pwa/favicon.ico" sizes="48x48" />
+    <link rel="apple-touch-icon" href="/images/pwa/apple-touch-icon.png" />
 </head>
 
 <body>
@@ -372,6 +372,21 @@
     <div id="modal-saving-defaults" class="is-hidden">
         <div data-i18n="savingDefaults"></div>
     </div>
+    <dialog class="dialog-main dialog-alert">
+        <h3 class="dialog-title"></h3>
+        <div class="dialog-message"></div>
+        <div class="dialog-buttons">
+            <button class="dialog-button-ok regular-button" data-i18n="OK"></button>
+        </div>
+    </dialog>
+    <dialog class="dialog-main dialog-confirm">
+        <h3 class="dialog-title"></h3>
+        <div class="dialog-message"></div>
+        <div class="dialog-buttons">
+            <button class="dialog-button-ok regular-button" data-i18n="OK"></button>
+            <button class="dialog-button-cancel regular-button" data-i18n="Cancel"></button>
+        </div>
+    </dialog>
     <div id="defaults-wrapper" style="display: none">
 
         <div class="defaults-dialog__background"></div>

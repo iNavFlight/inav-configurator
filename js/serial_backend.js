@@ -30,6 +30,9 @@ import {resquestDfuPermission} from './web/dfu'
 import configurationTab from '../tabs/configuration';
 import cliTab from '../tabs/cli';
 
+import SITLWebAssembly from './web/SITL-Webassembly';
+import { time } from 'three/tsl';
+
 var SerialBackend = (function () {
 
     var publicScope = {},
@@ -143,7 +146,10 @@ var SerialBackend = (function () {
                 $('.tab_firmware_flasher').show();
             }
             var type = ConnectionType.Serial;
-            if (data.isBle) {
+
+            if (!bridge.isElectron && data.isSitl) {
+                type = ConnectionType.serialEXT
+            } else if (data.isBle) {
                 type = ConnectionType.BLE;
             } else if (data.isTcp || data.isSitl) {
                 type = ConnectionType.TCP;
@@ -207,25 +213,57 @@ var SerialBackend = (function () {
                         if (selected_port == 'tcp' || selected_port == 'udp') {
                             CONFIGURATOR.connection.connect(publicScope.$portOverride.val(), {}, privateScope.onOpen);
                         } else if (selected_port == 'sitl') {
-                            CONFIGURATOR.connection.connect("127.0.0.1:5760", {}, privateScope.onOpen);
-                        } else if (selected_port == 'sitl-demo') {
-                            SITLProcess.stop();
-                            SITLProcess.start("demo.bin");                        
-                            this.isDemoRunning = true;
-
-                            // Wait 1 sec until SITL is ready
-                            setTimeout(() => {
+                            if (bridge.isElectron) {
                                 CONFIGURATOR.connection.connect("127.0.0.1:5760", {}, privateScope.onOpen);
-                            }, 1000);
+                            } else {
+                                CONFIGURATOR.connection.connect(0, {}, privateScope.onOpen);
+                            }
+                        } else if (selected_port == 'sitl-demo') {
+                            if (bridge.isElectron) {
+                                SITLProcess.stop();
+                                SITLProcess.start("demo.bin");
+
+                                this.isDemoRunning = true;
+                                // Wait 1 sec until SITL is ready
+                                setTimeout(() => {
+                                    CONFIGURATOR.connection.connect("127.0.0.1:5760", {}, privateScope.onOpen);
+                                }, 1000);
+                            }  else {
+                                SITLWebAssembly.reset();
+                                SITLWebAssembly.start({
+                                    eepromFile: "demo.bin",
+                                    proxyPort: 0 // disable proxy server
+                                }, (err, cmd) => {
+                                    if (err) {
+                                        GUI.log(`SITL WASM start error: ${err.message}`);
+                                    } else {
+                                        GUI.log(`SITL WASM started with command: ${cmd}`);
+                                        this.isDemoRunning = true;
+                                    }
+                                });
+                                
+
+                                // Wait 7 sec until SITL is ready
+                                setTimeout(() => {
+                                    CONFIGURATOR.connection.connect(0, {}, privateScope.onOpen);
+                                }, 1000);
+                            }
+
+                            
                         } else {
                             CONFIGURATOR.connection.connect(selected_port, {bitrate: selected_baud}, privateScope.onOpen);
                         }
                     } else {
+
                         if (this.isDemoRunning) {
-                            SITLProcess.stop();
+                            if (bridge.isElectron) {
+                                SITLProcess.stop();
+                            } else {
+                                SITLWebAssembly.reset();
+                            }
                             this.isDemoRunning = false;
                         }
-                        
+
                         var wasConnected = CONFIGURATOR.connectionValid;
 
                         timeout.killAll();

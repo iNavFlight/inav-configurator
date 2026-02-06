@@ -68,18 +68,73 @@ const dialog =  {
        }
     },
     alert: function (message) {
-        if (bridge.isElectron) {
-            return window.electronAPI.alertDialog(message);
-        } else {
-            alert(message);
-        }
+        return new Promise((resolve) => {
+            const $dialog = $(".dialog-alert");
+            const $title = $dialog.find(".dialog-title");
+            const $content = $dialog.find(".dialog-message");
+            const $buttonConfirm = $dialog.find(".dialog-button-ok");
+
+            if (dialog.length === 0) {  
+                resolve(false);
+                return;
+            }
+
+            if (typeof message === "string") {
+                message = {
+                    text: message
+                };
+            }
+    
+            $title.html(message.title ? message.title : "INAV Configurator");
+            $content.html(message.text);
+            $buttonConfirm.off("click");
+
+            $buttonConfirm.on("click", () => {
+                $dialog[0].close();
+                resolve();
+            });
+
+            $dialog[0].showModal();
+        });
     },
     confirm: function (message) {
-        if (bridge.isElectron) {
-            return window.electronAPI.confirmDialog(message);
-        } else {
-            return confirm(message);
-        }
+        
+        return new Promise((resolve) => {
+            const $dialog = $(".dialog-confirm");
+            const $title = $dialog.find(".dialog-title");
+            const $content = $dialog.find(".dialog-message");
+            const $buttonConfirm = $dialog.find(".dialog-button-ok");
+            const $buttonCancel = $dialog.find(".dialog-button-cancel");
+
+            if (dialog.length === 0) {  
+                resolve(false);
+                return;
+            }
+
+            if (typeof message === "string") {
+                message = {
+                    text: message
+                };
+            }
+
+            $title.html(message.title ? message.title : "INAV Configurator");
+            $content.html(message.text);
+            $buttonConfirm.off("click");
+
+            $buttonConfirm.on("click", () => {
+                $dialog[0].close();
+                resolve(true);
+            });
+
+            $buttonCancel.off("click");
+
+            $buttonCancel.on("click", () => {
+                $dialog[0].close();
+                resolve(false);
+            });
+
+            $dialog[0].showModal();
+     });
     }
 };
 

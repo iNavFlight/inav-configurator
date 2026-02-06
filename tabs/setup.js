@@ -17,6 +17,7 @@ import { mixer } from './../js/model';
 import BitHelper from './../js/bitHelper';
 import dialog from '../js/dialog';
 import { set } from 'ol/transform';
+import bridge from '../js/bridge';
 
 const setupTab = {};
 

@@ -324,7 +324,7 @@ firmwareFlasherTab.initialize = function (callback) {
             $('select[name="board"]').on('change', function () {
 
                 $("a.load_remote_file").addClass('disabled');
-                var target = $(this).children("option:selected").text();
+                var target = $(this).children("option:selected").val();
 
                 if (!GUI.connect_lock) {
                     $('.progress').val(0).removeClass('valid invalid');
@@ -340,17 +340,19 @@ firmwareFlasherTab.initialize = function (callback) {
                         versions_e.append($("<option value='0'>{0} {1}</option>".format(i18n.getMessage('firmwareFlasherOptionLabelSelectFirmwareVersionFor'), target)));
                     }
 
-                    firmwareFlasherTab.releases[target].forEach(function(descriptor) {
-                        var select_e =
-                                $("<option value='{0}'>{0} - {1} - {2} ({3})</option>".format(
-                                        descriptor.version,
-                                        descriptor.target,
-                                        descriptor.date,
-                                        descriptor.status
-                                )).data('summary', descriptor);
+                    if (typeof firmwareFlasherTab.releases[target]?.forEach === 'function') {
+                        firmwareFlasherTab.releases[target].forEach(function(descriptor) {
+                            var select_e =
+                                    $("<option value='{0}'>{0} - {1} - {2} ({3})</option>".format(
+                                            descriptor.version,
+                                            descriptor.target,
+                                            descriptor.date,
+                                            descriptor.status
+                                    )).data('summary', descriptor);
 
-                        versions_e.append(select_e);
-                    });
+                            versions_e.append(select_e);
+                        });
+                    }
                 }
             });
 
@@ -861,11 +863,17 @@ firmwareFlasherTab.onOpen = async function(openInfo) {
 firmwareFlasherTab.onValidFirmware = function() {
     MSP.send_message(MSPCodes.MSP_BUILD_INFO, false, false, function () {
         MSP.send_message(MSPCodes.MSP_BOARD_INFO, false, false, function () {
-            $('select[name="board"] option[value=' + FC.CONFIG.target + ']').attr("selected", "selected");
+            var boardSelect = $('select[name="board"]');
+            boardSelect.val(FC.CONFIG.target);
+
             GUI.log(i18n.getMessage('targetPrefetchsuccessful') + FC.CONFIG.target);
 
             firmwareFlasherTab.closeTempConnection();
-            $('select[name="board"]').trigger('change');
+
+            // Only trigger change if the board was actually found and selected
+            if (boardSelect.val() === FC.CONFIG.target) {
+                boardSelect.trigger('change');
+            }
         });
     });
 };

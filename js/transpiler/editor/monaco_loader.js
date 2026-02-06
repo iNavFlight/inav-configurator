@@ -37,7 +37,12 @@ function initializeMonacoEditor(monaco, containerId, options = {}) {
         lineNumbers: 'on',
         renderWhitespace: 'selection',
         tabSize: 2,
-        insertSpaces: true
+        insertSpaces: true,
+        wordBasedSuggestions: 'off',  // Disable word-based suggestions (use string "off", not boolean)
+        suggest: {
+            showWords: false,
+            showVariables: false  // Don't show local variables in autocomplete (prevents pollution)
+        }
     };
     
     // Merge options
@@ -60,11 +65,12 @@ function initializeMonacoEditor(monaco, containerId, options = {}) {
         noEmit: true,
         esModuleInterop: true,
         allowJs: true,
-        checkJs: false
+        checkJs: false,
+        lib: ['es2020']  // Only ES2020 core library (excludes DOM/browser APIs like navigator)
     });
-    
+
     console.log('Monaco Editor initialized');
-    
+
     return editor;
 }
 

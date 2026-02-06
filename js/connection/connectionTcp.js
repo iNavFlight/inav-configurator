@@ -1,9 +1,8 @@
 'use strict'
 
 import GUI from './../gui';
-import  { ConnectionType, Connection } from './connection';
+import { ConnectionType, Connection } from './connection';
 import i18n from './../localization';
-import bridge from '../bridge';
 
 const STANDARD_TCP_PORT = 5761;
 
@@ -22,7 +21,7 @@ class ConnectionTcp extends Connection {
         this._ipcErrorHandler = null;
     }
 
-    registerListeners() {
+    registerIpcListeners() {
         if (this._ipcDataHandler) {
             return; // Already registered
         }
@@ -31,7 +30,7 @@ class ConnectionTcp extends Connection {
             this._onReceiveListeners.forEach(listener => {
                 listener({
                     connectionId: this._connectionId,
-                    data: event.detail
+                    data: buffer
                 });
             });
         });
@@ -51,7 +50,7 @@ class ConnectionTcp extends Connection {
         });
     }
 
-    removeListeners() {
+    removeIpcListeners() {
         if (this._ipcDataHandler) {
             window.electronAPI.offTcpData(this._ipcDataHandler);
             this._ipcDataHandler = null;
@@ -67,7 +66,7 @@ class ConnectionTcp extends Connection {
     }
 
     connectImplementation(address, options, callback) {
-        this.registerListeners();
+        this.registerIpcListeners();
 
         var addr = address.split(':');
         if (addr.length >= 2) {
@@ -78,7 +77,7 @@ class ConnectionTcp extends Connection {
             this._connectionPort = STANDARD_TCP_PORT;
         } 
 
-        bridge.tcpConnect(this._connectionIP, this._connectionPort).then(response => {
+        window.electronAPI.tcpConnect(this._connectionIP, this._connectionPort).then(response => {
             if (!response.error) {
                 GUI.log(i18n.getMessage('connectionConnected', ["tcp://" + this._connectionIP + ":" + this._connectionPort]));
                 this._connectionId = response.id;
@@ -100,7 +99,7 @@ class ConnectionTcp extends Connection {
     disconnectImplementation(callback) {
         
         if (this._connectionId) {
-            bridge.tcpClose();
+            window.electronAPI.tcpClose();
         }
 
         this._connectionIP = "";
@@ -113,7 +112,7 @@ class ConnectionTcp extends Connection {
 
    sendImplementation(data, callback) {     
         if (this._connectionId) {
-            bridge.tcpSend(data).then(response => {
+            window.electronAPI.tcpSend(data).then(response => {
                 var result = 0;
                 var sent = response.bytesWritten;
                 if (response.error) {

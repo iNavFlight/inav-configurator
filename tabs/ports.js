@@ -8,6 +8,7 @@ import FC from './../js/fc';
 import i18n from './../js/localization';
 import serialPortHelper from './../js/serialPortHelper';
 import jBox from 'jbox';
+import bridge from '../js/bridge';
 
 const portsTab = {};
 
@@ -87,78 +88,80 @@ portsTab.initialize = function (callback) {
             var serialPort = FC.SERIAL_CONFIG.ports[portIndex];
 
             port_configuration_e.data('serialPort', serialPort);
+            
+            //Append only port different than USB VCP or UART 1 on Webassembly (serialEx port)
+            if (serialPort.identifier == 20 || (!bridge.isElectron && serialPort.identifier == 0)) {
+                continue;
+            }          
+  
+            port_configuration_e.find('select.msp_baudrate').val(serialPort.msp_baudrate);
+            port_configuration_e.find('select.telemetry_baudrate').val(serialPort.telemetry_baudrate);
+            port_configuration_e.find('select.sensors_baudrate').val(serialPort.sensors_baudrate);
+            port_configuration_e.find('select.peripherals_baudrate').val(serialPort.peripherals_baudrate);
 
-            //Append only port different than USB VCP
-            if (serialPort.identifier != 20) {
+            port_configuration_e.find('.identifier').text(serialPortHelper.getPortName(serialPort.identifier));
+            if (serialPort.identifier >= 30) {
+                port_configuration_e.find('.softSerialWarning').css("display", "inline")
+            } else {
+                port_configuration_e.find('.softSerialWarning').css("display", "none")
+            }
 
-                port_configuration_e.find('select.msp_baudrate').val(serialPort.msp_baudrate);
-                port_configuration_e.find('select.telemetry_baudrate').val(serialPort.telemetry_baudrate);
-                port_configuration_e.find('select.sensors_baudrate').val(serialPort.sensors_baudrate);
-                port_configuration_e.find('select.peripherals_baudrate').val(serialPort.peripherals_baudrate);
+            port_configuration_e.data('index', portIndex);
+            port_configuration_e.data('port', serialPort);
 
-                port_configuration_e.find('.identifier').text(serialPortHelper.getPortName(serialPort.identifier));
-                if (serialPort.identifier >= 30) {
-                    port_configuration_e.find('.softSerialWarning').css("display", "inline")
-                } else {
-                    port_configuration_e.find('.softSerialWarning').css("display", "none")
-                }
+            for (var columnIndex = 0; columnIndex < columns.length; columnIndex++) {
+                var column = columns[columnIndex];
 
-                port_configuration_e.data('index', portIndex);
-                port_configuration_e.data('port', serialPort);
+                var functions_e = $(port_configuration_e).find('.functionsCell-' + column);
+                let functions_e_id = "portFunc-" + column + "-" + portIndex;
+                functions_e.attr("id", functions_e_id);
 
-                for (var columnIndex = 0; columnIndex < columns.length; columnIndex++) {
-                    var column = columns[columnIndex];
+                for (i = 0; i < serialPortHelper.getRules().length; i++) {
+                    var functionRule = serialPortHelper.getRules()[i];
+                    var functionName = functionRule.name;
 
-                    var functions_e = $(port_configuration_e).find('.functionsCell-' + column);
-                    let functions_e_id = "portFunc-" + column + "-" + portIndex;
-                    functions_e.attr("id", functions_e_id);
+                    if (functionRule.groups.indexOf(column) == -1) {
+                        continue;
+                    }
 
-                    for (i = 0; i < serialPortHelper.getRules().length; i++) {
-                        var functionRule = serialPortHelper.getRules()[i];
-                        var functionName = functionRule.name;
+                    var select_e;
+                    if (column !== 'telemetry' && column !== 'peripherals' && column !== 'sensors') {
+                        var checkboxId = 'functionCheckbox-' + portIndex + '-' + columnIndex + '-' + i;
+                        functions_e.prepend('<span class="function"><input type="checkbox" class="togglemedium" id="' + checkboxId + '" value="' + functionName + '" /><label for="' + checkboxId + '"> ' + functionRule.displayName + '</label></span>');
 
-                        if (functionRule.groups.indexOf(column) == -1) {
-                            continue;
+                        if (serialPort.functions.indexOf(functionName) >= 0) {
+                            var checkbox_e = functions_e.find('#' + checkboxId);
+                            checkbox_e.prop("checked", true);
                         }
 
-                        var select_e;
-                        if (column !== 'telemetry' && column !== 'peripherals' && column !== 'sensors') {
-                            var checkboxId = 'functionCheckbox-' + portIndex + '-' + columnIndex + '-' + i;
-                            functions_e.prepend('<span class="function"><input type="checkbox" class="togglemedium" id="' + checkboxId + '" value="' + functionName + '" /><label for="' + checkboxId + '"> ' + functionRule.displayName + '</label></span>');
+                    } else {
 
-                            if (serialPort.functions.indexOf(functionName) >= 0) {
-                                var checkbox_e = functions_e.find('#' + checkboxId);
-                                checkbox_e.prop("checked", true);
-                            }
-
-                        } else {
-
-                            var selectElementName = 'function-' + column;
-                            var selectElementSelector = 'select[name=' + selectElementName + ']';
-                            select_e = functions_e.find(selectElementSelector);
+                        var selectElementName = 'function-' + column;
+                        var selectElementSelector = 'select[name=' + selectElementName + ']';
+                        select_e = functions_e.find(selectElementSelector);
+                        
+                        if (select_e.length == 0) {
+                            functions_e.prepend('<span class="function"><select id="' + selectElementName + '" name="' + selectElementName + '" class="function-select ' + selectElementName + '" /></span>');
                             
-                            if (select_e.length == 0) {
-                                functions_e.prepend('<span class="function"><select id="' + selectElementName + '" name="' + selectElementName + '" class="function-select ' + selectElementName + '" /></span>');
-                                
-                                functions_e.find('#' + selectElementName).on('change', () => {
-                                    updateDefaultBaud(functions_e_id, column);
-                                });
-                                
-                                select_e = functions_e.find(selectElementSelector);
-                                var disabledText = i18n.getMessage('portsTelemetryDisabled');
-                                select_e.append('<option value="">' + disabledText + '</option>');
-                            }
-                            select_e.append('<option value="' + functionName + '">' + functionRule.displayName + '</option>');
+                            functions_e.find('#' + selectElementName).on('change', () => {
+                                updateDefaultBaud(functions_e_id, column);
+                            });
+                            
+                            select_e = functions_e.find(selectElementSelector);
+                            var disabledText = i18n.getMessage('portsTelemetryDisabled');
+                            select_e.append('<option value="">' + disabledText + '</option>');
+                        }
+                        select_e.append('<option value="' + functionName + '">' + functionRule.displayName + '</option>');
 
-                            if (serialPort.functions.indexOf(functionName) >= 0) {
-                                select_e.val(functionName);
-                            }
+                        if (serialPort.functions.indexOf(functionName) >= 0) {
+                            select_e.val(functionName);
                         }
                     }
                 }
-                ports_e.find('tbody').append(port_configuration_e);
+            }
+            ports_e.find('tbody').append(port_configuration_e);
 
-            }            
+                       
         }
 
         $('table.ports tbody').on('change', 'select', onSwitchChange);

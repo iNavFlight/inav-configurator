@@ -45,7 +45,7 @@ receiverTab.rateChartHeight = 117;
         Settings.saveInputs(onComplete);
     }
 
-    function process_html() {
+    function process_html(settingsPromise) {
         // translate to user-selected language
        i18n.localize();;
 
@@ -79,8 +79,6 @@ receiverTab.rateChartHeight = 117;
             }
         });
 
-        $serialRxProvider.trigger("change");
-
         $receiverMode.on('change', function () {
             if ($(this).find("option:selected").text() == "SERIAL") {
                 $serialWrapper.show();
@@ -93,7 +91,11 @@ receiverTab.rateChartHeight = 117;
             }
         });
 
-        $receiverMode.trigger("change");
+        // Wait for settings to load before triggering change events
+        // Trigger receiverMode which will trigger serialRxProvider when mode is SERIAL
+        settingsPromise.then(function() {
+            $receiverMode.trigger("change");
+        });
 
         // fill in data from RC_tuning
         $('.tunings .throttle input[name="mid"]').val(FC.RC_tuning.throttle_MID.toFixed(2));
@@ -310,9 +312,9 @@ receiverTab.rateChartHeight = 117;
         });
 
         $("a.sticks").on('click', function () {
-            var mspWin = window.open("tabs/receiver_msp.html", "receiver_msp", "width=420,height=760,menubar=no,contextIsolation=no,nodeIntegration=yes");
+            var mspWin = window.open("tabs/receiver_msp.html", "receiver_msp", "width=420,height=760,menubar=no");
             
-            mspWin.window.setRawRx = function (channels) {
+            mspWin.setRawRx = function (channels) {
                 if (CONFIGURATOR.connectionValid && GUI.active_tab != 'cli') {
                     mspHelper.setRawRx(channels);
                     return true;
@@ -322,7 +324,9 @@ receiverTab.rateChartHeight = 117;
             }
         });
 
-        /* Drop MSP control sticks for now, needs more work
+        /* Drop MSP control sticks for now, works inconsistently across platforms
+        Doesn't work properly in either elecron or PWA, and it takes quite a bit of effort to get both to run.
+        If anyone misses it, feel free. I give up.
         // Only show the MSP control sticks if the MSP Rx feature is enabled
         mspHelper.getSetting("receiver_type").then(function (s) {
             if (s && s.setting.table && s.setting.table.values) {

@@ -9,6 +9,8 @@
 
 'use strict';
 
+import { extractValue as sharedExtractValue, extractIdentifier as sharedExtractIdentifier } from './expression_utils.js';
+
 class ArrowFunctionHelper {
   constructor(codegen) {
     this.codegen = codegen; // Reference to code generator for condition transformation
@@ -72,6 +74,7 @@ class ArrowFunctionHelper {
 
     // Process each statement in the block
     for (const stmt of body.body) {
+      // Handle assignment expressions
       if (stmt.type === 'ExpressionStatement' &&
           stmt.expression &&
           stmt.expression.type === 'AssignmentExpression') {
@@ -82,8 +85,64 @@ class ArrowFunctionHelper {
         );
         if (action) actions.push(action);
       }
+      // Handle if statements
+      else if (stmt.type === 'IfStatement') {
+        const ifAction = this.transformIfStatement(stmt);
+        if (ifAction) actions.push(ifAction);
+      }
     }
 
+    return actions;
+  }
+
+  /**
+   * Transform if statement from Acorn AST node
+   */
+  transformIfStatement(stmt) {
+    if (!stmt.test || !stmt.consequent) return null;
+
+    return {
+      type: 'IfStatement',
+      condition: this.transformCondition(stmt.test),
+      consequent: stmt.consequent.type === 'BlockStatement'
+        ? this.extractBlockActions(stmt.consequent)
+        : [],
+      alternate: stmt.alternate
+        ? (stmt.alternate.type === 'BlockStatement'
+            ? this.extractBlockActions(stmt.alternate)
+            : (stmt.alternate.type === 'IfStatement'
+                ? [this.transformIfStatement(stmt.alternate)]
+                : []))
+        : [],
+      loc: stmt.loc,
+      range: stmt.range
+    };
+  }
+
+  /**
+   * Extract actions from a block statement
+   */
+  extractBlockActions(block) {
+    if (!block || !block.body || !Array.isArray(block.body)) {
+      return [];
+    }
+
+    const actions = [];
+    for (const stmt of block.body) {
+      if (stmt.type === 'ExpressionStatement' &&
+          stmt.expression &&
+          stmt.expression.type === 'AssignmentExpression') {
+        const action = this.transformAssignment(
+          stmt.expression,
+          stmt.loc,
+          stmt.range
+        );
+        if (action) actions.push(action);
+      } else if (stmt.type === 'IfStatement') {
+        const ifAction = this.transformIfStatement(stmt);
+        if (ifAction) actions.push(ifAction);
+      }
+    }
     return actions;
   }
 
@@ -128,6 +187,30 @@ class ArrowFunctionHelper {
         type: 'MemberExpression',
         value: this.extractIdentifier(expr)
       };
+    }
+
+    // Handle call expressions: edge(...), delta(...), xor(...), etc.
+    if (expr.type === 'CallExpression') {
+      return {
+        type: 'CallExpression',
+        callee: expr.callee,
+        arguments: expr.arguments.map(arg => this.transformCondition(arg) || arg)
+      };
+    }
+
+    // Handle ternary/conditional expressions: a ? b : c
+    if (expr.type === 'ConditionalExpression') {
+      return {
+        type: 'ConditionalExpression',
+        test: this.transformCondition(expr.test),
+        consequent: this.transformCondition(expr.consequent),
+        alternate: this.transformCondition(expr.alternate)
+      };
+    }
+
+    // Handle parenthesized expressions (unwrap)
+    if (expr.type === 'ParenthesizedExpression' || expr.extra?.parenthesized) {
+      return this.transformCondition(expr.expression || expr);
     }
 
     // Handle identifiers and literals
@@ -187,57 +270,18 @@ class ArrowFunctionHelper {
 
   /**
    * Extract identifier from Acorn AST node
+   * Delegates to shared implementation in expression_utils.js
    */
   extractIdentifier(expr) {
-    if (!expr) return '';
-
-    if (expr.type === 'Identifier') {
-      return expr.name;
-    }
-
-    if (expr.type === 'MemberExpression') {
-      const object = this.extractIdentifier(expr.object);
-
-      if (expr.computed) {
-        // Computed access: gvar[0] or rc[5]
-        const property = this.extractValue(expr.property);
-        return `${object}[${property}]`;
-      } else {
-        // Dot access: flight.altitude or override.vtx.power
-        const property = expr.property && expr.property.name ?
-          expr.property.name : '';
-        return property ? `${object}.${property}` : object;
-      }
-    }
-
-    return '';
+    return sharedExtractIdentifier(expr, (e) => this.extractValue(e));
   }
 
   /**
    * Extract value from Acorn AST node
+   * Delegates to shared implementation in expression_utils.js
    */
   extractValue(expr) {
-    if (!expr) return null;
-
-    if (expr.type === 'Literal') {
-      return expr.value;
-    }
-
-    if (expr.type === 'Identifier') {
-      return expr.name;
-    }
-
-    if (expr.type === 'MemberExpression') {
-      return this.extractIdentifier(expr);
-    }
-
-    if (expr.type === 'UnaryExpression' && expr.operator === '-') {
-      // Handle negative numbers
-      const val = this.extractValue(expr.argument);
-      return typeof val === 'number' ? -val : val;
-    }
-
-    return null;
+    return sharedExtractValue(expr);
   }
 
   /**

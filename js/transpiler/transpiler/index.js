@@ -130,6 +130,17 @@ class Transpiler {
       // Adjust line numbers if import was auto-added
       const adjustedWarnings = this.adjustLineNumbers(allWarnings, lineOffset);
 
+      // Categorize warnings to check for errors
+      const categorized = this.categorizeWarnings(adjustedWarnings);
+
+      // If there are parser errors (type='error'), fail the transpilation
+      if (categorized.errors && categorized.errors.length > 0) {
+        const errorMessages = categorized.errors.map(e =>
+          `  - ${e.message}${e.line ? ` (line ${e.line})` : ''}`
+        ).join('\n');
+        throw new Error(`Parse errors:\n${errorMessages}`);
+      }
+
       // Get gvar allocation summary
       const gvarSummary = this.analyzer.variableHandler ?
         this.analyzer.variableHandler.getAllocationSummary() :
@@ -142,7 +153,7 @@ class Transpiler {
         success: true,
         commands,
         logicConditionCount: this.codegen.lcIndex,
-        warnings: this.categorizeWarnings(adjustedWarnings),
+        warnings: categorized,
         optimizations: this.optimizer.getStats(),
         gvarUsage: gvarSummary,
         variableMap,

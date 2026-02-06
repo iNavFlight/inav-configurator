@@ -1,5 +1,6 @@
 'use strict'
 
+import bridge from "./bridge";
 
 const GeozoneType = Object.freeze({
     EXCULSIVE: 0,
@@ -252,7 +253,7 @@ let Geozone = function (type, shape, minAltitude, maxAltitude, sealevelRef, radi
 
     self.getElevationFromServer = async function (lon, lat, globalSettings) {
         let elevation = "N/A";
-        const response = await fetch('https://api.opentopodata.org/v1/aster30m?locations='+lat+','+lon);
+        const response = await fetch(bridge.proxy('https://api.opentopodata.org/v1/aster30m?locations='+lat+','+lon));
         const myJson = await response.json();
         if (myJson.status == "OK" && myJson.results[0].elevation != null) {
             elevation = myJson.results[0].elevation;

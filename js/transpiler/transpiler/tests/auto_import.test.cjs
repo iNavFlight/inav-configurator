@@ -13,21 +13,21 @@ const { Transpiler } = require('../index.js');
 describe('Auto-Insert INAV Import', () => {
   test('hasInavImport() detects wildcard import', () => {
     const transpiler = new Transpiler();
-    const code = `import * as inav from 'inav';\n\nconst { flight } = inav;`;
+    const code = `import * as inav from 'inav';\n\n`;
 
     expect(transpiler.hasInavImport(code)).toBe(true);
   });
 
   test('hasInavImport() detects destructured import', () => {
     const transpiler = new Transpiler();
-    const code = `import { flight, override } from 'inav';\n\nif (flight.yaw > 1800) {}`;
+    const code = `import { flight, override } from 'inav';\n\nif (inav.flight.yaw > 1800) {}`;
 
     expect(transpiler.hasInavImport(code)).toBe(true);
   });
 
   test('hasInavImport() detects default import', () => {
     const transpiler = new Transpiler();
-    const code = `import inav from 'inav';\n\nconst { flight } = inav;`;
+    const code = `import inav from 'inav';\n\n`;
 
     expect(transpiler.hasInavImport(code)).toBe(true);
   });
@@ -41,14 +41,14 @@ describe('Auto-Insert INAV Import', () => {
 
   test('hasInavImport() detects import with double quotes', () => {
     const transpiler = new Transpiler();
-    const code = `import * as inav from "inav";\n\nconst { flight } = inav;`;
+    const code = `import * as inav from "inav";\n\n`;
 
     expect(transpiler.hasInavImport(code)).toBe(true);
   });
 
   test('hasInavImport() detects CommonJS require', () => {
     const transpiler = new Transpiler();
-    const code = `const inav = require('inav');\n\nconst { flight } = inav;`;
+    const code = `const inav = require('inav');\n\n`;
 
     expect(transpiler.hasInavImport(code)).toBe(true);
   });
@@ -56,7 +56,7 @@ describe('Auto-Insert INAV Import', () => {
   test('hasInavImport() returns false for code without import', () => {
     const transpiler = new Transpiler();
     // Just using the inav variable (destructuring) is NOT an import
-    const code = `if (flight.yaw > 1800) {}`;
+    const code = `if (inav.flight.yaw > 1800) {}`;
 
     expect(transpiler.hasInavImport(code)).toBe(false);
   });
@@ -71,14 +71,14 @@ describe('Auto-Insert INAV Import', () => {
   test('hasInavImport() ignores imports from other modules', () => {
     const transpiler = new Transpiler();
     // Import from other module, no inav import
-    const code = `import { something } from 'other-module';\n\nif (flight.yaw > 1800) {}`;
+    const code = `import { something } from 'other-module';\n\nif (inav.flight.yaw > 1800) {}`;
 
     expect(transpiler.hasInavImport(code)).toBe(false);
   });
 
   test('hasInavImport() ignores commented imports', () => {
     const transpiler = new Transpiler();
-    const code = `// import * as inav from 'inav';\n\nconst { flight } = inav;`;
+    const code = `// import * as inav from 'inav';\n\n`;
 
     // Note: Current regex doesn't filter comments, but that's acceptable
     // Comments are uncommon at exact import position
@@ -86,7 +86,7 @@ describe('Auto-Insert INAV Import', () => {
 
   test('ensureInavImport() adds import to code without import', () => {
     const transpiler = new Transpiler();
-    const code = `if (flight.yaw > 1800) { gvar[0] = 1; }`;
+    const code = `if (inav.flight.yaw > 1800) { inav.gvar[0] = 1; }`;
     const result = transpiler.ensureInavImport(code);
 
     expect(result.code).toContain("import * as inav from 'inav';");
@@ -97,7 +97,7 @@ describe('Auto-Insert INAV Import', () => {
 
   test('ensureInavImport() does not add duplicate import', () => {
     const transpiler = new Transpiler();
-    const code = `import * as inav from 'inav';\n\nconst { flight } = inav;`;
+    const code = `import * as inav from 'inav';\n\n`;
     const result = transpiler.ensureInavImport(code);
 
     expect(result.code).toBe(code); // Unchanged
@@ -107,7 +107,7 @@ describe('Auto-Insert INAV Import', () => {
 
   test('ensureInavImport() preserves existing destructured import', () => {
     const transpiler = new Transpiler();
-    const code = `import { flight } from 'inav';\n\nif (flight.yaw > 1800) {}`;
+    const code = `import { flight } from 'inav';\n\nif (inav.flight.yaw > 1800) {}`;
     const result = transpiler.ensureInavImport(code);
 
     expect(result.code).toBe(code); // Unchanged
@@ -125,7 +125,7 @@ describe('Auto-Insert INAV Import', () => {
 
   test('ensureInavImport() prepends import at beginning', () => {
     const transpiler = new Transpiler();
-    const code = `// My flight script\nif (flight.yaw > 1800) {}`;
+    const code = `// My flight script\nif (inav.flight.yaw > 1800) {}`;
     const result = transpiler.ensureInavImport(code);
 
     expect(result.code.startsWith("import * as inav from 'inav';")).toBe(true);
@@ -136,11 +136,11 @@ describe('Auto-Import Integration with Transpiler', () => {
   test('transpile() works with code missing import', () => {
     const transpiler = new Transpiler();
     const code = `
-      const { flight, override } = inav;
+      
       let threshold = 1800;
 
       on.always(() => {
-        override.throttle = threshold;
+        inav.override.throttle = threshold;
       });
     `;
 
@@ -155,11 +155,11 @@ describe('Auto-Import Integration with Transpiler', () => {
     const code = `
       import * as inav from 'inav';
 
-      const { flight, override } = inav;
+      
       let threshold = 1800;
 
       on.always(() => {
-        override.throttle = threshold;
+        inav.override.throttle = threshold;
       });
     `;
 
@@ -172,10 +172,10 @@ describe('Auto-Import Integration with Transpiler', () => {
   test('lint() works with code missing import', () => {
     const transpiler = new Transpiler();
     const code = `
-      const { flight } = inav;
+      
 
-      if (flight.yaw > 1800) {
-        gvar[0] = 1;
+      if (inav.flight.yaw > 1800) {
+        inav.gvar[0] = 1;
       }
     `;
 

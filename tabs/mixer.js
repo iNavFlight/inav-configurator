@@ -453,6 +453,14 @@ mixerTab.initialize = function (callback, scrollPosition) {
             }
         }
 
+        const $img = $("#motor-mixer-preview-img");
+        const imgHeight = $img.height();
+
+        // Skip positioning if image hasn't loaded yet (height would be 0)
+        if (imgHeight === 0) {
+            return;
+        }
+
         for (const i in rules) {
             if (rules.hasOwnProperty(i)) {
                 const rule = rules[i];
@@ -462,14 +470,14 @@ mixerTab.initialize = function (callback, scrollPosition) {
                     continue;
                 }
 
-                let top_px = 30;
+                let top_px = 28;
                 let left_px = 28;
                 if (rule.getRoll() < -0.5) {
-                  left_px = $("#motor-mixer-preview-img").width() - 42;
+                  left_px = $img.width() - 42;
                 }
 
                 if (rule.getPitch() > 0.5) {
-                  top_px = $("#motor-mixer-preview-img").height() - 42;
+                  top_px = imgHeight - 44;
                 }
                 $("#motorNumber"+index).css("left", left_px + "px");
                 $("#motorNumber"+index).css("top", top_px + "px");
@@ -657,9 +665,18 @@ mixerTab.initialize = function (callback, scrollPosition) {
             const isReversed = motorDirectionCheckbox.val() == 1 && (FC.MIXER_CONFIG.platformType == PLATFORM.MULTIROTOR || FC.MIXER_CONFIG.platformType == PLATFORM.TRICOPTER);
 
             import(`./../resources/motor_order/${currentMixerPreset.image}${isReversed ? "_reverse" : ""}.svg`).then(({default: path}) => {
-                $('.mixerPreview img').attr('src', path);
+                const $img = $('.mixerPreview img');
+                $img.attr('src', path);
+                // Wait for image to load before positioning motor numbers
+                $img.off('load.motorNumbers').on('load.motorNumbers', function() {
+                    labelMotorNumbers();
+                });
+                // If image is already cached, load event won't fire, so check complete
+                if ($img[0].complete) {
+                    labelMotorNumbers();
+                }
             });
-            
+
             renderServoOutputImage();
         };
 
@@ -720,7 +737,6 @@ mixerTab.initialize = function (callback, scrollPosition) {
             }
 
             updateRefreshButtonStatus();
-            labelMotorNumbers();
             updateMotorDirection();
         });
 
