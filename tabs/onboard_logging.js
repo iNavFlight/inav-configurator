@@ -3,20 +3,20 @@
 import MSPCodes from './../js/msp/MSPCodes';
 import MSP from './../js/msp';
 import mspHelper from"./../js/msp/MSPHelper";
-import { GUI, TABS } from './../js/gui';
+import GUI from './../js/gui';
 import FC from './../js/fc';
 import CONFIGURATOR from './../js/data_storage';
 import features from './../js/feature_framework';
 import i18n from './../js/localization';
 import BitHelper from './../js/bitHelper';
-import dialog from './../js/dialog';
+import bridge from '../js/bridge';
 
 var sdcardTimer;
 
-TABS.onboard_logging = {
+const onboardLoggingTab = {
 };
 
-TABS.onboard_logging.initialize = function (callback) {
+onboardLoggingTab.initialize = function (callback) {
     let
         saveCancelled, eraseCancelled;
 
@@ -38,8 +38,8 @@ TABS.onboard_logging.initialize = function (callback) {
         "BLACKBOX_FEATURE_SERVOS",
     ];
 
-    if (GUI.active_tab != 'onboard_logging') {
-        GUI.active_tab = 'onboard_logging';
+    if (GUI.active_tab !== this) {
+        GUI.active_tab = this;
     }
 
     if (CONFIGURATOR.connectionValid) {
@@ -359,6 +359,7 @@ TABS.onboard_logging.initialize = function (callback) {
                     let nextAddress = 0;
 
                     show_saving_dialog();
+                    let webBuffer = [];
 
                     function onChunkRead(chunkAddress, chunk) {
                         if (chunk != null) {
@@ -368,24 +369,28 @@ TABS.onboard_logging.initialize = function (callback) {
 
                                 $(".dataflash-saving progress").attr("value", nextAddress / maxBytes * 100);
 
-                                window.electronAPI.appendFile(filename, new Uint8Array(chunk))
-                                    .then(() => {
-                                        if (saveCancelled) {
-                                            dismiss_saving_dialog();
-                                        } else if (nextAddress >= maxBytes) {
-                                            mark_saving_dialog_done();
-                                        } else {
-                                            mspHelper.dataflashRead(nextAddress, onChunkRead);
-                                        }
-                                    })
-                                    .catch(err => {
-                                        console.error('Error writing blackbox data:', err);
-                                        GUI.log(i18n.getMessage('ErrorWritingFile'));
-                                        dismiss_saving_dialog();
+                                if (bridge.isElectron) { 
+                                    window.electronAPI.appendFile(filename, new Uint8Array(chunk), {
+                                        "flag": "a"
                                     });
+                                } else {
+                                    webBuffer.push(...chunk);
+                                }
+
+                                // Untested !
+                                if (saveCancelled) {
+                                    dismiss_saving_dialog();
+                                } else if (nextAddress >= maxBytes) {
+                                    mark_saving_dialog_done();
+                                } else {
+                                    mspHelper.dataflashRead(nextAddress, onChunkRead);
+                                }
 
                             } else {
                                 // A zero-byte block indicates end-of-file, so we're done
+                                if (!bridge.isElectron) {
+                                    bridge.writeFile(filename, new Uint8Array(webBuffer), true);
+                                }
                                 mark_saving_dialog_done();
                             }
                         } else {
@@ -462,7 +467,7 @@ TABS.onboard_logging.initialize = function (callback) {
     }
 };
 
-TABS.onboard_logging.cleanup = function (callback) {
+onboardLoggingTab.cleanup = function (callback) {
     if (sdcardTimer) {
         clearTimeout(sdcardTimer);
         sdcardTimer = false;
@@ -472,3 +477,5 @@ TABS.onboard_logging.cleanup = function (callback) {
         callback();
     }
 };
+
+export default onboardLoggingTab;

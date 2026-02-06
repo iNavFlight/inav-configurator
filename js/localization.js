@@ -2,8 +2,7 @@
 
 // Thanks to Betaflight :)
 import i18next from 'i18next';
-
-import store from './store'
+import bridge from './bridge';
 
 
 const availableLanguages = ['en', 'ja', 'ru', 'uk', 'zh_CN'];
@@ -20,8 +19,8 @@ i18n.loadMessages = async function(languages) {
 }
 
 i18n.init = function (callback) {
-    const locale = window.electronAPI.appGetLocale();
-    const userLanguage = store.get('userLanguage', locale);
+    const locale = bridge.getAppLocale();
+    const userLanguage = bridge.storeGet('userLanguage', locale);
     this.loadMessages(availableLanguages).then(resources => {
         i18next.init({
             lng: userLanguage,
@@ -71,7 +70,7 @@ i18n.parseInputFile = function (data) {
 i18n.getValidLocale = function(userLocale) {
     let validUserLocale = userLocale;
     if (validUserLocale === 'DEFAULT') {
-        validUserLocale = window.electronAPI.appGetLocale();
+        validUserLocale = bridge.getAppLocale();
         console.log(`Detected locale ${validUserLocale}`);
     }
 
@@ -118,7 +117,7 @@ i18n.getLanguages = function() {
 }
 
 i18n.changeLanguage = function(languageSelected) {
-    store.set('userLanguage', languageSelected);
+    bridge.storeSet('userLanguage', languageSelected);
     i18next.changeLanguage(i18n.getValidLocale(languageSelected));
 };
 

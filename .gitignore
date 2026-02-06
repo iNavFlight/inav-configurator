@@ -10,9 +10,10 @@ inav-configurator.iml
 .eslintrc.json
 /.project
 /cache/
-/dist/
 /apps/
 /build/
+/dist/
+/dev-dist/
 *~
 *.swp
 *.bak

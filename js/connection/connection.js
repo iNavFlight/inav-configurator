@@ -1,18 +1,19 @@
 'use strict';
 
-import { GUI } from './../gui';
+import GUI from './../gui';
 
 const ConnectionType = {
     Serial: 0,
     TCP:    1,
     UDP:    2,
-    BLE:    3
+    BLE:    3,
+    serialEXT: 4
 }
 
 class Connection {
 
     constructor() {       
-        this._connectionId   = 0;
+        this._connectionId   = null;
         this._openRequested  = false;
         this._openCanceled   = false;
         this._bitrate        = 0;
@@ -129,13 +130,13 @@ class Connection {
     }
 
     disconnect(callback) {
-        if (this._connectionId) {
+        if (this._connectionId !== null) {
             this.emptyOutputBuffer();
             this.removeAllListeners();
 
             // Clean up IPC listeners if the subclass implements this method
-            if (typeof this.removeIpcListeners === 'function') {
-                this.removeIpcListeners();
+            if (typeof this.removeListeners === 'function') {
+                this.removeListeners();
             }
 
             this.disconnectImplementation(result => {

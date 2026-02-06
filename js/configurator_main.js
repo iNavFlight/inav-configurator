@@ -4,7 +4,8 @@ import $ from 'jquery';
 import 'jquery-ui-dist/jquery-ui';
 import * as THREE from 'three'
 
-import { GUI, TABS } from './gui';
+import bridge from './bridge'
+import GUI from './gui';
 import CONFIGURATOR from './data_storage';
 import FC  from './fc';
 import { globalSettings, UnitType } from './globalSettings';
@@ -19,8 +20,37 @@ import appUpdater from './appUpdater';
 import CliAutoComplete from './CliAutoComplete'; 
 import { SITLProcess } from './sitl';
 import settingsCache from './settingsCache';
-import store from './store';
+import browser from './web/browser';
 
+// "Preload" tabs
+import landingTab from './../tabs/landing';
+import firmwareFlasherTab from './../tabs/firmware_flasher';
+import sitlTab from './../tabs/sitl';
+import auxiliaryTab from './../tabs/auxiliary';
+import adjustmentsTab from './../tabs/adjustments';
+import portsTab from './../tabs/ports'
+import ledStripTab from './../tabs/led_strip';
+import failsafeTab from './../tabs/failsafe';
+import setupTab from './../tabs/setup'
+import calibrationTab from './../tabs/calibration';
+import configurationTab from './../tabs/configuration';
+import pidTuningTab from './../tabs/pid_tuning';
+import receiverTab from './../tabs/receiver';
+import gpsTab from './../tabs/gps';
+import magnetometerTab from './../tabs/magnetometer';
+import missionControlTab from './../tabs/mission_control';
+import mixerTab from './../tabs/mixer';
+import programmingTab from './../tabs/programming';
+import javascriptProgrammingTab from './../tabs/javascript_programming';
+import outputsTab from './../tabs/outputs';
+import osdTab from './../tabs/osd';
+import sensorsTab from './../tabs/sensors';
+import loggingTab from './../tabs/logging';
+import advancedTuningTab from './../tabs/advanced_tuning';
+import onboardLoggingTab from  './../tabs/onboard_logging';
+import cliTab from './../tabs/cli';
+import searchTab from './../tabs/search';
+import dialog from './dialog';
 
 window.$ = $;
 
@@ -28,35 +58,11 @@ window.$ = $;
 $(function() {
     i18n.init( () => {
         i18n.localize();
-
+        
+        bridge.init();
         MSP.init();
         mspHelper.init();
-        SerialBackend.init();
-
-        GUI.updateEzTuneTabVisibility = function(loadMixerConfig) {
-            let useEzTune = true;
-            if (CONFIGURATOR.connectionValid) {
-                if (loadMixerConfig) {
-                    mspHelper.loadMixerConfig(function () {
-                        if (FC.MIXER_CONFIG.platformType == PLATFORM.MULTIROTOR || FC.MIXER_CONFIG.platformType == PLATFORM.TRICOPTER) {
-                            $('.tab_ez_tune').removeClass("is-hidden");
-                        } else {
-                            $('.tab_ez_tune').addClass("is-hidden");
-                            useEzTune = false;
-                        }
-                    });
-                } else {
-                    if (FC.MIXER_CONFIG.platformType == PLATFORM.MULTIROTOR || FC.MIXER_CONFIG.platformType == PLATFORM.TRICOPTER) {
-                        $('.tab_ez_tune').removeClass("is-hidden");
-                    } else {
-                        $('.tab_ez_tune').addClass("is-hidden");
-                        useEzTune = false;
-                    }
-                }
-            }
-        
-            return useEzTune;
-        };
+        SerialBackend.init();;
 
         GUI.updateActivatedTab = function() {
             var activeTab = $('#tabs > ul li.active');
@@ -64,17 +70,17 @@ $(function() {
             $('a', activeTab).trigger('click');
         }
 
-        globalSettings.unitType = store.get('unit_type', UnitType.none);
-        globalSettings.mapProviderType = store.get('map_provider_type', 'osm'); 
-        globalSettings.assistnowApiKey = store.get('assistnow_api_key', '');
-        globalSettings.proxyURL = store.get('proxyurl', 'http://192.168.1.222/mapproxy/service?');
-        globalSettings.proxyLayer = store.get('proxylayer', 'your_proxy_layer_name');
-        globalSettings.showProfileParameters = store.get('show_profile_parameters', 1);
-        globalSettings.assistnowOfflineData = store.get('assistnow_offline_data', []);
-        globalSettings.assistnowOfflineDate = store.get('assistnow_offline_date', 0);
+        globalSettings.unitType = bridge.storeGet('unit_type', UnitType.none);
+        globalSettings.mapProviderType = bridge.storeGet('map_provider_type', 'osm'); 
+        globalSettings.assistnowApiKey = bridge.storeGet('assistnow_api_key', '');
+        globalSettings.proxyURL = bridge.storeGet('proxyurl', 'http://192.168.1.222/mapproxy/service?');
+        globalSettings.proxyLayer = bridge.storeGet('proxylayer', 'your_proxy_layer_name');
+        globalSettings.showProfileParameters = bridge.storeGet('show_profile_parameters', 1);
+        globalSettings.assistnowOfflineData = bridge.storeGet('assistnow_offline_data', []);
+        globalSettings.assistnowOfflineDate = bridge.storeGet('assistnow_offline_date', 0);
         updateProfilesHighlightColours();
 
-        var cliAutocomplete = store.get('cli_autocomplete', true);
+        var cliAutocomplete = bridge.storeGet('cli_autocomplete', true);
         globalSettings.cliAutocomplete = cliAutocomplete;
         CliAutoComplete.setEnabled(cliAutocomplete);
         
@@ -84,25 +90,35 @@ $(function() {
             globalSettings.osdUnits = null;
         }
 
-        const version = window.electronAPI.appGetVersion();
-        // alternative - window.navigator.appVersion.match(/Chrome\/([0-9.]*)/)[1];
+        const version = bridge.getAppVersion();
+        
+        // Detect browser and version
+       
         GUI.log(i18n.getMessage('getRunningOS') + GUI.operating_system + '</strong>, ' +
-            'Electron: <strong>' + navigator.userAgent.match(/Electron\/([\d\.]+\d+)/)[1] + '</strong>, ' +
+            browser.getBrowserInfo() +
             i18n.getMessage('getConfiguratorVersion') + version + '</strong>');
 
         $('#status-bar .version').text(version);
         $('#logo .version').text(version);
         update.firmwareVersion();
 
-        if (store.get('logopen', false)) {
+        if (bridge.storeGet('logopen', false)) {
             $("#showlog").trigger('click');
         }
 
-        if (store.get('update_notify', true)) { 
-            appUpdater.checkRelease(version);
+        if (bridge.isElectron) {
+            if (bridge.storeGet('update_notify', true)) { 
+                appUpdater.checkRelease(version);
+            }
         }
-        
 
+        if (!browser.isUsbSupported()) {
+            $('.tab_firmware_flasher').remove();
+        }
+
+        browser.registerSW();
+        browser.checkBrowserSupport();
+        
         // log library versions in console to make version tracking easier
         console.log('Libraries: jQuery - ' + $.fn.jquery + ', three.js - ' + THREE.REVISION);
 
@@ -179,86 +195,85 @@ $(function() {
 
                     switch (tab) {
                         case 'landing':
-                            import('./../tabs/landing').then(() => TABS.landing.initialize(content_ready));
+                            landingTab.initialize(content_ready);
                             break;
                         case 'firmware_flasher':
-                            import('./../tabs/firmware_flasher').then(() => TABS.firmware_flasher.initialize(content_ready));
+                            firmwareFlasherTab.initialize(content_ready);
                             break;
                         case 'sitl':
-                            import('./../tabs/sitl').then(() => TABS.sitl.initialize(content_ready));
+                           sitlTab.initialize(content_ready);
                             break;
                         case 'auxiliary':
-                            import('./../tabs/auxiliary').then(() => TABS.auxiliary.initialize(content_ready));
+                            auxiliaryTab.initialize(content_ready);
                             break;
                         case 'adjustments':
-                            import('./../tabs/adjustments').then(() => TABS.adjustments.initialize(content_ready));
+                            adjustmentsTab.initialize(content_ready);
                             break;
                         case 'ports':
-                            import('./../tabs/ports').then(() => TABS.ports.initialize(content_ready));
+                           portsTab.initialize(content_ready);
                             break;
                         case 'led_strip':
-                            import('./../tabs/led_strip').then(() => TABS.led_strip.initialize(content_ready));
+                            ledStripTab.initialize(content_ready);
                             break;
                         case 'failsafe':
-                            import('./../tabs/failsafe').then(() => TABS.failsafe.initialize(content_ready));
+                            failsafeTab.initialize(content_ready);
                             break;
                         case 'setup':
-                            import('./../tabs/setup').then(() => TABS.setup.initialize(content_ready));
+                            setupTab.initialize(content_ready);
                             break;
                         case 'calibration':
-                            import('./../tabs/calibration').then(() => TABS.calibration.initialize(content_ready));
+                            calibrationTab.initialize(content_ready);
                             break;
                         case 'configuration':
-                            import('./../tabs/configuration').then(() => TABS.configuration.initialize(content_ready));
+                            configurationTab.initialize(content_ready);
                             break;
                         case 'pid_tuning':
-                            import('./../tabs/pid_tuning').then(() => TABS.pid_tuning.initialize(content_ready));
+                            pidTuningTab.initialize(content_ready);
                             break;
                         case 'receiver':
-                            import('./../tabs/receiver').then(() => TABS.receiver.initialize(content_ready));
+                            receiverTab.initialize(content_ready);
                             break;
                         case 'gps':
-                            import('./../tabs/gps').then(() => TABS.gps.initialize(content_ready));
+                            gpsTab.initialize(content_ready);
                             break;
                         case 'magnetometer':
-                            import('./../tabs/magnetometer').then(() => TABS.magnetometer.initialize(content_ready));
+                            magnetometerTab.initialize(content_ready);
                             break;
                         case 'mission_control':
-                            import('./../tabs/mission_control').then(() => TABS.mission_control.initialize(content_ready));
+                            missionControlTab.initialize(content_ready);
                             break;
                         case 'mixer':
-                            import('./../tabs/mixer').then(() => TABS.mixer.initialize(content_ready));
+                            mixerTab.initialize(content_ready);
                             break;
                         case 'outputs':
-                            import('./../tabs/outputs').then(() => TABS.outputs.initialize(content_ready));
+                            outputsTab.initialize(content_ready);
                             break;
                         case 'osd':
-                            import('./../tabs/osd').then(() => TABS.osd.initialize(content_ready));
+                            osdTab.initialize(content_ready);
                             break;
                         case 'sensors':
-                            import('./../tabs/sensors').then(() => TABS.sensors.initialize(content_ready));
+                            sensorsTab.initialize(content_ready);
                             break;
                         case 'logging':
-                            import('./../tabs/logging').then(() => TABS.logging.initialize(content_ready));
+                            loggingTab.initialize(content_ready);
                             break;
                         case 'onboard_logging':
-                            import('./../tabs/onboard_logging').then(() => TABS.onboard_logging.initialize(content_ready));
+                            onboardLoggingTab.initialize(content_ready);
                             break;
                         case 'advanced_tuning':
-                            import('./../tabs/advanced_tuning').then(() => TABS.advanced_tuning.initialize(content_ready));
+                            advancedTuningTab.initialize(content_ready);
                             break;
                         case 'programming':
-                            import('./../tabs/programming').then(() => TABS.programming.initialize(content_ready));
+                            programmingTab.initialize(content_ready);
                             break;
                         case 'cli':
-                            import('./../tabs/cli').then(() => TABS.cli.initialize(content_ready));
+                            cliTab.initialize(content_ready);
                             break;
                         case 'search':
-                            import('./../tabs/search').then(() => TABS.search.initialize(content_ready));
+                            searchTab.initialize(content_ready);
                             break;
-
                        case 'javascript_programming':
-                           import('./../tabs/javascript_programming').then(() => TABS.javascript_programming.initialize(content_ready));
+                           javascriptProgrammingTab.initialize(content_ready);
                            break;
                         default:
                             console.log('Tab not found:' + tab);
@@ -268,8 +283,6 @@ $(function() {
         });
 
         $('#tabs ul.mode-disconnected li a:first').trigger( "click" );
-
-    
 
         // options
         $('#options').on('click', function() {
@@ -291,23 +304,29 @@ $(function() {
                     // translate to user-selected language
                     i18n.localize();
 
+                    if (!bridge.isElectron) {
+                        $('#resetSitl').hide();
+                        $('#updateNotifications').hide();
+                        $('#disable3DAcceleration').hide();
+                    }
+
                     // if notifications are enabled, or wasn't set, check the notifications checkbox
-                    if (store.get('update_notify', true)) {
+                    if (bridge.storeGet('update_notify', true)) {
                         $('div.notifications input').prop('checked', true);
                     }
 
                     $('div.notifications input').on('change', function () {
                         var check = $(this).is(':checked');
-                        store.set('update_notify', check);
+                        bridge.storeSet('update_notify', check);
                     });
                     
-                    if (store.get('disable_3d_acceleration', false)) {
+                    if (bridge.storeGet('disable_3d_acceleration', false)) {
                         $('div.disable_3d_acceleration input').prop('checked', true);
                     }
 
                      $('div.disable_3d_acceleration input').on('change', function () {
                         var check = $(this).is(':checked');
-                        store.set('disable_3d_acceleration', check);
+                        bridge.storeSet('disable_3d_acceleration', check);
                     });
 
                     $('div.statistics input').on('change', function () {
@@ -316,7 +335,7 @@ $(function() {
 
                     $('div.show_profile_parameters input').on('change', function () {
                         globalSettings.showProfileParameters = $(this).is(':checked');
-                        store.set('show_profile_parameters', globalSettings.showProfileParameters);
+                        bridge.storeSet('show_profile_parameters', globalSettings.showProfileParameters);
 
                         // Update CSS on select boxes
                         updateProfilesHighlightColours();
@@ -329,7 +348,7 @@ $(function() {
 
                     $('div.cli_autocomplete input').on('change', function () {
                         globalSettings.cliAutocomplete = $(this).is(':checked');
-                        store.set('cli_autocomplete', globalSettings.cliAutocomplete);
+                        bridge.storeSet('cli_autocomplete', globalSettings.cliAutocomplete);
 
                         CliAutoComplete.setEnabled($(this).is(':checked'));
                     });
@@ -356,7 +375,7 @@ $(function() {
                     // Set the value of the unit type
                     // none, OSD, imperial, metric
                     $('#ui-unit-type').on('change', function () {
-                        store.set('unit_type', $(this).val());
+                        bridge.storeSet('unit_type', $(this).val());
                         globalSettings.unitType = $(this).val();
 
                         // Update the osd units in global settings
@@ -371,19 +390,19 @@ $(function() {
                         activeTab.find('a').trigger( "click" );
                     });
                     $('#map-provider-type').on('change', function () {
-                        store.set('map_provider_type', $(this).val());
+                        bridge.storeSet('map_provider_type', $(this).val());
                         globalSettings.mapProviderType = $(this).val();
                     });
                     $('#proxyurl').on('change', function () {
-                        store.set('proxyurl', $(this).val());
+                        bridge.storeSet('proxyurl', $(this).val());
                         globalSettings.proxyURL = $(this).val();
                     });
                     $('#proxylayer').on('change', function () {
-                        store.set('proxylayer', $(this).val());
+                        bridge.storeSet('proxylayer', $(this).val());
                         globalSettings.proxyLayer = $(this).val();
                     });
                     $('#assistnow-api-key').on('change', function () {
-                        store.set('assistnow_api_key', $(this).val());
+                        bridge.storeSet('assistnow_api_key', $(this).val());
                         globalSettings.assistnowApiKey = $(this).val();
                     });
  
@@ -498,7 +517,7 @@ $(function() {
             $("#content").removeClass('logopen');
             $(".tab_container").removeClass('logopen');
             $("#scrollicon").removeClass('active');
-            store.set('logopen', false);
+            bridge.storeSet('logopen', false);
 
             state = false;
         }else{
@@ -507,7 +526,7 @@ $(function() {
             $("#content").addClass('logopen');
             $(".tab_container").addClass('logopen');
             $("#scrollicon").addClass('active');
-            store.set('logopen', true);
+            bridge.storeSet('logopen', true);
 
             state = true;
         }

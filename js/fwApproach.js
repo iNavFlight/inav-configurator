@@ -1,5 +1,7 @@
 'use strict';
 
+import bridge from "./bridge";
+
 const ApproachDirection = Object.freeze({
     LEFT: 0,
     RIGHT: 1,
@@ -85,7 +87,7 @@ let FwApproach = function (number, approachAltAsl = 0, landAltAsl = 0, approachD
 
     self.getElevationFromServer = async function (lon, lat, globalSettings) {
         let elevation = "N/A";
-        const response = await fetch('https://api.opentopodata.org/v1/aster30m?locations='+lat+','+lon);
+        const response = await fetch(bridge.proxy('https://api.opentopodata.org/v1/aster30m?locations='+lat+','+lon));
         const myJson = await response.json();
         if (myJson.status == "OK" && myJson.results[0].elevation != null) {
             elevation = myJson.results[0].elevation;

@@ -4,7 +4,7 @@ import { marked } from 'marked';
 import semver from 'semver';
 
 import i18n from './../js/localization';
-import { GUI, TABS } from './../js/gui';
+import GUI from './../js/gui';
 import MSP from './../js/msp';
 import MSPCodes from './../js/msp/MSPCodes';
 import FC from './../js/fc';
@@ -18,14 +18,15 @@ import mspHelper from './../js/msp/MSPHelper';
 import STM32 from './../js/protocols/stm32';
 import STM32DFU from './../js/protocols/stm32usbdfu';
 import mspDeduplicationQueue from './../js/msp/mspDeduplicationQueue';
-import store from './../js/store';
-import dialog from '../js/dialog.js';
+import dialog from './../js/dialog.js';
+import bridge from './../js/bridge';
 
-TABS.firmware_flasher = {};
-TABS.firmware_flasher.initialize = function (callback) {
+const firmwareFlasherTab = {};
 
-    if (GUI.active_tab != 'firmware_flasher') {
-        GUI.active_tab = 'firmware_flasher';
+firmwareFlasherTab.initialize = function (callback) {
+
+    if (GUI.active_tab !== this) {
+        GUI.active_tab = this;
     }
 
     var intel_hex = false, // standard intel hex in string format
@@ -113,7 +114,7 @@ TABS.firmware_flasher.initialize = function (callback) {
             buildBoardOptions();
             GUI.log(i18n.getMessage('toggledRCs'));
             if (selectedTarget === "0") {
-                TABS.firmware_flasher.getTarget();
+                firmwareFlasherTab.getTarget();
             } else {
                 $('select[name="board"] option[value=' + selectedTarget + ']').attr("selected", "selected");
                 $('select[name="board"]').trigger('change');
@@ -151,7 +152,7 @@ TABS.firmware_flasher.initialize = function (callback) {
             var sortedTargets = [];
             var unsortedTargets = [];
 
-            TABS.firmware_flasher.releasesData.forEach(function(release){
+            firmwareFlasherTab.releasesData.forEach(function(release){
                 release.assets.forEach(function(asset){
                     var result = parseFilename(asset.name);
 
@@ -166,7 +167,7 @@ TABS.firmware_flasher.initialize = function (callback) {
 
             if (showDevReleases) {
                 var majorCount = {};
-                TABS.firmware_flasher.devReleasesData.forEach(function (release) {
+                firmwareFlasherTab.devReleasesData.forEach(function (release) {
                     release.assets.forEach(function (asset) {
                         var result = parseDevFilename(asset.name);
 
@@ -183,7 +184,7 @@ TABS.firmware_flasher.initialize = function (callback) {
                 releases[release] = [];
             });
 
-            TABS.firmware_flasher.releasesData.forEach(function(release){
+            firmwareFlasherTab.releasesData.forEach(function(release){
 
                 var versionFromTagExpression = /v?(.*)/;
                 var matchVersionFromTag = versionFromTagExpression.exec(release.tag_name);
@@ -224,9 +225,9 @@ TABS.firmware_flasher.initialize = function (callback) {
                 });
             });
 
-            if(showDevReleases && TABS.firmware_flasher.devReleasesData) {
+            if(showDevReleases && firmwareFlasherTab.devReleasesData) {
                 var majorCount = {};
-                TABS.firmware_flasher.devReleasesData.forEach(function(release){
+                firmwareFlasherTab.devReleasesData.forEach(function(release){
                     var major = getReleaseMajor(release.name);
 
                     if (!(major in majorCount)) {
@@ -296,16 +297,16 @@ TABS.firmware_flasher.initialize = function (callback) {
                         }
                     });
                 });
-            TABS.firmware_flasher.releases = releases;
+            firmwareFlasherTab.releases = releases;
             const end = performance.now();
             console.log(`buildBoardOptions: ${end - start} ms`)
             return;
         };
 
         $.get('https://api.github.com/repos/iNavFlight/inav-nightly/releases?per_page=50', function(releasesData) {
-            TABS.firmware_flasher.devReleasesData = releasesData;
+            firmwareFlasherTab.devReleasesData = releasesData;
         }).fail(function (data){
-            TABS.firmware_flasher.devReleasesData = {};
+            firmwareFlasherTab.devReleasesData = {};
             if (data["responseJSON"]){
                 GUI.log("<b>GITHUB Query Failed: <code>{0}</code></b>".format(data["responseJSON"].message));
             }
@@ -316,7 +317,7 @@ TABS.firmware_flasher.initialize = function (callback) {
 
 
         $.get('https://api.github.com/repos/iNavFlight/inav/releases?per_page=10', function (releasesData){
-            TABS.firmware_flasher.releasesData = releasesData;
+            firmwareFlasherTab.releasesData = releasesData;
             buildBoardOptions(releasesData);
 
             // bind events
@@ -339,8 +340,8 @@ TABS.firmware_flasher.initialize = function (callback) {
                         versions_e.append($("<option value='0'>{0} {1}</option>".format(i18n.getMessage('firmwareFlasherOptionLabelSelectFirmwareVersionFor'), target)));
                     }
 
-                    if (typeof TABS.firmware_flasher.releases[target]?.forEach === 'function') {
-                        TABS.firmware_flasher.releases[target].forEach(function(descriptor) {
+                    if (typeof firmwareFlasherTab.releases[target]?.forEach === 'function') {
+                        firmwareFlasherTab.releases[target].forEach(function(descriptor) {
                             var select_e =
                                     $("<option value='{0}'>{0} - {1} - {2} ({3})</option>".format(
                                             descriptor.version,
@@ -356,7 +357,7 @@ TABS.firmware_flasher.initialize = function (callback) {
             });
 
             $('a.auto_select_target').removeClass('disabled');
-            TABS.firmware_flasher.getTarget();
+            firmwareFlasherTab.getTarget();
         }).fail(function (data){
             if (data["responseJSON"]){
                 GUI.log("<b>GITHUB Query Failed: <code>{0}</code></b>".format(data["responseJSON"].message));
@@ -376,25 +377,23 @@ TABS.firmware_flasher.initialize = function (callback) {
                     return;
                 }
 
-                let filename;
-                if (result.filePaths.length == 1) {
-                    filename = result.filePaths[0];
+                let file;
+                if (result.files.length == 1) {
+                    file = result.files[0];
                 }
                 
                 $('div.git_info').slideUp();
 
-                console.log('Loading file from: ' + filename);
-
-                window.electronAPI.readFile(filename).then(response => {
+                bridge.readFile(file).then(response => {
 
                     if (response.error) {
-                        console.log("Error loading local file", response.erroe);
+                        console.log("Error loading local file", response.error);
                         return;
                     }
 
                     console.log('File loaded');
 
-                    parse_hex(response.data.toString(), function (data) {
+                    parse_hex(response.data, function (data) {
                         parsed_hex = data;
 
                         if (parsed_hex) {
@@ -505,7 +504,10 @@ TABS.firmware_flasher.initialize = function (callback) {
             if (summary) { // undefined while list is loading or while running offline
                 fileName = summary.file;
                 $(".load_remote_file").text(i18n.getMessage('firmwareFlasherButtonLoading')).addClass('disabled');
-                $.get(summary.url, function (data) {
+                
+                const url = bridge.proxy(summary.url);
+                
+                $.get(url, function (data) {
                     enable_load_online_button();
                     process_hex(data, summary);
                 }).fail(failed_to_load);
@@ -577,10 +579,10 @@ TABS.firmware_flasher.initialize = function (callback) {
                 if (result.canceled) {
                     return;
                 }
-                fs.writeFileSync(result.filePath, intel_hex, (err) => {
-                    if (err) {
+                bridge.writeFile(result.filePath, intel_hex).then(error => {
+                    if (error) {
                         GUI.log(i18n.getMessage('ErrorWritingFile'));
-                        return console.error(err);
+                        return console.error(error);
                     }
                 });
                 let sFilename = String(result.filePath.split('\\').pop().split('/').pop());
@@ -589,7 +591,7 @@ TABS.firmware_flasher.initialize = function (callback) {
         });
 
         
-        if (store.get('no_reboot_sequence', false)) {
+        if (bridge.storeGet('no_reboot_sequence', false)) {
             $('input.updating').prop('checked', true);
             $('.flash_on_connect_wrapper').show();
         } else {
@@ -607,12 +609,12 @@ TABS.firmware_flasher.initialize = function (callback) {
                 $('.flash_on_connect_wrapper').hide();
             }
 
-            store.set('no_reboot_sequence', status);
+            bridge.storeSet('no_reboot_sequence', status);
         });
 
         $('input.updating').trigger('change');
         
-        if (store.get('flash_manual_baud', false)) {
+        if (bridge.storeGet('flash_manual_baud', false)) {
             $('input.flash_manual_baud').prop('checked', true);
         } else {
             $('input.flash_manual_baud').prop('checked', false);
@@ -621,25 +623,25 @@ TABS.firmware_flasher.initialize = function (callback) {
         // bind UI hook so the status is saved on change
         $('input.flash_manual_baud').on('change', function () {
             var status = $(this).is(':checked');
-            store.set('flash_manual_baud', status);
+            bridge.storeSet('flash_manual_baud', status);
         });
 
         $('input.flash_manual_baud').trigger('change');
         
 
-        var flash_manual_baud_rate = store.get('flash_manual_baud_rate', '');
+        var flash_manual_baud_rate = bridge.storeGet('flash_manual_baud_rate', '');
         $('#flash_manual_baud_rate').val(flash_manual_baud_rate);
 
         // bind UI hook so the status is saved on change
         $('#flash_manual_baud_rate').on('change', function () {
             var baud = parseInt($('#flash_manual_baud_rate').val());
-            store.set('flash_manual_baud_rate', baud);
+            bridge.storeSet('flash_manual_baud_rate', baud);
         });
 
         $('input.flash_manual_baud_rate').trigger('change');
 
         
-        if (store.get('flash_on_connect', false)) {
+        if (bridge.storeGet('flash_on_connect', false)) {
             $('input.flash_on_connect').prop('checked', true);
         } else {
             $('input.flash_on_connect').prop('checked', false);
@@ -675,12 +677,12 @@ TABS.firmware_flasher.initialize = function (callback) {
                 PortHandler.flush_callbacks();
             }
 
-            store.set('flash_on_connect', status);
+            bridge.storeSet('flash_on_connect', status);
         }).trigger('change');
         
 
         
-        if (store.get('erase_chip', false)) {
+        if (bridge.storeGet('erase_chip', false)) {
             $('input.erase_chip').prop('checked', true);
         } else {
             $('input.erase_chip').prop('checked', false);
@@ -688,7 +690,7 @@ TABS.firmware_flasher.initialize = function (callback) {
 
         // bind UI hook so the status is saved on change
         $('input.erase_chip').on('change', async function () {
-            store.set('erase_chip', $(this).is(':checked'));
+            bridge.storeSet('erase_chip', $(this).is(':checked'));
         });
 
         $('input.erase_chip').trigger('change');
@@ -703,19 +705,19 @@ TABS.firmware_flasher.initialize = function (callback) {
         });
 
         $('a.auto_select_target').on('click', function () {
-            TABS.firmware_flasher.getTarget();
+            firmwareFlasherTab.getTarget();
         });
 
         GUI.content_ready(callback);
     }));
 };
 
-TABS.firmware_flasher.FLASH_MESSAGE_TYPES = {NEUTRAL : 'NEUTRAL',
+firmwareFlasherTab.FLASH_MESSAGE_TYPES = {NEUTRAL : 'NEUTRAL',
                                              VALID   : 'VALID',
                                              INVALID : 'INVALID',
                                              ACTION  : 'ACTION'};
 
-TABS.firmware_flasher.flashingMessage = function(message, type) {
+firmwareFlasherTab.flashingMessage = function(message, type) {
     let self = this;
 
     let progressLabel_e = $('span.progressLabel');
@@ -744,13 +746,13 @@ TABS.firmware_flasher.flashingMessage = function(message, type) {
     return self;
 };
 
-TABS.firmware_flasher.flashProgress = function(value) {
+firmwareFlasherTab.flashProgress = function(value) {
     $('.progress').val(value);
 
     return this;
 };
 
-TABS.firmware_flasher.cleanup = function (callback) {
+firmwareFlasherTab.cleanup = function (callback) {
     PortHandler.flush_callbacks();
 
     // unbind "global" events
@@ -760,7 +762,7 @@ TABS.firmware_flasher.cleanup = function (callback) {
     if (callback) callback();
 };
 
-TABS.firmware_flasher.getTarget = function() {
+firmwareFlasherTab.getTarget = function() {
     GUI.log(i18n.getMessage('automaticTargetSelect'));
     
     var selected_baud = parseInt($('#baud').val());
@@ -774,9 +776,9 @@ TABS.firmware_flasher.getTarget = function() {
             GUI.connecting_to = selected_port;
 
             if (selected_port == 'tcp' || selected_port == 'udp') {
-                CONFIGURATOR.connection.connect($portOverride.val(), {}, TABS.firmware_flasher.onOpen);
+                CONFIGURATOR.connection.connect($portOverride.val(), {}, firmwareFlasherTab.onOpen);
             } else {
-                CONFIGURATOR.connection.connect(selected_port, {bitrate: selected_baud}, TABS.firmware_flasher.onOpen);
+                CONFIGURATOR.connection.connect(selected_port, {bitrate: selected_baud}, firmwareFlasherTab.onOpen);
             }
         }
     } else {
@@ -784,7 +786,7 @@ TABS.firmware_flasher.getTarget = function() {
     }
 };
 
-TABS.firmware_flasher.onOpen = async function(openInfo) {
+firmwareFlasherTab.onOpen = async function(openInfo) {
     if (openInfo) {
         GUI.connected_to = GUI.connecting_to;
 
@@ -792,20 +794,20 @@ TABS.firmware_flasher.onOpen = async function(openInfo) {
         GUI.connecting_to = false;
 
         // save selected port with chrome.storage if the port differs
-        var last_used_port = store.get('last_used_port', '');
+        var last_used_port = bridge.storeGet('last_used_port', '');
         if (last_used_port) {
             if (last_used_port != GUI.connected_to) {
                 // last used port doesn't match the one found in local db, we will store the new one
-                store.set('last_used_port', GUI.connected_to);
+                bridge.storeSet('last_used_port', GUI.connected_to);
             }
         } else {
             // variable isn't stored yet, saving
-            store.set('last_used_port', GUI.connected_to);
+            bridge.storeSet('last_used_port', GUI.connected_to);
         }
         
 
-        store.set('last_used_bps', CONFIGURATOR.connection.bitrate);
-        store.set('wireless_mode_enabled', $('#wireless-mode').is(":checked"));
+        bridge.storeSet('last_used_bps', CONFIGURATOR.connection.bitrate);
+        bridge.storeSet('wireless_mode_enabled', $('#wireless-mode').is(":checked"));
 
         CONFIGURATOR.connection.addOnReceiveListener(SerialBackend.read_serial);
 
@@ -814,7 +816,7 @@ TABS.firmware_flasher.onOpen = async function(openInfo) {
             if (!CONFIGURATOR.connectionValid) {
                 GUI.log(i18n.getMessage('targetPrefetchFail') + i18n.getMessage('noConfigurationReceived'));
 
-                TABS.firmware_flasher.closeTempConnection();
+                firmwareFlasherTab.closeTempConnection();
             }
         }, 10000);
 
@@ -836,19 +838,19 @@ TABS.firmware_flasher.onOpen = async function(openInfo) {
                     MSP.send_message(MSPCodes.MSP_FC_VERSION, false, false, function () {
                         if (semver.lt(FC.CONFIG.flightControllerVersion, "5.0.0")) {
                             GUI.log(i18n.getMessage('targetPrefetchFailOld'));
-                            TABS.firmware_flasher.closeTempConnection();
+                            firmwareFlasherTab.closeTempConnection();
                         } else {
                             mspHelper.getCraftName(function(name) {
                                 if (name) {
                                     FC.CONFIG.name = name;
                                 }
-                                TABS.firmware_flasher.onValidFirmware();  
+                                firmwareFlasherTab.onValidFirmware();  
                             });
                         }
                     });
                 } else {
                     GUI.log(i18n.getMessage('targetPrefetchFailNonINAV'));
-                    TABS.firmware_flasher.closeTempConnection();
+                    firmwareFlasherTab.closeTempConnection();
                 }
             });
         });
@@ -858,7 +860,7 @@ TABS.firmware_flasher.onOpen = async function(openInfo) {
     }
 };
 
-TABS.firmware_flasher.onValidFirmware = function() {
+firmwareFlasherTab.onValidFirmware = function() {
     MSP.send_message(MSPCodes.MSP_BUILD_INFO, false, false, function () {
         MSP.send_message(MSPCodes.MSP_BOARD_INFO, false, false, function () {
             var boardSelect = $('select[name="board"]');
@@ -866,7 +868,7 @@ TABS.firmware_flasher.onValidFirmware = function() {
 
             GUI.log(i18n.getMessage('targetPrefetchsuccessful') + FC.CONFIG.target);
 
-            TABS.firmware_flasher.closeTempConnection();
+            firmwareFlasherTab.closeTempConnection();
 
             // Only trigger change if the board was actually found and selected
             if (boardSelect.val() === FC.CONFIG.target) {
@@ -876,7 +878,7 @@ TABS.firmware_flasher.onValidFirmware = function() {
     });
 };
 
-TABS.firmware_flasher.closeTempConnection = function() {
+firmwareFlasherTab.closeTempConnection = function() {
     timeout.killAll();
     interval.killAll(['global_data_refresh', 'msp-load-update', 'ltm-connection-check']);
 
@@ -892,3 +894,5 @@ TABS.firmware_flasher.closeTempConnection = function() {
     CONFIGURATOR.connection.disconnect();
     MSP.disconnect_cleanup();
 };
+
+export default firmwareFlasherTab;

@@ -29,6 +29,30 @@
     "language": {
         "message": "Language"
     },
+    "close": {
+        "message": "Close"
+    },
+    "browserCheckNotificationHeader": {
+        "message": "Browser not supported"
+    },
+    "browserCheckNotificationDescription": {
+        "message": "Your browser does not support all features required by INAV Configurator Web version. Please use a different browser (latest version of Chrome, Edge or Opera) or install the <a href=\"https://www.google.com/chrome/\" target=\"_blank\">latest version of Chrome</a>.<br><br>The following features are not supported:<br><br>"
+    },
+    "browserNotSupportedSerial": {
+        "message": "Web Serial API (Serial Port access)"
+    },
+    "browserNotSupportedUsb": {
+        "message": "Web USB API (DFU Device access)"
+    },
+    "browserNotSupportedBle": {
+        "message": "Web Bluetooth API (BLE Device access)"
+    },
+    "pwaUpdateNeedRefreshMessage": {    
+        "message": "A new version of the application is available. Do you want to update now?<br><br> This will refresh the page, unsaved changes will be lost.<br>You can also update later by refreshing the page manually."
+    },
+    "pwaOfflineReadyMessage": {
+        "message": "The application is ready to work offline. "
+    },
     "options_title": {
         "message": "Application Options"
     },
@@ -188,6 +212,39 @@
     "sitlResetDemoModeData": {
         "message": "Reset Demo Mode"
     },
+    "sitlDownloadEeprom": {
+        "message": "Download EEPROM"
+    },
+    "sitlDeleteEeprom": {
+        "message": "Delete EEPROM"
+    },
+    "sitlEepromFileName": {
+        "message": "EEPROM File Name"
+    },
+    "sitlEepromActions": {
+        "message": "Actions"
+    },
+    "sitlWebAssemblyInfo": {
+        "message": "<br/><h4>SITL WebAssembly</h4><br/>SITL WebAssembly allows you to run INAV SITL directly in the browser without the need to install any additional software. <br/>This feature is <b>experimental</b> and may not work on all systems. If you encounter problems, please use the traditional SITL method and download the standalone Configurator for your system.<br/><b>Note:</b> The first start may take a while as the WebAssembly module needs to be downloaded and initialized.<br/>For Network functionality (UARTS 2-8, Simulator), a Websocket-To-Socket proxy server is necessary, please refer to <a href=\"https://github.com/iNavFlight/inav/blob/master/docs/SITL/SITL.md\">INAV SITL Documentation</a>."
+    },
+    "sitlEnableWasmProxy": {
+        "message": "Enable WebAssembly Proxy"
+    },
+    "sitlEnableWasmProxyHelp": {
+        "message": "If enabled, SITL tries to connect to a Websocket to Socket proxy running on the specified port. The proxy forwards data between SITL WebAssembly and the simulator running on the host system. If disabled all network functions (Simulator and UART 2-8) are disabled."
+    },
+    "sitlWasmProxyPort": {
+        "message": "WebAssembly Proxy Port"
+    },
+    "sitlWasmProxyPortHelp": {
+        "message": "Port number of the Websocket to Socket proxy running on the host system."
+    },
+    "sitlEepromFiles"   : {
+        "message": "EEPROM Files"
+    },
+    "sitlEepromFilesHelp": {
+        "message": "Here you can manage EEPROM files for SITL. You can download or delete existing EEPROM files."
+    },
     "sitlOSNotSupported": {
         "message": "SITL is not supported on this operating system."
     },
@@ -304,6 +361,12 @@
     },
     "serialPortOpened": {
         "message": "MSP connection <span style=\"color: #37a8db\">successfully</span> opened with ID: $1"
+    },
+    "webSerialPermission" : {
+        "message": "Allow serial device"
+    },
+    "webDfuPermission": {
+        "message": "Allow DFU device"
     },
     "serialPortOpenFail": {
         "message": "<span style=\"color: red\">Failed</span> to open MSP connection"
@@ -3055,6 +3118,9 @@
     },
     "OK": {
         "message": "OK"
+    },
+    "Cancel" : {
+        "message": "Cancel"
     },
     "accCalibrationStartTitle": {
         "message": "Accelerometer Calibration"

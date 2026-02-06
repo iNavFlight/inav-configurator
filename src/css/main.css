@@ -1120,12 +1120,53 @@ li.active .ic_mag {
 dialog {
     background-color: white;
     padding: 1em;
-    height: auto;
     margin: auto auto;
     position: absolute;
-    width: 50%;
-    border-radius: 3px;
+    width: 35em;
+    border-radius: 6px;
     border: 1px solid silver;
+}
+
+dialog .dialog-alert {
+    width: 40em;
+    border-radius: 5px;
+    height: fit-content;
+}
+
+.dialog-main .dialog-buttons {
+    display: flex;
+    justify-content: center;
+    margin-top: 1em;
+}
+
+.dialog-main h3 {
+    margin-bottom: 0.5em;
+}
+
+.dialog-main .regular-button {
+    margin-top: 8px;
+    margin-bottom: 8px;
+    margin-right: 10px;
+    background-color: #37a8db;
+    border-radius: 3px;
+    border: 1px solid #3599bc;
+    color: #fff;
+    font-family: 'open_sansbold', Arial;
+    font-size: 12px;
+    text-shadow: 0px 1px rgba(0, 0, 0, 0.25);
+    display: inline-block;
+    cursor: pointer;
+    transition: all ease 0.2s;
+    padding: 0px;
+    padding-left: 9px;
+    padding-right: 9px;
+    line-height: 28px;
+    min-width: 80px;
+}
+
+.dialog-main .regular-button:hover {
+    background-color: #3599bc;
+    transition: all ease 0.2s;
 }
 
 /* Border of the Tab */

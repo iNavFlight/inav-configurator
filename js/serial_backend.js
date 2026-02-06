@@ -2,7 +2,7 @@
 
 import semver from 'semver';
 
-import { GUI, TABS } from './gui';
+import GUI from './gui';
 import MSP from './msp';
 import FC from './fc';
 import MSPCodes from './msp/MSPCodes';
@@ -25,7 +25,13 @@ import jBox from 'jbox';
 import groundstation from './groundstation';
 import ltmDecoder from './ltmDecoder';
 import mspDeduplicationQueue from './msp/mspDeduplicationQueue';
-import store from './store';
+import bridge from './bridge';
+import {resquestDfuPermission} from './web/dfu' 
+import configurationTab from '../tabs/configuration';
+import cliTab from '../tabs/cli';
+
+import SITLWebAssembly from './web/SITL-Webassembly';
+import { time } from 'three/tsl';
 
 var SerialBackend = (function () {
 
@@ -101,7 +107,7 @@ var SerialBackend = (function () {
                         //noinspection JSUnresolvedVariable
                         GUI.log(i18n.getMessage('deviceReady'));
                         //noinspection JSValidateTypes
-                        TABS.configuration.initialize(false, $('#content').scrollTop());
+                        configurationTab.initialize(false, $('#content').scrollTop());
                     });
                 },1500); // 1500 ms seems to be just the right amount of delay to prevent data request timeouts
             }
@@ -111,37 +117,43 @@ var SerialBackend = (function () {
 
         GUI.updateManualPortVisibility = function(){
             var selected_port = privateScope.$port.find('option:selected');
-            if (selected_port.data().isManual || selected_port.data().isTcp || selected_port.data().isUdp) {
+
+            const data = selected_port.data() || {};
+
+            if (data.isManual || data.isTcp || data.isUdp) {
                 $('#port-override-option').show();
             }
             else {
                 $('#port-override-option').hide();
             }
 
-            if (selected_port.data().isTcp || selected_port.data().isUdp) {
+            if (data.isTcp || data.isUdp) {
                 $('#port-override-label').text("IP:Port");
             } else {
                 $('#port-override-label').text("Port");
             }
 
-            if (selected_port.data().isDFU || selected_port.data().isBle || selected_port.data().isTcp || selected_port.data().isUdp || selected_port.data().isSitl) {
+            if (data.isDFU || data.isBle || data.isTcp || data.isUdp || data.isSitl) {
                 privateScope.$baud.hide();
             }
             else {
                 privateScope.$baud.show();
             }        
 
-            if (selected_port.data().isBle || selected_port.data().isTcp || selected_port.data().isUdp || selected_port.data().isSitl) {
+            if (data.isBle || data.isTcp || data.isUdp || data.isSitl) {
                 $('.tab_firmware_flasher').hide();
             } else {
                 $('.tab_firmware_flasher').show();
             }
             var type = ConnectionType.Serial;
-            if (selected_port.data().isBle) {
+
+            if (!bridge.isElectron && data.isSitl) {
+                type = ConnectionType.serialEXT
+            } else if (data.isBle) {
                 type = ConnectionType.BLE;
-            } else if (selected_port.data().isTcp || selected_port.data().isSitl) {
+            } else if (data.isTcp || data.isSitl) {
                 type = ConnectionType.TCP;
-            } else if (selected_port.data().isUdp) {
+            } else if (data.isUdp) {
                 type = ConnectionType.UDP;
             } 
             CONFIGURATOR.connection = connectionFactory(type, CONFIGURATOR.connection);
@@ -151,16 +163,28 @@ var SerialBackend = (function () {
         GUI.updateManualPortVisibility();
 
         publicScope.$portOverride.on('change', function () {
-            store.set('portOverride', publicScope.$portOverride.val());
+            bridge.storeSet('portOverride', publicScope.$portOverride.val());
         });
         
-        publicScope.$portOverride.val(store.get('portOverride', ''));        
+        publicScope.$portOverride.val(bridge.storeGet('portOverride', ''));        
 
         privateScope.$port.on('change', function (target) {
-            GUI.updateManualPortVisibility();
+            if (!bridge.isElectron) {
+                const selected_port = privateScope.$port.find('option:selected');
+                if (selected_port.data().isWebPermission) {
+                    bridge.requestWebSerialPermission().then(() => GUI.updateManualPortVisibility());
+                }
+
+                if (selected_port.data().isDfuPermission) {
+                    resquestDfuPermission().then(() => GUI.updateManualPortVisibility());
+                }
+
+            } else {
+                GUI.updateManualPortVisibility();
+            }
         });
 
-    $('div.connect_controls a.connect').click(function () {
+    $('div.connect_controls a.connect').on('click', function () {
 
         if (groundstation.isActivated()) {
             groundstation.deactivate();
@@ -189,39 +213,54 @@ var SerialBackend = (function () {
                         if (selected_port == 'tcp' || selected_port == 'udp') {
                             CONFIGURATOR.connection.connect(publicScope.$portOverride.val(), {}, privateScope.onOpen);
                         } else if (selected_port == 'sitl') {
-                            CONFIGURATOR.connection.connect("127.0.0.1:5760", {}, privateScope.onOpen);
-                        } else if (selected_port == 'sitl-demo') {
-                            SITLProcess.stop();
-                            SITLProcess.start("demo.bin");                        
-                            this.isDemoRunning = true;
-
-                            // Wait 1 sec until SITL is ready
-                            setTimeout(() => {
+                            if (bridge.isElectron) {
                                 CONFIGURATOR.connection.connect("127.0.0.1:5760", {}, privateScope.onOpen);
-                            }, 1000);
+                            } else {
+                                CONFIGURATOR.connection.connect(0, {}, privateScope.onOpen);
+                            }
+                        } else if (selected_port == 'sitl-demo') {
+                            if (bridge.isElectron) {
+                                SITLProcess.stop();
+                                SITLProcess.start("demo.bin");
+
+                                this.isDemoRunning = true;
+                                // Wait 1 sec until SITL is ready
+                                setTimeout(() => {
+                                    CONFIGURATOR.connection.connect("127.0.0.1:5760", {}, privateScope.onOpen);
+                                }, 1000);
+                            }  else {
+                                SITLWebAssembly.reset();
+                                SITLWebAssembly.start({
+                                    eepromFile: "demo.bin",
+                                    proxyPort: 0 // disable proxy server
+                                }, (err, cmd) => {
+                                    if (err) {
+                                        GUI.log(`SITL WASM start error: ${err.message}`);
+                                    } else {
+                                        GUI.log(`SITL WASM started with command: ${cmd}`);
+                                        this.isDemoRunning = true;
+                                    }
+                                });
+                                
+
+                                // Wait 7 sec until SITL is ready
+                                setTimeout(() => {
+                                    CONFIGURATOR.connection.connect(0, {}, privateScope.onOpen);
+                                }, 1000);
+                            }
+
+                            
                         } else {
                             CONFIGURATOR.connection.connect(selected_port, {bitrate: selected_baud}, privateScope.onOpen);
                         }
                     } else {
-                        // Check for unsaved changes in JavaScript Programming tab
-                        if (GUI.active_tab === 'javascript_programming' &&
-                            TABS.javascript_programming &&
-                            TABS.javascript_programming.isDirty) {
-                            console.log('[Disconnect] Checking for unsaved changes in JavaScript Programming tab');
-                            const confirmMsg = i18n.getMessage('unsavedChanges') ||
-                                'You have unsaved changes. Leave anyway?';
-
-                            if (!confirm(confirmMsg)) {
-                                console.log('[Disconnect] User cancelled disconnect due to unsaved changes');
-                                return; // Cancel disconnect
-                            }
-                            console.log('[Disconnect] User confirmed, proceeding with disconnect');
-                            // Clear isDirty flag so tab switch during disconnect doesn't show warning again
-                            TABS.javascript_programming.isDirty = false;
-                        }
 
                         if (this.isDemoRunning) {
-                            SITLProcess.stop();
+                            if (bridge.isElectron) {
+                                SITLProcess.stop();
+                            } else {
+                                SITLWebAssembly.reset();
+                            }
                             this.isDemoRunning = false;
                         }
 
@@ -290,7 +329,7 @@ var SerialBackend = (function () {
 
     privateScope.onValidFirmware = function ()
     {
-    MSP.send_message(MSPCodes.MSP_BUILD_INFO, false, false, function () {
+        MSP.send_message(MSPCodes.MSP_BUILD_INFO, false, false, function () {
 
         GUI.log(i18n.getMessage('buildInfoReceived', [FC.CONFIG.buildInfo]));
 
@@ -311,7 +350,6 @@ var SerialBackend = (function () {
 
                 $('#tabs ul.mode-connected .tab_setup a').trigger( "click" );
 
-                GUI.updateEzTuneTabVisibility(true);
                 update.firmwareVersion();
             });
         });
@@ -360,25 +398,20 @@ var SerialBackend = (function () {
             GUI.log(i18n.getMessage('serialPortOpened', [openInfo.connectionId]));
 
             // save selected port if the port differs
-            var last_used_port = store.get('last_used_port', false);
+            var last_used_port = bridge.storeGet('last_used_port', false);
             if (last_used_port) {
                 if (last_used_port != GUI.connected_to) {
                     // last used port doesn't match the one found in local db, we will store the new one
-                    store.set('last_used_port', GUI.connected_to);
+                    bridge.storeSet('last_used_port', GUI.connected_to);
                 }
             } else {
                 // variable isn't stored yet, saving
-                store.set('last_used_port', GUI.connected_to);
+                bridge.storeSet('last_used_port', GUI.connected_to);
             }
         
 
-            store.set('last_used_bps', CONFIGURATOR.connection.bitrate);
-            store.set('wireless_mode_enabled', $('#wireless-mode').is(":checked"));
-
-            // Reset state BEFORE adding receive listeners to ensure any
-            // garbage bytes or boot messages don't corrupt the MSP decoder
-            FC.resetState();
-            MSP.disconnect_cleanup();
+            bridge.storeSet('last_used_bps', CONFIGURATOR.connection.bitrate);
+            bridge.storeSet('wireless_mode_enabled', $('#wireless-mode').is(":checked"));
 
             CONFIGURATOR.connection.addOnReceiveListener(publicScope.read_serial);
             CONFIGURATOR.connection.addOnReceiveListener(ltmDecoder.read);
@@ -406,6 +439,8 @@ var SerialBackend = (function () {
                     groundstation.activate($('#main-wrapper'));
                 }
             }, 1000);
+
+            FC.resetState();
 
             // request configuration data. Start with MSPv1 and
             // upgrade to MSPv2 if possible.
@@ -524,7 +559,7 @@ var SerialBackend = (function () {
         if (!CONFIGURATOR.cliActive) {
             MSP.read(info);
         } else if (CONFIGURATOR.cliActive) {
-            TABS.cli.read(info);
+            cliTab.read(info);
         }
     }
 

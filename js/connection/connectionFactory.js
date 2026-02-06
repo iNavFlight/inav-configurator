@@ -5,6 +5,7 @@ import ConnectionBle from './connectionBle';
 import ConnectionSerial from './connectionSerial';
 import ConnectionTcp from './connectionTcp';
 import ConnectionUdp from './connectionUdp';
+import ConnectionExt from './connectionExt.js';
 
 var connectionFactory = function(type, instance) {
     if (instance && (instance.type == type || instance.connectionId)){
@@ -24,6 +25,9 @@ var connectionFactory = function(type, instance) {
         default:
         case ConnectionType.Serial:
             instance = new ConnectionSerial();
+            break;
+        case ConnectionType.serialEXT:
+            instance = new ConnectionExt();
             break;
     }
     return instance;

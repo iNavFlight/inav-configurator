@@ -1,5 +1,6 @@
 "use strict";
 
+import $ from 'jquery';
 import noUiSlider from 'nouislider';
 
 var

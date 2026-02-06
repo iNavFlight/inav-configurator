@@ -3,6 +3,7 @@
 import { getLength } from 'ol/sphere';
 import { LineString } from 'ol/geom';
 import { fromLonLat } from 'ol/proj';
+import  bridge from './bridge.js';
 
 import MWNP from './mwnp';
 import Waypoint from './waypoint';
@@ -458,7 +459,7 @@ let WaypointCollection = function () {
         point2measure.forEach(function (item) {
             coordList += item + '|';
         });
-        const response = await fetch('https://api.opentopodata.org/v1/aster30m?locations='+coordList+'&samples='+String(samples+1));
+        const response = await fetch(bridge.proxy('https://api.opentopodata.org/v1/aster30m?locations='+coordList+'&samples='+String(samples+1)));
         const myJson = await response.json();
 
         if (myJson.status == "OK") {

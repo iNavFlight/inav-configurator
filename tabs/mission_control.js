@@ -37,7 +37,7 @@ import mspHelper from './../js/msp/MSPHelper';
 import MSPCodes from './../js/msp/MSPCodes';
 import MSP from './../js/msp';
 import mspQueue from './../js/serial_queue';
-import { GUI, TABS } from './../js/gui';
+import GUI from './../js/gui';
 import FC from './../js/fc';
 import CONFIGURATOR from './../js/data_storage';
 import i18n from './../js/localization';
@@ -53,10 +53,11 @@ import SerialBackend from './../js/serial_backend';
 import { distanceOnLine, wrap_360, calculate_new_cooridatnes } from './../js/helpers';
 import interval from './../js/intervals';
 import { Geozone, GeozoneVertex, GeozoneType, GeozoneShapes, GeozoneFenceAction }  from './../js/geozone';
-import store from './../js/store';
 import dialog from '../js/dialog';
+import bridge from './../js/bridge';
 
 import html from'./mission_control.html?raw';
+import { mul } from 'three/tsl';
 
 var MAX_NEG_FW_LAND_ALT = -2000; // cm
 
@@ -109,9 +110,9 @@ const icons = Object.create(null)
 //
 ////////////////////////////////////
 
-TABS.mission_control = {};
-TABS.mission_control.isYmapLoad = false;
-TABS.mission_control.initialize = function (callback) {
+const missionControlTab = {};
+missionControlTab.isYmapLoad = false;
+missionControlTab.initialize = function (callback) {
 
     let cursorInitialized = false;
     let curPosStyle;
@@ -135,8 +136,8 @@ TABS.mission_control.initialize = function (callback) {
     let isGeozoneEnabeld = false;
     let settings = {speed: 0, alt: 5000, safeRadiusSH: 50, fwApproachAlt: 60, fwLandAlt: 5, maxDistSH: 0, fwApproachLength: 0, fwLoiterRadius: 0};
 
-    if (GUI.active_tab != 'mission_control') {
-        GUI.active_tab = 'mission_control';
+    if (GUI.active_tab !== this) {
+        GUI.active_tab = this;
     }
 
     if (FC.isFeatureEnabled('GEOZONE')) {
@@ -543,7 +544,7 @@ function iconKey(filename) {
     //
     /////////////////////////////////////////////
     function loadSettings() {
-        const missionPlannerSettings = store.get('missionPlannerSettings', false);
+        const missionPlannerSettings = bridge.storeGet('missionPlannerSettings', false);
         if (missionPlannerSettings) {
             if (!missionPlannerSettings.fwApproachLength && settings.fwApproachLength) {
                 missionPlannerSettings.fwApproachLength = settings.fwApproachLength;
@@ -557,7 +558,7 @@ function iconKey(filename) {
     }
 
     function saveSettings() {
-        store.set('missionPlannerSettings', settings);
+        bridge.storeSet('missionPlannerSettings', settings);
     }
 
     function refreshSettings() {
@@ -1428,8 +1429,8 @@ function iconKey(filename) {
                     return;
                 }
 
-                if (result.filePaths.length == 1) {
-                    loadMissionFile(result.filePaths[0]);
+                if (result.files.length == 1) {
+                    loadMissionFile(result.files[0]);
                     multimissionCount = 0;
                     multimission.flush();
                     renderMultimissionTable();
@@ -2463,7 +2464,7 @@ function iconKey(filename) {
         // save map view settings when user moves it
         //////////////////////////////////////////////////////////////////////////
         map.on('moveend', function (evt) {
-            store.set('missionPlannerLastValues', {
+            bridge.storeSet('missionPlannerLastValues', {
                 center: toLonLat(map.getView().getCenter()),
                 zoom: map.getView().getZoom()
             });
@@ -2471,7 +2472,7 @@ function iconKey(filename) {
         //////////////////////////////////////////////////////////////////////////
         // load map view settings on startup
         //////////////////////////////////////////////////////////////////////////
-        const missionPlannerLastValues = store.get('missionPlannerLastValues', false);
+        const missionPlannerLastValues = bridge.storeGet('missionPlannerLastValues', false);
         if (missionPlannerLastValues && missionPlannerLastValues.zoom && missionPlannerLastValues.center) {
             map.getView().setCenter(fromLonLat(missionPlannerLastValues.center));
             map.getView().setZoom(missionPlannerLastValues.zoom);
@@ -2521,11 +2522,11 @@ function iconKey(filename) {
 
                 let P3Value = selectedMarker.getP3();
 
-                changeSwitch($('#pointP3Alt'), TABS.mission_control.isBitSet(P3Value, MWNP.P3.ALT_TYPE));
-                changeSwitch($('#pointP3UserAction1'), TABS.mission_control.isBitSet(P3Value, MWNP.P3.USER_ACTION_1));
-                changeSwitch($('#pointP3UserAction2'), TABS.mission_control.isBitSet(P3Value, MWNP.P3.USER_ACTION_2));
-                changeSwitch($('#pointP3UserAction3'), TABS.mission_control.isBitSet(P3Value, MWNP.P3.USER_ACTION_3));
-                changeSwitch($('#pointP3UserAction4'), TABS.mission_control.isBitSet(P3Value, MWNP.P3.USER_ACTION_4));
+                changeSwitch($('#pointP3Alt'), missionControlTab.isBitSet(P3Value, MWNP.P3.ALT_TYPE));
+                changeSwitch($('#pointP3UserAction1'), missionControlTab.isBitSet(P3Value, MWNP.P3.USER_ACTION_1));
+                changeSwitch($('#pointP3UserAction2'), missionControlTab.isBitSet(P3Value, MWNP.P3.USER_ACTION_2));
+                changeSwitch($('#pointP3UserAction3'), missionControlTab.isBitSet(P3Value, MWNP.P3.USER_ACTION_3));
+                changeSwitch($('#pointP3UserAction4'), missionControlTab.isBitSet(P3Value, MWNP.P3.USER_ACTION_4));
 
                 var altitudeMeters = app.ConvertCentimetersToMeters(selectedMarker.getAlt());
 
@@ -2543,7 +2544,7 @@ function iconKey(filename) {
                         selectedMarker.setAlt(returnAltitude);
 
                         /*
-                        if (TABS.mission_control.isBitSet(P3Value, MWNP.P3.ALT_TYPE)) {
+                        if (missionControlTab.isBitSet(P3Value, MWNP.P3.ALT_TYPE)) {
                             if (!selectedFwApproachWp.getIsSeaLevelRef()) {
                                 selectedFwApproachWp.setApproachDirection(selectedFwApproachWp.getApproachDirection() + elevationAtWP * 100);
                                 selectedFwApproachWp.setLandAltAsl(selectedFwApproachWp.getLandAltAsl() + elevationAtWP * 100);
@@ -2551,7 +2552,7 @@ function iconKey(filename) {
 
                         }
                         */
-                        selectedFwApproachWp.setIsSeaLevelRef(TABS.mission_control.isBitSet(P3Value, MWNP.P3.ALT_TYPE) ? 1 : 0);
+                        selectedFwApproachWp.setIsSeaLevelRef(missionControlTab.isBitSet(P3Value, MWNP.P3.ALT_TYPE) ? 1 : 0);
                         $('#wpApproachAlt').val(selectedFwApproachWp.getApproachAltAsl());
                         $('#wpLandAlt').val(selectedFwApproachWp.getLandAltAsl);
                         $('#wpLandAltM').text(selectedFwApproachWp.getLandAltAsl() / 100 + " m");
@@ -2917,10 +2918,10 @@ function iconKey(filename) {
                 var P3Value = selectedMarker.getP3();
 
                 if (disableMarkerEdit) {
-                    changeSwitch($('#pointP3Alt'), TABS.mission_control.isBitSet(P3Value, MWNP.P3.ALT_TYPE));
+                    changeSwitch($('#pointP3Alt'), missionControlTab.isBitSet(P3Value, MWNP.P3.ALT_TYPE));
                 }
 
-                P3Value = TABS.mission_control.setBit(P3Value, MWNP.P3.ALT_TYPE, $('#pointP3Alt').prop("checked"));
+                P3Value = missionControlTab.setBit(P3Value, MWNP.P3.ALT_TYPE, $('#pointP3Alt').prop("checked"));
                 (async () => {
                     const elevationAtWP = await selectedMarker.getElevation(globalSettings);
                     $('#elevationValueAtWP').text(elevationAtWP);
@@ -3004,10 +3005,10 @@ function iconKey(filename) {
         $('#pointP3UserAction1').on('change', function(event){
             if (selectedMarker) {
                 if (disableMarkerEdit) {
-                    changeSwitch($('#pointP3UserAction1'), TABS.mission_control.isBitSet(selectedMarker.getP3(), MWNP.P3.USER_ACTION_1));
+                    changeSwitch($('#pointP3UserAction1'), missionControlTab.isBitSet(selectedMarker.getP3(), MWNP.P3.USER_ACTION_1));
                 }
 
-                var P3Value = TABS.mission_control.setBit(selectedMarker.getP3(), MWNP.P3.USER_ACTION_1, $('#pointP3UserAction1').prop("checked"));
+                var P3Value = missionControlTab.setBit(selectedMarker.getP3(), MWNP.P3.USER_ACTION_1, $('#pointP3UserAction1').prop("checked"));
                 selectedMarker.setP3(P3Value);
 
                 mission.updateWaypoint(selectedMarker);
@@ -3019,10 +3020,10 @@ function iconKey(filename) {
         $('#pointP3UserAction2').on('change', function(event){
             if (selectedMarker) {
                 if (disableMarkerEdit) {
-                    changeSwitch($('#pointP3UserAction2'), TABS.mission_control.isBitSet(selectedMarker.getP3(), MWNP.P3.USER_ACTION_2));
+                    changeSwitch($('#pointP3UserAction2'), missionControlTab.isBitSet(selectedMarker.getP3(), MWNP.P3.USER_ACTION_2));
                 }
 
-                var P3Value = TABS.mission_control.setBit(selectedMarker.getP3(), MWNP.P3.USER_ACTION_2, $('#pointP3UserAction2').prop("checked"));
+                var P3Value = missionControlTab.setBit(selectedMarker.getP3(), MWNP.P3.USER_ACTION_2, $('#pointP3UserAction2').prop("checked"));
                 selectedMarker.setP3(P3Value);
 
                 mission.updateWaypoint(selectedMarker);
@@ -3034,10 +3035,10 @@ function iconKey(filename) {
         $('#pointP3UserAction3').on('change', function(event){
             if (selectedMarker) {
                 if (disableMarkerEdit) {
-                    changeSwitch($('#pointP3UserAction3'), TABS.mission_control.isBitSet(selectedMarker.getP3(), MWNP.P3.USER_ACTION_3));
+                    changeSwitch($('#pointP3UserAction3'), missionControlTab.isBitSet(selectedMarker.getP3(), MWNP.P3.USER_ACTION_3));
                 }
 
-                var P3Value = TABS.mission_control.setBit(selectedMarker.getP3(), MWNP.P3.USER_ACTION_3, $('#pointP3UserAction3').prop("checked"));
+                var P3Value = missionControlTab.setBit(selectedMarker.getP3(), MWNP.P3.USER_ACTION_3, $('#pointP3UserAction3').prop("checked"));
                 selectedMarker.setP3(P3Value);
 
                 mission.updateWaypoint(selectedMarker);
@@ -3049,10 +3050,10 @@ function iconKey(filename) {
         $('#pointP3UserAction4').on('change', function(event){
             if (selectedMarker) {
                 if (disableMarkerEdit) {
-                    changeSwitch($('#pointP3UserAction4'), TABS.mission_control.isBitSet(selectedMarker.getP3(), MWNP.P3.USER_ACTION_4));
+                    changeSwitch($('#pointP3UserAction4'), missionControlTab.isBitSet(selectedMarker.getP3(), MWNP.P3.USER_ACTION_4));
                 }
 
-                var P3Value = TABS.mission_control.setBit(selectedMarker.getP3(), MWNP.P3.USER_ACTION_4, $('#pointP3UserAction4').prop("checked"));
+                var P3Value = missionControlTab.setBit(selectedMarker.getP3(), MWNP.P3.USER_ACTION_4, $('#pointP3UserAction4').prop("checked"));
                 selectedMarker.setP3(P3Value);
 
                 mission.updateWaypoint(selectedMarker);
@@ -3652,15 +3653,19 @@ function iconKey(filename) {
         // Callback for Remove buttons
         /////////////////////////////////////////////
         $('#removeAllPoints').on('click', function () {
-            if (markers.length && dialog.confirm(i18n.getMessage('confirm_delete_all_points'))) {
-                if (removeAllMultiMissionCheck()) {
-                    removeAllWaypoints();
-                    updateMultimissionState();
-                }
-                for (let i = FC.SAFEHOMES.getMaxSafehomeCount(); i < FC.FW_APPROACH.getMaxFwApproachCount(); i++) {
-                    FC.FW_APPROACH.clean(i);
-                }
-                plotElevation();
+            if (markers.length){
+                dialog.confirm(i18n.getMessage('confirm_delete_all_points')).then(result => {
+                    if (result) {
+                        if (removeAllMultiMissionCheck()) {
+                            removeAllWaypoints();
+                            updateMultimissionState();
+                        }
+                        for (let i = FC.SAFEHOMES.getMaxSafehomeCount(); i < FC.FW_APPROACH.getMaxFwApproachCount(); i++) {
+                            FC.FW_APPROACH.clean(i);
+                        }
+                        plotElevation();
+                    }
+                });
             }
         });
 
@@ -3718,14 +3723,15 @@ function iconKey(filename) {
                     console.log('No file selected');
                     return;
                 }
-                if (result.filePaths.length == 1) {
-                    loadMissionFile(result.filePaths[0]);
+                if (result.files.length == 1) {
+                    loadMissionFile(result.files[0]);
                 }
             })
         });
 
         $('#saveFileMissionButton').on('click', function () {
             var options = {
+                defaultPath: 'inav-mission.mission',
                 filters: [ { name: "Mission file", extensions: ['mission'] } ]
             };
             dialog.showSaveDialog(options).then(result =>  {
@@ -3816,7 +3822,7 @@ function iconKey(filename) {
             FC.FW_APPROACH.clean(i);
         }
 
-        window.electronAPI.readFile(filename).then(response => {
+        bridge.readFile(filename).then(response => {
             if (response.error) {
                 GUI.log(i18n.getMessage('errorReadingFile'));
                 console.error(response.error);
@@ -3942,24 +3948,36 @@ function iconKey(filename) {
                 }
 
                 if (missionEndFlagCount > 1) {
-                    if (multimissionCount && ! dialog.confirm(i18n.getMessage('confirm_multimission_file_load'))) {
+                    
+                    let loadFile = false;
+                    if (multimissionCount) {
+                        dialog.confirm(i18n.getMessage('confirm_multimission_file_load').then(result => {
+                            if (!result) {
+                                return; 
+                            }
+
+                            loadFile = true;
+                            /* update Attached Waypoints (i.e non Map Markers)
+                            * Ensure WPs numbered sequentially across all missions */
+                            i = 1;
+                            mission.get().forEach(function (element) {
+                                element.setNumber(i);
+                                i++;
+                            });
+                            mission.update(false, true);
+                            multimissionCount = missionEndFlagCount;
+                            multimission.reinit();
+                            multimission.copy(mission);
+                            renderMultimissionTable();
+                            $('#missionPlannerMultiMission').fadeIn(300);
+                        }));
+                    }
+
+                    if (!loadFile) {
                         mission.flush();
                         return;
-                    } else {
-                        /* update Attached Waypoints (i.e non Map Markers)
-                         * Ensure WPs numbered sequentially across all missions */
-                        i = 1;
-                        mission.get().forEach(function (element) {
-                            element.setNumber(i);
-                            i++;
-                        });
-                        mission.update(false, true);
-                        multimissionCount = missionEndFlagCount;
-                        multimission.reinit();
-                        multimission.copy(mission);
-                        renderMultimissionTable();
-                        $('#missionPlannerMultiMission').fadeIn(300);
                     }
+
                 } else {
                     // update Attached Waypoints (i.e non Map Markers)
                     mission.update(true, true);
@@ -3985,7 +4003,14 @@ function iconKey(filename) {
                     updateHome();
                 }
                 updateTotalInfo();
-                let sFilename = String(filename.split('\\').pop().split('/').pop());
+                
+                let sFilename = '';
+                if (typeof filename === 'string'){
+                    sFilename = String(filename.split('\\').pop().split('/').pop());
+                } else {
+                    sFilename = filename.name
+                }
+
                 GUI.log(sFilename + i18n.getMessage('loadedSuccessfully'));
                 updateFilename(sFilename);
             });
@@ -4057,7 +4082,7 @@ function iconKey(filename) {
         var builder = new xml2js.Builder({ 'rootName': 'mission', 'renderOpts': { 'pretty': true, 'indent': '\t', 'newline': '\n' } });
         var xml = builder.buildObject(data);
         xml = xml.replace(/missionitem mission/g, 'meta mission');
-        fs.writeFile(filename, xml, (err) => {
+        bridge.writeFile(filename, xml, (err) => {
             if (err) {
                 GUI.log(i18n.getMessage('ErrorWritingFile'));
                 return console.error(err);
@@ -4194,7 +4219,7 @@ function iconKey(filename) {
     function checkAltElevSanity(resetAltitude, checkAltitude, elevation, AbsAltCheck) {
         let groundClearance = "NO HOME";
         let altitude = checkAltitude;
-        AbsAltCheck = (typeof AbsAltCheck == "boolean") ? AbsAltCheck : TABS.mission_control.isBitSet(AbsAltCheck, MWNP.P3.ALT_TYPE);
+        AbsAltCheck = (typeof AbsAltCheck == "boolean") ? AbsAltCheck : missionControlTab.isBitSet(AbsAltCheck, MWNP.P3.ALT_TYPE);
 
         if (AbsAltCheck) {
             if (checkAltitude < 100 * elevation) {
@@ -4432,13 +4457,13 @@ function iconKey(filename) {
       };
 };
 
-TABS.mission_control.isBitSet = function(bits, testBit) {
+missionControlTab.isBitSet = function(bits, testBit) {
     let isTrue = ((bits & (1 << testBit)) != 0);
 
     return isTrue;
 }
 
-TABS.mission_control.setBit = function(bits, bit, value) {
+missionControlTab.setBit = function(bits, bit, value) {
     return value ? bits |= (1 << bit) : bits &= ~(1 << bit);
 }
 
@@ -4452,6 +4477,8 @@ TABS.mission_control.setBit = function(bits, bit, value) {
     // }
 // }
 
-TABS.mission_control.cleanup = function (callback) {
+missionControlTab.cleanup = function (callback) {
     if (callback) callback();
 };
+
+export default missionControlTab;

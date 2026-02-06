@@ -227,11 +227,11 @@ function createWindow() {
   mainWindowState.manage(mainWindow);
 
   // Open the DevTools.
-  if (process.env.NODE_ENV === 'development') {
+  //if (process.env.NODE_ENV === 'development') {
     mainWindow.on("ready-to-show", () => {
       mainWindow.webContents.openDevTools({mode: process.env.DEV_TOOLS_MODE});
     });
-  }
+  //}
 };
 
 app.on('before-quit', async () => {

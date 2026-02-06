@@ -7,21 +7,23 @@ import noUiSlider from 'nouislider';
 import mspHelper from './../js/msp/MSPHelper';
 import MSPCodes from './../js/msp/MSPCodes';
 import MSP from './../js/msp';
-import { GUI, TABS } from './../js/gui';
+import GUI from './../js/gui';
 import FC from './../js/fc';
 import adjustBoxNameIfPeripheralWithModeID from './../js/peripherals';
 import i18n from './../js/localization';
 import interval from './../js/intervals';
-import store from './../js/store';
+import bridge from './../js/bridge';
 
 
 var ORIG_AUX_CONFIG_IDS = [];
 
-TABS.auxiliary = {};
+const auxiliaryTab = {};
 
-TABS.auxiliary.initialize = function (callback) {
-    GUI.active_tab_ref = this;
-    GUI.active_tab = 'auxiliary';
+auxiliaryTab.initialize = function (callback) {
+    
+    if (GUI.active_tab !== this) {
+        GUI.active_tab = this;
+    };
 
     let LOCAL_AUX_CONFIG = [];
     let LOCAL_AUX_CONFIG_IDS = [];
@@ -498,11 +500,11 @@ TABS.auxiliary.initialize = function (callback) {
         }
 
         let hideUnusedModes = false;
-        let hideUnusedModesStore = store.get('hideUnusedModes', false);
+        let hideUnusedModesStore = bridge.storeGet('hideUnusedModes', false);
         $("input#switch-toggle-unused")
             .on('change', function () {
                 hideUnusedModes = $(this).prop("checked");
-                store.set('hideUnusedModes', hideUnusedModes);
+                bridge.storeSet('hideUnusedModes', hideUnusedModes);
                 update_ui();
             })
             .prop("checked", !!hideUnusedModesStore)
@@ -520,10 +522,12 @@ TABS.auxiliary.initialize = function (callback) {
     }
 };
 
-TABS.auxiliary.cleanup = function (callback) {
+auxiliaryTab.cleanup = function (callback) {
     if (callback) callback();
 };
 
 $(window).on('resize', function(){
     $(".tab-auxiliary .acroEnabled").width($("#mode-0 .info").width());
 });
+
+export default auxiliaryTab;

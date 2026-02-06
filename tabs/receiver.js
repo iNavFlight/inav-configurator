@@ -4,22 +4,22 @@ import MSPChainerClass from './../js/msp/MSPchainer';
 import mspHelper from './../js/msp/MSPHelper';
 import MSPCodes from './../js/msp/MSPCodes';
 import MSP from './../js/msp';
-import { GUI, TABS } from './../js/gui';
+import GUI from './../js/gui';
 import FC from './../js/fc';
 import CONFIGURATOR from './../js/data_storage';
 import Settings from './../js/settings';
 import i18n from './../js/localization';
 import interval from './../js/intervals';
 
-TABS.receiver = {
-    rateChartHeight: 117
-};
+const receiverTab = { };
+ 
+receiverTab.rateChartHeight = 117;
 
-TABS.receiver.initialize = function (callback) {
+ receiverTab.initialize = function (callback) {
     var self = this;
 
-    if (GUI.active_tab != 'receiver') {
-        GUI.active_tab = 'receiver';
+    if (GUI.active_tab !== this) {
+        GUI.active_tab = this;
     }
 
     var loadChainer = new MSPChainerClass();
@@ -215,7 +215,7 @@ TABS.receiver.initialize = function (callback) {
 
         $('select[name="rssi_channel"]').val(FC.MISC.rssi_channel);
 
-        var rateHeight = TABS.receiver.rateChartHeight;
+        var rateHeight = receiverTab.rateChartHeight;
 
         // UI Hooks
         // curves
@@ -314,7 +314,7 @@ TABS.receiver.initialize = function (callback) {
         $("a.sticks").on('click', function () {
             var mspWin = window.open("tabs/receiver_msp.html", "receiver_msp", "width=420,height=760,menubar=no");
             
-            mspWin.window.setRawRx = function (channels) {
+            mspWin.setRawRx = function (channels) {
                 if (CONFIGURATOR.connectionValid && GUI.active_tab != 'cli') {
                     mspHelper.setRawRx(channels);
                     return true;
@@ -324,12 +324,17 @@ TABS.receiver.initialize = function (callback) {
             }
         });
 
+        /* Drop MSP control sticks for now, works inconsistently across platforms
+        Doesn't work properly in either elecron or PWA, and it takes quite a bit of effort to get both to run.
+        If anyone misses it, feel free. I give up.
         // Only show the MSP control sticks if the MSP Rx feature is enabled
         mspHelper.getSetting("receiver_type").then(function (s) {
             if (s && s.setting.table && s.setting.table.values) {
                 $(".sticks_btn").toggle(s.setting.table.values[s.value] == 'MSP');
             }
         });
+        */
+       $(".sticks_btn").hide();
 
         function get_rc_data() {
             MSP.send_message(MSPCodes.MSP_RC, false, false, update_ui);
@@ -350,8 +355,10 @@ TABS.receiver.initialize = function (callback) {
     }
 };
 
-TABS.receiver.cleanup = function (callback) {
+receiverTab.cleanup = function (callback) {
     $(window).off('resize', this.resize);
 
     if (callback) callback();
 };
+
+export default receiverTab;

@@ -1,7 +1,7 @@
 'use strict'
 
-import { GUI } from './../gui';
-import  { ConnectionType, Connection } from './connection';
+import GUI from './../gui';
+import { ConnectionType, Connection } from './connection';
 import i18n from './../localization';
 
 const STANDARD_TCP_PORT = 5761;
