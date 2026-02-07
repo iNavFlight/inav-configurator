@@ -53,6 +53,9 @@
     "pwaOfflineReadyMessage": {
         "message": "The application is ready to work offline. "
     },
+    "pwaInDevelopmentMessage": {
+        "message": "You are running a development version of the application. Some features may not work as expected."
+    },
     "options_title": {
         "message": "Application Options"
     },

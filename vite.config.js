@@ -27,7 +27,15 @@ export default defineConfig({
           }
           return 'assets/[name]-[hash][extname]';
         }
-      }
+      },
+      plugins: [
+        copy({
+          targets: [
+            { src: 'images/pwa/inav_icon_*.png', dest: 'dist' },
+          ],
+          hook: "writeBundle",
+        })
+      ]
     },
   },
   assetsInclude: ['**/*.gltf', '**/*.glb', '**/*.woff2', '**/*.woff', '**/*.ttf', '**/*.eot', '**/*.svg', '**/*.wasm' ],
@@ -68,12 +76,12 @@ export default defineConfig({
           theme_color: '#ffffff',
           icons: [
             { 
-              src: './images/pwa/inav_icon_192.png',
+              src: './inav_icon_192.png',
               sizes: '192x192',
               type: 'image/png'
             },
             { 
-              src: './images/pwa/inav_icon_512.png',
+              src: './inav_icon_512.png',
               sizes: '512x512',
               type: 'image/png'
             }

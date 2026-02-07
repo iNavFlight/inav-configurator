@@ -50,6 +50,7 @@ import advancedTuningTab from './../tabs/advanced_tuning';
 import onboardLoggingTab from  './../tabs/onboard_logging';
 import cliTab from './../tabs/cli';
 import searchTab from './../tabs/search';
+import dialog from './dialog';
 
 
 window.$ = $;
@@ -117,6 +118,9 @@ $(function() {
             
             browser.registerSW();
             browser.checkBrowserSupport();
+
+            // Todo: Remove when web version is out of beta
+            dialog.alert(i18n.getMessage('pwaInDevelopmentMessage'));
         }
         
         // log library versions in console to make version tracking easier

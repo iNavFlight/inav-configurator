@@ -1,0 +1,4 @@
+# this file is used by cloudflare to add appropriate headers
+https://inav-configurator.pages.dev/*
+    cross-origin-embedder-policy: require-corp
+    cross-origin-opener-policy: same-origin
