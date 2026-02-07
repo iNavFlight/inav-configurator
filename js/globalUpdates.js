@@ -4,7 +4,7 @@ import CONFIGURATOR from './data_storage';
 import FC from './fc';
 import { globalSettings } from './globalSettings';
 import i18n from './localization';
-import bridge from './bridge';
+import {bridge, Platform} from './bridge';
 
 var update = {
 

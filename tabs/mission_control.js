@@ -54,7 +54,7 @@ import { distanceOnLine, wrap_360, calculate_new_cooridatnes } from './../js/hel
 import interval from './../js/intervals';
 import { Geozone, GeozoneVertex, GeozoneType, GeozoneShapes, GeozoneFenceAction }  from './../js/geozone';
 import dialog from '../js/dialog';
-import bridge from './../js/bridge';
+import {bridge, Platform} from './../js/bridge';
 
 import html from'./mission_control.html?raw';
 import { mul } from 'three/tsl';

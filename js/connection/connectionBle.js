@@ -48,8 +48,8 @@ class ConnectionBle extends Connection {
         this._writeCharacteristic   = false;
         this._device                = false;
         this._deviceDescription     = false;
-        this._onCharateristicValueChangedListeners = [];
-        this._onDisconnectListeners   = [];
+        this._onReceiveListeners = [];
+        this._onReceiveErrorListeners   = [];
         this._reconnects = 0;
         this._handleOnCharateristicValueChanged = false;
         this._handleDisconnect = false;
@@ -107,7 +107,7 @@ class ConnectionBle extends Connection {
             console.log("Found BLE device: " + device.name);
             this._device = device;
             this._handleDisconnect = event => {
-                this._onDisconnectListeners.forEach(listener => {
+                this._onReceiveErrorListeners.forEach(listener => {
                     listener("disconnected");
                 });      
             };
@@ -166,7 +166,7 @@ class ConnectionBle extends Connection {
                         buffer[i] = event.target.value.getUint8(i);
                     }
 
-                    this._onCharateristicValueChangedListeners.forEach(listener => {
+                    this._onReceiveListeners.forEach(listener => {
                         listener({
                             connectionId: 0xFF,
                             data: buffer
@@ -242,19 +242,19 @@ class ConnectionBle extends Connection {
     }
 
     addOnReceiveCallback(callback){
-        this._onCharateristicValueChangedListeners.push(callback);
+        this._onReceiveListeners.push(callback);
     }
 
     removeOnReceiveCallback(callback){
-        this._onCharateristicValueChangedListeners = this._onCharateristicValueChangedListeners.filter(listener => listener !== callback);
+        this._onReceiveListeners = this._onReceiveListeners.filter(listener => listener !== callback);
     }
 
     addOnReceiveErrorCallback(callback) {
-        this._onDisconnectListeners.push(callback);
+        this._onReceiveErrorListeners.push(callback);
     }
 
     removeOnReceiveErrorCallback(callback) {
-        this._onDisconnectListeners = this._onDisconnectListeners.filter(listener => listener !== callback);
+        this._onReceiveErrorListeners = this._onReceiveErrorListeners.filter(listener => listener !== callback);
     }
 
     static getBleUUIDs() {

@@ -3,7 +3,7 @@
 import GUI from './../js/gui';
 import i18n from './localization';
 import ConnectionSerial from './connection/connectionSerial';
-import bridge from './bridge';
+import {bridge, Platform} from './bridge';
 import browser from './web/browser';
 
 var usbDevices =  [
@@ -28,7 +28,7 @@ PortHandler.initialize = function () {
 PortHandler.check = function () {
     var self = this;
 
-    if (!browser.isSerialSupported()) {
+    if (bridge.getPlatform() === Platform.Web && !browser.isSerialSupported()) {
         console.log('Serial API not supported in this browser.');
         self.update_port_select(null);
         GUI.updateManualPortVisibility();
@@ -212,7 +212,7 @@ PortHandler.update_port_select = function (ports) {
         }
     }
     
-    if (!bridge.isElectron) {
+    if (bridge.getPlatform() === Platform.Web) {
         if (browser.isSerialSupported()) {
             $('div#port-picker #port').append($("<option/>", {value: 'webPermission', text: i18n.getMessage('webSerialPermission'), data: {isWebPermission: true}}));
         }
@@ -224,11 +224,11 @@ PortHandler.update_port_select = function (ports) {
         $('div#port-picker #port').append($("<option/>", {value: 'manual', text: 'Manual Selection', data: {isManual: true}}));
     }
 
-    if (browser.isBleSupported()) {
+    if (bridge.getPlatform() === Platform.Web && browser.isBleSupported()) {
         $('div#port-picker #port').append($("<option/>", {value: 'ble', text: 'BLE', data: {isBle: true}}));
     }
     
-    if (bridge.isElectron) {
+    if (bridge.getPlatform() === Platform.Electron) {
         $('div#port-picker #port').append($("<option/>", {value: 'tcp', text: 'TCP', data: {isTcp: true}}));
         $('div#port-picker #port').append($("<option/>", {value: 'udp', text: 'UDP', data: {isUdp: true}}));    
     }

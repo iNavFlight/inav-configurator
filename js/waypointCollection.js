@@ -3,7 +3,7 @@
 import { getLength } from 'ol/sphere';
 import { LineString } from 'ol/geom';
 import { fromLonLat } from 'ol/proj';
-import  bridge from './bridge.js';
+import { bridge } from './bridge';
 
 import MWNP from './mwnp';
 import Waypoint from './waypoint';

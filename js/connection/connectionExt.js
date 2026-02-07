@@ -3,7 +3,7 @@
 import GUI from './../gui';
 import { ConnectionType, Connection } from './connection';
 import i18n from './../localization';
-import bridge from './../bridge';
+import {bridge, Platform} from './../bridge';
 import SITLWebAssembly from './../web/SITL-Webassembly.js';
 import { disconnect } from 'process';
 import { listen } from 'ol/events.js';

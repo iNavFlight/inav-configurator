@@ -1,8 +1,8 @@
-import bridge from "./bridge";
+import {bridge, Platform} from "./bridge";
 
 const dialog =  {
     showOpenDialog: async function (options) {
-        if (bridge.isElectron) {
+        if (bridge.getPlatform() === Platform.Electron) {
             const response = await window.electronAPI.showOpenDialog(options);
             return {
                 canceled: response.canceled,
@@ -57,7 +57,7 @@ const dialog =  {
         }
     },
     showSaveDialog: async function (options) {
-       if (bridge.isElectron){
+       if (bridge.getPlatform() === Platform.Electron){
          return window.electronAPI.showSaveDialog(options);
        } else {
         // Just passthrou in PWA

@@ -9,7 +9,7 @@ import CONFIGURATOR from './../js/data_storage';
 import features from './../js/feature_framework';
 import i18n from './../js/localization';
 import BitHelper from './../js/bitHelper';
-import bridge from '../js/bridge';
+import {bridge, Platform} from '../js/bridge';
 
 var sdcardTimer;
 
@@ -369,7 +369,7 @@ onboardLoggingTab.initialize = function (callback) {
 
                                 $(".dataflash-saving progress").attr("value", nextAddress / maxBytes * 100);
 
-                                if (bridge.isElectron) { 
+                                if (bridge.getPlatform() === Platform.Electron) { 
                                     window.electronAPI.appendFile(filename, new Uint8Array(chunk), {
                                         "flag": "a"
                                     });
@@ -388,7 +388,7 @@ onboardLoggingTab.initialize = function (callback) {
 
                             } else {
                                 // A zero-byte block indicates end-of-file, so we're done
-                                if (!bridge.isElectron) {
+                                if (bridge.getPlatform() === Platform.Web) {
                                     bridge.writeFile(filename, new Uint8Array(webBuffer), true);
                                 }
                                 mark_saving_dialog_done();

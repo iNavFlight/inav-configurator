@@ -1,7 +1,7 @@
 'use strict';
 
 import FC from './fc';
-import bridge from './bridge';
+import {bridge, Platform} from './bridge';
 
 var settingsCache = (function() {
 

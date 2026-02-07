@@ -8,7 +8,7 @@ import FC from './../js/fc';
 import i18n from './../js/localization';
 import serialPortHelper from './../js/serialPortHelper';
 import jBox from 'jbox';
-import bridge from '../js/bridge';
+import {bridge, Platform} from '../js/bridge';
 
 const portsTab = {};
 
@@ -90,7 +90,7 @@ portsTab.initialize = function (callback) {
             port_configuration_e.data('serialPort', serialPort);
             
             //Append only port different than USB VCP or UART 1 on Webassembly (serialEx port)
-            if (serialPort.identifier == 20 || (!bridge.isElectron && serialPort.identifier == 0)) {
+            if (serialPort.identifier == 20 || (bridge.getPlatform() === Platform.Web && serialPort.identifier == 0)) {
                 continue;
             }          
   

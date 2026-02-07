@@ -6,7 +6,7 @@ import GUI from './../js/gui';
 import i18n from './../js/localization';
 import { SITLProcess, SitlSerialPortUtils } from './../js/sitl';
 import dialog from './../js/dialog';
-import bridge from './../js/bridge';
+import {bridge, Platform} from './../js/bridge';
 import SITLWebAssembly from '../js/web/SITL-Webassembly';
 
 const localhost = "127.0.0.1"
@@ -98,7 +98,7 @@ sitlTab.initialize = (callback) => {
         
         i18n.localize();
 
-        if (!bridge.isElectron) {
+        if (bridge.getPlatform() === Platform.Web) {
             $('#sitlWebAssemblyInfo').show();
             $('#wasmProxy').removeClass('is-hidden');
             $('#wasmProxyPort').removeClass('is-hidden');
@@ -127,7 +127,7 @@ sitlTab.initialize = (callback) => {
         var wasmProxy_e = $('#sitlEnableWasmProxy');
         var wasmProxyPort_e = $('#sitlWasmProxyPort');
         
-        if (bridge.isElectron) {
+        if (bridge.getPlatform() === Platform.Electron) {
             if (SITLProcess.isRunning) {
                 $('.sitlStart').addClass('disabled');
                 $('.sitlStop').removeClass('disabled');
@@ -169,7 +169,7 @@ sitlTab.initialize = (callback) => {
         sitlWasmProxyPort = bridge.storeGet('sitlWasmProxyPort', 8081);
         wasmProxyPort_e.val(sitlWasmProxyPort);
 
-        if (bridge.isElectron) {
+        if (bridge.getPlatform() === Platform.Electron) {
             SitlSerialPortUtils.resetPortsList();
             SitlSerialPortUtils.pollSerialPorts(ports => {
                 serialPorts_e.find('*').remove();
@@ -229,7 +229,7 @@ sitlTab.initialize = (callback) => {
             $('.sitlStart').addClass('disabled');
             $('.sitlStop').removeClass('disabled');
             
-            if (!bridge.isElectron) {
+            if (bridge.getPlatform() === Platform.Web) {
                 $('.eepromActionButton').prop('disabled', true);
             }
    
@@ -267,7 +267,7 @@ sitlTab.initialize = (callback) => {
                 }
             }
             channelMap = channelMap.substring(0, channelMap.length - 1);
-            if (bridge.isElectron) {
+            if (bridge.getPlatform() === Platform.Electron) {
                 var serialOptions = null;
                 if ( serialReceiverEnable_e.is(':checked') && !!serialPorts_e.val()) {
                     var selectedProtocoll = protocollPreset_e.find(':selected').val();
@@ -292,7 +292,7 @@ sitlTab.initialize = (callback) => {
 
             appendLog("\n");
             
-            if (bridge.isElectron) {
+            if (bridge.getPlatform() === Platform.Electron) {
                 SITLProcess.start(currentProfile.eepromFileName, sim, useImu_e.is(':checked'), simIp, simPort, channelMap, serialOptions, result => {
                     appendLog(result);
                 });
@@ -325,7 +325,7 @@ sitlTab.initialize = (callback) => {
 
         $('.sitlStop').on('click', ()=> {
                
-            if (bridge.isElectron) {
+            if (bridge.getPlatform() === Platform.Electron) {
                 SITLProcess.stop();
             } else {
                 try {
@@ -455,7 +455,7 @@ sitlTab.initialize = (callback) => {
             currentProfile.parity = parity_e.val();
             });
         
-        if (bridge.isElectron) {
+        if (bridge.getPlatform() === Platform.Electron) {
             window.electronAPI.onChildProcessStdout(data => {
                 appendLog(data);
             });

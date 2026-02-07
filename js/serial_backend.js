@@ -25,7 +25,7 @@ import jBox from 'jbox';
 import groundstation from './groundstation';
 import ltmDecoder from './ltmDecoder';
 import mspDeduplicationQueue from './msp/mspDeduplicationQueue';
-import bridge from './bridge';
+import {bridge, Platform} from './bridge';
 import {resquestDfuPermission} from './web/dfu' 
 import configurationTab from '../tabs/configuration';
 import cliTab from '../tabs/cli';
@@ -147,7 +147,7 @@ var SerialBackend = (function () {
             }
             var type = ConnectionType.Serial;
 
-            if (!bridge.isElectron && data.isSitl) {
+            if (bridge.getPlatform() === Platform.Web && data.isSitl) {
                 type = ConnectionType.serialEXT
             } else if (data.isBle) {
                 type = ConnectionType.BLE;
@@ -169,7 +169,7 @@ var SerialBackend = (function () {
         publicScope.$portOverride.val(bridge.storeGet('portOverride', ''));        
 
         privateScope.$port.on('change', function (target) {
-            if (!bridge.isElectron) {
+            if (bridge.getPlatform() === Platform.Web) {
                 const selected_port = privateScope.$port.find('option:selected');
                 if (selected_port.data().isWebPermission) {
                     bridge.requestWebSerialPermission().then(() => GUI.updateManualPortVisibility());
@@ -213,13 +213,13 @@ var SerialBackend = (function () {
                         if (selected_port == 'tcp' || selected_port == 'udp') {
                             CONFIGURATOR.connection.connect(publicScope.$portOverride.val(), {}, privateScope.onOpen);
                         } else if (selected_port == 'sitl') {
-                            if (bridge.isElectron) {
+                            if (bridge.getPlatform() === Platform.Electron) {
                                 CONFIGURATOR.connection.connect("127.0.0.1:5760", {}, privateScope.onOpen);
                             } else {
                                 CONFIGURATOR.connection.connect(0, {}, privateScope.onOpen);
                             }
                         } else if (selected_port == 'sitl-demo') {
-                            if (bridge.isElectron) {
+                            if (bridge.getPlatform() === Platform.Electron) {
                                 SITLProcess.stop();
                                 SITLProcess.start("demo.bin");
 
@@ -256,7 +256,7 @@ var SerialBackend = (function () {
                     } else {
 
                         if (this.isDemoRunning) {
-                            if (bridge.isElectron) {
+                            if (bridge.getPlatform() === Platform.Electron) {
                                 SITLProcess.stop();
                             } else {
                                 SITLWebAssembly.reset();

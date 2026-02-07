@@ -18,6 +18,9 @@ export default defineConfig((env) => {
       outDir: `.vite/renderer/${name}`,
       assetsInlineLimit: Number.MAX_SAFE_INTEGER,
       chunkSizeWarningLimit: 10240,
+      rollupOptions: {
+        external: [/.*\/web\/.*/],
+      }
     },
     plugins: [
       inject({

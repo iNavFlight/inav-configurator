@@ -10,7 +10,7 @@ import CONFIGURATOR from './../js/data_storage';
 import interval from './../js/intervals';
 import i18n from './../js/localization';
 import BitHelper from './../js/bitHelper';
-import bridge from './../js/bridge';
+import {bridge, Platform} from './../js/bridge';
 
 const sensorsTab = {};
 sensorsTab.initialize = function (callback) {

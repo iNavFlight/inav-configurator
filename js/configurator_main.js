@@ -4,7 +4,7 @@ import $ from 'jquery';
 import 'jquery-ui-dist/jquery-ui';
 import * as THREE from 'three'
 
-import bridge from './bridge'
+import {bridge, Platform} from './bridge'
 import GUI from './gui';
 import CONFIGURATOR from './data_storage';
 import FC  from './fc';
@@ -50,7 +50,7 @@ import advancedTuningTab from './../tabs/advanced_tuning';
 import onboardLoggingTab from  './../tabs/onboard_logging';
 import cliTab from './../tabs/cli';
 import searchTab from './../tabs/search';
-import dialog from './dialog';
+
 
 window.$ = $;
 
@@ -91,11 +91,10 @@ $(function() {
         }
 
         const version = bridge.getAppVersion();
-        
-        // Detect browser and version
+        const platformInfo = bridge.getPlatformInfo();
        
         GUI.log(i18n.getMessage('getRunningOS') + GUI.operating_system + '</strong>, ' +
-            browser.getBrowserInfo() +
+            platformInfo +
             i18n.getMessage('getConfiguratorVersion') + version + '</strong>');
 
         $('#status-bar .version').text(version);
@@ -106,18 +105,19 @@ $(function() {
             $("#showlog").trigger('click');
         }
 
-        if (bridge.isElectron) {
+        if (bridge.getPlatform() === Platform.Electron) {
             if (bridge.storeGet('update_notify', true)) { 
                 appUpdater.checkRelease(version);
             }
+        } else if (bridge.getPlatform() === Platform.Web) {
+            
+            if (!browser.isUsbSupported()) {
+                $('.tab_firmware_flasher').remove();
+            }
+            
+            browser.registerSW();
+            browser.checkBrowserSupport();
         }
-
-        if (!browser.isUsbSupported()) {
-            $('.tab_firmware_flasher').remove();
-        }
-
-        browser.registerSW();
-        browser.checkBrowserSupport();
         
         // log library versions in console to make version tracking easier
         console.log('Libraries: jQuery - ' + $.fn.jquery + ', three.js - ' + THREE.REVISION);
@@ -304,7 +304,7 @@ $(function() {
                     // translate to user-selected language
                     i18n.localize();
 
-                    if (!bridge.isElectron) {
+                    if (bridge.getPlatform() === Platform.Web) {
                         $('#resetSitl').hide();
                         $('#updateNotifications').hide();
                         $('#disable3DAcceleration').hide();

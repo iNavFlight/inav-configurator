@@ -34,7 +34,8 @@ export default defineConfig({
   plugins: [
       inject({
         $: 'jquery',
-        jQuery: 'jquery',        
+        jQuery: 'jquery',
+        exclude: '**/*.css'    
       }),
       VitePWA({
         registerType: 'prompt',

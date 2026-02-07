@@ -7,7 +7,7 @@
 
 import { get } from 'jquery';
 import GUI from './../gui';
-import bridge from '../bridge';
+import {bridge, Platform} from '../bridge';
 
 import inavSITLModule from './WASM/inav_9.0.0_WASM.js';
 import inavWasmUrl from './WASM/inav_9.0.0_WASM.wasm?url';

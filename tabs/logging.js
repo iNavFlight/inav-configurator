@@ -9,7 +9,7 @@ import interval from './../js/intervals';
 import i18n from './../js/localization';
 import { zeroPad } from './../js/helpers';
 import dialog from '../js/dialog';
-import bridge from '../js/bridge'
+import {bridge, Platform} from '../js/bridge'
 
 
 const loggingTab = {};
@@ -51,7 +51,7 @@ loggingTab.initialize = function (callback) {
         i18n.localize();;
 
         // UI hooks
-        if (!bridge.isElectron) {
+        if (bridge.getPlatform() === Platform.Web) {
              $('a.log_file').hide();
              prepare_file();
         }
@@ -96,7 +96,7 @@ loggingTab.initialize = function (callback) {
                             interval.add('write_data', function write_data() {
                                 if (log_buffer.length && readyToWrite) { // only execute when there is actual data to write
                                     
-                                    if (bridge.isElectron) {
+                                    if (bridge.getPlatform() === Platform.Electron) {
                                         window.electronAPI.appendFile(loggingFileName, log_buffer.join('\n') + '\n');
                                     } else {
                                         // On PWA we can't acces local files nor append to a file.
@@ -112,7 +112,7 @@ loggingTab.initialize = function (callback) {
                                     
                                     $('.samples').text(samples += log_buffer.length);                
                                     
-                                    $('.size').text(`${formatFileSize(totalSize)} ${!bridge.isElectron ? `(Chunk ${webFileCount})` : ''}`);
+                                    $('.size').text(`${formatFileSize(totalSize)} ${bridge.getPlatform() === Platform.Web ? `(Chunk ${webFileCount})` : ''}`);
                                     log_buffer = [];
                                 }
                             }, 1000);
@@ -126,7 +126,7 @@ loggingTab.initialize = function (callback) {
                     } else {
                         interval.killAll(['global_data_refresh', 'msp-load-update', 'ltm-connection-check']);
 
-                        if (!bridge.isElectron) { 
+                        if (bridge.getPlatform() === Platform.Web) { 
                             bridge.writeFile(`${loggingFileName}-${webFileCount++}`, webFileBuffer.join('\n') + '\n');
                             webFileBuffer = [];
                         }

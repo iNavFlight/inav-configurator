@@ -234,7 +234,7 @@ The project is transitioning from **Electron-only desktop application** to a **d
 Abstraction layer that detects runtime (Electron vs Browser) and provides unified API:
 
 ```javascript
-bridge.isElectron  // boolean: true if running in Electron
+bridge.getPlatform() === Platform.Electron  // boolean: true if running in Electron
 bridge.serialEvents  // EventTarget for serial data events
 ```
 
@@ -410,7 +410,7 @@ yarn pwa:deploy  # Pushes to github.com/iNavFlight/inav-configurator/gh-pages
 When converting Electron-only code to PWA-compatible:
 
 - [ ] Replace `window.electronAPI.*` calls with `bridge.*`
-- [ ] Replace `import store from './store'` with `import bridge from './bridge'`
+- [ ] Replace `import store from './store'` with `import {bridge, Platform} from './bridge'`
 - [ ] Replace `import { GUI, TABS } from './gui'` with `import GUI from './gui'`
 - [ ] Update dynamic tab imports to static imports
 - [ ] Add `.js` extension to all ES6 imports

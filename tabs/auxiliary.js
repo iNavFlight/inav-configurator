@@ -12,7 +12,7 @@ import FC from './../js/fc';
 import adjustBoxNameIfPeripheralWithModeID from './../js/peripherals';
 import i18n from './../js/localization';
 import interval from './../js/intervals';
-import bridge from './../js/bridge';
+import {bridge, Platform} from './../js/bridge';
 
 
 var ORIG_AUX_CONFIG_IDS = [];

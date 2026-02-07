@@ -14,7 +14,7 @@ import mspDeduplicationQueue from './../js/msp/mspDeduplicationQueue';
 import FC from './../js/fc';
 import { generateFilename } from './../js/helpers';
 import dialog from '../js/dialog';
-import bridge from '../js/bridge';
+import {bridge, Platform} from '../js/bridge';
 import interval from '../js/intervals';
 
 const cliTab = {};

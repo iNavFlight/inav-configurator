@@ -1,6 +1,6 @@
 'use strict';
 
-import bridge from "./bridge";
+import {bridge, Platform} from "./bridge";
 
 const ApproachDirection = Object.freeze({
     LEFT: 0,

@@ -1,4 +1,4 @@
-import bridge from "../bridge"
+import {bridge, Platform} from "../bridge"
 
 const resquestDfuPermission = async function()
 {

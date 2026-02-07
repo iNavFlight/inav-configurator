@@ -1,7 +1,7 @@
 
 'use strict';
 
-import bridge from "./bridge";
+import {bridge, Platform} from "./bridge";
 
 let Waypoint = function (number, action, lat, lon, alt=0, p1=0, p2=0, p3=0, endMission=0, isUsed=true, isAttached=false, attachedId="", multiMissionIdx = 0) {
 

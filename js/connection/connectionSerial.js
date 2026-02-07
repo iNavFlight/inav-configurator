@@ -3,7 +3,7 @@
 import GUI from './../gui';
 import { ConnectionType, Connection } from './connection';
 import i18n from './../localization';
-import bridge from './../bridge';
+import {bridge, Platform} from './../bridge';
 
 const serialDevices = [
     { vendorId: 1027, productId: 24577 }, // FT232R USB UART

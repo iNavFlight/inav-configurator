@@ -1,6 +1,6 @@
 'use strict'
 
-import bridge from "./bridge";
+import {bridge, Platform} from "./bridge";
 
 const GeozoneType = Object.freeze({
     EXCULSIVE: 0,

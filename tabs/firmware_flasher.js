@@ -19,7 +19,7 @@ import STM32 from './../js/protocols/stm32';
 import STM32DFU from './../js/protocols/stm32usbdfu';
 import mspDeduplicationQueue from './../js/msp/mspDeduplicationQueue';
 import dialog from './../js/dialog.js';
-import bridge from './../js/bridge';
+import {bridge, Platform} from './../js/bridge';
 
 const firmwareFlasherTab = {};
 

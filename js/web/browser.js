@@ -1,5 +1,5 @@
 import { registerSW } from 'virtual:pwa-register';
-import bridge from '../bridge';
+import {bridge, Platform} from '../bridge';
 import i18n from '../localization';
 import dialog from '../dialog';
 import GUI from '../gui';
@@ -47,7 +47,7 @@ const browser = {
 
         if (!this.isChromiumBased() || (!isSerialSupported && !isUsbSupported && !isBleSupported)) {
            dialog.alert({
-                title: i18n.getMessage('browserNotSupportedNotificationTitle'),
+                title: i18n.getMessage('browserCheckNotificationHeader'),
                 text: content
             });
         }
@@ -62,10 +62,7 @@ const browser = {
         let browserInfo = '';
         const ua = navigator.userAgent;
         
-        if (bridge.isElectron) {
-            const electronMatch = ua.match(/Electron\/([\d\.]+)/);
-            browserInfo = 'Electron: <strong>' + (electronMatch ? electronMatch[1] : 'unknown') + '</strong>, ';
-        } else if (ua.indexOf('Firefox') > -1) {
+        if (ua.indexOf('Firefox') > -1) {
             const firefoxMatch = ua.match(/Firefox\/([\d\.]+)/);
             browserInfo = 'Firefox: <strong>' + (firefoxMatch ? firefoxMatch[1] : 'unknown') + '</strong>, ';
         } else if (ua.indexOf('Safari') > -1 && ua.indexOf('Chrome') === -1) {

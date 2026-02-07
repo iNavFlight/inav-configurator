@@ -2,7 +2,7 @@
 
 // Thanks to Betaflight :)
 import i18next from 'i18next';
-import bridge from './bridge';
+import {bridge, Platform} from './bridge';
 
 
 const availableLanguages = ['en', 'ja', 'ru', 'uk', 'zh_CN'];

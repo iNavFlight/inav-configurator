@@ -16,7 +16,7 @@ import { globalSettings } from './../js/globalSettings';
 import { PortHandler } from './../js/port_handler';
 import i18n from './../js/localization';
 import dialog from './../js/dialog';
-import bridge from './../js/bridge';
+import {bridge, Platform} from './../js/bridge';
 
 var SYM = SYM || {};
 SYM.LAST_CHAR = 225; // For drawing the font preview
