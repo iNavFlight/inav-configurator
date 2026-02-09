@@ -13,6 +13,7 @@ import jBox from 'jbox';
 import interval from './../js/intervals';
 import ServoMixRule from './../js/servoMixRule';
 import MotorMixRule from './../js/motorMixRule';
+import BitHelper from './../js/bitHelper';
 
 TABS.mixer = {};
 
@@ -608,15 +609,26 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
             currentMotor: 0,        // Which motor we're currently locating (0-3)
             motorPositions: {},     // Map: motorIndex -> positionIndex
             locateInterval: null,   // Interval for repeating locate command
-            isActive: false         // Is wizard in progress?
+            isActive: false,        // Is wizard in progress?
+            savedDshotBeeper: null  // Original dshot_beeper_enabled value to restore
         };
+
+        function sendMotorValues(motorIndex, value) {
+            var buffer = [];
+            for (var i = 0; i < 8; i++) {
+                var val = (i === motorIndex) ? value : FC.MISC.mincommand;
+                buffer.push(BitHelper.lowByte(val));
+                buffer.push(BitHelper.highByte(val));
+            }
+            MSP.send_message(MSPCodes.MSP_SET_MOTOR, buffer);
+        }
 
         function stopMotors() {
             if (wizardState.locateInterval) {
                 clearInterval(wizardState.locateInterval);
                 wizardState.locateInterval = null;
             }
-            mspHelper.sendMotorLocate(255, function() {});
+            sendMotorValues(-1, FC.MISC.mincommand);  // All motors at mincommand
         }
 
         function resetWizard() {
@@ -638,11 +650,9 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
             $('.wizard-progress-step').removeClass('active complete');
         }
 
-        function startLocatingMotor(motorIndex) {
-            // Update progress display
+        function updateWizardProgress(motorIndex) {
             $('#wizard-current-motor').text(motorIndex + 1);
 
-            // Update progress bar
             $('.wizard-progress-step').each(function() {
                 const step = parseInt($(this).attr('data-step'), 10);
                 $(this).removeClass('active complete');
@@ -653,7 +663,6 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
                 }
             });
 
-            // Enable clicking on unassigned positions
             $('.wizard-position-btn').each(function() {
                 const pos = parseInt($(this).attr('data-position'), 10);
                 const isAssigned = Object.values(wizardState.motorPositions).includes(pos);
@@ -661,20 +670,30 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
                     $(this).addClass('waiting');
                 }
             });
+        }
 
-            // Clear any existing interval to prevent overlaps
-            if (wizardState.locateInterval) {
-                clearInterval(wizardState.locateInterval);
-                wizardState.locateInterval = null;
-            }
+        function startMotorPulse(motorIndex) {
+            // Three short twitches with a pause, repeating
+            // ON 20ms, OFF 20ms, ON 20ms, OFF 20ms, ON 20ms, OFF 700ms (800ms cycle)
+            // Safety: every tick defaults to OFF unless inside an ON window
+            var spinValue = Math.round(FC.MISC.mincommand + 0.15 * (FC.MISC.maxthrottle - FC.MISC.mincommand));
+            var stopped = FC.MISC.mincommand;
+            var startTime = Date.now();
+            var CYCLE = 800;
 
-            // Send locate command and repeat every 2 seconds
-            const sendLocate = function() {
-                mspHelper.sendMotorLocate(motorIndex, function() {});
-            };
+            sendMotorValues(motorIndex, spinValue);
+            wizardState.locateInterval = setInterval(function() {
+                var elapsed = (Date.now() - startTime) % CYCLE;
+                // ON windows: [0,20), [40,60), [80,100)
+                var isOn = (elapsed < 20) || (elapsed >= 40 && elapsed < 60) || (elapsed >= 80 && elapsed < 100);
+                sendMotorValues(motorIndex, isOn ? spinValue : stopped);
+            }, 10);
+        }
 
-            sendLocate();  // Send immediately
-            wizardState.locateInterval = setInterval(sendLocate, 2000);
+        function startLocatingMotor(motorIndex) {
+            updateWizardProgress(motorIndex);
+            stopMotors();
+            startMotorPulse(motorIndex);
         }
 
         function onPositionClicked(positionIndex) {
@@ -732,8 +751,21 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
             $('#wizard-intro').addClass('is-hidden');
             $('#wizard-progress').removeClass('is-hidden');
 
-            // Start locating first motor
-            startLocatingMotor(0);
+            // Disable DShot beeper so it doesn't twitch all motors during locate
+            mspHelper.getSetting('dshot_beeper_enabled').then(function(setting) {
+                if (setting) {
+                    wizardState.savedDshotBeeper = setting.value;
+                    if (setting.value) {
+                        mspHelper.setSetting('dshot_beeper_enabled', 0, function() {
+                            startLocatingMotor(0);
+                        });
+                        return;
+                    }
+                }
+                startLocatingMotor(0);
+            }).catch(function() {
+                startLocatingMotor(0);
+            });
         });
 
         // Emergency stop button click handler
@@ -783,6 +815,12 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
         motorWizardModal.options.onClose = function() {
             stopMotors();
             wizardState.isActive = false;
+
+            // Restore DShot beeper if it was enabled before the wizard
+            if (wizardState.savedDshotBeeper) {
+                mspHelper.setSetting('dshot_beeper_enabled', wizardState.savedDshotBeeper);
+                wizardState.savedDshotBeeper = null;
+            }
         };
 
         const updateMotorDirection = function () {
