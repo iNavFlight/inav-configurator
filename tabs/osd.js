@@ -2437,8 +2437,10 @@ OSD.reload = function(callback) {
                     
                     MSP.promise(MSPCodes.MSP2_INAV_CUSTOM_OSD_ELEMENTS).then(() => { 
                         mspHelper.loadOsdCustomElements(() => {
-                            createCustomElements();
-                            done();
+                            mspHelper.loadLogicConditions(() => {
+                                createCustomElements();
+                                done();
+                            });
                         });
                     });
                 });
@@ -3558,10 +3560,6 @@ TABS.osd = {};
 TABS.osd.initialize = function (callback) {
 
     mspHelper.loadServoMixRules();
-    mspHelper.loadLogicConditions(function() {
-        // Refresh LC dropdowns now that conditions are loaded
-        $('select.lc, select.ico_lc').html(getLCoptions());
-    });
 
     if (GUI.active_tab != 'osd') {
         GUI.active_tab = 'osd';
@@ -4009,14 +4007,14 @@ function fillCustomElementsValues() {
             }
         }
 
-        $('.osdCustomElement-' + i + '-visibility-type').val(FC.OSD_CUSTOM_ELEMENTS .items[i].customElementVisibility.type).trigger('change');
+        $('.osdCustomElement-' + i + '-visibility-type').val(FC.OSD_CUSTOM_ELEMENTS.items[i].customElementVisibility.type).trigger('change');
         var valueVisibilityCell = $('.osdCustomElement-' + i + '-visibility-value');
-        switch (FC.OSD_CUSTOM_ELEMENTS .items[i].customElementVisibility.type){
+        switch (FC.OSD_CUSTOM_ELEMENTS.items[i].customElementVisibility.type){
             case 1:
-                valueVisibilityCell.find('.gv').val(FC.OSD_CUSTOM_ELEMENTS .items[i].customElementVisibility.value).trigger('change');
+                valueVisibilityCell.find('.gv').val(FC.OSD_CUSTOM_ELEMENTS.items[i].customElementVisibility.value).trigger('change');
                 break;
             case 2:
-                valueVisibilityCell.find('.lc').val(FC.OSD_CUSTOM_ELEMENTS .items[i].customElementVisibility.value).trigger('change');
+                valueVisibilityCell.find('.lc').val(FC.OSD_CUSTOM_ELEMENTS.items[i].customElementVisibility.value).trigger('change');
                 break;
         }
 
