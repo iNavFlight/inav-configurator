@@ -448,7 +448,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
             rules = currentMixerPreset.motorMixer;
         }
 
-        if (currentMixerPreset.image != 'quad_x') {
+        if (currentMixerPreset.image != 'quad_x' && currentMixerPreset.image != 'quad_p') {
             for (let i = 1; i < 5; i++) {
                 $("#motorNumber"+i).css("visibility", "hidden");
             }
@@ -467,19 +467,30 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
                 const rule = rules[i];
                 index++;
 
-                if (currentMixerPreset.image != 'quad_x') {
+                if (currentMixerPreset.image != 'quad_x' && currentMixerPreset.image != 'quad_p') {
                     continue;
                 }
 
                 let top_px = 28;
                 let left_px = 28;
-                if (rule.getRoll() < -0.5) {
-                  left_px = $img.width() - 42;
+
+                const roll = rule.getRoll();
+                const pitch = rule.getPitch();
+
+                if (Math.abs(roll) < 0.1) {
+                    // Center horizontally (Plus: front/rear motors)
+                    left_px = ($img.width() - 14) / 2;
+                } else if (roll < -0.5) {
+                    left_px = $img.width() - 42;
                 }
 
-                if (rule.getPitch() > 0.5) {
-                  top_px = imgHeight - 44;
+                if (Math.abs(pitch) < 0.1) {
+                    // Center vertically (Plus: left/right motors)
+                    top_px = (imgHeight - 14) / 2;
+                } else if (pitch > 0.5) {
+                    top_px = imgHeight - 44;
                 }
+
                 $("#motorNumber"+index).css("left", left_px + "px");
                 $("#motorNumber"+index).css("top", top_px + "px");
                 $("#motorNumber"+index).removeClass("is-hidden");
@@ -650,6 +661,22 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
             $('.wizard-progress-step').removeClass('active complete');
         }
 
+        function positionWizardButtons() {
+            if (currentMixerPreset.image === 'quad_p') {
+                // Plus layout: cardinal positions (center of each edge)
+                $('#wizardPos0').css({ bottom: '-8px', left: 'calc(50% - 18px)', top: '', right: '', transform: '' });
+                $('#wizardPos1').css({ right: '-8px', top: 'calc(50% - 18px)', bottom: '', left: '', transform: '' });
+                $('#wizardPos2').css({ left: '-8px', top: 'calc(50% - 18px)', bottom: '', right: '', transform: '' });
+                $('#wizardPos3').css({ top: '-8px', left: 'calc(50% - 18px)', bottom: '', right: '', transform: '' });
+            } else {
+                // X layout: diagonal corners
+                $('#wizardPos0').css({ bottom: '10px', right: '10px', top: '', left: '', transform: '' });
+                $('#wizardPos1').css({ top: '10px', right: '10px', bottom: '', left: '', transform: '' });
+                $('#wizardPos2').css({ bottom: '10px', left: '10px', top: '', right: '', transform: '' });
+                $('#wizardPos3').css({ top: '10px', left: '10px', bottom: '', right: '', transform: '' });
+            }
+        }
+
         function updateWizardProgress(motorIndex) {
             $('#wizard-current-motor').text(motorIndex + 1);
 
@@ -809,6 +836,8 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
             if ($mainImg.attr('src')) {
                 $wizardImg.attr('src', $mainImg.attr('src'));
             }
+
+            positionWizardButtons();
         };
 
         // Clean up when modal closes
@@ -874,7 +903,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
 
             FC.MIXER_CONFIG.appliedMixerPreset = presetId;
 
-            if (currentMixerPreset.id == 3) {
+            if (currentMixerPreset.id == 3 || currentMixerPreset.id == 2) {
                 $("#mixer-wizard-gui_box").removeClass("is-hidden");
             } else {
                 $("#mixer-wizard-gui_box").addClass("is-hidden");
