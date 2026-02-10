@@ -3898,7 +3898,7 @@ function buildSlotRow(i, ii) {
         }
     });
 
-    $row.append($hiddenType).append($sourceSelect).append($formatSelect).append($valueDiv);
+    $row.append($hiddenType).append($sourceSelect).append($valueDiv).append($formatSelect);
     return $row;
 }
 
