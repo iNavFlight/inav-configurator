@@ -3796,8 +3796,10 @@ function createCustomElements(){
     $('#INAVCharacterMapDocURL').attr('href', globalSettings.configuratorTreeLocation + 'resources/osd/INAV%20Character%20Map.md');
 }
 
-// Build one slot column (type + value cells) inside a card
-function buildSlotColumn(i, ii, $typeRow, $valueRow) {
+// Build one slot row (source select + value inputs) inside a card body
+function buildSlotRow(i, ii) {
+    var $row = $('<div>').addClass('ce-slot-row');
+
     // Hidden original type select — preserves class names for fillCustomElementsValues/customElementGetDataForRow
     var $hiddenType = $('<select>').addClass('osdCustomElement-' + i + '-part-' + ii + '-type')
         .data('valueCellClass', 'osdCustomElement-' + i + '-part-' + ii + '-value')
@@ -3870,43 +3872,40 @@ function buildSlotColumn(i, ii, $typeRow, $valueRow) {
     });
     $formatSelect.on('change', updateHiddenType);
 
-    // Reverse bridge: hidden type change → update visible selects (for fillCustomElementsValues)
-    $hiddenType.on('change', function() {
-        var type = parseInt($(this).val());
-        var sf = ceTypeToSourceFormat(type);
-        // Update visible selects without triggering change (prevents loop)
-        $sourceSelect.val(sf.source);
-        if (sf.source === 5 || sf.source === 6) {
-            $formatSelect.show().val(sf.formatIndex);
-        } else {
-            $formatSelect.hide();
-        }
-        // Show/hide value inputs using existing data-value logic
-        var dataValue = $(this).find(':selected').data('value');
-        var valueBlock = $('.osdCustomElement-' + i + '-part-' + ii + '-value');
-        valueBlock.find('.value').hide();
-        if (dataValue) {
-            valueBlock.find('.' + dataValue).show();
-        }
-    });
-
-    // Type cell
-    var $typeTd = $('<td>').append($hiddenType).append($sourceSelect).append($formatSelect);
-    $typeRow.append($typeTd);
-
-    // Value cell (same structure as original)
-    var $valueTd = $('<td>').addClass('osdCustomElement-' + i + '-part-' + ii + '-value')
+    // Value container
+    var $valueDiv = $('<div>').addClass('ce-slot-value osdCustomElement-' + i + '-part-' + ii + '-value')
         .append($('<input>').addClass('value').addClass('text').attr('type', 'text').attr('maxlength', FC.OSD_CUSTOM_ELEMENTS.settings.customElementTextSize).hide())
         .append($('<input>').addClass('value').addClass('ico').attr('min', 1).attr('max', 255).hide())
         .append($('<select>').addClass('value').addClass('ico_gv').html(getGVoptions()).hide())
         .append($('<select>').addClass('value').addClass('ico_lc').html(getLCoptions()).hide())
         .append($('<select>').addClass('value').addClass('gv').html(getGVoptions()).hide())
         .append($('<select>').addClass('value').addClass('lc').html(getLCoptions()).hide());
-    $valueRow.append($valueTd);
+
+    // Reverse bridge: hidden type change → update visible selects (for fillCustomElementsValues)
+    $hiddenType.on('change', function() {
+        var type = parseInt($(this).val());
+        var sf = ceTypeToSourceFormat(type);
+        $sourceSelect.val(sf.source);
+        if (sf.source === 5 || sf.source === 6) {
+            $formatSelect.show().val(sf.formatIndex);
+        } else {
+            $formatSelect.hide();
+        }
+        var dataValue = $(this).find(':selected').data('value');
+        $valueDiv.find('.value').hide();
+        if (dataValue) {
+            $valueDiv.find('.' + dataValue).show();
+        }
+    });
+
+    $row.append($hiddenType).append($sourceSelect).append($formatSelect).append($valueDiv);
+    return $row;
 }
 
-// Build visibility column for a custom element card
-function buildVisibilityColumn(i, $typeRow, $valueRow) {
+// Build visibility row for a custom element card
+function buildVisibilityRow(i) {
+    var $row = $('<div>').addClass('ce-slot-row');
+
     var $selectVisibility = $('<select>').addClass('osdCustomElement-' + i + '-visibility-type')
         .data('valueCellClass', 'osdCustomElement-' + i + '-visibility-value')
         .html(
@@ -3914,21 +3913,21 @@ function buildVisibilityColumn(i, $typeRow, $valueRow) {
             '<option data-value="gv" value="1">Global Variable</option>' +
             '<option data-value="lc" value="2">Logic Condition</option>'
         );
-    $typeRow.append($('<td>').append($selectVisibility));
 
-    var $valueTd = $('<td>').addClass('osdCustomElement-' + i + '-visibility-value')
+    var $valueDiv = $('<div>').addClass('ce-slot-value osdCustomElement-' + i + '-visibility-value')
         .append($('<select>').addClass('value').addClass('gv').html(getGVoptions()).hide())
         .append($('<select>').addClass('value').addClass('lc').html(getLCoptions()).hide());
-    $valueRow.append($valueTd);
 
     $selectVisibility.on('change', function() {
         var dataValue = $(this).find(':selected').data('value');
-        var valueBlock = $('.osdCustomElement-' + i + '-visibility-value');
-        valueBlock.find('.value').hide();
+        $valueDiv.find('.value').hide();
         if (dataValue) {
-            valueBlock.find('.' + dataValue).show();
+            $valueDiv.find('.' + dataValue).show();
         }
     });
+
+    $row.append($selectVisibility).append($valueDiv);
+    return $row;
 }
 
 // Build a single custom element card
@@ -3995,19 +3994,14 @@ function buildCustomElementCard(i) {
         });
     });
 
-    // Body
+    // Body — vertical stacked rows (one per slot + visibility)
     var $body = $('<div>').addClass('ce-card-body settings');
-    var $table = $('<table>').addClass('osdCustomElement_main_table');
-    var $typeRow = $('<tr>').data('row', i);
-    var $valueRow = $('<tr>').data('row', i);
 
     for (var ii = 0; ii < FC.OSD_CUSTOM_ELEMENTS.settings.customElementParts; ii++) {
-        buildSlotColumn(i, ii, $typeRow, $valueRow);
+        $body.append(buildSlotRow(i, ii));
     }
-    buildVisibilityColumn(i, $typeRow, $valueRow);
+    $body.append(buildVisibilityRow(i));
 
-    $table.append($typeRow).append($valueRow);
-    $body.append($table);
     $card.append($header).append($body);
     return $card;
 }
@@ -4048,24 +4042,27 @@ function updateCustomElementCardStates() {
     updateCardHeaderPreviews();
 }
 
-// Update card header preview text from display group items
+// Update card header preview with plain-text slot summary (no OSD font characters)
 function updateCardHeaderPreviews() {
-    var ceGroup = OSD.constants.ALL_DISPLAY_GROUPS.filter(function(e) {
-        return e.name == "osdGroupOSDCustomElements";
-    })[0];
-    if (!ceGroup) return;
-
     $('#osdCustomElementCards .ce-card').each(function() {
         var idx = parseInt($(this).attr('data-ce-index'));
-        var itemName = 'CUSTOM_ELEMENT_' + (idx + 1);
-        for (var si = 0; si < ceGroup.items.length; si++) {
-            if (ceGroup.items[si].name == itemName) {
-                var preview = ceGroup.items[si].preview || '';
-                var defaultPreview = 'CE_' + (idx + 1);
-                $(this).find('.ce-card-preview').text(preview !== defaultPreview ? preview : '');
-                break;
+        var parts = [];
+        for (var ii = 0; ii < FC.OSD_CUSTOM_ELEMENTS.settings.customElementParts; ii++) {
+            var type = parseInt($('.osdCustomElement-' + idx + '-part-' + ii + '-type').val());
+            if (type === 0) continue;
+            var sf = ceTypeToSourceFormat(type);
+            var sourceNames = ['', 'Text', 'Icon', 'Icon', 'Icon', 'GV', 'LC'];
+            var label = sourceNames[sf.source] || '';
+            if ((sf.source === 5 || sf.source === 6) && sf.formatIndex > 0) {
+                label += ' ' + OSD.constants.CE_FORMATS[sf.formatIndex].label;
             }
+            if (sf.source === 1) {
+                var text = $('.osdCustomElement-' + idx + '-part-' + ii + '-value').find('.text').val();
+                if (text) label = '"' + text.trim() + '"';
+            }
+            parts.push(label);
         }
+        $(this).find('.ce-card-preview').text(parts.join(' + '));
     });
 }
 
@@ -4279,7 +4276,7 @@ function fillCustomElementsValues() {
 function customElementsInitCallback() {
 
     var callback = function(){
-        var row = $(this).closest('tr').data('row');
+        var row = parseInt($(this).closest('.ce-card').attr('data-ce-index'));
 
         customElementNormaliseRow(row);
         customElementDisableNonValidOptionsRow(row);

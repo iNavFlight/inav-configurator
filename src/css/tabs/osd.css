@@ -791,12 +791,35 @@
     border-top: 1px solid #eee;
 }
 
-.ce-source-select, .ce-format-select {
-    width: 100% !important;
+.ce-slot-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 4px;
+}
+
+.ce-slot-row:last-child {
+    margin-bottom: 0;
+}
+
+.ce-source-select {
+    width: auto !important;
+    flex-shrink: 0;
 }
 
 .ce-format-select {
-    margin-top: 4px;
+    width: auto !important;
+    flex-shrink: 0;
+}
+
+.ce-slot-value {
+    flex: 1;
+    min-width: 0;
+}
+
+.ce-slot-value input,
+.ce-slot-value select {
+    width: 100% !important;
 }
 
 .osdCustomElement_main_table {
