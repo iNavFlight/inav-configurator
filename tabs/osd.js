@@ -3933,14 +3933,16 @@ function buildVisibilityRow(i) {
 // Build a single custom element card
 function buildCustomElementCard(i) {
     var ceItemName = 'CUSTOM_ELEMENT_' + (i + 1);
-    var ceGroup = OSD.constants.ALL_DISPLAY_GROUPS.filter(function(e) {
+    var ceGroup = OSD.constants.ALL_DISPLAY_GROUPS.find(function(e) {
         return e.name == "osdGroupOSDCustomElements";
-    })[0];
+    });
     var ceDisplayItem = null;
-    for (var ci = 0; ci < ceGroup.items.length; ci++) {
-        if (ceGroup.items[ci].name == ceItemName) {
-            ceDisplayItem = ceGroup.items[ci];
-            break;
+    if (ceGroup && Array.isArray(ceGroup.items)) {
+        for (var ci = 0; ci < ceGroup.items.length; ci++) {
+            if (ceGroup.items[ci].name == ceItemName) {
+                ceDisplayItem = ceGroup.items[ci];
+                break;
+            }
         }
     }
 
