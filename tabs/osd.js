@@ -3769,6 +3769,45 @@ TABS.osd.initialize = function (callback) {
     });
 };
 
+// Icon picker popup — shows a grid of OSD font characters for selection
+function openIconPicker($targetInput) {
+    // Close any existing picker
+    $('.ce-icon-picker-overlay').remove();
+
+    var $overlay = $('<div>').addClass('ce-icon-picker-overlay').on('click', function() {
+        $(this).remove();
+    });
+
+    var $popup = $('<div>').addClass('ce-icon-picker-popup').on('click', function(e) {
+        e.stopPropagation();
+    });
+    $popup.append($('<div>').addClass('ce-icon-picker-title').text('Select OSD Icon'));
+
+    var $grid = $('<div>').addClass('ce-icon-picker-grid');
+    var currentVal = parseInt($targetInput.val()) || 0;
+
+    for (var c = 1; c <= 255; c++) {
+        var url = (FONT.data && FONT.data.character_image_urls[c]) ? FONT.draw(c) : '';
+        var $tile = $('<div>').addClass('ce-icon-picker-tile')
+            .attr('data-char', c)
+            .attr('title', '#' + c)
+            .append($('<img>').attr('src', url));
+        if (c === currentVal) {
+            $tile.addClass('ce-icon-picker-selected');
+        }
+        $tile.on('click', function() {
+            var val = parseInt($(this).attr('data-char'));
+            $targetInput.val(val).trigger('change');
+            $overlay.remove();
+        });
+        $grid.append($tile);
+    }
+
+    $popup.append($grid);
+    $overlay.append($popup);
+    $('body').append($overlay);
+}
+
 // Convert source index (0-6) + format index to the flat type value (0-28)
 // Sources: 0=None, 1=Text, 2=Icon Static, 3=Icon GV, 4=Icon LC, 5=GV, 6=LC
 function ceSourceFormatToType(source, formatIndex) {
@@ -3872,10 +3911,33 @@ function buildSlotRow(i, ii) {
     });
     $formatSelect.on('change', updateHiddenType);
 
+    // Icon picker: hidden input + clickable preview button
+    var $icoInput = $('<input>').addClass('value').addClass('ico').attr('type', 'hidden').attr('min', 1).attr('max', 255);
+    var $icoBtn = $('<div>').addClass('value ico ce-ico-picker-btn').hide()
+        .append($('<img>').addClass('ce-ico-preview'))
+        .append($('<span>').addClass('ce-ico-label'));
+    // Update preview when input value changes
+    $icoInput.on('change', function() {
+        var val = parseInt($(this).val()) || 0;
+        if (val > 0 && FONT.data && FONT.data.character_image_urls[val]) {
+            $icoBtn.find('.ce-ico-preview').attr('src', FONT.draw(val));
+            $icoBtn.find('.ce-ico-label').text('#' + val);
+        } else {
+            $icoBtn.find('.ce-ico-preview').attr('src', '');
+            $icoBtn.find('.ce-ico-label').text('Pick icon');
+        }
+    });
+    // Open popup grid on click
+    $icoBtn.on('click', function(e) {
+        e.stopPropagation();
+        openIconPicker($icoInput);
+    });
+
     // Value container
     var $valueDiv = $('<div>').addClass('ce-slot-value osdCustomElement-' + i + '-part-' + ii + '-value')
         .append($('<input>').addClass('value').addClass('text').attr('type', 'text').attr('maxlength', FC.OSD_CUSTOM_ELEMENTS.settings.customElementTextSize).hide())
-        .append($('<input>').addClass('value').addClass('ico').attr('min', 1).attr('max', 255).hide())
+        .append($icoInput)
+        .append($icoBtn)
         .append($('<select>').addClass('value').addClass('ico_gv').html(getGVoptions()).hide())
         .append($('<select>').addClass('value').addClass('ico_lc').html(getLCoptions()).hide())
         .append($('<select>').addClass('value').addClass('gv').html(getGVoptions()).hide())
