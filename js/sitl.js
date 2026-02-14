@@ -183,17 +183,19 @@ var SITLProcess = {
 
     spawn: function(path, args) {
 
-        var opts = undefined;
-        if (GUI.operating_system == 'Linux')
-            opts = { useShell: true };
-
-        window.electronAPI.startChildProcess(path, args, opts);
-
-        if (this.processHandle == -1) {
+        window.electronAPI.onChildProcessError((error) => {
+            console.log(`SITL error: ${error.message || JSON.stringify(error)}`);
+            GUI.log(`SITL error: ${error.message || JSON.stringify(error)}`);
+        });
+        window.electronAPI.onChildProcessExit((data) => {
+            if (data.code !== 0 && data.code !== null) {
+                console.log(`SITL process exited with code ${data.code}`);
+                GUI.log(`SITL process exited with code ${data.code}`);
+            }
             this.isRunning = false;
-            return;
-        }
+        });
 
+        window.electronAPI.startChildProcess(path, args);
         this.isRunning = true;
     },
 

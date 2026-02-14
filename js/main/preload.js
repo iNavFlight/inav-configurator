@@ -95,4 +95,10 @@ contextBridge.exposeInMainWorld('electronAPI', {
     return handler;
   },
   offChildProcessError: (handler) => ipcRenderer.removeListener('onChildProcessError', handler),
+  onChildProcessExit: (callback) => {
+    const handler = (_event, data) => callback(data);
+    ipcRenderer.on('onChildProcessExit', handler);
+    return handler;
+  },
+  offChildProcessExit: (handler) => ipcRenderer.removeListener('onChildProcessExit', handler),
 });
