@@ -93,8 +93,9 @@ var SitlSerialPortUtils = {
 
 var SITLProcess = {
 
-    spawn : null,
     isRunning: false,
+    _errorHandler: null,
+    _exitHandler: null,
 
     deleteEepromFile(filename) {
         window.electronAPI.rm(`${window.electronAPI.appGetPath('userData')}/${filename}`).then(error => {
@@ -183,11 +184,18 @@ var SITLProcess = {
 
     spawn: function(path, args) {
 
-        window.electronAPI.onChildProcessError((error) => {
+        if (this._errorHandler) {
+            window.electronAPI.offChildProcessError(this._errorHandler);
+        }
+        if (this._exitHandler) {
+            window.electronAPI.offChildProcessExit(this._exitHandler);
+        }
+
+        this._errorHandler = window.electronAPI.onChildProcessError((error) => {
             console.log(`SITL error: ${error.message || JSON.stringify(error)}`);
             GUI.log(`SITL error: ${error.message || JSON.stringify(error)}`);
         });
-        window.electronAPI.onChildProcessExit((data) => {
+        this._exitHandler = window.electronAPI.onChildProcessExit((data) => {
             if (data.code !== 0 && data.code !== null) {
                 console.log(`SITL process exited with code ${data.code}`);
                 GUI.log(`SITL process exited with code ${data.code}`);
