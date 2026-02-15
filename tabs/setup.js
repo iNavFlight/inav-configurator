@@ -150,6 +150,8 @@ TABS.setup.initialize = function (callback) {
                     gpsLat_e.text((FC.GPS_DATA.lat / 10000000).toFixed(4) + ' deg');
                     gpsLon_e.text((FC.GPS_DATA.lon / 10000000).toFixed(4) + ' deg');
                 });
+            } else {
+                gpsFix_e.html(i18n.getMessage('gpsFixNotConnected'));
             }
         }
 
@@ -174,7 +176,7 @@ TABS.setup.initialize = function (callback) {
             let remaining_capacity_unit = FC.MISC.battery_capacity_unit == 'mAh' ? 'mAh' : 'Wh';
             bat_remaining_e.text(i18n.getMessage('initialSetupBatteryRemainingCapacityValue', ((FC.MISC.battery_capacity > 0) && FC.ANALOG.battery_full_when_plugged_in) ? [remaining_capacity_value, remaining_capacity_unit] : ['NA', '']));
             bat_percent_e.text(i18n.getMessage('initialSetupBatteryPercentageValue', [FC.ANALOG.battery_percentage]));
-            bat_full_e.text(i18n.getMessage('initialSetupBatteryFullValue', [FC.ANALOG.battery_full_when_plugged_in]));
+            bat_full_e.text(i18n.getMessage('initialSetupBatteryFullValue', [FC.ANALOG.battery_full_when_plugged_in ? 'Yes' : 'No']));
             bat_thresh_e.text(i18n.getMessage('initialSetupBatteryThresholdsValue', [FC.ANALOG.use_capacity_thresholds]));
             bat_mah_drawn_e.text(i18n.getMessage('initialSetupBatteryMahValue', [FC.ANALOG.mAhdrawn]));
             let capacity_drawn_decimals = FC.ANALOG.mWhdrawn.toString().length < 5 ? 3 : (7 - FC.ANALOG.mWhdrawn.toString().length);

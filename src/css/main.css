@@ -1721,16 +1721,14 @@ dialog {
     color: white;
     font-size: 10px;
     margin-top: 20px;
-    width: 100px;
     float: right;
     margin-right: 20px;
     line-height: 12px;
-    height: 64px;
     border-radius: 5px;
     border: 1px solid #272727;
     box-shadow: 0 1px 0 rgba(92, 92, 92, 0.5);
     background: #434343 -webkit-linear-gradient(top, transparent, rgba(0, 0, 0, 0.55));
-    padding-top: 5px;
+    padding: 1em;
     display: none;
     text-shadow: 0 1px rgba(0, 0, 0, 1.0);
 }
@@ -1794,13 +1792,8 @@ dialog {
 }
 
 .dataflash-contents_global {
-    margin-top: 30px;
     border: 1px solid #4A4A4A;
     background-color: #4A4A4A;
-    display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    justify-content: flex-start;
     border-radius: 3px;
     margin-left: 5px;
     margin-right: 5px;
@@ -1816,21 +1809,13 @@ dialog {
 }
 
 .dataflash-contents_global li {
-    height: 5px;
-    position: relative;
+    min-height: 5px;
     box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.20);
     border-radius: 2px;
-
 }
 
-.dataflash-contents_global li div {
-    position: absolute;
-    top: -30px;
-    margin-top: 0;
-    left: 0;
-    right: 0;
-    width: 120px;
-    text-align: left;
+.dataflash-free_global_label {
+    white-space: nowrap;
     color: silver;
 }
 
@@ -1855,6 +1840,11 @@ dialog {
     display: none;
 }
 
+.battery-label {
+    display: inline;
+    color: #aaa;
+}
+
 /* Battery element styling*/
 
 #quad-status_wrapper {
@@ -1862,11 +1852,9 @@ dialog {
     color: white;
     font-size: 10px;
     margin-top: 20px;
-    width: 100px;
     float: right;
     margin-right: 20px;
     line-height: 12px;
-    height: 67px;
     border-radius: 5px;
     border: 1px solid #272727;
     box-shadow: 0 1px 0 rgba(92, 92, 92, 0.5);
@@ -1878,21 +1866,12 @@ dialog {
     display: none;
     margin-top: 10px;
     margin-left: 14px;
-    height: 10px;
-    width: 30px;
 }
 
 .battery-legend {
     display: inline;
-    position: relative;
-    top: -2px;
-    margin-top: 0;
-    left: 0;
-    right: 0;
-    width: 40px;
-    text-align: left;
     color: silver;
-    margin-left: -8px;
+    margin-right: 8px;
 }
 
 .quad-status-contents progress::-webkit-progress-bar {
@@ -1915,8 +1894,8 @@ dialog {
 
 .battery-icon {
     display: inline-block;
-    height: 30px;
-    width: 60px;
+    min-height: 30px;
+    min-width: 60px;
     transition: none;
     margin-top: 4px;
     background: url("./../../images/icons/cf_icon_bat_grey.svg") no-repeat center;
