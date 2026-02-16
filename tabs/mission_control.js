@@ -143,6 +143,8 @@ TABS.mission_control.initialize = function (callback) {
         isGeozoneEnabeld = true;
     }
 
+    
+
     if (CONFIGURATOR.connectionValid) {
         var loadChainer = new MSPChainerClass();
         loadChainer.setChain([
@@ -240,6 +242,8 @@ function iconKey(filename) {
             loadSettings();
             // let the dom load finish, avoiding the resizing of the map
             setTimeout(initMap, 200);
+            // Set initial button visibility based on mission state
+            setTimeout(updateLocationButtonsVisibility, 300);
             if (!isOffline) {
                 setTimeout(() => {
                     if (FC.SAFEHOMES.safehomeCount() >= 1) {
@@ -1323,6 +1327,7 @@ function iconKey(filename) {
         setView(14);
         refreshLayers();
         updateTotalInfo();
+        updateLocationButtonsVisibility();
     }
 
     /* selects single mission from MM repository */
@@ -1364,6 +1369,7 @@ function iconKey(filename) {
         refreshLayers();
         updateTotalInfo();
         plotElevation();
+        updateLocationButtonsVisibility();
     }
 
     /* single mission selection using WP Edit panel button */
@@ -1424,7 +1430,6 @@ function iconKey(filename) {
             };
             dialog.showOpenDialog(options).then(result => {
                 if (result.canceled) {
-                    console.log('No file selected');
                     return;
                 }
 
@@ -1460,14 +1465,25 @@ function iconKey(filename) {
     //
     /////////////////////////////////////////////
 
+    // Show/hide location buttons based on waypoint presence
+    function updateLocationButtonsVisibility() {
+        if (mission.isEmpty() && !multimissionCount) {
+            $('#centerOnCurrentLocation, #searchAddress').fadeIn(300);
+        } else {
+            $('#centerOnCurrentLocation, #searchAddress').fadeOut(300);
+        }
+    }
+
     function removeAllWaypoints() {
         mission.reinit();
         refreshLayers();
         clearEditForm();
         updateTotalInfo();
         clearFilename();
+        updateLocationButtonsVisibility();
     }
 
+    
     function addWaypointMarker(waypoint, isEdit=false) {
         let coord = fromLonLat([waypoint.getLonMap(), waypoint.getLatMap()]);
         var iconFeature = new Feature({
@@ -2682,6 +2698,7 @@ function iconKey(filename) {
                     refreshLayers();
                     plotElevation();
                 }
+                updateLocationButtonsVisibility();
             }
             //mission.missionDisplayDebug();
             updateMultimissionState();
@@ -2726,6 +2743,12 @@ function iconKey(filename) {
         /////////////////////////////////////////////
         // Callback to show/hide menu boxes
         /////////////////////////////////////////////
+        
+        // Ensure ActionContent is visible initially
+        if ($('#showHideActionButton').children().attr('class') === 'ic_hide') {
+            $('#ActionContent').show();
+        }
+        
         $('#showHideActionButton').on('click', function () {
             var src = ($(this).children().attr('class') === 'ic_hide')
                 ? 'ic_show'
@@ -3664,6 +3687,109 @@ function iconKey(filename) {
             }
         });
 
+        // Address search button
+        $(document).on('click', '#searchAddressButton, #searchAddress', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            // Remove any existing dialog
+            $('#addressSearchDialog, #addressSearchBackdrop').remove();
+
+            // Create dialog
+            const addressDialog = $(`
+                <div id="addressSearchBackdrop" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+                     background: rgba(0,0,0,0.5); z-index: 10000;">
+                    <div id="addressSearchDialog" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); 
+                         background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.3);">
+                        <h3>Search for Location</h3>
+                        <input type="text" id="addressInput" style="width: 280px; padding: 8px 12px; margin: 10px 0; border: 1px solid #ccc; font-size: 14px;" 
+                               placeholder="Enter address, city, or coordinates" value="" autocomplete="off">
+                        <div style="margin-top: 15px; text-align: right;">
+                            <button id="searchCancel" style="padding: 8px 16px; margin-right: 10px;">Cancel</button>
+                            <button id="searchOK" style="padding: 8px 16px; background: #007cba; color: white; border: none;">Search</button>
+                        </div>
+                    </div>
+                </div>
+            `);
+
+            $('body').append(addressDialog);
+
+          
+            // Search function
+            function doSearch() {
+                const address = $('#addressInput').val().trim();
+                $('#addressSearchBackdrop').remove();
+
+                if (address) {
+                    const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&limit=1`;
+                    
+                    fetch(url)
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data && data.length > 0) {
+                                const result = data[0];
+                                const coord = fromLonLat([parseFloat(result.lon), parseFloat(result.lat)]);
+                                map.getView().setCenter(coord);
+                                map.getView().setZoom(18);
+                                dialog.alert(`Found: ${result.display_name}`);
+                            } else {
+                                dialog.alert('Address not found.');
+                            }
+                        })
+                        .catch(err => {
+                            console.error('Search failed:', err);
+                            dialog.alert('Search failed. Check your connection.');
+                        });
+                }
+
+                setTimeout(() => {
+                    const input = document.getElementById('addressInput');
+                    input?.focus();
+                    input?.select();
+                }, 50);
+
+            }
+
+            // Event handlers
+            $('#searchOK').click(doSearch);
+            $('#searchCancel').click(() => $('#addressSearchBackdrop').remove());
+            $('#addressInput').keypress(function(e) {
+                if (e.which === 13) doSearch();
+            });
+            
+            // Only close on backdrop click, not dialog content click
+            $('#addressSearchBackdrop').click(function(e) {
+                if (e.target === this) {
+                    $('#addressSearchBackdrop').remove();
+                }
+            });
+            
+            // Prevent clicks inside the dialog from closing it
+            $('#addressSearchDialog').click(function(e) {
+                e.stopPropagation();
+            });
+        });
+
+        $('#centerOnCurrentLocationButton').on('click', function (e) {
+            e.preventDefault();
+            
+            // Use IP-based location
+            fetch('https://ipapi.co/json/')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.latitude && data.longitude) {
+                        const coord = fromLonLat([data.longitude, data.latitude]);
+                        map.getView().setCenter(coord);
+                        map.getView().setZoom(12);
+                    } else {
+                        alert('Unable to determine location from IP address.');
+                    }
+                })
+                .catch(err => {
+                    alert('Unable to get location. Please check your internet connection.');
+                });
+        });
+
         $('#removePoint').on('click', function () {
             if (selectedMarker) {
                 if (mission.isJumpTargetAttached(selectedMarker)) {
@@ -3686,6 +3812,7 @@ function iconKey(filename) {
                         clearEditForm();
                         refreshLayers();
                         plotElevation();
+                        updateLocationButtonsVisibility();
                     }
                 }
                 else {
@@ -3700,6 +3827,7 @@ function iconKey(filename) {
                     plotElevation();
                 }
                 updateMultimissionState();
+                updateLocationButtonsVisibility();
             }
         });
 
@@ -3715,7 +3843,6 @@ function iconKey(filename) {
             };
             dialog.showOpenDialog(options).then(result => {
                 if (result.canceled) {
-                    console.log('No file selected');
                     return;
                 }
                 if (result.filePaths.length == 1) {
@@ -3965,6 +4092,7 @@ function iconKey(filename) {
                     mission.update(true, true);
                 }
                 updateMultimissionState();
+                updateLocationButtonsVisibility();
 
                 if (Object.keys(mission.getCenter()).length !== 0) {
                     var coord = fromLonLat([mission.getCenter().lon / 10000000 , mission.getCenter().lat / 10000000]);
@@ -4149,6 +4277,7 @@ function iconKey(filename) {
                 mission.update(false, true);
                 refreshLayers();
                 $('#MPeditPoint').fadeOut(300);
+                updateLocationButtonsVisibility();
             }
         ]);
         saveChainer.execute();
