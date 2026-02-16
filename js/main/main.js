@@ -118,10 +118,7 @@ function createWindow() {
       preload: path.join(__dirname, 'preload.mjs'),
       nodeIntegration: true,
       webSecurity: false,
-      contextIsolation: true,
-      enableRemoteModule: true,
-      // Enable location services like a regular browser
-      experimentalFeatures: true
+      contextIsolation: true
     },
   });
 
@@ -192,18 +189,6 @@ function createWindow() {
   mainWindow.webContents.session.setDevicePermissionHandler((details) => {
     if (details.deviceType === 'usb') {     
         return true;
-    }
-  });
-
-  // Handle geolocation permission requests
-  mainWindow.webContents.session.setPermissionRequestHandler((webContents, permission, callback) => {
-    console.log('Permission requested:', permission);
-    if (permission === 'geolocation') {
-      // Always allow geolocation for the configurator
-      callback(true);
-    } else {
-      // Allow other permissions by default
-      callback(true);
     }
   });
 
