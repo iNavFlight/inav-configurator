@@ -1,7 +1,7 @@
 {
   "name": "inav-configurator",
   "productName": "INAV Configurator",
-  "description": "Configurator for the open source flight controller software INAV.",
+  "description": "Configurator for the open source flight controller firmware INAV.",
   "version": "9.0.2",
   "main": ".vite/build/main.js",
   "type": "module",
