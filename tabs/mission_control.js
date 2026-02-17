@@ -3730,7 +3730,6 @@ function iconKey(filename) {
                                 const result = data[0];
                                 const coord = fromLonLat([parseFloat(result.lon), parseFloat(result.lat)]);
                                 map.getView().setCenter(coord);
-                                map.getView().setZoom(18);
                                 dialog.alert(`Found: ${result.display_name}`);
                             } else {
                                 dialog.alert('Address not found.');
@@ -3768,26 +3767,6 @@ function iconKey(filename) {
             $('#addressSearchDialog').click(function(e) {
                 e.stopPropagation();
             });
-        });
-
-        $('#centerOnCurrentLocationButton').on('click', function (e) {
-            e.preventDefault();
-            
-            // Use IP-based location
-            fetch('https://ipapi.co/json/')
-                .then(response => response.json())
-                .then(data => {
-                    if (data.latitude && data.longitude) {
-                        const coord = fromLonLat([data.longitude, data.latitude]);
-                        map.getView().setCenter(coord);
-                        map.getView().setZoom(12);
-                    } else {
-                        alert('Unable to determine location from IP address.');
-                    }
-                })
-                .catch(err => {
-                    alert('Unable to get location. Please check your internet connection.');
-                });
         });
 
         $('#removePoint').on('click', function () {
