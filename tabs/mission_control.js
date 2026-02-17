@@ -288,8 +288,10 @@ function iconKey(filename) {
           let lat = FC.GPS_DATA.lat / 10000000;
           let lon = FC.GPS_DATA.lon / 10000000;
 
+          const hasGpsLock = (FC.GPS_DATA.fix >= 2) || (FC.GPS_DATA.numSat >= 4);
+
           //Update map
-          if (FC.GPS_DATA.fix >= 2) {
+          if (hasGpsLock) {
 
               if (!cursorInitialized) {
                   cursorInitialized = true;
@@ -376,20 +378,22 @@ function iconKey(filename) {
                   //create layer for heading, alt, groundspeed
                   textGeom = new Point([0,0]);
 
-                  textStyle = new Style({
-                    text: new Text({
-                      font: 'bold 35px Calibri,sans-serif',
-                      fill: new Fill({ color: '#fff' }),
-                      offsetX: map.getSize()[0]-260,
-                      offsetY: 80,
-                      textAlign: 'left',
-                      backgroundFill: new Fill({ color: '#000' }),
-                      stroke: new Stroke({
-                        color: '#fff', width: 2
-                      }),
-                      text: 'H: XXX\nAlt: XXXm\nSpeed: XXXcm/s'
-                    })
-                  });
+                                      const boxMargin = 150;
+                                    textStyle = new Style({ // slimmer top-right GPS overlay
+                                        text: new Text({
+                                            font: 'bold 20px Calibri,sans-serif',
+                                            fill: new Fill({ color: '#fff' }),
+                                            offsetX: map.getSize()[0] - boxMargin,
+                                            offsetY: 50,
+                                            textAlign: 'left',
+                                            backgroundFill: new Fill({ color: 'rgba(0, 0, 0, 0.35)' }),
+                                            stroke: new Stroke({
+                                                color: 'rgba(0, 0, 0, 0.7)',
+                                                width: 2
+                                            }),
+                                            text: 'H: XXX\nAlt: XXX m\nSpd: XXX cm/s\nDist: XXX m\nSats: XX'
+                                        })
+                                    });
 
                   textFeature = new Feature({
                     geometry: textGeom
@@ -428,11 +432,13 @@ function iconKey(filename) {
               //update data text
               textGeom.setCoordinates(map.getCoordinateFromPixel([0,0]));
               let tmpText = textStyle.getText();
+              tmpText.setOffsetX(map.getSize()[0] - 150);
               tmpText.setText('                                \n' +
                               'H: ' + FC.SENSOR_DATA.kinematics[2] +
-                              '\nAlt: ' + FC.SENSOR_DATA.altitude +
-                              'm\nSpeed: ' + FC.GPS_DATA.speed + 'cm/s\n' +
-                              'Dist: ' + FC.GPS_DATA.distanceToHome + 'm');
+                              '\nAlt: ' + FC.SENSOR_DATA.altitude + ' m' +
+                              '\nSpd: ' + FC.GPS_DATA.speed + ' cm/s' +
+                              '\nDist: ' + FC.GPS_DATA.distanceToHome + ' m' +
+                              '\nSats: ' + FC.GPS_DATA.numSat);
           }
         }
 
