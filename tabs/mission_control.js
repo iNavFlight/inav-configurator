@@ -122,9 +122,9 @@ TABS.mission_control.initialize = function (callback) {
     let breadCrumbStyle;
     let breadCrumbSource;
     let breadCrumbVector;
-    let textStyle;
-    let textFeature;
-    var textGeom;
+    let autoCenteredOnFix = false;
+    let infoOverlayEl;
+    let infoOverlaySpans;
     let isOffline = false;
     let selectedSafehome;
     let $safehomeContentBox;
@@ -374,49 +374,68 @@ function iconKey(filename) {
                     source: breadCrumbSource
                   });
 
-                  /////////////////////////////
-                  //create layer for heading, alt, groundspeed
-                  textGeom = new Point([0,0]);
-
-                                      const boxMargin = 150;
-                                    textStyle = new Style({ // slimmer top-right GPS overlay
-                                        text: new Text({
-                                            font: 'bold 20px Calibri,sans-serif',
-                                            fill: new Fill({ color: '#fff' }),
-                                            offsetX: map.getSize()[0] - boxMargin,
-                                            offsetY: 50,
-                                            textAlign: 'left',
-                                            backgroundFill: new Fill({ color: 'rgba(0, 0, 0, 0.35)' }),
-                                            stroke: new Stroke({
-                                                color: 'rgba(0, 0, 0, 0.7)',
-                                                width: 2
-                                            }),
-                                            text: 'H: XXX\nAlt: XXX m\nSpd: XXX cm/s\nDist: XXX m\nSats: XX'
-                                        })
-                                    });
-
-                  textFeature = new Feature({
-                    geometry: textGeom
-                  });
-
-                  textFeature.setStyle(textStyle);
-
-                  var textSource = new VectorSource({
-                    features: [textFeature]
-                  });
-
-                  var textVector = new VectorLayer({
-                    source: textSource
-                  });
-
                   map.addLayer(rthLayer);
                   map.addLayer(breadCrumbVector);
                   map.addLayer(currentPositionLayer);
-                  map.addControl(textVector);
+
+                                    // Create a simple top bar overlay for telemetry text
+                                    const targetEl = map.getTargetElement();
+                                    if (targetEl) {
+                                        if (!targetEl.style.position) {
+                                            targetEl.style.position = 'relative';
+                                        }
+                                        infoOverlayEl = document.createElement('div');
+                                        infoOverlayEl.className = 'mc-gps-inline';
+                                        Object.assign(infoOverlayEl.style, {
+                                            position: 'absolute',
+                                            bottom: '18px',
+                                            left: '0',
+                                            right: '0',
+                                            padding: '6px 10px',
+                                            background: 'rgba(0, 0, 0, 0.45)',
+                                            color: '#fff',
+                                            font: '600 14px "Segoe UI", Calibri, sans-serif',
+                                            textShadow: '0 0 4px rgba(0, 0, 0, 0.8)',
+                                            textAlign: 'center',
+                                            display: 'flex',
+                                            justifyContent: 'center',
+                                            gap: '18px',
+                                            alignItems: 'center',
+                                            flexWrap: 'wrap',
+                                            fontVariantNumeric: 'tabular-nums',
+                                            pointerEvents: 'none',
+                                            zIndex: 5,
+                                            whiteSpace: 'nowrap',
+                                            overflow: 'hidden',
+                                            textOverflow: 'ellipsis',
+                                            visibility: 'hidden'
+                                        });
+
+                                        infoOverlaySpans = {};
+                                        const telemetryFields = ['H', 'Alt', 'Spd', 'Dist', 'Sats', 'Lat', 'Lon'];
+                                        telemetryFields.forEach((field) => {
+                                            const span = document.createElement('span');
+                                            span.style.minWidth = '78px';
+                                            span.style.textAlign = 'center';
+                                            infoOverlaySpans[field] = span;
+                                            infoOverlayEl.appendChild(span);
+                                        });
+
+                                        targetEl.appendChild(infoOverlayEl);
+                                    }
               }
 
               let gpsPos = fromLonLat([lon, lat]);
               curPosGeo.setCoordinates(gpsPos);
+
+                            // One-time auto-center/zoom when we first have a valid GPS lock
+                            if (!autoCenteredOnFix && map && map.getView()) {
+                                autoCenteredOnFix = true;
+                                map.getView().setCenter(gpsPos);
+                                if (map.getView().getZoom() < 14) {
+                                    map.getView().setZoom(14);
+                                }
+                            }
 
               breadCrumbLS.appendCoordinate(gpsPos);
 
@@ -429,17 +448,32 @@ function iconKey(filename) {
 
               curPosStyle.getImage().setRotation((FC.SENSOR_DATA.kinematics[2]/360.0) * 6.28318);
 
-              //update data text
-              textGeom.setCoordinates(map.getCoordinateFromPixel([0,0]));
-              let tmpText = textStyle.getText();
-              tmpText.setOffsetX(map.getSize()[0] - 150);
-              tmpText.setText('                                \n' +
-                              'H: ' + FC.SENSOR_DATA.kinematics[2] +
-                              '\nAlt: ' + FC.SENSOR_DATA.altitude + ' m' +
-                              '\nSpd: ' + FC.GPS_DATA.speed + ' cm/s' +
-                              '\nDist: ' + FC.GPS_DATA.distanceToHome + ' m' +
-                              '\nSats: ' + FC.GPS_DATA.numSat);
+                            if (infoOverlayEl) {
+                                const latStr = lat.toFixed(6);
+                                const lonStr = lon.toFixed(6);
+                                infoOverlayEl.style.visibility = 'visible';
+                                if (infoOverlaySpans) {
+                                    infoOverlaySpans.H.textContent = `H: ${FC.SENSOR_DATA.kinematics[2]}`;
+                                    infoOverlaySpans.Alt.textContent = `Alt: ${FC.SENSOR_DATA.altitude} m`;
+                                    infoOverlaySpans.Spd.textContent = `Spd: ${FC.GPS_DATA.speed} cm/s`;
+                                    infoOverlaySpans.Dist.textContent = `Dist: ${FC.GPS_DATA.distanceToHome} m`;
+                                    infoOverlaySpans.Sats.textContent = `Sats: ${FC.GPS_DATA.numSat}`;
+                                    infoOverlaySpans.Lat.textContent = `Lat: ${latStr}`;
+                                    infoOverlaySpans.Lon.textContent = `Lon: ${lonStr}`;
+                                } else {
+                                    infoOverlayEl.textContent =
+                                        `H: ${FC.SENSOR_DATA.kinematics[2]}  ` +
+                                        `Alt: ${FC.SENSOR_DATA.altitude} m  ` +
+                                        `Spd: ${FC.GPS_DATA.speed} cm/s  ` +
+                                        `Dist: ${FC.GPS_DATA.distanceToHome} m  ` +
+                                        `Sats: ${FC.GPS_DATA.numSat}  ` +
+                                        `Lat: ${latStr}  Lon: ${lonStr}`;
+                                }
+                            }
           }
+                    else if (infoOverlayEl) {
+                        infoOverlayEl.style.visibility = 'hidden';
+                    }
         }
 
         /*
