@@ -287,6 +287,7 @@ function iconKey(filename) {
 
           let lat = FC.GPS_DATA.lat / 10000000;
           let lon = FC.GPS_DATA.lon / 10000000;
+                    const latLonPrecision = 5; // Raise this to 6 if you want more precise lat/lon readout later.
 
           const hasGpsLock = (FC.GPS_DATA.fix >= 2) || (FC.GPS_DATA.numSat >= 4);
 
@@ -394,7 +395,7 @@ function iconKey(filename) {
                                             padding: '6px 10px',
                                             background: 'rgba(0, 0, 0, 0.45)',
                                             color: '#fff',
-                                            font: '600 14px "Segoe UI", Calibri, sans-serif',
+                                            font: '600 16px "Segoe UI", Calibri, sans-serif',
                                             textShadow: '0 0 4px rgba(0, 0, 0, 0.8)',
                                             textAlign: 'center',
                                             display: 'flex',
@@ -428,14 +429,14 @@ function iconKey(filename) {
               let gpsPos = fromLonLat([lon, lat]);
               curPosGeo.setCoordinates(gpsPos);
 
-                            // One-time auto-center/zoom when we first have a valid GPS lock
-                            if (!autoCenteredOnFix && map && map.getView()) {
-                                autoCenteredOnFix = true;
-                                map.getView().setCenter(gpsPos);
-                                if (map.getView().getZoom() < 14) {
-                                    map.getView().setZoom(14);
-                                }
-                            }
+                            // Uncomment to auto-center/zoom once when GPS lock is first acquired
+                            // if (!autoCenteredOnFix && map && map.getView()) {
+                            //     autoCenteredOnFix = true;
+                            //     map.getView().setCenter(gpsPos);
+                            //     if (map.getView().getZoom() < 14) {
+                            //         map.getView().setZoom(14);
+                            //     }
+                            // }
 
               breadCrumbLS.appendCoordinate(gpsPos);
 
@@ -449,8 +450,8 @@ function iconKey(filename) {
               curPosStyle.getImage().setRotation((FC.SENSOR_DATA.kinematics[2]/360.0) * 6.28318);
 
                             if (infoOverlayEl) {
-                                const latStr = lat.toFixed(6);
-                                const lonStr = lon.toFixed(6);
+                                const latStr = lat.toFixed(latLonPrecision);
+                                const lonStr = lon.toFixed(latLonPrecision);
                                 infoOverlayEl.style.visibility = 'visible';
                                 if (infoOverlaySpans) {
                                     infoOverlaySpans.H.textContent = `H: ${FC.SENSOR_DATA.kinematics[2]}`;
