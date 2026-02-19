@@ -1076,18 +1076,36 @@ li.active .ic_mag {
     padding: 0 10px 0 10px;
     border-top: 1px solid #7d7d79;
     background-color: #bfbeb5;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
 }
 
 #status-bar div {
-    float: left;
+    flex: 0 0 auto;
     padding-right: 10px;
     margin-right: 10px;
     border-right: 1px solid #7d7d79;
+    white-space: nowrap;
+}
+
+#status-bar div:has(.arming-flags) {
+    flex: 1 1 auto;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    min-width: 0;
+}
+
+#status-bar .arming-flags {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 #status-bar .version {
-    float: right;
-    margin: 0;
+    flex: 0 0 auto;
+    margin-left: auto;
     padding: 0;
     border: 0;
 }
