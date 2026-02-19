@@ -123,6 +123,7 @@ TABS.mission_control.initialize = function (callback) {
     let breadCrumbSource;
     let breadCrumbVector;
     let autoCenteredOnFix = false;
+    let lastGpsPos = null;
     let infoOverlayEl;
     let infoOverlaySpans;
     let isOffline = false;
@@ -229,7 +230,10 @@ function iconKey(filename) {
             $('#saveMissionButton').hide();
             $('#loadEepromMissionButton').hide();
             $('#saveEepromMissionButton').hide();
+            $('#centerOnDrone').hide();
             isOffline = true;
+        } else {
+            $('#centerOnDrone').show();
         }
 
         $('#infoGeozoneMissionWarning').hide();
@@ -237,6 +241,7 @@ function iconKey(filename) {
         $safehomeContentBox = $('#SafehomeContentBox');
         $waypointOptionsTableBody = $('#waypointOptionsTableBody');
         $geozoneContent = $('#geozoneContent');
+        $('#centerOnDrone').css({ opacity: 0.45, pointerEvents: 'none' });
 
        
             loadSettings();
@@ -265,6 +270,20 @@ function iconKey(filename) {
             }
     
         i18n.localize();
+
+        // Append shortcut hints after i18n sets titles (Ctrl-based)
+        const addShortcutHint = (selector, suffix) => {
+            const el = $(selector);
+            if (!el.length) return;
+            const current = el.attr('title') || '';
+            if (current.includes(suffix)) return;
+            el.attr('title', `${current}${current ? ' ' : ''}${suffix}`.trim());
+        };
+        addShortcutHint('#centerOnDroneButton', '(Ctrl+C)');
+        addShortcutHint('#loadFileMissionButton', '(Ctrl+L)');
+        addShortcutHint('#saveFileMissionButton', '(Ctrl+S)');
+        addShortcutHint('#removeAllPoints a', '(Ctrl+D)');
+        addShortcutHint('#searchAddressButton', '(Ctrl+A)');
 
         function get_raw_gps_data() {
             MSP.send_message(MSPCodes.MSP_RAW_GPS, false, false, get_comp_gps_data);
@@ -389,18 +408,18 @@ function iconKey(filename) {
                                         infoOverlayEl.className = 'mc-gps-inline';
                                         Object.assign(infoOverlayEl.style, {
                                             position: 'absolute',
-                                            bottom: '18px',
+                                            bottom: '1.125rem',
                                             left: '0',
                                             right: '0',
-                                            padding: '6px 10px',
+                                            padding: '0.375rem 0.625rem',
                                             background: 'rgba(0, 0, 0, 0.45)',
                                             color: '#fff',
-                                            font: '600 16px "Segoe UI", Calibri, sans-serif',
+                                            font: '600 1rem "Segoe UI", Calibri, sans-serif',
                                             textShadow: '0 0 4px rgba(0, 0, 0, 0.8)',
                                             textAlign: 'center',
                                             display: 'flex',
                                             justifyContent: 'center',
-                                            gap: '18px',
+                                            gap: '1.125rem',
                                             alignItems: 'center',
                                             flexWrap: 'wrap',
                                             fontVariantNumeric: 'tabular-nums',
@@ -416,7 +435,7 @@ function iconKey(filename) {
                                         const telemetryFields = ['H', 'Alt', 'Spd', 'Dist', 'Sats', 'Lat', 'Lon'];
                                         telemetryFields.forEach((field) => {
                                             const span = document.createElement('span');
-                                            span.style.minWidth = '78px';
+                                            span.style.minWidth = '4.875rem';
                                             span.style.textAlign = 'center';
                                             infoOverlaySpans[field] = span;
                                             infoOverlayEl.appendChild(span);
@@ -428,6 +447,8 @@ function iconKey(filename) {
 
               let gpsPos = fromLonLat([lon, lat]);
               curPosGeo.setCoordinates(gpsPos);
+              lastGpsPos = gpsPos;
+              $('#centerOnDrone').css({ opacity: 1, pointerEvents: 'auto' });
 
                             // Uncomment to auto-center/zoom once when GPS lock is first acquired
                             // if (!autoCenteredOnFix && map && map.getView()) {
@@ -473,6 +494,7 @@ function iconKey(filename) {
                             }
           }
                     else if (infoOverlayEl) {
+                        $('#centerOnDrone').css({ opacity: 0.45, pointerEvents: 'none' });
                         infoOverlayEl.style.visibility = 'hidden';
                     }
         }
@@ -1509,9 +1531,9 @@ function iconKey(filename) {
     // Show/hide location buttons based on waypoint presence
     function updateLocationButtonsVisibility() {
         if (mission.isEmpty() && !multimissionCount) {
-            $('#centerOnCurrentLocation, #searchAddress').fadeIn(300);
+            $('#centerOnCurrentLocation').fadeIn(300);
         } else {
-            $('#centerOnCurrentLocation, #searchAddress').fadeOut(300);
+            $('#centerOnCurrentLocation').fadeOut(300);
         }
     }
 
@@ -1661,10 +1683,6 @@ function iconKey(filename) {
                 addFwApproach(element.getLonMap(), element.getLatMap(), FC.FW_APPROACH.get()[FC.SAFEHOMES.getMaxSafehomeCount() + element.getMultiMissionIdx()], lines);
             }
         });
-        //reset text position
-        if (textGeom) {
-            textGeom.setCoordinates(map.getCoordinateFromPixel([0,0]));
-        }
         let lengthMission = mission.getDistance(true);
 
         if (disableMarkerEdit) {
@@ -3808,6 +3826,63 @@ function iconKey(filename) {
             $('#addressSearchDialog').click(function(e) {
                 e.stopPropagation();
             });
+        });
+
+        $(document).on('click', '#centerOnDroneButton, #centerOnDrone', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            if (lastGpsPos && map && map.getView()) {
+                map.getView().setCenter(lastGpsPos);
+            }
+        });
+
+        // Keyboard shortcuts (ignored when typing in inputs):
+        //  C -> center on latest GPS fix
+        //  Ctrl+L -> load mission from file
+        //  Ctrl+S -> save mission to file
+        //  Ctrl+D -> delete all points
+        //  Ctrl+A -> address search dialog
+        $(document).on('keydown.mcCenter', function (e) {
+            const key = (e.key || '').toLowerCase();
+            const target = e.target;
+            const isTyping = target && (
+                target.tagName === 'INPUT' ||
+                target.tagName === 'TEXTAREA' ||
+                target.isContentEditable ||
+                target.tagName === 'SELECT'
+            );
+            if (isTyping) return;
+
+            // Center on GPS fix (plain C or Ctrl+C)
+            if (!e.repeat && key === 'c') {
+                if (lastGpsPos && map && map.getView()) {
+                    map.getView().setCenter(lastGpsPos);
+                }
+            }
+
+            // Ctrl+L: open mission from file
+            if (!e.repeat && e.ctrlKey && key === 'l') {
+                e.preventDefault();
+                $('#loadFileMissionButton').trigger('click');
+            }
+
+            // Ctrl+S: save mission to file
+            if (!e.repeat && e.ctrlKey && key === 's') {
+                e.preventDefault();
+                $('#saveFileMissionButton').trigger('click');
+            }
+
+            // Ctrl+D: delete all points
+            if (!e.repeat && e.ctrlKey && key === 'd') {
+                e.preventDefault();
+                $('#removeAllPoints').trigger('click');
+            }
+
+            // Ctrl+A: address search
+            if (!e.repeat && e.ctrlKey && key === 'a') {
+                e.preventDefault();
+                $('#searchAddressButton').trigger('click');
+            }
         });
 
         $('#removePoint').on('click', function () {
