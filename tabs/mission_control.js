@@ -3842,7 +3842,7 @@ function iconKey(filename) {
         //  Ctrl+S -> save mission to file
         //  Ctrl+D -> delete all points
         //  Ctrl+A -> address search dialog
-        $(document).on('keydown.mcCenter', function (e) {
+        $(document).off('keydown.mcCenter').on('keydown.mcCenter', function (e) {
             const key = (e.key || '').toLowerCase();
             const target = e.target;
             const isTyping = target && (
@@ -3929,7 +3929,7 @@ function iconKey(filename) {
         /////////////////////////////////////////////
         // Callback for Save/load buttons
         /////////////////////////////////////////////
-        $('#loadFileMissionButton').on('click', function () {
+        $('#loadFileMissionButton').off('click').on('click', function () {
             if (!fileLoadMultiMissionCheck()) return;
 
             if (markers.length && !dialog.confirm(i18n.getMessage('confirm_delete_all_points'))) return;
@@ -3946,7 +3946,7 @@ function iconKey(filename) {
             })
         });
 
-        $('#saveFileMissionButton').on('click', function () {
+        $('#saveFileMissionButton').off('click').on('click', function () {
             var options = {
                 filters: [ { name: "Mission file", extensions: ['mission'] } ]
             };
@@ -4280,15 +4280,16 @@ function iconKey(filename) {
         var builder = new xml2js.Builder({ 'rootName': 'mission', 'renderOpts': { 'pretty': true, 'indent': '\t', 'newline': '\n' } });
         var xml = builder.buildObject(data);
         xml = xml.replace(/missionitem mission/g, 'meta mission');
-        fs.writeFile(filename, xml, (err) => {
+        window.electronAPI.writeFile(filename, xml).then((err) => {
             if (err) {
                 GUI.log(i18n.getMessage('ErrorWritingFile'));
                 return console.error(err);
             }
+
+            let sFilename = String(filename.split('\\').pop().split('/').pop());
+            GUI.log(sFilename + i18n.getMessage('savedSuccessfully'));
+            updateFilename(sFilename);
         });
-        let sFilename = String(filename.split('\\').pop().split('/').pop());
-        GUI.log(sFilename + i18n.getMessage('savedSuccessfully'));
-        updateFilename(sFilename);
     }
 
     /////////////////////////////////////////////
