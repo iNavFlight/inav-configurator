@@ -225,14 +225,84 @@ TABS.setup.initialize3D = function () {
     canvas = $('.model-and-info #canvas');
     wrapper = $('.model-and-info #canvas_wrapper');
 
-    // webgl capability detector
-    // it would seem the webgl "enabling" through advanced settings will be ignored in the future
-    // and webgl will be supported if gpu supports it by default (canary 40.0.2175.0), keep an eye on this one
-    var detector_canvas = document.createElement('canvas');
-    if (window.WebGLRenderingContext && (detector_canvas.getContext('webgl') || detector_canvas.getContext('experimental-webgl'))) {
-        renderer = new THREE.WebGLRenderer({canvas: canvas.get(0), alpha: true, antialias: true});
-        useWebGlRenderer = true;
+    // Robust WebGL capability detection with fallback
+    function tryCreateWebGLContext() {
+        if (!window.WebGLRenderingContext) {
+            return null;
+        }
+
+        const detector_canvas = document.createElement('canvas');
+        let gl = null;
+        let renderMethod = null;
+
+        // Try 1: Hardware-accelerated WebGL (best performance)
+        try {
+            gl = detector_canvas.getContext('webgl') || detector_canvas.getContext('experimental-webgl');
+            if (gl) {
+                renderMethod = 'hardware';
+                console.log('[3D] Using hardware-accelerated WebGL');
+            }
+        } catch (e) {
+            console.warn('[3D] Hardware WebGL failed:', e);
+        }
+
+        // Try 2: Software-rendered WebGL (slower but more compatible)
+        if (!gl) {
+            try {
+                gl = detector_canvas.getContext('webgl', { failIfMajorPerformanceCaveat: false }) ||
+                     detector_canvas.getContext('experimental-webgl', { failIfMajorPerformanceCaveat: false });
+                if (gl) {
+                    renderMethod = 'software';
+                    console.log('[3D] Using software-rendered WebGL (slower performance)');
+                }
+            } catch (e) {
+                console.warn('[3D] Software WebGL failed:', e);
+            }
+        }
+
+        return gl ? { context: gl, method: renderMethod } : null;
     }
+
+    const webglResult = tryCreateWebGLContext();
+
+    if (webglResult) {
+        try {
+            renderer = new THREE.WebGLRenderer({canvas: canvas.get(0), alpha: true, antialias: true});
+            useWebGlRenderer = true;
+
+            // Show performance notice if using software rendering
+            if (webglResult.method === 'software') {
+                GUI.log('<span style="color: orange;">3D view using software rendering (slower). Consider updating graphics drivers or disabling hardware acceleration in Options.</span>');
+            }
+        } catch (e) {
+            console.error('[3D] Failed to create THREE.WebGLRenderer:', e);
+            renderer = null;
+            useWebGlRenderer = false;
+        }
+    }
+
+    // Check if WebGL is available
+    if (!renderer) {
+        // WebGL not supported - show fallback message
+        wrapper.html('<div class="webgl-fallback" style="display: flex; align-items: center; justify-content: center; height: 100%; color: #888; text-align: center; padding: 20px;">' +
+            '<div>' +
+            '<p style="margin: 0 0 10px 0; font-size: 14px; font-weight: bold;">3D view unavailable</p>' +
+            '<p style="margin: 0 0 10px 0; font-size: 12px;">WebGL could not be initialized. This may be due to:</p>' +
+            '<ul style="text-align: left; margin: 10px 0; padding-left: 20px; font-size: 12px;">' +
+            '<li>Graphics drivers need updating</li>' +
+            '<li>Hardware acceleration issues</li>' +
+            '<li>Browser or system limitations</li>' +
+            '</ul>' +
+            '<p style="margin: 10px 0 0 0; font-size: 12px; font-style: italic;">Try: Options → Disable 3D Hardware Acceleration, then restart</p>' +
+            '</div>' +
+            '</div>');
+
+        // Provide no-op functions so the rest of the tab doesn't break
+        this.render3D = function () {};
+        this.resize3D = function () {};
+        return;
+    }
+
     // initialize render size for current canvas size
     renderer.setSize(wrapper.width()*2, wrapper.height()*2);
 

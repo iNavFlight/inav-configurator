@@ -417,7 +417,7 @@ TABS.gps.initialize = function (callback) {
                             textBaseline: "bottom",
                             offsetY: +40,
                             padding: [2, 2, 2, 2],
-                            backgroundFill: '#444444',
+                            backgroundFill: new Fill({ color: '#444444' }),
                             fill: new Fill({color: '#ffffff'}),
                         })),
                     });
