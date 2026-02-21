@@ -16,6 +16,7 @@ import { Transpiler } from './../js/transpiler/index.js';
 import { Decompiler } from './../js/transpiler/transpiler/decompiler.js';
 import * as MonacoLoader from './../js/transpiler/editor/monaco_loader.js';
 import * as LCHighlighting from './../js/transpiler/lc_highlighting.js';
+import * as GvarDisplay from './../js/transpiler/gvar_display.js';
 import examples from './../js/transpiler/examples/index.js';
 import settingsCache from './../js/settingsCache.js';
 import * as monaco from 'monaco-editor';
@@ -44,6 +45,9 @@ TABS.javascript_programming = {
     lcToLineMapping: {},
     activeDecorations: [],
     statusChainer: null,
+
+    // Gvar display state
+    gvarWidgets: [],
 
     analyticsChanges: {},
 
@@ -81,13 +85,12 @@ TABS.javascript_programming = {
 
                     self.loadFromFC(function() {
                         self.isDirty = false;
+                        self.updateSaveButtonState();
 
                         // Set up dirty tracking AFTER initial load to avoid marking as dirty during decompilation
                         self.editor.onDidChangeModelContent(function() {
-                            if (!self.isDirty) {
-                                console.log('[JavaScript Programming] Editor marked as dirty (unsaved changes)');
-                            }
                             self.isDirty = true;
+                            self.updateSaveButtonState();
                         });
 
                         // Set up LC status polling for active highlighting
@@ -170,6 +173,7 @@ if (inav.flight.homeDistance > 100) {
             if (confirm('Clear editor? This cannot be undone.')) {
                 self.editor.setValue(self.getDefaultCode());
                 self.isDirty = false;
+                self.updateSaveButtonState();
             }
         });
 
@@ -226,13 +230,13 @@ if (inav.flight.homeDistance > 100) {
             // Set the code in the editor
             if (self.editor && self.editor.setValue) {
                 self.editor.setValue(example.code);
-                console.log('Loaded example:', example.name);
             } else {
                 console.error('Editor not initialized');
             }
 
             // Mark as dirty since we changed the code
             self.isDirty = true;
+            self.updateSaveButtonState();
 
         } catch (error) {
             console.error('Failed to load example:', error);
@@ -294,13 +298,30 @@ if (inav.flight.homeDistance > 100) {
                 }
             });
 
-            console.log('Examples dropdown populated with', Object.keys(examples).length, 'examples');
-
         } catch (error) {
             console.error('Failed to load examples:', error);
         }
     },
 
+    /**
+     * Update Save button state based on isDirty flag
+     * Disables Save button when code matches FC (isDirty = false)
+     */
+    updateSaveButtonState: function() {
+        const $saveButton = $('.tab-programming .save');
+
+        if (!$saveButton.length) {
+            return;
+        }
+
+        if (this.isDirty) {
+            // Code has been modified - enable Save button
+            $saveButton.removeClass('disabled');
+        } else {
+            // Code matches FC - disable Save button
+            $saveButton.addClass('disabled');
+        }
+    },
 
     /**
      * Transpile JavaScript to INAV logic conditions
@@ -502,6 +523,7 @@ if (inav.flight.homeDistance > 100) {
             // Clear isDirty flag AFTER setValue completes
             setTimeout(() => {
                 self.isDirty = false;
+                self.updateSaveButtonState();
             }, 0);
             // Clear stale mapping and decorations
             self.lcToLineMapping = {};
@@ -527,7 +549,6 @@ if (inav.flight.homeDistance > 100) {
             let_variables: {},
             var_variables: {}
         };
-        console.log('Variable map retrieved:', variableMap);
 
         // Decompile to JavaScript
         try {
@@ -561,7 +582,7 @@ if (inav.flight.homeDistance > 100) {
                 // Clear isDirty flag AFTER setValue completes (setValue triggers onChange asynchronously)
                 setTimeout(() => {
                     self.isDirty = false;
-                    console.log('[JavaScript Programming] isDirty cleared after load');
+                    self.updateSaveButtonState();
                 }, 0);
             } else {
                 // Decompilation failed
@@ -569,6 +590,7 @@ if (inav.flight.homeDistance > 100) {
                 self.showError('Decompilation failed: ' + result.error);
                 self.editor.setValue(result.code || self.getDefaultCode());
                 self.isDirty = false;
+                self.updateSaveButtonState();
             }
 
         } catch (error) {
@@ -577,6 +599,7 @@ if (inav.flight.homeDistance > 100) {
             self.showError('Decompilation error: ' + error.message);
             self.editor.setValue(self.getDefaultCode());
             self.isDirty = false;
+            self.updateSaveButtonState();
         }
 
         if (callback) callback();
@@ -662,7 +685,6 @@ if (inav.flight.homeDistance > 100) {
         // Store variable map for preservation between sessions
         if (result.variableMap) {
             settingsCache.set('javascript_variables', result.variableMap);
-            console.log('Variable map stored:', result.variableMap);
         }
 
         // Clear existing logic conditions
@@ -749,6 +771,7 @@ if (inav.flight.homeDistance > 100) {
         saveChainer.setExitPoint(function() {
             GUI.log(i18n.getMessage('logicConditionsSaved') || 'Logic conditions saved successfully');
             self.isDirty = false;
+            self.updateSaveButtonState();
 
             // Optionally reboot (commented out for safety - user can reboot manually)
             // const shouldReboot = confirm('Reboot flight controller to apply changes?');
@@ -782,16 +805,27 @@ if (inav.flight.homeDistance > 100) {
         // Prevent duplicate polling loops if initialize/setup runs multiple times
         interval.remove('js_programming_lc_highlight');
 
-        // In-flight guard to prevent overlapping MSP requests
+        // Prevent overlapping MSP requests
         self._lcPollInFlight = false;
 
-        // Create MSP chainer for polling LC status
         self.statusChainer = new MSPChainerClass();
         self.statusChainer.setChain([
-            mspHelper.loadLogicConditionsStatus
+            mspHelper.loadLogicConditionsStatus,
+            mspHelper.loadGlobalVariablesStatus
         ]);
         self.statusChainer.setExitPoint(function() {
-            self.updateActiveHighlighting();
+            try {
+                self.updateActiveHighlighting();
+            } catch (error) {
+                console.error('[JavaScript Programming] Active highlighting update failed:', error);
+            }
+
+            try {
+                self.updateGvarDisplay();
+            } catch (error) {
+                console.error('[JavaScript Programming] Gvar display update failed:', error);
+            }
+
             self._lcPollInFlight = false;
         });
 
@@ -869,16 +903,50 @@ if (inav.flight.homeDistance > 100) {
         );
     },
 
+    /**
+     * Update inline gvar value display
+     * Shows non-zero gvar values as inline hints next to references
+     */
+    updateGvarDisplay: function() {
+        const self = this;
+
+        if (!self.editor || !FC.GLOBAL_VARIABLES_STATUS) {
+            return;
+        }
+
+        const code = self.editor.getValue();
+        const gvarRefs = GvarDisplay.findGvarReferences(code);
+
+        if (gvarRefs.length === 0) {
+            self.gvarWidgets = GvarDisplay.clearWidgets(
+                self.editor,
+                self.gvarWidgets
+            );
+            return;
+        }
+
+        const gvarValues = FC.GLOBAL_VARIABLES_STATUS.getAll();
+
+        const widgets = GvarDisplay.createGvarWidgets(
+            self.editor,
+            gvarRefs,
+            gvarValues
+        );
+
+        self.gvarWidgets = GvarDisplay.applyWidgets(
+            self.editor,
+            self.gvarWidgets,
+            widgets
+        );
+    },
+
     cleanup: function (callback) {
-        console.log('[JavaScript Programming] cleanup() - disposing editor');
-
-        // Stop LC status polling
         interval.remove('js_programming_lc_highlight');
-
-        // Clear active highlighting
         this.clearActiveHighlighting();
-
-        // Clear status chainer
+        this.gvarWidgets = GvarDisplay.clearWidgets(
+            this.editor,
+            this.gvarWidgets
+        );
         this.statusChainer = null;
 
         // Dispose Monaco editor
