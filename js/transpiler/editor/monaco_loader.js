@@ -38,6 +38,7 @@ function initializeMonacoEditor(monaco, containerId, options = {}) {
         renderWhitespace: 'selection',
         tabSize: 2,
         insertSpaces: true,
+        glyphMargin: true,  // Enable gutter for active LC highlighting decorations
         wordBasedSuggestions: 'off',  // Disable word-based suggestions (use string "off", not boolean)
         suggest: {
             showWords: false,

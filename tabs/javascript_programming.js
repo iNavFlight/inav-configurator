@@ -11,9 +11,11 @@ import mspHelper from './../js/msp/MSPHelper.js';
 import { GUI, TABS } from './../js/gui.js';
 import FC from './../js/fc.js';
 import i18n from './../js/localization.js';
+import interval from './../js/intervals.js';
 import { Transpiler } from './../js/transpiler/index.js';
 import { Decompiler } from './../js/transpiler/transpiler/decompiler.js';
 import * as MonacoLoader from './../js/transpiler/editor/monaco_loader.js';
+import * as LCHighlighting from './../js/transpiler/lc_highlighting.js';
 import examples from './../js/transpiler/examples/index.js';
 import settingsCache from './../js/settingsCache.js';
 import * as monaco from 'monaco-editor';
@@ -38,6 +40,11 @@ TABS.javascript_programming = {
     decompiler: null,
     currentCode: '',
 
+    // Active LC highlighting state
+    lcToLineMapping: {},
+    activeDecorations: [],
+    statusChainer: null,
+
     analyticsChanges: {},
 
     initialize: function (callback) {
@@ -51,6 +58,9 @@ TABS.javascript_programming = {
             GUI.load(html, () => {
                 try {
                     self.initTranspiler();
+
+                    // Store monaco reference for use in highlighting
+                    self.monaco = monaco;
 
                     // Initialize editor with INAV configuration
                     self.editor = MonacoLoader.initializeMonacoEditor(monaco, 'monaco-editor');
@@ -79,6 +89,9 @@ TABS.javascript_programming = {
                             }
                             self.isDirty = true;
                         });
+
+                        // Set up LC status polling for active highlighting
+                        self.setupActiveHighlighting();
 
                         // Localize i18n strings
                         i18n.localize();
@@ -185,8 +198,7 @@ if (inav.flight.homeDistance > 100) {
         });
     },
 
-    /*
-    **
+    /**
      * Load a specific example into the editor
      * @param {string} exampleId - The ID of the example to load
      */
@@ -337,6 +349,11 @@ if (inav.flight.homeDistance > 100) {
 
                 GUI.log(`Transpiled successfully: ${result.logicConditionCount}/64 logic conditions`);
 
+                // Store LC-to-line mapping for transpiler-side highlighting
+                if (result.lcToLineMapping) {
+                    self.lcToLineMapping = result.lcToLineMapping;
+                }
+
             } else {
                 // Show error
                 this.showError(result.error);
@@ -482,7 +499,13 @@ if (inav.flight.homeDistance > 100) {
         if (!logicConditions || logicConditions.length === 0) {
             GUI.log(i18n.getMessage('noLogicConditions') || 'No logic conditions found on FC');
             self.editor.setValue(self.getDefaultCode());
-            self.isDirty = false;
+            // Clear isDirty flag AFTER setValue completes
+            setTimeout(() => {
+                self.isDirty = false;
+            }, 0);
+            // Clear stale mapping and decorations
+            self.lcToLineMapping = {};
+            self.clearActiveHighlighting();
             if (callback) callback();
             return;
         }
@@ -514,6 +537,12 @@ if (inav.flight.homeDistance > 100) {
                 // Set the decompiled code
                 self.editor.setValue(result.code);
 
+                // Clear old decorations before setting new mapping
+                self.clearActiveHighlighting();
+
+                // Store LC-to-line mapping for active highlighting
+                self.lcToLineMapping = result.lcToLineMapping || {};
+
                 // Show stats
                 if (result.stats) {
                     GUI.log(
@@ -529,7 +558,11 @@ if (inav.flight.homeDistance > 100) {
                     $('#transpiler-warnings').hide();
                 }
 
-                self.isDirty = false;
+                // Clear isDirty flag AFTER setValue completes (setValue triggers onChange asynchronously)
+                setTimeout(() => {
+                    self.isDirty = false;
+                    console.log('[JavaScript Programming] isDirty cleared after load');
+                }, 0);
             } else {
                 // Decompilation failed
                 GUI.log('Decompilation failed: ' + result.error);
@@ -610,6 +643,11 @@ if (inav.flight.homeDistance > 100) {
         if (result.logicConditionCount > 64) {
             this.showError('Cannot save: Too many logic conditions (' + result.logicConditionCount + '/64)');
             return;
+        }
+
+        // Store LC-to-line mapping for transpiler-side highlighting
+        if (result.lcToLineMapping) {
+            self.lcToLineMapping = result.lcToLineMapping;
         }
 
         // Confirm save
@@ -735,8 +773,113 @@ if (inav.flight.homeDistance > 100) {
         });
     },
 
+    /**
+     * Set up active LC highlighting with status polling
+     */
+    setupActiveHighlighting: function() {
+        const self = this;
+
+        // Prevent duplicate polling loops if initialize/setup runs multiple times
+        interval.remove('js_programming_lc_highlight');
+
+        // In-flight guard to prevent overlapping MSP requests
+        self._lcPollInFlight = false;
+
+        // Create MSP chainer for polling LC status
+        self.statusChainer = new MSPChainerClass();
+        self.statusChainer.setChain([
+            mspHelper.loadLogicConditionsStatus
+        ]);
+        self.statusChainer.setExitPoint(function() {
+            self.updateActiveHighlighting();
+            self._lcPollInFlight = false;
+        });
+
+        // Start 500ms polling interval (2Hz - sufficient for debugging without saturating MSP)
+        interval.add('js_programming_lc_highlight', function() {
+            if (!self.statusChainer || self._lcPollInFlight) return;
+            self._lcPollInFlight = true;
+            self.statusChainer.execute();
+        }, 500);
+    },
+
+    /**
+     * Update active LC highlighting based on current status
+     */
+    updateActiveHighlighting: function() {
+        const self = this;
+
+        // Check if FC data is available first (short-circuit if disconnected)
+        if (!FC.LOGIC_CONDITIONS_STATUS || !FC.LOGIC_CONDITIONS) {
+            return;
+        }
+
+        const lcStatus = FC.LOGIC_CONDITIONS_STATUS.getAll();
+        const lcConditions = FC.LOGIC_CONDITIONS.get();
+
+        // Verify data is loaded and has expected types
+        if (!Array.isArray(lcStatus) || !Array.isArray(lcConditions)) {
+            return;
+        }
+
+        // Don't highlight if code has been modified
+        if (self.isDirty) {
+            self.clearActiveHighlighting();
+            return;
+        }
+
+        // Don't highlight if no mapping available
+        if (!self.lcToLineMapping || Object.keys(self.lcToLineMapping).length === 0) {
+            return;
+        }
+
+        // Categorize LCs by status (TRUE/FALSE)
+        const { trueLCs, falseLCs } = LCHighlighting.categorizeLCsByStatus(
+            lcStatus,
+            lcConditions,
+            self.lcToLineMapping
+        );
+
+        // Map LCs to editor line numbers with combined status
+        const lineStatus = LCHighlighting.mapLCsToLines(
+            trueLCs,
+            falseLCs,
+            self.lcToLineMapping
+        );
+
+        // Create Monaco decorations from line status
+        const decorations = LCHighlighting.createMonacoDecorations(lineStatus, self.monaco);
+
+        // Apply decorations to editor
+        self.activeDecorations = LCHighlighting.applyDecorations(
+            self.editor,
+            self.activeDecorations,
+            decorations
+        );
+    },
+
+    /**
+     * Clear all active LC highlighting
+     */
+    clearActiveHighlighting: function() {
+        const self = this;
+        self.activeDecorations = LCHighlighting.clearDecorations(
+            self.editor,
+            self.activeDecorations
+        );
+    },
+
     cleanup: function (callback) {
         console.log('[JavaScript Programming] cleanup() - disposing editor');
+
+        // Stop LC status polling
+        interval.remove('js_programming_lc_highlight');
+
+        // Clear active highlighting
+        this.clearActiveHighlighting();
+
+        // Clear status chainer
+        this.statusChainer = null;
 
         // Dispose Monaco editor
         // Note: Unsaved changes are checked BEFORE cleanup() is called:
