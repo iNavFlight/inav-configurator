@@ -23,4 +23,6 @@ tags
 TAGS
 # Visual Studio files
 .vs/
-.vscode/
+.vscode/# Lock files
+yarn.lock
+package-lock.json
