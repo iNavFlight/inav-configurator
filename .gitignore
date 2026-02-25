@@ -21,3 +21,6 @@ eeprom.bin
 # ctags
 tags
 TAGS
+# Visual Studio files
+.vs/
+.vscode/
