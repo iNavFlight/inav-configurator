@@ -4109,6 +4109,12 @@
     "osdElement_G_FORCE_Z_HELP": {
         "message": "Shows the g force in the Z axis (vertical)"
     },
+    "osdElement_GPS_EXTRA_STATS": {
+        "message": "GPS Diagnostics"
+    },
+    "osdElement_GPS_EXTRA_STATS_HELP": {
+        "message": "Visible satellite count and locked satellite indicator(5 levels) for each constellation in this order: GPS–Galileo–BeiDou–GLONASS. Followed by SNR level (higher better)"
+    },    
     "osdElement_ROLL_PIDS": {
         "message": "Roll PIDs"
     },
