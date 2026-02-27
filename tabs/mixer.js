@@ -569,7 +569,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
         saveChainer.execute();
     }
 
-    function processHtml() {
+    function processHtml(settingsPromise) {
 
         $servoMixTable = $('#servo-mix-table');
         $servoMixTableBody = $servoMixTable.find('tbody');
@@ -747,6 +747,9 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
         } else {
             $mixerPreset.trigger('change');
         }
+
+        // Re-run after settings load, since configureInputs() is async.
+        settingsPromise.then(() => updateMotorDirection());
 
         modal = new jBox('Modal', {
             width: 480,
