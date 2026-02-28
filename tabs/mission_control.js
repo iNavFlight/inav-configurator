@@ -308,7 +308,7 @@ function iconKey(filename) {
           let lon = FC.GPS_DATA.lon / 10000000;
                     const latLonPrecision = 5; // Raise this to 6 if you want more precise lat/lon readout later.
 
-          const hasGpsLock = (FC.GPS_DATA.fix >= 2) || (FC.GPS_DATA.numSat >= 4);
+          const hasGpsLock = FC.GPS_DATA.fix >= 2;
 
           //Update map
           if (hasGpsLock) {
