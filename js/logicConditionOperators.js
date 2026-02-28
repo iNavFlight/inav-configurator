@@ -322,11 +322,11 @@ const LOGIC_OPERATORS = {
         output: "boolean"
     },
     52: {
-        name: "LED Pin PWM",
+        name: "PINIO PWM",
         operandType: "Set Flight Parameter",
-        hasOperand: [true, false],
+        hasOperand: [true, true],
         output: "raw"
-    },        
+    },
     53: {
         name: "Disable GPS Sensor Fix",
         operandType: "Set Flight Parameter",

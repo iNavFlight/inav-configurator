@@ -31,8 +31,10 @@ var OutputMappingCollection = function () {
     const OUTPUT_TYPE_MOTOR = 0;
     const OUTPUT_TYPE_SERVO = 1;
     const OUTPUT_TYPE_LED   = 2;
+    const OUTPUT_TYPE_PINIO = 3;
 
     const SPECIAL_LABEL_LED = 1;
+    const SPECIAL_LABEL_PINIO_BASE = 2;  // values 2..5 = USER1..USER4 (add channel index 0-3)
 
     self.TIMER_OUTPUT_MODE_AUTO = 0;
     self.TIMER_OUTPUT_MODE_MOTORS = 1;
@@ -88,7 +90,9 @@ var OutputMappingCollection = function () {
         for (let i = 0; i < data.length; i++) {
             timerMap[i] = null;
 
-            if (servosToGo > 0 && BitHelper.bit_check(data[i]['usageFlags'], TIM_USE_LED)) {
+            if (data[i]['specialLabels'] >= SPECIAL_LABEL_PINIO_BASE) {
+                timerMap[i] = OUTPUT_TYPE_PINIO;
+            } else if (servosToGo > 0 && BitHelper.bit_check(data[i]['usageFlags'], TIM_USE_LED)) {
                 console.log(i + ": LED");
                 timerMap[i] = OUTPUT_TYPE_LED;
             } else if (servosToGo > 0 && BitHelper.bit_check(data[i]['usageFlags'], TIM_USE_SERVO)) {
@@ -114,7 +118,7 @@ var OutputMappingCollection = function () {
 
         console.log("Offset: " + offset)
         for (let i = 0; i < self.getOutputCount(); i++) {
-            
+
             let assignment = timerMap[i + offset];
 
             if (assignment === null) {
@@ -127,6 +131,8 @@ var OutputMappingCollection = function () {
                 currentServoIndex++;
             } else if (assignment == OUTPUT_TYPE_LED) {
                 outputMap[i] = "Led";
+            } else if (assignment == OUTPUT_TYPE_PINIO) {
+                outputMap[i] = "USER" + (data[i + offset]['specialLabels'] - SPECIAL_LABEL_PINIO_BASE + 1);
             }
         }
 
@@ -149,7 +155,8 @@ var OutputMappingCollection = function () {
             if (
                 BitHelper.bit_check(flags, TIM_USE_MOTOR) ||
                 BitHelper.bit_check(flags, TIM_USE_SERVO) ||
-                BitHelper.bit_check(flags, TIM_USE_LED)
+                BitHelper.bit_check(flags, TIM_USE_LED) ||
+                data[i]['specialLabels'] >= SPECIAL_LABEL_PINIO_BASE
             ) {
                 retVal++;
             };
@@ -163,7 +170,8 @@ var OutputMappingCollection = function () {
             if (
                 BitHelper.bit_check(data[i]['usageFlags'], TIM_USE_MOTOR) ||
                 BitHelper.bit_check(data[i]['usageFlags'], TIM_USE_SERVO) ||
-                BitHelper.bit_check(data[i]['usageFlags'], TIM_USE_LED)
+                BitHelper.bit_check(data[i]['usageFlags'], TIM_USE_LED) ||
+                data[i]['specialLabels'] >= SPECIAL_LABEL_PINIO_BASE
             ) {
                 return i;
             }
