@@ -272,6 +272,7 @@ const OPERATION_NAMES = {
   [53]: 'Disable Gps Fix',
   [54]: 'Reset Mag Calibration',
   [55]: 'Set Gimbal Sensitivity',
+  [56]: 'Override Min Ground Speed',
 };
 
 /**
