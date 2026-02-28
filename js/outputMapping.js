@@ -38,6 +38,7 @@ var OutputMappingCollection = function () {
     self.TIMER_OUTPUT_MODE_MOTORS = 1;
     self.TIMER_OUTPUT_MODE_SERVOS = 2;
     self.TIMER_OUTPUT_MODE_LED = 3;
+    self.TIMER_OUTPUT_MODE_PINIO = 4;
 
     self.flushTimerOverrides = function() {
         timerOverrides = {};
