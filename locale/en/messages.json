@@ -4983,7 +4983,7 @@
         "message": "This action overrides all current mixer settings and replaces them with default values. There is no 'Undo' option!"
     },
     "mixerWizardModalTitle": {
-        "message": "Quadcopter Mixer Wizard"
+        "message": "Motor Mixer Wizard"
     },
     "mixerWizardModalApply": {
         "message": "Apply"

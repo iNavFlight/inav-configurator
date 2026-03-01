@@ -238,10 +238,7 @@
                         <span data-i18n="mixerWizardClickPosition"></span>
                     </p>
                     <div class="wizard-progress-bar">
-                        <div class="wizard-progress-step" data-step="0">1</div>
-                        <div class="wizard-progress-step" data-step="1">2</div>
-                        <div class="wizard-progress-step" data-step="2">3</div>
-                        <div class="wizard-progress-step" data-step="3">4</div>
+                        <!-- Steps generated dynamically by JS based on motor count -->
                     </div>
                     <div class="wizard-buttons">
                         <a id="wizard-stop-button" class="modal__button modal__button--warning" data-i18n="mixerWizardStop"></a>
@@ -260,22 +257,7 @@
                 <div class="wizard-preview">
                     <div class="wizard-motor-preview">
                         <img src="./resources/motor_order/custom.svg" id="wizard-preview-img"/>
-                        <!-- Position 0 (X: Rear-Right, +: Rear) -->
-                        <div class="wizard-position-btn" id="wizardPos0" data-position="0">
-                            <span class="position-label"></span>
-                        </div>
-                        <!-- Position 1 (X: Front-Right, +: Right) -->
-                        <div class="wizard-position-btn" id="wizardPos1" data-position="1">
-                            <span class="position-label"></span>
-                        </div>
-                        <!-- Position 2 (X: Rear-Left, +: Left) -->
-                        <div class="wizard-position-btn" id="wizardPos2" data-position="2">
-                            <span class="position-label"></span>
-                        </div>
-                        <!-- Position 3 (X: Front-Left, +: Front) -->
-                        <div class="wizard-position-btn" id="wizardPos3" data-position="3">
-                            <span class="position-label"></span>
-                        </div>
+                        <!-- Position buttons generated dynamically by JS based on mixer preset -->
                     </div>
                 </div>
             </div>

@@ -262,16 +262,6 @@
     50% { box-shadow: 0 0 15px rgba(52, 152, 219, 0.8); }
 }
 
-/* Position buttons at quad corners (Quad X layout) */
-/* Position 0: Rear-Right */
-#wizardPos0 { bottom: 10px; right: 10px; }
-/* Position 1: Front-Right */
-#wizardPos1 { top: 10px; right: 10px; }
-/* Position 2: Rear-Left */
-#wizardPos2 { bottom: 10px; left: 10px; }
-/* Position 3: Front-Left */
-#wizardPos3 { top: 10px; left: 10px; }
-
 /* Wizard button container */
 .wizard-buttons {
     margin-top: 1em;

@@ -615,9 +615,27 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
             content: $('#mixerWizardContent')
         });
 
+        // SVG arm-tip positions (200×200 viewbox px) keyed by preset image name.
+        // Index i corresponds to motorMixer[i] — the physical arm for that mixer slot.
+        // Coordinates match the motor numbering shown in resources/motor_order/*.svg.
+        // Presets with coaxial stacked motors (octo_x8, y4, y6) are intentionally
+        // omitted — multiple motors share the same physical position, making visual
+        // identification ambiguous.
+        const WIZARD_MOTOR_POSITIONS = {
+            'quad_x':      [{x:160,y:160},{x:160,y:40},{x:40,y:160},{x:40,y:40}],
+            'quad_p':      [{x:100,y:160},{x:160,y:100},{x:40,y:100},{x:100,y:40}],
+            'vtail_quad':  [{x:140,y:160},{x:160,y:40},{x:60,y:160},{x:40,y:40}],
+            'atail_quad':  [{x:60,y:160},{x:160,y:40},{x:140,y:160},{x:40,y:40}],
+            'hex_x':       [{x:130,y:48},{x:160,y:100},{x:130,y:152},{x:70,y:152},{x:40,y:100},{x:70,y:48}],
+            'hex_p':       [{x:100,y:40},{x:152,y:70},{x:152,y:130},{x:100,y:160},{x:48,y:130},{x:48,y:70}],
+            'octo_flat_x': [{x:127,y:35},{x:165,y:73},{x:165,y:127},{x:127,y:165},{x:73,y:165},{x:35,y:127},{x:35,y:73},{x:73,y:35}],
+            'octo_flat_p': [{x:100,y:30},{x:150,y:51},{x:170,y:100},{x:150,y:150},{x:100,y:170},{x:51,y:150},{x:30,y:100},{x:51,y:51}],
+            'tri':         [{x:100,y:160},{x:160,y:40},{x:40,y:40}],
+        };
+
         // Motor Wizard State Machine
         const wizardState = {
-            currentMotor: 0,        // Which motor we're currently locating (0-3)
+            currentMotor: 0,        // Which motor we're currently locating
             motorPositions: {},     // Map: motorIndex -> positionIndex
             locateInterval: null,   // Interval for repeating locate command
             isActive: false,        // Is wizard in progress?
@@ -642,7 +660,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
             sendMotorValues(-1, FC.MISC.mincommand);  // All motors at mincommand
         }
 
-        function resetWizard() {
+        function resetWizard(numMotors) {
             wizardState.currentMotor = 0;
             wizardState.motorPositions = {};
             wizardState.isActive = false;
@@ -653,28 +671,26 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
             $('#wizard-progress').addClass('is-hidden');
             $('#wizard-complete').addClass('is-hidden');
 
-            // Reset position buttons
-            $('.wizard-position-btn').removeClass('waiting assigned');
-            $('.wizard-position-btn .position-label').text('');
-
-            // Reset progress steps
-            $('.wizard-progress-step').removeClass('active complete');
+            // Regenerate progress steps for this motor count
+            const $bar = $('.wizard-progress-bar').empty();
+            for (let i = 0; i < numMotors; i++) {
+                $bar.append(`<div class="wizard-progress-step" data-step="${i}">${i + 1}</div>`);
+            }
         }
 
-        function positionWizardButtons() {
-            if (currentMixerPreset.image === 'quad_p') {
-                // Plus layout: cardinal positions (center of each edge)
-                $('#wizardPos0').css({ bottom: '-8px', left: 'calc(50% - 18px)', top: '', right: '', transform: '' });
-                $('#wizardPos1').css({ right: '-8px', top: 'calc(50% - 18px)', bottom: '', left: '', transform: '' });
-                $('#wizardPos2').css({ left: '-8px', top: 'calc(50% - 18px)', bottom: '', right: '', transform: '' });
-                $('#wizardPos3').css({ top: '-8px', left: 'calc(50% - 18px)', bottom: '', right: '', transform: '' });
-            } else {
-                // X layout: diagonal corners
-                $('#wizardPos0').css({ bottom: '10px', right: '10px', top: '', left: '', transform: '' });
-                $('#wizardPos1').css({ top: '10px', right: '10px', bottom: '', left: '', transform: '' });
-                $('#wizardPos2').css({ bottom: '10px', left: '10px', top: '', right: '', transform: '' });
-                $('#wizardPos3').css({ top: '10px', left: '10px', bottom: '', right: '', transform: '' });
-            }
+        function buildPositionButtons(positions) {
+            const $preview = $('.wizard-motor-preview');
+            $preview.find('.wizard-position-btn').remove();
+            // Button is 36×36px; offset by half to center it on the SVG coordinate
+            const HALF = 18;
+            positions.forEach((pos, i) => {
+                $preview.append(
+                    `<div class="wizard-position-btn" id="wizardPos${i}" data-position="${i}"
+                          style="left:${pos.x - HALF}px;top:${pos.y - HALF}px">
+                         <span class="position-label"></span>
+                     </div>`
+                );
+            });
         }
 
         function updateWizardProgress(motorIndex) {
@@ -742,7 +758,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
             // Move to next motor or complete
             wizardState.currentMotor++;
 
-            if (wizardState.currentMotor >= 4) {
+            if (wizardState.currentMotor >= currentMixerPreset.motorMixer.length) {
                 // All motors identified
                 wizardComplete();
             } else {
@@ -761,8 +777,8 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
             $('#wizard-complete').removeClass('is-hidden');
         }
 
-        // Position button click handler
-        $('.wizard-position-btn').on('click', function() {
+        // Position button click handler — delegated so it works on dynamically generated buttons
+        $('.wizard-motor-preview').on('click', '.wizard-position-btn', function() {
             if (!$(this).hasClass('waiting')) return;
             const positionIndex = parseInt($(this).attr('data-position'), 10);
             onPositionClicked(positionIndex);
@@ -806,7 +822,8 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
             // Build motor rules from wizard results
             FC.MOTOR_RULES.flush();
 
-            for (let motorIndex = 0; motorIndex < 4; motorIndex++) {
+            const numMotors = currentMixerPreset.motorMixer.length;
+            for (let motorIndex = 0; motorIndex < numMotors; motorIndex++) {
                 const positionIndex = wizardState.motorPositions[motorIndex];
                 const r = currentMixerPreset.motorMixer[positionIndex];
 
@@ -828,7 +845,12 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
 
         // Reset wizard when modal opens
         motorWizardModal.options.onOpen = function() {
-            resetWizard();
+            const positions = WIZARD_MOTOR_POSITIONS[currentMixerPreset.image];
+            if (!positions) {
+                motorWizardModal.close();
+                return;
+            }
+            resetWizard(positions.length);
 
             // Update preview image
             const $wizardImg = $('#wizard-preview-img');
@@ -837,7 +859,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
                 $wizardImg.attr('src', $mainImg.attr('src'));
             }
 
-            positionWizardButtons();
+            buildPositionButtons(positions);
         };
 
         // Clean up when modal closes
@@ -903,11 +925,8 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
 
             FC.MIXER_CONFIG.appliedMixerPreset = presetId;
 
-            if (currentMixerPreset.id == 3 || currentMixerPreset.id == 2) {
-                $("#mixer-wizard-gui_box").removeClass("is-hidden");
-            } else {
-                $("#mixer-wizard-gui_box").addClass("is-hidden");
-            }
+            const wizardSupported = Object.prototype.hasOwnProperty.call(WIZARD_MOTOR_POSITIONS, currentMixerPreset.image);
+            $("#mixer-wizard-gui_box").toggleClass("is-hidden", !wizardSupported);
 
             if (FC.MIXER_CONFIG.platformType == PLATFORM.AIRPLANE && currentMixerPreset.id != loadedMixerPresetID) {
                 $("#needToUpdateMixerMessage").removeClass("is-hidden");
