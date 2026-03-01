@@ -1621,10 +1621,6 @@ var mspHelper = (function () {
                 // Just and ACK from the fc.
                 break;
 
-            case MSPCodes.MSP2_INAV_MOTOR_LOCATE:
-                // Response is single byte: 1=success, 0=failure
-                break;
-
             case MSPCodes.MSP2_INAV_GEOZONE:
                 
                 if (data.buffer.byteLength == 0) {
@@ -3615,10 +3611,6 @@ var mspHelper = (function () {
 
     self.sendUbloxCommand = function (ubloxData, callback) {
         MSP.send_message(MSPCodes.MSP2_INAV_GPS_UBLOX_COMMAND, ubloxData, false, callback);
-    };
-
-    self.sendMotorLocate = function (motorIndex, callback) {
-        MSP.send_message(MSPCodes.MSP2_INAV_MOTOR_LOCATE, [motorIndex], false, callback);
     };
 
     return self;
