@@ -21,8 +21,3 @@ eeprom.bin
 # ctags
 tags
 TAGS
-# Visual Studio files
-.vs/
-.vscode/# Lock files
-yarn.lock
-package-lock.json
