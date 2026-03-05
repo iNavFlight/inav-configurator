@@ -37,7 +37,7 @@
         "message": "Options d'application"
     },
     "options_receive_app_notifications": {
-        "message": "Recevoir une notification <strong></strong> sur le bureau lorsque l'application est mise à jour"
+        "message": "Recevoir une <strong>notification</strong> sur le bureau lorsque l'application est mise à jour"
     },
     "options_improve_configurator": {
         "message": "Envoyer des données d'utilisation anonymes à l'équipe de développeurs"
