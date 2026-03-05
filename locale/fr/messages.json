@@ -46,13 +46,13 @@
         "message": "Désactivez l'accélération 3D. Si les modèles 3D ne sont pas affichés. Nécessite le redémarrage de l'application."
     },
     "options_showProfileParameters": {
-        "message": "Mettez en surbrillance les paramètres qui changent lors du changement de batterie ou de profil de contrôle"
+        "message": "Mettre en valeur les paramètres qui changent lors du changement de la batterie ou des profils de contrôle"
     },
     "options_cliAutocomplete": {
-        "message": "Remplissage automatique avancé de la CLI"
+        "message": "AutoComplete avancé de la CLI"
     },
     "options_unit_type": {
-        "message": "Définir le rendu des unités uniquement sur le configurateur"
+        "message": "Définir comment les unités apparaissent sur le configurateur seulement"
     },
     "options_render": {
         "message": "Options de rendu du configurateur"
@@ -64,22 +64,22 @@
         "message": "Déconnexion..."
     },
     "connect": {
-        "message": "Connecter"
+        "message": "Se connecter"
     },
     "connecting": {
-        "message": "De liaison"
+        "message": "Connexion"
     },
     "disconnect": {
-        "message": "Déconnecter"
+        "message": "Se déconnecter"
     },
     "autoConnect": {
         "message": "Connexion automatique"
     },
     "autoConnectEnabled": {
-        "message": "Connexion automatique: activée-Le configurateur tente automatiquement de se connecter lorsqu'un nouveau port est détecté"
+        "message": "Connexion automatique: Activée - Le configurateur tentera automatiquement de se connecter lorsqu'un nouveau port est détecté"
     },
     "autoConnectDisabled": {
-        "message": "Connexion automatique: désactivée - L'utilisateur doit sélectionner le bon port série et cliquer seul sur le bouton \"Connecter\""
+        "message": "Connexion automatique: Désactivée - L'utilisateur doit sélectionner le bon port série et cliquer sur le bouton \"Se connecter\" manuellement"
     },
     "deviceRebooting": {
         "message": "Appareil - <span style=\"color: red\">Redémarrage</span>"
@@ -94,7 +94,7 @@
         "message": "Non connecté"
     },
     "backupFileIncompatible": {
-        "message": "Le fichier de sauvegarde fourni a été généré pour la version précédente du configurateur et est incompatible avec cette version du configurateur. Désolé"
+        "message": "Le fichier de sauvegarde fourni a été généré pour une version précédente du configurateur et est incompatible avec cette version du configurateur. Désolé"
     },
     "backupFileUnmigratable": {
         "message": "Le fichier de sauvegarde fourni a été généré par une version précédente du configurateur et ne peut pas être migré. Désolé."
@@ -112,19 +112,19 @@
         "message": "Documentation"
     },
     "tabFirmwareFlasher": {
-        "message": "Flasheur du micrologiciel"
+        "message": "Flasheur Logiciel"
     },
     "tabLanding": {
-        "message": "Accueillir"
+        "message": "Bienvenue"
     },
     "tabHelp": {
-        "message": "Documentation et assistance"
+        "message": "Documentation & Assistance"
     },
     "tabSetup": {
         "message": "Statut"
     },
     "tabCalibration": {
-        "message": "Étalonnage"
+        "message": "Calibration"
     },
     "tabConfiguration": {
         "message": "Configuration"
@@ -142,16 +142,16 @@
         "message": "Divers"
     },
     "tabModeSelection": {
-        "message": "Sélection du mode"
+        "message": "Sélection du Mode"
     },
     "tabServos": {
-        "message": "Servomoteurs"
+        "message": "Servos"
     },
     "tabFailsafe": {
-        "message": "Sécurité intégrée"
+        "message": "Failsafe"
     },
     "tabEzTune": {
-        "message": "C'est Tune"
+        "message": "Ez Tune"
     },
     "tabGPS": {
         "message": "GPS"
@@ -169,10 +169,10 @@
         "message": "CLI"
     },
     "tabLogging": {
-        "message": "Journalisation connectée"
+        "message": "Loggage Connectée"
     },
     "tabOnboardLogging": {
-        "message": "Boîte noire"
+        "message": "Boîte Noire"
     },
     "tabAdjustments": {
         "message": "Ajustements"
@@ -184,10 +184,10 @@
         "message": "SITL"
     },
     "sitlDemoMode": {
-        "message": "Mode démo"
+        "message": "Mode Démo"
     },
     "sitlResetDemoModeData": {
-        "message": "Réinitialiser le mode démo"
+        "message": "Réinitialiser Mode Démo"
     },
     "sitlOSNotSupported": {
         "message": "SITL n'est pas pris en charge sur ce système d'exploitation."
@@ -202,7 +202,7 @@
         "message": "Simulateur"
     },
     "sitlUseImu": {
-        "message": "Utilisez le NEZ"
+        "message": "Utiliser l'IMU"
     },
     "sitlSimIP": {
         "message": "IP du simulateur"
@@ -211,7 +211,7 @@
         "message": "Port du simulateur"
     },
     "sitlChannelMap": {
-        "message": "Cartographie des canaux"
+        "message": "Mapping des canaux"
     },
     "sitlSimInput": {
         "message": "Entrée du simulateur"
@@ -220,16 +220,16 @@
         "message": "Sortie INAV"
     },
     "sitlLog": {
-        "message": "Enregistrer"
+        "message": "Logger"
     },
     "sitlStart": {
         "message": "Commencer"
     },
     "sitlStop": {
-        "message": "Arrêt"
+        "message": "Arrêter"
     },
     "sitlStopped": {
-        "message": "SITL arrêté"
+        "message": "SITL arrêté\n"
     },
     "sitlProfiles": {
         "message": "Profils SITL"
@@ -262,16 +262,16 @@
         "message": "Récepteur série"
     },
     "sitlSerialProtocoll": {
-        "message": "Paramètres du port série prédéfinis pour le protocole RX du récepteur connecté"
+        "message": "Paramètres du port série pour le Protocole RX du récepteur connecté"
     },
     "sitlSerialStopbits": {
-        "message": "Bits d'arrêt"
+        "message": "Stopbits"
     },
     "sitlSerialPort": {
         "message": "Le récepteur série/Proxy FC est connecté au port série de l'hôte"
     },
     "sitlSerialUART": {
-        "message": "Le récepteur série est configuré sur l'UART de SITL"
+        "message": "Le récepteur série est configuré sur \"SITL's UART\""
     },
     "sitlSerialParity": {
         "message": "Parité"
@@ -280,13 +280,13 @@
         "message": "Activer"
     },
     "sitlHelp": {
-        "message": "SITL (Software in the loop) permet d'exécuter INAV entièrement par logiciel sur PC sans utiliser de contrôleur de vol et de simuler des vols FPV complets. Pour cela, INAV est compilé avec un compilateur PC normal. Les capteurs sont remplacés par des données fournies par un simulateur.<br/>Actuellement pris en charge sont:<br/><ul><li><a href=\"https://www.realflight.com\" target=\"_blank\">RealFlight</a><br/></li><li><a href=\"https://www.x-plane.com\" target=\"_blank\">X-Plane</a></li></ul>"
+        "message": "SITL (Software in the loop (trad: Logiciel en boucle)) permet d'exécuter INAV entièrement par logiciel sur PC sans utiliser de contrôleur de vol et de simuler des vols FPV complets. Pour cela, INAV est compilé avec un compilateur PC normal. Les capteurs sont remplacés par des données fournies par un simulateur.<br/>Actuellement pris en charge sont:<br/><ul><li><a href=\"https://www.realflight.com\" target=\"_blank\">RealFlight</a><br/></li><li><a href=\"https://www.x-plane.com\" target=\"_blank\">X-Plane</a></li></ul>"
     },
     "sitlProfilesHelp": {
-        "message": "Les profils sont enregistrés localement. Les profils contiennent non seulement toutes les données de cet onglet, mais aussi le fichier de configuration (\"EEPROM\") d'INAV lui-même. <br><span style=\"color: red\">Remarque:</span><br>Les profils standard ne peuvent pas être écrasés. Pour enregistrer vos modifications, créez un nouveau profil."
+        "message": "Les profils sont enregistrés localement. Les profils contiennent non seulement toutes les données de cet onglet, mais aussi le fichier de configuration (\"EEPROM\") d'INAV lui-même. <br><span style=\"color: red\">Remarque:</span><br>Les profils standard ne peuvent pas être écrasés. Pour enregistrer vos modifications il faut créer un nouveau profil."
     },
     "sitlEnableSimulatorHelp": {
-        "message": "Si cette option est désactivée, seul UARTS (MSP/Configurator) peut être utilisé. Utile pour configurer INAV sans avoir à démarrer le simulateur."
+        "message": "Si cette option est désactivée, seul UARTS (MSP/Configurator) peuvent être utilisés. C'est utile pour configurer INAV sans avoir à démarrer le simulateur."
     },
     "sitlUseImuHelp": {
         "message": "Utilisez les données du capteur IMU du simulateur au lieu d'utiliser directement les données d'attitude du simulateur (expérimental, non recommandé)."
@@ -5155,7 +5155,7 @@
         "message": "Conditions logiques"
     },
     "logicId": {
-        "message": null
+        "message": "#"
     },
     "logicEnabled": {
         "message": "Activé"
@@ -5269,7 +5269,7 @@
         "message": "Fonctions globales"
     },
     "functionId": {
-        "message": null
+        "message": "#"
     },
     "functionEnabled": {
         "message": "Activé"
@@ -5329,7 +5329,7 @@
         "message": ""
     },
     "SafehomeId": {
-        "message": null
+        "message": "#"
     },
     "SafehomeEnabled": {
         "message": "Activé"
@@ -5344,13 +5344,13 @@
         "message": "Élév."
     },
     "WaypointOptionSelected": {
-        "message": null
+        "message": "+"
     },
     "WaypointOptionId": {
-        "message": null
+        "message": "#"
     },
     "WaypointOptionAction": {
-        "message": "Taper"
+        "message": "Type"
     },
     "WaypointOptionP1": {
         "message": "P1"
@@ -5359,7 +5359,7 @@
         "message": "P2"
     },
     "pidId": {
-        "message": null
+        "message": "#"
     },
     "pidEnabled": {
         "message": "Activé"

@@ -271,7 +271,7 @@
         "message": "Stopbits"
     },
     "sitlSerialPort": {
-        "message": "Serial receiver/Proxy FC is connectected to host's serial port"
+        "message": "Serial receiver/Proxy FC is connected to host's serial port"
     },
     "sitlSerialUART": {
         "message": "Serial receiver is configured on SITL's UART"
