@@ -26,6 +26,10 @@
         "message": "Русский",
         "_comment": "Don't translate!"
     },
+    "language_fr": {
+        "message": "Français",
+        "_comment": "Don't translate!"
+    },
     "language": {
         "message": "Langue"
     },
@@ -6168,7 +6172,7 @@
         "message": "Messages de battement de coeur"
     },
     "currentLanguage": {
-        "message": "dans"
+        "message": "fr"
     },
     "search": {
         "message": "Recherche"
