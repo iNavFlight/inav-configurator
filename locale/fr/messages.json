@@ -52,7 +52,7 @@
         "message": "AutoComplete avancé de la CLI"
     },
     "options_unit_type": {
-        "message": "Définir comment les unités apparaissent sur le configurateur seulement"
+        "message": "Définir comment les unités apparaissent sur le configurateur (seulement le configurateur)"
     },
     "options_render": {
         "message": "Options de rendu du configurateur"
@@ -118,7 +118,7 @@
         "message": "Bienvenue"
     },
     "tabHelp": {
-        "message": "Documentation & Assistance"
+        "message": "Documentation & Aide"
     },
     "tabSetup": {
         "message": "Statut"
@@ -169,7 +169,7 @@
         "message": "CLI"
     },
     "tabLogging": {
-        "message": "Loggage Connectée"
+        "message": "Journal Connecté"
     },
     "tabOnboardLogging": {
         "message": "Boîte Noire"
@@ -220,7 +220,7 @@
         "message": "Sortie INAV"
     },
     "sitlLog": {
-        "message": "Logger"
+        "message": "Journal"
     },
     "sitlStart": {
         "message": "Commencer"
@@ -268,7 +268,7 @@
         "message": "Stopbits"
     },
     "sitlSerialPort": {
-        "message": "Le récepteur série/Proxy FC est connecté au port série de l'hôte"
+        "message": "Le récepteur série/Proxy contrôleur de vol est connecté au port série de l'hôte"
     },
     "sitlSerialUART": {
         "message": "Le récepteur série est configuré sur \"SITL's UART\""
@@ -325,7 +325,7 @@
         "message": "Type d'appareil BLE: $1"
     },
     "connectionBleNotSupported": {
-        "message": "<span style=\"color: red\">Erreur de connexion:</span> Le micrologiciel ne prend pas en charge les connexions BLE. Avorter."
+        "message": "<span style=\"color: red\">Erreur de connexion:</span> Le logiciel ne prend pas en charge les connexions BLE. Avorter."
     },
     "connectionBleInterrupted": {
         "message": "La connexion a été interrompue de manière inattendue."
@@ -439,10 +439,10 @@
         "message": "Aucune configuration reçue dans les <span style=\"color: red\">10 secondes</span>, communication <span style=\"color: red\">failed</span>"
     },
     "firmwareVersionNotSupported": {
-        "message": "Cette version du micrologiciel est <span style=\"color: red\">non prise en charge</span>. Cette version du Configurateur prend en charge les micrologiciels de $1 à $2 (exclus)"
+        "message": "Cette version du logiciel est <span style=\"color: red\">non prise en charge</span>. Cette version du Configurateur prend en charge les logiciels de $1 à $2 (exclus)"
     },
     "firmwareVariantNotSupported": {
-        "message": "Cette variante du micrologiciel est <span style=\"color: red\">non prise en charge</span>. Veuillez mettre à niveau vers le micrologiciel INAV. Utilisez CLI pour la sauvegarde avant de flasher.  La procédure de sauvegarde/restauration CLI est dans la documentation."
+        "message": "Cette variante du logiciel est <span style=\"color: red\">non prise en charge</span>. Veuillez mettre à niveau vers le logiciel INAV. Utilisez CLI pour la sauvegarde avant de flasher.  La procédure de sauvegarde/restauration CLI est dans la documentation."
     },
     "tabSwitchConnectionRequired": {
         "message": "Vous devez <strong>connect</strong> avant de pouvoir afficher l'un des onglets."
@@ -451,10 +451,10 @@
         "message": "Vous <span style=\"color: red\">ne pouvez pas</span> faire cela pour le moment, veuillez attendre la fin de l'opération en cours..."
     },
     "tabSwitchUpgradeRequired": {
-        "message": "Vous devez <strong>mettre à niveau</strong> votre micrologiciel avant de pouvoir utiliser l'onglet $1."
+        "message": "Vous devez <strong>mettre à niveau</strong> votre logiciel avant de pouvoir utiliser l'onglet $1."
     },
     "firmwareVersion": {
-        "message": "Version du micrologiciel: <strong>$1</strong>"
+        "message": "Version du logiciel: <strong>$1</strong>"
     },
     "apiVersionReceived": {
         "message": "Version de l'API MultiWii <span style=\"color: #37a8db\">reçu</span> - <strong>$1</strong>"
@@ -466,7 +466,7 @@
         "message": "Carte: <strong>$1</strong>, version: <strong>$2</strong>"
     },
     "buildInfoReceived": {
-        "message": "Micrologiciel en cours d'exécution publié le: <strong>$1</strong>"
+        "message": "Logiciel en cours d'exécution publié le: <strong>$1</strong>"
     },
     "fcInfoReceived": {
         "message": "Informations sur le contrôleur de vol, identifiant: <strong>$1</strong>, version: <strong>$2</strong>"
@@ -502,7 +502,7 @@
         "message": "Drapeaux d'armement:"
     },
     "dfu_connect_message": {
-        "message": "Veuillez utiliser le Firmware Flasher pour accéder aux appareils DFU."
+        "message": "Veuillez utiliser le Logiciel Flasher pour accéder aux appareils DFU."
     },
     "dfu_erased_kilobytes": {
         "message": "Effacement de $1 Ko de flash <span style=\"color: #37a8db\">avec succès</span>"
@@ -517,37 +517,37 @@
         "message": "EEPROM <span style=\"color: #37a8db\">enregistré</span>"
     },
     "defaultWelcomeIntro": {
-        "message": "Bienvenue dans <strong>INAV - Configurator</strong>, un utilitaire conçu pour simplifier la mise à jour, la configuration et le réglage de votre contrôleur de vol."
+        "message": "Bienvenue dans <strong>INAV - Configurator</strong>, un outil conçu pour simplifier la mise à jour et le réglage de votre contrôleur de vol."
     },
     "defaultWelcomeHead": {
-        "message": "Micrologiciel et pilotes"
+        "message": "Logiciel et pilotes"
     },
     "defaultWelcomeHead2": {
-        "message": "Amis INAV"
+        "message": "Communauté INAV"
     },
     "defaultWelcomeText2": {
-        "message": "INAV est soutenu par une grande communauté d'utilisateurs, de développeurs et d'entreprises. Voici une courte liste: <a href=\"http://www.mateksys.com/\" target=\"_blank\">Mateksys</a>, <a href=\"https://www.speedybee.com/\" target=\"_blank\">SpeedyBee</a>, <a href=\"https://geprc.com/\" target=\"_blank\">GEPRC</a>."
+        "message": "INAV est soutenu par une grande communauté d'utilisateurs, de développeurs et d'entreprises. En voici une courte liste: <a href=\"http://www.mateksys.com/\" target=\"_blank\">Mateksys</a>, <a href=\"https://www.speedybee.com/\" target=\"_blank\">SpeedyBee</a>, <a href=\"https://geprc.com/\" target=\"_blank\">GEPRC</a>."
     },
     "defaultWelcomeText": {
-        "message": "Le code source du micrologiciel peut être téléchargé à partir de <a href=\"https://github.com/iNavFlight\" title=\"www.github.com\" target=\"_blank\">ici</a><br />L'image binaire du micrologiciel la plus récente est disponible <a href=\"https://github.com/iNavFlight/inav/releases\" title=\"www.github.com\" target=\"_blank\">ici</a>.<br /><br />Les derniers <strong>STM USB VCP Drivers</strong> peuvent être téléchargés à partir de <a href=\"http://www.st.com/web/en/catalog/tools/PF257938\" title=\"http://www.st.com\" target=\"_blank\">ici</a><br />Le dernier <strong>Zadig</strong> pour le flashage DFU Windows peut être téléchargé à partir de <a href=\"http://zadig.akeo.ie/\" title=\"http://zadig.akeo.ie\" target=\"_blank\">ici</a><br />"
+        "message": "Le code source du logiciel peut être téléchargé <a href=\"https://github.com/iNavFlight\" title=\"www.github.com\" target=\"_blank\">ici</a><br/>Le fichier de téléchargement du logiciel le plus récent est disponible <a href=\"https://github.com/iNavFlight/inav/releases\" title=\"www.github.com\" target=\"_blank\">ici</a>.<br/><br/>Les derniers <strong>pilotes STM USB VCP</strong> peuvent être téléchargés <a href=\"http://www.st.com/web/en/catalog/tools/PF257938\" title=\"http://www.st.com\" target=\"_blank\">ici</a><br/>Le dernier <strong>Zadig</strong> pour le flashage DFU Windows peut être téléchargé <a href=\"http://zadig.akeo.ie/\" title=\"http://zadig.akeo.ie\" target=\"_blank\">ici</a><br/>"
     },
     "defaultContributingHead": {
         "message": "Contribuer"
     },
     "defaultContributingText": {
-        "message": "Si vous souhaitez contribuer à rendre INAV encore meilleur, vous pouvez nous aider de plusieurs manières, notamment:<br /><ul><li>Répondre aux questions des autres utilisateurs sur les forums et IRC.</li><li>Contribuer au code du micrologiciel et du configurateur - nouvelles fonctionnalités, correctifs, améliorations</li><li>Test <a href=\"https://github.com/iNavFlight/inav/pulls\" target=\"_blank\">new fonctionnalités/correctifs</a> et fournir des commentaires.</li><li>Aider avec <a href=\"https://github.com/iNavFlight/inav/issues\" target=\"_blank\">problèmes et commenter les demandes de fonctionnalités</a>.</li></ul>"
+        "message": "Si vous souhaitez contribuer et rendre INAV meilleur, vous pouvez nous aider de plusieurs manières, notamment:<br/><ul><li>Répondre aux questions des autres utilisateurs sur les forums.</li><li>Contribuer au code du logiciel et du configurateur - nouvelles fonctionnalités, correctifs, améliorations</li><li>Tester de <a href=\"https://github.com/iNavFlight/inav/pulls\" target=\"_blank\">nouvelles fonctionnalités/correctifs</a> et fournir des commentaires.</li><li>Aider avec <a href=\"https://github.com/iNavFlight/inav/issues\" target=\"_blank\">les problèmes et commenter les demandes de fonctionnalités</a>.</li></ul>"
     },
     "defaultChangelogHead": {
         "message": "Configurateur - Journal des modifications"
     },
     "defaultButtonFirmwareFlasher": {
-        "message": "Flasheur du micrologiciel"
+        "message": "Flasheur du logiciel"
     },
     "defaultDonateHead": {
         "message": "Open Source / Avis de don"
     },
     "defaultDonateText": {
-        "message": "Cet utilitaire est entièrement <strong>open source</strong> et est disponible gratuitement pour tous les utilisateurs <strong>INAV</strong>.<br />Si vous avez trouvé INAV ou INAV Configurator utile, veuillez envisager de <strong>soutenir</strong> son développement en faisant un don."
+        "message": "Cet utilitaire est entièrement <strong>open source</strong> et est disponible gratuitement pour tous les utilisateurs <strong>INAV</strong>.<br/>Si vous avez trouvé INAV ou INAV Configurator utile, veuillez envisager de <strong>soutenir</strong> son développement en faisant un don."
     },
     "defaultSponsorsHead": {
         "message": "INAV est soutenu par"
@@ -556,7 +556,7 @@
         "message": "Prise en charge des groupes RC"
     },
     "communityDiscordServer": {
-        "message": "Serveur Discorde"
+        "message": "Serveur Discord"
     },
     "communitySlackSupport": {
         "message": "Chat en direct de l’assistance Slack"
@@ -568,7 +568,7 @@
         "message": "Groupe Facebook"
     },
     "initialSetupBackupAndRestoreApiVersion": {
-        "message": "<span style=\"color: red\">Fonctionnalité de sauvegarde et de restauration désactivée.</span> Vous disposez d'un micrologiciel avec la version API <span style=\"color: red\">$1</span>, la sauvegarde et la restauration nécessitent <span style=\"color: #37a8db\">$2</span>.  Veuillez sauvegarder vos paramètres via la CLI, voir la documentation INAV pour la procédure."
+        "message": "<span style=\"color: red\">Fonctionnalité de sauvegarde et de restauration désactivée.</span> Vous disposez d'un logiciel avec la version API <span style=\"color: red\">$1</span>, la sauvegarde et la restauration nécessitent <span style=\"color: #37a8db\">$2</span>.  Veuillez sauvegarder vos paramètres via la CLI, voir la documentation INAV pour la procédure."
     },
     "initialSetupButtonCalibrateAccel": {
         "message": "Calibrer l'accéléromètre"
@@ -946,7 +946,7 @@
         "message": "Sélectionnez les données que vous souhaitez envoyer au capteur de télémétrie <strong>fuel</strong>."
     },
     "configurationFeaturesHelp": {
-        "message": "<strong>Remarque:</strong> Toutes les combinaisons de fonctionnalités ne sont pas valides.  Lorsque le micrologiciel du contrôleur de vol détecte des combinaisons de fonctionnalités non valides, les fonctionnalités en conflit seront désactivées.<br /><strong>Remarque:</strong> Configurez les ports série <span style=\"color: red\">avant</span> en activant les fonctionnalités qui utiliseront les ports."
+        "message": "<strong>Remarque:</strong> Toutes les combinaisons de fonctionnalités ne sont pas valides.  Lorsque le logiciel du contrôleur de vol détecte des combinaisons de fonctionnalités non valides, les fonctionnalités en conflit seront désactivées.<br/><strong>Remarque:</strong> Configurez les ports série <span style=\"color: red\">avant</span> en activant les fonctionnalités qui utiliseront les ports."
     },
     "configurationSerialRXHelp": {
         "message": "<strong>Remarque:</strong> N'oubliez pas de configurer un port série (via l'onglet Ports) pour le récepteur série."
@@ -1117,7 +1117,7 @@
         "message": "Se tortiller pour se réveiller au ralenti"
     },
     "configurationWiggleWakeIdleHelp": {
-        "message": "Si elle est activée, cette fonctionnalité permet à un mouvement de lacet de l'avion de réveiller les moteurs du ralenti.<br />0:Désactivé (par défaut)<br />1: 1 mouvement - Ce paramètre a un point de détection plus élevé, pour les avions sans queue qui peut être déplacé facilement <br />2: 2 mouvements - Ce paramètre a un point de détection plus bas, mais nécessite une action répétée. Ceci est destiné aux modèles plus grands et aux avions avec queues"
+        "message": "Si elle est activée, cette fonctionnalité permet à un mouvement de lacet de l'avion de réveiller les moteurs du ralenti.<br/>0:Désactivé (par défaut)<br/>1: 1 mouvement - Ce paramètre a un point de détection plus élevé, pour les avions sans queue qui peut être déplacé facilement <br/>2: 2 mouvements - Ce paramètre a un point de détection plus bas, mais nécessite une action répétée. Ceci est destiné aux modèles plus grands et aux avions avec queues"
     },
     "configurationLaunchMotorDelay": {
         "message": "Retard moteur"
@@ -1300,13 +1300,13 @@
         "message": "Rapport de mouvement du rouleau du suiveur de tête"
     },
     "portsHelp": {
-        "message": "<strong>Remarque:</strong> toutes les combinaisons ne sont pas valides.  Lorsque le micrologiciel du contrôleur de vol détecte cela, la configuration du port série sera réinitialisée."
+        "message": "<strong>Remarque:</strong> toutes les combinaisons ne sont pas valides.  Lorsque le logiciel du contrôleur de vol détecte cela, la configuration du port série sera réinitialisée."
     },
     "portsMSPWarning": {
         "message": "<strong>Attention:</strong><p>Mettre MSP sur plus de deux ports UART peut interférer avec la communication USB. Pensez à supprimer MSP d'un port où il n'est pas nécessaire.</p>"
     },
     "portsFirmwareUpgradeRequired": {
-        "message": "Mise à niveau du micrologiciel <span style=\"color: red\">required</span>."
+        "message": "Mise à niveau du logiciel <span style=\"color: red\">required</span>."
     },
     "portsButtonSave": {
         "message": "Enregistrer et redémarrer"
@@ -1561,7 +1561,7 @@
         "message": "Limite de taux de maintien de cap"
     },
     "pidTuning_MagHoldYawRateHelp": {
-        "message": "Taux de rotation YAW maximum que le contrôleur MagHold peut demander à l'UAV. Utilisé uniquement lorsque le mode MagHold est activé, pendant la navigation RTH et WAYPOINT. Des valeurs inférieures à 30 dps donnent de jolis virages « cinématographiques »"
+        "message": "Taux d'inclinaison de droite à gauche (YAW) maximal que le contrôleur MagHold peut demander à l'UAV. Utilisé uniquement lorsque le mode MagHold est activé, pendant la navigation RTH et WAYPOINT. Des valeurs inférieures à 30 dps donnent de jolis virages « cinématographiques »"
     },
     "pidTuning_Filters": {
         "message": "Filtres"
@@ -1750,7 +1750,7 @@
         "message": "EEPROM <span style=\"color: #37a8db\">saved</span>: réglage PID"
     },
     "receiverHelp": {
-        "message": "Veuillez lire le chapitre récepteur de la documentation.  Configurez le port série (si nécessaire), le mode récepteur (série/ppm/pwm), le fournisseur (pour les récepteurs série), associez le récepteur, définissez la carte des canaux, configurez les points de terminaison/plage de canal sur TX afin que tous les canaux passent de ~ 1 000 à ~ 2 000.  Définissez le point médian (1 500 par défaut), coupez les canaux à 1 500, configurez la bande morte du stick, vérifiez le comportement lorsque TX est désactivé ou hors de portée. Assurez-vous que les valeurs des canaux augmentent toutes lorsque vous poussez les manettes vers le haut et vers la droite. Sinon, inversez le canal dans le TX. N'appliquez aucun autre mélange dans le TX.<br /><span style=\"color: red\">IMPORTANT:</span> Avant de voler, lisez le chapitre de sécurité de la documentation et configurez la sécurité."
+        "message": "Veuillez lire le chapitre récepteur de la documentation.  Configurez le port série (si nécessaire), le mode récepteur (série/ppm/pwm), le fournisseur (pour les récepteurs série), associez le récepteur, définissez la carte des canaux, configurez les points de terminaison/plage de canal sur TX afin que tous les canaux passent de ~ 1 000 à ~ 2 000.  Définissez le point médian (1 500 par défaut), coupez les canaux à 1 500, configurez la bande morte du stick, vérifiez le comportement lorsque TX est désactivé ou hors de portée. Assurez-vous que les valeurs des canaux augmentent toutes lorsque vous poussez les manettes vers le haut et vers la droite. Sinon, inversez le canal dans le TX. N'appliquez aucun autre mélange dans le TX.<br/><span style=\"color: red\">IMPORTANT:</span> Avant de voler, lisez le chapitre de sécurité de la documentation et configurez la sécurité."
     },
     "receiverThrottleMid": {
         "message": "Milieu de l'accélérateur"
@@ -2002,7 +2002,7 @@
         "message": "Réglage de l'accélérateur de croisière FW de navigation"
     },
     "adjustmentsFunction33": {
-        "message": "Réglage du pas du micrologiciel de navigation vers l'accélérateur"
+        "message": "Réglage du pas du logiciel de navigation vers l'accélérateur"
     },
     "adjustmentsFunction34": {
         "message": "Ajustement de l'alignement du rouleau de carton"
@@ -2221,10 +2221,10 @@
         "message": "Outil d'alignement"
     },
     "magnetometerHelp": {
-        "message": "1. Ajustez l'orientation du contrôleur de vol pour qu'elle corresponde à l'orientation physique de l'avion <u>selon la flèche « direction » sur le contrôleur de vol</u>.<br/>2. Ajustez le modèle du magnétomètre, la puce du magnétomètre ou l'orientation des axes du magnétomètre pour qu'ils correspondent à l'orientation physique de l'avion.<br/><strong>Remarque:</strong> Le préréglage d'orientation du magnétomètre (align_mag) est relatif au FC. Assurez-vous d'abord d'aligner FC (align_board_pitch, align_board_roll, align_board_yaw).<br/>Si le préréglage n'est pas utilisé (l'orientation est définie à l'aide de align_mag_roll, align_mag_pitch et align_mag_yaw), alors l'orientation du magnétomètre est indépendante."
+        "message": "1. Ajustez l'orientation du contrôleur de vol pour qu'elle corresponde à l'orientation physique de l'avion <u>selon la flèche « direction » sur le contrôleur de vol</u>.<br/>2. Ajustez le modèle du magnétomètre, la puce du magnétomètre ou l'orientation des axes du magnétomètre pour qu'ils correspondent à l'orientation physique de l'avion.<br/><strong>Remarque:</strong> Le préréglage d'orientation du magnétomètre (align_mag) est relatif au contrôleur de vol. Assurez-vous d'abord d'aligner contrôleur de vol (align_board_pitch, align_board_roll, align_board_yaw).<br/>Si le préréglage n'est pas utilisé (l'orientation est définie à l'aide de align_mag_roll, align_mag_pitch et align_mag_yaw), alors l'orientation du magnétomètre est indépendante."
     },
     "magnetometerOrientationPreset": {
-        "message": "Préréglage d'orientation (align_mag). Par rapport à l’orientation FC"
+        "message": "Préréglage d'orientation (align_mag). Par rapport à l’orientation du contrôleur de vol"
     },
     "boardInfo": {
         "message": "1. Sélectionnez l'alignement du contrôleur de vol<br>(align_board_roll, align_board_pitch, align_board_yaw)"
@@ -2269,13 +2269,13 @@
         "message": "Maître"
     },
     "motorsNotice": {
-        "message": "<strong>Mode de test du moteur Remarque:</strong><br />Le déplacement des curseurs fera <strong>tourner les moteurs</strong>.<br />Afin d'éviter les blessures <strong style=\"color: red\">retirez TOUTES les hélices</strong> avant d'utiliser cette fonction.<br />"
+        "message": "<strong>Mode de test du moteur Remarque:</strong><br/>Le déplacement des curseurs fera <strong>tourner les moteurs</strong>.<br/>Afin d'éviter les blessures <strong style=\"color: red\">retirez TOUTES les hélices</strong> avant d'utiliser cette fonction.<br/>"
     },
     "motorsEnableControl": {
         "message": "Je comprends les risques, les hélices sont retirées - Activer le contrôle moteur."
     },
     "sensorsInfo": {
-        "message": "Gardez à l'esprit que l'utilisation de périodes de mise à jour rapides et le rendu de plusieurs graphiques en même temps nécessitent beaucoup de ressources et brûleront votre batterie plus rapidement si vous utilisez un ordinateur portable.<br />Nous vous recommandons de rendre uniquement les graphiques pour les capteurs qui vous intéressent tout en utilisant des périodes de mise à jour raisonnables."
+        "message": "Gardez à l'esprit que l'utilisation de périodes de mise à jour rapides et le rendu de plusieurs graphiques en même temps nécessitent beaucoup de ressources et brûleront votre batterie plus rapidement si vous utilisez un ordinateur portable.<br/>Nous vous recommandons de rendre uniquement les graphiques pour les capteurs qui vous intéressent tout en utilisant des périodes de mise à jour raisonnables."
     },
     "sensorsRefresh": {
         "message": "Rafraîchir:"
@@ -2284,7 +2284,7 @@
         "message": "Échelle:"
     },
     "cliInfo": {
-        "message": "<strong>Remarque</strong>: Quitter l'onglet CLI ou appuyer sur Déconnecter <strong>automatiquement</strong> enverra \"<strong>exit</strong>\" à la carte.  Avec le dernier micrologiciel, le contrôleur <span style=\"color: red\">restart</span> et les modifications non enregistrées seront <span style=\"color: red\">lost</span>."
+        "message": "<strong>Remarque</strong>: Quitter l'onglet CLI ou appuyer sur Déconnecter <strong>automatiquement</strong> enverra \"<strong>exit</strong>\" à la carte.  Avec le dernier logiciel, le contrôleur <span style=\"color: red\">restart</span> et les modifications non enregistrées seront <span style=\"color: red\">lost</span>."
     },
     "cliInputPlaceholder": {
         "message": "Écrivez votre commande ici"
@@ -2347,7 +2347,7 @@
         "message": "Exécuter"
     },
     "loggingNote": {
-        "message": "Les données seront enregistrées dans cet onglet <span style=\"color: red\">only</span>, quitter l'onglet entraînera <span style=\"color: red\">annuler</span> la journalisation et l'application reviendra à son état normal de <strong>\"configurateur\"</strong>.<br /> Vous êtes libre de sélectionner la période de mise à jour globale, les données seront écrites dans le fichier journal tous les <strong>1</strong> seconde pour des raisons de performances."
+        "message": "Les données seront enregistrées dans cet onglet <span style=\"color: red\">seulement</span>, quitter l'onglet entraînera <span style=\"color: red\">une annulation</span> de la journalisation et l'application reviendra à son état normal de <strong>\"configurateur\"</strong>.<br/> Vous êtes libre de sélectionner la période de mise à jour globale, les données seront écrites dans le fichier journal toutes les <strong>1</strong> seconde pour des raisons de performances."
     },
     "loggingSamplesSaved": {
         "message": "Échantillons enregistrés:"
@@ -2368,7 +2368,7 @@
         "message": "Quitter la journalisation / Se déconnecter"
     },
     "loggingErrorNotConnected": {
-        "message": "Vous devez d'abord <strong>connecter</strong>"
+        "message": "Vous devez d'abord <strong>vous connecter</strong>"
     },
     "loggingErrorLogFile": {
         "message": "Veuillez sélectionner le fichier journal"
@@ -2380,7 +2380,7 @@
         "message": "Fichier journal précédent chargé automatiquement: <strong>$1</strong>"
     },
     "blackboxNotSupported": {
-        "message": "Le micrologiciel de votre contrôleur de vol ne prend pas en charge la journalisation Blackbox ou la fonction Blackbox n'est pas activée"
+        "message": "Le logiciel de votre contrôleur de vol ne prend pas en charge la journalisation Blackbox ou la fonction Blackbox n'est pas activée"
     },
     "blackboxConfiguration": {
         "message": "Configuration de la boîte noire"
@@ -2389,7 +2389,7 @@
         "message": "Enregistrer et redémarrer"
     },
     "serialLogging": {
-        "message": "Dispositif d'enregistrement série hors-bord"
+        "message": "Dispositif de journalisation série hors-bord"
     },
     "serialLoggingSupportedNote": {
         "message": "Vous pouvez vous connecter à un périphérique de journalisation externe (tel qu'un OpenLog ou un clone compatible) en utilisant un port série. Configurez le port dans l'onglet Ports."
@@ -2410,7 +2410,7 @@
         "message": "Votre contrôleur de vol ne dispose pas d'une puce dataflash compatible."
     },
     "dataflashFirmwareUpgradeRequired": {
-        "message": "Dataflash nécessite un firmware &gt;= 1.8.0."
+        "message": "Dataflash nécessite un logiciel &gt;= 1.8.0."
     },
     "dataflashButtonSaveFile": {
         "message": "Enregistrer le flash dans un fichier..."
@@ -2476,13 +2476,13 @@
         "message": "Binaire:"
     },
     "firmwareFlasherReleaseStatusReleaseCandidate": {
-        "message": "<span style=\"color: red\">IMPORTANT: cette version du micrologiciel est actuellement marquée comme version candidate.  Veuillez signaler immédiatement tout problème.</span>"
+        "message": "<span style=\"color: red\">IMPORTANT: cette version du logiciel est actuellement marquée comme version candidate.  Veuillez signaler immédiatement tout problème.</span>"
     },
     "firmwareFlasherReleaseFileUrl": {
         "message": "Téléchargez manuellement."
     },
     "firmwareFlasherTargetWarning": {
-        "message": "<span style=\"color: red\">IMPORTANT</span>: Assurez-vous de flasher un fichier approprié pour votre cible.  Flasher un binaire pour la mauvaise cible peut provoquer des <span style=\"color: red\">bad</span> choses."
+        "message": "<span style=\"color: red\">IMPORTANT</span>: Assurez-vous de flasher un fichier approprié pour votre carte. Flasher un fichier sur la mauvaise carte peut provoquer des <span style=\"color: red\">problèmes</span>."
     },
     "firmwareFlasherPath": {
         "message": "Chemin:"
@@ -2497,19 +2497,19 @@
         "message": "Progrès:"
     },
     "firmwareFlasherLoadFirmwareFile": {
-        "message": "Veuillez charger le fichier du firmware"
+        "message": "Veuillez charger le fichier du logiciel"
     },
     "firmwareFlasherNoReboot": {
-        "message": "Aucune séquence de redémarrage"
+        "message": "Pas de séquence de redémarrage"
     },
     "firmwareFlasherOnlineSelectBoardDescription": {
-        "message": "Sélectionnez votre carte pour voir les versions de micrologiciels disponibles en ligne - Sélectionnez le micrologiciel approprié pour votre carte. Veuillez noter que <strong>Auto-select Target</strong> ne fonctionnera que pour les firmwares INAV 5.0 et plus récents."
+        "message": "Sélectionnez votre carte pour voir les versions de logiciels disponibles en ligne - Sélectionnez le logiciel approprié pour votre carte. Note: la <strong>Sélection Automatique</strong> ne fonctionnera que pour les versions INAV 5.0 et plus récentes."
     },
     "firmwareFlasherOnlineSelectFirmwareVersionDescription": {
-        "message": "Sélectionnez la version du firmware pour votre carte.<br />Remarque: même si vous pouvez flasher différentes versions du firmware à l'aide de ce configurateur. Lors de la configuration du contrôleur de vol, vous devez faire correspondre les numéros de version majeure et mineure du micrologiciel et du configurateur."
+        "message": "Sélectionnez la version du logiciel pour votre carte.<br/>Remarque: même si vous pouvez flasher différentes versions du logiciel à l'aide de ce configurateur. Lors de la configuration du contrôleur de vol, vous devez faire correspondre les numéros de version majeure et mineure du logiciel et du configurateur."
     },
     "firmwareFlasherNoRebootDescription": {
-        "message": "Activez-le si vous avez alimenté votre FC alors que les broches du chargeur de démarrage sont reliées par un pont ou si le bouton BOOT de votre FC est enfoncé."
+        "message": "Activez-le si vous avez alimenté votre contrôleur de vol alors que les broches du chargeur de démarrage sont reliées par un pont ou si le bouton BOOT de votre contrôleur de vol est enfoncé."
     },
     "firmwareFlasherFlashOnConnect": {
         "message": "Flash lors de la connexion"
@@ -2524,52 +2524,52 @@
         "message": "Efface toutes les données de configuration actuellement stockées sur la carte."
     },
     "firmwareFlasherFlashDevelopmentFirmware": {
-        "message": "Utiliser le micrologiciel de développement"
+        "message": "Utiliser le logiciel de développement"
     },
     "firmwareFlasherFlashDevelopmentFirmwareDescription": {
-        "message": "Flash le firmware de développement le plus récent (non testé)."
+        "message": "Flash le logiciel de développement le plus récent (non testé)."
     },
     "firmwareFlasherManualBaud": {
         "message": "Débit en bauds manuel"
     },
     "firmwareFlasherManualBaudDescription": {
-        "message": "Sélection manuelle du débit en bauds pour les cartes qui ne prennent pas en charge la vitesse par défaut ou pour le flashage via Bluetooth.<br /><span style=\"color: red\">Remarque:</span> Non utilisé lors du flashage via USB DFU"
+        "message": "Sélection manuelle du débit en bauds pour les cartes qui ne prennent pas en charge la vitesse par défaut ou pour le flashage via Bluetooth.<br/><span style=\"color: red\">Remarque:</span> Non utilisé lors du flashage via USB DFU"
     },
     "firmwareFlasherShowDevelopmentReleases": {
         "message": "Afficher les versions instables"
     },
     "firmwareFlasherShowDevelopmentReleasesDescription": {
-        "message": "Afficher les versions candidates et les versions de développement."
+        "message": "Distinguer les versions publiées des versions de développement."
     },
     "firmwareFlasherOptionLabelSelectFirmware": {
-        "message": "Choisissez un micrologiciel/une carte"
+        "message": "Choisissez un logiciel/une carte"
     },
     "firmwareFlasherOptionLabelSelectBoard": {
-        "message": "Choisissez un tableau"
+        "message": "Choisissez une carte"
     },
     "firmwareFlasherOptionLabelSelectFirmwareVersion": {
-        "message": "Choisissez une version du micrologiciel"
+        "message": "Choisissez une version du logiciel"
     },
     "firmwareFlasherOptionLabelSelectFirmwareVersionFor": {
-        "message": "Choisissez une version du micrologiciel pour"
+        "message": "Choisissez une version du logiciel pour"
     },
     "firmwareFlasherButtonAutoSelect": {
-        "message": "Cible de sélection automatique"
+        "message": "Sélection Automatique"
     },
     "firmwareFlasherButtonLoadLocal": {
-        "message": "Charger le micrologiciel [local]"
+        "message": "Charger le logiciel [local]"
     },
     "firmwareFlasherButtonLoadOnline": {
-        "message": "Charger le micrologiciel [en ligne]"
+        "message": "Charger le logiciel [en ligne]"
     },
     "firmwareFlasherButtonLoading": {
         "message": "Chargement..."
     },
     "firmwareFlasherFlashFirmware": {
-        "message": "Micrologiciel Flash"
+        "message": "Flasher le Logiciel"
     },
     "firmwareFlasherGithubInfoHead": {
-        "message": "Informations sur le micrologiciel Github"
+        "message": "Informations sur le logiciel Github"
     },
     "firmwareFlasherCommiter": {
         "message": "Commitateur:"
@@ -2590,31 +2590,31 @@
         "message": "Avertissement"
     },
     "firmwareFlasherWarningText": {
-        "message": "Veuillez <span style=\"color: red\">not</span> essayer de flasher du matériel <strong>non-iNAV</strong> avec ce firmware flasher.<br />Ne <span style=\"color: red\">not</span> <strong>déconnecter</strong> la carte ou <strong>éteindre</strong> votre ordinateur pendant clignotant.<br /><br /><strong>Remarque: </strong>Le chargeur de démarrage STM32 est stocké dans la ROM, il ne peut pas être maçonné.<br /><!--strong>Remarque: </strong><span style=\"color: red\">Auto-Connect</span> est toujours désactivé lorsque vous êtes dans le micrologiciel flasher.<br / --><strong>Remarque: </strong>Assurez-vous d'avoir une sauvegarde; certaines mises à niveau/rétrogradations effaceront votre configuration.<br /><strong>Remarque:</strong> Si vous rencontrez des problèmes de flash, essayez d'abord de déconnecter tous les câbles de votre FC, essayez de redémarrer, mettez à niveau Chrome, mettez à niveau les pilotes.<br /><strong>Remarque:</strong> Lors du flashage de cartes qui ont des prises USB directement connectées (Matek H743-SLIM, Holybro Kakute, etc.), assurez-vous d'avoir lu la section Flashage USB du manuel INAV et d'avoir installé le logiciel et les pilotes appropriés."
+        "message": "<span style=\"color: red\">Ne flasher pas</span> du matériel <strong>non-iNAV</strong> avec ce logiciel.<br/>Ne <span style=\"color: red\">pas</span> <strong>déconnecter</strong> la carte ou <strong>éteindre</strong> votre ordinateur pendant l'opération (lorsque ça clignote).<br/><br/><strong>Remarque: </strong>Le chargeur de démarrage STM32 est stocké dans la ROM, il ne peut pas être modifié.<br/><!--strong>Remarque: </strong><span style=\"color: red\">Auto-Connect</span> est toujours désactivé lorsque vous êtes dans le logiciel flasher.<br / --><strong>Remarque: </strong>Assurez-vous d'avoir une sauvegarde; certaines mises à niveau/rétrogradations effaceront votre configuration.<br/><strong>Remarque:</strong> Si vous rencontrez des problèmes de flash, essayez d'abord de déconnecter tous les câbles de votre contrôleur de vol, essayez de redémarrer le logiciel/l'ordinateur, mettez à jour votre navigateur, mettez à jour les pilotes.<br/><strong>Remarque:</strong> Lors du flashage de cartes qui ont des prises USB directement connectées (Matek H743-SLIM, Holybro Kakute, etc.), assurez-vous d'avoir lu la section Flashage USB du manuel INAV et d'avoir installé le logiciel et les pilotes appropriés."
     },
     "firmwareFlasherRecoveryHead": {
         "message": "<strong>Récupération/Communication perdue<strong>"
     },
     "firmwareFlasherRecoveryText": {
-        "message": "Si vous avez perdu la communication avec votre carte, suivez ces étapes pour restaurer la communication: <ul><li>Éteignez</li><li>Activez «Aucune séquence de redémarrage», activez «Effacement complet de la puce». correctement).</li><li>Installez tous les pilotes STM32 et Zadig si nécessaire (voir la section <a href=\"https://github.com/iNavFlight/inav/blob/master/docs/USB%20Flashing.md\"target=\"_blank\">USB Flashing</a> du manuel INAV).</li><li>Fermez le configurateur, fermez toutes les instances Chrome en cours d'exécution, fermez toutes les applications Chrome, redémarrez le configurateur.</li><li>Relâchez le bouton BOOT si votre FC en a un.</li><li>Flash avec le firmware correct (en utilisant le débit en bauds manuel si spécifié dans le manuel de votre FC).</li><li>Éteindre.</li><li>Retirez le cavalier BOOT.</li><li>Allumez-vous (la LED d'activité devrait flash).</li><li>Connectez-vous normalement.</li></ul>"
+        "message": "Si vous avez perdu la communication avec votre carte, suivez ces étapes pour restaurer la communication: <ul><li>Éteignez la carte</li><li>Activez «Pas de séquence de redémarrage», activez «Effacement complet de la puce».</li><li>Placez un pont sur les broches BOOT ou appuyez continuellement sur le bouton BOOT.</li><li>Allumez la carte (la LED d'activité ne va PAS clignoter si les opérations ont été faites correctements).</li><li>Installez tous les pilotes STM32 et Zadig (si nécessaire voir la section <a href=\"https://github.com/iNavFlight/inav/blob/master/docs/USB%20Flashing.md\"target=\"_blank\">USB Flashing</a> du manuel INAV).</li><li>Fermez le configurateur, fermez toutes les instances/fenêtres du navigateur web en cours d'exécution, redémarrez le configurateur.</li><li>Relâchez le bouton BOOT si votre contrôleur de vol en a un.</li><li>Flashez avec le logiciel correct (en utilisant le débit en bauds manuel si spécifié dans le manuel de votre contrôleur de vol).</li><li>Éteignez la carte.</li><li>Retirez le cavalier BOOT.</li><li>Allumez la carte (la LED d'activité doit clignoter).</li><li>Faites une connexion normal.</li></ul>"
     },
     "firmwareFlasherButtonLeave": {
-        "message": "Laisser le micrologiciel clignotant"
+        "message": "Laisser le logiciel clignotant"
     },
     "firmwareFlasherFirmwareNotLoaded": {
-        "message": "Firmware non chargé"
+        "message": "Logiciel non chargé"
     },
     "firmwareFlasherHexCorrupted": {
         "message": "Le fichier HEX semble être corrompu"
     },
     "firmwareFlasherRemoteFirmwareLoaded": {
-        "message": "<span style=\"color: #37a8db\">Micrologiciel à distance chargé, prêt à clignoter</span>"
+        "message": "<span style=\"color: #37a8db\">Logiciel à distance chargé, prêt à clignoter</span>"
     },
     "firmwareFlasherFailedToLoadOnlineFirmware": {
-        "message": "Échec du chargement du micrologiciel distant"
+        "message": "Échec du chargement du logiciel distant"
     },
     "ledStripHelp": {
-        "message": "Le contrôleur de vol peut contrôler les couleurs et les effets des LED individuelles sur une bande.<br />Configurez les LED sur la grille, configurez l'ordre de câblage, puis fixez les LED sur votre avion en fonction des positions de la grille. Les LED sans numéro de commande de fil ne seront pas enregistrées.<br />Double-cliquez sur une couleur pour modifier les valeurs HSV."
+        "message": "Le contrôleur de vol peut contrôler les couleurs et les effets des LED individuelles sur une bande.<br/>Configurez les LED sur la grille, configurez l'ordre de câblage, puis fixez les LED sur votre avion en fonction des positions de la grille. Les LED sans numéro de commande de fil ne seront pas enregistrées.<br/>Double-cliquez sur une couleur pour modifier les valeurs HSV."
     },
     "ledStripButtonSave": {
         "message": "Sauvegarder"
@@ -2656,7 +2656,7 @@
         "message": "Accélérateur de sécurité"
     },
     "failsafeFeaturesHelpNew": {
-        "message": "Failsafe comporte deux étapes. <strong>L'étape 1</strong> est entrée lorsqu'un canal de vol a une durée d'impulsion invalide, que le récepteur signale un mode de sécurité ou qu'il n'y a aucun signal du récepteur, les paramètres de repli du canal sont appliqués à <span style=\"color: red\">tous les canaux</span> et un court laps de temps est fourni pour permettre la récupération. <strong>L'étape 2</strong> est entrée lorsque la condition d'erreur prend plus de temps que le temps de garde configuré alors que l'engin est <span style=\"color: red\">armé</span>, tous les canaux resteront au paramètre de repli de canal appliqué à moins qu'ils ne soient annulés par la procédure choisie. <br /><strong>Remarque:</strong> Avant d'entrer dans l'étape 1, les paramètres de repli de canal sont également appliqués aux canaux radio individuels qui ont des impulsions non valides."
+        "message": "Failsafe comporte deux étapes. <strong>L'étape 1</strong> est entrée lorsqu'un canal de vol a une durée d'impulsion invalide, que le récepteur signale un mode de sécurité ou qu'il n'y a aucun signal du récepteur, les paramètres de repli du canal sont appliqués à <span style=\"color: red\">tous les canaux</span> et un court laps de temps est fourni pour permettre la récupération. <strong>L'étape 2</strong> est entrée lorsque la condition d'erreur prend plus de temps que le temps de garde configuré alors que l'engin est <span style=\"color: red\">armé</span>, tous les canaux resteront au paramètre de repli de canal appliqué à moins qu'ils ne soient annulés par la procédure choisie. <br/><strong>Remarque:</strong> Avant d'entrer dans l'étape 1, les paramètres de repli de canal sont également appliqués aux canaux radio individuels qui ont des impulsions non valides."
     },
     "failsafePulsrangeTitle": {
         "message": "Paramètres de plage d'impulsion valides"
@@ -2842,7 +2842,7 @@
         "message": "Il s’agit du taux d’accélération angulaire maximal que le pilote est autorisé à exiger de l’UAV. Le drone devrait être capable de satisfaire à ce taux d’accélération. En règle générale, plus le drone est gros, pour réduire l'accélération qu'il peut gérer"
     },
     "pidTuningTPAHelp": {
-        "message": "Facteur d’atténuation PID du papillon. Les gains PID seront réduits linéairement à partir de 0 au point d'arrêt TPA (accélérateur) jusqu'au facteur TPA au papillon maximum."
+        "message": "Facteur d’atténuation de l'accéleration PID. Les gains PID seront réduits linéairement à partir de 0 au point d'arrêt TPA (accélérateur) jusqu'au facteur TPA à l'accélération maximale."
     },
     "pidTuningTPABreakPointHelp": {
         "message": "L'atténuation PID du papillon commence lorsque la position du papillon dépasse cette valeur."
@@ -2860,13 +2860,13 @@
         "message": "Fréquence des tâches d'attitude"
     },
     "configurationGyroLpfHelp": {
-        "message": "Fréquence de coupure matérielle pour le gyroscope. En général, une valeur plus élevée est meilleure mais rend le drone plus sensible aux vibrations"
+        "message": "Fréquence de coupure matérielle pour le gyroscope. En général, une valeur plus élevée est mieux mais rend le drone plus sensible aux vibrations"
     },
     "configurationAsyncModeHelp": {
-        "message": "Voir la documentation du micrologiciel \"Looptime\" pour plus de détails"
+        "message": "Voir la documentation du logiciel \"Looptime\" pour plus de détails"
     },
     "configurationGyroFrequencyHelp": {
-        "message": "En général, une valeur plus élevée est meilleure mais rend le drone plus sensible aux vibrations. Doit être maintenu au-dessus de la fréquence « Temps de boucle du contrôleur de vol ». La valeur pratique maximale dépend du matériel. Si la valeur est trop élevée, la carte risque de ne pas fonctionner correctement. Observez l’utilisation du processeur."
+        "message": "En général, une valeur plus élevée est mieux mais rend le drone plus sensible aux vibrations. Doit être maintenu au-dessus de la fréquence « Temps de boucle du contrôleur de vol ». La valeur pratique maximale dépend du matériel. Si la valeur est trop élevée, la carte risque de ne pas fonctionner correctement. Observez l’utilisation du processeur."
     },
     "configurationAccelerometerFrequencyHelp": {
         "message": "Pour les besoins d'Acro, cette valeur peut être réduite par défaut"
@@ -2875,7 +2875,7 @@
         "message": "Pour les besoins d'Acro, cette valeur peut être réduite par défaut"
     },
     "configurationLoopTimeHelp": {
-        "message": "En général, une valeur plus élevée est meilleure. Avec le gyroscope asynchrone, doit être maintenu en dessous de la fréquence de mise à jour du gyroscope. La valeur pratique maximale dépend du matériel. Si la valeur est trop élevée, la carte risque de ne pas fonctionner correctement. Observez l’utilisation du processeur."
+        "message": "En général, une valeur plus élevée est mieux. Avec le gyroscope asynchrone, doit être maintenu en dessous de la fréquence de mise à jour du gyroscope. La valeur pratique maximale dépend du matériel. Si la valeur est trop élevée, la carte risque de ne pas fonctionner correctement. Observez l’utilisation du processeur."
     },
     "tabOSD": {
         "message": "OSD"
@@ -3349,28 +3349,28 @@
         "message": "L'activation de cette option vous permettra de remplacer la commande automatique des gaz dans tous les modes de navigation. Vous ne pouvez pas descendre en dessous de la valeur du papillon automatique, sauf avec l'arrêt du moteur sur papillon nul."
     },
     "minThrottle": {
-        "message": "Min. étrangler"
+        "message": "Accélération min."
     },
     "maxThrottle": {
-        "message": "Max. étrangler"
+        "message": "Accélération max."
     },
     "maxBankAngle": {
-        "message": "Max. angle d'inclinaison de la navigation"
+        "message": "Angle d'inclinaison maximal de la navigation"
     },
     "maxBankAngleHelp": {
-        "message": "Angle d'inclinaison maximal dans les modes de navigation. Contraint par l'angle de ROLL maximum dans l'onglet de réglage PID."
+        "message": "Angle d'inclinaison maximal dans les modes de navigation. Contraint par l'angle de l'inclinaison en tonneau de gauche à droite (ROLL) maximal dans l'onglet de réglage PID."
     },
     "maxClimbAngle": {
-        "message": "Max. angle de montée de navigation"
+        "message": "Angle de montée maximal de navigation"
     },
     "maxClimbAngleHelp": {
-        "message": "Angle de montée maximum dans les modes de navigation. Contraint par l'angle PITCH maximum dans l'onglet de réglage PID."
+        "message": "Angle de montée maximal dans les modes de navigation. Contraint par l'angle d'inclinaison de haut en bas (PITCH) maximal dans l'onglet de réglage PID."
     },
     "navManualClimbRate": {
         "message": "Max. Taux de montée en maintenant Alt"
     },
     "navManualClimbRateHelp": {
-        "message": "Le micrologiciel du taux de montée/descente maximum est autorisé lors du traitement des entrées du pilote pour le mode de contrôle ALTHOLD [cm/s]"
+        "message": "Le logiciel du taux de montée/descente maximal est autorisé lors du traitement des entrées du pilote pour le mode de contrôle ALTHOLD [cm/s]"
     },
     "navAutoClimbRate": {
         "message": "Max. taux de montée de navigation"
@@ -4483,13 +4483,13 @@
         "message": "Téléchargez une nouvelle application"
     },
     "tabMissionControl": {
-        "message": "Contrôle de mission"
+        "message": "Contrôle Missions"
     },
     "loadMissionButton": {
-        "message": "Charger la mission du FC"
+        "message": "Charger la mission du contrôleur de vol"
     },
     "saveMissionButton": {
-        "message": "Sauvegarder la mission au FC"
+        "message": "Sauvegarder la mission au contrôleur de vol"
     },
     "loadEepromMissionButton": {
         "message": "Charger la mission EEPROM"
@@ -4597,10 +4597,10 @@
         "message": "Enregistrer le fichier de mission"
     },
     "missionTitleLoadMissionFromFC": {
-        "message": "Charger la mission du FC"
+        "message": "Charger la mission du contrôleur de vol"
     },
     "missionTitleSaveMissionToFC": {
-        "message": "Sauvegarder la mission au FC"
+        "message": "Sauvegarder la mission au contrôleur de vol"
     },
     "missionTitleLoadEepromMission": {
         "message": "Charger la mission EEPROM"
@@ -4936,7 +4936,7 @@
         "message": "Préréglage du mélangeur"
     },
     "mixerNotLoaded": {
-        "message": "Le mixeur n'est pas chargé.<br />Cliquez sur <b>Charger et appliquer</b> ou <b>Charger le mixeur</b> pour utiliser le mixeur sélectionné.<br />Ou cliquez sur <b>Actualiser le mixeur</b> pour utiliser votre mixeur actuel."
+        "message": "Le mixeur n'est pas chargé.<br/>Cliquez sur <b>Charger et appliquer</b> ou <b>Charger le mixeur</b> pour utiliser le mixeur sélectionné.<br/>Ou cliquez sur <b>Actualiser le mixeur</b> pour utiliser votre mixeur actuel."
     },
     "mixerLoadPresetRules": {
         "message": "Charger le mélangeur"
@@ -5008,7 +5008,7 @@
         "message": "Préréglage du mixeur"
     },
     "fcFirmwareUpdateRequired": {
-        "message": "Le micrologiciel du contrôleur de vol doit être mis à jour vers la dernière version pour utiliser cette fonction"
+        "message": "Le logiciel du contrôleur de vol doit être mis à jour vers la dernière version pour utiliser cette fonction"
     },
     "mixerNotConfigured": {
         "message": "Mélangeur non configuré. Utilisez l'onglet <u>Mixer</u> pour le configurer!"
@@ -5020,7 +5020,7 @@
         "message": "Cela permettra de sélectionner de nouvelles valeurs par défaut pour tous les paramètres. Le réglage PID existant et d'autres paramètres pourraient être perdus!\nVoulez-vous continuer ?"
     },
     "confirm_reset_pid": {
-        "message": "Cela réinitialisera tous les paramètres PID aux valeurs par défaut du micrologiciel et les enregistrera.\nVoulez-vous continuer ?"
+        "message": "Cela réinitialisera tous les paramètres PID aux valeurs par défaut du logiciel et les enregistrera.\nVoulez-vous continuer ?"
     },
     "mappingTableOutput": {
         "message": "Sortie (minuterie)"
@@ -5209,13 +5209,13 @@
         "message": "Type LPF à terme D"
     },
     "dterm_lpf_type_help": {
-        "message": "BIQUAD offre une meilleure atténuation du bruit pour un prix de retard plus élevé. PT1 a une atténuation plus faible mais offre un retard plus faible."
+        "message": "BIQUAD offre une meilleure atténuation du bruit mais avec une latence plus élevé. PT1 a une atténuation plus faible avec une latence plus faible."
     },
     "dterm_lpf2_type": {
         "message": "Type LPF D-term Stage 2"
     },
     "dterm_lpf2_type_help": {
-        "message": "BIQUAD offre une meilleure atténuation du bruit pour un prix de retard plus élevé. PT1 a une atténuation plus faible mais offre un retard plus faible."
+        "message": "BIQUAD offre une meilleure atténuation du bruit mais avec une latence plus élevé. PT1 a une atténuation plus faible avec une latence plus faible."
     },
     "dterm_lpf2_hz": {
         "message": "Fréquence de coupure LPF D-term Stage 2"
@@ -5239,10 +5239,10 @@
         "message": "Valeurs par défaut"
     },
     "defaultsDialogInfo": {
-        "message": "INAV Configurator souhaite savoir quel type de drone vous configurez. Sur la base de ces informations, il modifiera certaines valeurs par défaut pour débloquer les meilleures performances de vol."
+        "message": "INAV Configurator souhaite savoir quel type de drone vous configurez. Sur la base de ces informations, il modifiera certaines valeurs par défaut pour obtenir les meilleures performances de vol."
     },
     "defaultsDialogInfo2": {
-        "message": "Évitez de restaurer aveuglément toute la configuration du PID et du filtre de la version précédente d'INAV. Le meilleur résultat peut être obtenu en rétablissant les valeurs par défaut!"
+        "message": "Évitez de restaurer aveuglément toute la configuration du PID et du filtre de la version précédente d'INAV. De meilleurs résultats peuvent être obtenus en rétablissant les valeurs par défaut!"
     },
     "throttleIdle": {
         "message": "Puissance au ralenti des moteurs [%]"
@@ -5707,7 +5707,7 @@
         "message": "CONFIGURATEUR"
     },
     "mainLogoTextFirmware": {
-        "message": "MICROLOGICIEL FC"
+        "message": "LOGICIEL contrôleur de vol"
     },
     "mainPortOverrideLabel": {
         "message": "Port:"
@@ -5719,7 +5719,7 @@
         "message": "Aucune puce dataflash <br> trouvée"
     },
     "sensorDataFlashFreeSpace": {
-        "message": "Dataflash: <br />gratuit"
+        "message": "Dataflash: <br/>gratuit"
     },
     "mixerProfile1": {
         "message": "Profil de mélangeur 1"
@@ -5905,7 +5905,7 @@
         "message": "Configurateur: <strong>"
     },
     "loadedReleaseInfo": {
-        "message": "Informations de version chargées depuis GitHub."
+        "message": "Infos version chargées depuis GitHub."
     },
     "newVersionAvailable": {
         "message": "Nouvelle version disponible !"
@@ -5929,7 +5929,7 @@
         "message": "RC basculés"
     },
     "noFirmwareSelectedToLoad": {
-        "message": "<b>Aucun firmware sélectionné à charger</b>"
+        "message": "<b>Aucun logiciel sélectionné à charger</b>"
     },
     "selectValidSerialPort": {
         "message": "<span style=\"color: red\">Veuillez sélectionner un port série valide</span>'"
@@ -6013,10 +6013,10 @@
         "message": "Impossible de pré-extraire la cible: contrôleur de vol dans DFU"
     },
     "targetPrefetchFailOld": {
-        "message": "Impossible de pré-extraire la cible: le micrologiciel INAV est trop ancien"
+        "message": "Impossible de pré-extraire la cible: le logiciel INAV est trop ancien"
     },
     "targetPrefetchFailNonINAV": {
-        "message": "Impossible de pré-extraire la cible: micrologiciel non-INAV"
+        "message": "Impossible de pré-extraire la cible: logiciel non-INAV"
     },
     "targetPrefetchFailNoPort": {
         "message": "Impossible de pré-extraire la cible: aucun port"
@@ -6199,10 +6199,10 @@
         "message": "Transpiler vers INAV"
     },
     "javascriptLoad": {
-        "message": "Charger depuis FC"
+        "message": "Charger depuis le contrôleur de vol"
     },
     "javascriptSave": {
-        "message": "Enregistrer dans FC"
+        "message": "Enregistrer dans le contrôleur de vol"
     },
     "javascriptClear": {
         "message": "Effacer l'éditeur"
