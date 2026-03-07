@@ -2350,7 +2350,7 @@
         "message": "Les données seront enregistrées dans cet onglet <span style=\"color: red\">seulement</span>, quitter l'onglet entraînera <span style=\"color: red\">une annulation</span> de la journalisation et l'application reviendra à son état normal de <strong>\"configurateur\"</strong>.<br/> Vous êtes libre de sélectionner la période de mise à jour globale, les données seront écrites dans le fichier journal toutes les <strong>1</strong> seconde pour des raisons de performances."
     },
     "loggingSamplesSaved": {
-        "message": "Échantillons enregistrés:"
+        "message": "Échantillons:"
     },
     "loggingLogSize": {
         "message": "Taille:"
