@@ -559,7 +559,7 @@
         "message": "Serveur Discord"
     },
     "communitySlackSupport": {
-        "message": "Chat en direct de l’assistance Slack"
+        "message": "Chat en direct de l'assistance Slack"
     },
     "communityTelegramSupport": {
         "message": "Chaîne de télégramme"
@@ -613,7 +613,7 @@
         "message": "Type de mélangeur"
     },
     "initialSetupThrottleHead": {
-        "message": "Paramètres de l'accélérateur"
+        "message": "Paramètres d'accélération"
     },
     "initialSetupMinimum": {
         "message": "Minimum:"
@@ -856,13 +856,13 @@
         "message": "L'activation de cette option est requise pour qu'INAV envoie des signaux à ESC. Il s'agit d'une mesure de sécurité qui empêche les servos d'être endommagés juste après le clignotement du contrôleur de vol."
     },
     "featureBLACKBOX": {
-        "message": "Enregistreur de données de vol Blackbox"
+        "message": "Enregistreur de données de vol dans la boîte noire"
     },
     "featureBLACKBOXTip": {
-        "message": "Configurez via l'onglet BlackBox après l'activation."
+        "message": "Configurez via l'onglet Boîte Noire après l'activation."
     },
     "onboardLoggingBlackbox": {
-        "message": "Dispositif de journalisation Blackbox"
+        "message": "Dispositif de journalisation de la boîte noire"
     },
     "onboardLoggingBlackboxRate": {
         "message": "Portion des itérations de la boucle de vol à enregistrer (taux d'enregistrement)"
@@ -937,7 +937,7 @@
         "message": "Utiliser les capteurs Pitch & Roll en télémétrie"
     },
     "serialrx_frSkyPitchRollHelp": {
-        "message": "Cela envoie des capteurs de télémétrie de tangage et d’angle de roulis au lieu des capteurs de données brutes standard de l’accéléromètre. Cela doit être activé <strong>on</strong> si vous utilisez les scripts LUA du tableau de bord de télémétrie INAV OpenTX/EdgeTX ou ETHOS."
+        "message": "Cela envoie des capteurs de télémétrie de tangage et d'angle de roulis au lieu des capteurs de données brutes standard de l'accéléromètre. Cela doit être activé <strong>on</strong> si vous utilisez les scripts LUA du tableau de bord de télémétrie INAV OpenTX/EdgeTX ou ETHOS."
     },
     "serialrx_frSkyFuelUnitLabel": {
         "message": "Unités de carburant SmartPort"
@@ -991,7 +991,7 @@
         "message": "Accélération minimale"
     },
     "configurationThrottleMid": {
-        "message": "Accélérateur central [valeur centrale des entrées RC]"
+        "message": "Accélération milieu [valeur centrale des entrées RC]"
     },
     "configurationThrottleMaximum": {
         "message": "Accélération maximale"
@@ -1117,7 +1117,7 @@
         "message": "Se tortiller pour se réveiller au ralenti"
     },
     "configurationWiggleWakeIdleHelp": {
-        "message": "Si elle est activée, cette fonctionnalité permet à un mouvement de lacet de l'avion de réveiller les moteurs du ralenti.<br/>0:Désactivé (par défaut)<br/>1: 1 mouvement - Ce paramètre a un point de détection plus élevé, pour les avions sans queue qui peut être déplacé facilement <br/>2: 2 mouvements - Ce paramètre a un point de détection plus bas, mais nécessite une action répétée. Ceci est destiné aux modèles plus grands et aux avions avec queues"
+        "message": "Si elle est activée, cette fonctionnalité permet de secouer l'avion pour réveiller les moteurs.<br/>0:Désactivé (par défaut)<br/>1: 1 secousse - Ce paramètre a un niveau de détection plus élevé, pour les avions sans queue qui peut être déplacé facilement <br/>2: 2 secousses - Ce paramètre a un niveau de détection plus bas, mais nécessite une action répétée. Ceci est destiné aux modèles plus grands et aux avions avec queues"
     },
     "configurationLaunchMotorDelay": {
         "message": "Retard moteur"
@@ -1204,13 +1204,13 @@
         "message": "Décalage du fuseau horaire"
     },
     "tzOffsetHelp": {
-        "message": "Décalage du fuseau horaire par rapport à UTC. Ceci est appliqué à l’heure GPS pour l’enregistrement et l’horodatage des journaux Blackbox. (Par défaut = 0 minutes)"
+        "message": "Décalage du fuseau horaire par rapport à UTC. Ceci est appliqué à l'heure GPS pour la journalisation de la boîte noire. (Par défaut = 0 minutes)"
     },
     "tzAutomaticDST": {
-        "message": "Heure d’été automatique"
+        "message": "Heure d'été automatique"
     },
     "tzAutomaticDSTHelp": {
-        "message": "Ajoutez automatiquement l’heure d’été à l’heure GPS en cas de besoin ou ignorez-la simplement. Comprend des préréglages pour l'UE et les États-Unis. Si vous habitez en dehors de ces zones, il est suggéré de gérer l'heure d'été manuellement via tz_offset. (Par défaut = Désactivé)"
+        "message": "Ajoutez automatiquement l'heure d'été à l'heure GPS en cas de besoin ou ignorez-la simplement. Comprend des préréglages pour l'UE et les États-Unis. Si vous habitez en dehors de ces zones, il est suggéré de gérer l'heure d'été manuellement via tz_offset. (Par défaut = Désactivé)"
     },
     "configurationGPSBaudrate": {
         "message": "Débit en bauds"
@@ -1237,13 +1237,13 @@
         "message": "VTX"
     },
     "configurationVTXBand": {
-        "message": "Groupe"
+        "message": "Bande"
     },
     "configurationNoBand": {
         "message": "Aucun"
     },
     "configurationVTXNoBandHelp": {
-        "message": "La fréquence VTX a été réglée manuellement. La sélection d’une bande écrasera la fréquence configurée."
+        "message": "La fréquence VTX a été réglée manuellement. La sélection d'une bande écrasera la fréquence configurée."
     },
     "configurationVTXChannel": {
         "message": "Canal"
@@ -1276,7 +1276,7 @@
         "message": "Sensibilité du cardan"
     },
     "configurationGimbalPanChannel": {
-        "message": "Canal panoramique (lacet)"
+        "message": "Canal d'inclinaison (yaw)"
     },
     "configurationGimbalTiltChannel": {
         "message": "Canal d'inclinaison (pitch)"
@@ -1474,31 +1474,31 @@
         "message": "Les valeurs ci-dessous modifient le comportement des modes de vol ANGLE et HORIZON. Différents contrôleurs PID gèrent les valeurs LEVEL différemment. Veuillez vérifier la documentation."
     },
     "pidTuning_RatesAndExpo": {
-        "message": "Tarifs & Expo"
+        "message": "Taux & Expo"
     },
     "pidTuning_Rates_Stabilized": {
-        "message": "Tarifs stabilisés"
+        "message": "Taux stabilisés"
     },
     "pidTuning_Rates_Roll": {
-        "message": "Roulement (°/s)"
+        "message": "Roll (°/s)"
     },
     "pidTuning_Rates_Pitch": {
-        "message": "Pas (°/s)"
+        "message": "Pitch (°/s)"
     },
     "pidTuning_Rates_Yaw": {
-        "message": "Lacet (°/s)"
+        "message": "Yaw (°/s)"
     },
     "pidTuning_Expo_Stabilized": {
         "message": "Expo stabilisée"
     },
     "pidTuning_Expo_Manual": {
-        "message": "Expo manuelle"
+        "message": "Expo manuel"
     },
     "pidTuning_Expo_RollPitch": {
         "message": "Roulis et tangage (%)"
     },
     "pidTuning_Expo_Yaw": {
-        "message": "Lacet (%)"
+        "message": "Yaw (%)"
     },
     "pidTuning_RateDynamics": {
         "message": "Dynamique des taux"
@@ -1519,16 +1519,16 @@
         "message": "Fin"
     },
     "pidTuning_RollPitchRate": {
-        "message": "ROULEAU &amp; Tarif EMPLACEMENT"
+        "message": "ROLL &amp; Taux de PITCH"
     },
     "pidTuning_RollRate": {
-        "message": "Taux de ROULEAU"
+        "message": "Taux de ROLL"
     },
     "pidTuning_PitchRate": {
-        "message": "Tarif EMPLACEMENT"
+        "message": "Taux de PITCH"
     },
     "pidTuning_YawRate": {
-        "message": "taux de YAW"
+        "message": "Taux de YAW"
     },
     "pidTuning_RollAndPitchExpo": {
         "message": "Salon du roulis et du tangage"
@@ -1561,7 +1561,7 @@
         "message": "Limite de taux de maintien de cap"
     },
     "pidTuning_MagHoldYawRateHelp": {
-        "message": "Taux d'inclinaison de droite à gauche (YAW) maximal que le contrôleur MagHold peut demander à l'UAV. Utilisé uniquement lorsque le mode MagHold est activé, pendant la navigation RTH et WAYPOINT. Des valeurs inférieures à 30 dps donnent de jolis virages « cinématographiques »"
+        "message": "Taux de YAW maximal que le contrôleur MagHold peut demander à l'UAV. Utilisé uniquement lorsque le mode MagHold est activé, pendant la navigation RTH et WAYPOINT. Des valeurs inférieures à 30 dps donnent de jolis virages « cinématographiques »"
     },
     "pidTuning_Filters": {
         "message": "Filtres"
@@ -1582,7 +1582,7 @@
         "message": "Fréquence minimale du filtre matriciel"
     },
     "pidTuning_MatrixFilterMinFrequencyHelp": {
-        "message": "Fréquence minimale pour le filtre matriciel. La valeur doit dépendre de la taille de l’hélice. 150 Hz fonctionne bien avec 5quot; et plus petit. Pour 7\" et au-dessus, même en dessous de 100 Hz."
+        "message": "Fréquence minimale pour le filtre matriciel. La valeur doit dépendre de la taille de l'hélice. 150 Hz fonctionne bien avec 5quot; et plus petit. Pour 7\" et au-dessus, même en dessous de 100 Hz."
     },
     "pidTuning_MatrixFilterQFactor": {
         "message": "Facteur Q du filtre matriciel"
@@ -1636,7 +1636,7 @@
         "message": "Angle d'inclinaison de gel Iterm"
     },
     "pidTuning_itermBankAngleFreezeHelp": {
-        "message": "Geler l'Iterm de lacet lorsque l'avion est incliné à plus de ce nombre de degrés. Cela aide à empêcher le gouvernail de contrecarrer le virage. 0 désactive cette fonctionnalité. S'applique uniquement aux aéronefs à voilure fixe."
+        "message": "Geler l'Iterm (yaw) lorsque l'avion est incliné à plus de ce nombre de degrés. Cela aide à empêcher le gouvernail de contrecarrer le virage. 0 désactive cette fonctionnalité. S'applique uniquement aux aéronefs à voilure fixe."
     },
     "pidTuning_dTermMechanics": {
         "message": "Mécanique du terme D"
@@ -1645,7 +1645,7 @@
         "message": "D-Boost min. Échelle"
     },
     "pidTuning_d_boost_min_help": {
-        "message": "Définit l'atténuation Dterm maximale autorisée pendant la phase d'accélération du manche. La valeur 1,0 signifie que Dterm n’est pas atténué. 0,5 signifie qu'il peut rétrécir de moitié. Des valeurs plus faibles entraînent une réponse plus rapide lors d’un mouvement rapide du manche."
+        "message": "Définit l'atténuation Dterm maximale autorisée pendant la phase d'accélération du manche. La valeur 1,0 signifie que Dterm n'est pas atténué. 0,5 signifie qu'il peut rétrécir de moitié. Des valeurs plus faibles entraînent une réponse plus rapide lors d'un mouvement rapide du manche."
     },
     "pidTuning_d_boost_max": {
         "message": "D-Boost Max. Échelle"
@@ -1663,7 +1663,7 @@
         "message": "Gyroscope D-Boost LPF"
     },
     "pidTuning_d_boost_gyro_delta_lpf_hz_help": {
-        "message": "Doit être réglé sur la fréquence des oscillations du lavage de l’hélice. Les quads de 5 pouces fonctionnent mieux à environ 80 Hz, les quads de 7 pouces à environ 50 Hz"
+        "message": "Doit être réglé sur la fréquence des oscillations du lavage de l'hélice. Les quads de 5 pouces fonctionnent mieux à environ 80 Hz, les quads de 7 pouces à environ 50 Hz"
     },
     "pidTuning_tpaMechanics": {
         "message": "Atténuation PID de poussée"
@@ -1753,10 +1753,10 @@
         "message": "Veuillez lire le chapitre récepteur de la documentation.  Configurez le port série (si nécessaire), le mode récepteur (série/ppm/pwm), le fournisseur (pour les récepteurs série), associez le récepteur, définissez la carte des canaux, configurez les points de terminaison/plage de canal sur TX afin que tous les canaux passent de ~ 1 000 à ~ 2 000.  Définissez le point médian (1 500 par défaut), coupez les canaux à 1 500, configurez la bande morte du stick, vérifiez le comportement lorsque TX est désactivé ou hors de portée. Assurez-vous que les valeurs des canaux augmentent toutes lorsque vous poussez les manettes vers le haut et vers la droite. Sinon, inversez le canal dans le TX. N'appliquez aucun autre mélange dans le TX.<br/><span style=\"color: red\">IMPORTANT:</span> Avant de voler, lisez le chapitre de sécurité de la documentation et configurez la sécurité."
     },
     "receiverThrottleMid": {
-        "message": "Milieu de l'accélérateur"
+        "message": "Accélération MID"
     },
     "receiverThrottleExpo": {
-        "message": "EXPO des gaz"
+        "message": "Accélération EXPO"
     },
     "receiverRcRate": {
         "message": "Taux RC"
@@ -2137,7 +2137,7 @@
         "message": "Mélangeur <span style=\"color: #37a8db\">saved</span>"
     },
     "mixerWizard": {
-        "message": "Assistant de mixage de moteur"
+        "message": "Assistant Mixer"
     },
     "mixerWizardInfo": {
         "message": "<ol><li>Retirez les hélices</li><li>Connectez LiPo et utilisez l'onglet Sorties pour tester tous les moteurs</li><li>Notez la position de chaque moteur (moteur n°1 - haut gauche et ainsi de suite)</li><li>Remplissez le tableau ci-dessous</li></ol>"
@@ -2182,7 +2182,7 @@
         "message": "Vitesse:"
     },
     "gpsSats": {
-        "message": "Samedi:"
+        "message": "Satellites:"
     },
     "gpsDistToHome": {
         "message": "Dist à la maison:"
@@ -2224,7 +2224,7 @@
         "message": "1. Ajustez l'orientation du contrôleur de vol pour qu'elle corresponde à l'orientation physique de l'avion <u>selon la flèche « direction » sur le contrôleur de vol</u>.<br/>2. Ajustez le modèle du magnétomètre, la puce du magnétomètre ou l'orientation des axes du magnétomètre pour qu'ils correspondent à l'orientation physique de l'avion.<br/><strong>Remarque:</strong> Le préréglage d'orientation du magnétomètre (align_mag) est relatif au contrôleur de vol. Assurez-vous d'abord d'aligner contrôleur de vol (align_board_pitch, align_board_roll, align_board_yaw).<br/>Si le préréglage n'est pas utilisé (l'orientation est définie à l'aide de align_mag_roll, align_mag_pitch et align_mag_yaw), alors l'orientation du magnétomètre est indépendante."
     },
     "magnetometerOrientationPreset": {
-        "message": "Préréglage d'orientation (align_mag). Par rapport à l’orientation du contrôleur de vol"
+        "message": "Préréglage d'orientation (align_mag). Par rapport à l'orientation du contrôleur de vol"
     },
     "boardInfo": {
         "message": "1. Sélectionnez l'alignement du contrôleur de vol<br>(align_board_roll, align_board_pitch, align_board_yaw)"
@@ -2380,7 +2380,7 @@
         "message": "Fichier journal précédent chargé automatiquement: <strong>$1</strong>"
     },
     "blackboxNotSupported": {
-        "message": "Le logiciel de votre contrôleur de vol ne prend pas en charge la journalisation Blackbox ou la fonction Blackbox n'est pas activée"
+        "message": "Le logiciel de votre contrôleur de vol ne prend pas en charge la journalisation dans la boîte noire ou la fonction boîte noire n'est pas activée"
     },
     "blackboxConfiguration": {
         "message": "Configuration de la boîte noire"
@@ -2422,7 +2422,7 @@
         "message": "Confirmer l'effacement du dataflash"
     },
     "dataflashConfirmEraseNote": {
-        "message": "Cela effacera tous les journaux Blackbox ou autres données contenues dans le dataflash, ce qui prendra environ 20 secondes, en êtes-vous sûr?"
+        "message": "Cela effacera tous les journaux de la boîte noire ou autres données contenues dans le dataflash, ce qui prendra environ 20 secondes, en êtes-vous sûr?"
     },
     "dataflashEraseing": {
         "message": "Effacement en cours, veuillez patienter..."
@@ -2695,7 +2695,7 @@
         "message": "Temps de garde pour l'activation après la perte du signal [Pour les décisecondes (ds) : 1 = 0,1 sec.]"
     },
     "failsafeDelayHelp": {
-        "message": "Il est temps pour l’étape 1 d’attendre la récupération"
+        "message": "Il est temps pour l'étape 1 d'attendre la récupération"
     },
     "failsafeThrottleItem": {
         "message": "Valeur des gaz utilisée lors de l'atterrissage"
@@ -2833,16 +2833,16 @@
         "message": "Limite d'accélération roulis/tangage"
     },
     "axisAccelerationLimitRollPitchHelp": {
-        "message": "Il s’agit du taux d’accélération angulaire maximal que le pilote est autorisé à exiger de l’UAV. Le drone devrait être capable de satisfaire à ce taux d’accélération. En règle générale, plus le drone est gros, pour réduire l'accélération qu'il peut gérer"
+        "message": "Il s'agit du taux d'accélération angulaire maximal que le pilote est autorisé à exiger de l'UAV. Le drone devrait être capable de satisfaire à ce taux d'accélération. En règle générale, plus le drone est gros, pour réduire l'accélération qu'il peut gérer"
     },
     "axisAccelerationLimitYaw": {
         "message": "Limite d'accélération de lacet"
     },
     "axisAccelerationLimitYawHelp": {
-        "message": "Il s’agit du taux d’accélération angulaire maximal que le pilote est autorisé à exiger de l’UAV. Le drone devrait être capable de satisfaire à ce taux d’accélération. En règle générale, plus le drone est gros, pour réduire l'accélération qu'il peut gérer"
+        "message": "Il s'agit du taux d'accélération angulaire maximal que le pilote est autorisé à exiger de l'UAV. Le drone devrait être capable de satisfaire à ce taux d'accélération. En règle générale, plus le drone est gros, pour réduire l'accélération qu'il peut gérer"
     },
     "pidTuningTPAHelp": {
-        "message": "Facteur d’atténuation de l'accéleration PID. Les gains PID seront réduits linéairement à partir de 0 au point d'arrêt TPA (accélérateur) jusqu'au facteur TPA à l'accélération maximale."
+        "message": "Facteur d'atténuation de l'accéleration PID. Les gains PID seront réduits linéairement à partir de 0 au point d'arrêt TPA (accélérateur) jusqu'au facteur TPA à l'accélération maximale."
     },
     "pidTuningTPABreakPointHelp": {
         "message": "L'atténuation PID du papillon commence lorsque la position du papillon dépasse cette valeur."
@@ -2866,7 +2866,7 @@
         "message": "Voir la documentation du logiciel \"Looptime\" pour plus de détails"
     },
     "configurationGyroFrequencyHelp": {
-        "message": "En général, une valeur plus élevée est mieux mais rend le drone plus sensible aux vibrations. Doit être maintenu au-dessus de la fréquence « Temps de boucle du contrôleur de vol ». La valeur pratique maximale dépend du matériel. Si la valeur est trop élevée, la carte risque de ne pas fonctionner correctement. Observez l’utilisation du processeur."
+        "message": "En général, une valeur plus élevée est mieux mais rend le drone plus sensible aux vibrations. Doit être maintenu au-dessus de la fréquence « Temps de boucle du contrôleur de vol ». La valeur pratique maximale dépend du matériel. Si la valeur est trop élevée, la carte risque de ne pas fonctionner correctement. Observez l'utilisation du processeur."
     },
     "configurationAccelerometerFrequencyHelp": {
         "message": "Pour les besoins d'Acro, cette valeur peut être réduite par défaut"
@@ -2875,7 +2875,7 @@
         "message": "Pour les besoins d'Acro, cette valeur peut être réduite par défaut"
     },
     "configurationLoopTimeHelp": {
-        "message": "En général, une valeur plus élevée est mieux. Avec le gyroscope asynchrone, doit être maintenu en dessous de la fréquence de mise à jour du gyroscope. La valeur pratique maximale dépend du matériel. Si la valeur est trop élevée, la carte risque de ne pas fonctionner correctement. Observez l’utilisation du processeur."
+        "message": "En général, une valeur plus élevée est mieux. Avec le gyroscope asynchrone, doit être maintenu en dessous de la fréquence de mise à jour du gyroscope. La valeur pratique maximale dépend du matériel. Si la valeur est trop élevée, la carte risque de ne pas fonctionner correctement. Observez l'utilisation du processeur."
     },
     "tabOSD": {
         "message": "OSD"
@@ -3040,7 +3040,7 @@
         "message": "Étalonnage de l'accéléromètre"
     },
     "accCalibrationStartBody": {
-        "message": "Placez le contrôleur de vol dans la position indiquée sur l'image, puis appuyez à nouveau sur le bouton <strong>Calibrate</strong>. Répétez l’opération pour chacune des 6 positions. Gardez-le stable pendant l'étalonnage."
+        "message": "Placez le contrôleur de vol dans la position indiquée sur l'image, puis appuyez à nouveau sur le bouton <strong>Calibrate</strong>. Répétez l'opération pour chacune des 6 positions. Gardez-le stable pendant l'étalonnage."
     },
     "accCalibrationStopTitle": {
         "message": "Calibrage terminé"
@@ -3088,7 +3088,7 @@
         "message": "Fréquence de coupure du deuxième filtre coupe-bande gyroscopique."
     },
     "gyroNotchHz1Help": {
-        "message": "Doit être réglé sur la fréquence harmonique de l’hélice. Généralement égal à <i>[motor_fréquence] * [propeller_blades_number]</i><br><br>Doit être supérieur à la fréquence de coupure<br><br><i>0</i> désactive le filtre"
+        "message": "Doit être réglé sur la fréquence harmonique de l'hélice. Généralement égal à <i>[motor_fréquence] * [propeller_blades_number]</i><br><br>Doit être supérieur à la fréquence de coupure<br><br><i>0</i> désactive le filtre"
     },
     "gyroNotchHz2Help": {
         "message": "Doit être réglé sur la fréquence du moteur.<br><br>Doit être au-dessus de la fréquence de coupure et en dessous de la première fréquence du filtre coupe-bande gyroscopique.<br><br><i>0</i> désactive le filtre"
@@ -3151,10 +3151,10 @@
         "message": "Position du stick pour le survol althold"
     },
     "mcWpSlowdown": {
-        "message": "Ralentissez à l’approche d’un waypoint"
+        "message": "Ralentissez à l'approche d'un waypoint"
     },
     "mcWpSlowdownHelp": {
-        "message": "Lorsqu'il est activé, le moteur NAV ralentira lors du passage au waypoint suivant. Cela donne la priorité au retournement du mouvement vers l’avant. Lorsqu'il est désactivé, le moteur NAV continue jusqu'au waypoint suivant et tourne au fur et à mesure."
+        "message": "Lorsqu'il est activé, le moteur NAV ralentira lors du passage au waypoint suivant. Cela donne la priorité au retournement du mouvement vers l'avant. Lorsqu'il est désactivé, le moteur NAV continue jusqu'au waypoint suivant et tourne au fur et à mesure."
     },
     "positionEstimatorConfiguration": {
         "message": "Estimateur de position"
@@ -3175,7 +3175,7 @@
         "message": "Poids GPS vitesse horizontale"
     },
     "positionEstimatorConfigurationDisclaimer": {
-        "message": "Ces valeurs doivent être modifiées avec beaucoup de prudence. Dans la plupart des cas, il n’est pas nécessaire de les modifier. Pour les utilisateurs avancés uniquement!"
+        "message": "Ces valeurs doivent être modifiées avec beaucoup de prudence. Dans la plupart des cas, il n'est pas nécessaire de les modifier. Pour les utilisateurs avancés uniquement!"
     },
     "gps_min_sats": {
         "message": "Min. Satellites GPS pour une position valide"
@@ -3208,7 +3208,7 @@
         "message": "S'il est réglé sur ON ou ON_FW_SPIRAL, l'avion montera d'abord jusqu'à nav_rth_altitude avant de tourner pour rentrer chez lui. S'il est réglé sur OFF, l'avion fera demi-tour et rentrera immédiatement chez lui en montant sur le chemin. Pour une aile fixe, ON utilisera une montée linéaire, ON_FW_SPIRAL utilisera une montée en virage plus tranquille avec un taux de montée défini par nav_auto_climb_rate et un taux de virage défini par nav_fw_loiter_radius (ON_FW_SPIRAL est un réglage d'aile fixe et se comporte de la même manière que ON pour un multirotor)."
     },
     "rthClimbIgnoreEmergency": {
-        "message": "Grimpez quel que soit l’état des capteurs de position"
+        "message": "Grimpez quel que soit l'état des capteurs de position"
     },
     "rthAltControlOverride": {
         "message": "Annuler l'altitude RTH et le réglage de montée avec le manche de roulis/tangage"
@@ -3265,7 +3265,7 @@
         "message": "Mode maison sécurisé"
     },
     "rthSafeHomeHelp": {
-        "message": "Utilisé pour contrôler quand les refuges seront utilisés. Les valeurs possibles sont OFF, RTH et RTH_FS. Consultez la documentation Safehome pour plus d’informations."
+        "message": "Utilisé pour contrôler quand les refuges seront utilisés. Les valeurs possibles sont OFF, RTH et RTH_FS. Consultez la documentation Safehome pour plus d'informations."
     },
     "rthSafeHomeDistance": {
         "message": "Distance maximale de sécurité à la maison"
@@ -3358,13 +3358,13 @@
         "message": "Angle d'inclinaison maximal de la navigation"
     },
     "maxBankAngleHelp": {
-        "message": "Angle d'inclinaison maximal dans les modes de navigation. Contraint par l'angle de l'inclinaison en tonneau de gauche à droite (ROLL) maximal dans l'onglet de réglage PID."
+        "message": "Angle d'inclinaison maximal dans les modes de navigation. Contraint par l'angle de l'inclinaison ROLL maximale dans l'onglet de réglage PID."
     },
     "maxClimbAngle": {
         "message": "Angle de montée maximal de navigation"
     },
     "maxClimbAngleHelp": {
-        "message": "Angle de montée maximal dans les modes de navigation. Contraint par l'angle d'inclinaison de haut en bas (PITCH) maximal dans l'onglet de réglage PID."
+        "message": "Angle de montée maximal dans les modes de navigation. Contraint par l'angle d'inclinaison PITCH maximale dans l'onglet de réglage PID."
     },
     "navManualClimbRate": {
         "message": "Max. Taux de montée en maintenant Alt"
@@ -3388,7 +3388,7 @@
         "message": "Rapport pas/accélérateur"
     },
     "pitchToThrottleHelp": {
-        "message": "Dans les modes de navigation, chaque degré de montée ajoutera autant d'unités à l'accélérateur de croisière. A l’inverse, chaque degré de plongée y soustraira."
+        "message": "Dans les modes de navigation, chaque degré de montée ajoutera autant d'unités à l'accélérateur de croisière. A l'inverse, chaque degré de plongée y soustraira."
     },
     "minThrottleDownPitch": {
         "message": "Pas minimum de réduction des gaz"
@@ -3511,7 +3511,7 @@
         "message": "Zone morte de pas en mode montée en flèche"
     },
     "soarPitchDeadbandHelp": {
-        "message": "Bande morte d'angle de tangage lorsque le mode de montée en flèche est activé (deg). Mode angle inactif dans la zone morte permettant au tangage de flotter librement pendant la montée en flèche."
+        "message": "Zone morte d'angle de tangage lorsque le mode de montée en flèche est activé (deg). Mode angle inactif dans la zone morte permettant au tangage de flotter librement pendant la montée en flèche."
     },
     "altControlResponse": {
         "message": "Facteur de réponse du contrôle d'altitude"
@@ -3535,13 +3535,13 @@
         "message": "Paramètres d'atterrissage à voilure fixe"
     },
     "MissionPlannerOnlyOneLandWp": {
-        "message": "Vous ne pouvez définir qu’un seul waypoint LAND par mission."
+        "message": "Vous ne pouvez définir qu'un seul waypoint LAND par mission."
     },
     "fwLandApproachLength": {
         "message": "Longueur d'approche finale"
     },
     "fwLandApproachLengthHelp": {
-        "message": "La durée de l'approche finale comprend également la phase de plané et d'interception. Il s’agit de la longueur entre le point de départ sûr et le point de virage final."
+        "message": "La durée de l'approche finale comprend également la phase de plané et d'interception. Il s'agit de la longueur entre le point de départ sûr et le point de virage final."
     },
     "fwLandFinalApproachPitch2throttle": {
         "message": "Modificateur pour le rapport pas/gaz en approche finale"
@@ -3610,7 +3610,7 @@
         "message": "Utiliser le logo du pilote"
     },
     "osd_use_large_pilot_logo_help": {
-        "message": "Utilisez votre grand logo pilote avec/à la place du logo INAV. Cela nécessite une police personnalisée avec votre logo pilote. Ceci est visible sur l’écran d’armement."
+        "message": "Utilisez votre grand logo pilote avec/à la place du logo INAV. Cela nécessite une police personnalisée avec votre logo pilote. Ceci est visible sur l'écran d'armement."
     },
     "osd_units": {
         "message": "Unités"
@@ -3640,7 +3640,7 @@
         "message": "Précision du régime ESC"
     },
     "osd_esc_rpm_precision_help": {
-        "message": "Le nombre de chiffres affichés sur l’affichage RPM. Si le RPM est supérieur au nombre de chiffres, il sera affiché en milliers de RPM avec autant de décimales que permis."
+        "message": "Le nombre de chiffres affichés sur l'affichage RPM. Si le RPM est supérieur au nombre de chiffres, il sera affiché en milliers de RPM avec autant de décimales que permis."
     },
     "osd_crosshairs_style": {
         "message": "Style de réticule"
@@ -3673,7 +3673,7 @@
         "message": "Éléments OSD personnalisés"
     },
     "osd_custom_element_settings_HELP": {
-        "message": "Pour des détails complets sur la façon d’utiliser les éléments OSD personnalisés. Cliquez dessus ?"
+        "message": "Pour des détails complets sur la façon d'utiliser les éléments OSD personnalisés. Cliquez dessus ?"
     },
     "osd_custom_element_settings_icons_HELP": {
         "message": "Vous pouvez trouver les numéros des icônes en cliquant sur ce bouton d'aide."
@@ -3790,13 +3790,13 @@
         "message": "Vitesse minimale"
     },
     "osd_airspeed_min_alarm_HELP": {
-        "message": "L’anémomètre clignote lorsque la vitesse est inférieure à ce seuil. Zéro désactive cette alarme."
+        "message": "L'anémomètre clignote lorsque la vitesse est inférieure à ce seuil. Zéro désactive cette alarme."
     },
     "osd_airspeed_max_alarm": {
         "message": "Vitesse maximale"
     },
     "osd_airspeed_max_alarm_HELP": {
-        "message": "L’anémomètre clignote lorsque la vitesse est supérieure à ce seuil. Zéro désactive cette alarme."
+        "message": "L'anémomètre clignote lorsque la vitesse est supérieure à ce seuil. Zéro désactive cette alarme."
     },
     "osd_gforce_alarm": {
         "message": "force g"
@@ -5065,19 +5065,19 @@
         "message": "Max. durée de freinage"
     },
     "brakingTimeoutTip": {
-        "message": "Mesure de sécurité. Il s’agit de la période la plus longue pendant laquelle le freinage peut être actif."
+        "message": "Mesure de sécurité. Il s'agit de la période la plus longue pendant laquelle le freinage peut être actif."
     },
     "brakingBoostFactor": {
         "message": "Facteur de boost"
     },
     "brakingBoostFactorTip": {
-        "message": "Définit la force de l’accélération du freinage. 100% signifie que le moteur de navigation est autorisé à doubler la vitesse d'inclinaison et l'accélération"
+        "message": "Définit la force de l'accélération du freinage. 100% signifie que le moteur de navigation est autorisé à doubler la vitesse d'inclinaison et l'accélération"
     },
     "brakingBoostTimeout": {
         "message": "Max. durée du boost de freinage"
     },
     "brakingBoostTimeoutTip": {
-        "message": "Mesure de sécurité. Il s’agit de la période la plus longue pendant laquelle l’assistance au freinage peut être active."
+        "message": "Mesure de sécurité. Il s'agit de la période la plus longue pendant laquelle l'assistance au freinage peut être active."
     },
     "brakingBoostSpeedThreshold": {
         "message": "Boost min. seuil de vitesse"
@@ -5248,10 +5248,10 @@
         "message": "Puissance au ralenti des moteurs [%]"
     },
     "throttleIdleDigitalInfo": {
-        "message": "Pour les protocoles numériques, IDLE peut être réduit jusqu'à 5 à 7 % sans que les moteurs ne s'arrêtent en l'air. Si un drone vacille après avoir baissé les gaz, essayez d’augmenter IDLE pour éliminer ce comportement."
+        "message": "Pour les protocoles numériques, IDLE peut être réduit jusqu'à 5 à 7 % sans que les moteurs ne s'arrêtent en l'air. Si un drone vacille après avoir baissé les gaz, essayez d'augmenter IDLE pour éliminer ce comportement."
     },
     "throttleIdleAnalogInfo": {
-        "message": "Pour les protocoles analogiques, IDLE peut être abaissé en dessous de 10 % si les moteurs fonctionnent correctement sans bégaiement. Si un drone vacille après avoir baissé les gaz, essayez d’augmenter IDLE pour éliminer ce comportement."
+        "message": "Pour les protocoles analogiques, IDLE peut être abaissé en dessous de 10 % si les moteurs fonctionnent correctement sans bégaiement. Si un drone vacille après avoir baissé les gaz, essayez d'augmenter IDLE pour éliminer ce comportement."
     },
     "motor_poles": {
         "message": "Nombre de pôles du moteur (nombre d'aimants)"
@@ -5275,7 +5275,7 @@
         "message": "Activé"
     },
     "functionLogicId": {
-        "message": "Condition logique d’activation"
+        "message": "Condition logique d'activation"
     },
     "functionAction": {
         "message": "Action"
@@ -6055,7 +6055,7 @@
         "message": "Aide à avoir une sensation de bâton vif. Chaque fois que vous effectuez un mouvement rapide du stick, une vivacité élevée accélérera la réponse du drone. Aussi bien lorsque vous démarrez que lorsque vous arrêtez la manœuvre. Essayez différentes valeurs pour trouver celle qui vous convient le mieux."
     },
     "ezTuneFilterHzTips": {
-        "message": "Ceci définit la fréquence de coupure de base pour tous les filtres gyroscopiques INAV et D-term. Des valeurs plus élevées entraîneront un retard de filtre plus faible et une meilleure stabilisation, mais plus de bruit traversera les filtres et les moteurs deviendront chauds, l'UAV pourrait osciller et devenir inutilisable. Votre objectif est d’augmenter cette valeur aussi haut que possible avant que des effets négatifs n’apparaissent. Les effets négatifs comprennent: des moteurs chauds, des oscillations audibles, des tremblements rapides du drone, un drone prenant de l'altitude par lui-même. Les points de départ habituels pour «Filtre Hz» sont: <strong>accessoires de 3 pouces</strong>: 90, <strong>5accessoires de 5pouces</strong>: 110, <strong>accessoires de 7pouces</strong>: 90, <strong>accessoires de 10pouces</strong>: 75, <strong>Accessoires de 12 pouces</strong>: 60. Utilisez Blackbox et votre bon sens pour trouver la valeur la plus adaptée à votre drone."
+        "message": "Ceci définit la fréquence de coupure de base pour tous les filtres gyroscopiques INAV et D-term. Des valeurs plus élevées entraîneront un retard de filtre plus faible et une meilleure stabilisation, mais plus de bruit traversera les filtres et les moteurs deviendront chauds, l'UAV pourrait osciller et devenir inutilisable. Votre objectif est d'augmenter cette valeur aussi haut que possible avant que des effets négatifs n'apparaissent. Les effets négatifs comprennent: des moteurs chauds, des oscillations audibles, des tremblements rapides du drone, un drone prenant de l'altitude par lui-même. Les points de départ habituels pour «Filtre Hz» sont: <strong>accessoires de 3 pouces</strong>: 90, <strong>5accessoires de 5pouces</strong>: 110, <strong>accessoires de 7pouces</strong>: 90, <strong>accessoires de 10pouces</strong>: 75, <strong>Accessoires de 12 pouces</strong>: 60. Utilisez la boîte noire et de la logique pour trouver la valeur la plus adaptée à votre drone."
     },
     "ezTuneAxisRatioTips": {
         "message": "Décrit la répartition poids/moment d'inertie de votre drone. Plus le cadre est long (plus de masse sur l'axe avant-arrière), plus le rapport d'axe est requis. Le cadre Perfect X a un rapport de 100. La plupart des cadres modernes devraient se situer entre 110 et 130. Le format par défaut 110 est un bon point de départ."
@@ -6067,7 +6067,7 @@
         "message": "Décrit les forces d'une force qui s'oppose à tout changement de vitesse de rotation. Il amortit l'accélération du roulis et du tangage et provoque un vol plus fluide et plus stable. Votre tâche lors du réglage est de découvrir de combien vous pouvez l'augmenter avant que des symptômes négatifs n'apparaissent: moteurs chauds, oscillations audibles, dépassement. La plupart des quads modernes devraient accepter un « amortissement » jusqu'à 150-180. C'est un équivalent du terme D."
     },
     "ezTuneStabilityTips": {
-        "message": "Définit la force de stabilisation à long terme. La plupart des quads modernes devraient tolérer une «stabilité», même jusqu'à 120-130. Il n’est généralement pas nécessaire de le régler du tout. Si l'UAV souffre d'un fort souffle d'hélice pendant la descente verticale, réduire la «Stabilité» pourrait aider. C'est un équivalent en I-terme"
+        "message": "Définit la force de stabilisation à long terme. La plupart des quads modernes devraient tolérer une «stabilité», même jusqu'à 120-130. Il n'est généralement pas nécessaire de le régler du tout. Si l'UAV souffre d'un fort souffle d'hélice pendant la descente verticale, réduire la «Stabilité» pourrait aider. C'est un équivalent en I-terme"
     },
     "ezTuneAggressivenessTips": {
         "message": "Définit la vitesse à laquelle votre drone réagira aux mouvements rapides du manche. Une «agressivité» plus élevée se traduit par des manœuvres plus rapides et plus rapides. Cela n'affecte pas la stabilisation, seulement la sensation de bâton. C'est un équivalent du terme FF."
@@ -6097,7 +6097,7 @@
         "message": "Lorsqu'il est activé, <strong>Ez Tune</strong> remplacera plusieurs paramètres INAV pour simplifier le processus de réglage. Au lieu de définir chaque paramètre PID et filtrage indépendamment, vous n'avez qu'à travailler avec 7 curseurs. Ez Tune ajustera automatiquement tous les autres paramètres pour répondre à vos besoins. Ez Tune est un excellent point de départ pour les nouveaux utilisateurs et un excellent moyen de régler rapidement un nouveau drone. Il n'est pas recommandé d'utiliser Ez Tune sur les versions avancées, car cela remplacera tous vos paramètres et vous ne pourrez pas affiner votre drone. Lorsque Ez Tune est activé, les paramètres de l'onglet <strong>PID tuning</strong> seront remplacés par EzTune."
     },
     "ezTuneDisclaimer": {
-        "message": "<strong>Avertissement:</strong> Ez Tune est une fonction expérimentale. Il n’est pas garanti qu’il fonctionne sur tous les drones. Il n'est pas garanti qu'il fonctionne avec tous les types de cadres. Il n'est pas garanti qu'il fonctionne avec toutes les hélices. Tous les calculs et résultats de réglage peuvent changer dans les futures versions d'INAV. Nous vous encourageons toujours à le consulter et à partager votre expérience sur INAV Discord dans la chaîne <strong>#ez-tune</strong>"
+        "message": "<strong>Avertissement:</strong> Ez Tune est une fonction expérimentale. Il n'est pas garanti qu'il fonctionne sur tous les drones. Il n'est pas garanti qu'il fonctionne avec tous les types de cadres. Il n'est pas garanti qu'il fonctionne avec toutes les hélices. Tous les calculs et résultats de réglage peuvent changer dans les futures versions d'INAV. Nous vous encourageons toujours à le consulter et à partager votre expérience sur INAV Discord dans la chaîne <strong>#ez-tune</strong>"
     },
     "ezTuneNote": {
         "message": "<strong>Important</strong> Ez Tune est activé. Tous les paramètres de cet onglet sont définis et contrôlés par Ez Tune. Pour utiliser l'onglet PID Tuning, vous devez désactiver Ez Tune. Pour ce faire, décochez la case <strong>Enabled</strong> dans l'onglet Ez Tune."
@@ -6127,7 +6127,7 @@
         "message": "Vbat"
     },
     "gsTelemetrySats": {
-        "message": "Sats"
+        "message": "Satellites"
     },
     "gsTelemetryFix": {
         "message": "Réparer"
