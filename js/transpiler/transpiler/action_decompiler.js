@@ -530,9 +530,10 @@ class ActionDecompiler {
     return `inav.override.gimbalSensitivity = ${value};`;
   }
 
-  handlePinioPwm(channel, duty) {
-    // operandA = PINIO channel index (0-3), operandB = duty cycle (0-100)
-    return `inav.override.pinioPwm(${channel}, ${duty});`;
+  handlePinioPwm(duty, pin) {
+    // operandA = duty cycle (0-100), operandB = pin (0=LED pin, 1=USER1, 2=USER2, ...)
+    // Function name "pwmOnPin" mirrors the operand order: pwm (duty) first, pin second
+    return `inav.override.pwmOnPin(${duty}, ${pin});`;
   }
 
   handlePortSet(lc, value) {

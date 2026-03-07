@@ -322,7 +322,7 @@ const LOGIC_OPERATORS = {
         output: "boolean"
     },
     52: {
-        name: "PINIO PWM",
+        name: "PWM on pin",
         operandType: "Set Flight Parameter",
         hasOperand: [true, true],
         output: "raw"
