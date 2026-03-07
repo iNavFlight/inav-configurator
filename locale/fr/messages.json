@@ -1750,7 +1750,7 @@
         "message": "EEPROM <span style=\"color: #37a8db\">saved</span>: réglage PID"
     },
     "receiverHelp": {
-        "message": "Veuillez lire le chapitre récepteur de la documentation.  Configurez le port série (si nécessaire), le mode récepteur (série/ppm/pwm), le fournisseur (pour les récepteurs série), associez le récepteur, définissez la carte des canaux, configurez les points de terminaison/plage de canal sur TX afin que tous les canaux passent de ~ 1 000 à ~ 2 000.  Définissez le point médian (1 500 par défaut), coupez les canaux à 1 500, configurez la bande morte du stick, vérifiez le comportement lorsque TX est désactivé ou hors de portée. Assurez-vous que les valeurs des canaux augmentent toutes lorsque vous poussez les manettes vers le haut et vers la droite. Sinon, inversez le canal dans le TX. N'appliquez aucun autre mélange dans le TX.<br/><span style=\"color: red\">IMPORTANT:</span> Avant de voler, lisez le chapitre de sécurité de la documentation et configurez la sécurité."
+        "message": "Veuillez lire le chapitre récepteur de la documentation. Configurez le port série (si nécessaire), le mode récepteur (série/ppm/pwm), le fournisseur (pour les récepteurs série), associez le récepteur, définissez la carte des canaux, configurez les points de terminaison/plage de canal sur TX afin que tous les canaux passent de ~ 1 000 à ~ 2 000.  Définissez le point médian (1 500 par défaut), coupez les canaux à 1 500, configurez la bande morte du stick, vérifiez le comportement lorsque TX est désactivé ou hors de portée. Assurez-vous que les valeurs des canaux augmentent toutes lorsque vous poussez les manettes vers le haut et vers la droite. Sinon, inversez le canal dans le TX. N'appliquez aucun autre mélange dans le TX.<br/><span style=\"color: red\">IMPORTANT:</span> Avant de voler, lisez le chapitre de sécurité de la documentation et configurez la sécurité."
     },
     "receiverThrottleMid": {
         "message": "Accélération MID"
@@ -2353,7 +2353,7 @@
         "message": "Échantillons enregistrés:"
     },
     "loggingLogSize": {
-        "message": "Taille du journal:"
+        "message": "Taille:"
     },
     "loggingButtonLogFile": {
         "message": "Sélectionnez le fichier journal"
@@ -5707,7 +5707,7 @@
         "message": "CONFIGURATEUR"
     },
     "mainLogoTextFirmware": {
-        "message": "LOGICIEL contrôleur de vol"
+        "message": "LOGICIEL FC"
     },
     "mainPortOverrideLabel": {
         "message": "Port:"
