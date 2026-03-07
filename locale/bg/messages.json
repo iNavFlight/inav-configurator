@@ -216,10 +216,7 @@
   "sitlChannelMap": {
     "message": "Картографиране на канали"
   },
-  "language_bg": {
-    "message": "Български",
-    "_comment": "Don't translate!"
-  },
+ 
   "sitlSimInput": {
     "message": "Вход от симулатор"
   },
