@@ -6306,6 +6306,49 @@
   },
   "javascriptCompleteExample": {
     "message": "Complete Example"
+  },
+
+  "missionGridPatternTitle": {
+    "message": "Generate grid survey pattern (Ctrl+G)"
+  },
+  "missionGridDrawPrompt": {
+    "message": "Click on the map to draw a survey area polygon. Double-click to finish. Press Escape to cancel."
+  },
+  "missionGridSettingsTitle": {
+    "message": "Grid Survey Settings"
+  },
+  "missionGridSpacing": {
+    "message": "Line Spacing"
+  },
+  "missionGridAltitude": {
+    "message": "Altitude"
+  },
+  "missionGridSpeed": {
+    "message": "Speed"
+  },
+  "missionGridAngle": {
+    "message": "Sweep Angle"
+  },
+  "missionGridOvershoot": {
+    "message": "Overshoot"
+  },
+  "missionGridEndRTH": {
+    "message": "End with RTH"
+  },
+  "missionGridPreview": {
+    "message": "Preview"
+  },
+  "missionGridGenerate": {
+    "message": "Generate"
+  },
+  "missionGridNoWaypoints": {
+    "message": "No waypoints generated. Try adjusting spacing or area."
+  },
+  "missionGridWaypointCount": {
+    "message": "Waypoints: $1 (remaining capacity: $2)"
+  },
+  "missionGridTooManyWaypoints": {
+    "message": "Grid needs $1 waypoints but only $2 slots remaining. Reduce area or increase spacing."
   }
 
 }

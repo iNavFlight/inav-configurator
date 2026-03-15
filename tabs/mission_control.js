@@ -24,11 +24,12 @@ import Point from 'ol/geom/Point.js';
 import Feature from 'ol/Feature';
 import VectorSource from 'ol/source/Vector.js';
 import VectorLayer from 'ol/layer/Vector.js';
-import { LineString } from 'ol/geom';
+import { LineString, Polygon } from 'ol/geom';
 import Stroke from 'ol/style/Stroke';
 import RegularShape from 'ol/style/RegularShape';
 import Circle from 'ol/geom/Circle';
 import PointerInteraction from 'ol/interaction/Pointer.js';
+import Draw from 'ol/interaction/Draw.js';
 import {defaults as defaultInteractions} from 'ol/interaction/defaults';
 import {Control, defaults as defaultControls} from 'ol/control.js';
 
@@ -284,6 +285,7 @@ function iconKey(filename) {
         addShortcutHint('#saveFileMissionButton', '(Ctrl+S)');
         addShortcutHint('#removeAllPoints a', '(Ctrl+D)');
         addShortcutHint('#searchAddressButton', '(Ctrl+A)');
+        addShortcutHint('#gridPatternButton', '(Ctrl+G)');
 
         function get_raw_gps_data() {
             MSP.send_message(MSPCodes.MSP_RAW_GPS, false, false, get_comp_gps_data);
@@ -550,6 +552,8 @@ function iconKey(filename) {
     var selectedFwApproachWp = null;
     var selectedFwApproachSh = null;
     var lockShExclHeading = false;
+    var gridDrawInteraction = null;
+    var gridPreviewLayer = null;
 
 
     //////////////////////////////////////////////////////////////////////////////////////////////
@@ -2283,6 +2287,8 @@ function iconKey(filename) {
                 });
 
             if (feature) {
+                // Ignore features from layers without a 'kind' (e.g. grid preview)
+                if (!tempMarker || !tempMarker.kind) return false;
                 this.coordinate_ = evt.coordinate;
                 this.feature_ = feature;
                 this.layer_ = tempMarker;
@@ -2295,6 +2301,7 @@ function iconKey(filename) {
          * @param {ol.MapBrowserEvent} evt Map browser event.
          */
         app.handleDragEvent = function (evt) {
+            if (!tempMarker || !tempMarker.kind) return;
             
             if (tempMarker.kind == "safehomecircle" || tempMarker.kind == "geozonecircle") {
                 return;
@@ -2390,6 +2397,7 @@ function iconKey(filename) {
          * @return {boolean} `false` to stop the drag sequence.
          */
         app.handleUpEvent = function (evt) {
+            if (!tempMarker || !tempMarker.kind) return false;
             if (tempMarker.kind == "waypoint") {
                 if (selectedMarker != null && tempMarker.number == selectedMarker.getLayerNumber()) {
                     (async () => {
@@ -2578,7 +2586,12 @@ function iconKey(filename) {
                 function (feature, layer) {
                     return layer;
                 });
-            if (selectedFeature && tempMarker.kind == "waypoint") {
+            // Ignore features from layers without a kind (e.g. grid preview overlay)
+            if (selectedFeature && tempMarker && !tempMarker.kind) {
+                selectedFeature = null;
+                tempMarker = null;
+            }
+            if (selectedFeature && tempMarker && tempMarker.kind == "waypoint") {
                 $("#editMission").hide();
                 selectedMarker = mission.getWaypoint(tempMarker.number);
 
@@ -3836,6 +3849,363 @@ function iconKey(filename) {
             }
         });
 
+        /////////////////////////////////////////////
+        // Grid Pattern survey mission generator
+        /////////////////////////////////////////////
+        $(document).on('click', '#gridPatternButton, #gridPattern', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            startGridPolygonDraw();
+        });
+
+        function startGridPolygonDraw() {
+            // Cancel any existing grid draw
+            cancelGridDraw();
+
+            // Show instruction banner
+            showGridBanner(i18n.getMessage('missionGridDrawPrompt'));
+
+            const drawSource = new VectorSource();
+            gridPreviewLayer = new VectorLayer({
+                source: drawSource,
+                style: new Style({
+                    stroke: new Stroke({ color: 'rgba(255, 140, 0, 0.8)', width: 2 }),
+                    fill: new Fill({ color: 'rgba(255, 140, 0, 0.15)' }),
+                }),
+            });
+            map.addLayer(gridPreviewLayer);
+
+            gridDrawInteraction = new Draw({
+                source: drawSource,
+                type: 'Polygon',
+            });
+
+            gridDrawInteraction.on('drawend', function (evt) {
+                const polygon = evt.feature.getGeometry();
+                map.removeInteraction(gridDrawInteraction);
+                gridDrawInteraction = null;
+                hideGridBanner();
+                showGridSettingsDialog(polygon);
+            });
+
+            map.addInteraction(gridDrawInteraction);
+
+            // Allow Escape to cancel
+            $(document).off('keydown.gridDraw').on('keydown.gridDraw', function (evt) {
+                if (evt.key === 'Escape') {
+                    cancelGridDraw();
+                }
+            });
+        }
+
+        function cancelGridDraw() {
+            $(document).off('keydown.gridDraw');
+            hideGridBanner();
+            if (gridDrawInteraction) {
+                map.removeInteraction(gridDrawInteraction);
+                gridDrawInteraction = null;
+            }
+            if (gridPreviewLayer) {
+                map.removeLayer(gridPreviewLayer);
+                gridPreviewLayer = null;
+            }
+        }
+
+        function showGridBanner(msg) {
+            hideGridBanner();
+            const banner = $('<div id="gridBanner" style="position:absolute;top:10px;left:50%;transform:translateX(-50%);' +
+                'background:rgba(255,140,0,0.9);color:#fff;padding:8px 20px;border-radius:6px;z-index:9999;' +
+                'font-weight:bold;pointer-events:none;white-space:nowrap;"></div>').text(msg);
+            $('#missionMap').css('position', 'relative').append(banner);
+        }
+
+        function hideGridBanner() {
+            $('#gridBanner').remove();
+        }
+
+        function showGridSettingsDialog(polygon) {
+            const coordsLonLat = polygon.getCoordinates()[0].map(c => toLonLat(c));
+
+            // Store polygon reference for the sidebar card
+            gridPolygonCoords = coordsLonLat;
+            gridPolygonGeom = polygon;
+
+            // Populate card fields
+            $('#gridAltitude').val(settings.alt / 100);
+            $('#gridSpeed').val(settings.speed ? settings.speed / 100 : 0);
+
+            // Show the sidebar card
+            $('#missionPlannerGridSettings').fadeIn(200);
+
+            // Run initial preview
+            updateGridPreview();
+        }
+
+        var gridPolygonCoords = null;
+        var gridPolygonGeom = null;
+
+        function getGridParams() {
+            return {
+                spacing: parseFloat($('#gridSpacing').val()) || 25,
+                altitude: (parseFloat($('#gridAltitude').val()) || 50) * 100,
+                speed: (parseFloat($('#gridSpeed').val()) || 0) * 100,
+                angle: parseFloat($('#gridAngle').val()) || 0,
+                overshoot: parseFloat($('#gridOvershoot').val()) || 0,
+            };
+        }
+
+        function updateGridPreview() {
+            if (!gridPolygonCoords || !gridPreviewLayer) return;
+
+            const params = getGridParams();
+            const waypoints = generateGridWaypoints(gridPolygonCoords, params);
+
+            gridPreviewLayer.getSource().clear();
+
+            if (waypoints.length < 2) {
+                $('#gridWaypointCount').text(i18n.getMessage('missionGridNoWaypoints')).css('color', '#c00');
+                return;
+            }
+
+            const maxWp = mission.getMaxWaypoints();
+            const totalCount = waypoints.length + ($('#gridEndRTH').is(':checked') ? 1 : 0);
+            const countText = i18n.getMessage('missionGridWaypointCount', [totalCount, maxWp]);
+            $('#gridWaypointCount').text(countText).css('color', totalCount > maxWp ? 'red' : '#666');
+
+            // Polygon outline
+            const polyFeature = new Feature({ geometry: gridPolygonGeom });
+            polyFeature.setStyle(new Style({
+                stroke: new Stroke({ color: 'rgba(255, 140, 0, 0.8)', width: 2 }),
+                fill: new Fill({ color: 'rgba(255, 140, 0, 0.1)' }),
+            }));
+            gridPreviewLayer.getSource().addFeature(polyFeature);
+
+            // Survey path line
+            const previewCoords = waypoints.map(wp => fromLonLat([wp.lon, wp.lat]));
+            const lineFeature = new Feature({ geometry: new LineString(previewCoords) });
+            lineFeature.setStyle(new Style({
+                stroke: new Stroke({ color: 'rgba(255, 140, 0, 0.8)', width: 2, lineDash: [8, 4] }),
+            }));
+            gridPreviewLayer.getSource().addFeature(lineFeature);
+
+            // Numbered dots
+            waypoints.forEach((wp, idx) => {
+                const dotFeature = new Feature({ geometry: new Point(fromLonLat([wp.lon, wp.lat])) });
+                dotFeature.setStyle(new Style({
+                    image: new RegularShape({
+                        fill: new Fill({ color: '#ff8c00' }),
+                        stroke: new Stroke({ color: '#fff', width: 1 }),
+                        points: 16,
+                        radius: 5,
+                    }),
+                    text: new Text({
+                        text: String(idx + 1),
+                        offsetY: -12,
+                        fill: new Fill({ color: '#ff8c00' }),
+                        font: 'bold 11px sans-serif',
+                    }),
+                }));
+                gridPreviewLayer.getSource().addFeature(dotFeature);
+            });
+        }
+
+        function hideGridCard() {
+            $('#missionPlannerGridSettings').fadeOut(200);
+            gridPolygonCoords = null;
+            gridPolygonGeom = null;
+        }
+
+        // Live preview when any grid input changes
+        $(document).on('change input', '#missionPlannerGridSettings input', function () {
+            updateGridPreview();
+        });
+
+        // Cancel button (X icon in titlebar)
+        $(document).on('click', '#gridCancel', function (e) {
+            e.preventDefault();
+            hideGridCard();
+            cancelGridDraw();
+        });
+
+        // Generate button
+        $(document).on('click', '#gridGenerate', function () {
+            if (!gridPolygonCoords) return;
+
+            const params = getGridParams();
+            const waypoints = generateGridWaypoints(gridPolygonCoords, params);
+
+            if (waypoints.length === 0) {
+                dialog.alert(i18n.getMessage('missionGridNoWaypoints'));
+                return;
+            }
+
+            const totalCount = waypoints.length + ($('#gridEndRTH').is(':checked') ? 1 : 0);
+
+            if (totalCount > mission.getMaxWaypoints()) {
+                dialog.alert(i18n.getMessage('missionGridTooManyWaypoints', [totalCount, mission.getMaxWaypoints()]));
+                return;
+            }
+
+            // Clear existing waypoints before generating grid
+            removeAllWaypoints();
+
+            waypoints.forEach(function (wp) {
+                const tempWp = new Waypoint(
+                    mission.get().length,
+                    MWNP.WPTYPE.WAYPOINT,
+                    Math.round(wp.lat * 1e7),
+                    Math.round(wp.lon * 1e7),
+                    Number(params.altitude),
+                    Number(params.speed)
+                );
+
+                if (mission.get().length === 0) {
+                    tempWp.setMultiMissionIdx(multimissionCount === 0 ? 0 : multimissionCount - 1);
+                    FC.FW_APPROACH.clean(FC.SAFEHOMES.getMaxSafehomeCount() + tempWp.getMultiMissionIdx());
+                } else {
+                    tempWp.setMultiMissionIdx(mission.getWaypoint(mission.get().length - 1).getMultiMissionIdx());
+                }
+
+                mission.put(tempWp);
+            });
+
+            // Append RTH waypoint if checkbox is checked
+            if ($('#gridEndRTH').is(':checked')) {
+                const lastWp = waypoints[waypoints.length - 1];
+                const rthWp = new Waypoint(
+                    mission.get().length,
+                    MWNP.WPTYPE.RTH,
+                    Math.round(lastWp.lat * 1e7),
+                    Math.round(lastWp.lon * 1e7),
+                    0,
+                    0
+                );
+                rthWp.setMultiMissionIdx(mission.getWaypoint(mission.get().length - 1).getMultiMissionIdx());
+                mission.put(rthWp);
+            }
+
+            mission.update(singleMissionActive());
+            refreshLayers();
+            plotElevation();
+            updateMultimissionState();
+            updateLocationButtonsVisibility();
+
+            hideGridCard();
+            cancelGridDraw();
+        });
+
+        /**
+         * Compute the optimal angle for survey lines by finding the longest edge
+         * of the polygon and using its bearing as the line direction.
+         */
+        function computeOptimalAngle(coordsLonLat) {
+            let maxDist = 0;
+            let bestAngle = 0;
+            for (let i = 0; i < coordsLonLat.length - 1; i++) {
+                const dx = coordsLonLat[i + 1][0] - coordsLonLat[i][0];
+                const dy = coordsLonLat[i + 1][1] - coordsLonLat[i][1];
+                const dist = dx * dx + dy * dy;
+                if (dist > maxDist) {
+                    maxDist = dist;
+                    bestAngle = Math.atan2(dx, dy) * 180 / Math.PI;
+                }
+            }
+            return ((bestAngle % 360) + 360) % 360;
+        }
+
+        /**
+         * Generate lawnmower/zigzag waypoints inside a polygon.
+         * @param {Array} coordsLonLat - Polygon vertices as [lon, lat] pairs (last == first)
+         * @param {Object} params - { spacing (m), angle (deg), overshoot (m) }
+         * @returns {Array} Array of { lat, lon } objects
+         */
+        function generateGridWaypoints(coordsLonLat, params) {
+            const verts = coordsLonLat.slice(0, -1); // Remove closing duplicate
+            if (verts.length < 3) return [];
+
+            // Convert to local meters using centroid as origin
+            const centroid = verts.reduce((acc, v) => [acc[0] + v[0] / verts.length, acc[1] + v[1] / verts.length], [0, 0]);
+            const cosLat = Math.cos(centroid[1] * Math.PI / 180);
+            const metersPerDegLon = 111320 * cosLat;
+            const metersPerDegLat = 110540;
+
+            function toLocal(lonlat) {
+                return [(lonlat[0] - centroid[0]) * metersPerDegLon, (lonlat[1] - centroid[1]) * metersPerDegLat];
+            }
+            function toGeo(xy) {
+                return [centroid[0] + xy[0] / metersPerDegLon, centroid[1] + xy[1] / metersPerDegLat];
+            }
+
+            const localVerts = verts.map(toLocal);
+
+            // Rotate polygon so sweep lines are horizontal
+            const angleRad = params.angle * Math.PI / 180;
+            function rotate(p, a) {
+                const c = Math.cos(a), s = Math.sin(a);
+                return [p[0] * c - p[1] * s, p[0] * s + p[1] * c];
+            }
+            function unrotate(p, a) { return rotate(p, -a); }
+
+            const rotVerts = localVerts.map(v => rotate(v, -angleRad));
+
+            // Find Y extent
+            let minY = Infinity, maxY = -Infinity;
+            rotVerts.forEach(v => { minY = Math.min(minY, v[1]); maxY = Math.max(maxY, v[1]); });
+
+            const spacing = params.spacing;
+            if (spacing <= 0) return [];
+
+            // Generate horizontal sweep lines
+            const waypoints = [];
+            let direction = 1; // 1 = left-to-right, -1 = right-to-left
+
+            // Start first line half-spacing inside the boundary
+            const startY = minY + spacing * 0.25;
+            const endY = maxY - spacing * 0.25;
+
+            for (let y = startY; y <= endY; y += spacing) {
+                // Find intersections of line y=const with polygon edges
+                const intersections = [];
+                for (let i = 0; i < rotVerts.length; i++) {
+                    const j = (i + 1) % rotVerts.length;
+                    const y1 = rotVerts[i][1], y2 = rotVerts[j][1];
+                    if ((y1 <= y && y2 > y) || (y2 <= y && y1 > y)) {
+                        const t = (y - y1) / (y2 - y1);
+                        const x = rotVerts[i][0] + t * (rotVerts[j][0] - rotVerts[i][0]);
+                        intersections.push(x);
+                    }
+                }
+
+                intersections.sort((a, b) => a - b);
+
+                // Process pairs of intersections (entry/exit)
+                for (let k = 0; k + 1 < intersections.length; k += 2) {
+                    let x1 = intersections[k];
+                    let x2 = intersections[k + 1];
+
+                    // Apply overshoot extension
+                    if (params.overshoot > 0) {
+                        x1 -= params.overshoot;
+                        x2 += params.overshoot;
+                    }
+
+                    // Order points based on sweep direction
+                    const ptA = direction > 0 ? [x1, y] : [x2, y];
+                    const ptB = direction > 0 ? [x2, y] : [x1, y];
+
+                    const geoA = toGeo(unrotate(ptA, angleRad));
+                    const geoB = toGeo(unrotate(ptB, angleRad));
+
+                    waypoints.push({ lon: geoA[0], lat: geoA[1] });
+                    waypoints.push({ lon: geoB[0], lat: geoB[1] });
+                }
+
+                direction *= -1; // Alternate sweep direction for lawnmower
+            }
+
+            return waypoints;
+        }
+
         // Keyboard shortcuts (ignored when typing in inputs):
         //  C -> center on latest GPS fix
         //  Ctrl+L -> load mission from file
@@ -3882,6 +4252,12 @@ function iconKey(filename) {
             if (!e.repeat && e.ctrlKey && key === 'a') {
                 e.preventDefault();
                 $('#searchAddressButton').trigger('click');
+            }
+
+            // Ctrl+G: grid pattern
+            if (!e.repeat && e.ctrlKey && key === 'g') {
+                e.preventDefault();
+                startGridPolygonDraw();
             }
         });
 

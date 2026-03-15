@@ -101,6 +101,10 @@
     background-image: url(./../../../images/icons/search-white.svg);
 }
 
+.tab-mission-control .ic_grid {
+    background-image: url(./../../../images/icons/cf_icon_MP_grid_grey.svg);
+}
+
 .tab-mission-control .ic_setup {
     background-image: url(./../../../images/icons/cf_icon_setup_white.svg);
 }
