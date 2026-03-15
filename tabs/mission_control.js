@@ -4117,14 +4117,24 @@ function iconKey(filename) {
             apiOverlayEl.style.visibility = 'visible';
         }
 
-        // Center button: dual-purpose
-        // Priority 1: drone GPS position (most accurate, from live telemetry)
-        // Priority 2: Google Geolocation API cached position (rough, IP-based)
+        // Center button: triple-priority
+        // Priority 1: first waypoint of loaded mission (where user is working)
+        // Priority 2: drone GPS position (most accurate, from live telemetry)
+        // Priority 3: Google Geolocation API cached position (rough, IP-based)
         $(document).on('click', '#centerOnDroneButton, #centerOnDrone', function (e) {
             e.preventDefault();
             e.stopPropagation();
-            if (lastGpsPos && map && map.getView()) {
-                // Drone GPS has a fix — always use it as the most accurate source
+            if (markers.length > 0 && map && map.getView()) {
+                // Mission loaded — center on first waypoint
+                var firstFeature = markers[0].getSource().getFeatures()[0];
+                if (firstFeature) {
+                    map.getView().setCenter(firstFeature.getGeometry().getCoordinates());
+                    if (map.getView().getZoom() < 14) {
+                        map.getView().setZoom(14);
+                    }
+                }
+            } else if (lastGpsPos && map && map.getView()) {
+                // No mission but drone GPS has a fix
                 map.getView().setCenter(lastGpsPos);
             } else if (googleGeoPos && map && map.getView()) {
                 // No drone GPS — fall back to cached Google API rough position
