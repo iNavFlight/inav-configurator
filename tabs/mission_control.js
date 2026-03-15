@@ -211,7 +211,7 @@ TABS.mission_control.initialize = function (callback) {
                 $('#condGusts').text(gustVal + ' ' + unitLabel);
                 const cardinalClean = windCardinal.replace(/_/g, ' ').toLowerCase()
                     .replace(/\b\w/g, function (c) { return c.toUpperCase(); });
-                $('#condWindDir').text(arrows[idx] + ' ' + cardinalClean + ' (' + windDirDeg + '°)');
+                $('#condWindDir').text(arrows[idx] + ' From ' + cardinalClean + ' (' + windDirDeg + '°)');
 
                 // Temperature & feels‐like
                 const tempDeg = data.temperature.degrees;
