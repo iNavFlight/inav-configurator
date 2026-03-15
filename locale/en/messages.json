@@ -4967,6 +4967,9 @@
     "confirm_delete_all_points": {
         "message": "Do you really want to delete all points?"
     },
+    "confirm_delete_selected_point": {
+        "message": "Delete this waypoint?"
+    },
     "confirm_delete_point_with_options": {
         "message": "Do you really want to delete this Waypoint with non-Geo JUMP/SET_HEAD/RTH options? \nIf yes, Non-Geo options attached will be removed also!"
     },

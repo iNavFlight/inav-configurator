@@ -30,6 +30,7 @@ import RegularShape from 'ol/style/RegularShape';
 import Circle from 'ol/geom/Circle';
 import PointerInteraction from 'ol/interaction/Pointer.js';
 import Draw from 'ol/interaction/Draw.js';
+import Overlay from 'ol/Overlay.js';
 import {defaults as defaultInteractions} from 'ol/interaction/defaults';
 import {Control, defaults as defaultControls} from 'ol/control.js';
 
@@ -1657,7 +1658,30 @@ function iconKey(filename) {
                 }
             }
             else if (element.isAttached()) {
-                if (element.getAction() == MWNP.WPTYPE.JUMP) {
+                if (element.getAction() == MWNP.WPTYPE.RTH && typeof oldPos !== 'undefined') {
+                    // Green RTH marker at the last waypoint position
+                    var rthMarker = new Feature({ geometry: new Point(oldPos) });
+                    rthMarker.setStyle(new Style({
+                        image: new RegularShape({
+                            fill: new Fill({ color: '#00c850' }),
+                            stroke: new Stroke({ color: '#fff', width: 2 }),
+                            points: 32,
+                            radius: 10,
+                        }),
+                        text: new Text({
+                            text: 'RTH',
+                            font: 'bold 9px sans-serif',
+                            fill: new Fill({ color: '#fff' }),
+                        }),
+                    }));
+                    var rthSource = new VectorSource({ features: [rthMarker] });
+                    var rthLayer = new VectorLayer({ source: rthSource });
+                    rthLayer.kind = "rth";
+                    rthLayer.selection = false;
+                    lines.push(rthLayer);
+                    map.addLayer(rthLayer);
+                }
+                else if (element.getAction() == MWNP.WPTYPE.JUMP) {
                     let jumpWPIndex = multiMissionWPNum + element.getP1();
                     let coord = fromLonLat([mission.getWaypoint(jumpWPIndex).getLonMap(), mission.getWaypoint(jumpWPIndex).getLatMap()]);
                     paintLine(oldPos, coord, element.getNumber(), '#e935d6', 5, "Repeat x"+(element.getP2() == -1 ? " infinite" : String(element.getP2())), false, true);
@@ -2273,6 +2297,7 @@ function iconKey(filename) {
          */
         app.handleDownEvent = function (evt) {
             if (disableMarkerEdit) return false;
+            addWpTooltipEl.style.display = 'none';
 
             var map = evt.map;
 
@@ -2373,22 +2398,30 @@ function iconKey(filename) {
          * @param {ol.MapBrowserEvent} evt Event.
          */
         app.handleMoveEvent = function (evt) {
-            if (this.cursor_) {
-                var map = evt.map;
-                var feature = map.forEachFeatureAtPixel(evt.pixel,
-                    function (feature, layer) {
-                        return feature;
-                    });
-                var element = evt.map.getTargetElement();
-                if (feature && feature.name != "circleFeature" && feature.name != "circleSafeFeature") {
-                    if (element.style.cursor != this.cursor_) {
-                        this.previousCursor_ = element.style.cursor;
-                        element.style.cursor = this.cursor_;
-                    }
-                } else if (this.previousCursor_ !== undefined) {
-                    element.style.cursor = this.previousCursor_;
-                    this.previousCursor_ = undefined;
+            var map = evt.map;
+            var feature = map.forEachFeatureAtPixel(evt.pixel,
+                function (feature, layer) {
+                    return feature;
+                });
+            var hoverLayer = map.forEachFeatureAtPixel(evt.pixel,
+                function (feature, layer) {
+                    return layer;
+                });
+            var element = evt.map.getTargetElement();
+            var isLine = hoverLayer && hoverLayer.kind === 'line' && hoverLayer.selection;
+
+            if (feature && feature.name != "circleFeature" && feature.name != "circleSafeFeature") {
+                if (isLine) {
+                    element.style.cursor = 'crosshair';
+                    addWpTooltipEl.style.display = '';
+                    addWpOverlay.setPosition(evt.coordinate);
+                } else {
+                    element.style.cursor = 'pointer';
+                    addWpTooltipEl.style.display = 'none';
                 }
+            } else {
+                element.style.cursor = '';
+                addWpTooltipEl.style.display = 'none';
             }
         };
 
@@ -2542,6 +2575,30 @@ function iconKey(filename) {
         setTimeout(function() {
             $('.ol-attribution a').attr('target', '_blank');
         }, 100);
+        // "Add WP" tooltip overlay shown when hovering on a flight path line
+        var addWpTooltipEl = document.createElement('div');
+        addWpTooltipEl.className = 'add-wp-tooltip';
+        addWpTooltipEl.innerHTML = '<span style="font-size:1.1em;font-weight:bold;">＋</span> Add WP';
+        Object.assign(addWpTooltipEl.style, {
+            background: 'rgba(20,151,241,0.9)',
+            color: '#fff',
+            padding: '3px 8px',
+            borderRadius: '4px',
+            fontSize: '0.85em',
+            fontFamily: 'sans-serif',
+            whiteSpace: 'nowrap',
+            pointerEvents: 'none',
+            boxShadow: '0 1px 4px rgba(0,0,0,0.3)',
+            display: 'none',
+        });
+        var addWpOverlay = new Overlay({
+            element: addWpTooltipEl,
+            offset: [12, -12],
+            positioning: 'bottom-left',
+            stopEvent: false,
+        });
+        map.addOverlay(addWpOverlay);
+
         //////////////////////////////////////////////////////////////////////////
         // save map view settings when user moves it
         //////////////////////////////////////////////////////////////////////////
@@ -4092,6 +4149,9 @@ function iconKey(filename) {
 
             hideGridCard();
             cancelGridDraw();
+
+            // Auto-select first waypoint
+            selectWaypointByLayerNumber(0);
         });
 
         /**
@@ -4259,10 +4319,123 @@ function iconKey(filename) {
                 e.preventDefault();
                 startGridPolygonDraw();
             }
+
+            // Delete key: delete selected waypoint with confirmation
+            if (key === 'delete' && selectedMarker && !$(e.target).is('input, select, textarea')) {
+                e.preventDefault();
+                if (dialog.confirm(i18n.getMessage('confirm_delete_selected_point'))) {
+                    $('#removePoint').trigger('click');
+                }
+            }
+
+            // Left/Right arrow keys: navigate between waypoints
+            if ((key === 'arrowleft' || key === 'arrowright') && !$(e.target).is('input, select, textarea')) {
+                e.preventDefault();
+                var wpList = mission.get().filter(function (wp) { return !wp.isAttached(); });
+                if (wpList.length === 0) return;
+
+                var currentLayerNum = selectedMarker ? selectedMarker.getLayerNumber() : -1;
+                var targetLayerNum;
+                if (key === 'arrowleft') {
+                    targetLayerNum = currentLayerNum > 0 ? currentLayerNum - 1 : wpList.length - 1;
+                } else {
+                    targetLayerNum = currentLayerNum < wpList.length - 1 ? currentLayerNum + 1 : 0;
+                }
+                selectWaypointByLayerNumber(targetLayerNum);
+            }
         });
+
+        // Programmatically select a waypoint by its layer number (0-based display index)
+        function selectWaypointByLayerNumber(layerNum) {
+            // Deselect current
+            if (selectedFeature && selectedMarker) {
+                try { selectedFeature.setStyle(getWaypointIcon(selectedMarker, false)); } catch (e) {}
+            }
+            selectedMarker = null;
+            selectedFeature = null;
+            tempMarker = null;
+
+            // Find the marker layer with this layerNumber
+            var markerLayer = markers.find(function (m) { return m.layerNumber === layerNum; });
+            if (!markerLayer) {
+                clearEditForm();
+                return;
+            }
+
+            tempMarker = markerLayer;
+            selectedMarker = mission.getWaypoint(markerLayer.number);
+            selectedFeature = markerLayer.getSource().getFeatures()[0];
+
+            if (!selectedMarker || !selectedFeature) {
+                clearEditForm();
+                return;
+            }
+
+            selectedFwApproachWp = FC.FW_APPROACH.get()[FC.SAFEHOMES.getMaxSafehomeCount() + selectedMarker.getMultiMissionIdx()];
+
+            selectedFeature.setStyle(getWaypointIcon(selectedMarker, true));
+
+            var coord = toLonLat(selectedFeature.getGeometry().getCoordinates());
+            let P3Value = selectedMarker.getP3();
+
+            changeSwitch($('#pointP3Alt'), TABS.mission_control.isBitSet(P3Value, MWNP.P3.ALT_TYPE));
+            changeSwitch($('#pointP3UserAction1'), TABS.mission_control.isBitSet(P3Value, MWNP.P3.USER_ACTION_1));
+            changeSwitch($('#pointP3UserAction2'), TABS.mission_control.isBitSet(P3Value, MWNP.P3.USER_ACTION_2));
+            changeSwitch($('#pointP3UserAction3'), TABS.mission_control.isBitSet(P3Value, MWNP.P3.USER_ACTION_3));
+            changeSwitch($('#pointP3UserAction4'), TABS.mission_control.isBitSet(P3Value, MWNP.P3.USER_ACTION_4));
+
+            var altitudeMeters = selectedMarker.getAlt() / 100;
+
+            if (selectedMarker.getAction() == MWNP.WPTYPE.LAND) {
+                $('#wpFwLanding').fadeIn(300);
+            } else {
+                $('#wpFwLanding').fadeOut(300);
+            }
+
+            (async () => {
+                const elevationAtWP = await selectedMarker.getElevation(globalSettings);
+                $('#elevationValueAtWP').text(elevationAtWP);
+                const returnAltitude = checkAltElevSanity(false, selectedMarker.getAlt(), elevationAtWP, P3Value);
+                selectedMarker.setAlt(returnAltitude);
+                plotElevation();
+            })();
+
+            $('#elevationAtWP').fadeIn();
+            $('#groundClearanceAtWP').fadeIn();
+
+            $('#altitudeInMeters').text(` ${altitudeMeters}m`);
+            $('#pointLon').val(Math.round(coord[0] * 10000000) / 10000000);
+            $('#pointLat').val(Math.round(coord[1] * 10000000) / 10000000);
+            $('#pointAlt').val(selectedMarker.getAlt());
+            $('#pointType').val(selectedMarker.getAction());
+            $('#pointP1').val(selectedMarker.getP1());
+            $('#pointP2').val(selectedMarker.getP2());
+
+            for (var j in dictOfLabelParameterPoint[selectedMarker.getAction()]) {
+                if (dictOfLabelParameterPoint[selectedMarker.getAction()][j] != '') {
+                    $('#pointP'+String(j).slice(-1)+'class').fadeIn(300);
+                    $('label[for=pointP'+String(j).slice(-1)+']').html(dictOfLabelParameterPoint[selectedMarker.getAction()][j]);
+                }
+                else {$('#pointP'+String(j).slice(-1)+'class').fadeOut(300);}
+            }
+            selectedMarker = renderWaypointOptionsTable(selectedMarker);
+            $('#EditPointNumber').text("Edit point "+String(selectedMarker.getLayerNumber()+1));
+
+            // Quick flash transition so user sees the card update
+            var $card = $('#MPeditPoint');
+            if ($card.is(':visible')) {
+                $card.css('opacity', 0.3).animate({ opacity: 1 }, 200);
+            } else {
+                $card.fadeIn(300);
+            }
+            $('#pointP3UserActionClass').fadeIn();
+            redrawLayer();
+        }
 
         $('#removePoint').on('click', function () {
             if (selectedMarker) {
+                var prevLayerNum = selectedMarker.getLayerNumber() - 1;
+
                 if (mission.isJumpTargetAttached(selectedMarker)) {
                     dialog.alert(i18n.getMessage('MissionPlannerJumpTargetRemoval'));
                 }
@@ -4284,6 +4457,10 @@ function iconKey(filename) {
                         refreshLayers();
                         plotElevation();
                         updateLocationButtonsVisibility();
+
+                        if (prevLayerNum >= 0 && !mission.isEmpty()) {
+                            selectWaypointByLayerNumber(Math.min(prevLayerNum, mission.get().filter(function (wp) { return !wp.isAttached(); }).length - 1));
+                        }
                     }
                 }
                 else {
@@ -4296,6 +4473,10 @@ function iconKey(filename) {
                     clearEditForm();
                     refreshLayers();
                     plotElevation();
+
+                    if (prevLayerNum >= 0 && !mission.isEmpty()) {
+                        selectWaypointByLayerNumber(Math.min(prevLayerNum, mission.get().filter(function (wp) { return !wp.isAttached(); }).length - 1));
+                    }
                 }
                 updateMultimissionState();
                 updateLocationButtonsVisibility();
