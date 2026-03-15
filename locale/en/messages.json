@@ -6268,13 +6268,13 @@
         "message": "Create a new project (or select an existing one)"
     },
     "googleLocationHelpStep3": {
-        "message": "Go to <strong>APIs &amp; Services → Library</strong> and enable the <strong>Geolocation API</strong> and the <strong>Weather API</strong>"
+        "message": "Go to <strong>APIs &amp; Services → Library</strong> and enable the <strong>Geolocation API</strong>, <strong>Geocoding API</strong>, and the <strong>Weather API</strong>"
     },
     "googleLocationHelpStep4": {
         "message": "Go to <strong>APIs &amp; Services → Credentials</strong> and click <strong>Create Credentials → API Key</strong>"
     },
     "googleLocationHelpStep5": {
-        "message": "Copy the key and paste it here. For security, restrict the key to the Geolocation API and Weather API only."
+        "message": "Copy the key and paste it here. For security, restrict the key to the Geolocation, Geocoding, and Weather APIs only."
     },
     "googleLocationHelpNote": {
         "message": "Google offers a free tier that includes up to 40,000 geolocation requests and 500 weather lookups per month. Your key is stored locally on your computer and is never shared."

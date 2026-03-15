@@ -4022,33 +4022,54 @@ function iconKey(filename) {
                 $('#addressSearchBackdrop').remove();
 
                 if (address) {
-                    const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&limit=1`;
-                    
-                    fetch(url)
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data && data.length > 0) {
-                                const result = data[0];
-                                const coord = fromLonLat([parseFloat(result.lon), parseFloat(result.lat)]);
-                                if (dialog.confirm(`Found: ${result.display_name}\n\nMove to this location?`)) {
-                                    map.getView().setCenter(coord);
+                    // Try Google Geocoding API first if key exists, fall back to Nominatim
+                    if (globalSettings.googleApiKey) {
+                        const googleUrl = 'https://maps.googleapis.com/maps/api/geocode/json?address='
+                            + encodeURIComponent(address) + '&key=' + globalSettings.googleApiKey;
+                        fetch(googleUrl)
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.status === 'OK' && data.results && data.results.length > 0) {
+                                    const result = data.results[0];
+                                    const lat = result.geometry.location.lat;
+                                    const lng = result.geometry.location.lng;
+                                    const coord = fromLonLat([lng, lat]);
+                                    if (dialog.confirm(`Found: ${result.formatted_address}\nSource: Google\n\nMove to this location?`)) {
+                                        map.getView().setCenter(coord);
+                                    }
+                                } else {
+                                    // Google failed — fall back to Nominatim
+                                    searchNominatim(address);
                                 }
-                            } else {
-                                dialog.alert('Address not found.');
-                            }
-                        })
-                        .catch(err => {
-                            console.error('Search failed:', err);
-                            dialog.alert('Search failed. Check your connection.');
-                        });
+                            })
+                            .catch(() => {
+                                searchNominatim(address);
+                            });
+                    } else {
+                        searchNominatim(address);
+                    }
                 }
+            }
 
-                setTimeout(() => {
-                    const input = document.getElementById('addressInput');
-                    input?.focus();
-                    input?.select();
-                }, 50);
-
+            function searchNominatim(address) {
+                const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&limit=1`;
+                fetch(url)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data && data.length > 0) {
+                            const result = data[0];
+                            const coord = fromLonLat([parseFloat(result.lon), parseFloat(result.lat)]);
+                            if (dialog.confirm(`Found: ${result.display_name}\nSource: OpenStreetMap\n\nMove to this location?`)) {
+                                map.getView().setCenter(coord);
+                            }
+                        } else {
+                            dialog.alert('Address not found.');
+                        }
+                    })
+                    .catch(err => {
+                        console.error('Search failed:', err);
+                        dialog.alert('Search failed. Check your connection.');
+                    });
             }
 
             // Event handlers
@@ -4111,9 +4132,8 @@ function iconKey(filename) {
                 var zoom = 14;
                 if (googleGeoPos.accuracy > 5000) zoom = 10;
                 else if (googleGeoPos.accuracy > 1000) zoom = 12;
-                if (map.getView().getZoom() < zoom) {
-                    map.getView().setZoom(zoom);
-                }
+                // Always set zoom to match accuracy — zoom out if too close
+                map.getView().setZoom(zoom);
                 // Show the API location banner with coords & accuracy warning
                 showApiLocationBanner();
             }
