@@ -539,18 +539,21 @@ $(function() {
                                 fetch(weatherUrl)
                                     .then(function (wr) { return wr.json(); })
                                     .then(function (wd) {
-                                        if (wd.currentConditions && wd.currentConditions.wind) {
-                                            var windSpeed = wd.currentConditions.wind.speed
-                                                ? wd.currentConditions.wind.speed.value : '?';
-                                            var windUnit = wd.currentConditions.wind.speed
-                                                ? wd.currentConditions.wind.speed.unit : '';
+                                        if (wd.wind && wd.wind.speed) {
+                                            var windVal = wd.wind.speed.value;
+                                            var windUnit = wd.wind.speed.unit === 'KILOMETERS_PER_HOUR' ? 'km/h' : 'mph';
                                             var weatherMsg = i18n.getMessage('googleLocationTestWeather', [
-                                                windSpeed, windUnit
+                                                windVal, windUnit
                                             ]);
                                             $result.html(locMsg + '<br>' + weatherMsg);
                                         } else if (wd.error) {
                                             var warnMsg = i18n.getMessage('googleLocationTestWeatherFail', [
                                                 wd.error.message || JSON.stringify(wd.error)
+                                            ]);
+                                            $result.html(locMsg + '<br><span style="color:#c00;">' + warnMsg + '</span>');
+                                        } else {
+                                            var warnMsg = i18n.getMessage('googleLocationTestWeatherFail', [
+                                                'Unexpected response'
                                             ]);
                                             $result.html(locMsg + '<br><span style="color:#c00;">' + warnMsg + '</span>');
                                         }

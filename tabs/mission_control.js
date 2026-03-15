@@ -154,8 +154,7 @@ TABS.mission_control.initialize = function (callback) {
     let conditionsFetched = false;  // Prevent redundant fetches
     function fetchConditionsInfo(lat, lng) {
         if (!globalSettings.googleApiKey) {
-            $('#conditionsLoading').hide();
-            $('#conditionsError').text(i18n.getMessage('conditionsNoKey')).show();
+            $('#missionPlannerConditions').hide();
             return;
         }
 
@@ -180,15 +179,16 @@ TABS.mission_control.initialize = function (callback) {
                 // API error response
                 if (data.error) {
                     console.log('Google Weather API error:', data.error.message);
-                    $('#conditionsLoading').hide();
-                    $('#conditionsError').text(i18n.getMessage('conditionsUnavailable')).show();
+                    $('#missionPlannerConditions').hide();
                     return;
                 }
                 if (!data.temperature) {
-                    $('#conditionsLoading').hide();
-                    $('#conditionsError').text(i18n.getMessage('conditionsUnavailable')).show();
+                    $('#missionPlannerConditions').hide();
                     return;
                 }
+
+                // Weather data loaded — show the panel
+                $('#missionPlannerConditions').show();
 
                 // Weather description (e.g. "Sunny", "Partly cloudy")
                 const desc = (data.weatherCondition && data.weatherCondition.description)
