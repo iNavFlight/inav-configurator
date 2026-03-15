@@ -6225,6 +6225,9 @@
     "gpsOptionsAssistnowToken": {
         "message": "AssitNow Token"
     },
+    "gpsOptionsGoogleApiKey": {
+        "message": "Google Geolocation API Key"
+    },
     "gpsLoadAssistnowOfflineButton": {
         "message": "Load AssistNow Offline"
     },

@@ -329,6 +329,14 @@
     top: 165px;
 }
 
+.mission-control-geolocate {
+    bottom: 3em;
+    right: .5em;
+}
+.ol-touch .mission-control-geolocate {
+    bottom: 3.5em;
+}
+
 .tab-mission-control .geozoneVerticesTable {
     width: 100%;
     text-align: center;

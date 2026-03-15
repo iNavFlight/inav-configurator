@@ -2235,6 +2235,66 @@ function iconKey(filename) {
             }
         };
 
+        class GeolocateControl extends Control {
+
+            constructor(opt_options) {
+                var options = opt_options || {};
+                var button = document.createElement('button');
+
+                button.innerHTML = '\u2316';
+                button.style = 'font-size:1.4em;color:#fff;background-color:rgba(0,60,136,.5);';
+                button.title = 'Center map on my location';
+
+                button.addEventListener('click', function () {
+                    var apiKey = globalSettings.googleApiKey;
+                    if (!apiKey) {
+                        console.warn('No Google API key configured. Set it in Application Options → GPS Options.');
+                        return;
+                    }
+                    button.disabled = true;
+                    button.style.opacity = '0.5';
+                    fetch('https://www.googleapis.com/geolocation/v1/geolocate?key=' + apiKey, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ considerIp: true })
+                    })
+                    .then(function (r) { return r.json(); })
+                    .then(function (data) {
+                        if (data.location) {
+                            var coord = fromLonLat([data.location.lng, data.location.lat]);
+                            map.getView().setCenter(coord);
+                            var zoom = 14;
+                            if (data.accuracy > 5000) zoom = 10;
+                            else if (data.accuracy > 1000) zoom = 12;
+                            if (map.getView().getZoom() < zoom) {
+                                map.getView().setZoom(zoom);
+                            }
+                            console.log('Geolocation success:', data.location.lat, data.location.lng,
+                                        'accuracy:', data.accuracy, 'm');
+                        } else {
+                            console.error('Geolocation API error:', data);
+                        }
+                        button.disabled = false;
+                        button.style.opacity = '1';
+                    })
+                    .catch(function (err) {
+                        console.error('Geolocation request failed:', err);
+                        button.disabled = false;
+                        button.style.opacity = '1';
+                    });
+                }, false);
+
+                var element = document.createElement('div');
+                element.className = 'mission-control-geolocate ol-unselectable ol-control';
+                element.appendChild(button);
+
+                super({
+                    element: element,
+                    target: options.target
+                });
+            }
+        };
+
         class PlannerMultiMissionControl extends Control {
 
             constructor(opt_options) {
@@ -2494,6 +2554,7 @@ function iconKey(filename) {
                 new PlannerMultiMissionControl(),
                 new PlannerSafehomeControl(),
                 new PlannerElevationControl(),
+                new GeolocateControl(),
             ]
 
             if (isGeozoneEnabeld) {
@@ -2505,6 +2566,7 @@ function iconKey(filename) {
                 new PlannerSettingsControl(),
                 new PlannerMultiMissionControl(),
                 new PlannerElevationControl(),
+                new GeolocateControl(),
                 //new app.PlannerSafehomeControl() // TO COMMENT FOR RELEASE : DECOMMENT FOR DEBUG
             ]
         }

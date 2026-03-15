@@ -67,6 +67,7 @@ $(function() {
         globalSettings.unitType = store.get('unit_type', UnitType.none);
         globalSettings.mapProviderType = store.get('map_provider_type', 'osm'); 
         globalSettings.assistnowApiKey = store.get('assistnow_api_key', '');
+        globalSettings.googleApiKey = store.get('google_api_key', '');
         globalSettings.proxyURL = store.get('proxyurl', 'http://192.168.1.222/mapproxy/service?');
         globalSettings.proxyLayer = store.get('proxylayer', 'your_proxy_layer_name');
         globalSettings.showProfileParameters = store.get('show_profile_parameters', 1);
@@ -465,6 +466,11 @@ $(function() {
                     $('#assistnow-api-key').on('change', function () {
                         store.set('assistnow_api_key', $(this).val());
                         globalSettings.assistnowApiKey = $(this).val();
+                    });
+                    $('#google-api-key').val(globalSettings.googleApiKey);
+                    $('#google-api-key').on('change', function () {
+                        store.set('google_api_key', $(this).val());
+                        globalSettings.googleApiKey = $(this).val();
                     });
  
                     $('#demoModeReset').on('click', function () {
