@@ -88,6 +88,70 @@
                     </div>
                 </div>
 
+                <!-- Conditions Information panel — weather from Google Weather API -->
+                <!-- Uses coordinates from drone GPS or Google Geolocation API -->
+                <div id="missionPlannerConditions" class="gui_box grey">
+                    <div class="gui_box_titlebar">
+                        <div class="spacer_box_title" data-i18n="conditionsInfoHead"></div>
+                        <div class="btnMenu btnMenuIcon show_btn" id="showHideConditionsButton">
+                            <a class="ic_hide" href="#" i18n_title="missionTitleHide"></a>
+                        </div>
+                    </div>
+                    <div class="spacer" id="ConditionsContent">
+                        <div id="conditionsLoading" style="color: #999; font-style: italic; padding: 4px 0;" data-i18n="conditionsWaiting"></div>
+                        <div id="conditionsData" style="display: none;">
+                            <div style="padding-bottom: 2px; font-weight: bold;">
+                                <span id="condWeather" style="color: #3394b5"></span>
+                            </div>
+                            <div style="padding-bottom: 2px;">
+                                <span data-i18n="conditionsWind"></span>
+                                <span id="condWind" style="color: #3394b5"></span>
+                            </div>
+                            <div style="padding-bottom: 2px;">
+                                <span data-i18n="conditionsGusts"></span>
+                                <span id="condGusts" style="color: #3394b5"></span>
+                            </div>
+                            <div style="padding-bottom: 2px;">
+                                <span data-i18n="conditionsWindDir"></span>
+                                <span id="condWindDir" style="color: #3394b5"></span>
+                            </div>
+                            <div style="padding-bottom: 2px;">
+                                <span data-i18n="conditionsTemp"></span>
+                                <span id="condTemp" style="color: #3394b5"></span>
+                            </div>
+                            <div style="padding-bottom: 2px;">
+                                <span data-i18n="conditionsFeelsLike"></span>
+                                <span id="condFeelsLike" style="color: #3394b5"></span>
+                            </div>
+                            <div style="padding-bottom: 2px;">
+                                <span data-i18n="conditionsHumidity"></span>
+                                <span id="condHumidity" style="color: #3394b5"></span>
+                            </div>
+                            <div style="padding-bottom: 2px;">
+                                <span data-i18n="conditionsUV"></span>
+                                <span id="condUV" style="color: #3394b5"></span>
+                            </div>
+                            <div style="padding-bottom: 2px;">
+                                <span data-i18n="conditionsPrecip"></span>
+                                <span id="condPrecip" style="color: #3394b5"></span>
+                            </div>
+                            <div style="padding-bottom: 2px;">
+                                <span data-i18n="conditionsThunder"></span>
+                                <span id="condThunder" style="color: #3394b5"></span>
+                            </div>
+                            <div style="padding-bottom: 2px;">
+                                <span data-i18n="conditionsVisibility"></span>
+                                <span id="condVisibility" style="color: #3394b5"></span>
+                            </div>
+                            <div style="padding-bottom: 2px;">
+                                <span data-i18n="conditionsCloud"></span>
+                                <span id="condCloud" style="color: #3394b5"></span>
+                            </div>
+                        </div>
+                        <div id="conditionsError" style="display: none; color: #c00; font-size: 0.9em;"></div>
+                    </div>
+                </div>
+
                 <div id="missionPlannerSettings" class="gui_box grey" style="display: none">
                     <div class="gui_box_titlebar">
                         <div class="spacer_box_title" data-i18n="missionDefaultSettingsHead"></div>
