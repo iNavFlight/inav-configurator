@@ -1609,6 +1609,10 @@ function iconKey(filename) {
         });
     }
 
+    // Vertical pixel offset to push RTH/heading markers below the WP pin (increase to move further down)
+    var MARKER_ICON_OFFSET_Y = 10;
+    var MARKER_ICON_OFFSET_X = -2;  // Match WP pin text offsetX
+
     function repaintLine4Waypoints(mission) {
         let oldPos,
             oldAction,
@@ -1667,10 +1671,13 @@ function iconKey(filename) {
                             stroke: new Stroke({ color: '#fff', width: 2 }),
                             points: 32,
                             radius: 10,
+                            displacement: [MARKER_ICON_OFFSET_X, -MARKER_ICON_OFFSET_Y],
                         }),
                         text: new Text({
                             text: 'RTH',
                             font: 'bold 9px sans-serif',
+                            offsetX: MARKER_ICON_OFFSET_X,
+                            offsetY: MARKER_ICON_OFFSET_Y,
                             fill: new Fill({ color: '#fff' }),
                         }),
                     }));
@@ -1698,10 +1705,14 @@ function iconKey(filename) {
                         activateHead = true;
                         oldHeading = String(element.getP1());
 
-                        // Black circle with white arrow pointing in the heading direction
+                        // Black circle with white direction dot pointing in the heading direction
                         if (typeof oldPos !== 'undefined') {
                             var headingDeg = element.getP1();
                             var headingRad = headingDeg * Math.PI / 180;
+                            // Dot displacement: sin for X (east), cos for Y (north/up) from circle center
+                            var dotRadius = 9;
+                            var dotDx = Math.sin(headingRad) * dotRadius;
+                            var dotDy = Math.cos(headingRad) * dotRadius;
                             var headMarker = new Feature({ geometry: new Point(oldPos) });
                             headMarker.setStyle([
                                 new Style({
@@ -1709,22 +1720,24 @@ function iconKey(filename) {
                                         fill: new Fill({ color: '#222' }),
                                         stroke: new Stroke({ color: '#fff', width: 2 }),
                                         points: 32,
-                                        radius: 12,
+                                        radius: 10,
+                                        displacement: [MARKER_ICON_OFFSET_X, -MARKER_ICON_OFFSET_Y],
                                     }),
                                 }),
                                 new Style({
-                                    text: new Text({
-                                        text: '\u2191',
-                                        font: 'bold 18px sans-serif',
-                                        rotation: headingRad,
+                                    image: new RegularShape({
                                         fill: new Fill({ color: '#fff' }),
+                                        points: 32,
+                                        radius: 4,
+                                        displacement: [MARKER_ICON_OFFSET_X + dotDx, -MARKER_ICON_OFFSET_Y + dotDy],
                                     }),
                                 }),
                                 new Style({
                                     text: new Text({
                                         text: headingDeg + '\u00B0',
                                         font: 'bold 9px sans-serif',
-                                        offsetY: 18,
+                                        offsetX: MARKER_ICON_OFFSET_X,
+                                        offsetY: MARKER_ICON_OFFSET_Y + 18,
                                         fill: new Fill({ color: '#222' }),
                                         stroke: new Stroke({ color: '#fff', width: 3 }),
                                     }),
