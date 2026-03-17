@@ -1675,7 +1675,7 @@ function iconKey(filename) {
                         }),
                     }));
                     var rthSource = new VectorSource({ features: [rthMarker] });
-                    var rthLayer = new VectorLayer({ source: rthSource });
+                    var rthLayer = new VectorLayer({ source: rthSource, zIndex: 99 });
                     rthLayer.kind = "rth";
                     rthLayer.selection = false;
                     lines.push(rthLayer);
@@ -1697,6 +1697,46 @@ function iconKey(filename) {
                         activatePoi = false;
                         activateHead = true;
                         oldHeading = String(element.getP1());
+
+                        // Black circle with white arrow pointing in the heading direction
+                        if (typeof oldPos !== 'undefined') {
+                            var headingDeg = element.getP1();
+                            var headingRad = headingDeg * Math.PI / 180;
+                            var headMarker = new Feature({ geometry: new Point(oldPos) });
+                            headMarker.setStyle([
+                                new Style({
+                                    image: new RegularShape({
+                                        fill: new Fill({ color: '#222' }),
+                                        stroke: new Stroke({ color: '#fff', width: 2 }),
+                                        points: 32,
+                                        radius: 12,
+                                    }),
+                                }),
+                                new Style({
+                                    text: new Text({
+                                        text: '\u2191',
+                                        font: 'bold 18px sans-serif',
+                                        rotation: headingRad,
+                                        fill: new Fill({ color: '#fff' }),
+                                    }),
+                                }),
+                                new Style({
+                                    text: new Text({
+                                        text: headingDeg + '\u00B0',
+                                        font: 'bold 9px sans-serif',
+                                        offsetY: 18,
+                                        fill: new Fill({ color: '#222' }),
+                                        stroke: new Stroke({ color: '#fff', width: 3 }),
+                                    }),
+                                }),
+                            ]);
+                            var headSource = new VectorSource({ features: [headMarker] });
+                            var headLayer = new VectorLayer({ source: headSource, zIndex: 99 });
+                            headLayer.kind = "heading";
+                            headLayer.selection = false;
+                            lines.push(headLayer);
+                            map.addLayer(headLayer);
+                        }
                     }
                 }
 
