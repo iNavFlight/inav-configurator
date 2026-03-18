@@ -1618,6 +1618,7 @@ function iconKey(filename) {
             oldAction,
             poiList = [],
             oldHeading,
+            lastWaypointLayerNumber = -1,
             multiMissionWPNum = 0;
         let activatePoi = false;
         let activateHead = false;
@@ -1658,6 +1659,7 @@ function iconKey(filename) {
                         multiMissionWPNum = element.getNumber() + 1;
                     } else {
                         oldPos = coord;
+                        lastWaypointLayerNumber = element.getLayerNumber();
                     }
                 }
             }
@@ -1682,6 +1684,7 @@ function iconKey(filename) {
                     var rthLayer = new VectorLayer({ source: rthSource, zIndex: 99 });
                     rthLayer.kind = "rth";
                     rthLayer.selection = false;
+                    rthLayer.parentLayerNumber = lastWaypointLayerNumber;
                     lines.push(rthLayer);
                     map.addLayer(rthLayer);
                 }
@@ -1738,6 +1741,7 @@ function iconKey(filename) {
                             var headLayer = new VectorLayer({ source: headSource, zIndex: 99 });
                             headLayer.kind = "heading";
                             headLayer.selection = false;
+                            headLayer.parentLayerNumber = lastWaypointLayerNumber;
                             lines.push(headLayer);
                             map.addLayer(headLayer);
                         }
@@ -2691,6 +2695,11 @@ function iconKey(filename) {
             if (selectedFeature && tempMarker && !tempMarker.kind) {
                 selectedFeature = null;
                 tempMarker = null;
+            }
+            // Clicking RTH/heading marker selects the parent waypoint
+            if (tempMarker && (tempMarker.kind === 'rth' || tempMarker.kind === 'heading') && tempMarker.parentLayerNumber >= 0) {
+                selectWaypointByLayerNumber(tempMarker.parentLayerNumber);
+                return;
             }
             if (selectedFeature && tempMarker && tempMarker.kind == "waypoint") {
                 $("#editMission").hide();
@@ -4465,8 +4474,9 @@ function iconKey(filename) {
             selectedMarker = renderWaypointOptionsTable(selectedMarker);
             $('#EditPointNumber').text("Edit point "+String(selectedMarker.getLayerNumber()+1));
 
-            // Quick flash transition so user sees the card update
+            // Stop any in-progress fadeOut from clearEditForm, then show card
             var $card = $('#MPeditPoint');
+            $card.stop(true, true);
             if ($card.is(':visible')) {
                 $card.css('opacity', 0.3).animate({ opacity: 1 }, 200);
             } else {
