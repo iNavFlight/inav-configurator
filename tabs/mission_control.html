@@ -49,6 +49,52 @@
                             href="#"
                             title="Center map on latest GPS fix (Ctrl+C)"></a>
                         </div>
+
+                        <div id="gridPattern" class="btn btn-default" style="padding-top: 1px; display: inline-block; cursor: pointer; float: left;">
+                            <a id="gridPatternButton"
+                            class="btnicon ic_grid"
+                            href="#"
+                            i18n_title="missionGridPatternTitle"></a>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="missionPlannerGridSettings" class="gui_box grey" style="display: none;">
+                    <div class="gui_box_titlebar">
+                        <div class="spacer_box_title" data-i18n="missionGridSettingsTitle"></div>
+                        <div class="btnMenu btnMenuIcon save_btn">
+                            <a id="gridCancel" class="ic_cancel" href="#" i18n_title="missionSettingsCancel"></a>
+                        </div>
+                    </div>
+                    <div class="spacer" id="gridSettingsContent">
+                        <div class="point">
+                            <label class="point-label" for="gridSpacing" data-i18n="missionGridSpacing"></label>
+                            <input id="gridSpacing" type="number" value="25" min="5" max="1000" step="5"> m
+                        </div>
+                        <div class="point">
+                            <label class="point-label" for="gridAltitude" data-i18n="missionGridAltitude"></label>
+                            <input id="gridAltitude" type="number" value="50" min="5" max="5000" step="5"> m
+                        </div>
+                        <div class="point">
+                            <label class="point-label" for="gridSpeed" data-i18n="missionGridSpeed"></label>
+                            <input id="gridSpeed" type="number" value="0" min="0" max="100" step="1"> m/s
+                        </div>
+                        <div class="point">
+                            <label class="point-label" for="gridAngle" data-i18n="missionGridAngle"></label>
+                            <input id="gridAngle" type="number" value="0" min="0" max="359" step="1"> &deg;
+                        </div>
+                        <div class="point">
+                            <label class="point-label" for="gridOvershoot" data-i18n="missionGridOvershoot"></label>
+                            <input id="gridOvershoot" type="number" value="0" min="0" max="200" step="5"> m
+                        </div>
+                        <div class="point">
+                            <label class="point-label" for="gridEndRTH" data-i18n="missionGridEndRTH"></label>
+                            <input id="gridEndRTH" type="checkbox" checked>
+                        </div>
+                        <div id="gridWaypointCount" style="margin-top:4px;margin-left:5px;font-size:0.9em;color:#666;"></div>
+                        <div style="margin-top:8px;text-align:right;padding-right:5px;">
+                            <button id="gridGenerate" class="default_btn" data-i18n="missionGridGenerate" style="background:#007cba;color:#fff;border:none;padding:4px 14px;cursor:pointer;"></button>
+                        </div>
                     </div>
                 </div>
 
