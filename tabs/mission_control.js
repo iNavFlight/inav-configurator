@@ -1705,31 +1705,21 @@ function iconKey(filename) {
                         activateHead = true;
                         oldHeading = String(element.getP1());
 
-                        // Black circle with white direction dot pointing in the heading direction
+                        // Black circle with white arrow pointing in the heading direction
                         if (typeof oldPos !== 'undefined') {
                             var headingDeg = element.getP1();
-                            var headingRad = headingDeg * Math.PI / 180;
-                            // Dot displacement: sin for X (east), cos for Y (north/up) from circle center
-                            var dotRadius = 9;
-                            var dotDx = Math.sin(headingRad) * dotRadius;
-                            var dotDy = Math.cos(headingRad) * dotRadius;
+                            // SVG: circle stays fixed, arrow rotates around center via SVG transform
+                            var arrowSvg = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">'
+                                + '<circle cx="12" cy="12" r="10" fill="#222" stroke="#fff" stroke-width="2"/>'
+                                + '<path d="M12 4 L15 10 L12 8 L9 10 Z" fill="#fff" transform="rotate(' + headingDeg + ' 12 12)"/>'
+                                + '</svg>';
                             var headMarker = new Feature({ geometry: new Point(oldPos) });
                             headMarker.setStyle([
                                 new Style({
-                                    image: new RegularShape({
-                                        fill: new Fill({ color: '#222' }),
-                                        stroke: new Stroke({ color: '#fff', width: 2 }),
-                                        points: 32,
-                                        radius: 10,
+                                    image: new Icon({
+                                        src: 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(arrowSvg),
+                                        scale: 1,
                                         displacement: [MARKER_ICON_OFFSET_X, -MARKER_ICON_OFFSET_Y],
-                                    }),
-                                }),
-                                new Style({
-                                    image: new RegularShape({
-                                        fill: new Fill({ color: '#fff' }),
-                                        points: 32,
-                                        radius: 4,
-                                        displacement: [MARKER_ICON_OFFSET_X + dotDx, -MARKER_ICON_OFFSET_Y + dotDy],
                                     }),
                                 }),
                                 new Style({
