@@ -1710,9 +1710,10 @@ function iconKey(filename) {
                             var headingDeg = element.getP1();
                             // SVG: circle stays fixed, arrow rotates around center via SVG transform
                             var arrowSvg = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">'
-                                + '<circle cx="12" cy="12" r="10" fill="#222" stroke="#fff" stroke-width="2"/>'
-                                + '<path d="M12 4 L15 10 L12 8 L9 10 Z" fill="#fff" transform="rotate(' + headingDeg + ' 12 12)"/>'
-                                + '</svg>';
+  + '<circle cx="12" cy="12" r="10" fill="#222" stroke="#fff" stroke-width="2"/>'
+  + '<line x1="12" y1="2.71" x2="12" y2="12" stroke="#fff" stroke-width="1" transform="rotate(' + headingDeg + ' 12 12)"/>'
+  + '<path d="M12 2.5 L15 8.5 L12 6.5 L9 8.5 Z" fill="#fff" transform="rotate(' + headingDeg + ' 12 12)"/>'
+  + '</svg>';
                             var headMarker = new Feature({ geometry: new Point(oldPos) });
                             headMarker.setStyle([
                                 new Style({
