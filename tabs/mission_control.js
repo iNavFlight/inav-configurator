@@ -1664,22 +1664,18 @@ function iconKey(filename) {
             else if (element.isAttached()) {
                 if (element.getAction() == MWNP.WPTYPE.RTH && typeof oldPos !== 'undefined') {
                     // RTH marker
-                    var markerOpacity = 0.60;
+                    // RTH marker as SVG
+                    var markerOpacity = 0.85;
+                    var rthSvg = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" opacity="' + markerOpacity + '">' +
+                        '<circle cx="12" cy="12" r="10" fill="#00c850" stroke="#fff" stroke-width="2"/>' +
+                        '<text x="12" y="15" text-anchor="middle" font-size="7" font-family="sans-serif" font-weight="bold" fill="#fff">RTH</text>' +
+                        '</svg>';
                     var rthMarker = new Feature({ geometry: new Point(oldPos) });
                     rthMarker.setStyle(new Style({
-                        image: new RegularShape({
-                            fill: new Fill({ color: 'rgba(0, 200, 80, ' + markerOpacity + ')' }),
-                            stroke: new Stroke({ color: 'rgba(255, 255, 255, ' + markerOpacity + ')', width: 2 }),
-                            points: 32,
-                            radius: 10,
+                        image: new Icon({
+                            src: 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(rthSvg),
+                            scale: 1,
                             displacement: [MARKER_ICON_OFFSET_X, -MARKER_ICON_OFFSET_Y],
-                        }),
-                        text: new Text({
-                            text: 'RTH',
-                            font: 'bold 8px sans-serif',
-                            offsetX: MARKER_ICON_OFFSET_X,
-                            offsetY: MARKER_ICON_OFFSET_Y,
-                            fill: new Fill({ color: '#fff' }),
                         }),
                     }));
                     var rthSource = new VectorSource({ features: [rthMarker] });
@@ -1710,7 +1706,7 @@ function iconKey(filename) {
                         if (typeof oldPos !== 'undefined') {
                             var headingDeg = element.getP1();
                             // SVG: circle stays fixed, arrow rotates around center via SVG transform
-                            var markerOpacity = 0.60;
+                            var markerOpacity = 0.85;
 
                             var arrowSvg = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" opacity="' + markerOpacity + '">'
                             + '<circle cx="12" cy="12" r="10" fill="#222" stroke="#fff" stroke-width="2"/>'
