@@ -1610,7 +1610,7 @@ function iconKey(filename) {
     }
 
     // Vertical pixel offset to push RTH/heading markers below the WP pin (increase to move further down)
-    var MARKER_ICON_OFFSET_Y = 10;
+    var MARKER_ICON_OFFSET_Y = 11;
     var MARKER_ICON_OFFSET_X = -2;  // Match WP pin text offsetX
 
     function repaintLine4Waypoints(mission) {
@@ -1663,19 +1663,20 @@ function iconKey(filename) {
             }
             else if (element.isAttached()) {
                 if (element.getAction() == MWNP.WPTYPE.RTH && typeof oldPos !== 'undefined') {
-                    // Green RTH marker at the last waypoint position
+                    // RTH marker
+                    var markerOpacity = 0.60;
                     var rthMarker = new Feature({ geometry: new Point(oldPos) });
                     rthMarker.setStyle(new Style({
                         image: new RegularShape({
-                            fill: new Fill({ color: '#00c850' }),
-                            stroke: new Stroke({ color: '#fff', width: 2 }),
+                            fill: new Fill({ color: 'rgba(0, 200, 80, ' + markerOpacity + ')' }),
+                            stroke: new Stroke({ color: 'rgba(255, 255, 255, ' + markerOpacity + ')', width: 2 }),
                             points: 32,
                             radius: 10,
                             displacement: [MARKER_ICON_OFFSET_X, -MARKER_ICON_OFFSET_Y],
                         }),
                         text: new Text({
                             text: 'RTH',
-                            font: 'bold 9px sans-serif',
+                            font: 'bold 8px sans-serif',
                             offsetX: MARKER_ICON_OFFSET_X,
                             offsetY: MARKER_ICON_OFFSET_Y,
                             fill: new Fill({ color: '#fff' }),
@@ -1709,11 +1710,14 @@ function iconKey(filename) {
                         if (typeof oldPos !== 'undefined') {
                             var headingDeg = element.getP1();
                             // SVG: circle stays fixed, arrow rotates around center via SVG transform
-                            var arrowSvg = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">'
-  + '<circle cx="12" cy="12" r="10" fill="#222" stroke="#fff" stroke-width="2"/>'
-  + '<line x1="12" y1="2.71" x2="12" y2="12" stroke="#fff" stroke-width="1" transform="rotate(' + headingDeg + ' 12 12)"/>'
-  + '<path d="M12 2.5 L15 8.5 L12 6.5 L9 8.5 Z" fill="#fff" transform="rotate(' + headingDeg + ' 12 12)"/>'
-  + '</svg>';
+                            var markerOpacity = 0.60;
+
+                            var arrowSvg = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" opacity="' + markerOpacity + '">'
+                            + '<circle cx="12" cy="12" r="10" fill="#222" stroke="#fff" stroke-width="2"/>'
+                            + '<line x1="12" y1="2.71" x2="12" y2="12" stroke="#fff" stroke-width="1" transform="rotate(' + headingDeg + ' 12 12)"/>'
+                            + '<path d="M12 2.5 L15 8.5 L12 6.5 L9 8.5 Z" fill="#fff" transform="rotate(' + headingDeg + ' 12 12)"/>'
+                            + '<circle cx="12" cy="12" r="0.9" fill="#fff"/>'
+                            + '</svg>';
                             var headMarker = new Feature({ geometry: new Point(oldPos) });
                             headMarker.setStyle([
                                 new Style({
