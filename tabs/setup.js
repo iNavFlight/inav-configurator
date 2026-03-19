@@ -150,6 +150,8 @@ TABS.setup.initialize = function (callback) {
                     gpsLat_e.text((FC.GPS_DATA.lat / 10000000).toFixed(4) + ' deg');
                     gpsLon_e.text((FC.GPS_DATA.lon / 10000000).toFixed(4) + ' deg');
                 });
+            } else {
+                gpsFix_e.html(i18n.getMessage('gpsFixNotConnected'));
             }
         }
 

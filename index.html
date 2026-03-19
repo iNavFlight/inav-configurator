@@ -87,7 +87,7 @@
                         <div class="dropdown dropdown-dark">
                             <form name="profile-change" id="profile-change">
                                 <!--suppress HtmlFormInputWithoutLabel -->
-                                <select class="dropdown-select" id="profilechange">
+                                <select class="dropdown-select" id="profilechange" data-i18n_title="sensorProfileTitle">
                                     <option value="0" i18n="sensorProfile1"></option>
                                     <option value="1" i18n="sensorProfile2"></option>
                                     <option value="2" i18n="sensorProfile3"></option>
@@ -98,7 +98,7 @@
                     <div id="mixer_profile_change">
                         <div class="dropdown  dropdown-dark">
                             <form name="mixer-profile-change" id="mixer-profile-change">
-                                <select class="dropdown-select" id="mixerprofilechange">
+                                <select class="dropdown-select" id="mixerprofilechange" data-i18n_title="mixerProfileTitle">
                                 <option value="0" i18n="mixerProfile1"></option>
                                 <option value="1" i18n="mixerProfile2"></option>
                                 </select>
@@ -109,7 +109,7 @@
                         <div class="dropdown dropdown-dark">
                             <form name="battery-profile-change" id="battery-profile-change">
                                 <!--suppress HtmlFormInputWithoutLabel -->
-                                <select class="dropdown-select" id="batteryprofilechange">
+                                <select class="dropdown-select" id="batteryprofilechange" data-i18n_title="sensorBatteryProfileTitle">
                                     <option value="0" i18n="sensorBatteryProfile1"></option>
                                     <option value="1" i18n="sensorBatteryProfile2"></option>
                                     <option value="2" i18n="sensorBatteryProfile3"></option>
@@ -120,10 +120,9 @@
                 </div>
                 <div id="dataflash_wrapper_global">
                     <div class="noflash_global" align="center" i18n="sensorDataFlashNotFound"></div>
+                    <div class="dataflash-free_global_label" i18n="sensorDataFlashFreeSpace"></div>
                     <ul class="dataflash-contents_global">
-                        <li class="dataflash-free_global">
-                            <div class="legend" i18n="sensorDataFlashFreeSpace"></div>
-                        </li>
+                        <li class="dataflash-free_global"></li>
                     </ul>
                 </div>
                 <div id="sensor-status" class="sensor_state mode-connected">
@@ -161,6 +160,7 @@
                             <div class="battery-status"></div>
                         </div>
                     </div>
+                    <div class="battery-label">Batt</div>
                     <div class="battery-legend" i18n="sensorBatteryVoltage"></div>
                     <div class="bottomStatusIcons">
                         <div id="armedIcon" class="statusicon armed cf_tip" data-i18n_title="mainHelpArmed"></div>
