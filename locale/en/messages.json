@@ -47,6 +47,12 @@
     "options_cliAutocomplete": {
         "message": "Advanced CLI AutoComplete"
     },
+    "navExpandAll": {
+        "message": "Expand All"
+    },
+    "navCollapseAll": {
+        "message": "Collapse All"
+    },
     "options_unit_type": {
         "message": "Set how the units render on the configurator only"
     },
@@ -118,6 +124,30 @@
     },
     "tabHelp": {
         "message": "Documentation & Support"
+    },
+    "navGroupSetup": {
+        "message": "Setup & Configuration"
+    },
+    "navGroupFlight": {
+        "message": "Flight Control"
+    },
+    "navGroupTuning": {
+        "message": "Tuning"
+    },
+    "navGroupNavigation": {
+        "message": "Navigation & Mission"
+    },
+    "navGroupSensors": {
+        "message": "Sensors & Peripherals"
+    },
+    "navGroupLogging": {
+        "message": "Data Logging"
+    },
+    "navGroupProgramming": {
+        "message": "Programming"
+    },
+    "navGroupTools": {
+        "message": "Tools"
     },
     "tabSetup": {
         "message": "Status"
@@ -1208,6 +1238,24 @@
     },
     "configurationGPSUseGlonass": {
         "message": "Gps use Glonass Satellites (RU)"
+    },
+    "gpsPresetMode": {
+        "message": "GPS Configuration Preset"
+    },
+    "gpsPresetModeHelp": {
+        "message": "Choose a preset optimized for your GPS module, or use Manual for custom configuration. Auto-detect will identify your GPS module if connected."
+    },
+    "gpsUpdateRate": {
+        "message": "GPS Update Rate (Hz)"
+    },
+    "gpsUpdateRateHelp": {
+        "message": "How often the GPS module sends position updates. Higher rates provide lower latency but may reduce accuracy with multiple constellations on M10 modules."
+    },
+    "gpsAutoDetectFailed": {
+        "message": "Could not auto-detect GPS module. Please connect flight controller or select manual preset."
+    },
+    "gpsAutoDetectSuccess": {
+        "message": "GPS module detected:"
     },
     "tzOffset": {
         "message": "Timezone Offset"

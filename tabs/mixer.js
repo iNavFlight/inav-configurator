@@ -131,6 +131,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
                                 '<option value=' + FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_MOTORS + '' + (usageMode == FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_MOTORS ? ' selected' : '')+ '>MOTORS</option>'+
                                 '<option value=' + FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_SERVOS + '' + (usageMode == FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_SERVOS ? ' selected' : '')+ '>SERVOS</option>'+
                                 '<option value=' + FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_LED + '' + (usageMode == FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_LED ? ' selected' : '')+ '>LED</option>'+
+                                '<option value=' + FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_PINIO + '' + (usageMode == FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_PINIO ? ' selected' : '')+ '>PINIO / DUTY CYCLE</option>'+
                             '</select>' +
                             '<label for="timer-output-' + t + '">' +
                                 '<span> Timer ' + (parseInt(t) + 1) + '</span>' +
