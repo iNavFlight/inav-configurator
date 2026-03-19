@@ -49,6 +49,20 @@ TABS.led_strip.initialize = function (callback, scrollPosition) {
     load_led_config();
 
 
+    function isLedSlotConfigured(led) {
+        if (!led) return false;
+        // Normalize functions and directions to strings — they are arrays in MSP-received data,
+        // strings in UI/preset data.
+        var fnStr = Array.isArray(led.functions) ? led.functions.join('') : (led.functions || '');
+        var dirStr = Array.isArray(led.directions) ? led.directions.join('') : (led.directions || '');
+        if (led.x === 0 && led.y === 0 && dirStr === '') {
+            if (fnStr === '') return false;                       // UI/preset empty slot
+            if (fnStr === 'c' && led.color == 0) return false;  // MSP empty slot (Color-only, no overlays)
+            // Note: loose == for color because DOM parsing yields a string ("0") while MSP yields a number (0)
+        }
+        return true;
+    }
+
     function buildUsedWireNumbers() {
         var usedWireNumbers = [];
         $('.mainGrid .gPoint .wire').each(function () {
@@ -90,7 +104,7 @@ TABS.led_strip.initialize = function (callback, scrollPosition) {
         // Re-populate from FC.LED_STRIP
         for (var ledIndex = 0; ledIndex < FC.LED_STRIP.length; ledIndex++) {
             var led = FC.LED_STRIP[ledIndex];
-            if (!led || (led.functions === '' && led.directions === '' && led.x === 0 && led.y === 0)) continue;
+            if (!isLedSlotConfigured(led)) continue;
 
             var gridIndex = led.y * 16 + led.x;
             var cell = $('.gPoint').eq(gridIndex);
@@ -198,6 +212,11 @@ TABS.led_strip.initialize = function (callback, scrollPosition) {
     }
 
     function process_html() {
+
+        var initialConfiguredSlots = new Set();
+        for (var i = 0; i < FC.LED_STRIP.length; i++) {
+            if (isLedSlotConfigured(FC.LED_STRIP[i])) initialConfiguredSlots.add(i);
+        }
 
        i18n.localize();;
 
@@ -730,7 +749,7 @@ TABS.led_strip.initialize = function (callback, scrollPosition) {
             var ledIndex = ledResult.index;
             var led = ledResult.led;
 
-            if (led.functions[0] == 'c' && led.functions.length == 1 && led.directions.length == 0 && led.color == 0 && led.x == 0 && led.y == 0) {
+            if (!isLedSlotConfigured(led)) {
                 return;
             }
 
@@ -750,7 +769,13 @@ TABS.led_strip.initialize = function (callback, scrollPosition) {
 
         $('a.save').on('click', function () {
 
-            mspHelper.sendLedStripConfig(send_led_strip_colors);
+            var currentConfiguredSlots = new Set();
+            for (var i = 0; i < FC.LED_STRIP.length; i++) {
+                if (isLedSlotConfigured(FC.LED_STRIP[i])) currentConfiguredSlots.add(i);
+            }
+            var slotsToSend = new Set([...initialConfiguredSlots, ...currentConfiguredSlots]);
+
+            mspHelper.sendLedStripConfig(send_led_strip_colors, slotsToSend);
 
             function send_led_strip_colors() {
                 mspHelper.sendLedStripColors(send_led_strip_mode_colors);
