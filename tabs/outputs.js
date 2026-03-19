@@ -16,14 +16,12 @@ import interval from './../js/intervals';
 
 TABS.outputs = {
     allowTestMode: false,
-    feature3DEnabled: false,
-    feature3DSupported: false
+    feature3DEnabled: false
 };
 TABS.outputs.initialize = function (callback) {
     var self = this;
 
     self.armed = false;
-    self.feature3DSupported = false;
     self.allowTestMode = true;
 
     var $motorsEnableTestMode;
@@ -402,10 +400,6 @@ TABS.outputs.initialize = function (callback) {
     function process_motors() {
         $motorsEnableTestMode = $('#motorsEnableTestMode');
 
-        if (self.feature3DEnabled && !self.feature3DSupported) {
-            self.allowTestMode = false;
-        }
-
         $motorsEnableTestMode.prop('checked', false);
         $motorsEnableTestMode.prop('disabled', true);
 
@@ -526,10 +520,9 @@ TABS.outputs.initialize = function (callback) {
         $slidersInput.prop('max', FC.MISC.maxthrottle);
         $('div.values li:not(:last)').text(FC.MISC.mincommand);
 
-        if (self.feature3DEnabled && self.feature3DSupported) {
-            //Arbitrary sanity checks
-            //Note: values may need to be revisited
-            if (FC.REVERSIBLE_MOTORS.neutral > 1575 || FC.EVERSIBLE_MOTORS.neutral < 1425)
+        if (self.feature3DEnabled) {
+            // Clamp neutral to safe range around midpoint (1500us); values outside indicate corrupt config
+            if (FC.REVERSIBLE_MOTORS.neutral > 1575 || FC.REVERSIBLE_MOTORS.neutral < 1425)
                 FC.REVERSIBLE_MOTORS.neutral = 1500;
 
             $slidersInput.val(FC.REVERSIBLE_MOTORS.neutral);
@@ -590,7 +583,7 @@ TABS.outputs.initialize = function (callback) {
                 $slidersInput.prop('disabled', true);
 
                 // change all values to default
-                if (self.feature3DEnabled && self.feature3DSupported) {
+                if (self.feature3DEnabled) {
                     $slidersInput.val(FC.REVERSIBLE_MOTORS.neutral);
                 } else {
                     $slidersInput.val(FC.MISC.mincommand);
