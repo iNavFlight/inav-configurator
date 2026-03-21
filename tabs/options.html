@@ -1,7 +1,8 @@
 <div class="content_wrapper">
+    <div id="optionsClose">X</div>
     <div class="tab_title"><span data-i18n="options_title"></span>
     </div>
-
+    
     <div class="Wrapper">
         <div class="options-section gui_box grey">
 
@@ -16,6 +17,10 @@
                     <label for="improveConfigurator"><span data-i18n="options_improve_configurator"></span></label>
                 </div>
                 -->
+                <div class="checkbox disable_3d_acceleration">
+                    <input id="disable3dAcceleration" type="checkbox" />
+                    <label for="disable3dAcceleration"><span data-i18n="options_disable3dAcceleration"></span></label>
+                </div>
                 <div class="checkbox show_profile_parameters">
                     <input id="showProfileParameters" type="checkbox" />
                     <label for="showProfileParameters"><span data-i18n="options_showProfileParameters"></span></label>
@@ -39,17 +44,11 @@
                 <div class="select">                    
                     <select id="map-provider-type">
                         <option value="osm">OpenStreetMap</option>
-                        <option value="bing">Bing Maps</option>
+                        <option value="esri">Esri World Imagery</option>
                         <option value="mapproxy">MapProxy</option>
                     </select>       
                     <label for="map-provider-type" data-i18n="mapProvider"></label>             
                 </div>
-
-                <div class="number">
-                    <input type="password" id="map-api-key" style="border: solid 1px black" />                
-                    <label for="map-api-key" data-i18n="mapApiKey"></label>                    
-                </div>
-
                 <div class="number">                    
                     <input type="text" id="proxyurl" style="border: solid 1px black" />
                     <label for="proxyurl" data-i18n="proxyURL"></label>

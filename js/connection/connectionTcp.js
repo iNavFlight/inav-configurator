@@ -1,27 +1,73 @@
 'use strict'
 
-const net = require('net')
-
-const { GUI } = require('./../gui');
-const  { ConnectionType, Connection } = require('./connection')
-const i18n = require('./../localization');
+import { GUI } from './../gui';
+import  { ConnectionType, Connection } from './connection';
+import i18n from './../localization';
 
 const STANDARD_TCP_PORT = 5761;
 
 class ConnectionTcp extends Connection {
-    
     constructor() {
         super();
-        
-        this._socket = null;
-        this._connectionIP =  "";
-        this.connectionPort =  0;
+
+        this._connectionIP = "";
+        this.connectionPort = 0;
         this._onReceiveListeners = [];
         this._onErrorListener = [];
         super._type = ConnectionType.TCP;
+
+        this._ipcDataHandler = null;
+        this._ipcEndHandler = null;
+        this._ipcErrorHandler = null;
     }
 
-    connectImplementation(address, options, callback) {     
+    registerIpcListeners() {
+        if (this._ipcDataHandler) {
+            return; // Already registered
+        }
+
+        this._ipcDataHandler = window.electronAPI.onTcpData(buffer => {
+            this._onReceiveListeners.forEach(listener => {
+                listener({
+                    connectionId: this._connectionId,
+                    data: buffer
+                });
+            });
+        });
+
+        this._ipcEndHandler = window.electronAPI.onTcpEnd(() => {
+            console.log("TCP Remote has closed the connection");
+            this.abort();
+        });
+
+        this._ipcErrorHandler = window.electronAPI.onTcpError(error => {
+            GUI.log(error);
+            console.log(error);
+            this.abort();
+            this._onReceiveErrorListeners.forEach(listener => {
+                listener(error);
+            });
+        });
+    }
+
+    removeIpcListeners() {
+        if (this._ipcDataHandler) {
+            window.electronAPI.offTcpData(this._ipcDataHandler);
+            this._ipcDataHandler = null;
+        }
+        if (this._ipcEndHandler) {
+            window.electronAPI.offTcpEnd(this._ipcEndHandler);
+            this._ipcEndHandler = null;
+        }
+        if (this._ipcErrorHandler) {
+            window.electronAPI.offTcpError(this._ipcErrorHandler);
+            this._ipcErrorHandler = null;
+        }
+    }
+
+    connectImplementation(address, options, callback) {
+        this.registerIpcListeners();
+
         var addr = address.split(':');
         if (addr.length >= 2) {
             this._connectionIP = addr[0];
@@ -31,87 +77,65 @@ class ConnectionTcp extends Connection {
             this._connectionPort = STANDARD_TCP_PORT;
         } 
 
-        try {
-            this._socket = net.connect({ host: this._connectionIP, port: this._connectionPort }, () => {
-                this._socket.setNoDelay(true);
+        window.electronAPI.tcpConnect(this._connectionIP, this._connectionPort).then(response => {
+            if (!response.error) {
                 GUI.log(i18n.getMessage('connectionConnected', ["tcp://" + this._connectionIP + ":" + this._connectionPort]));
-                
+                this._connectionId = response.id;
                 if (callback) {
                     callback({
                         bitrate: 115200,
-                        connectionId: ++this._connectionId
+                        connectionId: this._connectionId
                     });
+                } 
+            } else {
+                console.log("TCP error " + response.errorMsg);
+                if (callback) {
+                    callback(false);
                 }
-
-            });
-        } catch (error) {
-            console.log(error);
-            callback(false);
-        }
-
-        this._socket.on('data', buffer => {
-            this._onReceiveListeners.forEach(listener => {
-                listener({
-                    connectionId: this._connectionId,
-                    data: buffer
-                });
-            });
-        })
-
-        this._socket.on('end', () => {
-            console.log("TCP Remote has closed the connection");
-            if (this._socket) {
-                this.abort();
             }
-        });
-
-        this._socket.on('error', (error) => {
-            GUI.log(error);
-            console.log(error);
-            
-            if (this._socket) {
-                this.abort();
-            }               
-            this._onReceiveErrorListeners.forEach(listener => {
-                listener(error);    
-            });
         });
     }
 
     disconnectImplementation(callback) {
         
-        if (this._socket && !this._socket.destroyed) {
-            this._socket.end();
+        if (this._connectionId) {
+            window.electronAPI.tcpClose();
         }
 
         this._connectionIP = "";
         this._connectionPort = 0;
-        this._socket = null;
 
        if (callback) {
            callback(true);
        }
     }
 
-   sendImplementation(data, callback) {;
-        if (this._socket && !this._socket.destroyed) {
-            this._socket.write(Buffer.from(data), () => {
+   sendImplementation(data, callback) {     
+        if (this._connectionId) {
+            window.electronAPI.tcpSend(data).then(response => {
+                var result = 0;
+                var sent = response.bytesWritten;
+                if (response.error) {
+                    console.log("Serial write error: " + response.msg);
+                    result = 1;
+                    sent = 0;
+                }
                 if (callback) {
                     callback({
-                        bytesSent: data.byteLength,
-                        resultCode: 0
+                        bytesSent: sent,
+                        resultCode: result
                     });
                 }
-            })
+            });
         }
-   }
+    }
 
     addOnReceiveCallback(callback){
-        this._onReceiveErrorListeners.push(callback);
+        this._onReceiveListeners.push(callback);
     }
 
     removeOnReceiveCallback(callback){
-        this._onReceiveListeners = this._onReceiveErrorListeners.filter(listener => listener !== callback);
+        this._onReceiveListeners = this._onReceiveListeners.filter(listener => listener !== callback);
     }
 
     addOnReceiveErrorCallback(callback) {
@@ -123,4 +147,4 @@ class ConnectionTcp extends Connection {
     }
 }
 
-module.exports = ConnectionTcp;
+export default ConnectionTcp;

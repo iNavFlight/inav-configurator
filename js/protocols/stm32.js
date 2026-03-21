@@ -7,13 +7,13 @@
 */
 'use strict';
 
-const CONFIGURATOR = require('./../data_storage');
-const { GUI } = require('./../gui');
-const interval = require('./../intervals');
-const { usbDevices, PortHandler } = require('./../port_handler');
-const ConnectionSerial = require('./../connection/connectionSerial');
-const STM32DFU = require('./stm32usbdfu');
-const i18n = require('./../localization');
+import CONFIGURATOR from './../data_storage';
+import { GUI }from './../gui';
+import interval from './../intervals';
+import { usbDevices, PortHandler } from './../port_handler';
+import ConnectionSerial from './../connection/connectionSerial';
+import STM32DFU from './stm32usbdfu';
+import i18n from './../localization';
 
 var STM32_protocol = function () {
     this.baud;
@@ -57,6 +57,180 @@ var STM32_protocol = function () {
     this.useExtendedErase = false;
 };
 
+// Polls for reboot completion by checking for DFU device or serial port
+STM32_protocol.prototype.pollForRebootCompletion = function(port, hex, options, onSuccess, onTimeout) {
+    var self = this;
+    var intervalMs = 250;
+    var retries = 0;
+    var maxRetries = 40; // timeout after intervalMs * 40 (10 seconds)
+    var portAbsentCount = 0; // Count how many times the port has been absent
+    var portAbsentThreshold = 8; // Require port to be absent this many times (2 seconds) before trying to connect
+    var connectingInProgress = false;
+    var pollInterval = null;
+
+    pollInterval = setInterval(function() {
+        retries++;
+        if (retries > maxRetries) {
+            clearInterval(pollInterval);
+            onTimeout();
+            return;
+        }
+
+        // Don't start new operations if we're already trying to connect
+        if (connectingInProgress) {
+            return;
+        }
+
+        // Check for DFU devices first (preferred path for STM32 with DFU bootloader)
+        PortHandler.check_usb_devices(function(dfu_available) {
+            if (dfu_available) {
+                console.log('DFU device detected');
+                clearInterval(pollInterval);
+                STM32DFU.connect(usbDevices, hex, options);
+                return;
+            }
+
+            // Check for serial port
+            ConnectionSerial.getDevices().then(function(devices) {
+                if (devices && devices.includes(port)) {
+                    // Port is present
+                    // Only attempt connection if port was absent for a while (device has fully rebooted)
+                    // This prevents connecting during USB re-enumeration when device is transitioning to DFU
+                    if (portAbsentCount >= portAbsentThreshold) {
+                        console.log('Port ' + port + ' reappeared after being absent, attempting connection...');
+                        connectingInProgress = true;
+                        clearInterval(pollInterval);
+
+                        // Extra delay to let the serial port fully stabilize
+                        setTimeout(function() {
+                            CONFIGURATOR.connection.connect(port, {bitrate: self.baud, parityBit: 'even', stopBits: 'one'}, function (openInfo) {
+                                if (openInfo) {
+                                    console.log('Serial bootloader connection successful');
+                                    onSuccess();
+                                } else {
+                                    console.log('Serial bootloader connection failed');
+                                    GUI.connect_lock = false;
+                                    onTimeout();
+                                }
+                            });
+                        }, 500);
+                    } else {
+                        console.log('Port ' + port + ' present but waiting for reboot cycle (absent count: ' + portAbsentCount + '/' + portAbsentThreshold + ')');
+                    }
+                } else {
+                    // Port is absent - device is rebooting
+                    portAbsentCount++;
+                    if (portAbsentCount <= portAbsentThreshold) {
+                        console.log('Port ' + port + ' absent (' + portAbsentCount + '/' + portAbsentThreshold + ')');
+                    }
+                }
+            }).catch(function(err) {
+                console.log('Error checking serial devices:', err);
+            });
+        });
+    }, intervalMs);
+};
+
+ // Waits for a specific response from the serial connection with timeout
+STM32_protocol.prototype.waitForResponse = function(expectedString, timeoutMs, callback) {
+    var receivedData = '';
+    var timeoutHandle = null;
+    var onReceiveListener = null;
+    var callbackFired = false;
+
+    var cleanup = function() {
+        if (timeoutHandle) {
+            clearTimeout(timeoutHandle);
+            timeoutHandle = null;
+        }
+        if (onReceiveListener) {
+            CONFIGURATOR.connection.removeOnReceiveCallback(onReceiveListener);
+            onReceiveListener = null;
+        }
+    };
+
+    // Set up timeout
+    timeoutHandle = setTimeout(function() {
+        if (callbackFired) return;
+        callbackFired = true;
+        cleanup();
+        console.log('Timeout waiting for response:', expectedString);
+        callback(false, receivedData);
+    }, timeoutMs);
+
+    // Set up receive listener
+    onReceiveListener = function(info) {
+        if (callbackFired) return;
+        var data = new Uint8Array(info.data);
+        var str = String.fromCharCode.apply(null, data);
+        receivedData += str;
+
+        // Check if we received the expected string
+        if (receivedData.includes(expectedString)) {
+            callbackFired = true;
+            cleanup();
+            callback(true, receivedData);
+        }
+    };
+
+    CONFIGURATOR.connection.addOnReceiveCallback(onReceiveListener);
+};
+
+/**
+ * Sends reboot command to enter DFU mode using new CLI-based protocol
+ * Protocol: Send '#' -> Wait for CLI prompt -> Send 'dfu\r\n' -> Disconnect
+ * @param {function} callback - Called after command sequence completes with (success)
+ */
+STM32_protocol.prototype.sendRebootCommand = function(callback) {
+    var self = this;
+    var responseWaiter = null; // Store reference to cleanup later
+
+    console.log('Entering CLI to send DFU command');
+
+    var cleanupAndDisconnect = function(success) {
+        CONFIGURATOR.connection.disconnect(function(result) {
+            callback(success);
+        });
+    };
+
+    // Step 1: Set up response listener before sending # (to avoid missing the response)
+    self.waitForResponse('CLI', 2000, function(success, receivedData) {
+        if (!success) {
+            console.log('Failed to enter CLI mode, timeout waiting for prompt');
+            console.log('Received data:', receivedData);
+            cleanupAndDisconnect(false);
+            return;
+        }
+
+        console.log('CLI mode entered, sending dfu command');
+
+        // Step 3: Send 'dfu\r\n' command
+        var dfuCommandStr = 'dfu\r\n';
+        var dfuBuffer = new ArrayBuffer(dfuCommandStr.length);
+        var dfuView = new Uint8Array(dfuBuffer);
+        for (var i = 0; i < dfuCommandStr.length; i++) {
+            dfuView[i] = dfuCommandStr.charCodeAt(i);
+        }
+
+        CONFIGURATOR.connection.send(dfuBuffer, function() {
+            console.log('DFU command sent, disconnecting');
+            cleanupAndDisconnect(true);
+        });
+    });
+
+    // Step 2: Send '####\r\n' to enter CLI (listener is already set up above)
+    var cliEnterStr = '####\r\n';
+    var cliEnterBuffer = new ArrayBuffer(cliEnterStr.length);
+    var cliEnterView = new Uint8Array(cliEnterBuffer);
+    for (var i = 0; i < cliEnterStr.length; i++) {
+        cliEnterView[i] = cliEnterStr.charCodeAt(i);
+    }
+
+    CONFIGURATOR.connection.send(cliEnterBuffer, function() {
+        console.log('Sent #### to enter CLI, waiting for prompt...');
+    });
+};
+
 // no input parameters
 STM32_protocol.prototype.connect = function (port, baud, hex, options, callback) {
     var self = this;
@@ -81,6 +255,24 @@ STM32_protocol.prototype.connect = function (port, baud, hex, options, callback)
         self.options.erase_chip = true;
     }
 
+    // Check if device is already in DFU mode before attempting serial connection
+    PortHandler.check_usb_devices(function(dfu_available) {
+        if (dfu_available) {
+            console.log('Device already in DFU mode, connecting directly');
+            GUI.connect_lock = true;
+            STM32DFU.connect(usbDevices, hex, options);
+            return;
+        }
+
+        // Device not in DFU mode, proceed with normal flow
+        self.connectSerial(port, hex, options);
+    });
+};
+
+// Internal method to handle serial connection flow
+STM32_protocol.prototype.connectSerial = function(port, hex, options) {
+    var self = this;
+
     if (self.options.no_reboot) {
         CONFIGURATOR.connection.connect(port, {bitrate: self.baud, parityBit: 'even', stopBits: 'one'}, function (openInfo) {
             if (openInfo) {
@@ -93,68 +285,37 @@ STM32_protocol.prototype.connect = function (port, baud, hex, options, callback)
             }
         });
     } else {
+        // Need to send reboot command to enter DFU/bootloader
         CONFIGURATOR.connection.connect(port, {bitrate: self.options.reboot_baud}, function (openInfo) {
-            if (openInfo) {
-                console.log('Sending ascii "R" to reboot');
-
-                // we are connected, disabling connect button in the UI
-                GUI.connect_lock = true;
-
-                var bufferOut = new ArrayBuffer(1);
-                var bufferView = new Uint8Array(bufferOut);
-
-                bufferView[0] = 0x52;
-
-                CONFIGURATOR.connection.send(bufferOut, function () {
-                    CONFIGURATOR.connection.disconnect(function (result) {
-                        if (result) {
-                            var intervalMs = 200;
-                            var retries = 0;
-                            var maxRetries = 50; // timeout after intervalMs * 50
-                            var interval = setInterval(function() {
-                                var tryFailed = function() {
-                                    retries++;
-                                    if (retries > maxRetries) {
-                                        clearInterval(interval);
-                                            GUI.log(i18n.getMessage('failedToFlash') + port);
-                                    }
-                                }
-                                // Check for DFU devices
-                                PortHandler.check_usb_devices(function(dfu_available) {
-                                    if (dfu_available) {
-                                        clearInterval(interval);
-                                        STM32DFU.connect(usbDevices, hex, options);
-                                        return;
-                                    }
-                                    // Check for the serial port
-                                    ConnectionSerial.getDevices(function(devices) {
-                                        if (devices && devices.includes(port)) {
-                                            // Serial port might briefly reappear on DFU devices while
-                                            // the FC is rebooting, so we don't clear the interval
-                                            // until we succesfully connect.
-                                            CONFIGURATOR.connection.connect(port, {bitrate: self.baud, parityBit: 'even', stopBits: 'one'}, function (openInfo) {
-                                                if (openInfo) {
-                                                    clearInterval(interval);
-                                                    self.initialize();
-                                                } else {
-                                                    GUI.connect_lock = false;
-                                                    tryFailed();
-                                                }
-                                            });
-                                            return;
-                                        }
-                                        tryFailed();
-                                    });
-                                });
-                            }, intervalMs);
-                        } else {
-                            GUI.connect_lock = false;
-                        }
-                    });
-                });
-            } else {
+            if (!openInfo) {
                 GUI.log(i18n.getMessage('failedToOpenSerialPort'));
+                return;
             }
+
+            // Connected - lock UI and send reboot command
+            GUI.connect_lock = true;
+
+            self.sendRebootCommand(function(disconnectResult) {
+                if (!disconnectResult) {
+                    GUI.connect_lock = false;
+                    return;
+                }
+
+                // Poll for device to reboot and reappear
+                self.pollForRebootCompletion(
+                    port,
+                    hex,
+                    options,
+                    function onSuccess() {
+                        // Device reconnected via serial
+                        self.initialize();
+                    },
+                    function onTimeout() {
+                        // Polling timed out
+                        GUI.log(i18n.getMessage('failedToFlash') + port);
+                    }
+                );
+            });
         });
     }
 };
@@ -799,4 +960,4 @@ STM32_protocol.prototype.upload_procedure = function (step) {
 // initialize object
 var STM32 = new STM32_protocol();
 
-module.exports = STM32;
+export default STM32;

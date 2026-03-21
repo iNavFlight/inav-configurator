@@ -1,32 +1,31 @@
 'use strict';
 
-const semver = require('semver');
-const Store = require('electron-store');
-const store = new Store();
+import semver from 'semver';
 
-const { GUI, TABS } = require('./gui');
-const MSP = require('./msp');
-const FC = require('./fc');
-const MSPCodes = require('./msp/MSPCodes');
-const mspHelper = require('./msp/MSPHelper');
-const { ConnectionType, Connection } = require('./connection/connection');
-const connectionFactory = require('./connection/connectionFactory');
-const CONFIGURATOR = require('./data_storage');
-const  { PortHandler } = require('./port_handler');
-const i18n = require('./../js/localization');
-const interval = require('./intervals');
-const periodicStatusUpdater = require('./periodicStatusUpdater');
-const mspQueue = require('./serial_queue');
-const timeout = require('./timeouts');
-const defaultsDialog = require('./defaults_dialog');
-const { SITLProcess } = require('./sitl');
-const update = require('./globalUpdates');
-const BitHelper = require('./bitHelper');
-const BOARD = require('./boards');
-const jBox = require('./libraries/jBox/jBox.min');
-const groundstation = require('./groundstation');
-const ltmDecoder = require('./ltmDecoder');
-const mspDeduplicationQueue = require('./msp/mspDeduplicationQueue');
+import { GUI, TABS } from './gui';
+import MSP from './msp';
+import FC from './fc';
+import MSPCodes from './msp/MSPCodes';
+import mspHelper from './msp/MSPHelper';
+import { ConnectionType, Connection } from './connection/connection';
+import connectionFactory from './connection/connectionFactory';
+import CONFIGURATOR from './data_storage';
+import  { PortHandler } from './port_handler';
+import i18n from './../js/localization';
+import interval from './intervals';
+import periodicStatusUpdater from './periodicStatusUpdater';
+import mspQueue from './serial_queue';
+import timeout from './timeouts';
+import defaultsDialog from './defaults_dialog';
+import { SITLProcess } from './sitl';
+import update from './globalUpdates';
+import BitHelper from './bitHelper';
+import BOARD from './boards';
+import jBox from 'jbox';
+import groundstation from './groundstation';
+import ltmDecoder from './ltmDecoder';
+import mspDeduplicationQueue from './msp/mspDeduplicationQueue';
+import store from './store';
 
 var SerialBackend = (function () {
 
@@ -154,9 +153,8 @@ var SerialBackend = (function () {
         publicScope.$portOverride.on('change', function () {
             store.set('portOverride', publicScope.$portOverride.val());
         });
-
-        publicScope.$portOverride.val(store.get('portOverride', ''));
         
+        publicScope.$portOverride.val(store.get('portOverride', ''));        
 
         privateScope.$port.on('change', function (target) {
             GUI.updateManualPortVisibility();
@@ -193,10 +191,8 @@ var SerialBackend = (function () {
                         } else if (selected_port == 'sitl') {
                             CONFIGURATOR.connection.connect("127.0.0.1:5760", {}, privateScope.onOpen);
                         } else if (selected_port == 'sitl-demo') {
-                            if (SITLProcess.isRunning) {
-                                SITLProcess.stop();
-                            }
-                            SITLProcess.start("demo.bin"), 1000;                        
+                            SITLProcess.stop();
+                            SITLProcess.start("demo.bin");                        
                             this.isDemoRunning = true;
 
                             // Wait 1 sec until SITL is ready
@@ -207,11 +203,28 @@ var SerialBackend = (function () {
                             CONFIGURATOR.connection.connect(selected_port, {bitrate: selected_baud}, privateScope.onOpen);
                         }
                     } else {
+                        // Check for unsaved changes in JavaScript Programming tab
+                        if (GUI.active_tab === 'javascript_programming' &&
+                            TABS.javascript_programming &&
+                            TABS.javascript_programming.isDirty) {
+                            console.log('[Disconnect] Checking for unsaved changes in JavaScript Programming tab');
+                            const confirmMsg = i18n.getMessage('unsavedChanges') ||
+                                'You have unsaved changes. Leave anyway?';
+
+                            if (!confirm(confirmMsg)) {
+                                console.log('[Disconnect] User cancelled disconnect due to unsaved changes');
+                                return; // Cancel disconnect
+                            }
+                            console.log('[Disconnect] User confirmed, proceeding with disconnect');
+                            // Clear isDirty flag so tab switch during disconnect doesn't show warning again
+                            TABS.javascript_programming.isDirty = false;
+                        }
+
                         if (this.isDemoRunning) {
                             SITLProcess.stop();
                             this.isDemoRunning = false;
                         }
-                        
+
                         var wasConnected = CONFIGURATOR.connectionValid;
 
                         timeout.killAll();
@@ -362,6 +375,11 @@ var SerialBackend = (function () {
             store.set('last_used_bps', CONFIGURATOR.connection.bitrate);
             store.set('wireless_mode_enabled', $('#wireless-mode').is(":checked"));
 
+            // Reset state BEFORE adding receive listeners to ensure any
+            // garbage bytes or boot messages don't corrupt the MSP decoder
+            FC.resetState();
+            MSP.disconnect_cleanup();
+
             CONFIGURATOR.connection.addOnReceiveListener(publicScope.read_serial);
             CONFIGURATOR.connection.addOnReceiveListener(ltmDecoder.read);
 
@@ -388,8 +406,6 @@ var SerialBackend = (function () {
                     groundstation.activate($('#main-wrapper'));
                 }
             }, 1000);
-
-            FC.resetState();
 
             // request configuration data. Start with MSPv1 and
             // upgrade to MSPv2 if possible.
@@ -473,6 +489,7 @@ var SerialBackend = (function () {
                 FC.PIDs.push(new Array(4));
             }
 
+            
             interval.add('msp-load-update', function () {
                 $('#msp-version').text("MSP version: " + MSP.protocolVersion.toFixed(0));
                 $('#msp-load').text("MSP load: " + mspQueue.getLoad().toFixed(1));
@@ -619,4 +636,4 @@ var SerialBackend = (function () {
 
 })();
 
-module.exports = SerialBackend;
+export default SerialBackend;

@@ -112,3 +112,7 @@
 .tab-adjustments .adjustment .functionSwitchChannel {
     width: 5%;
 }
+
+.tab-adjustments .noUi-value {
+    margin-top: 5px;
+} 

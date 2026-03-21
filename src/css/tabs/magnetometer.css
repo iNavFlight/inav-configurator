@@ -226,3 +226,7 @@ progress[value]::-webkit-progress-value {
         font-weight: bold;
     }   
 }
+
+.tab-magnetometer .noUi-value {
+    margin-top: 6px;
+} 

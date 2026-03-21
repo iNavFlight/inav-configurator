@@ -13,7 +13,6 @@ var globalSettings = {
     osdUnits: null,
     // Map  
     mapProviderType: null,
-    mapApiKey: null,
     proxyURL: null,
     proxyLayer: null,
     // Show colours for profiles
@@ -32,4 +31,4 @@ var globalSettings = {
     }
 };
 
-module.exports = { globalSettings, UnitType };
+export { globalSettings, UnitType };

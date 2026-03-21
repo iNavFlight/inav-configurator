@@ -1,18 +1,15 @@
 'use strict';
 
-const { dialog } = require("@electron/remote");
-const fs = require('fs');
-const path = require('path');
-
-const MSPCodes = require('./../js/msp/MSPCodes');
-const MSP = require('./../js/msp');
-const mspHelper = require("./../js/msp/MSPHelper");
-const { GUI, TABS } = require('./../js/gui');
-const FC = require('./../js/fc');
-const CONFIGURATOR = require('./../js/data_storage');
-const features = require('./../js/feature_framework');
-const i18n = require('./../js/localization');
-const BitHelper = require('./../js/bitHelper');
+import MSPCodes from './../js/msp/MSPCodes';
+import MSP from './../js/msp';
+import mspHelper from"./../js/msp/MSPHelper";
+import { GUI, TABS } from './../js/gui';
+import FC from './../js/fc';
+import CONFIGURATOR from './../js/data_storage';
+import features from './../js/feature_framework';
+import i18n from './../js/localization';
+import BitHelper from './../js/bitHelper';
+import dialog from './../js/dialog';
 
 var sdcardTimer;
 
@@ -80,7 +77,7 @@ TABS.onboard_logging.initialize = function (callback) {
     }
 
     function load_html() {
-        GUI.load(path.join(__dirname, "onboard_logging.html"), function() {
+        import('./onboard_logging.html?raw').then(({default: html}) => GUI.load(html, function() {
             // translate to user-selected language
            i18n.localize();;
 
@@ -164,7 +161,7 @@ TABS.onboard_logging.initialize = function (callback) {
             update_html();
 
             GUI.content_ready(callback);
-        });
+        }));
     }
 
     function populateDevices() {
@@ -371,17 +368,21 @@ TABS.onboard_logging.initialize = function (callback) {
 
                                 $(".dataflash-saving progress").attr("value", nextAddress / maxBytes * 100);
 
-                                fs.writeFileSync(filename, new Uint8Array(chunk), {
-                                    "flag": "a"
-                                })
-
-                                if (saveCancelled) {
-                                    dismiss_saving_dialog();
-                                } else if (nextAddress >= maxBytes) {
-                                    mark_saving_dialog_done();
-                                }else {
-                                    mspHelper.dataflashRead(nextAddress, onChunkRead);
-                                }
+                                window.electronAPI.appendFile(filename, new Uint8Array(chunk))
+                                    .then(() => {
+                                        if (saveCancelled) {
+                                            dismiss_saving_dialog();
+                                        } else if (nextAddress >= maxBytes) {
+                                            mark_saving_dialog_done();
+                                        } else {
+                                            mspHelper.dataflashRead(nextAddress, onChunkRead);
+                                        }
+                                    })
+                                    .catch(err => {
+                                        console.error('Error writing blackbox data:', err);
+                                        GUI.log(i18n.getMessage('ErrorWritingFile'));
+                                        dismiss_saving_dialog();
+                                    });
 
                             } else {
                                 // A zero-byte block indicates end-of-file, so we're done

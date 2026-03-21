@@ -16,10 +16,14 @@
     },
     "language_ja": {
         "message": "日本語",
-         "_comment": "Don't translate!"
-      },
+        "_comment": "Don't translate!"
+    },
     "language_zh_CN": {
         "message": "简体中文",
+        "_comment": "Don't translate!"
+    },
+    "language_ru": {
+        "message": "Русский",
         "_comment": "Don't translate!"
     },
     "language": {
@@ -922,11 +926,29 @@
     "serialrx_halfduplex": {
         "message": "Послідовний приймач напівдуплексний"
     },
+    "serialrx_frSkyPitchRollLabel": {
+        "message": "Використовувати сенсори тангажа та крену в телеметрії"
+    },
+    "serialrx_frSkyPitchRollHelp": {
+        "message": "Це надсилає телеметрію кутів тангажа та крену замість стандартних сирих даних датчиків акселерометра. Потрібно <strong>увімкнути</strong>, якщо використовуються панелі телеметрії з LUA-скриптів для INAV під OpenTX/EdgeTX або ETHOS."
+    },
+    "serialrx_frSkyFuelUnitLabel": {
+        "message": "Одиниці виміру пального SmartPort"
+    },
+    "serialrx_frSkyFuelUnitHelp": {
+        "message": "Виберіть дані, які потрібно надсилати на телеметричний датчик <strong>пального</strong>."
+    },
     "configurationFeaturesHelp": {
         "message": "<strong>Примітка:</strong> Не всі комбінації функцій є дійсними. Коли прошивка польотного контролера виявляє недійсні комбінації, конфліктуючі функції будуть вимкнені. <br /> <strong>Примітка:</strong> Налаштуйте послідовні порти <span style=\"color: red\">перед</span> активацією функцій, які будуть використовувати ці порти."
     },
     "configurationSerialRXHelp": {
         "message": "<strong>Примітка:</strong> Не забудьте налаштувати послідовний порт (через вкладку портів) для послідовного приймача"
+    },
+    "configurationFrSkyOptions": {
+        "message": "Параметри FrSky"
+    },
+    "configurationFrSkyOptions_HELP": {
+        "message": "Ці параметри забезпечують швидкий доступ до налаштування телеметричних датчиків SmartPort для роботи з телеметричними LUA-скриптами OpenTX/EdgeTX та ETHOS. Зверніть увагу: якщо ви використовуєте SBUS, необхідно налаштувати телеметрію SmartPort на окремому послідовному порту."
     },
     "configurationSensorAlignmentMag": {
         "message": "Вирівнювання магнітометра"
@@ -1083,6 +1105,12 @@
     },
     "configurationLaunchIdleDelayHelp": {
         "message": "Установіть затримку між підняттям тяги для старту та переходом мотора на холості оберти. За замовчуванням: 0 [0-60000]"
+    },
+    "configurationWiggleWakeIdle": {
+        "message": "Поворушити для виходу з простою"
+    },
+    "configurationWiggleWakeIdleHelp": {
+        "message": "Якщо увімкнено, ця функція дозволяє похитування по осі рискання для запуску моторів після холостого ходу.<br />0: Вимкнено (за замовчуванням)<br />1: 1 похитування – Вищий поріг виявлення, призначено для літаків без хвоста, які можуть легше обертатись<br />\n2: 2 похитування – Нижчий поріг виявлення, але потребує повторної дії. Призначено для більших моделей та літаків з хвостом"
     },
     "configurationLaunchMotorDelay": {
         "message": "Затримка мотора"
@@ -1266,6 +1294,9 @@
     },
     "portsHelp": {
         "message": "<strong>Примітка:</strong> не всі комбінації є допустимими. Коли прошивка польотного контролера виявляє це, конфігурація послідовного порту буде скинута."
+    },
+    "portsMSPWarning": {
+        "message": "<strong>Увага:</strong><p>Увімкнення MSP більш ніж на двох UART-портах може заважати роботі USB-з’єднання. Рекомендується вимкнути MSP на порту, де він не потрібен.</p>"
     },
     "portsFirmwareUpgradeRequired": {
         "message": "<span style=\"color: red\">Потрібне</span> оновлення прошивки."
@@ -2043,6 +2074,9 @@
     },
     "adjustmentsFunction59": {
         "message": "Коригування індексу мультимісії"
+    },
+    "adjustmentsFunction60": {
+        "message": "Коригування відгуку контролю висоти для нерухомого крила"
     },
     "adjustmentsSave": {
         "message": "Зберегти"
@@ -3472,6 +3506,12 @@
     "soarPitchDeadbandHelp": {
         "message": "Мертва зона кута тангажа при увімкненому режимі планерування (градусів). Режим кут неактивний в межах мертвої зони, дозволяючи тангажу вільно коливатися під час планерування."
     },
+    "altControlResponse": {
+        "message": "Коефіцієнт відгуку контролю висоти"
+    },
+    "altControlResponseHelp": {
+        "message": "Налаштовує відгук контролю висоти для нерухомого крила при наближенні до цільової висоти. Вищі значення підвищують чутливість контролю висоти, але можуть також спричинити надмірне перерегулювання або нестабільність тангажу, якщо встановлені занадто високими."
+    },
     "waypointRadiusHelp": {
         "message": "Це встановлює допустиму відстань від точки маршруту, на якій вважається, що точку маршруту було досягнуто."
     },
@@ -3626,6 +3666,9 @@
         "message": "Користувацькі елементи OSD"
     },
     "osd_custom_element_settings_HELP": {
+        "message": "Для вичерпної інформації про те, як використовувати користувацькі OSD елементи. Натисніть цей ?"
+    },
+    "osd_custom_element_settings_icons_HELP": {
         "message": "Номери іконок можна знайти, натиснувши цю кнопку допомоги."
     },
     "custom_element": {
@@ -4003,10 +4046,10 @@
     "osdElement_VARIO_HELP": {
         "message": "Показує вертикальну швидкість за допомогою стрілок вгору або вниз. Кожна стрілка представляє 10 см (~4 дюйми) на секунду."
     },
-    "osdElement_VARIO_NUM": {
-        "message": "Значення варіометра"
+    "osdElement_VERTICAL_SPEED_INDICATOR": {
+        "message": "Індикатор вертикальної швидкості"
     },
-    "osdElement_VARIO_NUM_HELP": {
+    "osdElement_VERTICAL_SPEED_INDICATOR_HELP": {
         "message": "Показує числом вертикальну швидкість"
     },
     "osdElement_G_FORCE": {
@@ -4228,11 +4271,11 @@
     "osdPanServoIndex_HELP": {
         "message": "Встановіть номер виходу сервоприводу панорамування відповідно до таблиці виходів мікшера. Наприклад, вихід S6."
     },
-    "osdPanServoPwm2centideg": {
+    "osdPanServoRangeDecadegrees": {
         "message": "Загальна кількість градусів руху сервоприводу панорамування"
     },
-    "osdPanServoPwm2centideg_HELP": {
-        "message": "Кути обертання сервоприводу панорами. Сервопривід з обертанням на 180 градусів від 1000 до 2000 мкс ШІМ зазвичай потребує значення 180 для цього налаштування. Зробіть значення негативним, щоб змінити напрямок."
+    "osdPanServoRangeDecadegrees_HELP": {
+        "message": "Кут обертання сервопривода панорамування. Сервопривід з кутом обертання 180 градусів зазвичай потребує значення 180 для цього параметра. Задайте від’ємне значення, щоб інвертувати напрямок обертання."
     },
     "osdPanServoIndicatorShowDegrees": {
         "message": "Показувати градуси зміщення поруч з індикатором панорамування"
@@ -4394,7 +4437,7 @@
         "message": "Завантажити шрифт"
     },
     "osd_font_manager": {
-        "message": "Менеджер шрифтів"
+        "message": "Менеджер шрифтів для аналога"
     },
     "uploadingCharacters": {
         "message": "Завантаження..."
@@ -5053,9 +5096,6 @@
     "mapProvider": {
         "message": "Постачальник мапи"
     },
-    "mapApiKey": {
-        "message": "Ключ API карти"
-    },
     "proxyURL": {
         "message": "MapProxy URL"
     },
@@ -5135,7 +5175,7 @@
         "message": "Закрити"
     },
     "logicActivator": {
-        "message": "Активний"
+        "message": "Працює коли"
     },
     "save": {
         "message": "Зберегти"
@@ -5353,11 +5393,11 @@
     "motor_direction_inverted_hint": {
         "message": "Увімкніть, якщо напрямок мотора змінено на протилежний і пропелери встановлені у зворотному напрямку."
     },
-    "mixer_pid_profile_linking": {
-        "message": "Профіль керування буде використовувати той самий індекс, що й індекс Профілю мікшера"
+    "mixer_control_profile_linking": {
+        "message": "Профіль керування використовуватиме той самий індекс, що і профіль мікшера"
     },
-    "mixer_pid_profile_linking_hint": {
-        "message": "mixer_pid_profile_linking: Увімкніть на обох профілях змішування, якщо ви хочете, щоб перемикання профілю керування здійснювалося через перемикання профілю мікшера (рекомендується для налаштувань типу втол/змішана платформа)"
+    "mixer_control_profile_linking_hint": {
+        "message": "mixer_control_profile_linking: Увімкніть для обох профілів мікшера, якщо ви хочете, щоб перемикання профілів керування виконувалося разом із перемиканням профілів мікшера (рекомендується для VTOL або змішаних типів платформ)"
     },
     "blackboxFields": {
         "message": "Поля чорної скрині"
@@ -6126,5 +6166,68 @@
     },
     "currentLanguage": {
         "message": "uk"
+    },
+    "search": {
+        "message": "Пошук"
+    },
+    "tabJavaScriptProgramming": {
+        "message": "Програмування на JavaScript"
+    },
+    "javascriptProgrammingDescription": {
+        "message": "Пишіть код на JavaScript для керування літальним апаратом. Транспілятор перетворює ваш код на логічні умови INAV."
+    },
+    "javascriptBetaWarning": {
+        "message": "<strong>Пишіть на JavaScript, отримуйте логічні умови INAV!</strong> Використовуйте звичний синтаксис JavaScript з повним автодоповненням та перевіркою помилок. <strong>Наразі в стадії бета-тестування. Не використовуйте для критично важливих застосунків!</strong>"
+    },
+    "javascriptEditorTitle": {
+        "message": "Редактор JavaScript (shift-ctrl-v щоб вставити, правий клік по змінній для перейменування)"
+    },
+    "javascriptLoadExample": {
+        "message": "Завантажити приклад:"
+    },
+    "javascriptSelectExample": {
+        "message": "-- Оберіть приклад --"
+    },
+    "javascriptTranspile": {
+        "message": "Транспілювати в INAV"
+    },
+    "javascriptLoad": {
+        "message": "Завантажити з польотного контролера"
+    },
+    "javascriptSave": {
+        "message": "Зберегти до польотного контролера"
+    },
+    "javascriptClear": {
+        "message": "Очистити редактор"
+    },
+    "javascriptOutputTitle": {
+        "message": "Вихідні дані логічних умов INAV"
+    },
+    "javascriptLcCount": {
+        "message": "$1 / $2 ЛУ"
+    },
+    "javascriptOptimizationsApplied": {
+        "message": "Застосовані оптимізації:"
+    },
+    "javascriptApiReference": {
+        "message": "Довідник з API та приклади"
+    },
+    "javascriptQuickReference": {
+        "message": "Короткий довідник"
+    },
+    "javascriptFlightParameters": {
+        "message": "Параметри польоту (тільки читання)"
+    },
+    "javascriptRcChannels": {
+        "message": "Канали пульта"
+    },
+    "javascriptOverrides": {
+        "message": "Перевизначення (запис)"
+    },
+    "javascriptGlobalVariables": {
+        "message": "Глобальні змінні"
+    },
+    "javascriptCompleteExample": {
+        "message": "Повний приклад"
     }
 }

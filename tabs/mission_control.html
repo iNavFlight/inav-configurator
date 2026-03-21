@@ -182,10 +182,6 @@
                             </table>
                         </div>
                     </div>
-                    <div class="point" id="elevationEarthModelclass" style="display: none">
-                        <label class="spacer_box_title" for="elevationEarthModel" data-i18n="missionEllipsoidEarthDEMModel"></label>
-                        <input id="elevationEarthModel" type="checkbox" value="0" class="togglemedium" checked required>
-                    </div>
                 </div>
 
                 <div id="missionPlannerSafehome" class="gui_box grey" style="display: none">
@@ -584,6 +580,7 @@
                 </div>
                 <div class="spacer">
                     <div id="elevationDiv">
+                        <canvas id="elevationChart"></canvas>
                     </div>
                 </div>
             </div>
