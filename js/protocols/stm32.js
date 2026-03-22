@@ -14,6 +14,7 @@ import { usbDevices, PortHandler } from './../port_handler';
 import ConnectionSerial from './../connection/connectionSerial';
 import STM32DFU from './stm32usbdfu';
 import i18n from './../localization';
+import platform from './../platform';
 
 var STM32_protocol = function () {
     this.baud;
@@ -231,6 +232,29 @@ STM32_protocol.prototype.sendRebootCommand = function(callback) {
     });
 };
 
+STM32_protocol.prototype.startWebDfuReconnect = function (hex, options, callback) {
+    GUI.log('Waiting for the flight controller to reboot into DFU mode...');
+
+    setTimeout(function () {
+        const confirmed = platform.dialog.confirm(
+            'The flight controller should now be in DFU mode. Click OK to select the DFU USB device and continue flashing.'
+        );
+
+        if (!confirmed) {
+            GUI.connect_lock = false;
+            GUI.log('DFU device selection was cancelled.');
+            return;
+        }
+
+        GUI.log('Select the DFU device in the browser USB chooser to continue flashing.');
+        STM32DFU.requestAndConnect(usbDevices, hex, options, callback).then(function() {
+            if (!STM32DFU.usbDevice) {
+                GUI.connect_lock = false;
+            }
+        });
+    }, 1500);
+};
+
 // no input parameters
 STM32_protocol.prototype.connect = function (port, baud, hex, options, callback) {
     var self = this;
@@ -253,6 +277,16 @@ STM32_protocol.prototype.connect = function (port, baud, hex, options, callback)
 
     if (options.erase_chip) {
         self.options.erase_chip = true;
+    }
+
+    if (port === 'DFU') {
+        GUI.connect_lock = true;
+        STM32DFU.requestAndConnect(usbDevices, hex, options, callback).then(function() {
+            if (!STM32DFU.usbDevice) {
+                GUI.connect_lock = false;
+            }
+        });
+        return;
     }
 
     // Check if device is already in DFU mode before attempting serial connection
@@ -298,6 +332,11 @@ STM32_protocol.prototype.connectSerial = function(port, hex, options) {
             self.sendRebootCommand(function(disconnectResult) {
                 if (!disconnectResult) {
                     GUI.connect_lock = false;
+                    return;
+                }
+
+                if (platform.isWeb) {
+                    self.startWebDfuReconnect(hex, options, self.callback);
                     return;
                 }
 

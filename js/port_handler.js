@@ -3,6 +3,7 @@
 import { GUI } from './../js/gui';
 import ConnectionSerial from './connection/connectionSerial';
 import store from './store';
+import platform from './platform';
 
 var usbDevices =  [
     { 'vendorId': 1155, 'productId': 57105}, 
@@ -165,7 +166,15 @@ PortHandler.check = function () {
 };
 
 PortHandler.check_usb_devices = function (callback) {
-    
+    const self = this;
+
+    if (!platform.capabilities.usb) {
+        if (callback) {
+            callback(false);
+        }
+        return;
+    }
+
     self.dfu_available = false;
     
     navigator.usb.getDevices().then(devices => {
@@ -178,12 +187,12 @@ PortHandler.check_usb_devices = function (callback) {
             });
         });
 
-        if (self.dfu_available) {
+        if (!platform.isWeb && self.dfu_available) {
             if (!$("div#port-picker #port [value='DFU']").length) {
                 $('div#port-picker #port').append($('<option/>', {value: "DFU", text: "DFU", data: {isDFU: true}}));
                 $('div#port-picker #port').val('DFU');
             }
-        } else {
+        } else if (!platform.isWeb) {
             if ($("div#port-picker #port [value='DFU']").length) {
                 $("div#port-picker #port [value='DFU']").remove();
             }
@@ -192,7 +201,31 @@ PortHandler.check_usb_devices = function (callback) {
         if (callback) 
             callback(self.dfu_available);
     });
-}
+};
+
+PortHandler.requestDFUDevice = async function () {
+    if (!platform.capabilities.usb) {
+        return null;
+    }
+
+    try {
+        const filters = usbDevices.map(device => ({
+            vendorId: device.vendorId,
+            productId: device.productId,
+        }));
+
+        const device = await navigator.usb.requestDevice({ filters });
+        this.dfu_available = !!device;
+
+        return device;
+    } catch (error) {
+        if (error?.name !== 'NotFoundError') {
+            console.log('WebUSB DFU device request failed:', error);
+        }
+
+        return null;
+    }
+};
 
 PortHandler.update_port_select = function (ports) {
     $('div#port-picker #port').html(''); // drop previous one
@@ -201,12 +234,36 @@ PortHandler.update_port_select = function (ports) {
         $('div#port-picker #port').append($("<option/>", {value: ports[i], text: ports[i], data: {isManual: false}}));
     }
 
+    if (platform.isWeb) {
+        if (platform.capabilities.ble) {
+            $('div#port-picker #port').append($("<option/>", {value: 'ble', text: 'BLE', data: {isBle: true}}));
+        }
+
+        return;
+    }
+
     $('div#port-picker #port').append($("<option/>", {value: 'manual', text: 'Manual Selection', data: {isManual: true}}));
-    $('div#port-picker #port').append($("<option/>", {value: 'ble', text: 'BLE', data: {isBle: true}}));
-    $('div#port-picker #port').append($("<option/>", {value: 'tcp', text: 'TCP', data: {isTcp: true}}));
-    $('div#port-picker #port').append($("<option/>", {value: 'udp', text: 'UDP', data: {isUdp: true}}));
-    $('div#port-picker #port').append($("<option/>", {value: 'sitl', text: 'SITL', data: {isSitl: true}}));
-    $('div#port-picker #port').append($("<option/>", {value: 'sitl-demo', text: 'Demo mode', data: {isSitl: true}}));
+
+    if (platform.capabilities.usb) {
+        $('div#port-picker #port').append($("<option/>", {value: 'DFU', text: 'DFU', data: {isDFU: true}}));
+    }
+
+    if (platform.capabilities.ble) {
+        $('div#port-picker #port').append($("<option/>", {value: 'ble', text: 'BLE', data: {isBle: true}}));
+    }
+
+    if (platform.capabilities.tcp) {
+        $('div#port-picker #port').append($("<option/>", {value: 'tcp', text: 'TCP', data: {isTcp: true}}));
+    }
+
+    if (platform.capabilities.udp) {
+        $('div#port-picker #port').append($("<option/>", {value: 'udp', text: 'UDP', data: {isUdp: true}}));
+    }
+
+    if (platform.capabilities.sitl) {
+        $('div#port-picker #port').append($("<option/>", {value: 'sitl', text: 'SITL', data: {isSitl: true}}));
+        $('div#port-picker #port').append($("<option/>", {value: 'sitl-demo', text: 'Demo mode', data: {isSitl: true}}));
+    }
 };
 
 PortHandler.port_detected = function(name, code, timeout, ignore_timeout) {

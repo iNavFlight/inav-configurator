@@ -3,6 +3,7 @@
 import { GUI } from './../gui';
 import { ConnectionType, Connection } from './connection';
 import i18n from './../localization';
+import platform from './../platform';
 
 const serialDevices = [
     { vendorId: 1027, productId: 24577 }, // FT232R USB UART
@@ -28,6 +29,11 @@ class ConnectionSerial extends Connection {
         this._ipcDataHandler = null;
         this._ipcCloseHandler = null;
         this._ipcErrorHandler = null;
+        this._webPort = null;
+        this._webReader = null;
+        this._webReadLoopRunning = false;
+        this._webReadLoopPromise = null;
+        this._webDisconnecting = false;
     }
 
     registerIpcListeners() {
@@ -76,6 +82,11 @@ class ConnectionSerial extends Connection {
     }
 
     connectImplementation(path, options, callback) {
+        if (platform.isWeb) {
+            this.connectWeb(path, options, callback);
+            return;
+        }
+
         this.registerIpcListeners();
 
         window.electronAPI.serialConnect(path, options).then(response => {
@@ -98,6 +109,11 @@ class ConnectionSerial extends Connection {
     }
 
     disconnectImplementation(callback) {   
+        if (platform.isWeb) {
+            this.disconnectWeb(callback);
+            return;
+        }
+
         if (this._connectionId) {
             window.electronAPI.serialClose().then(response => {
                 var ok = true;
@@ -113,6 +129,11 @@ class ConnectionSerial extends Connection {
     }
 
     sendImplementation(data, callback) {        
+        if (platform.isWeb) {
+            this.sendWeb(data, callback);
+            return;
+        }
+
         if (this._connectionId) {
             window.electronAPI.serialSend(data).then(response => {
                 var result = 0;
@@ -149,7 +170,161 @@ class ConnectionSerial extends Connection {
     } 
 
     static async getDevices() {
+        if (platform.isWeb) {
+            return platform.capabilities.serial ? ['webserial'] : [];
+        }
+
         return window.electronAPI.listSerialDevices();
+    }
+
+    async connectWeb(path, options, callback) {
+        if (!platform.capabilities.serial) {
+            if (callback) {
+                callback(false);
+            }
+            return;
+        }
+
+        try {
+            const filters = serialDevices.map(device => ({
+                usbVendorId: device.vendorId,
+                usbProductId: device.productId
+            }));
+            const grantedPorts = await navigator.serial.getPorts();
+            this._webPort = grantedPorts[0] || await navigator.serial.requestPort({ filters });
+
+            await this._webPort.open({
+                baudRate: options.bitrate,
+                dataBits: 8,
+                stopBits: 1,
+                parity: 'none',
+                flowControl: 'none'
+            });
+
+            this.startWebReadLoop();
+
+            GUI.log(i18n.getMessage('connectionConnected', ['Web Serial']));
+            if (callback) {
+                callback({
+                    bitrate: options.bitrate,
+                    connectionId: 1
+                });
+            }
+        } catch (error) {
+            console.log('Web Serial connection error', error);
+            if (callback) {
+                callback(false);
+            }
+        }
+    }
+
+    startWebReadLoop() {
+        if (!this._webPort?.readable || this._webReadLoopRunning) {
+            return;
+        }
+
+        this._webReadLoopRunning = true;
+        this._webDisconnecting = false;
+
+        const read = async () => {
+            while (this._webPort?.readable && !this._webDisconnecting) {
+                this._webReader = this._webPort.readable.getReader();
+                try {
+                    while (true) {
+                        const { value, done } = await this._webReader.read();
+                        if (done || this._webDisconnecting) {
+                            break;
+                        }
+
+                        if (value) {
+                            this._onReceiveListeners.forEach(listener => {
+                                listener({
+                                    connectionId: this._connectionId,
+                                    data: value
+                                });
+                            });
+                        }
+                    }
+                } catch (error) {
+                    if (!this._webDisconnecting) {
+                        console.log('Web Serial read error', error);
+                        this._onReceiveErrorListeners.forEach(listener => listener(error));
+                    }
+                } finally {
+                    if (this._webReader) {
+                        this._webReader.releaseLock();
+                    }
+                    this._webReader = null;
+                }
+            }
+
+            this._webReadLoopRunning = false;
+        };
+
+        this._webReadLoopPromise = read().finally(() => {
+            this._webReadLoopPromise = null;
+        });
+    }
+
+    async disconnectWeb(callback) {
+        let ok = true;
+
+        try {
+            this._webDisconnecting = true;
+
+            if (this._webReader) {
+                await this._webReader.cancel();
+            }
+            if (this._webReadLoopPromise) {
+                await this._webReadLoopPromise;
+            }
+            if (this._webPort) {
+                await this._webPort.close();
+            }
+        } catch (error) {
+            console.log('Unable to close Web Serial port', error);
+            ok = false;
+        } finally {
+            this._webPort = null;
+            this._webReader = null;
+            this._webReadLoopRunning = false;
+            this._webReadLoopPromise = null;
+            this._webDisconnecting = false;
+        }
+
+        if (callback) {
+            callback(ok);
+        }
+    }
+
+    async sendWeb(data, callback) {
+        let resultCode = 0;
+        let bytesSent = 0;
+
+        try {
+            if (!this._webPort?.writable) {
+                throw new Error('Web Serial port is not writable');
+            }
+
+            const writer = this._webPort.writable.getWriter();
+            try {
+                const chunk = data instanceof Uint8Array ? data : new Uint8Array(data);
+                await writer.write(chunk);
+                bytesSent = chunk.byteLength;
+            } finally {
+                writer.releaseLock();
+            }
+        } catch (error) {
+            console.log('Web Serial write error', error);
+            resultCode = 1;
+        }
+
+        if (callback) {
+            callback({
+                bytesSent,
+                resultCode
+            });
+        }
     }
 }
 

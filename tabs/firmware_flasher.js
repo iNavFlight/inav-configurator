@@ -20,6 +20,7 @@ import STM32DFU from './../js/protocols/stm32usbdfu';
 import mspDeduplicationQueue from './../js/msp/mspDeduplicationQueue';
 import store from './../js/store';
 import dialog from '../js/dialog.js';
+import platform from './../js/platform';
 
 TABS.firmware_flasher = {};
 TABS.firmware_flasher.initialize = function (callback) {
@@ -35,6 +36,12 @@ TABS.firmware_flasher.initialize = function (callback) {
     import('./firmware_flasher.html?raw').then(({default: html}) => GUI.load(html, function () {
         // translate to user-selected language
         i18n.localize();
+
+        if (platform.isWeb) {
+            $('.web-dfu-help').show();
+            $('input.updating').closest('tr').hide();
+            $('input.show_development_releases').closest('tr').hide();
+        }
 
         function enable_load_online_button() {
             $(".load_remote_file").text(i18n.getMessage('firmwareFlasherButtonLoadOnline')).removeClass('disabled');
@@ -302,25 +309,17 @@ TABS.firmware_flasher.initialize = function (callback) {
             return;
         };
 
-        $.get('https://api.github.com/repos/iNavFlight/inav-nightly/releases?per_page=50', function(releasesData) {
-            TABS.firmware_flasher.devReleasesData = releasesData;
-        }).fail(function (data){
-            TABS.firmware_flasher.devReleasesData = {};
-            if (data["responseJSON"]){
-                GUI.log("<b>GITHUB Query Failed: <code>{0}</code></b>".format(data["responseJSON"].message));
-            }
+        function setFirmwareCatalogOffline(message) {
             $('select[name="board"]').empty().append('<option value="0">Offline</option>');
             $('select[name="firmware_version"]').empty().append('<option value="0">Offline</option>');
             $('a.auto_select_target').addClass('disabled');
-        });
+            if (message) {
+                GUI.log(message);
+            }
+        }
 
-
-        $.get('https://api.github.com/repos/iNavFlight/inav/releases?per_page=10', function (releasesData){
-            TABS.firmware_flasher.releasesData = releasesData;
-            buildBoardOptions(releasesData);
-
-            // bind events
-            $('select[name="board"]').on('change', function () {
+        function bindFirmwareSelectors() {
+            $('select[name="board"]').off('change.firmwareFlasher').on('change.firmwareFlasher', function () {
 
                 $("a.load_remote_file").addClass('disabled');
                 var target = $(this).children("option:selected").val();
@@ -357,14 +356,59 @@ TABS.firmware_flasher.initialize = function (callback) {
 
             $('a.auto_select_target').removeClass('disabled');
             TABS.firmware_flasher.getTarget();
-        }).fail(function (data){
-            if (data["responseJSON"]){
-                GUI.log("<b>GITHUB Query Failed: <code>{0}</code></b>".format(data["responseJSON"].message));
+        }
+
+        function applyFirmwareCatalog(releasesData, devReleasesData = []) {
+            TABS.firmware_flasher.releasesData = releasesData;
+            TABS.firmware_flasher.devReleasesData = devReleasesData;
+            buildBoardOptions(releasesData);
+            bindFirmwareSelectors();
+        }
+
+        async function loadWebFirmwareCatalog() {
+            try {
+                const manifestUrl = new URL('./firmware/manifest.json', window.location.href);
+                const response = await fetch(manifestUrl);
+
+                if (!response.ok) {
+                    throw new Error(`${response.status} ${response.statusText}`);
+                }
+
+                const manifest = await response.json();
+                applyFirmwareCatalog(manifest.releases || [], manifest.devReleases || []);
+            } catch (error) {
+                console.error('Failed to load web firmware catalog', error);
+                setFirmwareCatalogOffline('<b>Firmware mirror is unavailable for the web edition</b>');
             }
-            $('select[name="board"]').empty().append('<option value="0">Offline</option>');
-            $('select[name="firmware_version"]').empty().append('<option value="0">Offline</option>');
-            $('a.auto_select_target').addClass('disabled');
-        });
+        }
+
+        function loadElectronFirmwareCatalog() {
+            $.get('https://api.github.com/repos/iNavFlight/inav-nightly/releases?per_page=50', function(releasesData) {
+                TABS.firmware_flasher.devReleasesData = releasesData;
+            }).fail(function (data){
+                TABS.firmware_flasher.devReleasesData = {};
+                if (data["responseJSON"]){
+                    GUI.log("<b>GITHUB Query Failed: <code>{0}</code></b>".format(data["responseJSON"].message));
+                }
+                setFirmwareCatalogOffline();
+            });
+
+
+            $.get('https://api.github.com/repos/iNavFlight/inav/releases?per_page=10', function (releasesData){
+                applyFirmwareCatalog(releasesData, TABS.firmware_flasher.devReleasesData);
+            }).fail(function (data){
+                if (data["responseJSON"]){
+                    GUI.log("<b>GITHUB Query Failed: <code>{0}</code></b>".format(data["responseJSON"].message));
+                }
+                setFirmwareCatalogOffline();
+            });
+        }
+
+        if (platform.isWeb) {
+            loadWebFirmwareCatalog();
+        } else {
+            loadElectronFirmwareCatalog();
+        }
 
         $('a.load_file').on('click', function () {
 
@@ -385,7 +429,7 @@ TABS.firmware_flasher.initialize = function (callback) {
 
                 console.log('Loading file from: ' + filename);
 
-                window.electronAPI.readFile(filename).then(response => {
+                platform.files.readFile(filename).then(response => {
 
                     if (response.error) {
                         console.log("Error loading local file", response.erroe);
@@ -501,14 +545,31 @@ TABS.firmware_flasher.initialize = function (callback) {
                 enable_load_online_button();
             }
 
+            async function loadRemoteFirmware(url) {
+                if (platform.isWeb) {
+                    const response = await fetch(url);
+
+                    if (!response.ok) {
+                        throw new Error(`Failed to fetch firmware: ${response.status} ${response.statusText}`);
+                    }
+
+                    return response.text();
+                }
+
+                return $.get(url);
+            }
+
             var summary = $('select[name="firmware_version"] option:selected').data('summary');
             if (summary) { // undefined while list is loading or while running offline
                 fileName = summary.file;
                 $(".load_remote_file").text(i18n.getMessage('firmwareFlasherButtonLoading')).addClass('disabled');
-                $.get(summary.url, function (data) {
+                loadRemoteFirmware(summary.url).then(function (data) {
                     enable_load_online_button();
                     process_hex(data, summary);
-                }).fail(failed_to_load);
+                }).catch(function (error) {
+                    console.error('Failed to load online firmware', error);
+                    failed_to_load();
+                });
             } else {
                 $('span.progressLabel').text(i18n.getMessage('firmwareFlasherFailedToLoadOnlineFirmware'));
             }
@@ -559,7 +620,11 @@ TABS.firmware_flasher.initialize = function (callback) {
                                 GUI.log(i18n.getMessage('selectValidSerialPort'));
                             }
                         } else {
-                            STM32DFU.connect(usbDevices, parsed_hex, options);
+                            if (platform.isWeb) {
+                                STM32DFU.requestAndConnect(usbDevices, parsed_hex, options);
+                            } else {
+                                STM32DFU.connect(usbDevices, parsed_hex, options);
+                            }
                         }
                     } else {
                         $('span.progressLabel').text(i18n.getMessage('firmwareFlasherFirmwareNotLoaded'));
@@ -577,14 +642,16 @@ TABS.firmware_flasher.initialize = function (callback) {
                 if (result.canceled) {
                     return;
                 }
-                fs.writeFileSync(result.filePath, intel_hex, (err) => {
+                platform.files.writeFile(result.filePath, intel_hex).then(err => {
                     if (err) {
                         GUI.log(i18n.getMessage('ErrorWritingFile'));
-                        return console.error(err);
+                        console.error(err);
+                        return;
                     }
+
+                    let sFilename = String(result.filePath.split('\\').pop().split('/').pop());
+                    GUI.log(sFilename + i18n.getMessage('savedSuccessfully'));
                 });
-                let sFilename = String(result.filePath.split('\\').pop().split('/').pop());
-                GUI.log(sFilename + i18n.getMessage('savedSuccessfully'));
             });
         });
 
@@ -711,9 +778,11 @@ TABS.firmware_flasher.initialize = function (callback) {
 };
 
 TABS.firmware_flasher.FLASH_MESSAGE_TYPES = {NEUTRAL : 'NEUTRAL',
-                                             VALID   : 'VALID',
-                                             INVALID : 'INVALID',
-                                             ACTION  : 'ACTION'};
+                                            VALID   : 'VALID',
+                                            INVALID : 'INVALID',
+                                            ACTION  : 'ACTION'};
+
+TABS.firmware_flasher.webConnectState = null;
 
 TABS.firmware_flasher.flashingMessage = function(message, type) {
     let self = this;
@@ -752,12 +821,137 @@ TABS.firmware_flasher.flashProgress = function(value) {
 
 TABS.firmware_flasher.cleanup = function (callback) {
     PortHandler.flush_callbacks();
+    TABS.firmware_flasher.webConnectState = null;
 
     // unbind "global" events
     $(document).unbind('keypress');
     $(document).off('click', 'span.progressLabel a');
 
     if (callback) callback();
+};
+
+TABS.firmware_flasher.handleWebConnectClick = function (port, baud) {
+    if (!platform.isWeb || GUI.active_tab !== 'firmware_flasher') {
+        return false;
+    }
+
+    if (!port || port === '0') {
+        GUI.log(i18n.getMessage('targetPrefetchFailNoPort'));
+        return true;
+    }
+
+    TABS.firmware_flasher.webConnectState = {
+        port,
+        baud,
+        phase: 'identify'
+    };
+
+    GUI.connect_lock = true;
+    TABS.firmware_flasher.getTarget();
+    return true;
+};
+
+TABS.firmware_flasher.waitForCliResponse = function(expectedString, timeoutMs, callback) {
+    var receivedData = '';
+    var timeoutHandle = null;
+    var callbackFired = false;
+
+    var onReceiveListener = function(info) {
+        if (callbackFired) {
+            return;
+        }
+
+        var data = new Uint8Array(info.data);
+        var str = String.fromCharCode.apply(null, data);
+        receivedData += str;
+
+        if (receivedData.includes(expectedString)) {
+            callbackFired = true;
+            clearTimeout(timeoutHandle);
+            CONFIGURATOR.connection.removeOnReceiveCallback(onReceiveListener);
+            callback(true, receivedData);
+        }
+    };
+
+    timeoutHandle = setTimeout(function() {
+        if (callbackFired) {
+            return;
+        }
+
+        callbackFired = true;
+        CONFIGURATOR.connection.removeOnReceiveCallback(onReceiveListener);
+        callback(false, receivedData);
+    }, timeoutMs);
+
+    CONFIGURATOR.connection.addOnReceiveCallback(onReceiveListener);
+};
+
+TABS.firmware_flasher.requestWebDfuReady = function () {
+    GUI.log('Waiting for the flight controller to reboot into DFU mode...');
+
+    setTimeout(function () {
+        const confirmed = dialog.confirm(
+            'The flight controller should now be in DFU mode. Click OK to select the DFU USB device and prepare the flasher.'
+        );
+
+        if (!confirmed) {
+            GUI.connect_lock = false;
+            TABS.firmware_flasher.webConnectState = null;
+            GUI.log('DFU device selection was cancelled.');
+            return;
+        }
+
+        GUI.log('Select the DFU device in the browser USB chooser.');
+        PortHandler.requestDFUDevice().then(function (device) {
+            GUI.connect_lock = false;
+            TABS.firmware_flasher.webConnectState = null;
+
+            if (device) {
+                GUI.log('DFU device is ready. Load firmware and click Flash Firmware.');
+            } else {
+                GUI.log('No DFU device was selected.');
+            }
+        });
+    }, 1500);
+};
+
+TABS.firmware_flasher.switchToWebDfu = function () {
+    TABS.firmware_flasher.waitForCliResponse('CLI', 2000, function(success, receivedData) {
+        if (!success) {
+            GUI.connect_lock = false;
+            TABS.firmware_flasher.webConnectState = null;
+            GUI.log('Failed to enter CLI mode before requesting DFU.');
+            console.log('Received data while waiting for CLI:', receivedData);
+            TABS.firmware_flasher.closeTempConnection();
+            return;
+        }
+
+        var dfuCommandStr = 'dfu\r\n';
+        var dfuBuffer = new ArrayBuffer(dfuCommandStr.length);
+        var dfuView = new Uint8Array(dfuBuffer);
+
+        for (var i = 0; i < dfuCommandStr.length; i++) {
+            dfuView[i] = dfuCommandStr.charCodeAt(i);
+        }
+
+        CONFIGURATOR.connection.send(dfuBuffer, function () {
+            TABS.firmware_flasher.closeTempConnection(function () {
+                TABS.firmware_flasher.requestWebDfuReady();
+            });
+        });
+    });
+
+    var cliEnterStr = '####\r\n';
+    var cliEnterBuffer = new ArrayBuffer(cliEnterStr.length);
+    var cliEnterView = new Uint8Array(cliEnterBuffer);
+
+    for (var i = 0; i < cliEnterStr.length; i++) {
+        cliEnterView[i] = cliEnterStr.charCodeAt(i);
+    }
+
+    CONFIGURATOR.connection.send(cliEnterBuffer, function () {
+        console.log('Sent #### to enter CLI from firmware flasher');
+    });
 };
 
 TABS.firmware_flasher.getTarget = function() {
@@ -780,7 +974,11 @@ TABS.firmware_flasher.getTarget = function() {
             }
         }
     } else {
-        GUI.log(i18n.getMessage('targetPrefetchFailDFU'));
+        if (platform.isWeb) {
+            GUI.log('Target prefetch is unavailable in WebUSB DFU mode.');
+        } else {
+            GUI.log(i18n.getMessage('targetPrefetchFailDFU'));
+        }
     }
 };
 
@@ -853,6 +1051,8 @@ TABS.firmware_flasher.onOpen = async function(openInfo) {
             });
         });
     } else {
+        GUI.connect_lock = false;
+        TABS.firmware_flasher.webConnectState = null;
         GUI.log(i18n.getMessage('targetPrefetchFail') + i18n.getMessage('serialPortOpenFail'));
         return;
     }
@@ -866,17 +1066,23 @@ TABS.firmware_flasher.onValidFirmware = function() {
 
             GUI.log(i18n.getMessage('targetPrefetchsuccessful') + FC.CONFIG.target);
 
-            TABS.firmware_flasher.closeTempConnection();
-
             // Only trigger change if the board was actually found and selected
             if (boardSelect.val() === FC.CONFIG.target) {
                 boardSelect.trigger('change');
             }
+
+            if (platform.isWeb && TABS.firmware_flasher.webConnectState?.phase === 'identify') {
+                TABS.firmware_flasher.webConnectState.phase = 'rebooting';
+                TABS.firmware_flasher.switchToWebDfu();
+                return;
+            }
+
+            TABS.firmware_flasher.closeTempConnection();
         });
     });
 };
 
-TABS.firmware_flasher.closeTempConnection = function() {
+TABS.firmware_flasher.closeTempConnection = function(callback) {
     timeout.killAll();
     interval.killAll(['global_data_refresh', 'msp-load-update', 'ltm-connection-check']);
 
@@ -889,6 +1095,15 @@ TABS.firmware_flasher.closeTempConnection = function() {
     CONFIGURATOR.connectionValid = false;
     GUI.connected_to = false;
 
-    CONFIGURATOR.connection.disconnect();
+    CONFIGURATOR.connection.disconnect(function () {
+        if (!callback) {
+            GUI.connect_lock = false;
+            TABS.firmware_flasher.webConnectState = null;
+        }
+
+        if (callback) {
+            callback();
+        }
+    });
     MSP.disconnect_cleanup();
 };

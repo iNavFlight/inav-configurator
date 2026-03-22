@@ -10,6 +10,7 @@ import i18n from './../js/localization';
 import { zeroPad } from './../js/helpers';
 import dialog from '../js/dialog';
 import store from './../js/store';
+import platform from './../js/platform';
 
 
 TABS.logging = {};
@@ -44,10 +45,20 @@ TABS.logging.initialize = function (callback) {
         // translate to user-selected language
         i18n.localize();;
 
+        if (platform.isWeb) {
+            $('a.log_file, a.logging').addClass('disabled');
+            $('.tab-logging .note_spacer').append('<p>Browser edition does not support streamed file logging yet.</p>');
+        }
+
         // UI hooks
         $('a.log_file').on('click', prepare_file);
 
         $('a.logging').on('click', function () {
+            if (platform.isWeb) {
+                GUI.log('Browser edition does not support streamed file logging yet.');
+                return;
+            }
+
             if (GUI.connected_to) {
                 if (readyToWrite) {
                     var clicks = $(this).data('clicks');
@@ -82,7 +93,7 @@ TABS.logging.initialize = function (callback) {
                             interval.add('log_data_poll', log_data_poll, parseInt($('select.speed').val()), true); // refresh rate goes here
                             interval.add('write_data', function write_data() {
                                 if (log_buffer.length && readyToWrite) { // only execute when there is actual data to write
-                                    window.electronAPI.appendFile(loggingFileName, log_buffer.join('\n') + '\n');
+                                    platform.files.appendFile(loggingFileName, log_buffer.join('\n') + '\n');
                                     $('.samples').text(samples += log_buffer.length);
                                     log_buffer = [];
                                 }
@@ -224,6 +235,11 @@ TABS.logging.initialize = function (callback) {
     }
 
     function prepare_file() {
+        if (platform.isWeb) {
+            GUI.log('Browser edition does not support streamed file logging yet.');
+            return;
+        }
+
         // create or load the file
 
         const date = new Date();

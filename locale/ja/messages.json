@@ -2585,6 +2585,15 @@
     "firmwareFlasherRecoveryText": {
         "message": "FCボードとの通信が切断された場合、次の手順で通信を復旧してください: <ul><li>電源をOFFにする</li><li>『再起動シーケンスなし』を有効にし、『チップメモリの完全消去』を有効にします。</li><li>BOOTピンをジャンパーで接続するか、BOOTボタンを押し続けます。</li><li>電源をONにします。(正しく行われればアクティビティLEDは点滅しません)</li><li>必要に応じて、すべてのSTM32ドライバとZadigをインストールします。(INAVマニュアルの<a href=\"https://github.com/iNavFlight/inav/blob/master/docs/USB%20Flashing.md\"target=\"_blank\">USB Flashing</a>章を参照)</li><li>Configuratorを閉じ、すべてのChromeブラウザとChromeアプリを終了してから、Configuratorを再起動します。</li><li>FCボードにBOOTボタンがある場合は、ここでボタンを放します。</li><li>正しいファームウェアで書き込みします。(FCボードのマニュアルに指定がある場合は手動で伝送速度[ボーレート]を設定)</li><li>電源をOFFにします。</li> <li>BOOTジャンパーを取り外します。</li><li>電源をONにします。(アクティビティLEDが点滅するはずです)</li><li>再度、通常通りに接続してください。</li></ul>"
     },
+    "firmwareFlasherWebDfuHead": {
+        "message": "Browser DFU flow"
+    },
+    "firmwareFlasherWebDfuText": {
+        "message": "Select <code>DFU</code> in the port picker, click <code>Flash Firmware</code>, then approve the browser USB chooser."
+    },
+    "firmwareFlasherWebDfuModeText": {
+        "message": "If the flight controller is still running normal firmware, reboot it into DFU/bootloader mode first, reconnect it, then flash from <code>DFU</code>."
+    },
     "firmwareFlasherButtonLeave": {
         "message": "ファームフラッシャーより退避"
     },

@@ -17,6 +17,7 @@ import { PortHandler } from './../js/port_handler';
 import i18n from './../js/localization';
 import store from './../js/store';
 import dialog from './../js/dialog';
+import platform from './../js/platform';
 
 var SYM = SYM || {};
 SYM.LAST_CHAR = 225; // For drawing the font preview
@@ -272,7 +273,7 @@ FONT.openFontFile = function ($preview) {
             }
 
             if (result.filePaths.length == 1) {
-                    window.electronAPI.readFile(result.filePaths[0]).then(response => {
+                    platform.files.readFile(result.filePaths[0]).then(response => {
                     if (response.error) {
                         GUI.log(i18n.getMessage('ErrorReadingFile'));
                         console.log(response.error);
