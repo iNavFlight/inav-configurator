@@ -80,6 +80,14 @@ sudo mv inav-configurator.desktop /usr/share/applications/
 
 The web edition is a browser build intended to run from HTTPS hosting such as GitHub Pages.
 
+Supported browsers:
+
+* Chromium-based desktop browsers with Web Serial, WebUSB, and Web Bluetooth available, such as recent Google Chrome, Microsoft Edge, and Opera
+
+Not supported for the full web edition feature set:
+
+* Firefox, Safari, Mobile browsers
+
 Build locally:
 
 1. Install dependencies with `yarn install`
