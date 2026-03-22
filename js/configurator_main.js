@@ -86,7 +86,10 @@ $(function() {
         }
 
         const version = platform.app.getVersion();
-        const electronMatch = navigator.userAgent.match(/Electron\/([\d\.]+\d+)/);
+        const electronVersionExpression = /Electron\/([\d\.]+\d+)/;
+        const electronMatch = typeof navigator !== 'undefined'
+            ? electronVersionExpression.exec(navigator.userAgent)
+            : null;
         const runtimeVersion = platform.isElectron && electronMatch ? `Electron: <strong>${electronMatch[1]}</strong>, ` : '';
         GUI.log(i18n.getMessage('getRunningOS') + GUI.operating_system + '</strong>, ' +
             runtimeVersion +

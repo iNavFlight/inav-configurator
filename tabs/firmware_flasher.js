@@ -365,6 +365,24 @@ TABS.firmware_flasher.initialize = function (callback) {
             bindFirmwareSelectors();
         }
 
+        function logFirmwareCatalogFailure(error) {
+            const message = error?.responseJSON?.message || error?.message;
+
+            if (message) {
+                GUI.log("<b>GITHUB Query Failed: <code>{0}</code></b>".format(message));
+            }
+        }
+
+        async function fetchReleaseCatalog(url) {
+            const response = await fetch(url);
+
+            if (!response.ok) {
+                throw new Error(`${response.status} ${response.statusText}`);
+            }
+
+            return response.json();
+        }
+
         async function loadWebFirmwareCatalog() {
             try {
                 const manifestUrl = new URL('./firmware/manifest.json', window.location.href);
@@ -382,26 +400,23 @@ TABS.firmware_flasher.initialize = function (callback) {
             }
         }
 
-        function loadElectronFirmwareCatalog() {
-            $.get('https://api.github.com/repos/iNavFlight/inav-nightly/releases?per_page=50', function(releasesData) {
-                TABS.firmware_flasher.devReleasesData = releasesData;
-            }).fail(function (data){
+        async function loadElectronFirmwareCatalog() {
+            try {
+                TABS.firmware_flasher.devReleasesData = await fetchReleaseCatalog('https://api.github.com/repos/iNavFlight/inav-nightly/releases?per_page=50');
+            } catch (error) {
                 TABS.firmware_flasher.devReleasesData = {};
-                if (data["responseJSON"]){
-                    GUI.log("<b>GITHUB Query Failed: <code>{0}</code></b>".format(data["responseJSON"].message));
-                }
+                logFirmwareCatalogFailure(error);
                 setFirmwareCatalogOffline();
-            });
+                return;
+            }
 
-
-            $.get('https://api.github.com/repos/iNavFlight/inav/releases?per_page=10', function (releasesData){
+            try {
+                const releasesData = await fetchReleaseCatalog('https://api.github.com/repos/iNavFlight/inav/releases?per_page=10');
                 applyFirmwareCatalog(releasesData, TABS.firmware_flasher.devReleasesData);
-            }).fail(function (data){
-                if (data["responseJSON"]){
-                    GUI.log("<b>GITHUB Query Failed: <code>{0}</code></b>".format(data["responseJSON"].message));
-                }
+            } catch (error) {
+                logFirmwareCatalogFailure(error);
                 setFirmwareCatalogOffline();
-            });
+            }
         }
 
         if (platform.isWeb) {
@@ -432,7 +447,7 @@ TABS.firmware_flasher.initialize = function (callback) {
                 platform.files.readFile(filename).then(response => {
 
                     if (response.error) {
-                        console.log("Error loading local file", response.erroe);
+                        console.log("Error loading local file", response.error);
                         return;
                     }
 
@@ -943,7 +958,7 @@ TABS.firmware_flasher.switchToWebDfu = function () {
 
     var cliEnterStr = '####\r\n';
     var cliEnterBuffer = new ArrayBuffer(cliEnterStr.length);
-    var cliEnterView = new Uint8Array(cliEnterBuffer);
+    const cliEnterView = new Uint8Array(cliEnterBuffer);
 
     for (var i = 0; i < cliEnterStr.length; i++) {
         cliEnterView[i] = cliEnterStr.charCodeAt(i);

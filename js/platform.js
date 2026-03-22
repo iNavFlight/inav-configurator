@@ -1,6 +1,9 @@
 'use strict';
 
-const isElectron = typeof window !== 'undefined' && typeof window.electronAPI !== 'undefined';
+const browserWindow = globalThis.window;
+const electronApi = browserWindow?.electronAPI;
+const isElectron = electronApi !== undefined;
+const hasSecureContext = globalThis.isSecureContext === true;
 const selectedFiles = new Map();
 
 function getNavigatorLocale() {
@@ -107,9 +110,9 @@ const platform = {
     isElectron,
     isWeb: !isElectron,
     capabilities: {
-        serial: isElectron || (typeof navigator !== 'undefined' && !!navigator.serial && window.isSecureContext),
-        ble: typeof navigator !== 'undefined' && !!navigator.bluetooth && window.isSecureContext,
-        usb: typeof navigator !== 'undefined' && !!navigator.usb && window.isSecureContext,
+        serial: isElectron || (typeof navigator !== 'undefined' && !!navigator.serial && hasSecureContext),
+        ble: typeof navigator !== 'undefined' && !!navigator.bluetooth && hasSecureContext,
+        usb: typeof navigator !== 'undefined' && !!navigator.usb && hasSecureContext,
         tcp: isElectron,
         udp: isElectron,
         sitl: isElectron,
@@ -118,23 +121,23 @@ const platform = {
     },
     app: {
         getVersion() {
-            return isElectron ? window.electronAPI.appGetVersion() : 'web-dev';
+            return isElectron ? electronApi.appGetVersion() : 'web-dev';
         },
         getLocale() {
-            return isElectron ? window.electronAPI.appGetLocale() : getNavigatorLocale();
+            return isElectron ? electronApi.appGetLocale() : getNavigatorLocale();
         },
         getPath(name) {
-            return isElectron ? window.electronAPI.appGetPath(name) : '';
+            return isElectron ? electronApi.appGetPath(name) : '';
         }
     },
     store: {
         get(key, defaultValue) {
             if (isElectron) {
-                return window.electronAPI.storeGet(key, defaultValue);
+                return electronApi.storeGet(key, defaultValue);
             }
 
             try {
-                const raw = window.localStorage.getItem(`inav:${key}`);
+                const raw = browserWindow.localStorage.getItem(`inav:${key}`);
                 return raw === null ? defaultValue : JSON.parse(raw);
             } catch (_error) {
                 return defaultValue;
@@ -142,32 +145,32 @@ const platform = {
         },
         set(key, value) {
             if (isElectron) {
-                window.electronAPI.storeSet(key, value);
+                electronApi.storeSet(key, value);
                 return;
             }
 
-            window.localStorage.setItem(`inav:${key}`, JSON.stringify(value));
+            browserWindow.localStorage.setItem(`inav:${key}`, JSON.stringify(value));
         },
         delete(key) {
             if (isElectron) {
-                window.electronAPI.storeDelete(key);
+                electronApi.storeDelete(key);
                 return;
             }
 
-            window.localStorage.removeItem(`inav:${key}`);
+            browserWindow.localStorage.removeItem(`inav:${key}`);
         }
     },
     dialog: {
         showOpenDialog(options) {
             if (isElectron) {
-                return window.electronAPI.showOpenDialog(options);
+                return electronApi.showOpenDialog(options);
             }
 
             return browserOpenDialog(options);
         },
         showSaveDialog(options = {}) {
             if (isElectron) {
-                return window.electronAPI.showSaveDialog(options);
+                return electronApi.showSaveDialog(options);
             }
 
             return Promise.resolve({
@@ -177,24 +180,24 @@ const platform = {
         },
         alert(message) {
             if (isElectron) {
-                return window.electronAPI.alertDialog(message);
+                return electronApi.alertDialog(message);
             }
 
-            window.alert(message);
+            globalThis.alert(message);
             return 0;
         },
         confirm(message) {
             if (isElectron) {
-                return window.electronAPI.confirmDialog(message);
+                return electronApi.confirmDialog(message);
             }
 
-            return window.confirm(message);
+            return globalThis.confirm(message);
         }
     },
     files: {
         writeFile(filename, data) {
             if (isElectron) {
-                return window.electronAPI.writeFile(filename, data);
+                return electronApi.writeFile(filename, data);
             }
 
             triggerDownload(filename, data);
@@ -202,28 +205,28 @@ const platform = {
         },
         appendFile(filename, data) {
             if (isElectron) {
-                return window.electronAPI.appendFile(filename, data);
+                return electronApi.appendFile(filename, data);
             }
 
             return Promise.reject(new Error(`appendFile is not supported in browser runtime for ${filename}`));
         },
         readFile(filename, encoding = 'utf8') {
             if (isElectron) {
-                return window.electronAPI.readFile(filename, encoding);
+                return electronApi.readFile(filename, encoding);
             }
 
             return browserReadFile(filename, encoding);
         },
         rm(path) {
             if (isElectron) {
-                return window.electronAPI.rm(path);
+                return electronApi.rm(path);
             }
 
             return Promise.resolve('rm is not supported in browser runtime');
         },
         chmod(path, mode) {
             if (isElectron) {
-                return window.electronAPI.chmod(path, mode);
+                return electronApi.chmod(path, mode);
             }
 
             return Promise.resolve('chmod is not supported in browser runtime');
