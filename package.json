@@ -7,6 +7,10 @@
   "type": "module",
   "scripts": {
     "start": "electron-forge start",
+    "start:web": "vite --config vite.web.config.js",
+    "build:web": "vite build --config vite.web.config.js",
+    "build:web:pages": "yarn build:web && node ./scripts/prepare-web-firmware.mjs",
+    "preview:web": "vite preview --config vite.web.config.js",
     "package": "electron-forge package",
     "make": "electron-forge make",
     "publish": "electron-forge publish",

@@ -4,6 +4,7 @@
 import i18next from 'i18next';
 
 import store from './store'
+import platform from './platform';
 
 
 const availableLanguages = ['en', 'ja', 'ru', 'uk', 'zh_CN'];
@@ -20,7 +21,7 @@ i18n.loadMessages = async function(languages) {
 }
 
 i18n.init = function (callback) {
-    const locale = window.electronAPI.appGetLocale();
+    const locale = platform.app.getLocale();
     const userLanguage = store.get('userLanguage', locale);
     this.loadMessages(availableLanguages).then(resources => {
         i18next.init({
@@ -71,7 +72,7 @@ i18n.parseInputFile = function (data) {
 i18n.getValidLocale = function(userLocale) {
     let validUserLocale = userLocale;
     if (validUserLocale === 'DEFAULT') {
-        validUserLocale = window.electronAPI.appGetLocale();
+        validUserLocale = platform.app.getLocale();
         console.log(`Detected locale ${validUserLocale}`);
     }
 

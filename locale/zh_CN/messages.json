@@ -2603,6 +2603,15 @@
     "firmwareFlasherRecoveryText": {
         "message": "如果您和飞控板失去通信，请依照以下步骤恢复通信 :: <ul><li>关闭电源</li><li>开启选项 : 无重启序列 & 清空所有资料</li><li>将 Boot 脚位短路或是按住 Boot 键</li><li>开启电源(如果正确的话，LED 指示灯不会闪烁)</li><li>如果有需要请安装 STM32 驱动程序以及 Zadig 软件(在 iNav 文档中参阅<a href=\"https://github.com/iNavFlight/inav/blob/master/docs/USB%20Flashing.md\"target=\"_blank\">USB刷写</a> 的部分)</li><li>关闭 iNav Configurator，关闭所有 Chrome，关闭所有 Chrome 外挂程序，重新启动 iNav Configurator</li><li>松开 Boot 键，如果您的飞控板有Boot键的话</li><li>烧写正确的固件(手动选择波特率，如果您的飞控手册有指定)</li><li>关闭电源</li><li>移除 Boot 短路脚位</li><li>开启电源(LED 指示灯应该会闪烁)</li><li>正常连线</li></ul>"
     },
+    "firmwareFlasherWebDfuHead": {
+        "message": "Browser DFU flow"
+    },
+    "firmwareFlasherWebDfuText": {
+        "message": "Select <code>DFU</code> in the port picker, click <code>Flash Firmware</code>, then approve the browser USB chooser."
+    },
+    "firmwareFlasherWebDfuModeText": {
+        "message": "If the flight controller is still running normal firmware, reboot it into DFU/bootloader mode first, reconnect it, then flash from <code>DFU</code>."
+    },
     "firmwareFlasherButtonLeave": {
         "message": "关闭固件烧写"
     },

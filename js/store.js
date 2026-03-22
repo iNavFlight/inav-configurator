@@ -1,13 +1,15 @@
+import platform from './platform';
+
 const store = {
     get: (key, defaultValue) => {
-        return window.electronAPI.storeGet(key, defaultValue);
+        return platform.store.get(key, defaultValue);
     },
     set: (key, value) => {
-        window.electronAPI.storeSet(key, value);
+        platform.store.set(key, value);
     },
     delete: (key) => {
-        window.electronAPI.storeDelete(key);
+        platform.store.delete(key);
     }
-}   
+}
 
 export default store;

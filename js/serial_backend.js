@@ -26,6 +26,7 @@ import groundstation from './groundstation';
 import ltmDecoder from './ltmDecoder';
 import mspDeduplicationQueue from './msp/mspDeduplicationQueue';
 import store from './store';
+import platform from './platform';
 
 var SerialBackend = (function () {
 
@@ -173,9 +174,20 @@ var SerialBackend = (function () {
                 var selected_port = privateScope.$port.find('option:selected').data().isManual ?
                     publicScope.$portOverride.val() :
                         String(privateScope.$port.val());
-                
+
+                if (!clicks &&
+                    platform.isWeb &&
+                    GUI.active_tab === 'firmware_flasher' &&
+                    TABS.firmware_flasher &&
+                    typeof TABS.firmware_flasher.handleWebConnectClick === 'function') {
+                    if (TABS.firmware_flasher.handleWebConnectClick(selected_port, selected_baud)) {
+                        return;
+                    }
+                }
+
                 if (selected_port === 'DFU') {
                     GUI.log(i18n.getMessage('dfu_connect_message'));
+                    $('.tab_firmware_flasher a').trigger('click');
                 }
                 else if (selected_port != '0') {
                     if (!clicks) {

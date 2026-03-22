@@ -55,6 +55,7 @@ import interval from './../js/intervals';
 import { Geozone, GeozoneVertex, GeozoneType, GeozoneShapes, GeozoneFenceAction }  from './../js/geozone';
 import store from './../js/store';
 import dialog from '../js/dialog';
+import platform from '../js/platform';
 
 import html from'./mission_control.html?raw';
 
@@ -3816,7 +3817,7 @@ function iconKey(filename) {
             FC.FW_APPROACH.clean(i);
         }
 
-        window.electronAPI.readFile(filename).then(response => {
+        platform.files.readFile(filename).then(response => {
             if (response.error) {
                 GUI.log(i18n.getMessage('errorReadingFile'));
                 console.error(response.error);
@@ -4057,7 +4058,7 @@ function iconKey(filename) {
         var builder = new xml2js.Builder({ 'rootName': 'mission', 'renderOpts': { 'pretty': true, 'indent': '\t', 'newline': '\n' } });
         var xml = builder.buildObject(data);
         xml = xml.replace(/missionitem mission/g, 'meta mission');
-        fs.writeFile(filename, xml, (err) => {
+        platform.files.writeFile(filename, xml).then((err) => {
             if (err) {
                 GUI.log(i18n.getMessage('ErrorWritingFile'));
                 return console.error(err);

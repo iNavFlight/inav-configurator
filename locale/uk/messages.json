@@ -2591,6 +2591,15 @@
     "firmwareFlasherRecoveryText": {
         "message": "Якщо ви втратили зв'язок з вашою платою, дотримуйтесь цих кроків, щоб відновити його: <ul><li>Вимкніть живлення</li><li>Увімкніть 'Польотник уже в режимі завантажувача', увімкніть 'Повністю очистити мікроконтролер'.</li><li>З'єднайте контакти BOOT або утримуйте кнопку BOOT.</li><li>Увімкніть живлення (індикатор активності НЕ буде блимати, якщо все зроблено правильно).</li><li>Встановіть усі драйвери STM32 і Zadig, якщо це необхідно (див. розділ <a href=\"https://github.com/iNavFlight/inav/blob/master/docs/USB%20Flashing.md\"target=\"_blank\">Прошивка через USB</a> в документації INAV).</li><li>Закрийте конфігуратор, закрийте всі запущені екземпляри Chrome, закрийте всі програми Chrome, перезапустіть конфігуратор.</li><li>Відпустіть кнопку BOOT, якщо вона є на вашому польотному контролері.</li><li>Прошивайте правильною прошивкою (використовуючи ручну швидкість передачі даних, якщо це вказано в керівництві до вашого польотного контролера).</li><li>Вимкніть живлення.</li><li>Видаліть перемичку BOOT.</li><li>Увімкніть живлення (індикатор активності має блимати).</li><li>Під'єднайте як зазвичай.</li></ul>"
     },
+    "firmwareFlasherWebDfuHead": {
+        "message": "Browser DFU flow"
+    },
+    "firmwareFlasherWebDfuText": {
+        "message": "Select <code>DFU</code> in the port picker, click <code>Flash Firmware</code>, then approve the browser USB chooser."
+    },
+    "firmwareFlasherWebDfuModeText": {
+        "message": "If the flight controller is still running normal firmware, reboot it into DFU/bootloader mode first, reconnect it, then flash from <code>DFU</code>."
+    },
     "firmwareFlasherButtonLeave": {
         "message": "Вийти з програматора"
     },

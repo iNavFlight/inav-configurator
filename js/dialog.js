@@ -1,15 +1,17 @@
+import platform from './platform';
+
 const dialog =  {
     showOpenDialog: async function (options) {
-        return window.electronAPI.showOpenDialog(options);
+        return platform.dialog.showOpenDialog(options);
     },
     showSaveDialog: async function (options) {
-        return window.electronAPI.showSaveDialog(options);
+        return platform.dialog.showSaveDialog(options);
     },
     alert: function (message) {
-        return window.electronAPI.alertDialog(message);
+        return platform.dialog.alert(message);
     },
     confirm: function (message) {
-        return window.electronAPI.confirmDialog(message);
+        return platform.dialog.confirm(message);
     }
 };
 

@@ -20,6 +20,7 @@ import CliAutoComplete from './CliAutoComplete';
 import { SITLProcess } from './sitl';
 import settingsCache from './settingsCache';
 import store from './store';
+import platform from './platform';
 
 
 window.$ = $;
@@ -84,10 +85,14 @@ $(function() {
             globalSettings.osdUnits = null;
         }
 
-        const version = window.electronAPI.appGetVersion();
-        // alternative - window.navigator.appVersion.match(/Chrome\/([0-9.]*)/)[1];
+        const version = platform.app.getVersion();
+        const electronVersionExpression = /Electron\/([\d\.]+\d+)/;
+        const electronMatch = typeof navigator !== 'undefined'
+            ? electronVersionExpression.exec(navigator.userAgent)
+            : null;
+        const runtimeVersion = platform.isElectron && electronMatch ? `Electron: <strong>${electronMatch[1]}</strong>, ` : '';
         GUI.log(i18n.getMessage('getRunningOS') + GUI.operating_system + '</strong>, ' +
-            'Electron: <strong>' + navigator.userAgent.match(/Electron\/([\d\.]+\d+)/)[1] + '</strong>, ' +
+            runtimeVersion +
             i18n.getMessage('getConfiguratorVersion') + version + '</strong>');
 
         $('#status-bar .version').text(version);
@@ -100,6 +105,12 @@ $(function() {
 
         if (store.get('update_notify', true)) { 
             appUpdater.checkRelease(version);
+        }
+
+        if (platform.isWeb) {
+            $('.tab_sitl').hide();
+            GUI.defaultAllowedTabsWhenDisconnected = GUI.defaultAllowedTabsWhenDisconnected.filter(tab => tab !== 'sitl');
+            GUI.allowedTabs = GUI.defaultAllowedTabsWhenDisconnected.slice();
         }
         
 
@@ -386,6 +397,10 @@ $(function() {
                         store.set('assistnow_api_key', $(this).val());
                         globalSettings.assistnowApiKey = $(this).val();
                     });
+
+                    if (platform.isWeb) {
+                        $('#demoModeReset').closest('.options-section').hide();
+                    }
  
                     $('#demoModeReset').on('click', function () {
                         SITLProcess.deleteEepromFile('demo.bin');

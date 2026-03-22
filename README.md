@@ -76,6 +76,73 @@ sudo mv inav-configurator.desktop /usr/share/applications/
     * Extract ZIP archive and run INAV Configurator
     * OR use the DMG package for installation
 
+### Web Edition
+
+The web edition is a browser build intended to run from HTTPS hosting such as GitHub Pages.
+
+Supported browsers:
+
+* Chromium-based desktop browsers with Web Serial, WebUSB, and Web Bluetooth available, such as recent Google Chrome, Microsoft Edge, and Opera
+
+Not supported for the full web edition feature set:
+
+* Firefox, Safari, Mobile browsers
+
+Build locally:
+
+1. Install dependencies with `yarn install`
+2. Build the browser app with `yarn build:web`
+3. Preview it locally with `yarn preview:web`
+
+Build for GitHub Pages with online firmware mirror:
+
+1. Run `yarn build:web:pages`
+2. This builds `dist-web/`
+3. It also prepares `dist-web/firmware/manifest.json` plus mirrored `.hex` files under `dist-web/firmware/<release>/`
+
+Firmware delivery for the web edition:
+
+The browser build cannot load `.hex` files directly from GitHub Release asset URLs because normal browser CORS rules block that fetch path. For the web edition, firmware must be served from the same origin as the app. `yarn build:web:pages` solves this by downloading selected release assets into `dist-web/firmware/` and generating `dist-web/firmware/manifest.json`. The web flasher reads that manifest and fetches firmware from the same GitHub Pages site, which allows `Load Online` to work.
+
+Optional firmware mirror filters:
+
+* `WEB_FIRMWARE_TARGETS=KAKUTEF7MINI,MATEKF405SE`
+* `WEB_FIRMWARE_RELEASES=1`
+* `WEB_FIRMWARE_REPO=iNavFlight/inav`
+
+Firmware mirror environment variables:
+
+* `WEB_FIRMWARE_TARGETS`
+  Comma-separated list of INAV target names to mirror into the web build. Example: `WEB_FIRMWARE_TARGETS=KAKUTEF7MINI,MATEKF405SE`
+  Only `.hex` assets for these targets will be downloaded into `dist-web/firmware/`.
+  If omitted, all `.hex` targets from the selected releases are mirrored.
+
+* `WEB_FIRMWARE_RELEASES`
+  Number of releases to fetch from the firmware repository. Example: `WEB_FIRMWARE_RELEASES=1`
+  `1` means only the latest release is mirrored.
+
+* `WEB_FIRMWARE_REPO`
+  Source GitHub repository in `owner/repo` format. Example: `WEB_FIRMWARE_REPO=iNavFlight/inav`
+  The default source is the main INAV firmware repository.
+  Change this only if you want to mirror firmware from a fork or another compatible repository.
+
+
+What works in the web edition:
+
+* Web Serial connection
+* Web Bluetooth connection
+* WebUSB DFU flashing
+* Loading local firmware files
+* Loading online firmware files from the mirrored `dist-web/firmware/` catalog
+
+What does not work in the web edition:
+
+* TCP and UDP connections
+* SITL and other local process control features
+* Desktop-only file flows that require unrestricted filesystem access
+* Electron auto-update flow
+
+
 ## Building and running INAV Configurator locally (for development)
 
 For local development, the **node.js** build system is used.

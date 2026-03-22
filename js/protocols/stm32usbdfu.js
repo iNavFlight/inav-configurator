@@ -14,6 +14,7 @@
 
 import { GUI, TABS } from './../gui';
 import i18n from './../localization';
+import { PortHandler } from './../port_handler';
 
 var STM32DFU_protocol = function () {
     this.callback = null;
@@ -113,6 +114,11 @@ STM32DFU_protocol.prototype.connect = function (usbDevices, hex, options, callba
         }
 
     });
+};
+
+STM32DFU_protocol.prototype.requestAndConnect = async function (usbDevices, hex, options, callback) {
+    await PortHandler.requestDFUDevice();
+    this.connect(usbDevices, hex, options, callback);
 };
 
 STM32DFU_protocol.prototype.openDevice = function () {

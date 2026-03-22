@@ -10,6 +10,7 @@ import features from './../js/feature_framework';
 import i18n from './../js/localization';
 import BitHelper from './../js/bitHelper';
 import dialog from './../js/dialog';
+import platform from './../js/platform';
 
 var sdcardTimer;
 
@@ -108,6 +109,11 @@ TABS.onboard_logging.initialize = function (callback) {
                 $('.tab-onboard_logging a.save-flash').on('click', flash_save_begin);
                 $('.tab-onboard_logging a.save-flash-cancel').on('click', flash_save_cancel);
                 $('.tab-onboard_logging a.save-flash-dismiss').on('click', dismiss_saving_dialog);
+            }
+
+            if (platform.isWeb) {
+                $('.tab-onboard_logging a.save-flash').addClass('disabled');
+                $('.tab-onboard_logging .require-dataflash-supported .spacer_box').append('<p>Browser edition does not support streaming flash log export yet.</p>');
             }
 
             $('.save-blackbox-feature').on('click', function () {
@@ -350,6 +356,11 @@ TABS.onboard_logging.initialize = function (callback) {
     }
 
     function flash_save_begin() {
+        if (platform.isWeb) {
+            GUI.log('Browser edition does not support streaming flash log export yet.');
+            return;
+        }
+
         if (GUI.connected_to) {
             // Begin by refreshing the occupied size in case it changed while the tab was open
             flash_update_summary(function() {
@@ -368,7 +379,7 @@ TABS.onboard_logging.initialize = function (callback) {
 
                                 $(".dataflash-saving progress").attr("value", nextAddress / maxBytes * 100);
 
-                                window.electronAPI.appendFile(filename, new Uint8Array(chunk))
+                                platform.files.appendFile(filename, new Uint8Array(chunk))
                                     .then(() => {
                                         if (saveCancelled) {
                                             dismiss_saving_dialog();

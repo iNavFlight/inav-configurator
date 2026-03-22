@@ -5,6 +5,8 @@ name: Build Configurator
 on: 
   pull_request:
 
+  workflow_dispatch:
+
   workflow_call:
     #inputs:
     #  release_build:
