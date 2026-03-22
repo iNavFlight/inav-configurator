@@ -12,16 +12,26 @@ const targetFilter = new Set(
 );
 
 function parseFilename(filename) {
-    const targetFromFilenameExpression = /inav_([\d.]+(?:-rc\d+)?)?_?([^.]+)\.(.*)/;
-    const match = targetFromFilenameExpression.exec(filename);
+    if (!filename.startsWith('inav_')) {
+        return null;
+    }
 
-    if (!match) {
+    const extensionIndex = filename.lastIndexOf('.');
+    if (extensionIndex <= 'inav_'.length || extensionIndex === filename.length - 1) {
+        return null;
+    }
+
+    const format = filename.slice(extensionIndex + 1);
+    const stem = filename.slice('inav_'.length, extensionIndex);
+    const separatorIndex = stem.lastIndexOf('_');
+
+    if (separatorIndex <= 0 || separatorIndex === stem.length - 1) {
         return null;
     }
 
     return {
-        rawTarget: match[2],
-        format: match[3],
+        rawTarget: stem.slice(separatorIndex + 1),
+        format,
     };
 }
 
