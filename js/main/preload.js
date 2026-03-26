@@ -74,6 +74,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   appendFile: (filename, data) => ipcRenderer.invoke('appendFile', filename, data),
   readFile: (filename, encoding = 'utf8') => ipcRenderer.invoke('readFile', filename, encoding),
   rm: (path) => ipcRenderer.invoke('rm', path),
+  ejectDrive: (driveLetter) => ipcRenderer.invoke('ejectDrive', driveLetter),
   chmod: (path, mode) => ipcRenderer.invoke('chmod', path, mode),
   getBackupDir: () => ipcRenderer.invoke('getBackupDir'),
   openBackupDir: () => ipcRenderer.invoke('openBackupDir'),

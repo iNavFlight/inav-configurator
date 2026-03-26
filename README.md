@@ -4,6 +4,66 @@ INAV Configurator is a cross-platform configuration tool for the [INAV](https://
 
 Various types of aircraft are supported by the tool and by INAV, e.g. quadcopters, hexacopters, octocopters, and fixed-wing aircraft.
 
+---
+
+## Map Downloader
+
+Download offline map tiles directly to your radio's SD card for use with OSD map widgets — no flight controller connection required.
+
+![Map Downloader Overview](images/map_generator/Hero.png)
+
+### Supported Output Targets
+
+| Target | Sub-target | SD Card Path |
+|--------|-----------|--------------|
+| b14ckyy ETHOS Mapping Widget | — | `/bitmaps/ethosmaps/maps/{Provider}/{MapType}/{Zoom}/...` |
+| Yaapu Telemetry | ETHOS | `/bitmaps/yaapu/maps/{MapType}/{Zoom}/{Y}/s_{X}.png` |
+| Yaapu Telemetry | EdgeTX | `/IMAGES/yaapu/maps/{MapType}/{Zoom}/{Y}/s_{X}.png` |
+
+### Map Providers
+
+| Provider | Available Map Types |
+|----------|-------------------|
+| OpenStreetMap | Street |
+| ESRI | Street, Satellite, Hybrid |
+| Google | Street, Satellite, Hybrid, Terrain |
+
+### Key Features
+
+| Feature | Description |
+|---------|-------------|
+| **Area Selection** | Draw a rectangle on the map to define the download region with live width/height measurements |
+| **Zoom Range** | Select which zoom levels (1–20) to download |
+| **Sync to SD Card** | Write tiles directly to a mounted SD card |
+| **Export as ZIP** | Save tiles as a portable ZIP archive |
+| **Eject SD Card** | Safely unmount the SD card from within the app (Windows / macOS / Linux) |
+| **Local Tile Cache** | Cache tiles locally to speed up repeated downloads |
+| **Save / Restore Settings** | Persist your preferences across sessions |
+| **Geocoder Search** | Jump to any location by name or address |
+| **Measure Tool** | Measure distances on the map via right-click |
+
+### How to Use
+
+**1. Select your target and map settings**
+
+Configure the output target, map provider, map type, and zoom range in the sidebar.
+
+![Settings Panel](images/map_generator/settings.png)
+
+**2. Draw the download area**
+
+Click the rectangle tool and draw over the region you want. Side labels show the area dimensions in real time.
+
+![Drawing Area](images/map_generator/Drawing.png)
+
+**3. Sync or export**
+
+Click **Sync to SD Card** or **Export as ZIP**. The sync modal shows a summary before downloading begins.
+
+![Sync Modal](images/map_generator/Sync.png)
+
+---
+
 # Support
 
 INAV Configurator comes `as is`, without any warranty and support from the authors. If you find a bug, please create an issue on [GitHub](https://github.com/iNavFlight/inav-configurator/issues).

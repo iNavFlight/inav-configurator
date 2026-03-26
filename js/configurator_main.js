@@ -198,6 +198,9 @@ $(function() {
                         case 'sitl':
                            sitlTab.initialize(content_ready);
                             break;
+                        case 'map_generator':
+                            import('./../tabs/map_generator').then(() => TABS.map_generator.initialize(content_ready));
+                            break;
                         case 'auxiliary':
                             auxiliaryTab.initialize(content_ready);
                             break;

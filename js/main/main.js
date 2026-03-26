@@ -5,7 +5,8 @@ import Store from "electron-store";
 import path from 'path';
 import { fileURLToPath } from 'node:url';
 import started from 'electron-squirrel-startup';
-import { writeFile, readFile, appendFile, readdir } from 'node:fs/promises';
+import { writeFile, readFile, appendFile, readdir, mkdir } from 'node:fs/promises';
+import { execFile } from 'node:child_process';
 
 import tcp from './tcp';
 import udp from './udp';
@@ -358,6 +359,7 @@ app.whenReady().then(() => {
   ipcMain.handle('writeFile', (_event, filename, data) => {
     return new Promise(async resolve => {
       try {
+        await mkdir(path.dirname(filename), { recursive: true });
         await writeFile(filename, data);
         resolve(false)
       } catch (err) {
@@ -402,7 +404,7 @@ app.whenReady().then(() => {
 
   ipcMain.handle('rm', (_event, path) => {
     return new Promise(resolve => {
-      rm(path, error => {
+      rm(path, { recursive: true, force: true }, error => {
         if (error) {
           resolve(error.message)
         } else {
@@ -436,6 +438,29 @@ app.whenReady().then(() => {
     }
     const files = await readdir(backupDir);
     return files.filter(f => f.endsWith('.txt') || f.endsWith('.cli'));
+  });
+
+  ipcMain.handle('ejectDrive', (_event, driveLetter) => {
+    return new Promise(resolve => {
+      if (process.platform === 'win32') {
+        // Use PowerShell to safely eject a removable drive
+        const letter = driveLetter.replaceAll(/[^a-zA-Z]/g, '').charAt(0);
+        if (!letter) return resolve('Invalid drive letter');
+        const script = `$ns = (New-Object -ComObject Shell.Application).Namespace('${letter}:\\'); if ($ns) { $ns.Self.InvokeVerb('Eject') } else { throw 'Drive ${letter}: not found or already ejected' }`;
+        const psPath = path.join(process.env.SYSTEMROOT || 'C:\\Windows', 'System32', 'WindowsPowerShell', 'v1.0', 'powershell.exe');
+        execFile(psPath, ['-NoProfile', '-Command', script], { timeout: 10000 }, (err) => {
+          resolve(err ? err.message : false);
+        });
+      } else if (process.platform === 'darwin') {
+        execFile('/usr/sbin/diskutil', ['eject', driveLetter], { timeout: 10000 }, (err) => {
+          resolve(err ? err.message : false);
+        });
+      } else {
+        execFile('/usr/bin/udisksctl', ['unmount', '-b', driveLetter], { timeout: 10000 }, (err) => {
+          resolve(err ? err.message : false);
+        });
+      }
+    });
   });
 
   ipcMain.on('startChildProcess', (_event, command, args, opts) => {
