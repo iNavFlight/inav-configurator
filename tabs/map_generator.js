@@ -1158,6 +1158,7 @@ TABS.map_generator.initialize = function (callback) {
             updateProgress(0, total, startTime, 0);
 
             let nextTileIndex = 0, consecutiveErrors = 0;
+            const failedTiles = [];
             const workerCount = Math.max(1, Math.min(TILE_CONCURRENCY, tiles.length));
 
             const workers = Array.from({ length: workerCount }, async () => {
@@ -1191,6 +1192,7 @@ TABS.map_generator.initialize = function (callback) {
                     } catch (err) {
                         failedCount++;
                         consecutiveErrors++;
+                        failedTiles.push({ z, tz, x, y });
                         console.warn(`Tile failed z${z} x${x} y${y}:`, err.message);
                     } finally {
                         processed++;
@@ -1200,6 +1202,45 @@ TABS.map_generator.initialize = function (callback) {
             });
 
             await Promise.all(workers);
+
+            /* Auto-retry failed tiles after cooldown — rate limits likely expired by now. */
+            if (failedTiles.length > 0 && !syncAborted) {
+                const retryCount = failedTiles.length;
+                console.log(`Retrying ${retryCount} failed tile(s) after cooldown...`);
+                $('#mapgen_download_status').text('Cooling down before retry...');
+                await sleep(3000);
+
+                let retryRecovered = 0, retryIndex = 0;
+                const retryWorkers = Array.from({ length: Math.max(1, Math.min(2, retryCount)) }, async () => {
+                    const { canvas, ctx } = createWorkerCanvas();
+                    while (!syncAborted) {
+                        const ci = retryIndex++;
+                        if (ci >= failedTiles.length) break;
+                        await sleep(400);
+
+                        const { z, tz, x, y } = failedTiles[ci];
+                        try {
+                            const pathArr = getTilePath({ target, isZipMode, provider, mapType, z, x, y, subtarget });
+                            if (isZipMode) {
+                                const buf = await fetchResizedTileWithRetry(provider, mapType, tz, x, y, canvas, ctx);
+                                addTileToZip(zip, pathArr, buf);
+                            } else {
+                                const fullPath = sdPath + '/' + pathArr.join('/');
+                                const buf = await fetchResizedTileWithRetry(provider, mapType, tz, x, y, canvas, ctx);
+                                await globalThis.electronAPI.writeFile(fullPath, new Uint8Array(buf));
+                            }
+                            retryRecovered++;
+                            failedCount--;
+                            console.log(`Recovered: z${z} x${x} y${y}`);
+                        } catch (e) {
+                            console.warn(`Retry failed: z${z} x${x} y${y}`);
+                        }
+                        $('#mapgen_download_status').text(`Retrying: ${ci + 1} / ${retryCount} (recovered: ${retryRecovered})`);
+                    }
+                });
+                await Promise.all(retryWorkers);
+                if (retryRecovered > 0) console.log(`Retry recovered ${retryRecovered} of ${retryCount} tile(s).`);
+            }
 
             tileCache.persistSize();
             updateCacheSizeDisplay();
