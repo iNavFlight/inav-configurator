@@ -153,7 +153,7 @@ function getTilePath({ target, isZipMode, provider, mapType, z, x, y, subtarget 
 }
 
 // ─── Image loading with timeout ─────────────────────────────────────────
-function loadImage(url, timeoutMs = 12000) {
+function loadImage(url, timeoutMs = 6000) {
     return new Promise((resolve, reject) => {
         const img = new Image();
         let finished = false;
@@ -231,16 +231,22 @@ async function fetchResizedTile(provider, mapType, z, x, y, canvas, ctx) {
     return buf;
 }
 
+/* Retry transient tile download failures before declaring a tile lost.
+ * Fast-fails (under 1.5s) indicate server rejection (e.g. 403 rate-limit),
+ * so retries are skipped to avoid hammering the provider. */
 async function fetchResizedTileWithRetry(provider, mapType, z, x, y, canvas, ctx) {
     const maxRetries = 2;
     let lastError = null;
     for (let attempt = 0; attempt <= maxRetries; attempt++) {
+        const t0 = Date.now();
         try {
             return await fetchResizedTile(provider, mapType, z, x, y, canvas, ctx);
         } catch (err) {
             lastError = err;
+            const elapsed = Date.now() - t0;
+            if (elapsed < 1500) break;
             if (attempt < maxRetries) {
-                await sleep(200 * (attempt + 1));
+                await sleep(300 * (attempt + 1));
             }
         }
     }
@@ -1151,12 +1157,14 @@ TABS.map_generator.initialize = function (callback) {
             $('#mapgen_progress_fill').css('width', '0%');
             updateProgress(0, total, startTime, 0);
 
-            let nextTileIndex = 0;
+            let nextTileIndex = 0, consecutiveErrors = 0;
             const workerCount = Math.max(1, Math.min(TILE_CONCURRENCY, tiles.length));
 
             const workers = Array.from({ length: workerCount }, async () => {
                 const { canvas, ctx } = createWorkerCanvas();
                 while (!syncAborted) {
+                    if (consecutiveErrors >= 5) await sleep(1500);
+                    else if (consecutiveErrors >= 2) await sleep(500);
                     const currentIndex = nextTileIndex++;
                     if (currentIndex >= tiles.length) break;
 
@@ -1179,8 +1187,10 @@ TABS.map_generator.initialize = function (callback) {
                             const buf = await fetchResizedTileWithRetry(provider, mapType, tz, x, y, canvas, ctx);
                             await globalThis.electronAPI.writeFile(fullPath, new Uint8Array(buf));
                         }
+                        consecutiveErrors = 0;
                     } catch (err) {
                         failedCount++;
+                        consecutiveErrors++;
                         console.warn(`Tile failed z${z} x${x} y${y}:`, err.message);
                     } finally {
                         processed++;
