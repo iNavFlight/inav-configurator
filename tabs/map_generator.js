@@ -362,13 +362,21 @@ TABS.map_generator.initialize = function (callback) {
         // ── Initialize tile cache ───────────────────────────────────
         tileCache.init();
 
-        // ── Populate zoom selectors ─────────────────────────────────
+        // ── Populate zoom selectors, respecting per-provider max zoom ──
+        const PROVIDER_MAX_ZOOM = { OSM: 19, ESRI: 20, GOOGLE: 20 };
         const minZSelect = $('#mapgen_min_zoom');
         const maxZSelect = $('#mapgen_max_zoom');
-        for (let i = 1; i <= 20; i++) {
-            minZSelect.append(new Option(i, i, false, i === 8));
-            maxZSelect.append(new Option(i, i, false, i === 14));
+        function rebuildZoomSelectors(maxZ) {
+            const prevMin = parseInt(minZSelect.val()) || 8, prevMax = parseInt(maxZSelect.val()) || 14;
+            minZSelect.empty(); maxZSelect.empty();
+            for (let i = 1; i <= maxZ; i++) {
+                minZSelect.append(new Option(i, i));
+                maxZSelect.append(new Option(i, i));
+            }
+            minZSelect.val(Math.min(prevMin, maxZ));
+            maxZSelect.val(Math.min(prevMax, maxZ));
         }
+        rebuildZoomSelectors(20);
 
         // ── Restore settings (only if user explicitly saved) ────────
         const settingsSaved = store.get('mapgen_settings_saved', false);
@@ -438,6 +446,8 @@ TABS.map_generator.initialize = function (callback) {
             } else {
                 $('#mapgen_yaapu_warning').hide();
             }
+
+            rebuildZoomSelectors(PROVIDER_MAX_ZOOM[provider] || 20);
         }
         syncMapOptions();
 
