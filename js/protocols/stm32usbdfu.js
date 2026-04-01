@@ -192,8 +192,13 @@ STM32DFU_protocol.prototype.getString = function (index, callback) {
     self.usbDevice.controlTransferIn(setup, 255).then(result => {
         if (result.status == 'ok') {;
             var length = result.data.getUint8(0);
+            var actualLength = result.data.byteLength;
+            // Some STM32 DFU implementations report incorrect bLength,
+            // so we must clamp it to the actual received buffer size
+            var safeLength = Math.min(length, actualLength);
             var descriptor = "";
-            for (var i = 2; i < length; i += 2) {
+            // Ensure we don't read past buffer (UTF-16 = 2 bytes per char)
+            for (var i = 2; i + 1 < safeLength; i += 2) {
                 var charCode = result.data.getUint16(i, true);
                 descriptor += String.fromCharCode(charCode);
             }
