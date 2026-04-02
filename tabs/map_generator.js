@@ -133,9 +133,9 @@ function getTilePath({ target, isZipMode, provider, mapType, z, x, y, subtarget 
     if (target === 'b14ckyy') {
         const base = isZipMode ? ['ethosmaps', 'maps'] : ['bitmaps', 'ethosmaps', 'maps'];
         if (provider === 'ESRI') {
-            return [...base, provider, mapType, displayZoom, `${y}`, `${x}.png`];
+            return [...base, provider, mapType, displayZoom, `${y}`, `${x}.jpg`];
         }
-        return [...base, provider, mapType, displayZoom, `${x}`, `${y}.png`];
+        return [...base, provider, mapType, displayZoom, `${x}`, `${y}.jpg`];
     }
 
     // Yaapu — always uses Google-style folder names regardless of provider
@@ -192,17 +192,19 @@ function createWorkerCanvas() {
     return { canvas, ctx: canvas.getContext('2d') };
 }
 
-function canvasToArrayBuffer(canvas) {
+function canvasToArrayBuffer(canvas, target) {
+    const mimeType = (target === 'b14ckyy') ? 'image/jpeg' : 'image/png';
+    const quality = (target === 'b14ckyy') ? 0.7 : undefined;
     return new Promise((resolve, reject) => {
         canvas.toBlob(blob => {
             if (!blob) return reject(new Error('Canvas conversion failed'));
             blob.arrayBuffer().then(resolve).catch(reject);
-        }, 'image/png');
+        }, mimeType, quality);
     });
 }
 
 // ─── Tile fetch + resize ────────────────────────────────────────────────
-async function fetchResizedTile(provider, mapType, z, x, y, canvas, ctx) {
+async function fetchResizedTile(provider, mapType, z, x, y, canvas, ctx, target) {
     // Check local cache first
     const cached = await tileCache.get(provider, mapType, z, x, y);
     if (cached) return cached;
@@ -220,7 +222,7 @@ async function fetchResizedTile(provider, mapType, z, x, y, canvas, ctx) {
         } catch (_) { /* overlay is non-critical, continue without labels */ }
     }
 
-    const buf = await canvasToArrayBuffer(canvas);
+    const buf = await canvasToArrayBuffer(canvas, target);
     if (buf.byteLength < 128) {
         throw new Error('Generated tile too small — likely corrupt');
     }
@@ -234,13 +236,13 @@ async function fetchResizedTile(provider, mapType, z, x, y, canvas, ctx) {
 /* Retry transient tile download failures before declaring a tile lost.
  * Fast-fails (under 1.5s) indicate server rejection (e.g. 403 rate-limit),
  * so retries are skipped to avoid hammering the provider. */
-async function fetchResizedTileWithRetry(provider, mapType, z, x, y, canvas, ctx) {
+async function fetchResizedTileWithRetry(provider, mapType, z, x, y, canvas, ctx, target) {
     const maxRetries = 2;
     let lastError = null;
     for (let attempt = 0; attempt <= maxRetries; attempt++) {
         const t0 = Date.now();
         try {
-            return await fetchResizedTile(provider, mapType, z, x, y, canvas, ctx);
+            return await fetchResizedTile(provider, mapType, z, x, y, canvas, ctx, target);
         } catch (err) {
             lastError = err;
             const elapsed = Date.now() - t0;
@@ -278,7 +280,7 @@ const tileCache = {
     },
 
     getCachePath(provider, mapType, z, x, y) {
-        return `${this.basePath}/${provider}/${mapType}/${z}/${x}/${y}.png`;
+        return `${this.basePath}/${provider}/${mapType}/${z}/${x}/${y}.jpg`;
     },
 
     async get(provider, mapType, z, x, y) {
@@ -1042,8 +1044,8 @@ TABS.map_generator.initialize = function (callback) {
             if (target === 'b14ckyy') {
                 const base = zipMode ? 'ethosmaps/maps' : '/bitmaps/ethosmaps/maps';
                 return provider === 'ESRI'
-                    ? `${base}/${provider}/${mapType}/[Z]/[Y]/[X].png`
-                    : `${base}/${provider}/${mapType}/[Z]/[X]/[Y].png`;
+                    ? `${base}/${provider}/${mapType}/[Z]/[Y]/[X].jpg`
+                    : `${base}/${provider}/${mapType}/[Z]/[X]/[Y].jpg`;
             }
             let base = 'yaapu/maps';
             if (!zipMode) {
@@ -1184,7 +1186,7 @@ TABS.map_generator.initialize = function (callback) {
                         const pathArr = getTilePath({ target, isZipMode, provider, mapType, z, x, y, subtarget });
 
                         if (isZipMode) {
-                            const buf = await fetchResizedTileWithRetry(provider, mapType, tz, x, y, canvas, ctx);
+                            const buf = await fetchResizedTileWithRetry(provider, mapType, tz, x, y, canvas, ctx, target);
                             addTileToZip(zip, pathArr, buf);
                         } else {
                             const fullPath = sdPath + '/' + pathArr.join('/');
@@ -1195,7 +1197,7 @@ TABS.map_generator.initialize = function (callback) {
                                 continue;
                             }
 
-                            const buf = await fetchResizedTileWithRetry(provider, mapType, tz, x, y, canvas, ctx);
+                            const buf = await fetchResizedTileWithRetry(provider, mapType, tz, x, y, canvas, ctx, target);
                             await globalThis.electronAPI.writeFile(fullPath, new Uint8Array(buf));
                         }
                         consecutiveErrors = 0;
@@ -1232,11 +1234,11 @@ TABS.map_generator.initialize = function (callback) {
                         try {
                             const pathArr = getTilePath({ target, isZipMode, provider, mapType, z, x, y, subtarget });
                             if (isZipMode) {
-                                const buf = await fetchResizedTileWithRetry(provider, mapType, tz, x, y, canvas, ctx);
+                                const buf = await fetchResizedTileWithRetry(provider, mapType, tz, x, y, canvas, ctx, target);
                                 addTileToZip(zip, pathArr, buf);
                             } else {
                                 const fullPath = sdPath + '/' + pathArr.join('/');
-                                const buf = await fetchResizedTileWithRetry(provider, mapType, tz, x, y, canvas, ctx);
+                                const buf = await fetchResizedTileWithRetry(provider, mapType, tz, x, y, canvas, ctx, target);
                                 await globalThis.electronAPI.writeFile(fullPath, new Uint8Array(buf));
                             }
                             retryRecovered++;
