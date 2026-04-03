@@ -9,6 +9,7 @@ import 'leaflet-control-geocoder/dist/Control.Geocoder.css';
 import { GUI, TABS } from './../js/gui';
 import i18n from './../js/localization';
 import store from './../js/store';
+import { globalSettings, UnitType } from './../js/globalSettings';
 import JSZip from 'jszip';
 
 // Fix Leaflet default marker icon paths (broken by bundlers)
@@ -388,7 +389,8 @@ TABS.map_generator.initialize = function (callback) {
         const savedProject   = settingsSaved ? store.get('mapgen_project_name', 'MyLocalField') : 'MyLocalField';
         const savedMinZoom   = settingsSaved ? store.get('mapgen_min_zoom', 8) : 8;
         const savedMaxZoom   = settingsSaved ? store.get('mapgen_max_zoom', 14) : 14;
-        const savedUnit      = settingsSaved ? store.get('mapgen_area_unit', 'km2') : 'km2';
+        const defaultUnit    = globalSettings.unitType === UnitType.imperial ? 'mi2' : 'km2';
+        const savedUnit      = settingsSaved ? store.get('mapgen_area_unit', defaultUnit) : defaultUnit;
         const savedCenter    = settingsSaved ? store.get('mapgen_last_center', [42.6977, 23.3219]) : [42.6977, 23.3219];
         const savedZoom      = settingsSaved ? store.get('mapgen_last_zoom', 12) : 12;
 
@@ -934,7 +936,7 @@ TABS.map_generator.initialize = function (callback) {
             $('#mapgen_project_name').val('MyLocalField');
             $('#mapgen_min_zoom').val(8);
             $('#mapgen_max_zoom').val(14);
-            $('#mapgen_area_unit').val('km2');
+            $('#mapgen_area_unit').val(globalSettings.unitType === UnitType.imperial ? 'mi2' : 'km2');
             syncMapOptions();
             switchMapLayer();
             map.setView([42.6977, 23.3219], 12);
