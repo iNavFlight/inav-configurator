@@ -1164,7 +1164,6 @@ TABS.map_generator.initialize = function (callback) {
             const startTime = Date.now();
 
             // Switch to progress view
-            $('#mapgen_sync_info').html('');
             $('#mapgen_modal_confirm').hide();
             $('#mapgen_modal_cancel').text('Abort');
             $('#mapgen_progress_section').show();
