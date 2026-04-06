@@ -1940,7 +1940,8 @@ TABS.map_generator.initialize = function (callback) {
             $('#mapgen_progress_fill').css('width', '0%');
             $('#mapgen_download_status').text('Starting...');
 
-            for (let ti = 0; ti < tiles.length && !syncAborted; ti++) {
+            for (let ti = 0; ti < tiles.length; ti++) {
+                if (syncAborted) break;
                 const tile = tiles[ti];
                 const name = srtmTileName(tile.lat, tile.lon);
                 const prefix = `Tile ${completed + 1}/${totalTiles}: `;
@@ -2044,7 +2045,8 @@ TABS.map_generator.initialize = function (callback) {
             const totalBytes = datFiles.reduce((s, f) => s + f.data.length, 0);
             let writtenBytes = 0;
 
-            for (let i = 0; i < datFiles.length && !syncAborted; i++) {
+            for (let i = 0; i < datFiles.length; i++) {
+                if (syncAborted) break;
                 const df = datFiles[i];
                 const fullPath = sdPath + '/' + df.name;
                 try {
