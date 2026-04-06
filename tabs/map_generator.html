@@ -14,6 +14,7 @@
                             <select id="mapgen_target">
                                 <option value="b14ckyy">b14ckyy ETHOS Mapping Widget</option>
                                 <option value="yaapu">Yaapu</option>
+                                <option value="terrain">INAV Terrain (SRTM)</option>
                             </select>
                             <label for="mapgen_target"><span data-i18n="mapgenTarget">Target Widget</span></label>
                         </div>
@@ -67,7 +68,14 @@
                                 <label for="mapgen_max_zoom"><span data-i18n="mapgenMaxZoom">Max Zoom</span></label>
                             </div>
                         </div>
-                        <div style="font-size:10px; color:#888; margin:2px 0 4px; font-style:italic;">Hint: Each extra zoom level ≈ 4× more tiles. Keep the area small or lower max zoom (when large area selected) to avoid long syncs and rate limits.</div>
+                        <div id="mapgen_hint_tiles" style="font-size:10px; color:#888; margin:2px 0 4px; font-style:italic;">Hint: Each extra zoom level ≈ 4× more tiles. Keep the area small or lower max zoom (when large area selected) to avoid long syncs and rate limits.</div>
+                        <div id="mapgen_hint_terrain" style="font-size:10px; color:#888; margin:2px 0 4px; font-style:italic; display:none;">Hint: One .DAT file per 1°×1° grid square (~111 km). Data: NASA SRTM1 at 30m resolution. Ocean depths are clamped to 0m.</div>
+
+                        <div id="mapgen_terrain_alt_row" class="checkbox mapgen-overwrite-row" style="display:none;">
+                            <input type="checkbox" id="mapgen_terrain_alt_toggle" />
+                            <label for="mapgen_terrain_alt_toggle"><span>Live Altitude</span></label>
+                        </div>
+                        <div id="mapgen_terrain_alt_hint" style="font-size:10px; color:#ff9800; margin:2px 0 4px; font-style:italic; display:none;">Altitude available after generating .DAT files — uses locally cached SRTM data to avoid unnecessary server requests.</div>
 
                         <div class="select">
                             <select id="mapgen_area_unit">
@@ -125,6 +133,8 @@
                         </div>
 
                         <a id="mapgen_clear_cache" class="btn" href="#" data-i18n="mapgenClearCache">Clear Cache</a>
+
+                        <a id="mapgen_clear_hgt_cache" class="btn" href="#" style="display:none; margin-top:6px;">Clear HGT Cache</a>
                     </div>
                 </div>
 
@@ -139,6 +149,7 @@
                 <div id="mapgen_measure_popup" style="display:none;"></div>
                 <div id="mapgen_mouse_coords">
                     <span id="mapgen_coords_output">Lat: 0.0000, Lng: 0.0000</span>
+                    <span id="mapgen_alt_output" style="display:none;">Alt: —</span>
                 </div>
             </div>
         </div>
