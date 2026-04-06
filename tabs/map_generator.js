@@ -337,6 +337,287 @@ const tileCache = {
     },
 };
 
+// ─── SRTM HGT → DAT conversion engine ──────────────────────────────────
+const SRTM_BASE_URL = 'https://s3.amazonaws.com/elevation-tiles-prod/skadi';
+const SRTM_GRID = 3601;
+const TERRAIN_SPACING = 30;
+const TERRAIN_BLK_SIZE_X = 28;
+const TERRAIN_BLK_SIZE_Y = 32;
+const TERRAIN_BLK_SPACE_X = 24;
+const TERRAIN_BLK_SPACE_Y = 28;
+const TERRAIN_IO_BLOCK = 2048;
+const TERRAIN_IO_DATA = 1821;
+const LOCATION_SCALING_FACTOR_F32 = Math.fround(0.011131884502145034);
+const LOCATION_SCALING_FACTOR_INV_F32 = Math.fround(89.83204953368922);
+
+function crc16xmodem(data, len) {
+    let crc = 0;
+    for (let i = 0; i < len; i++) {
+        crc ^= data[i] << 8;
+        for (let j = 0; j < 8; j++) {
+            crc = (crc & 0x8000) ? ((crc << 1) ^ 0x1021) : (crc << 1);
+            crc &= 0xFFFF;
+        }
+    }
+    return crc;
+}
+
+function lonScale(latDeg) {
+    return Math.max(Math.fround(Math.cos(Math.fround(latDeg * Math.PI / 180))), 0.01);
+}
+
+function addOffset(latE7, lonE7, ofsNorth, ofsEast) {
+    const dlat = Math.trunc(ofsNorth * LOCATION_SCALING_FACTOR_INV_F32);
+    const ls = lonScale((latE7 + dlat * 0.5) * 1e-7);
+    const dlng = Math.trunc((ofsEast * LOCATION_SCALING_FACTOR_INV_F32) / ls);
+    return [latE7 + dlat, lonE7 + dlng];
+}
+
+function eastBlocks(latE7, lonE7) {
+    const r = addOffset(latE7, lonE7 + 10000000, 0, 2 * TERRAIN_SPACING * TERRAIN_BLK_SIZE_Y);
+    const dlng = r[1] - lonE7;
+    const eastDist = dlng * LOCATION_SCALING_FACTOR_F32 * lonScale((latE7 + r[0]) * 0.5 * 1e-7);
+    return Math.floor(eastDist / (TERRAIN_SPACING * TERRAIN_BLK_SPACE_Y));
+}
+
+function makeHgtView(hgtData) {
+    const hgtBuf = (hgtData.buffer && hgtData.buffer.byteLength === hgtData.length)
+        ? hgtData.buffer : hgtData.buffer.slice(hgtData.byteOffset, hgtData.byteOffset + hgtData.byteLength);
+    return new DataView(hgtBuf);
+}
+
+function hgtElevation(hgtCache, degLat, degLon, lat, lon) {
+    let tileLat = Math.floor(lat);
+    let tileLon = Math.floor(lon);
+    let key = tileLat + '_' + tileLon;
+    let hgtView = hgtCache[key];
+    if (!hgtView) {
+        key = degLat + '_' + degLon;
+        hgtView = hgtCache[key];
+        if (!hgtView) return 0;
+        tileLat = degLat;
+        tileLon = degLon;
+    }
+    const fracLat = Math.max(0, Math.min(1, lat - tileLat));
+    const fracLon = Math.max(0, Math.min(1, lon - tileLon));
+    const rowF = (1 - fracLat) * 3600;
+    const colF = fracLon * 3600;
+    const r0 = Math.max(0, Math.min(3599, Math.floor(rowF)));
+    const c0 = Math.max(0, Math.min(3599, Math.floor(colF)));
+    const r1 = Math.min(3600, r0 + 1);
+    const c1 = Math.min(3600, c0 + 1);
+    const dr = Math.max(0, Math.min(1, rowF - r0));
+    const dc = Math.max(0, Math.min(1, colF - c0));
+    function getH(r, c) {
+        const v = hgtView.getInt16((r * SRTM_GRID + c) * 2, false);
+        return v === -32768 ? 0 : v;
+    }
+    const alt = Math.trunc(
+        getH(r0, c0) * (1 - dr) * (1 - dc) +
+        getH(r0, c1) * (1 - dr) * dc +
+        getH(r1, c0) * dr * (1 - dc) +
+        getH(r1, c1) * dr * dc
+    );
+    return alt < 0 ? 0 : alt;
+}
+
+function srtmTileName(lat, lon) {
+    const lp = lat >= 0 ? 'N' : 'S';
+    const lnp = lon >= 0 ? 'E' : 'W';
+    return lp + String(Math.abs(lat)).padStart(2, '0') + lnp + String(Math.abs(lon)).padStart(3, '0');
+}
+
+function srtmUrl(lat, lon) {
+    const name = srtmTileName(lat, lon);
+    return SRTM_BASE_URL + '/' + name.substring(0, 3) + '/' + name + '.hgt.gz';
+}
+
+function estimateDatSizeMB(lat) {
+    const baseLat = Math.floor(Math.abs(lat)) * (lat >= 0 ? 1 : -1) * 10000000;
+    const baseLon = 0;
+    let numX = 0;
+    while (addOffset(baseLat, baseLon, numX * TERRAIN_BLK_SPACE_X * TERRAIN_SPACING, 0)[0] * 1e-7 - baseLat * 1e-7 < 1.0) numX++;
+    const numY = eastBlocks(baseLat, baseLon);
+    return (numX * numY * TERRAIN_IO_BLOCK) / 1048576;
+}
+
+function packTerrainBlock(latE7, lonE7, spacing, heights, idxX, idxY, lonDeg, latDeg) {
+    const buf = new ArrayBuffer(TERRAIN_IO_BLOCK);
+    const v = new DataView(buf);
+    const u8 = new Uint8Array(buf);
+    v.setBigUint64(0, 0x00FFFFFFFFFFFFFFn, true);
+    v.setInt32(8, latE7, true);
+    v.setInt32(12, lonE7, true);
+    v.setUint16(16, 0, true);
+    v.setUint16(18, 1, true);
+    v.setUint16(20, spacing, true);
+    let off = 22;
+    for (let x = 0; x < TERRAIN_BLK_SIZE_X; x++) {
+        for (let y = 0; y < TERRAIN_BLK_SIZE_Y; y++) {
+            v.setInt16(off, heights[x * TERRAIN_BLK_SIZE_Y + y], true);
+            off += 2;
+        }
+    }
+    v.setUint16(1814, idxX, true);
+    v.setUint16(1816, idxY, true);
+    v.setInt16(1818, lonDeg, true);
+    v.setInt8(1820, latDeg);
+    v.setUint8(1821, 1);
+    const crc = crc16xmodem(u8, TERRAIN_IO_DATA);
+    v.setUint16(16, crc, true);
+    return u8;
+}
+
+async function createDatFromHgt(degLat, degLon, hgtCache, progressCb) {
+    const baseLat = degLat * 10000000;
+    const baseLon = degLon * 10000000;
+    let numX = 0;
+    while (addOffset(baseLat, baseLon, numX * TERRAIN_BLK_SPACE_X * TERRAIN_SPACING, 0)[0] * 1e-7 - degLat < 1.0) numX++;
+    const numY = eastBlocks(baseLat, baseLon);
+    const totalBlocks = numX * numY;
+    const output = new Uint8Array(totalBlocks * TERRAIN_IO_BLOCK);
+    let blockNum = 0;
+    for (let ix = 0; ix < numX; ix++) {
+        for (let iy = 0; iy < numY; iy++) {
+            const blk = addOffset(baseLat, baseLon,
+                ix * TERRAIN_BLK_SPACE_X * TERRAIN_SPACING,
+                iy * TERRAIN_BLK_SPACE_Y * TERRAIN_SPACING);
+            const latE7 = blk[0];
+            const lonE7 = blk[1];
+            const heights = new Int16Array(TERRAIN_BLK_SIZE_X * TERRAIN_BLK_SIZE_Y);
+            for (let gx = 0; gx < TERRAIN_BLK_SIZE_X; gx++) {
+                for (let gy = 0; gy < TERRAIN_BLK_SIZE_Y; gy++) {
+                    const pt = addOffset(baseLat, baseLon,
+                        (ix * TERRAIN_BLK_SPACE_X + gx) * TERRAIN_SPACING,
+                        (iy * TERRAIN_BLK_SPACE_Y + gy) * TERRAIN_SPACING);
+                    heights[gx * TERRAIN_BLK_SIZE_Y + gy] = hgtElevation(hgtCache, degLat, degLon, pt[0] * 1e-7, pt[1] * 1e-7);
+                }
+            }
+            const block = packTerrainBlock(latE7, lonE7, TERRAIN_SPACING, heights, ix, iy, degLon, degLat);
+            output.set(block, blockNum * TERRAIN_IO_BLOCK);
+            blockNum++;
+            if (blockNum % 200 === 0) {
+                if (progressCb) progressCb(blockNum, totalBlocks);
+                await new Promise(r => setTimeout(r, 0));
+            }
+        }
+    }
+    if (progressCb) progressCb(totalBlocks, totalBlocks);
+    return output;
+}
+
+async function decompressGz(arrayBuffer) {
+    const ds = new DecompressionStream('gzip');
+    const blob = new Blob([arrayBuffer]);
+    const decompressed = blob.stream().pipeThrough(ds);
+    const reader = decompressed.getReader();
+    const chunks = [];
+    while (true) {
+        const result = await reader.read();
+        if (result.done) break;
+        chunks.push(result.value);
+    }
+    const totalLen = chunks.reduce((s, c) => s + c.length, 0);
+    const data = new Uint8Array(totalLen);
+    let off = 0;
+    for (const chunk of chunks) { data.set(chunk, off); off += chunk.length; }
+    return data;
+}
+
+async function fetchSrtmTile(lat, lon, statusCb) {
+    const url = srtmUrl(lat, lon);
+    if (statusCb) statusCb('connecting');
+    const resp = await fetch(url);
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    if (statusCb) statusCb('downloading');
+    const gz = await resp.arrayBuffer();
+    if (statusCb) statusCb('decompressing');
+    return await decompressGz(gz);
+}
+
+function terrainDatFilename(lat, lon) {
+    const latPrefix = lat >= 0 ? 'N' : 'S';
+    const lonPrefix = lon >= 0 ? 'E' : 'W';
+    const latStr = String(Math.abs(lat)).padStart(2, '0');
+    const lonStr = String(Math.abs(lon)).padStart(3, '0');
+    return latPrefix + latStr + lonPrefix + lonStr + '.DAT';
+}
+
+function getTerrainDegreeTiles(bounds) {
+    const tiles = [];
+    const latMin = Math.floor(bounds.getSouth());
+    const latMax = Math.floor(bounds.getNorth());
+    const lonMin = Math.floor(bounds.getWest());
+    const lonMax = Math.floor(bounds.getEast());
+    for (let lat = latMin; lat <= latMax; lat++) {
+        for (let lon = lonMin; lon <= lonMax; lon++) {
+            tiles.push({ lat, lon });
+        }
+    }
+    return tiles;
+}
+
+// ─── IndexedDB HGT cache (persist downloaded SRTM tiles for resume/reuse) ──
+const hgtDb = {
+    _instance: null,
+
+    open() {
+        if (this._instance) return Promise.resolve(this._instance);
+        return new Promise((resolve, reject) => {
+            const req = indexedDB.open('terrainHgtCache', 1);
+            req.onupgradeneeded = e => e.target.result.createObjectStore('hgt');
+            req.onsuccess = e => { this._instance = e.target.result; resolve(this._instance); };
+            req.onerror = () => reject(req.error);
+        });
+    },
+
+    async get(key) {
+        try {
+            const db = await this.open();
+            return new Promise(resolve => {
+                const req = db.transaction('hgt', 'readonly').objectStore('hgt').get(key);
+                req.onsuccess = () => resolve(req.result || null);
+                req.onerror = () => resolve(null);
+            });
+        } catch (_) { return null; }
+    },
+
+    async put(key, data) {
+        try {
+            const db = await this.open();
+            return new Promise(resolve => {
+                const tx = db.transaction('hgt', 'readwrite');
+                tx.objectStore('hgt').put(data, key);
+                tx.oncomplete = () => resolve();
+                tx.onerror = () => resolve();
+            });
+        } catch (_) { /* ignore */ }
+    },
+
+    async cachedSet() {
+        try {
+            const db = await this.open();
+            return new Promise(resolve => {
+                const req = db.transaction('hgt', 'readonly').objectStore('hgt').getAllKeys();
+                req.onsuccess = () => resolve(new Set(req.result));
+                req.onerror = () => resolve(new Set());
+            });
+        } catch (_) { return new Set(); }
+    },
+
+    async clear() {
+        try {
+            const db = await this.open();
+            return new Promise(resolve => {
+                const tx = db.transaction('hgt', 'readwrite');
+                tx.objectStore('hgt').clear();
+                tx.oncomplete = () => resolve();
+                tx.onerror = () => resolve();
+            });
+        } catch (_) { /* ignore */ }
+    },
+};
+
 // ─── Tab lifecycle ──────────────────────────────────────────────────────
 TABS.map_generator.initialize = function (callback) {
     if (GUI.active_tab !== 'map_generator') {
@@ -361,6 +642,10 @@ TABS.map_generator.initialize = function (callback) {
         let sdPath = store.get('mapgen_sd_path', null);
         let syncAborted = false;
         const TILE_CONCURRENCY = 4;
+        let terrainGridLayer = null;
+        let liveAltEnabled = false;
+        let liveAltCache = {};
+        let preTerrainZoom = null;
 
         // ── Initialize tile cache ───────────────────────────────────
         tileCache.init();
@@ -452,6 +737,7 @@ TABS.map_generator.initialize = function (callback) {
             }
 
             rebuildZoomSelectors(PROVIDER_MAX_ZOOM[provider] || 20);
+            updateTerrainMode();
         }
         syncMapOptions();
 
@@ -590,6 +876,10 @@ TABS.map_generator.initialize = function (callback) {
             const rect = L.rectangle(bounds, rectStyle);
             drawnItems.addLayer(rect);
             updateSideLabels(rect);
+            if (isTerrainMode()) {
+                updateTerrainGrid();
+                updateTerrainStatus();
+            }
         }
 
         function enableDrawMode() {
@@ -680,6 +970,7 @@ TABS.map_generator.initialize = function (callback) {
                 sideLabels = { width: null, height: null };
             }
             $('#mapgen_status').text(i18n.getMessage('mapgenStatusDefault') || 'Draw a rectangle on the map to select your area.');
+            if (isTerrainMode()) updateTerrainGrid();
         }
 
         function handleMeasureClick(e) {
@@ -839,6 +1130,9 @@ TABS.map_generator.initialize = function (callback) {
                 sideLabels.height = L.marker(midL, { icon: L.divIcon({ className: 'mapgen-side-label', html: hS }) }).addTo(map);
             }
 
+            // In terrain mode, updateTerrainStatus() sets the status area
+            if (isTerrainMode()) return;
+
             const maxZoomTiles = calculateTiles(bounds, maxZ, maxZ);
             let statusHtml =
                 `<span class="mapgen-area">Area: ${formatArea(area, unit)}</span><br>` +
@@ -852,16 +1146,24 @@ TABS.map_generator.initialize = function (callback) {
         function triggerUpdate() {
             if (drawnItems.getLayers().length > 0) {
                 updateSideLabels(drawnItems.getLayers()[0]);
+                if (isTerrainMode()) updateTerrainStatus();
             }
             $('#mapgen_zoom_display').text('Zoom: ' + map.getZoom());
         }
 
         // ── Map events ──────────────────────────────────────────────
 
-        map.on('zoomend moveend', triggerUpdate);
+        map.on('zoomend moveend', () => {
+            triggerUpdate();
+            if (isTerrainMode()) updateTerrainGrid();
+        });
 
         map.on('mousemove', e => {
             $('#mapgen_coords_output').text(`Lat: ${e.latlng.lat.toFixed(4)}, Lng: ${e.latlng.lng.toFixed(4)}`);
+            if (liveAltEnabled) {
+                const alt = getAltFromCache(e.latlng.lat, e.latlng.lng);
+                $('#mapgen_alt_output').text(alt !== null ? 'Alt: ' + alt + 'm' : 'Alt: \u2014');
+            }
         });
 
         map.on('zoomend', () => {
@@ -892,6 +1194,7 @@ TABS.map_generator.initialize = function (callback) {
                     sideLabels = { width: null, height: null };
                 }
                 $('#mapgen_status').text(i18n.getMessage('mapgenStatusDefault') || 'Draw a rectangle on the map to select your area.');
+                if (isTerrainMode()) updateTerrainGrid();
                 return; // stop here — next right-click will disengage
             }
             // No rectangle → disengage draw mode if active
@@ -945,7 +1248,7 @@ TABS.map_generator.initialize = function (callback) {
         }
 
         // ── Control event bindings ──────────────────────────────────
-        $('#mapgen_target').on('change', () => { syncMapOptions(); });
+        $('#mapgen_target').on('change', () => { syncMapOptions(); triggerUpdate(); });
         $('#mapgen_provider').on('change', () => { syncMapOptions(); switchMapLayer(); });
         $('#mapgen_maptype').on('change', () => { switchMapLayer(); });
         $('#mapgen_min_zoom, #mapgen_max_zoom').on('change', () => { triggerUpdate(); });
@@ -1017,9 +1320,12 @@ TABS.map_generator.initialize = function (callback) {
         });
 
         $('#mapgen_clear_cache').on('click', async () => {
-            if (!globalThis.electronAPI.confirmDialog('Clear all cached map tiles?')) return;
+            if (!globalThis.electronAPI.confirmDialog('Clear all cached map tiles and HGT data?')) return;
             await tileCache.clear();
+            await hgtDb.clear();
+            liveAltCache = {};
             updateCacheSizeDisplay();
+            updateHgtCacheInfo();
         });
 
         // ── Sync pipeline ───────────────────────────────────────────
@@ -1128,8 +1434,20 @@ TABS.map_generator.initialize = function (callback) {
             showModal();
         }
 
-        $('#mapgen_sync_btn').on('click', () => showSyncModal(false));
-        $('#mapgen_zip_btn').on('click', () => showSyncModal(true));
+        $('#mapgen_sync_btn').on('click', () => {
+            if (isTerrainMode()) {
+                showTerrainSyncModal();
+            } else {
+                showSyncModal(false);
+            }
+        });
+        $('#mapgen_zip_btn').on('click', () => {
+            if (isTerrainMode()) {
+                showTerrainSyncModal();
+            } else {
+                showSyncModal(true);
+            }
+        });
 
         $('#mapgen_modal_cancel').on('click', (e) => {
             e.preventDefault();
@@ -1139,7 +1457,11 @@ TABS.map_generator.initialize = function (callback) {
 
         $('#mapgen_modal_confirm').on('click', async (e) => {
             e.preventDefault();
-            await runSync();
+            if (isTerrainMode()) {
+                await terrainGenerateAndSync();
+            } else {
+                await runSync();
+            }
         });
 
         async function runSync() {
@@ -1300,6 +1622,512 @@ TABS.map_generator.initialize = function (callback) {
         setTimeout(() => {
             if (map) map.invalidateSize();
         }, 200);
+
+        // ── Terrain helper functions ────────────────────────────────
+        function isTerrainMode() {
+            return $('#mapgen_target').val() === 'terrain';
+        }
+
+        function getTargetCategory() {
+            return isTerrainMode() ? 'fc' : 'radio';
+        }
+
+        function updateTerrainGrid() {
+            if (terrainGridLayer) {
+                map.removeLayer(terrainGridLayer);
+                terrainGridLayer = null;
+            }
+            if (!isTerrainMode()) return;
+
+            terrainGridLayer = L.layerGroup();
+            const mapBounds = map.getBounds();
+            const latMin = Math.floor(mapBounds.getSouth()) - 1;
+            const latMax = Math.ceil(mapBounds.getNorth()) + 1;
+            const lonMin = Math.floor(mapBounds.getWest()) - 1;
+            const lonMax = Math.ceil(mapBounds.getEast()) + 1;
+
+            for (let lat = latMin; lat <= latMax; lat++) {
+                L.polyline([[lat, lonMin - 1], [lat, lonMax + 1]], {
+                    color: '#ff6600', weight: 1, opacity: 0.5, dashArray: '6,4', interactive: false,
+                }).addTo(terrainGridLayer);
+            }
+            for (let lon = lonMin; lon <= lonMax; lon++) {
+                L.polyline([[latMin - 1, lon], [latMax + 1, lon]], {
+                    color: '#ff6600', weight: 1, opacity: 0.5, dashArray: '6,4', interactive: false,
+                }).addTo(terrainGridLayer);
+            }
+
+            const selLayer = drawnItems.getLayers()[0];
+            if (selLayer) {
+                const sb = selLayer.getBounds();
+                const sLatMin = Math.floor(sb.getSouth());
+                const sLatMax = Math.floor(sb.getNorth());
+                const sLonMin = Math.floor(sb.getWest());
+                const sLonMax = Math.floor(sb.getEast());
+                const selLats = new Set();
+                const selLons = new Set();
+                for (let lat = sLatMin; lat <= sLatMax + 1; lat++) selLats.add(lat);
+                for (let lon = sLonMin; lon <= sLonMax + 1; lon++) selLons.add(lon);
+                const solidStyle = { color: '#ff6600', weight: 2.5, opacity: 0.9, interactive: false };
+                selLats.forEach(lat => {
+                    L.polyline([[lat, sLonMin], [lat, sLonMax + 1]], solidStyle).addTo(terrainGridLayer);
+                });
+                selLons.forEach(lon => {
+                    L.polyline([[sLatMin, lon], [sLatMax + 1, lon]], solidStyle).addTo(terrainGridLayer);
+                });
+            }
+
+            const zoom = map.getZoom();
+            if (zoom >= 6) {
+                const lbl = zoom >= 8 ? { fs: 11, pad: '2px 5px', w: 80, h: 16, bg: 0.8 }
+                          : zoom >= 7 ? { fs: 10, pad: '2px 4px', w: 74, h: 14, bg: 0.7 }
+                                       : { fs: 9, pad: '1px 3px', w: 64, h: 13, bg: 0.55 };
+                for (let lat = latMin; lat < latMax; lat++) {
+                    for (let lon = lonMin; lon < lonMax; lon++) {
+                        if (lat >= -90 && lat < 90 && lon >= -180 && lon < 180) {
+                            L.marker([lat + 0.5, lon + 0.5], {
+                                icon: L.divIcon({
+                                    className: 'terrain-grid-label',
+                                    html: `<span style="font-size:${lbl.fs}px;padding:${lbl.pad};background:rgba(255,102,0,${lbl.bg})">${terrainDatFilename(lat, lon)}</span>`,
+                                    iconSize: [lbl.w, lbl.h],
+                                    iconAnchor: [lbl.w / 2, lbl.h / 2],
+                                }),
+                                interactive: false,
+                            }).addTo(terrainGridLayer);
+                        }
+                    }
+                }
+            }
+
+            terrainGridLayer.addTo(map);
+        }
+
+        function updateTerrainStatus() {
+            if (!isTerrainMode()) return;
+            const layer = drawnItems.getLayers()[0];
+            if (!layer) {
+                $('#mapgen_status').html('<span style="color:#ffb300;">Draw a rectangle to select terrain area...</span>');
+                return;
+            }
+            const bounds = layer.getBounds();
+            const latlngs = layer.getLatLngs()[0];
+            const area = L.GeometryUtil.geodesicArea(latlngs);
+            const unit = $('#mapgen_area_unit').val();
+            const tiles = getTerrainDegreeTiles(bounds);
+            const estSizeMB = tiles.reduce((s, t) => s + estimateDatSizeMB(t.lat), 0).toFixed(0);
+            const fileList = tiles.map(t => terrainDatFilename(t.lat, t.lon));
+            const midLat = (bounds.getNorth() + bounds.getSouth()) / 2;
+            const tileKmNS = 111.0;
+            const tileKmEW = 111.0 * Math.cos(midLat * Math.PI / 180);
+            const gridAreaSqM = tiles.length * tileKmNS * tileKmEW * 1e6;
+
+            let statusHtml =
+                `<span class="mapgen-area">Selected Area: ${formatArea(area, unit)}</span><br>` +
+                `<span class="mapgen-area">Grid Coverage: ${tiles.length} tile(s) \u00b7 ${formatArea(gridAreaSqM, unit)}</span><br>` +
+                `<span class="mapgen-tiles">Est. Size: ~${estSizeMB} MB</span><br>` +
+                `<span style="color:#888; font-size:11px;">${fileList.join(', ')}</span>`;
+            if (bounds.getNorth() > 60 || bounds.getSouth() < -56) {
+                statusHtml += '<br><span style="color:#c62828; font-size:11px;">&#9888;&#65039; Selection extends beyond SRTM coverage (60\u00b0N to 56\u00b0S). Tiles outside this range will have no elevation data.</span>';
+            }
+            $('#mapgen_status').html(statusHtml);
+        }
+
+        function updateTerrainMode() {
+            if (!map) return; // called before map init from syncMapOptions
+            const isTerrain = isTerrainMode();
+
+            // SRTM attribution
+            const srtmAttr = 'Elevation data: <a href="https://www.usgs.gov/centers/eros/science/usgs-eros-archive-digital-elevation-shuttle-radar-topography-mission-srtm-1">NASA SRTM</a>';
+            if (isTerrain) {
+                map.attributionControl.addAttribution(srtmAttr);
+            } else {
+                map.attributionControl.removeAttribution(srtmAttr);
+            }
+
+            // Zoom to terrain-friendly level
+            if (isTerrain && preTerrainZoom === null) {
+                preTerrainZoom = map.getZoom();
+                map.setZoom(8);
+            } else if (!isTerrain && preTerrainZoom !== null) {
+                map.setZoom(preTerrainZoom);
+                preTerrainZoom = null;
+            }
+
+            // Hide tile-specific controls in terrain mode
+            // Provider, map type, project name, zoom row — always visible when not terrain
+            $('#mapgen_provider').closest('.select').toggle(!isTerrain);
+            $('#mapgen_maptype').closest('.select').toggle(!isTerrain);
+            $('#mapgen_project_name').closest('.number').toggle(!isTerrain);
+            $('.mapgen-zoom-row').toggle(!isTerrain);
+            // Warnings and subtarget: only force-hide in terrain mode
+            // syncMapOptions() handles their conditional visibility otherwise
+            if (isTerrain) {
+                $('#mapgen_subtarget_wrapper').addClass('mapgen-subtarget-hidden');
+                $('#mapgen_google_warning').hide();
+                $('#mapgen_yaapu_warning').hide();
+            }
+            // Hints
+            $('#mapgen_hint_tiles').toggle(!isTerrain);
+            $('#mapgen_hint_terrain').toggle(isTerrain);
+            // Terrain altitude controls
+            $('#mapgen_terrain_alt_row').toggle(isTerrain);
+            if (!isTerrain) {
+                $('#mapgen_terrain_alt_toggle').prop('checked', false);
+                toggleLiveAlt();
+            }
+            // Force OSM in terrain mode
+            if (isTerrain) {
+                if (currentLayer) map.removeLayer(currentLayer);
+                if (map.hasLayer(esriLabels)) map.removeLayer(esriLabels);
+                currentLayer = osmLayer;
+                currentLayer.addTo(map);
+            } else {
+                switchMapLayer();
+            }
+            // SD card label
+            updateSdLabel();
+
+            updateTerrainGrid();
+            if (drawnItems.getLayers().length > 0) {
+                updateSideLabels(drawnItems.getLayers()[0]);
+            }
+            if (isTerrain) {
+                updateTerrainStatus();
+                updateHgtCacheInfo();
+            } else {
+                $('#mapgen_clear_hgt_cache').hide();
+            }
+        }
+
+        function updateSdLabel() {
+            const isFc = getTargetCategory() === 'fc';
+            if (sdPath) {
+                const label = isFc ? 'Change FC SD Folder' : (i18n.getMessage('mapgenChangeSd') || 'Change SD Folder');
+                $('#mapgen_link_sd').text(label);
+            } else {
+                const label = isFc ? 'Select FC SD Card Folder' : (i18n.getMessage('mapgenLinkSD') || 'Select SD Card Folder');
+                $('#mapgen_link_sd').text(label);
+            }
+        }
+
+        // ── Live altitude readout ───────────────────────────────────
+        function toggleLiveAlt() {
+            liveAltEnabled = $('#mapgen_terrain_alt_toggle').is(':checked');
+            $('#mapgen_alt_output').toggle(liveAltEnabled);
+            $('#mapgen_terrain_alt_hint').toggle(liveAltEnabled);
+            if (!liveAltEnabled) $('#mapgen_alt_output').text('Alt: \u2014');
+        }
+
+        function getAltFromCache(lat, lon) {
+            const tileLat = Math.floor(lat);
+            const tileLon = Math.floor(lon);
+            const key = tileLat + '_' + tileLon;
+            const hgtView = liveAltCache[key];
+            if (!hgtView) return null;
+            const fracLat = Math.max(0, Math.min(1, lat - tileLat));
+            const fracLon = Math.max(0, Math.min(1, lon - tileLon));
+            const row = Math.max(0, Math.min(3600, Math.round((1 - fracLat) * 3600)));
+            const col = Math.max(0, Math.min(3600, Math.round(fracLon * 3600)));
+            const v = hgtView.getInt16((row * 3601 + col) * 2, false);
+            if (v === -32768) return 0;
+            return v < 0 ? 0 : v;
+        }
+
+        $('#mapgen_terrain_alt_toggle').on('change', toggleLiveAlt);
+
+        // ── HGT cache UI ────────────────────────────────────────────
+        async function updateHgtCacheInfo() {
+            try {
+                const cached = await hgtDb.cachedSet();
+                if (cached.size > 0 && isTerrainMode()) {
+                    $('#mapgen_clear_hgt_cache').text(`Clear HGT Cache (${cached.size} tile${cached.size > 1 ? 's' : ''}, ~${cached.size * 25} MB)`).show();
+                } else {
+                    $('#mapgen_clear_hgt_cache').hide();
+                }
+            } catch (_) {
+                $('#mapgen_clear_hgt_cache').hide();
+            }
+        }
+
+        $('#mapgen_clear_hgt_cache').on('click', async () => {
+            const cached = await hgtDb.cachedSet();
+            if (cached.size === 0) return;
+            if (!globalThis.electronAPI.confirmDialog(`Clear ${cached.size} cached HGT tile(s) (~${cached.size * 25} MB)?`)) return;
+            await hgtDb.clear();
+            liveAltCache = {};
+            updateHgtCacheInfo();
+        });
+
+        // ── Terrain sync pipeline ───────────────────────────────────
+        async function showTerrainSyncModal() {
+            const layer = drawnItems.getLayers()[0];
+            if (!layer) {
+                $('#mapgen_status').text('Error: Please draw a rectangle to select terrain area.');
+                return;
+            }
+
+            syncAborted = false;
+            const bounds = layer.getBounds();
+            const tiles = getTerrainDegreeTiles(bounds);
+            const fileList = tiles.map(t => terrainDatFilename(t.lat, t.lon));
+            const totalSizeMB = tiles.reduce((s, t) => s + estimateDatSizeMB(t.lat), 0).toFixed(0);
+
+            // Compute all unique HGT keys needed (primaries + neighbors)
+            const hgtKeysSet = new Set();
+            tiles.forEach(t => {
+                hgtKeysSet.add(t.lat + '_' + t.lon);
+                hgtKeysSet.add(t.lat + '_' + (t.lon + 1));
+                hgtKeysSet.add((t.lat + 1) + '_' + t.lon);
+                hgtKeysSet.add((t.lat + 1) + '_' + (t.lon + 1));
+            });
+            const totalHgt = hgtKeysSet.size;
+            const cachedSetKeys = await hgtDb.cachedSet();
+            let cachedCount = 0;
+            hgtKeysSet.forEach(k => { if (cachedSetKeys.has(k)) cachedCount++; });
+
+            const hgtSizeMB = (tiles.length * 13).toFixed(0);
+            const cacheInfo = cachedCount > 0
+                ? (cachedCount === totalHgt
+                    ? `<span style="color:#87b025;">All ${totalHgt} HGT tiles cached \u2014 no download needed</span>`
+                    : `${cachedCount} of ${totalHgt} HGT tiles cached`)
+                : `~${hgtSizeMB} MB compressed`;
+
+            const hasSD = !!sdPath;
+            let infoHtml = `
+                <div class="mapgen-info-row"><span>Target:</span><span>INAV Terrain (SRTM1 30m)</span></div>
+                <div class="mapgen-info-row"><span>Terrain Files:</span><span>${tiles.length} .DAT file(s)</span></div>
+                <div class="mapgen-info-row"><span>Est. Output:</span><span>~${totalSizeMB} MB</span></div>
+                <div class="mapgen-info-row"><span>SRTM Download:</span><span>${cacheInfo}</span></div>
+                <div class="mapgen-info-row"><span>Files:</span><span style="font-size:10px;">${fileList.join(', ')}</span></div>
+            `;
+            if (hasSD) {
+                infoHtml += `<div class="mapgen-info-row"><span>SD Path:</span><span style="font-size:11px;">${$('<span>').text(sdPath).html()}</span></div>`;
+                infoHtml += `<div style="margin:6px 0; font-size:11px; color:#888;">\u26a0\ufe0f FREESPAC.E will be auto-deleted from SD card during sync. INAV will recreate it on next boot.</div>`;
+            } else {
+                infoHtml += `<div style="margin:6px 0; font-size:11px; color:#888;">\u26a0\ufe0f Delete FREESPAC.E from the SD card before copying. INAV will recreate it on next boot.</div>`;
+            }
+            infoHtml += `<div style="font-size:12px; color:#888; line-height:1.5;">Source: NASA SRTM 30m elevation data (public domain)</div>`;
+
+            $('#mapgen_sync_info').html(infoHtml);
+            $('#mapgen_modal_header').text('INAV Terrain Generator');
+            $('#mapgen_progress_section').hide();
+            $('#mapgen_modal_actions').show();
+            $('#mapgen_modal_confirm').show().text(hasSD ? 'Generate & Sync' : 'Generate & Download ZIP');
+            $('#mapgen_modal_cancel').text('Cancel');
+            showModal();
+        }
+
+        async function terrainGenerateAndSync() {
+            const layer = drawnItems.getLayers()[0];
+            if (!layer) return;
+
+            syncAborted = false;
+            const bounds = layer.getBounds();
+            const tiles = getTerrainDegreeTiles(bounds);
+            const totalTiles = tiles.length;
+            let completed = 0;
+            const datFiles = [];
+            const hgtCache = {};
+            const startTime = Date.now();
+            const hasSD = !!sdPath;
+            const forceOverwrite = $('#mapgen_overwrite').is(':checked');
+
+            // Switch to progress view
+            $('#mapgen_modal_header').text('Generating Terrain Files...');
+            $('#mapgen_modal_confirm').hide();
+            $('#mapgen_modal_cancel').text('Abort');
+            $('#mapgen_progress_section').show();
+            $('#mapgen_progress_fill').css('width', '0%');
+            $('#mapgen_download_status').text('Starting...');
+
+            for (let ti = 0; ti < tiles.length && !syncAborted; ti++) {
+                const tile = tiles[ti];
+                const name = srtmTileName(tile.lat, tile.lon);
+                const prefix = `Tile ${completed + 1}/${totalTiles}: `;
+                const primaryKey = tile.lat + '_' + tile.lon;
+
+                // Download or use cached HGT data
+                if (!hgtCache[primaryKey]) {
+                    const cachedBuf = await hgtDb.get(primaryKey);
+                    if (cachedBuf) {
+                        hgtCache[primaryKey] = makeHgtView(new Uint8Array(cachedBuf));
+                        $('#mapgen_download_status').text(prefix + '\u2705 Cached ' + name);
+                    } else {
+                        $('#mapgen_download_status').text(prefix + '\u2b07\ufe0f Connecting to SRTM server...');
+                        try {
+                            const hgtData = await fetchSrtmTile(tile.lat, tile.lon, stage => {
+                                const msg = stage === 'connecting' ? '\u2b07\ufe0f Connecting to SRTM server...'
+                                    : stage === 'downloading' ? `\u2b07\ufe0f Downloading ${name}.hgt.gz...`
+                                    : `\ud83d\udce6 Decompressing ${name}...`;
+                                $('#mapgen_download_status').text(prefix + msg);
+                            });
+                            hgtCache[primaryKey] = makeHgtView(hgtData);
+                            hgtDb.put(primaryKey, hgtData.buffer || hgtData);
+                            $('#mapgen_download_status').text(prefix + `\u2705 Downloaded ${name} (${(hgtData.length / 1048576).toFixed(1)} MB)`);
+                        } catch (e) {
+                            console.warn(`SRTM fetch failed for ${name}:`, e.message);
+                            $('#mapgen_download_status').text(`Failed to download ${name}. Continuing...`);
+                        }
+                    }
+                }
+
+                // Fetch neighbor tiles for interpolation at edges
+                const neighbors = [[tile.lat, tile.lon + 1], [tile.lat + 1, tile.lon], [tile.lat + 1, tile.lon + 1]];
+                for (const [nLat, nLon] of neighbors) {
+                    const nKey = nLat + '_' + nLon;
+                    if (!hgtCache[nKey]) {
+                        const cachedN = await hgtDb.get(nKey);
+                        if (cachedN) {
+                            hgtCache[nKey] = makeHgtView(new Uint8Array(cachedN));
+                        } else {
+                            try {
+                                const nData = await fetchSrtmTile(nLat, nLon);
+                                hgtCache[nKey] = makeHgtView(nData);
+                                hgtDb.put(nKey, nData.buffer || nData);
+                            } catch (_) { /* adjacent tile not available */ }
+                        }
+                    }
+                }
+
+                // Convert HGT → DAT
+                $('#mapgen_download_status').text(prefix + `\u2699\ufe0f Converting ${name} to .DAT...`);
+                try {
+                    const datData = await createDatFromHgt(tile.lat, tile.lon, hgtCache, (done, total) => {
+                        const pct = ((completed + done / total) / totalTiles * 100).toFixed(0);
+                        $('#mapgen_progress_fill').css('width', pct + '%');
+                        $('#mapgen_download_status').text(prefix + `\u2699\ufe0f Converting ${name} (${Math.round(done / total * 100)}%)`);
+                    });
+                    datFiles.push({ name: terrainDatFilename(tile.lat, tile.lon), data: datData });
+                    $('#mapgen_download_status').text(prefix + `\u2705 ${terrainDatFilename(tile.lat, tile.lon)} (${(datData.length / 1048576).toFixed(1)} MB)`);
+                } catch (e) {
+                    console.warn(`Conversion failed for ${name}:`, e.message);
+                }
+                completed++;
+            }
+
+            // Share downloaded HGT tiles with live altitude readout
+            Object.keys(hgtCache).forEach(k => { liveAltCache[k] = hgtCache[k]; });
+            updateHgtCacheInfo();
+
+            if (syncAborted || datFiles.length === 0) {
+                if (datFiles.length === 0) {
+                    $('#mapgen_download_status').text('No files generated.');
+                    $('#mapgen_modal_cancel').text('Close');
+                    $('#mapgen_modal_confirm').hide();
+                }
+                return;
+            }
+
+            // Write to SD or download as ZIP
+            if (hasSD) {
+                await writeTerrainToSD(datFiles, forceOverwrite);
+            } else {
+                await downloadTerrainZip(datFiles);
+            }
+        }
+
+        async function writeTerrainToSD(datFiles, forceOverwrite) {
+            $('#mapgen_modal_header').text('Writing to SD Card...');
+            $('#mapgen_download_status').text('Writing to SD card: 0 / ' + datFiles.length + '...');
+            $('#mapgen_progress_fill').css('width', '0%');
+
+            // Try to delete FREESPAC.E
+            try {
+                await globalThis.electronAPI.rm(sdPath + '/FREESPAC.E');
+            } catch (_) { /* OK */ }
+
+            const startTime = Date.now();
+            const total = datFiles.length;
+            let processed = 0;
+            let failedCount = 0;
+            let skipped = 0;
+            const totalBytes = datFiles.reduce((s, f) => s + f.data.length, 0);
+            let writtenBytes = 0;
+
+            for (let i = 0; i < datFiles.length && !syncAborted; i++) {
+                const df = datFiles[i];
+                const fullPath = sdPath + '/' + df.name;
+                try {
+                    if (!forceOverwrite) {
+                        const exists = await tileExistsOnSD(fullPath);
+                        if (exists) {
+                            skipped++;
+                            writtenBytes += df.data.length;
+                            processed++;
+                            const pct = totalBytes > 0 ? (writtenBytes / totalBytes * 100) : 0;
+                            $('#mapgen_progress_fill').css('width', pct.toFixed(0) + '%');
+                            $('#mapgen_download_status').text(`Skipped (exists): ${df.name}`);
+                            continue;
+                        }
+                    }
+                    await globalThis.electronAPI.writeFile(fullPath, df.data);
+                    writtenBytes += df.data.length;
+                    const pct = totalBytes > 0 ? (writtenBytes / totalBytes * 100) : 0;
+                    $('#mapgen_progress_fill').css('width', pct.toFixed(0) + '%');
+                    const elapsed = Date.now() - startTime;
+                    if (writtenBytes > 0 && elapsed > 500) {
+                        const remainMs = Math.max(0, elapsed / writtenBytes * (totalBytes - writtenBytes));
+                        const mins = Math.floor(remainMs / 60000);
+                        const secs = Math.ceil((remainMs % 60000) / 1000);
+                        const speed = (writtenBytes / 1024 / (elapsed / 1000)).toFixed(0);
+                        $('#mapgen_download_status').text(`Writing ${df.name}... ${pct.toFixed(0)}% (${speed} KB/s, ${mins}:${secs.toString().padStart(2, '0')} remaining)`);
+                    }
+                } catch (e) {
+                    failedCount++;
+                    console.warn(`Failed: ${df.name}: ${e.message}`);
+                }
+                processed++;
+            }
+
+            if (syncAborted) return;
+            showTerrainComplete(total, failedCount, skipped, true);
+        }
+
+        async function downloadTerrainZip(datFiles) {
+            $('#mapgen_download_status').text('Creating ZIP...');
+            $('#mapgen_progress_fill').css('width', '0%');
+
+            const zip = new JSZip();
+            for (const df of datFiles) {
+                zip.file(df.name, df.data);
+            }
+
+            const blob = await zip.generateAsync({ type: 'arraybuffer' });
+            const result = await globalThis.electronAPI.showSaveDialog({
+                title: 'Save Terrain Files ZIP',
+                defaultPath: 'INAV_Terrain_SRTM.zip',
+                filters: [{ name: 'ZIP Archive', extensions: ['zip'] }],
+            });
+            if (!result.canceled && result.filePath) {
+                await globalThis.electronAPI.writeFile(result.filePath, new Uint8Array(blob));
+            }
+            showTerrainComplete(datFiles.length, 0, 0, false);
+        }
+
+        function showTerrainComplete(total, failedCount, skipped, isSD) {
+            skipped = skipped || 0;
+            if (failedCount > 0) {
+                $('#mapgen_download_status').text(`Done with ${failedCount} error(s).${skipped > 0 ? ` ${skipped} skipped (already existed).` : ''}`);
+            } else {
+                const written = total - skipped;
+                let summary = `${written} .DAT file(s) written`;
+                if (skipped > 0) summary += `, ${skipped} skipped (already existed)`;
+
+                const title = isSD ? 'Terrain Sync Complete!' : 'Terrain Generation Complete!';
+                const msg = isSD ? 'All terrain files synced to SD card!' : 'All terrain files generated!';
+                $('#mapgen_modal_header').text(title);
+                $('#mapgen_sync_info').html(`
+                    <div class="mapgen-info-row"><span>Files:</span><span>${summary}</span></div>
+                    <div style="margin:18px 0; text-align:center; color:#87b025; font-size:16px; font-weight:bold;">${msg}</div>
+                    <div style="text-align:center; color:#888; font-size:12px;">Enable terrain in INAV CLI:<br><code style="color:#ffb300;">set terrain_enabled = ON</code> then <code style="color:#ffb300;">save</code></div>
+                `);
+                $('#mapgen_progress_section').hide();
+                $('#mapgen_download_status').text(`${isSD ? 'Sync' : 'Export'} complete! ${summary}`);
+            }
+            $('#mapgen_modal_actions').show();
+            $('#mapgen_modal_confirm').hide();
+            $('#mapgen_modal_cancel').text('Close');
+        }
 
         GUI.content_ready(callback);
     }
