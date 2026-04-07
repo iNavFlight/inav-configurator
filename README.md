@@ -6,21 +6,71 @@ Various types of aircraft are supported by the tool and by INAV, e.g. quadcopter
 
 ---
 
-## Map Downloader
+## Map Generator
 
-Download offline map tiles directly to your radio's SD card for use with OSD map widgets — no flight controller connection required.
+The Map Generator tab works without a flight controller connection. Select a target, draw an area on the map, and sync the output to an SD card or export as ZIP.
 
-![Map Downloader Overview](images/map_generator/Hero.png)
+![Map Generator Overview](images/map_generator/Hero.png)
 
-### Supported Output Targets
+### Targets
 
-| Target | Sub-target | SD Card Path |
-|--------|-----------|--------------|
-| b14ckyy ETHOS Mapping Widget | — | `/bitmaps/ethosmaps/maps/{Provider}/{MapType}/{Zoom}/...` |
-| Yaapu Telemetry | ETHOS | `/bitmaps/yaapu/maps/{MapType}/{Zoom}/{Y}/s_{X}.png` |
-| Yaapu Telemetry | EdgeTX | `/IMAGES/yaapu/maps/{MapType}/{Zoom}/{Y}/s_{X}.png` |
+| Target | Output | SD Card |
+|--------|--------|---------|
+| [INAV Terrain (SRTM)](https://github.com/iNavFlight/inav/wiki/Navigation-Terrain-Following) | `.DAT` elevation files | Flight controller |
+| [b14ckyy ETHOS Mapping Widget](https://github.com/b14ckyy/ETHOSMappingWidget-Revisited) | Map tiles | Radio |
+| [Yaapu Telemetry Widget](https://github.com/yaapu/EthosMappingWidget) (ETHOS / EdgeTX) | Map tiles | Radio |
 
-### Map Providers
+---
+
+### INAV Terrain (SRTM)
+
+Generate `.DAT` terrain elevation files from [NASA SRTM1](https://www.usgs.gov/centers/eros/science/usgs-eros-archive-digital-elevation-shuttle-radar-topography-mission-srtm-1) data (1 arc-second, ~30 m resolution, public domain). The files go on the flight controller's SD card and enable terrain altitude reference in the OSD and for sanity checks. The generated files are also compatible with ArduPilot.
+
+![Terrain Mode](images/map_generator/terrain_mode.png)
+
+#### How to Use
+
+1. Select **INAV Terrain (SRTM)** as the target — the map switches to a 1°×1° degree grid overlay
+2. Draw a rectangle over your flying area — the status shows which `.DAT` files will be generated and the estimated size
+3. Link your FC's SD card folder (or use Export as ZIP)
+4. Click **Sync to SD Card** — SRTM elevation data is downloaded, converted to `.DAT` format, and written directly to the SD card
+5. Enable terrain in INAV CLI: `set terrain_enabled = ON` then `save`
+
+![Terrain Sync](images/map_generator/terrain_sync.png)
+
+| Detail | Value |
+|--------|-------|
+| **Data source** | NASA SRTM1 (public domain, from AWS) |
+| **Resolution** | 1 arc-second (~30 meters) |
+| **Coverage** | 60°N to 56°S (global land areas) |
+| **Output** | One `.DAT` file per 1°×1° grid square (~111 km), e.g. `N42E023.DAT` |
+| **Output location** | FC SD card root (e.g. `G:\N42E023.DAT`) |
+| **File size** | ~30 MB per tile |
+| **Format** | 2048-byte blocks, 32×28 int16 height grids, CRC-16/XMODEM checksums |
+
+- **Grid Overlay** — orange 1°×1° grid on the map with `.DAT` filename labels
+- **HGT Cache** — downloaded SRTM tiles are cached in IndexedDB; repeat generations reuse cached data
+- **Live Altitude** — after generation, hover the mouse to see SRTM elevation (from cache, no server requests)
+- **FREESPAC.E Handling** — auto-deleted from the SD card during sync; INAV recreates it on next boot
+- **Skip Existing** — files already on the SD card are skipped unless Force Overwrite is checked
+- Ocean depths are clamped to 0 m
+
+![Terrain Complete](images/map_generator/terrain_complete.png)
+
+#### SD Card Preparation
+
+- Format the SD card with [SD Memory Card Formatter](https://www.sdcard.org/downloads/formatter/) (not Windows Format)
+- Delete `FREESPAC.E` from the SD card before copying files manually (the sync button does this automatically)
+- Use an external SD card reader — INAV MSC mode is very slow
+- Use a quality SD card — cheap cards may cause read errors in flight
+
+---
+
+### Radio Map Tiles — b14ckyy & Yaapu
+
+Download offline map tiles for radio mapping widgets to your radio's SD card.
+
+#### Map Providers
 
 | Provider | Available Map Types |
 |----------|-------------------|
@@ -28,39 +78,33 @@ Download offline map tiles directly to your radio's SD card for use with OSD map
 | ESRI | Street, Satellite, Hybrid |
 | Google | Street, Satellite, Hybrid, Terrain |
 
-### Key Features
+#### Output Paths
 
-| Feature | Description |
-|---------|-------------|
-| **Area Selection** | Draw a rectangle on the map to define the download region with live width/height measurements |
-| **Zoom Range** | Select which zoom levels (1–20) to download |
-| **Sync to SD Card** | Write tiles directly to a mounted SD card |
-| **Export as ZIP** | Save tiles as a portable ZIP archive |
-| **Eject SD Card** | Safely unmount the SD card from within the app (Windows / macOS / Linux) |
-| **Local Tile Cache** | Cache tiles locally to speed up repeated downloads |
-| **Save / Restore Settings** | Persist your preferences across sessions |
-| **Geocoder Search** | Jump to any location by name or address |
-| **Measure Tool** | Measure distances on the map via right-click |
+| Target | Sub-target | SD Card Path |
+|--------|-----------|--------------|
+| b14ckyy | — | `/bitmaps/ethosmaps/maps/{Provider}/{MapType}/{Zoom}/...` |
+| Yaapu | ETHOS | `/bitmaps/yaapu/maps/{MapType}/{Zoom}/{Y}/s_{X}.png` |
+| Yaapu | EdgeTX | `/IMAGES/yaapu/maps/{MapType}/{Zoom}/{Y}/s_{X}.png` |
 
-### How to Use
-
-**1. Select your target and map settings**
-
-Configure the output target, map provider, map type, and zoom range in the sidebar.
-
-![Settings Panel](images/map_generator/settings.png)
-
-**2. Draw the download area**
-
-Click the rectangle tool and draw over the region you want. Side labels show the area dimensions in real time.
+1. Select the output target (b14ckyy or Yaapu), map provider, map type, and zoom range
+2. Draw a rectangle over the region you want — side labels show dimensions in real time
+3. Click **Sync to SD Card** or **Export as ZIP**
 
 ![Drawing Area](images/map_generator/Drawing.png)
 
-**3. Sync or export**
+---
 
-Click **Sync to SD Card** or **Export as ZIP**. The sync modal shows a summary before downloading begins.
+### Common Features
 
-![Sync Modal](images/map_generator/Sync.png)
+| Feature | Description |
+|---------|-------------|
+| **Sync to SD Card** | Write files directly to a mounted SD card |
+| **Export as ZIP** | Save files as a portable ZIP archive |
+| **Eject SD Card** | Safely unmount the SD card from within the app (Windows / macOS / Linux) |
+| **Geocoder Search** | Jump to any location by name or address |
+| **Measure Tool** | Measure distances on the map |
+| **Save / Restore Settings** | Persist your preferences across sessions |
+| **Force Overwrite** | Re-download and overwrite existing files on the SD card |
 
 ---
 
