@@ -31,6 +31,9 @@ import Circle from 'ol/geom/Circle';
 import PointerInteraction from 'ol/interaction/Pointer.js';
 import {defaults as defaultInteractions} from 'ol/interaction/defaults';
 import {Control, defaults as defaultControls} from 'ol/control.js';
+import DragAndDrop from 'ol/interaction/DragAndDrop.js';
+import {GPX, GeoJSON, IGC, KML, TopoJSON} from 'ol/format.js';
+import { unzipSync } from 'fflate';
 
 import MSPChainerClass from './../js/msp/MSPchainer';
 import mspHelper from './../js/msp/MSPHelper';
@@ -57,6 +60,21 @@ import store from './../js/store';
 import dialog from '../js/dialog';
 
 import html from'./mission_control.html?raw';
+
+function extractKmlFromKmz(source) {
+    const data = source instanceof Uint8Array ? source : new Uint8Array(source);
+    const unzipped = unzipSync(data);
+    const kmlEntry = Object.keys(unzipped).find(name => name === 'doc.kml')
+                  || Object.keys(unzipped).find(name => name.endsWith('.kml'));
+    if (!kmlEntry) throw new Error('No KML file found in KMZ archive');
+    return new TextDecoder().decode(unzipped[kmlEntry]);
+}
+
+class KMZ extends KML {
+    getType() { return 'arraybuffer'; }
+    readFeature(source, options) { return super.readFeature(extractKmlFromKmz(source), options); }
+    readFeatures(source, options) { return super.readFeatures(extractKmlFromKmz(source), options); }
+}
 
 var MAX_NEG_FW_LAND_ALT = -2000; // cm
 
@@ -1524,6 +1542,116 @@ function iconKey(filename) {
 
     /////////////////////////////////////////////
     //
+    // Layer Management Functions
+    //
+    /////////////////////////////////////////////
+
+    function updateLayerListUI() {
+        $('#layerListContainer').empty();
+        const customLayers = [];
+        map.getLayers().forEach(layer => {
+            if (layer.get('is_custom_overlay') === true) {
+                customLayers.push(layer);
+            }
+        });
+        if (customLayers.length === 0) {
+            $('#layerListContainer').html('<div style="color: #888; font-style: italic;">No layers loaded</div>');
+            return;
+        }
+        customLayers.forEach((layer, i) => {
+            const layerName = layer.get('name');
+            const isVisible = layer.getVisible();
+            const layerId = 'layer_' + layerName.replace(/[^a-zA-Z0-9]/g, '_' + i);
+            const layerHtml = `
+                <div class="layer-item" style="display: flex; align-items: center; justify-content: space-between; padding: 8px 5px; border-bottom: 1px solid #444;">
+                    <div style="flex: 1; display: flex; align-items: center; min-width: 0;">
+                        <input id="${layerId}" type="checkbox" class="togglemedium layer-toggle" data-layer-name="${layerName}" ${isVisible ? 'checked' : ''} style="flex-shrink: 0;">
+                        <label for="${layerId}" style="margin-left: 8px; cursor: pointer; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${layerName}</label>
+                    </div>
+                    <div class="btnTable btnTableIcon btnTable-danger" style="margin-left: 10px; flex-shrink: 0;">
+                        <a class="ic_removeAll layer-delete" data-layer-name="${layerName}" href="#" title="Delete layer"></a>
+                    </div>
+                </div>
+            `;
+            $('#layerListContainer').append(layerHtml);
+        });
+        GUI.switchery();
+        $('.layer-toggle').on('change', function() {
+            const layerName = $(this).attr('data-layer-name');
+            const isChecked = $(this).is(':checked');
+            map.getLayers().forEach(layer => {
+                if (layer.get('name') === layerName && layer.get('is_custom_overlay')) {
+                    layer.setVisible(isChecked);
+                }
+            });
+        });
+        $('.layer-delete').on('click', function(event) {
+            event.preventDefault();
+            const layerName = $(this).attr('data-layer-name');
+            if (dialog.confirm(i18n.getMessage('layerConfirmDelete'))) {
+                removeLayerFromDisk(layerName);
+            }
+        });
+    }
+
+    function saveLayerToDisk(layer) {
+        let customOverlayList = store.get('custom_overlay_list');
+        if (customOverlayList === undefined) {
+            customOverlayList = [];
+        }
+        const writer = new GeoJSON();
+        const geojsonStr = writer.writeFeatures(layer.getSource().getFeatures());
+        const layerName = layer.get('name');
+        customOverlayList = customOverlayList.filter(l => l.name !== layerName);
+        const savedLayer = {
+            name: layerName,
+            layer_data: geojsonStr,
+            visible: layer.getVisible()
+        };
+        customOverlayList.push(savedLayer);
+        store.set('custom_overlay_list', customOverlayList);
+        GUI.log(`Saved layer: ${layerName}`);
+    }
+
+    function removeLayerFromDisk(layerName) {
+        let customOverlayList = store.get('custom_overlay_list');
+        if (!customOverlayList) return;
+        customOverlayList = customOverlayList.filter(l => l.name !== layerName);
+        store.set('custom_overlay_list', customOverlayList);
+        const layersToRemove = [];
+        map.getLayers().forEach(layer => {
+            if (layer.get('name') === layerName && layer.get('is_custom_overlay')) {
+                layersToRemove.push(layer);
+            }
+        });
+        layersToRemove.forEach(layer => map.removeLayer(layer));
+        updateLayerListUI();
+        GUI.log(`Removed layer: ${layerName}`);
+    }
+
+    function createGeoLayer(features, fileName, visible) {
+        const vectorSource = new VectorSource({ features: features });
+        vectorSource.forEachFeature(function(feature) {
+            if (!feature.get('name')) feature.set('name', fileName);
+            feature.set('show_info_on_hover', true);
+        });
+        const vectorLayer = new VectorLayer({ source: vectorSource, visible: visible });
+        vectorLayer.set('name', fileName);
+        vectorLayer.set('is_custom_overlay', true);
+        vectorLayer.set('no_interaction', true);
+        map.addLayer(vectorLayer);
+        return vectorLayer;
+    }
+
+    function addGeoLayerToMap(features, fileName, visible = true) {
+        const vectorLayer = createGeoLayer(features, fileName, visible);
+        saveLayerToDisk(vectorLayer);
+        updateLayerListUI();
+        GUI.log(`Added layer: ${fileName}`);
+    }
+
+    /////////////////////////////////////////////
+    //
     // Manage Waypoint
     //
     /////////////////////////////////////////////
@@ -2272,14 +2400,16 @@ function iconKey(filename) {
 
             var map = evt.map;
 
+            const isInteractable = (layer) => !layer || layer.get('no_interaction') !== true;
+
             var feature = map.forEachFeatureAtPixel(evt.pixel,
                 function (feature, layer) {
-                    return feature;
+                    return isInteractable(layer) ? feature : null;
                 });
 
             tempMarker = map.forEachFeatureAtPixel(evt.pixel,
                 function (feature, layer) {
-                    return layer;
+                    return isInteractable(layer) ? layer : null;
                 });
 
             if (feature) {
@@ -2551,6 +2681,77 @@ function iconKey(filename) {
             map.getView().setCenter(fromLonLat(missionPlannerLastValues.center));
             map.getView().setZoom(missionPlannerLastValues.zoom);
         }         
+
+        //////////////////////////////////////////////////////////////////////////
+        // Load previously saved GEO files from electron store
+        //////////////////////////////////////////////////////////////////////////
+        if (store.get('custom_overlay_list') === undefined) {
+            store.set('custom_overlay_list', []);
+        }
+
+        for (let savedLayer of store.get('custom_overlay_list')) {
+            const features = new GeoJSON().readFeatures(savedLayer.layer_data, {
+                dataProjection: 'EPSG:4326',
+                featureProjection: map.getView().getProjection()
+            });
+            createGeoLayer(features, savedLayer.name, savedLayer.visible !== false);
+        }
+        updateLayerListUI();
+
+        //////////////////////////////////////////////////////////////////////////
+        // Add drag-and-drop support for GEO files
+        //////////////////////////////////////////////////////////////////////////
+        const dragAndDropInteraction = new DragAndDrop({
+            formatConstructors: [
+                GPX,
+                GeoJSON,
+                IGC,
+                KML,
+                KMZ,
+                TopoJSON,
+            ],
+        });
+
+        dragAndDropInteraction.on('addfeatures', function(event) {
+            const fileName = event.file.name;
+            GUI.log(`Drag-and-dropped file: ${fileName}`);
+            addGeoLayerToMap(event.features, fileName);
+        });
+
+        map.addInteraction(dragAndDropInteraction);
+
+        //////////////////////////////////////////////////////////////////////////
+        // Feature hover info display
+        //////////////////////////////////////////////////////////////////////////
+        const displayFeatureInfo = function(pixel) {
+            const features = [];
+            const geoInfoEl = document.getElementById('geo_info');
+            map.forEachFeatureAtPixel(pixel, function(feature) {
+                if (feature.get('show_info_on_hover') === true) {
+                    features.push(feature);
+                }
+            });
+
+            if (features.length > 0) {
+                const info = [];
+                for (let i = 0; i < features.length; i++) {
+                    const name = features[i].get('name') || 'Unknown';
+                    info.push(name);
+                }
+                geoInfoEl.innerHTML = info.join(', ');
+                geoInfoEl.style.opacity = '1';
+            } else {
+                geoInfoEl.style.opacity = '0';
+            }
+        };
+
+        map.on('pointermove', function(evt) {
+            if (evt.dragging) {
+                return;
+            }
+            const pixel = map.getEventPixel(evt.originalEvent);
+            displayFeatureInfo(pixel);
+        });
 
         //////////////////////////////////////////////////////////////////////////
         // Map on-click behavior definition
@@ -3994,6 +4195,106 @@ function iconKey(filename) {
             $(this).addClass('disabled');
             GUI.log(i18n.getMessage('startSendPoint'));
             sendWaypointsToFC(true);
+        });
+
+        /////////////////////////////////////////////
+        // Callback for Layer management buttons
+        /////////////////////////////////////////////
+        $('#loadGeoFileButton').on('click', function() {
+            var options = {
+                filters: [
+                    { name: 'GEO Files', extensions: ['kml', 'kmz', 'geojson', 'json', 'gpx', 'igc', 'topojson'] },
+                    { name: 'All Files', extensions: ['*'] }
+                ]
+            };
+
+            dialog.showOpenDialog(options).then(result => {
+                if (result.canceled) {
+                    console.log('No file selected');
+                    return;
+                }
+
+                if (result.filePaths.length == 1) {
+                    const filePath = result.filePaths[0];
+                    const fileName = filePath.split('/').pop().split('\\').pop();
+                    const ext = fileName.split('.').pop().toLowerCase();
+
+                    // Read file content using Electron API (binary for kmz, text otherwise)
+                    window.electronAPI.readFile(filePath, ext === 'kmz' ? null : undefined).then(response => {
+                        if (response.error) {
+                            GUI.log(`Error reading file: ${response.error}`);
+                            dialog.alert(i18n.getMessage('layerLoadError'));
+                            return;
+                        }
+
+                        try {
+                            // Detect format and parse
+                            let format;
+                            let fileData = response.data;
+
+                            switch(ext) {
+                                case 'kmz':
+                                    fileData = extractKmlFromKmz(response.data);
+                                    format = new KML();
+                                    break;
+                                case 'kml':
+                                    format = new KML();
+                                    break;
+                                case 'json':
+                                case 'geojson':
+                                    format = new GeoJSON();
+                                    break;
+                                case 'gpx':
+                                    format = new GPX();
+                                    break;
+                                case 'igc':
+                                    format = new IGC();
+                                    break;
+                                case 'topojson':
+                                    format = new TopoJSON();
+                                    break;
+                                default:
+                                    throw new Error('Unsupported file format');
+                            }
+
+                            const features = format.readFeatures(fileData, {
+                                dataProjection: 'EPSG:4326',
+                                featureProjection: 'EPSG:3857'
+                            });
+
+                            if (features.length === 0) {
+                                throw new Error('No features found in file');
+                            }
+
+                            addGeoLayerToMap(features, fileName);
+                            GUI.log(`Loaded ${features.length} features from ${fileName}`);
+
+                        } catch (error) {
+                            GUI.log(`Error parsing file: ${error.message}`);
+                            dialog.alert(i18n.getMessage('layerParseError'));
+                        }
+                    }).catch(error => {
+                        GUI.log(`Error reading file: ${error.message || error}`);
+                        dialog.alert(i18n.getMessage('layerLoadError'));
+                    });
+                }
+            }).catch(error => {
+                GUI.log(`Error opening file dialog: ${error.message || error}`);
+                dialog.alert(i18n.getMessage('layerLoadError'));
+            });
+        });
+
+        $('#showHideLayersButton').on('click', function () {
+            var src = ($(this).children().attr('class') === 'ic_hide')
+                ? 'ic_show'
+                : 'ic_hide';
+            $(this).children().attr('class', src);
+            if ($(this).children().attr('class') === 'ic_hide') {
+                $('#layerContent').fadeIn(300);
+            }
+            else {
+                $('#layerContent').fadeOut(300);
+            }
         });
 
         /////////////////////////////////////////////
