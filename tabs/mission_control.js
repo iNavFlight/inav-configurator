@@ -1561,7 +1561,7 @@ function iconKey(filename) {
         customLayers.forEach((layer, i) => {
             const layerName = layer.get('name');
             const isVisible = layer.getVisible();
-            const layerId = 'layer_' + layerName.replace(/[^a-zA-Z0-9]/g, '_' + i);
+            const layerId = 'layer_' + layerName.replaceAll(/[^a-zA-Z0-9]/g, '_' + i);
             const layerHtml = `
                 <div class="layer-item" style="display: flex; align-items: center; justify-content: space-between; padding: 8px 5px; border-bottom: 1px solid #444;">
                     <div style="flex: 1; display: flex; align-items: center; min-width: 0;">
@@ -1648,6 +1648,42 @@ function iconKey(filename) {
         saveLayerToDisk(vectorLayer);
         updateLayerListUI();
         GUI.log(`Added layer: ${fileName}`);
+    }
+
+    async function loadGeoFile(filePath) {
+        const fileName = filePath.split('/').pop().split('\\').pop();
+        const ext = fileName.split('.').pop().toLowerCase();
+
+        const response = await globalThis.electronAPI.readFile(filePath, ext === 'kmz' ? null : undefined);
+        if (response.error) {
+            GUI.log(`Error reading file: ${response.error}`);
+            dialog.alert(i18n.getMessage('layerLoadError'));
+            return;
+        }
+
+        let format;
+        let fileData = response.data;
+
+        switch (ext) {
+            case 'kmz': fileData = extractKmlFromKmz(response.data); format = new KML(); break;
+            case 'kml': format = new KML(); break;
+            case 'json':
+            case 'geojson': format = new GeoJSON(); break;
+            case 'gpx': format = new GPX(); break;
+            case 'igc': format = new IGC(); break;
+            case 'topojson': format = new TopoJSON(); break;
+            default: throw new Error('Unsupported file format');
+        }
+
+        const features = format.readFeatures(fileData, {
+            dataProjection: 'EPSG:4326',
+            featureProjection: 'EPSG:3857'
+        });
+
+        if (features.length === 0) throw new Error('No features found in file');
+
+        addGeoLayerToMap(features, fileName);
+        GUI.log(`Loaded ${features.length} features from ${fileName}`);
     }
 
     /////////////////////////////////////////////
@@ -2400,7 +2436,7 @@ function iconKey(filename) {
 
             var map = evt.map;
 
-            const isInteractable = (layer) => !layer || layer.get('no_interaction') !== true;
+            const isInteractable = (layer) => layer?.get('no_interaction') !== true;
 
             var feature = map.forEachFeatureAtPixel(evt.pixel,
                 function (feature, layer) {
@@ -2734,9 +2770,8 @@ function iconKey(filename) {
 
             if (features.length > 0) {
                 const info = [];
-                for (let i = 0; i < features.length; i++) {
-                    const name = features[i].get('name') || 'Unknown';
-                    info.push(name);
+                for (const feature of features) {
+                    info.push(feature.get('name') || 'Unknown');
                 }
                 geoInfoEl.innerHTML = info.join(', ');
                 geoInfoEl.style.opacity = '1';
@@ -3003,102 +3038,27 @@ function iconKey(filename) {
         /////////////////////////////////////////////
         // Callback to show/hide menu boxes
         /////////////////////////////////////////////
-        
+
+        function setupShowHidePanel(buttonId, contentId) {
+            $(`#${buttonId}`).on('click', function () {
+                const wasVisible = $(this).children().attr('class') === 'ic_hide';
+                $(this).children().attr('class', wasVisible ? 'ic_show' : 'ic_hide');
+                $(`#${contentId}`)[wasVisible ? 'fadeOut' : 'fadeIn'](300);
+            });
+        }
+
         // Ensure ActionContent is visible initially
         if ($('#showHideActionButton').children().attr('class') === 'ic_hide') {
             $('#ActionContent').show();
         }
-        
-        $('#showHideActionButton').on('click', function () {
-            var src = ($(this).children().attr('class') === 'ic_hide')
-                ? 'ic_show'
-                : 'ic_hide';
-            $(this).children().attr('class', src);
-            if ($(this).children().attr('class') === 'ic_hide') {
-                $('#ActionContent').fadeIn(300);
-            }
-            else {
-                $('#ActionContent').fadeOut(300);
-            }
-        });
 
-        $('#showHideInfoButton').on('click', function () {
-            var src = ($(this).children().attr('class') === 'ic_hide')
-                ? 'ic_show'
-                : 'ic_hide';
-            $(this).children().attr('class', src);
-            if ($(this).children().attr('class') === 'ic_hide') {
-                $('#InfoContent').fadeIn(300);
-            }
-            else {
-                $('#InfoContent').fadeOut(300);
-            }
-        });
-
-        $('#showHideSafehomeButton').on('click', function () {
-            var src = ($(this).children().attr('class') === 'ic_hide')
-                ? 'ic_show'
-                : 'ic_hide';
-            $(this).children().attr('class', src);
-            if ($(this).children().attr('class') === 'ic_hide') {
-                $('#SafehomeContent').fadeIn(300);
-            }
-            else {
-                $('#SafehomeContent').fadeOut(300);
-            }
-        });
-
-        $('#showHideHomeButton').on('click', function () {
-            var src = ($(this).children().attr('class') === 'ic_hide')
-                ? 'ic_show'
-                : 'ic_hide';
-            $(this).children().attr('class', src);
-            if ($(this).children().attr('class') === 'ic_hide') {
-                $('#HomeContent').fadeIn(300);
-            }
-            else {
-                $('#HomeContent').fadeOut(300);
-            }
-        });
-
-        $('#showHideWPeditButton').on('click', function () {
-            var src = ($(this).children().attr('class') === 'ic_hide')
-                ? 'ic_show'
-                : 'ic_hide';
-            $(this).children().attr('class', src);
-            if ($(this).children().attr('class') === 'ic_hide') {
-                $('#WPeditContent').fadeIn(300);
-            }
-            else {
-                $('#WPeditContent').fadeOut(300);
-            }
-        });
-
-        $('#showHideMultimissionButton').on('click', function () {
-            var src = ($(this).children().attr('class') === 'ic_hide')
-                ? 'ic_show'
-                : 'ic_hide';
-            $(this).children().attr('class', src);
-            if ($(this).children().attr('class') === 'ic_hide') {
-                $('#multimissionContent').fadeIn(300);
-            }
-            else {
-                $('#multimissionContent').fadeOut(300);
-            }
-        });
-
-        $('#showHideGeozonesButton').on('click', function () {
-            var src = ($(this).children().attr('class') === 'ic_hide')
-                ? 'ic_show'
-                : 'ic_hide';
-            $(this).children().attr('class', src);
-            if ($(this).children().attr('class') === 'ic_hide') {
-                $('#geozoneContent').fadeIn(300);
-            }
-            else {
-                $('#geozoneContent').fadeOut(300);
-            }
-        });
+        setupShowHidePanel('showHideActionButton',      'ActionContent');
+        setupShowHidePanel('showHideInfoButton',        'InfoContent');
+        setupShowHidePanel('showHideSafehomeButton',    'SafehomeContent');
+        setupShowHidePanel('showHideHomeButton',        'HomeContent');
+        setupShowHidePanel('showHideWPeditButton',      'WPeditContent');
+        setupShowHidePanel('showHideMultimissionButton','multimissionContent');
+        setupShowHidePanel('showHideGeozonesButton',    'geozoneContent');
 
         /////////////////////////////////////////////
         // Callback for Waypoint edition
@@ -4200,102 +4160,34 @@ function iconKey(filename) {
         /////////////////////////////////////////////
         // Callback for Layer management buttons
         /////////////////////////////////////////////
-        $('#loadGeoFileButton').on('click', function() {
-            var options = {
+        $('#loadGeoFileButton').on('click', async function() {
+            const options = {
                 filters: [
                     { name: 'GEO Files', extensions: ['kml', 'kmz', 'geojson', 'json', 'gpx', 'igc', 'topojson'] },
                     { name: 'All Files', extensions: ['*'] }
                 ]
             };
 
-            dialog.showOpenDialog(options).then(result => {
-                if (result.canceled) {
-                    console.log('No file selected');
-                    return;
-                }
-
-                if (result.filePaths.length == 1) {
-                    const filePath = result.filePaths[0];
-                    const fileName = filePath.split('/').pop().split('\\').pop();
-                    const ext = fileName.split('.').pop().toLowerCase();
-
-                    // Read file content using Electron API (binary for kmz, text otherwise)
-                    window.electronAPI.readFile(filePath, ext === 'kmz' ? null : undefined).then(response => {
-                        if (response.error) {
-                            GUI.log(`Error reading file: ${response.error}`);
-                            dialog.alert(i18n.getMessage('layerLoadError'));
-                            return;
-                        }
-
-                        try {
-                            // Detect format and parse
-                            let format;
-                            let fileData = response.data;
-
-                            switch(ext) {
-                                case 'kmz':
-                                    fileData = extractKmlFromKmz(response.data);
-                                    format = new KML();
-                                    break;
-                                case 'kml':
-                                    format = new KML();
-                                    break;
-                                case 'json':
-                                case 'geojson':
-                                    format = new GeoJSON();
-                                    break;
-                                case 'gpx':
-                                    format = new GPX();
-                                    break;
-                                case 'igc':
-                                    format = new IGC();
-                                    break;
-                                case 'topojson':
-                                    format = new TopoJSON();
-                                    break;
-                                default:
-                                    throw new Error('Unsupported file format');
-                            }
-
-                            const features = format.readFeatures(fileData, {
-                                dataProjection: 'EPSG:4326',
-                                featureProjection: 'EPSG:3857'
-                            });
-
-                            if (features.length === 0) {
-                                throw new Error('No features found in file');
-                            }
-
-                            addGeoLayerToMap(features, fileName);
-                            GUI.log(`Loaded ${features.length} features from ${fileName}`);
-
-                        } catch (error) {
-                            GUI.log(`Error parsing file: ${error.message}`);
-                            dialog.alert(i18n.getMessage('layerParseError'));
-                        }
-                    }).catch(error => {
-                        GUI.log(`Error reading file: ${error.message || error}`);
-                        dialog.alert(i18n.getMessage('layerLoadError'));
-                    });
-                }
-            }).catch(error => {
+            let result;
+            try {
+                result = await dialog.showOpenDialog(options);
+            } catch (error) {
                 GUI.log(`Error opening file dialog: ${error.message || error}`);
                 dialog.alert(i18n.getMessage('layerLoadError'));
-            });
+                return;
+            }
+
+            if (result.canceled || result.filePaths.length !== 1) return;
+
+            try {
+                await loadGeoFile(result.filePaths[0]);
+            } catch (error) {
+                GUI.log(`Error loading file: ${error.message}`);
+                dialog.alert(i18n.getMessage('layerParseError'));
+            }
         });
 
-        $('#showHideLayersButton').on('click', function () {
-            var src = ($(this).children().attr('class') === 'ic_hide')
-                ? 'ic_show'
-                : 'ic_hide';
-            $(this).children().attr('class', src);
-            if ($(this).children().attr('class') === 'ic_hide') {
-                $('#layerContent').fadeIn(300);
-            }
-            else {
-                $('#layerContent').fadeOut(300);
-            }
-        });
+        setupShowHidePanel('showHideLayersButton', 'layerContent');
 
         /////////////////////////////////////////////
         // Callback for settings
