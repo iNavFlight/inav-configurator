@@ -219,6 +219,17 @@ function createWindow() {
   mainWindow.removeMenu();
   mainWindow.setMinimumSize(800, 600);
 
+  // Fix OSM 403: packaged builds use file:// protocol, so tile requests
+  // carry no valid Referer. OSM rejects these with 403.
+  mainWindow.webContents.session.webRequest.onBeforeSendHeaders(
+    { urls: ['https://*.tile.openstreetmap.org/*'] },
+    (details, callback) => {
+      details.requestHeaders['Referer'] = 'https://github.com/iNavFlight/inav-configurator';
+      details.requestHeaders['User-Agent'] = 'INAV-Configurator/9.0 (https://github.com/iNavFlight/inav-configurator)';
+      callback({ requestHeaders: details.requestHeaders });
+    }
+  );
+
   if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
     mainWindow.loadURL(MAIN_WINDOW_VITE_DEV_SERVER_URL);
   } else {
