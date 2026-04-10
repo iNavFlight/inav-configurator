@@ -688,7 +688,11 @@ TABS.map_generator.initialize = function (callback) {
         $('#mapgen_area_unit').val(savedUnit);
 
         // ── SD path display ─────────────────────────────────────────
-        function updateSdDisplay() {
+        async function updateSdDisplay() {
+            if (sdPath && !(await globalThis.electronAPI.pathExists(sdPath))) {
+                sdPath = '';
+                store.set('mapgen_sd_path', '');
+            }
             if (sdPath) {
                 $('#mapgen_sd_path').text(sdPath).addClass('linked');
                 $('#mapgen_link_sd').text(i18n.getMessage('mapgenChangeSd') || 'Change SD Folder');
@@ -700,6 +704,7 @@ TABS.map_generator.initialize = function (callback) {
             }
         }
         updateSdDisplay();
+        window.addEventListener('focus', () => updateSdDisplay());
 
         // ── Provider-dependent map type options ─────────────────────
         function syncMapOptions() {
@@ -1320,12 +1325,9 @@ TABS.map_generator.initialize = function (callback) {
         });
 
         $('#mapgen_clear_cache').on('click', async () => {
-            if (!globalThis.electronAPI.confirmDialog('Clear all cached map tiles and HGT data?')) return;
+            if (!globalThis.electronAPI.confirmDialog('Clear all cached map tiles?')) return;
             await tileCache.clear();
-            await hgtDb.clear();
-            liveAltCache = {};
             updateCacheSizeDisplay();
-            updateHgtCacheInfo();
         });
 
         // ── Sync pipeline ───────────────────────────────────────────
@@ -1797,6 +1799,11 @@ TABS.map_generator.initialize = function (callback) {
             } else {
                 $('#mapgen_clear_hgt_cache').hide();
             }
+
+            // Toggle cache UI: tile cache controls for map targets, HGT button for terrain
+            $('.mapgen-cache-row').toggle(!isTerrain);
+            $('#mapgen_cache_enabled').closest('.checkbox').toggle(!isTerrain);
+            $('#mapgen_clear_cache').toggle(!isTerrain);
         }
 
         function updateSdLabel() {

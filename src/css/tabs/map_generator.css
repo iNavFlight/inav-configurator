@@ -282,7 +282,8 @@
     border-radius: 3px;
 }
 
-.tab-map_generator #mapgen_clear_cache {
+.tab-map_generator #mapgen_clear_cache,
+.tab-map_generator #mapgen_clear_hgt_cache {
     display: block;
     width: 100%;
     padding: 6px 12px;
@@ -301,12 +302,14 @@
     transition: background-color 0.2s;
 }
 
-.tab-map_generator #mapgen_clear_cache:hover {
+.tab-map_generator #mapgen_clear_cache:hover,
+.tab-map_generator #mapgen_clear_hgt_cache:hover {
     background-color: #e0e0e0;
     border-color: #999;
 }
 
-.tab-map_generator #mapgen_clear_cache:active {
+.tab-map_generator #mapgen_clear_cache:active,
+.tab-map_generator #mapgen_clear_hgt_cache:active {
     background-color: #d0d0d0;
 }
 
