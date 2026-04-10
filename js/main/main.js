@@ -5,7 +5,7 @@ import Store from "electron-store";
 import path from 'path';
 import { fileURLToPath } from 'node:url';
 import started from 'electron-squirrel-startup';
-import { writeFile, readFile, appendFile, readdir, mkdir } from 'node:fs/promises';
+import { writeFile, readFile, appendFile, readdir, mkdir, access } from 'node:fs/promises';
 import { execFile } from 'node:child_process';
 
 import tcp from './tcp';
@@ -370,7 +370,7 @@ app.whenReady().then(() => {
   ipcMain.handle('writeFile', (_event, filename, data) => {
     return new Promise(async resolve => {
       try {
-        await mkdir(path.dirname(filename), { recursive: true });
+        await mkdir(path.dirname(filename), { recursive: true }).catch(() => {});
         await writeFile(filename, data);
         resolve(false)
       } catch (err) {
@@ -449,6 +449,15 @@ app.whenReady().then(() => {
     }
     const files = await readdir(backupDir);
     return files.filter(f => f.endsWith('.txt') || f.endsWith('.cli'));
+  });
+
+  ipcMain.handle('pathExists', async (_event, filePath) => {
+    try {
+      await access(filePath);
+      return true;
+    } catch {
+      return false;
+    }
   });
 
   ipcMain.handle('ejectDrive', (_event, driveLetter) => {
