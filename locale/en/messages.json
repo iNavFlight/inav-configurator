@@ -6298,5 +6298,104 @@
     },
     "searchPlaceholder": {
         "message": "Search settings..."
+    },
+    "backupRestoreButtonBackup": {
+        "message": "Backup Config"
+    },
+    "backupRestoreButtonRestore": {
+        "message": "Restore Config"
+    },
+    "backupRestoreOpenBackupsFolder": {
+        "message": "Open Backups"
+    },
+    "backupRestoreStatusConnecting": {
+        "message": "Connecting to flight controller..."
+    },
+    "backupRestoreStatusEnteringCli": {
+        "message": "Entering CLI mode..."
+    },
+    "backupRestoreStatusReadingConfig": {
+        "message": "Reading configuration (diff all)..."
+    },
+    "backupRestoreStatusSavingFile": {
+        "message": "Saving backup file..."
+    },
+    "backupRestoreStatusExitingCli": {
+        "message": "Exiting CLI (rebooting)..."
+    },
+    "backupRestoreStatusRestoringConfig": {
+        "message": "Restoring configuration..."
+    },
+    "backupRestoreStatusSaving": {
+        "message": "Saving and rebooting..."
+    },
+    "backupRestoreStatusBackupComplete": {
+        "message": "Backup complete. Proceeding with flash..."
+    },
+    "backupRestoreBackupSaved": {
+        "message": "Configuration backup saved to: $1"
+    },
+    "backupRestoreAutoBackupSaved": {
+        "message": "Auto-backup saved to: $1"
+    },
+    "backupRestoreBackupComplete": {
+        "message": "Backup complete."
+    },
+    "backupRestoreBackupCancelled": {
+        "message": "Backup cancelled."
+    },
+    "backupRestoreBackupFailed": {
+        "message": "Backup failed."
+    },
+    "backupRestoreRestoreComplete": {
+        "message": "Configuration restored. Flight controller is rebooting."
+    },
+    "backupRestoreRestoreCancelled": {
+        "message": "Restore cancelled."
+    },
+    "backupRestoreRestoreFailed": {
+        "message": "Restore failed."
+    },
+    "backupRestoreFlashCompleteBackupSaved": {
+        "message": "Flash complete. Configuration backup was saved."
+    },
+    "backupRestoreOverlayTitle": {
+        "message": "Restoring Configuration"
+    },
+    "backupRestoreStatusRestoringProgress": {
+        "message": "Restoring configuration... ($1 / $2)"
+    },
+    "backupRestoreRestoreAborted": {
+        "message": "Restore aborted — settings were NOT saved."
+    },
+    "backupRestoreErrorTitle": {
+        "message": "Errors During Restore"
+    },
+    "backupRestoreErrorText": {
+        "message": "The following errors were reported by the flight controller. You can save the settings anyway or abort without saving."
+    },
+    "backupRestoreErrorAbort": {
+        "message": "Abort (Don't Save)"
+    },
+    "backupRestoreErrorSave": {
+        "message": "Save Anyway"
+    },
+    "backupRestoreFlashCompleteOfferRestore": {
+        "message": "Flash complete. A backup was saved before flashing."
+    },
+    "backupRestoreAutoRestoreConfirm": {
+        "message": "Full chip erase was performed. Would you like to restore the configuration backup that was saved before flashing?"
+    },
+    "backupRestoreAutoRestoreWaiting": {
+        "message": "Waiting for flight controller to boot..."
+    },
+    "backupRestoreAutoRestoreYes": {
+        "message": "Yes, Restore"
+    },
+    "backupRestoreAutoRestoreNo": {
+        "message": "No, Skip"
+    },
+    "backupRestoreAutoRestoreWaitingPort": {
+        "message": "Waiting for $1 to become available..."
     }
 }

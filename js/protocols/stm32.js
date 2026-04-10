@@ -86,7 +86,7 @@ STM32_protocol.prototype.pollForRebootCompletion = function(port, hex, options, 
             if (dfu_available) {
                 console.log('DFU device detected');
                 clearInterval(pollInterval);
-                STM32DFU.connect(usbDevices, hex, options);
+                STM32DFU.connect(usbDevices, hex, options, self.callback);
                 return;
             }
 
@@ -178,7 +178,7 @@ STM32_protocol.prototype.waitForResponse = function(expectedString, timeoutMs, c
 
 /**
  * Sends reboot command to enter DFU mode using new CLI-based protocol
- * Protocol: Send '#' -> Wait for CLI prompt -> Send 'dfu\r\n' -> Disconnect
+ * Protocol: Send '#' -> Wait for CLI prompt -> (optional: onCliReady callback) -> Send 'dfu\r\n' -> Disconnect
  * @param {function} callback - Called after command sequence completes with (success)
  */
 STM32_protocol.prototype.sendRebootCommand = function(callback) {
@@ -193,18 +193,9 @@ STM32_protocol.prototype.sendRebootCommand = function(callback) {
         });
     };
 
-    // Step 1: Set up response listener before sending # (to avoid missing the response)
-    self.waitForResponse('CLI', 2000, function(success, receivedData) {
-        if (!success) {
-            console.log('Failed to enter CLI mode, timeout waiting for prompt');
-            console.log('Received data:', receivedData);
-            cleanupAndDisconnect(false);
-            return;
-        }
+    var sendDfuCommand = function() {
+        console.log('Sending dfu command');
 
-        console.log('CLI mode entered, sending dfu command');
-
-        // Step 3: Send 'dfu\r\n' command
         var dfuCommandStr = 'dfu\r\n';
         var dfuBuffer = new ArrayBuffer(dfuCommandStr.length);
         var dfuView = new Uint8Array(dfuBuffer);
@@ -216,6 +207,28 @@ STM32_protocol.prototype.sendRebootCommand = function(callback) {
             console.log('DFU command sent, disconnecting');
             cleanupAndDisconnect(true);
         });
+    };
+
+    // Step 1: Set up response listener before sending # (to avoid missing the response)
+    self.waitForResponse('CLI', 2000, function(success, receivedData) {
+        if (!success) {
+            console.log('Failed to enter CLI mode, timeout waiting for prompt');
+            console.log('Received data:', receivedData);
+            cleanupAndDisconnect(false);
+            return;
+        }
+
+        console.log('CLI mode entered');
+
+        // If onCliReady callback is set, call it before sending DFU command
+        // This allows pre-flash backup (diff all) while CLI is active
+        if (self.options.onCliReady) {
+            self.options.onCliReady(CONFIGURATOR.connection, function() {
+                sendDfuCommand();
+            });
+        } else {
+            sendDfuCommand();
+        }
     });
 
     // Step 2: Send '####\r\n' to enter CLI (listener is already set up above)
@@ -242,7 +255,8 @@ STM32_protocol.prototype.connect = function (port, baud, hex, options, callback)
     self.options = {
         no_reboot:      false,
         reboot_baud:    false,
-        erase_chip:     false
+        erase_chip:     false,
+        onCliReady:     null
     };
 
     if (options.no_reboot) {
@@ -255,12 +269,16 @@ STM32_protocol.prototype.connect = function (port, baud, hex, options, callback)
         self.options.erase_chip = true;
     }
 
+    if (options.onCliReady) {
+        self.options.onCliReady = options.onCliReady;
+    }
+
     // Check if device is already in DFU mode before attempting serial connection
     PortHandler.check_usb_devices(function(dfu_available) {
         if (dfu_available) {
             console.log('Device already in DFU mode, connecting directly');
             GUI.connect_lock = true;
-            STM32DFU.connect(usbDevices, hex, options);
+            STM32DFU.connect(usbDevices, hex, options, self.callback);
             return;
         }
 

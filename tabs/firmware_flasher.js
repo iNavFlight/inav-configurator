@@ -17,9 +17,11 @@ import mspQueue from './../js/serial_queue';
 import mspHelper from './../js/msp/MSPHelper';
 import STM32 from './../js/protocols/stm32';
 import STM32DFU from './../js/protocols/stm32usbdfu';
+import ConnectionSerial from './../js/connection/connectionSerial';
 import mspDeduplicationQueue from './../js/msp/mspDeduplicationQueue';
 import store from './../js/store';
 import dialog from '../js/dialog.js';
+import BackupRestore from './../js/backup_restore';
 
 TABS.firmware_flasher = {};
 
@@ -543,6 +545,195 @@ TABS.firmware_flasher.initialize = function (callback) {
                             options.erase_chip = true;
                         }
 
+                        // Save original port before flash (port picker may change during DFU)
+                        var originalPort = String($('div#port-picker #port').val());
+                        var originalBaud = parseInt($('div#port-picker #baud').val());
+
+                        // Common completion handler for both serial and DFU flash paths
+                        function onFlashComplete() {
+                            var backup = BackupRestore.getLastAutoBackup();
+                            if (backup) {
+                                GUI.log(i18n.getMessage('backupRestoreAutoBackupSaved', [backup.filePath]));
+
+                                if (options.erase_chip) {
+                                    // Full chip erase — offer auto-restore via in-app overlay
+                                    $('span.progressLabel').text(i18n.getMessage('backupRestoreFlashCompleteOfferRestore'));
+
+                                    // Show confirm overlay (non-blocking — lets FC reboot from DFU in the background)
+                                    var $confirmOverlay = $('#restore-confirm-overlay');
+                                    $confirmOverlay.removeClass('is-hidden');
+                                    i18n.localize($confirmOverlay);
+
+                                    var $yesBtn = $confirmOverlay.find('.restore-confirm-overlay__btn--yes');
+                                    var $noBtn = $confirmOverlay.find('.restore-confirm-overlay__btn--no');
+                                    var $confirmStatus = $confirmOverlay.find('.restore-confirm-overlay__status');
+
+                                    function confirmCleanup() {
+                                        $yesBtn.off('click.autoRestore');
+                                        $noBtn.off('click.autoRestore');
+                                        $confirmOverlay.addClass('is-hidden');
+                                    }
+
+                                    $noBtn.on('click.autoRestore', function(e) {
+                                        e.preventDefault();
+                                        confirmCleanup();
+                                        BackupRestore.clearLastAutoBackup();
+                                        $('span.progressLabel').text(i18n.getMessage('backupRestoreFlashCompleteBackupSaved'));
+                                    });
+
+                                    $yesBtn.on('click.autoRestore', function(e) {
+                                        e.preventDefault();
+                                        // Hide confirm overlay, show waiting status
+                                        $yesBtn.off('click.autoRestore');
+                                        $noBtn.off('click.autoRestore');
+
+                                        // Use the original port saved before flash (port picker may show DFU)
+                                        var restorePort = originalPort;
+                                        var restoreBaud = originalBaud;
+
+                                        // Show restore progress overlay
+                                        var $overlay = $('#restore-overlay');
+                                        var $overlayStatus = $overlay.find('.restore-overlay__status');
+                                        var $overlayFill = $overlay.find('.restore-overlay__progress-fill');
+                                        var $overlayText = $overlay.find('.restore-overlay__progress-text');
+                                        $overlayFill.css('width', '0%');
+                                        $overlayText.text('');
+                                        $overlayStatus.text(i18n.getMessage('backupRestoreAutoRestoreWaitingPort', [restorePort]));
+                                        $confirmOverlay.addClass('is-hidden');
+                                        $overlay.removeClass('is-hidden');
+
+                                        // Poll for COM port to appear (FC rebooting from DFU to normal)
+                                        var portPollRetries = 0;
+                                        var maxPortPollRetries = 60; // 30 seconds max
+                                        var portPollInterval = setInterval(function() {
+                                            portPollRetries++;
+                                            if (portPollRetries > maxPortPollRetries) {
+                                                clearInterval(portPollInterval);
+                                                $overlay.addClass('is-hidden');
+                                                GUI.connect_lock = false;
+                                                GUI.log(i18n.getMessage('backupRestoreRestoreFailed'));
+                                                $('span.progressLabel').text(i18n.getMessage('backupRestoreRestoreFailed'));
+                                                BackupRestore.clearLastAutoBackup();
+                                                return;
+                                            }
+
+                                            ConnectionSerial.getDevices().then(function(devices) {
+                                                if (devices && devices.includes(restorePort)) {
+                                                    clearInterval(portPollInterval);
+                                                    // Port found — wait a moment for it to stabilize, then connect
+                                                    $overlayStatus.text(i18n.getMessage('backupRestoreStatusConnecting'));
+                                                    setTimeout(function() {
+                                                        doAutoRestore(restorePort, restoreBaud, backup, $overlay, $overlayStatus, $overlayFill, $overlayText);
+                                                    }, 2000);
+                                                }
+                                            });
+                                        }, 500);
+                                    });
+                                } else {
+                                    // No full chip erase — just show backup info
+                                    $('span.progressLabel').html(
+                                        i18n.getMessage('backupRestoreFlashCompleteBackupSaved') +
+                                        ' <a class="open_backup_dir" href="#">' +
+                                        i18n.getMessage('backupRestoreOpenBackupsFolder') + '</a>'
+                                    );
+                                    $('.open_backup_dir').on('click', function(e) {
+                                        e.preventDefault();
+                                        window.electronAPI.openBackupDir();
+                                    });
+                                    BackupRestore.clearLastAutoBackup();
+                                }
+                            }
+                        }
+
+                        // Extracted restore logic to keep onFlashComplete readable
+                        function doAutoRestore(restorePort, restoreBaud, backup, $overlay, $overlayStatus, $overlayFill, $overlayText) {
+                            GUI.connect_lock = true;
+
+                            CONFIGURATOR.connection.connect(restorePort, {bitrate: restoreBaud}, function(openInfo) {
+                                if (!openInfo) {
+                                    $overlay.addClass('is-hidden');
+                                    GUI.connect_lock = false;
+                                    GUI.log(i18n.getMessage('failedToOpenSerialPort'));
+                                    $('span.progressLabel').text(i18n.getMessage('backupRestoreRestoreFailed'));
+                                    BackupRestore.clearLastAutoBackup();
+                                    return;
+                                }
+
+                                function onProgress(info) {
+                                    if (info.phase === 'entering-cli') {
+                                        $overlayStatus.text(i18n.getMessage('backupRestoreStatusEnteringCli'));
+                                    } else if (info.phase === 'restoring') {
+                                        var pct = info.total > 0 ? Math.round((info.current / info.total) * 100) : 0;
+                                        $overlayStatus.text(i18n.getMessage('backupRestoreStatusRestoringProgress', [info.current, info.total]));
+                                        $overlayFill.css('width', pct + '%');
+                                        $overlayText.text(info.current + ' / ' + info.total);
+                                    }
+                                }
+
+                                BackupRestore.performRestore(backup.data, onProgress).then(function(result) {
+                                    $overlay.addClass('is-hidden');
+
+                                    if (result.errors.length > 0) {
+                                        // Show error dialog
+                                        var $errorDlg = $('#restore-error-dialog');
+                                        $errorDlg.find('.restore-error-dialog__errors').text(result.errors.join('\n'));
+                                        $errorDlg.removeClass('is-hidden');
+
+                                        var $saveBtn = $errorDlg.find('.restore-error-dialog__btn--save');
+                                        var $abortBtn = $errorDlg.find('.restore-error-dialog__btn--abort');
+
+                                        function cleanup() {
+                                            $saveBtn.off('click.restoreErr');
+                                            $abortBtn.off('click.restoreErr');
+                                            $errorDlg.addClass('is-hidden');
+                                        }
+
+                                        $saveBtn.on('click.restoreErr', function(e) {
+                                            e.preventDefault();
+                                            cleanup();
+                                            BackupRestore.saveAndReboot().then(function() {
+                                                GUI.log(i18n.getMessage('backupRestoreRestoreComplete'));
+                                                $('span.progressLabel').text(i18n.getMessage('backupRestoreRestoreComplete'));
+                                                CONFIGURATOR.connection.disconnect(function() {
+                                                    GUI.connect_lock = false;
+                                                });
+                                            });
+                                        });
+
+                                        $abortBtn.on('click.restoreErr', function(e) {
+                                            e.preventDefault();
+                                            cleanup();
+                                            BackupRestore.abortRestore().then(function() {
+                                                GUI.log(i18n.getMessage('backupRestoreRestoreAborted'));
+                                                $('span.progressLabel').text(i18n.getMessage('backupRestoreRestoreAborted'));
+                                                CONFIGURATOR.connection.disconnect(function() {
+                                                    GUI.connect_lock = false;
+                                                });
+                                            });
+                                        });
+                                    } else {
+                                        BackupRestore.saveAndReboot().then(function() {
+                                            GUI.log(i18n.getMessage('backupRestoreRestoreComplete'));
+                                            $('span.progressLabel').text(i18n.getMessage('backupRestoreRestoreComplete'));
+                                            CONFIGURATOR.connection.disconnect(function() {
+                                                GUI.connect_lock = false;
+                                            });
+                                        });
+                                    }
+                                    BackupRestore.clearLastAutoBackup();
+                                }).catch(function(err) {
+                                    $overlay.addClass('is-hidden');
+                                    console.error('Auto-restore failed:', err);
+                                    GUI.log(i18n.getMessage('backupRestoreRestoreFailed'));
+                                    $('span.progressLabel').text(i18n.getMessage('backupRestoreRestoreFailed'));
+                                    BackupRestore.clearLastAutoBackup();
+                                    CONFIGURATOR.connection.disconnect(function() {
+                                        GUI.connect_lock = false;
+                                    });
+                                });
+                            });
+                        }
+
                         if (String($('div#port-picker #port').val()) != 'DFU') {
                             if (String($('div#port-picker #port').val()) != '0') {
                                 var port = String($('div#port-picker #port').val()),
@@ -571,20 +762,224 @@ TABS.firmware_flasher.initialize = function (callback) {
                                     baud = parseInt($('#flash_manual_baud_rate').val());
                                 }
 
+                                // Add auto-backup handler: captures diff all while CLI is
+                                // active during the reboot sequence (before DFU command)
+                                if (!options.no_reboot) {
+                                    options.onCliReady = BackupRestore.createOnCliReadyHandler(function(msgKey) {
+                                        $('span.progressLabel').text(i18n.getMessage(msgKey));
+                                    });
+                                }
 
-                                STM32.connect(port, baud, parsed_hex, options);
+                                STM32.connect(port, baud, parsed_hex, options, onFlashComplete);
                             } else {
                                 console.log('Please select valid serial port');
                                 GUI.log(i18n.getMessage('selectValidSerialPort'));
                             }
                         } else {
-                            STM32DFU.connect(usbDevices, parsed_hex, options);
+                            STM32DFU.connect(usbDevices, parsed_hex, options, onFlashComplete);
                         }
                     } else {
                         $('span.progressLabel').text(i18n.getMessage('firmwareFlasherFirmwareNotLoaded'));
                     }
                 }
             }
+        });
+
+        // Backup Config button
+        $('a.backup_config').on('click', function () {
+            if (GUI.connect_lock) return;
+
+            var port = String($('div#port-picker #port').val());
+            if (port === '0' || port === 'DFU') {
+                GUI.log(i18n.getMessage('selectValidSerialPort'));
+                return;
+            }
+
+            $('span.progressLabel').text(i18n.getMessage('backupRestoreStatusConnecting'));
+
+            // Connect to FC, perform backup via CLI, then disconnect
+            var rebootBaud = parseInt($('div#port-picker #baud').val());
+            GUI.connect_lock = true;
+
+            CONFIGURATOR.connection.connect(port, {bitrate: rebootBaud}, function(openInfo) {
+                if (!openInfo) {
+                    GUI.connect_lock = false;
+                    GUI.log(i18n.getMessage('failedToOpenSerialPort'));
+                    return;
+                }
+
+                BackupRestore.performBackupToFile(function(msgKey) {
+                    $('span.progressLabel').text(i18n.getMessage(msgKey));
+                }).then(function(result) {
+                    if (result) {
+                        GUI.log(i18n.getMessage('backupRestoreBackupSaved', [result.filePath]));
+                        $('span.progressLabel').text(i18n.getMessage('backupRestoreBackupComplete'));
+                    } else {
+                        $('span.progressLabel').text(i18n.getMessage('backupRestoreBackupCancelled'));
+                    }
+                    // FC reboots after CLI exit, disconnect and unlock
+                    CONFIGURATOR.connection.disconnect(function() {
+                        GUI.connect_lock = false;
+                    });
+                }).catch(function(err) {
+                    console.error('Backup failed:', err);
+                    GUI.log(i18n.getMessage('backupRestoreBackupFailed'));
+                    $('span.progressLabel').text(i18n.getMessage('backupRestoreBackupFailed'));
+                    CONFIGURATOR.connection.disconnect(function() {
+                        GUI.connect_lock = false;
+                    });
+                });
+            });
+        });
+
+        // Restore Config button
+        $('a.restore_config').on('click', async function () {
+            if (GUI.connect_lock) return;
+
+            var port = String($('div#port-picker #port').val());
+            if (port === '0' || port === 'DFU') {
+                GUI.log(i18n.getMessage('selectValidSerialPort'));
+                return;
+            }
+
+            // Show file dialog BEFORE connecting to avoid idle connection during user interaction
+            var backupDir = await window.electronAPI.getBackupDir();
+            var fileResult = await window.electronAPI.showOpenDialog({
+                defaultPath: backupDir,
+                filters: [
+                    { name: 'CLI/TXT', extensions: ['cli', 'txt'] },
+                    { name: 'ALL', extensions: ['*'] },
+                ],
+                properties: ['openFile'],
+            });
+
+            if (fileResult.canceled || !fileResult.filePaths || fileResult.filePaths.length === 0) {
+                $('span.progressLabel').text(i18n.getMessage('backupRestoreRestoreCancelled'));
+                return;
+            }
+
+            var fileResponse = await window.electronAPI.readFile(fileResult.filePaths[0]);
+            if (fileResponse.error) {
+                GUI.log(i18n.getMessage('backupRestoreRestoreFailed'));
+                $('span.progressLabel').text(i18n.getMessage('backupRestoreRestoreFailed'));
+                return;
+            }
+
+            // Show overlay and lock UI
+            var $overlay = $('#restore-overlay');
+            var $overlayStatus = $overlay.find('.restore-overlay__status');
+            var $overlayFill = $overlay.find('.restore-overlay__progress-fill');
+            var $overlayText = $overlay.find('.restore-overlay__progress-text');
+            $overlayFill.css('width', '0%');
+            $overlayText.text('');
+            $overlayStatus.text(i18n.getMessage('backupRestoreStatusConnecting'));
+            $overlay.removeClass('is-hidden');
+
+            $('span.progressLabel').text(i18n.getMessage('backupRestoreStatusConnecting'));
+
+            var rebootBaud = parseInt($('div#port-picker #baud').val());
+            GUI.connect_lock = true;
+
+            CONFIGURATOR.connection.connect(port, {bitrate: rebootBaud}, function(openInfo) {
+                if (!openInfo) {
+                    $overlay.addClass('is-hidden');
+                    GUI.connect_lock = false;
+                    GUI.log(i18n.getMessage('failedToOpenSerialPort'));
+                    return;
+                }
+
+                // Progress callback from performRestore
+                function onProgress(info) {
+                    switch (info.phase) {
+                        case 'entering-cli':
+                            $overlayStatus.text(i18n.getMessage('backupRestoreStatusEnteringCli'));
+                            $overlayFill.css('width', '0%');
+                            $overlayText.text('');
+                            break;
+                        case 'restoring':
+                            $overlayStatus.text(i18n.getMessage('backupRestoreStatusRestoringProgress', [info.current, info.total]));
+                            var pct = info.total > 0 ? Math.round((info.current / info.total) * 100) : 0;
+                            $overlayFill.css('width', pct + '%');
+                            $overlayText.text(info.current + ' / ' + info.total);
+                            $('span.progressLabel').text(i18n.getMessage('backupRestoreStatusRestoringProgress', [info.current, info.total]));
+                            break;
+                        case 'saving':
+                            $overlayStatus.text(i18n.getMessage('backupRestoreStatusSaving'));
+                            $overlayFill.css('width', '100%');
+                            break;
+                    }
+                }
+
+                BackupRestore.performRestore(fileResponse.data, onProgress).then(function(result) {
+                    $overlay.addClass('is-hidden');
+
+                    if (result.errors.length > 0) {
+                        // Show error dialog — let user decide to save or abort
+                        var $errorDlg = $('#restore-error-dialog');
+                        var $errorList = $errorDlg.find('.restore-error-dialog__errors');
+                        $errorList.text(result.errors.join('\n'));
+                        $errorDlg.removeClass('is-hidden');
+
+                        // Wait for user choice via one-time click handlers
+                        var $saveBtn = $errorDlg.find('.restore-error-dialog__btn--save');
+                        var $abortBtn = $errorDlg.find('.restore-error-dialog__btn--abort');
+
+                        function cleanup() {
+                            $saveBtn.off('click.restoreErr');
+                            $abortBtn.off('click.restoreErr');
+                            $errorDlg.addClass('is-hidden');
+                        }
+
+                        $saveBtn.on('click.restoreErr', function(e) {
+                            e.preventDefault();
+                            cleanup();
+                            $('span.progressLabel').text(i18n.getMessage('backupRestoreStatusSaving'));
+                            BackupRestore.saveAndReboot().then(function() {
+                                GUI.log(i18n.getMessage('backupRestoreRestoreComplete'));
+                                $('span.progressLabel').text(i18n.getMessage('backupRestoreRestoreComplete'));
+                                CONFIGURATOR.connection.disconnect(function() {
+                                    GUI.connect_lock = false;
+                                });
+                            });
+                        });
+
+                        $abortBtn.on('click.restoreErr', function(e) {
+                            e.preventDefault();
+                            cleanup();
+                            $('span.progressLabel').text(i18n.getMessage('backupRestoreRestoreAborted'));
+                            BackupRestore.abortRestore().then(function() {
+                                GUI.log(i18n.getMessage('backupRestoreRestoreAborted'));
+                                CONFIGURATOR.connection.disconnect(function() {
+                                    GUI.connect_lock = false;
+                                });
+                            });
+                        });
+                    } else {
+                        // No errors — save immediately
+                        $('span.progressLabel').text(i18n.getMessage('backupRestoreStatusSaving'));
+                        BackupRestore.saveAndReboot().then(function() {
+                            GUI.log(i18n.getMessage('backupRestoreRestoreComplete'));
+                            $('span.progressLabel').text(i18n.getMessage('backupRestoreRestoreComplete'));
+                            CONFIGURATOR.connection.disconnect(function() {
+                                GUI.connect_lock = false;
+                            });
+                        });
+                    }
+                }).catch(function(err) {
+                    $overlay.addClass('is-hidden');
+                    console.error('Restore failed:', err);
+                    GUI.log(i18n.getMessage('backupRestoreRestoreFailed'));
+                    $('span.progressLabel').text(i18n.getMessage('backupRestoreRestoreFailed'));
+                    CONFIGURATOR.connection.disconnect(function() {
+                        GUI.connect_lock = false;
+                    });
+                });
+            });
+        });
+
+        // Open Backups Folder button
+        $('a.open_backups_folder').on('click', function () {
+            window.electronAPI.openBackupDir();
         });
 
         $(document).on('click', 'span.progressLabel a.save_firmware', function () {

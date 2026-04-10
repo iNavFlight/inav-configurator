@@ -75,6 +75,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
   readFile: (filename, encoding = 'utf8') => ipcRenderer.invoke('readFile', filename, encoding),
   rm: (path) => ipcRenderer.invoke('rm', path),
   chmod: (path, mode) => ipcRenderer.invoke('chmod', path, mode),
+  getBackupDir: () => ipcRenderer.invoke('getBackupDir'),
+  openBackupDir: () => ipcRenderer.invoke('openBackupDir'),
+  listBackups: () => ipcRenderer.invoke('listBackups'),
   startChildProcess: (command, args, opts) => ipcRenderer.send('startChildProcess', command, args, opts),
   killChildProcess: () => ipcRenderer.send('killChildProcess'),
   onChildProcessStdout: (callback) => {

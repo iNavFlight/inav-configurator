@@ -13,7 +13,12 @@ export default {
       'resources/public/sitl'
     ],
   },
-  rebuildConfig: {},
+  rebuildConfig: {
+    // Native modules (serialport, usb) ship with prebuilt binaries for each platform.
+    // vite-plugin-native handles them at build time. Skip electron-rebuild to avoid
+    // requiring Visual Studio Build Tools on Windows during development.
+    onlyModules: [],
+  },
   plugins: [
     {
       name: '@electron-forge/plugin-vite',
