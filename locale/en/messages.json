@@ -6397,5 +6397,17 @@
     },
     "backupRestoreAutoRestoreWaitingPort": {
         "message": "Waiting for $1 to become available..."
+    },
+    "firmwareFlasherVersionWarningTitle": {
+        "message": "⚠ Version Update Warning"
+    },
+    "firmwareFlasherVersionWarningText": {
+        "message": "Updating from $1 to $2 without full chip erase can cause unpredictable issues or configuration corruption. Configurator will not restore your FC configuration automatically."
+    },
+    "firmwareFlasherVersionWarningContinue": {
+        "message": "Continue without erase"
+    },
+    "firmwareFlasherVersionWarningCancel": {
+        "message": "Cancel"
     }
 }

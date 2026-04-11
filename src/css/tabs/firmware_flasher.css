@@ -281,6 +281,86 @@
     font-weight: normal;
 }
 
+/* Version warning overlay: minor/major update without chip erase */
+#version-warning-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#version-warning-overlay.is-hidden {
+    display: none;
+}
+
+.version-warning-overlay__content {
+    background: #fff;
+    border-radius: 8px;
+    padding: 2em 3em;
+    min-width: 380px;
+    max-width: 560px;
+    text-align: center;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.version-warning-overlay__title {
+    font-size: 1.3em;
+    font-weight: bold;
+    margin-bottom: 1em;
+    color: #c00;
+}
+
+.version-warning-overlay__text {
+    font-size: 1em;
+    margin-bottom: 1.5em;
+    color: #555;
+    line-height: 1.6;
+}
+
+.version-warning-overlay__buttons {
+    display: flex;
+    justify-content: center;
+    gap: 1em;
+}
+
+.version-warning-overlay__btn {
+    padding: 0.7em 1.5em;
+    border-radius: 4px;
+    font-weight: bold;
+    font-size: 0.95em;
+    cursor: pointer;
+    text-decoration: none;
+    text-align: center;
+    transition: all ease 0.2s;
+}
+
+.version-warning-overlay__btn--continue {
+    background: #c00;
+    border: 1px solid #a00;
+    color: #fff;
+}
+
+.version-warning-overlay__btn--continue:hover {
+    background: #a00;
+}
+
+.version-warning-overlay__btn--cancel {
+    background: #37a8db;
+    border: 1px solid #3a9dbf;
+    color: #fff;
+    text-shadow: 0 1px rgba(0, 0, 0, 0.25);
+}
+
+.version-warning-overlay__btn--cancel:hover {
+    background: #3394b5;
+}
+
 /* Restore overlay: blocks entire tab during restore */
 #restore-overlay {
     position: fixed;

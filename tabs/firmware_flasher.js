@@ -540,6 +540,7 @@ TABS.firmware_flasher.initialize = function (callback) {
                 if (!GUI.connect_lock) { // button disabled while flashing is in progress
                     if (parsed_hex != false) {
                         var options = {};
+                        var skipAutoRestore = false;
 
                         if ($('input.erase_chip').is(':checked')) {
                             options.erase_chip = true;
@@ -549,14 +550,79 @@ TABS.firmware_flasher.initialize = function (callback) {
                         var originalPort = String($('div#port-picker #port').val());
                         var originalBaud = parseInt($('div#port-picker #baud').val());
 
+                        // Determine version update type (patch / minor / major)
+                        var currentVersion = FC.CONFIG.flightControllerVersion;
+                        var selectedSummary = $('select[name="firmware_version"] option:selected').data('summary');
+                        var targetVersion = selectedSummary ? semver.clean(selectedSummary.version) : null;
+                        var isMinorOrMajorUpdate = false;
+
+                        if (currentVersion && targetVersion && semver.valid(currentVersion) && semver.valid(targetVersion)) {
+                            var diffType = semver.diff(currentVersion, targetVersion);
+                            // minor, major, premajor, preminor all count as non-patch
+                            if (diffType && diffType !== 'patch' && diffType !== 'prepatch' && diffType !== 'prerelease') {
+                                isMinorOrMajorUpdate = true;
+                            }
+                        }
+
+                        // Version check gate: warn if minor/major update without chip erase
+                        if (isMinorOrMajorUpdate && !options.erase_chip) {
+                            showVersionWarning(currentVersion, targetVersion, function onContinue() {
+                                skipAutoRestore = true;
+                                proceedWithFlash();
+                            });
+                            return; // wait for user decision
+                        }
+
+                        proceedWithFlash();
+                        return;
+
+                        // Shows the version warning overlay; calls onContinue if user proceeds
+                        function showVersionWarning(fromVer, toVer, onContinue) {
+                            var $warn = $('#version-warning-overlay');
+                            $warn.find('.version-warning-overlay__text').text(
+                                i18n.getMessage('firmwareFlasherVersionWarningText', [fromVer, toVer])
+                            );
+                            $warn.removeClass('is-hidden');
+                            i18n.localize($warn);
+
+                            var $continueBtn = $warn.find('.version-warning-overlay__btn--continue');
+                            var $cancelBtn = $warn.find('.version-warning-overlay__btn--cancel');
+
+                            function cleanup() {
+                                $continueBtn.off('click.versionWarn');
+                                $cancelBtn.off('click.versionWarn');
+                                $warn.addClass('is-hidden');
+                            }
+
+                            $cancelBtn.on('click.versionWarn', function(e) {
+                                e.preventDefault();
+                                cleanup();
+                                // User cancelled — do nothing
+                            });
+
+                            $continueBtn.on('click.versionWarn', function(e) {
+                                e.preventDefault();
+                                cleanup();
+                                onContinue();
+                            });
+                        }
+
+                        function proceedWithFlash() {
+
                         // Common completion handler for both serial and DFU flash paths
                         function onFlashComplete() {
+                            // Update stored FC version to what we just flashed
+                            // so subsequent version checks are accurate without reconnecting
+                            if (targetVersion) {
+                                FC.CONFIG.flightControllerVersion = targetVersion;
+                            }
+
                             var backup = BackupRestore.getLastAutoBackup();
                             if (backup) {
                                 GUI.log(i18n.getMessage('backupRestoreAutoBackupSaved', [backup.filePath]));
 
-                                if (options.erase_chip) {
-                                    // Full chip erase — offer auto-restore via in-app overlay
+                                if (options.erase_chip && !skipAutoRestore) {
+                                    // Full chip erase + patch-only update — offer auto-restore via in-app overlay
                                     $('span.progressLabel').text(i18n.getMessage('backupRestoreFlashCompleteOfferRestore'));
 
                                     // Show confirm overlay (non-blocking — lets FC reboot from DFU in the background)
@@ -778,6 +844,9 @@ TABS.firmware_flasher.initialize = function (callback) {
                         } else {
                             STM32DFU.connect(usbDevices, parsed_hex, options, onFlashComplete);
                         }
+
+                        } // end proceedWithFlash
+
                     } else {
                         $('span.progressLabel').text(i18n.getMessage('firmwareFlasherFirmwareNotLoaded'));
                     }

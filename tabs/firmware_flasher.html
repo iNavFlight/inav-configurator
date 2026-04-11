@@ -11,6 +11,18 @@
         </div>
     </div>
 
+    <!-- Version warning overlay: shown when minor/major update without chip erase -->
+    <div id="version-warning-overlay" class="is-hidden">
+        <div class="version-warning-overlay__content">
+            <div class="version-warning-overlay__title" i18n="firmwareFlasherVersionWarningTitle"></div>
+            <div class="version-warning-overlay__text"></div>
+            <div class="version-warning-overlay__buttons">
+                <a class="version-warning-overlay__btn version-warning-overlay__btn--continue" href="#" i18n="firmwareFlasherVersionWarningContinue"></a>
+                <a class="version-warning-overlay__btn version-warning-overlay__btn--cancel" href="#" i18n="firmwareFlasherVersionWarningCancel"></a>
+            </div>
+        </div>
+    </div>
+
     <!-- Confirm overlay: ask user if they want to auto-restore after flash -->
     <div id="restore-confirm-overlay" class="is-hidden">
         <div class="restore-confirm-overlay__content">
