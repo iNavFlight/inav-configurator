@@ -584,7 +584,36 @@ const BackupRestore = {
             throw new Error('Failed to write backup file: ' + err);
         }
 
+        // Prune old auto-backups: keep only the 10 most recent UPDATE_ files
+        await this._pruneAutoBackups(backupDir, 10);
+
         return { filePath, version, data: fileContent };
+    },
+
+    /**
+     * Keep only the N most recent auto-backup files (UPDATE_ prefix with standard naming).
+     * Files that have been renamed by the user are not touched.
+     * @private
+     */
+    async _pruneAutoBackups(backupDir, maxKeep) {
+        const AUTO_BACKUP_PATTERN = /^UPDATE_inav_backup_.*_\d{4}-\d{2}-\d{2}_\d{6}\.txt$/;
+
+        try {
+            const allFiles = await window.electronAPI.listBackups();
+            const autoBackups = allFiles
+                .filter(f => AUTO_BACKUP_PATTERN.test(f))
+                .sort(); // lexicographic sort — filename contains timestamp so this gives chronological order
+
+            if (autoBackups.length > maxKeep) {
+                const toDelete = autoBackups.slice(0, autoBackups.length - maxKeep);
+                for (const file of toDelete) {
+                    await window.electronAPI.rm(backupDir + '/' + file);
+                }
+                console.log(`Pruned ${toDelete.length} old auto-backup(s)`);
+            }
+        } catch (err) {
+            console.warn('Failed to prune auto-backups:', err);
+        }
     },
 
     /**
