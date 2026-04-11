@@ -22,6 +22,7 @@ import mspDeduplicationQueue from './../js/msp/mspDeduplicationQueue';
 import store from './../js/store';
 import dialog from '../js/dialog.js';
 import BackupRestore from './../js/backup_restore';
+import MigrationHandler from './../js/migration/migration_handler';
 
 TABS.firmware_flasher = {};
 
@@ -30,6 +31,39 @@ TABS.firmware_flasher = {};
 function normalizeTargetName(name) {
     if (name == null) return '';
     return String(name).replace(/-/g, '_');
+}
+
+/**
+ * Disconnect with a timeout fallback.
+ * After save/exit the FC reboots and the serial port may vanish before
+ * the disconnect callback fires, which would leave connect_lock stuck.
+ */
+function disconnectSafely(callback) {
+    var done = false;
+    var fallback = setTimeout(function() {
+        if (!done) {
+            done = true;
+            console.warn('Disconnect timed out, forcing unlock');
+            callback();
+        }
+    }, 3000);
+
+    try {
+        CONFIGURATOR.connection.disconnect(function() {
+            if (!done) {
+                done = true;
+                clearTimeout(fallback);
+                callback();
+            }
+        });
+    } catch (e) {
+        if (!done) {
+            done = true;
+            clearTimeout(fallback);
+            console.warn('Disconnect threw:', e);
+            callback();
+        }
+    }
 }
 
 TABS.firmware_flasher.initialize = function (callback) {
@@ -621,80 +655,93 @@ TABS.firmware_flasher.initialize = function (callback) {
                             if (backup) {
                                 GUI.log(i18n.getMessage('backupRestoreAutoBackupSaved', [backup.filePath]));
 
-                                if (options.erase_chip && !skipAutoRestore) {
-                                    // Full chip erase + patch-only update — offer auto-restore via in-app overlay
-                                    $('span.progressLabel').text(i18n.getMessage('backupRestoreFlashCompleteOfferRestore'));
+                                // Check for major version downgrade — no auto-restore for downgrades
+                                var backupVersion = MigrationHandler.extractBackupVersion(backup.data);
+                                var isMajorDowngrade = false;
+                                if (backupVersion && targetVersion && semver.valid(backupVersion) && semver.valid(targetVersion)) {
+                                    if (semver.major(backupVersion) > semver.major(targetVersion)) {
+                                        isMajorDowngrade = true;
+                                    }
+                                }
 
-                                    // Show confirm overlay (non-blocking — lets FC reboot from DFU in the background)
-                                    var $confirmOverlay = $('#restore-confirm-overlay');
-                                    $confirmOverlay.removeClass('is-hidden');
-                                    i18n.localize($confirmOverlay);
+                                if (isMajorDowngrade) {
+                                    // Major downgrade — inform user, no auto-restore
+                                    GUI.log(i18n.getMessage('backupRestoreDowngradeNoAutoRestore'));
+                                    $('span.progressLabel').html(
+                                        i18n.getMessage('backupRestoreDowngradeNoAutoRestore') +
+                                        ' <a class="open_backup_dir" href="#">' +
+                                        i18n.getMessage('backupRestoreOpenBackupsFolder') + '</a>'
+                                    );
+                                    $('.open_backup_dir').on('click', function(e) {
+                                        e.preventDefault();
+                                        window.electronAPI.openBackupDir();
+                                    });
+                                    BackupRestore.clearLastAutoBackup();
+                                } else if (options.erase_chip && !skipAutoRestore) {
+                                    // Full chip erase — offer auto-restore
 
-                                    var $yesBtn = $confirmOverlay.find('.restore-confirm-overlay__btn--yes');
-                                    var $noBtn = $confirmOverlay.find('.restore-confirm-overlay__btn--no');
-                                    var $confirmStatus = $confirmOverlay.find('.restore-confirm-overlay__status');
+                                    // Pre-compute migration to decide which dialog to show
+                                    var migrationNeeded = targetVersion && MigrationHandler.isMigrationNeeded(backup.data, targetVersion);
+                                    var migrationResult = null;
+                                    var dataToRestore = backup.data;
 
-                                    function confirmCleanup() {
-                                        $yesBtn.off('click.autoRestore');
-                                        $noBtn.off('click.autoRestore');
-                                        $confirmOverlay.addClass('is-hidden');
+                                    if (migrationNeeded) {
+                                        migrationResult = MigrationHandler.migrateBackupData(backup.data, targetVersion);
+                                        dataToRestore = migrationResult.migratedContent;
                                     }
 
-                                    $noBtn.on('click.autoRestore', function(e) {
-                                        e.preventDefault();
-                                        confirmCleanup();
-                                        BackupRestore.clearLastAutoBackup();
-                                        $('span.progressLabel').text(i18n.getMessage('backupRestoreFlashCompleteBackupSaved'));
-                                    });
-
-                                    $yesBtn.on('click.autoRestore', function(e) {
-                                        e.preventDefault();
-                                        // Hide confirm overlay, show waiting status
-                                        $yesBtn.off('click.autoRestore');
-                                        $noBtn.off('click.autoRestore');
-
-                                        // Use the original port saved before flash (port picker may show DFU)
-                                        var restorePort = originalPort;
-                                        var restoreBaud = originalBaud;
-
-                                        // Show restore progress overlay
-                                        var $overlay = $('#restore-overlay');
-                                        var $overlayStatus = $overlay.find('.restore-overlay__status');
-                                        var $overlayFill = $overlay.find('.restore-overlay__progress-fill');
-                                        var $overlayText = $overlay.find('.restore-overlay__progress-text');
-                                        $overlayFill.css('width', '0%');
-                                        $overlayText.text('');
-                                        $overlayStatus.text(i18n.getMessage('backupRestoreAutoRestoreWaitingPort', [restorePort]));
-                                        $confirmOverlay.addClass('is-hidden');
-                                        $overlay.removeClass('is-hidden');
-
-                                        // Poll for COM port to appear (FC rebooting from DFU to normal)
-                                        var portPollRetries = 0;
-                                        var maxPortPollRetries = 60; // 30 seconds max
-                                        var portPollInterval = setInterval(function() {
-                                            portPollRetries++;
-                                            if (portPollRetries > maxPortPollRetries) {
-                                                clearInterval(portPollInterval);
-                                                $overlay.addClass('is-hidden');
-                                                GUI.connect_lock = false;
-                                                GUI.log(i18n.getMessage('backupRestoreRestoreFailed'));
-                                                $('span.progressLabel').text(i18n.getMessage('backupRestoreRestoreFailed'));
-                                                BackupRestore.clearLastAutoBackup();
-                                                return;
-                                            }
-
-                                            ConnectionSerial.getDevices().then(function(devices) {
-                                                if (devices && devices.includes(restorePort)) {
-                                                    clearInterval(portPollInterval);
-                                                    // Port found — wait a moment for it to stabilize, then connect
-                                                    $overlayStatus.text(i18n.getMessage('backupRestoreStatusConnecting'));
-                                                    setTimeout(function() {
-                                                        doAutoRestore(restorePort, restoreBaud, backup, $overlay, $overlayStatus, $overlayFill, $overlayText);
-                                                    }, 2000);
-                                                }
+                                    if (migrationNeeded && migrationResult.summary.totalChanges > 0) {
+                                        // Show migration preview overlay instead of simple confirm
+                                        showMigrationPreview(migrationResult.summary, function onContinue() {
+                                            // Log migration info
+                                            GUI.log(i18n.getMessage('backupRestoreMigrationApplied', [
+                                                migrationResult.summary.fromVersion,
+                                                migrationResult.summary.toVersion,
+                                                migrationResult.summary.totalChanges.toString()
+                                            ]));
+                                            startPortPollingAndRestore(dataToRestore);
+                                        }, function onCancel() {
+                                            BackupRestore.clearLastAutoBackup();
+                                            $('span.progressLabel').html(
+                                                i18n.getMessage('backupRestoreFlashCompleteBackupSaved') +
+                                                ' <a class="open_backup_dir" href="#">' +
+                                                i18n.getMessage('backupRestoreOpenBackupsFolder') + '</a>'
+                                            );
+                                            $('.open_backup_dir').on('click', function(e) {
+                                                e.preventDefault();
+                                                window.electronAPI.openBackupDir();
                                             });
-                                        }, 500);
-                                    });
+                                        });
+                                    } else {
+                                        // No migration needed — show simple confirm overlay
+                                        $('span.progressLabel').text(i18n.getMessage('backupRestoreFlashCompleteOfferRestore'));
+
+                                        var $confirmOverlay = $('#restore-confirm-overlay');
+                                        $confirmOverlay.removeClass('is-hidden');
+                                        i18n.localize($confirmOverlay);
+
+                                        var $yesBtn = $confirmOverlay.find('.restore-confirm-overlay__btn--yes');
+                                        var $noBtn = $confirmOverlay.find('.restore-confirm-overlay__btn--no');
+
+                                        function confirmCleanup() {
+                                            $yesBtn.off('click.autoRestore');
+                                            $noBtn.off('click.autoRestore');
+                                            $confirmOverlay.addClass('is-hidden');
+                                        }
+
+                                        $noBtn.on('click.autoRestore', function(e) {
+                                            e.preventDefault();
+                                            confirmCleanup();
+                                            BackupRestore.clearLastAutoBackup();
+                                            $('span.progressLabel').text(i18n.getMessage('backupRestoreFlashCompleteBackupSaved'));
+                                        });
+
+                                        $yesBtn.on('click.autoRestore', function(e) {
+                                            e.preventDefault();
+                                            confirmCleanup();
+                                            startPortPollingAndRestore(dataToRestore);
+                                        });
+                                    }
                                 } else {
                                     // No full chip erase — just show backup info
                                     $('span.progressLabel').html(
@@ -711,8 +758,131 @@ TABS.firmware_flasher.initialize = function (callback) {
                             }
                         }
 
-                        // Extracted restore logic to keep onFlashComplete readable
-                        function doAutoRestore(restorePort, restoreBaud, backup, $overlay, $overlayStatus, $overlayFill, $overlayText) {
+                        // Show migration preview overlay with changes and warnings
+                        function showMigrationPreview(summary, onContinue, onCancel) {
+                            var $preview = $('#migration-preview-overlay');
+                            var $subtitle = $preview.find('.migration-preview__subtitle');
+                            var $changes = $preview.find('.migration-preview__changes');
+                            var $warnings = $preview.find('.migration-preview__warnings');
+                            var $continueBtn = $preview.find('.migration-preview__btn--continue');
+                            var $cancelBtn = $preview.find('.migration-preview__btn--cancel');
+
+                            // Populate subtitle
+                            $subtitle.text(i18n.getMessage('migrationPreviewSubtitle', [summary.fromVersion, summary.toVersion]));
+
+                            // Build changes text
+                            var changesLines = [];
+                            if (summary.removedSettings.length > 0) {
+                                changesLines.push(i18n.getMessage('migrationPreviewRemovedHeader', [summary.removedSettings.length.toString()]));
+                                for (var i = 0; i < summary.removedSettings.length; i++) {
+                                    changesLines.push('  • ' + summary.removedSettings[i]);
+                                }
+                                changesLines.push('');
+                            }
+                            if (summary.renamedSettings.length > 0) {
+                                changesLines.push(i18n.getMessage('migrationPreviewRenamedSettingsHeader', [summary.renamedSettings.length.toString()]));
+                                for (var i = 0; i < summary.renamedSettings.length; i++) {
+                                    changesLines.push('  • ' + summary.renamedSettings[i]);
+                                }
+                                changesLines.push('');
+                            }
+                            if (summary.renamedCommands.length > 0) {
+                                changesLines.push(i18n.getMessage('migrationPreviewRenamedCommandsHeader', [summary.renamedCommands.length.toString()]));
+                                for (var i = 0; i < summary.renamedCommands.length; i++) {
+                                    changesLines.push('  • ' + summary.renamedCommands[i]);
+                                }
+                                changesLines.push('');
+                            }
+                            if (summary.valueReplacements.length > 0) {
+                                changesLines.push(i18n.getMessage('migrationPreviewValueReplacementsHeader', [summary.valueReplacements.length.toString()]));
+                                for (var i = 0; i < summary.valueReplacements.length; i++) {
+                                    changesLines.push('  • ' + summary.valueReplacements[i]);
+                                }
+                                changesLines.push('');
+                            }
+                            if (summary.osdRemappings.length > 0) {
+                                changesLines.push(i18n.getMessage('migrationPreviewOsdRemappingsHeader', [summary.osdRemappings.length.toString()]));
+                                for (var i = 0; i < summary.osdRemappings.length; i++) {
+                                    changesLines.push('  • ' + summary.osdRemappings[i]);
+                                }
+                            }
+                            $changes.text(changesLines.join('\n'));
+
+                            // Build warnings text
+                            if (summary.warnings.length > 0) {
+                                var warnLines = [];
+                                for (var i = 0; i < summary.warnings.length; i++) {
+                                    warnLines.push('⚠ ' + summary.warnings[i]);
+                                }
+                                $warnings.text(warnLines.join('\n'));
+                            } else {
+                                $warnings.text('');
+                            }
+
+                            $preview.removeClass('is-hidden');
+                            i18n.localize($preview);
+
+                            function cleanup() {
+                                $continueBtn.off('click.migPreview');
+                                $cancelBtn.off('click.migPreview');
+                                $preview.addClass('is-hidden');
+                            }
+
+                            $cancelBtn.on('click.migPreview', function(e) {
+                                e.preventDefault();
+                                cleanup();
+                                onCancel();
+                            });
+
+                            $continueBtn.on('click.migPreview', function(e) {
+                                e.preventDefault();
+                                cleanup();
+                                onContinue();
+                            });
+                        }
+
+                        // Start port polling and auto-restore with given data
+                        function startPortPollingAndRestore(restoreData) {
+                            var restorePort = originalPort;
+                            var restoreBaud = originalBaud;
+
+                            var $overlay = $('#restore-overlay');
+                            var $overlayStatus = $overlay.find('.restore-overlay__status');
+                            var $overlayFill = $overlay.find('.restore-overlay__progress-fill');
+                            var $overlayText = $overlay.find('.restore-overlay__progress-text');
+                            $overlayFill.css('width', '0%');
+                            $overlayText.text('');
+                            $overlayStatus.text(i18n.getMessage('backupRestoreAutoRestoreWaitingPort', [restorePort]));
+                            $overlay.removeClass('is-hidden');
+
+                            var portPollRetries = 0;
+                            var maxPortPollRetries = 60; // 30 seconds max
+                            var portPollInterval = setInterval(function() {
+                                portPollRetries++;
+                                if (portPollRetries > maxPortPollRetries) {
+                                    clearInterval(portPollInterval);
+                                    $overlay.addClass('is-hidden');
+                                    GUI.connect_lock = false;
+                                    GUI.log(i18n.getMessage('backupRestoreRestoreFailed'));
+                                    $('span.progressLabel').text(i18n.getMessage('backupRestoreRestoreFailed'));
+                                    BackupRestore.clearLastAutoBackup();
+                                    return;
+                                }
+
+                                ConnectionSerial.getDevices().then(function(devices) {
+                                    if (devices && devices.includes(restorePort)) {
+                                        clearInterval(portPollInterval);
+                                        $overlayStatus.text(i18n.getMessage('backupRestoreStatusConnecting'));
+                                        setTimeout(function() {
+                                            doAutoRestore(restorePort, restoreBaud, restoreData, $overlay, $overlayStatus, $overlayFill, $overlayText);
+                                        }, 2000);
+                                    }
+                                });
+                            }, 500);
+                        }
+
+                        // Extracted restore logic — restoreData is already migrated if needed
+                        function doAutoRestore(restorePort, restoreBaud, restoreData, $overlay, $overlayStatus, $overlayFill, $overlayText) {
                             GUI.connect_lock = true;
 
                             CONFIGURATOR.connection.connect(restorePort, {bitrate: restoreBaud}, function(openInfo) {
@@ -736,7 +906,7 @@ TABS.firmware_flasher.initialize = function (callback) {
                                     }
                                 }
 
-                                BackupRestore.performRestore(backup.data, onProgress).then(function(result) {
+                                BackupRestore.performRestore(restoreData, onProgress).then(function(result) {
                                     $overlay.addClass('is-hidden');
 
                                     if (result.errors.length > 0) {
@@ -760,7 +930,7 @@ TABS.firmware_flasher.initialize = function (callback) {
                                             BackupRestore.saveAndReboot().then(function() {
                                                 GUI.log(i18n.getMessage('backupRestoreRestoreComplete'));
                                                 $('span.progressLabel').text(i18n.getMessage('backupRestoreRestoreComplete'));
-                                                CONFIGURATOR.connection.disconnect(function() {
+                                                disconnectSafely(function() {
                                                     GUI.connect_lock = false;
                                                 });
                                             });
@@ -772,7 +942,7 @@ TABS.firmware_flasher.initialize = function (callback) {
                                             BackupRestore.abortRestore().then(function() {
                                                 GUI.log(i18n.getMessage('backupRestoreRestoreAborted'));
                                                 $('span.progressLabel').text(i18n.getMessage('backupRestoreRestoreAborted'));
-                                                CONFIGURATOR.connection.disconnect(function() {
+                                                disconnectSafely(function() {
                                                     GUI.connect_lock = false;
                                                 });
                                             });
@@ -781,7 +951,7 @@ TABS.firmware_flasher.initialize = function (callback) {
                                         BackupRestore.saveAndReboot().then(function() {
                                             GUI.log(i18n.getMessage('backupRestoreRestoreComplete'));
                                             $('span.progressLabel').text(i18n.getMessage('backupRestoreRestoreComplete'));
-                                            CONFIGURATOR.connection.disconnect(function() {
+                                            disconnectSafely(function() {
                                                 GUI.connect_lock = false;
                                             });
                                         });
@@ -793,7 +963,7 @@ TABS.firmware_flasher.initialize = function (callback) {
                                     GUI.log(i18n.getMessage('backupRestoreRestoreFailed'));
                                     $('span.progressLabel').text(i18n.getMessage('backupRestoreRestoreFailed'));
                                     BackupRestore.clearLastAutoBackup();
-                                    CONFIGURATOR.connection.disconnect(function() {
+                                    disconnectSafely(function() {
                                         GUI.connect_lock = false;
                                     });
                                 });
@@ -887,14 +1057,14 @@ TABS.firmware_flasher.initialize = function (callback) {
                         $('span.progressLabel').text(i18n.getMessage('backupRestoreBackupCancelled'));
                     }
                     // FC reboots after CLI exit, disconnect and unlock
-                    CONFIGURATOR.connection.disconnect(function() {
+                    disconnectSafely(function() {
                         GUI.connect_lock = false;
                     });
                 }).catch(function(err) {
                     console.error('Backup failed:', err);
                     GUI.log(i18n.getMessage('backupRestoreBackupFailed'));
                     $('span.progressLabel').text(i18n.getMessage('backupRestoreBackupFailed'));
-                    CONFIGURATOR.connection.disconnect(function() {
+                    disconnectSafely(function() {
                         GUI.connect_lock = false;
                     });
                 });
@@ -934,6 +1104,40 @@ TABS.firmware_flasher.initialize = function (callback) {
                 return;
             }
 
+            var fileData = fileResponse.data;
+            var currentFcVersion = FC.CONFIG.flightControllerVersion;
+
+            // Run migration before connecting (text-only, no FC needed)
+            var migrationNeeded = currentFcVersion && MigrationHandler.isMigrationNeeded(fileData, currentFcVersion);
+            var migrationResult = null;
+
+            if (migrationNeeded) {
+                migrationResult = MigrationHandler.migrateBackupData(fileData, currentFcVersion);
+                fileData = migrationResult.migratedContent;
+            }
+
+            // If migration has changes, show preview overlay and wait for user decision
+            if (migrationResult && migrationResult.summary.totalChanges > 0) {
+                await new Promise(function(resolve) {
+                    showManualMigrationPreview(migrationResult.summary, function onContinue() {
+                        GUI.log(i18n.getMessage('backupRestoreMigrationApplied', [
+                            migrationResult.summary.fromVersion,
+                            migrationResult.summary.toVersion,
+                            migrationResult.summary.totalChanges.toString()
+                        ]));
+                        resolve(true);
+                    }, function onCancel() {
+                        fileData = null; // signal cancellation
+                        resolve(false);
+                    });
+                });
+
+                if (!fileData) {
+                    $('span.progressLabel').text(i18n.getMessage('backupRestoreRestoreCancelled'));
+                    return;
+                }
+            }
+
             // Show overlay and lock UI
             var $overlay = $('#restore-overlay');
             var $overlayStatus = $overlay.find('.restore-overlay__status');
@@ -948,6 +1152,86 @@ TABS.firmware_flasher.initialize = function (callback) {
 
             var rebootBaud = parseInt($('div#port-picker #baud').val());
             GUI.connect_lock = true;
+
+            // Show migration preview for manual restore
+            function showManualMigrationPreview(summary, onContinue, onCancel) {
+                var $preview = $('#migration-preview-overlay');
+                var $subtitle = $preview.find('.migration-preview__subtitle');
+                var $changes = $preview.find('.migration-preview__changes');
+                var $warnings = $preview.find('.migration-preview__warnings');
+                var $continueBtn = $preview.find('.migration-preview__btn--continue');
+                var $cancelBtn = $preview.find('.migration-preview__btn--cancel');
+
+                $subtitle.text(i18n.getMessage('migrationPreviewSubtitle', [summary.fromVersion, summary.toVersion]));
+
+                var changesLines = [];
+                if (summary.removedSettings.length > 0) {
+                    changesLines.push(i18n.getMessage('migrationPreviewRemovedHeader', [summary.removedSettings.length.toString()]));
+                    for (var ci = 0; ci < summary.removedSettings.length; ci++) {
+                        changesLines.push('  • ' + summary.removedSettings[ci]);
+                    }
+                    changesLines.push('');
+                }
+                if (summary.renamedSettings.length > 0) {
+                    changesLines.push(i18n.getMessage('migrationPreviewRenamedSettingsHeader', [summary.renamedSettings.length.toString()]));
+                    for (var ci = 0; ci < summary.renamedSettings.length; ci++) {
+                        changesLines.push('  • ' + summary.renamedSettings[ci]);
+                    }
+                    changesLines.push('');
+                }
+                if (summary.renamedCommands.length > 0) {
+                    changesLines.push(i18n.getMessage('migrationPreviewRenamedCommandsHeader', [summary.renamedCommands.length.toString()]));
+                    for (var ci = 0; ci < summary.renamedCommands.length; ci++) {
+                        changesLines.push('  • ' + summary.renamedCommands[ci]);
+                    }
+                    changesLines.push('');
+                }
+                if (summary.valueReplacements.length > 0) {
+                    changesLines.push(i18n.getMessage('migrationPreviewValueReplacementsHeader', [summary.valueReplacements.length.toString()]));
+                    for (var ci = 0; ci < summary.valueReplacements.length; ci++) {
+                        changesLines.push('  • ' + summary.valueReplacements[ci]);
+                    }
+                    changesLines.push('');
+                }
+                if (summary.osdRemappings.length > 0) {
+                    changesLines.push(i18n.getMessage('migrationPreviewOsdRemappingsHeader', [summary.osdRemappings.length.toString()]));
+                    for (var ci = 0; ci < summary.osdRemappings.length; ci++) {
+                        changesLines.push('  • ' + summary.osdRemappings[ci]);
+                    }
+                }
+                $changes.text(changesLines.join('\n'));
+
+                if (summary.warnings.length > 0) {
+                    var warnLines = [];
+                    for (var wi = 0; wi < summary.warnings.length; wi++) {
+                        warnLines.push('⚠ ' + summary.warnings[wi]);
+                    }
+                    $warnings.text(warnLines.join('\n'));
+                } else {
+                    $warnings.text('');
+                }
+
+                $preview.removeClass('is-hidden');
+                i18n.localize($preview);
+
+                function cleanup() {
+                    $continueBtn.off('click.migPreview');
+                    $cancelBtn.off('click.migPreview');
+                    $preview.addClass('is-hidden');
+                }
+
+                $cancelBtn.on('click.migPreview', function(e) {
+                    e.preventDefault();
+                    cleanup();
+                    onCancel();
+                });
+
+                $continueBtn.on('click.migPreview', function(e) {
+                    e.preventDefault();
+                    cleanup();
+                    onContinue();
+                });
+            }
 
             CONFIGURATOR.connection.connect(port, {bitrate: rebootBaud}, function(openInfo) {
                 if (!openInfo) {
@@ -979,7 +1263,7 @@ TABS.firmware_flasher.initialize = function (callback) {
                     }
                 }
 
-                BackupRestore.performRestore(fileResponse.data, onProgress).then(function(result) {
+                BackupRestore.performRestore(fileData, onProgress).then(function(result) {
                     $overlay.addClass('is-hidden');
 
                     if (result.errors.length > 0) {
@@ -1006,7 +1290,7 @@ TABS.firmware_flasher.initialize = function (callback) {
                             BackupRestore.saveAndReboot().then(function() {
                                 GUI.log(i18n.getMessage('backupRestoreRestoreComplete'));
                                 $('span.progressLabel').text(i18n.getMessage('backupRestoreRestoreComplete'));
-                                CONFIGURATOR.connection.disconnect(function() {
+                                disconnectSafely(function() {
                                     GUI.connect_lock = false;
                                 });
                             });
@@ -1018,7 +1302,7 @@ TABS.firmware_flasher.initialize = function (callback) {
                             $('span.progressLabel').text(i18n.getMessage('backupRestoreRestoreAborted'));
                             BackupRestore.abortRestore().then(function() {
                                 GUI.log(i18n.getMessage('backupRestoreRestoreAborted'));
-                                CONFIGURATOR.connection.disconnect(function() {
+                                disconnectSafely(function() {
                                     GUI.connect_lock = false;
                                 });
                             });
@@ -1029,7 +1313,7 @@ TABS.firmware_flasher.initialize = function (callback) {
                         BackupRestore.saveAndReboot().then(function() {
                             GUI.log(i18n.getMessage('backupRestoreRestoreComplete'));
                             $('span.progressLabel').text(i18n.getMessage('backupRestoreRestoreComplete'));
-                            CONFIGURATOR.connection.disconnect(function() {
+                            disconnectSafely(function() {
                                 GUI.connect_lock = false;
                             });
                         });
@@ -1039,7 +1323,7 @@ TABS.firmware_flasher.initialize = function (callback) {
                     console.error('Restore failed:', err);
                     GUI.log(i18n.getMessage('backupRestoreRestoreFailed'));
                     $('span.progressLabel').text(i18n.getMessage('backupRestoreRestoreFailed'));
-                    CONFIGURATOR.connection.disconnect(function() {
+                    disconnectSafely(function() {
                         GUI.connect_lock = false;
                     });
                 });

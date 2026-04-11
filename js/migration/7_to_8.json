@@ -1,0 +1,49 @@
+{
+    "fromVersion": "7",
+    "toVersion": "8",
+    "description": "INAV 7.x → 8.0 migration profile",
+
+    "commandRenames": {
+        "profile": "control_profile"
+    },
+
+    "settingRenames": {},
+
+    "valueReplacements": {
+        "gps_provider": {
+            "UBLOX7": "UBLOX"
+        }
+    },
+
+    "removed": [
+        "control_deadband",
+        "cpu_underclock",
+        "disarm_kill_switch",
+        "dji_workarounds",
+        "fw_iterm_limit_stick_position",
+        "gyro_anti_aliasing_lpf_type",
+        "gyro_hardware_lpf",
+        "gyro_main_lpf_type",
+        "gyro_use_dyn_lpf",
+        "inav_use_gps_no_baro",
+        "inav_use_gps_velned",
+        "ledstrip_visual_beeper",
+        "max_throttle",
+        "nav_auto_climb_rate",
+        "nav_manual_climb_rate",
+        "osd_stats_min_voltage_unit",
+        "pidsum_limit",
+        "pidsum_limit_yaw"
+    ],
+
+    "osdCustomElementTypeMapping": {
+        "4": "9",
+        "5": "16",
+        "6": "7",
+        "7": "10"
+    },
+
+    "warnings": [
+        "nav_fw_wp_tracking_accuracy semantics changed: was arbitrary tracking response, now distance in meters. Review your value manually."
+    ]
+}

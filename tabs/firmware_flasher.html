@@ -48,6 +48,20 @@
         </div>
     </div>
 
+    <!-- Migration preview overlay: shown before restore when migration is needed -->
+    <div id="migration-preview-overlay" class="is-hidden">
+        <div class="migration-preview__content">
+            <div class="migration-preview__title" i18n="migrationPreviewTitle"></div>
+            <div class="migration-preview__subtitle"></div>
+            <div class="migration-preview__changes"></div>
+            <div class="migration-preview__warnings"></div>
+            <div class="migration-preview__buttons">
+                <a class="migration-preview__btn migration-preview__btn--cancel" href="#" i18n="migrationPreviewCancel"></a>
+                <a class="migration-preview__btn migration-preview__btn--continue" href="#" i18n="migrationPreviewContinue"></a>
+            </div>
+        </div>
+    </div>
+
     <div class="content_wrapper">
         <div class="options gui_box">
             <div class="spacer">

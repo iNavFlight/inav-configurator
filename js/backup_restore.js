@@ -5,6 +5,7 @@ import { GUI } from './gui';
 import FC from './fc';
 import i18n from './localization';
 import semver from 'semver';
+import MigrationHandler from './migration/migration_handler';
 
 const BACKUP_TIMEOUT_MS = 15000;
 const CLI_ENTER_TIMEOUT_MS = 3000;
@@ -627,6 +628,36 @@ const BackupRestore = {
         const self = this;
         return function(connection, done) {
             self.captureCliDiffAll(connection, onProgress, done);
+        };
+    },
+
+    /**
+     * Perform restore with automatic migration if needed.
+     * Detects version mismatch between backup and current FC,
+     * applies migration profiles, and then restores.
+     *
+     * @param {string} fileContent - The backup file content
+     * @param {string} targetVersion - The target INAV version on the FC
+     * @param {function} onProgress - Progress callback
+     * @returns {Promise<{errors: string[], migrationSummary: object|null}>}
+     */
+    async performRestoreWithMigration(fileContent, targetVersion, onProgress) {
+        let dataToRestore = fileContent;
+        let migrationSummary = null;
+
+        if (targetVersion && MigrationHandler.isMigrationNeeded(fileContent, targetVersion)) {
+            const result = MigrationHandler.migrateBackupData(fileContent, targetVersion);
+            dataToRestore = result.migratedContent;
+            migrationSummary = result.summary;
+
+            console.log('Migration applied:', MigrationHandler.formatSummary(result.summary));
+        }
+
+        const restoreResult = await this.performRestore(dataToRestore, onProgress);
+
+        return {
+            errors: restoreResult.errors,
+            migrationSummary,
         };
     },
 };

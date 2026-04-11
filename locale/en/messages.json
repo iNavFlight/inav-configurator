@@ -6409,5 +6409,41 @@
     },
     "firmwareFlasherVersionWarningCancel": {
         "message": "Cancel"
+    },
+    "backupRestoreMigrationApplied": {
+        "message": "Migration applied: $1 → $2 ($3 changes)"
+    },
+    "backupRestoreMigrationWarningsHeader": {
+        "message": "Migration Warnings:"
+    },
+    "backupRestoreDowngradeNoAutoRestore": {
+        "message": "Major version downgrade detected. Auto-restore is not available — please restore your backup manually after verifying settings."
+    },
+    "migrationPreviewTitle": {
+        "message": "Settings Migration Required"
+    },
+    "migrationPreviewSubtitle": {
+        "message": "Your backup ($1) will be migrated to match the new firmware ($2). The following changes will be applied:"
+    },
+    "migrationPreviewRemovedHeader": {
+        "message": "Removed settings ($1):"
+    },
+    "migrationPreviewRenamedSettingsHeader": {
+        "message": "Renamed settings ($1):"
+    },
+    "migrationPreviewRenamedCommandsHeader": {
+        "message": "Renamed commands ($1):"
+    },
+    "migrationPreviewValueReplacementsHeader": {
+        "message": "Value replacements ($1):"
+    },
+    "migrationPreviewOsdRemappingsHeader": {
+        "message": "OSD type remappings ($1):"
+    },
+    "migrationPreviewContinue": {
+        "message": "Continue with Restore"
+    },
+    "migrationPreviewCancel": {
+        "message": "Cancel (Manual Review)"
     }
 }
