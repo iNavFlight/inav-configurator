@@ -288,6 +288,29 @@ const MigrationHandler = {
     },
 
     /**
+     * Check if there is a major version jump that is NOT fully covered by migration profiles.
+     * Returns true when profiles are missing for one or more major version steps.
+     * @param {string} fileContent - Backup file content
+     * @param {string} targetVersion - Target INAV version (semver)
+     * @returns {boolean}
+     */
+    hasMissingProfiles(fileContent, targetVersion) {
+        const fromVersion = this.extractBackupVersion(fileContent);
+        if (!fromVersion || !targetVersion) return false;
+
+        const fromMajor = semver.major(semver.coerce(fromVersion));
+        const toMajor = semver.major(semver.coerce(targetVersion));
+
+        if (toMajor <= fromMajor) return false; // same or downgrade
+
+        const chain = this.buildMigrationChain(fromVersion, targetVersion);
+        const coveredSteps = chain.length;
+        const requiredSteps = toMajor - fromMajor;
+
+        return coveredSteps < requiredSteps;
+    },
+
+    /**
      * Get all available migration profiles (for developer tools / UI).
      * @returns {object[]}
      */

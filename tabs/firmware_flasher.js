@@ -682,6 +682,7 @@ TABS.firmware_flasher.initialize = function (callback) {
 
                                     // Pre-compute migration to decide which dialog to show
                                     var migrationNeeded = targetVersion && MigrationHandler.isMigrationNeeded(backup.data, targetVersion);
+                                    var missingProfiles = targetVersion && MigrationHandler.hasMissingProfiles(backup.data, targetVersion);
                                     var migrationResult = null;
                                     var dataToRestore = backup.data;
 
@@ -690,7 +691,35 @@ TABS.firmware_flasher.initialize = function (callback) {
                                         dataToRestore = migrationResult.migratedContent;
                                     }
 
-                                    if (migrationNeeded && migrationResult.summary.totalChanges > 0) {
+                                    // Inject missing-profile warning into summary if applicable
+                                    if (missingProfiles) {
+                                        if (!migrationResult) {
+                                            var backupVer = MigrationHandler.extractBackupVersion(backup.data) || 'unknown';
+                                            migrationResult = {
+                                                migratedContent: dataToRestore,
+                                                summary: {
+                                                    fromVersion: backupVer,
+                                                    toVersion: targetVersion,
+                                                    profilesApplied: [],
+                                                    totalChanges: 0,
+                                                    removedSettings: [],
+                                                    renamedSettings: [],
+                                                    renamedCommands: [],
+                                                    valueReplacements: [],
+                                                    settingRemappings: [],
+                                                    warnings: [],
+                                                },
+                                            };
+                                        }
+                                        migrationResult.summary.warnings.push(
+                                            i18n.getMessage('migrationMissingProfileWarning', [
+                                                migrationResult.summary.fromVersion,
+                                                migrationResult.summary.toVersion,
+                                            ])
+                                        );
+                                    }
+
+                                    if (migrationResult && (migrationResult.summary.totalChanges > 0 || migrationResult.summary.warnings.length > 0)) {
                                         // Show migration preview overlay instead of simple confirm
                                         showMigrationPreview(migrationResult.summary, function onContinue() {
                                             // Log migration info
@@ -1109,6 +1138,7 @@ TABS.firmware_flasher.initialize = function (callback) {
 
             // Run migration before connecting (text-only, no FC needed)
             var migrationNeeded = currentFcVersion && MigrationHandler.isMigrationNeeded(fileData, currentFcVersion);
+            var missingProfiles = currentFcVersion && MigrationHandler.hasMissingProfiles(fileData, currentFcVersion);
             var migrationResult = null;
 
             if (migrationNeeded) {
@@ -1116,8 +1146,36 @@ TABS.firmware_flasher.initialize = function (callback) {
                 fileData = migrationResult.migratedContent;
             }
 
-            // If migration has changes, show preview overlay and wait for user decision
-            if (migrationResult && migrationResult.summary.totalChanges > 0) {
+            // Inject missing-profile warning if applicable
+            if (missingProfiles) {
+                if (!migrationResult) {
+                    var backupVer = MigrationHandler.extractBackupVersion(fileResponse.data) || 'unknown';
+                    migrationResult = {
+                        migratedContent: fileData,
+                        summary: {
+                            fromVersion: backupVer,
+                            toVersion: currentFcVersion,
+                            profilesApplied: [],
+                            totalChanges: 0,
+                            removedSettings: [],
+                            renamedSettings: [],
+                            renamedCommands: [],
+                            valueReplacements: [],
+                            settingRemappings: [],
+                            warnings: [],
+                        },
+                    };
+                }
+                migrationResult.summary.warnings.push(
+                    i18n.getMessage('migrationMissingProfileWarning', [
+                        migrationResult.summary.fromVersion,
+                        migrationResult.summary.toVersion,
+                    ])
+                );
+            }
+
+            // If migration has changes or warnings, show preview overlay and wait for user decision
+            if (migrationResult && (migrationResult.summary.totalChanges > 0 || migrationResult.summary.warnings.length > 0)) {
                 await new Promise(function(resolve) {
                     showManualMigrationPreview(migrationResult.summary, function onContinue() {
                         GUI.log(i18n.getMessage('backupRestoreMigrationApplied', [
