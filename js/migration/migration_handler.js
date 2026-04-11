@@ -383,6 +383,32 @@ const MigrationHandler = {
 
         return lines.join('\n');
     },
+
+    /**
+     * Create an empty migration summary object.
+     * Useful when no migration profiles exist but a summary structure is needed.
+     * @param {string} fromVersion
+     * @param {string} toVersion
+     * @param {string} migratedContent - The (unmodified) backup content
+     * @returns {{migratedContent: string, summary: object}}
+     */
+    createEmptyResult(fromVersion, toVersion, migratedContent) {
+        return {
+            migratedContent,
+            summary: {
+                fromVersion: fromVersion || 'unknown',
+                toVersion: toVersion || 'unknown',
+                profilesApplied: [],
+                totalChanges: 0,
+                removedSettings: [],
+                renamedSettings: [],
+                renamedCommands: [],
+                valueReplacements: [],
+                settingRemappings: [],
+                warnings: [],
+            },
+        };
+    },
 };
 
 export default MigrationHandler;

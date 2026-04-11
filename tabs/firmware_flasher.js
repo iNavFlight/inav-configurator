@@ -569,6 +569,85 @@ TABS.firmware_flasher.initialize = function (callback) {
             }
         });
 
+        // --- Shared helpers for migration preview (used by flash + manual restore) ---
+
+        // Show progress label with a link to open the backups folder
+        function showBackupSavedMessage(messageKey) {
+            $('span.progressLabel').html(
+                i18n.getMessage(messageKey) +
+                ' <a class="open_backup_dir" href="#">' +
+                i18n.getMessage('backupRestoreOpenBackupsFolder') + '</a>'
+            );
+            $('.open_backup_dir').on('click', function(e) {
+                e.preventDefault();
+                window.electronAPI.openBackupDir();
+            });
+        }
+
+        // Build migration changes text for preview overlay
+        function buildMigrationChangesText(summary) {
+            var sections = [
+                { key: 'removedSettings', header: 'migrationPreviewRemovedHeader' },
+                { key: 'renamedSettings', header: 'migrationPreviewRenamedSettingsHeader' },
+                { key: 'renamedCommands', header: 'migrationPreviewRenamedCommandsHeader' },
+                { key: 'valueReplacements', header: 'migrationPreviewValueReplacementsHeader' },
+                { key: 'settingRemappings', header: 'migrationPreviewSettingRemappingsHeader' },
+            ];
+            var lines = [];
+            for (var s = 0; s < sections.length; s++) {
+                var items = summary[sections[s].key];
+                if (items && items.length > 0) {
+                    if (lines.length > 0) lines.push('');
+                    lines.push(i18n.getMessage(sections[s].header, [items.length.toString()]));
+                    for (var j = 0; j < items.length; j++) {
+                        lines.push('  • ' + items[j]);
+                    }
+                }
+            }
+            return lines.join('\n');
+        }
+
+        // Show migration preview overlay with changes and warnings
+        function showMigrationPreview(summary, onContinue, onCancel) {
+            var $preview = $('#migration-preview-overlay');
+            var $changes = $preview.find('.migration-preview__changes');
+            var $warnings = $preview.find('.migration-preview__warnings');
+            var $continueBtn = $preview.find('.migration-preview__btn--continue');
+            var $cancelBtn = $preview.find('.migration-preview__btn--cancel');
+
+            $preview.find('.migration-preview__subtitle').text(
+                i18n.getMessage('migrationPreviewSubtitle', [summary.fromVersion, summary.toVersion])
+            );
+            $changes.text(buildMigrationChangesText(summary));
+
+            if (summary.warnings.length > 0) {
+                $warnings.text(summary.warnings.map(function(w) { return '⚠ ' + w; }).join('\n'));
+            } else {
+                $warnings.text('');
+            }
+
+            $preview.removeClass('is-hidden');
+            i18n.localize($preview);
+
+            function cleanup() {
+                $continueBtn.off('click.migPreview');
+                $cancelBtn.off('click.migPreview');
+                $preview.addClass('is-hidden');
+            }
+
+            $cancelBtn.on('click.migPreview', function(e) {
+                e.preventDefault();
+                cleanup();
+                onCancel();
+            });
+
+            $continueBtn.on('click.migPreview', function(e) {
+                e.preventDefault();
+                cleanup();
+                onContinue();
+            });
+        }
+
         $('a.flash_firmware').on('click', function () {
             if (!$(this).hasClass('disabled')) {
                 if (!GUI.connect_lock) { // button disabled while flashing is in progress
@@ -667,15 +746,7 @@ TABS.firmware_flasher.initialize = function (callback) {
                                 if (isMajorDowngrade) {
                                     // Major downgrade — inform user, no auto-restore
                                     GUI.log(i18n.getMessage('backupRestoreDowngradeNoAutoRestore'));
-                                    $('span.progressLabel').html(
-                                        i18n.getMessage('backupRestoreDowngradeNoAutoRestore') +
-                                        ' <a class="open_backup_dir" href="#">' +
-                                        i18n.getMessage('backupRestoreOpenBackupsFolder') + '</a>'
-                                    );
-                                    $('.open_backup_dir').on('click', function(e) {
-                                        e.preventDefault();
-                                        window.electronAPI.openBackupDir();
-                                    });
+                                    showBackupSavedMessage('backupRestoreDowngradeNoAutoRestore');
                                     BackupRestore.clearLastAutoBackup();
                                 } else if (options.erase_chip && !skipAutoRestore) {
                                     // Full chip erase — offer auto-restore
@@ -695,21 +766,7 @@ TABS.firmware_flasher.initialize = function (callback) {
                                     if (missingProfiles) {
                                         if (!migrationResult) {
                                             var backupVer = MigrationHandler.extractBackupVersion(backup.data) || 'unknown';
-                                            migrationResult = {
-                                                migratedContent: dataToRestore,
-                                                summary: {
-                                                    fromVersion: backupVer,
-                                                    toVersion: targetVersion,
-                                                    profilesApplied: [],
-                                                    totalChanges: 0,
-                                                    removedSettings: [],
-                                                    renamedSettings: [],
-                                                    renamedCommands: [],
-                                                    valueReplacements: [],
-                                                    settingRemappings: [],
-                                                    warnings: [],
-                                                },
-                                            };
+                                            migrationResult = MigrationHandler.createEmptyResult(backupVer, targetVersion, dataToRestore);
                                         }
                                         migrationResult.summary.warnings.push(
                                             i18n.getMessage('migrationMissingProfileWarning', [
@@ -731,15 +788,7 @@ TABS.firmware_flasher.initialize = function (callback) {
                                             startPortPollingAndRestore(dataToRestore);
                                         }, function onCancel() {
                                             BackupRestore.clearLastAutoBackup();
-                                            $('span.progressLabel').html(
-                                                i18n.getMessage('backupRestoreFlashCompleteBackupSaved') +
-                                                ' <a class="open_backup_dir" href="#">' +
-                                                i18n.getMessage('backupRestoreOpenBackupsFolder') + '</a>'
-                                            );
-                                            $('.open_backup_dir').on('click', function(e) {
-                                                e.preventDefault();
-                                                window.electronAPI.openBackupDir();
-                                            });
+                                            showBackupSavedMessage('backupRestoreFlashCompleteBackupSaved');
                                         });
                                     } else {
                                         // No migration needed — show simple confirm overlay
@@ -773,101 +822,10 @@ TABS.firmware_flasher.initialize = function (callback) {
                                     }
                                 } else {
                                     // No full chip erase — just show backup info
-                                    $('span.progressLabel').html(
-                                        i18n.getMessage('backupRestoreFlashCompleteBackupSaved') +
-                                        ' <a class="open_backup_dir" href="#">' +
-                                        i18n.getMessage('backupRestoreOpenBackupsFolder') + '</a>'
-                                    );
-                                    $('.open_backup_dir').on('click', function(e) {
-                                        e.preventDefault();
-                                        window.electronAPI.openBackupDir();
-                                    });
+                                    showBackupSavedMessage('backupRestoreFlashCompleteBackupSaved');
                                     BackupRestore.clearLastAutoBackup();
                                 }
                             }
-                        }
-
-                        // Show migration preview overlay with changes and warnings
-                        function showMigrationPreview(summary, onContinue, onCancel) {
-                            var $preview = $('#migration-preview-overlay');
-                            var $subtitle = $preview.find('.migration-preview__subtitle');
-                            var $changes = $preview.find('.migration-preview__changes');
-                            var $warnings = $preview.find('.migration-preview__warnings');
-                            var $continueBtn = $preview.find('.migration-preview__btn--continue');
-                            var $cancelBtn = $preview.find('.migration-preview__btn--cancel');
-
-                            // Populate subtitle
-                            $subtitle.text(i18n.getMessage('migrationPreviewSubtitle', [summary.fromVersion, summary.toVersion]));
-
-                            // Build changes text
-                            var changesLines = [];
-                            if (summary.removedSettings.length > 0) {
-                                changesLines.push(i18n.getMessage('migrationPreviewRemovedHeader', [summary.removedSettings.length.toString()]));
-                                for (var i = 0; i < summary.removedSettings.length; i++) {
-                                    changesLines.push('  • ' + summary.removedSettings[i]);
-                                }
-                                changesLines.push('');
-                            }
-                            if (summary.renamedSettings.length > 0) {
-                                changesLines.push(i18n.getMessage('migrationPreviewRenamedSettingsHeader', [summary.renamedSettings.length.toString()]));
-                                for (var i = 0; i < summary.renamedSettings.length; i++) {
-                                    changesLines.push('  • ' + summary.renamedSettings[i]);
-                                }
-                                changesLines.push('');
-                            }
-                            if (summary.renamedCommands.length > 0) {
-                                changesLines.push(i18n.getMessage('migrationPreviewRenamedCommandsHeader', [summary.renamedCommands.length.toString()]));
-                                for (var i = 0; i < summary.renamedCommands.length; i++) {
-                                    changesLines.push('  • ' + summary.renamedCommands[i]);
-                                }
-                                changesLines.push('');
-                            }
-                            if (summary.valueReplacements.length > 0) {
-                                changesLines.push(i18n.getMessage('migrationPreviewValueReplacementsHeader', [summary.valueReplacements.length.toString()]));
-                                for (var i = 0; i < summary.valueReplacements.length; i++) {
-                                    changesLines.push('  • ' + summary.valueReplacements[i]);
-                                }
-                                changesLines.push('');
-                            }
-                            if (summary.settingRemappings.length > 0) {
-                                changesLines.push(i18n.getMessage('migrationPreviewSettingRemappingsHeader', [summary.settingRemappings.length.toString()]));
-                                for (var i = 0; i < summary.settingRemappings.length; i++) {
-                                    changesLines.push('  • ' + summary.settingRemappings[i]);
-                                }
-                            }
-                            $changes.text(changesLines.join('\n'));
-
-                            // Build warnings text
-                            if (summary.warnings.length > 0) {
-                                var warnLines = [];
-                                for (var i = 0; i < summary.warnings.length; i++) {
-                                    warnLines.push('⚠ ' + summary.warnings[i]);
-                                }
-                                $warnings.text(warnLines.join('\n'));
-                            } else {
-                                $warnings.text('');
-                            }
-
-                            $preview.removeClass('is-hidden');
-                            i18n.localize($preview);
-
-                            function cleanup() {
-                                $continueBtn.off('click.migPreview');
-                                $cancelBtn.off('click.migPreview');
-                                $preview.addClass('is-hidden');
-                            }
-
-                            $cancelBtn.on('click.migPreview', function(e) {
-                                e.preventDefault();
-                                cleanup();
-                                onCancel();
-                            });
-
-                            $continueBtn.on('click.migPreview', function(e) {
-                                e.preventDefault();
-                                cleanup();
-                                onContinue();
-                            });
                         }
 
                         // Start port polling and auto-restore with given data
@@ -1150,21 +1108,7 @@ TABS.firmware_flasher.initialize = function (callback) {
             if (missingProfiles) {
                 if (!migrationResult) {
                     var backupVer = MigrationHandler.extractBackupVersion(fileResponse.data) || 'unknown';
-                    migrationResult = {
-                        migratedContent: fileData,
-                        summary: {
-                            fromVersion: backupVer,
-                            toVersion: currentFcVersion,
-                            profilesApplied: [],
-                            totalChanges: 0,
-                            removedSettings: [],
-                            renamedSettings: [],
-                            renamedCommands: [],
-                            valueReplacements: [],
-                            settingRemappings: [],
-                            warnings: [],
-                        },
-                    };
+                    migrationResult = MigrationHandler.createEmptyResult(backupVer, currentFcVersion, fileData);
                 }
                 migrationResult.summary.warnings.push(
                     i18n.getMessage('migrationMissingProfileWarning', [
@@ -1177,7 +1121,7 @@ TABS.firmware_flasher.initialize = function (callback) {
             // If migration has changes or warnings, show preview overlay and wait for user decision
             if (migrationResult && (migrationResult.summary.totalChanges > 0 || migrationResult.summary.warnings.length > 0)) {
                 await new Promise(function(resolve) {
-                    showManualMigrationPreview(migrationResult.summary, function onContinue() {
+                    showMigrationPreview(migrationResult.summary, function onContinue() {
                         GUI.log(i18n.getMessage('backupRestoreMigrationApplied', [
                             migrationResult.summary.fromVersion,
                             migrationResult.summary.toVersion,
@@ -1210,86 +1154,6 @@ TABS.firmware_flasher.initialize = function (callback) {
 
             var rebootBaud = parseInt($('div#port-picker #baud').val());
             GUI.connect_lock = true;
-
-            // Show migration preview for manual restore
-            function showManualMigrationPreview(summary, onContinue, onCancel) {
-                var $preview = $('#migration-preview-overlay');
-                var $subtitle = $preview.find('.migration-preview__subtitle');
-                var $changes = $preview.find('.migration-preview__changes');
-                var $warnings = $preview.find('.migration-preview__warnings');
-                var $continueBtn = $preview.find('.migration-preview__btn--continue');
-                var $cancelBtn = $preview.find('.migration-preview__btn--cancel');
-
-                $subtitle.text(i18n.getMessage('migrationPreviewSubtitle', [summary.fromVersion, summary.toVersion]));
-
-                var changesLines = [];
-                if (summary.removedSettings.length > 0) {
-                    changesLines.push(i18n.getMessage('migrationPreviewRemovedHeader', [summary.removedSettings.length.toString()]));
-                    for (var ci = 0; ci < summary.removedSettings.length; ci++) {
-                        changesLines.push('  • ' + summary.removedSettings[ci]);
-                    }
-                    changesLines.push('');
-                }
-                if (summary.renamedSettings.length > 0) {
-                    changesLines.push(i18n.getMessage('migrationPreviewRenamedSettingsHeader', [summary.renamedSettings.length.toString()]));
-                    for (var ci = 0; ci < summary.renamedSettings.length; ci++) {
-                        changesLines.push('  • ' + summary.renamedSettings[ci]);
-                    }
-                    changesLines.push('');
-                }
-                if (summary.renamedCommands.length > 0) {
-                    changesLines.push(i18n.getMessage('migrationPreviewRenamedCommandsHeader', [summary.renamedCommands.length.toString()]));
-                    for (var ci = 0; ci < summary.renamedCommands.length; ci++) {
-                        changesLines.push('  • ' + summary.renamedCommands[ci]);
-                    }
-                    changesLines.push('');
-                }
-                if (summary.valueReplacements.length > 0) {
-                    changesLines.push(i18n.getMessage('migrationPreviewValueReplacementsHeader', [summary.valueReplacements.length.toString()]));
-                    for (var ci = 0; ci < summary.valueReplacements.length; ci++) {
-                        changesLines.push('  • ' + summary.valueReplacements[ci]);
-                    }
-                    changesLines.push('');
-                }
-                if (summary.settingRemappings.length > 0) {
-                    changesLines.push(i18n.getMessage('migrationPreviewSettingRemappingsHeader', [summary.settingRemappings.length.toString()]));
-                    for (var ci = 0; ci < summary.settingRemappings.length; ci++) {
-                        changesLines.push('  • ' + summary.settingRemappings[ci]);
-                    }
-                }
-                $changes.text(changesLines.join('\n'));
-
-                if (summary.warnings.length > 0) {
-                    var warnLines = [];
-                    for (var wi = 0; wi < summary.warnings.length; wi++) {
-                        warnLines.push('⚠ ' + summary.warnings[wi]);
-                    }
-                    $warnings.text(warnLines.join('\n'));
-                } else {
-                    $warnings.text('');
-                }
-
-                $preview.removeClass('is-hidden');
-                i18n.localize($preview);
-
-                function cleanup() {
-                    $continueBtn.off('click.migPreview');
-                    $cancelBtn.off('click.migPreview');
-                    $preview.addClass('is-hidden');
-                }
-
-                $cancelBtn.on('click.migPreview', function(e) {
-                    e.preventDefault();
-                    cleanup();
-                    onCancel();
-                });
-
-                $continueBtn.on('click.migPreview', function(e) {
-                    e.preventDefault();
-                    cleanup();
-                    onContinue();
-                });
-            }
 
             CONFIGURATOR.connection.connect(port, {bitrate: rebootBaud}, function(openInfo) {
                 if (!openInfo) {
