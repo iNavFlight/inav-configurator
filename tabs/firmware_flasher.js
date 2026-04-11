@@ -74,6 +74,7 @@ TABS.firmware_flasher.initialize = function (callback) {
 
     var intel_hex = false, // standard intel hex in string format
         parsed_hex = false, // parsed raw hex in array format
+        localFirmwareLoaded = false, // true when firmware loaded from local file
         fileName = "inav.hex";
 
     import('./firmware_flasher.html?raw').then(({default: html}) => GUI.load(html, function () {
@@ -453,6 +454,7 @@ TABS.firmware_flasher.initialize = function (callback) {
                         parsed_hex = data;
 
                         if (parsed_hex) {
+                            localFirmwareLoaded = true;
                             $('a.flash_firmware').removeClass('disabled');
 
                             $('span.progressLabel').text('Loaded Local Firmware: (' + parsed_hex.bytes_total + ' bytes)');
@@ -489,6 +491,7 @@ TABS.firmware_flasher.initialize = function (callback) {
 
             function process_hex(data, summary) {
                 intel_hex = data;
+                localFirmwareLoaded = false;
 
                 parse_hex(intel_hex, function (data) {
                     parsed_hex = data;
@@ -664,9 +667,9 @@ TABS.firmware_flasher.initialize = function (callback) {
                         var originalBaud = parseInt($('div#port-picker #baud').val());
 
                         // Determine version update type (patch / minor / major)
-                        var currentVersion = FC.CONFIG.flightControllerVersion;
+                        var currentVersion = (FC.CONFIG && FC.CONFIG.flightControllerVersion) ? FC.CONFIG.flightControllerVersion : null;
                         var selectedSummary = $('select[name="firmware_version"] option:selected').data('summary');
-                        var targetVersion = selectedSummary ? semver.clean(selectedSummary.version) : null;
+                        var targetVersion = (!localFirmwareLoaded && selectedSummary) ? semver.clean(selectedSummary.version) : null;
                         var isMinorOrMajorUpdate = false;
 
                         if (currentVersion && targetVersion && semver.valid(currentVersion) && semver.valid(targetVersion)) {
@@ -726,7 +729,7 @@ TABS.firmware_flasher.initialize = function (callback) {
                         function onFlashComplete() {
                             // Update stored FC version to what we just flashed
                             // so subsequent version checks are accurate without reconnecting
-                            if (targetVersion) {
+                            if (targetVersion && FC.CONFIG) {
                                 FC.CONFIG.flightControllerVersion = targetVersion;
                             }
 
@@ -743,7 +746,11 @@ TABS.firmware_flasher.initialize = function (callback) {
                                     }
                                 }
 
-                                if (isMajorDowngrade) {
+                                if (!targetVersion) {
+                                    // Local firmware file — unknown target version, no auto-restore
+                                    showBackupSavedMessage('backupRestoreFlashCompleteBackupSaved');
+                                    BackupRestore.clearLastAutoBackup();
+                                } else if (isMajorDowngrade) {
                                     // Major downgrade — inform user, no auto-restore
                                     GUI.log(i18n.getMessage('backupRestoreDowngradeNoAutoRestore'));
                                     showBackupSavedMessage('backupRestoreDowngradeNoAutoRestore');
@@ -1092,53 +1099,6 @@ TABS.firmware_flasher.initialize = function (callback) {
             }
 
             var fileData = fileResponse.data;
-            var currentFcVersion = FC.CONFIG.flightControllerVersion;
-
-            // Run migration before connecting (text-only, no FC needed)
-            var migrationNeeded = currentFcVersion && MigrationHandler.isMigrationNeeded(fileData, currentFcVersion);
-            var missingProfiles = currentFcVersion && MigrationHandler.hasMissingProfiles(fileData, currentFcVersion);
-            var migrationResult = null;
-
-            if (migrationNeeded) {
-                migrationResult = MigrationHandler.migrateBackupData(fileData, currentFcVersion);
-                fileData = migrationResult.migratedContent;
-            }
-
-            // Inject missing-profile warning if applicable
-            if (missingProfiles) {
-                if (!migrationResult) {
-                    var backupVer = MigrationHandler.extractBackupVersion(fileResponse.data) || 'unknown';
-                    migrationResult = MigrationHandler.createEmptyResult(backupVer, currentFcVersion, fileData);
-                }
-                migrationResult.summary.warnings.push(
-                    i18n.getMessage('migrationMissingProfileWarning', [
-                        migrationResult.summary.fromVersion,
-                        migrationResult.summary.toVersion,
-                    ])
-                );
-            }
-
-            // If migration has changes or warnings, show preview overlay and wait for user decision
-            if (migrationResult && (migrationResult.summary.totalChanges > 0 || migrationResult.summary.warnings.length > 0)) {
-                await new Promise(function(resolve) {
-                    showMigrationPreview(migrationResult.summary, function onContinue() {
-                        GUI.log(i18n.getMessage('backupRestoreMigrationApplied', [
-                            migrationResult.summary.fromVersion,
-                            migrationResult.summary.toVersion,
-                            migrationResult.summary.totalChanges.toString()
-                        ]));
-                        resolve(true);
-                    }, function onCancel() {
-                        fileData = null; // signal cancellation
-                        resolve(false);
-                    });
-                });
-
-                if (!fileData) {
-                    $('span.progressLabel').text(i18n.getMessage('backupRestoreRestoreCancelled'));
-                    return;
-                }
-            }
 
             // Show overlay and lock UI
             var $overlay = $('#restore-overlay');
@@ -1162,6 +1122,84 @@ TABS.firmware_flasher.initialize = function (callback) {
                     GUI.log(i18n.getMessage('failedToOpenSerialPort'));
                     return;
                 }
+
+                // Query actual FC version via MSP before deciding on migration.
+                // The cached FC.CONFIG.flightControllerVersion may be stale after
+                // a flash (e.g. targetVersion was null for a local firmware file).
+                $overlayStatus.text(i18n.getMessage('backupRestoreStatusConnecting'));
+                MSP.disconnect_cleanup();
+                var mspListener = function(info) { MSP.read(info); };
+                CONFIGURATOR.connection.addOnReceiveCallback(mspListener);
+
+                var versionQueryDone = false;
+                var versionQueryTimeout = setTimeout(function() {
+                    if (!versionQueryDone) {
+                        versionQueryDone = true;
+                        CONFIGURATOR.connection.removeOnReceiveCallback(mspListener);
+                        console.warn('MSP_FC_VERSION query timed out, using cached version');
+                        proceedAfterVersionQuery();
+                    }
+                }, 3000);
+
+                MSP.send_message(MSPCodes.MSP_FC_VERSION, false, false, function() {
+                    if (!versionQueryDone) {
+                        versionQueryDone = true;
+                        clearTimeout(versionQueryTimeout);
+                        CONFIGURATOR.connection.removeOnReceiveCallback(mspListener);
+                        proceedAfterVersionQuery();
+                    }
+                });
+
+                function proceedAfterVersionQuery() {
+                    var currentFcVersion = FC.CONFIG.flightControllerVersion;
+
+                    // Run migration check with the real FC version
+                    var migrationNeeded = currentFcVersion && MigrationHandler.isMigrationNeeded(fileData, currentFcVersion);
+                    var missingProfiles = currentFcVersion && MigrationHandler.hasMissingProfiles(fileData, currentFcVersion);
+                    var migrationResult = null;
+
+                    if (migrationNeeded) {
+                        migrationResult = MigrationHandler.migrateBackupData(fileData, currentFcVersion);
+                        fileData = migrationResult.migratedContent;
+                    }
+
+                    // Inject missing-profile warning if applicable
+                    if (missingProfiles) {
+                        if (!migrationResult) {
+                            var backupVer = MigrationHandler.extractBackupVersion(fileData) || 'unknown';
+                            migrationResult = MigrationHandler.createEmptyResult(backupVer, currentFcVersion, fileData);
+                        }
+                        migrationResult.summary.warnings.push(
+                            i18n.getMessage('migrationMissingProfileWarning', [
+                                migrationResult.summary.fromVersion,
+                                migrationResult.summary.toVersion,
+                            ])
+                        );
+                    }
+
+                    // If migration has changes or warnings, show preview and wait for user decision
+                    if (migrationResult && (migrationResult.summary.totalChanges > 0 || migrationResult.summary.warnings.length > 0)) {
+                        $overlay.addClass('is-hidden'); // hide connecting overlay for preview
+                        showMigrationPreview(migrationResult.summary, function onContinue() {
+                            GUI.log(i18n.getMessage('backupRestoreMigrationApplied', [
+                                migrationResult.summary.fromVersion,
+                                migrationResult.summary.toVersion,
+                                migrationResult.summary.totalChanges.toString()
+                            ]));
+                            $overlay.removeClass('is-hidden');
+                            doRestore();
+                        }, function onCancel() {
+                            $('span.progressLabel').text(i18n.getMessage('backupRestoreRestoreCancelled'));
+                            disconnectSafely(function() {
+                                GUI.connect_lock = false;
+                            });
+                        });
+                    } else {
+                        doRestore();
+                    }
+                }
+
+                function doRestore() {
 
                 // Progress callback from performRestore
                 function onProgress(info) {
@@ -1249,6 +1287,7 @@ TABS.firmware_flasher.initialize = function (callback) {
                         GUI.connect_lock = false;
                     });
                 });
+                } // doRestore
             });
         });
 

@@ -329,8 +329,11 @@ STM32_protocol.prototype.connectSerial = function(port, hex, options) {
                         self.initialize();
                     },
                     function onTimeout() {
-                        // Polling timed out
+                        // Polling timed out — DFU device not detected
+                        console.log('DFU/bootloader detection timed out on port ' + port);
                         GUI.log(i18n.getMessage('failedToFlash') + port);
+                        $('span.progressLabel').text(i18n.getMessage('failedToFlash') + port);
+                        GUI.connect_lock = false;
                     }
                 );
             });

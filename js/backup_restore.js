@@ -530,6 +530,14 @@ const BackupRestore = {
                 }
                 connection.removeOnReceiveCallback(receiveCallback);
 
+                // Extract the real FC version from the diff all header
+                // e.g. "# INAV/MATEKF765 7.1.2 May 15 2024 / 12:00:00 (abc123)"
+                const versionMatch = outputBuffer.match(/INAV\/\S+\s+(\d+\.\d+\.\d+)/);
+                if (versionMatch) {
+                    FC.CONFIG.flightControllerVersion = versionMatch[1];
+                    console.log('FC version detected from diff output: ' + versionMatch[1]);
+                }
+
                 const cleanedOutput = self._cleanDiffOutput(outputBuffer);
 
                 if (onProgress) onProgress('backupRestoreStatusSavingFile');
@@ -603,7 +611,13 @@ const BackupRestore = {
             const allFiles = await window.electronAPI.listBackups();
             const autoBackups = allFiles
                 .filter(f => AUTO_BACKUP_PATTERN.test(f))
-                .sort(); // lexicographic sort — filename contains timestamp so this gives chronological order
+                .sort(function(a, b) {
+                    // Sort by timestamp portion (YYYY-MM-DD_HHMMSS) to avoid
+                    // version strings affecting order (e.g. "7.1.2" < "9.0.1")
+                    var tsA = a.match(/(\d{4}-\d{2}-\d{2}_\d{6})\.txt$/);
+                    var tsB = b.match(/(\d{4}-\d{2}-\d{2}_\d{6})\.txt$/);
+                    return (tsA ? tsA[1] : a).localeCompare(tsB ? tsB[1] : b);
+                });
 
             if (autoBackups.length > maxKeep) {
                 const toDelete = autoBackups.slice(0, autoBackups.length - maxKeep);
