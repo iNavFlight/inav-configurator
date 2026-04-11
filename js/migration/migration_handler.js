@@ -130,20 +130,23 @@ const MigrationHandler = {
             }
         }
 
-        // 3. OSD custom element type remapping
-        //    Lines like: "set osd_custom_element_1_type = 4"
-        if (command === 'set' && profile.osdCustomElementTypeMapping) {
+        // 3. Generic setting pattern mappings (value remapping by regex pattern)
+        //    e.g. OSD custom element type IDs renumbered between versions
+        if (command === 'set' && profile.settingPatternMappings && profile.settingPatternMappings.length > 0) {
             const settingName = parts[1] ? parts[1].toLowerCase() : '';
-            if (settingName.match(/^osd_custom_element_\d+_type$/)) {
-                const eqIdx = parts.indexOf('=');
-                if (eqIdx !== -1 && eqIdx + 1 < parts.length) {
-                    const oldTypeId = parts[eqIdx + 1];
-                    if (profile.osdCustomElementTypeMapping[oldTypeId]) {
-                        const newTypeId = profile.osdCustomElementTypeMapping[oldTypeId];
-                        parts[eqIdx + 1] = newTypeId;
-                        changes.push(`OSD custom element type remapped: ${oldTypeId} → ${newTypeId}`);
-                        currentLine = parts.join(' ');
+            for (const mapping of profile.settingPatternMappings) {
+                if (new RegExp(mapping.pattern).test(settingName)) {
+                    const eqIdx = parts.indexOf('=');
+                    if (eqIdx !== -1 && eqIdx + 1 < parts.length) {
+                        const oldVal = parts[eqIdx + 1];
+                        if (mapping.valueMap[oldVal]) {
+                            parts[eqIdx + 1] = mapping.valueMap[oldVal];
+                            const desc = mapping.description || 'Setting value remapped';
+                            changes.push(`${desc}: "${settingName}" ${oldVal} → ${mapping.valueMap[oldVal]}`);
+                            currentLine = parts.join(' ');
+                        }
                     }
+                    break; // Only first matching pattern applies
                 }
             }
         }
@@ -168,7 +171,7 @@ const MigrationHandler = {
      *     renamedSettings: string[],
      *     renamedCommands: string[],
      *     valueReplacements: string[],
-     *     osdRemappings: string[],
+     *     settingRemappings: string[],
      *     warnings: string[]
      *   }
      * }}
@@ -185,7 +188,7 @@ const MigrationHandler = {
             renamedSettings: [],
             renamedCommands: [],
             valueReplacements: [],
-            osdRemappings: [],
+            settingRemappings: [],
             warnings: [],
         };
 
@@ -253,8 +256,8 @@ const MigrationHandler = {
                         summary.renamedCommands.push(change);
                     } else if (change.startsWith('Value replaced')) {
                         summary.valueReplacements.push(change);
-                    } else if (change.startsWith('OSD')) {
-                        summary.osdRemappings.push(change);
+                    } else {
+                        summary.settingRemappings.push(change);
                     }
                 }
             }
@@ -341,9 +344,9 @@ const MigrationHandler = {
             }
         }
 
-        if (summary.osdRemappings.length > 0) {
-            lines.push(`\nOSD type remappings (${summary.osdRemappings.length}):`);
-            for (const r of summary.osdRemappings) {
+        if (summary.settingRemappings.length > 0) {
+            lines.push(`\nSetting remappings (${summary.settingRemappings.length}):`);
+            for (const r of summary.settingRemappings) {
                 lines.push(`  - ${r}`);
             }
         }

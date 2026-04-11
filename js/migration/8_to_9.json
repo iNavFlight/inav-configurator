@@ -16,7 +16,7 @@
 
     "removed": [],
 
-    "osdCustomElementTypeMapping": {},
+    "settingPatternMappings": [],
 
     "warnings": [
         "Position estimator defaults changed: w_z_baro_v 0.1→0.35, inav_w_z_gps_p 0.2→0.35, inav_w_z_gps_v 0.1→0.35. Review if you had custom values.",

@@ -6437,8 +6437,8 @@
     "migrationPreviewValueReplacementsHeader": {
         "message": "Value replacements ($1):"
     },
-    "migrationPreviewOsdRemappingsHeader": {
-        "message": "OSD type remappings ($1):"
+    "migrationPreviewSettingRemappingsHeader": {
+        "message": "Setting remappings ($1):"
     },
     "migrationPreviewContinue": {
         "message": "Continue with Restore"

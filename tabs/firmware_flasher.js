@@ -800,10 +800,10 @@ TABS.firmware_flasher.initialize = function (callback) {
                                 }
                                 changesLines.push('');
                             }
-                            if (summary.osdRemappings.length > 0) {
-                                changesLines.push(i18n.getMessage('migrationPreviewOsdRemappingsHeader', [summary.osdRemappings.length.toString()]));
-                                for (var i = 0; i < summary.osdRemappings.length; i++) {
-                                    changesLines.push('  • ' + summary.osdRemappings[i]);
+                            if (summary.settingRemappings.length > 0) {
+                                changesLines.push(i18n.getMessage('migrationPreviewSettingRemappingsHeader', [summary.settingRemappings.length.toString()]));
+                                for (var i = 0; i < summary.settingRemappings.length; i++) {
+                                    changesLines.push('  • ' + summary.settingRemappings[i]);
                                 }
                             }
                             $changes.text(changesLines.join('\n'));
@@ -1193,10 +1193,10 @@ TABS.firmware_flasher.initialize = function (callback) {
                     }
                     changesLines.push('');
                 }
-                if (summary.osdRemappings.length > 0) {
-                    changesLines.push(i18n.getMessage('migrationPreviewOsdRemappingsHeader', [summary.osdRemappings.length.toString()]));
-                    for (var ci = 0; ci < summary.osdRemappings.length; ci++) {
-                        changesLines.push('  • ' + summary.osdRemappings[ci]);
+                if (summary.settingRemappings.length > 0) {
+                    changesLines.push(i18n.getMessage('migrationPreviewSettingRemappingsHeader', [summary.settingRemappings.length.toString()]));
+                    for (var ci = 0; ci < summary.settingRemappings.length; ci++) {
+                        changesLines.push('  • ' + summary.settingRemappings[ci]);
                     }
                 }
                 $changes.text(changesLines.join('\n'));

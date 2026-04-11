@@ -36,12 +36,13 @@
         "pidsum_limit_yaw"
     ],
 
-    "osdCustomElementTypeMapping": {
-        "4": "9",
-        "5": "16",
-        "6": "7",
-        "7": "10"
-    },
+    "settingPatternMappings": [
+        {
+            "pattern": "^osd_custom_element_\\d+_type$",
+            "valueMap": { "4": "9", "5": "16", "6": "7", "7": "10" },
+            "description": "OSD custom element type IDs were renumbered"
+        }
+    ],
 
     "warnings": [
         "nav_fw_wp_tracking_accuracy semantics changed: was arbitrary tracking response, now distance in meters. Review your value manually."
