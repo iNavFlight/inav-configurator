@@ -228,7 +228,16 @@ var mspHelper = (function () {
                     FC.ADSB_VEHICLES.vehicles.push(vehicle);
                 }
                 break;
-                
+            case MSPCodes.MSP2_ADSB_LIMITS:
+                FC.ADSB_LIMITS.adsb_distance_warning = data.getUint16(0, true);
+                FC.ADSB_LIMITS.adsb_distance_alert = data.getUint16(2, true);
+                FC.ADSB_LIMITS.adsb_ignore_plane_above_me_limit = data.getUint16(4, true);
+                break;
+            case MSPCodes.MSP2_ADSB_WARNING_VEHICLE_ICAO:
+                FC.ADSB_WARNING_ICAO = {}
+                FC.ADSB_WARNING_ICAO.icao = data.getUint32(0, true);
+                FC.ADSB_WARNING_ICAO.isAlert = data.getUint8(4, true);
+                break;
             case MSPCodes.MSP_ATTITUDE:
                 FC.SENSOR_DATA.kinematics[0] = data.getInt16(0, true) / 10.0; // x
                 FC.SENSOR_DATA.kinematics[1] = data.getInt16(2, true) / 10.0; // y
@@ -2936,6 +2945,14 @@ var mspHelper = (function () {
 
     self.loadMiscV2 = function (callback) {
         MSP.send_message(MSPCodes.MSPV2_INAV_MISC, false, false, callback);
+    };
+
+    self.loadADSBLimits = function (callback) {
+        MSP.send_message(MSPCodes.MSP2_ADSB_LIMITS, false, false, callback);
+    };
+
+    self.loadADSBWarningIcao = function (callback) {
+        MSP.send_message(MSPCodes.MSP2_ADSB_WARNING_VEHICLE_ICAO, false, false, callback);
     };
 
     self.loadOutputMapping = function (callback) {

@@ -1,3 +1,23 @@
+
+.tab-gps .gps_content_wrapper {
+    flex: 1;
+    display: flex;
+    min-height: 0;
+}
+
+.tab-gps .cf_column.twothird {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+.tab-gps .gui_box.gps_map {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
 .tab-gps progress {
     width: 100%;
     border-radius: 3px;
@@ -42,12 +62,6 @@
 .tab-gps #connect a {
     font-weight: bold;
     margin-top: 10px;
-}
-
-.tab-gps #loadmap {
-    height: 100%;
-    width: 100%;
-    float: left;
 }
 
 .map-button {
@@ -118,7 +132,7 @@
 }
 
 #gps-map {
-    height: 400px;
+    height: calc(100vh - 305px);
     width: 100%;
     float: left;
     position: relative;
@@ -139,12 +153,55 @@ progress[value]::-webkit-progress-value {
     box-shadow: 0 0 3px rgba(0, 0, 0, 0.25) inset;
 }
 
-@media only screen and (max-width: 1055px) , only screen and (max-device-width: 1055px) {
+.adsb-table__wrapper {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    display: block;
+}
 
-    #gps-map {
-        height: 347px;
-        width: 100%;
-        float: left;
-    }
+td.adsbVehicleList {
+    overflow: hidden;
+    max-width: 0;
+}
 
+.adsb-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+}
+
+.adsb-table__header {
+    background: #e4e4e4;
+    color: #000000;
+    padding: 4px 8px;
+    border: 1px solid #ccc;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.adsb-table__cell {
+    padding: 3px 8px;
+    border: 1px solid #ccc;
+    text-align: center;
+    color: #252525;
+    background-color: #f9f9f9;
+}
+
+.adsb-table__row--alert .adsb-table__cell {
+    background-color: #f66464;
+}
+
+.adsb-table__row--warning .adsb-table__cell {
+    background-color: #fdbea9;
+}
+
+.adsb-table__row--stale {
+    opacity: 0.5;
+}
+
+.adsb-table__empty {
+    text-align: center;
+    padding: 8px;
+    color: #323232;
 }

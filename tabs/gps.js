@@ -12,8 +12,10 @@ import Style from 'ol/style/Style'
 import Icon from 'ol/style/Icon';
 import Text from 'ol/style/Text';
 import Fill from 'ol/style/Fill';
+import Stroke  from 'ol/style/Stroke';
 import Point from 'ol/geom/Point.js';
 import Feature from 'ol/Feature';
+import { circular } from 'ol/geom/Polygon';
 import VectorSource from 'ol/source/Vector.js';
 import VectorLayer from 'ol/layer/Vector.js';
 
@@ -71,7 +73,8 @@ TABS.gps.initialize = function (callback) {
     var loadChain = [
         mspHelper.loadFeatures,
         mspHelper.loadSerialPorts,
-        mspHelper.loadMiscV2
+        mspHelper.loadMiscV2,
+        mspHelper.loadADSBLimits,
     ];
 
     loadChainer.setChain(loadChain);
@@ -130,7 +133,93 @@ TABS.gps.initialize = function (callback) {
     let vehiclesCursorInitialized = false;
     let arrowIcon;
 
-    function process_html() {
+    function renderAdsbListTable() {
+        // Create table only if it doesn't exist yet
+        if ($('.adsbVehicleList').find('.adsb-table').length === 0) {
+            var $table = $('<table>').addClass('adsb-table');
+            var $thead = $('<thead>');
+            var $headerRow = $('<tr>');
+            [
+                i18n.getMessage('adsbCallsign'),
+                'ICAO',
+                i18n.getMessage('gpsLat'),
+                i18n.getMessage('gpsLon'),
+                i18n.getMessage('adsbAlt'),
+                i18n.getMessage('adsbHeading'),
+                'TSLC',
+                'TTL',
+                i18n.getMessage('adsbEmitter')
+            ].forEach(function(col) {
+                $headerRow.append($('<th>').addClass('adsb-table__header').text(col));
+            });
+            $thead.append($headerRow);
+            $table.append($thead);
+            $table.append($('<tbody>').addClass('adsb-table__body'));
+
+            var $wrapper = $('<div>').addClass('adsb-table__wrapper').append($table);
+            $('.adsbVehicleList').empty().append($wrapper);
+        }
+
+        var $tbody = $('.adsb-table__body');
+
+        if (FC.ADSB_VEHICLES.vehicles.length === 0) {
+            $tbody.empty();
+            $tbody.append(
+                $('<tr>').append(
+                    $('<td>').attr('colspan', 9).addClass('adsb-table__empty').text('No vehicles')
+                )
+            );
+            return;
+        }
+
+        // Remove extra rows if vehicle count decreased
+        var existingRows = $tbody.find('tr');
+        if (existingRows.length > FC.ADSB_VEHICLES.vehicles.length) {
+            existingRows.slice(FC.ADSB_VEHICLES.vehicles.length).remove();
+        }
+
+        FC.ADSB_VEHICLES.vehicles.forEach(function(v, i) {
+            var cells = [
+                v.callsign || '—',
+                '0x' + (v.icao >>> 0).toString(16).toUpperCase().padStart(6, '0'),
+                (v.lat / 1e7).toFixed(5),
+                (v.lon / 1e7).toFixed(5),
+                (v.altCM / 100).toFixed(0) + 'm',
+                v.headingDegrees + '°',
+                v.tslc + 's',
+                v.ttl,
+                v.emitterType
+            ];
+
+            var isAlert   = FC.ADSB_WARNING_ICAO.icao == v.icao && FC.ADSB_WARNING_ICAO.isAlert == 1;
+            var isWarning = FC.ADSB_WARNING_ICAO.icao == v.icao && FC.ADSB_WARNING_ICAO.isAlert != 1;
+            var rowClass  = isAlert ? 'adsb-table__row--alert' : isWarning ? 'adsb-table__row--warning' : 'adsb-table__row--normal';
+
+            var $row = $tbody.find('tr').eq(i);
+
+            if ($row.length === 0) {
+                // Row doesn't exist yet — create it
+                $row = $('<tr>');
+                cells.forEach(function() {
+                    $row.append($('<td>').addClass('adsb-table__cell'));
+                });
+                $tbody.append($row);
+            }
+
+            // Update classes and cell values without rebuilding the DOM
+            $row.removeClass('adsb-table__row--alert adsb-table__row--warning adsb-table__row--normal adsb-table__row--stale');
+            $row.addClass(rowClass);
+            if (v.tslc > 10) $row.addClass('adsb-table__row--stale');
+
+            $row.find('td').each(function(j) {
+                $(this).text(cells[j]);
+            });
+        });
+
+        $('.adsbVehicleListRow').show();
+    }
+
+    async function process_html() {
         i18n.localize();
 
         var fcFeatures = FC.getFeatures();
@@ -271,14 +360,15 @@ TABS.gps.initialize = function (callback) {
 
             if (feature && feature.get('data') && feature.get('name')) {
                 TABS.gps.toolboxAdsbVehicle.setContent(
-                    `callsign: <strong>` + feature.get('name') + `</strong><br />`
-                    + `lat: <strong>`+ (feature.get('data').lat / 10000000) + `</strong><br />`
-                    + `lon: <strong>`+ (feature.get('data').lon / 10000000) + `</strong><br />`
-                    + `ASL: <strong>`+ (feature.get('data').altCM ) / 100 + `m</strong><br />`
-                    + `heading: <strong>`+ feature.get('data').headingDegrees + `°</strong><br />`
-                    + `type: <strong>`+ ADSB_VEHICLE_TYPE[feature.get('data').emitterType].name + `</strong>`
+                    `ICAO: <strong>0x${(feature.get('data').icao >>> 0).toString(16).toUpperCase().padStart(6, '0')}</strong><br />
+                    ${i18n.getMessage('adsbCallsign')}: <strong>${feature.get('name')}</strong><br /> 
+                    ${i18n.getMessage('gpsLat')}: <strong>${feature.get('data').lat / 10000000}</strong><br /> 
+                    ${i18n.getMessage('gpsLon')}: <strong>${feature.get('data').lon / 10000000}</strong><br />
+                    ${i18n.getMessage('adsbAsl')}: <strong>${(feature.get('data').altCM) / 100}m</strong><br /> 
+                    ${i18n.getMessage('adsbHeading')}: <strong>${feature.get('data').headingDegrees}°</strong><br /> 
+                    ${i18n.getMessage('adsbType')}: <strong>${ADSB_VEHICLE_TYPE[feature.get('data').emitterType].name}</strong>`
                 ).open();
-            }else{
+            } else {
                 TABS.gps.toolboxAdsbVehicle.close();
             }
         });
@@ -300,7 +390,15 @@ TABS.gps.initialize = function (callback) {
         }
 
         function get_raw_adsb_data() {
-            MSP.send_message(MSPCodes.MSP2_ADSB_VEHICLE_LIST, false, false, update_adsb_ui);
+            MSP.send_message(MSPCodes.MSP2_ADSB_VEHICLE_LIST, false, false, get_adsb_warning);
+        }
+
+        function get_adsb_warning() {
+            if(FC.ADSB_VEHICLES.vehiclesCount > 0) {
+                MSP.send_message(MSPCodes.MSP2_ADSB_WARNING_VEHICLE_ICAO, false, false, update_adsb_ui);
+            } else {
+                update_adsb_ui();
+            }
         }
 
         function update_gps_ui() {
@@ -387,6 +485,20 @@ TABS.gps.initialize = function (callback) {
             $('.adsbVehicleTotalMessages').html(FC.ADSB_VEHICLES.vehiclePacketCount);
             $('.adsbHeartbeatTotalMessages').html(FC.ADSB_VEHICLES.heartbeatPacketCount);
 
+            if(FC.ADSB_VEHICLES.vehiclePacketCount > 0){
+                $('.adsbWarningIcao').html('0x' + (FC.ADSB_WARNING_ICAO.icao >>> 0).toString(16).toUpperCase().padStart(6, '0'));
+                $('.adsbWarningType').html(FC.ADSB_WARNING_ICAO.icao != 0 ? (FC.ADSB_WARNING_ICAO.isAlert == 1 ? i18n.getMessage('adsbAlert') : i18n.getMessage('adsbWarning')) : i18n.getMessage('adsbNoWarning'));
+
+                $('.adsbWarningIcaoRow').show();
+                $('.adsbWarningTypeRow').show();
+                renderAdsbListTable();
+            }else{
+                $('.adsbWarningIcaoRow').hide();
+                $('.adsbWarningTypeRow').hide();
+                $('.adsbVehicleListRow').hide();
+            }
+
+
             for (let key in FC.ADSB_VEHICLES.vehicles) {
                 let vehicle = FC.ADSB_VEHICLES.vehicles[key];
 
@@ -435,6 +547,54 @@ TABS.gps.initialize = function (callback) {
                     vehicleVectorSource.addFeature(iconFeature);
                 }
             }
+
+            /////////////////////////////////////////////////////////////////////////////////
+            if (FC.GPS_DATA.fix >= 2  && vehiclesCursorInitialized && FC.ADSB_LIMITS.adsb_distance_alert > 0 &&  FC.ADSB_LIMITS.adsb_distance_warning > 0){
+                let lat = FC.GPS_DATA.lat / 10000000;
+                let lon = FC.GPS_DATA.lon / 10000000;
+
+                let circleWarning = circular(
+                    [lon, lat],
+                    FC.ADSB_LIMITS.adsb_distance_warning,
+                    64
+                );
+                circleWarning.transform('EPSG:4326', 'EPSG:3857');
+
+                let featureWarning = new Feature({ geometry: circleWarning });
+                featureWarning.setStyle(new Style({
+                    fill: new Fill({
+                        color: 'rgba(255, 255, 0, 0.15)'
+                    }),
+                    stroke: new Stroke({
+                        color: '#ffff00',
+                        width: 2
+                    })
+                }));
+
+                vehicleVectorSource.addFeature(featureWarning);
+
+                let circleAlert = circular(
+                    [lon, lat],
+                    FC.ADSB_LIMITS.adsb_distance_alert,
+                    64
+                );
+
+                circleAlert.transform('EPSG:4326', 'EPSG:3857');
+
+                let featureAlert = new Feature({ geometry: circleAlert });
+                featureAlert.setStyle(new Style({
+                    fill: new Fill({
+                        color: 'rgba(255, 0, 0, 0.15)'
+                    }),
+                    stroke: new Stroke({
+                        color: '#ff0000',
+                        width: 2
+                    })
+                }));
+
+                vehicleVectorSource.addFeature(featureAlert);
+            }
+///////////////////////////////////////////////////////////////////////////////
         }
 
         /*
