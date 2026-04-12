@@ -255,6 +255,8 @@ TABS.magnetometer.initialize = function (callback) {
         }
     }
 
+    let _settingSlider = false;
+
     function updateFCCliString() {
         var s = " align_board_roll=" + (self.boardAlignmentConfig.roll * 10) +  
                 " align_board_pitch=" + (self.boardAlignmentConfig.pitch * 10) + 
@@ -269,7 +271,7 @@ TABS.magnetometer.initialize = function (callback) {
         }
 
         self.boardAlignmentConfig.roll = Number(value);
-        self.pageElements.board_roll_slider.val(self.boardAlignmentConfig.roll);
+        if (self.pageElements.board_roll_slider[0].noUiSlider && !_settingSlider) { _settingSlider = true; self.pageElements.board_roll_slider[0].noUiSlider.set(self.boardAlignmentConfig.roll); _settingSlider = false; }
         self.pageElements.orientation_board_roll.val(self.boardAlignmentConfig.roll);
         updateMagOrientationWithPreset();
         updateFCCliString();
@@ -278,7 +280,7 @@ TABS.magnetometer.initialize = function (callback) {
 
     function updateBoardPitchAxis(value) {
         self.boardAlignmentConfig.pitch = Number(value);
-        self.pageElements.board_pitch_slider.val(self.boardAlignmentConfig.pitch);
+        if (self.pageElements.board_pitch_slider[0].noUiSlider && !_settingSlider) { _settingSlider = true; self.pageElements.board_pitch_slider[0].noUiSlider.set(self.boardAlignmentConfig.pitch); _settingSlider = false; }
         self.pageElements.orientation_board_pitch.val(self.boardAlignmentConfig.pitch);
         updateMagOrientationWithPreset();
         updateFCCliString();
@@ -287,7 +289,7 @@ TABS.magnetometer.initialize = function (callback) {
 
     function updateBoardYawAxis(value) {
         self.boardAlignmentConfig.yaw = Number(value);
-        self.pageElements.board_yaw_slider.val(self.boardAlignmentConfig.yaw);
+        if (self.pageElements.board_yaw_slider[0].noUiSlider && !_settingSlider) { _settingSlider = true; self.pageElements.board_yaw_slider[0].noUiSlider.set(self.boardAlignmentConfig.yaw); _settingSlider = false; }
         self.pageElements.orientation_board_yaw.val(self.boardAlignmentConfig.yaw);
         updateMagOrientationWithPreset();
         updateFCCliString();
@@ -312,7 +314,7 @@ TABS.magnetometer.initialize = function (callback) {
     //Called when roll values change
     function updateRollAxis(value) {
         self.alignmentConfig.roll = Number(value);
-        self.pageElements.roll_slider.val(self.alignmentConfig.roll);
+        if (self.pageElements.roll_slider[0].noUiSlider && !_settingSlider) { _settingSlider = true; self.pageElements.roll_slider[0].noUiSlider.set(self.alignmentConfig.roll); _settingSlider = false; }
         self.pageElements.orientation_mag_roll.val(self.alignmentConfig.roll);
         updateMagCliString();
         self.render3D();
@@ -321,7 +323,7 @@ TABS.magnetometer.initialize = function (callback) {
     //Called when pitch values change
     function updatePitchAxis(value) {
         self.alignmentConfig.pitch = Number(value);
-        self.pageElements.pitch_slider.val(self.alignmentConfig.pitch);
+        if (self.pageElements.pitch_slider[0].noUiSlider && !_settingSlider) { _settingSlider = true; self.pageElements.pitch_slider[0].noUiSlider.set(self.alignmentConfig.pitch); _settingSlider = false; }
         self.pageElements.orientation_mag_pitch.val(self.alignmentConfig.pitch);
         updateMagCliString();
         self.render3D();
@@ -330,7 +332,7 @@ TABS.magnetometer.initialize = function (callback) {
     //Called when yaw values change
     function updateYawAxis(value) {
         self.alignmentConfig.yaw = Number(value);
-        self.pageElements.yaw_slider.val(self.alignmentConfig.yaw);
+        if (self.pageElements.yaw_slider[0].noUiSlider && !_settingSlider) { _settingSlider = true; self.pageElements.yaw_slider[0].noUiSlider.set(self.alignmentConfig.yaw); _settingSlider = false; }
         self.pageElements.orientation_mag_yaw.val(self.alignmentConfig.yaw);
         updateMagCliString();
         self.render3D();
@@ -477,13 +479,13 @@ TABS.magnetometer.initialize = function (callback) {
 
         
         self.pageElements.board_pitch_slider[0].noUiSlider.on('update', (values, handle) =>  {
-            updateBoardPitchAxis(values[handle]);
+            if (!_settingSlider) { _settingSlider = true; updateBoardPitchAxis(values[handle]); _settingSlider = false; }
         });
         self.pageElements.board_roll_slider[0].noUiSlider.on('update', (values, handle) =>  {
-            updateBoardRollAxis(values[handle]);
+            if (!_settingSlider) { _settingSlider = true; updateBoardRollAxis(values[handle]); _settingSlider = false; }
         });
         self.pageElements.board_yaw_slider[0].noUiSlider.on('update', (values, handle) =>  {
-            updateBoardYawAxis(values[handle]);
+            if (!_settingSlider) { _settingSlider = true; updateBoardYawAxis(values[handle]); _settingSlider = false; }
         });
         
 
@@ -575,13 +577,13 @@ TABS.magnetometer.initialize = function (callback) {
 
         
         self.pageElements.pitch_slider[0].noUiSlider.on('update', (values, handle) =>  {
-            updatePitchAxis(values[handle]);
+            if (!_settingSlider) { _settingSlider = true; updatePitchAxis(values[handle]); _settingSlider = false; }
         });
         self.pageElements.roll_slider[0].noUiSlider.on('update', (values, handle) =>  {
-            updateRollAxis(values[handle]);
+            if (!_settingSlider) { _settingSlider = true; updateRollAxis(values[handle]); _settingSlider = false; }
         });
         self.pageElements.yaw_slider[0].noUiSlider.on('update', (values, handle) =>  {
-            updateYawAxis(values[handle]);
+            if (!_settingSlider) { _settingSlider = true; updateYawAxis(values[handle]); _settingSlider = false; }
         });
 
         self.pageElements.pitch_slider[0].noUiSlider.on('slide', () => {
@@ -665,6 +667,7 @@ TABS.magnetometer.initialize3D = function () {
         model_file = 'fallback';
     }
 
+    let _renderPending = false;
     this.render3D = function () {
 
         if (!magModels || !fc)
@@ -673,7 +676,7 @@ TABS.magnetometer.initialize3D = function () {
         magModels.forEach( (m,i) => m.visible = i == self.elementToShow );
         fc.visible = true;
 
-        var magRotation = new THREE.Euler(-THREE.MathUtils.degToRad(self.alignmentConfig.pitch-180), THREE.MathUtils.degToRad(-180 - self.alignmentConfig.yaw), THREE.MathUtils.degToRad(self.alignmentConfig.roll), 'YXZ'); 
+        var magRotation = new THREE.Euler(-THREE.MathUtils.degToRad(self.alignmentConfig.pitch-180), THREE.MathUtils.degToRad(-180 - self.alignmentConfig.yaw), THREE.MathUtils.degToRad(self.alignmentConfig.roll), 'YXZ');
         var matrix = (new THREE.Matrix4()).makeRotationFromEuler(magRotation);
 
         var boardRotation = new THREE.Euler( THREE.MathUtils.degToRad( self.boardAlignmentConfig.pitch), THREE.MathUtils.degToRad( -self.boardAlignmentConfig.yaw ), THREE.MathUtils.degToRad( self.boardAlignmentConfig.roll ), 'YXZ');
@@ -681,15 +684,20 @@ TABS.magnetometer.initialize3D = function () {
 
 /*
         if ( self.isSavePreset ) {
-          matrix.premultiply(matrix1);  //preset specifies orientation relative to FC, align_max_xxx specify absolute orientation 
+          matrix.premultiply(matrix1);  //preset specifies orientation relative to FC, align_max_xxx specify absolute orientation
         }
 */
         magModels.forEach( (m,i) => m.rotation.setFromRotationMatrix(matrix) );
         fc.rotation.setFromRotationMatrix(matrix1);
 
-        // draw
-        if (camera != null)
-            renderer.render(scene, camera);
+        // draw — throttled to one render per animation frame
+        if (camera != null && !_renderPending) {
+            _renderPending = true;
+            requestAnimationFrame(() => {
+                _renderPending = false;
+                renderer.render(scene, camera);
+            });
+        }
     };
 
     // handle canvas resize
