@@ -10,7 +10,8 @@ export default {
     asar: false,
     icon: 'images/inav',
     extraResource: [
-      'resources/public/sitl'
+      'resources/public/sitl',
+      'assets/linux/45-inav.rules'
     ],
   },
   rebuildConfig: {
@@ -179,7 +180,10 @@ export default {
           icon: "./assets/linux/icon/inav_icon_128.png",
           description: "Configurator for the open source flight controller software INAV.",
           homepage: "https://github.com/inavflight/",
-
+          scripts: {
+            postinst: "./assets/linux/postinst",
+            postrm: "./assets/linux/postrm",
+          },
         }
       },
     },
@@ -194,6 +198,10 @@ export default {
           icon: "./assets/linux/icon/inav_icon_128.png",
           description: "Configurator for the open source flight controller software INAV.",
           homepage: "https://github.com/inavflight/",
+          scripts: {
+            post: "./assets/linux/postinst",
+            postun: "./assets/linux/postrm",
+          },
         }
       },
     },

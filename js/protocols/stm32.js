@@ -188,9 +188,29 @@ STM32_protocol.prototype.sendRebootCommand = function(callback) {
     console.log('Entering CLI to send DFU command');
 
     var cleanupAndDisconnect = function(success) {
-        CONFIGURATOR.connection.disconnect(function(result) {
-            callback(success);
-        });
+        var done = false;
+        var fireCallback = function() {
+            if (!done) {
+                done = true;
+                callback(success);
+            }
+        };
+
+        // On Linux the serial port vanishes before disconnect() runs,
+        // so _connectionId may already be false and the callback never fires.
+        // Use a timeout as safety net to guarantee the flash flow continues.
+        var fallback = setTimeout(fireCallback, 3000);
+
+        try {
+            CONFIGURATOR.connection.disconnect(function(result) {
+                clearTimeout(fallback);
+                fireCallback();
+            });
+        } catch (e) {
+            clearTimeout(fallback);
+            console.warn('Disconnect threw during DFU reboot:', e);
+            fireCallback();
+        }
     };
 
     var sendDfuCommand = function() {
