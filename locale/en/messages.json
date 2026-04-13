@@ -14,6 +14,18 @@
         "message": "українська",
         "_comment": "Don't translate!"
     },
+    "language_ja": {
+        "message": "日本語",
+        "_comment": "Don't translate!"
+    },
+    "language_zh_CN": {
+        "message": "简体中文",
+        "_comment": "Don't translate!"
+    },
+    "language_ru": {
+        "message": "Русский",
+        "_comment": "Don't translate!"
+    },
     "language": {
         "message": "Language"
     },
@@ -25,6 +37,9 @@
     },
     "options_improve_configurator": {
         "message": "Send anonymous usage data to the developer team"
+    },
+    "options_disable3dAcceleration" : {
+        "message": "Disable 3D Acceleration. If the 3D models are not displayed. Needs app restart."
     },
     "options_showProfileParameters": {
         "message": "Highlight parameters that change when switching battery or control profiles"
@@ -927,11 +942,29 @@
     "serialrx_halfduplex": {
         "message": "Serial receiver half-duplex"
     },
+    "serialrx_frSkyPitchRollLabel": {
+        "message": "Use Pitch & Roll sensors in telemetry"
+    },
+    "serialrx_frSkyPitchRollHelp": {
+        "message": "This sends pitch and roll angle telemetry sensors instead of the standard raw acellerometer data sensors. This should be turned <strong>on</strong> if using the INAV OpenTX/EdgeTX or ETHOS telemetry dashboard LUA scripts."
+    },
+    "serialrx_frSkyFuelUnitLabel": {
+        "message": "SmartPort Fuel units"
+    },
+    "serialrx_frSkyFuelUnitHelp": {
+        "message": "Select the data that you want sent to the <strong>fuel</strong> telemetry sensor."
+    },
     "configurationFeaturesHelp": {
         "message": "<strong>Note:</strong> Not all combinations of features are valid.  When the flight controller firmware detects invalid feature combinations conflicting features will be disabled.<br /><strong>Note:</strong> Configure serial ports <span style=\"color: red\">before</span> enabling the features that will use the ports."
     },
     "configurationSerialRXHelp": {
         "message": "<strong>Note:</strong> Remember to configure a Serial Port (via Ports tab) for the serial receiver"
+    },
+    "configurationFrSkyOptions": {
+        "message": "FrSky Options"
+    },
+    "configurationFrSkyOptions_HELP": {
+        "message": "These options provide quick access to configure the SmartPort telemetry sensors to work with the OpenTX/EdgeTX and ETHOS telemetry LUA scripts. Please note that if you are using SBUS. You will need to set up SmartPort telemetry on a separate serial port."
     },
     "configurationSensorAlignmentMag": {
         "message": "MAG Alignment"
@@ -1088,6 +1121,12 @@
     },
     "configurationLaunchIdleDelayHelp": {
         "message": "Set a time delay between raising the throttle for the launch, and the motor starting at idle throttle. Default: 0 [0-60000]"
+    },
+    "configurationWiggleWakeIdle": {
+        "message": "Wiggle to Wake Idle"
+    },
+    "configurationWiggleWakeIdleHelp": {
+        "message": "If enabled, this feature allows a yaw wiggle of the aircraft to wake up the motors from idle.<br />0: Disabled (default)<br />1: 1 wiggle - This setting has a higher detection point, for airplanes without a tail that can be moved easily<br />2: 2 wiggles - This setting has a lower detection point, but requires the repeated action. This is intended for larger models and airplanes with tails"
     },
     "configurationLaunchMotorDelay": {
         "message": "Motor Delay"
@@ -1272,8 +1311,8 @@
     "portsHelp": {
         "message": "<strong>Note:</strong> not all combinations are valid.  When the flight controller firmware detects this the serial port configuration will be reset."
     },
-    "portsMSPHelp": {
-        "message": "<strong>Note:</strong> Do <span style=\"color: red\">NOT</span> disable MSP on the first serial port unless you know what you are doing.  You may have to reflash and erase your configuration if you do."
+    "portsMSPWarning": {
+        "message": "<strong>Caution:</strong><p>Putting MSP on more than two UART ports may interfere with USB communication. Consider removing MSP from a port where it is not needed.</p>"
     },
     "portsFirmwareUpgradeRequired": {
         "message": "Firmware upgrade <span style=\"color: red\">required</span>."
@@ -1683,12 +1722,6 @@
     "pidTuning_Manual_Yaw": {
         "message": "Yaw (%)"
     },
-    "pidTuning_gyro_use_dyn_lpf": {
-        "message": "Dynamic gyro LPF"
-    },
-    "pidTuning_gyro_use_dyn_lpf_help": {
-        "message": "When enabled, main gyro LPF frequency is automatically adjusted based on the current throttle position. When disabled, static LPF cutoff frequency is used."
-    },
     "pidTuning_gyro_dyn_lpf_min_hz": {
         "message": "Dynamic gyro LPF min. cutoff"
     },
@@ -2059,6 +2092,9 @@
     },
     "adjustmentsFunction59": {
         "message": "Multi Mission Index Adjustment"
+    },
+    "adjustmentsFunction60": {
+        "message": "Fixed Wing Alt Control Response Adjustment"
     },
     "adjustmentsSave": {
         "message": "Save"
@@ -3497,6 +3533,12 @@
     "soarPitchDeadbandHelp": {
         "message": "Pitch Angle deadband when soaring mode enabled (deg). Angle mode inactive within deadband allowing pitch to free float whilst soaring."
     },
+    "altControlResponse": {
+        "message": "Altitude Control Response Factor"
+    },
+    "altControlResponseHelp": {
+        "message": "Adjusts the response of fixed wing altitude control as the target altitude is approached. Higher values will sharpen altitude control response but may also cause excessive overshoot or pitch instability if set too high."
+    },
     "waypointRadiusHelp": {
         "message": "This sets the distance away from a waypoint that triggers the waypoint as reached."
     },
@@ -3651,6 +3693,9 @@
         "message": "Custom OSD elements"
     },
     "osd_custom_element_settings_HELP": {
+        "message": "For comprehensive details on how to use Custom OSD elements. Click this ?"
+    },
+    "osd_custom_element_settings_icons_HELP": {
         "message": "You can find the icon numbers by clicking this help button."
     },
     "custom_element": {
@@ -4034,10 +4079,10 @@
     "osdElement_VARIO_HELP": {
         "message": "Shows vertical speed using up or down arrows. Each arrow represents 10cm (~4 inches) per second."
     },
-    "osdElement_VARIO_NUM": {
-        "message": "Numeric vario"
+    "osdElement_VERTICAL_SPEED_INDICATOR": {
+        "message": "Vertical Speed Indicator"
     },
-    "osdElement_VARIO_NUM_HELP": {
+    "osdElement_VERTICAL_SPEED_INDICATOR_HELP": {
         "message": "Shows vertical speed using a number"
     },
     "osdElement_G_FORCE": {
@@ -4259,11 +4304,11 @@
     "osdPanServoIndex_HELP": {
         "message": "Set the is to the output number of the pan servo; as shown in the mixer outputs table. For example output S6."
     },
-    "osdPanServoPwm2centideg": {
+    "osdPanServoRangeDecadegrees": {
         "message": "Total degrees of movement of the pan servo"
     },
-    "osdPanServoPwm2centideg_HELP": {
-        "message": "Degrees of pan servo rotation. A servo with 180 degrees of rotation from 1000 to 2000 us PWM typically needs 180 for this setting. Make the value negative to inverse the direction."
+    "osdPanServoRangeDecadegrees_HELP": {
+        "message": "Degrees of pan servo rotation. A servo with 180 degrees of rotation typically needs 180 for this setting. Make the value negative to inverse the direction."
     },
     "osdPanServoIndicatorShowDegrees": {
         "message": "Show degrees of offset next to pan indicator"
@@ -4321,6 +4366,15 @@
     },
     "osdElement_OSD_RANGEFINDER": {
         "message": "Rangefinder distance"
+    },
+    "osdElement_COURSE_NEXT_GEOZONE": {
+        "message": "Course to next Geozone"
+    },
+    "osdElement_HOR_DIST_TO_NEXT_GEOZONE": {
+        "message": "Horizontal distance to the next geozone"
+    },
+    "osdElement_VERT_DIST_TO_NEXT_GEOZONE": {
+        "message": "Vertical distance to the next geozone"
     },
     "osdSettingPLUS_CODE_DIGITS_HELP": {
         "message": "Precision at the equator: 10=13.9x13.9m; 11=2.8x3.5m; 12=56x87cm; 13=11x22cm."
@@ -4416,7 +4470,7 @@
         "message": "Upload Font"
     },
     "osd_font_manager": {
-        "message": "Font Manager"
+        "message": "Analogue Font Manager"
     },
     "uploadingCharacters": {
         "message": "Uploading..."
@@ -4682,6 +4736,171 @@
     "missionSafehomeMaxSafehomesReached": {
         "message": "Maximum number of safehomes reached."
     },
+    "missionGeozoneHead": {
+        "message": "Geozones"
+    },
+    "missionGeozoneEdit": {
+        "message": "Edit Geozone $1"
+    },
+    "missionGeozoneSaveAndReboot": {
+        "message": "Save Eeprom Geozones and reboot"
+    },
+    "missionGeozoneLoad": {
+        "message": "Load Eeprom Geozones"
+    },
+    "missionGeozone": {
+        "message": "-Geozone "
+    },
+    "missionGezoneType": {
+        "message": "Type"
+    },
+    "missionGezoneShape": {
+        "message": "Shape"
+    },
+    "missionGeozoneTypePolygon": {
+        "message": "Polygon"
+    },
+    "missionGeozoneTypeCircular": {
+        "message": "Circular"
+    },
+    "missionGeozoneMaxZonesReached": {
+        "message": "Maximum number of geozones reached."
+    },
+    "missionGeozoneMaxVerticesReached": {
+        "message": "Maximum number of geozone vertices reached."
+    },
+    "missionGeozoneWarning": {
+        "message": "At least one mission and one geozone are configured, please ensure that the mission does not violate the geozone."
+    },
+    "geozoneEdit": {
+        "message": "Edit Geozone "
+    },
+    "geozoneShape": {
+        "message": "Shape"
+    },
+    "geozoneInclusive": {
+        "message": "Inclusive"
+    },
+    "geozoneExcusive": {
+        "message": "Exclusive"
+    },
+    "geozoneMinAlt": {
+        "message": "Min. Alt (cm):"
+    },
+    "geozoneMaxAlt": {
+        "message": "Max. Alt (cm):"
+    },
+    "geozoneInfiniteAlt": {
+        "message": "0 = Infinite altitude"
+    },
+    "geozoneAction": {
+        "message": "Action:"
+    },
+    "geozoneActionNone": {
+        "message": "None"
+    },
+    "geozoneActionAvoid": {
+        "message": "Avoid"
+    },
+    "geozoneActionPosHold": {
+        "message": "Pos. Hold"
+    },
+    "geozoneActionRTH": {
+        "message": "RTH"
+    },
+    "geozoneRadius": {
+        "message": "Radius (cm):"
+    },
+    "geozoneVerices": {
+        "message": "Vertices:"
+    },
+    "": {
+        "message": ""
+    },
+    "featureGEOZONE": {
+        "message": "Geozone"
+    },
+    "geozone": {
+        "message": "Geozone"
+    },
+    "featureGEOZONETip": {
+        "message": "Virtual perimeters for geographical areas (also called geofence) with automatically triggered actions when the perimeters are violated."
+    },
+    "GeozoneSettings": {
+        "message": "Geozone Settings"
+    },
+    "geozoneDetectionDistance": {
+        "message": "Detection distance"
+    },
+    "geozoneDetectionDistanceHelp": {
+        "message": "Distance from which a geozone is detected"
+    },
+    "geozoneAvoidAltitudeRange": {
+        "message": "Avoid altitude range"
+    },
+    "geozoneAvoidAltitudeRangeHelp": {
+        "message": "Altitude range in which an attempt is made to avoid a geozone upwards"
+    },
+    "geozoneSafeAltitudeDistance": {
+        "message": "Safe altitude distance"
+    },
+    "geozoneSafeAltitudeDistanceHelp": {
+        "message": "Vertical distance that must be maintained to the upper and lower limits of the zone."
+    },
+    "geozoneSafehomeAsInclusive": {
+        "message": "Safehome as inclusive"
+    },
+    "geozoneSafehomeAsInclusiveHelp": {
+        "message": "Treat nearest safehome as inclusive geozone"
+    },
+    "geozoneSafehomeZoneAction": {
+        "message": "Safehome zone action"
+    },
+    "geozoneSafehomeZoneActionHelp": {
+        "message": "Fence action for safehome zone"
+    },
+    "geozoneMrStopDistance": {
+        "message" : "Multirotor stop distance"
+    },
+    "geozoneMrStopDistanceHelp": {
+        "message" : "Distance in which multirotors stops before the border"
+    },
+    "geozoneNoWayHomeAction": {
+        "message": "No way home action"
+    },
+    "geozoneNoWayHomeActionHelp": {
+        "message": "Action if RTH with active geozones is unable to calculate a course to home. RTH: Return to home and ignore any geozones."
+    },
+    "missionGeozoneReboot": {
+        "message": "Do you want to save and reboot?"
+    },
+    "missionGeozoneAvailableZones": {
+        "message": "Available Geozones:"
+    },
+    "missionGeozoneAvailableVertices": {
+        "message": "Available Vertices:"
+    },
+    "geozoneInvalidzone": {
+        "message": "Invalid Geozone(s) detected:"
+    },
+    "geozoneInvalidLat": {
+        "message": "Invalid latitude"
+    },
+    "geozoneInvalidLon": {
+        "message": "Invalid longitude"
+    },
+    "gezoneInvalidReasonNotCC": {
+        "message": "Not counter clockwise"
+    },
+    "gezoneInvalidReasonComplex": {
+        "message": "Complex"
+    },
+    "gezoneInvalidReasonMinMaxAlt": {
+        "message": "Max. Alt <= Min. Alt"
+    },
+    "geozoneUnableToSave": {
+        "message": "Unable to save geozones: Invalid zones"
+    },
     "missionMultiMissionHead": {
         "message": "Multi Missions"
     },
@@ -4910,9 +5129,6 @@
     "mapProvider": {
         "message": "Map Provider"
     },
-    "mapApiKey": {
-        "message": "Map API key"
-    },
     "proxyURL": {
         "message": "MapProxy URL"
     },
@@ -4992,7 +5208,7 @@
         "message": "Close"
     },
     "logicActivator": {
-        "message": "Active"
+        "message": "Active when"
     },
     "save": {
         "message": "Save"
@@ -5210,11 +5426,11 @@
     "motor_direction_inverted_hint": {
         "message": "Enable if the motor direction is reversed and the props are mounted in the opposite direction."
     },
-    "mixer_pid_profile_linking": {
+    "mixer_control_profile_linking": {
         "message": "Control Profile will use same index as Mixer Profile index"
     },
-    "mixer_pid_profile_linking_hint": {
-        "message": "mixer_pid_profile_linking: Enable on both Mixer Profile if you want Control Profile switching handled by Mixer Profile switching(Recommend in vtol/mixed plaform type setup)"
+    "mixer_control_profile_linking_hint": {
+        "message": "mixer_control_profile_linking: Enable on both Mixer Profile if you want Control Profile switching handled by Mixer Profile switching(Recommend in vtol/mixed plaform type setup)"
     },
     "blackboxFields": {
         "message": "Blackbox fields"
@@ -5532,7 +5748,7 @@
         "message": "No dataflash <br>chip found"
     },
     "sensorDataFlashFreeSpace": {
-        "message": "Dataflash: free space"
+        "message": "Dataflash: <br />free "
     },
     "mixerProfile1": {
         "message": "Mixer Profile 1"
@@ -5984,5 +6200,64 @@
     },
     "adsbHeartbeatTotalMessages": {
         "message": "Heartbeat msgs"
-    }
+    },
+    "currentLanguage": {
+        "message": "en"
+    },
+   "search": {
+        "message": "Search"
+    },
+  "tabJavaScriptProgramming": {
+    "message": "JavaScript Programming"
+  },
+  "javascriptProgrammingDescription": {
+    "message": "Write JavaScript code to control your aircraft. The transpiler converts your code into INAV Logic Conditions."
+  },
+  "javascriptBetaWarning": {
+    "message": "<strong>Currently in beta, for testing. Do not use for safety-critical applications!</strong>"
+  },
+  "javascriptEditorTitle": {
+    "message": "JavaScript Editor (shift-ctrl-v to paste, right-click a variable to rename)"
+  },
+  "javascriptLoadExample": {
+    "message": "Load Example:"
+  },
+  "javascriptSelectExample": {
+    "message": "-- Select Example --"
+  },
+  "javascriptTranspile": { "message": "Transpile to INAV" },
+  "javascriptLoad": { "message": "Load from FC" },
+  "javascriptSave": { "message": "Save to FC" },
+  "javascriptClear": { "message": "Clear Editor" },
+  "javascriptOutputTitle": {
+    "message": "INAV Logic Conditions Output"
+  },
+  "javascriptLcCount": {
+    "message": "$1 / $2 LCs"
+  },
+  "javascriptOptimizationsApplied": {
+    "message": "Optimizations Applied:"
+  },
+  "javascriptApiReference": {
+    "message": "API Reference & Examples"
+  },
+  "javascriptQuickReference": {
+    "message": "Quick Reference"
+  },
+  "javascriptFlightParameters": {
+    "message": "Flight Parameters (Read-Only)"
+  },
+  "javascriptRcChannels": {
+    "message": "RC Channels"
+  },
+  "javascriptOverrides": {
+    "message": "Overrides (Write)"
+  },
+  "javascriptGlobalVariables": {
+    "message": "Global Variables"
+  },
+  "javascriptCompleteExample": {
+    "message": "Complete Example"
+  }
+
 }

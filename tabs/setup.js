@@ -1,18 +1,21 @@
 'use strict';
 
-const path = require('path');
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
+import './../js/libraries/jquery.flightindicators';
 
-const MSPChainerClass = require('./../js/msp/MSPchainer');
-const FC = require('./../js/fc');
-const { GUI, TABS } = require('./../js/gui');
-const MSP = require('./../js/msp');
-const MSPCodes = require('./../js/msp/MSPCodes');
-const i18n = require('./../js/localization');
-const mspHelper = require('./../js/msp/MSPHelper');
-const interval = require('./../js/intervals');
-const SerialBackend = require('./../js/serial_backend');
-const { mixer } = require('./../js/model');
-const BitHelper = require('./../js/bitHelper')
+import MSPChainerClass from './../js/msp/MSPchainer';
+import FC from './../js/fc';
+import { GUI, TABS } from './../js/gui';
+import MSP from './../js/msp';
+import MSPCodes from './../js/msp/MSPCodes';
+import i18n from './../js/localization';
+import mspHelper from './../js/msp/MSPHelper';
+import interval from './../js/intervals';
+import SerialBackend from './../js/serial_backend';
+import { mixer } from './../js/model';
+import BitHelper from './../js/bitHelper';
+import dialog from '../js/dialog';
 
 TABS.setup = {
     yaw_fix: 0.0
@@ -29,7 +32,7 @@ TABS.setup.initialize = function (callback) {
 
     var loadChain = [
         mspHelper.loadFeatures,
-        mspHelper.queryFcStatus,
+        //mspHelper.queryFcStatus,
         mspHelper.loadMixerConfig,
         mspHelper.loadMiscV2,
         mspHelper.loadSerialPorts
@@ -39,9 +42,27 @@ TABS.setup.initialize = function (callback) {
     loadChainer.setExitPoint(load_html);
     loadChainer.execute();
 
+    let attitudeInstrument;
+    let headingnstrument;
+
     function load_html() {
-        GUI.load(path.join(__dirname, "setup.html"), process_html);
+        import('./setup.html?raw').then(({default: html}) => GUI.load(html, process_html));
     }
+
+    function updateInstruments () {
+        if (headingnstrument && attitudeInstrument) {
+            attitudeInstrument.setRoll(FC.SENSOR_DATA.kinematics[0]);
+            attitudeInstrument.setPitch(FC.SENSOR_DATA.kinematics[1]);
+            headingnstrument.setHeading(FC.SENSOR_DATA.kinematics[2]);
+        }
+    };
+
+    async function initializeInstruments() {
+        var options = {size:90, showBox : false, img_directory: './../../images/flightindicators/'};
+        
+        attitudeInstrument = await $.flightIndicator('#attitude', 'attitude', options);
+        headingnstrument = await $.flightIndicator('#heading', 'heading', options);
+    };
 
     function process_html() {
         // translate to user-selected language
@@ -68,10 +89,10 @@ TABS.setup.initialize = function (callback) {
             $('default_btn').addClass('disabled');
         }
 
-        self.initializeInstruments();
+        initializeInstruments();
 
         $('a.resetSettings').on('click', function () {
-            if (confirm(i18n.getMessage('confirm_reset_settings'))) {
+            if (dialog.confirm(i18n.getMessage('confirm_reset_settings'))) {
                 MSP.send_message(MSPCodes.MSP_RESET_CONF, false, false, function () {
                     GUI.log(i18n.getMessage('initialSetupSettingsRestored'));
     
@@ -138,7 +159,7 @@ TABS.setup.initialize = function (callback) {
 	            pitch_e.text(i18n.getMessage('initialSetupAttitude', [FC.SENSOR_DATA.kinematics[1]]));
                 heading_e.text(i18n.getMessage('initialSetupAttitude', [FC.SENSOR_DATA.kinematics[2]]));
                 self.render3D();
-                self.updateInstruments();
+                updateInstruments();
             });
         }
 
@@ -186,18 +207,6 @@ TABS.setup.initialize = function (callback) {
     }
 };
 
-TABS.setup.initializeInstruments = function() {
-    var options = {size:90, showBox : false, img_directory: path.join(__dirname, '/../images/flightindicators/')};
-    var attitude = $.flightIndicator('#attitude', 'attitude', options);
-    var heading = $.flightIndicator('#heading', 'heading', options);
-
-    this.updateInstruments = function() {
-        attitude.setRoll(FC.SENSOR_DATA.kinematics[0]);
-        attitude.setPitch(FC.SENSOR_DATA.kinematics[1]);
-        heading.setHeading(FC.SENSOR_DATA.kinematics[2]);
-    };
-};
-
 TABS.setup.initialize3D = function () {
     var self = this,
         loader,
@@ -223,8 +232,6 @@ TABS.setup.initialize3D = function () {
     if (window.WebGLRenderingContext && (detector_canvas.getContext('webgl') || detector_canvas.getContext('experimental-webgl'))) {
         renderer = new THREE.WebGLRenderer({canvas: canvas.get(0), alpha: true, antialias: true});
         useWebGlRenderer = true;
-    } else {
-        renderer = new THREE.CanvasRenderer({canvas: canvas.get(0), alpha: true});
     }
     // initialize render size for current canvas size
     renderer.setSize(wrapper.width()*2, wrapper.height()*2);
@@ -253,11 +260,13 @@ TABS.setup.initialize3D = function () {
     // setup scene
     scene = new THREE.Scene();
     const manager = new THREE.LoadingManager();
-    loader = new THREE.GLTFLoader(manager);
-    loader.load('./resources/models/' + model_file + '.gltf',  (obj) =>{
-        model = obj.scene;
-        model.scale.set(15, 15, 15);
-        modelWrapper.add(model);
+    loader = new GLTFLoader(manager);
+    import(`./../resources/models/model_${model_file}.gltf`).then(({default: gltf}) => {
+        loader.load(gltf,  (obj) =>{
+            model = obj.scene;
+            model.scale.set(15, 15, 15);
+            modelWrapper.add(model);
+        });
     });
 
     // stationary camera

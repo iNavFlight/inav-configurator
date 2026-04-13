@@ -1,26 +1,27 @@
 'use strict';
 
-const semver = require('semver');
+import semver from 'semver';
 
-require('./../injected_methods');
-const { GUI } = require('./../gui');
-const MSP = require('./../msp');
-const MSPCodes = require('./MSPCodes');
-const FC = require('./../fc');
-const VTX = require('./../vtx');
-const mspQueue = require('./../serial_queue');
-const ServoMixRule = require('./../servoMixRule');
-const MotorMixRule = require('./../motorMixRule');
-const LogicCondition = require('./../logicCondition');
-const BitHelper = require('../bitHelper');
-const serialPortHelper = require('./../serialPortHelper');
-const ProgrammingPid = require('./../programmingPid');
-const Safehome = require('./../safehome');
-const { FwApproach } = require('./../fwApproach');
-const Waypoint = require('./../waypoint');
-const mspDeduplicationQueue = require('./mspDeduplicationQueue');
-const mspStatistics = require('./mspStatistics');
-const settingsCache = require('./../settingsCache');
+import './../injected_methods';
+import { GUI } from './../gui';
+import MSP from './../msp';
+import MSPCodes from './MSPCodes';
+import FC from './../fc';
+import VTX from './../vtx';
+import mspQueue from './../serial_queue';
+import ServoMixRule from './../servoMixRule';
+import MotorMixRule from './../motorMixRule';
+import LogicCondition from './../logicCondition';
+import BitHelper from '../bitHelper';
+import serialPortHelper from './../serialPortHelper';
+import ProgrammingPid from './../programmingPid';
+import Safehome from './../safehome';
+import { FwApproach } from './../fwApproach';
+import Waypoint from './../waypoint';
+import mspDeduplicationQueue from './mspDeduplicationQueue';
+import mspStatistics from './mspStatistics';
+import settingsCache from './../settingsCache';
+import {Geozone, GeozoneVertex, GeozoneShapes } from './../geozone';
 
 var mspHelper = (function () {
     var self = {};
@@ -438,10 +439,10 @@ var mspHelper = (function () {
                 if (data.byteLength % 6 === 0) {
                     for (let i = 0; i < data.byteLength; i += 6) {
                         FC.SERVO_RULES.put(new ServoMixRule(
-                            data.getInt8(i),
-                            data.getInt8(i + 1),
+                            data.getUint8(i),
+                            data.getUint8(i + 1),
                             data.getInt16(i + 2, true),
-                            data.getInt8(i + 4),
+                            data.getUint8(i + 4),
                             data.getInt8(i + 5)
                         ));
                     }
@@ -471,16 +472,31 @@ var mspHelper = (function () {
                 break;
 
             case MSPCodes.MSP2_INAV_LOGIC_CONDITIONS_SINGLE:
-                FC.LOGIC_CONDITIONS.put(new LogicCondition(
-                    data.getInt8(0),
-                    data.getInt8(1),
-                    data.getUint8(2),
-                    data.getUint8(3),
-                    data.getInt32(4, true),
-                    data.getUint8(8),
-                    data.getInt32(9, true),
-                    data.getInt8(13)
-                ));
+                if (data.byteLength >= 14 && !dataHandler.unsupported) {
+                    FC.LOGIC_CONDITIONS.put(new LogicCondition(
+                        data.getInt8(0),
+                        data.getInt8(1),
+                        data.getUint8(2),
+                        data.getUint8(3),
+                        data.getInt32(4, true),
+                        data.getUint8(8),
+                        data.getInt32(9, true),
+                        data.getInt8(13)
+                    ));
+                } else {
+                    console.warn('MSP2_INAV_LOGIC_CONDITIONS_SINGLE: unexpected response (byteLength=' + data.byteLength + ', unsupported=' + dataHandler.unsupported + ')');
+                }
+                break;
+
+            case MSPCodes.MSP2_INAV_LOGIC_CONDITIONS_CONFIGURED:
+                // 8-byte bitmask: lower 32 bits first, then upper 32 bits
+                // Older firmware returns unsupported/empty - that's expected, mask stays null
+                if (data.byteLength >= 8 && !dataHandler.unsupported) {
+                    FC.LOGIC_CONDITIONS_CONFIGURED_MASK = {
+                        lower: data.getUint32(0, true),
+                        upper: data.getUint32(4, true)
+                    };
+                }
                 break;
 
             case MSPCodes.MSP2_INAV_LOGIC_CONDITIONS_STATUS:
@@ -1600,9 +1616,67 @@ var mspHelper = (function () {
 
                 FC.OSD_CUSTOM_ELEMENTS.items.push(customElement);
                 break;
+
             case MSPCodes.MSP2_INAV_GPS_UBLOX_COMMAND:
                 // Just and ACK from the fc.
                 break;
+            
+            case MSPCodes.MSP2_INAV_GEOZONE:
+                
+                if (data.buffer.byteLength == 0) {
+                    break;
+                }
+                var geozone = new Geozone(        
+                    data.getUint8(1),
+                    data.getUint8(2),
+                    data.getInt32(3, true),
+                    data.getInt32(7, true),
+                    data.getUint8(11),
+                    0,
+                    data.getInt8(12, true),
+                    null,
+                    data.getUint8(0, true),
+                );
+                let verticesCount = data.getUint8(13, true);
+                if (verticesCount == 0) {
+                    break;
+                }
+                if (geozone.getShape() == GeozoneShapes.POLYGON) {
+                    geozone.setVertices(new Array(verticesCount));
+                } else {
+                    geozone.setVertices(new Array(1));
+                }                
+                FC.GEOZONES.put(geozone);
+                break;
+            case MSPCodes.MSP2_INAV_GEOZONE_VERTEX:
+                if (data.buffer.byteLength == 0) {
+                    break;
+                }
+                var zoneID = data.getUint8(0);
+                var vertexId = data.getUint8(1);
+                var geozone = FC.GEOZONES.at(zoneID);
+                if (zoneID < FC.GEOZONES.geozoneCount()) {
+                    geozone.setVertex(
+                        vertexId,
+                        new GeozoneVertex(
+                            vertexId,
+                            data.getInt32(2, true),
+                            data.getInt32(6, true),
+                        )
+                    );
+                    if (geozone.getShape() == GeozoneShapes.CIRCULAR) {
+                        geozone.setRadius(data.getUint32(10, true));
+                    }
+                }
+                break;
+            
+            case MSPCodes.MSP2_INAV_SET_GEOZONE_VERTICE:
+                console.log("Geozone vertex saved")
+                break; 
+            
+            case MSPCodes.MSP2_INAV_SET_GEOZONE:
+                console.log("Geozone saved")
+                break;    
 
             default:
                 console.log('Unknown code detected: 0x' + dataHandler.code.toString(16));
@@ -2371,7 +2445,8 @@ var mspHelper = (function () {
     };
 
     self.loadLogicConditions = function (callback) {
-        if (semver.gte(FC.CONFIG.flightControllerVersion, "5.0.0")) {
+        // Helper function for legacy path: fetch all 64 conditions one by one
+        function loadAllConditionsLegacy() {
             FC.LOGIC_CONDITIONS.flush();
             let idx = 0;
             MSP.send_message(MSPCodes.MSP2_INAV_LOGIC_CONDITIONS_SINGLE, [idx], false, nextLogicCondition);
@@ -2384,9 +2459,73 @@ var mspHelper = (function () {
                     MSP.send_message(MSPCodes.MSP2_INAV_LOGIC_CONDITIONS_SINGLE, [idx], false, callback);
                 }
             }
-        } else {
-            MSP.send_message(MSPCodes.MSP2_INAV_LOGIC_CONDITIONS, false, false, callback);
         }
+
+        // Try to get the optimized CONFIGURED mask with timeout fallback
+        FC.LOGIC_CONDITIONS_CONFIGURED_MASK = null;
+        let maskResponseReceived = false;
+
+        // Set up timeout fallback - if no response in 500ms, use legacy path
+        const fallbackTimeout = setTimeout(function() {
+            if (!maskResponseReceived) {
+                maskResponseReceived = true;
+                loadAllConditionsLegacy();
+            }
+        }, 500);
+
+        MSP.send_message(MSPCodes.MSP2_INAV_LOGIC_CONDITIONS_CONFIGURED, false, false, function() {
+            if (maskResponseReceived) return; // Timeout already triggered legacy path
+            maskResponseReceived = true;
+            clearTimeout(fallbackTimeout);
+
+            const mask = FC.LOGIC_CONDITIONS_CONFIGURED_MASK;
+
+            if (mask) {
+                // Optimized path: use the configured mask to only fetch configured conditions
+                FC.LOGIC_CONDITIONS.flush();
+                const maxConditions = FC.LOGIC_CONDITIONS.getMaxLogicConditionCount();
+                let idx = 0;
+
+                function processNextCondition() {
+                    while (idx < maxConditions) {
+                        // Check if this condition is configured (non-default)
+                        const isConfigured = (idx < 32) ?
+                            (mask.lower & (1 << idx)) !== 0 :
+                            (mask.upper & (1 << (idx - 32))) !== 0;
+
+                        if (isConfigured) {
+                            // Fetch from firmware - handler will put() it
+                            const onComplete = function() {
+                                idx++;
+                                processNextCondition();
+                            };
+                            MSP.send_message(MSPCodes.MSP2_INAV_LOGIC_CONDITIONS_SINGLE, [idx], false, onComplete);
+                            return; // Wait for async MSP response
+                        } else {
+                            // Not configured - put default directly and continue loop
+                            FC.LOGIC_CONDITIONS.put(new LogicCondition(
+                                0,      // enabled
+                                -1,     // activatorId
+                                0,      // operation
+                                0,      // operandAType
+                                0,      // operandAValue
+                                0,      // operandBType
+                                0,      // operandBValue
+                                0       // flags
+                            ));
+                            idx++;
+                        }
+                    }
+                    // All conditions processed
+                    if (callback) callback();
+                }
+
+                processNextCondition();
+            } else {
+                // Legacy path: mask not available, fetch all 64 conditions
+                loadAllConditionsLegacy();
+            }
+        });
     }
 
     self.sendLogicConditions = function (onCompleteCallback) {
@@ -2800,7 +2939,7 @@ var mspHelper = (function () {
     };
 
     self.loadOutputMapping = function (callback) {
-        alert('Obsolete MSPHelper.loadOutputMapping call');
+        console.warn('Warning: self.loadOutputMapping is obsolete and may be removed in future versions. Please update usage.');
         MSP.send_message(MSPCodes.MSPV2_INAV_OUTPUT_MAPPING, false, false, callback);
     };
 
@@ -3090,6 +3229,68 @@ var mspHelper = (function () {
             }
         };
     };
+
+    self.loadGeozones = function (callback) {
+        FC.GEOZONES.flush();
+        let geozoneID = -1;
+        let vertexID = -1;
+        nextGeozone();
+
+        function nextVertex() {
+            vertexID++;
+            let zone = FC.GEOZONES.at(geozoneID);
+            if (!zone || zone.getVerticesCount() == 0) {
+                nextGeozone();
+                return;
+            }
+            if (vertexID < FC.GEOZONES.at(geozoneID).getVerticesCount() && zone.getShape() == GeozoneShapes.POLYGON) {
+                MSP.send_message(MSPCodes.MSP2_INAV_GEOZONE_VERTEX, [geozoneID, vertexID], false, nextVertex); 
+            } else {
+                MSP.send_message(MSPCodes.MSP2_INAV_GEOZONE_VERTEX, [geozoneID, vertexID], false, nextGeozone); 
+            }
+        }
+
+        function nextGeozone() {
+            geozoneID++;
+            vertexID = -1;
+            if (geozoneID < FC.GEOZONES.getMaxZones()) {
+                MSP.send_message(MSPCodes.MSP2_INAV_GEOZONE, [geozoneID], false, nextVertex);
+            } else {
+                MSP.send_message(MSPCodes.MSP2_INAV_GEOZONE, [geozoneID], false, callback);
+            }
+        }
+    };
+
+    self.saveGeozones = function (callback) {
+        let geozoneID = -1;
+        let vertexID = -1;
+        nextGeozone()
+
+        function nextVertex() {
+            vertexID++;
+
+            let zone = FC.GEOZONES.at(geozoneID);
+            if (!zone || zone.getVerticesCount() == 0) {
+                nextGeozone();
+                return;
+            }
+            if (vertexID < FC.GEOZONES.at(geozoneID).getVerticesCount() - 1) {
+                MSP.send_message(MSPCodes.MSP2_INAV_SET_GEOZONE_VERTICE, FC.GEOZONES.extractBufferVertices(geozoneID, vertexID), false, nextVertex); 
+            } else {
+                MSP.send_message(MSPCodes.MSP2_INAV_SET_GEOZONE_VERTICE, FC.GEOZONES.extractBufferVertices(geozoneID, vertexID), false, nextGeozone); 
+            }
+        }
+
+        function nextGeozone() {
+            geozoneID++;
+            vertexID = -1;
+            if (geozoneID < FC.GEOZONES.getMaxZones()) {
+                MSP.send_message(MSPCodes.MSP2_INAV_SET_GEOZONE, FC.GEOZONES.extractBufferZone(geozoneID), false, nextVertex);
+            } else {
+                MSP.send_message(MSPCodes.MSP2_INAV_SET_GEOZONE, FC.GEOZONES.extractBufferZone(geozoneID), false, callback);
+            }
+        }
+    }
 
     self._getSetting = function (name) {
 
@@ -3415,4 +3616,4 @@ var mspHelper = (function () {
     return self;
 })();
 
-module.exports = mspHelper;
+export default mspHelper;

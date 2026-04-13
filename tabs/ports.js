@@ -1,28 +1,56 @@
 'use strict';
 
-const path = require('path');
-
-const mspHelper = require('./../js/msp/MSPHelper');
-const MSPCodes = require('./../js/msp/MSPCodes');
-const MSP = require('./../js/msp');
-const { GUI, TABS } = require('./../js/gui');
-const FC = require('./../js/fc');
-const i18n = require('./../js/localization');
-const serialPortHelper = require('./../js/serialPortHelper');
+import mspHelper from './../js/msp/MSPHelper';
+import MSPCodes from './../js/msp/MSPCodes';
+import MSP from './../js/msp';
+import { GUI, TABS } from './../js/gui';
+import FC from './../js/fc';
+import i18n from './../js/localization';
+import serialPortHelper from './../js/serialPortHelper';
+import jBox from 'jbox';
 
 TABS.ports = {};
 
 TABS.ports.initialize = function (callback) {
 
     var columns = ['data', 'logging', 'sensors', 'telemetry', 'rx', 'peripherals'];
+    var mspWarningModal;
 
     if (GUI.active_tab != 'ports') {
         GUI.active_tab = 'ports';
     }
 
     mspHelper.loadSerialPorts(function () {
-        GUI.load(path.join(__dirname, "ports.html"), on_tab_loaded_handler)
+        import('./ports.html?raw').then(({default: html}) => GUI.load(html, on_tab_loaded_handler));
     });
+
+    function checkMSPPortCount(excludeCheckbox) {
+        let mspCount = 0;
+
+        $('.tab-ports .portConfiguration').each(function () {
+            const $portConfig = $(this);
+
+            // Check each MSP checkbox in this port configuration
+            $portConfig.find('input:checkbox[value="MSP"]').each(function() {
+                const $checkbox = $(this);
+                // Skip the checkbox we're currently changing (to get "before" count)
+                if (excludeCheckbox && $checkbox.is(excludeCheckbox)) {
+                    return;
+                }
+                if ($checkbox.is(':checked')) {
+                    mspCount++;
+                }
+            });
+        });
+
+        return mspCount;
+    }
+
+    function showMSPWarning() {
+        if (mspWarningModal && typeof mspWarningModal.open === 'function') {
+            mspWarningModal.open();
+        }
+    }
 
     function update_ui() {
 
@@ -152,6 +180,16 @@ TABS.ports.initialize = function (callback) {
             return;
         }
 
+        // Check if MSP checkbox was just checked
+        if ($cT.is('input[type="checkbox"]') && $cT.val() === 'MSP' && $cT.is(':checked')) {
+            // Count MSP ports excluding the one being changed to get "before" count
+            const mspCountBefore = checkMSPPortCount($cT);
+            // If we already had 2+ and are adding another, show warning
+            if (mspCountBefore >= 2) {
+                showMSPWarning();
+            }
+        }
+
         if (rule && rule.isUnique) {
             let $selects = $cT.closest('tr').find('.function-select');
             $selects.each(function (index, element) {
@@ -181,6 +219,22 @@ TABS.ports.initialize = function (callback) {
        i18n.localize();;
 
         update_ui();
+
+        // Initialize the MSP warning modal
+        mspWarningModal = new jBox('Modal', {
+            width: 480,
+            height: 200,
+            closeButton: 'title',
+            animation: false,
+            title: i18n.getMessage('portsMspWarningTitle') || 'MSP Port Warning',
+            content: $('#mspWarningContent')
+        });
+
+        // Check if more than 2 MSP ports are already configured on load
+        const initialMspCount = checkMSPPortCount();
+        if (initialMspCount > 2) {
+            showMSPWarning();
+        }
 
         $('a.save').on('click', on_save_handler);
 
@@ -268,5 +322,6 @@ function updateDefaultBaud(baudSelect, column) {
 }
 
 TABS.ports.cleanup = function (callback) {
+    $('.jBox-wrapper').remove();
     if (callback) callback();
 };

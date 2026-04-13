@@ -21,10 +21,6 @@ var defaultsDialogData = [
                 value: "256HZ"
             },
             {
-                key: "looptime",
-                value: 500
-            },
-            {
                 key: "motor_pwm_protocol",
                 value: "DSHOT300"
             },
@@ -143,10 +139,6 @@ var defaultsDialogData = [
                 value: "256HZ"
             },
             {
-                key: "looptime",
-                value: 500
-            },
-            {
                 key: "motor_pwm_protocol",
                 value: "DSHOT300"
             },
@@ -192,10 +184,6 @@ var defaultsDialogData = [
             /*
             Dynamic gyro LPF
             */
-            {
-                key: "gyro_use_dyn_lpf",
-                value: "ON"
-            },
             {
                 key: "gyro_dyn_lpf_min_hz",
                 value: 85
@@ -282,10 +270,6 @@ var defaultsDialogData = [
             {
                 key: "gyro_hardware_lpf",
                 value: "256HZ"
-            },
-            {
-                key: "looptime",
-                value: 500
             },
             {
                 key: "motor_pwm_protocol",
@@ -471,18 +455,6 @@ var defaultsDialogData = [
                 value: 3
             },
             {
-                key: "nav_fw_pos_z_p",
-                value: 25
-            },
-            {
-                key: "nav_fw_pos_z_i",
-                value: 5
-            },
-            {
-                key: "nav_fw_pos_z_d",
-                value: 8
-            },
-            {
                 key: "nav_fw_pos_xy_p",
                 value: 55
             },
@@ -547,6 +519,26 @@ var defaultsDialogData = [
                 value: 255
             },
             {
+                key: "nav_fw_pos_z_p",
+                value: 22
+            },
+            {
+                key: "nav_fw_pos_z_i",
+                value: 6
+            },
+            {
+                key: "nav_fw_pos_z_d",
+                value: 2
+            },
+            {
+                key: "nav_fw_pos_z_FF",
+                value: 25
+            },
+            {
+                key: "set nav_fw_alt_control_response",
+                value: 45
+            },
+            {
                 key: "airmode_type",
                 value: "STICK_CENTER_ONCE"
             },
@@ -589,6 +581,13 @@ var defaultsDialogData = [
             {
                 key: "nav_fw_launch_climb_angle",
                 value: 25
+            },
+            /*
+             * TPA
+             */
+            {
+                key: "tpa_rate",
+                value: 80
             },
         ],
     },
@@ -677,20 +676,8 @@ var defaultsDialogData = [
                 value: 3
             },
             {
-                key: "nav_fw_pos_z_p",
-                value: 35
-            },
-            {
-                key: "nav_fw_pos_z_i",
-                value: 5
-            },
-            {
-                key: "nav_fw_pos_z_d",
-                value: 10
-            },
-            {
                 key: "nav_fw_pos_xy_p",
-                value: 70
+                value: 75
             },
             {
                 key: "fw_turn_assist_pitch_gain",
@@ -753,6 +740,26 @@ var defaultsDialogData = [
                 value: 100
             },
             {
+                key: "nav_fw_pos_z_p",
+                value: 25
+            },
+            {
+                key: "nav_fw_pos_z_i",
+                value: 6
+            },
+            {
+                key: "nav_fw_pos_z_d",
+                value: 5
+            },
+            {
+                key: "nav_fw_pos_z_FF",
+                value: 25
+            },
+            {
+                key: "set nav_fw_alt_control_response",
+                value: 45
+            },
+            {
                 key: "airmode_type",
                 value: "STICK_CENTER_ONCE"
             },
@@ -795,6 +802,13 @@ var defaultsDialogData = [
             {
                 key: "nav_fw_launch_climb_angle",
                 value: 25
+            },
+            /*
+             * TPA
+             */
+            {
+                key: "tpa_rate",
+                value: 80
             },
         ],
     },
@@ -878,4 +892,4 @@ var defaultsDialogData = [
     }
 ];
 
-module.exports = defaultsDialogData;
+export default defaultsDialogData;

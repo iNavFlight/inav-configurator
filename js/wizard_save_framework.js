@@ -1,9 +1,9 @@
 'use strict';
 
-const mspHelper = require('./msp/MSPHelper');
-const serialPortHelper = require('./serialPortHelper');
-const FC = require('./fc');
-const features = require('./feature_framework');
+import mspHelper from './msp/MSPHelper';
+import serialPortHelper from './serialPortHelper';
+import FC from './fc';
+import features from './feature_framework';
 
 var wizardSaveFramework = (function () {
 
@@ -31,7 +31,7 @@ var wizardSaveFramework = (function () {
 
                 serialPortHelper.set(config.value.port, 'GPS', config.value.baud);
                 mspHelper.saveSerialPorts(function () {
-                    features.execute(callback);
+                    features.execute(self.enableVirtulaPitot(config, callback));
                 });
                 break;
             case 'gpsProtocol':
@@ -40,6 +40,14 @@ var wizardSaveFramework = (function () {
             default:
                 callback();
                 break;
+        }
+    };
+
+    self.enableVirtulaPitot = function (config, callback) {
+        if (config.value.port != '-1') {
+            mspHelper.setSetting('pitot_hardware', "VIRTUAL", callback);
+        } else {
+            callback();
         }
     };
 
@@ -70,4 +78,4 @@ var wizardSaveFramework = (function () {
     return self;
 })();
 
-module.exports = wizardSaveFramework;
+export default wizardSaveFramework;

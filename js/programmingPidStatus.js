@@ -32,4 +32,4 @@ var ProgrammingPidStatus = function () {
     return self;
 };
 
-module.exports = ProgrammingPidStatus;
+export default ProgrammingPidStatus;

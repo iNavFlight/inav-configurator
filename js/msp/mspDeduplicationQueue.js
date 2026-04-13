@@ -38,4 +38,4 @@ var mspDeduplicationQueue = function() {
     return publicScope;
 }();
 
-module.exports = mspDeduplicationQueue;
+export default mspDeduplicationQueue;

@@ -1,9 +1,9 @@
 'use strict'
 
-const { GUI } = require('./../gui');
+import { GUI } from './../gui';
 
-const  { ConnectionType, Connection } = require('./connection');
-const i18n = require('./../localization');
+import  { ConnectionType, Connection } from './connection';
+import i18n from './../localization';
 
 // BLE 20 bytes buffer
 const BLE_WRITE_BUFFER_LENGTH = 20;
@@ -48,7 +48,6 @@ class ConnectionBle extends Connection {
         this._writeCharacteristic   = false;
         this._device                = false;
         this._deviceDescription     = false;
-        this._onCharateristicValueChangedListeners = [];
         this._onDisconnectListeners   = [];
         this._reconnects = 0;
         this._handleOnCharateristicValueChanged = false;
@@ -166,11 +165,13 @@ class ConnectionBle extends Connection {
                         buffer[i] = event.target.value.getUint8(i);
                     }
 
-                    this._onCharateristicValueChangedListeners.forEach(listener => {
-                        listener({
-                            connectionId: 0xFF,
-                            data: buffer
-                        });
+                    const info = {
+                        connectionId: 0xFF,
+                        data: buffer
+                    };
+
+                    this._onReceiveListeners.forEach(listener => {
+                        listener(info);
                     });
                 };
 
@@ -242,11 +243,11 @@ class ConnectionBle extends Connection {
     }
 
     addOnReceiveCallback(callback){
-        this._onCharateristicValueChangedListeners.push(callback);
+        this._onReceiveListeners.push(callback);
     }
 
     removeOnReceiveCallback(callback){
-        this._onCharateristicValueChangedListeners = this._onCharateristicValueChangedListeners.filter(listener => listener !== callback);
+        this._onReceiveListeners = this._onReceiveListeners.filter(listener => listener !== callback);
     }
 
     addOnReceiveErrorCallback(callback) {
@@ -266,4 +267,4 @@ class ConnectionBle extends Connection {
     }
 }
 
-module.exports = ConnectionBle;
+export default ConnectionBle;

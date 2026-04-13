@@ -40,7 +40,7 @@ var interval = function () {
             code();
             data.fired++;
         }, interval);
-
+        
         privateScope.intervals.push(data);
 
         return data;
@@ -140,4 +140,4 @@ var interval = function () {
     return publicScope;
 }();
 
-module.exports = interval;
+export default interval;

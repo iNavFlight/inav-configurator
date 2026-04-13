@@ -1,11 +1,10 @@
 'use strict';
 
-const { GUI } = require('./gui');
-const FC = require('./fc');
-const CONFIGURATOR = require('./data_storage');
-const MSP = require('./msp');
-const MSPCodes = require('./msp/MSPCodes');
-const mspQueue = require('./serial_queue');
+import { GUI } from './gui';
+import FC from './fc';
+import CONFIGURATOR from './data_storage';
+import MSP from './msp';
+import MSPCodes from './msp/MSPCodes';
 
  var periodicStatusUpdater = (function () {
 
@@ -40,22 +39,20 @@ const mspQueue = require('./serial_queue');
 
         var active = ((Date.now() - MSP.analog_last_received_timestamp) < publicScope.getUpdateInterval(CONFIGURATOR.connection.bitrate) * 3);
 
-        if (FC.isModeEnabled('ARM'))
-            $(".armedicon").css({
-                'background-image': 'url("./images/icons/cf_icon_armed_active.svg")'
-            });
-        else
-            $(".armedicon").css({
-                'background-image': 'url("./images/icons/cf_icon_armed_grey.svg")'
-            });
-        if (FC.isModeEnabled('FAILSAFE'))
-            $(".failsafeicon").css({
-                'background-image': 'url("./images/icons/cf_icon_failsafe_active.svg")'
-            });
-        else
-            $(".failsafeicon").css({
-                'background-image': 'url("./images/icons/cf_icon_failsafe_grey.svg")'
-            });
+        if (FC.isModeEnabled('ARM')) {
+            $("#armedIcon").removeClass('armed');
+            $("#armedIcon").addClass('armed-active');
+        } else {
+            $("#armedIcon").removeClass('armed-active');
+            $("#armedIcon").addClass('armed');
+        }
+        if (FC.isModeEnabled('FAILSAFE')) {
+            $("#failsafeicon").removeClass('failsafe');
+            $("#failsafeicon").addClass('failsafe-active');
+        } else {
+            $("#failsafeicon").removeClass('failsafe-active');
+            $("#failsafeicon").addClass('failsafe');
+        }
 
         if (FC.ANALOG != undefined) {
             var nbCells;
@@ -71,13 +68,11 @@ const mspQueue = require('./serial_queue');
             });
         
             if (active) {
-                $(".linkicon").css({
-                    'background-image': 'url("./images/icons/cf_icon_link_active.svg")'
-                });
+                $("#linkicon").removeClass('link');
+                $("#linkicon").addClass('link-active');
             } else {
-                $(".linkicon").css({
-                    'background-image': 'url("./images/icons/cf_icon_link_grey.svg")'
-                });
+                $("#linkicon").removeClass('link-active');
+                $("#linkicon").addClass('link');
             }
 
             if (((FC.ANALOG.use_capacity_thresholds && FC.ANALOG.battery_remaining_capacity <= FC.MISC.battery_capacity_warning - FC.MISC.battery_capacity_critical) || (!FC.ANALOG.use_capacity_thresholds && FC.ANALOG.voltage < warn)) || FC.ANALOG.voltage < min) {
@@ -125,4 +120,4 @@ const mspQueue = require('./serial_queue');
     return publicScope;
 })();
 
-module.exports = periodicStatusUpdater;
+export default periodicStatusUpdater;

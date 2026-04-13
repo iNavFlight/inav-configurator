@@ -1,10 +1,10 @@
 'use strict'
 
-const { ConnectionType } = require('./connection');
-const ConnectionBle = require('./connectionBle');
-const ConnectionSerial = require('./connectionSerial');
-const ConnectionTcp = require('./connectionTcp');
-const ConnectionUdp = require('./connectionUdp');
+import { ConnectionType } from './connection';
+import ConnectionBle from './connectionBle';
+import ConnectionSerial from './connectionSerial';
+import ConnectionTcp from './connectionTcp';
+import ConnectionUdp from './connectionUdp';
 
 var connectionFactory = function(type, instance) {
     if (instance && (instance.type == type || instance.connectionId)){
@@ -29,4 +29,4 @@ var connectionFactory = function(type, instance) {
     return instance;
 };
 
-module.exports = connectionFactory;
+export default connectionFactory;

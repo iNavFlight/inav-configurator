@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - master
+      - maintenance-8.x.x
 #  pull_request:
 
 jobs:
@@ -27,11 +28,16 @@ jobs:
               with:
                 path: artifacts
                 merge-multiple: true
+            - name: Get version
+              id: version
+              run: |
+                VERSION=$(grep version package.json | cut -d: -f2 | cut -d\" -f2)
+                echo "VERSION=${VERSION}" >> $GITHUB_ENV
             - name: Upload release artifacts
               uses: softprops/action-gh-release@v2
               with:
-                name: inav-configurator-dev-${{ steps.date.outputs.today }}-${{ github.run_number }}-${{ github.sha }}
-                tag_name: v${{ steps.date.outputs.today }}.${{ github.run_number }}
+                name: inav-configurator-${{ env.VERSION }}-dev-${{ steps.date.outputs.today }}-${{ github.run_number }}-${{ github.sha }}
+                tag_name: v${{env.VERSION}}-${{ steps.date.outputs.today }}.${{ github.run_number }}
                 # To create release on a different repo, we need a token setup
                 token: ${{ secrets.NIGHTLY_TOKEN }}
                 repository: iNavFlight/inav-configurator-nightly

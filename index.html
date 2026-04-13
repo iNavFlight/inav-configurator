@@ -1,14 +1,8 @@
 <!DOCTYPE html>
-<html>
+<html i18n_lang="currentLanguage">
 
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <link type="text/css" rel="stylesheet" href="./src/css/styles.css" media="all" />    
-    <script type="text/javascript">require('./js/configurator_main.js');</script>
-    <!-- TODO: Update to newer Versions and use proper modules (require) -->
-    <script type="text/javascript" src="./js/libraries/three/three.min.js"></script>
-    <script type="text/javascript" src="./js/libraries/three/OrbitControls.js"></script>
-    <script type="text/javascript" src="./js/libraries/three/GLTFLoader.js"></script>
     <title>INAV Configurator</title>
 </head>
 
@@ -82,19 +76,13 @@
                             <label for="wireless-mode">
                                 <span class="" data-i18n="wirelessModeSwitch"></span>
                             </label>
-                            <input id="wireless-mode" class=" togglesmall" type="checkbox" />
+                            <input id="wireless-mode" class="togglesmall" type="checkbox" />
                         </div>
                     </div>
                 </div>
             </div>
             <div class="header-wrapper">
-                <div id="dataflash_wrapper_global">
-                    <div class="noflash_global" align="center" i18n="sensorDataFlashNotFound"></div>
-                    <ul class="dataflash-contents_global">
-                        <li class="dataflash-free_global">
-                            <div class="legend" i18n="sensorDataFlashFreeSpace"></div>
-                        </li>
-                    </ul>
+                <div id="profiles_wrapper_global">
                     <div id="profile_change">
                         <div class="dropdown dropdown-dark">
                             <form name="profile-change" id="profile-change">
@@ -129,6 +117,14 @@
                             </form>
                         </div>
                     </div>
+                </div>
+                <div id="dataflash_wrapper_global">
+                    <div class="noflash_global" align="center" i18n="sensorDataFlashNotFound"></div>
+                    <ul class="dataflash-contents_global">
+                        <li class="dataflash-free_global">
+                            <div class="legend" i18n="sensorDataFlashFreeSpace"></div>
+                        </li>
+                    </ul>
                 </div>
                 <div id="sensor-status" class="sensor_state mode-connected">
                     <ul>
@@ -167,9 +163,9 @@
                     </div>
                     <div class="battery-legend" i18n="sensorBatteryVoltage"></div>
                     <div class="bottomStatusIcons">
-                        <div class="armedicon cf_tip" data-i18n_title="mainHelpArmed"></div>
-                        <div class="failsafeicon cf_tip" data-i18n_title="mainHelpFailsafe"></div>
-                        <div class="linkicon cf_tip" data-i18n_title="mainHelpLink"></div>
+                        <div id="armedIcon" class="statusicon armed cf_tip" data-i18n_title="mainHelpArmed"></div>
+                        <div id="failsafeicon" class="statusicon failsafe cf_tip" data-i18n_title="mainHelpFailsafe"></div>
+                        <div id="linkicon" class="statusicon link cf_tip" data-i18n_title="mainHelpLink"></div>
                     </div>
                 </div>
             </div>
@@ -279,6 +275,9 @@
                     <li class="tab_programming">
                         <a href="#" data-i18n="tabProgramming" class="tabicon ic_config" title="Programming"></a>
                     </li>
+                    <li class="tab_javascript_programming">
+                        <a href="#" i18n="tabJavaScriptProgramming" class="tabicon ic_javascript_programming" title="Javascript Programming">></a>
+                    </li>
                     <li class="tab_receiver">
                         <a href="#" data-i18n="tabReceiver" class="tabicon ic_rx" title="Receiver"></a>
                     </li>
@@ -316,6 +315,10 @@
                     <li class="tab_cli">
                         <a href="#" data-i18n="tabCLI" class="tabicon ic_cli" title="CLI"></a>
                     </li>
+                    <li class="tab_search">
+                        <a href="#" data-i18n="search" class="tabicon ic_search" title="Search"></a>
+                    </li>
+
 
                     <!-- <li class=""><a href="#" class="tabicon ic_advanced">Advanced (spare icon)</a></li> -->
                 </ul>
@@ -380,6 +383,7 @@
             </div>
         </div>
     </div>
+    <script type="module" src="/js/configurator_main.js"></script>
 </body>
 
 </html>

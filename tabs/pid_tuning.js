@@ -1,20 +1,17 @@
 'use strict';
 
-const path = require('path');
-const Store = require('electron-store');
-const store = new Store()
-
-const MSPChainerClass = require('./../js/msp/MSPchainer');
-const mspHelper = require('./../js/msp/MSPHelper');
-const MSPCodes = require('./../js/msp/MSPCodes');
-const MSP = require('./../js/msp');
-const { GUI, TABS } = require('./../js/gui');
-const tabs = require('./../js/tabs');
-const FC = require('./../js/fc');
-const Settings = require('./../js/settings');
-const i18n = require('./../js/localization');
-const { scaleRangeInt } = require('./../js/helpers');
-const interval = require('./../js/intervals');
+import MSPChainerClass from './../js/msp/MSPchainer';
+import mspHelper from './../js/msp/MSPHelper';
+import MSPCodes from './../js/msp/MSPCodes';
+import MSP from './../js/msp';
+import { GUI, TABS } from './../js/gui';
+import tabs from './../js/tabs';
+import FC from './../js/fc';
+import Settings from './../js/settings';
+import i18n from './../js/localization';
+import { scaleRangeInt } from './../js/helpers';
+import interval from './../js/intervals';
+import dialog from '../js/dialog';
 
 TABS.pid_tuning = {
     rateChartHeight: 117
@@ -44,7 +41,7 @@ TABS.pid_tuning.initialize = function (callback) {
     }
 
     function load_html() {
-        GUI.load(path.join(__dirname, "pid_tuning.html"), Settings.processHtml(process_html));
+        import('./pid_tuning.html?raw').then(({default: html}) => GUI.load(html, Settings.processHtml(process_html)));
     }
 
     function drawExpoCanvas(value, $element, color, width, height, clear) {
@@ -262,7 +259,7 @@ TABS.pid_tuning.initialize = function (callback) {
 
         $("#ez_tune_enabled").prop('checked', FC.EZ_TUNE.enabled).trigger('change');
 
-        GUI.sliderize($('#ez_tune_filter_hz'), FC.EZ_TUNE.filterHz, 10, 300);
+        GUI.sliderize($('#ez_tune_filter_hz'), FC.EZ_TUNE.filterHz, 20, 300);
         GUI.sliderize($('#ez_tune_axis_ratio'), FC.EZ_TUNE.axisRatio, 25, 175);
         GUI.sliderize($('#ez_tune_response'), FC.EZ_TUNE.response, 0, 200);
         GUI.sliderize($('#ez_tune_damping'), FC.EZ_TUNE.damping, 0, 200);
@@ -299,7 +296,7 @@ TABS.pid_tuning.initialize = function (callback) {
 
         $('.action-resetPIDs').on('click', function() {
 
-            if (confirm(i18n.getMessage('confirm_reset_pid'))) {
+            if (dialog.confirm(i18n.getMessage('confirm_reset_pid'))) {
                 MSP.send_message(MSPCodes.MSP_SET_RESET_CURR_PID, false, false, false);
                 GUI.updateActivatedTab();
             }
@@ -307,7 +304,7 @@ TABS.pid_tuning.initialize = function (callback) {
 
         $('.action-resetDefaults').on('click', function() {
 
-            if (confirm(i18n.getMessage('confirm_select_defaults'))) {
+            if (dialog.confirm(i18n.getMessage('confirm_select_defaults'))) {
                 mspHelper.setSetting("applied_defaults", 0, function() { 
                     mspHelper.saveToEeprom( function () {
                         GUI.log(i18n.getMessage('configurationEepromSaved'));
@@ -449,18 +446,6 @@ TABS.pid_tuning.initialize = function (callback) {
 
             mspHelper.savePidData(send_rc_tuning_changes); 
         });
-
-        $('#gyro_use_dyn_lpf').on('change', function () {
-
-            if ($(this).is(':checked')) {
-                $('.for_dynamic_gyro_lpf').show();
-                $('.for_static_gyro_lpf').hide();
-            } else {
-                $('.for_dynamic_gyro_lpf').hide();
-                $('.for_static_gyro_lpf').show();
-            }
-
-        }).trigger('change');
 
         GUI.content_ready(callback);
     }

@@ -29,4 +29,4 @@ var SimpleSmoothFilter = function (initialValue, smoothingFactor) {
     return self;
 };
 
-module.exports = SimpleSmoothFilter;
+export default SimpleSmoothFilter;

@@ -1,9 +1,9 @@
 'use strict';
 
-const FC = require('./fc');
-const { GUI } = require('./../js/gui');
-const { LOGIC_OPERATORS } = require('./logicConditionOperators');
-const { OPERAND_TYPES } = require('./logicConditionOperantTypes');
+import FC from './fc';
+import { GUI } from './../js/gui';
+import { LOGIC_OPERATORS } from './logicConditionOperators';
+import { OPERAND_TYPES } from './logicConditionOperantTypes';
 
 let LogicCondition = function (enabled, activatorId, operation, operandAType, operandAValue, operandBType, operandBValue, flags) {
     let self = {};
@@ -238,10 +238,10 @@ let LogicCondition = function (enabled, activatorId, operation, operandAType, op
         $container.find('tbody').append('<tr>\
                 <td class="logic_cell__index"></td>\
                 <td class="logic_cell__enabled"></td>\
+                <td class="logic_cell__activator"></td>\
                 <td class="logic_cell__operation"></td>\
                 <td class="logic_cell__operandA"></td>\
                 <td class="logic_cell__operandB"></td>\
-                <td class="logic_cell__activator"></div></td>\
                 <td class="logic_cell__flags"></div></td>\
                 <td class="logic_cell__status"></td>\
             </tr>\
@@ -255,6 +255,7 @@ let LogicCondition = function (enabled, activatorId, operation, operandAType, op
             prop('checked', self.getEnabled()).
             change(self.onEnabledChange);
 
+        // self.renderActivator();
         /*
          * Operator select
          */
@@ -321,4 +322,4 @@ let LogicCondition = function (enabled, activatorId, operation, operandAType, op
     return self;
 };
 
-module.exports = LogicCondition;
+export default LogicCondition;

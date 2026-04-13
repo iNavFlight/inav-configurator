@@ -1,8 +1,7 @@
 'use strict';
 
-const Store = require('electron-store');
-const store = new Store();
-const FC = require('./fc');
+import FC from './fc';
+import store from './store';
 
 var settingsCache = (function() {
 
@@ -44,4 +43,4 @@ var settingsCache = (function() {
     return publicScope;
 }());
 
-module.exports = settingsCache;
+export default settingsCache;
