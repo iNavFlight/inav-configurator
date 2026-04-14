@@ -49,6 +49,8 @@ var FC = {
     SERVO_DATA: null,
     GPS_DATA: null,
     ADSB_VEHICLES: null,
+    ADSB_LIMITS: null,
+    ADSB_WARNING_ICAO: null,
     MISSION_PLANNER: null,
     ANALOG: null,
     ARMING_CONFIG: null,
@@ -287,6 +289,17 @@ var FC = {
             vehiclePacketCount: 0,
             heartbeatPacketCount: 0,
             vehicles: []
+        };
+
+        this.ADSB_LIMITS = {
+            adsb_distance_alert: 0,
+            adsb_distance_warning: 0,
+            adsb_ignore_plane_above_me_limit: 0,
+        };
+
+        this.ADSB_WARNING_ICAO = {
+            icao: 0,
+            isAlert: 0,
         };
 
         this.MISSION_PLANNER = new WaypointCollection();

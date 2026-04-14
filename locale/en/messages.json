@@ -6201,6 +6201,42 @@
     "adsbHeartbeatTotalMessages": {
         "message": "Heartbeat msgs"
     },
+    "adsbCallsign": {
+        "message": "Callsign"
+    },
+    "adsbAsl": {
+        "message": "Asl (m)"
+    },
+    "adsbHeading": {
+        "message": "Heading°"
+    },
+    "adsbType": {
+        "message": "Type"
+    },
+    "adsbAlt": {
+        "message": "Alt"
+    },
+    "adsbEmitter": {
+        "message": "Emitter"
+    },
+    "adsbAlert": {
+        "message": "Alert"
+    },
+    "adsbWarning": {
+        "message": "Warning"
+    },
+    "adsbNoWarning": {
+        "message": "None"
+    },
+    "adsbWarningIcao": {
+        "message": "Alert/Warning ICAO"
+    },
+    "adsbWarningType": {
+        "message": "Alert/Warning type"
+    },
+    "noVehicles": {
+        "message": "No vehicles"
+    },
     "currentLanguage": {
         "message": "en"
     },
