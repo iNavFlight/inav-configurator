@@ -6234,6 +6234,9 @@
     "adsbWarningType": {
         "message": "Alert/Warning type"
     },
+    "noVehicles": {
+        "message": "No vehicles"
+    },
     "currentLanguage": {
         "message": "en"
     },

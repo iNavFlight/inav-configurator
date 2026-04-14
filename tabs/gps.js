@@ -166,7 +166,7 @@ TABS.gps.initialize = function (callback) {
             $tbody.empty();
             $tbody.append(
                 $('<tr>').append(
-                    $('<td>').attr('colspan', 9).addClass('adsb-table__empty').text('No vehicles')
+                    $('<td>').attr('colspan', 9).addClass('adsb-table__empty').text(i18n.getMessage('noVehicles'))
                 )
             );
             return;
