@@ -572,9 +572,6 @@ TABS.firmware_flasher.initialize = function (callback) {
             }
         });
 
-        // --- Shared helpers for migration preview (used by flash + manual restore) ---
-
-        // Show progress label with a link to open the backups folder
         function showBackupSavedMessage(messageKey) {
             $('span.progressLabel').html(
                 i18n.getMessage(messageKey) +
@@ -587,7 +584,6 @@ TABS.firmware_flasher.initialize = function (callback) {
             });
         }
 
-        // Build migration changes text for preview overlay
         function buildMigrationChangesText(summary) {
             var sections = [
                 { key: 'removedSettings', header: 'migrationPreviewRemovedHeader' },
@@ -610,7 +606,6 @@ TABS.firmware_flasher.initialize = function (callback) {
             return lines.join('\n');
         }
 
-        // Show migration preview overlay with changes and warnings
         function showMigrationPreview(summary, onContinue, onCancel) {
             var $preview = $('#migration-preview-overlay');
             var $changes = $preview.find('.migration-preview__changes');
@@ -662,11 +657,9 @@ TABS.firmware_flasher.initialize = function (callback) {
                             options.erase_chip = true;
                         }
 
-                        // Save original port before flash (port picker may change during DFU)
                         var originalPort = String($('div#port-picker #port').val());
                         var originalBaud = parseInt($('div#port-picker #baud').val());
 
-                        // Determine version update type (patch / minor / major)
                         var currentVersion = (FC.CONFIG && FC.CONFIG.flightControllerVersion) ? FC.CONFIG.flightControllerVersion : null;
                         var selectedSummary = $('select[name="firmware_version"] option:selected').data('summary');
                         var targetVersion = (!localFirmwareLoaded && selectedSummary) ? semver.clean(selectedSummary.version) : null;
@@ -674,13 +667,11 @@ TABS.firmware_flasher.initialize = function (callback) {
 
                         if (currentVersion && targetVersion && semver.valid(currentVersion) && semver.valid(targetVersion)) {
                             var diffType = semver.diff(currentVersion, targetVersion);
-                            // minor, major, premajor, preminor all count as non-patch
                             if (diffType && diffType !== 'patch' && diffType !== 'prepatch' && diffType !== 'prerelease') {
                                 isMinorOrMajorUpdate = true;
                             }
                         }
 
-                        // Version check gate: warn if minor/major update without chip erase
                         if (isMinorOrMajorUpdate && !options.erase_chip) {
                             showVersionWarning(currentVersion, targetVersion, function onContinue() {
                                 skipAutoRestore = true;
@@ -692,7 +683,6 @@ TABS.firmware_flasher.initialize = function (callback) {
                         proceedWithFlash();
                         return;
 
-                        // Shows the version warning overlay; calls onContinue if user proceeds
                         function showVersionWarning(fromVer, toVer, onContinue) {
                             var $warn = $('#version-warning-overlay');
                             $warn.find('.version-warning-overlay__text').text(
@@ -713,7 +703,6 @@ TABS.firmware_flasher.initialize = function (callback) {
                             $cancelBtn.on('click.versionWarn', function(e) {
                                 e.preventDefault();
                                 cleanup();
-                                // User cancelled — do nothing
                             });
 
                             $continueBtn.on('click.versionWarn', function(e) {
@@ -725,10 +714,7 @@ TABS.firmware_flasher.initialize = function (callback) {
 
                         function proceedWithFlash() {
 
-                        // Common completion handler for both serial and DFU flash paths
                         function onFlashComplete() {
-                            // Update stored FC version to what we just flashed
-                            // so subsequent version checks are accurate without reconnecting
                             if (targetVersion && FC.CONFIG) {
                                 FC.CONFIG.flightControllerVersion = targetVersion;
                             }
@@ -737,7 +723,6 @@ TABS.firmware_flasher.initialize = function (callback) {
                             if (backup) {
                                 GUI.log(i18n.getMessage('backupRestoreAutoBackupSaved', [backup.filePath]));
 
-                                // Check for major version downgrade — no auto-restore for downgrades
                                 var backupVersion = MigrationHandler.extractBackupVersion(backup.data);
                                 var isMajorDowngrade = false;
                                 if (backupVersion && targetVersion && semver.valid(backupVersion) && semver.valid(targetVersion)) {
@@ -747,18 +732,13 @@ TABS.firmware_flasher.initialize = function (callback) {
                                 }
 
                                 if (!targetVersion) {
-                                    // Local firmware file — unknown target version, no auto-restore
                                     showBackupSavedMessage('backupRestoreFlashCompleteBackupSaved');
                                     BackupRestore.clearLastAutoBackup();
                                 } else if (isMajorDowngrade) {
-                                    // Major downgrade — inform user, no auto-restore
                                     GUI.log(i18n.getMessage('backupRestoreDowngradeNoAutoRestore'));
                                     showBackupSavedMessage('backupRestoreDowngradeNoAutoRestore');
                                     BackupRestore.clearLastAutoBackup();
                                 } else if (options.erase_chip && !skipAutoRestore) {
-                                    // Full chip erase — offer auto-restore
-
-                                    // Pre-compute migration to decide which dialog to show
                                     var migrationNeeded = targetVersion && MigrationHandler.isMigrationNeeded(backup.data, targetVersion);
                                     var missingProfiles = targetVersion && MigrationHandler.hasMissingProfiles(backup.data, targetVersion);
                                     var migrationResult = null;
@@ -769,7 +749,6 @@ TABS.firmware_flasher.initialize = function (callback) {
                                         dataToRestore = migrationResult.migratedContent;
                                     }
 
-                                    // Inject missing-profile warning into summary if applicable
                                     if (missingProfiles) {
                                         if (!migrationResult) {
                                             var backupVer = MigrationHandler.extractBackupVersion(backup.data) || 'unknown';
@@ -784,9 +763,7 @@ TABS.firmware_flasher.initialize = function (callback) {
                                     }
 
                                     if (migrationResult && (migrationResult.summary.totalChanges > 0 || migrationResult.summary.warnings.length > 0)) {
-                                        // Show migration preview overlay instead of simple confirm
                                         showMigrationPreview(migrationResult.summary, function onContinue() {
-                                            // Log migration info
                                             GUI.log(i18n.getMessage('backupRestoreMigrationApplied', [
                                                 migrationResult.summary.fromVersion,
                                                 migrationResult.summary.toVersion,
@@ -798,7 +775,6 @@ TABS.firmware_flasher.initialize = function (callback) {
                                             showBackupSavedMessage('backupRestoreFlashCompleteBackupSaved');
                                         });
                                     } else {
-                                        // No migration needed — show simple confirm overlay
                                         $('span.progressLabel').text(i18n.getMessage('backupRestoreFlashCompleteOfferRestore'));
 
                                         var $confirmOverlay = $('#restore-confirm-overlay');
@@ -828,14 +804,12 @@ TABS.firmware_flasher.initialize = function (callback) {
                                         });
                                     }
                                 } else {
-                                    // No full chip erase — just show backup info
                                     showBackupSavedMessage('backupRestoreFlashCompleteBackupSaved');
                                     BackupRestore.clearLastAutoBackup();
                                 }
                             }
                         }
 
-                        // Start port polling and auto-restore with given data
                         function startPortPollingAndRestore(restoreData) {
                             var restorePort = originalPort;
                             var restoreBaud = originalBaud;
@@ -875,7 +849,6 @@ TABS.firmware_flasher.initialize = function (callback) {
                             }, 500);
                         }
 
-                        // Extracted restore logic — restoreData is already migrated if needed
                         function doAutoRestore(restorePort, restoreBaud, restoreData, $overlay, $overlayStatus, $overlayFill, $overlayText) {
                             GUI.connect_lock = true;
 
@@ -904,7 +877,6 @@ TABS.firmware_flasher.initialize = function (callback) {
                                     $overlay.addClass('is-hidden');
 
                                     if (result.errors.length > 0) {
-                                        // Show error dialog
                                         var $errorDlg = $('#restore-error-dialog');
                                         $errorDlg.find('.restore-error-dialog__errors').text(result.errors.join('\n'));
                                         $errorDlg.removeClass('is-hidden');
@@ -992,8 +964,6 @@ TABS.firmware_flasher.initialize = function (callback) {
                                     baud = parseInt($('#flash_manual_baud_rate').val());
                                 }
 
-                                // Add auto-backup handler: captures diff all while CLI is
-                                // active during the reboot sequence (before DFU command)
                                 if (!options.no_reboot) {
                                     options.onCliReady = BackupRestore.createOnCliReadyHandler(function(msgKey) {
                                         $('span.progressLabel').text(i18n.getMessage(msgKey));
@@ -1018,7 +988,6 @@ TABS.firmware_flasher.initialize = function (callback) {
             }
         });
 
-        // Backup Config button
         $('a.backup_config').on('click', function () {
             if (GUI.connect_lock) return;
 
@@ -1030,7 +999,6 @@ TABS.firmware_flasher.initialize = function (callback) {
 
             $('span.progressLabel').text(i18n.getMessage('backupRestoreStatusConnecting'));
 
-            // Connect to FC, perform backup via CLI, then disconnect
             var rebootBaud = parseInt($('div#port-picker #baud').val());
             GUI.connect_lock = true;
 
@@ -1050,7 +1018,6 @@ TABS.firmware_flasher.initialize = function (callback) {
                     } else {
                         $('span.progressLabel').text(i18n.getMessage('backupRestoreBackupCancelled'));
                     }
-                    // FC reboots after CLI exit, disconnect and unlock
                     disconnectSafely(function() {
                         GUI.connect_lock = false;
                     });
@@ -1065,7 +1032,6 @@ TABS.firmware_flasher.initialize = function (callback) {
             });
         });
 
-        // Restore Config button
         $('a.restore_config').on('click', async function () {
             if (GUI.connect_lock) return;
 
@@ -1075,7 +1041,6 @@ TABS.firmware_flasher.initialize = function (callback) {
                 return;
             }
 
-            // Show file dialog BEFORE connecting to avoid idle connection during user interaction
             var backupDir = await window.electronAPI.getBackupDir();
             var fileResult = await window.electronAPI.showOpenDialog({
                 defaultPath: backupDir,
@@ -1100,7 +1065,6 @@ TABS.firmware_flasher.initialize = function (callback) {
 
             var fileData = fileResponse.data;
 
-            // Show overlay and lock UI
             var $overlay = $('#restore-overlay');
             var $overlayStatus = $overlay.find('.restore-overlay__status');
             var $overlayFill = $overlay.find('.restore-overlay__progress-fill');
@@ -1123,9 +1087,6 @@ TABS.firmware_flasher.initialize = function (callback) {
                     return;
                 }
 
-                // Query actual FC version via MSP before deciding on migration.
-                // The cached FC.CONFIG.flightControllerVersion may be stale after
-                // a flash (e.g. targetVersion was null for a local firmware file).
                 $overlayStatus.text(i18n.getMessage('backupRestoreStatusConnecting'));
                 MSP.disconnect_cleanup();
                 var mspListener = function(info) { MSP.read(info); };
@@ -1153,7 +1114,6 @@ TABS.firmware_flasher.initialize = function (callback) {
                 function proceedAfterVersionQuery() {
                     var currentFcVersion = FC.CONFIG.flightControllerVersion;
 
-                    // Run migration check with the real FC version
                     var migrationNeeded = currentFcVersion && MigrationHandler.isMigrationNeeded(fileData, currentFcVersion);
                     var missingProfiles = currentFcVersion && MigrationHandler.hasMissingProfiles(fileData, currentFcVersion);
                     var migrationResult = null;
@@ -1163,7 +1123,6 @@ TABS.firmware_flasher.initialize = function (callback) {
                         fileData = migrationResult.migratedContent;
                     }
 
-                    // Inject missing-profile warning if applicable
                     if (missingProfiles) {
                         if (!migrationResult) {
                             var backupVer = MigrationHandler.extractBackupVersion(fileData) || 'unknown';
@@ -1177,9 +1136,8 @@ TABS.firmware_flasher.initialize = function (callback) {
                         );
                     }
 
-                    // If migration has changes or warnings, show preview and wait for user decision
                     if (migrationResult && (migrationResult.summary.totalChanges > 0 || migrationResult.summary.warnings.length > 0)) {
-                        $overlay.addClass('is-hidden'); // hide connecting overlay for preview
+                        $overlay.addClass('is-hidden');
                         showMigrationPreview(migrationResult.summary, function onContinue() {
                             GUI.log(i18n.getMessage('backupRestoreMigrationApplied', [
                                 migrationResult.summary.fromVersion,
@@ -1201,7 +1159,6 @@ TABS.firmware_flasher.initialize = function (callback) {
 
                 function doRestore() {
 
-                // Progress callback from performRestore
                 function onProgress(info) {
                     switch (info.phase) {
                         case 'entering-cli':
@@ -1227,13 +1184,11 @@ TABS.firmware_flasher.initialize = function (callback) {
                     $overlay.addClass('is-hidden');
 
                     if (result.errors.length > 0) {
-                        // Show error dialog — let user decide to save or abort
                         var $errorDlg = $('#restore-error-dialog');
                         var $errorList = $errorDlg.find('.restore-error-dialog__errors');
                         $errorList.text(result.errors.join('\n'));
                         $errorDlg.removeClass('is-hidden');
 
-                        // Wait for user choice via one-time click handlers
                         var $saveBtn = $errorDlg.find('.restore-error-dialog__btn--save');
                         var $abortBtn = $errorDlg.find('.restore-error-dialog__btn--abort');
 
@@ -1268,7 +1223,6 @@ TABS.firmware_flasher.initialize = function (callback) {
                             });
                         });
                     } else {
-                        // No errors — save immediately
                         $('span.progressLabel').text(i18n.getMessage('backupRestoreStatusSaving'));
                         BackupRestore.saveAndReboot().then(function() {
                             GUI.log(i18n.getMessage('backupRestoreRestoreComplete'));
@@ -1291,7 +1245,6 @@ TABS.firmware_flasher.initialize = function (callback) {
             });
         });
 
-        // Open Backups Folder button
         $('a.open_backups_folder').on('click', function () {
             window.electronAPI.openBackupDir();
         });

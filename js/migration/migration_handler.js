@@ -2,7 +2,6 @@
 
 import semver from 'semver';
 
-// Import migration profiles
 import profile_7_to_8 from './7_to_8.json';
 import profile_8_to_9 from './8_to_9.json';
 
@@ -47,20 +46,18 @@ const MigrationHandler = {
         const fromMajor = semver.major(fromVersion);
         const toMajor = semver.major(toVersion);
 
-        if (fromMajor >= toMajor) return []; // same or downgrade — no migration
+        if (fromMajor >= toMajor) return [];
 
         const chain = [];
         for (const profile of MIGRATION_PROFILES) {
             const profileFrom = parseInt(profile.fromVersion, 10);
             const profileTo = parseInt(profile.toVersion, 10);
 
-            // Include this profile if it bridges a gap in our version range
             if (profileFrom >= fromMajor && profileTo <= toMajor) {
                 chain.push(profile);
             }
         }
 
-        // Sort by fromVersion to ensure correct order
         chain.sort((a, b) => parseInt(a.fromVersion, 10) - parseInt(b.fromVersion, 10));
 
         return chain;
@@ -76,13 +73,12 @@ const MigrationHandler = {
         const changes = [];
         let currentLine = line;
 
-        // Parse the line into parts: command [subcommand] [setting] [value...]
         const parts = currentLine.split(/\s+/);
         if (parts.length === 0) return { line: currentLine, changes };
 
         const command = parts[0].toLowerCase();
 
-        // 1. Command renames (e.g. "profile" → "control_profile")
+        // 1. Command renames
         if (profile.commandRenames) {
             const lowerParts = parts.map(p => p.toLowerCase());
             for (const [oldCmd, newCmd] of Object.entries(profile.commandRenames)) {
@@ -116,8 +112,6 @@ const MigrationHandler = {
             // 2c. Value replacements
             if (profile.valueReplacements && profile.valueReplacements[settingName]) {
                 const valueMap = profile.valueReplacements[settingName];
-                // The value is everything after "set <name> = "
-                // Handle the "set name = value" pattern
                 const eqIdx = parts.indexOf('=');
                 if (eqIdx !== -1 && eqIdx + 1 < parts.length) {
                     const oldValue = parts[eqIdx + 1];
@@ -130,8 +124,7 @@ const MigrationHandler = {
             }
         }
 
-        // 3. Generic setting pattern mappings (value remapping by regex pattern)
-        //    e.g. OSD custom element type IDs renumbered between versions
+        // 3. Setting pattern mappings
         if (command === 'set' && profile.settingPatternMappings && profile.settingPatternMappings.length > 0) {
             const settingName = parts[1] ? parts[1].toLowerCase() : '';
             for (const mapping of profile.settingPatternMappings) {
@@ -146,7 +139,7 @@ const MigrationHandler = {
                             currentLine = parts.join(' ');
                         }
                     }
-                    break; // Only first matching pattern applies
+                    break;
                 }
             }
         }
@@ -202,7 +195,6 @@ const MigrationHandler = {
             return { migratedContent: fileContent, summary };
         }
 
-        // Collect profile descriptions and warnings
         for (const profile of chain) {
             summary.profilesApplied.push(`${profile.fromVersion} → ${profile.toVersion}: ${profile.description}`);
             if (profile.warnings) {
@@ -210,27 +202,23 @@ const MigrationHandler = {
             }
         }
 
-        // Process each line of the file content
         const lines = fileContent.split('\n');
         const migratedLines = [];
 
         for (const rawLine of lines) {
             const trimmed = rawLine.trim();
 
-            // Pass through comments, empty lines, and non-command lines unchanged
             if (trimmed.length === 0 || trimmed.startsWith('#')) {
                 migratedLines.push(rawLine);
                 continue;
             }
 
-            // Skip save/exit — these are handled by the restore flow
             const lower = trimmed.toLowerCase();
             if (lower === 'save' || lower === 'exit') {
                 migratedLines.push(rawLine);
                 continue;
             }
 
-            // Apply each profile in the chain sequentially
             let currentLine = trimmed;
             let lineRemoved = false;
 
@@ -245,7 +233,6 @@ const MigrationHandler = {
                     currentLine = result.line;
                 }
 
-                // Categorize changes for the summary
                 for (const change of result.changes) {
                     summary.totalChanges++;
                     if (change.startsWith('Removed')) {
@@ -265,7 +252,6 @@ const MigrationHandler = {
             if (!lineRemoved) {
                 migratedLines.push(currentLine);
             }
-            // Removed lines are simply not added to migratedLines
         }
 
         return {
@@ -301,7 +287,7 @@ const MigrationHandler = {
         const fromMajor = semver.major(semver.coerce(fromVersion));
         const toMajor = semver.major(semver.coerce(targetVersion));
 
-        if (toMajor <= fromMajor) return false; // same or downgrade
+        if (toMajor <= fromMajor) return false;
 
         const chain = this.buildMigrationChain(fromVersion, targetVersion);
         const coveredSteps = chain.length;

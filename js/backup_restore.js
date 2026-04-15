@@ -13,7 +13,6 @@ const LINE_DELAY_MS = 50;
 const PROFILE_SWITCH_DELAY_MS = 100;
 const REBOOT_WAIT_MS = 1500;
 
-// Stores the last auto-backup info for post-flash restore
 let lastAutoBackup = null;
 
 /**
@@ -26,9 +25,6 @@ const BackupRestore = {
     _outputHistory: '',
     _cliReady: false,
 
-    /**
-     * Send a raw string over the active connection.
-     */
     _sendString(str, callback) {
         const buf = new ArrayBuffer(str.length);
         const view = new Uint8Array(buf);
@@ -50,7 +46,6 @@ const BackupRestore = {
 
             let timeoutHandle = null;
 
-            // Set up receive listener
             this._receiveCallback = (info) => {
                 const data = new Uint8Array(info.data);
                 for (let i = 0; i < data.length; i++) {
@@ -69,7 +64,6 @@ const BackupRestore = {
             };
             CONFIGURATOR.connection.addOnReceiveCallback(this._receiveCallback);
 
-            // Timeout
             timeoutHandle = setTimeout(() => {
                 if (!this._cliReady) {
                     this._cleanup();
@@ -77,7 +71,6 @@ const BackupRestore = {
                 }
             }, CLI_ENTER_TIMEOUT_MS);
 
-            // Send '#' to enter CLI
             this._sendString('#');
         });
     },
@@ -101,19 +94,16 @@ const BackupRestore = {
                     this._outputHistory += ch;
 
                     if (data[i] === 10 || data[i] === 13) {
-                        // newline
                         this._cliBuffer = '';
                     } else {
                         this._cliBuffer += ch;
                     }
                 }
 
-                // Detect prompt return: line starting with '# ' (INAV CLI prompt)
                 if (this._cliBuffer.endsWith('# ') || this._cliBuffer === '# ') {
                     if (timeoutHandle) {
                         clearTimeout(timeoutHandle);
                     }
-                    // Restore original callback
                     CONFIGURATOR.connection.removeOnReceiveCallback(this._receiveCallback);
                     this._receiveCallback = originalCallback;
                     if (originalCallback) {
@@ -123,7 +113,6 @@ const BackupRestore = {
                 }
             };
 
-            // Swap callbacks
             if (originalCallback) {
                 CONFIGURATOR.connection.removeOnReceiveCallback(originalCallback);
             }
@@ -142,9 +131,6 @@ const BackupRestore = {
         });
     },
 
-    /**
-     * Clean up receive listener.
-     */
     _cleanup() {
         if (this._receiveCallback) {
             CONFIGURATOR.connection.removeOnReceiveCallback(this._receiveCallback);
@@ -162,17 +148,11 @@ const BackupRestore = {
         return new Promise((resolve) => {
             this._cleanup();
             this._sendString('exit\r', () => {
-                // Give the FC a moment to start processing the exit command
-                // before the caller disconnects the serial port
                 setTimeout(resolve, 500);
             });
         });
     },
 
-    /**
-     * Send 'save' and wait for it to be transmitted.
-     * The FC will write EEPROM and reboot after receiving save.
-     */
     _saveCli() {
         return new Promise((resolve) => {
             this._cleanup();
@@ -182,10 +162,6 @@ const BackupRestore = {
         });
     },
 
-    /**
-     * Generate a backup filename.
-     * @param {string} [prefix=''] - Optional prefix (e.g. 'UPDATE_')
-     */
     generateBackupFilename(prefix) {
         const date = new Date();
         const pad = (n) => String(n).padStart(2, '0');
@@ -213,20 +189,15 @@ const BackupRestore = {
 
         if (onProgress) onProgress('backupRestoreStatusReadingConfig');
 
-        // Send diff all and capture output
         const diffOutput = await this._sendCommand('diff all');
-
-        // Clean the output: remove the command echo and the trailing prompt
         const cleanedOutput = this._cleanDiffOutput(diffOutput);
 
         if (onProgress) onProgress('backupRestoreStatusSavingFile');
 
-        // Get backup directory and save
         const backupDir = await window.electronAPI.getBackupDir();
         const filename = this.generateBackupFilename();
         const filePath = backupDir + '/' + filename;
 
-        // Add header with metadata
         const header = `# INAV Backup\n# Version: ${version}\n# Board: ${FC.CONFIG.target || FC.CONFIG.boardIdentifier}\n# Date: ${new Date().toISOString()}\n# Craft: ${FC.CONFIG.name || ''}\n#\n`;
         const fileContent = header + cleanedOutput;
 
@@ -237,7 +208,6 @@ const BackupRestore = {
 
         if (onProgress) onProgress('backupRestoreStatusExitingCli');
 
-        // Exit CLI (triggers reboot) — wait for command to be sent
         await this._exitCli();
 
         return { filePath, version, data: fileContent };
@@ -291,7 +261,6 @@ const BackupRestore = {
 
         if (onProgress) onProgress('backupRestoreStatusExitingCli');
 
-        // Exit CLI (triggers reboot) — wait for command to be sent
         await this._exitCli();
 
         return { filePath: result.filePath, version, data: fileContent };
@@ -321,8 +290,6 @@ const BackupRestore = {
         report('entering-cli', 0, 0);
         await this._enterCli();
 
-        // Parse lines: filter comments, empty lines, header, and
-        // save/exit commands (handled separately by saveAndReboot/abortRestore)
         const lines = fileContent.split('\n')
             .map(line => line.trim())
             .filter(line => {
@@ -335,11 +302,9 @@ const BackupRestore = {
         const total = lines.length;
         report('restoring', 0, total);
 
-        // Send each line individually and check the response for errors
         for (let i = 0; i < lines.length; i++) {
             const line = lines[i];
 
-            // Small delay before profile switch commands
             if (line.toLowerCase().includes('_profile')) {
                 await new Promise(resolve => setTimeout(resolve, PROFILE_SWITCH_DELAY_MS));
             }
@@ -347,14 +312,11 @@ const BackupRestore = {
             try {
                 const response = await this._sendCommand(line);
 
-                // Detect error patterns in the FC response
                 const responseLines = response.split('\n');
                 for (const rl of responseLines) {
                     const trimmed = rl.trim();
                     if (trimmed.length === 0) continue;
-                    // Skip the command echo
                     if (trimmed === line) continue;
-                    // Skip prompt-only lines
                     if (trimmed === '#' || trimmed === '# ') continue;
 
                     if (trimmed.includes('### ERROR:') ||
@@ -376,28 +338,14 @@ const BackupRestore = {
         return { errors };
     },
 
-    /**
-     * Save and reboot after restore. Call this after performRestore when
-     * the user confirms they want to keep the restored settings.
-     */
     async saveAndReboot() {
         await this._saveCli();
     },
 
-    /**
-     * Abort restore: exit CLI without saving. The FC will reboot with
-     * previous settings.
-     */
     async abortRestore() {
         await this._exitCli();
     },
 
-    /**
-     * Restore from a user-chosen file.
-     * Opens a file picker starting at the default backup directory.
-     * @param {function} onProgress - Optional callback for status updates
-     * @returns {Promise<boolean>} true if restore was performed, false if cancelled
-     */
     async performRestoreFromFile(onProgress) {
         if (!CONFIGURATOR.connection) {
             throw new Error('Not connected to flight controller');
@@ -427,18 +375,13 @@ const BackupRestore = {
         return true;
     },
 
-    /**
-     * Clean diff all output: remove command echo, ANSI escapes, and trailing prompt.
-     */
     _cleanDiffOutput(raw) {
         let lines = raw.split('\n');
 
-        // Remove first line if it's the command echo
         if (lines.length > 0 && lines[0].includes('diff all')) {
             lines.shift();
         }
 
-        // Remove trailing prompt lines
         while (lines.length > 0) {
             const last = lines[lines.length - 1].trim();
             if (last === '#' || last === '# ' || last === '') {
@@ -448,17 +391,10 @@ const BackupRestore = {
             }
         }
 
-        // Remove ANSI escape sequences
         const ansiRegex = /\x1B\[[0-9;]*[A-Za-z]/g;
         return lines.map(line => line.replace(ansiRegex, '')).join('\n') + '\n';
     },
 
-    /**
-     * Determine the type of version change.
-     * @param {string} fromVersion - e.g. "9.0.0"
-     * @param {string} toVersion - e.g. "9.0.1"
-     * @returns {'major'|'minor'|'patch'|'same'|null}
-     */
     getVersionChangeType(fromVersion, toVersion) {
         if (!fromVersion || !toVersion) return null;
         if (!semver.valid(fromVersion) || !semver.valid(toVersion)) return null;
@@ -466,28 +402,16 @@ const BackupRestore = {
         return semver.diff(fromVersion, toVersion);
     },
 
-    /**
-     * Check if auto-restore is safe for the given version change.
-     * Minor and patch updates are safe (INAV policy: 100% settings compatible).
-     * Major updates are NOT safe for auto-restore.
-     */
     isAutoRestoreSafe(fromVersion, toVersion) {
         const changeType = this.getVersionChangeType(fromVersion, toVersion);
         return changeType === 'minor' || changeType === 'patch' ||
                changeType === 'prepatch' || changeType === 'preminor';
     },
 
-    /**
-     * Get the last auto-backup info (set during flash process).
-     * @returns {{filePath: string, version: string, data: string}|null}
-     */
     getLastAutoBackup() {
         return lastAutoBackup;
     },
 
-    /**
-     * Clear the last auto-backup info.
-     */
     clearLastAutoBackup() {
         lastAutoBackup = null;
     },
@@ -522,16 +446,12 @@ const BackupRestore = {
                 }
             }
 
-            // Detect prompt return after diff all output: line ending with '# '
-            // The prompt appears after all diff output is complete
             if (lineBuffer.endsWith('# ') && outputBuffer.length > 20) {
                 if (timeoutHandle) {
                     clearTimeout(timeoutHandle);
                 }
                 connection.removeOnReceiveCallback(receiveCallback);
 
-                // Extract the real FC version from the diff all header
-                // e.g. "# INAV/MATEKF765 7.1.2 May 15 2024 / 12:00:00 (abc123)"
                 const versionMatch = outputBuffer.match(/INAV\/\S+\s+(\d+\.\d+\.\d+)/);
                 if (versionMatch) {
                     FC.CONFIG.flightControllerVersion = versionMatch[1];
@@ -542,7 +462,6 @@ const BackupRestore = {
 
                 if (onProgress) onProgress('backupRestoreStatusSavingFile');
 
-                // Save to default backup directory
                 self._saveAutoBackup(cleanedOutput).then(function(result) {
                     lastAutoBackup = result;
                     console.log('Auto-backup saved to: ' + result.filePath);
@@ -550,7 +469,6 @@ const BackupRestore = {
                     done();
                 }).catch(function(err) {
                     console.error('Auto-backup failed to save:', err);
-                    // Don't block the flash process even if backup save fails
                     done();
                 });
             }
@@ -558,14 +476,12 @@ const BackupRestore = {
 
         connection.addOnReceiveCallback(receiveCallback);
 
-        // Timeout: if diff all takes too long, proceed anyway
         timeoutHandle = setTimeout(function() {
             console.warn('Auto-backup timed out, proceeding with flash');
             connection.removeOnReceiveCallback(receiveCallback);
             done();
         }, BACKUP_TIMEOUT_MS);
 
-        // Send diff all command
         const cmd = 'diff all\n';
         const buf = new ArrayBuffer(cmd.length);
         const view = new Uint8Array(buf);
@@ -575,10 +491,6 @@ const BackupRestore = {
         connection.send(buf);
     },
 
-    /**
-     * Save auto-backup data to the default backup directory.
-     * @private
-     */
     async _saveAutoBackup(cleanedOutput) {
         const version = FC.CONFIG.flightControllerVersion || 'unknown';
         const backupDir = await window.electronAPI.getBackupDir();
@@ -593,17 +505,11 @@ const BackupRestore = {
             throw new Error('Failed to write backup file: ' + err);
         }
 
-        // Prune old auto-backups: keep only the 10 most recent UPDATE_ files
         await this._pruneAutoBackups(backupDir, 10);
 
         return { filePath, version, data: fileContent };
     },
 
-    /**
-     * Keep only the N most recent auto-backup files (UPDATE_ prefix with standard naming).
-     * Files that have been renamed by the user are not touched.
-     * @private
-     */
     async _pruneAutoBackups(backupDir, maxKeep) {
         const AUTO_BACKUP_PATTERN = /^UPDATE_inav_backup_.*_\d{4}-\d{2}-\d{2}_\d{6}\.txt$/;
 
@@ -612,8 +518,6 @@ const BackupRestore = {
             const autoBackups = allFiles
                 .filter(f => AUTO_BACKUP_PATTERN.test(f))
                 .sort(function(a, b) {
-                    // Sort by timestamp portion (YYYY-MM-DD_HHMMSS) to avoid
-                    // version strings affecting order (e.g. "7.1.2" < "9.0.1")
                     var tsA = a.match(/(\d{4}-\d{2}-\d{2}_\d{6})\.txt$/);
                     var tsB = b.match(/(\d{4}-\d{2}-\d{2}_\d{6})\.txt$/);
                     return (tsA ? tsA[1] : a).localeCompare(tsB ? tsB[1] : b);
@@ -631,13 +535,6 @@ const BackupRestore = {
         }
     },
 
-    /**
-     * Create an onCliReady handler for STM32 flash options.
-     * This handler will capture diff all output while CLI is active during the flash process.
-     *
-     * @param {function} onProgress - Optional progress callback
-     * @returns {function} onCliReady handler for STM32 options
-     */
     createOnCliReadyHandler(onProgress) {
         const self = this;
         return function(connection, done) {
