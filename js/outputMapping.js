@@ -86,18 +86,31 @@ var OutputMappingCollection = function () {
 
         for (let i = 0; i < data.length; i++) {
             timerMap[i] = null;
+        }
 
-            if (servosToGo > 0 && BitHelper.bit_check(data[i]['usageFlags'], TIM_USE_LED)) {
-                console.log(i + ": LED");
-                timerMap[i] = OUTPUT_TYPE_LED;
-            } else if (servosToGo > 0 && BitHelper.bit_check(data[i]['usageFlags'], TIM_USE_SERVO)) {
-                console.log(i + ": SERVO");
-                servosToGo--;
-                timerMap[i] = OUTPUT_TYPE_SERVO;
-            } else if (motorsToGo > 0 && BitHelper.bit_check(data[i]['usageFlags'], TIM_USE_MOTOR)) {
-                console.log(i + ": MOTOR");
-                motorsToGo--;
-                timerMap[i] = OUTPUT_TYPE_MOTOR;
+        // Two priority passes: dedicated outputs first, then auto.
+        // Matches firmware pwmBuildTimerOutputList() behavior.
+        for (let priority = 0; priority < 2; priority++) {
+            let isDedicated = (priority === 0);
+
+            for (let i = 0; i < data.length; i++) {
+                if (timerMap[i] !== null) continue;
+
+                let flags = data[i]['usageFlags'];
+                let timerId = data[i]['timerId'];
+                let mode = timerOverrides[timerId] || self.TIMER_OUTPUT_MODE_AUTO;
+
+                if (motorsToGo > 0 && BitHelper.bit_check(flags, TIM_USE_MOTOR)
+                        && (isDedicated ? mode === self.TIMER_OUTPUT_MODE_MOTORS : mode !== self.TIMER_OUTPUT_MODE_MOTORS)) {
+                    timerMap[i] = OUTPUT_TYPE_MOTOR;
+                    motorsToGo--;
+                } else if (servosToGo > 0 && BitHelper.bit_check(flags, TIM_USE_SERVO)
+                        && (isDedicated ? mode === self.TIMER_OUTPUT_MODE_SERVOS : mode !== self.TIMER_OUTPUT_MODE_SERVOS)) {
+                    timerMap[i] = OUTPUT_TYPE_SERVO;
+                    servosToGo--;
+                } else if (!isDedicated && BitHelper.bit_check(flags, TIM_USE_LED)) {
+                    timerMap[i] = OUTPUT_TYPE_LED;
+                }
             }
         }
 

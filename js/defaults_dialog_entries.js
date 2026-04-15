@@ -391,6 +391,10 @@ var defaultsDialogData = [
                 value: 3
             },
             {
+                key: "looptime",
+                value: 1000
+            },
+            {
                 key: "gyro_hardware_lpf",
                 value: "256HZ"
             },
@@ -535,7 +539,7 @@ var defaultsDialogData = [
                 value: 25
             },
             {
-                key: "set nav_fw_alt_control_response",
+                key: "nav_fw_alt_control_response",
                 value: 45
             },
             {
@@ -610,6 +614,10 @@ var defaultsDialogData = [
             {
                 key: "applied_defaults",
                 value: 4
+            },
+            {
+                key: "looptime",
+                value: 1000
             },
             {
                 key: "gyro_hardware_lpf",
@@ -756,7 +764,7 @@ var defaultsDialogData = [
                 value: 25
             },
             {
-                key: "set nav_fw_alt_control_response",
+                key: "nav_fw_alt_control_response",
                 value: 45
             },
             {
@@ -823,6 +831,10 @@ var defaultsDialogData = [
             {
                 key: "model_preview_type",
                 value: 31
+            },
+            {
+                key: "looptime",
+                value: 1000
             },
             {
                 key: "gyro_hardware_lpf",
