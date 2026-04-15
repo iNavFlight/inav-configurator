@@ -452,17 +452,17 @@ GUI_control.prototype.sliderize = function ($input, value, min, max) {
 GUI_control.prototype.update_dataflash_global = function () {
     function formatFilesize(bytes) {
         if (bytes < 1024) {
-            return bytes + "B";
+            return Math.round(bytes / 1024) + " KB";
         }
         var kilobytes = bytes / 1024;
 
         if (kilobytes < 1024) {
-            return Math.round(kilobytes) + "kB";
+            return Math.round(kilobytes) + " KB";
         }
 
         var megabytes = kilobytes / 1024;
 
-        return megabytes.toFixed(1) + "MB";
+        return megabytes.toFixed(1) + " MB";
     }
 
     var supportsDataflash = FC.DATAFLASH.totalSize > 0;
@@ -480,7 +480,7 @@ GUI_control.prototype.update_dataflash_global = function () {
         width: (100-(FC.DATAFLASH.totalSize - FC.DATAFLASH.usedSize) / FC.DATAFLASH.totalSize * 100) + "%",
         display: 'block'
         });
-        $(".dataflash-free_global div").html(i18n.getMessage('sensorDataFlashFreeSpace') + formatFilesize(FC.DATAFLASH.totalSize - FC.DATAFLASH.usedSize));
+        $(".dataflash-free_global_label").html(i18n.getMessage('sensorDataFlashFreeSpace') + formatFilesize(FC.DATAFLASH.totalSize - FC.DATAFLASH.usedSize) + " free");
     } else {
         $(".noflash_global").css({
         display: 'block'
