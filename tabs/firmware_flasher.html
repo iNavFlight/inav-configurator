@@ -1,4 +1,67 @@
 <div class="tab-firmware_flasher toolbar_fixed_bottom">
+    <!-- Restore overlay: blocks UI during restore operation -->
+    <div id="restore-overlay" class="is-hidden">
+        <div class="restore-overlay__content">
+            <div class="restore-overlay__title" i18n="backupRestoreOverlayTitle"></div>
+            <div class="restore-overlay__status" i18n="backupRestoreStatusEnteringCli"></div>
+            <div class="restore-overlay__progress-bar">
+                <div class="restore-overlay__progress-fill"></div>
+            </div>
+            <div class="restore-overlay__progress-text">0 / 0</div>
+        </div>
+    </div>
+
+    <!-- Version warning overlay: shown when minor/major update without chip erase -->
+    <div id="version-warning-overlay" class="is-hidden">
+        <div class="version-warning-overlay__content">
+            <div class="version-warning-overlay__title" i18n="firmwareFlasherVersionWarningTitle"></div>
+            <div class="version-warning-overlay__text"></div>
+            <div class="version-warning-overlay__buttons">
+                <a class="version-warning-overlay__btn version-warning-overlay__btn--continue" href="#" i18n="firmwareFlasherVersionWarningContinue"></a>
+                <a class="version-warning-overlay__btn version-warning-overlay__btn--cancel" href="#" i18n="firmwareFlasherVersionWarningCancel"></a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirm overlay: ask user if they want to auto-restore after flash -->
+    <div id="restore-confirm-overlay" class="is-hidden">
+        <div class="restore-confirm-overlay__content">
+            <div class="restore-confirm-overlay__title" i18n="backupRestoreAutoRestoreConfirm"></div>
+            <div class="restore-confirm-overlay__status"></div>
+            <div class="restore-confirm-overlay__buttons">
+                <a class="restore-confirm-overlay__btn restore-confirm-overlay__btn--no" href="#" i18n="backupRestoreAutoRestoreNo"></a>
+                <a class="restore-confirm-overlay__btn restore-confirm-overlay__btn--yes" href="#" i18n="backupRestoreAutoRestoreYes"></a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Error dialog: shown after restore if errors were detected -->
+    <div id="restore-error-dialog" class="is-hidden">
+        <div class="restore-error-dialog__content">
+            <div class="restore-error-dialog__title" i18n="backupRestoreErrorTitle"></div>
+            <div class="restore-error-dialog__text" i18n="backupRestoreErrorText"></div>
+            <div class="restore-error-dialog__errors"></div>
+            <div class="restore-error-dialog__buttons">
+                <a class="restore-error-dialog__btn restore-error-dialog__btn--abort" href="#" i18n="backupRestoreErrorAbort"></a>
+                <a class="restore-error-dialog__btn restore-error-dialog__btn--save" href="#" i18n="backupRestoreErrorSave"></a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Migration preview overlay: shown before restore when migration is needed -->
+    <div id="migration-preview-overlay" class="is-hidden">
+        <div class="migration-preview__content">
+            <div class="migration-preview__title" i18n="migrationPreviewTitle"></div>
+            <div class="migration-preview__subtitle"></div>
+            <div class="migration-preview__changes"></div>
+            <div class="migration-preview__warnings"></div>
+            <div class="migration-preview__buttons">
+                <a class="migration-preview__btn migration-preview__btn--cancel" href="#" i18n="migrationPreviewCancel"></a>
+                <a class="migration-preview__btn migration-preview__btn--continue" href="#" i18n="migrationPreviewContinue"></a>
+            </div>
+        </div>
+    </div>
+
     <div class="content_wrapper">
         <div class="options gui_box">
             <div class="spacer">
@@ -126,6 +189,15 @@
         </div>
         <div class="btn">
             <a class="flash_firmware disabled" href="#progressbar" i18n="firmwareFlasherFlashFirmware"></a>
+        </div>
+        <div class="btn">
+            <a class="backup_config" href="#" i18n="backupRestoreButtonBackup"></a>
+        </div>
+        <div class="btn">
+            <a class="restore_config" href="#" i18n="backupRestoreButtonRestore"></a>
+        </div>
+        <div class="btn">
+            <a class="open_backups_folder" href="#" i18n="backupRestoreOpenBackupsFolder"></a>
         </div>
     </div>
 </div>

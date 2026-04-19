@@ -1,0 +1,25 @@
+{
+    "fromVersion": "8",
+    "toVersion": "9",
+    "description": "INAV 8.0 → 9.0 migration profile",
+
+    "commandRenames": {
+        "controlrate_profile": "use_control_profile"
+    },
+
+    "settingRenames": {
+        "mixer_pid_profile_linking": "mixer_control_profile_linking",
+        "osd_pan_servo_pwm2centideg": "osd_pan_servo_range_decadegrees"
+    },
+
+    "valueReplacements": {},
+
+    "removed": [],
+
+    "settingPatternMappings": [],
+
+    "warnings": [
+        "Position estimator defaults changed: w_z_baro_v 0.1→0.35, inav_w_z_gps_p 0.2→0.35, inav_w_z_gps_v 0.1→0.35. Review if you had custom values.",
+        "ahrs_acc_ignore_rate default changed from 20 to 15."
+    ]
+}

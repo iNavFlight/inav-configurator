@@ -128,6 +128,7 @@ STM32DFU_protocol.prototype.openDevice = function () {
         if(GUI.operating_system === 'Linux') {
             GUI.log(i18n.getMessage('usbDeviceUdevNotice'));
         }
+        GUI.connect_lock = false;
     });
 };
 

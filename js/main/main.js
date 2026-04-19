@@ -1,11 +1,11 @@
-import { chmod, rm } from 'node:fs';
+import { chmod, rm, mkdirSync, existsSync } from 'node:fs';
 import { app, BrowserWindow, ipcMain, Menu, MenuItem, shell, dialog } from 'electron';
 import windowStateKeeper from 'electron-window-state';
 import Store from "electron-store";
 import path from 'path';
 import { fileURLToPath } from 'node:url';
 import started from 'electron-squirrel-startup';
-import { writeFile, readFile, appendFile } from 'node:fs/promises';
+import { writeFile, readFile, appendFile, readdir } from 'node:fs/promises';
 
 import tcp from './tcp';
 import udp from './udp';
@@ -410,6 +410,32 @@ app.whenReady().then(() => {
         }
       });
     });
+  });
+
+  ipcMain.handle('getBackupDir', (_event) => {
+    const backupDir = path.join(app.getPath('userData'), 'inav-backups');
+    if (!existsSync(backupDir)) {
+      mkdirSync(backupDir, { recursive: true });
+    }
+    return backupDir;
+  });
+
+  ipcMain.handle('openBackupDir', async (_event) => {
+    const backupDir = path.join(app.getPath('userData'), 'inav-backups');
+    if (!existsSync(backupDir)) {
+      mkdirSync(backupDir, { recursive: true });
+    }
+    await shell.openPath(backupDir);
+    return backupDir;
+  });
+
+  ipcMain.handle('listBackups', async (_event) => {
+    const backupDir = path.join(app.getPath('userData'), 'inav-backups');
+    if (!existsSync(backupDir)) {
+      return [];
+    }
+    const files = await readdir(backupDir);
+    return files.filter(f => f.endsWith('.txt') || f.endsWith('.cli'));
   });
 
   ipcMain.on('startChildProcess', (_event, command, args, opts) => {
