@@ -662,7 +662,8 @@ OSD.constants = {
         'AVATAR',
         'BF43COMPAT',
         'BFHDCOMPAT',
-        'DJI_NATIVE'
+        'DJI_NATIVE',
+        'AUTOHD'
     ],
     VIDEO_LINES: {
         PAL: 16,
@@ -672,6 +673,7 @@ OSD.constants = {
         AVATAR: 20,
         BF43COMPAT: 16,
         BFHDCOMPAT: 20,
+        AUTOHD:22,
         DJI_NATIVE: 20
     },
     VIDEO_COLS: {
@@ -682,7 +684,8 @@ OSD.constants = {
         AVATAR: 53,
         BF43COMPAT: 30,
         BFHDCOMPAT: 53,
-        DJI_NATIVE: 53,
+        AUTOHD:60,
+        DJI_NATIVE: 53
     },
     VIDEO_BUFFER_CHARS: {
         PAL: 480,
@@ -692,6 +695,7 @@ OSD.constants = {
         AVATAR: 1060,
         BF43COMPAT: 480,
         BFHDCOMPAT: 1060,
+        AUTOHD: 1320,
         DJI_NATIVE: 1060
     },
     UNIT_TYPES: [
@@ -2513,6 +2517,14 @@ OSD.updateDisplaySize = function () {
     $('.preview').toggleClass('preview_hdzero cut43_left', (video_type == 'HDZERO'))
     $('.third_right').toggleClass('preview_hdzero_side', (video_type == 'HDZERO'))
     // -- BFHDCOMPAT
+    $('.third_left').toggleClass('preview_bfhdcompat_side', (video_type == 'BFHDCOMPAT'))
+    $('.preview').toggleClass('preview_bfhdcompat cut43_left', (video_type == 'BFHDCOMPAT'))
+    $('.third_right').toggleClass('preview_bfhdcompat_side', (video_type == 'BFHDCOMPAT'))
+    // -- AUTOHD
+    $('.third_left').toggleClass('preview_autohd_side', video_type == 'AUTOHD')
+    $('.preview').toggleClass('preview_autohd cut43_left', video_type == 'AUTOHD')
+    $('.third_right').toggleClass('preview_autohd_side', video_type == 'AUTOHD')
+ 
     $('.third_left').toggleClass('preview_bfhdcompat_side', (video_type == 'BFHDCOMPAT' || video_type == 'DJI_NATIVE'))
     $('.preview').toggleClass('preview_bfhdcompat cut43_left', (video_type == 'BFHDCOMPAT' || video_type == 'DJI_NATIVE'))
     $('.third_right').toggleClass('preview_bfhdcompat_side', (video_type == 'BFHDCOMPAT' || video_type == 'DJI_NATIVE'))
@@ -2807,7 +2819,9 @@ OSD.GUI.checkAndProcessSymbolPosition = function(pos, charCode) {
     }
 };
 
-const mspVideoSystem = [1,3,4,5,6,7,8];   // indexes of PAL, HDZERO, DJIWTF, AVATAR, BF43COMPAT, BFHDCOMPAT & DJI_NATIVE
+
+const mspVideoSystem = [1,3,4,5,6,7,8,9];   // indexes of PAL, HDZERO, DJIWTF, AVATAR, BF43COMPAT,  BFHDCOMPAT, AUTOHD & DJI_NATIVE
+
 const analogVideoSystem = [0,1,2];  // indexes of AUTO, PAL, & NTSC
 
 OSD.GUI.updateVideoMode = function() {
