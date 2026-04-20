@@ -1895,6 +1895,12 @@ OSD.constants = {
                                 return 'FD  142'  + FONT.symbol(SYM.ALT_M) + FONT.symbol(SYM.DIR_TO_HOME);
                         }
                     }
+                },
+                {
+                    name: 'GPS_EXTRA_STATS',
+                    id: 169,
+                    min_version: '9.0.1',                    
+                   preview: '0' + FONT.symbol(SYM.SYM_HUD_SIGNAL_3) + '0' + FONT.symbol(SYM.SYM_HUD_SIGNAL_3) + '0' + FONT.symbol(SYM.SYM_HUD_SIGNAL_3) + '0'+ FONT.symbol(SYM.SYM_HUD_SIGNAL_3) + FONT.symbol(SYM.SNR) + '99'
                 }
             ]
         },
