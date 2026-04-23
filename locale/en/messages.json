@@ -3710,6 +3710,12 @@
     "osd_home_position_arm_screen": {
         "message": "Home Position on Arming Screen"
     },
+    "osd_framerate_hz": {
+        "message": "OSD Framerate (Hz)"
+    },
+    "osd_framerate_hz_help": {
+        "message": "Target refresh rate for OSD elements in Hz. Each element is redrawn at approximately this rate. Values above 10 Hz provide no visible improvement for typical flight data but increase CPU load. Artificial horizon and telemetry are always updated every cycle regardless of this setting. Set to -1 for legacy behavior (one element per frame)."
+    },
     "osd_hud_settings": {
         "message": "Heads-up Display settings"
     },
