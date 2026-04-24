@@ -724,10 +724,10 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
             }
 
             if (FC.MIXER_CONFIG.platformType == PLATFORM.MULTIROTOR || FC.MIXER_CONFIG.platformType == PLATFORM.TRICOPTER) {
-                $('#motor_direction_inverted').parent().removeClass("is-hidden");
+                $('#motor_direction_container').removeClass("is-hidden");
                 $('#platform-type').parent('.select').removeClass('no-bottom-border');
             } else {
-                $('#motor_direction_inverted').parent().addClass("is-hidden");
+                $('#motor_direction_container').addClass("is-hidden");
                 $('#platform-type').parent('.select').addClass('no-bottom-border');
             }
 
