@@ -67,6 +67,7 @@ $(function() {
         globalSettings.unitType = store.get('unit_type', UnitType.none);
         globalSettings.mapProviderType = store.get('map_provider_type', 'osm'); 
         globalSettings.assistnowApiKey = store.get('assistnow_api_key', '');
+        globalSettings.googleApiKey = store.get('google_api_key', '');
         globalSettings.proxyURL = store.get('proxyurl', 'http://192.168.1.222/mapproxy/service?');
         globalSettings.proxyLayer = store.get('proxylayer', 'your_proxy_layer_name');
         globalSettings.showProfileParameters = store.get('show_profile_parameters', 1);
@@ -465,6 +466,112 @@ $(function() {
                     $('#assistnow-api-key').on('change', function () {
                         store.set('assistnow_api_key', $(this).val());
                         globalSettings.assistnowApiKey = $(this).val();
+                    });
+                    $('#google-api-key').val(globalSettings.googleApiKey);
+                    $('#google-api-key').on('change', function () {
+                        store.set('google_api_key', $(this).val());
+                        globalSettings.googleApiKey = $(this).val();
+                    });
+
+                    // Google Location Services: Help button
+                    // Shows a popup explaining how to obtain a Google Geolocation API key
+                    // and what benefit it provides in the Mission Control tab.
+                    $('#google-api-key-help').on('click', function (e) {
+                        e.preventDefault();
+                        var helpHtml =
+                            '<div id="googleApiHelpBackdrop" style="position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:10000;display:flex;align-items:center;justify-content:center;">' +
+                            '<div id="googleApiHelpDialog" style="background:#fff;border-radius:6px;padding:1.5em 2em;max-width:520px;width:90%;max-height:80vh;overflow-y:auto;box-shadow:0 4px 24px rgba(0,0,0,0.3);font-size:0.95em;line-height:1.5;">' +
+                            '<h3 style="margin:0 0 0.75em 0;color:#333;">' + i18n.getMessage('googleLocationHelpTitle') + '</h3>' +
+                            '<p>' + i18n.getMessage('googleLocationHelpBenefit') + '</p>' +
+                            '<p><strong>' + i18n.getMessage('googleLocationHelpHowTitle') + '</strong></p>' +
+                            '<ol style="padding-left:1.2em;margin:0.5em 0;">' +
+                            '<li>' + i18n.getMessage('googleLocationHelpStep1') + '</li>' +
+                            '<li>' + i18n.getMessage('googleLocationHelpStep2') + '</li>' +
+                            '<li>' + i18n.getMessage('googleLocationHelpStep3') + '</li>' +
+                            '<li>' + i18n.getMessage('googleLocationHelpStep4') + '</li>' +
+                            '<li>' + i18n.getMessage('googleLocationHelpStep5') + '</li>' +
+                            '</ol>' +
+                            '<p style="margin-top:0.75em;color:#666;font-size:0.9em;">' + i18n.getMessage('googleLocationHelpNote') + '</p>' +
+                            '<div style="text-align:right;margin-top:1em;"><a href="#" id="googleApiHelpClose" style="color:#5880a0;font-weight:bold;text-decoration:none;">' + i18n.getMessage('googleLocationHelpClose') + '</a></div>' +
+                            '</div></div>';
+                        $('body').append(helpHtml);
+                        $('#googleApiHelpBackdrop').on('click', function (ev) {
+                            if (ev.target === this) $(this).remove();
+                        });
+                        $('#googleApiHelpClose').on('click', function (ev) {
+                            ev.preventDefault();
+                            $('#googleApiHelpBackdrop').remove();
+                        });
+                    });
+
+                    // Google Location Services: Test button
+                    // Calls the Google Geolocation API with the entered key and shows
+                    // success (with coordinates + accuracy) or the error message.
+                    $('#google-api-key-test').on('click', function (e) {
+                        e.preventDefault();
+                        var apiKey = $('#google-api-key').val() || globalSettings.googleApiKey;
+                        var $result = $('#google-api-key-result');
+                        if (!apiKey) {
+                            $result.text(i18n.getMessage('googleLocationTestNoKey'))
+                                   .css({ color: '#c00', background: '#fff3f3' }).show();
+                            return;
+                        }
+                        $result.text('Testing...').css({ color: '#666', background: '#f5f5f5' }).show();
+                        fetch('https://www.googleapis.com/geolocation/v1/geolocate?key=' + apiKey, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ considerIp: true })
+                        })
+                        .then(function (r) { return r.json(); })
+                        .then(function (data) {
+                            if (data.location) {
+                                var locMsg = i18n.getMessage('googleLocationTestSuccess', [
+                                    data.location.lat.toFixed(4),
+                                    data.location.lng.toFixed(4),
+                                    Math.round(data.accuracy)
+                                ]);
+                                $result.html(locMsg).css({ color: '#080', background: '#f0fff0' });
+
+                                // Also test the Weather API with the returned coordinates
+                                var weatherUrl = 'https://weather.googleapis.com/v1/currentConditions:lookup?key=' + apiKey
+                                    + '&location.latitude=' + data.location.lat
+                                    + '&location.longitude=' + data.location.lng;
+                                fetch(weatherUrl)
+                                    .then(function (wr) { return wr.json(); })
+                                    .then(function (wd) {
+                                        if (wd.wind && wd.wind.speed) {
+                                            var windVal = wd.wind.speed.value;
+                                            var windUnit = wd.wind.speed.unit === 'KILOMETERS_PER_HOUR' ? 'km/h' : 'mph';
+                                            var weatherMsg = i18n.getMessage('googleLocationTestWeather', [
+                                                windVal, windUnit
+                                            ]);
+                                            $result.html(locMsg + '<br>' + weatherMsg);
+                                        } else if (wd.error) {
+                                            var warnMsg = i18n.getMessage('googleLocationTestWeatherFail', [
+                                                wd.error.message || JSON.stringify(wd.error)
+                                            ]);
+                                            $result.html(locMsg + '<br><span style="color:#c00;">' + warnMsg + '</span>');
+                                        } else {
+                                            var warnMsg = i18n.getMessage('googleLocationTestWeatherFail', [
+                                                'Unexpected response'
+                                            ]);
+                                            $result.html(locMsg + '<br><span style="color:#c00;">' + warnMsg + '</span>');
+                                        }
+                                    })
+                                    .catch(function (werr) {
+                                        var warnMsg = i18n.getMessage('googleLocationTestWeatherFail', [werr.message]);
+                                        $result.html(locMsg + '<br><span style="color:#c00;">' + warnMsg + '</span>');
+                                    });
+                            } else {
+                                var errMsg = (data.error && data.error.message) || JSON.stringify(data);
+                                $result.text(i18n.getMessage('googleLocationTestError', [errMsg]))
+                                       .css({ color: '#c00', background: '#fff3f3' });
+                            }
+                        })
+                        .catch(function (err) {
+                            $result.text(i18n.getMessage('googleLocationTestError', [err.message]))
+                                   .css({ color: '#c00', background: '#fff3f3' });
+                        });
                     });
  
                     $('#demoModeReset').on('click', function () {

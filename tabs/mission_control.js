@@ -124,8 +124,10 @@ TABS.mission_control.initialize = function (callback) {
     let breadCrumbVector;
     let autoCenteredOnFix = false;
     let lastGpsPos = null;
+    let googleGeoPos = null;  // Cached position from Google Geolocation API (rough, IP-based)
     let infoOverlayEl;
     let infoOverlaySpans;
+    let apiOverlayEl;   // Temporary banner for Google API location (shown until drone GPS locks)
     let isOffline = false;
     let selectedSafehome;
     let $safehomeContentBox;
@@ -144,7 +146,135 @@ TABS.mission_control.initialize = function (callback) {
         isGeozoneEnabeld = true;
     }
 
-    
+    //////////////////////////////////////////////////////////////////////////
+    // Conditions Information — fetch weather from Google Weather API
+    // Uses coordinates from either drone GPS (preferred) or Google API cache.
+    // Requires the same Google API key (with Weather API enabled).
+    //////////////////////////////////////////////////////////////////////////
+    let conditionsFetched = false;  // Prevent redundant fetches
+    function fetchConditionsInfo(lat, lng) {
+        if (!globalSettings.googleApiKey) {
+            $('#missionPlannerConditions').hide();
+            return;
+        }
+
+        // Use the app's unit preference to request matching units from Google
+        // unitType: 'imperial' → IMPERIAL, 'OSD' → check osdUnits (0=imperial, 1=metric)
+        // Anything else (metric, none) → default METRIC from the API
+        const useImperial = globalSettings.unitType === 'imperial'
+            || (globalSettings.unitType === 'OSD' && globalSettings.osdUnits === 0);
+        const url = 'https://weather.googleapis.com/v1/currentConditions:lookup'
+            + '?key=' + globalSettings.googleApiKey
+            + '&location.latitude=' + lat.toFixed(4)
+            + '&location.longitude=' + lng.toFixed(4)
+            + (useImperial ? '&unitsSystem=IMPERIAL' : '');
+
+        $('#conditionsLoading').text(i18n.getMessage('conditionsWaiting'));
+        $('#conditionsData').hide();
+        $('#conditionsError').hide();
+
+        fetch(url)
+            .then(function (r) { return r.json(); })
+            .then(function (data) {
+                // API error response
+                if (data.error) {
+                    console.log('Google Weather API error:', data.error.message);
+                    $('#missionPlannerConditions').hide();
+                    return;
+                }
+                if (!data.temperature) {
+                    $('#missionPlannerConditions').hide();
+                    return;
+                }
+
+                // Weather data loaded — show the panel
+                $('#missionPlannerConditions').show();
+
+                // Weather description (e.g. "Sunny", "Partly cloudy")
+                const desc = (data.weatherCondition && data.weatherCondition.description)
+                    ? data.weatherCondition.description.text : '—';
+                $('#condWeather').text(desc);
+
+                // Wind speed, gusts, direction
+                const windSpeed = data.wind ? data.wind.speed.value : 0;
+                const windUnit = data.wind ? data.wind.speed.unit : '';
+                const gustVal = (data.wind && data.wind.gust) ? data.wind.gust.value : 0;
+                const windDirDeg = (data.wind && data.wind.direction) ? data.wind.direction.degrees : 0;
+                const windCardinal = (data.wind && data.wind.direction) ? data.wind.direction.cardinal : '';
+
+                // Arrow characters for wind direction (shows where wind blows FROM)
+                const arrows = ['↓','↙','←','↗','↑','↗','→','↘'];
+                const idx = Math.round(windDirDeg / 45) % 8;
+                const unitLabel = windUnit === 'KILOMETERS_PER_HOUR' ? 'km/h' : 'mph';
+
+                $('#condWind').text(windSpeed + ' ' + unitLabel);
+                $('#condGusts').text(gustVal + ' ' + unitLabel);
+                const cardinalClean = windCardinal.replace(/_/g, ' ').toLowerCase()
+                    .replace(/\b\w/g, function (c) { return c.toUpperCase(); });
+                $('#condWindDir').text(arrows[idx] + ' From ' + cardinalClean + ' (' + windDirDeg + '°)');
+
+                // Temperature & feels‐like
+                const tempDeg = data.temperature.degrees;
+                const tempUnit = data.temperature.unit === 'CELSIUS' ? '°C' : '°F';
+                const feelsLike = data.feelsLikeTemperature ? data.feelsLikeTemperature.degrees : null;
+                $('#condTemp').text(tempDeg + ' ' + tempUnit);
+                $('#condFeelsLike').text(feelsLike != null ? (feelsLike + ' ' + tempUnit) : '—');
+
+                // Humidity
+                $('#condHumidity').text(data.relativeHumidity + ' %');
+
+                // UV Index
+                const uv = data.uvIndex != null ? data.uvIndex : '—';
+                $('#condUV').text(uv);
+                if (uv !== '—') {
+                    if (uv <= 2)       { $('#condUV').css('color', '#4caf50'); }
+                    else if (uv <= 5)  { $('#condUV').css('color', '#ff9800'); }
+                    else if (uv <= 7)  { $('#condUV').css('color', '#f57c00'); }
+                    else               { $('#condUV').css('color', '#f44336'); }
+                }
+
+                // Precipitation
+                const precip = (data.precipitation && data.precipitation.qpf)
+                    ? data.precipitation.qpf.quantity : 0;
+                const precipUnit = (data.precipitation && data.precipitation.qpf)
+                    ? (data.precipitation.qpf.unit === 'MILLIMETERS' ? 'mm' : 'in') : 'mm';
+                $('#condPrecip').text(precip + ' ' + precipUnit);
+
+                // Thunderstorm probability
+                const thunder = data.thunderstormProbability != null ? data.thunderstormProbability : 0;
+                $('#condThunder').text(thunder + ' %');
+                if (thunder > 30) { $('#condThunder').css('color', '#f44336'); }
+                else if (thunder > 10) { $('#condThunder').css('color', '#ff9800'); }
+
+                // Visibility
+                const visDist = data.visibility ? data.visibility.distance : '—';
+                const visUnit = (data.visibility && data.visibility.unit === 'KILOMETERS') ? 'km' : 'mi';
+                $('#condVisibility').text(visDist + ' ' + visUnit);
+
+                // Cloud cover
+                $('#condCloud').text((data.cloudCover != null ? data.cloudCover : '—') + ' %');
+
+                // Color-code wind speed (thresholds in km/h, convert if imperial)
+                const wsKmh = (windUnit === 'KILOMETERS_PER_HOUR') ? windSpeed : windSpeed * 1.609;
+                if (wsKmh < 20)      { $('#condWind').css('color', '#4caf50'); }
+                else if (wsKmh < 35) { $('#condWind').css('color', '#ff9800'); }
+                else                 { $('#condWind').css('color', '#f44336'); }
+
+                const gsKmh = (windUnit === 'KILOMETERS_PER_HOUR') ? gustVal : gustVal * 1.609;
+                if (gsKmh < 25)      { $('#condGusts').css('color', '#4caf50'); }
+                else if (gsKmh < 45) { $('#condGusts').css('color', '#ff9800'); }
+                else                 { $('#condGusts').css('color', '#f44336'); }
+
+                $('#conditionsLoading').hide();
+                $('#conditionsData').show();
+                conditionsFetched = true;
+            })
+            .catch(function (err) {
+                console.log('Google Weather fetch failed:', err.message);
+                $('#conditionsLoading').hide();
+                $('#conditionsError').text(i18n.getMessage('conditionsUnavailable')).show();
+            });
+    }
 
     if (CONFIGURATOR.connectionValid) {
         var loadChainer = new MSPChainerClass();
@@ -230,9 +360,12 @@ function iconKey(filename) {
             $('#saveMissionButton').hide();
             $('#loadEepromMissionButton').hide();
             $('#saveEepromMissionButton').hide();
+            // Hide center button initially when offline; will be shown if Google API key
+            // is configured and returns a valid location (see initMap probing below)
             $('#centerOnDrone').hide();
             isOffline = true;
         } else {
+            // Connected to drone — show button (dimmed until GPS lock acquired)
             $('#centerOnDrone').show();
         }
 
@@ -450,14 +583,16 @@ function iconKey(filename) {
               lastGpsPos = gpsPos;
               $('#centerOnDrone').css({ opacity: 1, pointerEvents: 'auto' });
 
-                            // Uncomment to auto-center/zoom once when GPS lock is first acquired
-                            // if (!autoCenteredOnFix && map && map.getView()) {
-                            //     autoCenteredOnFix = true;
-                            //     map.getView().setCenter(gpsPos);
-                            //     if (map.getView().getZoom() < 14) {
-                            //         map.getView().setZoom(14);
-                            //     }
-                            // }
+                            // Auto-center/zoom once when drone GPS lock is first acquired
+                            if (!autoCenteredOnFix && map && map.getView()) {
+                                autoCenteredOnFix = true;
+                                map.getView().setCenter(gpsPos);
+                                if (map.getView().getZoom() < 14) {
+                                    map.getView().setZoom(14);
+                                }
+                                // Refresh conditions with precise drone GPS coordinates
+                                fetchConditionsInfo(lat, lon);
+                            }
 
               breadCrumbLS.appendCoordinate(gpsPos);
 
@@ -469,6 +604,11 @@ function iconKey(filename) {
               }
 
               curPosStyle.getImage().setRotation((FC.SENSOR_DATA.kinematics[2]/360.0) * 6.28318);
+
+                            // Drone has GPS lock — hide the API location banner (irrelevant now)
+                            if (apiOverlayEl) {
+                                apiOverlayEl.style.visibility = 'hidden';
+                            }
 
                             if (infoOverlayEl) {
                                 const latStr = lat.toFixed(latLonPrecision);
@@ -2550,7 +2690,95 @@ function iconKey(filename) {
         if (missionPlannerLastValues && missionPlannerLastValues.zoom && missionPlannerLastValues.center) {
             map.getView().setCenter(fromLonLat(missionPlannerLastValues.center));
             map.getView().setZoom(missionPlannerLastValues.zoom);
-        }         
+        }
+
+        //////////////////////////////////////////////////////////////////////////
+        // API location banner — created on map init so it exists even when
+        // offline (no drone connected). Shown temporarily when the user
+        // centers on the Google API position; hidden once drone GPS locks.
+        //////////////////////////////////////////////////////////////////////////
+        (function createApiOverlay() {
+            var targetEl = map.getTargetElement();
+            if (!targetEl) return;
+            if (!targetEl.style.position) targetEl.style.position = 'relative';
+            apiOverlayEl = document.createElement('div');
+            apiOverlayEl.className = 'mc-api-location-banner';
+            Object.assign(apiOverlayEl.style, {
+                position: 'absolute',
+                bottom: '1.125rem',
+                left: '0',
+                right: '0',
+                padding: '0.375rem 0.625rem',
+                background: 'rgba(80, 120, 160, 0.75)',
+                color: '#fff',
+                font: '600 0.9rem "Segoe UI", Calibri, sans-serif',
+                textShadow: '0 0 4px rgba(0, 0, 0, 0.8)',
+                textAlign: 'center',
+                display: 'flex',
+                justifyContent: 'center',
+                gap: '1.125rem',
+                alignItems: 'center',
+                flexWrap: 'wrap',
+                fontVariantNumeric: 'tabular-nums',
+                pointerEvents: 'none',
+                zIndex: 5,
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                visibility: 'hidden'
+            });
+            targetEl.appendChild(apiOverlayEl);
+        })();
+
+        //////////////////////////////////////////////////////////////////////////
+        // Google Geolocation API probe on map load
+        // If no drone GPS fix and a Google API key is configured, silently probe
+        // the API to get a rough IP-based position. On success, cache the result
+        // in googleGeoPos and enable the center button so the user can press it
+        // to jump to their approximate area. If the drone GPS later acquires a
+        // fix, it always takes priority over this cached position.
+        //////////////////////////////////////////////////////////////////////////
+        if (globalSettings.googleApiKey && !(FC.GPS_DATA && FC.GPS_DATA.fix >= 2)) {
+            fetch('https://www.googleapis.com/geolocation/v1/geolocate?key=' + globalSettings.googleApiKey, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ considerIp: true })
+            })
+            .then(function (r) { return r.json(); })
+            .then(function (data) {
+                if (data.location) {
+                    // Cache the rough position for use by the center button
+                    googleGeoPos = {
+                        coord: fromLonLat([data.location.lng, data.location.lat]),
+                        lat: data.location.lat,
+                        lng: data.location.lng,
+                        accuracy: data.accuracy
+                    };
+                    console.log('Google geolocation cached:', data.location.lat, data.location.lng,
+                                'accuracy:', data.accuracy, 'm');
+                    // If drone GPS still hasn't locked, show & enable the center button
+                    if (!lastGpsPos) {
+                        $('#centerOnDrone').show();
+                        $('#centerOnDrone').css({ opacity: 1, pointerEvents: 'auto' });
+                        // Auto-center on the rough API location when tab opens
+                        map.getView().setCenter(googleGeoPos.coord);
+                        if (map.getView().getZoom() < 10) {
+                            map.getView().setZoom(10);
+                        }
+                        // Show the API location banner so the user knows this is IP-based
+                        showApiLocationBanner();
+                    }
+                    // Fetch weather conditions for the approximate location
+                    if (!conditionsFetched) {
+                        fetchConditionsInfo(data.location.lat, data.location.lng);
+                    }
+                }
+            })
+            .catch(function (err) {
+                // Silently ignore — button stays hidden if no drone and API fails
+                console.log('Google geolocation unavailable:', err.message);
+            });
+        }
 
         //////////////////////////////////////////////////////////////////////////
         // Map on-click behavior definition
@@ -2831,6 +3059,20 @@ function iconKey(filename) {
             }
             else {
                 $('#InfoContent').fadeOut(300);
+            }
+        });
+
+        // Show/hide Conditions Information panel
+        $('#showHideConditionsButton').on('click', function () {
+            var src = ($(this).children().attr('class') === 'ic_hide')
+                ? 'ic_show'
+                : 'ic_hide';
+            $(this).children().attr('class', src);
+            if ($(this).children().attr('class') === 'ic_hide') {
+                $('#ConditionsContent').fadeIn(300);
+            }
+            else {
+                $('#ConditionsContent').fadeOut(300);
             }
         });
 
@@ -3780,32 +4022,54 @@ function iconKey(filename) {
                 $('#addressSearchBackdrop').remove();
 
                 if (address) {
-                    const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&limit=1`;
-                    
-                    fetch(url)
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data && data.length > 0) {
-                                const result = data[0];
-                                const coord = fromLonLat([parseFloat(result.lon), parseFloat(result.lat)]);
-                                map.getView().setCenter(coord);
-                                dialog.alert(`Found: ${result.display_name}`);
-                            } else {
-                                dialog.alert('Address not found.');
-                            }
-                        })
-                        .catch(err => {
-                            console.error('Search failed:', err);
-                            dialog.alert('Search failed. Check your connection.');
-                        });
+                    // Try Google Geocoding API first if key exists, fall back to Nominatim
+                    if (globalSettings.googleApiKey) {
+                        const googleUrl = 'https://maps.googleapis.com/maps/api/geocode/json?address='
+                            + encodeURIComponent(address) + '&key=' + globalSettings.googleApiKey;
+                        fetch(googleUrl)
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.status === 'OK' && data.results && data.results.length > 0) {
+                                    const result = data.results[0];
+                                    const lat = result.geometry.location.lat;
+                                    const lng = result.geometry.location.lng;
+                                    const coord = fromLonLat([lng, lat]);
+                                    if (dialog.confirm(`Found: ${result.formatted_address}\nSource: Google\n\nMove to this location?`)) {
+                                        map.getView().setCenter(coord);
+                                    }
+                                } else {
+                                    // Google failed — fall back to Nominatim
+                                    searchNominatim(address);
+                                }
+                            })
+                            .catch(() => {
+                                searchNominatim(address);
+                            });
+                    } else {
+                        searchNominatim(address);
+                    }
                 }
+            }
 
-                setTimeout(() => {
-                    const input = document.getElementById('addressInput');
-                    input?.focus();
-                    input?.select();
-                }, 50);
-
+            function searchNominatim(address) {
+                const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&limit=1`;
+                fetch(url)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data && data.length > 0) {
+                            const result = data[0];
+                            const coord = fromLonLat([parseFloat(result.lon), parseFloat(result.lat)]);
+                            if (dialog.confirm(`Found: ${result.display_name}\nSource: OpenStreetMap\n\nMove to this location?`)) {
+                                map.getView().setCenter(coord);
+                            }
+                        } else {
+                            dialog.alert('Address not found.');
+                        }
+                    })
+                    .catch(err => {
+                        console.error('Search failed:', err);
+                        dialog.alert('Search failed. Check your connection.');
+                    });
             }
 
             // Event handlers
@@ -3828,11 +4092,60 @@ function iconKey(filename) {
             });
         });
 
+        //////////////////////////////////////////////////////////////////////////
+        // showApiLocationBanner()
+        // Displays a temporary bottom banner on the map showing the Google API
+        // estimated location (lat, lng, accuracy) with a warning that accuracy
+        // may be low. This banner is ONLY shown when there is NO drone GPS lock
+        // and the user centers on the Google API fallback position. Once the
+        // drone acquires a GPS fix, the banner is automatically hidden (see the
+        // telemetry update loop above).
+        //////////////////////////////////////////////////////////////////////////
+        function showApiLocationBanner() {
+            if (!apiOverlayEl || !googleGeoPos) return;
+            // Hide the drone telemetry overlay (not relevant without GPS lock)
+            if (infoOverlayEl) infoOverlayEl.style.visibility = 'hidden';
+            // Build the API location info text
+            var latStr = googleGeoPos.lat.toFixed(4);
+            var lngStr = googleGeoPos.lng.toFixed(4);
+            var accKm = (googleGeoPos.accuracy / 1000).toFixed(0);
+            apiOverlayEl.textContent =
+                i18n.getMessage('apiLocationBannerPrefix') +
+                '  Lat: ' + latStr + '  Lon: ' + lngStr +
+                '  (~' + accKm + ' km)  \u2014 ' +
+                i18n.getMessage('apiLocationBannerWarning');
+            apiOverlayEl.style.visibility = 'visible';
+        }
+
+        // Center button: triple-priority
+        // Priority 1: first waypoint of loaded mission (where user is working)
+        // Priority 2: drone GPS position (most accurate, from live telemetry)
+        // Priority 3: Google Geolocation API cached position (rough, IP-based)
         $(document).on('click', '#centerOnDroneButton, #centerOnDrone', function (e) {
             e.preventDefault();
             e.stopPropagation();
-            if (lastGpsPos && map && map.getView()) {
+            if (markers.length > 0 && map && map.getView()) {
+                // Mission loaded — center on first waypoint
+                var firstFeature = markers[0].getSource().getFeatures()[0];
+                if (firstFeature) {
+                    map.getView().setCenter(firstFeature.getGeometry().getCoordinates());
+                    if (map.getView().getZoom() < 14) {
+                        map.getView().setZoom(14);
+                    }
+                }
+            } else if (lastGpsPos && map && map.getView()) {
+                // No mission but drone GPS has a fix
                 map.getView().setCenter(lastGpsPos);
+            } else if (googleGeoPos && map && map.getView()) {
+                // No drone GPS — fall back to cached Google API rough position
+                map.getView().setCenter(googleGeoPos.coord);
+                var zoom = 14;
+                if (googleGeoPos.accuracy > 5000) zoom = 10;
+                else if (googleGeoPos.accuracy > 1000) zoom = 12;
+                // Always set zoom to match accuracy — zoom out if too close
+                map.getView().setZoom(zoom);
+                // Show the API location banner with coords & accuracy warning
+                showApiLocationBanner();
             }
         });
 
@@ -3854,9 +4167,20 @@ function iconKey(filename) {
             if (isTyping) return;
 
             // Center on GPS fix (plain C or Ctrl+C)
+            // Same dual logic as the button: drone GPS first, then Google API fallback
             if (!e.repeat && key === 'c') {
                 if (lastGpsPos && map && map.getView()) {
                     map.getView().setCenter(lastGpsPos);
+                } else if (googleGeoPos && map && map.getView()) {
+                    map.getView().setCenter(googleGeoPos.coord);
+                    var zoom = 14;
+                    if (googleGeoPos.accuracy > 5000) zoom = 10;
+                    else if (googleGeoPos.accuracy > 1000) zoom = 12;
+                    if (map.getView().getZoom() < zoom) {
+                        map.getView().setZoom(zoom);
+                    }
+                    // Show the API location banner with coords & accuracy warning
+                    showApiLocationBanner();
                 }
             }
 
