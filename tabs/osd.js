@@ -11,7 +11,7 @@ import { GUI, TABS } from './../js/gui';
 import MSP from './../js/msp';
 import MSPCodes from './../js/msp/MSPCodes';
 import mspHelper from './../js/msp/MSPHelper';
-import Settings from './../js/settings';
+import Settings, { smartRound } from './../js/settings';
 import { globalSettings } from './../js/globalSettings';
 import { PortHandler } from './../js/port_handler';
 import i18n from './../js/localization';
@@ -769,10 +769,10 @@ OSD.constants = {
                     case 0: // Imperial
                     case 3: // UK
                         // meters to miles
-                        return (value / 1609.344).toFixed(2);
+                        return smartRound(value / 1609.344, 2);
                     case 4: // GA
                         // metres to nautical miles
-                        return (value / 1852.001).toFixed(2);
+                        return smartRound(value / 1852.001, 2);
                     default: // Metric
                         return value;
                 }
