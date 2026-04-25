@@ -535,6 +535,7 @@ TABS.cli.cleanup = function (callback) {
             if (callback) callback();
         }, 1000); // if we dont allow enough time to reboot, CRC of "first" command sent will fail, keep an eye for this one
         CONFIGURATOR.cliActive = false;
+        CONFIGURATOR.cliValid = false;
 
         CliAutoComplete.cleanup();
         $(CliAutoComplete).off();
