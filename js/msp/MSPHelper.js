@@ -198,11 +198,12 @@ var mspHelper = (function () {
                 FC.GPS_DATA.hdop = data.getUint16(14, true);
                 FC.GPS_DATA.eph = data.getUint16(16, true);
                 FC.GPS_DATA.epv = data.getUint16(18, true);
-                // Check if hwVersion field exists (firmware with extended MSP_GPSSTATISTICS)
-                if (data.byteLength >= 24) {
-                    FC.GPS_DATA.hwVersion = data.getUint32(20, true);
+                // hwVersion: 1-byte field (bits [7:6]=series, bits [5:0]=generation)
+                // Added in maintenance-9.x; absent in older firmware (payload < 21 bytes)
+                if (data.byteLength >= 21) {
+                    FC.GPS_DATA.hwVersion = data.getUint8(20);
                 } else {
-                    FC.GPS_DATA.hwVersion = 0; // Unknown for older firmware
+                    FC.GPS_DATA.hwVersion = 0;
                 }
                 break;
             case MSPCodes.MSP2_ADSB_VEHICLE_LIST:
