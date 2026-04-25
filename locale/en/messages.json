@@ -26,6 +26,10 @@
         "message": "Русский",
         "_comment": "Don't translate!"
     },
+    "language_fr": {
+        "message": "Français",
+        "_comment": "Don't translate!"
+    },
     "language": {
         "message": "Language"
     },
@@ -294,7 +298,7 @@
         "message": "Stopbits"
     },
     "sitlSerialPort": {
-        "message": "Serial receiver/Proxy FC is connectected to host's serial port"
+        "message": "Serial receiver/Proxy FC is connected to host's serial port"
     },
     "sitlSerialUART": {
         "message": "Serial receiver is configured on SITL's UART"
