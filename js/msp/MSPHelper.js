@@ -1646,7 +1646,7 @@ var mspHelper = (function () {
             case MSPCodes.MSP2_INAV_GPS_UBLOX_COMMAND:
                 // Just and ACK from the fc.
                 break;
-            
+
             case MSPCodes.MSP2_INAV_GEOZONE:
                 
                 if (data.buffer.byteLength == 0) {
