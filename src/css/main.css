@@ -680,9 +680,127 @@ input[type="number"]::-webkit-inner-spin-button {
     background-color: #37a8db;
 }
 
+/* Accordion Navigation Groups */
+#tabs .nav-group {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.30);
+}
+
+#tabs .group-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    cursor: pointer;
+    background-color: #2d2d2d;
+    transition: background-color 0.2s;
+    user-select: none;
+    border-top: solid 1px rgba(255, 255, 255, 0.05);
+}
+
+#tabs .group-header:hover {
+    background-color: #353535;
+}
+
+#tabs .group-header.active {
+    background-color: transparent;
+    padding: 0;
+    min-height: 1px;
+    border-top: 1px solid rgba(55, 168, 219, 0.3);
+}
+
+#tabs .group-title {
+    font-family: 'open_sanssemibold', Arial, serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: #b0b0b0;
+    transition: opacity 0.2s;
+}
+
+#tabs .group-header.active .group-title {
+    display: none;
+}
+
+#tabs .chevron {
+    font-size: 10px;
+    transition: transform 0.2s, opacity 0.2s;
+    color: #808080;
+}
+
+#tabs .group-header.active .chevron {
+    display: none;
+}
+
+#tabs .group-items {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+    background-color: #252525;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+#tabs .group-items.expanded {
+    max-height: 500px;
+}
+
+#tabs .group-items li {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.20);
+}
+
+#tabs .group-items li:last-child {
+    border-bottom: 0;
+}
+
+#tabs .group-items li a {
+    padding-left: 40px;
+}
+
+/* Expand/Collapse All Toggle */
+#tabs .nav-toggle-all {
+    margin-top: 4px;
+    padding: 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+#tabs .nav-toggle-all a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 6px 12px;
+    color: #37a8db;
+    font-family: 'open_sanssemibold', Arial, serif;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    background-color: rgba(55, 168, 219, 0.05);
+    transition: background-color 0.2s, color 0.2s;
+}
+
+#tabs .nav-toggle-all a:hover {
+    background-color: rgba(55, 168, 219, 0.15);
+    color: #4db8eb;
+}
+
+#tabs .nav-toggle-all svg {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+}
+
+#tabs .nav-toggle-all .toggle-text {
+    display: none;
+}
+
 .tabicon {
     background: no-repeat 13px 7px;
     background-size: 15px;
+}
+
+/* Adjust icon position for accordion tabs */
+#tabs .group-items .tabicon {
+    background-position: 20px 7px;
 }
 
 /* Tab-Icons */
@@ -1024,7 +1142,7 @@ li.active .ic_mag {
 }
 
 .ic_search {
-    background-image: url("./../../images/icons/search-gray.svg");
+    background-image: url("./../../images/icons/search-white.svg");
 }
 
 .ic_search:hover {
@@ -1076,18 +1194,36 @@ li.active .ic_mag {
     padding: 0 10px 0 10px;
     border-top: 1px solid #7d7d79;
     background-color: #bfbeb5;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
 }
 
 #status-bar div {
-    float: left;
+    flex: 0 0 auto;
     padding-right: 10px;
     margin-right: 10px;
     border-right: 1px solid #7d7d79;
+    white-space: nowrap;
+}
+
+#status-bar div:has(.arming-flags) {
+    flex: 1 1 auto;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    min-width: 0;
+}
+
+#status-bar .arming-flags {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 #status-bar .version {
-    float: right;
-    margin: 0;
+    flex: 0 0 auto;
+    margin-left: auto;
     padding: 0;
     border: 0;
 }
@@ -1721,16 +1857,14 @@ dialog {
     color: white;
     font-size: 10px;
     margin-top: 20px;
-    width: 100px;
     float: right;
     margin-right: 20px;
     line-height: 12px;
-    height: 64px;
     border-radius: 5px;
     border: 1px solid #272727;
     box-shadow: 0 1px 0 rgba(92, 92, 92, 0.5);
     background: #434343 -webkit-linear-gradient(top, transparent, rgba(0, 0, 0, 0.55));
-    padding-top: 5px;
+    padding: 1em;
     display: none;
     text-shadow: 0 1px rgba(0, 0, 0, 1.0);
 }
@@ -1794,13 +1928,8 @@ dialog {
 }
 
 .dataflash-contents_global {
-    margin-top: 30px;
     border: 1px solid #4A4A4A;
     background-color: #4A4A4A;
-    display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    justify-content: flex-start;
     border-radius: 3px;
     margin-left: 5px;
     margin-right: 5px;
@@ -1816,21 +1945,13 @@ dialog {
 }
 
 .dataflash-contents_global li {
-    height: 5px;
-    position: relative;
+    min-height: 5px;
     box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.20);
     border-radius: 2px;
-
 }
 
-.dataflash-contents_global li div {
-    position: absolute;
-    top: -30px;
-    margin-top: 0;
-    left: 0;
-    right: 0;
-    width: 120px;
-    text-align: left;
+.dataflash-free_global_label {
+    white-space: nowrap;
     color: silver;
 }
 
@@ -1855,6 +1976,11 @@ dialog {
     display: none;
 }
 
+.battery-label {
+    display: inline;
+    color: #aaa;
+}
+
 /* Battery element styling*/
 
 #quad-status_wrapper {
@@ -1862,11 +1988,9 @@ dialog {
     color: white;
     font-size: 10px;
     margin-top: 20px;
-    width: 100px;
     float: right;
     margin-right: 20px;
     line-height: 12px;
-    height: 67px;
     border-radius: 5px;
     border: 1px solid #272727;
     box-shadow: 0 1px 0 rgba(92, 92, 92, 0.5);
@@ -1878,21 +2002,12 @@ dialog {
     display: none;
     margin-top: 10px;
     margin-left: 14px;
-    height: 10px;
-    width: 30px;
 }
 
 .battery-legend {
     display: inline;
-    position: relative;
-    top: -2px;
-    margin-top: 0;
-    left: 0;
-    right: 0;
-    width: 40px;
-    text-align: left;
     color: silver;
-    margin-left: -8px;
+    margin-right: 8px;
 }
 
 .quad-status-contents progress::-webkit-progress-bar {
@@ -1915,8 +2030,8 @@ dialog {
 
 .battery-icon {
     display: inline-block;
-    height: 30px;
-    width: 60px;
+    min-height: 30px;
+    min-width: 60px;
     transition: none;
     margin-top: 4px;
     background: url("./../../images/icons/cf_icon_bat_grey.svg") no-repeat center;
@@ -2276,7 +2391,8 @@ select {
 
 .subtab__header_label--current {
     font-weight: bold;
-    background-color: #ccc;
+    background-color: #37a8db;
+    color: #fff;
 }
 
 .subtab__header_label:hover {
@@ -2315,6 +2431,11 @@ ol li {
 
 .unit_wrapper ~ label, select ~ label, input ~ label {
     margin-left: 10px;
+}
+
+.input-unit {
+    margin-left: 2px;
+    color: #555;
 }
 
 /* Position the unit to the right of the wrapper */
