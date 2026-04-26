@@ -546,7 +546,7 @@
         "message": "Сохранение dataflash в файл"
     },
     "receiverChannelMapTitle": {
-        "message": "Вы можете определить Вашу собственную карту каналов нажав на это поле"
+        "message": "Порядок каналов: A=Крен, E=Тангаж, T=Газ, R=Рыскание. Нажмите, чтобы изменить."
     },
     "sitlUseImuHelp": {
         "message": "Используйте данные датчика IMU из симулятора вместо использования данных об ориентации напрямую из симулятора (экспериментальный вариант, не рекомендуется)."
@@ -832,7 +832,7 @@
         "message": "Сохранить и перезагрузить"
     },
     "failsafeDelayItem": {
-        "message": "Время задержки активации после потери сигнала [В децисекундах (дс): 1дс = 0.1 сек.]"
+        "message": "Время задержки активации после потери сигнала"
     },
     "missionEllipsoidEarthDEMModel": {
         "message": "Использовать эллипсоид вместо SL DEM: "
@@ -901,7 +901,7 @@
         "message": "Сохранить"
     },
     "sensorStatusSonar": {
-        "message": "Сонар/Дальномер"
+        "message": "Сонар/Дальномер — Синий: исправен, Красный: ошибка, Выключен: не обнаружен"
     },
     "ledStripFunctionGPSOption": {
         "message": "GPS"
@@ -1123,7 +1123,7 @@
         "message": "Информация о полётном контроллере, идентификатор: <strong>$1</strong>, версия: <strong>$2</strong>"
     },
     "sensorDataFlashFreeSpace": {
-        "message": "Флеш-память:<br />пуста "
+        "message": "Флеш-память: "
     },
     "defaultSponsorsHead": {
         "message": "INAV поддерживается"
@@ -1306,7 +1306,7 @@
         "message": "Failsafe приёмника"
     },
     "failsafeOffDelayItem": {
-        "message": "Задержка выключения двигателей в режиме Failsafe [В децисекундах (дс): 1дс = 0,1 сек.]"
+        "message": "Задержка выключения двигателей в режиме Failsafe"
     },
     "osdElement_EFFICIENCY_MAH": {
         "message": "Эффективность (мА·ч/км)"
@@ -1978,7 +1978,7 @@
         "message": "Вход PPM приёмника"
     },
     "sensorOpticalFlow": {
-        "message": "Оптический поток"
+        "message": "Оптический поток — Синий: исправен, Красный: ошибка, Выключен: не обнаружен"
     },
     "autoConnectDisabled": {
         "message": "Автоподключение: отключено - пользователю необходимо выбрать нужный последовательный порт и самостоятельно нажать кнопку «Подключиться»"
@@ -2223,7 +2223,7 @@
         "message": "Сообщения БПЛА"
     },
     "timerOutputs": {
-        "message": "Выходы таймера"
+        "message": "Группы выходов (Таймеры)"
     },
     "adjustmentsFunction54": {
         "message": "Регулировка ослабления PID-коэффициентов тяги (TPA)"
@@ -2767,7 +2767,7 @@
         "message": "Направление карты"
     },
     "initialSetupResetText": {
-        "message": "Восстановить настройки <strong>по умолчанию</strong>"
+        "message": ""
     },
     "motor_poles": {
         "message": "Количество полюсов мотора (количество магнитов)"
@@ -3032,7 +3032,7 @@
         "message": "Предупреждение о качестве канал связи"
     },
     "sensorAirspeed": {
-        "message": "Воздушная скорость"
+        "message": "Датчик воздушной скорости — Синий: исправен, Красный: ошибка, Выключен: не обнаружен"
     },
     "configurationGPSBaudrate": {
         "message": "Скорость передачи данных"
@@ -3344,7 +3344,7 @@
         "message": "Настройка цвета"
     },
     "sensorStatusBaro": {
-        "message": "Барометр"
+        "message": "Барометр — Синий: исправен, Красный: ошибка, Выключен: не обнаружен"
     },
     "osdElement_SENSOR3_TEMPERATURE": {
         "message": "Датчик температуры 3"
@@ -3843,7 +3843,7 @@
         "message": "Передний правый"
     },
     "throttleIdle": {
-        "message": "Мощность моторов на холостом ходу [%]"
+        "message": "Мощность моторов на холостом ходу"
     },
     "missionTitleUpdateAll": {
         "message": "Обновить всё"
@@ -3915,7 +3915,7 @@
         "message": "Вывод"
     },
     "sensorStatusMag": {
-        "message": "Магнитометр"
+        "message": "Магнитометр — Синий: исправен, Красный: ошибка, Выключен: не обнаружен"
     },
     "tabSwitchConnectionRequired": {
         "message": "Прежде чем увидеть любую из вкладок, вам нужно <strong>подключиться</strong>."
@@ -4533,7 +4533,7 @@
         "message": "Показывает самую высокую полную скорость, учитывая как горизонтальную, так и вертикальную скорости."
     },
     "sensorStatusGPS": {
-        "message": "GPS"
+        "message": "GPS — Синий: исправен, Красный: ошибка, Выключен: не обнаружен"
     },
     "pidTuning_fw_level_pitch_trim": {
         "message": "Триммирование уровня [°]"
@@ -4603,7 +4603,7 @@
         "message": "Выбранный полётный контроллер: "
     },
     "sensorStatusGyro": {
-        "message": "Гироскоп"
+        "message": "Гироскоп — Синий: исправен, Красный: ошибка, Выключен: не обнаружен"
     },
     "rthTrackBack": {
         "message": "Режим следования по обратному маршруту (RTH)"
@@ -5410,7 +5410,7 @@
         "message": "$1"
     },
     "sensorStatusAccel": {
-        "message": "Акселерометр"
+        "message": "Акселерометр — Синий: исправен, Красный: ошибка, Выключен: не обнаружен"
     },
     "osdAlarmADSB_MAX_DISTANCE_WARNING": {
         "message": "Отображаемое расстояние в метрах до ADSB судна"
@@ -6079,7 +6079,7 @@
         "message": "Метод набора высоты на первом этапе"
     },
     "initialSetupBatteryFull": {
-        "message": "Батарея полностью заряжена"
+        "message": "При подключении считать батарею заряженной"
     },
     "ledStripModeColorsModeGPSNoSats": {
         "message": "GPS: нет спутников"
@@ -6566,5 +6566,191 @@
     },
     "osdElement_HOME_HEADING_ERROR": {
         "message": "Ошибка курса на дом"
+    },
+    "layerManagementTitle": {
+        "message": "Слои карты"
+    },
+    "layerLoadGeoFile": {
+        "message": "Загрузить GEO-файл"
+    },
+    "layerDragDropHint": {
+        "message": "или перетащите GEO-файлы на карту"
+    },
+    "layerConfirmDelete": {
+        "message": "Вы уверены, что хотите удалить этот слой?"
+    },
+    "layerLoadError": {
+        "message": "Ошибка загрузки GEO-файла. Пожалуйста, проверьте формат файла."
+    },
+    "layerParseError": {
+        "message": "Ошибка чтения GEO-файла. Неподдерживаемый формат или повреждённые данные."
+    },
+    "sensorProfileTitle": {
+        "message": "Профиль управления — хранит настройки PID, рейтов и фильтрации"
+    },
+    "mixerProfileTitle": {
+        "message": "Профиль микшера — хранит конфигурацию микшеров моторов/сервоприводов и настройки выходов"
+    },
+    "sensorBatteryProfileTitle": {
+        "message": "Профиль аккумулятора — хранит настройки напряжения, ёмкости и датчика тока"
+    },
+    "gpsFixNotConnected": {
+        "message": "<span class=\"fixnone\">Не подключено</span>"
+    },
+    "receiverButtonSticksTitle": {
+        "message": "Отображение стиков в реальном времени для проверки каналов приёмника"
+    },
+    "searchPlaceholder": {
+        "message": "Поиск настроек..."
+    },
+    "backupRestoreButtonBackup": {
+        "message": "Бэкап настроек"
+    },
+    "backupRestoreButtonRestore": {
+        "message": "Восстановление настроек"
+    },
+    "backupRestoreOpenBackupsFolder": {
+        "message": "Открыть бекапы"
+    },
+    "backupRestoreStatusConnecting": {
+        "message": "Подключение к полётному контроллеру..."
+    },
+    "backupRestoreStatusEnteringCli": {
+        "message": "Вход в режим CLI..."
+    },
+    "backupRestoreStatusReadingConfig": {
+        "message": "Чтение конфигурации (все изменённые параметры)..."
+    },
+    "backupRestoreStatusSavingFile": {
+        "message": "Сохранение бэкапа..."
+    },
+    "backupRestoreStatusExitingCli": {
+        "message": "Выход из CLI (перезагрузка)..."
+    },
+    "backupRestoreStatusRestoringConfig": {
+        "message": "Восстановление конфигурации..."
+    },
+    "backupRestoreStatusSaving": {
+        "message": "Сохранение и перезагрузка..."
+    },
+    "backupRestoreStatusBackupComplete": {
+        "message": "Резервное копирование завершено. Переходим к прошивке..."
+    },
+    "backupRestoreBackupSaved": {
+        "message": "Бэкап сохранён в: $1"
+    },
+    "backupRestoreAutoBackupSaved": {
+        "message": "Автобэкап сохранён в: $1"
+    },
+    "backupRestoreBackupComplete": {
+        "message": "Резервное копирование завершено."
+    },
+    "backupRestoreBackupCancelled": {
+        "message": "Резервное копирование отменено."
+    },
+    "backupRestoreBackupFailed": {
+        "message": "Ошибка резервного копирования."
+    },
+    "backupRestoreRestoreComplete": {
+        "message": "Конфигурация восстановлена. Полётный контроллер перезагружается."
+    },
+    "backupRestoreRestoreCancelled": {
+        "message": "Восстановление отменено."
+    },
+    "backupRestoreRestoreFailed": {
+        "message": "Ошибка восстановления."
+    },
+    "backupRestoreFlashCompleteBackupSaved": {
+        "message": "Прошивка завершена. Резервная копия конфигурации сохранена."
+    },
+    "backupRestoreOverlayTitle": {
+        "message": "Восстановление конфигурации"
+    },
+    "backupRestoreStatusRestoringProgress": {
+        "message": "Восстановление конфигурации... ($1 / $2)"
+    },
+    "backupRestoreRestoreAborted": {
+        "message": "Восстановление прервано — настройки НЕ были сохранены."
+    },
+    "backupRestoreErrorTitle": {
+        "message": "Ошибка в процессе восстановления"
+    },
+    "backupRestoreErrorText": {
+        "message": "Полётный контроллер сообщил о следующих ошибках. Вы можете всё равно сохранить настройки или прервать процесс без сохранения."
+    },
+    "backupRestoreErrorAbort": {
+        "message": "Отмена (Не сохранять)"
+    },
+    "backupRestoreErrorSave": {
+        "message": "Всё равно сохранить"
+    },
+    "backupRestoreFlashCompleteOfferRestore": {
+        "message": "Прошивка завершена. Перед прошивкой была создана резервная копия."
+    },
+    "backupRestoreAutoRestoreConfirm": {
+        "message": "Была выполнена полная очистка чипа. Хотите восстановить резервную копию конфигурации, сохранённую перед прошивкой?"
+    },
+    "backupRestoreAutoRestoreWaiting": {
+        "message": "Ожидание загрузки полётного контроллера..."
+    },
+    "backupRestoreAutoRestoreYes": {
+        "message": "Да, восстановить"
+    },
+    "backupRestoreAutoRestoreNo": {
+        "message": "Нет, пропустить"
+    },
+    "backupRestoreAutoRestoreWaitingPort": {
+        "message": "Ожидание, пока устройство $1 станет доступным..."
+    },
+    "firmwareFlasherVersionWarningTitle": {
+        "message": "⚠ Предупреждение об обновлении версии"
+    },
+    "firmwareFlasherVersionWarningText": {
+        "message": "Обновление с версии $1 до $2 без полной очистки чипа может привести к непредсказуемым ошибкам или повреждению конфигурации. Конфигуратор не будет восстанавливать настройки вашего полётного контроллера автоматически."
+    },
+    "firmwareFlasherVersionWarningContinue": {
+        "message": "Продолжить без очистки чипа"
+    },
+    "firmwareFlasherVersionWarningCancel": {
+        "message": "Отмена"
+    },
+    "backupRestoreMigrationApplied": {
+        "message": "Обновление: $1 → $2 (изменений: $3)"
+    },
+    "backupRestoreMigrationWarningsHeader": {
+        "message": "Предупреждения обновления:"
+    },
+    "backupRestoreDowngradeNoAutoRestore": {
+        "message": "Вы перешли на более старую версию прошивки. Автоматический возврат настроек невозможен — проверьте параметры и восстановите бэкап вручную."
+    },
+    "migrationPreviewTitle": {
+        "message": "Требуется перенос настроек под новую версию"
+    },
+    "migrationPreviewSubtitle": {
+        "message": "Мы адаптируем ваш бэкап ($1) под новую прошивку ($2). Будут внесены следующие изменения:"
+    },
+    "migrationPreviewRemovedHeader": {
+        "message": "Удалённые параметры ($1):"
+    },
+    "migrationPreviewRenamedSettingsHeader": {
+        "message": "Переименованные параметры ($1):"
+    },
+    "migrationPreviewRenamedCommandsHeader": {
+        "message": "Переименованные команды ($1):"
+    },
+    "migrationPreviewValueReplacementsHeader": {
+        "message": "Замена значений ($1):"
+    },
+    "migrationPreviewSettingRemappingsHeader": {
+        "message": "Переназначение параметров ($1):"
+    },
+    "migrationPreviewContinue": {
+        "message": "Продолжить восстановление"
+    },
+    "migrationPreviewCancel": {
+        "message": "Отмена (ручная проверка)"
+    },
+    "migrationMissingProfileWarning": {
+        "message": "Для перехода с версии $1 на $2 нет готового профиля миграции. Настройки будут перенесены «как есть» — некоторые из них могут не сработать или будут проигнорированы прошивкой."
     }
 }
