@@ -278,7 +278,8 @@ var FC = {
             messageDt: 0,
             errors: 0,
             timeouts: 0,
-            packetCount: 0
+            packetCount: 0,
+            hwVersion: 0
         };
         
         this.ADSB_VEHICLES = {
@@ -356,6 +357,10 @@ var FC = {
             power: 0,
             pitmode: 0,
             low_power_disarm: 0,
+            band_count: 0,
+            channel_count: 0,
+            power_count: 0,
+            power_min: 1,
         };
 
         this.ADVANCED_CONFIG = {

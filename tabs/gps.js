@@ -279,9 +279,9 @@ TABS.gps.initialize = function (callback) {
 
         function detectGPSPreset(hwVersion) {
             switch(hwVersion) {
-                case 800:  return 'm8';
-                case 900:  return 'm9-precision';  // Default to precision mode for better accuracy
-                case 1000: return 'm10';
+                case 0x48: return 'm8';
+                case 0x49: return 'm9-precision';
+                case 0x4A: return 'm10';
                 default:   return 'manual';
             }
         }
