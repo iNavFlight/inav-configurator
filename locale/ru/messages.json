@@ -546,7 +546,7 @@
         "message": "Сохранение dataflash в файл"
     },
     "receiverChannelMapTitle": {
-        "message": "Вы можете определить Вашу собственную карту каналов нажав на это поле"
+        "message": "Порядок каналов: A=Крен, E=Тангаж, T=Газ, R=Рыскание. Нажмите, чтобы изменить."
     },
     "sitlUseImuHelp": {
         "message": "Используйте данные датчика IMU из симулятора вместо использования данных об ориентации напрямую из симулятора (экспериментальный вариант, не рекомендуется)."
@@ -832,7 +832,7 @@
         "message": "Сохранить и перезагрузить"
     },
     "failsafeDelayItem": {
-        "message": "Время задержки активации после потери сигнала [В децисекундах (дс): 1дс = 0.1 сек.]"
+        "message": "Время задержки активации после потери сигнала"
     },
     "missionEllipsoidEarthDEMModel": {
         "message": "Использовать эллипсоид вместо SL DEM: "
@@ -901,7 +901,7 @@
         "message": "Сохранить"
     },
     "sensorStatusSonar": {
-        "message": "Сонар/Дальномер"
+        "message": "Сонар/Дальномер — Синий: исправен, Красный: ошибка, Выключен: не обнаружен"
     },
     "ledStripFunctionGPSOption": {
         "message": "GPS"
@@ -1123,7 +1123,7 @@
         "message": "Информация о полётном контроллере, идентификатор: <strong>$1</strong>, версия: <strong>$2</strong>"
     },
     "sensorDataFlashFreeSpace": {
-        "message": "Флеш-память:<br />пуста "
+        "message": "Флеш-память: "
     },
     "defaultSponsorsHead": {
         "message": "INAV поддерживается"
@@ -1306,7 +1306,7 @@
         "message": "Failsafe приёмника"
     },
     "failsafeOffDelayItem": {
-        "message": "Задержка выключения двигателей в режиме Failsafe [В децисекундах (дс): 1дс = 0,1 сек.]"
+        "message": "Задержка выключения двигателей в режиме Failsafe"
     },
     "osdElement_EFFICIENCY_MAH": {
         "message": "Эффективность (мА·ч/км)"
@@ -1978,7 +1978,7 @@
         "message": "Вход PPM приёмника"
     },
     "sensorOpticalFlow": {
-        "message": "Оптический поток"
+        "message": "Оптический поток — Синий: исправен, Красный: ошибка, Выключен: не обнаружен"
     },
     "autoConnectDisabled": {
         "message": "Автоподключение: отключено - пользователю необходимо выбрать нужный последовательный порт и самостоятельно нажать кнопку «Подключиться»"
@@ -2223,7 +2223,7 @@
         "message": "Сообщения БПЛА"
     },
     "timerOutputs": {
-        "message": "Выходы таймера"
+        "message": "Группы выходов (Таймеры)"
     },
     "adjustmentsFunction54": {
         "message": "Регулировка ослабления PID-коэффициентов тяги (TPA)"
@@ -2767,7 +2767,7 @@
         "message": "Направление карты"
     },
     "initialSetupResetText": {
-        "message": "Восстановить настройки <strong>по умолчанию</strong>"
+        "message": ""
     },
     "motor_poles": {
         "message": "Количество полюсов мотора (количество магнитов)"
@@ -3032,7 +3032,7 @@
         "message": "Предупреждение о качестве канал связи"
     },
     "sensorAirspeed": {
-        "message": "Воздушная скорость"
+        "message": "Датчик воздушной скорости — Синий: исправен, Красный: ошибка, Выключен: не обнаружен"
     },
     "configurationGPSBaudrate": {
         "message": "Скорость передачи данных"
@@ -3344,7 +3344,7 @@
         "message": "Настройка цвета"
     },
     "sensorStatusBaro": {
-        "message": "Барометр"
+        "message": "Барометр — Синий: исправен, Красный: ошибка, Выключен: не обнаружен"
     },
     "osdElement_SENSOR3_TEMPERATURE": {
         "message": "Датчик температуры 3"
@@ -3843,7 +3843,7 @@
         "message": "Передний правый"
     },
     "throttleIdle": {
-        "message": "Мощность моторов на холостом ходу [%]"
+        "message": "Мощность моторов на холостом ходу"
     },
     "missionTitleUpdateAll": {
         "message": "Обновить всё"
@@ -3915,7 +3915,7 @@
         "message": "Вывод"
     },
     "sensorStatusMag": {
-        "message": "Магнитометр"
+        "message": "Магнитометр — Синий: исправен, Красный: ошибка, Выключен: не обнаружен"
     },
     "tabSwitchConnectionRequired": {
         "message": "Прежде чем увидеть любую из вкладок, вам нужно <strong>подключиться</strong>."
@@ -4533,7 +4533,7 @@
         "message": "Показывает самую высокую полную скорость, учитывая как горизонтальную, так и вертикальную скорости."
     },
     "sensorStatusGPS": {
-        "message": "GPS"
+        "message": "GPS — Синий: исправен, Красный: ошибка, Выключен: не обнаружен"
     },
     "pidTuning_fw_level_pitch_trim": {
         "message": "Триммирование уровня [°]"
@@ -4603,7 +4603,7 @@
         "message": "Выбранный полётный контроллер: "
     },
     "sensorStatusGyro": {
-        "message": "Гироскоп"
+        "message": "Гироскоп — Синий: исправен, Красный: ошибка, Выключен: не обнаружен"
     },
     "rthTrackBack": {
         "message": "Режим следования по обратному маршруту (RTH)"
@@ -5410,7 +5410,7 @@
         "message": "$1"
     },
     "sensorStatusAccel": {
-        "message": "Акселерометр"
+        "message": "Акселерометр — Синий: исправен, Красный: ошибка, Выключен: не обнаружен"
     },
     "osdAlarmADSB_MAX_DISTANCE_WARNING": {
         "message": "Отображаемое расстояние в метрах до ADSB судна"
@@ -6079,7 +6079,7 @@
         "message": "Метод набора высоты на первом этапе"
     },
     "initialSetupBatteryFull": {
-        "message": "Батарея полностью заряжена"
+        "message": "При подключении считать батарею заряженной"
     },
     "ledStripModeColorsModeGPSNoSats": {
         "message": "GPS: нет спутников"
@@ -6187,7 +6187,7 @@
         "message": "Единицы измерения расхода топлива (SmartPort)"
     },
     "serialrx_frSkyFuelUnitHelp": {
-        "message": "Выберите данные, которые вы хотите отправлять на сенсор телеметрии, отвечающий за <strong>«топливо»<strong> (расход/заряд)."
+        "message": "Выберите данные, которые вы хотите отправлять на сенсор телеметрии, отвечающий за <strong>«топливо»</strong> (расход/заряд)."
     },
     "configurationFrSkyOptions": {
         "message": "Опции FrSky"
@@ -6241,7 +6241,7 @@
         "message": "Используйте JavaScript-код для управления вашим летательным аппаратом. Транспилер преобразует ваш код в «Логические условия» прошивки INAV."
     },
     "javascriptBetaWarning": {
-        "message": "<strong>Пишите на JavaScript — получайте логические условия INAV!</strong> Используйте привычный синтаксис JavaScript с полной поддержкой автодополнения и проверки ошибок. <strong>На данный момент функция находится в режиме бета-тестирования. Не используйте её для задач, критически важных для безопасности полетов!</strong>"
+        "message": "<strong>На данный момент функция находится в режиме бета-тестирования. Не используйте её для задач, критически важных для безопасности полётов!</strong>"
     },
     "javascriptEditorTitle": {
         "message": "Редактор JavaScript (Ctrl+Shift+V для вставки; чтобы переименовать переменную, щёлкните по ней правой кнопкой мыши)"
@@ -6281,5 +6281,476 @@
     },
     "javascriptOptimizationsApplied": {
         "message": "Применены оптимизации:"
+    },
+    "osdElement_POWER_SUPPLY_IMPEDANCE": {
+        "message": "Внутреннее сопротивление источника питания"
+    },
+    "osdElement_REMAINING_FLIGHT_TIME": {
+        "message": "Оставшееся время полёта"
+    },
+    "osdElement_REMAINING_FLIGHT_DISTANCE": {
+        "message": "Оставшаяся расстояние полёта"
+    },
+    "osdElement_THROTTLE_GAUGE": {
+        "message": "Шкала газа"
+    },
+    "osdElement_THROTTLE_POSITION": {
+        "message": "Значение газа"
+    },
+    "osdElement_SCALED_THROTTLE_POSITION": {
+        "message": "Скорректированный газ"
+    },
+    "osdElement_CRAFT_NAME": {
+        "message": "Название аппарата"
+    },
+    "osdElement_PILOT_NAME": {
+        "message": "Имя пилота"
+    },
+    "osdElement_PILOT_LOGO": {
+        "message": "Лого пилота"
+    },
+    "osdElement_FLYMODE": {
+        "message": "Режим полёта"
+    },
+    "osdElement_HEADING": {
+        "message": "Курс"
+    },
+    "osdElement_HEADING_GRAPH": {
+        "message": "Лента компаса"
+    },
+    "osdElement_AIR_SPEED": {
+        "message": "Воздушная скорость"
+    },
+    "osdElement_MIN_GROUND_SPEED": {
+        "message": "Мин. путевая скорость"
+    },
+    "osdElement_GLIDE_TIME": {
+        "message": "Время планирования"
+    },
+    "osdElement_GLIDE_RANGE": {
+        "message": "Дистанция планирования"
+    },
+    "osdElement_MISSION INFO": {
+        "message": "Информация о миссии"
+    },
+    "osdElement_VERSION": {
+        "message": "Версия"
+    },
+    "osdElement_MULTI FUNCTION STATUS": {
+        "message": "Многофункциональный статус"
+    },
+    "osdElement_BLACKBOX": {
+        "message": "Чёрный ящик"
+    },
+    "osdElement_ALTITUDE": {
+        "message": "Высота"
+    },
+    "osdElement_VARIO": {
+        "message": "Вариометр"
+    },
+    "osdElement_ONTIME": {
+        "message": "Время работы"
+    },
+    "osdElement_FLYTIME": {
+        "message": "Время полёта"
+    },
+    "osdElement_CROSSHAIRS": {
+        "message": "Перекрестие"
+    },
+    "osdElement_ARTIFICIAL_HORIZON": {
+        "message": "Линия горизонта"
+    },
+    "osdElement_HORIZON_SIDEBARS": {
+        "message": "Боковые шкалы"
+    },
+    "osdElement_PITCH_ANGLE": {
+        "message": "Угол тангажа"
+    },
+    "osdElement_ROLL_ANGLE": {
+        "message": "Угол крена"
+    },
+    "osdElement_CURRENT_DRAW": {
+        "message": "Потребление тока"
+    },
+    "osdElement_WH_DRAWN": {
+        "message": "Израсходованная энергия (Вт*ч)"
+    },
+    "osdElement_POWER": {
+        "message": "Мощность"
+    },
+    "osdElement_CLIMB_EFFICIENCY": {
+        "message": "Эффективность набора высоты"
+    },
+    "osdElement_LONGITUDE": {
+        "message": "Долгота"
+    },
+    "osdElement_LATITUDE": {
+        "message": "Широта"
+    },
+    "osdElement_DISTANCE_TO_HOME": {
+        "message": "Расстояние до дома"
+    },
+    "osdElement_ODOMETER": {
+        "message": "Одометр"
+    },
+    "osdElement_COURSE_HOLD_ERROR": {
+        "message": "Ошибка удержания курса"
+    },
+    "osdElement_COURSE_HOLD_ADJUSTMENT": {
+        "message": "Коррекция курса"
+    },
+    "osdElement_GROUND COURSE": {
+        "message": "Путевой угол"
+    },
+    "osdElement_ADSB_WARNING_MESSAGE": {
+        "message": "Сообщение ADS-B"
+    },
+    "osdElement_ADSB_INFO": {
+        "message": "ADS-B инфо"
+    },
+    "osdElement_CROSS TRACK ERROR": {
+        "message": "Отклонение от пути"
+    },
+    "osdElement_RX_POWER_DOWNLINK": {
+        "message": "Мощность обратного канала связи"
+    },
+    "osdElement_RX_BAND": {
+        "message": "Диапазон Rx"
+    },
+    "osdElement_RX_MODE": {
+        "message": "Режим Rx"
+    },
+    "osdElement_CUSTOM_ELEMENT_1": {
+        "message": "Пользовательский элемент 1"
+    },
+    "osdElement_CUSTOM_ELEMENT_2": {
+        "message": "Пользовательский элемент 2"
+    },
+    "osdElement_CUSTOM_ELEMENT_3": {
+        "message": "Пользовательский элемент 3"
+    },
+    "osdElement_CUSTOM_ELEMENT_4": {
+        "message": "Пользовательский элемент 4"
+    },
+    "osdElement_CUSTOM_ELEMENT_5": {
+        "message": "Пользовательский элемент 5"
+    },
+    "osdElement_CUSTOM_ELEMENT_6": {
+        "message": "Пользовательский элемент 6"
+    },
+    "osdElement_CUSTOM_ELEMENT_7": {
+        "message": "Пользовательский элемент 7"
+    },
+    "osdElement_CUSTOM_ELEMENT_8": {
+        "message": "Пользовательский элемент 8"
+    },
+    "osdElement_HEADING_P": {
+        "message": "P-составляющая курса"
+    },
+    "osdElement_BOARD_ALIGNMENT_ROLL": {
+        "message": "Наклон платы (крен)"
+    },
+    "osdElement_BOARD_ALIGNMENT_PITCH": {
+        "message": "Наклон платы (тангаж)"
+    },
+    "osdElement_THROTTLE_EXPO": {
+        "message": "Экспонента газа"
+    },
+    "osdElement_STABILIZED.RC_EXPO": {
+        "message": "Стабилизированная экспонента"
+    },
+    "osdElement_STABILIZED.RC_YAW_EXPO": {
+        "message": "Экспонента рыскания в стабилизированном режиме"
+    },
+    "osdElement_STABILIZED.PITCH_RATE": {
+        "message": "Скорость тангажа (стабилизированная)"
+    },
+    "osdElement_STABILIZED.ROLL_RATE": {
+        "message": "Скорость крена (стабилизированная)"
+    },
+    "osdElement_STABILIZED.YAW_RATE": {
+        "message": "Скорость рыскания (стабилизированная)"
+    },
+    "osdElement_MANUAL_RC_EXPO": {
+        "message": "Экспонента ручного управления"
+    },
+    "osdElement_MANUAL_RC_YAW_EXPO": {
+        "message": "Экспонента ручного управления: рыскание"
+    },
+    "osdElement_MANUAL_PITCH_RATE": {
+        "message": "Скорость тангажа (ручное)"
+    },
+    "osdElement_MANUAL_ROLL_RATE": {
+        "message": "Скорость крена (ручное)"
+    },
+    "osdElement_MANUAL_YAW_RATE": {
+        "message": "Скорость рыскания (ручное)"
+    },
+    "osdElement_NAV_FW_CRUISE_THROTTLE": {
+        "message": "Крейсерская тяга (фиксированное крыло)"
+    },
+    "osdElement_NAV_FW_PITCH_TO_THROTTLE": {
+        "message": "Компенсация газа по тангажу"
+    },
+    "osdElement_FW_MIN_THROTTLE_DOWN_PITCH_ANGLE": {
+        "message": "Минимальный угол тангажа для снижения тяги"
+    },
+    "osdElement_THRUST_PID_ATTENUATION": {
+        "message": "Снижение усиления PID при тяге"
+    },
+    "osdElement_CONTROL_SMOOTHNESS": {
+        "message": "Плавность управления"
+    },
+    "osdElement_TPA_TIME_CONSTANT": {
+        "message": "Постоянная времени TPA"
+    },
+    "osdElement_FW_LEVEL_TRIM": {
+        "message": "Корректировка уровня"
+    },
+    "osdElement_MISSION_INDEX": {
+        "message": "Индекс миссии"
+    },
+    "osdElement_FW_ALT_CONTROL_RESPONSE": {
+        "message": "Отклик управления высотой (самолет)"
+    },
+    "navExpandAll": {
+        "message": "Развернуть всё"
+    },
+    "navCollapseAll": {
+        "message": "Свернуть всё"
+    },
+    "navGroupSetup": {
+        "message": "Настройка"
+    },
+    "navGroupFlight": {
+        "message": "Управление полётом"
+    },
+    "navGroupTuning": {
+        "message": "Тюнинг"
+    },
+    "navGroupNavigation": {
+        "message": "Навигация и миссии"
+    },
+    "navGroupSensors": {
+        "message": "Сенсоры и периферия"
+    },
+    "navGroupLogging": {
+        "message": "Логгирование"
+    },
+    "navGroupProgramming": {
+        "message": "Программирование"
+    },
+    "navGroupTools": {
+        "message": "Инструменты"
+    },
+    "gpsPresetMode": {
+        "message": "Пресет конфигурации GPS"
+    },
+    "gpsPresetModeHelp": {
+        "message": "Выберите пресет, оптимизированный под ваш GPS-модуль, или используйте «Вручную» для индивидуальной настройки. «Автоопределение» определит ваш модуль автоматически, если он подключен."
+    },
+    "gpsUpdateRate": {
+        "message": "Частота обновления GPS (Гц)"
+    },
+    "gpsUpdateRateHelp": {
+        "message": "Частота отправки данных о местоположении модулем GPS. Высокая частота снижает задержку, но может снизить точность при одновременном использовании нескольких спутниковых систем на модулях серии M10."
+    },
+    "gpsAutoDetectFailed": {
+        "message": "Не удалось автоматически обнаружить GPS-модуль. Пожалуйста, подключите полётный контроллер или выберите пресет вручную."
+    },
+    "gpsAutoDetectSuccess": {
+        "message": "Обнаружен GPS-модуль:"
+    },
+    "osdElement_DIRECTION_TO_HOME": {
+        "message": "Направление на дом"
+    },
+    "osdElement_HOME_HEADING_ERROR": {
+        "message": "Ошибка курса на дом"
+    },
+    "layerManagementTitle": {
+        "message": "Слои карты"
+    },
+    "layerLoadGeoFile": {
+        "message": "Загрузить GEO-файл"
+    },
+    "layerDragDropHint": {
+        "message": "или перетащите GEO-файлы на карту"
+    },
+    "layerConfirmDelete": {
+        "message": "Вы уверены, что хотите удалить этот слой?"
+    },
+    "layerLoadError": {
+        "message": "Ошибка загрузки GEO-файла. Пожалуйста, проверьте формат файла."
+    },
+    "layerParseError": {
+        "message": "Ошибка чтения GEO-файла. Неподдерживаемый формат или повреждённые данные."
+    },
+    "sensorProfileTitle": {
+        "message": "Профиль управления — хранит настройки PID, рейтов и фильтрации"
+    },
+    "mixerProfileTitle": {
+        "message": "Профиль микшера — хранит конфигурацию микшеров моторов/сервоприводов и настройки выходов"
+    },
+    "sensorBatteryProfileTitle": {
+        "message": "Профиль аккумулятора — хранит настройки напряжения, ёмкости и датчика тока"
+    },
+    "gpsFixNotConnected": {
+        "message": "<span class=\"fixnone\">Не подключено</span>"
+    },
+    "receiverButtonSticksTitle": {
+        "message": "Отображение стиков в реальном времени для проверки каналов приёмника"
+    },
+    "searchPlaceholder": {
+        "message": "Поиск настроек..."
+    },
+    "backupRestoreButtonBackup": {
+        "message": "Бэкап настроек"
+    },
+    "backupRestoreButtonRestore": {
+        "message": "Восстановление настроек"
+    },
+    "backupRestoreOpenBackupsFolder": {
+        "message": "Открыть бекапы"
+    },
+    "backupRestoreStatusConnecting": {
+        "message": "Подключение к полётному контроллеру..."
+    },
+    "backupRestoreStatusEnteringCli": {
+        "message": "Вход в режим CLI..."
+    },
+    "backupRestoreStatusReadingConfig": {
+        "message": "Чтение конфигурации (все изменённые параметры)..."
+    },
+    "backupRestoreStatusSavingFile": {
+        "message": "Сохранение бэкапа..."
+    },
+    "backupRestoreStatusExitingCli": {
+        "message": "Выход из CLI (перезагрузка)..."
+    },
+    "backupRestoreStatusRestoringConfig": {
+        "message": "Восстановление конфигурации..."
+    },
+    "backupRestoreStatusSaving": {
+        "message": "Сохранение и перезагрузка..."
+    },
+    "backupRestoreStatusBackupComplete": {
+        "message": "Резервное копирование завершено. Переходим к прошивке..."
+    },
+    "backupRestoreBackupSaved": {
+        "message": "Бэкап сохранён в: $1"
+    },
+    "backupRestoreAutoBackupSaved": {
+        "message": "Автобэкап сохранён в: $1"
+    },
+    "backupRestoreBackupComplete": {
+        "message": "Резервное копирование завершено."
+    },
+    "backupRestoreBackupCancelled": {
+        "message": "Резервное копирование отменено."
+    },
+    "backupRestoreBackupFailed": {
+        "message": "Ошибка резервного копирования."
+    },
+    "backupRestoreRestoreComplete": {
+        "message": "Конфигурация восстановлена. Полётный контроллер перезагружается."
+    },
+    "backupRestoreRestoreCancelled": {
+        "message": "Восстановление отменено."
+    },
+    "backupRestoreRestoreFailed": {
+        "message": "Ошибка восстановления."
+    },
+    "backupRestoreFlashCompleteBackupSaved": {
+        "message": "Прошивка завершена. Резервная копия конфигурации сохранена."
+    },
+    "backupRestoreOverlayTitle": {
+        "message": "Восстановление конфигурации"
+    },
+    "backupRestoreStatusRestoringProgress": {
+        "message": "Восстановление конфигурации... ($1 / $2)"
+    },
+    "backupRestoreRestoreAborted": {
+        "message": "Восстановление прервано — настройки НЕ были сохранены."
+    },
+    "backupRestoreErrorTitle": {
+        "message": "Ошибка в процессе восстановления"
+    },
+    "backupRestoreErrorText": {
+        "message": "Полётный контроллер сообщил о следующих ошибках. Вы можете всё равно сохранить настройки или прервать процесс без сохранения."
+    },
+    "backupRestoreErrorAbort": {
+        "message": "Отмена (Не сохранять)"
+    },
+    "backupRestoreErrorSave": {
+        "message": "Всё равно сохранить"
+    },
+    "backupRestoreFlashCompleteOfferRestore": {
+        "message": "Прошивка завершена. Перед прошивкой была создана резервная копия."
+    },
+    "backupRestoreAutoRestoreConfirm": {
+        "message": "Была выполнена полная очистка чипа. Хотите восстановить резервную копию конфигурации, сохранённую перед прошивкой?"
+    },
+    "backupRestoreAutoRestoreWaiting": {
+        "message": "Ожидание загрузки полётного контроллера..."
+    },
+    "backupRestoreAutoRestoreYes": {
+        "message": "Да, восстановить"
+    },
+    "backupRestoreAutoRestoreNo": {
+        "message": "Нет, пропустить"
+    },
+    "backupRestoreAutoRestoreWaitingPort": {
+        "message": "Ожидание, пока устройство $1 станет доступным..."
+    },
+    "firmwareFlasherVersionWarningTitle": {
+        "message": "⚠ Предупреждение об обновлении версии"
+    },
+    "firmwareFlasherVersionWarningText": {
+        "message": "Обновление с версии $1 до $2 без полной очистки чипа может привести к непредсказуемым ошибкам или повреждению конфигурации. Конфигуратор не будет восстанавливать настройки вашего полётного контроллера автоматически."
+    },
+    "firmwareFlasherVersionWarningContinue": {
+        "message": "Продолжить без очистки чипа"
+    },
+    "firmwareFlasherVersionWarningCancel": {
+        "message": "Отмена"
+    },
+    "backupRestoreMigrationApplied": {
+        "message": "Обновление: $1 → $2 (изменений: $3)"
+    },
+    "backupRestoreMigrationWarningsHeader": {
+        "message": "Предупреждения обновления:"
+    },
+    "backupRestoreDowngradeNoAutoRestore": {
+        "message": "Вы перешли на более старую версию прошивки. Автоматический возврат настроек невозможен — проверьте параметры и восстановите бэкап вручную."
+    },
+    "migrationPreviewTitle": {
+        "message": "Требуется перенос настроек под новую версию"
+    },
+    "migrationPreviewSubtitle": {
+        "message": "Мы адаптируем ваш бэкап ($1) под новую прошивку ($2). Будут внесены следующие изменения:"
+    },
+    "migrationPreviewRemovedHeader": {
+        "message": "Удалённые параметры ($1):"
+    },
+    "migrationPreviewRenamedSettingsHeader": {
+        "message": "Переименованные параметры ($1):"
+    },
+    "migrationPreviewRenamedCommandsHeader": {
+        "message": "Переименованные команды ($1):"
+    },
+    "migrationPreviewValueReplacementsHeader": {
+        "message": "Замена значений ($1):"
+    },
+    "migrationPreviewSettingRemappingsHeader": {
+        "message": "Переназначение параметров ($1):"
+    },
+    "migrationPreviewContinue": {
+        "message": "Продолжить восстановление"
+    },
+    "migrationPreviewCancel": {
+        "message": "Отмена (ручная проверка)"
+    },
+    "migrationMissingProfileWarning": {
+        "message": "Для перехода с версии $1 на $2 нет готового профиля миграции. Настройки будут перенесены «как есть» — некоторые из них могут не сработать или будут проигнорированы прошивкой."
     }
 }
