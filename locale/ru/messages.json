@@ -5789,6 +5789,63 @@
     "configurationNoBand": {
         "message": "Отсутствует"
     },
+    "configurationPowerLimits": {
+        "message": "Ограничение мощности"
+    },
+    "configurationPowerLimitsHelp": {
+        "message": "Ограничьте потребление тока и мощности для защиты аккумулятора и регуляторов. Установите 0 для отключения. Единицы: dA (деци-ампер) = А×10, dW (деци-ватт) = Вт×10, ds (деци-секунда) = с×10."
+    },
+    "configurationPowerLimitsNote": {
+        "message": "Защищает аккумулятор от перегрузки по току, плавно уменьшая газ. Требует датчик тока. Задайте непрерывные и пиковые ограничения согласно спецификации аккумулятора."
+    },
+    "configurationLimitContCurrent": {
+        "message": "Непрерывный ток (dA)"
+    },
+    "configurationLimitContCurrentHelp": {
+        "message": "Максимальный постоянный ток в деци-амперах (dA). Пример: 500 = 50А. Установите 0 для отключения ограничения тока."
+    },
+    "configurationLimitBurstCurrent": {
+        "message": "Пиковый ток (dA)"
+    },
+    "configurationLimitBurstCurrentHelp": {
+        "message": "Повышенный ток допускается на короткое время (резкие манёвры, набор высоты). Пример: 750 = 75А. Должен быть >= непрерывного."
+    },
+    "configurationLimitBurstCurrentTime": {
+        "message": "Время пикового тока (ds)"
+    },
+    "configurationLimitBurstCurrentTimeHelp": {
+        "message": "Продолжительность пикового тока в деци-секундах (ds). Пример: 100 = 10 секунд. По истечении снижается до непрерывного."
+    },
+    "configurationLimitBurstCurrentFalldownTime": {
+        "message": "Время снижения тока (ds)"
+    },
+    "configurationLimitBurstCurrentFalldownTimeHelp": {
+        "message": "Время плавного снижения от пикового до непрерывного ограничения в деци-секундах (ds). Пример: 20 = 2 секунды."
+    },
+    "configurationLimitContPower": {
+        "message": "Непрерывная мощность (dW)"
+    },
+    "configurationLimitContPowerHelp": {
+        "message": "Максимальная постоянная мощность в деци-ваттах (dW). Пример: 8000 = 800 Вт. Установите 0 для отключения. Требует измерение напряжения."
+    },
+    "configurationLimitBurstPower": {
+        "message": "Пиковая мощность (dW)"
+    },
+    "configurationLimitBurstPowerHelp": {
+        "message": "Повышенная мощность допускается на короткое время. Пример: 10000 = 1000 Вт. Должна быть >= непрерывной."
+    },
+    "configurationLimitBurstPowerTime": {
+        "message": "Время пиковой мощности (ds)"
+    },
+    "configurationLimitBurstPowerTimeHelp": {
+        "message": "Продолжительность пиковой мощности в деци-секундах (ds). Пример: 50 = 5 секунд."
+    },
+    "configurationLimitBurstPowerFalldownTime": {
+        "message": "Время снижения мощности (ds)"
+    },
+    "configurationLimitBurstPowerFalldownTimeHelp": {
+        "message": "Время плавного снижения от пиковой до непрерывной мощности в деци-секундах (ds). Пример: 10 = 1 секунда."
+    },
     "sensorsTemperature4": {
         "message": "Температура 4, °C"
     },

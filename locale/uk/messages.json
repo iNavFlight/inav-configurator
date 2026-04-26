@@ -1235,6 +1235,63 @@
     "configurationNoBand": {
         "message": "Відсутній"
     },
+    "configurationPowerLimits": {
+        "message": "Обмеження потужності"
+    },
+    "configurationPowerLimitsHelp": {
+        "message": "Обмежте споживання струму та потужності для захисту акумулятора та регуляторів. Встановіть 0 для вимкнення. Одиниці: dA (деці-ампер) = А×10, dW (деці-ват) = Вт×10, ds (деці-секунда) = с×10."
+    },
+    "configurationPowerLimitsNote": {
+        "message": "Захищає акумулятор від перевантаження по струму, плавно зменшуючи газ. Потребує датчик струму. Задайте безперервні та пікові обмеження відповідно до специфікації акумулятора."
+    },
+    "configurationLimitContCurrent": {
+        "message": "Безперервний струм (dA)"
+    },
+    "configurationLimitContCurrentHelp": {
+        "message": "Максимальний постійний струм у деці-амперах (dA). Приклад: 500 = 50А. Встановіть 0 для вимкнення обмеження струму."
+    },
+    "configurationLimitBurstCurrent": {
+        "message": "Піковий струм (dA)"
+    },
+    "configurationLimitBurstCurrentHelp": {
+        "message": "Підвищений струм допускається на короткий час (різкі маневри, набір висоти). Приклад: 750 = 75А. Має бути >= безперервного."
+    },
+    "configurationLimitBurstCurrentTime": {
+        "message": "Час пікового струму (ds)"
+    },
+    "configurationLimitBurstCurrentTimeHelp": {
+        "message": "Тривалість пікового струму у деці-секундах (ds). Приклад: 100 = 10 секунд. Після закінчення знижується до безперервного."
+    },
+    "configurationLimitBurstCurrentFalldownTime": {
+        "message": "Час зниження струму (ds)"
+    },
+    "configurationLimitBurstCurrentFalldownTimeHelp": {
+        "message": "Час плавного зниження від пікового до безперервного обмеження у деці-секундах (ds). Приклад: 20 = 2 секунди."
+    },
+    "configurationLimitContPower": {
+        "message": "Безперервна потужність (dW)"
+    },
+    "configurationLimitContPowerHelp": {
+        "message": "Максимальна постійна потужність у деці-ватах (dW). Приклад: 8000 = 800 Вт. Встановіть 0 для вимкнення. Потребує вимірювання напруги."
+    },
+    "configurationLimitBurstPower": {
+        "message": "Пікова потужність (dW)"
+    },
+    "configurationLimitBurstPowerHelp": {
+        "message": "Підвищена потужність допускається на короткий час. Приклад: 10000 = 1000 Вт. Має бути >= безперервної."
+    },
+    "configurationLimitBurstPowerTime": {
+        "message": "Час пікової потужності (ds)"
+    },
+    "configurationLimitBurstPowerTimeHelp": {
+        "message": "Тривалість пікової потужності у деці-секундах (ds). Приклад: 50 = 5 секунд."
+    },
+    "configurationLimitBurstPowerFalldownTime": {
+        "message": "Час зниження потужності (ds)"
+    },
+    "configurationLimitBurstPowerFalldownTimeHelp": {
+        "message": "Час плавного зниження від пікової до безперервної потужності у деці-секундах (ds). Приклад: 10 = 1 секунда."
+    },
     "configurationVTXNoBandHelp": {
         "message": "Частота VTX була встановлена вручну. Вибір діапазону перезапише налаштовану частоту."
     },
