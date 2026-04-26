@@ -1,0 +1,188 @@
+<div class="tab-map_generator toolbar_fixed_bottom">
+    <div class="content_wrapper">
+        <div class="tab_title" data-i18n="tabMapGenerator">Map Generator</div>
+
+        <div class="mapgen-layout">
+            <!-- Sidebar Controls -->
+            <div class="mapgen-sidebar">
+                <div class="config-section gui_box grey">
+                    <div class="gui_box_titlebar">
+                        <div class="spacer_box_title" data-i18n="mapgenOutputSettings">Output Settings</div>
+                    </div>
+                    <div class="spacer_box">
+                        <div class="select">
+                            <select id="mapgen_target">
+                                <option value="b14ckyy">b14ckyy ETHOS Mapping Widget</option>
+                                <option value="yaapu">Yaapu</option>
+                                <option value="terrain">INAV Terrain (SRTM)</option>
+                            </select>
+                            <label for="mapgen_target"><span data-i18n="mapgenTarget">Target Widget</span></label>
+                        </div>
+
+                        <div class="select mapgen-subtarget-hidden" id="mapgen_subtarget_wrapper">
+                            <select id="mapgen_subtarget">
+                                <option value="ethos">ETHOS</option>
+                                <option value="edgetx">EdgeTX</option>
+                            </select>
+                            <label for="mapgen_subtarget"><span data-i18n="mapgenSubTarget">Platform</span></label>
+                        </div>
+
+                        <div class="select">
+                            <select id="mapgen_provider">
+                                <option value="OSM" selected>Standard Map (OSM)</option>
+                                <option value="ESRI">ESRI High-Res</option>
+                                <option value="GOOGLE">Google High-Res</option>
+                            </select>
+                            <label for="mapgen_provider"><span data-i18n="mapgenProvider">Provider</span></label>
+                        </div>
+
+                        <div class="select">
+                            <select id="mapgen_maptype"></select>
+                            <label for="mapgen_maptype"><span data-i18n="mapgenMapType">Map Type</span></label>
+                        </div>
+
+                        <div id="mapgen_google_warning" class="mapgen-warning" style="display:none;">
+                            <span data-i18n="mapgenGoogleWarning">Warning: Google might temporarily ban IPs after bulk downloads for 24 hours.</span>
+                        </div>
+                        <div id="mapgen_yaapu_warning" class="mapgen-warning mapgen-warning-yaapu" style="display:none;"></div>
+                    </div>
+                </div>
+
+                <div class="config-section gui_box grey">
+                    <div class="gui_box_titlebar">
+                        <div class="spacer_box_title" data-i18n="mapgenProjectSettings">Project Settings</div>
+                    </div>
+                    <div class="spacer_box">
+                        <div class="number">
+                            <input type="text" id="mapgen_project_name" value="MyLocalField" maxlength="32" />
+                            <label for="mapgen_project_name"><span data-i18n="mapgenProjectName">Project Folder Name</span></label>
+                        </div>
+
+                        <div class="mapgen-zoom-row">
+                            <div class="select">
+                                <select id="mapgen_min_zoom"></select>
+                                <label for="mapgen_min_zoom"><span data-i18n="mapgenMinZoom">Min Zoom</span></label>
+                            </div>
+                            <div class="select">
+                                <select id="mapgen_max_zoom"></select>
+                                <label for="mapgen_max_zoom"><span data-i18n="mapgenMaxZoom">Max Zoom</span></label>
+                            </div>
+                        </div>
+                        <div id="mapgen_hint_tiles" style="font-size:10px; color:#888; margin:2px 0 4px; font-style:italic;">Hint: Each extra zoom level ≈ 4× more tiles. Keep the area small or lower max zoom (when large area selected) to avoid long syncs and rate limits.</div>
+                        <div id="mapgen_hint_terrain" style="font-size:10px; color:#888; margin:2px 0 4px; font-style:italic; display:none;">Hint: One .DAT file per 1°×1° grid square (~111 km). Data: NASA SRTM1 at 30m resolution. Ocean depths are clamped to 0m.</div>
+
+                        <div id="mapgen_terrain_alt_row" class="checkbox mapgen-overwrite-row" style="display:none;">
+                            <input type="checkbox" id="mapgen_terrain_alt_toggle" />
+                            <label for="mapgen_terrain_alt_toggle"><span>Live Altitude</span></label>
+                        </div>
+                        <div id="mapgen_terrain_alt_hint" style="font-size:10px; color:#ff9800; margin:2px 0 4px; font-style:italic; display:none;">Altitude available after generating .DAT files — uses locally cached SRTM data to avoid unnecessary server requests.</div>
+
+                        <div class="select">
+                            <select id="mapgen_area_unit">
+                                <option value="km2" selected>km²</option>
+                                <option value="mi2">mi²</option>
+                                <option value="ha">ha</option>
+                                <option value="acre">acre</option>
+                            </select>
+                            <label for="mapgen_area_unit"><span data-i18n="mapgenAreaUnit">Area Unit</span></label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="config-section gui_box grey">
+                    <div class="gui_box_titlebar">
+                        <div class="spacer_box_title" data-i18n="mapgenSdCard">SD Card</div>
+                    </div>
+                    <div class="spacer_box">
+                        <a id="mapgen_link_sd" class="btn" href="#" data-i18n="mapgenLinkSD">Select SD Card Folder</a>
+                        <a id="mapgen_eject_sd" class="btn mapgen-eject-btn" href="#" style="display:none;" data-i18n="mapgenEjectSD">Eject SD Card</a>
+                        <div id="mapgen_sd_path" class="mapgen-sd-path" data-i18n="mapgenNoSdLinked">No SD card folder selected</div>
+
+                        <div class="checkbox mapgen-overwrite-row">
+                            <input type="checkbox" id="mapgen_overwrite" />
+                            <label for="mapgen_overwrite"><span data-i18n="mapgenForceOverwrite">Force Overwrite existing tiles</span></label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="config-section gui_box grey">
+                    <div class="gui_box_titlebar">
+                        <div class="spacer_box_title" data-i18n="mapgenTileCache">Tile Cache</div>
+                    </div>
+                    <div class="spacer_box">
+                        <div class="checkbox mapgen-overwrite-row">
+                            <input type="checkbox" id="mapgen_cache_enabled" checked />
+                            <label for="mapgen_cache_enabled"><span data-i18n="mapgenCacheEnabled">Enable local tile cache</span></label>
+                        </div>
+
+                        <div class="mapgen-cache-row">
+                            <div class="mapgen-cache-info">
+                                <span data-i18n="mapgenCacheSize">Cache size:</span>
+                                <span id="mapgen_cache_size">0 KB</span>
+                            </div>
+                            <div class="mapgen-cache-max">
+                                <select id="mapgen_cache_max">
+                                    <option value="100">100 MB</option>
+                                    <option value="250">250 MB</option>
+                                    <option value="500" selected>500 MB</option>
+                                    <option value="1000">1 GB</option>
+                                    <option value="2000">2 GB</option>
+                                </select>
+                                <label for="mapgen_cache_max"><span data-i18n="mapgenCacheMaxSize">Max</span></label>
+                            </div>
+                        </div>
+
+                        <a id="mapgen_clear_cache" class="btn" href="#" data-i18n="mapgenClearCache">Clear Tile Cache</a>
+
+                        <a id="mapgen_clear_hgt_cache" class="btn" href="#" style="display:none; margin-top:6px;">Clear HGT Cache</a>
+                    </div>
+                </div>
+
+                <div id="mapgen_status" class="mapgen-status" data-i18n="mapgenStatusDefault">Draw a rectangle on the map to select your area.</div>
+            </div>
+
+            <!-- Map Container -->
+            <div class="mapgen-map-container">
+                <div id="mapgen_map"></div>
+                <div id="mapgen_crosshair">+</div>
+                <div id="mapgen_zoom_display">Zoom: 12</div>
+                <div id="mapgen_measure_popup" style="display:none;"></div>
+                <div id="mapgen_mouse_coords">
+                    <span id="mapgen_coords_output">Lat: 0.0000, Lng: 0.0000</span>
+                    <span id="mapgen_alt_output" style="display:none;">Alt: —</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="content_toolbar">
+        <div class="btn mapgen-toolbar-left" id="mapgen_save_settings_btn">
+            <a href="#" data-i18n="mapgenSaveSettings">Save Settings</a>
+        </div>
+        <div class="btn mapgen-toolbar-left" id="mapgen_restore_settings_btn">
+            <a href="#" data-i18n="mapgenRestoreSettings">Restore Defaults</a>
+        </div>
+        <div class="btn" id="mapgen_sync_btn">
+            <a class="save" href="#" data-i18n="mapgenSyncToSD">Sync to SD Card</a>
+        </div>
+        <div class="btn" id="mapgen_zip_btn">
+            <a class="save" href="#" data-i18n="mapgenExportZip">Export as ZIP</a>
+        </div>
+    </div>
+
+    <!-- Sync Confirmation Modal -->
+    <div id="mapgen_sync_overlay" class="mapgen-overlay">
+        <div class="mapgen-modal">
+            <h3 id="mapgen_modal_header" class="modal__title" data-i18n="mapgenSyncTitle">Syncing to SD Card</h3>
+            <div id="mapgen_sync_info" class="modal__text"></div>
+            <div id="mapgen_progress_section" style="display:none;">
+                <div class="mapgen-progress-bg"><div id="mapgen_progress_fill"></div></div>
+                <div id="mapgen_download_status">Ready...</div>
+            </div>
+            <div id="mapgen_modal_actions" class="mapgen-modal-buttons">
+                <a id="mapgen_modal_cancel" class="modal__button" href="#">Cancel</a>
+                <a id="mapgen_modal_confirm" class="modal__button modal__button--main" href="#" data-i18n="mapgenConfirmSync">Confirm Sync</a>
+            </div>
+        </div>
+    </div>
+</div>

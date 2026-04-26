@@ -209,6 +209,93 @@
     "tabSitl": {
         "message": "SITL"
     },
+    "tabMapGenerator": {
+        "message": "Map Generator"
+    },
+    "mapgenOutputSettings": {
+        "message": "Output Settings"
+    },
+    "mapgenTarget": {
+        "message": "Target Widget"
+    },
+    "mapgenProvider": {
+        "message": "Provider"
+    },
+    "mapgenMapType": {
+        "message": "Map Type"
+    },
+    "mapgenGoogleWarning": {
+        "message": "Warning: Google might temporarily ban IPs after bulk downloads for 24 hours."
+    },
+    "mapgenProjectSettings": {
+        "message": "Project Settings"
+    },
+    "mapgenProjectName": {
+        "message": "Project Folder Name"
+    },
+    "mapgenMinZoom": {
+        "message": "Min Zoom"
+    },
+    "mapgenMaxZoom": {
+        "message": "Max Zoom"
+    },
+    "mapgenAreaUnit": {
+        "message": "Area Unit"
+    },
+    "mapgenSdCard": {
+        "message": "SD Card"
+    },
+    "mapgenLinkSD": {
+        "message": "Select SD Card Folder"
+    },
+    "mapgenChangeSd": {
+        "message": "Change SD Folder"
+    },
+    "mapgenEjectSD": {
+        "message": "Eject SD Card"
+    },
+    "mapgenNoSdLinked": {
+        "message": "No SD card folder selected"
+    },
+    "mapgenForceOverwrite": {
+        "message": "Force Overwrite existing tiles"
+    },
+    "mapgenStatusDefault": {
+        "message": "Draw a rectangle on the map to select your area."
+    },
+    "mapgenSyncToSD": {
+        "message": "Sync to SD Card"
+    },
+    "mapgenExportZip": {
+        "message": "Export as ZIP"
+    },
+    "mapgenSaveSettings": {
+        "message": "Save Settings"
+    },
+    "mapgenRestoreSettings": {
+        "message": "Restore Defaults"
+    },
+    "mapgenSyncTitle": {
+        "message": "Syncing to SD Card"
+    },
+    "mapgenConfirmSync": {
+        "message": "Confirm Sync"
+    },
+    "mapgenTileCache": {
+        "message": "Tile Cache"
+    },
+    "mapgenCacheEnabled": {
+        "message": "Enable local tile cache"
+    },
+    "mapgenCacheSize": {
+        "message": "Cache size:"
+    },
+    "mapgenCacheMaxSize": {
+        "message": "Max cache size"
+    },
+    "mapgenClearCache": {
+        "message": "Clear Cache"
+    },
     "sitlDemoMode": {
         "message": "Demo Mode"
     },
