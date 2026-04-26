@@ -345,7 +345,7 @@ var SerialBackend = (function () {
     privateScope.onOpen = function (openInfo) {
 
         if (FC.restartRequired) {
-            GUI_control.prototype.log("<span style='color: red; font-weight: bolder'><strong>" + i18n.getMessage("illegalStateRestartRequired") + "</strong></span>");
+            GUI.log("<span style='color: red; font-weight: bolder'><strong>" + i18n.getMessage("illegalStateRestartRequired") + "</strong></span>");
             $('div.connect_controls a').trigger( "click" ); // disconnect
             return;
         }
@@ -413,7 +413,7 @@ var SerialBackend = (function () {
             MSP.send_message(MSPCodes.MSP_API_VERSION, false, false, function () {
                 
                 if (FC.CONFIG.apiVersion === "0.0.0") {
-                    GUI_control.prototype.log("<span style='color: red; font-weight: bolder'><strong>" + i18n.getMessage("illegalStateRestartRequired") + "</strong></span>");
+                    GUI.log("<span style='color: red; font-weight: bolder'><strong>" + i18n.getMessage("illegalStateRestartRequired") + "</strong></span>");
                     FC.restartRequired = true;
                     return;
                 }

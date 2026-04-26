@@ -766,6 +766,10 @@
     border: 1px solid #e58383;
 }
 
+.tab-osd .osd_settings .gui_box + .gui_box {
+    margin-top: 1em;
+}
+
 
 .settings .btn a:hover {
     background-color: #3394b5;
