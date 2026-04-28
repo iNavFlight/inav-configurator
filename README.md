@@ -1,3 +1,5 @@
+[![MseeP.ai Security Assessment Badge](https://mseep.net/pr/inavflight-inav-configurator-badge.png)](https://mseep.ai/app/inavflight-inav-configurator)
+
 # INAV Configurator
 
 INAV Configurator is a cross-platform configuration tool for the [INAV](https://github.com/iNavFlight/inav) flight control system.
