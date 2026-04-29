@@ -122,9 +122,10 @@ TABS.mission_control.initialize = function (callback) {
     let breadCrumbStyle;
     let breadCrumbSource;
     let breadCrumbVector;
-    let textStyle;
-    let textFeature;
-    var textGeom;
+    let autoCenteredOnFix = false;
+    let lastGpsPos = null;
+    let infoOverlayEl;
+    let infoOverlaySpans;
     let isOffline = false;
     let selectedSafehome;
     let $safehomeContentBox;
@@ -142,6 +143,8 @@ TABS.mission_control.initialize = function (callback) {
     if (FC.isFeatureEnabled('GEOZONE')) {
         isGeozoneEnabeld = true;
     }
+
+    
 
     if (CONFIGURATOR.connectionValid) {
         var loadChainer = new MSPChainerClass();
@@ -227,7 +230,10 @@ function iconKey(filename) {
             $('#saveMissionButton').hide();
             $('#loadEepromMissionButton').hide();
             $('#saveEepromMissionButton').hide();
+            $('#centerOnDrone').hide();
             isOffline = true;
+        } else {
+            $('#centerOnDrone').show();
         }
 
         $('#infoGeozoneMissionWarning').hide();
@@ -235,11 +241,14 @@ function iconKey(filename) {
         $safehomeContentBox = $('#SafehomeContentBox');
         $waypointOptionsTableBody = $('#waypointOptionsTableBody');
         $geozoneContent = $('#geozoneContent');
+        $('#centerOnDrone').css({ opacity: 0.45, pointerEvents: 'none' });
 
        
             loadSettings();
             // let the dom load finish, avoiding the resizing of the map
             setTimeout(initMap, 200);
+            // Set initial button visibility based on mission state
+            setTimeout(updateLocationButtonsVisibility, 300);
             if (!isOffline) {
                 setTimeout(() => {
                     if (FC.SAFEHOMES.safehomeCount() >= 1) {
@@ -262,6 +271,20 @@ function iconKey(filename) {
     
         i18n.localize();
 
+        // Append shortcut hints after i18n sets titles (Ctrl-based)
+        const addShortcutHint = (selector, suffix) => {
+            const el = $(selector);
+            if (!el.length) return;
+            const current = el.attr('title') || '';
+            if (current.includes(suffix)) return;
+            el.attr('title', `${current}${current ? ' ' : ''}${suffix}`.trim());
+        };
+        addShortcutHint('#centerOnDroneButton', '(Ctrl+C)');
+        addShortcutHint('#loadFileMissionButton', '(Ctrl+L)');
+        addShortcutHint('#saveFileMissionButton', '(Ctrl+S)');
+        addShortcutHint('#removeAllPoints a', '(Ctrl+D)');
+        addShortcutHint('#searchAddressButton', '(Ctrl+A)');
+
         function get_raw_gps_data() {
             MSP.send_message(MSPCodes.MSP_RAW_GPS, false, false, get_comp_gps_data);
         }
@@ -283,9 +306,12 @@ function iconKey(filename) {
 
           let lat = FC.GPS_DATA.lat / 10000000;
           let lon = FC.GPS_DATA.lon / 10000000;
+                    const latLonPrecision = 5; // Raise this to 6 if you want more precise lat/lon readout later.
+
+          const hasGpsLock = FC.GPS_DATA.fix >= 2;
 
           //Update map
-          if (FC.GPS_DATA.fix >= 2) {
+          if (hasGpsLock) {
 
               if (!cursorInitialized) {
                   cursorInitialized = true;
@@ -368,47 +394,70 @@ function iconKey(filename) {
                     source: breadCrumbSource
                   });
 
-                  /////////////////////////////
-                  //create layer for heading, alt, groundspeed
-                  textGeom = new Point([0,0]);
-
-                  textStyle = new Style({
-                    text: new Text({
-                      font: 'bold 35px Calibri,sans-serif',
-                      fill: new Fill({ color: '#fff' }),
-                      offsetX: map.getSize()[0]-260,
-                      offsetY: 80,
-                      textAlign: 'left',
-                      backgroundFill: new Fill({ color: '#000' }),
-                      stroke: new Stroke({
-                        color: '#fff', width: 2
-                      }),
-                      text: 'H: XXX\nAlt: XXXm\nSpeed: XXXcm/s'
-                    })
-                  });
-
-                  textFeature = new Feature({
-                    geometry: textGeom
-                  });
-
-                  textFeature.setStyle(textStyle);
-
-                  var textSource = new VectorSource({
-                    features: [textFeature]
-                  });
-
-                  var textVector = new VectorLayer({
-                    source: textSource
-                  });
-
                   map.addLayer(rthLayer);
                   map.addLayer(breadCrumbVector);
                   map.addLayer(currentPositionLayer);
-                  map.addControl(textVector);
+
+                                    // Create a simple top bar overlay for telemetry text
+                                    const targetEl = map.getTargetElement();
+                                    if (targetEl) {
+                                        if (!targetEl.style.position) {
+                                            targetEl.style.position = 'relative';
+                                        }
+                                        infoOverlayEl = document.createElement('div');
+                                        infoOverlayEl.className = 'mc-gps-inline';
+                                        Object.assign(infoOverlayEl.style, {
+                                            position: 'absolute',
+                                            bottom: '1.125rem',
+                                            left: '0',
+                                            right: '0',
+                                            padding: '0.375rem 0.625rem',
+                                            background: 'rgba(0, 0, 0, 0.45)',
+                                            color: '#fff',
+                                            font: '600 1rem "Segoe UI", Calibri, sans-serif',
+                                            textShadow: '0 0 4px rgba(0, 0, 0, 0.8)',
+                                            textAlign: 'center',
+                                            display: 'flex',
+                                            justifyContent: 'center',
+                                            gap: '1.125rem',
+                                            alignItems: 'center',
+                                            flexWrap: 'wrap',
+                                            fontVariantNumeric: 'tabular-nums',
+                                            pointerEvents: 'none',
+                                            zIndex: 5,
+                                            whiteSpace: 'nowrap',
+                                            overflow: 'hidden',
+                                            textOverflow: 'ellipsis',
+                                            visibility: 'hidden'
+                                        });
+
+                                        infoOverlaySpans = {};
+                                        const telemetryFields = ['H', 'Alt', 'Spd', 'Dist', 'Sats', 'Lat', 'Lon'];
+                                        telemetryFields.forEach((field) => {
+                                            const span = document.createElement('span');
+                                            span.style.minWidth = '4.875rem';
+                                            span.style.textAlign = 'center';
+                                            infoOverlaySpans[field] = span;
+                                            infoOverlayEl.appendChild(span);
+                                        });
+
+                                        targetEl.appendChild(infoOverlayEl);
+                                    }
               }
 
               let gpsPos = fromLonLat([lon, lat]);
               curPosGeo.setCoordinates(gpsPos);
+              lastGpsPos = gpsPos;
+              $('#centerOnDrone').css({ opacity: 1, pointerEvents: 'auto' });
+
+                            // Uncomment to auto-center/zoom once when GPS lock is first acquired
+                            // if (!autoCenteredOnFix && map && map.getView()) {
+                            //     autoCenteredOnFix = true;
+                            //     map.getView().setCenter(gpsPos);
+                            //     if (map.getView().getZoom() < 14) {
+                            //         map.getView().setZoom(14);
+                            //     }
+                            // }
 
               breadCrumbLS.appendCoordinate(gpsPos);
 
@@ -421,15 +470,33 @@ function iconKey(filename) {
 
               curPosStyle.getImage().setRotation((FC.SENSOR_DATA.kinematics[2]/360.0) * 6.28318);
 
-              //update data text
-              textGeom.setCoordinates(map.getCoordinateFromPixel([0,0]));
-              let tmpText = textStyle.getText();
-              tmpText.setText('                                \n' +
-                              'H: ' + FC.SENSOR_DATA.kinematics[2] +
-                              '\nAlt: ' + FC.SENSOR_DATA.altitude +
-                              'm\nSpeed: ' + FC.GPS_DATA.speed + 'cm/s\n' +
-                              'Dist: ' + FC.GPS_DATA.distanceToHome + 'm');
+                            if (infoOverlayEl) {
+                                const latStr = lat.toFixed(latLonPrecision);
+                                const lonStr = lon.toFixed(latLonPrecision);
+                                infoOverlayEl.style.visibility = 'visible';
+                                if (infoOverlaySpans) {
+                                    infoOverlaySpans.H.textContent = `H: ${FC.SENSOR_DATA.kinematics[2]}`;
+                                    infoOverlaySpans.Alt.textContent = `Alt: ${FC.SENSOR_DATA.altitude} m`;
+                                    infoOverlaySpans.Spd.textContent = `Spd: ${FC.GPS_DATA.speed} cm/s`;
+                                    infoOverlaySpans.Dist.textContent = `Dist: ${FC.GPS_DATA.distanceToHome} m`;
+                                    infoOverlaySpans.Sats.textContent = `Sats: ${FC.GPS_DATA.numSat}`;
+                                    infoOverlaySpans.Lat.textContent = `Lat: ${latStr}`;
+                                    infoOverlaySpans.Lon.textContent = `Lon: ${lonStr}`;
+                                } else {
+                                    infoOverlayEl.textContent =
+                                        `H: ${FC.SENSOR_DATA.kinematics[2]}  ` +
+                                        `Alt: ${FC.SENSOR_DATA.altitude} m  ` +
+                                        `Spd: ${FC.GPS_DATA.speed} cm/s  ` +
+                                        `Dist: ${FC.GPS_DATA.distanceToHome} m  ` +
+                                        `Sats: ${FC.GPS_DATA.numSat}  ` +
+                                        `Lat: ${latStr}  Lon: ${lonStr}`;
+                                }
+                            }
           }
+                    else if (infoOverlayEl) {
+                        $('#centerOnDrone').css({ opacity: 0.45, pointerEvents: 'none' });
+                        infoOverlayEl.style.visibility = 'hidden';
+                    }
         }
 
         /*
@@ -1323,6 +1390,7 @@ function iconKey(filename) {
         setView(14);
         refreshLayers();
         updateTotalInfo();
+        updateLocationButtonsVisibility();
     }
 
     /* selects single mission from MM repository */
@@ -1364,6 +1432,7 @@ function iconKey(filename) {
         refreshLayers();
         updateTotalInfo();
         plotElevation();
+        updateLocationButtonsVisibility();
     }
 
     /* single mission selection using WP Edit panel button */
@@ -1424,7 +1493,6 @@ function iconKey(filename) {
             };
             dialog.showOpenDialog(options).then(result => {
                 if (result.canceled) {
-                    console.log('No file selected');
                     return;
                 }
 
@@ -1460,14 +1528,25 @@ function iconKey(filename) {
     //
     /////////////////////////////////////////////
 
+    // Show/hide location buttons based on waypoint presence
+    function updateLocationButtonsVisibility() {
+        if (mission.isEmpty() && !multimissionCount) {
+            $('#centerOnCurrentLocation').fadeIn(300);
+        } else {
+            $('#centerOnCurrentLocation').fadeOut(300);
+        }
+    }
+
     function removeAllWaypoints() {
         mission.reinit();
         refreshLayers();
         clearEditForm();
         updateTotalInfo();
         clearFilename();
+        updateLocationButtonsVisibility();
     }
 
+    
     function addWaypointMarker(waypoint, isEdit=false) {
         let coord = fromLonLat([waypoint.getLonMap(), waypoint.getLatMap()]);
         var iconFeature = new Feature({
@@ -1604,10 +1683,6 @@ function iconKey(filename) {
                 addFwApproach(element.getLonMap(), element.getLatMap(), FC.FW_APPROACH.get()[FC.SAFEHOMES.getMaxSafehomeCount() + element.getMultiMissionIdx()], lines);
             }
         });
-        //reset text position
-        if (textGeom) {
-            textGeom.setCoordinates(map.getCoordinateFromPixel([0,0]));
-        }
         let lengthMission = mission.getDistance(true);
 
         if (disableMarkerEdit) {
@@ -2682,6 +2757,7 @@ function iconKey(filename) {
                     refreshLayers();
                     plotElevation();
                 }
+                updateLocationButtonsVisibility();
             }
             //mission.missionDisplayDebug();
             updateMultimissionState();
@@ -2726,6 +2802,12 @@ function iconKey(filename) {
         /////////////////////////////////////////////
         // Callback to show/hide menu boxes
         /////////////////////////////////////////////
+        
+        // Ensure ActionContent is visible initially
+        if ($('#showHideActionButton').children().attr('class') === 'ic_hide') {
+            $('#ActionContent').show();
+        }
+        
         $('#showHideActionButton').on('click', function () {
             var src = ($(this).children().attr('class') === 'ic_hide')
                 ? 'ic_show'
@@ -3664,6 +3746,145 @@ function iconKey(filename) {
             }
         });
 
+        // Address search button
+        $(document).on('click', '#searchAddressButton, #searchAddress', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            // Remove any existing dialog
+            $('#addressSearchDialog, #addressSearchBackdrop').remove();
+
+            // Create dialog
+            const addressDialog = $(`
+                <div id="addressSearchBackdrop" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+                     background: rgba(0,0,0,0.5); z-index: 10000;">
+                    <div id="addressSearchDialog" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); 
+                         background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.3);">
+                        <h3>Search for Location</h3>
+                        <input type="text" id="addressInput" style="width: 280px; padding: 8px 12px; margin: 10px 0; border: 1px solid #ccc; font-size: 14px;" 
+                               placeholder="Enter address, city, or coordinates" value="" autocomplete="off">
+                        <div style="margin-top: 15px; text-align: right;">
+                            <button id="searchCancel" style="padding: 8px 16px; margin-right: 10px;">Cancel</button>
+                            <button id="searchOK" style="padding: 8px 16px; background: #007cba; color: white; border: none;">Search</button>
+                        </div>
+                    </div>
+                </div>
+            `);
+
+            $('body').append(addressDialog);
+
+          
+            // Search function
+            function doSearch() {
+                const address = $('#addressInput').val().trim();
+                $('#addressSearchBackdrop').remove();
+
+                if (address) {
+                    const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&limit=1`;
+                    
+                    fetch(url)
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data && data.length > 0) {
+                                const result = data[0];
+                                const coord = fromLonLat([parseFloat(result.lon), parseFloat(result.lat)]);
+                                map.getView().setCenter(coord);
+                                dialog.alert(`Found: ${result.display_name}`);
+                            } else {
+                                dialog.alert('Address not found.');
+                            }
+                        })
+                        .catch(err => {
+                            console.error('Search failed:', err);
+                            dialog.alert('Search failed. Check your connection.');
+                        });
+                }
+
+                setTimeout(() => {
+                    const input = document.getElementById('addressInput');
+                    input?.focus();
+                    input?.select();
+                }, 50);
+
+            }
+
+            // Event handlers
+            $('#searchOK').click(doSearch);
+            $('#searchCancel').click(() => $('#addressSearchBackdrop').remove());
+            $('#addressInput').keypress(function(e) {
+                if (e.which === 13) doSearch();
+            });
+            
+            // Only close on backdrop click, not dialog content click
+            $('#addressSearchBackdrop').click(function(e) {
+                if (e.target === this) {
+                    $('#addressSearchBackdrop').remove();
+                }
+            });
+            
+            // Prevent clicks inside the dialog from closing it
+            $('#addressSearchDialog').click(function(e) {
+                e.stopPropagation();
+            });
+        });
+
+        $(document).on('click', '#centerOnDroneButton, #centerOnDrone', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            if (lastGpsPos && map && map.getView()) {
+                map.getView().setCenter(lastGpsPos);
+            }
+        });
+
+        // Keyboard shortcuts (ignored when typing in inputs):
+        //  C -> center on latest GPS fix
+        //  Ctrl+L -> load mission from file
+        //  Ctrl+S -> save mission to file
+        //  Ctrl+D -> delete all points
+        //  Ctrl+A -> address search dialog
+        $(document).off('keydown.mcCenter').on('keydown.mcCenter', function (e) {
+            const key = (e.key || '').toLowerCase();
+            const target = e.target;
+            const isTyping = target && (
+                target.tagName === 'INPUT' ||
+                target.tagName === 'TEXTAREA' ||
+                target.isContentEditable ||
+                target.tagName === 'SELECT'
+            );
+            if (isTyping) return;
+
+            // Center on GPS fix (plain C or Ctrl+C)
+            if (!e.repeat && key === 'c') {
+                if (lastGpsPos && map && map.getView()) {
+                    map.getView().setCenter(lastGpsPos);
+                }
+            }
+
+            // Ctrl+L: open mission from file
+            if (!e.repeat && e.ctrlKey && key === 'l') {
+                e.preventDefault();
+                $('#loadFileMissionButton').trigger('click');
+            }
+
+            // Ctrl+S: save mission to file
+            if (!e.repeat && e.ctrlKey && key === 's') {
+                e.preventDefault();
+                $('#saveFileMissionButton').trigger('click');
+            }
+
+            // Ctrl+D: delete all points
+            if (!e.repeat && e.ctrlKey && key === 'd') {
+                e.preventDefault();
+                $('#removeAllPoints').trigger('click');
+            }
+
+            // Ctrl+A: address search
+            if (!e.repeat && e.ctrlKey && key === 'a') {
+                e.preventDefault();
+                $('#searchAddressButton').trigger('click');
+            }
+        });
+
         $('#removePoint').on('click', function () {
             if (selectedMarker) {
                 if (mission.isJumpTargetAttached(selectedMarker)) {
@@ -3686,6 +3907,7 @@ function iconKey(filename) {
                         clearEditForm();
                         refreshLayers();
                         plotElevation();
+                        updateLocationButtonsVisibility();
                     }
                 }
                 else {
@@ -3700,13 +3922,14 @@ function iconKey(filename) {
                     plotElevation();
                 }
                 updateMultimissionState();
+                updateLocationButtonsVisibility();
             }
         });
 
         /////////////////////////////////////////////
         // Callback for Save/load buttons
         /////////////////////////////////////////////
-        $('#loadFileMissionButton').on('click', function () {
+        $('#loadFileMissionButton').off('click').on('click', function () {
             if (!fileLoadMultiMissionCheck()) return;
 
             if (markers.length && !dialog.confirm(i18n.getMessage('confirm_delete_all_points'))) return;
@@ -3715,7 +3938,6 @@ function iconKey(filename) {
             };
             dialog.showOpenDialog(options).then(result => {
                 if (result.canceled) {
-                    console.log('No file selected');
                     return;
                 }
                 if (result.filePaths.length == 1) {
@@ -3724,7 +3946,7 @@ function iconKey(filename) {
             })
         });
 
-        $('#saveFileMissionButton').on('click', function () {
+        $('#saveFileMissionButton').off('click').on('click', function () {
             var options = {
                 filters: [ { name: "Mission file", extensions: ['mission'] } ]
             };
@@ -3965,6 +4187,7 @@ function iconKey(filename) {
                     mission.update(true, true);
                 }
                 updateMultimissionState();
+                updateLocationButtonsVisibility();
 
                 if (Object.keys(mission.getCenter()).length !== 0) {
                     var coord = fromLonLat([mission.getCenter().lon / 10000000 , mission.getCenter().lat / 10000000]);
@@ -4057,15 +4280,17 @@ function iconKey(filename) {
         var builder = new xml2js.Builder({ 'rootName': 'mission', 'renderOpts': { 'pretty': true, 'indent': '\t', 'newline': '\n' } });
         var xml = builder.buildObject(data);
         xml = xml.replace(/missionitem mission/g, 'meta mission');
-        fs.writeFile(filename, xml, (err) => {
+
+        window.electronAPI.writeFile(filename, xml).then((err) => {
             if (err) {
                 GUI.log(i18n.getMessage('ErrorWritingFile'));
                 return console.error(err);
             }
+
+            let sFilename = String(filename.split('\\').pop().split('/').pop());
+            GUI.log(sFilename + i18n.getMessage('savedSuccessfully'));
+            updateFilename(sFilename);
         });
-        let sFilename = String(filename.split('\\').pop().split('/').pop());
-        GUI.log(sFilename + i18n.getMessage('savedSuccessfully'));
-        updateFilename(sFilename);
     }
 
     /////////////////////////////////////////////
@@ -4149,6 +4374,7 @@ function iconKey(filename) {
                 mission.update(false, true);
                 refreshLayers();
                 $('#MPeditPoint').fadeOut(300);
+                updateLocationButtonsVisibility();
             }
         ]);
         saveChainer.execute();

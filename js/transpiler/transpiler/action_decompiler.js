@@ -51,14 +51,60 @@ class ActionDecompiler {
         return this.handleOverrideThrottle(lc, allConditions);
     }
 
+    // Operations that only use operandA (operandB is unused/ignored)
+    // These should not decompile operandB to avoid incorrect validation warnings
+    const operandAOnlyOperations = [
+      OPERATION.SET_VTX_POWER_LEVEL,
+      OPERATION.SET_VTX_BAND,
+      OPERATION.SET_VTX_CHANNEL,
+      OPERATION.SET_OSD_LAYOUT,
+      OPERATION.LOITER_OVERRIDE,
+      OPERATION.OVERRIDE_MIN_GROUND_SPEED,
+      OPERATION.SET_HEADING_TARGET,
+      OPERATION.SET_PROFILE,
+      OPERATION.SET_GIMBAL_SENSITIVITY
+    ];
+
+    // Operations that use no operands (boolean flags only)
+    const noOperandOperations = [
+      OPERATION.OVERRIDE_ARMING_SAFETY,
+      OPERATION.SWAP_ROLL_YAW,
+      OPERATION.INVERT_ROLL,
+      OPERATION.INVERT_PITCH,
+      OPERATION.INVERT_YAW,
+      OPERATION.DISABLE_GPS_FIX,
+      OPERATION.RESET_MAG_CALIBRATION
+    ];
+
     // INAV operand pattern (confirmed by logic_condition.c):
-    // - Most overrides: operandA = value, operandB = 0
+    // - Most overrides: operandA = value, operandB = 0 (unused)
     // - GVAR_INC/DEC: operandA = gvar index, operandB = increment/decrement
     // - FLIGHT_AXIS: operandA = axis index, operandB = angle/rate
     // - RC_CHANNEL: operandA = channel, operandB = value
     // - PORT_SET: operandA = pin, operandB = value
-    const valueA = this.decompileOperand(lc.operandAType, lc.operandAValue, allConditions);
-    const valueB = this.decompileOperand(lc.operandBType, lc.operandBValue, allConditions);
+
+    // Warn about unexpected operands (version detection for new firmware features)
+    if (noOperandOperations.includes(lc.operation)) {
+      if (lc.operandAType !== 0 || lc.operandAValue !== 0) {
+        this.addWarning(`Unexpected operand A to ${getOperationName(lc.operation)} operation (type=${lc.operandAType}, value=${lc.operandAValue}). This may indicate a firmware version mismatch.`);
+      }
+      if (lc.operandBType !== 0 || lc.operandBValue !== 0) {
+        this.addWarning(`Unexpected operand B to ${getOperationName(lc.operation)} operation (type=${lc.operandBType}, value=${lc.operandBValue}). This may indicate a firmware version mismatch.`);
+      }
+    } else if (operandAOnlyOperations.includes(lc.operation)) {
+      if (lc.operandBType !== 0 || lc.operandBValue !== 0) {
+        this.addWarning(`Unexpected operand B to ${getOperationName(lc.operation)} operation (type=${lc.operandBType}, value=${lc.operandBValue}). This may indicate a firmware version mismatch.`);
+      }
+    }
+
+    // Only decompile operands that are actually used by the operation
+    // This prevents incorrect validation warnings (e.g., PID range check on unused operands)
+    const valueA = noOperandOperations.includes(lc.operation)
+      ? null
+      : this.decompileOperand(lc.operandAType, lc.operandAValue, allConditions);
+    const valueB = (operandAOnlyOperations.includes(lc.operation) || noOperandOperations.includes(lc.operation))
+      ? null
+      : this.decompileOperand(lc.operandBType, lc.operandBValue, allConditions);
 
     switch (lc.operation) {
       // GVAR operations: operandA = index, operandB = value

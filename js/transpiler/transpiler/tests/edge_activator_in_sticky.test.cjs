@@ -160,16 +160,20 @@ describe('Edge with activator used as sticky operand', () => {
     // It should NOT appear as raw edge(rc[12].high, 100) inside the rc[11] ~ 1500 block
     // without the profile check
 
-    // Look for hoisted variable with activator
+    // Look for hoisted variable with activator (pattern 1)
     const hasHoistedWithActivator = /const cond\d+ = .* \? .*edge\(.*\) : 0/.test(code);
 
-    if (!hasHoistedWithActivator) {
-      // If not hoisted, the edge inside sticky should still have profile check
-      // This would be a more complex pattern, but let's check
-      console.log('Edge was not hoisted with activator - checking alternative patterns');
+    // Look for inline edge with activator in sticky callback (pattern 2)
+    // The edge should be wrapped in a ternary inside the sticky on: callback
+    const hasInlineEdgeWithActivator = /on:\s*\(\)\s*=>\s*\(.*\?\s*edge\(.*\)\s*:\s*0\)/.test(code);
+
+    if (!hasHoistedWithActivator && !hasInlineEdgeWithActivator) {
+      console.log('Edge was not hoisted with activator and not inline with activator');
+      console.log('Code:', code);
     }
 
-    expect(hasHoistedWithActivator).toBe(true);
+    // Either pattern is acceptable - both preserve the activator relationship
+    expect(hasHoistedWithActivator || hasInlineEdgeWithActivator).toBe(true);
   });
 });
 
