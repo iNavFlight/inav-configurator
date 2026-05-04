@@ -2766,20 +2766,25 @@ var mspHelper = (function () {
         }
     };
 
-    self.sendLedStripConfig = function (onCompleteCallback) {
+    self.sendLedStripConfig = function (onCompleteCallback, slotsToSend) {
 
-        var nextFunction = send_next_led_strip_config;
-
-        var ledIndex = 0;
-
-        if (FC.LED_STRIP.length == 0) {
-            onCompleteCallback();
-        } else {
-            send_next_led_strip_config();
+        var indicesToSend = [];
+        for (var i = 0; i < FC.LED_STRIP.length; i++) {
+            if (!slotsToSend || slotsToSend.has(i)) {
+                indicesToSend.push(i);
+            }
         }
 
-        function send_next_led_strip_config() {
+        if (indicesToSend.length === 0) {
+            onCompleteCallback();
+            return;
+        }
 
+        var position = 0;
+        send_next_led_strip_config();
+
+        function send_next_led_strip_config() {
+            var ledIndex = indicesToSend[position];
             var led = FC.LED_STRIP[ledIndex];
             /*
              var led = {
@@ -2849,10 +2854,8 @@ var mspHelper = (function () {
             buffer.push(BitHelper.specificByte(extra, 0));
 
             // prepare for next iteration
-            ledIndex++;
-            if (ledIndex == FC.LED_STRIP.length) {
-                nextFunction = onCompleteCallback;
-            }
+            position++;
+            var nextFunction = (position === indicesToSend.length) ? onCompleteCallback : send_next_led_strip_config;
 
             MSP.send_message(MSPCodes.MSP2_INAV_SET_LED_STRIP_CONFIG_EX, buffer, false, nextFunction);
         }

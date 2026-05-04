@@ -23,6 +23,7 @@
     border-radius: 3px;
     background-color: #dcdcdc;
     border: silver;
+    margin-top: 4em;
 }
 
 .tab-led-strip .mainGrid .gPoint {
@@ -432,6 +433,10 @@
 /* Quick Layouts */
 .tab-led-strip .quick-layouts {
     margin: 8px 0;
+    width: 50%;
+    margin-bottom: 2em;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .tab-led-strip .quick-layouts .color_section {
