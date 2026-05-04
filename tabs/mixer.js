@@ -137,6 +137,10 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
                             '</label>' +
                         '</div>'
             );
+            $('#timer-output-' + t).on('change', function() {
+                updateTimerOverride();
+                renderOutputMapping();
+            });
         }
 
     }

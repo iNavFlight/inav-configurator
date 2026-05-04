@@ -44,7 +44,7 @@ var OutputMappingCollection = function () {
     }
 
     self.setTimerOverride = function (timer, outputMode) {
-        timerOverrides[timer] = outputMode;
+        timerOverrides[timer] = parseInt(outputMode, 10);
     }
 
     self.getTimerOverride = function (timer) {
@@ -100,6 +100,11 @@ var OutputMappingCollection = function () {
                 let timerId = data[i]['timerId'];
                 let mode = timerOverrides[timerId] || self.TIMER_OUTPUT_MODE_AUTO;
 
+                // Pass 1: skip dedicated overrides — they were handled (or intentionally skipped) in Pass 0
+                if (!isDedicated && (mode === self.TIMER_OUTPUT_MODE_MOTORS || mode === self.TIMER_OUTPUT_MODE_SERVOS)) {
+                    continue;
+                }
+
                 if (motorsToGo > 0 && BitHelper.bit_check(flags, TIM_USE_MOTOR)
                         && (isDedicated ? mode === self.TIMER_OUTPUT_MODE_MOTORS : mode !== self.TIMER_OUTPUT_MODE_MOTORS)) {
                     timerMap[i] = OUTPUT_TYPE_MOTOR;
@@ -118,22 +123,33 @@ var OutputMappingCollection = function () {
     };
 
     self.getOutputTable = function (isMR, motors, servos) {
-        let currentMotorIndex = 1,
-            currentServoIndex = 0,
+        let currentServoIndex = 0,
             timerMap = getTimerMap(isMR, motors, servos.length),
+            motorNumbers = {},
             outputMap = [],
             offset = getFirstOutputOffset();
 
+        // Number motors in assignment order: dedicated (OUTPUT_MODE_MOTORS) first, then auto.
+        // Matches firmware timMotors[] build order in pwmBuildTimerOutputList().
+        let motorNum = 1;
+        for (let i = 0; i < data.length; i++) {
+            if (timerMap[i] !== OUTPUT_TYPE_MOTOR) continue;
+            let mode = timerOverrides[data[i]['timerId']] || self.TIMER_OUTPUT_MODE_AUTO;
+            if (mode === self.TIMER_OUTPUT_MODE_MOTORS) motorNumbers[i] = motorNum++;
+        }
+        for (let i = 0; i < data.length; i++) {
+            if (timerMap[i] === OUTPUT_TYPE_MOTOR && motorNumbers[i] === undefined) motorNumbers[i] = motorNum++;
+        }
+
         console.log("Offset: " + offset)
         for (let i = 0; i < self.getOutputCount(); i++) {
-            
+
             let assignment = timerMap[i + offset];
 
             if (assignment === null) {
                 outputMap[i] = "-";
             } else if (assignment == OUTPUT_TYPE_MOTOR) {
-                outputMap[i] = "Motor " + currentMotorIndex;
-                currentMotorIndex++;
+                outputMap[i] = "Motor " + motorNumbers[i + offset];
             } else if (assignment == OUTPUT_TYPE_SERVO) {
                 outputMap[i] = "Servo " + servos[currentServoIndex];
                 currentServoIndex++;
