@@ -41,6 +41,7 @@ mixerTab.initialize = function (callback, scrollPosition) {
         mspHelper.loadMotorMixRules,
         mspHelper.loadOutputMappingExt,
         mspHelper.loadTimerOutputModes,
+        mspHelper.loadOutputAssignment,
         mspHelper.loadLogicConditions,
         mspHelper.loadEzTune,
     ]);
@@ -140,18 +141,27 @@ mixerTab.initialize = function (callback, scrollPosition) {
             );
             $('#timer-output-' + t).on('change', function() {
                 updateTimerOverride();
-                renderOutputMapping();
+                if (FC.OUTPUT_MAPPING.hasDirectAssignment()) {
+                    mspHelper.queryOutputAssignment(renderOutputMapping);
+                } else {
+                    renderOutputMapping();
+                }
             });
         }
 
     }
 
     function renderOutputMapping() {
-        let outputMap = FC.OUTPUT_MAPPING.getOutputTable(
-            FC.MIXER_CONFIG.platformType == PLATFORM.MULTIROTOR || FC.MIXER_CONFIG.platformType == PLATFORM.TRICOPTER,
-            FC.MOTOR_RULES.getNumberOfConfiguredMotors(),
-            FC.SERVO_RULES.getUsedServoIndexes()
-        );
+        let outputMap;
+        if (FC.OUTPUT_MAPPING.hasDirectAssignment()) {
+            outputMap = FC.OUTPUT_MAPPING.getOutputTableDirect();
+        } else {
+            outputMap = FC.OUTPUT_MAPPING.getOutputTable(
+                FC.MIXER_CONFIG.platformType == PLATFORM.MULTIROTOR || FC.MIXER_CONFIG.platformType == PLATFORM.TRICOPTER,
+                FC.MOTOR_RULES.getNumberOfConfiguredMotors(),
+                FC.SERVO_RULES.getUsedServoIndexes()
+            );
+        }
 
         for (let i = 1; i <= FC.OUTPUT_MAPPING.getOutputCount(); i++) {
             $('#function-' + i).html(outputMap[i - 1]);
