@@ -92,6 +92,9 @@
     "savingDefaults": {
         "message": "Device - <span style=\"color: red\">Saving default settings</span>"
     },
+    "changeMixerProfileReboot": {
+        "message": "Changing mixer profiles requires a reboot. Continue?"
+    },
     "fcNotConnected": {
         "message": "Not connected"
     },
@@ -1093,6 +1096,63 @@
     },
     "configurationBatteryCapacityUnit": {
         "message": "Battery Capacity Unit"
+    },
+    "configurationPowerLimits": {
+        "message": "Power Limiting"
+    },
+    "configurationPowerLimitsHelp": {
+        "message": "Limit battery current and power draw to protect your battery and ESCs. Set to 0 to disable. Units: dA (deci-amps) = A×10, dW (deci-watts) = W×10, ds (deci-seconds) = s×10."
+    },
+    "configurationPowerLimitsNote": {
+        "message": "Protects battery from over-current by smoothly reducing throttle. Requires current sensor. Set continuous and burst limits per your battery specs."
+    },
+    "configurationLimitContCurrent": {
+        "message": "Continuous Current Limit (dA)"
+    },
+    "configurationLimitContCurrentHelp": {
+        "message": "Maximum sustained current draw in deci-amps (dA). Example: 500 = 50A. Set to 0 to disable current limiting."
+    },
+    "configurationLimitBurstCurrent": {
+        "message": "Burst Current Limit (dA)"
+    },
+    "configurationLimitBurstCurrentHelp": {
+        "message": "Higher current allowed for short bursts (punch-outs, climbs). Example: 750 = 75A. Should be >= continuous limit."
+    },
+    "configurationLimitBurstCurrentTime": {
+        "message": "Burst Current Time (ds)"
+    },
+    "configurationLimitBurstCurrentTimeHelp": {
+        "message": "Duration burst current is allowed in deci-seconds (ds). Example: 100 = 10 seconds. After this time, limit falls to continuous."
+    },
+    "configurationLimitBurstCurrentFalldownTime": {
+        "message": "Burst Current Falldown Time (ds)"
+    },
+    "configurationLimitBurstCurrentFalldownTimeHelp": {
+        "message": "Smooth ramp-down time from burst to continuous limit in deci-seconds (ds). Example: 20 = 2 seconds."
+    },
+    "configurationLimitContPower": {
+        "message": "Continuous Power Limit (dW)"
+    },
+    "configurationLimitContPowerHelp": {
+        "message": "Maximum sustained power draw in deci-watts (dW). Example: 8000 = 800W. Set to 0 to disable power limiting. Requires voltage measurement."
+    },
+    "configurationLimitBurstPower": {
+        "message": "Burst Power Limit (dW)"
+    },
+    "configurationLimitBurstPowerHelp": {
+        "message": "Higher power allowed for short bursts. Example: 10000 = 1000W. Should be >= continuous limit."
+    },
+    "configurationLimitBurstPowerTime": {
+        "message": "Burst Power Time (ds)"
+    },
+    "configurationLimitBurstPowerTimeHelp": {
+        "message": "Duration burst power is allowed in deci-seconds (ds). Example: 50 = 5 seconds."
+    },
+    "configurationLimitBurstPowerFalldownTime": {
+        "message": "Burst Power Falldown Time (ds)"
+    },
+    "configurationLimitBurstPowerFalldownTimeHelp": {
+        "message": "Smooth ramp-down time from burst to continuous power limit in deci-seconds (ds). Example: 10 = 1 second."
     },
     "configurationLaunch": {
         "message": "Fixed Wing Auto Launch Settings"
@@ -6209,6 +6269,24 @@
     "gpsAssistnowLoadDataError": {
         "message": "Error loading AssistNow data."
     },
+    "layerManagementTitle": {
+        "message": "Map Layers"
+    },
+    "layerLoadGeoFile": {
+        "message": "Load GEO File"
+    },
+    "layerDragDropHint": {
+        "message": "or drag & drop GEO files onto the map"
+    },
+    "layerConfirmDelete": {
+        "message": "Are you sure you want to delete this layer?"
+    },
+    "layerLoadError": {
+        "message": "Error loading GEO file. Please check the file format."
+    },
+    "layerParseError": {
+        "message": "Error parsing GEO file. Unsupported format or corrupted data."
+    },
     "adsbVehicleTotalMessages": {
         "message": "Vehicle msgs"
     },
@@ -6298,5 +6376,155 @@
     },
     "searchPlaceholder": {
         "message": "Search settings..."
+    },
+    "backupRestoreButtonBackup": {
+        "message": "Backup Config"
+    },
+    "backupRestoreButtonRestore": {
+        "message": "Restore Config"
+    },
+    "backupRestoreOpenBackupsFolder": {
+        "message": "Open Backups"
+    },
+    "backupRestoreStatusConnecting": {
+        "message": "Connecting to flight controller..."
+    },
+    "backupRestoreStatusEnteringCli": {
+        "message": "Entering CLI mode..."
+    },
+    "backupRestoreStatusReadingConfig": {
+        "message": "Reading configuration (diff all)..."
+    },
+    "backupRestoreStatusSavingFile": {
+        "message": "Saving backup file..."
+    },
+    "backupRestoreStatusExitingCli": {
+        "message": "Exiting CLI (rebooting)..."
+    },
+    "backupRestoreStatusRestoringConfig": {
+        "message": "Restoring configuration..."
+    },
+    "backupRestoreStatusSaving": {
+        "message": "Saving and rebooting..."
+    },
+    "backupRestoreStatusBackupComplete": {
+        "message": "Backup complete. Proceeding with flash..."
+    },
+    "backupRestoreBackupSaved": {
+        "message": "Configuration backup saved to: $1"
+    },
+    "backupRestoreAutoBackupSaved": {
+        "message": "Auto-backup saved to: $1"
+    },
+    "backupRestoreBackupComplete": {
+        "message": "Backup complete."
+    },
+    "backupRestoreBackupCancelled": {
+        "message": "Backup cancelled."
+    },
+    "backupRestoreBackupFailed": {
+        "message": "Backup failed."
+    },
+    "backupRestoreRestoreComplete": {
+        "message": "Configuration restored. Flight controller is rebooting."
+    },
+    "backupRestoreRestoreCancelled": {
+        "message": "Restore cancelled."
+    },
+    "backupRestoreRestoreFailed": {
+        "message": "Restore failed."
+    },
+    "backupRestoreFlashCompleteBackupSaved": {
+        "message": "Flash complete. Configuration backup was saved."
+    },
+    "backupRestoreOverlayTitle": {
+        "message": "Restoring Configuration"
+    },
+    "backupRestoreStatusRestoringProgress": {
+        "message": "Restoring configuration... ($1 / $2)"
+    },
+    "backupRestoreRestoreAborted": {
+        "message": "Restore aborted — settings were NOT saved."
+    },
+    "backupRestoreErrorTitle": {
+        "message": "Errors During Restore"
+    },
+    "backupRestoreErrorText": {
+        "message": "The following errors were reported by the flight controller. You can save the settings anyway or abort without saving."
+    },
+    "backupRestoreErrorAbort": {
+        "message": "Abort (Don't Save)"
+    },
+    "backupRestoreErrorSave": {
+        "message": "Save Anyway"
+    },
+    "backupRestoreFlashCompleteOfferRestore": {
+        "message": "Flash complete. A backup was saved before flashing."
+    },
+    "backupRestoreAutoRestoreConfirm": {
+        "message": "Full chip erase was performed. Would you like to restore the configuration backup that was saved before flashing?"
+    },
+    "backupRestoreAutoRestoreWaiting": {
+        "message": "Waiting for flight controller to boot..."
+    },
+    "backupRestoreAutoRestoreYes": {
+        "message": "Yes, Restore"
+    },
+    "backupRestoreAutoRestoreNo": {
+        "message": "No, Skip"
+    },
+    "backupRestoreAutoRestoreWaitingPort": {
+        "message": "Waiting for $1 to become available..."
+    },
+    "firmwareFlasherVersionWarningTitle": {
+        "message": "⚠ Version Update Warning"
+    },
+    "firmwareFlasherVersionWarningText": {
+        "message": "Updating from $1 to $2 without full chip erase can cause unpredictable issues or configuration corruption. Configurator will not restore your FC configuration automatically."
+    },
+    "firmwareFlasherVersionWarningContinue": {
+        "message": "Continue without erase"
+    },
+    "firmwareFlasherVersionWarningCancel": {
+        "message": "Cancel"
+    },
+    "backupRestoreMigrationApplied": {
+        "message": "Migration applied: $1 → $2 ($3 changes)"
+    },
+    "backupRestoreMigrationWarningsHeader": {
+        "message": "Migration Warnings:"
+    },
+    "backupRestoreDowngradeNoAutoRestore": {
+        "message": "Major version downgrade detected. Auto-restore is not available — please restore your backup manually after verifying settings."
+    },
+    "migrationPreviewTitle": {
+        "message": "Settings Migration Required"
+    },
+    "migrationPreviewSubtitle": {
+        "message": "Your backup ($1) will be migrated to match the new firmware ($2). The following changes will be applied:"
+    },
+    "migrationPreviewRemovedHeader": {
+        "message": "Removed settings ($1):"
+    },
+    "migrationPreviewRenamedSettingsHeader": {
+        "message": "Renamed settings ($1):"
+    },
+    "migrationPreviewRenamedCommandsHeader": {
+        "message": "Renamed commands ($1):"
+    },
+    "migrationPreviewValueReplacementsHeader": {
+        "message": "Value replacements ($1):"
+    },
+    "migrationPreviewSettingRemappingsHeader": {
+        "message": "Setting remappings ($1):"
+    },
+    "migrationPreviewContinue": {
+        "message": "Continue with Restore"
+    },
+    "migrationPreviewCancel": {
+        "message": "Cancel (Manual Review)"
+    },
+    "migrationMissingProfileWarning": {
+        "message": "No migration profile available for version $1 → $2. Settings will be restored without conversion — some may fail or be ignored by the firmware."
     }
 }

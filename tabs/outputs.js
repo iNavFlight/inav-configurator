@@ -4,7 +4,7 @@ import MSPChainerClass from './../js/msp/MSPchainer';
 import mspHelper from './../js/msp/MSPHelper';
 import MSPCodes from './../js/msp/MSPCodes';
 import MSP from './../js/msp';
-import { GUI, TABS } from './../js/gui';
+import GUI from './../js/gui';
 import FC from './../js/fc';
 import i18n from './../js/localization';
 import BitHelper from '../js/bitHelper';
@@ -14,12 +14,12 @@ import { mixer, PLATFORM } from './../js/model';
 import timeout from './../js/timeouts';
 import interval from './../js/intervals';
 
-TABS.outputs = {
+const outputsTab = {
     allowTestMode: false,
     feature3DEnabled: false,
     feature3DSupported: false
 };
-TABS.outputs.initialize = function (callback) {
+outputsTab.initialize = function (callback) {
     var self = this;
 
     self.armed = false;
@@ -28,8 +28,8 @@ TABS.outputs.initialize = function (callback) {
 
     var $motorsEnableTestMode;
 
-    if (GUI.active_tab !== 'outputs') {
-        GUI.active_tab = 'outputs';
+    if (GUI.active_tab !== this) {
+        GUI.active_tab = this;
     }
 
     var loadChainer = new MSPChainerClass();
@@ -749,6 +749,8 @@ TABS.outputs.initialize = function (callback) {
 
 };
 
-TABS.outputs.cleanup = function (callback) {
+outputsTab.cleanup = function (callback) {
     if (callback) callback();
 };
+
+export default outputsTab;

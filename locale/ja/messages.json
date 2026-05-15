@@ -1235,6 +1235,63 @@
     "configurationNoBand": {
         "message": "なし"
     },
+    "configurationPowerLimits": {
+        "message": "電力制限"
+    },
+    "configurationPowerLimitsHelp": {
+        "message": "バッテリーとESCを保護するために電流と電力の消費を制限します。0に設定すると無効になります。単位: dA（デシアンペア）= A×10、dW（デシワット）= W×10、ds（デシ秒）= s×10。"
+    },
+    "configurationPowerLimitsNote": {
+        "message": "スロットルを滑らかに絞ることでバッテリーの過電流を防止します。電流センサーが必要です。バッテリーの仕様に合わせて連続制限とバースト制限を設定してください。"
+    },
+    "configurationLimitContCurrent": {
+        "message": "連続電流制限 (dA)"
+    },
+    "configurationLimitContCurrentHelp": {
+        "message": "デシアンペア（dA）での最大持続電流。例：500 = 50A。電流制限を無効にするには0に設定。"
+    },
+    "configurationLimitBurstCurrent": {
+        "message": "バースト電流制限 (dA)"
+    },
+    "configurationLimitBurstCurrentHelp": {
+        "message": "短時間のバースト（急上昇など）に許容される高電流。例：750 = 75A。連続制限以上に設定してください。"
+    },
+    "configurationLimitBurstCurrentTime": {
+        "message": "バースト電流時間 (ds)"
+    },
+    "configurationLimitBurstCurrentTimeHelp": {
+        "message": "デシ秒（ds）でのバースト電流許容時間。例：100 = 10秒。この時間を超えると連続制限に戻ります。"
+    },
+    "configurationLimitBurstCurrentFalldownTime": {
+        "message": "バースト電流低下時間 (ds)"
+    },
+    "configurationLimitBurstCurrentFalldownTimeHelp": {
+        "message": "バースト制限から連続制限へのデシ秒（ds）での滑らかな移行時間。例：20 = 2秒。"
+    },
+    "configurationLimitContPower": {
+        "message": "連続電力制限 (dW)"
+    },
+    "configurationLimitContPowerHelp": {
+        "message": "デシワット（dW）での最大持続電力。例：8000 = 800W。電力制限を無効にするには0に設定。電圧測定が必要です。"
+    },
+    "configurationLimitBurstPower": {
+        "message": "バースト電力制限 (dW)"
+    },
+    "configurationLimitBurstPowerHelp": {
+        "message": "短時間のバーストに許容される高電力。例：10000 = 1000W。連続制限以上に設定してください。"
+    },
+    "configurationLimitBurstPowerTime": {
+        "message": "バースト電力時間 (ds)"
+    },
+    "configurationLimitBurstPowerTimeHelp": {
+        "message": "デシ秒（ds）でのバースト電力許容時間。例：50 = 5秒。"
+    },
+    "configurationLimitBurstPowerFalldownTime": {
+        "message": "バースト電力低下時間 (ds)"
+    },
+    "configurationLimitBurstPowerFalldownTimeHelp": {
+        "message": "バースト制限から連続電力制限へのデシ秒（ds）での滑らかな移行時間。例：10 = 1秒。"
+    },
     "configurationVTXNoBandHelp": {
         "message": "VTXの周波数が手動で設定されています。バンドを選択すると設定された周波数が上書きされます。"
     },

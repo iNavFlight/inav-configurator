@@ -27,6 +27,7 @@
     "electron-squirrel-startup": "^1.0.1",
     "electron-store": "^10.1.0",
     "electron-window-state": "^5.0.3",
+    "fflate": "^0.8.2",
     "fs": "0.0.1-security",
     "i18next": "^25.5.0",
     "inflection": "^3.0.2",

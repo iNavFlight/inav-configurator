@@ -1,6 +1,6 @@
 'use strict'
 
-import { GUI } from './gui';
+import GUI from './gui';
 
 const serialRXProtocolls = [
 {

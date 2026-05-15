@@ -1238,6 +1238,63 @@
     "configurationNoBand": {
         "message": "None"
     },
+    "configurationPowerLimits": {
+        "message": "功率限制"
+    },
+    "configurationPowerLimitsHelp": {
+        "message": "限制电流和功率消耗以保护电池和电调。设为0禁用。单位：dA（分安培）= A×10，dW（分瓦）= W×10，ds（分秒）= s×10。"
+    },
+    "configurationPowerLimitsNote": {
+        "message": "通过平滑降低油门来保护电池免受过流。需要电流传感器。根据电池规格设置连续限制和突发限制。"
+    },
+    "configurationLimitContCurrent": {
+        "message": "持续电流限制 (dA)"
+    },
+    "configurationLimitContCurrentHelp": {
+        "message": "最大持续电流（分安培 dA）。示例：500 = 50A。设为0禁用电流限制。"
+    },
+    "configurationLimitBurstCurrent": {
+        "message": "突发电流限制 (dA)"
+    },
+    "configurationLimitBurstCurrentHelp": {
+        "message": "短时突发（急推油门、爬升）允许的更高电流。示例：750 = 75A。应大于等于持续限制值。"
+    },
+    "configurationLimitBurstCurrentTime": {
+        "message": "突发电流时间 (ds)"
+    },
+    "configurationLimitBurstCurrentTimeHelp": {
+        "message": "允许突发电流的持续时间（分秒 ds）。示例：100 = 10秒。超时后限制降回持续值。"
+    },
+    "configurationLimitBurstCurrentFalldownTime": {
+        "message": "突发电流降落时间 (ds)"
+    },
+    "configurationLimitBurstCurrentFalldownTimeHelp": {
+        "message": "从突发限制平滑过渡到持续限制的时间（分秒 ds）。示例：20 = 2秒。"
+    },
+    "configurationLimitContPower": {
+        "message": "持续功率限制 (dW)"
+    },
+    "configurationLimitContPowerHelp": {
+        "message": "最大持续功率（分瓦 dW）。示例：8000 = 800W。设为0禁用功率限制。需要电压测量。"
+    },
+    "configurationLimitBurstPower": {
+        "message": "突发功率限制 (dW)"
+    },
+    "configurationLimitBurstPowerHelp": {
+        "message": "短时突发允许的更高功率。示例：10000 = 1000W。应大于等于持续限制值。"
+    },
+    "configurationLimitBurstPowerTime": {
+        "message": "突发功率时间 (ds)"
+    },
+    "configurationLimitBurstPowerTimeHelp": {
+        "message": "允许突发功率的持续时间（分秒 ds）。示例：50 = 5秒。"
+    },
+    "configurationLimitBurstPowerFalldownTime": {
+        "message": "突发功率降落时间 (ds)"
+    },
+    "configurationLimitBurstPowerFalldownTimeHelp": {
+        "message": "从突发限制平滑过渡到持续功率限制的时间（分秒 ds）。示例：10 = 1秒。"
+    },
     "configurationVTXNoBandHelp": {
         "message": "已手动设置VTX频率。选择一个频段将覆盖当前配置的频率。"
     },
