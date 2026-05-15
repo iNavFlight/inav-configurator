@@ -1,24 +1,22 @@
 'use strict';
 
-const path = require('path');
+import MSPChainerClass from './../js/msp/MSPchainer';
+import mspHelper from './../js/msp/MSPHelper';
+import GUI from './../js/gui';
+import FC from './../js/fc';
+import tabs from './../js/tabs';
+import i18n from './../js/localization';
+import interval from './../js/intervals';
 
-const MSPChainerClass = require('./../js/msp/MSPchainer');
-const mspHelper = require('./../js/msp/MSPHelper');
-const { GUI, TABS } = require('./../js/gui');
-const FC = require('./../js/fc');
-const tabs = require('./../js/tabs');
-const i18n = require('./../js/localization');
-const interval = require('./../js/intervals');
+const programmingTab = {};
 
-TABS.programming = {};
-
-TABS.programming.initialize = function (callback, scrollPosition) {
+programmingTab.initialize = function (callback, scrollPosition) {
     let loadChainer = new MSPChainerClass(),
         saveChainer = new MSPChainerClass(),
         statusChainer = new MSPChainerClass();
 
-    if (GUI.active_tab != 'programming') {
-        GUI.active_tab = 'programming';
+    if (GUI.active_tab !== this) {
+        GUI.active_tab = this;
     }
 
     loadChainer.setChain([
@@ -44,7 +42,7 @@ TABS.programming.initialize = function (callback, scrollPosition) {
     statusChainer.setExitPoint(onStatusPullDone);
 
     function loadHtml() {
-        GUI.load(path.join(__dirname, "programming.html"), processHtml);
+        import('./programming.html?raw').then(({default: html}) => GUI.load(html, processHtml));
     }
 
     function processHtml() {
@@ -81,6 +79,8 @@ TABS.programming.initialize = function (callback, scrollPosition) {
     }
 }
 
-TABS.programming.cleanup = function (callback) {
+programmingTab.cleanup = function (callback) {
     if (callback) callback();
 };
+
+export default programmingTab;

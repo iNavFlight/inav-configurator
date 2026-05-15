@@ -1,13 +1,12 @@
-const { GUI, TABS } = require('./../js/gui');
-const path = require('path');
-const i18n = require('./../js/localization');
+import GUI from './../js/gui';
+import i18n from './../js/localization';
 
 
 
-TABS.search = { };
+const searchTab = { };
 
 
-tabNames = [
+const tabNames = [
  "adjustments",
  "advanced_tuning",
  "auxiliary",
@@ -39,14 +38,14 @@ tabNames = [
 ];
 
 
-  TABS.search.searchMessages = function (keyword) {
+  searchTab.searchMessages = function (keyword) {
     var resultsDiv = document.getElementById('search-results');
     keyword = keyword.toLowerCase();
     resultsDiv.innerHTML = '';
 
-    simClick = function (evt) {
-      tabName = evt.currentTarget.getAttribute("tabName");
-      tabLink = document.getElementsByClassName("tab_".concat(tabName))[0].getElementsByTagName("a")[0];
+    const simClick = function (evt) {
+      const tabName = evt.currentTarget.getAttribute("tabName");
+      const tabLink = document.getElementsByClassName("tab_".concat(tabName))[0].getElementsByTagName("a")[0];
       tabLink.click();
     };
 
@@ -78,31 +77,28 @@ tabNames = [
       }
     }
 
-    for ( result of document.getElementsByClassName("searchResult") ) {
+    for ( const result of document.getElementsByClassName("searchResult") ) {
       result.addEventListener('click', simClick, false);
     }
   }
   
   
-  TABS.search.getMessages = function () {
-    const res_messages = fetch('locale/en/messages.json');
-    res_messages
-      .then (data => data.json())
-      .then (data => {
-         this.messages = data;
-      })
-      .catch((error) => {
-         console.error(error)
-      });
+  searchTab.getMessages = function () {
+    import(`../locale/en/messages.json`).then(({default: messages}) => {
+        this.messages = messages;
+    }).catch(error => {
+        console.error('Failed to load messages.json:', error);
+    });
+
   }
   
-  TABS.search.geti18nHTML = function (filename, filecontents) {
+  searchTab.geti18nHTML = function (filename, filecontents) {
   
     const parser = new DOMParser();
     const htmlDoc = parser.parseFromString(filecontents, 'text/html');
     var hasDataI18n = htmlDoc.querySelectorAll('[data-i18n]:not([data-i18n=""])');
     for (const element of hasDataI18n) {
-      key = element.getAttribute('data-i18n');
+      const key = element.getAttribute('data-i18n');
       if (! this.key2page.has(key) ) {
         this.key2page.set( key, new Set() );
       }
@@ -110,16 +106,16 @@ tabNames = [
     }
     hasDataI18n = htmlDoc.querySelectorAll('[i18n]:not([i18n=""])');
     for (const element of hasDataI18n) {
-      key = element.getAttribute('i18n');
+      const key = element.getAttribute('i18n');
       if (! this.key2page.has(key) ) {
         this.key2page.set( key, new Set() );
       }
       this.key2page.get(key).add(filename);
     }
 
-    settings = htmlDoc.querySelectorAll('[data-setting]:not([data-setting=""])');
+    const settings = htmlDoc.querySelectorAll('[data-setting]:not([data-setting=""])');
     for (const element of settings) {
-      key = element.getAttribute('data-setting');
+      const key = element.getAttribute('data-setting');
       if (! this.setting2page.has(key) ) {
         this.setting2page.set( key, new Set() );
       }
@@ -129,11 +125,12 @@ tabNames = [
   }
 
 
-  TABS.search.geti18nJs = function (filename, filecontents) {
+  searchTab.geti18nJs = function (filename, filecontents) {
     var re = /(?:data-i18n=|i18n.getMessage\()["']([^"']*)['"]/g
  
-    while (match = re.exec(filecontents)) {
-      key = match[1];
+    let match;
+    while ((match = re.exec(filecontents))) {
+      const key = match[1];
       if (! this.key2page.has(key) ) {
         this.key2page.set( key, new Set() );
       }
@@ -142,55 +139,43 @@ tabNames = [
   }
 
 
-  TABS.search.indexTab =  async function indexTab(tabName) {
-    var response = fetch(`tabs/${tabName}.js`);
-    response
-      .then (data => data.text()) 
-      .then (data => {
-        this.geti18nJs(tabName, data);
-      })
-      .catch((error) => {
-        console.error(error)
-      });
+  searchTab.indexTab =  async function indexTab(tabName) {
+    import(`./${tabName}.js?raw`).then(({default: javascript}) => {
+        this.geti18nJs(tabName, javascript);
+    }).catch(error => console.error(`Failed to index JS for tab ${tabName}:`, error));;
 
+    import(`./${tabName}.html?raw`).then(({default: html}) => {
+        this.geti18nHTML(tabName, html);
+    }).catch(error => console.error(`Failed to index HTML for tab ${tabName}:`, error));;
 
-    response = fetch(`tabs/${tabName}.html`);
-    response
-      .then (data => data.text())
-      .then (data => {
-        this.geti18nHTML(tabName, data);
-      })
-      .catch((error) => {
-        console.error(error)
-      });
   };
   
 
-TABS.search.initialize = function (callback) {
+searchTab.initialize = function (callback) {
     var self = this;
     this.key2page = new Map();
     this.setting2page = new Map();
     this.messages;
 
-    if (GUI.active_tab != 'search') {
-        GUI.active_tab = 'search';
+    if (GUI.active_tab !== this) {
+        GUI.active_tab = this;
     }
 
     function searchKeyword() {
-      TABS.search.searchMessages(document.getElementById('search-keyword').value);
+      searchTab.searchMessages(document.getElementById('search-keyword').value);
     }
 
     function searchKeywordTyping() {
       if (document.getElementById('search-keyword').value.length > 2) {
-        TABS.search.searchMessages(document.getElementById('search-keyword').value);
+        searchTab.searchMessages(document.getElementById('search-keyword').value);
       }
     }
-    GUI.load(path.join(__dirname, "search.html"), function () {
+    import('./search.html?raw').then(({default: html}) => GUI.load(html, function () {
         i18n.localize();
         document.getElementById('search-label').addEventListener('click', searchKeyword, false);
         document.getElementById('search-keyword').addEventListener('keyup', searchKeywordTyping, false);
         GUI.content_ready(callback);
-    } );
+    }));
     self.getMessages();
     for (let tab of tabNames) {
         self.indexTab(tab);
@@ -198,7 +183,8 @@ TABS.search.initialize = function (callback) {
 }
 
 
-TABS.search.cleanup = function (callback) {
+searchTab.cleanup = function (callback) {
     if (callback) callback();
 };
 
+export default searchTab;

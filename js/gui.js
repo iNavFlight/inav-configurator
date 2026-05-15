@@ -1,16 +1,11 @@
 'use strict';
-const { dialog } = require("@electron/remote");
 
-const CONFIGURATOR = require('./data_storage');
-const Switchery = require('./libraries/switchery/switchery')
-const MSP = require('./msp');
-const FC = require('./fc');
-const interval = require('./intervals');
-const { scaleRangeInt } = require('./helpers');
-const i18n = require('./localization');
-const mspDeduplicationQueue = require("./msp/mspDeduplicationQueue");
-
-var TABS = {}; // filled by individual tab js file
+import MSP from './msp';
+import FC from './fc';
+import interval from './intervals';
+import { scaleRangeInt } from './helpers';
+import i18n from './localization';
+import mspDeduplicationQueue from "./msp/mspDeduplicationQueue";
 
 var GUI_control = function () {
     this.connecting_to = false;
@@ -50,6 +45,7 @@ var GUI_control = function () {
         'mission_control',
         'mixer',
         'programming',
+        'javascript_programming',
         'ez_tune',
         'search'
     ];
@@ -102,45 +98,29 @@ GUI_control.prototype.tab_switch_cleanup = function (callback) {
     interval.killAll(['global_data_refresh', 'msp-load-update', 'ltm-connection-check']);
 
     if (this.active_tab) {
-        TABS[this.active_tab].cleanup(callback);
+        this.active_tab.cleanup(callback);
     } else {
         callback();
     }
 };
 
 GUI_control.prototype.switchery = function() {
+   
     $('.togglesmall').each(function(index, elem) {
-        var switchery = new Switchery(elem, {
-            size: 'small',
-            color: '#37a8db',
-            secondaryColor: '#c4c4c4'
-        });
-        $(elem).on("change", function (evt) {
-            switchery.setPosition();
-        });
+        $(elem).wrapAll('<label class="ios7-switch" style="font-size: 12px"/>');
+        $(elem).after('<span></span>')
         $(elem).removeClass('togglesmall');
     });
 
     $('.toggle').each(function(index, elem) {
-        var switchery = new Switchery(elem, {
-            color: '#37a8db',
-            secondaryColor: '#c4c4c4'
-        });
-        $(elem).on("change", function (evt) {
-            switchery.setPosition();
-        });
+        $(elem).wrapAll('<label class="ios7-switch" style="font-size: 17px"/>');
+        $(elem).after('<span></span>')
         $(elem).removeClass('toggle');
     });
 
     $('.togglemedium').each(function(index, elem) {
-        var switchery = new Switchery(elem, {
-            className: 'switcherymid',
-            color: '#37a8db',
-            secondaryColor: '#c4c4c4'
-        });
-        $(elem).on("change", function (evt) {
-            switchery.setPosition();
-        });
+        $(elem).wrapAll('<label class="ios7-switch" style="font-size: 15px"/>');
+        $(elem).after('<span></span>')
         $(elem).removeClass('togglemedium');
     });
 };
@@ -148,40 +128,8 @@ GUI_control.prototype.switchery = function() {
 
 GUI_control.prototype.content_ready = function (callback) {
     const content = $('#content').removeClass('loading');
-    $('.togglesmall').each(function(index, elem) {
-        var switchery = new Switchery(elem, {
-          size: 'small',
-          color: '#37a8db',
-          secondaryColor: '#c4c4c4'
-        });
-        $(elem).on("change", function (evt) {
-            switchery.setPosition();
-        });
-        $(elem).removeClass('togglesmall');
-    });
-
-    $('.toggle').each(function(index, elem) {
-        var switchery = new Switchery(elem, {
-            color: '#37a8db',
-            secondaryColor: '#c4c4c4'
-        });
-        $(elem).on("change", function (evt) {
-            switchery.setPosition();
-        });
-        $(elem).removeClass('toggle');
-    });
-
-    $('.togglemedium').each(function(index, elem) {
-        var switchery = new Switchery(elem, {
-            className: 'switcherymid',
-            color: '#37a8db',
-            secondaryColor: '#c4c4c4'
-         });
-         $(elem).on("change", function (evt) {
-             switchery.setPosition();
-         });
-         $(elem).removeClass('togglemedium');
-    });
+    
+    this.switchery();
 
     // Insert a documentation button next to the tab title
     const tabTitle = $('div#content .tab_title').first();
@@ -225,6 +173,7 @@ GUI_control.prototype.updateStatusBar = function() {
         'ARMED':(1 << 2),
         //'WAS_EVER_ARMED':(1 << 3),
         'SIMULATOR_MODE':(1 << 4),
+        'ARMING_DISABLED_GEOZONE':(1 << 6),
         'ARMING_DISABLED_FAILSAFE_SYSTEM':(1 << 7),
         'ARMING_DISABLED_NOT_LEVEL':(1 << 8),
         'ARMING_DISABLED_SENSORS_CALIBRATING':(1 << 9),
@@ -235,7 +184,7 @@ GUI_control.prototype.updateStatusBar = function() {
         'ARMING_DISABLED_ARM_SWITCH':(1 << 14),
         'ARMING_DISABLED_HARDWARE_FAILURE':(1 << 15),
         'ARMING_DISABLED_BOXFAILSAFE':(1 << 16),
-        'ARMING_DISABLED_BOXKILLSWITCH':(1 << 17),
+        //'ARMING_DISABLED_BOXKILLSWITCH':(1 << 17),
         'ARMING_DISABLED_RC_LINK':(1 << 18),
         'ARMING_DISABLED_THROTTLE':(1 << 19),
         'ARMING_DISABLED_CLI':(1 << 20),
@@ -322,14 +271,12 @@ GUI_control.prototype.simpleBind = function () {
     });
 };
 
-GUI_control.prototype.load = function(rel, callback) {
+GUI_control.prototype.load = function(html, callback) {
     const content = $('#content').addClass('loading');
-    $.get(rel, function(data) {
-        $(data).appendTo(content);
-        if (callback) {
-            callback();
-        }
-    });
+    $(html).appendTo(content);
+    if (callback) {
+        callback();
+    }
 }
 
 GUI_control.prototype.renderOperandValue = function ($container, operandMetadata, operand, value, onChange) {
@@ -502,17 +449,17 @@ GUI_control.prototype.sliderize = function ($input, value, min, max) {
 GUI_control.prototype.update_dataflash_global = function () {
     function formatFilesize(bytes) {
         if (bytes < 1024) {
-            return bytes + "B";
+            return Math.round(bytes / 1024) + " KB";
         }
         var kilobytes = bytes / 1024;
 
         if (kilobytes < 1024) {
-            return Math.round(kilobytes) + "kB";
+            return Math.round(kilobytes) + " KB";
         }
 
         var megabytes = kilobytes / 1024;
 
-        return megabytes.toFixed(1) + "MB";
+        return megabytes.toFixed(1) + " MB";
     }
 
     var supportsDataflash = FC.DATAFLASH.totalSize > 0;
@@ -530,7 +477,7 @@ GUI_control.prototype.update_dataflash_global = function () {
         width: (100-(FC.DATAFLASH.totalSize - FC.DATAFLASH.usedSize) / FC.DATAFLASH.totalSize * 100) + "%",
         display: 'block'
         });
-        $(".dataflash-free_global div").html(i18n.getMessage('sensorDataFlashFreeSpace') + formatFilesize(FC.DATAFLASH.totalSize - FC.DATAFLASH.usedSize));
+        $(".dataflash-free_global_label").html(i18n.getMessage('sensorDataFlashFreeSpace') + formatFilesize(FC.DATAFLASH.totalSize - FC.DATAFLASH.usedSize) + " free");
     } else {
         $(".noflash_global").css({
         display: 'block'
@@ -542,18 +489,8 @@ GUI_control.prototype.update_dataflash_global = function () {
     }
 };
 
-/**
-* Don't use alert() or confirm() in Electron, it has a nasty bug: https://github.com/electron/electron/issues/31917
-*/ 
-GUI_control.prototype.alert = function(message) {
-    dialog.showMessageBoxSync({ message: message, icon: "./images/inav_icon_128.png" });
-}
-
-GUI_control.prototype.confirm = function(message) {
-    return dialog.showMessageBoxSync({ message: message, icon: "./images/inav_icon_128.png", buttons: ["Yes", "No"]}) == 0;
-}
 
 // initialize object into GUI variable
 var GUI = new GUI_control();
 
-module.exports = { GUI, TABS };
+export default GUI;

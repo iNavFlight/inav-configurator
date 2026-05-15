@@ -1,23 +1,21 @@
 'use strict';
 
-const path = require('path');
+import MSPCodes from './../js/msp/MSPCodes';
+import MSP from './../js/msp';
+import GUI from './../js/gui';
+import FC from './../js/fc';
+import Settings from './../js/settings';
+import i18n from './../js/localization';
 
-const MSPCodes = require('./../js/msp/MSPCodes');
-const MSP = require('./../js/msp');
-const { GUI, TABS } = require('./../js/gui');
-const FC = require('./../js/fc');
-const Settings = require('./../js/settings');
-const i18n = require('./../js/localization');
+const advancedTuningTab = {};
 
-TABS.advanced_tuning = {};
+advancedTuningTab.initialize = function (callback) {
 
-TABS.advanced_tuning.initialize = function (callback) {
-
-    if (GUI.active_tab != 'advanced_tuning') {
-        GUI.active_tab = 'advanced_tuning';
+    if (GUI.active_tab !== this) {
+        GUI.active_tab = this;
     }
 
-    loadHtml();
+    import('./advanced_tuning.html?raw').then(({default: html}) => GUI.load(html, Settings.processHtml(processHtml)));
 
     function save_to_eeprom() {
         console.log('save_to_eeprom');
@@ -33,9 +31,7 @@ TABS.advanced_tuning.initialize = function (callback) {
         });
     }
 
-    function loadHtml() {
-        GUI.load(path.join(__dirname, "advanced_tuning.html"), Settings.processHtml(function () {
-
+    function processHtml() {
         if (FC.isAirplane()) {
             $('.airplaneTuning').show();
             $('.airplaneTuningTitle').show();
@@ -66,40 +62,38 @@ TABS.advanced_tuning.initialize = function (callback) {
         
         // Set up required field warnings
         $('#launchIdleThr').on('keyup', () => {
-            TABS.advanced_tuning.checkRequirements_IdleThrottle();
+            advancedTuningTab.checkRequirements_IdleThrottle();
         });
 
         $('#launchIdleDelay').on('keyup', () => {
-            TABS.advanced_tuning.checkRequirements_IdleThrottle();
+            advancedTuningTab.checkRequirements_IdleThrottle();
         });
 
         $('#wiggleWakeIdle').on('change', function () {
-            TABS.advanced_tuning.checkRequirements_IdleThrottle();
+            advancedTuningTab.checkRequirements_IdleThrottle();
         });
 
         $('#rthHomeAltitude').on('keyup', () => {
-            TABS.advanced_tuning.checkRequirements_LinearDescent();
+            advancedTuningTab.checkRequirements_LinearDescent();
         });
 
         $('#rthUseLinearDescent').on('change', function () {
-            TABS.advanced_tuning.checkRequirements_LinearDescent();
+            advancedTuningTab.checkRequirements_LinearDescent();
         });
 
         // Preload required field warnings
-        TABS.advanced_tuning.checkRequirements_IdleThrottle();
-        TABS.advanced_tuning.checkRequirements_LinearDescent();
+        advancedTuningTab.checkRequirements_IdleThrottle();
+        advancedTuningTab.checkRequirements_LinearDescent();
 
         $('a.save').on('click', function () {
             Settings.saveInputs(save_to_eeprom);
         });
         GUI.content_ready(callback);
-
-        }));
     }
 };
 
 
-TABS.advanced_tuning.checkRequirements_IdleThrottle = function() {
+advancedTuningTab.checkRequirements_IdleThrottle = function() {
     let idleThrottle = $('#launchIdleThr');
     if (($('#launchIdleDelay').val() > 0 || $('#wiggleWakeIdle').find(":selected").val() > 0) && (idleThrottle.val() == "" || idleThrottle.val() < "1150")) {
         idleThrottle.addClass('inputRequiredWarning');
@@ -108,7 +102,7 @@ TABS.advanced_tuning.checkRequirements_IdleThrottle = function() {
     }
 };
 
-TABS.advanced_tuning.checkRequirements_LinearDescent = function() {
+advancedTuningTab.checkRequirements_LinearDescent = function() {
     let rthHomeAlt = $('#rthHomeAltitude');
     let minRthHomeAlt = 1000.0 / rthHomeAlt.data('setting-multiplier'); // 10 metres minimum recommended for safety.
     
@@ -119,6 +113,8 @@ TABS.advanced_tuning.checkRequirements_LinearDescent = function() {
     }
 };
 
-TABS.advanced_tuning.cleanup = function (callback) {
+advancedTuningTab.cleanup = function (callback) {
     if (callback) callback();
 };
+
+export default advancedTuningTab;

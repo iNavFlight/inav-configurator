@@ -31,4 +31,4 @@ var BitHelper = function() {
     return self;
 }();
 
-module.exports = BitHelper;
+export default BitHelper;

@@ -1,8 +1,8 @@
 'use strict';
 
-const mspHelper = require('./msp/MSPHelper');
-const serialPortHelper = require('./serialPortHelper');
-const FC = require('./fc');
+import mspHelper from './msp/MSPHelper';
+import serialPortHelper from './serialPortHelper';
+import FC from './fc';
 
 const wizardUiBindings = (function () {
 
@@ -93,4 +93,4 @@ const wizardUiBindings = (function () {
     return self;
 })();
 
-module.exports = wizardUiBindings;
+export default wizardUiBindings;

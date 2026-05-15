@@ -66,6 +66,10 @@ const OPERAND_TYPES = {
             43: "Flown Loiter Radius [m]",
             44: "Downlink LQ",
             45: "Uplink RSSI dBm",
+            46: "Minimum Ground Speed [m/s]",
+            47: "Horizontal Wind Speed [cm/s]",
+            48: "Wind Direction [deg]",
+            49: "Relative Wind Offset [deg]",
         }
     },
     3: {
@@ -132,4 +136,4 @@ const OPERAND_TYPES = {
     },
 };
 
-module.exports = { OPERAND_TYPES };
+export { OPERAND_TYPES };

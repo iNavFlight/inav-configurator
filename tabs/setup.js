@@ -1,35 +1,38 @@
 'use strict';
 
-const path = require('path');
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
+import './../js/libraries/jquery.flightindicators';
 
-const MSPChainerClass = require('./../js/msp/MSPchainer');
-const FC = require('./../js/fc');
-const { GUI, TABS } = require('./../js/gui');
-const MSP = require('./../js/msp');
-const MSPCodes = require('./../js/msp/MSPCodes');
-const i18n = require('./../js/localization');
-const mspHelper = require('./../js/msp/MSPHelper');
-const interval = require('./../js/intervals');
-const SerialBackend = require('./../js/serial_backend');
-const { mixer } = require('./../js/model');
-const BitHelper = require('./../js/bitHelper')
+import MSPChainerClass from './../js/msp/MSPchainer';
+import FC from './../js/fc';
+import GUI from './../js/gui';
+import MSP from './../js/msp';
+import MSPCodes from './../js/msp/MSPCodes';
+import i18n from './../js/localization';
+import mspHelper from './../js/msp/MSPHelper';
+import interval from './../js/intervals';
+import SerialBackend from './../js/serial_backend';
+import { mixer } from './../js/model';
+import BitHelper from './../js/bitHelper';
+import dialog from '../js/dialog';
 
-TABS.setup = {
+const setupTab = {
     yaw_fix: 0.0
 };
 
-TABS.setup.initialize = function (callback) {
+setupTab.initialize = function (callback) {
     var self = this;
 
-    if (GUI.active_tab != 'setup') {
-        GUI.active_tab = 'setup';
+    if (GUI.active_tab !== this) {
+        GUI.active_tab = this;
     }
 
     var loadChainer = new MSPChainerClass();
 
     var loadChain = [
         mspHelper.loadFeatures,
-        mspHelper.queryFcStatus,
+        //mspHelper.queryFcStatus,
         mspHelper.loadMixerConfig,
         mspHelper.loadMiscV2,
         mspHelper.loadSerialPorts
@@ -39,9 +42,27 @@ TABS.setup.initialize = function (callback) {
     loadChainer.setExitPoint(load_html);
     loadChainer.execute();
 
+    let attitudeInstrument;
+    let headingnstrument;
+
     function load_html() {
-        GUI.load(path.join(__dirname, "setup.html"), process_html);
+        import('./setup.html?raw').then(({default: html}) => GUI.load(html, process_html));
     }
+
+    function updateInstruments () {
+        if (headingnstrument && attitudeInstrument) {
+            attitudeInstrument.setRoll(FC.SENSOR_DATA.kinematics[0]);
+            attitudeInstrument.setPitch(FC.SENSOR_DATA.kinematics[1]);
+            headingnstrument.setHeading(FC.SENSOR_DATA.kinematics[2]);
+        }
+    };
+
+    async function initializeInstruments() {
+        var options = {size:90, showBox : false, img_directory: './../../images/flightindicators/'};
+        
+        attitudeInstrument = await $.flightIndicator('#attitude', 'attitude', options);
+        headingnstrument = await $.flightIndicator('#heading', 'heading', options);
+    };
 
     function process_html() {
         // translate to user-selected language
@@ -68,10 +89,10 @@ TABS.setup.initialize = function (callback) {
             $('default_btn').addClass('disabled');
         }
 
-        self.initializeInstruments();
+        initializeInstruments();
 
         $('a.resetSettings').on('click', function () {
-            if (GUI.confirm(i18n.getMessage('confirm_reset_settings'))) {
+            if (dialog.confirm(i18n.getMessage('confirm_reset_settings'))) {
                 MSP.send_message(MSPCodes.MSP_RESET_CONF, false, false, function () {
                     GUI.log(i18n.getMessage('initialSetupSettingsRestored'));
     
@@ -129,6 +150,8 @@ TABS.setup.initialize = function (callback) {
                     gpsLat_e.text((FC.GPS_DATA.lat / 10000000).toFixed(4) + ' deg');
                     gpsLon_e.text((FC.GPS_DATA.lon / 10000000).toFixed(4) + ' deg');
                 });
+            } else {
+                gpsFix_e.html(i18n.getMessage('gpsFixNotConnected'));
             }
         }
 
@@ -138,7 +161,7 @@ TABS.setup.initialize = function (callback) {
 	            pitch_e.text(i18n.getMessage('initialSetupAttitude', [FC.SENSOR_DATA.kinematics[1]]));
                 heading_e.text(i18n.getMessage('initialSetupAttitude', [FC.SENSOR_DATA.kinematics[2]]));
                 self.render3D();
-                self.updateInstruments();
+                updateInstruments();
             });
         }
 
@@ -186,19 +209,7 @@ TABS.setup.initialize = function (callback) {
     }
 };
 
-TABS.setup.initializeInstruments = function() {
-    var options = {size:90, showBox : false, img_directory: path.join(__dirname, '/../images/flightindicators/')};
-    var attitude = $.flightIndicator('#attitude', 'attitude', options);
-    var heading = $.flightIndicator('#heading', 'heading', options);
-
-    this.updateInstruments = function() {
-        attitude.setRoll(FC.SENSOR_DATA.kinematics[0]);
-        attitude.setPitch(FC.SENSOR_DATA.kinematics[1]);
-        heading.setHeading(FC.SENSOR_DATA.kinematics[2]);
-    };
-};
-
-TABS.setup.initialize3D = function () {
+setupTab.initialize3D = function () {
     var self = this,
         loader,
         canvas,
@@ -216,16 +227,84 @@ TABS.setup.initialize3D = function () {
     canvas = $('.model-and-info #canvas');
     wrapper = $('.model-and-info #canvas_wrapper');
 
-    // webgl capability detector
-    // it would seem the webgl "enabling" through advanced settings will be ignored in the future
-    // and webgl will be supported if gpu supports it by default (canary 40.0.2175.0), keep an eye on this one
-    var detector_canvas = document.createElement('canvas');
-    if (window.WebGLRenderingContext && (detector_canvas.getContext('webgl') || detector_canvas.getContext('experimental-webgl'))) {
-        renderer = new THREE.WebGLRenderer({canvas: canvas.get(0), alpha: true, antialias: true});
-        useWebGlRenderer = true;
-    } else {
-        renderer = new THREE.CanvasRenderer({canvas: canvas.get(0), alpha: true});
+    // Robust WebGL capability detection with fallback
+    function tryCreateWebGLContext() {
+        if (!window.WebGLRenderingContext) {
+            return null;
+        }
+
+        const detector_canvas = document.createElement('canvas');
+        let gl = null;
+        let renderMethod = null;
+
+        // Try 1: Hardware-accelerated WebGL (best performance)
+        try {
+            gl = detector_canvas.getContext('webgl') || detector_canvas.getContext('experimental-webgl');
+            if (gl) {
+                renderMethod = 'hardware';
+                console.log('[3D] Using hardware-accelerated WebGL');
+            }
+        } catch (e) {
+            console.warn('[3D] Hardware WebGL failed:', e);
+        }
+
+        // Try 2: Software-rendered WebGL (slower but more compatible)
+        if (!gl) {
+            try {
+                gl = detector_canvas.getContext('webgl', { failIfMajorPerformanceCaveat: false }) ||
+                     detector_canvas.getContext('experimental-webgl', { failIfMajorPerformanceCaveat: false });
+                if (gl) {
+                    renderMethod = 'software';
+                    console.log('[3D] Using software-rendered WebGL (slower performance)');
+                }
+            } catch (e) {
+                console.warn('[3D] Software WebGL failed:', e);
+            }
+        }
+
+        return gl ? { context: gl, method: renderMethod } : null;
     }
+
+    const webglResult = tryCreateWebGLContext();
+
+    if (webglResult) {
+        try {
+            renderer = new THREE.WebGLRenderer({canvas: canvas.get(0), alpha: true, antialias: true});
+            useWebGlRenderer = true;
+
+            // Show performance notice if using software rendering
+            if (webglResult.method === 'software') {
+                GUI.log('<span style="color: orange;">3D view using software rendering (slower). Consider updating graphics drivers or disabling hardware acceleration in Options.</span>');
+            }
+        } catch (e) {
+            console.error('[3D] Failed to create THREE.WebGLRenderer:', e);
+            renderer = null;
+            useWebGlRenderer = false;
+        }
+    }
+
+    // Check if WebGL is available
+    if (!renderer) {
+        // WebGL not supported - show fallback message
+        wrapper.html('<div class="webgl-fallback" style="display: flex; align-items: center; justify-content: center; height: 100%; color: #888; text-align: center; padding: 20px;">' +
+            '<div>' +
+            '<p style="margin: 0 0 10px 0; font-size: 14px; font-weight: bold;">3D view unavailable</p>' +
+            '<p style="margin: 0 0 10px 0; font-size: 12px;">WebGL could not be initialized. This may be due to:</p>' +
+            '<ul style="text-align: left; margin: 10px 0; padding-left: 20px; font-size: 12px;">' +
+            '<li>Graphics drivers need updating</li>' +
+            '<li>Hardware acceleration issues</li>' +
+            '<li>Browser or system limitations</li>' +
+            '</ul>' +
+            '<p style="margin: 10px 0 0 0; font-size: 12px; font-style: italic;">Try: Options → Disable 3D Hardware Acceleration, then restart</p>' +
+            '</div>' +
+            '</div>');
+
+        // Provide no-op functions so the rest of the tab doesn't break
+        this.render3D = function () {};
+        this.resize3D = function () {};
+        return;
+    }
+
     // initialize render size for current canvas size
     renderer.setSize(wrapper.width()*2, wrapper.height()*2);
 
@@ -253,11 +332,13 @@ TABS.setup.initialize3D = function () {
     // setup scene
     scene = new THREE.Scene();
     const manager = new THREE.LoadingManager();
-    loader = new THREE.GLTFLoader(manager);
-    loader.load('./resources/models/' + model_file + '.gltf',  (obj) =>{
-        model = obj.scene;
-        model.scale.set(15, 15, 15);
-        modelWrapper.add(model);
+    loader = new GLTFLoader(manager);
+    import(`./../resources/models/model_${model_file}.gltf`).then(({default: gltf}) => {
+        loader.load(gltf,  (obj) =>{
+            model = obj.scene;
+            model.scale.set(15, 15, 15);
+            modelWrapper.add(model);
+        });
     });
 
     // stationary camera
@@ -303,8 +384,10 @@ TABS.setup.initialize3D = function () {
     $(window).on('resize', this.resize3D);
 };
 
-TABS.setup.cleanup = function (callback) {
+setupTab.cleanup = function (callback) {
     $(window).off('resize', this.resize3D);
 
     if (callback) callback();
 };
+
+export default setupTab;

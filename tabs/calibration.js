@@ -1,21 +1,19 @@
 'use strict';
 
-const path = require('path');
+import MSPChainerClass from './../js/msp/MSPchainer';
+import mspHelper from './../js/msp/MSPHelper';
+import MSPCodes from './../js/msp/MSPCodes';
+import MSP from './../js/msp';
+import GUI from './../js/gui';
+import FC from './../js/fc';
+import timeout from './../js/timeouts';
+import interval from './../js/intervals';
+import i18n from './../js/localization';
+import jBox from 'jbox';
 
-const MSPChainerClass = require('./../js/msp/MSPchainer');
-const mspHelper = require('./../js/msp/MSPHelper');
-const MSPCodes = require('./../js/msp/MSPCodes');
-const MSP = require('./../js/msp');
-const { GUI, TABS } = require('./../js/gui');
-const FC = require('./../js/fc');
-const timeout = require('./../js/timeouts');
-const interval = require('./../js/intervals');
-const i18n = require('./../js/localization');
-const jBox = require('./../js/libraries/jBox/jBox.min');
+const calibrationTab = {};
 
-TABS.calibration = {};
-
-TABS.calibration.model = (function () {
+calibrationTab.model = (function () {
     var publicScope = {},
         privateScope = {};
 
@@ -52,7 +50,7 @@ TABS.calibration.model = (function () {
     return publicScope;
 })();
 
-TABS.calibration.initialize = function (callback) {
+calibrationTab.initialize = function (callback) {
 
     var loadChainer = new MSPChainerClass(),
         saveChainer = new MSPChainerClass(),
@@ -60,8 +58,8 @@ TABS.calibration.initialize = function (callback) {
         modalStop,
         modalProcessing;
 
-    if (GUI.active_tab != 'calibration') {
-        GUI.active_tab = 'calibration';
+    if (GUI.active_tab !== this) {
+        GUI.active_tab = this;
     }
     loadChainer.setChain([
         mspHelper.queryFcStatus,
@@ -93,7 +91,7 @@ TABS.calibration.initialize = function (callback) {
     }
 
     function loadHtml() {
-        GUI.load(path.join(__dirname, "calibration.html"), processHtml);
+        import('./calibration.html?raw').then(({default: html}) => GUI.load(html, processHtml));
     }
 
     function updateCalibrationSteps() {
@@ -121,7 +119,7 @@ TABS.calibration.initialize = function (callback) {
     }
 
     function checkFinishAccCalibrate() {
-        if (TABS.calibration.model.next() === null) {
+        if (calibrationTab.model.next() === null) {
             modalStop = new jBox('Modal', {
                 width: 400,
                 height: 200,
@@ -138,7 +136,7 @@ TABS.calibration.initialize = function (callback) {
         var newStep = null,
             $button = $(this);
 
-        if (TABS.calibration.model.getStep() === null) {
+        if (calibrationTab.model.getStep() === null) {
             for (var i = 0; i < 6; i++) {
                 if (FC.CALIBRATION_DATA.acc['Pos' + i] === 1) {
                     FC.CALIBRATION_DATA.acc['Pos' + i] = 0;
@@ -154,7 +152,7 @@ TABS.calibration.initialize = function (callback) {
                 content: $('#modal-acc-calibration-start')
             }).open();
         } else {
-            newStep = TABS.calibration.model.next();
+            newStep = calibrationTab.model.next();
         }
 
         /*
@@ -315,7 +313,7 @@ TABS.calibration.initialize = function (callback) {
 
         $('#modal-start-button').on('click', function () {
             modalStart.close();
-            TABS.calibration.model.next();
+            calibrationTab.model.next();
         });
 
         $('#modal-stop-button').on('click', function () {
@@ -334,6 +332,8 @@ TABS.calibration.initialize = function (callback) {
     }
 };
 
-TABS.calibration.cleanup = function (callback) {
+calibrationTab.cleanup = function (callback) {
     if (callback) callback();
 };
+
+export default calibrationTab;

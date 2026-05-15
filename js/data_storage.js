@@ -11,4 +11,4 @@ var CONFIGURATOR = {
     'connection': false
 };
 
-module.exports = CONFIGURATOR;
+export default CONFIGURATOR;

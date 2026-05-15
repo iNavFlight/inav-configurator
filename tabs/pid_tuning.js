@@ -1,26 +1,23 @@
 'use strict';
 
-const path = require('path');
-const Store = require('electron-store');
-const store = new Store()
+import MSPChainerClass from './../js/msp/MSPchainer';
+import mspHelper from './../js/msp/MSPHelper';
+import MSPCodes from './../js/msp/MSPCodes';
+import MSP from './../js/msp';
+import GUI from './../js/gui';
+import tabs from './../js/tabs';
+import FC from './../js/fc';
+import Settings from './../js/settings';
+import i18n from './../js/localization';
+import { scaleRangeInt } from './../js/helpers';
+import interval from './../js/intervals';
+import dialog from '../js/dialog';
 
-const MSPChainerClass = require('./../js/msp/MSPchainer');
-const mspHelper = require('./../js/msp/MSPHelper');
-const MSPCodes = require('./../js/msp/MSPCodes');
-const MSP = require('./../js/msp');
-const { GUI, TABS } = require('./../js/gui');
-const tabs = require('./../js/tabs');
-const FC = require('./../js/fc');
-const Settings = require('./../js/settings');
-const i18n = require('./../js/localization');
-const { scaleRangeInt } = require('./../js/helpers');
-const interval = require('./../js/intervals');
-
-TABS.pid_tuning = {
+const pidTuningTab = {
     rateChartHeight: 117
 };
 
-TABS.pid_tuning.initialize = function (callback) {
+pidTuningTab.initialize = function (callback) {
 
     var loadChainer = new MSPChainerClass();
 
@@ -39,12 +36,12 @@ TABS.pid_tuning.initialize = function (callback) {
     loadChainer.setExitPoint(load_html);
     loadChainer.execute();
 
-    if (GUI.active_tab != 'pid_tuning') {
-        GUI.active_tab = 'pid_tuning';
+    if (GUI.active_tab !== this) {
+        GUI.active_tab = this;
     }
 
     function load_html() {
-        GUI.load(path.join(__dirname, "pid_tuning.html"), Settings.processHtml(process_html));
+        import('./pid_tuning.html?raw').then(({default: html}) => GUI.load(html, Settings.processHtml(process_html)));
     }
 
     function drawExpoCanvas(value, $element, color, width, height, clear) {
@@ -76,7 +73,7 @@ TABS.pid_tuning.initialize = function (callback) {
             pitch_roll_curve,
             '#a00000',
             200,
-            TABS.pid_tuning.rateChartHeight,
+            pidTuningTab.rateChartHeight,
             true
         );
         drawExpoCanvas(
@@ -84,7 +81,7 @@ TABS.pid_tuning.initialize = function (callback) {
             pitch_roll_curve,
             '#00a000',
             200,
-            TABS.pid_tuning.rateChartHeight,
+            pidTuningTab.rateChartHeight,
             false
         );
 
@@ -93,7 +90,7 @@ TABS.pid_tuning.initialize = function (callback) {
             manual_expo_curve,
             '#a00000',
             200,
-            TABS.pid_tuning.rateChartHeight,
+            pidTuningTab.rateChartHeight,
             true
         );
 
@@ -102,7 +99,7 @@ TABS.pid_tuning.initialize = function (callback) {
             manual_expo_curve,
             '#00a000',
             200,
-            TABS.pid_tuning.rateChartHeight,
+            pidTuningTab.rateChartHeight,
             false
         );
 
@@ -299,7 +296,7 @@ TABS.pid_tuning.initialize = function (callback) {
 
         $('.action-resetPIDs').on('click', function() {
 
-            if (GUI.confirm(i18n.getMessage('confirm_reset_pid'))) {
+            if (dialog.confirm(i18n.getMessage('confirm_reset_pid'))) {
                 MSP.send_message(MSPCodes.MSP_SET_RESET_CURR_PID, false, false, false);
                 GUI.updateActivatedTab();
             }
@@ -307,7 +304,7 @@ TABS.pid_tuning.initialize = function (callback) {
 
         $('.action-resetDefaults').on('click', function() {
 
-            if (GUI.confirm(i18n.getMessage('confirm_select_defaults'))) {
+            if (dialog.confirm(i18n.getMessage('confirm_select_defaults'))) {
                 mspHelper.setSetting("applied_defaults", 0, function() { 
                     mspHelper.saveToEeprom( function () {
                         GUI.log(i18n.getMessage('configurationEepromSaved'));
@@ -401,7 +398,7 @@ TABS.pid_tuning.initialize = function (callback) {
 
             GUI.tab_switch_cleanup(function () {
                 GUI.log(i18n.getMessage('pidTuningDataRefreshed'));
-                TABS.pid_tuning.initialize();
+                pidTuningTab.initialize();
             });
         });
 
@@ -454,8 +451,10 @@ TABS.pid_tuning.initialize = function (callback) {
     }
 };
 
-TABS.pid_tuning.cleanup = function (callback) {
+pidTuningTab.cleanup = function (callback) {
     if (callback) {
         callback();
     }
 };
+
+export default pidTuningTab;

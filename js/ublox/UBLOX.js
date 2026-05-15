@@ -1,13 +1,10 @@
 'use strict';
 
-const semver = require('semver');
-
-require('./../injected_methods');
-const jBox = require('./../libraries/jBox/jBox.min');
-const i18n = require('./../localization');
-const { GUI } = require('./../gui');
-const { globalSettings } = require('../globalSettings');
-const Store = require('electron-store');
+import './../injected_methods';
+import i18n from './../localization';
+import GUI from './../gui';
+import { globalSettings } from '../globalSettings';
+import dialog from '../dialog';
 
 
 var ublox = (function () {
@@ -157,14 +154,20 @@ var ublox = (function () {
                 if(req.status == 200) {
                     successCallback(req.response);
                 } else {
-                    failCallback(event);
+                    if(failCallback != null) {
+                        var dec = new TextDecoder('utf-8');
+                        GUI.log(`http status: ${req.status}: ${dec.decode(req.response)}`)
+                        failCallback(req.response);
+                    }
                 }
             };
         }
 
         if (failCallback != null) {
             req.onerror = (event) => {
-                failCallback(event);
+                var dec = new TextDecoder('utf-8');
+                GUI.log(i18n.getMessage("gpsAssistnowLoadDataError") + ": Received an unkonwn error when trying to download data.")
+                failCallback("Unknown error.");
             }
         }
           
@@ -172,13 +175,15 @@ var ublox = (function () {
             req.send(null);
         } catch(error) {
             GUI.alert(i18n.getMessage("gpsAssistnowLoadDataError"));
-            console.log(i18n.getMessage("gpsAssistnowLoadDataError") + ':' + error.toString());
+            GUI.log(i18n.getMessage("gpsAssistnowLoadDataError") + ':' + error.toString());
+            console.log(i18n.getMessage("gpsAssistnowLoadDataError") + ':' + JSON.stringify(error));
         }
     }
 
 
-    function loadError(event) {
-        GUI.alert(i18n.getMessage("gpsAssistnowLoadDataError"));
+    function loadError(e) {
+        dialog.alert(i18n.getMessage("gpsAssistnowLoadDataError"));
+        console.log(JSON.stringify(e));
     }
 
     // For more info on assistnow, check:
@@ -203,7 +208,7 @@ var ublox = (function () {
         }
 
         getBinaryData(url, processOfflineData, loadError);
-        //$.get(url, processOfflineData).fail(function() {GUI.alert("Error loading Offline data")});
+        //$.get(url, processOfflineData).fail(async function() {dialog.alert("Error loading Offline data")});
     };
 
     self.loadAssistnowOnline = function(callback) {
@@ -244,4 +249,4 @@ var ublox = (function () {
 })();
 
 
-module.exports = ublox;
+export default ublox;

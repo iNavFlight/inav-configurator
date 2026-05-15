@@ -75,4 +75,4 @@ var eventFrequencyAnalyzer = (function () {
     return publicScope;
 })();
 
-module.exports = eventFrequencyAnalyzer;
+export default eventFrequencyAnalyzer;

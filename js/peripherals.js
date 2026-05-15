@@ -1,6 +1,6 @@
 'use strict';
 
-const FC = require('./fc');
+import FC from './fc';
 
 // return true if user has choose a special peripheral
 function isPeripheralSelected(peripheralName) {
@@ -38,4 +38,4 @@ function adjustBoxNameIfPeripheralWithModeID(modeId, defaultName) {
     return defaultName;  
 }
 
-module.exports = adjustBoxNameIfPeripheralWithModeID ;
+export default adjustBoxNameIfPeripheralWithModeID ;

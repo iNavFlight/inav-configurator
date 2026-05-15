@@ -197,6 +197,80 @@
                 </div>
             </div>
 
+            <div class="config-section gui_box grey">
+                <div class="gui_box_titlebar">
+                    <div class="spacer_box_title" data-i18n="configurationPowerLimits"></div>
+                    <div class="helpicon cf_tip" data-i18n_title="configurationPowerLimitsHelp"></div>
+                </div>
+                <div class="spacer_box">
+                    <div class="note">
+                        <div class="note_spacer">
+                            <p data-i18n="configurationPowerLimitsNote"></p>
+                        </div>
+                    </div>
+
+                    <!-- Current Limits -->
+                    <div class="number">
+                        <input type="number" class="batteryProfileHighlight" id="limit_cont_current" name="limit_cont_current" step="1" min="0" max="2000" data-setting="limit_cont_current" />
+                        <label for="limit_cont_current">
+                            <span data-i18n="configurationLimitContCurrent"></span>
+                        </label>
+                        <div for="limit_cont_current" class="helpicon cf_tip" data-i18n_title="configurationLimitContCurrentHelp"></div>
+                    </div>
+                    <div class="number">
+                        <input type="number" class="batteryProfileHighlight" id="limit_burst_current" name="limit_burst_current" step="1" min="0" max="2000" data-setting="limit_burst_current" />
+                        <label for="limit_burst_current">
+                            <span data-i18n="configurationLimitBurstCurrent"></span>
+                        </label>
+                        <div for="limit_burst_current" class="helpicon cf_tip" data-i18n_title="configurationLimitBurstCurrentHelp"></div>
+                    </div>
+                    <div class="number">
+                        <input type="number" class="batteryProfileHighlight" id="limit_burst_current_time" name="limit_burst_current_time" step="1" min="0" max="600" data-setting="limit_burst_current_time" />
+                        <label for="limit_burst_current_time">
+                            <span data-i18n="configurationLimitBurstCurrentTime"></span>
+                        </label>
+                        <div for="limit_burst_current_time" class="helpicon cf_tip" data-i18n_title="configurationLimitBurstCurrentTimeHelp"></div>
+                    </div>
+                    <div class="number">
+                        <input type="number" class="batteryProfileHighlight" id="limit_burst_current_falldown_time" name="limit_burst_current_falldown_time" step="1" min="0" max="600" data-setting="limit_burst_current_falldown_time" />
+                        <label for="limit_burst_current_falldown_time">
+                            <span data-i18n="configurationLimitBurstCurrentFalldownTime"></span>
+                        </label>
+                        <div for="limit_burst_current_falldown_time" class="helpicon cf_tip" data-i18n_title="configurationLimitBurstCurrentFalldownTimeHelp"></div>
+                    </div>
+
+                    <!-- Power Limits -->
+                    <div class="number">
+                        <input type="number" class="batteryProfileHighlight" id="limit_cont_power" name="limit_cont_power" step="1" min="0" max="20000" data-setting="limit_cont_power" />
+                        <label for="limit_cont_power">
+                            <span data-i18n="configurationLimitContPower"></span>
+                        </label>
+                        <div for="limit_cont_power" class="helpicon cf_tip" data-i18n_title="configurationLimitContPowerHelp"></div>
+                    </div>
+                    <div class="number">
+                        <input type="number" class="batteryProfileHighlight" id="limit_burst_power" name="limit_burst_power" step="1" min="0" max="20000" data-setting="limit_burst_power" />
+                        <label for="limit_burst_power">
+                            <span data-i18n="configurationLimitBurstPower"></span>
+                        </label>
+                        <div for="limit_burst_power" class="helpicon cf_tip" data-i18n_title="configurationLimitBurstPowerHelp"></div>
+                    </div>
+                    <div class="number">
+                        <input type="number" class="batteryProfileHighlight" id="limit_burst_power_time" name="limit_burst_power_time" step="1" min="0" max="600" data-setting="limit_burst_power_time" />
+                        <label for="limit_burst_power_time">
+                            <span data-i18n="configurationLimitBurstPowerTime"></span>
+                        </label>
+                        <div for="limit_burst_power_time" class="helpicon cf_tip" data-i18n_title="configurationLimitBurstPowerTimeHelp"></div>
+                    </div>
+                    <div class="number">
+                        <input type="number" class="batteryProfileHighlight" id="limit_burst_power_falldown_time" name="limit_burst_power_falldown_time" step="1" min="0" max="600" data-setting="limit_burst_power_falldown_time" />
+                        <label for="limit_burst_power_falldown_time">
+                            <span data-i18n="configurationLimitBurstPowerFalldownTime"></span>
+                        </label>
+                        <div for="limit_burst_power_falldown_time" class="helpicon cf_tip" data-i18n_title="configurationLimitBurstPowerFalldownTimeHelp"></div>
+                    </div>
+                </div>
+            </div>
+
             <div class="config-section gui_box grey config-vtx">
                 <div class="gui_box_titlebar">
                     <div class="spacer_box_title" data-i18n="configurationVTX"></div>
@@ -239,61 +313,64 @@
                 <div class="gui_box_titlebar">
                     <div class="spacer_box_title" data-i18n="configurationGimbal"></div>
                 </div>
-                    <div class="number gimbal_sensitivity_wrapper">
+                <div class="spacer_box">
+                    <div class="number">
                         <input type="number" id="gimbal_sensitivity" name="gimbal_sensitivity" data-setting="gimbal_sensitivity" />
                         <label for="gimbal_sensitivity">
                             <span data-i18n="configurationGimbalSensitivity"></span>
                         </label>
                     </div>
-                    <div class="number gimbal_pan_channel_wrapper">
+                    <div class="number">
                         <input type="number" id="gimbal_pan_channel" name="gimbal_pan_channel" data-setting="gimbal_pan_channel" />
                         <label for="gimbal_pan_channel">
                             <span data-i18n="configurationGimbalPanChannel"></span>
                         </label>
                     </div>
-                    <div class="number gimbal_tilt_channel_wrapper">
+                    <div class="number">
                         <input type="number" id="gimbal_tilt_channel" name="gimbal_tilt_channel" data-setting="gimbal_tilt_channel" />
                         <label for="gimbal_tilt_channel">
                             <span data-i18n="configurationGimbalTiltChannel"></span>
                         </label>
                     </div>
-                    <div class="number gimbal_roll_channel_wrapper">
+                    <div class="number">
                         <input type="number" id="gimbal_roll_channel" name="gimbal_roll_channel" data-setting="gimbal_roll_channel" />
                         <label for="gimbal_roll_channel">
                             <span data-i18n="configurationGimbalRollChannel"></span>
                         </label>
                     </div>
+                </div>
             </div>
 
             <div class="config-section gui_box grey config-headtracker">
                 <div class="gui_box_titlebar">
                     <div class="spacer_box_title" data-i18n="configurationHeadtracker"></div>
                 </div>
-                    <div class="select headtracker_type_wrapper">
+                <div class="spacer_box">
+                    <div class="number">
                         <select id="headtracker-type" data-setting="headtracker_type"></select>
                         <label for="headtrack-type">
                             <span data-i18n="configurationHeadtrackerType"></span>
                         </label>
                     </div>
-
-                    <div class="number headtracker_pan_ratio_wrapper">
+                    <div class="number">
                         <input type="number" data-step="0.01" min="0" max="5" id="headtracker_pan_ratio" data-setting="headtracker_pan_ratio">
                         <label for="headtracker_pan_ratio">
                             <span data-i18n="configurationHeadtrackerPanRatio"></span>
                         </label>
                     </div>
-                    <div class="number headtracker_tilt_ratio_wrapper">
+                    <div class="number">
                         <input type="number" data-step="0.01" min="0" max="5" id="headtracker_tilt_ratio" data-setting="headtracker_tilt_ratio">
                         <label for="headtracker_tilt_ratio">
                             <span data-i18n="configurationHeadtrackerTiltRatio"></span>
                         </label>
                     </div>
-                    <div class="number headtracker_roll_ratio_wrapper">
+                    <div class="number">
                         <input type="number" data-step="0.01" id="headtracker_roll_ratio" data-setting="headtracker_roll_ratio">
                         <label for="headtracker_roll_ratio">
                             <span data-i18n="configurationHeadtrackerRollRatio"></span>
                         </label>
                     </div>
+                </div>
             </div>
         </div>
 

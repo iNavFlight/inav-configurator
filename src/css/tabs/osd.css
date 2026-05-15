@@ -348,7 +348,7 @@
     margin-right: 1em;
 }
 
-button {
+.tab-osd button {
     padding: 4px 10px !important;
     font-family: 'open_sanssemibold', Arial, serif;
     font-size: 9pt !important;
@@ -458,6 +458,13 @@ button {
 .tab-osd .preview_avatar {
     width: 636px !important; /* 12 X char width */
     left: calc(50% - 335px) !important; /* width / 2 + 17 */
+}
+
+.spacer_box.osd_customelement_icons_help {
+    padding-top: 0px;
+}
+.helpicon.osd_customelement_icons_help {
+    margin-bottom: 5px;
 }
 
 .tab-osd .hd_avatar_43_left {
@@ -757,6 +764,10 @@ button {
 .settings .btn_danger a{
     background-color: #e2a2a2;
     border: 1px solid #e58383;
+}
+
+.tab-osd .osd_settings .gui_box + .gui_box {
+    margin-top: 1em;
 }
 
 

@@ -1,42 +1,57 @@
-window.$ = window.jQuery =  require('jquery'), 
-                            require('jquery-ui-dist/jquery-ui'),
-                            require('jquery-textcomplete'),
-                            require('./libraries/jquery.flightindicators'),
-                            require('./libraries/jquery.nouislider.all.min'),
-                            require('./libraries/jquery.ba-throttle-debounce');
+import '../src/css/styles.css'
 
-const { app } = require('@electron/remote');
-const d3 = require('./libraries/d3.min');
-const Store = require('electron-store');
-const store = new Store();
+import $ from 'jquery';
+import 'jquery-ui-dist/jquery-ui';
+import * as THREE from 'three'
 
-const { GUI, TABS } = require('./gui');
-const CONFIGURATOR = require('./data_storage');
-const FC = require('./fc');
-const { globalSettings, UnitType } = require('./globalSettings');
-const { PLATFORM } = require('./model')
-const i18n = require('./localization');
-const SerialBackend = require('./serial_backend');
-const MSP = require('./msp');
-const MSPCodes = require('./../js/msp/MSPCodes');
-const mspHelper = require('./msp/MSPHelper');
-const update = require('./globalUpdates');
-const appUpdater = require('./appUpdater');
-const CliAutoComplete = require('./CliAutoComplete');
-const { SITLProcess } = require('./sitl');
-const settingsCache = require('./settingsCache');
+import GUI from './gui';
+import CONFIGURATOR from './data_storage';
+import FC  from './fc';
+import { globalSettings, UnitType } from './globalSettings';
+import { PLATFORM } from './model'
+import i18n from './localization';
+import SerialBackend from './serial_backend';
+import MSP from './msp';
+import MSPCodes  from './../js/msp/MSPCodes';
+import mspHelper  from './msp/MSPHelper';
+import update from './globalUpdates';
+import appUpdater from './appUpdater';
+import CliAutoComplete from './CliAutoComplete'; 
+import { SITLProcess } from './sitl';
+import settingsCache from './settingsCache';
+import store from './store';
 
-process.on('uncaughtException', function (error) {   
-    if (process.env.NODE_ENV !== 'development') {
-        GUI.log(i18n.getMessage('unexpectedError', error.message));
-        if (GUI.connected_to || GUI.connecting_to) {
-            GUI.log(i18n.getMessage('disconnecting'));
-            $('a.connect').trigger('click');
-        } 
-    } else {
-        throw error;
-    }
-});
+// "Preload" tabs
+import landingTab from './../tabs/landing';
+import firmwareFlasherTab from './../tabs/firmware_flasher';
+import sitlTab from './../tabs/sitl';
+import auxiliaryTab from './../tabs/auxiliary';
+import adjustmentsTab from './../tabs/adjustments';
+import portsTab from './../tabs/ports'
+import ledStripTab from './../tabs/led_strip';
+import failsafeTab from './../tabs/failsafe';
+import setupTab from './../tabs/setup'
+import calibrationTab from './../tabs/calibration';
+import configurationTab from './../tabs/configuration';
+import pidTuningTab from './../tabs/pid_tuning';
+import receiverTab from './../tabs/receiver';
+import gpsTab from './../tabs/gps';
+import magnetometerTab from './../tabs/magnetometer';
+import missionControlTab from './../tabs/mission_control';
+import mixerTab from './../tabs/mixer';
+import programmingTab from './../tabs/programming';
+import javascriptProgrammingTab from './../tabs/javascript_programming';
+import outputsTab from './../tabs/outputs';
+import osdTab from './../tabs/osd';
+import sensorsTab from './../tabs/sensors';
+import loggingTab from './../tabs/logging';
+import advancedTuningTab from './../tabs/advanced_tuning';
+import onboardLoggingTab from  './../tabs/onboard_logging';
+import cliTab from './../tabs/cli';
+import searchTab from './../tabs/search';
+import dialog from './dialog'
+
+window.$ = $;
 
 // Set how the units render on the configurator only
 $(function() {
@@ -47,41 +62,16 @@ $(function() {
         mspHelper.init();
         SerialBackend.init();
 
-        GUI.updateEzTuneTabVisibility = function(loadMixerConfig) {
-            let useEzTune = true;
-            if (CONFIGURATOR.connectionValid) {
-                if (loadMixerConfig) {
-                    mspHelper.loadMixerConfig(function () {
-                        if (FC.MIXER_CONFIG.platformType == PLATFORM.MULTIROTOR || FC.MIXER_CONFIG.platformType == PLATFORM.TRICOPTER) {
-                            $('.tab_ez_tune').removeClass("is-hidden");
-                        } else {
-                            $('.tab_ez_tune').addClass("is-hidden");
-                            useEzTune = false;
-                        }
-                    });
-                } else {
-                    if (FC.MIXER_CONFIG.platformType == PLATFORM.MULTIROTOR || FC.MIXER_CONFIG.platformType == PLATFORM.TRICOPTER) {
-                        $('.tab_ez_tune').removeClass("is-hidden");
-                    } else {
-                        $('.tab_ez_tune').addClass("is-hidden");
-                        useEzTune = false;
-                    }
-                }
-            }
-        
-            return useEzTune;
-        };
-
         GUI.updateActivatedTab = function() {
-            var activeTab = $('#tabs > ul li.active');
-            activeTab.removeClass('active');
-            $('a', activeTab).trigger('click');
+            if (!GUI.tab_switch_in_progress) {
+                const activeTab = $('#tabs > ul li.active');
+                activeTab.removeClass('active');
+                $('a', activeTab).trigger('click');
+            }
         }
 
-        globalSettings.store = store;
         globalSettings.unitType = store.get('unit_type', UnitType.none);
         globalSettings.mapProviderType = store.get('map_provider_type', 'osm'); 
-        globalSettings.mapApiKey = store.get('map_api_key', '');
         globalSettings.assistnowApiKey = store.get('assistnow_api_key', '');
         globalSettings.proxyURL = store.get('proxyurl', 'http://192.168.1.222/mapproxy/service?');
         globalSettings.proxyLayer = store.get('proxylayer', 'your_proxy_layer_name');
@@ -100,13 +90,14 @@ $(function() {
             globalSettings.osdUnits = null;
         }
 
+        const version = window.electronAPI.appGetVersion();
         // alternative - window.navigator.appVersion.match(/Chrome\/([0-9.]*)/)[1];
         GUI.log(i18n.getMessage('getRunningOS') + GUI.operating_system + '</strong>, ' +
-            'Chrome: <strong>' + process.versions['chrome'] + '</strong>, ' +
-            i18n.getMessage('getConfiguratorVersion') + app.getVersion() + '</strong>');
+            'Electron: <strong>' + navigator.userAgent.match(/Electron\/([\d\.]+\d+)/)[1] + '</strong>, ' +
+            i18n.getMessage('getConfiguratorVersion') + version + '</strong>');
 
-        $('#status-bar .version').text(app.getVersion());
-        $('#logo .version').text(app.getVersion());
+        $('#status-bar .version').text(version);
+        $('#logo .version').text(version);
         update.firmwareVersion();
 
         if (store.get('logopen', false)) {
@@ -114,11 +105,12 @@ $(function() {
         }
 
         if (store.get('update_notify', true)) { 
-            appUpdater.checkRelease(app.getVersion());
+            appUpdater.checkRelease(version);
         }
+        
 
         // log library versions in console to make version tracking easier
-        console.log('Libraries: jQuery - ' + $.fn.jquery + ', d3 - ' + d3.version + ', three.js - ' + THREE.REVISION);
+        console.log('Libraries: jQuery - ' + $.fn.jquery + ', three.js - ' + THREE.REVISION);
 
         // Tabs
         var ui_tabs = $('#tabs > ul');
@@ -129,6 +121,12 @@ $(function() {
             }
 
             if ($(this).parent().hasClass('active') == false && !GUI.tab_switch_in_progress) { // only initialize when the tab isn't already active
+                
+                if (CONFIGURATOR.cliActive) {
+                    cliTab.exit($(this).parent());
+                    return;
+                }
+                    
                 var self = this,
                     tabClass = $(self).parent().prop('class');
 
@@ -150,6 +148,20 @@ $(function() {
                 if (GUI.allowedTabs.indexOf(tab) < 0) {
                     GUI.log(i18n.getMessage('tabSwitchUpgradeRequired', [tabName]));
                     return;
+                }
+
+                // Check for unsaved changes in current tab before switching
+                if (GUI.active_tab === javascriptProgrammingTab &&
+                    javascriptProgrammingTab.isDirty) {
+                    console.log('[Tab Switch] Checking for unsaved changes in JavaScript Programming tab');
+                    const confirmMsg = i18n.getMessage('unsavedChanges') ||
+                        'You have unsaved changes. Leave anyway?';
+
+                    if (!confirm(confirmMsg)) {
+                        console.log('[Tab Switch] User cancelled tab switch');
+                        return; // Cancel tab switch
+                    }
+                    console.log('[Tab Switch] User confirmed tab switch');
                 }
 
                 GUI.tab_switch_in_progress = true;
@@ -178,113 +190,86 @@ $(function() {
 
                     switch (tab) {
                         case 'landing':
-                            require('./../tabs/landing')
-                            TABS.landing.initialize(content_ready);
+                            landingTab.initialize(content_ready);
                             break;
                         case 'firmware_flasher':
-                            require('./../tabs/firmware_flasher')
-                            TABS.firmware_flasher.initialize(content_ready);
+                            firmwareFlasherTab.initialize(content_ready);
                             break;
                         case 'sitl':
-                            require('./../tabs/sitl')
-                            TABS.sitl.initialize(content_ready);
+                           sitlTab.initialize(content_ready);
                             break;
                         case 'auxiliary':
-                            require('./../tabs/auxiliary')
-                            TABS.auxiliary.initialize(content_ready);
+                            auxiliaryTab.initialize(content_ready);
                             break;
                         case 'adjustments':
-                            require('./../tabs/adjustments')
-                            TABS.adjustments.initialize(content_ready);
+                            adjustmentsTab.initialize(content_ready);
                             break;
                         case 'ports':
-                            require('./../tabs/ports');
-                            TABS.ports.initialize(content_ready);
+                           portsTab.initialize(content_ready);
                             break;
                         case 'led_strip':
-                            require('./../tabs/led_strip');
-                            TABS.led_strip.initialize(content_ready);
+                            ledStripTab.initialize(content_ready);
                             break;
                         case 'failsafe':
-                            require('./../tabs/failsafe');
-                            TABS.failsafe.initialize(content_ready);
+                            failsafeTab.initialize(content_ready);
                             break;
                         case 'setup':
-                            require('./../tabs/setup');
-                            TABS.setup.initialize(content_ready);
+                            setupTab.initialize(content_ready);
                             break;
                         case 'calibration':
-                            require('./../tabs/calibration');
-                            TABS.calibration.initialize(content_ready);
+                            calibrationTab.initialize(content_ready);
                             break;
                         case 'configuration':
-                            require('./../tabs/configuration');
-                            TABS.configuration.initialize(content_ready);
+                            configurationTab.initialize(content_ready);
                             break;
                         case 'pid_tuning':
-                            require('./../tabs/pid_tuning');
-                            TABS.pid_tuning.initialize(content_ready);
+                            pidTuningTab.initialize(content_ready);
                             break;
                         case 'receiver':
-                            require('./../tabs/receiver');
-                            TABS.receiver.initialize(content_ready);
+                            receiverTab.initialize(content_ready);
                             break;
                         case 'gps':
-                            require('./../tabs/gps');
-                            TABS.gps.initialize(content_ready);
+                            gpsTab.initialize(content_ready);
                             break;
                         case 'magnetometer':
-                            require('./../tabs/magnetometer');
-                            TABS.magnetometer.initialize(content_ready);
+                            magnetometerTab.initialize(content_ready);
                             break;
                         case 'mission_control':
-                            require('./../tabs/mission_control');
-                            TABS.mission_control.initialize(content_ready);
+                            missionControlTab.initialize(content_ready);
                             break;
                         case 'mixer':
-                            require('./../tabs/mixer');
-                            TABS.mixer.initialize(content_ready);
+                            mixerTab.initialize(content_ready);
                             break;
                         case 'outputs':
-                            require('./../tabs/outputs');
-                            TABS.outputs.initialize(content_ready);
+                            outputsTab.initialize(content_ready);
                             break;
                         case 'osd':
-                            require('./../tabs/osd');
-                            TABS.osd.initialize(content_ready);
+                            osdTab.initialize(content_ready);
                             break;
                         case 'sensors':
-                            require('./../tabs/sensors');
-                            TABS.sensors.initialize(content_ready);
+                            sensorsTab.initialize(content_ready);
                             break;
                         case 'logging':
-                            require('./../tabs/logging');
-                            TABS.logging.initialize(content_ready);
+                            loggingTab.initialize(content_ready);
                             break;
                         case 'onboard_logging':
-                            require('./../tabs/onboard_logging');
-                            TABS.onboard_logging.initialize(content_ready);
+                            onboardLoggingTab.initialize(content_ready);
                             break;
                         case 'advanced_tuning':
-                            require('./../tabs/advanced_tuning');
-                            TABS.advanced_tuning.initialize(content_ready);
+                            advancedTuningTab.initialize(content_ready);
                             break;
                         case 'programming':
-                            require('./../tabs/programming');
-                            TABS.programming.initialize(content_ready);
+                            programmingTab.initialize(content_ready);
                             break;
                         case 'cli':
-                            require('./../tabs/cli');
-                            TABS.cli.initialize(content_ready);
-                            break;
-                        case 'ez_tune':
-                            require('./../tabs/ez_tune');
-                            TABS.ez_tune.initialize(content_ready);
+                            cliTab.initialize(content_ready);
                             break;
                         case 'search':
-                            require('./../tabs/search');
-                            TABS.search.initialize(content_ready);
+                            searchTab.initialize(content_ready);
                             break;
+                       case 'javascript_programming':
+                           javascriptProgrammingTab.initialize(content_ready);
+                           break;
                         default:
                             console.log('Tab not found:' + tab);
                     }
@@ -294,16 +279,182 @@ $(function() {
 
         $('#tabs ul.mode-disconnected li a:first').trigger( "click" );
 
+        // Accordion Navigation Groups
+        $('.group-header').on('click', function(e) {
+            e.stopPropagation(); // Prevent triggering tab click
+            const header = $(this);
+            const items = header.next('.group-items');
+
+            // Toggle this group
+            header.toggleClass('active');
+            items.toggleClass('expanded');
+
+            // Update aria-expanded for accessibility
+            header.attr('aria-expanded', header.hasClass('active'));
+
+            // Update the expand/collapse all button state
+            updateToggleAllButton();
+        });
+
+        // Keyboard accessibility for accordion headers
+        $('.group-header').on('keydown', function(e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                $(this).trigger('click');
+            }
+        });
+
+        // Function to update toggle all button state
+        function updateToggleAllButton() {
+            const allExpanded = $('.nav-group .group-header.active').length === $('.nav-group .group-header').length;
+            const $expandIcon = $('#toggleAllGroups .expand-icon');
+            const $collapseIcon = $('#toggleAllGroups .collapse-icon');
+            const $toggleText = $('#toggleAllGroups .toggle-text');
+
+            if (allExpanded) {
+                $expandIcon.hide();
+                $collapseIcon.show();
+                $toggleText.attr('data-i18n', 'navCollapseAll');
+                $toggleText.text(i18n.getMessage('navCollapseAll'));
+            } else {
+                $expandIcon.show();
+                $collapseIcon.hide();
+                $toggleText.attr('data-i18n', 'navExpandAll');
+                $toggleText.text(i18n.getMessage('navExpandAll'));
+            }
+        }
+
+        // Expand/Collapse All Toggle
+        $('#toggleAllGroups').on('click', function(e) {
+            e.preventDefault();
+            const allExpanded = $('.nav-group .group-header.active').length === $('.nav-group .group-header').length;
+
+            if (allExpanded) {
+                // Collapse all except first
+                $('.nav-group .group-header').removeClass('active').attr('aria-expanded', 'false');
+                $('.nav-group .group-items').removeClass('expanded');
+                $('#tabs ul.mode-connected .nav-group:first-child .group-header').addClass('active').attr('aria-expanded', 'true');
+                $('#tabs ul.mode-connected .nav-group:first-child .group-items').addClass('expanded');
+                store.set('expand_all_groups', false);
+            } else {
+                // Expand all
+                $('.nav-group .group-header').addClass('active').attr('aria-expanded', 'true');
+                $('.nav-group .group-items').addClass('expanded');
+                store.set('expand_all_groups', true);
+            }
+
+            updateToggleAllButton();
+        });
+
+        // Initialize: apply saved expand all preference or expand first group by default
+        if (store.get('expand_all_groups', false)) {
+            // Expand all groups
+            $('.nav-group .group-header').addClass('active').attr('aria-expanded', 'true');
+            $('.nav-group .group-items').addClass('expanded');
+        } else {
+            // Expand first group only
+            $('#tabs ul.mode-connected .nav-group:first-child .group-header').addClass('active').attr('aria-expanded', 'true');
+            $('#tabs ul.mode-connected .nav-group:first-child .group-items').addClass('expanded');
+        }
+
+        // Update button state on initialization
+        updateToggleAllButton();
+
+
+        // Accordion Navigation Groups
+        $('.group-header').on('click', function(e) {
+            e.stopPropagation(); // Prevent triggering tab click
+            const header = $(this);
+            const items = header.next('.group-items');
+
+            // Toggle this group
+            header.toggleClass('active');
+            items.toggleClass('expanded');
+
+            // Update aria-expanded for accessibility
+            header.attr('aria-expanded', header.hasClass('active'));
+
+            // Update the expand/collapse all button state
+            updateToggleAllButton();
+        });
+
+        // Keyboard accessibility for accordion headers
+        $('.group-header').on('keydown', function(e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                $(this).trigger('click');
+            }
+        });
+
+        function updateToggleAllButton() {
+            const allExpanded = $('.nav-group .group-header.active').length === $('.nav-group .group-header').length;
+            const $expandIcon = $('#toggleAllGroups .expand-icon');
+            const $collapseIcon = $('#toggleAllGroups .collapse-icon');
+            const $toggleText = $('#toggleAllGroups .toggle-text');
+
+            if (allExpanded) {
+                $expandIcon.hide();
+                $collapseIcon.show();
+                $toggleText.attr('data-i18n', 'navCollapseAll');
+                $toggleText.text(i18n.getMessage('navCollapseAll'));
+            } else {
+                $expandIcon.show();
+                $collapseIcon.hide();
+                $toggleText.attr('data-i18n', 'navExpandAll');
+                $toggleText.text(i18n.getMessage('navExpandAll'));
+            }
+        }
+
+        // Expand/Collapse All Toggle
+        $('#toggleAllGroups').on('click', function(e) {
+            e.preventDefault();
+            const allExpanded = $('.nav-group .group-header.active').length === $('.nav-group .group-header').length;
+
+            if (allExpanded) {
+                // Collapse all except first
+                $('.nav-group .group-header').removeClass('active').attr('aria-expanded', 'false');
+                $('.nav-group .group-items').removeClass('expanded');
+                $('#tabs ul.mode-connected .nav-group:first-child .group-header').addClass('active').attr('aria-expanded', 'true');
+                $('#tabs ul.mode-connected .nav-group:first-child .group-items').addClass('expanded');
+                store.set('expand_all_groups', false);
+            } else {
+                // Expand all
+                $('.nav-group .group-header').addClass('active').attr('aria-expanded', 'true');
+                $('.nav-group .group-items').addClass('expanded');
+                store.set('expand_all_groups', true);
+            }
+
+            updateToggleAllButton();
+        });
+
+        // Initialize: apply saved expand all preference or expand first group by default
+        if (store.get('expand_all_groups', false)) {
+            $('.nav-group .group-header').addClass('active').attr('aria-expanded', 'true');
+            $('.nav-group .group-items').addClass('expanded');
+        } else {
+            $('#tabs ul.mode-connected .nav-group:first-child .group-header').addClass('active').attr('aria-expanded', 'true');
+            $('#tabs ul.mode-connected .nav-group:first-child .group-items').addClass('expanded');
+        }
+
+        updateToggleAllButton();
+
         // options
         $('#options').on('click', function() {
             var el = $(this);
+
+            function closeOptions() {
+                $('div#options-window').slideUp(250, function () {
+                    el.removeClass('active');
+                    $(this).empty().remove();
+                });
+            }
 
             if (!el.hasClass('active')) {
                 el.addClass('active');
                 el.after('<div id="options-window"></div>');
 
-                $('div#options-window').load('./tabs/options.html', function () {
-
+                import('./../tabs/options.html?raw').then(({default: html}) => {
+                    $('div#options-window').html(html);
                     // translate to user-selected language
                     i18n.localize();
 
@@ -315,6 +466,24 @@ $(function() {
                     $('div.notifications input').on('change', function () {
                         var check = $(this).is(':checked');
                         store.set('update_notify', check);
+                    });
+                    
+                    if (store.get('disable_3d_acceleration', false)) {
+                        $('div.disable_3d_acceleration input').prop('checked', true);
+                    }
+
+                     $('div.disable_3d_acceleration input').on('change', function () {
+                        var check = $(this).is(':checked');
+                        store.set('disable_3d_acceleration', check);
+                    });
+
+                    if (store.get('disable_3d_acceleration', false)) {
+                        $('div.disable_3d_acceleration input').prop('checked', true);
+                    }
+
+                    $('div.disable_3d_acceleration input').on('change', function () {
+                        var check = $(this).is(':checked');
+                        store.set('disable_3d_acceleration', check);
                     });
 
                     $('div.statistics input').on('change', function () {
@@ -343,7 +512,6 @@ $(function() {
 
                     $('#ui-unit-type').val(globalSettings.unitType);
                     $('#map-provider-type').val(globalSettings.mapProviderType);
-                    $('#map-api-key').val(globalSettings.mapApiKey);
                     $('#proxyurl').val(globalSettings.proxyURL);
                     $('#proxylayer').val(globalSettings.proxyLayer);
                     $('#showProfileParameters').prop('checked', globalSettings.showProfileParameters);
@@ -354,7 +522,9 @@ $(function() {
                         $('#languageOption').append("<option value='{0}'>{1}</option>".format(lng, i18n.getMessage("language_" + lng)));
                     });
 
+                                        
                     $('#languageOption').val(i18n.getCurrentLanguage());
+                    
                     $('#languageOption').on('change', () => {
                         i18n.changeLanguage($('#languageOption').val());
                     });
@@ -380,10 +550,6 @@ $(function() {
                         store.set('map_provider_type', $(this).val());
                         globalSettings.mapProviderType = $(this).val();
                     });
-                    $('#map-api-key').on('change', function () {
-                        store.set('map_api_key', $(this).val());
-                        globalSettings.mapApiKey = $(this).val();
-                    });
                     $('#proxyurl').on('change', function () {
                         store.set('proxyurl', $(this).val());
                         globalSettings.proxyURL = $(this).val();
@@ -403,21 +569,17 @@ $(function() {
                     $('#maintenanceFlushSettingsCache').on('click', function () {
                         settingsCache.flush();
                     });
-                    function close_and_cleanup(e) {
-                        if (e.type == 'click' && !$.contains($('div#options-window')[0], e.target) || e.type == 'keyup' && e.keyCode == 27) {
-                            $(document).unbind('click keyup', close_and_cleanup);
 
-                            $('div#options-window').slideUp(250, function () {
-                                el.removeClass('active');
-                                $(this).empty().remove();
-                            });
+                    $('#optionsClose').on('click', () => {
+                        if ($('#options').hasClass('active')) {
+                            closeOptions();
                         }
-                    }
-
-                    $(document).bind('click keyup', close_and_cleanup);
-
-                    $(this).slideDown(250);
+                    })
+        
+                    $('div#options-window').slideDown(250);
                 });
+            } else {
+                closeOptions();
             }
         });
 
@@ -534,12 +696,20 @@ $(function() {
         var mixerprofile_e = $('#mixerprofilechange');
 
         mixerprofile_e.on('change', function () {
-            var mixerprofile = parseInt($(this).val());
+            if (!dialog.confirm(i18n.getMessage("changeMixerProfileReboot"))) 
+            {
+                $(this).val(FC.CONFIG.mixer_profile)
+                return;
+            }
+            
+            const mixerprofile = parseInt($(this).val());
             MSP.send_message(MSPCodes.MSP2_INAV_SELECT_MIXER_PROFILE, [mixerprofile], false, function () {
-                GUI.log(i18n.getMessage('setMixerProfile', [mixerprofile + 1]));
-                MSP.send_message(MSPCodes.MSP_SET_REBOOT, false, false, function () {
+                GUI.tab_switch_cleanup(function() {
+                    GUI.log(i18n.getMessage('setMixerProfile', [mixerprofile + 1]));
                     GUI.log(i18n.getMessage('deviceRebooting'));
-                    GUI.handleReconnect();
+                    GUI.handleReconnect(true);
+                    // This order! Why? ¯\_(ツ)_/¯
+                    MSP.send_message(MSPCodes.MSP_SET_REBOOT, false, false);
                 });
             });
         });

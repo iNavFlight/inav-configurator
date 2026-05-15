@@ -1,21 +1,19 @@
 'use strict';
 
-const path = require('path');
+import mspHelper from './../js/msp/MSPHelper';
+import MSPCodes from './../js/msp/MSPCodes';
+import MSP from './../js/msp';
+import GUI from './../js/gui';
+import FC from './../js/fc';
+import Settings from './../js/settings';
+import i18n from './../js/localization';
 
-const mspHelper = require('./../js/msp/MSPHelper');
-const MSPCodes = require('./../js/msp/MSPCodes');
-const MSP = require('./../js/msp');
-const { GUI, TABS } = require('./../js/gui');
-const FC = require('./../js/fc');
-const Settings = require('./../js/settings');
-const i18n = require('./../js/localization');
+const failsafeTab = {};
 
-TABS.failsafe = {};
+failsafeTab.initialize = function (callback, scrollPosition) {
 
-TABS.failsafe.initialize = function (callback, scrollPosition) {
-
-    if (GUI.active_tab != 'failsafe') {
-        GUI.active_tab = 'failsafe';
+    if (GUI.active_tab !== this) {
+        GUI.active_tab = this;
     }
 
     // Can get rid of this when MSPHelper supports strings (fixed in #7734, awaiting merge)
@@ -24,7 +22,7 @@ TABS.failsafe.initialize = function (callback, scrollPosition) {
     }
 
     function load_html() {
-        GUI.load(path.join(__dirname, "failsafe.html"), Settings.processHtml(function() {
+        import('./failsafe.html?raw').then(({default: html}) => GUI.load(html, Settings.processHtml(function () {
             GUI.simpleBind();
 
             // translate to user-selected language
@@ -122,7 +120,7 @@ TABS.failsafe.initialize = function (callback, scrollPosition) {
             });
 
             GUI.content_ready(callback);
-        }));
+        })));
     }
 
     load_failssafe_config();
@@ -146,6 +144,8 @@ TABS.failsafe.initialize = function (callback, scrollPosition) {
     }
 };
 
-TABS.failsafe.cleanup = function (callback) {
+failsafeTab.cleanup = function (callback) {
     if (callback) callback();
 };
+
+export default failsafeTab;

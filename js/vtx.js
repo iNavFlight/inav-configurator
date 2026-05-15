@@ -20,23 +20,6 @@ var VTX = (function() {
     self.CHANNEL_MIN = 1;
     self.CHANNEL_MAX = 8;
 
-    self.getMinPower = function(vtxDev) {
-        if (vtxDev == self.DEV_MSP) {
-            return 0;
-        }
-        return 1;
-    }
-
-    self.getMaxPower = function(vtxDev) {
-        if ((vtxDev == self.DEV_SMARTAUDIO) || (vtxDev == self.DEV_TRAMP)) {
-            return 5;
-        }     
-        if (vtxDev == self.DEV_MSP) {
-            return 4;
-        }
-        return 3;
-    }
-
     self.LOW_POWER_DISARM_MIN = 0;
     self.LOW_POWER_DISARM_MAX = 2;
 
@@ -45,4 +28,4 @@ var VTX = (function() {
     return self;
 })();
 
-module.exports = VTX;
+export default VTX;

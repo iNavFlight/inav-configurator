@@ -1,32 +1,31 @@
 'use strict';
 
-const path = require('path');
-const fs = require('fs');
-const { dialog } = require("@electron/remote");
+import MSP from './../js/msp';
+import mspQueue from './../js/serial_queue';
+import GUI from './../js/gui';
+import CONFIGURATOR from './../js/data_storage';
+import timeout from './../js/timeouts';
+import i18n from './../js/localization';
+import { globalSettings } from './../js/globalSettings';
+import CliAutoComplete from './../js/CliAutoComplete';
+import { ConnectionType } from './../js/connection/connection';
+import jBox from 'jbox';
+import mspDeduplicationQueue from './../js/msp/mspDeduplicationQueue';
+import FC from './../js/fc';
+import { generateFilename } from './../js/helpers';
+import dialog from '../js/dialog';
 
-const MSP = require('./../js/msp');
-const mspQueue =  require('./../js/serial_queue');
-const { GUI, TABS } = require('./../js/gui');
-const CONFIGURATOR = require('./../js/data_storage');
-var timeout = require('./../js/timeouts');
-const i18n = require('./../js/localization');
-const { globalSettings } = require('./../js/globalSettings');
-const CliAutoComplete = require('./../js/CliAutoComplete');
-const { ConnectionType } = require('./../js/connection/connection');
-const jBox = require('./../js/libraries/jBox/jBox.min');
-const mspDeduplicationQueue = require('./../js/msp/mspDeduplicationQueue');
-const FC = require('./../js/fc');
-const { generateFilename } = require('./../js/helpers');
-
-TABS.cli = {
-    lineDelayMs: 50,
-    profileSwitchDelayMs: 100,
+const cliTab = {
     outputHistory: "",
     cliBuffer: "",
+    promptCallback: null,
+    promptTimeoutId: null,
     GUI: {
         snippetPreviewWindow: null,
     },
 };
+
+cliTab.nextTab = null;
 
 function removePromptHash(promptText) {
     return promptText.replace(/^# /, '');
@@ -89,11 +88,12 @@ function copyToClipboard(text) {
         .then(onCopySuccessful, onCopyFailed);
 }
 
-TABS.cli.initialize = function (callback) {
+cliTab.initialize = function (callback) {
     var self = this;
+    self.nextTab = null;
 
-    if (GUI.active_tab != 'cli') {
-        GUI.active_tab = 'cli';
+    if (GUI.active_tab !== this) {
+        GUI.active_tab = this;
     }
 
     // Flush MSP queue as well as all MSP registered callbacks
@@ -104,41 +104,55 @@ TABS.cli.initialize = function (callback) {
     self.outputHistory = "";
     self.cliBuffer = "";
 
-    const clipboardCopySupport = (() => {
-        let nwGui = null;
-        try {
-            nwGui = require('nw.gui');
-        } catch (e) {}
-        return !(nwGui == null && !navigator.clipboard)
-        })();
+    const clipboardCopySupport = !!(navigator.clipboard?.writeText) || document.queryCommandSupported?.('copy');
 
 
     function executeCommands(out_string) {
         self.history.add(out_string.trim());
 
-        var outputArray = out_string.split("\n");
-        return outputArray.reduce((p, line, index) =>
-            p.then((delay) =>
-                new Promise((resolve) => {
-                    timeout.add('CLI_send_slowly', () => {
-                        let processingDelay = TABS.cli.lineDelayMs;
-                        if (line.toLowerCase().includes('_profile')) {
-                            processingDelay = TABS.cli.profileSwitchDelayMs;
-                        }
-                        const isLastCommand = outputArray.length === index + 1;
-                        if (isLastCommand && TABS.cli.cliBuffer) {
-                            line = getCliCommand(line, TABS.cli.cliBuffer);
-                        }
-                        TABS.cli.sendLine(line, () => {
-                            resolve(processingDelay);
-                        });
-                    }, delay);
-                })
-            ), Promise.resolve(0),
-        );
-    }
+        const lines = out_string.split("\n").filter(l => l.length > 0);
+        if (lines.length === 0) return Promise.resolve();
 
-    GUI.load(path.join(__dirname, "cli.html"), function () {
+        return new Promise((resolve) => {
+            let nextToSend = 0;
+            let promptsReceived = 0;
+            let promptGeneration = 0;
+
+            function sendOne() {
+                const line = lines[nextToSend];
+                const isLast = nextToSend === lines.length - 1;
+                const cmd = isLast ? getCliCommand(line, cliTab.cliBuffer) : line;
+                nextToSend++;
+                cliTab.sendLine(cmd);
+            }
+
+            function armCallback() {
+                clearTimeout(cliTab.promptTimeoutId);
+                const myGen = ++promptGeneration;
+                cliTab.promptTimeoutId = setTimeout(() => {
+                    if (myGen !== promptGeneration) return; // real prompt already fired
+                    cliTab.promptCallback = null;
+                    onPrompt();
+                }, 5000);
+                cliTab.promptCallback = onPrompt;
+            }
+
+            function onPrompt() {
+                promptsReceived++;
+                if (nextToSend < lines.length) sendOne();
+                if (promptsReceived === lines.length) {
+                    resolve();
+                } else {
+                    armCallback();
+                }
+            }
+
+            sendOne();
+            if (lines.length > 1) sendOne();
+            armCallback();
+        });
+    }
+    import('./cli.html?raw').then(({default: html}) => GUI.load(html, function () {
         // translate to user-selected language
        i18n.localize();
 
@@ -178,7 +192,7 @@ TABS.cli.initialize = function (callback) {
                     return;
                 }
 
-                fs.writeFile(result.filePath, self.outputHistory, (err) => {
+                window.electronAPI.writeFile(result.filePath, self.outputHistory).then(err => {
                     if (err) {
                         GUI.log(i18n.getMessage('ErrorWritingFile'));
                         return console.error(err);
@@ -192,21 +206,21 @@ TABS.cli.initialize = function (callback) {
         });
 
         $('.tab-cli .exit').on('click', function () {
-            self.send(getCliCommand('exit\n', TABS.cli.cliBuffer));
+            self.send(getCliCommand('exit\n', cliTab.cliBuffer));
         });
 
         $('.tab-cli .savecmd').on('click', function () {
-            self.send(getCliCommand('save\n', TABS.cli.cliBuffer));
+            self.send(getCliCommand('save\n', cliTab.cliBuffer));
         });
 
         $('.tab-cli .msc').on('click', function () {
-            self.send(getCliCommand('msc\n', TABS.cli.cliBuffer));
+            self.send(getCliCommand('msc\n', cliTab.cliBuffer));
         });
 
         $('.tab-cli .diffall').on('click', function () {
             self.outputHistory = "";
             $('.tab-cli .window .wrapper').empty();
-            self.send(getCliCommand('diff all\n', TABS.cli.cliBuffer));
+            self.send(getCliCommand('diff all\n', cliTab.cliBuffer));
         });
 
         $('.tab-cli .clear').on('click', function () {
@@ -262,13 +276,13 @@ TABS.cli.initialize = function (callback) {
                 }
 
                 if (result.filePaths.length == 1) {
-                    fs.readFile(result.filePaths[0], (err, data) => {
-                        if (err) {
+                    window.electronAPI.readFile(result.filePaths[0]).then(response => {
+                        if (response.error) {
                             GUI.log(i18n.getMessage('ErrorReadingFile'));
-                            return console.error(err);
-                        }
+                            console.error(response.error);
+                            return;                        }
 
-                        previewCommands(data);
+                        previewCommands(response.data);
                     });
                 }
             }).catch (err => {
@@ -360,32 +374,32 @@ TABS.cli.initialize = function (callback) {
             let delay = CONFIGURATOR.connection.deviceDescription.delay;
             if (delay > 0) {
                 timeout.add('cli_delay', () =>  {
-                    self.send(getCliCommand("cli_delay " +  delay + '\n', TABS.cli.cliBuffer));
-                    self.send(getCliCommand('# ' + i18n.getMessage('connectionBleCliEnter') + '\n', TABS.cli.cliBuffer));
+                    self.send(getCliCommand("cli_delay " +  delay + '\n', cliTab.cliBuffer));
+                    self.send(getCliCommand('# ' + i18n.getMessage('connectionBleCliEnter') + '\n', cliTab.cliBuffer));
                 }, 400);
             }
         }
 
         GUI.content_ready(callback);
-    });
+    }));
 };
 
-TABS.cli.history = {
+cliTab.history = {
     history: [],
     index:  0
 };
 
-TABS.cli.history.add = function (str) {
+cliTab.history.add = function (str) {
     this.history.push(str);
     this.index = this.history.length;
 };
 
-TABS.cli.history.prev = function () {
+cliTab.history.prev = function () {
     if (this.index > 0) this.index -= 1;
     return this.history[this.index];
 };
 
-TABS.cli.history.next = function () {
+cliTab.history.next = function () {
     if (this.index < this.history.length) this.index += 1;
     return this.history[this.index - 1];
 };
@@ -416,7 +430,7 @@ function setPrompt(text) {
     $('.tab-cli textarea').val(text);
 }
 
-TABS.cli.read = function (readInfo) {
+cliTab.read = function (readInfo) {
     /*  Some info about handling line feeds and carriage return
 
         line feed = LF = \n = 0x0A = 10
@@ -489,7 +503,7 @@ TABS.cli.read = function (readInfo) {
             CONFIGURATOR.cliValid = false;
             GUI.log(i18n.getMessage('cliReboot'));
             GUI.log(i18n.getMessage('deviceRebooting'));
-            GUI.handleReconnect();
+            GUI.handleReconnect(cliTab.nextTab || false);
         }
 
     }
@@ -510,17 +524,24 @@ TABS.cli.read = function (readInfo) {
     }
 
     setPrompt(removePromptHash(this.cliBuffer));
+
+    if (cliTab.promptCallback && this.cliBuffer.endsWith('# ')) {
+        const cb = cliTab.promptCallback;
+        cliTab.promptCallback = null;
+        clearTimeout(cliTab.promptTimeoutId);
+        cb();
+    }
 };
 
-TABS.cli.sendLine = function (line, callback) {
+cliTab.sendLine = function (line, callback) {
     this.send(line + '\n', callback);
 };
 
-TABS.cli.sendAutoComplete = function (line, callback) {
+cliTab.sendAutoComplete = function (line, callback) {
     this.send(line + '\t', callback);
 };
 
-TABS.cli.send = function (line, callback) {
+cliTab.send = function (line, callback) {
     var bufferOut = new ArrayBuffer(line.length);
     var bufView = new Uint8Array(bufferOut);
 
@@ -531,22 +552,25 @@ TABS.cli.send = function (line, callback) {
     CONFIGURATOR.connection.send(bufferOut, callback);
 };
 
-TABS.cli.cleanup = function (callback) {
+cliTab.exit = function(nextTab) {
+    this.nextTab = nextTab;
+    this.send(getCliCommand('exit\r', this.cliBuffer));
+};
+
+cliTab.cleanup = function (callback) {
+    clearTimeout(cliTab.promptTimeoutId);
+    cliTab.promptCallback = null;
+
     if (!(CONFIGURATOR.connectionValid && CONFIGURATOR.cliValid && CONFIGURATOR.cliActive)) {
         if (callback) callback();
         return;
     }
-    this.send(getCliCommand('exit\r', this.cliBuffer), function (writeInfo) {
-        // we could handle this "nicely", but this will do for now
-        // (another approach is however much more complicated):
-        // we can setup an interval asking for data lets say every 200ms, when data arrives, callback will be triggered and tab switched
-        // we could probably implement this someday
-        timeout.add('waiting_for_bootup', function waiting_for_bootup() {
-            if (callback) callback();
-        }, 1000); // if we dont allow enough time to reboot, CRC of "first" command sent will fail, keep an eye for this one
-        CONFIGURATOR.cliActive = false;
 
-        CliAutoComplete.cleanup();
-        $(CliAutoComplete).off();
-    });
+    CONFIGURATOR.cliActive = false;
+    CliAutoComplete.cleanup();
+    $(CliAutoComplete).off();
+
+    if (callback) callback();
 };
+
+export default cliTab;

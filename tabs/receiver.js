@@ -1,27 +1,25 @@
 'use strict';
 
-const path = require('path');
+import MSPChainerClass from './../js/msp/MSPchainer';
+import mspHelper from './../js/msp/MSPHelper';
+import MSPCodes from './../js/msp/MSPCodes';
+import MSP from './../js/msp';
+import GUI from './../js/gui';
+import FC from './../js/fc';
+import CONFIGURATOR from './../js/data_storage';
+import Settings from './../js/settings';
+import i18n from './../js/localization';
+import interval from './../js/intervals';
 
-const MSPChainerClass = require('./../js/msp/MSPchainer');
-const mspHelper = require('./../js/msp/MSPHelper');
-const MSPCodes = require('./../js/msp/MSPCodes');
-const MSP = require('./../js/msp');
-const { GUI, TABS } = require('./../js/gui');
-const FC = require('./../js/fc');
-const CONFIGURATOR = require('./../js/data_storage');
-const Settings = require('./../js/settings');
-const i18n = require('./../js/localization');
-const interval = require('./../js/intervals');
-
-TABS.receiver = {
+const receiverTab = {
     rateChartHeight: 117
 };
 
-TABS.receiver.initialize = function (callback) {
+receiverTab.initialize = function (callback) {
     var self = this;
 
-    if (GUI.active_tab != 'receiver') {
-        GUI.active_tab = 'receiver';
+    if (GUI.active_tab !== this) {
+        GUI.active_tab = this;
     }
 
     var loadChainer = new MSPChainerClass();
@@ -40,14 +38,14 @@ TABS.receiver.initialize = function (callback) {
     loadChainer.execute();
 
     function load_html() {
-        GUI.load(path.join(__dirname, "receiver.html"), Settings.processHtml(process_html));
+        import('./receiver.html?raw').then(({default: html}) => GUI.load(html, Settings.processHtml(process_html)));
     }
 
     function saveSettings(onComplete) {
         Settings.saveInputs(onComplete);
     }
 
-    function process_html() {
+    function process_html(settingsPromise) {
         // translate to user-selected language
        i18n.localize();;
 
@@ -66,20 +64,38 @@ TABS.receiver.initialize = function (callback) {
                 return 0;
             }
         });
-        $("#serialrx_provider").empty().append(serialRxProviders);
-        $('#serialrx_provider').val(selectedRxProvider);
+
+        let $serialRxProvider = $("#serialrx_provider");
+        $serialRxProvider.empty().append(serialRxProviders);
+        $serialRxProvider.val(selectedRxProvider);
+
+        $serialRxProvider.on('change', function() {
+            const frSkyRXProviders = ["SBUS", "FPORT", "FPORT2", "FBUS"];
+            
+            if (frSkyRXProviders.includes($(this).find("option:selected").text())) {
+                $("#frSkyOptions").show();
+            } else {
+                $("#frSkyOptions").hide();
+            }
+        });
 
         $receiverMode.on('change', function () {
             if ($(this).find("option:selected").text() == "SERIAL") {
                 $serialWrapper.show();
+                $serialRxProvider.trigger("change");
                 $receiverMode.parent().removeClass("no-bottom-border");
             } else {
                 $serialWrapper.hide();
+                $("#frSkyOptions").hide();
                 $receiverMode.parent().addClass("no-bottom-border");
             }
         });
 
-        $receiverMode.trigger("change");
+        // Wait for settings to load before triggering change events
+        // Trigger receiverMode which will trigger serialRxProvider when mode is SERIAL
+        settingsPromise.then(function() {
+            $receiverMode.trigger("change");
+        });
 
         // fill in data from RC_tuning
         $('.tunings .throttle input[name="mid"]').val(FC.RC_tuning.throttle_MID.toFixed(2));
@@ -199,7 +215,7 @@ TABS.receiver.initialize = function (callback) {
 
         $('select[name="rssi_channel"]').val(FC.MISC.rssi_channel);
 
-        var rateHeight = TABS.receiver.rateChartHeight;
+        var rateHeight = receiverTab.rateChartHeight;
 
         // UI Hooks
         // curves
@@ -296,7 +312,7 @@ TABS.receiver.initialize = function (callback) {
         });
 
         $("a.sticks").on('click', function () {
-            var mspWin = window.open("tabs/receiver_msp.html", "receiver_msp", "width=420,height=760,menubar=no,contextIsolation=no,nodeIntegration=yes");
+            var mspWin = window.open("tabs/receiver_msp.html", "receiver_msp", "width=420,height=760,menubar=no");
             
             mspWin.window.setRawRx = function (channels) {
                 if (CONFIGURATOR.connectionValid && GUI.active_tab != 'cli') {
@@ -334,8 +350,10 @@ TABS.receiver.initialize = function (callback) {
     }
 };
 
-TABS.receiver.cleanup = function (callback) {
+receiverTab.cleanup = function (callback) {
     $(window).off('resize', this.resize);
 
     if (callback) callback();
 };
+
+export default receiverTab;

@@ -1,32 +1,32 @@
 'use strict';
 
-const semver = require('semver');
-const Store = require('electron-store');
-const store = new Store();
+import semver from 'semver';
 
-const { GUI, TABS } = require('./gui');
-const MSP = require('./msp');
-const FC = require('./fc');
-const MSPCodes = require('./msp/MSPCodes');
-const mspHelper = require('./msp/MSPHelper');
-const { ConnectionType, Connection } = require('./connection/connection');
-const connectionFactory = require('./connection/connectionFactory');
-const CONFIGURATOR = require('./data_storage');
-const  { PortHandler } = require('./port_handler');
-const i18n = require('./../js/localization');
-const interval = require('./intervals');
-const periodicStatusUpdater = require('./periodicStatusUpdater');
-const mspQueue = require('./serial_queue');
-const timeout = require('./timeouts');
-const defaultsDialog = require('./defaults_dialog');
-const { SITLProcess } = require('./sitl');
-const update = require('./globalUpdates');
-const BitHelper = require('./bitHelper');
-const BOARD = require('./boards');
-const jBox = require('./libraries/jBox/jBox.min');
-const groundstation = require('./groundstation');
-const ltmDecoder = require('./ltmDecoder');
-const mspDeduplicationQueue = require('./msp/mspDeduplicationQueue');
+import GUI from './gui';
+import MSP from './msp';
+import FC from './fc';
+import MSPCodes from './msp/MSPCodes';
+import mspHelper from './msp/MSPHelper';
+import { ConnectionType, Connection } from './connection/connection';
+import connectionFactory from './connection/connectionFactory';
+import CONFIGURATOR from './data_storage';
+import  { PortHandler } from './port_handler';
+import i18n from './../js/localization';
+import interval from './intervals';
+import periodicStatusUpdater from './periodicStatusUpdater';
+import mspQueue from './serial_queue';
+import timeout from './timeouts';
+import defaultsDialog from './defaults_dialog';
+import { SITLProcess } from './sitl';
+import update from './globalUpdates';
+import BitHelper from './bitHelper';
+import jBox from 'jbox';
+import groundstation from './groundstation';
+import ltmDecoder from './ltmDecoder';
+import mspDeduplicationQueue from './msp/mspDeduplicationQueue';
+import store from './store';
+import cliTab from '../tabs/cli';
+import javascriptProgrammingTab from '../tabs/javascript_programming';
 
 var SerialBackend = (function () {
 
@@ -36,6 +36,8 @@ var SerialBackend = (function () {
     privateScope.isDemoRunning = false;
 
     privateScope.isWirelessMode = false;
+
+    privateScope.reopenTab = null;
 
     /*
      * Handle "Wireless" mode with strict queueing of messages
@@ -57,59 +59,40 @@ var SerialBackend = (function () {
             }
         });
 
-        GUI.handleReconnect = function ($tabElement) {
+        GUI.handleReconnect = function (reopenLastTab = true) {
 
-            let modal;
+            let modal = new jBox('Modal', {
+                width: 400,
+                height: 120,
+                animation: false,
+                closeOnClick: false,
+                closeOnEsc: false,
+                content: '<div id="modal-reconnect"><div data-i18n="deviceRebooting">Device - <span style="color: red">Rebooting</span></div></div>'
+            }).open();
 
-            if (BOARD.hasVcp(FC.CONFIG.boardIdentifier)) { // VCP-based flight controls may crash old drivers, we catch and reconnect
-
-                modal = new jBox('Modal', {
-                    width: 400,
-                    height: 120,
-                    animation: false,
-                    closeOnClick: false,
-                    closeOnEsc: false,
-                    content: $('#modal-reconnect')
-                }).open();
-
-                /*
-                Disconnect
-                */
-                setTimeout(function () {
-                    $('a.connect').trigger( "click" );
-                }, 100);
-
-                /*
-                Connect again
-                */
-                setTimeout(function start_connection() {
-                    modal.close();
-                    $('a.connect').trigger( "click" );
-
-                    /*
-                    Open configuration tab
-                    */
-                    if ($tabElement != null) {
-                        setTimeout(function () {
-                            $tabElement.trigger( "click" );
-                        }, 500);
-                    }
-
-                }, 7000);
+            if (typeof reopenLastTab === 'boolean') {
+                privateScope.reopenTab = reopenLastTab ? $('#tabs > ul li.active') : null;
             } else {
-                timeout.add('waiting_for_bootup', function waiting_for_bootup() {
-                    MSP.send_message(MSPCodes.MSPV2_INAV_STATUS, false, false, function () {
-                        //noinspection JSUnresolvedVariable
-                        GUI.log(i18n.getMessage('deviceReady'));
-                        //noinspection JSValidateTypes
-                        TABS.configuration.initialize(false, $('#content').scrollTop());
-                    });
-                },1500); // 1500 ms seems to be just the right amount of delay to prevent data request timeouts
+                privateScope.reopenTab = reopenLastTab;
             }
+
+            /*
+            Disconnect
+            */
+            setTimeout(function () {
+                privateScope.reConnect();
+            }, 100);
+
+            /*
+            Connect again
+            */
+            setTimeout(function start_connection() {
+                modal.close();
+                privateScope.reConnect();
+            }, 5000);
         };
 
-        
-
+    
         GUI.updateManualPortVisibility = function(){
             var selected_port = privateScope.$port.find('option:selected');
             if (selected_port.data().isManual || selected_port.data().isTcp || selected_port.data().isUdp) {
@@ -154,16 +137,19 @@ var SerialBackend = (function () {
         publicScope.$portOverride.on('change', function () {
             store.set('portOverride', publicScope.$portOverride.val());
         });
-
-        publicScope.$portOverride.val(store.get('portOverride', ''));
         
+        publicScope.$portOverride.val(store.get('portOverride', ''));        
 
         privateScope.$port.on('change', function (target) {
             GUI.updateManualPortVisibility();
         });
 
-    $('div.connect_controls a.connect').click(function () {
-
+    $('div.connect_controls a.connect').on('click', () => {
+        privateScope.reopenTab = null;
+        privateScope.reConnect()
+    });
+    
+    privateScope.reConnect = function() {
         if (groundstation.isActivated()) {
             groundstation.deactivate();
         }
@@ -193,10 +179,8 @@ var SerialBackend = (function () {
                         } else if (selected_port == 'sitl') {
                             CONFIGURATOR.connection.connect("127.0.0.1:5760", {}, privateScope.onOpen);
                         } else if (selected_port == 'sitl-demo') {
-                            if (SITLProcess.isRunning) {
-                                SITLProcess.stop();
-                            }
-                            SITLProcess.start("demo.bin"), 1000;                        
+                            SITLProcess.stop();
+                            SITLProcess.start("demo.bin");                        
                             this.isDemoRunning = true;
 
                             // Wait 1 sec until SITL is ready
@@ -207,11 +191,27 @@ var SerialBackend = (function () {
                             CONFIGURATOR.connection.connect(selected_port, {bitrate: selected_baud}, privateScope.onOpen);
                         }
                     } else {
+                        // Check for unsaved changes in JavaScript Programming tab
+                        if (GUI.active_tab === javascriptProgrammingTab &&
+                            javascriptProgrammingTab.isDirty) {
+                            console.log('[Disconnect] Checking for unsaved changes in JavaScript Programming tab');
+                            const confirmMsg = i18n.getMessage('unsavedChanges') ||
+                                'You have unsaved changes. Leave anyway?';
+
+                            if (!confirm(confirmMsg)) {
+                                console.log('[Disconnect] User cancelled disconnect due to unsaved changes');
+                                return; // Cancel disconnect
+                            }
+                            console.log('[Disconnect] User confirmed, proceeding with disconnect');
+                            // Clear isDirty flag so tab switch during disconnect doesn't show warning again
+                            javascriptProgrammingTab.isDirty = false;
+                        }
+
                         if (this.isDemoRunning) {
                             SITLProcess.stop();
                             this.isDemoRunning = false;
                         }
-                        
+
                         var wasConnected = CONFIGURATOR.connectionValid;
 
                         timeout.killAll();
@@ -270,7 +270,7 @@ var SerialBackend = (function () {
                     $(this).data("clicks", !clicks);
                 }
             }
-        });
+        }
 
         PortHandler.initialize();
     }
@@ -294,12 +294,16 @@ var SerialBackend = (function () {
                 GUI.allowedTabs = GUI.defaultAllowedTabsWhenConnected.slice();
                 privateScope.onConnect();
 
-                defaultsDialog.init();
+                defaultsDialog.init().then( () => {
 
-                $('#tabs ul.mode-connected .tab_setup a').trigger( "click" );
-
-                GUI.updateEzTuneTabVisibility(true);
-                update.firmwareVersion();
+                    if (privateScope.reopenTab) {
+                        $('a', privateScope.reopenTab).trigger('click');
+                    } else {
+                        $(`#tabs ul.mode-connected .tab_setup a`).trigger('click');
+                    }
+                    
+                    update.firmwareVersion();
+                });
             });
         });
     });
@@ -332,7 +336,7 @@ var SerialBackend = (function () {
     privateScope.onOpen = function (openInfo) {
 
         if (FC.restartRequired) {
-            GUI_control.prototype.log("<span style='color: red; font-weight: bolder'><strong>" + i18n.getMessage("illegalStateRestartRequired") + "</strong></span>");
+            GUI.log("<span style='color: red; font-weight: bolder'><strong>" + i18n.getMessage("illegalStateRestartRequired") + "</strong></span>");
             $('div.connect_controls a').trigger( "click" ); // disconnect
             return;
         }
@@ -362,6 +366,11 @@ var SerialBackend = (function () {
             store.set('last_used_bps', CONFIGURATOR.connection.bitrate);
             store.set('wireless_mode_enabled', $('#wireless-mode').is(":checked"));
 
+            // Reset state BEFORE adding receive listeners to ensure any
+            // garbage bytes or boot messages don't corrupt the MSP decoder
+            FC.resetState();
+            MSP.disconnect_cleanup();
+
             CONFIGURATOR.connection.addOnReceiveListener(publicScope.read_serial);
             CONFIGURATOR.connection.addOnReceiveListener(ltmDecoder.read);
 
@@ -389,15 +398,13 @@ var SerialBackend = (function () {
                 }
             }, 1000);
 
-            FC.resetState();
-
             // request configuration data. Start with MSPv1 and
             // upgrade to MSPv2 if possible.
             MSP.protocolVersion = MSP.constants.PROTOCOL_V2;
             MSP.send_message(MSPCodes.MSP_API_VERSION, false, false, function () {
                 
                 if (FC.CONFIG.apiVersion === "0.0.0") {
-                    GUI_control.prototype.log("<span style='color: red; font-weight: bolder'><strong>" + i18n.getMessage("illegalStateRestartRequired") + "</strong></span>");
+                    GUI.log("<span style='color: red; font-weight: bolder'><strong>" + i18n.getMessage("illegalStateRestartRequired") + "</strong></span>");
                     FC.restartRequired = true;
                     return;
                 }
@@ -473,6 +480,7 @@ var SerialBackend = (function () {
                 FC.PIDs.push(new Array(4));
             }
 
+            
             interval.add('msp-load-update', function () {
                 $('#msp-version').text("MSP version: " + MSP.protocolVersion.toFixed(0));
                 $('#msp-load').text("MSP load: " + mspQueue.getLoad().toFixed(1));
@@ -507,7 +515,7 @@ var SerialBackend = (function () {
         if (!CONFIGURATOR.cliActive) {
             MSP.read(info);
         } else if (CONFIGURATOR.cliActive) {
-            TABS.cli.read(info);
+            cliTab.read(info);
         }
     }
 
@@ -619,4 +627,4 @@ var SerialBackend = (function () {
 
 })();
 
-module.exports = SerialBackend;
+export default SerialBackend;

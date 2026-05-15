@@ -1,24 +1,26 @@
 'use strict';
 
-const path = require('path');
-const { GUI, TABS } = require('./../js/gui');
-const i18n = require('./../js/localization');
+import GUI from './../js/gui';
+import i18n from './../js/localization';
 
 const landing = {};
 landing.initialize = function (callback) {
 
-    if (GUI.active_tab != 'landing') {
-        GUI.active_tab = 'landing';
+    if (GUI.active_tab !== this) {
+        GUI.active_tab = this;
     }
-    GUI.load(path.join(__dirname, "landing.html"), function () {
-        i18n.localize();
-        GUI.content_ready(callback);
+    import('./landing.html?raw').then(({default: html}) => {
+        GUI.load(html, () => {
+            i18n.localize();
+            GUI.content_ready(callback);
+        });
     });
-
 };
 
 landing.cleanup = function (callback) {
     if (callback) callback();
 };
 
-TABS.landing = landing;
+const landingTab = landing;
+
+export default landingTab;

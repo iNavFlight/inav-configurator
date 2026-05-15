@@ -1,6 +1,6 @@
 'use strict';
 
-const BitHelper = require('./bitHelper');
+import BitHelper from './bitHelper';
 
 var SafehomeCollection = function () {
 
@@ -101,4 +101,4 @@ var SafehomeCollection = function () {
     return self;
 };
 
-module.exports = SafehomeCollection;
+export default SafehomeCollection;

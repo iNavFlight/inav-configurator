@@ -1,6 +1,6 @@
 'use strict';
 
-const ServoMixRule = require('./servoMixRule');
+import ServoMixRule from './servoMixRule';
 
 var ServoMixerRuleCollection = function () {
 
@@ -158,4 +158,4 @@ var ServoMixerRuleCollection = function () {
     return self;
 };
 
-module.exports = ServoMixerRuleCollection;
+export default ServoMixerRuleCollection;
