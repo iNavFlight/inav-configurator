@@ -2996,12 +2996,12 @@ var mspHelper = (function () {
     }
 
     self.queryOutputAssignment = function(callback) {
-        var overrideIds = FC.OUTPUT_MAPPING.getUsedTimerIds();
-        var buffer = [];
+        const overrideIds = FC.OUTPUT_MAPPING.getUsedTimerIds();
+        const buffer = [];
         buffer.push(overrideIds.length);
-        for (var i = 0; i < overrideIds.length; i++) {
-            var timerId = parseInt(overrideIds[i]);
-            var outputMode = FC.OUTPUT_MAPPING.getTimerOverride(timerId) || FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_AUTO;
+        for (const id of overrideIds) {
+            const timerId = Number.parseInt(id);
+            const outputMode = FC.OUTPUT_MAPPING.getTimerOverride(timerId) || FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_AUTO;
             buffer.push(timerId);
             buffer.push(outputMode);
         }
