@@ -1496,6 +1496,9 @@
     "portsFunction_HEADTRACKER": {
         "message": "Serial Headtracker"
     },
+    "portsFunction_CRSF_SENSOR": {
+        "message": "CRSF Sensor"
+    },
     "pidTuning_Other": {
         "message": "Other"
     },
