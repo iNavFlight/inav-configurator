@@ -166,10 +166,10 @@ const serialPortHelper = (function () {
         'DJI_FPV': 21,
         'SBUS_OUTPUT': 22,
         'SMARTPORT_MASTER': 23,
+        'CRSF_SENSOR': 24,
         'MSP_DISPLAYPORT': 25,
         'GIMBAL': 26,
-        'HEADTRACKER': 27,
-        'CRSF_SENSOR': 24
+        'HEADTRACKER': 27
     };
 
     privateScope.identifierToName = {
@@ -193,8 +193,7 @@ const serialPortHelper = (function () {
             '38400',
             '57600',
             '115200',
-            '230400',
-            '420000'
+            '230400'
         ],
         'MSP': [
             '2400',

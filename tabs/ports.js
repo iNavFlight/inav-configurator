@@ -152,6 +152,7 @@ portsTab.initialize = function (callback) {
 
                             if (serialPort.functions.indexOf(functionName) >= 0) {
                                 select_e.val(functionName);
+                                updateDefaultBaud(functions_e_id, column);
                             }
                         }
                     }
@@ -197,7 +198,7 @@ portsTab.initialize = function (callback) {
                 let $element = $(element);
 
                 if ($element.val() != functionName) {
-                    $element.val('');
+                    $element.val('').trigger('change');
                 }
             });
 
