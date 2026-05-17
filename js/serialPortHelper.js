@@ -131,6 +131,13 @@ const serialPortHelper = (function () {
             name: 'HEADTRACKER',
             groups: ['peripherals'],
             defaultBaud: 115200
+        },
+        {
+            name: 'CRSF_SENSOR',
+            groups: ['sensors'],
+            defaultBaud: 420000,
+            lockedBaud: true,
+            isUnique: true
         }
     ];
 
@@ -161,7 +168,8 @@ const serialPortHelper = (function () {
         'SMARTPORT_MASTER': 23,
         'MSP_DISPLAYPORT': 25,
         'GIMBAL': 26,
-        'HEADTRACKER': 27
+        'HEADTRACKER': 27,
+        'CRSF_SENSOR': 24
     };
 
     privateScope.identifierToName = {
@@ -185,7 +193,8 @@ const serialPortHelper = (function () {
             '38400',
             '57600',
             '115200',
-            '230400'
+            '230400',
+            '420000'
         ],
         'MSP': [
             '2400',

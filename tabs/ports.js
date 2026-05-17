@@ -318,7 +318,9 @@ function updateDefaultBaud(baudSelect, column) {
         baudRate = rule.defaultBaud;
     }
 
-    section.find("." + column + "_baudrate").children('[value=' + baudRate + ']').prop('selected', true);
+    const $baudSelect = section.find("." + column + "_baudrate");
+    $baudSelect.children('[value=' + baudRate + ']').prop('selected', true);
+    $baudSelect.prop('disabled', !!(rule && rule.lockedBaud));
 }
 
 portsTab.cleanup = function (callback) {
