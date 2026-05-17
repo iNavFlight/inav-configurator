@@ -107,7 +107,7 @@ portsTab.initialize = function (callback) {
                 port_configuration_e.data('port', serialPort);
 
                 for (var columnIndex = 0; columnIndex < columns.length; columnIndex++) {
-                    var column = columns[columnIndex];
+                    let column = columns[columnIndex];
 
                     var functions_e = $(port_configuration_e).find('.functionsCell-' + column);
                     let functions_e_id = "portFunc-" + column + "-" + portIndex;
