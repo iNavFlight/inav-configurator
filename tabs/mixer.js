@@ -140,18 +140,27 @@ mixerTab.initialize = function (callback, scrollPosition) {
             );
             $('#timer-output-' + t).on('change', function() {
                 updateTimerOverride();
-                renderOutputMapping();
+                if (FC.OUTPUT_MAPPING.hasDirectAssignment()) {
+                    mspHelper.queryOutputAssignment(renderOutputMapping);
+                } else {
+                    renderOutputMapping();
+                }
             });
         }
 
     }
 
     function renderOutputMapping() {
-        let outputMap = FC.OUTPUT_MAPPING.getOutputTable(
-            FC.MIXER_CONFIG.platformType == PLATFORM.MULTIROTOR || FC.MIXER_CONFIG.platformType == PLATFORM.TRICOPTER,
-            FC.MOTOR_RULES.getNumberOfConfiguredMotors(),
-            FC.SERVO_RULES.getUsedServoIndexes()
-        );
+        let outputMap;
+        if (FC.OUTPUT_MAPPING.hasDirectAssignment()) {
+            outputMap = FC.OUTPUT_MAPPING.getOutputTableDirect();
+        } else {
+            outputMap = FC.OUTPUT_MAPPING.getOutputTable(
+                FC.MIXER_CONFIG.platformType == PLATFORM.MULTIROTOR || FC.MIXER_CONFIG.platformType == PLATFORM.TRICOPTER,
+                FC.MOTOR_RULES.getNumberOfConfiguredMotors(),
+                FC.SERVO_RULES.getUsedServoIndexes()
+            );
+        }
 
         for (let i = 1; i <= FC.OUTPUT_MAPPING.getOutputCount(); i++) {
             $('#function-' + i).html(outputMap[i - 1]);
@@ -660,6 +669,7 @@ mixerTab.initialize = function (callback, scrollPosition) {
             }
 
             renderMotorMixRules();
+            FC.OUTPUT_MAPPING.invalidateDirectAssignment();
             renderOutputMapping();
 
             motorWizardModal.close();
@@ -785,6 +795,7 @@ mixerTab.initialize = function (callback, scrollPosition) {
             FC.MIXER_CONFIG.hasFlaps = (currentMixerPreset.hasFlaps === true) ? true : false;
             renderServoMixRules();
             renderMotorMixRules();
+            FC.OUTPUT_MAPPING.invalidateDirectAssignment();
             renderOutputMapping();
             updateRefreshButtonStatus();
         });
@@ -803,12 +814,14 @@ mixerTab.initialize = function (callback, scrollPosition) {
         $servoMixTableBody.on('click', "[data-role='role-servo-delete']", function (event) {
             FC.SERVO_RULES.drop($(event.currentTarget).attr("data-index"));
             renderServoMixRules();
+            FC.OUTPUT_MAPPING.invalidateDirectAssignment();
             renderOutputMapping();
         });
 
         $motorMixTableBody.on('click', "[data-role='role-motor-delete']", function (event) {
             FC.MOTOR_RULES.drop($(event.currentTarget).attr("data-index"));
             renderMotorMixRules();
+            FC.OUTPUT_MAPPING.invalidateDirectAssignment();
             renderOutputMapping();
         });
 
@@ -820,6 +833,7 @@ mixerTab.initialize = function (callback, scrollPosition) {
             if (FC.SERVO_RULES.hasFreeSlots()) {
                 FC.SERVO_RULES.put(new ServoMixRule(FC.SERVO_RULES.getNextUnusedIndex(), 0, 100, 0));
                 renderServoMixRules();
+                FC.OUTPUT_MAPPING.invalidateDirectAssignment();
                 renderOutputMapping();
             }
         });
@@ -828,6 +842,7 @@ mixerTab.initialize = function (callback, scrollPosition) {
             if (FC.MOTOR_RULES.hasFreeSlots()) {
                 FC.MOTOR_RULES.put(new MotorMixRule(1, 0, 0, 0));
                 renderMotorMixRules();
+                FC.OUTPUT_MAPPING.invalidateDirectAssignment();
                 renderOutputMapping();
             }
         });
@@ -844,6 +859,20 @@ mixerTab.initialize = function (callback, scrollPosition) {
         renderOutputTable();
         renderOutputMapping();
         renderTimerOverride();
+
+        // Attempt to enhance output preview with firmware-authoritative assignments.
+        // Tab is already functional above; this re-renders if/when firmware responds.
+        // The settled guard handles the edge case of a malformed packet causing no callback.
+        {
+            let settled = false;
+            const onOutputAssignmentLoaded = function() {
+                if (settled) return;
+                settled = true;
+                renderOutputMapping();
+            };
+            mspHelper.loadOutputAssignment(onOutputAssignmentLoaded);
+            setTimeout(onOutputAssignmentLoaded, 2000);
+        }
 
         FC.LOGIC_CONDITIONS.init($('#logic-wrapper'));
 

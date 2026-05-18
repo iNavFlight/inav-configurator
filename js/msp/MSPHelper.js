@@ -1495,6 +1495,17 @@ var mspHelper = (function () {
                 }
                 break;
 
+            case MSPCodes.MSP2_INAV_OUTPUT_ASSIGNMENT:
+            case MSPCodes.MSP2_INAV_QUERY_OUTPUT_ASSIGNMENT:
+                FC.OUTPUT_MAPPING.flushDirectAssignment();
+                for (let i = 0; i + 2 < data.byteLength; i += 3) {
+                    let outputIndex = data.getUint8(i);
+                    let type = data.getUint8(i + 1);
+                    let number = data.getUint8(i + 2);
+                    FC.OUTPUT_MAPPING.setDirectAssignment(outputIndex, type, number);
+                }
+                break;
+
             case MSPCodes.MSP2_INAV_MC_BRAKING:
                 try {
                     FC.BRAKING_CONFIG.speedThreshold = data.getUint16(0, true);
@@ -2978,6 +2989,23 @@ var mspHelper = (function () {
 
     self.loadTimerOutputModes = function(callback) {
         MSP.send_message(MSPCodes.MSP2_INAV_TIMER_OUTPUT_MODE, false, false, callback);
+    }
+
+    self.loadOutputAssignment = function(callback) {
+        MSP.send_message(MSPCodes.MSP2_INAV_OUTPUT_ASSIGNMENT, false, false, callback);
+    }
+
+    self.queryOutputAssignment = function(callback) {
+        const overrideIds = FC.OUTPUT_MAPPING.getUsedTimerIds();
+        const buffer = [];
+        buffer.push(overrideIds.length);
+        for (const id of overrideIds) {
+            const timerId = Number.parseInt(id);
+            const outputMode = FC.OUTPUT_MAPPING.getTimerOverride(timerId) || FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_AUTO;
+            buffer.push(timerId);
+            buffer.push(outputMode);
+        }
+        MSP.send_message(MSPCodes.MSP2_INAV_QUERY_OUTPUT_ASSIGNMENT, buffer, false, callback);
     }
 
     self.sendTimerOutputModes = function(onCompleteCallback) {

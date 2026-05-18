@@ -5,7 +5,8 @@ import BitHelper from "./bitHelper";
 var OutputMappingCollection = function () {
     let self = {},
         data = [],
-        timerOverrides = {};
+        timerOverrides = {},
+        directAssignments = [];
 
     const colorTable = [
             "#8ecae6",
@@ -45,6 +46,48 @@ var OutputMappingCollection = function () {
 
     self.flushTimerOverrides = function() {
         timerOverrides = {};
+    }
+
+    self.flushDirectAssignment = function() {
+        directAssignments = [];
+    }
+
+    // Discard cached data to force JS fallback on the next render — used when local
+    // motor/servo rules change before being saved, so firmware data is stale.
+    self.invalidateDirectAssignment = function() {
+        directAssignments = [];
+    }
+
+    self.setDirectAssignment = function(outputIndex, type, number) {
+        directAssignments.push({ outputIndex, type, number });
+    }
+
+    self.hasDirectAssignment = function() {
+        return directAssignments.length > 0;
+    }
+
+    // Build output table from firmware-reported direct assignments.
+    // Falls back gracefully: outputs not present in directAssignments show as '-'.
+    self.getOutputTableDirect = function() {
+        let offset = getFirstOutputOffset();
+        let outputCount = self.getOutputCount();
+        let outputMap = new Array(outputCount).fill('-');
+
+        for (let entry of directAssignments) {
+            let displayIndex = entry.outputIndex - offset;
+            if (displayIndex < 0 || displayIndex >= outputCount) continue;
+            if (entry.type === 1) {
+                outputMap[displayIndex] = 'Motor ' + entry.number;
+            } else if (entry.type === 2) {
+                outputMap[displayIndex] = 'Servo ' + entry.number;
+            } else if (entry.type === 3) {
+                outputMap[displayIndex] = 'Led';
+            } else if (entry.type === 4) {
+                outputMap[displayIndex] = 'USER' + entry.number;
+            }
+        }
+
+        return outputMap;
     }
 
     self.setTimerOverride = function (timer, outputMode) {
@@ -174,6 +217,7 @@ var OutputMappingCollection = function () {
 
     self.flush = function () {
         data = [];
+        directAssignments = [];
     };
 
     self.put = function (element) {
