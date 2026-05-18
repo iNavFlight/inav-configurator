@@ -52,6 +52,12 @@ var OutputMappingCollection = function () {
         directAssignments = [];
     }
 
+    // Discard cached data to force JS fallback on the next render — used when local
+    // motor/servo rules change before being saved, so firmware data is stale.
+    self.invalidateDirectAssignment = function() {
+        directAssignments = [];
+    }
+
     self.setDirectAssignment = function(outputIndex, type, number) {
         directAssignments.push({ outputIndex, type, number });
     }
@@ -74,6 +80,10 @@ var OutputMappingCollection = function () {
                 outputMap[displayIndex] = 'Motor ' + entry.number;
             } else if (entry.type === 2) {
                 outputMap[displayIndex] = 'Servo ' + entry.number;
+            } else if (entry.type === 3) {
+                outputMap[displayIndex] = 'Led';
+            } else if (entry.type === 4) {
+                outputMap[displayIndex] = 'USER' + entry.number;
             }
         }
 
@@ -207,6 +217,7 @@ var OutputMappingCollection = function () {
 
     self.flush = function () {
         data = [];
+        directAssignments = [];
     };
 
     self.put = function (element) {
