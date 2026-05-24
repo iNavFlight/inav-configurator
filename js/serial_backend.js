@@ -452,6 +452,10 @@ var SerialBackend = (function () {
     }
 
     privateScope.onConnect = function () {
+        FC.CONFIG.profile = -1;
+        FC.CONFIG.battery_profile = -1;
+        FC.CONFIG.mixer_profile = -1;
+
         timeout.remove('connecting'); // kill connecting timer
         $('#connectbutton a.connect_state').text(i18n.getMessage('disconnect')).addClass('active');
         $('#connectbutton a.connect').addClass('active');
