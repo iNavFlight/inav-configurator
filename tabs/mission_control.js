@@ -31,13 +31,16 @@ import Circle from 'ol/geom/Circle';
 import PointerInteraction from 'ol/interaction/Pointer.js';
 import {defaults as defaultInteractions} from 'ol/interaction/defaults';
 import {Control, defaults as defaultControls} from 'ol/control.js';
+import DragAndDrop from 'ol/interaction/DragAndDrop.js';
+import {GPX, GeoJSON, IGC, KML, TopoJSON} from 'ol/format.js';
+import { unzipSync } from 'fflate';
 
 import MSPChainerClass from './../js/msp/MSPchainer';
 import mspHelper from './../js/msp/MSPHelper';
 import MSPCodes from './../js/msp/MSPCodes';
 import MSP from './../js/msp';
 import mspQueue from './../js/serial_queue';
-import { GUI, TABS } from './../js/gui';
+import GUI from './../js/gui';
 import FC from './../js/fc';
 import CONFIGURATOR from './../js/data_storage';
 import i18n from './../js/localization';
@@ -57,6 +60,21 @@ import store from './../js/store';
 import dialog from '../js/dialog';
 
 import html from'./mission_control.html?raw';
+
+function extractKmlFromKmz(source) {
+    const data = source instanceof Uint8Array ? source : new Uint8Array(source);
+    const unzipped = unzipSync(data);
+    const kmlEntry = Object.keys(unzipped).find(name => name === 'doc.kml')
+                  || Object.keys(unzipped).find(name => name.endsWith('.kml'));
+    if (!kmlEntry) throw new Error('No KML file found in KMZ archive');
+    return new TextDecoder().decode(unzipped[kmlEntry]);
+}
+
+class KMZ extends KML {
+    getType() { return 'arraybuffer'; }
+    readFeature(source, options) { return super.readFeature(extractKmlFromKmz(source), options); }
+    readFeatures(source, options) { return super.readFeatures(extractKmlFromKmz(source), options); }
+}
 
 var MAX_NEG_FW_LAND_ALT = -2000; // cm
 
@@ -109,9 +127,9 @@ const icons = Object.create(null)
 //
 ////////////////////////////////////
 
-TABS.mission_control = {};
-TABS.mission_control.isYmapLoad = false;
-TABS.mission_control.initialize = function (callback) {
+const missionControlTab = {};
+missionControlTab.isYmapLoad = false;
+missionControlTab.initialize = function (callback) {
 
     let cursorInitialized = false;
     let curPosStyle;
@@ -136,8 +154,8 @@ TABS.mission_control.initialize = function (callback) {
     let isGeozoneEnabeld = false;
     let settings = {speed: 0, alt: 5000, safeRadiusSH: 50, fwApproachAlt: 60, fwLandAlt: 5, maxDistSH: 0, fwApproachLength: 0, fwLoiterRadius: 0};
 
-    if (GUI.active_tab != 'mission_control') {
-        GUI.active_tab = 'mission_control';
+    if (GUI.active_tab !== this) {
+        GUI.active_tab = this;
     }
 
     if (FC.isFeatureEnabled('GEOZONE')) {
@@ -1524,6 +1542,152 @@ function iconKey(filename) {
 
     /////////////////////////////////////////////
     //
+    // Layer Management Functions
+    //
+    /////////////////////////////////////////////
+
+    function updateLayerListUI() {
+        $('#layerListContainer').empty();
+        const customLayers = [];
+        map.getLayers().forEach(layer => {
+            if (layer.get('is_custom_overlay') === true) {
+                customLayers.push(layer);
+            }
+        });
+        if (customLayers.length === 0) {
+            $('#layerListContainer').html('<div style="color: #888; font-style: italic;">No layers loaded</div>');
+            return;
+        }
+        customLayers.forEach((layer, i) => {
+            const layerName = layer.get('name');
+            const isVisible = layer.getVisible();
+            const layerId = 'layer_' + layerName.replaceAll(/[^a-zA-Z0-9]/g, '_' + i);
+            const layerHtml = `
+                <div class="layer-item" style="display: flex; align-items: center; justify-content: space-between; padding: 8px 5px; border-bottom: 1px solid #444;">
+                    <div style="flex: 1; display: flex; align-items: center; min-width: 0;">
+                        <input id="${layerId}" type="checkbox" class="togglemedium layer-toggle" data-layer-name="${layerName}" ${isVisible ? 'checked' : ''} style="flex-shrink: 0;">
+                        <label for="${layerId}" style="margin-left: 8px; cursor: pointer; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${layerName}</label>
+                    </div>
+                    <div class="btnTable btnTableIcon btnTable-danger" style="margin-left: 10px; flex-shrink: 0;">
+                        <a class="ic_removeAll layer-delete" data-layer-name="${layerName}" href="#" title="Delete layer"></a>
+                    </div>
+                </div>
+            `;
+            $('#layerListContainer').append(layerHtml);
+        });
+        GUI.switchery();
+        $('.layer-toggle').on('change', function() {
+            const layerName = $(this).attr('data-layer-name');
+            const isChecked = $(this).is(':checked');
+            map.getLayers().forEach(layer => {
+                if (layer.get('name') === layerName && layer.get('is_custom_overlay')) {
+                    layer.setVisible(isChecked);
+                }
+            });
+        });
+        $('.layer-delete').on('click', function(event) {
+            event.preventDefault();
+            const layerName = $(this).attr('data-layer-name');
+            if (dialog.confirm(i18n.getMessage('layerConfirmDelete'))) {
+                removeLayerFromDisk(layerName);
+            }
+        });
+    }
+
+    function saveLayerToDisk(layer) {
+        let customOverlayList = store.get('custom_overlay_list');
+        if (customOverlayList === undefined) {
+            customOverlayList = [];
+        }
+        const writer = new GeoJSON();
+        const geojsonStr = writer.writeFeatures(layer.getSource().getFeatures());
+        const layerName = layer.get('name');
+        customOverlayList = customOverlayList.filter(l => l.name !== layerName);
+        const savedLayer = {
+            name: layerName,
+            layer_data: geojsonStr,
+            visible: layer.getVisible()
+        };
+        customOverlayList.push(savedLayer);
+        store.set('custom_overlay_list', customOverlayList);
+        GUI.log(`Saved layer: ${layerName}`);
+    }
+
+    function removeLayerFromDisk(layerName) {
+        let customOverlayList = store.get('custom_overlay_list');
+        if (!customOverlayList) return;
+        customOverlayList = customOverlayList.filter(l => l.name !== layerName);
+        store.set('custom_overlay_list', customOverlayList);
+        const layersToRemove = [];
+        map.getLayers().forEach(layer => {
+            if (layer.get('name') === layerName && layer.get('is_custom_overlay')) {
+                layersToRemove.push(layer);
+            }
+        });
+        layersToRemove.forEach(layer => map.removeLayer(layer));
+        updateLayerListUI();
+        GUI.log(`Removed layer: ${layerName}`);
+    }
+
+    function createGeoLayer(features, fileName, visible) {
+        const vectorSource = new VectorSource({ features: features });
+        vectorSource.forEachFeature(function(feature) {
+            if (!feature.get('name')) feature.set('name', fileName);
+            feature.set('show_info_on_hover', true);
+        });
+        const vectorLayer = new VectorLayer({ source: vectorSource, visible: visible });
+        vectorLayer.set('name', fileName);
+        vectorLayer.set('is_custom_overlay', true);
+        vectorLayer.set('no_interaction', true);
+        map.addLayer(vectorLayer);
+        return vectorLayer;
+    }
+
+    function addGeoLayerToMap(features, fileName, visible = true) {
+        const vectorLayer = createGeoLayer(features, fileName, visible);
+        saveLayerToDisk(vectorLayer);
+        updateLayerListUI();
+        GUI.log(`Added layer: ${fileName}`);
+    }
+
+    async function loadGeoFile(filePath) {
+        const fileName = filePath.split('/').pop().split('\\').pop();
+        const ext = fileName.split('.').pop().toLowerCase();
+
+        const response = await globalThis.electronAPI.readFile(filePath, ext === 'kmz' ? null : undefined);
+        if (response.error) {
+            GUI.log(`Error reading file: ${response.error}`);
+            dialog.alert(i18n.getMessage('layerLoadError'));
+            return;
+        }
+
+        let format;
+        let fileData = response.data;
+
+        switch (ext) {
+            case 'kmz': fileData = extractKmlFromKmz(response.data); format = new KML(); break;
+            case 'kml': format = new KML(); break;
+            case 'json':
+            case 'geojson': format = new GeoJSON(); break;
+            case 'gpx': format = new GPX(); break;
+            case 'igc': format = new IGC(); break;
+            case 'topojson': format = new TopoJSON(); break;
+            default: throw new Error('Unsupported file format');
+        }
+
+        const features = format.readFeatures(fileData, {
+            dataProjection: 'EPSG:4326',
+            featureProjection: 'EPSG:3857'
+        });
+
+        if (features.length === 0) throw new Error('No features found in file');
+
+        addGeoLayerToMap(features, fileName);
+        GUI.log(`Loaded ${features.length} features from ${fileName}`);
+    }
+
+    /////////////////////////////////////////////
+    //
     // Manage Waypoint
     //
     /////////////////////////////////////////////
@@ -2272,14 +2436,16 @@ function iconKey(filename) {
 
             var map = evt.map;
 
+            const isInteractable = (layer) => layer?.get('no_interaction') !== true;
+
             var feature = map.forEachFeatureAtPixel(evt.pixel,
                 function (feature, layer) {
-                    return feature;
+                    return isInteractable(layer) ? feature : null;
                 });
 
             tempMarker = map.forEachFeatureAtPixel(evt.pixel,
                 function (feature, layer) {
-                    return layer;
+                    return isInteractable(layer) ? layer : null;
                 });
 
             if (feature) {
@@ -2553,6 +2719,76 @@ function iconKey(filename) {
         }         
 
         //////////////////////////////////////////////////////////////////////////
+        // Load previously saved GEO files from electron store
+        //////////////////////////////////////////////////////////////////////////
+        if (store.get('custom_overlay_list') === undefined) {
+            store.set('custom_overlay_list', []);
+        }
+
+        for (let savedLayer of store.get('custom_overlay_list')) {
+            const features = new GeoJSON().readFeatures(savedLayer.layer_data, {
+                dataProjection: 'EPSG:4326',
+                featureProjection: map.getView().getProjection()
+            });
+            createGeoLayer(features, savedLayer.name, savedLayer.visible !== false);
+        }
+        updateLayerListUI();
+
+        //////////////////////////////////////////////////////////////////////////
+        // Add drag-and-drop support for GEO files
+        //////////////////////////////////////////////////////////////////////////
+        const dragAndDropInteraction = new DragAndDrop({
+            formatConstructors: [
+                GPX,
+                GeoJSON,
+                IGC,
+                KML,
+                KMZ,
+                TopoJSON,
+            ],
+        });
+
+        dragAndDropInteraction.on('addfeatures', function(event) {
+            const fileName = event.file.name;
+            GUI.log(`Drag-and-dropped file: ${fileName}`);
+            addGeoLayerToMap(event.features, fileName);
+        });
+
+        map.addInteraction(dragAndDropInteraction);
+
+        //////////////////////////////////////////////////////////////////////////
+        // Feature hover info display
+        //////////////////////////////////////////////////////////////////////////
+        const displayFeatureInfo = function(pixel) {
+            const features = [];
+            const geoInfoEl = document.getElementById('geo_info');
+            map.forEachFeatureAtPixel(pixel, function(feature) {
+                if (feature.get('show_info_on_hover') === true) {
+                    features.push(feature);
+                }
+            });
+
+            if (features.length > 0) {
+                const info = [];
+                for (const feature of features) {
+                    info.push(feature.get('name') || 'Unknown');
+                }
+                geoInfoEl.innerHTML = info.join(', ');
+                geoInfoEl.style.opacity = '1';
+            } else {
+                geoInfoEl.style.opacity = '0';
+            }
+        };
+
+        map.on('pointermove', function(evt) {
+            if (evt.dragging) {
+                return;
+            }
+            const pixel = map.getEventPixel(evt.originalEvent);
+            displayFeatureInfo(pixel);
+        });
+
+        //////////////////////////////////////////////////////////////////////////
         // Map on-click behavior definition
         //////////////////////////////////////////////////////////////////////////
         map.on('click', function (evt) {
@@ -2596,11 +2832,11 @@ function iconKey(filename) {
 
                 let P3Value = selectedMarker.getP3();
 
-                changeSwitch($('#pointP3Alt'), TABS.mission_control.isBitSet(P3Value, MWNP.P3.ALT_TYPE));
-                changeSwitch($('#pointP3UserAction1'), TABS.mission_control.isBitSet(P3Value, MWNP.P3.USER_ACTION_1));
-                changeSwitch($('#pointP3UserAction2'), TABS.mission_control.isBitSet(P3Value, MWNP.P3.USER_ACTION_2));
-                changeSwitch($('#pointP3UserAction3'), TABS.mission_control.isBitSet(P3Value, MWNP.P3.USER_ACTION_3));
-                changeSwitch($('#pointP3UserAction4'), TABS.mission_control.isBitSet(P3Value, MWNP.P3.USER_ACTION_4));
+                changeSwitch($('#pointP3Alt'), missionControlTab.isBitSet(P3Value, MWNP.P3.ALT_TYPE));
+                changeSwitch($('#pointP3UserAction1'), missionControlTab.isBitSet(P3Value, MWNP.P3.USER_ACTION_1));
+                changeSwitch($('#pointP3UserAction2'), missionControlTab.isBitSet(P3Value, MWNP.P3.USER_ACTION_2));
+                changeSwitch($('#pointP3UserAction3'), missionControlTab.isBitSet(P3Value, MWNP.P3.USER_ACTION_3));
+                changeSwitch($('#pointP3UserAction4'), missionControlTab.isBitSet(P3Value, MWNP.P3.USER_ACTION_4));
 
                 var altitudeMeters = app.ConvertCentimetersToMeters(selectedMarker.getAlt());
 
@@ -2618,7 +2854,7 @@ function iconKey(filename) {
                         selectedMarker.setAlt(returnAltitude);
 
                         /*
-                        if (TABS.mission_control.isBitSet(P3Value, MWNP.P3.ALT_TYPE)) {
+                        if (missionControlTab.isBitSet(P3Value, MWNP.P3.ALT_TYPE)) {
                             if (!selectedFwApproachWp.getIsSeaLevelRef()) {
                                 selectedFwApproachWp.setApproachDirection(selectedFwApproachWp.getApproachDirection() + elevationAtWP * 100);
                                 selectedFwApproachWp.setLandAltAsl(selectedFwApproachWp.getLandAltAsl() + elevationAtWP * 100);
@@ -2626,7 +2862,7 @@ function iconKey(filename) {
 
                         }
                         */
-                        selectedFwApproachWp.setIsSeaLevelRef(TABS.mission_control.isBitSet(P3Value, MWNP.P3.ALT_TYPE) ? 1 : 0);
+                        selectedFwApproachWp.setIsSeaLevelRef(missionControlTab.isBitSet(P3Value, MWNP.P3.ALT_TYPE) ? 1 : 0);
                         $('#wpApproachAlt').val(selectedFwApproachWp.getApproachAltAsl());
                         $('#wpLandAlt').val(selectedFwApproachWp.getLandAltAsl);
                         $('#wpLandAltM').text(selectedFwApproachWp.getLandAltAsl() / 100 + " m");
@@ -2802,102 +3038,27 @@ function iconKey(filename) {
         /////////////////////////////////////////////
         // Callback to show/hide menu boxes
         /////////////////////////////////////////////
-        
+
+        function setupShowHidePanel(buttonId, contentId) {
+            $(`#${buttonId}`).on('click', function () {
+                const wasVisible = $(this).children().attr('class') === 'ic_hide';
+                $(this).children().attr('class', wasVisible ? 'ic_show' : 'ic_hide');
+                $(`#${contentId}`)[wasVisible ? 'fadeOut' : 'fadeIn'](300);
+            });
+        }
+
         // Ensure ActionContent is visible initially
         if ($('#showHideActionButton').children().attr('class') === 'ic_hide') {
             $('#ActionContent').show();
         }
-        
-        $('#showHideActionButton').on('click', function () {
-            var src = ($(this).children().attr('class') === 'ic_hide')
-                ? 'ic_show'
-                : 'ic_hide';
-            $(this).children().attr('class', src);
-            if ($(this).children().attr('class') === 'ic_hide') {
-                $('#ActionContent').fadeIn(300);
-            }
-            else {
-                $('#ActionContent').fadeOut(300);
-            }
-        });
 
-        $('#showHideInfoButton').on('click', function () {
-            var src = ($(this).children().attr('class') === 'ic_hide')
-                ? 'ic_show'
-                : 'ic_hide';
-            $(this).children().attr('class', src);
-            if ($(this).children().attr('class') === 'ic_hide') {
-                $('#InfoContent').fadeIn(300);
-            }
-            else {
-                $('#InfoContent').fadeOut(300);
-            }
-        });
-
-        $('#showHideSafehomeButton').on('click', function () {
-            var src = ($(this).children().attr('class') === 'ic_hide')
-                ? 'ic_show'
-                : 'ic_hide';
-            $(this).children().attr('class', src);
-            if ($(this).children().attr('class') === 'ic_hide') {
-                $('#SafehomeContent').fadeIn(300);
-            }
-            else {
-                $('#SafehomeContent').fadeOut(300);
-            }
-        });
-
-        $('#showHideHomeButton').on('click', function () {
-            var src = ($(this).children().attr('class') === 'ic_hide')
-                ? 'ic_show'
-                : 'ic_hide';
-            $(this).children().attr('class', src);
-            if ($(this).children().attr('class') === 'ic_hide') {
-                $('#HomeContent').fadeIn(300);
-            }
-            else {
-                $('#HomeContent').fadeOut(300);
-            }
-        });
-
-        $('#showHideWPeditButton').on('click', function () {
-            var src = ($(this).children().attr('class') === 'ic_hide')
-                ? 'ic_show'
-                : 'ic_hide';
-            $(this).children().attr('class', src);
-            if ($(this).children().attr('class') === 'ic_hide') {
-                $('#WPeditContent').fadeIn(300);
-            }
-            else {
-                $('#WPeditContent').fadeOut(300);
-            }
-        });
-
-        $('#showHideMultimissionButton').on('click', function () {
-            var src = ($(this).children().attr('class') === 'ic_hide')
-                ? 'ic_show'
-                : 'ic_hide';
-            $(this).children().attr('class', src);
-            if ($(this).children().attr('class') === 'ic_hide') {
-                $('#multimissionContent').fadeIn(300);
-            }
-            else {
-                $('#multimissionContent').fadeOut(300);
-            }
-        });
-
-        $('#showHideGeozonesButton').on('click', function () {
-            var src = ($(this).children().attr('class') === 'ic_hide')
-                ? 'ic_show'
-                : 'ic_hide';
-            $(this).children().attr('class', src);
-            if ($(this).children().attr('class') === 'ic_hide') {
-                $('#geozoneContent').fadeIn(300);
-            }
-            else {
-                $('#geozoneContent').fadeOut(300);
-            }
-        });
+        setupShowHidePanel('showHideActionButton',      'ActionContent');
+        setupShowHidePanel('showHideInfoButton',        'InfoContent');
+        setupShowHidePanel('showHideSafehomeButton',    'SafehomeContent');
+        setupShowHidePanel('showHideHomeButton',        'HomeContent');
+        setupShowHidePanel('showHideWPeditButton',      'WPeditContent');
+        setupShowHidePanel('showHideMultimissionButton','multimissionContent');
+        setupShowHidePanel('showHideGeozonesButton',    'geozoneContent');
 
         /////////////////////////////////////////////
         // Callback for Waypoint edition
@@ -2999,10 +3160,10 @@ function iconKey(filename) {
                 var P3Value = selectedMarker.getP3();
 
                 if (disableMarkerEdit) {
-                    changeSwitch($('#pointP3Alt'), TABS.mission_control.isBitSet(P3Value, MWNP.P3.ALT_TYPE));
+                    changeSwitch($('#pointP3Alt'), missionControlTab.isBitSet(P3Value, MWNP.P3.ALT_TYPE));
                 }
 
-                P3Value = TABS.mission_control.setBit(P3Value, MWNP.P3.ALT_TYPE, $('#pointP3Alt').prop("checked"));
+                P3Value = missionControlTab.setBit(P3Value, MWNP.P3.ALT_TYPE, $('#pointP3Alt').prop("checked"));
                 (async () => {
                     const elevationAtWP = await selectedMarker.getElevation(globalSettings);
                     $('#elevationValueAtWP').text(elevationAtWP);
@@ -3086,10 +3247,10 @@ function iconKey(filename) {
         $('#pointP3UserAction1').on('change', function(event){
             if (selectedMarker) {
                 if (disableMarkerEdit) {
-                    changeSwitch($('#pointP3UserAction1'), TABS.mission_control.isBitSet(selectedMarker.getP3(), MWNP.P3.USER_ACTION_1));
+                    changeSwitch($('#pointP3UserAction1'), missionControlTab.isBitSet(selectedMarker.getP3(), MWNP.P3.USER_ACTION_1));
                 }
 
-                var P3Value = TABS.mission_control.setBit(selectedMarker.getP3(), MWNP.P3.USER_ACTION_1, $('#pointP3UserAction1').prop("checked"));
+                var P3Value = missionControlTab.setBit(selectedMarker.getP3(), MWNP.P3.USER_ACTION_1, $('#pointP3UserAction1').prop("checked"));
                 selectedMarker.setP3(P3Value);
 
                 mission.updateWaypoint(selectedMarker);
@@ -3101,10 +3262,10 @@ function iconKey(filename) {
         $('#pointP3UserAction2').on('change', function(event){
             if (selectedMarker) {
                 if (disableMarkerEdit) {
-                    changeSwitch($('#pointP3UserAction2'), TABS.mission_control.isBitSet(selectedMarker.getP3(), MWNP.P3.USER_ACTION_2));
+                    changeSwitch($('#pointP3UserAction2'), missionControlTab.isBitSet(selectedMarker.getP3(), MWNP.P3.USER_ACTION_2));
                 }
 
-                var P3Value = TABS.mission_control.setBit(selectedMarker.getP3(), MWNP.P3.USER_ACTION_2, $('#pointP3UserAction2').prop("checked"));
+                var P3Value = missionControlTab.setBit(selectedMarker.getP3(), MWNP.P3.USER_ACTION_2, $('#pointP3UserAction2').prop("checked"));
                 selectedMarker.setP3(P3Value);
 
                 mission.updateWaypoint(selectedMarker);
@@ -3116,10 +3277,10 @@ function iconKey(filename) {
         $('#pointP3UserAction3').on('change', function(event){
             if (selectedMarker) {
                 if (disableMarkerEdit) {
-                    changeSwitch($('#pointP3UserAction3'), TABS.mission_control.isBitSet(selectedMarker.getP3(), MWNP.P3.USER_ACTION_3));
+                    changeSwitch($('#pointP3UserAction3'), missionControlTab.isBitSet(selectedMarker.getP3(), MWNP.P3.USER_ACTION_3));
                 }
 
-                var P3Value = TABS.mission_control.setBit(selectedMarker.getP3(), MWNP.P3.USER_ACTION_3, $('#pointP3UserAction3').prop("checked"));
+                var P3Value = missionControlTab.setBit(selectedMarker.getP3(), MWNP.P3.USER_ACTION_3, $('#pointP3UserAction3').prop("checked"));
                 selectedMarker.setP3(P3Value);
 
                 mission.updateWaypoint(selectedMarker);
@@ -3131,10 +3292,10 @@ function iconKey(filename) {
         $('#pointP3UserAction4').on('change', function(event){
             if (selectedMarker) {
                 if (disableMarkerEdit) {
-                    changeSwitch($('#pointP3UserAction4'), TABS.mission_control.isBitSet(selectedMarker.getP3(), MWNP.P3.USER_ACTION_4));
+                    changeSwitch($('#pointP3UserAction4'), missionControlTab.isBitSet(selectedMarker.getP3(), MWNP.P3.USER_ACTION_4));
                 }
 
-                var P3Value = TABS.mission_control.setBit(selectedMarker.getP3(), MWNP.P3.USER_ACTION_4, $('#pointP3UserAction4').prop("checked"));
+                var P3Value = missionControlTab.setBit(selectedMarker.getP3(), MWNP.P3.USER_ACTION_4, $('#pointP3UserAction4').prop("checked"));
                 selectedMarker.setP3(P3Value);
 
                 mission.updateWaypoint(selectedMarker);
@@ -3954,7 +4115,11 @@ function iconKey(filename) {
                 if (result.canceled) {
                     return;
                 }
-                saveMissionFile(result.filePath);
+                let filePath = result.filePath;
+                if (!filePath.endsWith('.mission')) {
+                    filePath += '.mission';
+                }
+                saveMissionFile(filePath);
             });
         });
 
@@ -3995,6 +4160,38 @@ function iconKey(filename) {
             GUI.log(i18n.getMessage('startSendPoint'));
             sendWaypointsToFC(true);
         });
+
+        /////////////////////////////////////////////
+        // Callback for Layer management buttons
+        /////////////////////////////////////////////
+        $('#loadGeoFileButton').on('click', async function() {
+            const options = {
+                filters: [
+                    { name: 'GEO Files', extensions: ['kml', 'kmz', 'geojson', 'json', 'gpx', 'igc', 'topojson'] },
+                    { name: 'All Files', extensions: ['*'] }
+                ]
+            };
+
+            let result;
+            try {
+                result = await dialog.showOpenDialog(options);
+            } catch (error) {
+                GUI.log(`Error opening file dialog: ${error.message || error}`);
+                dialog.alert(i18n.getMessage('layerLoadError'));
+                return;
+            }
+
+            if (result.canceled || result.filePaths.length !== 1) return;
+
+            try {
+                await loadGeoFile(result.filePaths[0]);
+            } catch (error) {
+                GUI.log(`Error loading file: ${error.message}`);
+                dialog.alert(i18n.getMessage('layerParseError'));
+            }
+        });
+
+        setupShowHidePanel('showHideLayersButton', 'layerContent');
 
         /////////////////////////////////////////////
         // Callback for settings
@@ -4420,7 +4617,7 @@ function iconKey(filename) {
     function checkAltElevSanity(resetAltitude, checkAltitude, elevation, AbsAltCheck) {
         let groundClearance = "NO HOME";
         let altitude = checkAltitude;
-        AbsAltCheck = (typeof AbsAltCheck == "boolean") ? AbsAltCheck : TABS.mission_control.isBitSet(AbsAltCheck, MWNP.P3.ALT_TYPE);
+        AbsAltCheck = (typeof AbsAltCheck == "boolean") ? AbsAltCheck : missionControlTab.isBitSet(AbsAltCheck, MWNP.P3.ALT_TYPE);
 
         if (AbsAltCheck) {
             if (checkAltitude < 100 * elevation) {
@@ -4658,13 +4855,13 @@ function iconKey(filename) {
       };
 };
 
-TABS.mission_control.isBitSet = function(bits, testBit) {
+missionControlTab.isBitSet = function(bits, testBit) {
     let isTrue = ((bits & (1 << testBit)) != 0);
 
     return isTrue;
 }
 
-TABS.mission_control.setBit = function(bits, bit, value) {
+missionControlTab.setBit = function(bits, bit, value) {
     return value ? bits |= (1 << bit) : bits &= ~(1 << bit);
 }
 
@@ -4678,6 +4875,8 @@ TABS.mission_control.setBit = function(bits, bit, value) {
     // }
 // }
 
-TABS.mission_control.cleanup = function (callback) {
+missionControlTab.cleanup = function (callback) {
     if (callback) callback();
 };
+
+export default missionControlTab;

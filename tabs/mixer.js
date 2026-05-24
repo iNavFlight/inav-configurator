@@ -4,7 +4,7 @@ import MSPChainerClass from './../js/msp/MSPchainer';
 import mspHelper from './../js/msp/MSPHelper';
 import MSPCodes from './../js/msp/MSPCodes';
 import MSP from './../js/msp';
-import { GUI, TABS } from './../js/gui';
+import GUI from './../js/gui';
 import FC from './../js/fc';
 import i18n from './../js/localization';
 import { mixer, platform, PLATFORM, INPUT, STABILIZED } from './../js/model';
@@ -14,9 +14,9 @@ import interval from './../js/intervals';
 import ServoMixRule from './../js/servoMixRule';
 import MotorMixRule from './../js/motorMixRule';
 
-TABS.mixer = {};
+const mixerTab = {};
 
-TABS.mixer.initialize = function (callback, scrollPosition) {
+mixerTab.initialize = function (callback, scrollPosition) {
 
     let loadChainer = new MSPChainerClass(),
         saveChainer = new MSPChainerClass(),
@@ -30,8 +30,8 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
         modal,
         motorWizardModal;
 
-    if (GUI.active_tab != 'mixer') {
-        GUI.active_tab = 'mixer';
+    if (GUI.active_tab !== this) {
+        GUI.active_tab = this;
     }
 
     loadChainer.setChain([
@@ -131,22 +131,36 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
                                 '<option value=' + FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_MOTORS + '' + (usageMode == FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_MOTORS ? ' selected' : '')+ '>MOTORS</option>'+
                                 '<option value=' + FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_SERVOS + '' + (usageMode == FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_SERVOS ? ' selected' : '')+ '>SERVOS</option>'+
                                 '<option value=' + FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_LED + '' + (usageMode == FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_LED ? ' selected' : '')+ '>LED</option>'+
+                                '<option value=' + FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_PINIO + '' + (usageMode == FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_PINIO ? ' selected' : '')+ '>PINIO / DUTY CYCLE</option>'+
                             '</select>' +
                             '<label for="timer-output-' + t + '">' +
                                 '<span> Timer ' + (parseInt(t) + 1) + '</span>' +
                             '</label>' +
                         '</div>'
             );
+            $('#timer-output-' + t).on('change', function() {
+                updateTimerOverride();
+                if (FC.OUTPUT_MAPPING.hasDirectAssignment()) {
+                    mspHelper.queryOutputAssignment(renderOutputMapping);
+                } else {
+                    renderOutputMapping();
+                }
+            });
         }
 
     }
 
     function renderOutputMapping() {
-        let outputMap = FC.OUTPUT_MAPPING.getOutputTable(
-            FC.MIXER_CONFIG.platformType == PLATFORM.MULTIROTOR || FC.MIXER_CONFIG.platformType == PLATFORM.TRICOPTER,
-            FC.MOTOR_RULES.getNumberOfConfiguredMotors(),
-            FC.SERVO_RULES.getUsedServoIndexes()
-        );
+        let outputMap;
+        if (FC.OUTPUT_MAPPING.hasDirectAssignment()) {
+            outputMap = FC.OUTPUT_MAPPING.getOutputTableDirect();
+        } else {
+            outputMap = FC.OUTPUT_MAPPING.getOutputTable(
+                FC.MIXER_CONFIG.platformType == PLATFORM.MULTIROTOR || FC.MIXER_CONFIG.platformType == PLATFORM.TRICOPTER,
+                FC.MOTOR_RULES.getNumberOfConfiguredMotors(),
+                FC.SERVO_RULES.getUsedServoIndexes()
+            );
+        }
 
         for (let i = 1; i <= FC.OUTPUT_MAPPING.getOutputCount(); i++) {
             $('#function-' + i).html(outputMap[i - 1]);
@@ -655,6 +669,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
             }
 
             renderMotorMixRules();
+            FC.OUTPUT_MAPPING.invalidateDirectAssignment();
             renderOutputMapping();
 
             motorWizardModal.close();
@@ -731,7 +746,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
                 $('#platform-type').parent('.select').addClass('no-bottom-border');
             }
 
-            if (!GUI.updateEzTuneTabVisibility(false)) {
+            if (FC.MIXER_CONFIG.platformType !== PLATFORM.MULTIROTOR && FC.MIXER_CONFIG.platformType !== PLATFORM.TRICOPTER) {
                 FC.EZ_TUNE.enabled = 0;
                 mspHelper.saveEzTune();
             }
@@ -780,6 +795,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
             FC.MIXER_CONFIG.hasFlaps = (currentMixerPreset.hasFlaps === true) ? true : false;
             renderServoMixRules();
             renderMotorMixRules();
+            FC.OUTPUT_MAPPING.invalidateDirectAssignment();
             renderOutputMapping();
             updateRefreshButtonStatus();
         });
@@ -798,12 +814,14 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
         $servoMixTableBody.on('click', "[data-role='role-servo-delete']", function (event) {
             FC.SERVO_RULES.drop($(event.currentTarget).attr("data-index"));
             renderServoMixRules();
+            FC.OUTPUT_MAPPING.invalidateDirectAssignment();
             renderOutputMapping();
         });
 
         $motorMixTableBody.on('click', "[data-role='role-motor-delete']", function (event) {
             FC.MOTOR_RULES.drop($(event.currentTarget).attr("data-index"));
             renderMotorMixRules();
+            FC.OUTPUT_MAPPING.invalidateDirectAssignment();
             renderOutputMapping();
         });
 
@@ -815,6 +833,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
             if (FC.SERVO_RULES.hasFreeSlots()) {
                 FC.SERVO_RULES.put(new ServoMixRule(FC.SERVO_RULES.getNextUnusedIndex(), 0, 100, 0));
                 renderServoMixRules();
+                FC.OUTPUT_MAPPING.invalidateDirectAssignment();
                 renderOutputMapping();
             }
         });
@@ -823,6 +842,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
             if (FC.MOTOR_RULES.hasFreeSlots()) {
                 FC.MOTOR_RULES.put(new MotorMixRule(1, 0, 0, 0));
                 renderMotorMixRules();
+                FC.OUTPUT_MAPPING.invalidateDirectAssignment();
                 renderOutputMapping();
             }
         });
@@ -839,6 +859,20 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
         renderOutputTable();
         renderOutputMapping();
         renderTimerOverride();
+
+        // Attempt to enhance output preview with firmware-authoritative assignments.
+        // Tab is already functional above; this re-renders if/when firmware responds.
+        // The settled guard handles the edge case of a malformed packet causing no callback.
+        {
+            let settled = false;
+            const onOutputAssignmentLoaded = function() {
+                if (settled) return;
+                settled = true;
+                renderOutputMapping();
+            };
+            mspHelper.loadOutputAssignment(onOutputAssignmentLoaded);
+            setTimeout(onOutputAssignmentLoaded, 2000);
+        }
 
         FC.LOGIC_CONDITIONS.init($('#logic-wrapper'));
 
@@ -870,9 +904,11 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
 
 };
 
-TABS.mixer.cleanup = function (callback) {
+mixerTab.cleanup = function (callback) {
     //delete modal;
     //delete motorWizardModal;
     $('.jBox-wrapper').remove();
     if (callback) callback();
 };
+
+export default mixerTab;

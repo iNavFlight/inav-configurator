@@ -7,7 +7,7 @@ import jBox from 'jbox';
 import { debounce } from 'throttle-debounce';
 
 import FC from './../js/fc';
-import { GUI, TABS } from './../js/gui';
+import GUI from './../js/gui';
 import MSP from './../js/msp';
 import MSPCodes from './../js/msp/MSPCodes';
 import mspHelper from './../js/msp/MSPHelper';
@@ -1895,6 +1895,12 @@ OSD.constants = {
                                 return 'FD  142'  + FONT.symbol(SYM.ALT_M) + FONT.symbol(SYM.DIR_TO_HOME);
                         }
                     }
+                },
+                {
+                    name: 'GPS_EXTRA_STATS',
+                    id: 169,
+                    min_version: '9.0.1',                    
+                   preview: '0' + FONT.symbol(SYM.SYM_HUD_SIGNAL_3) + '0' + FONT.symbol(SYM.SYM_HUD_SIGNAL_3) + '0' + FONT.symbol(SYM.SYM_HUD_SIGNAL_3) + '0'+ FONT.symbol(SYM.SYM_HUD_SIGNAL_3) + FONT.symbol(SYM.SNR) + '99'
                 }
             ]
         },
@@ -3559,13 +3565,13 @@ HARDWARE.update = function(callback) {
     });
 };
 
-TABS.osd = {};
-TABS.osd.initialize = function (callback) {
+const osdTab = {};
+osdTab.initialize = function (callback) {
 
     mspHelper.loadServoMixRules();
 
-    if (GUI.active_tab != 'osd') {
-        GUI.active_tab = 'osd';
+    if (GUI.active_tab !== this) {
+        GUI.active_tab = this;
     }
 
     function save_to_eeprom() {
@@ -4315,7 +4321,7 @@ function updatePanServoPreview() {
     OSD.GUI.updatePreviews();
 }
 
-TABS.osd.cleanup = function (callback) {
+osdTab.cleanup = function (callback) {
     PortHandler.flush_callbacks();
 
     // unbind "global" events
@@ -4327,3 +4333,5 @@ TABS.osd.cleanup = function (callback) {
 
     if (callback) callback();
 };
+
+export default osdTab;

@@ -10,10 +10,16 @@ export default {
     asar: false,
     icon: 'images/inav',
     extraResource: [
-      'resources/public/sitl'
+      'resources/public/sitl',
+      'assets/linux/45-inav.rules'
     ],
   },
-  rebuildConfig: {},
+  rebuildConfig: {
+    // Native modules (serialport, usb) ship with prebuilt binaries for each platform.
+    // vite-plugin-native handles them at build time. Skip electron-rebuild to avoid
+    // requiring Visual Studio Build Tools on Windows during development.
+    onlyModules: [],
+  },
   plugins: [
     {
       name: '@electron-forge/plugin-vite',
@@ -174,7 +180,10 @@ export default {
           icon: "./assets/linux/icon/inav_icon_128.png",
           description: "Configurator for the open source flight controller software INAV.",
           homepage: "https://github.com/inavflight/",
-
+          scripts: {
+            postinst: "./assets/linux/postinst",
+            postrm: "./assets/linux/postrm",
+          },
         }
       },
     },
@@ -189,6 +198,10 @@ export default {
           icon: "./assets/linux/icon/inav_icon_128.png",
           description: "Configurator for the open source flight controller software INAV.",
           homepage: "https://github.com/inavflight/",
+          scripts: {
+            post: "./assets/linux/postinst",
+            postun: "./assets/linux/postrm",
+          },
         }
       },
     },

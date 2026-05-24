@@ -3,7 +3,7 @@
 import semver from 'semver';
 
 import './../injected_methods';
-import { GUI } from './../gui';
+import GUI from './../gui';
 import MSP from './../msp';
 import MSPCodes from './MSPCodes';
 import FC from './../fc';
@@ -198,11 +198,10 @@ var mspHelper = (function () {
                 FC.GPS_DATA.hdop = data.getUint16(14, true);
                 FC.GPS_DATA.eph = data.getUint16(16, true);
                 FC.GPS_DATA.epv = data.getUint16(18, true);
-                // Check if hwVersion field exists (firmware with extended MSP_GPSSTATISTICS)
-                if (data.byteLength >= 24) {
-                    FC.GPS_DATA.hwVersion = data.getUint32(20, true);
+                if (data.byteLength >= 21) {
+                    FC.GPS_DATA.hwVersion = data.getUint8(20);
                 } else {
-                    FC.GPS_DATA.hwVersion = 0; // Unknown for older firmware
+                    FC.GPS_DATA.hwVersion = 0;
                 }
                 break;
             case MSPCodes.MSP2_ADSB_VEHICLE_LIST:
@@ -1176,9 +1175,30 @@ var mspHelper = (function () {
                     FC.VTX_CONFIG.channel = data.getUint8(offset++);
                     FC.VTX_CONFIG.power = data.getUint8(offset++);
                     FC.VTX_CONFIG.pitmode = data.getUint8(offset++);
-                    // Ignore wether the VTX is ready for now
+                    // Ignore whether the VTX is ready for now
                     offset++;
                     FC.VTX_CONFIG.low_power_disarm = data.getUint8(offset++);
+
+                    // Check if firmware supports VTX table (INAV 9.0+)
+                    if (offset < data.byteLength) {
+                        const vtxtable_available = data.getUint8(offset++);
+                        if (vtxtable_available) {
+                            if (offset + 2 < data.byteLength) {
+                                FC.VTX_CONFIG.band_count = data.getUint8(offset++);
+                                FC.VTX_CONFIG.channel_count = data.getUint8(offset++);
+                                FC.VTX_CONFIG.power_count = data.getUint8(offset++);
+                            }
+
+                            // Check if firmware sends powerMin (INAV 9.1+)
+                            if (offset < data.byteLength) {
+                                FC.VTX_CONFIG.power_min = data.getUint8(offset++);
+                            } else {
+                                // Firmware 9.0 doesn't send powerMin, use fallback
+                                // MSP VTX supports power off (index 0), others start at 1
+                                FC.VTX_CONFIG.power_min = (FC.VTX_CONFIG.device_type == VTX.DEV_MSP) ? 0 : 1;
+                            }
+                        }
+                    }
                 }
                 break;
             case MSPCodes.MSP_ADVANCED_CONFIG:
@@ -1481,6 +1501,17 @@ var mspHelper = (function () {
                     let timerId = data.getUint8(i);
                     let outputMode = data.getUint8(i + 1);
                     FC.OUTPUT_MAPPING.setTimerOverride(timerId, outputMode);
+                }
+                break;
+
+            case MSPCodes.MSP2_INAV_OUTPUT_ASSIGNMENT:
+            case MSPCodes.MSP2_INAV_QUERY_OUTPUT_ASSIGNMENT:
+                FC.OUTPUT_MAPPING.flushDirectAssignment();
+                for (let i = 0; i + 2 < data.byteLength; i += 3) {
+                    let outputIndex = data.getUint8(i);
+                    let type = data.getUint8(i + 1);
+                    let number = data.getUint8(i + 2);
+                    FC.OUTPUT_MAPPING.setDirectAssignment(outputIndex, type, number);
                 }
                 break;
 
@@ -2975,6 +3006,23 @@ var mspHelper = (function () {
 
     self.loadTimerOutputModes = function(callback) {
         MSP.send_message(MSPCodes.MSP2_INAV_TIMER_OUTPUT_MODE, false, false, callback);
+    }
+
+    self.loadOutputAssignment = function(callback) {
+        MSP.send_message(MSPCodes.MSP2_INAV_OUTPUT_ASSIGNMENT, false, false, callback);
+    }
+
+    self.queryOutputAssignment = function(callback) {
+        const overrideIds = FC.OUTPUT_MAPPING.getUsedTimerIds();
+        const buffer = [];
+        buffer.push(overrideIds.length);
+        for (const id of overrideIds) {
+            const timerId = Number.parseInt(id);
+            const outputMode = FC.OUTPUT_MAPPING.getTimerOverride(timerId) || FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_AUTO;
+            buffer.push(timerId);
+            buffer.push(outputMode);
+        }
+        MSP.send_message(MSPCodes.MSP2_INAV_QUERY_OUTPUT_ASSIGNMENT, buffer, false, callback);
     }
 
     self.sendTimerOutputModes = function(onCompleteCallback) {

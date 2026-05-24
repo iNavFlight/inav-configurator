@@ -7,9 +7,6 @@ import { scaleRangeInt } from './helpers';
 import i18n from './localization';
 import mspDeduplicationQueue from "./msp/mspDeduplicationQueue";
 
-var TABS = {}; // filled by individual tab js file
-
-
 var GUI_control = function () {
     this.connecting_to = false;
     this.connected_to = false;
@@ -101,7 +98,7 @@ GUI_control.prototype.tab_switch_cleanup = function (callback) {
     interval.killAll(['global_data_refresh', 'msp-load-update', 'ltm-connection-check']);
 
     if (this.active_tab) {
-        TABS[this.active_tab].cleanup(callback);
+        this.active_tab.cleanup(callback);
     } else {
         callback();
     }
@@ -496,4 +493,4 @@ GUI_control.prototype.update_dataflash_global = function () {
 // initialize object into GUI variable
 var GUI = new GUI_control();
 
-export { GUI, TABS };
+export default GUI;
