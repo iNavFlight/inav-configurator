@@ -301,6 +301,8 @@ var SerialBackend = (function () {
                     } else {
                         $(`#tabs ul.mode-connected .tab_setup a`).trigger('click');
                     }
+
+                    update.firmwareVersion();
                 });
             });
         });
