@@ -2,6 +2,8 @@
 
 import MSPCodes from './../js/msp/MSPCodes';
 import MSP from './../js/msp';
+import MSPChainerClass from './../js/msp/MSPchainer';
+import mspHelper from './../js/msp/MSPHelper';
 import GUI from './../js/gui';
 import FC from './../js/fc';
 import Settings from './../js/settings';
@@ -15,7 +17,14 @@ advancedTuningTab.initialize = function (callback) {
         GUI.active_tab = this;
     }
 
-    import('./advanced_tuning.html?raw').then(({default: html}) => GUI.load(html, Settings.processHtml(processHtml)));
+    const loadChainer = new MSPChainerClass();
+    loadChainer.setChain([mspHelper.loadMixerConfig]);
+    loadChainer.setExitPoint(load_html);
+    loadChainer.execute();
+
+    function load_html() {
+        import('./advanced_tuning.html?raw').then(({default: html}) => GUI.load(html, Settings.processHtml(processHtml)));
+    }
 
     function save_to_eeprom() {
         console.log('save_to_eeprom');
@@ -58,7 +67,7 @@ advancedTuningTab.initialize = function (callback) {
 
         GUI.simpleBind();
 
-        i18n.localize();;
+        i18n.localize();
         
         // Set up required field warnings
         $('#launchIdleThr').on('keyup', () => {

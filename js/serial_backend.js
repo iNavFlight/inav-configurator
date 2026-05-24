@@ -71,9 +71,17 @@ var SerialBackend = (function () {
             }).open();
 
             if (typeof reopenLastTab === 'boolean') {
-                privateScope.reopenTab = reopenLastTab ? $('#tabs > ul li.active') : null;
+                const $anchor = $('#tabs > ul li.active a');
+                privateScope.reopenTab = reopenLastTab && $anchor.length ? $anchor : null;
             } else {
-                privateScope.reopenTab = reopenLastTab;
+                // Callers may pass an <a> or an <li>; normalize to the <a> element
+                const $el = reopenLastTab ? $(reopenLastTab) : null;
+                if ($el) {
+                    const anchor = $el.is('a') ? $el : $('a', $el);
+                    privateScope.reopenTab = anchor.length ? anchor : null;
+                } else {
+                    privateScope.reopenTab = null;
+                }
             }
 
             /*
@@ -297,7 +305,7 @@ var SerialBackend = (function () {
                 defaultsDialog.init().then( () => {
 
                     if (privateScope.reopenTab) {
-                        $('a', privateScope.reopenTab).trigger('click');
+                        privateScope.reopenTab.trigger('click');
                     } else {
                         $(`#tabs ul.mode-connected .tab_setup a`).trigger('click');
                     }

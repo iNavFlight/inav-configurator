@@ -86,13 +86,13 @@ var mspHelper = (function () {
 
                 let profile_byte = data.getUint8(offset++)
                 let profile = profile_byte & 0x0F;
-                if (profile !== FC.CONFIG.profile) {
+                if (profile !== FC.CONFIG.profile && FC.CONFIG.profile !== -1) {
                     profile_changed |= GUI.PROFILES_CHANGED.CONTROL;
                 }
                 FC.CONFIG.profile = profile;
 
                 let battery_profile = (profile_byte & 0xF0) >> 4;
-                if (battery_profile !== FC.CONFIG.battery_profile) {
+                if (battery_profile !== FC.CONFIG.battery_profile && FC.CONFIG.battery_profile !== -1) {
                     profile_changed |= GUI.PROFILES_CHANGED.BATTERY;
                 }
                 FC.CONFIG.battery_profile = battery_profile;
@@ -104,7 +104,7 @@ var mspHelper = (function () {
                 //read mixer profile as the last byte in the the message
                 profile_byte = data.getUint8(dataHandler.message_length_expected - 1);
                 let mixer_profile = profile_byte & 0x0F;
-                if (mixer_profile !== FC.CONFIG.mixer_profile) {
+                if (mixer_profile !== FC.CONFIG.mixer_profile && FC.CONFIG.mixer_profile !== -1) {
                     profile_changed |= GUI.PROFILES_CHANGED.MIXER;
                 }
                 FC.CONFIG.mixer_profile = mixer_profile;

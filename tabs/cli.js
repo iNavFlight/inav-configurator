@@ -566,7 +566,9 @@ cliTab.cleanup = function (callback) {
         return;
     }
 
+
     CONFIGURATOR.cliActive = false;
+    CONFIGURATOR.cliValid = false;
     CliAutoComplete.cleanup();
     $(CliAutoComplete).off();
 

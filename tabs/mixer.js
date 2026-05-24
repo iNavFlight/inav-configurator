@@ -583,7 +583,7 @@ mixerTab.initialize = function (callback, scrollPosition) {
         saveChainer.execute();
     }
 
-    function processHtml() {
+    function processHtml(settingsPromise) {
 
         $servoMixTable = $('#servo-mix-table');
         $servoMixTableBody = $servoMixTable.find('tbody');
@@ -739,10 +739,10 @@ mixerTab.initialize = function (callback, scrollPosition) {
             }
 
             if (FC.MIXER_CONFIG.platformType == PLATFORM.MULTIROTOR || FC.MIXER_CONFIG.platformType == PLATFORM.TRICOPTER) {
-                $('#motor_direction_inverted').parent().removeClass("is-hidden");
+                $('#motor_direction_container').removeClass("is-hidden");
                 $('#platform-type').parent('.select').removeClass('no-bottom-border');
             } else {
-                $('#motor_direction_inverted').parent().addClass("is-hidden");
+                $('#motor_direction_container').addClass("is-hidden");
                 $('#platform-type').parent('.select').addClass('no-bottom-border');
             }
 
@@ -762,6 +762,9 @@ mixerTab.initialize = function (callback, scrollPosition) {
         } else {
             $mixerPreset.trigger('change');
         }
+
+        // Re-run after settings load, since configureInputs() is async.
+        settingsPromise.then(() => updateMotorDirection());
 
         modal = new jBox('Modal', {
             width: 480,
@@ -879,6 +882,12 @@ mixerTab.initialize = function (callback, scrollPosition) {
         i18n.localize();;
 
         interval.add('logic_conditions_pull', getLogicConditionsStatus, 350);
+
+        // configureInputs() populates radio buttons asynchronously via MSP.
+        // The synchronous $mixerPreset.trigger('change') above fires before
+        // those requests complete, so re-run once the real values are in.
+        settingsPromise.then(() => updateMotorDirection())
+            .catch((error) => console.error('Settings load failed, motor direction not updated:', error));
 
         GUI.content_ready(callback);
     }

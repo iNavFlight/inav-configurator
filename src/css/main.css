@@ -1322,31 +1322,41 @@ dialog {
 .content_toolbar {
     /*  content toolbar panel */
     width: 100%;
-    height: 30px;
+    box-sizing: border-box;
     background-color: #EFEFEF;
     box-shadow: rgba(0, 0, 0, 0.10) 0 -3px 8px;
-    padding: 10px 0;
-    overflow: hidden;
+    padding: 6px 10px;
     border-top: 1px solid #F9F9F9;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.content_toolbar > div {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.content_toolbar .toolbar-left {
+    margin-right: auto;
 }
 
 .content_toolbar .btn a {
     /*  common styles for content toolbar buttons */
-    margin-top: 0;
-    margin-bottom: 0;
-    margin-right: 20px;
+    margin: 5px;
     background-color: #37a8db;
     border-radius: 3px;
     border: 1px solid #3394b5;
     color: #fff;
-    float: right;
     font-family: 'open_sansbold', Arial, serif;
     font-size: 12px;
     text-shadow: 0 1px rgba(0, 0, 0, 0.25);
     display: block;
     cursor: pointer;
     transition: all ease 0.2s;
-    padding: 0 9px;
+    padding: 5px 9px;
     line-height: 28px;
 }
 
