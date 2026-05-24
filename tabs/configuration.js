@@ -68,7 +68,7 @@ configurationTab.initialize = function (callback, scrollPosition) {
     function reinitialize() {
         //noinspection JSUnresolvedVariable
         GUI.log(i18n.getMessage('deviceRebooting'));
-        GUI.handleReconnect($('.tab_configuration a'));
+        GUI.handleReconnect($('.tab_configuration'));
     }
 
     function load_html() {

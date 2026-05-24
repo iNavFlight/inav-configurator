@@ -169,7 +169,7 @@ magnetometerTab.initialize = function (callback) {
 
     function reinitialize() {
         GUI.log(i18n.getMessage('deviceRebooting'));
-        GUI.handleReconnect($('.tab_magnetometer a'));
+        GUI.handleReconnect($('.tab_magnetometer'));
     }
 
     function load_html() {

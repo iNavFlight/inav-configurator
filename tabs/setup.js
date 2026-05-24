@@ -99,7 +99,7 @@ setupTab.initialize = function (callback) {
                     GUI.tab_switch_cleanup(function () {
                         MSP.send_message(MSPCodes.MSP_SET_REBOOT, false, false, function() {
                             GUI.log(i18n.getMessage('deviceRebooting'));
-                            GUI.handleReconnect();
+                            GUI.handleReconnect($(".tab_setup"));
                         });
                     });
                 });

@@ -73,7 +73,7 @@ mixerTab.initialize = function (callback, scrollPosition) {
     function reinitialize() {
         //noinspection JSUnresolvedVariable
         GUI.log(i18n.getMessage('deviceRebooting'));
-        GUI.handleReconnect($('.tab_mixer a'));
+        GUI.handleReconnect($('.tab_mixer'));
     }
 
     function loadHtml() {

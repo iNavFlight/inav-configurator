@@ -303,7 +303,7 @@ portsTab.initialize = function (callback) {
 
         function on_reboot_success_handler() {
             GUI.log(i18n.getMessage('deviceRebooting'));
-            GUI.handleReconnect($('.tab_ports a'));
+            GUI.handleReconnect($('.tab_ports'));
         }
     }
 };

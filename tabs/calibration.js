@@ -87,7 +87,7 @@ calibrationTab.initialize = function (callback) {
     function reinitialize() {
         //noinspection JSUnresolvedVariable
         GUI.log(i18n.getMessage('deviceRebooting'));
-        GUI.handleReconnect($('.tab_calibration a'));
+        GUI.handleReconnect($('.tab_calibration'));
     }
 
     function loadHtml() {
