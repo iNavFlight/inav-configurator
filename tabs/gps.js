@@ -66,6 +66,9 @@ gpsTab.initialize = function (callback) {
         17:{iconNum: 9,  name: 'Surface'}, // ADSB_EMITTER_TYPE_EMERGENCY_SURFACE
         18:{iconNum: 10, name: 'Service surface'}, // ADSB_EMITTER_TYPE_SERVICE_SURFACE
         19:{iconNum: 12, name: 'Pint obstacle'}, // ADSB_EMITTER_TYPE_POINT_OBSTACLE
+        getTypeById: function(id){
+            return this[id] !== undefined ? this[id] : this[0];
+        },
     };
 
     var loadChainer = new MSPChainerClass();
@@ -112,7 +115,7 @@ gpsTab.initialize = function (callback) {
     
     async function loadIcons() {
         for (let i = 0; i <= 19; i++) {
-            ADSB_VEHICLE_TYPE[i].icon = (await import(`./../resources/adsb/adsb_${ADSB_VEHICLE_TYPE[i].iconNum}.png?inline`)).default;
+            ADSB_VEHICLE_TYPE.getTypeById(i).icon = (await import(`./../resources/adsb/adsb_${ADSB_VEHICLE_TYPE.getTypeById(i).iconNum}.png?inline`)).default;
         }
         arrowIcon = (await import('./../images/icons/map/cf_icon_position.png?inline')).default;
     }
@@ -191,8 +194,8 @@ gpsTab.initialize = function (callback) {
                 v.emitterType
             ];
 
-            var isAlert   = FC.ADSB_WARNING_ICAO.icao == v.icao && FC.ADSB_WARNING_ICAO.isAlert == 1;
-            var isWarning = FC.ADSB_WARNING_ICAO.icao == v.icao && FC.ADSB_WARNING_ICAO.isAlert != 1;
+            var isAlert   = FC.ADSB_WARNING_ICAO != null ? (FC.ADSB_WARNING_ICAO.icao == v.icao && FC.ADSB_WARNING_ICAO.isAlert == 1) : 0;
+            var isWarning = FC.ADSB_WARNING_ICAO != null ?  (FC.ADSB_WARNING_ICAO.icao == v.icao && FC.ADSB_WARNING_ICAO.isAlert != 1) : 0;
             var rowClass  = isAlert ? 'adsb-table__row--alert' : isWarning ? 'adsb-table__row--warning' : 'adsb-table__row--normal';
 
             var $row = $tbody.find('tr').eq(i);
@@ -529,7 +532,7 @@ gpsTab.initialize = function (callback) {
                     ${i18n.getMessage('gpsLon')}: <strong>${feature.get('data').lon / 10000000}</strong><br />
                     ${i18n.getMessage('adsbAsl')}: <strong>${(feature.get('data').altCM) / 100}m</strong><br />
                     ${i18n.getMessage('adsbHeading')}: <strong>${feature.get('data').headingDegrees}°</strong><br />
-                    ${i18n.getMessage('adsbType')}: <strong>${ADSB_VEHICLE_TYPE[feature.get('data').emitterType].name}</strong>`
+                    ${i18n.getMessage('adsbType')}: <strong>${ADSB_VEHICLE_TYPE.getTypeById(feature.get('data').emitterType).name}</strong>`
                 ).open();
             } else {
                 gpsTab.toolboxAdsbVehicle.close();
@@ -560,6 +563,7 @@ gpsTab.initialize = function (callback) {
             if(FC.ADSB_VEHICLES.vehiclesCount > 0) {
                 MSP.send_message(MSPCodes.MSP2_ADSB_WARNING_VEHICLE_ICAO, false, false, update_adsb_ui);
             } else {
+                FC.ADSB_WARNING_ICAO = null
                 update_adsb_ui();
             }
         }
@@ -649,8 +653,14 @@ gpsTab.initialize = function (callback) {
             $('.adsbHeartbeatTotalMessages').html(FC.ADSB_VEHICLES.heartbeatPacketCount);
 
             if(FC.ADSB_VEHICLES.vehiclePacketCount > 0){
-                $('.adsbWarningIcao').html('0x' + (FC.ADSB_WARNING_ICAO.icao >>> 0).toString(16).toUpperCase().padStart(6, '0'));
-                $('.adsbWarningType').html(FC.ADSB_WARNING_ICAO.icao != 0 ? (FC.ADSB_WARNING_ICAO.isAlert == 1 ? i18n.getMessage('adsbAlert') : i18n.getMessage('adsbWarning')) : i18n.getMessage('adsbNoWarning'));
+                if (FC.ADSB_WARNING_ICAO != null && FC.ADSB_WARNING_ICAO.icao != null && FC.ADSB_WARNING_ICAO.icao != 0){
+                    $('.adsbWarningIcao').html('0x' + (FC.ADSB_WARNING_ICAO.icao >>> 0).toString(16).toUpperCase().padStart(6, '0'));
+                    $('.adsbWarningType').html(FC.ADSB_WARNING_ICAO.isAlert == 1 ? i18n.getMessage('adsbAlert') : i18n.getMessage('adsbWarning'));
+                }else{
+                    $('.adsbWarningIcao').html('0x00');
+                    $('.adsbWarningType').html(i18n.getMessage('adsbNoWarning'));
+                }
+
 
                 $('.adsbWarningIcaoRow').show();
                 $('.adsbWarningTypeRow').show();
@@ -684,7 +694,7 @@ gpsTab.initialize = function (callback) {
                             rotation: vehicle.headingDegrees * (Math.PI / 180),
                             scale: 0.8,
                             anchor: [0.5, 0.5],
-                            src: ADSB_VEHICLE_TYPE[vehicle.emitterType].icon,
+                            src: ADSB_VEHICLE_TYPE.getTypeById(vehicle.emitterType).icon,
                         })),
                         text: new Text(({
                             text: vehicle.callsign,
