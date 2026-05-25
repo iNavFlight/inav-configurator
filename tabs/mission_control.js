@@ -24,7 +24,7 @@ import Point from 'ol/geom/Point.js';
 import Feature from 'ol/Feature';
 import VectorSource from 'ol/source/Vector.js';
 import VectorLayer from 'ol/layer/Vector.js';
-import { LineString, Polygon } from 'ol/geom';
+import { LineString } from 'ol/geom';
 import Stroke from 'ol/style/Stroke';
 import RegularShape from 'ol/style/RegularShape';
 import Circle from 'ol/geom/Circle';
@@ -2605,7 +2605,7 @@ function iconKey(filename) {
          * @return {boolean} `false` to stop the drag sequence.
          */
         app.handleUpEvent = function (evt) { // NOSONAR - OpenLayers PointerInteraction ends the drag sequence by returning false here.
-            if (!tempMarker || !tempMarker.kind) return false;
+            if (!tempMarker?.kind) return false;
             if (tempMarker.kind == "waypoint") {
                 if (selectedMarker != null && tempMarker.number == selectedMarker.getLayerNumber()) {
                     (async () => {
@@ -4355,9 +4355,12 @@ function iconKey(filename) {
             }
 
             const currentLayerNum = selectedMarker ? selectedMarker.getLayerNumber() : -1;
-            const targetLayerNum = key === 'arrowleft'
-                ? (currentLayerNum > 0 ? currentLayerNum - 1 : waypointList.length - 1)
-                : (currentLayerNum < waypointList.length - 1 ? currentLayerNum + 1 : 0);
+            let targetLayerNum;
+            if (key === 'arrowleft') {
+                targetLayerNum = currentLayerNum > 0 ? currentLayerNum - 1 : waypointList.length - 1;
+            } else {
+                targetLayerNum = currentLayerNum < waypointList.length - 1 ? currentLayerNum + 1 : 0;
+            }
 
             selectWaypointByLayerNumber(targetLayerNum);
             return true;
