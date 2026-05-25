@@ -546,15 +546,15 @@ function iconKey(filename) {
     //////////////////////////////////////////////////////////////////////////////////////////////
     //      define & init parameters for Selected Marker
     //////////////////////////////////////////////////////////////////////////////////////////////
-    var selectedMarker = null;
-    var selectedFeature = null;
-    var tempMarker = null;
-    var disableMarkerEdit = false;
-    var selectedFwApproachWp = null;
-    var selectedFwApproachSh = null;
-    var lockShExclHeading = false;
-    var gridDrawInteraction = null;
-    var gridPreviewLayer = null;
+    let selectedMarker = null;
+    let selectedFeature = null;
+    let tempMarker = null;
+    let disableMarkerEdit = false;
+    let selectedFwApproachWp = null;
+    let selectedFwApproachSh = null;
+    let lockShExclHeading = false;
+    let gridDrawInteraction = null;
+    let gridPreviewLayer = null;
 
 
     //////////////////////////////////////////////////////////////////////////////////////////////
@@ -1610,8 +1610,8 @@ function iconKey(filename) {
     }
 
     // Vertical pixel offset to push RTH/heading markers below the WP pin (increase to move further down)
-    var MARKER_ICON_OFFSET_Y = 11;
-    var MARKER_ICON_OFFSET_X = -2;  // Match WP pin text offsetX
+    const MARKER_ICON_OFFSET_Y = 11;
+    const MARKER_ICON_OFFSET_X = -2;  // Match WP pin text offsetX
 
     function repaintLine4Waypoints(mission) {
         let oldPos,
@@ -1667,12 +1667,12 @@ function iconKey(filename) {
                 if (element.getAction() == MWNP.WPTYPE.RTH && typeof oldPos !== 'undefined') {
                     // RTH marker
                     // RTH marker as SVG
-                    var markerOpacity = 0.85;
-                    var rthSvg = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" opacity="' + markerOpacity + '">' +
+                    const markerOpacity = 0.85;
+                    const rthSvg = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" opacity="' + markerOpacity + '">' +
                         '<circle cx="12" cy="12" r="10" fill="#00c850" stroke="#fff" stroke-width="2"/>' +
                         '<text x="12" y="15" text-anchor="middle" font-size="7" font-family="sans-serif" font-weight="bold" fill="#fff">RTH</text>' +
                         '</svg>';
-                    var rthMarker = new Feature({ geometry: new Point(oldPos) });
+                    const rthMarker = new Feature({ geometry: new Point(oldPos) });
                     rthMarker.setStyle(new Style({
                         image: new Icon({
                             src: 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(rthSvg),
@@ -1680,8 +1680,8 @@ function iconKey(filename) {
                             displacement: [MARKER_ICON_OFFSET_X, -MARKER_ICON_OFFSET_Y],
                         }),
                     }));
-                    var rthSource = new VectorSource({ features: [rthMarker] });
-                    var rthLayer = new VectorLayer({ source: rthSource, zIndex: 99 });
+                    const rthSource = new VectorSource({ features: [rthMarker] });
+                    const rthLayer = new VectorLayer({ source: rthSource, zIndex: 99 });
                     rthLayer.kind = "rth";
                     rthLayer.selection = false;
                     rthLayer.parentLayerNumber = lastWaypointLayerNumber;
@@ -1707,17 +1707,17 @@ function iconKey(filename) {
 
                         // Black circle with white arrow pointing in the heading direction
                         if (typeof oldPos !== 'undefined') {
-                            var headingDeg = element.getP1();
+                            const headingDeg = element.getP1();
                             // SVG: circle stays fixed, arrow rotates around center via SVG transform
-                            var markerOpacity = 0.85;
+                            const markerOpacity = 0.85;
 
-                            var arrowSvg = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" opacity="' + markerOpacity + '">'
+                            const arrowSvg = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" opacity="' + markerOpacity + '">'
                             + '<circle cx="12" cy="12" r="10" fill="#222" stroke="#fff" stroke-width="2"/>'
                             + '<line x1="12" y1="2.71" x2="12" y2="12" stroke="#fff" stroke-width="1" transform="rotate(' + headingDeg + ' 12 12)"/>'
                             + '<path d="M12 2.5 L15 8.5 L12 6.5 L9 8.5 Z" fill="#fff" transform="rotate(' + headingDeg + ' 12 12)"/>'
                             + '<circle cx="12" cy="12" r="0.9" fill="#fff"/>'
                             + '</svg>';
-                            var headMarker = new Feature({ geometry: new Point(oldPos) });
+                            const headMarker = new Feature({ geometry: new Point(oldPos) });
                             headMarker.setStyle([
                                 new Style({
                                     image: new Icon({
@@ -1737,8 +1737,8 @@ function iconKey(filename) {
                                     }),
                                 }),
                             ]);
-                            var headSource = new VectorSource({ features: [headMarker] });
-                            var headLayer = new VectorLayer({ source: headSource, zIndex: 99 });
+                            const headSource = new VectorSource({ features: [headMarker] });
+                            const headLayer = new VectorLayer({ source: headSource, zIndex: 99 });
                             headLayer.kind = "heading";
                             headLayer.selection = false;
                             headLayer.parentLayerNumber = lastWaypointLayerNumber;
@@ -2447,16 +2447,16 @@ function iconKey(filename) {
          */
         app.handleMoveEvent = function (evt) {
             var map = evt.map;
-            var feature = map.forEachFeatureAtPixel(evt.pixel,
+            const feature = map.forEachFeatureAtPixel(evt.pixel,
                 function (feature, layer) {
                     return feature;
                 });
-            var hoverLayer = map.forEachFeatureAtPixel(evt.pixel,
+            const hoverLayer = map.forEachFeatureAtPixel(evt.pixel,
                 function (feature, layer) {
                     return layer;
                 });
-            var element = evt.map.getTargetElement();
-            var isLine = hoverLayer && hoverLayer.kind === 'line' && hoverLayer.selection;
+            const element = evt.map.getTargetElement();
+            const isLine = hoverLayer && hoverLayer.kind === 'line' && hoverLayer.selection;
 
             if (feature && feature.name != "circleFeature" && feature.name != "circleSafeFeature") {
                 if (isLine) {
@@ -2624,7 +2624,7 @@ function iconKey(filename) {
             $('.ol-attribution a').attr('target', '_blank');
         }, 100);
         // "Add WP" tooltip overlay shown when hovering on a flight path line
-        var addWpTooltipEl = document.createElement('div');
+        const addWpTooltipEl = document.createElement('div');
         addWpTooltipEl.className = 'add-wp-tooltip';
         addWpTooltipEl.innerHTML = '<span style="font-size:1.1em;font-weight:bold;">＋</span> Add WP';
         Object.assign(addWpTooltipEl.style, {
@@ -2639,7 +2639,7 @@ function iconKey(filename) {
             boxShadow: '0 1px 4px rgba(0,0,0,0.3)',
             display: 'none',
         });
-        var addWpOverlay = new Overlay({
+        const addWpOverlay = new Overlay({
             element: addWpTooltipEl,
             offset: [12, -12],
             positioning: 'bottom-left',
@@ -4051,8 +4051,8 @@ function iconKey(filename) {
             updateGridPreview();
         }
 
-        var gridPolygonCoords = null;
-        var gridPolygonGeom = null;
+        let gridPolygonCoords = null;
+        let gridPolygonGeom = null;
 
         function getGridParams() {
             return {
@@ -4384,11 +4384,11 @@ function iconKey(filename) {
             // Left/Right arrow keys: navigate between waypoints
             if ((key === 'arrowleft' || key === 'arrowright') && !$(e.target).is('input, select, textarea')) {
                 e.preventDefault();
-                var wpList = mission.get().filter(function (wp) { return !wp.isAttached(); });
+                const wpList = mission.get().filter(function (wp) { return !wp.isAttached(); });
                 if (wpList.length === 0) return;
 
-                var currentLayerNum = selectedMarker ? selectedMarker.getLayerNumber() : -1;
-                var targetLayerNum;
+                const currentLayerNum = selectedMarker ? selectedMarker.getLayerNumber() : -1;
+                let targetLayerNum;
                 if (key === 'arrowleft') {
                     targetLayerNum = currentLayerNum > 0 ? currentLayerNum - 1 : wpList.length - 1;
                 } else {
@@ -4409,7 +4409,7 @@ function iconKey(filename) {
             tempMarker = null;
 
             // Find the marker layer with this layerNumber
-            var markerLayer = markers.find(function (m) { return m.layerNumber === layerNum; });
+            const markerLayer = markers.find(function (m) { return m.layerNumber === layerNum; });
             if (!markerLayer) {
                 clearEditForm();
                 return;
@@ -4428,7 +4428,7 @@ function iconKey(filename) {
 
             selectedFeature.setStyle(getWaypointIcon(selectedMarker, true));
 
-            var coord = toLonLat(selectedFeature.getGeometry().getCoordinates());
+            const coord = toLonLat(selectedFeature.getGeometry().getCoordinates());
             let P3Value = selectedMarker.getP3();
 
             changeSwitch($('#pointP3Alt'), TABS.mission_control.isBitSet(P3Value, MWNP.P3.ALT_TYPE));
@@ -4437,7 +4437,7 @@ function iconKey(filename) {
             changeSwitch($('#pointP3UserAction3'), TABS.mission_control.isBitSet(P3Value, MWNP.P3.USER_ACTION_3));
             changeSwitch($('#pointP3UserAction4'), TABS.mission_control.isBitSet(P3Value, MWNP.P3.USER_ACTION_4));
 
-            var altitudeMeters = selectedMarker.getAlt() / 100;
+            const altitudeMeters = selectedMarker.getAlt() / 100;
 
             if (selectedMarker.getAction() == MWNP.WPTYPE.LAND) {
                 $('#wpFwLanding').fadeIn(300);
@@ -4464,7 +4464,7 @@ function iconKey(filename) {
             $('#pointP1').val(selectedMarker.getP1());
             $('#pointP2').val(selectedMarker.getP2());
 
-            for (var j in dictOfLabelParameterPoint[selectedMarker.getAction()]) {
+            for (const j in dictOfLabelParameterPoint[selectedMarker.getAction()]) {
                 if (dictOfLabelParameterPoint[selectedMarker.getAction()][j] != '') {
                     $('#pointP'+String(j).slice(-1)+'class').fadeIn(300);
                     $('label[for=pointP'+String(j).slice(-1)+']').html(dictOfLabelParameterPoint[selectedMarker.getAction()][j]);
@@ -4475,7 +4475,7 @@ function iconKey(filename) {
             $('#EditPointNumber').text("Edit point "+String(selectedMarker.getLayerNumber()+1));
 
             // Stop any in-progress fadeOut from clearEditForm, then show card
-            var $card = $('#MPeditPoint');
+            const $card = $('#MPeditPoint');
             $card.stop(true, true);
             if ($card.is(':visible')) {
                 $card.css('opacity', 0.3).animate({ opacity: 1 }, 200);
@@ -4488,7 +4488,7 @@ function iconKey(filename) {
 
         $('#removePoint').on('click', function () {
             if (selectedMarker) {
-                var prevLayerNum = selectedMarker.getLayerNumber() - 1;
+                const prevLayerNum = selectedMarker.getLayerNumber() - 1;
 
                 if (mission.isJumpTargetAttached(selectedMarker)) {
                     dialog.alert(i18n.getMessage('MissionPlannerJumpTargetRemoval'));
