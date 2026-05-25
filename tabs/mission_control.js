@@ -105,6 +105,133 @@ const iconNames = [
 
 const icons = Object.create(null)
 
+function rotateGridPoint(point, angleRad) {
+    const cosAngle = Math.cos(angleRad);
+    const sinAngle = Math.sin(angleRad);
+
+    return [
+        point[0] * cosAngle - point[1] * sinAngle,
+        point[0] * sinAngle + point[1] * cosAngle,
+    ];
+}
+
+function createGridProjection(vertices) {
+    const centroid = vertices.reduce((accumulator, vertex) => [
+        accumulator[0] + vertex[0] / vertices.length,
+        accumulator[1] + vertex[1] / vertices.length,
+    ], [0, 0]);
+    const cosLat = Math.cos(centroid[1] * Math.PI / 180);
+    const metersPerDegLon = 111320 * cosLat;
+    const metersPerDegLat = 110540;
+
+    return {
+        toLocal(lonLat) {
+            return [
+                (lonLat[0] - centroid[0]) * metersPerDegLon,
+                (lonLat[1] - centroid[1]) * metersPerDegLat,
+            ];
+        },
+        toGeo(point) {
+            return [
+                centroid[0] + point[0] / metersPerDegLon,
+                centroid[1] + point[1] / metersPerDegLat,
+            ];
+        },
+    };
+}
+
+function getGridYBounds(vertices) {
+    return vertices.reduce((bounds, vertex) => ({
+        minY: Math.min(bounds.minY, vertex[1]),
+        maxY: Math.max(bounds.maxY, vertex[1]),
+    }), { minY: Infinity, maxY: -Infinity });
+}
+
+function getGridIntersections(vertices, y) {
+    const intersections = [];
+
+    for (let index = 0; index < vertices.length; index++) {
+        const nextIndex = (index + 1) % vertices.length;
+        const y1 = vertices[index][1];
+        const y2 = vertices[nextIndex][1];
+
+        if ((y1 <= y && y2 > y) || (y2 <= y && y1 > y)) {
+            const interpolation = (y - y1) / (y2 - y1);
+            const x = vertices[index][0] + interpolation * (vertices[nextIndex][0] - vertices[index][0]);
+            intersections.push(x);
+        }
+    }
+
+    return intersections.sort((left, right) => left - right);
+}
+
+function createSweepWaypointPair(intersections, pairIndex, y, direction, overshoot, toGeo, angleRad) {
+    let x1 = intersections[pairIndex];
+    let x2 = intersections[pairIndex + 1];
+
+    if (overshoot > 0) {
+        x1 -= overshoot;
+        x2 += overshoot;
+    }
+
+    const pointA = direction > 0 ? [x1, y] : [x2, y];
+    const pointB = direction > 0 ? [x2, y] : [x1, y];
+    const geoA = toGeo(rotateGridPoint(pointA, angleRad));
+    const geoB = toGeo(rotateGridPoint(pointB, angleRad));
+
+    return [
+        { lon: geoA[0], lat: geoA[1] },
+        { lon: geoB[0], lat: geoB[1] },
+    ];
+}
+
+function generateGridWaypoints(coordsLonLat, params) {
+    const vertices = coordsLonLat.slice(0, -1);
+    if (vertices.length < 3 || params.spacing <= 0) {
+        return [];
+    }
+
+    const projection = createGridProjection(vertices);
+    const angleRad = params.angle * Math.PI / 180;
+    const rotatedVertices = vertices
+        .map(projection.toLocal)
+        .map((vertex) => rotateGridPoint(vertex, -angleRad));
+    const { minY, maxY } = getGridYBounds(rotatedVertices);
+    const startY = minY + params.spacing * 0.25;
+    const endY = maxY - params.spacing * 0.25;
+    const waypoints = [];
+    let direction = 1;
+
+    for (let y = startY; y <= endY; y += params.spacing) {
+        const intersections = getGridIntersections(rotatedVertices, y);
+
+        for (let pairIndex = 0; pairIndex + 1 < intersections.length; pairIndex += 2) {
+            waypoints.push(...createSweepWaypointPair(
+                intersections,
+                pairIndex,
+                y,
+                direction,
+                params.overshoot,
+                projection.toGeo,
+                angleRad,
+            ));
+        }
+
+        direction *= -1;
+    }
+
+    return waypoints;
+}
+
+function isMissionControlTypingTarget(target) {
+    return Boolean(target && (
+        target.tagName === 'INPUT' ||
+        target.tagName === 'TEXTAREA' ||
+        target.isContentEditable ||
+        target.tagName === 'SELECT'
+    ));
+}
+
 ////////////////////////////////////
 //
 // Tab mission control block
@@ -1664,7 +1791,7 @@ function iconKey(filename) {
                 }
             }
             else if (element.isAttached()) {
-                if (element.getAction() == MWNP.WPTYPE.RTH && typeof oldPos !== 'undefined') {
+                if (element.getAction() == MWNP.WPTYPE.RTH && oldPos !== undefined) {
                     // RTH marker
                     // RTH marker as SVG
                     const markerOpacity = 0.85;
@@ -1700,13 +1827,13 @@ function iconKey(filename) {
                         activateHead = false;
                         oldHeading = 'undefined'
                     }
-                    else if (typeof element.getP1() != 'undefined' && element.getP1() != -1) {
+                    else if (element.getP1() !== undefined && element.getP1() != -1) {
                         activatePoi = false;
                         activateHead = true;
                         oldHeading = String(element.getP1());
 
                         // Black circle with white arrow pointing in the heading direction
-                        if (typeof oldPos !== 'undefined') {
+                        if (oldPos !== undefined) {
                             const headingDeg = element.getP1();
                             // SVG: circle stays fixed, arrow rotates around center via SVG transform
                             const markerOpacity = 0.85;
@@ -2361,7 +2488,7 @@ function iconKey(filename) {
 
             if (feature) {
                 // Ignore features from layers without a 'kind' (e.g. grid preview)
-                if (!tempMarker || !tempMarker.kind) return false;
+                if (!tempMarker?.kind) return false;
                 this.coordinate_ = evt.coordinate;
                 this.feature_ = feature;
                 this.layer_ = tempMarker;
@@ -2374,7 +2501,7 @@ function iconKey(filename) {
          * @param {ol.MapBrowserEvent} evt Map browser event.
          */
         app.handleDragEvent = function (evt) {
-            if (!tempMarker || !tempMarker.kind) return;
+            if (!tempMarker?.kind) return;
             
             if (tempMarker.kind == "safehomecircle" || tempMarker.kind == "geozonecircle") {
                 return;
@@ -2456,7 +2583,7 @@ function iconKey(filename) {
                     return layer;
                 });
             const element = evt.map.getTargetElement();
-            const isLine = hoverLayer && hoverLayer.kind === 'line' && hoverLayer.selection;
+            const isLine = hoverLayer?.kind === 'line' && hoverLayer.selection;
 
             if (feature && feature.name != "circleFeature" && feature.name != "circleSafeFeature") {
                 if (isLine) {
@@ -2477,7 +2604,7 @@ function iconKey(filename) {
          * @param {ol.MapBrowserEvent} evt Map browser event.
          * @return {boolean} `false` to stop the drag sequence.
          */
-        app.handleUpEvent = function (evt) {
+        app.handleUpEvent = function (evt) { // NOSONAR - OpenLayers PointerInteraction ends the drag sequence by returning false here.
             if (!tempMarker || !tempMarker.kind) return false;
             if (tempMarker.kind == "waypoint") {
                 if (selectedMarker != null && tempMarker.number == selectedMarker.getLayerNumber()) {
@@ -2697,11 +2824,11 @@ function iconKey(filename) {
                 tempMarker = null;
             }
             // Clicking RTH/heading marker selects the parent waypoint
-            if (tempMarker && (tempMarker.kind === 'rth' || tempMarker.kind === 'heading') && tempMarker.parentLayerNumber >= 0) {
+            if ((tempMarker?.kind === 'rth' || tempMarker?.kind === 'heading') && tempMarker.parentLayerNumber >= 0) {
                 selectWaypointByLayerNumber(tempMarker.parentLayerNumber);
                 return;
             }
-            if (selectedFeature && tempMarker && tempMarker.kind == "waypoint") {
+            if (selectedFeature && tempMarker?.kind == "waypoint") {
                 $("#editMission").hide();
                 selectedMarker = mission.getWaypoint(tempMarker.number);
 
@@ -2712,8 +2839,8 @@ function iconKey(filename) {
                     selectedFwApproachWp.setLandAltAsl(settings.fwLandAlt * 100);
                 }
 
-                var geometry = selectedFeature.getGeometry();
-                var coord = toLonLat(geometry.getCoordinates());
+                const geometry = selectedFeature.getGeometry();
+                const coord = toLonLat(geometry.getCoordinates());
 
                 selectedFeature.setStyle(getWaypointIcon(selectedMarker, true));
 
@@ -2725,7 +2852,7 @@ function iconKey(filename) {
                 changeSwitch($('#pointP3UserAction3'), TABS.mission_control.isBitSet(P3Value, MWNP.P3.USER_ACTION_3));
                 changeSwitch($('#pointP3UserAction4'), TABS.mission_control.isBitSet(P3Value, MWNP.P3.USER_ACTION_4));
 
-                var altitudeMeters = app.ConvertCentimetersToMeters(selectedMarker.getAlt());
+                const altitudeMeters = app.ConvertCentimetersToMeters(selectedMarker.getAlt());
 
                 if (selectedMarker.getAction() == MWNP.WPTYPE.LAND) {
                     $('#wpFwLanding').fadeIn(300);
@@ -4056,11 +4183,11 @@ function iconKey(filename) {
 
         function getGridParams() {
             return {
-                spacing: parseFloat($('#gridSpacing').val()) || 25,
-                altitude: (parseFloat($('#gridAltitude').val()) || 50) * 100,
-                speed: (parseFloat($('#gridSpeed').val()) || 0) * 100,
-                angle: parseFloat($('#gridAngle').val()) || 0,
-                overshoot: parseFloat($('#gridOvershoot').val()) || 0,
+                spacing: Number.parseFloat($('#gridSpacing').val()) || 25,
+                altitude: (Number.parseFloat($('#gridAltitude').val()) || 50) * 100,
+                speed: (Number.parseFloat($('#gridSpeed').val()) || 0) * 100,
+                angle: Number.parseFloat($('#gridAngle').val()) || 0,
+                overshoot: Number.parseFloat($('#gridOvershoot').val()) || 0,
             };
         }
 
@@ -4181,7 +4308,7 @@ function iconKey(filename) {
 
             // Append RTH waypoint if checkbox is checked
             if ($('#gridEndRTH').is(':checked')) {
-                const lastWp = waypoints[waypoints.length - 1];
+                const lastWp = waypoints.at(-1);
                 const rthWp = new Waypoint(
                     mission.get().length,
                     MWNP.WPTYPE.RTH,
@@ -4207,202 +4334,103 @@ function iconKey(filename) {
             selectWaypointByLayerNumber(0);
         });
 
-        /**
-         * Compute the optimal angle for survey lines by finding the longest edge
-         * of the polygon and using its bearing as the line direction.
-         */
-        function computeOptimalAngle(coordsLonLat) {
-            let maxDist = 0;
-            let bestAngle = 0;
-            for (let i = 0; i < coordsLonLat.length - 1; i++) {
-                const dx = coordsLonLat[i + 1][0] - coordsLonLat[i][0];
-                const dy = coordsLonLat[i + 1][1] - coordsLonLat[i][1];
-                const dist = dx * dx + dy * dy;
-                if (dist > maxDist) {
-                    maxDist = dist;
-                    bestAngle = Math.atan2(dx, dy) * 180 / Math.PI;
-                }
-            }
-            return ((bestAngle % 360) + 360) % 360;
-        }
-
-        /**
-         * Generate lawnmower/zigzag waypoints inside a polygon.
-         * @param {Array} coordsLonLat - Polygon vertices as [lon, lat] pairs (last == first)
-         * @param {Object} params - { spacing (m), angle (deg), overshoot (m) }
-         * @returns {Array} Array of { lat, lon } objects
-         */
-        function generateGridWaypoints(coordsLonLat, params) {
-            const verts = coordsLonLat.slice(0, -1); // Remove closing duplicate
-            if (verts.length < 3) return [];
-
-            // Convert to local meters using centroid as origin
-            const centroid = verts.reduce((acc, v) => [acc[0] + v[0] / verts.length, acc[1] + v[1] / verts.length], [0, 0]);
-            const cosLat = Math.cos(centroid[1] * Math.PI / 180);
-            const metersPerDegLon = 111320 * cosLat;
-            const metersPerDegLat = 110540;
-
-            function toLocal(lonlat) {
-                return [(lonlat[0] - centroid[0]) * metersPerDegLon, (lonlat[1] - centroid[1]) * metersPerDegLat];
-            }
-            function toGeo(xy) {
-                return [centroid[0] + xy[0] / metersPerDegLon, centroid[1] + xy[1] / metersPerDegLat];
-            }
-
-            const localVerts = verts.map(toLocal);
-
-            // Rotate polygon so sweep lines are horizontal
-            const angleRad = params.angle * Math.PI / 180;
-            function rotate(p, a) {
-                const c = Math.cos(a), s = Math.sin(a);
-                return [p[0] * c - p[1] * s, p[0] * s + p[1] * c];
-            }
-            function unrotate(p, a) { return rotate(p, -a); }
-
-            const rotVerts = localVerts.map(v => rotate(v, -angleRad));
-
-            // Find Y extent
-            let minY = Infinity, maxY = -Infinity;
-            rotVerts.forEach(v => { minY = Math.min(minY, v[1]); maxY = Math.max(maxY, v[1]); });
-
-            const spacing = params.spacing;
-            if (spacing <= 0) return [];
-
-            // Generate horizontal sweep lines
-            const waypoints = [];
-            let direction = 1; // 1 = left-to-right, -1 = right-to-left
-
-            // Start first line half-spacing inside the boundary
-            const startY = minY + spacing * 0.25;
-            const endY = maxY - spacing * 0.25;
-
-            for (let y = startY; y <= endY; y += spacing) {
-                // Find intersections of line y=const with polygon edges
-                const intersections = [];
-                for (let i = 0; i < rotVerts.length; i++) {
-                    const j = (i + 1) % rotVerts.length;
-                    const y1 = rotVerts[i][1], y2 = rotVerts[j][1];
-                    if ((y1 <= y && y2 > y) || (y2 <= y && y1 > y)) {
-                        const t = (y - y1) / (y2 - y1);
-                        const x = rotVerts[i][0] + t * (rotVerts[j][0] - rotVerts[i][0]);
-                        intersections.push(x);
-                    }
-                }
-
-                intersections.sort((a, b) => a - b);
-
-                // Process pairs of intersections (entry/exit)
-                for (let k = 0; k + 1 < intersections.length; k += 2) {
-                    let x1 = intersections[k];
-                    let x2 = intersections[k + 1];
-
-                    // Apply overshoot extension
-                    if (params.overshoot > 0) {
-                        x1 -= params.overshoot;
-                        x2 += params.overshoot;
-                    }
-
-                    // Order points based on sweep direction
-                    const ptA = direction > 0 ? [x1, y] : [x2, y];
-                    const ptB = direction > 0 ? [x2, y] : [x1, y];
-
-                    const geoA = toGeo(unrotate(ptA, angleRad));
-                    const geoB = toGeo(unrotate(ptB, angleRad));
-
-                    waypoints.push({ lon: geoA[0], lat: geoA[1] });
-                    waypoints.push({ lon: geoB[0], lat: geoB[1] });
-                }
-
-                direction *= -1; // Alternate sweep direction for lawnmower
-            }
-
-            return waypoints;
-        }
-
         // Keyboard shortcuts (ignored when typing in inputs):
         //  C -> center on latest GPS fix
         //  Ctrl+L -> load mission from file
         //  Ctrl+S -> save mission to file
         //  Ctrl+D -> delete all points
         //  Ctrl+A -> address search dialog
-        $(document).off('keydown.mcCenter').on('keydown.mcCenter', function (e) {
+        function handleWaypointNavigationShortcut(e, key) {
+            if (key !== 'arrowleft' && key !== 'arrowright') {
+                return false;
+            }
+
+            e.preventDefault();
+
+            const waypointList = mission.get().filter(function (waypoint) {
+                return !waypoint.isAttached();
+            });
+            if (waypointList.length === 0) {
+                return true;
+            }
+
+            const currentLayerNum = selectedMarker ? selectedMarker.getLayerNumber() : -1;
+            const targetLayerNum = key === 'arrowleft'
+                ? (currentLayerNum > 0 ? currentLayerNum - 1 : waypointList.length - 1)
+                : (currentLayerNum < waypointList.length - 1 ? currentLayerNum + 1 : 0);
+
+            selectWaypointByLayerNumber(targetLayerNum);
+            return true;
+        }
+
+        function handleMissionControlCtrlShortcut(e, key) {
+            if (e.repeat || !e.ctrlKey) {
+                return false;
+            }
+
+            const shortcutActions = {
+                l() { $('#loadFileMissionButton').trigger('click'); },
+                s() { $('#saveFileMissionButton').trigger('click'); },
+                d() { $('#removeAllPoints').trigger('click'); },
+                a() { $('#searchAddressButton').trigger('click'); },
+                g() { startGridPolygonDraw(); },
+            };
+
+            const shortcutAction = shortcutActions[key];
+            if (!shortcutAction) {
+                return false;
+            }
+
+            e.preventDefault();
+            shortcutAction();
+            return true;
+        }
+
+        function handleMissionControlDeleteShortcut(e, key) {
+            if (key !== 'delete' || !selectedMarker) {
+                return false;
+            }
+
+            e.preventDefault();
+            if (dialog.confirm(i18n.getMessage('confirm_delete_selected_point'))) {
+                $('#removePoint').trigger('click');
+            }
+
+            return true;
+        }
+
+        function handleMissionControlKeydown(e) {
             const key = (e.key || '').toLowerCase();
-            const target = e.target;
-            const isTyping = target && (
-                target.tagName === 'INPUT' ||
-                target.tagName === 'TEXTAREA' ||
-                target.isContentEditable ||
-                target.tagName === 'SELECT'
-            );
-            if (isTyping) return;
-
-            // Center on GPS fix (plain C or Ctrl+C)
-            if (!e.repeat && key === 'c') {
-                if (lastGpsPos && map && map.getView()) {
-                    map.getView().setCenter(lastGpsPos);
-                }
+            if (isMissionControlTypingTarget(e.target)) {
+                return;
             }
 
-            // Ctrl+L: open mission from file
-            if (!e.repeat && e.ctrlKey && key === 'l') {
-                e.preventDefault();
-                $('#loadFileMissionButton').trigger('click');
+            if (!e.repeat && key === 'c' && lastGpsPos && map?.getView()) {
+                map.getView().setCenter(lastGpsPos);
             }
 
-            // Ctrl+S: save mission to file
-            if (!e.repeat && e.ctrlKey && key === 's') {
-                e.preventDefault();
-                $('#saveFileMissionButton').trigger('click');
+            if (handleMissionControlCtrlShortcut(e, key)) {
+                return;
             }
 
-            // Ctrl+D: delete all points
-            if (!e.repeat && e.ctrlKey && key === 'd') {
-                e.preventDefault();
-                $('#removeAllPoints').trigger('click');
+            if (handleMissionControlDeleteShortcut(e, key)) {
+                return;
             }
 
-            // Ctrl+A: address search
-            if (!e.repeat && e.ctrlKey && key === 'a') {
-                e.preventDefault();
-                $('#searchAddressButton').trigger('click');
-            }
+            handleWaypointNavigationShortcut(e, key);
+        }
 
-            // Ctrl+G: grid pattern
-            if (!e.repeat && e.ctrlKey && key === 'g') {
-                e.preventDefault();
-                startGridPolygonDraw();
-            }
-
-            // Delete key: delete selected waypoint with confirmation
-            if (key === 'delete' && selectedMarker && !$(e.target).is('input, select, textarea')) {
-                e.preventDefault();
-                if (dialog.confirm(i18n.getMessage('confirm_delete_selected_point'))) {
-                    $('#removePoint').trigger('click');
-                }
-            }
-
-            // Left/Right arrow keys: navigate between waypoints
-            if ((key === 'arrowleft' || key === 'arrowright') && !$(e.target).is('input, select, textarea')) {
-                e.preventDefault();
-                const wpList = mission.get().filter(function (wp) { return !wp.isAttached(); });
-                if (wpList.length === 0) return;
-
-                const currentLayerNum = selectedMarker ? selectedMarker.getLayerNumber() : -1;
-                let targetLayerNum;
-                if (key === 'arrowleft') {
-                    targetLayerNum = currentLayerNum > 0 ? currentLayerNum - 1 : wpList.length - 1;
-                } else {
-                    targetLayerNum = currentLayerNum < wpList.length - 1 ? currentLayerNum + 1 : 0;
-                }
-                selectWaypointByLayerNumber(targetLayerNum);
-            }
-        });
+        $(document).off('keydown.mcCenter').on('keydown.mcCenter', handleMissionControlKeydown);
 
         // Programmatically select a waypoint by its layer number (0-based display index)
         function selectWaypointByLayerNumber(layerNum) {
             // Deselect current
             if (selectedFeature && selectedMarker) {
-                try { selectedFeature.setStyle(getWaypointIcon(selectedMarker, false)); } catch (e) {}
+                try {
+                    selectedFeature.setStyle(getWaypointIcon(selectedMarker, false));
+                } catch (error) {
+                    console.debug('Ignoring stale waypoint feature during deselection', error);
+                }
             }
             selectedMarker = null;
             selectedFeature = null;
@@ -4465,11 +4493,16 @@ function iconKey(filename) {
             $('#pointP2').val(selectedMarker.getP2());
 
             for (const j in dictOfLabelParameterPoint[selectedMarker.getAction()]) {
-                if (dictOfLabelParameterPoint[selectedMarker.getAction()][j] != '') {
-                    $('#pointP'+String(j).slice(-1)+'class').fadeIn(300);
-                    $('label[for=pointP'+String(j).slice(-1)+']').html(dictOfLabelParameterPoint[selectedMarker.getAction()][j]);
+                const labelText = dictOfLabelParameterPoint[selectedMarker.getAction()][j];
+                const parameterSuffix = String(j).slice(-1);
+
+                if (labelText === '') {
+                    $('#pointP' + parameterSuffix + 'class').fadeOut(300);
+                    continue;
                 }
-                else {$('#pointP'+String(j).slice(-1)+'class').fadeOut(300);}
+
+                $('#pointP' + parameterSuffix + 'class').fadeIn(300);
+                $('label[for=pointP' + parameterSuffix + ']').html(labelText);
             }
             selectedMarker = renderWaypointOptionsTable(selectedMarker);
             $('#EditPointNumber').text("Edit point "+String(selectedMarker.getLayerNumber()+1));
@@ -4486,55 +4519,66 @@ function iconKey(filename) {
             redrawLayer();
         }
 
-        $('#removePoint').on('click', function () {
-            if (selectedMarker) {
-                const prevLayerNum = selectedMarker.getLayerNumber() - 1;
-
-                if (mission.isJumpTargetAttached(selectedMarker)) {
-                    dialog.alert(i18n.getMessage('MissionPlannerJumpTargetRemoval'));
-                }
-                else if (mission.getAttachedFromWaypoint(selectedMarker) && mission.getAttachedFromWaypoint(selectedMarker).length != 0) {
-                    if (dialog.confirm(i18n.getMessage('confirm_delete_point_with_options'))) {
-                        mission.getAttachedFromWaypoint(selectedMarker).forEach(function (element) {
-
-                            if (element.getAction() == MWNP.WPTYPE.LAND) {
-                                FC.FW_APPROACH.clean(element.getNumber());
-                            }
-
-                            mission.dropWaypoint(element);
-                            mission.update(singleMissionActive());
-                        });
-                        mission.dropWaypoint(selectedMarker);
-                        selectedMarker = null;
-                        mission.update(singleMissionActive());
-                        clearEditForm();
-                        refreshLayers();
-                        plotElevation();
-                        updateLocationButtonsVisibility();
-
-                        if (prevLayerNum >= 0 && !mission.isEmpty()) {
-                            selectWaypointByLayerNumber(Math.min(prevLayerNum, mission.get().filter(function (wp) { return !wp.isAttached(); }).length - 1));
-                        }
-                    }
-                }
-                else {
-                    mission.dropWaypoint(selectedMarker);
-                    if (selectedMarker.getAction() == MWNP.WPTYPE.LAND) {
-                        FC.FW_APPROACH.clean(selectedFwApproachWp.getNumber());
-                    }
-                    selectedMarker = null;
-                    mission.update(singleMissionActive());
-                    clearEditForm();
-                    refreshLayers();
-                    plotElevation();
-
-                    if (prevLayerNum >= 0 && !mission.isEmpty()) {
-                        selectWaypointByLayerNumber(Math.min(prevLayerNum, mission.get().filter(function (wp) { return !wp.isAttached(); }).length - 1));
-                    }
-                }
-                updateMultimissionState();
-                updateLocationButtonsVisibility();
+        function selectPreviousWaypoint(prevLayerNum) {
+            if (prevLayerNum < 0 || mission.isEmpty()) {
+                return;
             }
+
+            const waypointCount = mission.get().filter(function (waypoint) {
+                return !waypoint.isAttached();
+            }).length;
+
+            selectWaypointByLayerNumber(Math.min(prevLayerNum, waypointCount - 1));
+        }
+
+        function finalizeWaypointRemoval(prevLayerNum) {
+            mission.update(singleMissionActive());
+            clearEditForm();
+            refreshLayers();
+            plotElevation();
+            selectPreviousWaypoint(prevLayerNum);
+        }
+
+        function removeAttachedWaypoints(attachedWaypoints) {
+            attachedWaypoints.forEach(function (waypoint) {
+                if (waypoint.getAction() == MWNP.WPTYPE.LAND) {
+                    FC.FW_APPROACH.clean(waypoint.getNumber());
+                }
+
+                mission.dropWaypoint(waypoint);
+            });
+        }
+
+        $('#removePoint').on('click', function () {
+            if (!selectedMarker) {
+                return;
+            }
+
+            const prevLayerNum = selectedMarker.getLayerNumber() - 1;
+            const attachedWaypoints = mission.getAttachedFromWaypoint(selectedMarker) || [];
+
+            if (mission.isJumpTargetAttached(selectedMarker)) {
+                dialog.alert(i18n.getMessage('MissionPlannerJumpTargetRemoval'));
+            } else if (attachedWaypoints.length > 0) {
+                if (!dialog.confirm(i18n.getMessage('confirm_delete_point_with_options'))) {
+                    return;
+                }
+
+                removeAttachedWaypoints(attachedWaypoints);
+                mission.dropWaypoint(selectedMarker);
+                selectedMarker = null;
+                finalizeWaypointRemoval(prevLayerNum);
+            } else {
+                mission.dropWaypoint(selectedMarker);
+                if (selectedMarker.getAction() == MWNP.WPTYPE.LAND) {
+                    FC.FW_APPROACH.clean(selectedFwApproachWp.getNumber());
+                }
+                selectedMarker = null;
+                finalizeWaypointRemoval(prevLayerNum);
+            }
+
+            updateMultimissionState();
+            updateLocationButtonsVisibility();
         });
 
         /////////////////////////////////////////////
