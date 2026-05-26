@@ -125,6 +125,124 @@ function testGoogleApiKey(e) {
         });
 }
 
+function reloadActiveTab() {
+    const activeTab = $('#tabs li.active');
+    activeTab.removeClass('active');
+    activeTab.find('a').trigger('click');
+}
+
+function closeOptionsWindow(el) {
+    $('div#options-window').slideUp(250, function () {
+        el.removeClass('active');
+        $(this).empty().remove();
+    });
+}
+
+function initializeOptionsWindow(el, html) {
+    $('div#options-window').html(html);
+    i18n.localize();
+
+    if (store.get('update_notify', true)) {
+        $('div.notifications input').prop('checked', true);
+    }
+
+    $('div.notifications input').on('change', function () {
+        const check = $(this).is(':checked');
+        store.set('update_notify', check);
+    });
+
+    if (store.get('disable_3d_acceleration', false)) {
+        $('div.disable_3d_acceleration input').prop('checked', true);
+    }
+
+    $('div.disable_3d_acceleration input').on('change', function () {
+        const check = $(this).is(':checked');
+        store.set('disable_3d_acceleration', check);
+    });
+
+    $('div.statistics input').on('change', function () {
+        $(this).is(':checked');
+    });
+
+    $('div.show_profile_parameters input').on('change', function () {
+        globalSettings.showProfileParameters = $(this).is(':checked');
+        store.set('show_profile_parameters', globalSettings.showProfileParameters);
+        updateProfilesHighlightColours();
+        reloadActiveTab();
+    });
+
+    $('div.cli_autocomplete input').on('change', function () {
+        globalSettings.cliAutocomplete = $(this).is(':checked');
+        store.set('cli_autocomplete', globalSettings.cliAutocomplete);
+        CliAutoComplete.setEnabled($(this).is(':checked'));
+    });
+
+    $('#ui-unit-type').val(globalSettings.unitType);
+    $('#map-provider-type').val(globalSettings.mapProviderType);
+    $('#proxyurl').val(globalSettings.proxyURL);
+    $('#proxylayer').val(globalSettings.proxyLayer);
+    $('#showProfileParameters').prop('checked', globalSettings.showProfileParameters);
+    $('#cliAutocomplete').prop('checked', globalSettings.cliAutocomplete);
+    $('#assistnow-api-key').val(globalSettings.assistnowApiKey);
+
+    i18n.getLanguages().forEach(lng => {
+        $('#languageOption').append("<option value='{0}'>{1}</option>".format(lng, i18n.getMessage('language_' + lng)));
+    });
+
+    $('#languageOption').val(i18n.getCurrentLanguage());
+    $('#languageOption').on('change', () => {
+        i18n.changeLanguage($('#languageOption').val());
+    });
+
+    $('#ui-unit-type').on('change', function () {
+        store.set('unit_type', $(this).val());
+        globalSettings.unitType = $(this).val();
+
+        if (globalSettings.unitType === UnitType.OSD) {
+            get_osd_settings();
+        }
+
+        reloadActiveTab();
+    });
+    $('#map-provider-type').on('change', function () {
+        store.set('map_provider_type', $(this).val());
+        globalSettings.mapProviderType = $(this).val();
+    });
+    $('#proxyurl').on('change', function () {
+        store.set('proxyurl', $(this).val());
+        globalSettings.proxyURL = $(this).val();
+    });
+    $('#proxylayer').on('change', function () {
+        store.set('proxylayer', $(this).val());
+        globalSettings.proxyLayer = $(this).val();
+    });
+    $('#assistnow-api-key').on('change', function () {
+        store.set('assistnow_api_key', $(this).val());
+        globalSettings.assistnowApiKey = $(this).val();
+    });
+    $('#google-api-key').val(globalSettings.googleApiKey);
+    $('#google-api-key').on('change', function () {
+        store.set('google_api_key', $(this).val());
+        globalSettings.googleApiKey = $(this).val();
+    });
+    $('#google-api-key-help').on('click', showGoogleApiHelpDialog);
+    $('#google-api-key-test').on('click', testGoogleApiKey);
+
+    $('#demoModeReset').on('click', function () {
+        SITLProcess.deleteEepromFile('demo.bin');
+    });
+    $('#maintenanceFlushSettingsCache').on('click', function () {
+        settingsCache.flush();
+    });
+    $('#optionsClose').on('click', function () {
+        if ($('#options').hasClass('active')) {
+            closeOptionsWindow(el);
+        }
+    });
+
+    $('div#options-window').slideDown(250);
+}
+
 // Set how the units render on the configurator only
 $(function() {
     i18n.init( () => {
@@ -455,144 +573,17 @@ $(function() {
 
         // options
         $('#options').on('click', function() {
-            var el = $(this);
-
-            function closeOptions() {
-                $('div#options-window').slideUp(250, function () {
-                    el.removeClass('active');
-                    $(this).empty().remove();
-                });
-            }
+            const el = $(this);
 
             if (!el.hasClass('active')) {
                 el.addClass('active');
                 el.after('<div id="options-window"></div>');
 
                 import('./../tabs/options.html?raw').then(({default: html}) => {
-                    $('div#options-window').html(html);
-                    // translate to user-selected language
-                    i18n.localize();
-
-                    // if notifications are enabled, or wasn't set, check the notifications checkbox
-                    if (store.get('update_notify', true)) {
-                        $('div.notifications input').prop('checked', true);
-                    }
-
-                    $('div.notifications input').on('change', function () {
-                        var check = $(this).is(':checked');
-                        store.set('update_notify', check);
-                    });
-                    
-                    if (store.get('disable_3d_acceleration', false)) {
-                        $('div.disable_3d_acceleration input').prop('checked', true);
-                    }
-
-                     $('div.disable_3d_acceleration input').on('change', function () {
-                        var check = $(this).is(':checked');
-                        store.set('disable_3d_acceleration', check);
-                    });
-
-                    $('div.statistics input').on('change', function () {
-                        var check = $(this).is(':checked');
-                    });
-
-                    $('div.show_profile_parameters input').on('change', function () {
-                        globalSettings.showProfileParameters = $(this).is(':checked');
-                        store.set('show_profile_parameters', globalSettings.showProfileParameters);
-
-                        // Update CSS on select boxes
-                        updateProfilesHighlightColours();
-
-                        // Horrible way to reload the tab
-                        const activeTab = $('#tabs li.active');
-                        activeTab.removeClass('active');
-                        activeTab.find('a').trigger( "click" );
-                    });
-
-                    $('div.cli_autocomplete input').on('change', function () {
-                        globalSettings.cliAutocomplete = $(this).is(':checked');
-                        store.set('cli_autocomplete', globalSettings.cliAutocomplete);
-
-                        CliAutoComplete.setEnabled($(this).is(':checked'));
-                    });
-
-                    $('#ui-unit-type').val(globalSettings.unitType);
-                    $('#map-provider-type').val(globalSettings.mapProviderType);
-                    $('#proxyurl').val(globalSettings.proxyURL);
-                    $('#proxylayer').val(globalSettings.proxyLayer);
-                    $('#showProfileParameters').prop('checked', globalSettings.showProfileParameters);
-                    $('#cliAutocomplete').prop('checked', globalSettings.cliAutocomplete);
-                    $('#assistnow-api-key').val(globalSettings.assistnowApiKey);
-                    
-                    i18n.getLanguages().forEach(lng => {
-                        $('#languageOption').append("<option value='{0}'>{1}</option>".format(lng, i18n.getMessage("language_" + lng)));
-                    });
-
-                                        
-                    $('#languageOption').val(i18n.getCurrentLanguage());
-                    
-                    $('#languageOption').on('change', () => {
-                        i18n.changeLanguage($('#languageOption').val());
-                    });
-
-                    // Set the value of the unit type
-                    // none, OSD, imperial, metric
-                    $('#ui-unit-type').on('change', function () {
-                        store.set('unit_type', $(this).val());
-                        globalSettings.unitType = $(this).val();
-
-                        // Update the osd units in global settings
-                        // but only if we need it
-                        if (globalSettings.unitType === UnitType.OSD) {
-                            get_osd_settings();
-                        }
-
-                        // Horrible way to reload the tab
-                        const activeTab = $('#tabs li.active');
-                        activeTab.removeClass('active');
-                        activeTab.find('a').trigger( "click" );
-                    });
-                    $('#map-provider-type').on('change', function () {
-                        store.set('map_provider_type', $(this).val());
-                        globalSettings.mapProviderType = $(this).val();
-                    });
-                    $('#proxyurl').on('change', function () {
-                        store.set('proxyurl', $(this).val());
-                        globalSettings.proxyURL = $(this).val();
-                    });
-                    $('#proxylayer').on('change', function () {
-                        store.set('proxylayer', $(this).val());
-                        globalSettings.proxyLayer = $(this).val();
-                    });
-                    $('#assistnow-api-key').on('change', function () {
-                        store.set('assistnow_api_key', $(this).val());
-                        globalSettings.assistnowApiKey = $(this).val();
-                    });
-                    $('#google-api-key').val(globalSettings.googleApiKey);
-                    $('#google-api-key').on('change', function () {
-                        store.set('google_api_key', $(this).val());
-                        globalSettings.googleApiKey = $(this).val();
-                    });
-                    $('#google-api-key-help').on('click', showGoogleApiHelpDialog);
-                    $('#google-api-key-test').on('click', testGoogleApiKey);
- 
-                    $('#demoModeReset').on('click', function () {
-                        SITLProcess.deleteEepromFile('demo.bin');
-                    });
-                    $('#maintenanceFlushSettingsCache').on('click', function () {
-                        settingsCache.flush();
-                    });
-
-                    $('#optionsClose').on('click', () => {
-                        if ($('#options').hasClass('active')) {
-                            closeOptions();
-                        }
-                    })
-        
-                    $('div#options-window').slideDown(250);
+                    initializeOptionsWindow(el, html);
                 });
             } else {
-                closeOptions();
+                closeOptionsWindow(el);
             }
         });
 

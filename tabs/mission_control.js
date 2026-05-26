@@ -103,6 +103,151 @@ const iconNames = [
 
 const icons = Object.create(null)
 
+function showConditionsPanel(isVisible) {
+    $('#missionPlannerConditions').toggle(isVisible);
+}
+
+function toTitleCase(value) {
+    return value.replaceAll('_', ' ').toLowerCase()
+        .replace(/\b\w/g, function (c) { return c.toUpperCase(); });
+}
+
+function applyThresholdColor(selector, value, lowThreshold, mediumThreshold) {
+    if (value < lowThreshold) {
+        $(selector).css('color', '#4caf50');
+    } else if (value < mediumThreshold) {
+        $(selector).css('color', '#ff9800');
+    } else {
+        $(selector).css('color', '#f44336');
+    }
+}
+
+function getPrecipitationUnit(data) {
+    const precipitationQuantity = data.precipitation?.qpf;
+    if (!precipitationQuantity) {
+        return 'mm';
+    }
+
+    return precipitationQuantity.unit === 'MILLIMETERS' ? 'mm' : 'in';
+}
+
+function applyUvColor(uv) {
+    if (uv === '—') {
+        return;
+    }
+
+    if (uv > 7) {
+        $('#condUV').css('color', '#f44336');
+        return;
+    }
+
+    if (uv > 5) {
+        $('#condUV').css('color', '#f57c00');
+        return;
+    }
+
+    applyThresholdColor('#condUV', uv, 3, 6);
+}
+
+function applyThunderColor(thunder) {
+    if (thunder > 30) {
+        $('#condThunder').css('color', '#f44336');
+    } else if (thunder > 10) {
+        $('#condThunder').css('color', '#ff9800');
+    }
+}
+
+function renderConditionsInfo(data) {
+    if (data.error) {
+        console.log('Google Weather API error:', data.error.message);
+        showConditionsPanel(false);
+        return false;
+    }
+
+    if (data.temperature == null) {
+        showConditionsPanel(false);
+        return false;
+    }
+
+    showConditionsPanel(true);
+
+    const windSpeed = data.wind?.speed?.value ?? 0;
+    const windUnit = data.wind?.speed?.unit || '';
+    const gustVal = data.wind?.gust?.value ?? 0;
+    const windDirDeg = data.wind?.direction?.degrees ?? 0;
+    const windCardinal = data.wind?.direction?.cardinal || '';
+    const windUnitLabel = windUnit === 'KILOMETERS_PER_HOUR' ? 'km/h' : 'mph';
+    const windArrow = ['↓', '↙', '←', '↗', '↑', '↗', '→', '↘'][Math.round(windDirDeg / 45) % 8];
+    const tempUnit = data.temperature.unit === 'CELSIUS' ? '°C' : '°F';
+    const feelsLike = data.feelsLikeTemperature?.degrees;
+    const uv = data.uvIndex ?? '—';
+    const precip = data.precipitation?.qpf?.quantity ?? 0;
+    const precipUnit = getPrecipitationUnit(data);
+    const thunder = data.thunderstormProbability ?? 0;
+    const visibilityDistance = data.visibility?.distance ?? '—';
+    const visibilityUnit = data.visibility?.unit === 'KILOMETERS' ? 'km' : 'mi';
+    const cloudCover = data.cloudCover ?? '—';
+    const windSpeedKmh = windUnit === 'KILOMETERS_PER_HOUR' ? windSpeed : windSpeed * 1.609;
+    const gustSpeedKmh = windUnit === 'KILOMETERS_PER_HOUR' ? gustVal : gustVal * 1.609;
+
+    $('#condWeather').text(data.weatherCondition?.description?.text || '—');
+    $('#condWind').text(windSpeed + ' ' + windUnitLabel);
+    $('#condGusts').text(gustVal + ' ' + windUnitLabel);
+    $('#condWindDir').text(windArrow + ' From ' + toTitleCase(windCardinal) + ' (' + windDirDeg + '°)');
+    $('#condTemp').text(data.temperature.degrees + ' ' + tempUnit);
+    $('#condFeelsLike').text(feelsLike != null ? (feelsLike + ' ' + tempUnit) : '—');
+    $('#condHumidity').text(data.relativeHumidity + ' %');
+    $('#condUV').text(uv);
+    $('#condPrecip').text(precip + ' ' + precipUnit);
+    $('#condThunder').text(thunder + ' %');
+    $('#condVisibility').text(visibilityDistance + ' ' + visibilityUnit);
+    $('#condCloud').text(cloudCover + ' %');
+
+    applyUvColor(uv);
+    applyThunderColor(thunder);
+    applyThresholdColor('#condWind', windSpeedKmh, 20, 35);
+    applyThresholdColor('#condGusts', gustSpeedKmh, 25, 45);
+
+    $('#conditionsLoading').hide();
+    $('#conditionsData').show();
+
+    return true;
+}
+
+function showApiLocationBanner(apiOverlayEl, infoOverlayEl, googleGeoPos) {
+    if (!apiOverlayEl || !googleGeoPos) return;
+
+    if (infoOverlayEl) {
+        infoOverlayEl.style.visibility = 'hidden';
+    }
+
+    const latStr = googleGeoPos.lat.toFixed(4);
+    const lngStr = googleGeoPos.lng.toFixed(4);
+    const accKm = (googleGeoPos.accuracy / 1000).toFixed(0);
+    apiOverlayEl.textContent =
+        i18n.getMessage('apiLocationBannerPrefix') +
+        '  Lat: ' + latStr + '  Lon: ' + lngStr +
+        '  (~' + accKm + ' km)  \u2014 ' +
+        i18n.getMessage('apiLocationBannerWarning');
+    apiOverlayEl.style.visibility = 'visible';
+}
+
+function getGoogleLocationZoom(googleGeoPos) {
+    if (!googleGeoPos) {
+        return 14;
+    }
+
+    if (googleGeoPos.accuracy > 5000) {
+        return 10;
+    }
+
+    if (googleGeoPos.accuracy > 1000) {
+        return 12;
+    }
+
+    return 14;
+}
+
 ////////////////////////////////////
 //
 // Tab mission control block
@@ -153,95 +298,6 @@ TABS.mission_control.initialize = function (callback) {
     //////////////////////////////////////////////////////////////////////////
     let conditionsFetched = false;  // Prevent redundant fetches
 
-    function showConditionsPanel(isVisible) {
-        $('#missionPlannerConditions').toggle(isVisible);
-    }
-
-    function toTitleCase(value) {
-        return value.replaceAll('_', ' ').toLowerCase()
-            .replace(/\b\w/g, function (c) { return c.toUpperCase(); });
-    }
-
-    function applyThresholdColor(selector, value, lowThreshold, mediumThreshold) {
-        if (value < lowThreshold) {
-            $(selector).css('color', '#4caf50');
-        } else if (value < mediumThreshold) {
-            $(selector).css('color', '#ff9800');
-        } else {
-            $(selector).css('color', '#f44336');
-        }
-    }
-
-    function renderConditionsInfo(data) {
-        if (data.error) {
-            console.log('Google Weather API error:', data.error.message);
-            showConditionsPanel(false);
-            return;
-        }
-
-        if (!data.temperature) {
-            showConditionsPanel(false);
-            return;
-        }
-
-        showConditionsPanel(true);
-
-        const windSpeed = data.wind?.speed?.value ?? 0;
-        const windUnit = data.wind?.speed?.unit || '';
-        const gustVal = data.wind?.gust?.value ?? 0;
-        const windDirDeg = data.wind?.direction?.degrees ?? 0;
-        const windCardinal = data.wind?.direction?.cardinal || '';
-        const windUnitLabel = windUnit === 'KILOMETERS_PER_HOUR' ? 'km/h' : 'mph';
-        const windArrow = ['↓', '↙', '←', '↗', '↑', '↗', '→', '↘'][Math.round(windDirDeg / 45) % 8];
-        const tempUnit = data.temperature.unit === 'CELSIUS' ? '°C' : '°F';
-        const feelsLike = data.feelsLikeTemperature?.degrees;
-        const uv = data.uvIndex ?? '—';
-        const precip = data.precipitation?.qpf?.quantity ?? 0;
-        const precipUnit = data.precipitation?.qpf
-            ? (data.precipitation.qpf.unit === 'MILLIMETERS' ? 'mm' : 'in') : 'mm';
-        const thunder = data.thunderstormProbability ?? 0;
-        const visibilityDistance = data.visibility?.distance ?? '—';
-        const visibilityUnit = data.visibility?.unit === 'KILOMETERS' ? 'km' : 'mi';
-        const cloudCover = data.cloudCover ?? '—';
-        const windSpeedKmh = windUnit === 'KILOMETERS_PER_HOUR' ? windSpeed : windSpeed * 1.609;
-        const gustSpeedKmh = windUnit === 'KILOMETERS_PER_HOUR' ? gustVal : gustVal * 1.609;
-
-        $('#condWeather').text(data.weatherCondition?.description?.text || '—');
-        $('#condWind').text(windSpeed + ' ' + windUnitLabel);
-        $('#condGusts').text(gustVal + ' ' + windUnitLabel);
-        $('#condWindDir').text(windArrow + ' From ' + toTitleCase(windCardinal) + ' (' + windDirDeg + '°)');
-        $('#condTemp').text(data.temperature.degrees + ' ' + tempUnit);
-        $('#condFeelsLike').text(feelsLike != null ? (feelsLike + ' ' + tempUnit) : '—');
-        $('#condHumidity').text(data.relativeHumidity + ' %');
-        $('#condUV').text(uv);
-        $('#condPrecip').text(precip + ' ' + precipUnit);
-        $('#condThunder').text(thunder + ' %');
-        $('#condVisibility').text(visibilityDistance + ' ' + visibilityUnit);
-        $('#condCloud').text(cloudCover + ' %');
-
-        if (uv !== '—') {
-            applyThresholdColor('#condUV', uv, 3, 6);
-            if (uv > 7) {
-                $('#condUV').css('color', '#f44336');
-            } else if (uv > 5) {
-                $('#condUV').css('color', '#f57c00');
-            }
-        }
-
-        if (thunder > 30) {
-            $('#condThunder').css('color', '#f44336');
-        } else if (thunder > 10) {
-            $('#condThunder').css('color', '#ff9800');
-        }
-
-        applyThresholdColor('#condWind', windSpeedKmh, 20, 35);
-        applyThresholdColor('#condGusts', gustSpeedKmh, 25, 45);
-
-        $('#conditionsLoading').hide();
-        $('#conditionsData').show();
-        conditionsFetched = true;
-    }
-
     function fetchConditionsInfo(lat, lng) {
         if (!globalSettings.googleApiKey) {
             showConditionsPanel(false);
@@ -265,7 +321,9 @@ TABS.mission_control.initialize = function (callback) {
 
         fetch(url)
             .then(function (r) { return r.json(); })
-            .then(renderConditionsInfo)
+            .then(function (data) {
+                conditionsFetched = renderConditionsInfo(data);
+            })
             .catch(function (err) {
                 console.log('Google Weather fetch failed:', err.message);
                 $('#conditionsLoading').hide();
@@ -4105,38 +4163,6 @@ function iconKey(filename) {
         // drone acquires a GPS fix, the banner is automatically hidden (see the
         // telemetry update loop above).
         //////////////////////////////////////////////////////////////////////////
-        function showApiLocationBanner() {
-            if (!apiOverlayEl || !googleGeoPos) return;
-            // Hide the drone telemetry overlay (not relevant without GPS lock)
-            if (infoOverlayEl) infoOverlayEl.style.visibility = 'hidden';
-            // Build the API location info text
-            const latStr = googleGeoPos.lat.toFixed(4);
-            const lngStr = googleGeoPos.lng.toFixed(4);
-            const accKm = (googleGeoPos.accuracy / 1000).toFixed(0);
-            apiOverlayEl.textContent =
-                i18n.getMessage('apiLocationBannerPrefix') +
-                '  Lat: ' + latStr + '  Lon: ' + lngStr +
-                '  (~' + accKm + ' km)  \u2014 ' +
-                i18n.getMessage('apiLocationBannerWarning');
-            apiOverlayEl.style.visibility = 'visible';
-        }
-
-        function getGoogleLocationZoom() {
-            if (!googleGeoPos) {
-                return 14;
-            }
-
-            if (googleGeoPos.accuracy > 5000) {
-                return 10;
-            }
-
-            if (googleGeoPos.accuracy > 1000) {
-                return 12;
-            }
-
-            return 14;
-        }
-
         function centerMapOnPreferredLocation(keepExistingZoom = false) {
             const mapView = map?.getView();
             if (!mapView) {
@@ -4164,11 +4190,11 @@ function iconKey(filename) {
             }
 
             mapView.setCenter(googleGeoPos.coord);
-            const zoom = getGoogleLocationZoom();
+            const zoom = getGoogleLocationZoom(googleGeoPos);
             if (!keepExistingZoom || mapView.getZoom() < zoom) {
                 mapView.setZoom(zoom);
             }
-            showApiLocationBanner();
+            showApiLocationBanner(apiOverlayEl, infoOverlayEl, googleGeoPos);
 
             return true;
         }
