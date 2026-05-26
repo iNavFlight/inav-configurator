@@ -152,9 +152,99 @@ TABS.mission_control.initialize = function (callback) {
     // Requires the same Google API key (with Weather API enabled).
     //////////////////////////////////////////////////////////////////////////
     let conditionsFetched = false;  // Prevent redundant fetches
+
+    function showConditionsPanel(isVisible) {
+        $('#missionPlannerConditions').toggle(isVisible);
+    }
+
+    function toTitleCase(value) {
+        return value.replaceAll('_', ' ').toLowerCase()
+            .replace(/\b\w/g, function (c) { return c.toUpperCase(); });
+    }
+
+    function applyThresholdColor(selector, value, lowThreshold, mediumThreshold) {
+        if (value < lowThreshold) {
+            $(selector).css('color', '#4caf50');
+        } else if (value < mediumThreshold) {
+            $(selector).css('color', '#ff9800');
+        } else {
+            $(selector).css('color', '#f44336');
+        }
+    }
+
+    function renderConditionsInfo(data) {
+        if (data.error) {
+            console.log('Google Weather API error:', data.error.message);
+            showConditionsPanel(false);
+            return;
+        }
+
+        if (!data.temperature) {
+            showConditionsPanel(false);
+            return;
+        }
+
+        showConditionsPanel(true);
+
+        const windSpeed = data.wind?.speed?.value ?? 0;
+        const windUnit = data.wind?.speed?.unit || '';
+        const gustVal = data.wind?.gust?.value ?? 0;
+        const windDirDeg = data.wind?.direction?.degrees ?? 0;
+        const windCardinal = data.wind?.direction?.cardinal || '';
+        const windUnitLabel = windUnit === 'KILOMETERS_PER_HOUR' ? 'km/h' : 'mph';
+        const windArrow = ['↓', '↙', '←', '↗', '↑', '↗', '→', '↘'][Math.round(windDirDeg / 45) % 8];
+        const tempUnit = data.temperature.unit === 'CELSIUS' ? '°C' : '°F';
+        const feelsLike = data.feelsLikeTemperature?.degrees;
+        const uv = data.uvIndex ?? '—';
+        const precip = data.precipitation?.qpf?.quantity ?? 0;
+        const precipUnit = data.precipitation?.qpf
+            ? (data.precipitation.qpf.unit === 'MILLIMETERS' ? 'mm' : 'in') : 'mm';
+        const thunder = data.thunderstormProbability ?? 0;
+        const visibilityDistance = data.visibility?.distance ?? '—';
+        const visibilityUnit = data.visibility?.unit === 'KILOMETERS' ? 'km' : 'mi';
+        const cloudCover = data.cloudCover ?? '—';
+        const windSpeedKmh = windUnit === 'KILOMETERS_PER_HOUR' ? windSpeed : windSpeed * 1.609;
+        const gustSpeedKmh = windUnit === 'KILOMETERS_PER_HOUR' ? gustVal : gustVal * 1.609;
+
+        $('#condWeather').text(data.weatherCondition?.description?.text || '—');
+        $('#condWind').text(windSpeed + ' ' + windUnitLabel);
+        $('#condGusts').text(gustVal + ' ' + windUnitLabel);
+        $('#condWindDir').text(windArrow + ' From ' + toTitleCase(windCardinal) + ' (' + windDirDeg + '°)');
+        $('#condTemp').text(data.temperature.degrees + ' ' + tempUnit);
+        $('#condFeelsLike').text(feelsLike != null ? (feelsLike + ' ' + tempUnit) : '—');
+        $('#condHumidity').text(data.relativeHumidity + ' %');
+        $('#condUV').text(uv);
+        $('#condPrecip').text(precip + ' ' + precipUnit);
+        $('#condThunder').text(thunder + ' %');
+        $('#condVisibility').text(visibilityDistance + ' ' + visibilityUnit);
+        $('#condCloud').text(cloudCover + ' %');
+
+        if (uv !== '—') {
+            applyThresholdColor('#condUV', uv, 3, 6);
+            if (uv > 7) {
+                $('#condUV').css('color', '#f44336');
+            } else if (uv > 5) {
+                $('#condUV').css('color', '#f57c00');
+            }
+        }
+
+        if (thunder > 30) {
+            $('#condThunder').css('color', '#f44336');
+        } else if (thunder > 10) {
+            $('#condThunder').css('color', '#ff9800');
+        }
+
+        applyThresholdColor('#condWind', windSpeedKmh, 20, 35);
+        applyThresholdColor('#condGusts', gustSpeedKmh, 25, 45);
+
+        $('#conditionsLoading').hide();
+        $('#conditionsData').show();
+        conditionsFetched = true;
+    }
+
     function fetchConditionsInfo(lat, lng) {
         if (!globalSettings.googleApiKey) {
-            $('#missionPlannerConditions').hide();
+            showConditionsPanel(false);
             return;
         }
 
@@ -175,100 +265,7 @@ TABS.mission_control.initialize = function (callback) {
 
         fetch(url)
             .then(function (r) { return r.json(); })
-            .then(function (data) {
-                // API error response
-                if (data.error) {
-                    console.log('Google Weather API error:', data.error.message);
-                    $('#missionPlannerConditions').hide();
-                    return;
-                }
-                if (!data.temperature) {
-                    $('#missionPlannerConditions').hide();
-                    return;
-                }
-
-                // Weather data loaded — show the panel
-                $('#missionPlannerConditions').show();
-
-                // Weather description (e.g. "Sunny", "Partly cloudy")
-                const desc = (data.weatherCondition && data.weatherCondition.description)
-                    ? data.weatherCondition.description.text : '—';
-                $('#condWeather').text(desc);
-
-                // Wind speed, gusts, direction
-                const windSpeed = data.wind ? data.wind.speed.value : 0;
-                const windUnit = data.wind ? data.wind.speed.unit : '';
-                const gustVal = (data.wind && data.wind.gust) ? data.wind.gust.value : 0;
-                const windDirDeg = (data.wind && data.wind.direction) ? data.wind.direction.degrees : 0;
-                const windCardinal = (data.wind && data.wind.direction) ? data.wind.direction.cardinal : '';
-
-                // Arrow characters for wind direction (shows where wind blows FROM)
-                const arrows = ['↓','↙','←','↗','↑','↗','→','↘'];
-                const idx = Math.round(windDirDeg / 45) % 8;
-                const unitLabel = windUnit === 'KILOMETERS_PER_HOUR' ? 'km/h' : 'mph';
-
-                $('#condWind').text(windSpeed + ' ' + unitLabel);
-                $('#condGusts').text(gustVal + ' ' + unitLabel);
-                const cardinalClean = windCardinal.replace(/_/g, ' ').toLowerCase()
-                    .replace(/\b\w/g, function (c) { return c.toUpperCase(); });
-                $('#condWindDir').text(arrows[idx] + ' From ' + cardinalClean + ' (' + windDirDeg + '°)');
-
-                // Temperature & feels‐like
-                const tempDeg = data.temperature.degrees;
-                const tempUnit = data.temperature.unit === 'CELSIUS' ? '°C' : '°F';
-                const feelsLike = data.feelsLikeTemperature ? data.feelsLikeTemperature.degrees : null;
-                $('#condTemp').text(tempDeg + ' ' + tempUnit);
-                $('#condFeelsLike').text(feelsLike != null ? (feelsLike + ' ' + tempUnit) : '—');
-
-                // Humidity
-                $('#condHumidity').text(data.relativeHumidity + ' %');
-
-                // UV Index
-                const uv = data.uvIndex != null ? data.uvIndex : '—';
-                $('#condUV').text(uv);
-                if (uv !== '—') {
-                    if (uv <= 2)       { $('#condUV').css('color', '#4caf50'); }
-                    else if (uv <= 5)  { $('#condUV').css('color', '#ff9800'); }
-                    else if (uv <= 7)  { $('#condUV').css('color', '#f57c00'); }
-                    else               { $('#condUV').css('color', '#f44336'); }
-                }
-
-                // Precipitation
-                const precip = (data.precipitation && data.precipitation.qpf)
-                    ? data.precipitation.qpf.quantity : 0;
-                const precipUnit = (data.precipitation && data.precipitation.qpf)
-                    ? (data.precipitation.qpf.unit === 'MILLIMETERS' ? 'mm' : 'in') : 'mm';
-                $('#condPrecip').text(precip + ' ' + precipUnit);
-
-                // Thunderstorm probability
-                const thunder = data.thunderstormProbability != null ? data.thunderstormProbability : 0;
-                $('#condThunder').text(thunder + ' %');
-                if (thunder > 30) { $('#condThunder').css('color', '#f44336'); }
-                else if (thunder > 10) { $('#condThunder').css('color', '#ff9800'); }
-
-                // Visibility
-                const visDist = data.visibility ? data.visibility.distance : '—';
-                const visUnit = (data.visibility && data.visibility.unit === 'KILOMETERS') ? 'km' : 'mi';
-                $('#condVisibility').text(visDist + ' ' + visUnit);
-
-                // Cloud cover
-                $('#condCloud').text((data.cloudCover != null ? data.cloudCover : '—') + ' %');
-
-                // Color-code wind speed (thresholds in km/h, convert if imperial)
-                const wsKmh = (windUnit === 'KILOMETERS_PER_HOUR') ? windSpeed : windSpeed * 1.609;
-                if (wsKmh < 20)      { $('#condWind').css('color', '#4caf50'); }
-                else if (wsKmh < 35) { $('#condWind').css('color', '#ff9800'); }
-                else                 { $('#condWind').css('color', '#f44336'); }
-
-                const gsKmh = (windUnit === 'KILOMETERS_PER_HOUR') ? gustVal : gustVal * 1.609;
-                if (gsKmh < 25)      { $('#condGusts').css('color', '#4caf50'); }
-                else if (gsKmh < 45) { $('#condGusts').css('color', '#ff9800'); }
-                else                 { $('#condGusts').css('color', '#f44336'); }
-
-                $('#conditionsLoading').hide();
-                $('#conditionsData').show();
-                conditionsFetched = true;
-            })
+            .then(renderConditionsInfo)
             .catch(function (err) {
                 console.log('Google Weather fetch failed:', err.message);
                 $('#conditionsLoading').hide();
@@ -277,7 +274,7 @@ TABS.mission_control.initialize = function (callback) {
     }
 
     if (CONFIGURATOR.connectionValid) {
-        var loadChainer = new MSPChainerClass();
+        const loadChainer = new MSPChainerClass();
         loadChainer.setChain([
             mspHelper.getMissionInfo,
             //mspHelper.loadWaypoints,
@@ -578,13 +575,13 @@ function iconKey(filename) {
                                     }
               }
 
-              let gpsPos = fromLonLat([lon, lat]);
+              const gpsPos = fromLonLat([lon, lat]);
               curPosGeo.setCoordinates(gpsPos);
               lastGpsPos = gpsPos;
               $('#centerOnDrone').css({ opacity: 1, pointerEvents: 'auto' });
 
                             // Auto-center/zoom once when drone GPS lock is first acquired
-                            if (!autoCenteredOnFix && map && map.getView()) {
+                            if (!autoCenteredOnFix && map?.getView()) {
                                 autoCenteredOnFix = true;
                                 map.getView().setCenter(gpsPos);
                                 if (map.getView().getZoom() < 14) {
@@ -596,7 +593,7 @@ function iconKey(filename) {
 
               breadCrumbLS.appendCoordinate(gpsPos);
 
-              var coords = breadCrumbLS.getCoordinates();
+              const coords = breadCrumbLS.getCoordinates();
               if(coords.length > 100)
               {
                 coords.shift();
@@ -2698,7 +2695,7 @@ function iconKey(filename) {
         // centers on the Google API position; hidden once drone GPS locks.
         //////////////////////////////////////////////////////////////////////////
         (function createApiOverlay() {
-            var targetEl = map.getTargetElement();
+            const targetEl = map.getTargetElement();
             if (!targetEl) return;
             if (!targetEl.style.position) targetEl.style.position = 'relative';
             apiOverlayEl = document.createElement('div');
@@ -3064,9 +3061,10 @@ function iconKey(filename) {
 
         // Show/hide Conditions Information panel
         $('#showHideConditionsButton').on('click', function () {
-            var src = ($(this).children().attr('class') === 'ic_hide')
-                ? 'ic_show'
-                : 'ic_hide';
+            let src = 'ic_hide';
+            if ($(this).children().attr('class') === 'ic_hide') {
+                src = 'ic_show';
+            }
             $(this).children().attr('class', src);
             if ($(this).children().attr('class') === 'ic_hide') {
                 $('#ConditionsContent').fadeIn(300);
@@ -3988,15 +3986,81 @@ function iconKey(filename) {
             }
         });
 
+        function closeAddressSearchDialog() {
+            $('#addressSearchDialog, #addressSearchBackdrop').remove();
+        }
+
+        function confirmAndCenterMap(coord, description, source) {
+            if (dialog.confirm(`Found: ${description}\nSource: ${source}\n\nMove to this location?`)) {
+                map.getView().setCenter(coord);
+            }
+        }
+
+        function searchNominatim(address) {
+            const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&limit=1`;
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    if (data?.length > 0) {
+                        const result = data[0];
+                        const coord = fromLonLat([parseFloat(result.lon), parseFloat(result.lat)]);
+                        confirmAndCenterMap(coord, result.display_name, 'OpenStreetMap');
+                    } else {
+                        dialog.alert('Address not found.');
+                    }
+                })
+                .catch(err => {
+                    console.error('Search failed:', err);
+                    dialog.alert('Search failed. Check your connection.');
+                });
+        }
+
+        function searchGoogleAddress(address) {
+            const googleUrl = 'https://maps.googleapis.com/maps/api/geocode/json?address='
+                + encodeURIComponent(address) + '&key=' + globalSettings.googleApiKey;
+
+            return fetch(googleUrl)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'OK' && data.results?.length > 0) {
+                        const result = data.results[0];
+                        const lat = result.geometry.location.lat;
+                        const lng = result.geometry.location.lng;
+                        const coord = fromLonLat([lng, lat]);
+                        confirmAndCenterMap(coord, result.formatted_address, 'Google');
+                        return;
+                    }
+
+                    searchNominatim(address);
+                })
+                .catch(() => {
+                    searchNominatim(address);
+                });
+        }
+
+        function runAddressSearch() {
+            const address = $('#addressInput').val().trim();
+            closeAddressSearchDialog();
+
+            if (!address) {
+                return;
+            }
+
+            if (globalSettings.googleApiKey) {
+                searchGoogleAddress(address);
+                return;
+            }
+
+            searchNominatim(address);
+        }
+
         // Address search button
         $(document).on('click', '#searchAddressButton, #searchAddress', function (e) {
             e.preventDefault();
             e.stopPropagation();
 
-            // Remove any existing dialog
-            $('#addressSearchDialog, #addressSearchBackdrop').remove();
+            closeAddressSearchDialog();
 
-            // Create dialog
             const addressDialog = $(`
                 <div id="addressSearchBackdrop" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
                      background: rgba(0,0,0,0.5); z-index: 10000;">
@@ -4015,78 +4079,18 @@ function iconKey(filename) {
 
             $('body').append(addressDialog);
 
-          
-            // Search function
-            function doSearch() {
-                const address = $('#addressInput').val().trim();
-                $('#addressSearchBackdrop').remove();
-
-                if (address) {
-                    // Try Google Geocoding API first if key exists, fall back to Nominatim
-                    if (globalSettings.googleApiKey) {
-                        const googleUrl = 'https://maps.googleapis.com/maps/api/geocode/json?address='
-                            + encodeURIComponent(address) + '&key=' + globalSettings.googleApiKey;
-                        fetch(googleUrl)
-                            .then(response => response.json())
-                            .then(data => {
-                                if (data.status === 'OK' && data.results && data.results.length > 0) {
-                                    const result = data.results[0];
-                                    const lat = result.geometry.location.lat;
-                                    const lng = result.geometry.location.lng;
-                                    const coord = fromLonLat([lng, lat]);
-                                    if (dialog.confirm(`Found: ${result.formatted_address}\nSource: Google\n\nMove to this location?`)) {
-                                        map.getView().setCenter(coord);
-                                    }
-                                } else {
-                                    // Google failed — fall back to Nominatim
-                                    searchNominatim(address);
-                                }
-                            })
-                            .catch(() => {
-                                searchNominatim(address);
-                            });
-                    } else {
-                        searchNominatim(address);
-                    }
-                }
-            }
-
-            function searchNominatim(address) {
-                const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&limit=1`;
-                fetch(url)
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data && data.length > 0) {
-                            const result = data[0];
-                            const coord = fromLonLat([parseFloat(result.lon), parseFloat(result.lat)]);
-                            if (dialog.confirm(`Found: ${result.display_name}\nSource: OpenStreetMap\n\nMove to this location?`)) {
-                                map.getView().setCenter(coord);
-                            }
-                        } else {
-                            dialog.alert('Address not found.');
-                        }
-                    })
-                    .catch(err => {
-                        console.error('Search failed:', err);
-                        dialog.alert('Search failed. Check your connection.');
-                    });
-            }
-
-            // Event handlers
-            $('#searchOK').click(doSearch);
-            $('#searchCancel').click(() => $('#addressSearchBackdrop').remove());
+            $('#searchOK').click(runAddressSearch);
+            $('#searchCancel').click(closeAddressSearchDialog);
             $('#addressInput').keypress(function(e) {
-                if (e.which === 13) doSearch();
+                if (e.which === 13) {
+                    runAddressSearch();
+                }
             });
-            
-            // Only close on backdrop click, not dialog content click
             $('#addressSearchBackdrop').click(function(e) {
                 if (e.target === this) {
-                    $('#addressSearchBackdrop').remove();
+                    closeAddressSearchDialog();
                 }
             });
-            
-            // Prevent clicks inside the dialog from closing it
             $('#addressSearchDialog').click(function(e) {
                 e.stopPropagation();
             });
@@ -4106,15 +4110,67 @@ function iconKey(filename) {
             // Hide the drone telemetry overlay (not relevant without GPS lock)
             if (infoOverlayEl) infoOverlayEl.style.visibility = 'hidden';
             // Build the API location info text
-            var latStr = googleGeoPos.lat.toFixed(4);
-            var lngStr = googleGeoPos.lng.toFixed(4);
-            var accKm = (googleGeoPos.accuracy / 1000).toFixed(0);
+            const latStr = googleGeoPos.lat.toFixed(4);
+            const lngStr = googleGeoPos.lng.toFixed(4);
+            const accKm = (googleGeoPos.accuracy / 1000).toFixed(0);
             apiOverlayEl.textContent =
                 i18n.getMessage('apiLocationBannerPrefix') +
                 '  Lat: ' + latStr + '  Lon: ' + lngStr +
                 '  (~' + accKm + ' km)  \u2014 ' +
                 i18n.getMessage('apiLocationBannerWarning');
             apiOverlayEl.style.visibility = 'visible';
+        }
+
+        function getGoogleLocationZoom() {
+            if (!googleGeoPos) {
+                return 14;
+            }
+
+            if (googleGeoPos.accuracy > 5000) {
+                return 10;
+            }
+
+            if (googleGeoPos.accuracy > 1000) {
+                return 12;
+            }
+
+            return 14;
+        }
+
+        function centerMapOnPreferredLocation(keepExistingZoom = false) {
+            const mapView = map?.getView();
+            if (!mapView) {
+                return false;
+            }
+
+            if (markers.length > 0) {
+                const firstFeature = markers[0].getSource().getFeatures()[0];
+                if (firstFeature) {
+                    mapView.setCenter(firstFeature.getGeometry().getCoordinates());
+                    if (mapView.getZoom() < 14) {
+                        mapView.setZoom(14);
+                    }
+                    return true;
+                }
+            }
+
+            if (lastGpsPos) {
+                mapView.setCenter(lastGpsPos);
+                return true;
+            }
+
+            if (!googleGeoPos) {
+                return false;
+            }
+
+            mapView.setCenter(googleGeoPos.coord);
+            const zoom = getGoogleLocationZoom();
+            if (!keepExistingZoom || mapView.getZoom() < zoom) {
+                mapView.setZoom(zoom);
+            }
+            showApiLocationBanner();
+
+            return true;
         }
 
         // Center button: triple-priority
@@ -4124,29 +4180,7 @@ function iconKey(filename) {
         $(document).on('click', '#centerOnDroneButton, #centerOnDrone', function (e) {
             e.preventDefault();
             e.stopPropagation();
-            if (markers.length > 0 && map && map.getView()) {
-                // Mission loaded — center on first waypoint
-                var firstFeature = markers[0].getSource().getFeatures()[0];
-                if (firstFeature) {
-                    map.getView().setCenter(firstFeature.getGeometry().getCoordinates());
-                    if (map.getView().getZoom() < 14) {
-                        map.getView().setZoom(14);
-                    }
-                }
-            } else if (lastGpsPos && map && map.getView()) {
-                // No mission but drone GPS has a fix
-                map.getView().setCenter(lastGpsPos);
-            } else if (googleGeoPos && map && map.getView()) {
-                // No drone GPS — fall back to cached Google API rough position
-                map.getView().setCenter(googleGeoPos.coord);
-                var zoom = 14;
-                if (googleGeoPos.accuracy > 5000) zoom = 10;
-                else if (googleGeoPos.accuracy > 1000) zoom = 12;
-                // Always set zoom to match accuracy — zoom out if too close
-                map.getView().setZoom(zoom);
-                // Show the API location banner with coords & accuracy warning
-                showApiLocationBanner();
-            }
+            centerMapOnPreferredLocation();
         });
 
         // Keyboard shortcuts (ignored when typing in inputs):
@@ -4169,19 +4203,7 @@ function iconKey(filename) {
             // Center on GPS fix (plain C or Ctrl+C)
             // Same dual logic as the button: drone GPS first, then Google API fallback
             if (!e.repeat && key === 'c') {
-                if (lastGpsPos && map && map.getView()) {
-                    map.getView().setCenter(lastGpsPos);
-                } else if (googleGeoPos && map && map.getView()) {
-                    map.getView().setCenter(googleGeoPos.coord);
-                    var zoom = 14;
-                    if (googleGeoPos.accuracy > 5000) zoom = 10;
-                    else if (googleGeoPos.accuracy > 1000) zoom = 12;
-                    if (map.getView().getZoom() < zoom) {
-                        map.getView().setZoom(zoom);
-                    }
-                    // Show the API location banner with coords & accuracy warning
-                    showApiLocationBanner();
-                }
+                centerMapOnPreferredLocation(true);
             }
 
             // Ctrl+L: open mission from file
