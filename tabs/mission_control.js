@@ -195,7 +195,7 @@ function renderConditionsInfo(data) {
     $('#condGusts').text(gustVal + ' ' + windUnitLabel);
     $('#condWindDir').text(windArrow + ' From ' + toTitleCase(windCardinal) + ' (' + windDirDeg + '°)');
     $('#condTemp').text(data.temperature.degrees + ' ' + tempUnit);
-    $('#condFeelsLike').text(feelsLike != null ? (feelsLike + ' ' + tempUnit) : '—');
+    $('#condFeelsLike').text(feelsLike == null ? '—' : (feelsLike + ' ' + tempUnit));
     $('#condHumidity').text(data.relativeHumidity + ' %');
     $('#condUV').text(uv);
     $('#condPrecip').text(precip + ' ' + precipUnit);
