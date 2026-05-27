@@ -6,7 +6,7 @@ import i18next from 'i18next';
 import store from './store'
 
 
-const availableLanguages = ['en', 'ja', 'ru', 'uk', 'zh_CN'];
+const availableLanguages = ['en', 'ja', 'ru', 'uk', 'zh_CN', 'fr'];
 
 const i18n = {};
 

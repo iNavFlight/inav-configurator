@@ -1,4 +1,8 @@
 {
+    "language_fr": {
+        "message": "Français",
+        "_comment": "Don't translate!"
+    },
     "ezTuneRate": {
         "message": "Скорость вращения"
     },

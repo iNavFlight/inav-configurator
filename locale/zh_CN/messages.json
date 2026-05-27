@@ -22,6 +22,10 @@
         "message": "Русский",
         "_comment": "Don't translate!"
     },
+    "language_fr": {
+        "message": "Français",
+        "_comment": "Don't translate!"
+    },
     "language": {
         "message": "语言"
     },
