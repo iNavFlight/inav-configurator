@@ -749,6 +749,7 @@ TABS.map_generator.initialize = function (callback) {
             const osmSelected = provider === 'OSM';
             $('#mapgen_osm_warning').toggle(osmSelected);
             $('#mapgen_maptiler_key_row').toggle(provider === 'MAPTILER');
+            $('#mapgen_maptiler_help').toggle(provider === 'MAPTILER');
             const exportBlocked = osmSelected || (provider === 'MAPTILER' && !$('#mapgen_maptiler_key').val().trim());
             $('#mapgen_sync_btn a, #mapgen_zip_btn a').toggleClass('disabled', exportBlocked);
 
