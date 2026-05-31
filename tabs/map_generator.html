@@ -35,7 +35,6 @@
                                 <option value="MAPTILER">MapTiler</option>
                             </select>
                             <label for="mapgen_provider"><span data-i18n="mapgenProvider">Provider</span></label>
-                            <a id="mapgen_maptiler_help" class="helpicon" href="https://github.com/MartinovEm/inav-configurator/blob/feature/map-generator/README.md#maptiler-setup" target="_blank" style="display:none;"></a>
                         </div>
 
                         <div class="select">
@@ -43,9 +42,10 @@
                             <label for="mapgen_maptype"><span data-i18n="mapgenMapType">Map Type</span></label>
                         </div>
 
-                        <div id="mapgen_maptiler_key_row" style="display:none; margin: 4px 0;">
-                            <input id="mapgen_maptiler_key" type="text" placeholder="MapTiler API key" style="width:100%; box-sizing:border-box; padding:4px 6px;" />
-                            <div style="font-size:0.85em; color:#888; margin-top:2px;">Get a free key at <a href="https://maptiler.com" target="_blank">maptiler.com</a></div>
+                        <div id="mapgen_maptiler_key_row" style="display:none; float:left; clear:both; width:100%; margin-bottom:5px; padding-bottom:5px; border-bottom:1px solid #ddd; box-sizing:border-box;">
+                            <div id="mapgen_maptiler_key_tip" class="helpicon" style="cursor:pointer;"></div>
+                            <input id="mapgen_maptiler_key" type="text" placeholder="MapTiler API key" style="width:calc(100% - 20px); box-sizing:border-box; padding:4px 6px;" />
+                            <div style="font-size:0.85em; color:#888; margin-top:2px; clear:both;">Get a free key at <a href="https://maptiler.com" target="_blank">maptiler.com</a></div>
                         </div>
                         <div id="mapgen_google_warning" class="mapgen-warning" style="display:none;">
                             <span data-i18n="mapgenGoogleWarning">Warning: Google might temporarily ban IPs after bulk downloads for 24 hours.</span>

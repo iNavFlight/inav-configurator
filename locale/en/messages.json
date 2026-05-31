@@ -233,6 +233,9 @@
     "mapgenOsmWarning": {
         "message": "OSM Standard tile policy does not permit offline bulk export. Select ESRI, Google, or MapTiler (OSM Style) for SD/ZIP export."
     },
+    "mapgenMaptilerKeyHelp": {
+        "message": "MapTiler requires a free API key to serve map tiles. Your key is saved automatically — you only need to enter it once. Free tier includes 5,000 sessions/month, which is plenty for personal use."
+    },
     "mapgenProjectSettings": {
         "message": "Project Settings"
     },

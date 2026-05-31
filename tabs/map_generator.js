@@ -6,6 +6,7 @@ import 'leaflet-draw'; // for L.GeometryUtil.geodesicArea
 import 'leaflet-control-geocoder';
 import 'leaflet-control-geocoder/dist/Control.Geocoder.css';
 
+import jBox from 'jbox';
 import GUI, { TABS } from './../js/gui';
 import i18n from './../js/localization';
 import store from './../js/store';
@@ -749,7 +750,6 @@ TABS.map_generator.initialize = function (callback) {
             const osmSelected = provider === 'OSM';
             $('#mapgen_osm_warning').toggle(osmSelected);
             $('#mapgen_maptiler_key_row').toggle(provider === 'MAPTILER');
-            $('#mapgen_maptiler_help').toggle(provider === 'MAPTILER');
             const exportBlocked = osmSelected || (provider === 'MAPTILER' && !$('#mapgen_maptiler_key').val().trim());
             $('#mapgen_sync_btn a, #mapgen_zip_btn a').toggleClass('disabled', exportBlocked);
 
@@ -2188,6 +2188,16 @@ TABS.map_generator.initialize = function (callback) {
             $('#mapgen_modal_confirm').hide();
             $('#mapgen_modal_cancel').text('Close');
         }
+
+        new jBox('Tooltip', {
+            attach: '#mapgen_maptiler_key_tip',
+            content: i18n.getMessage('mapgenMaptilerKeyHelp'),
+            getContent: null,
+            delayOpen: 100,
+            delayClose: 100,
+            position: { x: 'right', y: 'center' },
+            outside: 'x'
+        });
 
         GUI.content_ready(callback);
     }
