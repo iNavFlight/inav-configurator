@@ -72,11 +72,41 @@ Download offline map tiles for radio mapping widgets to your radio's SD card.
 
 #### Map Providers
 
-| Provider | Available Map Types |
-|----------|-------------------|
-| OpenStreetMap | Street |
-| ESRI | Street, Satellite, Hybrid |
-| Google | Street, Satellite, Hybrid, Terrain |
+| Provider | Available Map Types | Export |
+|----------|-------------------|--------|
+| OpenStreetMap | Street | Preview only — [tile policy](https://operations.osmfoundation.org/policies/tiles/) does not permit bulk offline export. Use **MapTiler → OSM Style** instead. |
+| ESRI | Street, Satellite, Hybrid | ✓ |
+| Google | Street, Satellite, Hybrid | ✓ |
+| MapTiler | Satellite, Street, Hybrid, OSM Style, Outdoor, Topo | ✓ (free API key required — see [MapTiler Setup](#maptiler-setup)) |
+
+#### MapTiler Setup
+
+MapTiler provides high-quality map tiles including styles not available from other providers (Outdoor, Topo, OSM Style). A free API key is required.
+
+Without a valid key, the map preview shows placeholder tiles:
+
+![MapTiler without a valid key](images/map_generator/MapTiler_Preview.png)
+
+**Getting a free API key:**
+
+1. Click the **?** icon next to the API key field, or go to [maptiler.com](https://maptiler.com) and create a free account
+   - **Role**: select **Developer**
+   - **What do you plan to do**: select **Use ready-made maps**
+2. After registration, open your account dashboard → **API Keys**
+3. Copy your default key and paste it into the **MapTiler API key** field
+
+![MapTiler API key input](images/map_generator/MapTiler_Key.png)
+
+The key is saved automatically and persists across sessions.
+
+| Map Type | Best for |
+|----------|----------|
+| Satellite | Aerial imagery — general area planning |
+| Hybrid | Satellite + road labels |
+| Street | Road map |
+| OSM Style | OpenStreetMap-style tiles, policy-compliant for offline export |
+| Outdoor | Topographic style with trails and contours — mountain flying |
+| Topo | Pure contour lines — elevation and terrain awareness |
 
 #### Output Paths
 
