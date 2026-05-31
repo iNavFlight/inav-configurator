@@ -115,9 +115,10 @@ function getTileUrl(provider, mapType, z, x, y, maptilerKey = '') {
         return `https://tile.openstreetmap.org/${z}/${x}/${y}.png`;
     }
     if (provider === 'MAPTILER') {
-        const styleMap = { 'Satellite': 'satellite', 'Hybrid': 'hybrid', 'Street': 'streets-v2', 'OSM Style': 'openstreetmap' };
+        const styleMap = { 'Satellite': 'satellite', 'Hybrid': 'hybrid', 'Street': 'streets-v2', 'OSM Style': 'openstreetmap', 'Outdoor': 'outdoor-v2', 'Topo': 'topo-v2' };
         const style = styleMap[mapType] || 'streets-v2';
-        const ext   = (mapType === 'Street' || mapType === 'OSM Style') ? 'png' : 'jpg';
+        const pngTypes = new Set(['Street', 'OSM Style', 'Outdoor', 'Topo']);
+        const ext   = pngTypes.has(mapType) ? 'png' : 'jpg';
         return `https://api.maptiler.com/maps/${style}/${z}/${x}/${y}.${ext}?key=${maptilerKey}`;
     }
     // GOOGLE
@@ -729,6 +730,8 @@ TABS.map_generator.initialize = function (callback) {
                 typeSelect.append(new Option('Street', 'Street', true, true));
                 typeSelect.append(new Option('Hybrid', 'Hybrid'));
                 typeSelect.append(new Option('OSM Style', 'OSM Style'));
+                typeSelect.append(new Option('Outdoor', 'Outdoor'));
+                typeSelect.append(new Option('Topo', 'Topo'));
             } else {
                 typeSelect.append(new Option('Satellite', 'Satellite'));
                 typeSelect.append(new Option('Street', 'Street', true, true));
@@ -788,9 +791,10 @@ TABS.map_generator.initialize = function (callback) {
 
         function getMaptilerLayer(type) {
             const key   = $('#mapgen_maptiler_key').val().trim();
-            const styleMap = { 'Satellite': 'satellite', 'Hybrid': 'hybrid', 'Street': 'streets-v2', 'OSM Style': 'openstreetmap' };
+            const styleMap = { 'Satellite': 'satellite', 'Hybrid': 'hybrid', 'Street': 'streets-v2', 'OSM Style': 'openstreetmap', 'Outdoor': 'outdoor-v2', 'Topo': 'topo-v2' };
             const style = styleMap[type] || 'streets-v2';
-            const ext   = (type === 'Street' || type === 'OSM Style') ? 'png' : 'jpg';
+            const pngTypes = new Set(['Street', 'OSM Style', 'Outdoor', 'Topo']);
+            const ext   = pngTypes.has(type) ? 'png' : 'jpg';
             return L.tileLayer(`https://api.maptiler.com/maps/${style}/{z}/{x}/{y}.${ext}?key=${key}`, { maxZoom: 20, crossOrigin: true, attribution: maptilerAttr });
         }
 
