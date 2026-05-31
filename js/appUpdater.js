@@ -16,7 +16,7 @@ appUpdater.checkRelease = function (currVersion) {
         let newVersion = releaseData.tag_name;
         let newPrerelase = releaseData.prerelease;
 
-        if (newPrerelase == false && semver.gt(newVersion, currVersion)) {
+        if (newPrerelase == false && semver.valid(newVersion) && semver.valid(currVersion) && semver.gt(newVersion, currVersion)) {
             
             window.electronAPI.appGetVersion().then(currentVersion => {
                 GUI.log(newVersion, currentVersion);
