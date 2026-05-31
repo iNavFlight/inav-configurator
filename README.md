@@ -76,7 +76,7 @@ Download offline map tiles for radio mapping widgets to your radio's SD card.
 |----------|-------------------|--------|
 | OpenStreetMap | Street | Preview only — [tile policy](https://operations.osmfoundation.org/policies/tiles/) does not permit bulk offline export. Use **MapTiler → OSM Style** instead. |
 | ESRI | Street, Satellite, Hybrid | ✓ |
-| Google | Street, Satellite, Hybrid | ✓ |
+| Google | Street, Satellite, Hybrid | ✓ — Note: Google may temporarily block your IP for 24 hours after bulk downloads |
 | MapTiler | Satellite, Street, Hybrid, OSM Style, Outdoor, Topo | ✓ (free API key required — see [MapTiler Setup](#maptiler-setup)) |
 
 #### MapTiler Setup
