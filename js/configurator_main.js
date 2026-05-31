@@ -4,7 +4,7 @@ import $ from 'jquery';
 import 'jquery-ui-dist/jquery-ui';
 import * as THREE from 'three'
 
-import GUI from './gui';
+import GUI, { TABS } from './gui';
 import CONFIGURATOR from './data_storage';
 import FC  from './fc';
 import { globalSettings, UnitType } from './globalSettings';

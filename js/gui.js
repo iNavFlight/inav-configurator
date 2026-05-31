@@ -494,4 +494,7 @@ GUI_control.prototype.update_dataflash_global = function () {
 // initialize object into GUI variable
 var GUI = new GUI_control();
 
+// Shared tab registry — populated by each tab module as a side effect
+export const TABS = {};
+
 export default GUI;
