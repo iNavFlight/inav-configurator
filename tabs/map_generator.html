@@ -42,11 +42,9 @@
                             <label for="mapgen_maptype"><span data-i18n="mapgenMapType">Map Type</span></label>
                         </div>
 
-                        <div id="mapgen_maptiler_key_row" style="display:none; margin: 4px 0;">
-                            <div style="display:flex; align-items:center; gap:6px;">
-                                <input id="mapgen_maptiler_key" type="text" placeholder="MapTiler API key" style="flex:1; min-width:0; box-sizing:border-box; padding:4px 6px;" />
-                                <a class="helpicon" href="https://github.com/MartinovEm/inav-configurator/blob/feature/map-generator/README.md#maptiler-setup" target="_blank" style="float:none; margin-top:0; flex-shrink:0;"></a>
-                            </div>
+                        <div id="mapgen_maptiler_key_row" style="display:none; margin: 4px 0; position:relative;">
+                            <input id="mapgen_maptiler_key" type="text" placeholder="MapTiler API key" style="width:calc(100% - 22px); box-sizing:border-box; padding:4px 6px;" />
+                            <a class="helpicon" href="https://github.com/MartinovEm/inav-configurator/blob/feature/map-generator/README.md#maptiler-setup" target="_blank" style="position:absolute; right:0; top:0; float:none; margin-top:0;"></a>
                             <div style="font-size:0.85em; color:#888; margin-top:2px;">Get a free key at <a href="https://maptiler.com" target="_blank">maptiler.com</a></div>
                         </div>
                         <div id="mapgen_google_warning" class="mapgen-warning" style="display:none;">

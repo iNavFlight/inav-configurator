@@ -95,6 +95,8 @@ Without a valid key, the map preview shows placeholder tiles:
 2. After registration, open your account dashboard → **API Keys**
 3. Copy your default key and paste it into the **MapTiler API key** field
 
+> **Free tier:** MapTiler's free plan includes 5,000 sessions per month, which is more than enough for personal use downloading tiles for your flying area.
+
 ![MapTiler API key input](images/map_generator/MapTiler_Key.png)
 
 The key is saved automatically and persists across sessions.
