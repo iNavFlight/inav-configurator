@@ -2189,7 +2189,7 @@ TABS.map_generator.initialize = function (callback) {
             $('#mapgen_modal_cancel').text('Close');
         }
 
-        new jBox('Tooltip', {
+        const maptilerKeyTooltip = new jBox('Tooltip', {
             attach: '#mapgen_maptiler_key_tip',
             content: i18n.getMessage('mapgenMaptilerKeyHelp'),
             getContent: null,
