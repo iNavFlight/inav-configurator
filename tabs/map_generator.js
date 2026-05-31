@@ -729,6 +729,9 @@ TABS.map_generator.initialize = function (callback) {
 
             // Warnings
             $('#mapgen_google_warning').toggle(provider === 'GOOGLE');
+            const osmSelected = provider === 'OSM';
+            $('#mapgen_osm_warning').toggle(osmSelected);
+            $('#mapgen_sync_btn a, #mapgen_zip_btn a').toggleClass('disabled', osmSelected);
 
             // Show/hide Yaapu sub-target selector
             $('#mapgen_subtarget_wrapper').toggleClass('mapgen-subtarget-hidden', target !== 'yaapu');
@@ -1437,6 +1440,7 @@ TABS.map_generator.initialize = function (callback) {
         }
 
         $('#mapgen_sync_btn').on('click', () => {
+            if ($('#mapgen_provider').val() === 'OSM') return;
             if (isTerrainMode()) {
                 showTerrainSyncModal();
             } else {
@@ -1444,6 +1448,7 @@ TABS.map_generator.initialize = function (callback) {
             }
         });
         $('#mapgen_zip_btn').on('click', () => {
+            if ($('#mapgen_provider').val() === 'OSM') return;
             if (isTerrainMode()) {
                 showTerrainSyncModal();
             } else {

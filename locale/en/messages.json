@@ -230,6 +230,9 @@
     "mapgenGoogleWarning": {
         "message": "Warning: Google might temporarily ban IPs after bulk downloads for 24 hours."
     },
+    "mapgenOsmWarning": {
+        "message": "OSM Standard tile policy does not permit offline bulk export. Select ESRI or Google for SD/ZIP export."
+    },
     "mapgenProjectSettings": {
         "message": "Project Settings"
     },
