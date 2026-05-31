@@ -115,8 +115,9 @@ function getTileUrl(provider, mapType, z, x, y, maptilerKey = '') {
         return `https://tile.openstreetmap.org/${z}/${x}/${y}.png`;
     }
     if (provider === 'MAPTILER') {
-        const style = mapType === 'Satellite' ? 'satellite' : mapType === 'Hybrid' ? 'hybrid' : 'streets-v2';
-        const ext   = mapType === 'Street' ? 'png' : 'jpg';
+        const styleMap = { 'Satellite': 'satellite', 'Hybrid': 'hybrid', 'Street': 'streets-v2', 'OSM Style': 'openstreetmap' };
+        const style = styleMap[mapType] || 'streets-v2';
+        const ext   = (mapType === 'Street' || mapType === 'OSM Style') ? 'png' : 'jpg';
         return `https://api.maptiler.com/maps/${style}/${z}/${x}/${y}.${ext}?key=${maptilerKey}`;
     }
     // GOOGLE
@@ -723,6 +724,11 @@ TABS.map_generator.initialize = function (callback) {
             typeSelect.empty();
             if (provider === 'OSM') {
                 typeSelect.append(new Option('Street', 'Street', true, true));
+            } else if (provider === 'MAPTILER') {
+                typeSelect.append(new Option('Satellite', 'Satellite'));
+                typeSelect.append(new Option('Street', 'Street', true, true));
+                typeSelect.append(new Option('Hybrid', 'Hybrid'));
+                typeSelect.append(new Option('OSM Style', 'OSM Style'));
             } else {
                 typeSelect.append(new Option('Satellite', 'Satellite'));
                 typeSelect.append(new Option('Street', 'Street', true, true));
@@ -782,8 +788,9 @@ TABS.map_generator.initialize = function (callback) {
 
         function getMaptilerLayer(type) {
             const key   = $('#mapgen_maptiler_key').val().trim();
-            const style = type === 'Satellite' ? 'satellite' : type === 'Hybrid' ? 'hybrid' : 'streets-v2';
-            const ext   = type === 'Street' ? 'png' : 'jpg';
+            const styleMap = { 'Satellite': 'satellite', 'Hybrid': 'hybrid', 'Street': 'streets-v2', 'OSM Style': 'openstreetmap' };
+            const style = styleMap[type] || 'streets-v2';
+            const ext   = (type === 'Street' || type === 'OSM Style') ? 'png' : 'jpg';
             return L.tileLayer(`https://api.maptiler.com/maps/${style}/{z}/{x}/{y}.${ext}?key=${key}`, { maxZoom: 20, crossOrigin: true, attribution: maptilerAttr });
         }
 
