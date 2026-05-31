@@ -89,7 +89,7 @@ Without a valid key, the map preview shows placeholder tiles:
 
 **Getting a free API key:**
 
-1. Click the **?** icon next to the API key field, or go to [maptiler.com](https://maptiler.com) and create a free account
+1. Go to [maptiler.com](https://maptiler.com) and create a free account
    - **Role**: select **Developer**
    - **What do you plan to do**: select **Use ready-made maps**
 2. After registration, open your account dashboard → **API Keys**
