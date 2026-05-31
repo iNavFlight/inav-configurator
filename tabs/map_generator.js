@@ -105,7 +105,7 @@ function formatArea(sqMeters, unit) {
 
 // ─── Tile URL resolution ────────────────────────────────────────────────
 // z here is already 0-based (tile server zoom)
-function getTileUrl(provider, mapType, z, x, y) {
+function getTileUrl(provider, mapType, z, x, y, maptilerKey = '') {
     if (provider === 'ESRI') {
         return mapType === 'Street'
             ? `https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/${z}/${y}/${x}`
@@ -113,6 +113,11 @@ function getTileUrl(provider, mapType, z, x, y) {
     }
     if (provider === 'OSM') {
         return `https://tile.openstreetmap.org/${z}/${x}/${y}.png`;
+    }
+    if (provider === 'MAPTILER') {
+        const style = mapType === 'Satellite' ? 'satellite' : mapType === 'Hybrid' ? 'hybrid' : 'streets-v2';
+        const ext   = mapType === 'Street' ? 'png' : 'jpg';
+        return `https://api.maptiler.com/maps/${style}/${z}/${x}/${y}.${ext}?key=${maptilerKey}`;
     }
     // GOOGLE
     if (mapType === 'Satellite') return `https://mt1.google.com/vt/lyrs=s&x=${x}&y=${y}&z=${z}`;
@@ -210,7 +215,8 @@ async function fetchResizedTile(provider, mapType, z, x, y, canvas, ctx, target)
     const cached = await tileCache.get(provider, mapType, z, x, y);
     if (cached) return cached;
 
-    const img = await loadImage(getTileUrl(provider, mapType, z, x, y));
+    const maptilerKey = store.get('mapgen_maptiler_key', '');
+    const img = await loadImage(getTileUrl(provider, mapType, z, x, y, maptilerKey));
     ctx.clearRect(0, 0, 100, 100);
     ctx.drawImage(img, 0, 0, 256, 256, 0, 0, 100, 100);
 
@@ -651,7 +657,7 @@ TABS.map_generator.initialize = function (callback) {
         tileCache.init();
 
         // ── Populate zoom selectors, respecting per-provider max zoom ──
-        const PROVIDER_MAX_ZOOM = { OSM: 19, ESRI: 20, GOOGLE: 20 };
+        const PROVIDER_MAX_ZOOM = { OSM: 19, ESRI: 20, GOOGLE: 20, MAPTILER: 20 };
         const minZSelect = $('#mapgen_min_zoom');
         const maxZSelect = $('#mapgen_max_zoom');
         function rebuildZoomSelectors(maxZ) {
@@ -670,7 +676,8 @@ TABS.map_generator.initialize = function (callback) {
         const settingsSaved = store.get('mapgen_settings_saved', false);
         const savedTarget    = settingsSaved ? store.get('mapgen_target', 'b14ckyy') : 'b14ckyy';
         const savedSubtarget = settingsSaved ? store.get('mapgen_subtarget', 'ethos') : 'ethos';
-        const savedProvider  = settingsSaved ? store.get('mapgen_provider', 'OSM') : 'OSM';
+        const savedProvider    = settingsSaved ? store.get('mapgen_provider', 'OSM') : 'OSM';
+        const savedMaptilerKey = store.get('mapgen_maptiler_key', '');
         const savedProject   = settingsSaved ? store.get('mapgen_project_name', 'MyLocalField') : 'MyLocalField';
         const savedMinZoom   = settingsSaved ? store.get('mapgen_min_zoom', 8) : 8;
         const savedMaxZoom   = settingsSaved ? store.get('mapgen_max_zoom', 14) : 14;
@@ -682,6 +689,7 @@ TABS.map_generator.initialize = function (callback) {
         $('#mapgen_subtarget').val(savedSubtarget);
         $('#mapgen_target').val(savedTarget);
         $('#mapgen_provider').val(savedProvider);
+        $('#mapgen_maptiler_key').val(savedMaptilerKey);
         $('#mapgen_project_name').val(savedProject);
         $('#mapgen_min_zoom').val(savedMinZoom);
         $('#mapgen_max_zoom').val(savedMaxZoom);
@@ -727,11 +735,13 @@ TABS.map_generator.initialize = function (callback) {
                 typeSelect.val(savedMapType);
             }
 
-            // Warnings
+            // Warnings / provider-specific UI
             $('#mapgen_google_warning').toggle(provider === 'GOOGLE');
             const osmSelected = provider === 'OSM';
             $('#mapgen_osm_warning').toggle(osmSelected);
-            $('#mapgen_sync_btn a, #mapgen_zip_btn a').toggleClass('disabled', osmSelected);
+            $('#mapgen_maptiler_key_row').toggle(provider === 'MAPTILER');
+            const exportBlocked = osmSelected || (provider === 'MAPTILER' && !$('#mapgen_maptiler_key').val().trim());
+            $('#mapgen_sync_btn a, #mapgen_zip_btn a').toggleClass('disabled', exportBlocked);
 
             // Show/hide Yaapu sub-target selector
             $('#mapgen_subtarget_wrapper').toggleClass('mapgen-subtarget-hidden', target !== 'yaapu');
@@ -757,9 +767,10 @@ TABS.map_generator.initialize = function (callback) {
         }).setView(savedCenter, savedZoom);
 
         // Tile layers
-        const osmAttr  = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
-        const esriAttr = '&copy; <a href="https://www.esri.com/">Esri</a> &mdash; Sources: Esri, Maxar, Earthstar Geographics';
-        const googleAttr = 'Map data &copy; <a href="https://www.google.com/intl/en/help/terms_maps/">Google</a>';
+        const osmAttr      = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
+        const esriAttr     = '&copy; <a href="https://www.esri.com/">Esri</a> &mdash; Sources: Esri, Maxar, Earthstar Geographics';
+        const googleAttr   = 'Map data &copy; <a href="https://www.google.com/intl/en/help/terms_maps/">Google</a>';
+        const maptilerAttr = '&copy; <a href="https://www.maptiler.com/copyright/">MapTiler</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
 
         const osmLayer       = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 20, attribution: osmAttr });
         const esriSatellite  = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom: 20, crossOrigin: true, attribution: esriAttr });
@@ -768,6 +779,13 @@ TABS.map_generator.initialize = function (callback) {
         const googleSatellite = L.tileLayer('https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', { maxZoom: 20, attribution: googleAttr });
         const googleStreet   = L.tileLayer('https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', { maxZoom: 20, attribution: googleAttr });
         const googleHybrid   = L.tileLayer('https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', { maxZoom: 20, attribution: googleAttr });
+
+        function getMaptilerLayer(type) {
+            const key   = $('#mapgen_maptiler_key').val().trim();
+            const style = type === 'Satellite' ? 'satellite' : type === 'Hybrid' ? 'hybrid' : 'streets-v2';
+            const ext   = type === 'Street' ? 'png' : 'jpg';
+            return L.tileLayer(`https://api.maptiler.com/maps/${style}/{z}/{x}/{y}.${ext}?key=${key}`, { maxZoom: 20, crossOrigin: true, attribution: maptilerAttr });
+        }
 
         currentLayer = osmLayer;
         currentLayer.addTo(map);
@@ -778,6 +796,12 @@ TABS.map_generator.initialize = function (callback) {
 
             if (currentLayer) map.removeLayer(currentLayer);
             if (map.hasLayer(esriLabels)) map.removeLayer(esriLabels);
+
+            if (provider === 'MAPTILER') {
+                currentLayer = getMaptilerLayer(type);
+                currentLayer.addTo(map);
+                return;
+            }
 
             const layerMap = {
                 'Satellite_ESRI': esriSatellite,
@@ -1240,6 +1264,7 @@ TABS.map_generator.initialize = function (callback) {
             store.delete('mapgen_area_unit');
             store.delete('mapgen_last_center');
             store.delete('mapgen_last_zoom');
+            // Note: mapgen_maptiler_key is intentionally NOT deleted on restore defaults
             // Reset UI to defaults
             $('#mapgen_target').val('b14ckyy');
             $('#mapgen_subtarget').val('ethos');
@@ -1259,6 +1284,11 @@ TABS.map_generator.initialize = function (callback) {
         $('#mapgen_target').on('change', () => { syncMapOptions(); triggerUpdate(); });
         $('#mapgen_provider').on('change', () => { syncMapOptions(); switchMapLayer(); });
         $('#mapgen_maptype').on('change', () => { switchMapLayer(); });
+        $('#mapgen_maptiler_key').on('input', () => {
+            store.set('mapgen_maptiler_key', $('#mapgen_maptiler_key').val().trim());
+            syncMapOptions();
+            if ($('#mapgen_provider').val() === 'MAPTILER') switchMapLayer();
+        });
         $('#mapgen_min_zoom, #mapgen_max_zoom').on('change', () => { triggerUpdate(); });
         $('#mapgen_area_unit').on('change', () => { triggerUpdate(); refreshScale(); });
 
@@ -1440,7 +1470,9 @@ TABS.map_generator.initialize = function (callback) {
         }
 
         $('#mapgen_sync_btn').on('click', () => {
-            if ($('#mapgen_provider').val() === 'OSM') return;
+            const provider = $('#mapgen_provider').val();
+            if (provider === 'OSM') return;
+            if (provider === 'MAPTILER' && !$('#mapgen_maptiler_key').val().trim()) return;
             if (isTerrainMode()) {
                 showTerrainSyncModal();
             } else {
@@ -1448,7 +1480,9 @@ TABS.map_generator.initialize = function (callback) {
             }
         });
         $('#mapgen_zip_btn').on('click', () => {
-            if ($('#mapgen_provider').val() === 'OSM') return;
+            const provider = $('#mapgen_provider').val();
+            if (provider === 'OSM') return;
+            if (provider === 'MAPTILER' && !$('#mapgen_maptiler_key').val().trim()) return;
             if (isTerrainMode()) {
                 showTerrainSyncModal();
             } else {

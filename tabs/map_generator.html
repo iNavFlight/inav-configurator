@@ -32,6 +32,7 @@
                                 <option value="OSM" selected>Standard Map (OSM)</option>
                                 <option value="ESRI">ESRI High-Res</option>
                                 <option value="GOOGLE">Google High-Res</option>
+                                <option value="MAPTILER">MapTiler</option>
                             </select>
                             <label for="mapgen_provider"><span data-i18n="mapgenProvider">Provider</span></label>
                         </div>
@@ -41,6 +42,10 @@
                             <label for="mapgen_maptype"><span data-i18n="mapgenMapType">Map Type</span></label>
                         </div>
 
+                        <div id="mapgen_maptiler_key_row" style="display:none; margin: 4px 0;">
+                            <input id="mapgen_maptiler_key" type="text" placeholder="MapTiler API key" style="width:100%; box-sizing:border-box; padding:4px 6px;" />
+                            <div style="font-size:0.85em; color:#888; margin-top:2px;" data-i18n="mapgenMaptilerKeyHint">Get a free key at <a href="https://maptiler.com" target="_blank">maptiler.com</a></div>
+                        </div>
                         <div id="mapgen_google_warning" class="mapgen-warning" style="display:none;">
                             <span data-i18n="mapgenGoogleWarning">Warning: Google might temporarily ban IPs after bulk downloads for 24 hours.</span>
                         </div>

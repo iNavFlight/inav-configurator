@@ -233,6 +233,9 @@
     "mapgenOsmWarning": {
         "message": "OSM Standard tile policy does not permit offline bulk export. Select ESRI or Google for SD/ZIP export."
     },
+    "mapgenMaptilerKeyHint": {
+        "message": "Get a free key at maptiler.com"
+    },
     "mapgenProjectSettings": {
         "message": "Project Settings"
     },
