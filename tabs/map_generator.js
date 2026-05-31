@@ -6,7 +6,7 @@ import 'leaflet-draw'; // for L.GeometryUtil.geodesicArea
 import 'leaflet-control-geocoder';
 import 'leaflet-control-geocoder/dist/Control.Geocoder.css';
 
-import { GUI, TABS } from './../js/gui';
+import GUI, { TABS } from './../js/gui';
 import i18n from './../js/localization';
 import store from './../js/store';
 import { globalSettings, UnitType } from './../js/globalSettings';
