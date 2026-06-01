@@ -35,8 +35,8 @@
   dronecanTab.render = function () {
       const nodes = FC.DRONECAN_NODES;
       const status = document.getElementById('dronecan-status');
-      const table = document.getElementById('dronecan-node-table');
-      const tbody = document.getElementById('dronecan-node-tbody');
+      const table = document.getElementById('dronecan-node-wrapper');
+       const tbody = document.getElementById('dronecan-node-tbody');
 
       if (!nodes || nodes.length === 0) {
           status.style.display = '';

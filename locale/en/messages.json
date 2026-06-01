@@ -206,6 +206,9 @@
     "dronecanColUptime": {
         "message": "Uptime"
     },
+    "dronecanNodesTitle": {
+        "message": "DroneCAN Nodes"
+    },
     "dronecanNodeDetail": {
         "message": "Node Detail"
     },
