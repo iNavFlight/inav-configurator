@@ -114,11 +114,10 @@
 }
 
 .tab-gps .gps-dronecan-info {
-    padding: 6px 8px;
-    margin: 4px 0;
-    background-color: #e8f4f8;
-    border-left: 3px solid #39a9dc;
-    border-radius: 2px;
+    padding: 5px;
+    margin: 5px 0;
+    background: #f0f0f0;
+    border-radius: 3px;
     font-size: 0.9em;
 }
 
