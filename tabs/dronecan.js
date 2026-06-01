@@ -12,6 +12,8 @@
   const MODE_LABELS = ['OPERATIONAL', 'INITIALIZATION', 'MAINTENANCE', 'SOFTWARE_UPDATE', '', '', '', 'OFFLINE'];
 
   const dronecanTab = {};
+  const nameCache = {};
+
 
   dronecanTab.initialize = function (callback) {
       GUI.active_tab = this;
@@ -60,12 +62,25 @@
               <td>—</td>
               <td><span class="health-badge ${HEALTH_CLASSES[health]}">${HEALTH_LABELS[health]}</span></td>
               <td>${MODE_LABELS[mode]}</td>
-              <td>—</td>
               <td>${lastSeen}</td>
           `;
+          if (nameCache[node.nodeID] !== undefined) {
+            row.cells[1].textContent = nameCache[node.nodeID];
+          } else {
+            MSP.send_message(MSPCodes.MSP2_INAV_DRONECAN_NODE_INFO, [node.nodeID], false, () => {
+                if (FC.DRONECAN_NODE_INFO) {
+                    nameCache[node.nodeID] = FC.DRONECAN_NODE_INFO.name;
+                    const r = tbody.querySelector(`tr[data-node-id="${node.nodeID}"]`);
+                    if (r) r.cells[1].textContent = FC.DRONECAN_NODE_INFO.name;
+                }   
+            }); 
+          }   
+
           row.addEventListener('click', () => dronecanTab.showDetail(node.nodeID));
           tbody.appendChild(row);
       });
+      
+
   };
 
   dronecanTab.showDetail = function (nodeId) {
@@ -82,6 +97,7 @@
               <tr><th>Name</th><td>${info.name}</td></tr>
               <tr><th>Health</th><td>${HEALTH_LABELS[info.health] || info.health}</td></tr>
               <tr><th>Mode</th><td>${MODE_LABELS[info.mode] || info.mode}</td></tr>
+              <tr><th>Last Seen</th><td>${(info.last_seen_ms / 1000).toFixed(1)}s ago</td></tr>
               <tr><th>Uptime</th><td>${uptime}</td></tr>
               <tr><th>Vendor Status</th><td>${info.vendor_status_code}</td></tr>
           `;

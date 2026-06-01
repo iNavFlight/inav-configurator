@@ -6,10 +6,10 @@
       color: #fff;
   }
 
-  .health-ok       { background-color: #2e7d32; }
+  .health-ok       { background-color: green; }
   .health-warning  { background-color: #f57f17; }
-  .health-error    { background-color: #c62828; }
-  .health-critical { background-color: #6a1b9a; }
+  .health-error    { background-color: red; }
+  .health-critical { background-color: red; }
 
   #dronecan-node-table {
       width: 100%;
