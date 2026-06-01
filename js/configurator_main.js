@@ -38,6 +38,7 @@ import configurationTab from './../tabs/configuration';
 import pidTuningTab from './../tabs/pid_tuning';
 import receiverTab from './../tabs/receiver';
 import gpsTab from './../tabs/gps';
+import dronecanTab from './../tabs/dronecan';
 import magnetometerTab from './../tabs/magnetometer';
 import missionControlTab from './../tabs/mission_control';
 import mixerTab from './../tabs/mixer';
@@ -118,7 +119,7 @@ $(function() {
         var ui_tabs = $('#tabs > ul');
         $('a', ui_tabs).on('click', function() {
 
-            if ($(this).parent().hasClass("tab_help")) {
+            if ($(this).parent().hasClass("tab_help") || $(this).parent().hasClass("nav-toggle-all")) {
                 return;
             }
 
@@ -236,6 +237,9 @@ $(function() {
                         case 'gps':
                             gpsTab.initialize(content_ready);
                             break;
+                         case 'dronecan':
+                              dronecanTab.initialize(content_ready);
+                              break;
                         case 'magnetometer':
                             magnetometerTab.initialize(content_ready);
                             break;
