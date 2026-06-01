@@ -113,13 +113,10 @@
     border-top-right-radius: 0;
 }
 
-.tab-gps .gps-dronecan-info span {
-    display: block;
-    padding: 5px;
-    margin: 5px 0;
-    background: #f0f0f0;
-    border-radius: 3px;
+.tab-gps .gps-dronecan-info {
     font-size: 0.9em;
+    font-style: italic;
+    margin: 2px 0 4px;
 }
 
 .tab-gps .config-section .checkbox .switchery {
