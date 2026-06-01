@@ -364,66 +364,6 @@ $(function() {
         // Update button state on initialization
         updateToggleAllButton();
 
-        // Keyboard accessibility for accordion headers
-        $('.group-header').on('keydown', function(e) {
-            if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                $(this).trigger('click');
-            }
-        });
-
-        function updateToggleAllButton() {
-            const allExpanded = $('.nav-group .group-header.active').length === $('.nav-group .group-header').length;
-            const $expandIcon = $('#toggleAllGroups .expand-icon');
-            const $collapseIcon = $('#toggleAllGroups .collapse-icon');
-            const $toggleText = $('#toggleAllGroups .toggle-text');
-
-            if (allExpanded) {
-                $expandIcon.hide();
-                $collapseIcon.show();
-                $toggleText.attr('data-i18n', 'navCollapseAll');
-                $toggleText.text(i18n.getMessage('navCollapseAll'));
-            } else {
-                $expandIcon.show();
-                $collapseIcon.hide();
-                $toggleText.attr('data-i18n', 'navExpandAll');
-                $toggleText.text(i18n.getMessage('navExpandAll'));
-            }
-        }
-
-        // Expand/Collapse All Toggle
-        $('#toggleAllGroups').on('click', function(e) {
-            e.preventDefault();
-            const allExpanded = $('.nav-group .group-header.active').length === $('.nav-group .group-header').length;
-
-            if (allExpanded) {
-                // Collapse all except first
-                $('.nav-group .group-header').removeClass('active').attr('aria-expanded', 'false');
-                $('.nav-group .group-items').removeClass('expanded');
-                $('#tabs ul.mode-connected .nav-group:first-child .group-header').addClass('active').attr('aria-expanded', 'true');
-                $('#tabs ul.mode-connected .nav-group:first-child .group-items').addClass('expanded');
-                store.set('expand_all_groups', false);
-            } else {
-                // Expand all
-                $('.nav-group .group-header').addClass('active').attr('aria-expanded', 'true');
-                $('.nav-group .group-items').addClass('expanded');
-                store.set('expand_all_groups', true);
-            }
-
-            updateToggleAllButton();
-        });
-
-        // Initialize: apply saved expand all preference or expand first group by default
-        if (store.get('expand_all_groups', false)) {
-            $('.nav-group .group-header').addClass('active').attr('aria-expanded', 'true');
-            $('.nav-group .group-items').addClass('expanded');
-        } else {
-            $('#tabs ul.mode-connected .nav-group:first-child .group-header').addClass('active').attr('aria-expanded', 'true');
-            $('#tabs ul.mode-connected .nav-group:first-child .group-items').addClass('expanded');
-        }
-
-        updateToggleAllButton();
-
         // options
         $('#options').on('click', function() {
             var el = $(this);
