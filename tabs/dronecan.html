@@ -1,45 +1,71 @@
 <div class="tab-dronecan toolbar_fixed_bottom">
-      <div class="content_wrapper">
-          <div class="tab_title" data-i18n="tabDroneCAN"></div>
+    <div class="content_wrapper">
+        <div class="tab_title" data-i18n="tabDroneCAN"></div>
 
-          <div id="dronecan-status" class="note">
-              <div class="note_spacer">
-                  <p data-i18n="dronecanNoNodes"></p>
-              </div>
-          </div>
+        <div class="gui_box grey">
+            <div class="gui_box_titlebar">
+                <div class="spacer_box_title" data-i18n="dronecanBusConfig"></div>
+            </div>
+            <div class="spacer_box">
+                <div class="dronecan-config-row">
+                    <label data-i18n="dronecanBitrate"></label>
+                    <select id="dronecan-bitrate">
+                        <option value="125">125 kbps</option>
+                        <option value="250">250 kbps</option>
+                        <option value="500">500 kbps</option>
+                        <option value="1000">1000 kbps</option>
+                    </select>
+                </div>
+                <div class="dronecan-config-row">
+                    <label data-i18n="dronecanNodeId"></label>
+                    <input id="dronecan-node-id" type="number" min="1" max="127" value="1">
+                </div>
+            </div>
+        </div>
 
-          <div id="dronecan-node-wrapper" style="display:none">
-              <div class="gui_box grey">
-                  <div class="gui_box_titlebar">
-                      <div class="spacer_box_title" data-i18n="dronecanNodesTitle"></div>
-                  </div>
-                  <div class="spacer_box">
-                      <table id="dronecan-node-table" class="dronecan-nodes">
-                          <thead>
-                              <tr>
-                                  <th data-i18n="dronecanColNodeID"></th>
-                                  <th data-i18n="dronecanColName"></th>
-                                  <th data-i18n="dronecanColHealth"></th>
-                                  <th data-i18n="dronecanColMode"></th>
-                                  <th data-i18n="dronecanColLastSeen"></th>
-                              </tr>
-                          </thead>
-                          <tbody id="dronecan-node-tbody"></tbody>
-                      </table>
-                  </div>
-              </div>
+        <div id="dronecan-status" class="note">
+            <div class="note_spacer">
+                <p data-i18n="dronecanNoNodes"></p>
+            </div>
+        </div>
 
-              <div id="dronecan-node-detail" class="gui_box grey" style="display:none">
-                  <div class="gui_box_titlebar">
-                      <div class="spacer_box_title" data-i18n="dronecanNodeDetail"></div>
-                  </div>
-                  <div class="spacer_box">
-                      <table class="dronecan-detail">
-                          <tbody id="dronecan-detail-tbody"></tbody>
-                      </table>
-                  </div>
-              </div>
-          </div>
+        <div id="dronecan-node-wrapper" style="display:none">
+            <div class="gui_box grey">
+                <div class="gui_box_titlebar">
+                    <div class="spacer_box_title" data-i18n="dronecanNodesTitle"></div>
+                </div>
+                <div class="spacer_box">
+                    <table id="dronecan-node-table" class="dronecan-nodes">
+                        <thead>
+                            <tr>
+                                <th data-i18n="dronecanColNodeID"></th>
+                                <th data-i18n="dronecanColName"></th>
+                                <th data-i18n="dronecanColHealth"></th>
+                                <th data-i18n="dronecanColMode"></th>
+                                <th data-i18n="dronecanColLastSeen"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="dronecan-node-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
 
-      </div>
-  </div>
+            <div id="dronecan-node-detail" class="gui_box grey" style="display:none">
+                <div class="gui_box_titlebar">
+                    <div class="spacer_box_title" data-i18n="dronecanNodeDetail"></div>
+                </div>
+                <div class="spacer_box">
+                    <table class="dronecan-detail">
+                        <tbody id="dronecan-detail-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <div class="content_toolbar supported hide">
+        <div class="btn save_btn">
+            <a id="dronecan-save" class="save" href="#" data-i18n="dronecanSave"></a>
+        </div>
+    </div>
+</div>

@@ -215,6 +215,21 @@
     "dronecanNoNodes": {
         "message": "No DroneCAN nodes detected."
     },
+    "dronecanBusConfig": {
+        "message": "Bus Configuration"
+    },
+    "dronecanBitrate": {
+        "message": "CAN Baud Rate"
+    },
+    "dronecanNodeId": {
+        "message": "FC Node ID"
+    },
+    "dronecanSave": {
+        "message": "Save & Reboot"
+    },
+    "dronecanNodeIdReservedWarning": {
+        "message": "Node IDs 126 and 127 are reserved for diagnostic tools. Are you sure?"
+    },
     "tabOutputs": {
         "message": "Outputs"
     },
