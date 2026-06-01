@@ -132,6 +132,7 @@ dronecanTab.saveConfig = function () {
 
 dronecanTab.cleanup = function (callback) {
     interval.remove('dronecan_refresh');
+    Object.keys(nameCache).forEach(k => delete nameCache[k]);
     if (callback) callback();
 };
 
