@@ -185,6 +185,33 @@
     "tabGPS": {
         "message": "GPS"
     },
+    "tabDroneCAN": {
+        "message": "DroneCAN"
+    },
+    "dronecanColHealth": {
+        "message": "Health"
+    },
+    "dronecanColLastSeen": {
+        "message": "Last Seen"
+    },
+    "dronecanColMode": {
+        "message": "Mode"
+    },
+    "dronecanColName": {
+        "message": "Name"
+    },
+    "dronecanColNodeID": {
+        "message": "Node ID"
+    },
+    "dronecanColUptime": {
+        "message": "Uptime"
+    },
+    "dronecanNodeDetail": {
+        "message": "Node Detail"
+    },
+    "dronecanNoNodes": {
+        "message": "No DroneCAN nodes detected."
+    },
     "tabOutputs": {
         "message": "Outputs"
     },

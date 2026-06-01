@@ -1,0 +1,31 @@
+<div id="tab-dronecan" class="tab-pane">
+      <div class="tab-header">
+          <h3 data-i18n="tabDroneCAN"></h3>
+      </div>
+      <div class="tab-content">
+          <div id="dronecan-status">
+              <span data-i18n="dronecanNoNodes">No DroneCAN nodes detected.</span>
+          </div>
+          <table id="dronecan-node-table" style="display:none">
+              <thead>
+                  <tr>
+                      <th data-i18n="dronecanColNodeID">Node ID</th>
+                      <th data-i18n="dronecanColName">Name</th>
+                      <th data-i18n="dronecanColHealth">Health</th>
+                      <th data-i18n="dronecanColMode">Mode</th>
+                      <th data-i18n="dronecanColUptime">Uptime</th>
+                      <th data-i18n="dronecanColLastSeen">Last Seen</th>
+                  </tr>
+              </thead>
+              <tbody id="dronecan-node-tbody">
+              </tbody>
+          </table>
+          <div id="dronecan-node-detail" style="display:none">
+              <h4 data-i18n="dronecanNodeDetail">Node Detail</h4>
+              <table id="dronecan-detail-table">
+                  <tbody id="dronecan-detail-tbody">
+                  </tbody>
+              </table>
+          </div>
+      </div>
+  </div>
