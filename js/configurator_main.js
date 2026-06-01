@@ -232,6 +232,9 @@ $(function() {
                         case 'gps':
                             gpsTab.initialize(content_ready);
                             break;
+                         case 'dronecan':
+                              dronecanTab.initialize(content_ready);
+                              break;
                         case 'magnetometer':
                             magnetometerTab.initialize(content_ready);
                             break;
@@ -361,24 +364,6 @@ $(function() {
         // Update button state on initialization
         updateToggleAllButton();
 
-
-        // Accordion Navigation Groups
-        // $('.group-header').on('click', function(e) {
-        //     e.stopPropagation(); // Prevent triggering tab click
-        //     const header = $(this);
-        //     const items = header.next('.group-items');
-
-        //     // Toggle this group
-        //     header.toggleClass('active');
-        //     items.toggleClass('expanded');
-
-        //     // Update aria-expanded for accessibility
-        //     header.attr('aria-expanded', header.hasClass('active'));
-
-        //     // Update the expand/collapse all button state
-        //     updateToggleAllButton();
-        // });
-
         // Keyboard accessibility for accordion headers
         $('.group-header').on('keydown', function(e) {
             if (e.key === 'Enter' || e.key === ' ') {
@@ -474,15 +459,6 @@ $(function() {
                     }
 
                      $('div.disable_3d_acceleration input').on('change', function () {
-                        var check = $(this).is(':checked');
-                        store.set('disable_3d_acceleration', check);
-                    });
-
-                    if (store.get('disable_3d_acceleration', false)) {
-                        $('div.disable_3d_acceleration input').prop('checked', true);
-                    }
-
-                    $('div.disable_3d_acceleration input').on('change', function () {
                         var check = $(this).is(':checked');
                         store.set('disable_3d_acceleration', check);
                     });

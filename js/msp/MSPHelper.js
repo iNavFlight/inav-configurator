@@ -1559,30 +1559,30 @@ var mspHelper = (function () {
 
             case MSPCodes.MSP2_INAV_DRONECAN_NODES:
                 FC.DRONECAN_NODES = [];
-                if (dataView.byteLength > 0) {
-                    const count = dataView.getUint8(0);
+                if (data.byteLength > 0) {
+                    const count = data.getUint8(0);
                     for (let i = 0; i < count; i++) {
                         const offset = 1 + i * 7;
                         FC.DRONECAN_NODES.push({
-                            nodeID:      dataView.getUint8(offset),
-                            health:      dataView.getUint8(offset + 1),
-                            mode:        dataView.getUint8(offset + 2),
-                            last_seen_ms: dataView.getUint32(offset + 3, true),
+                            nodeID:      data.getUint8(offset),
+                            health:      data.getUint8(offset + 1),
+                            mode:        data.getUint8(offset + 2),
+                            last_seen_ms: data.getUint32(offset + 3, true),
                         });
                     }
                 }
                 break;
             
              case MSPCodes.MSP2_INAV_DRONECAN_NODE_INFO:
-                if (dataView.byteLength >= 46) {
+                if (data.byteLength >= 46) {
                     FC.DRONECAN_NODE_INFO = {
-                        nodeID:             dataView.getUint8(0),
-                        health:             dataView.getUint8(1),
-                        mode:               dataView.getUint8(2),
-                        uptime_sec:         dataView.getUint32(3, true),
-                        vendor_status_code: dataView.getUint16(7, true),
-                        last_seen_ms:       dataView.getUint32(9, true),
-                        name:               String.fromCharCode(...new Uint8Array(dataView.buffer, dataView.byteOffset + 14, dataView.getUint8(13))),
+                        nodeID:             data.getUint8(0),
+                        health:             data.getUint8(1),
+                        mode:               data.getUint8(2),
+                        uptime_sec:         data.getUint32(3, true),
+                        vendor_status_code: data.getUint16(7, true),
+                        last_seen_ms:       data.getUint32(9, true),
+                        name:               String.fromCharCode(...new Uint8Array(data.buffer, data.byteOffset + 14, data.getUint8(13))),
                     };
                 }
                 break;

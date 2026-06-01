@@ -14,16 +14,14 @@
   const dronecanTab = {};
 
   dronecanTab.initialize = function (callback) {
-      if (GUI.active_tab !== 'dronecan') {
-          GUI.active_tab = 'dronecan';
-      }
+      GUI.active_tab = this;
 
       import('./dronecan.html?raw').then(({default: html}) => {
           GUI.load(html, () => {
               i18n.localize();
               dronecanTab.refresh();
               interval.add('dronecan_refresh', () => dronecanTab.refresh(), 2000);
-              if (callback) callback();
+              GUI.content_ready(callback);
           });
       });
   };
@@ -92,7 +90,7 @@
   };
 
   dronecanTab.cleanup = function (callback) {
-      interval.kill('dronecan_refresh');
+      interval.remove('dronecan_refresh');
       if (callback) callback();
   };
 

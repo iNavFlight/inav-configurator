@@ -1,0 +1,39 @@
+.health-badge {
+      display: inline-block;
+      padding: 0.15em 0.5em;
+      border-radius: 3px;
+      font-weight: bold;
+      color: #fff;
+  }
+
+  .health-ok       { background-color: #2e7d32; }
+  .health-warning  { background-color: #f57f17; }
+  .health-error    { background-color: #c62828; }
+  .health-critical { background-color: #6a1b9a; }
+
+  #dronecan-node-table {
+      width: 100%;
+      border-collapse: collapse;
+  }
+
+  #dronecan-node-table th,
+  #dronecan-node-table td {
+      padding: 0.4em 0.6em;
+      border-bottom: 1px solid #444;
+      text-align: left;
+  }
+
+  #dronecan-node-table tbody tr:hover {
+      background-color: rgba(255,255,255,0.05);
+      cursor: pointer;
+  }
+
+  #dronecan-node-detail {
+      margin-top: 1.5em;
+  }
+
+  #dronecan-detail-table th {
+      padding-right: 1em;
+      text-align: left;
+      color: #aaa;
+  }
