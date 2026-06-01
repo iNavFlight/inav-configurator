@@ -113,7 +113,8 @@
     border-top-right-radius: 0;
 }
 
-.tab-gps .gps-dronecan-info {
+.tab-gps .gps-dronecan-info span {
+    display: block;
     padding: 5px;
     margin: 5px 0;
     background: #f0f0f0;
