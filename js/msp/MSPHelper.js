@@ -1565,6 +1565,7 @@ var mspHelper = (function () {
                     const count = data.getUint8(0);
                     for (let i = 0; i < count; i++) {
                         const offset = 1 + i * 7;
+                        if (offset + 7 > data.byteLength) break;
                         FC.DRONECAN_NODES.push({
                             nodeID:      data.getUint8(offset),
                             health:      data.getUint8(offset + 1),

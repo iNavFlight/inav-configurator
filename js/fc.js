@@ -613,6 +613,9 @@ var FC = {
            items: [],
         };
 
+        this.DRONECAN_NODES = [];
+        this.DRONECAN_NODE_INFO = null;
+
     },
     getOutputUsages: function() {
         return {
