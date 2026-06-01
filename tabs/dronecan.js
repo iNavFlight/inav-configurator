@@ -97,6 +97,8 @@
               <tr><th>Name</th><td>${info.name}</td></tr>
               <tr><th>Health</th><td>${HEALTH_LABELS[info.health] || info.health}</td></tr>
               <tr><th>Mode</th><td>${MODE_LABELS[info.mode] || info.mode}</td></tr>
+              <tr><th>Last Seen</th><td>${(info.last_seen_ms / 1000).toFixed(1)}s ago</td></tr>
+              <tr><th>Uptime</th><td>${uptime}</td></tr>
               <tr><th>Vendor Status</th><td>${info.vendor_status_code}</td></tr>
           `;
           detail.style.display = '';
