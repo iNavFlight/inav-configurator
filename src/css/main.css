@@ -1141,6 +1141,18 @@ li.active .ic_mag {
     background-image: url("./../../images/icons/cf_icon_mag_white.svg");
 }
 
+.ic_dronecan {
+    background-image: url("./../../images/icons/cf_icon_dronecan_grey.svg");
+}
+
+.ic_dronecan:hover {
+    background-image: url("./../../images/icons/cf_icon_dronecan_white.svg");
+}
+
+li.active .ic_dronecan {
+    background-image: url("./../../images/icons/cf_icon_dronecan_white.svg");
+}
+
 .ic_search {
     background-image: url("./../../images/icons/search-white.svg");
 }
