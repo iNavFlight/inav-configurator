@@ -1322,6 +1322,9 @@
     "configurationGPSProtocol": {
         "message": "Protocol"
     },
+    "gpsDroneCANInfo": {
+        "message": "GPS is provided via DroneCAN. Configure bus settings on the DroneCAN tab. Serial port and baud rate do not apply."
+    },
     "configurationGPSUseGalileo": {
         "message": "Gps use Galileo Satellites (EU)"
     },

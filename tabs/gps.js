@@ -190,6 +190,13 @@ gpsTab.initialize = function (callback) {
 
         gps_protocol_e.on('change', function () {
             FC.MISC.gps_type = parseInt($(this).val());
+            const isDroneCAN = FC.MISC.gps_type === 4;
+            $('#gps_port').closest('.select').toggle(!isDroneCAN);
+            $('#gps_baud').closest('.select').toggle(!isDroneCAN);
+            $('#gps_dronecan_info').toggle(isDroneCAN);
+            if (isDroneCAN) {
+                $port.val(-1);
+            }
         });
 
         gps_protocol_e.val(FC.MISC.gps_type);

@@ -671,7 +671,9 @@ var FC = {
         return [
             'UBLOX',
             'MSP',
-            'FAKE'
+            'CRSF',
+            'FAKE',
+            'DRONECAN'
         ];
     },
     getGpsBaudRates: function () {
