@@ -1587,6 +1587,16 @@ var mspHelper = (function () {
                         last_seen_ms:       data.getUint32(9, true),
                         name:               String.fromCharCode(...new Uint8Array(data.buffer, data.byteOffset + 14, data.getUint8(13))),
                     };
+                if (data.byteLength >= 71) {
+                    const info = FC.DRONECAN_NODE_INFO;
+                    info.sw_major                   = data.getUint8(46);
+                    info.sw_minor                   = data.getUint8(47);
+                    info.sw_optional_field_flags    = data.getUint8(48);
+                    info.sw_vcs_commit              = data.getUint32(49, true);
+                    info.hw_major                   = data.getUint8(53);
+                    info.hw_minor                   = data.getUint8(54);
+                    info.hw_unique_id               = new Uint8Array(data.buffer, data.byteOffset + 55, 16);
+                    }
                 }
                 break;
 
