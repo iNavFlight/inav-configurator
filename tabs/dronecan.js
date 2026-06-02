@@ -120,6 +120,11 @@ dronecanTab.showDetail = function (nodeId) {
             <tr><th>Last Seen</th><td>${(info.last_seen_ms / 1000).toFixed(1)}s ago</td></tr>
             <tr><th>Uptime</th><td>${uptime}</td></tr>
             <tr><th>Vendor Status</th><td>${info.vendor_status_code}</td></tr>
+            ${info.sw_major !== undefined ? `
+                <tr><th>SW Version</th><td>${info.sw_major}.${info.sw_minor}${(info.sw_optional_field_flags & 1) ? ` (${info.sw_vcs_commit.toString(16).padStart(8, '0')})` : ''}</td></tr>
+                <tr><th>HW Version</th><td>${info.hw_major}.${info.hw_minor}</td></tr>
+                <tr><th>Unique ID</th><td>${Array.from(info.hw_unique_id).map(b => b.toString(16).padStart(2, '0')).join(':')}</td></tr>
+            ` : ''}
         `;
         tbody.querySelector('.dronecan-detail-name').textContent = info.name;
         detail.style.display = '';
