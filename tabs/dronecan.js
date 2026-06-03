@@ -227,7 +227,7 @@ dronecanTab.showDetail = function (nodeId) {
 dronecanTab.showParams = function (nodeId) {
     const container = document.getElementById('dronecan-params');
     if (!container) return;
-    container.innerHTML = '<p>Loading parameters...</p>';
+    container.innerHTML = `<p>${i18n.getMessage('dronecanParamsLoading')}</p>`;
 
     const params = [];
 
@@ -248,7 +248,7 @@ dronecanTab.showParams = function (nodeId) {
 
     function renderParams() {
         if (params.length === 0) {
-            container.innerHTML = '<p>No parameters.</p>';
+            container.innerHTML = `<p>${i18n.getMessage('dronecanNoParams')}</p>`;
             return;
         }
         const TYPE_LABELS = ['', 'INT', 'FLOAT', 'BOOL', 'STRING'];
@@ -256,6 +256,9 @@ dronecanTab.showParams = function (nodeId) {
             if (v === undefined) return '—';
             return type === 2 ? Number(v).toFixed(3) : String(v);
         };
+        const lblWrite       = i18n.getMessage('dronecanParamWrite');
+        const lblSaveEeprom  = i18n.getMessage('dronecanSaveToEeprom');
+        const lblRestartNode = i18n.getMessage('dronecanRestartNode');
         let html = '<table><thead><tr><th>#</th><th>Name</th><th>Type</th><th>Value</th><th>Range</th><th></th></tr></thead><tbody>';
         params.forEach(p => {
             const valStr = p.value_type === 3 ? (p.value ? 'true' : 'false') : String(p.value);
@@ -269,11 +272,11 @@ dronecanTab.showParams = function (nodeId) {
                 <td>${TYPE_LABELS[p.value_type] || p.value_type}</td>
                 <td><input class="param-input" data-index="${p.index}" data-type="${p.value_type}" value="${esc(valStr)}"></td>
                 <td class="param-range">${esc(rangeStr)}</td>
-                <td><button class="param-write" data-index="${p.index}">Write</button></td>
+                <td><button class="param-write" data-index="${p.index}">${esc(lblWrite)}</button></td>
             </tr>`;
         });
         html += '</tbody></table>';
-        html += '<div class="param-actions"><button class="param-action-btn param-save-eeprom">Save to EEPROM</button> <button class="param-action-btn param-restart-node">Restart Node</button></div>';
+        html += `<div class="param-actions"><button class="param-action-btn param-save-eeprom">${esc(lblSaveEeprom)}</button> <button class="param-action-btn param-restart-node">${esc(lblRestartNode)}</button></div>`;
         container.innerHTML = html;
 
         container.querySelector('.param-save-eeprom').addEventListener('click', function () {
@@ -281,9 +284,10 @@ dronecanTab.showParams = function (nodeId) {
             btn.disabled = true;
             btn.textContent = '...';
             dronecanAsyncPoll(10, nodeId, { opcode: 0 }, (err, result) => {
-                btn.textContent = (!err && result && result.ok) ? 'Saved!' : 'Failed';
+                btn.textContent = (!err && result && result.ok)
+                    ? i18n.getMessage('dronecanSaved') : i18n.getMessage('dronecanFailed');
                 btn.disabled = false;
-                setTimeout(() => { btn.textContent = 'Save to EEPROM'; }, 2000);
+                setTimeout(() => { btn.textContent = i18n.getMessage('dronecanSaveToEeprom'); }, 2000);
             });
         });
 
@@ -292,9 +296,10 @@ dronecanTab.showParams = function (nodeId) {
             btn.disabled = true;
             btn.textContent = '...';
             dronecanAsyncPoll(5, nodeId, null, (err, result) => {
-                btn.textContent = (!err && result && result.ok) ? 'Restarting...' : 'Failed';
+                btn.textContent = (!err && result && result.ok)
+                    ? i18n.getMessage('dronecanRestarting') : i18n.getMessage('dronecanFailed');
                 btn.disabled = false;
-                setTimeout(() => { btn.textContent = 'Restart Node'; }, 3000);
+                setTimeout(() => { btn.textContent = i18n.getMessage('dronecanRestartNode'); }, 3000);
             });
         });
 
@@ -322,9 +327,9 @@ dronecanTab.showParams = function (nodeId) {
                         input.style.outline = '2px solid #cc0000';
                         const lo = param.min !== undefined ? param.min : '—';
                         const hi = param.max !== undefined ? param.max : '—';
-                        input.title = `Must be between ${lo} and ${hi}`;
-                        btn.textContent = 'Out of range';
-                        setTimeout(() => { btn.textContent = 'Write'; }, 2000);
+                        input.title = i18n.getMessage('dronecanParamRangeMustBeBetween', [lo, hi]);
+                        btn.textContent = i18n.getMessage('dronecanParamOutOfRange');
+                        setTimeout(() => { btn.textContent = i18n.getMessage('dronecanParamWrite'); }, 2000);
                         return;
                     }
                 }
@@ -337,12 +342,12 @@ dronecanTab.showParams = function (nodeId) {
                     if (!err && result) {
                         param.value = result.value;
                         input.value = param.value_type === 3 ? (result.value ? 'true' : 'false') : String(result.value);
-                        btn.textContent = 'OK';
+                        btn.textContent = i18n.getMessage('OK');
                     } else {
-                        btn.textContent = 'ERR';
+                        btn.textContent = i18n.getMessage('dronecanParamError');
                     }
                     btn.disabled = false;
-                    setTimeout(() => { btn.textContent = 'Write'; }, 2000);
+                    setTimeout(() => { btn.textContent = i18n.getMessage('dronecanParamWrite'); }, 2000);
                 });
             });
         });

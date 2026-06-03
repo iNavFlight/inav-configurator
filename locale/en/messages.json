@@ -6589,5 +6589,38 @@
     },
     "migrationMissingProfileWarning": {
         "message": "No migration profile available for version $1 → $2. Settings will be restored without conversion — some may fail or be ignored by the firmware."
+    },
+    "dronecanParamsLoading": {
+        "message": "Loading parameters..."
+    },
+    "dronecanNoParams": {
+        "message": "No parameters."
+    },
+    "dronecanParamWrite": {
+        "message": "Write"
+    },
+    "dronecanParamError": {
+        "message": "ERR"
+    },
+    "dronecanParamOutOfRange": {
+        "message": "Out of range"
+    },
+    "dronecanParamRangeMustBeBetween": {
+        "message": "Must be between $1 and $2"
+    },
+    "dronecanSaveToEeprom": {
+        "message": "Save to EEPROM"
+    },
+    "dronecanSaved": {
+        "message": "Saved!"
+    },
+    "dronecanFailed": {
+        "message": "Failed"
+    },
+    "dronecanRestartNode": {
+        "message": "Restart Node"
+    },
+    "dronecanRestarting": {
+        "message": "Restarting..."
     }
 }
