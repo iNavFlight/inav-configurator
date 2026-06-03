@@ -1619,10 +1619,12 @@ var mspHelper = (function () {
                                         const lo = data.getUint32(offset, true);
                                         const hi = data.getUint32(offset + 4, true);
                                         const big = BigInt(hi) * BigInt(0x100000000) + BigInt(lo);
-                                        result.value = (big >= BigInt(Number.MIN_SAFE_INTEGER) &&
-                                                        big <= BigInt(Number.MAX_SAFE_INTEGER))
-                                                       ? Number(big) : big;
+                                        const signed = big >= (1n << 63n) ? big - (1n << 64n) : big;
+                                        result.value = (signed >= BigInt(Number.MIN_SAFE_INTEGER) &&
+                                                        signed <= BigInt(Number.MAX_SAFE_INTEGER))
+                                                        ? Number(signed) : signed;
                                         break;
+
                                     }
                                     case 2: // FLOAT
                                         result.value = data.getFloat32(offset, true);
