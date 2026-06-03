@@ -9,7 +9,7 @@
   .health-ok       { background-color: green; }
   .health-warning  { background-color: #f57f17; }
   .health-error    { background-color: red; }
-  .health-critical { background-color: red; }
+  .health-critical { background-color: #7b0000; }
 
   #dronecan-node-table {
       width: 100%;

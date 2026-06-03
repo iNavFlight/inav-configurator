@@ -1641,6 +1641,8 @@ var mspHelper = (function () {
                                     default:
                                         result.value = null;
                                 }
+                                // offset is not advanced past the value — nothing follows in the current protocol.
+                                // If firmware extends PARAM_GETSET responses with min/max fields, advance offset here.
                             }
                         }
                     }

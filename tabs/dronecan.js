@@ -10,6 +10,7 @@ import interval from './../js/intervals';
 
 const HEALTH_LABELS = ['OK', 'WARNING', 'ERROR', 'CRITICAL'];
 const HEALTH_CLASSES = ['health-ok', 'health-warning', 'health-error', 'health-critical'];
+const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 const MODE_LABELS = ['OPERATIONAL', 'INITIALIZATION', 'MAINTENANCE', 'SOFTWARE_UPDATE', 'UNKNOWN_4', 'UNKNOWN_5', 'UNKNOWN_6', 'OFFLINE'];
 
 const dronecanTab = {};
@@ -196,7 +197,7 @@ dronecanTab.showDetail = function (nodeId) {
           
         tbody.innerHTML = `
             <tr><th>Node ID</th><td>${nodeId}</td></tr>
-            <tr><th>Name</th><td class="dronecan-detail-name">${result ? result.name : (err ? 'Error' : '—')}</td></tr>
+            <tr><th>Name</th><td class="dronecan-detail-name">${result ? esc(result.name) : (err ? 'Error' : '—')}</td></tr>
             <tr><th>Health</th><td data-detail="health">${HEALTH_LABELS[node.health] || node.health}</td></tr>
             <tr><th>Mode</th><td data-detail="mode">${modeLabel}</td></tr>
             <tr><th>Last Seen</th><td data-detail="last-seen">${(node.last_seen_ms / 1000).toFixed(1)}s ago</td></tr>
@@ -243,9 +244,9 @@ dronecanTab.showParams = function (nodeId) {
             const valStr = p.value_type === 3 ? (p.value ? 'true' : 'false') : String(p.value);
             html += `<tr>
                 <td>${p.index}</td>
-                <td>${p.name}</td>
+                <td>${esc(p.name)}</td>
                 <td>${TYPE_LABELS[p.value_type] || p.value_type}</td>
-                <td><input class="param-input" data-index="${p.index}" data-type="${p.value_type}" value="${valStr}"></td>
+                <td><input class="param-input" data-index="${p.index}" data-type="${p.value_type}" value="${esc(valStr)}"></td>
                 <td><button class="param-write" data-index="${p.index}">Write</button></td>
             </tr>`;
         });
@@ -331,7 +332,7 @@ dronecanTab.saveConfig = function () {
 dronecanTab.cleanup = function (callback) {
     interval.remove('dronecan_refresh');
     currentDetailNodeId = null;
-    Object.keys(nameCache).forEach(k => delete nameCache[k]);
+    Object.keys(nameCache).forEach(k => delete nameCache[k]); // prevent stale names from a previous vehicle appearing on reconnect
     if (callback) callback();
 };
 
