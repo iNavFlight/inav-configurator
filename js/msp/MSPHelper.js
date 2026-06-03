@@ -1645,6 +1645,26 @@ var mspHelper = (function () {
                                     default:
                                         result.value = null;
                                 }
+                                const decodeNumeric = () => {
+                                    const type = data.getUint8(offset++);
+                                    if (type === 1) { // INTEGER
+                                        const lo = data.getUint32(offset, true);
+                                        const hi = data.getUint32(offset + 4, true);
+                                        offset += 8;
+                                        const big = BigInt(hi) * BigInt(0x100000000) + BigInt(lo);
+                                        const signed = big >= (1n << 63n) ? big - (1n << 64n) : big;
+                                        return (signed >= BigInt(Number.MIN_SAFE_INTEGER) &&
+                                                signed <= BigInt(Number.MAX_SAFE_INTEGER))
+                                               ? Number(signed) : signed;
+                                    } else if (type === 2) { // FLOAT
+                                        const v = data.getFloat32(offset, true);
+                                        offset += 4;
+                                        return v;
+                                    }
+                                    return undefined; // EMPTY
+                                };
+                                result.min = decodeNumeric();
+                                result.max = decodeNumeric();
                             }
                         }
                         } catch (e) { /* truncated or malformed response — result fields may be partial */ }

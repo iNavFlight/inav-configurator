@@ -240,7 +240,8 @@ dronecanTab.showParams = function (nodeId) {
                 renderParams();
                 return;
             }
-            params.push({ index, name: result.name, value_type: result.value_type, value: result.value });
+            params.push({ index, name: result.name, value_type: result.value_type, value: result.value,
+                min: result.min, max: result.max });
             fetchParam(index + 1);
         });
     }
@@ -251,14 +252,23 @@ dronecanTab.showParams = function (nodeId) {
             return;
         }
         const TYPE_LABELS = ['', 'INT', 'FLOAT', 'BOOL', 'STRING'];
-        let html = '<table><thead><tr><th>#</th><th>Name</th><th>Type</th><th>Value</th><th></th></tr></thead><tbody>';
+        const fmtNumeric = (v, type) => {
+            if (v === undefined) return '—';
+            return type === 2 ? Number(v).toFixed(3) : String(v);
+        };
+        let html = '<table><thead><tr><th>#</th><th>Name</th><th>Type</th><th>Value</th><th>Range</th><th></th></tr></thead><tbody>';
         params.forEach(p => {
             const valStr = p.value_type === 3 ? (p.value ? 'true' : 'false') : String(p.value);
+            const hasRange = (p.value_type === 1 || p.value_type === 2) && (p.min !== undefined || p.max !== undefined);
+            const rangeStr = hasRange
+                ? `${fmtNumeric(p.min, p.value_type)} … ${fmtNumeric(p.max, p.value_type)}`
+                : '—';
             html += `<tr>
                 <td>${p.index}</td>
                 <td>${esc(p.name)}</td>
                 <td>${TYPE_LABELS[p.value_type] || p.value_type}</td>
                 <td><input class="param-input" data-index="${p.index}" data-type="${p.value_type}" value="${esc(valStr)}"></td>
+                <td class="param-range">${esc(rangeStr)}</td>
                 <td><button class="param-write" data-index="${p.index}">Write</button></td>
             </tr>`;
         });
@@ -303,6 +313,23 @@ dronecanTab.showParams = function (nodeId) {
                     case 3: payload.value = writeValue === 'true' || writeValue === '1'; break;
                     case 4: payload.value = writeValue; break;
                 }
+
+                if (param.value_type === 1 || param.value_type === 2) {
+                    const num = Number(payload.value);
+                    const tooLow  = param.min !== undefined && num < param.min;
+                    const tooHigh = param.max !== undefined && num > param.max;
+                    if (tooLow || tooHigh) {
+                        input.style.outline = '2px solid #cc0000';
+                        const lo = param.min !== undefined ? param.min : '—';
+                        const hi = param.max !== undefined ? param.max : '—';
+                        input.title = `Must be between ${lo} and ${hi}`;
+                        btn.textContent = 'Out of range';
+                        setTimeout(() => { btn.textContent = 'Write'; }, 2000);
+                        return;
+                    }
+                }
+                input.style.outline = '';
+                input.title = '';
 
                 btn.disabled = true;
                 btn.textContent = '...';

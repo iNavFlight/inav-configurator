@@ -6,9 +6,9 @@
       color: #fff;
   }
 
-  .health-ok       { background-color: green; }
+  .health-ok       { background-color: #388e3c; }
   .health-warning  { background-color: #f57f17; }
-  .health-error    { background-color: red; }
+  .health-error    { background-color: #cc0000; }
   .health-critical { background-color: #7b0000; }
 
   #dronecan-node-table {
@@ -89,6 +89,11 @@
       margin-top: 1em;
       display: flex;
       gap: 0.5em;
+      align-items: center;
+  }
+
+  #dronecan-params button.param-save-eeprom {
+      min-width: 9em;
   }
 
   #dronecan-params button.param-action-btn {
