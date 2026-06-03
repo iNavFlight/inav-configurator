@@ -26,6 +26,16 @@ import {Geozone, GeozoneVertex, GeozoneShapes } from './../geozone';
 var mspHelper = (function () {
     var self = {};
 
+    const PARAM_TYPE_INT    = 1;
+    const PARAM_TYPE_FLOAT  = 2;
+    const PARAM_TYPE_BOOL   = 3;
+    const PARAM_TYPE_STRING = 4;
+    const DRONECAN_SERVICE_GETNODEINFO    = 1;
+    const DRONECAN_SERVICE_RESTART_NODE   = 5;
+    const DRONECAN_SERVICE_EXECUTE_OPCODE = 10;
+    const DRONECAN_SERVICE_PARAM_GETSET   = 11;
+    const DRONECAN_ASYNC_STATE_READY      = 2;
+
     self.sensorStatusEx = null;
 
     self.setSensorStatusEx = function (cb)  {
@@ -1595,51 +1605,88 @@ var mspHelper = (function () {
                     const node_id    = data.getUint8(4); 
                     const result = { state, seq, service_id, node_id };
                       
-                    if (state === 2) { // READY
+                    if (state === DRONECAN_ASYNC_STATE_READY) {
+                        try {
                         let offset = 5;
-                        const name_len = data.getUint8(offset++);
-                        result.name = String.fromCharCode(
-                            ...new Uint8Array(data.buffer, data.byteOffset + offset, name_len));
-                        offset += name_len;
-                          
-                        if (service_id === 1) { // GETNODEINFO
-                            result.sw_major                = data.getUint8(offset++);
-                            result.sw_minor                = data.getUint8(offset++);
-                            result.sw_optional_field_flags = data.getUint8(offset++);
-                            result.sw_vcs_commit           = data.getUint32(offset, true); offset += 4;
-                            result.hw_major                = data.getUint8(offset++);
-                            result.hw_minor                = data.getUint8(offset++);
-                            result.hw_unique_id            = new Uint8Array(
-                                data.buffer, data.byteOffset + offset, 16);
-                        } else if (service_id === 11) { // PARAM_GETSET
-                            result.value_type = data.getUint8(offset++);
-                            switch (result.value_type) {
-                                case 1: { // INT
-                                    const lo = data.getUint32(offset, true);
-                                    const hi = data.getUint32(offset + 4, true);
-                                    const big = BigInt(hi) * BigInt(0x100000000) + BigInt(lo);
-                                    result.value = (big >= BigInt(Number.MIN_SAFE_INTEGER) &&
-                                                    big <= BigInt(Number.MAX_SAFE_INTEGER))
-                                                   ? Number(big) : big;
-                                    break;         
-                                }   
-                                case 2: // FLOAT
-                                    result.value = data.getFloat32(offset, true);
-                                    break;
-                                case 3: // BOOL
-                                    result.value = data.getUint8(offset) !== 0;
-                                    break;
-                                case 4: { // STRING
-                                    const slen = data.getUint8(offset++);
-                                    result.value = String.fromCharCode(
-                                        ...new Uint8Array(data.buffer, data.byteOffset + offset, slen));
-                                    break;
-                                }   
-                                default:
-                                    result.value = null;
+                        if (service_id === DRONECAN_SERVICE_RESTART_NODE || service_id === DRONECAN_SERVICE_EXECUTE_OPCODE) {
+                            result.ok = data.getUint8(offset) !== 0;
+                        } else {
+                            const name_len = data.getUint8(offset++);
+                            result.name = String.fromCodePoint(
+                                ...new Uint8Array(data.buffer, data.byteOffset + offset, name_len));
+                            offset += name_len;
+
+                            if (service_id === DRONECAN_SERVICE_GETNODEINFO) {
+                                result.sw_major                = data.getUint8(offset++);
+                                result.sw_minor                = data.getUint8(offset++);
+                                result.sw_optional_field_flags = data.getUint8(offset++);
+                                result.sw_vcs_commit           = data.getUint32(offset, true); offset += 4;
+                                result.hw_major                = data.getUint8(offset++);
+                                result.hw_minor                = data.getUint8(offset++);
+                                result.hw_unique_id            = new Uint8Array(
+                                    data.buffer, data.byteOffset + offset, 16).slice(); // copy; don't hold a live view into the MSP buffer
+                            } else if (service_id === DRONECAN_SERVICE_PARAM_GETSET) {
+                                result.value_type = data.getUint8(offset++);
+                                switch (result.value_type) {
+                                    case PARAM_TYPE_INT: { // 8 bytes, little-endian lo/hi
+                                        const lo = data.getUint32(offset, true);
+                                        const hi = data.getUint32(offset + 4, true);
+                                        const big = BigInt(hi) * BigInt(0x100000000) + BigInt(lo);
+                                        const signed = big >= (1n << 63n) ? big - (1n << 64n) : big;
+                                        result.value = (signed >= BigInt(Number.MIN_SAFE_INTEGER) &&
+                                                        signed <= BigInt(Number.MAX_SAFE_INTEGER))
+                                                        ? Number(signed) : signed;
+                                        offset += 8;
+                                        break;
+                                    }
+                                    case PARAM_TYPE_FLOAT: // 4 bytes
+                                        result.value = data.getFloat32(offset, true);
+                                        offset += 4;
+                                        break;
+                                    case PARAM_TYPE_BOOL: // 1 byte
+                                        result.value = data.getUint8(offset) !== 0;
+                                        offset += 1;
+                                        break;
+                                    case PARAM_TYPE_STRING: { // 1-byte length prefix + data
+                                        const slen = data.getUint8(offset++);
+                                        result.value = String.fromCodePoint(
+                                            ...new Uint8Array(data.buffer, data.byteOffset + offset, slen));
+                                        offset += slen;
+                                        break;
+                                    }
+                                    default:
+                                        result.value = null;
+                                }
+                                // min/max are NumericValue (EMPTY, INT, or FLOAT); only present for INT and FLOAT params
+                                if (result.value_type === PARAM_TYPE_INT || result.value_type === PARAM_TYPE_FLOAT) {
+                                    const decodeNumeric = () => {
+                                        const type = data.getUint8(offset++);
+                                        let value; // EMPTY — no range provided
+                                        if (type === PARAM_TYPE_INT) {
+                                            const lo = data.getUint32(offset, true);
+                                            const hi = data.getUint32(offset + 4, true);
+                                            offset += 8;
+                                            const big = BigInt(hi) * BigInt(0x100000000) + BigInt(lo);
+                                            const signed = big >= (1n << 63n) ? big - (1n << 64n) : big;
+                                            value = (signed >= BigInt(Number.MIN_SAFE_INTEGER) &&
+                                                     signed <= BigInt(Number.MAX_SAFE_INTEGER))
+                                                    ? Number(signed) : signed;
+                                        } else if (type === PARAM_TYPE_FLOAT) {
+                                            value = data.getFloat32(offset, true);
+                                            offset += 4;
+                                        }
+                                        return value;
+                                    };
+                                    result.min = decodeNumeric();
+                                    result.max = decodeNumeric();
+                                }
                             }
                         }
+                        } catch (e) {
+                            console.warn('MSP2_INAV_DRONECAN_ASYNC_RESULT: truncated or malformed response, result fields may be partial (' + e.message + ')');
+                        }
                     }
+
                     FC.DRONECAN_ASYNC_RESULT = result;
                 }
                 break;

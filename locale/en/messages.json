@@ -234,6 +234,27 @@
     "dronecanNodeIdReservedWarning": {
         "message": "Node IDs 126 and 127 are reserved for diagnostic tools. Are you sure?"
     },
+    "dronecanDetailColProperty": {
+        "message": "Property"
+    },
+    "dronecanDetailColValue": {
+        "message": "Value"
+    },
+    "dronecanParamColIndex": {
+        "message": "#"
+    },
+    "dronecanParamColName": {
+        "message": "Name"
+    },
+    "dronecanParamColType": {
+        "message": "Type"
+    },
+    "dronecanParamColValue": {
+        "message": "Value"
+    },
+    "dronecanParamColRange": {
+        "message": "Range"
+    },
     "tabOutputs": {
         "message": "Outputs"
     },
@@ -7004,5 +7025,44 @@
     },
     "migrationMissingProfileWarning": {
         "message": "No migration profile available for version $1 → $2. Settings will be restored without conversion — some may fail or be ignored by the firmware."
+    },
+    "dronecanParamsLoading": {
+        "message": "Loading parameters..."
+    },
+    "dronecanNoParams": {
+        "message": "No parameters."
+    },
+    "dronecanParamWrite": {
+        "message": "Write"
+    },
+    "dronecanParamError": {
+        "message": "ERR"
+    },
+    "dronecanParamOutOfRange": {
+        "message": "Out of range"
+    },
+    "dronecanParamRangeMustBeBetween": {
+        "message": "Must be between $1 and $2"
+    },
+    "dronecanSaveToEeprom": {
+        "message": "Save to EEPROM"
+    },
+    "dronecanSaved": {
+        "message": "Saved!"
+    },
+    "dronecanFailed": {
+        "message": "Failed"
+    },
+    "dronecanRestartNode": {
+        "message": "Restart Node"
+    },
+    "dronecanRestarting": {
+        "message": "Restarting..."
+    },
+    "dronecanSecondsAgo": {
+        "message": "$1s ago"
+    },
+    "dronecanNameError": {
+        "message": "Error"
     }
 }

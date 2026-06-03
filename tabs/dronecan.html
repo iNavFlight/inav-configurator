@@ -8,7 +8,7 @@
             </div>
             <div class="spacer_box">
                 <div class="dronecan-config-row">
-                    <label data-i18n="dronecanBitrate"></label>
+                    <label for="dronecan-bitrate" data-i18n="dronecanBitrate">CAN Baud Rate</label>
                     <select id="dronecan-bitrate">
                         <option value="125">125 kbps</option>
                         <option value="250">250 kbps</option>
@@ -17,7 +17,7 @@
                     </select>
                 </div>
                 <div class="dronecan-config-row">
-                    <label data-i18n="dronecanNodeId"></label>
+                    <label for="dronecan-node-id" data-i18n="dronecanNodeId">FC Node ID</label>
                     <input id="dronecan-node-id" type="number" min="1" max="127" value="1">
                 </div>
             </div>
@@ -56,6 +56,12 @@
                 </div>
                 <div class="spacer_box">
                     <table class="dronecan-detail">
+                        <thead>
+                            <tr>
+                                <th class="sr-only" data-i18n="dronecanDetailColProperty"></th>
+                                <th class="sr-only" data-i18n="dronecanDetailColValue"></th>
+                            </tr>
+                        </thead>
                         <tbody id="dronecan-detail-tbody"></tbody>
                     </table>
                 </div>
@@ -66,7 +72,7 @@
     </div>
     <div class="content_toolbar supported hide">
         <div class="btn save_btn">
-            <a id="dronecan-save" class="save" href="#" data-i18n="dronecanSave"></a>
+            <a id="dronecan-save" class="save" href="#" data-i18n="dronecanSave">Save &amp; Reboot</a>
         </div>
     </div>
 </div>
