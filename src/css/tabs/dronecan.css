@@ -84,3 +84,33 @@
       color: #555;
       cursor: default;
   }
+
+ .param-actions {
+      margin-top: 1em;
+      display: flex;
+      gap: 0.5em;
+  }
+
+  #dronecan-params button.param-action-btn {
+      padding: 0.35em 1em;
+      background-color: #37a8db;
+      border: 1px solid #37a8db;
+      border-radius: 4px;
+      color: #fff;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all ease 0.2s;
+  }
+
+  #dronecan-params button.param-action-btn:hover {
+      background-color: #2a8ab8;
+      border-color: #2a8ab8;
+  }
+
+  #dronecan-params button.param-action-btn:disabled {
+      background-color: #555;
+      border-color: #555;
+      cursor: default;
+  }
+
+

@@ -1595,49 +1595,54 @@ var mspHelper = (function () {
                       
                     if (state === 2) { // READY
                         let offset = 5;
-                        const name_len = data.getUint8(offset++);
-                        result.name = String.fromCharCode(
-                            ...new Uint8Array(data.buffer, data.byteOffset + offset, name_len));
-                        offset += name_len;
-                          
-                        if (service_id === 1) { // GETNODEINFO
-                            result.sw_major                = data.getUint8(offset++);
-                            result.sw_minor                = data.getUint8(offset++);
-                            result.sw_optional_field_flags = data.getUint8(offset++);
-                            result.sw_vcs_commit           = data.getUint32(offset, true); offset += 4;
-                            result.hw_major                = data.getUint8(offset++);
-                            result.hw_minor                = data.getUint8(offset++);
-                            result.hw_unique_id            = new Uint8Array(
-                                data.buffer, data.byteOffset + offset, 16);
-                        } else if (service_id === 11) { // PARAM_GETSET
-                            result.value_type = data.getUint8(offset++);
-                            switch (result.value_type) {
-                                case 1: { // INT
-                                    const lo = data.getUint32(offset, true);
-                                    const hi = data.getUint32(offset + 4, true);
-                                    const big = BigInt(hi) * BigInt(0x100000000) + BigInt(lo);
-                                    result.value = (big >= BigInt(Number.MIN_SAFE_INTEGER) &&
-                                                    big <= BigInt(Number.MAX_SAFE_INTEGER))
-                                                   ? Number(big) : big;
-                                    break;         
-                                }   
-                                case 2: // FLOAT
-                                    result.value = data.getFloat32(offset, true);
-                                    break;
-                                case 3: // BOOL
-                                    result.value = data.getUint8(offset) !== 0;
-                                    break;
-                                case 4: { // STRING
-                                    const slen = data.getUint8(offset++);
-                                    result.value = String.fromCharCode(
-                                        ...new Uint8Array(data.buffer, data.byteOffset + offset, slen));
-                                    break;
-                                }   
-                                default:
-                                    result.value = null;
+                        if (service_id === 10 || service_id === 5) { // EXECUTE_OPCODE or RESTART_NODE
+                            result.ok = data.getUint8(offset) !== 0;
+                        } else {
+                            const name_len = data.getUint8(offset++);
+                            result.name = String.fromCharCode(
+                                ...new Uint8Array(data.buffer, data.byteOffset + offset, name_len));
+                            offset += name_len;
+
+                            if (service_id === 1) { // GETNODEINFO
+                                result.sw_major                = data.getUint8(offset++);
+                                result.sw_minor                = data.getUint8(offset++);
+                                result.sw_optional_field_flags = data.getUint8(offset++);
+                                result.sw_vcs_commit           = data.getUint32(offset, true); offset += 4;
+                                result.hw_major                = data.getUint8(offset++);
+                                result.hw_minor                = data.getUint8(offset++);
+                                result.hw_unique_id            = new Uint8Array(
+                                    data.buffer, data.byteOffset + offset, 16);
+                            } else if (service_id === 11) { // PARAM_GETSET
+                                result.value_type = data.getUint8(offset++);
+                                switch (result.value_type) {
+                                    case 1: { // INT
+                                        const lo = data.getUint32(offset, true);
+                                        const hi = data.getUint32(offset + 4, true);
+                                        const big = BigInt(hi) * BigInt(0x100000000) + BigInt(lo);
+                                        result.value = (big >= BigInt(Number.MIN_SAFE_INTEGER) &&
+                                                        big <= BigInt(Number.MAX_SAFE_INTEGER))
+                                                       ? Number(big) : big;
+                                        break;
+                                    }
+                                    case 2: // FLOAT
+                                        result.value = data.getFloat32(offset, true);
+                                        break;
+                                    case 3: // BOOL
+                                        result.value = data.getUint8(offset) !== 0;
+                                        break;
+                                    case 4: { // STRING
+                                        const slen = data.getUint8(offset++);
+                                        result.value = String.fromCharCode(
+                                            ...new Uint8Array(data.buffer, data.byteOffset + offset, slen));
+                                        break;
+                                    }
+                                    default:
+                                        result.value = null;
+                                }
                             }
                         }
                     }
+
                     FC.DRONECAN_ASYNC_RESULT = result;
                 }
                 break;

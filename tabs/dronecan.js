@@ -14,6 +14,7 @@ const MODE_LABELS = ['OPERATIONAL', 'INITIALIZATION', 'MAINTENANCE', 'SOFTWARE_U
 
 const dronecanTab = {};
 const nameCache = {};
+let currentDetailNodeId = null;
 
 function dronecanAsyncPoll(service_id, node_id, params, onDone) {
     const reqPayload = [
@@ -43,7 +44,13 @@ function dronecanAsyncPoll(service_id, node_id, params, onDone) {
                     break;
                 }
             }
+            const nameEnc = new TextEncoder().encode(String(params.name || '').slice(0, 92));
+            reqPayload.push(nameEnc.length, ...nameEnc);
         }
+    }
+
+    if (service_id === 10 && params) {
+        reqPayload.push(params.opcode);
     }
 
     MSP.send_message(MSPCodes.MSP2_INAV_DRONECAN_ASYNC_REQUEST, reqPayload, false, () => {
@@ -119,6 +126,9 @@ dronecanTab.render = function () {
     if (!nodes || nodes.length === 0) {
         status.style.display = '';
         table.style.display = 'none';
+        document.getElementById('dronecan-node-detail').style.display = 'none';
+        currentDetailNodeId = null;
+
         return;
     }
 
@@ -152,9 +162,28 @@ dronecanTab.render = function () {
     });
 
     fetchNamesSequentially(nodesToFetch, 0, tbody);
+    if (currentDetailNodeId !== null) {
+        const liveNode = nodes.find(n => n.nodeID === currentDetailNodeId);
+        if (!liveNode) {
+            document.getElementById('dronecan-node-detail').style.display = 'none';
+            currentDetailNodeId = null;
+        } else {
+            const detail = document.getElementById('dronecan-node-detail');
+            const health = liveNode.health < HEALTH_LABELS.length ? liveNode.health : 3;
+            const uptime = `${Math.floor(liveNode.uptime_sec / 3600)}h ${Math.floor((liveNode.uptime_sec % 3600) / 60)}m ${liveNode.uptime_sec % 60}s`;
+            const modeLabel = (liveNode.mode < MODE_LABELS.length && MODE_LABELS[liveNode.mode]) ? MODE_LABELS[liveNode.mode] : `MODE_${liveNode.mode}`;
+            const set = (attr, val) => { const el = detail.querySelector(`[data-detail="${attr}"]`); if (el) el.textContent = val; };
+            set('health', HEALTH_LABELS[health]);
+            set('mode', modeLabel);
+            set('last-seen', `${(liveNode.last_seen_ms / 1000).toFixed(1)}s ago`);
+            set('uptime', uptime);
+            set('vendor-status', liveNode.vendor_status_code);
+        }
+    }
 };
 
 dronecanTab.showDetail = function (nodeId) {
+    currentDetailNodeId = nodeId;
     const node = FC.DRONECAN_NODES.find(n => n.nodeID === nodeId);
     if (!node) return;
     
@@ -167,11 +196,11 @@ dronecanTab.showDetail = function (nodeId) {
         tbody.innerHTML = `
             <tr><th>Node ID</th><td>${nodeId}</td></tr>
             <tr><th>Name</th><td class="dronecan-detail-name">${result ? result.name : (err ? 'Error' : '—')}</td></tr>
-            <tr><th>Health</th><td>${HEALTH_LABELS[node.health] || node.health}</td></tr>
-            <tr><th>Mode</th><td>${modeLabel}</td></tr>
-            <tr><th>Last Seen</th><td>${(node.last_seen_ms / 1000).toFixed(1)}s ago</td></tr>
-            <tr><th>Uptime</th><td>${uptime}</td></tr>
-            <tr><th>Vendor Status</th><td>${node.vendor_status_code}</td></tr>
+            <tr><th>Health</th><td data-detail="health">${HEALTH_LABELS[node.health] || node.health}</td></tr>
+            <tr><th>Mode</th><td data-detail="mode">${modeLabel}</td></tr>
+            <tr><th>Last Seen</th><td data-detail="last-seen">${(node.last_seen_ms / 1000).toFixed(1)}s ago</td></tr>
+            <tr><th>Uptime</th><td data-detail="uptime">${uptime}</td></tr>
+            <tr><th>Vendor Status</th><td data-detail="vendor-status">${node.vendor_status_code}</td></tr>
             ${result ? `
                 <tr><th>SW Version</th><td>${result.sw_major}.${result.sw_minor}${(result.sw_optional_field_flags & 1) ? ` (${result.sw_vcs_commit.toString(16).padStart(8, '0')})` : ''}</td></tr>
                 <tr><th>HW Version</th><td>${result.hw_major}.${result.hw_minor}</td></tr>
@@ -219,8 +248,30 @@ dronecanTab.showParams = function (nodeId) {
             </tr>`;
         });
         html += '</tbody></table>';
+        html += '<div class="param-actions"><button class="param-action-btn param-save-eeprom">Save to EEPROM</button> <button class="param-action-btn param-restart-node">Restart Node</button></div>';
         container.innerHTML = html;
 
+        container.querySelector('.param-save-eeprom').addEventListener('click', function () {
+            const btn = this;
+            btn.disabled = true;
+            btn.textContent = '...';
+            dronecanAsyncPoll(10, nodeId, { opcode: 0 }, (err, result) => {
+                btn.textContent = (!err && result && result.ok) ? 'Saved!' : 'Failed';
+                btn.disabled = false;
+                setTimeout(() => { btn.textContent = 'Save to EEPROM'; }, 2000);
+            });
+        });
+
+        container.querySelector('.param-restart-node').addEventListener('click', function () {
+            const btn = this;
+            btn.disabled = true;
+            btn.textContent = '...';
+            dronecanAsyncPoll(5, nodeId, null, (err, result) => {
+                btn.textContent = (!err && result && result.ok) ? 'Restarting...' : 'Failed';
+                btn.disabled = false;
+                setTimeout(() => { btn.textContent = 'Restart Node'; }, 3000);
+            });
+        });
 
         container.querySelectorAll('.param-write').forEach(btn => {
             btn.addEventListener('click', () => {
@@ -230,7 +281,7 @@ dronecanTab.showParams = function (nodeId) {
                 if (!input || !param) return;
 
                 let writeValue = input.value;
-                const payload = { index: idx, is_write: true, value_type: param.value_type };
+                const payload = { index: idx, is_write: true, value_type: param.value_type, name: param.name };
                 switch (param.value_type) {
                     case 1: payload.value = Number(writeValue); break;
                     case 2: payload.value = parseFloat(writeValue); break;
@@ -277,6 +328,7 @@ dronecanTab.saveConfig = function () {
 
 dronecanTab.cleanup = function (callback) {
     interval.remove('dronecan_refresh');
+    currentDetailNodeId = null;
     Object.keys(nameCache).forEach(k => delete nameCache[k]);
     if (callback) callback();
 };
