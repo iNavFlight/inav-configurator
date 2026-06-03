@@ -37,3 +37,50 @@
       text-align: left;
       color: #aaa;
   }
+  
+  #dronecan-params {
+      padding: 1em 0 40px 0;
+  }
+
+  #dronecan-params table {
+      width: 100%;
+      border-collapse: collapse;
+  }
+
+  #dronecan-params th,
+  #dronecan-params td {
+      padding: 0.4em 0.6em;
+      border-bottom: 1px solid #444;
+      text-align: left;
+  }
+
+  #dronecan-params input.param-input {
+      border: 1px solid #555;
+      padding: 0.2em 0.4em;
+      border-radius: 3px;
+      width: 100%;
+      box-sizing: border-box;
+  }
+  
+  #dronecan-params button.param-write {
+      padding: 0.2em 0.7em;
+      background-color: #fff;
+      border: 1px solid #37a8db;
+      border-radius: 4px;
+      color: #37a8db;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all ease 0.2s;
+      white-space: nowrap;
+  }
+
+  #dronecan-params button.param-write:hover {
+      background-color: #37a8db;
+      color: #fff;
+  }
+
+  #dronecan-params button.param-write:disabled {
+      border-color: #555;
+      color: #555;
+      cursor: default;
+  }

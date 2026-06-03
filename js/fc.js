@@ -89,7 +89,8 @@ var FC = {
     FLIGHT_MODES: null,
     GEOZONES: null,
     DRONECAN_NODES: [],
-    DRONECAN_NODE_INFO: null,
+    DRONECAN_ASYNC_REQUEST: null,
+    DRONECAN_ASYNC_RESULT: null,
 
     restartRequired: false,
     MAX_SERVO_RATE: 125,
@@ -614,7 +615,8 @@ var FC = {
         };
 
         this.DRONECAN_NODES = [];
-        this.DRONECAN_NODE_INFO = null;
+        this.DRONECAN_ASYNC_REQUEST = null;
+        this.DRONECAN_ASYNC_RESULT = null;
 
     },
     getOutputUsages: function() {
