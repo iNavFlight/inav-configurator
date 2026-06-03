@@ -13,10 +13,14 @@ const HEALTH_CLASSES = ['health-ok', 'health-warning', 'health-error', 'health-c
 const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 const POLL_INTERVAL_MS  = 75;
 const POLL_MAX_ATTEMPTS = 34; // 34 polls × 75 ms ≈ 2.5 s total window
-const MODE_LABELS = ['OPERATIONAL', 'INITIALIZATION', 'MAINTENANCE', 'SOFTWARE_UPDATE', 'UNKNOWN_4', 'UNKNOWN_5', 'UNKNOWN_6', 'OFFLINE'];
+const MODE_LABELS = ['OPERATIONAL', 'INITIALIZATION', 'MAINTENANCE', 'SOFTWARE_UPDATE', 'UNKNOWN_4', 'UNKNOWN_5', 'UNKNOWN_6', 'OFFLINE']; // modes 0-3 per DroneCAN NodeStatus; 4-6 reserved by spec
+
+function getModeLabel(mode) {
+    return (mode < MODE_LABELS.length && MODE_LABELS[mode]) ? MODE_LABELS[mode] : `MODE_${mode}`;
+}
 
 const dronecanTab = {};
-const nameCache = {};
+let nameCache = {};
 let currentDetailNodeId = null;
 
 function dronecanAsyncPoll(service_id, node_id, params, onDone) {
@@ -67,7 +71,10 @@ function dronecanAsyncPoll(service_id, node_id, params, onDone) {
         const poll = () => {
             MSP.send_message(MSPCodes.MSP2_INAV_DRONECAN_ASYNC_RESULT, false, false, () => {
                 const r = FC.DRONECAN_ASYNC_RESULT;
-                if (!r || r.seq !== expectedSeq || r.service_id !== service_id || r.node_id !== node_id) { onDone(new Error('stale'), null); return; }
+                if (!r || r.seq !== expectedSeq ||
+                    r.service_id !== service_id || r.node_id !== node_id) {
+                    onDone(new Error('stale'), null); return;
+                }
                 if (r.state === 2) { onDone(null, r); }
                 else if (r.state === 3) { onDone(new Error('error'), null); }
                 else if (++attempts < POLL_MAX_ATTEMPTS) { setTimeout(poll, POLL_INTERVAL_MS); }
@@ -142,16 +149,16 @@ dronecanTab.render = function () {
     const nodesToFetch = [];
     nodes.forEach(node => {
         const health = node.health < HEALTH_LABELS.length ? node.health : 3;
-        const modeLabel = (node.mode < MODE_LABELS.length && MODE_LABELS[node.mode]) ? MODE_LABELS[node.mode] : `MODE_${node.mode}`;
+        const modeLabel = getModeLabel(node.mode);
         const lastSeen = (node.last_seen_ms / 1000).toFixed(1) + 's ago';
 
         const row = document.createElement('tr');
         row.dataset.nodeId = node.nodeID;
         row.innerHTML = `
-            <td>${node.nodeID}</td>
+            <td>${esc(node.nodeID)}</td>
             <td>—</td>
             <td><span class="health-badge ${HEALTH_CLASSES[health]}">${HEALTH_LABELS[health]}</span></td>
-            <td>${modeLabel}</td>
+            <td>${esc(modeLabel)}</td>
             <td>${lastSeen}</td>
         `;
         if (nameCache[node.nodeID] !== undefined) {
@@ -174,7 +181,7 @@ dronecanTab.render = function () {
             const detail = document.getElementById('dronecan-node-detail');
             const health = liveNode.health < HEALTH_LABELS.length ? liveNode.health : 3;
             const uptime = `${Math.floor(liveNode.uptime_sec / 3600)}h ${Math.floor((liveNode.uptime_sec % 3600) / 60)}m ${liveNode.uptime_sec % 60}s`;
-            const modeLabel = (liveNode.mode < MODE_LABELS.length && MODE_LABELS[liveNode.mode]) ? MODE_LABELS[liveNode.mode] : `MODE_${liveNode.mode}`;
+            const modeLabel = getModeLabel(liveNode.mode);
             const set = (attr, val) => { const el = detail.querySelector(`[data-detail="${attr}"]`); if (el) el.textContent = val; };
             set('health', HEALTH_LABELS[health]);
             set('mode', modeLabel);
@@ -196,19 +203,19 @@ dronecanTab.showDetail = function (nodeId) {
         const tbody  = document.getElementById('dronecan-detail-tbody');
         const health   = node.health < HEALTH_LABELS.length ? node.health : 3;
         const uptime   = result ? `${Math.floor(node.uptime_sec / 3600)}h ${Math.floor((node.uptime_sec % 3600) / 60)}m ${node.uptime_sec % 60}s` : '—';
-        const modeLabel = (node.mode < MODE_LABELS.length && MODE_LABELS[node.mode]) ? MODE_LABELS[node.mode] : `MODE_${node.mode}`;
+        const modeLabel = getModeLabel(node.mode);
 
         tbody.innerHTML = `
-            <tr><th>Node ID</th><td>${nodeId}</td></tr>
+            <tr><th>Node ID</th><td>${esc(nodeId)}</td></tr>
             <tr><th>Name</th><td class="dronecan-detail-name">${result ? esc(result.name) : (err ? 'Error' : '—')}</td></tr>
             <tr><th>Health</th><td data-detail="health">${HEALTH_LABELS[health]}</td></tr>
-            <tr><th>Mode</th><td data-detail="mode">${modeLabel}</td></tr>
+            <tr><th>Mode</th><td data-detail="mode">${esc(modeLabel)}</td></tr>
             <tr><th>Last Seen</th><td data-detail="last-seen">${(node.last_seen_ms / 1000).toFixed(1)}s ago</td></tr>
             <tr><th>Uptime</th><td data-detail="uptime">${uptime}</td></tr>
-            <tr><th>Vendor Status</th><td data-detail="vendor-status">${node.vendor_status_code}</td></tr>
+            <tr><th>Vendor Status</th><td data-detail="vendor-status">${esc(node.vendor_status_code)}</td></tr>
             ${result ? `
-                <tr><th>SW Version</th><td>${result.sw_major}.${result.sw_minor}${(result.sw_optional_field_flags & 1) ? ` (${result.sw_vcs_commit.toString(16).padStart(8, '0')})` : ''}</td></tr>
-                <tr><th>HW Version</th><td>${result.hw_major}.${result.hw_minor}</td></tr>
+                <tr><th>SW Version</th><td>${esc(result.sw_major)}.${esc(result.sw_minor)}${(result.sw_optional_field_flags & 1) ? ` (${result.sw_vcs_commit.toString(16).padStart(8, '0')})` : ''}</td></tr>
+                <tr><th>HW Version</th><td>${esc(result.hw_major)}.${esc(result.hw_minor)}</td></tr>
                 <tr><th>Unique ID</th><td>${Array.from(result.hw_unique_id).map(b => b.toString(16).padStart(2, '0')).join(':')}</td></tr>
             ` : ''}
         `;
@@ -225,6 +232,7 @@ dronecanTab.showParams = function (nodeId) {
     const params = [];
 
     function fetchParam(index) {
+        if (index > 254) { renderParams(); return; } // DroneCAN param index is 8-bit (0-254 valid)
         if (nodeId !== currentDetailNodeId) return;
         dronecanAsyncPoll(11, nodeId, { index, is_write: false }, (err, result) => {
             if (nodeId !== currentDetailNodeId) return;
@@ -318,7 +326,7 @@ dronecanTab.showParams = function (nodeId) {
 
 dronecanTab.saveConfig = function () {
     const bitrate = $('#dronecan-bitrate').val();
-    const nodeId = parseInt($('#dronecan-node-id').val());
+    const nodeId = parseInt($('#dronecan-node-id').val(), 10);
     if (nodeId >= 126 && !confirm(i18n.getMessage('dronecanNodeIdReservedWarning'))) return;
     mspHelper.setSetting('dronecan_bitrate_kbps', bitrate, function () {
         mspHelper.setSetting('dronecan_node_id', nodeId, function () {
@@ -336,7 +344,7 @@ dronecanTab.saveConfig = function () {
 dronecanTab.cleanup = function (callback) {
     interval.remove('dronecan_refresh');
     currentDetailNodeId = null;
-    Object.keys(nameCache).forEach(k => delete nameCache[k]); // prevent stale names from a previous vehicle appearing on reconnect
+    nameCache = {}; // prevent stale names from a previous vehicle appearing on reconnect
     if (callback) callback();
 };
 

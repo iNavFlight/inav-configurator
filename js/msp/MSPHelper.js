@@ -1616,7 +1616,7 @@ var mspHelper = (function () {
                             } else if (service_id === 11) { // PARAM_GETSET
                                 result.value_type = data.getUint8(offset++);
                                 switch (result.value_type) {
-                                    case 1: { // INT
+                                    case 1: { // INT (8 bytes)
                                         const lo = data.getUint32(offset, true);
                                         const hi = data.getUint32(offset + 4, true);
                                         const big = BigInt(hi) * BigInt(0x100000000) + BigInt(lo);
@@ -1624,26 +1624,27 @@ var mspHelper = (function () {
                                         result.value = (signed >= BigInt(Number.MIN_SAFE_INTEGER) &&
                                                         signed <= BigInt(Number.MAX_SAFE_INTEGER))
                                                         ? Number(signed) : signed;
+                                        offset += 8;
                                         break;
-
                                     }
-                                    case 2: // FLOAT
+                                    case 2: // FLOAT (4 bytes)
                                         result.value = data.getFloat32(offset, true);
+                                        offset += 4;
                                         break;
-                                    case 3: // BOOL
+                                    case 3: // BOOL (1 byte)
                                         result.value = data.getUint8(offset) !== 0;
+                                        offset += 1;
                                         break;
-                                    case 4: { // STRING
+                                    case 4: { // STRING (1-byte length prefix + data)
                                         const slen = data.getUint8(offset++);
                                         result.value = String.fromCharCode(
                                             ...new Uint8Array(data.buffer, data.byteOffset + offset, slen));
+                                        offset += slen;
                                         break;
                                     }
                                     default:
                                         result.value = null;
                                 }
-                                // offset is not advanced past the value — nothing follows in the current protocol.
-                                // If firmware extends PARAM_GETSET responses with min/max fields, advance offset here.
                             }
                         }
                         } catch (e) { /* truncated or malformed response — result fields may be partial */ }
