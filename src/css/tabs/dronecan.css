@@ -1,4 +1,4 @@
-.health-badge {
+  .health-badge {
       display: inline-block;
       padding: 0.15em 0.5em;
       border-radius: 3px;
@@ -39,7 +39,7 @@
   }
   
   #dronecan-params {
-      padding: 1em 0 40px 0;
+      padding: 1em 0 2.5em 0;
   }
 
   #dronecan-params table {

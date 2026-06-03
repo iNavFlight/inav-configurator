@@ -1594,6 +1594,7 @@ var mspHelper = (function () {
                     const result = { state, seq, service_id, node_id };
                       
                     if (state === 2) { // READY
+                        try {
                         let offset = 5;
                         if (service_id === 5 || service_id === 10) { // RESTART_NODE or EXECUTE_OPCODE
                             result.ok = data.getUint8(offset) !== 0;
@@ -1611,7 +1612,7 @@ var mspHelper = (function () {
                                 result.hw_major                = data.getUint8(offset++);
                                 result.hw_minor                = data.getUint8(offset++);
                                 result.hw_unique_id            = new Uint8Array(
-                                    data.buffer, data.byteOffset + offset, 16);
+                                    data.buffer, data.byteOffset + offset, 16).slice(); // copy; don't hold a live view into the MSP buffer
                             } else if (service_id === 11) { // PARAM_GETSET
                                 result.value_type = data.getUint8(offset++);
                                 switch (result.value_type) {
@@ -1645,6 +1646,7 @@ var mspHelper = (function () {
                                 // If firmware extends PARAM_GETSET responses with min/max fields, advance offset here.
                             }
                         }
+                        } catch (e) { /* truncated or malformed response — result fields may be partial */ }
                     }
 
                     FC.DRONECAN_ASYNC_RESULT = result;

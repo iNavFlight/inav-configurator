@@ -11,6 +11,8 @@ import interval from './../js/intervals';
 const HEALTH_LABELS = ['OK', 'WARNING', 'ERROR', 'CRITICAL'];
 const HEALTH_CLASSES = ['health-ok', 'health-warning', 'health-error', 'health-critical'];
 const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+const POLL_INTERVAL_MS  = 75;
+const POLL_MAX_ATTEMPTS = 34; // 34 polls × 75 ms ≈ 2.5 s total window
 const MODE_LABELS = ['OPERATIONAL', 'INITIALIZATION', 'MAINTENANCE', 'SOFTWARE_UPDATE', 'UNKNOWN_4', 'UNKNOWN_5', 'UNKNOWN_6', 'OFFLINE'];
 
 const dronecanTab = {};
@@ -65,14 +67,14 @@ function dronecanAsyncPoll(service_id, node_id, params, onDone) {
         const poll = () => {
             MSP.send_message(MSPCodes.MSP2_INAV_DRONECAN_ASYNC_RESULT, false, false, () => {
                 const r = FC.DRONECAN_ASYNC_RESULT;
-                if (!r || r.seq !== expectedSeq) { onDone(new Error('stale'), null); return; }
+                if (!r || r.seq !== expectedSeq || r.service_id !== service_id || r.node_id !== node_id) { onDone(new Error('stale'), null); return; }
                 if (r.state === 2) { onDone(null, r); }
                 else if (r.state === 3) { onDone(new Error('error'), null); }
-                else if (++attempts < 34) { setTimeout(poll, 75); } // 34 × 75 ms ≈ 2.5 s window
+                else if (++attempts < POLL_MAX_ATTEMPTS) { setTimeout(poll, POLL_INTERVAL_MS); }
                 else { onDone(new Error('timeout'), null); }
             });
         };
-        setTimeout(poll, 75);
+        setTimeout(poll, POLL_INTERVAL_MS);
     });
 }
 
@@ -192,13 +194,14 @@ dronecanTab.showDetail = function (nodeId) {
         if (nodeId !== currentDetailNodeId) return;
         const detail = document.getElementById('dronecan-node-detail');
         const tbody  = document.getElementById('dronecan-detail-tbody');
-        const uptime = result ? `${Math.floor(node.uptime_sec / 3600)}h ${Math.floor((node.uptime_sec % 3600) / 60)}m ${node.uptime_sec % 60}s` : '—';
+        const health   = node.health < HEALTH_LABELS.length ? node.health : 3;
+        const uptime   = result ? `${Math.floor(node.uptime_sec / 3600)}h ${Math.floor((node.uptime_sec % 3600) / 60)}m ${node.uptime_sec % 60}s` : '—';
         const modeLabel = (node.mode < MODE_LABELS.length && MODE_LABELS[node.mode]) ? MODE_LABELS[node.mode] : `MODE_${node.mode}`;
-          
+
         tbody.innerHTML = `
             <tr><th>Node ID</th><td>${nodeId}</td></tr>
             <tr><th>Name</th><td class="dronecan-detail-name">${result ? esc(result.name) : (err ? 'Error' : '—')}</td></tr>
-            <tr><th>Health</th><td data-detail="health">${HEALTH_LABELS[node.health] || node.health}</td></tr>
+            <tr><th>Health</th><td data-detail="health">${HEALTH_LABELS[health]}</td></tr>
             <tr><th>Mode</th><td data-detail="mode">${modeLabel}</td></tr>
             <tr><th>Last Seen</th><td data-detail="last-seen">${(node.last_seen_ms / 1000).toFixed(1)}s ago</td></tr>
             <tr><th>Uptime</th><td data-detail="uptime">${uptime}</td></tr>
@@ -222,6 +225,7 @@ dronecanTab.showParams = function (nodeId) {
     const params = [];
 
     function fetchParam(index) {
+        if (nodeId !== currentDetailNodeId) return;
         dronecanAsyncPoll(11, nodeId, { index, is_write: false }, (err, result) => {
             if (nodeId !== currentDetailNodeId) return;
             if (err || !result || !result.name) {
@@ -283,7 +287,7 @@ dronecanTab.showParams = function (nodeId) {
                 const param = params.find(p => p.index === idx);
                 if (!input || !param) return;
 
-                let writeValue = input.value;
+                const writeValue = input.value;
                 const payload = { index: idx, is_write: true, value_type: param.value_type, name: param.name };
                 switch (param.value_type) {
                     case 1: payload.value = Number(writeValue); break;
