@@ -1562,39 +1562,83 @@ var mspHelper = (function () {
                 if (data.byteLength > 0) {
                     const count = data.getUint8(0);
                     for (let i = 0; i < count; i++) {
-                        const offset = 1 + i * 7;
-                        if (offset + 7 > data.byteLength) break;
+                        const offset = 1 + i * 13;
+                        if (offset + 13 > data.byteLength) break;
                         FC.DRONECAN_NODES.push({
-                            nodeID:      data.getUint8(offset),
-                            health:      data.getUint8(offset + 1),
-                            mode:        data.getUint8(offset + 2),
-                            last_seen_ms: data.getUint32(offset + 3, true),
+                            nodeID:              data.getUint8(offset),
+                            health:              data.getUint8(offset + 1),
+                            mode:                data.getUint8(offset + 2),
+                            last_seen_ms:        data.getUint32(offset + 3, true),
+                            uptime_sec:          data.getUint32(offset + 7, true),
+                            vendor_status_code:  data.getUint16(offset + 11, true),
                         });
                     }
                 }
                 break;
             
-             case MSPCodes.MSP2_INAV_DRONECAN_NODE_INFO:
-                if (data.byteLength >= 46) {
-                    FC.DRONECAN_NODE_INFO = {
-                        nodeID:             data.getUint8(0),
-                        health:             data.getUint8(1),
-                        mode:               data.getUint8(2),
-                        uptime_sec:         data.getUint32(3, true),
-                        vendor_status_code: data.getUint16(7, true),
-                        last_seen_ms:       data.getUint32(9, true),
-                        name:               String.fromCharCode(...new Uint8Array(data.buffer, data.byteOffset + 14, data.getUint8(13))),
-                    };
-                if (data.byteLength >= 71) {
-                    const info = FC.DRONECAN_NODE_INFO;
-                    info.sw_major                   = data.getUint8(46);
-                    info.sw_minor                   = data.getUint8(47);
-                    info.sw_optional_field_flags    = data.getUint8(48);
-                    info.sw_vcs_commit              = data.getUint32(49, true);
-                    info.hw_major                   = data.getUint8(53);
-                    info.hw_minor                   = data.getUint8(54);
-                    info.hw_unique_id               = new Uint8Array(data.buffer, data.byteOffset + 55, 16);
+            case MSPCodes.MSP2_INAV_DRONECAN_ASYNC_REQUEST:
+                if (data.byteLength >= 2) {
+                    FC.DRONECAN_ASYNC_REQUEST = {
+                        status: data.getUint8(0),
+                        seq:    data.getUint8(1),
+                    };  
+                }   
+                break;
+                  
+            case MSPCodes.MSP2_INAV_DRONECAN_ASYNC_RESULT:
+                if (data.byteLength >= 5) {
+                    const state      = data.getUint8(0);
+                    const seq        = data.getUint8(1);
+                    const service_id = data.getUint16(2, true);
+                    const node_id    = data.getUint8(4); 
+                    const result = { state, seq, service_id, node_id };
+                      
+                    if (state === 2) { // READY
+                        let offset = 5;
+                        const name_len = data.getUint8(offset++);
+                        result.name = String.fromCharCode(
+                            ...new Uint8Array(data.buffer, data.byteOffset + offset, name_len));
+                        offset += name_len;
+                          
+                        if (service_id === 1) { // GETNODEINFO
+                            result.sw_major                = data.getUint8(offset++);
+                            result.sw_minor                = data.getUint8(offset++);
+                            result.sw_optional_field_flags = data.getUint8(offset++);
+                            result.sw_vcs_commit           = data.getUint32(offset, true); offset += 4;
+                            result.hw_major                = data.getUint8(offset++);
+                            result.hw_minor                = data.getUint8(offset++);
+                            result.hw_unique_id            = new Uint8Array(
+                                data.buffer, data.byteOffset + offset, 16);
+                        } else if (service_id === 11) { // PARAM_GETSET
+                            result.value_type = data.getUint8(offset++);
+                            switch (result.value_type) {
+                                case 1: { // INT
+                                    const lo = data.getUint32(offset, true);
+                                    const hi = data.getUint32(offset + 4, true);
+                                    const big = BigInt(hi) * BigInt(0x100000000) + BigInt(lo);
+                                    result.value = (big >= BigInt(Number.MIN_SAFE_INTEGER) &&
+                                                    big <= BigInt(Number.MAX_SAFE_INTEGER))
+                                                   ? Number(big) : big;
+                                    break;         
+                                }   
+                                case 2: // FLOAT
+                                    result.value = data.getFloat32(offset, true);
+                                    break;
+                                case 3: // BOOL
+                                    result.value = data.getUint8(offset) !== 0;
+                                    break;
+                                case 4: { // STRING
+                                    const slen = data.getUint8(offset++);
+                                    result.value = String.fromCharCode(
+                                        ...new Uint8Array(data.buffer, data.byteOffset + offset, slen));
+                                    break;
+                                }   
+                                default:
+                                    result.value = null;
+                            }
+                        }
                     }
+                    FC.DRONECAN_ASYNC_RESULT = result;
                 }
                 break;
 
