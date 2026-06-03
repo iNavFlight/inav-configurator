@@ -1502,25 +1502,20 @@ function iconKey(filename) {
         return true;
     }
 
-    function fileLoadMultiMissionCheck() {
+    async function fileLoadMultiMissionCheck() {
         if (singleMissionActive()) {
             return true;
-        } else if (dialog.confirm(i18n.getMessage('confirm_overwrite_multimission_file_load_option'))) {
+        } else if (await dialog.confirm(i18n.getMessage('confirm_overwrite_multimission_file_load_option'))) {
             var options = {
                 filters: [ { name: "Mission file", extensions: ['mission'] } ]
             };
-            dialog.showOpenDialog(options).then(result => {
-                if (result.canceled) {
-                    return;
-                }
-
-                if (result.filePaths.length == 1) {
-                    loadMissionFile(result.filePaths[0]);
-                    multimissionCount = 0;
-                    multimission.flush();
-                    renderMultimissionTable();
-                }
-            });
+            const result = await dialog.showOpenDialog(options);
+            if (!result.canceled && result.filePaths.length == 1) {
+                loadMissionFile(result.filePaths[0]);
+                multimissionCount = 0;
+                multimission.flush();
+                renderMultimissionTable();
+            }
         }
         return false;
     }
@@ -1585,10 +1580,10 @@ function iconKey(filename) {
                 }
             });
         });
-        $('.layer-delete').on('click', function(event) {
+        $('.layer-delete').on('click', async function(event) {
             event.preventDefault();
             const layerName = $(this).attr('data-layer-name');
-            if (dialog.confirm(i18n.getMessage('layerConfirmDelete'))) {
+            if (await dialog.confirm(i18n.getMessage('layerConfirmDelete'))) {
                 removeLayerFromDisk(layerName);
             }
         });
@@ -3728,14 +3723,14 @@ function iconKey(filename) {
             }, 1000);
         });
 
-        $('#saveEepromGeozoneButton').on('click', event => {
+        $('#saveEepromGeozoneButton').on('click', async event => {
 
             if (invalidGeoZones) {
                 dialog.alert(i18n.getMessage("geozoneUnableToSave"));
                 return;
             }
             
-            if (dialog.confirm(i18n.getMessage("missionGeozoneReboot"))) {            
+            if (await dialog.confirm(i18n.getMessage("missionGeozoneReboot"))) {
                 $(event.currentTarget).addClass('disabled');
                 GUI.log('Start of sending Geozones');
                 mspHelper.saveGeozones(() => {
@@ -3894,8 +3889,8 @@ function iconKey(filename) {
         /////////////////////////////////////////////
         // Callback for Remove buttons
         /////////////////////////////////////////////
-        $('#removeAllPoints').on('click', function () {
-            if (markers.length && dialog.confirm(i18n.getMessage('confirm_delete_all_points'))) {
+        $('#removeAllPoints').on('click', async function () {
+            if (markers.length && await dialog.confirm(i18n.getMessage('confirm_delete_all_points'))) {
                 if (removeAllMultiMissionCheck()) {
                     removeAllWaypoints();
                     updateMultimissionState();
@@ -4046,13 +4041,13 @@ function iconKey(filename) {
             }
         });
 
-        $('#removePoint').on('click', function () {
+        $('#removePoint').on('click', async function () {
             if (selectedMarker) {
                 if (mission.isJumpTargetAttached(selectedMarker)) {
                     dialog.alert(i18n.getMessage('MissionPlannerJumpTargetRemoval'));
                 }
                 else if (mission.getAttachedFromWaypoint(selectedMarker) && mission.getAttachedFromWaypoint(selectedMarker).length != 0) {
-                    if (dialog.confirm(i18n.getMessage('confirm_delete_point_with_options'))) {
+                    if (await dialog.confirm(i18n.getMessage('confirm_delete_point_with_options'))) {
                         mission.getAttachedFromWaypoint(selectedMarker).forEach(function (element) {
 
                             if (element.getAction() == MWNP.WPTYPE.LAND) {
@@ -4090,21 +4085,17 @@ function iconKey(filename) {
         /////////////////////////////////////////////
         // Callback for Save/load buttons
         /////////////////////////////////////////////
-        $('#loadFileMissionButton').off('click').on('click', function () {
-            if (!fileLoadMultiMissionCheck()) return;
+        $('#loadFileMissionButton').off('click').on('click', async function () {
+            if (!await fileLoadMultiMissionCheck()) return;
 
-            if (markers.length && !dialog.confirm(i18n.getMessage('confirm_delete_all_points'))) return;
+            if (markers.length && !await dialog.confirm(i18n.getMessage('confirm_delete_all_points'))) return;
             var options = {
                 filters: [ { name: "Mission file", extensions: ['mission'] } ]
             };
-            dialog.showOpenDialog(options).then(result => {
-                if (result.canceled) {
-                    return;
-                }
-                if (result.filePaths.length == 1) {
-                    loadMissionFile(result.filePaths[0]);
-                }
-            })
+            const result = await dialog.showOpenDialog(options);
+            if (!result.canceled && result.filePaths.length == 1) {
+                loadMissionFile(result.filePaths[0]);
+            }
         });
 
         $('#saveFileMissionButton').off('click').on('click', function () {
@@ -4123,9 +4114,9 @@ function iconKey(filename) {
             });
         });
 
-        $('#loadMissionButton').on('click', function () {
+        $('#loadMissionButton').on('click', async function () {
             let message = multimissionCount ? 'confirm_overwrite_multimission_file_load_option' : 'confirm_delete_all_points';
-            if ((markers.length || multimissionCount) && !dialog.confirm(i18n.getMessage(message))) return;
+            if ((markers.length || multimissionCount) && !await dialog.confirm(i18n.getMessage(message))) return;
             removeAllWaypoints();
             $(this).addClass('disabled');
             GUI.log(i18n.getMessage('startGetPoint'));
@@ -4142,9 +4133,9 @@ function iconKey(filename) {
             sendWaypointsToFC(false);
         });
 
-        $('#loadEepromMissionButton').on('click', function () {
+        $('#loadEepromMissionButton').on('click', async function () {
             let message = multimissionCount ? 'confirm_overwrite_multimission_file_load_option' : 'confirm_delete_all_points';
-            if ((markers.length || multimissionCount) && !dialog.confirm(i18n.getMessage(message))) return;
+            if ((markers.length || multimissionCount) && !await dialog.confirm(i18n.getMessage(message))) return;
             removeAllWaypoints();
             $(this).addClass('disabled');
             GUI.log(i18n.getMessage('startGetPoint'));
@@ -4235,180 +4226,187 @@ function iconKey(filename) {
             FC.FW_APPROACH.clean(i);
         }
 
-        window.electronAPI.readFile(filename).then(response => {
+        window.electronAPI.readFile(filename).then(async response => {
             if (response.error) {
                 GUI.log(i18n.getMessage('errorReadingFile'));
                 console.error(response.error);
                 return;
             }
 
-            xml2js.Parser({ 'explicitChildren': true, 'preserveChildrenOrder': true }).parseString(response.data, (err, result) => {
-                if (err) {
-                    GUI.log(i18n.getMessage('errorParsingFile'));
-                    return console.error(err);
-                }
+            let result;
+            try {
+                result = await new Promise((resolve, reject) => {
+                    xml2js.Parser({ 'explicitChildren': true, 'preserveChildrenOrder': true }).parseString(response.data, (err, res) => {
+                        if (err) reject(err);
+                        else resolve(res);
+                    });
+                });
+            } catch (err) {
+                GUI.log(i18n.getMessage('errorParsingFile'));
+                console.error(err);
+                return;
+            }
 
-                // parse mission file
-                removeAllWaypoints();
-                let missionEndFlagCount = 0;
-                var node = null;
-                var nodemission = null;
-                for (var noderoot in result) {
-                    if (!nodemission && noderoot.match(/mission/i)) {
-                        nodemission = result[noderoot];
-                        var missionIdx = -1;
-                        if (nodemission.$$ && nodemission.$$.length) {
-                            for (var i = 0; i < nodemission.$$.length; i++) {
-                                node = nodemission.$$[i];
-                                if (node['#name'].match(/version/i) && node.$) {
-                                    for (var attr in node.$) {
-                                        if (attr.match(/value/i)) {
-                                            mission.setVersion(node.$[attr]);
-                                        }
+            // parse mission file
+            removeAllWaypoints();
+            let missionEndFlagCount = 0;
+            var node = null;
+            var nodemission = null;
+            for (var noderoot in result) {
+                if (!nodemission && noderoot.match(/mission/i)) {
+                    nodemission = result[noderoot];
+                    var missionIdx = -1;
+                    if (nodemission.$$ && nodemission.$$.length) {
+                        for (var i = 0; i < nodemission.$$.length; i++) {
+                            node = nodemission.$$[i];
+                            if (node['#name'].match(/version/i) && node.$) {
+                                for (var attr in node.$) {
+                                    if (attr.match(/value/i)) {
+                                        mission.setVersion(node.$[attr]);
                                     }
-                                } else if (node['#name'].match(/meta/i) || node['#name'].match(/mwp/i) && node.$) {
-                                    for (var attr in node.$) {
-                                        if (attr.match(/mission/i)) {
-                                            missionIdx = parseInt(node.$[attr]) -1;
-                                        } else if (attr.match(/zoom/i)) {
-                                            mission.setCenterZoom(parseInt(node.$[attr]));
-                                        } else if (attr.match(/cx/i)) {
-                                            mission.setCenterLon(parseFloat(node.$[attr]) * 10000000);
-                                        } else if (attr.match(/cy/i)) {
-                                            mission.setCenterLat(parseFloat(node.$[attr]) * 10000000);
-                                        } else if (attr.match(/home\-x/i)) {
-                                            HOME.setLon(Math.round(parseFloat(node.$[attr]) * 10000000));
-                                        } else if (attr.match(/home\-y/i)) {
-                                            HOME.setLat(Math.round(parseFloat(node.$[attr]) * 10000000));
-                                        }
-                                    }
-                                } else if (node['#name'].match(/missionitem/i) && node.$) {
-                                    //var point = {};
-                                    var point = new Waypoint(0,0,0,0);
-                                    for (var attr in node.$) {
-                                        if (attr.match(/no/i)) {
-                                            point.setNumber(parseInt(node.$[attr]));
-                                        } else if (attr.match(/action/i)) {
-                                            if (node.$[attr].match(/WAYPOINT/i)) {
-                                                point.setAction(MWNP.WPTYPE.WAYPOINT);
-                                            } else if (node.$[attr].match(/PH_UNLIM/i) || node.$[attr].match(/POSHOLD_UNLIM/i)) {
-                                                point.setAction(MWNP.WPTYPE.POSHOLD_UNLIM);
-                                            } else if (node.$[attr].match(/PH_TIME/i) || node.$[attr].match(/POSHOLD_TIME/i)) {
-                                                point.setAction(MWNP.WPTYPE.POSHOLD_TIME);
-                                            } else if (node.$[attr].match(/RTH/i)) {
-                                                point.setAction(MWNP.WPTYPE.RTH);
-                                            } else if (node.$[attr].match(/SET_POI/i)) {
-                                                point.setAction(MWNP.WPTYPE.SET_POI);
-                                            } else if (node.$[attr].match(/JUMP/i)) {
-                                                point.setAction(MWNP.WPTYPE.JUMP);
-                                            } else if (node.$[attr].match(/SET_HEAD/i)) {
-                                                point.setAction(MWNP.WPTYPE.SET_HEAD);
-                                            } else if (node.$[attr].match(/LAND/i)) {
-                                                point.setAction(MWNP.WPTYPE.LAND);
-                                            } else {
-                                                point.setAction(0);
-                                            }
-                                        } else if (attr.match(/lat/i)) {
-                                            point.setLat(Math.round(parseFloat(node.$[attr]) * 10000000));
-                                        } else if (attr.match(/lon/i)) {
-                                            point.setLon(Math.round(parseFloat(node.$[attr]) * 10000000));
-                                        } else if (attr.match(/alt/i)) {
-                                            point.setAlt((parseInt(node.$[attr]) * 100));
-                                        } else if (attr.match(/parameter1/i)) {
-                                            point.setP1(parseInt(node.$[attr]));
-                                        } else if (attr.match(/parameter2/i)) {
-                                            point.setP2(parseInt(node.$[attr]));
-                                        } else if (attr.match(/parameter3/i)) {
-                                            point.setP3(parseInt(node.$[attr]));
-                                        } else if (attr.match(/flag/i)) {
-                                            point.setEndMission(parseInt(node.$[attr]));
-                                            if (parseInt(node.$[attr]) == 0xA5) {
-                                                missionEndFlagCount ++;
-                                            }
-                                        }
-                                    }
-                                    if (missionIdx >= 0) {
-                                        point.setMultiMissionIdx(missionIdx);
-                                    }
-                                    mission.put(point);
-                                } else if (node['#name'].match(/fwapproach/i) && node.$) {
-                                    var fwApproach = new FwApproach(0);
-                                    var idx = -1;
-                                    for (var attr in node.$) {
-                                        if (attr.match(/index/i)) {
-                                            idx = parseInt(node.$[attr]);
-                                        } else if (attr.match(/no/i)) {
-                                            fwApproach.setNumber(parseInt(node.$[attr]));
-                                        } else if (attr.match(/approach-alt/i)) {
-                                            fwApproach.setApproachAltAsl(parseInt(node.$[attr]));
-                                        } else if (attr.match(/land-alt/i)) {
-                                            fwApproach.setLandAltAsl(parseInt(node.$[attr]));
-                                        } else if (attr.match(/approach-direction/i)) {
-                                            fwApproach.setApproachDirection(node.$[attr] == 'left' ? 0 : 1);
-                                        } else if (attr.match(/landheading1/i)) {
-                                            fwApproach.setLandHeading1(parseInt(node.$[attr]));
-                                        } else if (attr.match(/landheading2/i)) {
-                                            fwApproach.setLandHeading2(parseInt(node.$[attr]));
-                                        } else if (attr.match(/sealevel-ref/i)) {
-                                            fwApproach.setIsSeaLevelRef(parseBooleans(node.$[attr]) ? 1 : 0);
-                                        }
-                                    }
-                                    FC.FW_APPROACH.insert(fwApproach, FC.SAFEHOMES.getMaxSafehomeCount() + idx);
                                 }
+                            } else if (node['#name'].match(/meta/i) || node['#name'].match(/mwp/i) && node.$) {
+                                for (var attr in node.$) {
+                                    if (attr.match(/mission/i)) {
+                                        missionIdx = parseInt(node.$[attr]) -1;
+                                    } else if (attr.match(/zoom/i)) {
+                                        mission.setCenterZoom(parseInt(node.$[attr]));
+                                    } else if (attr.match(/cx/i)) {
+                                        mission.setCenterLon(parseFloat(node.$[attr]) * 10000000);
+                                    } else if (attr.match(/cy/i)) {
+                                        mission.setCenterLat(parseFloat(node.$[attr]) * 10000000);
+                                    } else if (attr.match(/home\-x/i)) {
+                                        HOME.setLon(Math.round(parseFloat(node.$[attr]) * 10000000));
+                                    } else if (attr.match(/home\-y/i)) {
+                                        HOME.setLat(Math.round(parseFloat(node.$[attr]) * 10000000));
+                                    }
+                                }
+                            } else if (node['#name'].match(/missionitem/i) && node.$) {
+                                //var point = {};
+                                var point = new Waypoint(0,0,0,0);
+                                for (var attr in node.$) {
+                                    if (attr.match(/no/i)) {
+                                        point.setNumber(parseInt(node.$[attr]));
+                                    } else if (attr.match(/action/i)) {
+                                        if (node.$[attr].match(/WAYPOINT/i)) {
+                                            point.setAction(MWNP.WPTYPE.WAYPOINT);
+                                        } else if (node.$[attr].match(/PH_UNLIM/i) || node.$[attr].match(/POSHOLD_UNLIM/i)) {
+                                            point.setAction(MWNP.WPTYPE.POSHOLD_UNLIM);
+                                        } else if (node.$[attr].match(/PH_TIME/i) || node.$[attr].match(/POSHOLD_TIME/i)) {
+                                            point.setAction(MWNP.WPTYPE.POSHOLD_TIME);
+                                        } else if (node.$[attr].match(/RTH/i)) {
+                                            point.setAction(MWNP.WPTYPE.RTH);
+                                        } else if (node.$[attr].match(/SET_POI/i)) {
+                                            point.setAction(MWNP.WPTYPE.SET_POI);
+                                        } else if (node.$[attr].match(/JUMP/i)) {
+                                            point.setAction(MWNP.WPTYPE.JUMP);
+                                        } else if (node.$[attr].match(/SET_HEAD/i)) {
+                                            point.setAction(MWNP.WPTYPE.SET_HEAD);
+                                        } else if (node.$[attr].match(/LAND/i)) {
+                                            point.setAction(MWNP.WPTYPE.LAND);
+                                        } else {
+                                            point.setAction(0);
+                                        }
+                                    } else if (attr.match(/lat/i)) {
+                                        point.setLat(Math.round(parseFloat(node.$[attr]) * 10000000));
+                                    } else if (attr.match(/lon/i)) {
+                                        point.setLon(Math.round(parseFloat(node.$[attr]) * 10000000));
+                                    } else if (attr.match(/alt/i)) {
+                                        point.setAlt((parseInt(node.$[attr]) * 100));
+                                    } else if (attr.match(/parameter1/i)) {
+                                        point.setP1(parseInt(node.$[attr]));
+                                    } else if (attr.match(/parameter2/i)) {
+                                        point.setP2(parseInt(node.$[attr]));
+                                    } else if (attr.match(/parameter3/i)) {
+                                        point.setP3(parseInt(node.$[attr]));
+                                    } else if (attr.match(/flag/i)) {
+                                        point.setEndMission(parseInt(node.$[attr]));
+                                        if (parseInt(node.$[attr]) == 0xA5) {
+                                            missionEndFlagCount ++;
+                                        }
+                                    }
+                                }
+                                if (missionIdx >= 0) {
+                                    point.setMultiMissionIdx(missionIdx);
+                                }
+                                mission.put(point);
+                            } else if (node['#name'].match(/fwapproach/i) && node.$) {
+                                var fwApproach = new FwApproach(0);
+                                var idx = -1;
+                                for (var attr in node.$) {
+                                    if (attr.match(/index/i)) {
+                                        idx = parseInt(node.$[attr]);
+                                    } else if (attr.match(/no/i)) {
+                                        fwApproach.setNumber(parseInt(node.$[attr]));
+                                    } else if (attr.match(/approach-alt/i)) {
+                                        fwApproach.setApproachAltAsl(parseInt(node.$[attr]));
+                                    } else if (attr.match(/land-alt/i)) {
+                                        fwApproach.setLandAltAsl(parseInt(node.$[attr]));
+                                    } else if (attr.match(/approach-direction/i)) {
+                                        fwApproach.setApproachDirection(node.$[attr] == 'left' ? 0 : 1);
+                                    } else if (attr.match(/landheading1/i)) {
+                                        fwApproach.setLandHeading1(parseInt(node.$[attr]));
+                                    } else if (attr.match(/landheading2/i)) {
+                                        fwApproach.setLandHeading2(parseInt(node.$[attr]));
+                                    } else if (attr.match(/sealevel-ref/i)) {
+                                        fwApproach.setIsSeaLevelRef(parseBooleans(node.$[attr]) ? 1 : 0);
+                                    }
+                                }
+                                FC.FW_APPROACH.insert(fwApproach, FC.SAFEHOMES.getMaxSafehomeCount() + idx);
                             }
                         }
                     }
                 }
+            }
 
-                if (missionEndFlagCount > 1) {
-                    if (multimissionCount && ! dialog.confirm(i18n.getMessage('confirm_multimission_file_load'))) {
-                        mission.flush();
-                        return;
-                    } else {
-                        /* update Attached Waypoints (i.e non Map Markers)
-                         * Ensure WPs numbered sequentially across all missions */
-                        i = 1;
-                        mission.get().forEach(function (element) {
-                            element.setNumber(i);
-                            i++;
-                        });
-                        mission.update(false, true);
-                        multimissionCount = missionEndFlagCount;
-                        multimission.reinit();
-                        multimission.copy(mission);
-                        renderMultimissionTable();
-                        $('#missionPlannerMultiMission').fadeIn(300);
-                    }
+            if (missionEndFlagCount > 1) {
+                if (multimissionCount && ! await dialog.confirm(i18n.getMessage('confirm_multimission_file_load'))) {
+                    mission.flush();
+                    return;
                 } else {
-                    // update Attached Waypoints (i.e non Map Markers)
-                    mission.update(true, true);
+                    /* update Attached Waypoints (i.e non Map Markers)
+                     * Ensure WPs numbered sequentially across all missions */
+                    i = 1;
+                    mission.get().forEach(function (element) {
+                        element.setNumber(i);
+                        i++;
+                    });
+                    mission.update(false, true);
+                    multimissionCount = missionEndFlagCount;
+                    multimission.reinit();
+                    multimission.copy(mission);
+                    renderMultimissionTable();
+                    $('#missionPlannerMultiMission').fadeIn(300);
                 }
-                updateMultimissionState();
-                updateLocationButtonsVisibility();
+            } else {
+                // update Attached Waypoints (i.e non Map Markers)
+                mission.update(true, true);
+            }
+            updateMultimissionState();
+            updateLocationButtonsVisibility();
 
-                if (Object.keys(mission.getCenter()).length !== 0) {
-                    var coord = fromLonLat([mission.getCenter().lon / 10000000 , mission.getCenter().lat / 10000000]);
-                    map.getView().setCenter(coord);
-                    if (mission.getCenter().zoom) {
-                        map.getView().setZoom(mission.getCenter().zoom);
-                    }
-                    else {
-                        map.getView().setZoom(16);
-                    }
+            if (Object.keys(mission.getCenter()).length !== 0) {
+                var coord = fromLonLat([mission.getCenter().lon / 10000000 , mission.getCenter().lat / 10000000]);
+                map.getView().setCenter(coord);
+                if (mission.getCenter().zoom) {
+                    map.getView().setZoom(mission.getCenter().zoom);
                 }
                 else {
-                    setView(16);
+                    map.getView().setZoom(16);
                 }
+            }
+            else {
+                setView(16);
+            }
 
-                redrawLayers();
-                if (!(HOME.getLatMap() == 0 && HOME.getLonMap() == 0)) {
-                    updateHome();
-                }
-                updateTotalInfo();
-                let sFilename = String(filename.split('\\').pop().split('/').pop());
-                GUI.log(sFilename + i18n.getMessage('loadedSuccessfully'));
-                updateFilename(sFilename);
-            });
+            redrawLayers();
+            if (!(HOME.getLatMap() == 0 && HOME.getLonMap() == 0)) {
+                updateHome();
+            }
+            updateTotalInfo();
+            let sFilename = String(filename.split('\\').pop().split('/').pop());
+            GUI.log(sFilename + i18n.getMessage('loadedSuccessfully'));
+            updateFilename(sFilename);
         });
     }
 

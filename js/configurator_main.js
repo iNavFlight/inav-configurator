@@ -5,6 +5,7 @@ import 'jquery-ui-dist/jquery-ui';
 import * as THREE from 'three'
 
 import GUI from './gui';
+import interval from './intervals';
 import CONFIGURATOR from './data_storage';
 import FC  from './fc';
 import { globalSettings, UnitType } from './globalSettings';
@@ -20,6 +21,7 @@ import CliAutoComplete from './CliAutoComplete';
 import { SITLProcess } from './sitl';
 import settingsCache from './settingsCache';
 import store from './store';
+import periodicStatusUpdater from './periodicStatusUpdater';
 
 // "Preload" tabs
 import landingTab from './../tabs/landing';
@@ -609,20 +611,24 @@ $(function() {
 
         var mixerprofile_e = $('#mixerprofilechange');
 
-        mixerprofile_e.on('change', function () {
-            if (!dialog.confirm(i18n.getMessage("changeMixerProfileReboot"))) 
+        mixerprofile_e.on('change', async function () {
+            const mixerprofile = parseInt($(this).val());
+            const previousMixerProfile = FC.CONFIG.mixer_profile;
+            // Stop poller before the confirm dialog: a status poll arriving during
+            // the async await would reset the dropdown back to the old value.
+            interval.remove('global_data_refresh');
+            if (!await dialog.confirm(i18n.getMessage("changeMixerProfileReboot")))
             {
-                $(this).val(FC.CONFIG.mixer_profile)
+                $(this).val(previousMixerProfile);
+                interval.add('global_data_refresh', periodicStatusUpdater.run, periodicStatusUpdater.getUpdateInterval(CONFIGURATOR.connection.bitrate), false);
                 return;
             }
-            
-            const mixerprofile = parseInt($(this).val());
+            // global_data_refresh already removed; proceed with profile switch.
             MSP.send_message(MSPCodes.MSP2_INAV_SELECT_MIXER_PROFILE, [mixerprofile], false, function () {
                 GUI.tab_switch_cleanup(function() {
                     GUI.log(i18n.getMessage('setMixerProfile', [mixerprofile + 1]));
                     GUI.log(i18n.getMessage('deviceRebooting'));
-                    GUI.handleReconnect(true);
-                    // This order! Why? ¯\_(ツ)_/¯
+                    GUI.handleReconnect(true); // register disconnect handler BEFORE reboot triggers disconnect
                     MSP.send_message(MSPCodes.MSP_SET_REBOOT, false, false);
                 });
             });
