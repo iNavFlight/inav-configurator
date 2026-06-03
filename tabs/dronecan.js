@@ -67,7 +67,7 @@ function dronecanAsyncPoll(service_id, node_id, params, onDone) {
                 if (!r || r.seq !== expectedSeq) { onDone(new Error('stale'), null); return; }
                 if (r.state === 2) { onDone(null, r); }
                 else if (r.state === 3) { onDone(new Error('error'), null); }
-                else if (++attempts < 34) { setTimeout(poll, 75); }
+                else if (++attempts < 34) { setTimeout(poll, 75); } // 34 × 75 ms ≈ 2.5 s window
                 else { onDone(new Error('timeout'), null); }
             });
         };
@@ -188,6 +188,7 @@ dronecanTab.showDetail = function (nodeId) {
     if (!node) return;
     
     dronecanAsyncPoll(1, nodeId, null, (err, result) => {
+        if (nodeId !== currentDetailNodeId) return;
         const detail = document.getElementById('dronecan-node-detail');
         const tbody  = document.getElementById('dronecan-detail-tbody');
         const uptime = result ? `${Math.floor(node.uptime_sec / 3600)}h ${Math.floor((node.uptime_sec % 3600) / 60)}m ${node.uptime_sec % 60}s` : '—';
@@ -221,6 +222,7 @@ dronecanTab.showParams = function (nodeId) {
 
     function fetchParam(index) {
         dronecanAsyncPoll(11, nodeId, { index, is_write: false }, (err, result) => {
+            if (nodeId !== currentDetailNodeId) return;
             if (err || !result || !result.name) {
                 renderParams();
                 return;

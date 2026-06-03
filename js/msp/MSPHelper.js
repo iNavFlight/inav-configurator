@@ -1595,7 +1595,7 @@ var mspHelper = (function () {
                       
                     if (state === 2) { // READY
                         let offset = 5;
-                        if (service_id === 10 || service_id === 5) { // EXECUTE_OPCODE or RESTART_NODE
+                        if (service_id === 5 || service_id === 10) { // RESTART_NODE or EXECUTE_OPCODE
                             result.ok = data.getUint8(offset) !== 0;
                         } else {
                             const name_len = data.getUint8(offset++);

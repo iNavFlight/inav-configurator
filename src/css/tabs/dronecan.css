@@ -68,7 +68,7 @@
       border: 1px solid #37a8db;
       border-radius: 4px;
       color: #37a8db;
-      font-size: 12px;
+      font-size: 1em;
       cursor: pointer;
       transition: all ease 0.2s;
       white-space: nowrap;
@@ -85,7 +85,7 @@
       cursor: default;
   }
 
- .param-actions {
+  #dronecan-params .param-actions {
       margin-top: 1em;
       display: flex;
       gap: 0.5em;
@@ -97,7 +97,7 @@
       border: 1px solid #37a8db;
       border-radius: 4px;
       color: #fff;
-      font-size: 12px;
+      font-size: 1em;
       cursor: pointer;
       transition: all ease 0.2s;
   }
