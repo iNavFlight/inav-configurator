@@ -330,6 +330,13 @@ dronecanTab.showParams = function (nodeId) {
 
                 if (param.value_type === PARAM_TYPE_INT || param.value_type === PARAM_TYPE_FLOAT) {
                     const num = Number(payload.value);
+                    if (isNaN(num)) {
+                        input.style.outline = '2px solid #cc0000';
+                        input.title = '';
+                        btn.textContent = i18n.getMessage('dronecanParamOutOfRange');
+                        setTimeout(() => { btn.textContent = i18n.getMessage('dronecanParamWrite'); }, 2000);
+                        return;
+                    }
                     // compare in BigInt domain if the bound exceeds safe integer range
                     const cmp = bound => typeof bound === 'bigint' ? BigInt(Math.trunc(num)) : num;
                     const tooLow  = param.min !== undefined && cmp(param.min) < param.min;
