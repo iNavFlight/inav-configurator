@@ -34,6 +34,7 @@ var mspHelper = (function () {
     const DRONECAN_SERVICE_RESTART_NODE   = 5;
     const DRONECAN_SERVICE_EXECUTE_OPCODE = 10;
     const DRONECAN_SERVICE_PARAM_GETSET   = 11;
+    const DRONECAN_ASYNC_STATE_READY      = 2;
 
     self.sensorStatusEx = null;
 
@@ -1602,7 +1603,7 @@ var mspHelper = (function () {
                     const node_id    = data.getUint8(4); 
                     const result = { state, seq, service_id, node_id };
                       
-                    if (state === 2) { // READY
+                    if (state === DRONECAN_ASYNC_STATE_READY) {
                         try {
                         let offset = 5;
                         if (service_id === DRONECAN_SERVICE_RESTART_NODE || service_id === DRONECAN_SERVICE_EXECUTE_OPCODE) {
