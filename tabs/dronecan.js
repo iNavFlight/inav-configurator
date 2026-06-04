@@ -269,7 +269,7 @@ dronecanTab.showParams = function (nodeId) {
             html += `<tr>
                 <td>${p.index}</td>
                 <td>${esc(p.name)}</td>
-                <td>${TYPE_LABELS[p.value_type] || p.value_type}</td>
+                <td>${TYPE_LABELS[p.value_type] || esc(String(p.value_type))}</td>
                 <td><input class="param-input" data-index="${p.index}" data-type="${p.value_type}" value="${esc(valStr)}"></td>
                 <td class="param-range">${esc(rangeStr)}</td>
                 <td><button class="param-write" data-index="${p.index}">${esc(lblWrite)}</button></td>
@@ -321,8 +321,8 @@ dronecanTab.showParams = function (nodeId) {
 
                 if (param.value_type === 1 || param.value_type === 2) {
                     const num = Number(payload.value);
-                    const tooLow  = param.min !== undefined && num < param.min;
-                    const tooHigh = param.max !== undefined && num > param.max;
+                    const tooLow  = param.min !== undefined && num < Number(param.min);
+                    const tooHigh = param.max !== undefined && num > Number(param.max);
                     if (tooLow || tooHigh) {
                         input.style.outline = '2px solid #cc0000';
                         const lo = param.min !== undefined ? param.min : '—';

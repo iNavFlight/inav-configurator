@@ -1614,9 +1614,13 @@ var mspHelper = (function () {
                                 result.hw_unique_id            = new Uint8Array(
                                     data.buffer, data.byteOffset + offset, 16).slice(); // copy; don't hold a live view into the MSP buffer
                             } else if (service_id === 11) { // PARAM_GETSET
+                                const PARAM_TYPE_INT    = 1;
+                                const PARAM_TYPE_FLOAT  = 2;
+                                const PARAM_TYPE_BOOL   = 3;
+                                const PARAM_TYPE_STRING = 4;
                                 result.value_type = data.getUint8(offset++);
                                 switch (result.value_type) {
-                                    case 1: { // INT (8 bytes)
+                                    case PARAM_TYPE_INT: { // 8 bytes, little-endian lo/hi
                                         const lo = data.getUint32(offset, true);
                                         const hi = data.getUint32(offset + 4, true);
                                         const big = BigInt(hi) * BigInt(0x100000000) + BigInt(lo);
@@ -1627,15 +1631,15 @@ var mspHelper = (function () {
                                         offset += 8;
                                         break;
                                     }
-                                    case 2: // FLOAT (4 bytes)
+                                    case PARAM_TYPE_FLOAT: // 4 bytes
                                         result.value = data.getFloat32(offset, true);
                                         offset += 4;
                                         break;
-                                    case 3: // BOOL (1 byte)
+                                    case PARAM_TYPE_BOOL: // 1 byte
                                         result.value = data.getUint8(offset) !== 0;
                                         offset += 1;
                                         break;
-                                    case 4: { // STRING (1-byte length prefix + data)
+                                    case PARAM_TYPE_STRING: { // 1-byte length prefix + data
                                         const slen = data.getUint8(offset++);
                                         result.value = String.fromCharCode(
                                             ...new Uint8Array(data.buffer, data.byteOffset + offset, slen));
@@ -1645,26 +1649,29 @@ var mspHelper = (function () {
                                     default:
                                         result.value = null;
                                 }
-                                const decodeNumeric = () => {
-                                    const type = data.getUint8(offset++);
-                                    if (type === 1) { // INTEGER
-                                        const lo = data.getUint32(offset, true);
-                                        const hi = data.getUint32(offset + 4, true);
-                                        offset += 8;
-                                        const big = BigInt(hi) * BigInt(0x100000000) + BigInt(lo);
-                                        const signed = big >= (1n << 63n) ? big - (1n << 64n) : big;
-                                        return (signed >= BigInt(Number.MIN_SAFE_INTEGER) &&
-                                                signed <= BigInt(Number.MAX_SAFE_INTEGER))
-                                               ? Number(signed) : signed;
-                                    } else if (type === 2) { // FLOAT
-                                        const v = data.getFloat32(offset, true);
-                                        offset += 4;
-                                        return v;
-                                    }
-                                    return undefined; // EMPTY
-                                };
-                                result.min = decodeNumeric();
-                                result.max = decodeNumeric();
+                                // min/max are NumericValue (EMPTY, INT, or FLOAT); only present for INT and FLOAT params
+                                if (result.value_type === PARAM_TYPE_INT || result.value_type === PARAM_TYPE_FLOAT) {
+                                    const decodeNumeric = () => {
+                                        const type = data.getUint8(offset++);
+                                        if (type === PARAM_TYPE_INT) {
+                                            const lo = data.getUint32(offset, true);
+                                            const hi = data.getUint32(offset + 4, true);
+                                            offset += 8;
+                                            const big = BigInt(hi) * BigInt(0x100000000) + BigInt(lo);
+                                            const signed = big >= (1n << 63n) ? big - (1n << 64n) : big;
+                                            return (signed >= BigInt(Number.MIN_SAFE_INTEGER) &&
+                                                    signed <= BigInt(Number.MAX_SAFE_INTEGER))
+                                                   ? Number(signed) : signed;
+                                        } else if (type === PARAM_TYPE_FLOAT) {
+                                            const v = data.getFloat32(offset, true);
+                                            offset += 4;
+                                            return v;
+                                        }
+                                        return undefined; // EMPTY — no range provided
+                                    };
+                                    result.min = decodeNumeric();
+                                    result.max = decodeNumeric();
+                                }
                             }
                         }
                         } catch (e) { /* truncated or malformed response — result fields may be partial */ }
