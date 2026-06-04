@@ -14,6 +14,10 @@ const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(
 const POLL_INTERVAL_MS  = 75;
 const POLL_MAX_ATTEMPTS = 34; // 34 polls × 75 ms ≈ 2.5 s total window
 const MODE_LABELS = ['OPERATIONAL', 'INITIALIZATION', 'MAINTENANCE', 'SOFTWARE_UPDATE', 'UNKNOWN_4', 'UNKNOWN_5', 'UNKNOWN_6', 'OFFLINE']; // modes 0-3 per DroneCAN NodeStatus; 4-6 reserved by spec
+const PARAM_TYPE_INT    = 1;
+const PARAM_TYPE_FLOAT  = 2;
+const PARAM_TYPE_BOOL   = 3;
+const PARAM_TYPE_STRING = 4;
 
 function getModeLabel(mode) {
     return (mode < MODE_LABELS.length && MODE_LABELS[mode]) ? MODE_LABELS[mode] : `MODE_${mode}`;
@@ -34,18 +38,18 @@ function dronecanAsyncPoll(service_id, node_id, params, onDone) {
         if (params.is_write) {
             reqPayload.push(params.value_type);
             switch (params.value_type) {
-                case 1: { // INT
+                case PARAM_TYPE_INT: {
                     const v = BigInt(Math.trunc(params.value));
                     for (let i = 0; i < 8; i++) reqPayload.push(Number((v >> BigInt(i * 8)) & 0xFFn));
                     break;
                 }
-                case 2: { // FLOAT
+                case PARAM_TYPE_FLOAT: {
                     const arr = new Float32Array([params.value]);
                     reqPayload.push(...new Uint8Array(arr.buffer));
                     break;
                 }
-                case 3: reqPayload.push(params.value ? 1 : 0); break;
-                case 4: {
+                case PARAM_TYPE_BOOL: reqPayload.push(params.value ? 1 : 0); break;
+                case PARAM_TYPE_STRING: {
                     const enc = new TextEncoder().encode(String(params.value).slice(0, 63));
                     reqPayload.push(enc.length, ...enc);
                     break;
@@ -254,15 +258,20 @@ dronecanTab.showParams = function (nodeId) {
         const TYPE_LABELS = ['', 'INT', 'FLOAT', 'BOOL', 'STRING'];
         const fmtNumeric = (v, type) => {
             if (v === undefined) return '—';
-            return type === 2 ? Number(v).toFixed(3) : String(v);
+            return type === PARAM_TYPE_FLOAT ? Number(v).toFixed(3) : String(v);
         };
         const lblWrite       = i18n.getMessage('dronecanParamWrite');
         const lblSaveEeprom  = i18n.getMessage('dronecanSaveToEeprom');
         const lblRestartNode = i18n.getMessage('dronecanRestartNode');
-        let html = '<table><thead><tr><th>#</th><th>Name</th><th>Type</th><th>Value</th><th>Range</th><th></th></tr></thead><tbody>';
+        const thIndex = i18n.getMessage('dronecanParamColIndex');
+        const thName  = i18n.getMessage('dronecanParamColName');
+        const thType  = i18n.getMessage('dronecanParamColType');
+        const thValue = i18n.getMessage('dronecanParamColValue');
+        const thRange = i18n.getMessage('dronecanParamColRange');
+        let html = `<table><thead><tr><th>${thIndex}</th><th>${thName}</th><th>${thType}</th><th>${thValue}</th><th>${thRange}</th><th></th></tr></thead><tbody>`;
         params.forEach(p => {
-            const valStr = p.value_type === 3 ? (p.value ? 'true' : 'false') : String(p.value);
-            const hasRange = (p.value_type === 1 || p.value_type === 2) && (p.min !== undefined || p.max !== undefined);
+            const valStr = p.value_type === PARAM_TYPE_BOOL ? (p.value ? 'true' : 'false') : String(p.value);
+            const hasRange = (p.value_type === PARAM_TYPE_INT || p.value_type === PARAM_TYPE_FLOAT) && (p.min !== undefined || p.max !== undefined);
             const rangeStr = hasRange
                 ? `${fmtNumeric(p.min, p.value_type)} … ${fmtNumeric(p.max, p.value_type)}`
                 : '—';
@@ -272,11 +281,11 @@ dronecanTab.showParams = function (nodeId) {
                 <td>${TYPE_LABELS[p.value_type] || esc(String(p.value_type))}</td>
                 <td><input class="param-input" data-index="${p.index}" data-type="${p.value_type}" value="${esc(valStr)}"></td>
                 <td class="param-range">${esc(rangeStr)}</td>
-                <td><button class="param-write" data-index="${p.index}">${esc(lblWrite)}</button></td>
+                <td><button class="param-write" data-index="${p.index}">${lblWrite}</button></td>
             </tr>`;
         });
         html += '</tbody></table>';
-        html += `<div class="param-actions"><button class="param-action-btn param-save-eeprom">${esc(lblSaveEeprom)}</button> <button class="param-action-btn param-restart-node">${esc(lblRestartNode)}</button></div>`;
+        html += `<div class="param-actions"><button class="param-action-btn param-save-eeprom">${lblSaveEeprom}</button> <button class="param-action-btn param-restart-node">${lblRestartNode}</button></div>`;
         container.innerHTML = html;
 
         container.querySelector('.param-save-eeprom').addEventListener('click', function () {
@@ -313,16 +322,18 @@ dronecanTab.showParams = function (nodeId) {
                 const writeValue = input.value;
                 const payload = { index: idx, is_write: true, value_type: param.value_type, name: param.name };
                 switch (param.value_type) {
-                    case 1: payload.value = Number(writeValue); break;
-                    case 2: payload.value = parseFloat(writeValue); break;
-                    case 3: payload.value = writeValue === 'true' || writeValue === '1'; break;
-                    case 4: payload.value = writeValue; break;
+                    case PARAM_TYPE_INT:    payload.value = Number(writeValue); break;
+                    case PARAM_TYPE_FLOAT:  payload.value = parseFloat(writeValue); break;
+                    case PARAM_TYPE_BOOL:   payload.value = writeValue === 'true' || writeValue === '1'; break;
+                    case PARAM_TYPE_STRING: payload.value = writeValue; break;
                 }
 
-                if (param.value_type === 1 || param.value_type === 2) {
+                if (param.value_type === PARAM_TYPE_INT || param.value_type === PARAM_TYPE_FLOAT) {
                     const num = Number(payload.value);
-                    const tooLow  = param.min !== undefined && num < Number(param.min);
-                    const tooHigh = param.max !== undefined && num > Number(param.max);
+                    // compare in BigInt domain if the bound exceeds safe integer range
+                    const cmp = bound => typeof bound === 'bigint' ? BigInt(Math.trunc(num)) : num;
+                    const tooLow  = param.min !== undefined && cmp(param.min) < param.min;
+                    const tooHigh = param.max !== undefined && cmp(param.max) > param.max;
                     if (tooLow || tooHigh) {
                         input.style.outline = '2px solid #cc0000';
                         const lo = param.min !== undefined ? param.min : '—';
@@ -341,7 +352,7 @@ dronecanTab.showParams = function (nodeId) {
                 dronecanAsyncPoll(11, nodeId, payload, (err, result) => {
                     if (!err && result) {
                         param.value = result.value;
-                        input.value = param.value_type === 3 ? (result.value ? 'true' : 'false') : String(result.value);
+                        input.value = param.value_type === PARAM_TYPE_BOOL ? (result.value ? 'true' : 'false') : String(result.value);
                         btn.textContent = i18n.getMessage('OK');
                     } else {
                         btn.textContent = i18n.getMessage('dronecanParamError');
