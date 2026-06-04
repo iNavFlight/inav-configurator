@@ -30,6 +30,10 @@ var mspHelper = (function () {
     const PARAM_TYPE_FLOAT  = 2;
     const PARAM_TYPE_BOOL   = 3;
     const PARAM_TYPE_STRING = 4;
+    const DRONECAN_SERVICE_GETNODEINFO    = 1;
+    const DRONECAN_SERVICE_RESTART_NODE   = 5;
+    const DRONECAN_SERVICE_EXECUTE_OPCODE = 10;
+    const DRONECAN_SERVICE_PARAM_GETSET   = 11;
 
     self.sensorStatusEx = null;
 
@@ -1601,7 +1605,7 @@ var mspHelper = (function () {
                     if (state === 2) { // READY
                         try {
                         let offset = 5;
-                        if (service_id === 5 || service_id === 10) { // RESTART_NODE or EXECUTE_OPCODE
+                        if (service_id === DRONECAN_SERVICE_RESTART_NODE || service_id === DRONECAN_SERVICE_EXECUTE_OPCODE) {
                             result.ok = data.getUint8(offset) !== 0;
                         } else {
                             const name_len = data.getUint8(offset++);
@@ -1609,7 +1613,7 @@ var mspHelper = (function () {
                                 ...new Uint8Array(data.buffer, data.byteOffset + offset, name_len));
                             offset += name_len;
 
-                            if (service_id === 1) { // GETNODEINFO
+                            if (service_id === DRONECAN_SERVICE_GETNODEINFO) {
                                 result.sw_major                = data.getUint8(offset++);
                                 result.sw_minor                = data.getUint8(offset++);
                                 result.sw_optional_field_flags = data.getUint8(offset++);
@@ -1618,7 +1622,7 @@ var mspHelper = (function () {
                                 result.hw_minor                = data.getUint8(offset++);
                                 result.hw_unique_id            = new Uint8Array(
                                     data.buffer, data.byteOffset + offset, 16).slice(); // copy; don't hold a live view into the MSP buffer
-                            } else if (service_id === 11) { // PARAM_GETSET
+                            } else if (service_id === DRONECAN_SERVICE_PARAM_GETSET) {
                                 result.value_type = data.getUint8(offset++);
                                 switch (result.value_type) {
                                     case PARAM_TYPE_INT: { // 8 bytes, little-endian lo/hi
