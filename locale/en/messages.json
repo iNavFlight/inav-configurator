@@ -6637,5 +6637,11 @@
     },
     "dronecanRestarting": {
         "message": "Restarting..."
+    },
+    "dronecanSecondsAgo": {
+        "message": "$1s ago"
+    },
+    "dronecanNameError": {
+        "message": "Error"
     }
 }

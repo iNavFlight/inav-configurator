@@ -22,6 +22,11 @@ const DRONECAN_SERVICE_GETNODEINFO    = 1;
 const DRONECAN_SERVICE_RESTART_NODE   = 5;
 const DRONECAN_SERVICE_EXECUTE_OPCODE = 10;
 const DRONECAN_SERVICE_PARAM_GETSET   = 11;
+const DRONECAN_ASYNC_STATE_READY         = 2;
+const DRONECAN_ASYNC_STATE_ERROR         = 3;
+const DRONECAN_ASYNC_REQUEST_STATUS_OK   = 0;
+const DRONECAN_ASYNC_REQUEST_STATUS_BUSY = 1;
+const DRONECAN_EXECUTE_OPCODE_SAVE       = 0;
 
 function getModeLabel(mode) {
     return (mode < MODE_LABELS.length && MODE_LABELS[mode]) ? MODE_LABELS[mode] : `MODE_${mode}`;
@@ -43,7 +48,7 @@ function dronecanAsyncPoll(service_id, node_id, params, onDone) {
             reqPayload.push(params.value_type);
             switch (params.value_type) {
                 case PARAM_TYPE_INT: {
-                    const v = BigInt(Math.trunc(params.value));
+                    const v = typeof params.value === 'bigint' ? params.value : BigInt(Math.trunc(params.value));
                     for (let i = 0; i < 8; i++) reqPayload.push(Number((v >> BigInt(i * 8)) & 0xFFn));
                     break;
                 }
@@ -70,8 +75,8 @@ function dronecanAsyncPoll(service_id, node_id, params, onDone) {
 
     MSP.send_message(MSPCodes.MSP2_INAV_DRONECAN_ASYNC_REQUEST, reqPayload, false, () => {
         const req = FC.DRONECAN_ASYNC_REQUEST;
-        if (!req || req.status !== 0) {
-            onDone(req && req.status === 1 ? new Error('busy') : new Error('not_ready'), null);
+        if (!req || req.status !== DRONECAN_ASYNC_REQUEST_STATUS_OK) {
+            onDone(req && req.status === DRONECAN_ASYNC_REQUEST_STATUS_BUSY ? new Error('busy') : new Error('not_ready'), null);
             return;
         }
         const expectedSeq = req.seq;
@@ -83,8 +88,8 @@ function dronecanAsyncPoll(service_id, node_id, params, onDone) {
                     r.service_id !== service_id || r.node_id !== node_id) {
                     onDone(new Error('stale'), null); return;
                 }
-                if (r.state === 2) { onDone(null, r); }
-                else if (r.state === 3) { onDone(new Error('error'), null); }
+                if (r.state === DRONECAN_ASYNC_STATE_READY) { onDone(null, r); }
+                else if (r.state === DRONECAN_ASYNC_STATE_ERROR) { onDone(new Error('error'), null); }
                 else if (++attempts < POLL_MAX_ATTEMPTS) { setTimeout(poll, POLL_INTERVAL_MS); }
                 else { onDone(new Error('timeout'), null); }
             });
@@ -158,7 +163,7 @@ dronecanTab.render = function () {
     nodes.forEach(node => {
         const health = node.health < HEALTH_LABELS.length ? node.health : 3;
         const modeLabel = getModeLabel(node.mode);
-        const lastSeen = (node.last_seen_ms / 1000).toFixed(1) + 's ago';
+        const lastSeen = i18n.getMessage('dronecanSecondsAgo', [(node.last_seen_ms / 1000).toFixed(1)]);
 
         const row = document.createElement('tr');
         row.dataset.nodeId = node.nodeID;
@@ -193,7 +198,7 @@ dronecanTab.render = function () {
             const set = (attr, val) => { const el = detail.querySelector(`[data-detail="${attr}"]`); if (el) el.textContent = val; };
             set('health', HEALTH_LABELS[health]);
             set('mode', modeLabel);
-            set('last-seen', `${(liveNode.last_seen_ms / 1000).toFixed(1)}s ago`);
+            set('last-seen', i18n.getMessage('dronecanSecondsAgo', [(liveNode.last_seen_ms / 1000).toFixed(1)]));
             set('uptime', uptime);
             set('vendor-status', liveNode.vendor_status_code);
         }
@@ -215,10 +220,10 @@ dronecanTab.showDetail = function (nodeId) {
 
         tbody.innerHTML = `
             <tr><th>Node ID</th><td>${esc(nodeId)}</td></tr>
-            <tr><th>Name</th><td class="dronecan-detail-name">${result ? esc(result.name) : (err ? 'Error' : '—')}</td></tr>
+            <tr><th>Name</th><td class="dronecan-detail-name">${result ? esc(result.name) : (err ? i18n.getMessage('dronecanNameError') : '—')}</td></tr>
             <tr><th>Health</th><td data-detail="health">${HEALTH_LABELS[health]}</td></tr>
             <tr><th>Mode</th><td data-detail="mode">${esc(modeLabel)}</td></tr>
-            <tr><th>Last Seen</th><td data-detail="last-seen">${(node.last_seen_ms / 1000).toFixed(1)}s ago</td></tr>
+            <tr><th>Last Seen</th><td data-detail="last-seen">${i18n.getMessage('dronecanSecondsAgo', [(node.last_seen_ms / 1000).toFixed(1)])}</td></tr>
             <tr><th>Uptime</th><td data-detail="uptime">${uptime}</td></tr>
             <tr><th>Vendor Status</th><td data-detail="vendor-status">${esc(node.vendor_status_code)}</td></tr>
             ${result ? `
@@ -240,7 +245,7 @@ dronecanTab.showParams = function (nodeId) {
     const params = [];
 
     function fetchParam(index) {
-        if (index > 254) { renderParams(); return; } // DroneCAN param index is 8-bit (0-254 valid)
+        if (index > 8191) { renderParams(); return; } // UAVCAN v0 GetSet.Request uses a uint13 index (max 8191); firmware reads uint16
         if (nodeId !== currentDetailNodeId) return;
         dronecanAsyncPoll(DRONECAN_SERVICE_PARAM_GETSET, nodeId, { index, is_write: false }, (err, result) => {
             if (nodeId !== currentDetailNodeId) return;
@@ -296,7 +301,7 @@ dronecanTab.showParams = function (nodeId) {
             const btn = this;
             btn.disabled = true;
             btn.textContent = '...';
-            dronecanAsyncPoll(DRONECAN_SERVICE_EXECUTE_OPCODE, nodeId, { opcode: 0 }, (err, result) => {
+            dronecanAsyncPoll(DRONECAN_SERVICE_EXECUTE_OPCODE, nodeId, { opcode: DRONECAN_EXECUTE_OPCODE_SAVE }, (err, result) => {
                 btn.textContent = (!err && result && result.ok)
                     ? i18n.getMessage('dronecanSaved') : i18n.getMessage('dronecanFailed');
                 btn.disabled = false;
@@ -326,25 +331,34 @@ dronecanTab.showParams = function (nodeId) {
                 const writeValue = input.value;
                 const payload = { index: idx, is_write: true, value_type: param.value_type, name: param.name };
                 switch (param.value_type) {
-                    case PARAM_TYPE_INT:    payload.value = Number(writeValue); break;
+                    case PARAM_TYPE_INT: {
+                        try { payload.value = BigInt(writeValue); } catch { payload.value = NaN; }
+                        break;
+                    }
                     case PARAM_TYPE_FLOAT:  payload.value = parseFloat(writeValue); break;
                     case PARAM_TYPE_BOOL:   payload.value = writeValue === 'true' || writeValue === '1'; break;
                     case PARAM_TYPE_STRING: payload.value = writeValue; break;
                 }
 
                 if (param.value_type === PARAM_TYPE_INT || param.value_type === PARAM_TYPE_FLOAT) {
-                    const num = Number(payload.value);
-                    if (isNaN(num)) {
+                    const isInt = param.value_type === PARAM_TYPE_INT;
+                    const invalid = isInt ? typeof payload.value !== 'bigint' : isNaN(payload.value);
+                    if (invalid) {
                         input.style.outline = '2px solid #cc0000';
                         input.title = i18n.getMessage('dronecanParamOutOfRange');
                         btn.textContent = i18n.getMessage('dronecanParamOutOfRange');
                         setTimeout(() => { btn.textContent = i18n.getMessage('dronecanParamWrite'); }, 2000);
                         return;
                     }
-                    // compare in BigInt domain if the bound exceeds safe integer range
-                    const cmp = bound => typeof bound === 'bigint' ? BigInt(Math.trunc(num)) : num;
-                    const tooLow  = param.min !== undefined && cmp(param.min) < param.min;
-                    const tooHigh = param.max !== undefined && cmp(param.max) > param.max;
+                    let tooLow = false, tooHigh = false;
+                    if (isInt) {
+                        const toBig = b => typeof b === 'bigint' ? b : BigInt(Math.round(b));
+                        if (param.min !== undefined) tooLow  = payload.value < toBig(param.min);
+                        if (param.max !== undefined) tooHigh = payload.value > toBig(param.max);
+                    } else {
+                        if (param.min !== undefined) tooLow  = payload.value < Number(param.min);
+                        if (param.max !== undefined) tooHigh = payload.value > Number(param.max);
+                    }
                     if (tooLow || tooHigh) {
                         input.style.outline = '2px solid #cc0000';
                         const lo = param.min !== undefined ? param.min : '—';
