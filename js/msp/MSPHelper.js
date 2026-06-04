@@ -26,6 +26,11 @@ import {Geozone, GeozoneVertex, GeozoneShapes } from './../geozone';
 var mspHelper = (function () {
     var self = {};
 
+    const PARAM_TYPE_INT    = 1;
+    const PARAM_TYPE_FLOAT  = 2;
+    const PARAM_TYPE_BOOL   = 3;
+    const PARAM_TYPE_STRING = 4;
+
     self.sensorStatusEx = null;
 
     self.setSensorStatusEx = function (cb)  {
@@ -1614,10 +1619,6 @@ var mspHelper = (function () {
                                 result.hw_unique_id            = new Uint8Array(
                                     data.buffer, data.byteOffset + offset, 16).slice(); // copy; don't hold a live view into the MSP buffer
                             } else if (service_id === 11) { // PARAM_GETSET
-                                const PARAM_TYPE_INT    = 1;
-                                const PARAM_TYPE_FLOAT  = 2;
-                                const PARAM_TYPE_BOOL   = 3;
-                                const PARAM_TYPE_STRING = 4;
                                 result.value_type = data.getUint8(offset++);
                                 switch (result.value_type) {
                                     case PARAM_TYPE_INT: { // 8 bytes, little-endian lo/hi

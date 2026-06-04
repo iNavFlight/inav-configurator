@@ -18,6 +18,10 @@ const PARAM_TYPE_INT    = 1;
 const PARAM_TYPE_FLOAT  = 2;
 const PARAM_TYPE_BOOL   = 3;
 const PARAM_TYPE_STRING = 4;
+const DRONECAN_SERVICE_GETNODEINFO    = 1;
+const DRONECAN_SERVICE_RESTART_NODE   = 5;
+const DRONECAN_SERVICE_EXECUTE_OPCODE = 10;
+const DRONECAN_SERVICE_PARAM_GETSET   = 11;
 
 function getModeLabel(mode) {
     return (mode < MODE_LABELS.length && MODE_LABELS[mode]) ? MODE_LABELS[mode] : `MODE_${mode}`;
@@ -32,7 +36,7 @@ function dronecanAsyncPoll(service_id, node_id, params, onDone) {
         service_id & 0xFF, (service_id >> 8) & 0xFF,
         node_id,
     ];
-    if (service_id === 11 && params) {
+    if (service_id === DRONECAN_SERVICE_PARAM_GETSET && params) {
         reqPayload.push(params.index & 0xFF, (params.index >> 8) & 0xFF);
         reqPayload.push(params.is_write ? 1 : 0);
         if (params.is_write) {
@@ -60,7 +64,7 @@ function dronecanAsyncPoll(service_id, node_id, params, onDone) {
         }
     }
 
-    if (service_id === 10 && params) {
+    if (service_id === DRONECAN_SERVICE_EXECUTE_OPCODE && params) {
         reqPayload.push(params.opcode);
     }
 
@@ -92,7 +96,7 @@ function dronecanAsyncPoll(service_id, node_id, params, onDone) {
 function fetchNamesSequentially(nodes, index, tbody) {
     if (index >= nodes.length) return; 
     const node = nodes[index]; 
-    dronecanAsyncPoll(1, node.nodeID, null, (err, result) => {
+    dronecanAsyncPoll(DRONECAN_SERVICE_GETNODEINFO, node.nodeID, null, (err, result) => {
         if (!err && result) {
             nameCache[node.nodeID] = result.name;
             const r = tbody.querySelector(`tr[data-node-id="${node.nodeID}"]`);
@@ -201,7 +205,7 @@ dronecanTab.showDetail = function (nodeId) {
     const node = FC.DRONECAN_NODES.find(n => n.nodeID === nodeId);
     if (!node) return;
     
-    dronecanAsyncPoll(1, nodeId, null, (err, result) => {
+    dronecanAsyncPoll(DRONECAN_SERVICE_GETNODEINFO, nodeId, null, (err, result) => {
         if (nodeId !== currentDetailNodeId) return;
         const detail = document.getElementById('dronecan-node-detail');
         const tbody  = document.getElementById('dronecan-detail-tbody');
@@ -238,7 +242,7 @@ dronecanTab.showParams = function (nodeId) {
     function fetchParam(index) {
         if (index > 254) { renderParams(); return; } // DroneCAN param index is 8-bit (0-254 valid)
         if (nodeId !== currentDetailNodeId) return;
-        dronecanAsyncPoll(11, nodeId, { index, is_write: false }, (err, result) => {
+        dronecanAsyncPoll(DRONECAN_SERVICE_PARAM_GETSET, nodeId, { index, is_write: false }, (err, result) => {
             if (nodeId !== currentDetailNodeId) return;
             if (err || !result || !result.name) {
                 renderParams();
@@ -292,7 +296,7 @@ dronecanTab.showParams = function (nodeId) {
             const btn = this;
             btn.disabled = true;
             btn.textContent = '...';
-            dronecanAsyncPoll(10, nodeId, { opcode: 0 }, (err, result) => {
+            dronecanAsyncPoll(DRONECAN_SERVICE_EXECUTE_OPCODE, nodeId, { opcode: 0 }, (err, result) => {
                 btn.textContent = (!err && result && result.ok)
                     ? i18n.getMessage('dronecanSaved') : i18n.getMessage('dronecanFailed');
                 btn.disabled = false;
@@ -304,7 +308,7 @@ dronecanTab.showParams = function (nodeId) {
             const btn = this;
             btn.disabled = true;
             btn.textContent = '...';
-            dronecanAsyncPoll(5, nodeId, null, (err, result) => {
+            dronecanAsyncPoll(DRONECAN_SERVICE_RESTART_NODE, nodeId, null, (err, result) => {
                 btn.textContent = (!err && result && result.ok)
                     ? i18n.getMessage('dronecanRestarting') : i18n.getMessage('dronecanFailed');
                 btn.disabled = false;
@@ -332,7 +336,7 @@ dronecanTab.showParams = function (nodeId) {
                     const num = Number(payload.value);
                     if (isNaN(num)) {
                         input.style.outline = '2px solid #cc0000';
-                        input.title = '';
+                        input.title = i18n.getMessage('dronecanParamOutOfRange');
                         btn.textContent = i18n.getMessage('dronecanParamOutOfRange');
                         setTimeout(() => { btn.textContent = i18n.getMessage('dronecanParamWrite'); }, 2000);
                         return;
@@ -356,7 +360,7 @@ dronecanTab.showParams = function (nodeId) {
 
                 btn.disabled = true;
                 btn.textContent = '...';
-                dronecanAsyncPoll(11, nodeId, payload, (err, result) => {
+                dronecanAsyncPoll(DRONECAN_SERVICE_PARAM_GETSET, nodeId, payload, (err, result) => {
                     if (!err && result) {
                         param.value = result.value;
                         input.value = param.value_type === PARAM_TYPE_BOOL ? (result.value ? 'true' : 'false') : String(result.value);
