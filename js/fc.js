@@ -281,7 +281,7 @@ var FC = {
             packetCount: 0,
             hwVersion: 0
         };
-        
+
         this.ADSB_VEHICLES = {
             vehiclesCount: 0,
             callsignLength: 0,
@@ -585,7 +585,7 @@ var FC = {
             sensitivityEnd: null,
             correctionCenter: null,
             correctionEnd: null,
-            weightCenter: null, 
+            weightCenter: null,
             weightEnd: null
         };
 
@@ -838,7 +838,7 @@ var FC = {
         var calibrated = true;
         var flagNames = FC.getArmingFlags();
 
-        if (this.CALIBRATION_DATA.accGain.X === 4096 && this.CALIBRATION_DATA.accGain.Y === 4096 && this.CALIBRATION_DATA.accGain.Z === 4096 && 
+        if (this.CALIBRATION_DATA.accGain.X === 4096 && this.CALIBRATION_DATA.accGain.Y === 4096 && this.CALIBRATION_DATA.accGain.Z === 4096 &&
             this.CALIBRATION_DATA.accZero.X === 0 && this.CALIBRATION_DATA.accZero.Y === 0 && this.CALIBRATION_DATA.accZero.Z === 0
            ) {
             calibrated = false;
@@ -870,7 +870,8 @@ var FC = {
             'Level',
             'Heading Hold',
             'Velocity Z',
-            'Nav Heading'
+            'Nav Heading',
+            'Auto Speed'
         ];
     },
     getRthAltControlMode: function () {
