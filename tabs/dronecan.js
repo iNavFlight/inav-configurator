@@ -451,6 +451,7 @@ function saveNodeIdAndReboot(nodeId) {
 dronecanTab.saveConfig = function () {
     const bitrate = $('#dronecan-bitrate').val();
     const nodeId = Number.parseInt($('#dronecan-node-id').val(), 10);
+    if (Number.isNaN(nodeId) || nodeId < 1 || nodeId > 127) return;
     if (nodeId >= 126 && !confirm(i18n.getMessage('dronecanNodeIdReservedWarning'))) return;
     mspHelper.setSetting('dronecan_bitrate_kbps', bitrate, () => saveNodeIdAndReboot(nodeId));
 };
