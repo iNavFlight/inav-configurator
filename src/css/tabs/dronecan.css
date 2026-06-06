@@ -44,7 +44,7 @@
     margin-top: 1.5em;
 }
 
-#dronecan-detail-table th {
+.dronecan-detail th {
     padding-right: 1em;
     text-align: left;
     color: #aaa;
