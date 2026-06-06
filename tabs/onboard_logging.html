@@ -129,30 +129,34 @@
                     <p class="require-dataflash-unsupported" data-i18n="dataflashFirmwareUpgradeRequired"></p>
                 </div>
             </div>
-            <div class="require-sdcard-supported">
-                <div class="gui_box grey">
-                    <div class="gui_box_titlebar" align="left">
-                        <div class="spacer_box_title" data-i18n="OnboardSDCard">
-                        </div>
+        </div>
+
+        <!-- SD card status. Shown when the SD card can be used for logging, i.e.
+             when Blackbox is supported, or when only terrain (GPS) logging is enabled. -->
+        <div class="require-sdcard-logging">
+            <div class="gui_box grey">
+                <div class="gui_box_titlebar">
+                    <div class="spacer_box_title" data-i18n="OnboardSDCard">
                     </div>
-                    <div class="spacer_box">
-                        <div class="sdcard">
-                            <div class="sdcard-icon"></div>
-                            <div class="sdcard-status"></div>
-                        </div>
+                </div>
+                <div class="spacer_box">
+                    <div class="sdcard">
+                        <div class="sdcard-icon"></div>
+                        <div class="sdcard-status"></div>
+                    </div>
 
-                        <p data-i18n="sdcardNote"></p>
+                    <p data-i18n="sdcardNote"></p>
 
-                        <div class="require-sdcard-ready">
-                            <ul class="sdcard-contents">
-                                <li class="sdcard-free">
-                                    <div class="legend"></div>
-                                </li>
-                                <li class="sdcard-other">
-                                    <div class="legend right"></div>
-                                </li>
-                            </ul><bbr />
-                        </div>
+                    <div class="require-sdcard-ready">
+                        <ul class="sdcard-contents">
+                            <li class="sdcard-free">
+                                <div class="legend"></div>
+                            </li>
+                            <li class="sdcard-other">
+                                <div class="legend right"></div>
+                            </li>
+                        </ul>
+                        <br />
                     </div>
                 </div>
             </div>

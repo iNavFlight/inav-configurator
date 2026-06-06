@@ -19,6 +19,9 @@ const onboardLoggingTab = {
 onboardLoggingTab.initialize = function (callback) {
     let
         saveCancelled, eraseCancelled;
+    var self = this;
+
+    self.terrain_enabled = false;
 
     //Add future blackbox values here and in messages.json, the checkbox are drawn by js
     const blackBoxFields = [
@@ -46,7 +49,18 @@ onboardLoggingTab.initialize = function (callback) {
         MSP.send_message(MSPCodes.MSP_FEATURE, false, false, function() {
             MSP.send_message(MSPCodes.MSP_DATAFLASH_SUMMARY, false, false, function() {
                 MSP.send_message(MSPCodes.MSP_SDCARD_SUMMARY, false, false, function() {
-		            MSP.send_message(MSPCodes.MSP2_BLACKBOX_CONFIG, false, false, load_html);
+                    mspHelper.getSetting("terrain_enabled").then(function(data){
+                        if (data == null) {
+                            console.warn("while setting terrain_enabled, data is null or undefined");
+                            return Promise.resolve();
+                        }
+
+                        self.terrain_enabled = Boolean(data.value);
+                        return Promise.resolve();
+                    })
+                    .then(function(){
+                        MSP.send_message(MSPCodes.MSP2_BLACKBOX_CONFIG, false, false, load_html);
+                    });
                 });
             });
         });
@@ -79,7 +93,7 @@ onboardLoggingTab.initialize = function (callback) {
     function load_html() {
         import('./onboard_logging.html?raw').then(({default: html}) => GUI.load(html, function() {
             // translate to user-selected language
-           i18n.localize();;
+           i18n.localize();
 
             var
                 dataflashPresent = FC.DATAFLASH.totalSize > 0,
@@ -96,7 +110,8 @@ onboardLoggingTab.initialize = function (callback) {
                 .toggleClass("sdcard-supported", FC.SDCARD.supported)
                 .toggleClass("blackbox-config-supported", FC.BLACKBOX.supported)
                 .toggleClass("blackbox-supported", blackboxSupport)
-                .toggleClass("blackbox-unsupported", !blackboxSupport);
+                .toggleClass("blackbox-unsupported", !blackboxSupport)
+                .toggleClass("only-terrain-supported", !blackboxSupport && self.terrain_enabled);
 
             if (dataflashPresent) {
                 // UI hooks

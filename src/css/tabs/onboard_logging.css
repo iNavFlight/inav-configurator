@@ -173,10 +173,10 @@
 .require-dataflash-present,
 .require-dataflash-supported,
 .require-sdcard-ready,
-.require-sdcard-supported,
 .require-blackbox-supported,
 .require-blackbox-unsupported,
 .require-blackbox-config-supported,
+.require-sdcard-logging,
 .tab-onboard_logging.dataflash-present .require-dataflash-not-present,
 .tab-onboard_logging.dataflash-supported .require-dataflash-unsupported,
 .tab-onboard_logging.sdcard-supported .require-sdcard-unsupported,
@@ -187,10 +187,16 @@
 .tab-onboard_logging.dataflash-present .require-dataflash-present,
 .tab-onboard_logging.dataflash-supported .require-dataflash-supported,
 .tab-onboard_logging.sdcard-ready .require-sdcard-ready,
-.tab-onboard_logging.sdcard-supported .require-sdcard-supported,
 .tab-onboard_logging.blackbox-supported .require-blackbox-supported,
 .tab-onboard_logging.blackbox-unsupported .require-blackbox-unsupported,
 .tab-onboard_logging.blackbox-config-supported .require-blackbox-config-supported {
+    display: block;
+}
+
+/* Show the SD card box whenever the card can be used for logging: either
+   Blackbox is supported, or only terrain (GPS) logging is enabled. */
+.tab-onboard_logging.sdcard-supported.blackbox-supported .require-sdcard-logging,
+.tab-onboard_logging.sdcard-supported.only-terrain-supported .require-sdcard-logging {
     display: block;
 }
 
