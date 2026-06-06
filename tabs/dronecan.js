@@ -93,7 +93,9 @@ function dronecanAsyncPoll(service_id, node_id, params, onDone) {
                 const r = FC.DRONECAN_ASYNC_RESULT;
                 if (!r || r.seq !== expectedSeq ||
                     r.service_id !== service_id || r.node_id !== node_id) {
-                    onDone(new Error('stale'), null); return;
+                    if (++attempts < POLL_MAX_ATTEMPTS) { setTimeout(poll, POLL_INTERVAL_MS); }
+                    else { onDone(new Error('stale'), null); }
+                    return;
                 }
                 if (r.state === DRONECAN_ASYNC_STATE_READY) { onDone(null, r); }
                 else if (r.state === DRONECAN_ASYNC_STATE_ERROR) { onDone(new Error('error'), null); }
