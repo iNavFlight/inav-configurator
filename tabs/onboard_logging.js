@@ -18,10 +18,8 @@ const onboardLoggingTab = {
 
 onboardLoggingTab.initialize = function (callback) {
     let
-        saveCancelled, eraseCancelled;
-    var self = this;
-
-    self.terrain_enabled = false;
+        saveCancelled, eraseCancelled,
+        terrainEnabled = false;
 
     //Add future blackbox values here and in messages.json, the checkbox are drawn by js
     const blackBoxFields = [
@@ -48,21 +46,21 @@ onboardLoggingTab.initialize = function (callback) {
     if (CONFIGURATOR.connectionValid) {
         MSP.send_message(MSPCodes.MSP_FEATURE, false, false, function() {
             MSP.send_message(MSPCodes.MSP_DATAFLASH_SUMMARY, false, false, function() {
-                MSP.send_message(MSPCodes.MSP_SDCARD_SUMMARY, false, false, function() {
-                    mspHelper.getSetting("terrain_enabled").then(function(data){
-                        if (data == null) {
-                            console.warn("while setting terrain_enabled, data is null or undefined");
-                            return Promise.resolve();
-                        }
-
-                        self.terrain_enabled = Boolean(data.value);
-                        return Promise.resolve();
-                    })
-                    .then(function(){
-                        MSP.send_message(MSPCodes.MSP2_BLACKBOX_CONFIG, false, false, load_html);
-                    });
-                });
+                MSP.send_message(MSPCodes.MSP_SDCARD_SUMMARY, false, false, load_terrain_setting);
             });
+        });
+    }
+
+    function load_terrain_setting() {
+        mspHelper.getSetting("terrain_enabled").then(function(data) {
+            if (data == null) {
+                console.warn("while setting terrain_enabled, data is null or undefined");
+                return;
+            }
+
+            terrainEnabled = Boolean(data.value);
+        }).then(function() {
+            MSP.send_message(MSPCodes.MSP2_BLACKBOX_CONFIG, false, false, load_html);
         });
     }
 
@@ -111,7 +109,7 @@ onboardLoggingTab.initialize = function (callback) {
                 .toggleClass("blackbox-config-supported", FC.BLACKBOX.supported)
                 .toggleClass("blackbox-supported", blackboxSupport)
                 .toggleClass("blackbox-unsupported", !blackboxSupport)
-                .toggleClass("only-terrain-supported", !blackboxSupport && self.terrain_enabled);
+                .toggleClass("only-terrain-supported", !blackboxSupport && terrainEnabled);
 
             if (dataflashPresent) {
                 // UI hooks
