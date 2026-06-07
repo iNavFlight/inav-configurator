@@ -43,6 +43,7 @@ var OutputMappingCollection = function () {
     self.TIMER_OUTPUT_MODE_SERVOS = 2;
     self.TIMER_OUTPUT_MODE_LED = 3;
     self.TIMER_OUTPUT_MODE_PINIO = 4;
+    self.TIMER_OUTPUT_MODE_BEEPER = 5;
 
     self.flushTimerOverrides = function() {
         timerOverrides = {};
@@ -76,13 +77,13 @@ var OutputMappingCollection = function () {
         for (let entry of directAssignments) {
             let displayIndex = entry.outputIndex - offset;
             if (displayIndex < 0 || displayIndex >= outputCount) continue;
-            if (entry.type === 1) {
+            if (entry.type === TIM_USE_MOTOR) {
                 outputMap[displayIndex] = 'Motor ' + entry.number;
-            } else if (entry.type === 2) {
+            } else if (entry.type === TIM_USE_SERVO) {
                 outputMap[displayIndex] = 'Servo ' + entry.number;
-            } else if (entry.type === 3) {
-                outputMap[displayIndex] = 'Led';
-            } else if (entry.type === 4) {
+            } else if (entry.type === TIM_USE_BEEPER) {
+                outputMap[displayIndex] = 'Buzzer';
+            } else if (entry.type === TIM_USE_PINIO) {
                 outputMap[displayIndex] = 'USER' + entry.number;
             }
         }
