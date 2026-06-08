@@ -30,10 +30,11 @@ var OutputMappingCollection = function () {
     const TIM_USE_BEEPER = 25;
     const TIM_USE_PINIO = 26;
 
-    const OUTPUT_TYPE_MOTOR = 0;
-    const OUTPUT_TYPE_SERVO = 1;
-    const OUTPUT_TYPE_LED   = 2;
-    const OUTPUT_TYPE_PINIO = 3;
+    const OUTPUT_TYPE_MOTOR  = 0;
+    const OUTPUT_TYPE_SERVO  = 1;
+    const OUTPUT_TYPE_LED    = 2;
+    const OUTPUT_TYPE_PINIO  = 3;
+    const OUTPUT_TYPE_BEEPER = 4;
 
     const SPECIAL_LABEL_LED = 1;
     const SPECIAL_LABEL_PINIO_BASE = 2;  // values 2..5 = USER1..USER4 (add channel index 0-3)
@@ -143,6 +144,15 @@ var OutputMappingCollection = function () {
             }
         }
 
+        // Pre-assign BEEPER outputs — explicitly overridden by user, takes precedence over flag-based assignment
+        for (let i = 0; i < data.length; i++) {
+            let timerId = data[i]['timerId'];
+            let mode = timerOverrides[timerId] || self.TIMER_OUTPUT_MODE_AUTO;
+            if (mode === self.TIMER_OUTPUT_MODE_BEEPER) {
+                timerMap[i] = OUTPUT_TYPE_BEEPER;
+            }
+        }
+
         // Two priority passes: dedicated outputs first, then auto.
         // Matches firmware pwmBuildTimerOutputList() behavior.
         for (let priority = 0; priority < 2; priority++) {
@@ -210,6 +220,8 @@ var OutputMappingCollection = function () {
                 outputMap[i] = "Led";
             } else if (assignment == OUTPUT_TYPE_PINIO) {
                 outputMap[i] = "USER" + (data[i + offset]['specialLabels'] - SPECIAL_LABEL_PINIO_BASE + 1);
+            } else if (assignment == OUTPUT_TYPE_BEEPER) {
+                outputMap[i] = "Buzzer";
             }
         }
 
