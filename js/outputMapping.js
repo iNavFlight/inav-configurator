@@ -114,7 +114,7 @@ var OutputMappingCollection = function () {
         return BitHelper.bit_check(data[outputIndex]['usageFlags'], TIM_USE_BEEPER);
     }
 
-    function isTimerDefaultFlag(timerId, flag) {
+    function isTimerDefault(timerId, flag) {
         let found = false;
         for (let i = 0; i < data.length; i++) {
             if (data[i]['timerId'] !== timerId) continue;
@@ -140,7 +140,7 @@ var OutputMappingCollection = function () {
 
     // Returns true when the timer's compile-time default assignment is BEEPER.
     self.isTimerDefaultBeeper = function(timerId) {
-        return isTimerDefaultFlag(timerId, TIM_USE_BEEPER);
+        return isTimerDefault(timerId, TIM_USE_BEEPER);
     }
 
     self.getOutputTimerColor = function (output) {

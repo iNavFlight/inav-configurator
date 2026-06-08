@@ -104,9 +104,7 @@ mixerTab.initialize = function (callback, scrollPosition) {
 
         // Timer row: one colspan cell per group, containing the mode dropdown.
         for (let group of groups) {
-            let usageMode = FC.OUTPUT_MAPPING.getTimerOverride(group.timerId);
-            // When no explicit override is set (AUTO), pre-select the timer's natural mode
-            // so LED-only and beeper-only timers show their purpose rather than "AUTO".
+            let usageMode = FC.OUTPUT_MAPPING.getTimerOverride(group.timerId) ?? FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_AUTO;
             let displayMode = usageMode;
             if (usageMode == FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_AUTO) {
                 if (FC.OUTPUT_MAPPING.isTimerDefaultLed(group.timerId)) {
@@ -171,7 +169,7 @@ mixerTab.initialize = function (callback, scrollPosition) {
         if (FC.OUTPUT_MAPPING.hasDirectAssignment()) {
             outputMap = FC.OUTPUT_MAPPING.getOutputTableDirect();
             for (let i = 0; i < Math.min(outputMap.length, jsMap.length); i++) {
-                if (outputMap[i] === '-') outputMap[i] = jsMap[i]; // fill in default LED and beeper
+                if (outputMap[i] === '-' && jsMap[i] && jsMap[i] !== '-') outputMap[i] = jsMap[i]; // fill in default LED and beeper
             }
         } else {
             outputMap = jsMap;
