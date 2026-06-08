@@ -896,6 +896,9 @@
     "onboardLoggingBlackboxRate": {
         "message": "Portion of flight loop iterations to log (logging rate)"
     },
+    "onboardLoggingTerrainRateWarning": {
+        "message": "Terrain is enabled, not recommended to use more than 25% logging rate"
+    },
     "featureCHANNEL_FORWARDING": {
         "message": "Forward aux channels to servo outputs"
     },

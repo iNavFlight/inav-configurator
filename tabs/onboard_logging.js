@@ -221,17 +221,29 @@ onboardLoggingTab.initialize = function (callback) {
         for (var i = 0; i < loggingRates.length; i++) {
             if (!addedCurrentValue && userRate.num / userRate.denom <= loggingRates[i].num / loggingRates[i].denom) {
                 if (userRate.num / userRate.denom < loggingRates[i].num / loggingRates[i].denom) {
-                    loggingRatesSelect.append('<option value="' + userRate.num + '/' + userRate.denom + '">'
-                            + userRate.num + '/' + userRate.denom + ' (' + Math.round(userRate.num / userRate.denom * 100) + '%)</option>');
+                    var userPercent = Math.round(userRate.num / userRate.denom * 100);
+                    loggingRatesSelect.append('<option value="' + userRate.num + '/' + userRate.denom + '" data-percent="' + userPercent + '">'
+                            + userRate.num + '/' + userRate.denom + ' (' + userPercent + '%)</option>');
                 }
                 addedCurrentValue = true;
             }
 
-            loggingRatesSelect.append('<option value="' + loggingRates[i].num + '/' + loggingRates[i].denom + '">'
-                + loggingRates[i].num + '/' + loggingRates[i].denom + ' (' + Math.round(loggingRates[i].num / loggingRates[i].denom * 100) + '%)</option>');
+            var percent = Math.round(loggingRates[i].num / loggingRates[i].denom * 100);
+            loggingRatesSelect.append('<option value="' + loggingRates[i].num + '/' + loggingRates[i].denom + '" data-percent="' + percent + '">'
+                + loggingRates[i].num + '/' + loggingRates[i].denom + ' (' + percent + '%)</option>');
 
         }
         loggingRatesSelect.val(userRate.num + '/' + userRate.denom);
+
+        loggingRatesSelect.on('change', update_terrain_rate_warning);
+        update_terrain_rate_warning();
+    }
+
+    function update_terrain_rate_warning() {
+        var percent = parseInt($(".blackboxRate select option:selected").data("percent"), 10);
+        var showWarning = terrainEnabled && percent > 25;
+
+        $(".tab-onboard_logging .terrain-rate-warning").toggle(showWarning);
     }
 
     function formatFilesizeKilobytes(kilobytes) {
