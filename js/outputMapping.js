@@ -116,9 +116,9 @@ var OutputMappingCollection = function () {
 
     function isTimerDefault(timerId, flag) {
         let found = false;
-        for (let i = 0; i < data.length; i++) {
-            if (data[i]['timerId'] !== timerId) continue;
-            let flags = data[i]['usageFlags'];
+        for (const entry of data) {
+            if (entry['timerId'] !== timerId) continue;
+            const flags = entry['usageFlags'];
             if (BitHelper.bit_check(flags, TIM_USE_MOTOR) || BitHelper.bit_check(flags, TIM_USE_SERVO)) return false;
             if (BitHelper.bit_check(flags, flag)) found = true;
         }
@@ -129,11 +129,11 @@ var OutputMappingCollection = function () {
     self.isTimerDefaultLed = function(timerId) {
         // LED can also be identified by specialLabels, so check both.
         let hasLed = false;
-        for (let i = 0; i < data.length; i++) {
-            if (data[i]['timerId'] !== timerId) continue;
-            let flags = data[i]['usageFlags'];
+        for (const entry of data) {
+            if (entry['timerId'] !== timerId) continue;
+            const flags = entry['usageFlags'];
             if (BitHelper.bit_check(flags, TIM_USE_MOTOR) || BitHelper.bit_check(flags, TIM_USE_SERVO)) return false;
-            if (BitHelper.bit_check(flags, TIM_USE_LED) || data[i]['specialLabels'] === SPECIAL_LABEL_LED) hasLed = true;
+            if (BitHelper.bit_check(flags, TIM_USE_LED) || entry['specialLabels'] === SPECIAL_LABEL_LED) hasLed = true;
         }
         return hasLed;
     }

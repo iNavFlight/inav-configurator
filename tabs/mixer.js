@@ -95,8 +95,8 @@ mixerTab.initialize = function (callback, scrollPosition) {
         for (let i = 0; i < outputCount; i++) {
             let timerId = FC.OUTPUT_MAPPING.getTimerId(i);
             let color = FC.OUTPUT_MAPPING.getOutputTimerColor(i);
-            if (groups.length > 0 && groups[groups.length - 1].timerId === timerId) {
-                groups[groups.length - 1].count++;
+            if (groups.length > 0 && groups.at(-1).timerId === timerId) {
+                groups.at(-1).count++;
             } else {
                 groups.push({ timerId, count: 1, color });
             }
