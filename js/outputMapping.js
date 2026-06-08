@@ -180,6 +180,8 @@ var OutputMappingCollection = function () {
                     servosToGo--;
                 } else if (!isDedicated && BitHelper.bit_check(flags, TIM_USE_LED)) {
                     timerMap[i] = OUTPUT_TYPE_LED;
+                } else if (!isDedicated && BitHelper.bit_check(flags, TIM_USE_BEEPER)) {
+                    timerMap[i] = OUTPUT_TYPE_BEEPER;
                 }
             }
         }
@@ -246,6 +248,7 @@ var OutputMappingCollection = function () {
                 BitHelper.bit_check(flags, TIM_USE_MOTOR) ||
                 BitHelper.bit_check(flags, TIM_USE_SERVO) ||
                 BitHelper.bit_check(flags, TIM_USE_LED) ||
+                BitHelper.bit_check(flags, TIM_USE_BEEPER) ||
                 BitHelper.bit_check(flags, TIM_USE_PINIO) ||
                 data[i]['specialLabels'] >= SPECIAL_LABEL_PINIO_BASE
             ) {
@@ -262,6 +265,7 @@ var OutputMappingCollection = function () {
                 BitHelper.bit_check(data[i]['usageFlags'], TIM_USE_MOTOR) ||
                 BitHelper.bit_check(data[i]['usageFlags'], TIM_USE_SERVO) ||
                 BitHelper.bit_check(data[i]['usageFlags'], TIM_USE_LED) ||
+                BitHelper.bit_check(data[i]['usageFlags'], TIM_USE_BEEPER) ||
                 BitHelper.bit_check(data[i]['usageFlags'], TIM_USE_PINIO) ||
                 data[i]['specialLabels'] >= SPECIAL_LABEL_PINIO_BASE
             ) {
