@@ -82,44 +82,54 @@ mixerTab.initialize = function (callback, scrollPosition) {
 
     function renderOutputTable() {
         let outputCount = FC.OUTPUT_MAPPING.getOutputCount(),
+            $timerRow = $('#timer-row'),
             $outputRow = $('#output-row'),
             $functionRow = $('#function-row');
 
+        $timerRow.append('<th></th>');
         $outputRow.append('<th data-i18n="mappingTableOutput"></th>');
         $functionRow.append('<th data-i18n="mappingTableFunction"></th>');
 
-        let seenTimers = new Set();
+        // Build consecutive timer groups for colspan cells.
+        let groups = [];
+        for (let i = 0; i < outputCount; i++) {
+            let timerId = FC.OUTPUT_MAPPING.getTimerId(i);
+            let color = FC.OUTPUT_MAPPING.getOutputTimerColor(i);
+            if (groups.length > 0 && groups[groups.length - 1].timerId === timerId) {
+                groups[groups.length - 1].count++;
+            } else {
+                groups.push({ timerId, count: 1, color });
+            }
+        }
 
+        // Timer row: one colspan cell per group, containing the mode dropdown.
+        for (let group of groups) {
+            let usageMode = FC.OUTPUT_MAPPING.getTimerOverride(group.timerId);
+            let selectHtml =
+                '<select id="timer-output-' + group.timerId + '">' +
+                    '<option value=' + FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_AUTO   + (usageMode == FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_AUTO   ? ' selected' : '') + '>AUTO</option>' +
+                    '<option value=' + FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_MOTORS + (usageMode == FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_MOTORS ? ' selected' : '') + '>MOTORS</option>' +
+                    '<option value=' + FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_SERVOS + (usageMode == FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_SERVOS ? ' selected' : '') + '>SERVOS</option>' +
+                    '<option value=' + FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_LED    + (usageMode == FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_LED    ? ' selected' : '') + '>LED</option>' +
+                    '<option value=' + FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_PINIO  + (usageMode == FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_PINIO  ? ' selected' : '') + '>PINIO / DUTY CYCLE</option>' +
+                    '<option value=' + FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_BEEPER + (usageMode == FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_BEEPER ? ' selected' : '') + '>BEEPER</option>' +
+                '</select>';
+            $timerRow.append('<td colspan="' + group.count + '" style="background-color: ' + group.color + '">' + selectHtml + '</td>');
+        }
+
+        // Output and function rows: one uniform-height cell per pad.
         for (let i = 1; i <= outputCount; i++) {
             let timerId = FC.OUTPUT_MAPPING.getTimerId(i - 1);
             let color = FC.OUTPUT_MAPPING.getOutputTimerColor(i - 1);
             let isLed = FC.OUTPUT_MAPPING.isLedPin(i - 1);
-            let isFirstPad = !seenTimers.has(timerId);
-            seenTimers.add(timerId);
-
-            let cellContent = '';
-            if (isFirstPad) {
-                let usageMode = FC.OUTPUT_MAPPING.getTimerOverride(timerId);
-                cellContent +=
-                    '<select id="timer-output-' + timerId + '">' +
-                        '<option value=' + FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_AUTO   + (usageMode == FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_AUTO   ? ' selected' : '') + '>AUTO</option>' +
-                        '<option value=' + FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_MOTORS + (usageMode == FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_MOTORS ? ' selected' : '') + '>MOTORS</option>' +
-                        '<option value=' + FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_SERVOS + (usageMode == FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_SERVOS ? ' selected' : '') + '>SERVOS</option>' +
-                        '<option value=' + FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_LED    + (usageMode == FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_LED    ? ' selected' : '') + '>LED</option>' +
-                        '<option value=' + FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_PINIO  + (usageMode == FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_PINIO  ? ' selected' : '') + '>PINIO / DUTY CYCLE</option>' +
-                        '<option value=' + FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_BEEPER + (usageMode == FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_BEEPER ? ' selected' : '') + '>BEEPER</option>' +
-                    '</select><br>';
-            }
-            cellContent += 'S' + i + (isLed ? '/LED' : '') + ' (Timer&nbsp;' + (timerId + 1) + ')';
-
-            $outputRow.append('<td style="background-color: ' + color + '">' + cellContent + '</td>');
+            $outputRow.append('<td style="background-color: ' + color + '">S' + i + (isLed ? '/LED' : '') + ' (Timer&nbsp;' + (timerId + 1) + ')</td>');
             $functionRow.append('<td id="function-' + i + '">-</td>');
         }
 
         $outputRow.find('td').css('width', 100 / (outputCount + 1) + '%');
 
-        for (let t of seenTimers) {
-            $('#timer-output-' + t).on('change', function() {
+        for (let group of groups) {
+            $('#timer-output-' + group.timerId).on('change', function() {
                 updateTimerOverride();
                 if (FC.OUTPUT_MAPPING.hasDirectAssignment()) {
                     mspHelper.queryOutputAssignment(renderOutputMapping);
