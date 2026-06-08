@@ -87,58 +87,38 @@ mixerTab.initialize = function (callback, scrollPosition) {
 
         $outputRow.append('<th data-i18n="mappingTableOutput"></th>');
         $functionRow.append('<th data-i18n="mappingTableFunction"></th>');
-        
-        for (let i = 1; i <= outputCount; i++) {
 
+        let seenTimers = new Set();
+
+        for (let i = 1; i <= outputCount; i++) {
             let timerId = FC.OUTPUT_MAPPING.getTimerId(i - 1);
             let color = FC.OUTPUT_MAPPING.getOutputTimerColor(i - 1);
             let isLed = FC.OUTPUT_MAPPING.isLedPin(i - 1);
+            let isFirstPad = !seenTimers.has(timerId);
+            seenTimers.add(timerId);
 
-            $outputRow.append('<td style="background-color: ' + color + '">S' + i + (isLed ? '/LED' : '') + ' (Timer&nbsp;' + (timerId + 1) + ')</td>');
-            $functionRow.append('<td id="function-' + i +'">-</td>');
+            let cellContent = '';
+            if (isFirstPad) {
+                let usageMode = FC.OUTPUT_MAPPING.getTimerOverride(timerId);
+                cellContent +=
+                    '<select id="timer-output-' + timerId + '">' +
+                        '<option value=' + FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_AUTO   + (usageMode == FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_AUTO   ? ' selected' : '') + '>AUTO</option>' +
+                        '<option value=' + FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_MOTORS + (usageMode == FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_MOTORS ? ' selected' : '') + '>MOTORS</option>' +
+                        '<option value=' + FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_SERVOS + (usageMode == FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_SERVOS ? ' selected' : '') + '>SERVOS</option>' +
+                        '<option value=' + FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_LED    + (usageMode == FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_LED    ? ' selected' : '') + '>LED</option>' +
+                        '<option value=' + FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_PINIO  + (usageMode == FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_PINIO  ? ' selected' : '') + '>PINIO / DUTY CYCLE</option>' +
+                        '<option value=' + FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_BEEPER + (usageMode == FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_BEEPER ? ' selected' : '') + '>BEEPER</option>' +
+                    '</select><br>';
+            }
+            cellContent += 'S' + i + (isLed ? '/LED' : '') + ' (Timer&nbsp;' + (timerId + 1) + ')';
+
+            $outputRow.append('<td style="background-color: ' + color + '">' + cellContent + '</td>');
+            $functionRow.append('<td id="function-' + i + '">-</td>');
         }
 
         $outputRow.find('td').css('width', 100 / (outputCount + 1) + '%');
 
-    }
-
-    function updateTimerOverride() {
-        let timers = FC.OUTPUT_MAPPING.getUsedTimerIds();
-
-        for(let i =0; i < timers.length;++i) {
-            let timerId = timers[i];
-            let $select = $('#timer-output-' + timerId);
-            if(!$select) {
-                continue;
-            }
-            FC.OUTPUT_MAPPING.setTimerOverride(timerId, $select.val());
-        }
-    }
-
-    function renderTimerOverride() {
-        let outputCount = FC.OUTPUT_MAPPING.getOutputCount(),
-            $container = $('#timerOutputsList'), timers = {};
-
-
-        let usedTimers = FC.OUTPUT_MAPPING.getUsedTimerIds();
-
-        for (let t of usedTimers) {
-            var usageMode = FC.OUTPUT_MAPPING.getTimerOverride(t);
-            $container.append(
-                        '<div class="select" style="padding: 5px; margin: 1px; background-color: ' + FC.OUTPUT_MAPPING.getTimerColor(t) + '">' +
-                            '<select id="timer-output-' + t + '">' +
-                                '<option value=' + FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_AUTO + '' + (usageMode == FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_AUTO ? ' selected' : '')+ '>AUTO</option>'+
-                                '<option value=' + FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_MOTORS + '' + (usageMode == FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_MOTORS ? ' selected' : '')+ '>MOTORS</option>'+
-                                '<option value=' + FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_SERVOS + '' + (usageMode == FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_SERVOS ? ' selected' : '')+ '>SERVOS</option>'+
-                                '<option value=' + FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_LED + '' + (usageMode == FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_LED ? ' selected' : '')+ '>LED</option>'+
-                                '<option value=' + FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_PINIO + '' + (usageMode == FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_PINIO ? ' selected' : '')+ '>PINIO / DUTY CYCLE</option>'+
-                                '<option value=' + FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_BEEPER + '' + (usageMode == FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_BEEPER ? ' selected' : '')+ '>BEEPER</option>'+
-                            '</select>' +
-                            '<label for="timer-output-' + t + '">' +
-                                '<span> Timer ' + (parseInt(t) + 1) + '</span>' +
-                            '</label>' +
-                        '</div>'
-            );
+        for (let t of seenTimers) {
             $('#timer-output-' + t).on('change', function() {
                 updateTimerOverride();
                 if (FC.OUTPUT_MAPPING.hasDirectAssignment()) {
@@ -148,7 +128,19 @@ mixerTab.initialize = function (callback, scrollPosition) {
                 }
             });
         }
+    }
 
+    function updateTimerOverride() {
+        let timers = FC.OUTPUT_MAPPING.getUsedTimerIds();
+
+        for(let i = 0; i < timers.length; ++i) {
+            let timerId = timers[i];
+            let $select = $('#timer-output-' + timerId);
+            if(!$select) {
+                continue;
+            }
+            FC.OUTPUT_MAPPING.setTimerOverride(timerId, $select.val());
+        }
     }
 
     function renderOutputMapping() {
@@ -862,7 +854,6 @@ mixerTab.initialize = function (callback, scrollPosition) {
 
         renderOutputTable();
         renderOutputMapping();
-        renderTimerOverride();
 
         // Attempt to enhance output preview with firmware-authoritative assignments.
         // Tab is already functional above; this re-renders if/when firmware responds.
