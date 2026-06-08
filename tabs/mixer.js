@@ -105,14 +105,24 @@ mixerTab.initialize = function (callback, scrollPosition) {
         // Timer row: one colspan cell per group, containing the mode dropdown.
         for (let group of groups) {
             let usageMode = FC.OUTPUT_MAPPING.getTimerOverride(group.timerId);
+            // When no explicit override is set (AUTO), pre-select the timer's natural mode
+            // so LED-only and beeper-only timers show their purpose rather than "AUTO".
+            let displayMode = usageMode;
+            if (usageMode == FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_AUTO) {
+                if (FC.OUTPUT_MAPPING.isTimerDefaultLed(group.timerId)) {
+                    displayMode = FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_LED;
+                } else if (FC.OUTPUT_MAPPING.isTimerDefaultBeeper(group.timerId)) {
+                    displayMode = FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_BEEPER;
+                }
+            }
             let selectHtml =
                 '<select id="timer-output-' + group.timerId + '">' +
-                    '<option value=' + FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_AUTO   + (usageMode == FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_AUTO   ? ' selected' : '') + '>AUTO</option>' +
-                    '<option value=' + FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_MOTORS + (usageMode == FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_MOTORS ? ' selected' : '') + '>MOTORS</option>' +
-                    '<option value=' + FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_SERVOS + (usageMode == FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_SERVOS ? ' selected' : '') + '>SERVOS</option>' +
-                    '<option value=' + FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_LED    + (usageMode == FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_LED    ? ' selected' : '') + '>LED</option>' +
-                    '<option value=' + FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_PINIO  + (usageMode == FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_PINIO  ? ' selected' : '') + '>PINIO / DUTY CYCLE</option>' +
-                    '<option value=' + FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_BEEPER + (usageMode == FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_BEEPER ? ' selected' : '') + '>BEEPER</option>' +
+                    '<option value=' + FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_AUTO   + (displayMode == FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_AUTO   ? ' selected' : '') + '>AUTO</option>' +
+                    '<option value=' + FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_MOTORS + (displayMode == FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_MOTORS ? ' selected' : '') + '>MOTORS</option>' +
+                    '<option value=' + FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_SERVOS + (displayMode == FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_SERVOS ? ' selected' : '') + '>SERVOS</option>' +
+                    '<option value=' + FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_LED    + (displayMode == FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_LED    ? ' selected' : '') + '>LED</option>' +
+                    '<option value=' + FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_PINIO  + (displayMode == FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_PINIO  ? ' selected' : '') + '>PINIO / DUTY CYCLE</option>' +
+                    '<option value=' + FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_BEEPER + (displayMode == FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_BEEPER ? ' selected' : '') + '>BEEPER</option>' +
                 '</select>';
             $timerRow.append('<td colspan="' + group.count + '" style="background-color: ' + group.color + '">' + selectHtml + '</td>');
         }
@@ -122,7 +132,8 @@ mixerTab.initialize = function (callback, scrollPosition) {
             let timerId = FC.OUTPUT_MAPPING.getTimerId(i - 1);
             let color = FC.OUTPUT_MAPPING.getOutputTimerColor(i - 1);
             let isLed = FC.OUTPUT_MAPPING.isLedPin(i - 1);
-            $outputRow.append('<td style="background-color: ' + color + '">S' + i + (isLed ? '/LED' : '') + ' (Timer&nbsp;' + (timerId + 1) + ')</td>');
+            let isBeeper = FC.OUTPUT_MAPPING.isBeeperPin(i - 1);
+            $outputRow.append('<td style="background-color: ' + color + '">S' + i + (isLed ? '/LED' : '') + (isBeeper ? '/Buzzer' : '') + ' (Timer&nbsp;' + (timerId + 1) + ')</td>');
             $functionRow.append('<td id="function-' + i + '">-</td>');
         }
 
@@ -154,15 +165,16 @@ mixerTab.initialize = function (callback, scrollPosition) {
     }
 
     function renderOutputMapping() {
+        let isMR = FC.MIXER_CONFIG.platformType == PLATFORM.MULTIROTOR || FC.MIXER_CONFIG.platformType == PLATFORM.TRICOPTER;
+        let jsMap = FC.OUTPUT_MAPPING.getOutputTable(isMR, FC.MOTOR_RULES.getNumberOfConfiguredMotors(), FC.SERVO_RULES.getUsedServoIndexes());
         let outputMap;
         if (FC.OUTPUT_MAPPING.hasDirectAssignment()) {
             outputMap = FC.OUTPUT_MAPPING.getOutputTableDirect();
+            for (let i = 0; i < Math.min(outputMap.length, jsMap.length); i++) {
+                if (outputMap[i] === '-') outputMap[i] = jsMap[i]; // fill in default LED and beeper
+            }
         } else {
-            outputMap = FC.OUTPUT_MAPPING.getOutputTable(
-                FC.MIXER_CONFIG.platformType == PLATFORM.MULTIROTOR || FC.MIXER_CONFIG.platformType == PLATFORM.TRICOPTER,
-                FC.MOTOR_RULES.getNumberOfConfiguredMotors(),
-                FC.SERVO_RULES.getUsedServoIndexes()
-            );
+            outputMap = jsMap;
         }
 
         for (let i = 1; i <= FC.OUTPUT_MAPPING.getOutputCount(); i++) {

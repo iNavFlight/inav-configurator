@@ -110,6 +110,39 @@ var OutputMappingCollection = function () {
         return data[timer].specialLabels == SPECIAL_LABEL_LED;
     }
 
+    self.isBeeperPin = function(outputIndex) {
+        return BitHelper.bit_check(data[outputIndex]['usageFlags'], TIM_USE_BEEPER);
+    }
+
+    function isTimerDefaultFlag(timerId, flag) {
+        let found = false;
+        for (let i = 0; i < data.length; i++) {
+            if (data[i]['timerId'] !== timerId) continue;
+            let flags = data[i]['usageFlags'];
+            if (BitHelper.bit_check(flags, TIM_USE_MOTOR) || BitHelper.bit_check(flags, TIM_USE_SERVO)) return false;
+            if (BitHelper.bit_check(flags, flag)) found = true;
+        }
+        return found;
+    }
+
+    // Returns true when the timer's compile-time default assignment is LED.
+    self.isTimerDefaultLed = function(timerId) {
+        // LED can also be identified by specialLabels, so check both.
+        let hasLed = false;
+        for (let i = 0; i < data.length; i++) {
+            if (data[i]['timerId'] !== timerId) continue;
+            let flags = data[i]['usageFlags'];
+            if (BitHelper.bit_check(flags, TIM_USE_MOTOR) || BitHelper.bit_check(flags, TIM_USE_SERVO)) return false;
+            if (BitHelper.bit_check(flags, TIM_USE_LED) || data[i]['specialLabels'] === SPECIAL_LABEL_LED) hasLed = true;
+        }
+        return hasLed;
+    }
+
+    // Returns true when the timer's compile-time default assignment is BEEPER.
+    self.isTimerDefaultBeeper = function(timerId) {
+        return isTimerDefaultFlag(timerId, TIM_USE_BEEPER);
+    }
+
     self.getOutputTimerColor = function (output) {
         let timerId = self.getTimerId(output);
 
