@@ -1633,17 +1633,17 @@ OSD.constants = {
                 {
                     name: 'AUTO SPEED',
                     id: 170,
-                    min_version: '10.0.0',
+                    // min_version: '10.0.0',
                     preview: function(osd_data) {
                         switch (OSD.data.preferences.units) {
                             case 0: // Imperial
                             case 2: // Metric + MPH
                             case 3: // UK
-                                return FONT.embed_dot('(127') + FONT.symbol(SYM.MPH_3D) + FONT.embed_dot(')');
+                                return FONT.embed_dot('G:127') + FONT.symbol(SYM.MPH_3D);
                             case 4: // GA
-                                return FONT.embed_dot('(110') + FONT.symbol(SYM.KT_3D) + FONT.embed_dot(')');
+                                return FONT.embed_dot('G:110') + FONT.symbol(SYM.KT_3D);
                             default: // Metric
-                                return FONT.embed_dot('(204') + FONT.symbol(SYM.KMH_3D) + FONT.embed_dot(')');
+                                return FONT.embed_dot('G:204') + FONT.symbol(SYM.KMH_3D);
                         }
                     }
                 },
