@@ -107,12 +107,12 @@ mixerTab.initialize = function (callback, scrollPosition) {
             [O.TIMER_OUTPUT_MODE_MOTORS, 'MOTORS'],
             [O.TIMER_OUTPUT_MODE_SERVOS, 'SERVOS'],
             [O.TIMER_OUTPUT_MODE_LED,    'LED'],
-            [O.TIMER_OUTPUT_MODE_PINIO,  'PINIO / DUTY CYCLE'],
+            [O.TIMER_OUTPUT_MODE_PINIO,  'PINIO / PWM'],
             [O.TIMER_OUTPUT_MODE_BEEPER, 'BEEPER'],
         ].map(([value, label]) =>
             '<option value=' + value + (displayMode === value ? ' selected' : '') + '>' + label + '</option>'
         ).join('');
-        return '<select id="timer-output-' + group.timerId + '">' + optionsHtml + '</select>';
+        return 'Timer&nbsp;' + (group.timerId + 1) + ' <select id="timer-output-' + group.timerId + '">' + optionsHtml + '</select>';
     }
 
     function renderOutputTable() {
@@ -129,7 +129,7 @@ mixerTab.initialize = function (callback, scrollPosition) {
 
         for (const group of groups) {
             const selectHtml = buildTimerSelectHtml(group);
-            $timerRow.append('<td colspan="' + group.count + '" style="background-color: ' + group.color + '">' + selectHtml + '</td>');
+            $timerRow.append('<td colspan="' + group.count + '" style="background-color: ' + group.color + '; padding-right: 4px">' + selectHtml + '</td>');
         }
 
         for (let i = 1; i <= outputCount; i++) {
@@ -137,7 +137,7 @@ mixerTab.initialize = function (callback, scrollPosition) {
             const color = FC.OUTPUT_MAPPING.getOutputTimerColor(i - 1);
             const isLed = FC.OUTPUT_MAPPING.isLedPin(i - 1);
             const isBeeper = FC.OUTPUT_MAPPING.isBeeperPin(i - 1);
-            $outputRow.append('<td style="background-color: ' + color + '">S' + i + (isLed ? '/LED' : '') + (isBeeper ? '/Buzzer' : '') + ' (Timer&nbsp;' + (timerId + 1) + ')</td>');
+            $outputRow.append('<td style="background-color: ' + color + '">S' + i + (isLed ? '/LED' : '') + (isBeeper ? '/Buzzer' : '') + '</td>');
             $functionRow.append('<td id="function-' + i + '">-</td>');
         }
 
