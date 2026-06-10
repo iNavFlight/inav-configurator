@@ -194,6 +194,7 @@ gpsTab.initialize = function (callback) {
             $('#gps_port').closest('.select').toggle(!isDroneCAN);
             $('#gps_baud').closest('.select').toggle(!isDroneCAN);
             $('#gps_dronecan_info').toggle(isDroneCAN);
+            $('#gps_dronecan_node_id_row').toggle(isDroneCAN);
             if (isDroneCAN) {
                 $port.val(-1);
             }

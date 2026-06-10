@@ -31,6 +31,11 @@
                             <select id="gps_baud" class="gps_baud"></select>
                             <label for="gps_baud"><span data-i18n="gpsBaud"></span></label>
                         </div>
+                        <div id="gps_dronecan_node_id_row" class="number" style="display: none;">
+                            <input type="number" id="gps_dronecan_node_id" data-setting="dronecan_gps_node_id" step="1" min="0" max="125" />
+                            <label for="gps_dronecan_node_id"><span data-i18n="gpsDroneCANNodeId"></span></label>
+                            <div for="gps_dronecan_node_id" class="helpicon cf_tip" data-i18n_title="gpsDroneCANNodeIdTip"></div>
+                        </div>
                         <div class="select">
                             <select id="gps_ubx_sbas" class="gps_ubx_sbas">
                                 <!-- list generated here -->

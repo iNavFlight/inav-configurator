@@ -1343,6 +1343,12 @@
     "gpsDroneCANInfo": {
         "message": "GPS is provided via DroneCAN. Configure bus settings on the DroneCAN tab. Serial port and baud rate do not apply."
     },
+    "gpsDroneCANNodeId": {
+        "message": "GPS Node ID"
+    },
+    "gpsDroneCANNodeIdTip": {
+        "message": "DroneCAN node ID of the GPS unit (1–125). Set to 0 to accept data from any node."
+    },
     "configurationGPSUseGalileo": {
         "message": "Gps use Galileo Satellites (EU)"
     },
