@@ -195,6 +195,14 @@ gpsTab.initialize = function (callback) {
             $('#gps_baud').closest('.select').toggle(!isDroneCAN);
             $('#gps_dronecan_info').toggle(isDroneCAN);
             $('#gps_dronecan_node_id_row').toggle(isDroneCAN);
+            $('#gps_ubx_sbas').closest('.select').toggle(!isDroneCAN);
+            $('#gps_preset_mode').closest('.select').toggle(!isDroneCAN);
+            $('#gps_ublox_nav_hz').closest('.number').toggle(!isDroneCAN);
+            $('#gps_use_galileo').closest('.checkbox').toggle(!isDroneCAN);
+            $('#gps_use_beidou').closest('.checkbox').toggle(!isDroneCAN);
+            $('#gps_use_glonass').closest('.checkbox').toggle(!isDroneCAN);
+            $('.loadAssistnowOnline').closest('.btn').toggle(!isDroneCAN);
+            $('.loadAssistnowOffline').closest('.btn').toggle(!isDroneCAN);
             if (isDroneCAN) {
                 $port.val(-1);
             }
