@@ -5495,6 +5495,12 @@
     "configurationCurrentMeterType": {
         "message": "Current Meter Type"
     },
+    "configurationDronecanBatteryId": {
+        "message": "DroneCAN Battery ID (0 = any)"
+    },
+    "configurationDronecanBatteryIdHelp": {
+        "message": "Filter BatteryInfo messages by the battery_id slot field reported by the BMS. Set to 0 to accept messages from any battery. Set to a specific value to reject messages from other battery slots. Applies to both voltage and current when either source is set to CAN."
+    },
     "MissionPlannerJumpSettingsCheck": {
         "message": "JUMP settings incorrect : Check it again! \nBeing forced to WP 1!"
     },

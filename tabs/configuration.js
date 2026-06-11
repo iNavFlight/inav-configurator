@@ -261,9 +261,21 @@ configurationTab.initialize = function (callback, scrollPosition) {
 
         });
 
+        function updateBatterySourceFields() {
+            const vbatIsCan = $('#vbat_meter_type option:selected').text() === 'CAN';
+            const currentIsCan = $('#current_meter_type option:selected').text() === 'CAN';
+            $('#voltagescale-row').toggle(!vbatIsCan);
+            $('#currentscale-row').toggle(!currentIsCan);
+            $('#currentoffset-row').toggle(!currentIsCan);
+            $('#dronecan-battery-id-row').toggle(vbatIsCan || currentIsCan);
+        }
+
+        $('#vbat_meter_type, #current_meter_type').on('change', updateBatterySourceFields);
+
         // Wait for settings to load before triggering change event
         settingsPromise.then(function() {
             $i2cSpeed.trigger('change');
+            updateBatterySourceFields();
         }).catch(function(error) {
             console.error('Settings load failed, I2C speed change not triggered:', error);
         });
@@ -278,7 +290,9 @@ configurationTab.initialize = function (callback, scrollPosition) {
             FC.MISC.vbatmincellvoltage = parseFloat($('#mincellvoltage').val());
             FC.MISC.vbatmaxcellvoltage = parseFloat($('#maxcellvoltage').val());
             FC.MISC.vbatwarningcellvoltage = parseFloat($('#warningcellvoltage').val());
-            FC.MISC.vbatscale = parseInt($('#voltagescale').val());
+            if ($('#vbat_meter_type option:selected').text() !== 'CAN') {
+                FC.MISC.vbatscale = parseInt($('#voltagescale').val());
+            }
 
             FC.MISC.battery_capacity = parseInt($('#battery_capacity').val());
             FC.MISC.battery_capacity_warning = parseInt($('#battery_capacity_warning').val() * FC.MISC.battery_capacity / 100);
@@ -288,8 +302,10 @@ configurationTab.initialize = function (callback, scrollPosition) {
             features.reset();
             features.fromUI($('.tab-configuration'));
             features.execute(function () {
-                FC.CURRENT_METER_CONFIG.scale = parseInt($('#currentscale').val());
-                FC.CURRENT_METER_CONFIG.offset = Math.round(parseFloat($('#currentoffset').val()) * 10);
+                if ($('#current_meter_type option:selected').text() !== 'CAN') {
+                    FC.CURRENT_METER_CONFIG.scale = parseInt($('#currentscale').val());
+                    FC.CURRENT_METER_CONFIG.offset = Math.round(parseFloat($('#currentoffset').val()) * 10);
+                }
                 saveChainer.execute();
             });
         });
