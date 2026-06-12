@@ -740,54 +740,21 @@ TABS.magnetometer.initialize = function (callback) {
         return magHeading;
     }
 
-    function accComputeYaw(changed, upside) {
-        // Is upside down just -1 X the upside up value?
-        var corrections = {
-            'up': {
-                 0: {
-                    45: -90, // Confirmed
-                    135: 0,  // Double check
-                    180: 0,  // Double check
-                    315: 90  // Confirmed
-                },
-                22: {
-                    22: -45,
-                    338: 45
-                },
-                45: {
-                    0: 0,   // Confirmed
-                    45: -45,
-                    90: -90,
-                    270: 90 // May be upside down
-                },
-                315: {
-                    0: 180, // Confirmed
-                    90: -90,
-                    270: 90
-                 },
-                338: {
-                  22: -135, // aka 225
-                  338: 135
-                }
-            },
-            'down': {
-                0: {
-                  45: -90 // 90?
-                },
-                45: {
-                    0: -90 // Double check
-                }
-            }
-        };
-        if (corrections[upside] &&
-            corrections[upside][changed[0]] &&
-            typeof corrections[upside][changed[0]][changed[1]] != 'undefined') {
-            console.log(corrections[upside][changed[0]][changed[1]]);
-            return (corrections[upside][changed[0]][changed[1]]);
-        } else {
-            console.log("accComputeYaw: No match for upside=" + upside + ", changed=" + changed);
-            return(-1);
-        }
+    function accComputeYaw(delta_pitch, delta_roll, flat_pitch, flat_roll) {
+        // Tilting the airframe nose-up by a known angle changes the
+        // accelerometer-derived pitch/roll by an amount that depends on how
+        // far the IMU's pitch axis is rotated, in yaw, from the airframe's
+        // nose. atan2(-delta_roll, delta_pitch) recovers that yaw offset
+        // directly, for any mounting angle, and is snapped to the nearest
+        // 45 degrees to match BOARD_ALIGNMENT's resolution.
+        //
+        // A board mounted upside-down (flat_pitch or flat_roll == +-180)
+        // negates only ONE of the two deltas' contribution to that formula
+        // -- which one depends on which axis the board was flipped about.
+        let pitchSign = (Math.abs(flat_roll)  === 180) ? -1 : 1;
+        let rollSign  = (Math.abs(flat_pitch) === 180) ? -1 : 1;
+        let yaw = Math.atan2(-delta_roll * rollSign, delta_pitch * pitchSign) * 180 / Math.PI;
+        return ((Math.round(yaw / 45) * 45) + 360) % 360;
     }
 
     function accAutoAlignReadFlat() {
@@ -847,8 +814,30 @@ TABS.magnetometer.initialize = function (callback) {
         // Note: Using standard aerospace conventions
         let roll = ( Math.atan2(acc_g_flat[1], acc_g_flat[2]) * 180/Math.PI ) % 360;
         let pitch = ( Math.atan2(-1 * acc_g_flat[0], Math.sqrt(acc_g_flat[1] ** 2 + acc_g_flat[2] ** 2)) * 180/Math.PI ) % 360;
-        self.acc_flat_xyz = new Array(pitch, roll, 0);
         console.log("Calculated attitude: pitch=" + pitch.toFixed(1) + "°, roll=" + roll.toFixed(1) + "°");
+
+        // Snap to the nearest 45 degrees: this is the board's mounting
+        // pitch/roll relative to the (level) airframe.
+        let roundedPitch = Math.round(pitch / 45) * 45;
+        let roundedRoll = Math.round(roll / 45) * 45;
+
+        // BOARD_ALIGNMENT only supports flat (0) or upside-down (180)
+        // pitch/roll. Anything else means the board is mounted on edge
+        // (sensor Z axis horizontal) or at a non-standard tilt, which this
+        // wizard can't resolve.
+        if (Math.abs(roundedPitch) % 180 !== 0 || Math.abs(roundedRoll) % 180 !== 0) {
+            console.error("Unsupported board orientation: pitch=" + roundedPitch + "°, roll=" + roundedRoll + "°");
+            modal = new jBox('Modal', {
+                width: 460,
+                height: 360,
+                animation: false,
+                closeOnClick: true,
+                content: $('#modal-acc-align-vertical-error')
+            }).open();
+            return;
+        }
+
+        self.acc_flat_xyz = new Array(roundedPitch, roundedRoll, 0);
 
         heading_flat = getMagHeading();
 
@@ -864,7 +853,6 @@ TABS.magnetometer.initialize = function (callback) {
 
 
     function accAutoAlignRead45() {
-        var changed = [0, 0, 0];
         let raw_changed = [0, 0, 0];
         var acc_align;
         var i;
@@ -917,65 +905,14 @@ TABS.magnetometer.initialize = function (callback) {
         console.log("Calculated attitude (45°): pitch=" + pitch.toFixed(1) + "°, roll=" + roll.toFixed(1) + "°");
 
         for (i = 0; i < acc_g_45.length; i++) {
-            self.acc_flat_xyz[i] = Math.round( self.acc_flat_xyz[i] / 45 ) * 45;
             raw_changed[i] = self.acc_flat_xyz[i] - acc_45_xyz[i];
         }
         console.log("raw_changed: " + raw_changed);
 
- 
-        // Check for 45° mounting (25.5mm boards)
-        let corner_raised = false;
-        if (
-               Math.abs(raw_changed[0]) > 13 &&  Math.abs(raw_changed[0]) < 30 &&
-               Math.abs(raw_changed[1]) > 13 &&  Math.abs(raw_changed[1]) < 30
-        ) {
-            corner_raised = true;
-        }
-
-        for (i = 0; i < acc_g_45.length; i++) {
-            if (corner_raised) {
-                changed[i] = ( 360 + Math.round(raw_changed[i] / 22) * 22 ) % 360;
-            } else {
-                changed[i] = ( 360 + Math.round(raw_changed[i] / 45) * 45 ) % 360;
-            }
-        }
-
-        // var boardRotation = new THREE.Euler( THREE.MathUtils.degToRad( -self.boardAlignmentConfig.pitch ), THREE.MathUtils.degToRad( -self.boardAlignmentConfig.yaw ), THREE.MathUtils.degToRad( -self.boardAlignmentConfig.roll ), 'YXZ');
-        // var matrix1 = (new THREE.Matrix4()).makeRotationFromEuler(boardRotation);
-
-        /*
-            Get the actual down direction.
-            Get which edge or corner was lifted.
-            Define front as the edge or corner that was lifted.
-            Define the absolute orientation as that which has the correct part down and the correct part front.
-            Apply sensor orientation on the board.
-            Rotate the current settings according to the needed correction matrix.
-            
-            
-            OR
-            
-            Get the rotation needed so that pitch and roll are near zero.
-            Define front as the edge or corner that was lifted.
-            Define the relative orientation (correction needed) as that which has the correct part down and the correct part front. (Relative to current settings).
-            Rotate the current settings according to the needed correction matrix.
-            
-        */
-
-      	// console.log(axis);
-       	// planet.position.applyQuaternion(quaternion);
-        
-        let upside = 'up';
-        // If the board is reading as upside down, fix that.
-        if ( roll > 120 ) {
-            // self.acc_flat_xyz[1] = (self.acc_flat_xyz[1] + 180) % 360;
-            upside = 'down';
-        }
-    
-        console.log("changed:");
-        console.log(changed);
-        console.log("upside: " + upside);
-    
-        let acc_yaw = accComputeYaw(changed, upside);
+        // The accelerometer-derived pitch/roll change caused by tilting the
+        // airframe nose-up by a known angle reveals how far the IMU's pitch
+        // axis is rotated, in yaw, relative to the airframe's nose.
+        let acc_yaw = accComputeYaw(raw_changed[0], raw_changed[1], self.acc_flat_xyz[0], self.acc_flat_xyz[1]);
         self.acc_flat_xyz[2] = acc_yaw;
 
 
