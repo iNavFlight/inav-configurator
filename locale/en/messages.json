@@ -5268,6 +5268,12 @@
     "servoMixerAdd": {
         "message": "Add new mixer rule"
     },
+    "servoMixRuleInvalidServoTargetTitle": {
+        "message": "Invalid servo target"
+    },
+    "servoMixRuleInvalidServoTarget": {
+        "message": "$1 servos are defined. Cannot output to servo #$2 because only $1 servos exist."
+    },
     "platformType": {
         "message": "Platform type"
     },
