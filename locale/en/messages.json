@@ -4930,6 +4930,9 @@
     "osdElement_OSD_RANGEFINDER": {
         "message": "Rangefinder distance"
     },
+    "osdElement_OSD_TERRAIN_AGL": {
+        "message": "Terrain AGL"
+    },
     "osdElement_COURSE_NEXT_GEOZONE": {
         "message": "Course to next Geozone"
     },
