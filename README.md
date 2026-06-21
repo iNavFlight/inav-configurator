@@ -19,7 +19,7 @@ everything, the hardware is not working, or you have any other _support_ problem
 
 ## Installation
 
- _INAV Configurator_ is distributed as a  _standalone_ application.
+ _INAV Configurator_ is distributed as a _standalone_ application.
 
 ### Windows
 
