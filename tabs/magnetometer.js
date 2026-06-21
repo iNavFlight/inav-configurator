@@ -279,6 +279,10 @@ magnetometerTab.initialize = function (callback) {
     }
 
     function updateBoardPitchAxis(value) {
+        if (value == null) {
+            return;
+        }
+
         self.boardAlignmentConfig.pitch = Number(value);
         if (self.pageElements.board_pitch_slider[0].noUiSlider && !_settingSlider) { _settingSlider = true; self.pageElements.board_pitch_slider[0].noUiSlider.set(self.boardAlignmentConfig.pitch); _settingSlider = false; }
         self.pageElements.orientation_board_pitch.val(self.boardAlignmentConfig.pitch);
@@ -288,6 +292,10 @@ magnetometerTab.initialize = function (callback) {
     }
 
     function updateBoardYawAxis(value) {
+        if (value == null) {
+            return;
+        }
+
         self.boardAlignmentConfig.yaw = Number(value);
         if (self.pageElements.board_yaw_slider[0].noUiSlider && !_settingSlider) { _settingSlider = true; self.pageElements.board_yaw_slider[0].noUiSlider.set(self.boardAlignmentConfig.yaw); _settingSlider = false; }
         self.pageElements.orientation_board_yaw.val(self.boardAlignmentConfig.yaw);
@@ -313,6 +321,10 @@ magnetometerTab.initialize = function (callback) {
 
     //Called when roll values change
     function updateRollAxis(value) {
+        if (value == null) {
+            return;
+        }
+
         self.alignmentConfig.roll = Number(value);
         if (self.pageElements.roll_slider[0].noUiSlider && !_settingSlider) { _settingSlider = true; self.pageElements.roll_slider[0].noUiSlider.set(self.alignmentConfig.roll); _settingSlider = false; }
         self.pageElements.orientation_mag_roll.val(self.alignmentConfig.roll);
@@ -322,6 +334,10 @@ magnetometerTab.initialize = function (callback) {
 
     //Called when pitch values change
     function updatePitchAxis(value) {
+        if (value == null) {
+            return;
+        }
+
         self.alignmentConfig.pitch = Number(value);
         if (self.pageElements.pitch_slider[0].noUiSlider && !_settingSlider) { _settingSlider = true; self.pageElements.pitch_slider[0].noUiSlider.set(self.alignmentConfig.pitch); _settingSlider = false; }
         self.pageElements.orientation_mag_pitch.val(self.alignmentConfig.pitch);
@@ -331,6 +347,10 @@ magnetometerTab.initialize = function (callback) {
 
     //Called when yaw values change
     function updateYawAxis(value) {
+        if (value == null) {
+            return;
+        }
+
         self.alignmentConfig.yaw = Number(value);
         if (self.pageElements.yaw_slider[0].noUiSlider && !_settingSlider) { _settingSlider = true; self.pageElements.yaw_slider[0].noUiSlider.set(self.alignmentConfig.yaw); _settingSlider = false; }
         self.pageElements.orientation_mag_yaw.val(self.alignmentConfig.yaw);
@@ -420,15 +440,15 @@ magnetometerTab.initialize = function (callback) {
         }
 
 
-        self.pageElements.orientation_board_roll.on('change', function () {
+        self.pageElements.orientation_board_roll.on('input change', function () {
             updateBoardRollAxis(clamp(this, -180, 360));
         });
 
-        self.pageElements.orientation_board_pitch.on('change', function () {
+        self.pageElements.orientation_board_pitch.on('input change', function () {
             updateBoardPitchAxis(clamp(this, -180, 360));
         });
 
-        self.pageElements.orientation_board_yaw.on('change', function () {
+        self.pageElements.orientation_board_yaw.on('input change', function () {
             updateBoardYawAxis(clamp(this, -180, 360));
         });
 
@@ -497,7 +517,11 @@ magnetometerTab.initialize = function (callback) {
         });
 
         function clamp(input, min, max) {
-            return Math.min(Math.max(parseInt($(input).val()), min), max);
+            const parsed = parseInt($(input).val(), 10);
+            if (isNaN(parsed)) {
+                return null;
+            }
+            return Math.min(Math.max(parsed, min), max);
         }
 
         self.pageElements.orientation_mag_e.on('change', function () {
@@ -511,17 +535,17 @@ magnetometerTab.initialize = function (callback) {
             presetUpdated(degrees);
         });
 
-        self.pageElements.orientation_mag_roll.on('change', function () {
+        self.pageElements.orientation_mag_roll.on('input change', function () {
             disableSavePreset();
             updateRollAxis(clamp(this, -180, 360));
         });
 
-        self.pageElements.orientation_mag_pitch.on('change', function () {
+        self.pageElements.orientation_mag_pitch.on('input change', function () {
             disableSavePreset();
             updatePitchAxis(clamp(this, -180, 360));
         });
 
-        self.pageElements.orientation_mag_yaw.on('change', function () {
+        self.pageElements.orientation_mag_yaw.on('input change', function () {
             disableSavePreset();
             updateYawAxis(clamp(this, -180, 360));
         });
