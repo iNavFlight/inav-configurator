@@ -219,7 +219,7 @@
         "message": "Output Settings"
     },
     "mapgenTarget": {
-        "message": "Target Widget"
+        "message": "Target"
     },
     "mapgenProvider": {
         "message": "Provider"

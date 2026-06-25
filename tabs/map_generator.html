@@ -12,11 +12,15 @@
                     <div class="spacer_box">
                         <div class="select">
                             <select id="mapgen_target">
-                                <option value="b14ckyy">b14ckyy ETHOS Mapping Widget</option>
-                                <option value="yaapu">Yaapu</option>
-                                <option value="terrain">INAV Terrain (SRTM)</option>
+                                <optgroup label="Flight Controller">
+                                    <option value="terrain">INAV Terrain (SRTM)</option>
+                                </optgroup>
+                                <optgroup label="Radio Widgets">
+                                    <option value="b14ckyy">b14ckyy ETHOS Mapping Widget</option>
+                                    <option value="yaapu">Yaapu</option>
+                                </optgroup>
                             </select>
-                            <label for="mapgen_target"><span data-i18n="mapgenTarget">Target Widget</span></label>
+                            <label for="mapgen_target"><span data-i18n="mapgenTarget">Target</span></label>
                         </div>
 
                         <div class="select mapgen-subtarget-hidden" id="mapgen_subtarget_wrapper">
