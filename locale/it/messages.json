@@ -286,7 +286,7 @@
         "message": "I profili sono salvati localmente. I profili contengono non solo tutti i dati di questa tab, ma anche il file di configurazione (\"EEPROM\") di INAV. <br><span style=\"color: red\">Nota:</span><br>I profili standard non possono essere sovrascritti. Per salvare le modifiche, crea un nuovo profilo. "
     },
     "sitlEnableSimulatorHelp": {
-        "message": "Se questa opzione e disattivata, possono essere usate solo le UART (MSP/Configurator). Utile per configurare INAV senza avviare il simulatore."
+        "message": "Se questa opzione è disattivata, possono essere usate solo le UART (MSP/Configurator). Utile per configurare INAV senza avviare il simulatore."
     },
     "sitlUseImuHelp": {
         "message": "Usa i dati sensore IMU del simulatore invece dei dati di assetto del simulatore in modo diretto (Sperimentale, non consigliato)."
@@ -514,7 +514,7 @@
         "message": "<span style=\"color: red; font-weight: bold\">Errore</span>: L'immagine fornita è più grande della flash disponibile sul chip! Immagine: $1 kiB, limite = $2 kiB"
     },
     "eeprom_saved_ok": {
-        "message": "EEPROM <span style=\"color: #37a8db\">saved</span>"
+        "message": "EEPROM <span style=\"color: #37a8db\">salvata</span>"
     },
     "defaultWelcomeIntro": {
         "message": "Benvenuto in <strong>INAV - Configurator</strong>, un'utilita pensata per semplificare aggiornamento, configurazione e tuning del flight controller."
@@ -535,7 +535,7 @@
         "message": "Contribuire"
     },
     "defaultContributingText": {
-        "message": "If you would like to help make INAV even better you can help in many ways, including:<br /><ul><li>Answering other users questions on the forums and IRC.</li><li>Contributing code to the firmware and configurator - new features, fixes, improvements</li><li>Testing <a href=\"https://github.com/iNavFlight/inav/pulls\" target=\"_blank\">new features/fixes</a> and providing feedback.</li><li>Helping out with <a href=\"https://github.com/iNavFlight/inav/issues\" target=\"_blank\">issues and commenting on feature requests</a>.</li></ul>"
+        "message": "Se desideri contribuire a rendere INAV ancora migliore, puoi aiutare in molti modi, tra cui:<br /><ul><li>Rispondere alle domande di altri utenti sui forum e su IRC.</li><li>Contribuire con codice al firmware e al configurator - nuove funzionalità, correzioni, miglioramenti</li><li>Testare <a href=\"https://github.com/iNavFlight/inav/pulls\" target=\"_blank\">nuove funzionalità/correzioni</a> e fornire feedback.</li><li>Aiutare con <a href=\"https://github.com/iNavFlight/inav/issues\" target=\"_blank\">i problemi e commentare le richieste di funzionalità</a>.</li></ul>"
     },
     "defaultChangelogHead": {
         "message": "Configurator - Changelog"
@@ -595,7 +595,7 @@
         "message": "Ripristina"
     },
     "initialSetupBackupRestoreText": {
-        "message": "<strong>Backup</strong> your configuration in case of an accident, <strong>CLI</strong> settings are <span style=\"color: red\">not</span> included - See 'dump' cli command"
+        "message": "<strong>Esegui il backup</strong> della tua configurazione in caso di incidente, le impostazioni <strong>CLI</strong> <span style=\"color: red\">non</span> sono incluse - Vedi il comando cli 'dump'"
     },
     "initialSetupBackupSuccess": {
         "message": "Backup salvato <span style=\"color: #37a8db\">correttamente</span>"
@@ -604,10 +604,10 @@
         "message": "Configurazione ripristinata <span style=\"color: #37a8db\">correttamente</span>"
     },
     "initialSetupButtonResetZaxis": {
-        "message": "Reset Z axis, offset: 0 deg"
+        "message": "Azzera asse Z, offset: 0 gradi"
     },
     "initialSetupButtonResetZaxisValue": {
-        "message": "Reset Z axis, offset: $1 deg"
+        "message": "Azzera asse Z, offset: $1 gradi"
     },
     "initialSetupMixerHead": {
         "message": "Tipo mixer"
@@ -736,7 +736,7 @@
         "message": "Modello: $1"
     },
     "initialSetupAttitude": {
-        "message": "$1 deg"
+        "message": "$1 gradi"
     },
     "initialSetupAccelCalibStarted": {
         "message": "Calibrazione accelerometro avviata"
@@ -760,7 +760,7 @@
         "message": "Impostazioni ripristinate ai valori <strong>predefiniti</strong>"
     },
     "initialSetupEepromSaved": {
-        "message": "EEPROM <span style=\"color: #37a8db\">saved</span>: Setup"
+        "message": "EEPROM <span style=\"color: #37a8db\">salvata</span>: Setup"
     },
     "RX_PPM": {
         "message": "Ingresso RX PPM"
@@ -1087,79 +1087,79 @@
         "message": "Angolo massimo di lancio"
     },
     "configurationLaunchMaxAngleHelp": {
-        "message": "Max throw angle (pitch/roll combined) to consider launch successful. Set to 180 to disable completely. Default: 45 [5-180]"
+        "message": "Angolo di lancio massimo (pitch/roll combinati) per considerare il lancio riuscito. Imposta a 180 per disabilitare completamente. Predefinito: 45 [5-180]"
     },
     "configurationLaunchDetectTime": {
         "message": "Tempo rilevamento"
     },
     "configurationLaunchDetectTimeHelp": {
-        "message": "Time for which thresholds have to breached to consider launch happened. Default: 40 [10-1000]"
+        "message": "Tempo per cui le soglie devono essere superate per considerare avvenuto il lancio. Predefinito: 40 [10-1000]"
     },
     "configurationLaunchThr": {
         "message": "Throttle di lancio"
     },
     "configurationLaunchThrHelp": {
-        "message": "Launch throttle - throttle to be set during launch sequence. Default: 1700 [1000-2000]"
+        "message": "Throttle di lancio - throttle da impostare durante la sequenza di lancio. Predefinito: 1700 [1000-2000]"
     },
     "configurationLaunchIdleThr": {
         "message": "Throttle idle"
     },
     "configurationLaunchIdleThrHelp": {
-        "message": "Idle throttle - throttle to be set before launch sequence is initiated. If set below minimum throttle it will force motor stop or at idle throttle (depending if the MOTOR_STOP is enabled). If set above minimum throttle it will force throttle to this value (if MOTOR_STOP is enabled it will be handled according to throttle stick position). Default: 1000 [1000-2000]"
+        "message": "Throttle al minimo (idle) - throttle da impostare prima dell'avvio della sequenza di lancio. Se impostato sotto il throttle minimo, forzerà l'arresto del motore o il throttle al minimo (a seconda che MOTOR_STOP sia abilitato). Se impostato sopra il throttle minimo, forzerà il throttle a questo valore (se MOTOR_STOP è abilitato verrà gestito in base alla posizione dello stick del throttle). Predefinito: 1000 [1000-2000]"
     },
     "configurationLaunchIdleDelay": {
         "message": "Ritardo throttle idle"
     },
     "configurationLaunchIdleDelayHelp": {
-        "message": "Set a time delay between raising the throttle for the launch, and the motor starting at idle throttle. Default: 0 [0-60000]"
+        "message": "Imposta un ritardo temporale tra l'aumento del throttle per il lancio e l'avvio del motore al throttle minimo (idle). Predefinito: 0 [0-60000]"
     },
     "configurationWiggleWakeIdle": {
         "message": "Wiggle per attivare idle"
     },
     "configurationWiggleWakeIdleHelp": {
-        "message": "If enabled, this feature allows a yaw wiggle of the aircraft to wake up the motors from idle.<br />0: Disabled (default)<br />1: 1 wiggle - This setting has a higher detection point, for airplanes without a tail that can be moved easily<br />2: 2 wiggles - This setting has a lower detection point, but requires the repeated action. This is intended for larger models and airplanes with tails"
+        "message": "Se abilitata, questa funzione consente un movimento (wiggle) di yaw del velivolo per risvegliare i motori dal minimo (idle).<br />0: Disabilitato (predefinito)<br />1: 1 wiggle - Questa impostazione ha un punto di rilevamento più alto, per aeroplani senza coda che possono essere mossi facilmente<br />2: 2 wiggle - Questa impostazione ha un punto di rilevamento più basso, ma richiede l'azione ripetuta. È pensata per modelli più grandi e aeroplani con coda"
     },
     "configurationLaunchMotorDelay": {
         "message": "Ritardo motore"
     },
     "configurationLaunchMotorDelayHelp": {
-        "message": "Delay between detected launch and launch sequence start and throttling up. Default: 500 [0-5000]"
+        "message": "Ritardo tra il lancio rilevato e l'avvio della sequenza di lancio con l'aumento del throttle. Predefinito: 500 [0-5000]"
     },
     "configurationLaunchSpinupTime": {
         "message": "Tempo spinup motore"
     },
     "configurationLaunchSpinupTimeHelp": {
-        "message": "Time to bring power from minimum throttle to nav_fw_launch_thr, to avoid big stress on ESC and large torque from propeller. Default: 100 [0-1000]"
+        "message": "Tempo per portare la potenza dal throttle minimo a nav_fw_launch_thr, per evitare grandi stress sull'ESC e una coppia elevata dell'elica. Predefinito: 100 [0-1000]"
     },
     "configurationLaunchMinTime": {
         "message": "Tempo minimo di lancio"
     },
     "configurationLaunchMinTimeHelp": {
-        "message": "Allow launch mode to execute at least this time [ms] and ignore stick movements. Default: 0 [0-60000]"
+        "message": "Permette alla modalità di lancio di eseguire almeno per questo tempo [ms] e ignora i movimenti dello stick. Predefinito: 0 [0-60000]"
     },
     "configurationLaunchTimeout": {
         "message": "Timeout lancio"
     },
     "configurationLaunchTimeoutHelp": {
-        "message": "Maximum time for launch sequence to be executed. After this time LAUNCH mode will be turned off and regular flight mode will take over. Default: 5000 [0-60000]"
+        "message": "Tempo massimo per l'esecuzione della sequenza di lancio. Dopo questo tempo la modalità LAUNCH verrà disattivata e la normale modalità di volo subentrerà. Predefinito: 5000 [0-60000]"
     },
     "configurationLaunchEndTime": {
         "message": "Tempo transizione finale"
     },
     "configurationLaunchEndTimeHelp": {
-        "message": "Smooth transition time at the end of the launch (ms). This is added to the Launch Timeout. Default: 2000 [0-5000]"
+        "message": "Tempo di transizione graduale alla fine del lancio (ms). Questo viene aggiunto al Timeout di lancio. Predefinito: 2000 [0-5000]"
     },
     "configurationLaunchMaxAltitude": {
         "message": "Altitudine massima"
     },
     "configurationLaunchMaxAltitudeHelp": {
-        "message": "Altitude at which LAUNCH mode will be turned off and regular flight mode will take over. Default: 0 [0-60000]"
+        "message": "Altitudine alla quale la modalità LAUNCH verrà disattivata e la normale modalità di volo subentrerà. Predefinito: 0 [0-60000]"
     },
     "configurationLaunchClimbAngle": {
         "message": "Angolo di salita"
     },
     "configurationLaunchClimbAngleHelp": {
-        "message": "Climb angle (attitude of model, not climb slope) for launch sequence (degrees), is also restrained by global max_angle_inclination_pit. Default: 18 [5-45]"
+        "message": "Angolo di salita (assetto del modello, non pendenza di salita) per la sequenza di lancio (gradi), è limitato anche dal valore globale max_angle_inclination_pit. Predefinito: 18 [5-45]"
     },
     "configuration3d": {
         "message": "Motori reversibili"
@@ -1183,7 +1183,7 @@
         "message": "Loop time flight controller"
     },
     "configurationCalculatedCyclesSec": {
-        "message": "Cycles/Sec (Hz)"
+        "message": "Cicli/Sec (Hz)"
     },
     "configurationGPS": {
         "message": "Configurazione"
@@ -1204,13 +1204,13 @@
         "message": "Offset fuso orario"
     },
     "tzOffsetHelp": {
-        "message": "Time zone offset from UTC. This is applied to the GPS time for logging and time-stamping of Blackbox logs. (Default = 0 mins)"
+        "message": "Offset del fuso orario rispetto all'UTC. Viene applicato all'orario GPS per il logging e la marcatura temporale dei log Blackbox. (Predefinito = 0 min)"
     },
     "tzAutomaticDST": {
         "message": "Ora legale automatica"
     },
     "tzAutomaticDSTHelp": {
-        "message": "Automatically add Daylight Saving Time to the GPS time when needed or simply ignore it. Includes presets for EU and the USA - if you live outside these areas it is suggested to manage DST manually via tz_offset. (Default = Off)"
+        "message": "Aggiunge automaticamente l'ora legale (Daylight Saving Time) all'orario GPS quando necessario o semplicemente la ignora. Include preset per UE e USA - se vivi al di fuori di queste aree si suggerisce di gestire il DST manualmente tramite tz_offset. (Predefinito = Off)"
     },
     "configurationGPSBaudrate": {
         "message": "Baud rate"
@@ -1243,7 +1243,7 @@
         "message": "Nessuna"
     },
     "configurationVTXNoBandHelp": {
-        "message": "VTX frequency has been set manually. Selecting a band will overwrite the configured frequency."
+        "message": "La frequenza del VTX è stata impostata manualmente. Selezionando una banda si sovrascriverà la frequenza configurata."
     },
     "configurationVTXChannel": {
         "message": "Canale"
@@ -1252,13 +1252,13 @@
         "message": "Livello Potenza"
     },
     "configurationVTXPowerHelp": {
-        "message": "VTX power level. The exact power in mw (or dBm) will depend on the specific hardware. Check your VTX manual."
+        "message": "Livello di potenza del VTX. La potenza esatta in mw (o dBm) dipenderà dall'hardware specifico. Controlla il manuale del tuo VTX."
     },
     "configurationVTXLowerPowerDisarm": {
-        "message": "Usa bassa potenza quando il mezzo è disarmato"
+        "message": "Usa bassa potenza quando il velivolo è disarmato"
     },
     "configurationVTXLowerPowerDisarmHelp": {
-        "message": "Enabling this option will make the VTX use its lowest power while the craft is disarmed. Use 'Until first arm' to make it use the lowest power only until you arm for the first time."
+        "message": "Abilitando questa opzione il VTX userà la sua potenza più bassa mentre il velivolo è disarmato. Usa 'Fino al primo arm' per fargli usare la potenza più bassa solo fino a quando esegui l'arm per la prima volta."
     },
     "configurationVTXLowPowerDisarmValue_0": {
         "message": "Disabilitato"
@@ -1324,10 +1324,10 @@
         "message": "Rangefinder"
     },
     "portsFunction_OPFLOW": {
-        "message": "Optic flow"
+        "message": "Flusso ottico"
     },
     "portsFunction_ESC": {
-        "message": "ESC output/telemetry"
+        "message": "Output/telemetria ESC"
     },
     "portsFunction_TELEMETRY_FRSKY": {
         "message": "FrSky"
@@ -1357,7 +1357,7 @@
         "message": "SmartPort Master"
     },
     "portsFunction_RX_SERIAL": {
-        "message": "Serial RX"
+        "message": "RX seriale"
     },
     "portsFunction_BLACKBOX": {
         "message": "Blackbox"
@@ -1384,13 +1384,13 @@
         "message": "MSP DisplayPort"
     },
     "portsFunction_SBUS_OUTPUT": {
-        "message": "SBus Output"
+        "message": "Output SBus"
     },
     "portsFunction_GIMBAL": {
-        "message": "Serial Gimbal"
+        "message": "Gimbal seriale"
     },
     "portsFunction_HEADTRACKER": {
-        "message": "Serial Headtracker"
+        "message": "Headtracker seriale"
     },
     "pidTuning_Other": {
         "message": "Altro"
@@ -1642,28 +1642,28 @@
         "message": "Meccanica D-term"
     },
     "pidTuning_d_boost_min": {
-        "message": "D-Boost Min. Scale"
+        "message": "Scala min. D-Boost"
     },
     "pidTuning_d_boost_min_help": {
-        "message": "Defines the max allowed Dterm attenuation during stick acceleration phase. Value 1.0 mean Dterm is not attenuate. 0.5 mean it's allowed to shrink by half. Lower values result in faster response during fast stick movement."
+        "message": "Definisce la massima attenuazione del Dterm consentita durante la fase di accelerazione dello stick. Il valore 1.0 significa che il Dterm non viene attenuato. 0.5 significa che può ridursi della metà. Valori più bassi risultano in una risposta più veloce durante i movimenti rapidi dello stick."
     },
     "pidTuning_d_boost_max": {
-        "message": "D-Boost Max. Scale"
+        "message": "Scala max. D-Boost"
     },
     "pidTuning_d_boost_max_help": {
-        "message": "Defines the maximum Dterm boost when maximum angular acceleration is reached. 1.0 means D-Boost is disabled, 2.0 means Dterm is allowed to grow by 100%. Values between 1.5 and 1.7 are usually the sweet spot."
+        "message": "Definisce il boost massimo del Dterm quando viene raggiunta l'accelerazione angolare massima. 1.0 significa che il D-Boost è disabilitato, 2.0 significa che il Dterm può crescere del 100%. Valori tra 1.5 e 1.7 sono solitamente il punto ottimale."
     },
     "pidTuning_d_boost_max_at_acceleration": {
-        "message": "Top D-Boost at acceleration [dps^2]"
+        "message": "D-Boost massimo all'accelerazione [dps^2]"
     },
     "pidTuning_d_boost_max_at_acceleration_help": {
-        "message": "D-Boost is fully active when angular acceleration (either detected by gyro or rate target) reached given acceleration. Between 0 and this value, D-Boost factor is scaled lineary"
+        "message": "Il D-Boost è completamente attivo quando l'accelerazione angolare (rilevata dal gyro o dal rate target) raggiunge l'accelerazione data. Tra 0 e questo valore, il fattore D-Boost è scalato linearmente"
     },
     "pidTuning_d_boost_gyro_delta_lpf_hz": {
         "message": "D-Boost gyro LPF"
     },
     "pidTuning_d_boost_gyro_delta_lpf_hz_help": {
-        "message": "Should be set to the frequency of propeller wash oscillations. 5-inch quads work best at around 80Hz, 7-inch quads at around 50Hz"
+        "message": "Dovrebbe essere impostato sulla frequenza delle oscillazioni del propeller wash. I quad da 5 pollici funzionano meglio intorno agli 80Hz, i quad da 7 pollici intorno ai 50Hz"
     },
     "pidTuning_tpaMechanics": {
         "message": "Attenuazione PID spinta"
@@ -1678,16 +1678,16 @@
         "message": "Costante di tempo TPA ala fissa"
     },
     "pidTuning_FW_TPATimeConstantHelp": {
-        "message": "TPA smoothing and delay time constant to reflect non-instant speed/throttle response of the plane."
+        "message": "Costante di tempo di smoothing e ritardo del TPA per riflettere la risposta non istantanea di velocità/throttle dell'aeroplano."
     },
     "pidTuning_fwLevelTrimMechanics": {
         "message": "Meccanica ala fissa"
     },
     "pidTuning_fw_level_pitch_trim": {
-        "message": "Level Trim [deg]"
+        "message": "Level Trim [gradi]"
     },
     "pidTuning_fw_level_pitch_trim_help": {
-        "message": "Pitch trim for self-leveling flight modes. In degrees. +5 means airplane nose should be raised 5 deg from level"
+        "message": "Trim del pitch per le modalità di volo auto-livellanti. In gradi. +5 significa che il muso dell'aeroplano dovrebbe essere alzato di 5 gradi rispetto al livello"
     },
     "pidTuning_ButtonSave": {
         "message": "Salva"
@@ -1699,7 +1699,7 @@
         "message": "Profilo"
     },
     "pidTuning_LoadedProfile": {
-        "message": "Loaded Profile: <strong style=\"color: #37a8db\">$1</strong>"
+        "message": "Profilo caricato: <strong style=\"color: #37a8db\">$1</strong>"
     },
     "pidTuning_Manual_Rates": {
         "message": "Rate manuali"
@@ -1723,25 +1723,25 @@
         "message": "Expo curva LPF dinamico gyro"
     },
     "pidTuning_gyro_dyn_lpf_min_hz_help": {
-        "message": "Defines the gyro LPF cutoff frequency at minimum throttle. When throttle is increased, LPF cutoff frequency is increased as well, up to the maximum cutoff frequency."
+        "message": "Definisce la frequenza di taglio del gyro LPF al throttle minimo. Quando il throttle viene aumentato, anche la frequenza di taglio del LPF viene aumentata, fino alla frequenza di taglio massima."
     },
     "pidTuning_gyro_dyn_lpf_max_hz_help": {
-        "message": "Defines the gyro LPF cutoff frequency at maximum throttle. When throttle is decreased, LPF cutoff frequency is decreased as well, down to the minimum cutoff frequency."
+        "message": "Definisce la frequenza di taglio del gyro LPF al throttle massimo. Quando il throttle viene diminuito, anche la frequenza di taglio del LPF viene diminuita, fino alla frequenza di taglio minima."
     },
     "loadedMixerProfile": {
-        "message": "Loaded Mixer Profile: <strong style=\"color: #37a8db\">$1</strong>, Check modes tab: MIXER PROFILE 2 if you don't see the changes"
+        "message": "Profilo mixer caricato: <strong style=\"color: #37a8db\">$1</strong>, Controlla la scheda modalità: MIXER PROFILE 2 se non vedi le modifiche"
     },
     "loadedBatteryProfile": {
-        "message": "Loaded Battery Profile: <strong style=\"color: #37a8db\">$1</strong>"
+        "message": "Profilo Batteria caricato: <strong style=\"color: #37a8db\">$1</strong>"
     },
     "setControlProfile": {
-        "message": "Set Control Profile: <strong style=\"color: #37a8db\">$1</strong>"
+        "message": "Imposta Control Profile: <strong style=\"color: #37a8db\">$1</strong>"
     },
     "setMixerProfile": {
-        "message": "Setting Mixer Profile: <strong style=\"color: #37a8db\">$1</strong>"
+        "message": "Impostazione Mixer Profile: <strong style=\"color: #37a8db\">$1</strong>"
     },
     "setBatteryProfile": {
-        "message": "Setting Battery Profile: <strong style=\"color: #37a8db\">$1</strong>"
+        "message": "Impostazione Battery Profile: <strong style=\"color: #37a8db\">$1</strong>"
     },
     "pidTuningDataRefreshed": {
         "message": "Dati PID <strong>aggiornati</strong>"
@@ -1837,10 +1837,10 @@
         "message": "Salva"
     },
     "auxiliaryEepromSaved": {
-        "message": "EEPROM <span style=\"color: #37a8db\">saved</span>"
+        "message": "EEPROM <span style=\"color: #37a8db\">salvata</span>"
     },
     "eepromSaved": {
-        "message": "EEPROM <span style=\"color: #37a8db\">saved</span>"
+        "message": "EEPROM <span style=\"color: #37a8db\">salvata</span>"
     },
     "adjustmentsHelp": {
         "message": "Configura gli switch di regolazione. Consulta la sezione 'regolazioni in volo' del manuale per i dettagli. Le modifiche applicate dalle funzioni di regolazione non vengono salvate automaticamente. Ci sono 4 slot. Ogni switch usato per regolazioni simultanee richiede l'uso esclusivo di uno slot."
@@ -1933,43 +1933,43 @@
         "message": "Regolazione CD/FF Pitch e Roll"
     },
     "adjustmentsFunction10": {
-        "message": "Pitch P Adjustment"
+        "message": "Regolazione Pitch P"
     },
     "adjustmentsFunction11": {
-        "message": "Pitch I Adjustment"
+        "message": "Regolazione Pitch I"
     },
     "adjustmentsFunction12": {
-        "message": "Pitch D Adjustment"
+        "message": "Regolazione Pitch D"
     },
     "adjustmentsFunction13": {
-        "message": "Pitch CD/FF Adjustment"
+        "message": "Regolazione Pitch CD/FF"
     },
     "adjustmentsFunction14": {
-        "message": "Roll P Adjustment"
+        "message": "Regolazione Roll P"
     },
     "adjustmentsFunction15": {
-        "message": "Roll I Adjustment"
+        "message": "Regolazione Roll I"
     },
     "adjustmentsFunction16": {
-        "message": "Roll D Adjustment"
+        "message": "Regolazione Roll D"
     },
     "adjustmentsFunction17": {
-        "message": "Roll CD/FF Adjustment"
+        "message": "Regolazione Roll CD/FF"
     },
     "adjustmentsFunction18": {
-        "message": "Yaw P Adjustment"
+        "message": "Regolazione Yaw P"
     },
     "adjustmentsFunction19": {
-        "message": "Yaw I Adjustment"
+        "message": "Regolazione Yaw I"
     },
     "adjustmentsFunction20": {
-        "message": "Yaw D Adjustment"
+        "message": "Regolazione Yaw D"
     },
     "adjustmentsFunction21": {
-        "message": "Yaw CD/FF Adjustment"
+        "message": "Regolazione Yaw CD/FF"
     },
     "adjustmentsFunction22": {
-        "message": "Rate Profile Selection"
+        "message": "Selezione profilo rate"
     },
     "adjustmentsFunction23": {
         "message": "Pitch Rate"
@@ -1978,85 +1978,85 @@
         "message": "Roll Rate"
     },
     "adjustmentsFunction25": {
-        "message": "RC Yaw Expo Adjustment"
+        "message": "Regolazione RC Yaw Expo"
     },
     "adjustmentsFunction26": {
-        "message": "Manual RC Expo Adjustment"
+        "message": "Regolazione Manual RC Expo"
     },
     "adjustmentsFunction27": {
-        "message": "Manual RC Yaw Expo Adjustment"
+        "message": "Regolazione Manual RC Yaw Expo"
     },
     "adjustmentsFunction28": {
-        "message": "Manual Pitch & Roll Rate Adjustment"
+        "message": "Regolazione Manual Pitch & Roll Rate"
     },
     "adjustmentsFunction29": {
-        "message": "Manual Roll Rate Adjustment"
+        "message": "Regolazione Manual Roll Rate"
     },
     "adjustmentsFunction30": {
-        "message": "Manual Pitch Rate Adjustment"
+        "message": "Regolazione Manual Pitch Rate"
     },
     "adjustmentsFunction31": {
-        "message": "Manual Yaw Rate Adjustment"
+        "message": "Regolazione Manual Yaw Rate"
     },
     "adjustmentsFunction32": {
-        "message": "Navigation FW Cruise Throttle Adjustment"
+        "message": "Regolazione Navigation FW Cruise Throttle"
     },
     "adjustmentsFunction33": {
-        "message": "Navigation FW Pitch To Throttle Adjustment"
+        "message": "Regolazione Navigation FW Pitch To Throttle"
     },
     "adjustmentsFunction34": {
-        "message": "Board Roll Alignment Adjustment"
+        "message": "Regolazione allineamento Roll della scheda"
     },
     "adjustmentsFunction35": {
-        "message": "Board Pitch Alignment Adjustment"
+        "message": "Regolazione allineamento Pitch della scheda"
     },
     "adjustmentsFunction36": {
-        "message": "Level P Adjustment"
+        "message": "Regolazione Level P"
     },
     "adjustmentsFunction37": {
-        "message": "Level I Adjustment"
+        "message": "Regolazione Level I"
     },
     "adjustmentsFunction38": {
-        "message": "Level D Adjustment"
+        "message": "Regolazione Level D"
     },
     "adjustmentsFunction39": {
-        "message": "Pos XY P Adjustment"
+        "message": "Regolazione Pos XY P"
     },
     "adjustmentsFunction40": {
-        "message": "Pos XY I Adjustment"
+        "message": "Regolazione Pos XY I"
     },
     "adjustmentsFunction41": {
-        "message": "Pos XY D Adjustment"
+        "message": "Regolazione Pos XY D"
     },
     "adjustmentsFunction42": {
-        "message": "Pos Z P Adjustment"
+        "message": "Regolazione Pos Z P"
     },
     "adjustmentsFunction43": {
-        "message": "Pos Z I Adjustment"
+        "message": "Regolazione Pos Z I"
     },
     "adjustmentsFunction44": {
-        "message": "Pos Z D Adjustment"
+        "message": "Regolazione Pos Z D"
     },
     "adjustmentsFunction45": {
-        "message": "Heading P Adjustment"
+        "message": "Regolazione Heading P"
     },
     "adjustmentsFunction46": {
-        "message": "Vel XY P Adjustment"
+        "message": "Regolazione Vel XY P"
     },
     "adjustmentsFunction47": {
-        "message": "Vel XY I Adjustment"
+        "message": "Regolazione Vel XY I"
     },
     "adjustmentsFunction48": {
-        "message": "Vel XY D Adjustment"
+        "message": "Regolazione Vel XY D"
     },
     "adjustmentsFunction49": {
-        "message": "Vel Z P Adjustment"
+        "message": "Regolazione Vel Z P"
     },
     "adjustmentsFunction50": {
-        "message": "Vel Z I Adjustment"
+        "message": "Regolazione Vel Z I"
     },
     "adjustmentsFunction51": {
-        "message": "Vel Z D Adjustment"
+        "message": "Regolazione Vel Z D"
     },
     "adjustmentsFunction52": {
         "message": "Regolazione angolo pitch minimo throttle down ala fissa"
@@ -2269,7 +2269,7 @@
         "message": "Master"
     },
     "motorsNotice": {
-        "message": "<strong>Motor Test Mode Notice:</strong><br />Moving the sliders will cause the motors to <strong>spin up</strong>.<br />In order to prevent injury <strong style=\"color: red\">remove ALL propellers</strong> before using this feature.<br />"
+        "message": "<strong>Avviso Modalità Test Motori:</strong><br />Lo spostamento degli slider farà <strong>girare</strong> i motori.<br />Per prevenire infortuni <strong style=\"color: red\">rimuovi TUTTE le eliche</strong> prima di usare questa funzione.<br />"
     },
     "motorsEnableControl": {
         "message": "Comprendo i rischi, le eliche sono state rimosse - Abilita controllo motori."
@@ -2455,7 +2455,7 @@
         "message": "Info release"
     },
     "firmwareFlasherReleaseName": {
-        "message": "Name/Version:"
+        "message": "Nome/Versione:"
     },
     "firmwareFlasherReleaseVersionUrl": {
         "message": "Visita la pagina della release."
@@ -2473,7 +2473,7 @@
         "message": "Target:"
     },
     "firmwareFlasherReleaseFile": {
-        "message": "Binary:"
+        "message": "Binario:"
     },
     "firmwareFlasherReleaseStatusReleaseCandidate": {
         "message": "<span style=\"color: red\">IMPORTANTE: Questa release firmware è attualmente contrassegnata come release candidate. Segnala immediatamente eventuali problemi.</span>"
@@ -2485,16 +2485,16 @@
         "message": "<span style=\"color: red\">IMPORTANTE</span>: Assicurati di flashare un file adatto al tuo target. Flashare un binario per il target sbagliato può causare problemi <span style=\"color: red\">seri</span>."
     },
     "firmwareFlasherPath": {
-        "message": "Path:"
+        "message": "Percorso:"
     },
     "firmwareFlasherSize": {
-        "message": "Size:"
+        "message": "Dimensione:"
     },
     "firmwareFlasherStatus": {
-        "message": "Status:"
+        "message": "Stato:"
     },
     "firmwareFlasherProgress": {
-        "message": "Progress:"
+        "message": "Avanzamento:"
     },
     "firmwareFlasherLoadFirmwareFile": {
         "message": "Carica un file firmware"
@@ -2530,13 +2530,13 @@
         "message": "Flasha il firmware di sviluppo più recente (non testato)."
     },
     "firmwareFlasherManualBaud": {
-        "message": "Manual baud rate"
+        "message": "Baud rate manuale"
     },
     "firmwareFlasherManualBaudDescription": {
         "message": "Selezione manuale del baud rate per board che non supportano la velocità predefinita o per flash via bluetooth.<br /><span style=\"color: red\">Nota:</span> Non usato durante flash via USB DFU"
     },
     "firmwareFlasherShowDevelopmentReleases": {
-        "message": "Show unstable releases"
+        "message": "Mostra release instabili"
     },
     "firmwareFlasherShowDevelopmentReleasesDescription": {
         "message": "Mostra release candidate e release di sviluppo."
@@ -2584,7 +2584,7 @@
         "message": "Vai su GitHub per esaminare questo commit..."
     },
     "firmwareFlasherMessage": {
-        "message": "Message:"
+        "message": "Messaggio:"
     },
     "firmwareFlasherWarningHead": {
         "message": "Attenzione"
@@ -2593,7 +2593,7 @@
         "message": "<span style=\"color: red\">Non</span> provare a flashare hardware <strong>non-iNAV</strong> con questo firmware flasher.<br />Durante il flash <span style=\"color: red\">non</span> <strong>scollegare</strong> la board e non <strong>spegnere</strong> il computer.<br /><br /><strong>Nota:</strong> Il bootloader STM32 e memorizzato in ROM e non può essere corrotto.<br /><!--strong>Nota: </strong><span style=\"color: red\">Auto-Connect</span> e sempre disabilitato quando sei nel firmware flasher.<br / --><strong>Nota:</strong> Assicurati di avere un backup; alcuni upgrade/downgrade cancellano la configurazione.<br /><strong>Nota:</strong> Se hai problemi di flash prova prima a scollegare tutti i cavi dal FC, riavviare, aggiornare Chrome e i driver.<br /><strong>Nota:</strong> Quando flashi board con presa USB direttamente collegata (Matek H743-SLIM, Holybro Kakute ecc.), assicurati di aver letto la sezione USB Flashing del manuale INAV e di avere software e driver corretti installati"
     },
     "firmwareFlasherRecoveryHead": {
-        "message": "<strong>Recovery / Lost communication<strong>"
+        "message": "<strong>Recupero / Comunicazione persa<strong>"
     },
     "firmwareFlasherRecoveryText": {
         "message": "Se hai perso la comunicazione con la board, segui questi passaggi per ripristinarla: <ul><li>Spegni</li><li>Abilita 'Nessuna sequenza di riavvio' e 'Cancellazione completa chip'.</li><li>Ponticella i pin BOOT o tieni premuto il tasto BOOT.</li><li>Accendi (se fatto correttamente il LED attività NON lampeggia).</li><li>Installa tutti i driver STM32 e Zadig se necessario (vedi sezione <a href=\"https://github.com/iNavFlight/inav/blob/master/docs/USB%20Flashing.md\"target=\"_blank\">USB Flashing</a> del manuale INAV).</li><li>Chiudi Configurator, chiudi tutte le istanze di Chrome in esecuzione, chiudi tutte le app Chrome, riavvia Configurator.</li><li>Rilascia il pulsante BOOT se il tuo FC lo ha.</li><li>Flasha il firmware corretto (usando baud rate manuale se indicato nel manuale del FC).</li><li>Spegni.</li><li>Rimuovi il ponticello BOOT.</li><li>Accendi (il LED attività dovrebbe lampeggiare).</li><li>Connettiti normalmente.</li></ul>"
@@ -2884,13 +2884,13 @@
         "message": "Sensori e bus"
     },
     "sensorAccelerometer": {
-        "message": "Accelerometer"
+        "message": "Accelerometro"
     },
     "sensorMagnetometer": {
-        "message": "Magnetometer"
+        "message": "Magnetometro"
     },
     "sensorBarometer": {
-        "message": "Barometer"
+        "message": "Barometro"
     },
     "sensorPitot": {
         "message": "Tubo di Pitot"
@@ -2905,31 +2905,31 @@
         "message": "Per abilitare via CLI usa il comando <strong>feature {name}</strong>"
     },
     "armingFailureReasonTitle": {
-        "message": "Pre-arming checks"
+        "message": "Controlli pre-arming"
     },
     "BLOCKED_UAV_NOT_LEVEL": {
-        "message": "UAV is levelled"
+        "message": "UAV livellato"
     },
     "BLOCKED_SENSORS_CALIBRATING": {
-        "message": "Run-time calibration"
+        "message": "Calibrazione a runtime"
     },
     "BLOCKED_SYSTEM_OVERLOADED": {
-        "message": "CPU load"
+        "message": "Carico CPU"
     },
     "BLOCKED_NAVIGATION_SAFETY": {
-        "message": "Navigation is safe"
+        "message": "Navigazione sicura"
     },
     "BLOCKED_COMPASS_NOT_CALIBRATED": {
-        "message": "Compass calibrated"
+        "message": "Bussola calibrata"
     },
     "BLOCKED_ACCELEROMETER_NOT_CALIBRATED": {
-        "message": "Accelerometer calibrated"
+        "message": "Accelerometro calibrato"
     },
     "BLOCKED_HARDWARE_FAILURE": {
-        "message": "Hardware health"
+        "message": "Stato hardware"
     },
     "BLOCKED_INVALID_SETTING": {
-        "message": "Settings validated"
+        "message": "Impostazioni validate"
     },
     "armingCheckPass": {
         "message": "<div class=\"checkspass\"></div>"
@@ -2959,34 +2959,34 @@
         "message": "Calibra sensore optical flow"
     },
     "accZero": {
-        "message": "Acc Zero"
+        "message": "Zero Acc"
     },
     "accGain": {
-        "message": "Acc Gain"
+        "message": "Guadagno Acc"
     },
     "NoteCalibration": {
-        "message": "Nota: se l'IMU e montata con un altro angolo o sotto il flight controller, esegui i passaggi di calibrazione con l'IMU orientata come nelle immagini, non il quad (altrimenti la calibrazione non funzionerà)."
+        "message": "Nota: se l'IMU è montata con un altro angolo o sotto il flight controller, esegui i passaggi di calibrazione con l'IMU orientata come nelle immagini, non il quad (altrimenti la calibrazione non funzionerà)."
     },
     "AccBtn": {
         "message": "Calibra accelerometro"
     },
     "stepTitle1": {
-        "message": "Step 1"
+        "message": "Passo 1"
     },
     "stepTitle2": {
-        "message": "Step 2"
+        "message": "Passo 2"
     },
     "stepTitle3": {
-        "message": "Step 3"
+        "message": "Passo 3"
     },
     "stepTitle4": {
-        "message": "Step 4"
+        "message": "Passo 4"
     },
     "stepTitle5": {
-        "message": "Step 5"
+        "message": "Passo 5"
     },
     "stepTitle6": {
-        "message": "Step 6"
+        "message": "Passo 6"
     },
     "MagXText": {
         "message": "Zero X"
@@ -2998,16 +2998,16 @@
         "message": "Zero Z"
     },
     "MagGainXText": {
-        "message": "Gain X"
+        "message": "Guadagno X"
     },
     "MagGainYText": {
-        "message": "Gain Y"
+        "message": "Guadagno Y"
     },
     "MagGainZText": {
-        "message": "Gain Z"
+        "message": "Guadagno Z"
     },
     "OpflowScaleText": {
-        "message": "Scale"
+        "message": "Scala"
     },
     "AccResetBtn": {
         "message": "Reset calibrazione accelerometro"
@@ -3088,16 +3088,16 @@
         "message": "Freq. cutoff filtro notch giroscopio secondo"
     },
     "gyroNotchHz1Help": {
-        "message": "Should be tuned to propeller harmonic frequency. Usually equals <i>[motor_frequency] * [propeller_blades_number]</i><br><br>Has to be above cutoff frequency<br><br><i>0</i> disables the filter"
+        "message": "Dovrebbe essere regolata sulla frequenza armonica dell'elica. Di solito è uguale a <i>[motor_frequency] * [propeller_blades_number]</i><br><br>Deve essere al di sopra della frequenza di taglio<br><br><i>0</i> disabilita il filtro"
     },
     "gyroNotchHz2Help": {
-        "message": "Should be tuned to motor frequency.<br><br>Has to be above cutoff frequency and below first gyro notch filter frequency.<br><br><i>0</i> disables the filter"
+        "message": "Dovrebbe essere regolata sulla frequenza del motore.<br><br>Deve essere al di sopra della frequenza di taglio e al di sotto della frequenza del primo filtro notch del gyro.<br><br><i>0</i> disabilita il filtro"
     },
     "gyroNotchCutoff1Help": {
-        "message": "Defines band of notch filter. <br><br>Has to be kept below notch filter frequency."
+        "message": "Definisce la banda del filtro notch. <br><br>Deve essere mantenuta al di sotto della frequenza del filtro notch."
     },
     "gyroNotchCutoff2Help": {
-        "message": "Defines band of notch filter. <br><br>Has to be kept below notch filter frequency."
+        "message": "Definisce la banda del filtro notch. <br><br>Deve essere mantenuta al di sotto della frequenza del filtro notch."
     },
     "dtermNotchHz": {
         "message": "Freq. filtro notch Dterm"
@@ -3106,10 +3106,10 @@
         "message": "Freq. cutoff filtro notch Dterm"
     },
     "dtermNotchHzHelp": {
-        "message": "Should be placed between first and second gyro notch filter frequency<br><br>Has to be above cutoff frequency<br><br><i>0</i> disables the filter"
+        "message": "Dovrebbe essere posizionato tra la prima e la seconda frequenza del filtro notch del gyro<br><br>Deve essere sopra la frequenza di cutoff<br><br><i>0</i> disabilita il filtro"
     },
     "dtermNotchCutoffHelp": {
-        "message": "Defines band of filter. <br><br>Has to be kept below notch filter frequency."
+        "message": "Definisce la banda del filtro. <br><br>Deve essere mantenuto sotto la frequenza del filtro notch."
     },
     "multiRotorNavigationConfiguration": {
         "message": "Impostazioni navigazione multirotore"
@@ -3205,7 +3205,7 @@
         "message": "Sali prima del RTH"
     },
     "rthClimbFirstHelp": {
-        "message": "If set to ON or ON_FW_SPIRAL, aircraft will climb to nav_rth_altitude first before turning to head home. If set to OFF, aircraft will turn and head home immediately climbing on the way. For a fixed wing, ON will use a linear climb, ON_FW_SPIRAL will use a loiter turning climb with climb rate set by nav_auto_climb_rate and turn rate set by nav_fw_loiter_radius (ON_FW_SPIRAL is a fixed wing setting and behaves the same as ON for a multirotor)."
+        "message": "Se impostato su ON o ON_FW_SPIRAL, l'velivolo salirà fino a nav_rth_altitude prima di virare verso casa. Se impostato su OFF, l'velivolo virerà e si dirigerà verso casa immediatamente salendo lungo il percorso. Per un'ala fissa, ON userà una salita lineare, ON_FW_SPIRAL userà una salita con virata in loiter con rateo di salita impostato da nav_auto_climb_rate e rateo di virata impostato da nav_fw_loiter_radius (ON_FW_SPIRAL è un'impostazione per ala fissa e si comporta come ON per un multirotore)."
     },
     "rthClimbIgnoreEmergency": {
         "message": "Sali indipendentemente dallo stato dei sensori posizione"
@@ -3214,7 +3214,7 @@
         "message": "Sovrascrivi quota RTH e salita con stick roll/pitch"
     },
     "rthAltControlOverrideHELP": {
-        "message": "When enabled, the climb on RTH can be canceled by holding full pitch down for >1 second so aircraft will fly home at the current altitude. On fixed wing aircraft, the 'Climb before RTH' setting can be overriden by holding full roll left or right for >1 second so that the plane will turn towards home immediately."
+        "message": "Quando abilitato, la salita durante l'RTH può essere annullata mantenendo il pitch tutto giù per >1 secondo, così l'velivolo volerà verso casa alla quota attuale. Sulle ali fisse, l'impostazione 'Climb before RTH' può essere sovrascritta mantenendo il roll tutto a sinistra o a destra per >1 secondo, così l'aereo virerà immediatamente verso casa."
     },
     "rthTailFirst": {
         "message": "Coda avanti"
@@ -3229,7 +3229,7 @@
         "message": "Soglia annullamento RTH"
     },
     "rthAbortThresholdHelp": {
-        "message": "RTH sanity checking feature will notice if the distance to home is increasing during RTH and if it exceeds the threshold defined by this parameter, instead of continuing RTH the UAV will enter emergency landing. Default is 500m which is safe enough for both multirotors and airplanes."
+        "message": "La funzione di controllo di sicurezza RTH rileverà se la distanza da casa aumenta durante l'RTH e, se supera la soglia definita da questo parametro, invece di continuare l'RTH l'UAV entrerà in atterraggio di emergenza. Il valore predefinito è 500m, che è abbastanza sicuro sia per multirotori che per aeroplani."
     },
     "fsMissionDelay": {
         "message": "Ritardo missione failsafe"
@@ -3253,25 +3253,25 @@
         "message": "Modalità RTH Track Back"
     },
     "rthTrackBackHelp": {
-        "message": "When enabled, the aircraft will follow its last path backwards first before flying home directly. Fixed Wing crafts will fly back the path with climbing but not descending. Usage modes for RTH Track Back. OFF = disabled, ON = Normal and Failsafe RTH, FS = Failsafe RTH only."
+        "message": "Quando abilitato, l'velivolo seguirà prima a ritroso il suo ultimo percorso prima di volare verso casa direttamente. Le ali fisse percorreranno il percorso a ritroso salendo ma non scendendo. Modalità di utilizzo per l'RTH Track Back. OFF = disabilitato, ON = RTH normale e in Failsafe, FS = solo RTH in Failsafe."
     },
     "rthTrackBackDistance": {
         "message": "Distanza RTH Track Back"
     },
     "rthTrackBackDistanceHelp": {
-        "message": "Distance flown during Track Back. Normal RTH is executed once this total flight distance is exceeded [m]."
+        "message": "Distanza percorsa durante il Track Back. L'RTH normale viene eseguito una volta superata questa distanza totale di volo [m]."
     },
     "rthSafeHome": {
         "message": "Modalità Safe Home"
     },
     "rthSafeHomeHelp": {
-        "message": "Used to control when safehomes will be used. Possible values are OFF, RTH and RTH_FS. See Safehome documentation for more information."
+        "message": "Usato per controllare quando verranno usati i safehome. I valori possibili sono OFF, RTH e RTH_FS. Vedi la documentazione Safehome per maggiori informazioni."
     },
     "rthSafeHomeDistance": {
         "message": "Distanza massima Safe Home"
     },
     "rthSafeHomeDistanceHelp": {
-        "message": "In order for a safehome to be used, it must be less than this distance [in cm] from the arming point."
+        "message": "Affinché un safehome possa essere usato, deve trovarsi a meno di questa distanza [in cm] dal punto di armamento."
     },
     "navMaxAltitude": {
         "message": "Altitudine massima per navigazione"
@@ -3283,7 +3283,7 @@
         "message": "Quota Home RTH"
     },
     "rthHomeAltitudeHelp": {
-        "message": "Used when not landing at the home point. Upon arriving at home, the plane will loiter and change altitude to the RTH Home Altitude. Default is 0, which is feature disabled."
+        "message": "Usato quando non si atterra al punto di partenza. All'arrivo a casa, l'aereo entrerà in loiter e cambierà quota fino alla RTH Home Altitude. Il valore predefinito è 0, che disabilita la funzione."
     },
     "rthTwoStage": {
         "message": "Metodo salita primo stadio"
@@ -3307,19 +3307,19 @@
         "message": "Distanza inizio discesa lineare"
     },
     "rthLinearDescentStartHelp": {
-        "message": "This is the distance away from the home position to start the linear descent. If set to 0, the linear descent will start immediately."
+        "message": "Questa è la distanza dalla posizione di casa a cui iniziare la discesa lineare. Se impostata a 0, la discesa lineare inizierà immediatamente."
     },
     "landMaxAltVspd": {
         "message": "Il velivolo inizierà a scendere a questa velocità una volta raggiunta la posizione <strong>Home</strong>."
     },
     "landMaxAltVspdHelp": {
-        "message": "After RTH if autolanding is enabled the aircraft will start to descend at this speed until reaching <strong>Slow down altitude</strong>"
+        "message": "Dopo l'RTH, se l'atterraggio automatico è abilitato, il velivolo inizierà a scendere a questa velocità fino a raggiungere l'<strong>Altitudine di rallentamento</strong>"
     },
     "landSlowdownMaxAlt": {
         "message": "Quando il velivolo è sceso a <i>questa</i> quota, inizierà a rallentare per l'atterraggio."
     },
     "landSlowdownMaxAltHelp": {
-        "message": "When the aircraft reaches this altitude it will start to slow down linearly between the <strong>Initial landing speed</strong> and <strong>Final landing speed</strong> to reach it at <strong>Final approach altitude</strong>"
+        "message": "Quando il velivolo raggiunge questa altitudine inizierà a rallentare linearmente tra la <strong>Velocità di atterraggio iniziale</strong> e la <strong>Velocità di atterraggio finale</strong> per raggiungerla all'<strong>Altitudine di avvicinamento finale</strong>"
     },
     "landSlowdownMinAlt": {
         "message": "Quando il velivolo è sceso a <i>questa</i> quota, avrà rallentato fino alla velocità di contatto."
@@ -3328,7 +3328,7 @@
         "message": "Questa è la velocità di contatto."
     },
     "landMinAltVspdHelp": {
-        "message": "The aircraft vertical speed target will be this value when the aircraft reaches the <strong>Final approach altitude</strong> after having slowed down linearly from the <strong>Slow down altitude</strong> at <strong>Initial landing speed</strong>"
+        "message": "Il target di velocità verticale del velivolo sarà questo valore quando il velivolo raggiunge l'<strong>Altitudine di avvicinamento finale</strong> dopo aver rallentato linearmente dall'<strong>Altitudine di rallentamento</strong> alla <strong>Velocità di atterraggio iniziale</strong>"
     },
     "emergencyDescentRate": {
         "message": "Velocità discesa emergenza"
@@ -3346,7 +3346,7 @@
         "message": "Consenti aumento manuale throttle"
     },
     "cruiseManualThrottleHelp": {
-        "message": "Turning this on, will allow you to override automatic throttle control in all navigation modes. You cannot go below the automatic throttle value, except with motor stop on zero throttle."
+        "message": "Attivando questa opzione, potrai sovrascrivere il controllo automatico del throttle in tutte le modalità di navigazione. Non puoi scendere sotto il valore di throttle automatico, tranne con l'arresto del motore a throttle zero."
     },
     "minThrottle": {
         "message": "Throttle min."
@@ -3358,55 +3358,55 @@
         "message": "Angolo massimo di banca in navigazione"
     },
     "maxBankAngleHelp": {
-        "message": "Maximum banking angle in navigation modes. Constrained by maximum ROLL angle in PID tuning tab."
+        "message": "Angolo massimo di inclinazione laterale nelle modalità di navigazione. Limitato dall'angolo massimo di ROLL nella scheda di taratura PID."
     },
     "maxClimbAngle": {
         "message": "Angolo massimo di salita in navigazione"
     },
     "maxClimbAngleHelp": {
-        "message": "Maximum climb angle in navigation modes. Constrained by maximum PITCH angle in PID tuning tab."
+        "message": "Angolo massimo di salita nelle modalità di navigazione. Limitato dall'angolo massimo di PITCH nella scheda di taratura PID."
     },
     "navManualClimbRate": {
         "message": "Velocità salita max Alt-hold"
     },
     "navManualClimbRateHelp": {
-        "message": "Maximum climb/descent rate firmware is allowed when processing pilot input for ALTHOLD control mode [cm/s]"
+        "message": "Velocità massima di salita/discesa consentita dal firmware durante l'elaborazione dell'input del pilota per la modalità di controllo ALTHOLD [cm/s]"
     },
     "navAutoClimbRate": {
         "message": "Rate massimo salita/discesa in navigazione"
     },
     "navAutoClimbRateHelp": {
-        "message": "Maximum climb/descent rate that UAV is allowed to reach during navigation modes. [cm/s]"
+        "message": "Velocità massima di salita/discesa che l'UAV può raggiungere durante le modalità di navigazione. [cm/s]"
     },
     "maxDiveAngle": {
         "message": "Angolo massimo di picchiata in navigazione"
     },
     "maxDiveAngleHelp": {
-        "message": "Maximum dive angle in navigation modes. Constrained by maximum PITCH angle in PID tuning tab."
+        "message": "Angolo massimo di discesa nelle modalità di navigazione. Limitato dall'angolo massimo di PITCH nella scheda di taratura PID."
     },
     "pitchToThrottle": {
         "message": "Rapporto pitch a throttle"
     },
     "pitchToThrottleHelp": {
-        "message": "In navigation modes, each degree of climb will add this many units to the cruise throttle. Conversely, each degree of diving will substract from it."
+        "message": "Nelle modalità di navigazione, ogni grado di salita aggiungerà questo numero di unità al throttle di crociera. Al contrario, ogni grado di discesa lo sottrarrà."
     },
     "minThrottleDownPitch": {
         "message": "Pitch con throttle minimo"
     },
     "minThrottleDownPitchHelp": {
-        "message": "Automatic pitch down angle when throttle is at 0 in angle mode. Progressively applied between cruise throttle and zero throttle."
+        "message": "Angolo di abbassamento automatico del pitch quando il throttle è a 0 in modalità angle. Applicato progressivamente tra il throttle di crociera e il throttle a zero."
     },
     "pitchToThrottleSmoothing": {
         "message": "Smoothing throttle"
     },
     "pitchToThrottleSmoothingHelp": {
-        "message": "How smoothly the autopilot adjusts the throttle level in response to pitch angle changes [0-9]."
+        "message": "Quanto dolcemente l'autopilota regola il livello del throttle in risposta ai cambiamenti dell'angolo di pitch [0-9]."
     },
     "pitchToThrottleThreshold": {
         "message": "Soglia regolazione throttle istantanea"
     },
     "pitchToThrottleThresholdHelp": {
-        "message": "The autopilot will instantly adjust the throttle level without smoothing according to pitch to throttle if the pitch angle is more this many centidegrees from the filtered value."
+        "message": "L'autopilota regolerà istantaneamente il livello del throttle senza smoothing in base al pitch-to-throttle se l'angolo di pitch è più di questo numero di centigradi rispetto al valore filtrato."
     },
     "loiterRadius": {
         "message": "Raggio loiter"
@@ -3421,19 +3421,19 @@
         "message": "Fluidità controllo"
     },
     "controlSmoothnessHelp": {
-        "message": "How smoothly the autopilot controls the airplane to correct the navigation error [0-9]."
+        "message": "Quanto dolcemente l'autopilota controlla l'aeroplano per correggere l'errore di navigazione [0-9]."
     },
     "wpTrackingAccuracy": {
         "message": "Precisione inseguimento waypoint"
     },
     "wpTrackingAccuracyHelp": {
-        "message": "Tracking deadband - how closely the craft follows a waypoint track in meters. Lower values track more closely but cause more control corrections. 2 is a good starting point [0-10]."
+        "message": "Deadband di tracking - quanto da vicino il velivolo segue una traccia di waypoint in metri. Valori più bassi seguono più da vicino ma causano più correzioni di controllo. 2 è un buon punto di partenza [0-10]."
     },
     "wpTrackingAngle": {
         "message": "Angolo inseguimento waypoint"
     },
     "wpTrackingAngleHelp": {
-        "message": "The angle the craft approaches the waypoint track. Lower values make the approach longer while higher values can cause overshoot. 60° is a good starting point [30-80]."
+        "message": "L'angolo con cui il velivolo si avvicina alla traccia del waypoint. Valori più bassi rendono l'avvicinamento più lungo mentre valori più alti possono causare overshoot. 60° è un buon punto di partenza [30-80]."
     },
     "powerConfiguration": {
         "message": "Impostazioni stima batteria"
@@ -3442,25 +3442,25 @@
         "message": "Potenza idle"
     },
     "idlePowerHelp": {
-        "message": "Power draw at zero throttle used for remaining flight time/distance estimation in 0.01W unit"
+        "message": "Assorbimento di potenza a throttle zero usato per la stima del tempo/distanza di volo rimanente in unità di 0,01W"
     },
     "cruisePower": {
         "message": "Potenza crociera"
     },
     "cruisePowerHelp": {
-        "message": "Power draw at cruise throttle used for remaining flight time/distance estimation in 0.01W unit"
+        "message": "Assorbimento di potenza al throttle di crociera usato per la stima del tempo/distanza di volo rimanente in unità da 0.01W"
     },
     "cruiseSpeed": {
         "message": "Velocità crociera"
     },
     "cruiseSpeedHelp": {
-        "message": "Speed for the plane/wing at cruise throttle used for remaining flight time/distance estimation in cm/s"
+        "message": "Velocità per l'aeroplano/ala al throttle di crociera usata per la stima del tempo/distanza di volo rimanente in cm/s"
     },
     "rthEnergyMargin": {
         "message": "Margine energia RTH"
     },
     "rthEnergyMarginHelp": {
-        "message": "Energy margin wanted after getting home (percent of battery energy capacity). Use for the remaining flight time/distance calculation."
+        "message": "Margine di energia desiderato dopo essere tornati a casa (percentuale della capacità energetica della batteria). Usato per il calcolo del tempo/distanza di volo rimanente."
     },
     "generalNavigationSettings": {
         "message": "Impostazioni navigazione generali"
@@ -3472,13 +3472,13 @@
         "message": "Carica waypoint all'avvio"
     },
     "wpLoadBootHelp": {
-        "message": "If enabled, Waypoint Missions in EEPROM will be loaded automatically after bootup."
+        "message": "Se abilitato, le missioni Waypoint in EEPROM verranno caricate automaticamente dopo l'avvio."
     },
     "wpEnforceAlt": {
         "message": "Imponi quota al waypoint"
     },
     "wpEnforceAltHelp": {
-        "message": "Ensures that the altitude at each waypoint is reached before continue to the next one. Craft will hold position [loiter for fixed wing] and climb/decent until the altitude is within the set range [1-2000 cm] from the waypoint altitude. Set to [0] to disable. Fixed wing crafts should not be set below 500cm."
+        "message": "Garantisce che la quota a ogni waypoint sia raggiunta prima di proseguire verso il successivo. Il velivolo manterrà la posizione [loiter per ala fissa] e salirà/scenderà finché la quota non sarà entro l'intervallo impostato [1-2000 cm] dalla quota del waypoint. Imposta a [0] per disabilitare. Le ali fisse non dovrebbero essere impostate sotto i 500cm."
     },
     "waypointRadius": {
         "message": "Raggio waypoint"
@@ -3487,46 +3487,46 @@
         "message": "Riavvia missione waypoint"
     },
     "wpRestartMissionHelp": {
-        "message": "Sets restart behaviour for a WP mission when interrupted mid mission. START from first WP, RESUME from last active WP or SWITCH between START and RESUME each time WP Mode is reselected ON. SWITCH effectively allows resuming once only from a previous mid mission waypoint after which the mission will restart from the first waypoint."
+        "message": "Imposta il comportamento di riavvio per una missione WP quando interrotta a metà. START dal primo WP, RESUME dall'ultimo WP attivo o SWITCH tra START e RESUME ogni volta che la modalità WP viene riselezionata su ON. SWITCH consente di fatto di riprendere una sola volta da un precedente waypoint a metà missione, dopodiché la missione ripartirà dal primo waypoint."
     },
     "wpTurnSmoothing": {
         "message": "Smussamento virata waypoint"
     },
     "wpTurnSmoothingHelp": {
-        "message": "Smooths turns during WP missions by switching to a loiter turn at waypoints. When set to ON the craft will reach the waypoint during the turn. When set to ON-CUT the craft will turn inside the waypoint without actually reaching it (cuts the corner)."
+        "message": "Smussa le virate durante le missioni WP passando a una virata in loiter ai waypoint. Quando impostato su ON il velivolo raggiungerà il waypoint durante la virata. Quando impostato su ON-CUT il velivolo virerà all'interno del waypoint senza raggiungerlo effettivamente (taglia l'angolo)."
     },
     "navMotorStop": {
-        "message": "Navigation Motor Stop Override"
+        "message": "Override Arresto Motore in Navigazione"
     },
     "navMotorStopHelp": {
-        "message": "When set to OFF the navigation system will not take over the control of the motor if the throttle is low (motor will stop). When set to OFF_ALWAYS the navigation system will not take over the control of the motor if the throttle was low even when failsafe is triggered. When set to AUTO_ONLY the navigation system will only take over the control of the throttle in autonomous navigation modes (NAV WP and NAV RTH). When set to ALL_NAV (default) the navigation system will take over the control of the motor completely and never allow the motor to stop even when the throttle is low. This setting only has an effect on NAV modes which take control of the throttle when combined with MOTOR_STOP and is likely to cause a stall if fw_min_throttle_down_pitch isn't set correctly or the pitch estimation is wrong for fixed wing models when not set to ALL_NAV."
+        "message": "Quando impostato su OFF il sistema di navigazione non prenderà il controllo del motor se il throttle è basso (il motor si fermerà). Quando impostato su OFF_ALWAYS il sistema di navigazione non prenderà il controllo del motor se il throttle era basso anche quando il failsafe è attivato. Quando impostato su AUTO_ONLY il sistema di navigazione prenderà il controllo del throttle solo nelle modalità di navigazione autonoma (NAV WP e NAV RTH). Quando impostato su ALL_NAV (predefinito) il sistema di navigazione prenderà il controllo completo del motor e non permetterà mai al motor di fermarsi anche quando il throttle è basso. Questa impostazione ha effetto solo sulle modalità NAV che prendono il controllo del throttle quando combinate con MOTOR_STOP ed è probabile che causi uno stallo se fw_min_throttle_down_pitch non è impostato correttamente o se la stima del pitch è errata per i modelli ad ala fissa quando non impostato su ALL_NAV."
     },
     "soarMotorStop": {
         "message": "Soaring Mode Motor Stop"
     },
     "soarMotorStopHelp": {
-        "message": "Stops motor when Soaring mode enabled."
+        "message": "Arresta il motore quando la modalità Soaring è abilitata."
     },
     "soarPitchDeadband": {
         "message": "Soaring Mode Pitch Deadband"
     },
     "soarPitchDeadbandHelp": {
-        "message": "Pitch Angle deadband when soaring mode enabled (deg). Angle mode inactive within deadband allowing pitch to free float whilst soaring."
+        "message": "Deadband dell'angolo di Pitch quando la modalità Soaring è abilitata (gradi). La modalità Angle è inattiva entro la deadband permettendo al pitch di fluttuare liberamente durante il soaring."
     },
     "altControlResponse": {
-        "message": "Altitude Control Response Factor"
+        "message": "Fattore di risposta del controllo di altitudine"
     },
     "altControlResponseHelp": {
-        "message": "Adjusts the response of fixed wing altitude control as the target altitude is approached. Higher values will sharpen altitude control response but may also cause excessive overshoot or pitch instability if set too high."
+        "message": "Regola la risposta del controllo di altitudine delle ali fisse man mano che ci si avvicina all'altitudine target. Valori più alti renderanno più reattivo il controllo di altitudine ma possono anche causare un eccessivo overshoot o instabilità del pitch se impostati troppo alti."
     },
     "waypointRadiusHelp": {
-        "message": "This sets the distance away from a waypoint that triggers the waypoint as reached."
+        "message": "Questo imposta la distanza da un waypoint che attiva il waypoint come raggiunto."
     },
     "waypointSafeDistance": {
         "message": "Distanza sicura waypoint"
     },
     "waypointSafeDistanceHelp": {
-        "message": "The maximum distance between the home point and the first waypoint."
+        "message": "La distanza massima tra il punto di partenza e il primo waypoint."
     },
     "fixedWingNavigationConfiguration": {
         "message": "Impostazioni Navigazione Ala Fissa"
@@ -3541,49 +3541,49 @@
         "message": "Lunghezza approccio finale"
     },
     "fwLandApproachLengthHelp": {
-        "message": "Length of the final approach, also includes the glide and intercept phase. This is the length from the safe home point to the final turn point."
+        "message": "Lunghezza dell'avvicinamento finale, include anche la fase di planata e di intercettazione. È la lunghezza dal punto home sicuro al punto di virata finale."
     },
     "fwLandFinalApproachPitch2throttle": {
-        "message": "Modifier for pitch to throttle ratio at final approach"
+        "message": "Modificatore per il rapporto pitch/throttle nell'avvicinamento finale"
     },
     "fwLandFinalApproachPitch2throttleHelp": {
-        "message": "This value is multiplied by the \"pitch to throttle ratio\" value during the final approach. Allows the velocity to be reduced."
+        "message": "Questo valore viene moltiplicato per il valore \"rapporto pitch/throttle\" durante l'avvicinamento finale. Permette di ridurre la velocità."
     },
     "fwLandGlideAlt": {
         "message": "Altitudine iniziale fase di planata"
     },
     "fwLandGlideAltHelp": {
-        "message": "At this altitude (measured from the altitude of the landing point) the engine is switched off and the aircraft glides from here."
+        "message": "A questa altitudine (misurata dall'altitudine del punto di atterraggio) il motore viene spento e il velivolo plana da qui."
     },
     "fwLandFlareAlt": {
         "message": "Altitudine iniziale fase di flare"
     },
     "fwLandFlareAltHelp": {
-        "message": "At this altitude (measured from the altitude of the landing point) the last phase of landing is executed."
+        "message": "A questa altitudine (misurata dall'altitudine del punto di atterraggio) viene eseguita l'ultima fase dell'atterraggio."
     },
     "fwLandGlidePitch": {
         "message": "Valore pitch fase di planata"
     },
     "fwLandGlidePitchHelp": {
-        "message": "This pitch angle is held during the glide phase."
+        "message": "Questo angolo di pitch viene mantenuto durante la fase di planata."
     },
     "fwLandFlarePitch": {
         "message": "Valore pitch fase di flare"
     },
     "fwLandFlarePitchHelp": {
-        "message": "This pitch angle is held during the flare phase."
+        "message": "Questo angolo di pitch viene mantenuto durante la fase di flare."
     },
     "fwLandMaxTailwind": {
         "message": "Vento coda max."
     },
     "fwLandMaxTailwindHelp": {
-        "message": "This value is used when no headwind landing is possible and wind speeds below this value are ignored (inaccuracies in INAV wind measurement)."
+        "message": "Questo valore viene usato quando non è possibile un atterraggio controvento e le velocità del vento inferiori a questo valore vengono ignorate (imprecisioni nella misurazione del vento di INAV)."
     },
     "osd_unsupported_msg1": {
-        "message": "Your flight controller isn't responding to OSD commands. This probably means that it does not have an integrated OSD."
+        "message": "Il tuo flight controller non risponde ai comandi OSD. Questo probabilmente significa che non dispone di un OSD integrato."
     },
     "osd_unsupported_msg2": {
-        "message": "Note that some flight controllers have an onboard <a href=\"https://www.youtube.com/watch?v=ikKH_6SQ-Tk\" target=\"_blank\">MinimOSD</a> that can be flashed and configured with <a href=\"https://github.com/ShikOfTheRa/scarab-osd/releases/latest\" target=\"_blank\">scarab-osd</a>, however the MinimOSD cannot be configured through this interface."
+        "message": "Nota che alcuni flight controller hanno un <a href=\"https://www.youtube.com/watch?v=ikKH_6SQ-Tk\" target=\"_blank\">MinimOSD</a> a bordo che può essere flashato e configurato con <a href=\"https://github.com/ShikOfTheRa/scarab-osd/releases/latest\" target=\"_blank\">scarab-osd</a>, tuttavia il MinimOSD non può essere configurato tramite questa interfaccia."
     },
     "osd_elements": {
         "message": "Elementi"
@@ -3598,7 +3598,7 @@
         "message": "Formato Video"
     },
     "osd_craft_name": {
-        "message": "Nome Mezzo"
+        "message": "Nome modello"
     },
     "osd_pilot_name": {
         "message": "Nome Pilota"
@@ -3610,7 +3610,7 @@
         "message": "Usa logo pilota"
     },
     "osd_use_large_pilot_logo_help": {
-        "message": "Use your large pilot logo with/instead of the INAV logo. This requires a custom font with your pilot logo. This is seen on the arming screen."
+        "message": "Usa il tuo logo pilota grande con/al posto del logo INAV. Questo richiede un font personalizzato con il tuo logo pilota. Viene visualizzato nella schermata di armamento."
     },
     "osd_units": {
         "message": "Unità"
@@ -3634,13 +3634,13 @@
         "message": "Cifre Plus Code"
     },
     "osd_plus_code_short": {
-        "message": "Plus Code Remove Leading Digits"
+        "message": "Plus Code Rimuovi cifre iniziali"
     },
     "osd_esc_rpm_precision": {
-        "message": "ESC RPM precision"
+        "message": "Precisione RPM ESC"
     },
     "osd_esc_rpm_precision_help": {
-        "message": "The number of digits shown in the RPM display. If the RPM is higher than the number of digits, it will be shown in thousand RPM with as many decimal places as allowed."
+        "message": "Il numero di cifre mostrate nella visualizzazione degli RPM. Se gli RPM sono superiori al numero di cifre, verranno mostrati in migliaia di RPM con tutte le cifre decimali consentite."
     },
     "osd_crosshairs_style": {
         "message": "Stile Mirino"
@@ -3649,7 +3649,7 @@
         "message": "Offset HUD e AHI"
     },
     "osd_horizon_offset_help": {
-        "message": "Move the HUD and AHI up or down on the OSD to get it level with the actual horizon. The AHI can appear high or low depending on the camera angle in flight. <span style='color:red;'>NOTE: </span> This does not work with the Pixel OSD. For that use the `osd_ahi_vertical_offset` command in the CLI."
+        "message": "Sposta l'HUD e l'AHI verso l'alto o verso il basso sull'OSD per allinearli con l'orizzonte reale. L'AHI può apparire alto o basso a seconda dell'angolo della camera in volo. <span style='color:red;'>NOTA: </span> Questo non funziona con il Pixel OSD. Per quello usa il comando `osd_ahi_vertical_offset` nella CLI."
     },
     "osd_left_sidebar_scroll": {
         "message": "Scroll Barra Laterale Sinistra"
@@ -3673,58 +3673,58 @@
         "message": "Elementi OSD personalizzati"
     },
     "osd_custom_element_settings_HELP": {
-        "message": "For comprehensive details on how to use Custom OSD elements. Click this ?"
+        "message": "Per dettagli completi su come usare gli elementi OSD personalizzati. Clicca questo ?"
     },
     "osd_custom_element_settings_icons_HELP": {
-        "message": "You can find the icon numbers by clicking this help button."
+        "message": "Puoi trovare i numeri delle icone cliccando questo pulsante di aiuto."
     },
     "custom_element": {
-        "message": "Custom element"
+        "message": "Elemento personalizzato"
     },
     "osd_hud_settings_HELP": {
-        "message": "This section allows tweaking the behavior of HUD elements."
+        "message": "Questa sezione permette di regolare il comportamento degli elementi HUD."
     },
     "osd_hud_radar_disp": {
-        "message": "Maximum number of radar elements on screen."
+        "message": "Numero massimo di elementi radar sullo schermo."
     },
     "osd_hud_radar_disp_help": {
-        "message": "This is used for INAV Radar/FormationFlight. 0 disables this feature."
+        "message": "Questo è usato per INAV Radar/FormationFlight. 0 disabilita questa funzione."
     },
     "osd_hud_radar_range_min": {
-        "message": "Minimum radar range"
+        "message": "Portata radar minima"
     },
     "osd_hud_radar_range_min_help": {
-        "message": "Radar aircrafts closer than this will not be displayed in the HUD."
+        "message": "Gli aeromobili radar più vicini di questo valore non verranno visualizzati nell'HUD."
     },
     "osd_hud_radar_range_max": {
-        "message": "Maximum radar range"
+        "message": "Portata radar massima"
     },
     "osd_hud_radar_range_max_help": {
-        "message": "Radar aircrafts further away than this will not be displayed in the HUD."
+        "message": "Gli aeromobili radar più distanti di questo valore non verranno visualizzati nell'HUD."
     },
     "osd_hud_wp_disp": {
-        "message": "Maximum number of waypoint elements on screen."
+        "message": "Numero massimo di elementi waypoint sullo schermo."
     },
     "osd_hud_wp_disp_help": {
-        "message": "Number of Wayponts to show on screen. 0 disables this feature."
+        "message": "Numero di waypoint da mostrare sullo schermo. 0 disabilita questa funzione."
     },
     "osd_camera_uptilt": {
-        "message": "Camera uptilt"
+        "message": "Inclinazione camera verso l'alto"
     },
     "osd_camera_uptilt_help": {
-        "message": "Set the camera uptilt for the FPV camera in degrees, positive is up, negative is down, relative to the horizontal. Used for correct display of HUD items and AHI (when enabled with osd_ahi_camera_uptilt_comp=ON)."
+        "message": "Imposta l'inclinazione verso l'alto della camera FPV in gradi, positivo è verso l'alto, negativo verso il basso, rispetto all'orizzontale. Usato per la corretta visualizzazione degli elementi HUD e dell'AHI (quando abilitato con osd_ahi_camera_uptilt_comp=ON)."
     },
     "osd_camera_fov_h": {
-        "message": "Camera Horizontal FOV"
+        "message": "FOV Orizzontale Camera"
     },
     "osd_camera_fov_h_help": {
-        "message": "Camera Horizontal Field of View in Degrees. It is used to calculate the position of elements in the HUD display."
+        "message": "Campo visivo orizzontale della camera in gradi. Viene usato per calcolare la posizione degli elementi nella visualizzazione HUD."
     },
     "osd_camera_fov_v": {
-        "message": "Camera Vertical FOV"
+        "message": "FOV verticale camera"
     },
     "osd_camera_fov_v_help": {
-        "message": "Camera Vertical Field of View in Degrees. It is used to calculate the position of elements in the HUD display."
+        "message": "Campo visivo verticale della camera in gradi. Viene usato per calcolare la posizione degli elementi nella visualizzazione HUD."
     },
     "osd_alarms": {
         "message": "Allarmi"
@@ -3733,7 +3733,7 @@
         "message": "Layout Predefinito"
     },
     "osdLayoutAlternative": {
-        "message": "Alternative Layout #$1"
+        "message": "Layout Alternativo #$1"
     },
     "osdUnitImperial": {
         "message": "Imperiale"
@@ -3745,28 +3745,28 @@
         "message": "Metrico + MPH"
     },
     "osdUnitMetricMPHTip": {
-        "message": "Use metric units except for the speed, which is displayed in miles per hour."
+        "message": "Usa unità metriche eccetto per la velocità, che è visualizzata in miglia orarie."
     },
     "osdUnitUK": {
         "message": "UK"
     },
     "osdUnitUKTip": {
-        "message": "Use imperial units except for the temperature, which is displayed in Celsius."
+        "message": "Usa unità imperiali eccetto per la temperatura, che è visualizzata in Celsius."
     },
     "osdUnitGA": {
-        "message": "General Aviation"
+        "message": "Aviazione Generale"
     },
     "osdUnitGATip": {
-        "message": "Use GA standard units (non-SI): Nautical Miles, Feet, Knots, Celcius."
+        "message": "Usa le unità standard GA (non-SI): Miglia Nautiche, Piedi, Nodi, Celsius."
     },
     "osd_rssi_alarm": {
         "message": "RSSI (%)"
     },
     "osdAlarmBATT_CAP": {
-        "message": "Used Battery"
+        "message": "Batteria Utilizzata"
     },
     "osdAlarmBATT_CAP_HELP": {
-        "message": "The battery capacity used indicator (mah drawn) will flash when the total consumed mah are greater than this value. Requires a current sensor. Zero disables this alarm."
+        "message": "L'indicatore della capacità di batteria utilizzata (mah prelevati) lampeggerà quando il totale dei mah consumati è maggiore di questo valore. Richiede un sensore di corrente. Zero disabilita questo allarme."
     },
     "osd_time_alarm": {
         "message": "Tempo Volo (minuti)"
@@ -3778,55 +3778,55 @@
         "message": "Distanza"
     },
     "osdAlarmDIST_HELP": {
-        "message": "The distance to home indicator will flash when the distance is greater than this value. Zero disables this alarm."
+        "message": "L'indicatore della distanza da casa lampeggerà quando la distanza è maggiore di questo valore. Zero disabilita questo allarme."
     },
     "osd_neg_alt_alarm": {
         "message": "Altitudine Negativa"
     },
     "osdAlarmMAX_NEG_ALTITUDE_HELP": {
-        "message": "The altitude indicator will flash when altitude is negative and its absolute value is greater than this alarm. Useful when taking off from elevated places. Zero disables this alarm."
+        "message": "L'indicatore di altitudine lampeggerà quando l'altitudine è negativa e il suo valore assoluto è maggiore di questo allarme. Utile quando si decolla da luoghi elevati. Zero disabilita questo allarme."
     },
     "osd_airspeed_min_alarm": {
         "message": "Velocità Aria Minima"
     },
     "osd_airspeed_min_alarm_HELP": {
-        "message": "The airspeed indicator will flash when the airspeed is below this threshold. Zero disables this alarm."
+        "message": "L'indicatore della velocità all'aria lampeggerà quando la velocità all'aria è sotto questa soglia. Zero disabilita questo allarme."
     },
     "osd_airspeed_max_alarm": {
         "message": "Velocità Aria Massima"
     },
     "osd_airspeed_max_alarm_HELP": {
-        "message": "The airspeed indicator will flash when the airspeed is above this threshold. Zero disables this alarm."
+        "message": "L'indicatore della velocità all'aria lampeggerà quando la velocità all'aria è sopra questa soglia. Zero disabilita questo allarme."
     },
     "osd_gforce_alarm": {
-        "message": "g force"
+        "message": "forza g"
     },
     "osdAlarmGFORCE_HELP": {
-        "message": "The g force element will start blinking when greater than this value"
+        "message": "L'elemento della forza g inizierà a lampeggiare quando maggiore di questo valore"
     },
     "osd_gforce_axis_alarm_min": {
         "message": "g force asse min"
     },
     "osdAlarmGFORCE_AXIS_MIN_HELP": {
-        "message": "The axes g force elements will start blinking when lower than this value"
+        "message": "Gli elementi della forza g degli assi inizieranno a lampeggiare quando minori di questo valore"
     },
     "osd_gforce_axis_alarm_max": {
         "message": "g force asse max"
     },
     "osdAlarmGFORCE_AXIS_MAX_HELP": {
-        "message": "The axes g force elements will start blinking when greater than this value"
+        "message": "Gli elementi della forza g degli assi inizieranno a lampeggiare quando maggiori di questo valore"
     },
     "osdAlarmADSB_MAX_DISTANCE_WARNING": {
-        "message": "Distance in meters of ADSB aircraft that is displayed"
+        "message": "Distanza in metri del velivolo ADSB che viene visualizzato"
     },
     "osdAlarmADSB_MAX_DISTANCE_ALERT": {
-        "message": "Distance inside which ADSB data flashes for proximity warning"
+        "message": "Distanza entro la quale i dati ADSB lampeggiano per l'avviso di prossimità"
     },
     "osd_current_alarm": {
         "message": "Corrente (A)"
     },
     "osdAlarmCURRENT_HELP": {
-        "message": "The current draw element will start blinking when the consumption is greater than this value. Zero disables this alarm."
+        "message": "L'elemento dell'assorbimento di corrente inizierà a lampeggiare quando il consumo è maggiore di questo valore. Zero disabilita questo allarme."
     },
     "osd_imu_temp_alarm_min": {
         "message": "Temperatura IMU minima"
@@ -3850,13 +3850,13 @@
         "message": "Livello Allarme SNR"
     },
     "osdalarmSNR_HELP": {
-        "message": "SNR is only shown below this value. 0dB (1:1 ratio), indicates that received signal equals noise floor."
+        "message": "L'SNR viene mostrato solo sotto questo valore. 0dB (rapporto 1:1), indica che il segnale ricevuto è uguale al livello di rumore di fondo."
     },
     "osd_link_quality_alarm": {
         "message": "Allarme Qualità Collegamento"
     },
     "osdalarmLQ_HELP": {
-        "message": "For Crossfire use 70%. For Tracer use 50%."
+        "message": "Per Crossfire usa 70%. Per Tracer usa 50%."
     },
     "osd_rssi_dbm_alarm": {
         "message": "Allarme RSSI dBm"
@@ -3868,7 +3868,7 @@
         "message": "Allerta distanza ADSB"
     },
     "osd_rssi_dbm_alarm_HELP": {
-        "message": "RSSI indicator blinks below this value. Range: [-130,0]. Zero disables this alarm."
+        "message": "L'indicatore RSSI lampeggia sotto questo valore. Intervallo: [-130,0]. Zero disabilita questo allarme."
     },
     "osdGroupGeneral": {
         "message": "Generale"
@@ -3880,7 +3880,7 @@
         "message": "Timer"
     },
     "osdGroupGForce": {
-        "message": "G force"
+        "message": "Forza G"
     },
     "osdGroupTemperature": {
         "message": "Temperatura"
@@ -3913,7 +3913,7 @@
         "message": "Mappe e Radar"
     },
     "osdGroupMapsAndRadars_HELP": {
-        "message": "Maps & radars allow laying out additional elements on top of them as long as they don't overlap any of the map parts visible in the preview."
+        "message": "Mappe e radar permettono di disporre elementi aggiuntivi sopra di essi a patto che non si sovrappongano ad alcuna delle parti della mappa visibili nell'anteprima."
     },
     "osdElement_ONTIME_FLYTIME": {
         "message": "Tempo acceso / Tempo di volo"
@@ -4267,37 +4267,37 @@
         "message": "Indicatore switch 4"
     },
     "osd_pan_servo_settings": {
-        "message": "Pan Servo OSD Settings"
+        "message": "Impostazioni OSD Servo Pan"
     },
     "osd_pan_servo_settings_HELP": {
-        "message": "This section enables and configures the pan servo offset feature. It is used to keep OSD elements, like the home arrow and POIs, pointing to or in the correct direction. Even when you have panned the camera around."
+        "message": "Questa sezione abilita e configura la funzione di offset del servo pan. Viene usata per mantenere gli elementi OSD, come la freccia di casa e i POI, puntati o orientati nella direzione corretta. Anche quando hai ruotato la camera con il pan."
     },
     "osdPanServoIndex": {
-        "message": "Pan Servo Output"
+        "message": "Uscita Servo Pan"
     },
     "osdPanServoIndex_HELP": {
-        "message": "Set the is to the output number of the pan servo; as shown in the mixer outputs table. For example output S6."
+        "message": "Imposta questo al numero di uscita del servo pan; come mostrato nella tabella delle uscite del mixer. Per esempio uscita S6."
     },
     "osdPanServoRangeDecadegrees": {
-        "message": "Total degrees of movement of the pan servo"
+        "message": "Gradi totali di movimento del servo pan"
     },
     "osdPanServoRangeDecadegrees_HELP": {
-        "message": "Degrees of pan servo rotation. A servo with 180 degrees of rotation typically needs 180 for this setting. Make the value negative to inverse the direction."
+        "message": "Gradi di rotazione del servo pan. Un servo con 180 gradi di rotazione tipicamente necessita di 180 per questa impostazione. Rendi il valore negativo per invertire la direzione."
     },
     "osdPanServoIndicatorShowDegrees": {
-        "message": "Show degrees of offset next to pan indicator"
+        "message": "Mostra i gradi di offset accanto all'indicatore pan"
     },
     "osdPanServoOffcentreWarning": {
-        "message": "Off-centre warning"
+        "message": "Avviso fuori centro"
     },
     "osdPanServoOffcentreWarning_HELP": {
-        "message": "Degrees either side of the pan servo centre; where it is assumed camera is wanted to be facing forwards, but isn't at 0. If in this range and not 0 for longer than 10 seconds, the pan servo offset OSD element will blink. 0 means the warning is disabled."
+        "message": "Gradi su ciascun lato del centro del servo pan; dove si presume che la camera debba essere rivolta in avanti, ma non lo è a 0. Se in questo intervallo e non a 0 per più di 10 secondi, l'elemento OSD dell'offset del servo pan lampeggerà. 0 significa che l'avviso è disabilitato."
     },
     "osdGroupOSDCustomElements": {
-        "message": "OSD Custom Elements"
+        "message": "Elementi Personalizzati OSD"
     },
     "osdGroupGVars": {
-        "message": "Global Variables"
+        "message": "Variabili Globali"
     },
     "osdElement_GVAR_0": {
         "message": "Variabile globale 0"
@@ -4336,7 +4336,7 @@
         "message": "Sensore di temperatura 8"
     },
     "osdSettingMainVoltageDecimals": {
-        "message": "Main voltage decimals"
+        "message": "Decimali tensione principale"
     },
     "osdElement_OSD_RANGEFINDER": {
         "message": "Distanza rangefinder"
@@ -4351,55 +4351,55 @@
         "message": "Distanza verticale dalla prossima geozone"
     },
     "osdSettingPLUS_CODE_DIGITS_HELP": {
-        "message": "Precision at the equator: 10=13.9x13.9m; 11=2.8x3.5m; 12=56x87cm; 13=11x22cm."
+        "message": "Precisione all'equatore: 10=13.9x13.9m; 11=2.8x3.5m; 12=56x87cm; 13=11x22cm."
     },
     "osdSettingPLUS_CODE_SHORT_HELP": {
-        "message": "Removing 2, 4 and 6 leading digits requires a reference location within, respectively, ~800km, ~40km and ~2km to recover the original coordinates."
+        "message": "La rimozione di 2, 4 e 6 cifre iniziali richiede una posizione di riferimento entro, rispettivamente, ~800km, ~40km e ~2km per recuperare le coordinate originali."
     },
     "osdSettingCRSF_LQ_FORMAT_HELP": {
-        "message": "TYPE1 shows LQ% as used by TBS hardware. TYPE2 shows RF Profile Modes (2=150Hz, 1=50Hz, 0=4Hz update rates) and LQ % [0..100%]. Tracer shows RFMode 1 (1=250Hz) and LQ % [0..100%]."
+        "message": "TYPE1 mostra LQ% come usato dall'hardware TBS. TYPE2 mostra le Modalità RF Profile (2=150Hz, 1=50Hz, 0=4Hz frequenze di aggiornamento) e LQ % [0..100%]. Tracer mostra RFMode 1 (1=250Hz) e LQ % [0..100%]."
     },
     "osd_video_show_guides": {
-        "message": "Show preview guides"
+        "message": "Mostra guide di anteprima"
     },
     "osd_video_HELP": {
-        "message": "For HD: red lines show 4:3 screen, HDZero: keep within the blue box for a higher refresh rate, AUTO/PAL: green line is NTSC limit."
+        "message": "Per HD: le linee rosse mostrano lo schermo 4:3, HDZero: rimani all'interno del riquadro blu per un refresh rate più alto, AUTO/PAL: la linea verde è il limite NTSC."
     },
     "osd_dji_HD_FPV": {
         "message": "DJI HD FPV"
     },
     "osd_dji_hide_unsupported": {
-        "message": "Hide unsupported elements"
+        "message": "Nascondi elementi non supportati"
     },
     "osd_dji_ESC_temp": {
-        "message": "Source of <i>ESC Temperature</i>"
+        "message": "Sorgente di <i>Temperatura ESC</i>"
     },
     "osd_dji_RSSI_source": {
-        "message": "Source of <i>RSSI</i>"
+        "message": "Sorgente di <i>RSSI</i>"
     },
     "osd_dji_GPS_source": {
-        "message": "Source of <i>GPS Speed</i>"
+        "message": "Sorgente di <i>Velocità GPS</i>"
     },
     "osd_dji_speed_source": {
-        "message": "Source of <i>3D Speed</i>"
+        "message": "Sorgente di <i>Velocità 3D</i>"
     },
     "osd_dji_use_craft_name_elements": {
-        "message": "Use craft name for messages and additional elements.</span><br/>Elements in <span class=\"blue\">blue</span> appear in Craft Name."
+        "message": "Usa il craft name per messaggi ed elementi aggiuntivi.</span><br/>Gli elementi in <span class=\"blue\">blu</span> appaiono nel Craft Name."
     },
     "osd_dji_adjustments": {
-        "message": "Show adjustments in Craft Name"
+        "message": "Mostra le regolazioni nel Craft Name"
     },
     "osd_dji_cn_alternating_duration": {
-        "message": "Craft Name alternating duration (in 1/10 sec)"
+        "message": "Durata alternanza Craft Name (in 1/10 di sec)"
     },
     "osd_switch_indicator_settings": {
-        "message": "Switch Indicator Settings"
+        "message": "Impostazioni indicatori switch"
     },
     "osd_switch_indicator_settings_HELP": {
-        "message": "It is recommended to use the Custom OSD Elements as a replacemtent for switch indicators. They are much more powerful. Click to see an example."
+        "message": "Si consiglia di usare gli elementi OSD personalizzati come sostituto degli indicatori switch. Sono molto più potenti. Clicca per vedere un esempio."
     },
     "osd_switch_indicators_align_left": {
-        "message": "Align switch names to left of switches"
+        "message": "Allinea i nomi degli switch a sinistra degli switch"
     },
     "osdSwitchInd0": {
         "message": "Switch 1"
@@ -4450,7 +4450,7 @@
         "message": "Caricamento in corso..."
     },
     "uploadedCharacters": {
-        "message": "Uploaded $1 characters"
+        "message": "Caricati $1 caratteri"
     },
     "portsIdentifier": {
         "message": "Identificatore"
@@ -4561,7 +4561,7 @@
         "message": "Aggiungi nuova missione"
     },
     "missionEllipsoidEarthDEMModel": {
-        "message": "Use Ellipsoid instead of SL DEM: "
+        "message": "Usa Ellissoide invece del DEM SL: "
     },
     "SafehomeLegend": {
         "message": "Legenda: "
@@ -4648,13 +4648,13 @@
         "message": "Lon:"
     },
     "missionSeaLevelRef": {
-        "message": "Sea level Ref: "
+        "message": "Rif. livello del mare: "
     },
     "missionElevation": {
         "message": "Elevazione (m):"
     },
     "missionNA": {
-        "message": "N/A"
+        "message": "N/D"
     },
     "missionGroundDist": {
         "message": "Dist Terreno (m):"
@@ -4681,10 +4681,10 @@
         "message": "Direzione approccio:"
     },
     "missionFwLandHeading1": {
-        "message": "Heading 1: (deg):"
+        "message": "Heading 1: (gradi):"
     },
     "missionFwLandHeading2": {
-        "message": "Heading 2: (deg):"
+        "message": "Heading 2: (gradi):"
     },
     "missionExclusive": {
         "message": "Escl."
@@ -4816,34 +4816,34 @@
         "message": "Intervallo di quota in cui si tenta di evitare una geozone verso l'alto"
     },
     "geozoneSafeAltitudeDistance": {
-        "message": "Safe altitude distance"
+        "message": "Distanza di altitudine sicura"
     },
     "geozoneSafeAltitudeDistanceHelp": {
-        "message": "Vertical distance that must be maintained to the upper and lower limits of the zone."
+        "message": "Distanza verticale che deve essere mantenuta rispetto ai limiti superiore e inferiore della zona."
     },
     "geozoneSafehomeAsInclusive": {
         "message": "Safehome come inclusiva"
     },
     "geozoneSafehomeAsInclusiveHelp": {
-        "message": "Treat nearest safehome as inclusive geozone"
+        "message": "Tratta la safehome più vicina come geozone inclusiva"
     },
     "geozoneSafehomeZoneAction": {
         "message": "Azione zona safehome"
     },
     "geozoneSafehomeZoneActionHelp": {
-        "message": "Fence action for safehome zone"
+        "message": "Azione di recinzione per la zona safehome"
     },
     "geozoneMrStopDistance": {
         "message": "Distanza arresto multirotore"
     },
     "geozoneMrStopDistanceHelp": {
-        "message": "Distance in which multirotors stops before the border"
+        "message": "Distanza alla quale i multirotori si fermano prima del confine"
     },
     "geozoneNoWayHomeAction": {
         "message": "Azione nessuna via verso home"
     },
     "geozoneNoWayHomeActionHelp": {
-        "message": "Action if RTH with active geozones is unable to calculate a course to home. RTH: Return to home and ignore any geozones."
+        "message": "Azione se l'RTH con geozone attive non è in grado di calcolare una rotta verso home. RTH: Ritorna a home e ignora qualsiasi geozone."
     },
     "missionGeozoneReboot": {
         "message": "Vuoi salvare e riavviare?"
@@ -4870,7 +4870,7 @@
         "message": "Complessa"
     },
     "gezoneInvalidReasonMinMaxAlt": {
-        "message": "Max. Alt <= Min. Alt"
+        "message": "Alt. Max <= Alt. Min"
     },
     "geozoneUnableToSave": {
         "message": "Impossibile salvare geozone: zone non valide"
@@ -4888,7 +4888,7 @@
         "message": "Usa l'applicazione stand-alone.<br> Visita il <a href=\"https://github.com/iNavFlight/inav-configurator/releases\" target=\"_blank\">sito</a> per leggere le note di rilascio e scaricare."
     },
     "eeprom_load_ok": {
-        "message": "EEPROM <span style=\"color: #37a8db\">loaded</span>"
+        "message": "EEPROM <span style=\"color: #37a8db\">caricata</span>"
     },
     "confirm_delete_all_points": {
         "message": "Vuoi davvero eliminare tutti i punti?"
@@ -4903,7 +4903,7 @@
         "message": "Questo sovrascriverà la multi missione corrente.\nContinuare?"
     },
     "multimission_active_index_saved_eeprom": {
-        "message": "Mission active index saved"
+        "message": "Indice missione attiva salvato"
     },
     "no_waypoints_to_load": {
         "message": "Nessun waypoint da caricare!"
@@ -4948,7 +4948,7 @@
         "message": "Carica e applica"
     },
     "mixerApplyModalTitle": {
-        "message": "Confirm"
+        "message": "Conferma"
     },
     "mixerButtonSaveAndReboot": {
         "message": "Salva e riavvia"
@@ -4963,16 +4963,16 @@
         "message": "Applica"
     },
     "motorWizard0": {
-        "message": "Rear-Right"
+        "message": "Posteriore-Destro"
     },
     "motorWizard1": {
-        "message": "Front-Right"
+        "message": "Anteriore-Destro"
     },
     "motorWizard2": {
-        "message": "Rear-Left"
+        "message": "Posteriore-Sinistro"
     },
     "motorWizard3": {
-        "message": "Front-Left"
+        "message": "Anteriore-Sinistro"
     },
     "mixerWizardMotorPosition": {
         "message": "Posizione motore"
@@ -5050,106 +5050,106 @@
         "message": "Distanza da home"
     },
     "brakingSpeedThreshold": {
-        "message": "Min. speed threshold"
+        "message": "Soglia di velocità min."
     },
     "brakingSpeedThresholdTip": {
-        "message": "Braking will be enabled only if actual speed if higher than threshold"
+        "message": "La frenata sarà abilitata solo se la velocità reale è superiore alla soglia"
     },
     "brakingDisengageSpeed": {
-        "message": "Braking disengage speed"
+        "message": "Velocità di disinnesto della frenata"
     },
     "brakingDisengageSpeedTip": {
-        "message": "Braking will end when speed goes below this value"
+        "message": "La frenata terminerà quando la velocità scenderà sotto questo valore"
     },
     "brakingTimeout": {
-        "message": "Max. braking duration"
+        "message": "Durata max. della frenata"
     },
     "brakingTimeoutTip": {
-        "message": "Safety measure. This is the longest period of time braking can be active."
+        "message": "Misura di sicurezza. Questo è il periodo di tempo più lungo per cui la frenata può essere attiva."
     },
     "brakingBoostFactor": {
-        "message": "Boost factor"
+        "message": "Fattore di boost"
     },
     "brakingBoostFactorTip": {
-        "message": "Defines how strong the braking boost will be. 100% means the navigation engine is allowed to double the banking speed and acceleration"
+        "message": "Definisce quanto forte sarà il boost di frenata. 100% significa che il motore di navigazione è autorizzato a raddoppiare la velocità di inclinazione e l'accelerazione"
     },
     "brakingBoostTimeout": {
-        "message": "Max. braking boost duration"
+        "message": "Durata max. del boost di frenata"
     },
     "brakingBoostTimeoutTip": {
-        "message": "Safety measure. This is the longest period of time braking boost can be active."
+        "message": "Misura di sicurezza. Questo è il periodo di tempo più lungo per cui il boost di frenata può essere attivo."
     },
     "brakingBoostSpeedThreshold": {
-        "message": "Boost min. speed threshold"
+        "message": "Soglia di velocità min. del boost"
     },
     "brakingBoostSpeedThresholdTip": {
-        "message": "Braking boost will be enabled only if actual speed if higher than threshold"
+        "message": "Il boost di frenata sarà abilitato solo se la velocità reale è superiore alla soglia"
     },
     "brakingBoostDisengageSpeed": {
-        "message": "Braking boost disengage speed"
+        "message": "Velocità di disinnesto del boost di frenata"
     },
     "brakingBoostDisengageSpeedTip": {
-        "message": "Braking boost will end when speed goes below this value"
+        "message": "Il boost di frenata terminerà quando la velocità scenderà sotto questo valore"
     },
     "brakingBankAngle": {
-        "message": "Max. bank angle"
+        "message": "Angolo di rollio max."
     },
     "brakingBankAngleTip": {
-        "message": "Max bank angle allowed during braking phase"
+        "message": "Angolo di rollio massimo consentito durante la fase di frenata"
     },
     "multirotorBrakingConfiguration": {
-        "message": "Multirotor braking mode configuration"
+        "message": "Configurazione modalità di frenata per multirotore"
     },
     "mapProvider": {
-        "message": "Map Provider"
+        "message": "Provider Mappa"
     },
     "proxyURL": {
-        "message": "MapProxy URL"
+        "message": "URL MapProxy"
     },
     "proxyLayer": {
-        "message": "MapProxy Layer"
+        "message": "Layer MapProxy"
     },
     "accNotchHz": {
-        "message": "Acc. notch filter freq."
+        "message": "Freq. filtro notch acc."
     },
     "accNotchHzHelp": {
-        "message": "Allow to set a single notch filter for accelerometer readout. Should be configured in the same way as gyro notch if accelerometer records a noise spike above acc. LPF filter"
+        "message": "Permette di impostare un singolo filtro notch per la lettura dell'accelerometro. Dovrebbe essere configurato allo stesso modo del notch gyro se l'accelerometro registra un picco di rumore sopra il filtro acc. LPF"
     },
     "accNotchCutoff": {
-        "message": "Acc. notch filter cutoff freq."
+        "message": "Freq. di taglio filtro notch acc."
     },
     "accNotchCutoffHelp": {
-        "message": "Should be kept below acc. notch filter frequency"
+        "message": "Dovrebbe essere mantenuta al di sotto della frequenza del filtro notch acc."
     },
     "gyroStage2LpfCutoffFrequency": {
-        "message": "Gyro Stage 2 LPF cutoff frequency"
+        "message": "Frequenza di taglio LPF Stage 2 del gyro"
     },
     "gyroStage2LpfCutoffFrequencyHelp": {
-        "message": "Second stage gyro low pass filter that is an equivalent of Betaflight not-Kalman stage2 filter. It has to be setup above first stage gyro LPF. For 5 and 6-inch miniquads, this usually means above 150Hz. 7-inch quads above 125Hz."
+        "message": "Filtro lowpass del gyro di secondo stadio che è l'equivalente del filtro non-Kalman stage2 di Betaflight. Deve essere impostato al di sopra dell'LPF del gyro di primo stadio. Per i miniquad da 5 e 6 pollici, di solito significa al di sopra di 150Hz. Per i quad da 7 pollici al di sopra di 125Hz."
     },
     "escProtocolNotAdvised": {
-        "message": "This ESC protocol is not advised, use it at your own risk"
+        "message": "Questo protocollo ESC non è consigliato, usalo a tuo rischio"
     },
     "escProtocolExperimental": {
-        "message": "Experimental ESC protocol, use at your own risk"
+        "message": "Protocollo ESC sperimentale, usalo a tuo rischio"
     },
     "looptimeNotAdvised": {
-        "message": "PID loop might be not stable if GPS is in use"
+        "message": "Il loop PID potrebbe non essere stabile se il GPS è in uso"
     },
     "gyroLpfSuggestedMessage": {
-        "message": "This is suggested setting for all multirotors with propeller size below 8 inches. Always check motor temperature after the first flight"
+        "message": "Questa è l'impostazione consigliata per tutti i multirotori con eliche di dimensione inferiore a 8 pollici. Controllare sempre la temperatura dei motori dopo il primo volo"
     },
     "gyroLpfNotAdvisedMessage": {
-        "message": "It is suggested to choose an higher cutoff frequency"
+        "message": "Si consiglia di scegliere una frequenza di taglio più alta"
     },
     "gyroLpfNotFlyableMessage": {
-        "message": "This setting will probably make the UAV unflyable"
+        "message": "Questa impostazione renderà probabilmente il UAV impilotabile"
     },
     "gyroLpfWhyNotHigherMessage": {
-        "message": "If motors are not overheating, try to set 256Hz instead"
+        "message": "Se i motori non si surriscaldano, prova a impostare 256Hz invece"
     },
     "gyroLpfWhyNotSlightlyHigherMessage": {
-        "message": "If there are no vibration problems and motors are not overheating, try to set 188Hz instead"
+        "message": "Se non ci sono problemi di vibrazione e i motori non si surriscaldano, prova a impostare 188Hz invece"
     },
     "tabLogicConditions": {
         "message": "Condizioni Logiche"
@@ -5203,25 +5203,25 @@
         "message": "Iterm Relax"
     },
     "itermRelaxHelp": {
-        "message": "Defines Iterm relaxation algorithm activation. PR mean it's active on Roll and Pitch axis. PRY is active also on Yaw."
+        "message": "Definisce l'attivazione dell'algoritmo di rilassamento dell'iterm. PR significa che è attivo sugli assi Roll e Pitch. PRY è attivo anche su Yaw."
     },
     "dterm_lpf_type": {
         "message": "Tipo D-term LPF"
     },
     "dterm_lpf_type_help": {
-        "message": "BIQUAD offers better noise attenuation for a price of higher delay. PT1 has lower attenuation but offers lower delay."
+        "message": "BIQUAD offre una migliore attenuazione del rumore al prezzo di un ritardo maggiore. PT1 ha un'attenuazione minore ma offre un ritardo minore."
     },
     "dterm_lpf2_type": {
         "message": "Tipo D-term Stage 2 LPF"
     },
     "dterm_lpf2_type_help": {
-        "message": "BIQUAD offers better noise attenuation for a price of higher delay. PT1 has lower attenuation but offers lower delay."
+        "message": "BIQUAD offre una migliore attenuazione del rumore al prezzo di un ritardo maggiore. PT1 ha un'attenuazione minore ma offre un ritardo minore."
     },
     "dterm_lpf2_hz": {
         "message": "Freq. cutoff D-term Stage 2 LPF"
     },
     "dterm_lpf2_hz_help": {
-        "message": "Lowpass cutoff filter for D-term on ROLL and PITCH axises. 0 mean filter is disabled"
+        "message": "Filtro lowpass di cutoff per il D-term sugli assi ROLL e PITCH. 0 significa che il filtro è disabilitato"
     },
     "tabFilteringAdvanced": {
         "message": "Altri filtri"
@@ -5233,37 +5233,37 @@
         "message": "Configurazione"
     },
     "vtxDisclaimer": {
-        "message": "Use only bands, channels and power levels that are legal in a place you fly! Always refer to VTX user manual and local regulations!"
+        "message": "Usa solo bande, canali e livelli di potenza che sono legali nel luogo in cui voli! Fai sempre riferimento al manuale utente del VTX e alle normative locali!"
     },
     "defaultsDialogTitle": {
         "message": "Valori predefiniti"
     },
     "defaultsDialogInfo": {
-        "message": "INAV Configurator would like to know which kind of UAV you are configuring. Based on this information it will modify some default values to unlock the best flying performance. "
+        "message": "INAV Configurator vorrebbe sapere quale tipo di UAV stai configurando. In base a questa informazione modificherà alcuni valori predefiniti per sbloccare le migliori prestazioni di volo. "
     },
     "defaultsDialogInfo2": {
-        "message": "Avoid blindly restoring all PID and filter configuration from the previous version of INAV. The best result can be obtained by retuning from defaults!"
+        "message": "Evita di ripristinare ciecamente tutta la configurazione di PID e filtri dalla versione precedente di INAV. Il miglior risultato si ottiene rifacendo la taratura dai valori predefiniti!"
     },
     "throttleIdle": {
         "message": "Potenza IDLE Motori [%]"
     },
     "throttleIdleDigitalInfo": {
-        "message": "For digital protocols, IDLE can be lowered even down to 5-7% without motors stopping in the air. If a drone wobbles after pulling throttle low, try increasing IDLE to tune this behavior out."
+        "message": "Per i protocolli digitali, l'IDLE può essere abbassato fino al 5-7% senza che i motori si fermino in aria. Se un drone oscilla dopo aver abbassato il throttle, prova ad aumentare l'IDLE per eliminare questo comportamento."
     },
     "throttleIdleAnalogInfo": {
-        "message": "For analog protocols, IDLE can be lowered below 10% if motors are working smooth without stuttering. If a drone wobbles after pulling throttle low, try increasing IDLE to tune this behavior out."
+        "message": "Per i protocolli analogici, l'IDLE può essere abbassato sotto il 10% se i motori funzionano in modo fluido senza singhiozzi. Se un drone oscilla dopo aver abbassato il throttle, prova ad aumentare l'IDLE per eliminare questo comportamento."
     },
     "motor_poles": {
         "message": "Numero poli motore (numero magneti)"
     },
     "motorStopWarning": {
-        "message": "Should be enabled on Airplanes, Rovers and Boats. Should not be enabled on Multirotors! On Multirotors, when Airmode is active, motors will not stop."
+        "message": "Dovrebbe essere abilitato su aerei, rover e barche. NON deve essere abilitato sui multirotore! Sui multirotore, quando Airmode è attivo, i motori non si fermeranno."
     },
     "reversibleEscWarning": {
-        "message": "When Reversible Motors are used, set Motors IDLE power to 0%"
+        "message": "Quando si usano Motor reversibili, impostare la potenza IDLE dei Motor a 0%"
     },
     "dynamic_gyro_notch_enabled_help": {
-        "message": "Matrix Gyro Filter is the new generation of dynamic gyro notches available in INAV. It is recommended to enable it on all Multirotor builds on F4 and F7 flight controllers."
+        "message": "Il Matrix Gyro Filter è la nuova generazione di notch dinamici del gyro disponibili in INAV. Si raccomanda di abilitarlo su tutte le build di multirotori con flight controller F4 e F7."
     },
     "globalFunctions": {
         "message": "Funzioni globali"
@@ -5290,13 +5290,13 @@
         "message": "Velocità I2C"
     },
     "configurationI2cSpeedHelp": {
-        "message": "I2C speed should be kept at the highest level that allows for all connected devices to work. Default 400kHz is a safe value and it is suggested to switch to 800kHz in case of Multirotors."
+        "message": "La velocità I2C dovrebbe essere mantenuta al livello più alto che consente a tutti i dispositivi collegati di funzionare. Il valore predefinito di 400kHz è un valore sicuro e si suggerisce di passare a 800kHz in caso di multirotori."
     },
     "i2cSpeedSuggested800khz": {
-        "message": "Please switch to 800kHz if connected hardware allows for it"
+        "message": "Passa a 800kHz se l'hardware collegato lo consente"
     },
     "i2cSpeedTooLow": {
-        "message": "This I2C speed is too low!"
+        "message": "Questa velocità I2C è troppo bassa!"
     },
     "configurationVoltageMeterType": {
         "message": "Tipo Misuratore Tensione"
@@ -5305,25 +5305,25 @@
         "message": "Tipo Misuratore Corrente"
     },
     "MissionPlannerJumpSettingsCheck": {
-        "message": "JUMP settings incorrect : Check it again! \nBeing forced to WP 1!"
+        "message": "Impostazioni JUMP non corrette: controllale di nuovo! \nForzato al WP 1!"
     },
     "MissionPlannerJump2SettingsCheck": {
-        "message": "JUMP settings incorrect : Repeat should not exceed 10! \nCheck it again! Being forced to number of repeat equal 0!"
+        "message": "Impostazioni JUMP non corrette: la ripetizione non deve superare 10! \nControllale di nuovo! Numero di ripetizioni forzato a 0!"
     },
     "MissionPlannerJump3SettingsCheck": {
-        "message": "JUMP settings incorrect : not able to Jump to a POI! \nBeing forced to WP 1!"
+        "message": "Impostazioni JUMP non corrette: impossibile saltare a un POI! \nForzato al WP 1!"
     },
     "MissionPlannerHeadSettingsCheck": {
-        "message": "Heading value is incorrect : Check it again! Being forced by default to -1 thence!"
+        "message": "Il valore di heading non è corretto: controllalo di nuovo! Forzato per impostazione predefinita a -1!"
     },
     "MissionPlannerRTHSettingsCheck": {
-        "message": "RTH option is incorrect : Should be 0 or 1. Check it again! \nBeing forced by default to 0, i.e no LAND after RTH!"
+        "message": "Opzione RTH non corretta: dovrebbe essere 0 o 1. Controllala di nuovo! \nForzata per impostazione predefinita a 0, ovvero nessun LAND dopo RTH!"
     },
     "MissionPlannerJumpTargetRemoval": {
-        "message": "You can't remove a Waypoint which is defined as a JUMP target! \nYou first need to remove the target on the waypoint triggering the JUMP."
+        "message": "Non puoi rimuovere un waypoint definito come target di un JUMP! \nDevi prima rimuovere il target sul waypoint che attiva il JUMP."
     },
     "MissionPlannerAltitudeChangeReset": {
-        "message": "Altitude below ground level. Change ignored"
+        "message": "Altitudine sotto il livello del suolo. Modifica ignorata"
     },
     "SafehomeSelected": {
         "message": ""
@@ -5398,58 +5398,58 @@
         "message": "Direzione motore inversa / Configurazione Props-out"
     },
     "motor_direction_inverted_hint": {
-        "message": "Enable if the motor direction is reversed and the props are mounted in the opposite direction."
+        "message": "Abilita se la direzione del motor è invertita e le eliche sono montate nella direzione opposta."
     },
     "mixer_control_profile_linking": {
-        "message": "Control Profile will use same index as Mixer Profile index"
+        "message": "Il Control Profile userà lo stesso indice del Mixer Profile"
     },
     "mixer_control_profile_linking_hint": {
-        "message": "mixer_control_profile_linking: Enable on both Mixer Profile if you want Control Profile switching handled by Mixer Profile switching(Recommend in vtol/mixed plaform type setup)"
+        "message": "mixer_control_profile_linking: Abilita su entrambi i Mixer Profile se vuoi che il cambio del Control Profile sia gestito dal cambio del Mixer Profile (Consigliato nelle configurazioni di tipo vtol/piattaforma mista)"
     },
     "blackboxFields": {
         "message": "Campi Blackbox"
     },
     "BLACKBOX_FEATURE_NAV_ACC": {
-        "message": "Navigation accelerometer"
+        "message": "Accelerometro navigazione"
     },
     "BLACKBOX_FEATURE_NAV_POS": {
-        "message": "Navigation position estimation"
+        "message": "Stima posizione navigazione"
     },
     "BLACKBOX_FEATURE_NAV_PID": {
-        "message": "Navigation PID"
+        "message": "PID navigazione"
     },
     "BLACKBOX_FEATURE_MAG": {
-        "message": "Magnetometer"
+        "message": "Magnetometro"
     },
     "BLACKBOX_FEATURE_ACC": {
-        "message": "Accelerometer"
+        "message": "Accelerometro"
     },
     "BLACKBOX_FEATURE_ATTITUDE": {
-        "message": "Attitude"
+        "message": "Assetto"
     },
     "BLACKBOX_FEATURE_RC_DATA": {
-        "message": "RC data"
+        "message": "Dati RC"
     },
     "BLACKBOX_FEATURE_RC_COMMAND": {
-        "message": "RC command"
+        "message": "Comando RC"
     },
     "BLACKBOX_FEATURE_MOTORS": {
-        "message": "Motors output"
+        "message": "Uscita motori"
     },
     "BLACKBOX_FEATURE_GYRO_RAW": {
-        "message": "Gyro RAW (no filtering)"
+        "message": "Gyro RAW (nessun filtraggio)"
     },
     "BLACKBOX_FEATURE_GYRO_PEAKS_ROLL": {
-        "message": "Gyro Noise peak freq. Roll"
+        "message": "Freq. picco rumore gyro Roll"
     },
     "BLACKBOX_FEATURE_GYRO_PEAKS_PITCH": {
-        "message": "Gyro Noise peak freq. Pitch"
+        "message": "Freq. picco rumore gyro Pitch"
     },
     "BLACKBOX_FEATURE_GYRO_PEAKS_YAW": {
-        "message": "Gyro Noise peak freq. Yaw"
+        "message": "Freq. picco rumore gyro Yaw"
     },
     "BLACKBOX_FEATURE_SERVOS": {
-        "message": "Servos output"
+        "message": "Uscita servo"
     },
     "axisRoll": {
         "message": "Roll"
@@ -5464,7 +5464,7 @@
         "message": "Mostra controllori PID avanzati"
     },
     "rc_filter_lpf_hz": {
-        "message": "Manual LPF Hz"
+        "message": "LPF Manuale Hz"
     },
     "rc_filter_smoothing_factor": {
         "message": "Fattore Smoothing Auto"
@@ -5479,16 +5479,16 @@
         "message": "Scala throttle"
     },
     "throttle_scale_help": {
-        "message": "Allow to limit effective power fed to the motors. Throttle Scale 1 mean there is no power limiting. Throttle Scale 0.5 means throttle position will be cut in half before passed to the motors."
+        "message": "Permette di limitare la potenza effettiva fornita ai motori. Throttle Scale 1 significa che non c'è limitazione di potenza. Throttle Scale 0.5 significa che la posizione del throttle sarà dimezzata prima di essere passata ai motori."
     },
     "pidTuning_MatrixFilterType": {
         "message": "Tipo Filtro Matrix"
     },
     "pidTuning_MatrixFilterTypeHelp": {
-        "message": "Defines the type of Matrix Filter. Default 2D filter is recommended for most users. 7-inch and larger quads may benefit from 3D filter."
+        "message": "Definisce il tipo di Matrix Filter. Il filtro 2D predefinito è consigliato per la maggior parte degli utenti. I quad da 7 pollici e più grandi possono beneficiare del filtro 3D."
     },
     "softSerialWarning": {
-        "message": "It is not advisable to use softserial for flight critical devices like GPS or receiver, or high traffic devices like MSP DisplayPort."
+        "message": "Non è consigliabile usare softserial per dispositivi critici per il volo come GPS o ricevitore, o per dispositivi ad alto traffico come MSP DisplayPort."
     },
     "ledStripColorSetupTitle": {
         "message": "Setup Colore"
@@ -5551,7 +5551,7 @@
         "message": "Throttle"
     },
     "ledStripLarsonscannerText": {
-        "message": "Larson scanner"
+        "message": "Scanner Larson"
     },
     "ledStripBlinkTitle": {
         "message": "Lampeggio"
@@ -5662,16 +5662,16 @@
         "message": "D"
     },
     "ledStripModesOrientationTitle": {
-        "message": "LED Orientation and Color"
+        "message": "Orientamento e colore dei LED"
     },
     "ledStripModesSpecialColorsTitle": {
-        "message": "Special colors"
+        "message": "Colori speciali"
     },
     "ledStripModeColorsModeDisarmed": {
-        "message": "Disarmed"
+        "message": "Disarmato"
     },
     "ledStripModeColorsModeArmed": {
-        "message": "Armed"
+        "message": "Armato"
     },
     "ledStripModeColorsModeAnimation": {
         "message": "Animazione"
@@ -5701,7 +5701,7 @@
         "message": "Cancella TUTTI i Cablaggio"
     },
     "ledStripWiringMessage": {
-        "message": "LEDs without wire ordering number will not be saved."
+        "message": "I LED senza numero d'ordine del cablaggio non verranno salvati."
     },
     "mainLogoText": {
         "message": "CONFIGURATOR"
@@ -5749,36 +5749,31 @@
         "message": "Giroscopio"
     },
     "sensorStatusGyroShort": {
-        "message": "Gyro",
-        "description": "Text of the image in the top sensors icons. Please keep it short."
+        "message": "Gyro"
     },
     "sensorStatusAccel": {
         "message": "Accelerometro"
     },
     "sensorStatusAccelShort": {
-        "message": "Accel",
-        "description": "Text of the image in the top sensors icons. Please keep it short."
+        "message": "Accel"
     },
     "sensorStatusMag": {
         "message": "Magnetometro"
     },
     "sensorStatusMagShort": {
-        "message": "Mag",
-        "description": "Text of the image in the top sensors icons. Please keep it short."
+        "message": "Mag"
     },
     "sensorStatusBaro": {
         "message": "Barometro"
     },
     "sensorStatusBaroShort": {
-        "message": "Baro",
-        "description": "Text of the image in the top sensors icons. Please keep it short."
+        "message": "Baro"
     },
     "sensorStatusGPS": {
         "message": "GPS"
     },
     "sensorStatusGPSShort": {
-        "message": "GPS",
-        "description": "Text of the image in the top sensors icons. Please keep it short."
+        "message": "GPS"
     },
     "sensorOpticalFlow": {
         "message": "Flusso ottico"
@@ -5790,8 +5785,7 @@
         "message": "Sonar / Telemetro"
     },
     "sensorStatusSonarShort": {
-        "message": "Sonar",
-        "description": "Text of the image in the top sensors icons. Please keep it short."
+        "message": "Sonar"
     },
     "sensorAirspeed": {
         "message": "Velocità aria"
@@ -5872,31 +5866,31 @@
         "message": "Velocità aria - cm/s"
     },
     "sensorsTemperature0": {
-        "message": "Temperature 0 - °C"
+        "message": "Temperatura 0 - °C"
     },
     "sensorsTemperature1": {
-        "message": "Temperature 1 - °C"
+        "message": "Temperatura 1 - °C"
     },
     "sensorsTemperature2": {
-        "message": "Temperature 2 - °C"
+        "message": "Temperatura 2 - °C"
     },
     "sensorsTemperature3": {
-        "message": "Temperature 3 - °C"
+        "message": "Temperatura 3 - °C"
     },
     "sensorsTemperature4": {
-        "message": "Temperature 4 - °C"
+        "message": "Temperatura 4 - °C"
     },
     "sensorsTemperature5": {
-        "message": "Temperature 5 - °C"
+        "message": "Temperatura 5 - °C"
     },
     "sensorsTemperature6": {
-        "message": "Temperature 6 - °C"
+        "message": "Temperatura 6 - °C"
     },
     "sensorsTemperature7": {
-        "message": "Temperature 7 - °C"
+        "message": "Temperatura 7 - °C"
     },
     "sensorsTemperatureValue": {
-        "message": "value:"
+        "message": "valore:"
     },
     "getRunningOS": {
         "message": "In esecuzione - SO: <strong>"
@@ -5962,22 +5956,22 @@
         "message": "Inizio invio punto"
     },
     "errorReadingFileXml2jsNotFound": {
-        "message": "<span style=\"color: red\">Error reading file (xml2js not found)</span>'"
+        "message": "<span style=\"color: red\">Errore nella lettura del file (xml2js non trovato)</span>'"
     },
     "errorReadingFile": {
-        "message": "<span style=\"color: red\">Error reading file</span>"
+        "message": "<span style=\"color: red\">Errore nella lettura del file</span>"
     },
     "errorParsingFile": {
-        "message": "<span style=\"color: red\">Error parsing file</span>"
+        "message": "<span style=\"color: red\">Errore nell'analisi del file</span>"
     },
     "loadedSuccessfully": {
-        "message": " has been loaded successfully !"
+        "message": " è stato caricato con successo !"
     },
     "errorWritingFileXml2jsNotFound": {
-        "message": "<span style=\"color: red\">Error writing file (xml2js not found)</span>"
+        "message": "<span style=\"color: red\">Errore nella scrittura del file (xml2js non trovato)</span>"
     },
     "savedSuccessfully": {
-        "message": " has been saved successfully !"
+        "message": " è stato salvato con successo !"
     },
     "endGetPoint": {
         "message": "Fine lettura punto"
@@ -6052,31 +6046,31 @@
         "message": "Snappiness"
     },
     "ezTuneSnappinessTips": {
-        "message": "Helps to have a snappy stick feeling. Whenever you do a fast stick movement, high Snappiness will accelerate the drone response. Both when you start and stop the manouver. Try different values to find the one that suits you best."
+        "message": "Aiuta ad avere una sensazione scattante dello stick. Ogni volta che fai un movimento rapido dello stick, una Snappiness alta accelererà la risposta del drone. Sia quando inizi che quando termini la manovra. Prova valori diversi per trovare quello che ti si addice meglio."
     },
     "ezTuneFilterHzTips": {
-        "message": "This sets the base cutoff frequency for all INAV gyro and D-term filters. Higher values will result in lower filter delay and better stabilization, but more noise will go through the filters and motors will get hot, UAV might oscillate and be unfyable. Your goal is to increase this value as high as possible before any negative effects appear. Negative effects include: hot motors, audible osciallations, UAV rapidly shaking, UAV gaining altitude by itself. Usual starting points for 'Filter Hz' are: <strong>3-inch props</strong>: 90, <strong>5-inch props</strong>: 110, <strong>7-inch props</strong>: 90, <strong>10-inch props</strong>: 75, <strong>12-inch props</strong>: 60. Use Blackbox and common sense to find a value that is most suited for your UAV."
+        "message": "Questo imposta la frequenza di cutoff di base per tutti i filtri del gyro e del D-term di INAV. Valori più alti produrranno un ritardo del filtro minore e una migliore stabilizzazione, ma più rumore passerà attraverso i filtri e i motori si scalderanno, l'UAV potrebbe oscillare ed essere invelabile. Il tuo obiettivo è aumentare questo valore il più possibile prima che compaiano effetti negativi. Gli effetti negativi includono: motori caldi, oscillazioni udibili, UAV che trema rapidamente, UAV che guadagna altitudine da solo. I punti di partenza usuali per 'Filter Hz' sono: <strong>eliche da 3 pollici</strong>: 90, <strong>eliche da 5 pollici</strong>: 110, <strong>eliche da 7 pollici</strong>: 90, <strong>eliche da 10 pollici</strong>: 75, <strong>eliche da 12 pollici</strong>: 60. Usa la Blackbox e il buon senso per trovare un valore più adatto al tuo UAV."
     },
     "ezTuneAxisRatioTips": {
-        "message": "Describes the weight/moment of inertia distribution of your UAV. The longer the frame (more mass on the front-back axis) more Axis Ratio is requires. Perfect X frame is ratio 100. Most modern frames should fit somewhere between 110 and 130. Default 110 is a good starting point."
+        "message": "Descrive la distribuzione del peso/momento d'inerzia del tuo UAV. Più lungo è il telaio (più massa sull'asse anteriore-posteriore) più Axis Ratio è richiesto. Un telaio X perfetto ha un rapporto di 100. La maggior parte dei telai moderni dovrebbe collocarsi tra 110 e 130. Il valore predefinito 110 è un buon punto di partenza."
     },
     "ezTuneResponseTips": {
-        "message": "This setting defines how fast the UAV will react to stick movements and gyro signal. Higher values will result in faster reaction, but also in more overshoots and oscillations. If UAV feels sluggish or has a slow wobble, increase the Response. If it has hot motors, audibly osciallates, overshoots or feels too nervous, decrease the Response. Most modern quads should beefy motors will fly best with Response below 80. Should be tuned together with Damping. It is a P-term equivalent."
+        "message": "Questa impostazione definisce quanto velocemente l'UAV reagirà ai movimenti dello stick e al segnale del gyro. Valori più alti produrranno una reazione più veloce, ma anche più overshoot e oscillazioni. Se l'UAV sembra lento o ha un'oscillazione lenta, aumenta la Response. Se ha motori caldi, oscilla in modo udibile, fa overshoot o sembra troppo nervoso, diminuisci la Response. La maggior parte dei quad moderni con motori robusti volerà meglio con una Response sotto 80. Dovrebbe essere tarata insieme al Damping. È un equivalente del P-term."
     },
     "ezTuneDampingTips": {
-        "message": "Describes the stengths of a force that opposes any rotation speed change. It dampens roll and pitch acceleration and causes smoother and more stable flight. Your task during tuning is to find out how much you can increase it before any negative symptoms appear: hot motors, audible osciallations, overshoot. Most modern quads should accept 'Damping' up to 150-180. It is a D-term equivalent."
+        "message": "Descrive l'intensità di una forza che si oppone a qualsiasi variazione della velocità di rotazione. Smorza l'accelerazione di roll e pitch e produce un volo più dolce e stabile. Il tuo compito durante la taratura è scoprire di quanto puoi aumentarlo prima che compaiano sintomi negativi: motori caldi, oscillazioni udibili, overshoot. La maggior parte dei quad moderni dovrebbe accettare un 'Damping' fino a 150-180. È un equivalente del D-term."
     },
     "ezTuneStabilityTips": {
-        "message": "Defines long-term stabilization strength. Most modern quads should tolerate 'Stability' even up to 120-130. Usually does not have to be tuned at all. If UAV suffers from heavy propwash during vertical descent, lowering 'Stability' might help. It is a I-term equivalent"
+        "message": "Definisce l'intensità della stabilizzazione a lungo termine. La maggior parte dei quad moderni dovrebbe tollerare una 'Stability' anche fino a 120-130. Di solito non deve essere tarata affatto. Se l'UAV soffre di forte propwash durante la discesa verticale, abbassare la 'Stability' potrebbe aiutare. È un equivalente del I-term"
     },
     "ezTuneAggressivenessTips": {
-        "message": "Defines how fast your UAV will react to fast stick movements. Higher 'Aggressiveness' results in snappier fast manouvers. It does not affect stabilization, only stick feeling. It is a FF-term equivalent."
+        "message": "Definisce quanto velocemente il tuo UAV reagirà ai movimenti rapidi dello stick. Una 'Aggressiveness' più alta produce manovre rapide più scattanti. Non influisce sulla stabilizzazione, solo sulla sensazione dello stick. È un equivalente del FF-term."
     },
     "ezTuneRateTips": {
-        "message": "Defines how fast your UAV will rotate around roll, pitch and yaw axis. Higher 'Rate' results in faster rotation. Value of 0 is the equivalent of 300dps, 100 is the equivalent of 600dps, 200 is the equivalent of 900dps."
+        "message": "Definisce quanto velocemente il tuo UAV ruoterà attorno agli assi roll, pitch e yaw. Un 'Rate' più alto produce una rotazione più veloce. Il valore 0 è l'equivalente di 300dps, 100 è l'equivalente di 600dps, 200 è l'equivalente di 900dps."
     },
     "ezTuneExpoTips": {
-        "message": "Defines expo of the RC input. Lower values result in more sensitive stick in the center. Higher values result in less sensitive center and more rapid response at the end of the stick. Value of 0 is the equivalent of 0 expo, 100 is the equivalent of 0.7 expo, 200 is the equivalent of 1.0 expo."
+        "message": "Definisce l'expo dell'input RC. Valori più bassi producono uno stick più sensibile al centro. Valori più alti producono un centro meno sensibile e una risposta più rapida alla fine dello stick. Il valore 0 è l'equivalente di 0 expo, 100 è l'equivalente di 0.7 expo, 200 è l'equivalente di 1.0 expo."
     },
     "ezTunePidPreview": {
         "message": "Anteprima PID"
@@ -6094,13 +6088,13 @@
         "message": "Expo"
     },
     "ezTuneEnabledTips": {
-        "message": "When enabled, <strong>Ez Tune</strong> will override multiple INAV setting to simplify the tuning process. Instead of setting each PID and filtering setting independently, you only have to work with 7 sliders. Ez Tune will automatically adjust all other settings to match your needs. Ez Tune is a great starting point for new users and a great way to quickly tune a new UAV. It is not recommended to use Ez Tune on advanced builds, as it will override all your settings and you will not be able to fine tune your UAV. When Ez Tune is enabled, settings from the <strong>PID tuning</strong> tab will be overriden by EzTune."
+        "message": "Quando abilitato, <strong>Ez Tune</strong> sovrascriverà molteplici impostazioni di INAV per semplificare il processo di taratura. Invece di impostare ogni PID e impostazione di filtraggio in modo indipendente, devi lavorare solo con 7 slider. Ez Tune regolerà automaticamente tutte le altre impostazioni per adattarsi alle tue esigenze. Ez Tune è un ottimo punto di partenza per i nuovi utenti e un ottimo modo per tarare rapidamente un nuovo UAV. Non è consigliato usare Ez Tune su build avanzate, poiché sovrascriverà tutte le tue impostazioni e non potrai mettere a punto finemente il tuo UAV. Quando Ez Tune è abilitato, le impostazioni della scheda <strong>PID tuning</strong> saranno sovrascritte da EzTune."
     },
     "ezTuneDisclaimer": {
-        "message": "<strong>Disclaimer:</strong> Ez Tune is an experimental function. It is not guaranteed to work on all UAVs. It is not guaranteed to work with all frame types. It is not guaranteed to work with all propellers. All computations and tuning result can change in future versions of INAV. We still encourage you to check it out and share your experience on INAV Discord in the <strong>#ez-tune</strong> channel"
+        "message": "<strong>Avvertenza:</strong> Ez Tune è una funzione sperimentale. Non è garantito che funzioni su tutti gli UAV. Non è garantito che funzioni con tutti i tipi di telaio. Non è garantito che funzioni con tutte le eliche. Tutti i calcoli e i risultati della taratura possono cambiare nelle versioni future di INAV. Ti incoraggiamo comunque a provarla e a condividere la tua esperienza su INAV Discord nel canale <strong>#ez-tune</strong>"
     },
     "ezTuneNote": {
-        "message": "<strong>Important</strong> Ez Tune is enabled. All settings on this tab are set and controlled by the Ez Tune. To use PID Tuning tab you have to disable Ez Tune. To do it, uncheck the <strong>Enabled</strong> checkbox on the Ez Tune tab."
+        "message": "<strong>Importante</strong> Ez Tune è abilitato. Tutte le impostazioni di questa scheda sono impostate e controllate da Ez Tune. Per usare la scheda PID Tuning devi disabilitare Ez Tune. Per farlo, deseleziona la casella <strong>Enabled</strong> nella scheda Ez Tune."
     },
     "gsActivated": {
         "message": "Modalità stazione terrestre attivata"
@@ -6172,7 +6166,7 @@
         "message": "Messaggi heartbeat"
     },
     "currentLanguage": {
-        "message": "en"
+        "message": "it"
     },
     "search": {
         "message": "Cerca"
@@ -6184,7 +6178,7 @@
         "message": "Scrivi codice JavaScript per controllare il tuo velivolo. Il transpiler converte il tuo codice in Condizioni Logiche INAV."
     },
     "javascriptBetaWarning": {
-        "message": "<strong>Currently in beta, for testing. Do not use for safety-critical applications!</strong>"
+        "message": "<strong>Attualmente in beta, per test. Non usare per applicazioni critiche per la sicurezza!</strong>"
     },
     "javascriptEditorTitle": {
         "message": "Editor JavaScript (shift-ctrl-v per incollare, clicca con il tasto destro su una variabile per rinominare)"
