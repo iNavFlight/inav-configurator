@@ -2,7 +2,9 @@
 /**
  * Test: MSP2_INAV_DRONECAN_ASYNC_RESULT decoder
  *
- * Mirrors the parsing logic in MSPHelper.js case MSP2_INAV_DRONECAN_ASYNC_RESULT.
+ * Mirrors the parsing logic in MSPHelper.js case MSP2_INAV_DRONECAN_ASYNC_RESULT
+ * (string decoding here uses String.fromCodePoint instead of fromCharCode per
+ * lint preference; both are equivalent for the single-byte values decoded here).
  * Run with: node test_dronecan_async_result.mjs
  *
  * Wire format (state, seq, service_id, node_id always present):
@@ -68,7 +70,7 @@ function parseAsyncResult(data) {
     if (state === 2) { // READY
         let offset = 5;
         const name_len = data.getUint8(offset++);
-        result.name = String.fromCharCode(
+        result.name = String.fromCodePoint(
             ...new Uint8Array(data.buffer, data.byteOffset + offset, name_len));
         offset += name_len;
 
@@ -100,7 +102,7 @@ function parseAsyncResult(data) {
                     break;
                 case 4: { // STRING
                     const slen = data.getUint8(offset++);
-                    result.value = String.fromCharCode(
+                    result.value = String.fromCodePoint(
                         ...new Uint8Array(data.buffer, data.byteOffset + offset, slen));
                     break;
                 }
@@ -261,12 +263,12 @@ console.log('\nTest: READY Param GetSet — FLOAT');
         makePrefix(2, 7, 11, 10),
         appendName(new Uint8Array(0), 'NAV_FW_CRUISE_THR'),
         u8(2),                  // value_type = FLOAT
-        f32le(1450.0),
+        f32le(1450),
     );
     const r = parseAsyncResult(new DataView(raw.buffer));
     assert(r !== null,                          'parses without error');
     assertEqual(r.value_type,             2,    'value_type = FLOAT');
-    assert(Math.abs(r.value - 1450.0) < 0.1,   'value ≈ 1450.0');
+    assert(Math.abs(r.value - 1450) < 0.1,   'value ≈ 1450');
 }
 
 console.log('\nTest: READY Param GetSet — BOOL true');
@@ -326,15 +328,13 @@ console.log('\nTest: READY Param GetSet — EMPTY type (unknown)');
 }
 
 console.log('\nTest: seq field preserved correctly across states');
-{
-    for (const [state, seq] of [[0, 0], [1, 128], [2, 255], [3, 1]]) {
-        const prefix = makePrefix(state, seq, 1, 5);
-        const raw    = state === 2
-            ? concat(prefix, u8(0), u8(0, 0, 0), u32le(0), u8(0, 0), new Uint8Array(16))
-            : prefix;
-        const r = parseAsyncResult(new DataView(raw.buffer));
-        assertEqual(r && r.seq, seq, `seq=${seq} preserved for state=${state}`);
-    }
+for (const [state, seq] of [[0, 0], [1, 128], [2, 255], [3, 1]]) {
+    const prefix = makePrefix(state, seq, 1, 5);
+    const raw    = state === 2
+        ? concat(prefix, u8(0), u8(0, 0, 0), u32le(0), u8(0, 0), new Uint8Array(16))
+        : prefix;
+    const r = parseAsyncResult(new DataView(raw.buffer));
+    assertEqual(r?.seq, seq, `seq=${seq} preserved for state=${state}`);
 }
 
 // ---------------------------------------------------------------------------

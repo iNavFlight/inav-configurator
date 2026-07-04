@@ -1,3 +1,15 @@
+.dronecan-detail .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
 #dronecan-node-table .health-badge {
     display: inline-block;
     padding: 0.15em 0.5em;
@@ -65,9 +77,9 @@
 #dronecan-params button.param-write {
     padding: 0.2em 0.7em;
     background-color: #fff;
-    border: 1px solid #37a8db;
+    border: 1px solid #156a8c;
     border-radius: 4px;
-    color: #37a8db;
+    color: #156a8c;
     font-size: 1em;
     cursor: pointer;
     transition: all ease 0.2s;
@@ -75,7 +87,7 @@
 }
 
 #dronecan-params button.param-write:hover {
-    background-color: #37a8db;
+    background-color: #156a8c;
     color: #fff;
 }
 
@@ -98,8 +110,8 @@
 
 #dronecan-params button.param-action-btn {
     padding: 0.35em 1em;
-    background-color: #37a8db;
-    border: 1px solid #37a8db;
+    background-color: #156a8c;
+    border: 1px solid #156a8c;
     border-radius: 4px;
     color: #fff;
     font-size: 1em;
@@ -108,8 +120,8 @@
 }
 
 #dronecan-params button.param-action-btn:hover {
-    background-color: #2a8ab8;
-    border-color: #2a8ab8;
+    background-color: #10536e;
+    border-color: #10536e;
 }
 
 #dronecan-params button.param-action-btn:disabled {

@@ -230,6 +230,12 @@
     "dronecanNodeIdReservedWarning": {
         "message": "Node IDs 126 and 127 are reserved for diagnostic tools. Are you sure?"
     },
+    "dronecanDetailColProperty": {
+        "message": "Property"
+    },
+    "dronecanDetailColValue": {
+        "message": "Value"
+    },
     "dronecanParamColIndex": {
         "message": "#"
     },
