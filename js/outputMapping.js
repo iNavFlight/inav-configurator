@@ -177,12 +177,16 @@ var OutputMappingCollection = function () {
             }
         }
 
-        // Pre-assign BEEPER outputs — explicitly overridden by user, takes precedence over flag-based assignment
+        // Pre-assign BEEPER outputs — explicitly overridden by user, takes precedence over flag-based assignment.
+        // A timer's mode applies to every pad sharing it, but only one pad can ever be the real
+        // beeper (firmware wires up just the first match), so only that first pad is pre-assigned here.
+        let beeperTimerClaimed = {};
         for (let i = 0; i < data.length; i++) {
             let timerId = data[i]['timerId'];
             let mode = timerOverrides[timerId] || self.TIMER_OUTPUT_MODE_AUTO;
-            if (mode === self.TIMER_OUTPUT_MODE_BEEPER) {
+            if (mode === self.TIMER_OUTPUT_MODE_BEEPER && !beeperTimerClaimed[timerId]) {
                 timerMap[i] = OUTPUT_TYPE_BEEPER;
+                beeperTimerClaimed[timerId] = true;
             }
         }
 
@@ -272,24 +276,11 @@ var OutputMappingCollection = function () {
         data.push(element);
     };
 
+    // Counts every pad from the first real output through the end of data —
+    // not just currently-flagged ones, since a BEEPER timer's sibling pads are
+    // legitimately flagless (see getTimerMap()) but still occupy a real column.
     self.getOutputCount = function () {
-        let retVal = 0;
-
-        for (let i = 0; i < data.length; i++) {
-            let flags = data[i]['usageFlags'];
-            if (
-                BitHelper.bit_check(flags, TIM_USE_MOTOR) ||
-                BitHelper.bit_check(flags, TIM_USE_SERVO) ||
-                BitHelper.bit_check(flags, TIM_USE_LED) ||
-                BitHelper.bit_check(flags, TIM_USE_BEEPER) ||
-                BitHelper.bit_check(flags, TIM_USE_PINIO) ||
-                data[i]['specialLabels'] >= SPECIAL_LABEL_PINIO_BASE
-            ) {
-                retVal++;
-            };
-        }
-
-        return retVal;
+        return data.length - getFirstOutputOffset();
     }
 
     function getFirstOutputOffset() {
