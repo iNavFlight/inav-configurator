@@ -260,13 +260,16 @@ dronecanTab.showDetail = function (nodeId) {
 };
 
 function paramValueToString(value_type, value) {
-    return value_type === PARAM_TYPE_BOOL ? (value ? 'true' : 'false') : String(value);
+    if (value_type === PARAM_TYPE_BOOL) {
+        return value ? 'true' : 'false';
+    }
+    return String(value);
 }
 
 function convertParamValue(value_type, writeValue) {
     switch (value_type) {
         case PARAM_TYPE_INT:
-            try { return BigInt(writeValue); } catch { return NaN; }
+            try { return BigInt(writeValue); } catch { return Number.NaN; }
         case PARAM_TYPE_FLOAT:  return Number.parseFloat(writeValue);
         case PARAM_TYPE_BOOL:   return writeValue === 'true' || writeValue === '1';
         case PARAM_TYPE_STRING:
