@@ -141,12 +141,14 @@
                     <div class="helpicon cf_tip" data-i18n_title="configurationBatterySettingsHelp"></div>
                 </div>
                 <div class="spacer_box">
-                    <div id="dronecan-battery-id-row" class="number">
-                        <input type="number" id="dronecan_battery_id" data-setting="dronecan_battery_id" step="1" min="0" max="255" />
-                        <label for="dronecan_battery_id">
-                            <span data-i18n="configurationDronecanBatteryId"></span>
-                        </label>
-                        <div for="dronecan_battery_id" class="helpicon cf_tip" data-i18n_title="configurationDronecanBatteryIdHelp"></div>
+                    <div class="setting-container">
+                        <div id="dronecan-battery-id-row" class="number" style="display: none;">
+                            <input type="number" id="dronecan_battery_id" data-setting="dronecan_battery_id" step="1" min="0" max="255" />
+                            <label for="dronecan_battery_id">
+                                <span data-i18n="configurationDronecanBatteryId"></span>
+                            </label>
+                            <div for="dronecan_battery_id" class="helpicon cf_tip" data-i18n_title="configurationDronecanBatteryIdHelp"></div>
+                        </div>
                     </div>
                     <div class="number">
                         <input type="number" class="batteryProfileHighlight" id="cells" name="cells" step="1" min="0" max="12" data-setting-placeholder="bat_cells" />
