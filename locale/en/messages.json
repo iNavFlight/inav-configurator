@@ -1347,7 +1347,7 @@
         "message": "GPS Node ID"
     },
     "gpsDroneCANNodeIdTip": {
-        "message": "DroneCAN node ID of the GPS unit (1–125). Set to 0 to accept data from any node."
+        "message": "DroneCAN node ID of the GPS unit (1–127). Set to 0 to accept data from any node."
     },
     "configurationGPSUseGalileo": {
         "message": "Gps use Galileo Satellites (EU)"
