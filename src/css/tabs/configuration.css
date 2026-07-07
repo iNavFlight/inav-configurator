@@ -107,6 +107,17 @@ hr {
     margin-bottom: 0;
 }
 
+/* #dronecan-battery-id-row is wrapped in its own .setting-container div so
+   Settings.configureInputs()'s generic auto-show can't reveal it before its
+   own CAN-source-conditional logic decides to - which incidentally makes it
+   match :last-child above even though it isn't the last field in the
+   section. Restore the normal separator it would otherwise lose. */
+#dronecan-battery-id-row {
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 5px;
+    margin-bottom: 5px;
+}
+
 .tab-configuration .gui_box_titlebar {
     margin-bottom: 0;
 }
