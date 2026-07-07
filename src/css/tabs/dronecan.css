@@ -1,0 +1,131 @@
+.dronecan-detail .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+#dronecan-node-table .health-badge {
+    display: inline-block;
+    padding: 0.15em 0.5em;
+    border-radius: 3px;
+    font-weight: bold;
+    color: #fff;
+}
+
+#dronecan-node-table .health-ok       { background-color: #388e3c; }
+#dronecan-node-table .health-warning  { background-color: #f57f17; }
+#dronecan-node-table .health-error    { background-color: #cc0000; }
+#dronecan-node-table .health-critical { background-color: #7b0000; }
+
+#dronecan-node-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+#dronecan-node-table th,
+#dronecan-node-table td {
+    padding: 0.4em 0.6em;
+    border-bottom: 1px solid #444;
+    text-align: left;
+}
+
+#dronecan-node-table tbody tr:hover {
+    background-color: rgba(255,255,255,0.05);
+    cursor: pointer;
+}
+
+#dronecan-node-detail {
+    margin-top: 1.5em;
+}
+
+.dronecan-detail th {
+    padding-right: 1em;
+    text-align: left;
+    color: #aaa;
+}
+
+#dronecan-params {
+    padding: 1em 0 2.5em 0;
+}
+
+#dronecan-params table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+#dronecan-params th,
+#dronecan-params td {
+    padding: 0.4em 0.6em;
+    border-bottom: 1px solid #444;
+    text-align: left;
+}
+
+#dronecan-params input.param-input {
+    border: 1px solid #555;
+    padding: 0.2em 0.4em;
+    border-radius: 3px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+#dronecan-params button.param-write {
+    padding: 0.2em 0.7em;
+    background-color: #fff;
+    border: 1px solid #156a8c;
+    border-radius: 4px;
+    color: #156a8c;
+    font-size: 1em;
+    cursor: pointer;
+    transition: all ease 0.2s;
+    white-space: nowrap;
+}
+
+#dronecan-params button.param-write:hover {
+    background-color: #156a8c;
+    color: #fff;
+}
+
+#dronecan-params button.param-write:disabled {
+    border-color: #555;
+    color: #555;
+    cursor: default;
+}
+
+#dronecan-params .param-actions {
+    margin-top: 1em;
+    display: flex;
+    gap: 0.5em;
+    align-items: center;
+}
+
+#dronecan-params button.param-save-eeprom {
+    min-width: 9em;
+}
+
+#dronecan-params button.param-action-btn {
+    padding: 0.35em 1em;
+    background-color: #156a8c;
+    border: 1px solid #156a8c;
+    border-radius: 4px;
+    color: #fff;
+    font-size: 1em;
+    cursor: pointer;
+    transition: all ease 0.2s;
+}
+
+#dronecan-params button.param-action-btn:hover {
+    background-color: #10536e;
+    border-color: #10536e;
+}
+
+#dronecan-params button.param-action-btn:disabled {
+    background-color: #555;
+    border-color: #555;
+    cursor: default;
+}

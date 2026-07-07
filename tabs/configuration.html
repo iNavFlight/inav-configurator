@@ -95,7 +95,7 @@
                         <div for="voltagesource" class="helpicon cf_tip" data-i18n_title="configurationVoltageSourceHelp"></div>
                     </div>
                     
-                    <div class="number">
+                    <div id="voltagescale-row" class="number">
                         <input type="number" id="voltagescale" name="voltagescale" step="1" min="10" max="65535" />
                         <label for="voltagescale">
                             <span data-i18n="configurationBatteryScale"></span>
@@ -114,14 +114,14 @@
                             <span data-i18n="configurationCurrentMeterType"></span>
                         </label>
                     </div>
-                    <div class="number">
+                    <div id="currentscale-row" class="number">
                         <input type="number" id="currentscale" name="currentscale" step="1" min="-10000" max="10000" data-setting-placeholder="current_meter_scale" />
                         <label for="currentscale">
                             <span data-i18n="configurationCurrentScale"></span>
                         </label>
                         <div for="currentscale" class="helpicon cf_tip" data-i18n_title="configurationCurrentScaleHelp"></div>
                     </div>
-                    <div class="number">
+                    <div id="currentoffset-row" class="number">
                         <input type="number" id="currentoffset" name="currentoffset" step="0.1" min="-3276.8" max="3276.7" />
                         <label for="currentoffset">
                             <span data-i18n="configurationCurrentOffset"></span>
@@ -141,6 +141,15 @@
                     <div class="helpicon cf_tip" data-i18n_title="configurationBatterySettingsHelp"></div>
                 </div>
                 <div class="spacer_box">
+                    <div class="setting-container">
+                        <div id="dronecan-battery-id-row" class="number" style="display: none;">
+                            <input type="number" id="dronecan_battery_id" data-setting="dronecan_battery_id" step="1" min="0" max="255" />
+                            <label for="dronecan_battery_id">
+                                <span data-i18n="configurationDronecanBatteryId">DroneCAN Battery ID</span>
+                            </label>
+                            <div for="dronecan_battery_id" class="helpicon cf_tip" data-i18n_title="configurationDronecanBatteryIdHelp"></div>
+                        </div>
+                    </div>
                     <div class="number">
                         <input type="number" class="batteryProfileHighlight" id="cells" name="cells" step="1" min="0" max="12" data-setting-placeholder="bat_cells" />
                         <label for="cells"><span data-i18n="configurationBatteryCells"></span></label>

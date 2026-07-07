@@ -36,6 +36,7 @@ import configurationTab from './../tabs/configuration';
 import pidTuningTab from './../tabs/pid_tuning';
 import receiverTab from './../tabs/receiver';
 import gpsTab from './../tabs/gps';
+import dronecanTab from './../tabs/dronecan';
 import magnetometerTab from './../tabs/magnetometer';
 import missionControlTab from './../tabs/mission_control';
 import mixerTab from './../tabs/mixer';
@@ -116,7 +117,7 @@ $(function() {
         var ui_tabs = $('#tabs > ul');
         $('a', ui_tabs).on('click', function() {
 
-            if ($(this).parent().hasClass("tab_help")) {
+            if ($(this).parent().hasClass("tab_help") || $(this).parent().hasClass("nav-toggle-all")) {
                 return;
             }
 
@@ -231,6 +232,9 @@ $(function() {
                         case 'gps':
                             gpsTab.initialize(content_ready);
                             break;
+                         case 'dronecan':
+                              dronecanTab.initialize(content_ready);
+                              break;
                         case 'magnetometer':
                             magnetometerTab.initialize(content_ready);
                             break;
@@ -360,84 +364,6 @@ $(function() {
         // Update button state on initialization
         updateToggleAllButton();
 
-
-        // Accordion Navigation Groups
-        $('.group-header').on('click', function(e) {
-            e.stopPropagation(); // Prevent triggering tab click
-            const header = $(this);
-            const items = header.next('.group-items');
-
-            // Toggle this group
-            header.toggleClass('active');
-            items.toggleClass('expanded');
-
-            // Update aria-expanded for accessibility
-            header.attr('aria-expanded', header.hasClass('active'));
-
-            // Update the expand/collapse all button state
-            updateToggleAllButton();
-        });
-
-        // Keyboard accessibility for accordion headers
-        $('.group-header').on('keydown', function(e) {
-            if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                $(this).trigger('click');
-            }
-        });
-
-        function updateToggleAllButton() {
-            const allExpanded = $('.nav-group .group-header.active').length === $('.nav-group .group-header').length;
-            const $expandIcon = $('#toggleAllGroups .expand-icon');
-            const $collapseIcon = $('#toggleAllGroups .collapse-icon');
-            const $toggleText = $('#toggleAllGroups .toggle-text');
-
-            if (allExpanded) {
-                $expandIcon.hide();
-                $collapseIcon.show();
-                $toggleText.attr('data-i18n', 'navCollapseAll');
-                $toggleText.text(i18n.getMessage('navCollapseAll'));
-            } else {
-                $expandIcon.show();
-                $collapseIcon.hide();
-                $toggleText.attr('data-i18n', 'navExpandAll');
-                $toggleText.text(i18n.getMessage('navExpandAll'));
-            }
-        }
-
-        // Expand/Collapse All Toggle
-        $('#toggleAllGroups').on('click', function(e) {
-            e.preventDefault();
-            const allExpanded = $('.nav-group .group-header.active').length === $('.nav-group .group-header').length;
-
-            if (allExpanded) {
-                // Collapse all except first
-                $('.nav-group .group-header').removeClass('active').attr('aria-expanded', 'false');
-                $('.nav-group .group-items').removeClass('expanded');
-                $('#tabs ul.mode-connected .nav-group:first-child .group-header').addClass('active').attr('aria-expanded', 'true');
-                $('#tabs ul.mode-connected .nav-group:first-child .group-items').addClass('expanded');
-                store.set('expand_all_groups', false);
-            } else {
-                // Expand all
-                $('.nav-group .group-header').addClass('active').attr('aria-expanded', 'true');
-                $('.nav-group .group-items').addClass('expanded');
-                store.set('expand_all_groups', true);
-            }
-
-            updateToggleAllButton();
-        });
-
-        // Initialize: apply saved expand all preference or expand first group by default
-        if (store.get('expand_all_groups', false)) {
-            $('.nav-group .group-header').addClass('active').attr('aria-expanded', 'true');
-            $('.nav-group .group-items').addClass('expanded');
-        } else {
-            $('#tabs ul.mode-connected .nav-group:first-child .group-header').addClass('active').attr('aria-expanded', 'true');
-            $('#tabs ul.mode-connected .nav-group:first-child .group-items').addClass('expanded');
-        }
-
-        updateToggleAllButton();
-
         // options
         $('#options').on('click', function() {
             var el = $(this);
@@ -473,15 +399,6 @@ $(function() {
                     }
 
                      $('div.disable_3d_acceleration input').on('change', function () {
-                        var check = $(this).is(':checked');
-                        store.set('disable_3d_acceleration', check);
-                    });
-
-                    if (store.get('disable_3d_acceleration', false)) {
-                        $('div.disable_3d_acceleration input').prop('checked', true);
-                    }
-
-                    $('div.disable_3d_acceleration input').on('change', function () {
                         var check = $(this).is(':checked');
                         store.set('disable_3d_acceleration', check);
                     });

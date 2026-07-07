@@ -28,6 +28,7 @@ var GUI_control = function () {
         'cli',
         'configuration',
         'gps',
+        'dronecan',
         'magnetometer',
         'led_strip',
         'logging',

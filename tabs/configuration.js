@@ -14,6 +14,14 @@ import features from './../js/feature_framework';
 
 const configurationTab = {};
 
+// vbat_meter_type and current_meter_type are separate firmware settings tables
+// (voltage_sensor / current_sensor) with different enum values, so "CAN" isn't
+// at the same ordinal in each - comparing the rendered option label instead of
+// a hardcoded index avoids two different magic numbers that would silently go
+// stale if either table is ever reordered in firmware. Safe today: no locale
+// file defines an i18n key literally named "CAN" (checked all 5 locales).
+const CAN_SOURCE_LABEL = 'CAN';
+
 configurationTab.initialize = function (callback, scrollPosition) {
 
     if (GUI.active_tab !== this) {
@@ -261,9 +269,21 @@ configurationTab.initialize = function (callback, scrollPosition) {
 
         });
 
+        function updateBatterySourceFields() {
+            const vbatIsCan = $('#vbat_meter_type option:selected').text() === CAN_SOURCE_LABEL;
+            const currentIsCan = $('#current_meter_type option:selected').text() === CAN_SOURCE_LABEL;
+            $('#voltagescale-row').toggle(!vbatIsCan);
+            $('#currentscale-row').toggle(!currentIsCan);
+            $('#currentoffset-row').toggle(!currentIsCan);
+            $('#dronecan-battery-id-row').toggle(vbatIsCan || currentIsCan);
+        }
+
+        $('#vbat_meter_type, #current_meter_type').on('change', updateBatterySourceFields);
+
         // Wait for settings to load before triggering change event
         settingsPromise.then(function() {
             $i2cSpeed.trigger('change');
+            updateBatterySourceFields();
         }).catch(function(error) {
             console.error('Settings load failed, I2C speed change not triggered:', error);
         });
@@ -278,7 +298,9 @@ configurationTab.initialize = function (callback, scrollPosition) {
             FC.MISC.vbatmincellvoltage = parseFloat($('#mincellvoltage').val());
             FC.MISC.vbatmaxcellvoltage = parseFloat($('#maxcellvoltage').val());
             FC.MISC.vbatwarningcellvoltage = parseFloat($('#warningcellvoltage').val());
-            FC.MISC.vbatscale = parseInt($('#voltagescale').val());
+            if ($('#vbat_meter_type option:selected').text() !== CAN_SOURCE_LABEL) {
+                FC.MISC.vbatscale = parseInt($('#voltagescale').val());
+            }
 
             FC.MISC.battery_capacity = parseInt($('#battery_capacity').val());
             FC.MISC.battery_capacity_warning = parseInt($('#battery_capacity_warning').val() * FC.MISC.battery_capacity / 100);
@@ -288,8 +310,10 @@ configurationTab.initialize = function (callback, scrollPosition) {
             features.reset();
             features.fromUI($('.tab-configuration'));
             features.execute(function () {
-                FC.CURRENT_METER_CONFIG.scale = parseInt($('#currentscale').val());
-                FC.CURRENT_METER_CONFIG.offset = Math.round(parseFloat($('#currentoffset').val()) * 10);
+                if ($('#current_meter_type option:selected').text() !== CAN_SOURCE_LABEL) {
+                    FC.CURRENT_METER_CONFIG.scale = parseInt($('#currentscale').val());
+                    FC.CURRENT_METER_CONFIG.offset = Math.round(parseFloat($('#currentoffset').val()) * 10);
+                }
                 saveChainer.execute();
             });
         });

@@ -113,6 +113,23 @@
     border-top-right-radius: 0;
 }
 
+.tab-gps .gps-dronecan-info {
+    font-size: 0.9em;
+    font-style: italic;
+    margin: 2px 0 4px;
+}
+
+/* #gps_dronecan_node_id_row is wrapped in its own .setting-container div so
+   Settings.configureInputs()'s generic auto-show can't reveal it before its
+   own CAN-source-conditional logic decides to - which incidentally makes it
+   match :last-child in configuration.css even though it isn't the last field
+   in the section. Restore the normal separator it would otherwise lose. */
+#gps_dronecan_node_id_row {
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 5px;
+    margin-bottom: 5px;
+}
+
 .tab-gps .config-section .checkbox .switchery {
     margin-right: 68px;
 }

@@ -15,6 +15,15 @@
                             <div for="feature-7" class="helpicon cf_tip" data-i18n_title="featureGPSTip"></div>
                         </div>
                         <div class="select">
+                            <select id="gps_protocol" class="gps_protocol">
+                                <!-- list generated here -->
+                            </select>
+                            <label for="gps_protocol"><span data-i18n="configurationGPSProtocol"></span></label>
+                            <div id="gps_dronecan_info" class="gps-dronecan-info" style="display: none;">
+                                <span data-i18n="gpsDroneCANInfo"></span>
+                            </div>
+                        </div>
+                        <div class="select">
                             <select id="gps_port" class="gps_port"></select>
                             <label for="gps_port"><span data-i18n="gpsPort"></span></label>
                         </div>
@@ -22,11 +31,12 @@
                             <select id="gps_baud" class="gps_baud"></select>
                             <label for="gps_baud"><span data-i18n="gpsBaud"></span></label>
                         </div>
-                        <div class="select">
-                            <select id="gps_protocol" class="gps_protocol">
-                                <!-- list generated here -->
-                            </select>
-                            <label for="gps_protocol"><span data-i18n="configurationGPSProtocol"></span></label>
+                        <div class="setting-container">
+                            <div id="gps_dronecan_node_id_row" class="number" style="display: none;">
+                                <input type="number" id="gps_dronecan_node_id" data-setting="dronecan_gps_node_id" step="1" min="0" max="127" />
+                                <label for="gps_dronecan_node_id"><span data-i18n="gpsDroneCANNodeId">GPS Node ID</span></label>
+                                <div for="gps_dronecan_node_id" class="helpicon cf_tip" data-i18n_title="gpsDroneCANNodeIdTip"></div>
+                            </div>
                         </div>
                         <div class="select">
                             <select id="gps_ubx_sbas" class="gps_ubx_sbas">

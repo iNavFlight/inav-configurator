@@ -185,6 +185,69 @@
     "tabGPS": {
         "message": "GPS"
     },
+    "tabDroneCAN": {
+        "message": "DroneCAN"
+    },
+    "dronecanColHealth": {
+        "message": "Health"
+    },
+    "dronecanColLastSeen": {
+        "message": "Last Seen"
+    },
+    "dronecanColMode": {
+        "message": "Mode"
+    },
+    "dronecanColName": {
+        "message": "Name"
+    },
+    "dronecanColNodeID": {
+        "message": "Node ID"
+    },
+    "dronecanNodesTitle": {
+        "message": "DroneCAN Nodes"
+    },
+    "dronecanNodeDetail": {
+        "message": "Node Detail"
+    },
+    "dronecanNoNodes": {
+        "message": "No DroneCAN nodes detected."
+    },
+    "dronecanBusConfig": {
+        "message": "Bus Configuration"
+    },
+    "dronecanBitrate": {
+        "message": "CAN Baud Rate"
+    },
+    "dronecanNodeId": {
+        "message": "FC Node ID"
+    },
+    "dronecanSave": {
+        "message": "Save & Reboot"
+    },
+    "dronecanNodeIdReservedWarning": {
+        "message": "Node IDs 126 and 127 are reserved for diagnostic tools. Are you sure?"
+    },
+    "dronecanDetailColProperty": {
+        "message": "Property"
+    },
+    "dronecanDetailColValue": {
+        "message": "Value"
+    },
+    "dronecanParamColIndex": {
+        "message": "#"
+    },
+    "dronecanParamColName": {
+        "message": "Name"
+    },
+    "dronecanParamColType": {
+        "message": "Type"
+    },
+    "dronecanParamColValue": {
+        "message": "Value"
+    },
+    "dronecanParamColRange": {
+        "message": "Range"
+    },
     "tabOutputs": {
         "message": "Outputs"
     },
@@ -1276,6 +1339,15 @@
     },
     "configurationGPSProtocol": {
         "message": "Protocol"
+    },
+    "gpsDroneCANInfo": {
+        "message": "GPS is provided via DroneCAN. Configure bus settings on the DroneCAN tab. Serial port and baud rate do not apply."
+    },
+    "gpsDroneCANNodeId": {
+        "message": "GPS Node ID"
+    },
+    "gpsDroneCANNodeIdTip": {
+        "message": "DroneCAN node ID of the GPS unit (1–127). Set to 0 to accept data from any node."
     },
     "configurationGPSUseGalileo": {
         "message": "Gps use Galileo Satellites (EU)"
@@ -5423,6 +5495,12 @@
     "configurationCurrentMeterType": {
         "message": "Current Meter Type"
     },
+    "configurationDronecanBatteryId": {
+        "message": "DroneCAN Battery ID"
+    },
+    "configurationDronecanBatteryIdHelp": {
+        "message": "Filter BatteryInfo messages by the battery_id slot field reported by the BMS (0–255). Set to 0 to accept messages from any battery. Set to a specific value to reject messages from other battery slots. Applies to both voltage and current when either source is set to CAN."
+    },
     "MissionPlannerJumpSettingsCheck": {
         "message": "JUMP settings incorrect : Check it again! \nBeing forced to WP 1!"
     },
@@ -6541,5 +6619,44 @@
     },
     "migrationMissingProfileWarning": {
         "message": "No migration profile available for version $1 → $2. Settings will be restored without conversion — some may fail or be ignored by the firmware."
+    },
+    "dronecanParamsLoading": {
+        "message": "Loading parameters..."
+    },
+    "dronecanNoParams": {
+        "message": "No parameters."
+    },
+    "dronecanParamWrite": {
+        "message": "Write"
+    },
+    "dronecanParamError": {
+        "message": "ERR"
+    },
+    "dronecanParamOutOfRange": {
+        "message": "Out of range"
+    },
+    "dronecanParamRangeMustBeBetween": {
+        "message": "Must be between $1 and $2"
+    },
+    "dronecanSaveToEeprom": {
+        "message": "Save to EEPROM"
+    },
+    "dronecanSaved": {
+        "message": "Saved!"
+    },
+    "dronecanFailed": {
+        "message": "Failed"
+    },
+    "dronecanRestartNode": {
+        "message": "Restart Node"
+    },
+    "dronecanRestarting": {
+        "message": "Restarting..."
+    },
+    "dronecanSecondsAgo": {
+        "message": "$1s ago"
+    },
+    "dronecanNameError": {
+        "message": "Error"
     }
 }
