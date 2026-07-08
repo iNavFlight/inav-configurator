@@ -433,7 +433,8 @@ let WaypointCollection = function () {
 
     self.getElevation = async function(globalSettings) {
         const [nLoop, point2measure, altPoint2measure, namePoint2measure, refPoint2measure] = self.getPoint2Measure(true);
-        let lengthMission = self.getDistance(true);
+        // false: real distance; true returns -1 for looping JUMP missions, zeroing samples
+        let lengthMission = self.getDistance(false);
         let totalMissionDistance = lengthMission.length >= 1 ? lengthMission[lengthMission.length -1].toFixed(1) : 0;
         let samples;
         let sampleMaxNum;
@@ -453,7 +454,9 @@ let WaypointCollection = function () {
             samples = sampleMaxNum;
         }
 
-        let elevation = "N/A";
+        samples = Math.max(1, samples); // opentopodata rejects < 2 samples (we send samples+1)
+
+        let elevation = [];
         let coordList = "";
         point2measure.forEach(function (item) {
             coordList += item + '|';

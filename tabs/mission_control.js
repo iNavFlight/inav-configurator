@@ -129,6 +129,9 @@ const icons = Object.create(null)
 
 const missionControlTab = {};
 missionControlTab.isYmapLoad = false;
+
+// Shared between plotElevation() (inside initialize) and cleanup()
+let elevationChartInstance = null;
 missionControlTab.initialize = function (callback) {
 
     let cursorInitialized = false;
@@ -4666,13 +4669,13 @@ function iconKey(filename) {
                 }
 
                 // Destroy existing chart if it exists
-                if (window.elevationChartInstance) {
-                    window.elevationChartInstance.destroy();
-                    window.elevationChartInstance = null;
+                if (elevationChartInstance) {
+                    elevationChartInstance.destroy();
+                    elevationChartInstance = null;
                 }
 
                 // Create empty chart with message
-                window.elevationChartInstance = new Chart(ctx, {
+                elevationChartInstance = new Chart(ctx, {
                     type: 'line',
                     data: {
                         labels: [0],
@@ -4790,18 +4793,21 @@ function iconKey(filename) {
                             ]
                         };
 
-                        // Update existing chart if it exists, otherwise create new one
-                        if (window.elevationChartInstance) {
+                        // reuse only if still bound to the current canvas (replaced on tab reload)
+                        if (elevationChartInstance && elevationChartInstance.canvas === ctx) {
                             // Update data
-                            window.elevationChartInstance.data = newData;
-                            window.elevationChartInstance.options.plugins.title.text = chartTitle;
-                            window.elevationChartInstance.options.scales.y.min = Math.floor(-10 + Math.min(minMission, minElevation));
-                            window.elevationChartInstance.options.scales.y.max = Math.ceil(10 + Math.max(maxMission, maxElevation));
+                            elevationChartInstance.data = newData;
+                            elevationChartInstance.options.plugins.title.text = chartTitle;
+                            elevationChartInstance.options.scales.y.min = Math.floor(-10 + Math.min(minMission, minElevation));
+                            elevationChartInstance.options.scales.y.max = Math.ceil(10 + Math.max(maxMission, maxElevation));
                             // Trigger re-render without animation for better performance during drag operations
-                            window.elevationChartInstance.update('none');
+                            elevationChartInstance.update('none');
                         } else {
+                            if (elevationChartInstance) {
+                                elevationChartInstance.destroy();
+                            }
                             // Create new chart
-                            window.elevationChartInstance = new Chart(ctx, {
+                            elevationChartInstance = new Chart(ctx, {
                                 type: 'line',
                                 data: newData,
                                 options: {
@@ -4874,6 +4880,10 @@ missionControlTab.setBit = function(bits, bit, value) {
 // }
 
 missionControlTab.cleanup = function (callback) {
+    if (elevationChartInstance) {
+        elevationChartInstance.destroy();
+        elevationChartInstance = null;
+    }
     if (callback) callback();
 };
 

@@ -10,7 +10,8 @@
     "package": "electron-forge package",
     "make": "electron-forge make",
     "publish": "electron-forge publish",
-    "lint": "echo \"No linting configured\""
+    "lint": "echo \"No linting configured\"",
+    "test": "node tests/transpiler/run_all_tests.cjs && node --test tests/*.test.mjs tests/transpiler/*.test.mjs"
   },
   "repository": {
     "type": "git",

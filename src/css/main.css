@@ -1986,11 +1986,6 @@ dialog {
     display: none;
 }
 
-.battery-label {
-    display: inline;
-    color: #aaa;
-}
-
 /* Battery element styling*/
 
 #quad-status_wrapper {
@@ -2015,9 +2010,12 @@ dialog {
 }
 
 .battery-legend {
-    display: inline;
+    display: inline-block;
+    vertical-align: middle;
+    min-width: 6ch;
+    text-align: center;
     color: silver;
-    margin-right: 8px;
+    font-variant-numeric: tabular-nums;
 }
 
 .quad-status-contents progress::-webkit-progress-bar {

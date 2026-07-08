@@ -3502,6 +3502,7 @@ OSD.GUI.updateAll = function() {
         OSD.GUI.updateFields(event);
     });
     $('.supported').fadeIn();
+    $('.content_toolbar.supported').css('display', 'flex');
     OSD.GUI.updateVideoMode();
     OSD.GUI.updateUnits();
     OSD.GUI.updateFields();

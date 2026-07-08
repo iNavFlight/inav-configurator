@@ -1003,31 +1003,23 @@ class INAVCodeGenerator {
     for (const [name, symbol] of this.variableHandler.symbols.entries()) {
       if (symbol.kind === 'let') {
         const lcIndex = this.variableHandler.letVariableLCIndices.get(name);
-
-        // Only include variables that generated LCs (were actually used)
-        // Variables that were fully inlined or unused won't have LC indices
-        if (lcIndex === undefined) {
-          continue;
-        }
-
         const expression = this.astToExpressionString(symbol.expressionAST);
 
         // Skip expressions that contain invalid/unknown parts
         // These happen when AST references other variables that were also inlined
         if (expression.includes('undefined') || expression.includes('/* unknown expression */')) {
           // Still store the variable, but with a placeholder expression
-          // The lcIndex is what matters for decompiler name matching
-          map.let_variables[name] = {
+          // Inlined let variables are folded into their use sites and never allocated an LC slot, so they have no lcIndex.
+          const entry = {
             expression: '/* expression unavailable */',
-            lcIndex: lcIndex,
             type: 'let'
           };
+          if (lcIndex !== undefined) { entry.lcIndex = lcIndex; }
+          map.let_variables[name] = entry;
         } else {
-          map.let_variables[name] = {
-            expression: expression,
-            lcIndex: lcIndex,
-            type: 'let'
-          };
+          const entry = { expression: expression, type: 'let' };
+          if (lcIndex !== undefined) { entry.lcIndex = lcIndex; }
+          map.let_variables[name] = entry;
         }
       } else if (symbol.kind === 'var') {
         map.var_variables[name] = {

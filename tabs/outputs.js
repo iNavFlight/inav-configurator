@@ -356,7 +356,7 @@ outputsTab.initialize = function (callback) {
         let usedServoIndex = 0;
 
         for (let servoIndex = 0; servoIndex < FC.SERVO_RULES.getServoCount(); servoIndex++) {
-            renderServos('Servo ' + servoIndex, '', servoIndex);
+            renderServos('Servo ' + (servoIndex + 1), '', servoIndex);
         }
         if (usedServoIndex == 0) {
             // No servos configured

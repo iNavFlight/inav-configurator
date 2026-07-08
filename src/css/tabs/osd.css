@@ -340,10 +340,6 @@
     padding-top:10px;
 }
 
-.tab-osd .content_toolbar {
-    text-align: right;
-}
-
 .tab-osd .content_toolbar button {
     margin-right: 1em;
 }
@@ -791,7 +787,16 @@
     text-align: center;
 }
 
-.osd_group { max-width: 300px; }
+.osd__elements > .spacer_right:not(.settings) {
+    column-width: 300px;
+    column-gap: 10px;
+}
+
+.osd_group {
+    float: none;
+    display: flow-root;
+    break-inside: avoid;
+}
 
 .ce-card-body {
     padding: 8px 10px;

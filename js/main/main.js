@@ -1,5 +1,5 @@
 import { chmod, rm, mkdirSync, existsSync } from 'node:fs';
-import { app, BrowserWindow, ipcMain, Menu, MenuItem, shell, dialog } from 'electron';
+import { app, BrowserWindow, ipcMain, Menu, MenuItem, shell, dialog, session } from 'electron';
 import windowStateKeeper from 'electron-window-state';
 import Store from "electron-store";
 import path from 'path';
@@ -97,6 +97,18 @@ function createDeviceChooser() {
 }
 
 app.on('ready', () => {
+  // Electron provides no valid Referer for OSM tiles (file:// in prod, localhost in dev).
+  // OSM CDN rejects both with 403, so inject the required headers unconditionally.
+  const PROJECT_URL = 'https://github.com/iNavFlight/inav-configurator';
+  session.defaultSession.webRequest.onBeforeSendHeaders(
+    { urls: ['https://tile.openstreetmap.org/*', 'https://*.tile.openstreetmap.org/*'] },
+    (details, callback) => {
+      details.requestHeaders['Referer'] = PROJECT_URL;
+      details.requestHeaders['User-Agent'] = `INAV-Configurator/${app.getVersion()} (${PROJECT_URL})`;
+      callback({ requestHeaders: details.requestHeaders });
+    }
+  );
+
   createWindow();
 });
 

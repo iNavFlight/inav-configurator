@@ -380,9 +380,31 @@ var MSP = {
             message.retryCounter = 10;
         }
 
-        mspQueue.put(message);
+        this._enqueue(message);
 
         return true;
+    },
+    /*
+     * Hand a message to the queue. put() can reject it (queue locked, or a
+     * request with the same MSP code already pending - the dedup key is the bare
+     * code, which collides for the per-setting MSP2_COMMON_SETTING reads). A
+     * rejected message would never fire its callback and hang any promise
+     * awaiting it, so retry briefly before giving up.
+     */
+    _enqueue(message) {
+        if (mspQueue.put(message)) {
+            return;
+        }
+        if (message.putRetries === undefined) {
+            message.putRetries = 25;
+        }
+        if (message.putRetries > 0) {
+            message.putRetries--;
+            setTimeout(() => this._enqueue(message), 150);
+        } else if (message.onFinish) {
+            // Give up rather than hang forever; let the caller's chain proceed.
+            message.onFinish(false);
+        }
     },
      _crc8_dvb_s2(crc, ch) {
         crc ^= ch;
