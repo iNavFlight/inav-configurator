@@ -2806,7 +2806,17 @@ OSD.GUI.preview = {
             position += overflows_line;
         }
 
-        $('input.' + item_id + '.position').val(position).trigger('change');
+        var $positionInput = $('input.' + item_id + '.position');
+        if ($positionInput.length > 0) {
+            $positionInput.val(position).trigger('change');
+        } else {
+            // The element is hidden from the list by the search filter, so its
+            // position input doesn't exist in the DOM. Update the item directly.
+            var itemData = OSD.data.items[item_id];
+            itemData.position = position;
+            OSD.msp.helpers.calculate.coords(itemData);
+            OSD.GUI.saveItem(item);
+        }
     }
 };
 
@@ -3508,6 +3518,11 @@ OSD.GUI.updateAll = function() {
         OSD.GUI.updateFields(event);
     });
     $('.supported').fadeIn();
+    // fadeIn() above matches the `.supported` toolbar too and stamps an inline
+    // `display: block` on it, which overrides `.content_toolbar { display: flex }`
+    // and stacks its buttons vertically. Clear the inline display and drop `hide`
+    // so the CSS flex layout applies.
+    $('.content_toolbar').css('display', '').removeClass('hide');
     OSD.GUI.updateVideoMode();
     OSD.GUI.updateUnits();
     OSD.GUI.updateFields();
