@@ -84,6 +84,8 @@ var mspHelper = (function () {
                 FC.CONFIG.cpuload = data.getUint16(offset, true);
                 offset += 2;
 
+                const wasUninitialized = FC.CONFIG.profile === -1 || FC.CONFIG.battery_profile === -1 || FC.CONFIG.mixer_profile === -1;
+
                 let profile_byte = data.getUint8(offset++)
                 let profile = profile_byte & 0x0F;
                 if (profile !== FC.CONFIG.profile && FC.CONFIG.profile !== -1) {
@@ -109,7 +111,7 @@ var mspHelper = (function () {
                 }
                 FC.CONFIG.mixer_profile = mixer_profile;
                 GUI.updateStatusBar();
-                if (profile_changed > 0) {
+                if (profile_changed > 0 || wasUninitialized) {
                     GUI.updateProfileChange(profile_changed);
                 }
                 break;
@@ -1657,7 +1659,7 @@ var mspHelper = (function () {
             case MSPCodes.MSP2_INAV_GPS_UBLOX_COMMAND:
                 // Just and ACK from the fc.
                 break;
-            
+
             case MSPCodes.MSP2_INAV_GEOZONE:
                 
                 if (data.buffer.byteLength == 0) {

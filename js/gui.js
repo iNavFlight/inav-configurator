@@ -6,6 +6,7 @@ import interval from './intervals';
 import { scaleRangeInt } from './helpers';
 import i18n from './localization';
 import mspDeduplicationQueue from "./msp/mspDeduplicationQueue";
+import mspQueue from './serial_queue';
 
 var GUI_control = function () {
     this.connecting_to = false;
@@ -93,6 +94,13 @@ GUI_control.prototype.log = function (message) {
 // default switch doesn't require callback to be set
 GUI_control.prototype.tab_switch_cleanup = function (callback) {
     MSP.callbacks_cleanup(); // we don't care about any old data that might or might not arrive
+    // Drop the previous tab's still-queued requests and release the port lock,
+    // otherwise they keep retrying and re-reserve their (shared) MSP code in the
+    // dedup queue, which then rejects the new tab's same-code requests and hangs
+    // its load.
+    mspQueue.flush();
+    mspQueue.freeHardLock();
+    mspQueue.freeSoftLock();
     mspDeduplicationQueue.flush();
 
     interval.killAll(['global_data_refresh', 'msp-load-update', 'ltm-connection-check']);
@@ -477,6 +485,9 @@ GUI_control.prototype.update_dataflash_global = function () {
         width: (100-(FC.DATAFLASH.totalSize - FC.DATAFLASH.usedSize) / FC.DATAFLASH.totalSize * 100) + "%",
         display: 'block'
         });
+        $(".dataflash-free_global_label").css({
+        display: 'block'
+        });
         $(".dataflash-free_global_label").html(i18n.getMessage('sensorDataFlashFreeSpace') + formatFilesize(FC.DATAFLASH.totalSize - FC.DATAFLASH.usedSize) + " free");
     } else {
         $(".noflash_global").css({
@@ -484,6 +495,10 @@ GUI_control.prototype.update_dataflash_global = function () {
         });
 
         $(".dataflash-contents_global").css({
+        display: 'none'
+        });
+
+        $(".dataflash-free_global_label").css({
         display: 'none'
         });
     }
