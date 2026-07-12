@@ -332,6 +332,10 @@
     height: 18px;
 }
 
+.tab-osd .content_wrapper {
+    height: calc(100% - 41px);
+}
+
 .font-preview {
     padding-top:10px;
 }
