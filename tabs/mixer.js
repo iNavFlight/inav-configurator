@@ -12,6 +12,7 @@ import Settings from './../js/settings';
 import jBox from 'jbox';
 import interval from './../js/intervals';
 import ServoMixRule from './../js/servoMixRule';
+import { getServoTargetWarning } from './../js/servoMixerTargetWarning';
 import MotorMixRule from './../js/motorMixRule';
 import BitHelper from './../js/bitHelper';
 
@@ -29,7 +30,8 @@ mixerTab.initialize = function (callback, scrollPosition) {
         $motorMixTable,
         $motorMixTableBody,
         modal,
-        motorWizardModal;
+        motorWizardModal,
+        servoTargetWarningModal;
 
     if (GUI.active_tab !== this) {
         GUI.active_tab = this;
@@ -394,7 +396,16 @@ mixerTab.initialize = function (callback, scrollPosition) {
                 });
 
                 $row.find(".mix-rule-servo").val(servoRule.getTarget()).on('change', function () {
-                    servoRule.setTarget(Number($(this).val()));
+                    const enteredTarget = Number($(this).val());
+
+                    servoRule.setTarget(enteredTarget);
+
+                    const warning = getServoTargetWarning(FC.SERVO_RULES.get(), enteredTarget);
+                    if (warning) {
+                        $('#servoTargetWarningContent .servo-target-warning-text')
+                            .html(i18n.getMessage('servoMixRuleInvalidServoTarget', [warning.ruleCount, warning.enteredTarget]));
+                        servoTargetWarningModal.open();
+                    }
                 });
 
                 $row.find(".mix-rule-rate").val(servoRule.getRate()).on('change', function () {
@@ -985,6 +996,15 @@ mixerTab.initialize = function (callback, scrollPosition) {
             attach: $('#load-and-apply-mixer-button'),
             title: i18n.getMessage("mixerApplyModalTitle"),
             content: $('#mixerApplyContent')
+        });
+
+        servoTargetWarningModal = new jBox('Modal', {
+            width: 480,
+            height: 200,
+            closeButton: 'title',
+            animation: false,
+            title: i18n.getMessage("servoMixRuleInvalidServoTargetTitle"),
+            content: $('#servoTargetWarningContent')
         });
 
         $('#execute-button').on('click', function () {
