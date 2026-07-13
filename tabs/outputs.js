@@ -356,7 +356,7 @@ outputsTab.initialize = function (callback) {
         let usedServoIndex = 0;
 
         for (let servoIndex = 0; servoIndex < FC.SERVO_RULES.getServoCount(); servoIndex++) {
-            renderServos('Servo ' + (servoIndex + 1), '', servoIndex);
+            renderServos('Servo ' + (servoIndex), '', servoIndex);
         }
         if (usedServoIndex == 0) {
             // No servos configured
@@ -499,15 +499,16 @@ outputsTab.initialize = function (callback) {
         $motorSliders.append('<div class="motor-slider-container"><input type="range" min="1000" max="2000" value="1000" disabled="disabled" class="master"/></div>');
         $motorValues.append('<li style="font-weight: bold" data-i18n="motorsMaster"></li>');
 
-        for (let i = 0; i < FC.SERVO_RULES.getServoCount(); i++) {
+        let servoCount = FC.SERVO_RULES.getServoCount();
+        for (let i = 0; i < servoCount; i++) {
 
             let opacity = "";
-            if (!FC.SERVO_RULES.isServoConfigured(15 - i)) {
+            if (!FC.SERVO_RULES.isServoConfigured(servoCount - i)) {
                 opacity = ' style="opacity: 0.2"';
             }
 
             servos_wrapper.append('\
-                <div class="m-block servo-' + (15 - i) + '" ' + opacity + '>\
+                <div class="m-block servo-' + (servoCount - i) + '" ' + opacity + '>\
                     <div class="meter-bar">\
                         <div class="label"></div>\
                         <div class="indicator">\
