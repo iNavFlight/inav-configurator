@@ -1161,7 +1161,7 @@ OSD.constants = {
                     preview: FONT.symbol(SYM.PAN_SERVO_IS_OFFSET_L) + '120' + FONT.symbol(SYM.DEGREES)
                 },
                 {
-                    name: 'MISSION INFO',
+                    name: 'MISSION_INFO',
                     id: 129,
                     min_version: '4.0.0',
                     preview: 'M1/6>101WP'
@@ -3508,6 +3508,7 @@ OSD.GUI.updateAll = function() {
         OSD.GUI.updateFields(event);
     });
     $('.supported').fadeIn();
+    $('.content_toolbar.supported').css('display', 'flex');
     OSD.GUI.updateVideoMode();
     OSD.GUI.updateUnits();
     OSD.GUI.updateFields();
@@ -3898,7 +3899,10 @@ function buildSlotRow(i, ii) {
     for (var fi = 0; fi < OSD.constants.CE_FORMATS.length; fi++) {
         formatHtml += '<option value="' + fi + '">' + OSD.constants.CE_FORMATS[fi].label + '</option>';
     }
-    var $formatSelect = $('<select>').addClass('ce-format-select').html(formatHtml).hide();
+    const $formatSelect = $('<select>').addClass('ce-format-select').html(formatHtml);
+
+    // Format row — shown only when source is GV (5) or LC (6)
+    const $fmtRow = $('<div>').addClass('ce-slot-row').hide().append($formatSelect);
 
     // Forward bridge: visible source/format → hidden type
     function updateHiddenType() {
@@ -3910,9 +3914,9 @@ function buildSlotRow(i, ii) {
     $sourceSelect.on('change', function() {
         var src = parseInt($(this).val());
         if (src === 5 || src === 6) {
-            $formatSelect.show();
+            $fmtRow.show();
         } else {
-            $formatSelect.hide();
+            $fmtRow.hide();
         }
         updateHiddenType();
     });
@@ -3956,9 +3960,10 @@ function buildSlotRow(i, ii) {
         var sf = ceTypeToSourceFormat(type);
         $sourceSelect.val(sf.source);
         if (sf.source === 5 || sf.source === 6) {
-            $formatSelect.show().val(sf.formatIndex);
+            $fmtRow.show();
+            $formatSelect.val(sf.formatIndex);
         } else {
-            $formatSelect.hide();
+            $fmtRow.hide();
         }
         var dataValue = $(this).find(':selected').data('value');
         $valueDiv.find('.value').hide();
@@ -3967,8 +3972,9 @@ function buildSlotRow(i, ii) {
         }
     });
 
-    $row.append($hiddenType).append($sourceSelect).append($valueDiv).append($formatSelect);
-    return $row;
+    $row.append($hiddenType).append($sourceSelect).append($valueDiv);
+    var $wrapper = $('<div>').append($row).append($fmtRow);
+    return $wrapper;
 }
 
 // Build visibility row for a custom element card

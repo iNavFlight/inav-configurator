@@ -1986,11 +1986,6 @@ dialog {
     display: none;
 }
 
-.battery-label {
-    display: inline;
-    color: #aaa;
-}
-
 /* Battery element styling*/
 
 #quad-status_wrapper {
@@ -2015,9 +2010,12 @@ dialog {
 }
 
 .battery-legend {
-    display: inline;
+    display: inline-block;
+    vertical-align: middle;
+    min-width: 6ch;
+    text-align: center;
     color: silver;
-    margin-right: 8px;
+    font-variant-numeric: tabular-nums;
 }
 
 .quad-status-contents progress::-webkit-progress-bar {
@@ -2095,6 +2093,15 @@ dialog {
     margin-top: 2px;
     border-bottom-left-radius: 5px;
     border-bottom-right-radius: 5px;
+}
+
+@media only screen and (max-width: 1439px) {
+
+    .content_toolbar .btn a {
+        padding: 0 5px;
+        line-height: 22px;
+    }
+
 }
 
 @media only screen and (max-width: 1055px) , only screen and (max-device-width: 1055px) {
@@ -2289,6 +2296,22 @@ select {
 
 .modal__button--main--inline {
     display: inline;
+}
+
+.modal__button--warning {
+    background-color: #e74c3c;
+    text-shadow: 0 1px rgba(0, 0, 0, 0.25);
+    color: #fff;
+    border: 1px solid #c0392b;
+    transition: all ease 0.2s;
+}
+
+.modal__button--warning:hover {
+    background-color: #c0392b;
+}
+
+.modal__button--warning:active {
+    box-shadow: inset 0 1px 5px rgba(0, 0, 0, 0.35);
 }
 
 .modal__button--disabled {

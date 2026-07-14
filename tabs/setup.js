@@ -91,8 +91,9 @@ setupTab.initialize = function (callback) {
 
         initializeInstruments();
 
-        $('a.resetSettings').on('click', function () {
-            if (dialog.confirm(i18n.getMessage('confirm_reset_settings'))) {
+        $('a.resetSettings').on('click', async function () {
+            if (await dialog.confirm(i18n.getMessage('confirm_reset_settings'))) {
+                interval.remove('global_data_refresh');
                 MSP.send_message(MSPCodes.MSP_RESET_CONF, false, false, function () {
                     GUI.log(i18n.getMessage('initialSetupSettingsRestored'));
     
