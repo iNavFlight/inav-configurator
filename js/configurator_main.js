@@ -5,6 +5,7 @@ import 'jquery-ui-dist/jquery-ui';
 import * as THREE from 'three'
 
 import GUI from './gui';
+import interval from './intervals';
 import CONFIGURATOR from './data_storage';
 import FC  from './fc';
 import { globalSettings, UnitType } from './globalSettings';
@@ -20,6 +21,7 @@ import CliAutoComplete from './CliAutoComplete';
 import { SITLProcess } from './sitl';
 import settingsCache from './settingsCache';
 import store from './store';
+import periodicStatusUpdater from './periodicStatusUpdater';
 
 // "Preload" tabs
 import landingTab from './../tabs/landing';
@@ -360,84 +362,6 @@ $(function() {
         // Update button state on initialization
         updateToggleAllButton();
 
-
-        // Accordion Navigation Groups
-        $('.group-header').on('click', function(e) {
-            e.stopPropagation(); // Prevent triggering tab click
-            const header = $(this);
-            const items = header.next('.group-items');
-
-            // Toggle this group
-            header.toggleClass('active');
-            items.toggleClass('expanded');
-
-            // Update aria-expanded for accessibility
-            header.attr('aria-expanded', header.hasClass('active'));
-
-            // Update the expand/collapse all button state
-            updateToggleAllButton();
-        });
-
-        // Keyboard accessibility for accordion headers
-        $('.group-header').on('keydown', function(e) {
-            if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                $(this).trigger('click');
-            }
-        });
-
-        function updateToggleAllButton() {
-            const allExpanded = $('.nav-group .group-header.active').length === $('.nav-group .group-header').length;
-            const $expandIcon = $('#toggleAllGroups .expand-icon');
-            const $collapseIcon = $('#toggleAllGroups .collapse-icon');
-            const $toggleText = $('#toggleAllGroups .toggle-text');
-
-            if (allExpanded) {
-                $expandIcon.hide();
-                $collapseIcon.show();
-                $toggleText.attr('data-i18n', 'navCollapseAll');
-                $toggleText.text(i18n.getMessage('navCollapseAll'));
-            } else {
-                $expandIcon.show();
-                $collapseIcon.hide();
-                $toggleText.attr('data-i18n', 'navExpandAll');
-                $toggleText.text(i18n.getMessage('navExpandAll'));
-            }
-        }
-
-        // Expand/Collapse All Toggle
-        $('#toggleAllGroups').on('click', function(e) {
-            e.preventDefault();
-            const allExpanded = $('.nav-group .group-header.active').length === $('.nav-group .group-header').length;
-
-            if (allExpanded) {
-                // Collapse all except first
-                $('.nav-group .group-header').removeClass('active').attr('aria-expanded', 'false');
-                $('.nav-group .group-items').removeClass('expanded');
-                $('#tabs ul.mode-connected .nav-group:first-child .group-header').addClass('active').attr('aria-expanded', 'true');
-                $('#tabs ul.mode-connected .nav-group:first-child .group-items').addClass('expanded');
-                store.set('expand_all_groups', false);
-            } else {
-                // Expand all
-                $('.nav-group .group-header').addClass('active').attr('aria-expanded', 'true');
-                $('.nav-group .group-items').addClass('expanded');
-                store.set('expand_all_groups', true);
-            }
-
-            updateToggleAllButton();
-        });
-
-        // Initialize: apply saved expand all preference or expand first group by default
-        if (store.get('expand_all_groups', false)) {
-            $('.nav-group .group-header').addClass('active').attr('aria-expanded', 'true');
-            $('.nav-group .group-items').addClass('expanded');
-        } else {
-            $('#tabs ul.mode-connected .nav-group:first-child .group-header').addClass('active').attr('aria-expanded', 'true');
-            $('#tabs ul.mode-connected .nav-group:first-child .group-items').addClass('expanded');
-        }
-
-        updateToggleAllButton();
-
         // options
         $('#options').on('click', function() {
             var el = $(this);
@@ -468,15 +392,6 @@ $(function() {
                         store.set('update_notify', check);
                     });
                     
-                    if (store.get('disable_3d_acceleration', false)) {
-                        $('div.disable_3d_acceleration input').prop('checked', true);
-                    }
-
-                     $('div.disable_3d_acceleration input').on('change', function () {
-                        var check = $(this).is(':checked');
-                        store.set('disable_3d_acceleration', check);
-                    });
-
                     if (store.get('disable_3d_acceleration', false)) {
                         $('div.disable_3d_acceleration input').prop('checked', true);
                     }
@@ -695,20 +610,24 @@ $(function() {
 
         var mixerprofile_e = $('#mixerprofilechange');
 
-        mixerprofile_e.on('change', function () {
-            if (!dialog.confirm(i18n.getMessage("changeMixerProfileReboot"))) 
+        mixerprofile_e.on('change', async function () {
+            const mixerprofile = parseInt($(this).val());
+            const previousMixerProfile = FC.CONFIG.mixer_profile;
+            // Stop poller before the confirm dialog: a status poll arriving during
+            // the async await would reset the dropdown back to the old value.
+            interval.remove('global_data_refresh');
+            if (!await dialog.confirm(i18n.getMessage("changeMixerProfileReboot")))
             {
-                $(this).val(FC.CONFIG.mixer_profile)
+                $(this).val(previousMixerProfile);
+                interval.add('global_data_refresh', periodicStatusUpdater.run, periodicStatusUpdater.getUpdateInterval(CONFIGURATOR.connection.bitrate), false);
                 return;
             }
-            
-            const mixerprofile = parseInt($(this).val());
+            // global_data_refresh already removed; proceed with profile switch.
             MSP.send_message(MSPCodes.MSP2_INAV_SELECT_MIXER_PROFILE, [mixerprofile], false, function () {
                 GUI.tab_switch_cleanup(function() {
                     GUI.log(i18n.getMessage('setMixerProfile', [mixerprofile + 1]));
                     GUI.log(i18n.getMessage('deviceRebooting'));
-                    GUI.handleReconnect(true);
-                    // This order! Why? ¯\_(ツ)_/¯
+                    GUI.handleReconnect(true); // register disconnect handler BEFORE reboot triggers disconnect
                     MSP.send_message(MSPCodes.MSP_SET_REBOOT, false, false);
                 });
             });

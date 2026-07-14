@@ -294,17 +294,18 @@ pidTuningTab.initialize = function (callback) {
 
         tabs.init($('.tab-pid_tuning'));
 
-        $('.action-resetPIDs').on('click', function() {
+        $('.action-resetPIDs').on('click', async function() {
 
-            if (dialog.confirm(i18n.getMessage('confirm_reset_pid'))) {
+            if (await dialog.confirm(i18n.getMessage('confirm_reset_pid'))) {
                 MSP.send_message(MSPCodes.MSP_SET_RESET_CURR_PID, false, false, false);
                 GUI.updateActivatedTab();
             }
         });
 
-        $('.action-resetDefaults').on('click', function() {
+        $('.action-resetDefaults').on('click', async function() {
 
-            if (dialog.confirm(i18n.getMessage('confirm_select_defaults'))) {
+            if (await dialog.confirm(i18n.getMessage('confirm_select_defaults'))) {
+                interval.remove('global_data_refresh');
                 mspHelper.setSetting("applied_defaults", 0, function() { 
                     mspHelper.saveToEeprom( function () {
                         GUI.log(i18n.getMessage('configurationEepromSaved'));
