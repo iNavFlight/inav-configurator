@@ -4,13 +4,13 @@
 
 .tab-configuration .leftWrapper {
     float: left;
-    width: calc(50% - 20px);
+    width: calc(50% - 2em);
 }
 
 .tab-configuration .rightWrapper {
     float: left;
-    width: calc(50% - 0px);
-    margin: 0 0 10px 20px;
+    width: calc(50% - 2em);
+    margin: 0 0 10px 3em;
 }
 
 .tab-configuration .mixerList {

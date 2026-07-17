@@ -68,6 +68,9 @@ class INAVCodeGenerator {
   constructor(variableHandler = null) {
     this.lcIndex = 0; // Current logic condition index
     this.commands = [];
+    this.lcToLineMapping = {}; // Map LC index -> source line number for highlighting
+    this.currentSourceLine = null; // Current source line being processed (for line tracking)
+    this.lineOffset = 0; // Line offset from auto-added imports (set by transpiler)
     this.errorHandler = new ErrorHandler(); // Error and warning collection
     this.operandMapping = buildForwardMapping(apiDefinitions);
     this.arrowHelper = new ArrowFunctionHelper(this);
@@ -150,28 +153,42 @@ class INAVCodeGenerator {
    */
   generateStatement(stmt) {
     if (!stmt) return;
-    switch (stmt.type) {
-      case 'EventHandler':
-        this.generateEventHandler(stmt);
-        break;
-      case 'Assignment':
-        // Top-level assignment (e.g., gvar[0] = value) - runs unconditionally
-        this.generateTopLevelAssignment(stmt);
-        break;
-      case 'StickyAssignment':
-        // latch1 = sticky({on: ..., off: ...})
-        this.generateStickyAssignment(stmt);
-        break;
-      case 'LetDeclaration':
-      case 'VarDeclaration':
-        // Skip - declarations handled separately
-        break;
-      default:
-        this.errorHandler.addError(
-          `Unsupported statement type: ${stmt.type}. Only assignments and event handlers are supported`,
-          stmt,
-          'unsupported_statement'
-        );
+
+    // Set current source line for LC-to-line tracking
+    const previousSourceLine = this.currentSourceLine;
+    if (stmt.loc && stmt.loc.start) {
+      // Acorn line numbers include auto-added import lines at the top
+      // Subtract lineOffset to match Monaco editor line numbers
+      this.currentSourceLine = stmt.loc.start.line - this.lineOffset;
+    }
+
+    try {
+      switch (stmt.type) {
+        case 'EventHandler':
+          this.generateEventHandler(stmt);
+          break;
+        case 'Assignment':
+          // Top-level assignment (e.g., gvar[0] = value) - runs unconditionally
+          this.generateTopLevelAssignment(stmt);
+          break;
+        case 'StickyAssignment':
+          // latch1 = sticky({on: ..., off: ...})
+          this.generateStickyAssignment(stmt);
+          break;
+        case 'LetDeclaration':
+        case 'VarDeclaration':
+          // Skip - declarations handled separately
+          break;
+        default:
+          this.errorHandler.addError(
+            `Unsupported statement type: ${stmt.type}. Only assignments and event handlers are supported`,
+            stmt,
+            'unsupported_statement'
+          );
+      }
+    } finally {
+      // Restore previous source line context
+      this.currentSourceLine = previousSourceLine;
     }
   }
 
@@ -248,6 +265,12 @@ class INAVCodeGenerator {
     this.commands.push(
       `logic ${lcIndex} 1 ${activatorId} ${operation} ${operandA.type} ${operandA.value} ${operandB.type} ${operandB.value} ${flags}`
     );
+
+    // Track source line mapping for transpiler-side highlighting
+    if (this.currentSourceLine !== null) {
+      this.lcToLineMapping[lcIndex] = this.currentSourceLine;
+    }
+
     this.lcIndex++;
     return lcIndex;
   }
@@ -980,31 +1003,23 @@ class INAVCodeGenerator {
     for (const [name, symbol] of this.variableHandler.symbols.entries()) {
       if (symbol.kind === 'let') {
         const lcIndex = this.variableHandler.letVariableLCIndices.get(name);
-
-        // Only include variables that generated LCs (were actually used)
-        // Variables that were fully inlined or unused won't have LC indices
-        if (lcIndex === undefined) {
-          continue;
-        }
-
         const expression = this.astToExpressionString(symbol.expressionAST);
 
         // Skip expressions that contain invalid/unknown parts
         // These happen when AST references other variables that were also inlined
         if (expression.includes('undefined') || expression.includes('/* unknown expression */')) {
           // Still store the variable, but with a placeholder expression
-          // The lcIndex is what matters for decompiler name matching
-          map.let_variables[name] = {
+          // Inlined let variables are folded into their use sites and never allocated an LC slot, so they have no lcIndex.
+          const entry = {
             expression: '/* expression unavailable */',
-            lcIndex: lcIndex,
             type: 'let'
           };
+          if (lcIndex !== undefined) { entry.lcIndex = lcIndex; }
+          map.let_variables[name] = entry;
         } else {
-          map.let_variables[name] = {
-            expression: expression,
-            lcIndex: lcIndex,
-            type: 'let'
-          };
+          const entry = { expression: expression, type: 'let' };
+          if (lcIndex !== undefined) { entry.lcIndex = lcIndex; }
+          map.let_variables[name] = entry;
         }
       } else if (symbol.kind === 'var') {
         map.var_variables[name] = {

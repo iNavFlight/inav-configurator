@@ -115,10 +115,12 @@ This is more efficient than explicit AND operations.
 
 ## Testing
 
-Tests are in `transpiler/tests/`. Run with:
+Tests are in `tests/transpiler/` (repo root). Run with:
 ```bash
-node js/transpiler/transpiler/tests/run_decompiler_tests.cjs
-node js/transpiler/transpiler/tests/run_comparison_operators_tests.cjs
+npm test                                      # run everything
+node tests/transpiler/run_all_tests.cjs      # transpiler suite only
+node tests/transpiler/run_decompiler_tests.cjs
+node tests/transpiler/run_comparison_operators_tests.cjs
 # etc.
 ```
 

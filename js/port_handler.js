@@ -1,6 +1,6 @@
 'use strict';
 
-import { GUI } from './../js/gui';
+import GUI from './../js/gui';
 import ConnectionSerial from './connection/connectionSerial';
 import store from './store';
 

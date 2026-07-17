@@ -280,3 +280,446 @@
     font-size: 12px;
     font-weight: normal;
 }
+
+/* Version warning overlay: minor/major update without chip erase */
+#version-warning-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#version-warning-overlay.is-hidden {
+    display: none;
+}
+
+.version-warning-overlay__content {
+    background: #fff;
+    border-radius: 8px;
+    padding: 2em 3em;
+    min-width: 380px;
+    max-width: 560px;
+    text-align: center;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.version-warning-overlay__title {
+    font-size: 1.3em;
+    font-weight: bold;
+    margin-bottom: 1em;
+    color: #c00;
+}
+
+.version-warning-overlay__text {
+    font-size: 1em;
+    margin-bottom: 1.5em;
+    color: #555;
+    line-height: 1.6;
+}
+
+.version-warning-overlay__buttons {
+    display: flex;
+    justify-content: center;
+    gap: 1em;
+}
+
+.version-warning-overlay__btn {
+    padding: 0.7em 1.5em;
+    border-radius: 4px;
+    font-weight: bold;
+    font-size: 0.95em;
+    cursor: pointer;
+    text-decoration: none;
+    text-align: center;
+    transition: all ease 0.2s;
+}
+
+.version-warning-overlay__btn--continue {
+    background: #c00;
+    border: 1px solid #a00;
+    color: #fff;
+}
+
+.version-warning-overlay__btn--continue:hover {
+    background: #a00;
+}
+
+.version-warning-overlay__btn--cancel {
+    background: #37a8db;
+    border: 1px solid #3a9dbf;
+    color: #fff;
+    text-shadow: 0 1px rgba(0, 0, 0, 0.25);
+}
+
+.version-warning-overlay__btn--cancel:hover {
+    background: #3394b5;
+}
+
+/* Restore overlay: blocks entire tab during restore */
+#restore-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#restore-overlay.is-hidden {
+    display: none;
+}
+
+.restore-overlay__content {
+    background: #fff;
+    border-radius: 8px;
+    padding: 2em 3em;
+    min-width: 380px;
+    max-width: 500px;
+    text-align: center;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.restore-overlay__title {
+    font-size: 1.4em;
+    font-weight: bold;
+    margin-bottom: 1em;
+    color: #333;
+}
+
+.restore-overlay__status {
+    font-size: 1.1em;
+    margin-bottom: 1em;
+    color: #555;
+}
+
+.restore-overlay__progress-bar {
+    width: 100%;
+    height: 22px;
+    background: #4f4f4f;
+    border-radius: 4px;
+    overflow: hidden;
+    box-shadow: inset 0 0 5px #2f2f2f;
+}
+
+.restore-overlay__progress-fill {
+    height: 100%;
+    width: 0%;
+    background: #37a8db;
+    border-radius: 4px;
+    transition: width 0.15s ease;
+}
+
+.restore-overlay__progress-text {
+    margin-top: 0.5em;
+    font-size: 0.95em;
+    color: #777;
+}
+
+/* Confirm overlay: auto-restore prompt after flash */
+#restore-confirm-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#restore-confirm-overlay.is-hidden {
+    display: none;
+}
+
+.restore-confirm-overlay__content {
+    background: #fff;
+    border-radius: 8px;
+    padding: 2em 3em;
+    min-width: 380px;
+    max-width: 520px;
+    text-align: center;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.restore-confirm-overlay__title {
+    font-size: 1.2em;
+    font-weight: bold;
+    margin-bottom: 1em;
+    color: #333;
+    line-height: 1.5;
+}
+
+.restore-confirm-overlay__status {
+    font-size: 1em;
+    margin-bottom: 1em;
+    color: #555;
+}
+
+.restore-confirm-overlay__status:empty {
+    display: none;
+}
+
+.restore-confirm-overlay__buttons {
+    display: flex;
+    justify-content: center;
+    gap: 1em;
+    margin-top: 1.5em;
+}
+
+.restore-confirm-overlay__btn {
+    padding: 0.7em 1.5em;
+    border-radius: 4px;
+    font-weight: bold;
+    font-size: 0.95em;
+    cursor: pointer;
+    text-decoration: none;
+    text-align: center;
+    transition: all ease 0.2s;
+}
+
+.restore-confirm-overlay__btn--no {
+    background: #fff;
+    border: 1px solid #888;
+    color: #555;
+}
+
+.restore-confirm-overlay__btn--no:hover {
+    background: #eee;
+    color: #333;
+}
+
+.restore-confirm-overlay__btn--yes {
+    background: #37a8db;
+    border: 1px solid #3a9dbf;
+    color: #fff;
+    text-shadow: 0 1px rgba(0, 0, 0, 0.25);
+}
+
+.restore-confirm-overlay__btn--yes:hover {
+    background: #3394b5;
+}
+
+/* Error dialog overlay after restore */
+#restore-error-dialog {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 10001;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#restore-error-dialog.is-hidden {
+    display: none;
+}
+
+.restore-error-dialog__content {
+    background: #fff;
+    border-radius: 8px;
+    padding: 2em;
+    min-width: 400px;
+    max-width: 600px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.restore-error-dialog__title {
+    font-size: 1.3em;
+    font-weight: bold;
+    color: darkred;
+    margin-bottom: 0.8em;
+}
+
+.restore-error-dialog__text {
+    font-size: 1em;
+    color: #555;
+    margin-bottom: 1em;
+    line-height: 1.5;
+}
+
+.restore-error-dialog__errors {
+    max-height: 200px;
+    overflow-y: auto;
+    background: #f5f5f5;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 0.8em;
+    margin-bottom: 1.5em;
+    font-family: monospace;
+    font-size: 0.85em;
+    line-height: 1.6;
+    color: #c00;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.restore-error-dialog__buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1em;
+}
+
+.restore-error-dialog__btn {
+    padding: 0.7em 1.5em;
+    border-radius: 4px;
+    font-weight: bold;
+    font-size: 0.95em;
+    cursor: pointer;
+    text-decoration: none;
+    text-align: center;
+    transition: all ease 0.2s;
+}
+
+.restore-error-dialog__btn--abort {
+    background: #fff;
+    border: 1px solid #c00;
+    color: #c00;
+}
+
+.restore-error-dialog__btn--abort:hover {
+    background: #c00;
+    color: #fff;
+}
+
+.restore-error-dialog__btn--save {
+    background: #37a8db;
+    border: 1px solid #3a9dbf;
+    color: #fff;
+    text-shadow: 0 1px rgba(0, 0, 0, 0.25);
+}
+
+.restore-error-dialog__btn--save:hover {
+    background: #3394b5;
+}
+
+/* Migration preview overlay: shown before restore when migration is needed */
+#migration-preview-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#migration-preview-overlay.is-hidden {
+    display: none;
+}
+
+.migration-preview__content {
+    background: #fff;
+    border-radius: 8px;
+    padding: 2em;
+    min-width: 420px;
+    max-width: 640px;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.migration-preview__title {
+    font-size: 1.3em;
+    font-weight: bold;
+    margin-bottom: 0.5em;
+    color: #333;
+}
+
+.migration-preview__subtitle {
+    font-size: 1em;
+    margin-bottom: 1.2em;
+    color: #555;
+}
+
+.migration-preview__changes {
+    max-height: 300px;
+    overflow-y: auto;
+    background: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 0.8em;
+    margin-bottom: 1em;
+    font-family: monospace;
+    font-size: 0.85em;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.migration-preview__changes:empty {
+    display: none;
+}
+
+.migration-preview__warnings {
+    background: #fff8e1;
+    border: 1px solid #ffe082;
+    border-radius: 4px;
+    padding: 0.8em;
+    margin-bottom: 1.5em;
+    font-size: 0.9em;
+    line-height: 1.6;
+    color: #795548;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.migration-preview__warnings:empty {
+    display: none;
+}
+
+.migration-preview__buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1em;
+}
+
+.migration-preview__btn {
+    padding: 0.7em 1.5em;
+    border-radius: 4px;
+    font-weight: bold;
+    font-size: 0.95em;
+    cursor: pointer;
+    text-decoration: none;
+    text-align: center;
+    transition: all ease 0.2s;
+}
+
+.migration-preview__btn--cancel {
+    background: #fff;
+    border: 1px solid #888;
+    color: #555;
+}
+
+.migration-preview__btn--cancel:hover {
+    background: #eee;
+    color: #333;
+}
+
+.migration-preview__btn--continue {
+    background: #37a8db;
+    border: 1px solid #3a9dbf;
+    color: #fff;
+    text-shadow: 0 1px rgba(0, 0, 0, 0.25);
+}
+
+.migration-preview__btn--continue:hover {
+    background: #3394b5;
+}
