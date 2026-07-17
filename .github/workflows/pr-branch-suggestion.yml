@@ -24,7 +24,7 @@ jobs:
 
             - **\`maintenance-10.x\`** - If your change introduces compatibility requirements between firmware and configurator that would break 9.x compatibility. This is for PRs which will be included in INAV 10.x
 
-            If \`master\` is the correct target for this change, no action is needed.
+            If \`master\` is the correct target for this change because it should never be included in any release, no action is needed.
 
             ---
             *This is an automated suggestion to help route contributions to the appropriate branch.*`;

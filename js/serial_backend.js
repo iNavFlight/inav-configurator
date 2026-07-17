@@ -164,7 +164,9 @@ var SerialBackend = (function () {
 
         if (GUI.connect_lock != true) { // GUI control overrides the user control
 
-                var clicks = $(this).data('clicks');
+                // Use the real connection state, not a toggle flag that competing
+                // async aborts could desync.
+                const isIdle = (GUI.connected_to === false) && (GUI.connecting_to === false);
                 var selected_baud = parseInt(privateScope.$baud.val());
                 var selected_port = privateScope.$port.find('option:selected').data().isManual ?
                     publicScope.$portOverride.val() :
@@ -174,9 +176,17 @@ var SerialBackend = (function () {
                     GUI.log(i18n.getMessage('dfu_connect_message'));
                 }
                 else if (selected_port != '0') {
-                    if (!clicks) {
+                    if (isIdle) {
                         console.log('Connecting to: ' + selected_port);
                         GUI.connecting_to = selected_port;
+
+                        // Clear leftover MSP state so a fast reconnect isn't
+                        // blocked by a previous session's retrying requests.
+                        mspQueue.flush();
+                        mspQueue.freeHardLock();
+                        mspQueue.freeSoftLock();
+                        mspDeduplicationQueue.flush();
+                        MSP.disconnect_cleanup();
 
                         // lock port select & baud while we are connecting / connected
                         $('#port, #baud, #delay').prop('disabled', true);
@@ -237,6 +247,7 @@ var SerialBackend = (function () {
                             GUI.tab_switch_in_progress = false;
                             CONFIGURATOR.connectionValid = false;
                             GUI.connected_to = false;
+                            GUI.connecting_to = false;
                             GUI.allowedTabs = GUI.defaultAllowedTabsWhenDisconnected.slice();
 
                             /*
@@ -274,8 +285,6 @@ var SerialBackend = (function () {
                             $('#tabs .tab_landing a').trigger( "click" );
                         }
                     }
-
-                    $(this).data("clicks", !clicks);
                 }
             }
         }
@@ -448,6 +457,10 @@ var SerialBackend = (function () {
             console.log('Failed to open serial port');
             GUI.log(i18n.getMessage('serialPortOpenFail'));
 
+            // Clear connecting state so the button reflects "disconnected".
+            GUI.connecting_to = false;
+            GUI.connected_to = false;
+
             var $connectButton = $('#connectbutton');
 
             $connectButton.find('.connect_state').text(i18n.getMessage('connect'));
@@ -455,9 +468,6 @@ var SerialBackend = (function () {
 
             // unlock port select & baud
             $('#port, #baud, #delay').prop('disabled', false);
-
-            // reset data
-            $connectButton.find('.connect').data("clicks", false);
         }
     }
 

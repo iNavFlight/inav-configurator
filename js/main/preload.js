@@ -11,8 +11,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
   appGetLocale: () => ipcRenderer.sendSync('appGetLocale'),
   showOpenDialog: (options) => ipcRenderer.invoke('dialog.showOpenDialog', options),
   showSaveDialog: (options) => ipcRenderer.invoke('dialog.showSaveDialog', options),
-  alertDialog: (message) => ipcRenderer.sendSync('dialog.alert', message),
-  confirmDialog: (message) => ipcRenderer.sendSync('dialog.confirm', message),
+  alertDialog: (message) => ipcRenderer.sendSync('dialog.alert', message), // TODO: still blocks renderer event loop — needs same async fix (invoke/handle) as confirm; see ipcMain.on('dialog.alert') in main.js
+  confirmDialog: (message) => ipcRenderer.invoke('dialog.confirm', message),
   tcpConnect: (host, port) => ipcRenderer.invoke('tcpConnect', host, port),
   tcpClose: () => ipcRenderer.send('tcpClose'),
   tcpSend: (data) => ipcRenderer.invoke('tcpSend', data),
