@@ -475,21 +475,22 @@ app.whenReady().then(() => {
 
   ipcMain.handle('ejectDrive', (_event, driveLetter) => {
     return new Promise(resolve => {
+      // The renderer only ever supplies a drive letter (A–Z); strip anything else so a
+      // command argument can never be injected into the platform eject commands below.
+      const letter = String(driveLetter).replaceAll(/[^a-zA-Z]/g, '').charAt(0);
+      if (!letter) return resolve('Invalid drive letter');
       if (process.platform === 'win32') {
-        // Use PowerShell to safely eject a removable drive
-        const letter = driveLetter.replaceAll(/[^a-zA-Z]/g, '').charAt(0);
-        if (!letter) return resolve('Invalid drive letter');
         const script = `$ns = (New-Object -ComObject Shell.Application).Namespace('${letter}:\\'); if ($ns) { $ns.Self.InvokeVerb('Eject') } else { throw 'Drive ${letter}: not found or already ejected' }`;
         const psPath = path.join(process.env.SYSTEMROOT || 'C:\\Windows', 'System32', 'WindowsPowerShell', 'v1.0', 'powershell.exe');
         execFile(psPath, ['-NoProfile', '-Command', script], { timeout: 10000 }, (err) => {
           resolve(err ? err.message : false);
         });
       } else if (process.platform === 'darwin') {
-        execFile('/usr/sbin/diskutil', ['eject', driveLetter], { timeout: 10000 }, (err) => {
+        execFile('/usr/sbin/diskutil', ['eject', letter], { timeout: 10000 }, (err) => {
           resolve(err ? err.message : false);
         });
       } else {
-        execFile('/usr/bin/udisksctl', ['unmount', '-b', driveLetter], { timeout: 10000 }, (err) => {
+        execFile('/usr/bin/udisksctl', ['unmount', '-b', letter], { timeout: 10000 }, (err) => {
           resolve(err ? err.message : false);
         });
       }
