@@ -1658,7 +1658,9 @@ TABS.map_generator.initialize = function (callback) {
             $('#mapgen_download_status').text('Generating ZIP file...');
             try {
                 const blob = await zip.generateAsync({ type: 'arraybuffer' });
-                const zipName = target === 'yaapu' ? `EthosMaps_yaapu_${subtarget}.zip` : `EthosMaps_${target}.zip`;
+                // Name the download after the user's Project Folder Name (sanitized for use as a filename)
+                const projectName = $('#mapgen_project_name').val().trim().replace(/[<>:"\/\\|?*]/g, '_');
+                const zipName = target === 'yaapu' ? `${projectName}_yaapu_${subtarget}.zip` : `${projectName}_${target}.zip`;
                 const result = await globalThis.electronAPI.showSaveDialog({
                     title: 'Save Map Tiles ZIP',
                     defaultPath: zipName,
