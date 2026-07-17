@@ -46,15 +46,8 @@ var SerialBackend = (function () {
         publicScope.$portOverride = $('#port-override'),
         mspHelper.setSensorStatusEx(privateScope.sensor_status_ex);
         
-        $('#wireless-mode').on('change', function () {
-            var $this = $(this);
-
-            if ($this.is(':checked')) {
-                mspQueue.setLockMethod('hard');
-            } else {
-                mspQueue.setLockMethod('soft');
-            }
-        });
+        // 无线模式开关已移除，改为根据连接类型自动设置
+        // BLE 使用硬锁定，串口使用软锁定
 
         GUI.handleReconnect = function (reopenLastTab = true) {
 
@@ -100,37 +93,36 @@ var SerialBackend = (function () {
     
         GUI.updateManualPortVisibility = function(){
             var selected_port = privateScope.$port.find('option:selected');
-            if (selected_port.data().isManual || selected_port.data().isTcp || selected_port.data().isUdp) {
-                $('#port-override-option').show();
-            }
-            else {
-                $('#port-override-option').hide();
-            }
 
-            if (selected_port.data().isTcp || selected_port.data().isUdp) {
-                $('#port-override-label').text("IP:Port");
-            } else {
-                $('#port-override-label').text("Port");
-            }
+            // 始终隐藏端口覆盖选项
+            $('#port-override-option').hide();
 
-            if (selected_port.data().isDFU || selected_port.data().isBle || selected_port.data().isTcp || selected_port.data().isUdp || selected_port.data().isSitl) {
+            // BLE 和 DFU 连接时隐藏波特率选择
+            if (selected_port.data().isDFU || selected_port.data().isBle) {
                 privateScope.$baud.hide();
-            }
-            else {
+            } else {
                 privateScope.$baud.show();
-            }        
+            }
 
-            if (selected_port.data().isBle || selected_port.data().isTcp || selected_port.data().isUdp || selected_port.data().isSitl) {
+            // BLE 连接时隐藏固件刷写选项
+            if (selected_port.data().isBle) {
                 $('.tab_firmware_flasher').hide();
             } else {
                 $('.tab_firmware_flasher').show();
             }
-            var type = ConnectionType.Serial;
+
+            // 根据连接类型自动设置消息队列模式
             if (selected_port.data().isBle) {
-                type = ConnectionType.BLE;
+                // BLE 连接：使用硬锁定（严格队列管理）
+                mspQueue.setLockMethod('hard');
+            } else {
+                // 串口连接：使用软锁定（宽松队列管理）
+                mspQueue.setLockMethod('soft');
             }
+
+            // 根据选择的端口类型创建对应的连接实例
+            var type = selected_port.data().isBle ? ConnectionType.BLE : ConnectionType.Serial;
             CONFIGURATOR.connection = connectionFactory(type, CONFIGURATOR.connection);
-            
         };
 
         GUI.updateManualPortVisibility();
@@ -161,9 +153,7 @@ var SerialBackend = (function () {
                 // async aborts could desync.
                 const isIdle = (GUI.connected_to === false) && (GUI.connecting_to === false);
                 var selected_baud = parseInt(privateScope.$baud.val());
-                var selected_port = privateScope.$port.find('option:selected').data().isManual ?
-                    publicScope.$portOverride.val() :
-                        String(privateScope.$port.val());
+                var selected_port = String(privateScope.$port.val());
                 
                 if (selected_port === 'DFU') {
                     GUI.log(i18n.getMessage('dfu_connect_message'));
@@ -185,35 +175,30 @@ var SerialBackend = (function () {
                         $('#port, #baud, #delay').prop('disabled', true);
                         $('div.connect_controls a.connect_state').text(i18n.getMessage('connecting'));
 
-                        // Web Serial API: 在用户手势上下文中请求串口权限
+                        // 保存连接类型
+                        store.set('last_connection_type', selected_port);
+
+                        // 根据选择的连接方式处理
                         if (CONFIGURATOR.connection.type === ConnectionType.Serial) {
-                            // 检查是否有已授权的端口
-                            navigator.serial.getPorts().then(async ports => {
-                                if (ports.length > 0) {
-                                    // 使用已授权的端口
-                                    CONFIGURATOR.connection._port = ports[0];
+                            // 串口连接：弹出设备选择框
+                            try {
+                                navigator.serial.requestPort().then(async port => {
+                                    CONFIGURATOR.connection._port = port;
                                     CONFIGURATOR.connection.connect(selected_port, {bitrate: selected_baud}, privateScope.onOpen);
-                                } else {
-                                    // 没有已授权端口，请求用户选择（必须在同步用户手势上下文）
-                                    try {
-                                        const port = await navigator.serial.requestPort();
-                                        CONFIGURATOR.connection._port = port;
-                                        CONFIGURATOR.connection.connect(selected_port, {bitrate: selected_baud}, privateScope.onOpen);
-                                    } catch (error) {
-                                        console.error('Failed to request port:', error);
-                                        GUI.log(i18n.getMessage('serialPortOpenFail'));
-                                        $('#port, #baud, #delay').prop('disabled', false);
-                                        $('div.connect_controls a.connect_state').text(i18n.getMessage('connect'));
-                                    }
-                                }
-                            }).catch(error => {
-                                console.error('Failed to get ports:', error);
+                                }).catch(error => {
+                                    console.error('Serial port selection cancelled or failed:', error);
+                                    GUI.log('串口选择已取消');
+                                    $('#port, #baud, #delay').prop('disabled', false);
+                                    $('div.connect_controls a.connect_state').text(i18n.getMessage('connect'));
+                                });
+                            } catch (error) {
+                                console.error('Failed to request serial port:', error);
                                 GUI.log(i18n.getMessage('serialPortOpenFail'));
                                 $('#port, #baud, #delay').prop('disabled', false);
                                 $('div.connect_controls a.connect_state').text(i18n.getMessage('connect'));
-                            });
-                        } else {
-                            // 蓝牙连接保持原有逻辑
+                            }
+                        } else if (CONFIGURATOR.connection.type === ConnectionType.BLE) {
+                            // BLE 连接：直接调用连接（内部会弹出蓝牙设备选择框）
                             CONFIGURATOR.connection.connect(selected_port, {bitrate: selected_baud}, privateScope.onOpen);
                         }
                     } else {
@@ -384,7 +369,6 @@ var SerialBackend = (function () {
 
 
             await store.set('last_used_bps', CONFIGURATOR.connection.bitrate);
-            await store.set('wireless_mode_enabled', $('#wireless-mode').is(":checked"));
 
             // Reset state BEFORE adding receive listeners to ensure any
             // garbage bytes or boot messages don't corrupt the MSP decoder

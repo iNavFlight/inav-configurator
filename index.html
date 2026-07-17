@@ -44,21 +44,19 @@
                 </div>
                 <div id="portsinput">
                     <div class="portsinput__row">
-                        <div id="port-override-option"
+                        <div id="port-override-option" style="display: none;"
                             class="portsinput__top-element portsinput__top-element--port-override">
                             <label id="port-override-label" for="port-override" i18n="mainPortOverrideLabel"></label>
                             <input id="port-override" type="text" value="/dev/rfcomm0" />
                         </div>
-                        <div class="dropdown dropdown-dark portsinput__top-element">
-                            <!--suppress HtmlFormInputWithoutLabel -->
-                            <select class="dropdown-select" id="port" title="Port">
-                                <option value="manual" i18n="mainManual"></option>
-                                <!-- port list gets generated here -->
+                        <div class="dropdown dropdown-dark portsinput__top-element" style="min-width: 150px;">
+                            <select class="dropdown-select" id="port" title="连接方式">
+                                <option value="serial">串口连接 (Serial)</option>
+                                <option value="ble">蓝牙连接 (BLE)</option>
                             </select>
                         </div>
                         <div class="dropdown dropdown-dark portsinput__top-element">
-                            <!--suppress HtmlFormInputWithoutLabel -->
-                            <select class="dropdown-select" id="baud" title="Baud Rate">
+                            <select class="dropdown-select" id="baud" title="波特率">
                                 <option value="115200" selected="selected">115200</option>
                                 <option value="57600">57600</option>
                                 <option value="38400">38400</option>
@@ -70,14 +68,6 @@
                                 <option value="2400">2400</option>
                                 <option value="1200">1200</option>
                             </select>
-                        </div>
-                    </div>
-                    <div class="portsinput__row">
-                        <div class="portsinput__top-element portsinput__top-element--inline">
-                            <label for="wireless-mode">
-                                <span class="" data-i18n="wirelessModeSwitch"></span>
-                            </label>
-                            <input id="wireless-mode" class="togglesmall" type="checkbox" />
                         </div>
                     </div>
                 </div>
