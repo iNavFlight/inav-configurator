@@ -1484,24 +1484,24 @@ TABS.map_generator.initialize = function (callback) {
         }
 
         $('#mapgen_sync_btn').on('click', () => {
+            if (isTerrainMode()) {
+                showTerrainSyncModal();
+                return;
+            }
             const provider = $('#mapgen_provider').val();
             if (provider === 'OSM') return;
             if (provider === 'MAPTILER' && !$('#mapgen_maptiler_key').val().trim()) return;
-            if (isTerrainMode()) {
-                showTerrainSyncModal();
-            } else {
-                showSyncModal(false);
-            }
+            showSyncModal(false);
         });
         $('#mapgen_zip_btn').on('click', () => {
+            if (isTerrainMode()) {
+                showTerrainSyncModal();
+                return;
+            }
             const provider = $('#mapgen_provider').val();
             if (provider === 'OSM') return;
             if (provider === 'MAPTILER' && !$('#mapgen_maptiler_key').val().trim()) return;
-            if (isTerrainMode()) {
-                showTerrainSyncModal();
-            } else {
-                showSyncModal(true);
-            }
+            showSyncModal(true);
         });
 
         $('#mapgen_modal_cancel').on('click', (e) => {
