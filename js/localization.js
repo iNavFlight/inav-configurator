@@ -20,9 +20,13 @@ i18n.loadMessages = async function(languages) {
 }
 
 i18n.init = function (callback) {
-    const locale = window.electronAPI.appGetLocale();
-    const userLanguage = store.get('userLanguage', locale);
-    this.loadMessages(availableLanguages).then(resources => {
+    // 获取浏览器语言并映射到系统支持的语言格式
+    const browserLocale = navigator.language || navigator.userLanguage || 'en';
+    const mappedLocale = i18n.mapBrowserLocale(browserLocale);
+    console.log(`Browser locale: ${browserLocale}, Mapped to: ${mappedLocale}`);
+
+    this.loadMessages(availableLanguages).then(async resources => {
+        const userLanguage = await store.get('userLanguage', mappedLocale);
         i18next.init({
             lng: userLanguage,
             getAsync: false,
@@ -35,7 +39,7 @@ i18n.init = function (callback) {
             if (err) {
                 console.error(`Error loading i18n: ${err}`);
             } else {
-                console.log('i18n system loaded');
+                console.log(`i18n system loaded, current language: ${userLanguage}`);
                 const detectedLanguage = i18n.getMessage(`language_${i18n.getValidLocale("DEFAULT")}`);
                 i18next.addResourceBundle('en', 'messages', { "detectedLanguage": detectedLanguage }, true, true);
                 i18next.on('languageChanged', function () {
@@ -68,11 +72,51 @@ i18n.parseInputFile = function (data) {
     return jsonData;
 }
 
+// 映射浏览器语言格式到系统支持的语言格式
+i18n.mapBrowserLocale = function(browserLocale) {
+    // 语言映射表：浏览器格式 -> 系统格式
+    const localeMap = {
+        'zh-CN': 'zh_CN',
+        'zh-cn': 'zh_CN',
+        'zh': 'zh_CN',
+        'ja': 'ja',
+        'ja-JP': 'ja',
+        'ru': 'ru',
+        'ru-RU': 'ru',
+        'uk': 'uk',
+        'uk-UA': 'uk',
+        'en': 'en',
+        'en-US': 'en',
+        'en-GB': 'en'
+    };
+
+    // 尝试精确匹配
+    if (localeMap[browserLocale]) {
+        return localeMap[browserLocale];
+    }
+
+    // 尝试匹配语言代码（忽略地区）
+    const langCode = browserLocale.split('-')[0];
+    if (localeMap[langCode]) {
+        return localeMap[langCode];
+    }
+
+    // 检查是否在可用语言列表中
+    if (availableLanguages.includes(browserLocale)) {
+        return browserLocale;
+    }
+
+    // 默认返回英语
+    return 'en';
+}
+
 i18n.getValidLocale = function(userLocale) {
     let validUserLocale = userLocale;
     if (validUserLocale === 'DEFAULT') {
-        validUserLocale = window.electronAPI.appGetLocale();
-        console.log(`Detected locale ${validUserLocale}`);
+        // 使用浏览器语言并映射到系统格式
+        const browserLocale = navigator.language || navigator.userLanguage || 'en';
+        validUserLocale = i18n.mapBrowserLocale(browserLocale);
+        console.log(`Detected locale ${browserLocale}, mapped to ${validUserLocale}`);
     }
 
     return validUserLocale;

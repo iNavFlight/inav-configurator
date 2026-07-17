@@ -44,20 +44,19 @@
                 </div>
                 <div id="portsinput">
                     <div class="portsinput__row">
-                        <div id="port-override-option" class="portsinput__top-element portsinput__top-element--port-override">
+                        <div id="port-override-option" style="display: none;"
+                            class="portsinput__top-element portsinput__top-element--port-override">
                             <label id="port-override-label" for="port-override" i18n="mainPortOverrideLabel"></label>
                             <input id="port-override" type="text" value="/dev/rfcomm0" />
                         </div>
-                        <div class="dropdown dropdown-dark portsinput__top-element">
-                            <!--suppress HtmlFormInputWithoutLabel -->
-                            <select class="dropdown-select" id="port" title="Port">
-                                <option value="manual" i18n="mainManual"></option>
-                                <!-- port list gets generated here -->
+                        <div class="dropdown dropdown-dark portsinput__top-element" style="min-width: 150px;">
+                            <select class="dropdown-select" id="port" title="连接方式">
+                                <option value="serial">串口连接 (Serial)</option>
+                                <option value="ble">蓝牙连接 (BLE)</option>
                             </select>
                         </div>
                         <div class="dropdown dropdown-dark portsinput__top-element">
-                            <!--suppress HtmlFormInputWithoutLabel -->
-                            <select class="dropdown-select" id="baud" title="Baud Rate">
+                            <select class="dropdown-select" id="baud" title="波特率">
                                 <option value="115200" selected="selected">115200</option>
                                 <option value="57600">57600</option>
                                 <option value="38400">38400</option>
@@ -71,14 +70,6 @@
                             </select>
                         </div>
                     </div>
-                    <div class="portsinput__row">
-                        <div class="portsinput__top-element portsinput__top-element--inline">
-                            <label for="wireless-mode">
-                                <span class="" data-i18n="wirelessModeSwitch"></span>
-                            </label>
-                            <input id="wireless-mode" class="togglesmall" type="checkbox" />
-                        </div>
-                    </div>
                 </div>
             </div>
             <div class="header-wrapper">
@@ -87,7 +78,7 @@
                         <div class="dropdown dropdown-dark">
                             <form name="profile-change" id="profile-change">
                                 <!--suppress HtmlFormInputWithoutLabel -->
-                                <select class="dropdown-select" id="profilechange" data-i18n_title="sensorProfileTitle">
+                                <select class="dropdown-select" id="profilechange">
                                     <option value="0" i18n="sensorProfile1"></option>
                                     <option value="1" i18n="sensorProfile2"></option>
                                     <option value="2" i18n="sensorProfile3"></option>
@@ -98,9 +89,9 @@
                     <div id="mixer_profile_change">
                         <div class="dropdown  dropdown-dark">
                             <form name="mixer-profile-change" id="mixer-profile-change">
-                                <select class="dropdown-select" id="mixerprofilechange" data-i18n_title="mixerProfileTitle">
-                                <option value="0" i18n="mixerProfile1"></option>
-                                <option value="1" i18n="mixerProfile2"></option>
+                                <select class="dropdown-select" id="mixerprofilechange">
+                                    <option value="0" i18n="mixerProfile1"></option>
+                                    <option value="1" i18n="mixerProfile2"></option>
                                 </select>
                             </form>
                         </div>
@@ -109,7 +100,7 @@
                         <div class="dropdown dropdown-dark">
                             <form name="battery-profile-change" id="battery-profile-change">
                                 <!--suppress HtmlFormInputWithoutLabel -->
-                                <select class="dropdown-select" id="batteryprofilechange" data-i18n_title="sensorBatteryProfileTitle">
+                                <select class="dropdown-select" id="batteryprofilechange">
                                     <option value="0" i18n="sensorBatteryProfile1"></option>
                                     <option value="1" i18n="sensorBatteryProfile2"></option>
                                     <option value="2" i18n="sensorBatteryProfile3"></option>
@@ -120,9 +111,10 @@
                 </div>
                 <div id="dataflash_wrapper_global">
                     <div class="noflash_global" align="center" i18n="sensorDataFlashNotFound"></div>
-                    <div class="dataflash-free_global_label" i18n="sensorDataFlashFreeSpace"></div>
                     <ul class="dataflash-contents_global">
-                        <li class="dataflash-free_global"></li>
+                        <li class="dataflash-free_global">
+                            <div class="legend" i18n="sensorDataFlashFreeSpace"></div>
+                        </li>
                     </ul>
                 </div>
                 <div id="sensor-status" class="sensor_state mode-connected">
@@ -163,7 +155,8 @@
                     <div class="battery-legend" i18n="sensorBatteryVoltage"></div>
                     <div class="bottomStatusIcons">
                         <div id="armedIcon" class="statusicon armed cf_tip" data-i18n_title="mainHelpArmed"></div>
-                        <div id="failsafeicon" class="statusicon failsafe cf_tip" data-i18n_title="mainHelpFailsafe"></div>
+                        <div id="failsafeicon" class="statusicon failsafe cf_tip" data-i18n_title="mainHelpFailsafe">
+                        </div>
                         <div id="linkicon" class="statusicon link cf_tip" data-i18n_title="mainHelpLink"></div>
                     </div>
                 </div>
@@ -183,37 +176,44 @@
                 <h2 class="groundstation-telemetry__header" data-i18n="gsTelemetry"></h2>
 
                 <div class="groundstation-telemetry__row groundstation-telemetry__row--big">
-                    <label for="gs-telemetry-voltage" class="groundstation-telemetry__label" data-i18n="gsTelemetryVoltageShort"></label>
+                    <label for="gs-telemetry-voltage" class="groundstation-telemetry__label"
+                        data-i18n="gsTelemetryVoltageShort"></label>
                     <div class="groundstation-telemetry__value" id="gs-telemetry-voltage">-</div>
                 </div>
 
                 <div class="groundstation-telemetry__row groundstation-telemetry__row--big">
-                    <label for="gs-telemetry-altitude" class="groundstation-telemetry__label" data-i18n="gsTelemetryAltitudeShort"></label>
+                    <label for="gs-telemetry-altitude" class="groundstation-telemetry__label"
+                        data-i18n="gsTelemetryAltitudeShort"></label>
                     <div class="groundstation-telemetry__value" id="gs-telemetry-altitude">-</div>
                 </div>
 
                 <div class="groundstation-telemetry__row groundstation-telemetry__row--big">
-                    <label for="gs-telemetry-speed" class="groundstation-telemetry__label" data-i18n="gsTelemetrySpeed"></label>
+                    <label for="gs-telemetry-speed" class="groundstation-telemetry__label"
+                        data-i18n="gsTelemetrySpeed"></label>
                     <div class="groundstation-telemetry__value" id="gs-telemetry-speed">-</div>
                 </div>
 
                 <div class="groundstation-telemetry__row">
-                    <label for="gs-telemetry-latitude" class="groundstation-telemetry__label" data-i18n="gsTelemetryLatitude"></label>
+                    <label for="gs-telemetry-latitude" class="groundstation-telemetry__label"
+                        data-i18n="gsTelemetryLatitude"></label>
                     <div class="groundstation-telemetry__value" id="gs-telemetry-latitude">-</div>
                 </div>
 
                 <div class="groundstation-telemetry__row">
-                    <label class="groundstation-telemetry__label" for="gs-telemetry-longitude" data-i18n="gsTelemetryLongitude"></label>
+                    <label class="groundstation-telemetry__label" for="gs-telemetry-longitude"
+                        data-i18n="gsTelemetryLongitude"></label>
                     <div class="groundstation-telemetry__value" id="gs-telemetry-longitude">-</div>
                 </div>
 
                 <div class="groundstation-telemetry__row">
-                    <label class="groundstation-telemetry__label" for="gs-telemetry-longitude" data-i18n="gsTelemetrySats"></label>
+                    <label class="groundstation-telemetry__label" for="gs-telemetry-longitude"
+                        data-i18n="gsTelemetrySats"></label>
                     <div class="groundstation-telemetry__value" id="gs-telemetry-sats">-</div>
                 </div>
 
                 <div class="groundstation-telemetry__row">
-                    <label class="groundstation-telemetry__label" for="gs-telemetry-longitude" data-i18n="gsTelemetryFix"></label>
+                    <label class="groundstation-telemetry__label" for="gs-telemetry-longitude"
+                        data-i18n="gsTelemetryFix"></label>
                     <div class="groundstation-telemetry__value" id="gs-telemetry-fix">-</div>
                 </div>
 
@@ -238,179 +238,86 @@
                         <a href="#" data-i18n="tabFirmwareFlasher" class="tabicon ic_flasher"
                             title="Firmware Flasher"></a>
                     </li>
-                    <li class="tab_sitl">
-                        <a href="#" data-i18n="tabSitl" class="tabicon ic_sitl" title="SITL"></a>
-                    </li>
                 </ul>
                 <ul class="mode-connected">
-                    <!-- Setup & Configuration -->
-                    <li class="nav-group">
-                        <div class="group-header" role="button" tabindex="0" aria-expanded="false">
-                            <span class="group-title" data-i18n="navGroupSetup">Setup & Configuration</span>
-                            <span class="chevron">▸</span>
-                        </div>
-                        <ul class="group-items">
-                            <li class="tab_setup">
-                                <a href="#" data-i18n="tabSetup" class="tabicon ic_setup" data-i18n_title="tabSetup"></a>
-                            </li>
-                            <li class="tab_calibration">
-                                <a href="#" data-i18n="tabCalibration" class="tabicon ic_calibration" title="Calibration"></a>
-                            </li>
-                            <li class="tab_magnetometer">
-                                <a href="#" data-i18n="tabMAGNETOMETER" class="tabicon ic_mag" title="MAGNETOMETER"></a>
-                            </li>
-                            <li class="tab_configuration">
-                                <a href="#" data-i18n="tabConfiguration" class="tabicon ic_config" title="Configuration"></a>
-                            </li>
-                            <li class="tab_ports">
-                                <a href="#" data-i18n="tabPorts" class="tabicon ic_ports" title="Ports"></a>
-                            </li>
-                        </ul>
+                    <li class="tab_setup">
+                        <a href="#" data-i18n="tabSetup" class="tabicon ic_setup" data-i18n_title="tabSetup"></a>
+                    </li>
+                    <li class="tab_calibration">
+                        <a href="#" data-i18n="tabCalibration" class="tabicon ic_calibration" title="Calibration"></a>
+                    </li>
+                    <li class="tab_mixer">
+                        <a href="#" data-i18n="tabMixer" class="tabicon ic_mixer" title="Mixer"></a>
+                    </li>
+                    <li class="tab_outputs">
+                        <a href="#" data-i18n="tabOutputs" class="tabicon ic_motor" title="Outputs"></a>
+                    </li>
+                    <li class="tab_ports">
+                        <a href="#" data-i18n="tabPorts" class="tabicon ic_ports" title="Ports"></a>
+                    </li>
+                    <li class="tab_configuration">
+                        <a href="#" data-i18n="tabConfiguration" class="tabicon ic_config" title="Configuration"></a>
+                    </li>
+                    <li class="tab_failsafe">
+                        <a href="#" data-i18n="tabFailsafe" class="tabicon ic_failsafe" title="Failsafe"></a>
+                    </li>
+                    <li class="tab_pid_tuning">
+                        <a href="#" data-i18n="tabPidTuning" class="tabicon ic_pid" data-i18n_title="tabPidTuning"></a>
+                    </li>
+                    <li class="tab_advanced_tuning">
+                        <a href="#" data-i18n="tabAdvancedTuning" class="tabicon ic_advanced"
+                            title="Advanced Tuning"></a>
+                    </li>
+                    <li class="tab_programming">
+                        <a href="#" data-i18n="tabProgramming" class="tabicon ic_config" title="Programming"></a>
+                    </li>
+                    <li class="tab_javascript_programming">
+                        <a href="#" i18n="tabJavaScriptProgramming" class="tabicon ic_javascript_programming"
+                            title="Javascript Programming">></a>
+                    </li>
+                    <li class="tab_receiver">
+                        <a href="#" data-i18n="tabReceiver" class="tabicon ic_rx" title="Receiver"></a>
+                    </li>
+                    <li class="tab_auxiliary">
+                        <a href="#" data-i18n="tabAuxiliary" class="tabicon ic_modes" title="Modes"></a>
+                    </li>
+                    <li class="tab_adjustments">
+                        <a href="#" data-i18n="tabAdjustments" class="tabicon ic_adjust" title="Adjustments"></a>
+                    </li>
+                    <li class="tab_gps">
+                        <a href="#" data-i18n="tabGPS" class="tabicon ic_gps" title="GPS"></a>
+                    </li>
+                    <li class="tab_magnetometer">
+                        <a href="#" data-i18n="tabMAGNETOMETER" class="tabicon ic_mag" title="MAGNETOMETER"></a>
+                    </li>
+                    <li class="tab_mission_control">
+                        <a href="#" data-i18n="tabMissionControl" class="tabicon ic_mission"
+                            title="Mission Control"></a>
+                    </li>
+                    <li class="tab_osd">
+                        <a href="#" data-i18n="tabOSD" class="tabicon ic_osd" title="OSD"></a>
+                    </li>
+                    <li class="tab_led_strip">
+                        <a href="#" data-i18n="tabLedStrip" class="tabicon ic_led" title="LED Strip"></a>
+                    </li>
+                    <li class="tab_sensors">
+                        <a href="#" data-i18n="tabRawSensorData" class="tabicon ic_sensors" title="Sensors"></a>
+                    </li>
+                    <li class="tab_logging">
+                        <a href="#" data-i18n="tabLogging" class="tabicon ic_log" title="Tethered Logging"></a>
+                    </li>
+                    <li class="tab_onboard_logging">
+                        <a href="#" data-i18n="tabOnboardLogging" class="tabicon ic_data" title="Onboard Logging"></a>
+                    </li>
+                    <li class="tab_cli">
+                        <a href="#" data-i18n="tabCLI" class="tabicon ic_cli" title="CLI"></a>
+                    </li>
+                    <li class="tab_search">
+                        <a href="#" data-i18n="search" class="tabicon ic_search" title="Search"></a>
                     </li>
 
-                    <!-- Flight Control -->
-                    <li class="nav-group">
-                        <div class="group-header" role="button" tabindex="0" aria-expanded="false">
-                            <span class="group-title" data-i18n="navGroupFlight">Flight Control</span>
-                            <span class="chevron">▸</span>
-                        </div>
-                        <ul class="group-items">
-                            <li class="tab_mixer">
-                                <a href="#" data-i18n="tabMixer" class="tabicon ic_mixer" title="Mixer"></a>
-                            </li>
-                            <li class="tab_outputs">
-                                <a href="#" data-i18n="tabOutputs" class="tabicon ic_motor" title="Outputs"></a>
-                            </li>
-                            <li class="tab_receiver">
-                                <a href="#" data-i18n="tabReceiver" class="tabicon ic_rx" title="Receiver"></a>
-                            </li>
-                            <li class="tab_auxiliary">
-                                <a href="#" data-i18n="tabAuxiliary" class="tabicon ic_modes" title="Modes"></a>
-                            </li>
-                            <li class="tab_failsafe">
-                                <a href="#" data-i18n="tabFailsafe" class="tabicon ic_failsafe" title="Failsafe"></a>
-                            </li>
-                        </ul>
-                    </li>
 
-                    <!-- Tuning -->
-                    <li class="nav-group">
-                        <div class="group-header" role="button" tabindex="0" aria-expanded="false">
-                            <span class="group-title" data-i18n="navGroupTuning">Tuning</span>
-                            <span class="chevron">▸</span>
-                        </div>
-                        <ul class="group-items">
-                            <li class="tab_pid_tuning">
-                                <a href="#" data-i18n="tabPidTuning" class="tabicon ic_pid" data-i18n_title="tabPidTuning"></a>
-                            </li>
-                            <li class="tab_advanced_tuning">
-                                <a href="#" data-i18n="tabAdvancedTuning" class="tabicon ic_advanced"
-                                    title="Advanced Tuning"></a>
-                            </li>
-                            <li class="tab_adjustments">
-                                <a href="#" data-i18n="tabAdjustments" class="tabicon ic_adjust" title="Adjustments"></a>
-                            </li>
-                        </ul>
-                    </li>
-
-                    <!-- Navigation & Mission -->
-                    <li class="nav-group">
-                        <div class="group-header" role="button" tabindex="0" aria-expanded="false">
-                            <span class="group-title" data-i18n="navGroupNavigation">Navigation & Mission</span>
-                            <span class="chevron">▸</span>
-                        </div>
-                        <ul class="group-items">
-                            <li class="tab_gps">
-                                <a href="#" data-i18n="tabGPS" class="tabicon ic_gps" title="GPS"></a>
-                            </li>
-                            <li class="tab_mission_control">
-                                <a href="#" data-i18n="tabMissionControl" class="tabicon ic_mission"
-                                    title="Mission Control"></a>
-                            </li>
-                        </ul>
-                    </li>
-
-                    <!-- Sensors & Peripherals -->
-                    <li class="nav-group">
-                        <div class="group-header" role="button" tabindex="0" aria-expanded="false">
-                            <span class="group-title" data-i18n="navGroupSensors">Sensors & Peripherals</span>
-                            <span class="chevron">▸</span>
-                        </div>
-                        <ul class="group-items">
-                            <li class="tab_sensors">
-                                <a href="#" data-i18n="tabRawSensorData" class="tabicon ic_sensors" title="Sensors"></a>
-                            </li>
-                            <li class="tab_osd">
-                                <a href="#" data-i18n="tabOSD" class="tabicon ic_osd" title="OSD"></a>
-                            </li>
-                            <li class="tab_led_strip">
-                                <a href="#" data-i18n="tabLedStrip" class="tabicon ic_led" title="LED Strip"></a>
-                            </li>
-                        </ul>
-                    </li>
-
-                    <!-- Data Logging -->
-                    <li class="nav-group">
-                        <div class="group-header" role="button" tabindex="0" aria-expanded="false">
-                            <span class="group-title" data-i18n="navGroupLogging">Data Logging</span>
-                            <span class="chevron">▸</span>
-                        </div>
-                        <ul class="group-items">
-                            <li class="tab_onboard_logging">
-                                <a href="#" data-i18n="tabOnboardLogging" class="tabicon ic_data" title="Onboard Logging"></a>
-                            </li>
-                            <li class="tab_logging">
-                                <a href="#" data-i18n="tabLogging" class="tabicon ic_log" title="Tethered Logging"></a>
-                            </li>
-                        </ul>
-                    </li>
-
-                    <!-- Programming -->
-                    <li class="nav-group">
-                        <div class="group-header" role="button" tabindex="0" aria-expanded="false">
-                            <span class="group-title" data-i18n="navGroupProgramming">Programming</span>
-                            <span class="chevron">▸</span>
-                        </div>
-                        <ul class="group-items">
-                            <li class="tab_programming">
-                                <a href="#" data-i18n="tabProgramming" class="tabicon ic_config" title="Programming"></a>
-                            </li>
-                            <li class="tab_javascript_programming">
-                                <a href="#" data-i18n="tabJavaScriptProgramming" class="tabicon ic_javascript_programming" title="Javascript Programming"></a>
-                            </li>
-                        </ul>
-                    </li>
-
-                    <!-- Tools -->
-                    <li class="nav-group">
-                        <div class="group-header" role="button" tabindex="0" aria-expanded="false">
-                            <span class="group-title" data-i18n="navGroupTools">Tools</span>
-                            <span class="chevron">▸</span>
-                        </div>
-                        <ul class="group-items">
-                            <li class="tab_cli">
-                                <a href="#" data-i18n="tabCLI" class="tabicon ic_cli" title="CLI"></a>
-                            </li>
-                            <li class="tab_search">
-                                <a href="#" data-i18n="search" class="tabicon ic_search" title="Search"></a>
-                            </li>
-                        </ul>
-                    </li>
-
-                    <!-- Expand/Collapse All Toggle -->
-                    <li class="nav-toggle-all">
-                        <a href="#" id="toggleAllGroups">
-                            <svg class="expand-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" role="img" aria-labelledby="expand-title">
-                                <title id="expand-title" data-i18n="navExpandAll">Expand All</title>
-                                <path d="M7 13l5 5 5-5M7 6l5 5 5-5" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                            <svg class="collapse-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" role="img" aria-labelledby="collapse-title" style="display: none;">
-                                <title id="collapse-title" data-i18n="navCollapseAll">Collapse All</title>
-                                <path d="M17 11l-5-5-5 5M17 18l-5-5-5 5" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                            <span class="toggle-text" data-i18n="navExpandAll">Expand All</span>
-                        </a>
-                    </li>
+                    <!-- <li class=""><a href="#" class="tabicon ic_advanced">Advanced (spare icon)</a></li> -->
                 </ul>
             </div>
             <div class="clear-both"></div>

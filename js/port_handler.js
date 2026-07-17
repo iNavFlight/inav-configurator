@@ -26,142 +26,39 @@ PortHandler.initialize = function () {
 PortHandler.check = function () {
     var self = this;
 
-    ConnectionSerial.getDevices().then((all_ports) => {
-        // filter out ports that are not serial
-        let current_ports = [];
-        for (var i = 0; i < all_ports.length; i++) {
-            if (all_ports[i].indexOf(':') === -1) {
-                current_ports.push(all_ports[i]);
-            }
-        }
-        
-        // port got removed or initial_ports wasn't initialized yet
-        if (self.array_difference(self.initial_ports, current_ports).length > 0 || !self.initial_ports) {
-            var removed_ports = self.array_difference(self.initial_ports, current_ports);
+    // 简化检查逻辑，只初始化端口选择器
+    if (!self.initial_ports) {
+        self.initial_ports = true;
 
-            if (self.initial_ports != false) {
-                if (removed_ports.length > 1) {
-                    console.log('PortHandler - Removed: ' + removed_ports);
-                } else {
-                    console.log('PortHandler - Removed: ' + removed_ports[0]);
-                }
-            }
+        // 初始化端口选择
+        self.update_port_select([]);
 
-            // disconnect "UI" if necessary
-            // Keep in mind that this routine can not fire during atmega32u4 reboot procedure !!!
-            if (GUI.connected_to) {
-                for (var i = 0; i < removed_ports.length; i++) {
-                    if (removed_ports[i] == GUI.connected_to) {
-                        $('div#port-picker a.connect').trigger( "click" );
-                    }
-                }
-            }
-
-            self.update_port_select(current_ports);
-
-            // trigger callbacks (only after initialization)
-            if (self.initial_ports) {
-                for (var i = (self.port_removed_callbacks.length - 1); i >= 0; i--) {
-                    var obj = self.port_removed_callbacks[i];
-
-                    // remove timeout
-                    clearTimeout(obj.timer);
-
-                    // trigger callback
-                    obj.code(removed_ports);
-
-                    // remove object from array
-                    var index = self.port_removed_callbacks.indexOf(obj);
-                    if (index > -1) self.port_removed_callbacks.splice(index, 1);
-                }
-            }
-
-            // auto-select last used port (only during initialization)
-            if (!self.initial_ports) {
-                const last_used_port = store.get('last_used_port', false);
-                // if last_used_port was set, we try to select it
-                if (last_used_port) {
-                    if (last_used_port == "ble" || last_used_port == "tcp" || last_used_port == "udp" || last_used_port == "sitl" || last_used_port == "sitl-demo") {
-                        $('#port').val(last_used_port);
-                    } else {
-                        current_ports.forEach(function(port) {
-                            if (port == last_used_port) {
-                                console.log('Selecting last used port: ' + last_used_port);
-                                $('#port').val(last_used_port);
-                            }
-                        });
-                    }
-                } else {
-                    console.log('Last used port wasn\'t saved "yet", auto-select disabled.');
-                }
-                
-                var last_used_bps = store.get('last_used_bps', false);
-                if (last_used_bps) {
-                    $('#baud').val(last_used_bps);
-                }
-
-                if (store.get('wireless_mode_enabled', false)) {
-                    $('#wireless-mode').prop('checked', true).trigger('change');
-                }
-
-            }
-
-            if (!self.initial_ports) {
-                // initialize
-                self.initial_ports = current_ports;
+        // 恢复上次使用的连接方式
+        store.get('last_connection_type', 'serial').then(last_type => {
+            if (last_type == 'ble') {
+                $('#port').val('ble');
             } else {
-                for (var i = 0; i < removed_ports.length; i++) {
-                    self.initial_ports.splice(self.initial_ports.indexOf(removed_ports[i]), 1);
-                }
+                $('#port').val('serial');
             }
-        }
+            $('#port').trigger('change');
+        });
 
-        // new port detected
-        var new_ports = self.array_difference(current_ports, self.initial_ports);
-
-        if (new_ports.length) {
-            if (new_ports.length > 1) {
-                console.log('PortHandler - Found: ' + new_ports);
-            } else {
-                console.log('PortHandler - Found: ' + new_ports[0]);
+        // 恢复波特率设置
+        store.get('last_used_bps', false).then(last_used_bps => {
+            if (last_used_bps) {
+                $('#baud').val(last_used_bps);
             }
+        });
+    }
 
-            self.update_port_select(current_ports);
+    // 检查 DFU 设备
+    self.check_usb_devices();
 
-            // select / highlight new port, if connected -> select connected port
-            if (!GUI.connected_to) {
-                $('div#port-picker #port').val(new_ports[0]);
-            } else {
-                $('div#port-picker #port').val(GUI.connected_to);
-            }
+    GUI.updateManualPortVisibility();
 
-            // trigger callbacks
-            for (var i = (self.port_detected_callbacks.length - 1); i >= 0; i--) {
-                var obj = self.port_detected_callbacks[i];
-
-                // remove timeout
-                clearTimeout(obj.timer);
-
-                // trigger callback
-                obj.code(new_ports);
-
-                // remove object from array
-                var index = self.port_detected_callbacks.indexOf(obj);
-                if (index > -1) self.port_detected_callbacks.splice(index, 1);
-            }
-
-            self.initial_ports = current_ports;
-        }
-
-        self.check_usb_devices();
-
-        GUI.updateManualPortVisibility();
-        
-        setTimeout(function () {
-            self.check();
-        }, 250);
-        
-    });
+    setTimeout(function () {
+        self.check();
+    }, 1000); // 降低检查频率
 };
 
 PortHandler.check_usb_devices = function (callback) {
@@ -197,16 +94,9 @@ PortHandler.check_usb_devices = function (callback) {
 PortHandler.update_port_select = function (ports) {
     $('div#port-picker #port').html(''); // drop previous one
 
-    for (var i = 0; i < ports.length; i++) {
-        $('div#port-picker #port').append($("<option/>", {value: ports[i], text: ports[i], data: {isManual: false}}));
-    }
-
-    $('div#port-picker #port').append($("<option/>", {value: 'manual', text: 'Manual Selection', data: {isManual: true}}));
-    $('div#port-picker #port').append($("<option/>", {value: 'ble', text: 'BLE', data: {isBle: true}}));
-    $('div#port-picker #port').append($("<option/>", {value: 'tcp', text: 'TCP', data: {isTcp: true}}));
-    $('div#port-picker #port').append($("<option/>", {value: 'udp', text: 'UDP', data: {isUdp: true}}));
-    $('div#port-picker #port').append($("<option/>", {value: 'sitl', text: 'SITL', data: {isSitl: true}}));
-    $('div#port-picker #port').append($("<option/>", {value: 'sitl-demo', text: 'Demo mode', data: {isSitl: true}}));
+    // 只显示两种连接方式
+    $('div#port-picker #port').append($("<option/>", {value: 'serial', text: '串口连接 (Serial)', data: {isSerial: true}}));
+    $('div#port-picker #port').append($("<option/>", {value: 'ble', text: '蓝牙连接 (BLE)', data: {isBle: true}}));
 };
 
 PortHandler.port_detected = function(name, code, timeout, ignore_timeout) {

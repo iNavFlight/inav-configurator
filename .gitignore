@@ -17,8 +17,7 @@ inav-configurator.iml
 *.swp
 *.bak
 eeprom.bin
-
+dist-web
 # ctags
 tags
 TAGS
-start-with-debugging.sh
