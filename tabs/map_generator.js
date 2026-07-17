@@ -152,13 +152,13 @@ function getTilePath({ target, isZipMode, provider, mapType, z, x, y, subtarget 
 
     if (isZipMode) {
         // ZIP path is the same for both ETHOS and EdgeTX
-        return ['yaapu', 'maps', yaapuMapName, displayZoom, `${y}`, `s_${x}.png`];
+        return ['yaapu', 'maps', yaapuMapName, displayZoom, `${y}`, `s_${x}.jpg`];
     }
     // SD path differs: ETHOS uses /bitmaps/, EdgeTX uses /IMAGES/
     const base = subtarget === 'edgetx'
         ? ['IMAGES', 'yaapu', 'maps']
         : ['bitmaps', 'yaapu', 'maps'];
-    return [...base, yaapuMapName, displayZoom, `${y}`, `s_${x}.png`];
+    return [...base, yaapuMapName, displayZoom, `${y}`, `s_${x}.jpg`];
 }
 
 // ─── Image loading with timeout ─────────────────────────────────────────
@@ -202,8 +202,8 @@ function createWorkerCanvas() {
 }
 
 function canvasToArrayBuffer(canvas, target) {
-    const mimeType = (target === 'b14ckyy') ? 'image/jpeg' : 'image/png';
-    const quality = (target === 'b14ckyy') ? 0.7 : undefined;
+    const mimeType = 'image/jpeg';
+    const quality = (target === 'b14ckyy') ? 0.7 : 0.8;
     return new Promise((resolve, reject) => {
         canvas.toBlob(blob => {
             if (!blob) return reject(new Error('Canvas conversion failed'));
@@ -1182,7 +1182,7 @@ TABS.map_generator.initialize = function (callback) {
             const maxZoomTiles = calculateTiles(bounds, maxZ, maxZ);
             let statusHtml =
                 `<span class="mapgen-area">Area: ${formatArea(area, unit)}</span><br>` +
-                `<span class="mapgen-tiles">Total Tiles (100x100 PNG): ${tiles.toLocaleString()}</span>`;
+                `<span class="mapgen-tiles">Total Tiles (100x100 JPEG): ${tiles.toLocaleString()}</span>`;
             if (maxZoomTiles < 64) {
                 statusHtml += `<br><span style="color:#c62828;">&#9888;&#65039; Low tile coverage at max zoom (${maxZoomTiles} tiles). Consider increasing max zoom.</span>`;
             }
@@ -1408,7 +1408,7 @@ TABS.map_generator.initialize = function (callback) {
             if (!zipMode) {
                 base = subtarget === 'edgetx' ? '/IMAGES/yaapu/maps' : '/bitmaps/yaapu/maps';
             }
-            return `${base}/${displayMapType}/[Z]/[Y]/s_[X].png`;
+            return `${base}/${displayMapType}/[Z]/[Y]/s_[X].jpg`;
         }
 
         function buildTargetLabel(target, subtarget) {
