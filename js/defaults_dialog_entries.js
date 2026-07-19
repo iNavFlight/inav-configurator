@@ -582,10 +582,6 @@ var defaultsDialogData = [
                 key: "nav_fw_launch_max_altitude",
                 value: 5000
             },
-            {
-                key: "nav_fw_launch_climb_angle",
-                value: 25
-            },
             /*
              * TPA
              */
@@ -806,10 +802,6 @@ var defaultsDialogData = [
             {
                 key: "nav_fw_launch_max_altitude",
                 value: 5000
-            },
-            {
-                key: "nav_fw_launch_climb_angle",
-                value: 25
             },
             /*
              * TPA
