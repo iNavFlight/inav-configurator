@@ -4,6 +4,7 @@ import MSPCodes from './msp/MSPCodes';
 import mspQueue from './serial_queue';
 import eventFrequencyAnalyzer from './eventFrequencyAnalyzer';
 import timeout from './timeouts';
+import CONFIGURATOR from './data_storage';
 
 /**
  *
@@ -392,13 +393,20 @@ var MSP = {
      * awaiting it, so retry briefly before giving up.
      */
     _enqueue(message) {
-        if (mspQueue.put(message)) {
+        // CONFIGURATOR.cliActive can flip true between retries (each one is a
+        // separate setTimeout, well after the original send_message() call).
+        // Check it before every attempt, including the first: a successful
+        // mspQueue.put() here would land the message in the FC's raw CLI
+        // stream instead of being MSP-parsed, regardless of which attempt
+        // this is. Give up rather than retry once that's happened - same as
+        // exhausting putRetries.
+        if (!CONFIGURATOR.cliActive && mspQueue.put(message)) {
             return;
         }
         if (message.putRetries === undefined) {
             message.putRetries = 25;
         }
-        if (message.putRetries > 0) {
+        if (message.putRetries > 0 && !CONFIGURATOR.cliActive) {
             message.putRetries--;
             setTimeout(() => this._enqueue(message), 150);
         } else if (message.onFinish) {
