@@ -153,6 +153,7 @@ const realMspUrl = rewriteAndWrite('js/msp.js', [
     [/^import mspQueue from '\.\/serial_queue';$/m, `import mspQueue from '${realMspQueueUrl}';`, "import mspQueue"],
     [/^import eventFrequencyAnalyzer from '\.\/eventFrequencyAnalyzer';$/m, `import eventFrequencyAnalyzer from '${realEventFrequencyAnalyzerUrl}';`, "import eventFrequencyAnalyzer"],
     [/^import timeout from '\.\/timeouts';$/m, `import timeout from '${realTimeoutUrl}';`, "import timeout"],
+    [/^import CONFIGURATOR from '\.\/data_storage';$/m, `import CONFIGURATOR from '${realConfiguratorUrl}';`, "import CONFIGURATOR"],
 ], 'msp-generated');
 
 function dataModule(code) {
@@ -479,6 +480,91 @@ test('periodicStatusUpdater.run() sanity check: sends MSP polls when CLI is not 
     // meaningless (it could be "passing" only because run() never sends
     // anything at all).
     assert.equal(mspQueue.getLength(), 4, 'periodicStatusUpdater.run() should queue its 4 status-poll MSP requests when CLI is not active');
+
+    mspQueue.flush();
+    mspDeduplicationQueue.flush();
+});
+
+test('MSP._enqueue retry must not land a message once CLI becomes active mid-retry', async () => {
+    const { default: MSP } = await import(realMspUrl);
+    const { default: mspQueue } = await import(realMspQueueUrl);
+    const { default: CONFIGURATOR } = await import(realConfiguratorUrl);
+    const { default: mspDeduplicationQueue } = await import(realMspDedupUrl);
+    const { default: MSPCodes } = await import(realMspCodesUrl);
+
+    CONFIGURATOR.connection = false;
+    CONFIGURATOR.connectionValid = true;
+    CONFIGURATOR.cliActive = false;
+    mspQueue.flush();
+    mspDeduplicationQueue.flush();
+
+    const code = MSPCodes.MSP_SENSOR_STATUS;
+
+    // Simulate a still-pending earlier request with the same MSP code (e.g.
+    // periodicStatusUpdater's previous tick, whose response hasn't arrived
+    // yet because round-trip time exceeds the poll interval - a real
+    // condition on a slow/loaded serial link). mspQueue.put() rejects this
+    // as a duplicate, so MSP.send_message()'s _enqueue() falls back to its
+    // retry-in-150ms path instead of queuing immediately.
+    mspDeduplicationQueue.put(code);
+
+    let finishedWith;
+    MSP.send_message(code, false, false, (result) => { finishedWith = result; });
+
+    assert.equal(mspQueue.getLength(), 0, 'sanity: the duplicate must not have been queued on the first attempt');
+
+    // CLI becomes active in the gap before the retry fires - exactly what
+    // happens in the running app when the user switches to the CLI tab
+    // while an earlier status poll of the same code is still in flight.
+    CONFIGURATOR.cliActive = true;
+    // The original still-pending request now finishes/expires, so if the
+    // retry doesn't check cliActive, it would succeed in queuing this
+    // instance the moment the dedup collision clears.
+    mspDeduplicationQueue.remove(code);
+
+    await new Promise((r) => setTimeout(r, 200)); // > the 150ms retry delay
+
+    assert.equal(
+        mspQueue.getLength(),
+        0,
+        'MSP._enqueue must not land a retried message once CONFIGURATOR.cliActive became true in the meantime'
+    );
+    assert.equal(finishedWith, false, 'the abandoned message should still resolve its callback with false, not hang forever');
+
+    mspQueue.flush();
+    mspDeduplicationQueue.flush();
+});
+
+test('MSP._enqueue retry sanity check: succeeds once the duplicate clears while CLI stays inactive (positive control)', async () => {
+    const { default: MSP } = await import(realMspUrl);
+    const { default: mspQueue } = await import(realMspQueueUrl);
+    const { default: CONFIGURATOR } = await import(realConfiguratorUrl);
+    const { default: mspDeduplicationQueue } = await import(realMspDedupUrl);
+    const { default: MSPCodes } = await import(realMspCodesUrl);
+
+    CONFIGURATOR.connection = false;
+    CONFIGURATOR.connectionValid = true;
+    CONFIGURATOR.cliActive = false;
+    mspQueue.flush();
+    mspDeduplicationQueue.flush();
+
+    const code = MSPCodes.MSP_SENSOR_STATUS;
+    mspDeduplicationQueue.put(code);
+
+    let finishedWith;
+    MSP.send_message(code, false, false, (result) => { finishedWith = result; });
+    assert.equal(mspQueue.getLength(), 0, 'sanity: the duplicate must not have been queued on the first attempt');
+
+    mspDeduplicationQueue.remove(code);
+    await new Promise((r) => setTimeout(r, 200));
+
+    // This is the behavior the retry mechanism exists for: once the
+    // duplicate clears and CLI never became active, the retry SHOULD
+    // eventually land the message. If this fails, the negative-case test
+    // above would be meaningless (it could be "passing" only because
+    // retries never queue anything at all).
+    assert.equal(mspQueue.getLength(), 1, 'the retried message should be queued once the duplicate clears and CLI stayed inactive');
+    assert.equal(finishedWith, undefined, 'onFinish should not fire for a message that was successfully queued');
 
     mspQueue.flush();
     mspDeduplicationQueue.flush();
