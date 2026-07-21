@@ -6338,9 +6338,6 @@
   "missionGridEndRTH": {
     "message": "End with RTH"
   },
-  "missionGridPreview": {
-    "message": "Preview"
-  },
   "missionGridGenerate": {
     "message": "Generate"
   },

@@ -4182,8 +4182,9 @@ function iconKey(filename) {
         let gridPolygonGeom = null;
 
         function getGridParams() {
+            const spacing = Number.parseFloat($('#gridSpacing').val());
             return {
-                spacing: Number.parseFloat($('#gridSpacing').val()) || 25,
+                spacing: Number.isNaN(spacing) ? 100 : spacing,
                 altitude: (Number.parseFloat($('#gridAltitude').val()) || 50) * 100,
                 speed: (Number.parseFloat($('#gridSpeed').val()) || 0) * 100,
                 angle: Number.parseFloat($('#gridAngle').val()) || 0,
