@@ -187,6 +187,7 @@ var SerialBackend = (function () {
                         mspQueue.freeSoftLock();
                         mspDeduplicationQueue.flush();
                         MSP.disconnect_cleanup();
+                        ltmDecoder.reset();
 
                         // lock port select & baud while we are connecting / connected
                         $('#port, #baud, #delay').prop('disabled', true);
@@ -260,6 +261,7 @@ var SerialBackend = (function () {
 
                             CONFIGURATOR.connection.disconnect(privateScope.onClosed);
                             MSP.disconnect_cleanup();
+                            ltmDecoder.reset();
 
                             // Reset various UI elements
                             $('span.i2c-error').text(0);
@@ -387,9 +389,10 @@ var SerialBackend = (function () {
             // garbage bytes or boot messages don't corrupt the MSP decoder
             FC.resetState();
             MSP.disconnect_cleanup();
+            ltmDecoder.reset();
 
             CONFIGURATOR.connection.addOnReceiveListener(publicScope.read_serial);
-            CONFIGURATOR.connection.addOnReceiveListener(ltmDecoder.read);
+            CONFIGURATOR.connection.addOnReceiveListener(publicScope.read_ltm);
 
             // disconnect after 10 seconds with error if we don't get IDENT data
             timeout.add('connecting', function () {
@@ -408,9 +411,11 @@ var SerialBackend = (function () {
                 }
             }, 10000);
 
-            //Add a timer that every 1s will check if LTM stream is receiving data and display alert if so
+            // LTM is only a fallback for an LTM-only connection. Once MSP has
+            // been validated, its payloads (including raw dataflash blocks)
+            // must never be interpreted as LTM telemetry.
             interval.add('ltm-connection-check', function () {
-                if (ltmDecoder.isReceiving()) {
+                if (!CONFIGURATOR.connectionValid && !MSP.wasEverReceiving() && ltmDecoder.isReceiving()) {
                     groundstation.activate($('#main-wrapper'));
                 }
             }, 1000);
@@ -534,6 +539,19 @@ var SerialBackend = (function () {
             MSP.read(info);
         } else if (CONFIGURATOR.cliActive) {
             cliTab.read(info);
+        }
+    }
+
+    publicScope.read_ltm = function (info) {
+        // LTM is only a fallback until we see the first checksum-valid MSP
+        // response. That avoids interpreting MSP setup payloads and, later,
+        // MSP_DATAFLASH_READ's arbitrary Blackbox bytes as LTM telemetry.
+        if (!CONFIGURATOR.connectionValid && !MSP.wasEverReceiving()) {
+            ltmDecoder.read(info);
+        } else if (MSP.wasEverReceiving()) {
+            // Clear a candidate LTM frame that may have arrived before the
+            // first valid MSP response completed protocol detection.
+            ltmDecoder.reset();
         }
     }
 
