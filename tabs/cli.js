@@ -518,12 +518,10 @@ cliTab.read = function (readInfo) {
         }
     }
 
-    // fallback to native autocomplete
-    if (!CliAutoComplete.isEnabled()) {
+    // do not echo the cache builder output into the input textarea
+    if (!CliAutoComplete.isBuilding()) {
         setPrompt(removePromptHash(this.cliBuffer));
     }
-
-    setPrompt(removePromptHash(this.cliBuffer));
 
     if (cliTab.promptCallback && this.cliBuffer.endsWith('# ')) {
         const cb = cliTab.promptCallback;
