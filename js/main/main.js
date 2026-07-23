@@ -1,11 +1,11 @@
-import { chmod, rm } from 'node:fs';
-import { app, BrowserWindow, ipcMain, Menu, MenuItem, shell, dialog } from 'electron';
+import { chmod, rm, mkdirSync, existsSync } from 'node:fs';
+import { app, BrowserWindow, ipcMain, Menu, MenuItem, shell, dialog, session } from 'electron';
 import windowStateKeeper from 'electron-window-state';
 import Store from "electron-store";
 import path from 'path';
 import { fileURLToPath } from 'node:url';
 import started from 'electron-squirrel-startup';
-import { writeFile, readFile, appendFile } from 'node:fs/promises';
+import { writeFile, readFile, appendFile, readdir } from 'node:fs/promises';
 
 import tcp from './tcp';
 import udp from './udp';
@@ -13,6 +13,19 @@ import serial from './serial';
 import child_process from './child_process';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+/**
+ * Returns the base path for SITL binaries.
+ * - In packaged mode: uses Electron's resourcesPath (where extraResource files are placed)
+ * - In dev mode: uses the source location in resources/public/sitl
+ */
+function getSitlBasePath() {
+  if (app.isPackaged) {
+    return path.join(process.resourcesPath, 'sitl');
+  } else {
+    return path.join(app.getAppPath(), 'resources', 'public', 'sitl');
+  }
+}
 
 const usbBootloaderIds =  [
   { vendorId: 1155, productId: 57105}, 
@@ -31,9 +44,19 @@ let selectBluetoothCallback = null;
 
 const store = new Store();
 
-// Workaround for some Linux systems: https://github.com/electron/electron/issues/32760 
-if (process.platform === 'linux') {
+// Workaround for some Linux systems: https://github.com/electron/electron/issues/32760
+if (store.get('disable_3d_acceleration', false)) {
   app.disableHardwareAcceleration();
+}
+
+// Enable remote debugging in development mode
+// This allows chrome://inspect and Playwright CDP connections
+if (!app.isPackaged) {  // Development mode (not packaged)
+  const port = process.env.CDP_PORT ?? '9222';
+  app.commandLine.appendSwitch('remote-debugging-port', port);
+  console.log(`[cdp] Remote debugging enabled on port ${port}`);
+  console.log(`   Chrome DevTools: chrome://inspect`);
+  console.log(`   CDP Endpoint: http://localhost:${port}`);
 }
 
 // In Electron the bluetooth device chooser didn't exist, so we have to build our own
@@ -41,7 +64,7 @@ function createDeviceChooser() {
   bluetoothDeviceChooser = new BrowserWindow({
     parent: mainWindow,
     width: 410,
-    height: 400,
+    height: 600,
     webPreferences: {
       preload: path.join(__dirname, 'bt-device-chooser-preload.mjs'),
     }
@@ -74,6 +97,18 @@ function createDeviceChooser() {
 }
 
 app.on('ready', () => {
+  // Electron provides no valid Referer for OSM tiles (file:// in prod, localhost in dev).
+  // OSM CDN rejects both with 403, so inject the required headers unconditionally.
+  const PROJECT_URL = 'https://github.com/iNavFlight/inav-configurator';
+  session.defaultSession.webRequest.onBeforeSendHeaders(
+    { urls: ['https://tile.openstreetmap.org/*', 'https://*.tile.openstreetmap.org/*'] },
+    (details, callback) => {
+      details.requestHeaders['Referer'] = PROJECT_URL;
+      details.requestHeaders['User-Agent'] = `INAV-Configurator/${app.getVersion()} (${PROJECT_URL})`;
+      callback({ requestHeaders: details.requestHeaders });
+    }
+  );
+
   createWindow();
 });
 
@@ -257,16 +292,44 @@ app.whenReady().then(() => {
     return dialog.showOpenDialog(options);
   }),
 
-  ipcMain.handle('dialog.showSaveDialog', (_event, options) => {
-    return dialog.showSaveDialog(options);
+  ipcMain.handle('dialog.showSaveDialog', async (_event, options) => {
+    const opts = options || {};
+    const LAST_SAVE_DIRECTORY_KEY = 'lastSaveDirectory';
+
+    // Get the last save directory from store
+    const lastDirectory = store.get(LAST_SAVE_DIRECTORY_KEY, null);
+
+    // If we have a last directory, combine it with the filename if one was provided
+    if (lastDirectory && opts.defaultPath) {
+      // If defaultPath is just a filename (no directory), prepend the last directory
+      if (!path.dirname(opts.defaultPath) || path.dirname(opts.defaultPath) === '.') {
+        opts.defaultPath = path.join(lastDirectory, opts.defaultPath);
+      }
+    } else if (lastDirectory && !opts.defaultPath) {
+      // No filename provided, just use the directory
+      opts.defaultPath = lastDirectory;
+    }
+
+    // Show the save dialog
+    const result = await dialog.showSaveDialog(opts);
+
+    // If user selected a file (didn't cancel), save the directory for next time
+    if (result && result.filePath && !result.canceled) {
+      // Extract directory from the full file path (path already imported at top)
+      const directory = path.dirname(result.filePath);
+      store.set(LAST_SAVE_DIRECTORY_KEY, directory);
+    }
+
+    return result;
   }),
 
   ipcMain.on('dialog.alert', (event, message) => {
     event.returnValue = dialog.showMessageBoxSync({ message: message, icon: path.join(__dirname, 'inav_icon_128.png')});
   });
 
-  ipcMain.on('dialog.confirm', (event, message) => {
-    event.returnValue = (dialog.showMessageBoxSync({ message: message, icon: path.join(__dirname, 'inav_icon_128.png'), buttons: ["Yes", "No"]}) == 0);
+  ipcMain.handle('dialog.confirm', async (_event, message) => {
+    const result = await dialog.showMessageBox({ message: message, icon: path.join(__dirname, 'inav_icon_128.png'), buttons: ["Yes", "No"] });
+    return result.response === 0;
   });
 
   ipcMain.handle('tcpConnect', (_event, host, port) => {
@@ -340,7 +403,7 @@ app.whenReady().then(() => {
 
   ipcMain.handle('chmod', (_event, pathName, mode) => {
     return new Promise(resolve => {
-      chmod(path.join(__dirname, 'sitl', pathName), mode, error => {
+      chmod(path.join(getSitlBasePath(), pathName), mode, error => {
         if (error) {
           resolve(error.message)
         } else {
@@ -362,8 +425,34 @@ app.whenReady().then(() => {
     });
   });
 
+  ipcMain.handle('getBackupDir', (_event) => {
+    const backupDir = path.join(app.getPath('userData'), 'inav-backups');
+    if (!existsSync(backupDir)) {
+      mkdirSync(backupDir, { recursive: true });
+    }
+    return backupDir;
+  });
+
+  ipcMain.handle('openBackupDir', (_event) => {
+    const backupDir = path.join(app.getPath('userData'), 'inav-backups');
+    if (!existsSync(backupDir)) {
+      mkdirSync(backupDir, { recursive: true });
+    }
+    shell.openPath(backupDir); // fire-and-forget: xdg-open on Linux never exits
+    return backupDir;
+  });
+
+  ipcMain.handle('listBackups', async (_event) => {
+    const backupDir = path.join(app.getPath('userData'), 'inav-backups');
+    if (!existsSync(backupDir)) {
+      return [];
+    }
+    const files = await readdir(backupDir);
+    return files.filter(f => f.endsWith('.txt') || f.endsWith('.cli'));
+  });
+
   ipcMain.on('startChildProcess', (_event, command, args, opts) => {
-    child_process.start(path.join(__dirname, 'sitl', command), args, opts, mainWindow);
+    child_process.start(path.join(getSitlBasePath(), command), args, opts, mainWindow);
   });
 
   ipcMain.on('killChildProcess', (_event) => {

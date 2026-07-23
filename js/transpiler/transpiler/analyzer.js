@@ -126,6 +126,9 @@ class SemanticAnalyzer {
       case 'VarDeclaration':
         this.handleVarDeclaration(stmt);
         break;
+      case 'StickyAssignment':
+        this.handleStickyAssignment(stmt);
+        break;
       case 'Assignment':
         this.checkAssignment(stmt);
         break;
@@ -148,6 +151,25 @@ class SemanticAnalyzer {
   handleVarDeclaration(stmt) {
     this.variableHandler.addVarVariable(stmt.name, stmt.initExpr, stmt.loc);
   }
+
+  /**
+   * Handle sticky assignment (var latch1 = sticky({...}) or latch1 = sticky({...}))
+   * Registers the variable as a special "latch" type so it's recognized in conditions
+   */
+  handleStickyAssignment(stmt) {
+    // Check if variable was pre-declared (e.g., var latch1;)
+    // This pattern is used by the decompiler when sticky has an activator
+    const existing = this.variableHandler.getVariable(stmt.target);
+    if (existing && existing.kind === 'var') {
+      // Convert from 'var' to 'latch' - update existing entry
+      this.variableHandler.convertToLatch(stmt.target);
+      return;
+    }
+
+    // Register as a special latch variable - doesn't use gvar slots
+    // The codegen will map it to an LC index
+    this.variableHandler.addLatchVariable(stmt.target, stmt.loc);
+  }
   
   /**
    * Check assignment statement
@@ -155,26 +177,36 @@ class SemanticAnalyzer {
   checkAssignment(stmt) {
     const line = stmt.loc ? stmt.loc.start.line : 0;
 
+    // Normalize target (strip 'inav.' prefix if present)
+    let normalizedTarget = stmt.target.startsWith('inav.') ? stmt.target.substring(5) : stmt.target;
+
     // Check for let reassignment (error)
-    if (this.variableHandler.checkLetReassignment(stmt.target, stmt.loc)) {
+    if (this.variableHandler.checkLetReassignment(normalizedTarget, stmt.loc)) {
       return; // Error already added by variableHandler
     }
 
     // Check if target is valid
-    if (stmt.target.startsWith('gvar[')) {
-      const index = this.extractGvarIndex(stmt.target);
+    if (normalizedTarget.startsWith('gvar[')) {
+      const index = this.extractGvarIndex(normalizedTarget);
       if (index === -1) {
         this.addError(`Invalid gvar syntax: ${stmt.target}`, line);
       } else if (index >= this.gvarCount) {
         this.addError(`Invalid gvar index ${index}. INAV only has gvar[0] through gvar[${this.gvarCount - 1}]`, line);
       }
-    } else if (this.variableHandler.isVariable(stmt.target)) {
+    } else if (this.variableHandler.isVariable(normalizedTarget)) {
       // Variable assignment - allowed for var variables
       // (let reassignment already caught above)
     } else if (!this.isValidWritableProperty(stmt.target)) {
-      this.addError(`Cannot assign to '${stmt.target}'. Not a valid INAV writable property.`, line);
+      // Check if it's an intermediate object and provide helpful error
+      const betterError = this.getImprovedWritabilityError(stmt.target, line);
+      if (betterError) {
+        this.addError(betterError, line);
+      } else {
+        // Use original target (with inav. prefix) for writability check
+        this.addError(`Cannot assign to '${stmt.target}'. Not a valid INAV writable property.`, line);
+      }
     }
-    
+
     // Check if value references are valid
     if (typeof stmt.value === 'string') {
       this.checkPropertyAccess(stmt.value, line);
@@ -342,7 +374,111 @@ class SemanticAnalyzer {
   extractGvarIndex(gvarStr) {
     return this.propertyAccessChecker.extractGvarIndex(gvarStr);
   }
-  
+
+  /**
+   * Generate improved error message for invalid writable property assignments
+   * Detects intermediate objects and suggests correct nested properties
+   * @param {string} target - Property path (e.g., "inav.override.flightAxis.yaw")
+   * @param {number} line - Line number for error reporting
+   * @returns {string|null} Improved error message or null if no improvement available
+   */
+  getImprovedWritabilityError(target, line) {
+    // Strip 'inav.' prefix if present
+    const normalizedTarget = target.startsWith('inav.') ? target.substring(5) : target;
+    const parts = normalizedTarget.split('.');
+
+    // Only applies to override namespace for now
+    if (parts[0] !== 'override') {
+      return null;
+    }
+
+    // Check if trying to assign to a 3-level intermediate object
+    // E.g., override.flightAxis.yaw (should be override.flightAxis.yaw.angle or .rate)
+    if (parts.length === 3) {
+      const overrideDef = this.getOverrideDefinition(parts[1], parts[2]);
+
+      if (overrideDef && overrideDef.type === 'object' && overrideDef.properties) {
+        const availableProps = Object.keys(overrideDef.properties);
+        const suggestions = availableProps.map(p => `inav.override.${parts[1]}.${parts[2]}.${p}`).join(', ');
+        return `Cannot assign to '${target}' - it's an object, not a property. Available properties: ${suggestions}`;
+      }
+    }
+
+    // Check if trying to assign to a 2-level intermediate object
+    // E.g., override.vtx (should be override.vtx.power, etc.)
+    // or override.flightAxis (should be override.flightAxis.roll.angle, etc.)
+    if (parts.length === 2) {
+      const categoryDef = this.getOverrideCategoryDefinition(parts[1]);
+
+      if (categoryDef && categoryDef.type === 'object' && categoryDef.properties) {
+        const propKeys = Object.keys(categoryDef.properties);
+
+        // Check if properties are simple (like vtx.power) or nested (like flightAxis.roll.angle)
+        const firstProp = categoryDef.properties[propKeys[0]];
+
+        if (firstProp && firstProp.type === 'object' && firstProp.properties) {
+          // Deeply nested (like flightAxis.roll.angle)
+          const nestedPropKeys = Object.keys(firstProp.properties);
+          const suggestions = propKeys.slice(0, 2).flatMap(p => {
+            const nested = categoryDef.properties[p];
+            if (nested && nested.properties) {
+              const nestedKeys = Object.keys(nested.properties);
+              if (nestedKeys.length > 0) {
+                const firstNestedProp = nestedKeys[0];
+                return [`inav.override.${parts[1]}.${p}.${firstNestedProp}`];
+              }
+            }
+            return [];
+          }).join(', ');
+          return `Cannot assign to '${target}' - it's an object, not a property. Examples: ${suggestions}, ...`;
+        } else {
+          // Simple properties (like vtx.power, vtx.band, vtx.channel)
+          const suggestions = propKeys.map(p => `inav.override.${parts[1]}.${p}`).join(', ');
+          return `Cannot assign to '${target}' - it's an object, not a property. Available properties: ${suggestions}`;
+        }
+      }
+    }
+
+    return null;
+  }
+
+  /**
+   * Get override definition for a specific property
+   * @private
+   */
+  getOverrideDefinition(category, property) {
+    try {
+      // Access raw API definitions, not processed structure
+      const overrideDefs = apiDefinitions.override;
+      if (!overrideDefs) return null;
+
+      // For nested objects like flightAxis, check if the property itself has properties
+      if (overrideDefs[category] && overrideDefs[category].properties) {
+        return overrideDefs[category].properties[property];
+      }
+
+      return null;
+    } catch (error) {
+      return null;
+    }
+  }
+
+  /**
+   * Get override category definition
+   * @private
+   */
+  getOverrideCategoryDefinition(category) {
+    try {
+      // Access raw API definitions, not processed structure
+      const overrideDefs = apiDefinitions.override;
+      if (!overrideDefs) return null;
+
+      return overrideDefs[category];
+    } catch (error) {
+      return null;
+    }
+  }
+
   /**
    * Check for common unsupported JavaScript features
    */
@@ -495,20 +631,23 @@ class SemanticAnalyzer {
   detectConflicts(ast) {
     // Track assignments by handler type and target
     const handlerAssignments = new Map();
-    
+
+    let stmtIndex = 0;
     for (const stmt of ast.statements) {
       if (stmt && stmt.type === 'EventHandler') {
-        const handlerKey = stmt.handler === 'ifthen' ? 
-          `ifthen:${this.serializeCondition(stmt.condition)}` : 
-          stmt.handler;
-        
+        // Each handler gets a unique key - we want to detect multiple
+        // assignments within the SAME handler, not across different handlers
+        const handlerKey = `${stmt.handler}:${stmtIndex}`;
+
         if (!handlerAssignments.has(handlerKey)) {
           handlerAssignments.set(handlerKey, new Map());
         }
-        
+
         if (stmt.body && Array.isArray(stmt.body)) {
           this.collectAssignments(stmt.body, handlerKey, handlerAssignments.get(handlerKey));
         }
+
+        stmtIndex++;
       }
     }
     
@@ -543,15 +682,6 @@ class SemanticAnalyzer {
       }
     }
   }
-  
-  /**
-   * Serialize condition for comparison
-   */
-  serializeCondition(condition) {
-    if (!condition) return 'null';
-    return JSON.stringify(condition);
-  }
-  
   /**
    * Collect all assignments in body
    */

@@ -3,7 +3,7 @@
 import semver from 'semver';
 
 import './../injected_methods';
-import { GUI } from './../gui';
+import GUI from './../gui';
 import MSP from './../msp';
 import MSPCodes from './MSPCodes';
 import FC from './../fc';
@@ -84,15 +84,17 @@ var mspHelper = (function () {
                 FC.CONFIG.cpuload = data.getUint16(offset, true);
                 offset += 2;
 
+                const wasUninitialized = FC.CONFIG.profile === -1 || FC.CONFIG.battery_profile === -1 || FC.CONFIG.mixer_profile === -1;
+
                 let profile_byte = data.getUint8(offset++)
                 let profile = profile_byte & 0x0F;
-                if (profile !== FC.CONFIG.profile) {
+                if (profile !== FC.CONFIG.profile && FC.CONFIG.profile !== -1) {
                     profile_changed |= GUI.PROFILES_CHANGED.CONTROL;
                 }
                 FC.CONFIG.profile = profile;
 
                 let battery_profile = (profile_byte & 0xF0) >> 4;
-                if (battery_profile !== FC.CONFIG.battery_profile) {
+                if (battery_profile !== FC.CONFIG.battery_profile && FC.CONFIG.battery_profile !== -1) {
                     profile_changed |= GUI.PROFILES_CHANGED.BATTERY;
                 }
                 FC.CONFIG.battery_profile = battery_profile;
@@ -104,12 +106,12 @@ var mspHelper = (function () {
                 //read mixer profile as the last byte in the the message
                 profile_byte = data.getUint8(dataHandler.message_length_expected - 1);
                 let mixer_profile = profile_byte & 0x0F;
-                if (mixer_profile !== FC.CONFIG.mixer_profile) {
+                if (mixer_profile !== FC.CONFIG.mixer_profile && FC.CONFIG.mixer_profile !== -1) {
                     profile_changed |= GUI.PROFILES_CHANGED.MIXER;
                 }
                 FC.CONFIG.mixer_profile = mixer_profile;
                 GUI.updateStatusBar();
-                if (profile_changed > 0) {
+                if (profile_changed > 0 || wasUninitialized) {
                     GUI.updateProfileChange(profile_changed);
                 }
                 break;
@@ -198,6 +200,11 @@ var mspHelper = (function () {
                 FC.GPS_DATA.hdop = data.getUint16(14, true);
                 FC.GPS_DATA.eph = data.getUint16(16, true);
                 FC.GPS_DATA.epv = data.getUint16(18, true);
+                if (data.byteLength >= 21) {
+                    FC.GPS_DATA.hwVersion = data.getUint8(20);
+                } else {
+                    FC.GPS_DATA.hwVersion = 0;
+                }
                 break;
             case MSPCodes.MSP2_ADSB_VEHICLE_LIST:
                 var byteOffsetCounter = 0;
@@ -472,16 +479,31 @@ var mspHelper = (function () {
                 break;
 
             case MSPCodes.MSP2_INAV_LOGIC_CONDITIONS_SINGLE:
-                FC.LOGIC_CONDITIONS.put(new LogicCondition(
-                    data.getInt8(0),
-                    data.getInt8(1),
-                    data.getUint8(2),
-                    data.getUint8(3),
-                    data.getInt32(4, true),
-                    data.getUint8(8),
-                    data.getInt32(9, true),
-                    data.getInt8(13)
-                ));
+                if (data.byteLength >= 14 && !dataHandler.unsupported) {
+                    FC.LOGIC_CONDITIONS.put(new LogicCondition(
+                        data.getInt8(0),
+                        data.getInt8(1),
+                        data.getUint8(2),
+                        data.getUint8(3),
+                        data.getInt32(4, true),
+                        data.getUint8(8),
+                        data.getInt32(9, true),
+                        data.getInt8(13)
+                    ));
+                } else {
+                    console.warn('MSP2_INAV_LOGIC_CONDITIONS_SINGLE: unexpected response (byteLength=' + data.byteLength + ', unsupported=' + dataHandler.unsupported + ')');
+                }
+                break;
+
+            case MSPCodes.MSP2_INAV_LOGIC_CONDITIONS_CONFIGURED:
+                // 8-byte bitmask: lower 32 bits first, then upper 32 bits
+                // Older firmware returns unsupported/empty - that's expected, mask stays null
+                if (data.byteLength >= 8 && !dataHandler.unsupported) {
+                    FC.LOGIC_CONDITIONS_CONFIGURED_MASK = {
+                        lower: data.getUint32(0, true),
+                        upper: data.getUint32(4, true)
+                    };
+                }
                 break;
 
             case MSPCodes.MSP2_INAV_LOGIC_CONDITIONS_STATUS:
@@ -1146,9 +1168,30 @@ var mspHelper = (function () {
                     FC.VTX_CONFIG.channel = data.getUint8(offset++);
                     FC.VTX_CONFIG.power = data.getUint8(offset++);
                     FC.VTX_CONFIG.pitmode = data.getUint8(offset++);
-                    // Ignore wether the VTX is ready for now
+                    // Ignore whether the VTX is ready for now
                     offset++;
                     FC.VTX_CONFIG.low_power_disarm = data.getUint8(offset++);
+
+                    // Check if firmware supports VTX table (INAV 9.0+)
+                    if (offset < data.byteLength) {
+                        const vtxtable_available = data.getUint8(offset++);
+                        if (vtxtable_available) {
+                            if (offset + 2 < data.byteLength) {
+                                FC.VTX_CONFIG.band_count = data.getUint8(offset++);
+                                FC.VTX_CONFIG.channel_count = data.getUint8(offset++);
+                                FC.VTX_CONFIG.power_count = data.getUint8(offset++);
+                            }
+
+                            // Check if firmware sends powerMin (INAV 9.1+)
+                            if (offset < data.byteLength) {
+                                FC.VTX_CONFIG.power_min = data.getUint8(offset++);
+                            } else {
+                                // Firmware 9.0 doesn't send powerMin, use fallback
+                                // MSP VTX supports power off (index 0), others start at 1
+                                FC.VTX_CONFIG.power_min = (FC.VTX_CONFIG.device_type == VTX.DEV_MSP) ? 0 : 1;
+                            }
+                        }
+                    }
                 }
                 break;
             case MSPCodes.MSP_ADVANCED_CONFIG:
@@ -1454,6 +1497,17 @@ var mspHelper = (function () {
                 }
                 break;
 
+            case MSPCodes.MSP2_INAV_OUTPUT_ASSIGNMENT:
+            case MSPCodes.MSP2_INAV_QUERY_OUTPUT_ASSIGNMENT:
+                FC.OUTPUT_MAPPING.flushDirectAssignment();
+                for (let i = 0; i + 2 < data.byteLength; i += 3) {
+                    let outputIndex = data.getUint8(i);
+                    let type = data.getUint8(i + 1);
+                    let number = data.getUint8(i + 2);
+                    FC.OUTPUT_MAPPING.setDirectAssignment(outputIndex, type, number);
+                }
+                break;
+
             case MSPCodes.MSP2_INAV_MC_BRAKING:
                 try {
                     FC.BRAKING_CONFIG.speedThreshold = data.getUint16(0, true);
@@ -1605,7 +1659,7 @@ var mspHelper = (function () {
             case MSPCodes.MSP2_INAV_GPS_UBLOX_COMMAND:
                 // Just and ACK from the fc.
                 break;
-            
+
             case MSPCodes.MSP2_INAV_GEOZONE:
                 
                 if (data.buffer.byteLength == 0) {
@@ -2430,7 +2484,8 @@ var mspHelper = (function () {
     };
 
     self.loadLogicConditions = function (callback) {
-        if (semver.gte(FC.CONFIG.flightControllerVersion, "5.0.0")) {
+        // Helper function for legacy path: fetch all 64 conditions one by one
+        function loadAllConditionsLegacy() {
             FC.LOGIC_CONDITIONS.flush();
             let idx = 0;
             MSP.send_message(MSPCodes.MSP2_INAV_LOGIC_CONDITIONS_SINGLE, [idx], false, nextLogicCondition);
@@ -2443,9 +2498,73 @@ var mspHelper = (function () {
                     MSP.send_message(MSPCodes.MSP2_INAV_LOGIC_CONDITIONS_SINGLE, [idx], false, callback);
                 }
             }
-        } else {
-            MSP.send_message(MSPCodes.MSP2_INAV_LOGIC_CONDITIONS, false, false, callback);
         }
+
+        // Try to get the optimized CONFIGURED mask with timeout fallback
+        FC.LOGIC_CONDITIONS_CONFIGURED_MASK = null;
+        let maskResponseReceived = false;
+
+        // Set up timeout fallback - if no response in 500ms, use legacy path
+        const fallbackTimeout = setTimeout(function() {
+            if (!maskResponseReceived) {
+                maskResponseReceived = true;
+                loadAllConditionsLegacy();
+            }
+        }, 500);
+
+        MSP.send_message(MSPCodes.MSP2_INAV_LOGIC_CONDITIONS_CONFIGURED, false, false, function() {
+            if (maskResponseReceived) return; // Timeout already triggered legacy path
+            maskResponseReceived = true;
+            clearTimeout(fallbackTimeout);
+
+            const mask = FC.LOGIC_CONDITIONS_CONFIGURED_MASK;
+
+            if (mask) {
+                // Optimized path: use the configured mask to only fetch configured conditions
+                FC.LOGIC_CONDITIONS.flush();
+                const maxConditions = FC.LOGIC_CONDITIONS.getMaxLogicConditionCount();
+                let idx = 0;
+
+                function processNextCondition() {
+                    while (idx < maxConditions) {
+                        // Check if this condition is configured (non-default)
+                        const isConfigured = (idx < 32) ?
+                            (mask.lower & (1 << idx)) !== 0 :
+                            (mask.upper & (1 << (idx - 32))) !== 0;
+
+                        if (isConfigured) {
+                            // Fetch from firmware - handler will put() it
+                            const onComplete = function() {
+                                idx++;
+                                processNextCondition();
+                            };
+                            MSP.send_message(MSPCodes.MSP2_INAV_LOGIC_CONDITIONS_SINGLE, [idx], false, onComplete);
+                            return; // Wait for async MSP response
+                        } else {
+                            // Not configured - put default directly and continue loop
+                            FC.LOGIC_CONDITIONS.put(new LogicCondition(
+                                0,      // enabled
+                                -1,     // activatorId
+                                0,      // operation
+                                0,      // operandAType
+                                0,      // operandAValue
+                                0,      // operandBType
+                                0,      // operandBValue
+                                0       // flags
+                            ));
+                            idx++;
+                        }
+                    }
+                    // All conditions processed
+                    if (callback) callback();
+                }
+
+                processNextCondition();
+            } else {
+                // Legacy path: mask not available, fetch all 64 conditions
+                loadAllConditionsLegacy();
+            }
+        });
     }
 
     self.sendLogicConditions = function (onCompleteCallback) {
@@ -2680,20 +2799,25 @@ var mspHelper = (function () {
         }
     };
 
-    self.sendLedStripConfig = function (onCompleteCallback) {
+    self.sendLedStripConfig = function (onCompleteCallback, slotsToSend) {
 
-        var nextFunction = send_next_led_strip_config;
-
-        var ledIndex = 0;
-
-        if (FC.LED_STRIP.length == 0) {
-            onCompleteCallback();
-        } else {
-            send_next_led_strip_config();
+        var indicesToSend = [];
+        for (var i = 0; i < FC.LED_STRIP.length; i++) {
+            if (!slotsToSend || slotsToSend.has(i)) {
+                indicesToSend.push(i);
+            }
         }
 
-        function send_next_led_strip_config() {
+        if (indicesToSend.length === 0) {
+            onCompleteCallback();
+            return;
+        }
 
+        var position = 0;
+        send_next_led_strip_config();
+
+        function send_next_led_strip_config() {
+            var ledIndex = indicesToSend[position];
             var led = FC.LED_STRIP[ledIndex];
             /*
              var led = {
@@ -2763,10 +2887,8 @@ var mspHelper = (function () {
             buffer.push(BitHelper.specificByte(extra, 0));
 
             // prepare for next iteration
-            ledIndex++;
-            if (ledIndex == FC.LED_STRIP.length) {
-                nextFunction = onCompleteCallback;
-            }
+            position++;
+            var nextFunction = (position === indicesToSend.length) ? onCompleteCallback : send_next_led_strip_config;
 
             MSP.send_message(MSPCodes.MSP2_INAV_SET_LED_STRIP_CONFIG_EX, buffer, false, nextFunction);
         }
@@ -2869,6 +2991,23 @@ var mspHelper = (function () {
 
     self.loadTimerOutputModes = function(callback) {
         MSP.send_message(MSPCodes.MSP2_INAV_TIMER_OUTPUT_MODE, false, false, callback);
+    }
+
+    self.loadOutputAssignment = function(callback) {
+        MSP.send_message(MSPCodes.MSP2_INAV_OUTPUT_ASSIGNMENT, false, false, callback);
+    }
+
+    self.queryOutputAssignment = function(callback) {
+        const overrideIds = FC.OUTPUT_MAPPING.getUsedTimerIds();
+        const buffer = [];
+        buffer.push(overrideIds.length);
+        for (const id of overrideIds) {
+            const timerId = Number.parseInt(id);
+            const outputMode = FC.OUTPUT_MAPPING.getTimerOverride(timerId) || FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_AUTO;
+            buffer.push(timerId);
+            buffer.push(outputMode);
+        }
+        MSP.send_message(MSPCodes.MSP2_INAV_QUERY_OUTPUT_ASSIGNMENT, buffer, false, callback);
     }
 
     self.sendTimerOutputModes = function(onCompleteCallback) {

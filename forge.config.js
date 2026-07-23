@@ -9,8 +9,17 @@ export default {
     executableName: "inav-configurator",
     asar: false,
     icon: 'images/inav',
+    extraResource: [
+      'resources/public/sitl',
+      'assets/linux/45-inav.rules'
+    ],
   },
-  rebuildConfig: {},
+  rebuildConfig: {
+    // Native modules (serialport, usb) ship with prebuilt binaries for each platform.
+    // vite-plugin-native handles them at build time. Skip electron-rebuild to avoid
+    // requiring Visual Studio Build Tools on Windows during development.
+    onlyModules: [],
+  },
   plugins: [
     {
       name: '@electron-forge/plugin-vite',
@@ -43,6 +52,59 @@ export default {
     },
   ],
   hooks: {
+    // Remove SITL binaries for other platforms/architectures to reduce package size
+    postPackage: async (forgeConfig, options) => {
+      for (const outputPath of options.outputPaths) {
+        let sitlPath;
+
+        if (options.platform === 'darwin') {
+          // macOS app bundle structure: <outputDir>/<AppName>.app/Contents/Resources/sitl
+          // Find the .app directory
+          const appBundles = fs.readdirSync(outputPath).filter(f => f.endsWith('.app'));
+          if (appBundles.length === 0) {
+            console.log(`postPackage: No .app bundle found in ${outputPath}`);
+            continue;
+          }
+          sitlPath = path.join(outputPath, appBundles[0], 'Contents', 'Resources', 'sitl');
+        } else {
+          // Windows/Linux: <outputPath>/resources/sitl
+          sitlPath = path.join(outputPath, 'resources', 'sitl');
+        }
+
+        console.log(`postPackage: Checking SITL path for ${options.platform}: ${sitlPath}`);
+        if (!fs.existsSync(sitlPath)) {
+          console.log(`postPackage: SITL path not found, skipping: ${sitlPath}`);
+          continue;
+        }
+
+        if (options.platform === 'win32') {
+          console.log('postPackage: Removing non-Windows SITL binaries (linux, macos)');
+          fs.rmSync(path.join(sitlPath, 'linux'), { recursive: true, force: true });
+          fs.rmSync(path.join(sitlPath, 'macos'), { recursive: true, force: true });
+        } else if (options.platform === 'darwin') {
+          console.log('postPackage: Removing non-macOS SITL binaries (linux, windows)');
+          fs.rmSync(path.join(sitlPath, 'linux'), { recursive: true, force: true });
+          fs.rmSync(path.join(sitlPath, 'windows'), { recursive: true, force: true });
+        } else if (options.platform === 'linux') {
+          console.log('postPackage: Removing non-Linux SITL binaries (macos, windows)');
+          fs.rmSync(path.join(sitlPath, 'macos'), { recursive: true, force: true });
+          fs.rmSync(path.join(sitlPath, 'windows'), { recursive: true, force: true });
+          // Remove wrong architecture
+          if (options.arch === 'x64') {
+            fs.rmSync(path.join(sitlPath, 'linux', 'arm64'), { recursive: true, force: true });
+          } else if (options.arch === 'arm64') {
+            // Move arm64 binary to linux root and remove x64
+            const arm64Binary = path.join(sitlPath, 'linux', 'arm64', 'inav_SITL');
+            const destBinary = path.join(sitlPath, 'linux', 'inav_SITL');
+            if (fs.existsSync(arm64Binary)) {
+              fs.rmSync(destBinary, { force: true });
+              fs.renameSync(arm64Binary, destBinary);
+              fs.rmSync(path.join(sitlPath, 'linux', 'arm64'), { recursive: true, force: true });
+            }
+          }
+        }
+      }
+    },
     // Uniform artifact file names
     postMake: async (config, makeResults) => {
       makeResults.forEach(result => {
@@ -118,7 +180,10 @@ export default {
           icon: "./assets/linux/icon/inav_icon_128.png",
           description: "Configurator for the open source flight controller software INAV.",
           homepage: "https://github.com/inavflight/",
-
+          scripts: {
+            postinst: "./assets/linux/postinst",
+            postrm: "./assets/linux/postrm",
+          },
         }
       },
     },
@@ -133,6 +198,10 @@ export default {
           icon: "./assets/linux/icon/inav_icon_128.png",
           description: "Configurator for the open source flight controller software INAV.",
           homepage: "https://github.com/inavflight/",
+          scripts: {
+            post: "./assets/linux/postinst",
+            postun: "./assets/linux/postrm",
+          },
         }
       },
     },

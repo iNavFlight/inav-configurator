@@ -115,8 +115,9 @@ class Transpiler {
       const optimized = this.optimize(analyzed.ast);
 
       // Step 4: Generate INAV CLI commands
-      // Pass the analyzer's variableHandler to codegen
+      // Pass the analyzer's variableHandler and lineOffset to codegen
       this.codegen.variableHandler = this.analyzer.variableHandler;
+      this.codegen.lineOffset = lineOffset;
       const commands = this.codegen.generate(optimized);
 
       // Combine all warnings
@@ -130,6 +131,17 @@ class Transpiler {
       // Adjust line numbers if import was auto-added
       const adjustedWarnings = this.adjustLineNumbers(allWarnings, lineOffset);
 
+      // Categorize warnings to check for errors
+      const categorized = this.categorizeWarnings(adjustedWarnings);
+
+      // If there are parser errors (type='error'), fail the transpilation
+      if (categorized.errors && categorized.errors.length > 0) {
+        const errorMessages = categorized.errors.map(e =>
+          `  - ${e.message}${e.line ? ` (line ${e.line})` : ''}`
+        ).join('\n');
+        throw new Error(`Parse errors:\n${errorMessages}`);
+      }
+
       // Get gvar allocation summary
       const gvarSummary = this.analyzer.variableHandler ?
         this.analyzer.variableHandler.getAllocationSummary() :
@@ -142,7 +154,8 @@ class Transpiler {
         success: true,
         commands,
         logicConditionCount: this.codegen.lcIndex,
-        warnings: this.categorizeWarnings(adjustedWarnings),
+        lcToLineMapping: this.codegen.lcToLineMapping,
+        warnings: categorized,
         optimizations: this.optimizer.getStats(),
         gvarUsage: gvarSummary,
         variableMap,

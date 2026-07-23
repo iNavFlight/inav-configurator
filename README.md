@@ -19,7 +19,7 @@ everything, the hardware is not working, or you have any other _support_ problem
 
 ## Installation
 
- _INAV Configurator_ is distributed as a  _standalone_ application.
+ _INAV Configurator_ is distributed as a _standalone_ application.
 
 ### Windows
 
@@ -29,7 +29,7 @@ everything, the hardware is not working, or you have any other _support_ problem
     * Extract ZIP archive and run the INAV Configurator app from the unpacked folder
     * OR just use the setup program `INAV-Configurator_win32_arch_x.y.z.exe`, **arch** is your computer architecture (ia32 (32bit) or x64 (64bit)), **x.y.z** is the INAV Configurator version number.
 
-4.  Configurator is not signed, so you have to allow Windows to run untrusted applications. There might be a monit for it during the first run
+4.  Configurator is not signed, so you have to allow Windows to run untrusted applications. There might be a prompt for it during the first run
 
 ### Linux
 
@@ -82,7 +82,7 @@ For local development, the **node.js** build system is used.
 
 1. Install node.js
 1. From the project folder run `yarn install`
-1. To build the and start the configurator:
+1. To build and start the configurator:
     - Run `yarn start`.
 
 To build the App run `yarn run make` to build for your platform.
@@ -113,10 +113,20 @@ Example (note the double -- ):
 To be able to open Inspector, set environment variable `NODE_ENV` to `development` or set the flag directly when run `npm start`:
 
 ```NODE_ENV=development npm start``` or ```$env:NODE_ENV="development" | npm start``` for Windows PowerShell
+Chrome Devtools will be available on http://localhost:9222. This can also be used with an MCP plugin
 
 Or use VScode and start a debug session `Debug Configurator` (Just hit F5!)
 
 To debug the main thread (source files in `js/main`), just set a breakpoint in VScode.
+
+
+To capture a debug log from a packaged version (such as from a user), they can run it as:
+```.\inav-configurator.exe --enable-logging --log-file=inav-log.txt```
+or to log to the console:
+```.\inav-configurator.exe --enable-logging --log-file=inav-log.txt```
+
+
+
 
 ## Different map providers
 
@@ -144,7 +154,7 @@ INAV provides the font images so that custom fonts can be created for your perso
 
 ### WebGL
 
-Make sure Settings -> System -> "User hardware acceleration when available" is checked to achieve the best performance
+Make sure Settings -> System -> "Use hardware acceleration when available" is checked to achieve the best performance
 
 ## Issue trackers
 

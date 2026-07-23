@@ -8,7 +8,7 @@ https://mapproxy.org/docs/latest/install.html Unix Install Guide
 
 https://mapproxy.org/docs/latest/install_windows.html Windows Install Guide
 
-https://hub.docker.com/r/yagajs/mapproxy/ Docker image (untested)
+https://hub.docker.com/r/yagajs/mapproxy/ Docker image
 
 ## Linux MapProxy virtual machine setup instructions
 1. Using virtualization platform of your choice, install a base 14.04 LTS Ubuntu server
@@ -177,7 +177,7 @@ https://hub.docker.com/r/yagajs/mapproxy/ Docker image (untested)
     ```
 1. You can use any map provider that is compatible with MapProxy, and once you zoom in on the region you will be flying in, the map tiles will be cached for offline use. You can test this by disabling your internet connection and browsing the demo URL in a browser
 	  
-    https://wiki.openstreetmap.org/wiki/WMS#OSM_WMS_Servers OpenStreetMap WSM servers 
+    https://wiki.openstreetmap.org/wiki/WMS#OSM_WMS_Servers OpenStreetMap WMS servers 
 	  
     https://lpdaac.usgs.gov/data_access/web_map_services_wms # USGS currently has 400+ WMS layers
     
@@ -185,3 +185,174 @@ https://hub.docker.com/r/yagajs/mapproxy/ Docker image (untested)
 	  https://qgis.org/en/site/
     
     * There are many government and public WMS providers available in different regions worldwide
+
+## Docker Setup Instructions
+
+Using Docker is the easiest way to run MapProxy without needing to manually configure Python, Apache, or virtual environments.
+
+### 1. Prerequisites
+Make sure you have Docker and Docker Compose installed:
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) (Windows/macOS)
+- `docker-compose` or `docker compose` CLI plugin (Linux)
+
+### 2. File Structure
+Create a directory for your MapProxy configuration and cache data:
+```text
+mapproxy/
+├── docker-compose.yml
+├── cache_data/
+└── docker/
+    ├── mapproxy.yaml
+    └── logging.ini
+```
+
+### 3. Configuration Files
+
+#### `docker-compose.yml`
+```yaml
+services:
+  mapproxy:
+    image: ghcr.io/mapproxy/mapproxy/mapproxy:6.1.1-dev
+    volumes:
+      - ./docker/mapproxy.yaml:/mapproxy/config/mapproxy.yaml
+      - ./cache_data:/mapproxy/config/cache_data
+      - ./docker/logging.ini:/mapproxy/config/logging.ini
+    ports:
+      - "8080:8080"
+```
+
+#### `docker/mapproxy.yaml`
+```yaml
+services:
+  demo:
+  wms:
+    md:
+      title: MapProxy WMS Service
+      abstract: MapProxy serving Satellite and other spatial layers.
+    srs: ['EPSG:3857', 'EPSG:4326', 'EPSG:900913']
+    image_formats: ['image/png', 'image/jpeg']
+  wmts:
+  tms:
+    use_path_info: true
+
+layers:
+  - name: arcgisonline
+    title: Satellite Imagery (ArcGIS World Imagery)
+    sources: [arcgisonline_cache]
+  - name: google
+    title: Google Satellite Imagery
+    sources: [google_cache]
+
+caches:
+  arcgisonline_cache:
+    grids: [webmercator_high_zoom]
+    sources: [arcgisonline_source]
+    upscale_tiles: 3
+    cache_rescaled_tiles: true
+    cache:
+      type: file
+      directory_layout: tc
+      directory: /mapproxy/config/cache_data/arcgisonline
+
+  google_cache:
+    grids: [webmercator_high_zoom]
+    sources: [google_source]
+    upscale_tiles: 3
+    cache_rescaled_tiles: true
+    cache:
+      type: file
+      directory_layout: tc
+      directory: /mapproxy/config/cache_data/google
+
+sources:
+  arcgisonline_source:
+    type: tile
+    url: https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/%(z)s/%(y)s/%(x)s
+    grid: webmercator_native
+    format: image/jpeg
+    coverage:
+      bbox: [-180, -85.0511, 180, 85.0511]
+      srs: 'EPSG:4326'
+    on_error:
+      404:
+        response: transparent
+        cache: true
+
+  google_source:
+    type: tile
+    url: http://mt1.google.com/vt/lyrs=s&hl=en&x=%(x)s&y=%(y)s&z=%(z)s
+    grid: webmercator_native
+    on_error:
+      404:
+        response: transparent
+        cache: true
+
+grids:
+  webmercator_native:
+    base: GLOBAL_WEBMERCATOR
+    num_levels: 20
+  webmercator_high_zoom:
+    base: GLOBAL_WEBMERCATOR
+    num_levels: 23
+
+globals:
+  cache:
+    base_dir: /mapproxy/config/cache_data
+    lock_dir: /mapproxy/config/cache_data/locks
+  image:
+    resampling_method: bicubic
+```
+
+#### `docker/logging.ini`
+```ini
+[loggers]
+keys=root,mapproxy
+
+[handlers]
+keys=console
+
+[formatters]
+keys=simple
+
+[logger_root]
+level=INFO
+handlers=console
+
+[logger_mapproxy]
+level=INFO
+handlers=console
+qualname=mapproxy
+propagate=0
+
+[handler_console]
+class=StreamHandler
+args=(sys.stdout,)
+level=NOTSET
+formatter=simple
+
+[formatter_simple]
+format=%(asctime)s - %(name)s - %(levelname)s - %(message)s
+```
+
+### 4. Running the Container
+1. **Permissions**: Make sure the cache directory exists and is writable by the container:
+   ```console
+   mkdir -p cache_data
+   chmod -R a+w cache_data
+   ```
+2. **Start service**: Run the docker container:
+   ```console
+   docker compose up -d
+   ```
+3. **Verify**: Open your browser and navigate to the demo page:
+   http://localhost:8080/demo/
+
+### 5. iNav Configurator Settings
+1. In the upper right corner click on **Application Options** (gears icon).
+2. For **Map Provider** select:
+   `MapProxy`
+3. For **MapProxy URL** use:
+   `http://localhost:8080/service?`
+4. For **MapProxy layer** use:
+   `arcgisonline` or `google` (as configured above).
+5. If map updates do not immediately display in the **Mission Control** tab, click to navigate to another tab and then return to **Mission Control** so the changes take effect.

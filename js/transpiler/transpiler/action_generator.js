@@ -23,6 +23,7 @@ class ActionGenerator {
    * @param {Function} context.getOverrideOperation - Function to get override operation
    * @param {Object} context.errorHandler - Error handler instance
    * @param {Object} context.variableHandler - Variable handler instance
+   * @param {Object} context.conditionGenerator - Condition generator for CSE cache invalidation
    */
   constructor(context) {
     this.pushLogicCommand = context.pushLogicCommand;
@@ -31,6 +32,7 @@ class ActionGenerator {
     this.getOverrideOperation = context.getOverrideOperation;
     this.errorHandler = context.errorHandler;
     this.variableHandler = context.variableHandler;
+    this.conditionGenerator = context.conditionGenerator;
   }
 
   /**
@@ -44,26 +46,29 @@ class ActionGenerator {
     const target = action.target;
     const value = action.value;
 
-    // Handle gvar assignment
-    if (target.startsWith('gvar[')) {
+    // Normalize target (strip 'inav.' prefix if present for internal checks)
+    const normalizedTarget = target.startsWith('inav.') ? target.substring(5) : target;
+
+    // Handle gvar assignment (with or without inav. prefix)
+    if (normalizedTarget.startsWith('gvar[')) {
       this.generateGvarAssignment(action, activatorId);
       return;
     }
 
-    // Handle RC channel assignment: rc[5] = 1500
-    if (target.startsWith('rc[')) {
+    // Handle RC channel assignment: rc[5] = 1500 (with or without inav. prefix)
+    if (normalizedTarget.startsWith('rc[')) {
       this.generateRcAssignment(target, value, activatorId);
       return;
     }
 
-    // Handle override operations
-    if (target.startsWith('override.')) {
+    // Handle override operations (expects inav.override. prefix)
+    if (target.startsWith('inav.override.') || normalizedTarget.startsWith('override.')) {
       this.generateOverride(target, value, activatorId);
       return;
     }
 
     // Handle variable assignment (var variables resolve to gvar[N])
-    if (this.variableHandler && this.variableHandler.isVariable(target)) {
+    if (this.variableHandler && this.variableHandler.isVariable(normalizedTarget)) {
       this.generateVariableAssignment(action, activatorId);
       return;
     }
@@ -83,6 +88,13 @@ class ActionGenerator {
     const target = action.target;
     const value = action.value;
     const index = parseInt(target.match(/\d+/)[0]);
+
+    // Invalidate CSE cache for expressions referencing this gvar
+    // This is critical for correctness: after gvar[N] is mutated,
+    // any cached condition like "gvar[N] < 2" must be re-evaluated
+    if (this.conditionGenerator) {
+      this.conditionGenerator.invalidateCacheForVariable(target);
+    }
 
     if (action.operation) {
       // Arithmetic: gvar[0] = gvar[0] + 10
@@ -194,8 +206,11 @@ class ActionGenerator {
     const operation = this.getOverrideOperation(target);
     const valueOperand = this.getOperand(value);
 
+    // Normalize target (strip 'inav.' prefix if present for consistent matching)
+    const normalizedTarget = target.startsWith('inav.') ? target.substring(5) : target;
+
     // Check for flight axis overrides which need axis in operandA
-    const flightAxisMatch = target.match(/^override\.flightAxis\.(roll|pitch|yaw)\.(angle|rate)$/);
+    const flightAxisMatch = normalizedTarget.match(/^override\.flightAxis\.(roll|pitch|yaw)\.(angle|rate)$/);
     if (flightAxisMatch) {
       const axisMap = { 'roll': 0, 'pitch': 1, 'yaw': 2 };
       const axisIndex = axisMap[flightAxisMatch[1]];
@@ -206,6 +221,7 @@ class ActionGenerator {
         activatorId
       );
     } else {
+      // Standard INAV pattern: operandA = value, operandB = 0 (matches firmware)
       this.pushLogicCommand(operation,
         valueOperand,
         { type: 0, value: 0 },
@@ -227,6 +243,11 @@ class ActionGenerator {
       // Resolve to gvar[N] and generate gvar assignment
       const gvarRef = resolution.gvarRef;
       const index = parseInt(gvarRef.match(/\d+/)[0]);
+
+      // Invalidate CSE cache for expressions referencing this gvar
+      if (this.conditionGenerator) {
+        this.conditionGenerator.invalidateCacheForVariable(gvarRef);
+      }
 
       if (action.operation) {
         // Arithmetic operation

@@ -1,6 +1,6 @@
 'use strict'
 
-import { GUI } from './../gui';
+import GUI from './../gui';
 
 import  { ConnectionType, Connection } from './connection';
 import i18n from './../localization';
@@ -19,8 +19,8 @@ const BleDevices = [
     {
         name: "Nordic Semiconductor NRF",
         serviceUuid:        '6e400001-b5a3-f393-e0a9-e50e24dcca9e',
-        writeCharateristic: '6e400003-b5a3-f393-e0a9-e50e24dcca9e', 
-        readCharateristic:  '6e400002-b5a3-f393-e0a9-e50e24dcca9e',
+        writeCharateristic: '6e400002-b5a3-f393-e0a9-e50e24dcca9e', 
+        readCharateristic:  '6e400003-b5a3-f393-e0a9-e50e24dcca9e',
         delay:              30,
     },
     {
@@ -48,7 +48,6 @@ class ConnectionBle extends Connection {
         this._writeCharacteristic   = false;
         this._device                = false;
         this._deviceDescription     = false;
-        this._onCharateristicValueChangedListeners = [];
         this._onDisconnectListeners   = [];
         this._reconnects = 0;
         this._handleOnCharateristicValueChanged = false;
@@ -60,30 +59,66 @@ class ConnectionBle extends Connection {
         return this._deviceDescription;
     }
 
-    async connectImplementation(path, options, callback) {      
-        console.log("Request BLE Device");    
-        await this.openDevice()
-            .then(() => {
-                this.addOnReceiveErrorListener(error => {
-                    GUI.log(i18n.getMessage('connectionBleInterrupted'));
-                    this.abort();
-                });
+    async connectImplementation(path, options, callback) {
+        console.log("Request BLE Device");
+        try {
+            // Fail cleanly if a GATT step hangs, instead of pending forever.
+            await this._withTimeout(this.openDevice(), 12000, "BLE connection timed out");
 
-                if (callback) {
-                    callback({
-                        // Dummy values
-                        connectionId: 0xff,
-                        bitrate: 115200 
-                    });
-                }
-            }).catch(error => {
-                GUI.log(i18n.getMessage('connectionBleError', [error]));
-                if (callback) {
-                    callback(false);
-                }
+            this.addOnReceiveErrorListener(error => {
+                GUI.log(i18n.getMessage('connectionBleInterrupted'));
+                this.abort();
             });
 
+            if (callback) {
+                callback({
+                    // Dummy values
+                    connectionId: 0xff,
+                    bitrate: 115200
+                });
+            }
+        } catch (error) {
+            GUI.log(i18n.getMessage('connectionBleError', [error]));
+            // Tear down a half-open GATT so the next attempt starts clean.
+            this._cleanupGatt();
+            if (callback) {
+                callback(false);
+            }
+        }
+
         return Promise.resolve();
+    }
+
+    _withTimeout(promise, ms, message) {
+        let timer;
+        const timeout = new Promise((_, reject) => {
+            timer = setTimeout(() => reject(new Error(message)), ms);
+        });
+        return Promise.race([promise, timeout]).finally(() => clearTimeout(timer));
+    }
+
+    _cleanupGatt() {
+        if (this._device) {
+            try {
+                if (this._handleDisconnect) {
+                    this._device.removeEventListener('gattserverdisconnected', this._handleDisconnect);
+                }
+                if (this._readCharacteristic && this._handleOnCharateristicValueChanged) {
+                    this._readCharacteristic.removeEventListener('characteristicvaluechanged', this._handleOnCharateristicValueChanged);
+                }
+                if (this._device.gatt?.connected) {
+                    this._device.gatt.disconnect();
+                }
+            } catch (e) {
+                console.log('BLE cleanup error (ignored):', e.message);
+            }
+        }
+        this._device = false;
+        this._writeCharacteristic = false;
+        this._readCharacteristic = false;
+        this._deviceDescription = false;
+        this._handleDisconnect = false;
+        this._handleOnCharateristicValueChanged = false;
     }
 
     async openDevice(){
@@ -166,11 +201,13 @@ class ConnectionBle extends Connection {
                         buffer[i] = event.target.value.getUint8(i);
                     }
 
-                    this._onCharateristicValueChangedListeners.forEach(listener => {
-                        listener({
-                            connectionId: 0xFF,
-                            data: buffer
-                        });
+                    const info = {
+                        connectionId: 0xFF,
+                        data: buffer
+                    };
+
+                    this._onReceiveListeners.forEach(listener => {
+                        listener(info);
                     });
                 };
 
@@ -195,41 +232,46 @@ class ConnectionBle extends Connection {
     }
 
     disconnectImplementation(callback) {
-        if (this._device) {
-            this._device.removeEventListener('gattserverdisconnected', this._handleDisconnect);
-            this._readCharacteristic.removeEventListener('characteristicvaluechanged', this._handleOnCharateristicValueChanged);
-
-            if (this._device.gatt.connected) {
-                this._device.gatt.disconnect();
-            }        
-            this._device = false;
-            this._writeCharacteristic = false; 
-            this._readCharacteristic = false;
-            this._deviceDescription = false; 
-        }
+        this._cleanupGatt();
 
         if (callback) {
             callback(true);
         }
     }
 
-    async sendImplementation (data, callback) {;
-        if (!this._writeCharacteristic) {
+    sendImplementation(data, callback) {
+        void this._writeChunks(data, callback);
+    }
+
+    async _writeChunks(data, callback) {
+        if (!this._writeCharacteristic || !this._device?.gatt?.connected) {
+            if (callback) {
+                callback({ bytesSent: 0, resultCode: 1 });
+            }
             return;
         }
-        
+
         let sent = 0;
-        let dataBuffer = new Uint8Array(data);
-        for (var i = 0; i < dataBuffer.length; i += BLE_WRITE_BUFFER_LENGTH) {
-            var length = BLE_WRITE_BUFFER_LENGTH;
+        const dataBuffer = new Uint8Array(data);
+        try {
+            for (let i = 0; i < dataBuffer.length; i += BLE_WRITE_BUFFER_LENGTH) {
+                let length = BLE_WRITE_BUFFER_LENGTH;
 
-            if (i + BLE_WRITE_BUFFER_LENGTH > dataBuffer.length) {
-                length = dataBuffer.length % BLE_WRITE_BUFFER_LENGTH;
+                if (i + BLE_WRITE_BUFFER_LENGTH > dataBuffer.length) {
+                    length = dataBuffer.length % BLE_WRITE_BUFFER_LENGTH;
+                }
+
+                const outBuffer = dataBuffer.subarray(i, i + length);
+                sent += outBuffer.length;
+                await this._writeCharacteristic.writeValue(outBuffer);
             }
-
-            var outBuffer = dataBuffer.subarray(i, i + length);
-            sent += outBuffer.length;
-            await this._writeCharacteristic.writeValue(outBuffer);   
+        } catch (error) {
+            // GATT can drop mid-write; report failure instead of throwing.
+            console.log('BLE write failed:', error.message);
+            if (callback) {
+                callback({ bytesSent: 0, resultCode: 1 });
+            }
+            return;
         }
 
         if (callback) {
@@ -238,15 +280,14 @@ class ConnectionBle extends Connection {
                 resultCode: 0
             });
         }
-        
     }
 
     addOnReceiveCallback(callback){
-        this._onCharateristicValueChangedListeners.push(callback);
+        this._onReceiveListeners.push(callback);
     }
 
     removeOnReceiveCallback(callback){
-        this._onCharateristicValueChangedListeners = this._onCharateristicValueChangedListeners.filter(listener => listener !== callback);
+        this._onReceiveListeners = this._onReceiveListeners.filter(listener => listener !== callback);
     }
 
     addOnReceiveErrorCallback(callback) {

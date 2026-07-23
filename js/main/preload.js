@@ -11,8 +11,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
   appGetLocale: () => ipcRenderer.sendSync('appGetLocale'),
   showOpenDialog: (options) => ipcRenderer.invoke('dialog.showOpenDialog', options),
   showSaveDialog: (options) => ipcRenderer.invoke('dialog.showSaveDialog', options),
-  alertDialog: (message) => ipcRenderer.sendSync('dialog.alert', message),
-  confirmDialog: (message) => ipcRenderer.sendSync('dialog.confirm', message),
+  alertDialog: (message) => ipcRenderer.sendSync('dialog.alert', message), // TODO: still blocks renderer event loop — needs same async fix (invoke/handle) as confirm; see ipcMain.on('dialog.alert') in main.js
+  confirmDialog: (message) => ipcRenderer.invoke('dialog.confirm', message),
   tcpConnect: (host, port) => ipcRenderer.invoke('tcpConnect', host, port),
   tcpClose: () => ipcRenderer.send('tcpClose'),
   tcpSend: (data) => ipcRenderer.invoke('tcpSend', data),
@@ -75,6 +75,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
   readFile: (filename, encoding = 'utf8') => ipcRenderer.invoke('readFile', filename, encoding),
   rm: (path) => ipcRenderer.invoke('rm', path),
   chmod: (path, mode) => ipcRenderer.invoke('chmod', path, mode),
+  getBackupDir: () => ipcRenderer.invoke('getBackupDir'),
+  openBackupDir: () => ipcRenderer.invoke('openBackupDir'),
+  listBackups: () => ipcRenderer.invoke('listBackups'),
   startChildProcess: (command, args, opts) => ipcRenderer.send('startChildProcess', command, args, opts),
   killChildProcess: () => ipcRenderer.send('killChildProcess'),
   onChildProcessStdout: (callback) => {

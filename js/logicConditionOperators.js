@@ -261,19 +261,19 @@ const LOGIC_OPERATORS = {
         hasOperand: [true, false],
         output: "boolean"
     },
-    57: {
+    58: {
         name: "Trigonometry: ACos",
         operandType: "Maths",
         hasOperand: [true, true],
         output: "raw"
     },
-    58: {
+    59: {
         name: "Trigonometry: ASin",
         operandType: "Maths",
         hasOperand: [true, true],
         output: "raw"
     },
-    59: {
+    60: {
         name: "Trigonometry: ATan2",
         operandType: "Maths",
         hasOperand: [true, true],
@@ -340,11 +340,11 @@ const LOGIC_OPERATORS = {
         output: "boolean"
     },
     52: {
-        name: "LED Pin PWM",
+        name: "PWM on pin",
         operandType: "Set Flight Parameter",
-        hasOperand: [true, false],
+        hasOperand: [true, true],
         output: "raw"
-    },        
+    },
     53: {
         name: "Disable GPS Sensor Fix",
         operandType: "Set Flight Parameter",

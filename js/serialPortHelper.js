@@ -131,6 +131,13 @@ const serialPortHelper = (function () {
             name: 'HEADTRACKER',
             groups: ['peripherals'],
             defaultBaud: 115200
+        },
+        {
+            name: 'CRSF_SENSOR',
+            groups: ['sensors'],
+            defaultBaud: 420000,
+            lockedBaud: true,
+            isUnique: true
         }
     ];
 
@@ -159,6 +166,7 @@ const serialPortHelper = (function () {
         'DJI_FPV': 21,
         'SBUS_OUTPUT': 22,
         'SMARTPORT_MASTER': 23,
+        'CRSF_SENSOR': 24,
         'MSP_DISPLAYPORT': 25,
         'GIMBAL': 26,
         'HEADTRACKER': 27

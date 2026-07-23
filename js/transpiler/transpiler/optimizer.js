@@ -73,13 +73,28 @@ class Optimizer {
    * Common Subexpression Elimination
    * Find duplicate conditions and reuse them
    * Also detects inverted conditions (condition vs !condition)
+   *
+   * IMPORTANT: CSE must be invalidated when variables used in conditions are mutated.
+   * For example, if `gvar[1] < 2` is cached and then `gvar[1]++` is executed,
+   * subsequent `gvar[1] < 2` checks must NOT reuse the cached condition.
+   *
+   * The order matters:
+   * 1. Process the statement's condition (potentially reuse from cache)
+   * 2. Add to statements list
+   * 3. AFTER processing the statement, invalidate cache for any variables
+   *    that were mutated in the statement's body
+   *
+   * This ensures the first `if (gvar[1] < 2)` can be cached, but after its
+   * body executes `gvar[1]++`, the cache is invalidated so subsequent
+   * `if (gvar[1] < 2)` checks get a fresh evaluation.
    */
   eliminateCommonSubexpressions(ast) {
-    const conditionMap = new Map(); // condition string -> first LC index
-    const invertedMap = new Map(); // base condition string -> inverted LC index
+    const conditionMap = new Map(); // condition string -> first statement
+    const invertedMap = new Map(); // base condition string -> inverted statement
     const statements = [];
 
     for (const statement of ast.statements) {
+      // Step 1: Process condition (may reuse from cache or add to cache)
       if (statement.type === 'EventHandler' && statement.condition) {
         const condition = statement.condition;
 
@@ -120,10 +135,93 @@ class Optimizer {
         }
       }
 
+      // Step 2: Add statement to output list
       statements.push(statement);
+
+      // Step 3: AFTER processing this statement, check if its body mutates
+      // any variables and invalidate cached conditions that reference them.
+      // This ensures subsequent statements don't incorrectly reuse conditions
+      // that depend on values that have been modified.
+      if (statement.type === 'EventHandler' && statement.body) {
+        const mutatedVars = this.findMutatedVariables(statement.body);
+        for (const varName of mutatedVars) {
+          this.invalidateCacheForVariable(conditionMap, invertedMap, varName);
+        }
+      }
     }
 
     return { ...ast, statements };
+  }
+
+  /**
+   * Find all variables that are mutated (assigned to) in a statement body
+   * @param {Array} body - Array of body statements
+   * @returns {Set<string>} Set of mutated variable names (e.g., 'gvar[1]')
+   */
+  findMutatedVariables(body) {
+    const mutated = new Set();
+
+    for (const stmt of body) {
+      if (stmt.type === 'Assignment' && stmt.target) {
+        // Direct gvar assignment: gvar[0] = ... or gvar[0]++
+        if (stmt.target.startsWith('gvar[')) {
+          mutated.add(stmt.target);
+        }
+        // Variable assignment that might resolve to gvar
+        // For now, we're conservative and track the target
+        mutated.add(stmt.target);
+      }
+
+      // Recursively check nested event handlers
+      if (stmt.type === 'EventHandler' && stmt.body) {
+        for (const varName of this.findMutatedVariables(stmt.body)) {
+          mutated.add(varName);
+        }
+      }
+    }
+
+    return mutated;
+  }
+
+  /**
+   * Invalidate cache entries that reference a specific variable
+   * @param {Map} conditionMap - Map of condition keys to statements
+   * @param {Map} invertedMap - Map of inverted condition keys to statements
+   * @param {string} varName - Variable name to invalidate (e.g., 'gvar[1]')
+   */
+  invalidateCacheForVariable(conditionMap, invertedMap, varName) {
+    // Find keys that reference this variable and delete them
+    for (const [key, _] of conditionMap.entries()) {
+      if (this.conditionKeyReferencesVariable(key, varName)) {
+        conditionMap.delete(key);
+      }
+    }
+
+    for (const [key, _] of invertedMap.entries()) {
+      if (this.conditionKeyReferencesVariable(key, varName)) {
+        invertedMap.delete(key);
+      }
+    }
+  }
+
+  /**
+   * Check if a condition key references a specific variable
+   * @param {string} key - Condition key (from getConditionKey)
+   * @param {string} varName - Variable name (e.g., 'gvar[1]')
+   * @returns {boolean} True if the key references the variable
+   */
+  conditionKeyReferencesVariable(key, varName) {
+    // For gvar[N], the key contains "mem:gvar[N]" for MemberExpression nodes
+    if (key.includes(`mem:${varName}`)) {
+      return true;
+    }
+
+    // Also check for direct string inclusion (handles various key formats)
+    if (key.includes(varName)) {
+      return true;
+    }
+
+    return false;
   }
 
   /**

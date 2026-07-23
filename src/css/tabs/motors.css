@@ -198,7 +198,7 @@
 
 .tab-motors .servos .titles li {
     float: right;
-    width: calc((100% / 16) - 10px);
+    width: calc((100% / 18) - 10px);
     margin: 0 0 0 10px;
 }
 
@@ -249,7 +249,7 @@
 
 .tab-motors .servos .m-block {
     float: right;
-    width: calc((100% / 16) - 10px);
+    width: calc((100% / 18) - 10px);
     margin: 0 0 0 10px;
     border-radius: 3px;
 }

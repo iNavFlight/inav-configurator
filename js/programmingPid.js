@@ -1,6 +1,6 @@
 'use strict';
 
-import { GUI } from './gui';
+import GUI from './gui';
 import { OPERAND_TYPES } from './logicConditionOperantTypes';
 
 let ProgrammingPid = function (enabled, setpointType, setpointValue, measurementType, measurementValue, gainP, gainI, gainD, gainFF) {
