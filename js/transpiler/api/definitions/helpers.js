@@ -33,7 +33,8 @@ export default {
     type: 'function',
     desc: 'Return absolute value',
     params: ['value'],
-    returns: 'number'
+    returns: 'number',
+    inavOperation: OPERATION.ABS
   },
   
   sin: {
@@ -96,7 +97,7 @@ export default {
     desc: 'Exclusive OR - true when exactly one argument is true',
     params: ['a', 'b'],
     returns: 'boolean',
-    inavOperation: 9 // OPERATION.XOR
+    inavOperation: OPERATION.XOR
   },
 
   nand: {
@@ -104,7 +105,7 @@ export default {
     desc: 'NOT AND - false when both arguments are true',
     params: ['a', 'b'],
     returns: 'boolean',
-    inavOperation: 10 // OPERATION.NAND
+    inavOperation: OPERATION.NAND
   },
 
   nor: {
@@ -112,7 +113,7 @@ export default {
     desc: 'NOT OR - true when both arguments are false',
     params: ['a', 'b'],
     returns: 'boolean',
-    inavOperation: 11 // OPERATION.NOR
+    inavOperation: OPERATION.NOR
   },
 
   approxEqual: {
@@ -120,7 +121,7 @@ export default {
     desc: 'Approximate equality with tolerance',
     params: ['a', 'b', 'tolerance'],
     returns: 'boolean',
-    inavOperation: 2 // OPERATION.APPROX_EQUAL
+    inavOperation: OPERATION.APPROX_EQUAL
   },
 
   // Mapping functions

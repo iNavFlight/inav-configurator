@@ -270,13 +270,13 @@ const LOGIC_OPERATORS = {
     58: {
         name: "Trigonometry: ACos",
         operandType: "Maths",
-        hasOperand: [true, true],
+        hasOperand: [true, false],
         output: "raw"
     },
     59: {
         name: "Trigonometry: ASin",
         operandType: "Maths",
-        hasOperand: [true, true],
+        hasOperand: [true, false],
         output: "raw"
     },
     60: {
