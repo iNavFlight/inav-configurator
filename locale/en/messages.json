@@ -2400,6 +2400,9 @@
     "cliInputPlaceholder": {
         "message": "Write your command here"
     },
+    "cliInputPlaceholderBuilding": {
+        "message": "Building AutoComplete cache, please wait ..."
+    },
     "cliEnter": {
         "message": "CLI mode detected"
     },
