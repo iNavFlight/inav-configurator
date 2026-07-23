@@ -261,6 +261,12 @@ const LOGIC_OPERATORS = {
         hasOperand: [true, false],
         output: "boolean"
     },
+    57: {
+        name: "Set Altitude Target",
+        operandType: "Set Flight Parameter",
+        hasOperand: [true, true],
+        output: "boolean"
+    },
     58: {
         name: "Trigonometry: ACos",
         operandType: "Maths",
