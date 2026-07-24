@@ -35,7 +35,7 @@ function lat2tile(lat, zoom) {
 function calculateTiles(bounds, minZ, maxZ) {
     let total = 0;
     for (let z = minZ; z <= maxZ; z++) {
-        const tz = z - 1; // UI shows 1-20, tile servers use 0-19
+        const tz = z; // folder number = real slippy zoom (matches the widgets)
         total += (Math.abs(lon2tile(bounds.getWest(), tz) - lon2tile(bounds.getEast(), tz)) + 1) *
                  (Math.abs(lat2tile(bounds.getSouth(), tz) - lat2tile(bounds.getNorth(), tz)) + 1);
     }
@@ -45,7 +45,7 @@ function calculateTiles(bounds, minZ, maxZ) {
 function buildTileList(bounds, minZ, maxZ) {
     const tiles = [];
     for (let z = minZ; z <= maxZ; z++) {
-        const tz = z - 1; // UI shows 1-20, tile servers use 0-19
+        const tz = z; // folder number = real slippy zoom (matches the widgets)
         const xMin = lon2tile(bounds.getWest(), tz);
         const xMax = lon2tile(bounds.getEast(), tz);
         const yMin = lat2tile(bounds.getNorth(), tz);
