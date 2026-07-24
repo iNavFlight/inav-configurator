@@ -221,7 +221,7 @@ async function fetchResizedTile(provider, mapType, z, x, y, canvas, ctx, target)
     const maptilerKey = store.get('mapgen_maptiler_key', '');
     const img = await loadImage(getTileUrl(provider, mapType, z, x, y, maptilerKey));
     ctx.clearRect(0, 0, 100, 100);
-    ctx.drawImage(img, 0, 0, 256, 256, 0, 0, 100, 100);
+    ctx.drawImage(img, 0, 0, img.naturalWidth, img.naturalHeight, 0, 0, 100, 100);
 
     // ESRI Hybrid: overlay transportation labels
     if (provider === 'ESRI' && mapType === 'Hybrid') {
