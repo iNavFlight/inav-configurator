@@ -3626,6 +3626,30 @@
     "altControlResponseHelp": {
         "message": "Adjusts the response of fixed wing altitude control as the target altitude is approached. Higher values will sharpen altitude control response but may also cause excessive overshoot or pitch instability if set too high."
     },
+    "minAutoSpeed": {
+        "message": "Minimum Allowed Speed"
+    },
+    "maxAutoSpeed": {
+        "message": "Maximum Allowed Speed"
+    },
+    "autoSpeedChannel": {
+        "message": "Speed Adjustment Channel Number"
+    },
+    "autoSpeedChannelHelp": {
+        "message": "Minimum channel = 4 which is Throttle (default)."
+    },
+    "autoSpeedThrSmoothing": {
+        "message": "Throttle Response Smoothing Factor"
+    },
+    "autoSpeedThrSmoothingHelp": {
+        "message": "Changes how smoothly the throttle responds in Auto speed mode. Increasing the setting makes throttle changes smoother but also reduces throttle response."
+    },
+    "autoSpeedLevelMinThr": {
+        "message": "Minimum Allowed Throttle In Level Flight"
+    },
+    "autoSpeedLevelMinThrHelp": {
+        "message": "Minimum throttle for LEVEL flight in auto speed mode when using ground speed as speed reference [us]. This should be set with just enough margin to avoid stalling. Throttle can go lower than this setting when pitching down to a minimum of nav_fw_min_thr."
+    },
     "waypointRadiusHelp": {
         "message": "This sets the distance away from a waypoint that triggers the waypoint as reached."
     },
@@ -3637,6 +3661,9 @@
     },
     "fixedWingNavigationConfiguration": {
         "message": "Fixed Wing Navigation Settings"
+    },
+    "fixedWingAutoSpeedConfiguration": {
+        "message": "Fixed Wing Auto Speed Settings"
     },
     "fixedWingLandingConfiguration": {
         "message": "Fixed Wing Landing Settings"
