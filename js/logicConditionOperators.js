@@ -345,6 +345,12 @@ const LOGIC_OPERATORS = {
         hasOperand: [true, false],
         output: "boolean"
     },
+    61: {
+        name: "Disable Auto Speed Airspeed",
+        operandType: "Set Flight Parameter",
+        hasOperand: [true, false],
+        output: "boolean"
+    },
 };
 
 export { LOGIC_OPERATORS };

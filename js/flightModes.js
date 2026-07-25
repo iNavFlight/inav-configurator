@@ -300,6 +300,11 @@ var FLIGHT_MODES = [
         boxId: 59,
         boxName: "GIMBAL HEADTRACKER",
         permanentId: 68
+    },
+    {
+        boxId: 60,
+        boxName: "AUTO SPEED",
+        permanentId: 69
     }
 ];
 
