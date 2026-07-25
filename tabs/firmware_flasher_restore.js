@@ -8,7 +8,7 @@ import MigrationHandler from '../js/migration/migration_handler';
 import CONFIGURATOR from '../js/data_storage';
 import GUI from '../js/gui';
 import FC from '../js/fc';
-import ConnectionSerial from '../js/connection/connectionSerial';
+import ConnectionSerial from '../js/connection/connectionSerialTransport';
 
 /**
  * Manages the post-flash restore UI flow for the Firmware Flasher tab.

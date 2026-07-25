@@ -1,7 +1,7 @@
 'use strict';
 
 import GUI from './../js/gui';
-import ConnectionSerial from './connection/connectionSerial';
+import ConnectionSerial from './connection/connectionSerialTransport';
 import store from './store';
 
 var usbDevices =  [
