@@ -10,11 +10,11 @@
         "message": "English",
         "_comment": "Don't translate!"
     },
-	  "language_bg": {
+    "language_bg": {
         "message": "Български",
         "_comment": "Don't translate!"
     },
-	  "language_uk": {
+    "language_uk": {
         "message": "українська",
         "_comment": "Don't translate!"
     },
@@ -2396,6 +2396,9 @@
     },
     "cliInputPlaceholder": {
         "message": "Write your command here"
+    },
+    "cliInputPlaceholderBuilding": {
+        "message": "Building AutoComplete cache, please wait..."
     },
     "cliEnter": {
         "message": "CLI mode detected"

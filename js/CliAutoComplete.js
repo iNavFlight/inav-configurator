@@ -81,6 +81,7 @@ CliAutoComplete._builderWatchdogTouch = function() {
             $(self).trigger('build:stop');
         } else {
             // give it one more try
+            self.builder.numFails++;
             self.builder.state = 'reset';
             self.builderStart();
         }

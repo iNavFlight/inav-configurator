@@ -24,7 +24,7 @@ appUpdater.checkRelease = function (currVersion) {
         }
 
         if (updateAvailable) {
-            window.electronAPI.appGetVersion().then(currentVersion => {
+            Promise.resolve(window.electronAPI.appGetVersion()).then(currentVersion => {
                 GUI.log(newVersion, currentVersion);
                 GUI.log(currVersion);
 

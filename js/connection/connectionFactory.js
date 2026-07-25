@@ -2,7 +2,7 @@
 
 import { ConnectionType } from './connection';
 import ConnectionBle from './connectionBle';
-import ConnectionSerial from './connectionSerial';
+import ConnectionSerial from './connectionSerialTransport';
 import ConnectionTcp from './connectionTcp';
 import ConnectionUdp from './connectionUdp';
 

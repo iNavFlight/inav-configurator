@@ -18,6 +18,7 @@ import dialog from '../js/dialog';
 const cliTab = {
     outputHistory: "",
     cliBuffer: "",
+    rawReceiveBuffer: new Uint8Array(0),
     promptCallback: null,
     promptTimeoutId: null,
     GUI: {
@@ -26,6 +27,97 @@ const cliTab = {
 };
 
 cliTab.nextTab = null;
+
+function xorChecksum(bytes) {
+    return bytes.reduce((checksum, byte) => checksum ^ byte, 0);
+}
+
+function crc8DvbS2(bytes) {
+    let crc = 0;
+    for (const byte of bytes) {
+        crc ^= byte;
+        for (let bit = 0; bit < 8; bit++) {
+            crc = (crc & 0x80) ? ((crc << 1) ^ 0xd5) & 0xff : (crc << 1) & 0xff;
+        }
+    }
+    return crc;
+}
+
+function appendBytes(left, right) {
+    const combined = new Uint8Array(left.length + right.length);
+    combined.set(left);
+    combined.set(right, left.length);
+    return combined;
+}
+
+/**
+ * CLI mode is entered while an MSP status request can still be in flight.
+ * Discard complete, checksum-valid MSP frames so their binary bytes cannot be
+ * treated as CLI input. Partial frames are held until the rest arrives.
+ */
+function removeMspFrames(data) {
+    const input = appendBytes(cliTab.rawReceiveBuffer, data);
+    const output = [];
+    let offset = 0;
+
+    while (offset < input.length) {
+        if (input[offset] !== 0x24) { // '$'
+            output.push(input[offset++]);
+            continue;
+        }
+
+        if (offset + 3 > input.length) {
+            break;
+        }
+
+        const isV1 = input[offset + 1] === 0x4d; // 'M'
+        const isV2 = input[offset + 1] === 0x58; // 'X'
+        const direction = input[offset + 2];
+        if ((!isV1 && !isV2) || ![0x3c, 0x3e, 0x21].includes(direction)) {
+            output.push(input[offset++]);
+            continue;
+        }
+
+        let frameLength;
+        let checksumValid;
+        if (isV1) {
+            if (offset + 6 > input.length) {
+                break;
+            }
+            const payloadLength = input[offset + 3];
+            if (payloadLength === 0xff) {
+                if (offset + 8 > input.length) {
+                    break;
+                }
+                frameLength = 8 + input[offset + 5] + (input[offset + 6] << 8);
+            } else {
+                frameLength = 6 + payloadLength;
+            }
+            if (offset + frameLength > input.length) {
+                break;
+            }
+            checksumValid = xorChecksum(input.slice(offset + 3, offset + frameLength - 1)) === input[offset + frameLength - 1];
+        } else {
+            if (offset + 9 > input.length) {
+                break;
+            }
+            frameLength = 9 + input[offset + 6] + (input[offset + 7] << 8);
+            if (offset + frameLength > input.length) {
+                break;
+            }
+            checksumValid = crc8DvbS2(input.slice(offset + 3, offset + frameLength - 1)) === input[offset + frameLength - 1];
+        }
+
+        if (checksumValid) {
+            offset += frameLength;
+        } else {
+            output.push(input[offset++]);
+        }
+    }
+
+    cliTab.rawReceiveBuffer = input.slice(offset);
+    return new Uint8Array(output);
+}
 
 function removePromptHash(promptText) {
     return promptText.replace(/^# /, '');
@@ -101,8 +193,14 @@ cliTab.initialize = function (callback) {
     mspDeduplicationQueue.flush();
     MSP.callbacks_cleanup();
 
+    // Any MSP request sent while the FC is in CLI mode is echoed back as "typed"
+    // characters, corrupting the prompt and the auto-complete cache builder.
+    // Lock the queue so pollers/retries cannot transmit until the tab is left.
+    mspQueue.lock();
+
     self.outputHistory = "";
     self.cliBuffer = "";
+    self.rawReceiveBuffer = new Uint8Array(0);
 
     const clipboardCopySupport = !!(navigator.clipboard?.writeText) || document.queryCommandSupported?.('copy');
 
@@ -441,7 +539,7 @@ cliTab.read = function (readInfo) {
         Windows understands (both) CRLF
         Chrome OS currently unknown
     */
-    var data = new Uint8Array(readInfo.data),
+    var data = removeMspFrames(new Uint8Array(readInfo.data)),
         validateText = "",
         sequenceCharsToSkip = 0;
 
@@ -511,6 +609,7 @@ cliTab.read = function (readInfo) {
     if (!CONFIGURATOR.cliValid && validateText.indexOf('CLI') !== -1) {
         GUI.log(i18n.getMessage('cliEnter'));
         CONFIGURATOR.cliValid = true;
+        this.rawReceiveBuffer = new Uint8Array(0);
 
         if (CliAutoComplete.isEnabled() && !CliAutoComplete.isBuilding()) {
             // start building autoComplete
@@ -561,18 +660,30 @@ cliTab.cleanup = function (callback) {
     clearTimeout(cliTab.promptTimeoutId);
     cliTab.promptCallback = null;
 
+    // Re-allow MSP traffic regardless of how the tab is being left.
+    mspQueue.unlock();
+
     if (!(CONFIGURATOR.connectionValid && CONFIGURATOR.cliValid && CONFIGURATOR.cliActive)) {
         if (callback) callback();
         return;
     }
-
 
     CONFIGURATOR.cliActive = false;
     CONFIGURATOR.cliValid = false;
     CliAutoComplete.cleanup();
     $(CliAutoComplete).off();
 
-    if (callback) callback();
+    // The UI promises that disconnecting from the CLI sends "exit" so the FC
+    // returns to MSP mode. Without this the FC stays in CLI mode and the next
+    // connection's MSP requests are echoed back, never answered. Flags are
+    // cleared first so the echoed output is not re-parsed as CLI data.
+    this.send(getCliCommand('exit\r', this.cliBuffer));
+    this.cliBuffer = "";
+
+    if (callback) {
+        // Let the in-flight "exit" bytes flush before the caller closes the port.
+        setTimeout(callback, 200);
+    }
 };
 
 export default cliTab;
