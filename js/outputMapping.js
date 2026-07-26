@@ -106,8 +106,8 @@ var OutputMappingCollection = function () {
         return colorTable[timerIndex % colorTable.length];
     }
 
-    self.isLedPin = function(timer) {
-        return data[timer].specialLabels == SPECIAL_LABEL_LED;
+    self.isLedPin = function(outputIndex) {
+        return BitHelper.bit_check(data[outputIndex]['usageFlags'], TIM_USE_LED);
     }
 
     self.isBeeperPin = function(outputIndex) {
@@ -187,6 +187,16 @@ var OutputMappingCollection = function () {
             if (mode === self.TIMER_OUTPUT_MODE_BEEPER && !beeperTimerClaimed[timerId]) {
                 timerMap[i] = OUTPUT_TYPE_BEEPER;
                 beeperTimerClaimed[timerId] = true;
+            }
+        }
+
+        let ledTimerClaimed = {};
+        for (let i = 0; i < data.length; i++) {
+            let timerId = data[i]['timerId'];
+            let mode = timerOverrides[timerId] || self.TIMER_OUTPUT_MODE_AUTO;
+            if (mode === self.TIMER_OUTPUT_MODE_LED && !ledTimerClaimed[timerId]) {
+                timerMap[i] = OUTPUT_TYPE_LED;
+                ledTimerClaimed[timerId] = true;
             }
         }
 
