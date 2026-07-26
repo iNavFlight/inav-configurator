@@ -62,6 +62,19 @@ const TIMER_OUTPUT_MODE_AUTO    = 0;
 const TIMER_OUTPUT_MODE_MOTORS  = 1;
 const TIMER_OUTPUT_MODE_SERVOS  = 2;
 const TIMER_OUTPUT_MODE_LED     = 3;
+const TIMER_OUTPUT_MODE_BEEPER  = 5;
+
+// BEEPER/PINIO-specific constants (from outputMapping.js) — added to cover
+// getTimerMap()'s BEEPER pre-assignment de-dup and getOutputCount()'s
+// length-based (not flag-count-based) total, per PR #2654.
+const TIM_USE_BEEPER = 25;
+const TIM_USE_PINIO  = 26;
+
+const OUTPUT_TYPE_PINIO  = 3;
+const OUTPUT_TYPE_BEEPER = 4;
+
+const SPECIAL_LABEL_PINIO_BASE = 2;  // values >= 2 = USER1..USER4 (capacity available)
+const PIN_LABEL_NONE = 0;            // capacity exhausted: usageFlags has TIM_USE_PINIO but no specialLabels
 
 // ── Inline getTimerMap() from outputMapping.js ────────────────────────────────
 // This is the EXACT two-pass algorithm from js/outputMapping.js getTimerMap().
@@ -110,6 +123,113 @@ function getTimerMap(data, timerOverrides, motors, servos) {
     }
 
     return timerMap;
+}
+
+// ── Inline getTimerMap() extended with BEEPER/PINIO pre-assignment ──────────
+// This mirrors the FULL current js/outputMapping.js getTimerMap(), including
+// the two pre-assignment loops added for PR #2654:
+//
+//   1. PINIO pre-assignment: any pad whose specialLabels >= SPECIAL_LABEL_PINIO_BASE
+//      is unconditionally OUTPUT_TYPE_PINIO (firmware only assigns specialLabels
+//      when PINIO_COUNT capacity is available; when capacity is exhausted the
+//      companion firmware change leaves specialLabels at PIN_LABEL_NONE (0), so
+//      this pre-assignment loop intentionally does NOT match it).
+//   2. BEEPER pre-assignment: a timer set to TIMER_OUTPUT_MODE_BEEPER only ever
+//      wires up ONE real beeper (firmware wires just the first matching pad on
+//      that timer), so `beeperTimerClaimed` ensures only the first (lowest
+//      index) pad sharing that timerId gets OUTPUT_TYPE_BEEPER; sibling pads on
+//      the same timer are intentionally left unassigned here.
+//
+// Any changes to outputMapping.js's getTimerMap() must be reflected here.
+function getTimerMapWithBeeperPinio(data, timerOverrides, motors, servos) {
+    let timerMap = new Array(data.length).fill(null);
+    let motorsToGo = motors;
+    let servosToGo = servos;
+
+    // Pre-assign PINIO outputs — identified by specialLabels, not timer priority.
+    for (let i = 0; i < data.length; i++) {
+        if (data[i].specialLabels >= SPECIAL_LABEL_PINIO_BASE) {
+            timerMap[i] = OUTPUT_TYPE_PINIO;
+        }
+    }
+
+    // Pre-assign BEEPER outputs — only the first pad per timerId can be the
+    // real beeper; siblings on the same timer are intentionally skipped.
+    const beeperTimerClaimed = {};
+    for (let i = 0; i < data.length; i++) {
+        const timerId = data[i].timerId;
+        const mode = timerOverrides[timerId] !== undefined
+                        ? timerOverrides[timerId]
+                        : TIMER_OUTPUT_MODE_AUTO;
+        if (mode === TIMER_OUTPUT_MODE_BEEPER && !beeperTimerClaimed[timerId]) {
+            timerMap[i] = OUTPUT_TYPE_BEEPER;
+            beeperTimerClaimed[timerId] = true;
+        }
+    }
+
+    for (let priority = 0; priority < 2; priority++) {
+        const isDedicated = (priority === 0);
+
+        for (let i = 0; i < data.length; i++) {
+            if (timerMap[i] !== null) continue;
+
+            const flags   = data[i].usageFlags;
+            const timerId = data[i].timerId;
+            const mode    = timerOverrides[timerId] !== undefined
+                                ? timerOverrides[timerId]
+                                : TIMER_OUTPUT_MODE_AUTO;
+
+            if (!isDedicated && (mode === TIMER_OUTPUT_MODE_MOTORS || mode === TIMER_OUTPUT_MODE_SERVOS)) {
+                continue;
+            }
+
+            if (motorsToGo > 0
+                    && BitHelper.bit_check(flags, TIM_USE_MOTOR)
+                    && (isDedicated ? mode === TIMER_OUTPUT_MODE_MOTORS
+                                    : mode !== TIMER_OUTPUT_MODE_MOTORS)) {
+                timerMap[i] = OUTPUT_TYPE_MOTOR;
+                motorsToGo--;
+            } else if (servosToGo > 0
+                    && BitHelper.bit_check(flags, TIM_USE_SERVO)
+                    && (isDedicated ? mode === TIMER_OUTPUT_MODE_SERVOS
+                                    : mode !== TIMER_OUTPUT_MODE_SERVOS)) {
+                timerMap[i] = OUTPUT_TYPE_SERVO;
+                servosToGo--;
+            } else if (!isDedicated && BitHelper.bit_check(flags, TIM_USE_LED)) {
+                timerMap[i] = OUTPUT_TYPE_LED;
+            } else if (!isDedicated && BitHelper.bit_check(flags, TIM_USE_BEEPER)) {
+                timerMap[i] = OUTPUT_TYPE_BEEPER;
+            }
+        }
+    }
+
+    return timerMap;
+}
+
+// ── Inline getFirstOutputOffset() / getOutputCount() from outputMapping.js ──
+// getOutputCount() now returns data.length - getFirstOutputOffset() (a range,
+// not a count of flagged pads), since BEEPER-timer sibling pads are
+// legitimately flagless (or carry only TIM_USE_PINIO with no specialLabels
+// when PINIO capacity is exhausted) yet still occupy a real output column
+// that must not be dropped when real motor/servo outputs follow them.
+function getFirstOutputOffset(data) {
+    for (let i = 0; i < data.length; i++) {
+        if (
+            BitHelper.bit_check(data[i].usageFlags, TIM_USE_MOTOR) ||
+            BitHelper.bit_check(data[i].usageFlags, TIM_USE_SERVO) ||
+            BitHelper.bit_check(data[i].usageFlags, TIM_USE_LED) ||
+            BitHelper.bit_check(data[i].usageFlags, TIM_USE_BEEPER) ||
+            BitHelper.bit_check(data[i].usageFlags, TIM_USE_PINIO) ||
+            data[i].specialLabels >= SPECIAL_LABEL_PINIO_BASE
+        ) {
+            return i;
+        }
+    }
+    return 0;
+}
+
+function getOutputCount(data) {
+    return data.length - getFirstOutputOffset(data);
 }
 
 // ── buildOutputLabels: mirrors getOutputTable() numbering ────────────────────
@@ -745,6 +865,123 @@ runTest('Dedicated motors at S1+S2, auto at S3+S4: both agree Motor1=S1, Motor2=
         `JS: [${jsLabels}] != FW: [${fwLabels}]`);
     assert(jsLabels[0] === 'Motor 1', `S1 expected Motor 1, got ${jsLabels[0]}`);
     assert(jsLabels[1] === 'Motor 2', `S2 expected Motor 2, got ${jsLabels[1]}`);
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// TC-10: BEEPER pre-assignment — only the FIRST pad sharing a BEEPER-mode
+// timer becomes OUTPUT_TYPE_BEEPER. Firmware's beeperInit() only ever wires
+// up the first matching pad on a timer, so siblings must NOT be labeled
+// "Buzzer" too (regression for PR #2654).
+// ─────────────────────────────────────────────────────────────────────────────
+console.log('\nTC-10: BEEPER pre-assignment claims only the first pad per timer');
+
+runTest('BEEPER timer with 3 sibling pads: only first (lowest index) gets OUTPUT_TYPE_BEEPER', () => {
+    const outputs = [
+        { usageFlags: BitHelper.bit_set(0, TIM_USE_BEEPER), timerId: 0 }, // true beeper pad
+        { usageFlags: 0, timerId: 0 },                                    // sibling 1
+        { usageFlags: 0, timerId: 0 },                                    // sibling 2
+        { usageFlags: BitHelper.bit_set(0, TIM_USE_MOTOR), timerId: 1 },  // unrelated motor
+    ];
+    const overrides = { 0: TIMER_OUTPUT_MODE_BEEPER };
+    const map = getTimerMapWithBeeperPinio(outputs, overrides, 1, 0);
+    assert(map[0] === OUTPUT_TYPE_BEEPER, `index0 (first pad) expected OUTPUT_TYPE_BEEPER, got ${map[0]}`);
+    assert(map[1] !== OUTPUT_TYPE_BEEPER, `index1 (sibling) must NOT be OUTPUT_TYPE_BEEPER, got ${map[1]}`);
+    assert(map[2] !== OUTPUT_TYPE_BEEPER, `index2 (sibling) must NOT be OUTPUT_TYPE_BEEPER, got ${map[2]}`);
+    assert(map[3] === OUTPUT_TYPE_MOTOR, `index3 (unrelated) expected OUTPUT_TYPE_MOTOR, got ${map[3]}`);
+});
+
+runTest('BEEPER timer siblings not at array index 0: first pad SHARING that timerId claims BEEPER', () => {
+    // The unrelated motor pad at index0 belongs to a DIFFERENT timer (9).
+    // Among the pads sharing timerId 3 (indices 1,2,3), only the first
+    // (index1) should claim OUTPUT_TYPE_BEEPER — proving the claim is
+    // per-timerId, not simply "global array index 0".
+    const outputs = [
+        { usageFlags: BitHelper.bit_set(0, TIM_USE_MOTOR), timerId: 9 }, // unrelated motor, different timer
+        { usageFlags: 0, timerId: 3 },                                   // first pad sharing BEEPER timer 3
+        { usageFlags: 0, timerId: 3 },                                   // sibling
+        { usageFlags: 0, timerId: 3 },                                   // sibling
+    ];
+    const overrides = { 3: TIMER_OUTPUT_MODE_BEEPER };
+    const map = getTimerMapWithBeeperPinio(outputs, overrides, 1, 0);
+    assert(map[0] === OUTPUT_TYPE_MOTOR, `index0 (different timer) expected OUTPUT_TYPE_MOTOR, got ${map[0]}`);
+    assert(map[1] === OUTPUT_TYPE_BEEPER, `index1 (first pad on timer 3) expected OUTPUT_TYPE_BEEPER, got ${map[1]}`);
+    assert(map[2] !== OUTPUT_TYPE_BEEPER, `index2 (sibling) must NOT be OUTPUT_TYPE_BEEPER, got ${map[2]}`);
+    assert(map[3] !== OUTPUT_TYPE_BEEPER, `index3 (sibling) must NOT be OUTPUT_TYPE_BEEPER, got ${map[3]}`);
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// TC-11: PINIO capacity-available sibling — a BEEPER-timer sibling pad
+// flagged TIM_USE_PINIO with specialLabels >= SPECIAL_LABEL_PINIO_BASE (i.e.
+// firmware had PINIO_COUNT capacity to spare) must get OUTPUT_TYPE_PINIO.
+// ─────────────────────────────────────────────────────────────────────────────
+console.log('\nTC-11: PINIO sibling with capacity available gets OUTPUT_TYPE_PINIO');
+
+runTest('BEEPER-timer sibling with TIM_USE_PINIO + specialLabels >= BASE gets OUTPUT_TYPE_PINIO', () => {
+    const outputs = [
+        { usageFlags: BitHelper.bit_set(0, TIM_USE_BEEPER), timerId: 0 },                              // true beeper
+        { usageFlags: BitHelper.bit_set(0, TIM_USE_PINIO), timerId: 0, specialLabels: SPECIAL_LABEL_PINIO_BASE }, // sibling, capacity available
+        { usageFlags: BitHelper.bit_set(0, TIM_USE_MOTOR), timerId: 1 },
+    ];
+    const overrides = { 0: TIMER_OUTPUT_MODE_BEEPER };
+    const map = getTimerMapWithBeeperPinio(outputs, overrides, 1, 0);
+    assert(map[0] === OUTPUT_TYPE_BEEPER, `index0 expected OUTPUT_TYPE_BEEPER, got ${map[0]}`);
+    assert(map[1] === OUTPUT_TYPE_PINIO, `index1 (capacity-available sibling) expected OUTPUT_TYPE_PINIO, got ${map[1]}`);
+    assert(map[2] === OUTPUT_TYPE_MOTOR, `index2 expected OUTPUT_TYPE_MOTOR, got ${map[2]}`);
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// TC-12: PINIO capacity-EXHAUSTED sibling — the companion firmware change
+// leaves specialLabels at PIN_LABEL_NONE (0) when PINIO_COUNT capacity (max 4,
+// shared with target-defined PINIO pins) is exhausted, even though
+// usageFlags still carries TIM_USE_PINIO. That pad must stay UNASSIGNED
+// (neither OUTPUT_TYPE_PINIO nor OUTPUT_TYPE_BEEPER) — and must still be
+// counted by getOutputCount(), not silently dropped.
+// ─────────────────────────────────────────────────────────────────────────────
+console.log('\nTC-12: PINIO sibling with capacity exhausted stays unassigned but counted');
+
+runTest('BEEPER-timer sibling with TIM_USE_PINIO but specialLabels=PIN_LABEL_NONE stays unassigned', () => {
+    const outputs = [
+        { usageFlags: BitHelper.bit_set(0, TIM_USE_MOTOR), timerId: 5 },                                  // index0: motor, defines offset
+        { usageFlags: BitHelper.bit_set(0, TIM_USE_BEEPER), timerId: 0 },                                 // index1: true beeper
+        { usageFlags: BitHelper.bit_set(0, TIM_USE_PINIO), timerId: 0, specialLabels: PIN_LABEL_NONE },   // index2: exhausted-capacity sibling
+        { usageFlags: BitHelper.bit_set(0, TIM_USE_MOTOR), timerId: 6 },                                  // index3: motor
+    ];
+    const overrides = { 0: TIMER_OUTPUT_MODE_BEEPER };
+    const map = getTimerMapWithBeeperPinio(outputs, overrides, 2, 0);
+    assert(map[2] !== OUTPUT_TYPE_PINIO, `index2 (capacity-exhausted sibling) must NOT be OUTPUT_TYPE_PINIO, got ${map[2]}`);
+    assert(map[2] !== OUTPUT_TYPE_BEEPER, `index2 (capacity-exhausted sibling) must NOT be OUTPUT_TYPE_BEEPER, got ${map[2]}`);
+    assert(map[2] === null, `index2 (capacity-exhausted sibling) expected to stay unassigned (null), got ${map[2]}`);
+
+    // Not silently dropped: getOutputCount() must still include this pad in the total.
+    const count = getOutputCount(outputs);
+    assert(count === 4, `getOutputCount() expected 4 (all pads from offset 0), got ${count}`);
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// TC-13: getOutputCount() regression — a real motor/servo output that appears
+// AFTER a BEEPER timer's flagless/PINIO-flagged sibling pads must still be
+// counted. This is the actual regression an earlier code review caught: the
+// old flag-based counting silently dropped real outputs that came later in
+// the array once earlier siblings broke the flag-based tally.
+// ─────────────────────────────────────────────────────────────────────────────
+console.log('\nTC-13: getOutputCount() regression — real output after BEEPER siblings');
+
+runTest('Real servo AFTER flagless/PINIO-flagged BEEPER siblings is included in getOutputCount()', () => {
+    const outputs = [
+        { usageFlags: BitHelper.bit_set(0, TIM_USE_BEEPER), timerId: 0 },                                // index0: true beeper (defines offset=0)
+        { usageFlags: 0, timerId: 0 },                                                                    // index1: flagless sibling
+        { usageFlags: BitHelper.bit_set(0, TIM_USE_PINIO), timerId: 0, specialLabels: PIN_LABEL_NONE },  // index2: capacity-exhausted sibling
+        { usageFlags: BitHelper.bit_set(0, TIM_USE_SERVO), timerId: 7 },                                 // index3: REAL servo, after the siblings
+    ];
+    const overrides = { 0: TIMER_OUTPUT_MODE_BEEPER };
+
+    const count = getOutputCount(outputs);
+    assert(count === 4, `getOutputCount() expected 4 (all pads from first real output onward), got ${count}`);
+
+    // And the real servo must actually be reachable/assigned — not lost due
+    // to an undercounted range.
+    const map = getTimerMapWithBeeperPinio(outputs, overrides, 0, 1);
+    assert(map[3] === OUTPUT_TYPE_SERVO, `index3 (real servo after siblings) expected OUTPUT_TYPE_SERVO, got ${map[3]}`);
 });
 
 // ═══════════════════════════════════════════════════════════════════════════════
