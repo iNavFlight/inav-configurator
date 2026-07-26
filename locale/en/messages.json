@@ -225,6 +225,9 @@
     "mapgenTarget": {
         "message": "Target"
     },
+    "mapgenTerrainSource": {
+        "message": "Elevation Source"
+    },
     "mapgenProvider": {
         "message": "Provider"
     },

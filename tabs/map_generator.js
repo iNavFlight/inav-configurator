@@ -12,6 +12,7 @@ import i18n from './../js/localization';
 import store from './../js/store';
 import { globalSettings, UnitType } from './../js/globalSettings';
 import JSZip from 'jszip';
+import { fromUrl, fromArrayBuffer } from 'geotiff';
 
 // Fix Leaflet default marker icon paths (broken by bundlers)
 delete L.Icon.Default.prototype._getIconUrl;
@@ -544,6 +545,240 @@ async function fetchSrtmTile(lat, lon, statusCb) {
     return await decompressGz(gz);
 }
 
+// ─── Copernicus GLO-30 → HGT-shaped grid ───────────────────────────────
+// Copernicus tiles are 1°x1° Cloud-Optimized GeoTIFF (Float32, 3600x3600,
+// pixel-is-point). Their sample points fall on exactly the same whole
+// arc-second graticule as SRTM .hgt, so filling the 3601x3601 grid that
+// hgtElevation()/createDatFromHgt() expect is a direct copy — no resampling,
+// no half-pixel shift. The 3601st row/column (the tile's south and east
+// edges) belong to the south / east neighbour tiles and are copied from them.
+const COPERNICUS_BASE_URL = 'https://copernicus-dem-30m.s3.amazonaws.com';
+// Required verbatim by the Copernicus WorldDEM-30 licence (Art. 6). These must
+// be reproduced character-for-character wherever the derived .DAT files are
+// presented or shipped, and imply no endorsement by any of the named parties.
+const COPERNICUS_NOTICE_1 = 'produced using Copernicus WorldDEM-30 © DLR e.V. 2010-2014 and © Airbus Defence and Space GmbH 2014-2018 provided under COPERNICUS by the European Union and ESA; all rights reserved';
+const COPERNICUS_NOTICE_2 = 'The organisations in charge of the Copernicus programme by law or by delegation do not incur any liability for any use of the Copernicus WorldDEM-30';
+const TERRAIN_ATTR_SRTM = 'Elevation data: <a href="https://www.usgs.gov/centers/eros/science/usgs-eros-archive-digital-elevation-shuttle-radar-topography-mission-srtm-1">NASA SRTM</a>';
+const TERRAIN_ATTR_COPERNICUS = 'Elevation data: <a href="https://registry.opendata.aws/copernicus-dem/">Copernicus WorldDEM-30</a>';
+// Shipped inside the exported ZIP. The WorldDEM-30 licence (Art. 6) ties the
+// notices to distribution / communication to the public, so the ZIP — the
+// artefact a user can pass on — carries them, while a direct write to the
+// user's own flight controller SD card (personal use) does not.
+function copernicusNoticeText() {
+    return 'INAV Terrain elevation data — attribution notice\r\n\r\n' +
+        'Elevation source: Copernicus WorldDEM-30 (GLO-30), 30 m\r\n' +
+        'https://registry.opendata.aws/copernicus-dem/\r\n\r\n' +
+        COPERNICUS_NOTICE_1 + '\r\n\r\n' +
+        COPERNICUS_NOTICE_2 + '\r\n\r\n' +
+        'This product is not endorsed by or affiliated with the European Union, ESA,\r\n' +
+        'Airbus Defence and Space GmbH or DLR e.V.\r\n\r\n' +
+        'Elevation data is provided "as is", without any warranty.\r\n' +
+        'Always verify terrain clearance before flight.\r\n';
+}
+
+const COPERNICUS_GRID = 3600;
+const COPERNICUS_ROW_BAND = 600;      // rows decoded per step, to cap peak memory
+const COPERNICUS_MAX_RETRIES = 2;
+
+function copernicusTileStem(lat, lon) {
+    const ns = (lat >= 0 ? 'N' : 'S') + String(Math.abs(lat)).padStart(2, '0');
+    const ew = (lon >= 0 ? 'E' : 'W') + String(Math.abs(lon)).padStart(3, '0');
+    return `Copernicus_DSM_COG_10_${ns}_00_${ew}_00_DEM`;
+}
+
+function copernicusUrl(lat, lon) {
+    const stem = copernicusTileStem(lat, lon);
+    return `${COPERNICUS_BASE_URL}/${stem}/${stem}.tif`;
+}
+
+// Polite retry: back off on transient errors (503 throttling), give up on 404
+// (a tile that simply does not exist — ocean or outside coverage).
+async function copernicusRetry(fn) {
+    let lastErr = null;
+    for (let attempt = 0; attempt <= COPERNICUS_MAX_RETRIES; attempt++) {
+        if (attempt > 0) await sleep(500 * (attempt + 1));
+        try {
+            return await fn();
+        } catch (e) {
+            if (e && e.notFound) throw e;
+            lastErr = e;
+        }
+    }
+    throw lastErr || new Error('Copernicus request failed');
+}
+
+// Opens one Copernicus tile. `full` downloads the whole GeoTIFF in a single
+// request (used for the tile being generated); otherwise the file is read
+// remotely with HTTP range requests, so a thin neighbour strip only pulls the
+// blocks it touches. Returns null when the tile does not exist.
+async function openCopernicusImage(lat, lon, imgCache, full, statusCb) {
+    const key = lat + '_' + lon;
+    if (Object.prototype.hasOwnProperty.call(imgCache, key) && (imgCache[key] === null || imgCache[key].full || !full)) {
+        return imgCache[key] ? imgCache[key].image : null;
+    }
+    try {
+        const entry = await copernicusRetry(async () => {
+            if (full) {
+                if (statusCb) statusCb('downloading');
+                const resp = await fetch(copernicusUrl(lat, lon));
+                if (resp.status === 404 || resp.status === 403) {
+                    const err = new Error('HTTP ' + resp.status);
+                    err.notFound = true;
+                    throw err;
+                }
+                if (!resp.ok) throw new Error('HTTP ' + resp.status);
+                const buf = await resp.arrayBuffer();
+                if (statusCb) statusCb('decoding', buf.byteLength);
+                const tiff = await fromArrayBuffer(buf);
+                return { image: await tiff.getImage(), full: true };
+            }
+            const tiff = await fromUrl(copernicusUrl(lat, lon));
+            return { image: await tiff.getImage(), full: false };
+        });
+        imgCache[key] = entry;
+        return entry.image;
+    } catch (e) {
+        // Missing tile is "no data", not a failure — but a network/server
+        // problem must surface so the user can decide about the fallback.
+        if (!(e && e.notFound)) throw e;
+        imgCache[key] = null;
+        return null;
+    }
+}
+
+function copernicusToInt16(v) {
+    if (!Number.isFinite(v)) return 0;              // void → sea level, as the SRTM path does
+    const r = Math.round(v);
+    if (r > 32767) return 32767;
+    if (r < -32767) return -32767;                  // keep -32768 reserved as the .hgt void marker
+    return r;
+}
+
+// Fills rows [rowFrom..rowTo] x cols [colFrom..colTo] of a 3601x3601
+// big-endian int16 grid for the 1° cell (degLat, degLon). Returns null if the
+// cell's own Copernicus tile does not exist.
+async function buildCopernicusGrid(degLat, degLon, rowFrom, rowTo, colFrom, colTo, imgCache, opts) {
+    const options = opts || {};
+    const statusCb = options.statusCb;
+    const primary = await openCopernicusImage(degLat, degLon, imgCache, !!options.full, statusCb);
+    if (!primary) return null;
+
+    const bytes = new Uint8Array(SRTM_GRID * SRTM_GRID * 2);
+    const view = new DataView(bytes.buffer);
+
+    const rowMainTo = Math.min(rowTo, COPERNICUS_GRID - 1);
+    const colMainTo = Math.min(colTo, COPERNICUS_GRID - 1);
+    const bandTotal = Math.max(1, rowMainTo - rowFrom + 1);
+
+    // Body: grid row r == tile pixel row r, grid col c == tile pixel col c.
+    for (let bandTop = rowFrom; bandTop <= rowMainTo; bandTop += COPERNICUS_ROW_BAND) {
+        const bandBottom = Math.min(rowMainTo, bandTop + COPERNICUS_ROW_BAND - 1);
+        const [band] = await primary.readRasters({
+            window: [colFrom, bandTop, colMainTo + 1, bandBottom + 1],
+        });
+        const bandWidth = colMainTo - colFrom + 1;
+        for (let r = bandTop; r <= bandBottom; r++) {
+            const src = (r - bandTop) * bandWidth;
+            let off = (r * SRTM_GRID + colFrom) * 2;
+            for (let c = 0; c < bandWidth; c++) {
+                view.setInt16(off, copernicusToInt16(band[src + c]), false);
+                off += 2;
+            }
+        }
+        if (statusCb) statusCb('grid', bandBottom - rowFrom + 1, bandTotal);
+        await new Promise(r => setTimeout(r, 0));
+    }
+
+    // East edge (grid column 3600) is the west column of the east neighbour.
+    if (colTo >= COPERNICUS_GRID) {
+        const east = await openCopernicusImage(degLat, degLon + 1, imgCache, false, null);
+        if (east) {
+            const [col] = await east.readRasters({ window: [0, rowFrom, 1, rowMainTo + 1] });
+            for (let r = rowFrom; r <= rowMainTo; r++) {
+                view.setInt16((r * SRTM_GRID + COPERNICUS_GRID) * 2, copernicusToInt16(col[r - rowFrom]), false);
+            }
+        }
+    }
+
+    // South edge (grid row 3600) is the north row of the south neighbour.
+    if (rowTo >= COPERNICUS_GRID) {
+        const south = await openCopernicusImage(degLat - 1, degLon, imgCache, false, null);
+        if (south) {
+            const [row] = await south.readRasters({ window: [colFrom, 0, colMainTo + 1, 1] });
+            let off = (COPERNICUS_GRID * SRTM_GRID + colFrom) * 2;
+            for (let c = 0; c <= colMainTo - colFrom; c++) {
+                view.setInt16(off, copernicusToInt16(row[c]), false);
+                off += 2;
+            }
+        }
+        if (colTo >= COPERNICUS_GRID) {
+            const southEast = await openCopernicusImage(degLat - 1, degLon + 1, imgCache, false, null);
+            if (southEast) {
+                const [px] = await southEast.readRasters({ window: [0, 0, 1, 1] });
+                view.setInt16((COPERNICUS_GRID * SRTM_GRID + COPERNICUS_GRID) * 2, copernicusToInt16(px[0]), false);
+            }
+        }
+    }
+
+    return view;
+}
+
+// The .DAT block grid starts at the cell's south-west corner and walks north
+// and east, overshooting the 1° square (~370 m north, ~2 km east at 42°N), so
+// the north / east / north-east neighbours must supply the samples past the
+// edge. Only that thin margin is needed, not the whole neighbour tile.
+function copernicusNorthMarginRows() {
+    return Math.ceil((1200 / 111320) * COPERNICUS_GRID) + 2;
+}
+
+function copernicusEastMarginCols(degLat) {
+    const cos = Math.max(0.05, Math.cos((degLat + 0.5) * Math.PI / 180));
+    return Math.ceil((2500 / (111320 * cos)) * COPERNICUS_GRID) + 2;
+}
+
+// Returns the tile cache createDatFromHgt() needs for one 1° cell: a full grid
+// for the cell itself plus N/E/NE edge data. Partial strips live in a per-cell
+// object and are never written to runCache or IndexedDB — a strip sits in a
+// zero-filled full-size buffer, so reusing one as a complete grid would look
+// like an ocean tile.
+async function ensureCopernicusCellData(degLat, degLon, runCache, imgCache, statusCb) {
+    const primaryKey = degLat + '_' + degLon;
+    if (!runCache[primaryKey]) {
+        const cachedBuf = await hgtDb.get('cop_' + primaryKey);
+        if (cachedBuf) runCache[primaryKey] = makeHgtView(new Uint8Array(cachedBuf));
+    }
+
+    const cellCache = {};
+    if (runCache[primaryKey]) cellCache[primaryKey] = runCache[primaryKey];
+
+    if (!cellCache[primaryKey]) {
+        const grid = await buildCopernicusGrid(degLat, degLon, 0, COPERNICUS_GRID, 0, COPERNICUS_GRID,
+            imgCache, { full: true, statusCb });
+        if (!grid) return null;
+        runCache[primaryKey] = grid;
+        cellCache[primaryKey] = grid;
+        hgtDb.put('cop_' + primaryKey, grid.buffer);
+    }
+
+    const rowStart = COPERNICUS_GRID - copernicusNorthMarginRows();
+    const colEnd = Math.min(COPERNICUS_GRID, copernicusEastMarginCols(degLat));
+    const neighbors = [
+        { lat: degLat, lon: degLon + 1, rowFrom: 0, rowTo: COPERNICUS_GRID, colFrom: 0, colTo: colEnd },
+        { lat: degLat + 1, lon: degLon, rowFrom: rowStart, rowTo: COPERNICUS_GRID, colFrom: 0, colTo: COPERNICUS_GRID },
+        { lat: degLat + 1, lon: degLon + 1, rowFrom: rowStart, rowTo: COPERNICUS_GRID, colFrom: 0, colTo: colEnd },
+    ];
+    for (const nb of neighbors) {
+        const key = nb.lat + '_' + nb.lon;
+        if (runCache[key]) { cellCache[key] = runCache[key]; continue; }
+        if (statusCb) statusCb('edges');
+        const strip = await buildCopernicusGrid(nb.lat, nb.lon, nb.rowFrom, nb.rowTo, nb.colFrom, nb.colTo,
+            imgCache, { full: false });
+        if (strip) cellCache[key] = strip;   // per-cell only — never cached as a full grid
+    }
+
+    return cellCache;
+}
+
 function terrainDatFilename(lat, lon) {
     const latPrefix = lat >= 0 ? 'N' : 'S';
     const lonPrefix = lon >= 0 ? 'E' : 'W';
@@ -655,6 +890,7 @@ TABS.map_generator.initialize = function (callback) {
         let liveAltEnabled = false;
         let liveAltCache = {};
         let preTerrainZoom = null;
+        let terrainFallbackPending = false;
 
         // ── Initialize tile cache ───────────────────────────────────
         tileCache.init();
@@ -691,6 +927,7 @@ TABS.map_generator.initialize = function (callback) {
 
         $('#mapgen_subtarget').val(savedSubtarget);
         $('#mapgen_target').val(savedTarget);
+        $('#mapgen_terrain_source').val(settingsSaved ? store.get('mapgen_terrain_source', 'copernicus') : 'copernicus');
         $('#mapgen_provider').val(savedProvider);
         $('#mapgen_maptiler_key').val(savedMaptilerKey);
         $('#mapgen_project_name').val(savedProject);
@@ -1254,6 +1491,7 @@ TABS.map_generator.initialize = function (callback) {
         // ── Settings persistence ────────────────────────────────────
         function saveSettings() {
             store.set('mapgen_target', $('#mapgen_target').val());
+            store.set('mapgen_terrain_source', $('#mapgen_terrain_source').val());
             store.set('mapgen_subtarget', $('#mapgen_subtarget').val());
             store.set('mapgen_provider', $('#mapgen_provider').val());
             store.set('mapgen_map_type', $('#mapgen_maptype').val());
@@ -1279,9 +1517,11 @@ TABS.map_generator.initialize = function (callback) {
             store.delete('mapgen_area_unit');
             store.delete('mapgen_last_center');
             store.delete('mapgen_last_zoom');
+            store.delete('mapgen_terrain_source');
             // Note: mapgen_maptiler_key is intentionally NOT deleted on restore defaults
             // Reset UI to defaults
             $('#mapgen_target').val('terrain');
+            $('#mapgen_terrain_source').val('copernicus');
             $('#mapgen_subtarget').val('ethos');
             $('#mapgen_provider').val('OSM');
             $('#mapgen_project_name').val('MyLocalField');
@@ -1297,6 +1537,11 @@ TABS.map_generator.initialize = function (callback) {
 
         // ── Control event bindings ──────────────────────────────────
         $('#mapgen_target').on('change', () => { syncMapOptions(); triggerUpdate(); });
+        $('#mapgen_terrain_source').on('change', () => {
+            store.set('mapgen_terrain_source', $('#mapgen_terrain_source').val());
+            updateTerrainSourceUI();
+            triggerUpdate();
+        });
         $('#mapgen_provider').on('change', () => { syncMapOptions(); switchMapLayer(); });
         $('#mapgen_maptype').on('change', () => { switchMapLayer(); });
         $('#mapgen_maptiler_key').on('input', () => {
@@ -1513,6 +1758,14 @@ TABS.map_generator.initialize = function (callback) {
 
         $('#mapgen_modal_confirm').on('click', async (e) => {
             e.preventDefault();
+            // Confirming the "Copernicus unavailable" prompt is the user's
+            // explicit consent to switch elevation source for this generation.
+            if (terrainFallbackPending) {
+                terrainFallbackPending = false;
+                $('#mapgen_terrain_source').val('srtm');
+                store.set('mapgen_terrain_source', 'srtm');
+                updateTerrainSourceUI();
+            }
             if (isTerrainMode()) {
                 await terrainGenerateAndSync();
             } else {
@@ -1693,6 +1946,54 @@ TABS.map_generator.initialize = function (callback) {
             return $('#mapgen_target').val() === 'terrain';
         }
 
+        // Anything other than an explicit 'srtm' means Copernicus, so a missing
+        // or unreadable setting still lands on the more accurate source.
+        function getTerrainSource() {
+            return $('#mapgen_terrain_source').val() === 'srtm' ? 'srtm' : 'copernicus';
+        }
+
+        function terrainSourceLabel() {
+            return getTerrainSource() === 'srtm' ? 'Terrain — SRTM1 (30m)' : 'Terrain — Copernicus GLO-30';
+        }
+
+        function updateTerrainSourceUI() {
+            const isTerrain = isTerrainMode();
+            const copernicus = getTerrainSource() === 'copernicus';
+            map.attributionControl.removeAttribution(TERRAIN_ATTR_SRTM);
+            map.attributionControl.removeAttribution(TERRAIN_ATTR_COPERNICUS);
+            if (isTerrain) {
+                map.attributionControl.addAttribution(copernicus ? TERRAIN_ATTR_COPERNICUS : TERRAIN_ATTR_SRTM);
+            }
+            if (copernicus) {
+                $('#mapgen_terrain_source_note').html(
+                    'Global coverage incl. &gt;60°N.' +
+                    '<div style="font-size:9px; color:#666; margin-top:3px;">' +
+                    $('<span>').text(COPERNICUS_NOTICE_1).html() + '. ' +
+                    $('<span>').text(COPERNICUS_NOTICE_2).html() + '.</div>');
+                $('#mapgen_hint_terrain').text('Hint: One .DAT file per 1°×1° grid square (~111 km). Data: Copernicus GLO-30 at 30m resolution. Ocean depths are clamped to 0m.');
+            } else {
+                $('#mapgen_terrain_source_note').html('Coverage 60°N to 56°S.');
+                $('#mapgen_hint_terrain').text('Hint: One .DAT file per 1°×1° grid square (~111 km). Data: NASA SRTM1 at 30m resolution. Ocean depths are clamped to 0m.');
+            }
+        }
+
+        // Copernicus is fetched from a public bucket — if it cannot be reached,
+        // ask before falling back to SRTM. Never switch elevation source
+        // silently: the user must know which source produced the files.
+        function showCopernicusFallbackPrompt() {
+            $('#mapgen_download_status').text('Copernicus server unavailable.');
+            $('#mapgen_progress_section').hide();
+            $('#mapgen_modal_actions').show();
+            $('#mapgen_sync_info').html(
+                '<div style="color:#aaa; font-size:13px; line-height:1.6; margin:8px 0;">' +
+                '<b style="color:#ff9800;">Copernicus GLO-30 is unavailable</b> (server unreachable or throttling).<br><br>' +
+                'You can switch this generation to the <b>NASA SRTM1</b> fallback source (coverage 60°N to 56°S), ' +
+                'or close and try Copernicus again later.</div>');
+            terrainFallbackPending = true;
+            $('#mapgen_modal_confirm').show().text('Switch to SRTM & Retry');
+            $('#mapgen_modal_cancel').text('Close');
+        }
+
         function getTargetCategory() {
             return isTerrainMode() ? 'fc' : 'radio';
         }
@@ -1791,8 +2092,12 @@ TABS.map_generator.initialize = function (callback) {
                 `<span class="mapgen-area">Grid Coverage: ${tiles.length} tile(s) \u00b7 ${formatArea(gridAreaSqM, unit)}</span><br>` +
                 `<span class="mapgen-tiles">Est. Size: ~${estSizeMB} MB</span><br>` +
                 `<span style="color:#888; font-size:11px;">${fileList.join(', ')}</span>`;
-            if (bounds.getNorth() > 60 || bounds.getSouth() < -56) {
-                statusHtml += '<br><span style="color:#c62828; font-size:11px;">&#9888;&#65039; Selection extends beyond SRTM coverage (60\u00b0N to 56\u00b0S). Tiles outside this range will have no elevation data.</span>';
+            const outsideCoverage = getTerrainSource() === 'copernicus'
+                ? (bounds.getNorth() > 84 || bounds.getSouth() < -90)
+                : (bounds.getNorth() > 60 || bounds.getSouth() < -56);
+            if (outsideCoverage) {
+                const range = getTerrainSource() === 'copernicus' ? '84\u00b0N to 90\u00b0S' : '60\u00b0N to 56\u00b0S';
+                statusHtml += `<br><span style="color:#c62828; font-size:11px;">&#9888;&#65039; Selection extends beyond elevation coverage (${range}). Tiles outside this range will have no elevation data.</span>`;
             }
             $('#mapgen_status').html(statusHtml);
         }
@@ -1801,13 +2106,10 @@ TABS.map_generator.initialize = function (callback) {
             if (!map) return; // called before map init from syncMapOptions
             const isTerrain = isTerrainMode();
 
-            // SRTM attribution
-            const srtmAttr = 'Elevation data: <a href="https://www.usgs.gov/centers/eros/science/usgs-eros-archive-digital-elevation-shuttle-radar-topography-mission-srtm-1">NASA SRTM</a>';
-            if (isTerrain) {
-                map.attributionControl.addAttribution(srtmAttr);
-            } else {
-                map.attributionControl.removeAttribution(srtmAttr);
-            }
+            // Elevation source picker (terrain only) and its attribution
+            $('#mapgen_terrain_source_wrapper').toggle(isTerrain);
+            $('#mapgen_terrain_source_note').toggle(isTerrain);
+            updateTerrainSourceUI();
 
             // Zoom to terrain-friendly level
             if (isTerrain && preTerrainZoom === null) {
@@ -1910,7 +2212,7 @@ TABS.map_generator.initialize = function (callback) {
             try {
                 const cached = await hgtDb.cachedSet();
                 if (cached.size > 0 && isTerrainMode()) {
-                    $('#mapgen_clear_hgt_cache').text(`Clear HGT Cache (${cached.size} tile${cached.size > 1 ? 's' : ''}, ~${cached.size * 25} MB)`).show();
+                    $('#mapgen_clear_hgt_cache').text(`Clear Elevation Cache (${cached.size} tile${cached.size > 1 ? 's' : ''}, ~${cached.size * 25} MB)`).show();
                 } else {
                     $('#mapgen_clear_hgt_cache').hide();
                 }
@@ -1922,7 +2224,7 @@ TABS.map_generator.initialize = function (callback) {
         $('#mapgen_clear_hgt_cache').on('click', async () => {
             const cached = await hgtDb.cachedSet();
             if (cached.size === 0) return;
-            if (!globalThis.electronAPI.confirmDialog(`Clear ${cached.size} cached HGT tile(s) (~${cached.size * 25} MB)?`)) return;
+            if (!globalThis.electronAPI.confirmDialog(`Clear ${cached.size} cached elevation tile(s) (~${cached.size * 25} MB)?`)) return;
             await hgtDb.clear();
             liveAltCache = {};
             updateHgtCacheInfo();
@@ -1953,21 +2255,24 @@ TABS.map_generator.initialize = function (callback) {
             const totalHgt = hgtKeysSet.size;
             const cachedSetKeys = await hgtDb.cachedSet();
             let cachedCount = 0;
-            hgtKeysSet.forEach(k => { if (cachedSetKeys.has(k)) cachedCount++; });
+            const cachePrefix = getTerrainSource() === 'copernicus' ? 'cop_' : '';
+            hgtKeysSet.forEach(k => { if (cachedSetKeys.has(cachePrefix + k)) cachedCount++; });
 
-            const hgtSizeMB = (tiles.length * 13).toFixed(0);
+            const copernicus = getTerrainSource() === 'copernicus';
+            const hgtSizeMB = (tiles.length * (copernicus ? 42 : 13)).toFixed(0);
+            const sourceUnit = copernicus ? 'GLO-30 tiles' : 'HGT tiles';
             const cacheInfo = cachedCount > 0
                 ? (cachedCount === totalHgt
-                    ? `<span style="color:#87b025;">All ${totalHgt} HGT tiles cached \u2014 no download needed</span>`
-                    : `${cachedCount} of ${totalHgt} HGT tiles cached`)
-                : `~${hgtSizeMB} MB compressed`;
+                    ? `<span style="color:#87b025;">All ${totalHgt} ${sourceUnit} cached \u2014 no download needed</span>`
+                    : `${cachedCount} of ${totalHgt} ${sourceUnit} cached`)
+                : `~${hgtSizeMB} MB`;
 
             const hasSD = !!sdPath;
             let infoHtml = `
-                <div class="mapgen-info-row"><span>Target:</span><span>INAV Terrain (SRTM1 30m)</span></div>
+                <div class="mapgen-info-row"><span>Target:</span><span>${terrainSourceLabel()}</span></div>
                 <div class="mapgen-info-row"><span>Terrain Files:</span><span>${tiles.length} .DAT file(s)</span></div>
                 <div class="mapgen-info-row"><span>Est. Output:</span><span>~${totalSizeMB} MB</span></div>
-                <div class="mapgen-info-row"><span>SRTM Download:</span><span>${cacheInfo}</span></div>
+                <div class="mapgen-info-row"><span>Elevation Download:</span><span>${cacheInfo}</span></div>
                 <div class="mapgen-info-row"><span>Files:</span><span style="font-size:10px;">${fileList.join(', ')}</span></div>
             `;
             if (hasSD) {
@@ -1976,7 +2281,10 @@ TABS.map_generator.initialize = function (callback) {
             } else {
                 infoHtml += `<div style="margin:6px 0; font-size:11px; color:#888;">\u26a0\ufe0f Delete FREESPAC.E from the SD card before copying. INAV will recreate it on next boot.</div>`;
             }
-            infoHtml += `<div style="font-size:12px; color:#888; line-height:1.5;">Source: NASA SRTM 30m elevation data (public domain)</div>`;
+            infoHtml += copernicus
+                ? `<div style="font-size:12px; color:#888; line-height:1.5;">Source: Copernicus GLO-30 (WorldDEM-30), 30m<br>` +
+                  `<span style="font-size:9px; color:#777;">${$('<span>').text(COPERNICUS_NOTICE_1).html()}. ${$('<span>').text(COPERNICUS_NOTICE_2).html()}.</span></div>`
+                : `<div style="font-size:12px; color:#888; line-height:1.5;">Source: NASA SRTM 30m elevation data (public domain)</div>`;
 
             $('#mapgen_sync_info').html(infoHtml);
             $('#mapgen_modal_header').text('INAV Terrain Generator');
@@ -1998,6 +2306,7 @@ TABS.map_generator.initialize = function (callback) {
             let completed = 0;
             const datFiles = [];
             const hgtCache = {};
+            const copernicusImages = {};
             const startTime = Date.now();
             const hasSD = !!sdPath;
             const forceOverwrite = $('#mapgen_overwrite').is(':checked');
@@ -2016,9 +2325,33 @@ TABS.map_generator.initialize = function (callback) {
                 const name = srtmTileName(tile.lat, tile.lon);
                 const prefix = `Tile ${completed + 1}/${totalTiles}: `;
                 const primaryKey = tile.lat + '_' + tile.lon;
+                let cellCache = hgtCache;
+                const isCopernicus = getTerrainSource() === 'copernicus';
+
+                if (isCopernicus) {
+                    try {
+                        cellCache = await ensureCopernicusCellData(tile.lat, tile.lon, hgtCache, copernicusImages, (stage, a, b) => {
+                            const msg = stage === 'downloading' ? `⬇️ Downloading ${name} (Copernicus)...`
+                                : stage === 'decoding' ? `📦 Decoding ${name} (${(a / 1048576).toFixed(1)} MB)...`
+                                    : stage === 'edges' ? `🧩 Fetching ${name} edge data...`
+                                        : `🧮 Building ${name} grid (${Math.round(a / b * 100)}%)`;
+                            $('#mapgen_download_status').text(prefix + msg);
+                        });
+                    } catch (e) {
+                        if (syncAborted) break;
+                        console.warn(`Copernicus fetch failed for ${name}:`, e.message);
+                        showCopernicusFallbackPrompt();
+                        return;
+                    }
+                    if (!cellCache) {
+                        $('#mapgen_download_status').text(prefix + `⚠️ No Copernicus data for ${name} (outside coverage). Skipping.`);
+                        completed++;
+                        continue;
+                    }
+                }
 
                 // Download or use cached HGT data
-                if (!hgtCache[primaryKey]) {
+                if (!isCopernicus && !hgtCache[primaryKey]) {
                     const cachedBuf = await hgtDb.get(primaryKey);
                     if (cachedBuf) {
                         hgtCache[primaryKey] = makeHgtView(new Uint8Array(cachedBuf));
@@ -2043,7 +2376,7 @@ TABS.map_generator.initialize = function (callback) {
                 }
 
                 // Fetch neighbor tiles for interpolation at edges
-                const neighbors = [[tile.lat, tile.lon + 1], [tile.lat + 1, tile.lon], [tile.lat + 1, tile.lon + 1]];
+                const neighbors = isCopernicus ? [] : [[tile.lat, tile.lon + 1], [tile.lat + 1, tile.lon], [tile.lat + 1, tile.lon + 1]];
                 for (const [nLat, nLon] of neighbors) {
                     const nKey = nLat + '_' + nLon;
                     if (!hgtCache[nKey]) {
@@ -2063,7 +2396,7 @@ TABS.map_generator.initialize = function (callback) {
                 // Convert HGT → DAT
                 $('#mapgen_download_status').text(prefix + `\u2699\ufe0f Converting ${name} to .DAT...`);
                 try {
-                    const datData = await createDatFromHgt(tile.lat, tile.lon, hgtCache, (done, total) => {
+                    const datData = await createDatFromHgt(tile.lat, tile.lon, cellCache, (done, total) => {
                         const pct = ((completed + done / total) / totalTiles * 100).toFixed(0);
                         $('#mapgen_progress_fill').css('width', pct + '%');
                         $('#mapgen_download_status').text(prefix + `\u2699\ufe0f Converting ${name} (${Math.round(done / total * 100)}%)`);
@@ -2159,15 +2492,17 @@ TABS.map_generator.initialize = function (callback) {
             $('#mapgen_download_status').text('Creating ZIP...');
             $('#mapgen_progress_fill').css('width', '0%');
 
+            const copernicus = getTerrainSource() === 'copernicus';
             const zip = new JSZip();
             for (const df of datFiles) {
                 zip.file(df.name, df.data);
             }
+            if (copernicus) zip.file('NOTICE.txt', copernicusNoticeText());
 
             const blob = await zip.generateAsync({ type: 'arraybuffer' });
             const result = await globalThis.electronAPI.showSaveDialog({
                 title: 'Save Terrain Files ZIP',
-                defaultPath: 'INAV_Terrain_SRTM.zip',
+                defaultPath: copernicus ? 'INAV_Terrain_Copernicus.zip' : 'INAV_Terrain_SRTM.zip',
                 filters: [{ name: 'ZIP Archive', extensions: ['zip'] }],
             });
             if (!result.canceled && result.filePath) {

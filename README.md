@@ -16,25 +16,45 @@ The Map Generator tab works without a flight controller connection. Select a tar
 
 | Target | Output | SD Card |
 |--------|--------|---------|
-| [INAV Terrain (SRTM)](https://github.com/iNavFlight/inav/wiki/Navigation-Terrain-Following) | `.DAT` elevation files | Flight controller |
+| [Terrain](https://github.com/iNavFlight/inav/wiki/Navigation-Terrain-Following) | `.DAT` elevation files | Flight controller |
 | [b14ckyy ETHOS Mapping Widget](https://github.com/b14ckyy/ETHOSMappingWidget-Revisited) | Map tiles | Radio |
 | [Yaapu Telemetry Widget](https://github.com/yaapu/EthosMappingWidget) (ETHOS / EdgeTX) | Map tiles | Radio |
 
 ---
 
-### INAV Terrain (SRTM)
+### Terrain
 
-Generate `.DAT` terrain elevation files from [NASA SRTM1](https://www.usgs.gov/centers/eros/science/usgs-eros-archive-digital-elevation-shuttle-radar-topography-mission-srtm-1) data (1 arc-second, ~30 m resolution, public domain). The files go on the flight controller's SD card and enable terrain altitude reference in the OSD and for sanity checks. The generated files are also compatible with ArduPilot.
+Generate `.DAT` terrain elevation files at 1 arc-second (~30 m) resolution. The files go on the flight controller's SD card and enable terrain altitude reference in the OSD and for sanity checks. The generated files are also compatible with ArduPilot.
+
+Two elevation sources are selectable:
+
+| Source | Coverage | Notes |
+|--------|----------|-------|
+| **Copernicus GLO-30** (default) | 84°N – 90°S | [Copernicus WorldDEM-30](https://registry.opendata.aws/copernicus-dem/); more accurate on bare earth and covers latitudes above 60°N |
+| NASA SRTM1 | 60°N – 56°S | [NASA SRTM1](https://www.usgs.gov/centers/eros/science/usgs-eros-archive-digital-elevation-shuttle-radar-topography-mission-srtm-1), public domain |
+
+The `.DAT` file format is identical for both sources — only the elevation values differ. If the Copernicus service cannot be reached, the Configurator asks before falling back to SRTM; the elevation source is never switched silently.
 
 ![Terrain Mode](images/map_generator/terrain_mode.png)
 
 #### How to Use
 
-1. Select **INAV Terrain (SRTM)** as the target — the map switches to a 1°×1° degree grid overlay
-2. Draw a rectangle over your flying area — the status shows which `.DAT` files will be generated and the estimated size
-3. Link your FC's SD card folder (or use Export as ZIP)
-4. Click **Sync to SD Card** — SRTM elevation data is downloaded, converted to `.DAT` format, and written directly to the SD card
-5. Enable terrain in INAV CLI: `set terrain_enabled = ON` then `save`
+1. Select **Terrain** as the target — the map switches to a 1°×1° degree grid overlay
+2. Pick the **Elevation Source** (Copernicus GLO-30 by default)
+3. Draw a rectangle over your flying area — the status shows which `.DAT` files will be generated and the estimated size
+4. Link your FC's SD card folder (or use Export as ZIP)
+5. Click **Sync to SD Card** — elevation data is downloaded, converted to `.DAT` format, and written directly to the SD card
+6. Enable terrain in INAV CLI: `set terrain_enabled = ON` then `save`
+
+#### Copernicus data attribution
+
+When the Copernicus source is used, the following notices are shown in the tab and included as a `NOTICE.txt` in the exported ZIP. Under the WorldDEM-30 licence they must accompany the data whenever it is distributed or communicated to the public:
+
+> produced using Copernicus WorldDEM-30 © DLR e.V. 2010-2014 and © Airbus Defence and Space GmbH 2014-2018 provided under COPERNICUS by the European Union and ESA; all rights reserved
+
+> The organisations in charge of the Copernicus programme by law or by delegation do not incur any liability for any use of the Copernicus WorldDEM-30
+
+This product is not endorsed by or affiliated with the European Union, ESA, Airbus Defence and Space GmbH or DLR e.V.
 
 ![Terrain Sync](images/map_generator/terrain_sync.png)
 
@@ -49,7 +69,7 @@ Generate `.DAT` terrain elevation files from [NASA SRTM1](https://www.usgs.gov/c
 | **Format** | 2048-byte blocks, 32×28 int16 height grids, CRC-16/XMODEM checksums |
 
 - **Grid Overlay** — orange 1°×1° grid on the map with `.DAT` filename labels
-- **HGT Cache** — downloaded SRTM tiles are cached in IndexedDB; repeat generations reuse cached data
+- **Elevation Cache** — downloaded elevation grids are cached in IndexedDB; repeat generations reuse cached data. Copernicus and SRTM grids are stored under separate keys, so switching source never mixes the two
 - **Live Altitude** — after generation, hover the mouse to see SRTM elevation (from cache, no server requests)
 - **FREESPAC.E Handling** — auto-deleted from the SD card during sync; INAV recreates it on next boot
 - **Skip Existing** — files already on the SD card are skipped unless Force Overwrite is checked

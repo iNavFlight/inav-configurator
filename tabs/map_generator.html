@@ -13,7 +13,7 @@
                         <div class="select">
                             <select id="mapgen_target">
                                 <optgroup label="Flight Controller">
-                                    <option value="terrain">INAV Terrain (SRTM)</option>
+                                    <option value="terrain">Terrain</option>
                                 </optgroup>
                                 <optgroup label="Radio Widgets">
                                     <option value="b14ckyy">b14ckyy ETHOS Mapping Widget</option>
@@ -30,6 +30,15 @@
                             </select>
                             <label for="mapgen_subtarget"><span data-i18n="mapgenSubTarget">Platform</span></label>
                         </div>
+
+                        <div class="select" id="mapgen_terrain_source_wrapper" style="display:none;">
+                            <select id="mapgen_terrain_source">
+                                <option value="copernicus" selected>Copernicus GLO-30</option>
+                                <option value="srtm">NASA SRTM1 (30m)</option>
+                            </select>
+                            <label for="mapgen_terrain_source"><span data-i18n="mapgenTerrainSource">Elevation Source</span></label>
+                        </div>
+                        <div id="mapgen_terrain_source_note" style="font-size:10px; color:#888; margin:2px 0 6px; line-height:1.45; display:none;"></div>
 
                         <div class="select">
                             <select id="mapgen_provider">
@@ -88,7 +97,7 @@
                             <input type="checkbox" id="mapgen_terrain_alt_toggle" />
                             <label for="mapgen_terrain_alt_toggle"><span>Live Altitude</span></label>
                         </div>
-                        <div id="mapgen_terrain_alt_hint" style="font-size:10px; color:#ff9800; margin:2px 0 4px; font-style:italic; display:none;">Altitude available after generating .DAT files — uses locally cached SRTM data to avoid unnecessary server requests.</div>
+                        <div id="mapgen_terrain_alt_hint" style="font-size:10px; color:#ff9800; margin:2px 0 4px; font-style:italic; display:none;">Altitude available after generating .DAT files — uses locally cached elevation data to avoid unnecessary server requests.</div>
 
                         <div class="select">
                             <select id="mapgen_area_unit">
@@ -147,7 +156,7 @@
 
                         <a id="mapgen_clear_cache" class="btn" href="#" data-i18n="mapgenClearCache">Clear Tile Cache</a>
 
-                        <a id="mapgen_clear_hgt_cache" class="btn" href="#" style="display:none; margin-top:6px;">Clear HGT Cache</a>
+                        <a id="mapgen_clear_hgt_cache" class="btn" href="#" style="display:none; margin-top:6px;">Clear Elevation Cache</a>
                     </div>
                 </div>
 
