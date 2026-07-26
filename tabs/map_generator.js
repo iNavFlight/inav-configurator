@@ -600,7 +600,7 @@ async function copernicusRetry(fn) {
         try {
             return await fn();
         } catch (e) {
-            if (e && e.notFound) throw e;
+            if (e?.notFound) throw e;
             lastErr = e;
         }
     }
@@ -613,7 +613,7 @@ async function copernicusRetry(fn) {
 // blocks it touches. Returns null when the tile does not exist.
 async function openCopernicusImage(lat, lon, imgCache, full, statusCb) {
     const key = lat + '_' + lon;
-    if (Object.prototype.hasOwnProperty.call(imgCache, key) && (imgCache[key] === null || imgCache[key].full || !full)) {
+    if (Object.hasOwn(imgCache, key) && (imgCache[key] === null || imgCache[key].full || !full)) {
         return imgCache[key] ? imgCache[key].image : null;
     }
     try {
@@ -640,7 +640,7 @@ async function openCopernicusImage(lat, lon, imgCache, full, statusCb) {
     } catch (e) {
         // Missing tile is "no data", not a failure — but a network/server
         // problem must surface so the user can decide about the fallback.
-        if (!(e && e.notFound)) throw e;
+        if (!e?.notFound) throw e;
         imgCache[key] = null;
         return null;
     }
