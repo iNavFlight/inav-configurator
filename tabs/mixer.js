@@ -133,7 +133,6 @@ mixerTab.initialize = function (callback, scrollPosition) {
         }
 
         for (let i = 1; i <= outputCount; i++) {
-            const timerId = FC.OUTPUT_MAPPING.getTimerId(i - 1);
             const color = FC.OUTPUT_MAPPING.getOutputTimerColor(i - 1);
             const isLed = FC.OUTPUT_MAPPING.isLedPin(i - 1);
             const isBeeper = FC.OUTPUT_MAPPING.isBeeperPin(i - 1);
