@@ -1,0 +1,11 @@
+#!/bin/bash
+# Post-removal script: remove udev rules
+
+RULES_DST="/etc/udev/rules.d/45-inav.rules"
+
+if [ -f "$RULES_DST" ]; then
+    rm -f "$RULES_DST"
+    udevadm control --reload-rules 2>/dev/null || true
+fi
+
+exit 0

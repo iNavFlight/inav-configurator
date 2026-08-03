@@ -4,7 +4,7 @@ import MSPChainerClass from './../js/msp/MSPchainer';
 import mspHelper from './../js/msp/MSPHelper';
 import MSPCodes from './../js/msp/MSPCodes';
 import MSP from './../js/msp';
-import { GUI, TABS } from './../js/gui';
+import GUI from './../js/gui';
 import FC from './../js/fc';
 import i18n from './../js/localization';
 import BitHelper from '../js/bitHelper';
@@ -14,12 +14,12 @@ import { mixer, PLATFORM } from './../js/model';
 import timeout from './../js/timeouts';
 import interval from './../js/intervals';
 
-TABS.outputs = {
+const outputsTab = {
     allowTestMode: false,
     feature3DEnabled: false,
     feature3DSupported: false
 };
-TABS.outputs.initialize = function (callback) {
+outputsTab.initialize = function (callback) {
     var self = this;
 
     self.armed = false;
@@ -28,8 +28,8 @@ TABS.outputs.initialize = function (callback) {
 
     var $motorsEnableTestMode;
 
-    if (GUI.active_tab !== 'outputs') {
-        GUI.active_tab = 'outputs';
+    if (GUI.active_tab !== this) {
+        GUI.active_tab = this;
     }
 
     var loadChainer = new MSPChainerClass();
@@ -356,7 +356,7 @@ TABS.outputs.initialize = function (callback) {
         let usedServoIndex = 0;
 
         for (let servoIndex = 0; servoIndex < FC.SERVO_RULES.getServoCount(); servoIndex++) {
-            renderServos('Servo ' + servoIndex, '', servoIndex);
+            renderServos('Servo ' + (servoIndex), '', servoIndex);
         }
         if (usedServoIndex == 0) {
             // No servos configured
@@ -499,15 +499,16 @@ TABS.outputs.initialize = function (callback) {
         $motorSliders.append('<div class="motor-slider-container"><input type="range" min="1000" max="2000" value="1000" disabled="disabled" class="master"/></div>');
         $motorValues.append('<li style="font-weight: bold" data-i18n="motorsMaster"></li>');
 
-        for (let i = 0; i < FC.SERVO_RULES.getServoCount(); i++) {
+        let servoCount = FC.SERVO_RULES.getServoCount();
+        for (let i = 0; i < servoCount; i++) {
 
             let opacity = "";
-            if (!FC.SERVO_RULES.isServoConfigured(15 - i)) {
+            if (!FC.SERVO_RULES.isServoConfigured(servoCount - i)) {
                 opacity = ' style="opacity: 0.2"';
             }
 
             servos_wrapper.append('\
-                <div class="m-block servo-' + (15 - i) + '" ' + opacity + '>\
+                <div class="m-block servo-' + (servoCount - i) + '" ' + opacity + '>\
                     <div class="meter-bar">\
                         <div class="label"></div>\
                         <div class="indicator">\
@@ -749,6 +750,8 @@ TABS.outputs.initialize = function (callback) {
 
 };
 
-TABS.outputs.cleanup = function (callback) {
+outputsTab.cleanup = function (callback) {
     if (callback) callback();
 };
+
+export default outputsTab;

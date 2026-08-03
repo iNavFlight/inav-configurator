@@ -6,7 +6,7 @@ import './../js/libraries/jquery.flightindicators';
 
 import MSPChainerClass from './../js/msp/MSPchainer';
 import FC from './../js/fc';
-import { GUI, TABS } from './../js/gui';
+import GUI from './../js/gui';
 import MSP from './../js/msp';
 import MSPCodes from './../js/msp/MSPCodes';
 import i18n from './../js/localization';
@@ -17,15 +17,15 @@ import { mixer } from './../js/model';
 import BitHelper from './../js/bitHelper';
 import dialog from '../js/dialog';
 
-TABS.setup = {
+const setupTab = {
     yaw_fix: 0.0
 };
 
-TABS.setup.initialize = function (callback) {
+setupTab.initialize = function (callback) {
     var self = this;
 
-    if (GUI.active_tab != 'setup') {
-        GUI.active_tab = 'setup';
+    if (GUI.active_tab !== this) {
+        GUI.active_tab = this;
     }
 
     var loadChainer = new MSPChainerClass();
@@ -91,8 +91,9 @@ TABS.setup.initialize = function (callback) {
 
         initializeInstruments();
 
-        $('a.resetSettings').on('click', function () {
-            if (dialog.confirm(i18n.getMessage('confirm_reset_settings'))) {
+        $('a.resetSettings').on('click', async function () {
+            if (await dialog.confirm(i18n.getMessage('confirm_reset_settings'))) {
+                interval.remove('global_data_refresh');
                 MSP.send_message(MSPCodes.MSP_RESET_CONF, false, false, function () {
                     GUI.log(i18n.getMessage('initialSetupSettingsRestored'));
     
@@ -150,6 +151,8 @@ TABS.setup.initialize = function (callback) {
                     gpsLat_e.text((FC.GPS_DATA.lat / 10000000).toFixed(4) + ' deg');
                     gpsLon_e.text((FC.GPS_DATA.lon / 10000000).toFixed(4) + ' deg');
                 });
+            } else {
+                gpsFix_e.html(i18n.getMessage('gpsFixNotConnected'));
             }
         }
 
@@ -207,7 +210,7 @@ TABS.setup.initialize = function (callback) {
     }
 };
 
-TABS.setup.initialize3D = function () {
+setupTab.initialize3D = function () {
     var self = this,
         loader,
         canvas,
@@ -382,8 +385,10 @@ TABS.setup.initialize3D = function () {
     $(window).on('resize', this.resize3D);
 };
 
-TABS.setup.cleanup = function (callback) {
+setupTab.cleanup = function (callback) {
     $(window).off('resize', this.resize3D);
 
     if (callback) callback();
 };
+
+export default setupTab;

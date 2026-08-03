@@ -127,7 +127,7 @@ class Decompiler {
       OPERATION.SET_PROFILE,
       OPERATION.FLIGHT_AXIS_ANGLE_OVERRIDE,
       OPERATION.FLIGHT_AXIS_RATE_OVERRIDE,
-      OPERATION.LED_PIN_PWM,
+      OPERATION.PINIO_PWM,
       OPERATION.DISABLE_GPS_FIX,
       OPERATION.RESET_MAG_CALIBRATION,
       OPERATION.SET_GIMBAL_SENSITIVITY
@@ -290,8 +290,8 @@ class Decompiler {
 
     // Build mapping: LC index -> generated name (cond1, cond2, etc.)
     const lcIndexToGeneratedName = new Map();
-    for (const [lcIndex, generatedName] of this.hoistingManager.hoistedActivatorVars.entries()) {
-      lcIndexToGeneratedName.set(lcIndex, generatedName);
+    for (const [lcIndex, entry] of this.hoistingManager.hoistedActivatorVars.entries()) {
+      lcIndexToGeneratedName.set(lcIndex, entry.varName);
     }
 
     // For each LC that has both a custom name and a generated name, rename

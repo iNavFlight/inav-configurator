@@ -303,9 +303,9 @@ function checkUnsupportedFeatures(line, lineNumber, monaco) {
   }
 
   // Unsupported: Math methods (except supported ones)
-  // Supported: Math.abs, Math.min, Math.max, Math.sin, Math.cos, Math.tan
-  if (line.match(/Math\.(floor|ceil|round|sqrt|pow|random|log|exp|atan|asin|acos|atan2)\s*\(/)) {
-    const match = line.match(/Math\.(floor|ceil|round|sqrt|pow|random|log|exp|atan|asin|acos|atan2)/);
+  // Supported: Math.abs, Math.min, Math.max, Math.sin, Math.cos, Math.tan, Math.acos, Math.asin, Math.atan2
+  if (line.match(/Math\.(floor|ceil|round|sqrt|pow|random|log|exp|atan)\s*\(/)) {
+    const match = line.match(/Math\.(floor|ceil|round|sqrt|pow|random|log|exp|atan)/);
     const method = match[1];
     let message = `Math.${method}() is not supported.`;
 

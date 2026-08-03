@@ -2,21 +2,21 @@
 
 import MSPChainerClass from './../js/msp/MSPchainer';
 import mspHelper from './../js/msp/MSPHelper';
-import { GUI, TABS } from './../js/gui';
+import GUI from './../js/gui';
 import FC from './../js/fc';
 import tabs from './../js/tabs';
 import i18n from './../js/localization';
 import interval from './../js/intervals';
 
-TABS.programming = {};
+const programmingTab = {};
 
-TABS.programming.initialize = function (callback, scrollPosition) {
+programmingTab.initialize = function (callback, scrollPosition) {
     let loadChainer = new MSPChainerClass(),
         saveChainer = new MSPChainerClass(),
         statusChainer = new MSPChainerClass();
 
-    if (GUI.active_tab != 'programming') {
-        GUI.active_tab = 'programming';
+    if (GUI.active_tab !== this) {
+        GUI.active_tab = this;
     }
 
     loadChainer.setChain([
@@ -79,6 +79,8 @@ TABS.programming.initialize = function (callback, scrollPosition) {
     }
 }
 
-TABS.programming.cleanup = function (callback) {
+programmingTab.cleanup = function (callback) {
     if (callback) callback();
 };
+
+export default programmingTab;

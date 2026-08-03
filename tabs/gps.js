@@ -22,7 +22,7 @@ import mspHelper from './../js/msp/MSPHelper';
 import MSPCodes from './../js/msp/MSPCodes';
 import MSP from './../js/msp';
 import interval from './../js/intervals';
-import { GUI, TABS } from './../js/gui';
+import GUI from './../js/gui';
 import FC from './../js/fc';
 import i18n from './../js/localization';
 import Settings from './../js/settings';
@@ -35,11 +35,11 @@ import ublox from '../js/ublox/UBLOX';
 import dialog from '../js/dialog';
 
 
-TABS.gps = {};
-TABS.gps.initialize = function (callback) {
+const gpsTab = {};
+gpsTab.initialize = function (callback) {
 
-    if (GUI.active_tab != 'gps') {
-        GUI.active_tab = 'gps';
+    if (GUI.active_tab !== this) {
+        GUI.active_tab = this;
     }
 
     // mavlink ADSB_EMITTER_TYPE
@@ -279,9 +279,9 @@ TABS.gps.initialize = function (callback) {
 
         function detectGPSPreset(hwVersion) {
             switch(hwVersion) {
-                case 800:  return 'm8';
-                case 900:  return 'm9-precision';  // Default to precision mode for better accuracy
-                case 1000: return 'm10';
+                case 0x48: return 'm8';
+                case 0x49: return 'm9-precision';
+                case 0x4A: return 'm10';
                 default:   return 'manual';
             }
         }
@@ -416,7 +416,7 @@ TABS.gps.initialize = function (callback) {
             view: mapView
         });
 
-        TABS.gps.toolboxAdsbVehicle = new jBox('Mouse', {
+        gpsTab.toolboxAdsbVehicle = new jBox('Mouse', {
             position: {
                 x: "right",
                 y: "bottom"
@@ -433,7 +433,7 @@ TABS.gps.initialize = function (callback) {
             });
 
             if (feature && feature.get('data') && feature.get('name')) {
-                TABS.gps.toolboxAdsbVehicle.setContent(
+                gpsTab.toolboxAdsbVehicle.setContent(
                     `callsign: <strong>` + feature.get('name') + `</strong><br />`
                     + `lat: <strong>`+ (feature.get('data').lat / 10000000) + `</strong><br />`
                     + `lon: <strong>`+ (feature.get('data').lon / 10000000) + `</strong><br />`
@@ -442,7 +442,7 @@ TABS.gps.initialize = function (callback) {
                     + `type: <strong>`+ ADSB_VEHICLE_TYPE[feature.get('data').emitterType].name + `</strong>`
                 ).open();
             }else{
-                TABS.gps.toolboxAdsbVehicle.close();
+                gpsTab.toolboxAdsbVehicle.close();
             }
         });
 
@@ -701,7 +701,7 @@ TABS.gps.initialize = function (callback) {
 
 };
 
-TABS.gps.cleanup = function (callback) {
+gpsTab.cleanup = function (callback) {
     // Remove all namespaced event handlers to prevent memory leaks
     $('#gps_preset_mode').off('.gpsTab');
     $('#gps_apply_optimal').off('.gpsTab');
@@ -711,7 +711,9 @@ TABS.gps.cleanup = function (callback) {
     $('a.loadAssistnowOffline').off('.gpsTab');
 
     if (callback) callback();
-    if (TABS.gps.toolboxAdsbVehicle){
-        TABS.gps.toolboxAdsbVehicle.close();
+    if (gpsTab.toolboxAdsbVehicle){
+        gpsTab.toolboxAdsbVehicle.close();
     }
 };
+
+export default gpsTab;

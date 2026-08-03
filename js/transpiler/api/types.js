@@ -86,6 +86,9 @@ declare namespace inav {
   function sin(degrees: number): number;
   function cos(degrees: number): number;
   function tan(degrees: number): number;
+  function acos(ratio: number): number;
+  function asin(ratio: number): number;
+  function atan2(y: number, x: number): number;
   function mapInput(value: number, maxInput: number): number;
   function mapOutput(value: number, maxOutput: number): number;
 }

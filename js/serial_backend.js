@@ -2,7 +2,7 @@
 
 import semver from 'semver';
 
-import { GUI, TABS } from './gui';
+import GUI from './gui';
 import MSP from './msp';
 import FC from './fc';
 import MSPCodes from './msp/MSPCodes';
@@ -20,32 +20,35 @@ import defaultsDialog from './defaults_dialog';
 import { SITLProcess } from './sitl';
 import update from './globalUpdates';
 import BitHelper from './bitHelper';
-import BOARD from './boards';
 import jBox from 'jbox';
 import groundstation from './groundstation';
 import ltmDecoder from './ltmDecoder';
 import mspDeduplicationQueue from './msp/mspDeduplicationQueue';
 import store from './store';
+import cliTab from '../tabs/cli';
+import javascriptProgrammingTab from '../tabs/javascript_programming';
 
 var SerialBackend = (function () {
 
     var publicScope = {},
         privateScope = {};
-        
+
     privateScope.isDemoRunning = false;
 
     privateScope.isWirelessMode = false;
+
+    privateScope.reopenTab = null;
 
     /*
      * Handle "Wireless" mode with strict queueing of messages
      */
     publicScope.init = function() {
-        
+
         privateScope.$port = $('#port'),
         privateScope.$baud = $('#baud'),
         publicScope.$portOverride = $('#port-override'),
         mspHelper.setSensorStatusEx(privateScope.sensor_status_ex);
-        
+
         $('#wireless-mode').on('change', function () {
             var $this = $(this);
 
@@ -56,58 +59,47 @@ var SerialBackend = (function () {
             }
         });
 
-        GUI.handleReconnect = function ($tabElement) {
+        GUI.handleReconnect = function (reopenLastTab = true) {
 
-            let modal;
+            let modal = new jBox('Modal', {
+                width: 400,
+                height: 120,
+                animation: false,
+                closeOnClick: false,
+                closeOnEsc: false,
+                content: '<div id="modal-reconnect"><div data-i18n="deviceRebooting">Device - <span style="color: red">Rebooting</span></div></div>'
+            }).open();
 
-            if (BOARD.hasVcp(FC.CONFIG.boardIdentifier)) { // VCP-based flight controls may crash old drivers, we catch and reconnect
-
-                modal = new jBox('Modal', {
-                    width: 400,
-                    height: 120,
-                    animation: false,
-                    closeOnClick: false,
-                    closeOnEsc: false,
-                    content: $('#modal-reconnect')
-                }).open();
-
-                /*
-                Disconnect
-                */
-                setTimeout(function () {
-                    $('a.connect').trigger( "click" );
-                }, 100);
-
-                /*
-                Connect again
-                */
-                setTimeout(function start_connection() {
-                    modal.close();
-                    $('a.connect').trigger( "click" );
-
-                    /*
-                    Open configuration tab
-                    */
-                    if ($tabElement != null) {
-                        setTimeout(function () {
-                            $tabElement.trigger( "click" );
-                        }, 500);
-                    }
-
-                }, 7000);
+            if (typeof reopenLastTab === 'boolean') {
+                const $anchor = $('#tabs > ul li.active a');
+                privateScope.reopenTab = reopenLastTab && $anchor.length ? $anchor : null;
             } else {
-                timeout.add('waiting_for_bootup', function waiting_for_bootup() {
-                    MSP.send_message(MSPCodes.MSPV2_INAV_STATUS, false, false, function () {
-                        //noinspection JSUnresolvedVariable
-                        GUI.log(i18n.getMessage('deviceReady'));
-                        //noinspection JSValidateTypes
-                        TABS.configuration.initialize(false, $('#content').scrollTop());
-                    });
-                },1500); // 1500 ms seems to be just the right amount of delay to prevent data request timeouts
+                // Callers may pass an <a> or an <li>; normalize to the <a> element
+                const $el = reopenLastTab ? $(reopenLastTab) : null;
+                if ($el) {
+                    const anchor = $el.is('a') ? $el : $('a', $el);
+                    privateScope.reopenTab = anchor.length ? anchor : null;
+                } else {
+                    privateScope.reopenTab = null;
+                }
             }
+
+            /*
+            Disconnect
+            */
+            setTimeout(function () {
+                privateScope.reConnect();
+            }, 100);
+
+            /*
+            Connect again
+            */
+            setTimeout(function start_connection() {
+                modal.close();
+                privateScope.reConnect();
+            }, 5000);
         };
 
-        
 
         GUI.updateManualPortVisibility = function(){
             var selected_port = privateScope.$port.find('option:selected');
@@ -129,7 +121,7 @@ var SerialBackend = (function () {
             }
             else {
                 privateScope.$baud.show();
-            }        
+            }
 
             if (selected_port.data().isBle || selected_port.data().isTcp || selected_port.data().isUdp || selected_port.data().isSitl) {
                 $('.tab_firmware_flasher').hide();
@@ -143,9 +135,9 @@ var SerialBackend = (function () {
                 type = ConnectionType.TCP;
             } else if (selected_port.data().isUdp) {
                 type = ConnectionType.UDP;
-            } 
+            }
             CONFIGURATOR.connection = connectionFactory(type, CONFIGURATOR.connection);
-            
+
         };
 
         GUI.updateManualPortVisibility();
@@ -153,34 +145,48 @@ var SerialBackend = (function () {
         publicScope.$portOverride.on('change', function () {
             store.set('portOverride', publicScope.$portOverride.val());
         });
-        
-        publicScope.$portOverride.val(store.get('portOverride', ''));        
+
+        publicScope.$portOverride.val(store.get('portOverride', ''));
 
         privateScope.$port.on('change', function (target) {
             GUI.updateManualPortVisibility();
         });
 
-    $('div.connect_controls a.connect').click(function () {
+    $('div.connect_controls a.connect').on('click', () => {
+        privateScope.reopenTab = null;
+        privateScope.reConnect()
+    });
 
+    privateScope.reConnect = function() {
         if (groundstation.isActivated()) {
             groundstation.deactivate();
         }
 
         if (GUI.connect_lock != true) { // GUI control overrides the user control
 
-                var clicks = $(this).data('clicks');
+                // Use the real connection state, not a toggle flag that competing
+                // async aborts could desync.
+                const isIdle = (GUI.connected_to === false) && (GUI.connecting_to === false);
                 var selected_baud = parseInt(privateScope.$baud.val());
                 var selected_port = privateScope.$port.find('option:selected').data().isManual ?
                     publicScope.$portOverride.val() :
                         String(privateScope.$port.val());
-                
+
                 if (selected_port === 'DFU') {
                     GUI.log(i18n.getMessage('dfu_connect_message'));
                 }
                 else if (selected_port != '0') {
-                    if (!clicks) {
+                    if (isIdle) {
                         console.log('Connecting to: ' + selected_port);
                         GUI.connecting_to = selected_port;
+
+                        // Clear leftover MSP state so a fast reconnect isn't
+                        // blocked by a previous session's retrying requests.
+                        mspQueue.flush();
+                        mspQueue.freeHardLock();
+                        mspQueue.freeSoftLock();
+                        mspDeduplicationQueue.flush();
+                        MSP.disconnect_cleanup();
 
                         // lock port select & baud while we are connecting / connected
                         $('#port, #baud, #delay').prop('disabled', true);
@@ -192,7 +198,7 @@ var SerialBackend = (function () {
                             CONFIGURATOR.connection.connect("127.0.0.1:5760", {}, privateScope.onOpen);
                         } else if (selected_port == 'sitl-demo') {
                             SITLProcess.stop();
-                            SITLProcess.start("demo.bin");                        
+                            SITLProcess.start("demo.bin");
                             this.isDemoRunning = true;
 
                             // Wait 1 sec until SITL is ready
@@ -204,9 +210,8 @@ var SerialBackend = (function () {
                         }
                     } else {
                         // Check for unsaved changes in JavaScript Programming tab
-                        if (GUI.active_tab === 'javascript_programming' &&
-                            TABS.javascript_programming &&
-                            TABS.javascript_programming.isDirty) {
+                        if (GUI.active_tab === javascriptProgrammingTab &&
+                            javascriptProgrammingTab.isDirty) {
                             console.log('[Disconnect] Checking for unsaved changes in JavaScript Programming tab');
                             const confirmMsg = i18n.getMessage('unsavedChanges') ||
                                 'You have unsaved changes. Leave anyway?';
@@ -217,7 +222,7 @@ var SerialBackend = (function () {
                             }
                             console.log('[Disconnect] User confirmed, proceeding with disconnect');
                             // Clear isDirty flag so tab switch during disconnect doesn't show warning again
-                            TABS.javascript_programming.isDirty = false;
+                            javascriptProgrammingTab.isDirty = false;
                         }
 
                         if (this.isDemoRunning) {
@@ -242,6 +247,7 @@ var SerialBackend = (function () {
                             GUI.tab_switch_in_progress = false;
                             CONFIGURATOR.connectionValid = false;
                             GUI.connected_to = false;
+                            GUI.connecting_to = false;
                             GUI.allowedTabs = GUI.defaultAllowedTabsWhenDisconnected.slice();
 
                             /*
@@ -279,11 +285,9 @@ var SerialBackend = (function () {
                             $('#tabs .tab_landing a').trigger( "click" );
                         }
                     }
-
-                    $(this).data("clicks", !clicks);
                 }
             }
-        });
+        }
 
         PortHandler.initialize();
     }
@@ -307,12 +311,16 @@ var SerialBackend = (function () {
                 GUI.allowedTabs = GUI.defaultAllowedTabsWhenConnected.slice();
                 privateScope.onConnect();
 
-                defaultsDialog.init();
+                defaultsDialog.init().then( () => {
 
-                $('#tabs ul.mode-connected .tab_setup a').trigger( "click" );
+                    if (privateScope.reopenTab) {
+                        privateScope.reopenTab.trigger('click');
+                    } else {
+                        $(`#tabs ul.mode-connected .tab_setup a`).trigger('click');
+                    }
 
-                GUI.updateEzTuneTabVisibility(true);
-                update.firmwareVersion();
+                    update.firmwareVersion();
+                });
             });
         });
     });
@@ -370,7 +378,7 @@ var SerialBackend = (function () {
                 // variable isn't stored yet, saving
                 store.set('last_used_port', GUI.connected_to);
             }
-        
+
 
             store.set('last_used_bps', CONFIGURATOR.connection.bitrate);
             store.set('wireless_mode_enabled', $('#wireless-mode').is(":checked"));
@@ -411,7 +419,7 @@ var SerialBackend = (function () {
             // upgrade to MSPv2 if possible.
             MSP.protocolVersion = MSP.constants.PROTOCOL_V2;
             MSP.send_message(MSPCodes.MSP_API_VERSION, false, false, function () {
-                
+
                 if (FC.CONFIG.apiVersion === "0.0.0") {
                     GUI.log("<span style='color: red; font-weight: bolder'><strong>" + i18n.getMessage("illegalStateRestartRequired") + "</strong></span>");
                     FC.restartRequired = true;
@@ -426,14 +434,14 @@ var SerialBackend = (function () {
 
                             GUI.log(i18n.getMessage('fcInfoReceived', [FC.CONFIG.flightControllerIdentifier, FC.CONFIG.flightControllerVersion]));
                             if (semver.gte(FC.CONFIG.flightControllerVersion, CONFIGURATOR.minfirmwareVersionAccepted) && semver.lt(FC.CONFIG.flightControllerVersion, CONFIGURATOR.maxFirmwareVersionAccepted)) {
-                                if (CONFIGURATOR.connection.type == ConnectionType.BLE && semver.lt(FC.CONFIG.flightControllerVersion, "5.0.0")) {  
+                                if (CONFIGURATOR.connection.type == ConnectionType.BLE && semver.lt(FC.CONFIG.flightControllerVersion, "5.0.0")) {
                                     privateScope.onBleNotSupported();
                                 } else {
                                     mspHelper.getCraftName(function(name) {
                                         if (name) {
                                             FC.CONFIG.name = name;
                                         }
-                                        privateScope.onValidFirmware();  
+                                        privateScope.onValidFirmware();
                                     });
                                 }
                             } else  {
@@ -449,6 +457,10 @@ var SerialBackend = (function () {
             console.log('Failed to open serial port');
             GUI.log(i18n.getMessage('serialPortOpenFail'));
 
+            // Clear connecting state so the button reflects "disconnected".
+            GUI.connecting_to = false;
+            GUI.connected_to = false;
+
             var $connectButton = $('#connectbutton');
 
             $connectButton.find('.connect_state').text(i18n.getMessage('connect'));
@@ -456,9 +468,6 @@ var SerialBackend = (function () {
 
             // unlock port select & baud
             $('#port, #baud, #delay').prop('disabled', false);
-
-            // reset data
-            $connectButton.find('.connect').data("clicks", false);
         }
     }
 
@@ -469,7 +478,7 @@ var SerialBackend = (function () {
         $('.mode-disconnected').hide();
         $('.mode-connected').show();
 
-        
+
         MSP.send_message(MSPCodes.MSP_BOXIDS, false, false, function () {
             FC.generateAuxConfig();
         });
@@ -483,13 +492,13 @@ var SerialBackend = (function () {
             /*
             * Init PIDs bank with a length that depends on the version
             */
-            let pidCount = 11;
+            let pidCount = 12;
 
             for (let i = 0; i < pidCount; i++) {
                 FC.PIDs.push(new Array(4));
             }
 
-            
+
             interval.add('msp-load-update', function () {
                 $('#msp-version').text("MSP version: " + MSP.protocolVersion.toFixed(0));
                 $('#msp-load').text("MSP load: " + mspQueue.getLoad().toFixed(1));
@@ -524,7 +533,7 @@ var SerialBackend = (function () {
         if (!CONFIGURATOR.cliActive) {
             MSP.read(info);
         } else if (CONFIGURATOR.cliActive) {
-            TABS.cli.read(info);
+            cliTab.read(info);
         }
     }
 

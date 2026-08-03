@@ -7,7 +7,7 @@ import noUiSlider from 'nouislider';
 import mspHelper from './../js/msp/MSPHelper';
 import MSPCodes from './../js/msp/MSPCodes';
 import MSP from './../js/msp';
-import { GUI, TABS } from './../js/gui';
+import GUI from './../js/gui';
 import FC from './../js/fc';
 import adjustBoxNameIfPeripheralWithModeID from './../js/peripherals';
 import i18n from './../js/localization';
@@ -17,11 +17,11 @@ import store from './../js/store';
 
 var ORIG_AUX_CONFIG_IDS = [];
 
-TABS.auxiliary = {};
+const auxiliaryTab = {};
 
-TABS.auxiliary.initialize = function (callback) {
+auxiliaryTab.initialize = function (callback) {
     GUI.active_tab_ref = this;
-    GUI.active_tab = 'auxiliary';
+    GUI.active_tab = this;
 
     let LOCAL_AUX_CONFIG = [];
     let LOCAL_AUX_CONFIG_IDS = [];
@@ -56,14 +56,14 @@ TABS.auxiliary.initialize = function (callback) {
         modeSections["Flight Modes"] = ["ANGLE", "HORIZON", "MANUAL", "ANGLE HOLD"];
         modeSections["Navigation Modes"] = ["NAV COURSE HOLD", "NAV CRUISE", "NAV POSHOLD", "NAV RTH", "NAV WP", "GCS NAV"];
         modeSections["Flight Mode Modifiers"] = ["NAV ALTHOLD", "HEADING HOLD", "AIR MODE", "SOARING", "SURFACE", "TURN ASSIST"];
-        modeSections["Fixed Wing"] = ["AUTO TUNE", "SERVO AUTOTRIM", "AUTO LEVEL TRIM", "NAV LAUNCH", "LOITER CHANGE", "FLAPERON"];
+        modeSections["Fixed Wing"] = ["AUTO TUNE", "SERVO AUTOTRIM", "AUTO LEVEL TRIM", "AUTO SPEED", "NAV LAUNCH", "LOITER CHANGE", "FLAPERON"];
         modeSections["Multi-rotor"] = ["FPV ANGLE MIX", "TURTLE", "MC BRAKING", "HEADFREE", "HEADADJ"];
         modeSections["OSD Modes"] = ["OSD OFF", "OSD ALT 1", "OSD ALT 2", "OSD ALT 3"];
         modeSections["FPV Camera Modes"] = ["CAMSTAB", "CAMERA CONTROL 1", "CAMERA CONTROL 2", "CAMERA CONTROL 3"];
         modeSections["VTOL"] = ["MIXER PROFILE 2", "MIXER TRANSITION"];
         modeSections["Beeper"] = ["BEEPER", "BEEPER MUTE"];
         modeSections["Gimbal"] = ["GIMBAL LEVEL TILT", "GIMBAL LEVEL ROLL", "GIMBAL LEVEL PAN", "GIMBAL HEADTRACKER", "GIMBAL CENTER"];
-        modeSections["Misc Modes"] = ["LEDS OFF", "LIGHTS", "HOME RESET", "WP PLANNER", "MISSION CHANGE", "BLACKBOX", "FAILSAFE", "KILLSWITCH", "TELEMETRY", "MSP RC OVERRIDE", "USER1", "USER2", "USER3", "USER4"];
+        modeSections["Misc Modes"] = ["LEDS OFF", "LIGHTS", "HOME RESET", "WP PLANNER", "MISSION CHANGE", "BLACKBOX", "FAILSAFE", "MULTI FUNCTION", "KILLSWITCH", "TELEMETRY", "MSP RC OVERRIDE", "USER1", "USER2", "USER3", "USER4"];
 
     function sort_modes_for_display() {
         // Sort the modes
@@ -520,10 +520,12 @@ TABS.auxiliary.initialize = function (callback) {
     }
 };
 
-TABS.auxiliary.cleanup = function (callback) {
+auxiliaryTab.cleanup = function (callback) {
     if (callback) callback();
 };
 
 $(window).on('resize', function(){
     $(".tab-auxiliary .acroEnabled").width($("#mode-0 .info").width());
 });
+
+export default auxiliaryTab;
