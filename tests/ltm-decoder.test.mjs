@@ -1,12 +1,8 @@
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
-import { resolve } from 'node:path';
 import test from 'node:test';
-import { fileURLToPath } from 'node:url';
 
 import ltmDecoder from '../js/ltmDecoder.js';
-
-const repoRoot = resolve(fileURLToPath(new URL('..', import.meta.url)));
+import createLtmProtocolGate from '../js/ltmProtocolGate.js';
 
 test('LTM decoder accepts a valid frame and reset clears its connection state', () => {
     ltmDecoder.reset();
@@ -25,11 +21,64 @@ test('LTM decoder accepts a valid frame and reset clears its connection state', 
     assert.equal(ltmDecoder.get().voltage, null);
 });
 
-test('a detected MSP stream does not route arbitrary payload bytes to LTM', () => {
-    const serialBackend = readFileSync(resolve(repoRoot, 'js/serial_backend.js'), 'utf8');
+test('a valid MSP frame blocks LTM-shaped bytes from activating Ground Station', () => {
+    // $M>, zero payload bytes, command 1, checksum 1.
+    const validMspFrame = Uint8Array.from([0x24, 0x4d, 0x3e, 0, 1, 1]);
+    // $TS followed by seven payload bytes and their valid XOR checksum.
+    const ltmShapedPayload = Uint8Array.from([0x24, 0x54, 0x53, 1, 2, 3, 4, 5, 6, 7, 0]);
+    let mspReceived = false;
+    let ltmReads = 0;
+    let ltmResets = 0;
+    let groundstationActivations = 0;
 
-    assert.match(serialBackend, /addOnReceiveListener\(publicScope\.read_ltm\)/);
-    assert.match(serialBackend, /publicScope\.read_ltm\s*=\s*function\s*\(info\)\s*\{[\s\S]*?if\s*\(!CONFIGURATOR\.connectionValid\s*&&\s*!MSP\.wasEverReceiving\(\)\)\s*\{[\s\S]*?ltmDecoder\.read\(info\);/);
-    assert.match(serialBackend, /else if\s*\(MSP\.wasEverReceiving\(\)\)\s*\{[\s\S]*?ltmDecoder\.reset\(\);/);
-    assert.match(serialBackend, /if\s*\(!CONFIGURATOR\.connectionValid\s*&&\s*!MSP\.wasEverReceiving\(\)\s*&&\s*ltmDecoder\.isReceiving\(\)\)/);
+    const decoder = {
+        read: function (info) {
+            ltmReads++;
+            ltmDecoder.read(info);
+        },
+        reset: function () {
+            ltmResets++;
+            ltmDecoder.reset();
+        },
+        isReceiving: function () {
+            return ltmDecoder.isReceiving();
+        }
+    };
+
+    const ltmProtocolGate = createLtmProtocolGate({
+        ltmDecoder: decoder,
+        wasMspReceiving: function () {
+            return mspReceived;
+        },
+        activateGroundstation: function () {
+            groundstationActivations++;
+        }
+    });
+
+    const receive = function (frame) {
+        // read_serial is registered before read_ltm, so a checksum-valid MSP
+        // frame has set MSP.wasEverReceiving() before the LTM route runs.
+        if (frame[0] === 0x24 && frame[1] === 0x4d && frame[2] === 0x3e) {
+            const payloadLength = frame[3];
+            let checksum = 0;
+
+            for (let index = 3; index < frame.length - 1; index++) {
+                checksum ^= frame[index];
+            }
+
+            mspReceived = frame.length === payloadLength + 6 && checksum === frame[frame.length - 1];
+        }
+
+        ltmProtocolGate.read({ data: frame.buffer });
+        ltmProtocolGate.activateGroundstationIfLtmOnly();
+    };
+
+    ltmProtocolGate.reset();
+    receive(validMspFrame);
+    receive(ltmShapedPayload);
+    receive(ltmShapedPayload);
+
+    assert.equal(ltmReads, 0);
+    assert.equal(ltmResets, 2, 'the initial reset and the MSP transition reset exactly once each');
+    assert.equal(groundstationActivations, 0);
 });

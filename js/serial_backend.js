@@ -23,6 +23,7 @@ import BitHelper from './bitHelper';
 import jBox from 'jbox';
 import groundstation from './groundstation';
 import ltmDecoder from './ltmDecoder';
+import createLtmProtocolGate from './ltmProtocolGate';
 import mspDeduplicationQueue from './msp/mspDeduplicationQueue';
 import store from './store';
 import cliTab from '../tabs/cli';
@@ -38,6 +39,16 @@ var SerialBackend = (function () {
     privateScope.isWirelessMode = false;
 
     privateScope.reopenTab = null;
+
+    privateScope.ltmProtocolGate = createLtmProtocolGate({
+        ltmDecoder,
+        wasMspReceiving: function () {
+            return MSP.wasEverReceiving();
+        },
+        activateGroundstation: function () {
+            groundstation.activate($('#main-wrapper'));
+        }
+    });
 
     /*
      * Handle "Wireless" mode with strict queueing of messages
@@ -187,7 +198,7 @@ var SerialBackend = (function () {
                         mspQueue.freeSoftLock();
                         mspDeduplicationQueue.flush();
                         MSP.disconnect_cleanup();
-                        ltmDecoder.reset();
+                        privateScope.ltmProtocolGate.reset();
 
                         // lock port select & baud while we are connecting / connected
                         $('#port, #baud, #delay').prop('disabled', true);
@@ -261,7 +272,7 @@ var SerialBackend = (function () {
 
                             CONFIGURATOR.connection.disconnect(privateScope.onClosed);
                             MSP.disconnect_cleanup();
-                            ltmDecoder.reset();
+                            privateScope.ltmProtocolGate.reset();
 
                             // Reset various UI elements
                             $('span.i2c-error').text(0);
@@ -389,7 +400,7 @@ var SerialBackend = (function () {
             // garbage bytes or boot messages don't corrupt the MSP decoder
             FC.resetState();
             MSP.disconnect_cleanup();
-            ltmDecoder.reset();
+            privateScope.ltmProtocolGate.reset();
 
             CONFIGURATOR.connection.addOnReceiveListener(publicScope.read_serial);
             CONFIGURATOR.connection.addOnReceiveListener(publicScope.read_ltm);
@@ -415,9 +426,7 @@ var SerialBackend = (function () {
             // been validated, its payloads (including raw dataflash blocks)
             // must never be interpreted as LTM telemetry.
             interval.add('ltm-connection-check', function () {
-                if (!CONFIGURATOR.connectionValid && !MSP.wasEverReceiving() && ltmDecoder.isReceiving()) {
-                    groundstation.activate($('#main-wrapper'));
-                }
+                privateScope.ltmProtocolGate.activateGroundstationIfLtmOnly();
             }, 1000);
 
             // request configuration data. Start with MSPv1 and
@@ -543,16 +552,7 @@ var SerialBackend = (function () {
     }
 
     publicScope.read_ltm = function (info) {
-        // LTM is only a fallback until we see the first checksum-valid MSP
-        // response. That avoids interpreting MSP setup payloads and, later,
-        // MSP_DATAFLASH_READ's arbitrary Blackbox bytes as LTM telemetry.
-        if (!CONFIGURATOR.connectionValid && !MSP.wasEverReceiving()) {
-            ltmDecoder.read(info);
-        } else if (MSP.wasEverReceiving()) {
-            // Clear a candidate LTM frame that may have arrived before the
-            // first valid MSP response completed protocol detection.
-            ltmDecoder.reset();
-        }
+        privateScope.ltmProtocolGate.read(info);
     }
 
     /**
