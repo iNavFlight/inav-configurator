@@ -448,7 +448,7 @@
         "message": "Devi <strong>connetterti</strong> prima di poter vedere le tab."
     },
     "tabSwitchWaitForOperation": {
-        "message": "Non puoi farlo adesso, attendi il completamento dell'operazione in corso..."
+        "message": "<span style=\"color: red\">Non puoi</span> farlo adesso, attendi il completamento dell'operazione in corso..."
     },
     "tabSwitchUpgradeRequired": {
         "message": "Devi <strong>aggiornare</strong> il firmware prima di poter usare la tab $1."
@@ -586,7 +586,7 @@
         "message": "Reimposta impostazioni"
     },
     "initialSetupResetText": {
-        "message": "Restore settings to <strong>default</strong>"
+        "message": ""
     },
     "initialSetupButtonBackup": {
         "message": "Backup"
@@ -2689,7 +2689,7 @@
         "message": "Abilitato"
     },
     "failsafeFeatureHelp": {
-        "message": "<strong>Nota:</strong> Quando la Fase 2 e DISABILITATA, viene usato il fallback <strong>Auto</strong> al posto delle impostazioni utente per tutti i canali di volo (Roll, Pitch, Yaw e Throttle)."
+        "message": "<strong>Nota:</strong> Quando la Fase 2 è DISABILITATA, viene usato il fallback <strong>Auto</strong> al posto delle impostazioni utente per tutti i canali di volo (Roll, Pitch, Yaw e Throttle)."
     },
     "failsafeDelayItem": {
         "message": "Tempo di guardia per attivazione dopo perdita segnale [In decisecondi (ds): 1 = 0,1 sec.]"
@@ -5698,7 +5698,7 @@
         "message": "Cancella selezionati"
     },
     "ledStripWiringClearAllControl": {
-        "message": "Cancella TUTTI i Cablaggio"
+        "message": "Cancella TUTTO il cablaggio"
     },
     "ledStripWiringMessage": {
         "message": "I LED senza numero d'ordine del cablaggio non verranno salvati."
@@ -5719,7 +5719,7 @@
         "message": "Nessun chip<br>dataflash trovato"
     },
     "sensorDataFlashFreeSpace": {
-        "message": "Dataflash: <br />free "
+        "message": "Dataflash: "
     },
     "mixerProfile1": {
         "message": "Profilo Mixer 1"
@@ -5746,49 +5746,49 @@
         "message": "Profilo Batteria 3"
     },
     "sensorStatusGyro": {
-        "message": "Giroscopio"
+        "message": "Giroscopio — Blu: funzionante, Rosso: errore, Scuro: non rilevato"
     },
     "sensorStatusGyroShort": {
         "message": "Gyro"
     },
     "sensorStatusAccel": {
-        "message": "Accelerometro"
+        "message": "Accelerometro — Blu: funzionante, Rosso: errore, Scuro: non rilevato"
     },
     "sensorStatusAccelShort": {
         "message": "Accel"
     },
     "sensorStatusMag": {
-        "message": "Magnetometro"
+        "message": "Magnetometro — Blu: funzionante, Rosso: errore, Scuro: non rilevato"
     },
     "sensorStatusMagShort": {
         "message": "Mag"
     },
     "sensorStatusBaro": {
-        "message": "Barometro"
+        "message": "Barometro — Blu: funzionante, Rosso: errore, Scuro: non rilevato"
     },
     "sensorStatusBaroShort": {
         "message": "Baro"
     },
     "sensorStatusGPS": {
-        "message": "GPS"
+        "message": "GPS — Blu: funzionante, Rosso: errore, Scuro: non rilevato"
     },
     "sensorStatusGPSShort": {
         "message": "GPS"
     },
     "sensorOpticalFlow": {
-        "message": "Flusso ottico"
+        "message": "Flusso ottico — Blu: funzionante, Rosso: errore, Scuro: non rilevato"
     },
     "sensorOpticalFlowShort": {
         "message": "Flow"
     },
     "sensorStatusSonar": {
-        "message": "Sonar / Telemetro"
+        "message": "Sonar / Telemetro — Blu: funzionante, Rosso: errore, Scuro: non rilevato"
     },
     "sensorStatusSonarShort": {
         "message": "Sonar"
     },
     "sensorAirspeed": {
-        "message": "Velocità aria"
+        "message": "Velocità aria — Blu: funzionante, Rosso: errore, Scuro: non rilevato"
     },
     "sensorAirspeedShort": {
         "message": "Velocità"
@@ -6797,5 +6797,155 @@
     },
     "osdElement_FW_ALT_CONTROL_RESPONSE": {
         "message": "Fw Alt Control Response"
+    },
+    "tabMapGenerator": {
+        "message": "Generatore mappe"
+    },
+    "mapgenOutputSettings": {
+        "message": "Impostazioni output"
+    },
+    "mapgenTarget": {
+        "message": "Destinazione"
+    },
+    "mapgenTerrainSource": {
+        "message": "Sorgente elevazione"
+    },
+    "mapgenProvider": {
+        "message": "Provider"
+    },
+    "mapgenMapType": {
+        "message": "Tipo di mappa"
+    },
+    "mapgenGoogleWarning": {
+        "message": "Attenzione: Google potrebbe bloccare temporaneamente gli IP per 24 ore dopo download massivi."
+    },
+    "mapgenOsmWarning": {
+        "message": "La policy delle tile OSM Standard non permette l'export massivo offline. Seleziona ESRI, Google o MapTiler (stile OSM) per l'export su SD/ZIP."
+    },
+    "mapgenMaptilerKeyHelp": {
+        "message": "MapTiler richiede una API key gratuita per fornire le tile della mappa. La tua chiave viene salvata automaticamente — devi inserirla una sola volta. Il piano gratuito include 5.000 sessioni/mese, più che sufficienti per uso personale."
+    },
+    "mapgenProjectSettings": {
+        "message": "Impostazioni progetto"
+    },
+    "mapgenProjectName": {
+        "message": "Nome cartella progetto"
+    },
+    "mapgenMinZoom": {
+        "message": "Zoom minimo"
+    },
+    "mapgenMaxZoom": {
+        "message": "Zoom massimo"
+    },
+    "mapgenAreaUnit": {
+        "message": "Unità di area"
+    },
+    "mapgenSdCard": {
+        "message": "Scheda SD"
+    },
+    "mapgenLinkSD": {
+        "message": "Seleziona cartella scheda SD"
+    },
+    "mapgenChangeSd": {
+        "message": "Cambia cartella SD"
+    },
+    "mapgenEjectSD": {
+        "message": "Espelli scheda SD"
+    },
+    "mapgenNoSdLinked": {
+        "message": "Nessuna cartella della scheda SD selezionata"
+    },
+    "mapgenForceOverwrite": {
+        "message": "Forza sovrascrittura delle tile esistenti"
+    },
+    "mapgenStatusDefault": {
+        "message": "Disegna un rettangolo sulla mappa per selezionare l'area."
+    },
+    "mapgenSyncToSD": {
+        "message": "Sincronizza su scheda SD"
+    },
+    "mapgenExportZip": {
+        "message": "Esporta come ZIP"
+    },
+    "mapgenSaveSettings": {
+        "message": "Salva impostazioni"
+    },
+    "mapgenRestoreSettings": {
+        "message": "Ripristina predefiniti"
+    },
+    "mapgenSyncTitle": {
+        "message": "Sincronizzazione su scheda SD"
+    },
+    "mapgenConfirmSync": {
+        "message": "Conferma sincronizzazione"
+    },
+    "mapgenTileCache": {
+        "message": "Cache delle tile"
+    },
+    "mapgenCacheEnabled": {
+        "message": "Abilita cache locale delle tile"
+    },
+    "mapgenCacheSize": {
+        "message": "Dimensione cache:"
+    },
+    "mapgenCacheMaxSize": {
+        "message": "Dimensione massima cache"
+    },
+    "mapgenClearCache": {
+        "message": "Svuota cache"
+    },
+    "onboardLoggingTerrainRateWarning": {
+        "message": "Terrain è abilitato, si sconsiglia di usare un logging rate superiore al 25%"
+    },
+    "portsFunction_CRSF_SENSOR": {
+        "message": "Sensore CRSF"
+    },
+    "cliInputPlaceholderBuilding": {
+        "message": "Costruzione della cache di autocompletamento, attendere ..."
+    },
+    "minAutoSpeed": {
+        "message": "Velocità minima consentita"
+    },
+    "maxAutoSpeed": {
+        "message": "Velocità massima consentita"
+    },
+    "autoSpeedChannel": {
+        "message": "Numero canale di regolazione velocità"
+    },
+    "autoSpeedChannelHelp": {
+        "message": "Canale minimo = 4, cioè il Throttle (predefinito)."
+    },
+    "autoSpeedThrSmoothing": {
+        "message": "Fattore di smorzamento risposta throttle"
+    },
+    "autoSpeedThrSmoothingHelp": {
+        "message": "Cambia quanto dolcemente risponde il throttle in modalità Auto speed. Aumentando il valore le variazioni di throttle diventano più fluide ma la risposta del throttle si riduce."
+    },
+    "autoSpeedLevelMinThr": {
+        "message": "Throttle minimo consentito in volo livellato"
+    },
+    "autoSpeedLevelMinThrHelp": {
+        "message": "Throttle minimo per il volo LEVEL in modalità auto speed quando si usa la velocità al suolo come riferimento [us]. Va impostato con un margine appena sufficiente a evitare lo stallo. Il throttle può scendere sotto questo valore in picchiata, fino a un minimo di nav_fw_min_thr."
+    },
+    "fixedWingAutoSpeedConfiguration": {
+        "message": "Impostazioni Auto Speed ala fissa"
+    },
+    "osd_framerate_hz": {
+        "message": "Framerate OSD (Hz)"
+    },
+    "osd_framerate_hz_help": {
+        "message": "Frequenza di aggiornamento target per gli elementi OSD in Hz. Ogni elemento viene ridisegnato circa a questa frequenza. Valori sopra i 10 Hz non danno miglioramenti visibili per i normali dati di volo ma aumentano il carico CPU. Orizzonte artificiale e telemetria vengono comunque aggiornati a ogni ciclo indipendentemente da questa impostazione. Imposta -1 per il comportamento legacy (un elemento per frame)."
+    },
+    "osdElement_GPS_EXTRA_STATS": {
+        "message": "Diagnostica GPS"
+    },
+    "osdElement_GPS_EXTRA_STATS_HELP": {
+        "message": "Numero di satelliti visibili e indicatore di satelliti agganciati (5 livelli) per ogni costellazione in quest'ordine: GPS–Galileo–BeiDou–GLONASS. Seguito dal livello SNR (più alto è, meglio è)"
+    },
+    "servoMixRuleInvalidServoTargetTitle": {
+        "message": "Target servo non valido"
+    },
+    "servoMixRuleInvalidServoTarget": {
+        "message": "Sono definiti $1 servo. Impossibile scrivere sul servo #$2 perché esistono solo $1 servo."
     }
 }
