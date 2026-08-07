@@ -4,7 +4,7 @@ import $ from 'jquery';
 import 'jquery-ui-dist/jquery-ui';
 import * as THREE from 'three'
 
-import GUI from './gui';
+import GUI, { TABS } from './gui';
 import interval from './intervals';
 import CONFIGURATOR from './data_storage';
 import FC  from './fc';
@@ -124,7 +124,7 @@ $(function() {
 
             if ($(this).parent().hasClass('active') == false && !GUI.tab_switch_in_progress) { // only initialize when the tab isn't already active
                 
-                if (CONFIGURATOR.cliActive) {
+                if (CONFIGURATOR.cliActive && CONFIGURATOR.cliValid) {
                     cliTab.exit($(this).parent());
                     return;
                 }
@@ -199,6 +199,9 @@ $(function() {
                             break;
                         case 'sitl':
                            sitlTab.initialize(content_ready);
+                            break;
+                        case 'map_generator':
+                            import('./../tabs/map_generator').then(() => TABS.map_generator.initialize(content_ready));
                             break;
                         case 'auxiliary':
                             auxiliaryTab.initialize(content_ready);
