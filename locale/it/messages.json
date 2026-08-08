@@ -517,7 +517,7 @@
         "message": "EEPROM <span style=\"color: #37a8db\">salvata</span>"
     },
     "defaultWelcomeIntro": {
-        "message": "Benvenuto in <strong>INAV - Configurator</strong>, un'utilità pensata per semplificare aggiornamento, configurazione e tuning del flight controller."
+        "message": "Benvenuto in <strong>INAV - Configurator</strong>, l'utility per aggiornamenti, configurazione e tuning del flight controller."
     },
     "defaultWelcomeHead": {
         "message": "Firmware e driver"
@@ -2326,7 +2326,7 @@
         "message": "Blackbox (MSC)"
     },
     "cliDiffAllBtn": {
-        "message": "Diff completo"
+        "message": "Diff All"
     },
     "cliCommandsHelp": {
         "message": "Digita o incolla i comandi nel riquadro a sinistra. Puoi usare i tasti freccia su e giù per richiamare i comandi già digitati. Scrivi 'help' o clicca su questa icona per maggiori informazioni."
@@ -6331,7 +6331,7 @@
         "message": "Direzione (heading)"
     },
     "osdElement_HEADING_GRAPH": {
-        "message": "Grafico direzione"
+        "message": "Indicatore di rotta"
     },
     "osdElement_AIR_SPEED": {
         "message": "Velocità aria"
