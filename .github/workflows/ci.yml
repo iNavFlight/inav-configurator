@@ -169,6 +169,8 @@ jobs:
             timeout_minutes: 10
             on_retry_command: rm -rfv node_modules
         - name: Build MacOS arm64
+          env:
+            NODE_OPTIONS: --max-old-space-size=4096
           run: yarn run make -- --arch="arm64"
         - name: Upload MacOS arm64 zip
           uses: actions/upload-artifact@v4
