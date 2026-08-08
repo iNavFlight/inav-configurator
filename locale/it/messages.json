@@ -1075,13 +1075,13 @@
         "message": "Velocità soglia"
     },
     "configurationLaunchVelocityHelp": {
-        "message": "Soglia di velocità in avanti per il rilevamento del lancio a braccio. Predefinito: 300 [100-10000]"
+        "message": "Soglia di velocità in avanti per il rilevamento del lancio a mano (swing). Predefinito: 300 [100-10000]"
     },
     "configurationLaunchAccel": {
         "message": "Accelerazione soglia"
     },
     "configurationLaunchAccelHelp": {
-        "message": "Soglia di accelerazione in avanti per lancio da bungee o a mano, 1G = 981 cm/s/s. Predefinito: 1863 [1000-20000]"
+        "message": "Soglia di accelerazione in avanti per lancio con elastico (bungee) o lancio a mano, 1G = 981 cm/s/s. Predefinito: 1863 [1000-20000]"
     },
     "configurationLaunchMaxAngle": {
         "message": "Angolo massimo di lancio"
@@ -2725,7 +2725,7 @@
         "message": "Kill Switch failsafe (disarma istantaneamente in failsafe)"
     },
     "failsafeKillSwitchHelp": {
-        "message": "Imposta questa opzione per fare in modo che lo switch failsafe, configurato nella scheda modes, agisca come kill switch diretto, bypassando la procedura failsafe selezionata. <strong>Nota:</strong> L'arming è bloccato con il kill switch failsafe in posizione ON"
+        "message": "Imposta questa opzione per fare in modo che lo switch failsafe, configurato nella scheda Modalità, agisca come kill switch diretto, bypassando la procedura failsafe selezionata. <strong>Nota:</strong> L'arming è bloccato con il kill switch failsafe in posizione ON"
     },
     "failsafeUseMinimumDistanceItem": {
         "message": "Usa procedura failsafe alternativa a distanza minima quando vicino a Home"
@@ -6190,7 +6190,7 @@
         "message": "-- Seleziona Esempio --"
     },
     "javascriptTranspile": {
-        "message": "Transpila in INAV"
+        "message": "Converti in INAV"
     },
     "javascriptLoad": {
         "message": "Carica da FC"
