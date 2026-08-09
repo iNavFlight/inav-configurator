@@ -5376,6 +5376,12 @@
     "eeprom_load_ok": {
         "message": "EEPROM <span style=\"color: #37a8db\">loaded</span>"
     },
+    "missionSearchAddressSrOnly": {
+        "message": "Search for address"
+    },
+    "missionCenterMapSrOnly": {
+        "message": "Center map on latest GPS fix"
+    },
     "confirm_delete_all_points": {
         "message": "Do you really want to delete all points?"
     },

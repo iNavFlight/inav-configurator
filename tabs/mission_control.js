@@ -4255,6 +4255,10 @@ function iconKey(filename) {
         });
 
         function startGridPolygonDraw() {
+            if (disableMarkerEdit) {
+                return;
+            }
+
             // Cancel any existing grid draw
             cancelGridDraw();
 
@@ -4426,6 +4430,10 @@ function iconKey(filename) {
 
         // Generate button
         $(document).on('click', '#gridGenerate', function () {
+            if (disableMarkerEdit) {
+                return;
+            }
+
             if (!gridPolygonCoords) return;
 
             const params = getGridParams();
@@ -4536,7 +4544,12 @@ function iconKey(filename) {
                 s() { $('#saveFileMissionButton').trigger('click'); },
                 d() { $('#removeAllPoints').trigger('click'); },
                 a() { $('#searchAddressButton').trigger('click'); },
-                g() { startGridPolygonDraw(); },
+                g() {
+                    if (disableMarkerEdit) {
+                        return;
+                    }
+                    startGridPolygonDraw();
+                },
             };
 
             const shortcutAction = shortcutActions[key];
@@ -4555,9 +4568,11 @@ function iconKey(filename) {
             }
 
             e.preventDefault();
-            if (dialog.confirm(i18n.getMessage('confirm_delete_selected_point'))) {
-                $('#removePoint').trigger('click');
-            }
+            dialog.confirm(i18n.getMessage('confirm_delete_selected_point')).then((ok) => {
+                if (ok) {
+                    $('#removePoint').trigger('click');
+                }
+            });
 
             return true;
         }
