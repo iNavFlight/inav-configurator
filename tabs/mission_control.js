@@ -139,6 +139,13 @@ function createGridProjection(vertices) {
         accumulator[1] + vertex[1] / vertices.length,
     ], [0, 0]);
     const cosLat = Math.cos(centroid[1] * Math.PI / 180);
+    const cosLatAbs = Math.abs(cosLat);
+    const MIN_COS_LAT = 0.001;
+
+    if (!Number.isFinite(cosLatAbs) || cosLatAbs < MIN_COS_LAT) {
+        return null;
+    }
+
     const metersPerDegLon = 111320 * cosLat;
     const metersPerDegLat = 110540;
 
@@ -210,6 +217,11 @@ function generateGridWaypoints(coordsLonLat, params) {
     }
 
     const projection = createGridProjection(vertices);
+    if (!projection) {
+        dialog.alert('Grid generation is unavailable at this latitude because longitude scale collapses near the poles.');
+        return [];
+    }
+
     const angleRad = params.angle * Math.PI / 180;
     const rotatedVertices = vertices
         .map(projection.toLocal)
@@ -1903,6 +1915,8 @@ function iconKey(filename) {
     const MARKER_ICON_OFFSET_X = -2;  // Match WP pin text offsetX
 
     function repaintLine4Waypoints(mission) {
+        const isValidCoordinate = (value) => Array.isArray(value) && value.length === 2 && Number.isFinite(value[0]) && Number.isFinite(value[1]);
+
         let oldPos,
             oldAction,
             poiList = [],
@@ -1942,7 +1956,7 @@ function iconKey(filename) {
                     }
 
                     if (element.getEndMission() == 0xA5) {
-                        oldPos = 'undefined';
+                        oldPos = undefined;
                         activatePoi = false;
                         activateHead = false;
                         multiMissionWPNum = element.getNumber() + 1;
@@ -1953,7 +1967,7 @@ function iconKey(filename) {
                 }
             }
             else if (element.isAttached()) {
-                if (element.getAction() == MWNP.WPTYPE.RTH && oldPos !== undefined) {
+                if (element.getAction() == MWNP.WPTYPE.RTH && isValidCoordinate(oldPos)) {
                     // RTH marker
                     // RTH marker as SVG
                     const markerOpacity = 0.85;
@@ -1995,7 +2009,7 @@ function iconKey(filename) {
                         oldHeading = String(element.getP1());
 
                         // Black circle with white arrow pointing in the heading direction
-                        if (oldPos !== undefined) {
+                        if (isValidCoordinate(oldPos)) {
                             const headingDeg = element.getP1();
                             // SVG: circle stays fixed, arrow rotates around center via SVG transform
                             const markerOpacity = 0.85;
@@ -2038,7 +2052,7 @@ function iconKey(filename) {
                 }
 
                 if (element.getEndMission() == 0xA5) {
-                    oldPos = 'undefined';
+                    oldPos = undefined;
                     activatePoi = false;
                     activateHead = false;
                     multiMissionWPNum = element.getNumber() + 1;
