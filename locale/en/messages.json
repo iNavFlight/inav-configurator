@@ -1350,6 +1350,12 @@
     "configurationLaunchClimbAngleHelp": {
         "message": "Climb angle (attitude of model, not climb slope) for launch sequence (degrees), is also restrained by global max_angle_inclination_pit. Default: 18 [5-45]"
     },
+    "configurationLaunchManual": {
+        "message": "Manual Throttle Launch"
+    },
+    "configurationLaunchManualHelp": {
+        "message": "Allows launch with throttle controlled directly by throttle stick. Launch control only levels wings and maintains climb pitch during launch. IF USED WITHOUT A GPS LOCK plane must be launched immediately after throttle is increased to avoid issues with climb out stabilisation and the launch ending sooner than expected."
+    },
     "configuration3d": {
         "message": "Reversible motors"
     },
@@ -4571,7 +4577,7 @@
     },
     "osdElement_GPS_EXTRA_STATS_HELP": {
         "message": "Visible satellite count and locked satellite indicator(5 levels) for each constellation in this order: GPS–Galileo–BeiDou–GLONASS. Followed by SNR level (higher better)"
-    },    
+    },
     "osdElement_ROLL_PIDS": {
         "message": "Roll PIDs"
     },
