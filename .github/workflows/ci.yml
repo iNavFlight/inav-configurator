@@ -25,7 +25,7 @@ jobs:
               uses: actions/upload-artifact@v4
               with:
                 name: pr-number
-                path: THIS-FILE-DOES-NOT-EXIST-sanity-check.txt
+                path: pr_number.txt
                 if-no-files-found: error
 
     build-linux:
