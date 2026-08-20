@@ -10,7 +10,7 @@ Various types of aircraft are supported by the tool and by INAV, e.g. quadcopter
 
 The Map Generator tab works without a flight controller connection. Select a target, draw an area on the map, and sync the output to an SD card or export as ZIP.
 
-![Map Generator Overview](images/map_generator/Hero.png)
+<img width="2559" height="1527" alt="map_gen_tab" src="https://github.com/user-attachments/assets/241e24dc-4509-44bd-947d-a20a1d77c9ae" />
 
 ### Targets
 
@@ -41,7 +41,6 @@ The candidate elevation sources were benchmarked against ICESat-2 satellite lase
 
 ![DEM accuracy vs the ICESat-2 laser](images/map_generator/dem_accuracy_forest.png)
 
-![Terrain Mode](images/map_generator/terrain_mode.png)
 
 #### How to Use
 
@@ -62,7 +61,12 @@ When the Copernicus source is used, the following notices are shown in the tab a
 
 This product is not endorsed by or affiliated with the European Union, ESA, Airbus Defence and Space GmbH or DLR e.V.
 
-![Terrain Sync](images/map_generator/terrain_sync.png)
+<img width="2559" height="1528" alt="tarr_target" src="https://github.com/user-attachments/assets/56975447-a884-4d47-9510-41e73710858f" />
+
+<img width="2559" height="1527" alt="generating_files" src="https://github.com/user-attachments/assets/f62eea67-1978-4877-a134-c38cbea89f75" />
+
+<img width="2559" height="1525" alt="ter_gen_complete" src="https://github.com/user-attachments/assets/07664701-e5b3-4f6a-8111-a48d9e35e473" />
+
 
 | Detail | Value |
 |--------|-------|
@@ -81,7 +85,6 @@ This product is not endorsed by or affiliated with the European Union, ESA, Airb
 - **Skip Existing** — files already on the SD card are skipped unless Force Overwrite is checked
 - Ocean depths are clamped to 0 m
 
-![Terrain Complete](images/map_generator/terrain_complete.png)
 
 #### SD Card Preparation
 
@@ -95,6 +98,8 @@ This product is not endorsed by or affiliated with the European Union, ESA, Airb
 ### Radio Map Tiles — b14ckyy & Yaapu
 
 Download offline map tiles for radio mapping widgets to your radio's SD card.
+
+![Map Generator Overview](images/map_generator/Hero.png)
 
 #### Map Providers
 
