@@ -35,6 +35,12 @@ Two elevation sources are selectable:
 
 The `.TER` file format is identical for both sources — only the elevation values differ. If the Copernicus service cannot be reached, the Configurator asks before falling back to SRTM; the elevation source is never switched silently.
 
+#### Why Copernicus is the default
+
+The candidate elevation sources were benchmarked against ICESat-2 satellite laser ground truth (ATL08 bare earth, n = 10,777 filtered points, block-bootstrap 95% CI, paired Wilcoxon): **Copernicus GLO-30 reaches a mean absolute error of ~1.07 m versus ~2.01 m for SRTM — about twice as accurate on bare earth** — and it also covers latitudes above 60°N, where SRTM has no data. SRTM is kept as a selectable fallback. The full methodology, numbers and charts are in [this PR comment](https://github.com/iNavFlight/inav-configurator/pull/2599#issuecomment-5085961982).
+
+![DEM accuracy vs the ICESat-2 laser](images/map_generator/dem_accuracy_forest.png)
+
 ![Terrain Mode](images/map_generator/terrain_mode.png)
 
 #### How to Use
