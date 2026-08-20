@@ -60,9 +60,9 @@ This product is not endorsed by or affiliated with the European Union, ESA, Airb
 
 | Detail | Value |
 |--------|-------|
-| **Data source** | NASA SRTM1 (public domain, from AWS) |
+| **Data source** | Copernicus GLO-30 (default) or NASA SRTM1 — selectable in the tab |
 | **Resolution** | 1 arc-second (~30 meters) |
-| **Coverage** | 60°N to 56°S (global land areas) |
+| **Coverage** | 84°N to 90°S (Copernicus) · 60°N to 56°S (SRTM) |
 | **Output** | One `.TER` file per 1°×1° grid square (~111 km), e.g. `N42E023.TER` |
 | **Output location** | FC SD card root (e.g. `G:\N42E023.TER`) |
 | **File size** | ~30 MB per tile |
@@ -70,7 +70,7 @@ This product is not endorsed by or affiliated with the European Union, ESA, Airb
 
 - **Grid Overlay** — orange 1°×1° grid on the map with `.TER` filename labels
 - **Elevation Cache** — downloaded elevation grids are cached in IndexedDB; repeat generations reuse cached data. Copernicus and SRTM grids are stored under separate keys, so switching source never mixes the two
-- **Live Altitude** — after generation, hover the mouse to see SRTM elevation (from cache, no server requests)
+- **Live Altitude** — after generation, hover the mouse to see the elevation under the cursor (from the local cache, no server requests)
 - **FREESPAC.E Handling** — auto-deleted from the SD card during sync; INAV recreates it on next boot
 - **Skip Existing** — files already on the SD card are skipped unless Force Overwrite is checked
 - Ocean depths are clamped to 0 m
@@ -97,11 +97,11 @@ Download offline map tiles for radio mapping widgets to your radio's SD card.
 | OpenStreetMap | Street | Preview only — [tile policy](https://operations.osmfoundation.org/policies/tiles/) does not permit bulk offline export. Use **MapTiler → OSM Style** instead. |
 | ESRI | Street, Satellite, Hybrid | ✓ |
 | Google | Street, Satellite, Hybrid | ✓ — Note: Google may temporarily block your IP for 24 hours after bulk downloads |
-| MapTiler | Satellite, Street, Hybrid, OSM Style, Outdoor, Topo | ✓ (free API key required — see [MapTiler Setup](#maptiler-setup)) |
+| MapTiler | Satellite, Street, Hybrid, OSM Style, Outdoor, Topo, Winter | ✓ (free API key required — see [MapTiler Setup](#maptiler-setup)) |
 
 #### MapTiler Setup
 
-MapTiler provides high-quality map tiles including styles not available from other providers (Outdoor, Topo, OSM Style). A free API key is required.
+MapTiler provides high-quality map tiles including styles not available from other providers (Outdoor, Topo, OSM Style, Winter). A free API key is required.
 
 Without a valid key, the map preview shows placeholder tiles:
 
@@ -129,14 +129,17 @@ The key is saved automatically and persists across sessions.
 | OSM Style | OpenStreetMap-style tiles, policy-compliant for offline export |
 | Outdoor | Topographic style with trails and contours — mountain flying |
 | Topo | Pure contour lines — elevation and terrain awareness |
+| Winter | Ski-resort style — pistes and winter terrain |
 
 #### Output Paths
 
 | Target | Sub-target | SD Card Path |
 |--------|-----------|--------------|
 | b14ckyy | — | `/bitmaps/ethosmaps/maps/{Provider}/{MapType}/{Zoom}/...` |
-| Yaapu | ETHOS | `/bitmaps/yaapu/maps/{MapType}/{Zoom}/{Y}/s_{X}.png` |
-| Yaapu | EdgeTX | `/IMAGES/yaapu/maps/{MapType}/{Zoom}/{Y}/s_{X}.png` |
+| Yaapu | ETHOS | `/bitmaps/yaapu/maps/{GoogleMapName}/{Zoom}/{Y}/s_{X}.jpg` |
+| Yaapu | EdgeTX | `/IMAGES/yaapu/maps/{GoogleMapName}/{Zoom}/{Y}/s_{X}.jpg` |
+
+Yaapu always uses Google-style folder names (`GoogleMap`, `GoogleSatelliteMap`, `GoogleHybridMap`) regardless of the selected provider, and its tiles are JPEG — that is what the Yaapu widgets expect.
 
 1. Select the output target (b14ckyy or Yaapu), map provider, map type, and zoom range
 2. Draw a rectangle over the region you want — side labels show dimensions in real time
