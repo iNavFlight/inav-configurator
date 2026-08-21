@@ -5953,10 +5953,10 @@
         "message": "Rainbow Overlay Settings"
     },
     "ledStripRainbowFreqLabel": {
-        "message": "Frequency"
+        "message": "Sweep Rate"
     },
     "ledStripRainbowFreqUnit": {
-        "message": "Hz"
+        "message": "1-255"
     },
     "ledStripRainbowColorDeltaLabel": {
         "message": "Color Delta"

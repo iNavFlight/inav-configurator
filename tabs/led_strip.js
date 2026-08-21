@@ -225,13 +225,11 @@ ledStripTab.initialize = function (callback, scrollPosition) {
             $('#rainbowFreqInput, #rainbowDeltaInput').prop('disabled', !rainbowActive).css('pointer-events', rainbowActive ? 'auto' : '');
         }
 
-        mspHelper.getSetting('ledstrip_rainbow_freq_hz').then(function (result) {
-            console.log('[Rainbow] ledstrip_rainbow_freq_hz =', result);
+        mspHelper.getSetting('ledstrip_rainbow_sweep_rate').then(function (result) {
             if (result && result.value !== null && result.value !== undefined) {
                 $('#rainbowFreqInput').val(result.value);
             }
         }).catch(function (err) {
-            console.error('[Rainbow] getSetting ledstrip_rainbow_freq_hz FAILED:', err);
         });
         mspHelper.getSetting('ledstrip_rainbow_delta_deg').then(function (result) {
             console.log('[Rainbow] ledstrip_rainbow_delta_deg =', result);
@@ -829,10 +827,10 @@ ledStripTab.initialize = function (callback, scrollPosition) {
             }
 
             function save_rainbow_settings() {
-                var freq = parseInt($('#rainbowFreqInput').val(), 10);
+                var freq = Math.max(1, Math.min(255, parseInt($('#rainbowFreqInput').val(), 10) || 1));
                 var delta = parseInt($('#rainbowDeltaInput').val(), 10);
 
-                mspHelper.setSetting('ledstrip_rainbow_freq_hz', freq, function () {
+                mspHelper.setSetting('ledstrip_rainbow_sweep_rate', freq, function () {
                     mspHelper.setSetting('ledstrip_rainbow_delta_deg', delta, save_to_eeprom);
                 });
             }
