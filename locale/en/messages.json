@@ -3561,6 +3561,12 @@
     "cruiseYawRateHelp": {
         "message": "This is the turning rate in Cruise and 3D Cruise."
     },
+    "cruiseLockOnLevel": {
+        "message": "Lock Course when Level"
+    },
+    "cruiseLockOnLevelHelp": {
+        "message": "Fixed wing only: When enabled, Course Hold / Cruise locks the new course only once the aircraft has rolled out level (below 10° bank) after a heading adjustment or a banked mode entry, so the course is not overshot while the aircraft is still turning. When disabled, the course locks as soon as the sticks are centered (legacy behaviour)."
+    },
     "cruiseManualThrottleLabel": {
         "message": "Allow manual throttle increase"
     },
