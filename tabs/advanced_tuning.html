@@ -614,7 +614,7 @@
 
             <div class="rightWrapper">
 
-                <div class="config-setion gui_box grey">
+                <div class="config-section gui_box grey">
                     <div class="gui_box_titlebar">
                         <div class="spacer_box_title" data-i18n="generalNavigationSettings"></div>
                     </div>
@@ -678,9 +678,21 @@
                         </div>
 
                         <div class="select">
-                            <select id="wpTurnSmoothing" data-setting="nav_fw_wp_turn_smoothing"></select>
-                            <label for="wpTurnSmoothing"><span data-i18n="wpTurnSmoothing"></span></label>
-                            <div for="wpTurnSmoothing" class="helpicon cf_tip" data-i18n_title="wpTurnSmoothingHelp"></div>
+                            <select id="wpTurnMode" data-setting="nav_fw_wp_turn_mode"></select>
+                            <label for="wpTurnMode"><span data-i18n="wpTurnMode"></span></label>
+                            <div for="wpTurnMode" class="helpicon cf_tip" data-i18n_title="wpTurnModeHelp"></div>
+                        </div>
+
+                        <div class="select">
+                            <select id="wpTurnCoordination" data-setting="nav_fw_wp_turn_coordination"></select>
+                            <label for="wpTurnCoordination"><span data-i18n="wpTurnCoordination"></span></label>
+                            <div for="wpTurnCoordination" class="helpicon cf_tip" data-i18n_title="wpTurnCoordinationHelp"></div>
+                        </div>
+
+                        <div class="number">
+                            <input type="number" id="wpTurnMaxLeadTime" data-unit="msec" data-setting="nav_fw_wp_turn_max_lead_time" data-setting-multiplier="1" step="100" min="3000" max="12000" />
+                            <label for="wpTurnMaxLeadTime"><span data-i18n="wpTurnMaxLeadTime"></span></label>
+                            <div for="wpTurnMaxLeadTime" class="helpicon cf_tip" data-i18n_title="wpTurnMaxLeadTimeHelp"></div>
                         </div>
 
                         <div class="select">
