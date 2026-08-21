@@ -23,6 +23,7 @@ import BitHelper from './bitHelper';
 import jBox from 'jbox';
 import groundstation from './groundstation';
 import ltmDecoder from './ltmDecoder';
+import createLtmProtocolGate from './ltmProtocolGate';
 import mspDeduplicationQueue from './msp/mspDeduplicationQueue';
 import store from './store';
 import cliTab from '../tabs/cli';
@@ -38,6 +39,16 @@ var SerialBackend = (function () {
     privateScope.isWirelessMode = false;
 
     privateScope.reopenTab = null;
+
+    privateScope.ltmProtocolGate = createLtmProtocolGate({
+        ltmDecoder,
+        wasMspReceiving: function () {
+            return MSP.wasEverReceiving();
+        },
+        activateGroundstation: function () {
+            groundstation.activate($('#main-wrapper'));
+        }
+    });
 
     /*
      * Handle "Wireless" mode with strict queueing of messages
@@ -187,6 +198,7 @@ var SerialBackend = (function () {
                         mspQueue.freeSoftLock();
                         mspDeduplicationQueue.flush();
                         MSP.disconnect_cleanup();
+                        privateScope.ltmProtocolGate.reset();
 
                         // lock port select & baud while we are connecting / connected
                         $('#port, #baud, #delay').prop('disabled', true);
@@ -260,6 +272,7 @@ var SerialBackend = (function () {
 
                             CONFIGURATOR.connection.disconnect(privateScope.onClosed);
                             MSP.disconnect_cleanup();
+                            privateScope.ltmProtocolGate.reset();
 
                             // Reset various UI elements
                             $('span.i2c-error').text(0);
@@ -387,9 +400,10 @@ var SerialBackend = (function () {
             // garbage bytes or boot messages don't corrupt the MSP decoder
             FC.resetState();
             MSP.disconnect_cleanup();
+            privateScope.ltmProtocolGate.reset();
 
             CONFIGURATOR.connection.addOnReceiveListener(publicScope.read_serial);
-            CONFIGURATOR.connection.addOnReceiveListener(ltmDecoder.read);
+            CONFIGURATOR.connection.addOnReceiveListener(publicScope.read_ltm);
 
             // disconnect after 10 seconds with error if we don't get IDENT data
             timeout.add('connecting', function () {
@@ -408,11 +422,11 @@ var SerialBackend = (function () {
                 }
             }, 10000);
 
-            //Add a timer that every 1s will check if LTM stream is receiving data and display alert if so
+            // LTM is only a fallback for an LTM-only connection. Once MSP has
+            // been validated, its payloads (including raw dataflash blocks)
+            // must never be interpreted as LTM telemetry.
             interval.add('ltm-connection-check', function () {
-                if (ltmDecoder.isReceiving()) {
-                    groundstation.activate($('#main-wrapper'));
-                }
+                privateScope.ltmProtocolGate.activateGroundstationIfLtmOnly();
             }, 1000);
 
             // request configuration data. Start with MSPv1 and
@@ -535,6 +549,10 @@ var SerialBackend = (function () {
         } else if (CONFIGURATOR.cliActive) {
             cliTab.read(info);
         }
+    }
+
+    publicScope.read_ltm = function (info) {
+        privateScope.ltmProtocolGate.read(info);
     }
 
     /**
