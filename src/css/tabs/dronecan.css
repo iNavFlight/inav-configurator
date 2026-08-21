@@ -99,9 +99,13 @@
 
 #dronecan-params .param-actions {
     margin-top: 1em;
+    padding: 0.5em 0;
     display: flex;
     gap: 0.5em;
     align-items: center;
+    position: sticky;
+    bottom: 0;
+    background-color: #f9f9f9;
 }
 
 #dronecan-params button.param-save-eeprom {
