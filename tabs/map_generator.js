@@ -2463,7 +2463,16 @@ TABS.map_generator.initialize = function (callback) {
                     datFiles.push({ name: terrainDatFilename(tile.lat, tile.lon), data: datData });
                     $('#mapgen_download_status').text(prefix + `\u2705 ${terrainDatFilename(tile.lat, tile.lon)} (${(datData.length / 1048576).toFixed(1)} MB)`);
                 } catch (e) {
+                    // A conversion failure (e.g. the packer's self-check) stops the
+                    // whole run. Writing an incomplete tile set and reporting success
+                    // would silently leave the FC without terrain for that square.
                     console.warn(`Conversion failed for ${name}:`, e.message);
+                    $('#mapgen_download_status').text(
+                        `❌ ${terrainDatFilename(tile.lat, tile.lon)} could not be generated: ${e.message}. ` +
+                        'Generation stopped — no files were written.');
+                    $('#mapgen_modal_cancel').text('Close');
+                    $('#mapgen_modal_confirm').hide();
+                    return;
                 }
                 completed++;
             }
