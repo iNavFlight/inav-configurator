@@ -3712,7 +3712,7 @@
         "message": "Waypoint Turn Mode"
     },
     "wpTurnModeHelp": {
-        "message": "Fixed wing only: How the aircraft turns at waypoints during missions. FLY_BY starts the turn early, based on the aircraft's real turn radius (from speed and maximum navigation bank angle), so the flight path joins the next leg smoothly without overshoot - the corner is cut and the waypoint is passed abeam instead of overflown. FLY_OVER flies directly over the waypoint and only then turns towards the next leg."
+        "message": "Fixed wing only: How the aircraft turns at waypoints during missions. FLY_BY starts the turn early, based on the aircraft's real turn radius (from speed and maximum navigation bank angle), so the flight path joins the next leg smoothly without overshoot - the corner is cut and the waypoint is passed abeam instead of overflown. FLY_OVER flies directly over the waypoint, then flies a coordinated turn that rolls out exactly on the line to the next waypoint. FLY_INTO eases away from the corner before the waypoint and then crosses it already aligned on the outbound course (survey/mapping line entries)."
     },
     "wpTurnCoordination": {
         "message": "Waypoint Turn Coordination"
