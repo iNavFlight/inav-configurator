@@ -5946,6 +5946,24 @@
     "ledStripEnableStrobeLightEffectText": {
         "message": "Enable strobe light effect"
     },
+    "ledStripRainbowOverlay": {
+        "message": "Rainbow"
+    },
+    "ledStripRainbowSettingsTitle": {
+        "message": "Rainbow Overlay Settings"
+    },
+    "ledStripRainbowFreqLabel": {
+        "message": "Frequency"
+    },
+    "ledStripRainbowFreqUnit": {
+        "message": "Hz"
+    },
+    "ledStripRainbowColorDeltaLabel": {
+        "message": "Color Delta"
+    },
+    "ledStripRainbowDeltaUnit": {
+        "message": "Degrees"
+    },
     "ledStripOverlayTitle": {
         "message": "Overlay"
     },
