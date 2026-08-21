@@ -203,8 +203,119 @@
     height: 100%;
 }
 
-#missionMap {
+#missionMapView {
+    position: relative;
     height: 100%;
+    width: 100%;
+}
+
+#missionMap,
+#missionMap3D {
+    height: 100%;
+    width: 100%;
+}
+
+#missionMap3D {
+    background: #0d1117;
+    display: none;
+    overflow: hidden;
+}
+
+#missionMap3D canvas,
+#missionMap3D .cesium-viewer,
+#missionMap3D .cesium-viewer-cesiumWidgetContainer,
+#missionMap3D .cesium-widget,
+#missionMap3D .cesium-widget canvas {
+    display: block;
+    height: 100%;
+    width: 100%;
+}
+
+#missionMap3D .cesium-viewer-bottom {
+    bottom: 2px;
+}
+
+#missionMap3D .cesium-widget-credits {
+    font-size: 10px;
+}
+
+#missionMap3DHelp {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: rgba(255, 255, 255, 0.78);
+    font: 600 14px "Segoe UI", Calibri, sans-serif;
+    text-align: center;
+    pointer-events: none;
+    z-index: 2;
+}
+
+#missionMap3DWarning {
+    position: absolute;
+    top: 0.5em;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    display: none;
+    max-width: calc(100% - 12em);
+    padding: 6px 10px;
+    border: 1px solid rgba(255, 255, 255, 0.75);
+    border-radius: 3px;
+    background: rgba(160, 18, 18, 0.94);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.45);
+    color: #fff;
+    font: 700 12px "Segoe UI", Calibri, sans-serif;
+    line-height: 16px;
+    pointer-events: none;
+    text-align: center;
+}
+
+#missionMap3DWarning[data-warning-type="unavailable"],
+#missionMap3DWarning[data-warning-type="home"] {
+    background: rgba(125, 78, 0, 0.94);
+}
+
+.mission-map-view-controls {
+    position: absolute;
+    top: 0.5em;
+    right: 0.5em;
+    z-index: 1001;
+    display: flex;
+    gap: 2px;
+    background: rgba(255, 255, 255, 0.85);
+    border: 0;
+    border-radius: 3px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+    margin: 0;
+    min-width: 0;
+    padding: 2px;
+}
+
+.mission-map-view-controls button {
+    min-width: 38px;
+    height: 24px;
+    border: 0;
+    border-radius: 2px;
+    background: transparent;
+    color: #333;
+    cursor: pointer;
+    font: 700 12px "Segoe UI", Calibri, sans-serif;
+}
+
+.mission-map-view-controls button.active {
+    background: rgba(0, 60, 136, 0.75);
+    color: #fff;
+}
+
+.mission-map-view-controls button:focus-visible {
+    outline: 2px solid #1497f1;
+    outline-offset: 1px;
+}
+
+.mission-map-view-controls button:disabled {
+    color: #888;
+    cursor: default;
 }
 
 /* #missionPlannerElevation {

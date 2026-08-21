@@ -4998,6 +4998,21 @@
     "missionElevation": {
         "message": "Elevation (m):"
     },
+    "missionMap3DEmpty": {
+        "message": "No mission to display in 3D."
+    },
+    "missionMap3DCollisionWarning": {
+        "message": "Warning: Planned route intersects terrain."
+    },
+    "missionMap3DTerrainUnavailable": {
+        "message": "Terrain data unavailable: Route collision check could not be completed."
+    },
+    "missionMap3DHomeRequired": {
+        "message": "HOME is not set: Relative-altitude terrain checks are unavailable."
+    },
+    "missionMap3DUnavailable": {
+        "message": "3D view unavailable on this system."
+    },
     "missionNA": {
         "message": "N/A"
     },
