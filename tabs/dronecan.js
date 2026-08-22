@@ -7,6 +7,7 @@ import GUI from './../js/gui';
 import FC from './../js/fc';
 import i18n from './../js/localization';
 import interval from './../js/intervals';
+import { DRONECAN_ASYNC_REQUEST_STATUS_OK, DRONECAN_ASYNC_REQUEST_STATUS_BUSY, shouldRetryBusyRequest } from './../js/dronecanAsyncRetry';
 
 const HEALTH_LABELS = ['OK', 'WARNING', 'ERROR', 'CRITICAL'];
 const HEALTH_CLASSES = ['health-ok', 'health-warning', 'health-error', 'health-critical'];
@@ -24,8 +25,6 @@ const DRONECAN_SERVICE_EXECUTE_OPCODE = 10;
 const DRONECAN_SERVICE_PARAM_GETSET   = 11;
 const DRONECAN_ASYNC_STATE_READY         = 2;
 const DRONECAN_ASYNC_STATE_ERROR         = 3;
-const DRONECAN_ASYNC_REQUEST_STATUS_OK   = 0;
-const DRONECAN_ASYNC_REQUEST_STATUS_BUSY = 1;
 const DRONECAN_EXECUTE_OPCODE_SAVE       = 0;
 
 function getModeLabel(mode) {
@@ -77,12 +76,20 @@ function buildAsyncRequestPayload(service_id, node_id, params) {
     return payload;
 }
 
-function dronecanAsyncPoll(service_id, node_id, params, onDone) {
+function dronecanAsyncPoll(service_id, node_id, params, onDone, requestAttempts = 0) {
     const reqPayload = buildAsyncRequestPayload(service_id, node_id, params);
 
     MSP.send_message(MSPCodes.MSP2_INAV_DRONECAN_ASYNC_REQUEST, reqPayload, false, () => {
         const req = FC.DRONECAN_ASYNC_REQUEST;
         if (req?.status !== DRONECAN_ASYNC_REQUEST_STATUS_OK) {
+            // The async slot is a single shared resource — BUSY is a normal,
+            // expected outcome when another poll (e.g. background node-name
+            // fetching) is using it, not a terminal error. Retry with the
+            // same backoff budget used for result polling below.
+            if (shouldRetryBusyRequest(req?.status, requestAttempts, POLL_MAX_ATTEMPTS)) {
+                setTimeout(() => dronecanAsyncPoll(service_id, node_id, params, onDone, requestAttempts + 1), POLL_INTERVAL_MS);
+                return;
+            }
             onDone(req?.status === DRONECAN_ASYNC_REQUEST_STATUS_BUSY ? new Error('busy') : new Error('not_ready'), null);
             return;
         }
@@ -191,7 +198,12 @@ dronecanTab.render = function () {
         tbody.appendChild(row);
     });
 
-    fetchNamesSequentially(nodesToFetch, 0, tbody);
+    // Background name-fetching and the per-node param detail view both poll
+    // the FC's single shared async slot; running both at once causes BUSY
+    // collisions. Defer name-fetching until the detail view closes.
+    if (currentDetailNodeId === null) {
+        fetchNamesSequentially(nodesToFetch, 0, tbody);
+    }
     if (currentDetailNodeId !== null) {
         const liveNode = nodes.find(n => n.nodeID === currentDetailNodeId);
         if (liveNode) {
