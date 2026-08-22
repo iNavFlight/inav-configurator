@@ -3712,7 +3712,7 @@
         "message": "Waypoint Turn Mode"
     },
     "wpTurnModeHelp": {
-        "message": "Fixed wing only: How the aircraft turns at waypoints during missions. DIRECT uses the classic reactive heading controller (legacy behaviour). The COORD modes fly the turn as an explicit coordinated arc of the aircraft's real turn radius (from speed and maximum navigation bank angle): COORD_FLYBY starts the turn early so the flight path joins the next leg smoothly without overshoot - the corner is cut and the waypoint is passed abeam instead of overflown. COORD_FLYOVER flies directly over the waypoint, then rolls out exactly on the line to the next waypoint. COORD_FLYINTO eases away from the corner before the waypoint and then crosses it already aligned on the outbound course (survey/mapping line entries)."
+        "message": "Fixed wing only: How the aircraft turns at waypoints during missions. DIRECT uses the classic reactive heading controller (legacy behaviour). The COORD modes fly the turn as an explicit coordinated arc of the aircraft's real turn radius (from speed and maximum navigation bank angle): COORD_FLYBY starts the turn early so the flight path joins the next leg smoothly without overshoot - the corner is cut and the waypoint is passed abeam instead of overflown. COORD_FLYOVER flies directly over the waypoint, then rolls out exactly on the line to the next waypoint. COORD_FLYINTO eases away from the corner before the waypoint and then crosses it already aligned on the outbound course (survey/mapping line entries). Autoland approach turns always fly COORD_FLYBY, regardless of this setting."
     },
     "wpTurnMaxLeadTime": {
         "message": "Waypoint Turn Max Lead Time"
