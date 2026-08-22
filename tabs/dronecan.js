@@ -6,8 +6,10 @@ import mspHelper from './../js/msp/MSPHelper';
 import GUI from './../js/gui';
 import FC from './../js/fc';
 import i18n from './../js/localization';
+import dialog from './../js/dialog';
 import interval from './../js/intervals';
 import { DRONECAN_ASYNC_REQUEST_STATUS_OK, DRONECAN_ASYNC_REQUEST_STATUS_BUSY, shouldRetryBusyRequest } from './../js/dronecanAsyncRetry';
+import { isValidDronecanNodeId } from './../js/dronecanNodeIdValidation';
 
 const HEALTH_LABELS = ['OK', 'WARNING', 'ERROR', 'CRITICAL'];
 const HEALTH_CLASSES = ['health-ok', 'health-warning', 'health-error', 'health-critical'];
@@ -463,6 +465,10 @@ function saveNodeIdAndReboot(nodeId) {
 dronecanTab.saveConfig = function () {
     const bitrate = $('#dronecan-bitrate').val();
     const nodeId = Number.parseInt($('#dronecan-node-id').val(), 10);
+    if (!isValidDronecanNodeId(nodeId)) {
+        dialog.alert(i18n.getMessage('dronecanNodeIdInvalid'));
+        return;
+    }
     if (nodeId >= 126 && !confirm(i18n.getMessage('dronecanNodeIdReservedWarning'))) return;
     mspHelper.setSetting('dronecan_bitrate_kbps', bitrate, () => saveNodeIdAndReboot(nodeId));
 };

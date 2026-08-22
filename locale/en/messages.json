@@ -234,6 +234,9 @@
     "dronecanNodeIdReservedWarning": {
         "message": "Node IDs 126 and 127 are reserved for diagnostic tools. Are you sure?"
     },
+    "dronecanNodeIdInvalid": {
+        "message": "Node ID must be a whole number between 1 and 127."
+    },
     "dronecanDetailColProperty": {
         "message": "Property"
     },
