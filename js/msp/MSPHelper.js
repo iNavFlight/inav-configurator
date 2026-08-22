@@ -22,6 +22,7 @@ import mspDeduplicationQueue from './mspDeduplicationQueue';
 import mspStatistics from './mspStatistics';
 import settingsCache from './../settingsCache';
 import {Geozone, GeozoneVertex, GeozoneShapes } from './../geozone';
+import { parseDronecanAsyncRequestResponse } from './../dronecanAsyncRequestParse';
 
 var mspHelper = (function () {
     var self = {};
@@ -1589,12 +1590,7 @@ var mspHelper = (function () {
                 break;
             
             case MSPCodes.MSP2_INAV_DRONECAN_ASYNC_REQUEST:
-                if (data.byteLength >= 2) {
-                    FC.DRONECAN_ASYNC_REQUEST = {
-                        status: data.getUint8(0),
-                        seq:    data.getUint8(1),
-                    };  
-                }   
+                FC.DRONECAN_ASYNC_REQUEST = parseDronecanAsyncRequestResponse(data);
                 break;
                   
             case MSPCodes.MSP2_INAV_DRONECAN_ASYNC_RESULT:
