@@ -10,6 +10,7 @@ import dialog from './../js/dialog';
 import interval from './../js/intervals';
 import { DRONECAN_ASYNC_REQUEST_STATUS_OK, DRONECAN_ASYNC_REQUEST_STATUS_BUSY, shouldRetryBusyRequest } from './../js/dronecanAsyncRetry';
 import { isValidDronecanNodeId } from './../js/dronecanNodeIdValidation';
+import { isValidIntParamValue, isValidFloatParamValue } from './../js/dronecanParamValidation';
 
 const HEALTH_LABELS = ['OK', 'WARNING', 'ERROR', 'CRITICAL'];
 const HEALTH_CLASSES = ['health-ok', 'health-warning', 'health-error', 'health-critical'];
@@ -293,7 +294,7 @@ function convertParamValue(value_type, writeValue) {
 
 function validateNumericParam(param, value) {
     const isInt = param.value_type === PARAM_TYPE_INT;
-    if (isInt ? typeof value !== 'bigint' : Number.isNaN(value)) {
+    if (isInt ? !isValidIntParamValue(value) : !isValidFloatParamValue(value)) {
         return { ok: false, message: i18n.getMessage('dronecanParamOutOfRange') };
     }
     const toBig = b => typeof b === 'bigint' ? b : BigInt(Math.round(b));
