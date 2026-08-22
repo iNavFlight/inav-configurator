@@ -669,15 +669,6 @@ var FC = {
     isMotorOutputEnabled: function () {
         return this.isFeatureEnabled('PWM_OUTPUT_ENABLE', this.getFeatures());
     },
-    getGpsProtocols: function () {
-        return [
-            'UBLOX',
-            'MSP',
-            'CRSF',
-            'FAKE',
-            'DRONECAN'
-        ];
-    },
     getGpsBaudRates: function () {
         return [
             '115200',
