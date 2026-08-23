@@ -37,10 +37,10 @@ const wizardUiBindings = (function () {
             // table rather than a hardcoded array, so this never drifts from
             // whatever enum ordering the connected firmware actually uses.
             mspHelper.getSetting('gps_provider').then(function (data) {
-                if (!data || !data.setting.table) {
+                if (!data?.setting?.table) {
                     return;
                 }
-                var gpsProtocols = data.setting.table.values;
+                const gpsProtocols = data.setting.table.values;
                 for (let i = 0; i < gpsProtocols.length; i++) {
                     $protocol.append('<option value="' + i + '">' + gpsProtocols[i] + '</option>');
                 }

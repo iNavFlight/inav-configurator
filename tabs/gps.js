@@ -184,11 +184,11 @@ gpsTab.initialize = function (callback) {
         // (not a hardcoded array) so this can never drift from whatever enum
         // ordering the connected firmware actually uses.
         mspHelper.getSetting('gps_provider').then(function (data) {
-            if (!data || !data.setting.table) {
+            if (!data?.setting?.table) {
                 return;
             }
-            var gpsProtocols = data.setting.table.values;
-            var droneCanIndex = gpsProtocols.indexOf('DRONECAN');
+            const gpsProtocols = data.setting.table.values;
+            const droneCanIndex = gpsProtocols.indexOf('DRONECAN');
 
             var gps_protocol_e = $('#gps_protocol');
             for (let i = 0; i < gpsProtocols.length; i++) {
