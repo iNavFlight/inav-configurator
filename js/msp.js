@@ -274,14 +274,15 @@ var MSP = {
                 this.packet_error++;
                 $('span.packet-error').html(this.packet_error);
             }
-
+        } finally {
             /*
-             * Free port
+             * Free port - processData is a pluggable callback, so releasing the lock
+             * cannot depend on it returning normally.
              */
             timeout.add('delayedFreeHardLock', function() {
                 mspQueue.freeHardLock();
             }, 10);
-        } finally {
+
             // Reset variables - MUST happen even if an exception occurred
             this.message_length_received = 0;
             this.state = this.decoder_states.IDLE;

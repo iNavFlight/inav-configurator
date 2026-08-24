@@ -63,8 +63,24 @@ var mspHelper = (function () {
      * @param {MSP} dataHandler
      */
     self.processData = function (dataHandler) {
-        var data = new DataView(dataHandler.message_buffer, 0), // DataView (allowing us to view arrayBuffer as struct/union)
-            offset = 0,
+        var data = new DataView(dataHandler.message_buffer, 0); // DataView (allowing us to view arrayBuffer as struct/union)
+
+        try {
+            parseMessage(dataHandler, data);
+        } catch (error) {
+            // Completing the request below has to happen regardless. A payload this
+            // Configurator cannot parse (FC built from a different branch, fields
+            // added or removed) would otherwise leave the request pending forever:
+            // whatever tab is waiting on it never finishes loading and the GUI stays
+            // stuck mid tab-switch until the user disconnects.
+            console.error('Failed to parse MSP code 0x' + dataHandler.code.toString(16) + ':', error);
+        }
+
+        completeRequest(dataHandler, data);
+    };
+
+    var parseMessage = function (dataHandler, data) {
+        var offset = 0,
             needle = 0,
             i = 0,
             buff = [],
@@ -319,6 +335,13 @@ var mspHelper = (function () {
             case MSPCodes.MSP2_PID:
                 // PID data arrived, we need to scale it and save to appropriate bank / array
                 for (let i = 0, needle = 0; i < (dataHandler.message_length_expected / 4); i++, needle += 4) {
+                    // A newer FC reports more banks than this Configurator knows about.
+                    // Keep them instead of writing past the array: MSP2_SET_PID is only
+                    // accepted at the FC's exact bank count, so dropping them would make
+                    // every PID save fail silently.
+                    if (!FC.PIDs[i]) {
+                        FC.PIDs[i] = new Array(4);
+                    }
                     FC.PIDs[i][0] = data.getUint8(needle);
                     FC.PIDs[i][1] = data.getUint8(needle + 1);
                     FC.PIDs[i][2] = data.getUint8(needle + 2);
@@ -1711,7 +1734,9 @@ var mspHelper = (function () {
         } else {
             console.log('FC reports unsupported message error: 0x' + dataHandler.code.toString(16));
         }
+    };
 
+    var completeRequest = function (dataHandler, data) {
         // trigger callbacks, cleanup/remove callback after trigger
         for (let i = dataHandler.callbacks.length - 1; i >= 0; i--) { // iterating in reverse because we use .splice which modifies array length
             if (i < dataHandler.callbacks.length) {
