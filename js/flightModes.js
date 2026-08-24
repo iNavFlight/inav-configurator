@@ -305,6 +305,11 @@ var FLIGHT_MODES = [
         boxId: 60,
         boxName: "AUTO SPEED",
         permanentId: 69
+    },
+    {
+        boxId: 61,
+        boxName: "IN FLIGHT MENU",
+        permanentId: 70
     }
 ];
 
