@@ -153,6 +153,18 @@ class Connection {
             });
         } else {
             this._openCanceled = true;
+
+            // The port can already be gone when disconnect() runs (FC rebooting into
+            // DFU, cable pulled). This connection object is a session-wide singleton,
+            // so without this it stays stuck with _transmitting true and every later
+            // send() only fills the buffer. Listener teardown is deliberately left to
+            // the branch above: the transports notify their error listeners after
+            // abort(), which lands here, and would then be talking to an empty list.
+            this.emptyOutputBuffer();
+
+            if (callback) {
+                callback(false);
+            }
         }
     }
     

@@ -93,6 +93,11 @@ class ConnectionTcp extends Connection {
                     callback(false);
                 }
             }
+        }).catch(error => {
+            console.log("TCP connection failed: " + error);
+            if (callback) {
+                callback(false);
+            }
         });
     }
 
@@ -110,24 +115,42 @@ class ConnectionTcp extends Connection {
        }
     }
 
-   sendImplementation(data, callback) {     
-        if (this._connectionId) {
-            window.electronAPI.tcpSend(data).then(response => {
-                var result = 0;
-                var sent = response.bytesWritten;
-                if (response.error) {
-                    console.log("Serial write error: " + response.msg);
-                    result = 1;
-                    sent = 0;
-                }
-                if (callback) {
-                    callback({
-                        bytesSent: sent,
-                        resultCode: result
-                    });
-                }
-            });
+   sendImplementation(data, callback) {
+        // Connection.send() advances its output queue only from this callback, so
+        // every path has to fire it - a lost callback stalls the queue for good.
+        if (!this._connectionId) {
+            if (callback) {
+                callback({
+                    bytesSent: 0,
+                    resultCode: 1
+                });
+            }
+            return;
         }
+
+        window.electronAPI.tcpSend(data).then(response => {
+            var result = 0;
+            var sent = response.bytesWritten;
+            if (response.error) {
+                console.log("TCP write error: " + response.msg);
+                result = 1;
+                sent = 0;
+            }
+            if (callback) {
+                callback({
+                    bytesSent: sent,
+                    resultCode: result
+                });
+            }
+        }).catch(error => {
+            console.log("TCP write failed: " + error);
+            if (callback) {
+                callback({
+                    bytesSent: 0,
+                    resultCode: 1
+                });
+            }
+        });
     }
 
     addOnReceiveCallback(callback){
