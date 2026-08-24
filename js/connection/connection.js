@@ -154,12 +154,8 @@ class Connection {
         } else {
             this._openCanceled = true;
 
-            // The port can already be gone when disconnect() runs (FC rebooting into
-            // DFU, cable pulled). This connection object is a session-wide singleton,
-            // so without this it stays stuck with _transmitting true and every later
-            // send() only fills the buffer. Listener teardown is deliberately left to
-            // the branch above: the transports notify their error listeners after
-            // abort(), which lands here, and would then be talking to an empty list.
+            // Port already gone: without this the singleton stays stuck with _transmitting
+            // true. No listener teardown here - transports notify them after abort().
             this.emptyOutputBuffer();
 
             if (callback) {
@@ -252,11 +248,8 @@ class Connection {
         // Note: Don't call addOnReceiveErrorCallback here - it would duplicate the push
     }
 
-    /**
-     * Hand received data to every listener. A listener that throws must not abort
-     * the loop: the remaining listeners would never see this or any later chunk,
-     * and the exception would escape uncaught into the IPC handler.
-     */
+    // A throwing listener must not abort the loop - the rest would never see this
+    // or any later chunk, and the exception would escape into the IPC handler.
     notifyReceiveListeners(info) {
         this._onReceiveListeners.forEach(listener => {
             try {

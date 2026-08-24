@@ -121,8 +121,7 @@ class ConnectionSerial extends Connection {
     }
 
     sendImplementation(data, callback) {
-        // Connection.send() advances its output queue only from this callback, so
-        // every path has to fire it - a lost callback stalls the queue for good.
+        // Connection.send() advances its queue only from this callback - never drop it.
         if (!this._connectionId) {
             if (callback) {
                 callback({

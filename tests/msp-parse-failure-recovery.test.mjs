@@ -127,6 +127,16 @@ const fcStubUrl = dataModule(`
     export default FC;
 `);
 const inertDefaultUrl = dataModule('export default {};');
+// GUI.log and i18n.getMessage are called on the parse-failure path, so these two
+// have to behave like the real thing rather than being inert.
+const guiStubUrl = dataModule(`
+    const GUI = { logged: [], log(message) { GUI.logged.push(message); } };
+    export default GUI;
+`);
+const i18nStubUrl = dataModule(`
+    const i18n = { getMessage(key) { return key; } };
+    export default i18n;
+`);
 const inertFwApproachUrl = dataModule('export const FwApproach = class {};');
 const inertGeozoneUrl = dataModule(`
     export const Geozone = class {};
@@ -137,7 +147,8 @@ const inertGeozoneUrl = dataModule(`
 const realMspHelperUrl = rewriteAndWrite('js/msp/MSPHelper.js', [
     [/^import semver from 'semver';$/m, `import semver from '${inertDefaultUrl}';`, "import semver"],
     [/^import '\.\/\.\.\/injected_methods';$/m, `import '${realInjectedMethodsUrl}';`, "import injected_methods"],
-    [/^import GUI from '\.\/\.\.\/gui';$/m, `import GUI from '${inertDefaultUrl}';`, "import GUI"],
+    [/^import GUI from '\.\/\.\.\/gui';$/m, `import GUI from '${guiStubUrl}';`, "import GUI"],
+    [/^import i18n from '\.\/\.\.\/localization';$/m, `import i18n from '${i18nStubUrl}';`, "import i18n"],
     [/^import MSP from '\.\/\.\.\/msp';$/m, `import MSP from '${realMspUrl}';`, "import MSP"],
     [/^import MSPCodes from '\.\/MSPCodes';$/m, `import MSPCodes from '${realMspCodesUrl}';`, "import MSPCodes"],
     [/^import FC from '\.\/\.\.\/fc';$/m, `import FC from '${fcStubUrl}';`, "import FC"],
@@ -163,8 +174,13 @@ const { default: MSPCodes } = await import(realMspCodesUrl);
 const { default: MSP } = await import(realMspUrl);
 const { default: mspQueue } = await import(realMspQueueUrl);
 const { default: mspDeduplicationQueue } = await import(realDedupUrl);
+const { default: CONFIGURATOR } = await import(realConfiguratorUrl);
+const { default: GUI } = await import(guiStubUrl);
 
 const FC = globalThis[FC_STATE_ID];
+
+// Wires MSP.onConfigWriteBlocked, the same call configurator_main.js makes at startup.
+mspHelper.init();
 
 /** Stand-in for the MSP decoder object processData() reads its message off. */
 function makeDataHandler(code, payloadBytes, onFinish) {
@@ -248,6 +264,12 @@ test('a parser that throws must still complete the request', async () => {
 
     assert.notEqual(response, null, 'the waiting tab must still get its callback, or it hangs forever');
     assert.equal(response.command, MSPCodes.MSP_LOOP_TIME);
+    assert.ok(
+        MSP.parseFailures.has(MSPCodes.MSP_LOOP_TIME),
+        'the failure must be recorded, or half-parsed state could still be written back'
+    );
+    MSP.parseFailures.clear();
+    assert.ok(GUI.logged.includes('mspResponseUnreadable'), 'the user must be told the values are suspect');
     assert.equal(handler.callbacks.length, 0, 'the request must be removed from the pending list');
     assert.equal(
         mspDeduplicationQueue.check(MSPCodes.MSP_LOOP_TIME),
@@ -285,4 +307,193 @@ test('a throwing processData must not leave the MSP queue hard-locked', async ()
         mspQueue.freeHardLock();
         mspQueue.setLockMethod('soft');
     }
+});
+
+// ---------------------------------------------------------------------------
+// Once a response could not be parsed, FC state is part fresh and part stale
+// with no way to tell which. Writing any of it back would push wrong values
+// into the aircraft, so every config write is refused until the next session.
+// ---------------------------------------------------------------------------
+
+/** A queue that can accept a message, with no leftover locks from earlier tests. */
+function resetQueue() {
+    CONFIGURATOR.connection = false; // keeps the real executor interval from dequeuing
+    CONFIGURATOR.cliActive = false;
+    mspQueue.flush();
+    mspDeduplicationQueue.flush();
+    mspQueue.freeHardLock();
+    mspQueue.freeSoftLock();
+    mspQueue.unlock();
+}
+
+/** Puts the session back into "everything parsed fine" state. */
+function clearParseFailures() {
+    MSP.parseFailures.clear();
+}
+
+test('every write code is classified - none falls through unnoticed', () => {
+    // A write nobody classified would be refused wholesale the moment anything
+    // else fails to parse. That is the safe direction, but it is not the intended
+    // behaviour, so adding an MSP write command must fail here until it is either
+    // paired with its read or listed as carrying no FC-read data.
+    const writeNames = Object.keys(MSPCodes).filter(name => /SET_|WRITE|SAVE|ERASE|RESET_|SELECT_/.test(name));
+    assert.ok(writeNames.length > 60, 'sanity: the write codes must still be recognisable by name');
+
+    clearParseFailures();
+    // With nothing broken, blockedWriteSource() reports false for everything, so
+    // probe the classification with one arbitrary failure in place instead.
+    MSP.parseFailures.add(MSPCodes.MSP_BOARD_INFO); // a read no write hands back
+
+    const unclassified = writeNames.filter(name => MSP.blockedWriteSource(MSPCodes[name]) !== false);
+
+    clearParseFailures();
+    assert.deepEqual(
+        unclassified,
+        [],
+        `these write codes are neither paired with a read nor listed as carrying no FC data: ${unclassified.join(', ')}`
+    );
+});
+
+test('a write is blocked only by the read it hands back', () => {
+    clearParseFailures();
+    MSP.parseFailures.add(MSPCodes.MSP2_PID);
+
+    assert.equal(MSP.blockedWriteSource(MSPCodes.MSP2_SET_PID), MSPCodes.MSP2_PID,
+        'the write that sends FC.PIDs back must be refused');
+
+    // Everything else on the same page, and every other page, keeps saving.
+    const stillAllowed = [
+        'MSP_SET_RC_TUNING',
+        'MSPV2_INAV_SET_RATE_PROFILE',
+        'MSPV2_SET_SETTING',
+        'MSP_SET_FEATURE',
+        'MSP2_INAV_SET_MIXER',
+        'MSP2_INAV_SET_SAFEHOME',
+        'MSP_SET_WP',
+    ];
+    for (const name of stillAllowed) {
+        assert.equal(MSP.blockedWriteSource(MSPCodes[name]), false, `${name} must keep working`);
+    }
+
+    clearParseFailures();
+});
+
+test('the pairing holds for the irregularly named writes', () => {
+    // These do not pair up by name alone (plural reads, VERTEX vs VERTICE), so a
+    // rename upstream would silently unpair them without this.
+    const pairs = [
+        ['MSP_SET_MODE_RANGE', 'MSP_MODE_RANGES'],
+        ['MSP_SET_ADJUSTMENT_RANGE', 'MSP_ADJUSTMENT_RANGES'],
+        ['MSP2_INAV_OSD_SET_LAYOUT_ITEM', 'MSP2_INAV_OSD_LAYOUTS'],
+        ['MSP2_INAV_SET_GEOZONE_VERTICE', 'MSP2_INAV_GEOZONE_VERTEX'],
+    ];
+
+    for (const [write, read] of pairs) {
+        clearParseFailures();
+        assert.notEqual(MSPCodes[read], undefined, `${read} must still exist in MSPCodes`);
+        MSP.parseFailures.add(MSPCodes[read]);
+        assert.equal(MSP.blockedWriteSource(MSPCodes[write]), MSPCodes[read], `${write} must pair with ${read}`);
+    }
+
+    clearParseFailures();
+});
+
+test('reads, reboot and live commands are never blocked', () => {
+    clearParseFailures();
+    // Every read this Configurator makes, at once - the worst case.
+    for (const name of Object.keys(MSPCodes)) {
+        MSP.parseFailures.add(MSPCodes[name]);
+    }
+
+    const neverBlocked = [
+        'MSP_STATUS',
+        'MSP2_PID',
+        'MSP_RC_TUNING',
+        'MSP_FC_VERSION',
+        // Stores nothing, and is how the user gets the FC back to a known-good state.
+        'MSP_SET_REBOOT',
+        // stopMotors() stops a running motor test with this - refusing it would
+        // strand the motors spinning.
+        'MSP_SET_MOTOR',
+        'MSP_SET_RAW_RC',
+        // Persists what is already on the FC; a refused write never got there.
+        'MSP_EEPROM_WRITE',
+    ];
+    for (const name of neverBlocked) {
+        assert.notEqual(MSPCodes[name], undefined, `${name} must still exist in MSPCodes`);
+        assert.equal(MSP.blockedWriteSource(MSPCodes[name]), false, `${name} must never be blocked`);
+    }
+
+    // The other half of the guarantee: with every read broken, every write that
+    // does carry FC-read data must be refused. Together with the "none falls
+    // through unnoticed" test above this pins both directions - an empty pairing
+    // map would pass one of them but never both.
+    const writeNames = Object.keys(MSPCodes).filter(name => /SET_|WRITE|SAVE|ERASE|RESET_|SELECT_/.test(name));
+    const blocked = writeNames.filter(name => MSP.blockedWriteSource(MSPCodes[name]) !== false);
+    assert.ok(blocked.length > 50, `expected the bulk of writes to be refused, got ${blocked.length}`);
+    assert.ok(blocked.includes('MSP2_SET_PID'));
+    assert.ok(blocked.includes('MSPV2_SET_SETTING'));
+    assert.ok(!blocked.includes('MSP_EEPROM_WRITE'));
+
+    clearParseFailures();
+});
+
+test('positive control: writes go out normally while parsing is healthy', () => {
+    resetQueue();
+    clearParseFailures();
+
+    const sent = MSP.send_message(MSPCodes.MSP2_SET_PID, [1, 2, 3, 4], false, () => {});
+
+    assert.equal(sent, true);
+    assert.equal(mspQueue.getLength(), 1, 'a healthy session must still queue its writes');
+});
+
+test('a blocked write reaches neither the wire nor a silent dead end', () => {
+    resetQueue();
+    clearParseFailures();
+    MSP.parseFailures.add(MSPCodes.MSP2_PID);
+    GUI.logged.length = 0;
+
+    let result = 'not called';
+    const sent = MSP.send_message(MSPCodes.MSP2_SET_PID, [1, 2, 3, 4], false, (r) => { result = r; });
+
+    assert.equal(sent, false, 'send_message must report the refusal');
+    assert.equal(mspQueue.getLength(), 0, 'nothing may be queued for the FC');
+    assert.equal(result, false, 'the caller must be told, or its save chain hangs like the original bug');
+    assert.ok(
+        GUI.logged.includes('mspWriteBlockedAfterParseFailure'),
+        'a silent refusal is worse than none - the user would believe the settings were saved'
+    );
+
+    clearParseFailures();
+});
+
+test('an unrelated page keeps saving after another page failed to load', () => {
+    resetQueue();
+    clearParseFailures();
+    MSP.parseFailures.add(MSPCodes.MSP2_PID);
+
+    assert.equal(MSP.send_message(MSPCodes.MSP_STATUS, false, false, () => {}), true, 'reads must keep working');
+    assert.equal(MSP.send_message(MSPCodes.MSP_SET_FEATURE, [1], false, () => {}), true, 'other settings must keep saving');
+    assert.equal(MSP.send_message(MSPCodes.MSP_EEPROM_WRITE, false, false, () => {}), true, 'the save must still be committable');
+    assert.equal(mspQueue.getLength(), 3);
+
+    clearParseFailures();
+});
+
+test('reconnecting clears the block', () => {
+    resetQueue();
+    clearParseFailures();
+    MSP.parseFailures.add(MSPCodes.MSP2_PID);
+
+    // What serial_backend.js does at the start of every session, right after
+    // FC.resetState() - everything gets re-read from the FC from scratch.
+    MSP.disconnect_cleanup();
+    assert.equal(MSP.parseFailures.size, 0);
+
+    resetQueue();
+    assert.equal(MSP.send_message(MSPCodes.MSP2_SET_PID, [1, 2, 3, 4], false, () => {}), true);
+    assert.equal(mspQueue.getLength(), 1, 'writes must work again after a reconnect');
+
+    resetQueue();
 });

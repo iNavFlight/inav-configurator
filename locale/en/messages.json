@@ -5769,6 +5769,12 @@
     "illegalStateRestartRequired": {
         "message": "Illegal state. Restart required."
     },
+    "mspResponseUnreadable": {
+        "message": "The flight controller's $1 response could not be read. The values it carries may be incomplete, so <span style=\"color: red\">saving them has been disabled</span> to prevent writing wrong settings to the aircraft. Settings that do not use this data are unaffected. Reconnect to try again."
+    },
+    "mspWriteBlockedAfterParseFailure": {
+        "message": "<span style=\"color: red\">Not saved.</span> These settings come from the flight controller's $1 response, which could not be read this session, so writing them back is refused. Reconnect to try again."
+    },
     "motor_direction_inverted": {
         "message": "Normal motor direction / Props-in configuration"
     },
