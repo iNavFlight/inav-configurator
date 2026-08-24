@@ -29,11 +29,9 @@ class ConnectionUdp extends Connection {
         }
 
         this._ipcMessageHandler = window.electronAPI.onUdpMessage(message => {
-            this._onReceiveListeners.forEach(listener => {
-                listener({
-                    connectionId: this._connectionId,
-                    data: message
-                });
+            this.notifyReceiveListeners({
+                connectionId: this._connectionId,
+                data: message
             });
         });
 
@@ -41,9 +39,7 @@ class ConnectionUdp extends Connection {
             GUI.log(error);
             console.log(error);
             this.abort();
-            this._onReceiveErrorListeners.forEach(listener => {
-                listener(error);
-            });
+            this.notifyReceiveErrorListeners(error);
         });
     }
 

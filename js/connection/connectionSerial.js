@@ -36,11 +36,9 @@ class ConnectionSerial extends Connection {
         }
 
         this._ipcDataHandler = window.electronAPI.onSerialData(buffer => {
-            this._onReceiveListeners.forEach(listener => {
-                listener({
-                    connectionId: this._connectionId,
-                    data: buffer
-                });
+            this.notifyReceiveListeners({
+                connectionId: this._connectionId,
+                data: buffer
             });
         });
 
@@ -54,9 +52,7 @@ class ConnectionSerial extends Connection {
             console.log(error);
             this.abort();
 
-            this._onReceiveErrorListeners.forEach(listener => {
-                listener(error);
-            });
+            this.notifyReceiveErrorListeners(error);
         });
     }
 

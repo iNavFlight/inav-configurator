@@ -252,6 +252,31 @@ class Connection {
         // Note: Don't call addOnReceiveErrorCallback here - it would duplicate the push
     }
 
+    /**
+     * Hand received data to every listener. A listener that throws must not abort
+     * the loop: the remaining listeners would never see this or any later chunk,
+     * and the exception would escape uncaught into the IPC handler.
+     */
+    notifyReceiveListeners(info) {
+        this._onReceiveListeners.forEach(listener => {
+            try {
+                listener(info);
+            } catch (error) {
+                console.error('Receive listener threw:', error);
+            }
+        });
+    }
+
+    notifyReceiveErrorListeners(error) {
+        this._onReceiveErrorListeners.forEach(listener => {
+            try {
+                listener(error);
+            } catch (listenerError) {
+                console.error('Receive error listener threw:', listenerError);
+            }
+        });
+    }
+
     removeAllListeners() {
         this._onReceiveListeners.forEach(listener => this.removeOnReceiveCallback(listener));
         this._onReceiveListeners = [];

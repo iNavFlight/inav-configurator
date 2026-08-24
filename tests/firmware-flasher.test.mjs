@@ -5,6 +5,8 @@
  *   Bug 1 — buildMigrationChain used range comparison instead of chain-walk
  *   Bug 2 — lastAutoBackup not cleared at the start of proceedWithFlash
  *   Bug 3 — _enterCli left its receive callback registered after resolving
+ * plus:
+ *   Bug 4 — restore's MSP version query ran against a null FC.CONFIG
  */
 
 import { test, describe } from 'node:test';
@@ -113,5 +115,42 @@ describe('_enterCli removes and nulls callback before resolving', () => {
         assert.notEqual(resolveIdx, -1, '_enterCli must call resolve()');
         assert.ok(removeIdx  < resolveIdx, 'removeOnReceiveCallback must come before resolve()');
         assert.ok(nullIdx    < resolveIdx, 'this._receiveCallback = null must come before resolve()');
+    });
+});
+
+// ---------------------------------------------------------------------------
+// Bug 4 — restore seeds FC.CONFIG before querying the FC version
+//
+// FC.CONFIG is null in js/fc.js until the first normal connect calls
+// FC.resetState(). Going straight to the flasher after startup skips that, so
+// MSPHelper's MSP_FC_VERSION handler ("FC.CONFIG.flightControllerVersion = ...")
+// threw, the pre-flash backup hung waiting for a response that never got
+// processed, and GUI.connect_lock stayed true.
+//
+// The seeding must be guarded by !FC.CONFIG: an unconditional resetState()
+// would wipe the cached version that the query's 3s timeout path falls back on.
+// ---------------------------------------------------------------------------
+
+describe('restore seeds FC.CONFIG before the MSP version query', () => {
+    const src = readFileSync(resolve(root, 'tabs/firmware_flasher.js'), 'utf8');
+    // The restore flow's version query, not the target-prefetch one further down.
+    const listenerIdx = src.indexOf('CONFIGURATOR.connection.addOnReceiveCallback(mspListener)');
+    const queryIdx = src.indexOf('var versionQueryDone = false');
+
+    test('the guard sits between the MSP listener and the version query', () => {
+        assert.notEqual(listenerIdx, -1, 'the restore flow must still register mspListener');
+        assert.notEqual(queryIdx, -1, 'the restore flow must still have its version query');
+
+        const between = src.slice(listenerIdx, queryIdx);
+        assert.match(between, /if\s*\(\s*!FC\.CONFIG\s*\)\s*\{\s*FC\.resetState\(\);/,
+            'FC.CONFIG must be seeded via FC.resetState() before MSP_FC_VERSION is sent');
+    });
+
+    test('the seeding stays conditional so a cached version is not wiped', () => {
+        const between = src.slice(listenerIdx, queryIdx);
+        const resetIdx = between.indexOf('FC.resetState()');
+        const guardIdx = between.indexOf('!FC.CONFIG');
+        assert.notEqual(guardIdx, -1, 'resetState() must be guarded by !FC.CONFIG');
+        assert.ok(guardIdx < resetIdx, 'the !FC.CONFIG guard must come before resetState()');
     });
 });

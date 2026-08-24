@@ -27,11 +27,9 @@ class ConnectionTcp extends Connection {
         }
 
         this._ipcDataHandler = window.electronAPI.onTcpData(buffer => {
-            this._onReceiveListeners.forEach(listener => {
-                listener({
-                    connectionId: this._connectionId,
-                    data: buffer
-                });
+            this.notifyReceiveListeners({
+                connectionId: this._connectionId,
+                data: buffer
             });
         });
 
@@ -44,9 +42,7 @@ class ConnectionTcp extends Connection {
             GUI.log(error);
             console.log(error);
             this.abort();
-            this._onReceiveErrorListeners.forEach(listener => {
-                listener(error);
-            });
+            this.notifyReceiveErrorListeners(error);
         });
     }
 
