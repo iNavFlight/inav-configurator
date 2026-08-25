@@ -6,6 +6,7 @@ import {
     ArcGisMapServerImageryProvider,
     ArcGISTiledElevationTerrainProvider,
     BoundingSphere,
+    CameraEventType,
     Cartesian2,
     Cartesian3,
     Cartographic,
@@ -13,9 +14,12 @@ import {
     EllipsoidGeodesic,
     EllipsoidTerrainProvider,
     HeadingPitchRange,
+    KeyboardEventModifier,
     LabelStyle,
     Math as CesiumMath,
     OpenStreetMapImageryProvider,
+    ScreenSpaceEventHandler,
+    ScreenSpaceEventType,
     VerticalOrigin,
     Viewer,
     buildModuleUrl,
@@ -660,7 +664,46 @@ function iconKey(filename) {
 
         viewer.scene.globe.depthTestAgainstTerrain = true;
         viewer.scene.globe.tileCacheSize = 500;
-        viewer.scene.screenSpaceCameraController.minimumZoomDistance = 20;
+
+        // Google Earth's modifier layout: Shift + left drag tilts and Ctrl + left drag looks
+        // around. Cesium has those two the other way round; the plain buttons already match
+        // (left drag moves, right drag and the wheel zoom, the middle button tilts).
+        const cameraController = viewer.scene.screenSpaceCameraController;
+        cameraController.minimumZoomDistance = 20;
+        cameraController.tiltEventTypes = [
+            CameraEventType.MIDDLE_DRAG,
+            CameraEventType.PINCH,
+            {eventType: CameraEventType.LEFT_DRAG, modifier: KeyboardEventModifier.SHIFT},
+            {eventType: CameraEventType.RIGHT_DRAG, modifier: KeyboardEventModifier.SHIFT}
+        ];
+        cameraController.lookEventTypes = {eventType: CameraEventType.LEFT_DRAG, modifier: KeyboardEventModifier.CTRL};
+
+        // Zooming and tilting pivot on whatever the cursor grabs. Started against the sky there
+        // is nothing to grab, and Cesium falls back to the globe centre, which hurls the camera
+        // away. Hold those gestures back until they actually catch the globe.
+        const cameraGuard = new ScreenSpaceEventHandler(viewer.scene.canvas);
+        const grabsGlobe = (position) => {
+            const ray = viewer.camera.getPickRay(position);
+            if (ray && viewer.scene.globe.pick(ray, viewer.scene)) return true;
+            return !!viewer.camera.pickEllipsoid(position, viewer.scene.globe.ellipsoid);
+        };
+        const holdGesture = (event) => {
+            const anchored = grabsGlobe(event.position);
+            cameraController.enableZoom = anchored;
+            cameraController.enableTilt = anchored;
+        };
+        const releaseGesture = () => {
+            cameraController.enableZoom = true;
+            cameraController.enableTilt = true;
+        };
+        cameraGuard.setInputAction(holdGesture, ScreenSpaceEventType.RIGHT_DOWN);
+        cameraGuard.setInputAction(releaseGesture, ScreenSpaceEventType.RIGHT_UP);
+        cameraGuard.setInputAction(holdGesture, ScreenSpaceEventType.MIDDLE_DOWN);
+        cameraGuard.setInputAction(releaseGesture, ScreenSpaceEventType.MIDDLE_UP);
+        cameraGuard.setInputAction(holdGesture, ScreenSpaceEventType.LEFT_DOWN, KeyboardEventModifier.SHIFT);
+        cameraGuard.setInputAction(releaseGesture, ScreenSpaceEventType.LEFT_UP, KeyboardEventModifier.SHIFT);
+        cameraGuard.setInputAction(releaseGesture, ScreenSpaceEventType.WHEEL);
+        cameraGuard.setInputAction(releaseGesture, ScreenSpaceEventType.PINCH_START);
 
         let destroyed = false;
         let updateSequence = 0;
@@ -969,6 +1012,7 @@ function iconKey(filename) {
             destroy() {
                 destroyed = true;
                 updateSequence++;
+                cameraGuard.destroy();
                 if (!viewer.isDestroyed()) viewer.destroy();
             }
         };
