@@ -2294,7 +2294,11 @@ function iconKey(filename) {
         if (Number.isNaN(elevation)) {
             try {
                 elevation = Number(await HOME.getElevation(globalSettings));
-                if (!Number.isNaN(elevation)) HOME.setAlt(elevation);
+                if (!Number.isNaN(elevation)) {
+                    HOME.setAlt(elevation);
+                    // the home row still says N/A until something looks the height up
+                    $('#elevationValueAtHome').text(elevation + ' m');
+                }
             } catch (error) {
                 console.warn('home elevation lookup failed:', error.message);
                 return null;
@@ -3618,7 +3622,12 @@ function iconKey(filename) {
 
                 P3Value = missionControlTab.setBit(P3Value, MWNP.P3.ALT_TYPE, $('#pointP3Alt').prop("checked"));
                 (async () => {
-                    const elevationAtWP = await selectedMarker.getElevation(globalSettings);
+                    // The elevation lookup takes a moment and the selector makes it easy to
+                    // move on meanwhile; the answer belongs to the waypoint that asked for it.
+                    const wp = selectedMarker;
+                    const elevationAtWP = await wp.getElevation(globalSettings);
+                    if (selectedMarker !== wp) return;
+
                     $('#elevationValueAtWP').text(elevationAtWP);
                     var altitude = Number($('#pointAlt').val());
 
