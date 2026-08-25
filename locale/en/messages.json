@@ -5013,14 +5013,14 @@
     "missionApplyNoElevation": {
         "message": "Elevation lookup failed, altitudes were not changed"
     },
+    "missionApplyHomeRequired": {
+        "message": "Set a home position first: the altitude reference is measured from it"
+    },
     "missionApplyMissionChanged": {
         "message": "The mission changed while elevations were loading, nothing was saved"
     },
     "missionApplyViaHome": {
         "message": "Sea level reference applied to $1 waypoint(s), converted via the home elevation"
-    },
-    "missionApplyViaTerrain": {
-        "message": "Sea level reference applied to $1 waypoint(s), converted via the terrain under each waypoint"
     },
     "missionApplyAltApplied": {
         "message": "Default altitude applied to $1 waypoint(s)"

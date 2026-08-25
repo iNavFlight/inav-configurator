@@ -151,8 +151,8 @@ function endsBelowGround(wp, index, plan, conversionCm) {
     let groundCm = null;
     if (plan.terrainCm) {
         groundCm = plan.terrainCm[index];
-    } else if (plan.reference) {
-        groundCm = conversionCm;
+    } else if (plan.homeCm !== null) {
+        groundCm = plan.homeCm;
     }
     if (groundCm === null) return false;
 
@@ -178,6 +178,7 @@ async function fetchWaypointElevations(waypoints) {
             const chunk = waypoints.slice(start, start + 100);
             const locations = chunk.map(wp => wp.getLatMap() + ',' + wp.getLonMap()).join('|');
             const response = await elevationFetch('https://api.opentopodata.org/v1/aster30m?locations=' + locations);
+            if (!response.ok) return null;
             const answer = await response.json();
             if (answer.status != 'OK' || !answer.results || answer.results.length != chunk.length) return null;
             answer.results.forEach(result => elevations.push(result.elevation == null ? null : result.elevation));
@@ -2281,28 +2282,25 @@ function iconKey(filename) {
         $('#MPapplySlrSaved').hide();
     }
 
-    /* A waypoint altitude is either measured from home or above sea level, so switching
-       the reference needs a ground level to convert through. Home is the exact one; without
-       a home point the terrain under each waypoint is used, which keeps every waypoint the
-       same height above the ground it flies over. */
-    async function resolveAltitudeReference(waypoints) {
-        if (homeMarkers.length) {
-            let elevation = Number(HOME.getAlt());
-            if (Number.isNaN(elevation)) {
-                try {
-                    elevation = Number(await HOME.getElevation(globalSettings));
-                    if (!Number.isNaN(elevation)) HOME.setAlt(elevation);
-                } catch (error) {
-                    console.warn('home elevation lookup failed:', error.message);
-                    elevation = Number.NaN;
-                }
-            }
-            if (!Number.isNaN(elevation)) {
-                return {kind: 'home', groundCm: waypoints.map(() => elevation * 100)};
+    /* The firmware measures a relative waypoint altitude from home and from nothing
+       else, so converting between the two references needs the home elevation. The
+       terrain under a waypoint is a different quantity: substituting it would store
+       numbers that fly at a different height than the ones on screen. Without a home
+       position there is no conversion to make, and the save says so. */
+    async function resolveHomeElevationCm() {
+        if (!homeMarkers.length) return null;
+
+        let elevation = Number(HOME.getAlt());
+        if (Number.isNaN(elevation)) {
+            try {
+                elevation = Number(await HOME.getElevation(globalSettings));
+                if (!Number.isNaN(elevation)) HOME.setAlt(elevation);
+            } catch (error) {
+                console.warn('home elevation lookup failed:', error.message);
+                return null;
             }
         }
-        const terrain = await fetchWaypointElevations(waypoints);
-        return terrain ? {kind: 'terrain', groundCm: terrain.map(e => e * 100)} : null;
+        return Number.isNaN(elevation) ? null : elevation * 100;
     }
 
     let applyingMissionDefaults = false;
@@ -2359,7 +2357,7 @@ function iconKey(filename) {
     }
 
     function writeDefaultsToWaypoint(wp, index, plan) {
-        const conversionCm = plan.reference ? plan.reference.groundCm[index] : 0;
+        const conversionCm = plan.homeCm ?? 0;
         if (plan.switchMoved && missionControlTab.isBitSet(wp.getP3(), MWNP.P3.ALT_TYPE) != plan.toAbsolute) {
             wp.setP3(missionControlTab.setBit(wp.getP3(), MWNP.P3.ALT_TYPE, plan.toAbsolute));
             wp.setAlt(Math.round(wp.getAlt() + (plan.toAbsolute ? conversionCm : -conversionCm)));
@@ -2385,17 +2383,15 @@ function iconKey(filename) {
        always measures from the terrain under that waypoint. */
     async function resolveGroundsForDefaults(waypoints, plan, onAltitudeUnavailable) {
         if (plan.switchMoved) {
-            plan.reference = await resolveAltitudeReference(waypoints);
-            if (!plan.reference) return false;
+            plan.homeCm = await resolveHomeElevationCm();
+            if (plan.homeCm === null) return false;
         }
 
         const needsTerrain = plan.applyAlt && (plan.switchMoved
             ? plan.toAbsolute
             : waypoints.some(wp => missionControlTab.isBitSet(wp.getP3(), MWNP.P3.ALT_TYPE)));
 
-        if (plan.reference?.kind === 'terrain') {
-            plan.terrainCm = plan.reference.groundCm;
-        } else if (needsTerrain) {
+        if (needsTerrain) {
             const terrain = await fetchWaypointElevations(waypoints);
             if (terrain) {
                 plan.terrainCm = terrain.map(e => e * 100);
@@ -2414,9 +2410,8 @@ function iconKey(filename) {
         if (plan.applyAlt) $('#MPapplyAltSaved').show();
         if (plan.speedChanged) $('#MPapplySpeedSaved').show();
 
-        if (plan.reference) {
-            GUI.log(i18n.getMessage(plan.reference.kind === 'home' ? 'missionApplyViaHome' : 'missionApplyViaTerrain',
-                                    [String(count)]));
+        if (plan.switchMoved) {
+            GUI.log(i18n.getMessage('missionApplyViaHome', [String(count)]));
         }
         if (plan.applyAlt) GUI.log(i18n.getMessage('missionApplyAltApplied', [String(count)]));
         if (plan.speedChanged) GUI.log(i18n.getMessage('missionApplySpeedApplied', [String(count)]));
@@ -2428,7 +2423,7 @@ function iconKey(filename) {
             toAbsolute: $('#MPapplySlrValue').prop('checked'),
             speedChanged: settings.speed !== oldSpeed,
             applyAlt: settings.alt !== oldAlt,
-            reference: null,
+            homeCm: null,
             terrainCm: null,
         };
         plan.switchMoved = plan.toAbsolute !== seaLevelSwitchOnOpen;
@@ -2465,14 +2460,14 @@ function iconKey(filename) {
             }
             if (plan.applyAlt) revertAltitude();
             changeSwitch($('#MPapplySlrValue'), seaLevelSwitchOnOpen);
-            GUI.log(i18n.getMessage('missionApplyNoElevation'));
+            GUI.log(i18n.getMessage('missionApplyHomeRequired'));
             return;
         }
 
         // The fetches took real time; deleting waypoints, switching the multi mission or
         // loading a file meanwhile replaced the mission, and writing the captured
         // waypoints back would resurrect it. Start over instead.
-        if ((plan.reference || plan.terrainCm) && missionWasReplaced(waypoints)) {
+        if ((plan.homeCm !== null || plan.terrainCm) && missionWasReplaced(waypoints)) {
             if (settings.alt !== oldAlt) revertAltitude();
             if (plan.speedChanged) {
                 settings.speed = oldSpeed;
@@ -4651,6 +4646,16 @@ function iconKey(filename) {
         // Callback for settings
         /////////////////////////////////////////////
         $('#saveSettings').on('click', async function () {
+            if ($(this).hasClass('disabled')) return;
+            $(this).addClass('disabled');
+            try {
+                await saveSettingsAndApply();
+            } finally {
+                $(this).removeClass('disabled');
+            }
+        });
+
+        async function saveSettingsAndApply() {
             let oldSafeRadiusSH = settings.safeRadiusSH;
             const oldAlt = settings.alt;
             const oldSpeed = settings.speed;
@@ -4677,7 +4682,7 @@ function iconKey(filename) {
             // The clearance display warns against the default altitude, which may just
             // have changed, so recompute it against the terrain already on screen.
             refreshGroundClearanceDisplay(Number($('#elevationValueAtWP').text()));
-        });
+        }
 
         $('#cancelSettings').on('click', function () {
             loadSettings();
