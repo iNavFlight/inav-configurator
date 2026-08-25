@@ -276,36 +276,23 @@
     background: rgba(125, 78, 0, 0.94);
 }
 
+/* Placed in the left map control column, below the geozone control (190px) */
 .mission-map-view-controls {
-    position: absolute;
-    top: 0.5em;
-    right: 0.5em;
+    top: 215px;
+    left: .5em;
     z-index: 1001;
-    display: flex;
-    gap: 2px;
-    background: rgba(255, 255, 255, 0.85);
     border: 0;
-    border-radius: 3px;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
     margin: 0;
     min-width: 0;
-    padding: 2px;
 }
 
 .mission-map-view-controls button {
-    min-width: 38px;
-    height: 24px;
-    border: 0;
-    border-radius: 2px;
-    background: transparent;
-    color: #333;
-    cursor: pointer;
-    font: 700 12px "Segoe UI", Calibri, sans-serif;
+    width: auto;
+    padding: 0 .3em;
 }
 
 .mission-map-view-controls button.active {
-    background: rgba(0, 60, 136, 0.75);
-    color: #fff;
+    background-color: rgba(0, 60, 136, 1);
 }
 
 .mission-map-view-controls button:focus-visible {
@@ -314,7 +301,7 @@
 }
 
 .mission-map-view-controls button:disabled {
-    color: #888;
+    color: #ccc;
     cursor: default;
 }
 
