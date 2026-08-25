@@ -2249,16 +2249,20 @@ function iconKey(filename) {
        ground. Dropped into a mission that reads its altitudes from sea level it would
        keep that number and sit hundreds of metres below the rest of the route, so it
        joins on the mission's own reference instead. */
-    async function adoptMissionAltitudeReference(waypoint) {
+    async function adoptMissionAltitudeReference(waypoint, knownElevation) {
         if (!missionUsesSeaLevel()) return;
 
         // Adding the waypoint must never hinge on the elevation service: with no answer
         // it joins on the relative reference, which the log says out loud.
-        let elevation = Number.NaN;
-        try {
-            elevation = Number(await waypoint.getElevation(globalSettings));
-        } catch (error) {
-            console.warn('elevation lookup failed:', error.message);
+        let elevation = knownElevation === undefined ? Number.NaN : Number(knownElevation);
+        if (Number.isNaN(elevation)) {
+            // The caller may already have looked this terrain up, and every lookup waits
+            // its turn at the elevation service's one-per-second gate.
+            try {
+                elevation = Number(await waypoint.getElevation(globalSettings));
+            } catch (error) {
+                console.warn('elevation lookup failed:', error.message);
+            }
         }
         if (Number.isNaN(elevation)) {
             GUI.log(i18n.getMessage('missionApplyNoElevation'));
@@ -2499,6 +2503,32 @@ function iconKey(filename) {
     function missionWasReplaced(waypoints) {
         const current = wpListSelectableWaypoints();
         return current.length !== waypoints.length || current.some((wp, i) => wp !== waypoints[i]);
+    }
+
+    /* Placing a waypoint waits on the elevation service while the map keeps taking
+       clicks. Run the additions one after another, so each one reads the mission length
+       it is actually appending to instead of the one two clicks ago. A failed addition
+       must not stall the ones behind it. */
+    let waypointAdditions = Promise.resolve();
+    function queueWaypointAddition(task) {
+        waypointAdditions = waypointAdditions.catch(() => {}).then(task);
+        return waypointAdditions;
+    }
+
+    /* A file load or a switch of multi mission replaces the whole waypoint collection.
+       An addition that started before that belongs to a mission which is gone, and
+       putting it in would graft it onto the new one. */
+    function collectionChangedSince(snapshot) {
+        const current = mission.get();
+        return current.length !== snapshot.length || current.some((wp, i) => wp !== snapshot[i]);
+    }
+
+    /* Some editor fields check what was typed and keep the stored value when it does not
+       hold up. The field handler says so here, so the tick in the title bar does not
+       claim an edit was taken that never reached the waypoint. */
+    let pointEditRefused = false;
+    function refusePointEdit() {
+        pointEditRefused = true;
     }
 
     function renderSafeHomeOptions()  {
@@ -3354,21 +3384,31 @@ function iconKey(filename) {
             }
             else if (selectedFeature && tempMarker.kind == "line" && tempMarker.selection && !disableMarkerEdit) {
                 let tempWpCoord = toLonLat(evt.coordinate);
-                let tempWp = new Waypoint(tempMarker.number, MWNP.WPTYPE.WAYPOINT, Math.round(tempWpCoord[1] * 10000000), Math.round(tempWpCoord[0] * 10000000), Number(settings.alt), Number(settings.speed));
-                tempWp.setMultiMissionIdx(mission.getWaypoint(0).getMultiMissionIdx());
+                const insertAt = tempMarker.number;
+                const wpLat = Math.round(tempWpCoord[1] * 10000000);
+                const wpLon = Math.round(tempWpCoord[0] * 10000000);
 
-                (async () => {
+                queueWaypointAddition(async () => {
+                    const snapshot = mission.get().slice();
+                    let tempWp = new Waypoint(insertAt, MWNP.WPTYPE.WAYPOINT, wpLat, wpLon, Number(settings.alt), Number(settings.speed));
+                    tempWp.setMultiMissionIdx(mission.getWaypoint(0).getMultiMissionIdx());
+
+                    let elevationAtWP;
                     if (homeMarkers.length && HOME.getAlt() != "N/A") {
-                        const elevationAtWP = await tempWp.getElevation(globalSettings);
+                        elevationAtWP = await tempWp.getElevation(globalSettings);
                         tempWp.setAlt(checkAltElevSanity(false, settings.alt, elevationAtWP, false));
                     }
-                    await adoptMissionAltitudeReference(tempWp);
+                    await adoptMissionAltitudeReference(tempWp, elevationAtWP);
+                    if (collectionChangedSince(snapshot)) {
+                        GUI.log(i18n.getMessage('missionApplyMissionChanged'));
+                        return;
+                    }
 
-                    mission.insertWaypoint(tempWp, tempMarker.number);
+                    mission.insertWaypoint(tempWp, insertAt);
                     mission.update(singleMissionActive());
                     refreshLayers();
                     plotElevation();
-                })()
+                });
             }
             else if (selectedFeature && tempMarker.kind == "safehome" && tempMarker.selection) {
                 updateSelectedShAndFwAp(tempMarker.number);
@@ -3402,28 +3442,39 @@ function iconKey(filename) {
             }
             else if (!disableMarkerEdit) {
                 let tempWpCoord = toLonLat(evt.coordinate);
-                let tempWp = new Waypoint(mission.get().length, MWNP.WPTYPE.WAYPOINT, Math.round(tempWpCoord[1] * 10000000), Math.round(tempWpCoord[0] * 10000000), Number(settings.alt), Number(settings.speed));
+                const wpLat = Math.round(tempWpCoord[1] * 10000000);
+                const wpLon = Math.round(tempWpCoord[0] * 10000000);
 
-                if (mission.get().length == 0) {
-                    tempWp.setMultiMissionIdx(multimissionCount == 0 ? 0 : multimissionCount - 1);
-                    FC.FW_APPROACH.clean(FC.SAFEHOMES.getMaxSafehomeCount() + tempWp.getMultiMissionIdx());
-                } else {
-                    tempWp.setMultiMissionIdx(mission.getWaypoint(mission.get().length - 1).getMultiMissionIdx());
-                }
+                queueWaypointAddition(async () => {
+                    // The number and the mission it belongs to are read here, once the
+                    // click ahead of this one has finished appending.
+                    const snapshot = mission.get().slice();
+                    let tempWp = new Waypoint(snapshot.length, MWNP.WPTYPE.WAYPOINT, wpLat, wpLon, Number(settings.alt), Number(settings.speed));
 
-                (async () => {
+                    if (snapshot.length == 0) {
+                        tempWp.setMultiMissionIdx(multimissionCount == 0 ? 0 : multimissionCount - 1);
+                        FC.FW_APPROACH.clean(FC.SAFEHOMES.getMaxSafehomeCount() + tempWp.getMultiMissionIdx());
+                    } else {
+                        tempWp.setMultiMissionIdx(mission.getWaypoint(snapshot.length - 1).getMultiMissionIdx());
+                    }
+
+                    let elevationAtWP;
                     if (homeMarkers.length && HOME.getAlt() != "N/A") {
-                        const elevationAtWP = await tempWp.getElevation(globalSettings);
+                        elevationAtWP = await tempWp.getElevation(globalSettings);
                         tempWp.setAlt(checkAltElevSanity(false, settings.alt, elevationAtWP, false));
                     }
-                    await adoptMissionAltitudeReference(tempWp);
+                    await adoptMissionAltitudeReference(tempWp, elevationAtWP);
+                    if (collectionChangedSince(snapshot)) {
+                        GUI.log(i18n.getMessage('missionApplyMissionChanged'));
+                        return;
+                    }
 
                     mission.put(tempWp);
                     mission.update(singleMissionActive());
                     refreshLayers();
                     plotElevation();
-                })()
-                updateLocationButtonsVisibility();
+                    updateLocationButtonsVisibility();
+                });
             }
             //mission.missionDisplayDebug();
             updateMultimissionState();
@@ -3566,6 +3617,12 @@ function iconKey(filename) {
             if (selectedMarker) {
                 const elevationAtWP = Number($('#elevationValueAtWP').text());
                 const returnAltitude = checkAltElevSanity(true, Number($('#pointAlt').val()), elevationAtWP, selectedMarker.getP3());
+                if (returnAltitude !== Number($('#pointAlt').val())) {
+                    // the sanity check kept the stored altitude, so show that one back
+                    $('#pointAlt').val(returnAltitude);
+                    $('#altitudeInMeters').text(' ' + convertCentimetersToMeters(returnAltitude) + 'm');
+                    refusePointEdit();
+                }
                 selectedMarker.setAlt(returnAltitude);
                 mission.updateWaypoint(selectedMarker);
                 mission.update(singleMissionActive());
@@ -3782,6 +3839,8 @@ function iconKey(filename) {
                 if (checkLandingAltitude(altitude, $('#pointP3Alt').prop('checked'), Number($('#elevationValueAtWP').text()))) {
                     selectedFwApproachWp.setLandAltAsl(Number($(event.currentTarget).val()));
                     $('#wpLandAltM').text(selectedFwApproachWp.getLandAltAsl() / 100 + " m");
+                } else {
+                    refusePointEdit();
                 }
             }
         });
@@ -4757,9 +4816,14 @@ function iconKey(filename) {
             + ' #wpApproachDirection, #wpLandHeading1, #wpLandHeading1Excl, #wpLandHeading2, #wpLandHeading2Excl';
         $(pointEditorFields).on('input', function () {
             $('#pointSavedTick').hide();
+            pointEditRefused = false;
         });
         $(pointEditorFields).on('change', function () {
-            if (selectedMarker) $('#pointSavedTick').show();
+            // A field that kept its stored value has nothing to confirm, and neither has
+            // a panel that is read only right now.
+            const taken = selectedMarker && !disableMarkerEdit && !pointEditRefused;
+            pointEditRefused = false;
+            $('#pointSavedTick').toggle(!!taken);
         });
 
         // The elevation profile floats over the map with both sides anchored, so its
@@ -4813,10 +4877,12 @@ function iconKey(filename) {
             // field. Fields already committed just show the tick.
             const active = document.activeElement;
             if (active && $(active).closest('#MPeditPoint').length) {
+                // the change handler above sets the tick according to what was taken
                 $(active).trigger('change');
                 active.blur();
+                return;
             }
-            $('#pointSavedTick').show();
+            $('#pointSavedTick').toggle(!disableMarkerEdit);
         });
 
         updateTotalInfo();
