@@ -168,8 +168,41 @@ jobs:
             command: yarn install --foreground-scripts
             timeout_minutes: 10
             on_retry_command: rm -rfv node_modules
+        # Signing/notarization steps only run when the repository has the
+        # required secrets configured; fork PRs build unsigned as before.
+        - name: Import signing certificate
+          if: ${{ secrets.MACOS_CERT_P12 != '' }}
+          env:
+            MACOS_CERT_P12: ${{ secrets.MACOS_CERT_P12 }}
+            MACOS_CERT_PASSWORD: ${{ secrets.MACOS_CERT_PASSWORD }}
+          run: |
+            KEYCHAIN=$RUNNER_TEMP/build.keychain-db
+            KEYCHAIN_PASSWORD=$(uuidgen)
+            echo "$MACOS_CERT_P12" | base64 --decode > $RUNNER_TEMP/cert.p12
+            security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN"
+            security set-keychain-settings -lut 21600 "$KEYCHAIN"
+            security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN"
+            security import $RUNNER_TEMP/cert.p12 -k "$KEYCHAIN" -P "$MACOS_CERT_PASSWORD" -T /usr/bin/codesign
+            security set-key-partition-list -S apple-tool:,apple: -s -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN"
+            security list-keychains -d user -s "$KEYCHAIN" login.keychain
+            rm $RUNNER_TEMP/cert.p12
+        - name: Write notarization API key
+          if: ${{ secrets.APPLE_API_KEY_P8 != '' }}
+          env:
+            APPLE_API_KEY_P8: ${{ secrets.APPLE_API_KEY_P8 }}
+          run: echo "$APPLE_API_KEY_P8" > $RUNNER_TEMP/apple_api_key.p8
         - name: Build MacOS arm64
+          env:
+            OSX_SIGN_IDENTITY: ${{ secrets.MACOS_SIGN_IDENTITY }}
+            APPLE_API_KEY: ${{ runner.temp }}/apple_api_key.p8
+            APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
+            APPLE_API_ISSUER: ${{ secrets.APPLE_API_ISSUER }}
           run: yarn run make -- --arch="arm64"
+        - name: Verify signing and notarization
+          if: ${{ secrets.MACOS_SIGN_IDENTITY != '' }}
+          run: |
+            xcrun stapler validate "out/INAV Configurator-darwin-arm64/INAV Configurator.app"
+            spctl --assess --type execute -v "out/INAV Configurator-darwin-arm64/INAV Configurator.app"
         - name: Upload MacOS arm64 zip
           uses: actions/upload-artifact@v4
           with:
@@ -216,10 +249,42 @@ jobs:
             command: yarn install --foreground-scripts
             timeout_minutes: 10
             on_retry_command: rm -rfv node_modules
+        # Signing/notarization steps only run when the repository has the
+        # required secrets configured; fork PRs build unsigned as before.
+        - name: Import signing certificate
+          if: ${{ secrets.MACOS_CERT_P12 != '' }}
+          env:
+            MACOS_CERT_P12: ${{ secrets.MACOS_CERT_P12 }}
+            MACOS_CERT_PASSWORD: ${{ secrets.MACOS_CERT_PASSWORD }}
+          run: |
+            KEYCHAIN=$RUNNER_TEMP/build.keychain-db
+            KEYCHAIN_PASSWORD=$(uuidgen)
+            echo "$MACOS_CERT_P12" | base64 --decode > $RUNNER_TEMP/cert.p12
+            security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN"
+            security set-keychain-settings -lut 21600 "$KEYCHAIN"
+            security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN"
+            security import $RUNNER_TEMP/cert.p12 -k "$KEYCHAIN" -P "$MACOS_CERT_PASSWORD" -T /usr/bin/codesign
+            security set-key-partition-list -S apple-tool:,apple: -s -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN"
+            security list-keychains -d user -s "$KEYCHAIN" login.keychain
+            rm $RUNNER_TEMP/cert.p12
+        - name: Write notarization API key
+          if: ${{ secrets.APPLE_API_KEY_P8 != '' }}
+          env:
+            APPLE_API_KEY_P8: ${{ secrets.APPLE_API_KEY_P8 }}
+          run: echo "$APPLE_API_KEY_P8" > $RUNNER_TEMP/apple_api_key.p8
         - name: Build MacOS x64
           env:
             NODE_OPTIONS: --max-old-space-size=4096
+            OSX_SIGN_IDENTITY: ${{ secrets.MACOS_SIGN_IDENTITY }}
+            APPLE_API_KEY: ${{ runner.temp }}/apple_api_key.p8
+            APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
+            APPLE_API_ISSUER: ${{ secrets.APPLE_API_ISSUER }}
           run: yarn run make -- --arch="x64"
+        - name: Verify signing and notarization
+          if: ${{ secrets.MACOS_SIGN_IDENTITY != '' }}
+          run: |
+            xcrun stapler validate "out/INAV Configurator-darwin-x64/INAV Configurator.app"
+            spctl --assess --type execute -v "out/INAV Configurator-darwin-x64/INAV Configurator.app"
         - name: Upload MacOS x64 zip
           uses: actions/upload-artifact@v4
           with:

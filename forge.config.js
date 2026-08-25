@@ -4,15 +4,98 @@ import { fileURLToPath } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
+// Remove SITL binaries for other platforms/architectures to reduce package size.
+// This must run via afterCopyExtraResources (before code signing) rather than
+// postPackage, otherwise deleting files invalidates the macOS signature seal.
+const pruneSitlBinaries = (stagingPath, electronVersion, platform, arch, done) => {
+  try {
+    let sitlPath;
+
+    if (platform === 'darwin') {
+      // macOS app bundle structure: <stagingPath>/<AppName>.app/Contents/Resources/sitl
+      const appBundles = fs.readdirSync(stagingPath).filter(f => f.endsWith('.app'));
+      if (appBundles.length === 0) {
+        console.log(`pruneSitlBinaries: No .app bundle found in ${stagingPath}`);
+        return done();
+      }
+      sitlPath = path.join(stagingPath, appBundles[0], 'Contents', 'Resources', 'sitl');
+    } else {
+      // Windows/Linux: <stagingPath>/resources/sitl
+      sitlPath = path.join(stagingPath, 'resources', 'sitl');
+    }
+
+    console.log(`pruneSitlBinaries: Checking SITL path for ${platform}: ${sitlPath}`);
+    if (!fs.existsSync(sitlPath)) {
+      console.log(`pruneSitlBinaries: SITL path not found, skipping: ${sitlPath}`);
+      return done();
+    }
+
+    if (platform === 'win32') {
+      console.log('pruneSitlBinaries: Removing non-Windows SITL binaries (linux, macos)');
+      fs.rmSync(path.join(sitlPath, 'linux'), { recursive: true, force: true });
+      fs.rmSync(path.join(sitlPath, 'macos'), { recursive: true, force: true });
+    } else if (platform === 'darwin') {
+      console.log('pruneSitlBinaries: Removing non-macOS SITL binaries (linux, windows)');
+      fs.rmSync(path.join(sitlPath, 'linux'), { recursive: true, force: true });
+      fs.rmSync(path.join(sitlPath, 'windows'), { recursive: true, force: true });
+    } else if (platform === 'linux') {
+      console.log('pruneSitlBinaries: Removing non-Linux SITL binaries (macos, windows)');
+      fs.rmSync(path.join(sitlPath, 'macos'), { recursive: true, force: true });
+      fs.rmSync(path.join(sitlPath, 'windows'), { recursive: true, force: true });
+      // Remove wrong architecture
+      if (arch === 'x64') {
+        fs.rmSync(path.join(sitlPath, 'linux', 'arm64'), { recursive: true, force: true });
+      } else if (arch === 'arm64') {
+        // Move arm64 binary to linux root and remove x64
+        const arm64Binary = path.join(sitlPath, 'linux', 'arm64', 'inav_SITL');
+        const destBinary = path.join(sitlPath, 'linux', 'inav_SITL');
+        if (fs.existsSync(arm64Binary)) {
+          fs.rmSync(destBinary, { force: true });
+          fs.renameSync(arm64Binary, destBinary);
+          fs.rmSync(path.join(sitlPath, 'linux', 'arm64'), { recursive: true, force: true });
+        }
+      }
+    }
+
+    done();
+  } catch (err) {
+    done(err);
+  }
+};
+
+// macOS code signing and notarization are opt-in via environment variables so
+// unsigned development and fork-PR builds keep working without credentials.
+// - OSX_SIGN_IDENTITY: "Developer ID Application: Name (TEAMID)" enables signing.
+// - Notarization (requires signing) uses either an App Store Connect API key
+//   (APPLE_API_KEY path + APPLE_API_KEY_ID + APPLE_API_ISSUER, suited to CI) or
+//   a local notarytool keychain profile (APPLE_KEYCHAIN_PROFILE).
+const osxSign = process.env.OSX_SIGN_IDENTITY
+  ? { identity: process.env.OSX_SIGN_IDENTITY }
+  : undefined;
+
+let osxNotarize;
+if (osxSign && process.env.APPLE_API_KEY_ID) {
+  osxNotarize = {
+    appleApiKey: process.env.APPLE_API_KEY,
+    appleApiKeyId: process.env.APPLE_API_KEY_ID,
+    appleApiIssuer: process.env.APPLE_API_ISSUER,
+  };
+} else if (osxSign && process.env.APPLE_KEYCHAIN_PROFILE) {
+  osxNotarize = { keychainProfile: process.env.APPLE_KEYCHAIN_PROFILE };
+}
+
 export default {
   packagerConfig: {
     executableName: "inav-configurator",
     asar: false,
     icon: 'images/inav',
+    osxSign,
+    osxNotarize,
     extraResource: [
       'resources/public/sitl',
       'assets/linux/45-inav.rules'
     ],
+    afterCopyExtraResources: [pruneSitlBinaries],
   },
   rebuildConfig: {
     // Native modules (serialport, usb) ship with prebuilt binaries for each platform.
@@ -52,59 +135,6 @@ export default {
     },
   ],
   hooks: {
-    // Remove SITL binaries for other platforms/architectures to reduce package size
-    postPackage: async (forgeConfig, options) => {
-      for (const outputPath of options.outputPaths) {
-        let sitlPath;
-
-        if (options.platform === 'darwin') {
-          // macOS app bundle structure: <outputDir>/<AppName>.app/Contents/Resources/sitl
-          // Find the .app directory
-          const appBundles = fs.readdirSync(outputPath).filter(f => f.endsWith('.app'));
-          if (appBundles.length === 0) {
-            console.log(`postPackage: No .app bundle found in ${outputPath}`);
-            continue;
-          }
-          sitlPath = path.join(outputPath, appBundles[0], 'Contents', 'Resources', 'sitl');
-        } else {
-          // Windows/Linux: <outputPath>/resources/sitl
-          sitlPath = path.join(outputPath, 'resources', 'sitl');
-        }
-
-        console.log(`postPackage: Checking SITL path for ${options.platform}: ${sitlPath}`);
-        if (!fs.existsSync(sitlPath)) {
-          console.log(`postPackage: SITL path not found, skipping: ${sitlPath}`);
-          continue;
-        }
-
-        if (options.platform === 'win32') {
-          console.log('postPackage: Removing non-Windows SITL binaries (linux, macos)');
-          fs.rmSync(path.join(sitlPath, 'linux'), { recursive: true, force: true });
-          fs.rmSync(path.join(sitlPath, 'macos'), { recursive: true, force: true });
-        } else if (options.platform === 'darwin') {
-          console.log('postPackage: Removing non-macOS SITL binaries (linux, windows)');
-          fs.rmSync(path.join(sitlPath, 'linux'), { recursive: true, force: true });
-          fs.rmSync(path.join(sitlPath, 'windows'), { recursive: true, force: true });
-        } else if (options.platform === 'linux') {
-          console.log('postPackage: Removing non-Linux SITL binaries (macos, windows)');
-          fs.rmSync(path.join(sitlPath, 'macos'), { recursive: true, force: true });
-          fs.rmSync(path.join(sitlPath, 'windows'), { recursive: true, force: true });
-          // Remove wrong architecture
-          if (options.arch === 'x64') {
-            fs.rmSync(path.join(sitlPath, 'linux', 'arm64'), { recursive: true, force: true });
-          } else if (options.arch === 'arm64') {
-            // Move arm64 binary to linux root and remove x64
-            const arm64Binary = path.join(sitlPath, 'linux', 'arm64', 'inav_SITL');
-            const destBinary = path.join(sitlPath, 'linux', 'inav_SITL');
-            if (fs.existsSync(arm64Binary)) {
-              fs.rmSync(destBinary, { force: true });
-              fs.renameSync(arm64Binary, destBinary);
-              fs.rmSync(path.join(sitlPath, 'linux', 'arm64'), { recursive: true, force: true });
-            }
-          }
-        }
-      }
-    },
     // Uniform artifact file names
     postMake: async (config, makeResults) => {
       makeResults.forEach(result => {

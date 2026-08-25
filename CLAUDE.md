@@ -95,6 +95,47 @@ MSP.send_message(MSPCodes.MSP_SOME_CODE, payload, false, () => {
 | macOS    | `yarn make --platform darwin` | DMG |
 | Linux    | `yarn make --platform linux` | DEB, RPM |
 
+## macOS Code Signing & Notarization
+
+Signing is opt-in via environment variables (see `forge.config.js`); without
+them, builds are unsigned. For a signed + notarized local release build:
+
+```bash
+export OSX_SIGN_IDENTITY="Developer ID Application: Your Name (TEAMID)"
+export APPLE_KEYCHAIN_PROFILE="your-notary-profile"  # from: xcrun notarytool store-credentials
+yarn make --platform darwin --arch arm64
+yarn make --platform darwin --arch x64
+```
+
+CI signs automatically when the repo secrets are configured (`MACOS_CERT_P12`,
+`MACOS_CERT_PASSWORD`, `MACOS_SIGN_IDENTITY`, `APPLE_API_KEY_P8`,
+`APPLE_API_KEY_ID`, `APPLE_API_ISSUER`) — see the macOS jobs in
+`.github/workflows/ci.yml`. Fork PRs without secrets build unsigned.
+
+Verify a build with:
+
+```bash
+xcrun stapler validate "out/INAV Configurator-darwin-arm64/INAV Configurator.app"
+spctl --assess --type execute -v "out/INAV Configurator-darwin-arm64/INAV Configurator.app"
+# expected: accepted, source=Notarized Developer ID
+```
+
+**Gotchas (learned the hard way):**
+
+- **Never run two macOS builds concurrently on one machine.** `@electron/packager`
+  wipes its shared temp dir (`$TMPDIR/electron-packager`) at the start of every
+  run — deleting the other build's staged app while it waits on Apple — and the
+  DMG maker writes to a fixed intermediate path (`out/make/INAV Configurator.dmg`).
+  Run architectures sequentially, or isolate each with its own `TMPDIR`.
+- **Files must not be deleted from the bundle after signing.** SITL pruning runs
+  in the `afterCopyExtraResources` hook (before signing) for this reason; moving
+  it to `postPackage` breaks the signature seal and fails notarization.
+- Notarization (`notarytool --wait`) can take minutes to hours depending on
+  Apple's queue; a quiet build is usually waiting, not hung.
+- If the DMG/ZIP step fails after successful notarization, don't rebuild —
+  re-run `yarn make -- --arch=<arch> --skip-package` to re-wrap the already
+  notarized app in `out/` without another Apple round-trip.
+
 ## Key Files by Importance
 
 | File | Purpose |
