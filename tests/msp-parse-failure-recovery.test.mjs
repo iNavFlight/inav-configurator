@@ -336,7 +336,7 @@ test('every write code is classified - none falls through unnoticed', () => {
     // else fails to parse. That is the safe direction, but it is not the intended
     // behaviour, so adding an MSP write command must fail here until it is either
     // paired with its read or listed as carrying no FC-read data.
-    const writeNames = Object.keys(MSPCodes).filter(name => /SET_|WRITE|SAVE|ERASE|RESET_|SELECT_/.test(name));
+    const writeNames = Object.keys(MSPCodes).filter(name => /(^|_)SET(_|$)|WRITE|SAVE|ERASE|RESET_|SELECT_/.test(name));
     assert.ok(writeNames.length > 60, 'sanity: the write codes must still be recognisable by name');
 
     clearParseFailures();
@@ -428,7 +428,7 @@ test('reads, reboot and live commands are never blocked', () => {
     // does carry FC-read data must be refused. Together with the "none falls
     // through unnoticed" test above this pins both directions - an empty pairing
     // map would pass one of them but never both.
-    const writeNames = Object.keys(MSPCodes).filter(name => /SET_|WRITE|SAVE|ERASE|RESET_|SELECT_/.test(name));
+    const writeNames = Object.keys(MSPCodes).filter(name => /(^|_)SET(_|$)|WRITE|SAVE|ERASE|RESET_|SELECT_/.test(name));
     const blocked = writeNames.filter(name => MSP.blockedWriteSource(MSPCodes[name]) !== false);
     assert.ok(blocked.length > 50, `expected the bulk of writes to be refused, got ${blocked.length}`);
     assert.ok(blocked.includes('MSP2_SET_PID'));
@@ -436,6 +436,34 @@ test('reads, reboot and live commands are never blocked', () => {
     assert.ok(!blocked.includes('MSP_EEPROM_WRITE'));
 
     clearParseFailures();
+});
+
+test('a write is recognised however its name spells SET', () => {
+    // The classifier is a name regex, so a test built on that same regex cannot
+    // notice a write it fails to match - MSP2_INAV_EZ_TUNE_SET was missed that way.
+    // Codes named after SET that are reads, or writes carrying no FC-read data:
+    const notGuarded = [
+        'MSPV2_SETTING', 'MSP2_COMMON_SETTING_INFO',
+        'MSP_SET_REBOOT', 'MSP_SET_MOTOR', 'MSP_SET_RAW_RC', 'MSP_SET_RAW_GPS',
+        'MSP_SET_HEAD', 'MSP_SET_RTC', 'MSP_RESET_CONF', 'MSP_SET_RESET_CURR_PID',
+        'MSP_SELECT_SETTING', 'MSP_SET_BOX',
+    ];
+
+    clearParseFailures();
+    for (const name of Object.keys(MSPCodes)) {
+        MSP.parseFailures.add(MSPCodes[name]);
+    }
+
+    const unguarded = Object.keys(MSPCodes)
+        .filter(name => name.includes('SET') && !notGuarded.includes(name))
+        .filter(name => MSP.blockedWriteSource(MSPCodes[name]) === false);
+
+    assert.equal(MSP.blockedWriteSource(MSPCodes.MSP2_INAV_EZ_TUNE_SET), MSPCodes.MSP2_INAV_EZ_TUNE,
+        'the suffix-form write must pair with the response it hands back');
+
+    clearParseFailures();
+    assert.deepEqual(unguarded, [],
+        `these SET codes are neither guarded nor listed as carrying no FC data: ${unguarded.join(', ')}`);
 });
 
 test('positive control: writes go out normally while parsing is healthy', () => {
@@ -448,7 +476,7 @@ test('positive control: writes go out normally while parsing is healthy', () => 
     assert.equal(mspQueue.getLength(), 1, 'a healthy session must still queue its writes');
 });
 
-test('a blocked write reaches neither the wire nor a silent dead end', () => {
+test('a blocked write reaches neither the wire nor the save chain behind it', () => {
     resetQueue();
     clearParseFailures();
     MSP.parseFailures.add(MSPCodes.MSP2_PID);
@@ -459,7 +487,9 @@ test('a blocked write reaches neither the wire nor a silent dead end', () => {
 
     assert.equal(sent, false, 'send_message must report the refusal');
     assert.equal(mspQueue.getLength(), 0, 'nothing may be queued for the FC');
-    assert.equal(result, false, 'the caller must be told, or its save chain hangs like the original bug');
+    // Save chains read being called as success - failsafe's savePhaseTwo ignores the
+    // argument and would go on to write EEPROM, log "saved" and reboot the FC.
+    assert.equal(result, 'not called', 'a write that never went out must not complete');
     assert.ok(
         GUI.logged.includes('mspWriteBlockedAfterParseFailure'),
         'a silent refusal is worse than none - the user would believe the settings were saved'

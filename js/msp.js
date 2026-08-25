@@ -9,7 +9,7 @@ import CONFIGURATOR from './data_storage';
 // Every MSP code that changes something on the FC, recognised by name so a write
 // added later is covered without maintaining a list here.
 const WRITE_CODE_NAMES = Object.keys(MSPCodes)
-    .filter(name => /SET_|WRITE|SAVE|ERASE|RESET_|SELECT_/.test(name));
+    .filter(name => /(^|_)SET(_|$)|WRITE|SAVE|ERASE|RESET_|SELECT_/.test(name));
 
 // Writes carrying nothing read off the FC, so an unreadable response cannot poison
 // them. Refusing the live ones would be a hazard of its own.
@@ -42,7 +42,9 @@ for (const name of WRITE_CODE_NAMES) {
     if (ALWAYS_ALLOWED_WRITE_CODES.has(MSPCodes[name])) {
         continue;
     }
-    const sourceName = IRREGULAR_WRITE_SOURCES[name] || name.replace('SET_', '');
+    // MSP2_INAV_EZ_TUNE_SET names its write the other way round.
+    const sourceName = IRREGULAR_WRITE_SOURCES[name]
+        || (name.endsWith('_SET') ? name.slice(0, -4) : name.replace('SET_', ''));
     if (MSPCodes[sourceName] !== undefined && sourceName !== name) {
         WRITE_SOURCE_CODES.set(MSPCodes[name], MSPCodes[sourceName]);
     }
@@ -161,6 +163,24 @@ var MSP = {
         // Unpaired write: refuse rather than guess. Over-blocking costs a refused save,
         // under-blocking puts wrong values into the aircraft.
         return WRITE_CODES.has(code) ? this.parseFailures.values().next().value : false;
+    },
+
+    // Reports and refuses a write built from an unreadable response.
+    refuseBlockedWrite(code) {
+        const blockedBy = this.blockedWriteSource(code);
+        if (blockedBy === false) {
+            return false;
+        }
+
+        console.error('Refusing MSP write ' + this.getCodeName(code) + ': its source ' +
+            this.getCodeName(blockedBy) + ' could not be parsed this session');
+
+        // A silent refusal would be worse - the user would believe it was saved.
+        if (this.onConfigWriteBlocked) {
+            this.onConfigWriteBlocked(code, blockedBy);
+        }
+
+        return true;
     },
 
     init() {
@@ -381,21 +401,9 @@ var MSP = {
     },
 
     send_message(code, data, callback_sent, callback_msp, protocolVersion) {
-        const blockedBy = this.blockedWriteSource(code);
-        if (blockedBy !== false) {
-            console.error('Refusing MSP write ' + this.getCodeName(code) + ': its source ' +
-                this.getCodeName(blockedBy) + ' could not be parsed this session');
-
-            // A silent refusal would be worse - the user would believe it was saved.
-            if (this.onConfigWriteBlocked) {
-                this.onConfigWriteBlocked(code, blockedBy);
-            }
-
-            // Report failure rather than going quiet, or the caller's save chain hangs.
-            if (callback_msp) {
-                callback_msp(false);
-            }
-
+        // No callback on a refusal: save chains ignore its argument, so calling it
+        // would run the EEPROM write and reboot as if the settings had been stored.
+        if (this.refuseBlockedWrite(code)) {
             return false;
         }
 
