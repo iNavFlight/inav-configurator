@@ -3,6 +3,7 @@
 import { getLength } from 'ol/sphere';
 import { LineString } from 'ol/geom';
 import { fromLonLat } from 'ol/proj';
+import elevationFetch from './elevationFetch';
 
 import MWNP from './mwnp';
 import Waypoint from './waypoint';
@@ -288,7 +289,7 @@ let WaypointCollection = function () {
     self.missionDisplayDebug = function() {
         if (data && data.length != 0) {
             data.forEach(function (element) {
-                console.log("N° : ", element.getNumber(),
+                console.log("NÂ° : ", element.getNumber(),
                             "Action : ", element.getAction(),
                             "Lon : ", element.getLon(),
                             "Lat : ", element.getLat(),
@@ -461,7 +462,7 @@ let WaypointCollection = function () {
         point2measure.forEach(function (item) {
             coordList += item + '|';
         });
-        const response = await fetch('https://api.opentopodata.org/v1/aster30m?locations='+coordList+'&samples='+String(samples+1));
+        const response = await elevationFetch('https://api.opentopodata.org/v1/aster30m?locations='+coordList+'&samples='+String(samples+1));
         const myJson = await response.json();
 
         if (myJson.status == "OK") {

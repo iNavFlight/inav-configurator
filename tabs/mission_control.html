@@ -121,10 +121,14 @@
                         <div class="point">
                             <label class="point-label" for="MPdefaultPointAlt" data-i18n="missionDefaultPointAlt"></label>
                             <input id="MPdefaultPointAlt" type="text" value="0" required>
+                            <span id="MPdefaultPointAltM" class="mpUnitHint"></span>
+                            <span id="MPapplyAltSaved" class="mpApplySaved" style="display: none">&#10003;</span>
                         </div>
                         <div class="point">
                             <label class="point-label" for="MPdefaultPointSpeed" data-i18n="missionDefaultPointSpeed"></label>
                             <input id="MPdefaultPointSpeed" type="text" value="0" required>
+                            <span id="MPdefaultPointSpeedKmh" class="mpUnitHint"></span>
+                            <span id="MPapplySpeedSaved" class="mpApplySaved" style="display: none">&#10003;</span>
                         </div>
                         <div class="point">
                             <label class="point-label" for="MPdefaultSafeRangeSH" data-i18n="missionDefaultSafeRangeSH"></label>
@@ -137,6 +141,11 @@
                         <div class="point">
                             <label class="point-label" for="MPdefaultLandAlt">FW Land Alt (m): </label>
                             <input id="MPdefaultLandAlt" type="text" value="0" required>
+                        </div>
+                        <div class="point">
+                            <label class="point-label" for="MPapplySlrValue" data-i18n="missionSeaLevelRef">Sea level Ref: </label>
+                            <input id="MPapplySlrValue" type="checkbox" value="0" class="togglemedium">
+                            <span id="MPapplySlrSaved" class="mpApplySaved" style="display: none">&#10003;</span>
                         </div>
                     </div>
                 </div>
@@ -417,6 +426,24 @@
                     </div>
                 </div>
 
+                <div id="missionPlannerWpList" class="gui_box grey">
+                    <div class="gui_box_titlebar">
+                        <div class="spacer_box_title" data-i18n="missionWpListHead"></div>
+                        <div class="btnMenu btnMenuIcon show_btn" id="showHideWpListButton">
+                            <a class="ic_hide" href="#" i18n_title="missionTitleHide" aria-label="Hide"></a>
+                        </div>
+                    </div>
+                    <div class="spacer" id="wpListContent">
+                        <div class="point">
+                            <label class="point-label" for="wpListSelect" data-i18n="missionWpListSelect">Waypoint:</label>
+                            <select id="wpListSelect"></select>
+                            <a id="wpListPrev" class="wpListNavBtn" href="#" i18n_title="missionWpListPrev">&#9664;</a>
+                            <a id="wpListNext" class="wpListNavBtn" href="#" i18n_title="missionWpListNext">&#9654;</a>
+                        </div>
+                        <div class="wpListCount" id="wpListCount"></div>
+                    </div>
+                </div>
+
                 <div class="gui_box grey" id="MPeditPoint" style="display: none">
                     <div class="gui_box_titlebar">
                         <div class="spacer_box_title" data-i18n="editPointHead" id="EditPointNumber"></div>
@@ -427,6 +454,10 @@
                             <div id="removePoint" class="btn btnMenu-danger">
                                 <a id="removePointButton" class="ic_removeAll" href="#" i18n_title="missionTitlRemove"></a>
                             </div>
+                            <div class="save_btn">
+                                <a id="savePointButton" class="ic_save" href="#" i18n_title="missionTitleSave" aria-label="Save"></a>
+                            </div>
+                            <span id="pointSavedTick" class="mpApplySaved pointSavedTick" style="display: none">&#10003;</span>
                             <div id="editMission" class="save_btn" style="display: none">
                                 <a id="editMissionButton" class="ic_setup" href="#" i18n_title="missionTitlEditMission"></a>
                             </div>
@@ -469,8 +500,8 @@
                             <span id="elevationValueAtWP" data-i18n="missionNA"></span>
                         </div>
                         <div class="point" id="groundClearanceAtWP" style="display: none">
-                            <label class="point-label" data-i18n="missionGroundDist"></label>
-                            <span id="groundClearanceValueAtWP" data-i18n="missionNA"></span>
+                            <label class="point-label" for="groundClearanceValueAtWP" data-i18n="missionGroundDist">Grd Dist (m):</label>
+                            <input id="groundClearanceValueAtWP" type="text" value="">
                         </div>
                         <div class="point" id="pointP1class" style="display: none">
                             <label class="point-label" for="pointP1" data-i18n="missionParameter1"></label>
