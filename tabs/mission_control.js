@@ -169,6 +169,18 @@ function updateDefaultUnitHints() {
     $('#MPdefaultPointSpeedKmh').text(Number.isNaN(speedCms) ? '' : ' ' + (Math.round(speedCms * 0.36) / 10) + 'km/h');
 }
 
+/* The default fields are plain text boxes and hold whatever was typed. A value that is
+   not a number differs from the stored one, so it would count as a change and be written
+   into every waypoint the save touches. Refuse it and put the stored value back. */
+function readNumericSetting(selector, stored) {
+    const typed = String($(selector).val()).trim();
+    const value = Number(typed);
+    if (typed !== '' && Number.isFinite(value)) return value;
+
+    $(selector).val(String(stored));
+    return stored;
+}
+
 /* One request for the whole mission instead of one per waypoint; opentopodata takes
    locations separated by a pipe and answers in the same order. */
 async function fetchWaypointElevations(waypoints) {
@@ -3408,6 +3420,9 @@ function iconKey(filename) {
                     mission.update(singleMissionActive());
                     refreshLayers();
                     plotElevation();
+                    // the counters read the mission, so they are refreshed once it holds
+                    // the new point rather than when the click was taken
+                    updateMultimissionState();
                 });
             }
             else if (selectedFeature && tempMarker.kind == "safehome" && tempMarker.selection) {
@@ -3474,6 +3489,9 @@ function iconKey(filename) {
                     refreshLayers();
                     plotElevation();
                     updateLocationButtonsVisibility();
+                    // the counters read the mission, so they are refreshed once it holds
+                    // the new point rather than when the click was taken
+                    updateMultimissionState();
                 });
             }
             //mission.missionDisplayDebug();
@@ -4729,11 +4747,11 @@ function iconKey(filename) {
             const oldSpeed = settings.speed;
 
             // update only default settings
-            settings.alt = Number($('#MPdefaultPointAlt').val());
-            settings.speed = Number($('#MPdefaultPointSpeed').val());
-            settings.safeRadiusSH = Number($('#MPdefaultSafeRangeSH').val());
-            settings.fwApproachAlt = Number($('#MPdefaultFwApproachAlt').val());
-            settings.fwLandAlt = Number($('#MPdefaultLandAlt').val());
+            settings.alt = readNumericSetting('#MPdefaultPointAlt', oldAlt);
+            settings.speed = readNumericSetting('#MPdefaultPointSpeed', oldSpeed);
+            settings.safeRadiusSH = readNumericSetting('#MPdefaultSafeRangeSH', oldSafeRadiusSH);
+            settings.fwApproachAlt = readNumericSetting('#MPdefaultFwApproachAlt', settings.fwApproachAlt);
+            settings.fwLandAlt = readNumericSetting('#MPdefaultLandAlt', settings.fwLandAlt);
 
             saveSettings();
 
@@ -5549,6 +5567,9 @@ missionControlTab.setBit = function(bits, bit, value) {
 // }
 
 missionControlTab.cleanup = function (callback) {
+    // The elevation panel's drag listens on the document, so it outlives the tab unless
+    // it is taken off here - reopening the tab would otherwise stack one pair per visit.
+    $(document).off('.elevationDrag');
     if (elevationChartInstance) {
         elevationChartInstance.destroy();
         elevationChartInstance = null;
