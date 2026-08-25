@@ -147,7 +147,11 @@ function wpListLabel(wp) {
 /* Below the ground it flies over means straight into the terrain. The terrain is the
    true ground; the conversion datum stands in when only the reference moved on a known
    home, and without either there is nothing to judge against. */
-function endsBelowGround(wp, index, plan, conversionCm) {
+function endsBelowGround(wp, index, plan) {
+    // A point of interest marks a place on the ground for the camera to look at; the
+    // aircraft never flies to it, and the save leaves its altitude alone.
+    if (wp.getAction() == MWNP.WPTYPE.SET_POI) return false;
+
     let groundCm = null;
     if (plan.terrainCm) {
         groundCm = plan.terrainCm[index];
@@ -2245,10 +2249,14 @@ function iconKey(filename) {
        moved it away from what the mission already says. */
     let seaLevelSwitchOnOpen = false;
 
+    /* An empty mission has no waypoint to read the reference from. It keeps the choice
+       that was last saved instead, so the switch survives until there is a waypoint and
+       the first one placed adopts it. */
     function missionUsesSeaLevel() {
         const waypoints = wpListSelectableWaypoints();
-        return waypoints.length > 0
-            && missionControlTab.isBitSet(waypoints[0].getP3(), MWNP.P3.ALT_TYPE);
+        if (!waypoints.length) return seaLevelSwitchOnOpen;
+
+        return missionControlTab.isBitSet(waypoints[0].getP3(), MWNP.P3.ALT_TYPE);
     }
 
     function refreshSeaLevelSwitch() {
@@ -2393,7 +2401,7 @@ function iconKey(filename) {
         if (plan.speedChanged) writeSpeedToWaypoint(wp);
         mission.updateWaypoint(wp);
 
-        return endsBelowGround(wp, index, plan, conversionCm);
+        return endsBelowGround(wp, index, plan);
     }
 
     /* Fetches the ground levels the requested changes need. Two different grounds serve
@@ -2407,15 +2415,19 @@ function iconKey(filename) {
             if (plan.homeCm === null) return false;
         }
 
-        const needsTerrain = plan.applyAlt && (plan.switchMoved
+        const altitudeNeedsTerrain = plan.applyAlt && (plan.switchMoved
             ? plan.toAbsolute
             : waypoints.some(wp => missionControlTab.isBitSet(wp.getP3(), MWNP.P3.ALT_TYPE)));
 
-        if (needsTerrain) {
+        // The below-ground warning is judged against the ground each waypoint flies over,
+        // so the terrain is worth having whenever altitudes move at all: a save that only
+        // switches the reference would otherwise be judged against home and stay quiet
+        // about a waypoint sitting inside its own hill.
+        if (plan.switchMoved || plan.applyAlt) {
             const terrain = await fetchWaypointElevations(waypoints);
             if (terrain) {
                 plan.terrainCm = terrain.map(e => e * 100);
-            } else {
+            } else if (altitudeNeedsTerrain) {
                 // without terrain the altitude cannot be placed above it; the switch and
                 // the speed still go ahead
                 plan.applyAlt = false;
@@ -2523,8 +2535,11 @@ function iconKey(filename) {
        must not stall the ones behind it. */
     let waypointAdditions = Promise.resolve();
     function queueWaypointAddition(task) {
-        waypointAdditions = waypointAdditions.catch(() => {}).then(task);
-        return waypointAdditions;
+        // The catch settles the chain either way, so one addition that fails neither
+        // stalls the clicks behind it nor escapes as an unhandled rejection.
+        waypointAdditions = waypointAdditions.then(task).catch(function (error) {
+            console.warn('adding a waypoint failed:', error.message);
+        });
     }
 
     /* A file load or a switch of multi mission replaces the whole waypoint collection.
@@ -3407,8 +3422,15 @@ function iconKey(filename) {
 
                     let elevationAtWP;
                     if (homeMarkers.length && HOME.getAlt() != "N/A") {
-                        elevationAtWP = await tempWp.getElevation(globalSettings);
-                        tempWp.setAlt(checkAltElevSanity(false, settings.alt, elevationAtWP, false));
+                        // Placing a waypoint must not hinge on the elevation service; with
+                        // no answer it keeps the default altitude.
+                        try {
+                            elevationAtWP = await tempWp.getElevation(globalSettings);
+                            tempWp.setAlt(checkAltElevSanity(false, settings.alt, elevationAtWP, false));
+                        } catch (error) {
+                            console.warn('elevation lookup failed:', error.message);
+                            elevationAtWP = undefined;
+                        }
                     }
                     await adoptMissionAltitudeReference(tempWp, elevationAtWP);
                     if (collectionChangedSince(snapshot)) {
@@ -3475,8 +3497,15 @@ function iconKey(filename) {
 
                     let elevationAtWP;
                     if (homeMarkers.length && HOME.getAlt() != "N/A") {
-                        elevationAtWP = await tempWp.getElevation(globalSettings);
-                        tempWp.setAlt(checkAltElevSanity(false, settings.alt, elevationAtWP, false));
+                        // Placing a waypoint must not hinge on the elevation service; with
+                        // no answer it keeps the default altitude.
+                        try {
+                            elevationAtWP = await tempWp.getElevation(globalSettings);
+                            tempWp.setAlt(checkAltElevSanity(false, settings.alt, elevationAtWP, false));
+                        } catch (error) {
+                            console.warn('elevation lookup failed:', error.message);
+                            elevationAtWP = undefined;
+                        }
                     }
                     await adoptMissionAltitudeReference(tempWp, elevationAtWP);
                     if (collectionChangedSince(snapshot)) {
