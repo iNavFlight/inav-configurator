@@ -3148,6 +3148,9 @@ function iconKey(filename) {
             })
         });
 
+        // Slot the 2D/3D toggle into the control column right below the bottom-most planner control,
+        // matching the 25px grid of the buttons above (settings 65px ... safehome 140px, geozones 190px)
+        $('#missionMapViewControls').css('top', `${CONFIGURATOR.connectionValid ? (isGeozoneEnabeld ? 215 : 165) : 140}px`);
         $('#missionMap2DButton').on('click', () => setMissionMapViewMode('2d'));
         $('#missionMap3DButton').on('click', () => setMissionMapViewMode('3d'));
         setMissionMapViewMode(missionMapViewMode);

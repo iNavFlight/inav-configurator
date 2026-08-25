@@ -276,7 +276,7 @@
     background: rgba(125, 78, 0, 0.94);
 }
 
-/* Placed in the left map control column, below the geozone control (190px) */
+/* Left map control column; the exact slot below the bottom-most planner control is set at runtime */
 .mission-map-view-controls {
     top: 215px;
     left: .5em;
@@ -284,15 +284,29 @@
     border: 0;
     margin: 0;
     min-width: 0;
+    padding: 0;
 }
 
+/* Same outer size as the other .ol-control buttons (1.375em at the inherited font size) */
 .mission-map-view-controls button {
-    width: auto;
-    padding: 0 .3em;
+    font-size: .72em;
+    width: 1.91em;
+    height: 1.91em;
+    line-height: 1.91em;
+    color: #fff;
+    background-color: rgba(0, 60, 136, .5);
 }
 
 .mission-map-view-controls button.active {
     background-color: rgba(0, 60, 136, 1);
+}
+
+.mission-map-view-controls #missionMap2DButton {
+    border-radius: 2px 2px 0 0;
+}
+
+.mission-map-view-controls #missionMap3DButton {
+    border-radius: 0 0 2px 2px;
 }
 
 .mission-map-view-controls button:focus-visible {
