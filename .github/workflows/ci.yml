@@ -6,12 +6,19 @@ on:
   pull_request:
 
   workflow_call:
-    #inputs:
-    #  release_build:
-    #   description: 'Specifies if it is a build that should include commit hash in hex file names or not'
-    #   default: false
-    #   required: false
-    #   type: boolean
+    secrets:
+      MACOS_CERT_P12:
+        required: false
+      MACOS_CERT_PASSWORD:
+        required: false
+      MACOS_SIGN_IDENTITY:
+        required: false
+      APPLE_API_KEY_P8:
+        required: false
+      APPLE_API_KEY_ID:
+        required: false
+      APPLE_API_ISSUER:
+        required: false
 
 jobs:
     save-pr-number:
@@ -168,14 +175,17 @@ jobs:
             command: yarn install --foreground-scripts
             timeout_minutes: 10
             on_retry_command: rm -rfv node_modules
-        # Signing/notarization steps only run when the repository has the
-        # required secrets configured; fork PRs build unsigned as before.
+        # secrets is not allowed in step `if:` on reusable workflows (workflow_call),
+        # so gate on env vars inside the script. Missing secrets → unsigned build.
         - name: Import signing certificate
-          if: ${{ secrets.MACOS_CERT_P12 != '' }}
           env:
             MACOS_CERT_P12: ${{ secrets.MACOS_CERT_P12 }}
             MACOS_CERT_PASSWORD: ${{ secrets.MACOS_CERT_PASSWORD }}
           run: |
+            if [ -z "$MACOS_CERT_P12" ]; then
+              echo "No MACOS_CERT_P12 secret; building unsigned."
+              exit 0
+            fi
             KEYCHAIN=$RUNNER_TEMP/build.keychain-db
             KEYCHAIN_PASSWORD=$(uuidgen)
             echo "$MACOS_CERT_P12" | base64 --decode > $RUNNER_TEMP/cert.p12
@@ -187,10 +197,14 @@ jobs:
             security list-keychains -d user -s "$KEYCHAIN" login.keychain
             rm $RUNNER_TEMP/cert.p12
         - name: Write notarization API key
-          if: ${{ secrets.APPLE_API_KEY_P8 != '' }}
           env:
             APPLE_API_KEY_P8: ${{ secrets.APPLE_API_KEY_P8 }}
-          run: echo "$APPLE_API_KEY_P8" > $RUNNER_TEMP/apple_api_key.p8
+          run: |
+            if [ -z "$APPLE_API_KEY_P8" ]; then
+              echo "No APPLE_API_KEY_P8 secret; skipping notarization key."
+              exit 0
+            fi
+            echo "$APPLE_API_KEY_P8" > $RUNNER_TEMP/apple_api_key.p8
         - name: Build MacOS arm64
           env:
             OSX_SIGN_IDENTITY: ${{ secrets.MACOS_SIGN_IDENTITY }}
@@ -199,8 +213,13 @@ jobs:
             APPLE_API_ISSUER: ${{ secrets.APPLE_API_ISSUER }}
           run: yarn run make -- --arch="arm64"
         - name: Verify signing and notarization
-          if: ${{ secrets.MACOS_SIGN_IDENTITY != '' }}
+          env:
+            OSX_SIGN_IDENTITY: ${{ secrets.MACOS_SIGN_IDENTITY }}
           run: |
+            if [ -z "$OSX_SIGN_IDENTITY" ]; then
+              echo "Unsigned build; skipping signing verification."
+              exit 0
+            fi
             xcrun stapler validate "out/INAV Configurator-darwin-arm64/INAV Configurator.app"
             spctl --assess --type execute -v "out/INAV Configurator-darwin-arm64/INAV Configurator.app"
         - name: Upload MacOS arm64 zip
@@ -249,14 +268,17 @@ jobs:
             command: yarn install --foreground-scripts
             timeout_minutes: 10
             on_retry_command: rm -rfv node_modules
-        # Signing/notarization steps only run when the repository has the
-        # required secrets configured; fork PRs build unsigned as before.
+        # secrets is not allowed in step `if:` on reusable workflows (workflow_call),
+        # so gate on env vars inside the script. Missing secrets → unsigned build.
         - name: Import signing certificate
-          if: ${{ secrets.MACOS_CERT_P12 != '' }}
           env:
             MACOS_CERT_P12: ${{ secrets.MACOS_CERT_P12 }}
             MACOS_CERT_PASSWORD: ${{ secrets.MACOS_CERT_PASSWORD }}
           run: |
+            if [ -z "$MACOS_CERT_P12" ]; then
+              echo "No MACOS_CERT_P12 secret; building unsigned."
+              exit 0
+            fi
             KEYCHAIN=$RUNNER_TEMP/build.keychain-db
             KEYCHAIN_PASSWORD=$(uuidgen)
             echo "$MACOS_CERT_P12" | base64 --decode > $RUNNER_TEMP/cert.p12
@@ -268,10 +290,14 @@ jobs:
             security list-keychains -d user -s "$KEYCHAIN" login.keychain
             rm $RUNNER_TEMP/cert.p12
         - name: Write notarization API key
-          if: ${{ secrets.APPLE_API_KEY_P8 != '' }}
           env:
             APPLE_API_KEY_P8: ${{ secrets.APPLE_API_KEY_P8 }}
-          run: echo "$APPLE_API_KEY_P8" > $RUNNER_TEMP/apple_api_key.p8
+          run: |
+            if [ -z "$APPLE_API_KEY_P8" ]; then
+              echo "No APPLE_API_KEY_P8 secret; skipping notarization key."
+              exit 0
+            fi
+            echo "$APPLE_API_KEY_P8" > $RUNNER_TEMP/apple_api_key.p8
         - name: Build MacOS x64
           env:
             NODE_OPTIONS: --max-old-space-size=4096
@@ -281,8 +307,13 @@ jobs:
             APPLE_API_ISSUER: ${{ secrets.APPLE_API_ISSUER }}
           run: yarn run make -- --arch="x64"
         - name: Verify signing and notarization
-          if: ${{ secrets.MACOS_SIGN_IDENTITY != '' }}
+          env:
+            OSX_SIGN_IDENTITY: ${{ secrets.MACOS_SIGN_IDENTITY }}
           run: |
+            if [ -z "$OSX_SIGN_IDENTITY" ]; then
+              echo "Unsigned build; skipping signing verification."
+              exit 0
+            fi
             xcrun stapler validate "out/INAV Configurator-darwin-x64/INAV Configurator.app"
             spctl --assess --type execute -v "out/INAV Configurator-darwin-x64/INAV Configurator.app"
         - name: Upload MacOS x64 zip

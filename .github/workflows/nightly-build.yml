@@ -11,6 +11,7 @@ jobs:
     build:
         name: build
         uses: ./.github/workflows/ci.yml
+        secrets: inherit
     
     release:
         name: Build nightly-release
