@@ -826,9 +826,12 @@ ledStripTab.initialize = function (callback, scrollPosition) {
                 mspHelper.sendLedStripModeColors(save_rainbow_settings);
             }
 
-            function save_rainbow_settings() {
-                var freq = Math.max(1, Math.min(255, parseInt($('#rainbowFreqInput').val(), 10) || 1));
-                var delta = parseInt($('#rainbowDeltaInput').val(), 10);
+                        function save_rainbow_settings() {
+                var freqRaw = Number($('#rainbowFreqInput').val());
+                var deltaRaw = Number($('#rainbowDeltaInput').val());
+
+                var freq = Number.isFinite(freqRaw) ? Math.max(0, Math.min(255, freqRaw)) : 100;
+                var delta = Number.isFinite(deltaRaw) ? Math.max(0, Math.min(359, deltaRaw)) : 30;
 
                 mspHelper.setSetting('ledstrip_rainbow_sweep_rate', freq, function () {
                     mspHelper.setSetting('ledstrip_rainbow_delta_deg', delta, save_to_eeprom);
