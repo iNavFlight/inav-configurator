@@ -270,6 +270,65 @@ class Connection {
         });
     }
 
+    /*
+     * Bridge a transport's write promise onto sendImplementation()'s callback.
+     * send() advances its queue only from there, so every path has to report once.
+     * A null promise means there is no port left to write to.
+     */
+    completeSend(label, promise, callback) {
+        const report = (bytesSent, resultCode) => {
+            if (callback) {
+                callback({ bytesSent: bytesSent, resultCode: resultCode });
+            }
+        };
+
+        if (!promise) {
+            report(0, 1);
+            return;
+        }
+
+        promise.then(response => {
+            if (response.error) {
+                console.log(label + ' write error: ' + response.msg);
+                report(0, 1);
+            } else {
+                report(response.bytesWritten, 0);
+            }
+        }).catch(error => {
+            console.log(label + ' write failed: ' + error);
+            report(0, 1);
+        });
+    }
+
+    // Same for a transport's close promise - disconnect() has to hear back either way.
+    completeClose(label, promise, callback) {
+        if (!promise) {
+            if (callback) {
+                callback(false);
+            }
+            return;
+        }
+
+        promise.then(response => {
+            if (response.error) {
+                console.log('Unable to close ' + label + ': ' + response.msg);
+            }
+            if (callback) {
+                callback(!response.error);
+            }
+        }).catch(this.reportFailure('Unable to close ' + label, callback));
+    }
+
+    // Rejection handler that reports a failed transport call instead of losing its callback.
+    reportFailure(message, callback) {
+        return error => {
+            console.log(message + ': ' + error);
+            if (callback) {
+                callback(false);
+            }
+        };
+    }
+
     removeAllListeners() {
         this._onReceiveListeners.forEach(listener => this.removeOnReceiveCallback(listener));
         this._onReceiveListeners = [];

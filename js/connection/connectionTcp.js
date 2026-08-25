@@ -89,12 +89,7 @@ class ConnectionTcp extends Connection {
                     callback(false);
                 }
             }
-        }).catch(error => {
-            console.log("TCP connection failed: " + error);
-            if (callback) {
-                callback(false);
-            }
-        });
+        }).catch(this.reportFailure("TCP connection failed", callback));
     }
 
     disconnectImplementation(callback) {
@@ -111,41 +106,8 @@ class ConnectionTcp extends Connection {
        }
     }
 
-   sendImplementation(data, callback) {
-        // Connection.send() advances its queue only from this callback - never drop it.
-        if (!this._connectionId) {
-            if (callback) {
-                callback({
-                    bytesSent: 0,
-                    resultCode: 1
-                });
-            }
-            return;
-        }
-
-        window.electronAPI.tcpSend(data).then(response => {
-            var result = 0;
-            var sent = response.bytesWritten;
-            if (response.error) {
-                console.log("TCP write error: " + response.msg);
-                result = 1;
-                sent = 0;
-            }
-            if (callback) {
-                callback({
-                    bytesSent: sent,
-                    resultCode: result
-                });
-            }
-        }).catch(error => {
-            console.log("TCP write failed: " + error);
-            if (callback) {
-                callback({
-                    bytesSent: 0,
-                    resultCode: 1
-                });
-            }
-        });
+    sendImplementation(data, callback) {
+        this.completeSend('TCP', this._connectionId ? window.electronAPI.tcpSend(data) : null, callback);
     }
 
     addOnReceiveCallback(callback){

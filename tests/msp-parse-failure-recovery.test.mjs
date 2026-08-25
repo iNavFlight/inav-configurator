@@ -22,7 +22,7 @@
  *
  * Fix under test:
  *   - MSP2_PID grows FC.PIDs to the bank count the FC actually reports
- *   - processData() wraps the parse and completes the request regardless
+ *   - handleResponse() runs the parse and completes the request regardless
  *   - msp.js releases the hard lock in a finally
  *
  * The tests execute the REAL production files. This codebase uses Vite-style
@@ -227,7 +227,7 @@ test('MSP2_PID: an FC reporting more banks than we know must not throw', () => {
     // serial_backend.js still pre-sizes FC.PIDs to 11.
     const handler = makeDataHandler(MSPCodes.MSP2_PID, pidPayload(12), (resp) => { response = resp; });
 
-    assert.doesNotThrow(() => mspHelper.processData(handler));
+    assert.doesNotThrow(() => mspHelper.handleResponse(handler));
 
     assert.equal(FC.PIDs.length, 12, 'FC.PIDs must grow to the bank count the FC reported');
     assert.deepEqual(FC.PIDs[0], [1, 2, 3, 4], 'the first bank must still be parsed');
@@ -240,7 +240,7 @@ test('MSP2_PID positive control: a matching bank count parses unchanged', () => 
 
     let response = null;
     const handler = makeDataHandler(MSPCodes.MSP2_PID, pidPayload(11), (resp) => { response = resp; });
-    mspHelper.processData(handler);
+    mspHelper.handleResponse(handler);
 
     assert.equal(FC.PIDs.length, 11, 'a matching FC must not change the bank count');
     assert.deepEqual(FC.PIDs[10], [41, 42, 43, 44]);
@@ -258,8 +258,8 @@ test('a parser that throws must still complete the request', async () => {
     mspDeduplicationQueue.put(MSPCodes.MSP_LOOP_TIME);
 
     assert.doesNotThrow(
-        () => mspHelper.processData(handler),
-        'a failed parse must not propagate out of processData()'
+        () => mspHelper.handleResponse(handler),
+        'a failed parse must not propagate out of handleResponse()'
     );
 
     assert.notEqual(response, null, 'the waiting tab must still get its callback, or it hangs forever');

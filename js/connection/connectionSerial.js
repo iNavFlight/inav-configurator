@@ -90,71 +90,15 @@ class ConnectionSerial extends Connection {
                     callback(false);
                 }
             }
-        }).catch(error => {
-            console.log("Serial connection failed: " + error);
-            if (callback) {
-                callback(false);
-            }
-        });
+        }).catch(this.reportFailure("Serial connection failed", callback));
     }
 
     disconnectImplementation(callback) {
-        if (this._connectionId) {
-            window.electronAPI.serialClose().then(response => {
-                var ok = true;
-                if (response.error) {
-                    console.log("Unable to close serial: " + response.msg);
-                    ok = false;
-                }
-                if (callback) {
-                    callback(ok);
-                }
-            }).catch(error => {
-                console.log("Unable to close serial: " + error);
-                if (callback) {
-                    callback(false);
-                }
-            });
-        } else if (callback) {
-            callback(false);
-        }
+        this.completeClose('serial', this._connectionId ? window.electronAPI.serialClose() : null, callback);
     }
 
     sendImplementation(data, callback) {
-        // Connection.send() advances its queue only from this callback - never drop it.
-        if (!this._connectionId) {
-            if (callback) {
-                callback({
-                    bytesSent: 0,
-                    resultCode: 1
-                });
-            }
-            return;
-        }
-
-        window.electronAPI.serialSend(data).then(response => {
-            var result = 0;
-            var sent = response.bytesWritten;
-            if (response.error) {
-                console.log("Serial write error: " + response.msg);
-                result = 1;
-                sent = 0;
-            }
-            if (callback) {
-                callback({
-                    bytesSent: sent,
-                    resultCode: result
-                });
-            }
-        }).catch(error => {
-            console.log("Serial write failed: " + error);
-            if (callback) {
-                callback({
-                    bytesSent: 0,
-                    resultCode: 1
-                });
-            }
-        });
+        this.completeSend('Serial', this._connectionId ? window.electronAPI.serialSend(data) : null, callback);
     }
 
     addOnReceiveCallback(callback){

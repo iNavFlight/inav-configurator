@@ -58,7 +58,7 @@ var mspHelper = (function () {
     var lastWriteBlockedNotice = 0;
 
     self.init = function() {
-        MSP.setProcessData(this.processData);
+        MSP.setProcessData(this.handleResponse);
 
         MSP.onConfigWriteBlocked = function (code, sourceCode) {
             // One notice per save burst - a save fans out into many writes.
@@ -72,17 +72,14 @@ var mspHelper = (function () {
     }
 
     /**
-     *
+     * MSP response entry point. Completing the request must happen even when a
+     * parser case throws, or the tab waiting on it never finishes loading.
      * @param {MSP} dataHandler
      */
-    self.processData = function (dataHandler) {
-        var data = new DataView(dataHandler.message_buffer, 0); // DataView (allowing us to view arrayBuffer as struct/union)
-
+    self.handleResponse = function (dataHandler) {
         try {
-            parseMessage(dataHandler, data);
+            self.processData(dataHandler);
         } catch (error) {
-            // Completing the request below must happen anyway, or the tab waiting on it
-            // never finishes loading and the GUI stays stuck mid tab-switch.
             console.error('Failed to parse MSP code 0x' + dataHandler.code.toString(16) + ':', error);
 
             // Half this message landed in FC state - refuse the writes handing it back.
@@ -92,11 +89,16 @@ var mspHelper = (function () {
             }
         }
 
-        completeRequest(dataHandler, data);
+        completeRequest(dataHandler, new DataView(dataHandler.message_buffer, 0));
     };
 
-    var parseMessage = function (dataHandler, data) {
-        var offset = 0,
+    /**
+     *
+     * @param {MSP} dataHandler
+     */
+    self.processData = function (dataHandler) {
+        var data = new DataView(dataHandler.message_buffer, 0), // DataView (allowing us to view arrayBuffer as struct/union)
+            offset = 0,
             needle = 0,
             i = 0,
             buff = [],
