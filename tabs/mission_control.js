@@ -659,7 +659,6 @@ function iconKey(filename) {
         });
 
         viewer.scene.globe.depthTestAgainstTerrain = true;
-        viewer.scene.globe.maximumScreenSpaceError = 1.5;
         viewer.scene.globe.tileCacheSize = 500;
         viewer.scene.screenSpaceCameraController.minimumZoomDistance = 20;
 
@@ -669,6 +668,8 @@ function iconKey(filename) {
         let terrainLoadFailed = false;
         let lastWaypoints = [];
         let lastHome = null;
+        let terrainCacheSignature = null;
+        let terrainCache = null;
 
         function showEmptyMap() {
             hideMission3DTerrainWarning();
@@ -803,10 +804,12 @@ function iconKey(filename) {
 
             $('#missionMap3DHelp').hide();
 
+            const signature = JSON.stringify(points);
+            const cache = terrainCacheSignature === signature ? terrainCache : null;
             const terrainPositions = points.map((point) => Cartographic.fromDegrees(point.lon, point.lat));
             let sampledPositions = terrainPositions;
             let terrainSamplingFailed = false;
-            if (!(terrainProvider instanceof EllipsoidTerrainProvider)) {
+            if (!cache && !(terrainProvider instanceof EllipsoidTerrainProvider)) {
                 try {
                     sampledPositions = await sampleTerrainMostDetailed(terrainProvider, terrainPositions);
                 } catch (error) {
@@ -816,7 +819,7 @@ function iconKey(filename) {
             }
             if (destroyed || sequence !== updateSequence) return;
 
-            const groundHeights = sampledPositions.map((position) => Number.isFinite(position.height) ? position.height : 0);
+            const groundHeights = cache ? cache.groundHeights : sampledPositions.map((position) => Number.isFinite(position.height) ? position.height : 0);
             const homeIndex = points.findIndex((point) => point.isHome);
             const hasHome = homeIndex >= 0;
             const homeGroundHeight = hasHome ? groundHeights[homeIndex] : null;
@@ -879,9 +882,13 @@ function iconKey(filename) {
 
             });
 
-            const routeTerrain = await sampleRouteTerrain(renderedPoints);
+            const routeTerrain = cache ? cache.routeTerrain : await sampleRouteTerrain(renderedPoints);
             if (destroyed || sequence !== updateSequence) return;
             terrainSamplingFailed ||= routeTerrain.samplingFailed;
+            if (!cache && !terrainSamplingFailed && !(terrainProvider instanceof EllipsoidTerrainProvider)) {
+                terrainCacheSignature = signature;
+                terrainCache = {groundHeights, routeTerrain};
+            }
             const hasTerrainCollision = renderRouteTerrain(routeTerrain.routeSamples);
             if (terrainLoadFailed || terrainSamplingFailed) {
                 showMission3DTerrainWarnings(['unavailable']);
@@ -928,6 +935,8 @@ function iconKey(filename) {
             terrainLoadFailed = false;
             terrainProvider = provider;
             viewer.terrainProvider = provider;
+            terrainCacheSignature = null;
+            terrainCache = null;
             if (missionMapViewMode === '3d') renderMission(lastWaypoints, lastHome);
         }).catch((error) => {
             terrainLoadFailed = true;
@@ -938,12 +947,16 @@ function iconKey(filename) {
         return {
             setVisible(visible) {
                 if (destroyed) return;
+                viewer.useDefaultRenderLoop = visible;
                 if (!visible) {
                     updateSequence++;
                     return;
                 }
-                viewer.resize();
-                viewer.scene.requestRender();
+                requestAnimationFrame(() => {
+                    if (destroyed) return;
+                    viewer.resize();
+                    viewer.scene.requestRender();
+                });
             },
             update(waypoints, home) {
                 lastWaypoints = waypoints;
@@ -967,11 +980,31 @@ function iconKey(filename) {
         }
     }
 
+    function ensureMission3DViewer() {
+        if (mission3DViewer) return true;
+        try {
+            mission3DViewer = createMission3DViewer(document.getElementById('missionMap3D'));
+            return true;
+        } catch (error) {
+            console.warn('Mission Planner 3D view is unavailable:', error);
+            const message = mission3DMessage('missionMap3DUnavailable', '3D view unavailable on this system.');
+            $('#missionMap3DButton').prop('disabled', true).attr('title', message);
+            $('#missionMap3DHelp').text(message);
+            return false;
+        }
+    }
+
     function setMissionMapViewMode(mode) {
-        missionMapViewMode = mode;
-        const is3D = mode === '3d';
+        let is3D = mode === '3d';
+        // Show the 3D container before creating the viewer so the canvas gets its real size
         $('#missionMap').toggle(!is3D);
         $('#missionMap3D').toggle(is3D);
+        if (is3D && !ensureMission3DViewer()) {
+            is3D = false;
+            $('#missionMap3D').hide();
+            $('#missionMap').show();
+        }
+        missionMapViewMode = is3D ? '3d' : '2d';
         $('#missionMap2DButton').toggleClass('active', !is3D).attr('aria-pressed', String(!is3D));
         $('#missionMap3DButton').toggleClass('active', is3D).attr('aria-pressed', String(is3D));
         $('#geo_info').toggle(!is3D);
@@ -3115,14 +3148,6 @@ function iconKey(filename) {
             })
         });
 
-        try {
-            mission3DViewer = createMission3DViewer(document.getElementById('missionMap3D'));
-        } catch (error) {
-            console.warn('Mission Planner 3D view is unavailable:', error);
-            const message = mission3DMessage('missionMap3DUnavailable', '3D view unavailable on this system.');
-            $('#missionMap3DButton').prop('disabled', true).attr('title', message);
-            $('#missionMap3DHelp').text(message);
-        }
         $('#missionMap2DButton').on('click', () => setMissionMapViewMode('2d'));
         $('#missionMap3DButton').on('click', () => setMissionMapViewMode('3d'));
         setMissionMapViewMode(missionMapViewMode);
