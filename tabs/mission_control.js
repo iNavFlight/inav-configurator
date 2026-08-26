@@ -1594,7 +1594,7 @@ function iconKey(filename) {
     }
 
     function saveLayerToDisk(layer) {
-        let customOverlayList = store.get('custom_overlay_list');
+        let customOverlayList = bridge.storeGet('custom_overlay_list');
         if (customOverlayList === undefined) {
             customOverlayList = [];
         }
@@ -1608,15 +1608,15 @@ function iconKey(filename) {
             visible: layer.getVisible()
         };
         customOverlayList.push(savedLayer);
-        store.set('custom_overlay_list', customOverlayList);
+        bridge.storeSet('custom_overlay_list', customOverlayList);
         GUI.log(`Saved layer: ${layerName}`);
     }
 
     function removeLayerFromDisk(layerName) {
-        let customOverlayList = store.get('custom_overlay_list');
+        let customOverlayList = bridge.storeGet('custom_overlay_list');
         if (!customOverlayList) return;
         customOverlayList = customOverlayList.filter(l => l.name !== layerName);
-        store.set('custom_overlay_list', customOverlayList);
+        bridge.storeSet('custom_overlay_list', customOverlayList);
         const layersToRemove = [];
         map.getLayers().forEach(layer => {
             if (layer.get('name') === layerName && layer.get('is_custom_overlay')) {
@@ -1649,19 +1649,32 @@ function iconKey(filename) {
         GUI.log(`Added layer: ${fileName}`);
     }
 
-    async function loadGeoFile(filePath) {
-        const fileName = filePath.split('/').pop().split('\\').pop();
+    async function loadGeoFile(file) {
+        const fileName = typeof file === 'string'
+            ? file.split('/').pop().split('\\').pop()
+            : file.name;
         const ext = fileName.split('.').pop().toLowerCase();
 
-        const response = await globalThis.electronAPI.readFile(filePath, ext === 'kmz' ? null : undefined);
-        if (response.error) {
-            GUI.log(`Error reading file: ${response.error}`);
-            dialog.alert(i18n.getMessage('layerLoadError'));
-            return;
+        let fileData;
+        if (bridge.getPlatform() === Platform.Electron) {
+            const response = await window.electronAPI.readFile(file, ext === 'kmz' ? null : undefined);
+            if (response.error) {
+                GUI.log(`Error reading file: ${response.error}`);
+                dialog.alert(i18n.getMessage('layerLoadError'));
+                return;
+            }
+            fileData = response.data;
+        } else {
+            try {
+                fileData = ext === 'kmz' ? await file.arrayBuffer() : await file.text();
+            } catch (error) {
+                GUI.log(`Error reading file: ${error.message || error}`);
+                dialog.alert(i18n.getMessage('layerLoadError'));
+                return;
+            }
         }
 
         let format;
-        let fileData = response.data;
 
         switch (ext) {
             case 'kmz': fileData = extractKmlFromKmz(response.data); format = new KML(); break;
@@ -2720,11 +2733,11 @@ function iconKey(filename) {
         //////////////////////////////////////////////////////////////////////////
         // Load previously saved GEO files from electron store
         //////////////////////////////////////////////////////////////////////////
-        if (store.get('custom_overlay_list') === undefined) {
-            store.set('custom_overlay_list', []);
+        if (bridge.storeGet('custom_overlay_list') === undefined) {
+            bridge.storeSet('custom_overlay_list', []);
         }
 
-        for (let savedLayer of store.get('custom_overlay_list')) {
+        for (let savedLayer of bridge.storeGet('custom_overlay_list')) {
             const features = new GeoJSON().readFeatures(savedLayer.layer_data, {
                 dataProjection: 'EPSG:4326',
                 featureProjection: map.getView().getProjection()
@@ -4183,10 +4196,10 @@ function iconKey(filename) {
                 return;
             }
 
-            if (result.canceled || result.filePaths.length !== 1) return;
+            if (result.canceled || result.files.length !== 1) return;
 
             try {
-                await loadGeoFile(result.filePaths[0]);
+                await loadGeoFile(result.files[0]);
             } catch (error) {
                 GUI.log(`Error loading file: ${error.message}`);
                 dialog.alert(i18n.getMessage('layerParseError'));
