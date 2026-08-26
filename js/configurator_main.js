@@ -22,7 +22,6 @@ import CliAutoComplete from './CliAutoComplete';
 import { SITLProcess } from './sitl';
 import settingsCache from './settingsCache';
 import browser from './web/browser';
-import store from './store';
 import periodicStatusUpdater from './periodicStatusUpdater';
 
 // "Preload" tabs
@@ -356,19 +355,19 @@ $(function() {
                 $('.nav-group .group-items').removeClass('expanded');
                 $('#tabs ul.mode-connected .nav-group:first-child .group-header').addClass('active').attr('aria-expanded', 'true');
                 $('#tabs ul.mode-connected .nav-group:first-child .group-items').addClass('expanded');
-                store.set('expand_all_groups', false);
+                bridge.storeSet('expand_all_groups', false);
             } else {
                 // Expand all
                 $('.nav-group .group-header').addClass('active').attr('aria-expanded', 'true');
                 $('.nav-group .group-items').addClass('expanded');
-                store.set('expand_all_groups', true);
+                bridge.storeSet('expand_all_groups', true);
             }
 
             updateToggleAllButton();
         });
 
         // Initialize: apply saved expand all preference or expand first group by default
-        if (store.get('expand_all_groups', false)) {
+        if (bridge.storeGet('expand_all_groups', false)) {
             // Expand all groups
             $('.nav-group .group-header').addClass('active').attr('aria-expanded', 'true');
             $('.nav-group .group-items').addClass('expanded');
