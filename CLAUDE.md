@@ -302,6 +302,8 @@ ENABLE_REMOTE_DEBUGGING=1 NODE_ENV=development npx electron-forge start -- --rem
 
 Then connect to `localhost:9222`. The same `--remote-debugging-port=9222` flag also works against a packaged build (`out/*/inav-configurator --remote-debugging-port=9222`) — useful since dev mode (Vite dev server) and a packaged build (`electron-forge package`, Rollup-bundled) can diverge on bundling-specific bugs that won't reproduce in dev mode.
 
+**Gotcha:** `electron-forge start` reads stdin as a readline prompt (`Type rs to restart`). Backgrounding it in a shell where stdin is `/dev/null` (e.g. `cmd &` or `nohup`) hits EOF immediately and kills the whole process tree before Vite/Electron finish loading. Keep stdin open but silent, e.g. `electron-forge start < <(sleep 600) &`.
+
 ---
 
 ## Progressive Web App (PWA) Migration
