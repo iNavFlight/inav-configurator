@@ -9,7 +9,7 @@ import 'leaflet-control-geocoder/dist/Control.Geocoder.css';
 import jBox from 'jbox';
 import GUI, { TABS } from './../js/gui';
 import i18n from './../js/localization';
-import store from './../js/store';
+import { bridge } from './../js/bridge';
 import { globalSettings, UnitType } from './../js/globalSettings';
 import JSZip from 'jszip';
 import { fromUrl, fromArrayBuffer } from 'geotiff';
@@ -219,7 +219,7 @@ async function fetchResizedTile(provider, mapType, z, x, y, canvas, ctx, target)
     const cached = await tileCache.get(provider, mapType, z, x, y);
     if (cached) return cached;
 
-    const maptilerKey = store.get('mapgen_maptiler_key', '');
+    const maptilerKey = bridge.storeGet('mapgen_maptiler_key', '');
     const img = await loadImage(getTileUrl(provider, mapType, z, x, y, maptilerKey));
     ctx.clearRect(0, 0, 100, 100);
     ctx.drawImage(img, 0, 0, img.naturalWidth, img.naturalHeight, 0, 0, 100, 100);
@@ -286,8 +286,8 @@ const tileCache = {
     init() {
         const userData = globalThis.electronAPI.appGetPath('userData');
         this.basePath = userData + '/map_tiles';
-        this.enabled = store.get('mapgen_cache_enabled', true);
-        this.trackedSizeBytes = store.get('mapgen_cache_size_bytes', 0);
+        this.enabled = bridge.storeGet('mapgen_cache_enabled', true);
+        this.trackedSizeBytes = bridge.storeGet('mapgen_cache_size_bytes', 0);
     },
 
     getCachePath(provider, mapType, z, x, y) {
@@ -311,7 +311,7 @@ const tileCache = {
     async put(provider, mapType, z, x, y, buf) {
         if (!this.enabled || !this.basePath) return;
         // Check max cache size
-        const maxBytes = (store.get('mapgen_cache_max_mb', 500)) * 1024 * 1024;
+        const maxBytes = (bridge.storeGet('mapgen_cache_max_mb', 500)) * 1024 * 1024;
         if (this.trackedSizeBytes >= maxBytes) return;
         try {
             const path = this.getCachePath(provider, mapType, z, x, y);
@@ -319,7 +319,7 @@ const tileCache = {
             this.trackedSizeBytes += buf.byteLength;
             // Persist every 50 tiles to avoid constant writes
             if (++this.writeCount % 50 === 0) {
-                store.set('mapgen_cache_size_bytes', this.trackedSizeBytes);
+                bridge.storeSet('mapgen_cache_size_bytes', this.trackedSizeBytes);
             }
         } catch (err) {
             console.warn('Cache write failed:', err.message);
@@ -327,7 +327,7 @@ const tileCache = {
     },
 
     persistSize() {
-        store.set('mapgen_cache_size_bytes', this.trackedSizeBytes);
+        bridge.storeSet('mapgen_cache_size_bytes', this.trackedSizeBytes);
     },
 
     getFormattedSize() {
@@ -340,7 +340,7 @@ const tileCache = {
         try {
             await globalThis.electronAPI.rm(this.basePath);
             this.trackedSizeBytes = 0;
-            store.set('mapgen_cache_size_bytes', 0);
+            bridge.storeSet('mapgen_cache_size_bytes', 0);
         } catch (err) {
             console.warn('Cache clear failed:', err.message);
         }
@@ -883,7 +883,7 @@ TABS.map_generator.initialize = function (callback) {
         let currentLayer = null;
         let drawnItems = null;
         let sideLabels = { width: null, height: null };
-        let sdPath = store.get('mapgen_sd_path', null);
+        let sdPath = bridge.storeGet('mapgen_sd_path', null);
         let syncAborted = false;
         const TILE_CONCURRENCY = 4;
         let terrainGridLayer = null;
@@ -912,22 +912,22 @@ TABS.map_generator.initialize = function (callback) {
         rebuildZoomSelectors(20);
 
         // ── Restore settings (only if user explicitly saved) ────────
-        const settingsSaved = store.get('mapgen_settings_saved', false);
-        const savedTarget    = settingsSaved ? store.get('mapgen_target', 'terrain') : 'terrain';
-        const savedSubtarget = settingsSaved ? store.get('mapgen_subtarget', 'ethos') : 'ethos';
-        const savedProvider    = settingsSaved ? store.get('mapgen_provider', 'OSM') : 'OSM';
-        const savedMaptilerKey = store.get('mapgen_maptiler_key', '');
-        const savedProject   = settingsSaved ? store.get('mapgen_project_name', 'MyLocalField') : 'MyLocalField';
-        const savedMinZoom   = settingsSaved ? store.get('mapgen_min_zoom', 8) : 8;
-        const savedMaxZoom   = settingsSaved ? store.get('mapgen_max_zoom', 14) : 14;
+        const settingsSaved = bridge.storeGet('mapgen_settings_saved', false);
+        const savedTarget    = settingsSaved ? bridge.storeGet('mapgen_target', 'terrain') : 'terrain';
+        const savedSubtarget = settingsSaved ? bridge.storeGet('mapgen_subtarget', 'ethos') : 'ethos';
+        const savedProvider    = settingsSaved ? bridge.storeGet('mapgen_provider', 'OSM') : 'OSM';
+        const savedMaptilerKey = bridge.storeGet('mapgen_maptiler_key', '');
+        const savedProject   = settingsSaved ? bridge.storeGet('mapgen_project_name', 'MyLocalField') : 'MyLocalField';
+        const savedMinZoom   = settingsSaved ? bridge.storeGet('mapgen_min_zoom', 8) : 8;
+        const savedMaxZoom   = settingsSaved ? bridge.storeGet('mapgen_max_zoom', 14) : 14;
         const defaultUnit    = globalSettings.unitType === UnitType.imperial ? 'mi2' : 'km2';
-        const savedUnit      = settingsSaved ? store.get('mapgen_area_unit', defaultUnit) : defaultUnit;
-        const savedCenter    = settingsSaved ? store.get('mapgen_last_center', [42.6977, 23.3219]) : [42.6977, 23.3219];
-        const savedZoom      = settingsSaved ? store.get('mapgen_last_zoom', 12) : 12;
+        const savedUnit      = settingsSaved ? bridge.storeGet('mapgen_area_unit', defaultUnit) : defaultUnit;
+        const savedCenter    = settingsSaved ? bridge.storeGet('mapgen_last_center', [42.6977, 23.3219]) : [42.6977, 23.3219];
+        const savedZoom      = settingsSaved ? bridge.storeGet('mapgen_last_zoom', 12) : 12;
 
         $('#mapgen_subtarget').val(savedSubtarget);
         $('#mapgen_target').val(savedTarget);
-        $('#mapgen_terrain_source').val(settingsSaved ? store.get('mapgen_terrain_source', 'copernicus') : 'copernicus');
+        $('#mapgen_terrain_source').val(settingsSaved ? bridge.storeGet('mapgen_terrain_source', 'copernicus') : 'copernicus');
         $('#mapgen_provider').val(savedProvider);
         $('#mapgen_maptiler_key').val(savedMaptilerKey);
         $('#mapgen_project_name').val(savedProject);
@@ -939,7 +939,7 @@ TABS.map_generator.initialize = function (callback) {
         async function updateSdDisplay() {
             if (sdPath && !(await globalThis.electronAPI.pathExists(sdPath))) {
                 sdPath = '';
-                store.set('mapgen_sd_path', '');
+                bridge.storeSet('mapgen_sd_path', '');
             }
             if (sdPath) {
                 $('#mapgen_sd_path').text(sdPath).addClass('linked');
@@ -978,7 +978,7 @@ TABS.map_generator.initialize = function (callback) {
             }
 
             // Restore saved map type if still valid
-            const savedMapType = store.get('mapgen_map_type', 'Street');
+            const savedMapType = bridge.storeGet('mapgen_map_type', 'Street');
             if (typeSelect.find(`option[value="${savedMapType}"]`).length) {
                 typeSelect.val(savedMapType);
             }
@@ -1074,7 +1074,7 @@ TABS.map_generator.initialize = function (callback) {
         }
 
         // Restore saved map type after syncMapOptions populated the dropdown
-        const restoredMapType = store.get('mapgen_map_type', 'Street');
+        const restoredMapType = bridge.storeGet('mapgen_map_type', 'Street');
         if ($('#mapgen_maptype').find(`option[value="${restoredMapType}"]`).length) {
             $('#mapgen_maptype').val(restoredMapType);
         }
@@ -1490,34 +1490,34 @@ TABS.map_generator.initialize = function (callback) {
 
         // ── Settings persistence ────────────────────────────────────
         function saveSettings() {
-            store.set('mapgen_target', $('#mapgen_target').val());
-            store.set('mapgen_terrain_source', $('#mapgen_terrain_source').val());
-            store.set('mapgen_subtarget', $('#mapgen_subtarget').val());
-            store.set('mapgen_provider', $('#mapgen_provider').val());
-            store.set('mapgen_map_type', $('#mapgen_maptype').val());
-            store.set('mapgen_project_name', $('#mapgen_project_name').val());
-            store.set('mapgen_min_zoom', Number.parseInt($('#mapgen_min_zoom').val(), 10));
-            store.set('mapgen_max_zoom', Number.parseInt($('#mapgen_max_zoom').val(), 10));
-            store.set('mapgen_area_unit', $('#mapgen_area_unit').val());
+            bridge.storeSet('mapgen_target', $('#mapgen_target').val());
+            bridge.storeSet('mapgen_terrain_source', $('#mapgen_terrain_source').val());
+            bridge.storeSet('mapgen_subtarget', $('#mapgen_subtarget').val());
+            bridge.storeSet('mapgen_provider', $('#mapgen_provider').val());
+            bridge.storeSet('mapgen_map_type', $('#mapgen_maptype').val());
+            bridge.storeSet('mapgen_project_name', $('#mapgen_project_name').val());
+            bridge.storeSet('mapgen_min_zoom', Number.parseInt($('#mapgen_min_zoom').val(), 10));
+            bridge.storeSet('mapgen_max_zoom', Number.parseInt($('#mapgen_max_zoom').val(), 10));
+            bridge.storeSet('mapgen_area_unit', $('#mapgen_area_unit').val());
             const c = map.getCenter();
-            store.set('mapgen_last_center', [c.lat, c.lng]);
-            store.set('mapgen_last_zoom', map.getZoom());
-            store.set('mapgen_settings_saved', true);
+            bridge.storeSet('mapgen_last_center', [c.lat, c.lng]);
+            bridge.storeSet('mapgen_last_zoom', map.getZoom());
+            bridge.storeSet('mapgen_settings_saved', true);
         }
 
         function restoreDefaults() {
-            store.delete('mapgen_settings_saved');
-            store.delete('mapgen_target');
-            store.delete('mapgen_subtarget');
-            store.delete('mapgen_provider');
-            store.delete('mapgen_map_type');
-            store.delete('mapgen_project_name');
-            store.delete('mapgen_min_zoom');
-            store.delete('mapgen_max_zoom');
-            store.delete('mapgen_area_unit');
-            store.delete('mapgen_last_center');
-            store.delete('mapgen_last_zoom');
-            store.delete('mapgen_terrain_source');
+            bridge.storeDelete('mapgen_settings_saved');
+            bridge.storeDelete('mapgen_target');
+            bridge.storeDelete('mapgen_subtarget');
+            bridge.storeDelete('mapgen_provider');
+            bridge.storeDelete('mapgen_map_type');
+            bridge.storeDelete('mapgen_project_name');
+            bridge.storeDelete('mapgen_min_zoom');
+            bridge.storeDelete('mapgen_max_zoom');
+            bridge.storeDelete('mapgen_area_unit');
+            bridge.storeDelete('mapgen_last_center');
+            bridge.storeDelete('mapgen_last_zoom');
+            bridge.storeDelete('mapgen_terrain_source');
             // Note: mapgen_maptiler_key is intentionally NOT deleted on restore defaults
             // Reset UI to defaults
             $('#mapgen_target').val('terrain');
@@ -1538,14 +1538,14 @@ TABS.map_generator.initialize = function (callback) {
         // ── Control event bindings ──────────────────────────────────
         $('#mapgen_target').on('change', () => { syncMapOptions(); triggerUpdate(); });
         $('#mapgen_terrain_source').on('change', () => {
-            store.set('mapgen_terrain_source', $('#mapgen_terrain_source').val());
+            bridge.storeSet('mapgen_terrain_source', $('#mapgen_terrain_source').val());
             updateTerrainSourceUI();
             triggerUpdate();
         });
         $('#mapgen_provider').on('change', () => { syncMapOptions(); switchMapLayer(); });
         $('#mapgen_maptype').on('change', () => { switchMapLayer(); });
         $('#mapgen_maptiler_key').on('input', () => {
-            store.set('mapgen_maptiler_key', $('#mapgen_maptiler_key').val().trim());
+            bridge.storeSet('mapgen_maptiler_key', $('#mapgen_maptiler_key').val().trim());
             syncMapOptions();
             if ($('#mapgen_provider').val() === 'MAPTILER') switchMapLayer();
         });
@@ -1570,7 +1570,7 @@ TABS.map_generator.initialize = function (callback) {
             });
             if (!result.canceled && result.filePaths && result.filePaths.length > 0) {
                 sdPath = result.filePaths[0];
-                store.set('mapgen_sd_path', sdPath);
+                bridge.storeSet('mapgen_sd_path', sdPath);
                 updateSdDisplay();
             }
         });
@@ -1587,12 +1587,12 @@ TABS.map_generator.initialize = function (callback) {
             if (err) {
                 // Drive likely already ejected or not found — clear the link
                 sdPath = '';
-                store.set('mapgen_sd_path', '');
+                bridge.storeSet('mapgen_sd_path', '');
                 updateSdDisplay();
                 $('#mapgen_status').text('SD card unlinked. (Drive may already be ejected.)');
             } else {
                 sdPath = '';
-                store.set('mapgen_sd_path', '');
+                bridge.storeSet('mapgen_sd_path', '');
                 updateSdDisplay();
                 $('#mapgen_status').text('SD card ejected safely.');
             }
@@ -1605,16 +1605,16 @@ TABS.map_generator.initialize = function (callback) {
 
         // Restore saved cache settings
         $('#mapgen_cache_enabled').prop('checked', tileCache.enabled);
-        $('#mapgen_cache_max').val(store.get('mapgen_cache_max_mb', 500));
+        $('#mapgen_cache_max').val(bridge.storeGet('mapgen_cache_max_mb', 500));
         updateCacheSizeDisplay();
 
         $('#mapgen_cache_enabled').on('change', function () {
             tileCache.enabled = $(this).is(':checked');
-            store.set('mapgen_cache_enabled', tileCache.enabled);
+            bridge.storeSet('mapgen_cache_enabled', tileCache.enabled);
         });
 
         $('#mapgen_cache_max').on('change', function () {
-            store.set('mapgen_cache_max_mb', Number.parseInt($(this).val(), 10));
+            bridge.storeSet('mapgen_cache_max_mb', Number.parseInt($(this).val(), 10));
         });
 
         $('#mapgen_clear_cache').on('click', async () => {
@@ -1763,7 +1763,7 @@ TABS.map_generator.initialize = function (callback) {
             if (terrainFallbackPending) {
                 terrainFallbackPending = false;
                 $('#mapgen_terrain_source').val('srtm');
-                store.set('mapgen_terrain_source', 'srtm');
+                bridge.storeSet('mapgen_terrain_source', 'srtm');
                 updateTerrainSourceUI();
             }
             if (isTerrainMode()) {
