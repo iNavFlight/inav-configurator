@@ -11,11 +11,11 @@ import Settings from './../js/settings';
 import i18n from './../js/localization';
 import interval from './../js/intervals';
 
-const receiverTab = { };
- 
-receiverTab.rateChartHeight = 117;
+const receiverTab = {
+    rateChartHeight: 117
+};
 
- receiverTab.initialize = function (callback) {
+receiverTab.initialize = function (callback) {
     var self = this;
 
     if (GUI.active_tab !== this) {

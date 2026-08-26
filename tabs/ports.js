@@ -155,6 +155,7 @@ portsTab.initialize = function (callback) {
 
                         if (serialPort.functions.indexOf(functionName) >= 0) {
                             select_e.val(functionName);
+                            updateDefaultBaud(functions_e_id, column);
                         }
                     }
                 }
@@ -200,7 +201,7 @@ portsTab.initialize = function (callback) {
                 let $element = $(element);
 
                 if ($element.val() != functionName) {
-                    $element.val('');
+                    $element.val('').trigger('change');
                 }
             });
 
@@ -321,7 +322,9 @@ function updateDefaultBaud(baudSelect, column) {
         baudRate = rule.defaultBaud;
     }
 
-    section.find("." + column + "_baudrate").children('[value=' + baudRate + ']').prop('selected', true);
+    const $baudSelect = section.find("." + column + "_baudrate");
+    $baudSelect.children('[value=' + baudRate + ']').prop('selected', true);
+    $baudSelect.prop('disabled', !!(rule && rule.lockedBaud));
 }
 
 portsTab.cleanup = function (callback) {

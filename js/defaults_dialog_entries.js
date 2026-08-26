@@ -391,6 +391,10 @@ var defaultsDialogData = [
                 value: 3
             },
             {
+                key: "looptime",
+                value: 1000
+            },
+            {
                 key: "gyro_hardware_lpf",
                 value: "256HZ"
             },
@@ -519,23 +523,23 @@ var defaultsDialogData = [
                 value: 255
             },
             {
-                key: "set nav_fw_pos_z_p",
+                key: "nav_fw_pos_z_p",
                 value: 22
             },
             {
-                key: "set nav_fw_pos_z_i",
+                key: "nav_fw_pos_z_i",
                 value: 6
             },
             {
-                key: "set nav_fw_pos_z_d",
+                key: "nav_fw_pos_z_d",
                 value: 2
             },
             {
-                key: "set nav_fw_pos_z_FF",
+                key: "nav_fw_pos_z_FF",
                 value: 25
             },
             {
-                key: "set nav_fw_alt_control_response",
+                key: "nav_fw_alt_control_response",
                 value: 45
             },
             {
@@ -578,10 +582,6 @@ var defaultsDialogData = [
                 key: "nav_fw_launch_max_altitude",
                 value: 5000
             },
-            {
-                key: "nav_fw_launch_climb_angle",
-                value: 25
-            },
             /*
              * TPA
              */
@@ -610,6 +610,10 @@ var defaultsDialogData = [
             {
                 key: "applied_defaults",
                 value: 4
+            },
+            {
+                key: "looptime",
+                value: 1000
             },
             {
                 key: "gyro_hardware_lpf",
@@ -740,23 +744,23 @@ var defaultsDialogData = [
                 value: 100
             },
             {
-                key: "set nav_fw_pos_z_p",
+                key: "nav_fw_pos_z_p",
                 value: 25
             },
             {
-                key: "set nav_fw_pos_z_i",
+                key: "nav_fw_pos_z_i",
                 value: 6
             },
             {
-                key: "set nav_fw_pos_z_d",
+                key: "nav_fw_pos_z_d",
                 value: 5
             },
             {
-                key: "set nav_fw_pos_z_FF",
+                key: "nav_fw_pos_z_FF",
                 value: 25
             },
             {
-                key: "set nav_fw_alt_control_response",
+                key: "nav_fw_alt_control_response",
                 value: 45
             },
             {
@@ -799,10 +803,6 @@ var defaultsDialogData = [
                 key: "nav_fw_launch_max_altitude",
                 value: 5000
             },
-            {
-                key: "nav_fw_launch_climb_angle",
-                value: 25
-            },
             /*
              * TPA
              */
@@ -823,6 +823,10 @@ var defaultsDialogData = [
             {
                 key: "model_preview_type",
                 value: 31
+            },
+            {
+                key: "looptime",
+                value: 1000
             },
             {
                 key: "gyro_hardware_lpf",

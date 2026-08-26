@@ -3,6 +3,9 @@ import i18n from './../js/localization';
 
 const searchTab = { };
 
+// Tabs that have no corresponding .js file and must be skipped during JS indexing.
+const jslessTab = new Set(["debug_trace", "options"]);
+
 const tabNames = [
  "adjustments",
  "advanced_tuning",
@@ -136,9 +139,11 @@ const tabNames = [
 
 
   searchTab.indexTab =  async function indexTab(tabName) {
-    import(`./${tabName}.js?raw`).then(({default: javascript}) => {
-        this.geti18nJs(tabName, javascript);
-    }).catch(error => console.error(`Failed to index JS for tab ${tabName}:`, error));;
+    if (!jslessTab.has(tabName)) {
+        import(`./${tabName}.js?raw`).then(({default: javascript}) => {
+            this.geti18nJs(tabName, javascript);
+        }).catch(error => console.error(`Failed to index JS for tab ${tabName}:`, error));
+    }
 
     import(`./${tabName}.html?raw`).then(({default: html}) => {
         this.geti18nHTML(tabName, html);

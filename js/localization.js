@@ -5,7 +5,7 @@ import i18next from 'i18next';
 import {bridge, Platform} from './bridge';
 
 
-const availableLanguages = ['en', 'ja', 'ru', 'uk', 'zh_CN'];
+const availableLanguages = ['en', 'de', 'ja', 'ru', 'bg', 'uk', 'zh_CN'];
 
 const i18n = {};
 

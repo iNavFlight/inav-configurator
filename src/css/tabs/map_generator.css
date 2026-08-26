@@ -1,0 +1,686 @@
+/* ── Map Generator Tab ──────────────────────────────────────────────── */
+
+.tab-map_generator { height: 100%; }
+
+.tab-map_generator .content_wrapper {
+    display: flex;
+    flex-direction: column;
+    height: calc(100% - 90px);
+    overflow: hidden;
+    padding-bottom: 0;
+}
+
+.tab-map_generator .tab_title {
+    flex-shrink: 0;
+}
+
+.tab-map_generator .mapgen-layout {
+    display: flex;
+    flex: 1;
+    min-height: 0;
+    gap: 0;
+}
+
+.tab-map_generator .mapgen-sidebar {
+    width: 340px;
+    min-width: 300px;
+    overflow-y: auto;
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+.tab-map_generator .mapgen-map-container {
+    flex: 1;
+    position: relative;
+    min-height: 0;
+}
+
+.tab-map_generator #mapgen_map {
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+/* ── Crosshair ────────────────────────────────────────────────────── */
+.tab-map_generator #mapgen_crosshair {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #87b025;
+    font-size: 32px;
+    font-weight: 300;
+    z-index: 9999;
+    pointer-events: none;
+    line-height: 1;
+    text-shadow: 0 0 3px rgba(0,0,0,0.8);
+}
+
+/* ── HUD overlays ─────────────────────────────────────────────────── */
+.tab-map_generator #mapgen_zoom_display {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 9999;
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 4px 10px;
+    font-weight: bold;
+    font-size: 11px;
+    pointer-events: none;
+}
+
+.tab-map_generator #mapgen_mouse_coords {
+    position: absolute;
+    bottom: 26px;
+    right: 10px;
+    z-index: 9999;
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 4px 10px;
+    font-family: 'Consolas', monospace;
+    font-size: 11px;
+    white-space: nowrap;
+}
+
+/* ── Side labels on map ───────────────────────────────────────────── */
+.mapgen-side-label {
+    background: rgba(255, 255, 255, 0.9) !important;
+    border: 1px solid #87b025 !important;
+    border-radius: 3px !important;
+    color: #333 !important;
+    font-family: 'Consolas', monospace !important;
+    font-size: 10px !important;
+    padding: 3px 8px !important;
+    white-space: nowrap !important;
+    pointer-events: none;
+    text-align: center;
+    min-width: 50px;
+}
+
+/* ── Subtarget visibility ──────────────────────────────────────────── */
+.tab-map_generator .mapgen-subtarget-hidden {
+    display: none !important;
+}
+
+/* ── Zoom row ─────────────────────────────────────────────────────── */
+.tab-map_generator .mapgen-zoom-row {
+    display: flex;
+    gap: 10px;
+    clear: both;
+    width: 100%;
+    margin-bottom: 5px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid #ddd;
+}
+
+.tab-map_generator .mapgen-zoom-row > .select {
+    flex: 1;
+    float: none !important;
+    width: auto !important;
+    border-bottom: none !important;
+    padding-bottom: 0 !important;
+    margin-bottom: 0 !important;
+}
+
+.tab-map_generator .mapgen-zoom-row > .select select {
+    width: 100%;
+}
+
+/* ── Warnings ─────────────────────────────────────────────────────── */
+.tab-map_generator .mapgen-warning {
+    font-size: 11px;
+    color: #b36b00;
+    padding: 8px;
+    background: rgba(255, 152, 0, 0.08);
+    border-radius: 4px;
+    border: 1px solid rgba(255, 152, 0, 0.3);
+    line-height: 1.4;
+    margin-top: 5px;
+    clear: left;
+    float: left;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.tab-map_generator .mapgen-warning-yaapu {
+    color: #c62828;
+    background: rgba(244, 67, 54, 0.08);
+    border-color: rgba(244, 67, 54, 0.3);
+}
+
+/* ── SD card button ───────────────────────────────────────────────── */
+.tab-map_generator #mapgen_link_sd {
+    display: block;
+    width: 100%;
+    padding: 6px 12px;
+    margin-bottom: 5px;
+    background-color: #f0f0f0;
+    color: #333;
+    text-align: center;
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: bold;
+    border: 1px solid #bbb;
+    border-radius: 3px;
+    cursor: pointer;
+    box-sizing: border-box;
+    transition: background-color 0.2s;
+}
+
+.tab-map_generator #mapgen_link_sd:hover {
+    background-color: #e0e0e0;
+    border-color: #999;
+}
+
+.tab-map_generator #mapgen_link_sd:active {
+    background-color: #d0d0d0;
+}
+
+.tab-map_generator .mapgen-eject-btn {
+    display: block;
+    width: 100%;
+    padding: 6px 12px;
+    margin-bottom: 5px;
+    background-color: #fff3e0;
+    color: #bf4400;
+    text-align: center;
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: bold;
+    border: 1px solid #ffcc80;
+    border-radius: 3px;
+    cursor: pointer;
+    box-sizing: border-box;
+    transition: background-color 0.2s;
+}
+
+.tab-map_generator .mapgen-eject-btn:hover {
+    background-color: #ffe0b2;
+    border-color: #ffb74d;
+}
+
+.tab-map_generator .mapgen-eject-btn:active {
+    background-color: #ffcc80;
+}
+
+/* ── SD card path ─────────────────────────────────────────────────── */
+.tab-map_generator .mapgen-sd-path {
+    font-size: 11px;
+    color: #999;
+    margin-top: 5px;
+    word-break: break-all;
+    padding: 4px;
+}
+
+.tab-map_generator .mapgen-sd-path.linked {
+    color: #4CAF50;
+    font-weight: bold;
+}
+
+/* ── Overwrite checkbox row ───────────────────────────────────────── */
+.tab-map_generator .mapgen-overwrite-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 8px;
+    padding-top: 8px;
+    clear: both;
+}
+
+.tab-map_generator .mapgen-overwrite-row input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    margin: 0;
+    flex-shrink: 0;
+    cursor: pointer;
+}
+
+.tab-map_generator .mapgen-overwrite-row label {
+    margin: 0;
+    font-size: 12px;
+    cursor: pointer;
+    line-height: 1.3;
+}
+
+/* ── Cache info ───────────────────────────────────────────────────── */
+.tab-map_generator .mapgen-cache-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 0;
+    clear: both;
+}
+
+.tab-map_generator .mapgen-cache-info {
+    font-size: 12px;
+    color: #555;
+    flex: 1;
+}
+
+.tab-map_generator #mapgen_cache_size {
+    font-weight: bold;
+    color: #333;
+}
+
+.tab-map_generator .mapgen-cache-max {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    color: #666;
+}
+
+.tab-map_generator .mapgen-cache-max select {
+    padding: 2px 4px;
+    font-size: 11px;
+    border: 1px solid silver;
+    border-radius: 3px;
+}
+
+.tab-map_generator #mapgen_clear_cache,
+.tab-map_generator #mapgen_clear_hgt_cache {
+    display: block;
+    width: 100%;
+    padding: 6px 12px;
+    margin-top: 4px;
+    clear: both;
+    background-color: #f0f0f0;
+    color: #333;
+    text-align: center;
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: bold;
+    border: 1px solid #bbb;
+    border-radius: 3px;
+    cursor: pointer;
+    box-sizing: border-box;
+    transition: background-color 0.2s;
+}
+
+.tab-map_generator #mapgen_clear_cache:hover,
+.tab-map_generator #mapgen_clear_hgt_cache:hover {
+    background-color: #e0e0e0;
+    border-color: #999;
+}
+
+.tab-map_generator #mapgen_clear_cache:active,
+.tab-map_generator #mapgen_clear_hgt_cache:active {
+    background-color: #d0d0d0;
+}
+
+/* ── Status area ──────────────────────────────────────────────────── */
+.tab-map_generator .mapgen-status {
+    font-size: 13px;
+    color: #ffb300;
+    text-align: center;
+    padding: 10px;
+    font-weight: bold;
+    background: rgba(0, 0, 0, 0.03);
+    border-radius: 4px;
+    margin-top: 10px;
+}
+
+.tab-map_generator .mapgen-area {
+    color: #ff9800;
+}
+
+.tab-map_generator .mapgen-tiles {
+    color: #87b025;
+}
+
+/* ── Sync modal overlay ───────────────────────────────────────────── */
+.tab-map_generator .mapgen-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 10000;
+    justify-content: center;
+    align-items: center;
+}
+
+.tab-map_generator .mapgen-overlay.open {
+    display: flex;
+}
+
+.tab-map_generator .mapgen-modal {
+    background: #fff;
+    border: 1px solid silver;
+    color: #333;
+    width: 90%;
+    max-width: 450px;
+    padding: 20px 25px;
+    border-radius: 3px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.tab-map_generator .mapgen-modal .modal__title {
+    margin: 0 0 15px 0;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #37a8db;
+    color: #333;
+    font-size: 18px;
+    line-height: 22px;
+    font-weight: normal;
+    text-align: left;
+}
+
+.tab-map_generator .mapgen-modal .modal__text {
+    line-height: 1.5em;
+    font-size: 13px;
+}
+
+/* ── Sync info rows ───────────────────────────────────────────────── */
+.tab-map_generator .mapgen-info-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 6px;
+    font-size: 13px;
+    border-bottom: 1px solid #f0f0f0;
+    padding-bottom: 6px;
+}
+
+.tab-map_generator .mapgen-info-row span:first-child {
+    color: #666;
+}
+
+.tab-map_generator .mapgen-info-row span:last-child {
+    font-weight: bold;
+    color: #333;
+}
+
+/* ── Progress bar ─────────────────────────────────────────────────── */
+.tab-map_generator .mapgen-progress-bg {
+    background: #eee;
+    width: 100%;
+    height: 14px;
+    border-radius: 7px;
+    margin: 15px 0 8px;
+    overflow: hidden;
+}
+
+.tab-map_generator #mapgen_progress_fill {
+    background: #37a8db;
+    width: 0%;
+    height: 100%;
+    transition: width 0.15s;
+    border-radius: 7px;
+}
+
+.tab-map_generator #mapgen_download_status {
+    font-size: 11px;
+    text-align: center;
+    color: #888;
+    margin-bottom: 10px;
+}
+
+/* ── Modal buttons ────────────────────────────────────────────────── */
+.tab-map_generator .mapgen-modal-buttons {
+    display: flex;
+    gap: 12px;
+    margin-top: 18px;
+}
+
+.tab-map_generator .mapgen-modal-buttons .modal__button {
+    flex: 1;
+    padding: 8px 16px;
+    text-align: center;
+    text-decoration: none;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all ease 0.2s;
+    display: block;
+    /* Secondary/cancel style (outline) */
+    background-color: #fff;
+    border: 1px solid #2980b9;
+    color: #2980b9;
+}
+
+.tab-map_generator .mapgen-modal-buttons .modal__button:hover {
+    background-color: #f0f8ff;
+}
+
+.tab-map_generator .mapgen-modal-buttons .modal__button:active {
+    box-shadow: inset 0 1px 5px rgba(0, 0, 0, 0.15);
+}
+
+/* Primary/confirm button */
+.tab-map_generator .mapgen-modal-buttons .modal__button--main {
+    background-color: #20759c;
+    border: 1px solid #1b6689;
+    color: #fff;
+    text-shadow: none;
+}
+
+.tab-map_generator .mapgen-modal-buttons .modal__button--main:hover {
+    background-color: #1b6689;
+}
+
+.tab-map_generator .mapgen-modal-buttons .modal__button--main:active {
+    background-color: #20759c;
+    box-shadow: inset 0 1px 5px rgba(0, 0, 0, 0.35);
+}
+
+/* ── Terrain grid labels ──────────────────────────────────────────── */
+.tab-map_generator .terrain-grid-label {
+    text-align: center;
+    color: #fff;
+    font-weight: bold;
+    text-shadow: 0 0 3px #000;
+    pointer-events: none;
+    background: transparent !important;
+    border: none !important;
+}
+
+/* ── Leaflet control overrides (fix INAV global reset * { border:0 }) ── */
+.tab-map_generator .leaflet-bar {
+    border: 2px solid rgba(0, 0, 0, 0.2) !important;
+    border-radius: 4px !important;
+    box-shadow: none !important;
+}
+
+.tab-map_generator .leaflet-bar a,
+.tab-map_generator .leaflet-bar a:hover {
+    display: block !important;
+    width: 30px !important;
+    height: 30px !important;
+    line-height: 30px !important;
+    text-align: center !important;
+    font-size: 18px !important;
+    font-weight: bold !important;
+    color: #333 !important;
+    background-color: #fff !important;
+    border: none !important;
+    border-bottom: 1px solid #ccc !important;
+    text-decoration: none !important;
+    font-family: 'Lucida Console', Monaco, monospace !important;
+}
+
+.tab-map_generator .leaflet-bar a:last-child {
+    border-bottom: none !important;
+}
+
+.tab-map_generator .leaflet-bar a:hover {
+    background-color: #f4f4f4 !important;
+}
+
+.tab-map_generator .leaflet-control-zoom-in,
+.tab-map_generator .leaflet-control-zoom-out {
+    cursor: pointer;
+}
+
+/* Leaflet Draw toolbar icons */
+.tab-map_generator .leaflet-draw-toolbar a {
+    background-size: 300px 30px !important;
+    width: 30px !important;
+    height: 30px !important;
+}
+
+/* Leaflet scale bar fix */
+.tab-map_generator .leaflet-control-scale-line {
+    border: 2px solid #777 !important;
+    border-top: none !important;
+    padding: 2px 5px 1px !important;
+    font-size: 11px !important;
+    background: rgba(255, 255, 255, 0.7) !important;
+    line-height: 1.4 !important;
+}
+
+/* Leaflet geocoder fix */
+.tab-map_generator .leaflet-control-geocoder {
+    border: 2px solid rgba(0, 0, 0, 0.2) !important;
+    border-radius: 4px !important;
+    background: #fff !important;
+}
+
+.tab-map_generator .leaflet-control-geocoder input {
+    border: none !important;
+    outline: none !important;
+    font-size: 12px !important;
+    padding: 4px 8px !important;
+}
+
+.tab-map_generator .leaflet-control-geocoder-alternatives {
+    display: block;
+    width: 272px;
+    list-style: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    background: #fff;
+    border-top: 1px solid #ccc;
+    max-height: 300px;
+    overflow-y: auto;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+.tab-map_generator .leaflet-control-geocoder-alternatives-minimized {
+    display: none !important;
+    height: 0 !important;
+}
+
+.tab-map_generator .leaflet-control-geocoder-alternatives li {
+    display: block !important;
+    padding: 8px 10px !important;
+    margin: 0 !important;
+    border-bottom: 1px solid #e0e0e0 !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    cursor: pointer;
+    font-size: 13px;
+    color: #333;
+    background: #fff;
+}
+
+.tab-map_generator .leaflet-control-geocoder-alternatives li:last-child {
+    border-bottom: none !important;
+}
+
+.tab-map_generator .leaflet-control-geocoder-alternatives li:hover,
+.tab-map_generator .leaflet-control-geocoder-selected {
+    background-color: #f0f0f0 !important;
+}
+
+.tab-map_generator .leaflet-control-geocoder-alternatives li a,
+.tab-map_generator .leaflet-control-geocoder-alternatives li a:hover {
+    width: auto !important;
+    height: auto !important;
+    line-height: normal !important;
+    background: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
+    text-align: left !important;
+    color: #333 !important;
+    text-decoration: none !important;
+    display: inline !important;
+    padding: 0 !important;
+    font-size: 13px !important;
+}
+
+.tab-map_generator .leaflet-control-geocoder-address-context {
+    color: #888 !important;
+    font-size: 11px !important;
+}
+
+/* ── Toolbar left-aligned buttons ─────────────────────────────────── */
+.tab-map_generator .content_toolbar .mapgen-toolbar-left a {
+    float: left;
+    margin-left: 20px;
+    margin-right: 0;
+}
+
+.tab-map_generator .content_toolbar #mapgen_restore_settings_btn a {
+    background-color: #fff;
+    border: 1px solid #2980b9;
+    color: #2980b9;
+    text-shadow: none;
+}
+
+.tab-map_generator .content_toolbar #mapgen_restore_settings_btn a:hover {
+    background-color: #f0f8ff;
+}
+
+.tab-map_generator .content_toolbar #mapgen_restore_settings_btn a:active {
+    background-color: #e0f0fc;
+    box-shadow: inset 0 1px 5px rgba(0, 0, 0, 0.15);
+}
+
+/* Custom fullscreen button */
+.tab-map_generator .mapgen-fullscreen-btn {
+    width: 30px !important;
+    height: 30px !important;
+    line-height: 30px !important;
+    font-size: 16px !important;
+    cursor: pointer;
+}
+
+/* Right toolbar positioning (below zoom display HUD) */
+.tab-map_generator .mapgen-right-toolbar {
+    margin-top: 40px !important;
+}
+
+/* Custom measure button active state */
+.tab-map_generator .mapgen-measure-active {
+    background-color: #6d8c1e !important;
+    color: #fff !important;
+}
+
+/* Measure HUD popup (center of map) */
+.tab-map_generator #mapgen_measure_popup {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -120%);
+    z-index: 9999;
+    background: rgba(0, 0, 0, 0.75);
+    color: #fff;
+    padding: 6px 14px;
+    border-radius: 4px;
+    font-family: 'Consolas', monospace;
+    font-size: 13px;
+    font-weight: bold;
+    pointer-events: none;
+    white-space: nowrap;
+}
+
+/* Measure tooltip on map */
+.tab-map_generator .mapgen-measure-tooltip {
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid #87b025;
+    border-radius: 3px;
+    padding: 3px 8px;
+    font-size: 11px;
+    font-family: 'Consolas', monospace;
+    white-space: nowrap;
+    pointer-events: none;
+}

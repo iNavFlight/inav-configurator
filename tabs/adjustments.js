@@ -14,7 +14,7 @@ import interval from './../js/intervals';
 const adjustmentsTab = {};
 
 adjustmentsTab.initialize = function (callback) {
-    
+
     if (GUI.active_tab !== this) {
         GUI.active_tab = this;
     }

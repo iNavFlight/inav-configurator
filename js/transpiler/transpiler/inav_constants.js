@@ -80,11 +80,15 @@ const OPERATION = {
   TIMER: 49,
   DELTA: 50,
   APPROX_EQUAL: 51,
-  LED_PIN_PWM: 52,
+  PINIO_PWM: 52,
   DISABLE_GPS_FIX: 53,
   RESET_MAG_CALIBRATION: 54,
   SET_GIMBAL_SENSITIVITY: 55,
   OVERRIDE_MIN_GROUND_SPEED: 56,
+  SET_ALTITUDE_TARGET: 57,
+  ACOS: 58,
+  ASIN: 59,
+  ATAN2: 60,
 };
 
 /**
@@ -268,10 +272,15 @@ const OPERATION_NAMES = {
   [49]: 'Timer',
   [50]: 'Delta',
   [51]: 'Approx Equal',
-  [52]: 'Led Pin Pwm',
+  [52]: 'Pinio Pwm',
   [53]: 'Disable Gps Fix',
   [54]: 'Reset Mag Calibration',
   [55]: 'Set Gimbal Sensitivity',
+  [56]: 'Override Min Ground Speed',
+  [57]: 'Set Altitude Target',
+  [58]: 'Acos',
+  [59]: 'Asin',
+  [60]: 'Atan2',
 };
 
 /**

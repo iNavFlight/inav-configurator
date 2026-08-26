@@ -286,23 +286,24 @@ CliAutoComplete._initTextcomplete = function() {
 
         const textCompleteDropDownElement = $('.textcomplete-dropdown');
 
+        // savedMouseoverItemHandler is closure-local so it resets to null each time
+        // _initTextcomplete() is called, which happens after every cleanup()/rebuild cycle.
         if (!savedMouseoverItemHandler) {
-            // save the original 'mouseover' handeler
-            try {
-                savedMouseoverItemHandler = $._data(textCompleteDropDownElement[0], 'events').mouseover[0].handler;
-            } catch (error) {
-                console.log(error);
-            }
+            // _onMouseover is the library's private item-highlight handler. There is no
+            // public API to retrieve it, so we bind it directly from the Completer object
+            // stored by the plugin under the standard $textarea.data('textComplete') key.
+            const completer = $textarea.data('textComplete');
+            savedMouseoverItemHandler = $.proxy(completer.dropdown._onMouseover, completer.dropdown);
 
             if (savedMouseoverItemHandler) {
                 textCompleteDropDownElement
                 .off('mouseover') // initially disable it
-                .off('mousemove') // avoid `mousemove` accumulation if previous show did not trigger `mousemove`
-                .on('mousemove', '.textcomplete-item', function(e) {
+                .off('mousemove.cliAutocomplete') // avoid accumulation if previous show did not trigger `mousemove`
+                .on('mousemove.cliAutocomplete', '.textcomplete-item', function(e) {
                         // the mouse has moved so reenable `mouseover`
                     $(this).parent()
-                    .off('mousemove')
-                    .on('mouseover', '.textcomplete-item', savedMouseoverItemHandler);
+                    .off('mousemove.cliAutocomplete')
+                    .on('mouseover.cliAutocomplete', '.textcomplete-item', savedMouseoverItemHandler);
 
                     // trigger the mouseover handler to select the item under the cursor
                     savedMouseoverItemHandler(e);

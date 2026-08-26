@@ -17,13 +17,17 @@ import dialog from '../js/dialog';
 import {bridge, Platform} from '../js/bridge';
 import interval from '../js/intervals';
 
-const cliTab = {};
+const cliTab = {
+    outputHistory: "",
+    cliBuffer: "",
+    promptCallback: null,
+    promptTimeoutId: null,
+    GUI: {
+        snippetPreviewWindow: null,
+    },
+};
 
-cliTab.lineDelayMs = 50;
-cliTab.profileSwitchDelayMs = 100;
-cliTab.outputHistory = "";
-cliTab.cliBuffer = "";
-cliTab.GUI = { snippetPreviewWindow: null };
+cliTab.nextTab = null;
 
 function removePromptHash(promptText) {
     return promptText.replace(/^# /, '');
@@ -88,6 +92,13 @@ function copyToClipboard(text) {
 
 cliTab.initialize = function (callback) {
     var self = this;
+    self.nextTab = null;
+
+    // Must be set before mspQueue.flush() below and before the async HTML
+    // import, so periodicStatusUpdater.run() (a 300ms interval kept alive
+    // across tab switches) can never see cliActive === false and queue a
+    // status poll in the gap - the flush only clears what's queued so far.
+    CONFIGURATOR.cliActive = true;
 
     if (GUI.active_tab !== this) {
         GUI.active_tab = this;
@@ -110,34 +121,53 @@ cliTab.initialize = function (callback) {
     function executeCommands(out_string) {
         self.history.add(out_string.trim());
 
-        var outputArray = out_string.split("\n");
-        return outputArray.reduce((p, line, index) =>
-            p.then((delay) =>
-                new Promise((resolve) => {
-                    timeout.add('CLI_send_slowly', () => {
-                        let processingDelay = cliTab.lineDelayMs;
-                        if (line.toLowerCase().includes('_profile')) {
-                            processingDelay = cliTab.profileSwitchDelayMs;
-                        }
-                        const isLastCommand = outputArray.length === index + 1;
-                        if (isLastCommand && cliTab.cliBuffer) {
-                            line = getCliCommand(line, cliTab.cliBuffer);
-                        }
-                        cliTab.sendLine(line, () => {
-                            resolve(processingDelay);
-                        });
-                    }, delay);
-                })
-            ), Promise.resolve(0),
-        );
+        const lines = out_string.split("\n").filter(l => l.length > 0);
+        if (lines.length === 0) return Promise.resolve();
+
+        return new Promise((resolve) => {
+            let nextToSend = 0;
+            let promptsReceived = 0;
+            let promptGeneration = 0;
+
+            function sendOne() {
+                const line = lines[nextToSend];
+                const isLast = nextToSend === lines.length - 1;
+                const cmd = isLast ? getCliCommand(line, cliTab.cliBuffer) : line;
+                nextToSend++;
+                cliTab.sendLine(cmd);
+            }
+
+            function armCallback() {
+                clearTimeout(cliTab.promptTimeoutId);
+                const myGen = ++promptGeneration;
+                cliTab.promptTimeoutId = setTimeout(() => {
+                    if (myGen !== promptGeneration) return; // real prompt already fired
+                    cliTab.promptCallback = null;
+                    onPrompt();
+                }, 5000);
+                cliTab.promptCallback = onPrompt;
+            }
+
+            function onPrompt() {
+                promptsReceived++;
+                if (nextToSend < lines.length) sendOne();
+                if (promptsReceived === lines.length) {
+                    resolve();
+                } else {
+                    armCallback();
+                }
+            }
+
+            sendOne();
+            if (lines.length > 1) sendOne();
+            armCallback();
+        });
     }
     import('./cli.html?raw').then(({default: html}) => GUI.load(html, function () {
         // translate to user-selected language
        i18n.localize();
 
         $('.cliDocsBtn').attr('href', globalSettings.docsTreeLocation + 'Settings.md');
-
-        CONFIGURATOR.cliActive = true;
 
         var textarea = $('.tab-cli textarea[name="commands"]');
         CliAutoComplete.initialize(textarea, self.sendLine.bind(self), writeToOutput);
@@ -482,7 +512,7 @@ cliTab.read = function (readInfo) {
             CONFIGURATOR.cliValid = false;
             GUI.log(i18n.getMessage('cliReboot'));
             GUI.log(i18n.getMessage('deviceRebooting'));
-            GUI.handleReconnect();
+            GUI.handleReconnect(cliTab.nextTab || false);
         }
 
     }
@@ -497,12 +527,17 @@ cliTab.read = function (readInfo) {
         }
     }
 
-    // fallback to native autocomplete
-    if (!CliAutoComplete.isEnabled()) {
+    // do not echo the cache builder output into the input textarea
+    if (!CliAutoComplete.isBuilding()) {
         setPrompt(removePromptHash(this.cliBuffer));
     }
 
-    setPrompt(removePromptHash(this.cliBuffer));
+    if (cliTab.promptCallback && this.cliBuffer.endsWith('# ')) {
+        const cb = cliTab.promptCallback;
+        cliTab.promptCallback = null;
+        clearTimeout(cliTab.promptTimeoutId);
+        cb();
+    }
 };
 
 cliTab.sendLine = function (line, callback) {
@@ -524,24 +559,27 @@ cliTab.send = function (line, callback) {
     CONFIGURATOR.connection.send(bufferOut, callback);
 };
 
+cliTab.exit = function(nextTab) {
+    this.nextTab = nextTab;
+    this.send(getCliCommand('exit\r', this.cliBuffer));
+};
+
 cliTab.cleanup = function (callback) {
+    clearTimeout(cliTab.promptTimeoutId);
+    cliTab.promptCallback = null;
+
     if (!(CONFIGURATOR.connectionValid && CONFIGURATOR.cliValid && CONFIGURATOR.cliActive)) {
         if (callback) callback();
         return;
     }
-    this.send(getCliCommand('exit\r', this.cliBuffer), function (writeInfo) {
-        // we could handle this "nicely", but this will do for now
-        // (another approach is however much more complicated):
-        // we can setup an interval asking for data lets say every 200ms, when data arrives, callback will be triggered and tab switched
-        // we could probably implement this someday
-        timeout.add('waiting_for_bootup', function waiting_for_bootup() {
-            if (callback) callback();
-        }, 1000); // if we dont allow enough time to reboot, CRC of "first" command sent will fail, keep an eye for this one
-        CONFIGURATOR.cliActive = false;
 
-        CliAutoComplete.cleanup();
-        $(CliAutoComplete).off();
-    });
+
+    CONFIGURATOR.cliActive = false;
+    CONFIGURATOR.cliValid = false;
+    CliAutoComplete.cleanup();
+    $(CliAutoComplete).off();
+
+    if (callback) callback();
 };
 
 export default cliTab;

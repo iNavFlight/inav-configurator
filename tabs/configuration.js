@@ -162,9 +162,7 @@ configurationTab.initialize = function (callback, scrollPosition) {
 
             var vtx_power = $('#vtx_power');
             vtx_power.empty();
-            var minPower = VTX.getMinPower(FC.VTX_CONFIG.device_type);
-            var maxPower = VTX.getMaxPower(FC.VTX_CONFIG.device_type);
-            for (var ii = minPower; ii <= maxPower; ii++) {
+            for (var ii = FC.VTX_CONFIG.power_min; ii <= FC.VTX_CONFIG.power_count; ii++) {
                 var option = $('<option value="' + ii + '">' + ii + '</option>');
                 if (ii == FC.VTX_CONFIG.power) {
                     option.prop('selected', true);

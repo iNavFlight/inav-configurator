@@ -17,11 +17,54 @@ import mspQueue from './../js/serial_queue';
 import mspHelper from './../js/msp/MSPHelper';
 import STM32 from './../js/protocols/stm32';
 import STM32DFU from './../js/protocols/stm32usbdfu';
+
 import mspDeduplicationQueue from './../js/msp/mspDeduplicationQueue';
 import dialog from './../js/dialog.js';
 import {bridge, Platform} from './../js/bridge';
+import BackupRestore from './../js/backup_restore';
+import { FlashRestoreFlow, showMigrationPreview, prepareRestoreData, executeRestore } from './firmware_flasher_restore';
 
 const firmwareFlasherTab = {};
+
+// Normalize target names to underscores for consistent dictionary lookups.
+// Hyphens supported as workaround for 9.0.0 filename inconsistency.
+function normalizeTargetName(name) {
+    if (name == null) return '';
+    return String(name).replace(/-/g, '_');
+}
+
+/**
+ * Disconnect with a timeout fallback.
+ * After save/exit the FC reboots and the serial port may vanish before
+ * the disconnect callback fires, which would leave connect_lock stuck.
+ */
+function disconnectSafely(callback) {
+    var done = false;
+    var fallback = setTimeout(function() {
+        if (!done) {
+            done = true;
+            console.warn('Disconnect timed out, forcing unlock');
+            callback();
+        }
+    }, 3000);
+
+    try {
+        CONFIGURATOR.connection.disconnect(function() {
+            if (!done) {
+                done = true;
+                clearTimeout(fallback);
+                callback();
+            }
+        });
+    } catch (e) {
+        if (!done) {
+            done = true;
+            clearTimeout(fallback);
+            console.warn('Disconnect threw:', e);
+            callback();
+        }
+    }
+}
 
 firmwareFlasherTab.initialize = function (callback) {
 
@@ -31,6 +74,7 @@ firmwareFlasherTab.initialize = function (callback) {
 
     var intel_hex = false, // standard intel hex in string format
         parsed_hex = false, // parsed raw hex in array format
+        localFirmwareLoaded = false, // true when firmware loaded from local file
         fileName = "inav.hex";
 
     import('./firmware_flasher.html?raw').then(({default: html}) => GUI.load(html, function () {
@@ -73,7 +117,7 @@ firmwareFlasherTab.initialize = function (callback) {
             //var targetFromFilenameExpression = /inav_([\d.]+)?_?([^.]+)\.(.*)/;
             // inav_8.0.0_TUNERCF405_dev-20240617-88fb1d0.hex
             // inav_8.0.0_TUNERCF405_ci-20240617-88fb1d0.hex
-            var targetFromFilenameExpression = /^inav_(\d+)([\d.]+)_([A-Za-z0-9_]+)_(ci|dev)-(\d{4})(\d{2})(\d{2})-(\w+)\.(hex)$/;
+            var targetFromFilenameExpression = /^inav_(\d+)([\d.]+)_([A-Za-z0-9_-]+)_(ci|dev)-(\d{4})(\d{2})(\d{2})-(\w+)\.(hex)$/;
             var match = targetFromFilenameExpression.exec(filename);
 
             if (!match) {
@@ -81,9 +125,10 @@ firmwareFlasherTab.initialize = function (callback) {
                 return null;
             }
 
+            var rawMatch = match[3];  // e.g., "TBS-LUCID-H7-WING" or "TBS_LUCID_H7_WING"
             return {
-                raw_target: match[3],
-                target: match[3].replace("_", " "),
+                target_id: normalizeTargetName(rawMatch),
+                target: rawMatch.replace(/_/g, " ").replace(/-/g, " "),  // Display: "TBS LUCID H7 WING"
                 format: match[9],
                 version: match[1]+match[2],
                 major: match[1]
@@ -101,9 +146,10 @@ firmwareFlasherTab.initialize = function (callback) {
 
             //GUI.log("non dev: match[2]: " + match[2] + " match[3]: " + match[3]);
 
+            var rawMatch = match[2];  // e.g., "MATEKF405" or "MATEK-F405"
             return {
-                raw_target: match[2],
-                target: match[2].replace("_", " "),
+                target_id: normalizeTargetName(rawMatch),
+                target: rawMatch.replace(/_/g, " ").replace(/-/g, " "),  // Display: "MATEKF405"
                 format: match[3],
             };
         }
@@ -116,7 +162,7 @@ firmwareFlasherTab.initialize = function (callback) {
             if (selectedTarget === "0") {
                 firmwareFlasherTab.getTarget();
             } else {
-                $('select[name="board"] option[value=' + selectedTarget + ']').attr("selected", "selected");
+                $('select[name="board"] option[value="' + selectedTarget + '"]').attr("selected", "selected");
                 $('select[name="board"]').trigger('change');
             }
         });
@@ -159,8 +205,8 @@ firmwareFlasherTab.initialize = function (callback) {
                     if ((!showDevReleases && release.prerelease) || !result) {
                         return;
                     }
-                    if($.inArray(result.target, unsortedTargets) == -1) {
-                        unsortedTargets.push(result.target);
+                    if($.inArray(result.target_id, unsortedTargets) == -1) {
+                        unsortedTargets.push(result.target_id);
                     }
                 });
             });
@@ -171,8 +217,10 @@ firmwareFlasherTab.initialize = function (callback) {
                     release.assets.forEach(function (asset) {
                         var result = parseDevFilename(asset.name);
 
-                        if (result && $.inArray(result.target, unsortedTargets) == -1) {
-                            unsortedTargets.push(result.target);
+                        if (result) {
+                            if ($.inArray(result.target_id, unsortedTargets) == -1) {
+                                unsortedTargets.push(result.target_id);
+                            }
                         }
                     });
                 });
@@ -215,13 +263,16 @@ firmwareFlasherTab.initialize = function (callback) {
                         "version"   : release.tag_name,
                         "url"       : asset.browser_download_url,
                         "file"      : asset.name,
-                        "raw_target": result.raw_target,
+                        "target_id" : result.target_id,
                         "target"    : result.target,
                         "date"      : formattedDate,
                         "notes"     : release.body,
                         "status"    : release.prerelease ? "release-candidate" : "stable"
                     };
-                    releases[result.target].push(descriptor);
+                    // Skip duplicate entries (e.g. both hyphen and underscore variants of same target+version)
+                    if (!releases[result.target_id].some(d => d.version === descriptor.version && d.status === descriptor.status)) {
+                        releases[result.target_id].push(descriptor);
+                    }
                 });
             });
 
@@ -269,13 +320,16 @@ firmwareFlasherTab.initialize = function (callback) {
                             "version"   : release.tag_name,
                             "url"       : asset.browser_download_url,
                             "file"      : asset.name,
-                            "raw_target": result.raw_target,
+                            "target_id" : result.target_id,
                             "target"    : result.target,
                             "date"      : formattedDate,
                             "notes"     : release.body,
                             "status"    : release.prerelease ? "nightly" : "stable"
                         };
-                        releases[result.target].push(descriptor);
+                        // Skip duplicate entries (e.g. both hyphen and underscore variants of same target+version)
+                        if (!releases[result.target_id].some(d => d.version === descriptor.version && d.status === descriptor.status)) {
+                            releases[result.target_id].push(descriptor);
+                        }
                     });
                 });
             }
@@ -290,7 +344,7 @@ firmwareFlasherTab.initialize = function (callback) {
                             selectTargets.push(target);
                             var select_e =
                                     $("<option value='{0}'>{1}</option>".format(
-                                            descriptor.raw_target,
+                                            descriptor.target_id,
                                             descriptor.target
                                     )).data('summary', descriptor);
                             boards_e.append(select_e);
@@ -325,6 +379,7 @@ firmwareFlasherTab.initialize = function (callback) {
 
                 $("a.load_remote_file").addClass('disabled');
                 var target = $(this).children("option:selected").val();
+                var targetDisplay = $(this).children("option:selected").text();
 
                 if (!GUI.connect_lock) {
                     $('.progress').val(0).removeClass('valid invalid');
@@ -337,7 +392,7 @@ firmwareFlasherTab.initialize = function (callback) {
                     if(target == 0) {
                         versions_e.append($("<option value='0'>{0}</option>".format(i18n.getMessage('firmwareFlasherOptionLabelSelectFirmwareVersion'))));
                     } else {
-                        versions_e.append($("<option value='0'>{0} {1}</option>".format(i18n.getMessage('firmwareFlasherOptionLabelSelectFirmwareVersionFor'), target)));
+                        versions_e.append($("<option value='0'>{0} {1}</option>".format(i18n.getMessage('firmwareFlasherOptionLabelSelectFirmwareVersionFor'), targetDisplay)));
                     }
 
                     if (typeof firmwareFlasherTab.releases[target]?.forEach === 'function') {
@@ -397,6 +452,7 @@ firmwareFlasherTab.initialize = function (callback) {
                         parsed_hex = data;
 
                         if (parsed_hex) {
+                            localFirmwareLoaded = true;
                             $('a.flash_firmware').removeClass('disabled');
 
                             $('span.progressLabel').text('Loaded Local Firmware: (' + parsed_hex.bytes_total + ' bytes)');
@@ -433,6 +489,7 @@ firmwareFlasherTab.initialize = function (callback) {
 
             function process_hex(data, summary) {
                 intel_hex = data;
+                localFirmwareLoaded = false;
 
                 parse_hex(intel_hex, function (data) {
                     parsed_hex = data;
@@ -521,10 +578,78 @@ firmwareFlasherTab.initialize = function (callback) {
                 if (!GUI.connect_lock) { // button disabled while flashing is in progress
                     if (parsed_hex != false) {
                         var options = {};
+                        var skipAutoRestore = false;
 
                         if ($('input.erase_chip').is(':checked')) {
                             options.erase_chip = true;
                         }
+
+                        var originalPort = String($('div#port-picker #port').val());
+                        var originalBaud = parseInt($('div#port-picker #baud').val());
+
+                        var currentVersion = (FC.CONFIG && FC.CONFIG.flightControllerVersion) ? FC.CONFIG.flightControllerVersion : null;
+                        var selectedSummary = $('select[name="firmware_version"] option:selected').data('summary');
+                        var targetVersion = (!localFirmwareLoaded && selectedSummary) ? semver.clean(selectedSummary.version) : null;
+                        var isMinorOrMajorUpdate = false;
+
+                        if (currentVersion && targetVersion && semver.valid(currentVersion) && semver.valid(targetVersion)) {
+                            var diffType = semver.diff(currentVersion, targetVersion);
+                            if (diffType && diffType !== 'patch' && diffType !== 'prepatch' && diffType !== 'prerelease') {
+                                isMinorOrMajorUpdate = true;
+                            }
+                        }
+
+                        if (isMinorOrMajorUpdate && !options.erase_chip) {
+                            showVersionWarning(currentVersion, targetVersion, function onContinue() {
+                                skipAutoRestore = true;
+                                proceedWithFlash();
+                            });
+                            return; // wait for user decision
+                        }
+
+                        proceedWithFlash();
+                        return;
+
+                        function showVersionWarning(fromVer, toVer, onContinue) {
+                            var $warn = $('#version-warning-overlay');
+                            $warn.find('.version-warning-overlay__text').text(
+                                i18n.getMessage('firmwareFlasherVersionWarningText', [fromVer, toVer])
+                            );
+                            $warn.removeClass('is-hidden');
+                            i18n.localize($warn);
+
+                            var $continueBtn = $warn.find('.version-warning-overlay__btn--continue');
+                            var $cancelBtn = $warn.find('.version-warning-overlay__btn--cancel');
+
+                            function cleanup() {
+                                $continueBtn.off('click.versionWarn');
+                                $cancelBtn.off('click.versionWarn');
+                                $warn.addClass('is-hidden');
+                            }
+
+                            $cancelBtn.on('click.versionWarn', function(e) {
+                                e.preventDefault();
+                                cleanup();
+                            });
+
+                            $continueBtn.on('click.versionWarn', function(e) {
+                                e.preventDefault();
+                                cleanup();
+                                onContinue();
+                            });
+                        }
+
+                        function proceedWithFlash() {
+                        BackupRestore.clearLastAutoBackup();
+
+                        var restoreFlow = new FlashRestoreFlow({
+                            options,
+                            skipAutoRestore,
+                            originalPort,
+                            originalBaud,
+                            targetVersion,
+                            disconnectSafely,
+                        });
 
                         if (String($('div#port-picker #port').val()) != 'DFU') {
                             if (String($('div#port-picker #port').val()) != '0') {
@@ -554,20 +679,182 @@ firmwareFlasherTab.initialize = function (callback) {
                                     baud = parseInt($('#flash_manual_baud_rate').val());
                                 }
 
+                                if (!options.no_reboot) {
+                                    options.onCliReady = BackupRestore.createOnCliReadyHandler(function(msgKey) {
+                                        $('span.progressLabel').text(i18n.getMessage(msgKey));
+                                    });
+                                }
 
-                                STM32.connect(port, baud, parsed_hex, options);
+                                STM32.connect(port, baud, parsed_hex, options, () => restoreFlow.onFlashComplete());
                             } else {
                                 console.log('Please select valid serial port');
                                 GUI.log(i18n.getMessage('selectValidSerialPort'));
                             }
                         } else {
-                            STM32DFU.connect(usbDevices, parsed_hex, options);
+                            STM32DFU.connect(usbDevices, parsed_hex, options, () => restoreFlow.onFlashComplete());
                         }
+
+                        } // end proceedWithFlash
+
                     } else {
                         $('span.progressLabel').text(i18n.getMessage('firmwareFlasherFirmwareNotLoaded'));
                     }
                 }
             }
+        });
+
+        $('a.backup_config').on('click', function () {
+            if (GUI.connect_lock) return;
+
+            var port = String($('div#port-picker #port').val());
+            if (port === '0' || port === 'DFU') {
+                GUI.log(i18n.getMessage('selectValidSerialPort'));
+                return;
+            }
+
+            $('span.progressLabel').text(i18n.getMessage('backupRestoreStatusConnecting'));
+
+            var rebootBaud = parseInt($('div#port-picker #baud').val());
+            GUI.connect_lock = true;
+
+            CONFIGURATOR.connection.connect(port, {bitrate: rebootBaud}, function(openInfo) {
+                if (!openInfo) {
+                    GUI.connect_lock = false;
+                    GUI.log(i18n.getMessage('failedToOpenSerialPort'));
+                    return;
+                }
+
+                BackupRestore.performBackupToFile(function(msgKey) {
+                    $('span.progressLabel').text(i18n.getMessage(msgKey));
+                }).then(function(result) {
+                    if (result) {
+                        GUI.log(i18n.getMessage('backupRestoreBackupSaved', [result.filePath]));
+                        $('span.progressLabel').text(i18n.getMessage('backupRestoreBackupComplete'));
+                    } else {
+                        $('span.progressLabel').text(i18n.getMessage('backupRestoreBackupCancelled'));
+                    }
+                    disconnectSafely(function() {
+                        GUI.connect_lock = false;
+                    });
+                }).catch(function(err) {
+                    console.error('Backup failed:', err);
+                    GUI.log(i18n.getMessage('backupRestoreBackupFailed'));
+                    $('span.progressLabel').text(i18n.getMessage('backupRestoreBackupFailed'));
+                    disconnectSafely(function() {
+                        GUI.connect_lock = false;
+                    });
+                });
+            });
+        });
+
+        $('a.restore_config').on('click', async function () {
+            if (GUI.connect_lock) return;
+
+            var port = String($('div#port-picker #port').val());
+            if (port === '0' || port === 'DFU') {
+                GUI.log(i18n.getMessage('selectValidSerialPort'));
+                return;
+            }
+
+            var backupDir = await window.electronAPI.getBackupDir();
+            var fileResult = await window.electronAPI.showOpenDialog({
+                defaultPath: backupDir,
+                filters: [
+                    { name: 'CLI/TXT', extensions: ['cli', 'txt'] },
+                    { name: 'ALL', extensions: ['*'] },
+                ],
+                properties: ['openFile'],
+            });
+
+            if (fileResult.canceled || !fileResult.filePaths || fileResult.filePaths.length === 0) {
+                $('span.progressLabel').text(i18n.getMessage('backupRestoreRestoreCancelled'));
+                return;
+            }
+
+            var fileResponse = await window.electronAPI.readFile(fileResult.filePaths[0]);
+            if (fileResponse.error) {
+                GUI.log(i18n.getMessage('backupRestoreRestoreFailed'));
+                $('span.progressLabel').text(i18n.getMessage('backupRestoreRestoreFailed'));
+                return;
+            }
+
+            var fileData = fileResponse.data;
+
+            var $overlay = $('#restore-overlay');
+            var $overlayStatus = $overlay.find('.restore-overlay__status');
+            var $overlayFill = $overlay.find('.restore-overlay__progress-fill');
+            var $overlayText = $overlay.find('.restore-overlay__progress-text');
+            $overlayFill.css('width', '0%');
+            $overlayText.text('');
+            $overlayStatus.text(i18n.getMessage('backupRestoreStatusConnecting'));
+            $overlay.removeClass('is-hidden');
+
+            $('span.progressLabel').text(i18n.getMessage('backupRestoreStatusConnecting'));
+
+            var rebootBaud = parseInt($('div#port-picker #baud').val());
+            GUI.connect_lock = true;
+
+            CONFIGURATOR.connection.connect(port, {bitrate: rebootBaud}, function(openInfo) {
+                if (!openInfo) {
+                    $overlay.addClass('is-hidden');
+                    GUI.connect_lock = false;
+                    GUI.log(i18n.getMessage('failedToOpenSerialPort'));
+                    return;
+                }
+
+                $overlayStatus.text(i18n.getMessage('backupRestoreStatusConnecting'));
+                MSP.disconnect_cleanup();
+                var mspListener = function(info) { MSP.read(info); };
+                CONFIGURATOR.connection.addOnReceiveCallback(mspListener);
+
+                var versionQueryDone = false;
+                var versionQueryTimeout = setTimeout(function() {
+                    if (!versionQueryDone) {
+                        versionQueryDone = true;
+                        CONFIGURATOR.connection.removeOnReceiveCallback(mspListener);
+                        console.warn('MSP_FC_VERSION query timed out, using cached version');
+                        proceedAfterVersionQuery();
+                    }
+                }, 3000);
+
+                MSP.send_message(MSPCodes.MSP_FC_VERSION, false, false, function() {
+                    if (!versionQueryDone) {
+                        versionQueryDone = true;
+                        clearTimeout(versionQueryTimeout);
+                        CONFIGURATOR.connection.removeOnReceiveCallback(mspListener);
+                        proceedAfterVersionQuery();
+                    }
+                });
+
+                function proceedAfterVersionQuery() {
+                    var currentFcVersion = FC.CONFIG.flightControllerVersion;
+                    var { dataToRestore, migrationResult } = prepareRestoreData(fileData, currentFcVersion);
+
+                    if (migrationResult && (migrationResult.summary.totalChanges > 0 ||
+                                           migrationResult.summary.warnings.length > 0)) {
+                        $overlay.addClass('is-hidden');
+                        showMigrationPreview(migrationResult.summary, function onContinue() {
+                            GUI.log(i18n.getMessage('backupRestoreMigrationApplied', [
+                                migrationResult.summary.fromVersion,
+                                migrationResult.summary.toVersion,
+                                migrationResult.summary.totalChanges.toString()
+                            ]));
+                            $overlay.removeClass('is-hidden');
+                            executeRestore(port, rebootBaud, dataToRestore, $overlay, { disconnectSafely });
+                        }, function onCancel() {
+                            $('span.progressLabel').text(i18n.getMessage('backupRestoreRestoreCancelled'));
+                            disconnectSafely(function() { GUI.connect_lock = false; });
+                        });
+                    } else {
+                        executeRestore(port, rebootBaud, dataToRestore, $overlay, { disconnectSafely });
+                    }
+                }
+            });
+        });
+
+        $('a.open_backups_folder').on('click', function (e) {
+            e.preventDefault();
+            window.electronAPI.openBackupDir();
         });
 
         $(document).on('click', 'span.progressLabel a.save_firmware', function () {
@@ -828,7 +1115,7 @@ firmwareFlasherTab.onOpen = async function(openInfo) {
         MSP.send_message(MSPCodes.MSP_API_VERSION, false, false, function () {
             
             if (FC.CONFIG.apiVersion === "0.0.0") {
-                GUI_control.prototype.log("Cannot prefetch target: <span style='color: red; font-weight: bolder'><strong>" + i18n.getMessage("illegalStateRestartRequired") + "</strong></span>");
+                GUI.log("Cannot prefetch target: <span style='color: red; font-weight: bolder'><strong>" + i18n.getMessage("illegalStateRestartRequired") + "</strong></span>");
                 FC.restartRequired = true;
                 return;
             }
@@ -864,14 +1151,15 @@ firmwareFlasherTab.onValidFirmware = function() {
     MSP.send_message(MSPCodes.MSP_BUILD_INFO, false, false, function () {
         MSP.send_message(MSPCodes.MSP_BOARD_INFO, false, false, function () {
             var boardSelect = $('select[name="board"]');
-            boardSelect.val(FC.CONFIG.target);
+            var normalizedTarget = normalizeTargetName(FC.CONFIG.target);
+            boardSelect.val(normalizedTarget);
 
             GUI.log(i18n.getMessage('targetPrefetchsuccessful') + FC.CONFIG.target);
 
             firmwareFlasherTab.closeTempConnection();
 
             // Only trigger change if the board was actually found and selected
-            if (boardSelect.val() === FC.CONFIG.target) {
+            if (boardSelect.val() === normalizedTarget) {
                 boardSelect.trigger('change');
             }
         });

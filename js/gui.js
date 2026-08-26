@@ -6,6 +6,8 @@ import interval from './intervals';
 import { scaleRangeInt } from './helpers';
 import i18n from './localization';
 import mspDeduplicationQueue from "./msp/mspDeduplicationQueue";
+import mspQueue from './serial_queue';
+
 var GUI_control = function () {
     this.connecting_to = false;
     this.connected_to = false;
@@ -18,6 +20,7 @@ var GUI_control = function () {
         'firmware_flasher',
         'mission_control',
         'sitl',
+        'map_generator',
         'help'
     ];
     this.defaultAllowedTabsWhenConnected = [
@@ -92,6 +95,13 @@ GUI_control.prototype.log = function (message) {
 // default switch doesn't require callback to be set
 GUI_control.prototype.tab_switch_cleanup = function (callback) {
     MSP.callbacks_cleanup(); // we don't care about any old data that might or might not arrive
+    // Drop the previous tab's still-queued requests and release the port lock,
+    // otherwise they keep retrying and re-reserve their (shared) MSP code in the
+    // dedup queue, which then rejects the new tab's same-code requests and hangs
+    // its load.
+    mspQueue.flush();
+    mspQueue.freeHardLock();
+    mspQueue.freeSoftLock();
     mspDeduplicationQueue.flush();
 
     interval.killAll(['global_data_refresh', 'msp-load-update', 'ltm-connection-check']);
@@ -448,17 +458,17 @@ GUI_control.prototype.sliderize = function ($input, value, min, max) {
 GUI_control.prototype.update_dataflash_global = function () {
     function formatFilesize(bytes) {
         if (bytes < 1024) {
-            return bytes + "B";
+            return Math.round(bytes / 1024) + " KB";
         }
         var kilobytes = bytes / 1024;
 
         if (kilobytes < 1024) {
-            return Math.round(kilobytes) + "kB";
+            return Math.round(kilobytes) + " KB";
         }
 
         var megabytes = kilobytes / 1024;
 
-        return megabytes.toFixed(1) + "MB";
+        return megabytes.toFixed(1) + " MB";
     }
 
     var supportsDataflash = FC.DATAFLASH.totalSize > 0;
@@ -476,7 +486,10 @@ GUI_control.prototype.update_dataflash_global = function () {
         width: (100-(FC.DATAFLASH.totalSize - FC.DATAFLASH.usedSize) / FC.DATAFLASH.totalSize * 100) + "%",
         display: 'block'
         });
-        $(".dataflash-free_global div").html(i18n.getMessage('sensorDataFlashFreeSpace') + formatFilesize(FC.DATAFLASH.totalSize - FC.DATAFLASH.usedSize));
+        $(".dataflash-free_global_label").css({
+        display: 'block'
+        });
+        $(".dataflash-free_global_label").html(i18n.getMessage('sensorDataFlashFreeSpace') + formatFilesize(FC.DATAFLASH.totalSize - FC.DATAFLASH.usedSize) + " free");
     } else {
         $(".noflash_global").css({
         display: 'block'
@@ -485,11 +498,20 @@ GUI_control.prototype.update_dataflash_global = function () {
         $(".dataflash-contents_global").css({
         display: 'none'
         });
+
+        $(".dataflash-free_global_label").css({
+        display: 'none'
+        });
     }
 };
 
 
 // initialize object into GUI variable
 var GUI = new GUI_control();
+
+// Shared tab registry — populated by each tab module as a side effect.
+// Only tabs/map_generator.js still uses this pattern (not yet migrated to
+// the static-import default-export convention used by the other tabs).
+export const TABS = {};
 
 export default GUI;

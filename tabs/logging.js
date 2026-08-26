@@ -19,7 +19,7 @@ loggingTab.initialize = function (callback) {
     let loggingFileName = null;
     let readyToWrite = false;
 
-    
+
     const maxWebLogFileSize = 1024 * 1024; // 1 MB
     let webFileBuffer = [];
     let webFileCount = 1;
