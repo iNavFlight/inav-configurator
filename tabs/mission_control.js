@@ -2205,6 +2205,7 @@ function iconKey(filename) {
         }
 
         $('#elevationValueAtWP').text(elevation);
+        rememberTerrain(wp, elevation);
 
         let clearance = 'NO HOME';
         if (missionControlTab.isBitSet(wp.getP3(), MWNP.P3.ALT_TYPE)) {
@@ -2289,6 +2290,7 @@ function iconKey(filename) {
             return;
         }
 
+        rememberTerrain(waypoint, elevation);
         waypoint.setP3(missionControlTab.setBit(waypoint.getP3(), MWNP.P3.ALT_TYPE, true));
         waypoint.setAlt(Math.round(Number(settings.alt) + elevation * 100));
     }
@@ -2429,6 +2431,7 @@ function iconKey(filename) {
             const terrain = await fetchWaypointElevations(waypoints);
             if (terrain) {
                 plan.terrainCm = terrain.map(e => e * 100);
+                waypoints.forEach((wp, i) => rememberTerrain(wp, terrain[i]));
             } else if (altitudeNeedsTerrain) {
                 // without terrain the altitude cannot be placed above it; the switch and
                 // the speed still go ahead
@@ -2554,6 +2557,68 @@ function iconKey(filename) {
     function collectionChangedSince(snapshot) {
         const current = mission.get();
         return current.length !== snapshot.length || current.some((wp, i) => wp !== snapshot[i]);
+    }
+
+    /* The ground a waypoint was last measured against. Dragged somewhere else it should
+       keep its height above the ground it flies over, not its height above the sea, and
+       that needs the ground it had before the move. Keyed by the waypoint itself, so a
+       deleted one takes its entry with it. */
+    const terrainUnderWaypoint = new WeakMap();
+    function rememberTerrain(wp, elevationMeters) {
+        const value = Number(elevationMeters);
+        if (!Number.isNaN(value)) terrainUnderWaypoint.set(wp, value * 100);
+    }
+
+    /* A dragged waypoint now sits over different ground. Measured from the sea its number
+       says nothing about how high it flies any more, so it keeps the clearance it had and
+       the altitude follows the new terrain. Measured from home the terrain never entered
+       into the number, so only the sanity check applies, as before. */
+    async function settleDraggedWaypoint(wp, isSelected) {
+        if (!wp) return;
+
+        const groundBeforeCm = terrainUnderWaypoint.get(wp);
+        let elevationAtWP = Number.NaN;
+        try {
+            elevationAtWP = Number(await wp.getElevation(globalSettings));
+        } catch (error) {
+            console.warn('elevation lookup failed:', error.message);
+        }
+        if (Number.isNaN(elevationAtWP)) {
+            plotElevation();
+            return;
+        }
+        rememberTerrain(wp, elevationAtWP);
+
+        if (groundBeforeCm !== undefined && missionControlTab.isBitSet(wp.getP3(), MWNP.P3.ALT_TYPE)) {
+            wp.setAlt(Math.round(elevationAtWP * 100 + (wp.getAlt() - groundBeforeCm)));
+        }
+        wp.setAlt(checkAltElevSanity(false, wp.getAlt(), elevationAtWP, wp.getP3()));
+
+        if (wp.getAction() == MWNP.WPTYPE.LAND) {
+            const approach = FC.FW_APPROACH.get()[FC.SAFEHOMES.getMaxSafehomeCount() + wp.getMultiMissionIdx()];
+            if (approach.getIsSeaLevelRef()) {
+                if (approach.getElevation() != 0) {
+                    approach.setApproachAltAsl(approach.getApproachAltAsl() - approach.getElevation() + elevationAtWP * 100);
+                    approach.setLandAltAsl(approach.getLandAltAsl() - approach.getElevation() + elevationAtWP * 100);
+                }
+                approach.setElevation(elevationAtWP * 100);
+                if (isSelected) {
+                    $('#wpApproachAlt').val(approach.getApproachAltAsl());
+                    $('#wpLandAlt').val(approach.getLandAltAsl());
+                    $('#wpLandAltM').text(approach.getLandAltAsl() / 100 + " m");
+                    $('#wpApproachAltM').text(approach.getApproachAltAsl() / 100 + " m");
+                }
+            }
+        }
+
+        mission.updateWaypoint(wp);
+        renderWaypointSelect();
+        if (isSelected && selectedMarker === wp) {
+            $('#elevationValueAtWP').text(elevationAtWP);
+            syncEditPanelWithSelection();
+            refreshGroundClearanceDisplay(elevationAtWP);
+        }
+        plotElevation();
     }
 
     /* Some editor fields check what was typed and keep the stored value when it does not
@@ -3148,34 +3213,8 @@ function iconKey(filename) {
         app.handleUpEvent = function (evt) {
             if (tempMarker.kind == "waypoint") {
                 renderWaypointSelect();
-                if (selectedMarker != null && tempMarker.number == selectedMarker.getLayerNumber()) {
-                    (async () => {
-                        const elevationAtWP = await mission.getWaypoint(tempMarker.number).getElevation(globalSettings);
-                        $('#elevationValueAtWP').text(elevationAtWP);
-                        const returnAltitude = checkAltElevSanity(false, mission.getWaypoint(tempMarker.number).getAlt(), elevationAtWP, mission.getWaypoint(tempMarker.number).getP3());
-                        mission.getWaypoint(tempMarker.number).setAlt(returnAltitude);
-
-                        if (mission.getWaypoint(tempMarker.number).getAction() == MWNP.WPTYPE.LAND) {
-                            let approach = FC.FW_APPROACH.get()[FC.SAFEHOMES.getMaxSafehomeCount() + mission.getWaypoint(tempMarker.number).getMultiMissionIdx()];
-                            if (approach.getIsSeaLevelRef()) {
-                                if (approach.getElevation() != 0) {
-                                    approach.setApproachAltAsl(approach.getApproachAltAsl() - approach.getElevation() + elevationAtWP * 100);
-                                    approach.setLandAltAsl(approach.getLandAltAsl() - approach.getElevation() + elevationAtWP * 100);
-                                }
-                                approach.setElevation(elevationAtWP * 100);
-                                $('#wpApproachAlt').val(approach.getApproachAltAsl());
-                                $('#wpLandAlt').val(approach.getLandAltAsl);
-                                $('#wpLandAltM').text(approach.getLandAltAsl() / 100 + " m");
-                                $('#wpApproachAltM').text(approach.getApproachAltAsl() / 100 + " m");
-                            }
-                        }
-
-                        plotElevation();
-                    })()
-                } else {
-                    // Update elevation chart even for non-selected waypoints
-                    plotElevation();
-                }
+                settleDraggedWaypoint(mission.getWaypoint(tempMarker.number),
+                                      selectedMarker != null && tempMarker.number == selectedMarker.getLayerNumber());
             }
             else if (tempMarker.kind == "home" ) {
                 (async () => {
