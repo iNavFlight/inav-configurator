@@ -2100,6 +2100,7 @@ function iconKey(filename) {
                 if (selectedMarker !== wp) return;
 
                 $('#elevationValueAtWP').text(elevationAtWP);
+                rememberTerrain(wp, elevationAtWP);
                 const returnAltitude = checkAltElevSanity(false, wp.getAlt(), elevationAtWP, P3Value);
                 wp.setAlt(returnAltitude);
 
@@ -2569,6 +2570,24 @@ function iconKey(filename) {
         if (!Number.isNaN(value)) terrainUnderWaypoint.set(wp, value * 100);
     }
 
+    /* A waypoint that was never looked at has no remembered ground, and once the drag has
+       moved it its old coordinates are gone for good. So the question is asked the moment
+       it is picked up, while it still stands where it stood. */
+    let groundBeforeDragCm = Promise.resolve(undefined);
+    function captureGroundBeforeDrag(wp) {
+        const known = wp ? terrainUnderWaypoint.get(wp) : undefined;
+        if (!wp || known !== undefined) {
+            groundBeforeDragCm = Promise.resolve(known);
+            return;
+        }
+        groundBeforeDragCm = wp.getElevation(globalSettings)
+            .then(elevation => (Number.isNaN(Number(elevation)) ? undefined : Number(elevation) * 100))
+            .catch(error => {
+                console.warn('elevation lookup failed:', error.message);
+                return undefined;
+            });
+    }
+
     /* A dragged waypoint now sits over different ground. Measured from the sea its number
        says nothing about how high it flies any more, so it keeps the clearance it had and
        the altitude follows the new terrain. Measured from home the terrain never entered
@@ -2576,7 +2595,7 @@ function iconKey(filename) {
     async function settleDraggedWaypoint(wp, isSelected) {
         if (!wp) return;
 
-        const groundBeforeCm = terrainUnderWaypoint.get(wp);
+        const groundBeforeCm = await groundBeforeDragCm;
         let elevationAtWP = Number.NaN;
         try {
             elevationAtWP = Number(await wp.getElevation(globalSettings));
@@ -3108,6 +3127,9 @@ function iconKey(filename) {
                 this.feature_ = feature;
                 this.layer_ = tempMarker;
             }
+
+            captureGroundBeforeDrag(feature && tempMarker?.kind == "waypoint"
+                ? mission.getWaypoint(tempMarker.number) : null);
 
             return !!feature;
         };
@@ -3778,6 +3800,7 @@ function iconKey(filename) {
                     if (selectedMarker !== wp) return;
 
                     $('#elevationValueAtWP').text(elevationAtWP);
+                    rememberTerrain(wp, elevationAtWP);
                     var altitude = Number($('#pointAlt').val());
 
                     if (P3Value != selectedMarker.getP3()) {
