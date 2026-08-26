@@ -5006,14 +5006,14 @@
     "missionApplyNoElevation": {
         "message": "H\u00f6henabfrage fehlgeschlagen, H\u00f6hen wurden nicht ge\u00e4ndert"
     },
-    "missionApplyHomeRequired": {
-        "message": "Zuerst Home setzen: die H\u00f6henreferenz wird von dort aus gemessen"
-    },
     "missionApplyMissionChanged": {
         "message": "Die Mission hat sich w\u00e4hrend der H\u00f6henabfrage ge\u00e4ndert, es wurde nichts gespeichert"
     },
     "missionApplyViaHome": {
         "message": "Meeresspiegel-Referenz auf $1 Wegpunkt(e) angewendet, umgerechnet \u00fcber die Home-H\u00f6he"
+    },
+    "missionApplyViaTerrain": {
+        "message": "Meeresspiegel-Referenz auf $1 Wegpunkt(e) angewendet, umgerechnet \u00fcber die Gel\u00e4ndeh\u00f6he je Wegpunkt"
     },
     "missionApplyAltApplied": {
         "message": "Standardh\u00f6he auf $1 Wegpunkt(e) angewendet"

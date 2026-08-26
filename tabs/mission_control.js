@@ -2385,8 +2385,11 @@ function iconKey(filename) {
     }
 
     function writeDefaultsToWaypoint(wp, index, plan) {
-        const conversionCm = plan.homeCm ?? 0;
         if (plan.switchMoved && missionControlTab.isBitSet(wp.getP3(), MWNP.P3.ALT_TYPE) != plan.toAbsolute) {
+            // Home is the exact datum and keeps the flown path identical. Without it the
+            // terrain under the waypoint stands in, which is the ground the point
+            // editor's own switch measures from, and keeps the height above it.
+            const conversionCm = plan.homeCm ?? plan.terrainCm[index];
             wp.setP3(missionControlTab.setBit(wp.getP3(), MWNP.P3.ALT_TYPE, plan.toAbsolute));
             wp.setAlt(Math.round(wp.getAlt() + (plan.toAbsolute ? conversionCm : -conversionCm)));
             convertLandingApproach(wp, plan.toAbsolute, conversionCm);
@@ -2412,7 +2415,6 @@ function iconKey(filename) {
     async function resolveGroundsForDefaults(waypoints, plan, onAltitudeUnavailable) {
         if (plan.switchMoved) {
             plan.homeCm = await resolveHomeElevationCm();
-            if (plan.homeCm === null) return false;
         }
 
         const altitudeNeedsTerrain = plan.applyAlt && (plan.switchMoved
@@ -2434,7 +2436,10 @@ function iconKey(filename) {
                 onAltitudeUnavailable();
             }
         }
-        return true;
+
+        // The conversion needs one datum or the other. With neither there is nothing to
+        // measure from, so nothing is written.
+        return !plan.switchMoved || plan.homeCm !== null || plan.terrainCm !== null;
     }
 
     function reportDefaultsApplied(plan, count, belowGround) {
@@ -2443,7 +2448,8 @@ function iconKey(filename) {
         if (plan.speedChanged) $('#MPapplySpeedSaved').show();
 
         if (plan.switchMoved) {
-            GUI.log(i18n.getMessage('missionApplyViaHome', [String(count)]));
+            GUI.log(i18n.getMessage(plan.homeCm !== null ? 'missionApplyViaHome' : 'missionApplyViaTerrain',
+                                    [String(count)]));
         }
         if (plan.applyAlt) GUI.log(i18n.getMessage('missionApplyAltApplied', [String(count)]));
         if (plan.speedChanged) GUI.log(i18n.getMessage('missionApplySpeedApplied', [String(count)]));
@@ -2492,7 +2498,7 @@ function iconKey(filename) {
             }
             if (plan.applyAlt) revertAltitude();
             changeSwitch($('#MPapplySlrValue'), seaLevelSwitchOnOpen);
-            GUI.log(i18n.getMessage('missionApplyHomeRequired'));
+            GUI.log(i18n.getMessage('missionApplyNoElevation'));
             return;
         }
 
