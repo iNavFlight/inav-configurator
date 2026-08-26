@@ -294,6 +294,14 @@ NODE_ENV=development yarn start   # Dev mode (Electron)
 # Press Ctrl+Shift+I for DevTools
 ```
 
+For CDP-based automated testing (e.g. chrome-devtools MCP tools) or when you need to confirm the dev-mode process actually launched (a backgrounded `yarn start`/`electron-forge start` isn't always observable via `ps`/`pgrep`), run with an explicit remote-debugging port:
+
+```bash
+ENABLE_REMOTE_DEBUGGING=1 NODE_ENV=development npx electron-forge start -- --remote-debugging-port=9222
+```
+
+Then connect to `localhost:9222`. The same `--remote-debugging-port=9222` flag also works against a packaged build (`out/*/inav-configurator --remote-debugging-port=9222`) — useful since dev mode (Vite dev server) and a packaged build (`electron-forge package`, Rollup-bundled) can diverge on bundling-specific bugs that won't reproduce in dev mode.
+
 ---
 
 ## Progressive Web App (PWA) Migration
