@@ -2461,15 +2461,18 @@ function iconKey(filename) {
     }
 
     async function applyMissionDefaultsLocked(oldAlt, oldSpeed) {
+        /* Saving writes the defaults into the mission whether or not the fields were
+           touched. After a waypoint has been dragged or edited by hand, pressing save is
+           how the pilot puts the whole mission back onto the defaults - a button that
+           quietly does nothing because the field still reads the same is no help. */
         const plan = {
             toAbsolute: $('#MPapplySlrValue').prop('checked'),
-            speedChanged: settings.speed !== oldSpeed,
-            applyAlt: settings.alt !== oldAlt,
+            speedChanged: true,
+            applyAlt: true,
             homeCm: null,
             terrainCm: null,
         };
         plan.switchMoved = plan.toAbsolute !== seaLevelSwitchOnOpen;
-        if (!plan.switchMoved && !plan.applyAlt && !plan.speedChanged) return;
 
         const waypoints = wpListSelectableWaypoints();
         if (!waypoints.length) {
@@ -3208,8 +3211,16 @@ function iconKey(filename) {
         /**
          * @param {ol.MapBrowserEvent} evt Event.
          */
+        // Asking what lies under the cursor reads pixels back from the map, which Chrome
+        // warns about once per read; on every mouse move that is thousands of warnings in
+        // a session. A few checks per second is as much as a cursor change needs.
+        let lastHoverCheckAt = 0;
         app.handleMoveEvent = function (evt) {
             if (this.cursor_) {
+                const now = Date.now();
+                if (now - lastHoverCheckAt < 150) return;
+                lastHoverCheckAt = now;
+
                 var map = evt.map;
                 var feature = map.forEachFeatureAtPixel(evt.pixel,
                     function (feature, layer) {
