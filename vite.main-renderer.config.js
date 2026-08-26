@@ -13,13 +13,13 @@ export default defineConfig((env) => {
     root,
     mode,
     base: './',
-    assetsInclude: ['**/*.gltf', '**/*.glb'],
+    assetsInclude: ['**/*.gltf', '**/*.glb', '**/*.wasm'],
     build: {
       outDir: `.vite/renderer/${name}`,
       assetsInlineLimit: Number.MAX_SAFE_INTEGER,
       chunkSizeWarningLimit: 10240,
       rollupOptions: {
-        external: [/.*\/web\/.*/],
+        external: ['virtual:pwa-register'],
       }
     },
     plugins: [
