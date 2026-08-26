@@ -1,3 +1,4 @@
+import { registerSW } from 'virtual:pwa-register';
 import {bridge, Platform} from '../bridge';
 import i18n from '../localization';
 import dialog from '../dialog';
@@ -9,9 +10,8 @@ const browser = {
     updateNotification: null,
     offlineNotification: null,
 
-    registerSW: async function() {
+    registerSW: function() {
         const self = this;
-        const { registerSW } = await import('virtual:pwa-register');
         const updateSW = registerSW({
             onNeedRefresh() {
                 dialog.confirm(i18n.getMessage('pwaUpdateNeedRefreshMessage')).then((result) => {
