@@ -72,7 +72,7 @@ const bridge = {
             const response = await window.electronAPI.readFile(file);
             return {
                 error: response.error,
-                data: response.error ? null : response.toString()
+                data: response.error ? null : response.data
             }
         } else {
             try {
