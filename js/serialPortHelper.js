@@ -45,6 +45,11 @@ const serialPortHelper = (function () {
             isUnique: true
         },
         {
+            name: 'RX_SERIAL_SECONDARY',
+            groups: ['rx'],
+            isUnique: true
+        },
+        {
             name: 'BLACKBOX',
             groups: ['peripherals']
         },
@@ -156,6 +161,7 @@ const serialPortHelper = (function () {
         'RUNCAM_DEVICE_CONTROL': 10,
         'TBS_SMARTAUDIO': 11,
         'IRC_TRAMP': 12,
+        'RX_SERIAL_SECONDARY': 13,
         'OPFLOW': 14,
         'LOG': 15,
         'RANGEFINDER': 16,

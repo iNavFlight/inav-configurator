@@ -2065,6 +2065,24 @@ OSD.constants = {
                     positionable: true,
                     preview: FONT.symbol(SYM.RX_MODE) + '150HZ '
                 },
+                {
+                    name: 'ACTIVE_RX_LINK',
+                    id: 171,
+                    positionable: true,
+                    preview: 'RX:1'
+                },
+                {
+                    name: 'RX1_LINK_STATS',
+                    id: 172,
+                    positionable: true,
+                    preview: 'RX1 LQ100'
+                },
+                {
+                    name: 'RX2_LINK_STATS',
+                    id: 173,
+                    positionable: true,
+                    preview: 'RX2 LQ100'
+                },
             ]
         },
         {

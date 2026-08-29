@@ -35,9 +35,9 @@
         </div>
         <div class="fc_column half" style="margin-left: 20px;">
             
-            <div class="gui_box grey config-section">
+            <div class="gui_box grey config-section receiver-primary">
                 <div class="gui_box_titlebar">
-                    <div class="spacer_box_title" data-i18n="configurationReceiver"></div>
+                    <div class="spacer_box_title receiver-primary-title" data-i18n="configurationReceiver"></div>
                 </div>
                 <div class="spacer_box">
                     <div class="select">
@@ -65,6 +65,64 @@
                                 <span data-i18n="serialrx_halfduplex"></span>
                             </label>
                         </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="gui_box grey config-section receiver-secondary is-hidden">
+                <div class="gui_box_titlebar">
+                    <div class="spacer_box_title" data-i18n="receiverSecondaryMode"></div>
+                </div>
+                <div class="spacer_box">
+                    <div class="select">
+                        <select id="receiver_type_rx2" data-setting="receiver_type_rx2"></select>
+                        <label for="receiver_type_rx2">
+                            <span data-i18n="receiverType"></span>
+                        </label>
+                    </div>
+                    <div id="serialrx_provider_rx2-wrapper">
+                        <div class="info-box ok-box" data-i18n="receiverSecondaryHelp"></div>
+                        <div class="select">
+                            <select id="serialrx_provider_rx2" data-setting="serialrx_provider_rx2"></select>
+                            <label for="serialrx_provider_rx2">
+                                <span data-i18n="configurationSerialRX"></span>
+                            </label>
+                        </div>
+                        <div class="select">
+                            <select id="serialrx_inverted_rx2" data-setting="serialrx_inverted_rx2"></select>
+                            <label for="serialrx_inverted_rx2">
+                                <span data-i18n="serialrx_inverted"></span>
+                            </label>
+                        </div>
+                        <div class="select">
+                            <select id="serialrx_halfduplex_rx2" data-setting="serialrx_halfduplex_rx2"></select>
+                            <label for="serialrx_halfduplex_rx2">
+                                <span data-i18n="serialrx_halfduplex"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="gui_box grey config-section receiver-dual-status is-hidden">
+                <div class="gui_box_titlebar">
+                    <div class="spacer_box_title" data-i18n="receiverDualStatusTitle"></div>
+                </div>
+                <div class="spacer_box receiver-dual-status-body">
+                    <div class="receiver-dual-status-row"><span data-i18n="receiverActiveLink"></span><strong class="receiver-dual-active"></strong></div>
+                    <div class="receiver-dual-status-row">
+                        <span>RX1</span>
+                        <span><strong class="receiver-dual-rx1"></strong><small class="receiver-dual-rx1-metrics"></small></span>
+                    </div>
+                    <div class="receiver-dual-status-row">
+                        <span>RX2</span>
+                        <span><strong class="receiver-dual-rx2"></strong><small class="receiver-dual-rx2-metrics"></small></span>
+                    </div>
+                    <div class="receiver-dual-status-row"><span data-i18n="receiverDualStatus"></span><strong class="receiver-dual-health"></strong></div>
+                    <div class="receiver-dual-status-row"><span data-i18n="receiverLastSwitch"></span><strong class="receiver-dual-last-switch"></strong></div>
+                    <div class="receiver-dual-actions">
+                        <a href="#" class="regular-button receiver-select-rx1" data-rx-link="0" data-i18n="receiverSelectRx1"></a>
+                        <a href="#" class="regular-button receiver-select-rx2" data-rx-link="1" data-i18n="receiverSelectRx2"></a>
                     </div>
                 </div>
             </div>

@@ -900,6 +900,24 @@ var mspHelper = (function () {
                 offset += 1;
                 FC.RX_CONFIG.receiver_type = data.getUint8(offset);
                 offset += 1;
+
+                FC.RX_CONFIG.dualRxExtensionAvailable = data.byteLength >= offset + 7;
+                if (FC.RX_CONFIG.dualRxExtensionAvailable) {
+                    FC.RX_CONFIG.dualRxEnabled = data.getUint8(offset++);
+                    FC.RX_CONFIG.receiverTypeSecondary = data.getUint8(offset++);
+                    FC.RX_CONFIG.serialrx_provider_secondary = data.getUint8(offset++);
+                    FC.RX_CONFIG.serialrx_inverted_secondary = data.getUint8(offset++);
+                    FC.RX_CONFIG.halfDuplexSecondary = data.getUint8(offset++);
+                    FC.RX_CONFIG.sbusSyncIntervalSecondary = data.getUint16(offset, true);
+                    offset += 2;
+                } else {
+                    FC.RX_CONFIG.dualRxEnabled = 0;
+                    FC.RX_CONFIG.receiverTypeSecondary = 0;
+                    FC.RX_CONFIG.serialrx_provider_secondary = 0;
+                    FC.RX_CONFIG.serialrx_inverted_secondary = 0;
+                    FC.RX_CONFIG.halfDuplexSecondary = 0;
+                    FC.RX_CONFIG.sbusSyncIntervalSecondary = 0;
+                }
                 break;
 
             case MSPCodes.MSP_FAILSAFE_CONFIG:
@@ -1665,6 +1683,105 @@ var mspHelper = (function () {
                 FC.OSD_CUSTOM_ELEMENTS.items.push(customElement);
                 break;
 
+            case MSPCodes.MSP2_INAV_GET_LINK_STATS: {
+                const status = FC.RX_LINK_STATUS;
+
+                // Clear the extension before parsing every response so a short,
+                // legacy, or future-version reply cannot leave stale Dual RX state
+                // or per-link metrics visible from an earlier response.
+                status.extensionVersion = 0;
+                status.active = null;
+                status.configuredMask = 0;
+                status.initializedMask = 0;
+                status.validMask = 0;
+                status.statsValidMask = 0;
+                status.dualStatus = 0;
+                status.lastSwitchReason = 0;
+                status.lastSwitchTimeMs = 0;
+                for (const linkStatus of status.links) {
+                    linkStatus.validFields = 0;
+                    linkStatus.linkQuality = 0;
+                    linkStatus.uplinkRSSI = 0;
+                    linkStatus.uplinkLQ = 0;
+                    linkStatus.uplinkSNR = 0;
+                    linkStatus.downlinkLQ = 0;
+                    linkStatus.rfMode = 0;
+                    linkStatus.uplinkTXPower = 0;
+                    linkStatus.downlinkTXPower = 0;
+                    linkStatus.activeAntenna = 0;
+                    linkStatus.band = '';
+                    linkStatus.mode = '';
+                }
+
+                if (data.byteLength < 3) {
+                    break;
+                }
+
+                let linkOffset = 0;
+                status.legacyUplinkRSSI = -data.getUint8(linkOffset++);
+                status.legacyUplinkLQ = data.getUint8(linkOffset++);
+                status.legacyUplinkSNR = data.getInt8(linkOffset++);
+
+                if (data.byteLength < 15) {
+                    break;
+                }
+
+                status.extensionVersion = data.getUint8(linkOffset++);
+                if (status.extensionVersion !== 1) {
+                    break;
+                }
+
+                status.active = data.getUint8(linkOffset++);
+                status.configuredMask = data.getUint8(linkOffset++);
+                status.initializedMask = data.getUint8(linkOffset++);
+                status.validMask = data.getUint8(linkOffset++);
+                status.statsValidMask = data.getUint8(linkOffset++);
+                status.dualStatus = data.getUint8(linkOffset++);
+                status.lastSwitchReason = data.getUint8(linkOffset++);
+                status.lastSwitchTimeMs = data.getUint32(linkOffset, true);
+                linkOffset += 4;
+
+                const readFixedString = function(length) {
+                    let value = '';
+                    for (let i = 0; i < length; i++) {
+                        const code = data.getUint8(linkOffset++);
+                        if (code !== 0) {
+                            value += String.fromCharCode(code);
+                        }
+                    }
+                    return value;
+                };
+
+                const LINK_BLOCK_SIZE = 25;
+                for (let link = 0; link < 2; link++) {
+                    if (linkOffset + LINK_BLOCK_SIZE > data.byteLength) {
+                        break;
+                    }
+                    const linkStatus = status.links[link];
+                    linkStatus.validFields = data.getUint16(linkOffset, true);
+                    linkOffset += 2;
+                    linkStatus.linkQuality = data.getUint16(linkOffset, true);
+                    linkOffset += 2;
+                    linkStatus.uplinkRSSI = data.getInt16(linkOffset, true);
+                    linkOffset += 2;
+                    linkStatus.uplinkLQ = data.getUint8(linkOffset++);
+                    linkStatus.uplinkSNR = data.getInt8(linkOffset++);
+                    linkStatus.downlinkLQ = data.getUint8(linkOffset++);
+                    linkStatus.rfMode = data.getUint8(linkOffset++);
+                    linkStatus.uplinkTXPower = data.getUint16(linkOffset, true);
+                    linkOffset += 2;
+                    linkStatus.downlinkTXPower = data.getUint16(linkOffset, true);
+                    linkOffset += 2;
+                    linkStatus.activeAntenna = data.getUint8(linkOffset++);
+                    linkStatus.band = readFixedString(4);
+                    linkStatus.mode = readFixedString(6);
+                }
+                break;
+            }
+
+            case MSPCodes.MSP2_INAV_SET_RX_LINK:
+                break;
+
             case MSPCodes.MSP2_INAV_GPS_UBLOX_COMMAND:
                 // Just and ACK from the fc.
                 break;
@@ -1962,6 +2079,15 @@ var mspHelper = (function () {
                 buffer.push(0);
                 // receiver type in FC.RX_CONFIG rather than in BF_CONFIG.features
                 buffer.push(FC.RX_CONFIG.receiver_type);
+                if (FC.RX_CONFIG.dualRxExtensionAvailable) {
+                    buffer.push(FC.RX_CONFIG.dualRxEnabled);
+                    buffer.push(FC.RX_CONFIG.receiverTypeSecondary);
+                    buffer.push(FC.RX_CONFIG.serialrx_provider_secondary);
+                    buffer.push(FC.RX_CONFIG.serialrx_inverted_secondary);
+                    buffer.push(FC.RX_CONFIG.halfDuplexSecondary);
+                    buffer.push(BitHelper.lowByte(FC.RX_CONFIG.sbusSyncIntervalSecondary));
+                    buffer.push(BitHelper.highByte(FC.RX_CONFIG.sbusSyncIntervalSecondary));
+                }
                 break;
 
             case MSPCodes.MSP_SET_FAILSAFE_CONFIG:
@@ -3066,6 +3192,18 @@ var mspHelper = (function () {
 
     self.loadRxConfig = function (callback) {
         MSP.send_message(MSPCodes.MSP_RX_CONFIG, false, false, callback);
+    };
+
+    self.loadRxLinkStatus = function (callback) {
+        MSP.send_message(MSPCodes.MSP2_INAV_GET_LINK_STATS, false, false, callback);
+    };
+
+    self.setRxLink = function (link, callback) {
+        MSP.send_message(MSPCodes.MSP2_INAV_SET_RX_LINK, [link], false, function (response) {
+            if (callback) {
+                callback(!MSP.unsupported, response);
+            }
+        });
     };
 
     self.load3dConfig = function (callback) {

@@ -537,6 +537,44 @@ var FC = {
             spirx_protocol: 0,
             spirx_id: 0,
             spirx_channel_count: 0,
+            dualRxExtensionAvailable: false,
+            dualRxEnabled: 0,
+            receiverTypeSecondary: 0,
+            serialrx_provider_secondary: 0,
+            serialrx_inverted_secondary: 0,
+            halfDuplexSecondary: 0,
+            sbusSyncIntervalSecondary: 0,
+        };
+
+        const emptyRxLinkStatus = () => ({
+            validFields: 0,
+            linkQuality: 0,
+            uplinkRSSI: 0,
+            uplinkLQ: 0,
+            uplinkSNR: 0,
+            downlinkLQ: 0,
+            rfMode: 0,
+            uplinkTXPower: 0,
+            downlinkTXPower: 0,
+            activeAntenna: 0,
+            band: '',
+            mode: '',
+        });
+
+        this.RX_LINK_STATUS = {
+            legacyUplinkRSSI: 0,
+            legacyUplinkLQ: 0,
+            legacyUplinkSNR: 0,
+            extensionVersion: 0,
+            active: null,
+            configuredMask: 0,
+            initializedMask: 0,
+            validMask: 0,
+            statsValidMask: 0,
+            dualStatus: 0,
+            lastSwitchReason: 0,
+            lastSwitchTimeMs: 0,
+            links: [emptyRxLinkStatus(), emptyRxLinkStatus()],
         };
 
         this.POSITION_ESTIMATOR = {

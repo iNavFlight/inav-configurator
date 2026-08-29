@@ -375,6 +375,12 @@ const LOGIC_OPERATORS = {
         hasOperand: [true, false],
         output: "boolean"
     },
+    64: {
+        name: "RX handover",
+        operandType: "Set Flight Parameter",
+        hasOperand: [true, false],
+        output: "boolean"
+    },
 };
 
 export { LOGIC_OPERATORS };

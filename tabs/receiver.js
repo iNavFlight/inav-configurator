@@ -49,52 +49,183 @@ receiverTab.initialize = function (callback) {
         // translate to user-selected language
        i18n.localize();;
 
-        let $receiverMode = $('#receiver_type'),
-            $serialWrapper = $('#serialrx_provider-wrapper');
+        const $primaryMode = $('#receiver_type');
+        const $primaryWrapper = $('#serialrx_provider-wrapper');
+        const $primaryProvider = $('#serialrx_provider');
+        const $secondaryMode = $('#receiver_type_rx2');
+        const $secondaryWrapper = $('#serialrx_provider_rx2-wrapper');
+        const $secondaryProvider = $('#serialrx_provider_rx2');
+        let dualRxEnabled = false;
 
-        // Order Serial Rx providers
-        let serialRxProviders = $('#serialrx_provider option');
-        let selectedRxProvider = $('#serialrx_provider').val();
-        serialRxProviders.sort(function(a,b) {
-            if (a.text > b.text) {
-                return 1;
-            } else if (a.text < b.text) {
-                return -1;
-            } else {
-                return 0;
+        function setupReceiverMode($modeSelect, $serialWrapper, $providerSelect, enableFrSky) {
+            let serialRxProviders = $providerSelect.find('option');
+            const selectedRxProvider = $providerSelect.val();
+            serialRxProviders.sort(function(a, b) {
+                return a.text.localeCompare(b.text);
+            });
+            $providerSelect.empty().append(serialRxProviders);
+            $providerSelect.val(selectedRxProvider);
+
+            $providerSelect.on('change', function() {
+                if (!enableFrSky) {
+                    return;
+                }
+                const frSkyRXProviders = ["SBUS", "FPORT", "FPORT2", "FBUS"];
+                $('#frSkyOptions').toggle(frSkyRXProviders.includes($(this).find('option:selected').text()));
+            });
+
+            $modeSelect.on('change', function () {
+                if ($(this).find('option:selected').text() === 'SERIAL') {
+                    $serialWrapper.show();
+                    $providerSelect.trigger('change');
+                    $modeSelect.parent().removeClass('no-bottom-border');
+                } else {
+                    $serialWrapper.hide();
+                    if (enableFrSky) {
+                        $('#frSkyOptions').hide();
+                    }
+                    $modeSelect.parent().addClass('no-bottom-border');
+                }
+            });
+        }
+
+        setupReceiverMode($primaryMode, $primaryWrapper, $primaryProvider, true);
+        setupReceiverMode($secondaryMode, $secondaryWrapper, $secondaryProvider, false);
+
+        function dualStatusText(status) {
+            const keys = [
+                'receiverDualDisabled',
+                'receiverDualOk',
+                'receiverDualRx1NotConfigured',
+                'receiverDualRx2NotConfigured',
+                'receiverDualUnsupportedPair',
+                'receiverDualInitFailed',
+            ];
+            return i18n.getMessage(keys[status] || 'receiverStatusUnavailable');
+        }
+
+        function switchReasonText(reason) {
+            const keys = [
+                'receiverSwitchBoot',
+                'receiverSwitchLinkLoss',
+                'receiverSwitchLogicHandover',
+                'receiverSwitchMspHandover',
+                'receiverSwitchApiHandover',
+            ];
+            return i18n.getMessage(keys[reason] || 'receiverStatusUnavailable');
+        }
+
+        function linkStateText(status, link) {
+            const bit = 1 << link;
+            if (!(status.configuredMask & bit)) {
+                return i18n.getMessage('receiverLinkNotConfigured');
             }
+            if (!(status.initializedMask & bit)) {
+                return i18n.getMessage('receiverLinkInitError');
+            }
+            if (!(status.validMask & bit)) {
+                return i18n.getMessage('receiverLinkLost');
+            }
+            return i18n.getMessage('receiverLinkOk');
+        }
+
+        function linkMetricsText(status, link) {
+            const bit = 1 << link;
+            if (!(status.validMask & bit) || !(status.statsValidMask & bit)) {
+                return '';
+            }
+
+            const metrics = status.links[link];
+            const values = [];
+            if (metrics.validFields & (1 << 0)) {
+                values.push(metrics.uplinkRSSI + ' dBm');
+            }
+            if (metrics.validFields & (1 << 1)) {
+                values.push('LQ ' + metrics.uplinkLQ + '%');
+            }
+            if (metrics.validFields & (1 << 3)) {
+                values.push('SNR ' + metrics.uplinkSNR + ' dB');
+            }
+            return values.join(' · ');
+        }
+
+        function renderDualRxStatus() {
+            if (!dualRxEnabled) {
+                return;
+            }
+
+            const status = FC.RX_LINK_STATUS;
+            const $rx1Button = $('.receiver-select-rx1');
+            const $rx2Button = $('.receiver-select-rx2');
+
+            if (status.extensionVersion !== 1 || status.active === null) {
+                const unavailable = i18n.getMessage('receiverStatusUnavailable');
+                $('.receiver-dual-active').text(unavailable);
+                $('.receiver-dual-rx1').text(unavailable);
+                $('.receiver-dual-rx2').text(unavailable);
+                $('.receiver-dual-rx1-metrics, .receiver-dual-rx2-metrics').text('');
+                $('.receiver-dual-health').text(unavailable);
+                $('.receiver-dual-last-switch').text(unavailable);
+                $rx1Button.add($rx2Button).addClass('disabled').attr('aria-disabled', 'true');
+                return;
+            }
+
+            $('.receiver-dual-active').text(status.active === 0 ? 'RX1' : 'RX2');
+            $('.receiver-dual-rx1').text(linkStateText(status, 0));
+            $('.receiver-dual-rx2').text(linkStateText(status, 1));
+            $('.receiver-dual-rx1-metrics').text(linkMetricsText(status, 0));
+            $('.receiver-dual-rx2-metrics').text(linkMetricsText(status, 1));
+            $('.receiver-dual-health').text(dualStatusText(status.dualStatus));
+            $('.receiver-dual-last-switch').text(switchReasonText(status.lastSwitchReason) + ' @ ' + status.lastSwitchTimeMs + ' ms');
+
+            const rx1Selectable = (status.validMask & 0x01) !== 0 && status.active !== 0;
+            const rx2Selectable = (status.validMask & 0x02) !== 0 && status.active !== 1;
+            $rx1Button.toggleClass('disabled', !rx1Selectable).attr('aria-disabled', rx1Selectable ? 'false' : 'true');
+            $rx2Button.toggleClass('disabled', !rx2Selectable).attr('aria-disabled', rx2Selectable ? 'false' : 'true');
+        }
+
+        function refreshDualRxStatus() {
+            if (!dualRxEnabled) {
+                return;
+            }
+            mspHelper.loadRxLinkStatus(renderDualRxStatus);
+        }
+
+        function setDualRxUiEnabled(enabled) {
+            dualRxEnabled = enabled;
+            $('.receiver-secondary').toggleClass('is-hidden', !enabled);
+            $('.receiver-dual-status').toggleClass('is-hidden', !enabled);
+            $('.receiver-primary-title').text(i18n.getMessage(enabled ? 'receiverPrimaryMode' : 'configurationReceiver'));
+            if (enabled) {
+                refreshDualRxStatus();
+            }
+        }
+
+        $('.receiver-dual-actions a').on('click', function(event) {
+            event.preventDefault();
+            const $button = $(this);
+            if ($button.hasClass('disabled')) {
+                return;
+            }
+            const link = Number.parseInt($button.data('rx-link'));
+            mspHelper.setRxLink(link, function(success) {
+                if (!success) {
+                    GUI.log(i18n.getMessage('receiverHandoverRefused'));
+                    return;
+                }
+                refreshDualRxStatus();
+            });
         });
 
-        let $serialRxProvider = $("#serialrx_provider");
-        $serialRxProvider.empty().append(serialRxProviders);
-        $serialRxProvider.val(selectedRxProvider);
-
-        $serialRxProvider.on('change', function() {
-            const frSkyRXProviders = ["SBUS", "FPORT", "FPORT2", "FBUS"];
-            
-            if (frSkyRXProviders.includes($(this).find("option:selected").text())) {
-                $("#frSkyOptions").show();
-            } else {
-                $("#frSkyOptions").hide();
-            }
-        });
-
-        $receiverMode.on('change', function () {
-            if ($(this).find("option:selected").text() == "SERIAL") {
-                $serialWrapper.show();
-                $serialRxProvider.trigger("change");
-                $receiverMode.parent().removeClass("no-bottom-border");
-            } else {
-                $serialWrapper.hide();
-                $("#frSkyOptions").hide();
-                $receiverMode.parent().addClass("no-bottom-border");
-            }
-        });
-
-        // Wait for settings to load before triggering change events
-        // Trigger receiverMode which will trigger serialRxProvider when mode is SERIAL
+        // Wait for settings to load before triggering change events.
         settingsPromise.then(function() {
-            $receiverMode.trigger("change");
+            $primaryMode.trigger('change');
+            $secondaryMode.trigger('change');
+            mspHelper.getSetting('dual_rx_enabled').then(function(setting) {
+                setDualRxUiEnabled(!!(setting && setting.value));
+            }).catch(function() {
+                setDualRxUiEnabled(false);
+            });
         });
 
         // fill in data from RC_tuning
@@ -324,11 +455,18 @@ receiverTab.initialize = function (callback) {
             }
         });
 
-        // Only show the MSP control sticks if the MSP Rx feature is enabled
-        mspHelper.getSetting("receiver_type").then(function (s) {
-            if (s && s.setting.table && s.setting.table.values) {
-                $(".sticks_btn").toggle(s.setting.table.values[s.value] == 'MSP');
-            }
+        // Show MSP control sticks when either configured receiver uses MSP.
+        Promise.all([
+            mspHelper.getSetting('receiver_type'),
+            mspHelper.getSetting('dual_rx_enabled').catch(function() { return null; }),
+            mspHelper.getSetting('receiver_type_rx2').catch(function() { return null; }),
+        ]).then(function(settings) {
+            const primary = settings[0];
+            const dual = settings[1];
+            const secondary = settings[2];
+            const primaryIsMsp = primary && primary.setting.table && primary.setting.table.values && primary.setting.table.values[primary.value] === 'MSP';
+            const secondaryIsMsp = dual && dual.value && secondary && secondary.setting.table && secondary.setting.table.values && secondary.setting.table.values[secondary.value] === 'MSP';
+            $('.sticks_btn').toggle(!!(primaryIsMsp || secondaryIsMsp));
         });
 
         function get_rc_data() {
@@ -345,6 +483,7 @@ receiverTab.initialize = function (callback) {
         }
 
         interval.add('receiver_pull', get_rc_data, 25);
+        interval.add('dual_rx_status_pull', refreshDualRxStatus, 500);
 
         GUI.content_ready(callback);
     }
