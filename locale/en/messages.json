@@ -1179,6 +1179,24 @@
     "configurationCurrentOffset": {
         "message": "Offset in millivolt steps"
     },
+    "configurationIna226I2cBus": {
+        "message": "INA226 I2C Bus"
+    },
+    "configurationIna226I2cBusHelp": {
+        "message": "Hardware I2C bus connected to the INA226."
+    },
+    "configurationIna226I2cAddress": {
+        "message": "INA226 I2C Address"
+    },
+    "configurationIna226I2cAddressHelp": {
+        "message": "7-bit I2C address in decimal. 64 is 0x40 and 79 is 0x4F."
+    },
+    "configurationIna226ShuntResistance": {
+        "message": "INA226 Shunt Resistance (µΩ)"
+    },
+    "configurationIna226ShuntResistanceHelp": {
+        "message": "Shunt resistor value in micro-ohms (µΩ) used to calculate current."
+    },
     "configurationBatteryMultiwiiCurrent": {
         "message": "Enable support for legacy Multiwii MSP current output"
     },
