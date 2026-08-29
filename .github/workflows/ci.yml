@@ -1,17 +1,30 @@
 name: Build Configurator
 # Don't enable CI on push, just on PR. If you
 # are working on the main repo and want to trigger
-# a CI build submit a draft PR.
+# a CI build submit a draft PR. Signed tagged builds
+# are produced by .github/workflows/release.yml.
 on: 
   pull_request:
 
   workflow_call:
-    #inputs:
-    #  release_build:
-    #   description: 'Specifies if it is a build that should include commit hash in hex file names or not'
-    #   default: false
-    #   required: false
-    #   type: boolean
+    inputs:
+      require_signing:
+        description: 'Fail macOS jobs unless signing and notarization credentials are complete'
+        type: boolean
+        default: false
+    secrets:
+      MACOS_CERT_P12:
+        required: false
+      MACOS_CERT_PASSWORD:
+        required: false
+      MACOS_SIGN_IDENTITY:
+        required: false
+      APPLE_API_KEY_P8:
+        required: false
+      APPLE_API_KEY_ID:
+        required: false
+      APPLE_API_ISSUER:
+        required: false
 
 jobs:
     save-pr-number:
@@ -168,8 +181,101 @@ jobs:
             command: yarn install --foreground-scripts
             timeout_minutes: 10
             on_retry_command: rm -rfv node_modules
-        - name: Build MacOS arm64
-          run: yarn run make -- --arch="arm64"
+        # Signing credentials must never be imported on pull_request: yarn make
+        # loads the checked-out forge.config.js. Same-repo PRs receive secrets.
+        # Nightly and tagged releases (workflow_call) are the trusted signing path.
+        # Official releases pass require_signing so missing secrets fail the job.
+        - name: Import signing certificate
+          if: github.event_name != 'pull_request'
+          env:
+            MACOS_CERT_P12: ${{ secrets.MACOS_CERT_P12 }}
+            MACOS_CERT_PASSWORD: ${{ secrets.MACOS_CERT_PASSWORD }}
+            MACOS_SIGN_IDENTITY: ${{ secrets.MACOS_SIGN_IDENTITY }}
+            REQUIRE_SIGNING: ${{ inputs.require_signing }}
+          run: |
+            if [ -z "$MACOS_CERT_P12" ] || [ -z "$MACOS_CERT_PASSWORD" ] || [ -z "$MACOS_SIGN_IDENTITY" ]; then
+              if [ "$REQUIRE_SIGNING" = "true" ]; then
+                echo "::error::Official releases must be signed; set MACOS_CERT_P12, MACOS_CERT_PASSWORD, and MACOS_SIGN_IDENTITY."
+                exit 1
+              fi
+              echo "Incomplete signing secrets (need MACOS_CERT_P12, MACOS_CERT_PASSWORD, MACOS_SIGN_IDENTITY); building unsigned."
+              exit 0
+            fi
+            KEYCHAIN=$RUNNER_TEMP/build.keychain-db
+            KEYCHAIN_PASSWORD=$(uuidgen)
+            echo "$MACOS_CERT_P12" | base64 --decode > $RUNNER_TEMP/cert.p12
+            security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN"
+            security set-keychain-settings -lut 21600 "$KEYCHAIN"
+            security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN"
+            security import $RUNNER_TEMP/cert.p12 -k "$KEYCHAIN" -P "$MACOS_CERT_PASSWORD" -T /usr/bin/codesign
+            security set-key-partition-list -S apple-tool:,apple: -s -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN"
+            security list-keychains -d user -s "$KEYCHAIN" login.keychain
+            rm $RUNNER_TEMP/cert.p12
+            echo "OSX_SIGN_IDENTITY=$MACOS_SIGN_IDENTITY" >> "$GITHUB_ENV"
+        - name: Write notarization API key
+          if: github.event_name != 'pull_request'
+          env:
+            APPLE_API_KEY_P8: ${{ secrets.APPLE_API_KEY_P8 }}
+            APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
+            APPLE_API_ISSUER: ${{ secrets.APPLE_API_ISSUER }}
+            REQUIRE_SIGNING: ${{ inputs.require_signing }}
+          run: |
+            if [ -z "$APPLE_API_KEY_P8" ] || [ -z "$APPLE_API_KEY_ID" ] || [ -z "$APPLE_API_ISSUER" ]; then
+              if [ "$REQUIRE_SIGNING" = "true" ]; then
+                echo "::error::Official releases must be notarized; set APPLE_API_KEY_P8, APPLE_API_KEY_ID, and APPLE_API_ISSUER."
+                exit 1
+              fi
+              echo "Incomplete notarization secrets; skipping notarization key."
+              exit 0
+            fi
+            KEY_PATH="$RUNNER_TEMP/apple_api_key.p8"
+            echo "$APPLE_API_KEY_P8" > "$KEY_PATH"
+            echo "APPLE_API_KEY=$KEY_PATH" >> "$GITHUB_ENV"
+            echo "APPLE_API_KEY_ID=$APPLE_API_KEY_ID" >> "$GITHUB_ENV"
+            echo "APPLE_API_ISSUER=$APPLE_API_ISSUER" >> "$GITHUB_ENV"
+        # Package (and notarize) separately from DMG/ZIP so a flaky hdiutil
+        # detach does not redo Apple's notarization queue.
+        - name: Package MacOS arm64
+          env:
+            NODE_OPTIONS: --max-old-space-size=4096
+          run: |
+            yarn run package -- --arch="arm64"
+            test -d "out/INAV Configurator-darwin-arm64/INAV Configurator.app"
+        - name: Make MacOS arm64 distributables
+          uses: nick-fields/retry@ce71cc2ab81d554ebbe88c79ab5975992d79ba08 # v3.0.2
+          with:
+            max_attempts: 3
+            retry_on: error
+            timeout_minutes: 20
+            command: |
+              sudo mdutil -a -i off || true
+              hdiutil detach "/Volumes/INAV-Configurator" -force 2>/dev/null || true
+              yarn run make -- --arch="arm64" --skip-package
+        - name: Verify signing and notarization
+          if: github.event_name != 'pull_request'
+          env:
+            REQUIRE_SIGNING: ${{ inputs.require_signing }}
+          run: |
+            APP="out/INAV Configurator-darwin-arm64/INAV Configurator.app"
+            if [ -z "$OSX_SIGN_IDENTITY" ]; then
+              if [ "$REQUIRE_SIGNING" = "true" ]; then
+                echo "::error::Official releases must be signed."
+                exit 1
+              fi
+              echo "Unsigned build; skipping signing verification."
+              exit 0
+            fi
+            codesign --verify --deep --strict --verbose=2 "$APP"
+            if [ -n "$APPLE_API_KEY_ID" ] && [ -n "$APPLE_API_ISSUER" ] && [ -n "$APPLE_API_KEY" ] && [ -f "$APPLE_API_KEY" ]; then
+              xcrun stapler validate "$APP"
+              spctl --assess --type execute -v "$APP"
+            else
+              if [ "$REQUIRE_SIGNING" = "true" ]; then
+                echo "::error::Official releases must be notarized."
+                exit 1
+              fi
+              echo "Signed-only build; skipping notarization verification."
+            fi
         - name: Upload MacOS arm64 zip
           uses: actions/upload-artifact@v4
           with:
@@ -216,10 +322,101 @@ jobs:
             command: yarn install --foreground-scripts
             timeout_minutes: 10
             on_retry_command: rm -rfv node_modules
-        - name: Build MacOS x64
+        # Signing credentials must never be imported on pull_request: yarn make
+        # loads the checked-out forge.config.js. Same-repo PRs receive secrets.
+        # Nightly and tagged releases (workflow_call) are the trusted signing path.
+        # Official releases pass require_signing so missing secrets fail the job.
+        - name: Import signing certificate
+          if: github.event_name != 'pull_request'
+          env:
+            MACOS_CERT_P12: ${{ secrets.MACOS_CERT_P12 }}
+            MACOS_CERT_PASSWORD: ${{ secrets.MACOS_CERT_PASSWORD }}
+            MACOS_SIGN_IDENTITY: ${{ secrets.MACOS_SIGN_IDENTITY }}
+            REQUIRE_SIGNING: ${{ inputs.require_signing }}
+          run: |
+            if [ -z "$MACOS_CERT_P12" ] || [ -z "$MACOS_CERT_PASSWORD" ] || [ -z "$MACOS_SIGN_IDENTITY" ]; then
+              if [ "$REQUIRE_SIGNING" = "true" ]; then
+                echo "::error::Official releases must be signed; set MACOS_CERT_P12, MACOS_CERT_PASSWORD, and MACOS_SIGN_IDENTITY."
+                exit 1
+              fi
+              echo "Incomplete signing secrets (need MACOS_CERT_P12, MACOS_CERT_PASSWORD, MACOS_SIGN_IDENTITY); building unsigned."
+              exit 0
+            fi
+            KEYCHAIN=$RUNNER_TEMP/build.keychain-db
+            KEYCHAIN_PASSWORD=$(uuidgen)
+            echo "$MACOS_CERT_P12" | base64 --decode > $RUNNER_TEMP/cert.p12
+            security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN"
+            security set-keychain-settings -lut 21600 "$KEYCHAIN"
+            security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN"
+            security import $RUNNER_TEMP/cert.p12 -k "$KEYCHAIN" -P "$MACOS_CERT_PASSWORD" -T /usr/bin/codesign
+            security set-key-partition-list -S apple-tool:,apple: -s -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN"
+            security list-keychains -d user -s "$KEYCHAIN" login.keychain
+            rm $RUNNER_TEMP/cert.p12
+            echo "OSX_SIGN_IDENTITY=$MACOS_SIGN_IDENTITY" >> "$GITHUB_ENV"
+        - name: Write notarization API key
+          if: github.event_name != 'pull_request'
+          env:
+            APPLE_API_KEY_P8: ${{ secrets.APPLE_API_KEY_P8 }}
+            APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
+            APPLE_API_ISSUER: ${{ secrets.APPLE_API_ISSUER }}
+            REQUIRE_SIGNING: ${{ inputs.require_signing }}
+          run: |
+            if [ -z "$APPLE_API_KEY_P8" ] || [ -z "$APPLE_API_KEY_ID" ] || [ -z "$APPLE_API_ISSUER" ]; then
+              if [ "$REQUIRE_SIGNING" = "true" ]; then
+                echo "::error::Official releases must be notarized; set APPLE_API_KEY_P8, APPLE_API_KEY_ID, and APPLE_API_ISSUER."
+                exit 1
+              fi
+              echo "Incomplete notarization secrets; skipping notarization key."
+              exit 0
+            fi
+            KEY_PATH="$RUNNER_TEMP/apple_api_key.p8"
+            echo "$APPLE_API_KEY_P8" > "$KEY_PATH"
+            echo "APPLE_API_KEY=$KEY_PATH" >> "$GITHUB_ENV"
+            echo "APPLE_API_KEY_ID=$APPLE_API_KEY_ID" >> "$GITHUB_ENV"
+            echo "APPLE_API_ISSUER=$APPLE_API_ISSUER" >> "$GITHUB_ENV"
+        # Package (and notarize) separately from DMG/ZIP so a flaky hdiutil
+        # detach does not redo Apple's notarization queue.
+        - name: Package MacOS x64
           env:
             NODE_OPTIONS: --max-old-space-size=4096
-          run: yarn run make -- --arch="x64"
+          run: |
+            yarn run package -- --arch="x64"
+            test -d "out/INAV Configurator-darwin-x64/INAV Configurator.app"
+        - name: Make MacOS x64 distributables
+          uses: nick-fields/retry@ce71cc2ab81d554ebbe88c79ab5975992d79ba08 # v3.0.2
+          with:
+            max_attempts: 3
+            retry_on: error
+            timeout_minutes: 20
+            command: |
+              sudo mdutil -a -i off || true
+              hdiutil detach "/Volumes/INAV-Configurator" -force 2>/dev/null || true
+              yarn run make -- --arch="x64" --skip-package
+        - name: Verify signing and notarization
+          if: github.event_name != 'pull_request'
+          env:
+            REQUIRE_SIGNING: ${{ inputs.require_signing }}
+          run: |
+            APP="out/INAV Configurator-darwin-x64/INAV Configurator.app"
+            if [ -z "$OSX_SIGN_IDENTITY" ]; then
+              if [ "$REQUIRE_SIGNING" = "true" ]; then
+                echo "::error::Official releases must be signed."
+                exit 1
+              fi
+              echo "Unsigned build; skipping signing verification."
+              exit 0
+            fi
+            codesign --verify --deep --strict --verbose=2 "$APP"
+            if [ -n "$APPLE_API_KEY_ID" ] && [ -n "$APPLE_API_ISSUER" ] && [ -n "$APPLE_API_KEY" ] && [ -f "$APPLE_API_KEY" ]; then
+              xcrun stapler validate "$APP"
+              spctl --assess --type execute -v "$APP"
+            else
+              if [ "$REQUIRE_SIGNING" = "true" ]; then
+                echo "::error::Official releases must be notarized."
+                exit 1
+              fi
+              echo "Signed-only build; skipping notarization verification."
+            fi
         - name: Upload MacOS x64 zip
           uses: actions/upload-artifact@v4
           with:
