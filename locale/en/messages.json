@@ -216,6 +216,102 @@
     "tabSitl": {
         "message": "SITL"
     },
+    "tabMapGenerator": {
+        "message": "Map Generator"
+    },
+    "mapgenOutputSettings": {
+        "message": "Output Settings"
+    },
+    "mapgenTarget": {
+        "message": "Target"
+    },
+    "mapgenTerrainSource": {
+        "message": "Elevation Source"
+    },
+    "mapgenProvider": {
+        "message": "Provider"
+    },
+    "mapgenMapType": {
+        "message": "Map Type"
+    },
+    "mapgenGoogleWarning": {
+        "message": "Warning: Google might temporarily ban IPs after bulk downloads for 24 hours."
+    },
+    "mapgenOsmWarning": {
+        "message": "OSM Standard tile policy does not permit offline bulk export. Select ESRI, Google, or MapTiler (OSM Style) for SD/ZIP export."
+    },
+    "mapgenMaptilerKeyHelp": {
+        "message": "MapTiler requires a free API key to serve map tiles. Your key is saved automatically — you only need to enter it once. Free tier includes 5,000 sessions/month, which is plenty for personal use."
+    },
+    "mapgenProjectSettings": {
+        "message": "Project Settings"
+    },
+    "mapgenProjectName": {
+        "message": "Project Folder Name"
+    },
+    "mapgenMinZoom": {
+        "message": "Min Zoom"
+    },
+    "mapgenMaxZoom": {
+        "message": "Max Zoom"
+    },
+    "mapgenAreaUnit": {
+        "message": "Area Unit"
+    },
+    "mapgenSdCard": {
+        "message": "SD Card"
+    },
+    "mapgenLinkSD": {
+        "message": "Select SD Card Folder"
+    },
+    "mapgenChangeSd": {
+        "message": "Change SD Folder"
+    },
+    "mapgenEjectSD": {
+        "message": "Eject SD Card"
+    },
+    "mapgenNoSdLinked": {
+        "message": "No SD card folder selected"
+    },
+    "mapgenForceOverwrite": {
+        "message": "Force Overwrite existing tiles"
+    },
+    "mapgenStatusDefault": {
+        "message": "Draw a rectangle on the map to select your area."
+    },
+    "mapgenSyncToSD": {
+        "message": "Sync to SD Card"
+    },
+    "mapgenExportZip": {
+        "message": "Export as ZIP"
+    },
+    "mapgenSaveSettings": {
+        "message": "Save Settings"
+    },
+    "mapgenRestoreSettings": {
+        "message": "Restore Defaults"
+    },
+    "mapgenSyncTitle": {
+        "message": "Syncing to SD Card"
+    },
+    "mapgenConfirmSync": {
+        "message": "Confirm Sync"
+    },
+    "mapgenTileCache": {
+        "message": "Tile Cache"
+    },
+    "mapgenCacheEnabled": {
+        "message": "Enable local tile cache"
+    },
+    "mapgenCacheSize": {
+        "message": "Cache size:"
+    },
+    "mapgenCacheMaxSize": {
+        "message": "Max cache size"
+    },
+    "mapgenClearCache": {
+        "message": "Clear Cache"
+    },
     "sitlDemoMode": {
         "message": "Demo Mode"
     },
@@ -900,6 +996,9 @@
     "onboardLoggingBlackboxRate": {
         "message": "Portion of flight loop iterations to log (logging rate)"
     },
+    "onboardLoggingTerrainRateWarning": {
+        "message": "Terrain is enabled, not recommended to use more than 25% logging rate"
+    },
     "featureCHANNEL_FORWARDING": {
         "message": "Forward aux channels to servo outputs"
     },
@@ -1080,6 +1179,24 @@
     "configurationCurrentOffset": {
         "message": "Offset in millivolt steps"
     },
+    "configurationIna226I2cBus": {
+        "message": "INA226 I2C Bus"
+    },
+    "configurationIna226I2cBusHelp": {
+        "message": "Hardware I2C bus connected to the INA226."
+    },
+    "configurationIna226I2cAddress": {
+        "message": "INA226 I2C Address"
+    },
+    "configurationIna226I2cAddressHelp": {
+        "message": "7-bit I2C address in decimal. 64 is 0x40 and 79 is 0x4F."
+    },
+    "configurationIna226ShuntResistance": {
+        "message": "INA226 Shunt Resistance (µΩ)"
+    },
+    "configurationIna226ShuntResistanceHelp": {
+        "message": "Shunt resistor value in micro-ohms (µΩ) used to calculate current."
+    },
     "configurationBatteryMultiwiiCurrent": {
         "message": "Enable support for legacy Multiwii MSP current output"
     },
@@ -1250,6 +1367,12 @@
     },
     "configurationLaunchClimbAngleHelp": {
         "message": "Climb angle (attitude of model, not climb slope) for launch sequence (degrees), is also restrained by global max_angle_inclination_pit. Default: 18 [5-45]"
+    },
+    "configurationLaunchManual": {
+        "message": "Manual Throttle Launch"
+    },
+    "configurationLaunchManualHelp": {
+        "message": "Allows launch with throttle controlled directly by throttle stick. Launch control only levels wings and maintains climb pitch during launch. IF USED WITHOUT A GPS LOCK plane must be launched immediately after throttle is increased to avoid issues with climb out stabilisation and the launch ending sooner than expected."
     },
     "configuration3d": {
         "message": "Reversible motors"
@@ -1499,6 +1622,9 @@
     },
     "portsFunction_HEADTRACKER": {
         "message": "Serial Headtracker"
+    },
+    "portsFunction_CRSF_SENSOR": {
+        "message": "CRSF Sensor"
     },
     "pidTuning_Other": {
         "message": "Other"
@@ -2396,6 +2522,9 @@
     },
     "cliInputPlaceholder": {
         "message": "Write your command here"
+    },
+    "cliInputPlaceholderBuilding": {
+        "message": "Building AutoComplete cache, please wait ..."
     },
     "cliEnter": {
         "message": "CLI mode detected"
@@ -3627,6 +3756,30 @@
     "altControlResponseHelp": {
         "message": "Adjusts the response of fixed wing altitude control as the target altitude is approached. Higher values will sharpen altitude control response but may also cause excessive overshoot or pitch instability if set too high."
     },
+    "minAutoSpeed": {
+        "message": "Minimum Allowed Speed"
+    },
+    "maxAutoSpeed": {
+        "message": "Maximum Allowed Speed"
+    },
+    "autoSpeedChannel": {
+        "message": "Speed Adjustment Channel Number"
+    },
+    "autoSpeedChannelHelp": {
+        "message": "Minimum channel = 4 which is Throttle (default)."
+    },
+    "autoSpeedThrSmoothing": {
+        "message": "Throttle Response Smoothing Factor"
+    },
+    "autoSpeedThrSmoothingHelp": {
+        "message": "Changes how smoothly the throttle responds in Auto speed mode. Increasing the setting makes throttle changes smoother but also reduces throttle response."
+    },
+    "autoSpeedLevelMinThr": {
+        "message": "Minimum Allowed Throttle In Level Flight"
+    },
+    "autoSpeedLevelMinThrHelp": {
+        "message": "Minimum throttle for LEVEL flight in auto speed mode when using ground speed as speed reference [us]. This should be set with just enough margin to avoid stalling. Throttle can go lower than this setting when pitching down to a minimum of nav_fw_min_thr."
+    },
     "waypointRadiusHelp": {
         "message": "This sets the distance away from a waypoint that triggers the waypoint as reached."
     },
@@ -3638,6 +3791,9 @@
     },
     "fixedWingNavigationConfiguration": {
         "message": "Fixed Wing Navigation Settings"
+    },
+    "fixedWingAutoSpeedConfiguration": {
+        "message": "Fixed Wing Auto Speed Settings"
     },
     "fixedWingLandingConfiguration": {
         "message": "Fixed Wing Landing Settings"
@@ -4010,6 +4166,12 @@
     },
     "osd_home_position_arm_screen": {
         "message": "Home Position on Arming Screen"
+    },
+    "osd_framerate_hz": {
+        "message": "OSD Framerate (Hz)"
+    },
+    "osd_framerate_hz_help": {
+        "message": "Target refresh rate for OSD elements in Hz. Each element is redrawn at approximately this rate. Values above 10 Hz provide no visible improvement for typical flight data but increase CPU load. Artificial horizon and telemetry are always updated every cycle regardless of this setting. Set to -1 for legacy behavior (one element per frame)."
     },
     "osd_hud_settings": {
         "message": "Heads-up Display settings"
@@ -4427,6 +4589,12 @@
     },
     "osdElement_G_FORCE_Z_HELP": {
         "message": "Shows the g force in the Z axis (vertical)"
+    },
+    "osdElement_GPS_EXTRA_STATS": {
+        "message": "GPS Diagnostics"
+    },
+    "osdElement_GPS_EXTRA_STATS_HELP": {
+        "message": "Visible satellite count and locked satellite indicator(5 levels) for each constellation in this order: GPS–Galileo–BeiDou–GLONASS. Followed by SNR level (higher better)"
     },
     "osdElement_ROLL_PIDS": {
         "message": "Roll PIDs"
@@ -5282,6 +5450,12 @@
     },
     "servoMixerAdd": {
         "message": "Add new mixer rule"
+    },
+    "servoMixRuleInvalidServoTargetTitle": {
+        "message": "Invalid servo target"
+    },
+    "servoMixRuleInvalidServoTarget": {
+        "message": "$1 servos are defined. Cannot output to servo #$2 because only $1 servos exist."
     },
     "platformType": {
         "message": "Platform type"

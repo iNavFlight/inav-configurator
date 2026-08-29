@@ -14,6 +14,23 @@ import features from './../js/feature_framework';
 
 const configurationTab = {};
 
+function isIna226Selected($meterType) {
+    const settingInfo = $meterType.data('setting-info');
+    const selectedValue = Number.parseInt($meterType.val());
+
+    return settingInfo?.table?.values?.[selectedValue] === 'INA226';
+}
+
+function updateIna226SettingsVisibility() {
+    const usesIna226Voltage = isIna226Selected($('#vbat_meter_type'));
+    const usesIna226Current = isIna226Selected($('#current_meter_type'));
+
+    $('.ina226-common-setting').toggle(usesIna226Voltage || usesIna226Current);
+    $('.ina226-current-setting').toggle(usesIna226Current);
+    $('.adc-voltage-setting').toggle(!usesIna226Voltage);
+    $('.adc-current-setting').toggle(!usesIna226Current);
+}
+
 configurationTab.initialize = function (callback, scrollPosition) {
 
     if (GUI.active_tab !== this) {
@@ -264,8 +281,10 @@ configurationTab.initialize = function (callback, scrollPosition) {
         // Wait for settings to load before triggering change event
         settingsPromise.then(function() {
             $i2cSpeed.trigger('change');
+            $('#vbat_meter_type, #current_meter_type').on('change', updateIna226SettingsVisibility);
+            updateIna226SettingsVisibility();
         }).catch(function(error) {
-            console.error('Settings load failed, I2C speed change not triggered:', error);
+            console.error('Settings load failed, dependent controls not initialized:', error);
         });
 
         $('a.save').on('click', function () {

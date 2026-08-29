@@ -4,7 +4,7 @@ import $ from 'jquery';
 import 'jquery-ui-dist/jquery-ui';
 import * as THREE from 'three'
 
-import GUI from './gui';
+import GUI, { TABS } from './gui';
 import interval from './intervals';
 import CONFIGURATOR from './data_storage';
 import FC  from './fc';
@@ -199,6 +199,9 @@ $(function() {
                             break;
                         case 'sitl':
                            sitlTab.initialize(content_ready);
+                            break;
+                        case 'map_generator':
+                            import('./../tabs/map_generator').then(() => TABS.map_generator.initialize(content_ready));
                             break;
                         case 'auxiliary':
                             auxiliaryTab.initialize(content_ready);
