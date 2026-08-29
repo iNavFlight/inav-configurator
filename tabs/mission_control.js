@@ -4384,7 +4384,8 @@ function iconKey(filename) {
 
             const maxWp = mission.getMaxWaypoints();
             const totalCount = waypoints.length + ($('#gridEndRTH').is(':checked') ? 1 : 0);
-            const countText = i18n.getMessage('missionGridWaypointCount', [totalCount, maxWp]);
+            const remaining = Math.max(0, maxWp - totalCount);
+            const countText = i18n.getMessage('missionGridWaypointCount', [totalCount, remaining]);
             $('#gridWaypointCount').text(countText).css('color', totalCount > maxWp ? 'red' : '#666');
 
             // Polygon outline
