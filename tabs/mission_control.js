@@ -88,7 +88,7 @@ var dictOfLabelParameterPoint = {
     5:  {parameter1: '', parameter2: '', parameter3: ''},
     6:  {parameter1: 'Target WP number', parameter2: 'Number of repeat (-1: infinite)', parameter3: ''},
     7:  {parameter1: 'Heading (deg)', parameter2: '', parameter3: ''},
-    8:  {parameter1: '', parameter2: '', parameter3: 'Sea level Ref'}
+    8:  {parameter1: 'Speed (cm/s)', parameter2: '', parameter3: 'Sea level Ref'}
 };
 
 var waypointOptions = ['JUMP','SET_HEAD','RTH'];
@@ -3758,6 +3758,9 @@ function iconKey(filename) {
 
         $('#pointP1').on('change', function (event) {
             if (selectedMarker) {
+                if (selectedMarker.getAction() != MWNP.WPTYPE.SET_HEAD) {
+                    $('#pointP1').val(Math.abs(Number($('#pointP1').val())));
+                }
                 selectedMarker.setP1(Number($('#pointP1').val()));
                 mission.updateWaypoint(selectedMarker);
                 mission.update(singleMissionActive());
@@ -3767,6 +3770,9 @@ function iconKey(filename) {
 
         $('#pointP2').on('change', function (event) {
             if (selectedMarker) {
+                if (selectedMarker.getAction() == MWNP.WPTYPE.POSHOLD_TIME) {
+                    $('#pointP2').val(Math.abs(Number($('#pointP2').val())));
+                }
                 selectedMarker.setP2(Number($('#pointP2').val()));
                 mission.updateWaypoint(selectedMarker);
                 mission.update(singleMissionActive());

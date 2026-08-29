@@ -5,7 +5,8 @@ import Store from "electron-store";
 import path from 'path';
 import { fileURLToPath } from 'node:url';
 import started from 'electron-squirrel-startup';
-import { writeFile, readFile, appendFile, readdir } from 'node:fs/promises';
+import { writeFile, readFile, appendFile, readdir, mkdir, access } from 'node:fs/promises';
+import { execFile } from 'node:child_process';
 
 import tcp from './tcp';
 import udp from './udp';
@@ -230,6 +231,17 @@ function createWindow() {
   mainWindow.removeMenu();
   mainWindow.setMinimumSize(800, 600);
 
+  // Fix OSM 403: packaged builds use file:// protocol, so tile requests
+  // carry no valid Referer. OSM rejects these with 403.
+  mainWindow.webContents.session.webRequest.onBeforeSendHeaders(
+    { urls: ['https://*.tile.openstreetmap.org/*'] },
+    (details, callback) => {
+      details.requestHeaders['Referer'] = 'https://github.com/iNavFlight/inav-configurator';
+      details.requestHeaders['User-Agent'] = 'INAV-Configurator/9.0 (https://github.com/iNavFlight/inav-configurator)';
+      callback({ requestHeaders: details.requestHeaders });
+    }
+  );
+
   if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
     mainWindow.loadURL(MAIN_WINDOW_VITE_DEV_SERVER_URL);
   } else {
@@ -371,6 +383,7 @@ app.whenReady().then(() => {
   ipcMain.handle('writeFile', (_event, filename, data) => {
     return new Promise(async resolve => {
       try {
+        await mkdir(path.dirname(filename), { recursive: true }).catch(() => {});
         await writeFile(filename, data);
         resolve(false)
       } catch (err) {
@@ -415,7 +428,7 @@ app.whenReady().then(() => {
 
   ipcMain.handle('rm', (_event, path) => {
     return new Promise(resolve => {
-      rm(path, error => {
+      rm(path, { recursive: true, force: true }, error => {
         if (error) {
           resolve(error.message)
         } else {
@@ -449,6 +462,39 @@ app.whenReady().then(() => {
     }
     const files = await readdir(backupDir);
     return files.filter(f => f.endsWith('.txt') || f.endsWith('.cli'));
+  });
+
+  ipcMain.handle('pathExists', async (_event, filePath) => {
+    try {
+      await access(filePath);
+      return true;
+    } catch {
+      return false;
+    }
+  });
+
+  ipcMain.handle('ejectDrive', (_event, driveLetter) => {
+    return new Promise(resolve => {
+      // The renderer only ever supplies a drive letter (A–Z); strip anything else so a
+      // command argument can never be injected into the platform eject commands below.
+      const letter = String(driveLetter).replaceAll(/[^a-zA-Z]/g, '').charAt(0);
+      if (!letter) return resolve('Invalid drive letter');
+      if (process.platform === 'win32') {
+        const script = `$ns = (New-Object -ComObject Shell.Application).Namespace('${letter}:\\'); if ($ns) { $ns.Self.InvokeVerb('Eject') } else { throw 'Drive ${letter}: not found or already ejected' }`;
+        const psPath = path.join(process.env.SYSTEMROOT || 'C:\\Windows', 'System32', 'WindowsPowerShell', 'v1.0', 'powershell.exe');
+        execFile(psPath, ['-NoProfile', '-Command', script], { timeout: 10000 }, (err) => {
+          resolve(err ? err.message : false);
+        });
+      } else if (process.platform === 'darwin') {
+        execFile('/usr/sbin/diskutil', ['eject', letter], { timeout: 10000 }, (err) => {
+          resolve(err ? err.message : false);
+        });
+      } else {
+        execFile('/usr/bin/udisksctl', ['unmount', '-b', letter], { timeout: 10000 }, (err) => {
+          resolve(err ? err.message : false);
+        });
+      }
+    });
   });
 
   ipcMain.on('startChildProcess', (_event, command, args, opts) => {

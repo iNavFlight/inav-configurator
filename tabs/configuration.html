@@ -95,7 +95,7 @@
                         <div for="voltagesource" class="helpicon cf_tip" data-i18n_title="configurationVoltageSourceHelp"></div>
                     </div>
                     
-                    <div class="number">
+                    <div class="number adc-voltage-setting">
                         <input type="number" id="voltagescale" name="voltagescale" step="1" min="10" max="65535" />
                         <label for="voltagescale">
                             <span data-i18n="configurationBatteryScale"></span>
@@ -114,14 +114,35 @@
                             <span data-i18n="configurationCurrentMeterType"></span>
                         </label>
                     </div>
-                    <div class="number">
+                    <div class="number ina226-common-setting" style="display: none;">
+                        <input type="number" id="ina_bus" data-setting="ina_bus" />
+                        <label for="ina_bus">
+                            <span data-i18n="configurationIna226I2cBus">INA226 I2C Bus</span>
+                        </label>
+                        <div for="ina_bus" class="helpicon cf_tip" data-i18n_title="configurationIna226I2cBusHelp"></div>
+                    </div>
+                    <div class="number ina226-common-setting" style="display: none;">
+                        <input type="number" id="ina_address" data-setting="ina_address" />
+                        <label for="ina_address">
+                            <span data-i18n="configurationIna226I2cAddress">INA226 I2C Address</span>
+                        </label>
+                        <div for="ina_address" class="helpicon cf_tip" data-i18n_title="configurationIna226I2cAddressHelp"></div>
+                    </div>
+                    <div class="number ina226-current-setting" style="display: none;">
+                        <input type="number" id="ina_shunt_res_uohm" data-setting="ina_shunt_res_uohm" />
+                        <label for="ina_shunt_res_uohm">
+                            <span data-i18n="configurationIna226ShuntResistance">INA226 Shunt Resistance (µΩ)</span>
+                        </label>
+                        <div for="ina_shunt_res_uohm" class="helpicon cf_tip" data-i18n_title="configurationIna226ShuntResistanceHelp"></div>
+                    </div>
+                    <div class="number adc-current-setting">
                         <input type="number" id="currentscale" name="currentscale" step="1" min="-10000" max="10000" data-setting-placeholder="current_meter_scale" />
                         <label for="currentscale">
                             <span data-i18n="configurationCurrentScale"></span>
                         </label>
                         <div for="currentscale" class="helpicon cf_tip" data-i18n_title="configurationCurrentScaleHelp"></div>
                     </div>
-                    <div class="number">
+                    <div class="number adc-current-setting">
                         <input type="number" id="currentoffset" name="currentoffset" step="0.1" min="-3276.8" max="3276.7" />
                         <label for="currentoffset">
                             <span data-i18n="configurationCurrentOffset"></span>

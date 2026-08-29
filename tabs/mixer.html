@@ -43,13 +43,6 @@
                     </div>
                 </div>
             
-                <div class="platform-type gui_box grey">
-                    <div class="gui_box_titlebar">
-                        <div class="spacer_box_title" data-i18n="timerOutputs"></div>
-                    </div>
-                    <div class="spacer_box" id="timerOutputsList" style="padding: 0; width: calc(100% - 12px)"></div>
-                </div>
-
             </div>
             <div class="rightWrapper">
                 <div class="platform-type gui_box grey">
@@ -104,6 +97,9 @@
                 <div class="spacer_box_title" data-i18n="mappingTableTitle"></div>
             </div>
             <table class="output-table">
+                <tr id="timer-row">
+
+                </tr>
                 <tr id="output-row">
 
                 </tr>
@@ -211,6 +207,11 @@
         </div>
         <div class="modal__buttons">
             <a id="execute-button" class="modal__button modal__button--main" data-i18n="mixerButtonSaveAndReboot"></a>
+        </div>
+    </div>
+    <div id="servoTargetWarningContent" class="is-hidden">
+        <div class="modal__content">
+            <div class="modal__text"><p class="servo-target-warning-text"></p></div>
         </div>
     </div>
     <div id="mixerWizardContent" class="is-hidden">
