@@ -735,6 +735,28 @@ function iconKey(filename) {
             });
         }
 
+        // Ground height under every mission point. The ellipsoid provider needs no request, its
+        // surface already sits at zero, and a failed sample falls back to whatever heights the
+        // request left behind so the mission still draws; the caller then reports that the terrain
+        // reference is missing.
+        async function samplePointTerrain(points) {
+            const terrainPositions = points.map((point) => Cartographic.fromDegrees(point.lon, point.lat));
+            let sampledPositions = terrainPositions;
+            let samplingFailed = false;
+
+            if (!(terrainProvider instanceof EllipsoidTerrainProvider)) {
+                try {
+                    sampledPositions = await sampleTerrainMostDetailed(terrainProvider, terrainPositions);
+                } catch (error) {
+                    samplingFailed = true;
+                    console.warn('Mission Planner 3D terrain sampling failed:', error);
+                }
+            }
+
+            const groundHeights = sampledPositions.map((position) => Number.isFinite(position.height) ? position.height : 0);
+            return {groundHeights, samplingFailed};
+        }
+
         async function sampleRouteTerrain(renderedPoints) {
             const routeSegments = getMission3DRouteSegments(renderedPoints).filter((segment) => segment.length > 1);
             const routeEdges = routeSegments.flatMap((segment, segmentIndex) => segment.slice(1).map((end, index) => {
@@ -812,61 +834,10 @@ function iconKey(filename) {
             return {routeSamples, samplingFailed};
         }
 
-        function renderRouteTerrain(routeSamples) {
-            let hasTerrainCollision = false;
-
-            routeSamples.forEach((samples) => {
-                getMission3DRouteRuns(samples).forEach((run) => {
-                    hasTerrainCollision ||= run.collidesWithTerrain;
-                    viewer.entities.add({
-                        polyline: {
-                            positions: run.samples.map(getMission3DSampleCartesian),
-                            width: run.collidesWithTerrain ? 6 : 4,
-                            material: run.collidesWithTerrain ? mission3DCollisionColor : mission3DRouteColor,
-                            depthFailMaterial: run.collidesWithTerrain ? mission3DCollisionColor.withAlpha(0.9) : undefined
-                        }
-                    });
-                });
-            });
-
-            return hasTerrainCollision;
-        }
-
-        async function renderMission(waypoints, home) {
-            const sequence = ++updateSequence;
-            viewer.entities.removeAll();
-            hideMission3DTerrainWarning();
-
-            const points = getMission3DPoints(waypoints, home);
-            const missionPoints = points.filter((point) => !point.isHome);
-            if (!missionPoints.length) {
-                showEmptyMap();
-                viewer.scene.requestRender();
-                return;
-            }
-
-            $('#missionMap3DHelp').hide();
-
-            const signature = JSON.stringify(points);
-            const cache = terrainCacheSignature === signature ? terrainCache : null;
-            const terrainPositions = points.map((point) => Cartographic.fromDegrees(point.lon, point.lat));
-            let sampledPositions = terrainPositions;
-            let terrainSamplingFailed = false;
-            if (!cache && !(terrainProvider instanceof EllipsoidTerrainProvider)) {
-                try {
-                    sampledPositions = await sampleTerrainMostDetailed(terrainProvider, terrainPositions);
-                } catch (error) {
-                    terrainSamplingFailed = true;
-                    console.warn('Mission Planner 3D terrain sampling failed:', error);
-                }
-            }
-            if (destroyed || sequence !== updateSequence) return;
-
-            const groundHeights = cache ? cache.groundHeights : sampledPositions.map((position) => Number.isFinite(position.height) ? position.height : 0);
-            const homeIndex = points.findIndex((point) => point.isHome);
-            const hasHome = homeIndex >= 0;
-            const homeGroundHeight = hasHome ? groundHeights[homeIndex] : null;
-            const missingHomeReference = !hasHome && missionPoints.some((point) => !point.absoluteAltitude);
+        // One marker with its label per point, plus the drop line that ties a mission waypoint to
+        // the ground underneath it. The colour carries the state: home is green, a point that would
+        // sit below the terrain is red, landings and POIs are orange and everything else stays blue.
+        function renderMissionPoints(points, groundHeights, homeGroundHeight, hasHome) {
             const displayPositions = [];
             const renderedPoints = [];
 
@@ -885,8 +856,6 @@ function iconKey(filename) {
                 }
                 const position = Cartesian3.fromDegrees(point.lon, point.lat, plannedHeight);
                 renderedPoints.push({...point, plannedHeight, position, terrainClearanceAvailable});
-
-                if (!point.isHome) displayPositions.push(position);
 
                 viewer.entities.add({
                     position,
@@ -910,20 +879,92 @@ function iconKey(filename) {
                     }
                 });
 
-                if (!point.isHome) {
+                // HOME sits on the ground and outside the flown route, so it gets neither a drop
+                // line nor a say in how the camera frames the mission.
+                if (point.isHome) return;
+
+                displayPositions.push(position);
+                viewer.entities.add({
+                    polyline: {
+                        positions: [
+                            Cartesian3.fromDegrees(point.lon, point.lat, groundHeight),
+                            position
+                        ],
+                        width: 2,
+                        material: pointColor.withAlpha(0.72)
+                    }
+                });
+            });
+
+            return {displayPositions, renderedPoints};
+        }
+
+        function renderRouteTerrain(routeSamples) {
+            let hasTerrainCollision = false;
+
+            routeSamples.forEach((samples) => {
+                getMission3DRouteRuns(samples).forEach((run) => {
+                    hasTerrainCollision ||= run.collidesWithTerrain;
                     viewer.entities.add({
                         polyline: {
-                            positions: [
-                                Cartesian3.fromDegrees(point.lon, point.lat, groundHeight),
-                                position
-                            ],
-                            width: 2,
-                            material: pointColor.withAlpha(0.72)
+                            positions: run.samples.map(getMission3DSampleCartesian),
+                            width: run.collidesWithTerrain ? 6 : 4,
+                            material: run.collidesWithTerrain ? mission3DCollisionColor : mission3DRouteColor,
+                            depthFailMaterial: run.collidesWithTerrain ? mission3DCollisionColor.withAlpha(0.9) : undefined
                         }
                     });
-                }
-
+                });
             });
+
+            return hasTerrainCollision;
+        }
+
+        // Terrain warnings for a finished render. A provider that never loaded or a sample that
+        // failed makes every clearance meaningless, so that single warning replaces the others.
+        function showMissionWarnings(terrainSamplingFailed, hasTerrainCollision, missingHomeReference) {
+            if (terrainLoadFailed || terrainSamplingFailed) {
+                showMission3DTerrainWarnings(['unavailable']);
+                return;
+            }
+
+            const warningTypes = [];
+            if (hasTerrainCollision) warningTypes.push('collision');
+            if (missingHomeReference) warningTypes.push('home');
+            showMission3DTerrainWarnings(warningTypes);
+        }
+
+        async function renderMission(waypoints, home) {
+            const sequence = ++updateSequence;
+            viewer.entities.removeAll();
+            hideMission3DTerrainWarning();
+
+            const points = getMission3DPoints(waypoints, home);
+            const missionPoints = points.filter((point) => !point.isHome);
+            if (!missionPoints.length) {
+                showEmptyMap();
+                viewer.scene.requestRender();
+                return;
+            }
+
+            $('#missionMap3DHelp').hide();
+
+            const signature = JSON.stringify(points);
+            const cache = terrainCacheSignature === signature ? terrainCache : null;
+            // A cache hit answers straight away. A miss goes through samplePointTerrain, which asks
+            // the terrain provider only when a real one is loaded, but awaits either way, so on a
+            // miss the guard below always runs behind a suspension.
+            const pointTerrain = cache
+                ? {groundHeights: cache.groundHeights, samplingFailed: false}
+                : await samplePointTerrain(points);
+            if (destroyed || sequence !== updateSequence) return;
+
+            const groundHeights = pointTerrain.groundHeights;
+            let terrainSamplingFailed = pointTerrain.samplingFailed;
+            const homeIndex = points.findIndex((point) => point.isHome);
+            const hasHome = homeIndex >= 0;
+            const homeGroundHeight = hasHome ? groundHeights[homeIndex] : null;
+            const missingHomeReference = !hasHome && missionPoints.some((point) => !point.absoluteAltitude);
+            const {displayPositions, renderedPoints} = renderMissionPoints(points, groundHeights, homeGroundHeight, hasHome);
 
             const routeTerrain = cache ? cache.routeTerrain : await sampleRouteTerrain(renderedPoints);
             if (destroyed || sequence !== updateSequence) return;
@@ -933,14 +974,7 @@ function iconKey(filename) {
                 terrainCache = {groundHeights, routeTerrain};
             }
             const hasTerrainCollision = renderRouteTerrain(routeTerrain.routeSamples);
-            if (terrainLoadFailed || terrainSamplingFailed) {
-                showMission3DTerrainWarnings(['unavailable']);
-            } else {
-                const warningTypes = [];
-                if (hasTerrainCollision) warningTypes.push('collision');
-                if (missingHomeReference) warningTypes.push('home');
-                showMission3DTerrainWarnings(warningTypes);
-            }
+            showMissionWarnings(terrainSamplingFailed, hasTerrainCollision, missingHomeReference);
 
             const missionBounds = BoundingSphere.fromPoints(displayPositions);
             const range = Math.max(350, missionBounds.radius * 2.5, Math.max(...missionPoints.map((point) => Math.abs(point.altitude))) * 5);
@@ -1058,6 +1092,19 @@ function iconKey(filename) {
             if (is3D) updateMission3D();
         }
         if (!is3D && map) map.updateSize();
+    }
+
+    // Slot the 2D/3D toggle into the control column right below the bottom-most planner control,
+    // matching the 25px grid of the buttons above (settings 65px ... safehome 140px, geozones 190px).
+    // Which slot is free depends on how many controls initMap put into the column.
+    function missionMapViewControlsTop() {
+        if (!CONFIGURATOR.connectionValid) {
+            return 140; // no safehome button, so the column ends at 115px
+        }
+        if (isGeozoneEnabeld) {
+            return 215; // the geozones button fills the 190px slot
+        }
+        return 165; // the safehome button fills the 140px slot
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////////
@@ -3192,9 +3239,7 @@ function iconKey(filename) {
             })
         });
 
-        // Slot the 2D/3D toggle into the control column right below the bottom-most planner control,
-        // matching the 25px grid of the buttons above (settings 65px ... safehome 140px, geozones 190px)
-        $('#missionMapViewControls').css('top', `${CONFIGURATOR.connectionValid ? (isGeozoneEnabeld ? 215 : 165) : 140}px`);
+        $('#missionMapViewControls').css('top', `${missionMapViewControlsTop()}px`);
         $('#missionMap2DButton').on('click', () => setMissionMapViewMode('2d'));
         $('#missionMap3DButton').on('click', () => setMissionMapViewMode('3d'));
         setMissionMapViewMode(missionMapViewMode);
