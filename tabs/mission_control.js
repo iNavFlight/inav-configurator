@@ -265,6 +265,7 @@ missionControlTab.initialize = function (callback) {
         samples: [],
         speedMs: 15,
         bankAngleDeg: FirmwareDefaults.bankAngleDeg,
+        bankCeilingDeg: 0,
         wpRadiusCm: FirmwareDefaults.waypointRadiusCm,
         loiterRadiusCm: 0,
         approachLengthCm: 0,
@@ -329,6 +330,15 @@ missionControlTab.initialize = function (callback) {
             function (callback) {
                 mspHelper.getSetting("nav_fw_land_approach_length").then((data) => {
                     if (data) simulation.approachLengthCm = readNumericSetting(data, 0);
+                }).catch(() => {}).then(() => callback());
+            },
+            // The absolute ceiling on roll. nav_fw_bank_angle is what navigation asks
+            // for, but it can never be delivered beyond this, so the flown radius is
+            // set by whichever is the tighter of the two.
+            function (callback) {
+                mspHelper.getSetting("max_angle_inclination_rll").then((data) => {
+                    const deciDegrees = data ? readNumericSetting(data, 0) : 0;
+                    if (deciDegrees > 0) simulation.bankCeilingDeg = deciDegrees / 10;
                 }).catch(() => {}).then(() => callback());
             },
             function (callback) {
@@ -2760,7 +2770,9 @@ function iconKey(filename) {
 
         const parameters = {
             speedMs: simulation.speedMs,
-            bankAngleDeg: simulation.bankAngleDeg,
+            bankAngleDeg: simulation.bankCeilingDeg > 0
+                ? Math.min(simulation.bankAngleDeg, simulation.bankCeilingDeg)
+                : simulation.bankAngleDeg,
             loiterRadiusM: loiterRadiusCm / 100,
             waypointRadiusM: simulation.wpRadiusCm / 100,
             turnSmoothing: simulation.turnSmoothing
@@ -2806,6 +2818,11 @@ function iconKey(filename) {
         const radius = commandedTurnRadius(
             parameters.speedMs, parameters.bankAngleDeg, parameters.loiterRadiusM, parameters.turnSmoothing
         );
+        if (simulation.bankCeilingDeg > 0 && simulation.bankCeilingDeg < simulation.bankAngleDeg) {
+            $warnings.append($('<div/>').text(i18n.getMessage(
+                'missionSimulationBankCeiling', [String(simulation.bankCeilingDeg)]
+            )));
+        }
         $('#simulationTurnRadius').text(Number.isFinite(radius) ? `${radius.toFixed(0)} m` : '-');
 
         // A repeat or a truncated run means the figures no longer describe the whole

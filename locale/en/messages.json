@@ -5070,6 +5070,9 @@
     "missionSimulationDefaults": {
         "message": "No flight controller connected: approach length and loiter radius fall back to the firmware defaults, so the approach shown is generic."
     },
+    "missionSimulationBankCeiling": {
+        "message": "Turns are limited to $1 degrees of bank by max_angle_inclination_rll, below the angle navigation asks for, so they are wider than nav_fw_bank_angle alone suggests."
+    },
     "missionSimulationSpeedEstimated": {
         "message": "Cruise speed is an assumption: connect the flight controller to read fw_reference_airspeed, or set it to what your aircraft really cruises at. The turn radius depends on it squared."
     },
