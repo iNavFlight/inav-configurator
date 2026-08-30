@@ -2591,10 +2591,34 @@ function iconKey(filename) {
             });
     }
 
+    /* A landing waypoint carries an approach with altitudes of its own. Held against the
+       sea they were measured over the ground the waypoint used to stand on, so they are
+       shifted onto the new ground and keep the height above it they had. Held against home
+       the terrain never entered into them and they are left alone. */
+    function settleLandingApproach(wp, elevationAtWP, isSelected) {
+        if (wp.getAction() != MWNP.WPTYPE.LAND) return;
+
+        const approach = FC.FW_APPROACH.get()[FC.SAFEHOMES.getMaxSafehomeCount() + wp.getMultiMissionIdx()];
+        if (approach.getIsSeaLevelRef()) {
+            if (approach.getElevation() != 0) {
+                approach.setApproachAltAsl(approach.getApproachAltAsl() - approach.getElevation() + elevationAtWP * 100);
+                approach.setLandAltAsl(approach.getLandAltAsl() - approach.getElevation() + elevationAtWP * 100);
+            }
+            approach.setElevation(elevationAtWP * 100);
+            if (isSelected) {
+                $('#wpApproachAlt').val(approach.getApproachAltAsl());
+                $('#wpLandAlt').val(approach.getLandAltAsl());
+                $('#wpLandAltM').text(approach.getLandAltAsl() / 100 + " m");
+                $('#wpApproachAltM').text(approach.getApproachAltAsl() / 100 + " m");
+            }
+        }
+    }
+
     /* A dragged waypoint now sits over different ground. Measured from the sea its number
        says nothing about how high it flies any more, so it keeps the clearance it had and
        the altitude follows the new terrain. Measured from home the terrain never entered
-       into the number, so only the sanity check applies, as before. */
+       into the number, so only the sanity check applies, as before. The landing approach
+       of a LAND waypoint is settled separately, on its own reference. */
     async function settleDraggedWaypoint(wp, isSelected) {
         if (!wp) return;
 
@@ -2616,22 +2640,7 @@ function iconKey(filename) {
         }
         wp.setAlt(checkAltElevSanity(false, wp.getAlt(), elevationAtWP, wp.getP3()));
 
-        if (wp.getAction() == MWNP.WPTYPE.LAND) {
-            const approach = FC.FW_APPROACH.get()[FC.SAFEHOMES.getMaxSafehomeCount() + wp.getMultiMissionIdx()];
-            if (approach.getIsSeaLevelRef()) {
-                if (approach.getElevation() != 0) {
-                    approach.setApproachAltAsl(approach.getApproachAltAsl() - approach.getElevation() + elevationAtWP * 100);
-                    approach.setLandAltAsl(approach.getLandAltAsl() - approach.getElevation() + elevationAtWP * 100);
-                }
-                approach.setElevation(elevationAtWP * 100);
-                if (isSelected) {
-                    $('#wpApproachAlt').val(approach.getApproachAltAsl());
-                    $('#wpLandAlt').val(approach.getLandAltAsl());
-                    $('#wpLandAltM').text(approach.getLandAltAsl() / 100 + " m");
-                    $('#wpApproachAltM').text(approach.getApproachAltAsl() / 100 + " m");
-                }
-            }
-        }
+        settleLandingApproach(wp, elevationAtWP, isSelected);
 
         mission.updateWaypoint(wp);
         renderWaypointSelect();
