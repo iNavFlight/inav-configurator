@@ -95,6 +95,17 @@ export function resolveRouteAltitudes(route, homeAltM) {
 const toRadians = (degrees) => degrees * Math.PI / 180;
 const toDegrees = (radians) => radians * 180 / Math.PI;
 
+/*
+ * Guards for values arriving from settings, files and input fields.
+ *
+ * They state what the code needs — a real, usable number — instead of leaning on
+ * how NaN compares. A bare `value <= 0` would wave NaN through, and `!(value > 0)`
+ * catches NaN but still admits Infinity; both then travel into the geometry and
+ * come back out as a mission of unusable samples.
+ */
+const isPositive = (value) => Number.isFinite(value) && value > 0;
+const exceeds = (value, floor) => Number.isFinite(value) && Number.isFinite(floor) && value > floor;
+
 // Signed difference between two headings, in [-180, 180). An exact course
 // reversal comes back as -180, so the aircraft always picks the same side
 // rather than depending on rounding.
@@ -155,7 +166,7 @@ export function destination(from, bearingDeg, distanceM) {
  * flies; see effectiveTurnRadius().
  */
 export function turnRadius(speedMs, bankAngleDeg) {
-    if (!(speedMs > 0) || !(bankAngleDeg > 0) || bankAngleDeg >= 90) return Infinity;
+    if (!isPositive(speedMs) || !isPositive(bankAngleDeg) || bankAngleDeg >= 90) return Infinity;
     return (speedMs * speedMs) / (GRAVITY_MSS * Math.tan(toRadians(bankAngleDeg)));
 }
 
@@ -185,7 +196,7 @@ export function commandedTurnRadius(speedMs, bankAngleDeg, loiterRadiusM, smooth
 }
 
 export function turnRateDegPerSecond(speedMs, radiusM) {
-    if (!(radiusM > 0) || !Number.isFinite(radiusM) || !(speedMs > 0)) return 0;
+    if (!isPositive(radiusM) || !isPositive(speedMs)) return 0;
     return toDegrees(speedMs / radiusM);
 }
 
@@ -198,7 +209,7 @@ export function turnRateDegPerSecond(speedMs, radiusM) {
  * turn and put the aircraft at full bank on a straight leg.
  */
 export function bankForTurnRate(rateDegPerSecond, speedMs) {
-    if (!(speedMs > 0) || !rateDegPerSecond) return 0;
+    if (!isPositive(speedMs) || !rateDegPerSecond) return 0;
     return toDegrees(Math.atan2(toRadians(rateDegPerSecond) * speedMs, GRAVITY_MSS));
 }
 
@@ -245,8 +256,8 @@ export function buildLandingApproach(landPoint, approach, params) {
 
     const approachLengthM = (params.approachLengthCm ?? 0) / 100;
     const loiterRadiusM = (params.loiterRadiusCm ?? 0) / 100;
-    if (!(approachLengthM > 0)) return null;
-    if (!(approach.approachAltCm > approach.landAltCm)) return null;
+    if (!isPositive(approachLengthM)) return null;
+    if (!exceeds(approach.approachAltCm, approach.landAltCm)) return null;
 
     // Convert to centimetres above home FIRST — that is the frame the firmware
     // works in, and finalApproachAlt is derived from the converted value.
@@ -351,7 +362,7 @@ export function withLandingApproaches(route, approachFor, params) {
  */
 export function landingApproachProblem(approach, params) {
     if (landingHeading(approach) === null) return LandingApproachProblem.NO_HEADING;
-    if (!((params.approachLengthCm ?? 0) > 0)) return LandingApproachProblem.NO_APPROACH_LENGTH;
+    if (!isPositive(params.approachLengthCm ?? 0)) return LandingApproachProblem.NO_APPROACH_LENGTH;
     return LandingApproachProblem.ALTITUDES_IMPLAUSIBLE;
 }
 
@@ -405,7 +416,7 @@ const ALTITUDE_RAMP_FRACTION = 0.9;
  * is in fact still climbing.
  */
 export function altitudeAlongLeg(startAltM, targetAltM, initialDistanceM, remainingDistanceM) {
-    if (!(initialDistanceM > 0)) return targetAltM;
+    if (!isPositive(initialDistanceM)) return targetAltM;
 
     const travelled = initialDistanceM - Math.max(0, remainingDistanceM);
     const progress = Math.min(1, Math.max(0, travelled / (initialDistanceM * ALTITUDE_RAMP_FRACTION)));
@@ -442,7 +453,7 @@ export function simulateGroundTrack(points, params = {}) {
     const events = [];
     const warnings = [];
 
-    if (points.length < 2 || !(speedMs > 0) || !(timeStepS > 0)) {
+    if (points.length < 2 || !isPositive(speedMs) || !isPositive(timeStepS)) {
         return {samples, events, warnings, summary: emptySummary(radiusM)};
     }
 

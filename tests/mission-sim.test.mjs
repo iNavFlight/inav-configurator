@@ -329,6 +329,23 @@ describe('turn geometry', () => {
         assert.equal(turnRateDegPerSecond(15, Infinity), 0);
     });
 
+    test('unusable numbers are refused, not passed on', () => {
+        // A setting that arrives as NaN or Infinity must stop at the guard. Letting
+        // either through produces a whole mission of unusable samples with no error.
+        for (const bad of [NaN, Infinity, -Infinity, undefined]) {
+            assert.equal(turnRadius(bad, 35), Infinity, `speed ${bad}`);
+            assert.equal(turnRadius(15, bad), Infinity, `bank ${bad}`);
+            assert.equal(turnRateDegPerSecond(bad, 50), 0, `speed ${bad}`);
+        }
+    });
+
+    test('an unusable speed produces no track at all', () => {
+        for (const bad of [NaN, Infinity, 0, -5]) {
+            const result = simulateGroundTrack([HOME, destination(HOME, 90, 500)], {...FC, speedMs: bad});
+            assert.equal(result.samples.length, 0, `speed ${bad} produced ${result.samples.length} samples`);
+        }
+    });
+
     test('with turn smoothing off the corner is bank limited, not loiter sized', () => {
         // nav_fw_wp_turn_smoothing defaults to OFF, and the firmware then never
         // enters the smoothing block at all — the loiter radius stays out of it.
