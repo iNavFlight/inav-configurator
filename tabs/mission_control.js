@@ -288,6 +288,9 @@ missionControlTab.initialize = function (callback) {
             //mspHelper.loadWaypoints,
             mspHelper.loadSafehomes,
             mspHelper.loadFwApproach,
+            // Without this the tab never learns which airframe is attached, and
+            // FC.isAirplane() answers from stale defaults.
+            mspHelper.loadMixerConfig,
             function (callback) {
                 if (isGeozoneEnabeld) {
                     mspHelper.loadGeozones(callback);
@@ -2645,6 +2648,10 @@ function iconKey(filename) {
         };
     }
 
+    function updateSimulationAvailability() {
+        $('#simulateMission').toggle(!CONFIGURATOR.connectionValid || FC.isAirplane());
+    }
+
     function cleanSimulation() {
         if (simulation.layer) {
             map.removeLayer(simulation.layer);
@@ -4760,7 +4767,7 @@ function iconKey(filename) {
         $('#simulationSpeed').val(simulation.speedMs);
         // A fixed wing model has nothing to say about a multirotor or a rover.
         // Offline the airframe is unknown, so the offer stands.
-        $('#simulateMission').toggle(!CONFIGURATOR.connectionValid || FC.isAirplane());
+        updateSimulationAvailability();
 
         // Namespaced and released first: the tab can be entered more than once,
         // and a delegated handler would otherwise pile up on every visit and keep
