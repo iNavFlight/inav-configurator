@@ -90,6 +90,17 @@ import {
     getMission3DRouteSegments,
     getMission3DSamplingSpacing
 } from './../js/mission_3d';
+import {
+    FirmwareDefaults,
+    LandingApproachProblem,
+    SimPhase,
+    TurnSmoothing,
+    commandedTurnRadius,
+    getSimulationRoute,
+    resolveRouteAltitudes,
+    simulateGroundTrack,
+    withLandingApproaches
+} from './../js/mission_sim';
 
 import html from'./mission_control.html?raw';
 
@@ -233,6 +244,20 @@ missionControlTab.initialize = function (callback) {
     let invalidGeoZones = false;
     let isGeozoneEnabeld = false;
     let settings = {speed: 0, alt: 5000, safeRadiusSH: 50, fwApproachAlt: 60, fwLandAlt: 5, maxDistSH: 0, fwApproachLength: 0, fwLoiterRadius: 0};
+    // Flight path simulation. Everything but the cruise speed comes from the
+    // flight controller; the speed is the pilot's estimate, because a fixed wing
+    // holds a throttle setting rather than a commanded speed.
+    let simulation = {
+        enabled: false,
+        layer: null,
+        samples: [],
+        speedMs: 15,
+        bankAngleDeg: FirmwareDefaults.bankAngleDeg,
+        wpRadiusCm: FirmwareDefaults.waypointRadiusCm,
+        loiterRadiusCm: 0,
+        approachLengthCm: 0,
+        turnSmoothing: TurnSmoothing.OFF
+    };
 
     if (GUI.active_tab !== this) {
         GUI.active_tab = this;
@@ -272,6 +297,33 @@ missionControlTab.initialize = function (callback) {
                 mspHelper.getSetting(("nav_fw_loiter_radius")).then((data) => {
                     settings.fwLoiterRadius = parseInt(data.value);
                 }).then(callback);
+            },
+            // The simulation keeps its own defaults, so a firmware that does not
+            // carry one of these settings leaves the tab working.
+            function (callback) {
+                mspHelper.getSetting("nav_fw_bank_angle").then((data) => {
+                    if (data) simulation.bankAngleDeg = readNumericSetting(data, simulation.bankAngleDeg);
+                }).catch(() => {}).then(() => callback());
+            },
+            function (callback) {
+                mspHelper.getSetting("nav_fw_loiter_radius").then((data) => {
+                    if (data) simulation.loiterRadiusCm = readNumericSetting(data, 0);
+                }).catch(() => {}).then(() => callback());
+            },
+            function (callback) {
+                mspHelper.getSetting("nav_fw_land_approach_length").then((data) => {
+                    if (data) simulation.approachLengthCm = readNumericSetting(data, 0);
+                }).catch(() => {}).then(() => callback());
+            },
+            function (callback) {
+                mspHelper.getSetting("nav_wp_radius").then((data) => {
+                    if (data) simulation.wpRadiusCm = readNumericSetting(data, simulation.wpRadiusCm);
+                }).catch(() => {}).then(() => callback());
+            },
+            function (callback) {
+                mspHelper.getSetting("nav_fw_wp_turn_smoothing").then((data) => {
+                    if (data) simulation.turnSmoothing = readTurnSmoothing(data);
+                }).catch(() => {}).then(() => callback());
             }
         ]);
         loadChainer.setExitPoint(loadHtml);
@@ -711,6 +763,7 @@ function iconKey(filename) {
         let terrainLoadFailed = false;
         let lastWaypoints = [];
         let lastHome = null;
+        let lastSimulationSamples = [];
         let terrainCacheSignature = null;
         let terrainCache = null;
 
@@ -933,7 +986,39 @@ function iconKey(filename) {
             showMission3DTerrainWarnings(warningTypes);
         }
 
-        async function renderMission(waypoints, home) {
+        /*
+         * The track the aircraft will really fly, drawn beside the planned route.
+         *
+         * The samples carry their own altitude — the flight controller's ramp along
+         * each leg, and the approach altitudes on a landing — so the track is drawn
+         * where the aircraft will actually be, not where the plan says. Heights are
+         * metres above home, which is the frame the simulation works in; the ground
+         * beneath home puts them back into the same frame as the mission points.
+         */
+        function renderSimulatedTrack(samples, homeGroundHeight) {
+            if (!samples?.length) return;
+
+            const datum = Number.isFinite(homeGroundHeight) ? homeGroundHeight : 0;
+            const positions = samples.map(
+                (sample) => Cartesian3.fromDegrees(sample.lon, sample.lat, datum + (sample.altM ?? 0))
+            );
+
+            const trackColor = Color.fromCssColorString('#00c2a8');
+            viewer.entities.add({
+                polyline: {
+                    positions,
+                    width: 3,
+                    material: trackColor,
+                    // The globe depth-tests everything drawn against it, so a track
+                    // running behind a hill — or lying on the ellipsoid when no
+                    // terrain is loaded — would vanish. Keep it readable there
+                    // instead, dimmed, the way the waypoint markers stay readable.
+                    depthFailMaterial: trackColor.withAlpha(0.45)
+                }
+            });
+        }
+
+        async function renderMission(waypoints, home, simulationSamples = []) {
             const sequence = ++updateSequence;
             viewer.entities.removeAll();
             hideMission3DTerrainWarning();
@@ -975,6 +1060,7 @@ function iconKey(filename) {
             }
             const hasTerrainCollision = renderRouteTerrain(routeTerrain.routeSamples);
             showMissionWarnings(terrainSamplingFailed, hasTerrainCollision, missingHomeReference);
+            renderSimulatedTrack(simulationSamples, hasHome ? homeGroundHeight : 0);
 
             const missionBounds = BoundingSphere.fromPoints(displayPositions);
             const range = Math.max(350, missionBounds.radius * 2.5, Math.max(...missionPoints.map((point) => Math.abs(point.altitude))) * 5);
@@ -1014,11 +1100,11 @@ function iconKey(filename) {
             viewer.terrainProvider = provider;
             terrainCacheSignature = null;
             terrainCache = null;
-            if (missionMapViewMode === '3d') renderMission(lastWaypoints, lastHome);
+            if (missionMapViewMode === '3d') renderMission(lastWaypoints, lastHome, lastSimulationSamples);
         }).catch((error) => {
             terrainLoadFailed = true;
             console.warn('Mission Planner 3D terrain is unavailable, using an ellipsoid:', error);
-            if (!destroyed && missionMapViewMode === '3d') renderMission(lastWaypoints, lastHome);
+            if (!destroyed && missionMapViewMode === '3d') renderMission(lastWaypoints, lastHome, lastSimulationSamples);
         });
 
         return {
@@ -1035,10 +1121,11 @@ function iconKey(filename) {
                     viewer.scene.requestRender();
                 });
             },
-            update(waypoints, home) {
+            update(waypoints, home, simulationSamples = []) {
                 lastWaypoints = waypoints;
                 lastHome = home;
-                renderMission(waypoints, home);
+                lastSimulationSamples = simulationSamples;
+                renderMission(waypoints, home, simulationSamples);
             },
             resize() {
                 if (!destroyed) viewer.resize();
@@ -1054,7 +1141,7 @@ function iconKey(filename) {
 
     function updateMission3D() {
         if (mission3DViewer && missionMapViewMode === '3d') {
-            mission3DViewer.update(mission.get(), HOME);
+            mission3DViewer.update(mission.get(), HOME, simulation.enabled ? simulation.samples : []);
         }
     }
 
@@ -2403,6 +2490,7 @@ function iconKey(filename) {
             }
         }
 
+        repaintSimulation();
         updateMission3D();
     }
 
@@ -2482,6 +2570,7 @@ function iconKey(filename) {
     }
 
     function cleanLayers() {
+        cleanSimulation();
         for (var i in lines) {
             map.removeLayer(lines[i]);
         }
@@ -2498,6 +2587,208 @@ function iconKey(filename) {
             map.removeLayer(lines[i]);
         }
         lines = [];
+    }
+
+    /////////////////////////////////////////////
+    //
+    // Flight path simulation
+    //
+    /////////////////////////////////////////////
+
+    // Layers that only illustrate something must stay out of every hit test:
+    // picking one up as a marker to drag, or as a line to insert a waypoint into,
+    // would let an overlay quietly rewrite the mission.
+    const interactiveLayersOnly = {
+        layerFilter: (layer) => layer?.get('no_interaction') !== true
+    };
+
+    const SIMULATION_CRUISE_COLOUR = '#00c2a8';
+    const SIMULATION_TURN_COLOUR = '#ffb020';
+
+    // A setting that will not parse must not reach the model: NaN spreads through
+    // the geometry and comes back out as an empty map and a nonsense warning.
+    function readNumericSetting(setting, fallback) {
+        const value = parseInt(setting.value, 10);
+        return Number.isFinite(value) ? value : fallback;
+    }
+
+    // nav_fw_wp_turn_smoothing arrives as an index into its own lookup table.
+    function readTurnSmoothing(setting) {
+        const name = setting.setting?.table?.values?.[setting.value];
+        if (!name) return TurnSmoothing.OFF;
+
+        const normalized = String(name).toUpperCase();
+        if (normalized.includes('CUT')) return TurnSmoothing.CUT;
+        if (normalized === 'ON') return TurnSmoothing.ON;
+        return TurnSmoothing.OFF;
+    }
+
+    // The approach settings for a landing waypoint live after the safehome block
+    // in the same collection, indexed by the mission the waypoint belongs to -
+    // the same lookup addFwApproach uses for the drawn approach lines.
+    function landingApproachFor(point) {
+        const approach = FC.FW_APPROACH?.get()?.[FC.SAFEHOMES.getMaxSafehomeCount() + (point.multiMissionIdx ?? 0)];
+        if (!approach) return {};
+
+        return {
+            approachAltCm: approach.getApproachAltAsl(),
+            landAltCm: approach.getLandAltAsl(),
+            approachDirection: approach.getApproachDirection(),
+            landHeading1: approach.getLandHeading1(),
+            landHeading2: approach.getLandHeading2(),
+            isSeaLevelRef: approach.getIsSeaLevelRef()
+        };
+    }
+
+    function cleanSimulation() {
+        if (simulation.layer) {
+            map.removeLayer(simulation.layer);
+            simulation.layer = null;
+        }
+        simulation.samples = [];
+    }
+
+    function simulationTrackFeatures(samples) {
+        const features = [];
+        let run = [samples[0]];
+
+        const flush = (phase) => {
+            if (run.length < 2) return;
+            const feature = new Feature({
+                geometry: new LineString(run.map((point) => fromLonLat([point.lon, point.lat])))
+            });
+            feature.setStyle(new Style({
+                stroke: new Stroke({
+                    color: phase === SimPhase.TURN ? SIMULATION_TURN_COLOUR : SIMULATION_CRUISE_COLOUR,
+                    width: 3
+                })
+            }));
+            features.push(feature);
+        };
+
+        for (let index = 1; index < samples.length; index++) {
+            run.push(samples[index]);
+            if (samples[index].phase !== samples[index - 1].phase) {
+                flush(samples[index - 1].phase);
+                run = [samples[index]];
+            }
+        }
+        flush(samples.at(-1).phase);
+
+        return features;
+    }
+
+    function formatSimulationTime(seconds) {
+        const whole = Math.round(seconds);
+        return `${Math.floor(whole / 60)}:${String(whole % 60).padStart(2, '0')} min`;
+    }
+
+    function repaintSimulation() {
+        cleanSimulation();
+        $('#missionPlannerSimulation').toggle(simulation.enabled);
+        if (!simulation.enabled) return;
+
+        const $warnings = $('#simulationWarnings').empty();
+        const clearFigures = () => $('#simulationTime, #simulationDistance').text('-');
+
+        // In the all-missions view the map shows every mission but the simulation
+        // only ever flies one, so figures would describe something else entirely.
+        if (!singleMissionActive()) {
+            $('#simulationTurnRadius').text('');
+            clearFigures();
+            $warnings.text(i18n.getMessage('missionSimulationMultiMission'));
+            return;
+        }
+
+        const planned = getSimulationRoute(mission.get());
+
+        if (planned.length < 2) {
+            $('#simulationTurnRadius').text('');
+            clearFigures();
+            $warnings.text(i18n.getMessage('missionSimulationTooFewPoints'));
+            return;
+        }
+
+        // Home elevation is what turns an AMSL waypoint into the above-home frame
+        // the flight controller navigates in. Without it, absolute altitudes are
+        // left alone and the mismatch is reported rather than hidden.
+        const homeAltM = homeMarkers.length && HOME.getAlt() !== 'N/A' ? Number(HOME.getAlt()) : undefined;
+        const {route: withAltitudes, homeKnown} = resolveRouteAltitudes(planned, homeAltM);
+
+        // Offline these are still zero — they are only read from a connected
+        // flight controller — so the firmware's own defaults stand in rather than
+        // letting the approach quietly disappear.
+        const approachLengthCm = simulation.approachLengthCm || FirmwareDefaults.approachLengthCm;
+        const loiterRadiusCm = simulation.loiterRadiusCm || FirmwareDefaults.loiterRadiusCm;
+        const usingDefaults = !simulation.approachLengthCm || !simulation.loiterRadiusCm;
+
+        const approachParams = {approachLengthCm, loiterRadiusCm, homeAltM};
+        const {route, landingsWithoutApproach} = withLandingApproaches(
+            withAltitudes,
+            (point) => landingApproachFor(point),
+            approachParams
+        );
+
+        const parameters = {
+            speedMs: simulation.speedMs,
+            bankAngleDeg: simulation.bankAngleDeg,
+            loiterRadiusM: loiterRadiusCm / 100,
+            waypointRadiusM: simulation.wpRadiusCm / 100,
+            turnSmoothing: simulation.turnSmoothing
+        };
+        const result = simulateGroundTrack(route, parameters);
+        simulation.samples = result.samples;
+
+        const problemMessage = {
+            [LandingApproachProblem.NO_HEADING]: 'missionSimulationNoLandingHeading',
+            [LandingApproachProblem.NO_APPROACH_LENGTH]: 'missionSimulationNoApproachLength',
+            [LandingApproachProblem.ALTITUDES_IMPLAUSIBLE]: 'missionSimulationApproachAltitudes'
+        };
+        landingsWithoutApproach.forEach(({number, reason}) => {
+            $warnings.append($('<div/>').text(
+                i18n.getMessage(problemMessage[reason], [String(Number(number) + 1)])
+            ));
+        });
+        if (usingDefaults) {
+            $warnings.append($('<div/>').text(i18n.getMessage('missionSimulationDefaults')));
+        }
+        if (!homeKnown && planned.some((point) => point.absoluteAltitude)) {
+            $warnings.append($('<div/>').text(i18n.getMessage('missionSimulationNoHomeElevation')));
+        }
+
+        if (result.samples.length > 1) {
+            simulation.layer = new VectorLayer({
+                source: new VectorSource({features: simulationTrackFeatures(result.samples)})
+            });
+            // Keep the track out of every hit test: it must never be picked up as
+            // a marker to drag or a line to insert a waypoint into.
+            simulation.layer.set('no_interaction', true);
+            map.addLayer(simulation.layer);
+        }
+
+        const radius = commandedTurnRadius(
+            parameters.speedMs, parameters.bankAngleDeg, parameters.loiterRadiusM, parameters.turnSmoothing
+        );
+        $('#simulationTurnRadius').text(Number.isFinite(radius) ? `${radius.toFixed(0)} m` : '-');
+
+        // A repeat or a truncated run means the figures no longer describe the whole
+        // flight. Showing a rounded number anyway would read as a complete answer.
+        const repeats = mission.get().some((waypoint) => waypoint.getAction() === MWNP.WPTYPE.JUMP);
+        const truncated = result.warnings.some((warning) => warning.code === 'simulation-truncated');
+
+        if (repeats || truncated) {
+            clearFigures();
+            $warnings.append($('<div/>').text(i18n.getMessage(
+                repeats ? 'missionSimulationJumps' : 'missionSimulationTruncated'
+            )));
+        } else {
+            $('#simulationTime').text(formatSimulationTime(result.summary.totalTimeS));
+            $('#simulationDistance').text(`${(result.summary.totalDistanceM / 1000).toFixed(2)} km`);
+        }
+
+        result.warnings
+            .filter((warning) => warning.code !== 'simulation-truncated')
+            .forEach((warning) => $warnings.append($('<div/>').text(warning.text)));
     }
 
     function redrawLayers() {
@@ -2982,17 +3273,15 @@ function iconKey(filename) {
 
             var map = evt.map;
 
-            const isInteractable = (layer) => layer?.get('no_interaction') !== true;
-
             var feature = map.forEachFeatureAtPixel(evt.pixel,
-                function (feature, layer) {
-                    return isInteractable(layer) ? feature : null;
-                });
+                function (feature) {
+                    return feature;
+                }, interactiveLayersOnly);
 
             tempMarker = map.forEachFeatureAtPixel(evt.pixel,
                 function (feature, layer) {
-                    return isInteractable(layer) ? layer : null;
-                });
+                    return layer;
+                }, interactiveLayersOnly);
 
             if (feature) {
                 this.coordinate_ = evt.coordinate;
@@ -3015,9 +3304,9 @@ function iconKey(filename) {
             var map = evt.map;
 
             var feature = map.forEachFeatureAtPixel(evt.pixel,
-                function (feature, layer) {
+                function (feature) {
                     return feature;
-                });
+                }, interactiveLayersOnly);
 
             var deltaX = evt.coordinate[0] - this.coordinate_[0];
             var deltaY = evt.coordinate[1] - this.coordinate_[1];
@@ -3081,9 +3370,9 @@ function iconKey(filename) {
             if (this.cursor_) {
                 var map = evt.map;
                 var feature = map.forEachFeatureAtPixel(evt.pixel,
-                    function (feature, layer) {
+                    function (feature) {
                         return feature;
-                    });
+                    }, interactiveLayersOnly);
                 var element = evt.map.getTargetElement();
                 if (feature && feature.name != "circleFeature" && feature.name != "circleSafeFeature") {
                     if (element.style.cursor != this.cursor_) {
@@ -3358,13 +3647,13 @@ function iconKey(filename) {
                 }
             }
             selectedFeature = map.forEachFeatureAtPixel(evt.pixel,
-                function (feature, layer) {
+                function (feature) {
                     return feature;
-                });
+                }, interactiveLayersOnly);
             tempMarker = map.forEachFeatureAtPixel(evt.pixel,
                 function (feature, layer) {
                     return layer;
-                });
+                }, interactiveLayersOnly);
             if (selectedFeature && tempMarker.kind == "waypoint") {
                 $("#editMission").hide();
                 selectedMarker = mission.getWaypoint(tempMarker.number);
@@ -3556,12 +3845,12 @@ function iconKey(filename) {
         $(map.getViewport()).on('mousemove', function (e) {
             var pixel = map.getEventPixel(e.originalEvent);
             var name = "";
-            var hit = map.forEachFeatureAtPixel(pixel, function (feature, layer) {
+            var hit = map.forEachFeatureAtPixel(pixel, function (feature) {
                 if (feature) {
                     name = feature.getProperties().name;
                 }
                 return true;
-            });
+            }, interactiveLayersOnly);
             if (hit && name != "safehomeDist" && name != "safehomeSafe" && name != "geozoneCircle") {
                 map.getTargetElement().style.cursor = 'pointer';
             } else {
@@ -4464,6 +4753,35 @@ function iconKey(filename) {
                 plotElevation();
             }
         });
+
+        /////////////////////////////////////////////
+        // Flight path simulation
+        /////////////////////////////////////////////
+        $('#simulationSpeed').val(simulation.speedMs);
+        // A fixed wing model has nothing to say about a multirotor or a rover.
+        // Offline the airframe is unknown, so the offer stands.
+        $('#simulateMission').toggle(!CONFIGURATOR.connectionValid || FC.isAirplane());
+
+        // Namespaced and released first: the tab can be entered more than once,
+        // and a delegated handler would otherwise pile up on every visit and keep
+        // answering out of the previous closure.
+        $(document).off('click.mcSimulate').on('click.mcSimulate', '#simulateMissionButton, #simulateMission', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            simulation.enabled = !simulation.enabled;
+            $('#simulateMission').toggleClass('active', simulation.enabled);
+            repaintSimulation();
+            updateMission3D();
+        });
+
+        $(document).off('change.mcSimulate input.mcSimulate')
+            .on('change.mcSimulate input.mcSimulate', '#simulationSpeed', function () {
+                const speed = Number($(this).val());
+                if (!Number.isFinite(speed) || speed <= 0) return;
+                simulation.speedMs = speed;
+                repaintSimulation();
+                updateMission3D();
+            });
 
         // Address search button
         $(document).on('click', '#searchAddressButton, #searchAddress', function (e) {

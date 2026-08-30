@@ -2,7 +2,7 @@
 
 import MWNP from './mwnp.js';
 
-const ROUTE_ACTIONS = new Set([
+export const ROUTE_ACTIONS = new Set([
     MWNP.WPTYPE.WAYPOINT,
     MWNP.WPTYPE.POSHOLD_UNLIM,
     MWNP.WPTYPE.POSHOLD_TIME,

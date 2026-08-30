@@ -5034,6 +5034,57 @@
     "removeAllPointButtonSave": {
         "message": "Remove all points"
     },
+    "missionTitleSimulate": {
+        "message": "Show the track a fixed wing will actually fly"
+    },
+    "missionSimulationHead": {
+        "message": "Flight path simulation"
+    },
+    "missionSimulationSpeed": {
+        "message": "Cruise speed (m/s)"
+    },
+    "missionSimulationSpeedHelp": {
+        "message": "An estimate, not a value read from the flight controller. A fixed wing flies a cruise throttle setting, so nav_auto_speed and the per-waypoint speed do not apply to it. The turn radius grows with the square of this figure, so enter what your aircraft really cruises at."
+    },
+    "missionSimulationTurnRadius": {
+        "message": "Turn radius:"
+    },
+    "missionSimulationTime": {
+        "message": "Flight time:"
+    },
+    "missionSimulationDistance": {
+        "message": "Track length:"
+    },
+    "missionSimulationTooFewPoints": {
+        "message": "Add at least two waypoints to simulate the flight path."
+    },
+    "missionSimulationNoLandingHeading": {
+        "message": "Waypoint $1 lands without a landing heading, so no approach pattern is flown - the aircraft circles down onto the point. Set a landing heading to see the approach."
+    },
+    "missionSimulationNoApproachLength": {
+        "message": "Waypoint $1 has a landing heading, but the approach length is unknown. Connect the flight controller to read nav_fw_land_approach_length."
+    },
+    "missionSimulationApproachAltitudes": {
+        "message": "Waypoint $1 has an approach altitude that is not above its landing altitude, so no approach can be drawn. Check the landing settings for this waypoint."
+    },
+    "missionSimulationDefaults": {
+        "message": "No flight controller connected: approach length and loiter radius fall back to the firmware defaults, so the approach shown is generic."
+    },
+    "missionSimulationMultiMission": {
+        "message": "The flight path is simulated one mission at a time. Select a single mission to see it."
+    },
+    "missionSimulationJumps": {
+        "message": "This mission repeats waypoints with a jump, which the simulation does not follow, so flight time and track length are not shown. The track drawn is the first pass only."
+    },
+    "missionSimulationTruncated": {
+        "message": "The mission is longer than the simulation runs for, so the track stops part way and the figures are not shown."
+    },
+    "missionSimulationNoHomeElevation": {
+        "message": "This mission uses absolute altitudes, but the home elevation is unknown, so the vertical profile may be off. Set home to resolve it."
+    },
+    "missionSimulationDisclaimer": {
+        "message": "Altitudes and the landing approach follow the flight controller's own formulas. Turns are flown at the bank-limited radius: with nav_fw_wp_turn_smoothing ON or ON-CUT the aircraft starts its turn before the waypoint and curves inside the corner, which is not modelled here. Also not modelled: wind, holds (a POSHOLD point and the last waypoint of a mission are flown straight through, where the aircraft would circle), jumps, tracking back onto the leg line, and the pitch-held glide and flare over the last few metres, where the simulation stops. Assumes the aircraft follows its commanded track perfectly, so real turns start and finish more gently. A planning aid, not proof that a mission is safe to fly."
+    },
     "missionTotalInformationHead": {
         "message": "Total information"
     },

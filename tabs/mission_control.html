@@ -32,6 +32,10 @@
                             </div>
                         </div>
                         <hr> -->
+                        <div id="simulateMission" class="btn btn-default" style="padding-top: 1px; display: inline-block; cursor: pointer; float: left;">
+                            <a id="simulateMissionButton" class="btnicon ic_play" href="#" i18n_title="missionTitleSimulate"></a>
+                        </div>
+
                         <div id="removeAllPoints" class="btn btn-danger" style="padding-top: 1px; display: inline-block; float: left;">
                             <a class="btnicon ic_removeAll" href="#" i18n_title="missionTitleRemoveAll"></a>
                         </div>
@@ -85,6 +89,36 @@
                             <div style="display: inline-block" data-i18n="geozoneInvalidzone"></div>
                             <span id="geozoneInvalidContent"></span>
                         </div>
+                    </div>
+                </div>
+
+                <div id="missionPlannerSimulation" class="gui_box grey" style="display: none">
+                    <div class="gui_box_titlebar">
+                        <div class="spacer_box_title" data-i18n="missionSimulationHead"></div>
+                    </div>
+                    <div class="spacer" id="SimulationContent">
+                        <div class="number" style="padding-bottom: 4px;">
+                            <label>
+                                <input id="simulationSpeed" type="number" min="1" max="80" step="1" value="15" />
+                                <span data-i18n="missionSimulationSpeed"></span>
+                                <div class="helpicon cf_tip" data-i18n_title="missionSimulationSpeedHelp"></div>
+                            </label>
+                        </div>
+                        <div style="padding-bottom: 2px;">
+                            <span data-i18n="missionSimulationTurnRadius"></span>
+                            <span id="simulationTurnRadius"></span>
+                        </div>
+                        <div style="padding-bottom: 2px;">
+                            <span data-i18n="missionSimulationTime"></span>
+                            <span id="simulationTime"></span>
+                        </div>
+                        <div style="padding-bottom: 2px;">
+                            <span data-i18n="missionSimulationDistance"></span>
+                            <span id="simulationDistance"></span>
+                        </div>
+                        <div id="simulationWarnings" style="padding-top: 4px; color: red;"></div>
+                        <div style="padding-top: 6px; font-style: italic; opacity: .75;"
+                             data-i18n="missionSimulationDisclaimer"></div>
                     </div>
                 </div>
 
