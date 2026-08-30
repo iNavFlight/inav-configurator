@@ -5070,6 +5070,9 @@
     "missionSimulationDefaults": {
         "message": "No flight controller connected: approach length and loiter radius fall back to the firmware defaults, so the approach shown is generic."
     },
+    "missionSimulationFixedWingOnly": {
+        "message": "This models a fixed wing. The connected aircraft is not one, so the track shown does not describe how it will fly."
+    },
     "missionSimulationMultiMission": {
         "message": "The flight path is simulated one mission at a time. Select a single mission to see it."
     },

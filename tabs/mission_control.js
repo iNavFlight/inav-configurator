@@ -1011,7 +1011,7 @@ function iconKey(filename) {
          * beneath home puts them back into the same frame as the mission points.
          */
         function renderSimulatedTrack(samples, homeGroundHeight) {
-            if (!samples?.length) return;
+            if (!samples?.length) return [];
 
             const datum = Number.isFinite(homeGroundHeight) ? homeGroundHeight : 0;
             const positions = samples.map(
@@ -1031,6 +1031,8 @@ function iconKey(filename) {
                     depthFailMaterial: trackColor.withAlpha(0.45)
                 }
             });
+
+            return positions;
         }
 
         async function renderMission(waypoints, home, simulationSamples = []) {
@@ -1075,9 +1077,19 @@ function iconKey(filename) {
             }
             const hasTerrainCollision = renderRouteTerrain(routeTerrain.routeSamples);
             showMissionWarnings(terrainSamplingFailed, hasTerrainCollision, missingHomeReference);
-            renderSimulatedTrack(simulationSamples, hasHome ? homeGroundHeight : 0);
+            // The track's altitudes are metres above home, so they need the same
+            // ground the waypoints are measured from. Falling back to sea level
+            // instead buries the whole track as far underground as the site is
+            // high — which is exactly what it looks like: nothing there at all.
+            const trackDatum = Number.isFinite(homeGroundHeight)
+                ? homeGroundHeight
+                : (groundHeights[points.findIndex((point) => !point.isHome)] ?? 0);
+            const trackPositions = renderSimulatedTrack(simulationSamples, trackDatum);
 
-            const missionBounds = BoundingSphere.fromPoints(displayPositions);
+            // The simulated track has to be framed too. A landing approach runs an
+            // approach length past the touchdown point and out to the side, so
+            // framing the waypoints alone leaves the part worth looking at off screen.
+            const missionBounds = BoundingSphere.fromPoints(displayPositions.concat(trackPositions));
             const range = Math.max(350, missionBounds.radius * 2.5, Math.max(...missionPoints.map((point) => Math.abs(point.altitude))) * 5);
             viewer.camera.flyToBoundingSphere(missionBounds, {
                 duration: 0,
@@ -2648,10 +2660,6 @@ function iconKey(filename) {
         };
     }
 
-    function updateSimulationAvailability() {
-        $('#simulateMission').toggle(!CONFIGURATOR.connectionValid || FC.isAirplane());
-    }
-
     function cleanSimulation() {
         if (simulation.layer) {
             map.removeLayer(simulation.layer);
@@ -2758,6 +2766,11 @@ function iconKey(filename) {
         });
         if (usingDefaults) {
             $warnings.append($('<div/>').text(i18n.getMessage('missionSimulationDefaults')));
+        }
+        // Said rather than hidden: a hidden button is indistinguishable from a
+        // broken one, and airframe detection is not reliable enough to hide on.
+        if (CONFIGURATOR.connectionValid && !FC.isAirplane()) {
+            $warnings.append($('<div/>').text(i18n.getMessage('missionSimulationFixedWingOnly')));
         }
         if (!homeKnown && planned.some((point) => point.absoluteAltitude)) {
             $warnings.append($('<div/>').text(i18n.getMessage('missionSimulationNoHomeElevation')));
@@ -4765,9 +4778,7 @@ function iconKey(filename) {
         // Flight path simulation
         /////////////////////////////////////////////
         $('#simulationSpeed').val(simulation.speedMs);
-        // A fixed wing model has nothing to say about a multirotor or a rover.
-        // Offline the airframe is unknown, so the offer stands.
-        updateSimulationAvailability();
+
 
         // Namespaced and released first: the tab can be entered more than once,
         // and a delegated handler would otherwise pile up on every visit and keep
