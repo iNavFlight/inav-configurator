@@ -1094,17 +1094,17 @@ function iconKey(filename) {
         if (!is3D && map) map.updateSize();
     }
 
-    // Slot the 2D/3D toggle into the control column right below the bottom-most planner control,
-    // matching the 25px grid of the buttons above (settings 65px ... safehome 140px, geozones 190px).
-    // Which slot is free depends on how many controls initMap put into the column.
+    // Slot the 2D/3D toggle below the bottom-most control initMap actually built: settings 65px,
+    // multimission 90px, elevation 115px, safehome 140px, geozones 190px. Which one that is
+    // depends on the connection and on whether geozones are enabled.
     function missionMapViewControlsTop() {
         if (!CONFIGURATOR.connectionValid) {
-            return 140; // no safehome button, so the column ends at 115px
+            return 140; // without a connection the column ends at elevation, 115px
         }
         if (isGeozoneEnabeld) {
-            return 215; // the geozones button fills the 190px slot
+            return 215; // below geozones at 190px
         }
-        return 165; // the safehome button fills the 140px slot
+        return 165; // below safehome at 140px
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////////
