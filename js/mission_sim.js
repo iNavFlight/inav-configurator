@@ -477,36 +477,14 @@ export function simulateGroundTrack(points, params = {}) {
         const offCourse = headingDifference(heading, bearingToTarget);
         const relativeBearing = headingDifference(legBearing, bearingToTarget);
 
-        let done = null;
-        if (distanceM <= waypointRadiusM) {
-            done = SimEvent.REACHED;
-        } else if (Math.abs(relativeBearing) > passAngleDeg) {
-            done = SimEvent.OVERSHOT;
-        } else if (legTravelledM > legBudgetM) {
-            done = SimEvent.ABANDONED;
-        }
+        const done = waypointOutcome({
+            distanceM, relativeBearing, legTravelledM, waypointRadiusM, passAngleDeg, legBudgetM
+        });
 
         if (done) {
             events.push({t: elapsedS, type: done, waypointIndex: targetIndex, distanceM});
-            if (done === SimEvent.OVERSHOT) {
-                warnings.push({
-                    t: elapsedS,
-                    waypointIndex: targetIndex,
-                    code: 'waypoint-missed',
-                    distanceM,
-                    text: `Waypoint ${targetIndex + 1} is passed at ${Math.round(distanceM)} m `
-                        + 'instead of being reached — the turn onto it is tighter than the aircraft flies.'
-                });
-            }
-            if (done === SimEvent.ABANDONED) {
-                warnings.push({
-                    t: elapsedS,
-                    waypointIndex: targetIndex,
-                    code: 'leg-not-flyable',
-                    text: `Waypoint ${targetIndex} was never reached: at ${Math.round(radiusM)} m turn radius `
-                        + 'the aircraft circles it instead of closing in.'
-                });
-            }
+            const warning = waypointWarning(done, targetIndex, distanceM, radiusM, elapsedS);
+            if (warning) warnings.push(warning);
 
             targetIndex += 1;
             if (targetIndex < points.length) {
@@ -556,7 +534,7 @@ export function simulateGroundTrack(points, params = {}) {
             heading,
             bank,
             altitudeM,
-            target.isApproach ? SimPhase.APPROACH : (turning ? SimPhase.TURN : SimPhase.CRUISE),
+            phaseOf(target, turning),
             targetIndex
         ));
     }
@@ -583,6 +561,45 @@ export function simulateGroundTrack(points, params = {}) {
             waypointsReached: events.filter((event) => event.type === SimEvent.REACHED).length
         }
     };
+}
+
+// Whether the active waypoint is done with, and why.
+function waypointOutcome({distanceM, relativeBearing, legTravelledM, waypointRadiusM, passAngleDeg, legBudgetM}) {
+    if (distanceM <= waypointRadiusM) return SimEvent.REACHED;
+    if (Math.abs(relativeBearing) > passAngleDeg) return SimEvent.OVERSHOT;
+    if (legTravelledM > legBudgetM) return SimEvent.ABANDONED;
+    return null;
+}
+
+// Only the outcomes the pilot needs to act on produce a warning.
+function waypointWarning(outcome, waypointIndex, distanceM, radiusM, t) {
+    if (outcome === SimEvent.OVERSHOT) {
+        return {
+            t,
+            waypointIndex,
+            code: 'waypoint-missed',
+            distanceM,
+            text: `Waypoint ${waypointIndex + 1} is passed at ${Math.round(distanceM)} m `
+                + 'instead of being reached — the turn onto it is tighter than the aircraft flies.'
+        };
+    }
+
+    if (outcome === SimEvent.ABANDONED) {
+        return {
+            t,
+            waypointIndex,
+            code: 'leg-not-flyable',
+            text: `Waypoint ${waypointIndex} was never reached: at ${Math.round(radiusM)} m turn radius `
+                + 'the aircraft circles it instead of closing in.'
+        };
+    }
+
+    return null;
+}
+
+function phaseOf(target, turning) {
+    if (target.isApproach) return SimPhase.APPROACH;
+    return turning ? SimPhase.TURN : SimPhase.CRUISE;
 }
 
 function legBudget(from, to, radiusM) {

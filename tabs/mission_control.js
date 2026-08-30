@@ -174,6 +174,18 @@ const missionControlTab = {};
 missionControlTab.isYmapLoad = false;
 
 // Shared between plotElevation() (inside initialize) and cleanup()
+// A setting that will not parse must not reach the model: NaN spreads through the
+// geometry and comes back out as an empty map and a nonsense warning.
+function readNumericSetting(setting, fallback) {
+    const value = Number.parseInt(setting.value, 10);
+    return Number.isFinite(value) ? value : fallback;
+}
+
+function formatSimulationTime(seconds) {
+    const whole = Math.round(seconds);
+    return `${Math.floor(whole / 60)}:${String(whole % 60).padStart(2, '0')} min`;
+}
+
 let elevationChartInstance = null;
 let mission3DViewer = null;
 
@@ -2605,13 +2617,6 @@ function iconKey(filename) {
     const SIMULATION_CRUISE_COLOUR = '#00c2a8';
     const SIMULATION_TURN_COLOUR = '#ffb020';
 
-    // A setting that will not parse must not reach the model: NaN spreads through
-    // the geometry and comes back out as an empty map and a nonsense warning.
-    function readNumericSetting(setting, fallback) {
-        const value = parseInt(setting.value, 10);
-        return Number.isFinite(value) ? value : fallback;
-    }
-
     // nav_fw_wp_turn_smoothing arrives as an index into its own lookup table.
     function readTurnSmoothing(setting) {
         const name = setting.setting?.table?.values?.[setting.value];
@@ -2676,11 +2681,6 @@ function iconKey(filename) {
         flush(samples.at(-1).phase);
 
         return features;
-    }
-
-    function formatSimulationTime(seconds) {
-        const whole = Math.round(seconds);
-        return `${Math.floor(whole / 60)}:${String(whole % 60).padStart(2, '0')} min`;
     }
 
     function repaintSimulation() {
@@ -3845,7 +3845,7 @@ function iconKey(filename) {
         $(map.getViewport()).on('mousemove', function (e) {
             var pixel = map.getEventPixel(e.originalEvent);
             var name = "";
-            var hit = map.forEachFeatureAtPixel(pixel, function (feature) {
+            const hit = map.forEachFeatureAtPixel(pixel, function (feature) {
                 if (feature) {
                     name = feature.getProperties().name;
                 }

@@ -33,7 +33,7 @@
                         </div>
                         <hr> -->
                         <div id="simulateMission" class="btn btn-default" style="padding-top: 1px; display: inline-block; cursor: pointer; float: left;">
-                            <a id="simulateMissionButton" class="btnicon ic_play" href="#" i18n_title="missionTitleSimulate"></a>
+                            <a id="simulateMissionButton" class="btnicon ic_play" href="#" i18n_title="missionTitleSimulate"><span class="sr-only" data-i18n="missionSimulationHead"></span></a>
                         </div>
 
                         <div id="removeAllPoints" class="btn btn-danger" style="padding-top: 1px; display: inline-block; float: left;">
@@ -98,11 +98,11 @@
                     </div>
                     <div class="spacer" id="SimulationContent">
                         <div class="number" style="padding-bottom: 4px;">
-                            <label>
+                            <label for="simulationSpeed">
                                 <input id="simulationSpeed" type="number" min="1" max="80" step="1" value="15" />
                                 <span data-i18n="missionSimulationSpeed"></span>
-                                <div class="helpicon cf_tip" data-i18n_title="missionSimulationSpeedHelp"></div>
                             </label>
+                            <div class="helpicon cf_tip" data-i18n_title="missionSimulationSpeedHelp"></div>
                         </div>
                         <div style="padding-bottom: 2px;">
                             <span data-i18n="missionSimulationTurnRadius"></span>
