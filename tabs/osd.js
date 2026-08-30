@@ -1648,6 +1648,14 @@ OSD.constants = {
                     }
                 },
                 {
+                    name: 'MZTC_STATUS',
+                    id: 171,
+                    min_version: '10.0.0',
+                    preview: function(osd_data) {
+                        return 'IR OK ';
+                    }
+                },
+                {
                     name: 'GPS_MAX_SPEED',
                     id: 125,
                     preview: function(osd_data) {

@@ -108,6 +108,29 @@ var FC = {
         return true; // Currently all platforms use D term
     },
     resetState: function () {
+        // MassZero thermal camera. MZTC_CONFIG mirrors the 15 byte
+        // MSP2_MZTC_CONFIG payload. MZTC_STATUS stays null until the flight
+        // controller answers MSP2_MZTC_STATUS.
+        this.MZTC_CONFIG = {
+            enabled: 0,
+            port: 1,
+            baudrate: 8,
+            mode: 1,
+            update_rate: 9,
+            palette_mode: 0,
+            auto_shutter: 2,
+            digital_enhancement: 50,
+            spatial_denoise: 50,
+            temporal_denoise: 50,
+            brightness: 50,
+            contrast: 50,
+            zoom_level: 0,
+            mirror_mode: 0,
+            ffc_interval: 5
+        };
+
+        this.MZTC_STATUS = null;
+
         this.SENSOR_STATUS = {
             isHardwareHealthy: 0,
             gyroHwStatus: 0,

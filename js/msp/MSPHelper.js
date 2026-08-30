@@ -1726,6 +1726,55 @@ var mspHelper = (function () {
                 console.log("Geozone saved")
                 break;    
 
+            case MSPCodes.MSP2_MZTC_CONFIG:
+                // Fixed 15 byte payload, little endian, one field at a time.
+                // The firmware writes it with the sbufWrite helpers, so there
+                // is no compiler padding to account for here.
+                if (data.byteLength >= 15) {
+                    FC.MZTC_CONFIG = {
+                        enabled: data.getUint8(0),
+                        port: data.getUint8(1),
+                        baudrate: data.getUint8(2),
+                        mode: data.getUint8(3),
+                        update_rate: data.getUint8(4),
+                        palette_mode: data.getUint8(5),
+                        auto_shutter: data.getUint8(6),
+                        digital_enhancement: data.getUint8(7),
+                        spatial_denoise: data.getUint8(8),
+                        temporal_denoise: data.getUint8(9),
+                        brightness: data.getUint8(10),
+                        contrast: data.getUint8(11),
+                        zoom_level: data.getUint8(12),
+                        mirror_mode: data.getUint8(13),
+                        ffc_interval: data.getUint8(14)
+                    };
+                } else {
+                    console.log('MZTC_CONFIG payload too short: ' + data.byteLength + ' bytes, expected 15');
+                }
+                break;
+
+            case MSPCodes.MSP2_MZTC_STATUS:
+                // Fixed 7 byte payload. connected is set only after the camera
+                // has answered a command. An open UART does not set it.
+                if (data.byteLength >= 7) {
+                    FC.MZTC_STATUS = {
+                        status: data.getUint8(0),
+                        mode: data.getUint8(1),
+                        connected: data.getUint8(2),
+                        connection_quality: data.getUint8(3),
+                        last_calibration: data.getUint16(4, true),
+                        error_flags: data.getUint8(6)
+                    };
+                } else {
+                    console.log('MZTC_STATUS payload too short: ' + data.byteLength + ' bytes, expected 7');
+                    FC.MZTC_STATUS = null;
+                }
+                break;
+
+            case MSPCodes.MSP2_SET_MZTC_CONFIG:
+                console.log("MZTC config saved");
+                break;
+
             default:
                 console.log('Unknown code detected: 0x' + dataHandler.code.toString(16));
         } else {
@@ -2328,6 +2377,27 @@ var mspHelper = (function () {
                 buffer.push(FC.EZ_TUNE.snappiness);
                 break;
 
+
+            case MSPCodes.MSP2_SET_MZTC_CONFIG:
+                // Fixed 15 byte payload matching MSP2_MZTC_CONFIG. The firmware
+                // validates the whole request before applying any of it, so an
+                // out of range value is rejected in full.
+                buffer.push(FC.MZTC_CONFIG.enabled ? 1 : 0);
+                buffer.push(FC.MZTC_CONFIG.port);
+                buffer.push(FC.MZTC_CONFIG.baudrate);
+                buffer.push(FC.MZTC_CONFIG.mode);
+                buffer.push(FC.MZTC_CONFIG.update_rate);
+                buffer.push(FC.MZTC_CONFIG.palette_mode);
+                buffer.push(FC.MZTC_CONFIG.auto_shutter);
+                buffer.push(FC.MZTC_CONFIG.digital_enhancement);
+                buffer.push(FC.MZTC_CONFIG.spatial_denoise);
+                buffer.push(FC.MZTC_CONFIG.temporal_denoise);
+                buffer.push(FC.MZTC_CONFIG.brightness);
+                buffer.push(FC.MZTC_CONFIG.contrast);
+                buffer.push(FC.MZTC_CONFIG.zoom_level);
+                buffer.push(FC.MZTC_CONFIG.mirror_mode);
+                buffer.push(FC.MZTC_CONFIG.ffc_interval);
+                break;
 
             default:
                 return false;
@@ -2983,6 +3053,18 @@ var mspHelper = (function () {
 
     self.queryFcStatus = function (callback) {
         MSP.send_message(MSPCodes.MSPV2_INAV_STATUS, false, false, callback);
+    };
+
+    self.loadMZTCConfig = function (callback) {
+        MSP.send_message(MSPCodes.MSP2_MZTC_CONFIG, false, false, callback);
+    };
+
+    self.loadMZTCStatus = function (callback) {
+        MSP.send_message(MSPCodes.MSP2_MZTC_STATUS, false, false, callback);
+    };
+
+    self.saveMZTCConfig = function (callback) {
+        MSP.send_message(MSPCodes.MSP2_SET_MZTC_CONFIG, mspHelper.crunch(MSPCodes.MSP2_SET_MZTC_CONFIG), false, callback);
     };
 
     self.loadMiscV2 = function (callback) {
