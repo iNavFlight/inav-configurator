@@ -2722,31 +2722,11 @@ function iconKey(filename) {
         return features;
     }
 
-    function repaintSimulation() {
-        cleanSimulation();
-        $('#missionPlannerSimulation').toggle(simulation.enabled);
-        if (!simulation.enabled) return;
-
-        const $warnings = $('#simulationWarnings').empty();
-        const clearFigures = () => $('#simulationTime, #simulationDistance').text('-');
-
-        // In the all-missions view the map shows every mission but the simulation
-        // only ever flies one, so figures would describe something else entirely.
-        if (!singleMissionActive()) {
-            $('#simulationTurnRadius').text('');
-            clearFigures();
-            $warnings.text(i18n.getMessage('missionSimulationMultiMission'));
-            return;
-        }
-
+    // Everything the run needs, gathered in one place: the route with its landing
+    // approaches, the parameters, and what had to be assumed to get there.
+    function buildSimulationPlan() {
         const planned = getSimulationRoute(mission.get());
-
-        if (planned.length < 2) {
-            $('#simulationTurnRadius').text('');
-            clearFigures();
-            $warnings.text(i18n.getMessage('missionSimulationTooFewPoints'));
-            return;
-        }
+        if (planned.length < 2) return null;
 
         // Home elevation is what turns an AMSL waypoint into the above-home frame
         // the flight controller navigates in. Without it, absolute altitudes are
@@ -2754,95 +2734,130 @@ function iconKey(filename) {
         const homeAltM = homeMarkers.length && HOME.getAlt() !== 'N/A' ? Number(HOME.getAlt()) : undefined;
         const {route: withAltitudes, homeKnown} = resolveRouteAltitudes(planned, homeAltM);
 
-        // Offline these are still zero — they are only read from a connected
-        // flight controller — so the firmware's own defaults stand in rather than
-        // letting the approach quietly disappear.
+        // Offline these are still zero — they are only read from a connected flight
+        // controller — so the firmware's own defaults stand in rather than letting
+        // the approach quietly disappear.
         const approachLengthCm = simulation.approachLengthCm || FirmwareDefaults.approachLengthCm;
         const loiterRadiusCm = simulation.loiterRadiusCm || FirmwareDefaults.loiterRadiusCm;
-        const usingDefaults = !simulation.approachLengthCm || !simulation.loiterRadiusCm;
 
-        const approachParams = {approachLengthCm, loiterRadiusCm, homeAltM};
         const {route, landingsWithoutApproach} = withLandingApproaches(
             withAltitudes,
             (point) => landingApproachFor(point),
-            approachParams
+            {approachLengthCm, loiterRadiusCm, homeAltM}
         );
 
-        const parameters = {
-            speedMs: simulation.speedMs,
-            bankAngleDeg: simulation.bankCeilingDeg > 0
-                ? Math.min(simulation.bankAngleDeg, simulation.bankCeilingDeg)
-                : simulation.bankAngleDeg,
-            loiterRadiusM: loiterRadiusCm / 100,
-            waypointRadiusM: simulation.wpRadiusCm / 100,
-            turnSmoothing: simulation.turnSmoothing
-        };
-        const result = simulateGroundTrack(route, parameters);
-        simulation.samples = result.samples;
+        // nav_fw_bank_angle is what navigation asks for; max_angle_inclination_rll
+        // is what the aircraft can deliver. The tighter one sizes the turn.
+        const bankCeilingBinds = simulation.bankCeilingDeg > 0
+            && simulation.bankCeilingDeg < simulation.bankAngleDeg;
 
-        const problemMessage = {
-            [LandingApproachProblem.NO_HEADING]: 'missionSimulationNoLandingHeading',
-            [LandingApproachProblem.NO_APPROACH_LENGTH]: 'missionSimulationNoApproachLength',
-            [LandingApproachProblem.ALTITUDES_IMPLAUSIBLE]: 'missionSimulationApproachAltitudes'
+        return {
+            planned,
+            route,
+            landingsWithoutApproach,
+            homeKnown,
+            bankCeilingBinds,
+            usingDefaults: !simulation.approachLengthCm || !simulation.loiterRadiusCm,
+            parameters: {
+                speedMs: simulation.speedMs,
+                bankAngleDeg: bankCeilingBinds ? simulation.bankCeilingDeg : simulation.bankAngleDeg,
+                loiterRadiusM: loiterRadiusCm / 100,
+                waypointRadiusM: simulation.wpRadiusCm / 100,
+                turnSmoothing: simulation.turnSmoothing
+            }
         };
-        landingsWithoutApproach.forEach(({number, reason}) => {
-            $warnings.append($('<div/>').text(
-                i18n.getMessage(problemMessage[reason], [String(Number(number) + 1)])
-            ));
-        });
-        if (usingDefaults) {
-            $warnings.append($('<div/>').text(i18n.getMessage('missionSimulationDefaults')));
+    }
+
+    const LANDING_PROBLEM_MESSAGE = {
+        [LandingApproachProblem.NO_HEADING]: 'missionSimulationNoLandingHeading',
+        [LandingApproachProblem.NO_APPROACH_LENGTH]: 'missionSimulationNoApproachLength',
+        [LandingApproachProblem.ALTITUDES_IMPLAUSIBLE]: 'missionSimulationApproachAltitudes'
+    };
+
+    // Everything the reader has to know to judge what they are looking at.
+    function simulationNotices(plan, result) {
+        const notices = plan.landingsWithoutApproach.map(({number, reason}) =>
+            i18n.getMessage(LANDING_PROBLEM_MESSAGE[reason], [String(Number(number) + 1)]));
+
+        if (plan.usingDefaults) notices.push(i18n.getMessage('missionSimulationDefaults'));
+        if (!simulation.speedFromFc) notices.push(i18n.getMessage('missionSimulationSpeedEstimated'));
+        if (plan.bankCeilingBinds) {
+            notices.push(i18n.getMessage('missionSimulationBankCeiling', [String(simulation.bankCeilingDeg)]));
         }
-        if (!simulation.speedFromFc) {
-            $warnings.append($('<div/>').text(i18n.getMessage('missionSimulationSpeedEstimated')));
-        }
-        // Said rather than hidden: a hidden button is indistinguishable from a
-        // broken one, and airframe detection is not reliable enough to hide on.
+        // Said rather than hidden: a hidden button is indistinguishable from a broken
+        // one, and airframe detection is not reliable enough to hide a feature on.
         if (CONFIGURATOR.connectionValid && !FC.isAirplane()) {
-            $warnings.append($('<div/>').text(i18n.getMessage('missionSimulationFixedWingOnly')));
+            notices.push(i18n.getMessage('missionSimulationFixedWingOnly'));
         }
-        if (!homeKnown && planned.some((point) => point.absoluteAltitude)) {
-            $warnings.append($('<div/>').text(i18n.getMessage('missionSimulationNoHomeElevation')));
+        if (!plan.homeKnown && plan.planned.some((point) => point.absoluteAltitude)) {
+            notices.push(i18n.getMessage('missionSimulationNoHomeElevation'));
         }
+
+        return notices.concat(
+            result.warnings
+                .filter((warning) => warning.code !== 'simulation-truncated')
+                .map((warning) => warning.text)
+        );
+    }
+
+    // A repeat or a truncated run means the figures no longer describe the whole
+    // flight. Showing a rounded number anyway would read as a complete answer.
+    function showSimulationFigures(plan, result) {
+        const radius = commandedTurnRadius(
+            plan.parameters.speedMs, plan.parameters.bankAngleDeg,
+            plan.parameters.loiterRadiusM, plan.parameters.turnSmoothing
+        );
+        $('#simulationTurnRadius').text(Number.isFinite(radius) ? `${radius.toFixed(0)} m` : '-');
+
+        const repeats = mission.get().some((waypoint) => waypoint.getAction() === MWNP.WPTYPE.JUMP);
+        const truncated = result.warnings.some((warning) => warning.code === 'simulation-truncated');
+
+        if (repeats || truncated) {
+            $('#simulationTime, #simulationDistance').text('-');
+            return i18n.getMessage(repeats ? 'missionSimulationJumps' : 'missionSimulationTruncated');
+        }
+
+        $('#simulationTime').text(formatSimulationTime(result.summary.totalTimeS));
+        $('#simulationDistance').text(`${(result.summary.totalDistanceM / 1000).toFixed(2)} km`);
+        return null;
+    }
+
+    function repaintSimulation() {
+        cleanSimulation();
+        $('#missionPlannerSimulation').toggle(simulation.enabled);
+        if (!simulation.enabled) return;
+
+        const $warnings = $('#simulationWarnings').empty();
+        const stop = (message) => {
+            $('#simulationTurnRadius').text('');
+            $('#simulationTime, #simulationDistance').text('-');
+            $warnings.text(i18n.getMessage(message));
+        };
+
+        // In the all-missions view the map shows every mission but the simulation
+        // only ever flies one, so figures would describe something else entirely.
+        if (!singleMissionActive()) return stop('missionSimulationMultiMission');
+
+        const plan = buildSimulationPlan();
+        if (!plan) return stop('missionSimulationTooFewPoints');
+
+        const result = simulateGroundTrack(plan.route, plan.parameters);
+        simulation.samples = result.samples;
 
         if (result.samples.length > 1) {
             simulation.layer = new VectorLayer({
                 source: new VectorSource({features: simulationTrackFeatures(result.samples)})
             });
-            // Keep the track out of every hit test: it must never be picked up as
-            // a marker to drag or a line to insert a waypoint into.
+            // Keep the track out of every hit test: it must never be picked up as a
+            // marker to drag or a line to insert a waypoint into.
             simulation.layer.set('no_interaction', true);
             map.addLayer(simulation.layer);
         }
 
-        const radius = commandedTurnRadius(
-            parameters.speedMs, parameters.bankAngleDeg, parameters.loiterRadiusM, parameters.turnSmoothing
-        );
-        if (simulation.bankCeilingDeg > 0 && simulation.bankCeilingDeg < simulation.bankAngleDeg) {
-            $warnings.append($('<div/>').text(i18n.getMessage(
-                'missionSimulationBankCeiling', [String(simulation.bankCeilingDeg)]
-            )));
-        }
-        $('#simulationTurnRadius').text(Number.isFinite(radius) ? `${radius.toFixed(0)} m` : '-');
-
-        // A repeat or a truncated run means the figures no longer describe the whole
-        // flight. Showing a rounded number anyway would read as a complete answer.
-        const repeats = mission.get().some((waypoint) => waypoint.getAction() === MWNP.WPTYPE.JUMP);
-        const truncated = result.warnings.some((warning) => warning.code === 'simulation-truncated');
-
-        if (repeats || truncated) {
-            clearFigures();
-            $warnings.append($('<div/>').text(i18n.getMessage(
-                repeats ? 'missionSimulationJumps' : 'missionSimulationTruncated'
-            )));
-        } else {
-            $('#simulationTime').text(formatSimulationTime(result.summary.totalTimeS));
-            $('#simulationDistance').text(`${(result.summary.totalDistanceM / 1000).toFixed(2)} km`);
-        }
-
-        result.warnings
-            .filter((warning) => warning.code !== 'simulation-truncated')
-            .forEach((warning) => $warnings.append($('<div/>').text(warning.text)));
+        const incomplete = showSimulationFigures(plan, result);
+        simulationNotices(plan, result)
+            .concat(incomplete ?? [])
+            .forEach((text) => $warnings.append($('<div/>').text(text)));
     }
 
     function redrawLayers() {
