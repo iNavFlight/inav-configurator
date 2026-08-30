@@ -5167,6 +5167,42 @@
     "missionSeaLevelRef": {
         "message": "Sea level Ref: "
     },
+    "missionWpListHead": {
+        "message": "Waypoints"
+    },
+    "missionWpListSelect": {
+        "message": "Waypoint:"
+    },
+    "missionWpListPrev": {
+        "message": "Previous waypoint"
+    },
+    "missionWpListNext": {
+        "message": "Next waypoint"
+    },
+    "missionWpListCount": {
+        "message": "$1 waypoint(s) in the mission"
+    },
+    "missionApplyNoElevation": {
+        "message": "Elevation lookup failed, altitudes were not changed"
+    },
+    "missionApplyMissionChanged": {
+        "message": "The mission changed while elevations were loading, nothing was saved"
+    },
+    "missionApplyViaHome": {
+        "message": "Sea level reference applied to $1 waypoint(s), converted via the home elevation"
+    },
+    "missionApplyViaTerrain": {
+        "message": "Sea level reference applied to $1 waypoint(s), converted via the terrain under each waypoint"
+    },
+    "missionApplyAltApplied": {
+        "message": "Default altitude applied to $1 waypoint(s)"
+    },
+    "missionApplySpeedApplied": {
+        "message": "Default speed applied to $1 waypoint(s)"
+    },
+    "missionApplyBelowGround": {
+        "message": "Warning: $1 waypoint(s) now sit below the ground, check the altitudes"
+    },
     "missionElevation": {
         "message": "Elevation (m):"
     },
