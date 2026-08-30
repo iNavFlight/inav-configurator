@@ -4435,6 +4435,9 @@
     "osdGroupAltitude": {
         "message": "Altitude"
     },
+    "osdGroupThermalCamera": {
+        "message": "Thermal Camera"
+    },
     "osdGroupTimers": {
         "message": "Timers"
     },

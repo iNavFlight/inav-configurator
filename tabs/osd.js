@@ -1415,6 +1415,24 @@ OSD.constants = {
             ]
         },
         {
+            name: 'osdGroupThermalCamera',
+            items: [
+                {
+                    name: 'MZTC_STATUS',
+                    id: 171,
+                    // min_version stays commented out until the firmware
+                    // version is bumped, matching AUTO SPEED. The
+                    // maintenance-10.x firmware still reports 9.x, so a
+                    // 10.0.0 gate would hide the element on the builds that
+                    // actually support it.
+                    // min_version: '10.0.0',
+                    preview: function(osd_data) {
+                        return 'IR OK ';
+                    }
+                },
+            ]
+        },
+        {
             name: 'osdGroupTimers',
             items: [
                 {
@@ -1645,14 +1663,6 @@ OSD.constants = {
                             default: // Metric
                                 return FONT.embed_dot('G:204') + FONT.symbol(SYM.KMH_3D);
                         }
-                    }
-                },
-                {
-                    name: 'MZTC_STATUS',
-                    id: 171,
-                    min_version: '10.0.0',
-                    preview: function(osd_data) {
-                        return 'IR OK ';
                     }
                 },
                 {
