@@ -272,20 +272,37 @@ gpsTab.initialize = function (callback) {
         }
 
         // generate GPS
-        var gpsProtocols = FC.getGpsProtocols();
-        var gpsSbas = FC.getGpsSbasProviders();
+        // GPS protocol options come from the FC's live gps_provider setting table
+        // (not a hardcoded array) so this can never drift from whatever enum
+        // ordering the connected firmware actually uses.
+        mspHelper.getSetting('gps_provider').then(function (data) {
+            if (!data?.setting?.table) {
+                return;
+            }
+            const gpsProtocols = data.setting.table.values;
+            const droneCanIndex = gpsProtocols.indexOf('DRONECAN');
 
-        var gps_protocol_e = $('#gps_protocol');
-        for (let i = 0; i < gpsProtocols.length; i++) {
-            gps_protocol_e.append('<option value="' + i + '">' + gpsProtocols[i] + '</option>');
-        }
+            var gps_protocol_e = $('#gps_protocol');
+            for (let i = 0; i < gpsProtocols.length; i++) {
+                gps_protocol_e.append('<option value="' + i + '">' + gpsProtocols[i] + '</option>');
+            }
 
-        gps_protocol_e.on('change', function () {
-            FC.MISC.gps_type = parseInt($(this).val());
+            gps_protocol_e.on('change', function () {
+                FC.MISC.gps_type = parseInt($(this).val());
+                const isDroneCAN = FC.MISC.gps_type === droneCanIndex;
+                $('#gps_port').closest('.select').toggle(!isDroneCAN);
+                $('#gps_baud').closest('.select').toggle(!isDroneCAN);
+                $('#gps_dronecan_info').toggle(isDroneCAN);
+                if (isDroneCAN) {
+                    $port.val(-1);
+                }
+            });
+
+            gps_protocol_e.val(FC.MISC.gps_type);
+            gps_protocol_e.trigger('change');
         });
 
-        gps_protocol_e.val(FC.MISC.gps_type);
-        gps_protocol_e.trigger('change');
+        var gpsSbas = FC.getGpsSbasProviders();
 
         var gps_ubx_sbas_e = $('#gps_ubx_sbas');
         for (let i = 0; i < gpsSbas.length; i++) {

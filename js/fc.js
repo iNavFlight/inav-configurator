@@ -90,6 +90,9 @@ var FC = {
     EZ_TUNE: null,
     FLIGHT_MODES: null,
     GEOZONES: null,
+    DRONECAN_NODES: [],
+    DRONECAN_ASYNC_REQUEST: null,
+    DRONECAN_ASYNC_RESULT: null,
 
     restartRequired: false,
     MAX_SERVO_RATE: 125,
@@ -624,6 +627,10 @@ var FC = {
            items: [],
         };
 
+        this.DRONECAN_NODES = [];
+        this.DRONECAN_ASYNC_REQUEST = null;
+        this.DRONECAN_ASYNC_RESULT = null;
+
     },
     getOutputUsages: function() {
         return {
@@ -674,13 +681,6 @@ var FC = {
     },
     isMotorOutputEnabled: function () {
         return this.isFeatureEnabled('PWM_OUTPUT_ENABLE', this.getFeatures());
-    },
-    getGpsProtocols: function () {
-        return [
-            'UBLOX',
-            'MSP',
-            'FAKE'
-        ];
     },
     getGpsBaudRates: function () {
         return [
