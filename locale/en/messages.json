@@ -5044,7 +5044,7 @@
         "message": "Cruise speed (m/s)"
     },
     "missionSimulationSpeedHelp": {
-        "message": "An estimate, not a value read from the flight controller. A fixed wing flies a cruise throttle setting, so nav_auto_speed and the per-waypoint speed do not apply to it. The turn radius grows with the square of this figure, so enter what your aircraft really cruises at."
+        "message": "Read from fw_reference_airspeed when a flight controller is connected - the same speed the firmware uses for its own coordinated turn calculation when no airspeed sensor is fitted. Override it to see how the mission looks at another speed; the turn radius grows with the square of this figure. Note that nav_auto_speed and the per-waypoint speed do not apply to a fixed wing, which flies a throttle setting."
     },
     "missionSimulationTurnRadius": {
         "message": "Turn radius:"
@@ -5069,6 +5069,9 @@
     },
     "missionSimulationDefaults": {
         "message": "No flight controller connected: approach length and loiter radius fall back to the firmware defaults, so the approach shown is generic."
+    },
+    "missionSimulationSpeedEstimated": {
+        "message": "Cruise speed is an assumption: connect the flight controller to read fw_reference_airspeed, or set it to what your aircraft really cruises at. The turn radius depends on it squared."
     },
     "missionSimulationFixedWingOnly": {
         "message": "This models a fixed wing. The connected aircraft is not one, so the track shown does not describe how it will fly."

@@ -268,6 +268,7 @@ missionControlTab.initialize = function (callback) {
         wpRadiusCm: FirmwareDefaults.waypointRadiusCm,
         loiterRadiusCm: 0,
         approachLengthCm: 0,
+        speedFromFc: false,
         turnSmoothing: TurnSmoothing.OFF
     };
 
@@ -338,6 +339,19 @@ missionControlTab.initialize = function (callback) {
             function (callback) {
                 mspHelper.getSetting("nav_fw_wp_turn_smoothing").then((data) => {
                     if (data) simulation.turnSmoothing = readTurnSmoothing(data);
+                }).catch(() => {}).then(() => callback());
+            },
+            // The speed the firmware itself plans coordinated turns with when there
+            // is no airspeed sensor. Far better than asking the pilot to guess, and
+            // it is the same number the turn radius is derived from on the aircraft.
+            function (callback) {
+                mspHelper.getSetting("fw_reference_airspeed").then((data) => {
+                    if (!data) return;
+                    const centimetresPerSecond = readNumericSetting(data, 0);
+                    if (centimetresPerSecond > 0) {
+                        simulation.speedMs = Math.round(centimetresPerSecond / 100);
+                        simulation.speedFromFc = true;
+                    }
                 }).catch(() => {}).then(() => callback());
             }
         ]);
@@ -2766,6 +2780,9 @@ function iconKey(filename) {
         });
         if (usingDefaults) {
             $warnings.append($('<div/>').text(i18n.getMessage('missionSimulationDefaults')));
+        }
+        if (!simulation.speedFromFc) {
+            $warnings.append($('<div/>').text(i18n.getMessage('missionSimulationSpeedEstimated')));
         }
         // Said rather than hidden: a hidden button is indistinguishable from a
         // broken one, and airframe detection is not reliable enough to hide on.
