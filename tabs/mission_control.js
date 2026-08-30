@@ -2595,7 +2595,7 @@ function iconKey(filename) {
        sea they were measured over the ground the waypoint used to stand on, so they are
        shifted onto the new ground and keep the height above it they had. Held against home
        the terrain never entered into them and they are left alone. */
-    function settleLandingApproach(wp, elevationAtWP, isSelected) {
+    function settleLandingApproach(wp, elevationAtWP) {
         if (wp.getAction() != MWNP.WPTYPE.LAND) return;
 
         const approach = FC.FW_APPROACH.get()[FC.SAFEHOMES.getMaxSafehomeCount() + wp.getMultiMissionIdx()];
@@ -2605,12 +2605,6 @@ function iconKey(filename) {
                 approach.setLandAltAsl(approach.getLandAltAsl() - approach.getElevation() + elevationAtWP * 100);
             }
             approach.setElevation(elevationAtWP * 100);
-            if (isSelected) {
-                $('#wpApproachAlt').val(approach.getApproachAltAsl());
-                $('#wpLandAlt').val(approach.getLandAltAsl());
-                $('#wpLandAltM').text(approach.getLandAltAsl() / 100 + " m");
-                $('#wpApproachAltM').text(approach.getApproachAltAsl() / 100 + " m");
-            }
         }
     }
 
@@ -2640,7 +2634,7 @@ function iconKey(filename) {
         }
         wp.setAlt(checkAltElevSanity(false, wp.getAlt(), elevationAtWP, wp.getP3()));
 
-        settleLandingApproach(wp, elevationAtWP, isSelected);
+        settleLandingApproach(wp, elevationAtWP);
 
         mission.updateWaypoint(wp);
         renderWaypointSelect();
