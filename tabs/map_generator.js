@@ -621,8 +621,8 @@ async function openCopernicusImage(lat, lon, imgCache, full, statusCb) {
             if (full) {
                 if (statusCb) statusCb('downloading');
                 const resp = await fetch(copernicusUrl(lat, lon));
-                if (resp.status === 404 || resp.status === 403) {
-                    const err = new Error('HTTP ' + resp.status);
+                if (resp.status === 404) {           // no file = square is entirely sea
+                    const err = new Error('HTTP 404');
                     err.notFound = true;
                     throw err;
                 }
@@ -632,8 +632,24 @@ async function openCopernicusImage(lat, lon, imgCache, full, statusCb) {
                 const tiff = await fromArrayBuffer(buf);
                 return { image: await tiff.getImage(), full: true };
             }
-            const tiff = await fromUrl(copernicusUrl(lat, lon));
-            return { image: await tiff.getImage(), full: false };
+            try {
+                const tiff = await fromUrl(copernicusUrl(lat, lon));
+                return { image: await tiff.getImage(), full: false };
+            } catch (e) {
+                // geotiff throws a generic error with no status. Confirm with a
+                // HEAD: this bucket returns 404 for 1° squares that are entirely
+                // sea (no file) — that is "no data", so the edge stays at sea
+                // level. A 403 or anything else is a real access/network problem
+                // and must surface (→ ask-first SRTM fallback), not be silently
+                // zeroed into the terrain.
+                const head = await fetch(copernicusUrl(lat, lon), { method: 'HEAD' });
+                if (head.status === 404) {
+                    const err = new Error('HTTP 404');
+                    err.notFound = true;
+                    throw err;
+                }
+                throw e;
+            }
         });
         imgCache[key] = entry;
         return entry.image;
@@ -864,8 +880,10 @@ const hgtDb = {
 
 // ─── Tab lifecycle ──────────────────────────────────────────────────────
 TABS.map_generator.initialize = function (callback) {
-    if (GUI.active_tab !== 'map_generator') {
-        GUI.active_tab = 'map_generator';
+    // Must be the tab object, not its name — GUI.tab_switch_cleanup() calls
+    // active_tab.cleanup() when leaving the tab.
+    if (GUI.active_tab !== TABS.map_generator) {
+        GUI.active_tab = TABS.map_generator;
     }
 
     loadHtml();
