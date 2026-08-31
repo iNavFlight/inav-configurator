@@ -3637,7 +3637,7 @@ HARDWARE.update = function(callback) {
         });
 
         mspHelper.getSetting("terrain_enabled").then(function(data) {
-            HARDWARE.capabilities.useTerrain = Boolean(data.value);
+            HARDWARE.capabilities.useTerrain = Boolean(data && data.value);
         })
     });
 };
