@@ -86,6 +86,13 @@ function appendToStream(filename, data) {
   }
 }
 
+// download() is synchronous, so this flush actually completes before pagehide finishes.
+window.addEventListener("pagehide", () => {
+  for (const filename of Array.from(appendStreams.keys())) {
+    flushAppendStream(filename);
+  }
+});
+
 /**
  * Provides only browser-safe equivalents for the Electron preload API.
  * Unsupported desktop-only features deliberately fail with an explanatory
@@ -97,14 +104,6 @@ export function installBrowserPlatform() {
   }
 
   globalThis.__INAV_BROWSER_BUILD__ = true;
-
-  // One-time migration: an earlier browser build force-disabled the CLI
-  // auto-complete preference. Clear that stale value once so the default
-  // applies again, while preserving any choice the user makes afterwards.
-  if (!localStorage.getItem("inav:web_migration_cli_autocomplete")) {
-    localStorage.removeItem("inav:cli_autocomplete");
-    localStorage.setItem("inav:web_migration_cli_autocomplete", "1");
-  }
 
   globalThis.electronAPI = {
     storeGet(key, defaultValue) {

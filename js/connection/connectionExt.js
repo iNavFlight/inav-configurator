@@ -120,6 +120,7 @@ class ConnectionExt extends Connection {
             if (callback) {
                 callback(false);
             }
+            return;
         }
 
         let isConnected = false;

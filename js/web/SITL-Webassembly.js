@@ -15,6 +15,11 @@ let WASMModule = null;
 let isLoading = false;
 let isRunning = false;
 
+// Cap consecutive crash-auto-restarts so a persistently-crashing SITL binary
+// (bad EEPROM file, incompatible browser, etc.) doesn't loop forever.
+const MAX_AUTO_RESTART_ATTEMPTS = 3;
+let crashRestartCount = 0;
+
 // Event listeners for output
 const outputListeners = {
     print: [],
@@ -158,6 +163,12 @@ const SITLWebAssembly = {
                     GUI.log(`[SITL WASM] Exited with code ${code}`);
 
                     if (code === 1) {
+                        crashRestartCount++;
+                        if (crashRestartCount > MAX_AUTO_RESTART_ATTEMPTS) {
+                            GUI.log(`[SITL WASM] Crashed ${crashRestartCount} times in a row, giving up on auto-restart`);
+                            return;
+                        }
+
                         // Save command line args and attempt restart after short delay
                         let commandLineArgs = this.commandLineArgs.slice();
                         this.reset();
@@ -168,7 +179,7 @@ const SITLWebAssembly = {
                                 } else {
                                     GUI.log('[SITL WASM] Restarted');
                                 }
-                            });
+                            }, true);
                         }, 1000);
                     }
                 },                
@@ -236,8 +247,12 @@ const SITLWebAssembly = {
      *        }
      * @param {Function} callback - (err, commandString) => Called with formatted command or error
      */
-    start: async function(options = {}, callback) {
-        
+    start: async function(options = {}, callback, _isAutoRestart = false) {
+
+        if (!_isAutoRestart) {
+            crashRestartCount = 0;
+        }
+
         if (isRunning) {
             const msg = 'SITL WASM already running';
             console.warn(msg);
