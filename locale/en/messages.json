@@ -6712,6 +6712,144 @@
     "gpsOptionsAssistnowToken": {
         "message": "AssitNow Token"
     },
+    "googleLocationServices": {
+        "message": "Google Location & Weather Services"
+    },
+    "googleLocationApiKey": {
+        "message": "API Key"
+    },
+    "googleLocationTestButton": {
+        "message": "Test API key"
+    },
+    "googleLocationHelpButton": {
+        "message": "Help and setup instructions"
+    },
+    "googleLocationTestPending": {
+        "message": "Testing…"
+    },
+    "googleLocationTestSuccess": {
+        "message": "Success! Location: $1, $2 (accuracy: $3 m)"
+    },
+    "googleLocationTestNoKey": {
+        "message": "Please enter an API key first."
+    },
+    "googleLocationTestError": {
+        "message": "Error: $1"
+    },
+    "googleLocationTestGeocodingFail": {
+        "message": "Google Geocoding API unavailable: $1 — address search will use OpenStreetMap instead."
+    },
+    "googleLocationTestWeatherSuccess": {
+        "message": "Weather API OK"
+    },
+    "googleLocationTestWeather": {
+        "message": "Weather API OK — Wind: $1 $2"
+    },
+    "googleLocationTestWeatherFail": {
+        "message": "Weather API failed: $1 — Enable the Weather API in Google Cloud Console."
+    },
+    "googleLocationHelpTitle": {
+        "message": "Google Location & Weather Services"
+    },
+    "googleLocationHelpBenefit": {
+        "message": "With a Google API key, Mission Control can determine your approximate IP-based location before the flight controller has a GPS fix. It can also show current weather conditions for offline mission planning or the aircraft's GPS position."
+    },
+    "googleLocationHelpHowTitle": {
+        "message": "How to configure an API key:"
+    },
+    "googleLocationHelpStep1": {
+        "message": "Open the <a href='https://console.cloud.google.com/' target='_blank'>Google Cloud Console</a>."
+    },
+    "googleLocationHelpStep2": {
+        "message": "Create a project or select an existing project."
+    },
+    "googleLocationHelpStep3": {
+        "message": "Enable the Geolocation API, Geocoding API, and Weather API."
+    },
+    "googleLocationHelpStep4": {
+        "message": "Create an API key under APIs &amp; Services → Credentials."
+    },
+    "googleLocationHelpStep5": {
+        "message": "Restrict the key to the Geolocation, Geocoding, and Weather APIs, then paste it here."
+    },
+    "googleLocationHelpNote": {
+        "message": "The key is stored locally. Google API usage may be subject to quotas or billing; review your Google Cloud settings before enabling these services."
+    },
+    "googleLocationHelpClose": {
+        "message": "Close"
+    },
+    "apiLocationBannerPrefix": {
+        "message": "API location (IP-based)"
+    },
+    "apiLocationBannerCoordinates": {
+        "message": "Lat: $1  Lon: $2  (~$3 km)"
+    },
+    "apiLocationBannerWarning": {
+        "message": "accuracy may be low"
+    },
+    "addressSearchTitle": {
+        "message": "Search for Location"
+    },
+    "addressSearchPlaceholder": {
+        "message": "Enter address, city, or coordinates"
+    },
+    "addressSearchCancel": {
+        "message": "Cancel"
+    },
+    "addressSearchSubmit": {
+        "message": "Search"
+    },
+    "addressSearchConfirmation": {
+        "message": "Found: $1\nSource: $2\n\nMove to this location?"
+    },
+    "addressSearchNotFound": {
+        "message": "Address not found."
+    },
+    "addressSearchFailed": {
+        "message": "Search failed. Check your connection."
+    },
+    "conditionsInfoHead": {
+        "message": "Weather Conditions"
+    },
+    "conditionsWaiting": {
+        "message": "Waiting for location…"
+    },
+    "conditionsWind": {
+        "message": "Wind: "
+    },
+    "conditionsGusts": {
+        "message": "Gusts: "
+    },
+    "conditionsWindDir": {
+        "message": "Direction: "
+    },
+    "conditionsTemp": {
+        "message": "Temperature: "
+    },
+    "conditionsFeelsLike": {
+        "message": "Feels like: "
+    },
+    "conditionsHumidity": {
+        "message": "Humidity: "
+    },
+    "conditionsUV": {
+        "message": "UV index: "
+    },
+    "conditionsPrecip": {
+        "message": "Precipitation: "
+    },
+    "conditionsThunder": {
+        "message": "Thunderstorm: "
+    },
+    "conditionsVisibility": {
+        "message": "Visibility: "
+    },
+    "conditionsCloud": {
+        "message": "Cloud cover: "
+    },
+    "conditionsUnavailable": {
+        "message": "Weather data unavailable"
+    },
     "gpsLoadAssistnowOfflineButton": {
         "message": "Load AssistNow Offline"
     },

@@ -123,6 +123,195 @@ const iconNames = [
 
 const icons = Object.create(null)
 
+const missionControlLocationNamespace = '.missionControlLocation';
+let googleLocationAbortController = null;
+let weatherAbortController = null;
+let addressSearchAbortController = null;
+
+function cleanupMissionControlLocationResources() {
+    googleLocationAbortController?.abort();
+    googleLocationAbortController = null;
+    weatherAbortController?.abort();
+    weatherAbortController = null;
+    addressSearchAbortController?.abort();
+    addressSearchAbortController = null;
+
+    $(document).off(missionControlLocationNamespace);
+    $('#searchAddress, #centerOnDrone, #showHideConditionsButton').off(missionControlLocationNamespace);
+    $('#addressSearchDialog, #addressSearchBackdrop').remove();
+
+    const apiOverlayEl = document.getElementById('geo_info');
+    if (apiOverlayEl) {
+        apiOverlayEl.textContent = '';
+        apiOverlayEl.style.visibility = 'hidden';
+    }
+}
+
+function showConditionsPanel(isVisible) {
+    $('#missionPlannerConditions').toggleClass('is-hidden', !isVisible);
+}
+
+function toTitleCase(value) {
+    return String(value || '').replaceAll('_', ' ').toLowerCase()
+        .replace(/\b\w/g, function (character) { return character.toUpperCase(); });
+}
+
+function applyThresholdColor(selector, value, lowThreshold, mediumThreshold) {
+    $(selector).css('color', '');
+    if (!Number.isFinite(value)) {
+        return;
+    }
+
+    if (value < lowThreshold) {
+        $(selector).css('color', '#4caf50');
+    } else if (value < mediumThreshold) {
+        $(selector).css('color', '#ff9800');
+    } else {
+        $(selector).css('color', '#f44336');
+    }
+}
+
+function applyUvColor(uv) {
+    $('#condUV').css('color', '');
+    if (!Number.isFinite(uv)) {
+        return;
+    }
+
+    if (uv > 7) {
+        $('#condUV').css('color', '#f44336');
+    } else if (uv > 5) {
+        $('#condUV').css('color', '#f57c00');
+    } else {
+        applyThresholdColor('#condUV', uv, 3, 6);
+    }
+}
+
+function applyThunderColor(thunder) {
+    $('#condThunder').css('color', '');
+    if (!Number.isFinite(thunder)) {
+        return;
+    }
+
+    if (thunder > 30) {
+        $('#condThunder').css('color', '#f44336');
+    } else if (thunder > 10) {
+        $('#condThunder').css('color', '#ff9800');
+    }
+}
+
+function formatConditionsValue(value, unit = '') {
+    if (value == null || value === '') {
+        return '—';
+    }
+
+    return unit ? `${value} ${unit}` : String(value);
+}
+
+function renderConditionsInfo(data) {
+    if (!data || typeof data !== 'object' || data.error) {
+        return false;
+    }
+
+    const windSpeed = data.wind?.speed?.value;
+    const windUnit = data.wind?.speed?.unit;
+    const gustSpeed = data.wind?.gust?.value;
+    const windDirection = data.wind?.direction?.degrees;
+    const windCardinal = data.wind?.direction?.cardinal;
+    const windUnitLabels = {
+        KILOMETERS_PER_HOUR: 'km/h',
+        MILES_PER_HOUR: 'mph',
+    };
+    const windUnitLabel = windUnitLabels[windUnit] || '';
+    const windArrows = ['↓', '↙', '←', '↖', '↑', '↗', '→', '↘'];
+    const windArrow = Number.isFinite(windDirection)
+        ? windArrows[Math.round(windDirection / 45) % windArrows.length]
+        : '';
+    const windDirectionParts = [windArrow, toTitleCase(windCardinal)].filter(Boolean);
+    if (Number.isFinite(windDirection)) {
+        windDirectionParts.push(`(${windDirection}°)`);
+    }
+
+    const temperature = data.temperature?.degrees;
+    const temperatureUnit = data.temperature?.unit === 'CELSIUS'
+        ? '°C'
+        : data.temperature?.unit === 'FAHRENHEIT' ? '°F' : '';
+    const feelsLike = data.feelsLikeTemperature?.degrees;
+    const uv = data.uvIndex;
+    const precipitation = data.precipitation?.qpf?.quantity;
+    const precipitationUnit = data.precipitation?.qpf?.unit === 'INCHES' ? 'in' : 'mm';
+    const thunder = data.thunderstormProbability;
+    const visibility = data.visibility?.distance;
+    const visibilityUnit = data.visibility?.unit === 'KILOMETERS'
+        ? 'km'
+        : data.visibility?.unit === 'MILES' ? 'mi' : '';
+    const cloudCover = data.cloudCover;
+
+    $('#condWeather').text(data.weatherCondition?.description?.text || '—');
+    $('#condWind').text(formatConditionsValue(windSpeed, windUnitLabel));
+    $('#condGusts').text(formatConditionsValue(gustSpeed, windUnitLabel));
+    $('#condWindDir').text(windDirectionParts.join(' ') || '—');
+    $('#condTemp').text(formatConditionsValue(temperature, temperatureUnit));
+    $('#condFeelsLike').text(formatConditionsValue(feelsLike, temperatureUnit));
+    $('#condHumidity').text(formatConditionsValue(data.relativeHumidity, '%'));
+    $('#condUV').text(formatConditionsValue(uv));
+    $('#condPrecip').text(formatConditionsValue(precipitation, precipitationUnit));
+    $('#condThunder').text(formatConditionsValue(thunder, '%'));
+    $('#condVisibility').text(formatConditionsValue(visibility, visibilityUnit));
+    $('#condCloud').text(formatConditionsValue(cloudCover, '%'));
+
+    const windSpeedKmh = Number.isFinite(windSpeed)
+        ? (windUnit === 'MILES_PER_HOUR' ? windSpeed * 1.609 : windSpeed)
+        : Number.NaN;
+    const gustSpeedKmh = Number.isFinite(gustSpeed)
+        ? (windUnit === 'MILES_PER_HOUR' ? gustSpeed * 1.609 : gustSpeed)
+        : Number.NaN;
+    applyUvColor(uv);
+    applyThunderColor(thunder);
+    applyThresholdColor('#condWind', windSpeedKmh, 20, 35);
+    applyThresholdColor('#condGusts', gustSpeedKmh, 25, 45);
+
+    showConditionsPanel(true);
+    $('#conditionsLoading').hide();
+    $('#conditionsError').hide();
+    $('#conditionsData').removeClass('is-hidden').show();
+    return true;
+}
+
+function showApiLocationBanner(apiOverlayEl, infoOverlayEl, googleGeoPos) {
+    if (!apiOverlayEl || !googleGeoPos) {
+        return;
+    }
+
+    if (infoOverlayEl) {
+        infoOverlayEl.style.visibility = 'hidden';
+    }
+
+    const accuracyKm = Number.isFinite(googleGeoPos.accuracy)
+        ? (googleGeoPos.accuracy / 1000).toFixed(0)
+        : '—';
+    apiOverlayEl.textContent =
+        `${i18n.getMessage('apiLocationBannerPrefix')}  ` +
+        `${i18n.getMessage('apiLocationBannerCoordinates', [
+            googleGeoPos.lat.toFixed(4),
+            googleGeoPos.lng.toFixed(4),
+            accuracyKm,
+        ])} — ${i18n.getMessage('apiLocationBannerWarning')}`;
+    apiOverlayEl.style.visibility = 'visible';
+}
+
+function getGoogleLocationZoom(googleGeoPos) {
+    if (!googleGeoPos) {
+        return 14;
+    }
+    if (googleGeoPos.accuracy > 5000) {
+        return 10;
+    }
+    if (googleGeoPos.accuracy > 1000) {
+        return 12;
+    }
+    return 14;
+}
+
 function rotateGridPoint(point, angleRad) {
     const cosAngle = Math.cos(angleRad);
     const sinAngle = Math.sin(angleRad);
@@ -275,6 +464,8 @@ missionControlTab.isYmapLoad = false;
 let elevationChartInstance = null;
 missionControlTab.initialize = function (callback) {
 
+    cleanupMissionControlLocationResources();
+
     let cursorInitialized = false;
     let curPosStyle;
     let curPosGeo;
@@ -286,8 +477,10 @@ missionControlTab.initialize = function (callback) {
     let breadCrumbVector;
     let autoCenteredOnFix = false;
     let lastGpsPos = null;
+    let googleGeoPos = null;
     let infoOverlayEl;
     let infoOverlaySpans;
+    let apiOverlayEl;
     let isOffline = false;
     let selectedSafehome;
     let $safehomeContentBox;
@@ -297,6 +490,195 @@ missionControlTab.initialize = function (callback) {
     let invalidGeoZones = false;
     let isGeozoneEnabeld = false;
     let settings = {speed: 0, alt: 5000, safeRadiusSH: 50, fwApproachAlt: 60, fwLandAlt: 5, maxDistSH: 0, fwApproachLength: 0, fwLoiterRadius: 0};
+    let googleLocationRequestStarted = false;
+    let conditionsFetched = false;
+    const conditionsSourcesAttempted = new Set();
+
+    function getCurrentDroneLocation() {
+        const lat = FC.GPS_DATA?.lat / 10000000;
+        const lng = FC.GPS_DATA?.lon / 10000000;
+        if (FC.GPS_DATA?.fix < 2 || !Number.isFinite(lat) || !Number.isFinite(lng)
+            || Math.abs(lat) > 90 || Math.abs(lng) > 180) {
+            return null;
+        }
+
+        return {
+            lat,
+            lng,
+            coord: fromLonLat([lng, lat]),
+        };
+    }
+
+    function getFirstMissionCoordinate() {
+        const firstWaypoint = mission.get().find(function (waypoint) {
+            return !waypoint.isAttached();
+        });
+        if (!firstWaypoint) {
+            return null;
+        }
+
+        const lat = firstWaypoint.getLatMap();
+        const lng = firstWaypoint.getLonMap();
+        if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
+            return null;
+        }
+
+        return fromLonLat([lng, lat]);
+    }
+
+    function showConditionsUnavailable() {
+        showConditionsPanel(true);
+        $('#conditionsLoading').hide();
+        $('#conditionsData').addClass('is-hidden').hide();
+        $('#conditionsError').text(i18n.getMessage('conditionsUnavailable')).removeClass('is-hidden').show();
+    }
+
+    async function fetchConditionsInfo(lat, lng, source) {
+        if (!globalSettings.googleApiKey || conditionsSourcesAttempted.has(source)) {
+            return false;
+        }
+
+        conditionsSourcesAttempted.add(source);
+        const useImperial = globalSettings.unitType === 'imperial'
+            || (globalSettings.unitType === 'OSD' && globalSettings.osdUnits === 0);
+        const url = new URL('https://weather.googleapis.com/v1/currentConditions:lookup');
+        url.searchParams.set('key', globalSettings.googleApiKey);
+        url.searchParams.set('location.latitude', lat.toFixed(4));
+        url.searchParams.set('location.longitude', lng.toFixed(4));
+        if (useImperial) {
+            url.searchParams.set('unitsSystem', 'IMPERIAL');
+        }
+
+        weatherAbortController?.abort();
+        const requestController = new AbortController();
+        weatherAbortController = requestController;
+        showConditionsPanel(true);
+        $('#conditionsLoading').text(i18n.getMessage('conditionsWaiting')).show();
+        $('#conditionsData').addClass('is-hidden').hide();
+        $('#conditionsError').addClass('is-hidden').hide();
+
+        try {
+            const response = await fetch(url, { signal: requestController.signal });
+            const data = await response.json();
+            if (!response.ok || data?.error) {
+                throw new Error(data?.error?.message || `HTTP ${response.status}`);
+            }
+
+            conditionsFetched = renderConditionsInfo(data);
+            if (!conditionsFetched) {
+                showConditionsUnavailable();
+            }
+            return conditionsFetched;
+        } catch (error) {
+            if (error.name !== 'AbortError') {
+                conditionsFetched = false;
+                showConditionsUnavailable();
+                console.warn('Google Weather unavailable:', error.message);
+            }
+            return false;
+        } finally {
+            if (weatherAbortController === requestController) {
+                weatherAbortController = null;
+            }
+        }
+    }
+
+    function centerMapOnCurrentLocation(keepExistingZoom = false) {
+        const mapView = map?.getView();
+        if (!mapView) {
+            return false;
+        }
+
+        const droneLocation = getCurrentDroneLocation();
+        if (lastGpsPos || droneLocation) {
+            lastGpsPos = droneLocation?.coord || lastGpsPos;
+            mapView.setCenter(lastGpsPos);
+            if (!keepExistingZoom || mapView.getZoom() < 14) {
+                mapView.setZoom(14);
+            }
+            return true;
+        }
+
+        if (!googleGeoPos) {
+            return false;
+        }
+
+        mapView.setCenter(googleGeoPos.coord);
+        const zoom = getGoogleLocationZoom(googleGeoPos);
+        if (!keepExistingZoom || mapView.getZoom() < zoom) {
+            mapView.setZoom(zoom);
+        }
+        showApiLocationBanner(apiOverlayEl, infoOverlayEl, googleGeoPos);
+        return true;
+    }
+
+    function centerMapOnPreferredLocation(keepExistingZoom = false) {
+        const mapView = map?.getView();
+        if (!mapView) {
+            return false;
+        }
+
+        const firstWaypointCoord = getFirstMissionCoordinate();
+        if (firstWaypointCoord) {
+            mapView.setCenter(firstWaypointCoord);
+            if (!keepExistingZoom || mapView.getZoom() < 14) {
+                mapView.setZoom(14);
+            }
+            return true;
+        }
+
+        return centerMapOnCurrentLocation(keepExistingZoom);
+    }
+
+    async function requestGoogleApproximateLocation() {
+        if (googleLocationRequestStarted || !globalSettings.googleApiKey
+            || getFirstMissionCoordinate() || getCurrentDroneLocation()) {
+            return null;
+        }
+
+        googleLocationRequestStarted = true;
+        const url = new URL('https://www.googleapis.com/geolocation/v1/geolocate');
+        url.searchParams.set('key', globalSettings.googleApiKey);
+        const requestController = new AbortController();
+        googleLocationAbortController = requestController;
+
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ considerIp: true }),
+                signal: requestController.signal,
+            });
+            const data = await response.json();
+            if (!response.ok || !Number.isFinite(data?.location?.lat)
+                || !Number.isFinite(data?.location?.lng)) {
+                throw new Error(data?.error?.message || `HTTP ${response.status}`);
+            }
+
+            googleGeoPos = {
+                coord: fromLonLat([data.location.lng, data.location.lat]),
+                lat: data.location.lat,
+                lng: data.location.lng,
+                accuracy: Number(data.accuracy),
+            };
+
+            if (!getFirstMissionCoordinate() && !getCurrentDroneLocation() && !lastGpsPos) {
+                $('#centerOnDrone').show().css({ opacity: 1, pointerEvents: 'auto' });
+                centerMapOnPreferredLocation();
+                await fetchConditionsInfo(googleGeoPos.lat, googleGeoPos.lng, 'approximate');
+            }
+            return googleGeoPos;
+        } catch (error) {
+            if (error.name !== 'AbortError') {
+                console.warn('Google approximate location unavailable:', error.message);
+            }
+            return null;
+        } finally {
+            if (googleLocationAbortController === requestController) {
+                googleLocationAbortController = null;
+            }
+        }
+    }
 
     if (GUI.active_tab !== this) {
         GUI.active_tab = this;
@@ -612,6 +994,12 @@ function iconKey(filename) {
               curPosGeo.setCoordinates(gpsPos);
               lastGpsPos = gpsPos;
               $('#centerOnDrone').css({ opacity: 1, pointerEvents: 'auto' });
+              if (apiOverlayEl) {
+                  apiOverlayEl.style.visibility = 'hidden';
+              }
+              if (!conditionsFetched || !conditionsSourcesAttempted.has('gps')) {
+                  void fetchConditionsInfo(lat, lon, 'gps');
+              }
 
                             // Uncomment to auto-center/zoom once when GPS lock is first acquired
                             // if (!autoCenteredOnFix && map && map.getView()) {
@@ -657,7 +1045,11 @@ function iconKey(filename) {
                             }
           }
                     else if (infoOverlayEl) {
-                        $('#centerOnDrone').css({ opacity: 0.45, pointerEvents: 'none' });
+                        if (googleGeoPos) {
+                            $('#centerOnDrone').css({ opacity: 1, pointerEvents: 'auto' });
+                        } else {
+                            $('#centerOnDrone').css({ opacity: 0.45, pointerEvents: 'none' });
+                        }
                         infoOverlayEl.style.visibility = 'hidden';
                     }
         }
@@ -2921,6 +3313,12 @@ function iconKey(filename) {
             })
         });
 
+        apiOverlayEl = document.getElementById('geo_info');
+        if (apiOverlayEl) {
+            apiOverlayEl.textContent = '';
+            apiOverlayEl.style.visibility = 'hidden';
+        }
+
         //////////////////////////////////////////////////////////////////////////
         // Set the attribute link to open on an external browser window, so
         // it doesn't interfere with the configurator.
@@ -2968,7 +3366,19 @@ function iconKey(filename) {
         if (missionPlannerLastValues && missionPlannerLastValues.zoom && missionPlannerLastValues.center) {
             map.getView().setCenter(fromLonLat(missionPlannerLastValues.center));
             map.getView().setZoom(missionPlannerLastValues.zoom);
-        }         
+        }
+
+        const initialDroneLocation = getCurrentDroneLocation();
+        if (getFirstMissionCoordinate()) {
+            centerMapOnPreferredLocation();
+        } else if (initialDroneLocation) {
+            lastGpsPos = initialDroneLocation.coord;
+            $('#centerOnDrone').css({ opacity: 1, pointerEvents: 'auto' });
+            centerMapOnPreferredLocation();
+            void fetchConditionsInfo(initialDroneLocation.lat, initialDroneLocation.lng, 'gps');
+        } else {
+            void requestGoogleApproximateLocation();
+        }
 
         //////////////////////////////////////////////////////////////////////////
         // Load previously saved GEO files from electron store
@@ -4175,13 +4585,129 @@ function iconKey(filename) {
             }
         });
 
+        function closeAddressSearchDialog() {
+            $('#addressSearchDialog, #addressSearchBackdrop').remove();
+        }
+
+        async function readAddressSearchResponse(response) {
+            const data = await response.json();
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
+            }
+            return data;
+        }
+
+        async function searchGoogleAddress(address, signal) {
+            if (!globalSettings.googleApiKey) {
+                return null;
+            }
+
+            const url = new URL('https://maps.googleapis.com/maps/api/geocode/json');
+            url.searchParams.set('address', address);
+            url.searchParams.set('key', globalSettings.googleApiKey);
+
+            try {
+                const data = await readAddressSearchResponse(await fetch(url, { signal }));
+                if (data.status !== 'OK' || !data.results?.length) {
+                    return null;
+                }
+
+                const result = data.results[0];
+                const lat = result.geometry?.location?.lat;
+                const lng = result.geometry?.location?.lng;
+                if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
+                    return null;
+                }
+
+                return {
+                    coord: fromLonLat([lng, lat]),
+                    description: result.formatted_address,
+                    source: 'Google',
+                };
+            } catch (error) {
+                if (error.name === 'AbortError') {
+                    throw error;
+                }
+                return null;
+            }
+        }
+
+        async function searchNominatimAddress(address, signal) {
+            const url = new URL('https://nominatim.openstreetmap.org/search');
+            url.searchParams.set('format', 'json');
+            url.searchParams.set('q', address);
+            url.searchParams.set('limit', '1');
+
+            const data = await readAddressSearchResponse(await fetch(url, { signal }));
+            if (!Array.isArray(data) || data.length === 0) {
+                return null;
+            }
+
+            const result = data[0];
+            const lat = Number.parseFloat(result.lat);
+            const lng = Number.parseFloat(result.lon);
+            if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
+                return null;
+            }
+
+            return {
+                coord: fromLonLat([lng, lat]),
+                description: result.display_name,
+                source: 'OpenStreetMap',
+            };
+        }
+
+        async function confirmAndCenterMap(result, signal) {
+            const confirmed = await dialog.confirm(
+                i18n.getMessage('addressSearchConfirmation', [result.description, result.source])
+            );
+            if (!confirmed || signal.aborted || !map?.getView()) {
+                return false;
+            }
+
+            map.getView().setCenter(result.coord);
+            return true;
+        }
+
+        async function runAddressSearch() {
+            const address = $('#addressInput').val().trim();
+            closeAddressSearchDialog();
+            if (!address) {
+                return;
+            }
+
+            addressSearchAbortController?.abort();
+            const requestController = new AbortController();
+            addressSearchAbortController = requestController;
+
+            try {
+                const googleResult = await searchGoogleAddress(address, requestController.signal);
+                const result = googleResult
+                    || await searchNominatimAddress(address, requestController.signal);
+                if (!result) {
+                    dialog.alert(i18n.getMessage('addressSearchNotFound'));
+                    return;
+                }
+
+                await confirmAndCenterMap(result, requestController.signal);
+            } catch (error) {
+                if (error.name !== 'AbortError') {
+                    console.error('Address search failed:', error.message);
+                    dialog.alert(i18n.getMessage('addressSearchFailed'));
+                }
+            } finally {
+                if (addressSearchAbortController === requestController) {
+                    addressSearchAbortController = null;
+                }
+            }
+        }
+
         // Address search button
-        $(document).on('click', '#searchAddressButton, #searchAddress', function (e) {
+        $('#searchAddress').off(missionControlLocationNamespace).on(`click${missionControlLocationNamespace}`, function (e) {
             e.preventDefault();
             e.stopPropagation();
 
-            // Remove any existing dialog
-            $('#addressSearchDialog, #addressSearchBackdrop').remove();
+            closeAddressSearchDialog();
 
             // Create dialog
             const addressDialog = $(`
@@ -4189,80 +4715,62 @@ function iconKey(filename) {
                      background: rgba(0,0,0,0.5); z-index: 10000;">
                     <div id="addressSearchDialog" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); 
                          background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.3);">
-                        <h3>Search for Location</h3>
+                        <h3></h3>
                         <input type="text" id="addressInput" style="width: 280px; padding: 8px 12px; margin: 10px 0; border: 1px solid #ccc; font-size: 14px;" 
-                               placeholder="Enter address, city, or coordinates" value="" autocomplete="off">
+                               value="" autocomplete="off">
                         <div style="margin-top: 15px; text-align: right;">
-                            <button id="searchCancel" style="padding: 8px 16px; margin-right: 10px;">Cancel</button>
-                            <button id="searchOK" style="padding: 8px 16px; background: #007cba; color: white; border: none;">Search</button>
+                            <button id="searchCancel" style="padding: 8px 16px; margin-right: 10px;"></button>
+                            <button id="searchOK" style="padding: 8px 16px; background: #007cba; color: white; border: none;"></button>
                         </div>
                     </div>
                 </div>
             `);
 
+            addressDialog.find('h3').text(i18n.getMessage('addressSearchTitle'));
+            addressDialog.find('#addressInput').attr('placeholder', i18n.getMessage('addressSearchPlaceholder'));
+            addressDialog.find('#searchCancel').text(i18n.getMessage('addressSearchCancel'));
+            addressDialog.find('#searchOK').text(i18n.getMessage('addressSearchSubmit'));
+
             $('body').append(addressDialog);
 
-          
-            // Search function
-            function doSearch() {
-                const address = $('#addressInput').val().trim();
-                $('#addressSearchBackdrop').remove();
-
-                if (address) {
-                    const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&limit=1`;
-                    
-                    fetch(url)
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data && data.length > 0) {
-                                const result = data[0];
-                                const coord = fromLonLat([parseFloat(result.lon), parseFloat(result.lat)]);
-                                map.getView().setCenter(coord);
-                                dialog.alert(`Found: ${result.display_name}`);
-                            } else {
-                                dialog.alert('Address not found.');
-                            }
-                        })
-                        .catch(err => {
-                            console.error('Search failed:', err);
-                            dialog.alert('Search failed. Check your connection.');
-                        });
-                }
-
-                setTimeout(() => {
-                    const input = document.getElementById('addressInput');
-                    input?.focus();
-                    input?.select();
-                }, 50);
-
-            }
-
             // Event handlers
-            $('#searchOK').click(doSearch);
-            $('#searchCancel').click(() => $('#addressSearchBackdrop').remove());
-            $('#addressInput').keypress(function(e) {
-                if (e.which === 13) doSearch();
-            });
-            
-            // Only close on backdrop click, not dialog content click
-            $('#addressSearchBackdrop').click(function(e) {
-                if (e.target === this) {
-                    $('#addressSearchBackdrop').remove();
+            $('#searchOK').on(`click${missionControlLocationNamespace}`, runAddressSearch);
+            $('#searchCancel').on(`click${missionControlLocationNamespace}`, closeAddressSearchDialog);
+            $('#addressInput').on(`keydown${missionControlLocationNamespace}`, function(e) {
+                if (e.key === 'Enter') {
+                    void runAddressSearch();
                 }
             });
-            
+
+            // Only close on backdrop click, not dialog content click
+            $('#addressSearchBackdrop').on(`click${missionControlLocationNamespace}`, function(e) {
+                if (e.target === this) {
+                    closeAddressSearchDialog();
+                }
+            });
+
             // Prevent clicks inside the dialog from closing it
-            $('#addressSearchDialog').click(function(e) {
+            $('#addressSearchDialog').on(`click${missionControlLocationNamespace}`, function(e) {
                 e.stopPropagation();
             });
+
+            const input = document.getElementById('addressInput');
+            input?.focus();
+            input?.select();
         });
 
-        $(document).on('click', '#centerOnDroneButton, #centerOnDrone', function (e) {
+        $('#centerOnDrone').off(missionControlLocationNamespace).on(`click${missionControlLocationNamespace}`, function (e) {
             e.preventDefault();
             e.stopPropagation();
-            if (lastGpsPos && map && map.getView()) {
-                map.getView().setCenter(lastGpsPos);
-            }
+            centerMapOnCurrentLocation();
+        });
+
+        $('#showHideConditionsButton').off(missionControlLocationNamespace).on(`click${missionControlLocationNamespace}`, function (e) {
+            e.preventDefault();
+            const $icon = $(this).children('a');
+            const showContent = $icon.hasClass('ic_show');
+            $icon.toggleClass('ic_show', !showContent).toggleClass('ic_hide', showContent);
+            $('#ConditionsContent').stop(true, true)[showContent ? 'fadeIn' : 'fadeOut'](300);
         });
 
         /////////////////////////////////////////////
@@ -4604,8 +5112,8 @@ function iconKey(filename) {
                 return;
             }
 
-            if (!e.repeat && key === 'c' && lastGpsPos && map?.getView()) {
-                map.getView().setCenter(lastGpsPos);
+            if (!e.repeat && key === 'c') {
+                centerMapOnCurrentLocation(true);
             }
 
             if (handleMissionControlCtrlShortcut(e, key)) {
@@ -5575,6 +6083,7 @@ missionControlTab.setBit = function(bits, bit, value) {
 // }
 
 missionControlTab.cleanup = function (callback) {
+    cleanupMissionControlLocationResources();
     if (elevationChartInstance) {
         elevationChartInstance.destroy();
         elevationChartInstance = null;
