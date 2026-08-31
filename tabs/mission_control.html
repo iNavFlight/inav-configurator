@@ -32,6 +32,10 @@
                             </div>
                         </div>
                         <hr> -->
+                        <div id="simulateMission" class="btn btn-default" style="padding-top: 1px; display: inline-block; cursor: pointer; float: left;">
+                            <a id="simulateMissionButton" class="btnicon ic_play" href="#" i18n_title="missionTitleSimulate"><span class="sr-only" data-i18n="missionSimulationHead"></span></a>
+                        </div>
+
                         <div id="removeAllPoints" class="btn btn-danger" style="padding-top: 1px; display: inline-block; float: left;">
                             <a class="btnicon ic_removeAll" href="#" i18n_title="missionTitleRemoveAll"></a>
                         </div>
@@ -134,6 +138,42 @@
                             <div style="display: inline-block" data-i18n="geozoneInvalidzone"></div>
                             <span id="geozoneInvalidContent"></span>
                         </div>
+                    </div>
+                </div>
+
+                <div id="missionPlannerSimulation" class="gui_box grey" style="display: none">
+                    <div class="gui_box_titlebar">
+                        <div class="spacer_box_title" data-i18n="missionSimulationHead"></div>
+                    </div>
+                    <div class="spacer" id="SimulationContent">
+                        <div class="point">
+                            <label class="point-label" for="simulationSpeed" data-i18n="missionSimulationSpeed">Cruise speed (m/s)</label>
+                            <input id="simulationSpeed" type="number" min="1" max="80" step="1" value="15" required>
+                            <div class="helpicon cf_tip" data-i18n_title="missionSimulationSpeedHelp"></div>
+                        </div>
+                        <div style="padding-bottom: 2px;">
+                            <span data-i18n="missionSimulationTurnRadius"></span>
+                            <span id="simulationTurnRadius"></span>
+                        </div>
+                        <div style="padding-bottom: 2px;">
+                            <span data-i18n="missionSimulationTime"></span>
+                            <span id="simulationTime"></span>
+                        </div>
+                        <div style="padding-bottom: 2px;">
+                            <span data-i18n="missionSimulationDistance"></span>
+                            <span id="simulationDistance"></span>
+                        </div>
+                        <div style="padding-bottom: 2px;">
+                            <span style="color: #00c2a8;">&#9632;</span>
+                            <span data-i18n="missionSimulationLegendCruise"></span>
+                            <span style="color: #ffb020; padding-left: 0.5em;">&#9632;</span>
+                            <span data-i18n="missionSimulationLegendTurn"></span>
+                            <span style="color: #ff5fd2; padding-left: 0.5em;">&#9632;</span>
+                            <span data-i18n="missionSimulationLegendApproach"></span>
+                        </div>
+                        <div id="simulationWarnings" style="padding-top: 4px; color: red;"></div>
+                        <div style="padding-top: 6px; font-style: italic; opacity: .75;"
+                             data-i18n="missionSimulationDisclaimer"></div>
                     </div>
                 </div>
 
@@ -583,7 +623,7 @@
                                 <span data-i18n="missionExclusive"></span>
                             </div>
                             <div class="point">
-                                <label class="point-label-safehome" for="wpLandHeading2" data-i18n="missionFwLandHeading1"></label>
+                                <label class="point-label-safehome" for="wpLandHeading2" data-i18n="missionFwLandHeading2">Heading 2: (deg):</label>
                                 <input type="number" id="wpLandHeading2"></input>
                                 <input id="wpLandHeading2Excl" type="checkbox" value="0" class="togglemedium" checked required>
                                 <span data-i18n="missionExclusive"></span>
@@ -655,7 +695,17 @@
         </div>
         <div class="cf_column threefourth_left" style="height: 100%;">
             <div id="geo_info" style="display: block; position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.7); color: white; padding: 5px 10px; border-radius: 4px; font-size: 0.9em; text-overflow: ellipsis; white-space: nowrap; overflow: hidden; max-width: 80%; pointer-events: none; z-index: 1000;">&nbsp;</div>
-            <div id="missionMap"></div>
+            <div id="missionMapView">
+                <fieldset id="missionMapViewControls" class="mission-map-view-controls ol-unselectable ol-control" aria-label="Mission map view">
+                    <button id="missionMap2DButton" class="active" type="button" aria-pressed="true">2D</button>
+                    <button id="missionMap3DButton" type="button" aria-pressed="false">3D</button>
+                </fieldset>
+                <div id="missionMap"></div>
+                <div id="missionMap3D">
+                    <div id="missionMap3DWarning" role="alert" aria-live="polite"></div>
+                    <div id="missionMap3DHelp" data-i18n="missionMap3DEmpty"></div>
+                </div>
+            </div>
             <div id="missionPlannerElevation" class="gui_box grey" style="display: none">
                 <div class="gui_box_titlebar">
                     <div class="spacer_box_title" data-i18n="missionDefaultElevationHead"></div>

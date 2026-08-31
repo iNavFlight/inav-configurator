@@ -13,6 +13,7 @@ export default defineConfig((env) => {
     root,
     mode,
     base: './',
+    publicDir: 'node_modules/cesium/Build/Cesium',
     assetsInclude: ['**/*.gltf', '**/*.glb'],
     build: {
       outDir: `.vite/renderer/${name}`,

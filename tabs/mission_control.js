@@ -2,6 +2,30 @@
 
 import xml2js from 'xml2js';
 import { Chart, registerables } from 'chart.js';
+import {
+    ArcGisMapServerImageryProvider,
+    ArcGISTiledElevationTerrainProvider,
+    BoundingSphere,
+    CameraEventType,
+    Cartesian2,
+    Cartesian3,
+    Cartographic,
+    Color,
+    EllipsoidGeodesic,
+    EllipsoidTerrainProvider,
+    HeadingPitchRange,
+    KeyboardEventModifier,
+    LabelStyle,
+    Math as CesiumMath,
+    OpenStreetMapImageryProvider,
+    ScreenSpaceEventHandler,
+    ScreenSpaceEventType,
+    VerticalOrigin,
+    Viewer,
+    buildModuleUrl,
+    sampleTerrainMostDetailed
+} from 'cesium';
+import '@cesium/widgets/Source/widgets.css';
 
 // Register Chart.js components
 Chart.register(...registerables);
@@ -60,6 +84,26 @@ import interval from './../js/intervals';
 import { Geozone, GeozoneVertex, GeozoneType, GeozoneShapes, GeozoneFenceAction }  from './../js/geozone';
 import store from './../js/store';
 import dialog from '../js/dialog';
+import {
+    getMission3DPlannedHeight,
+    getMission3DPointLabel,
+    getMission3DPoints,
+    getMission3DRouteRuns,
+    getMission3DRouteSegments,
+    getMission3DSamplingSpacing
+} from './../js/mission_3d';
+import {
+    FirmwareDefaults,
+    LandingApproachProblem,
+    SimPhase,
+    phaseRuns,
+    TurnSmoothing,
+    commandedTurnRadius,
+    getSimulationRoute,
+    resolveRouteAltitudes,
+    simulateGroundTrack,
+    withLandingApproaches
+} from './../js/mission_sim';
 
 import html from'./mission_control.html?raw';
 
@@ -272,7 +316,90 @@ const missionControlTab = {};
 missionControlTab.isYmapLoad = false;
 
 // Shared between plotElevation() (inside initialize) and cleanup()
+// A setting that will not parse must not reach the model: NaN spreads through the
+// geometry and comes back out as an empty map and a nonsense warning.
+function readNumericSetting(setting, fallback) {
+    const value = Number.parseInt(setting.value, 10);
+    return Number.isFinite(value) ? value : fallback;
+}
+
+// One colour per flight phase, identical on the 2D map and in the 3D view, so a
+// stretch of track means the same thing wherever it is looked at.
+const SIMULATION_PHASE_COLOURS = Object.freeze({
+    [SimPhase.CRUISE]: '#00c2a8',
+    [SimPhase.TURN]: '#ffb020',
+    [SimPhase.APPROACH]: '#ff5fd2'
+});
+
+function simulationTrackFeatures(samples) {
+    return phaseRuns(samples)
+        .filter((run) => run.to > run.from)
+        .map((run) => {
+            const feature = new Feature({
+                geometry: new LineString(samples.slice(run.from, run.to + 1)
+                    .map((point) => fromLonLat([point.lon, point.lat])))
+            });
+            feature.setStyle(new Style({
+                stroke: new Stroke({
+                    color: SIMULATION_PHASE_COLOURS[run.phase] ?? SIMULATION_PHASE_COLOURS[SimPhase.CRUISE],
+                    width: 3
+                })
+            }));
+            return feature;
+        });
+}
+
+function formatSimulationTime(seconds) {
+    const whole = Math.round(seconds);
+    return `${Math.floor(whole / 60)}:${String(whole % 60).padStart(2, '0')} min`;
+}
+
 let elevationChartInstance = null;
+let mission3DViewer = null;
+
+function mission3DMessage(key, fallback) {
+    return i18n.getMessage(key) || fallback;
+}
+
+function hideMission3DTerrainWarning() {
+    $('#missionMap3DWarning').hide();
+}
+
+function showMission3DTerrainWarnings(types) {
+    const warning = $('#missionMap3DWarning');
+    const messages = [];
+
+    if (types.includes('unavailable')) {
+        messages.push(mission3DMessage(
+            'missionMap3DTerrainUnavailable',
+            'Terrain data unavailable: Route collision check could not be completed.'
+        ));
+    } else {
+        if (types.includes('collision')) {
+            messages.push(mission3DMessage(
+                'missionMap3DCollisionWarning',
+                'Warning: Planned route intersects terrain.'
+            ));
+        }
+        if (types.includes('home')) {
+            messages.push(mission3DMessage(
+                'missionMap3DHomeRequired',
+                'HOME is not set: Relative-altitude terrain checks are unavailable.'
+            ));
+        }
+    }
+
+    if (!messages.length) return;
+    warning
+        .attr('data-warning-type', types.includes('collision') ? 'collision' : types[0])
+        .text(messages.join(' '))
+        .show();
+}
+
+function getMission3DSampleCartesian(sample) {
+    return sample.cartesian;
+}
+
 missionControlTab.initialize = function (callback) {
 
     let cursorInitialized = false;
@@ -297,6 +424,23 @@ missionControlTab.initialize = function (callback) {
     let invalidGeoZones = false;
     let isGeozoneEnabeld = false;
     let settings = {speed: 0, alt: 5000, safeRadiusSH: 50, fwApproachAlt: 60, fwLandAlt: 5, maxDistSH: 0, fwApproachLength: 0, fwLoiterRadius: 0};
+    // Flight path simulation. Everything but the cruise speed comes from the
+    // flight controller; the speed is the pilot's estimate, because a fixed wing
+    // holds a throttle setting rather than a commanded speed.
+    let simulation = {
+        enabled: false,
+        layer: null,
+        samples: [],
+        altitudesAbsolute: false,
+        speedMs: 15,
+        bankAngleDeg: FirmwareDefaults.bankAngleDeg,
+        bankCeilingDeg: 0,
+        wpRadiusCm: FirmwareDefaults.waypointRadiusCm,
+        loiterRadiusCm: 0,
+        approachLengthCm: 0,
+        speedFromFc: false,
+        turnSmoothing: TurnSmoothing.OFF
+    };
 
     if (GUI.active_tab !== this) {
         GUI.active_tab = this;
@@ -315,6 +459,9 @@ missionControlTab.initialize = function (callback) {
             //mspHelper.loadWaypoints,
             mspHelper.loadSafehomes,
             mspHelper.loadFwApproach,
+            // Without this the tab never learns which airframe is attached, and
+            // FC.isAirplane() answers from stale defaults.
+            mspHelper.loadMixerConfig,
             function (callback) {
                 if (isGeozoneEnabeld) {
                     mspHelper.loadGeozones(callback);
@@ -336,6 +483,55 @@ missionControlTab.initialize = function (callback) {
                 mspHelper.getSetting(("nav_fw_loiter_radius")).then((data) => {
                     settings.fwLoiterRadius = parseInt(data.value);
                 }).then(callback);
+            },
+            // The simulation keeps its own defaults, so a firmware that does not
+            // carry one of these settings leaves the tab working.
+            function (callback) {
+                mspHelper.getSetting("nav_fw_bank_angle").then((data) => {
+                    if (data) simulation.bankAngleDeg = readNumericSetting(data, simulation.bankAngleDeg);
+                }).catch(() => {}).then(() => callback());
+            },
+            function (callback) {
+                mspHelper.getSetting("nav_fw_loiter_radius").then((data) => {
+                    if (data) simulation.loiterRadiusCm = readNumericSetting(data, 0);
+                }).catch(() => {}).then(() => callback());
+            },
+            function (callback) {
+                mspHelper.getSetting("nav_fw_land_approach_length").then((data) => {
+                    if (data) simulation.approachLengthCm = readNumericSetting(data, 0);
+                }).catch(() => {}).then(() => callback());
+            },
+            // The absolute ceiling on roll. nav_fw_bank_angle is what navigation asks
+            // for, but it can never be delivered beyond this, so the flown radius is
+            // set by whichever is the tighter of the two.
+            function (callback) {
+                mspHelper.getSetting("max_angle_inclination_rll").then((data) => {
+                    const deciDegrees = data ? readNumericSetting(data, 0) : 0;
+                    if (deciDegrees > 0) simulation.bankCeilingDeg = deciDegrees / 10;
+                }).catch(() => {}).then(() => callback());
+            },
+            function (callback) {
+                mspHelper.getSetting("nav_wp_radius").then((data) => {
+                    if (data) simulation.wpRadiusCm = readNumericSetting(data, simulation.wpRadiusCm);
+                }).catch(() => {}).then(() => callback());
+            },
+            function (callback) {
+                mspHelper.getSetting("nav_fw_wp_turn_smoothing").then((data) => {
+                    if (data) simulation.turnSmoothing = readTurnSmoothing(data);
+                }).catch(() => {}).then(() => callback());
+            },
+            // The speed the firmware itself plans coordinated turns with when there
+            // is no airspeed sensor. Far better than asking the pilot to guess, and
+            // it is the same number the turn radius is derived from on the aircraft.
+            function (callback) {
+                mspHelper.getSetting("fw_reference_airspeed").then((data) => {
+                    if (!data) return;
+                    const centimetresPerSecond = readNumericSetting(data, 0);
+                    if (centimetresPerSecond > 0) {
+                        simulation.speedMs = Math.round(centimetresPerSecond / 100);
+                        simulation.speedFromFc = true;
+                    }
+                }).catch(() => {}).then(() => callback());
             }
         ]);
         loadChainer.setExitPoint(loadHtml);
@@ -702,6 +898,563 @@ function iconKey(filename) {
     var geozoneLines = [];      // Layer for Lines between geozone vertices
 
     var map;
+    let missionMapViewMode = '2d';
+
+    const mission3DRouteColor = Color.fromCssColorString('#13b5ea');
+    const mission3DCollisionColor = Color.fromCssColorString('#e02f2f');
+
+    function createMission3DViewer(container) {
+        buildModuleUrl.setBaseUrl('./');
+
+        const viewer = new Viewer(container, {
+            animation: false,
+            baseLayer: false,
+            baseLayerPicker: false,
+            fullscreenButton: false,
+            geocoder: false,
+            homeButton: false,
+            infoBox: false,
+            navigationHelpButton: false,
+            sceneModePicker: false,
+            selectionIndicator: false,
+            timeline: false,
+            terrainProvider: new EllipsoidTerrainProvider(),
+            requestRenderMode: true,
+            maximumRenderTimeChange: Infinity
+        });
+
+        viewer.scene.globe.depthTestAgainstTerrain = true;
+        viewer.scene.globe.tileCacheSize = 500;
+
+        // Google Earth's modifier layout: Shift + left drag tilts and Ctrl + left drag looks
+        // around. Cesium has those two the other way round; the plain buttons already match
+        // (left drag moves, right drag and the wheel zoom, the middle button tilts).
+        const cameraController = viewer.scene.screenSpaceCameraController;
+        cameraController.minimumZoomDistance = 20;
+        cameraController.tiltEventTypes = [
+            CameraEventType.MIDDLE_DRAG,
+            CameraEventType.PINCH,
+            {eventType: CameraEventType.LEFT_DRAG, modifier: KeyboardEventModifier.SHIFT},
+            {eventType: CameraEventType.RIGHT_DRAG, modifier: KeyboardEventModifier.SHIFT}
+        ];
+        cameraController.lookEventTypes = {eventType: CameraEventType.LEFT_DRAG, modifier: KeyboardEventModifier.CTRL};
+
+        // Zooming and tilting pivot on whatever the cursor grabs. Started against the sky there
+        // is nothing to grab, and Cesium falls back to the globe centre, which hurls the camera
+        // away. Hold those gestures back until they actually catch the globe.
+        const cameraGuard = new ScreenSpaceEventHandler(viewer.scene.canvas);
+        const grabsGlobe = (position) => {
+            const ray = viewer.camera.getPickRay(position);
+            if (ray && viewer.scene.globe.pick(ray, viewer.scene)) return true;
+            return !!viewer.camera.pickEllipsoid(position, viewer.scene.globe.ellipsoid);
+        };
+        const holdGesture = (event) => {
+            const anchored = grabsGlobe(event.position);
+            cameraController.enableZoom = anchored;
+            cameraController.enableTilt = anchored;
+        };
+        const releaseGesture = () => {
+            cameraController.enableZoom = true;
+            cameraController.enableTilt = true;
+        };
+        cameraGuard.setInputAction(holdGesture, ScreenSpaceEventType.RIGHT_DOWN);
+        cameraGuard.setInputAction(releaseGesture, ScreenSpaceEventType.RIGHT_UP);
+        cameraGuard.setInputAction(holdGesture, ScreenSpaceEventType.MIDDLE_DOWN);
+        cameraGuard.setInputAction(releaseGesture, ScreenSpaceEventType.MIDDLE_UP);
+        cameraGuard.setInputAction(holdGesture, ScreenSpaceEventType.LEFT_DOWN, KeyboardEventModifier.SHIFT);
+        cameraGuard.setInputAction(releaseGesture, ScreenSpaceEventType.LEFT_UP, KeyboardEventModifier.SHIFT);
+        cameraGuard.setInputAction(releaseGesture, ScreenSpaceEventType.WHEEL);
+        cameraGuard.setInputAction(releaseGesture, ScreenSpaceEventType.PINCH_START);
+
+        let destroyed = false;
+        let updateSequence = 0;
+        let terrainProvider = viewer.terrainProvider;
+        let terrainLoadFailed = false;
+        let lastWaypoints = [];
+        let lastHome = null;
+        let lastSimulationSamples = [];
+        let lastSimulationAbsolute = false;
+        let terrainCacheSignature = null;
+        let terrainCache = null;
+
+        function showEmptyMap() {
+            hideMission3DTerrainWarning();
+            $('#missionMap3DHelp')
+                .text(mission3DMessage('missionMap3DEmpty', 'No mission to display in 3D.'))
+                .show();
+
+            if (!map) return;
+            const center = toLonLat(map.getView().getCenter());
+            const zoom = map.getView().getZoom() || 2;
+            const height = Math.max(1500, 35000000 / Math.pow(2, zoom));
+            viewer.camera.flyTo({
+                destination: Cartesian3.fromDegrees(center[0], center[1], height),
+                orientation: {
+                    heading: 0,
+                    pitch: CesiumMath.toRadians(-55),
+                    roll: 0
+                },
+                duration: 0
+            });
+        }
+
+        // Ground height under every mission point. The ellipsoid provider needs no request, its
+        // surface already sits at zero, and a failed sample falls back to whatever heights the
+        // request left behind so the mission still draws; the caller then reports that the terrain
+        // reference is missing.
+        async function samplePointTerrain(points) {
+            const terrainPositions = points.map((point) => Cartographic.fromDegrees(point.lon, point.lat));
+            let sampledPositions = terrainPositions;
+            let samplingFailed = false;
+
+            if (!(terrainProvider instanceof EllipsoidTerrainProvider)) {
+                try {
+                    sampledPositions = await sampleTerrainMostDetailed(terrainProvider, terrainPositions);
+                } catch (error) {
+                    samplingFailed = true;
+                    console.warn('Mission Planner 3D terrain sampling failed:', error);
+                }
+            }
+
+            const groundHeights = sampledPositions.map((position) => Number.isFinite(position.height) ? position.height : 0);
+            return {groundHeights, samplingFailed};
+        }
+
+        async function sampleRouteTerrain(renderedPoints) {
+            const routeSegments = getMission3DRouteSegments(renderedPoints).filter((segment) => segment.length > 1);
+            const routeEdges = routeSegments.flatMap((segment, segmentIndex) => segment.slice(1).map((end, index) => {
+                const start = segment[index];
+                const geodesic = new EllipsoidGeodesic(
+                    Cartographic.fromDegrees(start.lon, start.lat),
+                    Cartographic.fromDegrees(end.lon, end.lat)
+                );
+                return {
+                    segmentIndex,
+                    start,
+                    end,
+                    geodesic,
+                    distance: geodesic.surfaceDistance,
+                    terrainClearanceAvailable: start.terrainClearanceAvailable && end.terrainClearanceAvailable
+                };
+            }));
+            const samplingSpacing = getMission3DSamplingSpacing(routeEdges.map((edge) => edge.distance));
+            const routeSamples = routeSegments.map(() => []);
+            const terrainSamplePositions = [];
+            const terrainSampleDescriptors = [];
+
+            routeEdges.forEach((edge, edgeIndex) => {
+                const steps = Math.max(1, Math.ceil(edge.distance / samplingSpacing));
+                const previousEdge = routeEdges[edgeIndex - 1];
+                const sharesCheckedEndpoint = previousEdge?.segmentIndex === edge.segmentIndex
+                    && previousEdge.terrainClearanceAvailable === edge.terrainClearanceAvailable;
+                const firstStep = sharesCheckedEndpoint ? 1 : 0;
+
+                for (let step = firstStep; step <= steps; step++) {
+                    const fraction = step / steps;
+                    const position = edge.geodesic.interpolateUsingFraction(fraction, new Cartographic());
+                    const plannedHeight = edge.start.plannedHeight
+                        + (edge.end.plannedHeight - edge.start.plannedHeight) * fraction;
+                    const descriptor = {
+                        position,
+                        plannedHeight,
+                        terrainClearanceAvailable: edge.terrainClearanceAvailable
+                    };
+
+                    routeSamples[edge.segmentIndex].push(descriptor);
+                    if (descriptor.terrainClearanceAvailable) {
+                        terrainSampleDescriptors.push(descriptor);
+                        terrainSamplePositions.push(Cartographic.clone(position));
+                    }
+                }
+            });
+
+            let sampledRouteTerrain = terrainSamplePositions;
+            let samplingFailed = false;
+            if (!(terrainProvider instanceof EllipsoidTerrainProvider) && terrainSamplePositions.length) {
+                try {
+                    sampledRouteTerrain = await sampleTerrainMostDetailed(terrainProvider, terrainSamplePositions);
+                } catch (error) {
+                    samplingFailed = true;
+                    console.warn('Mission Planner 3D route terrain sampling failed:', error);
+                }
+            }
+
+            terrainSampleDescriptors.forEach((sample, index) => {
+                const terrainHeight = Number.isFinite(sampledRouteTerrain[index]?.height)
+                    ? sampledRouteTerrain[index].height
+                    : 0;
+                sample.clearance = sample.plannedHeight - terrainHeight;
+            });
+            routeSamples.flat().forEach((sample) => {
+                if (!sample.terrainClearanceAvailable) sample.clearance = Number.POSITIVE_INFINITY;
+                sample.cartesian = Cartesian3.fromRadians(
+                    sample.position.longitude,
+                    sample.position.latitude,
+                    sample.plannedHeight
+                );
+            });
+
+            return {routeSamples, samplingFailed};
+        }
+
+        // One marker with its label per point, plus the drop line that ties a mission waypoint to
+        // the ground underneath it. The colour carries the state: home is green, a point that would
+        // sit below the terrain is red, landings and POIs are orange and everything else stays blue.
+        function renderMissionPoints(points, groundHeights, homeGroundHeight, hasHome) {
+            const displayPositions = [];
+            const renderedPoints = [];
+
+            points.forEach((point, index) => {
+                const groundHeight = groundHeights[index];
+                const plannedHeight = getMission3DPlannedHeight(point, groundHeight, homeGroundHeight);
+                const clearance = plannedHeight - groundHeight;
+                const terrainClearanceAvailable = point.isHome || point.absoluteAltitude || hasHome;
+                let pointColor = Color.fromCssColorString('#1497f1');
+                if (point.isHome) {
+                    pointColor = Color.fromCssColorString('#88cc3e');
+                } else if (terrainClearanceAvailable && clearance < 0) {
+                    pointColor = Color.RED;
+                } else if (point.action === MWNP.WPTYPE.LAND || point.action === MWNP.WPTYPE.SET_POI) {
+                    pointColor = Color.ORANGE;
+                }
+                const position = Cartesian3.fromDegrees(point.lon, point.lat, plannedHeight);
+                renderedPoints.push({...point, plannedHeight, position, terrainClearanceAvailable});
+
+                viewer.entities.add({
+                    position,
+                    point: {
+                        color: pointColor,
+                        outlineColor: Color.WHITE,
+                        outlineWidth: 2,
+                        pixelSize: point.isHome ? 13 : 11,
+                        disableDepthTestDistance: Number.POSITIVE_INFINITY
+                    },
+                    label: {
+                        text: getMission3DPointLabel(point),
+                        font: '700 14px Segoe UI, Calibri, sans-serif',
+                        fillColor: Color.WHITE,
+                        outlineColor: Color.BLACK,
+                        outlineWidth: 3,
+                        style: LabelStyle.FILL_AND_OUTLINE,
+                        verticalOrigin: VerticalOrigin.BOTTOM,
+                        pixelOffset: new Cartesian2(0, -12),
+                        disableDepthTestDistance: Number.POSITIVE_INFINITY
+                    }
+                });
+
+                // HOME sits on the ground and outside the flown route, so it gets neither a drop
+                // line nor a say in how the camera frames the mission.
+                if (point.isHome) return;
+
+                displayPositions.push(position);
+                viewer.entities.add({
+                    polyline: {
+                        positions: [
+                            Cartesian3.fromDegrees(point.lon, point.lat, groundHeight),
+                            position
+                        ],
+                        width: 2,
+                        material: pointColor.withAlpha(0.72)
+                    }
+                });
+            });
+
+            return {displayPositions, renderedPoints};
+        }
+
+        function renderRouteTerrain(routeSamples) {
+            let hasTerrainCollision = false;
+
+            routeSamples.forEach((samples) => {
+                getMission3DRouteRuns(samples).forEach((run) => {
+                    hasTerrainCollision ||= run.collidesWithTerrain;
+                    viewer.entities.add({
+                        polyline: {
+                            positions: run.samples.map(getMission3DSampleCartesian),
+                            width: run.collidesWithTerrain ? 6 : 4,
+                            material: run.collidesWithTerrain ? mission3DCollisionColor : mission3DRouteColor,
+                            depthFailMaterial: run.collidesWithTerrain ? mission3DCollisionColor.withAlpha(0.9) : undefined
+                        }
+                    });
+                });
+            });
+
+            return hasTerrainCollision;
+        }
+
+        // Terrain warnings for a finished render. A provider that never loaded or a sample that
+        // failed makes every clearance meaningless, so that single warning replaces the others.
+        function showMissionWarnings(terrainSamplingFailed, hasTerrainCollision, missingHomeReference) {
+            if (terrainLoadFailed || terrainSamplingFailed) {
+                showMission3DTerrainWarnings(['unavailable']);
+                return;
+            }
+
+            const warningTypes = [];
+            if (hasTerrainCollision) warningTypes.push('collision');
+            if (missingHomeReference) warningTypes.push('home');
+            showMission3DTerrainWarnings(warningTypes);
+        }
+
+        /*
+         * The track the aircraft will really fly, drawn beside the planned route.
+         *
+         * The samples carry their own altitude — the flight controller's ramp along
+         * each leg, and the approach altitudes on a landing — so the track is drawn
+         * where the aircraft will actually be, not where the plan says. Heights are
+         * metres above home, which is the frame the simulation works in; the ground
+         * beneath home puts them back into the same frame as the mission points.
+         */
+        function renderSimulatedTrack(samples, homeGroundHeight) {
+            if (!samples?.length) return [];
+
+            const datum = Number.isFinite(homeGroundHeight) ? homeGroundHeight : 0;
+            const positions = samples.map(
+                (sample) => Cartesian3.fromDegrees(sample.lon, sample.lat, datum + (sample.altM ?? 0))
+            );
+
+            // One stretch per phase, in the same colours as the 2D map. Each
+            // stretch also hangs a translucent curtain from the track down to the
+            // ground: a line floating in space gives no sense of how high it is,
+            // and on the landing approach the curtain visibly narrows to nothing
+            // as the aircraft comes down — which is the point of drawing it.
+            phaseRuns(samples)
+                .filter((run) => run.to > run.from)
+                .forEach((run) => {
+                    const color = Color.fromCssColorString(
+                        SIMULATION_PHASE_COLOURS[run.phase] ?? SIMULATION_PHASE_COLOURS[SimPhase.CRUISE]
+                    );
+                    const runPositions = positions.slice(run.from, run.to + 1);
+
+                    // Every third sample keeps the curtain light without changing
+                    // its shape; the run's last point is kept so nothing is cut off.
+                    const curtainPositions = runPositions.filter((_, index) => index % 3 === 0);
+                    if ((runPositions.length - 1) % 3 !== 0) {
+                        curtainPositions.push(runPositions[runPositions.length - 1]);
+                    }
+                    if (curtainPositions.length > 1) {
+                        viewer.entities.add({
+                            wall: {
+                                positions: curtainPositions,
+                                material: color.withAlpha(0.22)
+                            }
+                        });
+                    }
+
+                    viewer.entities.add({
+                        polyline: {
+                            positions: runPositions,
+                            width: 4,
+                            material: color,
+                            // The globe depth-tests everything drawn against it, so a
+                            // track running behind a hill — or lying on the ellipsoid
+                            // when no terrain is loaded — would vanish. Keep it
+                            // readable there instead, dimmed, the way the waypoint
+                            // markers stay readable.
+                            depthFailMaterial: color.withAlpha(0.45)
+                        }
+                    });
+                });
+
+            return positions;
+        }
+
+        async function renderMission(waypoints, home, simulationSamples = [], simulationAltitudesAbsolute = false) {
+            const sequence = ++updateSequence;
+            viewer.entities.removeAll();
+            hideMission3DTerrainWarning();
+
+            const points = getMission3DPoints(waypoints, home);
+            const missionPoints = points.filter((point) => !point.isHome);
+            if (!missionPoints.length) {
+                showEmptyMap();
+                viewer.scene.requestRender();
+                return;
+            }
+
+            $('#missionMap3DHelp').hide();
+
+            const signature = JSON.stringify(points);
+            const cache = terrainCacheSignature === signature ? terrainCache : null;
+            // A cache hit answers straight away. A miss goes through samplePointTerrain, which asks
+            // the terrain provider only when a real one is loaded, but awaits either way, so on a
+            // miss the guard below always runs behind a suspension.
+            const pointTerrain = cache
+                ? {groundHeights: cache.groundHeights, samplingFailed: false}
+                : await samplePointTerrain(points);
+            if (destroyed || sequence !== updateSequence) return;
+
+            const groundHeights = pointTerrain.groundHeights;
+            let terrainSamplingFailed = pointTerrain.samplingFailed;
+            const homeIndex = points.findIndex((point) => point.isHome);
+            const hasHome = homeIndex >= 0;
+            const homeGroundHeight = hasHome ? groundHeights[homeIndex] : null;
+            const missingHomeReference = !hasHome && missionPoints.some((point) => !point.absoluteAltitude);
+            const {displayPositions, renderedPoints} = renderMissionPoints(points, groundHeights, homeGroundHeight, hasHome);
+
+            const routeTerrain = cache ? cache.routeTerrain : await sampleRouteTerrain(renderedPoints);
+            if (destroyed || sequence !== updateSequence) return;
+            terrainSamplingFailed ||= routeTerrain.samplingFailed;
+            if (!cache && !terrainSamplingFailed && !(terrainProvider instanceof EllipsoidTerrainProvider)) {
+                terrainCacheSignature = signature;
+                terrainCache = {groundHeights, routeTerrain};
+            }
+            const hasTerrainCollision = renderRouteTerrain(routeTerrain.routeSamples);
+            showMissionWarnings(terrainSamplingFailed, hasTerrainCollision, missingHomeReference);
+            // The track's altitudes are metres above home, so they need the same
+            // ground the waypoints are measured from. Falling back to sea level
+            // instead buries the whole track as far underground as the site is
+            // high — which is exactly what it looks like: nothing there at all.
+            // Cesium places everything by absolute height. Track altitudes that are
+            // already AMSL need no reference at all — adding the ground to them puts
+            // the aircraft a site's elevation above where it flies.
+            let trackDatum = 0;
+            if (!simulationAltitudesAbsolute) {
+                trackDatum = Number.isFinite(homeGroundHeight)
+                    ? homeGroundHeight
+                    : (groundHeights[points.findIndex((point) => !point.isHome)] ?? 0);
+            }
+            const trackPositions = renderSimulatedTrack(simulationSamples, trackDatum);
+
+            // The simulated track has to be framed too. A landing approach runs an
+            // approach length past the touchdown point and out to the side, so
+            // framing the waypoints alone leaves the part worth looking at off screen.
+            const missionBounds = BoundingSphere.fromPoints(displayPositions.concat(trackPositions));
+            const range = Math.max(350, missionBounds.radius * 2.5, Math.max(...missionPoints.map((point) => Math.abs(point.altitude))) * 5);
+            viewer.camera.flyToBoundingSphere(missionBounds, {
+                duration: 0,
+                offset: new HeadingPitchRange(0, CesiumMath.toRadians(-32), range)
+            });
+            viewer.scene.requestRender();
+        }
+
+        ArcGisMapServerImageryProvider.fromUrl(
+            'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer'
+        ).then((provider) => {
+            if (!destroyed) {
+                viewer.imageryLayers.addImageryProvider(provider);
+                viewer.scene.requestRender();
+            }
+        }).catch(async (error) => {
+            console.warn('Mission Planner 3D satellite imagery failed, using OpenStreetMap:', error);
+            try {
+                const provider = await OpenStreetMapImageryProvider.fromUrl('https://tile.openstreetmap.org/');
+                if (!destroyed) {
+                    viewer.imageryLayers.addImageryProvider(provider);
+                    viewer.scene.requestRender();
+                }
+            } catch (fallbackError) {
+                console.warn('Mission Planner 3D fallback imagery failed:', fallbackError);
+            }
+        });
+
+        ArcGISTiledElevationTerrainProvider.fromUrl(
+            'https://elevation3d.arcgis.com/arcgis/rest/services/WorldElevation3D/Terrain3D/ImageServer'
+        ).then((provider) => {
+            if (destroyed) return;
+            terrainLoadFailed = false;
+            terrainProvider = provider;
+            viewer.terrainProvider = provider;
+            terrainCacheSignature = null;
+            terrainCache = null;
+            if (missionMapViewMode === '3d') renderMission(lastWaypoints, lastHome, lastSimulationSamples, lastSimulationAbsolute);
+        }).catch((error) => {
+            terrainLoadFailed = true;
+            console.warn('Mission Planner 3D terrain is unavailable, using an ellipsoid:', error);
+            if (!destroyed && missionMapViewMode === '3d') renderMission(lastWaypoints, lastHome, lastSimulationSamples, lastSimulationAbsolute);
+        });
+
+        return {
+            setVisible(visible) {
+                if (destroyed) return;
+                viewer.useDefaultRenderLoop = visible;
+                if (!visible) {
+                    updateSequence++;
+                    return;
+                }
+                requestAnimationFrame(() => {
+                    if (destroyed) return;
+                    viewer.resize();
+                    viewer.scene.requestRender();
+                });
+            },
+            update(waypoints, home, simulationSamples = [], simulationAltitudesAbsolute = false) {
+                lastWaypoints = waypoints;
+                lastHome = home;
+                lastSimulationSamples = simulationSamples;
+                lastSimulationAbsolute = simulationAltitudesAbsolute;
+                renderMission(waypoints, home, simulationSamples, simulationAltitudesAbsolute);
+            },
+            resize() {
+                if (!destroyed) viewer.resize();
+            },
+            destroy() {
+                destroyed = true;
+                updateSequence++;
+                cameraGuard.destroy();
+                if (!viewer.isDestroyed()) viewer.destroy();
+            }
+        };
+    }
+
+    function updateMission3D() {
+        if (mission3DViewer && missionMapViewMode === '3d') {
+            mission3DViewer.update(
+                mission.get(), HOME,
+                simulation.enabled ? simulation.samples : [],
+                simulation.altitudesAbsolute
+            );
+        }
+    }
+
+    function ensureMission3DViewer() {
+        if (mission3DViewer) return true;
+        try {
+            mission3DViewer = createMission3DViewer(document.getElementById('missionMap3D'));
+            return true;
+        } catch (error) {
+            console.warn('Mission Planner 3D view is unavailable:', error);
+            const message = mission3DMessage('missionMap3DUnavailable', '3D view unavailable on this system.');
+            $('#missionMap3DButton').prop('disabled', true).attr('title', message);
+            $('#missionMap3DHelp').text(message);
+            return false;
+        }
+    }
+
+    function setMissionMapViewMode(mode) {
+        let is3D = mode === '3d';
+        // Show the 3D container before creating the viewer so the canvas gets its real size
+        $('#missionMap').toggle(!is3D);
+        $('#missionMap3D').toggle(is3D);
+        if (is3D && !ensureMission3DViewer()) {
+            is3D = false;
+            $('#missionMap3D').hide();
+            $('#missionMap').show();
+        }
+        missionMapViewMode = is3D ? '3d' : '2d';
+        $('#missionMap2DButton').toggleClass('active', !is3D).attr('aria-pressed', String(!is3D));
+        $('#missionMap3DButton').toggleClass('active', is3D).attr('aria-pressed', String(is3D));
+        $('#geo_info').toggle(!is3D);
+
+        if (mission3DViewer) {
+            mission3DViewer.setVisible(is3D);
+            if (is3D) updateMission3D();
+        }
+        if (!is3D && map) map.updateSize();
+    }
+
+    // Slot the 2D/3D toggle below the bottom-most control initMap actually built: settings 65px,
+    // multimission 90px, elevation 115px, safehome 140px, geozones 190px. Which one that is
+    // depends on the connection and on whether geozones are enabled.
+    function missionMapViewControlsTop() {
+        if (!CONFIGURATOR.connectionValid) {
+            return 140; // without a connection the column ends at elevation, 115px
+        }
+        if (isGeozoneEnabeld) {
+            return 215; // below geozones at 190px
+        }
+        return 165; // below safehome at 140px
+    }
 
     //////////////////////////////////////////////////////////////////////////////////////////////
     //      define & init parameters for Selected Marker
@@ -2073,6 +2826,9 @@ function iconKey(filename) {
                 $('#missionDistance').text('infinite');
             }
         }
+
+        repaintSimulation();
+        updateMission3D();
     }
 
     function paintLine(pos1, pos2, pos2ID, color='#1497f1', lineDash=0, lineText="", selection=true, arrow=false) {
@@ -2151,6 +2907,7 @@ function iconKey(filename) {
     }
 
     function cleanLayers() {
+        cleanSimulation();
         for (var i in lines) {
             map.removeLayer(lines[i]);
         }
@@ -2169,6 +2926,218 @@ function iconKey(filename) {
         lines = [];
     }
 
+    /////////////////////////////////////////////
+    //
+    // Flight path simulation
+    //
+    /////////////////////////////////////////////
+
+    // Layers that only illustrate something must stay out of every hit test:
+    // picking one up as a marker to drag, or as a line to insert a waypoint into,
+    // would let an overlay quietly rewrite the mission.
+    const interactiveLayersOnly = {
+        layerFilter: (layer) => layer?.get('no_interaction') !== true
+    };
+
+    // nav_fw_wp_turn_smoothing arrives as an index into its own lookup table.
+    function readTurnSmoothing(setting) {
+        const name = setting.setting?.table?.values?.[setting.value];
+        if (!name) return TurnSmoothing.OFF;
+
+        const normalized = String(name).toUpperCase();
+        if (normalized.includes('CUT')) return TurnSmoothing.CUT;
+        if (normalized === 'ON') return TurnSmoothing.ON;
+        return TurnSmoothing.OFF;
+    }
+
+    // The approach settings for a landing waypoint live after the safehome block
+    // in the same collection, indexed by the mission the waypoint belongs to -
+    // the same lookup addFwApproach uses for the drawn approach lines.
+    function landingApproachFor(point) {
+        const approach = FC.FW_APPROACH?.get()?.[FC.SAFEHOMES.getMaxSafehomeCount() + (point.multiMissionIdx ?? 0)];
+        if (!approach) return {};
+
+        return {
+            approachAltCm: approach.getApproachAltAsl(),
+            landAltCm: approach.getLandAltAsl(),
+            approachDirection: approach.getApproachDirection(),
+            landHeading1: approach.getLandHeading1(),
+            landHeading2: approach.getLandHeading2(),
+            isSeaLevelRef: approach.getIsSeaLevelRef()
+        };
+    }
+
+    function cleanSimulation() {
+        if (simulation.layer) {
+            map.removeLayer(simulation.layer);
+            simulation.layer = null;
+        }
+        simulation.samples = [];
+    }
+
+    // Everything the run needs, gathered in one place: the route with its landing
+    // approaches, the parameters, and what had to be assumed to get there.
+    function buildSimulationPlan() {
+        const planned = getSimulationRoute(mission.get());
+        if (planned.length < 2) return null;
+
+        // Home elevation is what turns an AMSL waypoint into the above-home frame
+        // the flight controller navigates in. Without it, absolute altitudes are
+        // left alone and the mismatch is reported rather than hidden.
+        const homeAltM = homeMarkers.length && HOME.getAlt() !== 'N/A' ? Number(HOME.getAlt()) : undefined;
+        const {route: withAltitudes, homeKnown, absolute} = resolveRouteAltitudes(planned, homeAltM);
+
+        // Offline these are still zero — they are only read from a connected flight
+        // controller — so the firmware's own defaults stand in rather than letting
+        // the approach quietly disappear.
+        const approachLengthCm = simulation.approachLengthCm || FirmwareDefaults.approachLengthCm;
+        const loiterRadiusCm = simulation.loiterRadiusCm || FirmwareDefaults.loiterRadiusCm;
+
+        const {route, landingsWithoutApproach, suspectLandings} = withLandingApproaches(
+            withAltitudes,
+            (point) => landingApproachFor(point),
+            {approachLengthCm, loiterRadiusCm, homeAltM, routeFrameAbsolute: absolute}
+        );
+
+        // nav_fw_bank_angle is what navigation asks for; max_angle_inclination_rll
+        // is what the aircraft can deliver. The tighter one sizes the turn.
+        const bankCeilingBinds = simulation.bankCeilingDeg > 0
+            && simulation.bankCeilingDeg < simulation.bankAngleDeg;
+
+        return {
+            planned,
+            route,
+            landingsWithoutApproach,
+            suspectLandings,
+            homeKnown,
+            altitudesAbsolute: absolute,
+            // The AMSL-on-AMSL case is drawn without home, anchored at the landing
+            // altitude — the shape is right, the one-third split may differ from
+            // the home-anchored firmware rule, and that assumption is worth a line.
+            approachAnchoredAtLanding: !homeKnown && absolute
+                && route.some((point) => point.isApproach),
+            bankCeilingBinds,
+            usingDefaults: !simulation.approachLengthCm || !simulation.loiterRadiusCm,
+            parameters: {
+                speedMs: simulation.speedMs,
+                bankAngleDeg: bankCeilingBinds ? simulation.bankCeilingDeg : simulation.bankAngleDeg,
+                loiterRadiusM: loiterRadiusCm / 100,
+                waypointRadiusM: simulation.wpRadiusCm / 100,
+                turnSmoothing: simulation.turnSmoothing
+            }
+        };
+    }
+
+    const LANDING_PROBLEM_MESSAGE = {
+        [LandingApproachProblem.NO_HEADING]: 'missionSimulationNoLandingHeading',
+        [LandingApproachProblem.NO_APPROACH_LENGTH]: 'missionSimulationNoApproachLength',
+        [LandingApproachProblem.NO_HOME_ELEVATION]: 'missionSimulationApproachNoHome',
+        [LandingApproachProblem.ALTITUDES_IMPLAUSIBLE]: 'missionSimulationApproachAltitudes'
+    };
+
+    // The model reports track warnings as code plus figures; the words belong to
+    // the app, where they go through i18n like every other user-facing string.
+    const TRACK_WARNING_MESSAGE = {
+        'waypoint-missed': (warning) => i18n.getMessage('missionSimulationWaypointMissed',
+            [String(warning.waypointNumber), String(Math.round(warning.distanceM))]),
+        'leg-not-flyable': (warning) => i18n.getMessage('missionSimulationLegNotFlyable',
+            [String(warning.waypointNumber), String(warning.radiusM)])
+    };
+
+    // Everything the reader has to know to judge what they are looking at.
+    function simulationNotices(plan, result) {
+        const notices = plan.landingsWithoutApproach.map(({number, reason}) =>
+            i18n.getMessage(LANDING_PROBLEM_MESSAGE[reason], [String(Number(number) + 1)]));
+
+        if (plan.usingDefaults) notices.push(i18n.getMessage('missionSimulationDefaults'));
+        if (!simulation.speedFromFc) notices.push(i18n.getMessage('missionSimulationSpeedEstimated'));
+        if (plan.bankCeilingBinds) {
+            notices.push(i18n.getMessage('missionSimulationBankCeiling', [String(simulation.bankCeilingDeg)]));
+        }
+        // Said rather than hidden: a hidden button is indistinguishable from a broken
+        // one, and airframe detection is not reliable enough to hide a feature on.
+        if (CONFIGURATOR.connectionValid && !FC.isAirplane()) {
+            notices.push(i18n.getMessage('missionSimulationFixedWingOnly'));
+        }
+        plan.suspectLandings.forEach(({number, gapM}) => {
+            notices.push(i18n.getMessage('missionSimulationApproachSuspect',
+                [String(Number(number) + 1), String(gapM)]));
+        });
+        if (plan.approachAnchoredAtLanding) {
+            notices.push(i18n.getMessage('missionSimulationApproachAnchored'));
+        }
+        if (!plan.homeKnown && plan.planned.some((point) => point.absoluteAltitude)) {
+            notices.push(i18n.getMessage('missionSimulationNoHomeElevation'));
+        }
+
+        return notices.concat(
+            result.warnings
+                .filter((warning) => warning.code !== 'simulation-truncated')
+                .map((warning) => TRACK_WARNING_MESSAGE[warning.code]?.(warning) ?? warning.text)
+        );
+    }
+
+    // A repeat or a truncated run means the figures no longer describe the whole
+    // flight. Showing a rounded number anyway would read as a complete answer.
+    function showSimulationFigures(plan, result) {
+        const radius = commandedTurnRadius(
+            plan.parameters.speedMs, plan.parameters.bankAngleDeg,
+            plan.parameters.loiterRadiusM, plan.parameters.turnSmoothing
+        );
+        $('#simulationTurnRadius').text(Number.isFinite(radius) ? `${radius.toFixed(0)} m` : '-');
+
+        const repeats = mission.get().some((waypoint) => waypoint.getAction() === MWNP.WPTYPE.JUMP);
+        const truncated = result.warnings.some((warning) => warning.code === 'simulation-truncated');
+
+        if (repeats || truncated) {
+            $('#simulationTime, #simulationDistance').text('-');
+            return i18n.getMessage(repeats ? 'missionSimulationJumps' : 'missionSimulationTruncated');
+        }
+
+        $('#simulationTime').text(formatSimulationTime(result.summary.totalTimeS));
+        $('#simulationDistance').text(`${(result.summary.totalDistanceM / 1000).toFixed(2)} km`);
+        return null;
+    }
+
+    function repaintSimulation() {
+        cleanSimulation();
+        $('#missionPlannerSimulation').toggle(simulation.enabled);
+        if (!simulation.enabled) return;
+
+        const $warnings = $('#simulationWarnings').empty();
+        const stop = (message) => {
+            $('#simulationTurnRadius').text('');
+            $('#simulationTime, #simulationDistance').text('-');
+            $warnings.text(i18n.getMessage(message));
+        };
+
+        // In the all-missions view the map shows every mission but the simulation
+        // only ever flies one, so figures would describe something else entirely.
+        if (!singleMissionActive()) return stop('missionSimulationMultiMission');
+
+        const plan = buildSimulationPlan();
+        if (!plan) return stop('missionSimulationTooFewPoints');
+
+        const result = simulateGroundTrack(plan.route, plan.parameters);
+        simulation.samples = result.samples;
+        simulation.altitudesAbsolute = plan.altitudesAbsolute;
+
+        if (result.samples.length > 1) {
+            simulation.layer = new VectorLayer({
+                source: new VectorSource({features: simulationTrackFeatures(result.samples)})
+            });
+            // Keep the track out of every hit test: it must never be picked up as a
+            // marker to drag or a line to insert a waypoint into.
+            simulation.layer.set('no_interaction', true);
+            map.addLayer(simulation.layer);
+        }
+
+        const incomplete = showSimulationFigures(plan, result);
+        simulationNotices(plan, result)
+            .concat(incomplete ?? [])
+            .forEach((text) => $warnings.append($('<div/>').text(text)));
+    }
+
     function redrawLayers() {
         if (!mission.isEmpty()) {
             repaintLine4Waypoints(mission);
@@ -2178,6 +3147,10 @@ function iconKey(filename) {
                 }
             });
 
+        } else {
+            // An emptied mission must empty the panel too, or its figures keep
+            // describing a track that is no longer there.
+            repaintSimulation();
         }
 
         if (!isOffline) geozoneWarning();
@@ -2652,17 +3625,15 @@ function iconKey(filename) {
 
             var map = evt.map;
 
-            const isInteractable = (layer) => layer?.get('no_interaction') !== true;
-
             var feature = map.forEachFeatureAtPixel(evt.pixel,
-                function (feature, layer) {
-                    return isInteractable(layer) ? feature : null;
-                });
+                function (feature) {
+                    return feature;
+                }, interactiveLayersOnly);
 
             tempMarker = map.forEachFeatureAtPixel(evt.pixel,
                 function (feature, layer) {
-                    return isInteractable(layer) ? layer : null;
-                });
+                    return layer;
+                }, interactiveLayersOnly);
 
             if (feature) {
                 // Ignore features from layers without a 'kind' (e.g. grid preview)
@@ -2688,9 +3659,9 @@ function iconKey(filename) {
             var map = evt.map;
 
             var feature = map.forEachFeatureAtPixel(evt.pixel,
-                function (feature, layer) {
+                function (feature) {
                     return feature;
-                });
+                }, interactiveLayersOnly);
 
             var deltaX = evt.coordinate[0] - this.coordinate_[0];
             var deltaY = evt.coordinate[1] - this.coordinate_[1];
@@ -2752,14 +3723,17 @@ function iconKey(filename) {
          */
         app.handleMoveEvent = function (evt) {
             var map = evt.map;
+            // The simulated track is drawn on top of the mission lines, so it has to
+            // stay out of the hover test too — otherwise it offers a crosshair and an
+            // "insert waypoint" tooltip over a layer that accepts neither.
             const feature = map.forEachFeatureAtPixel(evt.pixel,
-                function (feature, layer) {
+                function (feature) {
                     return feature;
-                });
+                }, interactiveLayersOnly);
             const hoverLayer = map.forEachFeatureAtPixel(evt.pixel,
                 function (feature, layer) {
                     return layer;
-                });
+                }, interactiveLayersOnly);
             const element = evt.map.getTargetElement();
             const isLine = hoverLayer?.kind === 'line' && hoverLayer.selection;
 
@@ -2921,6 +3895,11 @@ function iconKey(filename) {
             })
         });
 
+        $('#missionMapViewControls').css('top', `${missionMapViewControlsTop()}px`);
+        $('#missionMap2DButton').on('click', () => setMissionMapViewMode('2d'));
+        $('#missionMap3DButton').on('click', () => setMissionMapViewMode('3d'));
+        setMissionMapViewMode(missionMapViewMode);
+
         //////////////////////////////////////////////////////////////////////////
         // Set the attribute link to open on an external browser window, so
         // it doesn't interfere with the configurator.
@@ -3059,13 +4038,13 @@ function iconKey(filename) {
                 }
             }
             selectedFeature = map.forEachFeatureAtPixel(evt.pixel,
-                function (feature, layer) {
+                function (feature) {
                     return feature;
-                });
+                }, interactiveLayersOnly);
             tempMarker = map.forEachFeatureAtPixel(evt.pixel,
                 function (feature, layer) {
                     return layer;
-                });
+                }, interactiveLayersOnly);
             // Ignore features from layers without a kind (e.g. grid preview overlay)
             if (selectedFeature && tempMarker && !tempMarker.kind) {
                 selectedFeature = null;
@@ -3267,12 +4246,12 @@ function iconKey(filename) {
         $(map.getViewport()).on('mousemove', function (e) {
             var pixel = map.getEventPixel(e.originalEvent);
             var name = "";
-            var hit = map.forEachFeatureAtPixel(pixel, function (feature, layer) {
+            const hit = map.forEachFeatureAtPixel(pixel, function (feature) {
                 if (feature) {
                     name = feature.getProperties().name;
                 }
                 return true;
-            });
+            }, interactiveLayersOnly);
             if (hit && name != "safehomeDist" && name != "safehomeSafe" && name != "geozoneCircle") {
                 map.getTargetElement().style.cursor = 'pointer';
             } else {
@@ -3287,6 +4266,7 @@ function iconKey(filename) {
             let width = $("#missionMap canvas").width(), height = $("#missionMap canvas").height();
             if ((map.width_ != width) || (map.height_ != height)) map.updateSize();
             map.width_ = width; map.height_ = height;
+            if (mission3DViewer && missionMapViewMode === '3d') mission3DViewer.resize();
         }, 200);
 
         //////////////////////////////////////////////////////////////////////////
@@ -3486,23 +4466,14 @@ function iconKey(filename) {
                     $('#wpLandAltM').text(selectedFwApproachWp.getLandAltAsl() / 100 + " m");
                     $('#wpApproachAltM').text(selectedFwApproachWp.getApproachAltAsl() / 100 + " m");
 
-                    if (selectedFwApproachWp && selectedFwApproachWp.getIsSeaLevelRef() != $('#pointP3Alt').prop("checked")) {
-                        selectedFwApproachWp.setIsSeaLevelRef($('#pointP3Alt').prop("checked"));
-                        selectedFwApproachWp.setElevation(elevationAtWP * 100);
-                        if ($('#pointP3Alt').prop("checked")) {
-                            selectedFwApproachWp.setApproachAltAsl(selectedFwApproachWp.getApproachAltAsl() + elevationAtWP * 100);
-                            selectedFwApproachWp.setLandAltAsl(selectedFwApproachWp.getLandAltAsl() + elevationAtWP * 100);
-                        } else {
-                            selectedFwApproachWp.setApproachAltAsl(selectedFwApproachWp.getApproachAltAsl() - elevationAtWP * 100);
-                            selectedFwApproachWp.setLandAltAsl(selectedFwApproachWp.getLandAltAsl() - elevationAtWP * 100);
-                        }
-
-                        $('#wpApproachAlt').val(selectedFwApproachWp.getApproachAltAsl());
-                        $('#wpLandAlt').val(selectedFwApproachWp.getLandAltAsl());
-                    }
-
-                    $('#wpLandAltM').text(selectedFwApproachWp.getLandAltAsl() / 100 + " m");
-                    $('#wpApproachAltM').text(selectedFwApproachWp.getApproachAltAsl() / 100 + " m");
+                    // The LAND branch above is the one and only conversion of the
+                    // approach altitudes. A second block here used to convert them
+                    // again WITHOUT checking that the selected waypoint is a landing
+                    // at all — and since one approach object serves the whole
+                    // mission, toggling the altitude reference on any ordinary
+                    // waypoint silently added the site elevation to the approach
+                    // altitudes, once per toggle. That is where the ever-growing
+                    // approach and landing altitudes came from.
 
                     mission.updateWaypoint(selectedMarker);
                     mission.update(singleMissionActive());
@@ -3578,6 +4549,8 @@ function iconKey(filename) {
                 if (checkApproachAltitude(altitude, $('#pointP3Alt').prop('checked'), Number($('#elevationValueAtWP').text()))) {
                     selectedFwApproachWp.setApproachAltAsl(Number($(event.currentTarget).val()));
                     $('#wpApproachAltM').text(selectedFwApproachWp.getApproachAltAsl() / 100 + " m");
+                    repaintSimulation();
+                    updateMission3D();
                 }
             }
         });
@@ -3588,6 +4561,8 @@ function iconKey(filename) {
                 if (checkLandingAltitude(altitude, $('#pointP3Alt').prop('checked'), Number($('#elevationValueAtWP').text()))) {
                     selectedFwApproachWp.setLandAltAsl(Number($(event.currentTarget).val()));
                     $('#wpLandAltM').text(selectedFwApproachWp.getLandAltAsl() / 100 + " m");
+                    repaintSimulation();
+                    updateMission3D();
                 }
             }
         });
@@ -4174,6 +5149,38 @@ function iconKey(filename) {
                 plotElevation();
             }
         });
+
+        /////////////////////////////////////////////
+        // Flight path simulation
+        /////////////////////////////////////////////
+        $('#simulationSpeed').val(simulation.speedMs);
+        // The model is parameterised from the flight controller; without one it
+        // could only guess. Offline the feature stays out of the way entirely and
+        // the 3D view shows the plan alone.
+        $('#simulateMission').toggle(CONFIGURATOR.connectionValid);
+        if (!CONFIGURATOR.connectionValid) simulation.enabled = false;
+
+
+        // Namespaced and released first: the tab can be entered more than once,
+        // and a delegated handler would otherwise pile up on every visit and keep
+        // answering out of the previous closure.
+        $(document).off('click.mcSimulate').on('click.mcSimulate', '#simulateMissionButton, #simulateMission', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            simulation.enabled = !simulation.enabled;
+            $('#simulateMission').toggleClass('active', simulation.enabled);
+            repaintSimulation();
+            updateMission3D();
+        });
+
+        $(document).off('change.mcSimulate input.mcSimulate')
+            .on('change.mcSimulate input.mcSimulate', '#simulationSpeed', function () {
+                const speed = Number($(this).val());
+                if (!Number.isFinite(speed) || speed <= 0) return;
+                simulation.speedMs = speed;
+                repaintSimulation();
+                updateMission3D();
+            });
 
         // Address search button
         $(document).on('click', '#searchAddressButton, #searchAddress', function (e) {
@@ -5578,6 +6585,10 @@ missionControlTab.cleanup = function (callback) {
     if (elevationChartInstance) {
         elevationChartInstance.destroy();
         elevationChartInstance = null;
+    }
+    if (mission3DViewer) {
+        mission3DViewer.destroy();
+        mission3DViewer = null;
     }
     if (callback) callback();
 };

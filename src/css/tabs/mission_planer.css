@@ -207,8 +207,120 @@
     height: 100%;
 }
 
-#missionMap {
+#missionMapView {
+    position: relative;
     height: 100%;
+    width: 100%;
+}
+
+#missionMap,
+#missionMap3D {
+    height: 100%;
+    width: 100%;
+}
+
+#missionMap3D {
+    background: #0d1117;
+    display: none;
+    overflow: hidden;
+}
+
+#missionMap3D canvas,
+#missionMap3D .cesium-viewer,
+#missionMap3D .cesium-viewer-cesiumWidgetContainer,
+#missionMap3D .cesium-widget,
+#missionMap3D .cesium-widget canvas {
+    display: block;
+    height: 100%;
+    width: 100%;
+}
+
+#missionMap3D .cesium-viewer-bottom {
+    bottom: 2px;
+}
+
+#missionMap3D .cesium-widget-credits {
+    font-size: 10px;
+}
+
+#missionMap3DHelp {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: rgba(255, 255, 255, 0.78);
+    font: 600 14px "Segoe UI", Calibri, sans-serif;
+    text-align: center;
+    pointer-events: none;
+    z-index: 2;
+}
+
+#missionMap3DWarning {
+    position: absolute;
+    top: 0.5em;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    display: none;
+    max-width: calc(100% - 12em);
+    padding: 6px 10px;
+    border: 1px solid rgba(255, 255, 255, 0.75);
+    border-radius: 3px;
+    background: rgba(160, 18, 18, 0.94);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.45);
+    color: #fff;
+    font: 700 12px "Segoe UI", Calibri, sans-serif;
+    line-height: 16px;
+    pointer-events: none;
+    text-align: center;
+}
+
+#missionMap3DWarning[data-warning-type="unavailable"],
+#missionMap3DWarning[data-warning-type="home"] {
+    background: rgba(125, 78, 0, 0.94);
+}
+
+/* Left map control column; the exact slot below the bottom-most planner control is set at runtime */
+.mission-map-view-controls {
+    top: 215px;
+    left: .5em;
+    z-index: 1001;
+    border: 0;
+    margin: 0;
+    min-width: 0;
+    padding: 0;
+}
+
+/* Same outer size as the other .ol-control buttons (1.375em at the inherited font size) */
+.mission-map-view-controls button {
+    font-size: .72em;
+    width: 1.91em;
+    height: 1.91em;
+    line-height: 1.91em;
+    color: #fff;
+    background-color: rgba(0, 60, 136, .5);
+}
+
+.mission-map-view-controls button.active {
+    background-color: rgba(0, 60, 136, 1);
+}
+
+.mission-map-view-controls #missionMap2DButton {
+    border-radius: 2px 2px 0 0;
+}
+
+.mission-map-view-controls #missionMap3DButton {
+    border-radius: 0 0 2px 2px;
+}
+
+.mission-map-view-controls button:focus-visible {
+    outline: 2px solid #1497f1;
+    outline-offset: 1px;
+}
+
+.mission-map-view-controls button:disabled {
+    color: #ccc;
+    cursor: default;
 }
 
 /* #missionPlannerElevation {

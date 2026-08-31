@@ -4991,6 +4991,21 @@
     "missionElevation": {
         "message": "Geländehöhe (m):"
     },
+    "missionMap3DEmpty": {
+        "message": "Keine Mission für die 3D-Ansicht vorhanden."
+    },
+    "missionMap3DCollisionWarning": {
+        "message": "Warnung: Die geplante Flugroute schneidet das Gelände."
+    },
+    "missionMap3DTerrainUnavailable": {
+        "message": "Geländedaten nicht verfügbar: Die Routenkollisionsprüfung konnte nicht abgeschlossen werden."
+    },
+    "missionMap3DHomeRequired": {
+        "message": "HOME ist nicht gesetzt: Die Geländeprüfung für relative Höhen ist nicht verfügbar."
+    },
+    "missionMap3DUnavailable": {
+        "message": "Die 3D-Ansicht ist auf diesem System nicht verfügbar."
+    },
     "missionNA": {
         "message": "k. A."
     },

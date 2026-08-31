@@ -5110,6 +5110,90 @@
     "removeAllPointButtonSave": {
         "message": "Remove all points"
     },
+    "missionTitleSimulate": {
+        "message": "Show the track a fixed wing will actually fly"
+    },
+    "missionSimulationHead": {
+        "message": "Flight path simulation"
+    },
+    "missionSimulationSpeed": {
+        "message": "Cruise speed (m/s)"
+    },
+    "missionSimulationSpeedHelp": {
+        "message": "Read from fw_reference_airspeed when a flight controller is connected - the same speed the firmware uses for its own coordinated turn calculation when no airspeed sensor is fitted. Override it to see how the mission looks at another speed; the turn radius grows with the square of this figure. Note that nav_auto_speed and the per-waypoint speed do not apply to a fixed wing, which flies a throttle setting."
+    },
+    "missionSimulationLegendCruise": {
+        "message": "cruise"
+    },
+    "missionSimulationLegendTurn": {
+        "message": "turning"
+    },
+    "missionSimulationLegendApproach": {
+        "message": "landing approach"
+    },
+    "missionSimulationTurnRadius": {
+        "message": "Turn radius:"
+    },
+    "missionSimulationTime": {
+        "message": "Flight time:"
+    },
+    "missionSimulationDistance": {
+        "message": "Track length:"
+    },
+    "missionSimulationTooFewPoints": {
+        "message": "Add at least two waypoints to simulate the flight path."
+    },
+    "missionSimulationNoLandingHeading": {
+        "message": "Waypoint $1 lands without a landing heading, so no approach pattern is flown - the aircraft circles down onto the point. Set a landing heading to see the approach."
+    },
+    "missionSimulationNoApproachLength": {
+        "message": "Waypoint $1 has a landing heading, but the approach length is unknown. Connect the flight controller to read nav_fw_land_approach_length."
+    },
+    "missionSimulationApproachNoHome": {
+        "message": "Waypoint $1's approach and the mission use different altitude references, and without the home elevation they cannot be brought together. Set home to see the approach."
+    },
+    "missionSimulationApproachSuspect": {
+        "message": "Waypoint $1's approach lands $2 m away in altitude from the waypoint itself - its landing settings look corrupted. Check Approach Alt and Land Alt."
+    },
+    "missionSimulationApproachAnchored": {
+        "message": "Home is not set, so the approach profile is anchored at its landing altitude. The shape is right; set home for the firmware-exact altitude split."
+    },
+    "missionSimulationWaypointMissed": {
+        "message": "Waypoint $1 is passed at $2 m instead of being reached - the turn onto it is tighter than the aircraft flies."
+    },
+    "missionSimulationLegNotFlyable": {
+        "message": "Waypoint $1 is never reached: at $2 m turn radius the aircraft circles it instead of closing in."
+    },
+    "missionSimulationApproachAltitudes": {
+        "message": "Waypoint $1 has an approach altitude that is not above its landing altitude, so no approach can be drawn. Check the landing settings for this waypoint."
+    },
+    "missionSimulationDefaults": {
+        "message": "No flight controller connected: approach length and loiter radius fall back to the firmware defaults, so the approach shown is generic."
+    },
+    "missionSimulationBankCeiling": {
+        "message": "Turns are limited to $1 degrees of bank by max_angle_inclination_rll, below the angle navigation asks for, so they are wider than nav_fw_bank_angle alone suggests."
+    },
+    "missionSimulationSpeedEstimated": {
+        "message": "Cruise speed is an assumption: connect the flight controller to read fw_reference_airspeed, or set it to what your aircraft really cruises at. The turn radius depends on it squared."
+    },
+    "missionSimulationFixedWingOnly": {
+        "message": "This models a fixed wing. The connected aircraft is not one, so the track shown does not describe how it will fly."
+    },
+    "missionSimulationMultiMission": {
+        "message": "The flight path is simulated one mission at a time. Select a single mission to see it."
+    },
+    "missionSimulationJumps": {
+        "message": "This mission repeats waypoints with a jump, which the simulation does not follow, so flight time and track length are not shown. The track drawn is the first pass only."
+    },
+    "missionSimulationTruncated": {
+        "message": "The mission is longer than the simulation runs for, so the track stops part way and the figures are not shown."
+    },
+    "missionSimulationNoHomeElevation": {
+        "message": "This mission uses absolute altitudes, but the home elevation is unknown, so the vertical profile may be off. Set home to resolve it."
+    },
+    "missionSimulationDisclaimer": {
+        "message": "Altitudes and the landing approach follow the flight controller's own formulas. Turns are flown at the bank-limited radius: with nav_fw_wp_turn_smoothing ON or ON-CUT the aircraft starts its turn before the waypoint and curves inside the corner, which is not modelled here. Also not modelled: wind, holds (a POSHOLD point and the last waypoint of a mission are flown straight through, where the aircraft would circle), jumps, tracking back onto the leg line, and the pitch-held glide and flare over the last few metres, where the simulation stops. Assumes the aircraft follows its commanded track perfectly, so real turns start and finish more gently. A planning aid, not proof that a mission is safe to fly."
+    },
     "missionTotalInformationHead": {
         "message": "Total information"
     },
@@ -5241,6 +5325,21 @@
     },
     "missionElevation": {
         "message": "Elevation (m):"
+    },
+    "missionMap3DEmpty": {
+        "message": "No mission to display in 3D."
+    },
+    "missionMap3DCollisionWarning": {
+        "message": "Warning: Planned route intersects terrain."
+    },
+    "missionMap3DTerrainUnavailable": {
+        "message": "Terrain data unavailable: Route collision check could not be completed."
+    },
+    "missionMap3DHomeRequired": {
+        "message": "HOME is not set: Relative-altitude terrain checks are unavailable."
+    },
+    "missionMap3DUnavailable": {
+        "message": "3D view unavailable on this system."
     },
     "missionNA": {
         "message": "N/A"
