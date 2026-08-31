@@ -3630,15 +3630,18 @@ HARDWARE.update = function(callback) {
                 HARDWARE.capabilities.useBaro  = (FC.SENSOR_CONFIG.barometer != 0);
                 HARDWARE.capabilities.usePitot = (FC.SENSOR_CONFIG.pitot != 0);
 
-                if (callback) {
-                    callback();
-                }
+                mspHelper.getSetting("terrain_enabled").then(function(data) {
+                    HARDWARE.capabilities.useTerrain = Boolean(data && data.value);
+                }).catch(function() {
+                    // Setting not available in this firmware
+                    HARDWARE.capabilities.useTerrain = false;
+                }).finally(function() {
+                    if (callback) {
+                        callback();
+                    }
+                });
             });
         });
-
-        mspHelper.getSetting("terrain_enabled").then(function(data) {
-            HARDWARE.capabilities.useTerrain = Boolean(data && data.value);
-        })
     });
 };
 
