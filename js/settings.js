@@ -648,12 +648,33 @@ var Settings = (function () {
                     value = Math.round((parseFloat(input.val()) * multiplier) * Math.pow(10, precision)) / Math.pow(10, precision);
                 }
 
-                if (value > parseInt(input.data('default-max'))) {
-                    value = parseInt(input.data('default-max'));
+                // data-default-min and data-default-max only exist once a unit
+                // multiplier has rewritten the min and max attributes, so they
+                // hold the bounds in firmware units. Settings without a
+                // multiplier never get them, and parseInt(undefined) is NaN,
+                // which makes both comparisons false and skips the clamp
+                // entirely. Falling back to the attributes covers those,
+                // because without a multiplier the attributes already carry
+                // the firmware-unit bounds.
+                //
+                // This matters because the value is serialized with push8 and
+                // friends, which mask rather than reject. An out-of-range
+                // entry would otherwise wrap into a different in-range value
+                // that the flight controller then accepts as valid.
+                let clampMax = parseInt(input.data('default-max'));
+                if (isNaN(clampMax)) {
+                    clampMax = parseInt(input.attr('max'));
+                }
+                if (!isNaN(clampMax) && value > clampMax) {
+                    value = clampMax;
                 }
 
-                if (value < parseInt(input.data('default-min'))) {
-                    value = parseInt(input.data('default-min'));
+                let clampMin = parseInt(input.data('default-min'));
+                if (isNaN(clampMin)) {
+                    clampMin = parseInt(input.attr('min'));
+                }
+                if (!isNaN(clampMin) && value < clampMin) {
+                    value = clampMin;
                 }
             }
         }
