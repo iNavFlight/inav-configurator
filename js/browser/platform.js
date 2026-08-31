@@ -46,6 +46,50 @@ function download(filename, data) {
   URL.revokeObjectURL(url);
 }
 
+// appendFile() is called many times in a row (once per polling tick) by
+// tabs/logging.js and tabs/onboard_logging.js to stream data as it arrives,
+// the same way Electron's real fs.appendFile does on disk. A browser can't
+// append to an arbitrary file, so each stream's chunks are buffered here and
+// flushed as a single download either once enough has accumulated or once
+// the caller goes quiet for a bit (which is what "logging stopped" looks
+// like from here, since there's no explicit close/finalize call in either
+// tab today).
+const appendStreams = new Map();
+const APPEND_FLUSH_BYTES = 1024 * 1024; // 1MB
+const APPEND_FLUSH_IDLE_MS = 3000;
+
+function byteLength(chunk) {
+  return chunk instanceof Uint8Array ? chunk.byteLength : chunk.length;
+}
+
+function flushAppendStream(filename) {
+  const stream = appendStreams.get(filename);
+  if (!stream || stream.chunks.length === 0) return;
+  clearTimeout(stream.idleTimer);
+  appendStreams.delete(filename);
+  download(filename, new Blob(stream.chunks));
+}
+
+function appendToStream(filename, data) {
+  let stream = appendStreams.get(filename);
+  if (!stream) {
+    stream = { chunks: [], size: 0, idleTimer: null };
+    appendStreams.set(filename, stream);
+  }
+  stream.chunks.push(data);
+  stream.size += byteLength(data);
+
+  clearTimeout(stream.idleTimer);
+  if (stream.size >= APPEND_FLUSH_BYTES) {
+    flushAppendStream(filename);
+  } else {
+    stream.idleTimer = setTimeout(
+      () => flushAppendStream(filename),
+      APPEND_FLUSH_IDLE_MS,
+    );
+  }
+}
+
 /**
  * Provides only browser-safe equivalents for the Electron preload API.
  * Unsupported desktop-only features deliberately fail with an explanatory
@@ -111,7 +155,7 @@ export function installBrowserPlatform() {
       return false;
     },
     async appendFile(filename, data) {
-      download(filename, data);
+      appendToStream(filename, data);
       return false;
     },
     async getBackupDir() {
