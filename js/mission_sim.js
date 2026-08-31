@@ -378,6 +378,25 @@ export const SimPhase = Object.freeze({
     APPROACH: 'approach'
 });
 
+/*
+ * The track split into stretches of one phase, as index ranges into `samples`.
+ * Consecutive runs share their boundary sample so the drawn lines join without
+ * gaps. Both map views colour the track by phase, so they share this split.
+ */
+export function phaseRuns(samples) {
+    const runs = [];
+    if (!samples?.length) return runs;
+
+    let start = 0;
+    for (let index = 1; index <= samples.length; index++) {
+        if (index === samples.length || samples[index].phase !== samples[start].phase) {
+            runs.push({phase: samples[start].phase, from: start, to: Math.min(index, samples.length - 1)});
+            start = index;
+        }
+    }
+    return runs;
+}
+
 export const SimEvent = Object.freeze({
     REACHED: 'reached',      // came within the acceptance radius
     OVERSHOT: 'overshot',    // flew past it and gave up on reaching it

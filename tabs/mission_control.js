@@ -96,6 +96,7 @@ import {
     FirmwareDefaults,
     LandingApproachProblem,
     SimPhase,
+    phaseRuns,
     TurnSmoothing,
     commandedTurnRadius,
     getSimulationRoute,
@@ -321,6 +322,14 @@ function readNumericSetting(setting, fallback) {
     const value = Number.parseInt(setting.value, 10);
     return Number.isFinite(value) ? value : fallback;
 }
+
+// One colour per flight phase, identical on the 2D map and in the 3D view, so a
+// stretch of track means the same thing wherever it is looked at.
+const SIMULATION_PHASE_COLOURS = Object.freeze({
+    [SimPhase.CRUISE]: '#00c2a8',
+    [SimPhase.TURN]: '#ffb020',
+    [SimPhase.APPROACH]: '#ff5fd2'
+});
 
 function formatSimulationTime(seconds) {
     const whole = Math.round(seconds);
@@ -1186,19 +1195,48 @@ function iconKey(filename) {
                 (sample) => Cartesian3.fromDegrees(sample.lon, sample.lat, datum + (sample.altM ?? 0))
             );
 
-            const trackColor = Color.fromCssColorString('#00c2a8');
-            viewer.entities.add({
-                polyline: {
-                    positions,
-                    width: 3,
-                    material: trackColor,
-                    // The globe depth-tests everything drawn against it, so a track
-                    // running behind a hill — or lying on the ellipsoid when no
-                    // terrain is loaded — would vanish. Keep it readable there
-                    // instead, dimmed, the way the waypoint markers stay readable.
-                    depthFailMaterial: trackColor.withAlpha(0.45)
-                }
-            });
+            // One stretch per phase, in the same colours as the 2D map. Each
+            // stretch also hangs a translucent curtain from the track down to the
+            // ground: a line floating in space gives no sense of how high it is,
+            // and on the landing approach the curtain visibly narrows to nothing
+            // as the aircraft comes down — which is the point of drawing it.
+            phaseRuns(samples)
+                .filter((run) => run.to > run.from)
+                .forEach((run) => {
+                    const color = Color.fromCssColorString(
+                        SIMULATION_PHASE_COLOURS[run.phase] ?? SIMULATION_PHASE_COLOURS[SimPhase.CRUISE]
+                    );
+                    const runPositions = positions.slice(run.from, run.to + 1);
+
+                    // Every third sample keeps the curtain light without changing
+                    // its shape; the run's last point is kept so nothing is cut off.
+                    const curtainPositions = runPositions.filter((_, index) => index % 3 === 0);
+                    if ((runPositions.length - 1) % 3 !== 0) {
+                        curtainPositions.push(runPositions[runPositions.length - 1]);
+                    }
+                    if (curtainPositions.length > 1) {
+                        viewer.entities.add({
+                            wall: {
+                                positions: curtainPositions,
+                                material: color.withAlpha(0.22)
+                            }
+                        });
+                    }
+
+                    viewer.entities.add({
+                        polyline: {
+                            positions: runPositions,
+                            width: 4,
+                            material: color,
+                            // The globe depth-tests everything drawn against it, so a
+                            // track running behind a hill — or lying on the ellipsoid
+                            // when no terrain is loaded — would vanish. Keep it
+                            // readable there instead, dimmed, the way the waypoint
+                            // markers stay readable.
+                            depthFailMaterial: color.withAlpha(0.45)
+                        }
+                    });
+                });
 
             return positions;
         }
@@ -2882,9 +2920,6 @@ function iconKey(filename) {
         layerFilter: (layer) => layer?.get('no_interaction') !== true
     };
 
-    const SIMULATION_CRUISE_COLOUR = '#00c2a8';
-    const SIMULATION_TURN_COLOUR = '#ffb020';
-
     // nav_fw_wp_turn_smoothing arrives as an index into its own lookup table.
     function readTurnSmoothing(setting) {
         const name = setting.setting?.table?.values?.[setting.value];
@@ -2922,33 +2957,21 @@ function iconKey(filename) {
     }
 
     function simulationTrackFeatures(samples) {
-        const features = [];
-        let run = [samples[0]];
-
-        const flush = (phase) => {
-            if (run.length < 2) return;
-            const feature = new Feature({
-                geometry: new LineString(run.map((point) => fromLonLat([point.lon, point.lat])))
+        return phaseRuns(samples)
+            .filter((run) => run.to > run.from)
+            .map((run) => {
+                const feature = new Feature({
+                    geometry: new LineString(samples.slice(run.from, run.to + 1)
+                        .map((point) => fromLonLat([point.lon, point.lat])))
+                });
+                feature.setStyle(new Style({
+                    stroke: new Stroke({
+                        color: SIMULATION_PHASE_COLOURS[run.phase] ?? SIMULATION_PHASE_COLOURS[SimPhase.CRUISE],
+                        width: 3
+                    })
+                }));
+                return feature;
             });
-            feature.setStyle(new Style({
-                stroke: new Stroke({
-                    color: phase === SimPhase.TURN ? SIMULATION_TURN_COLOUR : SIMULATION_CRUISE_COLOUR,
-                    width: 3
-                })
-            }));
-            features.push(feature);
-        };
-
-        for (let index = 1; index < samples.length; index++) {
-            run.push(samples[index]);
-            if (samples[index].phase !== samples[index - 1].phase) {
-                flush(samples[index - 1].phase);
-                run = [samples[index]];
-            }
-        }
-        flush(samples.at(-1).phase);
-
-        return features;
     }
 
     // Everything the run needs, gathered in one place: the route with its landing

@@ -17,6 +17,7 @@ import {
     distanceBetween,
     getSimulationRoute,
     headingDifference,
+    phaseRuns,
     simulateGroundTrack,
     turnRadius,
     turnRateDegPerSecond
@@ -391,6 +392,47 @@ describe('turn geometry', () => {
             assert.equal(track.samples.length, tracks[0].samples.length);
             assert.ok(Math.abs(track.summary.turnRadiusM - turnRadius(FC.speedMs, FC.bankAngleDeg)) < 1e-9);
         }
+    });
+});
+
+describe('phase runs', () => {
+    const sample = (phase) => ({phase});
+
+    test('splits by phase and shares the boundary sample', () => {
+        const runs = phaseRuns([
+            sample('cruise'), sample('cruise'), sample('turn'), sample('turn'), sample('cruise')
+        ]);
+
+        assert.deepEqual(runs, [
+            {phase: 'cruise', from: 0, to: 2},
+            {phase: 'turn', from: 2, to: 4},
+            {phase: 'cruise', from: 4, to: 4}
+        ]);
+        // Shared boundaries are what keep the drawn stretches joined up.
+        for (let index = 1; index < runs.length; index++) {
+            assert.equal(runs[index].from, runs[index - 1].to);
+        }
+    });
+
+    test('a single-phase track is one run covering everything', () => {
+        const runs = phaseRuns([sample('cruise'), sample('cruise'), sample('cruise')]);
+        assert.deepEqual(runs, [{phase: 'cruise', from: 0, to: 2}]);
+    });
+
+    test('no samples means no runs', () => {
+        assert.deepEqual(phaseRuns([]), []);
+        assert.deepEqual(phaseRuns(undefined), []);
+    });
+
+    test('the flown track yields runs that cover every sample', () => {
+        const corner = destination(HOME, 0, 900);
+        const exit = destination(corner, 90, 900);
+        const result = simulateGroundTrack([HOME, corner, exit], FC);
+        const runs = phaseRuns(result.samples);
+
+        assert.equal(runs[0].from, 0);
+        assert.equal(runs.at(-1).to, result.samples.length - 1);
+        assert.ok(runs.some((run) => run.phase === 'turn'), 'a cornered track must contain a turn run');
     });
 });
 

@@ -5050,6 +5050,15 @@
     "missionSimulationSpeedHelp": {
         "message": "Read from fw_reference_airspeed when a flight controller is connected - the same speed the firmware uses for its own coordinated turn calculation when no airspeed sensor is fitted. Override it to see how the mission looks at another speed; the turn radius grows with the square of this figure. Note that nav_auto_speed and the per-waypoint speed do not apply to a fixed wing, which flies a throttle setting."
     },
+    "missionSimulationLegendCruise": {
+        "message": "cruise"
+    },
+    "missionSimulationLegendTurn": {
+        "message": "turning"
+    },
+    "missionSimulationLegendApproach": {
+        "message": "landing approach"
+    },
     "missionSimulationTurnRadius": {
         "message": "Turn radius:"
     },
