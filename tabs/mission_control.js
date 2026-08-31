@@ -3025,7 +3025,17 @@ function iconKey(filename) {
     const LANDING_PROBLEM_MESSAGE = {
         [LandingApproachProblem.NO_HEADING]: 'missionSimulationNoLandingHeading',
         [LandingApproachProblem.NO_APPROACH_LENGTH]: 'missionSimulationNoApproachLength',
+        [LandingApproachProblem.NO_HOME_ELEVATION]: 'missionSimulationApproachNoHome',
         [LandingApproachProblem.ALTITUDES_IMPLAUSIBLE]: 'missionSimulationApproachAltitudes'
+    };
+
+    // The model reports track warnings as code plus figures; the words belong to
+    // the app, where they go through i18n like every other user-facing string.
+    const TRACK_WARNING_MESSAGE = {
+        'waypoint-missed': (warning) => i18n.getMessage('missionSimulationWaypointMissed',
+            [String(warning.waypointNumber), String(Math.round(warning.distanceM))]),
+        'leg-not-flyable': (warning) => i18n.getMessage('missionSimulationLegNotFlyable',
+            [String(warning.waypointNumber), String(warning.radiusM)])
     };
 
     // Everything the reader has to know to judge what they are looking at.
@@ -3050,7 +3060,7 @@ function iconKey(filename) {
         return notices.concat(
             result.warnings
                 .filter((warning) => warning.code !== 'simulation-truncated')
-                .map((warning) => warning.text)
+                .map((warning) => TRACK_WARNING_MESSAGE[warning.code]?.(warning) ?? warning.text)
         );
     }
 
@@ -3124,6 +3134,10 @@ function iconKey(filename) {
                 }
             });
 
+        } else {
+            // An emptied mission must empty the panel too, or its figures keep
+            // describing a track that is no longer there.
+            repaintSimulation();
         }
 
         if (!isOffline) geozoneWarning();

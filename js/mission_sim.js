@@ -236,6 +236,7 @@ export const FirmwareDefaults = Object.freeze({
 export const LandingApproachProblem = Object.freeze({
     NO_HEADING: 'no-heading',
     NO_APPROACH_LENGTH: 'no-approach-length',
+    NO_HOME_ELEVATION: 'no-home-elevation',
     ALTITUDES_IMPLAUSIBLE: 'altitudes-implausible'
 });
 
@@ -261,8 +262,18 @@ export function buildLandingApproach(landPoint, approach, params) {
     if (heading === null) return null;
 
     const approachLengthM = (params.approachLengthCm ?? 0) / 100;
-    const loiterRadiusM = (params.loiterRadiusCm ?? 0) / 100;
+    // The loiter radius only widens the turn point's offset; an unusable value
+    // must not poison the geometry with NaN coordinates.
+    const loiterRadiusM = isPositive((params.loiterRadiusCm ?? 0) / 100)
+        ? (params.loiterRadiusCm ?? 0) / 100
+        : 0;
     if (!isPositive(approachLengthM)) return null;
+    // A sea-level-referenced approach carries AMSL figures. Without the home
+    // elevation they cannot be brought into the frame the track flies in, and
+    // running the one-third rule on the raw AMSL number produces altitudes that
+    // are wrong in EVERY frame — a final below the ground, a glide handover
+    // hundreds of metres early. Refusing is honest; drawing that is not.
+    if (Boolean(approach.isSeaLevelRef) && !Number.isFinite(params.homeAltM)) return null;
     if (!exceeds(approach.approachAltCm, approach.landAltCm)) return null;
 
     // Convert to centimetres above home FIRST — that is the frame the firmware
@@ -369,6 +380,9 @@ export function withLandingApproaches(route, approachFor, params) {
 export function landingApproachProblem(approach, params) {
     if (landingHeading(approach) === null) return LandingApproachProblem.NO_HEADING;
     if (!isPositive(params.approachLengthCm ?? 0)) return LandingApproachProblem.NO_APPROACH_LENGTH;
+    if (Boolean(approach.isSeaLevelRef) && !Number.isFinite(params.homeAltM)) {
+        return LandingApproachProblem.NO_HOME_ELEVATION;
+    }
     return LandingApproachProblem.ALTITUDES_IMPLAUSIBLE;
 }
 
@@ -519,7 +533,7 @@ export function simulateGroundTrack(points, params = {}) {
 
         if (done) {
             events.push({t: elapsedS, type: done, waypointIndex: targetIndex, distanceM});
-            const warning = waypointWarning(done, targetIndex, distanceM, radiusM, elapsedS);
+            const warning = waypointWarning(done, target, targetIndex, distanceM, radiusM, elapsedS);
             if (warning) warnings.push(warning);
 
             targetIndex += 1;
@@ -608,14 +622,20 @@ function waypointOutcome({distanceM, relativeBearing, legTravelledM, waypointRad
 }
 
 // Only the outcomes the pilot needs to act on produce a warning.
-function waypointWarning(outcome, waypointIndex, distanceM, radiusM, t) {
+function waypointWarning(outcome, target, waypointIndex, distanceM, radiusM, t) {
+    // The number shown is the one on the map marker — the route point's own
+    // waypoint number, not its position in the filtered route, which drifts as
+    // soon as non-geographic actions or injected approach points sit in between.
+    const waypointNumber = Number.isFinite(target?.number) ? target.number + 1 : waypointIndex + 1;
+
     if (outcome === SimEvent.OVERSHOT) {
         return {
             t,
             waypointIndex,
+            waypointNumber,
             code: 'waypoint-missed',
             distanceM,
-            text: `Waypoint ${waypointIndex + 1} is passed at ${Math.round(distanceM)} m `
+            text: `Waypoint ${waypointNumber} is passed at ${Math.round(distanceM)} m `
                 + 'instead of being reached — the turn onto it is tighter than the aircraft flies.'
         };
     }
@@ -624,8 +644,10 @@ function waypointWarning(outcome, waypointIndex, distanceM, radiusM, t) {
         return {
             t,
             waypointIndex,
+            waypointNumber,
             code: 'leg-not-flyable',
-            text: `Waypoint ${waypointIndex} was never reached: at ${Math.round(radiusM)} m turn radius `
+            radiusM: Math.round(radiusM),
+            text: `Waypoint ${waypointNumber} was never reached: at ${Math.round(radiusM)} m turn radius `
                 + 'the aircraft circles it instead of closing in.'
         };
     }
@@ -658,8 +680,9 @@ function sample(t, position, heading, bankDeg, altM, phase, waypointIndex) {
     };
 }
 
-// A route point may carry no altitude at all (a plain lat/lon list); fall back to
-// the neighbour so the ramp stays flat rather than diving to zero.
+// A route point may carry no altitude at all (a plain lat/lon list). The caller
+// supplies what to fall back to; when both are missing the ramp targets zero,
+// which only bare direct calls without resolveRouteAltitudes can reach.
 function altitudeOf(point, fallback) {
     if (Number.isFinite(point?.altM)) return point.altM;
     if (Number.isFinite(fallback?.altM)) return fallback.altM;

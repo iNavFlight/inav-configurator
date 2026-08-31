@@ -159,6 +159,15 @@ describe('route extraction', () => {
         assert.deepEqual(route.map((p) => p.number), [0, 1]);
     });
 
+    test('the altitude-reference bit of P3 is decoded, not ignored', () => {
+        const route = getSimulationRoute([
+            waypoint({number: 0, p3: 1 << MWNP.P3.ALT_TYPE}),
+            waypoint({number: 1})
+        ]);
+        assert.equal(route[0].absoluteAltitude, true);
+        assert.equal(route[1].absoluteAltitude, false);
+    });
+
     test('drops waypoints without usable coordinates', () => {
         const route = getSimulationRoute([
             waypoint({number: 0}),
@@ -272,6 +281,29 @@ describe('landing approach', () => {
 
     test('the second heading is used when only it is set', () => {
         assert.equal(landingHeading({landHeading1: 0, landHeading2: 180}), 180);
+    });
+
+    test('a sea-level approach without home elevation is refused, not misplaced', () => {
+        // Running the one-third rule on a raw AMSL figure puts the final below the
+        // ground and hands over to the glide hundreds of metres early — altitudes
+        // wrong in every frame. Refusing is the only honest answer.
+        const seaLevel = {...APPROACH, isSeaLevelRef: 1, approachAltCm: 55000, landAltCm: 50000};
+        assert.equal(buildLandingApproach(LAND, seaLevel, {...PARAMS, homeAltM: undefined}), null);
+
+        // With the home elevation known it converts into the above-home frame.
+        const built = buildLandingApproach(LAND, seaLevel, {...PARAMS, homeAltM: 500});
+        assert.ok(built);
+        assert.ok(Math.abs(built.points[0].altM - 50) < 0.01);
+
+        // And the refusal names the actual problem, not a missing heading.
+        const route = [
+            {lat: 47.57, lon: 9.33, number: 0, action: MWNP.WPTYPE.WAYPOINT, altM: 50},
+            {...LAND, number: 1, action: MWNP.WPTYPE.LAND, altM: 50}
+        ];
+        const {landingsWithoutApproach} = withLandingApproaches(
+            route, () => seaLevel, {...PARAMS, homeAltM: undefined}
+        );
+        assert.deepEqual(landingsWithoutApproach, [{number: 1, reason: 'no-home-elevation'}]);
     });
 
     test('landings are expanded into the route, and bare ones are reported', () => {
@@ -585,6 +617,20 @@ describe('ground track', () => {
             result.warnings.some((w) => w.code === 'waypoint-missed'),
             'a waypoint the aircraft cannot reach must produce a warning'
         );
+    });
+
+    test('warnings carry the map waypoint number, not the route index', () => {
+        // The displayed number must match the marker on the map even when the
+        // route index has drifted past filtered actions or injected points.
+        const corner = destination(HOME, 0, 900);
+        const exit = destination(corner, 170, 40);
+        const result = simulateGroundTrack(
+            [{...HOME, number: 4}, {...corner, number: 5}, {...exit, number: 6}], FC
+        );
+
+        const missed = result.warnings.find((warning) => warning.code === 'waypoint-missed');
+        assert.ok(missed, 'expected the unreachable waypoint to be reported');
+        assert.equal(missed.waypointNumber, 7);
     });
 
     test('a mission with fewer than two points produces nothing', () => {
