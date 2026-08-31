@@ -2388,18 +2388,22 @@ var mspHelper = (function () {
                 // Fixed 12 byte payload matching MSP2_MZTC_CONFIG. The firmware
                 // validates the whole request before applying any of it, so an
                 // out of range value is rejected in full.
-                buffer.push(FC.MZTC_CONFIG.mode);
-                buffer.push(FC.MZTC_CONFIG.update_rate);
-                buffer.push(FC.MZTC_CONFIG.palette_mode);
-                buffer.push(FC.MZTC_CONFIG.auto_shutter);
-                buffer.push(FC.MZTC_CONFIG.digital_enhancement);
-                buffer.push(FC.MZTC_CONFIG.spatial_denoise);
-                buffer.push(FC.MZTC_CONFIG.temporal_denoise);
-                buffer.push(FC.MZTC_CONFIG.brightness);
-                buffer.push(FC.MZTC_CONFIG.contrast);
-                buffer.push(FC.MZTC_CONFIG.zoom_level);
-                buffer.push(FC.MZTC_CONFIG.mirror_mode);
-                buffer.push(FC.MZTC_CONFIG.ffc_interval);
+                // One push in field order. The field order is the wire order,
+                // and it has to match MSP2_MZTC_CONFIG in the firmware.
+                buffer.push(
+                    FC.MZTC_CONFIG.mode,
+                    FC.MZTC_CONFIG.update_rate,
+                    FC.MZTC_CONFIG.palette_mode,
+                    FC.MZTC_CONFIG.auto_shutter,
+                    FC.MZTC_CONFIG.digital_enhancement,
+                    FC.MZTC_CONFIG.spatial_denoise,
+                    FC.MZTC_CONFIG.temporal_denoise,
+                    FC.MZTC_CONFIG.brightness,
+                    FC.MZTC_CONFIG.contrast,
+                    FC.MZTC_CONFIG.zoom_level,
+                    FC.MZTC_CONFIG.mirror_mode,
+                    FC.MZTC_CONFIG.ffc_interval
+                );
                 break;
 
             default:

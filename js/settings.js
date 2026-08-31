@@ -661,19 +661,19 @@ var Settings = (function () {
                 // friends, which mask rather than reject. An out-of-range
                 // entry would otherwise wrap into a different in-range value
                 // that the flight controller then accepts as valid.
-                let clampMax = parseInt(input.data('default-max'));
-                if (isNaN(clampMax)) {
-                    clampMax = parseInt(input.attr('max'));
+                let clampMax = Number.parseInt(input.data('default-max'));
+                if (Number.isNaN(clampMax)) {
+                    clampMax = Number.parseInt(input.attr('max'));
                 }
-                if (!isNaN(clampMax) && value > clampMax) {
+                if (!Number.isNaN(clampMax) && value > clampMax) {
                     value = clampMax;
                 }
 
-                let clampMin = parseInt(input.data('default-min'));
-                if (isNaN(clampMin)) {
-                    clampMin = parseInt(input.attr('min'));
+                let clampMin = Number.parseInt(input.data('default-min'));
+                if (Number.isNaN(clampMin)) {
+                    clampMin = Number.parseInt(input.attr('min'));
                 }
-                if (!isNaN(clampMin) && value < clampMin) {
+                if (!Number.isNaN(clampMin) && value < clampMin) {
                     value = clampMin;
                 }
             }
