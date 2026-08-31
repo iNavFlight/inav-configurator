@@ -331,6 +331,24 @@ const SIMULATION_PHASE_COLOURS = Object.freeze({
     [SimPhase.APPROACH]: '#ff5fd2'
 });
 
+function simulationTrackFeatures(samples) {
+    return phaseRuns(samples)
+        .filter((run) => run.to > run.from)
+        .map((run) => {
+            const feature = new Feature({
+                geometry: new LineString(samples.slice(run.from, run.to + 1)
+                    .map((point) => fromLonLat([point.lon, point.lat])))
+            });
+            feature.setStyle(new Style({
+                stroke: new Stroke({
+                    color: SIMULATION_PHASE_COLOURS[run.phase] ?? SIMULATION_PHASE_COLOURS[SimPhase.CRUISE],
+                    width: 3
+                })
+            }));
+            return feature;
+        });
+}
+
 function formatSimulationTime(seconds) {
     const whole = Math.round(seconds);
     return `${Math.floor(whole / 60)}:${String(whole % 60).padStart(2, '0')} min`;
@@ -1290,11 +1308,12 @@ function iconKey(filename) {
             // Cesium places everything by absolute height. Track altitudes that are
             // already AMSL need no reference at all — adding the ground to them puts
             // the aircraft a site's elevation above where it flies.
-            const trackDatum = simulationAltitudesAbsolute
-                ? 0
-                : (Number.isFinite(homeGroundHeight)
+            let trackDatum = 0;
+            if (!simulationAltitudesAbsolute) {
+                trackDatum = Number.isFinite(homeGroundHeight)
                     ? homeGroundHeight
-                    : (groundHeights[points.findIndex((point) => !point.isHome)] ?? 0));
+                    : (groundHeights[points.findIndex((point) => !point.isHome)] ?? 0);
+            }
             const trackPositions = renderSimulatedTrack(simulationSamples, trackDatum);
 
             // The simulated track has to be framed too. A landing approach runs an
@@ -2954,24 +2973,6 @@ function iconKey(filename) {
             simulation.layer = null;
         }
         simulation.samples = [];
-    }
-
-    function simulationTrackFeatures(samples) {
-        return phaseRuns(samples)
-            .filter((run) => run.to > run.from)
-            .map((run) => {
-                const feature = new Feature({
-                    geometry: new LineString(samples.slice(run.from, run.to + 1)
-                        .map((point) => fromLonLat([point.lon, point.lat])))
-                });
-                feature.setStyle(new Style({
-                    stroke: new Stroke({
-                        color: SIMULATION_PHASE_COLOURS[run.phase] ?? SIMULATION_PHASE_COLOURS[SimPhase.CRUISE],
-                        width: 3
-                    })
-                }));
-                return feature;
-            });
     }
 
     // Everything the run needs, gathered in one place: the route with its landing
