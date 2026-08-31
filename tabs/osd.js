@@ -1386,7 +1386,7 @@ OSD.constants = {
                 },
                 {
                     name: 'OSD_TERRAIN_AGL',
-                    id: 170,
+                    id: 171,
                     enabled: function() {
                         return HARDWARE.capabilities.useTerrain;
                     },
