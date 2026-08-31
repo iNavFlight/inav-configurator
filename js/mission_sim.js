@@ -110,6 +110,7 @@ const toDegrees = (radians) => radians * 180 / Math.PI;
  * come back out as a mission of unusable samples.
  */
 const isPositive = (value) => Number.isFinite(value) && value > 0;
+const positiveOrZero = (value) => (isPositive(value) ? value : 0);
 const exceeds = (value, floor) => Number.isFinite(value) && Number.isFinite(floor) && value > floor;
 
 // Signed difference between two headings, in [-180, 180). An exact course
@@ -257,6 +258,23 @@ export const LandingApproachProblem = Object.freeze({
  * configured: the firmware then sets up no approach at all (navigation.c:1848)
  * and simply circles down onto the point.
  */
+/*
+ * How the approach's figures convert. aglCm feeds the firmware's one-third rule
+ * — height above home when home is known, above the landing altitude otherwise;
+ * frameCm places a value in the frame the track is drawn in.
+ */
+function approachFrames(approach, params) {
+    const identity = (centimetres) => centimetres;
+    if (!approach.isSeaLevelRef) return {aglCm: identity, frameCm: identity};
+
+    if (Number.isFinite(params.homeAltM)) {
+        const aboveHome = (centimetres) => centimetres - params.homeAltM * 100;
+        return {aglCm: aboveHome, frameCm: aboveHome};
+    }
+
+    return {aglCm: (centimetres) => centimetres - approach.landAltCm, frameCm: identity};
+}
+
 export function buildLandingApproach(landPoint, approach, params) {
     const heading = landingHeading(approach);
     if (heading === null) return null;
@@ -264,9 +282,7 @@ export function buildLandingApproach(landPoint, approach, params) {
     const approachLengthM = (params.approachLengthCm ?? 0) / 100;
     // The loiter radius only widens the turn point's offset; an unusable value
     // must not poison the geometry with NaN coordinates.
-    const loiterRadiusM = isPositive((params.loiterRadiusCm ?? 0) / 100)
-        ? (params.loiterRadiusCm ?? 0) / 100
-        : 0;
+    const loiterRadiusM = positiveOrZero((params.loiterRadiusCm ?? 0) / 100);
     if (!isPositive(approachLengthM)) return null;
 
     /*
@@ -285,22 +301,13 @@ export function buildLandingApproach(landPoint, approach, params) {
      * figure yields a final below the ground and a glide handover hundreds of
      * metres early. That case is refused.
      */
-    const homeKnown = Number.isFinite(params.homeAltM);
-    const approachIsAmsl = Boolean(approach.isSeaLevelRef);
-    if (!homeKnown && approachIsAmsl !== Boolean(params.routeFrameAbsolute)) return null;
+    if (!Number.isFinite(params.homeAltM)
+        && Boolean(approach.isSeaLevelRef) !== Boolean(params.routeFrameAbsolute)) {
+        return null;
+    }
     if (!exceeds(approach.approachAltCm, approach.landAltCm)) return null;
 
-    // aglCm: height used by the firmware's one-third rule. frameCm: value in the
-    // frame the track is drawn in. baseCm re-anchors AGL heights into that frame.
-    const aglCm = approachIsAmsl
-        ? (homeKnown
-            ? (centimetres) => centimetres - params.homeAltM * 100
-            : (centimetres) => centimetres - approach.landAltCm)
-        : (centimetres) => centimetres;
-    const frameCm = approachIsAmsl && homeKnown
-        ? (centimetres) => centimetres - params.homeAltM * 100
-        : (centimetres) => centimetres;
-
+    const {aglCm, frameCm} = approachFrames(approach, params);
     const approachAglCm = aglCm(approach.approachAltCm);
     const landAglCm = aglCm(approach.landAltCm);
     // Whole-centimetre integer division, as in the firmware.
