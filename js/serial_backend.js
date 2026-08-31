@@ -12,6 +12,7 @@ import connectionFactory from './connection/connectionFactory';
 import CONFIGURATOR from './data_storage';
 import  { PortHandler } from './port_handler';
 import { requestDfuPermission } from './web/dfu';
+import ConnectionWebSerial from './connection/connectionWebSerial';
 import i18n from './../js/localization';
 import interval from './intervals';
 import periodicStatusUpdater from './periodicStatusUpdater';
@@ -164,6 +165,18 @@ var SerialBackend = (function () {
             var selected_port = privateScope.$port.find('option:selected');
             if (selected_port.data().isDfuPermission) {
                 requestDfuPermission().then(() => PortHandler.check_usb_devices());
+            }
+            if (privateScope.$port.val() === ConnectionWebSerial.CHOOSE_PORT_ID) {
+                // Deferred one tick so the select's own native dropdown has
+                // fully closed before requestPort() tries to open a new native
+                // popup - opening it synchronously here can be silently
+                // dropped by the OS while the previous popup is still
+                // tearing down. User activation survives this; its window is
+                // several seconds, not one task.
+                setTimeout(() => {
+                    privateScope.reopenTab = null;
+                    privateScope.reConnect();
+                }, 0);
             }
             GUI.updateManualPortVisibility();
         });
