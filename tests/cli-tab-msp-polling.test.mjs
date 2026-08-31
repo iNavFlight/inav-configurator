@@ -228,6 +228,19 @@ const mockDialogUrl = dataModule(`
     export default dialog;
 `);
 
+const mockIntervalUrl = dataModule(`
+    const interval = { killAll() {}, add() {}, remove() {} };
+    export default interval;
+`);
+
+const mockBridgeUrl = dataModule(`
+    export const Platform = { Electron: 'Electron', Web: 'Web' };
+    export const bridge = {
+        writeFile() { return Promise.resolve(false); },
+        readFile() { return Promise.resolve({ error: false, data: '' }); },
+    };
+`);
+
 /**
  * Replace the first line matching `regex` with `replacement`. Throws if no
  * line matches, so a future edit to the import lines we depend on fails the
@@ -268,6 +281,8 @@ function buildExecutableCliTabModule(tmpDir) {
         [/^import FC from '\.\/\.\.\/js\/fc';$/m, `import FC from '${mockFcUrl}';`, "import FC"],
         [/^import \{ generateFilename \} from '\.\/\.\.\/js\/helpers';$/m, `import { generateFilename } from '${mockHelpersUrl}';`, "import generateFilename"],
         [/^import dialog from '\.\.\/js\/dialog';$/m, `import dialog from '${mockDialogUrl}';`, "import dialog"],
+        [/^import \{bridge, Platform\} from '\.\.\/js\/bridge';$/m, `import {bridge, Platform} from '${mockBridgeUrl}';`, "import bridge"],
+        [/^import interval from '\.\.\/js\/intervals';$/m, `import interval from '${mockIntervalUrl}';`, "import interval"],
         // The one Vite-only asset import: Node cannot resolve `.html` specifiers
         // (verified: even node:test's experimental module mocking cannot
         // intercept this, since format detection on the real .html extension
