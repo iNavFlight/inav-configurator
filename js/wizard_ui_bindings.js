@@ -2,7 +2,6 @@
 
 import mspHelper from './msp/MSPHelper';
 import serialPortHelper from './serialPortHelper';
-import FC from './fc';
 
 const wizardUiBindings = (function () {
 
@@ -34,10 +33,18 @@ const wizardUiBindings = (function () {
                 $baud.append('<option value="' + baud + '">' + baud + '</option>');
             });
 
-            let gpsProtocols = FC.getGpsProtocols();
-            for (let i = 0; i < gpsProtocols.length; i++) {
-                $protocol.append('<option value="' + i + '">' + gpsProtocols[i] + '</option>');
-            }
+            // GPS protocol options come from the FC's live gps_provider setting
+            // table rather than a hardcoded array, so this never drifts from
+            // whatever enum ordering the connected firmware actually uses.
+            mspHelper.getSetting('gps_provider').then(function (data) {
+                if (!data?.setting?.table) {
+                    return;
+                }
+                const gpsProtocols = data.setting.table.values;
+                for (let i = 0; i < gpsProtocols.length; i++) {
+                    $protocol.append('<option value="' + i + '">' + gpsProtocols[i] + '</option>');
+                }
+            });
 
             if (currentPort !== null) {
                 $port.val(currentPort);

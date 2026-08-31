@@ -49,6 +49,8 @@ var FC = {
     SERVO_DATA: null,
     GPS_DATA: null,
     ADSB_VEHICLES: null,
+    ADSB_LIMITS: null,
+    ADSB_WARNING_ICAO: null,
     MISSION_PLANNER: null,
     ANALOG: null,
     ARMING_CONFIG: null,
@@ -88,6 +90,9 @@ var FC = {
     EZ_TUNE: null,
     FLIGHT_MODES: null,
     GEOZONES: null,
+    DRONECAN_NODES: [],
+    DRONECAN_ASYNC_REQUEST: null,
+    DRONECAN_ASYNC_RESULT: null,
 
     restartRequired: false,
     MAX_SERVO_RATE: 125,
@@ -288,6 +293,17 @@ var FC = {
             vehiclePacketCount: 0,
             heartbeatPacketCount: 0,
             vehicles: []
+        };
+
+        this.ADSB_LIMITS = {
+            adsb_distance_alert: 0,
+            adsb_distance_warning: 0,
+            adsb_ignore_plane_above_me_limit: 0,
+        };
+
+        this.ADSB_WARNING_ICAO = {
+            icao: 0,
+            isAlert: 0,
         };
 
         this.MISSION_PLANNER = new WaypointCollection();
@@ -611,6 +627,10 @@ var FC = {
            items: [],
         };
 
+        this.DRONECAN_NODES = [];
+        this.DRONECAN_ASYNC_REQUEST = null;
+        this.DRONECAN_ASYNC_RESULT = null;
+
     },
     getOutputUsages: function() {
         return {
@@ -661,13 +681,6 @@ var FC = {
     },
     isMotorOutputEnabled: function () {
         return this.isFeatureEnabled('PWM_OUTPUT_ENABLE', this.getFeatures());
-    },
-    getGpsProtocols: function () {
-        return [
-            'UBLOX',
-            'MSP',
-            'FAKE'
-        ];
     },
     getGpsBaudRates: function () {
         return [

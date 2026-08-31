@@ -10,6 +10,10 @@
         "message": "English",
         "_comment": "Don't translate!"
     },
+    "language_it": {
+        "message": "Italiano",
+        "_comment": "Don't translate!"
+    },
 	  "language_bg": {
         "message": "Български",
         "_comment": "Don't translate!"
@@ -188,6 +192,75 @@
     },
     "tabGPS": {
         "message": "GPS"
+    },
+    "tabDroneCAN": {
+        "message": "DroneCAN"
+    },
+    "dronecanColHealth": {
+        "message": "Health"
+    },
+    "dronecanColLastSeen": {
+        "message": "Last Seen"
+    },
+    "dronecanColMode": {
+        "message": "Mode"
+    },
+    "dronecanColName": {
+        "message": "Name"
+    },
+    "dronecanColNodeID": {
+        "message": "Node ID"
+    },
+    "dronecanColUptime": {
+        "message": "Uptime"
+    },
+    "dronecanNodesTitle": {
+        "message": "DroneCAN Nodes"
+    },
+    "dronecanNodeDetail": {
+        "message": "Node Detail"
+    },
+    "dronecanNoNodes": {
+        "message": "No DroneCAN nodes detected."
+    },
+    "dronecanBusConfig": {
+        "message": "Bus Configuration"
+    },
+    "dronecanBitrate": {
+        "message": "CAN Baud Rate"
+    },
+    "dronecanNodeId": {
+        "message": "FC Node ID"
+    },
+    "dronecanSave": {
+        "message": "Save & Reboot"
+    },
+    "dronecanNodeIdReservedWarning": {
+        "message": "Node IDs 126 and 127 are reserved for diagnostic tools. Are you sure?"
+    },
+    "dronecanNodeIdInvalid": {
+        "message": "Node ID must be a whole number between 1 and 127."
+    },
+    "dronecanDetailColProperty": {
+        "message": "Property"
+    },
+    "dronecanDetailColValue": {
+        "message": "Value"
+    },
+    "dronecanParamColIndex": {
+        "message": "#"
+    },
+    "dronecanParamColName": {
+        "message": "Name"
+    },
+    "dronecanParamColType": {
+        "message": "Type"
+    },
+    "dronecanParamColValue": {
+        "message": "Value"
+    },
+    "dronecanParamColRange": {
+        "message": "Range"
     },
     "tabOutputs": {
         "message": "Outputs"
@@ -1179,6 +1252,24 @@
     "configurationCurrentOffset": {
         "message": "Offset in millivolt steps"
     },
+    "configurationIna226I2cBus": {
+        "message": "INA226 I2C Bus"
+    },
+    "configurationIna226I2cBusHelp": {
+        "message": "Hardware I2C bus connected to the INA226."
+    },
+    "configurationIna226I2cAddress": {
+        "message": "INA226 I2C Address"
+    },
+    "configurationIna226I2cAddressHelp": {
+        "message": "7-bit I2C address in decimal. 64 is 0x40 and 79 is 0x4F."
+    },
+    "configurationIna226ShuntResistance": {
+        "message": "INA226 Shunt Resistance (µΩ)"
+    },
+    "configurationIna226ShuntResistanceHelp": {
+        "message": "Shunt resistor value in micro-ohms (µΩ) used to calculate current."
+    },
     "configurationBatteryMultiwiiCurrent": {
         "message": "Enable support for legacy Multiwii MSP current output"
     },
@@ -1385,6 +1476,9 @@
     },
     "configurationGPSProtocol": {
         "message": "Protocol"
+    },
+    "gpsDroneCANInfo": {
+        "message": "GPS is provided via DroneCAN. Configure bus settings on the DroneCAN tab. Serial port and baud rate do not apply."
     },
     "configurationGPSUseGalileo": {
         "message": "Gps use Galileo Satellites (EU)"
@@ -5385,8 +5479,17 @@
     "eeprom_load_ok": {
         "message": "EEPROM <span style=\"color: #37a8db\">loaded</span>"
     },
+    "missionSearchAddressSrOnly": {
+        "message": "Search for address"
+    },
+    "missionCenterMapSrOnly": {
+        "message": "Center map on latest GPS fix"
+    },
     "confirm_delete_all_points": {
         "message": "Do you really want to delete all points?"
+    },
+    "confirm_delete_selected_point": {
+        "message": "Delete this waypoint?"
     },
     "confirm_delete_point_with_options": {
         "message": "Do you really want to delete this Waypoint with non-Geo JUMP/SET_HEAD/RTH options? \nIf yes, Non-Geo options attached will be removed also!"
@@ -6723,6 +6826,42 @@
     "adsbHeartbeatTotalMessages": {
         "message": "Heartbeat msgs"
     },
+    "adsbCallsign": {
+        "message": "Callsign"
+    },
+    "adsbAsl": {
+        "message": "Asl (m)"
+    },
+    "adsbHeading": {
+        "message": "Heading°"
+    },
+    "adsbType": {
+        "message": "Type"
+    },
+    "adsbAlt": {
+        "message": "Alt"
+    },
+    "adsbEmitter": {
+        "message": "Emitter"
+    },
+    "adsbAlert": {
+        "message": "Alert"
+    },
+    "adsbWarning": {
+        "message": "Warning"
+    },
+    "adsbNoWarning": {
+        "message": "None"
+    },
+    "adsbWarningIcao": {
+        "message": "Alert/Warning ICAO"
+    },
+    "adsbWarningType": {
+        "message": "Alert/Warning type"
+    },
+    "noVehicles": {
+        "message": "No vehicles"
+    },
     "currentLanguage": {
         "message": "en"
     },
@@ -6788,6 +6927,45 @@
     },
     "javascriptCompleteExample": {
         "message": "Complete Example"
+    },
+    "missionGridPatternTitle": {
+        "message": "Generate grid survey pattern (Ctrl+G)"
+    },
+    "missionGridDrawPrompt": {
+        "message": "Click on the map to draw a survey area polygon. Double-click to finish. Press Escape to cancel."
+    },
+    "missionGridSettingsTitle": {
+        "message": "Grid Survey Settings"
+    },
+    "missionGridSpacing": {
+        "message": "Line Spacing"
+    },
+    "missionGridAltitude": {
+        "message": "Altitude"
+    },
+    "missionGridSpeed": {
+        "message": "Speed"
+    },
+    "missionGridAngle": {
+        "message": "Sweep Angle"
+    },
+    "missionGridOvershoot": {
+        "message": "Overshoot"
+    },
+    "missionGridEndRTH": {
+        "message": "End with RTH"
+    },
+    "missionGridGenerate": {
+        "message": "Generate"
+    },
+    "missionGridNoWaypoints": {
+        "message": "No waypoints generated. Try adjusting spacing or area."
+    },
+    "missionGridWaypointCount": {
+        "message": "Waypoints: $1 (remaining capacity: $2)"
+    },
+    "missionGridTooManyWaypoints": {
+        "message": "Grid needs $1 waypoints but only $2 slots remaining. Reduce area or increase spacing."
     },
     "sensorProfileTitle": {
         "message": "Control profile — stores PID tuning, rates, and filtering settings"
@@ -6956,5 +7134,44 @@
     },
     "migrationMissingProfileWarning": {
         "message": "No migration profile available for version $1 → $2. Settings will be restored without conversion — some may fail or be ignored by the firmware."
+    },
+    "dronecanParamsLoading": {
+        "message": "Loading parameters..."
+    },
+    "dronecanNoParams": {
+        "message": "No parameters."
+    },
+    "dronecanParamWrite": {
+        "message": "Write"
+    },
+    "dronecanParamError": {
+        "message": "ERR"
+    },
+    "dronecanParamOutOfRange": {
+        "message": "Out of range"
+    },
+    "dronecanParamRangeMustBeBetween": {
+        "message": "Must be between $1 and $2"
+    },
+    "dronecanSaveToEeprom": {
+        "message": "Save to EEPROM"
+    },
+    "dronecanSaved": {
+        "message": "Saved!"
+    },
+    "dronecanFailed": {
+        "message": "Failed"
+    },
+    "dronecanRestartNode": {
+        "message": "Restart Node"
+    },
+    "dronecanRestarting": {
+        "message": "Restarting..."
+    },
+    "dronecanSecondsAgo": {
+        "message": "$1s ago"
+    },
+    "dronecanNameError": {
+        "message": "Error"
     }
 }
