@@ -1639,14 +1639,17 @@
     "configurationThermalCameraNote": {
         "message": "Assign MZTC_CAMERA to a UART in the Ports tab to enable the camera. The port and its baud rate are set there. The camera ships at 115200."
     },
-    "configurationThermalCameraMode": {
-        "message": "Operating mode"
+    "configurationThermalCameraPreset": {
+        "message": "Purpose preset"
     },
     "configurationThermalCameraPalette": {
         "message": "Colour palette"
     },
     "configurationThermalCameraZoom": {
         "message": "Digital zoom"
+    },
+    "configurationThermalCameraAdvanced": {
+        "message": "Advanced image tuning"
     },
     "configurationThermalCameraMirror": {
         "message": "Image mirroring"
@@ -1671,9 +1674,6 @@
     },
     "configurationThermalCameraFFCInterval": {
         "message": "Shutter interval [minutes]"
-    },
-    "configurationThermalCameraUpdateRate": {
-        "message": "Driver poll rate [Hz]"
     },
     "portsFunction_CRSF_SENSOR": {
         "message": "CRSF Sensor"

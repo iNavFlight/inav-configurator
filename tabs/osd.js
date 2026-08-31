@@ -1416,6 +1416,9 @@ OSD.constants = {
         },
         {
             name: 'osdGroupThermalCamera',
+            enabled: function() {
+                return HARDWARE.capabilities.useMztcCamera;
+            },
             items: [
                 {
                     name: 'MZTC_STATUS',
@@ -3591,7 +3594,8 @@ HARDWARE.init = function() {
         useRx: false,
         useCRSF: false,
         useBaro: false,
-        usePitot: false
+        usePitot: false,
+        useMztcCamera: false
     };
 };
 
@@ -3609,6 +3613,9 @@ HARDWARE.update = function(callback) {
             }
             if (port.functions.includes('ESC')) {
                 HARDWARE.capabilities.useESCTelemetry = true;
+            }
+            if (port.functions.includes('MZTC_CAMERA')) {
+                HARDWARE.capabilities.useMztcCamera = true;
             }
         });
 

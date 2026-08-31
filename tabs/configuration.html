@@ -405,9 +405,9 @@
                         </div>
                     </div>
                     <div class="select">
-                        <select id="mztc_mode" data-setting="mztc_mode"></select>
-                        <label for="mztc_mode">
-                            <span data-i18n="configurationThermalCameraMode"></span>
+                        <select id="mztc_preset" data-setting="mztc_preset"></select>
+                        <label for="mztc_preset">
+                            <span data-i18n="configurationThermalCameraPreset"></span>
                         </label>
                     </div>
                     <div class="select">
@@ -422,22 +422,18 @@
                             <span data-i18n="configurationThermalCameraZoom"></span>
                         </label>
                     </div>
+                    <details class="mztc-advanced">
+                        <summary data-i18n="configurationThermalCameraAdvanced"></summary>
                     <div class="select">
-                        <select id="mztc_mirror_mode" data-setting="mztc_mirror_mode"></select>
-                        <label for="mztc_mirror_mode">
-                            <span data-i18n="configurationThermalCameraMirror"></span>
+                        <select id="mztc_auto_shutter" data-setting="mztc_auto_shutter"></select>
+                        <label for="mztc_auto_shutter">
+                            <span data-i18n="configurationThermalCameraAutoShutter"></span>
                         </label>
                     </div>
                     <div class="number">
-                        <input type="number" id="mztc_brightness" data-setting="mztc_brightness" />
-                        <label for="mztc_brightness">
-                            <span data-i18n="configurationThermalCameraBrightness"></span>
-                        </label>
-                    </div>
-                    <div class="number">
-                        <input type="number" id="mztc_contrast" data-setting="mztc_contrast" />
-                        <label for="mztc_contrast">
-                            <span data-i18n="configurationThermalCameraContrast"></span>
+                        <input type="number" id="mztc_ffc_interval" data-setting="mztc_ffc_interval" />
+                        <label for="mztc_ffc_interval">
+                            <span data-i18n="configurationThermalCameraFFCInterval"></span>
                         </label>
                     </div>
                     <div class="number">
@@ -458,24 +454,25 @@
                             <span data-i18n="configurationThermalCameraTemporalDenoise"></span>
                         </label>
                     </div>
+                    <div class="number">
+                        <input type="number" id="mztc_brightness" data-setting="mztc_brightness" />
+                        <label for="mztc_brightness">
+                            <span data-i18n="configurationThermalCameraBrightness"></span>
+                        </label>
+                    </div>
+                    <div class="number">
+                        <input type="number" id="mztc_contrast" data-setting="mztc_contrast" />
+                        <label for="mztc_contrast">
+                            <span data-i18n="configurationThermalCameraContrast"></span>
+                        </label>
+                    </div>
                     <div class="select">
-                        <select id="mztc_auto_shutter" data-setting="mztc_auto_shutter"></select>
-                        <label for="mztc_auto_shutter">
-                            <span data-i18n="configurationThermalCameraAutoShutter"></span>
+                        <select id="mztc_mirror_mode" data-setting="mztc_mirror_mode"></select>
+                        <label for="mztc_mirror_mode">
+                            <span data-i18n="configurationThermalCameraMirror"></span>
                         </label>
                     </div>
-                    <div class="number">
-                        <input type="number" id="mztc_ffc_interval" data-setting="mztc_ffc_interval" />
-                        <label for="mztc_ffc_interval">
-                            <span data-i18n="configurationThermalCameraFFCInterval"></span>
-                        </label>
-                    </div>
-                    <div class="number">
-                        <input type="number" id="mztc_update_rate" data-setting="mztc_update_rate" />
-                        <label for="mztc_update_rate">
-                            <span data-i18n="configurationThermalCameraUpdateRate"></span>
-                        </label>
-                    </div>
+                    </details>
                 </div>
             </div>
         </div>

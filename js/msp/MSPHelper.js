@@ -13,7 +13,7 @@ import mspQueue from './../serial_queue';
 // Fixed MZTC payload sizes, mirroring MSP2_MZTC_CONFIG_PAYLOAD_SIZE and
 // MSP2_MZTC_STATUS_PAYLOAD_SIZE in the firmware's msp_mztc.h. Naming them here
 // keeps the parse and the build path from drifting apart.
-const MZTC_CONFIG_BYTES = 12;
+const MZTC_CONFIG_BYTES = 11;
 const MZTC_STATUS_BYTES = 7;
 import ServoMixRule from './../servoMixRule';
 import MotorMixRule from './../motorMixRule';
@@ -1740,18 +1740,17 @@ var mspHelper = (function () {
                 // Ports tab.
                 if (data.byteLength >= MZTC_CONFIG_BYTES) {
                     FC.MZTC_CONFIG = {
-                        mode: data.getUint8(0),
-                        update_rate: data.getUint8(1),
-                        palette_mode: data.getUint8(2),
-                        auto_shutter: data.getUint8(3),
-                        digital_enhancement: data.getUint8(4),
-                        spatial_denoise: data.getUint8(5),
-                        temporal_denoise: data.getUint8(6),
-                        brightness: data.getUint8(7),
-                        contrast: data.getUint8(8),
-                        zoom_level: data.getUint8(9),
-                        mirror_mode: data.getUint8(10),
-                        ffc_interval: data.getUint8(11)
+                        preset: data.getUint8(0),
+                        palette_mode: data.getUint8(1),
+                        auto_shutter: data.getUint8(2),
+                        digital_enhancement: data.getUint8(3),
+                        spatial_denoise: data.getUint8(4),
+                        temporal_denoise: data.getUint8(5),
+                        brightness: data.getUint8(6),
+                        contrast: data.getUint8(7),
+                        zoom_level: data.getUint8(8),
+                        mirror_mode: data.getUint8(9),
+                        ffc_interval: data.getUint8(10)
                     };
                 } else {
                     console.log('MZTC_CONFIG payload too short: ' + data.byteLength +
@@ -1765,7 +1764,7 @@ var mspHelper = (function () {
                 if (data.byteLength >= MZTC_STATUS_BYTES) {
                     FC.MZTC_STATUS = {
                         status: data.getUint8(0),
-                        mode: data.getUint8(1),
+                        preset: data.getUint8(1),
                         connected: data.getUint8(2),
                         connection_quality: data.getUint8(3),
                         last_calibration: data.getUint16(4, true),
@@ -2391,8 +2390,7 @@ var mspHelper = (function () {
                 // One push in field order. The field order is the wire order,
                 // and it has to match MSP2_MZTC_CONFIG in the firmware.
                 buffer.push(
-                    FC.MZTC_CONFIG.mode,
-                    FC.MZTC_CONFIG.update_rate,
+                    FC.MZTC_CONFIG.preset,
                     FC.MZTC_CONFIG.palette_mode,
                     FC.MZTC_CONFIG.auto_shutter,
                     FC.MZTC_CONFIG.digital_enhancement,

@@ -261,7 +261,7 @@ var MSPCodes = {
     MSP2_MZTC_CONFIG:                   0x2240,
     MSP2_MZTC_STATUS:                   0x2241,
     MSP2_SET_MZTC_CONFIG:               0x2242,
-    MSP2_SET_MZTC_MODE:                 0x2243,
+    MSP2_SET_MZTC_PRESET:               0x2243,
     MSP2_SET_MZTC_PALETTE:              0x2244,
     MSP2_SET_MZTC_ZOOM:                 0x2245,
     MSP2_SET_MZTC_SHUTTER:              0x2246,
