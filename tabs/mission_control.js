@@ -2996,7 +2996,7 @@ function iconKey(filename) {
         const {route, landingsWithoutApproach} = withLandingApproaches(
             withAltitudes,
             (point) => landingApproachFor(point),
-            {approachLengthCm, loiterRadiusCm, homeAltM}
+            {approachLengthCm, loiterRadiusCm, homeAltM, routeFrameAbsolute: absolute}
         );
 
         // nav_fw_bank_angle is what navigation asks for; max_angle_inclination_rll
@@ -3010,6 +3010,11 @@ function iconKey(filename) {
             landingsWithoutApproach,
             homeKnown,
             altitudesAbsolute: absolute,
+            // The AMSL-on-AMSL case is drawn without home, anchored at the landing
+            // altitude — the shape is right, the one-third split may differ from
+            // the home-anchored firmware rule, and that assumption is worth a line.
+            approachAnchoredAtLanding: !homeKnown && absolute
+                && route.some((point) => point.isApproach),
             bankCeilingBinds,
             usingDefaults: !simulation.approachLengthCm || !simulation.loiterRadiusCm,
             parameters: {
@@ -3052,6 +3057,9 @@ function iconKey(filename) {
         // one, and airframe detection is not reliable enough to hide a feature on.
         if (CONFIGURATOR.connectionValid && !FC.isAirplane()) {
             notices.push(i18n.getMessage('missionSimulationFixedWingOnly'));
+        }
+        if (plan.approachAnchoredAtLanding) {
+            notices.push(i18n.getMessage('missionSimulationApproachAnchored'));
         }
         if (!plan.homeKnown && plan.planned.some((point) => point.absoluteAltitude)) {
             notices.push(i18n.getMessage('missionSimulationNoHomeElevation'));

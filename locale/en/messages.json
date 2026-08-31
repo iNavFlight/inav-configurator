@@ -5078,7 +5078,10 @@
         "message": "Waypoint $1 has a landing heading, but the approach length is unknown. Connect the flight controller to read nav_fw_land_approach_length."
     },
     "missionSimulationApproachNoHome": {
-        "message": "Waypoint $1 has a sea-level-referenced approach, but the home elevation is unknown, so its altitudes cannot be placed. Set home to see the approach."
+        "message": "Waypoint $1's approach and the mission use different altitude references, and without the home elevation they cannot be brought together. Set home to see the approach."
+    },
+    "missionSimulationApproachAnchored": {
+        "message": "Home is not set, so the approach profile is anchored at its landing altitude. The shape is right; set home for the firmware-exact altitude split."
     },
     "missionSimulationWaypointMissed": {
         "message": "Waypoint $1 is passed at $2 m instead of being reached - the turn onto it is tighter than the aircraft flies."

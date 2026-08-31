@@ -306,6 +306,23 @@ describe('landing approach', () => {
         assert.deepEqual(landingsWithoutApproach, [{number: 1, reason: 'no-home-elevation'}]);
     });
 
+    test('an AMSL approach on an AMSL route draws without home, anchored at its landing altitude', () => {
+        // Both figures share the AMSL frame, so no home elevation is needed: the
+        // one-third rule anchors at the landing altitude, which sits on the ground
+        // where the aircraft touches down. 550 m over 500 m gives 50 m of height;
+        // the final sits two thirds of that above the landing altitude.
+        const seaLevel = {...APPROACH, isSeaLevelRef: 1, approachAltCm: 55000, landAltCm: 50000};
+        const built = buildLandingApproach(LAND, seaLevel, {...PARAMS, homeAltM: undefined, routeFrameAbsolute: true});
+
+        assert.ok(built, 'matching frames must build');
+        const [turn, final, land] = built.points;
+        assert.ok(Math.abs(turn.altM - 550) < 0.01);
+        assert.ok(Math.abs(final.altM - 533.32) < 0.01);
+        assert.ok(Math.abs(land.stopAtAltM - 500) < 0.01);
+        // The glide slope still aims through the touchdown point, below it.
+        assert.ok(land.altM < 500);
+    });
+
     test('landings are expanded into the route, and bare ones are reported', () => {
         const route = [
             {lat: 47.57, lon: 9.33, number: 0, action: MWNP.WPTYPE.WAYPOINT, altM: 50},

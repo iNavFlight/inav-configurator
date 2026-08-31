@@ -268,28 +268,48 @@ export function buildLandingApproach(landPoint, approach, params) {
         ? (params.loiterRadiusCm ?? 0) / 100
         : 0;
     if (!isPositive(approachLengthM)) return null;
-    // A sea-level-referenced approach carries AMSL figures. Without the home
-    // elevation they cannot be brought into the frame the track flies in, and
-    // running the one-third rule on the raw AMSL number produces altitudes that
-    // are wrong in EVERY frame — a final below the ground, a glide handover
-    // hundreds of metres early. Refusing is honest; drawing that is not.
-    if (Boolean(approach.isSeaLevelRef) && !Number.isFinite(params.homeAltM)) return null;
+
+    /*
+     * Altitude frames. The approach's figures are AMSL when isSeaLevelRef is set,
+     * otherwise above home. The track flies above home when the home elevation is
+     * known, in the route's own frame otherwise (params.routeFrameAbsolute).
+     *
+     * With the home elevation known everything converts exactly, and the firmware's
+     * one-third rule runs on centimetres above home as it does on the aircraft.
+     * Without it, the approach can still be placed when it shares the route's
+     * frame — an AMSL approach on an AMSL route is anchored at its own landing
+     * altitude, which sits on the ground where the aircraft touches down, so the
+     * shape is right and only the one-third split can differ from the
+     * home-anchored firmware rule. What cannot be done honestly is bridging two
+     * DIFFERENT frames with no home elevation: the one-third rule on a raw AMSL
+     * figure yields a final below the ground and a glide handover hundreds of
+     * metres early. That case is refused.
+     */
+    const homeKnown = Number.isFinite(params.homeAltM);
+    const approachIsAmsl = Boolean(approach.isSeaLevelRef);
+    if (!homeKnown && approachIsAmsl !== Boolean(params.routeFrameAbsolute)) return null;
     if (!exceeds(approach.approachAltCm, approach.landAltCm)) return null;
 
-    // Convert to centimetres above home FIRST — that is the frame the firmware
-    // works in, and finalApproachAlt is derived from the converted value.
-    const homeAltM = params.homeAltM;
-    const seaLevelReferenced = Boolean(approach.isSeaLevelRef) && Number.isFinite(homeAltM);
-    const aboveHomeCm = (centimetres) => seaLevelReferenced ? centimetres - homeAltM * 100 : centimetres;
+    // aglCm: height used by the firmware's one-third rule. frameCm: value in the
+    // frame the track is drawn in. baseCm re-anchors AGL heights into that frame.
+    const aglCm = approachIsAmsl
+        ? (homeKnown
+            ? (centimetres) => centimetres - params.homeAltM * 100
+            : (centimetres) => centimetres - approach.landAltCm)
+        : (centimetres) => centimetres;
+    const frameCm = approachIsAmsl && homeKnown
+        ? (centimetres) => centimetres - params.homeAltM * 100
+        : (centimetres) => centimetres;
 
-    const approachAltCm = aboveHomeCm(approach.approachAltCm);
-    const landAltCm = aboveHomeCm(approach.landAltCm);
+    const approachAglCm = aglCm(approach.approachAltCm);
+    const landAglCm = aglCm(approach.landAltCm);
     // Whole-centimetre integer division, as in the firmware.
-    const finalApproachAltCm = Math.trunc(approachAltCm / 3) * 2;
+    const finalAglCm = Math.trunc(approachAglCm / 3) * 2;
+    const baseCm = frameCm(approach.landAltCm) - landAglCm;
 
-    const approachAltM = approachAltCm / 100;
-    const finalApproachAltM = finalApproachAltCm / 100;
-    const landAltM = landAltCm / 100;
+    const approachAltM = (baseCm + approachAglCm) / 100;
+    const finalApproachAltM = (baseCm + finalAglCm) / 100;
+    const landAltM = (baseCm + landAglCm) / 100;
 
     const sideBearing = approach.approachDirection === ApproachDirectionLeft
         ? normalizeHeading(heading - 90)
@@ -306,7 +326,7 @@ export function buildLandingApproach(landPoint, approach, params) {
             {...final, altM: finalApproachAltM, name: 'final', action: MWNP.WPTYPE.LAND, isApproach: true},
             {
                 ...land,
-                altM: landAltM - finalApproachAltM,
+                altM: (baseCm + landAglCm - finalAglCm) / 100,
                 name: 'land',
                 action: MWNP.WPTYPE.LAND,
                 isApproach: true,
@@ -380,7 +400,8 @@ export function withLandingApproaches(route, approachFor, params) {
 export function landingApproachProblem(approach, params) {
     if (landingHeading(approach) === null) return LandingApproachProblem.NO_HEADING;
     if (!isPositive(params.approachLengthCm ?? 0)) return LandingApproachProblem.NO_APPROACH_LENGTH;
-    if (Boolean(approach.isSeaLevelRef) && !Number.isFinite(params.homeAltM)) {
+    if (!Number.isFinite(params.homeAltM)
+        && Boolean(approach.isSeaLevelRef) !== Boolean(params.routeFrameAbsolute)) {
         return LandingApproachProblem.NO_HOME_ELEVATION;
     }
     return LandingApproachProblem.ALTITUDES_IMPLAUSIBLE;
