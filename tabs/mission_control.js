@@ -404,6 +404,7 @@ missionControlTab.initialize = function (callback) {
         enabled: false,
         layer: null,
         samples: [],
+        altitudesAbsolute: false,
         speedMs: 15,
         bankAngleDeg: FirmwareDefaults.bankAngleDeg,
         bankCeilingDeg: 0,
@@ -945,6 +946,7 @@ function iconKey(filename) {
         let lastWaypoints = [];
         let lastHome = null;
         let lastSimulationSamples = [];
+        let lastSimulationAbsolute = false;
         let terrainCacheSignature = null;
         let terrainCache = null;
 
@@ -1201,7 +1203,7 @@ function iconKey(filename) {
             return positions;
         }
 
-        async function renderMission(waypoints, home, simulationSamples = []) {
+        async function renderMission(waypoints, home, simulationSamples = [], simulationAltitudesAbsolute = false) {
             const sequence = ++updateSequence;
             viewer.entities.removeAll();
             hideMission3DTerrainWarning();
@@ -1247,9 +1249,14 @@ function iconKey(filename) {
             // ground the waypoints are measured from. Falling back to sea level
             // instead buries the whole track as far underground as the site is
             // high — which is exactly what it looks like: nothing there at all.
-            const trackDatum = Number.isFinite(homeGroundHeight)
-                ? homeGroundHeight
-                : (groundHeights[points.findIndex((point) => !point.isHome)] ?? 0);
+            // Cesium places everything by absolute height. Track altitudes that are
+            // already AMSL need no reference at all — adding the ground to them puts
+            // the aircraft a site's elevation above where it flies.
+            const trackDatum = simulationAltitudesAbsolute
+                ? 0
+                : (Number.isFinite(homeGroundHeight)
+                    ? homeGroundHeight
+                    : (groundHeights[points.findIndex((point) => !point.isHome)] ?? 0));
             const trackPositions = renderSimulatedTrack(simulationSamples, trackDatum);
 
             // The simulated track has to be framed too. A landing approach runs an
@@ -1293,11 +1300,11 @@ function iconKey(filename) {
             viewer.terrainProvider = provider;
             terrainCacheSignature = null;
             terrainCache = null;
-            if (missionMapViewMode === '3d') renderMission(lastWaypoints, lastHome, lastSimulationSamples);
+            if (missionMapViewMode === '3d') renderMission(lastWaypoints, lastHome, lastSimulationSamples, lastSimulationAbsolute);
         }).catch((error) => {
             terrainLoadFailed = true;
             console.warn('Mission Planner 3D terrain is unavailable, using an ellipsoid:', error);
-            if (!destroyed && missionMapViewMode === '3d') renderMission(lastWaypoints, lastHome, lastSimulationSamples);
+            if (!destroyed && missionMapViewMode === '3d') renderMission(lastWaypoints, lastHome, lastSimulationSamples, lastSimulationAbsolute);
         });
 
         return {
@@ -1314,11 +1321,12 @@ function iconKey(filename) {
                     viewer.scene.requestRender();
                 });
             },
-            update(waypoints, home, simulationSamples = []) {
+            update(waypoints, home, simulationSamples = [], simulationAltitudesAbsolute = false) {
                 lastWaypoints = waypoints;
                 lastHome = home;
                 lastSimulationSamples = simulationSamples;
-                renderMission(waypoints, home, simulationSamples);
+                lastSimulationAbsolute = simulationAltitudesAbsolute;
+                renderMission(waypoints, home, simulationSamples, simulationAltitudesAbsolute);
             },
             resize() {
                 if (!destroyed) viewer.resize();
@@ -1334,7 +1342,11 @@ function iconKey(filename) {
 
     function updateMission3D() {
         if (mission3DViewer && missionMapViewMode === '3d') {
-            mission3DViewer.update(mission.get(), HOME, simulation.enabled ? simulation.samples : []);
+            mission3DViewer.update(
+                mission.get(), HOME,
+                simulation.enabled ? simulation.samples : [],
+                simulation.altitudesAbsolute
+            );
         }
     }
 
@@ -2949,7 +2961,7 @@ function iconKey(filename) {
         // the flight controller navigates in. Without it, absolute altitudes are
         // left alone and the mismatch is reported rather than hidden.
         const homeAltM = homeMarkers.length && HOME.getAlt() !== 'N/A' ? Number(HOME.getAlt()) : undefined;
-        const {route: withAltitudes, homeKnown} = resolveRouteAltitudes(planned, homeAltM);
+        const {route: withAltitudes, homeKnown, absolute} = resolveRouteAltitudes(planned, homeAltM);
 
         // Offline these are still zero — they are only read from a connected flight
         // controller — so the firmware's own defaults stand in rather than letting
@@ -2973,6 +2985,7 @@ function iconKey(filename) {
             route,
             landingsWithoutApproach,
             homeKnown,
+            altitudesAbsolute: absolute,
             bankCeilingBinds,
             usingDefaults: !simulation.approachLengthCm || !simulation.loiterRadiusCm,
             parameters: {
@@ -3060,6 +3073,7 @@ function iconKey(filename) {
 
         const result = simulateGroundTrack(plan.route, plan.parameters);
         simulation.samples = result.samples;
+        simulation.altitudesAbsolute = plan.altitudesAbsolute;
 
         if (result.samples.length > 1) {
             simulation.layer = new VectorLayer({

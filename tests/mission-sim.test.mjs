@@ -201,8 +201,25 @@ describe('altitude reference', () => {
     });
 
     test('without home elevation an absolute altitude is flagged, not guessed', () => {
-        const {homeKnown} = resolveRouteAltitudes([{altCm: 45000, absoluteAltitude: true}], undefined);
+        const {homeKnown, absolute, route} = resolveRouteAltitudes(
+            [{altCm: 45000, absoluteAltitude: true}], undefined
+        );
         assert.equal(homeKnown, false);
+        // The figure stays as it is, and the frame it is in has to be reported:
+        // treating an AMSL height as a height above ground counts the site twice.
+        assert.equal(absolute, true);
+        assert.equal(route[0].altM, 450);
+    });
+
+    test('relative altitudes are never reported as absolute', () => {
+        const {absolute} = resolveRouteAltitudes([{altCm: 5000, absoluteAltitude: false}], undefined);
+        assert.equal(absolute, false);
+    });
+
+    test('a known home elevation resolves absolute altitudes, so the frame is not absolute', () => {
+        const {absolute, route} = resolveRouteAltitudes([{altCm: 49800, absoluteAltitude: true}], 448);
+        assert.equal(absolute, false);
+        assert.ok(Math.abs(route[0].altM - 50) < 1e-9);
     });
 });
 

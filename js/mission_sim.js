@@ -80,9 +80,15 @@ export function getSimulationRoute(waypoints) {
  */
 export function resolveRouteAltitudes(route, homeAltM) {
     const homeKnown = Number.isFinite(homeAltM);
+    // An absolute waypoint carries an AMSL figure. With the home elevation known it
+    // converts to the above-home frame; without it the figure has to stay as it is,
+    // and the caller must be told, because the two frames are hundreds of metres
+    // apart and adding a ground reference to an AMSL height counts it twice.
+    const absolute = !homeKnown && route.some((point) => point.absoluteAltitude);
 
     return {
         homeKnown,
+        absolute,
         route: route.map((point) => ({
             ...point,
             altM: point.absoluteAltitude && homeKnown
