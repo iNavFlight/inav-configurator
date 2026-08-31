@@ -284,6 +284,12 @@ const tileCache = {
     writeCount: 0,
 
     init() {
+        // writeFile is shimmed onto a real download in the browser build,
+        // so a set basePath would trigger one per tile. Leave it unset.
+        if (globalThis.__INAV_BROWSER_BUILD__) {
+            this.basePath = null;
+            return;
+        }
         const userData = globalThis.electronAPI.appGetPath('userData');
         this.basePath = userData + '/map_tiles';
         this.enabled = store.get('mapgen_cache_enabled', true);
