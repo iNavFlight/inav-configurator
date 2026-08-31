@@ -308,8 +308,13 @@ var FLIGHT_MODES = [
     },
     {
         boxId: 61,
-        boxName: "IN FLIGHT MENU",
+        boxName: "TERRAIN AGL HOLD",
         permanentId: 70
+    },
+    {
+        boxId: 62,
+        boxName: "IN FLIGHT MENU",
+        permanentId: 71
     }
 ];
 
