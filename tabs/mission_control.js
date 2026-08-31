@@ -207,6 +207,44 @@ function formatConditionsValue(value, unit = '') {
     return unit ? `${value} ${unit}` : String(value);
 }
 
+function getTemperatureUnit(unit) {
+    const temperatureUnits = {
+        CELSIUS: '°C',
+        FAHRENHEIT: '°F',
+    };
+    return temperatureUnits[unit] || '';
+}
+
+function getVisibilityUnit(unit) {
+    const visibilityUnits = {
+        KILOMETERS: 'km',
+        MILES: 'mi',
+    };
+    return visibilityUnits[unit] || '';
+}
+
+function convertWindSpeedToKmh(speed, unit) {
+    if (!Number.isFinite(speed)) {
+        return Number.NaN;
+    }
+    return unit === 'MILES_PER_HOUR' ? speed * 1.609 : speed;
+}
+
+function showConditionsUnavailable() {
+    showConditionsPanel(true);
+    $('#conditionsLoading').hide();
+    $('#conditionsData').addClass('is-hidden').hide();
+    $('#conditionsError').text(i18n.getMessage('conditionsUnavailable')).removeClass('is-hidden').show();
+}
+
+async function readAddressSearchResponse(response) {
+    const data = await response.json();
+    if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+    }
+    return data;
+}
+
 function renderConditionsInfo(data) {
     if (!data || typeof data !== 'object' || data.error) {
         return false;
@@ -232,18 +270,14 @@ function renderConditionsInfo(data) {
     }
 
     const temperature = data.temperature?.degrees;
-    const temperatureUnit = data.temperature?.unit === 'CELSIUS'
-        ? '°C'
-        : data.temperature?.unit === 'FAHRENHEIT' ? '°F' : '';
+    const temperatureUnit = getTemperatureUnit(data.temperature?.unit);
     const feelsLike = data.feelsLikeTemperature?.degrees;
     const uv = data.uvIndex;
     const precipitation = data.precipitation?.qpf?.quantity;
     const precipitationUnit = data.precipitation?.qpf?.unit === 'INCHES' ? 'in' : 'mm';
     const thunder = data.thunderstormProbability;
     const visibility = data.visibility?.distance;
-    const visibilityUnit = data.visibility?.unit === 'KILOMETERS'
-        ? 'km'
-        : data.visibility?.unit === 'MILES' ? 'mi' : '';
+    const visibilityUnit = getVisibilityUnit(data.visibility?.unit);
     const cloudCover = data.cloudCover;
 
     $('#condWeather').text(data.weatherCondition?.description?.text || '—');
@@ -259,12 +293,8 @@ function renderConditionsInfo(data) {
     $('#condVisibility').text(formatConditionsValue(visibility, visibilityUnit));
     $('#condCloud').text(formatConditionsValue(cloudCover, '%'));
 
-    const windSpeedKmh = Number.isFinite(windSpeed)
-        ? (windUnit === 'MILES_PER_HOUR' ? windSpeed * 1.609 : windSpeed)
-        : Number.NaN;
-    const gustSpeedKmh = Number.isFinite(gustSpeed)
-        ? (windUnit === 'MILES_PER_HOUR' ? gustSpeed * 1.609 : gustSpeed)
-        : Number.NaN;
+    const windSpeedKmh = convertWindSpeedToKmh(windSpeed, windUnit);
+    const gustSpeedKmh = convertWindSpeedToKmh(gustSpeed, windUnit);
     applyUvColor(uv);
     applyThunderColor(thunder);
     applyThresholdColor('#condWind', windSpeedKmh, 20, 35);
@@ -526,13 +556,6 @@ missionControlTab.initialize = function (callback) {
         return fromLonLat([lng, lat]);
     }
 
-    function showConditionsUnavailable() {
-        showConditionsPanel(true);
-        $('#conditionsLoading').hide();
-        $('#conditionsData').addClass('is-hidden').hide();
-        $('#conditionsError').text(i18n.getMessage('conditionsUnavailable')).removeClass('is-hidden').show();
-    }
-
     async function fetchConditionsInfo(lat, lng, source) {
         if (!globalSettings.googleApiKey || conditionsSourcesAttempted.has(source)) {
             return false;
@@ -678,6 +701,22 @@ missionControlTab.initialize = function (callback) {
                 googleLocationAbortController = null;
             }
         }
+    }
+
+    function initializeMapLocation() {
+        const initialDroneLocation = getCurrentDroneLocation();
+        if (getFirstMissionCoordinate()) {
+            centerMapOnPreferredLocation();
+            return;
+        }
+        if (initialDroneLocation) {
+            lastGpsPos = initialDroneLocation.coord;
+            $('#centerOnDrone').css({ opacity: 1, pointerEvents: 'auto' });
+            centerMapOnPreferredLocation();
+            void fetchConditionsInfo(initialDroneLocation.lat, initialDroneLocation.lng, 'gps');
+            return;
+        }
+        void requestGoogleApproximateLocation();
     }
 
     if (GUI.active_tab !== this) {
@@ -3368,17 +3407,7 @@ function iconKey(filename) {
             map.getView().setZoom(missionPlannerLastValues.zoom);
         }
 
-        const initialDroneLocation = getCurrentDroneLocation();
-        if (getFirstMissionCoordinate()) {
-            centerMapOnPreferredLocation();
-        } else if (initialDroneLocation) {
-            lastGpsPos = initialDroneLocation.coord;
-            $('#centerOnDrone').css({ opacity: 1, pointerEvents: 'auto' });
-            centerMapOnPreferredLocation();
-            void fetchConditionsInfo(initialDroneLocation.lat, initialDroneLocation.lng, 'gps');
-        } else {
-            void requestGoogleApproximateLocation();
-        }
+        initializeMapLocation();
 
         //////////////////////////////////////////////////////////////////////////
         // Load previously saved GEO files from electron store
@@ -4587,14 +4616,6 @@ function iconKey(filename) {
 
         function closeAddressSearchDialog() {
             $('#addressSearchDialog, #addressSearchBackdrop').remove();
-        }
-
-        async function readAddressSearchResponse(response) {
-            const data = await response.json();
-            if (!response.ok) {
-                throw new Error(`HTTP ${response.status}`);
-            }
-            return data;
         }
 
         async function searchGoogleAddress(address, signal) {
