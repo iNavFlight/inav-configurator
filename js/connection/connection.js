@@ -3,10 +3,11 @@
 import GUI from './../gui';
 
 const ConnectionType = {
-    Serial: 0,
-    TCP:    1,
-    UDP:    2,
-    BLE:    3
+    Serial:    0,
+    TCP:       1,
+    UDP:       2,
+    BLE:       3,
+    serialEXT: 4
 }
 
 class Connection {

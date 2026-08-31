@@ -15,11 +15,14 @@ export default defineConfig({
       include: ["**/*.js"],
     }),
   ],
-  assetsInclude: ["**/*.gltf", "**/*.glb"],
+  assetsInclude: ["**/*.gltf", "**/*.glb", "**/*.wasm"],
   build: {
     outDir: "dist-web",
     emptyOutDir: true,
-    assetsInlineLimit: Number.MAX_SAFE_INTEGER,
+    // .wasm stays a real emitted file: inlining it as base64 breaks the
+    // point of SITL-Webassembly.js's `?url` import (a real cacheable asset,
+    // not ~2MB of base64 duplicated into every chunk that references it).
+    assetsInlineLimit: (filePath) => !filePath.endsWith(".wasm"),
     chunkSizeWarningLimit: 10240,
   },
 });
