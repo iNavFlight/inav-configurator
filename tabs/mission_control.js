@@ -4466,23 +4466,14 @@ function iconKey(filename) {
                     $('#wpLandAltM').text(selectedFwApproachWp.getLandAltAsl() / 100 + " m");
                     $('#wpApproachAltM').text(selectedFwApproachWp.getApproachAltAsl() / 100 + " m");
 
-                    if (selectedFwApproachWp && selectedFwApproachWp.getIsSeaLevelRef() != $('#pointP3Alt').prop("checked")) {
-                        selectedFwApproachWp.setIsSeaLevelRef($('#pointP3Alt').prop("checked"));
-                        selectedFwApproachWp.setElevation(elevationAtWP * 100);
-                        if ($('#pointP3Alt').prop("checked")) {
-                            selectedFwApproachWp.setApproachAltAsl(selectedFwApproachWp.getApproachAltAsl() + elevationAtWP * 100);
-                            selectedFwApproachWp.setLandAltAsl(selectedFwApproachWp.getLandAltAsl() + elevationAtWP * 100);
-                        } else {
-                            selectedFwApproachWp.setApproachAltAsl(selectedFwApproachWp.getApproachAltAsl() - elevationAtWP * 100);
-                            selectedFwApproachWp.setLandAltAsl(selectedFwApproachWp.getLandAltAsl() - elevationAtWP * 100);
-                        }
-
-                        $('#wpApproachAlt').val(selectedFwApproachWp.getApproachAltAsl());
-                        $('#wpLandAlt').val(selectedFwApproachWp.getLandAltAsl());
-                    }
-
-                    $('#wpLandAltM').text(selectedFwApproachWp.getLandAltAsl() / 100 + " m");
-                    $('#wpApproachAltM').text(selectedFwApproachWp.getApproachAltAsl() / 100 + " m");
+                    // The LAND branch above is the one and only conversion of the
+                    // approach altitudes. A second block here used to convert them
+                    // again WITHOUT checking that the selected waypoint is a landing
+                    // at all — and since one approach object serves the whole
+                    // mission, toggling the altitude reference on any ordinary
+                    // waypoint silently added the site elevation to the approach
+                    // altitudes, once per toggle. That is where the ever-growing
+                    // approach and landing altitudes came from.
 
                     mission.updateWaypoint(selectedMarker);
                     mission.update(singleMissionActive());
