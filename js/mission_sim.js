@@ -362,9 +362,15 @@ export function landingHeading(approach) {
  * point — that is what the firmware does too — and reported so the planner can
  * say why nothing changed rather than leaving the pilot to wonder.
  */
+// An approach whose landing altitude sits this far from the waypoint it lands on
+// is not a plan, it is damaged data — the known editor bug inflates the approach
+// altitudes by one site elevation per touch.
+const APPROACH_WAYPOINT_GAP_M = 100;
+
 export function withLandingApproaches(route, approachFor, params) {
     const expanded = [];
     const landingsWithoutApproach = [];
+    const suspectLandings = [];
 
     for (const point of route) {
         if (point.action !== MWNP.WPTYPE.LAND) {
@@ -383,6 +389,18 @@ export function withLandingApproaches(route, approachFor, params) {
             continue;
         }
 
+        // The approach's landing altitude and the waypoint it lands on describe
+        // the same spot; when they are far apart, the data is corrupt and the
+        // drawing would tower or bury itself without this saying why.
+        const builtLandingAltM = built.points.at(-1).stopAtAltM;
+        if (Number.isFinite(point.altM) && Number.isFinite(builtLandingAltM)
+            && Math.abs(builtLandingAltM - point.altM) > APPROACH_WAYPOINT_GAP_M) {
+            suspectLandings.push({
+                number: point.number,
+                gapM: Math.round(Math.abs(builtLandingAltM - point.altM))
+            });
+        }
+
         expanded.push(...built.points.map((approachPoint) => ({
             ...approachPoint,
             number: point.number,
@@ -390,7 +408,7 @@ export function withLandingApproaches(route, approachFor, params) {
         })));
     }
 
-    return {route: expanded, landingsWithoutApproach};
+    return {route: expanded, landingsWithoutApproach, suspectLandings};
 }
 
 /*

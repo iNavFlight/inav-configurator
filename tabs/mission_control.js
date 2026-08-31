@@ -2993,7 +2993,7 @@ function iconKey(filename) {
         const approachLengthCm = simulation.approachLengthCm || FirmwareDefaults.approachLengthCm;
         const loiterRadiusCm = simulation.loiterRadiusCm || FirmwareDefaults.loiterRadiusCm;
 
-        const {route, landingsWithoutApproach} = withLandingApproaches(
+        const {route, landingsWithoutApproach, suspectLandings} = withLandingApproaches(
             withAltitudes,
             (point) => landingApproachFor(point),
             {approachLengthCm, loiterRadiusCm, homeAltM, routeFrameAbsolute: absolute}
@@ -3008,6 +3008,7 @@ function iconKey(filename) {
             planned,
             route,
             landingsWithoutApproach,
+            suspectLandings,
             homeKnown,
             altitudesAbsolute: absolute,
             // The AMSL-on-AMSL case is drawn without home, anchored at the landing
@@ -3058,6 +3059,10 @@ function iconKey(filename) {
         if (CONFIGURATOR.connectionValid && !FC.isAirplane()) {
             notices.push(i18n.getMessage('missionSimulationFixedWingOnly'));
         }
+        plan.suspectLandings.forEach(({number, gapM}) => {
+            notices.push(i18n.getMessage('missionSimulationApproachSuspect',
+                [String(Number(number) + 1), String(gapM)]));
+        });
         if (plan.approachAnchoredAtLanding) {
             notices.push(i18n.getMessage('missionSimulationApproachAnchored'));
         }
@@ -4553,6 +4558,8 @@ function iconKey(filename) {
                 if (checkApproachAltitude(altitude, $('#pointP3Alt').prop('checked'), Number($('#elevationValueAtWP').text()))) {
                     selectedFwApproachWp.setApproachAltAsl(Number($(event.currentTarget).val()));
                     $('#wpApproachAltM').text(selectedFwApproachWp.getApproachAltAsl() / 100 + " m");
+                    repaintSimulation();
+                    updateMission3D();
                 }
             }
         });
@@ -4563,6 +4570,8 @@ function iconKey(filename) {
                 if (checkLandingAltitude(altitude, $('#pointP3Alt').prop('checked'), Number($('#elevationValueAtWP').text()))) {
                     selectedFwApproachWp.setLandAltAsl(Number($(event.currentTarget).val()));
                     $('#wpLandAltM').text(selectedFwApproachWp.getLandAltAsl() / 100 + " m");
+                    repaintSimulation();
+                    updateMission3D();
                 }
             }
         });
@@ -5154,6 +5163,11 @@ function iconKey(filename) {
         // Flight path simulation
         /////////////////////////////////////////////
         $('#simulationSpeed').val(simulation.speedMs);
+        // The model is parameterised from the flight controller; without one it
+        // could only guess. Offline the feature stays out of the way entirely and
+        // the 3D view shows the plan alone.
+        $('#simulateMission').toggle(CONFIGURATOR.connectionValid);
+        if (!CONFIGURATOR.connectionValid) simulation.enabled = false;
 
 
         // Namespaced and released first: the tab can be entered more than once,

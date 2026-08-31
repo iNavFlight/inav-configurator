@@ -5080,6 +5080,9 @@
     "missionSimulationApproachNoHome": {
         "message": "Waypoint $1's approach and the mission use different altitude references, and without the home elevation they cannot be brought together. Set home to see the approach."
     },
+    "missionSimulationApproachSuspect": {
+        "message": "Waypoint $1's approach lands $2 m away in altitude from the waypoint itself - its landing settings look corrupted. Check Approach Alt and Land Alt."
+    },
     "missionSimulationApproachAnchored": {
         "message": "Home is not set, so the approach profile is anchored at its landing altitude. The shape is right; set home for the firmware-exact altitude split."
     },

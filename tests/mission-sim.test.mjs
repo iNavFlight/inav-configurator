@@ -323,6 +323,31 @@ describe('landing approach', () => {
         assert.ok(land.altM < 500);
     });
 
+    test('an approach landing far from its waypoint is flagged as corrupt data', () => {
+        // The known editor bug inflates approach altitudes by one site elevation
+        // per touch; the drawing then towers a kilometre up. The plan has to say
+        // that the data is broken instead of silently drawing it.
+        const route = [
+            {lat: 47.57, lon: 9.33, number: 0, action: MWNP.WPTYPE.WAYPOINT, altM: 490},
+            {...LAND, number: 2, action: MWNP.WPTYPE.LAND, altM: 490}
+        ];
+        const inflated = {...APPROACH, isSeaLevelRef: 1, approachAltCm: 184300, landAltCm: 178800};
+        const {suspectLandings} = withLandingApproaches(
+            route, () => inflated, {...PARAMS, homeAltM: undefined, routeFrameAbsolute: true}
+        );
+        assert.equal(suspectLandings.length, 1);
+        assert.equal(suspectLandings[0].number, 2);
+        assert.ok(suspectLandings[0].gapM > 1000, `gap was ${suspectLandings[0].gapM} m`);
+
+        // A sane approach near the waypoint raises nothing.
+        const sane = {...APPROACH, isSeaLevelRef: 1, approachAltCm: 55000, landAltCm: 50000};
+        const ok = withLandingApproaches(
+            [{...route[0]}, {...LAND, number: 2, action: MWNP.WPTYPE.LAND, altM: 500}],
+            () => sane, {...PARAMS, homeAltM: undefined, routeFrameAbsolute: true}
+        );
+        assert.deepEqual(ok.suspectLandings, []);
+    });
+
     test('landings are expanded into the route, and bare ones are reported', () => {
         const route = [
             {lat: 47.57, lon: 9.33, number: 0, action: MWNP.WPTYPE.WAYPOINT, altM: 50},
