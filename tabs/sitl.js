@@ -220,7 +220,7 @@ sitlTab.initialize = (callback) => {
 
         wasmProxyPort_e.on('change', () => {
             sitlWasmProxyPort = parseInt(wasmProxyPort_e.val());
-            if (sitlWasmProxyPort != NaN) {
+            if (!isNaN(sitlWasmProxyPort)) {
                 bridge.storeSet('sitlWasmProxyPort', sitlWasmProxyPort);
             }
         });

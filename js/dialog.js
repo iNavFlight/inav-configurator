@@ -24,9 +24,7 @@ const dialog =  {
                     if (Array.isArray(filter.extensions) && filter.extensions.length >= 1) {
                         const type = filter.extensions[0];
                         if (type != '*') {
-                            filter.extensions.forEach(extension => {
-                                accept[`text/${type}`] = [`.${extension}`]
-                            });
+                            accept[`text/${type}`] = filter.extensions.map(extension => `.${extension}`);
                             allOptions = false;
                         }
                     }

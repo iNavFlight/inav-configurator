@@ -77,7 +77,7 @@ $(function() {
         globalSettings.unitType = bridge.storeGet('unit_type', UnitType.none);
         globalSettings.mapProviderType = bridge.storeGet('map_provider_type', 'osm'); 
         globalSettings.assistnowApiKey = bridge.storeGet('assistnow_api_key', '');
-        globalSettings.proxyURL = bridge.storeGet('proxyurl', 'http://192.168.1.222/mapproxy/service?');
+        globalSettings.proxyURL = bridge.storeGet('proxyurl', 'https://192.168.1.222/mapproxy/service?');
         globalSettings.proxyLayer = bridge.storeGet('proxylayer', 'your_proxy_layer_name');
         globalSettings.showProfileParameters = bridge.storeGet('show_profile_parameters', 1);
         globalSettings.assistnowOfflineData = bridge.storeGet('assistnow_offline_data', []);

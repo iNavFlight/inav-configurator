@@ -1287,7 +1287,7 @@ dialog .dialog-alert {
     border-radius: 3px;
     border: 1px solid #3599bc;
     color: #fff;
-    font-family: 'open_sansbold', Arial;
+    font-family: 'open_sansbold', Arial, sans-serif;
     font-size: 12px;
     text-shadow: 0px 1px rgba(0, 0, 0, 0.25);
     display: inline-block;

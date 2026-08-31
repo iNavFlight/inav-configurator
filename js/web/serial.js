@@ -56,112 +56,100 @@ const webSerial = {
     isReading: false,
     id: 1,
 
-    connect: function(path, options) {
-       return new Promise(async resolve => {
-            if (this.isConnected) {
-                resolve({error: true, errorMsg: 'Already connected'});
-                return;
-            }
+    connect: async function(path, options) {
+        if (this.isConnected) {
+            return {error: true, errorMsg: 'Already connected'};
+        }
 
-            const port = this.ports.find(port => port.device.name == path);
+        const port = this.ports.find(port => port.device.name == path);
 
-            if (!port) {
-                resolve({error: true, errorMsg: `Unable to find port ${path}`});
-                return;
-            }
+        if (!port) {
+            return {error: true, errorMsg: `Unable to find port ${path}`};
+        }
 
-            try {
-                this.currentPort = port.port;
-                
-                await this.currentPort.open({baudRate: options.bitrate});
+        try {
+            this.currentPort = port.port;
 
-                this.writer = this.currentPort.writable.getWriter();
-                this.reader = this.currentPort.readable.getReader();
+            await this.currentPort.open({baudRate: options.bitrate});
 
-                this.currentPort.addEventListener('disconnect', this.onDisconnect );
+            this.writer = this.currentPort.writable.getWriter();
+            this.reader = this.currentPort.readable.getReader();
 
-                this.isReading = true;
-                this.isConnected = true;
-                this.readLoop();
-                resolve({error: false, id: this.id++});
-            } catch (err) {
-                resolve ({error: true, errorMsg: err});
-            }
-       })
-        
-    },
+            this.currentPort.addEventListener('disconnect', this.onDisconnect );
 
-    onDisconnect: function() {
-       try { 
-            this.close().then(() => { 
-                if (this.events) {
-                    this.events.dispatchEvent(new CustomEvent('close'));
-                }
-            });
-        } catch (error) {
-            console.log(`Unable to close port: ${error}`)
+            this.isReading = true;
+            this.isConnected = true;
+            this.readLoop();
+            return {error: false, id: this.id++};
+        } catch (err) {
+            return {error: true, errorMsg: err};
         }
     },
 
-    close: function() {
-        return new Promise(async resolve => {
-            if (!this.isConnected) {
-                resolve({error: false})
-                return;
+    onDisconnect: function() {
+        this.close().then(() => {
+            if (this.events) {
+                this.events.dispatchEvent(new CustomEvent('close'));
             }
-
-            this.isReading = false;
-
-            await new Promise((resolve) => setTimeout(resolve, 50));
-
-            if (this.reader) {
-                try {
-                    await this.reader.cancel();
-                } catch (error) {
-                    console.warn(`Reader cancel error (can be ignored): ${error}`);
-                }
-                this.reader = null;
-            }
-
-            if (this.writer) {
-                try {
-                    this.writer.releaseLock();
-                } catch (error) {
-                    console.warn(`Writer release error (can be ignored): ${error}`);
-                }
-                this.writer = null;
-            }
-
-            if (this.currentPort) 
-            {
-                this.currentPort.removeEventListener('disconnect', this.onDisconnect);
-                
-                try {
-                    await this.currentPort.close();
-                } catch (error) {
-                    resolve({error: true, msg: error.message})
-                }
-                this.currentPort = null;
-            }
-            this.isConnected = false;
-            resolve({error: false})
+        }).catch((error) => {
+            console.log(`Unable to close port: ${error}`)
         });
     },
 
-    send: function(data) {
-        return new Promise(async resolve => {
-            if (!this.isConnected || !this.writer) {
-                resolve({error: true, msg: 'Port closed or inavlid state.'})
+    close: async function() {
+        if (!this.isConnected) {
+            return {error: false};
+        }
+
+        this.isReading = false;
+
+        await new Promise((resolve) => setTimeout(resolve, 50));
+
+        if (this.reader) {
+            try {
+                await this.reader.cancel();
+            } catch (error) {
+                console.warn(`Reader cancel error (can be ignored): ${error}`);
             }
+            this.reader = null;
+        }
+
+        if (this.writer) {
+            try {
+                this.writer.releaseLock();
+            } catch (error) {
+                console.warn(`Writer release error (can be ignored): ${error}`);
+            }
+            this.writer = null;
+        }
+
+        let closeError = null;
+        if (this.currentPort)
+        {
+            this.currentPort.removeEventListener('disconnect', this.onDisconnect);
 
             try {
-                await this.writer.write(data);
-                resolve({error: false, bytesWritten: data.byteLength});
+                await this.currentPort.close();
             } catch (error) {
-                resolve({error: true, msg: `Serial write error: ${error}`});
+                closeError = {error: true, msg: error.message};
             }
+            this.currentPort = null;
+        }
+        this.isConnected = false;
+        return closeError || {error: false};
+    },
 
-        });
+    send: async function(data) {
+        if (!this.isConnected || !this.writer) {
+            return {error: true, msg: 'Port closed or inavlid state.'};
+        }
+
+        try {
+            await this.writer.write(data);
+            return {error: false, bytesWritten: data.byteLength};
+        } catch (error) {
+            return {error: true, msg: `Serial write error: ${error}`};
+        }
     },
 
     readLoop: async function() {
@@ -186,17 +174,24 @@ const webSerial = {
         try {
             const savedPorts = await navigator.serial.getPorts();
             this.ports = [];
-            return savedPorts.map((port) => {
+            const names = [];
+            for (const port of savedPorts) {
                 const portInfo = port.getInfo();
                 const device = serialDevices.find(dev => dev.productId == portInfo.usbProductId && dev.vendorId == portInfo.usbVendorId )
-        
+
+                if (!device) {
+                    console.warn(`Unknown serial device (vendorId=${portInfo.usbVendorId}, productId=${portInfo.usbProductId}), skipping`);
+                    continue;
+                }
+
                 this.ports.push({
                     device: device,
                     port: port
                 });
-    
-                return device.name;
-            });
+
+                names.push(device.name);
+            }
+            return names;
         } catch (error) {
             console.log(`Unable to list serial ports: ${error.message}`)
         }
