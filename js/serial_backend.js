@@ -11,6 +11,7 @@ import { ConnectionType, Connection } from './connection/connection';
 import connectionFactory from './connection/connectionFactory';
 import CONFIGURATOR from './data_storage';
 import  { PortHandler } from './port_handler';
+import { requestDfuPermission } from './web/dfu';
 import i18n from './../js/localization';
 import interval from './intervals';
 import periodicStatusUpdater from './periodicStatusUpdater';
@@ -160,6 +161,10 @@ var SerialBackend = (function () {
         publicScope.$portOverride.val(store.get('portOverride', ''));
 
         privateScope.$port.on('change', function (target) {
+            var selected_port = privateScope.$port.find('option:selected');
+            if (selected_port.data().isDfuPermission) {
+                requestDfuPermission().then(() => PortHandler.check_usb_devices());
+            }
             GUI.updateManualPortVisibility();
         });
 

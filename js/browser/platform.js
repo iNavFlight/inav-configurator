@@ -46,14 +46,10 @@ function download(filename, data) {
   URL.revokeObjectURL(url);
 }
 
-// appendFile() is called many times in a row (once per polling tick) by
-// tabs/logging.js and tabs/onboard_logging.js to stream data as it arrives,
-// the same way Electron's real fs.appendFile does on disk. A browser can't
-// append to an arbitrary file, so each stream's chunks are buffered here and
-// flushed as a single download either once enough has accumulated or once
-// the caller goes quiet for a bit (which is what "logging stopped" looks
-// like from here, since there's no explicit close/finalize call in either
-// tab today).
+// logging.js/onboard_logging.js call appendFile() once per poll tick,
+// matching Electron's real fs.appendFile. Buffer chunks per filename and
+// flush as one download once enough accumulates or the caller goes quiet
+// (there's no explicit close call to hook, so idle is the "stopped" signal).
 const appendStreams = new Map();
 const APPEND_FLUSH_BYTES = 1024 * 1024; // 1MB
 const APPEND_FLUSH_IDLE_MS = 3000;
