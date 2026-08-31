@@ -261,6 +261,17 @@ describe('landing approach', () => {
         assert.ok(Math.abs(turn.altM - 60) < 0.01);
     });
 
+    test('the direction flips even when it arrives as the editor string', () => {
+        // MSP delivers 0/1 as numbers, the editor dropdown as "0"/"1"; both must
+        // steer the circuit, or flipping the dropdown silently changes nothing.
+        const left = buildLandingApproach(LAND, {...APPROACH, approachDirection: '0'}, PARAMS);
+        const right = buildLandingApproach(LAND, {...APPROACH, approachDirection: '1'}, PARAMS);
+        const bearingLeft = bearingBetween(left.points[1], left.points[0]);
+        const bearingRight = bearingBetween(right.points[1], right.points[0]);
+        assert.ok(Math.abs(Math.abs(headingDifference(bearingLeft, bearingRight)) - 180) < 1,
+            `string direction did not flip the circuit (${bearingLeft.toFixed(0)} vs ${bearingRight.toFixed(0)})`);
+    });
+
     test('the approach turns the other way when configured right', () => {
         const left = buildLandingApproach(LAND, APPROACH, PARAMS);
         const right = buildLandingApproach(LAND, {...APPROACH, approachDirection: 1}, PARAMS);

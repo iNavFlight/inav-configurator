@@ -318,7 +318,10 @@ export function buildLandingApproach(landPoint, approach, params) {
     const finalApproachAltM = (baseCm + finalAglCm) / 100;
     const landAltM = (baseCm + landAglCm) / 100;
 
-    const sideBearing = approach.approachDirection === ApproachDirectionLeft
+    // The editor's dropdown delivers the direction as a string, MSP as a number;
+    // comparing strictly against the number made every edited approach fly the
+    // right-hand circuit no matter what was chosen.
+    const sideBearing = Number(approach.approachDirection) === ApproachDirectionLeft
         ? normalizeHeading(heading - 90)
         : normalizeHeading(heading + 90);
 
