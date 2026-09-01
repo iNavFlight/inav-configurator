@@ -144,6 +144,9 @@ var SerialBackend = (function () {
             var type = ConnectionType.Serial;
             if (selected_port.data().isBle) {
                 type = ConnectionType.BLE;
+            } else if (selected_port.data().isSitl && globalThis.__INAV_BROWSER_BUILD__) {
+                // Browser build talks to WASM SITL in-process via ccall, not TCP.
+                type = ConnectionType.serialEXT;
             } else if (selected_port.data().isTcp || selected_port.data().isSitl) {
                 type = ConnectionType.TCP;
             } else if (selected_port.data().isUdp) {
@@ -224,6 +227,11 @@ var SerialBackend = (function () {
 
                         if (selected_port == 'tcp' || selected_port == 'udp') {
                             CONFIGURATOR.connection.connect(publicScope.$portOverride.val(), {}, privateScope.onOpen);
+                        } else if (selected_port == 'sitl' && globalThis.__INAV_BROWSER_BUILD__) {
+                            // WASM SITL must already be running (started from the SITL
+                            // tab); connectionExt reports a clean failure via onOpen
+                            // if it isn't, same as a native SITL not listening on TCP.
+                            CONFIGURATOR.connection.connect(0, {}, privateScope.onOpen);
                         } else if (selected_port == 'sitl') {
                             CONFIGURATOR.connection.connect("127.0.0.1:5760", {}, privateScope.onOpen);
                         } else if (selected_port == 'sitl-demo') {
