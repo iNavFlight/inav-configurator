@@ -23,14 +23,17 @@ function selectFile(options = {}) {
       .filter((extension) => extension !== "*")
       .map((extension) => `.${extension}`)
       .join(",");
-    input.addEventListener(
-      "change",
-      () => {
-        const filePaths = Array.from(input.files || [], fileId);
-        resolve({ canceled: filePaths.length === 0, filePaths });
-      },
-      { once: true },
-    );
+
+    // Native <input type=file> fires no event on cancel, so without this
+    // an awaited showOpenDialog() would hang forever. The "cancel" event
+    // (Chromium/Firefox) fires reliably right after the dialog closes;
+    // "change" is still handled in case a browser fires only that.
+    const settle = () => {
+      const filePaths = Array.from(input.files || [], fileId);
+      resolve({ canceled: filePaths.length === 0, filePaths });
+    };
+    input.addEventListener("change", settle, { once: true });
+    input.addEventListener("cancel", settle, { once: true });
     input.click();
   });
 }
@@ -48,15 +51,12 @@ function download(filename, data) {
 
 // logging.js/onboard_logging.js call appendFile() once per poll tick,
 // matching Electron's real fs.appendFile. Buffer chunks per filename and
-// flush as one download once enough accumulates or the caller goes quiet
-// (there's no explicit close call to hook, so idle is the "stopped" signal).
+// flush as a single download once the caller goes quiet (there's no
+// explicit close call to hook, so idle is the "stopped" signal). Real
+// fs.appendFile appends to one continuous file, so this must not split
+// a session into multiple downloads - only idle/pagehide ever flush it.
 const appendStreams = new Map();
-const APPEND_FLUSH_BYTES = 1024 * 1024; // 1MB
 const APPEND_FLUSH_IDLE_MS = 3000;
-
-function byteLength(chunk) {
-  return chunk instanceof Uint8Array ? chunk.byteLength : chunk.length;
-}
 
 function flushAppendStream(filename) {
   const stream = appendStreams.get(filename);
@@ -69,21 +69,16 @@ function flushAppendStream(filename) {
 function appendToStream(filename, data) {
   let stream = appendStreams.get(filename);
   if (!stream) {
-    stream = { chunks: [], size: 0, idleTimer: null };
+    stream = { chunks: [], idleTimer: null };
     appendStreams.set(filename, stream);
   }
   stream.chunks.push(data);
-  stream.size += byteLength(data);
 
   clearTimeout(stream.idleTimer);
-  if (stream.size >= APPEND_FLUSH_BYTES) {
-    flushAppendStream(filename);
-  } else {
-    stream.idleTimer = setTimeout(
-      () => flushAppendStream(filename),
-      APPEND_FLUSH_IDLE_MS,
-    );
-  }
+  stream.idleTimer = setTimeout(
+    () => flushAppendStream(filename),
+    APPEND_FLUSH_IDLE_MS,
+  );
 }
 
 // download() is synchronous, so this flush actually completes before pagehide finishes.
