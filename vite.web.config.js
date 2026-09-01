@@ -38,6 +38,21 @@ export default defineConfig({
     }),
   ],
   assetsInclude: ["**/*.gltf", "**/*.glb", "**/*.wasm"],
+  // WASM SITL is built with pthread support (SharedArrayBuffer), which the
+  // browser only allows in a crossOriginIsolated context - i.e. these two
+  // headers must be present on every response, not just the WASM file's.
+  server: {
+    headers: {
+      "Cross-Origin-Opener-Policy": "same-origin",
+      "Cross-Origin-Embedder-Policy": "require-corp",
+    },
+  },
+  preview: {
+    headers: {
+      "Cross-Origin-Opener-Policy": "same-origin",
+      "Cross-Origin-Embedder-Policy": "require-corp",
+    },
+  },
   build: {
     outDir: "dist-web",
     emptyOutDir: true,
