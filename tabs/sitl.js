@@ -301,10 +301,11 @@ sitlTab.initialize = (callback) => {
                         proxyPort: sitlWasmProxyEnabled ? sitlWasmProxyPort : 0
                     },
                     (error, commandLineArgs) => {
-                        if (error)
+                        if (error) {
                             appendLog(error);
-
-                        appendLog(`SITL started with args: ${commandLineArgs}\n`);
+                        } else {
+                            appendLog(`SITL started with args: ${commandLineArgs}\n`);
+                        }
                     }
                 );
 

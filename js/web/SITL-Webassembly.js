@@ -276,14 +276,11 @@ const SITLWebAssembly = {
                 this.commandLineArgs = this._buildArguments(options);
             }
 
-            // If not initialized, initialize first
+            // If not initialized, initialize first. init() throws on failure,
+            // which the catch below reports via the outer callback - passing
+            // a callback here too would report the same failure twice.
             if (!WASMModule) {
-                await this.init({}, (err, module) => {
-                    if (err) {
-                        if (callback) callback(err);
-                        return;
-                    }
-                });
+                await this.init();
             }
 
             const commandString = 'inav_SITL_WASM ' + this.commandLineArgs.join(' ') + '\n';
