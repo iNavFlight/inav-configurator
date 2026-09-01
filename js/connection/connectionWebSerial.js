@@ -77,7 +77,7 @@ class ConnectionWebSerial extends Connection {
     ];
   }
 
-  async connectImplementation(portId, options, callback) {
+  connectImplementation(portId, options, callback) {
     if (!ConnectionWebSerial.isSupported()) {
       GUI.log(
         "Web Serial is not supported by this browser. Use a Chromium-based browser over HTTPS or localhost.",
@@ -86,45 +86,47 @@ class ConnectionWebSerial extends Connection {
       return;
     }
 
-    try {
-      // requestPort is called from the existing Connect click handler, satisfying
-      // the browser user-activation requirement for first-time permissions.
-      this._port =
-        ConnectionWebSerial._portsById.get(portId) ||
-        (await navigator.serial.requestPort());
-      await this._port.open({ baudRate: options.bitrate });
-      // Hold a single writer for the whole connection. Acquiring a writer per
-      // send fails whenever sends are queued back-to-back: the callback of the
-      // first send starts the next one before the first lock is released.
-      this._writer = this._port.writable.getWriter();
-      this.installDisconnectListener();
-
-      const label =
-        portId === ConnectionWebSerial.CHOOSE_PORT_ID
-          ? "Web Serial port"
-          : portId;
-      GUI.log(
-        i18n.getMessage("connectionConnected", [
-          `${label} @ ${options.bitrate} baud`,
-        ]),
-      );
-      callback({
-        bitrate: options.bitrate,
-        connectionId: ConnectionWebSerial._nextConnectionId++,
-      });
-      this._readLoopActive = true;
-      this._readTask = this.readLoop();
-    } catch (error) {
+    (async () => {
       try {
-        this._writer?.releaseLock();
-      } catch (_) {
-        // ignore cleanup errors
+        // requestPort is called from the existing Connect click handler, satisfying
+        // the browser user-activation requirement for first-time permissions.
+        this._port =
+          ConnectionWebSerial._portsById.get(portId) ||
+          (await navigator.serial.requestPort());
+        await this._port.open({ baudRate: options.bitrate });
+        // Hold a single writer for the whole connection. Acquiring a writer per
+        // send fails whenever sends are queued back-to-back: the callback of the
+        // first send starts the next one before the first lock is released.
+        this._writer = this._port.writable.getWriter();
+        this.installDisconnectListener();
+
+        const label =
+          portId === ConnectionWebSerial.CHOOSE_PORT_ID
+            ? "Web Serial port"
+            : portId;
+        GUI.log(
+          i18n.getMessage("connectionConnected", [
+            `${label} @ ${options.bitrate} baud`,
+          ]),
+        );
+        callback({
+          bitrate: options.bitrate,
+          connectionId: ConnectionWebSerial._nextConnectionId++,
+        });
+        this._readLoopActive = true;
+        this._readTask = this.readLoop();
+      } catch (error) {
+        try {
+          this._writer?.releaseLock();
+        } catch (_) {
+          // ignore cleanup errors
+        }
+        this._writer = null;
+        this._port = null;
+        GUI.log(`Web Serial connection error: ${error.message}`);
+        callback(false);
       }
-      this._writer = null;
-      this._port = null;
-      GUI.log(`Web Serial connection error: ${error.message}`);
-      callback(false);
-    }
+    })();
   }
 
   installDisconnectListener() {
@@ -199,47 +201,51 @@ class ConnectionWebSerial extends Connection {
     this._onReceiveErrorListeners.forEach((listener) => listener(error));
   }
 
-  async disconnectImplementation(callback) {
+  disconnectImplementation(callback) {
     this._readLoopActive = false;
     this.removeDisconnectListener();
 
-    try {
-      if (this._reader) {
-        await this._reader.cancel();
-      }
-      await this._readTask;
-      if (this._writer) {
-        this._writer.releaseLock();
+    (async () => {
+      try {
+        if (this._reader) {
+          await this._reader.cancel();
+        }
+        await this._readTask;
+        if (this._writer) {
+          this._writer.releaseLock();
+          this._writer = null;
+        }
+        if (this._port) {
+          await this._port.close();
+        }
+        this._port = null;
+        callback(true);
+      } catch (error) {
+        console.log(`Web Serial close error: ${error.message}`);
         this._writer = null;
+        this._port = null;
+        callback(false);
       }
-      if (this._port) {
-        await this._port.close();
-      }
-      this._port = null;
-      callback(true);
-    } catch (error) {
-      console.log(`Web Serial close error: ${error.message}`);
-      this._writer = null;
-      this._port = null;
-      callback(false);
-    }
+    })();
   }
 
-  async sendImplementation(data, callback) {
+  sendImplementation(data, callback) {
     if (!this._writer) {
       callback({ bytesSent: 0, resultCode: 1 });
       return;
     }
 
     const bytes = data instanceof Uint8Array ? data : new Uint8Array(data);
-    try {
-      await this._writer.write(bytes);
-      callback({ bytesSent: bytes.byteLength, resultCode: 0 });
-    } catch (error) {
-      console.log(`Web Serial write error: ${error.message}`);
-      this.handleReceiveError(error);
-      callback({ bytesSent: 0, resultCode: 1 });
-    }
+    (async () => {
+      try {
+        await this._writer.write(bytes);
+        callback({ bytesSent: bytes.byteLength, resultCode: 0 });
+      } catch (error) {
+        console.log(`Web Serial write error: ${error.message}`);
+        this.handleReceiveError(error);
+        callback({ bytesSent: 0, resultCode: 1 });
+      }
+    })();
   }
 
   addOnReceiveCallback(callback) {
