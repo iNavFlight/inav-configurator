@@ -153,24 +153,27 @@ class ConnectionExt extends Connection {
     }
 
     disconnectImplementation(callback) {
-        
-        // Nothing to close if WASM is not running
+
+        // Always clear our own polling interval, even if WASM already
+        // stopped running out from under us - otherwise it leaks forever.
+        if (this._messageCheckInterval) {
+            clearInterval(this._messageCheckInterval);
+            this._messageCheckInterval = null;
+        }
+
         if (!SITLWebAssembly.isRunning()) {
+            this._connectionId = null;
             if (callback) {
                 callback(true);
             }
             return;
         }
-        
+
         let isDisconnected = false;
-        if (this._messageCheckInterval) {
-            try {
-                isDisconnected = SITLWebAssembly.callCFunction('inavSerialExDisconnect', 'boolean', ['number'], [this._connectionId]);
-                clearInterval(this._messageCheckInterval);
-                this._messageCheckInterval = null;
-            } catch (error) {
-                console.log(error);
-            }
+        try {
+            isDisconnected = SITLWebAssembly.callCFunction('inavSerialExDisconnect', 'boolean', ['number'], [this._connectionId]);
+        } catch (error) {
+            console.log(error);
         }
 
         this._connectionId = null;
