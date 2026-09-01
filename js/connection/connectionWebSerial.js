@@ -13,6 +13,15 @@ import i18n from "./../localization";
  */
 class ConnectionWebSerial extends Connection {
   static _portsById = new Map();
+  // The browser returns the same SerialPort object (by ===) for a
+  // previously-granted device across repeated getPorts() calls in a page's
+  // lifetime, so this WeakMap lets each device keep the ID it was first
+  // assigned. Without it, an index-based ID would shift for every port
+  // whenever an earlier-granted device is removed, and port_handler.js's
+  // array-diff would read that shift as the removal of a *different*,
+  // still-connected device.
+  static _portObjectIds = new WeakMap();
+  static _nextPortIndex = 0;
   static _nextConnectionId = 1;
   static CHOOSE_PORT_ID = "webserial-choose-port";
 
@@ -31,13 +40,20 @@ class ConnectionWebSerial extends Connection {
     return typeof navigator !== "undefined" && "serial" in navigator;
   }
 
-  static portId(port, index) {
-    const info = port.getInfo();
-    const vendor = info.usbVendorId?.toString(16).padStart(4, "0");
-    const product = info.usbProductId?.toString(16).padStart(4, "0");
-    return vendor && product
-      ? `webserial-${vendor}-${product}-${index}`
-      : `webserial-granted-${index}`;
+  static portId(port) {
+    let id = ConnectionWebSerial._portObjectIds.get(port);
+    if (!id) {
+      const info = port.getInfo();
+      const vendor = info.usbVendorId?.toString(16).padStart(4, "0");
+      const product = info.usbProductId?.toString(16).padStart(4, "0");
+      const index = ConnectionWebSerial._nextPortIndex++;
+      id =
+        vendor && product
+          ? `webserial-${vendor}-${product}-${index}`
+          : `webserial-granted-${index}`;
+      ConnectionWebSerial._portObjectIds.set(port, id);
+    }
+    return id;
   }
 
   static async getDevices() {
@@ -47,9 +63,9 @@ class ConnectionWebSerial extends Connection {
 
     const ports = await navigator.serial.getPorts();
     ConnectionWebSerial._portsById.clear();
-    ports.forEach((port, index) => {
+    ports.forEach((port) => {
       ConnectionWebSerial._portsById.set(
-        ConnectionWebSerial.portId(port, index),
+        ConnectionWebSerial.portId(port),
         port,
       );
     });
