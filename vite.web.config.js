@@ -1,3 +1,4 @@
+import { fileURLToPath } from "node:url";
 import { defineConfig } from "vite";
 import inject from "@rollup/plugin-inject";
 import { VitePWA } from "vite-plugin-pwa";
@@ -36,6 +37,27 @@ export default defineConfig({
         ],
       },
     }),
+    {
+      // Popup windows don't need their own SW/manifest, and the injected
+      // "./"-relative paths 404 anyway since those files only exist at the
+      // build root, not under /tabs/.
+      name: "strip-pwa-injection-from-popups",
+      // Plugin-level enforce (not just the hook's own `order`) decides
+      // which bucket Vite runs it in; VitePWA's html hook is enforce:
+      // "post", so this must be too or it runs first regardless of order.
+      enforce: "post",
+      transformIndexHtml: {
+        order: "post",
+        handler(html, ctx) {
+          if (!/\/tabs\/(receiver_msp|debug_trace)\.html$/.test(ctx.filename)) {
+            return html;
+          }
+          return html
+            .replace(/<link rel="manifest"[^>]*>/, "")
+            .replace(/<script id="vite-plugin-pwa:register-sw"[^>]*><\/script>/, "");
+        },
+      },
+    },
   ],
   assetsInclude: ["**/*.gltf", "**/*.glb", "**/*.wasm"],
   // WASM SITL is built with pthread support (SharedArrayBuffer), which the
@@ -62,5 +84,20 @@ export default defineConfig({
     // import, which expects a real cacheable asset.
     assetsInlineLimit: (filePath) => !/\.(wasm|gltf|glb)$/.test(filePath),
     chunkSizeWarningLimit: 10240,
+    rollupOptions: {
+      // receiver_msp.html and debug_trace.html are opened via window.open()
+      // as standalone popup windows (tabs/receiver.js, tabs/sensors.js), so
+      // they need to be built as real entries, not just fetched HTML
+      // fragments like the rest of tabs/*.html.
+      input: {
+        main: fileURLToPath(new URL("./index.html", import.meta.url)),
+        receiver_msp: fileURLToPath(
+          new URL("./tabs/receiver_msp.html", import.meta.url),
+        ),
+        debug_trace: fileURLToPath(
+          new URL("./tabs/debug_trace.html", import.meta.url),
+        ),
+      },
+    },
   },
 });
