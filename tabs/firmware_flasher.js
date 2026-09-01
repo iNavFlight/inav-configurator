@@ -325,8 +325,10 @@ firmwareFlasherTab.initialize = function (callback) {
                             "releaseUrl": release.html_url,
                             "name"      : semver.clean(release.name),
                             "version"   : release.tag_name,
-                            // Use GitHub Pages URL (has CORS headers) instead of GitHub Releases
-                            "url"       : `https://inavflight.github.io/firmware/${release.tag_name}/${asset.name}`,
+                            // See the equivalent stable-release block above for why this is gated.
+                            "url"       : globalThis.__INAV_BROWSER_BUILD__
+                                ? `https://inavflight.github.io/firmware/${release.tag_name}/${asset.name}`
+                                : asset.browser_download_url,
                             "file"      : asset.name,
                             "target_id" : result.target_id,
                             "target"    : result.target,
