@@ -6811,6 +6811,18 @@
     "conditionsInfoHead": {
         "message": "Weather Conditions"
     },
+    "conditionsInfoHeadSource": {
+        "message": "Weather — $1"
+    },
+    "conditionsSourceAircraft": {
+        "message": "Aircraft"
+    },
+    "conditionsSourceWaypoint": {
+        "message": "WP1"
+    },
+    "conditionsSourceMapCenter": {
+        "message": "Map Center"
+    },
     "conditionsWaiting": {
         "message": "Waiting for location…"
     },

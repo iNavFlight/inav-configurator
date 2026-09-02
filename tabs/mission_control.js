@@ -124,17 +124,31 @@ const iconNames = [
 const icons = Object.create(null)
 
 const missionControlLocationNamespace = '.missionControlLocation';
+const WEATHER_RETRY_DELAY_MS = 5 * 60 * 1000;
+const WEATHER_REQUEST_TIMEOUT_MS = 30 * 1000;
+const WEATHER_MAP_REFRESH_DELAY_MS = 1000;
+const WEATHER_GPS_MIN_DISTANCE_METERS = 1000;
+const WEATHER_MAP_CENTER_MIN_DISTANCE_METERS = 1000;
+const WEATHER_WAYPOINT_MIN_DISTANCE_METERS = 10;
 let googleLocationAbortController = null;
 let weatherAbortController = null;
 let addressSearchAbortController = null;
+let weatherRetryTimer = null;
+let weatherMapRefreshTimer = null;
+let missionControlLocationLifecycleId = 0;
 
 function cleanupMissionControlLocationResources() {
+    missionControlLocationLifecycleId++;
     googleLocationAbortController?.abort();
     googleLocationAbortController = null;
     weatherAbortController?.abort();
     weatherAbortController = null;
     addressSearchAbortController?.abort();
     addressSearchAbortController = null;
+    clearTimeout(weatherRetryTimer);
+    weatherRetryTimer = null;
+    clearTimeout(weatherMapRefreshTimer);
+    weatherMapRefreshTimer = null;
 
     $(document).off(missionControlLocationNamespace);
     $('#searchAddress, #centerOnDrone, #showHideConditionsButton').off(missionControlLocationNamespace);
@@ -149,6 +163,64 @@ function cleanupMissionControlLocationResources() {
 
 function showConditionsPanel(isVisible) {
     $('#missionPlannerConditions').toggleClass('is-hidden', !isVisible);
+}
+
+function parseRetryAfterMs(retryAfter) {
+    if (!retryAfter) {
+        return WEATHER_RETRY_DELAY_MS;
+    }
+
+    const retryAfterSeconds = Number(retryAfter);
+    if (Number.isFinite(retryAfterSeconds)) {
+        return Math.max(WEATHER_RETRY_DELAY_MS, retryAfterSeconds * 1000);
+    }
+
+    const retryAt = Date.parse(retryAfter);
+    if (Number.isNaN(retryAt)) {
+        return WEATHER_RETRY_DELAY_MS;
+    }
+    return Math.max(WEATHER_RETRY_DELAY_MS, retryAt - Date.now());
+}
+
+function createWeatherRequestError(message, retryable, retryDelayMs = WEATHER_RETRY_DELAY_MS) {
+    const error = new Error(message);
+    error.weatherRetryable = retryable;
+    error.weatherRetryDelayMs = retryDelayMs;
+    return error;
+}
+
+function createWeatherResponseError(response, data) {
+    const status = response.status || Number(data?.error?.code);
+    const apiStatus = data?.error?.status;
+    const retryableApiStatuses = new Set([
+        'ABORTED',
+        'DEADLINE_EXCEEDED',
+        'INTERNAL',
+        'RESOURCE_EXHAUSTED',
+        'UNAVAILABLE',
+    ]);
+    const retryable = status === 408 || status === 429 || status >= 500
+        || retryableApiStatuses.has(apiStatus);
+    const retryDelayMs = status === 429
+        ? parseRetryAfterMs(response.headers?.get('Retry-After'))
+        : WEATHER_RETRY_DELAY_MS;
+    return createWeatherRequestError(
+        data?.error?.message || `HTTP ${status || response.status}`,
+        retryable,
+        retryDelayMs,
+    );
+}
+
+function getLocationDistanceMeters(first, second) {
+    const degreesToRadians = Math.PI / 180;
+    const latitudeDelta = (second.lat - first.lat) * degreesToRadians;
+    const longitudeDelta = (second.lng - first.lng) * degreesToRadians;
+    const firstLatitude = first.lat * degreesToRadians;
+    const secondLatitude = second.lat * degreesToRadians;
+    const haversine = Math.sin(latitudeDelta / 2) ** 2
+        + Math.cos(firstLatitude) * Math.cos(secondLatitude) * Math.sin(longitudeDelta / 2) ** 2;
+    const boundedHaversine = Math.min(1, Math.max(0, haversine));
+    return 6371000 * 2 * Math.atan2(Math.sqrt(boundedHaversine), Math.sqrt(1 - boundedHaversine));
 }
 
 function toTitleCase(value) {
@@ -495,6 +567,7 @@ let elevationChartInstance = null;
 missionControlTab.initialize = function (callback) {
 
     cleanupMissionControlLocationResources();
+    const locationLifecycleId = missionControlLocationLifecycleId;
 
     let cursorInitialized = false;
     let curPosStyle;
@@ -522,7 +595,9 @@ missionControlTab.initialize = function (callback) {
     let settings = {speed: 0, alt: 5000, safeRadiusSH: 50, fwApproachAlt: 60, fwLandAlt: 5, maxDistSH: 0, fwApproachLength: 0, fwLoiterRadius: 0};
     let googleLocationRequestStarted = false;
     let conditionsFetched = false;
-    const conditionsSourcesAttempted = new Set();
+    let activeWeatherSource = null;
+    let weatherApiKey = String(globalSettings.googleApiKey || '').trim();
+    let blockedWeatherApiKey = null;
 
     function getCurrentDroneLocation() {
         const lat = FC.GPS_DATA?.lat / 10000000;
@@ -539,7 +614,7 @@ missionControlTab.initialize = function (callback) {
         };
     }
 
-    function getFirstMissionCoordinate() {
+    function getFirstMissionLocation() {
         const firstWaypoint = mission.get().find(function (waypoint) {
             return !waypoint.isAttached();
         });
@@ -553,21 +628,122 @@ missionControlTab.initialize = function (callback) {
             return null;
         }
 
-        return fromLonLat([lng, lat]);
+        return {
+            type: 'waypoint',
+            lat,
+            lng,
+            coord: fromLonLat([lng, lat]),
+        };
     }
 
-    async function fetchConditionsInfo(lat, lng, source) {
-        if (!globalSettings.googleApiKey || conditionsSourcesAttempted.has(source)) {
+    function getFirstMissionCoordinate() {
+        return getFirstMissionLocation()?.coord || null;
+    }
+
+    function getMapCenterWeatherLocation() {
+        const center = map?.getView()?.getCenter();
+        if (!center) {
+            return null;
+        }
+
+        const [lng, lat] = toLonLat(center);
+        if (!Number.isFinite(lat) || !Number.isFinite(lng)
+            || Math.abs(lat) > 90 || Math.abs(lng) > 180) {
+            return null;
+        }
+        return { type: 'map', lat, lng };
+    }
+
+    function getPreferredWeatherSource() {
+        const droneLocation = getCurrentDroneLocation();
+        if (droneLocation) {
+            return { type: 'gps', lat: droneLocation.lat, lng: droneLocation.lng };
+        }
+        return getFirstMissionLocation() || getMapCenterWeatherLocation();
+    }
+
+    function isWeatherSourceMateriallyChanged(currentSource, nextSource) {
+        if (!currentSource || !nextSource || currentSource.type !== nextSource.type) {
+            return true;
+        }
+        const minimumDistances = {
+            gps: WEATHER_GPS_MIN_DISTANCE_METERS,
+            map: WEATHER_MAP_CENTER_MIN_DISTANCE_METERS,
+            waypoint: WEATHER_WAYPOINT_MIN_DISTANCE_METERS,
+        };
+        const minimumDistance = minimumDistances[nextSource.type];
+        return getLocationDistanceMeters(currentSource, nextSource) >= minimumDistance;
+    }
+
+    function updateConditionsTitle(source) {
+        const titleKeys = {
+            gps: 'conditionsSourceAircraft',
+            waypoint: 'conditionsSourceWaypoint',
+            map: 'conditionsSourceMapCenter',
+        };
+        $('#conditionsTitle').text(i18n.getMessage('conditionsInfoHeadSource', [
+            i18n.getMessage(titleKeys[source.type]),
+        ]));
+    }
+
+    function clearWeatherRetry() {
+        clearTimeout(weatherRetryTimer);
+        weatherRetryTimer = null;
+    }
+
+    function syncWeatherApiKey() {
+        const apiKey = String(globalSettings.googleApiKey || '').trim();
+        if (apiKey === weatherApiKey) {
+            return apiKey;
+        }
+
+        weatherApiKey = apiKey;
+        blockedWeatherApiKey = null;
+        activeWeatherSource = null;
+        conditionsFetched = false;
+        clearWeatherRetry();
+        weatherAbortController?.abort();
+        weatherAbortController = null;
+        return apiKey;
+    }
+
+    function scheduleWeatherRetry(source, apiKey, retryDelayMs) {
+        clearWeatherRetry();
+        weatherRetryTimer = setTimeout(function () {
+            weatherRetryTimer = null;
+            if (missionControlLocationLifecycleId !== locationLifecycleId
+                || String(globalSettings.googleApiKey || '').trim() !== apiKey
+                || blockedWeatherApiKey === apiKey) {
+                return;
+            }
+
+            const preferredSource = getPreferredWeatherSource();
+            if (!preferredSource) {
+                return;
+            }
+            if (isWeatherSourceMateriallyChanged(source, preferredSource)) {
+                evaluateWeatherSource();
+                return;
+            }
+
+            activeWeatherSource = preferredSource;
+            updateConditionsTitle(preferredSource);
+            void fetchConditionsInfo(preferredSource, apiKey);
+        }, retryDelayMs);
+    }
+
+    async function fetchConditionsInfo(source, apiKey) {
+        if (!apiKey || blockedWeatherApiKey === apiKey
+            || missionControlLocationLifecycleId !== locationLifecycleId) {
             return false;
         }
 
-        conditionsSourcesAttempted.add(source);
         const useImperial = globalSettings.unitType === 'imperial'
             || (globalSettings.unitType === 'OSD' && globalSettings.osdUnits === 0);
         const url = new URL('https://weather.googleapis.com/v1/currentConditions:lookup');
-        url.searchParams.set('key', globalSettings.googleApiKey);
-        url.searchParams.set('location.latitude', lat.toFixed(4));
-        url.searchParams.set('location.longitude', lng.toFixed(4));
+        url.searchParams.set('key', apiKey);
+        url.searchParams.set('location.latitude', source.lat.toFixed(4));
+        url.searchParams.set('location.longitude', source.lng.toFixed(4));
         if (useImperial) {
             url.searchParams.set('unitsSystem', 'IMPERIAL');
         }
@@ -575,6 +751,12 @@ missionControlTab.initialize = function (callback) {
         weatherAbortController?.abort();
         const requestController = new AbortController();
         weatherAbortController = requestController;
+        let requestTimedOut = false;
+        const timeoutTimer = setTimeout(function () {
+            requestTimedOut = true;
+            requestController.abort();
+        }, WEATHER_REQUEST_TIMEOUT_MS);
+        updateConditionsTitle(source);
         showConditionsPanel(true);
         $('#conditionsLoading').text(i18n.getMessage('conditionsWaiting')).show();
         $('#conditionsData').addClass('is-hidden').hide();
@@ -582,28 +764,117 @@ missionControlTab.initialize = function (callback) {
 
         try {
             const response = await fetch(url, { signal: requestController.signal });
-            const data = await response.json();
+            let data;
+            try {
+                data = await response.json();
+            } catch (error) {
+                if (!response.ok) {
+                    throw createWeatherResponseError(response, null);
+                }
+                throw error;
+            }
             if (!response.ok || data?.error) {
-                throw new Error(data?.error?.message || `HTTP ${response.status}`);
+                throw createWeatherResponseError(response, data);
+            }
+            if (missionControlLocationLifecycleId !== locationLifecycleId
+                || weatherAbortController !== requestController
+                || String(globalSettings.googleApiKey || '').trim() !== apiKey) {
+                return false;
             }
 
             conditionsFetched = renderConditionsInfo(data);
             if (!conditionsFetched) {
-                showConditionsUnavailable();
+                throw createWeatherRequestError('Invalid Weather API response', true);
             }
-            return conditionsFetched;
+            clearWeatherRetry();
+            blockedWeatherApiKey = null;
+            return true;
         } catch (error) {
-            if (error.name !== 'AbortError') {
-                conditionsFetched = false;
-                showConditionsUnavailable();
-                console.warn('Google Weather unavailable:', error.message);
+            let weatherError = error;
+            if (error.name === 'AbortError') {
+                if (!requestTimedOut) {
+                    return false;
+                }
+                weatherError = createWeatherRequestError('Weather API request timed out', true);
+            }
+            if (missionControlLocationLifecycleId !== locationLifecycleId
+                || weatherAbortController !== requestController
+                || String(globalSettings.googleApiKey || '').trim() !== apiKey) {
+                return false;
+            }
+
+            conditionsFetched = false;
+            showConditionsUnavailable();
+            console.warn('Google Weather unavailable:', weatherError.message);
+            if (weatherError.weatherRetryable !== false) {
+                scheduleWeatherRetry(source, apiKey, weatherError.weatherRetryDelayMs || WEATHER_RETRY_DELAY_MS);
+            } else {
+                clearWeatherRetry();
+                blockedWeatherApiKey = apiKey;
             }
             return false;
         } finally {
+            clearTimeout(timeoutTimer);
             if (weatherAbortController === requestController) {
                 weatherAbortController = null;
             }
         }
+    }
+
+    function evaluateWeatherSource({ allowMapCenterRefresh = true } = {}) {
+        if (missionControlLocationLifecycleId !== locationLifecycleId) {
+            return false;
+        }
+        const previousApiKey = weatherApiKey;
+        const apiKey = syncWeatherApiKey();
+        const apiKeyChanged = apiKey !== previousApiKey;
+        if (!apiKey) {
+            showConditionsPanel(false);
+            return false;
+        }
+
+        const preferredSource = getPreferredWeatherSource();
+        if (!preferredSource) {
+            return false;
+        }
+        if (!allowMapCenterRefresh && !apiKeyChanged && preferredSource.type === 'map'
+            && (!activeWeatherSource || activeWeatherSource.type === 'map')) {
+            return conditionsFetched;
+        }
+        if (preferredSource.type !== 'map') {
+            clearTimeout(weatherMapRefreshTimer);
+            weatherMapRefreshTimer = null;
+        }
+        updateConditionsTitle(preferredSource);
+        if (blockedWeatherApiKey === apiKey) {
+            return false;
+        }
+        if (!isWeatherSourceMateriallyChanged(activeWeatherSource, preferredSource)) {
+            return conditionsFetched;
+        }
+
+        clearWeatherRetry();
+        weatherAbortController?.abort();
+        activeWeatherSource = preferredSource;
+        conditionsFetched = false;
+        void fetchConditionsInfo(preferredSource, apiKey);
+        return true;
+    }
+
+    function scheduleMapCenterWeatherRefresh() {
+        clearTimeout(weatherMapRefreshTimer);
+        weatherMapRefreshTimer = null;
+        if (missionControlLocationLifecycleId !== locationLifecycleId
+            || getCurrentDroneLocation() || getFirstMissionLocation()) {
+            return;
+        }
+
+        weatherMapRefreshTimer = setTimeout(function () {
+            weatherMapRefreshTimer = null;
+            if (missionControlLocationLifecycleId === locationLifecycleId) {
+                evaluateWeatherSource();
+            }
+        }, WEATHER_MAP_REFRESH_DELAY_MS);
     }
 
     function centerMapOnCurrentLocation(keepExistingZoom = false) {
@@ -688,7 +959,6 @@ missionControlTab.initialize = function (callback) {
             if (!getFirstMissionCoordinate() && !getCurrentDroneLocation() && !lastGpsPos) {
                 $('#centerOnDrone').show().css({ opacity: 1, pointerEvents: 'auto' });
                 centerMapOnPreferredLocation();
-                await fetchConditionsInfo(googleGeoPos.lat, googleGeoPos.lng, 'approximate');
             }
             return googleGeoPos;
         } catch (error) {
@@ -707,16 +977,19 @@ missionControlTab.initialize = function (callback) {
         const initialDroneLocation = getCurrentDroneLocation();
         if (getFirstMissionCoordinate()) {
             centerMapOnPreferredLocation();
+            evaluateWeatherSource();
             return;
         }
         if (initialDroneLocation) {
             lastGpsPos = initialDroneLocation.coord;
             $('#centerOnDrone').css({ opacity: 1, pointerEvents: 'auto' });
             centerMapOnPreferredLocation();
-            void fetchConditionsInfo(initialDroneLocation.lat, initialDroneLocation.lng, 'gps');
+            evaluateWeatherSource();
             return;
         }
-        void requestGoogleApproximateLocation();
+        void requestGoogleApproximateLocation().then(function () {
+            evaluateWeatherSource();
+        });
     }
 
     if (GUI.active_tab !== this) {
@@ -1036,9 +1309,6 @@ function iconKey(filename) {
               if (apiOverlayEl) {
                   apiOverlayEl.style.visibility = 'hidden';
               }
-              if (!conditionsFetched || !conditionsSourcesAttempted.has('gps')) {
-                  void fetchConditionsInfo(lat, lon, 'gps');
-              }
 
                             // Uncomment to auto-center/zoom once when GPS lock is first acquired
                             // if (!autoCenteredOnFix && map && map.getView()) {
@@ -1091,6 +1361,7 @@ function iconKey(filename) {
                         }
                         infoOverlayEl.style.visibility = 'hidden';
                     }
+          evaluateWeatherSource({ allowMapCenterRefresh: false });
         }
 
         /*
@@ -2579,6 +2850,7 @@ function iconKey(filename) {
     function refreshLayers() {
         cleanLayers();
         redrawLayers();
+        evaluateWeatherSource();
     }
 
     function cleanLayers() {
@@ -3397,6 +3669,7 @@ function iconKey(filename) {
                 center: toLonLat(map.getView().getCenter()),
                 zoom: map.getView().getZoom()
             });
+            scheduleMapCenterWeatherRefresh();
         });
         //////////////////////////////////////////////////////////////////////////
         // load map view settings on startup
