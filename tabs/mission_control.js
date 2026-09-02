@@ -223,6 +223,66 @@ function getLocationDistanceMeters(first, second) {
     return 6371000 * 2 * Math.atan2(Math.sqrt(boundedHaversine), Math.sqrt(1 - boundedHaversine));
 }
 
+function isWeatherSourceMateriallyChanged(currentSource, nextSource) {
+    if (!currentSource || !nextSource || currentSource.type !== nextSource.type) {
+        return true;
+    }
+    const minimumDistances = {
+        gps: WEATHER_GPS_MIN_DISTANCE_METERS,
+        map: WEATHER_MAP_CENTER_MIN_DISTANCE_METERS,
+        waypoint: WEATHER_WAYPOINT_MIN_DISTANCE_METERS,
+    };
+    const minimumDistance = minimumDistances[nextSource.type];
+    return getLocationDistanceMeters(currentSource, nextSource) >= minimumDistance;
+}
+
+function updateConditionsTitle(source) {
+    const titleKeys = {
+        gps: 'conditionsSourceAircraft',
+        waypoint: 'conditionsSourceWaypoint',
+        map: 'conditionsSourceMapCenter',
+    };
+    $('#conditionsTitle').text(i18n.getMessage('conditionsInfoHeadSource', [
+        i18n.getMessage(titleKeys[source.type]),
+    ]));
+}
+
+function clearWeatherRetry() {
+    clearTimeout(weatherRetryTimer);
+    weatherRetryTimer = null;
+}
+
+async function parseWeatherResponse(response) {
+    let data;
+    try {
+        data = await response.json();
+    } catch (error) {
+        if (!response.ok) {
+            throw createWeatherResponseError(response, null);
+        }
+        throw error;
+    }
+    if (!response.ok || data?.error) {
+        throw createWeatherResponseError(response, data);
+    }
+    return data;
+}
+
+function isCurrentWeatherRequest(requestController, apiKey, locationLifecycleId) {
+    return missionControlLocationLifecycleId === locationLifecycleId
+        && weatherAbortController === requestController
+        && String(globalSettings.googleApiKey || '').trim() === apiKey;
+}
+
+function normalizeWeatherRequestError(error, requestTimedOut) {
+    if (error.name !== 'AbortError') {
+        return error;
+    }
+    return requestTimedOut
+        ? createWeatherRequestError('Weather API request timed out', true)
+        : null;
+}
+
 function toTitleCase(value) {
     return String(value || '').replaceAll('_', ' ').toLowerCase()
         .replace(/\b\w/g, function (character) { return character.toUpperCase(); });
@@ -662,39 +722,10 @@ missionControlTab.initialize = function (callback) {
         return getFirstMissionLocation() || getMapCenterWeatherLocation();
     }
 
-    function isWeatherSourceMateriallyChanged(currentSource, nextSource) {
-        if (!currentSource || !nextSource || currentSource.type !== nextSource.type) {
-            return true;
-        }
-        const minimumDistances = {
-            gps: WEATHER_GPS_MIN_DISTANCE_METERS,
-            map: WEATHER_MAP_CENTER_MIN_DISTANCE_METERS,
-            waypoint: WEATHER_WAYPOINT_MIN_DISTANCE_METERS,
-        };
-        const minimumDistance = minimumDistances[nextSource.type];
-        return getLocationDistanceMeters(currentSource, nextSource) >= minimumDistance;
-    }
-
-    function updateConditionsTitle(source) {
-        const titleKeys = {
-            gps: 'conditionsSourceAircraft',
-            waypoint: 'conditionsSourceWaypoint',
-            map: 'conditionsSourceMapCenter',
-        };
-        $('#conditionsTitle').text(i18n.getMessage('conditionsInfoHeadSource', [
-            i18n.getMessage(titleKeys[source.type]),
-        ]));
-    }
-
-    function clearWeatherRetry() {
-        clearTimeout(weatherRetryTimer);
-        weatherRetryTimer = null;
-    }
-
     function syncWeatherApiKey() {
         const apiKey = String(globalSettings.googleApiKey || '').trim();
         if (apiKey === weatherApiKey) {
-            return apiKey;
+            return false;
         }
 
         weatherApiKey = apiKey;
@@ -704,7 +735,7 @@ missionControlTab.initialize = function (callback) {
         clearWeatherRetry();
         weatherAbortController?.abort();
         weatherAbortController = null;
-        return apiKey;
+        return true;
     }
 
     function scheduleWeatherRetry(source, apiKey, retryDelayMs) {
@@ -764,21 +795,8 @@ missionControlTab.initialize = function (callback) {
 
         try {
             const response = await fetch(url, { signal: requestController.signal });
-            let data;
-            try {
-                data = await response.json();
-            } catch (error) {
-                if (!response.ok) {
-                    throw createWeatherResponseError(response, null);
-                }
-                throw error;
-            }
-            if (!response.ok || data?.error) {
-                throw createWeatherResponseError(response, data);
-            }
-            if (missionControlLocationLifecycleId !== locationLifecycleId
-                || weatherAbortController !== requestController
-                || String(globalSettings.googleApiKey || '').trim() !== apiKey) {
+            const data = await parseWeatherResponse(response);
+            if (!isCurrentWeatherRequest(requestController, apiKey, locationLifecycleId)) {
                 return false;
             }
 
@@ -790,16 +808,8 @@ missionControlTab.initialize = function (callback) {
             blockedWeatherApiKey = null;
             return true;
         } catch (error) {
-            let weatherError = error;
-            if (error.name === 'AbortError') {
-                if (!requestTimedOut) {
-                    return false;
-                }
-                weatherError = createWeatherRequestError('Weather API request timed out', true);
-            }
-            if (missionControlLocationLifecycleId !== locationLifecycleId
-                || weatherAbortController !== requestController
-                || String(globalSettings.googleApiKey || '').trim() !== apiKey) {
+            const weatherError = normalizeWeatherRequestError(error, requestTimedOut);
+            if (!weatherError || !isCurrentWeatherRequest(requestController, apiKey, locationLifecycleId)) {
                 return false;
             }
 
@@ -825,9 +835,8 @@ missionControlTab.initialize = function (callback) {
         if (missionControlLocationLifecycleId !== locationLifecycleId) {
             return false;
         }
-        const previousApiKey = weatherApiKey;
-        const apiKey = syncWeatherApiKey();
-        const apiKeyChanged = apiKey !== previousApiKey;
+        const apiKeyChanged = syncWeatherApiKey();
+        const apiKey = weatherApiKey;
         if (!apiKey) {
             showConditionsPanel(false);
             return false;
