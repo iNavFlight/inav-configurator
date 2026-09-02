@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - master
-      - maintenance-8.x.x
+      - maintenance-*
 #  pull_request:
 
 jobs:

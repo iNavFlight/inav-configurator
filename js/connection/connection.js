@@ -154,6 +154,14 @@ class Connection {
             });
         } else {
             this._openCanceled = true;
+
+            // Port already gone: without this the singleton stays stuck with _transmitting
+            // true. No listener teardown here - transports notify them after abort().
+            this.emptyOutputBuffer();
+
+            if (callback) {
+                callback(false);
+            }
         }
     }
     
@@ -239,6 +247,87 @@ class Connection {
     addOnReceiveErrorListener(callback) {
         this._onReceiveErrorListeners.push(callback);
         // Note: Don't call addOnReceiveErrorCallback here - it would duplicate the push
+    }
+
+    // A throwing listener must not abort the loop - the rest would never see this
+    // or any later chunk, and the exception would escape into the IPC handler.
+    notifyReceiveListeners(info) {
+        this._onReceiveListeners.forEach(listener => {
+            try {
+                listener(info);
+            } catch (error) {
+                console.error('Receive listener threw:', error);
+            }
+        });
+    }
+
+    notifyReceiveErrorListeners(error) {
+        this._onReceiveErrorListeners.forEach(listener => {
+            try {
+                listener(error);
+            } catch (listenerError) {
+                console.error('Receive error listener threw:', listenerError);
+            }
+        });
+    }
+
+    /*
+     * Bridge a transport's write promise onto sendImplementation()'s callback.
+     * send() advances its queue only from there, so every path has to report once.
+     * A null promise means there is no port left to write to.
+     */
+    completeSend(label, promise, callback) {
+        const report = (bytesSent, resultCode) => {
+            if (callback) {
+                callback({ bytesSent: bytesSent, resultCode: resultCode });
+            }
+        };
+
+        if (!promise) {
+            report(0, 1);
+            return;
+        }
+
+        promise.then(response => {
+            if (response.error) {
+                console.log(label + ' write error: ' + response.msg);
+                report(0, 1);
+            } else {
+                report(response.bytesWritten, 0);
+            }
+        }).catch(error => {
+            console.log(label + ' write failed: ' + error);
+            report(0, 1);
+        });
+    }
+
+    // Same for a transport's close promise - disconnect() has to hear back either way.
+    completeClose(label, promise, callback) {
+        if (!promise) {
+            if (callback) {
+                callback(false);
+            }
+            return;
+        }
+
+        promise.then(response => {
+            if (response.error) {
+                console.log('Unable to close ' + label + ': ' + response.msg);
+            }
+            if (callback) {
+                callback(!response.error);
+            }
+        }).catch(this.reportFailure('Unable to close ' + label, callback));
+    }
+
+    // Rejection handler that reports a failed transport call instead of losing its callback.
+    reportFailure(message, callback) {
+        return error => {
+            console.log(message + ': ' + error);
+            if (callback) {
+                callback(false);
+            }
+        };
     }
 
     removeAllListeners() {
