@@ -138,6 +138,7 @@ const i18nStubUrl = dataModule(`
     export default i18n;
 `);
 const inertFwApproachUrl = dataModule('export const FwApproach = class {};');
+const inertDronecanAsyncRequestParseUrl = dataModule('export const parseDronecanAsyncRequestResponse = () => null;');
 const inertGeozoneUrl = dataModule(`
     export const Geozone = class {};
     export const GeozoneVertex = class {};
@@ -162,6 +163,7 @@ const realMspHelperUrl = rewriteAndWrite('js/msp/MSPHelper.js', [
     [/^import ProgrammingPid from '\.\/\.\.\/programmingPid';$/m, `import ProgrammingPid from '${inertDefaultUrl}';`, "import ProgrammingPid"],
     [/^import Safehome from '\.\/\.\.\/safehome';$/m, `import Safehome from '${inertDefaultUrl}';`, "import Safehome"],
     [/^import \{ FwApproach \} from '\.\/\.\.\/fwApproach';$/m, `import { FwApproach } from '${inertFwApproachUrl}';`, "import FwApproach"],
+    [/^import \{ parseDronecanAsyncRequestResponse \} from '\.\/\.\.\/dronecanAsyncRequestParse';$/m, `import { parseDronecanAsyncRequestResponse } from '${inertDronecanAsyncRequestParseUrl}';`, "import parseDronecanAsyncRequestResponse"],
     [/^import Waypoint from '\.\/\.\.\/waypoint';$/m, `import Waypoint from '${inertDefaultUrl}';`, "import Waypoint"],
     [/^import mspDeduplicationQueue from '\.\/mspDeduplicationQueue';$/m, `import mspDeduplicationQueue from '${realDedupUrl}';`, "import mspDeduplicationQueue"],
     [/^import mspStatistics from '\.\/mspStatistics';$/m, `import mspStatistics from '${realStatisticsUrl}';`, "import mspStatistics"],
