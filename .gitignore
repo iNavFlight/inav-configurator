@@ -22,3 +22,4 @@ eeprom.bin
 tags
 TAGS
 start-with-debugging.sh
+dist-web/

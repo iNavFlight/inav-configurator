@@ -262,7 +262,13 @@ firmwareFlasherTab.initialize = function (callback) {
                         "releaseUrl": release.html_url,
                         "name"      : semver.clean(release.name),
                         "version"   : release.tag_name,
-                        "url"       : asset.browser_download_url,
+                        // Browser fetches are subject to CORS; GitHub Releases assets don't send
+                        // CORS headers, so the browser build needs the GitHub Pages mirror instead.
+                        // Desktop (Electron) isn't subject to CORS, so it keeps using the real
+                        // Releases asset URL.
+                        "url"       : globalThis.__INAV_BROWSER_BUILD__
+                            ? `https://inavflight.github.io/firmware/${release.tag_name}/${asset.name}`
+                            : asset.browser_download_url,
                         "file"      : asset.name,
                         "target_id" : result.target_id,
                         "target"    : result.target,
@@ -319,7 +325,10 @@ firmwareFlasherTab.initialize = function (callback) {
                             "releaseUrl": release.html_url,
                             "name"      : semver.clean(release.name),
                             "version"   : release.tag_name,
-                            "url"       : asset.browser_download_url,
+                            // See the equivalent stable-release block above for why this is gated.
+                            "url"       : globalThis.__INAV_BROWSER_BUILD__
+                                ? `https://inavflight.github.io/firmware/${release.tag_name}/${asset.name}`
+                                : asset.browser_download_url,
                             "file"      : asset.name,
                             "target_id" : result.target_id,
                             "target"    : result.target,
