@@ -11,8 +11,8 @@ const ConnectionType = {
 
 class Connection {
 
-    constructor() {       
-        this._connectionId   = 0;
+    constructor() {
+        this._connectionId   = null;
         this._openRequested  = false;
         this._openCanceled   = false;
         this._bitrate        = 0;
@@ -128,8 +128,14 @@ class Connection {
         throw new TypeError("Abstract method");
     }
 
+    // _connectionId can legitimately be 0 for some transports, so callers must
+    // not test it for truthiness - only null/false mean "not connected".
+    hasConnectionId() {
+        return this._connectionId !== null && this._connectionId !== false;
+    }
+
     disconnect(callback) {
-        if (this._connectionId) {
+        if (this.hasConnectionId()) {
             this.emptyOutputBuffer();
             this.removeAllListeners();
 

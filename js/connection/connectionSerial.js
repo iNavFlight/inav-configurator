@@ -94,11 +94,11 @@ class ConnectionSerial extends Connection {
     }
 
     disconnectImplementation(callback) {
-        this.completeClose('serial', this._connectionId ? window.electronAPI.serialClose() : null, callback);
+        this.completeClose('serial', this.hasConnectionId() ? window.electronAPI.serialClose() : null, callback);
     }
 
     sendImplementation(data, callback) {
-        this.completeSend('Serial', this._connectionId ? window.electronAPI.serialSend(data) : null, callback);
+        this.completeSend('Serial', this.hasConnectionId() ? window.electronAPI.serialSend(data) : null, callback);
     }
 
     addOnReceiveCallback(callback){
