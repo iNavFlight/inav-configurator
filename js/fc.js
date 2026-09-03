@@ -203,11 +203,17 @@ var FC = {
 
         this.generateAuxConfig = function () {
             console.log('Generating AUX_CONFIG');
+            // AUX_CONFIG and AUX_CONFIG_IDS must stay the same length and index-aligned —
+            // tabs/auxiliary.js pairs them by position, so an unrecognized id must be
+            // dropped from both, not just from the name list.
+            const ids = this.AUX_CONFIG_IDS;
             this.AUX_CONFIG = [];
-            for ( let i = 0; i < this.AUX_CONFIG_IDS.length; i++ ) {
-                let found = FLIGHT_MODES.find( mode => mode.permanentId === this.AUX_CONFIG_IDS[i] );
+            this.AUX_CONFIG_IDS = [];
+            for ( let i = 0; i < ids.length; i++ ) {
+                let found = FLIGHT_MODES.find( mode => mode.permanentId === ids[i] );
                 if (found) {
                     this.AUX_CONFIG.push(found.boxName);
+                    this.AUX_CONFIG_IDS.push(ids[i]);
                 }
             }
         };
