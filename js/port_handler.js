@@ -105,6 +105,11 @@ PortHandler.check = function () {
                     $('#wireless-mode').prop('checked', true).trigger('change');
                 }
 
+                if (store.get('wireless_mavlink_tunnel_enabled', false)) {
+                    $('#wireless-mavlink-tunnel').prop('checked', true).trigger('change');
+                }
+
+                $('#wireless-mavlink-sysid').val(store.get('wireless_mavlink_sysid', '0'));
             }
 
             if (!self.initial_ports) {

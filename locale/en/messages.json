@@ -688,6 +688,9 @@
     "tabSwitchUpgradeRequired": {
         "message": "You need to <strong>upgrade</strong> your firmware before you can use the $1 tab."
     },
+    "tabSwitchMavlinkTunnelUnavailable": {
+        "message": "CLI is not available over MAVLink tunnel mode."
+    },
     "firmwareVersion": {
         "message": "Firmware Version: <strong>$1</strong>"
     },
@@ -3537,6 +3540,21 @@
     },
     "wirelessModeSwitch": {
         "message": "Wireless mode"
+    },
+    "wirelessMavlinkTunnelSwitch": {
+        "message": "MAVLink Tunnel"
+    },
+    "wirelessMavlinkSysidLabel": {
+        "message": "SysID"
+    },
+    "mavlinkTunnelWaitingHeartbeat": {
+        "message": "Waiting for MAVLink heartbeat ($1)"
+    },
+    "mavlinkTunnelHeartbeatDetected": {
+        "message": "MAVLink heartbeat detected on SYSID $1"
+    },
+    "mavlinkTunnelHeartbeatTimeout": {
+        "message": "No MAVLink heartbeat received for tunnel mode"
     },
     "rthConfiguration": {
         "message": "RTH Settings"

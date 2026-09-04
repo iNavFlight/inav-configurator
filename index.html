@@ -44,6 +44,10 @@
                 </div>
                 <div id="portsinput">
                     <div class="portsinput__row">
+                        <div id="mavlink-sysid-option" class="portsinput__top-element portsinput__top-element--port-override" style="display: none;">
+                            <label for="wireless-mavlink-sysid" i18n="wirelessMavlinkSysidLabel"></label>
+                            <input id="wireless-mavlink-sysid" type="number" min="0" max="255" value="0" />
+                        </div>
                         <div id="port-override-option" class="portsinput__top-element portsinput__top-element--port-override">
                             <label id="port-override-label" for="port-override" i18n="mainPortOverrideLabel"></label>
                             <input id="port-override" type="text" value="/dev/rfcomm0" />
@@ -77,6 +81,12 @@
                                 <span class="" data-i18n="wirelessModeSwitch"></span>
                             </label>
                             <input id="wireless-mode" class="togglesmall" type="checkbox" />
+                        </div>
+                        <div id="mavlink-tunnel-option" class="portsinput__top-element portsinput__top-element--inline" style="display: none;">
+                            <label for="wireless-mavlink-tunnel">
+                                <span data-i18n="wirelessMavlinkTunnelSwitch"></span>
+                            </label>
+                            <input id="wireless-mavlink-tunnel" class="togglesmall" type="checkbox" />
                         </div>
                     </div>
                 </div>

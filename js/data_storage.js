@@ -8,6 +8,7 @@ var CONFIGURATOR = {
     'connectionValidCliOnly': false,
     'cliActive': false,
     'cliValid': false,
+    'mavlinkTunnelActive': false,
     'connection': false
 };
 

@@ -24,6 +24,7 @@ class Connection {
         this._onReceiveListeners      = [];
         this._onReceiveErrorListeners = [];
         this._type = null;
+        this._timeoutOverride = null;
         
         if (this.constructor === Connection) {
             throw new TypeError("Abstract class, cannot be instanced.");
@@ -260,11 +261,19 @@ class Connection {
         this._transmitting = false;
     }
 
+    setTimeoutOverride(timeoutMs) {
+        this._timeoutOverride = timeoutMs;
+    }
+
     /**
      * Default timeout values
      * @returns {number} [ms]
      */
     getTimeout() {
+        if (this._timeoutOverride !== null) {
+            return this._timeoutOverride;
+        }
+
         if (this._bitrate >= 57600) {
             return 3000;
         } if (this._bitrate >= 19200) {
