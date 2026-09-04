@@ -90,7 +90,7 @@ class ConnectionUdp extends Connection {
     }
 
     disconnectImplementation(callback) {
-        if (this._connectionId) {
+        if (this.hasConnectionId()) {
             window.electronAPI.udpClose().then(response => {
                 var ok = true;
                 if (response.error) {
@@ -104,8 +104,8 @@ class ConnectionUdp extends Connection {
         }  
     }
 
-   sendImplementation(data, callback) {    
-        if (this._connectionId) {
+   sendImplementation(data, callback) {
+        if (this.hasConnectionId()) {
             window.electronAPI.udpSend(data).then(response => {
                 var result = 0;
                 var sent = response.bytesWritten;
