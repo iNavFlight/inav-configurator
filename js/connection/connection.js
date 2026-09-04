@@ -129,8 +129,14 @@ class Connection {
         throw new TypeError("Abstract method");
     }
 
+    // _connectionId can legitimately be 0 (e.g. ConnectionExt's SITL WASM port),
+    // so callers must not test it for truthiness - only null/false mean "not connected".
+    hasConnectionId() {
+        return this._connectionId !== null && this._connectionId !== false;
+    }
+
     disconnect(callback) {
-        if (this._connectionId !== null && this._connectionId !== false) {
+        if (this.hasConnectionId()) {
             this.emptyOutputBuffer();
             this.removeAllListeners();
 

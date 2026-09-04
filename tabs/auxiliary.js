@@ -58,7 +58,7 @@ auxiliaryTab.initialize = function (callback) {
         modeSections["Flight Mode Modifiers"] = ["NAV ALTHOLD", "HEADING HOLD", "AIR MODE", "SOARING", "SURFACE", "TURN ASSIST"];
         modeSections["Fixed Wing"] = ["AUTO TUNE", "SERVO AUTOTRIM", "AUTO LEVEL TRIM", "AUTO SPEED", "NAV LAUNCH", "LOITER CHANGE", "FLAPERON"];
         modeSections["Multi-rotor"] = ["FPV ANGLE MIX", "TURTLE", "MC BRAKING", "HEADFREE", "HEADADJ"];
-        modeSections["OSD Modes"] = ["OSD OFF", "OSD ALT 1", "OSD ALT 2", "OSD ALT 3"];
+        modeSections["OSD Modes"] = ["IN FLIGHT MENU", "OSD OFF", "OSD ALT 1", "OSD ALT 2", "OSD ALT 3"];
         modeSections["FPV Camera Modes"] = ["CAMSTAB", "CAMERA CONTROL 1", "CAMERA CONTROL 2", "CAMERA CONTROL 3"];
         modeSections["VTOL"] = ["MIXER PROFILE 2", "MIXER TRANSITION"];
         modeSections["Beeper"] = ["BEEPER", "BEEPER MUTE"];
@@ -305,6 +305,15 @@ auxiliaryTab.initialize = function (callback) {
             // we must send this many back to the FC - overwrite all of the old ones to be sure.
             var requiredModesRangeCount = FC.MODE_RANGES.length;
 
+            // Modes this configurator build doesn't recognize (e.g. added by a newer
+            // firmware than this local FLIGHT_MODES table knows about) get no row in
+            // the UI at all - preserve their existing assignments as-is instead of
+            // letting the rebuild below silently disable them.
+            var recognizedIds = new Set(LOCAL_AUX_CONFIG_IDS);
+            var unrecognizedRanges = FC.MODE_RANGES.filter(function (modeRange) {
+                return !recognizedIds.has(modeRange.id);
+            });
+
             FC.MODE_RANGES = [];
 
             var uniqueModes = [];
@@ -329,6 +338,10 @@ auxiliaryTab.initialize = function (callback) {
                     FC.MODE_RANGES.push(modeRange);
                 });
             });
+
+            for (var preservedIndex = 0; preservedIndex < unrecognizedRanges.length && FC.MODE_RANGES.length < requiredModesRangeCount; preservedIndex++) {
+                FC.MODE_RANGES.push(unrecognizedRanges[preservedIndex]);
+            }
 
             for (var modeRangeIndex = FC.MODE_RANGES.length; modeRangeIndex < requiredModesRangeCount; modeRangeIndex++) {
                 var defaultModeRange = {

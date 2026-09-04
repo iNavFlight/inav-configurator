@@ -93,8 +93,8 @@ class ConnectionTcp extends Connection {
     }
 
     disconnectImplementation(callback) {
-        
-        if (this._connectionId) {
+
+        if (this.hasConnectionId()) {
             window.electronAPI.tcpClose();
         }
 
@@ -107,7 +107,7 @@ class ConnectionTcp extends Connection {
     }
 
     sendImplementation(data, callback) {
-        this.completeSend('TCP', this._connectionId ? window.electronAPI.tcpSend(data) : null, callback);
+        this.completeSend('TCP', this.hasConnectionId() ? window.electronAPI.tcpSend(data) : null, callback);
     }
 
     addOnReceiveCallback(callback){

@@ -86,11 +86,11 @@ class ConnectionUdp extends Connection {
     }
 
     disconnectImplementation(callback) {
-        this.completeClose('UDP', this._connectionId ? window.electronAPI.udpClose() : null, callback);
+        this.completeClose('UDP', this.hasConnectionId() ? window.electronAPI.udpClose() : null, callback);
     }
 
     sendImplementation(data, callback) {
-        this.completeSend('UDP', this._connectionId ? window.electronAPI.udpSend(data) : null, callback);
+        this.completeSend('UDP', this.hasConnectionId() ? window.electronAPI.udpSend(data) : null, callback);
     }
 
     addOnReceiveCallback(callback){
