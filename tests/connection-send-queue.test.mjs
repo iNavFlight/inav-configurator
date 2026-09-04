@@ -135,8 +135,8 @@ test('send() completes instead of wedging the queue when there is no port', asyn
     installElectronApiStub({ send: () => Promise.resolve({ error: false, bytesWritten: 3 }) });
 
     const connection = new ConnectionSerial();
-    // _connectionId is 0 out of the constructor: the port vanished (or was never
-    // opened) while the app still holds this singleton.
+    // _connectionId is null out of the constructor: the port vanished (or was
+    // never opened) while the app still holds this singleton.
     let sendInfo = null;
     connection.send(payload, (info) => { sendInfo = info; });
     await settle();
@@ -179,7 +179,9 @@ test('the queue keeps draining after the port disappears mid-session', async () 
     await settle();
     assert.equal(firstInfo.resultCode, 0, 'sanity: the first write goes out normally');
 
-    connection._connectionId = 0;
+    // false, not 0 - 0 is a legitimate connection id (e.g. ConnectionExt's SITL WASM
+    // port), so hasConnectionId() only treats null/false as "no port".
+    connection._connectionId = false;
 
     const results = [];
     connection.send(payload, (info) => results.push(info));
