@@ -37,6 +37,7 @@ function getModeLabel(mode) {
 const dronecanTab = {};
 let nameCache = {};
 let currentDetailNodeId = null;
+let dnaSettingLoaded = false;
 
 function encodeParamValueBytes(value_type, value) {
     switch (value_type) {
@@ -103,7 +104,9 @@ function dronecanAsyncPoll(service_id, node_id, params, onDone, requestAttempts 
                 const r = FC.DRONECAN_ASYNC_RESULT;
                 if (!r || r.seq !== expectedSeq ||
                     r.service_id !== service_id || r.node_id !== node_id) {
-                    onDone(new Error('stale'), null); return;
+                    if (++attempts < POLL_MAX_ATTEMPTS) { setTimeout(poll, POLL_INTERVAL_MS); }
+                    else { onDone(new Error('stale'), null); }
+                    return;
                 }
                 if (r.state === DRONECAN_ASYNC_STATE_READY) { onDone(null, r); }
                 else if (r.state === DRONECAN_ASYNC_STATE_ERROR) { onDone(new Error('error'), null); }
@@ -142,6 +145,15 @@ dronecanTab.initialize = function (callback) {
                 return mspHelper.getSetting('dronecan_node_id');
             }).then(data => {
                 if (data) $('#dronecan-node-id').val(data.value);
+                return mspHelper.getSetting('dronecan_use_dna_server');
+            }).then(data => {
+                if (data) $('#dronecan-use-dna-server').prop('checked', data.value !== 0);
+            }).catch(err => {
+                console.debug('dronecan: dronecan_use_dna_server setting not available:', err && err.message);
+                // Leave checkbox at default (unchecked) and continue.
+            }).finally(() => {
+                dnaSettingLoaded = true;
+                $('#dronecan-use-dna-server').prop('disabled', false);
             });
             $('#dronecan-save').on('click', dronecanTab.saveConfig);
             dronecanTab.refresh();
@@ -457,21 +469,28 @@ function finishSaveConfigAndReboot() {
     });
 }
 
-function saveNodeIdAndReboot(nodeId) {
+function saveNodeIdAndReboot(nodeId, useDNAServer) {
     mspHelper.setSetting('dronecan_node_id', nodeId, () => {
-        mspHelper.saveToEeprom(finishSaveConfigAndReboot);
+        mspHelper.setSetting('dronecan_use_dna_server', useDNAServer, () => {
+            mspHelper.saveToEeprom(finishSaveConfigAndReboot);
+        });
     });
 }
 
 dronecanTab.saveConfig = function () {
+    if (!dnaSettingLoaded) {
+        console.warn('dronecan: save blocked, dronecan_use_dna_server not yet read');
+        return;
+    }
     const bitrate = $('#dronecan-bitrate').val();
     const nodeId = Number.parseInt($('#dronecan-node-id').val(), 10);
     if (!isValidDronecanNodeId(nodeId)) {
         dialog.alert(i18n.getMessage('dronecanNodeIdInvalid'));
         return;
     }
+    const useDNAServer = $('#dronecan-use-dna-server').prop('checked') ? 1 : 0;
     if (nodeId >= 126 && !confirm(i18n.getMessage('dronecanNodeIdReservedWarning'))) return;
-    mspHelper.setSetting('dronecan_bitrate_kbps', bitrate, () => saveNodeIdAndReboot(nodeId));
+    mspHelper.setSetting('dronecan_bitrate_kbps', bitrate, () => saveNodeIdAndReboot(nodeId, useDNAServer));
 };
 
 dronecanTab.cleanup = function (callback) {

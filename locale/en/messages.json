@@ -211,9 +211,7 @@
     "dronecanColNodeID": {
         "message": "Node ID"
     },
-    "dronecanColUptime": {
-        "message": "Uptime"
-    },
+
     "dronecanNodesTitle": {
         "message": "DroneCAN Nodes"
     },
@@ -246,6 +244,9 @@
     },
     "dronecanDetailColValue": {
         "message": "Value"
+    },
+    "dronecanUseDnaServer": {
+        "message": "Enable Dynamic Node Allocation server"
     },
     "dronecanParamColIndex": {
         "message": "#"
