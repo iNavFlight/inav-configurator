@@ -150,6 +150,10 @@ $(function() {
                 }
 
                 if (GUI.allowedTabs.indexOf(tab) < 0) {
+                    if (CONFIGURATOR.mavlinkTunnelActive && tab === 'cli') {
+                        GUI.log(i18n.getMessage('tabSwitchMavlinkTunnelUnavailable'));
+                        return;
+                    }
                     GUI.log(i18n.getMessage('tabSwitchUpgradeRequired', [tabName]));
                     return;
                 }

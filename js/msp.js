@@ -91,6 +91,7 @@ var MSP = {
     lastFrameReceivedMs: 0,
 
     processData: null,
+    transportTransform: null,
 
     init() {
         mspQueue.setPutCallback(this.putCallback);
@@ -99,6 +100,10 @@ var MSP = {
 
     setProcessData(cb) {
         this.processData = cb;
+    },
+
+    setTransportTransform(cb) {
+        this.transportTransform = cb;
     },
 
     read: function (readInfo) {
@@ -370,7 +375,7 @@ var MSP = {
 
         var message = new MspMessageClass();
         message.code = code;
-        message.messageBody = buffer;
+        message.messageBody = this.transportTransform ? this.transportTransform(buffer) : buffer;
         message.onFinish = callback_msp;
         message.onSend = callback_sent;
 
@@ -446,6 +451,7 @@ var MSP = {
         this.last_received_timestamp = null;
         this.analog_last_received_timestamp = null;
         this.lastFrameReceivedMs = 0;
+        this.transportTransform = null;
 
         this.callbacks_cleanup();
     },
