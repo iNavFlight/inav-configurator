@@ -3838,11 +3838,17 @@
     "wpRestartMissionHelp": {
         "message": "Sets restart behaviour for a WP mission when interrupted mid mission. START from first WP, RESUME from last active WP or SWITCH between START and RESUME each time WP Mode is reselected ON. SWITCH effectively allows resuming once only from a previous mid mission waypoint after which the mission will restart from the first waypoint."
     },
-    "wpTurnSmoothing": {
-        "message": "Waypoint Turn Smoothing"
+    "wpTurnMode": {
+        "message": "Waypoint Turn Mode"
     },
-    "wpTurnSmoothingHelp": {
-        "message": "Smooths turns during WP missions by switching to a loiter turn at waypoints. When set to ON the craft will reach the waypoint during the turn. When set to ON-CUT the craft will turn inside the waypoint without actually reaching it (cuts the corner)."
+    "wpTurnModeHelp": {
+        "message": "Fixed wing only: How the aircraft turns at waypoints during missions. DIRECT uses the classic reactive heading controller (legacy behaviour). The COORD modes fly the turn as an explicit coordinated arc of the aircraft's real turn radius (from speed and maximum navigation bank angle): COORD_FLYBY starts the turn early so the flight path joins the next leg smoothly without overshoot - the corner is cut and the waypoint is passed abeam instead of overflown. COORD_FLYOVER flies directly over the waypoint, then rolls out exactly on the line to the next waypoint. COORD_FLYINTO eases away from the corner before the waypoint and then crosses it already aligned on the outbound course (survey/mapping line entries). Autoland approach turns always fly COORD_FLYBY, regardless of this setting."
+    },
+    "wpTurnMaxLeadTime": {
+        "message": "Waypoint Turn Max Lead Time"
+    },
+    "wpTurnMaxLeadTimeHelp": {
+        "message": "Fixed wing COORD_FLYBY turns only: Limits how early before a waypoint the turn is allowed to start [ms]. The required lead time grows with speed and turn angle; a too-low cap forces late turn-ins and overshoot. Raise towards 12000 for sluggish models, lower towards 3000 to keep turns close to the waypoint [3000-12000]."
     },
     "navMotorStop": {
         "message": "Navigation Motor Stop Override"
