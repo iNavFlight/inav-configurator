@@ -36,10 +36,11 @@
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync, writeFileSync, mkdtempSync, rmSync } from 'node:fs';
+import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, dirname, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import { makeRewriteAndWrite } from './helpers/rewriteAndWrite.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const repoRoot = resolve(__dirname, '..');
@@ -82,27 +83,7 @@ const mockBitHelperUrl = dataModule(`
 // so it can be loaded directly off disk with no rewriting.
 const realFlightModesUrl = pathToFileURL(join(repoRoot, 'js/flightModes.js')).href;
 
-/**
- * Rewrite the listed import specifiers in a real source file and write the
- * result to a temp module. Throws loudly if a pattern stops matching, so a
- * future reshuffle of those imports fails the test instead of passing
- * vacuously.
- */
-function rewriteAndWrite(relSrcPath, rules, outNamePrefix) {
-    let source = readFileSync(join(repoRoot, relSrcPath), 'utf8');
-    for (const [regex, replacement, label] of rules) {
-        if (!regex.test(source)) {
-            throw new Error(
-                `fc-generate-aux-config.test.mjs: expected to find and replace "${label}" in ${relSrcPath} ` +
-                `but the pattern ${regex} did not match. Update the test's substitution rules.`
-            );
-        }
-        source = source.replace(regex, replacement);
-    }
-    const outPath = join(tmpDir, `${outNamePrefix}.mjs`);
-    writeFileSync(outPath, source, 'utf8');
-    return pathToFileURL(outPath).href;
-}
+const rewriteAndWrite = makeRewriteAndWrite(repoRoot, tmpDir, 'fc-generate-aux-config.test.mjs');
 
 const realFcUrl = rewriteAndWrite('js/fc.js', [
     [/^import ServoMixerRuleCollection from '\.\/servoMixerRuleCollection';$/m, `import ServoMixerRuleCollection from '${mockClassUrl}';`, "import ServoMixerRuleCollection"],
