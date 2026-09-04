@@ -1415,6 +1415,27 @@ OSD.constants = {
             ]
         },
         {
+            name: 'osdGroupThermalCamera',
+            enabled: function() {
+                return HARDWARE.capabilities.useMztcCamera;
+            },
+            items: [
+                {
+                    name: 'MZTC_STATUS',
+                    id: 171,
+                    // min_version stays commented out until the firmware
+                    // version is bumped, matching AUTO SPEED. The
+                    // maintenance-10.x firmware still reports 9.x, so a
+                    // 10.0.0 gate would hide the element on the builds that
+                    // actually support it.
+                    // min_version: '10.0.0',
+                    preview: function(osd_data) {
+                        return 'IR OK ';
+                    }
+                },
+            ]
+        },
+        {
             name: 'osdGroupTimers',
             items: [
                 {
@@ -3573,7 +3594,8 @@ HARDWARE.init = function() {
         useRx: false,
         useCRSF: false,
         useBaro: false,
-        usePitot: false
+        usePitot: false,
+        useMztcCamera: false
     };
 };
 
@@ -3591,6 +3613,9 @@ HARDWARE.update = function(callback) {
             }
             if (port.functions.includes('ESC')) {
                 HARDWARE.capabilities.useESCTelemetry = true;
+            }
+            if (port.functions.includes('MZTC_CAMERA')) {
+                HARDWARE.capabilities.useMztcCamera = true;
             }
         });
 

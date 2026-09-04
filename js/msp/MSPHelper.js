@@ -9,6 +9,12 @@ import MSPCodes from './MSPCodes';
 import FC from './../fc';
 import VTX from './../vtx';
 import mspQueue from './../serial_queue';
+
+// Fixed MZTC payload sizes, mirroring MSP2_MZTC_CONFIG_PAYLOAD_SIZE and
+// MSP2_MZTC_STATUS_PAYLOAD_SIZE in the firmware's msp_mztc.h. Naming them here
+// keeps the parse and the build path from drifting apart.
+const MZTC_CONFIG_BYTES = 11;
+const MZTC_STATUS_BYTES = 7;
 import ServoMixRule from './../servoMixRule';
 import MotorMixRule from './../motorMixRule';
 import LogicCondition from './../logicCondition';
@@ -1854,6 +1860,54 @@ var mspHelper = (function () {
                 console.log("Geozone saved")
                 break;    
 
+            case MSPCodes.MSP2_MZTC_CONFIG:
+                // Fixed 12 byte payload, little endian, one field at a time.
+                // The firmware writes it with the sbufWrite helpers, so there
+                // is no compiler padding to account for here. The serial port
+                // and its baud rate are not in this payload. They live in the
+                // Ports tab.
+                if (data.byteLength >= MZTC_CONFIG_BYTES) {
+                    FC.MZTC_CONFIG = {
+                        preset: data.getUint8(0),
+                        palette_mode: data.getUint8(1),
+                        auto_shutter: data.getUint8(2),
+                        digital_enhancement: data.getUint8(3),
+                        spatial_denoise: data.getUint8(4),
+                        temporal_denoise: data.getUint8(5),
+                        brightness: data.getUint8(6),
+                        contrast: data.getUint8(7),
+                        zoom_level: data.getUint8(8),
+                        mirror_mode: data.getUint8(9),
+                        ffc_interval: data.getUint8(10)
+                    };
+                } else {
+                    console.log('MZTC_CONFIG payload too short: ' + data.byteLength +
+                                ' bytes, expected ' + MZTC_CONFIG_BYTES);
+                }
+                break;
+
+            case MSPCodes.MSP2_MZTC_STATUS:
+                // Fixed 7 byte payload. connected is set only after the camera
+                // has answered a command. An open UART does not set it.
+                if (data.byteLength >= MZTC_STATUS_BYTES) {
+                    FC.MZTC_STATUS = {
+                        status: data.getUint8(0),
+                        preset: data.getUint8(1),
+                        connected: data.getUint8(2),
+                        connection_quality: data.getUint8(3),
+                        last_calibration: data.getUint16(4, true),
+                        error_flags: data.getUint8(6)
+                    };
+                } else {
+                    console.log('MZTC_STATUS payload too short: ' + data.byteLength + ' bytes, expected ' + MZTC_STATUS_BYTES);
+                    FC.MZTC_STATUS = null;
+                }
+                break;
+
+            case MSPCodes.MSP2_SET_MZTC_CONFIG:
+                console.log("MZTC config saved");
+                break;
+
             default:
                 console.log('Unknown code detected: 0x' + dataHandler.code.toString(16));
         } else {
@@ -2456,6 +2510,27 @@ var mspHelper = (function () {
                 buffer.push(FC.EZ_TUNE.snappiness);
                 break;
 
+
+            case MSPCodes.MSP2_SET_MZTC_CONFIG:
+                // Fixed 12 byte payload matching MSP2_MZTC_CONFIG. The firmware
+                // validates the whole request before applying any of it, so an
+                // out of range value is rejected in full.
+                // One push in field order. The field order is the wire order,
+                // and it has to match MSP2_MZTC_CONFIG in the firmware.
+                buffer.push(
+                    FC.MZTC_CONFIG.preset,
+                    FC.MZTC_CONFIG.palette_mode,
+                    FC.MZTC_CONFIG.auto_shutter,
+                    FC.MZTC_CONFIG.digital_enhancement,
+                    FC.MZTC_CONFIG.spatial_denoise,
+                    FC.MZTC_CONFIG.temporal_denoise,
+                    FC.MZTC_CONFIG.brightness,
+                    FC.MZTC_CONFIG.contrast,
+                    FC.MZTC_CONFIG.zoom_level,
+                    FC.MZTC_CONFIG.mirror_mode,
+                    FC.MZTC_CONFIG.ffc_interval
+                );
+                break;
 
             default:
                 return false;
@@ -3111,6 +3186,18 @@ var mspHelper = (function () {
 
     self.queryFcStatus = function (callback) {
         MSP.send_message(MSPCodes.MSPV2_INAV_STATUS, false, false, callback);
+    };
+
+    self.loadMZTCConfig = function (callback) {
+        MSP.send_message(MSPCodes.MSP2_MZTC_CONFIG, false, false, callback);
+    };
+
+    self.loadMZTCStatus = function (callback) {
+        MSP.send_message(MSPCodes.MSP2_MZTC_STATUS, false, false, callback);
+    };
+
+    self.saveMZTCConfig = function (callback) {
+        MSP.send_message(MSPCodes.MSP2_SET_MZTC_CONFIG, mspHelper.crunch(MSPCodes.MSP2_SET_MZTC_CONFIG), false, callback);
     };
 
     self.loadMiscV2 = function (callback) {

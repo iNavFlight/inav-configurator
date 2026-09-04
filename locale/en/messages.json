@@ -1736,6 +1736,54 @@
     "portsFunction_HEADTRACKER": {
         "message": "Serial Headtracker"
     },
+    "portsFunction_MZTC_CAMERA": {
+        "message": "MassZero Thermal Camera"
+    },
+    "osdElement_MZTC_STATUS": {
+        "message": "Thermal Camera Status"
+    },
+    "configurationThermalCamera": {
+        "message": "MassZero Thermal Camera"
+    },
+    "configurationThermalCameraNote": {
+        "message": "Assign MZTC_CAMERA to a UART in the Ports tab to enable the camera. The port and its baud rate are set there. The camera ships at 115200."
+    },
+    "configurationThermalCameraPreset": {
+        "message": "Purpose preset"
+    },
+    "configurationThermalCameraPalette": {
+        "message": "Colour palette"
+    },
+    "configurationThermalCameraZoom": {
+        "message": "Digital zoom"
+    },
+    "configurationThermalCameraAdvanced": {
+        "message": "Advanced image tuning"
+    },
+    "configurationThermalCameraMirror": {
+        "message": "Image mirroring"
+    },
+    "configurationThermalCameraBrightness": {
+        "message": "Brightness [0-100]"
+    },
+    "configurationThermalCameraContrast": {
+        "message": "Contrast [0-100]"
+    },
+    "configurationThermalCameraEnhancement": {
+        "message": "Digital enhancement [0-100]"
+    },
+    "configurationThermalCameraSpatialDenoise": {
+        "message": "Spatial denoising [0-100]"
+    },
+    "configurationThermalCameraTemporalDenoise": {
+        "message": "Temporal denoising [0-100]"
+    },
+    "configurationThermalCameraAutoShutter": {
+        "message": "Automatic shutter mode"
+    },
+    "configurationThermalCameraFFCInterval": {
+        "message": "Shutter interval [minutes]"
+    },
     "portsFunction_CRSF_SENSOR": {
         "message": "CRSF Sensor"
     },
@@ -4495,6 +4543,9 @@
     },
     "osdGroupAltitude": {
         "message": "Altitude"
+    },
+    "osdGroupThermalCamera": {
+        "message": "Thermal Camera"
     },
     "osdGroupTimers": {
         "message": "Timers"
