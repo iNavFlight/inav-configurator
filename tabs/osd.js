@@ -2065,6 +2065,24 @@ OSD.constants = {
                     positionable: true,
                     preview: FONT.symbol(SYM.RX_MODE) + '150HZ '
                 },
+                {
+                    name: 'ACTIVE_RX_LINK',
+                    id: 171,
+                    positionable: true,
+                    preview: 'RX:1'
+                },
+                {
+                    name: 'RX1_LINK_STATS',
+                    id: 172,
+                    positionable: true,
+                    preview: 'RX1 LQ100'
+                },
+                {
+                    name: 'RX2_LINK_STATS',
+                    id: 173,
+                    positionable: true,
+                    preview: 'RX2 LQ100'
+                },
             ]
         },
         {
@@ -3596,8 +3614,15 @@ HARDWARE.update = function(callback) {
 
         // Update RX data for Crossfire detection
         mspHelper.loadRxConfig(function() {
-            HARDWARE.capabilities.useCRSF = (FC.RX_CONFIG.serialrx_provider == 6); // CRSF
-            HARDWARE.capabilities.useRx = (FC.RX_CONFIG.serialrx_provider == 6 || FC.RX_CONFIG.receiver_type == 2 || FC.RX_CONFIG.serialrx_provider == 12); // CRSF or MSP or MAVLINK
+        HARDWARE.capabilities.useCRSF =
+            FC.RX_CONFIG.serialrx_provider == 6 ||
+            (FC.RX_CONFIG.dualRxEnabled && FC.RX_CONFIG.serialrx_provider_secondary == 6);
+
+        HARDWARE.capabilities.useRx =
+            FC.RX_CONFIG.serialrx_provider == 6 ||
+            FC.RX_CONFIG.receiver_type == 2 ||
+            FC.RX_CONFIG.serialrx_provider == 12 ||
+            FC.RX_CONFIG.dualRxEnabled;
 
             mspHelper.loadSensorConfig(function () {
                 HARDWARE.capabilities.useBaro  = (FC.SENSOR_CONFIG.barometer != 0);

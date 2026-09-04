@@ -1162,6 +1162,18 @@
     "configurationReceiver": {
         "message": "Receiver Mode"
     },
+    "receiverPrimaryMode": {
+        "message": "RX1 Receiver Mode"
+    },
+    "receiverSecondaryMode": {
+        "message": "RX2 Receiver Mode"
+    },
+    "configurationDualReceivers": {
+        "message": "Dual Receivers"
+    },
+    "configurationDualReceiversHelp": {
+        "message": "Enables two live receiver links with latched failover. Configure RX2 on the Receiver tab and assign Secondary RX to its serial port on the Ports tab."
+    },
     "configurationRSSI": {
         "message": "RSSI (Signal Strength)"
     },
@@ -1700,7 +1712,10 @@
         "message": "SmartPort Master"
     },
     "portsFunction_RX_SERIAL": {
-        "message": "Serial RX"
+        "message": "Serial RX1"
+    },
+    "portsFunction_RX_SERIAL_SECONDARY": {
+        "message": "Serial RX2"
     },
     "portsFunction_BLACKBOX": {
         "message": "Blackbox"
@@ -2097,6 +2112,78 @@
     },
     "receiverHelp": {
         "message": "Please read receiver chapter of the documentation.  Configure serial port (if required), receiver mode (serial/ppm/pwm), provider (for serial receivers), bind receiver, set channel map, configure channel endpoints/range on TX so that all channels go from ~1000 to ~2000.  Set midpoint (default 1500), trim channels to 1500, configure stick deadband, verify behaviour when TX is off or out of range. Make sure that the channel values all increase when you push the sticks up and to the right. If not, reverse the channel in the TX. Do not apply any other mixing in the TX.<br /><span style=\"color: red\">IMPORTANT:</span> Before flying read failsafe chapter of documentation and configure failsafe."
+    },
+    "receiverSecondaryHelp": {
+        "message": "Configure RX2 for Dual RX. The secondary receiver remains live in standby and becomes the control source only after failover or an explicit handover."
+    },
+    "receiverDualStatusTitle": {
+        "message": "Dual RX Status"
+    },
+    "receiverActiveLink": {
+        "message": "Active link"
+    },
+    "receiverDualStatus": {
+        "message": "Dual RX"
+    },
+    "receiverLastSwitch": {
+        "message": "Last switch"
+    },
+    "receiverSelectRx1": {
+        "message": "Handover to RX1"
+    },
+    "receiverSelectRx2": {
+        "message": "Handover to RX2"
+    },
+    "receiverStatusUnavailable": {
+        "message": "Unavailable"
+    },
+    "receiverLinkNotConfigured": {
+        "message": "Not configured"
+    },
+    "receiverLinkInitError": {
+        "message": "Initialization error"
+    },
+    "receiverLinkLost": {
+        "message": "Lost"
+    },
+    "receiverLinkOk": {
+        "message": "OK"
+    },
+    "receiverDualDisabled": {
+        "message": "Disabled"
+    },
+    "receiverDualOk": {
+        "message": "OK"
+    },
+    "receiverDualRx1NotConfigured": {
+        "message": "RX1 not configured"
+    },
+    "receiverDualRx2NotConfigured": {
+        "message": "RX2 not configured"
+    },
+    "receiverDualUnsupportedPair": {
+        "message": "Unsupported receiver pair"
+    },
+    "receiverDualInitFailed": {
+        "message": "Receiver initialization failed"
+    },
+    "receiverSwitchBoot": {
+        "message": "Boot"
+    },
+    "receiverSwitchLinkLoss": {
+        "message": "Link loss"
+    },
+    "receiverSwitchLogicHandover": {
+        "message": "Programming handover"
+    },
+    "receiverSwitchMspHandover": {
+        "message": "Configurator/MSP handover"
+    },
+    "receiverSwitchApiHandover": {
+        "message": "API handover"
+    },
+    "receiverHandoverRefused": {
+        "message": "Receiver handover refused: target link is not currently usable."
     },
     "receiverThrottleMid": {
         "message": "Throttle MID"
@@ -4122,6 +4209,15 @@
     },
     "osdElement_RX_MODE": {
         "message": "Rx Mode"
+    },
+    "osdElement_ACTIVE_RX_LINK": {
+        "message": "Active RX link"
+    },
+    "osdElement_RX1_LINK_STATS": {
+        "message": "RX1 link status"
+    },
+    "osdElement_RX2_LINK_STATS": {
+        "message": "RX2 link status"
     },
     "osdElement_CUSTOM_ELEMENT_1": {
         "message": "Custom Element 1"
