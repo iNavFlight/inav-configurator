@@ -2,6 +2,7 @@ import '../src/css/styles.css'
 
 import $ from 'jquery';
 import 'jquery-ui-dist/jquery-ui';
+import jBox from 'jbox';
 import * as THREE from 'three'
 
 import GUI, { TABS } from './gui';
@@ -56,6 +57,152 @@ import dialog from './dialog'
 
 window.$ = $;
 
+function showGoogleApiTestResult($result, messages) {
+    $result.empty();
+    messages.forEach((message, index) => {
+        if (index > 0) {
+            $result.append($('<br>'));
+        }
+        $result.append(document.createTextNode(message));
+    });
+}
+
+async function readGoogleApiResponse(response) {
+    const data = await response.json();
+    if (!response.ok) {
+        throw new Error(data.error?.message || response.statusText || String(response.status));
+    }
+    return data;
+}
+
+function createGoogleApiUrl(baseUrl, parameters) {
+    const url = new URL(baseUrl);
+    Object.entries(parameters).forEach(([name, value]) => {
+        url.searchParams.set(name, value);
+    });
+    return url;
+}
+
+function getGoogleApiErrorMessage(error, apiKey) {
+    return String(error.message || error).replaceAll(apiKey, '');
+}
+
+async function testGoogleApiKey(event) {
+    event.preventDefault();
+
+    const apiKey = String($('#google-api-key').val() || '').trim();
+    const $result = $('#google-api-key-result');
+    if (!apiKey) {
+        showGoogleApiTestResult($result, [i18n.getMessage('googleLocationTestNoKey')]);
+        return;
+    }
+
+    showGoogleApiTestResult($result, [i18n.getMessage('googleLocationTestPending')]);
+
+    try {
+        const locationUrl = createGoogleApiUrl('https://www.googleapis.com/geolocation/v1/geolocate', {
+            key: apiKey,
+        });
+        const locationResponse = await fetch(locationUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ considerIp: true }),
+        });
+        const locationData = await readGoogleApiResponse(locationResponse);
+        if (!locationData.location) {
+            throw new Error(locationData.error?.message || JSON.stringify(locationData));
+        }
+
+        const latitude = locationData.location.lat;
+        const longitude = locationData.location.lng;
+        const locationMessage = i18n.getMessage('googleLocationTestSuccess', [
+            latitude.toFixed(4),
+            longitude.toFixed(4),
+            Math.round(locationData.accuracy),
+        ]);
+        const resultMessages = [locationMessage];
+
+        try {
+            const geocodingUrl = createGoogleApiUrl('https://maps.googleapis.com/maps/api/geocode/json', {
+                latlng: `${latitude},${longitude}`,
+                key: apiKey,
+            });
+            const geocodingData = await readGoogleApiResponse(await fetch(geocodingUrl));
+            if (geocodingData.status !== 'OK') {
+                throw new Error(geocodingData.error_message || geocodingData.status);
+            }
+        } catch (geocodingError) {
+            resultMessages.push(i18n.getMessage('googleLocationTestGeocodingFail', [
+                getGoogleApiErrorMessage(geocodingError, apiKey),
+            ]));
+        }
+
+        try {
+            const weatherUrl = createGoogleApiUrl('https://weather.googleapis.com/v1/currentConditions:lookup', {
+                key: apiKey,
+                'location.latitude': latitude,
+                'location.longitude': longitude,
+            });
+            const weatherData = await readGoogleApiResponse(await fetch(weatherUrl));
+            if (weatherData.wind?.speed) {
+                const windUnit = weatherData.wind.speed.unit === 'KILOMETERS_PER_HOUR' ? 'km/h' : 'mph';
+                resultMessages.push(i18n.getMessage('googleLocationTestWeather', [
+                    weatherData.wind.speed.value,
+                    windUnit,
+                ]));
+            } else {
+                resultMessages.push(i18n.getMessage('googleLocationTestWeatherSuccess'));
+            }
+        } catch (weatherError) {
+            resultMessages.push(i18n.getMessage('googleLocationTestWeatherFail', [
+                getGoogleApiErrorMessage(weatherError, apiKey),
+            ]));
+        }
+        showGoogleApiTestResult($result, resultMessages);
+    } catch (error) {
+        const errorMessage = getGoogleApiErrorMessage(error, apiKey);
+        showGoogleApiTestResult($result, [i18n.getMessage('googleLocationTestError', [errorMessage])]);
+    }
+}
+
+function showGoogleApiHelp(event) {
+    event.preventDefault();
+
+    const $content = $('<div class="modal__content"></div>');
+    $content.append($('<p class="modal__text"></p>').text(i18n.getMessage('googleLocationHelpBenefit')));
+    $content.append($('<p class="modal__text"></p>').text(i18n.getMessage('googleLocationHelpHowTitle')));
+
+    const $steps = $('<ol class="modal__text"></ol>');
+    for (let step = 1; step <= 5; step++) {
+        $steps.append($('<li></li>').html(i18n.getMessage(`googleLocationHelpStep${step}`)));
+    }
+    $steps.find('a[target="_blank"]').attr('rel', 'noopener noreferrer');
+    $content.append($steps);
+    $content.append($('<p class="modal__text"></p>').text(i18n.getMessage('googleLocationHelpNote')));
+
+    const $buttons = $('<div class="modal__buttons"></div>');
+    const $closeButton = $('<a class="modal__button modal__button--main" href="#"></a>')
+        .text(i18n.getMessage('googleLocationHelpClose'));
+    $buttons.append($closeButton);
+    $content.append($buttons);
+
+    const helpModal = new jBox('Modal', {
+        title: i18n.getMessage('googleLocationHelpTitle'),
+        animation: false,
+        closeOnClick: false,
+        closeOnEsc: true,
+        content: $content,
+        onCloseComplete: function () {
+            this.destroy();
+        },
+    });
+    $closeButton.on('click', function (closeEvent) {
+        closeEvent.preventDefault();
+        helpModal.close();
+    });
+    helpModal.open();
+}
+
 // Set how the units render on the configurator only
 $(function() {
     i18n.init( () => {
@@ -76,6 +223,7 @@ $(function() {
         globalSettings.unitType = store.get('unit_type', UnitType.none);
         globalSettings.mapProviderType = store.get('map_provider_type', 'osm'); 
         globalSettings.assistnowApiKey = store.get('assistnow_api_key', '');
+        globalSettings.googleApiKey = store.get('google_api_key', '');
         globalSettings.proxyURL = store.get('proxyurl', 'http://192.168.1.222/mapproxy/service?');
         globalSettings.proxyLayer = store.get('proxylayer', 'your_proxy_layer_name');
         globalSettings.showProfileParameters = store.get('show_profile_parameters', 1);
@@ -95,8 +243,9 @@ $(function() {
 
         const version = window.electronAPI.appGetVersion();
         // alternative - window.navigator.appVersion.match(/Chrome\/([0-9.]*)/)[1];
+        const runtimeVersion = navigator.userAgent.match(/Electron\/([\d.]+)/)?.[1] || 'browser';
         GUI.log(i18n.getMessage('getRunningOS') + GUI.operating_system + '</strong>, ' +
-            'Electron: <strong>' + navigator.userAgent.match(/Electron\/([\d\.]+\d+)/)[1] + '</strong>, ' +
+            'Electron: <strong>' + runtimeVersion + '</strong>, ' +
             i18n.getMessage('getConfiguratorVersion') + version + '</strong>');
 
         $('#status-bar .version').text(version);
@@ -439,6 +588,7 @@ $(function() {
                     $('#showProfileParameters').prop('checked', globalSettings.showProfileParameters);
                     $('#cliAutocomplete').prop('checked', globalSettings.cliAutocomplete);
                     $('#assistnow-api-key').val(globalSettings.assistnowApiKey);
+                    $('#google-api-key').val(globalSettings.googleApiKey);
                     
                     i18n.getLanguages().forEach(lng => {
                         $('#languageOption').append("<option value='{0}'>{1}</option>".format(lng, i18n.getMessage("language_" + lng)));
@@ -484,6 +634,14 @@ $(function() {
                         store.set('assistnow_api_key', $(this).val());
                         globalSettings.assistnowApiKey = $(this).val();
                     });
+                    $('#google-api-key').on('change', function () {
+                        const apiKey = String($(this).val() || '').trim();
+                        $(this).val(apiKey);
+                        store.set('google_api_key', apiKey);
+                        globalSettings.googleApiKey = apiKey;
+                    });
+                    $('#google-api-key-test').on('click', testGoogleApiKey);
+                    $('#google-api-key-help').on('click', showGoogleApiHelp);
  
                     $('#demoModeReset').on('click', function () {
                         SITLProcess.deleteEepromFile('demo.bin');

@@ -31,6 +31,49 @@ function updateIna226SettingsVisibility() {
     $('.adc-current-setting').toggle(!usesIna226Current);
 }
 
+function isMztcPortAssigned() {
+    const ports = FC.SERIAL_CONFIG?.ports;
+    if (!Array.isArray(ports)) {
+        return false;
+    }
+
+    return ports.some(port => port.functions?.includes('MZTC_CAMERA'));
+}
+
+function updateMztcSettingsVisibility() {
+    // The camera settings only reach the firmware over a UART, so the card is
+    // meaningless until the peripheral is assigned in the Ports tab.
+    $('.config-mztc').toggle(isMztcPortAssigned());
+}
+
+// Applying a preset is an action on the firmware, not a stored value. The
+// firmware writes the palette, brightness, contrast, enhancement, both denoise
+// levels, the shutter mode and the correction interval, then reports them back.
+// Sending MSP2_SET_MZTC_PRESET is what makes that happen. Saving the setting on
+// its own would only record the label.
+function applyMztcPreset(presetIndex, onDone) {
+    MSP.send_message(MSPCodes.MSP2_SET_MZTC_PRESET, [presetIndex], false, function () {
+        // Re-read every setting so the advanced fields show what the firmware
+        // actually applied instead of the values the user was looking at.
+        Settings.processHtml(onDone || function () {})();
+    });
+}
+
+function bindMztcPresetSelector() {
+    const $preset = $('#mztc_preset');
+    if (!$preset.length) {
+        return;
+    }
+
+    $preset.on('change', function () {
+        const value = Number.parseInt($(this).val(), 10);
+        if (Number.isNaN(value)) {
+            return;
+        }
+        applyMztcPreset(value);
+    });
+}
+
 configurationTab.initialize = function (callback, scrollPosition) {
 
     if (GUI.active_tab !== this) {
@@ -47,7 +90,8 @@ configurationTab.initialize = function (callback, scrollPosition) {
         mspHelper.loadVTXConfig,
         mspHelper.loadBoardAlignment,
         mspHelper.loadCurrentMeterConfig,
-        mspHelper.loadMiscV2
+        mspHelper.loadMiscV2,
+        mspHelper.loadSerialPorts
     ];
 
     loadChainer.setChain(loadChain);
@@ -283,6 +327,8 @@ configurationTab.initialize = function (callback, scrollPosition) {
             $i2cSpeed.trigger('change');
             $('#vbat_meter_type, #current_meter_type').on('change', updateIna226SettingsVisibility);
             updateIna226SettingsVisibility();
+            updateMztcSettingsVisibility();
+            bindMztcPresetSelector();
         }).catch(function(error) {
             console.error('Settings load failed, dependent controls not initialized:', error);
         });

@@ -6074,6 +6074,24 @@
     "ledStripWiringMessage": {
         "message": "LEDs ohne Verdrahtungsnummer werden nicht gespeichert."
     },
+    "ledStripQuickPresets": {
+        "message": "Schnell-Presets:"
+    },
+    "ledStripStep1Header": {
+        "message": "Verdrahtungsreihenfolge"
+    },
+    "ledStripStep2Header": {
+        "message": "Position & Richtung"
+    },
+    "ledStripStep3Header": {
+        "message": "Funktion"
+    },
+    "ledStripStep4Header": {
+        "message": "Farbe"
+    },
+    "ledStripEditPalette": {
+        "message": "Palettenfarben bearbeiten"
+    },
     "mainLogoText": {
         "message": "CONFIGURATOR"
     },

@@ -6,6 +6,52 @@ import eventFrequencyAnalyzer from './eventFrequencyAnalyzer';
 import timeout from './timeouts';
 import CONFIGURATOR from './data_storage';
 
+// Every MSP code that changes something on the FC, recognised by name so a write
+// added later is covered without maintaining a list here.
+const WRITE_CODE_NAMES = Object.keys(MSPCodes)
+    .filter(name => /(^|_)SET(_|$)|WRITE|SAVE|ERASE|RESET_|SELECT_/.test(name));
+
+// Writes carrying nothing read off the FC, so an unreadable response cannot poison
+// them. Refusing the live ones would be a hazard of its own.
+const ALWAYS_ALLOWED_WRITE_NAMES = [
+    'MSP_SET_REBOOT',            // stores nothing; the user's way out of a bad session
+    'MSP_SET_MOTOR',             // stopMotors() stops a running motor test with this
+    'MSP_SET_RAW_RC', 'MSP_SET_RAW_GPS', 'MSP_SET_HEAD', 'MSP_SET_RTC',
+    'MSP_EEPROM_WRITE',          // persists what is already on the FC
+    'MSP_RESET_CONF', 'MSP_SET_RESET_CURR_PID',
+    'MSP_SELECT_SETTING', 'MSP2_INAV_SELECT_BATTERY_PROFILE', 'MSP2_INAV_SELECT_MIXER_PROFILE',
+    'MSP_WP_MISSION_SAVE', 'MSP_DATAFLASH_ERASE', 'MSP_OSD_CHAR_WRITE',
+    'MSP_SET_BOX',               // legacy, never sent by this Configurator
+];
+
+// Writes that do not pair with their read by name alone.
+const IRREGULAR_WRITE_SOURCES = {
+    MSP_SET_MODE_RANGE:            'MSP_MODE_RANGES',
+    MSP_SET_ADJUSTMENT_RANGE:      'MSP_ADJUSTMENT_RANGES',
+    MSP2_INAV_OSD_SET_LAYOUT_ITEM: 'MSP2_INAV_OSD_LAYOUTS',
+    MSP2_INAV_SET_GEOZONE_VERTICE: 'MSP2_INAV_GEOZONE_VERTEX',
+};
+
+const WRITE_CODES = new Set(WRITE_CODE_NAMES.map(name => MSPCodes[name]));
+const ALWAYS_ALLOWED_WRITE_CODES = new Set(ALWAYS_ALLOWED_WRITE_NAMES.map(name => MSPCodes[name]));
+
+// write -> the read whose parsed state it hands back, so an unreadable response
+// disables only the saves carrying its values instead of every save.
+const WRITE_SOURCE_CODES = new Map();
+for (const name of WRITE_CODE_NAMES) {
+    if (ALWAYS_ALLOWED_WRITE_CODES.has(MSPCodes[name])) {
+        continue;
+    }
+    // MSP2_INAV_EZ_TUNE_SET names its write the other way round.
+    const sourceName = IRREGULAR_WRITE_SOURCES[name]
+        || (name.endsWith('_SET') ? name.slice(0, -4) : name.replace('SET_', ''));
+    if (MSPCodes[sourceName] !== undefined && sourceName !== name) {
+        WRITE_SOURCE_CODES.set(MSPCodes[name], MSPCodes[sourceName]);
+    }
+}
+
+const CODE_NAMES = new Map(Object.keys(MSPCodes).map(name => [MSPCodes[name], name]));
+
 /**
  *
  * @constructor
@@ -91,6 +137,51 @@ var MSP = {
     lastFrameReceivedMs: 0,
 
     processData: null,
+
+    // Reads whose response failed to parse this session. The FC state they fill is
+    // then part fresh and part stale, so the writes handing it back are refused.
+    parseFailures: new Set(),
+
+    // Set by MSPHelper; injected because gui.js already imports this module.
+    onConfigWriteBlocked: null,
+
+    getCodeName(code) {
+        return CODE_NAMES.get(code) || ('0x' + code.toString(16));
+    },
+
+    // Which unreadable response makes this write unsafe, or false if it is safe.
+    blockedWriteSource(code) {
+        if (this.parseFailures.size === 0 || ALWAYS_ALLOWED_WRITE_CODES.has(code)) {
+            return false;
+        }
+
+        const source = WRITE_SOURCE_CODES.get(code);
+        if (source !== undefined) {
+            return this.parseFailures.has(source) ? source : false;
+        }
+
+        // Unpaired write: refuse rather than guess. Over-blocking costs a refused save,
+        // under-blocking puts wrong values into the aircraft.
+        return WRITE_CODES.has(code) ? this.parseFailures.values().next().value : false;
+    },
+
+    // Reports and refuses a write built from an unreadable response.
+    refuseBlockedWrite(code) {
+        const blockedBy = this.blockedWriteSource(code);
+        if (blockedBy === false) {
+            return false;
+        }
+
+        console.error('Refusing MSP write ' + this.getCodeName(code) + ': its source ' +
+            this.getCodeName(blockedBy) + ' could not be parsed this session');
+
+        // A silent refusal would be worse - the user would believe it was saved.
+        if (this.onConfigWriteBlocked) {
+            this.onConfigWriteBlocked(code, blockedBy);
+        }
+
+        return true;
+    },
 
     init() {
         mspQueue.setPutCallback(this.putCallback);
@@ -274,14 +365,14 @@ var MSP = {
                 this.packet_error++;
                 $('span.packet-error').html(this.packet_error);
             }
-
+        } finally {
             /*
-             * Free port
+             * Free port - processData is pluggable, so this cannot depend on it returning.
              */
             timeout.add('delayedFreeHardLock', function() {
                 mspQueue.freeHardLock();
             }, 10);
-        } finally {
+
             // Reset variables - MUST happen even if an exception occurred
             this.message_length_received = 0;
             this.state = this.decoder_states.IDLE;
@@ -310,6 +401,12 @@ var MSP = {
     },
 
     send_message(code, data, callback_sent, callback_msp, protocolVersion) {
+        // No callback on a refusal: save chains ignore its argument, so calling it
+        // would run the EEPROM write and reboot as if the settings had been stored.
+        if (this.refuseBlockedWrite(code)) {
+            return false;
+        }
+
         var payloadLength = data && data.length ? data.length : 0;
         var length;
         var buffer;
@@ -446,6 +543,7 @@ var MSP = {
         this.last_received_timestamp = null;
         this.analog_last_received_timestamp = null;
         this.lastFrameReceivedMs = 0;
+        this.parseFailures.clear(); // the next session re-reads everything from scratch
 
         this.callbacks_cleanup();
     },

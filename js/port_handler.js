@@ -1,8 +1,9 @@
 'use strict';
 
 import GUI from './../js/gui';
-import ConnectionSerial from './connection/connectionSerial';
+import ConnectionSerial from './connection/connectionSerialTransport';
 import store from './store';
+import i18n from './../js/localization';
 
 var usbDevices =  [
     { 'vendorId': 1155, 'productId': 57105}, 
@@ -206,7 +207,18 @@ PortHandler.update_port_select = function (ports) {
     $('div#port-picker #port').append($("<option/>", {value: 'tcp', text: 'TCP', data: {isTcp: true}}));
     $('div#port-picker #port').append($("<option/>", {value: 'udp', text: 'UDP', data: {isUdp: true}}));
     $('div#port-picker #port').append($("<option/>", {value: 'sitl', text: 'SITL', data: {isSitl: true}}));
-    $('div#port-picker #port').append($("<option/>", {value: 'sitl-demo', text: 'Demo mode', data: {isSitl: true}}));
+    // Demo mode spawns a separate native demo binary (js/sitl.js SITLProcess);
+    // there's no WASM equivalent, so it's desktop-only. Browser users start
+    // WASM SITL from the SITL tab, then connect here via the 'sitl' entry.
+    if (!globalThis.__INAV_BROWSER_BUILD__) {
+        $('div#port-picker #port').append($("<option/>", {value: 'sitl-demo', text: 'Demo mode', data: {isSitl: true}}));
+    }
+
+    // check_usb_devices()'s getDevices() call never prompts, so offer an
+    // explicit way to request that first permission grant.
+    if (globalThis.__INAV_BROWSER_BUILD__) {
+        $('div#port-picker #port').append($("<option/>", {value: 'dfuPermission', text: i18n.getMessage('webDfuPermission'), data: {isDfuPermission: true}}));
+    }
 };
 
 PortHandler.port_detected = function(name, code, timeout, ignore_timeout) {

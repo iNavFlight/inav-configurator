@@ -11,7 +11,10 @@
     "make": "electron-forge make",
     "publish": "electron-forge publish",
     "lint": "echo \"No linting configured\"",
-    "test": "node tests/transpiler/run_all_tests.cjs && node --test tests/*.test.mjs tests/transpiler/*.test.mjs"
+    "test": "node tests/transpiler/run_all_tests.cjs && node --test tests/*.test.mjs tests/transpiler/*.test.mjs",
+    "web:dev": "vite --config vite.web.config.js",
+    "web:build": "vite build --config vite.web.config.js",
+    "web:preview": "vite preview --config vite.web.config.js"
   },
   "repository": {
     "type": "git",
@@ -70,6 +73,7 @@
     "electron": "^38.0.0",
     "process": "^0.11.10",
     "vite": "^7.1.4",
-    "vite-plugin-native": "^2.2.2"
+    "vite-plugin-native": "^2.2.2",
+    "vite-plugin-pwa": "^1.1.0"
   }
 }

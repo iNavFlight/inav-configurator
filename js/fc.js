@@ -111,6 +111,29 @@ var FC = {
         return true; // Currently all platforms use D term
     },
     resetState: function () {
+        // MassZero thermal camera. MZTC_CONFIG mirrors the 15 byte
+        // MSP2_MZTC_CONFIG payload. MZTC_STATUS stays null until the flight
+        // controller answers MSP2_MZTC_STATUS.
+        this.MZTC_CONFIG = {
+            enabled: 0,
+            port: 1,
+            baudrate: 8,
+            mode: 1,
+            update_rate: 9,
+            palette_mode: 0,
+            auto_shutter: 2,
+            digital_enhancement: 50,
+            spatial_denoise: 50,
+            temporal_denoise: 50,
+            brightness: 50,
+            contrast: 50,
+            zoom_level: 0,
+            mirror_mode: 0,
+            ffc_interval: 5
+        };
+
+        this.MZTC_STATUS = null;
+
         this.SENSOR_STATUS = {
             isHardwareHealthy: 0,
             gyroHwStatus: 0,
@@ -208,11 +231,17 @@ var FC = {
 
         this.generateAuxConfig = function () {
             console.log('Generating AUX_CONFIG');
+            // AUX_CONFIG and AUX_CONFIG_IDS must stay the same length and index-aligned —
+            // tabs/auxiliary.js pairs them by position, so an unrecognized id must be
+            // dropped from both, not just from the name list.
+            const ids = this.AUX_CONFIG_IDS;
             this.AUX_CONFIG = [];
-            for ( let i = 0; i < this.AUX_CONFIG_IDS.length; i++ ) {
-                let found = FLIGHT_MODES.find( mode => mode.permanentId === this.AUX_CONFIG_IDS[i] );
+            this.AUX_CONFIG_IDS = [];
+            for ( let i = 0; i < ids.length; i++ ) {
+                let found = FLIGHT_MODES.find( mode => mode.permanentId === ids[i] );
                 if (found) {
                     this.AUX_CONFIG.push(found.boxName);
+                    this.AUX_CONFIG_IDS.push(ids[i]);
                 }
             }
         };

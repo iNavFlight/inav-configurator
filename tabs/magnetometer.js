@@ -742,7 +742,9 @@ magnetometerTab.initialize3D = function () {
         if (!magModels || !fc)
             return;
 
-        magModels.forEach( (m,i) => m.visible = i == self.elementToShow );
+        // LIS2MDL and LIS3MDL are visually identical, so reuse the loaded LIS3MDL model.
+        const modelToShow = self.elementToShow === 30 ? 20 : self.elementToShow;
+        magModels.forEach( (m,i) => m.visible = i == modelToShow );
         fc.visible = true;
 
         var magRotation = new THREE.Euler(-THREE.MathUtils.degToRad(self.alignmentConfig.pitch-180), THREE.MathUtils.degToRad(-180 - self.alignmentConfig.yaw), THREE.MathUtils.degToRad(self.alignmentConfig.roll), 'YXZ');
@@ -837,7 +839,7 @@ magnetometerTab.initialize3D = function () {
     const loader = new GLTFLoader(manager);
 
     const magModelNames = ['xyz', 'ak8963c', 'ak8963n', 'ak8975', 'ak8975c', 'bn_880', 'diatone_mamba_m10_pro', 'flywoo_goku_m10_pro_v3', 'foxeer_m10q_120', 'foxeer_m10q_180', 'foxeer_m10q_250', 
-        'geprc_gep_m10_dq', 'gy271', 'gy273', 'hglrc_m100', 'qmc5883', 'holybro_m9n_micro', 'holybro_m9n_micro', 'ist8308', 'ist8310', 'lis3mdl', 
+        'geprc_gep_m10_dq', 'gy271', 'gy273', 'hglrc_m100', 'qmc5883', 'holybro_m9n_micro', 'holybro_m9n_micro', 'ist8308', 'ist8310', 'lis3mdl',
         'mag3110', 'matek_m8q', 'matek_m9n', 'matek_m10q', 'mlx90393', 'mp9250', 'qmc5883', 'flywoo_goku_m10_pro_v3', 'ws_m181'];
     magModels = [];
     //Load the UAV model

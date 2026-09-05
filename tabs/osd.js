@@ -1441,6 +1441,27 @@ OSD.constants = {
             ]
         },
         {
+            name: 'osdGroupThermalCamera',
+            enabled: function() {
+                return HARDWARE.capabilities.useMztcCamera;
+            },
+            items: [
+                {
+                    name: 'MZTC_STATUS',
+                    id: 171,
+                    // min_version stays commented out until the firmware
+                    // version is bumped, matching AUTO SPEED. The
+                    // maintenance-10.x firmware still reports 9.x, so a
+                    // 10.0.0 gate would hide the element on the builds that
+                    // actually support it.
+                    // min_version: '10.0.0',
+                    preview: function(osd_data) {
+                        return 'IR OK ';
+                    }
+                },
+            ]
+        },
+        {
             name: 'osdGroupTimers',
             items: [
                 {
@@ -3601,6 +3622,7 @@ HARDWARE.init = function() {
         useBaro: false,
         usePitot: false,
         useTerrain: false,
+        useMztcCamera: false
     };
 };
 
@@ -3618,6 +3640,9 @@ HARDWARE.update = function(callback) {
             }
             if (port.functions.includes('ESC')) {
                 HARDWARE.capabilities.useESCTelemetry = true;
+            }
+            if (port.functions.includes('MZTC_CAMERA')) {
+                HARDWARE.capabilities.useMztcCamera = true;
             }
         });
 
@@ -3855,7 +3880,8 @@ function openIconPicker($targetInput) {
     var $grid = $('<div>').addClass('ce-icon-picker-grid');
     var currentVal = parseInt($targetInput.val()) || 0;
 
-    for (var c = 1; c <= 255; c++) {
+    let maxFontChar = (FONT.data && FONT.data.character_image_urls.length > 0) ? FONT.data.character_image_urls.length - 1 : 511;
+    for (let c = 1; c <= maxFontChar; c++) {
         var url = (FONT.data && FONT.data.character_image_urls[c]) ? FONT.draw(c) : '';
         var $tile = $('<div>').addClass('ce-icon-picker-tile')
             .attr('data-char', c)
@@ -3984,7 +4010,7 @@ function buildSlotRow(i, ii) {
     $formatSelect.on('change', updateHiddenType);
 
     // Icon picker: hidden input + clickable preview button
-    var $icoInput = $('<input>').addClass('value').addClass('ico').attr('type', 'hidden').attr('min', 1).attr('max', 255);
+    let $icoInput = $('<input>').addClass('value').addClass('ico').attr('type', 'hidden').attr('min', 1).attr('max', 65535);
     var $icoBtn = $('<div>').addClass('value ico ce-ico-picker-btn').hide()
         .append($('<img>').addClass('ce-ico-preview'))
         .append($('<span>').addClass('ce-ico-label'));
@@ -4439,7 +4465,7 @@ function customElementNormaliseRow(row){
                 valueCell.find('.text').val(valueCell.find('.text').val().replace(/[^A-Z0-9!.\* ]/g, ""));
                 break;
             case 2:
-                valueCell.find('.ico').val(valueCell.find('.ico').val() > 255 ? 255 : valueCell.find('.ico').val());
+                valueCell.find('.ico').val(Math.min(valueCell.find('.ico').val(), 65535));
                 valueCell.find('.ico').val((valueCell.find('.ico').val() != '' && valueCell.find('.ico').val() < 1 )? 1 : valueCell.find('.ico').val());
         }
     }
