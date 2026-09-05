@@ -142,6 +142,7 @@ SYM.PILOT_LOGO_SML_L = 0x1D5;
 SYM.PILOT_LOGO_SML_C = 0x1D6;
 SYM.PILOT_LOGO_SML_R = 0x1D7;
 SYM.MIN_GND_SPEED = 0xDE;
+SYM.TERRAIN_FOLLOWING = 0xFB;
 
 SYM.AH_AIRCRAFT0 = 0x1A2;
 SYM.AH_AIRCRAFT1 = 0x1A3;
@@ -1380,6 +1381,31 @@ OSD.constants = {
                                 return FONT.embed_dot('13.8') + FONT.symbol(SYM.DIST_NM);
                             default: // Metric
                                 return FONT.embed_dot('25.6') + FONT.symbol(SYM.DIST_KM);
+                        }
+                    }
+                },
+                {
+                    name: 'OSD_TERRAIN_AGL',
+                    id: 171,
+                    enabled: function() {
+                        return HARDWARE.capabilities.useTerrain;
+                    },
+                    preview: function(osd_data) {
+
+                        var s = '114';
+                        if (Settings.getInputValue('osd_decimals_altitude') == 4) {
+                            s += '3';
+                        } if (Settings.getInputValue('osd_decimals_altitude') == 5) {
+                            s += '38';
+                        }
+
+                        switch (OSD.data.preferences.units) {
+                            case 0: // Imperial
+                            case 3: // UK
+                            case 4: // GA
+                                return FONT.symbol(SYM.TERRAIN_FOLLOWING) + s + FONT.symbol(SYM.ALT_FT);
+                            default: // Metric
+                                return FONT.symbol(SYM.TERRAIN_FOLLOWING) + s + FONT.symbol(SYM.ALT_M);
                         }
                     }
                 }
@@ -3595,6 +3621,7 @@ HARDWARE.init = function() {
         useCRSF: false,
         useBaro: false,
         usePitot: false,
+        useTerrain: false,
         useMztcCamera: false
     };
 };
@@ -3628,9 +3655,16 @@ HARDWARE.update = function(callback) {
                 HARDWARE.capabilities.useBaro  = (FC.SENSOR_CONFIG.barometer != 0);
                 HARDWARE.capabilities.usePitot = (FC.SENSOR_CONFIG.pitot != 0);
 
-                if (callback) {
-                    callback();
-                }
+                mspHelper.getSetting("terrain_enabled").then(function(data) {
+                    HARDWARE.capabilities.useTerrain = Boolean(data && data.value);
+                }).catch(function() {
+                    // Setting not available in this firmware
+                    HARDWARE.capabilities.useTerrain = false;
+                }).finally(function() {
+                    if (callback) {
+                        callback();
+                    }
+                });
             });
         });
     });
