@@ -6,8 +6,7 @@ import i18next from 'i18next';
 import store from './store'
 
 
-const availableLanguages = ['en', 'de', 'ja', 'ru', 'bg', 'uk', 'zh_CN'];
-
+const availableLanguages = ['en', 'de', 'ja', 'ru', 'bg', 'uk', 'zh_CN', 'sr'];
 const i18n = {};
 
 i18n.loadMessages = async function(languages) {
