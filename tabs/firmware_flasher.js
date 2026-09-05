@@ -816,6 +816,12 @@ firmwareFlasherTab.initialize = function (callback) {
                 var mspListener = function(info) { MSP.read(info); };
                 CONFIGURATOR.connection.addOnReceiveCallback(mspListener);
 
+                // FC.CONFIG is null until the first connect calls resetState(). Guarded on
+                // !FC.CONFIG so a cached version survives for the query's timeout path.
+                if (!FC.CONFIG) {
+                    FC.resetState();
+                }
+
                 var versionQueryDone = false;
                 var versionQueryTimeout = setTimeout(function() {
                     if (!versionQueryDone) {

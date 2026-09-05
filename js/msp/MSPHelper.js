@@ -4,6 +4,7 @@ import semver from 'semver';
 
 import './../injected_methods';
 import GUI from './../gui';
+import i18n from './../localization';
 import MSP from './../msp';
 import MSPCodes from './MSPCodes';
 import FC from './../fc';
@@ -71,9 +72,42 @@ var mspHelper = (function () {
     // always finish with a '\0'.
     var debugMsgBuffer = '';
 
+    var lastWriteBlockedNotice = 0;
+
     self.init = function() {
-        MSP.setProcessData(this.processData);
+        MSP.setProcessData(this.handleResponse);
+
+        MSP.onConfigWriteBlocked = function (code, sourceCode) {
+            // One notice per save burst - a save fans out into many writes.
+            const now = Date.now();
+            if (now - lastWriteBlockedNotice < 3000) {
+                return;
+            }
+            lastWriteBlockedNotice = now;
+            GUI.log(i18n.getMessage('mspWriteBlockedAfterParseFailure', [MSP.getCodeName(sourceCode)]));
+        };
     }
+
+    /**
+     * MSP response entry point. Completing the request must happen even when a
+     * parser case throws, or the tab waiting on it never finishes loading.
+     * @param {MSP} dataHandler
+     */
+    self.handleResponse = function (dataHandler) {
+        try {
+            self.processData(dataHandler);
+        } catch (error) {
+            console.error('Failed to parse MSP code 0x' + dataHandler.code.toString(16) + ':', error);
+
+            // Half this message landed in FC state - refuse the writes handing it back.
+            if (!MSP.parseFailures.has(dataHandler.code)) {
+                MSP.parseFailures.add(dataHandler.code);
+                GUI.log(i18n.getMessage('mspResponseUnreadable', [MSP.getCodeName(dataHandler.code)]));
+            }
+        }
+
+        completeRequest(dataHandler, new DataView(dataHandler.message_buffer, 0));
+    };
 
     /**
      *
@@ -345,6 +379,11 @@ var mspHelper = (function () {
             case MSPCodes.MSP2_PID:
                 // PID data arrived, we need to scale it and save to appropriate bank / array
                 for (let i = 0, needle = 0; i < (dataHandler.message_length_expected / 4); i++, needle += 4) {
+                    // A newer FC reports more banks than we know. Keep them rather than
+                    // write past the array - MSP2_SET_PID needs the FC's exact count.
+                    if (!FC.PIDs[i]) {
+                        FC.PIDs[i] = new Array(4);
+                    }
                     FC.PIDs[i][0] = data.getUint8(needle);
                     FC.PIDs[i][1] = data.getUint8(needle + 1);
                     FC.PIDs[i][2] = data.getUint8(needle + 2);
@@ -1913,7 +1952,9 @@ var mspHelper = (function () {
         } else {
             console.log('FC reports unsupported message error: 0x' + dataHandler.code.toString(16));
         }
+    };
 
+    var completeRequest = function (dataHandler, data) {
         // trigger callbacks, cleanup/remove callback after trigger
         for (let i = dataHandler.callbacks.length - 1; i >= 0; i--) { // iterating in reverse because we use .splice which modifies array length
             if (i < dataHandler.callbacks.length) {

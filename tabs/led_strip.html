@@ -9,10 +9,10 @@
 
 
         <div class="quick-layouts">
-            <div class="section step-header">Quick Presets:</div>
-            <button class="quickLayout" data-layout="xframe">X-Frame Quad</button>
-            <button class="quickLayout" data-layout="crossframe">Cross-Frame Quad</button>
-            <button class="quickLayout" data-layout="wing">Wing</button>
+            <div class="section step-header" i18n="ledStripQuickPresets">Quick Presets:</div>
+            <button class="quickLayout" data-layout="xframe" i18n="ledStripQuickPresetXFrame">X-Frame Quad</button>
+            <button class="quickLayout" data-layout="crossframe" i18n="ledStripQuickPresetCrossFrame">Cross-Frame Quad</button>
+            <button class="quickLayout" data-layout="wing" i18n="ledStripQuickPresetWing">Wing</button>
         </div>
 
         <div class="gridColumn">
@@ -61,18 +61,18 @@
         <div class="controls">
 
             <div class="step-section" data-step-section="1">
-                <div class="section step-header"><span class="circle-number">① </span>Wire Ordering
-                    <span class="step-instruction">Click Wire Ordering, then drag grid cells in the order LEDs are wired</span>
+                <div class="section step-header"><span class="circle-number">① </span><span i18n="ledStripStep1Header">Wire Ordering</span>
+                    <span class="step-instruction" i18n="ledStripStep1Instruction">Click Wire Ordering, then drag grid cells in the order LEDs are wired</span>
                 </div>
                 <button class="funcWire" i18n="ledStripWiringMode"></button>
                 <span class="wires-placed">
-                    <span class="placed-count">0</span> / 128 placed
+                    <span class="placed-count">0</span> <span i18n="ledStripPlacedText">/ 128 placed</span>
                 </span>
             </div>
 
             <div class="step-section" data-step-section="2">
-                <div class="section step-header"><span class="circle-number">② </span>Position &amp; Direction
-                    <span class="step-instruction">Optionally, select LEDs & set their orientation</span>
+                <div class="section step-header"><span class="circle-number">② </span><span i18n="ledStripStep2Header">Position &amp; Direction</span>
+                    <span class="step-instruction" i18n="ledStripStep2Instruction">Optionally, select LEDs & set their orientation</span>
                 </div>
                 <div class="directions">
                     <button class="dir-n" i18n="ledStripDirN"></button>
@@ -85,8 +85,8 @@
             </div>
 
             <div class="step-section" data-step-section="3">
-                <div class="section step-header"><span class="circle-number">③ </span>Function
-                    <span class="step-instruction">Select LEDs and assign their function (Flight Mode, Armed state, etc.) and overlays.</span>
+                <div class="section step-header"><span class="circle-number">③ </span><span i18n="ledStripStep3Header">Function</span>
+                    <span class="step-instruction" i18n="ledStripStep3Instruction">Select LEDs and assign their function (Flight Mode, Armed state, etc.) and overlays.</span>
                 </div>
                 <div class="select">
                     <span class="color_section" i18n="ledStripFunctionTitle"></span>
@@ -175,8 +175,8 @@
             </div>
 
             <div class="step-section" data-step-section="4">
-                <div class="section step-header"><span class="circle-number">④ </span>Color
-                    <span class="step-instruction">Select LEDs and click a color to assign it</span>
+                <div class="section step-header"><span class="circle-number">④ </span><span i18n="ledStripStep4Header">Color</span>
+                    <span class="step-instruction" i18n="ledStripStep4Instruction">Select LEDs and click a color to assign it</span>
                 </div>
                 <div class="colors">
                     <button class="color-0" i18n_title="colorBlack">0</button>
@@ -196,7 +196,7 @@
                     <button class="color-14" i18n_title="colorBlack">14</button>
                     <button class="color-15" i18n_title="colorBlack">15</button>
                 </div>
-                <button class="editPalette w100">Edit palette colors</button>
+                <button class="editPalette w100" i18n="ledStripEditPalette">Edit palette colors</button>
             </div>
         </div>
 

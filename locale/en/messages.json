@@ -6116,6 +6116,12 @@
     "illegalStateRestartRequired": {
         "message": "Illegal state. Restart required."
     },
+    "mspResponseUnreadable": {
+        "message": "The flight controller's $1 response could not be read. The values it carries may be incomplete, so <span style=\"color: red\">saving them has been disabled</span> to prevent writing wrong settings to the aircraft. Settings that do not use this data are unaffected. Reconnect to try again."
+    },
+    "mspWriteBlockedAfterParseFailure": {
+        "message": "<span style=\"color: red\">Not saved.</span> These settings come from the flight controller's $1 response, which could not be read this session, so writing them back is refused. Reconnect to try again."
+    },
     "motor_direction_inverted": {
         "message": "Normal motor direction / Props-in configuration"
     },
@@ -6427,6 +6433,48 @@
     },
     "ledStripWiringMessage": {
         "message": "LEDs without wire ordering number will not be saved."
+    },
+    "ledStripQuickPresets": {
+        "message": "Quick Presets:"
+    },
+    "ledStripQuickPresetXFrame": {
+        "message": "X-Frame Quad"
+    },
+    "ledStripQuickPresetCrossFrame": {
+        "message": "Cross-Frame Quad"
+    },
+    "ledStripQuickPresetWing": {
+        "message": "Wing"
+    },
+    "ledStripStep1Header": {
+        "message": "Wire Ordering"
+    },
+    "ledStripStep1Instruction": {
+        "message": "Click Wire Ordering, then drag grid cells in the order LEDs are wired"
+    },
+    "ledStripStep2Header": {
+        "message": "Position & Direction"
+    },
+    "ledStripStep2Instruction": {
+        "message": "Optionally, select LEDs & set their orientation"
+    },
+    "ledStripStep3Header": {
+        "message": "Function"
+    },
+    "ledStripStep3Instruction": {
+        "message": "Select LEDs and assign their function (Flight Mode, Armed state, etc.) and overlays."
+    },
+    "ledStripStep4Header": {
+        "message": "Color"
+    },
+    "ledStripStep4Instruction": {
+        "message": "Select LEDs and click a color to assign it"
+    },
+    "ledStripPlacedText": {
+        "message": "/ 128 placed"
+    },
+    "ledStripEditPalette": {
+        "message": "Edit palette colors"
     },
     "mainLogoText": {
         "message": "CONFIGURATOR"

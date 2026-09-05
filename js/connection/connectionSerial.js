@@ -36,11 +36,9 @@ class ConnectionSerial extends Connection {
         }
 
         this._ipcDataHandler = window.electronAPI.onSerialData(buffer => {
-            this._onReceiveListeners.forEach(listener => {
-                listener({
-                    connectionId: this._connectionId,
-                    data: buffer
-                });
+            this.notifyReceiveListeners({
+                connectionId: this._connectionId,
+                data: buffer
             });
         });
 
@@ -54,9 +52,7 @@ class ConnectionSerial extends Connection {
             console.log(error);
             this.abort();
 
-            this._onReceiveErrorListeners.forEach(listener => {
-                listener(error);
-            });
+            this.notifyReceiveErrorListeners(error);
         });
     }
 
@@ -87,49 +83,22 @@ class ConnectionSerial extends Connection {
                         bitrate: options.bitrate,
                         connectionId: this._connectionId
                     });
-                } 
+                }
             } else {
                 console.log("Serial connection error: " + response.msg);
                 if (callback) {
                     callback(false);
                 }
             }
-        });
+        }).catch(this.reportFailure("Serial connection failed", callback));
     }
 
     disconnectImplementation(callback) {
-        if (this.hasConnectionId()) {
-            window.electronAPI.serialClose().then(response => {
-                var ok = true;
-                if (response.error) {
-                    console.log("Unable to close serial: " + response.msg);
-                    ok = false;
-                }            
-                if (callback) {
-                    callback(ok);
-                }
-            });  
-        }  
+        this.completeClose('serial', this.hasConnectionId() ? window.electronAPI.serialClose() : null, callback);
     }
 
     sendImplementation(data, callback) {
-        if (this.hasConnectionId()) {
-            window.electronAPI.serialSend(data).then(response => {
-                var result = 0;
-                var sent = response.bytesWritten;
-                if (response.error) {
-                    console.log("Serial write error: " + response.msg);
-                    result = 1;
-                    sent = 0;
-                }
-                if (callback) {
-                    callback({
-                        bytesSent: sent,
-                        resultCode: result
-                    });
-                }
-            });
-        }
+        this.completeSend('Serial', this.hasConnectionId() ? window.electronAPI.serialSend(data) : null, callback);
     }
 
     addOnReceiveCallback(callback){
