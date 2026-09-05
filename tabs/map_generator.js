@@ -353,7 +353,7 @@ const tileCache = {
     },
 };
 
-// ─── SRTM HGT → DAT conversion engine ──────────────────────────────────
+// ─── Elevation grid → .TER conversion engine ──────────────────────────────────
 const SRTM_BASE_URL = 'https://s3.amazonaws.com/elevation-tiles-prod/skadi';
 const SRTM_GRID = 3601;
 const TERRAIN_SPACING = 30;
@@ -362,7 +362,7 @@ const TERRAIN_BLK_SIZE_Y = 32;
 const TERRAIN_BLK_SPACE_X = 24;
 const TERRAIN_BLK_SPACE_Y = 28;
 const TERRAIN_IO_BLOCK = 2048;
-const TERRAIN_IO_DATA = 1821;
+const TERRAIN_IO_DATA = 1151;   // bytes covered by the CRC (header + packed heights + trailer)
 const LOCATION_SCALING_FACTOR_F32 = Math.fround(0.011131884502145034);
 const LOCATION_SCALING_FACTOR_INV_F32 = Math.fround(89.83204953368922);
 
@@ -457,6 +457,38 @@ function estimateDatSizeMB(lat) {
     return (numX * numY * TERRAIN_IO_BLOCK) / 1048576;
 }
 
+// Bit-order sanity check for the 10-bit packer, mirror-verified against the
+// firmware decoder: values 0x2AA and 0x155 must serialise to bytes AA 56 05.
+// Runs once per generation; a failure means the bit order is wrong and no
+// terrain file may be produced.
+function terrainPackerSelfTest() {
+    const vals = [0x2AA, 0x155];
+    const out = [];
+    let acc = 0, accBits = 0;
+    for (const val of vals) {
+        acc |= val << accBits;
+        accBits += 10;
+        while (accBits >= 8) { out.push(acc & 0xFF); acc >>>= 8; accBits -= 8; }
+    }
+    out.push(acc & 0xFF);   // 4 remaining bits
+    if (out[0] !== 0xAA || out[1] !== 0x56 || out[2] !== 0x05) {
+        throw new Error('Terrain 10-bit packer self-test failed (bit order) — refusing to generate');
+    }
+}
+
+// Reads packed 10-bit value i back out of the block bytes (independent decode
+// used by the per-block self-check).
+function readPacked10(u8, i) {
+    const bit = i * 10;
+    const byte = 22 + (bit >> 3);
+    const word = u8[byte] | (u8[byte + 1] << 8) | (u8[byte + 2] << 16);
+    return (word >> (bit & 7)) & 0x3FF;
+}
+
+// Packs one 2048-byte terrain block in the version-50 layout: the 896 heights
+// are stored as 10-bit offsets in 2 m steps above the block's lowest point
+// (heightBase), as one continuous little-endian bitstream. The on-disk block
+// size is unchanged — the packing saves space inside the block, not on disk.
 function packTerrainBlock(latE7, lonE7, spacing, heights, idxX, idxY, lonDeg, latDeg) {
     const buf = new ArrayBuffer(TERRAIN_IO_BLOCK);
     const v = new DataView(buf);
@@ -465,26 +497,53 @@ function packTerrainBlock(latE7, lonE7, spacing, heights, idxX, idxY, lonDeg, la
     v.setInt32(8, latE7, true);
     v.setInt32(12, lonE7, true);
     v.setUint16(16, 0, true);
-    v.setUint16(18, 1, true);
+    v.setUint16(18, 50, true);              // format version 50 (10-bit × 2 m)
     v.setUint16(20, spacing, true);
-    let off = 22;
-    for (let x = 0; x < TERRAIN_BLK_SIZE_X; x++) {
-        for (let y = 0; y < TERRAIN_BLK_SIZE_Y; y++) {
-            v.setInt16(off, heights[x * TERRAIN_BLK_SIZE_Y + y], true);
-            off += 2;
+
+    // The lowest point in the block is the base every height is encoded against.
+    let heightBase = heights[0];
+    for (let i = 1; i < heights.length; i++) {
+        if (heights[i] < heightBase) heightBase = heights[i];
+    }
+
+    // 896 values × 10 bits: value i occupies bits [10·i .. 10·i+9] of one
+    // little-endian bitstream (fill the accumulator from the low end, emit a
+    // byte whenever 8 bits are ready). 8960 bits = exactly 1120 bytes.
+    let acc = 0, accBits = 0, off = 22;
+    for (let i = 0; i < heights.length; i++) {
+        let step = Math.round((heights[i] - heightBase) / 2);
+        if (step < 0) step = 0;
+        if (step > 1023) step = 1023;
+        acc |= step << accBits;
+        accBits += 10;
+        while (accBits >= 8) {
+            u8[off++] = acc & 0xFF;
+            acc >>>= 8;
+            accBits -= 8;
         }
     }
-    v.setUint16(1814, idxX, true);
-    v.setUint16(1816, idxY, true);
-    v.setInt16(1818, lonDeg, true);
-    v.setInt8(1820, latDeg);
-    v.setUint8(1821, 1);
+
+    v.setInt16(1142, heightBase, true);     // base sits AFTER the packed data
+    v.setUint16(1144, idxX, true);
+    v.setUint16(1146, idxY, true);
+    v.setInt16(1148, lonDeg, true);
+    v.setInt8(1150, latDeg);
     const crc = crc16xmodem(u8, TERRAIN_IO_DATA);
     v.setUint16(16, crc, true);
+
+    // Permanent self-check: independently decode the packed bytes and require
+    // every point to reconstruct within 1 m of the source height. On mismatch
+    // the encoder is broken — refuse to write bad terrain.
+    for (let i = 0; i < heights.length; i++) {
+        if (Math.abs(heightBase + 2 * readPacked10(u8, i) - heights[i]) > 1) {
+            throw new Error(`Terrain block self-check failed at point ${i} (block ${idxX}/${idxY})`);
+        }
+    }
     return u8;
 }
 
 async function createDatFromHgt(degLat, degLon, hgtCache, progressCb) {
+    terrainPackerSelfTest();
     const baseLat = degLat * 10000000;
     const baseLon = degLon * 10000000;
     let numX = 0;
@@ -560,7 +619,7 @@ async function fetchSrtmTile(lat, lon, statusCb) {
 // edges) belong to the south / east neighbour tiles and are copied from them.
 const COPERNICUS_BASE_URL = 'https://copernicus-dem-30m.s3.amazonaws.com';
 // Required verbatim by the Copernicus WorldDEM-30 licence (Art. 6). These must
-// be reproduced character-for-character wherever the derived .DAT files are
+// be reproduced character-for-character wherever the derived .TER files are
 // presented or shipped, and imply no endorsement by any of the named parties.
 const COPERNICUS_NOTICE_1 = 'produced using Copernicus WorldDEM-30 © DLR e.V. 2010-2014 and © Airbus Defence and Space GmbH 2014-2018 provided under COPERNICUS by the European Union and ESA; all rights reserved';
 const COPERNICUS_NOTICE_2 = 'The organisations in charge of the Copernicus programme by law or by delegation do not incur any liability for any use of the Copernicus WorldDEM-30';
@@ -745,7 +804,7 @@ async function buildCopernicusGrid(degLat, degLon, rowFrom, rowTo, colFrom, colT
     return view;
 }
 
-// The .DAT block grid starts at the cell's south-west corner and walks north
+// The .TER block grid starts at the cell's south-west corner and walks north
 // and east, overshooting the 1° square (~370 m north, ~2 km east at 42°N), so
 // the north / east / north-east neighbours must supply the samples past the
 // edge. Only that thin margin is needed, not the whole neighbour tile.
@@ -806,7 +865,7 @@ function terrainDatFilename(lat, lon) {
     const lonPrefix = lon >= 0 ? 'E' : 'W';
     const latStr = String(Math.abs(lat)).padStart(2, '0');
     const lonStr = String(Math.abs(lon)).padStart(3, '0');
-    return latPrefix + latStr + lonPrefix + lonStr + '.DAT';
+    return latPrefix + latStr + lonPrefix + lonStr + '.TER';
 }
 
 function getTerrainDegreeTiles(bounds) {
@@ -1994,10 +2053,10 @@ TABS.map_generator.initialize = function (callback) {
                     '<div style="font-size:9px; color:#666; margin-top:3px;">' +
                     $('<span>').text(COPERNICUS_NOTICE_1).html() + '. ' +
                     $('<span>').text(COPERNICUS_NOTICE_2).html() + '.</div>');
-                $('#mapgen_hint_terrain').text('Hint: One .DAT file per 1°×1° grid square (~111 km). Data: Copernicus GLO-30 at 30m resolution. Ocean depths are clamped to 0m.');
+                $('#mapgen_hint_terrain').text('Hint: One .TER file per 1°×1° grid square (~111 km). Data: Copernicus GLO-30 at 30m resolution. Ocean depths are clamped to 0m.');
             } else {
                 $('#mapgen_terrain_source_note').html('Coverage 60°N to 56°S.');
-                $('#mapgen_hint_terrain').text('Hint: One .DAT file per 1°×1° grid square (~111 km). Data: NASA SRTM1 at 30m resolution. Ocean depths are clamped to 0m.');
+                $('#mapgen_hint_terrain').text('Hint: One .TER file per 1°×1° grid square (~111 km). Data: NASA SRTM1 at 30m resolution. Ocean depths are clamped to 0m.');
             }
         }
 
@@ -2294,7 +2353,7 @@ TABS.map_generator.initialize = function (callback) {
             const hasSD = !!sdPath;
             let infoHtml = `
                 <div class="mapgen-info-row"><span>Target:</span><span>${terrainSourceLabel()}</span></div>
-                <div class="mapgen-info-row"><span>Terrain Files:</span><span>${tiles.length} .DAT file(s)</span></div>
+                <div class="mapgen-info-row"><span>Terrain Files:</span><span>${tiles.length} .TER file(s)</span></div>
                 <div class="mapgen-info-row"><span>Est. Output:</span><span>~${totalSizeMB} MB</span></div>
                 <div class="mapgen-info-row"><span>Elevation Download:</span><span>${cacheInfo}</span></div>
                 <div class="mapgen-info-row"><span>Files:</span><span style="font-size:10px;">${fileList.join(', ')}</span></div>
@@ -2417,8 +2476,8 @@ TABS.map_generator.initialize = function (callback) {
                     }
                 }
 
-                // Convert HGT → DAT
-                $('#mapgen_download_status').text(prefix + `\u2699\ufe0f Converting ${name} to .DAT...`);
+                // Convert elevation grid → .TER
+                $('#mapgen_download_status').text(prefix + `\u2699\ufe0f Converting ${name} to .TER...`);
                 try {
                     const datData = await createDatFromHgt(tile.lat, tile.lon, cellCache, (done, total) => {
                         const pct = ((completed + done / total) / totalTiles * 100).toFixed(0);
@@ -2428,7 +2487,16 @@ TABS.map_generator.initialize = function (callback) {
                     datFiles.push({ name: terrainDatFilename(tile.lat, tile.lon), data: datData });
                     $('#mapgen_download_status').text(prefix + `\u2705 ${terrainDatFilename(tile.lat, tile.lon)} (${(datData.length / 1048576).toFixed(1)} MB)`);
                 } catch (e) {
+                    // A conversion failure (e.g. the packer's self-check) stops the
+                    // whole run. Writing an incomplete tile set and reporting success
+                    // would silently leave the FC without terrain for that square.
                     console.warn(`Conversion failed for ${name}:`, e.message);
+                    $('#mapgen_download_status').text(
+                        `❌ ${terrainDatFilename(tile.lat, tile.lon)} could not be generated: ${e.message}. ` +
+                        'Generation stopped — no files were written.');
+                    $('#mapgen_modal_cancel').text('Close');
+                    $('#mapgen_modal_confirm').hide();
+                    return;
                 }
                 completed++;
             }
@@ -2541,7 +2609,7 @@ TABS.map_generator.initialize = function (callback) {
                 $('#mapgen_download_status').text(`Done with ${failedCount} error(s).${skipped > 0 ? ` ${skipped} skipped (already existed).` : ''}`);
             } else {
                 const written = total - skipped;
-                let summary = `${written} .DAT file(s) written`;
+                let summary = `${written} .TER file(s) written`;
                 if (skipped > 0) summary += `, ${skipped} skipped (already existed)`;
 
                 const title = isSD ? 'Terrain Sync Complete!' : 'Terrain Generation Complete!';

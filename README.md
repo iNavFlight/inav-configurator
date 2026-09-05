@@ -10,13 +10,13 @@ Various types of aircraft are supported by the tool and by INAV, e.g. quadcopter
 
 The Map Generator tab works without a flight controller connection. Select a target, draw an area on the map, and sync the output to an SD card or export as ZIP.
 
-![Map Generator Overview](images/map_generator/Hero.png)
+<img width="2559" height="1527" alt="map_gen_tab" src="https://github.com/user-attachments/assets/241e24dc-4509-44bd-947d-a20a1d77c9ae" />
 
 ### Targets
 
 | Target | Output | SD Card |
 |--------|--------|---------|
-| [Terrain](https://github.com/iNavFlight/inav/wiki/Navigation-Terrain-Following) | `.DAT` elevation files | Flight controller |
+| [Terrain](https://github.com/iNavFlight/inav/wiki/Navigation-Terrain-Following) | `.TER` elevation files | Flight controller |
 | [b14ckyy ETHOS Mapping Widget](https://github.com/b14ckyy/ETHOSMappingWidget-Revisited) | Map tiles | Radio |
 | [Yaapu Telemetry Widget](https://github.com/yaapu/EthosMappingWidget) (ETHOS / EdgeTX) | Map tiles | Radio |
 
@@ -24,7 +24,7 @@ The Map Generator tab works without a flight controller connection. Select a tar
 
 ### Terrain
 
-Generate `.DAT` terrain elevation files at 1 arc-second (~30 m) resolution. The files go on the flight controller's SD card and enable terrain altitude reference in the OSD and for sanity checks. The generated files are also compatible with ArduPilot.
+Generate `.TER` terrain elevation files at 1 arc-second (~30 m) resolution. The files go on the flight controller's SD card and enable terrain altitude reference in the OSD and for sanity checks.
 
 Two elevation sources are selectable:
 
@@ -33,17 +33,22 @@ Two elevation sources are selectable:
 | **Copernicus GLO-30** (default) | 84°N – 90°S | [Copernicus WorldDEM-30](https://registry.opendata.aws/copernicus-dem/); more accurate on bare earth and covers latitudes above 60°N |
 | NASA SRTM1 | 60°N – 56°S | [NASA SRTM1](https://www.usgs.gov/centers/eros/science/usgs-eros-archive-digital-elevation-shuttle-radar-topography-mission-srtm-1), public domain |
 
-The `.DAT` file format is identical for both sources — only the elevation values differ. If the Copernicus service cannot be reached, the Configurator asks before falling back to SRTM; the elevation source is never switched silently.
+The `.TER` file format is identical for both sources — only the elevation values differ. If the Copernicus service cannot be reached, the Configurator asks before falling back to SRTM; the elevation source is never switched silently.
 
-![Terrain Mode](images/map_generator/terrain_mode.png)
+#### Why Copernicus is the default
+
+The candidate elevation sources were benchmarked against ICESat-2 satellite laser ground truth (ATL08 bare earth, n = 10,777 filtered points, block-bootstrap 95% CI, paired Wilcoxon): **Copernicus GLO-30 reaches a mean absolute error of ~1.07 m versus ~2.01 m for SRTM — about twice as accurate on bare earth** — and it also covers latitudes above 60°N, where SRTM has no data. SRTM is kept as a selectable fallback. The full methodology, numbers and charts are in [this PR comment](https://github.com/iNavFlight/inav-configurator/pull/2599#issuecomment-5085961982).
+
+![DEM accuracy vs the ICESat-2 laser](images/map_generator/dem_accuracy_forest.png)
+
 
 #### How to Use
 
 1. Select **Terrain** as the target — the map switches to a 1°×1° degree grid overlay
 2. Pick the **Elevation Source** (Copernicus GLO-30 by default)
-3. Draw a rectangle over your flying area — the status shows which `.DAT` files will be generated and the estimated size
+3. Draw a rectangle over your flying area — the status shows which `.TER` files will be generated and the estimated size
 4. Link your FC's SD card folder (or use Export as ZIP)
-5. Click **Sync to SD Card** — elevation data is downloaded, converted to `.DAT` format, and written directly to the SD card
+5. Click **Sync to SD Card** — elevation data is downloaded, converted to `.TER` format, and written directly to the SD card
 6. Enable terrain in INAV CLI: `set terrain_enabled = ON` then `save`
 
 #### Copernicus data attribution
@@ -56,26 +61,30 @@ When the Copernicus source is used, the following notices are shown in the tab a
 
 This product is not endorsed by or affiliated with the European Union, ESA, Airbus Defence and Space GmbH or DLR e.V.
 
-![Terrain Sync](images/map_generator/terrain_sync.png)
+<img width="2559" height="1528" alt="tarr_target" src="https://github.com/user-attachments/assets/56975447-a884-4d47-9510-41e73710858f" />
+
+<img width="2559" height="1527" alt="generating_files" src="https://github.com/user-attachments/assets/f62eea67-1978-4877-a134-c38cbea89f75" />
+
+<img width="2559" height="1525" alt="ter_gen_complete" src="https://github.com/user-attachments/assets/07664701-e5b3-4f6a-8111-a48d9e35e473" />
+
 
 | Detail | Value |
 |--------|-------|
-| **Data source** | NASA SRTM1 (public domain, from AWS) |
+| **Data source** | Copernicus GLO-30 (default) or NASA SRTM1 — selectable in the tab |
 | **Resolution** | 1 arc-second (~30 meters) |
-| **Coverage** | 60°N to 56°S (global land areas) |
-| **Output** | One `.DAT` file per 1°×1° grid square (~111 km), e.g. `N42E023.DAT` |
-| **Output location** | FC SD card root (e.g. `G:\N42E023.DAT`) |
+| **Coverage** | 84°N to 90°S (Copernicus) · 60°N to 56°S (SRTM) |
+| **Output** | One `.TER` file per 1°×1° grid square (~111 km), e.g. `N42E023.TER` |
+| **Output location** | FC SD card root (e.g. `G:\N42E023.TER`) |
 | **File size** | ~30 MB per tile |
-| **Format** | 2048-byte blocks, 32×28 int16 height grids, CRC-16/XMODEM checksums |
+| **Format** | 2048-byte blocks, 28×32 heights packed as 10-bit offsets in 2 m steps above a per-block base, CRC-16/XMODEM checksums |
 
-- **Grid Overlay** — orange 1°×1° grid on the map with `.DAT` filename labels
+- **Grid Overlay** — orange 1°×1° grid on the map with `.TER` filename labels
 - **Elevation Cache** — downloaded elevation grids are cached in IndexedDB; repeat generations reuse cached data. Copernicus and SRTM grids are stored under separate keys, so switching source never mixes the two
-- **Live Altitude** — after generation, hover the mouse to see SRTM elevation (from cache, no server requests)
+- **Live Altitude** — after generation, hover the mouse to see the elevation under the cursor (from the local cache, no server requests)
 - **FREESPAC.E Handling** — auto-deleted from the SD card during sync; INAV recreates it on next boot
 - **Skip Existing** — files already on the SD card are skipped unless Force Overwrite is checked
 - Ocean depths are clamped to 0 m
 
-![Terrain Complete](images/map_generator/terrain_complete.png)
 
 #### SD Card Preparation
 
@@ -90,6 +99,8 @@ This product is not endorsed by or affiliated with the European Union, ESA, Airb
 
 Download offline map tiles for radio mapping widgets to your radio's SD card.
 
+![Map Generator Overview](images/map_generator/Hero.png)
+
 #### Map Providers
 
 | Provider | Available Map Types | Export |
@@ -97,11 +108,11 @@ Download offline map tiles for radio mapping widgets to your radio's SD card.
 | OpenStreetMap | Street | Preview only — [tile policy](https://operations.osmfoundation.org/policies/tiles/) does not permit bulk offline export. Use **MapTiler → OSM Style** instead. |
 | ESRI | Street, Satellite, Hybrid | ✓ |
 | Google | Street, Satellite, Hybrid | ✓ — Note: Google may temporarily block your IP for 24 hours after bulk downloads |
-| MapTiler | Satellite, Street, Hybrid, OSM Style, Outdoor, Topo | ✓ (free API key required — see [MapTiler Setup](#maptiler-setup)) |
+| MapTiler | Satellite, Street, Hybrid, OSM Style, Outdoor, Topo, Winter | ✓ (free API key required — see [MapTiler Setup](#maptiler-setup)) |
 
 #### MapTiler Setup
 
-MapTiler provides high-quality map tiles including styles not available from other providers (Outdoor, Topo, OSM Style). A free API key is required.
+MapTiler provides high-quality map tiles including styles not available from other providers (Outdoor, Topo, OSM Style, Winter). A free API key is required.
 
 Without a valid key, the map preview shows placeholder tiles:
 
@@ -129,14 +140,17 @@ The key is saved automatically and persists across sessions.
 | OSM Style | OpenStreetMap-style tiles, policy-compliant for offline export |
 | Outdoor | Topographic style with trails and contours — mountain flying |
 | Topo | Pure contour lines — elevation and terrain awareness |
+| Winter | Ski-resort style — pistes and winter terrain |
 
 #### Output Paths
 
 | Target | Sub-target | SD Card Path |
 |--------|-----------|--------------|
 | b14ckyy | — | `/bitmaps/ethosmaps/maps/{Provider}/{MapType}/{Zoom}/...` |
-| Yaapu | ETHOS | `/bitmaps/yaapu/maps/{MapType}/{Zoom}/{Y}/s_{X}.png` |
-| Yaapu | EdgeTX | `/IMAGES/yaapu/maps/{MapType}/{Zoom}/{Y}/s_{X}.png` |
+| Yaapu | ETHOS | `/bitmaps/yaapu/maps/{GoogleMapName}/{Zoom}/{Y}/s_{X}.jpg` |
+| Yaapu | EdgeTX | `/IMAGES/yaapu/maps/{GoogleMapName}/{Zoom}/{Y}/s_{X}.jpg` |
+
+Yaapu always uses Google-style folder names (`GoogleMap`, `GoogleSatelliteMap`, `GoogleHybridMap`) regardless of the selected provider, and its tiles are JPEG — that is what the Yaapu widgets expect.
 
 1. Select the output target (b14ckyy or Yaapu), map provider, map type, and zoom range
 2. Draw a rectangle over the region you want — side labels show dimensions in real time
