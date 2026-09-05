@@ -651,6 +651,70 @@
                         </div> -->
                     </div>
                 </div>
+
+                <div id="missionPlannerConditions" class="gui_box grey is-hidden">
+                    <div class="gui_box_titlebar">
+                        <div id="conditionsTitle" class="spacer_box_title" data-i18n="conditionsInfoHead"></div>
+                        <div class="btnMenu btnMenuIcon show_btn" id="showHideConditionsButton">
+                            <a class="ic_hide" href="#" i18n_title="missionTitleHide">
+                                <span class="sr-only" data-i18n="missionTitleHide"></span>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="spacer" id="ConditionsContent">
+                        <div id="conditionsLoading" data-i18n="conditionsWaiting"></div>
+                        <div id="conditionsData" class="is-hidden">
+                            <div class="point">
+                                <span id="condWeather"></span>
+                            </div>
+                            <div class="point">
+                                <span class="point-label" data-i18n="conditionsWind"></span>
+                                <span id="condWind"></span>
+                            </div>
+                            <div class="point">
+                                <span class="point-label" data-i18n="conditionsGusts"></span>
+                                <span id="condGusts"></span>
+                            </div>
+                            <div class="point">
+                                <span class="point-label" data-i18n="conditionsWindDir"></span>
+                                <span id="condWindDir"></span>
+                            </div>
+                            <div class="point">
+                                <span class="point-label" data-i18n="conditionsTemp"></span>
+                                <span id="condTemp"></span>
+                            </div>
+                            <div class="point">
+                                <span class="point-label" data-i18n="conditionsFeelsLike"></span>
+                                <span id="condFeelsLike"></span>
+                            </div>
+                            <div class="point">
+                                <span class="point-label" data-i18n="conditionsHumidity"></span>
+                                <span id="condHumidity"></span>
+                            </div>
+                            <div class="point">
+                                <span class="point-label" data-i18n="conditionsUV"></span>
+                                <span id="condUV"></span>
+                            </div>
+                            <div class="point">
+                                <span class="point-label" data-i18n="conditionsPrecip"></span>
+                                <span id="condPrecip"></span>
+                            </div>
+                            <div class="point">
+                                <span class="point-label" data-i18n="conditionsThunder"></span>
+                                <span id="condThunder"></span>
+                            </div>
+                            <div class="point">
+                                <span class="point-label" data-i18n="conditionsVisibility"></span>
+                                <span id="condVisibility"></span>
+                            </div>
+                            <div class="point">
+                                <span class="point-label" data-i18n="conditionsCloud"></span>
+                                <span id="condCloud"></span>
+                            </div>
+                        </div>
+                        <div id="conditionsError" class="is-hidden" data-i18n="conditionsUnavailable"></div>
+                    </div>
+                </div>
             </div>
         </div>
         <div class="cf_column threefourth_left" style="height: 100%;">
