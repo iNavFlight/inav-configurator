@@ -518,12 +518,15 @@ cliTab.read = function (readInfo) {
         }
     }
 
-    // fallback to native autocomplete
+    // Mirror the FC's line buffer into the command textarea. This is only correct as a
+    // "fallback to native autocomplete" when nothing else is driving the textarea: while the
+    // autocomplete cache builder is running (silently sending `help`/`dump`/`get` right after
+    // CLI entry, see CliAutoComplete.builderStart), this would splash fragments of that hidden
+    // output into the command box instead of the user's own input, so it must stay gated behind
+    // the same isEnabled() check used above rather than always running unconditionally.
     if (!CliAutoComplete.isEnabled()) {
         setPrompt(removePromptHash(this.cliBuffer));
     }
-
-    setPrompt(removePromptHash(this.cliBuffer));
 
     if (cliTab.promptCallback && this.cliBuffer.endsWith('# ')) {
         const cb = cliTab.promptCallback;
