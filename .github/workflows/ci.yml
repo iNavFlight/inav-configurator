@@ -26,6 +26,7 @@ jobs:
               with:
                 name: pr-number
                 path: pr_number.txt
+                if-no-files-found: error
 
     build-linux:
         runs-on: ubuntu-24.04
@@ -69,16 +70,19 @@ jobs:
               with:
                 name: ${{ env.BUILD_NAME }}_DEB
                 path: ./out/make/deb/x64/*.deb
+                if-no-files-found: error
             - name: Upload Linux rpm
               uses: actions/upload-artifact@v4
               with:
                 name: ${{ env.BUILD_NAME }}_RPM
                 path: ./out/make/rpm/x64/*.rpm
+                if-no-files-found: error
             - name: Upload Linux zip
               uses: actions/upload-artifact@v4
               with:
                 name: ${{ env.BUILD_NAME }}_ZIP
                 path: ./out/make/zip/linux/x64/*.zip
+                if-no-files-found: error
 
     build-linux-aarch64:
         runs-on: ubuntu-24.04
@@ -122,16 +126,19 @@ jobs:
               with:
                 name: ${{ env.BUILD_NAME }}_DEB
                 path: ./out/make/deb/arm64/*.deb
+                if-no-files-found: error
             - name: Upload Linux rpm
               uses: actions/upload-artifact@v4
               with:
                 name: ${{ env.BUILD_NAME }}_RPM
                 path: ./out/make/rpm/arm64/*.rpm
+                if-no-files-found: error
             - name: Upload Linux zip
               uses: actions/upload-artifact@v4
               with:
                 name: ${{ env.BUILD_NAME }}_ZIP
                 path: ./out/make/zip/linux/arm64/*.zip
+                if-no-files-found: error
 
     build-mac-arm64:
         runs-on: macos-15
@@ -177,11 +184,13 @@ jobs:
           with:
             name: ${{env.BUILD_NAMEarm64}}_ZIP
             path: ./out/make/zip/darwin/arm64/*.zip
+            if-no-files-found: error
         - name: Upload MacOS arm64 dmg
           uses: actions/upload-artifact@v4
           with:
             name: ${{env.BUILD_NAMEarm64}}_DMG
             path: ./out/make/*arm64*.dmg
+            if-no-files-found: error
 
     build-mac:
         runs-on: macos-15-intel
@@ -227,11 +236,13 @@ jobs:
           with:
             name: ${{env.BUILD_NAMEx64}}_ZIP
             path: ./out/make/zip/darwin/x64/*.zip
+            if-no-files-found: error
         - name: Upload MacOS x64 dmg
           uses: actions/upload-artifact@v4
           with:
             name: ${{env.BUILD_NAMEx64}}_DMG
             path: ./out/make/*x64*.dmg
+            if-no-files-found: error
 
     build-windows:
         runs-on: windows-latest
@@ -280,11 +291,13 @@ jobs:
               with:
                 name: ${{env.BUILD_NAMEx64}}_ZIP
                 path: ./out/make/zip/win32/x64/*.zip
+                if-no-files-found: error
             - name: Upload Windows x64 msi
               uses: actions/upload-artifact@v4
               with:
                 name: ${{env.BUILD_NAMEx64}}_MSI
                 path: ./out/make/wix/x64/*.msi
+                if-no-files-found: error
 
     build-windows-win32:
         runs-on: windows-latest
@@ -333,9 +346,11 @@ jobs:
               with:
                 name: ${{env.BUILD_NAMEia32}}_ZIP
                 path: ./out/make/zip/win32/ia32/*.zip
+                if-no-files-found: error
             - name: Upload Windows ia32 msi
               uses: actions/upload-artifact@v4
               with:
                 name: ${{env.BUILD_NAMEia32}}_MSI
                 path: ./out/make/wix/ia32/*.msi
+                if-no-files-found: error
  
