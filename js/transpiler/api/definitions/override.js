@@ -106,7 +106,79 @@ export default {
     readonly: false,
     range: [0, 150],
     inavOperation: OPERATION.OVERRIDE_MIN_GROUND_SPEED
+  },
 
+  // Axis Control Overrides
+  swapRollYaw: {
+    type: 'boolean',
+    desc: 'Swap roll and yaw control axes',
+    readonly: false,
+    inavOperation: OPERATION.SWAP_ROLL_YAW
+  },
+
+  invertRoll: {
+    type: 'boolean',
+    desc: 'Invert roll axis control',
+    readonly: false,
+    inavOperation: OPERATION.INVERT_ROLL
+  },
+
+  invertPitch: {
+    type: 'boolean',
+    desc: 'Invert pitch axis control',
+    readonly: false,
+    inavOperation: OPERATION.INVERT_PITCH
+  },
+
+  invertYaw: {
+    type: 'boolean',
+    desc: 'Invert yaw axis control',
+    readonly: false,
+    inavOperation: OPERATION.INVERT_YAW
+  },
+
+  // Navigation Overrides
+  headingTarget: {
+    type: 'number',
+    unit: 'deg',
+    desc: 'Override heading target in degrees',
+    readonly: false,
+    range: [0, 359],
+    inavOperation: OPERATION.SET_HEADING_TARGET
+  },
+
+  // Profile Override
+  profile: {
+    type: 'number',
+    desc: 'Override active profile (0-2)',
+    readonly: false,
+    range: [0, 2],
+    inavOperation: OPERATION.SET_PROFILE
+  },
+
+  // Gimbal Override
+  gimbalSensitivity: {
+    type: 'number',
+    desc: 'Override gimbal sensitivity',
+    readonly: false,
+    range: [0, 100],
+    inavOperation: OPERATION.SET_GIMBAL_SENSITIVITY
+  },
+
+  // GPS Overrides
+  disableGpsFix: {
+    type: 'boolean',
+    desc: 'Disable GPS fix (force no-fix state)',
+    readonly: false,
+    inavOperation: OPERATION.DISABLE_GPS_FIX
+  },
+
+  // Calibration Overrides
+  resetMagCalibration: {
+    type: 'boolean',
+    desc: 'Reset magnetometer calibration',
+    readonly: false,
+    inavOperation: OPERATION.RESET_MAG_CALIBRATION
   },
 
   // Flight Axis Overrides

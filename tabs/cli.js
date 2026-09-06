@@ -2,7 +2,7 @@
 
 import MSP from './../js/msp';
 import mspQueue from './../js/serial_queue';
-import { GUI, TABS } from './../js/gui';
+import GUI from './../js/gui';
 import CONFIGURATOR from './../js/data_storage';
 import timeout from './../js/timeouts';
 import i18n from './../js/localization';
@@ -15,15 +15,109 @@ import FC from './../js/fc';
 import { generateFilename } from './../js/helpers';
 import dialog from '../js/dialog';
 
-TABS.cli = {
-    lineDelayMs: 50,
-    profileSwitchDelayMs: 100,
+const cliTab = {
     outputHistory: "",
     cliBuffer: "",
+    rawReceiveBuffer: new Uint8Array(0),
+    promptCallback: null,
+    promptTimeoutId: null,
     GUI: {
         snippetPreviewWindow: null,
     },
 };
+
+cliTab.nextTab = null;
+
+function xorChecksum(bytes) {
+    return bytes.reduce((checksum, byte) => checksum ^ byte, 0);
+}
+
+function crc8DvbS2(bytes) {
+    let crc = 0;
+    for (const byte of bytes) {
+        crc ^= byte;
+        for (let bit = 0; bit < 8; bit++) {
+            crc = (crc & 0x80) ? ((crc << 1) ^ 0xd5) & 0xff : (crc << 1) & 0xff;
+        }
+    }
+    return crc;
+}
+
+function appendBytes(left, right) {
+    const combined = new Uint8Array(left.length + right.length);
+    combined.set(left);
+    combined.set(right, left.length);
+    return combined;
+}
+
+/**
+ * CLI mode is entered while an MSP status request can still be in flight.
+ * Discard complete, checksum-valid MSP frames so their binary bytes cannot be
+ * treated as CLI input. Partial frames are held until the rest arrives.
+ */
+function removeMspFrames(data) {
+    const input = appendBytes(cliTab.rawReceiveBuffer, data);
+    const output = [];
+    let offset = 0;
+
+    while (offset < input.length) {
+        if (input[offset] !== 0x24) { // '$'
+            output.push(input[offset++]);
+            continue;
+        }
+
+        if (offset + 3 > input.length) {
+            break;
+        }
+
+        const isV1 = input[offset + 1] === 0x4d; // 'M'
+        const isV2 = input[offset + 1] === 0x58; // 'X'
+        const direction = input[offset + 2];
+        if ((!isV1 && !isV2) || ![0x3c, 0x3e, 0x21].includes(direction)) {
+            output.push(input[offset++]);
+            continue;
+        }
+
+        let frameLength;
+        let checksumValid;
+        if (isV1) {
+            if (offset + 6 > input.length) {
+                break;
+            }
+            const payloadLength = input[offset + 3];
+            if (payloadLength === 0xff) {
+                if (offset + 8 > input.length) {
+                    break;
+                }
+                frameLength = 8 + input[offset + 5] + (input[offset + 6] << 8);
+            } else {
+                frameLength = 6 + payloadLength;
+            }
+            if (offset + frameLength > input.length) {
+                break;
+            }
+            checksumValid = xorChecksum(input.slice(offset + 3, offset + frameLength - 1)) === input[offset + frameLength - 1];
+        } else {
+            if (offset + 9 > input.length) {
+                break;
+            }
+            frameLength = 9 + input[offset + 6] + (input[offset + 7] << 8);
+            if (offset + frameLength > input.length) {
+                break;
+            }
+            checksumValid = crc8DvbS2(input.slice(offset + 3, offset + frameLength - 1)) === input[offset + frameLength - 1];
+        }
+
+        if (checksumValid) {
+            offset += frameLength;
+        } else {
+            output.push(input[offset++]);
+        }
+    }
+
+    cliTab.rawReceiveBuffer = input.slice(offset);
+    return new Uint8Array(output);
+}
 
 function removePromptHash(promptText) {
     return promptText.replace(/^# /, '');
@@ -86,11 +180,18 @@ function copyToClipboard(text) {
         .then(onCopySuccessful, onCopyFailed);
 }
 
-TABS.cli.initialize = function (callback) {
+cliTab.initialize = function (callback) {
     var self = this;
+    self.nextTab = null;
 
-    if (GUI.active_tab != 'cli') {
-        GUI.active_tab = 'cli';
+    // Must be set before mspQueue.flush() below and before the async HTML
+    // import, so periodicStatusUpdater.run() (a 300ms interval kept alive
+    // across tab switches) can never see cliActive === false and queue a
+    // status poll in the gap - the flush only clears what's queued so far.
+    CONFIGURATOR.cliActive = true;
+
+    if (GUI.active_tab !== this) {
+        GUI.active_tab = this;
     }
 
     // Flush MSP queue as well as all MSP registered callbacks
@@ -98,45 +199,68 @@ TABS.cli.initialize = function (callback) {
     mspDeduplicationQueue.flush();
     MSP.callbacks_cleanup();
 
+    // Any MSP request sent while the FC is in CLI mode is echoed back as "typed"
+    // characters, corrupting the prompt and the auto-complete cache builder.
+    // Lock the queue so pollers/retries cannot transmit until the tab is left.
+    mspQueue.lock();
+
     self.outputHistory = "";
     self.cliBuffer = "";
+    self.rawReceiveBuffer = new Uint8Array(0);
 
-    const clipboardCopySupport = (() => {
-        return false;    
-    })();
+    const clipboardCopySupport = !!(navigator.clipboard?.writeText) || document.queryCommandSupported?.('copy');
 
 
     function executeCommands(out_string) {
         self.history.add(out_string.trim());
 
-        var outputArray = out_string.split("\n");
-        return outputArray.reduce((p, line, index) =>
-            p.then((delay) =>
-                new Promise((resolve) => {
-                    timeout.add('CLI_send_slowly', () => {
-                        let processingDelay = TABS.cli.lineDelayMs;
-                        if (line.toLowerCase().includes('_profile')) {
-                            processingDelay = TABS.cli.profileSwitchDelayMs;
-                        }
-                        const isLastCommand = outputArray.length === index + 1;
-                        if (isLastCommand && TABS.cli.cliBuffer) {
-                            line = getCliCommand(line, TABS.cli.cliBuffer);
-                        }
-                        TABS.cli.sendLine(line, () => {
-                            resolve(processingDelay);
-                        });
-                    }, delay);
-                })
-            ), Promise.resolve(0),
-        );
+        const lines = out_string.split("\n").filter(l => l.length > 0);
+        if (lines.length === 0) return Promise.resolve();
+
+        return new Promise((resolve) => {
+            let nextToSend = 0;
+            let promptsReceived = 0;
+            let promptGeneration = 0;
+
+            function sendOne() {
+                const line = lines[nextToSend];
+                const isLast = nextToSend === lines.length - 1;
+                const cmd = isLast ? getCliCommand(line, cliTab.cliBuffer) : line;
+                nextToSend++;
+                cliTab.sendLine(cmd);
+            }
+
+            function armCallback() {
+                clearTimeout(cliTab.promptTimeoutId);
+                const myGen = ++promptGeneration;
+                cliTab.promptTimeoutId = setTimeout(() => {
+                    if (myGen !== promptGeneration) return; // real prompt already fired
+                    cliTab.promptCallback = null;
+                    onPrompt();
+                }, 5000);
+                cliTab.promptCallback = onPrompt;
+            }
+
+            function onPrompt() {
+                promptsReceived++;
+                if (nextToSend < lines.length) sendOne();
+                if (promptsReceived === lines.length) {
+                    resolve();
+                } else {
+                    armCallback();
+                }
+            }
+
+            sendOne();
+            if (lines.length > 1) sendOne();
+            armCallback();
+        });
     }
     import('./cli.html?raw').then(({default: html}) => GUI.load(html, function () {
         // translate to user-selected language
        i18n.localize();
 
         $('.cliDocsBtn').attr('href', globalSettings.docsTreeLocation + 'Settings.md');
-
-        CONFIGURATOR.cliActive = true;
 
         var textarea = $('.tab-cli textarea[name="commands"]');
         CliAutoComplete.initialize(textarea, self.sendLine.bind(self), writeToOutput);
@@ -184,21 +308,21 @@ TABS.cli.initialize = function (callback) {
         });
 
         $('.tab-cli .exit').on('click', function () {
-            self.send(getCliCommand('exit\n', TABS.cli.cliBuffer));
+            self.send(getCliCommand('exit\n', cliTab.cliBuffer));
         });
 
         $('.tab-cli .savecmd').on('click', function () {
-            self.send(getCliCommand('save\n', TABS.cli.cliBuffer));
+            self.send(getCliCommand('save\n', cliTab.cliBuffer));
         });
 
         $('.tab-cli .msc').on('click', function () {
-            self.send(getCliCommand('msc\n', TABS.cli.cliBuffer));
+            self.send(getCliCommand('msc\n', cliTab.cliBuffer));
         });
 
         $('.tab-cli .diffall').on('click', function () {
             self.outputHistory = "";
             $('.tab-cli .window .wrapper').empty();
-            self.send(getCliCommand('diff all\n', TABS.cli.cliBuffer));
+            self.send(getCliCommand('diff all\n', cliTab.cliBuffer));
         });
 
         $('.tab-cli .clear').on('click', function () {
@@ -352,8 +476,8 @@ TABS.cli.initialize = function (callback) {
             let delay = CONFIGURATOR.connection.deviceDescription.delay;
             if (delay > 0) {
                 timeout.add('cli_delay', () =>  {
-                    self.send(getCliCommand("cli_delay " +  delay + '\n', TABS.cli.cliBuffer));
-                    self.send(getCliCommand('# ' + i18n.getMessage('connectionBleCliEnter') + '\n', TABS.cli.cliBuffer));
+                    self.send(getCliCommand("cli_delay " +  delay + '\n', cliTab.cliBuffer));
+                    self.send(getCliCommand('# ' + i18n.getMessage('connectionBleCliEnter') + '\n', cliTab.cliBuffer));
                 }, 400);
             }
         }
@@ -362,22 +486,22 @@ TABS.cli.initialize = function (callback) {
     }));
 };
 
-TABS.cli.history = {
+cliTab.history = {
     history: [],
     index:  0
 };
 
-TABS.cli.history.add = function (str) {
+cliTab.history.add = function (str) {
     this.history.push(str);
     this.index = this.history.length;
 };
 
-TABS.cli.history.prev = function () {
+cliTab.history.prev = function () {
     if (this.index > 0) this.index -= 1;
     return this.history[this.index];
 };
 
-TABS.cli.history.next = function () {
+cliTab.history.next = function () {
     if (this.index < this.history.length) this.index += 1;
     return this.history[this.index - 1];
 };
@@ -408,7 +532,7 @@ function setPrompt(text) {
     $('.tab-cli textarea').val(text);
 }
 
-TABS.cli.read = function (readInfo) {
+cliTab.read = function (readInfo) {
     /*  Some info about handling line feeds and carriage return
 
         line feed = LF = \n = 0x0A = 10
@@ -419,7 +543,7 @@ TABS.cli.read = function (readInfo) {
         Windows understands (both) CRLF
         Chrome OS currently unknown
     */
-    var data = new Uint8Array(readInfo.data),
+    var data = removeMspFrames(new Uint8Array(readInfo.data)),
         validateText = "",
         sequenceCharsToSkip = 0;
 
@@ -481,7 +605,7 @@ TABS.cli.read = function (readInfo) {
             CONFIGURATOR.cliValid = false;
             GUI.log(i18n.getMessage('cliReboot'));
             GUI.log(i18n.getMessage('deviceRebooting'));
-            GUI.handleReconnect();
+            GUI.handleReconnect(cliTab.nextTab || false);
         }
 
     }
@@ -489,6 +613,7 @@ TABS.cli.read = function (readInfo) {
     if (!CONFIGURATOR.cliValid && validateText.indexOf('CLI') !== -1) {
         GUI.log(i18n.getMessage('cliEnter'));
         CONFIGURATOR.cliValid = true;
+        this.rawReceiveBuffer = new Uint8Array(0);
 
         if (CliAutoComplete.isEnabled() && !CliAutoComplete.isBuilding()) {
             // start building autoComplete
@@ -496,23 +621,28 @@ TABS.cli.read = function (readInfo) {
         }
     }
 
-    // fallback to native autocomplete
-    if (!CliAutoComplete.isEnabled()) {
+    // do not echo the cache builder output into the input textarea
+    if (!CliAutoComplete.isBuilding()) {
         setPrompt(removePromptHash(this.cliBuffer));
     }
 
-    setPrompt(removePromptHash(this.cliBuffer));
+    if (cliTab.promptCallback && this.cliBuffer.endsWith('# ')) {
+        const cb = cliTab.promptCallback;
+        cliTab.promptCallback = null;
+        clearTimeout(cliTab.promptTimeoutId);
+        cb();
+    }
 };
 
-TABS.cli.sendLine = function (line, callback) {
+cliTab.sendLine = function (line, callback) {
     this.send(line + '\n', callback);
 };
 
-TABS.cli.sendAutoComplete = function (line, callback) {
+cliTab.sendAutoComplete = function (line, callback) {
     this.send(line + '\t', callback);
 };
 
-TABS.cli.send = function (line, callback) {
+cliTab.send = function (line, callback) {
     var bufferOut = new ArrayBuffer(line.length);
     var bufView = new Uint8Array(bufferOut);
 
@@ -523,22 +653,39 @@ TABS.cli.send = function (line, callback) {
     CONFIGURATOR.connection.send(bufferOut, callback);
 };
 
-TABS.cli.cleanup = function (callback) {
+cliTab.exit = function(nextTab) {
+    this.nextTab = nextTab;
+    this.send(getCliCommand('exit\r', this.cliBuffer));
+};
+
+cliTab.cleanup = function (callback) {
+    clearTimeout(cliTab.promptTimeoutId);
+    cliTab.promptCallback = null;
+
+    // Re-allow MSP traffic regardless of how the tab is being left.
+    mspQueue.unlock();
+
     if (!(CONFIGURATOR.connectionValid && CONFIGURATOR.cliValid && CONFIGURATOR.cliActive)) {
         if (callback) callback();
         return;
     }
-    this.send(getCliCommand('exit\r', this.cliBuffer), function (writeInfo) {
-        // we could handle this "nicely", but this will do for now
-        // (another approach is however much more complicated):
-        // we can setup an interval asking for data lets say every 200ms, when data arrives, callback will be triggered and tab switched
-        // we could probably implement this someday
-        timeout.add('waiting_for_bootup', function waiting_for_bootup() {
-            if (callback) callback();
-        }, 1000); // if we dont allow enough time to reboot, CRC of "first" command sent will fail, keep an eye for this one
-        CONFIGURATOR.cliActive = false;
 
-        CliAutoComplete.cleanup();
-        $(CliAutoComplete).off();
-    });
+    CONFIGURATOR.cliActive = false;
+    CONFIGURATOR.cliValid = false;
+    CliAutoComplete.cleanup();
+    $(CliAutoComplete).off();
+
+    // The UI promises that disconnecting from the CLI sends "exit" so the FC
+    // returns to MSP mode. Without this the FC stays in CLI mode and the next
+    // connection's MSP requests are echoed back, never answered. Flags are
+    // cleared first so the echoed output is not re-parsed as CLI data.
+    this.send(getCliCommand('exit\r', this.cliBuffer));
+    this.cliBuffer = "";
+
+    if (callback) {
+        // Let the in-flight "exit" bytes flush before the caller closes the port.
+        setTimeout(callback, 200);
+    }
 };
+
+export default cliTab;

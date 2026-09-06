@@ -23,6 +23,7 @@ class ExpressionGenerator {
    * @param {Function} context.getArithmeticOperation - Function to get arithmetic operation
    * @param {Object} context.errorHandler - Error handler instance
    * @param {Object} context.arrowHelper - Arrow helper instance for identifier extraction
+   * @param {Object} context.conditionGenerator - Condition generator for ternary expressions
    */
   constructor(context) {
     this.pushLogicCommand = context.pushLogicCommand;
@@ -31,6 +32,7 @@ class ExpressionGenerator {
     this.getArithmeticOperation = context.getArithmeticOperation;
     this.errorHandler = context.errorHandler;
     this.arrowHelper = context.arrowHelper;
+    this.conditionGenerator = context.conditionGenerator;
   }
 
   /**
@@ -56,6 +58,8 @@ class ExpressionGenerator {
       case 'MemberExpression':
         // Variable reference - delegate to getOperand
         return this.getOperand(expr, activatorId);
+      case 'ConditionalExpression':
+        return this.generateConditional(expr, activatorId);
       default:
         this.errorHandler.addError(
           `Unsupported expression type: ${expr.type}. Use arithmetic operators (+, -, *, /) or supported functions`,
@@ -64,6 +68,71 @@ class ExpressionGenerator {
         );
         return { type: OPERAND_TYPE.VALUE, value: 0 };
     }
+  }
+
+  /**
+   * Generate conditional (ternary) expression as value
+   * Patterns:
+   *   cond ? val : 0   → val with cond as activator
+   *   a ? b : c        → general ternary using ADD to combine
+   * @private
+   */
+  generateConditional(expr, activatorId) {
+    const { test, consequent, alternate } = expr;
+
+    // Pattern: cond ? val : 0 → val with cond as activator
+    if (alternate === 0 || (alternate.type === 'Literal' && alternate.value === 0)) {
+      // Generate the condition using conditionGenerator
+      const condLcIndex = this.conditionGenerator.generate(test, activatorId);
+
+      // Generate the value with the condition as activator
+      return this.generate(consequent, condLcIndex);
+    }
+
+    // General ternary: a ? b : c
+    // Implemented as:
+    //   LC_COND: test condition
+    //   LC_CONS: consequent value with LC_COND as activator (value when true, 0 when false)
+    //   LC_NOT:  NOT(LC_COND)
+    //   LC_ALT:  alternate value with LC_NOT as activator (value when false, 0 when true)
+    //   LC_RES:  ADD(LC_CONS, LC_ALT) - combines (one is always 0)
+    const condLcIndex = this.conditionGenerator.generate(test, activatorId);
+
+    // Generate consequent value with condition as activator
+    const consequentOperand = this.generate(consequent, condLcIndex);
+    const consequentLcIndex = consequentOperand.type === OPERAND_TYPE.LC
+      ? consequentOperand.value
+      : this.pushLogicCommand(OPERATION.SET,
+          { type: OPERAND_TYPE.VALUE, value: 0 },
+          consequentOperand,
+          condLcIndex
+        );
+
+    // Generate NOT(condition)
+    const notCondLcIndex = this.pushLogicCommand(OPERATION.NOT,
+      { type: OPERAND_TYPE.LC, value: condLcIndex },
+      { type: OPERAND_TYPE.VALUE, value: 0 },
+      activatorId
+    );
+
+    // Generate alternate value with NOT(condition) as activator
+    const alternateOperand = this.generate(alternate, notCondLcIndex);
+    const alternateLcIndex = alternateOperand.type === OPERAND_TYPE.LC
+      ? alternateOperand.value
+      : this.pushLogicCommand(OPERATION.SET,
+          { type: OPERAND_TYPE.VALUE, value: 0 },
+          alternateOperand,
+          notCondLcIndex
+        );
+
+    // Combine with ADD - exactly one will be non-zero
+    const resultLcIndex = this.pushLogicCommand(OPERATION.ADD,
+      { type: OPERAND_TYPE.LC, value: consequentLcIndex },
+      { type: OPERAND_TYPE.LC, value: alternateLcIndex },
+      activatorId
+    );
+
+    return { type: OPERAND_TYPE.LC, value: resultLcIndex };
   }
 
   /**
@@ -77,8 +146,21 @@ class ExpressionGenerator {
       return this.generateMathCall(expr, activatorId);
     }
 
-    // Check for standalone functions (not Math methods)
-    const funcName = expr.callee?.name;
+    // Check for helper functions - backward compat: mapInput()
+    let funcName = null;
+    if (expr.callee.type === 'Identifier') {
+      funcName = expr.callee.name;
+    }
+    // Check for helper functions - new syntax: inav.helpers.mapInput()
+    else if (expr.callee.object?.property?.name === 'helpers') {
+      funcName = expr.callee.property?.name;
+    }
+
+    // If not a helper function call, unknown function
+    if (!funcName) {
+      this.errorHandler.addError('Unknown function call');
+      return { type: OPERAND_TYPE.VALUE, value: 0 };
+    }
 
     // Handle mapInput(value, maxValue) - MAP_INPUT
     // Scales value from [0:maxValue] to [0:1000]
@@ -109,7 +191,7 @@ class ExpressionGenerator {
     // Not a recognized function
     const methodName = expr.callee?.property?.name || funcName || 'unknown';
     this.errorHandler.addError(
-      `Unsupported function: ${methodName}(). Supported: Math.abs/min/max/sin/cos/tan(), mapInput(), mapOutput()`,
+      `Unsupported function: ${methodName}(). Supported: Math.abs/min/max/sin/cos/tan/acos/asin/atan2(), mapInput(), mapOutput()`,
       expr,
       'unsupported_function'
     );
@@ -117,7 +199,7 @@ class ExpressionGenerator {
   }
 
   /**
-   * Generate Math method call (abs, min, max, sin, cos, tan)
+   * Generate Math method call (abs, min, max, sin, cos, tan, acos, asin, atan2)
    * @private
    */
   generateMathCall(expr, activatorId) {
@@ -157,9 +239,32 @@ class ExpressionGenerator {
       return this.generateMathTrig(mathMethod, expr, activatorId);
     }
 
+    // Handle inverse trigonometric functions
+    if (mathMethod === 'acos' || mathMethod === 'asin') {
+      if (!this.validateFunctionArgs(`Math.${mathMethod}`, expr.arguments, 1, expr)) {
+        return { type: OPERAND_TYPE.VALUE, value: 0 };
+      }
+
+      const arg = this.getOperand(this.arrowHelper.extractIdentifier(expr.arguments[0]) || expr.arguments[0], activatorId);
+      const operation = mathMethod === 'acos' ? OPERATION.ACOS : OPERATION.ASIN;
+      return { type: OPERAND_TYPE.LC, value: this.pushLogicCommand(operation, arg, { type: OPERAND_TYPE.VALUE, value: 0 }, activatorId) };
+    }
+
+    // Handle Math.atan2(y, x)
+    if (mathMethod === 'atan2') {
+      if (!this.validateFunctionArgs('Math.atan2', expr.arguments, 2, expr)) {
+        return { type: OPERAND_TYPE.VALUE, value: 0 };
+      }
+
+      const y = this.getOperand(this.arrowHelper.extractIdentifier(expr.arguments[0]) || expr.arguments[0], activatorId);
+      const x = this.getOperand(this.arrowHelper.extractIdentifier(expr.arguments[1]) || expr.arguments[1], activatorId);
+
+      return { type: OPERAND_TYPE.LC, value: this.pushLogicCommand(OPERATION.ATAN2, y, x, activatorId) };
+    }
+
     // Unsupported Math method
     this.errorHandler.addError(
-      `Unsupported Math method: Math.${mathMethod}(). Supported: abs, min, max, sin, cos, tan`,
+      `Unsupported Math method: Math.${mathMethod}(). Supported: abs, min, max, sin, cos, tan, acos, asin, atan2`,
       expr,
       'unsupported_function'
     );

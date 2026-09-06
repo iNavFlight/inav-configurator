@@ -3,7 +3,7 @@
 import mapSeries from 'promise-map-series';
 
 import mspHelper from './../js/msp/MSPHelper';
-import { GUI } from './gui';
+import GUI from './gui';
 import FC from './fc';
 import { globalSettings, UnitType } from './globalSettings';
 import i18n from './localization';
@@ -21,6 +21,49 @@ function padZeros(val, length) {
     }
 
     return str;
+}
+
+/**
+ * Round a converted value to fewer decimal places when doing so
+ * changes the value by less than 1%. For example, 328.08 ft (from 100m)
+ * becomes "328" and 9842.52 ft becomes "9843". Also rounds to the
+ * nearest 10/100/etc when within 1 of a boundary (e.g. 999 → "1000").
+ * Returns a string like toFixed().
+ */
+function smartRound(value, decimalPlaces) {
+    if (decimalPlaces < 2 || value === 0) {
+        return value.toFixed(decimalPlaces);
+    }
+    // Try removing decimal places (most aggressive first)
+    let best = null;
+    for (let dp = 0; dp <= decimalPlaces - 2; dp++) {
+        let rounded = parseFloat(value.toFixed(dp));
+        if (Math.abs(rounded - value) / Math.abs(value) < 0.01) {
+            best = rounded.toFixed(dp);
+            break;
+        }
+    }
+    // Try rounding to nearest 10, 100, etc. but only when the integer
+    // value is within 1 of a boundary (e.g. 999->1000, 1001->1000).
+    // Use absolute values for boundary detection to handle negatives.
+    if (best !== null) {
+        let intVal = Math.round(Math.abs(value));
+        for (let mag = 1; mag <= 3; mag++) {
+            let factor = Math.pow(10, mag);
+            let remainder = intVal % factor;
+            if (remainder <= 1 || remainder >= factor - 1) {
+                let rounded = Math.sign(value) * Math.round(Math.abs(value) / factor) * factor;
+                if (Math.abs(rounded - value) / Math.abs(value) < 0.01) {
+                    best = rounded.toFixed(0);
+                } else {
+                    break;
+                }
+            } else {
+                break;
+            }
+        }
+    }
+    return best !== null ? best : value.toFixed(decimalPlaces);
 }
 
 var Settings = (function () {
@@ -157,9 +200,19 @@ var Settings = (function () {
                 if (input.data('live')) {
                     input.on('change', function () {
                         const settingPair = self.processInput(input);
+                        if (!settingPair) { return; }
                         return mspHelper.setSetting(settingPair.setting, settingPair.value);
                     });
                 }
+            }).catch(function(err) {
+                // Setting read failed. Log it so the problem is visible, then
+                // remove the input so incorrect data is not shown or saved.
+                console.error('Failed to read setting "' + settingName + '":', err);
+                var parent = input.parents('.setting-container:first');
+                if (parent.length == 0) {
+                    parent = input.parent();
+                }
+                parent.remove();
             });
         });
     };
@@ -534,7 +587,7 @@ var Settings = (function () {
             let mins = oldValue - (hours*60);
             newValue = ((hours < 0) ? padZeros(hours, 3) : padZeros(hours, 2)) + ':' + padZeros(mins, 2);
         } else {
-            newValue = Number((oldValue / multiplier)).toFixed(decimalPlaces);
+            newValue = smartRound(Number(oldValue / multiplier), decimalPlaces);
         }
 
         element.val(newValue);
@@ -595,12 +648,33 @@ var Settings = (function () {
                     value = Math.round((parseFloat(input.val()) * multiplier) * Math.pow(10, precision)) / Math.pow(10, precision);
                 }
 
-                if (value > parseInt(input.data('default-max'))) {
-                    value = parseInt(input.data('default-max'));
+                // data-default-min and data-default-max only exist once a unit
+                // multiplier has rewritten the min and max attributes, so they
+                // hold the bounds in firmware units. Settings without a
+                // multiplier never get them, and parseInt(undefined) is NaN,
+                // which makes both comparisons false and skips the clamp
+                // entirely. Falling back to the attributes covers those,
+                // because without a multiplier the attributes already carry
+                // the firmware-unit bounds.
+                //
+                // This matters because the value is serialized with push8 and
+                // friends, which mask rather than reject. An out-of-range
+                // entry would otherwise wrap into a different in-range value
+                // that the flight controller then accepts as valid.
+                let clampMax = Number.parseInt(input.data('default-max'));
+                if (Number.isNaN(clampMax)) {
+                    clampMax = Number.parseInt(input.attr('max'));
+                }
+                if (!Number.isNaN(clampMax) && value > clampMax) {
+                    value = clampMax;
                 }
 
-                if (value < parseInt(input.data('default-min'))) {
-                    value = parseInt(input.data('default-min'));
+                let clampMin = Number.parseInt(input.data('default-min'));
+                if (Number.isNaN(clampMin)) {
+                    clampMin = Number.parseInt(input.attr('min'));
+                }
+                if (!Number.isNaN(clampMin) && value < clampMin) {
+                    value = clampMin;
                 }
             }
         }
@@ -623,10 +697,15 @@ var Settings = (function () {
     };
 
     self.pickAndSaveSingleInput = function(inputs, finalCallback) {
+        // Skip inputs whose settings failed to load (null settingPair), using a
+        // loop rather than recursion to avoid stack growth for large null runs.
+        while (inputs.length > 0 && !self.processInput(inputs[0])) {
+            inputs.shift();
+        }
         if (inputs.length > 0) {
             var input = inputs.shift();
             var settingPair = self.processInput(input);
-            return mspHelper.setSetting(settingPair.setting, settingPair.value, function() {       
+            return mspHelper.setSetting(settingPair.setting, settingPair.value, function() {
                 return self.pickAndSaveSingleInput(inputs, finalCallback);
             });
         } else {
@@ -688,3 +767,4 @@ var Settings = (function () {
 })();
 
 export default  Settings;
+export { smartRound };

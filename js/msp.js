@@ -4,6 +4,53 @@ import MSPCodes from './msp/MSPCodes';
 import mspQueue from './serial_queue';
 import eventFrequencyAnalyzer from './eventFrequencyAnalyzer';
 import timeout from './timeouts';
+import CONFIGURATOR from './data_storage';
+
+// Every MSP code that changes something on the FC, recognised by name so a write
+// added later is covered without maintaining a list here.
+const WRITE_CODE_NAMES = Object.keys(MSPCodes)
+    .filter(name => /(^|_)SET(_|$)|WRITE|SAVE|ERASE|RESET_|SELECT_/.test(name));
+
+// Writes carrying nothing read off the FC, so an unreadable response cannot poison
+// them. Refusing the live ones would be a hazard of its own.
+const ALWAYS_ALLOWED_WRITE_NAMES = [
+    'MSP_SET_REBOOT',            // stores nothing; the user's way out of a bad session
+    'MSP_SET_MOTOR',             // stopMotors() stops a running motor test with this
+    'MSP_SET_RAW_RC', 'MSP_SET_RAW_GPS', 'MSP_SET_HEAD', 'MSP_SET_RTC',
+    'MSP_EEPROM_WRITE',          // persists what is already on the FC
+    'MSP_RESET_CONF', 'MSP_SET_RESET_CURR_PID',
+    'MSP_SELECT_SETTING', 'MSP2_INAV_SELECT_BATTERY_PROFILE', 'MSP2_INAV_SELECT_MIXER_PROFILE',
+    'MSP_WP_MISSION_SAVE', 'MSP_DATAFLASH_ERASE', 'MSP_OSD_CHAR_WRITE',
+    'MSP_SET_BOX',               // legacy, never sent by this Configurator
+];
+
+// Writes that do not pair with their read by name alone.
+const IRREGULAR_WRITE_SOURCES = {
+    MSP_SET_MODE_RANGE:            'MSP_MODE_RANGES',
+    MSP_SET_ADJUSTMENT_RANGE:      'MSP_ADJUSTMENT_RANGES',
+    MSP2_INAV_OSD_SET_LAYOUT_ITEM: 'MSP2_INAV_OSD_LAYOUTS',
+    MSP2_INAV_SET_GEOZONE_VERTICE: 'MSP2_INAV_GEOZONE_VERTEX',
+};
+
+const WRITE_CODES = new Set(WRITE_CODE_NAMES.map(name => MSPCodes[name]));
+const ALWAYS_ALLOWED_WRITE_CODES = new Set(ALWAYS_ALLOWED_WRITE_NAMES.map(name => MSPCodes[name]));
+
+// write -> the read whose parsed state it hands back, so an unreadable response
+// disables only the saves carrying its values instead of every save.
+const WRITE_SOURCE_CODES = new Map();
+for (const name of WRITE_CODE_NAMES) {
+    if (ALWAYS_ALLOWED_WRITE_CODES.has(MSPCodes[name])) {
+        continue;
+    }
+    // MSP2_INAV_EZ_TUNE_SET names its write the other way round.
+    const sourceName = IRREGULAR_WRITE_SOURCES[name]
+        || (name.endsWith('_SET') ? name.slice(0, -4) : name.replace('SET_', ''));
+    if (MSPCodes[sourceName] !== undefined && sourceName !== name) {
+        WRITE_SOURCE_CODES.set(MSPCodes[name], MSPCodes[sourceName]);
+    }
+}
+
+const CODE_NAMES = new Map(Object.keys(MSPCodes).map(name => [MSPCodes[name], name]));
 
 /**
  *
@@ -74,6 +121,7 @@ var MSP = {
     message_buffer:             null,
     message_buffer_uint8_view:  null,
     message_checksum:           0,
+    message_flag:               0,
     callbacks:                  [],
     packet_error:               0,
     unsupported:                0,
@@ -90,6 +138,51 @@ var MSP = {
 
     processData: null,
 
+    // Reads whose response failed to parse this session. The FC state they fill is
+    // then part fresh and part stale, so the writes handing it back are refused.
+    parseFailures: new Set(),
+
+    // Set by MSPHelper; injected because gui.js already imports this module.
+    onConfigWriteBlocked: null,
+
+    getCodeName(code) {
+        return CODE_NAMES.get(code) || ('0x' + code.toString(16));
+    },
+
+    // Which unreadable response makes this write unsafe, or false if it is safe.
+    blockedWriteSource(code) {
+        if (this.parseFailures.size === 0 || ALWAYS_ALLOWED_WRITE_CODES.has(code)) {
+            return false;
+        }
+
+        const source = WRITE_SOURCE_CODES.get(code);
+        if (source !== undefined) {
+            return this.parseFailures.has(source) ? source : false;
+        }
+
+        // Unpaired write: refuse rather than guess. Over-blocking costs a refused save,
+        // under-blocking puts wrong values into the aircraft.
+        return WRITE_CODES.has(code) ? this.parseFailures.values().next().value : false;
+    },
+
+    // Reports and refuses a write built from an unreadable response.
+    refuseBlockedWrite(code) {
+        const blockedBy = this.blockedWriteSource(code);
+        if (blockedBy === false) {
+            return false;
+        }
+
+        console.error('Refusing MSP write ' + this.getCodeName(code) + ': its source ' +
+            this.getCodeName(blockedBy) + ' could not be parsed this session');
+
+        // A silent refusal would be worse - the user would believe it was saved.
+        if (this.onConfigWriteBlocked) {
+            this.onConfigWriteBlocked(code, blockedBy);
+        }
+
+        return true;
+    },
+
     init() {
         mspQueue.setPutCallback(this.putCallback);
         mspQueue.setremoveCallback(this.removeCallback);
@@ -100,7 +193,13 @@ var MSP = {
     },
 
     read: function (readInfo) {
-        var data = new Uint8Array(readInfo.data);
+        var data;
+        try {
+            data = new Uint8Array(readInfo.data);
+        } catch (e) {
+            console.error('MSP read: Failed to create Uint8Array from readInfo.data:', e, 'readInfo:', readInfo);
+            return;
+        }
 
         for (var i = 0; i < data.length; i++) {
             switch (this.state) {
@@ -141,7 +240,8 @@ var MSP = {
                          this.decoder_states.FLAG_V2;
                     break;
                 case this.decoder_states.FLAG_V2:
-                    // Ignored for now
+                    // Store flag for CRC computation
+                    this.message_flag = data[i];
                     this.state = this.decoder_states.CODE_V2_LOW;
                     break;
                 case this.decoder_states.PAYLOAD_LENGTH_V1:
@@ -227,7 +327,7 @@ var MSP = {
                     break;
                 case this.decoder_states.CHECKSUM_V2:
                     this.message_checksum = 0;
-                    this.message_checksum = this._crc8_dvb_s2(this.message_checksum, 0); // flag
+                    this.message_checksum = this._crc8_dvb_s2(this.message_checksum, this.message_flag); // flag
                     this.message_checksum = this._crc8_dvb_s2(this.message_checksum, this.code & 0xFF);
                     this.message_checksum = this._crc8_dvb_s2(this.message_checksum, (this.code & 0xFF00) >> 8);
                     this.message_checksum = this._crc8_dvb_s2(this.message_checksum, this.message_length_expected & 0xFF);
@@ -254,26 +354,29 @@ var MSP = {
     },
 
     _dispatch_message(expected_checksum) {
-        if (this.message_checksum == expected_checksum) {
-            // message received, process
-            this.processData(this);
-            this.lastFrameReceivedMs = Date.now();
-        } else {
-            console.log('code: ' + this.code + ' - crc failed');
-            this.packet_error++;
-            $('span.packet-error').html(this.packet_error);
+        // Use try-finally to ensure state is ALWAYS reset, even if processData throws
+        try {
+            if (this.message_checksum == expected_checksum) {
+                // message received, process
+                this.processData(this);
+                this.lastFrameReceivedMs = Date.now();
+            } else {
+                console.log('code: ' + this.code + ' - crc failed');
+                this.packet_error++;
+                $('span.packet-error').html(this.packet_error);
+            }
+        } finally {
+            /*
+             * Free port - processData is pluggable, so this cannot depend on it returning.
+             */
+            timeout.add('delayedFreeHardLock', function() {
+                mspQueue.freeHardLock();
+            }, 10);
+
+            // Reset variables - MUST happen even if an exception occurred
+            this.message_length_received = 0;
+            this.state = this.decoder_states.IDLE;
         }
-
-        /*
-         * Free port
-         */
-        timeout.add('delayedFreeHardLock', function() {
-            mspQueue.freeHardLock();
-        }, 10);
-
-        // Reset variables
-        this.message_length_received = 0;
-        this.state = this.decoder_states.IDLE;
     },
 
     /**
@@ -298,6 +401,12 @@ var MSP = {
     },
 
     send_message(code, data, callback_sent, callback_msp, protocolVersion) {
+        // No callback on a refusal: save chains ignore its argument, so calling it
+        // would run the EEPROM write and reboot as if the settings had been stored.
+        if (this.refuseBlockedWrite(code)) {
+            return false;
+        }
+
         var payloadLength = data && data.length ? data.length : 0;
         var length;
         var buffer;
@@ -369,9 +478,38 @@ var MSP = {
             message.retryCounter = 10;
         }
 
-        mspQueue.put(message);
+        this._enqueue(message);
 
         return true;
+    },
+    /*
+     * Hand a message to the queue. put() can reject it (queue locked, or a
+     * request with the same MSP code already pending - the dedup key is the bare
+     * code, which collides for the per-setting MSP2_COMMON_SETTING reads). A
+     * rejected message would never fire its callback and hang any promise
+     * awaiting it, so retry briefly before giving up.
+     */
+    _enqueue(message) {
+        // CONFIGURATOR.cliActive can flip true between retries (each one is a
+        // separate setTimeout, well after the original send_message() call).
+        // Check it before every attempt, including the first: a successful
+        // mspQueue.put() here would land the message in the FC's raw CLI
+        // stream instead of being MSP-parsed, regardless of which attempt
+        // this is. Give up rather than retry once that's happened - same as
+        // exhausting putRetries.
+        if (!CONFIGURATOR.cliActive && mspQueue.put(message)) {
+            return;
+        }
+        if (message.putRetries === undefined) {
+            message.putRetries = 25;
+        }
+        if (message.putRetries > 0 && !CONFIGURATOR.cliActive) {
+            message.putRetries--;
+            setTimeout(() => this._enqueue(message), 150);
+        } else if (message.onFinish) {
+            // Give up rather than hang forever; let the caller's chain proceed.
+            message.onFinish(false);
+        }
     },
      _crc8_dvb_s2(crc, ch) {
         crc ^= ch;
@@ -402,6 +540,10 @@ var MSP = {
     disconnect_cleanup() {
         this.state = 0; // reset packet state for "clean" initial entry (this is only required if user hot-disconnects)
         this.packet_error = 0; // reset CRC packet error counter for next session
+        this.last_received_timestamp = null;
+        this.analog_last_received_timestamp = null;
+        this.lastFrameReceivedMs = 0;
+        this.parseFailures.clear(); // the next session re-reads everything from scratch
 
         this.callbacks_cleanup();
     },

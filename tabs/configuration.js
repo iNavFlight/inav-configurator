@@ -4,7 +4,7 @@ import MSPChainerClass from './../js/msp/MSPchainer';
 import mspHelper from './../js/msp/MSPHelper';
 import MSPCodes from './../js/msp/MSPCodes';
 import MSP from './../js/msp';
-import { GUI, TABS } from './../js/gui';
+import GUI from './../js/gui';
 import FC from './../js/fc';
 import interval from './../js/intervals';
 import VTX from './../js/vtx';
@@ -12,12 +12,72 @@ import i18n from './../js/localization';
 import Settings from './../js/settings';
 import features from './../js/feature_framework';
 
-TABS.configuration = {};
+const configurationTab = {};
 
-TABS.configuration.initialize = function (callback, scrollPosition) {
+function isIna226Selected($meterType) {
+    const settingInfo = $meterType.data('setting-info');
+    const selectedValue = Number.parseInt($meterType.val());
 
-    if (GUI.active_tab != 'configuration') {
-        GUI.active_tab = 'configuration';
+    return settingInfo?.table?.values?.[selectedValue] === 'INA226';
+}
+
+function updateIna226SettingsVisibility() {
+    const usesIna226Voltage = isIna226Selected($('#vbat_meter_type'));
+    const usesIna226Current = isIna226Selected($('#current_meter_type'));
+
+    $('.ina226-common-setting').toggle(usesIna226Voltage || usesIna226Current);
+    $('.ina226-current-setting').toggle(usesIna226Current);
+    $('.adc-voltage-setting').toggle(!usesIna226Voltage);
+    $('.adc-current-setting').toggle(!usesIna226Current);
+}
+
+function isMztcPortAssigned() {
+    const ports = FC.SERIAL_CONFIG?.ports;
+    if (!Array.isArray(ports)) {
+        return false;
+    }
+
+    return ports.some(port => port.functions?.includes('MZTC_CAMERA'));
+}
+
+function updateMztcSettingsVisibility() {
+    // The camera settings only reach the firmware over a UART, so the card is
+    // meaningless until the peripheral is assigned in the Ports tab.
+    $('.config-mztc').toggle(isMztcPortAssigned());
+}
+
+// Applying a preset is an action on the firmware, not a stored value. The
+// firmware writes the palette, brightness, contrast, enhancement, both denoise
+// levels, the shutter mode and the correction interval, then reports them back.
+// Sending MSP2_SET_MZTC_PRESET is what makes that happen. Saving the setting on
+// its own would only record the label.
+function applyMztcPreset(presetIndex, onDone) {
+    MSP.send_message(MSPCodes.MSP2_SET_MZTC_PRESET, [presetIndex], false, function () {
+        // Re-read every setting so the advanced fields show what the firmware
+        // actually applied instead of the values the user was looking at.
+        Settings.processHtml(onDone || function () {})();
+    });
+}
+
+function bindMztcPresetSelector() {
+    const $preset = $('#mztc_preset');
+    if (!$preset.length) {
+        return;
+    }
+
+    $preset.on('change', function () {
+        const value = Number.parseInt($(this).val(), 10);
+        if (Number.isNaN(value)) {
+            return;
+        }
+        applyMztcPreset(value);
+    });
+}
+
+configurationTab.initialize = function (callback, scrollPosition) {
+
+    if (GUI.active_tab !== this) {
+        GUI.active_tab = this;
 
     }
 
@@ -30,7 +90,8 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         mspHelper.loadVTXConfig,
         mspHelper.loadBoardAlignment,
         mspHelper.loadCurrentMeterConfig,
-        mspHelper.loadMiscV2
+        mspHelper.loadMiscV2,
+        mspHelper.loadSerialPorts
     ];
 
     loadChainer.setChain(loadChain);
@@ -75,7 +136,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         import('./configuration.html?raw').then(({default: html}) => GUI.load(html, Settings.processHtml(process_html)));
     }
 
-    function process_html() {
+    function process_html(settingsPromise) {
 
         let i;
 
@@ -163,9 +224,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
 
             var vtx_power = $('#vtx_power');
             vtx_power.empty();
-            var minPower = VTX.getMinPower(FC.VTX_CONFIG.device_type);
-            var maxPower = VTX.getMaxPower(FC.VTX_CONFIG.device_type);
-            for (var ii = minPower; ii <= maxPower; ii++) {
+            for (var ii = FC.VTX_CONFIG.power_min; ii <= FC.VTX_CONFIG.power_count; ii++) {
                 var option = $('<option value="' + ii + '">' + ii + '</option>');
                 if (ii == FC.VTX_CONFIG.power) {
                     option.prop('selected', true);
@@ -263,7 +322,16 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
 
         });
 
-        $i2cSpeed.trigger('change');
+        // Wait for settings to load before triggering change event
+        settingsPromise.then(function() {
+            $i2cSpeed.trigger('change');
+            $('#vbat_meter_type, #current_meter_type').on('change', updateIna226SettingsVisibility);
+            updateIna226SettingsVisibility();
+            updateMztcSettingsVisibility();
+            bindMztcPresetSelector();
+        }).catch(function(error) {
+            console.error('Settings load failed, dependent controls not initialized:', error);
+        });
 
         $('a.save').on('click', function () {
             //UPDATE: moved to GPS tab and hidden
@@ -299,6 +367,8 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
     }
 };
 
-TABS.configuration.cleanup = function (callback) {
+configurationTab.cleanup = function (callback) {
     if (callback) callback();
 };
+
+export default configurationTab;

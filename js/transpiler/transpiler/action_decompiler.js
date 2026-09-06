@@ -51,40 +51,96 @@ class ActionDecompiler {
         return this.handleOverrideThrottle(lc, allConditions);
     }
 
-    const value = this.decompileOperand(lc.operandBType, lc.operandBValue, allConditions);
+    // Operations that only use operandA (operandB is unused/ignored)
+    // These should not decompile operandB to avoid incorrect validation warnings
+    const operandAOnlyOperations = [
+      OPERATION.SET_VTX_POWER_LEVEL,
+      OPERATION.SET_VTX_BAND,
+      OPERATION.SET_VTX_CHANNEL,
+      OPERATION.SET_OSD_LAYOUT,
+      OPERATION.LOITER_OVERRIDE,
+      OPERATION.OVERRIDE_MIN_GROUND_SPEED,
+      OPERATION.SET_HEADING_TARGET,
+      OPERATION.SET_PROFILE,
+      OPERATION.SET_GIMBAL_SENSITIVITY
+    ];
+
+    // Operations that use no operands (boolean flags only)
+    const noOperandOperations = [
+      OPERATION.OVERRIDE_ARMING_SAFETY,
+      OPERATION.SWAP_ROLL_YAW,
+      OPERATION.INVERT_ROLL,
+      OPERATION.INVERT_PITCH,
+      OPERATION.INVERT_YAW,
+      OPERATION.DISABLE_GPS_FIX,
+      OPERATION.RESET_MAG_CALIBRATION
+    ];
+
+    // INAV operand pattern (confirmed by logic_condition.c):
+    // - Most overrides: operandA = value, operandB = 0 (unused)
+    // - GVAR_INC/DEC: operandA = gvar index, operandB = increment/decrement
+    // - FLIGHT_AXIS: operandA = axis index, operandB = angle/rate
+    // - RC_CHANNEL: operandA = channel, operandB = value
+    // - PORT_SET: operandA = pin, operandB = value
+
+    // Warn about unexpected operands (version detection for new firmware features)
+    if (noOperandOperations.includes(lc.operation)) {
+      if (lc.operandAType !== 0 || lc.operandAValue !== 0) {
+        this.addWarning(`Unexpected operand A to ${getOperationName(lc.operation)} operation (type=${lc.operandAType}, value=${lc.operandAValue}). This may indicate a firmware version mismatch.`);
+      }
+      if (lc.operandBType !== 0 || lc.operandBValue !== 0) {
+        this.addWarning(`Unexpected operand B to ${getOperationName(lc.operation)} operation (type=${lc.operandBType}, value=${lc.operandBValue}). This may indicate a firmware version mismatch.`);
+      }
+    } else if (operandAOnlyOperations.includes(lc.operation)) {
+      if (lc.operandBType !== 0 || lc.operandBValue !== 0) {
+        this.addWarning(`Unexpected operand B to ${getOperationName(lc.operation)} operation (type=${lc.operandBType}, value=${lc.operandBValue}). This may indicate a firmware version mismatch.`);
+      }
+    }
+
+    // Only decompile operands that are actually used by the operation
+    // This prevents incorrect validation warnings (e.g., PID range check on unused operands)
+    const valueA = noOperandOperations.includes(lc.operation)
+      ? null
+      : this.decompileOperand(lc.operandAType, lc.operandAValue, allConditions);
+    const valueB = (operandAOnlyOperations.includes(lc.operation) || noOperandOperations.includes(lc.operation))
+      ? null
+      : this.decompileOperand(lc.operandBType, lc.operandBValue, allConditions);
 
     switch (lc.operation) {
+      // GVAR operations: operandA = index, operandB = value
       case OPERATION.GVAR_INC:
-        return this.handleGvarInc(lc, value);
+        return this.handleGvarInc(lc, valueB);
 
       case OPERATION.GVAR_DEC:
-        return this.handleGvarDec(lc, value);
+        return this.handleGvarDec(lc, valueB);
 
       // OVERRIDE_THROTTLE_SCALE and OVERRIDE_THROTTLE handled in first switch (structural hoisting)
 
+      // Override operations: operandA = value, operandB = 0
       case OPERATION.SET_VTX_POWER_LEVEL:
-        return this.handleSetVtxPowerLevel(value);
+        return this.handleSetVtxPowerLevel(valueA);
 
       case OPERATION.SET_VTX_BAND:
-        return this.handleSetVtxBand(value);
+        return this.handleSetVtxBand(valueA);
 
       case OPERATION.SET_VTX_CHANNEL:
-        return this.handleSetVtxChannel(value);
+        return this.handleSetVtxChannel(valueA);
 
       case OPERATION.OVERRIDE_ARMING_SAFETY:
         return this.handleOverrideArmingSafety();
 
       case OPERATION.SET_OSD_LAYOUT:
-        return this.handleSetOsdLayout(value);
+        return this.handleSetOsdLayout(valueA);
 
+      // RC_CHANNEL_OVERRIDE: operandA = channel, operandB = value
       case OPERATION.RC_CHANNEL_OVERRIDE:
-        return this.handleRcChannelOverride(lc, value);
+        return this.handleRcChannelOverride(lc, valueB);
 
       case OPERATION.LOITER_OVERRIDE:
-        return this.handleLoiterOverride(value);
+        return this.handleLoiterOverride(valueA);
 
       case OPERATION.OVERRIDE_MIN_GROUND_SPEED:
-        return this.handleOverrideMinGroundSpeed(value);
+        return this.handleOverrideMinGroundSpeed(valueA);
 
       case OPERATION.SWAP_ROLL_YAW:
         return this.handleSwapRollYaw();
@@ -99,25 +155,27 @@ class ActionDecompiler {
         return this.handleInvertYaw();
 
       case OPERATION.SET_HEADING_TARGET:
-        return this.handleSetHeadingTarget(value);
+        return this.handleSetHeadingTarget(valueA);
 
       case OPERATION.SET_PROFILE:
-        return this.handleSetProfile(value);
+        return this.handleSetProfile(valueA);
 
+      // FLIGHT_AXIS: operandA = axis, operandB = angle/rate
       case OPERATION.FLIGHT_AXIS_ANGLE_OVERRIDE:
-        return this.handleFlightAxisAngleOverride(lc, value);
+        return this.handleFlightAxisAngleOverride(lc, valueB);
 
       case OPERATION.FLIGHT_AXIS_RATE_OVERRIDE:
-        return this.handleFlightAxisRateOverride(lc, value);
+        return this.handleFlightAxisRateOverride(lc, valueB);
 
       case OPERATION.SET_GIMBAL_SENSITIVITY:
-        return this.handleSetGimbalSensitivity(value);
+        return this.handleSetGimbalSensitivity(valueA);
 
-      case OPERATION.LED_PIN_PWM:
-        return this.handleLedPinPwm(lc, value);
+      case OPERATION.PINIO_PWM:
+        return this.handlePinioPwm(valueA, valueB);
 
+      // PORT_SET: operandA = pin, operandB = value
       case OPERATION.PORT_SET:
-        return this.handlePortSet(lc, value);
+        return this.handlePortSet(lc, valueB);
 
       case OPERATION.DISABLE_GPS_FIX:
         return this.handleDisableGpsFix();
@@ -144,7 +202,7 @@ class ActionDecompiler {
    * @returns {string} JavaScript statement(s)
    */
   handleGvarSet(lc, allConditions) {
-    const targetName = this.getVarNameForGvar(lc.operandAValue) || `gvar[${lc.operandAValue}]`;
+    const targetName = this.getVarNameForGvar(lc.operandAValue) || `inav.gvar[${lc.operandAValue}]`;
     return this.handleAssignmentWithHoisting(
       targetName,
       lc.operandBType, lc.operandBValue,
@@ -320,12 +378,12 @@ class ActionDecompiler {
   // at the LC level in handleAssignmentWithHoisting/decompileWithHoisting.
 
   handleGvarInc(lc, value) {
-    const targetName = this.getVarNameForGvar(lc.operandAValue) || `gvar[${lc.operandAValue}]`;
+    const targetName = this.getVarNameForGvar(lc.operandAValue) || `inav.gvar[${lc.operandAValue}]`;
     return `${targetName} = ${targetName} + ${value};`;
   }
 
   handleGvarDec(lc, value) {
-    const targetName = this.getVarNameForGvar(lc.operandAValue) || `gvar[${lc.operandAValue}]`;
+    const targetName = this.getVarNameForGvar(lc.operandAValue) || `inav.gvar[${lc.operandAValue}]`;
     return `${targetName} = ${targetName} - ${value};`;
   }
 
@@ -337,8 +395,8 @@ class ActionDecompiler {
    */
   handleOverrideThrottleScale(lc, allConditions) {
     return this.handleAssignmentWithHoisting(
-      'override.throttleScale',
-      lc.operandBType, lc.operandBValue,
+      'inav.override.throttleScale',
+      lc.operandAType, lc.operandAValue,  // Value is in operandA (per logic_condition.c)
       allConditions
     );
   }
@@ -352,7 +410,7 @@ class ActionDecompiler {
    */
   handleOverrideThrottle(lc, allConditions) {
     return this.handleAssignmentWithHoisting(
-      'override.throttle',
+      'inav.override.throttle',
       lc.operandAType, lc.operandAValue,  // Note: uses operandA
       allConditions
     );
@@ -360,7 +418,7 @@ class ActionDecompiler {
 
   /**
    * Generic handler for assignments that may need structural hoisting.
-   * @param {string} targetName - Assignment target (e.g., 'override.throttle')
+   * @param {string} targetName - Assignment target (e.g., 'inav.override.throttle')
    * @param {number} valueType - Operand type for the value
    * @param {number} valueValue - Operand value
    * @param {Array} allConditions - All conditions for LC chain traversal
@@ -394,62 +452,62 @@ class ActionDecompiler {
   }
 
   handleSetVtxPowerLevel(value) {
-    return `override.vtx.power = ${value};`;
+    return `inav.override.vtx.power = ${value};`;
   }
 
   handleSetVtxBand(value) {
-    return `override.vtx.band = ${value};`;
+    return `inav.override.vtx.band = ${value};`;
   }
 
   handleSetVtxChannel(value) {
-    return `override.vtx.channel = ${value};`;
+    return `inav.override.vtx.channel = ${value};`;
   }
 
   handleOverrideArmingSafety() {
-    return `override.armSafety = true;`;
+    return `inav.override.armSafety = true;`;
   }
 
   handleSetOsdLayout(value) {
-    return `override.osdLayout = ${value};`;
+    return `inav.override.osdLayout = ${value};`;
   }
 
   handleRcChannelOverride(lc, value) {
     // operandA contains channel number (1-based: 1-18)
     // Use cleaner array syntax instead of override.rcChannel()
-    return `rc[${lc.operandAValue}] = ${value};`;
+    return `inav.rc[${lc.operandAValue}] = ${value};`;
   }
 
   handleLoiterOverride(value) {
-    return `override.loiterRadius = ${value};`;
+    return `inav.override.loiterRadius = ${value};`;
   }
 
   handleOverrideMinGroundSpeed(value) {
-    return `override.minGroundSpeed = ${value};`;
+    return `inav.override.minGroundSpeed = ${value};`;
   }
 
   handleSwapRollYaw() {
-    return `override.swapRollYaw = true;`;
+    return `inav.override.swapRollYaw = true;`;
   }
 
   handleInvertRoll() {
-    return `override.invertRoll = true;`;
+    return `inav.override.invertRoll = true;`;
   }
 
   handleInvertPitch() {
-    return `override.invertPitch = true;`;
+    return `inav.override.invertPitch = true;`;
   }
 
   handleInvertYaw() {
-    return `override.invertYaw = true;`;
+    return `inav.override.invertYaw = true;`;
   }
 
   handleSetHeadingTarget(value) {
     // Value is in centidegrees
-    return `override.headingTarget = ${value};`;
+    return `inav.override.headingTarget = ${value};`;
   }
 
   handleSetProfile(value) {
-    return `override.profile = ${value};`;
+    return `inav.override.profile = ${value};`;
   }
 
   handleFlightAxisAngleOverride(lc, value) {
@@ -457,7 +515,7 @@ class ActionDecompiler {
     const axisNames = ['roll', 'pitch', 'yaw'];
     const axisIndex = lc.operandAValue;
     const axisName = axisNames[axisIndex] || axisIndex;
-    return `override.flightAxis.${axisName}.angle = ${value};`;
+    return `inav.override.flightAxis.${axisName}.angle = ${value};`;
   }
 
   handleFlightAxisRateOverride(lc, value) {
@@ -465,31 +523,31 @@ class ActionDecompiler {
     const axisNames = ['roll', 'pitch', 'yaw'];
     const axisIndex = lc.operandAValue;
     const axisName = axisNames[axisIndex] || axisIndex;
-    return `override.flightAxis.${axisName}.rate = ${value};`;
+    return `inav.override.flightAxis.${axisName}.rate = ${value};`;
   }
 
   handleSetGimbalSensitivity(value) {
-    return `override.gimbalSensitivity = ${value};`;
+    return `inav.override.gimbalSensitivity = ${value};`;
   }
 
-  handleLedPinPwm(lc, value) {
-    // operandA is pin (0-7), operandB is PWM value
-    this.addWarning(`LED_PIN_PWM may need verification - check API syntax`);
-    return `override.ledPin(${lc.operandAValue}, ${value});`;
+  handlePinioPwm(duty, pin) {
+    // operandA = duty cycle (0-100), operandB = pin (0=LED pin, 1=USER1, 2=USER2, ...)
+    // Function name "pwmOnPin" mirrors the operand order: pwm (duty) first, pin second
+    return `inav.override.pwmOnPin(${duty}, ${pin});`;
   }
 
   handlePortSet(lc, value) {
     // operandA is port (0-7), operandB is value (0 or 1)
     this.addWarning(`PORT_SET may not be available in JavaScript API`);
-    return `/* override.port(${lc.operandAValue}, ${value}); */ // PORT_SET - may not be supported`;
+    return `/* inav.override.port(${lc.operandAValue}, ${value}); */ // PORT_SET - may not be supported`;
   }
 
   handleDisableGpsFix() {
-    return `override.disableGpsFix = true;`;
+    return `inav.override.disableGpsFix = true;`;
   }
 
   handleResetMagCalibration() {
-    return `override.resetMagCalibration = true;`;
+    return `inav.override.resetMagCalibration = true;`;
   }
 
   handleArithmeticOperation(lc, value, allConditions) {

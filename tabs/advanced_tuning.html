@@ -70,6 +70,11 @@
                             <label for="launchEndTime"><span data-i18n="configurationLaunchEndTime"></span></label>
                             <div for="launchEndTime" class="helpicon cf_tip" data-i18n_title="configurationLaunchEndTimeHelp"></div>
                         </div>
+                        <div class="checkbox">
+                            <input type="checkbox" class="toggle update_preview" id="launchManual" data-setting="nav_fw_launch_manual_throttle" data-live="true" />
+                            <label for="launchManual"><span data-i18n="configurationLaunchManual"></span></label>
+                            <div for="launchManual" class="helpicon cf_tip" data-i18n_title="configurationLaunchManualHelp"></div>
+                        </div>
                     </div>
                 </div>
 
@@ -263,6 +268,43 @@
 
                     </div>
                 </div>
+
+                <div class="config-section gui_box grey">
+                    <div class="gui_box_titlebar">
+                        <div class="spacer_box_title" data-i18n="fixedWingAutoSpeedConfiguration"></div>
+                    </div>
+                    <div class="spacer_box">
+                        <div class="number">
+                            <input id="minAutoSpeed" type="number" data-unit="ms" data-setting="fw_auto_speed_min_speed" data-setting-multiplier="1" step="1" min="5" max="50" />
+                            <label for="minAutoSpeed"><span data-i18n="minAutoSpeed"></span></label>
+                        </div>
+
+                        <div class="number">
+                            <input id="maxAutoSpeed" type="number" data-unit="ms" data-setting="fw_auto_speed_max_speed" data-setting-multiplier="1" step="1" min="5" max="50" />
+                            <label for="maxAutoSpeed"><span data-i18n="maxAutoSpeed"></span></label>
+                        </div>
+
+                        <div class="number">
+                            <input id="autoSpeedChannel" type="number" data-setting="fw_auto_speed_channel" data-setting-multiplier="1" step="1" min="4" max="34" />
+                            <label for="autoSpeedChannel"><span data-i18n="autoSpeedChannel"></span></label>
+                            <div for="autoSpeedChannel" class="helpicon cf_tip" data-i18n_title="autoSpeedChannelHelp"></div>
+                        </div>
+
+                        <div class="number">
+                            <input id="autoSpeedThrSmoothing" type="number" data-setting="fw_auto_speed_thr_smoothing" data-setting-multiplier="1" step="1" min="1" max="10" />
+                            <label for="autoSpeedThrSmoothing"><span data-i18n="autoSpeedThrSmoothing"></span></label>
+                            <div for="autoSpeedThrSmoothing" class="helpicon cf_tip" data-i18n_title="autoSpeedThrSmoothingHelp"></div>
+                        </div>
+
+                        <div class="number">
+                            <input id="autoSpeedLevelMinThr" type="number" data-unit="us" data-setting="fw_auto_speed_level_min_thr" data-setting-multiplier="1" step="1" min="1000" max="2000" />
+                            <label for="autoSpeedLevelMinThr"><span data-i18n="autoSpeedLevelMinThr"></span></label>
+                            <div for="autoSpeedLevelMinThr" class="helpicon cf_tip" data-i18n_title="autoSpeedLevelMinThrHelp"></div>
+                        </div>
+
+                    </div>
+                </div>
+
             </div>
             <!-- right wrapper -->
 

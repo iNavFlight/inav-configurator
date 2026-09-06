@@ -3,21 +3,23 @@
 import MSPCodes from './../js/msp/MSPCodes';
 import MSP from './../js/msp';
 import mspHelper from"./../js/msp/MSPHelper";
-import { GUI, TABS } from './../js/gui';
+import GUI from './../js/gui';
 import FC from './../js/fc';
 import CONFIGURATOR from './../js/data_storage';
 import features from './../js/feature_framework';
 import i18n from './../js/localization';
 import BitHelper from './../js/bitHelper';
+import dialog from './../js/dialog';
 
 var sdcardTimer;
 
-TABS.onboard_logging = {
+const onboardLoggingTab = {
 };
 
-TABS.onboard_logging.initialize = function (callback) {
+onboardLoggingTab.initialize = function (callback) {
     let
-        saveCancelled, eraseCancelled;
+        saveCancelled, eraseCancelled,
+        terrainEnabled = false;
 
     //Add future blackbox values here and in messages.json, the checkbox are drawn by js
     const blackBoxFields = [
@@ -37,17 +39,28 @@ TABS.onboard_logging.initialize = function (callback) {
         "BLACKBOX_FEATURE_SERVOS",
     ];
 
-    if (GUI.active_tab != 'onboard_logging') {
-        GUI.active_tab = 'onboard_logging';
+    if (GUI.active_tab !== this) {
+        GUI.active_tab = this;
     }
 
     if (CONFIGURATOR.connectionValid) {
         MSP.send_message(MSPCodes.MSP_FEATURE, false, false, function() {
             MSP.send_message(MSPCodes.MSP_DATAFLASH_SUMMARY, false, false, function() {
-                MSP.send_message(MSPCodes.MSP_SDCARD_SUMMARY, false, false, function() {
-		            MSP.send_message(MSPCodes.MSP2_BLACKBOX_CONFIG, false, false, load_html);
-                });
+                MSP.send_message(MSPCodes.MSP_SDCARD_SUMMARY, false, false, load_terrain_setting);
             });
+        });
+    }
+
+    function load_terrain_setting() {
+        mspHelper.getSetting("terrain_enabled").then(function(data) {
+            if (data == null) {
+                console.warn("while setting terrain_enabled, data is null or undefined");
+                return;
+            }
+
+            terrainEnabled = Boolean(data.value);
+        }).then(function() {
+            MSP.send_message(MSPCodes.MSP2_BLACKBOX_CONFIG, false, false, load_html);
         });
     }
 
@@ -78,7 +91,7 @@ TABS.onboard_logging.initialize = function (callback) {
     function load_html() {
         import('./onboard_logging.html?raw').then(({default: html}) => GUI.load(html, function() {
             // translate to user-selected language
-           i18n.localize();;
+           i18n.localize();
 
             var
                 dataflashPresent = FC.DATAFLASH.totalSize > 0,
@@ -95,7 +108,8 @@ TABS.onboard_logging.initialize = function (callback) {
                 .toggleClass("sdcard-supported", FC.SDCARD.supported)
                 .toggleClass("blackbox-config-supported", FC.BLACKBOX.supported)
                 .toggleClass("blackbox-supported", blackboxSupport)
-                .toggleClass("blackbox-unsupported", !blackboxSupport);
+                .toggleClass("blackbox-unsupported", !blackboxSupport)
+                .toggleClass("only-terrain-supported", !blackboxSupport && terrainEnabled);
 
             if (dataflashPresent) {
                 // UI hooks
@@ -207,17 +221,29 @@ TABS.onboard_logging.initialize = function (callback) {
         for (var i = 0; i < loggingRates.length; i++) {
             if (!addedCurrentValue && userRate.num / userRate.denom <= loggingRates[i].num / loggingRates[i].denom) {
                 if (userRate.num / userRate.denom < loggingRates[i].num / loggingRates[i].denom) {
-                    loggingRatesSelect.append('<option value="' + userRate.num + '/' + userRate.denom + '">'
-                            + userRate.num + '/' + userRate.denom + ' (' + Math.round(userRate.num / userRate.denom * 100) + '%)</option>');
+                    var userPercent = Math.round(userRate.num / userRate.denom * 100);
+                    loggingRatesSelect.append('<option value="' + userRate.num + '/' + userRate.denom + '" data-percent="' + userPercent + '">'
+                            + userRate.num + '/' + userRate.denom + ' (' + userPercent + '%)</option>');
                 }
                 addedCurrentValue = true;
             }
 
-            loggingRatesSelect.append('<option value="' + loggingRates[i].num + '/' + loggingRates[i].denom + '">'
-                + loggingRates[i].num + '/' + loggingRates[i].denom + ' (' + Math.round(loggingRates[i].num / loggingRates[i].denom * 100) + '%)</option>');
+            var percent = Math.round(loggingRates[i].num / loggingRates[i].denom * 100);
+            loggingRatesSelect.append('<option value="' + loggingRates[i].num + '/' + loggingRates[i].denom + '" data-percent="' + percent + '">'
+                + loggingRates[i].num + '/' + loggingRates[i].denom + ' (' + percent + '%)</option>');
 
         }
         loggingRatesSelect.val(userRate.num + '/' + userRate.denom);
+
+        loggingRatesSelect.on('change', update_terrain_rate_warning);
+        update_terrain_rate_warning();
+    }
+
+    function update_terrain_rate_warning() {
+        var percent = parseInt($(".blackboxRate select option:selected").data("percent"), 10);
+        var showWarning = terrainEnabled && percent > 25;
+
+        $(".tab-onboard_logging .terrain-rate-warning").toggle(showWarning);
     }
 
     function formatFilesizeKilobytes(kilobytes) {
@@ -367,17 +393,21 @@ TABS.onboard_logging.initialize = function (callback) {
 
                                 $(".dataflash-saving progress").attr("value", nextAddress / maxBytes * 100);
 
-                                fs.writeFileSync(filename, new Uint8Array(chunk), {
-                                    "flag": "a"
-                                })
-
-                                if (saveCancelled) {
-                                    dismiss_saving_dialog();
-                                } else if (nextAddress >= maxBytes) {
-                                    mark_saving_dialog_done();
-                                }else {
-                                    mspHelper.dataflashRead(nextAddress, onChunkRead);
-                                }
+                                window.electronAPI.appendFile(filename, new Uint8Array(chunk))
+                                    .then(() => {
+                                        if (saveCancelled) {
+                                            dismiss_saving_dialog();
+                                        } else if (nextAddress >= maxBytes) {
+                                            mark_saving_dialog_done();
+                                        } else {
+                                            mspHelper.dataflashRead(nextAddress, onChunkRead);
+                                        }
+                                    })
+                                    .catch(err => {
+                                        console.error('Error writing blackbox data:', err);
+                                        GUI.log(i18n.getMessage('ErrorWritingFile'));
+                                        dismiss_saving_dialog();
+                                    });
 
                             } else {
                                 // A zero-byte block indicates end-of-file, so we're done
@@ -457,7 +487,7 @@ TABS.onboard_logging.initialize = function (callback) {
     }
 };
 
-TABS.onboard_logging.cleanup = function (callback) {
+onboardLoggingTab.cleanup = function (callback) {
     if (sdcardTimer) {
         clearTimeout(sdcardTimer);
         sdcardTimer = false;
@@ -467,3 +497,5 @@ TABS.onboard_logging.cleanup = function (callback) {
         callback();
     }
 };
+
+export default onboardLoggingTab;

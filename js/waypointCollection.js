@@ -433,7 +433,8 @@ let WaypointCollection = function () {
 
     self.getElevation = async function(globalSettings) {
         const [nLoop, point2measure, altPoint2measure, namePoint2measure, refPoint2measure] = self.getPoint2Measure(true);
-        let lengthMission = self.getDistance(true);
+        // false: real distance; true returns -1 for looping JUMP missions, zeroing samples
+        let lengthMission = self.getDistance(false);
         let totalMissionDistance = lengthMission.length >= 1 ? lengthMission[lengthMission.length -1].toFixed(1) : 0;
         let samples;
         let sampleMaxNum;
@@ -453,24 +454,30 @@ let WaypointCollection = function () {
             samples = sampleMaxNum;
         }
 
-        let elevation = "N/A";
+        samples = Math.max(1, samples); // opentopodata rejects < 2 samples (we send samples+1)
+
+        let elevation = [];
         let coordList = "";
         point2measure.forEach(function (item) {
             coordList += item + '|';
         });
-        const response = await fetch('https://api.opentopodata.org/v1/aster30m?locations='+coordList+'&samples='+String(samples+1));
-        const myJson = await response.json();
+        try {
+            const response = await fetch('https://api.opentopodata.org/v1/aster30m?locations='+coordList+'&samples='+String(samples+1));
+            const myJson = await response.json();
 
-        if (myJson.status == "OK") {
-            elevation = [];
-            for (var i = 0; i < myJson.results.length; i++){
-                if (myJson.results[i].elevation == null) {
-                    elevation[i] = 0;
-                } else {
-                    elevation[i] = myJson.results[i].elevation;
+            if (myJson.status == "OK") {
+                elevation = [];
+                for (var i = 0; i < myJson.results.length; i++){
+                    if (myJson.results[i].elevation == null) {
+                        elevation[i] = 0;
+                    } else {
+                        elevation[i] = myJson.results[i].elevation;
+                    }
                 }
             }
-        }        
+        } catch (error) {
+            console.log('Elevation lookup failed: ' + error.message);
+        }
         //console.log("elevation ", elevation);
         return [lengthMission, totalMissionDistance, samples, elevation, altPoint2measure, namePoint2measure, refPoint2measure];
     }

@@ -21,3 +21,5 @@ eeprom.bin
 # ctags
 tags
 TAGS
+start-with-debugging.sh
+dist-web/

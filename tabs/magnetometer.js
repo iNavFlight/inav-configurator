@@ -10,24 +10,24 @@ import MSP from './../js/msp';
 import MSPCodes from './../js/msp/MSPCodes';
 import mspHelper from './../js/msp/MSPHelper';
 import FC from './../js/fc';
-import { GUI, TABS } from './../js/gui';
+import GUI from './../js/gui';
 import i18n from './../js/localization';
 import { mixer } from './../js/model';
 import interval from './../js/intervals';
 import jBox from 'jbox';
 
-TABS.magnetometer = {};
+const magnetometerTab = {};
 
 
-TABS.magnetometer.initialize = function (callback) {
+magnetometerTab.initialize = function (callback) {
     var self = this;
 
     var modal;
     // var accel_data_45 = [0, 0, 0];
     var heading_flat;
 
-    if (GUI.active_tab != 'magnetometer') {
-        GUI.active_tab = 'magnetometer';
+    if (GUI.active_tab !== this) {
+        GUI.active_tab = this;
     }
 
     self.alignmentConfig = {
@@ -67,32 +67,41 @@ TABS.magnetometer.initialize = function (callback) {
         function (callback) {
             mspHelper.getSetting("align_mag_roll").then(function (data) {
                 if (data == null) {
-                    console.log("while settting align_mag_roll, data is null or undefined");
-                    return;
+                    console.warn("while setting align_mag_roll, data is null or undefined");
+                    return Promise.resolve();
                 }
                 self.alignmentConfig.roll = parseInt(data.value, 10) / 10;
                 self.mag_saved_roll = self.alignmentConfig.roll;
-            }).then(callback)
+            }).then(callback).catch(err => {
+                console.error('Failed to get align_mag_roll:', err);
+                callback();
+            });
         },
         function (callback) {
             mspHelper.getSetting("align_mag_pitch").then(function (data) {
                 if (data == null) {
-                    console.log("while settting align_mag_pitch, data is null or undefined");
-                    return;
+                    console.warn("while setting align_mag_pitch, data is null or undefined");
+                    return Promise.resolve();
                 }
                 self.alignmentConfig.pitch = parseInt(data.value, 10) / 10;
                 self.mag_saved_pitch = self.alignmentConfig.pitch;
-            }).then(callback)
+            }).then(callback).catch(err => {
+                console.error('Failed to get align_mag_pitch:', err);
+                callback();
+            });
         },
         function (callback) {
             mspHelper.getSetting("align_mag_yaw").then(function (data) {
                 if (data == null) {
-                    console.log("while settting align_mag_yaw, data is null or undefined");
-                    return;
+                    console.warn("while setting align_mag_yaw, data is null or undefined");
+                    return Promise.resolve();
                 }
                 self.alignmentConfig.yaw = parseInt(data.value, 10) / 10;
                 self.mag_saved_yaw = self.alignmentConfig.yaw;
-            }).then(callback)
+            }).then(callback).catch(err => {
+                console.error('Failed to get align_mag_yaw:', err);
+                callback();
+            });
         }
     ];
 
@@ -257,6 +266,8 @@ TABS.magnetometer.initialize = function (callback) {
         }
     }
 
+    let _settingSlider = false;
+
     function updateFCCliString() {
         var s = " align_board_roll=" + (self.boardAlignmentConfig.roll * 10) +  
                 " align_board_pitch=" + (self.boardAlignmentConfig.pitch * 10) + 
@@ -271,7 +282,7 @@ TABS.magnetometer.initialize = function (callback) {
         }
 
         self.boardAlignmentConfig.roll = Number(value);
-        self.pageElements.board_roll_slider.val(self.boardAlignmentConfig.roll);
+        if (self.pageElements.board_roll_slider[0].noUiSlider && !_settingSlider) { _settingSlider = true; self.pageElements.board_roll_slider[0].noUiSlider.set(self.boardAlignmentConfig.roll); _settingSlider = false; }
         self.pageElements.orientation_board_roll.val(self.boardAlignmentConfig.roll);
         updateMagOrientationWithPreset();
         updateFCCliString();
@@ -280,7 +291,7 @@ TABS.magnetometer.initialize = function (callback) {
 
     function updateBoardPitchAxis(value) {
         self.boardAlignmentConfig.pitch = Number(value);
-        self.pageElements.board_pitch_slider.val(self.boardAlignmentConfig.pitch);
+        if (self.pageElements.board_pitch_slider[0].noUiSlider && !_settingSlider) { _settingSlider = true; self.pageElements.board_pitch_slider[0].noUiSlider.set(self.boardAlignmentConfig.pitch); _settingSlider = false; }
         self.pageElements.orientation_board_pitch.val(self.boardAlignmentConfig.pitch);
         updateMagOrientationWithPreset();
         updateFCCliString();
@@ -289,7 +300,7 @@ TABS.magnetometer.initialize = function (callback) {
 
     function updateBoardYawAxis(value) {
         self.boardAlignmentConfig.yaw = Number(value);
-        self.pageElements.board_yaw_slider.val(self.boardAlignmentConfig.yaw);
+        if (self.pageElements.board_yaw_slider[0].noUiSlider && !_settingSlider) { _settingSlider = true; self.pageElements.board_yaw_slider[0].noUiSlider.set(self.boardAlignmentConfig.yaw); _settingSlider = false; }
         self.pageElements.orientation_board_yaw.val(self.boardAlignmentConfig.yaw);
         updateMagOrientationWithPreset();
         updateFCCliString();
@@ -314,7 +325,7 @@ TABS.magnetometer.initialize = function (callback) {
     //Called when roll values change
     function updateRollAxis(value) {
         self.alignmentConfig.roll = Number(value);
-        self.pageElements.roll_slider.val(self.alignmentConfig.roll);
+        if (self.pageElements.roll_slider[0].noUiSlider && !_settingSlider) { _settingSlider = true; self.pageElements.roll_slider[0].noUiSlider.set(self.alignmentConfig.roll); _settingSlider = false; }
         self.pageElements.orientation_mag_roll.val(self.alignmentConfig.roll);
         updateMagCliString();
         self.render3D();
@@ -323,7 +334,7 @@ TABS.magnetometer.initialize = function (callback) {
     //Called when pitch values change
     function updatePitchAxis(value) {
         self.alignmentConfig.pitch = Number(value);
-        self.pageElements.pitch_slider.val(self.alignmentConfig.pitch);
+        if (self.pageElements.pitch_slider[0].noUiSlider && !_settingSlider) { _settingSlider = true; self.pageElements.pitch_slider[0].noUiSlider.set(self.alignmentConfig.pitch); _settingSlider = false; }
         self.pageElements.orientation_mag_pitch.val(self.alignmentConfig.pitch);
         updateMagCliString();
         self.render3D();
@@ -332,7 +343,7 @@ TABS.magnetometer.initialize = function (callback) {
     //Called when yaw values change
     function updateYawAxis(value) {
         self.alignmentConfig.yaw = Number(value);
-        self.pageElements.yaw_slider.val(self.alignmentConfig.yaw);
+        if (self.pageElements.yaw_slider[0].noUiSlider && !_settingSlider) { _settingSlider = true; self.pageElements.yaw_slider[0].noUiSlider.set(self.alignmentConfig.yaw); _settingSlider = false; }
         self.pageElements.orientation_mag_yaw.val(self.alignmentConfig.yaw);
         updateMagCliString();
         self.render3D();
@@ -479,13 +490,13 @@ TABS.magnetometer.initialize = function (callback) {
 
         
         self.pageElements.board_pitch_slider[0].noUiSlider.on('update', (values, handle) =>  {
-            updateBoardPitchAxis(values[handle]);
+            if (!_settingSlider) { _settingSlider = true; updateBoardPitchAxis(values[handle]); _settingSlider = false; }
         });
         self.pageElements.board_roll_slider[0].noUiSlider.on('update', (values, handle) =>  {
-            updateBoardRollAxis(values[handle]);
+            if (!_settingSlider) { _settingSlider = true; updateBoardRollAxis(values[handle]); _settingSlider = false; }
         });
         self.pageElements.board_yaw_slider[0].noUiSlider.on('update', (values, handle) =>  {
-            updateBoardYawAxis(values[handle]);
+            if (!_settingSlider) { _settingSlider = true; updateBoardYawAxis(values[handle]); _settingSlider = false; }
         });
         
 
@@ -610,13 +621,13 @@ TABS.magnetometer.initialize = function (callback) {
 
         
         self.pageElements.pitch_slider[0].noUiSlider.on('update', (values, handle) =>  {
-            updatePitchAxis(values[handle]);
+            if (!_settingSlider) { _settingSlider = true; updatePitchAxis(values[handle]); _settingSlider = false; }
         });
         self.pageElements.roll_slider[0].noUiSlider.on('update', (values, handle) =>  {
-            updateRollAxis(values[handle]);
+            if (!_settingSlider) { _settingSlider = true; updateRollAxis(values[handle]); _settingSlider = false; }
         });
         self.pageElements.yaw_slider[0].noUiSlider.on('update', (values, handle) =>  {
-            updateYawAxis(values[handle]);
+            if (!_settingSlider) { _settingSlider = true; updateYawAxis(values[handle]); _settingSlider = false; }
         });
 
         self.pageElements.pitch_slider[0].noUiSlider.on('slide', () => {
@@ -1200,7 +1211,7 @@ TABS.magnetometer.initialize = function (callback) {
 };
 
 
-TABS.magnetometer.initialize3D = function () {
+magnetometerTab.initialize3D = function () {
 
     var self = this,
         canvas,
@@ -1217,15 +1228,84 @@ TABS.magnetometer.initialize3D = function () {
     canvas = $('.model-and-info #canvas');
     wrapper = $('.model-and-info #canvas_wrapper');
 
-    // webgl capability detector
-    // it would seem the webgl "enabling" through advanced settings will be ignored in the future
-    // and webgl will be supported if gpu supports it by default (canary 40.0.2175.0), keep an eye on this one
-    var detector_canvas = document.createElement('canvas');
-    if (window.WebGLRenderingContext && (detector_canvas.getContext('webgl') || detector_canvas.getContext('experimental-webgl'))) {
-        renderer = new THREE.WebGLRenderer({canvas: canvas.get(0), alpha: true, antialias: true});
-        useWebGlRenderer = true;
+    // Robust WebGL capability detection with fallback
+    function tryCreateWebGLContext() {
+        if (!window.WebGLRenderingContext) {
+            return null;
+        }
+
+        const detector_canvas = document.createElement('canvas');
+        let gl = null;
+        let renderMethod = null;
+
+        // Try 1: Hardware-accelerated WebGL (best performance)
+        try {
+            gl = detector_canvas.getContext('webgl') || detector_canvas.getContext('experimental-webgl');
+            if (gl) {
+                renderMethod = 'hardware';
+                console.log('[3D Magnetometer] Using hardware-accelerated WebGL');
+            }
+        } catch (e) {
+            console.warn('[3D Magnetometer] Hardware WebGL failed:', e);
+        }
+
+        // Try 2: Software-rendered WebGL (slower but more compatible)
+        if (!gl) {
+            try {
+                gl = detector_canvas.getContext('webgl', { failIfMajorPerformanceCaveat: false }) ||
+                     detector_canvas.getContext('experimental-webgl', { failIfMajorPerformanceCaveat: false });
+                if (gl) {
+                    renderMethod = 'software';
+                    console.log('[3D Magnetometer] Using software-rendered WebGL (slower performance)');
+                }
+            } catch (e) {
+                console.warn('[3D Magnetometer] Software WebGL failed:', e);
+            }
+        }
+
+        return gl ? { context: gl, method: renderMethod } : null;
     }
-    
+
+    const webglResult = tryCreateWebGLContext();
+
+    if (webglResult) {
+        try {
+            renderer = new THREE.WebGLRenderer({canvas: canvas.get(0), alpha: true, antialias: true});
+            useWebGlRenderer = true;
+
+            // Show performance notice if using software rendering
+            if (webglResult.method === 'software') {
+                GUI_control.prototype.log('<span style="color: orange;">3D view using software rendering (slower). Consider updating graphics drivers or disabling hardware acceleration in Options.</span>');
+            }
+        } catch (e) {
+            console.error('[3D Magnetometer] Failed to create THREE.WebGLRenderer:', e);
+            renderer = null;
+            useWebGlRenderer = false;
+        }
+    }
+
+    // Check if WebGL is available
+    if (!renderer) {
+        // WebGL not supported - show fallback message
+        wrapper.html('<div class="webgl-fallback" style="display: flex; align-items: center; justify-content: center; height: 100%; color: #888; text-align: center; padding: 20px;">' +
+            '<div>' +
+            '<p style="margin: 0 0 10px 0; font-size: 14px; font-weight: bold;">3D view unavailable</p>' +
+            '<p style="margin: 0 0 10px 0; font-size: 12px;">WebGL could not be initialized. This may be due to:</p>' +
+            '<ul style="text-align: left; margin: 10px 0; padding-left: 20px; font-size: 12px;">' +
+            '<li>Graphics drivers need updating</li>' +
+            '<li>Hardware acceleration issues</li>' +
+            '<li>Browser or system limitations</li>' +
+            '</ul>' +
+            '<p style="margin: 10px 0 0 0; font-size: 12px; font-style: italic;">Try: Options → Disable 3D Hardware Acceleration, then restart</p>' +
+            '</div>' +
+            '</div>');
+
+        // Provide no-op functions so the rest of the tab doesn't break
+        this.render3D = function () {};
+        this.resize3D = function () {};
+        return;
+    }
+
     // initialize render size for current canvas size
     renderer.setSize(wrapper.width() * 2, wrapper.height() * 2);
 
@@ -1237,8 +1317,7 @@ TABS.magnetometer.initialize3D = function () {
     if (useWebGlRenderer) {
         if (FC.MIXER_CONFIG.appliedMixerPreset === -1) {
             model_file = 'custom';
-            // GUI_control.prototype.log("<span style='color: red; font-weight: bolder'><strong>" + i18n.getMessage("mixerNotConfigured") + "</strong></span>");
-            // GUI.prototype.log("<span style='color: red; font-weight: bolder'><strong>" + i18n.getMessage("mixerNotConfigured") + "</strong></span>");
+            GUI.log("<span style='color: red; font-weight: bolder'><strong>" + i18n.getMessage("mixerNotConfigured") + "</strong></span>");
         }
         else {
             model_file = mixer.getById(FC.MIXER_CONFIG.appliedMixerPreset).model;
@@ -1253,15 +1332,18 @@ TABS.magnetometer.initialize3D = function () {
         model_file = 'fallback';
     }
 
+    let _renderPending = false;
     this.render3D = function () {
 
         if (!magModels || !fc)
             return;
 
-        magModels.forEach( (m,i) => m.visible = i == self.elementToShow );
+        // LIS2MDL and LIS3MDL are visually identical, so reuse the loaded LIS3MDL model.
+        const modelToShow = self.elementToShow === 30 ? 20 : self.elementToShow;
+        magModels.forEach( (m,i) => m.visible = i == modelToShow );
         fc.visible = true;
 
-        var magRotation = new THREE.Euler(-THREE.MathUtils.degToRad(self.alignmentConfig.pitch-180), THREE.MathUtils.degToRad(-180 - self.alignmentConfig.yaw), THREE.MathUtils.degToRad(self.alignmentConfig.roll), 'YXZ'); 
+        var magRotation = new THREE.Euler(-THREE.MathUtils.degToRad(self.alignmentConfig.pitch-180), THREE.MathUtils.degToRad(-180 - self.alignmentConfig.yaw), THREE.MathUtils.degToRad(self.alignmentConfig.roll), 'YXZ');
         var matrix = (new THREE.Matrix4()).makeRotationFromEuler(magRotation);
 
         var boardRotation = new THREE.Euler( THREE.MathUtils.degToRad( self.boardAlignmentConfig.pitch), THREE.MathUtils.degToRad( -self.boardAlignmentConfig.yaw ), THREE.MathUtils.degToRad( self.boardAlignmentConfig.roll ), 'YXZ');
@@ -1271,15 +1353,20 @@ TABS.magnetometer.initialize3D = function () {
         // Ray TODO this may be pretty much what I need to do.
 /*
         if ( self.isSavePreset ) {
-          matrix.premultiply(matrix1);  //preset specifies orientation relative to FC, align_max_xxx specify absolute orientation 
+          matrix.premultiply(matrix1);  //preset specifies orientation relative to FC, align_max_xxx specify absolute orientation
         }
 */
         magModels.forEach( (m,i) => m.rotation.setFromRotationMatrix(matrix) );
         fc.rotation.setFromRotationMatrix(matrix1);
 
-        // draw
-        if (camera != null)
-            renderer.render(scene, camera);
+        // draw — throttled to one render per animation frame
+        if (camera != null && !_renderPending) {
+            _renderPending = true;
+            requestAnimationFrame(() => {
+                _renderPending = false;
+                renderer.render(scene, camera);
+            });
+        }
     };
 
     // handle canvas resize
@@ -1350,7 +1437,7 @@ TABS.magnetometer.initialize3D = function () {
     const loader = new GLTFLoader(manager);
 
     const magModelNames = ['xyz', 'ak8963c', 'ak8963n', 'ak8975', 'ak8975c', 'bn_880', 'diatone_mamba_m10_pro', 'flywoo_goku_m10_pro_v3', 'foxeer_m10q_120', 'foxeer_m10q_180', 'foxeer_m10q_250', 
-        'geprc_gep_m10_dq', 'gy271', 'gy273', 'hglrc_m100', 'qmc5883', 'holybro_m9n_micro', 'holybro_m9n_micro', 'ist8308', 'ist8310', 'lis3mdl', 
+        'geprc_gep_m10_dq', 'gy271', 'gy273', 'hglrc_m100', 'qmc5883', 'holybro_m9n_micro', 'holybro_m9n_micro', 'ist8308', 'ist8310', 'lis3mdl',
         'mag3110', 'matek_m8q', 'matek_m9n', 'matek_m10q', 'mlx90393', 'mp9250', 'qmc5883', 'flywoo_goku_m10_pro_v3', 'ws_m181'];
     magModels = [];
     //Load the UAV model
@@ -1402,8 +1489,10 @@ TABS.magnetometer.initialize3D = function () {
 };
 
 
-TABS.magnetometer.cleanup = function (callback) {
+magnetometerTab.cleanup = function (callback) {
     $(window).off('resize', this.resize3D);
 
     if (callback) callback();
 };
+
+export default magnetometerTab;

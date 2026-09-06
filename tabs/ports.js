@@ -3,21 +3,21 @@
 import mspHelper from './../js/msp/MSPHelper';
 import MSPCodes from './../js/msp/MSPCodes';
 import MSP from './../js/msp';
-import { GUI, TABS } from './../js/gui';
+import GUI from './../js/gui';
 import FC from './../js/fc';
 import i18n from './../js/localization';
 import serialPortHelper from './../js/serialPortHelper';
 import jBox from 'jbox';
 
-TABS.ports = {};
+const portsTab = {};
 
-TABS.ports.initialize = function (callback) {
+portsTab.initialize = function (callback) {
 
     var columns = ['data', 'logging', 'sensors', 'telemetry', 'rx', 'peripherals'];
     var mspWarningModal;
 
-    if (GUI.active_tab != 'ports') {
-        GUI.active_tab = 'ports';
+    if (GUI.active_tab !== this) {
+        GUI.active_tab = this;
     }
 
     mspHelper.loadSerialPorts(function () {
@@ -107,7 +107,7 @@ TABS.ports.initialize = function (callback) {
                 port_configuration_e.data('port', serialPort);
 
                 for (var columnIndex = 0; columnIndex < columns.length; columnIndex++) {
-                    var column = columns[columnIndex];
+                    let column = columns[columnIndex];
 
                     var functions_e = $(port_configuration_e).find('.functionsCell-' + column);
                     let functions_e_id = "portFunc-" + column + "-" + portIndex;
@@ -152,6 +152,7 @@ TABS.ports.initialize = function (callback) {
 
                             if (serialPort.functions.indexOf(functionName) >= 0) {
                                 select_e.val(functionName);
+                                updateDefaultBaud(functions_e_id, column);
                             }
                         }
                     }
@@ -197,7 +198,7 @@ TABS.ports.initialize = function (callback) {
                 let $element = $(element);
 
                 if ($element.val() != functionName) {
-                    $element.val('');
+                    $element.val('').trigger('change');
                 }
             });
 
@@ -318,10 +319,14 @@ function updateDefaultBaud(baudSelect, column) {
         baudRate = rule.defaultBaud;
     }
 
-    section.find("." + column + "_baudrate").children('[value=' + baudRate + ']').prop('selected', true);
+    const $baudSelect = section.find("." + column + "_baudrate");
+    $baudSelect.children('[value=' + baudRate + ']').prop('selected', true);
+    $baudSelect.prop('disabled', !!(rule && rule.lockedBaud));
 }
 
-TABS.ports.cleanup = function (callback) {
+portsTab.cleanup = function (callback) {
     $('.jBox-wrapper').remove();
     if (callback) callback();
 };
+
+export default portsTab;
