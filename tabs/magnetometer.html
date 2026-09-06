@@ -100,10 +100,11 @@
     <div class="modal__content">
         <h1 class="modal__title" data-i18n="accAlignTitle"></h1>
         <div class="modal__text">
-            <div data-i18n="accAlignVerticalError">Vertical orientation not supported</div>
-            This wizard cannot determine the alignment of a flight controller mounted on its edge
-            (sensor pointing sideways rather than up or down). Please use a flat or upside-down mount,
-            or set the board alignment manually.
+            <div data-i18n="accAlignVerticalError">Readings did not match a supported mount</div>
+            This can happen if the flight controller is mounted on its edge (sensor pointing
+            sideways rather than up or down), if the board moved between the two readings, or if
+            the nose wasn't raised close enough to 45 degrees. Please use a flat or upside-down
+            mount and try again, or set the board alignment manually.
         </div>
     </div>
     <div class="modal__buttons">

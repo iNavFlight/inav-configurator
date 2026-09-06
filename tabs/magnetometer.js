@@ -535,6 +535,9 @@ TABS.magnetometer.initialize = function (callback) {
         $('#modal-acc-align-3').on('click', {"step": "3" }, accAutoAlignButton);
         $('#modal-acc-align-4').on('click', {"step": "4" }, accAutoAlignButton);
 
+        // Both buttons below also carry class="save", so the a.save handler
+        // above fires too -- that's what actually writes/saves the alignment
+        // and reboots. These handlers only close the modal first.
         $('#modal-board-align-save').on('click', function () {
             if (typeof modal != "undefined") {
                 modal.close();
@@ -737,6 +740,10 @@ TABS.magnetometer.initialize = function (callback) {
         return [v[0] / mag, v[1] / mag, v[2] / mag];
     }
 
+    function vecSquaredDistance(a, b) {
+        return (a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2 + (a[2] - b[2]) ** 2;
+    }
+
     /**
      * Find the BOARD_ALIGNMENT (roll, pitch, yaw) that best explains two
      * measured raw-sensor-frame vectors (rawFlat, rawTilt), given the known
@@ -775,10 +782,6 @@ TABS.magnetometer.initialize = function (callback) {
             }
         }
         return best;
-    }
-
-    function vecSquaredDistance(a, b) {
-        return (a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2 + (a[2] - b[2]) ** 2;
     }
 
     function getMagHeading() {
@@ -989,6 +992,10 @@ TABS.magnetometer.initialize = function (callback) {
         // a POSITIVE x-component here (x = -sin(pitch) = -sin(-45) = +sin45).
         const refTilt = [Math.SQRT1_2, 0, Math.SQRT1_2]; // nose-up 45 degrees
 
+        // Cross-product magnitude of two unit vectors is sin(angle between them);
+        // 0.3 ~= sin(17°), i.e. reject if the two readings are less than ~17
+        // degrees apart -- tight enough to catch "forgot to tilt" while leaving
+        // margin below the ~45 degrees this wizard actually asks for.
         const crossMag = Math.sqrt(vecCross(self.acc_flat_raw, acc_g_45).reduce((s, v) => s + v * v, 0));
         if (crossMag < 0.3) {
             console.error("Flat and 45° readings are too similar (cross magnitude " + crossMag.toFixed(3) + ") -- aircraft probably wasn't tilted enough between readings");
@@ -1007,6 +1014,9 @@ TABS.magnetometer.initialize = function (callback) {
         console.log("Best-fit board alignment: pitch=" + bestAlignment.pitch + "°, roll=" + bestAlignment.roll +
                    "°, yaw=" + bestAlignment.yaw + "° (fit error " + bestAlignment.err.toFixed(4) + ")");
 
+        // err is a sum of two squared-distance-between-unit-vectors terms; 1.0
+        // tolerates roughly 41 degrees of combined error across both readings
+        // (comfortably more than expected accelerometer noise) before giving up.
         if (bestAlignment.err > 1.0) {
             console.error("No supported board mount fits these readings well (fit error " + bestAlignment.err.toFixed(4) + ") -- board may be mounted on edge, moved during the test, or tilted at a non-45° angle");
             resetAlignButtons();
@@ -1033,9 +1043,6 @@ TABS.magnetometer.initialize = function (callback) {
         $("#modal-acc-align-setting").text(newPitch + ", " + newRoll + ", " + newYaw);
         return true;
     }
-
-
-
 
     function accAutoAlignCompass() {
         let roll_correction_needed = 0;
