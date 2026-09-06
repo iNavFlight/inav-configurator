@@ -136,6 +136,7 @@ var FC = {
             multiType: 0,
             msp_version: 0, // not specified using semantic versioning
             capability: 0,
+            capabilities: 0,
             cycleTime: 0,
             i2cError: 0,
             activeSensors: 0,
@@ -846,6 +847,10 @@ var FC = {
         }
 
         return calibrated;
+    },
+    getMagnetometerCalibrated: function () {
+        return !(this.CALIBRATION_DATA.magGain.X === 1024 && this.CALIBRATION_DATA.magGain.Y === 1024 && this.CALIBRATION_DATA.magGain.Z === 1024 &&
+                 this.CALIBRATION_DATA.magZero.X === 0 && this.CALIBRATION_DATA.magZero.Y === 0 && this.CALIBRATION_DATA.magZero.Z === 0);
     },
     getUserControlMode: function () {
         return [

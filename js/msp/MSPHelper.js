@@ -780,7 +780,7 @@ var mspHelper = (function () {
                 offset += 2;
                 if (semver.gt(FC.CONFIG.flightControllerVersion, "4.1.0")) {
                     FC.CONFIG.osdUsed = data.getUint8(offset++);
-                    FC.CONFIG.commCompatability = data.getUint8(offset++);
+                    FC.CONFIG.capabilities = data.getUint8(offset++);
                     let targetNameLen = data.getUint8(offset++);
                     let targetName = "";
                     targetNameLen += offset;

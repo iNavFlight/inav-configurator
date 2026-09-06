@@ -535,6 +535,31 @@ TABS.magnetometer.initialize = function (callback) {
         $('#modal-acc-align-3').on('click', {"step": "3" }, accAutoAlignButton);
         $('#modal-acc-align-4').on('click', {"step": "4" }, accAutoAlignButton);
 
+        $('#modal-board-align-save').on('click', function () {
+            if (typeof modal != "undefined") {
+                modal.close();
+            }
+        });
+
+        $('#modal-acc-align-done-save').on('click', function () {
+            if (typeof modal != "undefined") {
+                modal.close();
+            }
+        });
+
+        $('#modal-board-align-fallback').on('click', function () {
+            if (typeof modal != "undefined") {
+                modal.close();
+            }
+            modal = new jBox('Modal', {
+                width: 460,
+                height: 360,
+                animation: false,
+                closeOnClick: true,
+                content: $('#modal-acc-align-east')
+            }).open();
+        });
+
         noUiSlider.create(self.pageElements.roll_slider[0], {
             start: [self.alignmentConfig.roll],
             range: {
@@ -699,6 +724,63 @@ TABS.magnetometer.initialize = function (callback) {
         return applyRotation(R, transformed);
     }
 
+    function vecCross(a, b) {
+        return [
+            a[1] * b[2] - a[2] * b[1],
+            a[2] * b[0] - a[0] * b[2],
+            a[0] * b[1] - a[1] * b[0]
+        ];
+    }
+
+    function vecNormalize(v) {
+        const mag = Math.sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]);
+        return [v[0] / mag, v[1] / mag, v[2] / mag];
+    }
+
+    /**
+     * Find the BOARD_ALIGNMENT (roll, pitch, yaw) that best explains two
+     * measured raw-sensor-frame vectors (rawFlat, rawTilt), given the known
+     * aircraft-frame vectors they correspond to (refFlat, refTilt).
+     *
+     * This can't be done from a single vector (the flat reading alone):
+     * a pure roll-180 mount and a pure pitch-180 mount both read as ~(0,0,-1)
+     * when level, since gravity doesn't constrain rotation about itself. The
+     * second, tilted reading breaks that symmetry.
+     *
+     * Rather than extract Euler angles from a rotation matrix (which is
+     * ambiguous right where this wizard needs precision: asin(sin(180°)) and
+     * asin(sin(0°)) are both 0, so a naive extraction silently confuses
+     * pitch=180 with pitch=0+180 of roll/yaw), this does a direct search over
+     * the finite set of mounts BOARD_ALIGNMENT's wizard actually supports
+     * (roll/pitch flat-or-upside-down, yaw in 45 degree steps) and picks
+     * whichever one best predicts both measured vectors. Verified by
+     * round-tripping known mounts through buildRotationMatrix with zero error.
+     */
+    function findBestBoardAlignment(refFlat, refTilt, rawFlat, rawTilt) {
+        const nFlat = vecNormalize(rawFlat);
+        const nTilt = vecNormalize(rawTilt);
+
+        let best = null;
+        for (const roll of [0, 180]) {
+            for (const pitch of [0, 180]) {
+                for (let yaw = 0; yaw < 360; yaw += 45) {
+                    const R = buildRotationMatrix(roll, pitch, yaw);
+                    const predFlat = applyRotation(R, refFlat);
+                    const predTilt = applyRotation(R, refTilt);
+                    const err = vecSquaredDistance(predFlat, nFlat) + vecSquaredDistance(predTilt, nTilt);
+                    if (!best || err < best.err) {
+                        best = { roll, pitch, yaw, err };
+                    }
+                }
+            }
+        }
+        return best;
+    }
+
+    function vecSquaredDistance(a, b) {
+        return (a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2 + (a[2] - b[2]) ** 2;
+    }
+
     function getMagHeading() {
         // Get magnetometer data from MSP
         // NOTE: This data has BOTH compass alignment AND board alignment applied by firmware
@@ -740,21 +822,8 @@ TABS.magnetometer.initialize = function (callback) {
         return magHeading;
     }
 
-    function accComputeYaw(delta_pitch, delta_roll, flat_pitch, flat_roll) {
-        // Tilting the airframe nose-up by a known angle changes the
-        // accelerometer-derived pitch/roll by an amount that depends on how
-        // far the IMU's pitch axis is rotated, in yaw, from the airframe's
-        // nose. atan2(-delta_roll, delta_pitch) recovers that yaw offset
-        // directly, for any mounting angle, and is snapped to the nearest
-        // 45 degrees to match BOARD_ALIGNMENT's resolution.
-        //
-        // A board mounted upside-down (flat_pitch or flat_roll == +-180)
-        // negates only ONE of the two deltas' contribution to that formula
-        // -- which one depends on which axis the board was flipped about.
-        let pitchSign = (Math.abs(flat_roll)  === 180) ? -1 : 1;
-        let rollSign  = (Math.abs(flat_pitch) === 180) ? -1 : 1;
-        let yaw = Math.atan2(-delta_roll * rollSign, delta_pitch * pitchSign) * 180 / Math.PI;
-        return ((Math.round(yaw / 45) * 45) + 360) % 360;
+    function resetAlignButtons() {
+        $('.modal__button, #fc-align-start-button').css({ opacity: '', pointerEvents: '' });
     }
 
     function accAutoAlignReadFlat() {
@@ -800,6 +869,7 @@ TABS.magnetometer.initialize = function (callback) {
             console.error("  - Accelerometer needs calibration");
             console.error("  - Board is on an unstable surface");
 
+            resetAlignButtons();
             modal = new jBox('Modal', {
                 width: 460,
                 height: 360,
@@ -827,6 +897,7 @@ TABS.magnetometer.initialize = function (callback) {
         // wizard can't resolve.
         if (Math.abs(roundedPitch) % 180 !== 0 || Math.abs(roundedRoll) % 180 !== 0) {
             console.error("Unsupported board orientation: pitch=" + roundedPitch + "°, roll=" + roundedRoll + "°");
+            resetAlignButtons();
             modal = new jBox('Modal', {
                 width: 460,
                 height: 360,
@@ -838,6 +909,12 @@ TABS.magnetometer.initialize = function (callback) {
         }
 
         self.acc_flat_xyz = new Array(roundedPitch, roundedRoll, 0);
+        // Raw (de-rotated) flat-attitude vector, kept for the TRIAD solve in
+        // accAutoAlignRead45() -- a single vector reading can't tell a pure
+        // roll-180 flip from a pure pitch-180 flip (both read as ~(0,0,-1)g),
+        // so roundedPitch/roundedRoll above are NOT the final answer, only a
+        // sanity check that the mount is flat-or-upside-down (not on edge).
+        self.acc_flat_raw = acc_g_flat;
 
         heading_flat = getMagHeading();
 
@@ -853,10 +930,6 @@ TABS.magnetometer.initialize = function (callback) {
 
 
     function accAutoAlignRead45() {
-        let raw_changed = [0, 0, 0];
-        var acc_align;
-        var i;
-
         // Get accelerometer data from MSP_RAW_IMU
         let acc_g_transformed = [...FC.SENSOR_DATA.accelerometer];
 
@@ -889,6 +962,7 @@ TABS.magnetometer.initialize = function (callback) {
             console.error("Gravity magnitude out of range at 45°: " + A.toFixed(3) + "g");
             console.error("Board may have moved between readings!");
 
+            resetAlignButtons();
             modal = new jBox('Modal', {
                 width: 460,
                 height: 360,
@@ -896,101 +970,72 @@ TABS.magnetometer.initialize = function (callback) {
                 closeOnClick: true,
                 content: $('#modal-acc-align-calibration-error')
             }).open();
-            return;
+            return false;
         }
 
-        let roll = Math.atan2(acc_g_45[1], acc_g_45[2]) * 180/Math.PI;
-        let pitch = Math.atan2(-1 * acc_g_45[0], Math.sqrt(acc_g_45[1] ** 2 + acc_g_45[2] ** 2)) * 180/Math.PI;
-        let acc_45_xyz = new Array(pitch, roll, 0);
-        console.log("Calculated attitude (45°): pitch=" + pitch.toFixed(1) + "°, roll=" + roll.toFixed(1) + "°");
+        console.log("Raw data (45°, absolute): [" + acc_g_45.map(x => x.toFixed(3)).join(", ") + "] g");
 
-        for (i = 0; i < acc_g_45.length; i++) {
-            raw_changed[i] = self.acc_flat_xyz[i] - acc_45_xyz[i];
+        // A single vector reading (the flat step) can't tell a pure roll-180
+        // mount from a pure pitch-180 mount -- both read as ~(0,0,-1)g when
+        // level, since gravity alone doesn't constrain rotation about itself.
+        // Solve for roll/pitch/yaw jointly using BOTH readings: the flat
+        // reading and the known ~45 degree nose-up tilt give two non-parallel
+        // vectors, which is enough to fully determine the mounting rotation,
+        // independent of whatever alignment is currently configured on the FC.
+        const refFlat = [0, 0, 1];
+        // Nose-up is NEGATIVE attitude.values.pitch in INAV (see io/osd.c:
+        // "attitude.values.pitch > 0 -> SYM_PITCH_DOWN"), so the canonical
+        // reading for a correctly-mounted board tilted nose-up 45 degrees has
+        // a POSITIVE x-component here (x = -sin(pitch) = -sin(-45) = +sin45).
+        const refTilt = [Math.SQRT1_2, 0, Math.SQRT1_2]; // nose-up 45 degrees
+
+        const crossMag = Math.sqrt(vecCross(self.acc_flat_raw, acc_g_45).reduce((s, v) => s + v * v, 0));
+        if (crossMag < 0.3) {
+            console.error("Flat and 45° readings are too similar (cross magnitude " + crossMag.toFixed(3) + ") -- aircraft probably wasn't tilted enough between readings");
+            resetAlignButtons();
+            modal = new jBox('Modal', {
+                width: 460,
+                height: 360,
+                animation: false,
+                closeOnClick: true,
+                content: $('#modal-acc-align-tilt-error')
+            }).open();
+            return false;
         }
-        console.log("raw_changed: " + raw_changed);
 
-        // The accelerometer-derived pitch/roll change caused by tilting the
-        // airframe nose-up by a known angle reveals how far the IMU's pitch
-        // axis is rotated, in yaw, relative to the airframe's nose.
-        let acc_yaw = accComputeYaw(raw_changed[0], raw_changed[1], self.acc_flat_xyz[0], self.acc_flat_xyz[1]);
-        self.acc_flat_xyz[2] = acc_yaw;
+        const bestAlignment = findBestBoardAlignment(refFlat, refTilt, self.acc_flat_raw, acc_g_45);
+        console.log("Best-fit board alignment: pitch=" + bestAlignment.pitch + "°, roll=" + bestAlignment.roll +
+                   "°, yaw=" + bestAlignment.yaw + "° (fit error " + bestAlignment.err.toFixed(4) + ")");
 
+        if (bestAlignment.err > 1.0) {
+            console.error("No supported board mount fits these readings well (fit error " + bestAlignment.err.toFixed(4) + ") -- board may be mounted on edge, moved during the test, or tilted at a non-45° angle");
+            resetAlignButtons();
+            modal = new jBox('Modal', {
+                width: 460,
+                height: 360,
+                animation: false,
+                closeOnClick: true,
+                content: $('#modal-acc-align-vertical-error')
+            }).open();
+            return false;
+        }
 
-        // Ray TODO rotate based on current board alignment (board) and new board alignment (compass)
-        // The acc readings are relative to the current settings. :(
-        // Alternatively, set alignments to 0,0,0, save and reboot, then finish the wizard.
-        let newPitch = ( self.boardAlignmentConfig.saved_pitch + (Math.round(self.acc_flat_xyz[0] / 45) * 45) ) % 360;
-        let newRoll  = ( self.boardAlignmentConfig.saved_roll  + (Math.round(self.acc_flat_xyz[1] / 45) * 45) ) % 360;
-        let newYaw   = ( self.boardAlignmentConfig.saved_yaw   + acc_yaw ) % 360;
-    
-        updateBoardPitchAxis(newPitch % 360 );
-        updateBoardRollAxis (newRoll  % 360 );
-        updateBoardYawAxis(newYaw % 360);
-    
-    
-        /*
-        const quaternion = new THREE.Quaternion();
-        // const axis = new THREE.Vector3(self.acc_flat_xyz).normalize();
-        const axis = new THREE.Vector3(...FC.SENSOR_DATA.accelerometer).normalize();
-    
-        console.debug("axis: " + axis);
-        quaternion.setFromAxisAngle(axis, 0.05);
-        */
+        let newPitch = bestAlignment.pitch;
+        let newRoll  = bestAlignment.roll;
+        let newYaw   = bestAlignment.yaw;
+
+        self.acc_flat_xyz = [newPitch, newRoll, newYaw];
+
+        updateBoardPitchAxis(newPitch);
+        updateBoardRollAxis (newRoll);
+        updateBoardYawAxis(newYaw);
 
         $("#modal-acc-align-setting").text(newPitch + ", " + newRoll + ", " + newYaw);
+        return true;
     }
 
 
 
-    // Ray TODO - account for how the sensor is mounted to the board? SENSOR_ALIGNMENT.align_acc, SENSOR_ALIGNMENT.align_mag
-    // #define IMU_MPU6500_ALIGN        CW90_DEG
-
-    function OLDaccAutoAlignRead45() {
-        var changed = [0, 0, 0];
-        var acc_align;
-        var i;
-
-        let accel_data_45 = [...FC.SENSOR_DATA.accelerometer];
-
-        let roll = Math.atan2(acc_g_45[1], acc_g_45[2]) * 180/Math.PI;
-        let pitch = Math.atan2(-1 * acc_g_45[0], Math.sqrt(acc_g_45[1] ** 2 + acc_g_45[2] ** 2)) * 180/Math.PI;
-        let acc_45_xyz = new Array(pitch, roll, 0);
-
-        for (i = 0; i < acc_g_45.length; i++) {
-            self.acc_flat_xyz[i] = Math.round( self.acc_flat_xyz[i] / 45 ) * 45;
-            // acc_45_xyz[i] = rad2degrees(acc_45_xyz[i]);
-            changed[i] = ( 360 + Math.round((self.acc_flat_xyz[i] - acc_45_xyz[i]) / 45) * 45 ) % 360;
-        }
-
-
-
-        let upside = 'up';
-        // If the board is reading as upside down, fix that.
-        if ( roll > 120 ) {
-            // self.acc_flat_xyz[1] = (self.acc_flat_xyz[1] + 180) % 360;
-            upside = 'down';
-        }
-
-        console.log("changed:");
-        console.log(changed);
-        console.log("upside: " + upside);
-
-        let acc_yaw = accComputeYaw(changed, upside);
-        self.acc_flat_xyz[2] = acc_yaw;
-
-
-        // Ray TODO rotate based on current board alignment (board) and new board alignment (compass)
-        // Alternatively, set alignments to 0,0,0, save and reboot, then finish the wizard.
-        let newPitch = ( self.boardAlignmentConfig.saved_pitch + (Math.round(self.acc_flat_xyz[0] / 45) * 45) ) % 360;
-        let newRoll  = ( self.boardAlignmentConfig.saved_roll  + (Math.round(self.acc_flat_xyz[1] / 45) * 45) ) % 360;
-        let newYaw   = ( self.boardAlignmentConfig.saved_yaw   + acc_yaw ) % 360;
-
-        updateBoardPitchAxis(newPitch % 360 );
-        updateBoardRollAxis (newRoll  % 360 );
-        updateBoardYawAxis(newYaw % 360);
-
-        $("#modal-acc-align-setting").text(newPitch + ", " + newRoll + ", " + newYaw);
-    }
 
     function accAutoAlignCompass() {
         let roll_correction_needed = 0;
@@ -1050,12 +1095,22 @@ TABS.magnetometer.initialize = function (callback) {
             width: 460,
             height: 360,
             animation: false,
-            closeOnClick: true,
+            closeOnClick: false,
             content: $('#modal-acc-align-done')
         }).open();
     }
 
+    function isRamConstrainedTarget() {
+        // MSP_BOARD_INFO capabilities bit 2: 1 iff the board has enough RAM for the
+        // combined board/compass alignment wizard flow.
+        return !(FC.CONFIG.capabilities & (1 << 2));
+    }
+
     function accAutoAlignButton(event) {
+        // Visual feedback so a slow step doesn't look unresponsive and invite repeated clicks.
+        resetAlignButtons();
+        $(event.target).css({ opacity: 0.5, pointerEvents: 'none' });
+
         var step = event.data.step;
 
         // Steps: 1 start, 2 craft is flat north, 3 craft is nose up, 4 craft is flat and east
@@ -1089,24 +1144,46 @@ TABS.magnetometer.initialize = function (callback) {
         }
 
         else if (step == "3") {
-            var next_step;
-            next_step = $('#modal-acc-align-east');
-            if (FC.SENSOR_DATA.magnetometer[0] === 0 && FC.SENSOR_DATA.magnetometer[2] === 0) {
-                next_step = $('#modal-acc-align-done');
+            // MSP.send_message(MSPCodes.MSP_RAW_IMU, false, false, accAutoAlignRead45);
+            if (!accAutoAlignRead45()) {
+                return;
             }
 
-            // MSP.send_message(MSPCodes.MSP_RAW_IMU, false, false, accAutoAlignRead45);
-            accAutoAlignRead45();
-            modal = new jBox('Modal', {
-                width: 460,
-                height: 360,
-                animation: false,
-                closeOnClick: true,
-                content: next_step
-            }).open();
-
+            if (isRamConstrainedTarget()) {
+                var next_step = $('#modal-acc-align-east');
+                if (FC.SENSOR_DATA.magnetometer[0] === 0 && FC.SENSOR_DATA.magnetometer[2] === 0) {
+                    next_step = $('#modal-acc-align-done');
+                }
+                modal = new jBox('Modal', {
+                    width: 460,
+                    height: 360,
+                    animation: false,
+                    closeOnClick: false,
+                    content: next_step
+                }).open();
+            } else {
+                $("#modal-board-align-setting").text($("#modal-acc-align-setting").text());
+                modal = new jBox('Modal', {
+                    width: 460,
+                    height: 420,
+                    animation: false,
+                    closeOnClick: false,
+                    content: $('#modal-board-align-done')
+                }).open();
+            }
         }
         else if (step == "4") {
+            if (!FC.getMagnetometerCalibrated()) {
+                resetAlignButtons();
+                modal = new jBox('Modal', {
+                    width: 460,
+                    height: 360,
+                    animation: false,
+                    closeOnClick: true,
+                    content: $('#modal-acc-align-mag-uncalibrated-error')
+                }).open();
+                return;
+            }
             accAutoAlignCompass();
         }
     }
