@@ -10,6 +10,7 @@ import MSP from './../js/msp';
 import MSPCodes from './../js/msp/MSPCodes';
 import mspHelper from './../js/msp/MSPHelper';
 import FC from './../js/fc';
+import BitHelper from './../js/bitHelper';
 import GUI from './../js/gui';
 import i18n from './../js/localization';
 import { mixer } from './../js/model';
@@ -1169,7 +1170,9 @@ magnetometerTab.initialize = function (callback) {
 
             if (isRamConstrainedTarget()) {
                 var next_step = $('#modal-acc-align-east');
-                if (FC.SENSOR_DATA.magnetometer[0] === 0 && FC.SENSOR_DATA.magnetometer[2] === 0) {
+                if (!BitHelper.bit_check(FC.CONFIG.activeSensors, 2)) {
+                    // No mag: skip the compass-orientation step. (Not FC.SENSOR_DATA.magnetometer
+                    // === 0 -- that's a live sample and can read 0 on a real, working compass.)
                     next_step = $('#modal-acc-align-done');
                 }
                 modal = new jBox('Modal', {
