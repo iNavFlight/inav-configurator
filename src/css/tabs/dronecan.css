@@ -10,6 +10,41 @@
     border: 0;
 }
 
+.tab-dronecan .dronecan-settings {
+    display: grid;
+    grid-template-columns: auto auto;
+    align-items: center;
+    column-gap: 1.5em;
+    width: fit-content;
+}
+
+.tab-dronecan .dronecan-settings > label {
+    padding: 0.5em 0;
+    white-space: nowrap;
+    justify-self: start;
+}
+
+.tab-dronecan .dronecan-settings hr {
+    grid-column: 1 / -1;
+    width: 100%;
+    margin: 0;
+    border: none;
+    border-top: 1px solid #444;
+}
+
+.tab-dronecan .dronecan-settings select,
+.tab-dronecan .dronecan-settings input[type="number"] {
+    width: 8em;
+    box-sizing: border-box;
+}
+
+.tab-dronecan .dronecan-toggle-control {
+    display: flex;
+    align-items: center;
+    padding: 0.5em 0;
+    min-width: 8em;
+}
+
 #dronecan-node-table .health-badge {
     display: inline-block;
     padding: 0.15em 0.5em;
@@ -44,7 +79,7 @@
     margin-top: 1.5em;
 }
 
-#dronecan-detail-table th {
+.dronecan-detail th {
     padding-right: 1em;
     text-align: left;
     color: #aaa;

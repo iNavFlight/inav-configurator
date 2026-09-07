@@ -4,11 +4,18 @@ import semver from 'semver';
 
 import './../injected_methods';
 import GUI from './../gui';
+import i18n from './../localization';
 import MSP from './../msp';
 import MSPCodes from './MSPCodes';
 import FC from './../fc';
 import VTX from './../vtx';
 import mspQueue from './../serial_queue';
+
+// Fixed MZTC payload sizes, mirroring MSP2_MZTC_CONFIG_PAYLOAD_SIZE and
+// MSP2_MZTC_STATUS_PAYLOAD_SIZE in the firmware's msp_mztc.h. Naming them here
+// keeps the parse and the build path from drifting apart.
+const MZTC_CONFIG_BYTES = 11;
+const MZTC_STATUS_BYTES = 7;
 import ServoMixRule from './../servoMixRule';
 import MotorMixRule from './../motorMixRule';
 import LogicCondition from './../logicCondition';
@@ -65,9 +72,42 @@ var mspHelper = (function () {
     // always finish with a '\0'.
     var debugMsgBuffer = '';
 
+    var lastWriteBlockedNotice = 0;
+
     self.init = function() {
-        MSP.setProcessData(this.processData);
+        MSP.setProcessData(this.handleResponse);
+
+        MSP.onConfigWriteBlocked = function (code, sourceCode) {
+            // One notice per save burst - a save fans out into many writes.
+            const now = Date.now();
+            if (now - lastWriteBlockedNotice < 3000) {
+                return;
+            }
+            lastWriteBlockedNotice = now;
+            GUI.log(i18n.getMessage('mspWriteBlockedAfterParseFailure', [MSP.getCodeName(sourceCode)]));
+        };
     }
+
+    /**
+     * MSP response entry point. Completing the request must happen even when a
+     * parser case throws, or the tab waiting on it never finishes loading.
+     * @param {MSP} dataHandler
+     */
+    self.handleResponse = function (dataHandler) {
+        try {
+            self.processData(dataHandler);
+        } catch (error) {
+            console.error('Failed to parse MSP code 0x' + dataHandler.code.toString(16) + ':', error);
+
+            // Half this message landed in FC state - refuse the writes handing it back.
+            if (!MSP.parseFailures.has(dataHandler.code)) {
+                MSP.parseFailures.add(dataHandler.code);
+                GUI.log(i18n.getMessage('mspResponseUnreadable', [MSP.getCodeName(dataHandler.code)]));
+            }
+        }
+
+        completeRequest(dataHandler, new DataView(dataHandler.message_buffer, 0));
+    };
 
     /**
      *
@@ -339,6 +379,11 @@ var mspHelper = (function () {
             case MSPCodes.MSP2_PID:
                 // PID data arrived, we need to scale it and save to appropriate bank / array
                 for (let i = 0, needle = 0; i < (dataHandler.message_length_expected / 4); i++, needle += 4) {
+                    // A newer FC reports more banks than we know. Keep them rather than
+                    // write past the array - MSP2_SET_PID needs the FC's exact count.
+                    if (!FC.PIDs[i]) {
+                        FC.PIDs[i] = new Array(4);
+                    }
                     FC.PIDs[i][0] = data.getUint8(needle);
                     FC.PIDs[i][1] = data.getUint8(needle + 1);
                     FC.PIDs[i][2] = data.getUint8(needle + 2);
@@ -1854,12 +1899,62 @@ var mspHelper = (function () {
                 console.log("Geozone saved")
                 break;    
 
+            case MSPCodes.MSP2_MZTC_CONFIG:
+                // Fixed 12 byte payload, little endian, one field at a time.
+                // The firmware writes it with the sbufWrite helpers, so there
+                // is no compiler padding to account for here. The serial port
+                // and its baud rate are not in this payload. They live in the
+                // Ports tab.
+                if (data.byteLength >= MZTC_CONFIG_BYTES) {
+                    FC.MZTC_CONFIG = {
+                        preset: data.getUint8(0),
+                        palette_mode: data.getUint8(1),
+                        auto_shutter: data.getUint8(2),
+                        digital_enhancement: data.getUint8(3),
+                        spatial_denoise: data.getUint8(4),
+                        temporal_denoise: data.getUint8(5),
+                        brightness: data.getUint8(6),
+                        contrast: data.getUint8(7),
+                        zoom_level: data.getUint8(8),
+                        mirror_mode: data.getUint8(9),
+                        ffc_interval: data.getUint8(10)
+                    };
+                } else {
+                    console.log('MZTC_CONFIG payload too short: ' + data.byteLength +
+                                ' bytes, expected ' + MZTC_CONFIG_BYTES);
+                }
+                break;
+
+            case MSPCodes.MSP2_MZTC_STATUS:
+                // Fixed 7 byte payload. connected is set only after the camera
+                // has answered a command. An open UART does not set it.
+                if (data.byteLength >= MZTC_STATUS_BYTES) {
+                    FC.MZTC_STATUS = {
+                        status: data.getUint8(0),
+                        preset: data.getUint8(1),
+                        connected: data.getUint8(2),
+                        connection_quality: data.getUint8(3),
+                        last_calibration: data.getUint16(4, true),
+                        error_flags: data.getUint8(6)
+                    };
+                } else {
+                    console.log('MZTC_STATUS payload too short: ' + data.byteLength + ' bytes, expected ' + MZTC_STATUS_BYTES);
+                    FC.MZTC_STATUS = null;
+                }
+                break;
+
+            case MSPCodes.MSP2_SET_MZTC_CONFIG:
+                console.log("MZTC config saved");
+                break;
+
             default:
                 console.log('Unknown code detected: 0x' + dataHandler.code.toString(16));
         } else {
             console.log('FC reports unsupported message error: 0x' + dataHandler.code.toString(16));
         }
+    };
 
+    var completeRequest = function (dataHandler, data) {
         // trigger callbacks, cleanup/remove callback after trigger
         for (let i = dataHandler.callbacks.length - 1; i >= 0; i--) { // iterating in reverse because we use .splice which modifies array length
             if (i < dataHandler.callbacks.length) {
@@ -2456,6 +2551,27 @@ var mspHelper = (function () {
                 buffer.push(FC.EZ_TUNE.snappiness);
                 break;
 
+
+            case MSPCodes.MSP2_SET_MZTC_CONFIG:
+                // Fixed 12 byte payload matching MSP2_MZTC_CONFIG. The firmware
+                // validates the whole request before applying any of it, so an
+                // out of range value is rejected in full.
+                // One push in field order. The field order is the wire order,
+                // and it has to match MSP2_MZTC_CONFIG in the firmware.
+                buffer.push(
+                    FC.MZTC_CONFIG.preset,
+                    FC.MZTC_CONFIG.palette_mode,
+                    FC.MZTC_CONFIG.auto_shutter,
+                    FC.MZTC_CONFIG.digital_enhancement,
+                    FC.MZTC_CONFIG.spatial_denoise,
+                    FC.MZTC_CONFIG.temporal_denoise,
+                    FC.MZTC_CONFIG.brightness,
+                    FC.MZTC_CONFIG.contrast,
+                    FC.MZTC_CONFIG.zoom_level,
+                    FC.MZTC_CONFIG.mirror_mode,
+                    FC.MZTC_CONFIG.ffc_interval
+                );
+                break;
 
             default:
                 return false;
@@ -3111,6 +3227,18 @@ var mspHelper = (function () {
 
     self.queryFcStatus = function (callback) {
         MSP.send_message(MSPCodes.MSPV2_INAV_STATUS, false, false, callback);
+    };
+
+    self.loadMZTCConfig = function (callback) {
+        MSP.send_message(MSPCodes.MSP2_MZTC_CONFIG, false, false, callback);
+    };
+
+    self.loadMZTCStatus = function (callback) {
+        MSP.send_message(MSPCodes.MSP2_MZTC_STATUS, false, false, callback);
+    };
+
+    self.saveMZTCConfig = function (callback) {
+        MSP.send_message(MSPCodes.MSP2_SET_MZTC_CONFIG, mspHelper.crunch(MSPCodes.MSP2_SET_MZTC_CONFIG), false, callback);
     };
 
     self.loadMiscV2 = function (callback) {

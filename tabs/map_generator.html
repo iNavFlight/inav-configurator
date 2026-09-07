@@ -91,13 +91,13 @@
                             </div>
                         </div>
                         <div id="mapgen_hint_tiles" style="font-size:10px; color:#888; margin:2px 0 4px; font-style:italic;">Hint: Each extra zoom level ≈ 4× more tiles. Keep the area small or lower max zoom (when large area selected) to avoid long syncs and rate limits.</div>
-                        <div id="mapgen_hint_terrain" style="font-size:10px; color:#888; margin:2px 0 4px; font-style:italic; display:none;">Hint: One .DAT file per 1°×1° grid square (~111 km). Data: NASA SRTM1 at 30m resolution. Ocean depths are clamped to 0m.</div>
+                        <div id="mapgen_hint_terrain" style="font-size:10px; color:#888; margin:2px 0 4px; font-style:italic; display:none;">Hint: One .TER file per 1°×1° grid square (~111 km). Data: NASA SRTM1 at 30m resolution. Ocean depths are clamped to 0m.</div>
 
                         <div id="mapgen_terrain_alt_row" class="checkbox mapgen-overwrite-row" style="display:none;">
                             <input type="checkbox" id="mapgen_terrain_alt_toggle" />
                             <label for="mapgen_terrain_alt_toggle"><span>Live Altitude</span></label>
                         </div>
-                        <div id="mapgen_terrain_alt_hint" style="font-size:10px; color:#ff9800; margin:2px 0 4px; font-style:italic; display:none;">Altitude available after generating .DAT files — uses locally cached elevation data to avoid unnecessary server requests.</div>
+                        <div id="mapgen_terrain_alt_hint" style="font-size:10px; color:#ff9800; margin:2px 0 4px; font-style:italic; display:none;">Altitude available after generating .TER files — uses locally cached elevation data to avoid unnecessary server requests.</div>
 
                         <div class="select">
                             <select id="mapgen_area_unit">

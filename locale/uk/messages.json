@@ -5757,6 +5757,24 @@
     "ledStripWiringMessage": {
         "message": "Світлодіоди без порядкового номера підключення не будуть збережені."
     },
+    "ledStripQuickPresets": {
+        "message": "Швидкі пресети:"
+    },
+    "ledStripStep1Header": {
+        "message": "Порядок підключення"
+    },
+    "ledStripStep2Header": {
+        "message": "Положення та напрямок"
+    },
+    "ledStripStep3Header": {
+        "message": "Функція"
+    },
+    "ledStripStep4Header": {
+        "message": "Колір"
+    },
+    "ledStripEditPalette": {
+        "message": "Редагувати кольори палітри"
+    },
     "mainLogoText": {
         "message": "Конфігуратор"
     },

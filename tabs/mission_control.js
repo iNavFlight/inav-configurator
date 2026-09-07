@@ -123,6 +123,357 @@ const iconNames = [
 
 const icons = Object.create(null)
 
+const missionControlLocationNamespace = '.missionControlLocation';
+const WEATHER_RETRY_DELAY_MS = 5 * 60 * 1000;
+const WEATHER_REQUEST_TIMEOUT_MS = 30 * 1000;
+const WEATHER_MAP_REFRESH_DELAY_MS = 1000;
+const WEATHER_GPS_MIN_DISTANCE_METERS = 1000;
+const WEATHER_MAP_CENTER_MIN_DISTANCE_METERS = 1000;
+const WEATHER_WAYPOINT_MIN_DISTANCE_METERS = 10;
+let googleLocationAbortController = null;
+let weatherAbortController = null;
+let addressSearchAbortController = null;
+let weatherRetryTimer = null;
+let weatherMapRefreshTimer = null;
+let missionControlLocationLifecycleId = 0;
+
+function cleanupMissionControlLocationResources() {
+    missionControlLocationLifecycleId++;
+    googleLocationAbortController?.abort();
+    googleLocationAbortController = null;
+    weatherAbortController?.abort();
+    weatherAbortController = null;
+    addressSearchAbortController?.abort();
+    addressSearchAbortController = null;
+    clearTimeout(weatherRetryTimer);
+    weatherRetryTimer = null;
+    clearTimeout(weatherMapRefreshTimer);
+    weatherMapRefreshTimer = null;
+
+    $(document).off(missionControlLocationNamespace);
+    $('#searchAddress, #centerOnDrone, #showHideConditionsButton').off(missionControlLocationNamespace);
+    $('#addressSearchDialog, #addressSearchBackdrop').remove();
+
+    const apiOverlayEl = document.getElementById('geo_info');
+    if (apiOverlayEl) {
+        apiOverlayEl.textContent = '';
+        apiOverlayEl.style.visibility = 'hidden';
+    }
+}
+
+function showConditionsPanel(isVisible) {
+    $('#missionPlannerConditions').toggleClass('is-hidden', !isVisible);
+}
+
+function parseRetryAfterMs(retryAfter) {
+    if (!retryAfter) {
+        return WEATHER_RETRY_DELAY_MS;
+    }
+
+    const retryAfterSeconds = Number(retryAfter);
+    if (Number.isFinite(retryAfterSeconds)) {
+        return Math.max(WEATHER_RETRY_DELAY_MS, retryAfterSeconds * 1000);
+    }
+
+    const retryAt = Date.parse(retryAfter);
+    if (Number.isNaN(retryAt)) {
+        return WEATHER_RETRY_DELAY_MS;
+    }
+    return Math.max(WEATHER_RETRY_DELAY_MS, retryAt - Date.now());
+}
+
+function createWeatherRequestError(message, retryable, retryDelayMs = WEATHER_RETRY_DELAY_MS) {
+    const error = new Error(message);
+    error.weatherRetryable = retryable;
+    error.weatherRetryDelayMs = retryDelayMs;
+    return error;
+}
+
+function createWeatherResponseError(response, data) {
+    const status = response.status || Number(data?.error?.code);
+    const apiStatus = data?.error?.status;
+    const retryableApiStatuses = new Set([
+        'ABORTED',
+        'DEADLINE_EXCEEDED',
+        'INTERNAL',
+        'RESOURCE_EXHAUSTED',
+        'UNAVAILABLE',
+    ]);
+    const retryable = status === 408 || status === 429 || status >= 500
+        || retryableApiStatuses.has(apiStatus);
+    const retryDelayMs = status === 429
+        ? parseRetryAfterMs(response.headers?.get('Retry-After'))
+        : WEATHER_RETRY_DELAY_MS;
+    return createWeatherRequestError(
+        data?.error?.message || `HTTP ${status || response.status}`,
+        retryable,
+        retryDelayMs,
+    );
+}
+
+function getLocationDistanceMeters(first, second) {
+    const degreesToRadians = Math.PI / 180;
+    const latitudeDelta = (second.lat - first.lat) * degreesToRadians;
+    const longitudeDelta = (second.lng - first.lng) * degreesToRadians;
+    const firstLatitude = first.lat * degreesToRadians;
+    const secondLatitude = second.lat * degreesToRadians;
+    const haversine = Math.sin(latitudeDelta / 2) ** 2
+        + Math.cos(firstLatitude) * Math.cos(secondLatitude) * Math.sin(longitudeDelta / 2) ** 2;
+    const boundedHaversine = Math.min(1, Math.max(0, haversine));
+    return 6371000 * 2 * Math.atan2(Math.sqrt(boundedHaversine), Math.sqrt(1 - boundedHaversine));
+}
+
+function isWeatherSourceMateriallyChanged(currentSource, nextSource) {
+    if (!currentSource || !nextSource || currentSource.type !== nextSource.type) {
+        return true;
+    }
+    const minimumDistances = {
+        gps: WEATHER_GPS_MIN_DISTANCE_METERS,
+        map: WEATHER_MAP_CENTER_MIN_DISTANCE_METERS,
+        waypoint: WEATHER_WAYPOINT_MIN_DISTANCE_METERS,
+    };
+    const minimumDistance = minimumDistances[nextSource.type];
+    return getLocationDistanceMeters(currentSource, nextSource) >= minimumDistance;
+}
+
+function updateConditionsTitle(source) {
+    const titleKeys = {
+        gps: 'conditionsSourceAircraft',
+        waypoint: 'conditionsSourceWaypoint',
+        map: 'conditionsSourceMapCenter',
+    };
+    $('#conditionsTitle').text(i18n.getMessage('conditionsInfoHeadSource', [
+        i18n.getMessage(titleKeys[source.type]),
+    ]));
+}
+
+function clearWeatherRetry() {
+    clearTimeout(weatherRetryTimer);
+    weatherRetryTimer = null;
+}
+
+async function parseWeatherResponse(response) {
+    let data;
+    try {
+        data = await response.json();
+    } catch (error) {
+        if (!response.ok) {
+            throw createWeatherResponseError(response, null);
+        }
+        throw error;
+    }
+    if (!response.ok || data?.error) {
+        throw createWeatherResponseError(response, data);
+    }
+    return data;
+}
+
+function isCurrentWeatherRequest(requestController, apiKey, locationLifecycleId) {
+    return missionControlLocationLifecycleId === locationLifecycleId
+        && weatherAbortController === requestController
+        && String(globalSettings.googleApiKey || '').trim() === apiKey;
+}
+
+function normalizeWeatherRequestError(error, requestTimedOut) {
+    if (error.name !== 'AbortError') {
+        return error;
+    }
+    return requestTimedOut
+        ? createWeatherRequestError('Weather API request timed out', true)
+        : null;
+}
+
+function toTitleCase(value) {
+    return String(value || '').replaceAll('_', ' ').toLowerCase()
+        .replace(/\b\w/g, function (character) { return character.toUpperCase(); });
+}
+
+function applyThresholdColor(selector, value, lowThreshold, mediumThreshold) {
+    $(selector).css('color', '');
+    if (!Number.isFinite(value)) {
+        return;
+    }
+
+    if (value < lowThreshold) {
+        $(selector).css('color', '#4caf50');
+    } else if (value < mediumThreshold) {
+        $(selector).css('color', '#ff9800');
+    } else {
+        $(selector).css('color', '#f44336');
+    }
+}
+
+function applyUvColor(uv) {
+    $('#condUV').css('color', '');
+    if (!Number.isFinite(uv)) {
+        return;
+    }
+
+    if (uv > 7) {
+        $('#condUV').css('color', '#f44336');
+    } else if (uv > 5) {
+        $('#condUV').css('color', '#f57c00');
+    } else {
+        applyThresholdColor('#condUV', uv, 3, 6);
+    }
+}
+
+function applyThunderColor(thunder) {
+    $('#condThunder').css('color', '');
+    if (!Number.isFinite(thunder)) {
+        return;
+    }
+
+    if (thunder > 30) {
+        $('#condThunder').css('color', '#f44336');
+    } else if (thunder > 10) {
+        $('#condThunder').css('color', '#ff9800');
+    }
+}
+
+function formatConditionsValue(value, unit = '') {
+    if (value == null || value === '') {
+        return '—';
+    }
+
+    return unit ? `${value} ${unit}` : String(value);
+}
+
+function getTemperatureUnit(unit) {
+    const temperatureUnits = {
+        CELSIUS: '°C',
+        FAHRENHEIT: '°F',
+    };
+    return temperatureUnits[unit] || '';
+}
+
+function getVisibilityUnit(unit) {
+    const visibilityUnits = {
+        KILOMETERS: 'km',
+        MILES: 'mi',
+    };
+    return visibilityUnits[unit] || '';
+}
+
+function convertWindSpeedToKmh(speed, unit) {
+    if (!Number.isFinite(speed)) {
+        return Number.NaN;
+    }
+    return unit === 'MILES_PER_HOUR' ? speed * 1.609 : speed;
+}
+
+function showConditionsUnavailable() {
+    showConditionsPanel(true);
+    $('#conditionsLoading').hide();
+    $('#conditionsData').addClass('is-hidden').hide();
+    $('#conditionsError').text(i18n.getMessage('conditionsUnavailable')).removeClass('is-hidden').show();
+}
+
+async function readAddressSearchResponse(response) {
+    const data = await response.json();
+    if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+    }
+    return data;
+}
+
+function renderConditionsInfo(data) {
+    if (!data || typeof data !== 'object' || data.error) {
+        return false;
+    }
+
+    const windSpeed = data.wind?.speed?.value;
+    const windUnit = data.wind?.speed?.unit;
+    const gustSpeed = data.wind?.gust?.value;
+    const windDirection = data.wind?.direction?.degrees;
+    const windCardinal = data.wind?.direction?.cardinal;
+    const windUnitLabels = {
+        KILOMETERS_PER_HOUR: 'km/h',
+        MILES_PER_HOUR: 'mph',
+    };
+    const windUnitLabel = windUnitLabels[windUnit] || '';
+    const windArrows = ['↓', '↙', '←', '↖', '↑', '↗', '→', '↘'];
+    const windArrow = Number.isFinite(windDirection)
+        ? windArrows[Math.round(windDirection / 45) % windArrows.length]
+        : '';
+    const windDirectionParts = [windArrow, toTitleCase(windCardinal)].filter(Boolean);
+    if (Number.isFinite(windDirection)) {
+        windDirectionParts.push(`(${windDirection}°)`);
+    }
+
+    const temperature = data.temperature?.degrees;
+    const temperatureUnit = getTemperatureUnit(data.temperature?.unit);
+    const feelsLike = data.feelsLikeTemperature?.degrees;
+    const uv = data.uvIndex;
+    const precipitation = data.precipitation?.qpf?.quantity;
+    const precipitationUnit = data.precipitation?.qpf?.unit === 'INCHES' ? 'in' : 'mm';
+    const thunder = data.thunderstormProbability;
+    const visibility = data.visibility?.distance;
+    const visibilityUnit = getVisibilityUnit(data.visibility?.unit);
+    const cloudCover = data.cloudCover;
+
+    $('#condWeather').text(data.weatherCondition?.description?.text || '—');
+    $('#condWind').text(formatConditionsValue(windSpeed, windUnitLabel));
+    $('#condGusts').text(formatConditionsValue(gustSpeed, windUnitLabel));
+    $('#condWindDir').text(windDirectionParts.join(' ') || '—');
+    $('#condTemp').text(formatConditionsValue(temperature, temperatureUnit));
+    $('#condFeelsLike').text(formatConditionsValue(feelsLike, temperatureUnit));
+    $('#condHumidity').text(formatConditionsValue(data.relativeHumidity, '%'));
+    $('#condUV').text(formatConditionsValue(uv));
+    $('#condPrecip').text(formatConditionsValue(precipitation, precipitationUnit));
+    $('#condThunder').text(formatConditionsValue(thunder, '%'));
+    $('#condVisibility').text(formatConditionsValue(visibility, visibilityUnit));
+    $('#condCloud').text(formatConditionsValue(cloudCover, '%'));
+
+    const windSpeedKmh = convertWindSpeedToKmh(windSpeed, windUnit);
+    const gustSpeedKmh = convertWindSpeedToKmh(gustSpeed, windUnit);
+    applyUvColor(uv);
+    applyThunderColor(thunder);
+    applyThresholdColor('#condWind', windSpeedKmh, 20, 35);
+    applyThresholdColor('#condGusts', gustSpeedKmh, 25, 45);
+
+    showConditionsPanel(true);
+    $('#conditionsLoading').hide();
+    $('#conditionsError').hide();
+    $('#conditionsData').removeClass('is-hidden').show();
+    return true;
+}
+
+function showApiLocationBanner(apiOverlayEl, infoOverlayEl, googleGeoPos) {
+    if (!apiOverlayEl || !googleGeoPos) {
+        return;
+    }
+
+    if (infoOverlayEl) {
+        infoOverlayEl.style.visibility = 'hidden';
+    }
+
+    const accuracyKm = Number.isFinite(googleGeoPos.accuracy)
+        ? (googleGeoPos.accuracy / 1000).toFixed(0)
+        : '—';
+    apiOverlayEl.textContent =
+        `${i18n.getMessage('apiLocationBannerPrefix')}  ` +
+        `${i18n.getMessage('apiLocationBannerCoordinates', [
+            googleGeoPos.lat.toFixed(4),
+            googleGeoPos.lng.toFixed(4),
+            accuracyKm,
+        ])} — ${i18n.getMessage('apiLocationBannerWarning')}`;
+    apiOverlayEl.style.visibility = 'visible';
+}
+
+function getGoogleLocationZoom(googleGeoPos) {
+    if (!googleGeoPos) {
+        return 14;
+    }
+    if (googleGeoPos.accuracy > 5000) {
+        return 10;
+    }
+    if (googleGeoPos.accuracy > 1000) {
+        return 12;
+    }
+    return 14;
+}
+
 function rotateGridPoint(point, angleRad) {
     const cosAngle = Math.cos(angleRad);
     const sinAngle = Math.sin(angleRad);
@@ -275,6 +626,9 @@ missionControlTab.isYmapLoad = false;
 let elevationChartInstance = null;
 missionControlTab.initialize = function (callback) {
 
+    cleanupMissionControlLocationResources();
+    const locationLifecycleId = missionControlLocationLifecycleId;
+
     let cursorInitialized = false;
     let curPosStyle;
     let curPosGeo;
@@ -286,8 +640,10 @@ missionControlTab.initialize = function (callback) {
     let breadCrumbVector;
     let autoCenteredOnFix = false;
     let lastGpsPos = null;
+    let googleGeoPos = null;
     let infoOverlayEl;
     let infoOverlaySpans;
+    let apiOverlayEl;
     let isOffline = false;
     let selectedSafehome;
     let $safehomeContentBox;
@@ -297,6 +653,353 @@ missionControlTab.initialize = function (callback) {
     let invalidGeoZones = false;
     let isGeozoneEnabeld = false;
     let settings = {speed: 0, alt: 5000, safeRadiusSH: 50, fwApproachAlt: 60, fwLandAlt: 5, maxDistSH: 0, fwApproachLength: 0, fwLoiterRadius: 0};
+    let googleLocationRequestStarted = false;
+    let conditionsFetched = false;
+    let activeWeatherSource = null;
+    let weatherApiKey = String(globalSettings.googleApiKey || '').trim();
+    let blockedWeatherApiKey = null;
+
+    function getCurrentDroneLocation() {
+        const lat = FC.GPS_DATA?.lat / 10000000;
+        const lng = FC.GPS_DATA?.lon / 10000000;
+        if (FC.GPS_DATA?.fix < 2 || !Number.isFinite(lat) || !Number.isFinite(lng)
+            || Math.abs(lat) > 90 || Math.abs(lng) > 180) {
+            return null;
+        }
+
+        return {
+            lat,
+            lng,
+            coord: fromLonLat([lng, lat]),
+        };
+    }
+
+    function getFirstMissionLocation() {
+        const firstWaypoint = mission.get().find(function (waypoint) {
+            return !waypoint.isAttached();
+        });
+        if (!firstWaypoint) {
+            return null;
+        }
+
+        const lat = firstWaypoint.getLatMap();
+        const lng = firstWaypoint.getLonMap();
+        if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
+            return null;
+        }
+
+        return {
+            type: 'waypoint',
+            lat,
+            lng,
+            coord: fromLonLat([lng, lat]),
+        };
+    }
+
+    function getFirstMissionCoordinate() {
+        return getFirstMissionLocation()?.coord || null;
+    }
+
+    function getMapCenterWeatherLocation() {
+        const center = map?.getView()?.getCenter();
+        if (!center) {
+            return null;
+        }
+
+        const [lng, lat] = toLonLat(center);
+        if (!Number.isFinite(lat) || !Number.isFinite(lng)
+            || Math.abs(lat) > 90 || Math.abs(lng) > 180) {
+            return null;
+        }
+        return { type: 'map', lat, lng };
+    }
+
+    function getPreferredWeatherSource() {
+        const droneLocation = getCurrentDroneLocation();
+        if (droneLocation) {
+            return { type: 'gps', lat: droneLocation.lat, lng: droneLocation.lng };
+        }
+        return getFirstMissionLocation() || getMapCenterWeatherLocation();
+    }
+
+    function syncWeatherApiKey() {
+        const apiKey = String(globalSettings.googleApiKey || '').trim();
+        if (apiKey === weatherApiKey) {
+            return false;
+        }
+
+        weatherApiKey = apiKey;
+        blockedWeatherApiKey = null;
+        activeWeatherSource = null;
+        conditionsFetched = false;
+        clearWeatherRetry();
+        weatherAbortController?.abort();
+        weatherAbortController = null;
+        return true;
+    }
+
+    function scheduleWeatherRetry(source, apiKey, retryDelayMs) {
+        clearWeatherRetry();
+        weatherRetryTimer = setTimeout(function () {
+            weatherRetryTimer = null;
+            if (missionControlLocationLifecycleId !== locationLifecycleId
+                || String(globalSettings.googleApiKey || '').trim() !== apiKey
+                || blockedWeatherApiKey === apiKey) {
+                return;
+            }
+
+            const preferredSource = getPreferredWeatherSource();
+            if (!preferredSource) {
+                return;
+            }
+            if (isWeatherSourceMateriallyChanged(source, preferredSource)) {
+                evaluateWeatherSource();
+                return;
+            }
+
+            activeWeatherSource = preferredSource;
+            updateConditionsTitle(preferredSource);
+            void fetchConditionsInfo(preferredSource, apiKey);
+        }, retryDelayMs);
+    }
+
+    async function fetchConditionsInfo(source, apiKey) {
+        if (!apiKey || blockedWeatherApiKey === apiKey
+            || missionControlLocationLifecycleId !== locationLifecycleId) {
+            return false;
+        }
+
+        const useImperial = globalSettings.unitType === 'imperial'
+            || (globalSettings.unitType === 'OSD' && globalSettings.osdUnits === 0);
+        const url = new URL('https://weather.googleapis.com/v1/currentConditions:lookup');
+        url.searchParams.set('key', apiKey);
+        url.searchParams.set('location.latitude', source.lat.toFixed(4));
+        url.searchParams.set('location.longitude', source.lng.toFixed(4));
+        if (useImperial) {
+            url.searchParams.set('unitsSystem', 'IMPERIAL');
+        }
+
+        weatherAbortController?.abort();
+        const requestController = new AbortController();
+        weatherAbortController = requestController;
+        let requestTimedOut = false;
+        const timeoutTimer = setTimeout(function () {
+            requestTimedOut = true;
+            requestController.abort();
+        }, WEATHER_REQUEST_TIMEOUT_MS);
+        updateConditionsTitle(source);
+        showConditionsPanel(true);
+        $('#conditionsLoading').text(i18n.getMessage('conditionsWaiting')).show();
+        $('#conditionsData').addClass('is-hidden').hide();
+        $('#conditionsError').addClass('is-hidden').hide();
+
+        try {
+            const response = await fetch(url, { signal: requestController.signal });
+            const data = await parseWeatherResponse(response);
+            if (!isCurrentWeatherRequest(requestController, apiKey, locationLifecycleId)) {
+                return false;
+            }
+
+            conditionsFetched = renderConditionsInfo(data);
+            if (!conditionsFetched) {
+                throw createWeatherRequestError('Invalid Weather API response', true);
+            }
+            clearWeatherRetry();
+            blockedWeatherApiKey = null;
+            return true;
+        } catch (error) {
+            const weatherError = normalizeWeatherRequestError(error, requestTimedOut);
+            if (!weatherError || !isCurrentWeatherRequest(requestController, apiKey, locationLifecycleId)) {
+                return false;
+            }
+
+            conditionsFetched = false;
+            showConditionsUnavailable();
+            console.warn('Google Weather unavailable:', weatherError.message);
+            if (weatherError.weatherRetryable !== false) {
+                scheduleWeatherRetry(source, apiKey, weatherError.weatherRetryDelayMs || WEATHER_RETRY_DELAY_MS);
+            } else {
+                clearWeatherRetry();
+                blockedWeatherApiKey = apiKey;
+            }
+            return false;
+        } finally {
+            clearTimeout(timeoutTimer);
+            if (weatherAbortController === requestController) {
+                weatherAbortController = null;
+            }
+        }
+    }
+
+    function evaluateWeatherSource({ allowMapCenterRefresh = true } = {}) {
+        if (missionControlLocationLifecycleId !== locationLifecycleId) {
+            return false;
+        }
+        const apiKeyChanged = syncWeatherApiKey();
+        const apiKey = weatherApiKey;
+        if (!apiKey) {
+            showConditionsPanel(false);
+            return false;
+        }
+
+        const preferredSource = getPreferredWeatherSource();
+        if (!preferredSource) {
+            return false;
+        }
+        if (!allowMapCenterRefresh && !apiKeyChanged && preferredSource.type === 'map'
+            && (!activeWeatherSource || activeWeatherSource.type === 'map')) {
+            return conditionsFetched;
+        }
+        if (preferredSource.type !== 'map') {
+            clearTimeout(weatherMapRefreshTimer);
+            weatherMapRefreshTimer = null;
+        }
+        updateConditionsTitle(preferredSource);
+        if (blockedWeatherApiKey === apiKey) {
+            return false;
+        }
+        if (!isWeatherSourceMateriallyChanged(activeWeatherSource, preferredSource)) {
+            return conditionsFetched;
+        }
+
+        clearWeatherRetry();
+        weatherAbortController?.abort();
+        activeWeatherSource = preferredSource;
+        conditionsFetched = false;
+        void fetchConditionsInfo(preferredSource, apiKey);
+        return true;
+    }
+
+    function scheduleMapCenterWeatherRefresh() {
+        clearTimeout(weatherMapRefreshTimer);
+        weatherMapRefreshTimer = null;
+        if (missionControlLocationLifecycleId !== locationLifecycleId
+            || getCurrentDroneLocation() || getFirstMissionLocation()) {
+            return;
+        }
+
+        weatherMapRefreshTimer = setTimeout(function () {
+            weatherMapRefreshTimer = null;
+            if (missionControlLocationLifecycleId === locationLifecycleId) {
+                evaluateWeatherSource();
+            }
+        }, WEATHER_MAP_REFRESH_DELAY_MS);
+    }
+
+    function centerMapOnCurrentLocation(keepExistingZoom = false) {
+        const mapView = map?.getView();
+        if (!mapView) {
+            return false;
+        }
+
+        const droneLocation = getCurrentDroneLocation();
+        if (lastGpsPos || droneLocation) {
+            lastGpsPos = droneLocation?.coord || lastGpsPos;
+            mapView.setCenter(lastGpsPos);
+            if (!keepExistingZoom || mapView.getZoom() < 14) {
+                mapView.setZoom(14);
+            }
+            return true;
+        }
+
+        if (!googleGeoPos) {
+            return false;
+        }
+
+        mapView.setCenter(googleGeoPos.coord);
+        const zoom = getGoogleLocationZoom(googleGeoPos);
+        if (!keepExistingZoom || mapView.getZoom() < zoom) {
+            mapView.setZoom(zoom);
+        }
+        showApiLocationBanner(apiOverlayEl, infoOverlayEl, googleGeoPos);
+        return true;
+    }
+
+    function centerMapOnPreferredLocation(keepExistingZoom = false) {
+        const mapView = map?.getView();
+        if (!mapView) {
+            return false;
+        }
+
+        const firstWaypointCoord = getFirstMissionCoordinate();
+        if (firstWaypointCoord) {
+            mapView.setCenter(firstWaypointCoord);
+            if (!keepExistingZoom || mapView.getZoom() < 14) {
+                mapView.setZoom(14);
+            }
+            return true;
+        }
+
+        return centerMapOnCurrentLocation(keepExistingZoom);
+    }
+
+    async function requestGoogleApproximateLocation() {
+        if (googleLocationRequestStarted || !globalSettings.googleApiKey
+            || getFirstMissionCoordinate() || getCurrentDroneLocation()) {
+            return null;
+        }
+
+        googleLocationRequestStarted = true;
+        const url = new URL('https://www.googleapis.com/geolocation/v1/geolocate');
+        url.searchParams.set('key', globalSettings.googleApiKey);
+        const requestController = new AbortController();
+        googleLocationAbortController = requestController;
+
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ considerIp: true }),
+                signal: requestController.signal,
+            });
+            const data = await response.json();
+            if (!response.ok || !Number.isFinite(data?.location?.lat)
+                || !Number.isFinite(data?.location?.lng)) {
+                throw new Error(data?.error?.message || `HTTP ${response.status}`);
+            }
+
+            googleGeoPos = {
+                coord: fromLonLat([data.location.lng, data.location.lat]),
+                lat: data.location.lat,
+                lng: data.location.lng,
+                accuracy: Number(data.accuracy),
+            };
+
+            if (!getFirstMissionCoordinate() && !getCurrentDroneLocation() && !lastGpsPos) {
+                $('#centerOnDrone').show().css({ opacity: 1, pointerEvents: 'auto' });
+                centerMapOnPreferredLocation();
+            }
+            return googleGeoPos;
+        } catch (error) {
+            if (error.name !== 'AbortError') {
+                console.warn('Google approximate location unavailable:', error.message);
+            }
+            return null;
+        } finally {
+            if (googleLocationAbortController === requestController) {
+                googleLocationAbortController = null;
+            }
+        }
+    }
+
+    function initializeMapLocation() {
+        const initialDroneLocation = getCurrentDroneLocation();
+        if (getFirstMissionCoordinate()) {
+            centerMapOnPreferredLocation();
+            evaluateWeatherSource();
+            return;
+        }
+        if (initialDroneLocation) {
+            lastGpsPos = initialDroneLocation.coord;
+            $('#centerOnDrone').css({ opacity: 1, pointerEvents: 'auto' });
+            centerMapOnPreferredLocation();
+            evaluateWeatherSource();
+            return;
+        }
+        void requestGoogleApproximateLocation().then(function () {
+            evaluateWeatherSource();
+        });
+    }
 
     if (GUI.active_tab !== this) {
         GUI.active_tab = this;
@@ -612,6 +1315,9 @@ function iconKey(filename) {
               curPosGeo.setCoordinates(gpsPos);
               lastGpsPos = gpsPos;
               $('#centerOnDrone').css({ opacity: 1, pointerEvents: 'auto' });
+              if (apiOverlayEl) {
+                  apiOverlayEl.style.visibility = 'hidden';
+              }
 
                             // Uncomment to auto-center/zoom once when GPS lock is first acquired
                             // if (!autoCenteredOnFix && map && map.getView()) {
@@ -657,9 +1363,14 @@ function iconKey(filename) {
                             }
           }
                     else if (infoOverlayEl) {
-                        $('#centerOnDrone').css({ opacity: 0.45, pointerEvents: 'none' });
+                        if (googleGeoPos) {
+                            $('#centerOnDrone').css({ opacity: 1, pointerEvents: 'auto' });
+                        } else {
+                            $('#centerOnDrone').css({ opacity: 0.45, pointerEvents: 'none' });
+                        }
                         infoOverlayEl.style.visibility = 'hidden';
                     }
+          evaluateWeatherSource({ allowMapCenterRefresh: false });
         }
 
         /*
@@ -2148,6 +2859,7 @@ function iconKey(filename) {
     function refreshLayers() {
         cleanLayers();
         redrawLayers();
+        evaluateWeatherSource();
     }
 
     function cleanLayers() {
@@ -2921,6 +3633,12 @@ function iconKey(filename) {
             })
         });
 
+        apiOverlayEl = document.getElementById('geo_info');
+        if (apiOverlayEl) {
+            apiOverlayEl.textContent = '';
+            apiOverlayEl.style.visibility = 'hidden';
+        }
+
         //////////////////////////////////////////////////////////////////////////
         // Set the attribute link to open on an external browser window, so
         // it doesn't interfere with the configurator.
@@ -2960,6 +3678,7 @@ function iconKey(filename) {
                 center: toLonLat(map.getView().getCenter()),
                 zoom: map.getView().getZoom()
             });
+            scheduleMapCenterWeatherRefresh();
         });
         //////////////////////////////////////////////////////////////////////////
         // load map view settings on startup
@@ -2968,7 +3687,9 @@ function iconKey(filename) {
         if (missionPlannerLastValues && missionPlannerLastValues.zoom && missionPlannerLastValues.center) {
             map.getView().setCenter(fromLonLat(missionPlannerLastValues.center));
             map.getView().setZoom(missionPlannerLastValues.zoom);
-        }         
+        }
+
+        initializeMapLocation();
 
         //////////////////////////////////////////////////////////////////////////
         // Load previously saved GEO files from electron store
@@ -4175,13 +4896,121 @@ function iconKey(filename) {
             }
         });
 
+        function closeAddressSearchDialog() {
+            $('#addressSearchDialog, #addressSearchBackdrop').remove();
+        }
+
+        async function searchGoogleAddress(address, signal) {
+            if (!globalSettings.googleApiKey) {
+                return null;
+            }
+
+            const url = new URL('https://maps.googleapis.com/maps/api/geocode/json');
+            url.searchParams.set('address', address);
+            url.searchParams.set('key', globalSettings.googleApiKey);
+
+            try {
+                const data = await readAddressSearchResponse(await fetch(url, { signal }));
+                if (data.status !== 'OK' || !data.results?.length) {
+                    return null;
+                }
+
+                const result = data.results[0];
+                const lat = result.geometry?.location?.lat;
+                const lng = result.geometry?.location?.lng;
+                if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
+                    return null;
+                }
+
+                return {
+                    coord: fromLonLat([lng, lat]),
+                    description: result.formatted_address,
+                    source: 'Google',
+                };
+            } catch (error) {
+                if (error.name === 'AbortError') {
+                    throw error;
+                }
+                return null;
+            }
+        }
+
+        async function searchNominatimAddress(address, signal) {
+            const url = new URL('https://nominatim.openstreetmap.org/search');
+            url.searchParams.set('format', 'json');
+            url.searchParams.set('q', address);
+            url.searchParams.set('limit', '1');
+
+            const data = await readAddressSearchResponse(await fetch(url, { signal }));
+            if (!Array.isArray(data) || data.length === 0) {
+                return null;
+            }
+
+            const result = data[0];
+            const lat = Number.parseFloat(result.lat);
+            const lng = Number.parseFloat(result.lon);
+            if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
+                return null;
+            }
+
+            return {
+                coord: fromLonLat([lng, lat]),
+                description: result.display_name,
+                source: 'OpenStreetMap',
+            };
+        }
+
+        async function confirmAndCenterMap(result, signal) {
+            const confirmed = await dialog.confirm(
+                i18n.getMessage('addressSearchConfirmation', [result.description, result.source])
+            );
+            if (!confirmed || signal.aborted || !map?.getView()) {
+                return false;
+            }
+
+            map.getView().setCenter(result.coord);
+            return true;
+        }
+
+        async function runAddressSearch() {
+            const address = $('#addressInput').val().trim();
+            closeAddressSearchDialog();
+            if (!address) {
+                return;
+            }
+
+            addressSearchAbortController?.abort();
+            const requestController = new AbortController();
+            addressSearchAbortController = requestController;
+
+            try {
+                const googleResult = await searchGoogleAddress(address, requestController.signal);
+                const result = googleResult
+                    || await searchNominatimAddress(address, requestController.signal);
+                if (!result) {
+                    dialog.alert(i18n.getMessage('addressSearchNotFound'));
+                    return;
+                }
+
+                await confirmAndCenterMap(result, requestController.signal);
+            } catch (error) {
+                if (error.name !== 'AbortError') {
+                    console.error('Address search failed:', error.message);
+                    dialog.alert(i18n.getMessage('addressSearchFailed'));
+                }
+            } finally {
+                if (addressSearchAbortController === requestController) {
+                    addressSearchAbortController = null;
+                }
+            }
+        }
+
         // Address search button
-        $(document).on('click', '#searchAddressButton, #searchAddress', function (e) {
+        $('#searchAddress').off(missionControlLocationNamespace).on(`click${missionControlLocationNamespace}`, function (e) {
             e.preventDefault();
             e.stopPropagation();
 
-            // Remove any existing dialog
-            $('#addressSearchDialog, #addressSearchBackdrop').remove();
+            closeAddressSearchDialog();
 
             // Create dialog
             const addressDialog = $(`
@@ -4189,80 +5018,62 @@ function iconKey(filename) {
                      background: rgba(0,0,0,0.5); z-index: 10000;">
                     <div id="addressSearchDialog" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); 
                          background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.3);">
-                        <h3>Search for Location</h3>
+                        <h3></h3>
                         <input type="text" id="addressInput" style="width: 280px; padding: 8px 12px; margin: 10px 0; border: 1px solid #ccc; font-size: 14px;" 
-                               placeholder="Enter address, city, or coordinates" value="" autocomplete="off">
+                               value="" autocomplete="off">
                         <div style="margin-top: 15px; text-align: right;">
-                            <button id="searchCancel" style="padding: 8px 16px; margin-right: 10px;">Cancel</button>
-                            <button id="searchOK" style="padding: 8px 16px; background: #007cba; color: white; border: none;">Search</button>
+                            <button id="searchCancel" style="padding: 8px 16px; margin-right: 10px;"></button>
+                            <button id="searchOK" style="padding: 8px 16px; background: #007cba; color: white; border: none;"></button>
                         </div>
                     </div>
                 </div>
             `);
 
+            addressDialog.find('h3').text(i18n.getMessage('addressSearchTitle'));
+            addressDialog.find('#addressInput').attr('placeholder', i18n.getMessage('addressSearchPlaceholder'));
+            addressDialog.find('#searchCancel').text(i18n.getMessage('addressSearchCancel'));
+            addressDialog.find('#searchOK').text(i18n.getMessage('addressSearchSubmit'));
+
             $('body').append(addressDialog);
 
-          
-            // Search function
-            function doSearch() {
-                const address = $('#addressInput').val().trim();
-                $('#addressSearchBackdrop').remove();
-
-                if (address) {
-                    const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&limit=1`;
-                    
-                    fetch(url)
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data && data.length > 0) {
-                                const result = data[0];
-                                const coord = fromLonLat([parseFloat(result.lon), parseFloat(result.lat)]);
-                                map.getView().setCenter(coord);
-                                dialog.alert(`Found: ${result.display_name}`);
-                            } else {
-                                dialog.alert('Address not found.');
-                            }
-                        })
-                        .catch(err => {
-                            console.error('Search failed:', err);
-                            dialog.alert('Search failed. Check your connection.');
-                        });
-                }
-
-                setTimeout(() => {
-                    const input = document.getElementById('addressInput');
-                    input?.focus();
-                    input?.select();
-                }, 50);
-
-            }
-
             // Event handlers
-            $('#searchOK').click(doSearch);
-            $('#searchCancel').click(() => $('#addressSearchBackdrop').remove());
-            $('#addressInput').keypress(function(e) {
-                if (e.which === 13) doSearch();
-            });
-            
-            // Only close on backdrop click, not dialog content click
-            $('#addressSearchBackdrop').click(function(e) {
-                if (e.target === this) {
-                    $('#addressSearchBackdrop').remove();
+            $('#searchOK').on(`click${missionControlLocationNamespace}`, runAddressSearch);
+            $('#searchCancel').on(`click${missionControlLocationNamespace}`, closeAddressSearchDialog);
+            $('#addressInput').on(`keydown${missionControlLocationNamespace}`, function(e) {
+                if (e.key === 'Enter') {
+                    void runAddressSearch();
                 }
             });
-            
+
+            // Only close on backdrop click, not dialog content click
+            $('#addressSearchBackdrop').on(`click${missionControlLocationNamespace}`, function(e) {
+                if (e.target === this) {
+                    closeAddressSearchDialog();
+                }
+            });
+
             // Prevent clicks inside the dialog from closing it
-            $('#addressSearchDialog').click(function(e) {
+            $('#addressSearchDialog').on(`click${missionControlLocationNamespace}`, function(e) {
                 e.stopPropagation();
             });
+
+            const input = document.getElementById('addressInput');
+            input?.focus();
+            input?.select();
         });
 
-        $(document).on('click', '#centerOnDroneButton, #centerOnDrone', function (e) {
+        $('#centerOnDrone').off(missionControlLocationNamespace).on(`click${missionControlLocationNamespace}`, function (e) {
             e.preventDefault();
             e.stopPropagation();
-            if (lastGpsPos && map && map.getView()) {
-                map.getView().setCenter(lastGpsPos);
-            }
+            centerMapOnCurrentLocation();
+        });
+
+        $('#showHideConditionsButton').off(missionControlLocationNamespace).on(`click${missionControlLocationNamespace}`, function (e) {
+            e.preventDefault();
+            const $icon = $(this).children('a');
+            const showContent = $icon.hasClass('ic_show');
+            $icon.toggleClass('ic_show', !showContent).toggleClass('ic_hide', showContent);
+            $('#ConditionsContent').stop(true, true)[showContent ? 'fadeIn' : 'fadeOut'](300);
         });
 
         /////////////////////////////////////////////
@@ -4604,8 +5415,8 @@ function iconKey(filename) {
                 return;
             }
 
-            if (!e.repeat && key === 'c' && lastGpsPos && map?.getView()) {
-                map.getView().setCenter(lastGpsPos);
+            if (!e.repeat && key === 'c') {
+                centerMapOnCurrentLocation(true);
             }
 
             if (handleMissionControlCtrlShortcut(e, key)) {
@@ -5575,6 +6386,7 @@ missionControlTab.setBit = function(bits, bit, value) {
 // }
 
 missionControlTab.cleanup = function (callback) {
+    cleanupMissionControlLocationResources();
     if (elevationChartInstance) {
         elevationChartInstance.destroy();
         elevationChartInstance = null;
