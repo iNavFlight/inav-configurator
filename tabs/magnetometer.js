@@ -1171,8 +1171,7 @@ magnetometerTab.initialize = function (callback) {
             if (isRamConstrainedTarget()) {
                 var next_step = $('#modal-acc-align-east');
                 if (!BitHelper.bit_check(FC.CONFIG.activeSensors, 2)) {
-                    // No mag: skip the compass-orientation step. (Not FC.SENSOR_DATA.magnetometer
-                    // === 0 -- that's a live sample and can read 0 on a real, working compass.)
+                    // No mag: skip the compass-orientation step.
                     // #modal-acc-align-done also shows a "Compass alignment set to" line, which
                     // accAutoAlignCompass() normally fills in -- fill it in here too since that
                     // step never runs on this path, so it isn't left blank.
