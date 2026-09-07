@@ -566,6 +566,17 @@ magnetometerTab.initialize = function (callback) {
             if (typeof modal != "undefined") {
                 modal.close();
             }
+            if (!FC.getMagnetometerCalibrated()) {
+                resetAlignButtons();
+                modal = new jBox('Modal', {
+                    width: 460,
+                    height: 360,
+                    animation: false,
+                    closeOnClick: true,
+                    content: $('#modal-acc-align-mag-uncalibrated-error')
+                }).open();
+                return;
+            }
             modal = new jBox('Modal', {
                 width: 460,
                 height: 360,
@@ -1143,6 +1154,20 @@ magnetometerTab.initialize = function (callback) {
 
 
         if (step == "1") {
+            // Check compass calibration before the user does any physical positioning, not
+            // after -- this combined flow ends by using the compass, so there's no point
+            // walking through the board-alignment steps first if that's doomed to fail.
+            if (isRamConstrainedTarget() && BitHelper.bit_check(FC.CONFIG.activeSensors, 2) && !FC.getMagnetometerCalibrated()) {
+                resetAlignButtons();
+                modal = new jBox('Modal', {
+                    width: 460,
+                    height: 360,
+                    animation: false,
+                    closeOnClick: true,
+                    content: $('#modal-acc-align-mag-uncalibrated-error')
+                }).open();
+                return;
+            }
             modal = new jBox("Modal", {
                 animation: false,
                 height: 200,
@@ -1197,17 +1222,6 @@ magnetometerTab.initialize = function (callback) {
             }
         }
         else if (step == "4") {
-            if (!FC.getMagnetometerCalibrated()) {
-                resetAlignButtons();
-                modal = new jBox('Modal', {
-                    width: 460,
-                    height: 360,
-                    animation: false,
-                    closeOnClick: true,
-                    content: $('#modal-acc-align-mag-uncalibrated-error')
-                }).open();
-                return;
-            }
             accAutoAlignCompass();
         }
     }
