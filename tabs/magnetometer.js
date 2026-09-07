@@ -1173,6 +1173,10 @@ magnetometerTab.initialize = function (callback) {
                 if (!BitHelper.bit_check(FC.CONFIG.activeSensors, 2)) {
                     // No mag: skip the compass-orientation step. (Not FC.SENSOR_DATA.magnetometer
                     // === 0 -- that's a live sample and can read 0 on a real, working compass.)
+                    // #modal-acc-align-done also shows a "Compass alignment set to" line, which
+                    // accAutoAlignCompass() normally fills in -- fill it in here too since that
+                    // step never runs on this path, so it isn't left blank.
+                    $("#modal-compass-align-setting").text("N/A (no magnetometer detected)");
                     next_step = $('#modal-acc-align-done');
                 }
                 modal = new jBox('Modal', {
