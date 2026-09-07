@@ -7468,5 +7468,11 @@
     },
     "accAlignFinished": {
         "message": "Board alignment <span style=\"color: #37a8db\">finished</span>"
+    },
+    "autoAlignWizardTitle": {
+        "message": "Experimental: Auto Alignment Wizard"
+    },
+    "autoAlignWizardButton": {
+        "message": "Launch Wizard"
     }
 }
