@@ -18,7 +18,8 @@ const onboardLoggingTab = {
 
 onboardLoggingTab.initialize = function (callback) {
     let
-        saveCancelled, eraseCancelled;
+        saveCancelled, eraseCancelled,
+        terrainEnabled = false;
 
     //Add future blackbox values here and in messages.json, the checkbox are drawn by js
     const blackBoxFields = [
@@ -45,10 +46,21 @@ onboardLoggingTab.initialize = function (callback) {
     if (CONFIGURATOR.connectionValid) {
         MSP.send_message(MSPCodes.MSP_FEATURE, false, false, function() {
             MSP.send_message(MSPCodes.MSP_DATAFLASH_SUMMARY, false, false, function() {
-                MSP.send_message(MSPCodes.MSP_SDCARD_SUMMARY, false, false, function() {
-		            MSP.send_message(MSPCodes.MSP2_BLACKBOX_CONFIG, false, false, load_html);
-                });
+                MSP.send_message(MSPCodes.MSP_SDCARD_SUMMARY, false, false, load_terrain_setting);
             });
+        });
+    }
+
+    function load_terrain_setting() {
+        mspHelper.getSetting("terrain_enabled").then(function(data) {
+            if (data == null) {
+                console.warn("while setting terrain_enabled, data is null or undefined");
+                return;
+            }
+
+            terrainEnabled = Boolean(data.value);
+        }).then(function() {
+            MSP.send_message(MSPCodes.MSP2_BLACKBOX_CONFIG, false, false, load_html);
         });
     }
 
@@ -79,7 +91,7 @@ onboardLoggingTab.initialize = function (callback) {
     function load_html() {
         import('./onboard_logging.html?raw').then(({default: html}) => GUI.load(html, function() {
             // translate to user-selected language
-           i18n.localize();;
+           i18n.localize();
 
             var
                 dataflashPresent = FC.DATAFLASH.totalSize > 0,
@@ -96,7 +108,8 @@ onboardLoggingTab.initialize = function (callback) {
                 .toggleClass("sdcard-supported", FC.SDCARD.supported)
                 .toggleClass("blackbox-config-supported", FC.BLACKBOX.supported)
                 .toggleClass("blackbox-supported", blackboxSupport)
-                .toggleClass("blackbox-unsupported", !blackboxSupport);
+                .toggleClass("blackbox-unsupported", !blackboxSupport)
+                .toggleClass("only-terrain-supported", !blackboxSupport && terrainEnabled);
 
             if (dataflashPresent) {
                 // UI hooks
@@ -208,17 +221,29 @@ onboardLoggingTab.initialize = function (callback) {
         for (var i = 0; i < loggingRates.length; i++) {
             if (!addedCurrentValue && userRate.num / userRate.denom <= loggingRates[i].num / loggingRates[i].denom) {
                 if (userRate.num / userRate.denom < loggingRates[i].num / loggingRates[i].denom) {
-                    loggingRatesSelect.append('<option value="' + userRate.num + '/' + userRate.denom + '">'
-                            + userRate.num + '/' + userRate.denom + ' (' + Math.round(userRate.num / userRate.denom * 100) + '%)</option>');
+                    var userPercent = Math.round(userRate.num / userRate.denom * 100);
+                    loggingRatesSelect.append('<option value="' + userRate.num + '/' + userRate.denom + '" data-percent="' + userPercent + '">'
+                            + userRate.num + '/' + userRate.denom + ' (' + userPercent + '%)</option>');
                 }
                 addedCurrentValue = true;
             }
 
-            loggingRatesSelect.append('<option value="' + loggingRates[i].num + '/' + loggingRates[i].denom + '">'
-                + loggingRates[i].num + '/' + loggingRates[i].denom + ' (' + Math.round(loggingRates[i].num / loggingRates[i].denom * 100) + '%)</option>');
+            var percent = Math.round(loggingRates[i].num / loggingRates[i].denom * 100);
+            loggingRatesSelect.append('<option value="' + loggingRates[i].num + '/' + loggingRates[i].denom + '" data-percent="' + percent + '">'
+                + loggingRates[i].num + '/' + loggingRates[i].denom + ' (' + percent + '%)</option>');
 
         }
         loggingRatesSelect.val(userRate.num + '/' + userRate.denom);
+
+        loggingRatesSelect.on('change', update_terrain_rate_warning);
+        update_terrain_rate_warning();
+    }
+
+    function update_terrain_rate_warning() {
+        var percent = parseInt($(".blackboxRate select option:selected").data("percent"), 10);
+        var showWarning = terrainEnabled && percent > 25;
+
+        $(".tab-onboard_logging .terrain-rate-warning").toggle(showWarning);
     }
 
     function formatFilesizeKilobytes(kilobytes) {

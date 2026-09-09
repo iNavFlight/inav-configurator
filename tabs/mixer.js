@@ -12,6 +12,7 @@ import Settings from './../js/settings';
 import jBox from 'jbox';
 import interval from './../js/intervals';
 import ServoMixRule from './../js/servoMixRule';
+import { getServoTargetWarning } from './../js/servoMixerTargetWarning';
 import MotorMixRule from './../js/motorMixRule';
 import BitHelper from './../js/bitHelper';
 
@@ -29,7 +30,8 @@ mixerTab.initialize = function (callback, scrollPosition) {
         $motorMixTable,
         $motorMixTableBody,
         modal,
-        motorWizardModal;
+        motorWizardModal,
+        servoTargetWarningModal;
 
     if (GUI.active_tab !== this) {
         GUI.active_tab = this;
@@ -81,32 +83,84 @@ mixerTab.initialize = function (callback, scrollPosition) {
         import('./mixer.html?raw').then(({default: html}) => GUI.load(html, Settings.processHtml(processHtml)));
     }
 
-    function renderOutputTable() {
-        let outputCount = FC.OUTPUT_MAPPING.getOutputCount(),
-            $outputRow = $('#output-row'),
-            $functionRow = $('#function-row');
+    function buildTimerGroups(outputCount) {
+        const groups = [];
+        for (let i = 0; i < outputCount; i++) {
+            const timerId = FC.OUTPUT_MAPPING.getTimerId(i);
+            const color = FC.OUTPUT_MAPPING.getOutputTimerColor(i);
+            if (groups.length > 0 && groups.at(-1).timerId === timerId) {
+                groups.at(-1).count++;
+            } else {
+                groups.push({ timerId, count: 1, color });
+            }
+        }
+        return groups;
+    }
 
+    function buildTimerSelectHtml(group) {
+        const O = FC.OUTPUT_MAPPING;
+        const usageMode = O.getTimerOverride(group.timerId) ?? O.TIMER_OUTPUT_MODE_AUTO;
+        let displayMode = usageMode;
+        if (usageMode === O.TIMER_OUTPUT_MODE_AUTO) {
+            if (O.isTimerDefaultLed(group.timerId))         displayMode = O.TIMER_OUTPUT_MODE_LED;
+            else if (O.isTimerDefaultBeeper(group.timerId)) displayMode = O.TIMER_OUTPUT_MODE_BEEPER;
+        }
+        const optionsHtml = [
+            [O.TIMER_OUTPUT_MODE_AUTO,   'AUTO'],
+            [O.TIMER_OUTPUT_MODE_MOTORS, 'MOTORS'],
+            [O.TIMER_OUTPUT_MODE_SERVOS, 'SERVOS'],
+            [O.TIMER_OUTPUT_MODE_LED,    'LED'],
+            [O.TIMER_OUTPUT_MODE_PINIO,  'PINIO / PWM'],
+            [O.TIMER_OUTPUT_MODE_BEEPER, 'BEEPER'],
+        ].map(([value, label]) =>
+            '<option value=' + value + (displayMode === value ? ' selected' : '') + '>' + label + '</option>'
+        ).join('');
+        return 'Timer&nbsp;' + (group.timerId + 1) + ' <select id="timer-output-' + group.timerId + '">' + optionsHtml + '</select>';
+    }
+
+    function renderOutputTable() {
+        const outputCount = FC.OUTPUT_MAPPING.getOutputCount();
+        const $timerRow = $('#timer-row');
+        const $outputRow = $('#output-row');
+        const $functionRow = $('#function-row');
+
+        $timerRow.append('<th></th>');
         $outputRow.append('<th data-i18n="mappingTableOutput"></th>');
         $functionRow.append('<th data-i18n="mappingTableFunction"></th>');
-        
+
+        const groups = buildTimerGroups(outputCount);
+
+        for (const group of groups) {
+            const selectHtml = buildTimerSelectHtml(group);
+            $timerRow.append('<td colspan="' + group.count + '" style="background-color: ' + group.color + '; padding-right: 4px">' + selectHtml + '</td>');
+        }
+
         for (let i = 1; i <= outputCount; i++) {
-
-            let timerId = FC.OUTPUT_MAPPING.getTimerId(i - 1);
-            let color = FC.OUTPUT_MAPPING.getOutputTimerColor(i - 1);
-            let isLed = FC.OUTPUT_MAPPING.isLedPin(i - 1);
-
-            $outputRow.append('<td style="background-color: ' + color + '">S' + i + (isLed ? '/LED' : '') + ' (Timer&nbsp;' + (timerId + 1) + ')</td>');
-            $functionRow.append('<td id="function-' + i +'">-</td>');
+            const color = FC.OUTPUT_MAPPING.getOutputTimerColor(i - 1);
+            const isLed = FC.OUTPUT_MAPPING.isLedPin(i - 1);
+            const isBeeper = FC.OUTPUT_MAPPING.isBeeperPin(i - 1);
+            $outputRow.append('<td style="background-color: ' + color + '">S' + i + (isLed ? '/LED' : '') + (isBeeper ? '/Buzzer' : '') + '</td>');
+            $functionRow.append('<td id="function-' + i + '">-</td>');
         }
 
         $outputRow.find('td').css('width', 100 / (outputCount + 1) + '%');
 
+        for (const group of groups) {
+            $('#timer-output-' + group.timerId).on('change', function() {
+                updateTimerOverride();
+                if (FC.OUTPUT_MAPPING.hasDirectAssignment()) {
+                    mspHelper.queryOutputAssignment(renderOutputMapping);
+                } else {
+                    renderOutputMapping();
+                }
+            });
+        }
     }
 
     function updateTimerOverride() {
         let timers = FC.OUTPUT_MAPPING.getUsedTimerIds();
 
-        for(let i =0; i < timers.length;++i) {
+        for(let i = 0; i < timers.length; ++i) {
             let timerId = timers[i];
             let $select = $('#timer-output-' + timerId);
             if(!$select) {
@@ -116,38 +170,18 @@ mixerTab.initialize = function (callback, scrollPosition) {
         }
     }
 
-    function renderTimerOverride() {
-        let outputCount = FC.OUTPUT_MAPPING.getOutputCount(),
-            $container = $('#timerOutputsList'), timers = {};
-
-
-        let usedTimers = FC.OUTPUT_MAPPING.getUsedTimerIds();
-
-        for (let t of usedTimers) {
-            var usageMode = FC.OUTPUT_MAPPING.getTimerOverride(t);
-            $container.append(
-                        '<div class="select" style="padding: 5px; margin: 1px; background-color: ' + FC.OUTPUT_MAPPING.getTimerColor(t) + '">' +
-                            '<select id="timer-output-' + t + '">' +
-                                '<option value=' + FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_AUTO + '' + (usageMode == FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_AUTO ? ' selected' : '')+ '>AUTO</option>'+
-                                '<option value=' + FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_MOTORS + '' + (usageMode == FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_MOTORS ? ' selected' : '')+ '>MOTORS</option>'+
-                                '<option value=' + FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_SERVOS + '' + (usageMode == FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_SERVOS ? ' selected' : '')+ '>SERVOS</option>'+
-                                '<option value=' + FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_LED + '' + (usageMode == FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_LED ? ' selected' : '')+ '>LED</option>'+
-                            '</select>' +
-                            '<label for="timer-output-' + t + '">' +
-                                '<span> Timer ' + (parseInt(t) + 1) + '</span>' +
-                            '</label>' +
-                        '</div>'
-            );
-        }
-
-    }
-
     function renderOutputMapping() {
-        let outputMap = FC.OUTPUT_MAPPING.getOutputTable(
-            FC.MIXER_CONFIG.platformType == PLATFORM.MULTIROTOR || FC.MIXER_CONFIG.platformType == PLATFORM.TRICOPTER,
-            FC.MOTOR_RULES.getNumberOfConfiguredMotors(),
-            FC.SERVO_RULES.getUsedServoIndexes()
-        );
+        let isMR = FC.MIXER_CONFIG.platformType == PLATFORM.MULTIROTOR || FC.MIXER_CONFIG.platformType == PLATFORM.TRICOPTER;
+        let jsMap = FC.OUTPUT_MAPPING.getOutputTable(isMR, FC.MOTOR_RULES.getNumberOfConfiguredMotors(), FC.SERVO_RULES.getUsedServoIndexes());
+        let outputMap;
+        if (FC.OUTPUT_MAPPING.hasDirectAssignment()) {
+            outputMap = FC.OUTPUT_MAPPING.getOutputTableDirect();
+            for (let i = 0; i < Math.min(outputMap.length, jsMap.length); i++) {
+                if (outputMap[i] === '-' && jsMap[i] && jsMap[i] !== '-') outputMap[i] = jsMap[i]; // fill in default LED and beeper
+            }
+        } else {
+            outputMap = jsMap;
+        }
 
         for (let i = 1; i <= FC.OUTPUT_MAPPING.getOutputCount(); i++) {
             $('#function-' + i).html(outputMap[i - 1]);
@@ -380,7 +414,16 @@ mixerTab.initialize = function (callback, scrollPosition) {
                 });
 
                 $row.find(".mix-rule-servo").val(servoRule.getTarget()).on('change', function () {
-                    servoRule.setTarget(Number($(this).val()));
+                    const enteredTarget = Number($(this).val());
+
+                    servoRule.setTarget(enteredTarget);
+
+                    const warning = getServoTargetWarning(FC.SERVO_RULES.get(), enteredTarget);
+                    if (warning) {
+                        $('#servoTargetWarningContent .servo-target-warning-text')
+                            .html(i18n.getMessage('servoMixRuleInvalidServoTarget', [warning.ruleCount, warning.enteredTarget]));
+                        servoTargetWarningModal.open();
+                    }
                 });
 
                 $row.find(".mix-rule-rate").val(servoRule.getRate()).on('change', function () {
@@ -838,6 +881,7 @@ mixerTab.initialize = function (callback, scrollPosition) {
             }
 
             renderMotorMixRules();
+            FC.OUTPUT_MAPPING.invalidateDirectAssignment();
             renderOutputMapping();
 
             motorWizardModal.close();
@@ -972,6 +1016,15 @@ mixerTab.initialize = function (callback, scrollPosition) {
             content: $('#mixerApplyContent')
         });
 
+        servoTargetWarningModal = new jBox('Modal', {
+            width: 480,
+            height: 200,
+            closeButton: 'title',
+            animation: false,
+            title: i18n.getMessage("servoMixRuleInvalidServoTargetTitle"),
+            content: $('#servoTargetWarningContent')
+        });
+
         $('#execute-button').on('click', function () {
             loadedMixerPresetID = currentMixerPreset.id;
             mixer.loadServoRules(FC, currentMixerPreset);
@@ -994,6 +1047,7 @@ mixerTab.initialize = function (callback, scrollPosition) {
             FC.MIXER_CONFIG.hasFlaps = (currentMixerPreset.hasFlaps === true) ? true : false;
             renderServoMixRules();
             renderMotorMixRules();
+            FC.OUTPUT_MAPPING.invalidateDirectAssignment();
             renderOutputMapping();
             updateRefreshButtonStatus();
         });
@@ -1012,12 +1066,14 @@ mixerTab.initialize = function (callback, scrollPosition) {
         $servoMixTableBody.on('click', "[data-role='role-servo-delete']", function (event) {
             FC.SERVO_RULES.drop($(event.currentTarget).attr("data-index"));
             renderServoMixRules();
+            FC.OUTPUT_MAPPING.invalidateDirectAssignment();
             renderOutputMapping();
         });
 
         $motorMixTableBody.on('click', "[data-role='role-motor-delete']", function (event) {
             FC.MOTOR_RULES.drop($(event.currentTarget).attr("data-index"));
             renderMotorMixRules();
+            FC.OUTPUT_MAPPING.invalidateDirectAssignment();
             renderOutputMapping();
         });
 
@@ -1029,6 +1085,7 @@ mixerTab.initialize = function (callback, scrollPosition) {
             if (FC.SERVO_RULES.hasFreeSlots()) {
                 FC.SERVO_RULES.put(new ServoMixRule(FC.SERVO_RULES.getNextUnusedIndex(), 0, 100, 0));
                 renderServoMixRules();
+                FC.OUTPUT_MAPPING.invalidateDirectAssignment();
                 renderOutputMapping();
             }
         });
@@ -1037,6 +1094,7 @@ mixerTab.initialize = function (callback, scrollPosition) {
             if (FC.MOTOR_RULES.hasFreeSlots()) {
                 FC.MOTOR_RULES.put(new MotorMixRule(1, 0, 0, 0));
                 renderMotorMixRules();
+                FC.OUTPUT_MAPPING.invalidateDirectAssignment();
                 renderOutputMapping();
             }
         });
@@ -1052,7 +1110,20 @@ mixerTab.initialize = function (callback, scrollPosition) {
 
         renderOutputTable();
         renderOutputMapping();
-        renderTimerOverride();
+
+        // Attempt to enhance output preview with firmware-authoritative assignments.
+        // Tab is already functional above; this re-renders if/when firmware responds.
+        // The settled guard handles the edge case of a malformed packet causing no callback.
+        {
+            let settled = false;
+            const onOutputAssignmentLoaded = function() {
+                if (settled) return;
+                settled = true;
+                renderOutputMapping();
+            };
+            mspHelper.loadOutputAssignment(onOutputAssignmentLoaded);
+            setTimeout(onOutputAssignmentLoaded, 2000);
+        }
 
         FC.LOGIC_CONDITIONS.init($('#logic-wrapper'));
 

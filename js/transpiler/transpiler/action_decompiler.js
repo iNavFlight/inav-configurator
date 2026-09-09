@@ -170,8 +170,8 @@ class ActionDecompiler {
       case OPERATION.SET_GIMBAL_SENSITIVITY:
         return this.handleSetGimbalSensitivity(valueA);
 
-      case OPERATION.LED_PIN_PWM:
-        return this.handleLedPinPwm(lc, valueA);
+      case OPERATION.PINIO_PWM:
+        return this.handlePinioPwm(valueA, valueB);
 
       // PORT_SET: operandA = pin, operandB = value
       case OPERATION.PORT_SET:
@@ -530,10 +530,10 @@ class ActionDecompiler {
     return `inav.override.gimbalSensitivity = ${value};`;
   }
 
-  handleLedPinPwm(lc, value) {
-    // operandA is pin (0-7), operandB is PWM value
-    this.addWarning(`LED_PIN_PWM may need verification - check API syntax`);
-    return `inav.override.ledPin(${lc.operandAValue}, ${value});`;
+  handlePinioPwm(duty, pin) {
+    // operandA = duty cycle (0-100), operandB = pin (0=LED pin, 1=USER1, 2=USER2, ...)
+    // Function name "pwmOnPin" mirrors the operand order: pwm (duty) first, pin second
+    return `inav.override.pwmOnPin(${duty}, ${pin});`;
   }
 
   handlePortSet(lc, value) {

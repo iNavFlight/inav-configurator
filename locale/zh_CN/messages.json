@@ -5766,6 +5766,24 @@
     "ledStripWiringMessage": {
         "message": "没有布线序号的 LED 不会被保存。"
     },
+    "ledStripQuickPresets": {
+        "message": "快速预设:"
+    },
+    "ledStripStep1Header": {
+        "message": "接线顺序"
+    },
+    "ledStripStep2Header": {
+        "message": "位置和方向"
+    },
+    "ledStripStep3Header": {
+        "message": "功能"
+    },
+    "ledStripStep4Header": {
+        "message": "颜色"
+    },
+    "ledStripEditPalette": {
+        "message": "编辑调色板颜色"
+    },
 
 
     "mainLogoText": {

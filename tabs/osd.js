@@ -142,6 +142,7 @@ SYM.PILOT_LOGO_SML_L = 0x1D5;
 SYM.PILOT_LOGO_SML_C = 0x1D6;
 SYM.PILOT_LOGO_SML_R = 0x1D7;
 SYM.MIN_GND_SPEED = 0xDE;
+SYM.TERRAIN_FOLLOWING = 0xFB;
 
 SYM.AH_AIRCRAFT0 = 0x1A2;
 SYM.AH_AIRCRAFT1 = 0x1A3;
@@ -1382,6 +1383,31 @@ OSD.constants = {
                                 return FONT.embed_dot('25.6') + FONT.symbol(SYM.DIST_KM);
                         }
                     }
+                },
+                {
+                    name: 'OSD_TERRAIN_AGL',
+                    id: 171,
+                    enabled: function() {
+                        return HARDWARE.capabilities.useTerrain;
+                    },
+                    preview: function(osd_data) {
+
+                        var s = '114';
+                        if (Settings.getInputValue('osd_decimals_altitude') == 4) {
+                            s += '3';
+                        } if (Settings.getInputValue('osd_decimals_altitude') == 5) {
+                            s += '38';
+                        }
+
+                        switch (OSD.data.preferences.units) {
+                            case 0: // Imperial
+                            case 3: // UK
+                            case 4: // GA
+                                return FONT.symbol(SYM.TERRAIN_FOLLOWING) + s + FONT.symbol(SYM.ALT_FT);
+                            default: // Metric
+                                return FONT.symbol(SYM.TERRAIN_FOLLOWING) + s + FONT.symbol(SYM.ALT_M);
+                        }
+                    }
                 }
             ]
         },
@@ -1411,6 +1437,27 @@ OSD.constants = {
                     id: 103,
                     min_version: '2.2.0',
                     preview: FONT.symbol(SYM.GFORCE_Z) + FONT.embed_dot('-0.30')
+                },
+            ]
+        },
+        {
+            name: 'osdGroupThermalCamera',
+            enabled: function() {
+                return HARDWARE.capabilities.useMztcCamera;
+            },
+            items: [
+                {
+                    name: 'MZTC_STATUS',
+                    id: 171,
+                    // min_version stays commented out until the firmware
+                    // version is bumped, matching AUTO SPEED. The
+                    // maintenance-10.x firmware still reports 9.x, so a
+                    // 10.0.0 gate would hide the element on the builds that
+                    // actually support it.
+                    // min_version: '10.0.0',
+                    preview: function(osd_data) {
+                        return 'IR OK ';
+                    }
                 },
             ]
         },
@@ -1627,6 +1674,23 @@ OSD.constants = {
                                 return FONT.embed_dot('110') + FONT.symbol(SYM.KT_3D);
                             default: // Metric
                                 return FONT.embed_dot('204') + FONT.symbol(SYM.KMH_3D);
+                        }
+                    }
+                },
+                {
+                    name: 'AUTO SPEED',
+                    id: 170,
+                    // min_version: '10.0.0',
+                    preview: function(osd_data) {
+                        switch (OSD.data.preferences.units) {
+                            case 0: // Imperial
+                            case 2: // Metric + MPH
+                            case 3: // UK
+                                return FONT.embed_dot('G:127') + FONT.symbol(SYM.MPH_3D);
+                            case 4: // GA
+                                return FONT.embed_dot('G:110') + FONT.symbol(SYM.KT_3D);
+                            default: // Metric
+                                return FONT.embed_dot('G:204') + FONT.symbol(SYM.KMH_3D);
                         }
                     }
                 },
@@ -1903,6 +1967,12 @@ OSD.constants = {
                                 return 'FD  142'  + FONT.symbol(SYM.ALT_M) + FONT.symbol(SYM.DIR_TO_HOME);
                         }
                     }
+                },
+                {
+                    name: 'GPS_EXTRA_STATS',
+                    id: 169,
+                    min_version: '9.0.1',
+                   preview: '0' + FONT.symbol(SYM.SYM_HUD_SIGNAL_3) + '0' + FONT.symbol(SYM.SYM_HUD_SIGNAL_3) + '0' + FONT.symbol(SYM.SYM_HUD_SIGNAL_3) + '0'+ FONT.symbol(SYM.SYM_HUD_SIGNAL_3) + FONT.symbol(SYM.SNR) + '99'
                 }
             ]
         },
@@ -2442,7 +2512,7 @@ OSD.reload = function(callback) {
                 MSP.promise(MSPCodes.MSP2_INAV_OSD_PREFERENCES).then(function (resp) {
                     OSD.data.supported = true;
                     OSD.msp.decodePreferences(resp);
-                    
+
                     MSP.promise(MSPCodes.MSP2_INAV_CUSTOM_OSD_ELEMENTS).then(() => {
                         mspHelper.loadOsdCustomElements(() => {
                             MSP.promise(MSPCodes.MSP2_INAV_LOGIC_CONDITIONS_CONFIGURED).then(() => {
@@ -2459,7 +2529,7 @@ OSD.reload = function(callback) {
         });
     });
 
-    
+
 };
 
 OSD.updateSelectedLayout = function(new_layout) {
@@ -2800,7 +2870,17 @@ OSD.GUI.preview = {
             position += overflows_line;
         }
 
-        $('input.' + item_id + '.position').val(position).trigger('change');
+        var $positionInput = $('input.' + item_id + '.position');
+        if ($positionInput.length > 0) {
+            $positionInput.val(position).trigger('change');
+        } else {
+            // The element is hidden from the list by the search filter, so its
+            // position input doesn't exist in the DOM. Update the item directly.
+            var itemData = OSD.data.items[item_id];
+            itemData.position = position;
+            OSD.msp.helpers.calculate.coords(itemData);
+            OSD.GUI.saveItem(item);
+        }
     }
 };
 
@@ -3540,7 +3620,9 @@ HARDWARE.init = function() {
         useRx: false,
         useCRSF: false,
         useBaro: false,
-        usePitot: false
+        usePitot: false,
+        useTerrain: false,
+        useMztcCamera: false
     };
 };
 
@@ -3559,6 +3641,9 @@ HARDWARE.update = function(callback) {
             if (port.functions.includes('ESC')) {
                 HARDWARE.capabilities.useESCTelemetry = true;
             }
+            if (port.functions.includes('MZTC_CAMERA')) {
+                HARDWARE.capabilities.useMztcCamera = true;
+            }
         });
 
         // Update RX data for Crossfire detection
@@ -3570,9 +3655,16 @@ HARDWARE.update = function(callback) {
                 HARDWARE.capabilities.useBaro  = (FC.SENSOR_CONFIG.barometer != 0);
                 HARDWARE.capabilities.usePitot = (FC.SENSOR_CONFIG.pitot != 0);
 
-                if (callback) {
-                    callback();
-                }
+                mspHelper.getSetting("terrain_enabled").then(function(data) {
+                    HARDWARE.capabilities.useTerrain = Boolean(data && data.value);
+                }).catch(function() {
+                    // Setting not available in this firmware
+                    HARDWARE.capabilities.useTerrain = false;
+                }).finally(function() {
+                    if (callback) {
+                        callback();
+                    }
+                });
             });
         });
     });
@@ -3698,13 +3790,13 @@ osdTab.initialize = function (callback) {
                 $fontPicker.removeClass('active');
                 $(this).addClass('active');
                 store.set('osd_font', $(this).data('font-file'));
-                
+
                 import(`./../resources/osd/analogue/${$(this).data('font-file')}.mcm?raw`).then(({default: data}) => {
                     FONT.parseMCMFontFile(data);
                     FONT.preview($preview);
                     OSD.GUI.update();
                 });
-                
+
             });
 
             // load the last selected font when we change tabs
@@ -3788,7 +3880,8 @@ function openIconPicker($targetInput) {
     var $grid = $('<div>').addClass('ce-icon-picker-grid');
     var currentVal = parseInt($targetInput.val()) || 0;
 
-    for (var c = 1; c <= 255; c++) {
+    let maxFontChar = (FONT.data && FONT.data.character_image_urls.length > 0) ? FONT.data.character_image_urls.length - 1 : 511;
+    for (let c = 1; c <= maxFontChar; c++) {
         var url = (FONT.data && FONT.data.character_image_urls[c]) ? FONT.draw(c) : '';
         var $tile = $('<div>').addClass('ce-icon-picker-tile')
             .attr('data-char', c)
@@ -3917,7 +4010,7 @@ function buildSlotRow(i, ii) {
     $formatSelect.on('change', updateHiddenType);
 
     // Icon picker: hidden input + clickable preview button
-    var $icoInput = $('<input>').addClass('value').addClass('ico').attr('type', 'hidden').attr('min', 1).attr('max', 255);
+    let $icoInput = $('<input>').addClass('value').addClass('ico').attr('type', 'hidden').attr('min', 1).attr('max', 65535);
     var $icoBtn = $('<div>').addClass('value ico ce-ico-picker-btn').hide()
         .append($('<img>').addClass('ce-ico-preview'))
         .append($('<span>').addClass('ce-ico-label'));
@@ -4372,7 +4465,7 @@ function customElementNormaliseRow(row){
                 valueCell.find('.text').val(valueCell.find('.text').val().replace(/[^A-Z0-9!.\* ]/g, ""));
                 break;
             case 2:
-                valueCell.find('.ico').val(valueCell.find('.ico').val() > 255 ? 255 : valueCell.find('.ico').val());
+                valueCell.find('.ico').val(Math.min(valueCell.find('.ico').val(), 65535));
                 valueCell.find('.ico').val((valueCell.find('.ico').val() != '' && valueCell.find('.ico').val() < 1 )? 1 : valueCell.find('.ico').val());
         }
     }

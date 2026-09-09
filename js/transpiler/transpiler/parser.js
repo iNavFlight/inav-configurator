@@ -339,6 +339,18 @@ class JavaScriptParser {
       return this.transformEventHandler(handler, expr.arguments, loc, range);
     }
 
+    // inav.override.pwmOnPin(duty, pin)
+    // Name mirrors the operand order: pwm (duty=operandA) first, pin (operandB) second
+    if (expr.callee.type === 'MemberExpression' &&
+        expr.callee.object && expr.callee.object.type === 'MemberExpression' &&
+        expr.callee.object.object && expr.callee.object.object.name === 'inav' &&
+        expr.callee.object.property && expr.callee.object.property.name === 'override' &&
+        expr.callee.property && expr.callee.property.name === 'pwmOnPin') {
+      const duty = this.transformExpression(expr.arguments[0]);
+      const pin  = this.transformExpression(expr.arguments[1]);
+      return { type: 'PinioPwm', pin, duty, loc, range };
+    }
+
     // inav.events.edge(...), inav.events.sticky(...), etc.
     if (expr.callee.type === 'MemberExpression' &&
         expr.callee.object && expr.callee.object.type === 'MemberExpression' &&
@@ -658,6 +670,10 @@ class JavaScriptParser {
       // Handle update expressions (++, --) inside if bodies
       if (expr && expr.type === 'UpdateExpression') {
         return this.transformUpdateExpression(expr, stmt.loc, stmt.range);
+      }
+      // Handle recognized function calls (e.g. pinioPwm) inside if bodies
+      if (expr && expr.type === 'CallExpression') {
+        return this.transformCallExpression(expr, stmt.loc, stmt.range);
       }
     }
 

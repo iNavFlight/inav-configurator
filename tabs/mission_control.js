@@ -2,6 +2,30 @@
 
 import xml2js from 'xml2js';
 import { Chart, registerables } from 'chart.js';
+import {
+    ArcGisMapServerImageryProvider,
+    ArcGISTiledElevationTerrainProvider,
+    BoundingSphere,
+    CameraEventType,
+    Cartesian2,
+    Cartesian3,
+    Cartographic,
+    Color,
+    EllipsoidGeodesic,
+    EllipsoidTerrainProvider,
+    HeadingPitchRange,
+    KeyboardEventModifier,
+    LabelStyle,
+    Math as CesiumMath,
+    OpenStreetMapImageryProvider,
+    ScreenSpaceEventHandler,
+    ScreenSpaceEventType,
+    VerticalOrigin,
+    Viewer,
+    buildModuleUrl,
+    sampleTerrainMostDetailed
+} from 'cesium';
+import '@cesium/widgets/Source/widgets.css';
 
 // Register Chart.js components
 Chart.register(...registerables);
@@ -29,6 +53,8 @@ import Stroke from 'ol/style/Stroke';
 import RegularShape from 'ol/style/RegularShape';
 import Circle from 'ol/geom/Circle';
 import PointerInteraction from 'ol/interaction/Pointer.js';
+import Draw from 'ol/interaction/Draw.js';
+import Overlay from 'ol/Overlay.js';
 import {defaults as defaultInteractions} from 'ol/interaction/defaults';
 import {Control, defaults as defaultControls} from 'ol/control.js';
 import DragAndDrop from 'ol/interaction/DragAndDrop.js';
@@ -58,6 +84,14 @@ import interval from './../js/intervals';
 import { Geozone, GeozoneVertex, GeozoneType, GeozoneShapes, GeozoneFenceAction }  from './../js/geozone';
 import store from './../js/store';
 import dialog from '../js/dialog';
+import {
+    getMission3DPlannedHeight,
+    getMission3DPointLabel,
+    getMission3DPoints,
+    getMission3DRouteRuns,
+    getMission3DRouteSegments,
+    getMission3DSamplingSpacing
+} from './../js/mission_3d';
 
 import html from'./mission_control.html?raw';
 
@@ -87,7 +121,7 @@ var dictOfLabelParameterPoint = {
     5:  {parameter1: '', parameter2: '', parameter3: ''},
     6:  {parameter1: 'Target WP number', parameter2: 'Number of repeat (-1: infinite)', parameter3: ''},
     7:  {parameter1: 'Heading (deg)', parameter2: '', parameter3: ''},
-    8:  {parameter1: '', parameter2: '', parameter3: 'Sea level Ref'}
+    8:  {parameter1: 'Speed (cm/s)', parameter2: '', parameter3: 'Sea level Ref'}
 };
 
 var waypointOptions = ['JUMP','SET_HEAD','RTH'];
@@ -121,6 +155,496 @@ const iconNames = [
 
 const icons = Object.create(null)
 
+const missionControlLocationNamespace = '.missionControlLocation';
+const WEATHER_RETRY_DELAY_MS = 5 * 60 * 1000;
+const WEATHER_REQUEST_TIMEOUT_MS = 30 * 1000;
+const WEATHER_MAP_REFRESH_DELAY_MS = 1000;
+const WEATHER_GPS_MIN_DISTANCE_METERS = 1000;
+const WEATHER_MAP_CENTER_MIN_DISTANCE_METERS = 1000;
+const WEATHER_WAYPOINT_MIN_DISTANCE_METERS = 10;
+let googleLocationAbortController = null;
+let weatherAbortController = null;
+let addressSearchAbortController = null;
+let weatherRetryTimer = null;
+let weatherMapRefreshTimer = null;
+let missionControlLocationLifecycleId = 0;
+
+function cleanupMissionControlLocationResources() {
+    missionControlLocationLifecycleId++;
+    googleLocationAbortController?.abort();
+    googleLocationAbortController = null;
+    weatherAbortController?.abort();
+    weatherAbortController = null;
+    addressSearchAbortController?.abort();
+    addressSearchAbortController = null;
+    clearTimeout(weatherRetryTimer);
+    weatherRetryTimer = null;
+    clearTimeout(weatherMapRefreshTimer);
+    weatherMapRefreshTimer = null;
+
+    $(document).off(missionControlLocationNamespace);
+    $('#searchAddress, #centerOnDrone, #showHideConditionsButton').off(missionControlLocationNamespace);
+    $('#addressSearchDialog, #addressSearchBackdrop').remove();
+
+    const apiOverlayEl = document.getElementById('geo_info');
+    if (apiOverlayEl) {
+        apiOverlayEl.textContent = '';
+        apiOverlayEl.style.visibility = 'hidden';
+    }
+}
+
+function showConditionsPanel(isVisible) {
+    $('#missionPlannerConditions').toggleClass('is-hidden', !isVisible);
+}
+
+function parseRetryAfterMs(retryAfter) {
+    if (!retryAfter) {
+        return WEATHER_RETRY_DELAY_MS;
+    }
+
+    const retryAfterSeconds = Number(retryAfter);
+    if (Number.isFinite(retryAfterSeconds)) {
+        return Math.max(WEATHER_RETRY_DELAY_MS, retryAfterSeconds * 1000);
+    }
+
+    const retryAt = Date.parse(retryAfter);
+    if (Number.isNaN(retryAt)) {
+        return WEATHER_RETRY_DELAY_MS;
+    }
+    return Math.max(WEATHER_RETRY_DELAY_MS, retryAt - Date.now());
+}
+
+function createWeatherRequestError(message, retryable, retryDelayMs = WEATHER_RETRY_DELAY_MS) {
+    const error = new Error(message);
+    error.weatherRetryable = retryable;
+    error.weatherRetryDelayMs = retryDelayMs;
+    return error;
+}
+
+function createWeatherResponseError(response, data) {
+    const status = response.status || Number(data?.error?.code);
+    const apiStatus = data?.error?.status;
+    const retryableApiStatuses = new Set([
+        'ABORTED',
+        'DEADLINE_EXCEEDED',
+        'INTERNAL',
+        'RESOURCE_EXHAUSTED',
+        'UNAVAILABLE',
+    ]);
+    const retryable = status === 408 || status === 429 || status >= 500
+        || retryableApiStatuses.has(apiStatus);
+    const retryDelayMs = status === 429
+        ? parseRetryAfterMs(response.headers?.get('Retry-After'))
+        : WEATHER_RETRY_DELAY_MS;
+    return createWeatherRequestError(
+        data?.error?.message || `HTTP ${status || response.status}`,
+        retryable,
+        retryDelayMs,
+    );
+}
+
+function getLocationDistanceMeters(first, second) {
+    const degreesToRadians = Math.PI / 180;
+    const latitudeDelta = (second.lat - first.lat) * degreesToRadians;
+    const longitudeDelta = (second.lng - first.lng) * degreesToRadians;
+    const firstLatitude = first.lat * degreesToRadians;
+    const secondLatitude = second.lat * degreesToRadians;
+    const haversine = Math.sin(latitudeDelta / 2) ** 2
+        + Math.cos(firstLatitude) * Math.cos(secondLatitude) * Math.sin(longitudeDelta / 2) ** 2;
+    const boundedHaversine = Math.min(1, Math.max(0, haversine));
+    return 6371000 * 2 * Math.atan2(Math.sqrt(boundedHaversine), Math.sqrt(1 - boundedHaversine));
+}
+
+function isWeatherSourceMateriallyChanged(currentSource, nextSource) {
+    if (!currentSource || !nextSource || currentSource.type !== nextSource.type) {
+        return true;
+    }
+    const minimumDistances = {
+        gps: WEATHER_GPS_MIN_DISTANCE_METERS,
+        map: WEATHER_MAP_CENTER_MIN_DISTANCE_METERS,
+        waypoint: WEATHER_WAYPOINT_MIN_DISTANCE_METERS,
+    };
+    const minimumDistance = minimumDistances[nextSource.type];
+    return getLocationDistanceMeters(currentSource, nextSource) >= minimumDistance;
+}
+
+function updateConditionsTitle(source) {
+    const titleKeys = {
+        gps: 'conditionsSourceAircraft',
+        waypoint: 'conditionsSourceWaypoint',
+        map: 'conditionsSourceMapCenter',
+    };
+    $('#conditionsTitle').text(i18n.getMessage('conditionsInfoHeadSource', [
+        i18n.getMessage(titleKeys[source.type]),
+    ]));
+}
+
+function clearWeatherRetry() {
+    clearTimeout(weatherRetryTimer);
+    weatherRetryTimer = null;
+}
+
+async function parseWeatherResponse(response) {
+    let data;
+    try {
+        data = await response.json();
+    } catch (error) {
+        if (!response.ok) {
+            throw createWeatherResponseError(response, null);
+        }
+        throw error;
+    }
+    if (!response.ok || data?.error) {
+        throw createWeatherResponseError(response, data);
+    }
+    return data;
+}
+
+function isCurrentWeatherRequest(requestController, apiKey, locationLifecycleId) {
+    return missionControlLocationLifecycleId === locationLifecycleId
+        && weatherAbortController === requestController
+        && String(globalSettings.googleApiKey || '').trim() === apiKey;
+}
+
+function normalizeWeatherRequestError(error, requestTimedOut) {
+    if (error.name !== 'AbortError') {
+        return error;
+    }
+    return requestTimedOut
+        ? createWeatherRequestError('Weather API request timed out', true)
+        : null;
+}
+
+function toTitleCase(value) {
+    return String(value || '').replaceAll('_', ' ').toLowerCase()
+        .replace(/\b\w/g, function (character) { return character.toUpperCase(); });
+}
+
+function applyThresholdColor(selector, value, lowThreshold, mediumThreshold) {
+    $(selector).css('color', '');
+    if (!Number.isFinite(value)) {
+        return;
+    }
+
+    if (value < lowThreshold) {
+        $(selector).css('color', '#4caf50');
+    } else if (value < mediumThreshold) {
+        $(selector).css('color', '#ff9800');
+    } else {
+        $(selector).css('color', '#f44336');
+    }
+}
+
+function applyUvColor(uv) {
+    $('#condUV').css('color', '');
+    if (!Number.isFinite(uv)) {
+        return;
+    }
+
+    if (uv > 7) {
+        $('#condUV').css('color', '#f44336');
+    } else if (uv > 5) {
+        $('#condUV').css('color', '#f57c00');
+    } else {
+        applyThresholdColor('#condUV', uv, 3, 6);
+    }
+}
+
+function applyThunderColor(thunder) {
+    $('#condThunder').css('color', '');
+    if (!Number.isFinite(thunder)) {
+        return;
+    }
+
+    if (thunder > 30) {
+        $('#condThunder').css('color', '#f44336');
+    } else if (thunder > 10) {
+        $('#condThunder').css('color', '#ff9800');
+    }
+}
+
+function formatConditionsValue(value, unit = '') {
+    if (value == null || value === '') {
+        return '—';
+    }
+
+    return unit ? `${value} ${unit}` : String(value);
+}
+
+function getTemperatureUnit(unit) {
+    const temperatureUnits = {
+        CELSIUS: '°C',
+        FAHRENHEIT: '°F',
+    };
+    return temperatureUnits[unit] || '';
+}
+
+function getVisibilityUnit(unit) {
+    const visibilityUnits = {
+        KILOMETERS: 'km',
+        MILES: 'mi',
+    };
+    return visibilityUnits[unit] || '';
+}
+
+function convertWindSpeedToKmh(speed, unit) {
+    if (!Number.isFinite(speed)) {
+        return Number.NaN;
+    }
+    return unit === 'MILES_PER_HOUR' ? speed * 1.609 : speed;
+}
+
+function showConditionsUnavailable() {
+    showConditionsPanel(true);
+    $('#conditionsLoading').hide();
+    $('#conditionsData').addClass('is-hidden').hide();
+    $('#conditionsError').text(i18n.getMessage('conditionsUnavailable')).removeClass('is-hidden').show();
+}
+
+async function readAddressSearchResponse(response) {
+    const data = await response.json();
+    if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+    }
+    return data;
+}
+
+function renderConditionsInfo(data) {
+    if (!data || typeof data !== 'object' || data.error) {
+        return false;
+    }
+
+    const windSpeed = data.wind?.speed?.value;
+    const windUnit = data.wind?.speed?.unit;
+    const gustSpeed = data.wind?.gust?.value;
+    const windDirection = data.wind?.direction?.degrees;
+    const windCardinal = data.wind?.direction?.cardinal;
+    const windUnitLabels = {
+        KILOMETERS_PER_HOUR: 'km/h',
+        MILES_PER_HOUR: 'mph',
+    };
+    const windUnitLabel = windUnitLabels[windUnit] || '';
+    const windArrows = ['↓', '↙', '←', '↖', '↑', '↗', '→', '↘'];
+    const windArrow = Number.isFinite(windDirection)
+        ? windArrows[Math.round(windDirection / 45) % windArrows.length]
+        : '';
+    const windDirectionParts = [windArrow, toTitleCase(windCardinal)].filter(Boolean);
+    if (Number.isFinite(windDirection)) {
+        windDirectionParts.push(`(${windDirection}°)`);
+    }
+
+    const temperature = data.temperature?.degrees;
+    const temperatureUnit = getTemperatureUnit(data.temperature?.unit);
+    const feelsLike = data.feelsLikeTemperature?.degrees;
+    const uv = data.uvIndex;
+    const precipitation = data.precipitation?.qpf?.quantity;
+    const precipitationUnit = data.precipitation?.qpf?.unit === 'INCHES' ? 'in' : 'mm';
+    const thunder = data.thunderstormProbability;
+    const visibility = data.visibility?.distance;
+    const visibilityUnit = getVisibilityUnit(data.visibility?.unit);
+    const cloudCover = data.cloudCover;
+
+    $('#condWeather').text(data.weatherCondition?.description?.text || '—');
+    $('#condWind').text(formatConditionsValue(windSpeed, windUnitLabel));
+    $('#condGusts').text(formatConditionsValue(gustSpeed, windUnitLabel));
+    $('#condWindDir').text(windDirectionParts.join(' ') || '—');
+    $('#condTemp').text(formatConditionsValue(temperature, temperatureUnit));
+    $('#condFeelsLike').text(formatConditionsValue(feelsLike, temperatureUnit));
+    $('#condHumidity').text(formatConditionsValue(data.relativeHumidity, '%'));
+    $('#condUV').text(formatConditionsValue(uv));
+    $('#condPrecip').text(formatConditionsValue(precipitation, precipitationUnit));
+    $('#condThunder').text(formatConditionsValue(thunder, '%'));
+    $('#condVisibility').text(formatConditionsValue(visibility, visibilityUnit));
+    $('#condCloud').text(formatConditionsValue(cloudCover, '%'));
+
+    const windSpeedKmh = convertWindSpeedToKmh(windSpeed, windUnit);
+    const gustSpeedKmh = convertWindSpeedToKmh(gustSpeed, windUnit);
+    applyUvColor(uv);
+    applyThunderColor(thunder);
+    applyThresholdColor('#condWind', windSpeedKmh, 20, 35);
+    applyThresholdColor('#condGusts', gustSpeedKmh, 25, 45);
+
+    showConditionsPanel(true);
+    $('#conditionsLoading').hide();
+    $('#conditionsError').hide();
+    $('#conditionsData').removeClass('is-hidden').show();
+    return true;
+}
+
+function showApiLocationBanner(apiOverlayEl, infoOverlayEl, googleGeoPos) {
+    if (!apiOverlayEl || !googleGeoPos) {
+        return;
+    }
+
+    if (infoOverlayEl) {
+        infoOverlayEl.style.visibility = 'hidden';
+    }
+
+    const accuracyKm = Number.isFinite(googleGeoPos.accuracy)
+        ? (googleGeoPos.accuracy / 1000).toFixed(0)
+        : '—';
+    apiOverlayEl.textContent =
+        `${i18n.getMessage('apiLocationBannerPrefix')}  ` +
+        `${i18n.getMessage('apiLocationBannerCoordinates', [
+            googleGeoPos.lat.toFixed(4),
+            googleGeoPos.lng.toFixed(4),
+            accuracyKm,
+        ])} — ${i18n.getMessage('apiLocationBannerWarning')}`;
+    apiOverlayEl.style.visibility = 'visible';
+}
+
+function getGoogleLocationZoom(googleGeoPos) {
+    if (!googleGeoPos) {
+        return 14;
+    }
+    if (googleGeoPos.accuracy > 5000) {
+        return 10;
+    }
+    if (googleGeoPos.accuracy > 1000) {
+        return 12;
+    }
+    return 14;
+}
+
+function rotateGridPoint(point, angleRad) {
+    const cosAngle = Math.cos(angleRad);
+    const sinAngle = Math.sin(angleRad);
+
+    return [
+        point[0] * cosAngle - point[1] * sinAngle,
+        point[0] * sinAngle + point[1] * cosAngle,
+    ];
+}
+
+function createGridProjection(vertices) {
+    const centroid = vertices.reduce((accumulator, vertex) => [
+        accumulator[0] + vertex[0] / vertices.length,
+        accumulator[1] + vertex[1] / vertices.length,
+    ], [0, 0]);
+    const cosLat = Math.cos(centroid[1] * Math.PI / 180);
+    const cosLatAbs = Math.abs(cosLat);
+    const MIN_COS_LAT = 0.001;
+
+    if (!Number.isFinite(cosLatAbs) || cosLatAbs < MIN_COS_LAT) {
+        return null;
+    }
+
+    const metersPerDegLon = 111320 * cosLat;
+    const metersPerDegLat = 110540;
+
+    return {
+        toLocal(lonLat) {
+            return [
+                (lonLat[0] - centroid[0]) * metersPerDegLon,
+                (lonLat[1] - centroid[1]) * metersPerDegLat,
+            ];
+        },
+        toGeo(point) {
+            return [
+                centroid[0] + point[0] / metersPerDegLon,
+                centroid[1] + point[1] / metersPerDegLat,
+            ];
+        },
+    };
+}
+
+function getGridYBounds(vertices) {
+    return vertices.reduce((bounds, vertex) => ({
+        minY: Math.min(bounds.minY, vertex[1]),
+        maxY: Math.max(bounds.maxY, vertex[1]),
+    }), { minY: Infinity, maxY: -Infinity });
+}
+
+function getGridIntersections(vertices, y) {
+    const intersections = [];
+
+    for (let index = 0; index < vertices.length; index++) {
+        const nextIndex = (index + 1) % vertices.length;
+        const y1 = vertices[index][1];
+        const y2 = vertices[nextIndex][1];
+
+        if ((y1 <= y && y2 > y) || (y2 <= y && y1 > y)) {
+            const interpolation = (y - y1) / (y2 - y1);
+            const x = vertices[index][0] + interpolation * (vertices[nextIndex][0] - vertices[index][0]);
+            intersections.push(x);
+        }
+    }
+
+    return intersections.sort((left, right) => left - right);
+}
+
+function createSweepWaypointPair(intersections, pairIndex, y, direction, overshoot, toGeo, angleRad) {
+    let x1 = intersections[pairIndex];
+    let x2 = intersections[pairIndex + 1];
+
+    if (overshoot > 0) {
+        x1 -= overshoot;
+        x2 += overshoot;
+    }
+
+    const pointA = direction > 0 ? [x1, y] : [x2, y];
+    const pointB = direction > 0 ? [x2, y] : [x1, y];
+    const geoA = toGeo(rotateGridPoint(pointA, angleRad));
+    const geoB = toGeo(rotateGridPoint(pointB, angleRad));
+
+    return [
+        { lon: geoA[0], lat: geoA[1] },
+        { lon: geoB[0], lat: geoB[1] },
+    ];
+}
+
+function generateGridWaypoints(coordsLonLat, params) {
+    const vertices = coordsLonLat.slice(0, -1);
+    if (vertices.length < 3 || params.spacing <= 0) {
+        return [];
+    }
+
+    const projection = createGridProjection(vertices);
+    if (!projection) {
+        dialog.alert('Grid generation is unavailable at this latitude because longitude scale collapses near the poles.');
+        return [];
+    }
+
+    const angleRad = params.angle * Math.PI / 180;
+    const rotatedVertices = vertices
+        .map(projection.toLocal)
+        .map((vertex) => rotateGridPoint(vertex, -angleRad));
+    const { minY, maxY } = getGridYBounds(rotatedVertices);
+    const startY = minY + params.spacing * 0.25;
+    const endY = maxY - params.spacing * 0.25;
+    const waypoints = [];
+    let direction = 1;
+
+    for (let y = startY; y <= endY; y += params.spacing) {
+        const intersections = getGridIntersections(rotatedVertices, y);
+
+        for (let pairIndex = 0; pairIndex + 1 < intersections.length; pairIndex += 2) {
+            waypoints.push(...createSweepWaypointPair(
+                intersections,
+                pairIndex,
+                y,
+                direction,
+                params.overshoot,
+                projection.toGeo,
+                angleRad,
+            ));
+        }
+
+        direction *= -1;
+    }
+
+    return waypoints;
+}
+
+function isMissionControlTypingTarget(target) {
+    return Boolean(target && (
+        target.tagName === 'INPUT' ||
+        target.tagName === 'TEXTAREA' ||
+        target.isContentEditable ||
+        target.tagName === 'SELECT'
+    ));
+}
+
 ////////////////////////////////////
 //
 // Tab mission control block
@@ -132,7 +656,55 @@ missionControlTab.isYmapLoad = false;
 
 // Shared between plotElevation() (inside initialize) and cleanup()
 let elevationChartInstance = null;
+let mission3DViewer = null;
+
+function mission3DMessage(key, fallback) {
+    return i18n.getMessage(key) || fallback;
+}
+
+function hideMission3DTerrainWarning() {
+    $('#missionMap3DWarning').hide();
+}
+
+function showMission3DTerrainWarnings(types) {
+    const warning = $('#missionMap3DWarning');
+    const messages = [];
+
+    if (types.includes('unavailable')) {
+        messages.push(mission3DMessage(
+            'missionMap3DTerrainUnavailable',
+            'Terrain data unavailable: Route collision check could not be completed.'
+        ));
+    } else {
+        if (types.includes('collision')) {
+            messages.push(mission3DMessage(
+                'missionMap3DCollisionWarning',
+                'Warning: Planned route intersects terrain.'
+            ));
+        }
+        if (types.includes('home')) {
+            messages.push(mission3DMessage(
+                'missionMap3DHomeRequired',
+                'HOME is not set: Relative-altitude terrain checks are unavailable.'
+            ));
+        }
+    }
+
+    if (!messages.length) return;
+    warning
+        .attr('data-warning-type', types.includes('collision') ? 'collision' : types[0])
+        .text(messages.join(' '))
+        .show();
+}
+
+function getMission3DSampleCartesian(sample) {
+    return sample.cartesian;
+}
+
 missionControlTab.initialize = function (callback) {
+
+    cleanupMissionControlLocationResources();
+    const locationLifecycleId = missionControlLocationLifecycleId;
 
     let cursorInitialized = false;
     let curPosStyle;
@@ -145,8 +717,10 @@ missionControlTab.initialize = function (callback) {
     let breadCrumbVector;
     let autoCenteredOnFix = false;
     let lastGpsPos = null;
+    let googleGeoPos = null;
     let infoOverlayEl;
     let infoOverlaySpans;
+    let apiOverlayEl;
     let isOffline = false;
     let selectedSafehome;
     let $safehomeContentBox;
@@ -156,6 +730,353 @@ missionControlTab.initialize = function (callback) {
     let invalidGeoZones = false;
     let isGeozoneEnabeld = false;
     let settings = {speed: 0, alt: 5000, safeRadiusSH: 50, fwApproachAlt: 60, fwLandAlt: 5, maxDistSH: 0, fwApproachLength: 0, fwLoiterRadius: 0};
+    let googleLocationRequestStarted = false;
+    let conditionsFetched = false;
+    let activeWeatherSource = null;
+    let weatherApiKey = String(globalSettings.googleApiKey || '').trim();
+    let blockedWeatherApiKey = null;
+
+    function getCurrentDroneLocation() {
+        const lat = FC.GPS_DATA?.lat / 10000000;
+        const lng = FC.GPS_DATA?.lon / 10000000;
+        if (FC.GPS_DATA?.fix < 2 || !Number.isFinite(lat) || !Number.isFinite(lng)
+            || Math.abs(lat) > 90 || Math.abs(lng) > 180) {
+            return null;
+        }
+
+        return {
+            lat,
+            lng,
+            coord: fromLonLat([lng, lat]),
+        };
+    }
+
+    function getFirstMissionLocation() {
+        const firstWaypoint = mission.get().find(function (waypoint) {
+            return !waypoint.isAttached();
+        });
+        if (!firstWaypoint) {
+            return null;
+        }
+
+        const lat = firstWaypoint.getLatMap();
+        const lng = firstWaypoint.getLonMap();
+        if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
+            return null;
+        }
+
+        return {
+            type: 'waypoint',
+            lat,
+            lng,
+            coord: fromLonLat([lng, lat]),
+        };
+    }
+
+    function getFirstMissionCoordinate() {
+        return getFirstMissionLocation()?.coord || null;
+    }
+
+    function getMapCenterWeatherLocation() {
+        const center = map?.getView()?.getCenter();
+        if (!center) {
+            return null;
+        }
+
+        const [lng, lat] = toLonLat(center);
+        if (!Number.isFinite(lat) || !Number.isFinite(lng)
+            || Math.abs(lat) > 90 || Math.abs(lng) > 180) {
+            return null;
+        }
+        return { type: 'map', lat, lng };
+    }
+
+    function getPreferredWeatherSource() {
+        const droneLocation = getCurrentDroneLocation();
+        if (droneLocation) {
+            return { type: 'gps', lat: droneLocation.lat, lng: droneLocation.lng };
+        }
+        return getFirstMissionLocation() || getMapCenterWeatherLocation();
+    }
+
+    function syncWeatherApiKey() {
+        const apiKey = String(globalSettings.googleApiKey || '').trim();
+        if (apiKey === weatherApiKey) {
+            return false;
+        }
+
+        weatherApiKey = apiKey;
+        blockedWeatherApiKey = null;
+        activeWeatherSource = null;
+        conditionsFetched = false;
+        clearWeatherRetry();
+        weatherAbortController?.abort();
+        weatherAbortController = null;
+        return true;
+    }
+
+    function scheduleWeatherRetry(source, apiKey, retryDelayMs) {
+        clearWeatherRetry();
+        weatherRetryTimer = setTimeout(function () {
+            weatherRetryTimer = null;
+            if (missionControlLocationLifecycleId !== locationLifecycleId
+                || String(globalSettings.googleApiKey || '').trim() !== apiKey
+                || blockedWeatherApiKey === apiKey) {
+                return;
+            }
+
+            const preferredSource = getPreferredWeatherSource();
+            if (!preferredSource) {
+                return;
+            }
+            if (isWeatherSourceMateriallyChanged(source, preferredSource)) {
+                evaluateWeatherSource();
+                return;
+            }
+
+            activeWeatherSource = preferredSource;
+            updateConditionsTitle(preferredSource);
+            void fetchConditionsInfo(preferredSource, apiKey);
+        }, retryDelayMs);
+    }
+
+    async function fetchConditionsInfo(source, apiKey) {
+        if (!apiKey || blockedWeatherApiKey === apiKey
+            || missionControlLocationLifecycleId !== locationLifecycleId) {
+            return false;
+        }
+
+        const useImperial = globalSettings.unitType === 'imperial'
+            || (globalSettings.unitType === 'OSD' && globalSettings.osdUnits === 0);
+        const url = new URL('https://weather.googleapis.com/v1/currentConditions:lookup');
+        url.searchParams.set('key', apiKey);
+        url.searchParams.set('location.latitude', source.lat.toFixed(4));
+        url.searchParams.set('location.longitude', source.lng.toFixed(4));
+        if (useImperial) {
+            url.searchParams.set('unitsSystem', 'IMPERIAL');
+        }
+
+        weatherAbortController?.abort();
+        const requestController = new AbortController();
+        weatherAbortController = requestController;
+        let requestTimedOut = false;
+        const timeoutTimer = setTimeout(function () {
+            requestTimedOut = true;
+            requestController.abort();
+        }, WEATHER_REQUEST_TIMEOUT_MS);
+        updateConditionsTitle(source);
+        showConditionsPanel(true);
+        $('#conditionsLoading').text(i18n.getMessage('conditionsWaiting')).show();
+        $('#conditionsData').addClass('is-hidden').hide();
+        $('#conditionsError').addClass('is-hidden').hide();
+
+        try {
+            const response = await fetch(url, { signal: requestController.signal });
+            const data = await parseWeatherResponse(response);
+            if (!isCurrentWeatherRequest(requestController, apiKey, locationLifecycleId)) {
+                return false;
+            }
+
+            conditionsFetched = renderConditionsInfo(data);
+            if (!conditionsFetched) {
+                throw createWeatherRequestError('Invalid Weather API response', true);
+            }
+            clearWeatherRetry();
+            blockedWeatherApiKey = null;
+            return true;
+        } catch (error) {
+            const weatherError = normalizeWeatherRequestError(error, requestTimedOut);
+            if (!weatherError || !isCurrentWeatherRequest(requestController, apiKey, locationLifecycleId)) {
+                return false;
+            }
+
+            conditionsFetched = false;
+            showConditionsUnavailable();
+            console.warn('Google Weather unavailable:', weatherError.message);
+            if (weatherError.weatherRetryable !== false) {
+                scheduleWeatherRetry(source, apiKey, weatherError.weatherRetryDelayMs || WEATHER_RETRY_DELAY_MS);
+            } else {
+                clearWeatherRetry();
+                blockedWeatherApiKey = apiKey;
+            }
+            return false;
+        } finally {
+            clearTimeout(timeoutTimer);
+            if (weatherAbortController === requestController) {
+                weatherAbortController = null;
+            }
+        }
+    }
+
+    function evaluateWeatherSource({ allowMapCenterRefresh = true } = {}) {
+        if (missionControlLocationLifecycleId !== locationLifecycleId) {
+            return false;
+        }
+        const apiKeyChanged = syncWeatherApiKey();
+        const apiKey = weatherApiKey;
+        if (!apiKey) {
+            showConditionsPanel(false);
+            return false;
+        }
+
+        const preferredSource = getPreferredWeatherSource();
+        if (!preferredSource) {
+            return false;
+        }
+        if (!allowMapCenterRefresh && !apiKeyChanged && preferredSource.type === 'map'
+            && (!activeWeatherSource || activeWeatherSource.type === 'map')) {
+            return conditionsFetched;
+        }
+        if (preferredSource.type !== 'map') {
+            clearTimeout(weatherMapRefreshTimer);
+            weatherMapRefreshTimer = null;
+        }
+        updateConditionsTitle(preferredSource);
+        if (blockedWeatherApiKey === apiKey) {
+            return false;
+        }
+        if (!isWeatherSourceMateriallyChanged(activeWeatherSource, preferredSource)) {
+            return conditionsFetched;
+        }
+
+        clearWeatherRetry();
+        weatherAbortController?.abort();
+        activeWeatherSource = preferredSource;
+        conditionsFetched = false;
+        void fetchConditionsInfo(preferredSource, apiKey);
+        return true;
+    }
+
+    function scheduleMapCenterWeatherRefresh() {
+        clearTimeout(weatherMapRefreshTimer);
+        weatherMapRefreshTimer = null;
+        if (missionControlLocationLifecycleId !== locationLifecycleId
+            || getCurrentDroneLocation() || getFirstMissionLocation()) {
+            return;
+        }
+
+        weatherMapRefreshTimer = setTimeout(function () {
+            weatherMapRefreshTimer = null;
+            if (missionControlLocationLifecycleId === locationLifecycleId) {
+                evaluateWeatherSource();
+            }
+        }, WEATHER_MAP_REFRESH_DELAY_MS);
+    }
+
+    function centerMapOnCurrentLocation(keepExistingZoom = false) {
+        const mapView = map?.getView();
+        if (!mapView) {
+            return false;
+        }
+
+        const droneLocation = getCurrentDroneLocation();
+        if (lastGpsPos || droneLocation) {
+            lastGpsPos = droneLocation?.coord || lastGpsPos;
+            mapView.setCenter(lastGpsPos);
+            if (!keepExistingZoom || mapView.getZoom() < 14) {
+                mapView.setZoom(14);
+            }
+            return true;
+        }
+
+        if (!googleGeoPos) {
+            return false;
+        }
+
+        mapView.setCenter(googleGeoPos.coord);
+        const zoom = getGoogleLocationZoom(googleGeoPos);
+        if (!keepExistingZoom || mapView.getZoom() < zoom) {
+            mapView.setZoom(zoom);
+        }
+        showApiLocationBanner(apiOverlayEl, infoOverlayEl, googleGeoPos);
+        return true;
+    }
+
+    function centerMapOnPreferredLocation(keepExistingZoom = false) {
+        const mapView = map?.getView();
+        if (!mapView) {
+            return false;
+        }
+
+        const firstWaypointCoord = getFirstMissionCoordinate();
+        if (firstWaypointCoord) {
+            mapView.setCenter(firstWaypointCoord);
+            if (!keepExistingZoom || mapView.getZoom() < 14) {
+                mapView.setZoom(14);
+            }
+            return true;
+        }
+
+        return centerMapOnCurrentLocation(keepExistingZoom);
+    }
+
+    async function requestGoogleApproximateLocation() {
+        if (googleLocationRequestStarted || !globalSettings.googleApiKey
+            || getFirstMissionCoordinate() || getCurrentDroneLocation()) {
+            return null;
+        }
+
+        googleLocationRequestStarted = true;
+        const url = new URL('https://www.googleapis.com/geolocation/v1/geolocate');
+        url.searchParams.set('key', globalSettings.googleApiKey);
+        const requestController = new AbortController();
+        googleLocationAbortController = requestController;
+
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ considerIp: true }),
+                signal: requestController.signal,
+            });
+            const data = await response.json();
+            if (!response.ok || !Number.isFinite(data?.location?.lat)
+                || !Number.isFinite(data?.location?.lng)) {
+                throw new Error(data?.error?.message || `HTTP ${response.status}`);
+            }
+
+            googleGeoPos = {
+                coord: fromLonLat([data.location.lng, data.location.lat]),
+                lat: data.location.lat,
+                lng: data.location.lng,
+                accuracy: Number(data.accuracy),
+            };
+
+            if (!getFirstMissionCoordinate() && !getCurrentDroneLocation() && !lastGpsPos) {
+                $('#centerOnDrone').show().css({ opacity: 1, pointerEvents: 'auto' });
+                centerMapOnPreferredLocation();
+            }
+            return googleGeoPos;
+        } catch (error) {
+            if (error.name !== 'AbortError') {
+                console.warn('Google approximate location unavailable:', error.message);
+            }
+            return null;
+        } finally {
+            if (googleLocationAbortController === requestController) {
+                googleLocationAbortController = null;
+            }
+        }
+    }
+
+    function initializeMapLocation() {
+        const initialDroneLocation = getCurrentDroneLocation();
+        if (getFirstMissionCoordinate()) {
+            centerMapOnPreferredLocation();
+            evaluateWeatherSource();
+            return;
+        }
+        if (initialDroneLocation) {
+            lastGpsPos = initialDroneLocation.coord;
+            $('#centerOnDrone').css({ opacity: 1, pointerEvents: 'auto' });
+            centerMapOnPreferredLocation();
+            evaluateWeatherSource();
+            return;
+        }
+        void requestGoogleApproximateLocation().then(function () {
+            evaluateWeatherSource();
+        });
+    }
 
     if (GUI.active_tab !== this) {
         GUI.active_tab = this;
@@ -305,6 +1226,7 @@ function iconKey(filename) {
         addShortcutHint('#saveFileMissionButton', '(Ctrl+S)');
         addShortcutHint('#removeAllPoints a', '(Ctrl+D)');
         addShortcutHint('#searchAddressButton', '(Ctrl+A)');
+        addShortcutHint('#gridPatternButton', '(Ctrl+G)');
 
         function get_raw_gps_data() {
             MSP.send_message(MSPCodes.MSP_RAW_GPS, false, false, get_comp_gps_data);
@@ -470,6 +1392,9 @@ function iconKey(filename) {
               curPosGeo.setCoordinates(gpsPos);
               lastGpsPos = gpsPos;
               $('#centerOnDrone').css({ opacity: 1, pointerEvents: 'auto' });
+              if (apiOverlayEl) {
+                  apiOverlayEl.style.visibility = 'hidden';
+              }
 
                             // Uncomment to auto-center/zoom once when GPS lock is first acquired
                             // if (!autoCenteredOnFix && map && map.getView()) {
@@ -515,9 +1440,14 @@ function iconKey(filename) {
                             }
           }
                     else if (infoOverlayEl) {
-                        $('#centerOnDrone').css({ opacity: 0.45, pointerEvents: 'none' });
+                        if (googleGeoPos) {
+                            $('#centerOnDrone').css({ opacity: 1, pointerEvents: 'auto' });
+                        } else {
+                            $('#centerOnDrone').css({ opacity: 0.45, pointerEvents: 'none' });
+                        }
                         infoOverlayEl.style.visibility = 'hidden';
                     }
+          evaluateWeatherSource({ allowMapCenterRefresh: false });
         }
 
         /*
@@ -560,17 +1490,511 @@ function iconKey(filename) {
     var geozoneLines = [];      // Layer for Lines between geozone vertices
 
     var map;
+    let missionMapViewMode = '2d';
+
+    const mission3DRouteColor = Color.fromCssColorString('#13b5ea');
+    const mission3DCollisionColor = Color.fromCssColorString('#e02f2f');
+
+    function createMission3DViewer(container) {
+        buildModuleUrl.setBaseUrl('./');
+
+        const viewer = new Viewer(container, {
+            animation: false,
+            baseLayer: false,
+            baseLayerPicker: false,
+            fullscreenButton: false,
+            geocoder: false,
+            homeButton: false,
+            infoBox: false,
+            navigationHelpButton: false,
+            sceneModePicker: false,
+            selectionIndicator: false,
+            timeline: false,
+            terrainProvider: new EllipsoidTerrainProvider(),
+            requestRenderMode: true,
+            maximumRenderTimeChange: Infinity
+        });
+
+        viewer.scene.globe.depthTestAgainstTerrain = true;
+        viewer.scene.globe.tileCacheSize = 500;
+
+        // Google Earth's modifier layout: Shift + left drag tilts and Ctrl + left drag looks
+        // around. Cesium has those two the other way round; the plain buttons already match
+        // (left drag moves, right drag and the wheel zoom, the middle button tilts).
+        const cameraController = viewer.scene.screenSpaceCameraController;
+        cameraController.minimumZoomDistance = 20;
+        cameraController.tiltEventTypes = [
+            CameraEventType.MIDDLE_DRAG,
+            CameraEventType.PINCH,
+            {eventType: CameraEventType.LEFT_DRAG, modifier: KeyboardEventModifier.SHIFT},
+            {eventType: CameraEventType.RIGHT_DRAG, modifier: KeyboardEventModifier.SHIFT}
+        ];
+        cameraController.lookEventTypes = {eventType: CameraEventType.LEFT_DRAG, modifier: KeyboardEventModifier.CTRL};
+
+        // Zooming and tilting pivot on whatever the cursor grabs. Started against the sky there
+        // is nothing to grab, and Cesium falls back to the globe centre, which hurls the camera
+        // away. Hold those gestures back until they actually catch the globe.
+        const cameraGuard = new ScreenSpaceEventHandler(viewer.scene.canvas);
+        const grabsGlobe = (position) => {
+            const ray = viewer.camera.getPickRay(position);
+            if (ray && viewer.scene.globe.pick(ray, viewer.scene)) return true;
+            return !!viewer.camera.pickEllipsoid(position, viewer.scene.globe.ellipsoid);
+        };
+        const holdGesture = (event) => {
+            const anchored = grabsGlobe(event.position);
+            cameraController.enableZoom = anchored;
+            cameraController.enableTilt = anchored;
+        };
+        const releaseGesture = () => {
+            cameraController.enableZoom = true;
+            cameraController.enableTilt = true;
+        };
+        cameraGuard.setInputAction(holdGesture, ScreenSpaceEventType.RIGHT_DOWN);
+        cameraGuard.setInputAction(releaseGesture, ScreenSpaceEventType.RIGHT_UP);
+        cameraGuard.setInputAction(holdGesture, ScreenSpaceEventType.MIDDLE_DOWN);
+        cameraGuard.setInputAction(releaseGesture, ScreenSpaceEventType.MIDDLE_UP);
+        cameraGuard.setInputAction(holdGesture, ScreenSpaceEventType.LEFT_DOWN, KeyboardEventModifier.SHIFT);
+        cameraGuard.setInputAction(releaseGesture, ScreenSpaceEventType.LEFT_UP, KeyboardEventModifier.SHIFT);
+        cameraGuard.setInputAction(releaseGesture, ScreenSpaceEventType.WHEEL);
+        cameraGuard.setInputAction(releaseGesture, ScreenSpaceEventType.PINCH_START);
+
+        let destroyed = false;
+        let visible = false;
+        let resizeFrame = null;
+        let updateSequence = 0;
+        let terrainProvider = viewer.terrainProvider;
+        let terrainLoadFailed = false;
+        let lastWaypoints = [];
+        let lastHome = null;
+        let terrainCacheSignature = null;
+        let terrainCache = null;
+
+        function cancelResize() {
+            if (resizeFrame === null) return;
+            cancelAnimationFrame(resizeFrame);
+            resizeFrame = null;
+        }
+
+        function scheduleResize() {
+            if (destroyed || !visible || resizeFrame !== null) return;
+            resizeFrame = requestAnimationFrame(() => {
+                resizeFrame = null;
+                if (destroyed || !visible || !container.clientWidth || !container.clientHeight) return;
+                viewer.resize();
+                viewer.scene.requestRender();
+            });
+        }
+
+        // Follow the actual 3D layout, including changes after the view-mode switch.
+        // Coalesce notifications into one frame and leave the hidden viewer idle.
+        const resizeObserver = new ResizeObserver(scheduleResize);
+        resizeObserver.observe(container);
+
+        function showEmptyMap() {
+            hideMission3DTerrainWarning();
+            $('#missionMap3DHelp')
+                .text(mission3DMessage('missionMap3DEmpty', 'No mission to display in 3D.'))
+                .show();
+
+            if (!map) return;
+            const center = toLonLat(map.getView().getCenter());
+            const zoom = map.getView().getZoom() || 2;
+            const height = Math.max(1500, 35000000 / Math.pow(2, zoom));
+            viewer.camera.flyTo({
+                destination: Cartesian3.fromDegrees(center[0], center[1], height),
+                orientation: {
+                    heading: 0,
+                    pitch: CesiumMath.toRadians(-55),
+                    roll: 0
+                },
+                duration: 0
+            });
+        }
+
+        // Ground height under every mission point. The ellipsoid provider needs no request, its
+        // surface already sits at zero, and a failed sample falls back to whatever heights the
+        // request left behind so the mission still draws; the caller then reports that the terrain
+        // reference is missing.
+        async function samplePointTerrain(points) {
+            const terrainPositions = points.map((point) => Cartographic.fromDegrees(point.lon, point.lat));
+            let sampledPositions = terrainPositions;
+            let samplingFailed = false;
+
+            if (!(terrainProvider instanceof EllipsoidTerrainProvider)) {
+                try {
+                    sampledPositions = await sampleTerrainMostDetailed(terrainProvider, terrainPositions);
+                } catch (error) {
+                    samplingFailed = true;
+                    console.warn('Mission Planner 3D terrain sampling failed:', error);
+                }
+            }
+
+            const groundHeights = sampledPositions.map((position) => Number.isFinite(position.height) ? position.height : 0);
+            return {groundHeights, samplingFailed};
+        }
+
+        async function sampleRouteTerrain(renderedPoints) {
+            const routeSegments = getMission3DRouteSegments(renderedPoints).filter((segment) => segment.length > 1);
+            const routeEdges = routeSegments.flatMap((segment, segmentIndex) => segment.slice(1).map((end, index) => {
+                const start = segment[index];
+                const geodesic = new EllipsoidGeodesic(
+                    Cartographic.fromDegrees(start.lon, start.lat),
+                    Cartographic.fromDegrees(end.lon, end.lat)
+                );
+                return {
+                    segmentIndex,
+                    start,
+                    end,
+                    geodesic,
+                    distance: geodesic.surfaceDistance,
+                    terrainClearanceAvailable: start.terrainClearanceAvailable && end.terrainClearanceAvailable
+                };
+            }));
+            const samplingSpacing = getMission3DSamplingSpacing(routeEdges.map((edge) => edge.distance));
+            const routeSamples = routeSegments.map(() => []);
+            const terrainSamplePositions = [];
+            const terrainSampleDescriptors = [];
+
+            routeEdges.forEach((edge, edgeIndex) => {
+                const steps = Math.max(1, Math.ceil(edge.distance / samplingSpacing));
+                const previousEdge = routeEdges[edgeIndex - 1];
+                const sharesCheckedEndpoint = previousEdge?.segmentIndex === edge.segmentIndex
+                    && previousEdge.terrainClearanceAvailable === edge.terrainClearanceAvailable;
+                const firstStep = sharesCheckedEndpoint ? 1 : 0;
+
+                for (let step = firstStep; step <= steps; step++) {
+                    const fraction = step / steps;
+                    const position = edge.geodesic.interpolateUsingFraction(fraction, new Cartographic());
+                    const plannedHeight = edge.start.plannedHeight
+                        + (edge.end.plannedHeight - edge.start.plannedHeight) * fraction;
+                    const descriptor = {
+                        position,
+                        plannedHeight,
+                        terrainClearanceAvailable: edge.terrainClearanceAvailable
+                    };
+
+                    routeSamples[edge.segmentIndex].push(descriptor);
+                    if (descriptor.terrainClearanceAvailable) {
+                        terrainSampleDescriptors.push(descriptor);
+                        terrainSamplePositions.push(Cartographic.clone(position));
+                    }
+                }
+            });
+
+            let sampledRouteTerrain = terrainSamplePositions;
+            let samplingFailed = false;
+            if (!(terrainProvider instanceof EllipsoidTerrainProvider) && terrainSamplePositions.length) {
+                try {
+                    sampledRouteTerrain = await sampleTerrainMostDetailed(terrainProvider, terrainSamplePositions);
+                } catch (error) {
+                    samplingFailed = true;
+                    console.warn('Mission Planner 3D route terrain sampling failed:', error);
+                }
+            }
+
+            terrainSampleDescriptors.forEach((sample, index) => {
+                const terrainHeight = Number.isFinite(sampledRouteTerrain[index]?.height)
+                    ? sampledRouteTerrain[index].height
+                    : 0;
+                sample.clearance = sample.plannedHeight - terrainHeight;
+            });
+            routeSamples.flat().forEach((sample) => {
+                if (!sample.terrainClearanceAvailable) sample.clearance = Number.POSITIVE_INFINITY;
+                sample.cartesian = Cartesian3.fromRadians(
+                    sample.position.longitude,
+                    sample.position.latitude,
+                    sample.plannedHeight
+                );
+            });
+
+            return {routeSamples, samplingFailed};
+        }
+
+        // One marker with its label per point, plus the drop line that ties a mission waypoint to
+        // the ground underneath it. The colour carries the state: home is green, a point that would
+        // sit below the terrain is red, landings and POIs are orange and everything else stays blue.
+        function renderMissionPoints(points, groundHeights, homeGroundHeight, hasHome) {
+            const displayPositions = [];
+            const renderedPoints = [];
+
+            points.forEach((point, index) => {
+                const groundHeight = groundHeights[index];
+                const plannedHeight = getMission3DPlannedHeight(point, groundHeight, homeGroundHeight);
+                const clearance = plannedHeight - groundHeight;
+                const terrainClearanceAvailable = point.isHome || point.absoluteAltitude || hasHome;
+                let pointColor = Color.fromCssColorString('#1497f1');
+                if (point.isHome) {
+                    pointColor = Color.fromCssColorString('#88cc3e');
+                } else if (terrainClearanceAvailable && clearance < 0) {
+                    pointColor = Color.RED;
+                } else if (point.action === MWNP.WPTYPE.LAND || point.action === MWNP.WPTYPE.SET_POI) {
+                    pointColor = Color.ORANGE;
+                }
+                const position = Cartesian3.fromDegrees(point.lon, point.lat, plannedHeight);
+                renderedPoints.push({...point, plannedHeight, position, terrainClearanceAvailable});
+
+                viewer.entities.add({
+                    position,
+                    point: {
+                        color: pointColor,
+                        outlineColor: Color.WHITE,
+                        outlineWidth: 2,
+                        pixelSize: point.isHome ? 13 : 11,
+                        disableDepthTestDistance: Number.POSITIVE_INFINITY
+                    },
+                    label: {
+                        text: getMission3DPointLabel(point),
+                        font: '700 14px Segoe UI, Calibri, sans-serif',
+                        fillColor: Color.WHITE,
+                        outlineColor: Color.BLACK,
+                        outlineWidth: 3,
+                        style: LabelStyle.FILL_AND_OUTLINE,
+                        verticalOrigin: VerticalOrigin.BOTTOM,
+                        pixelOffset: new Cartesian2(0, -12),
+                        disableDepthTestDistance: Number.POSITIVE_INFINITY
+                    }
+                });
+
+                // HOME sits on the ground and outside the flown route, so it gets neither a drop
+                // line nor a say in how the camera frames the mission.
+                if (point.isHome) return;
+
+                displayPositions.push(position);
+                viewer.entities.add({
+                    polyline: {
+                        positions: [
+                            Cartesian3.fromDegrees(point.lon, point.lat, groundHeight),
+                            position
+                        ],
+                        width: 2,
+                        material: pointColor.withAlpha(0.72)
+                    }
+                });
+            });
+
+            return {displayPositions, renderedPoints};
+        }
+
+        function renderRouteTerrain(routeSamples) {
+            let hasTerrainCollision = false;
+
+            routeSamples.forEach((samples) => {
+                getMission3DRouteRuns(samples).forEach((run) => {
+                    hasTerrainCollision ||= run.collidesWithTerrain;
+                    viewer.entities.add({
+                        polyline: {
+                            positions: run.samples.map(getMission3DSampleCartesian),
+                            width: run.collidesWithTerrain ? 6 : 4,
+                            material: run.collidesWithTerrain ? mission3DCollisionColor : mission3DRouteColor,
+                            depthFailMaterial: run.collidesWithTerrain ? mission3DCollisionColor.withAlpha(0.9) : undefined
+                        }
+                    });
+                });
+            });
+
+            return hasTerrainCollision;
+        }
+
+        // Terrain warnings for a finished render. A provider that never loaded or a sample that
+        // failed makes every clearance meaningless, so that single warning replaces the others.
+        function showMissionWarnings(terrainSamplingFailed, hasTerrainCollision, missingHomeReference) {
+            if (terrainLoadFailed || terrainSamplingFailed) {
+                showMission3DTerrainWarnings(['unavailable']);
+                return;
+            }
+
+            const warningTypes = [];
+            if (hasTerrainCollision) warningTypes.push('collision');
+            if (missingHomeReference) warningTypes.push('home');
+            showMission3DTerrainWarnings(warningTypes);
+        }
+
+        async function renderMission(waypoints, home) {
+            const sequence = ++updateSequence;
+            viewer.entities.removeAll();
+            hideMission3DTerrainWarning();
+
+            const points = getMission3DPoints(waypoints, home);
+            const missionPoints = points.filter((point) => !point.isHome);
+            if (!missionPoints.length) {
+                showEmptyMap();
+                viewer.scene.requestRender();
+                return;
+            }
+
+            $('#missionMap3DHelp').hide();
+
+            const signature = JSON.stringify(points);
+            const cache = terrainCacheSignature === signature ? terrainCache : null;
+            // A cache hit answers straight away. A miss goes through samplePointTerrain, which asks
+            // the terrain provider only when a real one is loaded, but awaits either way, so on a
+            // miss the guard below always runs behind a suspension.
+            const pointTerrain = cache
+                ? {groundHeights: cache.groundHeights, samplingFailed: false}
+                : await samplePointTerrain(points);
+            if (destroyed || sequence !== updateSequence) return;
+
+            const groundHeights = pointTerrain.groundHeights;
+            let terrainSamplingFailed = pointTerrain.samplingFailed;
+            const homeIndex = points.findIndex((point) => point.isHome);
+            const hasHome = homeIndex >= 0;
+            const homeGroundHeight = hasHome ? groundHeights[homeIndex] : null;
+            const missingHomeReference = !hasHome && missionPoints.some((point) => !point.absoluteAltitude);
+            const {displayPositions, renderedPoints} = renderMissionPoints(points, groundHeights, homeGroundHeight, hasHome);
+
+            const routeTerrain = cache ? cache.routeTerrain : await sampleRouteTerrain(renderedPoints);
+            if (destroyed || sequence !== updateSequence) return;
+            terrainSamplingFailed ||= routeTerrain.samplingFailed;
+            if (!cache && !terrainSamplingFailed && !(terrainProvider instanceof EllipsoidTerrainProvider)) {
+                terrainCacheSignature = signature;
+                terrainCache = {groundHeights, routeTerrain};
+            }
+            const hasTerrainCollision = renderRouteTerrain(routeTerrain.routeSamples);
+            showMissionWarnings(terrainSamplingFailed, hasTerrainCollision, missingHomeReference);
+
+            const missionBounds = BoundingSphere.fromPoints(displayPositions);
+            const range = Math.max(350, missionBounds.radius * 2.5, Math.max(...missionPoints.map((point) => Math.abs(point.altitude))) * 5);
+            viewer.camera.flyToBoundingSphere(missionBounds, {
+                duration: 0,
+                offset: new HeadingPitchRange(0, CesiumMath.toRadians(-32), range)
+            });
+            viewer.scene.requestRender();
+        }
+
+        ArcGisMapServerImageryProvider.fromUrl(
+            'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer'
+        ).then((provider) => {
+            if (!destroyed) {
+                viewer.imageryLayers.addImageryProvider(provider);
+                viewer.scene.requestRender();
+            }
+        }).catch(async (error) => {
+            console.warn('Mission Planner 3D satellite imagery failed, using OpenStreetMap:', error);
+            try {
+                const provider = await OpenStreetMapImageryProvider.fromUrl('https://tile.openstreetmap.org/');
+                if (!destroyed) {
+                    viewer.imageryLayers.addImageryProvider(provider);
+                    viewer.scene.requestRender();
+                }
+            } catch (fallbackError) {
+                console.warn('Mission Planner 3D fallback imagery failed:', fallbackError);
+            }
+        });
+
+        ArcGISTiledElevationTerrainProvider.fromUrl(
+            'https://elevation3d.arcgis.com/arcgis/rest/services/WorldElevation3D/Terrain3D/ImageServer'
+        ).then((provider) => {
+            if (destroyed) return;
+            terrainLoadFailed = false;
+            terrainProvider = provider;
+            viewer.terrainProvider = provider;
+            terrainCacheSignature = null;
+            terrainCache = null;
+            if (missionMapViewMode === '3d') renderMission(lastWaypoints, lastHome);
+        }).catch((error) => {
+            terrainLoadFailed = true;
+            console.warn('Mission Planner 3D terrain is unavailable, using an ellipsoid:', error);
+            if (!destroyed && missionMapViewMode === '3d') renderMission(lastWaypoints, lastHome);
+        });
+
+        return {
+            setVisible(isVisible) {
+                if (destroyed) return;
+                visible = isVisible;
+                viewer.useDefaultRenderLoop = visible;
+                if (!visible) {
+                    cancelResize();
+                    updateSequence++;
+                    return;
+                }
+                scheduleResize();
+            },
+            update(waypoints, home) {
+                lastWaypoints = waypoints;
+                lastHome = home;
+                renderMission(waypoints, home);
+            },
+            destroy() {
+                if (destroyed) return;
+                destroyed = true;
+                visible = false;
+                resizeObserver.disconnect();
+                cancelResize();
+                updateSequence++;
+                cameraGuard.destroy();
+                if (!viewer.isDestroyed()) viewer.destroy();
+            }
+        };
+    }
+
+    function updateMission3D() {
+        if (mission3DViewer && missionMapViewMode === '3d') {
+            mission3DViewer.update(mission.get(), HOME);
+        }
+    }
+
+    function ensureMission3DViewer() {
+        if (mission3DViewer) return true;
+        try {
+            mission3DViewer = createMission3DViewer(document.getElementById('missionMap3D'));
+            return true;
+        } catch (error) {
+            console.warn('Mission Planner 3D view is unavailable:', error);
+            const message = mission3DMessage('missionMap3DUnavailable', '3D view unavailable on this system.');
+            $('#missionMap3DButton').prop('disabled', true).attr('title', message);
+            $('#missionMap3DHelp').text(message);
+            return false;
+        }
+    }
+
+    function setMissionMapViewMode(mode) {
+        let is3D = mode === '3d';
+        // Show the 3D container before creating the viewer so the canvas gets its real size
+        $('#missionMap').toggle(!is3D);
+        $('#missionMap3D').toggle(is3D);
+        if (is3D && !ensureMission3DViewer()) {
+            is3D = false;
+            $('#missionMap3D').hide();
+            $('#missionMap').show();
+        }
+        missionMapViewMode = is3D ? '3d' : '2d';
+        $('.tab-mission-control').toggleClass('mission-map-3d', is3D);
+        $('#missionMap2DButton').toggleClass('active', !is3D).attr('aria-pressed', String(!is3D));
+        $('#missionMap3DButton').toggleClass('active', is3D).attr('aria-pressed', String(is3D));
+        $('#geo_info').toggle(!is3D);
+
+        if (mission3DViewer) {
+            mission3DViewer.setVisible(is3D);
+            if (is3D) updateMission3D();
+        }
+        if (!is3D && map) map.updateSize();
+    }
+
+    // Slot the 2D/3D toggle below the bottom-most control initMap actually built: settings 65px,
+    // multimission 90px, elevation 115px, safehome 140px, geozones 190px. Which one that is
+    // depends on the connection and on whether geozones are enabled.
+    function missionMapViewControlsTop() {
+        if (!CONFIGURATOR.connectionValid) {
+            return 140; // without a connection the column ends at elevation, 115px
+        }
+        if (isGeozoneEnabeld) {
+            return 215; // below geozones at 190px
+        }
+        return 165; // below safehome at 140px
+    }
 
     //////////////////////////////////////////////////////////////////////////////////////////////
     //      define & init parameters for Selected Marker
     //////////////////////////////////////////////////////////////////////////////////////////////
-    var selectedMarker = null;
-    var selectedFeature = null;
-    var tempMarker = null;
-    var disableMarkerEdit = false;
-    var selectedFwApproachWp = null;
-    var selectedFwApproachSh = null;
-    var lockShExclHeading = false;
+    let selectedMarker = null;
+    let selectedFeature = null;
+    let tempMarker = null;
+    let disableMarkerEdit = false;
+    let selectedFwApproachWp = null;
+    let selectedFwApproachSh = null;
+    let lockShExclHeading = false;
+    let gridDrawInteraction = null;
+    let gridPreviewLayer = null;
 
 
     //////////////////////////////////////////////////////////////////////////////////////////////
@@ -1215,12 +2639,14 @@ function iconKey(filename) {
             HOME.setLat(Math.round(Number($(this).val()) * 10000000));
             cleanHomeLayers();
             renderHomeOnMap();
+            updateMission3D();
         });
 
         $(".home-lon").val(HOME.getLonMap()).on('change', function () {
             HOME.setLon(Math.round(Number($(this).val()) * 10000000));
             cleanHomeLayers();
             renderHomeOnMap();
+            updateMission3D();
         });
 
         if (HOME.getLatMap() == 0 && HOME.getLonMap() == 0) {
@@ -1291,6 +2717,7 @@ function iconKey(filename) {
         renderHomeTable();
         cleanHomeLayers();
         renderHomeOnMap();
+        updateMission3D();
         plotElevation();
     }
 
@@ -1766,11 +3193,18 @@ function iconKey(filename) {
         });
     }
 
+    // Vertical pixel offset to push RTH/heading markers below the WP pin (increase to move further down)
+    const MARKER_ICON_OFFSET_Y = 11;
+    const MARKER_ICON_OFFSET_X = -2;  // Match WP pin text offsetX
+
     function repaintLine4Waypoints(mission) {
+        const isValidCoordinate = (value) => Array.isArray(value) && value.length === 2 && Number.isFinite(value[0]) && Number.isFinite(value[1]);
+
         let oldPos,
             oldAction,
             poiList = [],
             oldHeading,
+            lastWaypointLayerNumber = -1,
             multiMissionWPNum = 0;
         let activatePoi = false;
         let activateHead = false;
@@ -1805,17 +3239,42 @@ function iconKey(filename) {
                     }
 
                     if (element.getEndMission() == 0xA5) {
-                        oldPos = 'undefined';
+                        oldPos = undefined;
                         activatePoi = false;
                         activateHead = false;
                         multiMissionWPNum = element.getNumber() + 1;
                     } else {
                         oldPos = coord;
+                        lastWaypointLayerNumber = element.getLayerNumber();
                     }
                 }
             }
             else if (element.isAttached()) {
-                if (element.getAction() == MWNP.WPTYPE.JUMP) {
+                if (element.getAction() == MWNP.WPTYPE.RTH && isValidCoordinate(oldPos)) {
+                    // RTH marker
+                    // RTH marker as SVG
+                    const markerOpacity = 0.85;
+                    const rthSvg = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" opacity="' + markerOpacity + '">' +
+                        '<circle cx="12" cy="12" r="10" fill="#00c850" stroke="#fff" stroke-width="2"/>' +
+                        '<text x="12" y="15" text-anchor="middle" font-size="7" font-family="sans-serif" font-weight="bold" fill="#fff">RTH</text>' +
+                        '</svg>';
+                    const rthMarker = new Feature({ geometry: new Point(oldPos) });
+                    rthMarker.setStyle(new Style({
+                        image: new Icon({
+                            src: 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(rthSvg),
+                            scale: 1,
+                            displacement: [MARKER_ICON_OFFSET_X, -MARKER_ICON_OFFSET_Y],
+                        }),
+                    }));
+                    const rthSource = new VectorSource({ features: [rthMarker] });
+                    const rthLayer = new VectorLayer({ source: rthSource, zIndex: 99 });
+                    rthLayer.kind = "rth";
+                    rthLayer.selection = false;
+                    rthLayer.parentLayerNumber = lastWaypointLayerNumber;
+                    lines.push(rthLayer);
+                    map.addLayer(rthLayer);
+                }
+                else if (element.getAction() == MWNP.WPTYPE.JUMP) {
                     let jumpWPIndex = multiMissionWPNum + element.getP1();
                     let coord = fromLonLat([mission.getWaypoint(jumpWPIndex).getLonMap(), mission.getWaypoint(jumpWPIndex).getLatMap()]);
                     paintLine(oldPos, coord, element.getNumber(), '#e935d6', 5, "Repeat x"+(element.getP2() == -1 ? " infinite" : String(element.getP2())), false, true);
@@ -1827,15 +3286,56 @@ function iconKey(filename) {
                         activateHead = false;
                         oldHeading = 'undefined'
                     }
-                    else if (typeof element.getP1() != 'undefined' && element.getP1() != -1) {
+                    else if (element.getP1() !== undefined && element.getP1() != -1) {
                         activatePoi = false;
                         activateHead = true;
                         oldHeading = String(element.getP1());
+
+                        // Black circle with white arrow pointing in the heading direction
+                        if (isValidCoordinate(oldPos)) {
+                            const headingDeg = element.getP1();
+                            // SVG: circle stays fixed, arrow rotates around center via SVG transform
+                            const markerOpacity = 0.85;
+
+                            const arrowSvg = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" opacity="' + markerOpacity + '">'
+                            + '<circle cx="12" cy="12" r="10" fill="#222" stroke="#fff" stroke-width="2"/>'
+                            + '<line x1="12" y1="2.71" x2="12" y2="12" stroke="#fff" stroke-width="1" transform="rotate(' + headingDeg + ' 12 12)"/>'
+                            + '<path d="M12 2.5 L15 8.5 L12 6.5 L9 8.5 Z" fill="#fff" transform="rotate(' + headingDeg + ' 12 12)"/>'
+                            + '<circle cx="12" cy="12" r="0.9" fill="#fff"/>'
+                            + '</svg>';
+                            const headMarker = new Feature({ geometry: new Point(oldPos) });
+                            headMarker.setStyle([
+                                new Style({
+                                    image: new Icon({
+                                        src: 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(arrowSvg),
+                                        scale: 1,
+                                        displacement: [MARKER_ICON_OFFSET_X, -MARKER_ICON_OFFSET_Y],
+                                    }),
+                                }),
+                                new Style({
+                                    text: new Text({
+                                        text: headingDeg + '\u00B0',
+                                        font: 'bold 9px sans-serif',
+                                        offsetX: MARKER_ICON_OFFSET_X,
+                                        offsetY: MARKER_ICON_OFFSET_Y + 18,
+                                        fill: new Fill({ color: '#222' }),
+                                        stroke: new Stroke({ color: '#fff', width: 3 }),
+                                    }),
+                                }),
+                            ]);
+                            const headSource = new VectorSource({ features: [headMarker] });
+                            const headLayer = new VectorLayer({ source: headSource, zIndex: 99 });
+                            headLayer.kind = "heading";
+                            headLayer.selection = false;
+                            headLayer.parentLayerNumber = lastWaypointLayerNumber;
+                            lines.push(headLayer);
+                            map.addLayer(headLayer);
+                        }
                     }
                 }
 
                 if (element.getEndMission() == 0xA5) {
-                    oldPos = 'undefined';
+                    oldPos = undefined;
                     activatePoi = false;
                     activateHead = false;
                     multiMissionWPNum = element.getNumber() + 1;
@@ -1856,6 +3356,8 @@ function iconKey(filename) {
                 $('#missionDistance').text('infinite');
             }
         }
+
+        updateMission3D();
     }
 
     function paintLine(pos1, pos2, pos2ID, color='#1497f1', lineDash=0, lineText="", selection=true, arrow=false) {
@@ -1931,6 +3433,7 @@ function iconKey(filename) {
     function refreshLayers() {
         cleanLayers();
         redrawLayers();
+        evaluateWeatherSource();
     }
 
     function cleanLayers() {
@@ -2431,6 +3934,7 @@ function iconKey(filename) {
          */
         app.handleDownEvent = function (evt) {
             if (disableMarkerEdit) return false;
+            addWpTooltipEl.style.display = 'none';
 
             var map = evt.map;
 
@@ -2447,6 +3951,8 @@ function iconKey(filename) {
                 });
 
             if (feature) {
+                // Ignore features from layers without a 'kind' (e.g. grid preview)
+                if (!tempMarker?.kind) return false;
                 this.coordinate_ = evt.coordinate;
                 this.feature_ = feature;
                 this.layer_ = tempMarker;
@@ -2459,6 +3965,7 @@ function iconKey(filename) {
          * @param {ol.MapBrowserEvent} evt Map browser event.
          */
         app.handleDragEvent = function (evt) {
+            if (!tempMarker?.kind) return;
             
             if (tempMarker.kind == "safehomecircle" || tempMarker.kind == "geozonecircle") {
                 return;
@@ -2530,22 +4037,30 @@ function iconKey(filename) {
          * @param {ol.MapBrowserEvent} evt Event.
          */
         app.handleMoveEvent = function (evt) {
-            if (this.cursor_) {
-                var map = evt.map;
-                var feature = map.forEachFeatureAtPixel(evt.pixel,
-                    function (feature, layer) {
-                        return feature;
-                    });
-                var element = evt.map.getTargetElement();
-                if (feature && feature.name != "circleFeature" && feature.name != "circleSafeFeature") {
-                    if (element.style.cursor != this.cursor_) {
-                        this.previousCursor_ = element.style.cursor;
-                        element.style.cursor = this.cursor_;
-                    }
-                } else if (this.previousCursor_ !== undefined) {
-                    element.style.cursor = this.previousCursor_;
-                    this.previousCursor_ = undefined;
+            var map = evt.map;
+            const feature = map.forEachFeatureAtPixel(evt.pixel,
+                function (feature, layer) {
+                    return feature;
+                });
+            const hoverLayer = map.forEachFeatureAtPixel(evt.pixel,
+                function (feature, layer) {
+                    return layer;
+                });
+            const element = evt.map.getTargetElement();
+            const isLine = hoverLayer?.kind === 'line' && hoverLayer.selection;
+
+            if (feature && feature.name != "circleFeature" && feature.name != "circleSafeFeature") {
+                if (isLine) {
+                    element.style.cursor = 'crosshair';
+                    addWpTooltipEl.style.display = '';
+                    addWpOverlay.setPosition(evt.coordinate);
+                } else {
+                    element.style.cursor = 'pointer';
+                    addWpTooltipEl.style.display = 'none';
                 }
+            } else {
+                element.style.cursor = '';
+                addWpTooltipEl.style.display = 'none';
             }
         };
 
@@ -2553,7 +4068,8 @@ function iconKey(filename) {
          * @param {ol.MapBrowserEvent} evt Map browser event.
          * @return {boolean} `false` to stop the drag sequence.
          */
-        app.handleUpEvent = function (evt) {
+        app.handleUpEvent = function (evt) { // NOSONAR - OpenLayers PointerInteraction ends the drag sequence by returning false here.
+            if (!tempMarker?.kind) return false;
             if (tempMarker.kind == "waypoint") {
                 if (selectedMarker != null && tempMarker.number == selectedMarker.getLayerNumber()) {
                     (async () => {
@@ -2691,6 +4207,17 @@ function iconKey(filename) {
             })
         });
 
+        $('#missionMapViewControls').css('top', `${missionMapViewControlsTop()}px`);
+        $('#missionMap2DButton').on('click', () => setMissionMapViewMode('2d'));
+        $('#missionMap3DButton').on('click', () => setMissionMapViewMode('3d'));
+        setMissionMapViewMode(missionMapViewMode);
+
+        apiOverlayEl = document.getElementById('geo_info');
+        if (apiOverlayEl) {
+            apiOverlayEl.textContent = '';
+            apiOverlayEl.style.visibility = 'hidden';
+        }
+
         //////////////////////////////////////////////////////////////////////////
         // Set the attribute link to open on an external browser window, so
         // it doesn't interfere with the configurator.
@@ -2698,6 +4225,30 @@ function iconKey(filename) {
         setTimeout(function() {
             $('.ol-attribution a').attr('target', '_blank');
         }, 100);
+        // "Add WP" tooltip overlay shown when hovering on a flight path line
+        const addWpTooltipEl = document.createElement('div');
+        addWpTooltipEl.className = 'add-wp-tooltip';
+        addWpTooltipEl.innerHTML = '<span style="font-size:1.1em;font-weight:bold;">＋</span> Add WP';
+        Object.assign(addWpTooltipEl.style, {
+            background: 'rgba(20,151,241,0.9)',
+            color: '#fff',
+            padding: '3px 8px',
+            borderRadius: '4px',
+            fontSize: '0.85em',
+            fontFamily: 'sans-serif',
+            whiteSpace: 'nowrap',
+            pointerEvents: 'none',
+            boxShadow: '0 1px 4px rgba(0,0,0,0.3)',
+            display: 'none',
+        });
+        const addWpOverlay = new Overlay({
+            element: addWpTooltipEl,
+            offset: [12, -12],
+            positioning: 'bottom-left',
+            stopEvent: false,
+        });
+        map.addOverlay(addWpOverlay);
+
         //////////////////////////////////////////////////////////////////////////
         // save map view settings when user moves it
         //////////////////////////////////////////////////////////////////////////
@@ -2706,6 +4257,7 @@ function iconKey(filename) {
                 center: toLonLat(map.getView().getCenter()),
                 zoom: map.getView().getZoom()
             });
+            scheduleMapCenterWeatherRefresh();
         });
         //////////////////////////////////////////////////////////////////////////
         // load map view settings on startup
@@ -2714,7 +4266,9 @@ function iconKey(filename) {
         if (missionPlannerLastValues && missionPlannerLastValues.zoom && missionPlannerLastValues.center) {
             map.getView().setCenter(fromLonLat(missionPlannerLastValues.center));
             map.getView().setZoom(missionPlannerLastValues.zoom);
-        }         
+        }
+
+        initializeMapLocation();
 
         //////////////////////////////////////////////////////////////////////////
         // Load previously saved GEO files from electron store
@@ -2812,7 +4366,17 @@ function iconKey(filename) {
                 function (feature, layer) {
                     return layer;
                 });
-            if (selectedFeature && tempMarker.kind == "waypoint") {
+            // Ignore features from layers without a kind (e.g. grid preview overlay)
+            if (selectedFeature && tempMarker && !tempMarker.kind) {
+                selectedFeature = null;
+                tempMarker = null;
+            }
+            // Clicking RTH/heading marker selects the parent waypoint
+            if ((tempMarker?.kind === 'rth' || tempMarker?.kind === 'heading') && tempMarker.parentLayerNumber >= 0) {
+                selectWaypointByLayerNumber(tempMarker.parentLayerNumber);
+                return;
+            }
+            if (selectedFeature && tempMarker?.kind == "waypoint") {
                 $("#editMission").hide();
                 selectedMarker = mission.getWaypoint(tempMarker.number);
 
@@ -2823,8 +4387,8 @@ function iconKey(filename) {
                     selectedFwApproachWp.setLandAltAsl(settings.fwLandAlt * 100);
                 }
 
-                var geometry = selectedFeature.getGeometry();
-                var coord = toLonLat(geometry.getCoordinates());
+                const geometry = selectedFeature.getGeometry();
+                const coord = toLonLat(geometry.getCoordinates());
 
                 selectedFeature.setStyle(getWaypointIcon(selectedMarker, true));
 
@@ -2836,7 +4400,7 @@ function iconKey(filename) {
                 changeSwitch($('#pointP3UserAction3'), missionControlTab.isBitSet(P3Value, MWNP.P3.USER_ACTION_3));
                 changeSwitch($('#pointP3UserAction4'), missionControlTab.isBitSet(P3Value, MWNP.P3.USER_ACTION_4));
 
-                var altitudeMeters = app.ConvertCentimetersToMeters(selectedMarker.getAlt());
+                const altitudeMeters = app.ConvertCentimetersToMeters(selectedMarker.getAlt());
 
                 if (selectedMarker.getAction() == MWNP.WPTYPE.LAND) {
                     $('#wpFwLanding').fadeIn(300);
@@ -3137,6 +4701,9 @@ function iconKey(filename) {
 
         $('#pointP1').on('change', function (event) {
             if (selectedMarker) {
+                if (selectedMarker.getAction() != MWNP.WPTYPE.SET_HEAD) {
+                    $('#pointP1').val(Math.abs(Number($('#pointP1').val())));
+                }
                 selectedMarker.setP1(Number($('#pointP1').val()));
                 mission.updateWaypoint(selectedMarker);
                 mission.update(singleMissionActive());
@@ -3146,6 +4713,9 @@ function iconKey(filename) {
 
         $('#pointP2').on('change', function (event) {
             if (selectedMarker) {
+                if (selectedMarker.getAction() == MWNP.WPTYPE.POSHOLD_TIME) {
+                    $('#pointP2').val(Math.abs(Number($('#pointP2').val())));
+                }
                 selectedMarker.setP2(Number($('#pointP2').val()));
                 mission.updateWaypoint(selectedMarker);
                 mission.update(singleMissionActive());
@@ -3905,13 +5475,121 @@ function iconKey(filename) {
             }
         });
 
+        function closeAddressSearchDialog() {
+            $('#addressSearchDialog, #addressSearchBackdrop').remove();
+        }
+
+        async function searchGoogleAddress(address, signal) {
+            if (!globalSettings.googleApiKey) {
+                return null;
+            }
+
+            const url = new URL('https://maps.googleapis.com/maps/api/geocode/json');
+            url.searchParams.set('address', address);
+            url.searchParams.set('key', globalSettings.googleApiKey);
+
+            try {
+                const data = await readAddressSearchResponse(await fetch(url, { signal }));
+                if (data.status !== 'OK' || !data.results?.length) {
+                    return null;
+                }
+
+                const result = data.results[0];
+                const lat = result.geometry?.location?.lat;
+                const lng = result.geometry?.location?.lng;
+                if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
+                    return null;
+                }
+
+                return {
+                    coord: fromLonLat([lng, lat]),
+                    description: result.formatted_address,
+                    source: 'Google',
+                };
+            } catch (error) {
+                if (error.name === 'AbortError') {
+                    throw error;
+                }
+                return null;
+            }
+        }
+
+        async function searchNominatimAddress(address, signal) {
+            const url = new URL('https://nominatim.openstreetmap.org/search');
+            url.searchParams.set('format', 'json');
+            url.searchParams.set('q', address);
+            url.searchParams.set('limit', '1');
+
+            const data = await readAddressSearchResponse(await fetch(url, { signal }));
+            if (!Array.isArray(data) || data.length === 0) {
+                return null;
+            }
+
+            const result = data[0];
+            const lat = Number.parseFloat(result.lat);
+            const lng = Number.parseFloat(result.lon);
+            if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
+                return null;
+            }
+
+            return {
+                coord: fromLonLat([lng, lat]),
+                description: result.display_name,
+                source: 'OpenStreetMap',
+            };
+        }
+
+        async function confirmAndCenterMap(result, signal) {
+            const confirmed = await dialog.confirm(
+                i18n.getMessage('addressSearchConfirmation', [result.description, result.source])
+            );
+            if (!confirmed || signal.aborted || !map?.getView()) {
+                return false;
+            }
+
+            map.getView().setCenter(result.coord);
+            return true;
+        }
+
+        async function runAddressSearch() {
+            const address = $('#addressInput').val().trim();
+            closeAddressSearchDialog();
+            if (!address) {
+                return;
+            }
+
+            addressSearchAbortController?.abort();
+            const requestController = new AbortController();
+            addressSearchAbortController = requestController;
+
+            try {
+                const googleResult = await searchGoogleAddress(address, requestController.signal);
+                const result = googleResult
+                    || await searchNominatimAddress(address, requestController.signal);
+                if (!result) {
+                    dialog.alert(i18n.getMessage('addressSearchNotFound'));
+                    return;
+                }
+
+                await confirmAndCenterMap(result, requestController.signal);
+            } catch (error) {
+                if (error.name !== 'AbortError') {
+                    console.error('Address search failed:', error.message);
+                    dialog.alert(i18n.getMessage('addressSearchFailed'));
+                }
+            } finally {
+                if (addressSearchAbortController === requestController) {
+                    addressSearchAbortController = null;
+                }
+            }
+        }
+
         // Address search button
-        $(document).on('click', '#searchAddressButton, #searchAddress', function (e) {
+        $('#searchAddress').off(missionControlLocationNamespace).on(`click${missionControlLocationNamespace}`, function (e) {
             e.preventDefault();
             e.stopPropagation();
 
-            // Remove any existing dialog
-            $('#addressSearchDialog, #addressSearchBackdrop').remove();
+            closeAddressSearchDialog();
 
             // Create dialog
             const addressDialog = $(`
@@ -3919,80 +5597,320 @@ function iconKey(filename) {
                      background: rgba(0,0,0,0.5); z-index: 10000;">
                     <div id="addressSearchDialog" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); 
                          background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.3);">
-                        <h3>Search for Location</h3>
+                        <h3></h3>
                         <input type="text" id="addressInput" style="width: 280px; padding: 8px 12px; margin: 10px 0; border: 1px solid #ccc; font-size: 14px;" 
-                               placeholder="Enter address, city, or coordinates" value="" autocomplete="off">
+                               value="" autocomplete="off">
                         <div style="margin-top: 15px; text-align: right;">
-                            <button id="searchCancel" style="padding: 8px 16px; margin-right: 10px;">Cancel</button>
-                            <button id="searchOK" style="padding: 8px 16px; background: #007cba; color: white; border: none;">Search</button>
+                            <button id="searchCancel" style="padding: 8px 16px; margin-right: 10px;"></button>
+                            <button id="searchOK" style="padding: 8px 16px; background: #007cba; color: white; border: none;"></button>
                         </div>
                     </div>
                 </div>
             `);
 
+            addressDialog.find('h3').text(i18n.getMessage('addressSearchTitle'));
+            addressDialog.find('#addressInput').attr('placeholder', i18n.getMessage('addressSearchPlaceholder'));
+            addressDialog.find('#searchCancel').text(i18n.getMessage('addressSearchCancel'));
+            addressDialog.find('#searchOK').text(i18n.getMessage('addressSearchSubmit'));
+
             $('body').append(addressDialog);
 
-          
-            // Search function
-            function doSearch() {
-                const address = $('#addressInput').val().trim();
-                $('#addressSearchBackdrop').remove();
-
-                if (address) {
-                    const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&limit=1`;
-                    
-                    fetch(url)
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data && data.length > 0) {
-                                const result = data[0];
-                                const coord = fromLonLat([parseFloat(result.lon), parseFloat(result.lat)]);
-                                map.getView().setCenter(coord);
-                                dialog.alert(`Found: ${result.display_name}`);
-                            } else {
-                                dialog.alert('Address not found.');
-                            }
-                        })
-                        .catch(err => {
-                            console.error('Search failed:', err);
-                            dialog.alert('Search failed. Check your connection.');
-                        });
-                }
-
-                setTimeout(() => {
-                    const input = document.getElementById('addressInput');
-                    input?.focus();
-                    input?.select();
-                }, 50);
-
-            }
-
             // Event handlers
-            $('#searchOK').click(doSearch);
-            $('#searchCancel').click(() => $('#addressSearchBackdrop').remove());
-            $('#addressInput').keypress(function(e) {
-                if (e.which === 13) doSearch();
-            });
-            
-            // Only close on backdrop click, not dialog content click
-            $('#addressSearchBackdrop').click(function(e) {
-                if (e.target === this) {
-                    $('#addressSearchBackdrop').remove();
+            $('#searchOK').on(`click${missionControlLocationNamespace}`, runAddressSearch);
+            $('#searchCancel').on(`click${missionControlLocationNamespace}`, closeAddressSearchDialog);
+            $('#addressInput').on(`keydown${missionControlLocationNamespace}`, function(e) {
+                if (e.key === 'Enter') {
+                    void runAddressSearch();
                 }
             });
-            
+
+            // Only close on backdrop click, not dialog content click
+            $('#addressSearchBackdrop').on(`click${missionControlLocationNamespace}`, function(e) {
+                if (e.target === this) {
+                    closeAddressSearchDialog();
+                }
+            });
+
             // Prevent clicks inside the dialog from closing it
-            $('#addressSearchDialog').click(function(e) {
+            $('#addressSearchDialog').on(`click${missionControlLocationNamespace}`, function(e) {
                 e.stopPropagation();
             });
+
+            const input = document.getElementById('addressInput');
+            input?.focus();
+            input?.select();
         });
 
-        $(document).on('click', '#centerOnDroneButton, #centerOnDrone', function (e) {
+        $('#centerOnDrone').off(missionControlLocationNamespace).on(`click${missionControlLocationNamespace}`, function (e) {
             e.preventDefault();
             e.stopPropagation();
-            if (lastGpsPos && map && map.getView()) {
-                map.getView().setCenter(lastGpsPos);
+            centerMapOnCurrentLocation();
+        });
+
+        $('#showHideConditionsButton').off(missionControlLocationNamespace).on(`click${missionControlLocationNamespace}`, function (e) {
+            e.preventDefault();
+            const $icon = $(this).children('a');
+            const showContent = $icon.hasClass('ic_show');
+            $icon.toggleClass('ic_show', !showContent).toggleClass('ic_hide', showContent);
+            $('#ConditionsContent').stop(true, true)[showContent ? 'fadeIn' : 'fadeOut'](300);
+        });
+
+        /////////////////////////////////////////////
+        // Grid Pattern survey mission generator
+        /////////////////////////////////////////////
+        $(document).on('click', '#gridPatternButton, #gridPattern', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            startGridPolygonDraw();
+        });
+
+        function startGridPolygonDraw() {
+            if (disableMarkerEdit) {
+                return;
             }
+
+            // Cancel any existing grid draw
+            cancelGridDraw();
+
+            // Show instruction banner
+            showGridBanner(i18n.getMessage('missionGridDrawPrompt'));
+
+            const drawSource = new VectorSource();
+            gridPreviewLayer = new VectorLayer({
+                source: drawSource,
+                style: new Style({
+                    stroke: new Stroke({ color: 'rgba(255, 140, 0, 0.8)', width: 2 }),
+                    fill: new Fill({ color: 'rgba(255, 140, 0, 0.15)' }),
+                }),
+            });
+            map.addLayer(gridPreviewLayer);
+
+            gridDrawInteraction = new Draw({
+                source: drawSource,
+                type: 'Polygon',
+            });
+
+            gridDrawInteraction.on('drawend', function (evt) {
+                const polygon = evt.feature.getGeometry();
+                map.removeInteraction(gridDrawInteraction);
+                gridDrawInteraction = null;
+                hideGridBanner();
+                showGridSettingsDialog(polygon);
+            });
+
+            map.addInteraction(gridDrawInteraction);
+
+            // Allow Escape to cancel
+            $(document).off('keydown.gridDraw').on('keydown.gridDraw', function (evt) {
+                if (evt.key === 'Escape') {
+                    cancelGridDraw();
+                }
+            });
+        }
+
+        function cancelGridDraw() {
+            $(document).off('keydown.gridDraw');
+            hideGridBanner();
+            if (gridDrawInteraction) {
+                map.removeInteraction(gridDrawInteraction);
+                gridDrawInteraction = null;
+            }
+            if (gridPreviewLayer) {
+                map.removeLayer(gridPreviewLayer);
+                gridPreviewLayer = null;
+            }
+        }
+
+        function showGridBanner(msg) {
+            hideGridBanner();
+            const banner = $('<div id="gridBanner" style="position:absolute;top:10px;left:50%;transform:translateX(-50%);' +
+                'background:rgba(255,140,0,0.9);color:#fff;padding:8px 20px;border-radius:6px;z-index:9999;' +
+                'font-weight:bold;pointer-events:none;white-space:nowrap;"></div>').text(msg);
+            $('#missionMap').css('position', 'relative').append(banner);
+        }
+
+        function hideGridBanner() {
+            $('#gridBanner').remove();
+        }
+
+        function showGridSettingsDialog(polygon) {
+            const coordsLonLat = polygon.getCoordinates()[0].map(c => toLonLat(c));
+
+            // Store polygon reference for the sidebar card
+            gridPolygonCoords = coordsLonLat;
+            gridPolygonGeom = polygon;
+
+            // Populate card fields
+            $('#gridAltitude').val(settings.alt / 100);
+            $('#gridSpeed').val(settings.speed ? settings.speed / 100 : 0);
+
+            // Show the sidebar card
+            $('#missionPlannerGridSettings').fadeIn(200);
+
+            // Run initial preview
+            updateGridPreview();
+        }
+
+        let gridPolygonCoords = null;
+        let gridPolygonGeom = null;
+
+        function getGridParams() {
+            const spacing = Number.parseFloat($('#gridSpacing').val());
+            return {
+                spacing: Number.isNaN(spacing) ? 100 : spacing,
+                altitude: (Number.parseFloat($('#gridAltitude').val()) || 50) * 100,
+                speed: (Number.parseFloat($('#gridSpeed').val()) || 0) * 100,
+                angle: Number.parseFloat($('#gridAngle').val()) || 0,
+                overshoot: Number.parseFloat($('#gridOvershoot').val()) || 0,
+            };
+        }
+
+        function updateGridPreview() {
+            if (!gridPolygonCoords || !gridPreviewLayer) return;
+
+            const params = getGridParams();
+            const waypoints = generateGridWaypoints(gridPolygonCoords, params);
+
+            gridPreviewLayer.getSource().clear();
+
+            if (waypoints.length < 2) {
+                $('#gridWaypointCount').text(i18n.getMessage('missionGridNoWaypoints')).css('color', '#c00');
+                return;
+            }
+
+            const maxWp = mission.getMaxWaypoints();
+            const totalCount = waypoints.length + ($('#gridEndRTH').is(':checked') ? 1 : 0);
+            const remaining = Math.max(0, maxWp - totalCount);
+            const countText = i18n.getMessage('missionGridWaypointCount', [totalCount, remaining]);
+            $('#gridWaypointCount').text(countText).css('color', totalCount > maxWp ? 'red' : '#666');
+
+            // Polygon outline
+            const polyFeature = new Feature({ geometry: gridPolygonGeom });
+            polyFeature.setStyle(new Style({
+                stroke: new Stroke({ color: 'rgba(255, 140, 0, 0.8)', width: 2 }),
+                fill: new Fill({ color: 'rgba(255, 140, 0, 0.1)' }),
+            }));
+            gridPreviewLayer.getSource().addFeature(polyFeature);
+
+            // Survey path line
+            const previewCoords = waypoints.map(wp => fromLonLat([wp.lon, wp.lat]));
+            const lineFeature = new Feature({ geometry: new LineString(previewCoords) });
+            lineFeature.setStyle(new Style({
+                stroke: new Stroke({ color: 'rgba(255, 140, 0, 0.8)', width: 2, lineDash: [8, 4] }),
+            }));
+            gridPreviewLayer.getSource().addFeature(lineFeature);
+
+            // Numbered dots
+            waypoints.forEach((wp, idx) => {
+                const dotFeature = new Feature({ geometry: new Point(fromLonLat([wp.lon, wp.lat])) });
+                dotFeature.setStyle(new Style({
+                    image: new RegularShape({
+                        fill: new Fill({ color: '#ff8c00' }),
+                        stroke: new Stroke({ color: '#fff', width: 1 }),
+                        points: 16,
+                        radius: 5,
+                    }),
+                    text: new Text({
+                        text: String(idx + 1),
+                        offsetY: -12,
+                        fill: new Fill({ color: '#ff8c00' }),
+                        font: 'bold 11px sans-serif',
+                    }),
+                }));
+                gridPreviewLayer.getSource().addFeature(dotFeature);
+            });
+        }
+
+        function hideGridCard() {
+            $('#missionPlannerGridSettings').fadeOut(200);
+            gridPolygonCoords = null;
+            gridPolygonGeom = null;
+        }
+
+        // Live preview when any grid input changes
+        $(document).on('change input', '#missionPlannerGridSettings input', function () {
+            updateGridPreview();
+        });
+
+        // Cancel button (X icon in titlebar)
+        $(document).on('click', '#gridCancel', function (e) {
+            e.preventDefault();
+            hideGridCard();
+            cancelGridDraw();
+        });
+
+        // Generate button
+        $(document).on('click', '#gridGenerate', function () {
+            if (disableMarkerEdit) {
+                return;
+            }
+
+            if (!gridPolygonCoords) return;
+
+            const params = getGridParams();
+            const waypoints = generateGridWaypoints(gridPolygonCoords, params);
+
+            if (waypoints.length === 0) {
+                dialog.alert(i18n.getMessage('missionGridNoWaypoints'));
+                return;
+            }
+
+            const totalCount = waypoints.length + ($('#gridEndRTH').is(':checked') ? 1 : 0);
+
+            if (totalCount > mission.getMaxWaypoints()) {
+                dialog.alert(i18n.getMessage('missionGridTooManyWaypoints', [totalCount, mission.getMaxWaypoints()]));
+                return;
+            }
+
+            // Clear existing waypoints before generating grid
+            removeAllWaypoints();
+
+            waypoints.forEach(function (wp) {
+                const tempWp = new Waypoint(
+                    mission.get().length,
+                    MWNP.WPTYPE.WAYPOINT,
+                    Math.round(wp.lat * 1e7),
+                    Math.round(wp.lon * 1e7),
+                    Number(params.altitude),
+                    Number(params.speed)
+                );
+
+                if (mission.get().length === 0) {
+                    tempWp.setMultiMissionIdx(multimissionCount === 0 ? 0 : multimissionCount - 1);
+                    FC.FW_APPROACH.clean(FC.SAFEHOMES.getMaxSafehomeCount() + tempWp.getMultiMissionIdx());
+                } else {
+                    tempWp.setMultiMissionIdx(mission.getWaypoint(mission.get().length - 1).getMultiMissionIdx());
+                }
+
+                mission.put(tempWp);
+            });
+
+            // Append RTH waypoint if checkbox is checked
+            if ($('#gridEndRTH').is(':checked')) {
+                const lastWp = waypoints.at(-1);
+                const rthWp = new Waypoint(
+                    mission.get().length,
+                    MWNP.WPTYPE.RTH,
+                    Math.round(lastWp.lat * 1e7),
+                    Math.round(lastWp.lon * 1e7),
+                    0,
+                    0
+                );
+                rthWp.setMultiMissionIdx(mission.getWaypoint(mission.get().length - 1).getMultiMissionIdx());
+                mission.put(rthWp);
+            }
+
+            mission.update(singleMissionActive());
+            refreshLayers();
+            plotElevation();
+            updateMultimissionState();
+            updateLocationButtonsVisibility();
+
+            hideGridCard();
+            cancelGridDraw();
+
+            // Auto-select first waypoint
+            selectWaypointByLayerNumber(0);
         });
 
         // Keyboard shortcuts (ignored when typing in inputs):
@@ -4001,88 +5919,255 @@ function iconKey(filename) {
         //  Ctrl+S -> save mission to file
         //  Ctrl+D -> delete all points
         //  Ctrl+A -> address search dialog
-        $(document).off('keydown.mcCenter').on('keydown.mcCenter', function (e) {
-            const key = (e.key || '').toLowerCase();
-            const target = e.target;
-            const isTyping = target && (
-                target.tagName === 'INPUT' ||
-                target.tagName === 'TEXTAREA' ||
-                target.isContentEditable ||
-                target.tagName === 'SELECT'
-            );
-            if (isTyping) return;
+        function handleWaypointNavigationShortcut(e, key) {
+            if (key !== 'arrowleft' && key !== 'arrowright') {
+                return false;
+            }
 
-            // Center on GPS fix (plain C or Ctrl+C)
+            e.preventDefault();
+
+            const waypointList = mission.get().filter(function (waypoint) {
+                return !waypoint.isAttached();
+            });
+            if (waypointList.length === 0) {
+                return true;
+            }
+
+            const currentLayerNum = selectedMarker ? selectedMarker.getLayerNumber() : -1;
+            let targetLayerNum;
+            if (key === 'arrowleft') {
+                targetLayerNum = currentLayerNum > 0 ? currentLayerNum - 1 : waypointList.length - 1;
+            } else {
+                targetLayerNum = currentLayerNum < waypointList.length - 1 ? currentLayerNum + 1 : 0;
+            }
+
+            selectWaypointByLayerNumber(targetLayerNum);
+            return true;
+        }
+
+        function handleMissionControlCtrlShortcut(e, key) {
+            if (e.repeat || !e.ctrlKey) {
+                return false;
+            }
+
+            const shortcutActions = {
+                l() { $('#loadFileMissionButton').trigger('click'); },
+                s() { $('#saveFileMissionButton').trigger('click'); },
+                d() { $('#removeAllPoints').trigger('click'); },
+                a() { $('#searchAddressButton').trigger('click'); },
+                g() {
+                    if (disableMarkerEdit) {
+                        return;
+                    }
+                    startGridPolygonDraw();
+                },
+            };
+
+            const shortcutAction = shortcutActions[key];
+            if (!shortcutAction) {
+                return false;
+            }
+
+            e.preventDefault();
+            shortcutAction();
+            return true;
+        }
+
+        function handleMissionControlDeleteShortcut(e, key) {
+            if (key !== 'delete' || !selectedMarker) {
+                return false;
+            }
+
+            e.preventDefault();
+            dialog.confirm(i18n.getMessage('confirm_delete_selected_point')).then((ok) => {
+                if (ok) {
+                    $('#removePoint').trigger('click');
+                }
+            });
+
+            return true;
+        }
+
+        function handleMissionControlKeydown(e) {
+            const key = (e.key || '').toLowerCase();
+            if (isMissionControlTypingTarget(e.target)) {
+                return;
+            }
+
             if (!e.repeat && key === 'c') {
-                if (lastGpsPos && map && map.getView()) {
-                    map.getView().setCenter(lastGpsPos);
+                centerMapOnCurrentLocation(true);
+            }
+
+            if (handleMissionControlCtrlShortcut(e, key)) {
+                return;
+            }
+
+            if (handleMissionControlDeleteShortcut(e, key)) {
+                return;
+            }
+
+            handleWaypointNavigationShortcut(e, key);
+        }
+
+        $(document).off('keydown.mcCenter').on('keydown.mcCenter', handleMissionControlKeydown);
+
+        // Programmatically select a waypoint by its layer number (0-based display index)
+        function selectWaypointByLayerNumber(layerNum) {
+            // Deselect current
+            if (selectedFeature && selectedMarker) {
+                try {
+                    selectedFeature.setStyle(getWaypointIcon(selectedMarker, false));
+                } catch (error) {
+                    console.debug('Ignoring stale waypoint feature during deselection', error);
                 }
             }
+            selectedMarker = null;
+            selectedFeature = null;
+            tempMarker = null;
 
-            // Ctrl+L: open mission from file
-            if (!e.repeat && e.ctrlKey && key === 'l') {
-                e.preventDefault();
-                $('#loadFileMissionButton').trigger('click');
+            // Find the marker layer with this layerNumber
+            const markerLayer = markers.find(function (m) { return m.layerNumber === layerNum; });
+            if (!markerLayer) {
+                clearEditForm();
+                return;
             }
 
-            // Ctrl+S: save mission to file
-            if (!e.repeat && e.ctrlKey && key === 's') {
-                e.preventDefault();
-                $('#saveFileMissionButton').trigger('click');
+            tempMarker = markerLayer;
+            selectedMarker = mission.getWaypoint(markerLayer.number);
+            selectedFeature = markerLayer.getSource().getFeatures()[0];
+
+            if (!selectedMarker || !selectedFeature) {
+                clearEditForm();
+                return;
             }
 
-            // Ctrl+D: delete all points
-            if (!e.repeat && e.ctrlKey && key === 'd') {
-                e.preventDefault();
-                $('#removeAllPoints').trigger('click');
+            selectedFwApproachWp = FC.FW_APPROACH.get()[FC.SAFEHOMES.getMaxSafehomeCount() + selectedMarker.getMultiMissionIdx()];
+
+            selectedFeature.setStyle(getWaypointIcon(selectedMarker, true));
+
+            const coord = toLonLat(selectedFeature.getGeometry().getCoordinates());
+            let P3Value = selectedMarker.getP3();
+
+            changeSwitch($('#pointP3Alt'), TABS.mission_control.isBitSet(P3Value, MWNP.P3.ALT_TYPE));
+            changeSwitch($('#pointP3UserAction1'), TABS.mission_control.isBitSet(P3Value, MWNP.P3.USER_ACTION_1));
+            changeSwitch($('#pointP3UserAction2'), TABS.mission_control.isBitSet(P3Value, MWNP.P3.USER_ACTION_2));
+            changeSwitch($('#pointP3UserAction3'), TABS.mission_control.isBitSet(P3Value, MWNP.P3.USER_ACTION_3));
+            changeSwitch($('#pointP3UserAction4'), TABS.mission_control.isBitSet(P3Value, MWNP.P3.USER_ACTION_4));
+
+            const altitudeMeters = selectedMarker.getAlt() / 100;
+
+            if (selectedMarker.getAction() == MWNP.WPTYPE.LAND) {
+                $('#wpFwLanding').fadeIn(300);
+            } else {
+                $('#wpFwLanding').fadeOut(300);
             }
 
-            // Ctrl+A: address search
-            if (!e.repeat && e.ctrlKey && key === 'a') {
-                e.preventDefault();
-                $('#searchAddressButton').trigger('click');
+            (async () => {
+                const elevationAtWP = await selectedMarker.getElevation(globalSettings);
+                $('#elevationValueAtWP').text(elevationAtWP);
+                const returnAltitude = checkAltElevSanity(false, selectedMarker.getAlt(), elevationAtWP, P3Value);
+                selectedMarker.setAlt(returnAltitude);
+                plotElevation();
+            })();
+
+            $('#elevationAtWP').fadeIn();
+            $('#groundClearanceAtWP').fadeIn();
+
+            $('#altitudeInMeters').text(` ${altitudeMeters}m`);
+            $('#pointLon').val(Math.round(coord[0] * 10000000) / 10000000);
+            $('#pointLat').val(Math.round(coord[1] * 10000000) / 10000000);
+            $('#pointAlt').val(selectedMarker.getAlt());
+            $('#pointType').val(selectedMarker.getAction());
+            $('#pointP1').val(selectedMarker.getP1());
+            $('#pointP2').val(selectedMarker.getP2());
+
+            for (const j in dictOfLabelParameterPoint[selectedMarker.getAction()]) {
+                const labelText = dictOfLabelParameterPoint[selectedMarker.getAction()][j];
+                const parameterSuffix = String(j).slice(-1);
+
+                if (labelText === '') {
+                    $('#pointP' + parameterSuffix + 'class').fadeOut(300);
+                    continue;
+                }
+
+                $('#pointP' + parameterSuffix + 'class').fadeIn(300);
+                $('label[for=pointP' + parameterSuffix + ']').html(labelText);
             }
-        });
+            selectedMarker = renderWaypointOptionsTable(selectedMarker);
+            $('#EditPointNumber').text("Edit point "+String(selectedMarker.getLayerNumber()+1));
+
+            // Stop any in-progress fadeOut from clearEditForm, then show card
+            const $card = $('#MPeditPoint');
+            $card.stop(true, true);
+            if ($card.is(':visible')) {
+                $card.css('opacity', 0.3).animate({ opacity: 1 }, 200);
+            } else {
+                $card.fadeIn(300);
+            }
+            $('#pointP3UserActionClass').fadeIn();
+            redrawLayer();
+        }
+
+        function selectPreviousWaypoint(prevLayerNum) {
+            if (prevLayerNum < 0 || mission.isEmpty()) {
+                return;
+            }
+
+            const waypointCount = mission.get().filter(function (waypoint) {
+                return !waypoint.isAttached();
+            }).length;
+
+            selectWaypointByLayerNumber(Math.min(prevLayerNum, waypointCount - 1));
+        }
+
+        function finalizeWaypointRemoval(prevLayerNum) {
+            mission.update(singleMissionActive());
+            clearEditForm();
+            refreshLayers();
+            plotElevation();
+            selectPreviousWaypoint(prevLayerNum);
+        }
+
+        function removeAttachedWaypoints(attachedWaypoints) {
+            attachedWaypoints.forEach(function (waypoint) {
+                if (waypoint.getAction() == MWNP.WPTYPE.LAND) {
+                    FC.FW_APPROACH.clean(waypoint.getNumber());
+                }
+
+                mission.dropWaypoint(waypoint);
+            });
+        }
 
         $('#removePoint').on('click', async function () {
-            if (selectedMarker) {
-                if (mission.isJumpTargetAttached(selectedMarker)) {
-                    dialog.alert(i18n.getMessage('MissionPlannerJumpTargetRemoval'));
-                }
-                else if (mission.getAttachedFromWaypoint(selectedMarker) && mission.getAttachedFromWaypoint(selectedMarker).length != 0) {
-                    if (await dialog.confirm(i18n.getMessage('confirm_delete_point_with_options'))) {
-                        mission.getAttachedFromWaypoint(selectedMarker).forEach(function (element) {
-
-                            if (element.getAction() == MWNP.WPTYPE.LAND) {
-                                FC.FW_APPROACH.clean(element.getNumber());
-                            }
-
-                            mission.dropWaypoint(element);
-                            mission.update(singleMissionActive());
-                        });
-                        mission.dropWaypoint(selectedMarker);
-                        selectedMarker = null;
-                        mission.update(singleMissionActive());
-                        clearEditForm();
-                        refreshLayers();
-                        plotElevation();
-                        updateLocationButtonsVisibility();
-                    }
-                }
-                else {
-                    mission.dropWaypoint(selectedMarker);
-                    if (selectedMarker.getAction() == MWNP.WPTYPE.LAND) {
-                        FC.FW_APPROACH.clean(selectedFwApproachWp.getNumber());
-                    }
-                    selectedMarker = null;
-                    mission.update(singleMissionActive());
-                    clearEditForm();
-                    refreshLayers();
-                    plotElevation();
-                }
-                updateMultimissionState();
-                updateLocationButtonsVisibility();
+            if (!selectedMarker) {
+                return;
             }
+
+            const prevLayerNum = selectedMarker.getLayerNumber() - 1;
+            const attachedWaypoints = mission.getAttachedFromWaypoint(selectedMarker) || [];
+
+            if (mission.isJumpTargetAttached(selectedMarker)) {
+                dialog.alert(i18n.getMessage('MissionPlannerJumpTargetRemoval'));
+            } else if (attachedWaypoints.length > 0) {
+                if (!(await dialog.confirm(i18n.getMessage('confirm_delete_point_with_options')))) {
+                    return;
+                }
+
+                removeAttachedWaypoints(attachedWaypoints);
+                mission.dropWaypoint(selectedMarker);
+                selectedMarker = null;
+                finalizeWaypointRemoval(prevLayerNum);
+            } else {
+                mission.dropWaypoint(selectedMarker);
+                if (selectedMarker.getAction() == MWNP.WPTYPE.LAND) {
+                    FC.FW_APPROACH.clean(selectedFwApproachWp.getNumber());
+                }
+                selectedMarker = null;
+                finalizeWaypointRemoval(prevLayerNum);
+            }
+
+            updateMultimissionState();
+            updateLocationButtonsVisibility();
         });
 
         /////////////////////////////////////////////
@@ -4880,9 +6965,14 @@ missionControlTab.setBit = function(bits, bit, value) {
 // }
 
 missionControlTab.cleanup = function (callback) {
+    cleanupMissionControlLocationResources();
     if (elevationChartInstance) {
         elevationChartInstance.destroy();
         elevationChartInstance = null;
+    }
+    if (mission3DViewer) {
+        mission3DViewer.destroy();
+        mission3DViewer = null;
     }
     if (callback) callback();
 };

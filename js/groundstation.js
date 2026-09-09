@@ -151,6 +151,10 @@ const groundstation = (function () {
 
         let telemetry = ltmDecoder.get();
 
+        const formatNumber = function (value, divisor, decimals, suffix) {
+            return Number.isFinite(value) ? (value / divisor).toFixed(decimals) + suffix : '-';
+        };
+
         if (telemetry.gpsFix && telemetry.gpsFix > 1) {
 
             let lat = telemetry.latitude / 10000000;
@@ -206,10 +210,10 @@ const groundstation = (function () {
             privateScope.$viewport.find("#gs-telemetry-longitude").html(lon);
         }
 
-        privateScope.$viewport.find("#gs-telemetry-altitude").html((telemetry.altitude / 100.0).toFixed(2) + 'm');
-        privateScope.$viewport.find("#gs-telemetry-voltage").html((telemetry.voltage / 1000.0).toFixed(2) + 'V');
-        privateScope.$viewport.find("#gs-telemetry-sats").html(telemetry.gpsSats);
-        privateScope.$viewport.find("#gs-telemetry-speed").html(telemetry.groundSpeed.toFixed(0) + 'm/s');
+        privateScope.$viewport.find("#gs-telemetry-altitude").html(formatNumber(telemetry.altitude, 100.0, 2, 'm'));
+        privateScope.$viewport.find("#gs-telemetry-voltage").html(formatNumber(telemetry.voltage, 1000.0, 2, 'V'));
+        privateScope.$viewport.find("#gs-telemetry-sats").html(Number.isFinite(telemetry.gpsSats) ? telemetry.gpsSats : '-');
+        privateScope.$viewport.find("#gs-telemetry-speed").html(formatNumber(telemetry.groundSpeed, 1, 0, 'm/s'));
 
         let fixText = '';
         if (telemetry.gpsFix == 3) {

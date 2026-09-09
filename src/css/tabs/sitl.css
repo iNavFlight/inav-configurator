@@ -36,6 +36,9 @@
     background-color: #ebe7e7;
 }
 
+.tab-sitl .eepromActionButton {
+    cursor: pointer
+}
 
 .sitlNumber {
     margin-left: 14px;
