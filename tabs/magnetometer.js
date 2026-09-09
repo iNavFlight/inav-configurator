@@ -1218,7 +1218,7 @@ magnetometerTab.initialize = function (callback) {
                     // #modal-acc-align-done also shows a "Compass alignment set to" line, which
                     // accAutoAlignCompass() normally fills in -- fill it in here too since that
                     // step never runs on this path, so it isn't left blank.
-                    $("#modal-compass-align-setting").text("N/A (no magnetometer detected)");
+                    $("#modal-compass-align-setting").text(i18n.getMessage("accAlignNoMagDetected"));
                     next_step = $('#modal-acc-align-done');
                 }
                 modal = new jBox('Modal', {

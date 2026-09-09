@@ -19,10 +19,7 @@
 <div id="modal-acc-align-start" class="is-hidden">
     <div class="modal__content">
         <h1 class="modal__title" data-i18n="accAlignTitle"></h1>
-        <div class="modal__text">Place the aircraft flat on the table, facing roughly north (+/- 20°).<br />
-        For best results, try to put it as far from the computer screen as you can.
-        Click OK after the aircraft is flat and pointing north.
-        </div>
+        <div class="modal__text" data-i18n="accAlignStartText"></div>
     </div>
     <div class="modal__buttons">
         <a id="modal-acc-align-2" class="modal__button modal__button--main" data-i18n="OK"></a>
@@ -33,8 +30,7 @@
 <div id="modal-acc-align-45" class="is-hidden">
     <div class="modal__content">
         <h1 class="modal__title" data-i18n="accAlignTitle"></h1>
-        <div class="modal__text">Please tilt the aircraft to about 45 degrees nose up. Then click the OK button while the aircraft
-        is pitched nose up.<img src="../images/acc-align-60.png"></div>
+        <div class="modal__text"><span data-i18n="accAlign45Text"></span><img src="../images/acc-align-60.png"></div>
     </div>
     <div class="modal__buttons">
         <a id="modal-acc-align-3" class="modal__button modal__button--main" data-i18n="OK"></a>
@@ -45,7 +41,7 @@
 <div id="modal-acc-align-east" class="is-hidden">
     <div class="modal__content">
         <h1 class="modal__title" data-i18n="accAlignTitle"></h1>
-        <div class="modal__text">Place the aircraft flat and pointing roughly <em>east</em>, then click OK.</div>
+        <div class="modal__text" data-i18n="accAlignEastText"></div>
     </div>
     <div class="modal__buttons">
         <a id="modal-acc-align-4" class="modal__button modal__button--main" data-i18n="OK"></a>
@@ -56,9 +52,8 @@
     <div class="modal__content">
         <h1 class="modal__title" data-i18n="accAlignFinished"></h1>
         <div class="modal__text">
-            <div data-i18n="accAlignFinished">accAlignFinished></div>
-            Board alignment set to <span id="modal-acc-align-setting"></span><br />
-            Compass alignment set to <span id="modal-compass-align-setting"></span>
+            <span data-i18n="accAlignDoneBoardLabel"></span> <span id="modal-acc-align-setting"></span><br />
+            <span data-i18n="accAlignDoneCompassLabel"></span> <span id="modal-compass-align-setting"></span>
         </div>
     </div>
     <div class="modal__buttons">
@@ -70,16 +65,12 @@
     <div class="modal__content">
         <h1 class="modal__title" data-i18n="accAlignFinished"></h1>
         <div class="modal__text">
-            Board alignment set to <span id="modal-board-align-setting"></span>.<br /><br />
-            Click <b>Save</b> to save this and reboot. After reboot, go to the
-            <b>Calibration</b> tab and click <b>Calibrate Magnetometer</b> to remove
-            hard/soft-iron interference (this does not set the compass orientation).<br /><br />
-            Once the compass is calibrated, use the manual compass alignment wizard below
-            to determine its orientation.
+            <span data-i18n="accAlignDoneBoardLabel"></span> <span id="modal-board-align-setting"></span>.<br /><br />
+            <span data-i18n="boardAlignDoneInstructions"></span>
         </div>
     </div>
     <div class="modal__buttons">
-        <a id="modal-board-align-fallback" class="modal__button" href="#">Manual compass wizard</a>
+        <a id="modal-board-align-fallback" class="modal__button" href="#" data-i18n="manualCompassWizardButton"></a>
         <a id="modal-board-align-save" class="save modal__button modal__button--main" href="#" data-i18n="configurationButtonSave"></a>
     </div>
 </div>
@@ -87,11 +78,7 @@
 <div id="modal-acc-align-calibration-error" class="is-hidden">
     <div class="modal__content">
         <h1 class="modal__title" data-i18n="accAlignTitle"></h1>
-        <div class="modal__text">
-            <div data-i18n="accAlignCalibrationError">Wrong Planet</div>
-            Accelerometer is not correctly calibrated for the current planet.
-            Please use the calibration tab to calibrate for the local gravity.
-        </div>
+        <div class="modal__text" data-i18n="accAlignCalibrationError"></div>
     </div>
     <div class="modal__buttons">
         <!-- <a class="save" href="#" data-i18n="configurationButtonSave"></a> -->
@@ -102,13 +89,7 @@
 <div id="modal-acc-align-vertical-error" class="is-hidden">
     <div class="modal__content">
         <h1 class="modal__title" data-i18n="accAlignTitle"></h1>
-        <div class="modal__text">
-            <div data-i18n="accAlignVerticalError">Readings did not match a supported mount</div>
-            This can happen if the flight controller is mounted on its edge (sensor pointing
-            sideways rather than up or down), if the board moved between the two readings, or if
-            the nose wasn't raised close enough to 45 degrees. Please use a flat or upside-down
-            mount and try again, or set the board alignment manually.
-        </div>
+        <div class="modal__text" data-i18n="accAlignVerticalError"></div>
     </div>
     <div class="modal__buttons">
         <a id="modal-acc-align-vertical-error-ok" class="modal__button modal__button--main" data-i18n="OK"></a>
@@ -118,11 +99,7 @@
 <div id="modal-acc-align-mag-uncalibrated-error" class="is-hidden">
     <div class="modal__content">
         <h1 class="modal__title" data-i18n="accAlignTitle"></h1>
-        <div class="modal__text">
-            <div data-i18n="accAlignMagUncalibratedError">Compass not calibrated</div>
-            The compass must be calibrated before its alignment can be determined. Please go to the
-            <b>Calibration</b> tab and click <b>Calibrate Magnetometer</b>, then re-run this wizard.
-        </div>
+        <div class="modal__text" data-i18n="accAlignMagUncalibratedError"></div>
     </div>
     <div class="modal__buttons">
         <a id="modal-acc-align-mag-uncalibrated-error-ok" class="modal__button modal__button--main" data-i18n="OK"></a>
@@ -132,11 +109,7 @@
 <div id="modal-acc-align-tilt-error" class="is-hidden">
     <div class="modal__content">
         <h1 class="modal__title" data-i18n="accAlignTitle"></h1>
-        <div class="modal__text">
-            <div data-i18n="accAlignTiltError">Nose was not raised enough</div>
-            The second reading looks too similar to the first. Please make sure the nose is
-            raised by about 45 degrees, then try again.
-        </div>
+        <div class="modal__text" data-i18n="accAlignTiltError"></div>
     </div>
     <div class="modal__buttons">
         <a id="modal-acc-align-tilt-error-ok" class="modal__button modal__button--main" data-i18n="OK"></a>

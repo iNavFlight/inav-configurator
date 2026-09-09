@@ -7474,5 +7474,41 @@
     },
     "autoAlignWizardButton": {
         "message": "Launch Wizard"
+    },
+    "accAlignStartText": {
+        "message": "Place the aircraft flat on the table, facing roughly north (+/- 20°).<br />For best results, try to put it as far from the computer screen as you can. Click OK after the aircraft is flat and pointing north."
+    },
+    "accAlign45Text": {
+        "message": "Please tilt the aircraft to about 45 degrees nose up. Then click the OK button while the aircraft is pitched nose up."
+    },
+    "accAlignEastText": {
+        "message": "Place the aircraft flat and pointing roughly <em>east</em>, then click OK."
+    },
+    "accAlignDoneBoardLabel": {
+        "message": "Board alignment set to"
+    },
+    "accAlignDoneCompassLabel": {
+        "message": "Compass alignment set to"
+    },
+    "boardAlignDoneInstructions": {
+        "message": "Click <b>Save</b> to save this and reboot. After reboot, go to the <b>Calibration</b> tab and click <b>Calibrate Magnetometer</b> to remove hard/soft-iron interference (this does not set the compass orientation).<br /><br />Once the compass is calibrated, use the manual compass alignment wizard below to determine its orientation."
+    },
+    "manualCompassWizardButton": {
+        "message": "Manual compass wizard"
+    },
+    "accAlignCalibrationError": {
+        "message": "Accelerometer is not correctly calibrated for the current planet. Please use the calibration tab to calibrate for the local gravity."
+    },
+    "accAlignVerticalError": {
+        "message": "Readings did not match a supported mount. This can happen if the flight controller is mounted on its edge (sensor pointing sideways rather than up or down), if the board moved between the two readings, or if the nose wasn't raised close enough to 45 degrees. Please use a flat or upside-down mount and try again, or set the board alignment manually."
+    },
+    "accAlignMagUncalibratedError": {
+        "message": "The compass must be calibrated before its alignment can be determined. Please go to the <b>Calibration</b> tab and click <b>Calibrate Magnetometer</b>, then re-run this wizard."
+    },
+    "accAlignTiltError": {
+        "message": "The second reading looks too similar to the first. Please make sure the nose is raised by about 45 degrees, then try again."
+    },
+    "accAlignNoMagDetected": {
+        "message": "N/A (no magnetometer detected)"
     }
 }
