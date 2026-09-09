@@ -807,6 +807,23 @@ magnetometerTab.initialize = function (callback) {
         return best;
     }
 
+    /**
+     * Fold the one redundant corner of findBestBoardAlignment's search grid.
+     * Rx(180)*Ry(180) == Rz(180) (two perpendicular 180-degree flips compose
+     * into a 180-degree flip about the third axis), so every (180, 180, yaw)
+     * is exactly the same physical rotation as (0, 0, yaw+180) -- not an
+     * approximation, bit-for-bit the same matrix. That's the only duplicate
+     * in the grid (32 combos represent the cube's 24 distinct orientations;
+     * the 8 extras are exactly this corner's 8 yaw values), so there's
+     * nothing else to simplify.
+     */
+    function simplifyBoardAlignment({ roll, pitch, yaw }) {
+        if (roll === 180 && pitch === 180) {
+            return { roll: 0, pitch: 0, yaw: (yaw + 180) % 360 };
+        }
+        return { roll, pitch, yaw };
+    }
+
     function getMagHeading() {
         // Get magnetometer data from MSP
         // NOTE: This data has BOTH compass alignment AND board alignment applied by firmware
@@ -1053,9 +1070,10 @@ magnetometerTab.initialize = function (callback) {
             return false;
         }
 
-        let newPitch = bestAlignment.pitch;
-        let newRoll  = bestAlignment.roll;
-        let newYaw   = bestAlignment.yaw;
+        const simplified = simplifyBoardAlignment(bestAlignment);
+        let newPitch = simplified.pitch;
+        let newRoll  = simplified.roll;
+        let newYaw   = simplified.yaw;
 
         self.acc_flat_xyz = [newPitch, newRoll, newYaw];
 
