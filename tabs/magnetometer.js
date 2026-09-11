@@ -767,6 +767,13 @@ magnetometerTab.initialize = function (callback) {
         return (a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2 + (a[2] - b[2]) ** 2;
     }
 
+    // The 16 mounts BOARD_ALIGNMENT's wizard supports: 8 right-side-up and
+    // 8 upside-down (roll 0 or 180, pitch always 0), yaw in 45-degree steps.
+    // Matches the firmware's own candidate table in compass_orientation.c.
+    const BOARD_ALIGNMENT_CANDIDATES = [0, 180].flatMap((roll) =>
+        [0, 45, 90, 135, 180, 225, 270, 315].map((yaw) => ({ roll, pitch: 0, yaw }))
+    );
+
     /**
      * Find the BOARD_ALIGNMENT (roll, pitch, yaw) that best explains two
      * measured raw-sensor-frame vectors (rawFlat, rawTilt), given the known
@@ -781,47 +788,25 @@ magnetometerTab.initialize = function (callback) {
      * ambiguous right where this wizard needs precision: asin(sin(180°)) and
      * asin(sin(0°)) are both 0, so a naive extraction silently confuses
      * pitch=180 with pitch=0+180 of roll/yaw), this does a direct search over
-     * the finite set of mounts BOARD_ALIGNMENT's wizard actually supports
-     * (roll/pitch flat-or-upside-down, yaw in 45 degree steps) and picks
-     * whichever one best predicts both measured vectors. Verified by
-     * round-tripping known mounts through buildRotationMatrix with zero error.
+     * BOARD_ALIGNMENT_CANDIDATES and picks whichever one best predicts both
+     * measured vectors. Verified by round-tripping known mounts through
+     * buildRotationMatrix with zero error.
      */
     function findBestBoardAlignment(refFlat, refTilt, rawFlat, rawTilt) {
         const nFlat = vecNormalize(rawFlat);
         const nTilt = vecNormalize(rawTilt);
 
         let best = null;
-        for (const roll of [0, 180]) {
-            for (const pitch of [0, 180]) {
-                for (let yaw = 0; yaw < 360; yaw += 45) {
-                    const R = buildRotationMatrix(roll, pitch, yaw);
-                    const predFlat = applyRotation(R, refFlat);
-                    const predTilt = applyRotation(R, refTilt);
-                    const err = vecSquaredDistance(predFlat, nFlat) + vecSquaredDistance(predTilt, nTilt);
-                    if (!best || err < best.err) {
-                        best = { roll, pitch, yaw, err };
-                    }
-                }
+        for (const { roll, pitch, yaw } of BOARD_ALIGNMENT_CANDIDATES) {
+            const R = buildRotationMatrix(roll, pitch, yaw);
+            const predFlat = applyRotation(R, refFlat);
+            const predTilt = applyRotation(R, refTilt);
+            const err = vecSquaredDistance(predFlat, nFlat) + vecSquaredDistance(predTilt, nTilt);
+            if (!best || err < best.err) {
+                best = { roll, pitch, yaw, err };
             }
         }
         return best;
-    }
-
-    /**
-     * Fold the one redundant corner of findBestBoardAlignment's search grid.
-     * Rx(180)*Ry(180) == Rz(180) (two perpendicular 180-degree flips compose
-     * into a 180-degree flip about the third axis), so every (180, 180, yaw)
-     * is exactly the same physical rotation as (0, 0, yaw+180) -- not an
-     * approximation, bit-for-bit the same matrix. That's the only duplicate
-     * in the grid (32 combos represent the cube's 24 distinct orientations;
-     * the 8 extras are exactly this corner's 8 yaw values), so there's
-     * nothing else to simplify.
-     */
-    function simplifyBoardAlignment({ roll, pitch, yaw }) {
-        if (roll === 180 && pitch === 180) {
-            return { roll: 0, pitch: 0, yaw: (yaw + 180) % 360 };
-        }
-        return { roll, pitch, yaw };
     }
 
     function getMagHeading() {
@@ -1070,10 +1055,9 @@ magnetometerTab.initialize = function (callback) {
             return false;
         }
 
-        const simplified = simplifyBoardAlignment(bestAlignment);
-        let newPitch = simplified.pitch;
-        let newRoll  = simplified.roll;
-        let newYaw   = simplified.yaw;
+        let newPitch = bestAlignment.pitch;
+        let newRoll  = bestAlignment.roll;
+        let newYaw   = bestAlignment.yaw;
 
         self.acc_flat_xyz = [newPitch, newRoll, newYaw];
 
