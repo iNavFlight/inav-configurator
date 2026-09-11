@@ -1114,7 +1114,7 @@ magnetometerTab.initialize = function (callback) {
 
 
         var rollCurrent90 = Math.round(self.mag_saved_roll / 90) * 90;
-        updateRollAxis( (rollCurrent90 - roll_correction_needed) % 360 );
+        updateRollAxis( (rollCurrent90 - roll_correction_needed + 360) % 360 );
 
         updateYawAxis( (self.mag_saved_yaw + yaw_correction_needed) % 360 );
         updatePitchAxis(self.mag_saved_pitch);
