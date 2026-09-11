@@ -7491,7 +7491,7 @@
         "message": "Compass alignment set to"
     },
     "boardAlignDoneInstructions": {
-        "message": "Click <b>Save</b> to save this and reboot. After reboot, go to the <b>Calibration</b> tab and click <b>Calibrate Magnetometer</b> to remove hard/soft-iron interference (this does not set the compass orientation).<br /><br />Once the compass is calibrated, use the manual compass alignment wizard below to determine its orientation."
+        "message": "Click <b>Save</b> to save this and reboot. After reboot, go to the <b>Calibration</b> tab and click <b>Calibrate Magnetometer</b>. On this board, INAV will also try to automatically detect the compass's mounting orientation during that calibration spin -- rotate the aircraft through as many orientations as you can for the best chance of success.<br /><br />If it can't determine the orientation with confidence, or you'd rather set it manually, use the compass wizard below."
     },
     "manualCompassWizardButton": {
         "message": "Manual compass wizard"
