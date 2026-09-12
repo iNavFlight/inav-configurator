@@ -79,7 +79,14 @@ onboardLoggingTab.initialize = function (callback) {
     }
 
     function load_html() {
-        import('./onboard_logging.html?raw').then(({default: html}) => GUI.load(html, Settings.processHtml(function() {
+        import('./onboard_logging.html?raw').then(({default: html}) => GUI.load(html, Settings.processHtml(async function(settingsPromise) {
+            // Wait for the settings to finish loading before the save handler is
+            // bound, so a quick save cannot race the background MSP reads and
+            // either overwrite the user's choice or drop it from the save.
+            if (settingsPromise) {
+                await settingsPromise;
+            }
+
             // translate to user-selected language
            i18n.localize();;
 
