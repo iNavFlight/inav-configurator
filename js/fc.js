@@ -899,6 +899,11 @@ var FC = {
         return !(this.CALIBRATION_DATA.magGain.X === 1024 && this.CALIBRATION_DATA.magGain.Y === 1024 && this.CALIBRATION_DATA.magGain.Z === 1024 &&
                  this.CALIBRATION_DATA.magZero.X === 0 && this.CALIBRATION_DATA.magZero.Y === 0 && this.CALIBRATION_DATA.magZero.Z === 0);
     },
+    hasCalibrationOrientationDetection: function () {
+        // MSP_BOARD_INFO capabilities bit 2: set iff the firmware auto-detects the
+        // compass's mounting orientation as part of MSP_MAG_CALIBRATION.
+        return !!(this.CONFIG.capabilities & (1 << 2));
+    },
     getUserControlMode: function () {
         return [
             "Attitude",

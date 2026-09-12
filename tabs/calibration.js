@@ -56,7 +56,8 @@ calibrationTab.initialize = function (callback) {
         saveChainer = new MSPChainerClass(),
         modalStart,
         modalStop,
-        modalProcessing;
+        modalProcessing,
+        modalMagAlign;
 
     if (GUI.active_tab !== this) {
         GUI.active_tab = this;
@@ -116,6 +117,57 @@ calibrationTab.initialize = function (callback) {
         });
         $('[name=OpflowScale]').val(FC.CALIBRATION_DATA.opflow.Scale);
         updateCalibrationSteps();
+    }
+
+    // Reads the settings the firmware's compass-orientation auto-detect (run as
+    // part of MSP_MAG_CALIBRATION on capable boards, see hasCalibrationOrientationDetection)
+    // writes on success. Detection is confidence-gated and simply leaves these
+    // untouched on failure, so the caller must diff against a before/after snapshot
+    // to tell "detected" from "not confident enough".
+    function getMagAlignmentSettings() {
+        return Promise.all([
+            mspHelper.getSetting("align_mag_roll"),
+            mspHelper.getSetting("align_mag_pitch"),
+            mspHelper.getSetting("align_mag_yaw"),
+            mspHelper.getSetting("align_mag"),
+        ]);
+    }
+
+    function magAlignmentSettingsEqual(a, b) {
+        return a.every(function (setting, i) { return setting.value === b[i].value; });
+    }
+
+    function formatMagAlignment(alignment) {
+        var roll = alignment[0].value / 10;
+        var pitch = alignment[1].value / 10;
+        var yaw = alignment[2].value / 10;
+
+        if (roll === 0 && pitch === 0 && yaw === 0) {
+            var alignSetting = alignment[3];
+            var names = (alignSetting.setting.table && alignSetting.setting.table.values) || [];
+            return names[alignSetting.value] || alignSetting.value;
+        }
+        return roll + ", " + pitch + ", " + yaw;
+    }
+
+    function reportMagCalibrationOrientation(beforePromise) {
+        Promise.all([beforePromise, getMagAlignmentSettings()]).then(function (result) {
+            var before = result[0], after = result[1];
+            var content;
+            if (magAlignmentSettingsEqual(before, after)) {
+                content = $('#modal-mag-align-not-detected');
+            } else {
+                $('#modal-mag-align-setting').text(formatMagAlignment(after));
+                content = $('#modal-mag-align-done');
+            }
+            modalMagAlign = new jBox('Modal', {
+                width: 460,
+                height: 200,
+                animation: false,
+                closeOnClick: true,
+                content: content
+            }).open();
+        });
     }
 
     function checkFinishAccCalibrate() {
@@ -237,6 +289,10 @@ calibrationTab.initialize = function (callback) {
         }
 
         $('#mag_btn').on('click', function () {
+            // Snapshot before the spin so we can tell whether the firmware's
+            // auto-detect actually changed anything (see reportMagCalibrationOrientation).
+            var magAlignBefore = FC.hasCalibrationOrientationDetection() ? getMagAlignmentSettings() : null;
+
             MSP.send_message(MSPCodes.MSP_MAG_CALIBRATION, false, false, function () {
                 GUI.log(i18n.getMessage('initialSetupMagCalibStarted'));
             });
@@ -263,13 +319,17 @@ calibrationTab.initialize = function (callback) {
 
                         modalProcessing.close();
                         GUI.log(i18n.getMessage('initialSetupMagCalibEnded'));
-                        
+
                         MSP.send_message(MSPCodes.MSP_CALIBRATION_DATA, false, false, updateSensorData);
                         interval.remove('compass_calibration_interval');
 
                         //Cleanup
                        //delete modalProcessing;
                         $('.jBox-wrapper').remove();
+
+                        if (magAlignBefore) {
+                            reportMagCalibrationOrientation(magAlignBefore);
+                        }
                     }, 1000);
                 } else {
                     modalProcessing.content.find('.modal-compass-countdown').text(countdown);
@@ -318,6 +378,12 @@ calibrationTab.initialize = function (callback) {
 
         $('#modal-stop-button').on('click', function () {
             modalStop.close();
+        });
+
+        $('#modal-mag-align-done-ok, #modal-mag-align-not-detected-ok').on('click', function () {
+            if (modalMagAlign) {
+                modalMagAlign.close();
+            }
         });
 
         // translate to user-selected language

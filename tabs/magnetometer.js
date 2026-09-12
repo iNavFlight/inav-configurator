@@ -1133,9 +1133,7 @@ magnetometerTab.initialize = function (callback) {
     }
 
     function isRamConstrainedTarget() {
-        // MSP_BOARD_INFO capabilities bit 2: 1 iff the board has enough RAM for the
-        // combined board/compass alignment wizard flow.
-        return !(FC.CONFIG.capabilities & (1 << 2));
+        return !FC.hasCalibrationOrientationDetection();
     }
 
     function accAutoAlignButton(event) {
@@ -1214,6 +1212,15 @@ magnetometerTab.initialize = function (callback) {
                 }).open();
             } else {
                 $("#modal-board-align-setting").text($("#modal-acc-align-setting").text());
+
+                // No mag: there's no compass step to do after this, unlike the RAM-constrained
+                // branch above which special-cases this by skipping straight to "done".
+                const hasMag = BitHelper.bit_check(FC.CONFIG.activeSensors, 2);
+                $("#modal-board-align-instructions").html(
+                    i18n.getMessage(hasMag ? "boardAlignDoneInstructions" : "boardAlignDoneNoMagInstructions")
+                );
+                $("#modal-board-align-fallback").toggle(hasMag);
+
                 modal = new jBox('Modal', {
                     width: 460,
                     height: 420,

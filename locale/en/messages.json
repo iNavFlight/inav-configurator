@@ -7493,6 +7493,9 @@
     "boardAlignDoneInstructions": {
         "message": "Click <b>Save</b> to save this and reboot. After reboot, go to the <b>Calibration</b> tab and click <b>Calibrate Magnetometer</b>. On this board, INAV will also try to automatically detect the compass's mounting orientation during that calibration spin -- rotate the aircraft through as many orientations as you can for the best chance of success.<br /><br />If it can't determine the orientation with confidence, or you'd rather set it manually, use the compass wizard below."
     },
+    "boardAlignDoneNoMagInstructions": {
+        "message": "Click <b>Save</b> to save this and reboot. No magnetometer was detected on this board, so there's no compass calibration or alignment to do."
+    },
     "manualCompassWizardButton": {
         "message": "Manual compass wizard"
     },
@@ -7510,5 +7513,11 @@
     },
     "accAlignNoMagDetected": {
         "message": "N/A (no magnetometer detected)"
+    },
+    "magCalibOrientationTitle": {
+        "message": "Compass orientation <span style=\"color: #37a8db\">detected</span>"
+    },
+    "magCalibOrientationNotDetected": {
+        "message": "INAV could not determine the compass's mounting orientation with confidence during that calibration spin. Use the auto alignment wizard on the <b>Alignment</b> tab to set it manually."
     }
 }
