@@ -1674,10 +1674,16 @@
         "message": "Spektrum Smart ESC (SRXL2)"
     },
     "srxl2Info": {
-        "message": "The ESC signal wire goes to the TX pin of the port assigned to Spektrum Smart ESC, not to a motor pad, and carries telemetry back on the same wire. One ESC per port, so this suits single-motor models."
+        "message": "The ESC signal wire goes to the TX pin of a port assigned to Spektrum Smart ESC, not to a motor pad, and carries telemetry back on the same wire. One ESC per port: a model with several motors needs a port each, assigned in motor order, so motor 1 is the lowest-numbered port."
     },
     "srxl2NoPort": {
         "message": "No port is assigned to Spektrum Smart ESC. Assign one in the Ports tab, or the motor will not be driven at all - this protocol has no fallback to PWM, because the pin is not a timer output."
+    },
+    "srxl2TooFewPorts": {
+        "message": "This model has $1 motors but only $2 port(s) assigned to Spektrum Smart ESC. One ESC needs one port, so assign one per motor in the Ports tab. The board will refuse to arm until they match."
+    },
+    "srxl2PortCount": {
+        "message": "Ports assigned to Spektrum Smart ESC: $1. Motor 1 uses the lowest-numbered of them."
     },
     "srxl2Telemetry": {
         "message": "Read telemetry from the ESC"

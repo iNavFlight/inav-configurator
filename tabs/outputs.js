@@ -141,16 +141,20 @@ outputsTab.initialize = function (callback) {
 
         let srxl2PollTimer = null;
 
-        function srxl2PortAssigned() {
+        /* One ESC per port, so this is also the number of motors that can be
+         * driven. Counted rather than tested for presence, because a twin with one
+         * port assigned is a different problem from one with none. */
+        function srxl2PortCount() {
             if (!FC.SERIAL_CONFIG || !FC.SERIAL_CONFIG.ports) {
-                return false;
+                return 0;
             }
+            let n = 0;
             for (const port of FC.SERIAL_CONFIG.ports) {
                 if (serialPortHelper.maskToFunctions(port.functionMask).indexOf('ESC_SRXL2') >= 0) {
-                    return true;
+                    n++;
                 }
             }
-            return false;
+            return n;
         }
 
         function srxl2CalStop() {
@@ -188,8 +192,22 @@ outputsTab.initialize = function (callback) {
         function srxl2UpdateVisibility() {
             const isSrxl2 = parseInt(FC.ADVANCED_CONFIG.motorPwmProtocol, 10) === SRXL2_PROTOCOL;
             $('#srxl2-esc').toggle(isSrxl2);
-            $('#srxl2-no-port').toggle(isSrxl2 && !srxl2PortAssigned());
-            if (!isSrxl2) {
+
+            if (isSrxl2) {
+                const ports = srxl2PortCount();
+                const motors = (FC.MIXER_CONFIG && FC.MIXER_CONFIG.numberOfMotors) || 0;
+                const $warn = $('#srxl2-no-port');
+
+                if (ports === 0) {
+                    $warn.html(i18n.getMessage('srxl2NoPort')).show();
+                } else if (motors > 0 && ports < motors) {
+                    $warn.html(i18n.getMessage('srxl2TooFewPorts', [motors, ports])).show();
+                } else {
+                    $warn.hide();
+                }
+
+                $('#srxl2-port-count').html(i18n.getMessage('srxl2PortCount', [ports]));
+            } else {
                 srxl2CalStop();
             }
         }
