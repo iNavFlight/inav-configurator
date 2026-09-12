@@ -5817,6 +5817,9 @@
     "BLACKBOX_FEATURE_GYRO_RAW": {
         "message": "Gyro RAW (no filtering)"
     },
+    "BLACKBOX_FEATURE_GYRO_SECONDARY": {
+        "message": "Gyro RAW secondary IMU (dual-gyro boards)"
+    },
     "BLACKBOX_FEATURE_GYRO_PEAKS_ROLL": {
         "message": "Gyro Noise peak freq. Roll"
     },
