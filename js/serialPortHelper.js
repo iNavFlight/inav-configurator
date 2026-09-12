@@ -95,12 +95,16 @@ const serialPortHelper = (function () {
              * half duplex, rather than to a motor pad, and the baud rate is
              * negotiated during the handshake rather than configured here.
              *
+             * Deliberately not isUnique: the protocol carries one ESC per bus, so a
+             * model with N motors needs N ports, assigned in motor order - motor 1
+             * is the lowest-numbered port. The firmware refuses to arm if there are
+             * fewer ports than motors.
+             *
              * requiresSetting names a setting that only exists when the firmware
              * was built with this support, so the function is not offered on a
              * board that would refuse it. */
             name: 'ESC_SRXL2',
             groups: ['peripherals'],
-            isUnique: true,
             requiresSetting: 'esc_srxl2_telemetry'
         },
         {
