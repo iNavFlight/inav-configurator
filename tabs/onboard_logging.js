@@ -10,6 +10,7 @@ import features from './../js/feature_framework';
 import i18n from './../js/localization';
 import BitHelper from './../js/bitHelper';
 import dialog from './../js/dialog';
+import Settings from './../js/settings';
 
 var sdcardTimer;
 
@@ -78,7 +79,7 @@ onboardLoggingTab.initialize = function (callback) {
     }
 
     function load_html() {
-        import('./onboard_logging.html?raw').then(({default: html}) => GUI.load(html, function() {
+        import('./onboard_logging.html?raw').then(({default: html}) => GUI.load(html, Settings.processHtml(function() {
             // translate to user-selected language
            i18n.localize();;
 
@@ -128,7 +129,12 @@ onboardLoggingTab.initialize = function (callback) {
                     features.reset();
                     features.fromUI($('.require-blackbox-supported'));
                     features.execute(function () {
-                        mspHelper.sendBlackboxConfiguration(save_to_eeprom);
+                        // The include flags travel inside the blackbox configuration
+                        // message; gyro_secondary_enabled is a regular setting and
+                        // takes the settings path instead.
+                        mspHelper.sendBlackboxConfiguration(function () {
+                            Settings.saveInputs(save_to_eeprom);
+                        });
                     });
                 });
             }
@@ -162,7 +168,7 @@ onboardLoggingTab.initialize = function (callback) {
             update_html();
 
             GUI.content_ready(callback);
-        }));
+        })));
     }
 
     function populateDevices() {
