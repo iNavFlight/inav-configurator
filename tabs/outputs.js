@@ -6,6 +6,7 @@ import MSPCodes from './../js/msp/MSPCodes';
 import MSP from './../js/msp';
 import GUI from './../js/gui';
 import FC from './../js/fc';
+import serialPortHelper from './../js/serialPortHelper';
 import i18n from './../js/localization';
 import BitHelper from '../js/bitHelper';
 import Settings from './../js/settings';
@@ -129,6 +130,94 @@ outputsTab.initialize = function (callback) {
             }
         }
 
+        /*
+         * SRXL2 is not a timer waveform like every other entry in this list: the
+         * ESC hangs off a UART, so the block below only makes sense for it, and a
+         * port has to have been assigned in the Ports tab for it to work at all.
+         */
+        const SRXL2_PROTOCOL = 7;
+
+        const SRXL2_CAL_OFF = 0, SRXL2_CAL_WAIT_BATTERY = 1, SRXL2_CAL_SETTLE = 2, SRXL2_CAL_LOW = 3;
+
+        let srxl2PollTimer = null;
+
+        function srxl2PortAssigned() {
+            if (!FC.SERIAL_CONFIG || !FC.SERIAL_CONFIG.ports) {
+                return false;
+            }
+            for (const port of FC.SERIAL_CONFIG.ports) {
+                if (serialPortHelper.maskToFunctions(port.functionMask).indexOf('ESC_SRXL2') >= 0) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        function srxl2CalStop() {
+            if (srxl2PollTimer) {
+                clearInterval(srxl2PollTimer);
+                srxl2PollTimer = null;
+            }
+            $('#srxl2-cal-abort').hide();
+            $('#srxl2-cal-start').show();
+            $('#srxl2-cal-ack').prop('checked', false);
+            $('#srxl2-cal-start').addClass('disabled');
+        }
+
+        function srxl2CalShow(messageId) {
+            $('#srxl2-cal-status').html(i18n.getMessage(messageId)).show();
+        }
+
+        function srxl2CalPoll() {
+            MSP.send_message(MSPCodes.MSP2_INAV_ESC_SRXL2_STATUS, false, false, function (resp) {
+                const phase = resp.data.readU8();
+                switch (phase) {
+                case SRXL2_CAL_WAIT_BATTERY: srxl2CalShow('srxl2CalibrateConnect'); break;
+                case SRXL2_CAL_SETTLE:       srxl2CalShow('srxl2CalibrateHeard');   break;
+                case SRXL2_CAL_LOW:          srxl2CalShow('srxl2CalibrateLow');     break;
+                default:
+                    /* The firmware ends every phase on its own, so reaching OFF is
+                     * the normal finish as well as the result of an abort. */
+                    srxl2CalShow('srxl2CalibrateDone');
+                    srxl2CalStop();
+                    break;
+                }
+            });
+        }
+
+        function srxl2UpdateVisibility() {
+            const isSrxl2 = parseInt(FC.ADVANCED_CONFIG.motorPwmProtocol, 10) === SRXL2_PROTOCOL;
+            $('#srxl2-esc').toggle(isSrxl2);
+            $('#srxl2-no-port').toggle(isSrxl2 && !srxl2PortAssigned());
+            if (!isSrxl2) {
+                srxl2CalStop();
+            }
+        }
+
+        $('#srxl2-cal-ack').on('change', function () {
+            $('#srxl2-cal-start').toggleClass('disabled', !$(this).is(':checked'));
+        });
+
+        $('#srxl2-cal-start').on('click', function () {
+            if ($(this).hasClass('disabled')) {
+                return;
+            }
+            const data = [SRXL2_CAL_WAIT_BATTERY];
+            MSP.send_message(MSPCodes.MSP2_INAV_ESC_SRXL2_CALIBRATE, data, false, function () {
+                $('#srxl2-cal-start').hide();
+                $('#srxl2-cal-abort').show();
+                srxl2CalShow('srxl2CalibrateConnect');
+                srxl2PollTimer = setInterval(srxl2CalPoll, 500);
+            });
+        });
+
+        $('#srxl2-cal-abort').on('click', function () {
+            MSP.send_message(MSPCodes.MSP2_INAV_ESC_SRXL2_CALIBRATE, [SRXL2_CAL_OFF], false, function () {
+                srxl2CalShow('srxl2CalibrateAborted');
+                srxl2CalStop();
+            });
+        });
+
         let $escProtocol = $('#esc-protocol');
         
         for (let i in escProtocols) {
@@ -138,16 +227,35 @@ outputsTab.initialize = function (callback) {
             }
         }
 
+        /*
+         * SRXL2 only exists in firmware built with it, and it costs flash, so a
+         * good many targets will not have it. Offering a protocol the board does
+         * not know would let someone select it and lose their motor, so ask
+         * first - the presence of its setting is the answer - and drop the option
+         * when it is not there.
+         */
+        mspHelper.getSetting('esc_srxl2_telemetry').then(function (setting) {
+            if (!setting) {
+                $escProtocol.find('option[value="' + SRXL2_PROTOCOL + '"]').remove();
+                $('#srxl2-esc').hide();
+            }
+        }).catch(function () {
+            $escProtocol.find('option[value="' + SRXL2_PROTOCOL + '"]').remove();
+            $('#srxl2-esc').hide();
+        });
+
         $escProtocol.val(FC.ADVANCED_CONFIG.motorPwmProtocol);
 
         $escProtocol.on('change', function () {
             FC.ADVANCED_CONFIG.motorPwmProtocol = $(this).val();
+            srxl2UpdateVisibility();
         });
 
         $idlePercent.on('change', handleIdleMessageBox);
         handleIdleMessageBox();
 
         $("#esc-protocols").show();
+        srxl2UpdateVisibility();
 
         let $servoRate = $('#servo-rate');
 

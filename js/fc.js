@@ -805,6 +805,16 @@ var FC = {
                 rates: {
                     16000: "16kHz"
                 }
+            },
+            7: {
+                /* Not a timer waveform: the ESC is driven over a UART, so the
+                 * output rate is the protocol's own and nothing here selects it. */
+                name: "SRXL2",
+                message: null,
+                defaultRate: 50,
+                rates: {
+                    50: "50Hz"
+                }
             }
         };
     },
