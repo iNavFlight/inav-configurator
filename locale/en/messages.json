@@ -1670,6 +1670,57 @@
     "portsFunction_OPFLOW": {
         "message": "Optic flow"
     },
+    "portsFunction_ESC_SRXL2": {
+        "message": "Spektrum Smart ESC (SRXL2)"
+    },
+    "srxl2Info": {
+        "message": "The ESC signal wire goes to the TX pin of the port assigned to Spektrum Smart ESC, not to a motor pad, and carries telemetry back on the same wire. One ESC per port, so this suits single-motor models."
+    },
+    "srxl2NoPort": {
+        "message": "No port is assigned to Spektrum Smart ESC. Assign one in the Ports tab, or the motor will not be driven at all - this protocol has no fallback to PWM, because the pin is not a timer output."
+    },
+    "srxl2Telemetry": {
+        "message": "Read telemetry from the ESC"
+    },
+    "srxl2TelemetryHelp": {
+        "message": "Telemetry shares the throttle wire, so unlike a conventional ESC there is no port to leave unassigned. Turn this off to read nothing from the ESC."
+    },
+    "srxl2ReverseChannel": {
+        "message": "Thrust Reverse channel"
+    },
+    "srxl2ReverseChannelHelp": {
+        "message": "The channel number the ESC's \"Thrust Rev.\" setting selects, as named on a Spektrum transmitter (CH5 to CH9). It has to match how the ESC was programmed, because nothing on the wire says which one it is. Set 0 if the ESC has no reverse."
+    },
+    "srxl2CalibrateTitle": {
+        "message": "Throttle range calibration"
+    },
+    "srxl2CalibrateWarning": {
+        "message": "REMOVE THE PROPELLER. This presents full throttle to the ESC. The battery must be disconnected to start: the ESC only learns its endpoints as it powers up."
+    },
+    "srxl2CalibrateAck": {
+        "message": "The propeller is removed and the battery is disconnected"
+    },
+    "srxl2CalibrateStart": {
+        "message": "Start calibration"
+    },
+    "srxl2CalibrateAbort": {
+        "message": "Abort"
+    },
+    "srxl2CalibrateConnect": {
+        "message": "Full throttle is on the wire. Connect the battery now."
+    },
+    "srxl2CalibrateHeard": {
+        "message": "The ESC has power. Holding full throttle while it accepts the high endpoint."
+    },
+    "srxl2CalibrateLow": {
+        "message": "Throttle lowered. Listen for the cell count, then one long tone."
+    },
+    "srxl2CalibrateDone": {
+        "message": "Finished. A long tone from the ESC means the range was stored."
+    },
+    "srxl2CalibrateAborted": {
+        "message": "Aborted. Throttle returned to normal control."
+    },
     "portsFunction_ESC": {
         "message": "ESC output/telemetry"
     },

@@ -91,6 +91,19 @@ const serialPortHelper = (function () {
             isUnique: true
         },
         {
+            /* Spektrum Smart ESC. The ESC signal wire goes to this port's TX pin,
+             * half duplex, rather than to a motor pad, and the baud rate is
+             * negotiated during the handshake rather than configured here.
+             *
+             * requiresSetting names a setting that only exists when the firmware
+             * was built with this support, so the function is not offered on a
+             * board that would refuse it. */
+            name: 'ESC_SRXL2',
+            groups: ['peripherals'],
+            isUnique: true,
+            requiresSetting: 'esc_srxl2_telemetry'
+        },
+        {
             name: 'OPFLOW',
             groups: ['sensors'],
             isUnique: true
@@ -176,7 +189,8 @@ const serialPortHelper = (function () {
         'MSP_DISPLAYPORT': 25,
         'GIMBAL': 26,
         'HEADTRACKER': 27,
-        'MZTC_CAMERA': 28
+        'MZTC_CAMERA': 28,
+        'ESC_SRXL2': 29
     };
 
     privateScope.identifierToName = {

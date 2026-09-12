@@ -258,6 +258,9 @@ var MSPCodes = {
     MSP2_INAV_GEOZONE_VERTEX:           0x2212,
     MSP2_INAV_SET_GEOZONE_VERTICE:      0x2213,
 
+    MSP2_INAV_ESC_SRXL2_STATUS:         0x2232,
+    MSP2_INAV_ESC_SRXL2_CALIBRATE:      0x2233,
+
     // MassZero Thermal Camera.
     // These sit in INAV's own 0x2000-0x2FFF range. The 0x3000 block belongs to
     // the Betaflight compatibility commands. MSP2_BETAFLIGHT_BIND is 0x3000.
