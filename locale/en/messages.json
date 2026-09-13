@@ -1692,10 +1692,10 @@
         "message": "Telemetry shares the throttle wire, so unlike a conventional ESC there is no port to leave unassigned. Turn this off to read nothing from the ESC."
     },
     "srxl2ReverseChannel": {
-        "message": "Thrust Reverse channel"
+        "message": "Thrust Reverse: ESC channel"
     },
     "srxl2ReverseChannelHelp": {
-        "message": "The channel number the ESC's \"Thrust Rev.\" setting selects, as named on a Spektrum transmitter (CH5 to CH9). It has to match how the ESC was programmed, because nothing on the wire says which one it is. Set 0 if the ESC has no reverse."
+        "message": "Which channel on the SRXL2 wire carries the reverse signal to the ESC. This is NOT a transmitter channel - it must match the ESC's own \"Thrust Rev.\" parameter, because nothing on the wire advertises it. Spektrum allow channels 5 to 9 and ship channel 7 by default. Set 0 if the ESC has no reverse. To fly with it, assign the THRUST REVERSE mode to a switch in the Modes tab."
     },
     "srxl2CalibrateTitle": {
         "message": "Throttle range calibration"
