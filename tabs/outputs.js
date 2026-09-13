@@ -234,6 +234,17 @@ outputsTab.initialize = function (callback) {
             const isSrxl2 = parseInt(FC.ADVANCED_CONFIG.motorPwmProtocol, 10) === SRXL2_PROTOCOL;
             $('#srxl2-esc').toggle(isSrxl2);
 
+            /*
+             * Assigning the port and choosing the protocol are two settings, and
+             * doing only the first is the easy mistake: the block below is hidden
+             * until the protocol is SRXL2, so without this the tab says nothing at
+             * all to someone who has configured the port and is wondering why
+             * nothing happened.
+             */
+            $('#srxl2-protocol-hint')
+                .toggle(!isSrxl2 && srxl2PortsAssignedInUi() > 0)
+                .html(i18n.getMessage('srxl2ProtocolNotSet'));
+
             if (isSrxl2) {
                 const assigned = srxl2PortsAssignedInUi();
                 const $warn = $('#srxl2-no-port');
