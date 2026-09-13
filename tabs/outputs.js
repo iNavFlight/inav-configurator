@@ -84,7 +84,7 @@ outputsTab.initialize = function (callback) {
         Settings.saveInputs(onComplete);
     }
 
-    function onLoad() {
+    function onLoad(settingsPromise) {
 
         self.feature3DEnabled = BitHelper.bit_check(FC.FEATURES, 12);
 
@@ -372,10 +372,22 @@ outputsTab.initialize = function (callback) {
         $idlePercent.on('change', handleIdleMessageBox);
         handleIdleMessageBox();
 
-        /* Settings has filled the inputs by now, so the checkbox can be set from
-          * the stored channel without fighting it. */
-        $reverseEnable.prop('checked', parseInt($reverseChannel.val(), 10) > 0);
-        $reverseRow.toggle($reverseEnable.is(':checked'));
+        /*
+         * Waited for on purpose. Settings.processHtml() starts configureInputs()
+         * and then calls this back immediately, by design, so the data-setting
+         * inputs are still empty here - reading the reverse channel now returns
+         * nothing and the switch would come up off every time, saved value or not.
+         */
+        function srxl2ReverseInit() {
+            $reverseEnable.prop('checked', parseInt($reverseChannel.val(), 10) > 0);
+            $reverseRow.toggle($reverseEnable.is(':checked'));
+        }
+
+        if (settingsPromise && typeof settingsPromise.then === 'function') {
+            settingsPromise.then(srxl2ReverseInit);
+        } else {
+            srxl2ReverseInit();
+        }
 
         $("#esc-protocols").show();
         srxl2UpdateVisibility();
