@@ -155,10 +155,37 @@ outputsTab.initialize = function (callback) {
 
         let srxl2PollTimer = null;
 
-        /* One ESC per port, so this is also the number of motors that can be
-         * driven. Counted rather than tested for presence, because a twin with one
-         * port assigned is a different problem from one with none. */
-        function srxl2PortCount() {
+        /*
+         * How many ports the firmware actually opened, and how many motors the
+         * mixer wants. Both come from the board rather than being inferred here,
+         * because they are exactly the two numbers pwmInitMotors() compares when it
+         * decides whether arming is allowed - so the warning cannot disagree with
+         * the behaviour it is warning about.
+         *
+         * Note MSP2_INAV_MIXER does NOT carry the model's motor count: its last two
+         * bytes are MAX_SUPPORTED_MOTORS and MAX_SUPPORTED_SERVOS, the compile-time
+         * ceilings. Reading numberOfMotors from there reports 12 on any board.
+         */
+        let srxl2Counts = null;     // {ports, motors}, or null if not yet known
+
+        function srxl2RefreshCounts(done) {
+            MSP.send_message(MSPCodes.MSP2_INAV_ESC_SRXL2_STATUS, false, false, function (resp) {
+                resp.data.readU8();                     // phase
+                resp.data.readU8();                     // connected
+                resp.data.readU8();                     // last calibration result
+                const ports = resp.data.readU8();
+                const motors = resp.data.readU8();
+
+                srxl2Counts = (ports === null || motors === null) ? null : { ports, motors };
+                if (done) {
+                    done();
+                }
+            });
+        }
+
+        /* What the Ports tab currently shows, saved or not. Used only to notice an
+         * assignment the board has not rebooted into yet. */
+        function srxl2PortsAssignedInUi() {
             if (!FC.SERIAL_CONFIG || !FC.SERIAL_CONFIG.ports) {
                 return 0;
             }
@@ -208,19 +235,35 @@ outputsTab.initialize = function (callback) {
             $('#srxl2-esc').toggle(isSrxl2);
 
             if (isSrxl2) {
-                const ports = srxl2PortCount();
-                const motors = (FC.MIXER_CONFIG && FC.MIXER_CONFIG.numberOfMotors) || 0;
+                const assigned = srxl2PortsAssignedInUi();
                 const $warn = $('#srxl2-no-port');
+                const $info = $('#srxl2-port-count');
 
-                if (ports === 0) {
+                if (!srxl2Counts) {
+                    /* The board has not been asked yet, or does not answer - say
+                     * only what is certain rather than inventing a motor count. */
+                    $warn.toggle(assigned === 0).html(i18n.getMessage('srxl2NoPort'));
+                    $info.html(i18n.getMessage('srxl2PortCount', [assigned]));
+                    return;
+                }
+
+                const ports = srxl2Counts.ports;
+                const motors = srxl2Counts.motors;
+
+                if (assigned === 0 && ports === 0) {
                     $warn.html(i18n.getMessage('srxl2NoPort')).show();
-                } else if (motors > 0 && ports < motors) {
+                } else if (ports === 0) {
+                    /* Assigned in the tab but not yet opened by the board: the ports
+                     * are opened at startup, so this needs a reboot rather than
+                     * another port. */
+                    $warn.html(i18n.getMessage('srxl2PortNeedsReboot', [assigned])).show();
+                } else if (ports < motors) {
                     $warn.html(i18n.getMessage('srxl2TooFewPorts', [motors, ports])).show();
                 } else {
                     $warn.hide();
                 }
 
-                $('#srxl2-port-count').html(i18n.getMessage('srxl2PortCount', [ports]));
+                $info.html(i18n.getMessage('srxl2PortCountOpen', [ports, motors]));
             } else {
                 srxl2CalStop();
             }
@@ -291,6 +334,9 @@ outputsTab.initialize = function (callback) {
 
         $("#esc-protocols").show();
         srxl2UpdateVisibility();
+        /* Asked once: both counts are settled at startup and cannot change without
+         * a reboot. Refreshes the block when the answer arrives. */
+        srxl2RefreshCounts(srxl2UpdateVisibility);
 
         let $servoRate = $('#servo-rate');
 
