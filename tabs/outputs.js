@@ -90,7 +90,7 @@ outputsTab.initialize = function (callback) {
 
         process_motors();
         process_servos();
-        processConfiguration();
+        processConfiguration(settingsPromise);
 
         finalize();
     }
@@ -107,7 +107,7 @@ outputsTab.initialize = function (callback) {
         }
     }
 
-    function processConfiguration() {
+    function processConfiguration(settingsPromise) {
         let escProtocols = FC.getEscProtocols(),
             servoRates = FC.getServoRates(),
             $idlePercent = $('#throttle_idle'),
