@@ -85,11 +85,13 @@ import { Geozone, GeozoneVertex, GeozoneType, GeozoneShapes, GeozoneFenceAction 
 import store from './../js/store';
 import dialog from '../js/dialog';
 import {
+    getMission3DFlightLegs,
+    getMission3DFlightSegments,
+    getMission3DJumpLabel,
     getMission3DPlannedHeight,
     getMission3DPointLabel,
     getMission3DPoints,
     getMission3DRouteRuns,
-    getMission3DRouteSegments,
     getMission3DSamplingSpacing
 } from './../js/mission_3d';
 import {
@@ -1614,6 +1616,7 @@ function iconKey(filename) {
 
     const mission3DRouteColor = Color.fromCssColorString('#13b5ea');
     const mission3DCollisionColor = Color.fromCssColorString('#e02f2f');
+    const mission3DJumpColor = Color.fromCssColorString('#e935d6');
 
     function createMission3DViewer(container) {
         buildModuleUrl.setBaseUrl('./');
@@ -1755,10 +1758,11 @@ function iconKey(filename) {
             return {groundHeights, samplingFailed};
         }
 
-        async function sampleRouteTerrain(renderedPoints) {
-            const routeSegments = getMission3DRouteSegments(renderedPoints).filter((segment) => segment.length > 1);
-            const routeEdges = routeSegments.flatMap((segment, segmentIndex) => segment.slice(1).map((end, index) => {
-                const start = segment[index];
+        async function sampleRouteTerrain(renderedPoints, flightLegs) {
+            // One segment per chain of flown legs, plus one per JUMP leg so it can be drawn apart.
+            const routeSegments = getMission3DFlightSegments(renderedPoints, flightLegs);
+            const routeEdges = routeSegments.flatMap((segment, segmentIndex) => segment.points.slice(1).map((end, index) => {
+                const start = segment.points[index];
                 const geodesic = new EllipsoidGeodesic(
                     Cartographic.fromDegrees(start.lon, start.lat),
                     Cartographic.fromDegrees(end.lon, end.lat)
@@ -1773,7 +1777,7 @@ function iconKey(filename) {
                 };
             }));
             const samplingSpacing = getMission3DSamplingSpacing(routeEdges.map((edge) => edge.distance));
-            const routeSamples = routeSegments.map(() => []);
+            const routeSamples = routeSegments.map((segment) => ({jump: segment.jump, samples: []}));
             const terrainSamplePositions = [];
             const terrainSampleDescriptors = [];
 
@@ -1795,7 +1799,7 @@ function iconKey(filename) {
                         terrainClearanceAvailable: edge.terrainClearanceAvailable
                     };
 
-                    routeSamples[edge.segmentIndex].push(descriptor);
+                    routeSamples[edge.segmentIndex].samples.push(descriptor);
                     if (descriptor.terrainClearanceAvailable) {
                         terrainSampleDescriptors.push(descriptor);
                         terrainSamplePositions.push(Cartographic.clone(position));
@@ -1820,7 +1824,7 @@ function iconKey(filename) {
                     : 0;
                 sample.clearance = sample.plannedHeight - terrainHeight;
             });
-            routeSamples.flat().forEach((sample) => {
+            routeSamples.flatMap((segment) => segment.samples).forEach((sample) => {
                 if (!sample.terrainClearanceAvailable) sample.clearance = Number.POSITIVE_INFINITY;
                 sample.cartesian = Cartesian3.fromRadians(
                     sample.position.longitude,
@@ -1900,18 +1904,37 @@ function iconKey(filename) {
         function renderRouteTerrain(routeSamples) {
             let hasTerrainCollision = false;
 
-            routeSamples.forEach((samples) => {
+            routeSamples.forEach(({samples, jump}) => {
+                const clearColor = jump ? mission3DJumpColor : mission3DRouteColor;
                 getMission3DRouteRuns(samples).forEach((run) => {
                     hasTerrainCollision ||= run.collidesWithTerrain;
                     viewer.entities.add({
                         polyline: {
                             positions: run.samples.map(getMission3DSampleCartesian),
                             width: run.collidesWithTerrain ? 6 : 4,
-                            material: run.collidesWithTerrain ? mission3DCollisionColor : mission3DRouteColor,
+                            material: run.collidesWithTerrain ? mission3DCollisionColor : clearColor,
                             depthFailMaterial: run.collidesWithTerrain ? mission3DCollisionColor.withAlpha(0.9) : undefined
                         }
                     });
                 });
+
+                // The repeat count sits mid-leg, like the label on the 2D editor's jump line.
+                if (jump && samples.length) {
+                    viewer.entities.add({
+                        position: getMission3DSampleCartesian(samples[Math.floor(samples.length / 2)]),
+                        label: {
+                            text: getMission3DJumpLabel(jump.repeat),
+                            font: '600 12px Segoe UI, Calibri, sans-serif',
+                            fillColor: mission3DJumpColor,
+                            outlineColor: Color.BLACK,
+                            outlineWidth: 3,
+                            style: LabelStyle.FILL_AND_OUTLINE,
+                            verticalOrigin: VerticalOrigin.BOTTOM,
+                            pixelOffset: new Cartesian2(0, -6),
+                            disableDepthTestDistance: Number.POSITIVE_INFINITY
+                        }
+                    });
+                }
             });
 
             return hasTerrainCollision;
@@ -2000,6 +2023,7 @@ function iconKey(filename) {
             hideMission3DTerrainWarning();
 
             const points = getMission3DPoints(waypoints, home);
+            const flightLegs = getMission3DFlightLegs(waypoints);
             const missionPoints = points.filter((point) => !point.isHome);
             if (!missionPoints.length) {
                 showEmptyMap();
@@ -2009,7 +2033,7 @@ function iconKey(filename) {
 
             $('#missionMap3DHelp').hide();
 
-            const signature = JSON.stringify(points);
+            const signature = JSON.stringify({points, flightLegs});
             const cache = terrainCacheSignature === signature ? terrainCache : null;
             // A cache hit answers straight away. A miss goes through samplePointTerrain, which asks
             // the terrain provider only when a real one is loaded, but awaits either way, so on a
@@ -2027,7 +2051,7 @@ function iconKey(filename) {
             const missingHomeReference = !hasHome && missionPoints.some((point) => !point.absoluteAltitude);
             const {displayPositions, renderedPoints} = renderMissionPoints(points, groundHeights, homeGroundHeight, hasHome);
 
-            const routeTerrain = cache ? cache.routeTerrain : await sampleRouteTerrain(renderedPoints);
+            const routeTerrain = cache ? cache.routeTerrain : await sampleRouteTerrain(renderedPoints, flightLegs);
             if (destroyed || sequence !== updateSequence) return;
             terrainSamplingFailed ||= routeTerrain.samplingFailed;
             if (!cache && !terrainSamplingFailed && !(terrainProvider instanceof EllipsoidTerrainProvider)) {
