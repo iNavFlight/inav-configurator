@@ -5735,6 +5735,24 @@
   "ledStripWiringMessage": {
     "message": "LED диодите без номер на реда на окабеляване няма да бъдат записани."
   },
+  "ledStripQuickPresets": {
+    "message": "Бързи предварителни настройки:"
+  },
+  "ledStripStep1Header": {
+    "message": "Ред на окабеляване"
+  },
+  "ledStripStep2Header": {
+    "message": "Позиция и посока"
+  },
+  "ledStripStep3Header": {
+    "message": "Функция"
+  },
+  "ledStripStep4Header": {
+    "message": "Цвят"
+  },
+  "ledStripEditPalette": {
+    "message": "Редактиране на цветовете на палитрата"
+  },
 
 
   "mainLogoText": {

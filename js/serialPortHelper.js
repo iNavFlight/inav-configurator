@@ -138,6 +138,12 @@ const serialPortHelper = (function () {
             defaultBaud: 115200
         },
         {
+            name: 'MZTC_CAMERA',
+            groups: ['peripherals'],
+            defaultBaud: 115200,
+            isUnique: true
+        },
+        {
             name: 'CRSF_SENSOR',
             groups: ['sensors'],
             defaultBaud: 420000,
@@ -175,7 +181,8 @@ const serialPortHelper = (function () {
         'CRSF_SENSOR': 24,
         'MSP_DISPLAYPORT': 25,
         'GIMBAL': 26,
-        'HEADTRACKER': 27
+        'HEADTRACKER': 27,
+        'MZTC_CAMERA': 28
     };
 
     privateScope.identifierToName = {

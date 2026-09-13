@@ -11,6 +11,8 @@ import { ConnectionType, Connection } from './connection/connection';
 import connectionFactory from './connection/connectionFactory';
 import CONFIGURATOR from './data_storage';
 import  { PortHandler } from './port_handler';
+import { requestDfuPermission } from './web/dfu';
+import ConnectionWebSerial from './connection/connectionWebSerial';
 import i18n from './../js/localization';
 import interval from './intervals';
 import periodicStatusUpdater from './periodicStatusUpdater';
@@ -142,6 +144,9 @@ var SerialBackend = (function () {
             var type = ConnectionType.Serial;
             if (selected_port.data().isBle) {
                 type = ConnectionType.BLE;
+            } else if (selected_port.data().isSitl && globalThis.__INAV_BROWSER_BUILD__) {
+                // Browser build talks to WASM SITL in-process via ccall, not TCP.
+                type = ConnectionType.serialEXT;
             } else if (selected_port.data().isTcp || selected_port.data().isSitl) {
                 type = ConnectionType.TCP;
             } else if (selected_port.data().isUdp) {
@@ -160,6 +165,22 @@ var SerialBackend = (function () {
         publicScope.$portOverride.val(store.get('portOverride', ''));
 
         privateScope.$port.on('change', function (target) {
+            var selected_port = privateScope.$port.find('option:selected');
+            if (selected_port.data().isDfuPermission) {
+                requestDfuPermission().then(() => PortHandler.check_usb_devices());
+            }
+            if (privateScope.$port.val() === ConnectionWebSerial.CHOOSE_PORT_ID) {
+                // Deferred one tick so the select's own native dropdown has
+                // fully closed before requestPort() tries to open a new native
+                // popup - opening it synchronously here can be silently
+                // dropped by the OS while the previous popup is still
+                // tearing down. User activation survives this; its window is
+                // several seconds, not one task.
+                setTimeout(() => {
+                    privateScope.reopenTab = null;
+                    privateScope.reConnect();
+                }, 0);
+            }
             GUI.updateManualPortVisibility();
         });
 
@@ -206,6 +227,11 @@ var SerialBackend = (function () {
 
                         if (selected_port == 'tcp' || selected_port == 'udp') {
                             CONFIGURATOR.connection.connect(publicScope.$portOverride.val(), {}, privateScope.onOpen);
+                        } else if (selected_port == 'sitl' && globalThis.__INAV_BROWSER_BUILD__) {
+                            // WASM SITL must already be running (started from the SITL
+                            // tab); connectionExt reports a clean failure via onOpen
+                            // if it isn't, same as a native SITL not listening on TCP.
+                            CONFIGURATOR.connection.connect(0, {}, privateScope.onOpen);
                         } else if (selected_port == 'sitl') {
                             CONFIGURATOR.connection.connect("127.0.0.1:5760", {}, privateScope.onOpen);
                         } else if (selected_port == 'sitl-demo') {

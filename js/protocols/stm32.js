@@ -11,7 +11,7 @@ import CONFIGURATOR from './../data_storage';
 import GUI from './../gui';
 import interval from './../intervals';
 import { usbDevices, PortHandler } from './../port_handler';
-import ConnectionSerial from './../connection/connectionSerial';
+import ConnectionSerial from './../connection/connectionSerialTransport';
 import STM32DFU from './stm32usbdfu';
 import i18n from './../localization';
 

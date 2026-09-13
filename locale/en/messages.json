@@ -14,11 +14,11 @@
         "message": "Italiano",
         "_comment": "Don't translate!"
     },
-	  "language_bg": {
+    "language_bg": {
         "message": "Български",
         "_comment": "Don't translate!"
     },
-	  "language_uk": {
+    "language_uk": {
         "message": "українська",
         "_comment": "Don't translate!"
     },
@@ -193,6 +193,76 @@
     "tabGPS": {
         "message": "GPS"
     },
+    "tabDroneCAN": {
+        "message": "DroneCAN"
+    },
+    "dronecanColHealth": {
+        "message": "Health"
+    },
+    "dronecanColLastSeen": {
+        "message": "Last Seen"
+    },
+    "dronecanColMode": {
+        "message": "Mode"
+    },
+    "dronecanColName": {
+        "message": "Name"
+    },
+    "dronecanColNodeID": {
+        "message": "Node ID"
+    },
+
+    "dronecanNodesTitle": {
+        "message": "DroneCAN Nodes"
+    },
+    "dronecanNodeDetail": {
+        "message": "Node Detail"
+    },
+    "dronecanNoNodes": {
+        "message": "No DroneCAN nodes detected."
+    },
+    "dronecanBusConfig": {
+        "message": "Bus Configuration"
+    },
+    "dronecanBitrate": {
+        "message": "CAN Baud Rate"
+    },
+    "dronecanNodeId": {
+        "message": "FC Node ID"
+    },
+    "dronecanSave": {
+        "message": "Save & Reboot"
+    },
+    "dronecanNodeIdReservedWarning": {
+        "message": "Node IDs 126 and 127 are reserved for diagnostic tools. Are you sure?"
+    },
+    "dronecanNodeIdInvalid": {
+        "message": "Node ID must be a whole number between 1 and 127."
+    },
+    "dronecanDetailColProperty": {
+        "message": "Property"
+    },
+    "dronecanDetailColValue": {
+        "message": "Value"
+    },
+    "dronecanUseDnaServer": {
+        "message": "Enable Dynamic Node Allocation server"
+    },
+    "dronecanParamColIndex": {
+        "message": "#"
+    },
+    "dronecanParamColName": {
+        "message": "Name"
+    },
+    "dronecanParamColType": {
+        "message": "Type"
+    },
+    "dronecanParamColValue": {
+        "message": "Value"
+    },
+    "dronecanParamColRange": {
+        "message": "Range"
+    },
     "tabOutputs": {
         "message": "Outputs"
     },
@@ -321,6 +391,39 @@
     },
     "sitlResetDemoModeData": {
         "message": "Reset Demo Mode"
+    },
+    "sitlDownloadEeprom": {
+        "message": "Download EEPROM"
+    },
+    "sitlDeleteEeprom": {
+        "message": "Delete EEPROM"
+    },
+    "sitlEepromFileName": {
+        "message": "EEPROM File Name"
+    },
+    "sitlEepromActions": {
+        "message": "Actions"
+    },
+    "sitlWebAssemblyInfo": {
+        "message": "<br/><h4>SITL WebAssembly</h4><br/>SITL WebAssembly allows you to run INAV SITL directly in the browser without the need to install any additional software. <br/>This feature is <b>experimental</b> and may not work on all systems. If you encounter problems, please use the traditional SITL method and download the standalone Configurator for your system.<br/><b>Note:</b> The first start may take a while as the WebAssembly module needs to be downloaded and initialized.<br/>For Network functionality (UARTS 2-8, Simulator), a Websocket-To-Socket proxy server is necessary, please refer to <a href=\"https://github.com/iNavFlight/inav/blob/master/docs/SITL/SITL.md\">INAV SITL Documentation</a>."
+    },
+    "sitlEnableWasmProxy": {
+        "message": "Enable WebAssembly Proxy"
+    },
+    "sitlEnableWasmProxyHelp": {
+        "message": "If enabled, SITL tries to connect to a Websocket to Socket proxy running on the specified port. The proxy forwards data between SITL WebAssembly and the simulator running on the host system. If disabled all network functions (Simulator and UART 2-8) are disabled."
+    },
+    "sitlWasmProxyPort": {
+        "message": "WebAssembly Proxy Port"
+    },
+    "sitlWasmProxyPortHelp": {
+        "message": "Port number of the Websocket to Socket proxy running on the host system."
+    },
+    "sitlEepromFiles": {
+        "message": "EEPROM Files"
+    },
+    "sitlEepromFilesHelp": {
+        "message": "Here you can manage EEPROM files for SITL. You can download or delete existing EEPROM files."
     },
     "sitlOSNotSupported": {
         "message": "SITL is not supported on this operating system."
@@ -636,6 +739,9 @@
     },
     "dfu_connect_message": {
         "message": "Please use the Firmware Flasher to access DFU devices"
+    },
+    "webDfuPermission": {
+        "message": "Grant DFU device permission..."
     },
     "dfu_erased_kilobytes": {
         "message": "Erased $1 kB of flash <span style=\"color: #37a8db\">successfully</span>"
@@ -1420,6 +1526,9 @@
     "configurationGPSProtocol": {
         "message": "Protocol"
     },
+    "gpsDroneCANInfo": {
+        "message": "GPS is provided via DroneCAN. Configure bus settings on the DroneCAN tab. Serial port and baud rate do not apply."
+    },
     "configurationGPSUseGalileo": {
         "message": "Gps use Galileo Satellites (EU)"
     },
@@ -1641,6 +1750,54 @@
     },
     "portsFunction_HEADTRACKER": {
         "message": "Serial Headtracker"
+    },
+    "portsFunction_MZTC_CAMERA": {
+        "message": "MassZero Thermal Camera"
+    },
+    "osdElement_MZTC_STATUS": {
+        "message": "Thermal Camera Status"
+    },
+    "configurationThermalCamera": {
+        "message": "MassZero Thermal Camera"
+    },
+    "configurationThermalCameraNote": {
+        "message": "Assign MZTC_CAMERA to a UART in the Ports tab to enable the camera. The port and its baud rate are set there. The camera ships at 115200."
+    },
+    "configurationThermalCameraPreset": {
+        "message": "Purpose preset"
+    },
+    "configurationThermalCameraPalette": {
+        "message": "Colour palette"
+    },
+    "configurationThermalCameraZoom": {
+        "message": "Digital zoom"
+    },
+    "configurationThermalCameraAdvanced": {
+        "message": "Advanced image tuning"
+    },
+    "configurationThermalCameraMirror": {
+        "message": "Image mirroring"
+    },
+    "configurationThermalCameraBrightness": {
+        "message": "Brightness [0-100]"
+    },
+    "configurationThermalCameraContrast": {
+        "message": "Contrast [0-100]"
+    },
+    "configurationThermalCameraEnhancement": {
+        "message": "Digital enhancement [0-100]"
+    },
+    "configurationThermalCameraSpatialDenoise": {
+        "message": "Spatial denoising [0-100]"
+    },
+    "configurationThermalCameraTemporalDenoise": {
+        "message": "Temporal denoising [0-100]"
+    },
+    "configurationThermalCameraAutoShutter": {
+        "message": "Automatic shutter mode"
+    },
+    "configurationThermalCameraFFCInterval": {
+        "message": "Shutter interval [minutes]"
     },
     "portsFunction_CRSF_SENSOR": {
         "message": "CRSF Sensor"
@@ -2615,7 +2772,7 @@
         "message": "Write your command here"
     },
     "cliInputPlaceholderBuilding": {
-        "message": "Building AutoComplete cache, please wait ..."
+        "message": "Building AutoComplete cache, please wait..."
     },
     "cliEnter": {
         "message": "CLI mode detected"
@@ -4483,6 +4640,9 @@
     "osdGroupAltitude": {
         "message": "Altitude"
     },
+    "osdGroupThermalCamera": {
+        "message": "Thermal Camera"
+    },
     "osdGroupTimers": {
         "message": "Timers"
     },
@@ -4954,6 +5114,9 @@
     "osdElement_OSD_RANGEFINDER": {
         "message": "Rangefinder distance"
     },
+    "osdElement_OSD_TERRAIN_AGL": {
+        "message": "Terrain AGL"
+    },
     "osdElement_COURSE_NEXT_GEOZONE": {
         "message": "Course to next Geozone"
     },
@@ -5134,6 +5297,90 @@
     "removeAllPointButtonSave": {
         "message": "Remove all points"
     },
+    "missionTitleSimulate": {
+        "message": "Show the track a fixed wing will actually fly"
+    },
+    "missionSimulationHead": {
+        "message": "Flight path simulation"
+    },
+    "missionSimulationSpeed": {
+        "message": "Cruise speed (m/s)"
+    },
+    "missionSimulationSpeedHelp": {
+        "message": "Read from fw_reference_airspeed when a flight controller is connected - the same speed the firmware uses for its own coordinated turn calculation when no airspeed sensor is fitted. Override it to see how the mission looks at another speed; the turn radius grows with the square of this figure. Note that nav_auto_speed and the per-waypoint speed do not apply to a fixed wing, which flies a throttle setting."
+    },
+    "missionSimulationLegendCruise": {
+        "message": "cruise"
+    },
+    "missionSimulationLegendTurn": {
+        "message": "turning"
+    },
+    "missionSimulationLegendApproach": {
+        "message": "landing approach"
+    },
+    "missionSimulationTurnRadius": {
+        "message": "Turn radius:"
+    },
+    "missionSimulationTime": {
+        "message": "Flight time:"
+    },
+    "missionSimulationDistance": {
+        "message": "Track length:"
+    },
+    "missionSimulationTooFewPoints": {
+        "message": "Add at least two waypoints to simulate the flight path."
+    },
+    "missionSimulationNoLandingHeading": {
+        "message": "Waypoint $1 lands without a landing heading, so no approach pattern is flown - the aircraft circles down onto the point. Set a landing heading to see the approach."
+    },
+    "missionSimulationNoApproachLength": {
+        "message": "Waypoint $1 has a landing heading, but the approach length is unknown. Connect the flight controller to read nav_fw_land_approach_length."
+    },
+    "missionSimulationApproachNoHome": {
+        "message": "Waypoint $1's approach and the mission use different altitude references, and without the home elevation they cannot be brought together. Set home to see the approach."
+    },
+    "missionSimulationApproachSuspect": {
+        "message": "Waypoint $1's approach lands $2 m away in altitude from the waypoint itself - its landing settings look corrupted. Check Approach Alt and Land Alt."
+    },
+    "missionSimulationApproachAnchored": {
+        "message": "Home is not set, so the approach profile is anchored at its landing altitude. The shape is right; set home for the firmware-exact altitude split."
+    },
+    "missionSimulationWaypointMissed": {
+        "message": "Waypoint $1 is passed at $2 m instead of being reached - the turn onto it is tighter than the aircraft flies."
+    },
+    "missionSimulationLegNotFlyable": {
+        "message": "Waypoint $1 is never reached: at $2 m turn radius the aircraft circles it instead of closing in."
+    },
+    "missionSimulationApproachAltitudes": {
+        "message": "Waypoint $1 has an approach altitude that is not above its landing altitude, so no approach can be drawn. Check the landing settings for this waypoint."
+    },
+    "missionSimulationDefaults": {
+        "message": "No flight controller connected: approach length and loiter radius fall back to the firmware defaults, so the approach shown is generic."
+    },
+    "missionSimulationBankCeiling": {
+        "message": "Turns are limited to $1 degrees of bank by max_angle_inclination_rll, below the angle navigation asks for, so they are wider than nav_fw_bank_angle alone suggests."
+    },
+    "missionSimulationSpeedEstimated": {
+        "message": "Cruise speed is an assumption: connect the flight controller to read fw_reference_airspeed, or set it to what your aircraft really cruises at. The turn radius depends on it squared."
+    },
+    "missionSimulationFixedWingOnly": {
+        "message": "This models a fixed wing. The connected aircraft is not one, so the track shown does not describe how it will fly."
+    },
+    "missionSimulationMultiMission": {
+        "message": "The flight path is simulated one mission at a time. Select a single mission to see it."
+    },
+    "missionSimulationJumps": {
+        "message": "This mission repeats waypoints with a jump, which the simulation does not follow, so flight time and track length are not shown. The track drawn is the first pass only."
+    },
+    "missionSimulationTruncated": {
+        "message": "The mission is longer than the simulation runs for, so the track stops part way and the figures are not shown."
+    },
+    "missionSimulationNoHomeElevation": {
+        "message": "This mission uses absolute altitudes, but the home elevation is unknown, so the vertical profile may be off. Set home to resolve it."
+    },
+    "missionSimulationDisclaimer": {
+        "message": "Altitudes and the landing approach follow the flight controller's own formulas. Turns are flown at the bank-limited radius: with nav_fw_wp_turn_smoothing ON or ON-CUT the aircraft starts its turn before the waypoint and curves inside the corner, which is not modelled here. Also not modelled: wind, holds (a POSHOLD point and the last waypoint of a mission are flown straight through, where the aircraft would circle), jumps, tracking back onto the leg line, and the pitch-held glide and flare over the last few metres, where the simulation stops. Assumes the aircraft follows its commanded track perfectly, so real turns start and finish more gently. A planning aid, not proof that a mission is safe to fly."
+    },
     "missionTotalInformationHead": {
         "message": "Total information"
     },
@@ -5265,6 +5512,21 @@
     },
     "missionElevation": {
         "message": "Elevation (m):"
+    },
+    "missionMap3DEmpty": {
+        "message": "No mission to display in 3D."
+    },
+    "missionMap3DCollisionWarning": {
+        "message": "Warning: Planned route intersects terrain."
+    },
+    "missionMap3DTerrainUnavailable": {
+        "message": "Terrain data unavailable: Route collision check could not be completed."
+    },
+    "missionMap3DHomeRequired": {
+        "message": "HOME is not set: Relative-altitude terrain checks are unavailable."
+    },
+    "missionMap3DUnavailable": {
+        "message": "3D view unavailable on this system."
     },
     "missionNA": {
         "message": "N/A"
@@ -5503,8 +5765,17 @@
     "eeprom_load_ok": {
         "message": "EEPROM <span style=\"color: #37a8db\">loaded</span>"
     },
+    "missionSearchAddressSrOnly": {
+        "message": "Search for address"
+    },
+    "missionCenterMapSrOnly": {
+        "message": "Center map on latest GPS fix"
+    },
     "confirm_delete_all_points": {
         "message": "Do you really want to delete all points?"
+    },
+    "confirm_delete_selected_point": {
+        "message": "Delete this waypoint?"
     },
     "confirm_delete_point_with_options": {
         "message": "Do you really want to delete this Waypoint with non-Geo JUMP/SET_HEAD/RTH options? \nIf yes, Non-Geo options attached will be removed also!"
@@ -6043,6 +6314,12 @@
     "illegalStateRestartRequired": {
         "message": "Illegal state. Restart required."
     },
+    "mspResponseUnreadable": {
+        "message": "The flight controller's $1 response could not be read. The values it carries may be incomplete, so <span style=\"color: red\">saving them has been disabled</span> to prevent writing wrong settings to the aircraft. Settings that do not use this data are unaffected. Reconnect to try again."
+    },
+    "mspWriteBlockedAfterParseFailure": {
+        "message": "<span style=\"color: red\">Not saved.</span> These settings come from the flight controller's $1 response, which could not be read this session, so writing them back is refused. Reconnect to try again."
+    },
     "motor_direction_inverted": {
         "message": "Normal motor direction / Props-in configuration"
     },
@@ -6354,6 +6631,48 @@
     },
     "ledStripWiringMessage": {
         "message": "LEDs without wire ordering number will not be saved."
+    },
+    "ledStripQuickPresets": {
+        "message": "Quick Presets:"
+    },
+    "ledStripQuickPresetXFrame": {
+        "message": "X-Frame Quad"
+    },
+    "ledStripQuickPresetCrossFrame": {
+        "message": "Cross-Frame Quad"
+    },
+    "ledStripQuickPresetWing": {
+        "message": "Wing"
+    },
+    "ledStripStep1Header": {
+        "message": "Wire Ordering"
+    },
+    "ledStripStep1Instruction": {
+        "message": "Click Wire Ordering, then drag grid cells in the order LEDs are wired"
+    },
+    "ledStripStep2Header": {
+        "message": "Position & Direction"
+    },
+    "ledStripStep2Instruction": {
+        "message": "Optionally, select LEDs & set their orientation"
+    },
+    "ledStripStep3Header": {
+        "message": "Function"
+    },
+    "ledStripStep3Instruction": {
+        "message": "Select LEDs and assign their function (Flight Mode, Armed state, etc.) and overlays."
+    },
+    "ledStripStep4Header": {
+        "message": "Color"
+    },
+    "ledStripStep4Instruction": {
+        "message": "Select LEDs and click a color to assign it"
+    },
+    "ledStripPlacedText": {
+        "message": "/ 128 placed"
+    },
+    "ledStripEditPalette": {
+        "message": "Edit palette colors"
     },
     "mainLogoText": {
         "message": "CONFIGURATOR"
@@ -6799,6 +7118,156 @@
     "gpsOptionsAssistnowToken": {
         "message": "AssitNow Token"
     },
+    "googleLocationServices": {
+        "message": "Google Location & Weather Services"
+    },
+    "googleLocationApiKey": {
+        "message": "API Key"
+    },
+    "googleLocationTestButton": {
+        "message": "Test API key"
+    },
+    "googleLocationHelpButton": {
+        "message": "Help and setup instructions"
+    },
+    "googleLocationTestPending": {
+        "message": "Testing…"
+    },
+    "googleLocationTestSuccess": {
+        "message": "Success! Location: $1, $2 (accuracy: $3 m)"
+    },
+    "googleLocationTestNoKey": {
+        "message": "Please enter an API key first."
+    },
+    "googleLocationTestError": {
+        "message": "Error: $1"
+    },
+    "googleLocationTestGeocodingFail": {
+        "message": "Google Geocoding API unavailable: $1 — address search will use OpenStreetMap instead."
+    },
+    "googleLocationTestWeatherSuccess": {
+        "message": "Weather API OK"
+    },
+    "googleLocationTestWeather": {
+        "message": "Weather API OK — Wind: $1 $2"
+    },
+    "googleLocationTestWeatherFail": {
+        "message": "Weather API failed: $1 — Enable the Weather API in Google Cloud Console."
+    },
+    "googleLocationHelpTitle": {
+        "message": "Google Location & Weather Services"
+    },
+    "googleLocationHelpBenefit": {
+        "message": "With a Google API key, Mission Control can determine your approximate IP-based location before the flight controller has a GPS fix. It can also show current weather conditions for offline mission planning or the aircraft's GPS position."
+    },
+    "googleLocationHelpHowTitle": {
+        "message": "How to configure an API key:"
+    },
+    "googleLocationHelpStep1": {
+        "message": "Open the <a href='https://console.cloud.google.com/' target='_blank'>Google Cloud Console</a>."
+    },
+    "googleLocationHelpStep2": {
+        "message": "Create a project or select an existing project."
+    },
+    "googleLocationHelpStep3": {
+        "message": "Enable the Geolocation API, Geocoding API, and Weather API."
+    },
+    "googleLocationHelpStep4": {
+        "message": "Create an API key under APIs &amp; Services → Credentials."
+    },
+    "googleLocationHelpStep5": {
+        "message": "Restrict the key to the Geolocation, Geocoding, and Weather APIs, then paste it here."
+    },
+    "googleLocationHelpNote": {
+        "message": "The key is stored locally. Google API usage may be subject to quotas or billing; review your Google Cloud settings before enabling these services."
+    },
+    "googleLocationHelpClose": {
+        "message": "Close"
+    },
+    "apiLocationBannerPrefix": {
+        "message": "API location (IP-based)"
+    },
+    "apiLocationBannerCoordinates": {
+        "message": "Lat: $1  Lon: $2  (~$3 km)"
+    },
+    "apiLocationBannerWarning": {
+        "message": "accuracy may be low"
+    },
+    "addressSearchTitle": {
+        "message": "Search for Location"
+    },
+    "addressSearchPlaceholder": {
+        "message": "Enter address, city, or coordinates"
+    },
+    "addressSearchCancel": {
+        "message": "Cancel"
+    },
+    "addressSearchSubmit": {
+        "message": "Search"
+    },
+    "addressSearchConfirmation": {
+        "message": "Found: $1\nSource: $2\n\nMove to this location?"
+    },
+    "addressSearchNotFound": {
+        "message": "Address not found."
+    },
+    "addressSearchFailed": {
+        "message": "Search failed. Check your connection."
+    },
+    "conditionsInfoHead": {
+        "message": "Weather Conditions"
+    },
+    "conditionsInfoHeadSource": {
+        "message": "Weather — $1"
+    },
+    "conditionsSourceAircraft": {
+        "message": "Aircraft"
+    },
+    "conditionsSourceWaypoint": {
+        "message": "WP1"
+    },
+    "conditionsSourceMapCenter": {
+        "message": "Map Center"
+    },
+    "conditionsWaiting": {
+        "message": "Waiting for location…"
+    },
+    "conditionsWind": {
+        "message": "Wind: "
+    },
+    "conditionsGusts": {
+        "message": "Gusts: "
+    },
+    "conditionsWindDir": {
+        "message": "Direction: "
+    },
+    "conditionsTemp": {
+        "message": "Temperature: "
+    },
+    "conditionsFeelsLike": {
+        "message": "Feels like: "
+    },
+    "conditionsHumidity": {
+        "message": "Humidity: "
+    },
+    "conditionsUV": {
+        "message": "UV index: "
+    },
+    "conditionsPrecip": {
+        "message": "Precipitation: "
+    },
+    "conditionsThunder": {
+        "message": "Thunderstorm: "
+    },
+    "conditionsVisibility": {
+        "message": "Visibility: "
+    },
+    "conditionsCloud": {
+        "message": "Cloud cover: "
+    },
+    "conditionsUnavailable": {
+        "message": "Weather data unavailable"
+    },
     "gpsLoadAssistnowOfflineButton": {
         "message": "Load AssistNow Offline"
     },
@@ -6942,6 +7411,45 @@
     },
     "javascriptCompleteExample": {
         "message": "Complete Example"
+    },
+    "missionGridPatternTitle": {
+        "message": "Generate grid survey pattern (Ctrl+G)"
+    },
+    "missionGridDrawPrompt": {
+        "message": "Click on the map to draw a survey area polygon. Double-click to finish. Press Escape to cancel."
+    },
+    "missionGridSettingsTitle": {
+        "message": "Grid Survey Settings"
+    },
+    "missionGridSpacing": {
+        "message": "Line Spacing"
+    },
+    "missionGridAltitude": {
+        "message": "Altitude"
+    },
+    "missionGridSpeed": {
+        "message": "Speed"
+    },
+    "missionGridAngle": {
+        "message": "Sweep Angle"
+    },
+    "missionGridOvershoot": {
+        "message": "Overshoot"
+    },
+    "missionGridEndRTH": {
+        "message": "End with RTH"
+    },
+    "missionGridGenerate": {
+        "message": "Generate"
+    },
+    "missionGridNoWaypoints": {
+        "message": "No waypoints generated. Try adjusting spacing or area."
+    },
+    "missionGridWaypointCount": {
+        "message": "Waypoints: $1 (remaining capacity: $2)"
+    },
+    "missionGridTooManyWaypoints": {
+        "message": "Grid needs $1 waypoints but only $2 slots remaining. Reduce area or increase spacing."
     },
     "sensorProfileTitle": {
         "message": "Control profile — stores PID tuning, rates, and filtering settings"
@@ -7110,5 +7618,44 @@
     },
     "migrationMissingProfileWarning": {
         "message": "No migration profile available for version $1 → $2. Settings will be restored without conversion — some may fail or be ignored by the firmware."
+    },
+    "dronecanParamsLoading": {
+        "message": "Loading parameters..."
+    },
+    "dronecanNoParams": {
+        "message": "No parameters."
+    },
+    "dronecanParamWrite": {
+        "message": "Write"
+    },
+    "dronecanParamError": {
+        "message": "ERR"
+    },
+    "dronecanParamOutOfRange": {
+        "message": "Out of range"
+    },
+    "dronecanParamRangeMustBeBetween": {
+        "message": "Must be between $1 and $2"
+    },
+    "dronecanSaveToEeprom": {
+        "message": "Save to EEPROM"
+    },
+    "dronecanSaved": {
+        "message": "Saved!"
+    },
+    "dronecanFailed": {
+        "message": "Failed"
+    },
+    "dronecanRestartNode": {
+        "message": "Restart Node"
+    },
+    "dronecanRestarting": {
+        "message": "Restarting..."
+    },
+    "dronecanSecondsAgo": {
+        "message": "$1s ago"
+    },
+    "dronecanNameError": {
+        "message": "Error"
     }
 }

@@ -4,11 +4,18 @@ import semver from 'semver';
 
 import './../injected_methods';
 import GUI from './../gui';
+import i18n from './../localization';
 import MSP from './../msp';
 import MSPCodes from './MSPCodes';
 import FC from './../fc';
 import VTX from './../vtx';
 import mspQueue from './../serial_queue';
+
+// Fixed MZTC payload sizes, mirroring MSP2_MZTC_CONFIG_PAYLOAD_SIZE and
+// MSP2_MZTC_STATUS_PAYLOAD_SIZE in the firmware's msp_mztc.h. Naming them here
+// keeps the parse and the build path from drifting apart.
+const MZTC_CONFIG_BYTES = 11;
+const MZTC_STATUS_BYTES = 7;
 import ServoMixRule from './../servoMixRule';
 import MotorMixRule from './../motorMixRule';
 import LogicCondition from './../logicCondition';
@@ -22,9 +29,20 @@ import mspDeduplicationQueue from './mspDeduplicationQueue';
 import mspStatistics from './mspStatistics';
 import settingsCache from './../settingsCache';
 import {Geozone, GeozoneVertex, GeozoneShapes } from './../geozone';
+import { parseDronecanAsyncRequestResponse } from './../dronecanAsyncRequestParse';
 
 var mspHelper = (function () {
     var self = {};
+
+    const PARAM_TYPE_INT    = 1;
+    const PARAM_TYPE_FLOAT  = 2;
+    const PARAM_TYPE_BOOL   = 3;
+    const PARAM_TYPE_STRING = 4;
+    const DRONECAN_SERVICE_GETNODEINFO    = 1;
+    const DRONECAN_SERVICE_RESTART_NODE   = 5;
+    const DRONECAN_SERVICE_EXECUTE_OPCODE = 10;
+    const DRONECAN_SERVICE_PARAM_GETSET   = 11;
+    const DRONECAN_ASYNC_STATE_READY      = 2;
 
     self.sensorStatusEx = null;
 
@@ -54,9 +72,42 @@ var mspHelper = (function () {
     // always finish with a '\0'.
     var debugMsgBuffer = '';
 
+    var lastWriteBlockedNotice = 0;
+
     self.init = function() {
-        MSP.setProcessData(this.processData);
+        MSP.setProcessData(this.handleResponse);
+
+        MSP.onConfigWriteBlocked = function (code, sourceCode) {
+            // One notice per save burst - a save fans out into many writes.
+            const now = Date.now();
+            if (now - lastWriteBlockedNotice < 3000) {
+                return;
+            }
+            lastWriteBlockedNotice = now;
+            GUI.log(i18n.getMessage('mspWriteBlockedAfterParseFailure', [MSP.getCodeName(sourceCode)]));
+        };
     }
+
+    /**
+     * MSP response entry point. Completing the request must happen even when a
+     * parser case throws, or the tab waiting on it never finishes loading.
+     * @param {MSP} dataHandler
+     */
+    self.handleResponse = function (dataHandler) {
+        try {
+            self.processData(dataHandler);
+        } catch (error) {
+            console.error('Failed to parse MSP code 0x' + dataHandler.code.toString(16) + ':', error);
+
+            // Half this message landed in FC state - refuse the writes handing it back.
+            if (!MSP.parseFailures.has(dataHandler.code)) {
+                MSP.parseFailures.add(dataHandler.code);
+                GUI.log(i18n.getMessage('mspResponseUnreadable', [MSP.getCodeName(dataHandler.code)]));
+            }
+        }
+
+        completeRequest(dataHandler, new DataView(dataHandler.message_buffer, 0));
+    };
 
     /**
      *
@@ -328,6 +379,11 @@ var mspHelper = (function () {
             case MSPCodes.MSP2_PID:
                 // PID data arrived, we need to scale it and save to appropriate bank / array
                 for (let i = 0, needle = 0; i < (dataHandler.message_length_expected / 4); i++, needle += 4) {
+                    // A newer FC reports more banks than we know. Keep them rather than
+                    // write past the array - MSP2_SET_PID needs the FC's exact count.
+                    if (!FC.PIDs[i]) {
+                        FC.PIDs[i] = new Array(4);
+                    }
                     FC.PIDs[i][0] = data.getUint8(needle);
                     FC.PIDs[i][1] = data.getUint8(needle + 1);
                     FC.PIDs[i][2] = data.getUint8(needle + 2);
@@ -1586,6 +1642,123 @@ var mspHelper = (function () {
                 console.log('Safehome points saved');
                 break;
 
+            case MSPCodes.MSP2_INAV_DRONECAN_NODES:
+                FC.DRONECAN_NODES = [];
+                if (data.byteLength > 0) {
+                    const count = data.getUint8(0);
+                    for (let i = 0; i < count; i++) {
+                        const offset = 1 + i * 13;
+                        if (offset + 13 > data.byteLength) break;
+                        FC.DRONECAN_NODES.push({
+                            nodeID:              data.getUint8(offset),
+                            health:              data.getUint8(offset + 1),
+                            mode:                data.getUint8(offset + 2),
+                            last_seen_ms:        data.getUint32(offset + 3, true),
+                            uptime_sec:          data.getUint32(offset + 7, true),
+                            vendor_status_code:  data.getUint16(offset + 11, true),
+                        });
+                    }
+                }
+                break;
+            
+            case MSPCodes.MSP2_INAV_DRONECAN_ASYNC_REQUEST:
+                FC.DRONECAN_ASYNC_REQUEST = parseDronecanAsyncRequestResponse(data);
+                break;
+                  
+            case MSPCodes.MSP2_INAV_DRONECAN_ASYNC_RESULT:
+                if (data.byteLength >= 5) {
+                    const state      = data.getUint8(0);
+                    const seq        = data.getUint8(1);
+                    const service_id = data.getUint16(2, true);
+                    const node_id    = data.getUint8(4); 
+                    const result = { state, seq, service_id, node_id };
+                      
+                    if (state === DRONECAN_ASYNC_STATE_READY) {
+                        try {
+                        let offset = 5;
+                        if (service_id === DRONECAN_SERVICE_RESTART_NODE || service_id === DRONECAN_SERVICE_EXECUTE_OPCODE) {
+                            result.ok = data.getUint8(offset) !== 0;
+                        } else {
+                            const name_len = data.getUint8(offset++);
+                            result.name = String.fromCodePoint(
+                                ...new Uint8Array(data.buffer, data.byteOffset + offset, name_len));
+                            offset += name_len;
+
+                            if (service_id === DRONECAN_SERVICE_GETNODEINFO) {
+                                result.sw_major                = data.getUint8(offset++);
+                                result.sw_minor                = data.getUint8(offset++);
+                                result.sw_optional_field_flags = data.getUint8(offset++);
+                                result.sw_vcs_commit           = data.getUint32(offset, true); offset += 4;
+                                result.hw_major                = data.getUint8(offset++);
+                                result.hw_minor                = data.getUint8(offset++);
+                                result.hw_unique_id            = new Uint8Array(
+                                    data.buffer, data.byteOffset + offset, 16).slice(); // copy; don't hold a live view into the MSP buffer
+                            } else if (service_id === DRONECAN_SERVICE_PARAM_GETSET) {
+                                result.value_type = data.getUint8(offset++);
+                                switch (result.value_type) {
+                                    case PARAM_TYPE_INT: { // 8 bytes, little-endian lo/hi
+                                        const lo = data.getUint32(offset, true);
+                                        const hi = data.getUint32(offset + 4, true);
+                                        const big = BigInt(hi) * BigInt(0x100000000) + BigInt(lo);
+                                        const signed = big >= (1n << 63n) ? big - (1n << 64n) : big;
+                                        result.value = (signed >= BigInt(Number.MIN_SAFE_INTEGER) &&
+                                                        signed <= BigInt(Number.MAX_SAFE_INTEGER))
+                                                        ? Number(signed) : signed;
+                                        offset += 8;
+                                        break;
+                                    }
+                                    case PARAM_TYPE_FLOAT: // 4 bytes
+                                        result.value = data.getFloat32(offset, true);
+                                        offset += 4;
+                                        break;
+                                    case PARAM_TYPE_BOOL: // 1 byte
+                                        result.value = data.getUint8(offset) !== 0;
+                                        offset += 1;
+                                        break;
+                                    case PARAM_TYPE_STRING: { // 1-byte length prefix + data
+                                        const slen = data.getUint8(offset++);
+                                        result.value = String.fromCodePoint(
+                                            ...new Uint8Array(data.buffer, data.byteOffset + offset, slen));
+                                        offset += slen;
+                                        break;
+                                    }
+                                    default:
+                                        result.value = null;
+                                }
+                                // min/max are NumericValue (EMPTY, INT, or FLOAT); only present for INT and FLOAT params
+                                if (result.value_type === PARAM_TYPE_INT || result.value_type === PARAM_TYPE_FLOAT) {
+                                    const decodeNumeric = () => {
+                                        const type = data.getUint8(offset++);
+                                        let value; // EMPTY — no range provided
+                                        if (type === PARAM_TYPE_INT) {
+                                            const lo = data.getUint32(offset, true);
+                                            const hi = data.getUint32(offset + 4, true);
+                                            offset += 8;
+                                            const big = BigInt(hi) * BigInt(0x100000000) + BigInt(lo);
+                                            const signed = big >= (1n << 63n) ? big - (1n << 64n) : big;
+                                            value = (signed >= BigInt(Number.MIN_SAFE_INTEGER) &&
+                                                     signed <= BigInt(Number.MAX_SAFE_INTEGER))
+                                                    ? Number(signed) : signed;
+                                        } else if (type === PARAM_TYPE_FLOAT) {
+                                            value = data.getFloat32(offset, true);
+                                            offset += 4;
+                                        }
+                                        return value;
+                                    };
+                                    result.min = decodeNumeric();
+                                    result.max = decodeNumeric();
+                                }
+                            }
+                        }
+                        } catch (e) {
+                            console.warn('MSP2_INAV_DRONECAN_ASYNC_RESULT: truncated or malformed response, result fields may be partial (' + e.message + ')');
+                        }
+                    }
+
+                    FC.DRONECAN_ASYNC_RESULT = result;
+                }
+                break;
+
             case MSPCodes.MSP2_INAV_FW_APPROACH:
                 FC.FW_APPROACH.put(new FwApproach(
                     data.getUint8(0),
@@ -1843,12 +2016,62 @@ var mspHelper = (function () {
                 console.log("Geozone saved")
                 break;    
 
+            case MSPCodes.MSP2_MZTC_CONFIG:
+                // Fixed 12 byte payload, little endian, one field at a time.
+                // The firmware writes it with the sbufWrite helpers, so there
+                // is no compiler padding to account for here. The serial port
+                // and its baud rate are not in this payload. They live in the
+                // Ports tab.
+                if (data.byteLength >= MZTC_CONFIG_BYTES) {
+                    FC.MZTC_CONFIG = {
+                        preset: data.getUint8(0),
+                        palette_mode: data.getUint8(1),
+                        auto_shutter: data.getUint8(2),
+                        digital_enhancement: data.getUint8(3),
+                        spatial_denoise: data.getUint8(4),
+                        temporal_denoise: data.getUint8(5),
+                        brightness: data.getUint8(6),
+                        contrast: data.getUint8(7),
+                        zoom_level: data.getUint8(8),
+                        mirror_mode: data.getUint8(9),
+                        ffc_interval: data.getUint8(10)
+                    };
+                } else {
+                    console.log('MZTC_CONFIG payload too short: ' + data.byteLength +
+                                ' bytes, expected ' + MZTC_CONFIG_BYTES);
+                }
+                break;
+
+            case MSPCodes.MSP2_MZTC_STATUS:
+                // Fixed 7 byte payload. connected is set only after the camera
+                // has answered a command. An open UART does not set it.
+                if (data.byteLength >= MZTC_STATUS_BYTES) {
+                    FC.MZTC_STATUS = {
+                        status: data.getUint8(0),
+                        preset: data.getUint8(1),
+                        connected: data.getUint8(2),
+                        connection_quality: data.getUint8(3),
+                        last_calibration: data.getUint16(4, true),
+                        error_flags: data.getUint8(6)
+                    };
+                } else {
+                    console.log('MZTC_STATUS payload too short: ' + data.byteLength + ' bytes, expected ' + MZTC_STATUS_BYTES);
+                    FC.MZTC_STATUS = null;
+                }
+                break;
+
+            case MSPCodes.MSP2_SET_MZTC_CONFIG:
+                console.log("MZTC config saved");
+                break;
+
             default:
                 console.log('Unknown code detected: 0x' + dataHandler.code.toString(16));
         } else {
             console.log('FC reports unsupported message error: 0x' + dataHandler.code.toString(16));
         }
+    };
 
+    var completeRequest = function (dataHandler, data) {
         // trigger callbacks, cleanup/remove callback after trigger
         for (let i = dataHandler.callbacks.length - 1; i >= 0; i--) { // iterating in reverse because we use .splice which modifies array length
             if (i < dataHandler.callbacks.length) {
@@ -2454,6 +2677,27 @@ var mspHelper = (function () {
                 buffer.push(FC.EZ_TUNE.snappiness);
                 break;
 
+
+            case MSPCodes.MSP2_SET_MZTC_CONFIG:
+                // Fixed 12 byte payload matching MSP2_MZTC_CONFIG. The firmware
+                // validates the whole request before applying any of it, so an
+                // out of range value is rejected in full.
+                // One push in field order. The field order is the wire order,
+                // and it has to match MSP2_MZTC_CONFIG in the firmware.
+                buffer.push(
+                    FC.MZTC_CONFIG.preset,
+                    FC.MZTC_CONFIG.palette_mode,
+                    FC.MZTC_CONFIG.auto_shutter,
+                    FC.MZTC_CONFIG.digital_enhancement,
+                    FC.MZTC_CONFIG.spatial_denoise,
+                    FC.MZTC_CONFIG.temporal_denoise,
+                    FC.MZTC_CONFIG.brightness,
+                    FC.MZTC_CONFIG.contrast,
+                    FC.MZTC_CONFIG.zoom_level,
+                    FC.MZTC_CONFIG.mirror_mode,
+                    FC.MZTC_CONFIG.ffc_interval
+                );
+                break;
 
             default:
                 return false;
@@ -3109,6 +3353,18 @@ var mspHelper = (function () {
 
     self.queryFcStatus = function (callback) {
         MSP.send_message(MSPCodes.MSPV2_INAV_STATUS, false, false, callback);
+    };
+
+    self.loadMZTCConfig = function (callback) {
+        MSP.send_message(MSPCodes.MSP2_MZTC_CONFIG, false, false, callback);
+    };
+
+    self.loadMZTCStatus = function (callback) {
+        MSP.send_message(MSPCodes.MSP2_MZTC_STATUS, false, false, callback);
+    };
+
+    self.saveMZTCConfig = function (callback) {
+        MSP.send_message(MSPCodes.MSP2_SET_MZTC_CONFIG, mspHelper.crunch(MSPCodes.MSP2_SET_MZTC_CONFIG), false, callback);
     };
 
     self.loadMiscV2 = function (callback) {

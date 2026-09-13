@@ -142,6 +142,7 @@ SYM.PILOT_LOGO_SML_L = 0x1D5;
 SYM.PILOT_LOGO_SML_C = 0x1D6;
 SYM.PILOT_LOGO_SML_R = 0x1D7;
 SYM.MIN_GND_SPEED = 0xDE;
+SYM.TERRAIN_FOLLOWING = 0xFB;
 
 SYM.AH_AIRCRAFT0 = 0x1A2;
 SYM.AH_AIRCRAFT1 = 0x1A3;
@@ -1382,6 +1383,31 @@ OSD.constants = {
                                 return FONT.embed_dot('25.6') + FONT.symbol(SYM.DIST_KM);
                         }
                     }
+                },
+                {
+                    name: 'OSD_TERRAIN_AGL',
+                    id: 171,
+                    enabled: function() {
+                        return HARDWARE.capabilities.useTerrain;
+                    },
+                    preview: function(osd_data) {
+
+                        var s = '114';
+                        if (Settings.getInputValue('osd_decimals_altitude') == 4) {
+                            s += '3';
+                        } if (Settings.getInputValue('osd_decimals_altitude') == 5) {
+                            s += '38';
+                        }
+
+                        switch (OSD.data.preferences.units) {
+                            case 0: // Imperial
+                            case 3: // UK
+                            case 4: // GA
+                                return FONT.symbol(SYM.TERRAIN_FOLLOWING) + s + FONT.symbol(SYM.ALT_FT);
+                            default: // Metric
+                                return FONT.symbol(SYM.TERRAIN_FOLLOWING) + s + FONT.symbol(SYM.ALT_M);
+                        }
+                    }
                 }
             ]
         },
@@ -1411,6 +1437,27 @@ OSD.constants = {
                     id: 103,
                     min_version: '2.2.0',
                     preview: FONT.symbol(SYM.GFORCE_Z) + FONT.embed_dot('-0.30')
+                },
+            ]
+        },
+        {
+            name: 'osdGroupThermalCamera',
+            enabled: function() {
+                return HARDWARE.capabilities.useMztcCamera;
+            },
+            items: [
+                {
+                    name: 'MZTC_STATUS',
+                    id: 171,
+                    // min_version stays commented out until the firmware
+                    // version is bumped, matching AUTO SPEED. The
+                    // maintenance-10.x firmware still reports 9.x, so a
+                    // 10.0.0 gate would hide the element on the builds that
+                    // actually support it.
+                    // min_version: '10.0.0',
+                    preview: function(osd_data) {
+                        return 'IR OK ';
+                    }
                 },
             ]
         },
@@ -3591,7 +3638,9 @@ HARDWARE.init = function() {
         useRx: false,
         useCRSF: false,
         useBaro: false,
-        usePitot: false
+        usePitot: false,
+        useTerrain: false,
+        useMztcCamera: false
     };
 };
 
@@ -3609,6 +3658,9 @@ HARDWARE.update = function(callback) {
             }
             if (port.functions.includes('ESC')) {
                 HARDWARE.capabilities.useESCTelemetry = true;
+            }
+            if (port.functions.includes('MZTC_CAMERA')) {
+                HARDWARE.capabilities.useMztcCamera = true;
             }
         });
 
@@ -3628,9 +3680,16 @@ HARDWARE.update = function(callback) {
                 HARDWARE.capabilities.useBaro  = (FC.SENSOR_CONFIG.barometer != 0);
                 HARDWARE.capabilities.usePitot = (FC.SENSOR_CONFIG.pitot != 0);
 
-                if (callback) {
-                    callback();
-                }
+                mspHelper.getSetting("terrain_enabled").then(function(data) {
+                    HARDWARE.capabilities.useTerrain = Boolean(data && data.value);
+                }).catch(function() {
+                    // Setting not available in this firmware
+                    HARDWARE.capabilities.useTerrain = false;
+                }).finally(function() {
+                    if (callback) {
+                        callback();
+                    }
+                });
             });
         });
     });
@@ -3846,7 +3905,8 @@ function openIconPicker($targetInput) {
     var $grid = $('<div>').addClass('ce-icon-picker-grid');
     var currentVal = parseInt($targetInput.val()) || 0;
 
-    for (var c = 1; c <= 255; c++) {
+    let maxFontChar = (FONT.data && FONT.data.character_image_urls.length > 0) ? FONT.data.character_image_urls.length - 1 : 511;
+    for (let c = 1; c <= maxFontChar; c++) {
         var url = (FONT.data && FONT.data.character_image_urls[c]) ? FONT.draw(c) : '';
         var $tile = $('<div>').addClass('ce-icon-picker-tile')
             .attr('data-char', c)
@@ -3975,7 +4035,7 @@ function buildSlotRow(i, ii) {
     $formatSelect.on('change', updateHiddenType);
 
     // Icon picker: hidden input + clickable preview button
-    var $icoInput = $('<input>').addClass('value').addClass('ico').attr('type', 'hidden').attr('min', 1).attr('max', 255);
+    let $icoInput = $('<input>').addClass('value').addClass('ico').attr('type', 'hidden').attr('min', 1).attr('max', 65535);
     var $icoBtn = $('<div>').addClass('value ico ce-ico-picker-btn').hide()
         .append($('<img>').addClass('ce-ico-preview'))
         .append($('<span>').addClass('ce-ico-label'));
@@ -4430,7 +4490,7 @@ function customElementNormaliseRow(row){
                 valueCell.find('.text').val(valueCell.find('.text').val().replace(/[^A-Z0-9!.\* ]/g, ""));
                 break;
             case 2:
-                valueCell.find('.ico').val(valueCell.find('.ico').val() > 255 ? 255 : valueCell.find('.ico').val());
+                valueCell.find('.ico').val(Math.min(valueCell.find('.ico').val(), 65535));
                 valueCell.find('.ico').val((valueCell.find('.ico').val() != '' && valueCell.find('.ico').val() < 1 )? 1 : valueCell.find('.ico').val());
         }
     }

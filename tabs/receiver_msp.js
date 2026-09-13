@@ -63,9 +63,9 @@ function transmitChannels() {
     }
 
     // Callback given to us by the window creator so we can have it send data over MSP for us:
-    if (!window.setRawRx(channelValues)) {
+    if (!window.opener.setRawRx(channelValues)) {
         // MSP connection has gone away
-        window.current().close();
+        window.close();
     }
 }
 
@@ -136,9 +136,7 @@ $(function() {
         var shrinkHeight = $(".warning").height();
 
         $(".warning").slideUp("short", function() {
-            window.current().innerBounds.minHeight -= shrinkHeight;
-            window.current().innerBounds.height -= shrinkHeight;
-            window.current().innerBounds.maxHeight -= shrinkHeight;
+            window.resizeBy(0, -shrinkHeight);
         });
 
         enableTX = true;
