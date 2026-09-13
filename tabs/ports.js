@@ -162,6 +162,15 @@ portsTab.initialize = function (callback) {
             }            
         }
 
+        /* The table exists now, so lock the rate selectors of any function that
+         * sets its own - without going through updateDefaultBaud(), which would
+         * overwrite the saved rates of every other port. */
+        $('table.ports tbody [id^="portFunc-"]').each(function () {
+            const id = $(this).attr('id');
+            const column = id.split('-')[1];
+            applyBaudLock(id, column);
+        });
+
         $('table.ports tbody').on('change', 'select', onSwitchChange);
         $('table.ports tbody').on('change', 'input', onSwitchChange);
     }
@@ -319,9 +328,43 @@ function updateDefaultBaud(baudSelect, column) {
         baudRate = rule.defaultBaud;
     }
 
-    const $baudSelect = section.find("." + column + "_baudrate");
-    $baudSelect.children('[value=' + baudRate + ']').prop('selected', true);
-    $baudSelect.prop('disabled', !!(rule && rule.lockedBaud));
+    section.find("." + column + "_baudrate").children('[value=' + baudRate + ']').prop('selected', true);
+
+    applyBaudLock(baudSelect, column);
+}
+
+/*
+ * Disable the rate selector of a function that sets its own rate, and for one whose
+ * rate is negotiated rather than merely fixed, show that instead of a number.
+ *
+ * Separate from updateDefaultBaud() because that also rewrites the rate, so it must
+ * not run over a saved configuration when the tab loads - and without a load-time
+ * pass a locked selector comes up editable until the function is changed.
+ *
+ * A locked rate is usually still a real number: CRSF_SENSOR runs at 420000 and says
+ * so. SRXL2 is different - 115200 is only where the link starts before the handshake
+ * negotiates upwards - so a rule can say negotiatedBaud and get the word "auto". The
+ * substitute option carries the stored rate as its value and changes only the text,
+ * so .val() still returns the real rate and the configuration is saved unchanged.
+ */
+function applyBaudLock(baudSelect, column) {
+    const section = $("#" + baudSelect);
+    const rule = serialPortHelper.getRuleByName(section.find('.function-' + column).val());
+    const $baud = section.find("." + column + "_baudrate");
+
+    $baud.prop('disabled', !!(rule && rule.lockedBaud));
+    $baud.find('option.baudAutoOption').remove();
+
+    if (rule && rule.negotiatedBaud) {
+        $baud.append($('<option/>')
+            .addClass('baudAutoOption')
+            .attr('value', $baud.val())
+            .text(i18n.getMessage('portsBaudAuto')));
+        $baud.find('option.baudAutoOption').prop('selected', true);
+        $baud.attr('title', i18n.getMessage('portsBaudFixedByProtocol'));
+    } else {
+        $baud.removeAttr('title');
+    }
 }
 
 portsTab.cleanup = function (callback) {

@@ -39,10 +39,26 @@
                         <div for="esc_srxl2_telemetry" class="helpicon cf_tip" data-i18n_title="srxl2TelemetryHelp"></div>
                     </div>
 
-                    <div class="number">
+                    <div class="select">
+                        <select id="esc_srxl2_telemetry_rate" data-setting="esc_srxl2_telemetry_rate"></select>
+                        <label for="esc_srxl2_telemetry_rate">
+                            <span data-i18n="srxl2TelemetryRate">How often to ask the ESC for telemetry</span>
+                        </label>
+                        <div for="esc_srxl2_telemetry_rate" class="helpicon cf_tip" data-i18n_title="srxl2TelemetryRateHelp"></div>
+                    </div>
+
+                    <div class="checkbox">
+                        <input id="srxl2-reverse-enable" type="checkbox" class="toggle" />
+                        <label for="srxl2-reverse-enable">
+                            <span data-i18n="srxl2ReverseEnable">Thrust reverse</span>
+                        </label>
+                        <div for="srxl2-reverse-enable" class="helpicon cf_tip" data-i18n_title="srxl2ReverseEnableHelp"></div>
+                    </div>
+
+                    <div class="number" id="srxl2-reverse-channel-row">
                         <input id="esc_srxl2_reverse_channel" data-setting="esc_srxl2_reverse_channel" type="number" />
                         <label for="esc_srxl2_reverse_channel">
-                            <span data-i18n="srxl2ReverseChannel">Thrust Reverse channel</span>
+                            <span data-i18n="srxl2ReverseChannel">Thrust Reverse: ESC channel</span>
                         </label>
                         <div for="esc_srxl2_reverse_channel" class="helpicon cf_tip" data-i18n_title="srxl2ReverseChannelHelp"></div>
                     </div>
