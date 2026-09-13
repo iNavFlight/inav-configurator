@@ -274,7 +274,11 @@ outputsTab.initialize = function (callback) {
                     $warn.hide();
                 }
 
-                $info.html(i18n.getMessage('srxl2PortCountOpen', [ports, motors]));
+                /* A board with no mixer preset applied reports no motors, which is
+                 * a normal starting state and not worth phrasing as "for 0 motors". */
+                $info.html(motors > 0
+                    ? i18n.getMessage('srxl2PortCountOpen', [ports, motors])
+                    : i18n.getMessage('srxl2PortCountOpenNoMixer', [ports]));
             } else {
                 srxl2CalStop();
             }
