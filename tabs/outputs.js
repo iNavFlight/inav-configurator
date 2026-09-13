@@ -47,6 +47,11 @@ outputsTab.initialize = function (callback) {
         mspHelper.loadOutputMappingExt,
         mspHelper.loadRcData,
         mspHelper.loadAdvancedConfig,
+        /* Needed to count the ports assigned to Spektrum Smart ESC. Without it
+         * FC.SERIAL_CONFIG is whatever an earlier tab happened to leave behind -
+         * empty on a fresh start - and the tab reports no port assigned however
+         * many there are. */
+        mspHelper.loadSerialPorts,
         function(callback) {
             mspHelper.getSetting("motor_direction_inverted").then((data)=>{
                 self.motorDirectionInverted=data.value;
@@ -244,23 +249,6 @@ outputsTab.initialize = function (callback) {
                 $escProtocol.append('<option value="' + i + '">' + protocolData.name + '</option>');
             }
         }
-
-        /*
-         * SRXL2 only exists in firmware built with it, and it costs flash, so a
-         * good many targets will not have it. Offering a protocol the board does
-         * not know would let someone select it and lose their motor, so ask
-         * first - the presence of its setting is the answer - and drop the option
-         * when it is not there.
-         */
-        mspHelper.getSetting('esc_srxl2_telemetry').then(function (setting) {
-            if (!setting) {
-                $escProtocol.find('option[value="' + SRXL2_PROTOCOL + '"]').remove();
-                $('#srxl2-esc').hide();
-            }
-        }).catch(function () {
-            $escProtocol.find('option[value="' + SRXL2_PROTOCOL + '"]').remove();
-            $('#srxl2-esc').hide();
-        });
 
         $escProtocol.val(FC.ADVANCED_CONFIG.motorPwmProtocol);
 
