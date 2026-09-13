@@ -16,12 +16,23 @@ portsTab.initialize = function (callback) {
     var columns = ['data', 'logging', 'sensors', 'telemetry', 'rx', 'peripherals'];
     var mspWarningModal;
 
+    /* PWM_TYPE_SRXL2. Assigning the Spektrum Smart ESC function and selecting that
+     * protocol are two settings, and a port assigned without it is always a
+     * misconfiguration - the port is never opened and the motor never driven. So
+     * saving one implies the other; see on_save_handler(). */
+    const SRXL2_PROTOCOL = 7;
+
     if (GUI.active_tab !== this) {
         GUI.active_tab = this;
     }
 
     mspHelper.loadSerialPorts(function () {
-        import('./ports.html?raw').then(({default: html}) => GUI.load(html, on_tab_loaded_handler));
+        /* Needed because saving may have to set the motor protocol as well, and
+         * writing MSP_SET_ADVANCED_CONFIG from a copy this tab never read would
+         * overwrite the rest of the motor configuration with zeroes. */
+        mspHelper.loadAdvancedConfig(function () {
+            import('./ports.html?raw').then(({default: html}) => GUI.load(html, on_tab_loaded_handler));
+        });
     });
 
     function checkMSPPortCount(excludeCheckbox) {
@@ -296,7 +307,28 @@ portsTab.initialize = function (callback) {
             FC.SERIAL_CONFIG.ports.push(serialPort);
         });
 
-        mspHelper.saveSerialPorts(save_to_eeprom);
+        /*
+         * A port assigned to Spektrum Smart ESC with any other motor protocol does
+         * nothing at all: the port is never opened, the motor never driven, and
+         * nothing says why. Since that combination is never what anyone wants, the
+         * protocol follows the port rather than being a second thing to remember.
+         *
+         * Logged rather than done quietly - it changes how the motors are driven,
+         * so it should be visible even though the state it replaces was broken.
+         */
+        const wantsSrxl2 = FC.SERIAL_CONFIG.ports.some(function (p) {
+            return p.functions.indexOf('ESC_SRXL2') >= 0;
+        });
+
+        if (wantsSrxl2 && parseInt(FC.ADVANCED_CONFIG.motorPwmProtocol, 10) !== SRXL2_PROTOCOL) {
+            FC.ADVANCED_CONFIG.motorPwmProtocol = SRXL2_PROTOCOL;
+            GUI.log(i18n.getMessage('srxl2ProtocolAutoSet'));
+            mspHelper.saveAdvancedConfig(function () {
+                mspHelper.saveSerialPorts(save_to_eeprom);
+            });
+        } else {
+            mspHelper.saveSerialPorts(save_to_eeprom);
+        }
 
         function save_to_eeprom() {
             MSP.send_message(MSPCodes.MSP_EEPROM_WRITE, false, false, on_saved_handler);
