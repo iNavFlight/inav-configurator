@@ -1706,6 +1706,21 @@
     "srxl2CalibrateAck": {
         "message": "The propeller is removed and the battery is disconnected"
     },
+    "srxl2CalibrateRefused": {
+        "message": "The flight controller refused to start the calibration."
+    },
+    "srxl2CalibrateRefusedArmed": {
+        "message": "Refused: the aircraft is armed. Disarm first - this sequence presents full throttle."
+    },
+    "srxl2CalibrateRefusedNoPort": {
+        "message": "Refused: no SRXL2 ESC port is open. Assign one in the Ports tab, set the motor protocol to SRXL2, and reboot."
+    },
+    "srxl2CalibrateRefusedBattery": {
+        "message": "Refused: the battery is connected. The ESC only learns its throttle range as it powers up, so it has to start with the pack out."
+    },
+    "srxl2CalibrateRefusedNoSensor": {
+        "message": "Refused: this board cannot sense battery voltage, so it cannot tell when the ESC powers up. Use esc_calibrate high / low from the CLI instead."
+    },
     "srxl2CalibrateStart": {
         "message": "Start calibration"
     },

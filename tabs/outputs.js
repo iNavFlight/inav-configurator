@@ -6,7 +6,6 @@ import MSPCodes from './../js/msp/MSPCodes';
 import MSP from './../js/msp';
 import GUI from './../js/gui';
 import FC from './../js/fc';
-import serialPortHelper from './../js/serialPortHelper';
 import i18n from './../js/localization';
 import BitHelper from '../js/bitHelper';
 import Settings from './../js/settings';
@@ -144,6 +143,16 @@ outputsTab.initialize = function (callback) {
 
         const SRXL2_CAL_OFF = 0, SRXL2_CAL_WAIT_BATTERY = 1, SRXL2_CAL_SETTLE = 2, SRXL2_CAL_LOW = 3;
 
+        /* srxl2CalResult_e in the firmware. The sequence presents full throttle, so
+         * it has preconditions, and the operator needs to know which one failed
+         * rather than watching a wizard start and immediately finish. */
+        const SRXL2_CAL_REFUSED = {
+            1: 'srxl2CalibrateRefusedArmed',
+            2: 'srxl2CalibrateRefusedNoPort',
+            3: 'srxl2CalibrateRefusedBattery',
+            4: 'srxl2CalibrateRefusedNoSensor',
+        };
+
         let srxl2PollTimer = null;
 
         /* One ESC per port, so this is also the number of motors that can be
@@ -155,7 +164,7 @@ outputsTab.initialize = function (callback) {
             }
             let n = 0;
             for (const port of FC.SERIAL_CONFIG.ports) {
-                if (serialPortHelper.maskToFunctions(port.functionMask).indexOf('ESC_SRXL2') >= 0) {
+                if (port.functions.indexOf('ESC_SRXL2') >= 0) {
                     n++;
                 }
             }
@@ -227,10 +236,30 @@ outputsTab.initialize = function (callback) {
             }
             const data = [SRXL2_CAL_WAIT_BATTERY];
             MSP.send_message(MSPCodes.MSP2_INAV_ESC_SRXL2_CALIBRATE, data, false, function () {
-                $('#srxl2-cal-start').hide();
-                $('#srxl2-cal-abort').show();
-                srxl2CalShow('srxl2CalibrateConnect');
-                srxl2PollTimer = setInterval(srxl2CalPoll, 500);
+                /*
+                 * The callback fires whether or not the firmware accepted: this is
+                 * an MSP IN command, so a refusal comes back as an error with no
+                 * payload to explain it. Read the status instead and let that
+                 * decide - otherwise the wizard announces "connect the battery" for
+                 * a sequence that never started, then reports it finished.
+                 */
+                MSP.send_message(MSPCodes.MSP2_INAV_ESC_SRXL2_STATUS, false, false, function (resp) {
+                    const phase = resp.data.readU8();
+
+                    if (phase === SRXL2_CAL_OFF) {
+                        resp.data.readU8();                     // connected
+                        const why = resp.data.readU8();   // null past the end, on older firmware
+                        srxl2CalShow(SRXL2_CAL_REFUSED[why] || 'srxl2CalibrateRefused');
+                        $('#srxl2-cal-ack').prop('checked', false);
+                        $('#srxl2-cal-start').addClass('disabled');
+                        return;
+                    }
+
+                    $('#srxl2-cal-start').hide();
+                    $('#srxl2-cal-abort').show();
+                    srxl2CalShow('srxl2CalibrateConnect');
+                    srxl2PollTimer = setInterval(srxl2CalPoll, 500);
+                });
             });
         });
 
