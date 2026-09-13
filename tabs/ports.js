@@ -20,38 +20,8 @@ portsTab.initialize = function (callback) {
         GUI.active_tab = this;
     }
 
-    /*
-     * Some functions only exist in firmware that was built with them. Ask once,
-     * before the checkboxes are drawn, so a board that does not have a function
-     * never offers it.
-     */
-    function resolveFunctionAvailability(done) {
-        const rules = serialPortHelper.getRules();
-        const gated = rules.filter(r => r.requiresSetting && r.available === undefined);
-
-        if (gated.length === 0) {
-            done();
-            return;
-        }
-
-        let pending = gated.length;
-        gated.forEach(function (rule) {
-            mspHelper.getSetting(rule.requiresSetting).then(function (setting) {
-                rule.available = !!setting;
-            }).catch(function () {
-                rule.available = false;
-            }).then(function () {
-                if (--pending === 0) {
-                    done();
-                }
-            });
-        });
-    }
-
     mspHelper.loadSerialPorts(function () {
-        resolveFunctionAvailability(function () {
-            import('./ports.html?raw').then(({default: html}) => GUI.load(html, on_tab_loaded_handler));
-        });
+        import('./ports.html?raw').then(({default: html}) => GUI.load(html, on_tab_loaded_handler));
     });
 
     function checkMSPPortCount(excludeCheckbox) {
@@ -146,10 +116,6 @@ portsTab.initialize = function (callback) {
                     for (i = 0; i < serialPortHelper.getRules().length; i++) {
                         var functionRule = serialPortHelper.getRules()[i];
                         var functionName = functionRule.name;
-
-                        if (functionRule.available === false) {
-                            continue;   // not in this firmware
-                        }
 
                         if (functionRule.groups.indexOf(column) == -1) {
                             continue;
