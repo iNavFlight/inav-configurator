@@ -446,6 +446,9 @@ test('CLI tab: periodicStatusUpdater must not queue MSP polls during cliTab.init
         // code) - otherwise the pending timeout would only ever get
         // cancelled on the passing/fixed-code run.
         realTimeoutModule.remove('enter_cli');
+        // initialize() locks the shared queue; leaving CLI must release it.
+        mspQueue.unlock();
+        CONFIGURATOR.cliActive = false;
         mspQueue.flush();
         mspDeduplicationQueue.flush();
     }

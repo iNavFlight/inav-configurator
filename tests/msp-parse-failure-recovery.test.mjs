@@ -37,7 +37,7 @@
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync, writeFileSync, mkdtempSync, rmSync } from 'node:fs';
+import { readFileSync, readdirSync, writeFileSync, mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, dirname, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -333,7 +333,33 @@ function clearParseFailures() {
     MSP.parseFailures.clear();
 }
 
-test('every write code is classified - none falls through unnoticed', () => {
+// Declared protocol constants with no sender yet. Their conservative production
+// fallback stays in force; implementing a sender requires classifying its input.
+const unusedWriteNames = [
+    'MSP2_SET_MZTC_PALETTE', 'MSP2_SET_MZTC_ZOOM', 'MSP2_SET_MZTC_SHUTTER',
+    'MSP2_SET_MZTC_IMAGE_PARAMS', 'MSP2_SET_MZTC_CORRECTION', 'MSP2_SET_MZTC_VIGNETTING',
+];
+
+test('unused MZTC writes remain unused and conservatively blocked', () => {
+    const sources = ['js', 'tabs'].flatMap(dir =>
+        readdirSync(join(repoRoot, dir), { recursive: true })
+            .filter(file => file.endsWith('.js') && !(dir === 'js' && file === 'msp/MSPCodes.js'))
+            .map(file => readFileSync(join(repoRoot, dir, file), 'utf8'))
+    ).join('\n');
+    clearParseFailures();
+    MSP.parseFailures.add(MSPCodes.MSP_BOARD_INFO);
+    try {
+        for (const name of unusedWriteNames) {
+            assert.notEqual(MSPCodes[name], undefined);
+            assert.equal(sources.includes(name), false, `${name} now has a sender: classify its input source`);
+            assert.equal(MSP.blockedWriteSource(MSPCodes[name]), MSPCodes.MSP_BOARD_INFO);
+        }
+    } finally {
+        clearParseFailures();
+    }
+});
+
+test('every implemented write code is classified - none falls through unnoticed', () => {
     // A write nobody classified would be refused wholesale the moment anything
     // else fails to parse. That is the safe direction, but it is not the intended
     // behaviour, so adding an MSP write command must fail here until it is either
@@ -346,7 +372,8 @@ test('every write code is classified - none falls through unnoticed', () => {
     // probe the classification with one arbitrary failure in place instead.
     MSP.parseFailures.add(MSPCodes.MSP_BOARD_INFO); // a read no write hands back
 
-    const unclassified = writeNames.filter(name => MSP.blockedWriteSource(MSPCodes[name]) !== false);
+    const unclassified = writeNames.filter(name =>
+        !unusedWriteNames.includes(name) && MSP.blockedWriteSource(MSPCodes[name]) !== false);
 
     clearParseFailures();
     assert.deepEqual(
@@ -418,6 +445,8 @@ test('reads, reboot and live commands are never blocked', () => {
         // strand the motors spinning.
         'MSP_SET_MOTOR',
         'MSP_SET_RAW_RC',
+        // Only the user-selected preset index is sent, never parsed FC state.
+        'MSP2_SET_MZTC_PRESET',
         // Persists what is already on the FC; a refused write never got there.
         'MSP_EEPROM_WRITE',
     ];
@@ -448,7 +477,7 @@ test('a write is recognised however its name spells SET', () => {
         'MSPV2_SETTING', 'MSP2_COMMON_SETTING_INFO',
         'MSP_SET_REBOOT', 'MSP_SET_MOTOR', 'MSP_SET_RAW_RC', 'MSP_SET_RAW_GPS',
         'MSP_SET_HEAD', 'MSP_SET_RTC', 'MSP_RESET_CONF', 'MSP_SET_RESET_CURR_PID',
-        'MSP_SELECT_SETTING', 'MSP_SET_BOX',
+        'MSP_SELECT_SETTING', 'MSP_SET_BOX', 'MSP2_SET_MZTC_PRESET',
     ];
 
     clearParseFailures();

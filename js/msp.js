@@ -21,6 +21,7 @@ const ALWAYS_ALLOWED_WRITE_NAMES = [
     'MSP_RESET_CONF', 'MSP_SET_RESET_CURR_PID',
     'MSP_SELECT_SETTING', 'MSP2_INAV_SELECT_BATTERY_PROFILE', 'MSP2_INAV_SELECT_MIXER_PROFILE',
     'MSP_WP_MISSION_SAVE', 'MSP_DATAFLASH_ERASE', 'MSP_OSD_CHAR_WRITE',
+    'MSP2_SET_MZTC_PRESET',      // explicit user-selected index, not FC-read configuration
     'MSP_SET_BOX',               // legacy, never sent by this Configurator
 ];
 
