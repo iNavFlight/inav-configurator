@@ -235,6 +235,16 @@ outputsTab.initialize = function (callback) {
             $('#srxl2-esc').toggle(isSrxl2);
 
             /*
+             * Reversible motors is the centre-zero throttle arrangement, which is a
+             * different kind of ESC. A Smart ESC reverses on a switch and goes on
+             * reading the throttle normally, so enabling it would hand the ESC
+             * roughly half throttle where the pilot expects the motor stopped. The
+             * firmware clears the feature for this protocol at startup; hiding the
+             * control keeps the tab from offering what the board will undo.
+             */
+            $('#feature-12').closest('.checkbox').toggle(!isSrxl2);
+
+            /*
              * Assigning the port and choosing the protocol are two settings, and
              * doing only the first is the easy mistake: the block below is hidden
              * until the protocol is SRXL2, so without this the tab says nothing at
