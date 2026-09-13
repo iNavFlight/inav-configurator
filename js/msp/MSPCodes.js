@@ -258,7 +258,7 @@ var MSPCodes = {
     MSP2_INAV_SET_GEOZONE:              0x2211,
     MSP2_INAV_GEOZONE_VERTEX:           0x2212,
     MSP2_INAV_SET_GEOZONE_VERTICE:      0x2213,
-    MSP2_INAV_SET_RX_LINK:              0x2232
+    MSP2_INAV_SET_RX_LINK:              0x2232,
 
     // MassZero Thermal Camera.
     // These sit in INAV's own 0x2000-0x2FFF range. The 0x3000 block belongs to
