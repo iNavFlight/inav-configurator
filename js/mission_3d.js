@@ -2,12 +2,24 @@
 
 import MWNP from './mwnp.js';
 
-const ROUTE_ACTIONS = new Set([
+export const ROUTE_ACTIONS = new Set([
     MWNP.WPTYPE.WAYPOINT,
     MWNP.WPTYPE.POSHOLD_UNLIM,
     MWNP.WPTYPE.POSHOLD_TIME,
     MWNP.WPTYPE.LAND
 ]);
+
+export const END_OF_MISSION_MARKER = 0xA5;
+
+// The single source of truth for "the flown route stops here", shared with
+// js/mission_sim.js's getSimulationRoute() so the 3D terrain view and the
+// kinematic simulator can't drift apart on what ends a mission.
+export function routeTerminatesAt(waypoint) {
+    const action = waypoint.getAction();
+    return action === MWNP.WPTYPE.RTH
+        || (action === MWNP.WPTYPE.LAND && !waypoint.isAttached())
+        || waypoint.getEndMission() === END_OF_MISSION_MARKER;
+}
 
 function hasValidHomePosition(home) {
     if (!home?.getLat || !home?.getLon) return false;
@@ -23,16 +35,6 @@ function isRouteWaypoint(waypoint) {
 
 function isJumpWaypoint(waypoint) {
     return waypoint.isAttached() && waypoint.getAction() === MWNP.WPTYPE.JUMP;
-}
-
-// RTH and an unattached LAND end the flown route wherever they occur — same firmware semantics
-// js/mission_sim.js's getSimulationRoute() stops at — not just when the multi-mission end marker
-// happens to be set on that slot.
-function terminatesMission3DRoute(waypoint) {
-    const action = waypoint.getAction();
-    return action === MWNP.WPTYPE.RTH
-        || (action === MWNP.WPTYPE.LAND && !waypoint.isAttached())
-        || waypoint.getEndMission() === 0xA5;
 }
 
 function buildMission3DPoint(waypoint) {
@@ -52,7 +54,8 @@ function buildMission3DPoint(waypoint) {
         absoluteAltitude: (waypoint.getP3() & (1 << MWNP.P3.ALT_TYPE)) !== 0,
         action,
         isHome: false,
-        isRoutePoint: ROUTE_ACTIONS.has(action)
+        isRoutePoint: ROUTE_ACTIONS.has(action),
+        endsMission: false
     };
 }
 
@@ -66,17 +69,28 @@ function buildMission3DHomePoint(home) {
         absoluteAltitude: true,
         action: 0,
         isHome: true,
-        isRoutePoint: false
+        isRoutePoint: false,
+        endsMission: false
     };
 }
 
 // The markers of the mission: every positional waypoint plus HOME when it is set. Attached
 // actions have no position of their own; JUMP shapes the route through getMission3DFlightLegs().
 export function getMission3DPoints(waypoints, home) {
-    const points = waypoints
-        .filter((waypoint) => !waypoint.isAttached())
-        .map(buildMission3DPoint)
-        .filter(Boolean);
+    const points = [];
+
+    waypoints.forEach((waypoint) => {
+        if (!waypoint.isAttached()) {
+            const point = buildMission3DPoint(waypoint);
+            if (point) {
+                points.push(point);
+            }
+        }
+
+        if (routeTerminatesAt(waypoint) && points.length) {
+            points.at(-1).endsMission = true;
+        }
+    });
 
     if (hasValidHomePosition(home)) {
         points.unshift(buildMission3DHomePoint(home));
@@ -146,11 +160,11 @@ export function getMission3DFlightLegs(waypoints, maximumSteps = waypoints.lengt
             }
         }
 
-        if (terminatesMission3DRoute(waypoint)) {
+        if (routeTerminatesAt(waypoint)) {
             walk.current = null;
             walk.pendingJump = null;
         }
-        if (waypoint.getEndMission() === 0xA5) walk.missionStartNumber = waypoint.getNumber() + 1;
+        if (waypoint.getEndMission() === END_OF_MISSION_MARKER) walk.missionStartNumber = waypoint.getNumber() + 1;
         index++;
     }
 
