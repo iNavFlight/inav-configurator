@@ -100,7 +100,17 @@ const serialPortHelper = (function () {
              * is the lowest-numbered port. The firmware refuses to arm if there are
              * fewer ports than motors. */
             name: 'ESC_SRXL2',
-            groups: ['peripherals']
+            groups: ['peripherals'],
+            /*
+             * The rate is not a choice. The driver opens the port at 115200 because
+             * that is what the specification requires every SRXL2 device to listen
+             * at, then negotiates upwards - to 400000 with an ESC that offers it -
+             * during the handshake. Whatever this control said would be ignored, so
+             * it is shown locked rather than left to imply otherwise.
+             */
+            defaultBaud: 115200,
+            lockedBaud: true,
+            negotiatedBaud: true
         },
         {
             name: 'OPFLOW',

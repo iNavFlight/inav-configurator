@@ -269,6 +269,31 @@ outputsTab.initialize = function (callback) {
             }
         }
 
+        /*
+         * Reverse is off when the channel is 0, which is how the firmware stores it,
+         * but a bare number field gives no hint that zero is the off switch. The
+         * checkbox is that switch; the channel only appears once it is on.
+         *
+         * SRXL2_REVERSE_DEFAULT is what Spektrum ship, so turning it on lands
+         * somewhere sensible rather than on a channel the ESC never watches.
+         */
+        const SRXL2_REVERSE_DEFAULT = 7;
+        const $reverseEnable = $('#srxl2-reverse-enable');
+        const $reverseChannel = $('#esc_srxl2_reverse_channel');
+        const $reverseRow = $('#srxl2-reverse-channel-row');
+
+        function srxl2ReverseSync() {
+            const on = $reverseEnable.is(':checked');
+            $reverseRow.toggle(on);
+            if (on && parseInt($reverseChannel.val(), 10) === 0) {
+                $reverseChannel.val(SRXL2_REVERSE_DEFAULT).trigger('change');
+            } else if (!on) {
+                $reverseChannel.val(0).trigger('change');
+            }
+        }
+
+        $reverseEnable.on('change', srxl2ReverseSync);
+
         $('#srxl2-cal-ack').on('change', function () {
             $('#srxl2-cal-start').toggleClass('disabled', !$(this).is(':checked'));
         });
@@ -331,6 +356,11 @@ outputsTab.initialize = function (callback) {
 
         $idlePercent.on('change', handleIdleMessageBox);
         handleIdleMessageBox();
+
+        /* Settings has filled the inputs by now, so the checkbox can be set from
+          * the stored channel without fighting it. */
+        $reverseEnable.prop('checked', parseInt($reverseChannel.val(), 10) > 0);
+        $reverseRow.toggle($reverseEnable.is(':checked'));
 
         $("#esc-protocols").show();
         srxl2UpdateVisibility();
