@@ -2615,6 +2615,9 @@
     "magnetometerHead": {
         "message": "Alignment Tool"
     },
+    "magnetometerLoadFailed": {
+        "message": "The Alignment Tool did not receive its configuration from the flight controller. The tab was not opened, the connection is unchanged."
+    },
     "magnetometerHelp": {
         "message": "1. Adjust Flight Controller orientation to match physical orientation on the aircraft <u>according to \"direction\" arrow on the Flight Controller</u>.<br/>2. Adjust magnetometer model, or magnetometer chip, or magnetometer axes orientation to match physical orientation on the aircraft.<br/><strong>Note:</strong> Magnetometer orientation preset (align_mag) is relative to FC. Make sure to align FC first (align_board_pitch, align_board_roll, align_board_yaw).<br/>If preset is not used (orientation is set using align_mag_roll, align_mag_pitch and align_mag_yaw), then magnetometer orientation is independent."
     },

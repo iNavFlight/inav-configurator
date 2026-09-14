@@ -14,8 +14,15 @@ import GUI from './../js/gui';
 import i18n from './../js/localization';
 import { mixer } from './../js/model';
 import interval from './../js/intervals';
+import timeout from './../js/timeouts';
 
 const magnetometerTab = {};
+
+// The load chain has no error path: a request that is never answered (a setting
+// the firmware does not know, a dropped MSP frame) leaves the tab on the loading
+// spinner and GUI.content_ready() is never reached, which keeps the tab switcher
+// blocked. Give up after this many milliseconds and show a message instead.
+const LOAD_TIMEOUT = 10000;
 
 
 magnetometerTab.initialize = function (callback) {
@@ -94,9 +101,13 @@ magnetometerTab.initialize = function (callback) {
         }
     ];
 
+    self.loadFinished = false;
+
     loadChainer.setChain(loadChain);
     loadChainer.setExitPoint(load_html);
     loadChainer.execute();
+
+    timeout.add('magnetometer_load', load_timed_out, LOAD_TIMEOUT);
 
     function areAnglesZero() {
         return self.alignmentConfig.pitch === 0 && self.alignmentConfig.roll === 0 && self.alignmentConfig.yaw === 0
@@ -173,7 +184,37 @@ magnetometerTab.initialize = function (callback) {
     }
 
     function load_html() {
+        if (self.loadFinished) {
+            return;
+        }
+        self.loadFinished = true;
+        timeout.remove('magnetometer_load');
+
         import('./magnetometer.html?raw').then(({default: html}) => GUI.load(html, process_html));
+    }
+
+    function load_timed_out() {
+        if (self.loadFinished) {
+            return;
+        }
+
+        // A hidden window throttles the timers that drive the MSP queue, so the
+        // chain is allowed to take longer than LOAD_TIMEOUT while the window is
+        // in the background. Only give up on a window the user can see.
+        if (document.hidden) {
+            timeout.add('magnetometer_load', load_timed_out, LOAD_TIMEOUT);
+            return;
+        }
+
+        self.loadFinished = true;
+
+        GUI.log(i18n.getMessage('magnetometerLoadFailed'));
+
+        // Hand the tab back to the user instead of leaving it loading forever.
+        GUI.load('<div class="tab-magnetometer"><div class="content_wrapper"><div class="note"><p data-i18n="magnetometerLoadFailed"></p></div></div></div>', function () {
+            i18n.localize();
+            GUI.content_ready(callback);
+        });
     }
 
     function generateRange(min, max, step) {
@@ -724,7 +765,10 @@ magnetometerTab.initialize3D = function () {
             GUI.log("<span style='color: red; font-weight: bolder'><strong>" + i18n.getMessage("mixerNotConfigured") + "</strong></span>");
         }
         else {
-            model_file = mixer.getById(FC.MIXER_CONFIG.appliedMixerPreset).model;
+            // A flight controller can report a preset this Configurator does not
+            // know; use the generic model rather than throwing out of the tab.
+            const appliedMixer = mixer.getById(FC.MIXER_CONFIG.appliedMixerPreset);
+            model_file = appliedMixer ? appliedMixer.model : 'fallback';
         }
     }
     else {
@@ -892,7 +936,12 @@ magnetometerTab.initialize3D = function () {
 
 
 magnetometerTab.cleanup = function (callback) {
-    $(window).off('resize', this.resize3D);
+    timeout.remove('magnetometer_load');
+
+    // Without the handler, off() would drop every resize listener on the window.
+    if (this.resize3D) {
+        $(window).off('resize', this.resize3D);
+    }
 
     if (callback) callback();
 };
