@@ -4866,7 +4866,7 @@
         "message": "Geladene Datei:"
     },
     "missionTotalInfoDistance": {
-        "message": "Distanz (m):"
+        "message": "Distanz:"
     },
     "missionTotalInfoAvailablePoints": {
         "message": "Verfügbare Punkte"
@@ -4875,10 +4875,10 @@
         "message": "Mission gültig"
     },
     "missionDefaultPointAlt": {
-        "message": "Höhe (cm): "
+        "message": "Höhe: "
     },
     "missionDefaultPointSpeed": {
-        "message": "Geschwindigkeit (cm/s): "
+        "message": "Geschwindigkeit: "
     },
     "missionDefaultSafeRangeSH": {
         "message": "Radius (m): "
@@ -5025,10 +5025,10 @@
         "message": "Fixed Wing Landeeinstellungen:"
     },
     "missionFwApproachAlt": {
-        "message": "Anflughöhe: (cm):"
+        "message": "Anflughöhe:"
     },
     "missionFwLandAlt": {
-        "message": "Landehöhe: (cm):"
+        "message": "Landehöhe:"
     },
     "missionFwApproachDir": {
         "message": "Anflugrichtung:"

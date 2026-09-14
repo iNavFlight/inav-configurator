@@ -4528,7 +4528,7 @@
         "message": "Nome file caricato:"
     },
     "missionTotalInfoDistance": {
-        "message": "Distanza (m):"
+        "message": "Distanza:"
     },
     "missionTotalInfoAvailablePoints": {
         "message": "Punti Disponibili"
@@ -4537,10 +4537,10 @@
         "message": "Missione valida"
     },
     "missionDefaultPointAlt": {
-        "message": "Alt (cm): "
+        "message": "Alt: "
     },
     "missionDefaultPointSpeed": {
-        "message": "Velocità (cm/s): "
+        "message": "Velocità: "
     },
     "missionDefaultSafeRangeSH": {
         "message": "Raggio (m): "
@@ -4672,10 +4672,10 @@
         "message": "Impostazioni atterraggio ala fissa:"
     },
     "missionFwApproachAlt": {
-        "message": "Alt Approccio: (cm):"
+        "message": "Alt Approccio:"
     },
     "missionFwLandAlt": {
-        "message": "Alt Atterraggio: (cm):"
+        "message": "Alt Atterraggio:"
     },
     "missionFwApproachDir": {
         "message": "Direzione approccio:"

@@ -5292,7 +5292,7 @@
         "message": "Filename loaded:"
     },
     "missionTotalInfoDistance": {
-        "message": "Distance (m):"
+        "message": "Distance:"
     },
     "missionTotalInfoAvailablePoints": {
         "message": "Available Points"
@@ -5301,10 +5301,10 @@
         "message": "Mission valid"
     },
     "missionDefaultPointAlt": {
-        "message": "Alt (cm): "
+        "message": "Alt: "
     },
     "missionDefaultPointSpeed": {
-        "message": "Speed (cm/s): "
+        "message": "Speed: "
     },
     "missionDefaultSafeRangeSH": {
         "message": "Radius (m): "
@@ -5451,10 +5451,10 @@
         "message": "Fixed Wing landing settings:"
     },
     "missionFwApproachAlt": {
-        "message": "Approach Alt: (cm):"
+        "message": "Approach Alt:"
     },
     "missionFwLandAlt": {
-        "message": "Land Alt: (cm):"
+        "message": "Land Alt:"
     },
     "missionFwApproachDir": {
         "message": "Approach direction:"

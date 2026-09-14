@@ -4559,7 +4559,7 @@
     "message": "Зареден файл:"
   },
   "missionTotalInfoDistance": {
-    "message": "Разстояние (m):"
+    "message": "Разстояние:"
   },
   "missionTotalInfoAvailablePoints": {
     "message": "Налични точки"
@@ -4568,10 +4568,10 @@
     "message": "Мисията е валидна"
   },
   "missionDefaultPointAlt": {
-    "message": "Височина (cm): "
+    "message": "Височина: "
   },
   "missionDefaultPointSpeed": {
-    "message": "Скорост (cm/s): "
+    "message": "Скорост: "
   },
   "missionDefaultSafeRangeSH": {
     "message": "Радиус (m): "
@@ -4703,10 +4703,10 @@
     "message": "Настройки за кацане на самолети:"
   },
   "missionFwApproachAlt": {
-    "message": "Височина на подход: (cm):"
+    "message": "Височина на подход:"
   },
   "missionFwLandAlt": {
-    "message": "Височина за кацане: (cm):"
+    "message": "Височина за кацане:"
   },
   "missionFwApproachDir": {
     "message": "Посока на подход:"

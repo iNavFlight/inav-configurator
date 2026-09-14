@@ -361,7 +361,7 @@
         "message": "Аналоговый вход RSSI"
     },
     "missionTotalInfoDistance": {
-        "message": "Расстояние (м):"
+        "message": "Расстояние:"
     },
     "sitlSimulator": {
         "message": "Симулятор"
@@ -1102,7 +1102,7 @@
         "message": "Миссия действительна"
     },
     "missionFwApproachAlt": {
-        "message": "Высота захода на посадку (см):"
+        "message": "Высота захода на посадку:"
     },
     "proxyLayer": {
         "message": "Слой MapProxy"
@@ -3422,7 +3422,7 @@
         "message": "Загрузить файл"
     },
     "missionFwLandAlt": {
-        "message": "Высота приземления (см):"
+        "message": "Высота приземления:"
     },
     "configurationVTXNoBandHelp": {
         "message": "Частота VTX установлена вручную. Выбор диапазона приведёт к перезаписи настроенной частоты."
@@ -4236,7 +4236,7 @@
         "message": "Выбранный вручную"
     },
     "missionDefaultPointSpeed": {
-        "message": "Скорость (см/с): "
+        "message": "Скорость: "
     },
     "osd_camera_fov_h": {
         "message": "Гориз. угол обзора камеры"
@@ -6007,7 +6007,7 @@
         "message": "Максимальный угол крена в навигационных режимах. Ограничен максимальным углом крена на вкладке «PID настройки»."
     },
     "missionDefaultPointAlt": {
-        "message": "Высота (см): "
+        "message": "Высота: "
     },
     "functionFlags": {
         "message": "Флаги"

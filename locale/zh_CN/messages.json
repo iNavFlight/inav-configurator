@@ -4596,7 +4596,7 @@
         "message": "已加载文件:"
     },
     "missionTotalInfoDistance": {
-        "message": "距离 (m):"
+        "message": "距离:"
     },
     "missionTotalInfoAvailablePoints": {
         "message": "可用航点"
@@ -4605,10 +4605,10 @@
         "message": "有效任务"
     },
     "missionDefaultPointAlt": {
-        "message": "高度 (cm): "
+        "message": "高度: "
     },
     "missionDefaultPointSpeed": {
-        "message": "速度 (cm/s): "
+        "message": "速度: "
     },
     "missionDefaultSafeRangeSH": {
         "message": "半径 (m): "
@@ -4740,10 +4740,10 @@
         "message": "固定翼着陆设置:"
     },
     "missionFwApproachAlt": {
-        "message": "进场高度: (厘米):"
+        "message": "进场高度:"
     },
     "missionFwLandAlt": {
-        "message": "着陆高度: (厘米):"
+        "message": "着陆高度:"
     },
     "missionFwApproachDir": {
         "message": "进场方向:"

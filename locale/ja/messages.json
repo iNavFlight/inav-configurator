@@ -4570,7 +4570,7 @@
         "message": "読み込まれたファイル名: "
     },
     "missionTotalInfoDistance": {
-        "message": "距離 (m):"
+        "message": "距離:"
     },
     "missionTotalInfoAvailablePoints": {
         "message": "利用可能なポイント"
@@ -4579,10 +4579,10 @@
         "message": "ミッションが有効"
     },
     "missionDefaultPointAlt": {
-        "message": "高度 (cm): "
+        "message": "高度: "
     },
     "missionDefaultPointSpeed": {
-        "message": "速度 (cm/s): "
+        "message": "速度: "
     },
     "missionDefaultSafeRangeSH": {
         "message": "半径 (m): "
@@ -4714,10 +4714,10 @@
         "message": "固定翼機 着陸設定: "
     },
     "missionFwApproachAlt": {
-        "message": "進入高度 (cm): "
+        "message": "進入高度: "
     },
     "missionFwLandAlt": {
-        "message": "着陸高度 (cm): "
+        "message": "着陸高度: "
     },
     "missionFwApproachDir": {
         "message": "進入方向: "

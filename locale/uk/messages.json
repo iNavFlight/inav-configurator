@@ -4582,7 +4582,7 @@
         "message": "Завантажено файл:"
     },
     "missionTotalInfoDistance": {
-        "message": "Відстань (м):"
+        "message": "Відстань:"
     },
     "missionTotalInfoAvailablePoints": {
         "message": "Доступні точки"
@@ -4591,10 +4591,10 @@
         "message": "Місія дійсна"
     },
     "missionDefaultPointAlt": {
-        "message": "Висота (см):"
+        "message": "Висота:"
     },
     "missionDefaultPointSpeed": {
-        "message": "Швидкість (см/с):"
+        "message": "Швидкість:"
     },
     "missionDefaultSafeRangeSH": {
         "message": "Радіус (м):"
@@ -4726,10 +4726,10 @@
         "message": "Налаштування посадки для фіксованого крила:"
     },
     "missionFwApproachAlt": {
-        "message": "Висота наближення: (см):"
+        "message": "Висота наближення:"
     },
     "missionFwLandAlt": {
-        "message": "Висота приземлення: (см):"
+        "message": "Висота приземлення:"
     },
     "missionFwApproachDir": {
         "message": "Напрямок наближення:"
