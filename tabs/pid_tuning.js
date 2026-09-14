@@ -257,6 +257,27 @@ pidTuningTab.initialize = function (callback) {
             $('.not-for-multirotor').hide();
         }
 
+        // The FC serves the PID bank that pid_type selects, while its navigation
+        // code always uses the bank of the platform type. When the two disagree
+        // the navigation gains below belong to the bank that is not flying.
+        mspHelper.getSetting('pid_type').then(function (data) {
+            if (!data) {
+                return;
+            }
+
+            let shownBankIsFixedWing = FC.usesFixedWingPidBank(data.value);
+            if (shownBankIsFixedWing === FC.usesFixedWingNavPids()) {
+                return;
+            }
+
+            $('#nav-pid-bank-mismatch').text(i18n.getMessage('pidTuningNavPidBankMismatch', [
+                shownBankIsFixedWing ? 'nav_fw_*' : 'nav_mc_*',
+                shownBankIsFixedWing ? 'nav_mc_*' : 'nav_fw_*'
+            ])).show();
+        }).catch(function (err) {
+            console.debug('pid_tuning: pid_type setting not available:', err?.message);
+        });
+
         $("#ez_tune_enabled").prop('checked', FC.EZ_TUNE.enabled).trigger('change');
 
         GUI.sliderize($('#ez_tune_filter_hz'), FC.EZ_TUNE.filterHz, 20, 300);

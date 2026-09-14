@@ -1814,6 +1814,9 @@
     "pidTuning_PIDother": {
         "message": "Additional PID Gains"
     },
+    "pidTuningNavPidBankMismatch": {
+        "message": "pid_type does not match the platform type. The flight controller reports the $1 gains, but navigation runs on $2. The navigation gains shown below are not the ones in use, so changing them has no effect. Set pid_type back to AUTO, or tune the $2 settings in the CLI."
+    },
     "pidTuning_SelectNewDefaults": {
         "message": "Select New Defaults"
     },

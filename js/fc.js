@@ -12,7 +12,7 @@ import OutputMappingCollection from './outputMapping';
 import SafehomeCollection from './safehomeCollection';
 import FwApproachCollection from './fwApproachCollection';
 import GeozoneCollection from './geozoneCollection';
-import { PLATFORM } from './model';
+import { PLATFORM, PID_TYPE } from './model';
 import VTX from './vtx';
 import BitHelper from './bitHelper';
 import { FLIGHT_MODES } from './flightModes';
@@ -103,6 +103,22 @@ var FC = {
     },
     isMultirotor: function () {
         return (this.MIXER_CONFIG.platformType == PLATFORM.MULTIROTOR || this.MIXER_CONFIG.platformType == PLATFORM.TRICOPTER);
+    },
+    // Navigation always runs on the bank that belongs to the platform type, no
+    // matter what pid_type says. Airplanes, rovers and boats use the nav_fw_*
+    // gains, every other platform the nav_mc_* ones.
+    usesFixedWingNavPids: function () {
+        return (this.MIXER_CONFIG.platformType == PLATFORM.AIRPLANE ||
+            this.MIXER_CONFIG.platformType == PLATFORM.ROVER ||
+            this.MIXER_CONFIG.platformType == PLATFORM.BOAT);
+    },
+    // The bank the FC reports over MSP2_PID follows pid_type instead, so it can
+    // point at the other set of gains than the one navigation is using.
+    usesFixedWingPidBank: function (pidType) {
+        if (pidType == PID_TYPE.AUTO) {
+            return this.usesFixedWingNavPids();
+        }
+        return (pidType == PID_TYPE.PIFF);
     },
     isRpyFfComponentUsed: function () {
         return true; // Currently all planes have roll, pitch and yaw FF
