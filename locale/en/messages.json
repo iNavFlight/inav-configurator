@@ -6872,6 +6872,12 @@
     "osdClearLayout": {
         "message": "Layout has been cleared"
     },
+    "osdLayoutSaveFailed": {
+        "message": "The flight controller did not accept all OSD layout changes. Settings were not saved to permanent storage. Check the connection and reload the OSD tab before trying again."
+    },
+    "osdElementsWithoutHardwareDisabled": {
+        "message": "Switched off elements without hardware or feature: $1. They keep their position and come back switched off when the hardware is enabled again."
+    },
     "failedToOpenSerialPort": {
         "message": "<span style=\"color: red\">Failed</span> to open serial port"
     },
