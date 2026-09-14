@@ -91,6 +91,28 @@ const serialPortHelper = (function () {
             isUnique: true
         },
         {
+            /* Spektrum Smart ESC. The ESC signal wire goes to this port's TX pin,
+             * half duplex, rather than to a motor pad, and the baud rate is
+             * negotiated during the handshake rather than configured here.
+             *
+             * Deliberately not isUnique: the protocol carries one ESC per bus, so a
+             * model with N motors needs N ports, assigned in motor order - motor 1
+             * is the lowest-numbered port. The firmware refuses to arm if there are
+             * fewer ports than motors. */
+            name: 'ESC_SRXL2',
+            groups: ['peripherals'],
+            /*
+             * The rate is not a choice. The driver opens the port at 115200 because
+             * that is what the specification requires every SRXL2 device to listen
+             * at, then negotiates upwards - to 400000 with an ESC that offers it -
+             * during the handshake. Whatever this control said would be ignored, so
+             * it is shown locked rather than left to imply otherwise.
+             */
+            defaultBaud: 115200,
+            lockedBaud: true,
+            negotiatedBaud: true
+        },
+        {
             name: 'OPFLOW',
             groups: ['sensors'],
             isUnique: true
@@ -176,7 +198,8 @@ const serialPortHelper = (function () {
         'MSP_DISPLAYPORT': 25,
         'GIMBAL': 26,
         'HEADTRACKER': 27,
-        'MZTC_CAMERA': 28
+        'MZTC_CAMERA': 28,
+        'ESC_SRXL2': 29
     };
 
     privateScope.identifierToName = {

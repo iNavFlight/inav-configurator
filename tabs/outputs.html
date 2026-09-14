@@ -26,6 +26,65 @@
                     <div class="clear-both"></div>
                 </div>
 
+                <div id="srxl2-protocol-hint" class="warning-box" style="display: none;"></div>
+
+                <div id="srxl2-esc" style="display: none;">
+                    <div id="srxl2-no-port" class="warning-box" style="display: none;"></div>
+                    <div data-i18n="srxl2Info" class="info-box"></div>
+                    <div id="srxl2-port-count" class="info-box"></div>
+
+                    <div class="checkbox">
+                        <input id="esc_srxl2_telemetry" type="checkbox" class="toggle" data-setting="esc_srxl2_telemetry" />
+                        <label for="esc_srxl2_telemetry">
+                            <span data-i18n="srxl2Telemetry">Read telemetry from the ESC</span>
+                        </label>
+                        <div for="esc_srxl2_telemetry" class="helpicon cf_tip" data-i18n_title="srxl2TelemetryHelp"></div>
+                    </div>
+
+                    <div class="select">
+                        <select id="esc_srxl2_telemetry_rate" data-setting="esc_srxl2_telemetry_rate"></select>
+                        <label for="esc_srxl2_telemetry_rate">
+                            <span data-i18n="srxl2TelemetryRate">How often to ask the ESC for telemetry</span>
+                        </label>
+                        <div for="esc_srxl2_telemetry_rate" class="helpicon cf_tip" data-i18n_title="srxl2TelemetryRateHelp"></div>
+                    </div>
+
+                    <div class="checkbox">
+                        <input id="srxl2-reverse-enable" type="checkbox" class="toggle" />
+                        <label for="srxl2-reverse-enable">
+                            <span data-i18n="srxl2ReverseEnable">Thrust reverse</span>
+                        </label>
+                        <div for="srxl2-reverse-enable" class="helpicon cf_tip" data-i18n_title="srxl2ReverseEnableHelp"></div>
+                    </div>
+
+                    <div class="number" id="srxl2-reverse-channel-row">
+                        <input id="esc_srxl2_reverse_channel" data-setting="esc_srxl2_reverse_channel" type="number" />
+                        <label for="esc_srxl2_reverse_channel">
+                            <span data-i18n="srxl2ReverseChannel">Thrust Reverse: ESC channel</span>
+                        </label>
+                        <div for="esc_srxl2_reverse_channel" class="helpicon cf_tip" data-i18n_title="srxl2ReverseChannelHelp"></div>
+                    </div>
+
+                    <div class="spacer_box">
+                        <div data-i18n="srxl2CalibrateTitle" class="spacer_box_title"></div>
+                        <div data-i18n="srxl2CalibrateWarning" class="warning-box"></div>
+
+                        <div class="checkbox">
+                            <input id="srxl2-cal-ack" type="checkbox" class="toggle" />
+                            <label for="srxl2-cal-ack">
+                                <span data-i18n="srxl2CalibrateAck">The propeller is removed and the battery is disconnected</span>
+                            </label>
+                        </div>
+
+                        <div class="line">
+                            <a href="#" id="srxl2-cal-start" class="regular-button disabled" data-i18n="srxl2CalibrateStart"></a>
+                            <a href="#" id="srxl2-cal-abort" class="regular-button" style="display: none;" data-i18n="srxl2CalibrateAbort"></a>
+                        </div>
+
+                        <div id="srxl2-cal-status" class="info-box" style="display: none;"></div>
+                    </div>
+                </div>
+
                 <div id="servo-rate-container">
                     <div class="select">
                         <select name="servo-rate" id="servo-rate" data-setting-placeholder="servo_pwm_rate"></select>

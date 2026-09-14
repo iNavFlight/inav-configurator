@@ -1670,6 +1670,111 @@
     "portsFunction_OPFLOW": {
         "message": "Optic flow"
     },
+    "portsBaudFixedByProtocol": {
+        "message": "This protocol sets its own line rate and ignores this setting. SRXL2 opens at 115200, as the specification requires, then negotiates upwards during the handshake."
+    },
+    "portsFunction_ESC_SRXL2": {
+        "message": "Spektrum Smart ESC (SRXL2)"
+    },
+    "srxl2Info": {
+        "message": "The ESC signal wire goes to the TX pin of a port assigned to Spektrum Smart ESC, not to a motor pad, and carries telemetry back on the same wire. One ESC per port: a model with several motors needs a port each, assigned in motor order, so motor 1 is the lowest-numbered port."
+    },
+    "srxl2ProtocolAutoSet": {
+        "message": "ESC protocol set to SRXL2, to match the port assigned to Spektrum Smart ESC. Change it in the Outputs tab if that is not what you wanted."
+    },
+    "srxl2ProtocolNotSet": {
+        "message": "A port is assigned to Spektrum Smart ESC, but the ESC protocol above is not SRXL2 - so the port is never opened and the motor is not driven. Set the protocol to SRXL2, then save and reboot. Assigning the port and choosing the protocol are two separate settings."
+    },
+    "srxl2NoPort": {
+        "message": "No port is assigned to Spektrum Smart ESC. Assign one in the Ports tab, or the motor will not be driven at all - this protocol has no fallback to PWM, because the pin is not a timer output."
+    },
+    "srxl2TooFewPorts": {
+        "message": "This model has $1 motors but the board opened only $2 SRXL2 port(s). One ESC needs one port, so assign one per motor in the Ports tab. The board will refuse to arm until they match."
+    },
+    "srxl2PortCountOpenNoMixer": {
+        "message": "SRXL2 ports open on the board: $1. Choose a model in the Mixer tab to set how many motors it has."
+    },
+    "srxl2PortCountOpen": {
+        "message": "SRXL2 ports open on the board: $1, for $2 motor(s). Motor 1 uses the lowest-numbered port."
+    },
+    "srxl2PortNeedsReboot": {
+        "message": "$1 port(s) assigned to Spektrum Smart ESC, but the board has not opened any. Ports are opened at startup - save and reboot."
+    },
+    "srxl2PortCount": {
+        "message": "Ports assigned to Spektrum Smart ESC: $1. Motor 1 uses the lowest-numbered of them."
+    },
+    "srxl2Telemetry": {
+        "message": "Read telemetry from the ESC"
+    },
+    "srxl2TelemetryHelp": {
+        "message": "Telemetry shares the throttle wire, so unlike a conventional ESC there is no port to leave unassigned. Turn this off to read nothing from the ESC."
+    },
+    "portsBaudAuto": {
+        "message": "auto"
+    },
+    "srxl2TelemetryRate": {
+        "message": "Ask the ESC for telemetry"
+    },
+    "srxl2TelemetryRateHelp": {
+        "message": "The reply shares the throttle wire with the control data, so a faster rate leaves the bus less headroom. Only the RPM filter benefits from the faster settings; everything else is a display and reads fine at a few hertz."
+    },
+    "srxl2ReverseEnable": {
+        "message": "Thrust reverse"
+    },
+    "srxl2ReverseEnableHelp": {
+        "message": "Turn on only if the ESC is programmed for reverse. Once on, assign the THRUST REVERSE mode to a switch in the Modes tab - that is what actually engages it in flight."
+    },
+    "srxl2ReverseChannel": {
+        "message": "Thrust Reverse: ESC channel"
+    },
+    "srxl2ReverseChannelHelp": {
+        "message": "Which channel on the SRXL2 wire carries the reverse signal to the ESC. This is NOT a transmitter channel - it must match the ESC's own \"Thrust Rev.\" parameter, because nothing on the wire advertises it. Spektrum allow channels 5 to 9 and ship channel 7 by default. Set 0 if the ESC has no reverse. To fly with it, assign the THRUST REVERSE mode to a switch in the Modes tab."
+    },
+    "srxl2CalibrateTitle": {
+        "message": "Throttle range calibration"
+    },
+    "srxl2CalibrateWarning": {
+        "message": "REMOVE THE PROPELLER. This presents full throttle to the ESC. The battery must be disconnected to start: the ESC only learns its endpoints as it powers up."
+    },
+    "srxl2CalibrateAck": {
+        "message": "The propeller is removed and the battery is disconnected"
+    },
+    "srxl2CalibrateRefused": {
+        "message": "The flight controller refused to start the calibration."
+    },
+    "srxl2CalibrateRefusedArmed": {
+        "message": "Refused: the aircraft is armed. Disarm first - this sequence presents full throttle."
+    },
+    "srxl2CalibrateRefusedNoPort": {
+        "message": "Refused: no SRXL2 ESC port is open. Assign one in the Ports tab, set the motor protocol to SRXL2, and reboot."
+    },
+    "srxl2CalibrateRefusedBattery": {
+        "message": "Refused: the battery is connected. The ESC only learns its throttle range as it powers up, so it has to start with the pack out."
+    },
+    "srxl2CalibrateRefusedNoSensor": {
+        "message": "Refused: this board cannot sense battery voltage, so it cannot tell when the ESC powers up. Use esc_calibrate high / low from the CLI instead."
+    },
+    "srxl2CalibrateStart": {
+        "message": "Start calibration"
+    },
+    "srxl2CalibrateAbort": {
+        "message": "Abort"
+    },
+    "srxl2CalibrateConnect": {
+        "message": "Full throttle is on the wire. Connect the battery now."
+    },
+    "srxl2CalibrateHeard": {
+        "message": "The ESC has power. Holding full throttle while it accepts the high endpoint."
+    },
+    "srxl2CalibrateLow": {
+        "message": "Throttle lowered. Listen for the cell count, then one long tone."
+    },
+    "srxl2CalibrateDone": {
+        "message": "Finished. A long tone from the ESC means the range was stored."
+    },
+    "srxl2CalibrateAborted": {
+        "message": "Aborted. Throttle returned to normal control."
+    },
     "portsFunction_ESC": {
         "message": "ESC output/telemetry"
     },
