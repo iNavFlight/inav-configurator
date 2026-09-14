@@ -376,8 +376,8 @@ app.whenReady().then(() => {
     return udp.send(data);
   });
 
-  ipcMain.on('udpClose', (_event) => {
-    udp.close();
+  ipcMain.handle('udpClose', (_event) => {
+    return udp.close();
   });
 
   ipcMain.handle('writeFile', (_event, filename, data) => {
