@@ -647,20 +647,20 @@ var SerialBackend = (function () {
      */
     privateScope.sensor_status = function (sensors_detected) {
 
-        if (typeof SENSOR_STATUS === 'undefined') {
+        if (!FC.SENSOR_STATUS) {
             return;
         }
 
-        SENSOR_STATUS.isHardwareHealthy = 1;
-        SENSOR_STATUS.gyroHwStatus      = publicScope.have_sensor(sensors_detected, 'gyro') ? 1 : 0;
-        SENSOR_STATUS.accHwStatus       = publicScope.have_sensor(sensors_detected, 'acc') ? 1 : 0;
-        SENSOR_STATUS.magHwStatus       = publicScope.have_sensor(sensors_detected, 'mag') ? 1 : 0;
-        SENSOR_STATUS.baroHwStatus      = publicScope.have_sensor(sensors_detected, 'baro') ? 1 : 0;
-        SENSOR_STATUS.gpsHwStatus       = publicScope.have_sensor(sensors_detected, 'gps') ? 1 : 0;
-        SENSOR_STATUS.rangeHwStatus     = publicScope.have_sensor(sensors_detected, 'sonar') ? 1 : 0;
-        SENSOR_STATUS.speedHwStatus     = publicScope.have_sensor(sensors_detected, 'airspeed') ? 1 : 0;
-        SENSOR_STATUS.flowHwStatus      = publicScope.have_sensor(sensors_detected, 'opflow') ? 1 : 0;
-        privateScope.sensor_status_ex(SENSOR_STATUS);
+        FC.SENSOR_STATUS.isHardwareHealthy = 1;
+        FC.SENSOR_STATUS.gyroHwStatus      = publicScope.have_sensor(sensors_detected, 'gyro') ? 1 : 0;
+        FC.SENSOR_STATUS.accHwStatus       = publicScope.have_sensor(sensors_detected, 'acc') ? 1 : 0;
+        FC.SENSOR_STATUS.magHwStatus       = publicScope.have_sensor(sensors_detected, 'mag') ? 1 : 0;
+        FC.SENSOR_STATUS.baroHwStatus      = publicScope.have_sensor(sensors_detected, 'baro') ? 1 : 0;
+        FC.SENSOR_STATUS.gpsHwStatus       = publicScope.have_sensor(sensors_detected, 'gps') ? 1 : 0;
+        FC.SENSOR_STATUS.rangeHwStatus     = publicScope.have_sensor(sensors_detected, 'sonar') ? 1 : 0;
+        FC.SENSOR_STATUS.speedHwStatus     = publicScope.have_sensor(sensors_detected, 'airspeed') ? 1 : 0;
+        FC.SENSOR_STATUS.flowHwStatus      = publicScope.have_sensor(sensors_detected, 'opflow') ? 1 : 0;
+        privateScope.sensor_status_ex(FC.SENSOR_STATUS);
     }
 
     publicScope.have_sensor = function (sensors_detected, sensor_code) {
