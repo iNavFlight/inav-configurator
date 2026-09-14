@@ -317,7 +317,7 @@ portsTab.initialize = function (callback) {
          * so it should be visible even though the state it replaces was broken.
          */
         const wantsSrxl2 = FC.SERIAL_CONFIG.ports.some(function (p) {
-            return p.functions.indexOf('ESC_SRXL2') >= 0;
+            return p.functions.includes('ESC_SRXL2');
         });
 
         if (wantsSrxl2 && parseInt(FC.ADVANCED_CONFIG.motorPwmProtocol, 10) !== SRXL2_PROTOCOL) {
