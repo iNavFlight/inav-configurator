@@ -191,7 +191,7 @@ outputsTab.initialize = function (callback) {
             }
             let n = 0;
             for (const port of FC.SERIAL_CONFIG.ports) {
-                if (port.functions.indexOf('ESC_SRXL2') >= 0) {
+                if (port.functions.includes('ESC_SRXL2')) {
                     n++;
                 }
             }
