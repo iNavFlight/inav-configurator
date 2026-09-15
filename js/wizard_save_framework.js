@@ -31,7 +31,9 @@ var wizardSaveFramework = (function () {
 
                 serialPortHelper.set(config.value.port, 'GPS', config.value.baud);
                 mspHelper.saveSerialPorts(function () {
-                    features.execute(self.enableVirtulaPitot(config, callback));
+                    features.execute(function () {
+                        self.enableVirtualPitot(config, callback);
+                    });
                 });
                 break;
             case 'gpsProtocol':
@@ -43,12 +45,27 @@ var wizardSaveFramework = (function () {
         }
     };
 
-    self.enableVirtulaPitot = function (config, callback) {
-        if (config.value.port != '-1') {
-            mspHelper.setSetting('pitot_hardware', "VIRTUAL", callback);
-        } else {
+    /*
+     * The virtual pitot derives airspeed from GPS and the wind estimator, which is
+     * only of use on a fixed wing. Every other platform keeps the firmware default.
+     * An airspeed sensor that is already selected is never replaced either, so
+     * re-running the wizard does not take a pitot away from the user.
+     */
+    self.enableVirtualPitot = function (config, callback) {
+        if (config.value.port == '-1' || !FC.isAirplane()) {
             callback();
+            return;
         }
+
+        mspHelper.getSetting('pitot_hardware').then(function (data) {
+            if (data?.setting?.table?.values?.[data.value] == 'NONE') {
+                mspHelper.setSetting('pitot_hardware', "VIRTUAL", callback);
+            } else {
+                callback();
+            }
+        }).catch(function () {
+            callback();
+        });
     };
 
     self.handleSetting = function (configs, finalCallback) {
