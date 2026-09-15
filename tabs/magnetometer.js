@@ -553,11 +553,10 @@ magnetometerTab.initialize = function (callback) {
             updateYawAxis(clamp(this, -180, 360));
         });
 
-        // #modal-board-align-save and #modal-acc-align-done-save are handled below
-        // (close the modal, then save) rather than by this generic handler, so the
-        // modal is guaranteed closed before the save/reboot chain runs, regardless of
-        // how long that chain takes.
-        $('a.save').not('#modal-board-align-save, #modal-acc-align-done-save').on('click', function () {
+        // #modal-acc-align-done-save is handled below (close the modal, then save) rather
+        // than by this generic handler, so the modal is guaranteed closed before the
+        // save/reboot chain runs, regardless of how long that chain takes.
+        $('a.save').not('#modal-acc-align-done-save').on('click', function () {
             saveChainer.execute()
         });
 
@@ -566,37 +565,11 @@ magnetometerTab.initialize = function (callback) {
         $('#modal-acc-align-3').on('click', {"step": "3" }, accAutoAlignButton);
         $('#modal-acc-align-4').on('click', {"step": "4" }, accAutoAlignButton);
 
-        $('#modal-board-align-save, #modal-acc-align-done-save').on('click', function () {
+        $('#modal-acc-align-done-save').on('click', function () {
             if (typeof modal != "undefined") {
                 modal.close();
             }
             saveChainer.execute();
-        });
-
-        $('#modal-board-align-fallback').on('click', function () {
-            if (typeof modal != "undefined") {
-                modal.close();
-            }
-            if (!FC.getMagnetometerCalibrated()) {
-                resetAlignButtons();
-                modal = new jBox('Modal', {
-                    width: 460,
-                    height: 360,
-                    animation: false,
-                    closeOnClick: true,
-                    content: $('#modal-acc-align-mag-uncalibrated-error')
-                }).open();
-                return;
-            }
-            // Board-align-done stopped the poll; the manual compass fallback needs it again.
-            startAlignPoll();
-            modal = new jBox('Modal', {
-                width: 460,
-                height: 360,
-                animation: false,
-                closeOnClick: true,
-                content: $('#modal-acc-align-east')
-            }).open();
         });
 
         noUiSlider.create(self.pageElements.roll_slider[0], {
@@ -721,11 +694,11 @@ magnetometerTab.initialize = function (callback) {
         }).open();
     }
 
-    // Scoped to the wizard's own modal ids (all prefixed modal-acc-align-/modal-board-align-)
-    // rather than a bare `.modal__button` selector, so this can't reach into some other
-    // modal that happens to share the class name.
+    // Scoped to the wizard's own modal ids (all prefixed modal-acc-align-) rather than a
+    // bare `.modal__button` selector, so this can't reach into some other modal that
+    // happens to share the class name.
     function resetAlignButtons() {
-        $('[id^="modal-acc-align-"].modal__button, [id^="modal-board-align-"].modal__button, #fc-align-start-button')
+        $('[id^="modal-acc-align-"].modal__button, #fc-align-start-button')
             .css({ opacity: '', pointerEvents: '' });
     }
 
@@ -1048,10 +1021,6 @@ magnetometerTab.initialize = function (callback) {
         }).open();
     }
 
-    function isRamConstrainedTarget() {
-        return !FC.hasCalibrationOrientationDetection();
-    }
-
     function accAutoAlignButton(event) {
         // Visual feedback so a slow step doesn't look unresponsive and invite repeated clicks.
         resetAlignButtons();
@@ -1071,9 +1040,10 @@ magnetometerTab.initialize = function (callback) {
 
         if (step == "1") {
             // Check compass calibration before the user does any physical positioning, not
-            // after -- this combined flow ends by using the compass, so there's no point
-            // walking through the board-alignment steps first if that's doomed to fail.
-            if (isRamConstrainedTarget() && BitHelper.bit_check(FC.CONFIG.activeSensors, 2) && !FC.getMagnetometerCalibrated()) {
+            // after -- this flow ends by using the compass (on every board class -- see the
+            // step-3 comment below), so there's no point walking through the board-alignment
+            // steps first if that's doomed to fail.
+            if (BitHelper.bit_check(FC.CONFIG.activeSensors, 2) && !FC.getMagnetometerCalibrated()) {
                 resetAlignButtons();
                 modal = new jBox('Modal', {
                     width: 460,
@@ -1104,47 +1074,30 @@ magnetometerTab.initialize = function (callback) {
                 return;
             }
 
-            if (isRamConstrainedTarget()) {
-                var next_step = $('#modal-acc-align-east');
-                if (!BitHelper.bit_check(FC.CONFIG.activeSensors, 2)) {
-                    // No mag: skip the compass-orientation step.
-                    // #modal-acc-align-done also shows a "Compass alignment set to" line, which
-                    // accAutoAlignCompass() normally fills in -- fill it in here too since that
-                    // step never runs on this path, so it isn't left blank.
-                    $("#modal-compass-align-setting").text(i18n.getMessage("accAlignNoMagDetected"));
-                    next_step = $('#modal-acc-align-done');
-                    // No compass step follows, so the wizard ends here -- stop the poll.
-                    stopAlignPoll();
-                }
-                modal = new jBox('Modal', {
-                    width: 460,
-                    height: 360,
-                    animation: false,
-                    closeOnClick: false,
-                    content: next_step
-                }).open();
-            } else {
-                $("#modal-board-align-setting").text($("#modal-acc-align-setting").text());
-
-                // No mag: there's no compass step to do after this, unlike the RAM-constrained
-                // branch above which special-cases this by skipping straight to "done".
-                const hasMag = BitHelper.bit_check(FC.CONFIG.activeSensors, 2);
-                $("#modal-board-align-instructions").html(
-                    i18n.getMessage(hasMag ? "boardAlignDoneInstructions" : "boardAlignDoneNoMagInstructions")
-                );
-                $("#modal-board-align-fallback").toggle(hasMag);
-
-                // Board-alignment-only wizard ends here; compass calibration (if any) happens
-                // separately on the Calibration tab, so the poll started at step 1 is done.
+            // The "face east" step costs the user one more modal and one more click on an
+            // aircraft they're already holding in position -- cheap enough that every board
+            // class gets a complete, immediate board+compass result from this one wizard
+            // pass, rather than RAM-capable boards being sent off to do a full compass
+            // calibration spin (relying on firmware's calibration-time auto-detection, which
+            // stays available and unaffected for anyone who skips this wizard entirely).
+            var next_step = $('#modal-acc-align-east');
+            if (!BitHelper.bit_check(FC.CONFIG.activeSensors, 2)) {
+                // No mag: skip the compass-orientation step.
+                // #modal-acc-align-done also shows a "Compass alignment set to" line, which
+                // accAutoAlignCompass() normally fills in -- fill it in here too since that
+                // step never runs on this path, so it isn't left blank.
+                $("#modal-compass-align-setting").text(i18n.getMessage("accAlignNoMagDetected"));
+                next_step = $('#modal-acc-align-done');
+                // No compass step follows, so the wizard ends here -- stop the poll.
                 stopAlignPoll();
-                modal = new jBox('Modal', {
-                    width: 460,
-                    height: 420,
-                    animation: false,
-                    closeOnClick: false,
-                    content: $('#modal-board-align-done')
-                }).open();
             }
+            modal = new jBox('Modal', {
+                width: 460,
+                height: 360,
+                animation: false,
+                closeOnClick: false,
+                content: next_step
+            }).open();
         }
         else if (step == "4") {
             accAutoAlignCompass();
