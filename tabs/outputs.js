@@ -19,6 +19,64 @@ const outputsTab = {
     feature3DEnabled: false,
     feature3DSupported: false
 };
+function processEscTelemetry() {
+    const $box = $('.esc-telemetry-box'),
+        $tbody = $('.esc-telemetry-table tbody'),
+        $noData = $('.esc-telemetry-no-data');
+
+    // Only worth polling when a serial port carries the ESC telemetry function
+    const ports = FC.SERIAL_CONFIG?.ports || [];
+    if (!ports.some(port => port.functions.includes('ESC'))) {
+        return;
+    }
+
+    function renderRows(motors) {
+        if ($tbody.children().length !== motors.length) {
+            $tbody.empty();
+            motors.forEach((motor, index) => {
+                $tbody.append('<tr><td class="esc-motor">' + (index + 1) + '</td><td class="esc-rpm"></td><td class="esc-temperature"></td><td class="esc-voltage"></td><td class="esc-current"></td></tr>');
+            });
+        }
+
+        let anyValid = false;
+        $tbody.children().each(function (index) {
+            const motor = motors[index],
+                $row = $(this);
+
+            if (!motor.valid) {
+                $row.addClass('esc-telemetry-invalid');
+                $row.find('td:not(.esc-motor)').text('-');
+                return;
+            }
+
+            anyValid = true;
+            $row.removeClass('esc-telemetry-invalid');
+            $row.find('.esc-rpm').text(motor.rpm);
+            $row.find('.esc-temperature').text(motor.temperature);
+            $row.find('.esc-voltage').text(motor.voltage.toFixed(2));
+            $row.find('.esc-current').text(motor.current.toFixed(2));
+        });
+
+        $noData.toggle(!anyValid);
+    }
+
+    function updateEscTelemetry() {
+        if (FC.ESC_TELEMETRY === null) {
+            // Firmware without ESC sensor support answers "unsupported": stop asking and hide the box
+            interval.remove('esc_telemetry_pull');
+            $box.addClass('is-hidden');
+            return;
+        }
+
+        $box.removeClass('is-hidden');
+        renderRows(FC.ESC_TELEMETRY);
+    }
+
+    interval.add('esc_telemetry_pull', function () {
+        MSP.send_message(MSPCodes.MSP2_INAV_ESC_TELEM, false, false, updateEscTelemetry);
+    }, 250, true);
+}
+
 outputsTab.initialize = function (callback) {
     var self = this;
 
@@ -46,6 +104,7 @@ outputsTab.initialize = function (callback) {
         mspHelper.loadOutputMappingExt,
         mspHelper.loadRcData,
         mspHelper.loadAdvancedConfig,
+        mspHelper.loadSerialPorts,
         function(callback) {
             mspHelper.getSetting("motor_direction_inverted").then((data)=>{
                 self.motorDirectionInverted=data.value;
@@ -85,6 +144,7 @@ outputsTab.initialize = function (callback) {
 
         process_motors();
         process_servos();
+        processEscTelemetry();
         processConfiguration();
 
         finalize();

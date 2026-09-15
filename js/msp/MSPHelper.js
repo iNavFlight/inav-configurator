@@ -28,6 +28,7 @@ import Waypoint from './../waypoint';
 import mspDeduplicationQueue from './mspDeduplicationQueue';
 import mspStatistics from './mspStatistics';
 import settingsCache from './../settingsCache';
+import { parseEscTelemetry } from './../escTelemetry';
 import {Geozone, GeozoneVertex, GeozoneShapes } from './../geozone';
 import { parseDronecanAsyncRequestResponse } from './../dronecanAsyncRequestParse';
 
@@ -1945,6 +1946,14 @@ var mspHelper = (function () {
 
             case MSPCodes.MSP2_SET_MZTC_CONFIG:
                 console.log("MZTC config saved");
+                break;
+
+            case MSPCodes.MSP2_INAV_ESC_TELEM:
+                // null = firmware built without USE_ESC_SENSOR (unsupported reply) or an unknown payload layout
+                FC.ESC_TELEMETRY = dataHandler.unsupported ? null : parseEscTelemetry(data);
+                if (!dataHandler.unsupported && FC.ESC_TELEMETRY === null) {
+                    console.log('MSP2_INAV_ESC_TELEM: unexpected payload length ' + data.byteLength);
+                }
                 break;
 
             default:

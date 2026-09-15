@@ -146,6 +146,7 @@ const inertGeozoneUrl = dataModule(`
 `);
 
 const realMspHelperUrl = rewriteAndWrite('js/msp/MSPHelper.js', [
+    [/^import \{ parseEscTelemetry \} from '\.\/\.\.\/escTelemetry';$/m, `import { parseEscTelemetry } from '${realModuleUrl('js/escTelemetry.js')}';`, "import parseEscTelemetry"],
     [/^import semver from 'semver';$/m, `import semver from '${inertDefaultUrl}';`, "import semver"],
     [/^import '\.\/\.\.\/injected_methods';$/m, `import '${realInjectedMethodsUrl}';`, "import injected_methods"],
     [/^import GUI from '\.\/\.\.\/gui';$/m, `import GUI from '${guiStubUrl}';`, "import GUI"],
