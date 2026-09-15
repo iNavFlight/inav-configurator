@@ -753,6 +753,13 @@
     background-color: rgba(255, 255, 255, 0.05);
 }
 
+.tab-mission-control .openaip-no-key {
+    padding: 6px 5px;
+    color: #888;
+    font-size: 0.9em;
+    font-style: italic;
+}
+
 .tab-mission-control #geo_info {
     transition: opacity 0.2s;
 }

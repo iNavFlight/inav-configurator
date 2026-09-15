@@ -142,6 +142,24 @@ The key is saved automatically and persists across sessions.
 | Topo | Pure contour lines — elevation and terrain awareness |
 | Winter | Ski-resort style — pistes and winter terrain |
 
+#### Airspace Overlays (openAIP)
+
+Mission Control can draw controlled airspace and airports from [openAIP](https://www.openaip.net) 
+on top of any map provider. Both overlays are off by default and are switched on individually in 
+**Options -> Airspace data (openAIP)**.
+
+A free openAIP API key is required:
+
+1. Create a free account at [openaip.net](https://www.openaip.net)
+2. Open your user profile and generate an API key
+3. Paste it into the **openAIP API key** field in Options
+
+The key is stored locally and persists across sessions, the same way the MapTiler key is. Without 
+a key the switches stay available but no tiles are requested.
+
+> Airspace data is advisory. It is not a substitute for an official aeronautical chart or for 
+> checking the rules that apply where you fly.
+
 #### Output Paths
 
 | Target | Sub-target | SD Card Path |
