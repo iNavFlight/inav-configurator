@@ -2512,6 +2512,23 @@ ol li {
     content: attr(data-unit) ;
 }
 
+/* Read-only conversion shown next to inputs that use a raw firmware unit,
+   e.g. "= 50 m" beside a value entered in cm */
+.unit-hint {
+    float: right;
+    /* padding, not margin: some tabs reset span margins */
+    padding: 0 8px 0 6px;
+    color: #888;
+    font-size: 11px;
+    line-height: 22px;
+    white-space: nowrap;
+}
+
+/* Rows without a help icon: leave room for one so the hints stay aligned */
+.unit-hint--no-icon {
+    padding-right: 22px;
+}
+
 .batteryProfileHighlight {
     background-color: none;
 }

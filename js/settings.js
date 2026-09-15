@@ -7,6 +7,7 @@ import GUI from './gui';
 import FC from './fc';
 import { globalSettings, UnitType } from './globalSettings';
 import i18n from './localization';
+import { getUnitHint, hasUnitHint } from './unitHint';
 
 function padZeros(val, length) {
     let str = val.toString();
@@ -596,10 +597,54 @@ var Settings = (function () {
         // Now wrap the input in a display that shows the unit
         element.wrap(`<div data-unit="${unitDisplayNames[unitName]}" title="${unitExpandedNames[unitName]}" class="unit_wrapper unit"></div>`);
 
+        // An input that still shows the raw firmware unit (no conversion
+        // applied) gets a read-only hint with the same value in a unit that
+        // is easier to read, so "5000 cm" is visibly "= 50 m".
+        if (multiplier === 1) {
+            self.attachUnitHint(element, inputUnit);
+        }
+
         function toFahrenheit(decidegC) {
             return (decidegC / 10) * 1.8 + 32;
         };
     }
+
+    /**
+     * Show the value of an input that uses a raw firmware unit in a more
+     * readable unit next to it. Display only: the input itself, and what is
+     * written to the flight controller, stay in the firmware unit.
+     *
+     * @param {JQuery Element} input Input already wrapped in .unit_wrapper
+     * @param {String} unit Unit from HTML Dom input
+     */
+    self.attachUnitHint = function (input, unit) {
+        if (!hasUnitHint(unit)) {
+            return;
+        }
+
+        const hint = $('<span class="unit-hint"></span>');
+        const wrapper = input.parent('.unit_wrapper');
+
+        // Both the hint and the help icon float right in a settings row, so
+        // the hint goes behind the icon to keep the icon at the far right.
+        // Rows without a help icon get the hint straight after the input,
+        // padded by the icon width so the hints line up across rows.
+        const helpIcon = wrapper.siblings('.helpicon, .helpiconLink').last();
+        if (helpIcon.length) {
+            hint.insertAfter(helpIcon);
+        } else {
+            hint.addClass('unit-hint--no-icon').insertAfter(wrapper);
+        }
+
+        const update = function () {
+            const converted = getUnitHint(unit, input.val());
+            hint.text(converted ? converted.text : '');
+            hint.attr('title', converted ? converted.title : null);
+        };
+
+        input.on('input change', update);
+        update();
+    };
 
     self.processInput = function(input) {
         var settingName = input.data('setting');
