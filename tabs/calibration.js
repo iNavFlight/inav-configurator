@@ -13,6 +13,9 @@ import jBox from 'jbox';
 
 const calibrationTab = {};
 
+// Used when the FC does not know mag_calibration_time. Matches the firmware default.
+const MAG_CALIBRATION_TIME_DEFAULT = 30;
+
 calibrationTab.model = (function () {
     var publicScope = {},
         privateScope = {};
@@ -56,7 +59,8 @@ calibrationTab.initialize = function (callback) {
         saveChainer = new MSPChainerClass(),
         modalStart,
         modalStop,
-        modalProcessing;
+        modalProcessing,
+        magCalibrationTime = MAG_CALIBRATION_TIME_DEFAULT;
 
     if (GUI.active_tab !== this) {
         GUI.active_tab = this;
@@ -64,7 +68,22 @@ calibrationTab.initialize = function (callback) {
     loadChainer.setChain([
         mspHelper.queryFcStatus,
         mspHelper.loadSensorConfig,
-        mspHelper.loadCalibrationData
+        mspHelper.loadCalibrationData,
+        function (callback) {
+            let finished = false;
+            function finish(setting) {
+                if (finished) return;
+                finished = true;
+                timeout.remove('mag_calibration_time_load');
+                if (setting && setting.value > 0) {
+                    magCalibrationTime = setting.value;
+                }
+                callback();
+            }
+            // getSetting can remain pending after transport retries are exhausted.
+            timeout.add('mag_calibration_time_load', () => finish(), 5000);
+            mspHelper.getSetting('mag_calibration_time').then(finish, () => finish());
+        }
     ]);
     loadChainer.setExitPoint(loadHtml);
     loadChainer.execute();
@@ -254,7 +273,8 @@ calibrationTab.initialize = function (callback) {
                 content: $('#modal-compass-processing').clone()
             }).open();
 
-            var countdown = 30;
+            var countdown = magCalibrationTime;
+            modalProcessing.content.find('.modal-compass-countdown').text(countdown);
             interval.add('compass_calibration_interval', function () {
                 countdown--;
                 if (countdown === 0) {
@@ -333,6 +353,7 @@ calibrationTab.initialize = function (callback) {
 };
 
 calibrationTab.cleanup = function (callback) {
+    timeout.remove('mag_calibration_time_load');
     if (callback) callback();
 };
 
