@@ -13,6 +13,9 @@ import jBox from 'jbox';
 
 const calibrationTab = {};
 
+// Module-scoped (not local to initialize()) so cleanup() below can close it too.
+let modalMagAlign;
+
 calibrationTab.model = (function () {
     var publicScope = {},
         privateScope = {};
@@ -56,8 +59,9 @@ calibrationTab.initialize = function (callback) {
         saveChainer = new MSPChainerClass(),
         modalStart,
         modalStop,
-        modalProcessing,
-        modalMagAlign;
+        modalProcessing;
+
+    modalMagAlign = undefined; // reset the module-scoped modal handle for this tab session
 
     if (GUI.active_tab !== this) {
         GUI.active_tab = this;
@@ -124,6 +128,13 @@ calibrationTab.initialize = function (callback) {
     // writes on success. Detection is confidence-gated and simply leaves these
     // untouched on failure, so the caller must diff against a before/after snapshot
     // to tell "detected" from "not confident enough".
+    //
+    // Known limitation: firmware doesn't expose a separate confidence/success flag over
+    // MSP, so a before==after result is ambiguous -- it could mean detection genuinely
+    // wasn't confident, OR it confidently redetected an orientation that was already
+    // correct (e.g. a previous manual wizard run). reportMagCalibrationOrientation()'s
+    // "not detected" modal wording is deliberately hedged to cover both cases; a real fix
+    // would need a firmware-side confidence flag added to the MSP response.
     function getMagAlignmentSettings() {
         return Promise.all([
             mspHelper.getSetting("align_mag_roll"),
@@ -404,6 +415,12 @@ calibrationTab.initialize = function (callback) {
 };
 
 calibrationTab.cleanup = function (callback) {
+    // reportMagCalibrationOrientation() can leave this open if the user switches tabs
+    // before dismissing it -- without this, it stays visible over whatever tab they land on.
+    if (modalMagAlign) {
+        modalMagAlign.close();
+    }
+
     if (callback) callback();
 };
 

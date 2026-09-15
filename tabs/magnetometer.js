@@ -68,6 +68,10 @@ magnetometerTab.initialize = function (callback) {
     var loadChain = [
         mspHelper.loadMixerConfig,
         mspHelper.loadBoardAlignment,
+        // Needed by accAutoAlignButton's step-1 FC.getMagnetometerCalibrated() check --
+        // without this, opening this tab directly (without having visited Calibration
+        // first) leaves FC.CALIBRATION_DATA null.
+        mspHelper.loadCalibrationData,
         function (callback) {
             self.boardAlignmentConfig.pitch = Math.round(FC.BOARD_ALIGNMENT.pitch / 10);
             self.boardAlignmentConfig.roll = Math.round(FC.BOARD_ALIGNMENT.roll / 10);
@@ -685,6 +689,15 @@ magnetometerTab.initialize = function (callback) {
         // magnetometer field, there is no rotation to undo here: whatever the current
         // align_mag/align_board settings are, this reading is unaffected by them, which is
         // exactly why the wizard (trying to determine those settings) uses it instead.
+        // FC.SENSOR_DATA.magnetometerUnaligned initializes to [0,0,0] and is only ever
+        // overwritten by an actual MSP2_INAV_MAG_UNALIGNED response (see startAlignPoll()).
+        // If none has arrived yet -- unstable connection, or older firmware that doesn't
+        // support this message -- that [0,0,0] would otherwise look like a perfectly valid
+        // (and, worse, perfectly *repeatable*) heading of 0 for both wizard readings,
+        // silently producing a bogus alignment. Return null instead so callers can bail.
+        if (!self.magUnalignedReceived) {
+            return null;
+        }
         let mag = FC.SENSOR_DATA.magnetometerUnaligned;
         // Must match firmware's own heading convention (atan2(magY, magX) on
         // magADC directly, confirmed against inav2 rotationMatrixRotateVector output on
@@ -693,6 +706,19 @@ magnetometerTab.initialize = function (callback) {
         let magHeading = rad2degrees ( Math.atan2(mag[1], mag[0]) );
         if (DEBUG_ALIGN) console.log("magHeading (unaligned, degrees): " + magHeading.toString());
         return magHeading;
+    }
+
+    function showMagNoDataError() {
+        console.error("getMagHeading: no MSP2_INAV_MAG_UNALIGNED response received yet");
+        resetAlignButtons();
+        stopAlignPoll();
+        modal = new jBox('Modal', {
+            width: 460,
+            height: 360,
+            animation: false,
+            closeOnClick: true,
+            content: $('#modal-acc-align-mag-no-data-error')
+        }).open();
     }
 
     // Scoped to the wizard's own modal ids (all prefixed modal-acc-align-/modal-board-align-)
@@ -712,9 +738,12 @@ magnetometerTab.initialize = function (callback) {
     // that's also called at the top of every step (including mid-wizard progression) purely
     // for button visual feedback, and killing the poll there would starve steps 2-4 of data.
     function startAlignPoll() {
+        self.magUnalignedReceived = false;
         interval.add('imu_data', function() {
             MSP.send_message(MSPCodes.MSP_RAW_IMU, false, false);
-            MSP.send_message(MSPCodes.MSP2_INAV_MAG_UNALIGNED, false, false);
+            MSP.send_message(MSPCodes.MSP2_INAV_MAG_UNALIGNED, false, false, function () {
+                self.magUnalignedReceived = true;
+            });
         }, 40);
     }
 
@@ -818,6 +847,10 @@ magnetometerTab.initialize = function (callback) {
         self.acc_flat_raw = acc_g_flat;
 
         heading_flat = getMagHeading();
+        if (heading_flat === null) {
+            showMagNoDataError();
+            return;
+        }
 
         modal = new jBox('Modal', {
             width: 460,
@@ -955,6 +988,10 @@ magnetometerTab.initialize = function (callback) {
         // Both come from getMagHeading(), which reads MSP2_INAV_MAG_UNALIGNED -- unaffected
         // by the current align_mag/align_board settings, unlike FC.SENSOR_DATA.magnetometer.
         let heading_east = getMagHeading();
+        if (heading_east === null) {
+            showMagNoDataError();
+            return;
+        }
 
         // Flip (right-side-up vs upside-down), and the mounting yaw offset itself, are
         // derived in computeCompassYaw() -- see its doc comment in boardAlignmentMath.js

@@ -7514,6 +7514,9 @@
     "accAlignMagDisagreementError": {
         "message": "The compass readings from the north and east positions don't agree. This usually means the aircraft wasn't actually facing north closely enough, or wasn't turned close enough to 90 degrees between the two readings. Please try again, facing as close to true north as you can."
     },
+    "accAlignMagNoDataError": {
+        "message": "No compass reading was received from the flight controller. This may mean the connection is unstable, or the firmware on this board doesn't support the alignment wizard's compass data request. Please check the connection and try again, or update the firmware."
+    },
     "accAlignTiltError": {
         "message": "The second reading looks too similar to the first. Please make sure the nose is raised by about 45 degrees, then try again."
     },
@@ -7524,6 +7527,6 @@
         "message": "Compass orientation <span style=\"color: #37a8db\">detected</span>"
     },
     "magCalibOrientationNotDetected": {
-        "message": "INAV could not determine the compass's mounting orientation with confidence during that calibration spin. Use the auto alignment wizard on the <b>Alignment</b> tab to set it manually."
+        "message": "The compass alignment setting didn't change during that calibration spin. This usually means INAV wasn't confident enough to detect the mounting orientation -- but if it was already set correctly (e.g. from a previous run of this wizard), this is also what a successful, unchanged detection looks like. If your compass heading looks wrong on the Status tab, use the auto alignment wizard on the <b>Alignment</b> tab to set it manually."
     }
 }

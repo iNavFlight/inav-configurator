@@ -897,6 +897,13 @@ var FC = {
         return calibrated;
     },
     getMagnetometerCalibrated: function () {
+        // CALIBRATION_DATA is null until something actually requests MSP_CALIBRATION_DATA
+        // (e.g. visiting the Calibration tab) -- treat "we don't know yet" as NOT
+        // calibrated (fail-safe) rather than let a caller that forgot to load it silently
+        // treat an absent answer as a pass.
+        if (!this.CALIBRATION_DATA) {
+            return false;
+        }
         // 1024 gain / 0 zero on all three axes is firmware's own "uncalibrated" sentinel --
         // see sensors/compass.c's resetCompass() defaults and the matching check this
         // mirrors (compassIsCalibrationComplete(), same three-axis test). If those defaults
