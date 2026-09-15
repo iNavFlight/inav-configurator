@@ -827,7 +827,7 @@ magnetometerTab.initialize = function (callback) {
 
         modal = new jBox('Modal', {
             width: 460,
-            height: 360,
+            height: 460,
             animation: false,
             closeOnClick: false,
             content: $('#modal-acc-align-45')
