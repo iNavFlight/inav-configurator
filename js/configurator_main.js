@@ -675,17 +675,25 @@ $(function() {
             }
         });
 
+        // Keep letters and punctuation out of numeric fields, but only those.
+        // A keyCode whitelist cannot express "any shortcut", so it used to
+        // swallow select all, copy, paste, cut, undo, Home and End as well,
+        // which left overwriting an existing value to backspace alone.
         $content.on('keydown', 'input[type="number"]', function (e) {
-            // whitelist all that we need for numeric control
-            var whitelist = [
-                96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, // numpad and standard number keypad
-                109, 189, // minus on numpad and in standard keyboard
-                8, 46, 9, // backspace, delete, tab
-                190, 110, // decimal point
-                37, 38, 39, 40, 13 // arrows and enter
-            ];
+            // Shortcuts carry a modifier, the browser handles them.
+            if (e.ctrlKey || e.metaKey || e.altKey) {
+                return;
+            }
 
-            if (whitelist.indexOf(e.keyCode) == -1) {
+            // Keys that do not insert text report a name rather than a single
+            // character: arrows, Home, End, backspace, delete, tab, enter.
+            if (typeof e.key !== 'string' || e.key.length > 1) {
+                return;
+            }
+
+            // What is left are the characters a number may consist of. The
+            // comma is the decimal separator the numpad emits on many layouts.
+            if (!/[0-9.,-]/.test(e.key)) {
                 e.preventDefault();
             }
         });
