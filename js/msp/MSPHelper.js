@@ -1217,15 +1217,6 @@ var mspHelper = (function () {
                 FC.SDCARD.freeSizeKB = data.getUint32(3, true);
                 FC.SDCARD.totalSizeKB = data.getUint32(7, true);
                 break;
-            case MSPCodes.MSP_BLACKBOX_CONFIG:
-                FC.BLACKBOX.supported = (data.getUint8(0) & 1) != 0;
-                FC.BLACKBOX.blackboxDevice = data.getUint8(1);
-                FC.BLACKBOX.blackboxRateNum = data.getUint8(2);
-                FC.BLACKBOX.blackboxRateDenom = data.getUint8(3);
-                break;
-            case MSPCodes.MSP_SET_BLACKBOX_CONFIG:
-                console.log("Blackbox config saved");
-                break;
             case MSPCodes.MSP_VTX_CONFIG:
                 FC.VTX_CONFIG.device_type = data.getUint8(offset++);
                 if (FC.VTX_CONFIG.device_type != VTX.DEV_UNKNOWN) {
@@ -1594,8 +1585,8 @@ var mspHelper = (function () {
             case MSPCodes.MSP2_BLACKBOX_CONFIG:
                 FC.BLACKBOX.supported = (data.getUint8(0) & 1) != 0;
                 FC.BLACKBOX.blackboxDevice = data.getUint8(1);
-                FC.BLACKBOX.blackboxRateNum = data.getUint16(2);
-                FC.BLACKBOX.blackboxRateDenom = data.getUint16(4);
+                FC.BLACKBOX.blackboxRateNum = data.getUint16(2, true);
+                FC.BLACKBOX.blackboxRateDenom = data.getUint16(4, true);
                 FC.BLACKBOX.blackboxIncludeFlags = data.getUint32(6,true);
                 break;
             case MSPCodes.MSP2_SET_BLACKBOX_CONFIG:
@@ -2598,9 +2589,8 @@ var mspHelper = (function () {
 
     self.sendBlackboxConfiguration = function (onDataCallback) {
         var buffer = [];
-        var messageId = MSPCodes.MSP_SET_BLACKBOX_CONFIG;
+        var messageId = MSPCodes.MSP2_SET_BLACKBOX_CONFIG;
         buffer.push(FC.BLACKBOX.blackboxDevice & 0xFF);
-        messageId = MSPCodes.MSP2_SET_BLACKBOX_CONFIG;
         buffer.push(BitHelper.lowByte(FC.BLACKBOX.blackboxRateNum));
         buffer.push(BitHelper.highByte(FC.BLACKBOX.blackboxRateNum));
         buffer.push(BitHelper.lowByte(FC.BLACKBOX.blackboxRateDenom));
