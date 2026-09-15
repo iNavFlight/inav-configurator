@@ -395,7 +395,10 @@ auxiliaryTab.initialize = function (callback) {
         function update_ui() {
             let hasUsedMode = false;
             let acroEnabled = true;
-            let acroFail = ["ANGLE", "HORIZON", "MANUAL", "ANGLE HOLD", "NAV RTH", "NAV POSHOLD", "NAV CRUISE", "NAV COURSE HOLD", "NAV WP", "GCS NAV"];
+            let acroFail = new Set(["ANGLE", "HORIZON", "MANUAL", "ANGLE HOLD", "NAV RTH", "NAV POSHOLD", "NAV CRUISE", "NAV COURSE HOLD", "NAV WP", "GCS NAV"]);
+            // The flight controller reports these modes as active for as long as the Configurator
+            // is connected, so only the selected channel range can make them block ACRO.
+            let acroFailOnlyWhenSelected = new Set(["MANUAL"]);
 
             var auxChannelCount = FC.RC.active_channels - 4;
 
@@ -413,40 +416,46 @@ auxiliaryTab.initialize = function (callback) {
                     continue;
                 }
 
+                // Check to see if the mode is in range
+                var modeRanges = modeElement.find(' .range');
+                for (let r = 0; r < modeRanges.length; r++) {
+                    const channel = Number.parseInt($(modeRanges[r]).find('.channel').val(), 10);
+                    if (!Number.isInteger(channel) || channel < 0 || channel >= auxChannelCount) {
+                        continue;
+                    }
+                    var rangeLow = $(modeRanges[r]).find('.lowerLimitValue').html();
+                    var rangeHigh = $(modeRanges[r]).find('.upperLimitValue').html();
+                    var markerPosition = $(modeRanges[r]).find('.marker')[0].style.left;
+                    markerPosition = Number.parseFloat(markerPosition);
+                    if (!Number.isFinite(markerPosition)) {
+                        continue;
+                    }
+
+                    rangeLow = (rangeLow - 900) / (2100-900) * 100;
+                    rangeHigh = (rangeHigh - 900) / (2100-900) * 100;
+
+                    if ((markerPosition >= rangeLow) && (markerPosition <= rangeHigh)) {
+                        inRange = true;
+                    }
+                }
+
                 if (FC.isModeBitSet(modeElement.data('origId'))) {
                     // The flight controller can activate the mode
                     $('.mode .name').eq(modeElement.data('index')).data('modeElement').addClass('on').removeClass('inRange').removeClass('off');
 
-                    if (jQuery.inArray(modeElement.data('modeName'), acroFail) !== -1) {
+                    if (acroFail.has(modeElement.data('modeName')) &&
+                        (inRange || !acroFailOnlyWhenSelected.has(modeElement.data('modeName')))) {
+                        acroEnabled = false;
+                    }
+                } else if (inRange) {
+                    $('.mode .name').eq(modeElement.data('index')).data('modeElement').removeClass('on').addClass('inRange').removeClass('off');
+
+                    if (acroFail.has(modeElement.data('modeName'))) {
                         acroEnabled = false;
                     }
                 } else {
-                    // Check to see if the mode is in range
-                    var modeRanges = modeElement.find(' .range');
-                    for (let r = 0; r < modeRanges.length; r++) {
-                        var rangeLow = $(modeRanges[r]).find('.lowerLimitValue').html();
-                        var rangeHigh = $(modeRanges[r]).find('.upperLimitValue').html();
-                        var markerPosition = $(modeRanges[r]).find('.marker')[0].style.left;
-                        markerPosition = markerPosition.substring(0, markerPosition.length-1);
-
-                        rangeLow = (rangeLow - 900) / (2100-900) * 100;
-                        rangeHigh = (rangeHigh - 900) / (2100-900) * 100;
-
-                        if ((markerPosition >= rangeLow) && (markerPosition <= rangeHigh)) {
-                            inRange = true;
-                        }
-                    }
-
-                    if (inRange) {
-                        $('.mode .name').eq(modeElement.data('index')).data('modeElement').removeClass('on').addClass('inRange').removeClass('off');
-
-                        if (jQuery.inArray(modeElement.data('modeName'), acroFail) !== -1) {
-                            acroEnabled = false;
-                        }
-                    } else {
-                        // If not, it is shown as disabled.
-                        $('.mode .name').eq(modeElement.data('index')).data('modeElement').removeClass('on').removeClass('inRange').addClass('off');
-                    }
+                    // If not, it is shown as disabled.
+                    $('.mode .name').eq(modeElement.data('index')).data('modeElement').removeClass('on').removeClass('inRange').addClass('off');
                 }
                 hasUsedMode = true;
             }
