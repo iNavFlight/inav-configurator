@@ -260,6 +260,14 @@ var mspHelper = (function () {
             case MSPCodes.MSP2_ADSB_VEHICLE_LIST:
                 var byteOffsetCounter = 0;
                 FC.ADSB_VEHICLES.vehicles = [];
+                if (dataHandler.unsupported || data.byteLength < 10) {
+                    // firmware without ADSB (error reply, no payload): no vehicles, keep the counters at zero
+                    FC.ADSB_VEHICLES.vehiclesCount = 0;
+                    FC.ADSB_VEHICLES.callsignLength = 0;
+                    FC.ADSB_VEHICLES.vehiclePacketCount = 0;
+                    FC.ADSB_VEHICLES.heartbeatPacketCount = 0;
+                    break;
+                }
                 FC.ADSB_VEHICLES.vehiclesCount = data.getUint8(byteOffsetCounter++);
                 FC.ADSB_VEHICLES.callsignLength = data.getUint8(byteOffsetCounter++);
                 FC.ADSB_VEHICLES.vehiclePacketCount = data.getUint32(byteOffsetCounter, true); byteOffsetCounter += 4;
@@ -287,6 +295,10 @@ var mspHelper = (function () {
                 }
                 break;
             case MSPCodes.MSP2_ADSB_LIMITS:
+                if (dataHandler.unsupported || data.byteLength < 6) {
+                    // firmware without ADSB answers with an error and no payload: leave the zero defaults
+                    break;
+                }
                 FC.ADSB_LIMITS.adsb_distance_warning = data.getUint16(0, true);
                 FC.ADSB_LIMITS.adsb_distance_alert = data.getUint16(2, true);
                 FC.ADSB_LIMITS.adsb_ignore_plane_above_me_limit = data.getUint16(4, true);
