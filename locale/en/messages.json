@@ -2135,6 +2135,18 @@
     "setMixerProfile": {
         "message": "Setting Mixer Profile: <strong style=\"color: #37a8db\">$1</strong>"
     },
+    "controlProfileName": {
+        "message": "Control profile name"
+    },
+    "batteryProfileName": {
+        "message": "Battery profile name"
+    },
+    "mixerProfileName": {
+        "message": "Mixer profile name"
+    },
+    "profileNameHelp": {
+        "message": "Optional name for this profile slot, shown next to its number in the profile dropdowns at the top. Up to 12 characters. Needs INAV 10 firmware."
+    },
     "setBatteryProfile": {
         "message": "Setting Battery Profile: <strong style=\"color: #37a8db\">$1</strong>"
     },
@@ -4876,6 +4888,15 @@
     },
     "osdElement_ACTIVE_PROFILE": {
         "message": "Show the active profile"
+    },
+    "osdElement_CONTROL_PROFILE_NAME": {
+        "message": "Name of the active control profile (slot symbol and number when unnamed)"
+    },
+    "osdElement_BATTERY_PROFILE_NAME": {
+        "message": "Name of the active battery profile (battery symbol and number when unnamed)"
+    },
+    "osdElement_MIXER_PROFILE_NAME": {
+        "message": "Name of the active mixer profile (M and number when unnamed)"
     },
     "osdElement_LEVEL_PIDS": {
         "message": "Level PIDs"

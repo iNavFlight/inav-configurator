@@ -47,6 +47,7 @@ var FC = {
     SENSOR_DATA: null,
     MOTOR_DATA: null,
     SERVO_DATA: null,
+    PROFILE_NAMES: null,
     GPS_DATA: null,
     ADSB_VEHICLES: null,
     ADSB_LIMITS: null,
@@ -294,6 +295,7 @@ var FC = {
 
         this.MOTOR_DATA = new Array(8);
         this.SERVO_DATA = new Array(16);
+        this.PROFILE_NAMES = null;
 
         this.GPS_DATA = {
             fix: 0,
