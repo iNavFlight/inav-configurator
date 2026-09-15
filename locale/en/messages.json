@@ -1526,6 +1526,12 @@
     "configurationGPSUseGlonass": {
         "message": "Gps use Glonass Satellites (RU)"
     },
+    "configurationGPSAssistNowAutonomous": {
+        "message": "AssistNow Autonomous (orbit prediction in the receiver)"
+    },
+    "configurationGPSAssistNowAutonomousHelp": {
+        "message": "u-blox M8 and newer: the receiver predicts satellite orbits from data it collected on earlier power-ups and fixes faster after a cold start, without an internet download. Needs the receiver's backup battery or supercapacitor to keep the data between flights. Requires INAV 10 firmware; the option is hidden on older firmware."
+    },
     "gpsPresetMode": {
         "message": "GPS Configuration Preset"
     },
