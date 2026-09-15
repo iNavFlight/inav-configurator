@@ -989,6 +989,9 @@
     "initialSetupMagCalibEnded": {
         "message": "Magnetometer calibration <span style=\"color: #37a8db\">finished</span>"
     },
+    "magCalibOrientationReportFailed": {
+        "message": "Could not read the compass alignment result after calibration -- check the connection and reopen this tab."
+    },
     "initialSetupOpflowCalibStarted": {
         "message": "Optic flow calibration started"
     },
@@ -7507,6 +7510,9 @@
     },
     "accAlignMagUncalibratedError": {
         "message": "The compass must be calibrated before its alignment can be determined. Please go to the <b>Calibration</b> tab and click <b>Calibrate Magnetometer</b>, then re-run this wizard."
+    },
+    "accAlignMagDisagreementError": {
+        "message": "The compass readings from the north and east positions don't agree. This usually means the aircraft wasn't actually facing north closely enough, or wasn't turned close enough to 90 degrees between the two readings. Please try again, facing as close to true north as you can."
     },
     "accAlignTiltError": {
         "message": "The second reading looks too similar to the first. Please make sure the nose is raised by about 45 degrees, then try again."

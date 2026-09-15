@@ -205,6 +205,15 @@ var mspHelper = (function () {
                 FC.SENSOR_DATA.magnetometer[1] = data.getInt16(14, true) / 1090;
                 FC.SENSOR_DATA.magnetometer[2] = data.getInt16(16, true) / 1090;
                 break;
+            case MSPCodes.MSP2_INAV_MAG_UNALIGNED:
+                // Calibrated, but NOT alignment-rotated -- unlike MSP_RAW_IMU's
+                // magnetometer field above, this is unaffected by the current
+                // align_mag/align_board settings. No /1090 division: atan2 is
+                // scale-invariant, and there is no other consumer of this field to match.
+                FC.SENSOR_DATA.magnetometerUnaligned[0] = data.getInt16(0, true);
+                FC.SENSOR_DATA.magnetometerUnaligned[1] = data.getInt16(2, true);
+                FC.SENSOR_DATA.magnetometerUnaligned[2] = data.getInt16(4, true);
+                break;
             case MSPCodes.MSP_SERVO:
                 var servoCount = dataHandler.message_length_expected / 2;
                 for (let i = 0; i < servoCount; i++) {

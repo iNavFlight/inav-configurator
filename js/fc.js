@@ -284,6 +284,7 @@ var FC = {
             gyroscope: [0, 0, 0],
             accelerometer: [0, 0, 0],
             magnetometer: [0, 0, 0],
+            magnetometerUnaligned: [0, 0, 0],
             altitude: 0,
             barometer: 0,
             sonar: 0,
@@ -896,6 +897,10 @@ var FC = {
         return calibrated;
     },
     getMagnetometerCalibrated: function () {
+        // 1024 gain / 0 zero on all three axes is firmware's own "uncalibrated" sentinel --
+        // see sensors/compass.c's resetCompass() defaults and the matching check this
+        // mirrors (compassIsCalibrationComplete(), same three-axis test). If those defaults
+        // ever change, this needs to change with them.
         return !(this.CALIBRATION_DATA.magGain.X === 1024 && this.CALIBRATION_DATA.magGain.Y === 1024 && this.CALIBRATION_DATA.magGain.Z === 1024 &&
                  this.CALIBRATION_DATA.magZero.X === 0 && this.CALIBRATION_DATA.magZero.Y === 0 && this.CALIBRATION_DATA.magZero.Z === 0);
     },

@@ -167,6 +167,11 @@ calibrationTab.initialize = function (callback) {
                 closeOnClick: true,
                 content: content
             }).open();
+        }).catch(function (err) {
+            // MSP timeout/disconnect while reading the before/after alignment settings --
+            // without this, the calibration finishes silently with no follow-up modal at all.
+            console.error('Failed to read compass alignment settings after calibration:', err);
+            GUI.log(i18n.getMessage('magCalibOrientationReportFailed'));
         });
     }
 
