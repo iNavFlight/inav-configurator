@@ -1903,7 +1903,7 @@ dialog {
     color: white;
     font-size: 10px;
     margin-top: 20px;
-    width: 130px;
+    width: 150px;
     float: right;
     margin-right: 10px;
     line-height: 12px;
@@ -1916,7 +1916,7 @@ dialog {
 #profile_change {
     color: white;
     margin: 0px;
-    width: 130px;
+    width: 150px;
     float: left;
     line-height: 12px;
 }
@@ -1928,7 +1928,7 @@ dialog {
 #mixer_profile_change {
     color: white;
     margin: 0px;
-    width: 130px;
+    width: 150px;
     float: left;
     line-height: 12px;
 }
@@ -1940,13 +1940,37 @@ dialog {
 #battery_profile_change {
     color: white;
     margin: 0px;
-    width: 130px;
+    width: 150px;
     float: right;
     line-height: 12px;
 }
 
 #battery_profile_change > .dropdown {
     margin: 0px;
+}
+
+#profiles_wrapper_global .profile-copy {
+    float: right;
+    width: 14px;
+    height: 14px;
+    margin: 3px 0 0 4px;
+    opacity: 0.7;
+    background: no-repeat center / 12px 12px url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><rect x='1' y='1' width='9' height='9' rx='1.5' fill='none' stroke='white' stroke-width='1.6'/><rect x='6' y='6' width='9' height='9' rx='1.5' fill='%23222' stroke='white' stroke-width='1.6'/></svg>");
+}
+
+#profiles_wrapper_global .profile-copy:hover {
+    opacity: 1;
+}
+
+#profile_change > .dropdown,
+#mixer_profile_change > .dropdown,
+#battery_profile_change > .dropdown {
+    width: 130px;
+    float: left;
+}
+
+#modal-copy-profile select {
+    margin-left: 6px;
 }
 
 .dataflash-contents_global {
