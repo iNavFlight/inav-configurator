@@ -139,10 +139,14 @@ function makeGuiMock() {
     return { log: () => {} };
 }
 
-test('BUG #11721 repro: reboot() must not fire before the FC acknowledges MSP_EEPROM_WRITE', async () => {
-    const handlerBody = extractRealSaveEepromGeozoneHandlerBody();
+/**
+ * Compile and run a save-eeprom-geozone handler body (real or hand-written)
+ * against the same mocked FC round trip, and collect what it did. Shared by
+ * both tests below so the repro test and its positive control exercise
+ * identical mechanics and only differ in which handler body they compile.
+ */
+async function runHandlerAndCollect(handlerBody) {
     const handler = compileRealHandler(handlerBody);
-
     const state = { saveToEepromCalled: false, saveToEepromCallbackProvided: false, eepromWriteAcked: false };
     const mspHelper = makeMspHelperMock(state, 20 /* ms, simulated FC round trip */);
 
@@ -167,6 +171,13 @@ test('BUG #11721 repro: reboot() must not fire before the FC acknowledges MSP_EE
     // Give the simulated FC ack (20ms) time to land, so we can also confirm
     // it does eventually arrive (sanity: the mock itself isn't broken).
     await new Promise((r) => setTimeout(r, 60));
+
+    return { state, rebootCalled, eepromWriteAckedWhenRebootFired };
+}
+
+test('BUG #11721 repro: reboot() must not fire before the FC acknowledges MSP_EEPROM_WRITE', async () => {
+    const { state, rebootCalled, eepromWriteAckedWhenRebootFired } =
+        await runHandlerAndCollect(extractRealSaveEepromGeozoneHandlerBody());
 
     assert.equal(state.saveToEepromCalled, true, 'sanity: mspHelper.saveToEeprom() must have been called');
     assert.equal(rebootCalled, true, 'sanity: reboot() must have been called');
@@ -215,30 +226,7 @@ test('positive control: a fixed handler that gates reboot() on saveToEeprom()\'s
             });
         }
     `;
-    const handler = compileRealHandler(fixedHandlerBody);
-
-    const state = { saveToEepromCalled: false, saveToEepromCallbackProvided: false, eepromWriteAcked: false };
-    const mspHelper = makeMspHelperMock(state, 20);
-
-    let rebootCalled = false;
-    let eepromWriteAckedWhenRebootFired = null;
-    const reboot = () => {
-        rebootCalled = true;
-        eepromWriteAckedWhenRebootFired = state.eepromWriteAcked;
-    };
-
-    await handler(
-        { currentTarget: {} },
-        false,
-        makeDialogMock(),
-        makeI18nMock(),
-        mspHelper,
-        makeGuiMock(),
-        reboot,
-        makeJQueryStub(),
-    );
-
-    await new Promise((r) => setTimeout(r, 60));
+    const { state, rebootCalled, eepromWriteAckedWhenRebootFired } = await runHandlerAndCollect(fixedHandlerBody);
 
     assert.equal(rebootCalled, true, 'sanity: reboot() must still eventually be called by the fixed handler');
     assert.equal(state.saveToEepromCallbackProvided, true, 'the fixed handler must pass a completion callback to saveToEeprom()');
