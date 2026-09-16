@@ -1426,6 +1426,9 @@ function iconKey(filename) {
             title: i18n.getMessage('missionApplySpeedLandTitle'),
             content: $('#landSpeedNotUpdatedContent')
         });
+        $('#landSpeedNotUpdatedOk').on('click', function () {
+            landSpeedNotUpdatedModal.close();
+        });
 
         // Append shortcut hints after i18n sets titles (Ctrl-based)
         const addShortcutHint = (selector, suffix) => {
