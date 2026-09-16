@@ -802,6 +802,15 @@ class INAVCodeGenerator {
       this.generateStickyAssignment(action, activatorId);
       return;
     }
+    // Handle pwmOnPin(duty, pin): operandA = duty, operandB = pin
+    if (action && action.type === 'PinioPwm') {
+      this.pushLogicCommand(OPERATION.PINIO_PWM,
+        this.getOperand(action.duty),  // operandA = duty cycle
+        this.getOperand(action.pin),   // operandB = pin (0=LED, 1=USER1, ...)
+        activatorId
+      );
+      return;
+    }
     this.actionGenerator.generate(action, activatorId);
   }
 

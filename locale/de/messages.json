@@ -4991,6 +4991,21 @@
     "missionElevation": {
         "message": "Geländehöhe (m):"
     },
+    "missionMap3DEmpty": {
+        "message": "Keine Mission für die 3D-Ansicht vorhanden."
+    },
+    "missionMap3DCollisionWarning": {
+        "message": "Warnung: Die geplante Flugroute schneidet das Gelände."
+    },
+    "missionMap3DTerrainUnavailable": {
+        "message": "Geländedaten nicht verfügbar: Die Routenkollisionsprüfung konnte nicht abgeschlossen werden."
+    },
+    "missionMap3DHomeRequired": {
+        "message": "HOME ist nicht gesetzt: Die Geländeprüfung für relative Höhen ist nicht verfügbar."
+    },
+    "missionMap3DUnavailable": {
+        "message": "Die 3D-Ansicht ist auf diesem System nicht verfügbar."
+    },
     "missionNA": {
         "message": "k. A."
     },
@@ -6073,6 +6088,24 @@
     },
     "ledStripWiringMessage": {
         "message": "LEDs ohne Verdrahtungsnummer werden nicht gespeichert."
+    },
+    "ledStripQuickPresets": {
+        "message": "Schnell-Presets:"
+    },
+    "ledStripStep1Header": {
+        "message": "Verdrahtungsreihenfolge"
+    },
+    "ledStripStep2Header": {
+        "message": "Position & Richtung"
+    },
+    "ledStripStep3Header": {
+        "message": "Funktion"
+    },
+    "ledStripStep4Header": {
+        "message": "Farbe"
+    },
+    "ledStripEditPalette": {
+        "message": "Palettenfarben bearbeiten"
     },
     "mainLogoText": {
         "message": "CONFIGURATOR"

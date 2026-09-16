@@ -49,6 +49,8 @@ var FC = {
     SERVO_DATA: null,
     GPS_DATA: null,
     ADSB_VEHICLES: null,
+    ADSB_LIMITS: null,
+    ADSB_WARNING_ICAO: null,
     MISSION_PLANNER: null,
     ANALOG: null,
     ARMING_CONFIG: null,
@@ -88,6 +90,9 @@ var FC = {
     EZ_TUNE: null,
     FLIGHT_MODES: null,
     GEOZONES: null,
+    DRONECAN_NODES: [],
+    DRONECAN_ASYNC_REQUEST: null,
+    DRONECAN_ASYNC_RESULT: null,
 
     restartRequired: false,
     MAX_SERVO_RATE: 125,
@@ -106,6 +111,29 @@ var FC = {
         return true; // Currently all platforms use D term
     },
     resetState: function () {
+        // MassZero thermal camera. MZTC_CONFIG mirrors the 15 byte
+        // MSP2_MZTC_CONFIG payload. MZTC_STATUS stays null until the flight
+        // controller answers MSP2_MZTC_STATUS.
+        this.MZTC_CONFIG = {
+            enabled: 0,
+            port: 1,
+            baudrate: 8,
+            mode: 1,
+            update_rate: 9,
+            palette_mode: 0,
+            auto_shutter: 2,
+            digital_enhancement: 50,
+            spatial_denoise: 50,
+            temporal_denoise: 50,
+            brightness: 50,
+            contrast: 50,
+            zoom_level: 0,
+            mirror_mode: 0,
+            ffc_interval: 5
+        };
+
+        this.MZTC_STATUS = null;
+
         this.SENSOR_STATUS = {
             isHardwareHealthy: 0,
             gyroHwStatus: 0,
@@ -203,11 +231,17 @@ var FC = {
 
         this.generateAuxConfig = function () {
             console.log('Generating AUX_CONFIG');
+            // AUX_CONFIG and AUX_CONFIG_IDS must stay the same length and index-aligned —
+            // tabs/auxiliary.js pairs them by position, so an unrecognized id must be
+            // dropped from both, not just from the name list.
+            const ids = this.AUX_CONFIG_IDS;
             this.AUX_CONFIG = [];
-            for ( let i = 0; i < this.AUX_CONFIG_IDS.length; i++ ) {
-                let found = FLIGHT_MODES.find( mode => mode.permanentId === this.AUX_CONFIG_IDS[i] );
+            this.AUX_CONFIG_IDS = [];
+            for ( let i = 0; i < ids.length; i++ ) {
+                let found = FLIGHT_MODES.find( mode => mode.permanentId === ids[i] );
                 if (found) {
                     this.AUX_CONFIG.push(found.boxName);
+                    this.AUX_CONFIG_IDS.push(ids[i]);
                 }
             }
         };
@@ -281,13 +315,24 @@ var FC = {
             packetCount: 0,
             hwVersion: 0
         };
-        
+
         this.ADSB_VEHICLES = {
             vehiclesCount: 0,
             callsignLength: 0,
             vehiclePacketCount: 0,
             heartbeatPacketCount: 0,
             vehicles: []
+        };
+
+        this.ADSB_LIMITS = {
+            adsb_distance_alert: 0,
+            adsb_distance_warning: 0,
+            adsb_ignore_plane_above_me_limit: 0,
+        };
+
+        this.ADSB_WARNING_ICAO = {
+            icao: 0,
+            isAlert: 0,
         };
 
         this.MISSION_PLANNER = new WaypointCollection();
@@ -585,7 +630,7 @@ var FC = {
             sensitivityEnd: null,
             correctionCenter: null,
             correctionEnd: null,
-            weightCenter: null, 
+            weightCenter: null,
             weightEnd: null
         };
 
@@ -610,6 +655,10 @@ var FC = {
            settings: {customElementsCount: 0, customElementTextSize: 0, customElementParts: 0},
            items: [],
         };
+
+        this.DRONECAN_NODES = [];
+        this.DRONECAN_ASYNC_REQUEST = null;
+        this.DRONECAN_ASYNC_RESULT = null;
 
     },
     getOutputUsages: function() {
@@ -661,13 +710,6 @@ var FC = {
     },
     isMotorOutputEnabled: function () {
         return this.isFeatureEnabled('PWM_OUTPUT_ENABLE', this.getFeatures());
-    },
-    getGpsProtocols: function () {
-        return [
-            'UBLOX',
-            'MSP',
-            'FAKE'
-        ];
     },
     getGpsBaudRates: function () {
         return [
@@ -838,7 +880,7 @@ var FC = {
         var calibrated = true;
         var flagNames = FC.getArmingFlags();
 
-        if (this.CALIBRATION_DATA.accGain.X === 4096 && this.CALIBRATION_DATA.accGain.Y === 4096 && this.CALIBRATION_DATA.accGain.Z === 4096 && 
+        if (this.CALIBRATION_DATA.accGain.X === 4096 && this.CALIBRATION_DATA.accGain.Y === 4096 && this.CALIBRATION_DATA.accGain.Z === 4096 &&
             this.CALIBRATION_DATA.accZero.X === 0 && this.CALIBRATION_DATA.accZero.Y === 0 && this.CALIBRATION_DATA.accZero.Z === 0
            ) {
             calibrated = false;
@@ -870,7 +912,8 @@ var FC = {
             'Level',
             'Heading Hold',
             'Velocity Z',
-            'Nav Heading'
+            'Nav Heading',
+            'Auto Speed'
         ];
     },
     getRthAltControlMode: function () {

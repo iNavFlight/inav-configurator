@@ -312,9 +312,13 @@ receiverTab.initialize = function (callback) {
         });
 
         $("a.sticks").on('click', function () {
-            var mspWin = window.open("tabs/receiver_msp.html", "receiver_msp", "width=420,height=760,menubar=no");
-            
-            mspWin.window.setRawRx = function (channels) {
+            // Exposed on this (opener) window rather than assigned onto the
+            // popup's window object: window.open() returns a reference to
+            // the popup's transient about:blank document, which gets
+            // replaced by a fresh global once it finishes navigating to
+            // receiver_msp.html - anything assigned there is lost before
+            // receiver_msp.js runs. The popup calls back via window.opener.
+            window.setRawRx = function (channels) {
                 if (CONFIGURATOR.connectionValid && GUI.active_tab != 'cli') {
                     mspHelper.setRawRx(channels);
                     return true;
@@ -322,6 +326,7 @@ receiverTab.initialize = function (callback) {
                     return false;
                 }
             }
+            window.open("tabs/receiver_msp.html", "receiver_msp", "width=420,height=760,menubar=no");
         });
 
         // Only show the MSP control sticks if the MSP Rx feature is enabled

@@ -101,6 +101,10 @@
     background-image: url(./../../../images/icons/search-white.svg);
 }
 
+.tab-mission-control .ic_grid {
+    background-image: url(./../../../images/icons/cf_icon_MP_grid_grey.svg);
+}
+
 .tab-mission-control .ic_setup {
     background-image: url(./../../../images/icons/cf_icon_setup_white.svg);
 }
@@ -188,23 +192,158 @@
     background-repeat:no-repeat;
 }
 
+/* The tab is a column: the title keeps its own height and the wrapper takes the rest, so the
+   planner never runs past #content. The former 90% wrapper under the title overflowed #content
+   on small screens, and when Chromium composites in software (integrated GPUs, old drivers) a
+   WebGL canvas that is clipped or covered at the bottom is drawn shifted down by that amount,
+   leaving a strip of stale 2D map along the top of the 3D view. The fixed status bar covers the
+   last few pixels of #content, so the wrapper also keeps 12px clear at the bottom. */
 .tab-mission-control .content_wrapper {
     display: flex;
-    height: 90%;
+    flex: 1 1 auto;
+    min-height: 0;
     flex-direction: row;
     justify-content: space-between;
     flex-wrap: wrap;
-    padding-bottom: 5px;
+    padding-bottom: 12px;
     padding-top: 5px;
 }
 
 
 .tab-mission-control {
+    display: flex;
+    flex-direction: column;
     height: 100%;
 }
 
-#missionMap {
+#missionMapView {
+    position: relative;
     height: 100%;
+    width: 100%;
+}
+
+/* In 3D the map column is a column too: an open elevation panel then takes its room from the
+   globe instead of pushing the canvas past #content, which is what the strip above needs. The
+   2D editor keeps its layout, where the page simply scrolls. */
+.tab-mission-control.mission-map-3d .threefourth_left {
+    display: flex;
+    flex-direction: column;
+}
+
+.tab-mission-control.mission-map-3d #missionMapView {
+    flex: 1 1 auto;
+    min-height: 0;
+    height: auto;
+}
+
+#missionMap,
+#missionMap3D {
+    height: 100%;
+    width: 100%;
+}
+
+#missionMap3D {
+    background: #0d1117;
+    display: none;
+    overflow: hidden;
+}
+
+#missionMap3D canvas,
+#missionMap3D .cesium-viewer,
+#missionMap3D .cesium-viewer-cesiumWidgetContainer,
+#missionMap3D .cesium-widget,
+#missionMap3D .cesium-widget canvas {
+    display: block;
+    height: 100%;
+    width: 100%;
+}
+
+#missionMap3D .cesium-viewer-bottom {
+    bottom: 2px;
+}
+
+#missionMap3D .cesium-widget-credits {
+    font-size: 10px;
+}
+
+#missionMap3DHelp {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: rgba(255, 255, 255, 0.78);
+    font: 600 14px "Segoe UI", Calibri, sans-serif;
+    text-align: center;
+    pointer-events: none;
+    z-index: 2;
+}
+
+#missionMap3DWarning {
+    position: absolute;
+    top: 0.5em;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    display: none;
+    max-width: calc(100% - 12em);
+    padding: 6px 10px;
+    border: 1px solid rgba(255, 255, 255, 0.75);
+    border-radius: 3px;
+    background: rgba(160, 18, 18, 0.94);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.45);
+    color: #fff;
+    font: 700 12px "Segoe UI", Calibri, sans-serif;
+    line-height: 16px;
+    pointer-events: none;
+    text-align: center;
+}
+
+#missionMap3DWarning[data-warning-type="unavailable"],
+#missionMap3DWarning[data-warning-type="home"] {
+    background: rgba(125, 78, 0, 0.94);
+}
+
+/* Left map control column; the exact slot below the bottom-most planner control is set at runtime */
+.mission-map-view-controls {
+    top: 215px;
+    left: .5em;
+    z-index: 1001;
+    border: 0;
+    margin: 0;
+    min-width: 0;
+    padding: 0;
+}
+
+/* Same outer size as the other .ol-control buttons (1.375em at the inherited font size) */
+.mission-map-view-controls button {
+    font-size: .72em;
+    width: 1.91em;
+    height: 1.91em;
+    line-height: 1.91em;
+    color: #fff;
+    background-color: rgba(0, 60, 136, .5);
+}
+
+.mission-map-view-controls button.active {
+    background-color: rgba(0, 60, 136, 1);
+}
+
+.mission-map-view-controls #missionMap2DButton {
+    border-radius: 2px 2px 0 0;
+}
+
+.mission-map-view-controls #missionMap3DButton {
+    border-radius: 0 0 2px 2px;
+}
+
+.mission-map-view-controls button:focus-visible {
+    outline: 2px solid #1497f1;
+    outline-offset: 1px;
+}
+
+.mission-map-view-controls button:disabled {
+    color: #ccc;
+    cursor: default;
 }
 
 /* #missionPlannerElevation {

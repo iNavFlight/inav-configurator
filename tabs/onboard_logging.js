@@ -19,7 +19,8 @@ const onboardLoggingTab = {
 
 onboardLoggingTab.initialize = function (callback) {
     let
-        saveCancelled, eraseCancelled;
+        saveCancelled, eraseCancelled,
+        terrainEnabled = false;
 
     //Add future blackbox values here and in messages.json, the checkbox are drawn by js
     const blackBoxFields = [
@@ -47,10 +48,21 @@ onboardLoggingTab.initialize = function (callback) {
     if (CONFIGURATOR.connectionValid) {
         MSP.send_message(MSPCodes.MSP_FEATURE, false, false, function() {
             MSP.send_message(MSPCodes.MSP_DATAFLASH_SUMMARY, false, false, function() {
-                MSP.send_message(MSPCodes.MSP_SDCARD_SUMMARY, false, false, function() {
-		            MSP.send_message(MSPCodes.MSP2_BLACKBOX_CONFIG, false, false, load_html);
-                });
+                MSP.send_message(MSPCodes.MSP_SDCARD_SUMMARY, false, false, load_terrain_setting);
             });
+        });
+    }
+
+    function load_terrain_setting() {
+        mspHelper.getSetting("terrain_enabled").then(function(data) {
+            if (data == null) {
+                console.warn("while setting terrain_enabled, data is null or undefined");
+                return;
+            }
+
+            terrainEnabled = Boolean(data.value);
+        }).then(function() {
+            MSP.send_message(MSPCodes.MSP2_BLACKBOX_CONFIG, false, false, load_html);
         });
     }
 
@@ -63,6 +75,31 @@ onboardLoggingTab.initialize = function (callback) {
 
     function save_to_eeprom() {
         MSP.send_message(MSPCodes.MSP_EEPROM_WRITE, false, false, reboot);
+    }
+
+    /*
+     * Read the setting back before committing to flash.
+     *
+     * mspHelper.setSetting() logs an encoding or write failure to the console and
+     * then calls its success continuation anyway, so a value that never reached
+     * the flight controller would still reach the EEPROM write, the "saved"
+     * message and the reboot. That is shared behaviour across every tab, not
+     * something this one can fix, but it should not be relied on either: this
+     * setting is checked, and the tab says so instead of claiming a save it
+     * cannot vouch for.
+     */
+    function save_secondary_gyro_verified() {
+        const wanted = $('#gyro_secondary_enabled').is(':checked') ? 1 : 0;
+
+        mspHelper.getSetting('gyro_secondary_enabled').then(function (setting) {
+            if (setting && parseInt(setting.value, 10) !== wanted) {
+                GUI.log(i18n.getMessage('onboardLoggingSecondaryGyroNotSaved'));
+                return;
+            }
+            save_to_eeprom();
+        }).catch(function () {
+            GUI.log(i18n.getMessage('onboardLoggingSecondaryGyroNotSaved'));
+        });
     }
 
     function reboot() {
@@ -88,7 +125,7 @@ onboardLoggingTab.initialize = function (callback) {
             }
 
             // translate to user-selected language
-           i18n.localize();;
+           i18n.localize();
 
             var
                 dataflashPresent = FC.DATAFLASH.totalSize > 0,
@@ -105,7 +142,8 @@ onboardLoggingTab.initialize = function (callback) {
                 .toggleClass("sdcard-supported", FC.SDCARD.supported)
                 .toggleClass("blackbox-config-supported", FC.BLACKBOX.supported)
                 .toggleClass("blackbox-supported", blackboxSupport)
-                .toggleClass("blackbox-unsupported", !blackboxSupport);
+                .toggleClass("blackbox-unsupported", !blackboxSupport)
+                .toggleClass("only-terrain-supported", !blackboxSupport && terrainEnabled);
 
             if (dataflashPresent) {
                 // UI hooks
@@ -140,7 +178,7 @@ onboardLoggingTab.initialize = function (callback) {
                         // message; gyro_secondary_enabled is a regular setting and
                         // takes the settings path instead.
                         mspHelper.sendBlackboxConfiguration(function () {
-                            Settings.saveInputs(save_to_eeprom);
+                            Settings.saveInputs(save_secondary_gyro_verified);
                         });
                     });
                 });
@@ -222,17 +260,29 @@ onboardLoggingTab.initialize = function (callback) {
         for (var i = 0; i < loggingRates.length; i++) {
             if (!addedCurrentValue && userRate.num / userRate.denom <= loggingRates[i].num / loggingRates[i].denom) {
                 if (userRate.num / userRate.denom < loggingRates[i].num / loggingRates[i].denom) {
-                    loggingRatesSelect.append('<option value="' + userRate.num + '/' + userRate.denom + '">'
-                            + userRate.num + '/' + userRate.denom + ' (' + Math.round(userRate.num / userRate.denom * 100) + '%)</option>');
+                    var userPercent = Math.round(userRate.num / userRate.denom * 100);
+                    loggingRatesSelect.append('<option value="' + userRate.num + '/' + userRate.denom + '" data-percent="' + userPercent + '">'
+                            + userRate.num + '/' + userRate.denom + ' (' + userPercent + '%)</option>');
                 }
                 addedCurrentValue = true;
             }
 
-            loggingRatesSelect.append('<option value="' + loggingRates[i].num + '/' + loggingRates[i].denom + '">'
-                + loggingRates[i].num + '/' + loggingRates[i].denom + ' (' + Math.round(loggingRates[i].num / loggingRates[i].denom * 100) + '%)</option>');
+            var percent = Math.round(loggingRates[i].num / loggingRates[i].denom * 100);
+            loggingRatesSelect.append('<option value="' + loggingRates[i].num + '/' + loggingRates[i].denom + '" data-percent="' + percent + '">'
+                + loggingRates[i].num + '/' + loggingRates[i].denom + ' (' + percent + '%)</option>');
 
         }
         loggingRatesSelect.val(userRate.num + '/' + userRate.denom);
+
+        loggingRatesSelect.on('change', update_terrain_rate_warning);
+        update_terrain_rate_warning();
+    }
+
+    function update_terrain_rate_warning() {
+        var percent = parseInt($(".blackboxRate select option:selected").data("percent"), 10);
+        var showWarning = terrainEnabled && percent > 25;
+
+        $(".tab-onboard_logging .terrain-rate-warning").toggle(showWarning);
     }
 
     function formatFilesizeKilobytes(kilobytes) {
