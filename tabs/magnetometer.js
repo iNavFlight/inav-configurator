@@ -18,12 +18,8 @@ import interval from './../js/intervals';
 import jBox from 'jbox';
 import {
     rad2degrees,
-    buildRotationMatrix,
-    applyRotation,
     calculateRawFromTransformed,
     vecCross,
-    vecNormalize,
-    vecSquaredDistance,
     findBestBoardAlignment,
     computeCompassYaw,
 } from './../js/boardAlignmentMath';
@@ -566,7 +562,7 @@ magnetometerTab.initialize = function (callback) {
         $('#modal-acc-align-4').on('click', {"step": "4" }, accAutoAlignButton);
 
         $('#modal-acc-align-done-save').on('click', function () {
-            if (typeof modal != "undefined") {
+            if (modal !== undefined) {
                 modal.close();
             }
             saveChainer.execute();
@@ -1080,7 +1076,7 @@ magnetometerTab.initialize = function (callback) {
             // pass, rather than RAM-capable boards being sent off to do a full compass
             // calibration spin (relying on firmware's calibration-time auto-detection, which
             // stays available and unaffected for anyone who skips this wizard entirely).
-            var next_step = $('#modal-acc-align-east');
+            let next_step = $('#modal-acc-align-east');
             if (!BitHelper.bit_check(FC.CONFIG.activeSensors, 2)) {
                 // No mag: skip the compass-orientation step.
                 // #modal-acc-align-done also shows a "Compass alignment set to" line, which

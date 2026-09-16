@@ -16,6 +16,25 @@ const calibrationTab = {};
 // Module-scoped (not local to initialize()) so cleanup() below can close it too.
 let modalMagAlign;
 
+// Pure functions of their arguments -- module-scoped rather than redeclared on
+// every calibrationTab.initialize() call.
+function magAlignmentSettingsEqual(a, b) {
+    return a.every(function (setting, i) { return setting.value === b[i].value; });
+}
+
+function formatMagAlignment(alignment) {
+    var roll = alignment[0].value / 10;
+    var pitch = alignment[1].value / 10;
+    var yaw = alignment[2].value / 10;
+
+    if (roll === 0 && pitch === 0 && yaw === 0) {
+        var alignSetting = alignment[3];
+        var names = alignSetting.setting?.table?.values || [];
+        return names[alignSetting.value] || alignSetting.value;
+    }
+    return roll + ", " + pitch + ", " + yaw;
+}
+
 calibrationTab.model = (function () {
     var publicScope = {},
         privateScope = {};
@@ -142,23 +161,6 @@ calibrationTab.initialize = function (callback) {
             mspHelper.getSetting("align_mag_yaw"),
             mspHelper.getSetting("align_mag"),
         ]);
-    }
-
-    function magAlignmentSettingsEqual(a, b) {
-        return a.every(function (setting, i) { return setting.value === b[i].value; });
-    }
-
-    function formatMagAlignment(alignment) {
-        var roll = alignment[0].value / 10;
-        var pitch = alignment[1].value / 10;
-        var yaw = alignment[2].value / 10;
-
-        if (roll === 0 && pitch === 0 && yaw === 0) {
-            var alignSetting = alignment[3];
-            var names = (alignSetting.setting.table && alignSetting.setting.table.values) || [];
-            return names[alignSetting.value] || alignSetting.value;
-        }
-        return roll + ", " + pitch + ", " + yaw;
     }
 
     function reportMagCalibrationOrientation(beforePromise) {

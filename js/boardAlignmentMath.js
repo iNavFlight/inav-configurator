@@ -146,7 +146,7 @@ export function vecCross(a, b) {
 }
 
 export function vecNormalize(v) {
-    const mag = Math.sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]);
+    const mag = Math.hypot(v[0], v[1], v[2]);
     return [v[0] / mag, v[1] / mag, v[2] / mag];
 }
 
