@@ -92,7 +92,7 @@ onboardLoggingTab.initialize = function (callback) {
         const wanted = $('#gyro_secondary_enabled').is(':checked') ? 1 : 0;
 
         mspHelper.getSetting('gyro_secondary_enabled').then(function (setting) {
-            if (setting && parseInt(setting.value, 10) !== wanted) {
+            if (setting && Number(setting.value) !== wanted) {
                 GUI.log(i18n.getMessage('onboardLoggingSecondaryGyroNotSaved'));
                 return;
             }
