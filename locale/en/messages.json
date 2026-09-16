@@ -5450,6 +5450,12 @@
     "missionApplyBelowGround": {
         "message": "Warning: $1 waypoint(s) now sit below the ground, check the altitudes"
     },
+    "missionApplySpeedLandTitle": {
+        "message": "Landing Speed Not Updated"
+    },
+    "missionApplySpeedLandSkipped": {
+        "message": "The default speed was not applied to this mission's LAND waypoint(s), since a landing usually needs a different speed than cruise. Set it directly on the waypoint if it needs to change."
+    },
     "missionElevation": {
         "message": "Elevation (m):"
     },

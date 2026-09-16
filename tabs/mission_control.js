@@ -1,6 +1,7 @@
 'use strict';
 
 import xml2js from 'xml2js';
+import jBox from 'jbox';
 import { Chart, registerables } from 'chart.js';
 import {
     ArcGisMapServerImageryProvider,
@@ -711,6 +712,12 @@ function formatSimulationTime(seconds) {
 }
 
 let elevationChartInstance = null;
+
+// The mission-wide default speed is never applied to LAND waypoints (the
+// firmware's getActiveSpeed() still honors their own P1), so the pilot needs
+// telling rather than a quiet skip.
+let landSpeedNotUpdatedModal = null;
+
 function convertCentimetersToMeters(val) {
     return Number.parseInt(val) / 100;
 }
@@ -1410,6 +1417,15 @@ function iconKey(filename) {
             }
     
         i18n.localize();
+
+        landSpeedNotUpdatedModal = new jBox('Modal', {
+            width: 480,
+            height: 200,
+            closeButton: 'title',
+            animation: false,
+            title: i18n.getMessage('missionApplySpeedLandTitle'),
+            content: $('#landSpeedNotUpdatedContent')
+        });
 
         // Append shortcut hints after i18n sets titles (Ctrl-based)
         const addShortcutHint = (selector, suffix) => {
@@ -4396,7 +4412,13 @@ function iconKey(filename) {
         return !plan.switchMoved || (plan.homeCm !== null && (!landingNeedsTerrain || plan.terrainCm !== null));
     }
 
-    function reportDefaultsApplied(plan, count, belowGround) {
+    function showLandSpeedNotUpdatedWarning() {
+        if (landSpeedNotUpdatedModal && typeof landSpeedNotUpdatedModal.open === 'function') {
+            landSpeedNotUpdatedModal.open();
+        }
+    }
+
+    function reportDefaultsApplied(plan, count, belowGround, hasLandWaypoint) {
         if (plan.switchMoved) $('#MPapplySlrSaved').show();
         if (plan.applyAlt) $('#MPapplyAltSaved').show();
         if (plan.speedChanged) $('#MPapplySpeedSaved').show();
@@ -4406,7 +4428,10 @@ function iconKey(filename) {
                                     [String(count)]));
         }
         if (plan.applyAlt) GUI.log(i18n.getMessage('missionApplyAltApplied', [String(count)]));
-        if (plan.speedChanged) GUI.log(i18n.getMessage('missionApplySpeedApplied', [String(count)]));
+        if (plan.speedChanged) {
+            GUI.log(i18n.getMessage('missionApplySpeedApplied', [String(count)]));
+            if (hasLandWaypoint) showLandSpeedNotUpdatedWarning();
+        }
         if (belowGround) GUI.log(i18n.getMessage('missionApplyBelowGround', [String(belowGround)]));
     }
 
@@ -4429,6 +4454,10 @@ function iconKey(filename) {
             seaLevelSwitchOnOpen = plan.toAbsolute;
             return;
         }
+        // Neither write path below applies the default speed to a LAND waypoint
+        // (see applySpeedToWaypoints / writeSpeedToWaypoint) - a landing usually
+        // needs its own speed, not cruise speed.
+        const hasLandWaypoint = waypoints.some((wp) => wp.getAction() == MWNP.WPTYPE.LAND);
 
         // A failed apply is rolled back into the settings so the next save can retry it -
         // otherwise nothing would count as changed any more.
@@ -4471,6 +4500,7 @@ function iconKey(filename) {
                 redrawLayer();
                 $('#MPapplySpeedSaved').show();
                 GUI.log(i18n.getMessage('missionApplySpeedApplied', [String(waypoints.length)]));
+                if (hasLandWaypoint) showLandSpeedNotUpdatedWarning();
             }
             if (plan.applyAlt) revertAltitude();
             changeSwitch($('#MPapplySlrValue'), seaLevelSwitchOnOpen);
@@ -4488,7 +4518,7 @@ function iconKey(filename) {
         syncEditPanelWithSelection();
         redrawLayer();
         plotElevation();
-        reportDefaultsApplied(plan, waypoints.length, belowGround);
+        reportDefaultsApplied(plan, waypoints.length, belowGround, hasLandWaypoint);
     }
 
     function missionWasReplaced(waypoints) {
