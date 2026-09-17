@@ -326,7 +326,7 @@ portsTab.initialize = function (callback) {
             return p.functions.includes('ESC_SRXL2');
         });
 
-        if (wantsSrxl2 && parseInt(FC.ADVANCED_CONFIG.motorPwmProtocol, 10) !== SRXL2_PROTOCOL) {
+        if (wantsSrxl2 && Number.parseInt(FC.ADVANCED_CONFIG.motorPwmProtocol, 10) !== SRXL2_PROTOCOL) {
             FC.ADVANCED_CONFIG.motorPwmProtocol = SRXL2_PROTOCOL;
             GUI.log(i18n.getMessage('srxl2ProtocolAutoSet'));
             mspHelper.saveAdvancedConfig(function () {
@@ -390,10 +390,10 @@ function applyBaudLock(baudSelect, column) {
     const rule = serialPortHelper.getRuleByName(section.find('.function-' + column).val());
     const $baud = section.find("." + column + "_baudrate");
 
-    $baud.prop('disabled', !!(rule && rule.lockedBaud));
+    $baud.prop('disabled', Boolean(rule?.lockedBaud));
     $baud.find('option.baudAutoOption').remove();
 
-    if (rule && rule.negotiatedBaud) {
+    if (rule?.negotiatedBaud) {
         $baud.append($('<option/>')
             .addClass('baudAutoOption')
             .attr('value', $baud.val())

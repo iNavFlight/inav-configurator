@@ -18,6 +18,13 @@ import interval from './../js/intervals';
  * sequence is called off. Out here because cleanup() needs it too. */
 const SRXL2_CAL_OFF = 0;
 
+/* MSP.send_message calls back with false when the request never made it. Reading
+ * .data off that throws, and a poller running every 500 ms throws on every tick,
+ * so every use of a reply checks it arrived first. */
+function srxl2StatusArrived(resp) {
+    return Boolean(resp?.data);
+}
+
 const outputsTab = {
     allowTestMode: false,
     srxl2Calibrating: false,
@@ -193,13 +200,6 @@ outputsTab.initialize = function (callback) {
          */
         let srxl2Counts = null;     // {ports, motors}, or null if not yet known
 
-        /* MSP.send_message calls back with false when the request never made it.
-         * Reading .data off that throws, and a poller running every 500 ms throws
-         * on every tick, so every use of a reply checks it arrived first. */
-        function srxl2StatusArrived(resp) {
-            return Boolean(resp && resp.data);
-        }
-
         function srxl2RefreshCounts(done) {
             MSP.send_message(MSPCodes.MSP2_INAV_ESC_SRXL2_STATUS, false, false, function (resp) {
                 /* The reply is parsed into FC.SRXL2_STATUS before this runs, so
@@ -217,7 +217,7 @@ outputsTab.initialize = function (callback) {
         /* What the Ports tab currently shows, saved or not. Used only to notice an
          * assignment the board has not rebooted into yet. */
         function srxl2PortsAssignedInUi() {
-            if (!FC.SERIAL_CONFIG || !FC.SERIAL_CONFIG.ports) {
+            if (!FC.SERIAL_CONFIG?.ports) {
                 return 0;
             }
             let n = 0;
@@ -262,7 +262,7 @@ outputsTab.initialize = function (callback) {
         }
 
         function srxl2UpdateVisibility() {
-            const isSrxl2 = parseInt(FC.ADVANCED_CONFIG.motorPwmProtocol, 10) === SRXL2_PROTOCOL;
+            const isSrxl2 = Number.parseInt(FC.ADVANCED_CONFIG.motorPwmProtocol, 10) === SRXL2_PROTOCOL;
             $('#srxl2-esc').toggle(isSrxl2);
 
             /*
@@ -341,7 +341,7 @@ outputsTab.initialize = function (callback) {
         function srxl2ReverseSync() {
             const on = $reverseEnable.is(':checked');
             $reverseRow.toggle(on);
-            if (on && parseInt($reverseChannel.val(), 10) === 0) {
+            if (on && Number.parseInt($reverseChannel.val(), 10) === 0) {
                 $reverseChannel.val(SRXL2_REVERSE_DEFAULT).trigger('change');
             } else if (!on) {
                 $reverseChannel.val(0).trigger('change');
@@ -424,7 +424,7 @@ outputsTab.initialize = function (callback) {
          * nothing and the switch would come up off every time, saved value or not.
          */
         function srxl2ReverseInit() {
-            $reverseEnable.prop('checked', parseInt($reverseChannel.val(), 10) > 0);
+            $reverseEnable.prop('checked', Number.parseInt($reverseChannel.val(), 10) > 0);
             $reverseRow.toggle($reverseEnable.is(':checked'));
         }
 
