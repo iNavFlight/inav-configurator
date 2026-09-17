@@ -841,6 +841,7 @@ mixerTab.initialize = function (callback, scrollPosition) {
             renderOutputMapping();
 
             motorWizardModal.close();
+            saveAndReboot();
         });
 
         // Reset wizard when modal opens
