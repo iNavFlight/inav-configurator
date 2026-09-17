@@ -892,7 +892,7 @@ mixerTab.initialize = function (callback, scrollPosition) {
                 }
             });
 
-            renderServoOutputImage();
+            renderOutputMapping();
         };
 
         $("#motor_direction_inverted").on('change', updateMotorDirection);
