@@ -38,7 +38,6 @@ onboardLoggingTab.initialize = function (callback) {
         "BLACKBOX_FEATURE_GYRO_PEAKS_PITCH",
         "BLACKBOX_FEATURE_GYRO_PEAKS_YAW",
         "BLACKBOX_FEATURE_SERVOS",
-        "BLACKBOX_FEATURE_GYRO_SECONDARY",
     ];
 
     if (GUI.active_tab !== this) {
