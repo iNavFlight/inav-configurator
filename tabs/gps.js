@@ -35,6 +35,7 @@ import jBox from 'jbox';
 import SerialBackend from '../js/serial_backend';
 import ublox from '../js/ublox/UBLOX';
 import dialog from '../js/dialog';
+import { GNSS_CONSTELLATIONS, gnssMasksKnown, gnssNames, gnssIsOffered } from '../js/gpsConstellations';
 
 
 const gpsTab = {};
@@ -446,8 +447,12 @@ gpsTab.initialize = function (callback) {
         function updateHardwareStatus() {
             if (FC.GPS_DATA && FC.GPS_DATA.hwVersion && FC.GPS_DATA.hwVersion > 0) {
                 const detectedPreset = detectGPSPreset(FC.GPS_DATA.hwVersion);
-                if (detectedPreset && detectedPreset !== 'manual' && GPS_PRESETS[detectedPreset]) {
-                    $('#gps_hardware_name').text(GPS_PRESETS[detectedPreset].name + ' detected');
+                // The receiver's own name when it reports one, because the hardware
+                // version alone cannot tell an F10 from an M10: both say 000A0000
+                const name = FC.GPS_DATA.moduleName
+                    || (GPS_PRESETS[detectedPreset] ? GPS_PRESETS[detectedPreset].name : '');
+                if (name) {
+                    $('#gps_hardware_name').text(name + ' detected');
                     $('#gps_hardware_status').show();
                 }
             }
@@ -585,7 +590,68 @@ gpsTab.initialize = function (callback) {
             }
         }
 
+        // What the detected generation is rated for. Taken from the presets this tab
+        // already ships, rather than a second table that could drift away from them.
+        const NAV_HZ_PRESETS = {
+            0x48: ['m8'],
+            0x49: ['m9-precision', 'm9-sport'],
+            0x4A: ['m10', 'm10-highperf']
+        };
+
+        function update_nav_hz_limit() {
+            const field = $('#gps_ublox_nav_hz');
+            const presets = NAV_HZ_PRESETS[FC.GPS_DATA.hwVersion];
+
+            if (!presets) {
+                field.removeAttr('title');
+                return;
+            }
+
+            const ceiling = Math.max(...presets.map(id => GPS_PRESETS[id].rate));
+            field.attr('title', i18n.getMessage('gpsUpdateRateCeiling', [String(ceiling)]));
+
+            // Only tighten the field when the stored value still fits. Lowering the
+            // ceiling under someone's own setting would leave it sitting in a field
+            // that calls it invalid, which is worse than leaving it alone.
+            if (parseInt(field.val(), 10) <= ceiling) {
+                field.attr('max', ceiling);
+            }
+        }
+
+        function update_gnss_availability() {
+            const supported = FC.GPS_DATA.gnssSupported;
+            const enabled = FC.GPS_DATA.gnssEnabled;
+
+            GNSS_CONSTELLATIONS.filter(c => c.box).forEach(function (c) {
+                $(c.box).closest('.checkbox').toggleClass('is-hidden', !gnssIsOffered(supported, c));
+            });
+
+            const row = $('#gps_constellations');
+            if (!gnssMasksKnown(supported)) {
+                row.addClass('is-hidden');
+                return;
+            }
+
+            // The short names keep the value inside the column the controls use, and they
+            // are the receiver's own: MON-VER spells the list GPS;GAL;BDS
+            $('#gps_constellations_value').text(gnssNames(supported, true).join(', '));
+
+            // What is running belongs in the tooltip: it is the same as what the receiver
+            // has almost always, and a second line for the exception would cost a row
+            row.attr('title', enabled === supported
+                ? i18n.getMessage('gpsConstellationsAllInUse')
+                : i18n.getMessage('gpsConstellationsInUse', [gnssNames(enabled).join(', ') || '-']));
+
+            row.removeClass('is-hidden');
+        }
+
         function update_gps_ui() {
+            update_gnss_availability();
+            update_nav_hz_limit();
+            // The module name arrives with the statistics, which can be later than the
+            // one-shot check done when the tab opens
+            updateHardwareStatus();
+
             let lat = FC.GPS_DATA.lat / 10000000;
             let lon = FC.GPS_DATA.lon / 10000000;
 

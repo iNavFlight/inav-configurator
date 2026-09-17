@@ -265,6 +265,20 @@ var mspHelper = (function () {
                 } else {
                     FC.GPS_DATA.hwVersion = 0;
                 }
+                if (data.byteLength >= 23) {
+                    FC.GPS_DATA.gnssSupported = data.getUint8(21);
+                    FC.GPS_DATA.gnssEnabled = data.getUint8(22);
+                } else {
+                    FC.GPS_DATA.gnssSupported = 0;
+                    FC.GPS_DATA.gnssEnabled = 0;
+                }
+                FC.GPS_DATA.moduleName = '';
+                if (data.byteLength >= 24) {
+                    const nameLength = data.getUint8(23);
+                    for (let i = 0; i < nameLength && 24 + i < data.byteLength; i++) {
+                        FC.GPS_DATA.moduleName += String.fromCharCode(data.getUint8(24 + i));
+                    }
+                }
                 break;
             case MSPCodes.MSP2_ADSB_VEHICLE_LIST:
                 var byteOffsetCounter = 0;

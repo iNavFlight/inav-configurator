@@ -1529,6 +1529,18 @@
     "configurationGPSUseGlonass": {
         "message": "Gps use Glonass Satellites (RU)"
     },
+    "gpsConstellations": {
+        "message": "Constellations"
+    },
+    "gpsConstellationsAllInUse": {
+        "message": "Reported by the receiver, and all of them in use"
+    },
+    "gpsConstellationsInUse": {
+        "message": "Reported by the receiver. In use: $1"
+    },
+    "gpsUpdateRateCeiling": {
+        "message": "This receiver is rated for $1 Hz"
+    },
     "gpsPresetMode": {
         "message": "GPS Configuration Preset"
     },
@@ -1563,7 +1575,7 @@
         "message": "Baudrate"
     },
     "configurationGPSubxSbas": {
-        "message": "Ground Assistance Type"
+        "message": "SBAS Augmentation"
     },
     "receiverType": {
         "message": "Receiver type"

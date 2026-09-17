@@ -197,3 +197,32 @@ td.adsbVehicleList {
     padding: 8px;
     color: #323232;
 }
+
+/* Read-only row: the value takes the width the controls take, so its label lands
+   on the same column as every label above it. */
+.tab-gps .gps_constellations span:first-child {
+    display: inline-block;
+    width: 106px;
+}
+
+.tab-gps .gps_constellations label {
+    margin-left: 10px;
+}
+
+/* The detection line is a statement rather than a control, but it sits among the
+   setting rows: the .number class gives it their geometry, so it starts on the
+   same column and carries the same separator. */
+.tab-gps #gps_hardware_status {
+    font-size: 12px;
+    color: #28a745;
+}
+
+.tab-gps .gps_hardware_tick {
+    margin-right: 5px;
+}
+
+.tab-gps #gps_apply_optimal {
+    margin-left: 10px;
+    color: #007bff;
+    text-decoration: none;
+}

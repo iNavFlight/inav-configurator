@@ -58,10 +58,10 @@
                             <div for="gps_preset_mode" class="helpicon cf_tip" data-i18n_title="gpsPresetModeHelp"></div>
                         </div>
                         <!-- Hardware detection status -->
-                        <div id="gps_hardware_status" style="display: none; padding: 5px; margin: 5px 0; font-size: 12px; color: #28a745;">
-                            <span style="margin-right: 5px;">✓</span>
+                        <div id="gps_hardware_status" class="number" style="display: none;">
+                            <span class="gps_hardware_tick">✓</span>
                             <span id="gps_hardware_name"></span>
-                            <a href="#" id="gps_apply_optimal" style="margin-left: 10px; color: #007bff; text-decoration: none;">[Use optimal settings]</a>
+                            <a href="#" id="gps_apply_optimal">[Use optimal settings]</a>
                         </div>
                         <!-- GPS Preset Info (shown when preset selected) -->
                         <div class="preset-info" id="preset_info" style="display: none; padding: 5px; margin: 5px 0; background: #f0f0f0; border-radius: 3px;">
@@ -87,6 +87,10 @@
                         <div class="checkbox">
                             <input type="checkbox" id="gps_use_glonass" class="toggle update_preview preset-controlled" data-setting="gps_ublox_use_glonass">
                             <label for="gps_use_glonass"><span data-i18n="configurationGPSUseGlonass"></span></label>
+                        </div>
+                        <div class="number gps_constellations is-hidden" id="gps_constellations">
+                            <span id="gps_constellations_value"></span>
+                            <label><span data-i18n="gpsConstellations"></span></label>
                         </div>
                         <div class="number">
                             <input type="number" id="tzOffset" data-setting="tz_offset" data-unit="tzmins" data-setting-multiplier="1" step="1" min="-1440" max="1440" />
