@@ -31,7 +31,13 @@ portsTab.initialize = function (callback) {
          * writing MSP_SET_ADVANCED_CONFIG from a copy this tab never read would
          * overwrite the rest of the motor configuration with zeroes. */
         mspHelper.loadAdvancedConfig(function () {
-            import('./ports.html?raw').then(({default: html}) => GUI.load(html, on_tab_loaded_handler));
+            /* Asked before the function menu is built. On a board without the
+             * Smart ESC driver this comes back as an unsupported command, and
+             * that is what keeps ESC_SRXL2 out of the list: a port assigned to
+             * a function the firmware cannot perform is never opened. */
+            MSP.send_message(MSPCodes.MSP2_INAV_ESC_SRXL2_STATUS, false, false, function () {
+                import('./ports.html?raw').then(({default: html}) => GUI.load(html, on_tab_loaded_handler));
+            });
         });
     });
 

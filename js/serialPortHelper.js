@@ -273,6 +273,17 @@ const serialPortHelper = (function () {
     publicScope.getRules = function () {
         privateScope.generateNames();
 
+        /*
+         * ESC_SRXL2 only exists where the firmware carries the driver. Offering
+         * it elsewhere lets a port be assigned to a function nothing opens, and
+         * the Outputs tab then forces a motor protocol nothing drives.
+         */
+        if (!FC.SRXL2_STATUS || !FC.SRXL2_STATUS.supported) {
+            return privateScope.rules.filter(function (rule) {
+                return rule.name !== 'ESC_SRXL2';
+            });
+        }
+
         return privateScope.rules;
     };
 

@@ -258,6 +258,22 @@ var FC = {
         this.PROGRAMMING_PID         = new ProgrammingPidCollection();
         this.PROGRAMMING_PID_STATUS  = new ProgrammingPidStatus();
 
+        /*
+         * What the Smart ESC driver reports about itself. `supported` starts
+         * false and is set by the first reply: firmware built without the driver
+         * answers MSP2_INAV_ESC_SRXL2_STATUS as an unsupported command, which is
+         * what tells the Configurator not to offer the protocol or the port
+         * function on that board.
+         */
+        this.SRXL2_STATUS = {
+            supported: false,
+            phase: 0,
+            connected: false,
+            lastResult: 0,
+            ports: 0,
+            motors: 0
+        };
+
         this.MIXER_CONFIG = {
             yawMotorDirection: 0,
             yawJumpPreventionLimit: 0,

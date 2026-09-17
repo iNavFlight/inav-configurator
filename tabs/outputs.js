@@ -14,8 +14,13 @@ import { mixer, PLATFORM } from './../js/model';
 import timeout from './../js/timeouts';
 import interval from './../js/intervals';
 
+/* Phase 0 of the firmware's calibration state machine, which is also how the
+ * sequence is called off. Out here because cleanup() needs it too. */
+const SRXL2_CAL_OFF = 0;
+
 const outputsTab = {
     allowTestMode: false,
+    srxl2Calibrating: false,
     feature3DEnabled: false,
     feature3DSupported: false
 };
@@ -51,6 +56,15 @@ outputsTab.initialize = function (callback) {
          * empty on a fresh start - and the tab reports no port assigned however
          * many there are. */
         mspHelper.loadSerialPorts,
+        /* One Smart ESC status request before the UI is built. On a board
+         * without the driver it comes back as an unsupported command, and that
+         * is what stops the tab offering a protocol and a port function the
+         * board has no code to perform. */
+        function (callback) {
+            MSP.send_message(MSPCodes.MSP2_INAV_ESC_SRXL2_STATUS, false, false, function () {
+                callback();
+            });
+        },
         function(callback) {
             mspHelper.getSetting("motor_direction_inverted").then((data)=>{
                 self.motorDirectionInverted=data.value;
@@ -141,7 +155,14 @@ outputsTab.initialize = function (callback) {
          */
         const SRXL2_PROTOCOL = 7;
 
-        const SRXL2_CAL_OFF = 0, SRXL2_CAL_WAIT_BATTERY = 1, SRXL2_CAL_SETTLE = 2, SRXL2_CAL_LOW = 3;
+        /* Offering SRXL2 where the firmware has none is not a cosmetic mistake:
+         * saving it leaves the board on a protocol nothing drives, and the
+         * motors unwritten. */
+        if (!FC.SRXL2_STATUS.supported) {
+            delete escProtocols[SRXL2_PROTOCOL];
+        }
+
+        const SRXL2_CAL_WAIT_BATTERY = 1, SRXL2_CAL_SETTLE = 2, SRXL2_CAL_LOW = 3;
 
         /* srxl2CalResult_e in the firmware. The sequence presents full throttle, so
          * it has preconditions, and the operator needs to know which one failed
@@ -153,7 +174,11 @@ outputsTab.initialize = function (callback) {
             4: 'srxl2CalibrateRefusedNoSensor',
         };
 
-        let srxl2PollTimer = null;
+        /* Registered with the interval helper rather than setInterval, because
+         * GUI.tab_switch_cleanup kills those for us: a poller that outlives its
+         * own Abort button would keep asking, and keep writing into content that
+         * is no longer on screen. */
+        const SRXL2_POLL = 'srxl2_cal_poll';
 
         /*
          * How many ports the firmware actually opened, and how many motors the
@@ -168,15 +193,21 @@ outputsTab.initialize = function (callback) {
          */
         let srxl2Counts = null;     // {ports, motors}, or null if not yet known
 
+        /* MSP.send_message calls back with false when the request never made it.
+         * Reading .data off that throws, and a poller running every 500 ms throws
+         * on every tick, so every use of a reply checks it arrived first. */
+        function srxl2StatusArrived(resp) {
+            return Boolean(resp && resp.data);
+        }
+
         function srxl2RefreshCounts(done) {
             MSP.send_message(MSPCodes.MSP2_INAV_ESC_SRXL2_STATUS, false, false, function (resp) {
-                resp.data.readU8();                     // phase
-                resp.data.readU8();                     // connected
-                resp.data.readU8();                     // last calibration result
-                const ports = resp.data.readU8();
-                const motors = resp.data.readU8();
-
-                srxl2Counts = (ports === null || motors === null) ? null : { ports, motors };
+                /* The reply is parsed into FC.SRXL2_STATUS before this runs, so
+                 * the numbers come from there rather than being read a second
+                 * time out of the buffer. */
+                srxl2Counts = srxl2StatusArrived(resp)
+                    ? { ports: FC.SRXL2_STATUS.ports, motors: FC.SRXL2_STATUS.motors }
+                    : null;
                 if (done) {
                     done();
                 }
@@ -199,10 +230,8 @@ outputsTab.initialize = function (callback) {
         }
 
         function srxl2CalStop() {
-            if (srxl2PollTimer) {
-                clearInterval(srxl2PollTimer);
-                srxl2PollTimer = null;
-            }
+            interval.remove(SRXL2_POLL);
+            outputsTab.srxl2Calibrating = false;
             $('#srxl2-cal-abort').hide();
             $('#srxl2-cal-start').show();
             $('#srxl2-cal-ack').prop('checked', false);
@@ -215,8 +244,10 @@ outputsTab.initialize = function (callback) {
 
         function srxl2CalPoll() {
             MSP.send_message(MSPCodes.MSP2_INAV_ESC_SRXL2_STATUS, false, false, function (resp) {
-                const phase = resp.data.readU8();
-                switch (phase) {
+                if (!srxl2StatusArrived(resp)) {
+                    return;     /* one lost poll; the next one in 500 ms decides */
+                }
+                switch (FC.SRXL2_STATUS.phase) {
                 case SRXL2_CAL_WAIT_BATTERY: srxl2CalShow('srxl2CalibrateConnect'); break;
                 case SRXL2_CAL_SETTLE:       srxl2CalShow('srxl2CalibrateHeard');   break;
                 case SRXL2_CAL_LOW:          srxl2CalShow('srxl2CalibrateLow');     break;
@@ -337,11 +368,14 @@ outputsTab.initialize = function (callback) {
                  * a sequence that never started, then reports it finished.
                  */
                 MSP.send_message(MSPCodes.MSP2_INAV_ESC_SRXL2_STATUS, false, false, function (resp) {
-                    const phase = resp.data.readU8();
-
-                    if (phase === SRXL2_CAL_OFF) {
-                        resp.data.readU8();                     // connected
-                        const why = resp.data.readU8();   // null past the end, on older firmware
+                    if (!srxl2StatusArrived(resp)) {
+                        srxl2CalShow('srxl2CalibrateRefused');
+                        $('#srxl2-cal-ack').prop('checked', false);
+                        $('#srxl2-cal-start').addClass('disabled');
+                        return;
+                    }
+                    if (FC.SRXL2_STATUS.phase === SRXL2_CAL_OFF) {
+                        const why = FC.SRXL2_STATUS.lastResult;
                         srxl2CalShow(SRXL2_CAL_REFUSED[why] || 'srxl2CalibrateRefused');
                         $('#srxl2-cal-ack').prop('checked', false);
                         $('#srxl2-cal-start').addClass('disabled');
@@ -351,7 +385,8 @@ outputsTab.initialize = function (callback) {
                     $('#srxl2-cal-start').hide();
                     $('#srxl2-cal-abort').show();
                     srxl2CalShow('srxl2CalibrateConnect');
-                    srxl2PollTimer = setInterval(srxl2CalPoll, 500);
+                    outputsTab.srxl2Calibrating = true;
+                    interval.add(SRXL2_POLL, srxl2CalPoll, 500);
                 });
             });
         });
@@ -1007,6 +1042,19 @@ outputsTab.initialize = function (callback) {
 };
 
 outputsTab.cleanup = function (callback) {
+    /*
+     * Leaving the tab takes the Abort button with it, so the sequence it would
+     * have stopped is called off here instead. The firmware is holding full
+     * throttle on the wire while it waits for the battery, and a control that
+     * has gone off screen is not a reason to leave it holding.
+     */
+    if (outputsTab.srxl2Calibrating) {
+        outputsTab.srxl2Calibrating = false;
+        MSP.send_message(MSPCodes.MSP2_INAV_ESC_SRXL2_CALIBRATE, [SRXL2_CAL_OFF], false, function () {
+            if (callback) callback();
+        });
+        return;
+    }
     if (callback) callback();
 };
 
