@@ -229,4 +229,17 @@ progress[value]::-webkit-progress-value {
 
 .tab-magnetometer .noUi-value {
     margin-top: 6px;
-} 
+}
+
+/* .gui_box and .default_btn both float, which never gets cleared by the
+   classic-flow help note that follows -- override both to normal flow so
+   the box's own bottom margin actually produces visible space. */
+.tab-magnetometer .wizard-launch-box {
+    float: none;
+    margin-bottom: 1.5em;
+}
+
+.tab-magnetometer .wizard-launch-button {
+    float: none;
+    display: inline-block;
+}

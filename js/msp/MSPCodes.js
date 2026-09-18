@@ -258,6 +258,11 @@ var MSPCodes = {
     MSP2_INAV_GEOZONE_VERTEX:           0x2212,
     MSP2_INAV_SET_GEOZONE_VERTICE:      0x2213,
 
+    // Compass reading with zero/gain calibration applied but no alignment rotation --
+    // used by the Alignment Tool wizard, which is determining that alignment itself and
+    // can't rely on a reading the current alignment settings already rotated.
+    MSP2_INAV_MAG_UNALIGNED:            0x2232,
+
     // MassZero Thermal Camera.
     // These sit in INAV's own 0x2000-0x2FFF range. The 0x3000 block belongs to
     // the Betaflight compatibility commands. MSP2_BETAFLIGHT_BIND is 0x3000.

@@ -164,6 +164,7 @@ var FC = {
             multiType: 0,
             msp_version: 0, // not specified using semantic versioning
             capability: 0,
+            capabilities: 0,
             cycleTime: 0,
             i2cError: 0,
             activeSensors: 0,
@@ -283,6 +284,7 @@ var FC = {
             gyroscope: [0, 0, 0],
             accelerometer: [0, 0, 0],
             magnetometer: [0, 0, 0],
+            magnetometerUnaligned: [0, 0, 0],
             altitude: 0,
             barometer: 0,
             sonar: 0,
@@ -893,6 +895,26 @@ var FC = {
         }
 
         return calibrated;
+    },
+    getMagnetometerCalibrated: function () {
+        // CALIBRATION_DATA is null until something actually requests MSP_CALIBRATION_DATA
+        // (e.g. visiting the Calibration tab) -- treat "we don't know yet" as NOT
+        // calibrated (fail-safe) rather than let a caller that forgot to load it silently
+        // treat an absent answer as a pass.
+        if (!this.CALIBRATION_DATA) {
+            return false;
+        }
+        // 1024 gain / 0 zero on all three axes is firmware's own "uncalibrated" sentinel --
+        // see sensors/compass.c's resetCompass() defaults and the matching check this
+        // mirrors (compassIsCalibrationComplete(), same three-axis test). If those defaults
+        // ever change, this needs to change with them.
+        return !(this.CALIBRATION_DATA.magGain.X === 1024 && this.CALIBRATION_DATA.magGain.Y === 1024 && this.CALIBRATION_DATA.magGain.Z === 1024 &&
+                 this.CALIBRATION_DATA.magZero.X === 0 && this.CALIBRATION_DATA.magZero.Y === 0 && this.CALIBRATION_DATA.magZero.Z === 0);
+    },
+    hasCalibrationOrientationDetection: function () {
+        // MSP_BOARD_INFO capabilities bit 2: set iff the firmware auto-detects the
+        // compass's mounting orientation as part of MSP_MAG_CALIBRATION.
+        return !!(this.CONFIG.capabilities & (1 << 2));
     },
     getUserControlMode: function () {
         return [

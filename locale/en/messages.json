@@ -989,6 +989,9 @@
     "initialSetupMagCalibEnded": {
         "message": "Magnetometer calibration <span style=\"color: #37a8db\">finished</span>"
     },
+    "magCalibOrientationReportFailed": {
+        "message": "Could not read the compass alignment result after calibration -- check the connection and reopen this tab."
+    },
     "initialSetupOpflowCalibStarted": {
         "message": "Optic flow calibration started"
     },
@@ -7561,5 +7564,59 @@
     },
     "dronecanNameError": {
         "message": "Error"
+    },
+    "accAlignTitle": {
+        "message": "Automatic Alignment Wizard"
+    },
+    "accAlignFinished": {
+        "message": "Board alignment <span style=\"color: #37a8db\">finished</span>"
+    },
+    "autoAlignWizardTitle": {
+        "message": "Experimental: Auto Alignment Wizard"
+    },
+    "autoAlignWizardButton": {
+        "message": "Launch Wizard"
+    },
+    "accAlignStartText": {
+        "message": "Place the aircraft flat on the table, facing roughly north (+/- 20°).<br />For best results, try to put it as far from the computer screen as you can. Click OK after the aircraft is flat and pointing north."
+    },
+    "accAlign45Text": {
+        "message": "Please tilt the aircraft to about 45 degrees nose up. Then click the OK button while the aircraft is pitched nose up."
+    },
+    "accAlignEastText": {
+        "message": "Place the aircraft flat and pointing roughly <em>east</em>, then click OK."
+    },
+    "accAlignDoneBoardLabel": {
+        "message": "Board alignment set to"
+    },
+    "accAlignDoneCompassLabel": {
+        "message": "Compass alignment set to"
+    },
+    "accAlignCalibrationError": {
+        "message": "Accelerometer is not correctly calibrated for the current planet. Please use the calibration tab to calibrate for the local gravity."
+    },
+    "accAlignVerticalError": {
+        "message": "Readings did not match a supported mount. This can happen if the flight controller is mounted on its edge (sensor pointing sideways rather than up or down), if the board moved between the two readings, or if the nose wasn't raised close enough to 45 degrees. Please use a flat or upside-down mount and try again, or set the board alignment manually."
+    },
+    "accAlignMagUncalibratedError": {
+        "message": "The compass must be calibrated before its alignment can be determined. Please go to the <b>Calibration</b> tab and click <b>Calibrate Magnetometer</b>, then re-run this wizard."
+    },
+    "accAlignMagDisagreementError": {
+        "message": "The compass readings from the north and east positions don't agree. This usually means the aircraft wasn't actually facing north closely enough, or wasn't turned close enough to 90 degrees between the two readings. Please try again, facing as close to true north as you can."
+    },
+    "accAlignMagNoDataError": {
+        "message": "No compass reading was received from the flight controller. This may mean the connection is unstable, or the firmware on this board doesn't support the alignment wizard's compass data request. Please check the connection and try again, or update the firmware."
+    },
+    "accAlignTiltError": {
+        "message": "The second reading looks too similar to the first. Please make sure the nose is raised by about 45 degrees, then try again."
+    },
+    "accAlignNoMagDetected": {
+        "message": "N/A (no magnetometer detected)"
+    },
+    "magCalibOrientationTitle": {
+        "message": "Compass orientation <span style=\"color: #37a8db\">detected</span>"
+    },
+    "magCalibOrientationNotDetected": {
+        "message": "The compass alignment setting didn't change during that calibration spin. This usually means INAV wasn't confident enough to detect the mounting orientation -- but if it was already set correctly (e.g. from a previous run of this wizard), this is also what a successful, unchanged detection looks like. If your compass heading looks wrong on the Status tab, use the auto alignment wizard on the <b>Alignment</b> tab to set it manually."
     }
 }
