@@ -11,7 +11,8 @@ const names = new Set(['resolveHomeElevationCm', 'homePositionKey', 'invalidateH
     'applyMissionDefaultsLocked', 'missionWasReplaced', 'collectionChangedSince',
     'settleDraggedWaypoint', 'waypointPositionKey', 'settleLandingApproach',
     'convertLandingApproach', 'writeDefaultsToWaypoint', 'writeSpeedToWaypoint',
-    'applySpeedToWaypoints', 'resolveGroundsForDefaults']);
+    'applySpeedToWaypoints', 'countSpeedWaypoints', 'showLandSpeedNotUpdatedWarning',
+    'resolveGroundsForDefaults']);
 const functions = [];
 function visit(node) {
     if (!node || typeof node !== 'object') return;
@@ -56,6 +57,7 @@ function harness() {
     HOME.setAlt(200);
     const ctx = vm.createContext({$, HOME, homeMarkers: [{}], homeElevationPosition: null,
         homeElevationRequest: null, pendingWaypointDrags: new WeakMap(),
+        landSpeedNotUpdatedModal: null,
         locationLifecycleId: 1, missionControlLocationLifecycleId: 1,
         globalSettings: {}, settings: {alt: 8000, speed: 300}, seaLevelSwitchOnOpen: false,
         groundBeforeDragCm: Promise.resolve(20000),

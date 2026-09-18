@@ -4317,6 +4317,14 @@ function iconKey(filename) {
         });
     }
 
+    /* Only the two types applySpeedToWaypoints actually writes to. A LAND waypoint keeps its
+       own speed, so counting it would claim the default reached more points than it did. */
+    function countSpeedWaypoints(waypoints) {
+        return waypoints.filter(function (wp) {
+            return wp.getAction() == MWNP.WPTYPE.WAYPOINT || wp.getAction() == MWNP.WPTYPE.POSHOLD_TIME;
+        }).length;
+    }
+
     /* The defaults describe the whole mission, so saving them applies what actually
        changed to every waypoint: a moved reference switch converts, a changed default
        altitude or speed is written out. Nothing is touched while the fields are edited,
@@ -4421,7 +4429,7 @@ function iconKey(filename) {
         }
     }
 
-    function reportDefaultsApplied(plan, count, belowGround, hasLandWaypoint) {
+    function reportDefaultsApplied(plan, count, belowGround, hasLandWaypoint, speedCount) {
         if (plan.switchMoved) $('#MPapplySlrSaved').show();
         if (plan.applyAlt) $('#MPapplyAltSaved').show();
         if (plan.speedChanged) $('#MPapplySpeedSaved').show();
@@ -4432,7 +4440,7 @@ function iconKey(filename) {
         }
         if (plan.applyAlt) GUI.log(i18n.getMessage('missionApplyAltApplied', [String(count)]));
         if (plan.speedChanged) {
-            GUI.log(i18n.getMessage('missionApplySpeedApplied', [String(count)]));
+            GUI.log(i18n.getMessage('missionApplySpeedApplied', [String(speedCount)]));
             if (hasLandWaypoint) showLandSpeedNotUpdatedWarning();
         }
         if (belowGround) GUI.log(i18n.getMessage('missionApplyBelowGround', [String(belowGround)]));
@@ -4502,7 +4510,7 @@ function iconKey(filename) {
                 syncEditPanelWithSelection();
                 redrawLayer();
                 $('#MPapplySpeedSaved').show();
-                GUI.log(i18n.getMessage('missionApplySpeedApplied', [String(waypoints.length)]));
+                GUI.log(i18n.getMessage('missionApplySpeedApplied', [String(countSpeedWaypoints(waypoints))]));
                 if (hasLandWaypoint) showLandSpeedNotUpdatedWarning();
             }
             if (plan.applyAlt) revertAltitude();
@@ -4521,7 +4529,7 @@ function iconKey(filename) {
         syncEditPanelWithSelection();
         redrawLayer();
         plotElevation();
-        reportDefaultsApplied(plan, waypoints.length, belowGround, hasLandWaypoint);
+        reportDefaultsApplied(plan, waypoints.length, belowGround, hasLandWaypoint, countSpeedWaypoints(waypoints));
     }
 
     function missionWasReplaced(waypoints) {
