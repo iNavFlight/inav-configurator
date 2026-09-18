@@ -8290,6 +8290,9 @@ missionControlTab.cleanup = function (callback) {
     // The elevation panel's drag listens on the document, so it outlives the tab unless
     // it is taken off here - reopening the tab would otherwise stack one pair per visit.
     $(document).off('.elevationDrag');
+    /* jBox appends its wrapper to body, which the tab switch does not empty, so the
+       modal's markup and its ids would stack one copy per visit. */
+    $('.jBox-wrapper').remove();
     cleanupMissionControlLocationResources();
     if (elevationChartInstance) {
         elevationChartInstance.destroy();
