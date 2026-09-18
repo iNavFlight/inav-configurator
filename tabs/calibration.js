@@ -345,7 +345,7 @@ calibrationTab.initialize = function (callback) {
                        //delete modalProcessing;
                         $('.jBox-wrapper').remove();
 
-                        if (magAlignBefore) {
+                        if (magAlignBefore !== null) {
                             reportMagCalibrationOrientation(magAlignBefore);
                         }
                     }, 1000);

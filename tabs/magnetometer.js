@@ -30,8 +30,8 @@ const magnetometerTab = {};
 magnetometerTab.initialize = function (callback) {
     var self = this;
 
-    var modal;
-    var heading_flat;
+    let modal;
+    let heading_flat;
 
     // Gates verbose per-step tracing (raw vectors, intermediate transforms) from the
     // board/compass auto-align wizard. Flip to true when debugging a hardware issue.
@@ -757,7 +757,7 @@ magnetometerTab.initialize = function (callback) {
         }
 
         // Check gravity magnitude to ensure valid reading
-        let A = Math.sqrt(acc_g_flat[0] ** 2 + acc_g_flat[1] ** 2 + acc_g_flat[2] ** 2);
+        let A = Math.hypot(acc_g_flat[0], acc_g_flat[1], acc_g_flat[2]);
         if (DEBUG_ALIGN) console.log("Gravity magnitude: " + A.toFixed(3) + "g");
 
         if (A > 1.15 || A < 0.85) {
@@ -782,7 +782,7 @@ magnetometerTab.initialize = function (callback) {
         // Calculate pitch and roll from raw accelerometer data
         // Note: Using standard aerospace conventions
         let roll = ( Math.atan2(acc_g_flat[1], acc_g_flat[2]) * 180/Math.PI ) % 360;
-        let pitch = ( Math.atan2(-1 * acc_g_flat[0], Math.sqrt(acc_g_flat[1] ** 2 + acc_g_flat[2] ** 2)) * 180/Math.PI ) % 360;
+        let pitch = ( Math.atan2(-1 * acc_g_flat[0], Math.hypot(acc_g_flat[1], acc_g_flat[2])) * 180/Math.PI ) % 360;
         if (DEBUG_ALIGN) console.log("Calculated attitude: pitch=" + pitch.toFixed(1) + "°, roll=" + roll.toFixed(1) + "°");
 
         // Snap to the nearest 45 degrees: this is the board's mounting
@@ -858,7 +858,7 @@ magnetometerTab.initialize = function (callback) {
         }
 
         // Check gravity magnitude again
-        let A = Math.sqrt(acc_g_45[0] ** 2 + acc_g_45[1] ** 2 + acc_g_45[2] ** 2);
+        let A = Math.hypot(acc_g_45[0], acc_g_45[1], acc_g_45[2]);
         if (DEBUG_ALIGN) console.log("Gravity magnitude (45°): " + A.toFixed(3) + "g");
 
         if (A > 1.15 || A < 0.85) {
@@ -948,7 +948,7 @@ magnetometerTab.initialize = function (callback) {
     }
 
     function accAutoAlignCompass() {
-        if ( typeof modal != "undefined" ) {
+        if (modal !== undefined) {
           modal.close();
         }
 
@@ -1022,14 +1022,14 @@ magnetometerTab.initialize = function (callback) {
         resetAlignButtons();
         $(event.target).css({ opacity: 0.5, pointerEvents: 'none' });
 
-        var step = event.data.step;
+        let step = event.data.step;
 
         // Steps: 1 start, 2 craft is flat north, 3 craft is nose up, 4 craft is flat and east
-        if ( typeof step == "undefined" ) {
+        if (step === undefined) {
             step = "1";
         }
 
-        if ( typeof modal != "undefined" ) {
+        if (modal !== undefined) {
           modal.close();
         }
 
