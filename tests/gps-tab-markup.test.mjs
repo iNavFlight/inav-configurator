@@ -42,6 +42,15 @@ test('every translation key in the tab exists in the English messages', () => {
     }
 });
 
+test('every message the tab script asks for exists', () => {
+    const script = readFileSync(join(root, 'tabs/gps.js'), 'utf8');
+    const keys = [...script.matchAll(/i18n\.getMessage\('([^']+)'/g)].map(m => m[1]);
+    assert.ok(keys.includes('gpsConstellationsLeftOut'), 'the left out warning should be looked up');
+    for (const key of keys) {
+        assert.ok(messages[key], `${key} has no message in locale/en`);
+    }
+});
+
 test('the rows that only report carry the section row geometry', () => {
     // .checkbox is what gives a row its column, its separator and its spacing.
     // Without it the row lands hard against the one above it

@@ -53,6 +53,38 @@ function gnssIsOffered(supported, constellation) {
 }
 
 /*
+ * What the firmware leaves out when the selection is more than the receiver can
+ * track at once. It keeps the constellations it turns on by default and lets the
+ * others go first, GLONASS, then BeiDou, then Galileo, which is the rule in
+ * ubloxGnssToEnable in gps_ublox.c. Nothing is left out while either number is
+ * unknown, because the firmware then sends the selection as it is.
+ */
+const GNSS_LEAVE_OUT_FIRST = ['glonass', 'beidou', 'galileo'];
+
+function gnssLeftOut(selected, supported, maxConcurrent) {
+    if (!gnssMasksKnown(supported) || !maxConcurrent) {
+        return [];
+    }
+
+    const count = mask => GNSS_CONSTELLATIONS.filter(c => (mask & c.bit) !== 0).length;
+    let mask = (selected | 0x01) & supported;
+    const leftOut = [];
+
+    for (const key of GNSS_LEAVE_OUT_FIRST) {
+        if (count(mask) <= maxConcurrent) {
+            break;
+        }
+        const c = GNSS_CONSTELLATIONS.find(c => c.key === key);
+        if (mask & c.bit) {
+            mask &= ~c.bit;
+            leftOut.push(c);
+        }
+    }
+
+    return leftOut;
+}
+
+/*
  * An indicator is the other way round: it is shown only when the receiver is
  * known to have the thing. There is nothing to lose by leaving out a line that
  * only reports, and a NavIC row on a receiver that has never heard of NavIC
@@ -68,5 +100,6 @@ export {
     gnssMasksKnown,
     gnssNames,
     gnssIsOffered,
-    gnssIsConfirmed
+    gnssIsConfirmed,
+    gnssLeftOut
 };

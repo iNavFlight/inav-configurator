@@ -28,7 +28,8 @@ import {
     gnssMasksKnown,
     gnssNames,
     gnssIsOffered,
-    gnssIsConfirmed
+    gnssIsConfirmed,
+    gnssLeftOut
 } from '../js/gpsConstellations.js';
 
 // The masks a real receiver reports, measured against an emulated u-blox in SITL
@@ -119,6 +120,35 @@ test('every entry points at something the tab can show', () => {
     for (const c of GNSS_CONSTELLATIONS.concat(GNSS_EXTENDED)) {
         assert.ok(c.box || c.row, `${c.name} has no control and no row`);
     }
+});
+
+// The same cases the firmware was run through in SITL, with the same outcome: the
+// tab has to name exactly what the receiver ends up without
+const ALL = 0x0F;
+const leftOut = (selected, supported, max) => gnssLeftOut(selected, supported, max).map(c => c.key);
+
+test('a receiver that tracks three loses GLONASS first', () => {
+    assert.deepEqual(leftOut(ALL, M10, 3), ['glonass']);
+    assert.deepEqual(leftOut(ALL, M10, 2), ['glonass', 'beidou']);
+});
+
+test('nothing is left out when the selection fits', () => {
+    assert.deepEqual(leftOut(ALL, M10, 4), []);
+    assert.deepEqual(leftOut(0x0D, M10, 3), []);
+});
+
+test('a constellation the receiver lacks does not take a slot', () => {
+    // An F10 with GLONASS ticked: it has no GLONASS, so three are left and they fit
+    assert.deepEqual(leftOut(ALL, F10, 3), []);
+});
+
+test('nothing is left out while the receiver has not answered', () => {
+    assert.deepEqual(leftOut(ALL, UNKNOWN, 3), []);
+    assert.deepEqual(leftOut(ALL, M10, 0), []);
+});
+
+test('GPS always counts, ticked or not', () => {
+    assert.deepEqual(leftOut(0x0E, M10, 3), ['glonass']);
 });
 
 test('the bits match the UBX-MON-GNSS field, not the order of the list', () => {

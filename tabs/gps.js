@@ -35,7 +35,7 @@ import jBox from 'jbox';
 import SerialBackend from '../js/serial_backend';
 import ublox from '../js/ublox/UBLOX';
 import dialog from '../js/dialog';
-import { GNSS_CONSTELLATIONS, GNSS_EXTENDED, gnssIsOffered, gnssIsConfirmed } from '../js/gpsConstellations';
+import { GNSS_CONSTELLATIONS, GNSS_EXTENDED, gnssIsOffered, gnssIsConfirmed, gnssLeftOut } from '../js/gpsConstellations';
 
 
 const gpsTab = {};
@@ -655,24 +655,27 @@ gpsTab.initialize = function (callback) {
 
         /*
          * A receiver tracks only so many constellations at once, and MON-GNSS says how
-         * many. INAV sends the selection as it is, without checking it against that
-         * number, so the tab is the only place that can point it out.
+         * many. When the selection is more than that, the firmware leaves some out and
+         * keeps the setting, so the tab says which, before and after saving alike.
+         * NavIC is not part of it: MON-GNSS counts the four majors only.
          */
         function update_gnss_budget() {
-            const ceiling = FC.GPS_DATA.gnssMaxConcurrent;
             const note = $('#gps_gnss_budget');
 
-            // GPS is never switched off, so it always takes one of the slots. NavIC is
-            // not counted: MON-GNSS reports on the four majors only
-            const asked = 1 + GNSS_CONSTELLATIONS.filter(c => c.box && $(c.box).is(':checked')).length;
+            const selected = GNSS_CONSTELLATIONS
+                .filter(c => c.box && $(c.box).is(':checked'))
+                .reduce((mask, c) => mask | c.bit, 0);
+            const leftOut = gnssLeftOut(selected, FC.GPS_DATA.gnssSupported, FC.GPS_DATA.gnssMaxConcurrent);
 
-            if (!ceiling || asked <= ceiling) {
+            if (!leftOut.length) {
                 note.addClass('is-hidden');
                 return;
             }
 
-            note.text(i18n.getMessage('gpsConstellationsBudget', [String(asked), String(ceiling)]))
-                .removeClass('is-hidden');
+            note.text(i18n.getMessage('gpsConstellationsLeftOut', [
+                String(FC.GPS_DATA.gnssMaxConcurrent),
+                leftOut.map(c => c.name).join(' and ')
+            ])).removeClass('is-hidden');
         }
 
         $('#gps_use_galileo, #gps_use_beidou, #gps_use_glonass').on('change.gpsTab', update_gnss_budget);

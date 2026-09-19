@@ -1559,8 +1559,8 @@
     "gpsConstellations": {
         "message": "Constellations"
     },
-    "gpsConstellationsBudget": {
-        "message": "$1 constellations are selected, but this receiver tracks only $2 at a time."
+    "gpsConstellationsLeftOut": {
+        "message": "This receiver tracks $1 constellations at a time, so $2 will not be used."
     },
     "gpsUpdateRateCeiling": {
         "message": "This receiver is rated for $1 Hz"
