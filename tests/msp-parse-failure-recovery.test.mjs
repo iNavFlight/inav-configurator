@@ -37,10 +37,13 @@
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync, writeFileSync, mkdtempSync, rmSync } from 'node:fs';
+import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, dirname, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+
+import { dataModule } from './helpers/dataModule.mjs';
+import { makeRewriteAndWrite } from './helpers/rewriteAndWrite.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const repoRoot = resolve(__dirname, '..');
@@ -48,38 +51,11 @@ const repoRoot = resolve(__dirname, '..');
 const tmpDir = mkdtempSync(join(tmpdir(), 'msp-parse-failure-'));
 process.on('exit', () => rmSync(tmpDir, { recursive: true, force: true }));
 
-function dataModule(code) {
-    // encodeURIComponent leaves ' ( ) ! * unescaped; the generated specifiers are
-    // embedded in single-quoted string literals, so escape those too.
-    const encoded = encodeURIComponent(code).replace(/['()!*]/g, (c) => '%' + c.charCodeAt(0).toString(16).toUpperCase());
-    return 'data:text/javascript,' + encoded;
-}
-
 function realModuleUrl(relPath) {
     return pathToFileURL(join(repoRoot, relPath)).href;
 }
 
-/**
- * Rewrite the listed import specifiers in a real source file and write the
- * result to a temp module. Throws loudly if a pattern stops matching, so a
- * future reshuffle of those imports fails the test instead of passing
- * vacuously.
- */
-function rewriteAndWrite(relSrcPath, rules, outName) {
-    let source = readFileSync(join(repoRoot, relSrcPath), 'utf8');
-    for (const [regex, replacement, label] of rules) {
-        if (!regex.test(source)) {
-            throw new Error(
-                `msp-parse-failure-recovery.test.mjs: expected to find and replace "${label}" in ${relSrcPath} ` +
-                `but the pattern ${regex} did not match. Update the test's substitution rules.`
-            );
-        }
-        source = source.replace(regex, replacement);
-    }
-    const outPath = join(tmpDir, outName);
-    writeFileSync(outPath, source, 'utf8');
-    return pathToFileURL(outPath).href;
-}
+const rewriteAndWrite = makeRewriteAndWrite(repoRoot, tmpDir, 'msp-parse-failure-recovery.test.mjs');
 
 // --- real, import-free leaf modules, loadable straight by absolute URL -------
 const realMspCodesUrl = realModuleUrl('js/msp/MSPCodes.js');
@@ -96,7 +72,7 @@ const realInjectedMethodsUrl = realModuleUrl('js/injected_methods.js');
 // would otherwise hang `node --test` forever.
 const realEventFrequencyAnalyzerUrl = rewriteAndWrite('js/eventFrequencyAnalyzer.js', [
     [/privateScope\.intervalHandler = setInterval\(publicScope\.analyze, bufferPeriod\);/g, 'privateScope.intervalHandler = setInterval(publicScope.analyze, bufferPeriod).unref();', "analyze setInterval"],
-], 'eventFrequencyAnalyzer-generated.mjs');
+], 'eventFrequencyAnalyzer-generated');
 
 const realMspQueueUrl = rewriteAndWrite('js/serial_queue.js', [
     [/^import CONFIGURATOR from '\.\/data_storage';$/m, `import CONFIGURATOR from '${realConfiguratorUrl}';`, "import CONFIGURATOR"],
@@ -106,7 +82,7 @@ const realMspQueueUrl = rewriteAndWrite('js/serial_queue.js', [
     [/^import mspDeduplicationQueue from '\.\/msp\/mspDeduplicationQueue';$/m, `import mspDeduplicationQueue from '${realDedupUrl}';`, "import mspDeduplicationQueue"],
     [/setInterval\(publicScope\.executor, Math\.round\(1000 \/ privateScope\.handlerFrequency\)\);/, 'setInterval(publicScope.executor, Math.round(1000 / privateScope.handlerFrequency)).unref();', "executor setInterval"],
     [/setInterval\(publicScope\.balancer, Math\.round\(1000 \/ privateScope\.balancerFrequency\)\);/, 'setInterval(publicScope.balancer, Math.round(1000 / privateScope.balancerFrequency)).unref();', "balancer setInterval"],
-], 'serial_queue-generated.mjs');
+], 'serial_queue-generated');
 
 const realMspUrl = rewriteAndWrite('js/msp.js', [
     [/^import MSPCodes from '\.\/msp\/MSPCodes';$/m, `import MSPCodes from '${realMspCodesUrl}';`, "import MSPCodes"],
@@ -114,7 +90,7 @@ const realMspUrl = rewriteAndWrite('js/msp.js', [
     [/^import eventFrequencyAnalyzer from '\.\/eventFrequencyAnalyzer';$/m, `import eventFrequencyAnalyzer from '${realEventFrequencyAnalyzerUrl}';`, "import eventFrequencyAnalyzer"],
     [/^import timeout from '\.\/timeouts';$/m, `import timeout from '${realTimeoutsUrl}';`, "import timeout"],
     [/^import CONFIGURATOR from '\.\/data_storage';$/m, `import CONFIGURATOR from '${realConfiguratorUrl}';`, "import CONFIGURATOR"],
-], 'msp-generated.mjs');
+], 'msp-generated');
 
 // FC has to be controllable (the tests set up PID banks); everything below it
 // is only referenced from switch cases these tests never reach, so those
@@ -167,7 +143,7 @@ const realMspHelperUrl = rewriteAndWrite('js/msp/MSPHelper.js', [
     [/^import mspStatistics from '\.\/mspStatistics';$/m, `import mspStatistics from '${realStatisticsUrl}';`, "import mspStatistics"],
     [/^import settingsCache from '\.\/\.\.\/settingsCache';$/m, `import settingsCache from '${inertDefaultUrl}';`, "import settingsCache"],
     [/^import \{Geozone, GeozoneVertex, GeozoneShapes \} from '\.\/\.\.\/geozone';$/m, `import { Geozone, GeozoneVertex, GeozoneShapes } from '${inertGeozoneUrl}';`, "import Geozone"],
-], 'MSPHelper-generated.mjs');
+], 'MSPHelper-generated');
 
 const { default: mspHelper } = await import(realMspHelperUrl);
 const { default: MSPCodes } = await import(realMspCodesUrl);
@@ -494,6 +470,28 @@ test('a blocked write reaches neither the wire nor the save chain behind it', ()
         GUI.logged.includes('mspWriteBlockedAfterParseFailure'),
         'a silent refusal is worse than none - the user would believe the settings were saved'
     );
+
+    clearParseFailures();
+});
+
+test('MSP.promise() on a blocked write settles instead of hanging', async () => {
+    resetQueue();
+    clearParseFailures();
+    MSP.parseFailures.add(MSPCodes.MSP2_PID);
+
+    // A refused write fires no callback; promise() must not leave the caller
+    // awaiting a response that can never arrive.
+    const outcome = await Promise.race([
+        MSP.promise(MSPCodes.MSP2_SET_PID, [1, 2, 3, 4]).then(
+            () => 'resolved',
+            () => 'rejected',
+        ),
+        wait(100).then(() => 'timeout'),
+    ]);
+
+    assert.notEqual(outcome, 'timeout', 'a refused write must not leave the promise pending forever');
+    assert.equal(outcome, 'rejected', 'a refused write must reject, not resolve as success');
+    assert.equal(mspQueue.getLength(), 0, 'nothing may be queued for the FC');
 
     clearParseFailures();
 });

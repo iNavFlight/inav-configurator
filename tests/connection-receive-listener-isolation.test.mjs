@@ -30,10 +30,13 @@
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync, writeFileSync, mkdtempSync, rmSync } from 'node:fs';
+import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, dirname, resolve } from 'node:path';
-import { fileURLToPath, pathToFileURL } from 'node:url';
+import { fileURLToPath } from 'node:url';
+
+import { dataModule } from './helpers/dataModule.mjs';
+import { makeRewriteAndWrite } from './helpers/rewriteAndWrite.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const repoRoot = resolve(__dirname, '..');
@@ -41,12 +44,7 @@ const repoRoot = resolve(__dirname, '..');
 const tmpDir = mkdtempSync(join(tmpdir(), 'connection-receive-listener-'));
 process.on('exit', () => rmSync(tmpDir, { recursive: true, force: true }));
 
-function dataModule(code) {
-    // encodeURIComponent leaves ' ( ) ! * unescaped; the generated specifiers are
-    // embedded in single-quoted string literals, so escape those too.
-    const encoded = encodeURIComponent(code).replace(/['()!*]/g, (c) => '%' + c.charCodeAt(0).toString(16).toUpperCase());
-    return 'data:text/javascript,' + encoded;
-}
+const rewriteAndWrite = makeRewriteAndWrite(repoRoot, tmpDir, 'connection-receive-listener-isolation.test.mjs');
 
 const mockGuiUrl = dataModule(`
     const GUI = { connected_to: false, connecting_to: false, log() {} };
@@ -57,28 +55,6 @@ const mockI18nUrl = dataModule(`
     const i18n = { getMessage(key) { return key; } };
     export default i18n;
 `);
-
-/**
- * Rewrite the listed import specifiers in a real source file and write the
- * result to a temp module. Throws loudly if a pattern stops matching, so a
- * future reshuffle of those imports fails the test instead of passing
- * vacuously.
- */
-function rewriteAndWrite(relSrcPath, rules, outNamePrefix) {
-    let source = readFileSync(join(repoRoot, relSrcPath), 'utf8');
-    for (const [regex, replacement, label] of rules) {
-        if (!regex.test(source)) {
-            throw new Error(
-                `connection-receive-listener-isolation.test.mjs: expected to find and replace "${label}" in ` +
-                `${relSrcPath} but the pattern ${regex} did not match. Update the test's substitution rules.`
-            );
-        }
-        source = source.replace(regex, replacement);
-    }
-    const outPath = join(tmpDir, `${outNamePrefix}.mjs`);
-    writeFileSync(outPath, source, 'utf8');
-    return pathToFileURL(outPath).href;
-}
 
 const realConnectionUrl = rewriteAndWrite('js/connection/connection.js', [
     [/^import GUI from '\.\/\.\.\/gui';$/m, `import GUI from '${mockGuiUrl}';`, "import GUI"],
