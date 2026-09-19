@@ -198,17 +198,6 @@ td.adsbVehicleList {
     color: #323232;
 }
 
-/* Read-only row: the value takes the width the controls take, so its label lands
-   on the same column as every label above it. */
-.tab-gps .gps_constellations span:first-child {
-    display: inline-block;
-    width: 106px;
-}
-
-.tab-gps .gps_constellations label {
-    margin-left: 10px;
-}
-
 /* The detection line is a statement rather than a control, but it sits among the
    setting rows: the .number class gives it their geometry, so it starts on the
    same column and carries the same separator. */
@@ -225,4 +214,33 @@ td.adsbVehicleList {
     margin-left: 10px;
     color: #007bff;
     text-decoration: none;
+}
+
+/* A constellation INAV decides on its own. The switch still shows its state, but
+   it is plainly not something to reach for */
+.tab-gps .gnss-fixed .ios7-switch {
+    cursor: default;
+    opacity: 0.55;
+}
+
+.tab-gps .gnss-fixed label {
+    cursor: default;
+}
+
+/* Sits right under the switches it counts, and carries their separator so it
+   reads as the last line of that group rather than a heading for the next */
+.tab-gps .gnss-budget {
+    clear: left;
+    float: left;
+    width: 100%;
+    margin-bottom: 5px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid #ddd;
+    color: #a13d20;
+    font-size: 11px;
+    line-height: 1.4;
+}
+
+.tab-gps .gnss-budget.is-hidden {
+    display: none;
 }

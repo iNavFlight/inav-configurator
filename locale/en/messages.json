@@ -1521,22 +1521,46 @@
         "message": "GPS is provided via DroneCAN. Configure bus settings on the DroneCAN tab. Serial port and baud rate do not apply."
     },
     "configurationGPSUseGalileo": {
-        "message": "Gps use Galileo Satellites (EU)"
+        "message": "Use Galileo Satellites (EU)"
+    },
+    "configurationGPSUseGalileoHelp": {
+        "message": "Europe's constellation. Running it alongside GPS puts more satellites in view, which makes the fix come sooner and hold steadier."
+    },
+    "configurationGPSUseGps": {
+        "message": "Use GPS Satellites (US)"
+    },
+    "configurationGPSUseGpsHelp": {
+        "message": "GPS is always used and cannot be switched off."
     },
     "configurationGPSUseBeidou": {
-        "message": "Gps use BeiDou Satellites (CN)"
+        "message": "Use BeiDou Satellites (CN)"
+    },
+    "configurationGPSUseBeidouHelp": {
+        "message": "China's constellation, and the largest of the four. It is worth having anywhere and is at its best over Asia."
     },
     "configurationGPSUseGlonass": {
-        "message": "Gps use Glonass Satellites (RU)"
+        "message": "Use GLONASS Satellites (RU)"
+    },
+    "configurationGPSUseGlonassHelp": {
+        "message": "Russia's constellation. It earns its place at high latitudes, where the others sit low in the sky."
+    },
+    "configurationGPSUseQzss": {
+        "message": "Use QZSS Satellites (JP)"
+    },
+    "configurationGPSUseQzssHelp": {
+        "message": "QZSS is switched on automatically on receivers that have it. Its satellites are only visible over Japan and Oceania, and elsewhere it costs nothing."
+    },
+    "configurationGPSUseNavic": {
+        "message": "Use NavIC Satellites (IN)"
+    },
+    "configurationGPSUseNavicHelp": {
+        "message": "This receiver has NavIC, but INAV leaves it alone, so it keeps whatever the receiver was shipped with. Its satellites are only visible over India."
     },
     "gpsConstellations": {
         "message": "Constellations"
     },
-    "gpsConstellationsAllInUse": {
-        "message": "Reported by the receiver, and all of them in use"
-    },
-    "gpsConstellationsInUse": {
-        "message": "Reported by the receiver. In use: $1"
+    "gpsConstellationsBudget": {
+        "message": "$1 constellations are selected, but this receiver tracks only $2 at a time."
     },
     "gpsUpdateRateCeiling": {
         "message": "This receiver is rated for $1 Hz"
@@ -1575,7 +1599,10 @@
         "message": "Baudrate"
     },
     "configurationGPSubxSbas": {
-        "message": "SBAS Augmentation"
+        "message": "Ground Assistance Type"
+    },
+    "configurationGPSubxSbasHelp": {
+        "message": "Ground stations measure the error in the satellite signals and broadcast the correction. Each region has its own service, so pick the one you fly in."
     },
     "receiverType": {
         "message": "Receiver type"

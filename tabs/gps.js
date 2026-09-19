@@ -35,7 +35,7 @@ import jBox from 'jbox';
 import SerialBackend from '../js/serial_backend';
 import ublox from '../js/ublox/UBLOX';
 import dialog from '../js/dialog';
-import { GNSS_CONSTELLATIONS, gnssMasksKnown, gnssNames, gnssIsOffered } from '../js/gpsConstellations';
+import { GNSS_CONSTELLATIONS, GNSS_EXTENDED, gnssIsOffered, gnssIsConfirmed } from '../js/gpsConstellations';
 
 
 const gpsTab = {};
@@ -447,12 +447,14 @@ gpsTab.initialize = function (callback) {
         function updateHardwareStatus() {
             if (FC.GPS_DATA && FC.GPS_DATA.hwVersion && FC.GPS_DATA.hwVersion > 0) {
                 const detectedPreset = detectGPSPreset(FC.GPS_DATA.hwVersion);
-                // The receiver's own name when it reports one, because the hardware
-                // version alone cannot tell an F10 from an M10: both say 000A0000
-                const name = FC.GPS_DATA.moduleName
-                    || (GPS_PRESETS[detectedPreset] ? GPS_PRESETS[detectedPreset].name : '');
-                if (name) {
-                    $('#gps_hardware_name').text(name + ' detected');
+                // The receiver's own name goes in the tab title, because the hardware
+                // version alone cannot tell an F10 from an M10: both report 000A0000
+                $('#gps_title_model').text(FC.GPS_DATA.moduleName ? ' - ' + FC.GPS_DATA.moduleName : '');
+
+                // The guess from the hardware version is only worth showing when the
+                // receiver did not name itself, otherwise it contradicts the title
+                if (!FC.GPS_DATA.moduleName && GPS_PRESETS[detectedPreset]) {
+                    $('#gps_hardware_name').text(GPS_PRESETS[detectedPreset].name + ' detected');
                     $('#gps_hardware_status').show();
                 }
             }
@@ -620,30 +622,53 @@ gpsTab.initialize = function (callback) {
 
         function update_gnss_availability() {
             const supported = FC.GPS_DATA.gnssSupported;
-            const enabled = FC.GPS_DATA.gnssEnabled;
+            const extended = FC.GPS_DATA.gnssExtended;
 
+            // The switches INAV can move. One is withdrawn only when the receiver has
+            // said it has no such constellation, never on a guess
             GNSS_CONSTELLATIONS.filter(c => c.box).forEach(function (c) {
                 $(c.box).closest('.checkbox').toggleClass('is-hidden', !gnssIsOffered(supported, c));
             });
 
-            const row = $('#gps_constellations');
-            if (!gnssMasksKnown(supported)) {
-                row.addClass('is-hidden');
+            const sbas = GNSS_EXTENDED.find(e => e.key === 'sbas');
+            $(sbas.row).closest('.select').toggleClass('is-hidden', !gnssIsOffered(extended, sbas));
+
+            // The rows that only report go the other way: they appear once the receiver
+            // has confirmed them, and stay away while nothing is known
+            const rows = GNSS_CONSTELLATIONS.filter(c => c.row)
+                .map(c => ({ row: c.row, on: gnssIsConfirmed(supported, c) }))
+                .concat(GNSS_EXTENDED.filter(e => e !== sbas)
+                    .map(e => ({ row: e.row, on: gnssIsConfirmed(extended, e) })));
+
+            rows.forEach(function (r) {
+                $(r.row).closest('.checkbox').toggleClass('is-hidden', !r.on);
+            });
+
+            update_gnss_budget();
+        }
+
+        /*
+         * A receiver tracks only so many constellations at once, and MON-GNSS says how
+         * many. INAV sends the selection as it is, without checking it against that
+         * number, so the tab is the only place that can point it out.
+         */
+        function update_gnss_budget() {
+            const ceiling = FC.GPS_DATA.gnssMaxConcurrent;
+            const note = $('#gps_gnss_budget');
+
+            // GPS is never switched off, so it always takes one of the slots
+            const asked = 1 + GNSS_CONSTELLATIONS.filter(c => c.box && $(c.box).is(':checked')).length;
+
+            if (!ceiling || asked <= ceiling) {
+                note.addClass('is-hidden');
                 return;
             }
 
-            // The short names keep the value inside the column the controls use, and they
-            // are the receiver's own: MON-VER spells the list GPS;GAL;BDS
-            $('#gps_constellations_value').text(gnssNames(supported, true).join(', '));
-
-            // What is running belongs in the tooltip: it is the same as what the receiver
-            // has almost always, and a second line for the exception would cost a row
-            row.attr('title', enabled === supported
-                ? i18n.getMessage('gpsConstellationsAllInUse')
-                : i18n.getMessage('gpsConstellationsInUse', [gnssNames(enabled).join(', ') || '-']));
-
-            row.removeClass('is-hidden');
+            note.text(i18n.getMessage('gpsConstellationsBudget', [String(asked), String(ceiling)]))
+                .removeClass('is-hidden');
         }
+
+        $('#gps_use_galileo, #gps_use_beidou, #gps_use_glonass').on('change.gpsTab', update_gnss_budget);
 
         function update_gps_ui() {
             update_gnss_availability();

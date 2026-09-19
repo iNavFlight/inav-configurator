@@ -320,6 +320,11 @@ var FC = {
             // Zero means the firmware could not read them, not that there are none
             gnssSupported: 0,
             gnssEnabled: 0,
+            // Bit 0 SBAS, 1 QZSS, 2 NavIC, which the receiver lists in its version
+            // strings rather than alongside the four major constellations
+            gnssExtended: 0,
+            // How many of the major constellations the receiver can track together
+            gnssMaxConcurrent: 0,
             // The name the receiver reports for itself, such as NEO-F10N. Empty when
             // the firmware could not read it
             moduleName: ''
