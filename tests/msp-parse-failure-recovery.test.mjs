@@ -37,25 +37,17 @@
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtempSync, rmSync } from 'node:fs';
-import { tmpdir } from 'node:os';
-import { join, dirname, resolve } from 'node:path';
-import { fileURLToPath, pathToFileURL } from 'node:url';
+import { join } from 'node:path';
+import { pathToFileURL } from 'node:url';
 
 import { dataModule } from './helpers/dataModule.mjs';
-import { makeRewriteAndWrite } from './helpers/rewriteAndWrite.mjs';
+import { makeHarness } from './helpers/harness.mjs';
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const repoRoot = resolve(__dirname, '..');
-
-const tmpDir = mkdtempSync(join(tmpdir(), 'msp-parse-failure-'));
-process.on('exit', () => rmSync(tmpDir, { recursive: true, force: true }));
+const { repoRoot, tmpDir, rewriteAndWrite } = makeHarness(import.meta.url, 'msp-parse-failure-recovery.test.mjs', 'msp-parse-failure-');
 
 function realModuleUrl(relPath) {
     return pathToFileURL(join(repoRoot, relPath)).href;
 }
-
-const rewriteAndWrite = makeRewriteAndWrite(repoRoot, tmpDir, 'msp-parse-failure-recovery.test.mjs');
 
 // --- real, import-free leaf modules, loadable straight by absolute URL -------
 const realMspCodesUrl = realModuleUrl('js/msp/MSPCodes.js');
@@ -491,6 +483,34 @@ test('MSP.promise() on a blocked write settles instead of hanging', async () => 
 
     assert.notEqual(outcome, 'timeout', 'a refused write must not leave the promise pending forever');
     assert.equal(outcome, 'rejected', 'a refused write must reject, not resolve as success');
+    assert.equal(mspQueue.getLength(), 0, 'nothing may be queued for the FC');
+
+    clearParseFailures();
+});
+
+test('setSetting() on a blocked write stops the save chain without invoking the success callback', async () => {
+    resetQueue();
+    clearParseFailures();
+    MSP.parseFailures.add(MSPCodes.MSPV2_SETTING);
+
+    // Bypass the settings read so the write path is exercised directly.
+    const originalGetSetting = mspHelper._getSetting;
+    mspHelper._getSetting = () => Promise.resolve({ index: 0, type: 'uint8_t' });
+
+    let callbackCalled = false;
+    const outcome = await Promise.race([
+        mspHelper.setSetting('test_setting', 5, () => { callbackCalled = true; }).then(
+            () => 'settled',
+            () => 'rejected',
+        ),
+        wait(100).then(() => 'timeout'),
+    ]);
+
+    mspHelper._getSetting = originalGetSetting;
+
+    assert.notEqual(outcome, 'timeout', 'a blocked setting write must settle, not hang');
+    assert.equal(outcome, 'settled', 'the refusal is consumed without propagating');
+    assert.equal(callbackCalled, false, 'the success callback must not run after a refused write');
     assert.equal(mspQueue.getLength(), 0, 'nothing may be queued for the FC');
 
     clearParseFailures();

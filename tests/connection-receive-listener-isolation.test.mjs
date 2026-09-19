@@ -30,21 +30,11 @@
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtempSync, rmSync } from 'node:fs';
-import { tmpdir } from 'node:os';
-import { join, dirname, resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
 
 import { dataModule } from './helpers/dataModule.mjs';
-import { makeRewriteAndWrite } from './helpers/rewriteAndWrite.mjs';
+import { makeHarness } from './helpers/harness.mjs';
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const repoRoot = resolve(__dirname, '..');
-
-const tmpDir = mkdtempSync(join(tmpdir(), 'connection-receive-listener-'));
-process.on('exit', () => rmSync(tmpDir, { recursive: true, force: true }));
-
-const rewriteAndWrite = makeRewriteAndWrite(repoRoot, tmpDir, 'connection-receive-listener-isolation.test.mjs');
+const { repoRoot, tmpDir, rewriteAndWrite } = makeHarness(import.meta.url, 'connection-receive-listener-isolation.test.mjs', 'connection-receive-listener-');
 
 const mockGuiUrl = dataModule(`
     const GUI = { connected_to: false, connecting_to: false, log() {} };

@@ -3531,12 +3531,16 @@ var mspHelper = (function () {
     };
 
     self.setSetting = function (name, value, callback) {
-        this.encodeSetting(name, value).then(function (data) {
+        // The onRejected handler catches only encodeSetting() failures (invalid
+        // setting/value). A refused write rejects from MSP.promise() and is
+        // consumed by the trailing catch, without reaching callback, so the save
+        // chain stops instead of advancing to EEPROM persistence and reboot.
+        return this.encodeSetting(name, value).then(function (data) {
             return MSP.promise(MSPCodes.MSPV2_SET_SETTING, data).then(callback);
-        }).catch(error =>  {
+        }, function (error) {
             console.log("Invalid setting: " + name, error);
             return Promise.resolve().then(callback);
-        });
+        }).catch(() => {});
     };
 
     self.getRTC = function (callback) {
