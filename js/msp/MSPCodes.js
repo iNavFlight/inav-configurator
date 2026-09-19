@@ -249,6 +249,7 @@ var MSPCodes = {
     MSP2_INAV_CUSTOM_OSD_ELEMENTS:      0x2100,
     MSP2_INAV_CUSTOM_OSD_ELEMENT:       0x2101,
     MSP2_INAV_SET_CUSTOM_OSD_ELEMENTS:  0x2102,
+    MSP2_INAV_GET_LINK_STATS:           0x2103,
 
     MSP2_INAV_SERVO_CONFIG:             0x2200,
     MSP2_INAV_SET_SERVO_CONFIG:         0x2201,
@@ -257,6 +258,7 @@ var MSPCodes = {
     MSP2_INAV_SET_GEOZONE:              0x2211,
     MSP2_INAV_GEOZONE_VERTEX:           0x2212,
     MSP2_INAV_SET_GEOZONE_VERTICE:      0x2213,
+    MSP2_INAV_SET_RX_LINK:              0x2232,
 
     // Compass reading with zero/gain calibration applied but no alignment rotation --
     // used by the Alignment Tool wizard, which is determining that alignment itself and
