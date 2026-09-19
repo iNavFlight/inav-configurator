@@ -1602,7 +1602,7 @@
         "message": "Ground Assistance Type"
     },
     "configurationGPSubxSbasHelp": {
-        "message": "Ground stations measure the error in the satellite signals and broadcast the correction. Each region has its own service, so pick the one you fly in."
+        "message": "Ground stations measure the error in the satellite signals and broadcast the correction. Auto listens for every service; picking a region limits the search to that one."
     },
     "receiverType": {
         "message": "Receiver type"
