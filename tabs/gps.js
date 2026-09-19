@@ -624,27 +624,33 @@ gpsTab.initialize = function (callback) {
             const supported = FC.GPS_DATA.gnssSupported;
             const extended = FC.GPS_DATA.gnssExtended;
 
-            // The switches INAV can move. One is withdrawn only when the receiver has
-            // said it has no such constellation, never on a guess
+            // The four majors keep their switches. One is withdrawn only when the
+            // receiver has said it has no such constellation, never on a guess
             GNSS_CONSTELLATIONS.filter(c => c.box).forEach(function (c) {
-                $(c.box).closest('.checkbox').toggleClass('is-hidden', !gnssIsOffered(supported, c));
+                show_row($(c.box).closest('.checkbox'), gnssIsOffered(supported, c));
             });
 
             const sbas = GNSS_EXTENDED.find(e => e.key === 'sbas');
-            $(sbas.row).closest('.select').toggleClass('is-hidden', !gnssIsOffered(extended, sbas));
+            show_row($(sbas.row).closest('.select'), gnssIsOffered(extended, sbas));
 
-            // The rows that only report go the other way: they appear once the receiver
-            // has confirmed them, and stay away while nothing is known
+            // The rest go the other way: they appear once the receiver has confirmed
+            // them, and stay away while nothing is known
             const rows = GNSS_CONSTELLATIONS.filter(c => c.row)
-                .map(c => ({ row: c.row, on: gnssIsConfirmed(supported, c) }))
+                .map(c => ({ el: c.row, on: gnssIsConfirmed(supported, c) }))
                 .concat(GNSS_EXTENDED.filter(e => e !== sbas)
-                    .map(e => ({ row: e.row, on: gnssIsConfirmed(extended, e) })));
+                    .map(e => ({ el: e.box || e.row, on: gnssIsConfirmed(extended, e) })));
 
             rows.forEach(function (r) {
-                $(r.row).closest('.checkbox').toggleClass('is-hidden', !r.on);
+                show_row($(r.el).closest('.checkbox'), r.on);
             });
 
             update_gnss_budget();
+        }
+
+        // Loading a setting shows the row it sits in, with an inline display that
+        // would outrank the class, so that goes before the class decides
+        function show_row(row, visible) {
+            row.css('display', '').toggleClass('is-hidden', !visible);
         }
 
         /*
@@ -656,7 +662,8 @@ gpsTab.initialize = function (callback) {
             const ceiling = FC.GPS_DATA.gnssMaxConcurrent;
             const note = $('#gps_gnss_budget');
 
-            // GPS is never switched off, so it always takes one of the slots
+            // GPS is never switched off, so it always takes one of the slots. NavIC is
+            // not counted: MON-GNSS reports on the four majors only
             const asked = 1 + GNSS_CONSTELLATIONS.filter(c => c.box && $(c.box).is(':checked')).length;
 
             if (!ceiling || asked <= ceiling) {
@@ -669,6 +676,10 @@ gpsTab.initialize = function (callback) {
         }
 
         $('#gps_use_galileo, #gps_use_beidou, #gps_use_glonass').on('change.gpsTab', update_gnss_budget);
+
+        // Once now, before the first statistics arrive, so a row the receiver has not
+        // confirmed is never shown just because its setting loaded
+        update_gnss_availability();
 
         function update_gps_ui() {
             update_gnss_availability();

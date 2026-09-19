@@ -22,7 +22,9 @@ const GNSS_EXTENDED = [
     // which service to listen to, so its control is the one the tab already has
     { key: 'sbas',  bit: 0x01, name: 'SBAS',  row: '#gps_ubx_sbas' },
     { key: 'qzss',  bit: 0x02, name: 'QZSS',  row: '#gps_have_qzss' },
-    { key: 'navic', bit: 0x04, name: 'NavIC', row: '#gps_have_navic' }
+    // A real switch, but it is only offered once the receiver has named NavIC:
+    // hardly any receiver has it, and the firmware sends its keys to no other
+    { key: 'navic', bit: 0x04, name: 'NavIC', box: '#gps_use_navic' }
 ];
 
 /*

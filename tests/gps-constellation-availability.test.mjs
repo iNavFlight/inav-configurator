@@ -80,6 +80,15 @@ test('NavIC is shown on the receiver that has it and nowhere else', () => {
     assert.equal(gnssIsConfirmed(EXT_M10, extra('navic')), false);
 });
 
+test('NavIC is a switch, but one that waits for the receiver to name it', () => {
+    // Offering it on a guess would show a NavIC switch on nearly every receiver,
+    // and the firmware only sends its keys to the ones that listed it
+    assert.equal(extra('navic').box, '#gps_use_navic');
+    assert.equal(gnssIsConfirmed(UNKNOWN, extra('navic')), false);
+    assert.equal(gnssIsConfirmed(EXT_M10, extra('navic')), false);
+    assert.equal(gnssIsConfirmed(EXT_F10, extra('navic')), true);
+});
+
 test('QZSS and SBAS are on both receivers', () => {
     for (const mask of [EXT_M10, EXT_F10]) {
         assert.equal(gnssIsConfirmed(mask, extra('qzss')), true);

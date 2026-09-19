@@ -45,14 +45,14 @@ test('every translation key in the tab exists in the English messages', () => {
 test('the rows that only report carry the section row geometry', () => {
     // .checkbox is what gives a row its column, its separator and its spacing.
     // Without it the row lands hard against the one above it
-    for (const id of ['gps_have_gps', 'gps_have_qzss', 'gps_have_navic']) {
+    for (const id of ['gps_have_gps', 'gps_have_qzss']) {
         const row = new RegExp(`<div class="checkbox gnss-fixed[^"]*"[^>]*>[^]{0,600}?id="${id}"`);
         assert.match(html, row, `${id} is not inside a .checkbox .gnss-fixed row`);
     }
 });
 
 test('the rows that only report cannot be changed from the tab', () => {
-    for (const id of ['gps_have_gps', 'gps_have_qzss', 'gps_have_navic']) {
+    for (const id of ['gps_have_gps', 'gps_have_qzss']) {
         const input = html.match(new RegExp(`<input[^>]*id="${id}"[^>]*>`));
         assert.ok(input, `${id} is not an input`);
         assert.match(input[0], /\bdisabled\b/, `${id} must not be editable`);
@@ -61,17 +61,27 @@ test('the rows that only report cannot be changed from the tab', () => {
     }
 });
 
-test('the three real switches are still bound to their settings', () => {
+test('the real switches are bound to their settings', () => {
     const bindings = {
         gps_use_galileo: 'gps_ublox_use_galileo',
         gps_use_beidou: 'gps_ublox_use_beidou',
-        gps_use_glonass: 'gps_ublox_use_glonass'
+        gps_use_glonass: 'gps_ublox_use_glonass',
+        gps_use_navic: 'gps_ublox_use_navic'
     };
     for (const [id, setting] of Object.entries(bindings)) {
         const input = html.match(new RegExp(`<input[^>]*id="${id}"[^>]*>`));
         assert.ok(input, `${id} is not in the tab`);
         assert.ok(input[0].includes(`data-setting="${setting}"`), `${id} lost its setting`);
     }
+});
+
+test('the NavIC switch starts hidden and is left alone by the presets', () => {
+    // The tab shows it once the receiver names NavIC. Before that it must not be
+    // on screen, whatever the setting says
+    assert.match(html, /<div class="checkbox is-hidden" id="gps_use_navic_row">/);
+    const input = html.match(/<input[^>]*id="gps_use_navic"[^>]*>/)[0];
+    assert.doesNotMatch(input, /preset-controlled/, 'no preset knows about NavIC');
+    assert.doesNotMatch(input, /disabled/, 'NavIC is a setting now, not a reading');
 });
 
 test('the read-only summary the switches replaced is gone', () => {

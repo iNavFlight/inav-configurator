@@ -1554,7 +1554,7 @@
         "message": "Use NavIC Satellites (IN)"
     },
     "configurationGPSUseNavicHelp": {
-        "message": "This receiver has NavIC, but INAV leaves it alone, so it keeps whatever the receiver was shipped with. Its satellites are only visible over India."
+        "message": "India's regional constellation. Its satellites are only visible over India and the region around it, so it helps there and nowhere else."
     },
     "gpsConstellations": {
         "message": "Constellations"

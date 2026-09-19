@@ -111,17 +111,17 @@
                             <label for="gps_use_glonass"><span data-i18n="configurationGPSUseGlonass"></span></label>
                             <div for="gps_use_glonass" class="helpicon cf_tip" data-i18n_title="configurationGPSUseGlonassHelp"></div>
                         </div>
-                        <!-- The ones INAV decides on its own. They are here so the tab
-                             answers what the receiver can do, not only what it is asked -->
+                        <div class="checkbox is-hidden" id="gps_use_navic_row">
+                            <input type="checkbox" id="gps_use_navic" class="toggle" data-setting="gps_ublox_use_navic">
+                            <label for="gps_use_navic"><span data-i18n="configurationGPSUseNavic"></span></label>
+                            <div for="gps_use_navic" class="helpicon cf_tip" data-i18n_title="configurationGPSUseNavicHelp"></div>
+                        </div>
+                        <!-- The one INAV decides on its own. It is here so the tab answers
+                             what the receiver can do, not only what it is asked -->
                         <div class="checkbox gnss-fixed is-hidden" id="gps_have_qzss_row">
                             <input type="checkbox" id="gps_have_qzss" class="toggle" checked disabled>
                             <label for="gps_have_qzss"><span data-i18n="configurationGPSUseQzss"></span></label>
                             <div for="gps_have_qzss" class="helpicon cf_tip" data-i18n_title="configurationGPSUseQzssHelp"></div>
-                        </div>
-                        <div class="checkbox gnss-fixed is-hidden" id="gps_have_navic_row">
-                            <input type="checkbox" id="gps_have_navic" class="toggle" disabled>
-                            <label for="gps_have_navic"><span data-i18n="configurationGPSUseNavic"></span></label>
-                            <div for="gps_have_navic" class="helpicon cf_tip" data-i18n_title="configurationGPSUseNavicHelp"></div>
                         </div>
                         <div class="gnss-budget is-hidden" id="gps_gnss_budget"></div>
                         <div class="select">
