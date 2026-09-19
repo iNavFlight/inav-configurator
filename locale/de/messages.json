@@ -4988,6 +4988,42 @@
     "missionSeaLevelRef": {
         "message": "Meeresspiegel-Ref.: "
     },
+    "missionWpListHead": {
+        "message": "Wegpunkte"
+    },
+    "missionWpListSelect": {
+        "message": "Wegpunkt:"
+    },
+    "missionWpListPrev": {
+        "message": "Vorheriger Wegpunkt"
+    },
+    "missionWpListNext": {
+        "message": "N\u00e4chster Wegpunkt"
+    },
+    "missionWpListCount": {
+        "message": "$1 Wegpunkt(e) in der Mission"
+    },
+    "missionApplyNoElevation": {
+        "message": "H\u00f6henabfrage fehlgeschlagen, H\u00f6hen wurden nicht ge\u00e4ndert"
+    },
+    "missionApplyMissionChanged": {
+        "message": "Die Mission hat sich w\u00e4hrend der H\u00f6henabfrage ge\u00e4ndert, es wurde nichts gespeichert"
+    },
+    "missionApplyViaHome": {
+        "message": "Meeresspiegel-Referenz auf $1 Wegpunkt(e) angewendet, umgerechnet \u00fcber die Home-H\u00f6he"
+    },
+    "missionApplyViaTerrain": {
+        "message": "Meeresspiegel-Referenz auf $1 Wegpunkt(e) angewendet, umgerechnet \u00fcber die Gel\u00e4ndeh\u00f6he je Wegpunkt"
+    },
+    "missionApplyAltApplied": {
+        "message": "Standardh\u00f6he auf $1 Wegpunkt(e) angewendet"
+    },
+    "missionApplySpeedApplied": {
+        "message": "Standard-Geschwindigkeit auf $1 Wegpunkt(e) angewendet"
+    },
+    "missionApplyBelowGround": {
+        "message": "Achtung: $1 Wegpunkt(e) liegen jetzt unter dem Gel\u00e4nde, bitte H\u00f6hen pr\u00fcfen"
+    },
     "missionElevation": {
         "message": "Geländehöhe (m):"
     },
