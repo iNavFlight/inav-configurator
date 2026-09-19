@@ -452,11 +452,18 @@ gpsTab.initialize = function (callback) {
                 $('#gps_title_model').text(FC.GPS_DATA.moduleName ? ' - ' + FC.GPS_DATA.moduleName : '');
 
                 // The guess from the hardware version is only worth showing when the
-                // receiver did not name itself, otherwise it contradicts the title
-                if (!FC.GPS_DATA.moduleName && GPS_PRESETS[detectedPreset]) {
+                // receiver did not name itself, otherwise it contradicts the title.
+                // An unknown version is not a guess either: it falls back to the manual
+                // preset, which says nothing about what is connected
+                const guessed = !FC.GPS_DATA.moduleName && detectedPreset !== 'manual'
+                    && GPS_PRESETS[detectedPreset];
+
+                if (guessed) {
                     $('#gps_hardware_name').text(GPS_PRESETS[detectedPreset].name + ' detected');
-                    $('#gps_hardware_status').show();
                 }
+
+                // The name can arrive after the version, so the guess goes when it does
+                $('#gps_hardware_status').toggle(!!guessed);
             }
         }
 
@@ -627,7 +634,17 @@ gpsTab.initialize = function (callback) {
             // The four majors keep their switches. One is withdrawn only when the
             // receiver has said it has no such constellation, never on a guess
             GNSS_CONSTELLATIONS.filter(c => c.box).forEach(function (c) {
-                show_row($(c.box).closest('.checkbox'), gnssIsOffered(supported, c));
+                const offered = gnssIsOffered(supported, c);
+
+                // Hidden inputs are saved like any other, so a constellation the
+                // receiver has just said it does not have is cleared as well as
+                // withdrawn: otherwise a preset, or the receiver before this one,
+                // keeps sending it a setting it cannot use and nobody can turn off
+                if (!offered && $(c.box).is(':checked')) {
+                    $(c.box).prop('checked', false).trigger('change');
+                }
+
+                show_row($(c.box).closest('.checkbox'), offered);
             });
 
             const sbas = GNSS_EXTENDED.find(e => e.key === 'sbas');

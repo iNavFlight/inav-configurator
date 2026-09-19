@@ -21,9 +21,19 @@ import { GNSS_CONSTELLATIONS, GNSS_EXTENDED } from '../js/gpsConstellations.js';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const html = readFileSync(join(root, 'tabs/gps.html'), 'utf8');
+const script = readFileSync(join(root, 'tabs/gps.js'), 'utf8');
 const messages = JSON.parse(readFileSync(join(root, 'locale/en/messages.json'), 'utf8'));
 
 const ids = new Set([...html.matchAll(/\bid="([^"]+)"/g)].map(m => m[1]));
+
+/* The last two rules live inside the tab's own closure, so they are read from the
+ * source rather than called: what matters is that the pass is still written the way
+ * the receiver's answers need it to be. */
+function around(anchor, length) {
+    const at = script.indexOf(anchor);
+    assert.notEqual(at, -1, `${anchor} is no longer in tabs/gps.js`);
+    return script.slice(at, at + length);
+}
 
 test('every selector in the constellation table names something in the tab', () => {
     for (const c of GNSS_CONSTELLATIONS.concat(GNSS_EXTENDED)) {
@@ -97,4 +107,20 @@ test('the read-only summary the switches replaced is gone', () => {
     assert.ok(!ids.has('gps_constellations'), 'the summary row is still in the tab');
     assert.equal(messages.gpsConstellationsInUse, undefined);
     assert.equal(messages.gpsConstellationsAllInUse, undefined);
+});
+
+test('a switch the receiver cannot use is cleared, not just hidden', () => {
+    // Settings are serialized whether their row is on screen or not, so hiding a
+    // constellation the receiver does not have would keep saving it with nobody
+    // able to turn it off
+    const block = around('const offered = gnssIsOffered', 700);
+    assert.match(block, /prop\('checked', false\)/, 'the withdrawn switch stays checked');
+});
+
+test('the detected-hardware line can go away again', () => {
+    // The module name can arrive after the hardware version, and an unknown version
+    // falls back to the manual preset, which is not a detection
+    const block = around('function updateHardwareStatus', 1600);
+    assert.match(block, /detectedPreset !== 'manual'/, 'the manual fallback is shown as a detection');
+    assert.match(block, /#gps_hardware_status'\)\.toggle/, 'the line is shown but never hidden');
 });
