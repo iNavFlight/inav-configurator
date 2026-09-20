@@ -525,10 +525,15 @@ var MSP = {
     },
     promise(code, data, protocolVersion) {
         var self = this;
-        return new Promise(function(resolve) {
-            self.send_message(code, data, false, function(data) {
+        return new Promise(function(resolve, reject) {
+            // A refused write fires no callback; reject so the caller cannot
+            // hang awaiting a response that will never arrive (resolving would
+            // run the save chain as if the settings had been stored).
+            if (!self.send_message(code, data, false, function(data) {
                 resolve(data);
-            }, protocolVersion);
+            }, protocolVersion)) {
+                reject(new Error('Refusing MSP write ' + self.getCodeName(code) + ': blocked by an unreadable response'));
+            }
         });
     },
     callbacks_cleanup() {

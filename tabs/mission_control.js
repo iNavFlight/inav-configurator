@@ -6210,9 +6210,10 @@ function iconKey(filename) {
                 mspHelper.saveSafehomes,
                 mspHelper.saveFwApproach,
                 function() {
-                    mspHelper.saveToEeprom();
-                    GUI.log(i18n.getMessage('endSendingSafehomePoints'));
-                    $('#saveEepromSafehomeButton').removeClass('disabled');
+                    mspHelper.saveToEeprom(() => {
+                        GUI.log(i18n.getMessage('endSendingSafehomePoints'));
+                        $('#saveEepromSafehomeButton').removeClass('disabled');
+                    });
                 }
             ]);
             saveChainer.execute();
@@ -6453,9 +6454,10 @@ function iconKey(filename) {
                 $(event.currentTarget).addClass('disabled');
                 GUI.log('Start of sending Geozones');
                 mspHelper.saveGeozones(() => {
-                    mspHelper.saveToEeprom();
-                    GUI.log('End of sending Geozones');
-                    reboot();
+                    mspHelper.saveToEeprom(() => {
+                        GUI.log('End of sending Geozones');
+                        reboot();
+                    });
                 });
             }
         });
