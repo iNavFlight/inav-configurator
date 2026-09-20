@@ -92,6 +92,12 @@ cliTab.initialize = function (callback) {
     var self = this;
     self.nextTab = null;
 
+    // Must be set before mspQueue.flush() below and before the async HTML
+    // import, so periodicStatusUpdater.run() (a 300ms interval kept alive
+    // across tab switches) can never see cliActive === false and queue a
+    // status poll in the gap - the flush only clears what's queued so far.
+    CONFIGURATOR.cliActive = true;
+
     if (GUI.active_tab !== this) {
         GUI.active_tab = this;
     }
@@ -157,8 +163,6 @@ cliTab.initialize = function (callback) {
        i18n.localize();
 
         $('.cliDocsBtn').attr('href', globalSettings.docsTreeLocation + 'Settings.md');
-
-        CONFIGURATOR.cliActive = true;
 
         var textarea = $('.tab-cli textarea[name="commands"]');
         CliAutoComplete.initialize(textarea, self.sendLine.bind(self), writeToOutput);

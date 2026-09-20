@@ -2528,22 +2528,25 @@ OSD.updateDisplaySize = function () {
     OSD.GUI.updateGuidesView($('#videoGuides').find('input').is(':checked'));
 };
 
+// Each save's .catch() only observes a refused write - the blocked-write notice
+// is already shown by MSP.onConfigWriteBlocked, and the success callback must
+// not run when the value was not stored.
 OSD.saveAlarms = function(callback) {
     let data = OSD.msp.encodeAlarms();
-    return MSP.promise(MSPCodes.MSP2_INAV_OSD_SET_ALARMS, data).then(callback);
+    return MSP.promise(MSPCodes.MSP2_INAV_OSD_SET_ALARMS, data).then(callback).catch(() => {});
 }
 
 OSD.saveConfig = function(callback) {
     return OSD.saveAlarms(function () {
         var data = OSD.msp.encodePreferences();
         return MSP.promise(MSPCodes.MSP2_INAV_OSD_SET_PREFERENCES, data).then(callback);
-    });
+    }).catch(() => {});
 };
 
 OSD.saveItem = function(item, callback) {
     let pos = OSD.data.items[item.id];
     let data = OSD.msp.encodeLayoutItem(OSD.data.selected_layout, item, pos);
-    return MSP.promise(MSPCodes.MSP2_INAV_OSD_SET_LAYOUT_ITEM, data).then(callback);
+    return MSP.promise(MSPCodes.MSP2_INAV_OSD_SET_LAYOUT_ITEM, data).then(callback).catch(() => {});
 };
 
 //noinspection JSUnusedLocalSymbols
@@ -4352,7 +4355,8 @@ function customElementsInitCallback() {
         customElementNormaliseRow(row);
         customElementDisableNonValidOptionsRow(row);
 
-        MSP.promise(MSPCodes.MSP2_INAV_SET_CUSTOM_OSD_ELEMENTS, customElementGetDataForRow(row));
+        // A refused write is already reported by MSP.onConfigWriteBlocked.
+        MSP.promise(MSPCodes.MSP2_INAV_SET_CUSTOM_OSD_ELEMENTS, customElementGetDataForRow(row)).catch(() => {});
     };
 
     var customElements = $('#osdCustomElementCards');

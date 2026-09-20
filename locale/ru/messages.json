@@ -3013,6 +3013,24 @@
     "ledStripWiringMessage": {
         "message": "Светодиоды без порядкового номера подключения не будут сохранены."
     },
+    "ledStripQuickPresets": {
+        "message": "Быстрые пресеты:"
+    },
+    "ledStripStep1Header": {
+        "message": "Порядок подключения"
+    },
+    "ledStripStep2Header": {
+        "message": "Положение и направление"
+    },
+    "ledStripStep3Header": {
+        "message": "Функция"
+    },
+    "ledStripStep4Header": {
+        "message": "Цвет"
+    },
+    "ledStripEditPalette": {
+        "message": "Редактировать цвета палитры"
+    },
     "missionGeozoneMaxVerticesReached": {
         "message": "Достигнуто максимальное количество вершин геозоны."
     },

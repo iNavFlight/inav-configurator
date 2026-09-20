@@ -29,11 +29,9 @@ class ConnectionUdp extends Connection {
         }
 
         this._ipcMessageHandler = window.electronAPI.onUdpMessage(message => {
-            this._onReceiveListeners.forEach(listener => {
-                listener({
-                    connectionId: this._connectionId,
-                    data: message
-                });
+            this.notifyReceiveListeners({
+                connectionId: this._connectionId,
+                data: message
             });
         });
 
@@ -41,9 +39,7 @@ class ConnectionUdp extends Connection {
             GUI.log(error);
             console.log(error);
             this.abort();
-            this._onReceiveErrorListeners.forEach(listener => {
-                listener(error);
-            });
+            this.notifyReceiveErrorListeners(error);
         });
     }
 
@@ -86,42 +82,15 @@ class ConnectionUdp extends Connection {
                     callback(false);
                 }
             }
-        });
+        }).catch(this.reportFailure("UDP connection failed", callback));
     }
 
     disconnectImplementation(callback) {
-        if (this._connectionId) {
-            window.electronAPI.udpClose().then(response => {
-                var ok = true;
-                if (response.error) {
-                    console.log("Unable to close UDP: " + response.msg);
-                    ok = false;
-                }            
-                if (callback) {
-                    callback(ok);
-                }
-            });  
-        }  
+        this.completeClose('UDP', this._connectionId ? window.electronAPI.udpClose() : null, callback);
     }
 
-   sendImplementation(data, callback) {    
-        if (this._connectionId) {
-            window.electronAPI.udpSend(data).then(response => {
-                var result = 0;
-                var sent = response.bytesWritten;
-                if (response.error) {
-                    console.log("Serial write error: " + response.msg);
-                    result = 1;
-                    sent = 0;
-                }
-                if (callback) {
-                    callback({
-                        bytesSent: sent,
-                        resultCode: result
-                    });
-                }
-            });
-        }
+    sendImplementation(data, callback) {
+        this.completeSend('UDP', this._connectionId ? window.electronAPI.udpSend(data) : null, callback);
     }
 
     addOnReceiveCallback(callback){

@@ -27,11 +27,9 @@ class ConnectionTcp extends Connection {
         }
 
         this._ipcDataHandler = window.electronAPI.onTcpData(buffer => {
-            this._onReceiveListeners.forEach(listener => {
-                listener({
-                    connectionId: this._connectionId,
-                    data: buffer
-                });
+            this.notifyReceiveListeners({
+                connectionId: this._connectionId,
+                data: buffer
             });
         });
 
@@ -44,9 +42,7 @@ class ConnectionTcp extends Connection {
             GUI.log(error);
             console.log(error);
             this.abort();
-            this._onReceiveErrorListeners.forEach(listener => {
-                listener(error);
-            });
+            this.notifyReceiveErrorListeners(error);
         });
     }
 
@@ -93,7 +89,7 @@ class ConnectionTcp extends Connection {
                     callback(false);
                 }
             }
-        });
+        }).catch(this.reportFailure("TCP connection failed", callback));
     }
 
     disconnectImplementation(callback) {
@@ -110,24 +106,8 @@ class ConnectionTcp extends Connection {
        }
     }
 
-   sendImplementation(data, callback) {     
-        if (this._connectionId) {
-            window.electronAPI.tcpSend(data).then(response => {
-                var result = 0;
-                var sent = response.bytesWritten;
-                if (response.error) {
-                    console.log("Serial write error: " + response.msg);
-                    result = 1;
-                    sent = 0;
-                }
-                if (callback) {
-                    callback({
-                        bytesSent: sent,
-                        resultCode: result
-                    });
-                }
-            });
-        }
+    sendImplementation(data, callback) {
+        this.completeSend('TCP', this._connectionId ? window.electronAPI.tcpSend(data) : null, callback);
     }
 
     addOnReceiveCallback(callback){

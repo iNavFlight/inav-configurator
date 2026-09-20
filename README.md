@@ -75,6 +75,7 @@ sudo mv inav-configurator.desktop /usr/share/applications/
 3. Install
     * Extract ZIP archive and run INAV Configurator
     * OR use the DMG package for installation
+4. Official tagged builds (`9.1.3` or `v9.1.3`) are signed and notarized. Nightlies are signed when repo secrets are configured. Pull-request and fork CI builds are always unsigned. If Gatekeeper blocks an unsigned app, run `xattr -cr "/path/to/INAV Configurator.app"` from Terminal.
 
 ## Building and running INAV Configurator locally (for development)
 

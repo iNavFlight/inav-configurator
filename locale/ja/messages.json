@@ -5745,6 +5745,24 @@
     "ledStripWiringMessage": {
         "message": "ワイヤーオーダー番号のないLEDは保存されません"
     },
+    "ledStripQuickPresets": {
+        "message": "クイックプリセット:"
+    },
+    "ledStripStep1Header": {
+        "message": "配線順序"
+    },
+    "ledStripStep2Header": {
+        "message": "位置と方向"
+    },
+    "ledStripStep3Header": {
+        "message": "機能"
+    },
+    "ledStripStep4Header": {
+        "message": "色"
+    },
+    "ledStripEditPalette": {
+        "message": "パレットの色を編集"
+    },
     "mainLogoText": {
         "message": "CONFIGURATOR"
     },

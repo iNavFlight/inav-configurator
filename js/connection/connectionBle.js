@@ -206,9 +206,7 @@ class ConnectionBle extends Connection {
                         data: buffer
                     };
 
-                    this._onReceiveListeners.forEach(listener => {
-                        listener(info);
-                    });
+                    this.notifyReceiveListeners(info);
                 };
 
                 this._readCharacteristic.addEventListener('characteristicvaluechanged', this._handleOnCharateristicValueChanged)
