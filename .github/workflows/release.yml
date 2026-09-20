@@ -1,0 +1,24 @@
+name: Release
+
+# Tagged version builds. Tag a merged version bump (e.g. 9.1.3 or v9.1.3) to
+# produce signed + notarized macOS artifacts. GitHub Release creation stays
+# manual — download the workflow artifacts and attach them in the UI.
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+      - '*.*.*'
+
+jobs:
+  build:
+    name: build
+    # Gate secrets on the tag actually being protected - without a tag
+    # protection rule for these patterns, anyone with push access can push a
+    # matching tag pointing at any commit and this job hands it the signing
+    # certificate and notarization credentials with require_signing forcing
+    # full use of them.
+    if: github.ref_protected == true
+    uses: ./.github/workflows/ci.yml
+    secrets: inherit
+    with:
+      require_signing: true

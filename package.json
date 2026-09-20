@@ -2,7 +2,7 @@
   "name": "inav-configurator",
   "productName": "INAV Configurator",
   "description": "Configurator for the open source flight controller software INAV.",
-  "version": "9.1.1",
+  "version": "9.1.2",
   "main": ".vite/build/main.js",
   "type": "module",
   "scripts": {
@@ -70,6 +70,7 @@
     "@electron-forge/maker-zip": "^7.8.3",
     "@electron-forge/plugin-auto-unpack-natives": "7.8.3",
     "@electron-forge/plugin-vite": "^7.8.3",
+    "@electron/osx-sign": "^2.7.0",
     "@rollup/plugin-inject": "^5.0.5",
     "electron": "^38.0.0",
     "process": "^0.11.10",

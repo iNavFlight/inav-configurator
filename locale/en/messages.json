@@ -7028,6 +7028,9 @@
     "osdClearLayout": {
         "message": "Layout has been cleared"
     },
+    "osdLayoutSaveItemFailed": {
+        "message": "<span style=\"color: red\">Failed</span> to save OSD layout item; some changes may not have been applied"
+    },
     "failedToOpenSerialPort": {
         "message": "<span style=\"color: red\">Failed</span> to open serial port"
     },
