@@ -283,7 +283,7 @@ var mspHelper = (function () {
                 if (data.byteLength >= 26) {
                     const nameLength = data.getUint8(25);
                     for (let i = 0; i < nameLength && 26 + i < data.byteLength; i++) {
-                        FC.GPS_DATA.moduleName += String.fromCharCode(data.getUint8(26 + i));
+                        FC.GPS_DATA.moduleName += String.fromCodePoint(data.getUint8(26 + i));
                     }
                 }
                 break;

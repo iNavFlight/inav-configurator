@@ -39,6 +39,13 @@ import { GNSS_CONSTELLATIONS, GNSS_EXTENDED, gnssIsOffered, gnssIsConfirmed, gns
 
 
 const gpsTab = {};
+
+// Loading a setting shows the row it sits in, with an inline display that would
+// outrank the class, so that goes before the class decides
+function show_row(row, visible) {
+    row.css('display', '').toggleClass('is-hidden', !visible);
+}
+
 gpsTab.initialize = function (callback) {
 
     if (GUI.active_tab !== this) {
@@ -453,7 +460,7 @@ gpsTab.initialize = function (callback) {
 
         // Which receiver this is, next to the tab title
         function updateReceiverName() {
-            if (!FC.GPS_DATA || !FC.GPS_DATA.hwVersion) {
+            if (!FC.GPS_DATA?.hwVersion) {
                 return;
             }
 
@@ -604,7 +611,7 @@ gpsTab.initialize = function (callback) {
             // Only tighten the field when the stored value still fits. Lowering the
             // ceiling under someone's own setting would leave it sitting in a field
             // that calls it invalid, which is worse than leaving it alone.
-            if (parseInt(field.val(), 10) <= ceiling) {
+            if (Number.parseInt(field.val(), 10) <= ceiling) {
                 field.attr('max', ceiling);
             }
         }
@@ -644,12 +651,6 @@ gpsTab.initialize = function (callback) {
             });
 
             update_gnss_budget();
-        }
-
-        // Loading a setting shows the row it sits in, with an inline display that
-        // would outrank the class, so that goes before the class decides
-        function show_row(row, visible) {
-            row.css('display', '').toggleClass('is-hidden', !visible);
         }
 
         /*
