@@ -2392,16 +2392,17 @@ OSD.is_item_displayed = function(item, group) {
     if (!group) {
         return false;
     }
-    if (typeof group.enabled === 'function' && group.enabled() === false) {
-        return false;
-    }
     if (item.min_version && !semver.gte(FC.CONFIG.flightControllerVersion, item.min_version)) {
         return false;
     }
-    if (typeof item.enabled === 'function' && item.enabled() === false) {
-        return false;
+    var gateOpen = !(typeof group.enabled === 'function' && group.enabled() === false)
+        && !(typeof item.enabled === 'function' && item.enabled() === false);
+    if (gateOpen) {
+        return true;
     }
-    return true;
+    // Hardware/feature gate closed (e.g. pitot_hardware set to NONE): keep an
+    // already-enabled element toggleable so the user can turn it off (#2639).
+    return OSD.data.items[item.id].isVisible === true;
 };
 
 OSD.get_item_preview = function(item) {
