@@ -1956,6 +1956,27 @@ var mspHelper = (function () {
                 console.log("MZTC config saved");
                 break;
 
+            case MSPCodes.MSP2_INAV_ESC_SRXL2_STATUS:
+                if (dataHandler.unsupported) {
+                    /* Built without the Smart ESC driver. Recorded rather than
+                     * only logged, so the tabs can stop offering a protocol and
+                     * a port function this board cannot perform. */
+                    FC.SRXL2_STATUS.supported = false;
+                    break;
+                }
+                FC.SRXL2_STATUS.supported = true;
+                FC.SRXL2_STATUS.phase = data.getUint8(0);
+                FC.SRXL2_STATUS.connected = data.getUint8(1) !== 0;
+                /* Older firmware stops here; the fields past the end read as
+                 * zero rather than as a refusal that never happened. */
+                FC.SRXL2_STATUS.lastResult = data.byteLength > 2 ? data.getUint8(2) : 0;
+                FC.SRXL2_STATUS.ports = data.byteLength > 3 ? data.getUint8(3) : 0;
+                FC.SRXL2_STATUS.motors = data.byteLength > 4 ? data.getUint8(4) : 0;
+                break;
+
+            case MSPCodes.MSP2_INAV_ESC_SRXL2_CALIBRATE:
+                break;
+
             default:
                 console.log('Unknown code detected: 0x' + dataHandler.code.toString(16));
         } else {
