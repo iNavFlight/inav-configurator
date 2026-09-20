@@ -443,48 +443,30 @@ gpsTab.initialize = function (callback) {
             applyGPSPreset($(this).val());
         });
 
-        // Hardware detection status indicator
-        function updateHardwareStatus() {
-            if (FC.GPS_DATA && FC.GPS_DATA.hwVersion && FC.GPS_DATA.hwVersion > 0) {
-                const detectedPreset = detectGPSPreset(FC.GPS_DATA.hwVersion);
-                // The receiver's own name goes in the tab title, because the hardware
-                // version alone cannot tell an F10 from an M10: both report 000A0000
-                $('#gps_title_model').text(FC.GPS_DATA.moduleName ? ' - ' + FC.GPS_DATA.moduleName : '');
+        // All the hardware version alone can say. The module name is better wherever
+        // the receiver reports one, since an F10 and an M10 both report 000A0000
+        const UBLOX_GENERATION = {
+            0x48: 'u-blox M8',
+            0x49: 'u-blox M9',
+            0x4A: 'u-blox M10'
+        };
 
-                // The guess from the hardware version is only worth showing when the
-                // receiver did not name itself, otherwise it contradicts the title.
-                // An unknown version is not a guess either: it falls back to the manual
-                // preset, which says nothing about what is connected
-                const guessed = !FC.GPS_DATA.moduleName && detectedPreset !== 'manual'
-                    && GPS_PRESETS[detectedPreset];
-
-                if (guessed) {
-                    $('#gps_hardware_name').text(GPS_PRESETS[detectedPreset].name + ' detected');
-                }
-
-                // The name can arrive after the version, so the guess goes when it does
-                $('#gps_hardware_status').toggle(!!guessed);
+        // Which receiver this is, next to the tab title
+        function updateReceiverName() {
+            if (!FC.GPS_DATA || !FC.GPS_DATA.hwVersion) {
+                return;
             }
+
+            const name = FC.GPS_DATA.moduleName || UBLOX_GENERATION[FC.GPS_DATA.hwVersion] || '';
+            $('#gps_title_model').text(name ? ' - ' + name : '');
         }
-
-        // Handler for "Use optimal settings" link (namespaced)
-        $('#gps_apply_optimal').on('click.gpsTab', function(e) {
-            e.preventDefault();
-            if (FC.GPS_DATA && FC.GPS_DATA.hwVersion) {
-                const detectedPreset = detectGPSPreset(FC.GPS_DATA.hwVersion);
-                if (detectedPreset && detectedPreset !== 'manual') {
-                    $('#gps_preset_mode').val(detectedPreset).trigger('change');
-                    GUI.log('Applied recommended settings for ' + GPS_PRESETS[detectedPreset].name);
-                }
-            }
-        });
 
         // Initialize - default to manual mode to preserve user's existing settings
         // User can explicitly select a preset or use "Auto-detect" if desired
         applyGPSPreset('manual');
 
-        // Check for hardware detection after a short delay to allow GPS data to arrive
-        setTimeout(updateHardwareStatus, 500);
+        // Name the receiver after a short delay, to let the first GPS data arrive
+        setTimeout(updateReceiverName, 500);
 
         let mapView = new View({
             center: [0, 0],
@@ -706,7 +688,7 @@ gpsTab.initialize = function (callback) {
             update_nav_hz_limit();
             // The module name arrives with the statistics, which can be later than the
             // one-shot check done when the tab opens
-            updateHardwareStatus();
+            updateReceiverName();
 
             let lat = FC.GPS_DATA.lat / 10000000;
             let lon = FC.GPS_DATA.lon / 10000000;
@@ -1013,7 +995,6 @@ gpsTab.initialize = function (callback) {
 gpsTab.cleanup = function (callback) {
     // Remove all namespaced event handlers to prevent memory leaks
     $('#gps_preset_mode').off('.gpsTab');
-    $('#gps_apply_optimal').off('.gpsTab');
     $('#center_button').off('.gpsTab');
     $('a.save').off('.gpsTab');
     $('a.loadAssistnowOnline').off('.gpsTab');

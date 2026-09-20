@@ -117,10 +117,24 @@ test('a switch the receiver cannot use is cleared, not just hidden', () => {
     assert.match(block, /prop\('checked', false\)/, 'the withdrawn switch stays checked');
 });
 
-test('the detected-hardware line can go away again', () => {
-    // The module name can arrive after the hardware version, and an unknown version
-    // falls back to the manual preset, which is not a detection
-    const block = around('function updateHardwareStatus', 1600);
-    assert.match(block, /detectedPreset !== 'manual'/, 'the manual fallback is shown as a detection');
-    assert.match(block, /#gps_hardware_status'\)\.toggle/, 'the line is shown but never hidden');
+test('the title names the receiver, whether or not it names itself', () => {
+    // The module name is the good one, and the hardware version is what is left when
+    // the receiver does not report one, as an M8 does not
+    const block = around('function updateReceiverName', 500);
+    assert.match(block, /moduleName \|\| UBLOX_GENERATION/, 'the title has lost its fallback');
+    assert.ok(ids.has('gps_title_model'), 'the title has nowhere to put the name');
+
+    const table = around('const UBLOX_GENERATION', 220);
+    for (const version of ['0x48', '0x49', '0x4A']) {
+        assert.match(table, new RegExp(`${version}: 'u-blox M`), `${version} has no name`);
+    }
+});
+
+test('the green detected-hardware line is gone from the tab', () => {
+    // The title says which receiver it is, and the preset menu already offers the
+    // auto-detect that its link duplicated
+    assert.ok(!ids.has('gps_hardware_status'), 'the detection line is still in the markup');
+    assert.ok(!ids.has('gps_apply_optimal'), 'the optimal-settings link is still in the markup');
+    assert.doesNotMatch(script, /gps_hardware_status|gps_apply_optimal/, 'the tab still reaches for it');
+    assert.match(html, /<option value="auto">/, 'the preset menu lost its auto-detect');
 });
