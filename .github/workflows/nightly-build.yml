@@ -3,7 +3,6 @@ name: Build pre-release
 on: 
   push:
     branches:
-      - master
       - maintenance-*
 #  pull_request:
 
