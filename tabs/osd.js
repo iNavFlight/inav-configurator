@@ -1448,7 +1448,7 @@ OSD.constants = {
             items: [
                 {
                     name: 'MZTC_STATUS',
-                    id: 171,
+                    id: 172,
                     // min_version stays commented out until the firmware
                     // version is bumped, matching AUTO SPEED. The
                     // maintenance-10.x firmware still reports 9.x, so a
