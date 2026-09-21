@@ -59,6 +59,7 @@ const realStatisticsUrl = realModuleUrl('js/msp/mspStatistics.js');
 const realSmoothFilterUrl = realModuleUrl('js/simple_smooth_filter.js');
 const realInjectedMethodsUrl = realModuleUrl('js/injected_methods.js');
 const realMspWriteOutcomeUrl = realModuleUrl('js/mspWriteOutcome.js');
+const realBitHelperUrl = realModuleUrl('js/bitHelper.js');
 
 // eventFrequencyAnalyzer and serial_queue start un-refed intervals in their
 // IIFEs. `.unref()` changes nothing about whether or how they run - it only
@@ -128,7 +129,7 @@ const realMspHelperUrl = rewriteAndWrite('js/msp/MSPHelper.js', [
     [/^import ServoMixRule from '\.\/\.\.\/servoMixRule';$/m, `import ServoMixRule from '${inertDefaultUrl}';`, "import ServoMixRule"],
     [/^import MotorMixRule from '\.\/\.\.\/motorMixRule';$/m, `import MotorMixRule from '${inertDefaultUrl}';`, "import MotorMixRule"],
     [/^import LogicCondition from '\.\/\.\.\/logicCondition';$/m, `import LogicCondition from '${inertDefaultUrl}';`, "import LogicCondition"],
-    [/^import BitHelper from '\.\.\/bitHelper';$/m, `import BitHelper from '${inertDefaultUrl}';`, "import BitHelper"],
+    [/^import BitHelper from '\.\.\/bitHelper';$/m, `import BitHelper from '${realBitHelperUrl}';`, "import BitHelper"],
     [/^import serialPortHelper from '\.\/\.\.\/serialPortHelper';$/m, `import serialPortHelper from '${inertDefaultUrl}';`, "import serialPortHelper"],
     [/^import ProgrammingPid from '\.\/\.\.\/programmingPid';$/m, `import ProgrammingPid from '${inertDefaultUrl}';`, "import ProgrammingPid"],
     [/^import Safehome from '\.\/\.\.\/safehome';$/m, `import Safehome from '${inertDefaultUrl}';`, "import Safehome"],
@@ -137,7 +138,7 @@ const realMspHelperUrl = rewriteAndWrite('js/msp/MSPHelper.js', [
     [/^import Waypoint from '\.\/\.\.\/waypoint';$/m, `import Waypoint from '${inertDefaultUrl}';`, "import Waypoint"],
     [/^import mspDeduplicationQueue from '\.\/mspDeduplicationQueue';$/m, `import mspDeduplicationQueue from '${realDedupUrl}';`, "import mspDeduplicationQueue"],
     [/^import mspStatistics from '\.\/mspStatistics';$/m, `import mspStatistics from '${realStatisticsUrl}';`, "import mspStatistics"],
-    [/^import \{ resolveMspWrite \} from '\.\/\.\.\/mspWriteOutcome';$/m, `import { resolveMspWrite } from '${realMspWriteOutcomeUrl}';`, "import resolveMspWrite"],
+    [/^import \{ resolveMspWrite, guardMspCallback \} from '\.\/\.\.\/mspWriteOutcome';$/m, `import { resolveMspWrite, guardMspCallback } from '${realMspWriteOutcomeUrl}';`, "import resolveMspWrite, guardMspCallback"],
     [/^import settingsCache from '\.\/\.\.\/settingsCache';$/m, `import settingsCache from '${inertDefaultUrl}';`, "import settingsCache"],
     [/^import \{Geozone, GeozoneVertex, GeozoneShapes \} from '\.\/\.\.\/geozone';$/m, `import { Geozone, GeozoneVertex, GeozoneShapes } from '${inertGeozoneUrl}';`, "import Geozone"],
 ], 'MSPHelper-generated');
@@ -618,4 +619,32 @@ test('reconnecting clears the block', () => {
     assert.equal(mspQueue.getLength(), 1, 'writes must work again after a reconnect');
 
     resetQueue();
+});
+
+test('sendLedStripConfig() stops mid-chain when the queue drops one LED\'s write', () => {
+    // Witnessed live on real hardware before this fix: with two LEDs queued,
+    // mocking MSP.send_message() to simulate the queue giving up on the
+    // first one (onFinish(false), same as a real exhausted-retries drop)
+    // let the chain advance to the second LED and then call
+    // onCompleteCallback anyway, as if both had landed.
+    FC.LED_STRIP = [
+        { x: 0, y: 0, functions: [], directions: [], color: 0 },
+        { x: 1, y: 1, functions: [], directions: [], color: 0 },
+    ];
+
+    const originalSendMessage = MSP.send_message;
+    const sentCodes = [];
+    MSP.send_message = function (code, data, callbackSent, callbackMsp) {
+        sentCodes.push(code);
+        callbackMsp(false);
+        return true;
+    };
+
+    let completed = false;
+    mspHelper.sendLedStripConfig(() => { completed = true; }, new Set([0, 1]));
+
+    MSP.send_message = originalSendMessage;
+
+    assert.equal(sentCodes.length, 1, 'a dropped write must not advance to the next LED');
+    assert.equal(completed, false, 'onCompleteCallback must not run when an LED write never landed');
 });

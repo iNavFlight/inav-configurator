@@ -19,3 +19,19 @@ export function resolveMspWrite(mspPromise, callback) {
         return landed;
     });
 }
+
+/**
+ * Same idea as resolveMspWrite(), for a plain MSP.send_message() completion
+ * callback instead of an MSP.promise(). MSP.send_message()'s callback fires
+ * with the literal false MSP.promise() would otherwise reject on when the
+ * queue drops the write after exhausting retries - wrapping the next step
+ * of a chained send with this skips it for that case, so the chain stops
+ * instead of advancing past a write that never landed.
+ */
+export function guardMspCallback(onFinish) {
+    return function (result) {
+        if (result !== false && onFinish) {
+            onFinish(result);
+        }
+    };
+}

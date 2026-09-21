@@ -27,7 +27,7 @@ import { FwApproach } from './../fwApproach';
 import Waypoint from './../waypoint';
 import mspDeduplicationQueue from './mspDeduplicationQueue';
 import mspStatistics from './mspStatistics';
-import { resolveMspWrite } from './../mspWriteOutcome';
+import { resolveMspWrite, guardMspCallback } from './../mspWriteOutcome';
 import settingsCache from './../settingsCache';
 import {Geozone, GeozoneVertex, GeozoneShapes } from './../geozone';
 import { parseDronecanAsyncRequestResponse } from './../dronecanAsyncRequestParse';
@@ -3079,7 +3079,7 @@ var mspHelper = (function () {
                 buffer.push(color.s);
                 buffer.push(color.v);
             }
-            MSP.send_message(MSPCodes.MSP_SET_LED_COLORS, buffer, false, onCompleteCallback);
+            MSP.send_message(MSPCodes.MSP_SET_LED_COLORS, buffer, false, guardMspCallback(onCompleteCallback));
         }
     };
 
@@ -3174,7 +3174,7 @@ var mspHelper = (function () {
             position++;
             var nextFunction = (position === indicesToSend.length) ? onCompleteCallback : send_next_led_strip_config;
 
-            MSP.send_message(MSPCodes.MSP2_INAV_SET_LED_STRIP_CONFIG_EX, buffer, false, nextFunction);
+            MSP.send_message(MSPCodes.MSP2_INAV_SET_LED_STRIP_CONFIG_EX, buffer, false, guardMspCallback(nextFunction));
         }
     };
 
@@ -3204,7 +3204,7 @@ var mspHelper = (function () {
                 nextFunction = onCompleteCallback;
             }
 
-            MSP.send_message(MSPCodes.MSP_SET_LED_STRIP_MODECOLOR, buffer, false, nextFunction);
+            MSP.send_message(MSPCodes.MSP_SET_LED_STRIP_MODECOLOR, buffer, false, guardMspCallback(nextFunction));
         }
     };
 
