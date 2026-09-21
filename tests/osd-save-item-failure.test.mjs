@@ -20,28 +20,24 @@
  * failure mode and is no longer swallowed as if it were a refused write.
  *
  * This file does not drive the real MSP transport or DOM (see
- * tests/magnetometer-slider.test.mjs for the established pattern) - it
- * mirrors the relevant logic with a mock MSP.promise() and a mock saveItem
- * built the same way as the real tabs/osd.js code, plus a line-for-line
- * mirror of the paste/clear loop.
+ * tests/magnetometer-slider.test.mjs for the established pattern), so
+ * OSD.saveItem()'s own item lookup and MSP payload encoding aren't
+ * exercised here. Its write-outcome handling is: it imports the real,
+ * production `resolveMspWrite()` from js/mspWriteOutcome.js - the same
+ * function tabs/osd.js itself calls - so a regression in that shared logic
+ * fails here too, rather than only in a hand-copied mirror of it.
  */
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import { resolveMspWrite } from '../js/mspWriteOutcome.js';
 
-// Mirrors the fixed tabs/osd.js `OSD.saveItem` body, parameterized on a mock
-// MSP.promise() so tests can control which writes the "FC" refuses or drops.
+// Stands in for tabs/osd.js's `OSD.saveItem(item, callback)`, parameterized
+// on a mock MSP.promise() so tests can control which writes the "FC"
+// refuses or drops, while using the real resolveMspWrite() production code.
 function createSaveItem(mspPromise) {
     return function saveItem(item, callback) {
-        return mspPromise(item).then(
-            function (result) { return result !== false; },
-            function () { return false; }
-        ).then(function (saved) {
-            if (saved && callback) {
-                callback();
-            }
-            return saved;
-        });
+        return resolveMspWrite(mspPromise(item), callback);
     };
 }
 

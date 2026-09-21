@@ -27,6 +27,7 @@ import { FwApproach } from './../fwApproach';
 import Waypoint from './../waypoint';
 import mspDeduplicationQueue from './mspDeduplicationQueue';
 import mspStatistics from './mspStatistics';
+import { resolveMspWrite } from './../mspWriteOutcome';
 import settingsCache from './../settingsCache';
 import {Geozone, GeozoneVertex, GeozoneShapes } from './../geozone';
 import { parseDronecanAsyncRequestResponse } from './../dronecanAsyncRequestParse';
@@ -3821,12 +3822,13 @@ var mspHelper = (function () {
     };
 
     self.setSetting = function (name, value, callback) {
-        // The blocked-write rejection is caught right on MSP.promise(), not on
-        // the whole chain, so it stops the save chain without reaching callback,
-        // but an exception thrown by callback itself still propagates instead of
-        // being silently swallowed.
+        // resolveMspWrite() treats a refused write and a write the queue
+        // dropped after exhausting retries (MSP.promise() resolves false
+        // rather than rejecting for that case) the same way: stop the save
+        // chain without reaching callback. An exception thrown by callback
+        // itself still propagates instead of being silently swallowed.
         return this.encodeSetting(name, value).then(function (data) {
-            return MSP.promise(MSPCodes.MSPV2_SET_SETTING, data).then(callback, function () {});
+            return resolveMspWrite(MSP.promise(MSPCodes.MSPV2_SET_SETTING, data), callback);
         }, function (error) {
             console.log("Invalid setting: " + name, error);
             return Promise.resolve().then(callback);

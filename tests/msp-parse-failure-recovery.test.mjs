@@ -58,6 +58,7 @@ const realDedupUrl = realModuleUrl('js/msp/mspDeduplicationQueue.js');
 const realStatisticsUrl = realModuleUrl('js/msp/mspStatistics.js');
 const realSmoothFilterUrl = realModuleUrl('js/simple_smooth_filter.js');
 const realInjectedMethodsUrl = realModuleUrl('js/injected_methods.js');
+const realMspWriteOutcomeUrl = realModuleUrl('js/mspWriteOutcome.js');
 
 // eventFrequencyAnalyzer and serial_queue start un-refed intervals in their
 // IIFEs. `.unref()` changes nothing about whether or how they run - it only
@@ -136,6 +137,7 @@ const realMspHelperUrl = rewriteAndWrite('js/msp/MSPHelper.js', [
     [/^import Waypoint from '\.\/\.\.\/waypoint';$/m, `import Waypoint from '${inertDefaultUrl}';`, "import Waypoint"],
     [/^import mspDeduplicationQueue from '\.\/mspDeduplicationQueue';$/m, `import mspDeduplicationQueue from '${realDedupUrl}';`, "import mspDeduplicationQueue"],
     [/^import mspStatistics from '\.\/mspStatistics';$/m, `import mspStatistics from '${realStatisticsUrl}';`, "import mspStatistics"],
+    [/^import \{ resolveMspWrite \} from '\.\/\.\.\/mspWriteOutcome';$/m, `import { resolveMspWrite } from '${realMspWriteOutcomeUrl}';`, "import resolveMspWrite"],
     [/^import settingsCache from '\.\/\.\.\/settingsCache';$/m, `import settingsCache from '${inertDefaultUrl}';`, "import settingsCache"],
     [/^import \{Geozone, GeozoneVertex, GeozoneShapes \} from '\.\/\.\.\/geozone';$/m, `import { Geozone, GeozoneVertex, GeozoneShapes } from '${inertGeozoneUrl}';`, "import Geozone"],
 ], 'MSPHelper-generated');
@@ -546,6 +548,25 @@ test('setSetting() on a blocked write stops the save chain without invoking the 
     assert.equal(mspQueue.getLength(), 0, 'nothing may be queued for the FC');
 
     clearParseFailures();
+});
+
+test('setSetting() does not advance the save chain when the queue drops the write after exhausting retries', async () => {
+    // The queue resolves (rather than rejects) with false when it gives up
+    // retrying - a congestion drop, not a rejected write. Mocking MSP.promise()
+    // directly exercises this without waiting out the queue's real retry delay.
+    const originalPromise = MSP.promise;
+    const originalGetSetting = mspHelper._getSetting;
+    MSP.promise = () => Promise.resolve(false);
+    mspHelper._getSetting = () => Promise.resolve({ index: 0, type: 'uint8_t' });
+
+    let callbackCalled = false;
+    const result = await mspHelper.setSetting('test_setting', 5, () => { callbackCalled = true; });
+
+    MSP.promise = originalPromise;
+    mspHelper._getSetting = originalGetSetting;
+
+    assert.equal(result, false, 'a dropped setting write must not be reported as saved');
+    assert.equal(callbackCalled, false, 'the save chain must not advance past a setting that never reached the FC');
 });
 
 test('setSetting() propagates an exception thrown by the success callback instead of swallowing it', async () => {

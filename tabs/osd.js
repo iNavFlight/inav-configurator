@@ -17,6 +17,7 @@ import { PortHandler } from './../js/port_handler';
 import i18n from './../js/localization';
 import store from './../js/store';
 import dialog from './../js/dialog';
+import { resolveMspWrite } from './../js/mspWriteOutcome';
 
 var SYM = SYM || {};
 SYM.LAST_CHAR = 225; // For drawing the font preview
@@ -2615,24 +2616,13 @@ OSD.saveConfig = function(callback) {
 };
 
 // Resolves true on success, false if the FC refused the write or the queue
-// dropped it after exhausting retries (MSP.promise() can resolve with false
-// instead of rejecting for that case) - so callers that await the result
+// dropped it after exhausting retries - so callers that await the result
 // (bulk paste/clear) can detect a failed write instead of assuming it
-// landed. The success callback only runs when the write actually landed,
-// and its exceptions are not swallowed here - they propagate with the rest
-// of the fulfillment chain instead of being reported as a refused write.
+// landed.
 OSD.saveItem = function(item, callback) {
     let pos = OSD.data.items[item.id];
     let data = OSD.msp.encodeLayoutItem(OSD.data.selected_layout, item, pos);
-    return MSP.promise(MSPCodes.MSP2_INAV_OSD_SET_LAYOUT_ITEM, data).then(
-        function (result) { return result !== false; },
-        function () { return false; }
-    ).then(function (saved) {
-        if (saved && callback) {
-            callback();
-        }
-        return saved;
-    });
+    return resolveMspWrite(MSP.promise(MSPCodes.MSP2_INAV_OSD_SET_LAYOUT_ITEM, data), callback);
 };
 
 //noinspection JSUnusedLocalSymbols
