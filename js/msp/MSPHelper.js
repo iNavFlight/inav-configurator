@@ -27,6 +27,7 @@ import { FwApproach } from './../fwApproach';
 import Waypoint from './../waypoint';
 import mspDeduplicationQueue from './mspDeduplicationQueue';
 import mspStatistics from './mspStatistics';
+import { resolveMspWrite, guardMspCallback } from './../mspWriteOutcome';
 import settingsCache from './../settingsCache';
 import {Geozone, GeozoneVertex, GeozoneShapes } from './../geozone';
 import { parseDronecanAsyncRequestResponse } from './../dronecanAsyncRequestParse';
@@ -3078,7 +3079,7 @@ var mspHelper = (function () {
                 buffer.push(color.s);
                 buffer.push(color.v);
             }
-            MSP.send_message(MSPCodes.MSP_SET_LED_COLORS, buffer, false, onCompleteCallback);
+            MSP.send_message(MSPCodes.MSP_SET_LED_COLORS, buffer, false, guardMspCallback(onCompleteCallback));
         }
     };
 
@@ -3173,7 +3174,7 @@ var mspHelper = (function () {
             position++;
             var nextFunction = (position === indicesToSend.length) ? onCompleteCallback : send_next_led_strip_config;
 
-            MSP.send_message(MSPCodes.MSP2_INAV_SET_LED_STRIP_CONFIG_EX, buffer, false, nextFunction);
+            MSP.send_message(MSPCodes.MSP2_INAV_SET_LED_STRIP_CONFIG_EX, buffer, false, guardMspCallback(nextFunction));
         }
     };
 
@@ -3203,7 +3204,7 @@ var mspHelper = (function () {
                 nextFunction = onCompleteCallback;
             }
 
-            MSP.send_message(MSPCodes.MSP_SET_LED_STRIP_MODECOLOR, buffer, false, nextFunction);
+            MSP.send_message(MSPCodes.MSP_SET_LED_STRIP_MODECOLOR, buffer, false, guardMspCallback(nextFunction));
         }
     };
 
@@ -3821,16 +3822,17 @@ var mspHelper = (function () {
     };
 
     self.setSetting = function (name, value, callback) {
-        // The onRejected handler catches only encodeSetting() failures (invalid
-        // setting/value). A refused write rejects from MSP.promise() and is
-        // consumed by the trailing catch, without reaching callback, so the save
-        // chain stops instead of advancing to EEPROM persistence and reboot.
+        // resolveMspWrite() treats a refused write and a write the queue
+        // dropped after exhausting retries (MSP.promise() resolves false
+        // rather than rejecting for that case) the same way: stop the save
+        // chain without reaching callback. An exception thrown by callback
+        // itself still propagates instead of being silently swallowed.
         return this.encodeSetting(name, value).then(function (data) {
-            return MSP.promise(MSPCodes.MSPV2_SET_SETTING, data).then(callback);
+            return resolveMspWrite(MSP.promise(MSPCodes.MSPV2_SET_SETTING, data), callback);
         }, function (error) {
             console.log("Invalid setting: " + name, error);
             return Promise.resolve().then(callback);
-        }).catch(() => {});
+        });
     };
 
     self.getRTC = function (callback) {

@@ -17,6 +17,7 @@ import { PortHandler } from './../js/port_handler';
 import i18n from './../js/localization';
 import store from './../js/store';
 import dialog from './../js/dialog';
+import { resolveMspWrite } from './../js/mspWriteOutcome';
 
 var SYM = SYM || {};
 SYM.LAST_CHAR = 225; // For drawing the font preview
@@ -2614,19 +2615,14 @@ OSD.saveConfig = function(callback) {
     }).catch(() => {});
 };
 
-// Resolves true on success, false if the FC refused/dropped the write -
-// never rejects, so fire-and-forget callers (OSD.GUI.saveItem) don't produce
-// an unhandled rejection, while callers that await the result (bulk paste/
-// clear) can detect a failed write instead of assuming it landed.
+// Resolves true on success, false if the FC refused the write or the queue
+// dropped it after exhausting retries - so callers that await the result
+// (bulk paste/clear) can detect a failed write instead of assuming it
+// landed.
 OSD.saveItem = function(item, callback) {
     let pos = OSD.data.items[item.id];
     let data = OSD.msp.encodeLayoutItem(OSD.data.selected_layout, item, pos);
-    return MSP.promise(MSPCodes.MSP2_INAV_OSD_SET_LAYOUT_ITEM, data).then(function() {
-        if (callback) {
-            callback();
-        }
-        return true;
-    }).catch(() => false);
+    return resolveMspWrite(MSP.promise(MSPCodes.MSP2_INAV_OSD_SET_LAYOUT_ITEM, data), callback);
 };
 
 //noinspection JSUnusedLocalSymbols
