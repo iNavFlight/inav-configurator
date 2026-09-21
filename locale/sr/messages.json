@@ -96,13 +96,13 @@
     "message": "Nije povezano"
   },
   "backupFileIncompatible": {
-    "message": "Priloženi fajl rezervne kopije je generisan za prethodnu verziju konfiguratora i nije kompatibilan sa ovom verzijom konfiguratora. Izvinjavamo se."
+    "message": "Priložena datoteka rezervne kopije je generisana za prethodnu verziju konfiguratora i nije kompatibilna sa ovom verzijom konfiguratora. Izvinjavamo se."
   },
   "backupFileUnmigratable": {
-    "message": "Priloženi fajl rezervne kopije je generisan prethodnom verzijom konfiguratora i ne može se migrirati. Izvinjavamo se."
+    "message": "Priložena datoteka rezervne kopije je generisana prethodnom verzijom konfiguratora i ne može se migrirati. Izvinjavamo se."
   },
   "configMigrationFrom": {
-    "message": "Migracija konfiguracionog fajla koji je generisao konfigurator: $1"
+    "message": "Migracija konfiguracione datoteke koju je generisao konfigurator: $1"
   },
   "configMigratedTo": {
     "message": "Konfiguracija je migrirana na konfigurator: $1"
@@ -288,7 +288,7 @@
     "message": "Serijski prijemnik"
   },
   "sitlSerialProtocoll": {
-    "message": "Unapred podešene postavke serijskog porta za RX Protocol povezanog prijemnika"
+    "message": "Unapred podešene postavke serijskog porta za RX protokol povezanog prijemnika"
   },
   "sitlSerialStopbits": {
     "message": "Stop bitovi"
@@ -402,7 +402,7 @@
     "message": "Komunikacija sa bootloader-om nije uspela"
   },
   "stm32ResponseBootloaderFailed": {
-    "message": "Nema odgovora od bootloader-a, programiranje: NIJE USPELO"
+    "message": "Nema odgovora od bootloader-a, programiranje: NEUSPEŠNO"
   },
   "stm32GlobalEraseExtended": {
     "message": "Izvršavanje globalnog brisanja čipa (putem proširenog brisanja) ..."
@@ -525,10 +525,10 @@
     "message": "Opterećenje CPU-a: $1%"
   },
   "statusbar_arming_flags": {
-    "message": "Arming zastavice:"
+    "message": "Zastavice armovanja:"
   },
   "dfu_connect_message": {
-    "message": "Koristite Firmware Flasher za pristup DFU uređajima"
+    "message": "Koristite karticu Programiranje firmvera za pristup DFU uređajima"
   },
   "dfu_erased_kilobytes": {
     "message": "Obrisano $1 kB fleš memorije <span style=\"color: #37a8db\">uspešno</span>"
@@ -561,7 +561,7 @@
     "message": "Doprinos"
   },
   "defaultContributingText": {
-    "message": "Ako želite da pomognete da INAV bude još bolji, možete pomoći na mnogo načina, uključujući:<br /><ul><li>Odgovaranje na pitanja drugih korisnika na forumima i IRC-u.</li><li>Doprinos kôdu za firmver i configurator — nove mogućnosti, ispravke, poboljšanja</li><li>Testiranje <a href=\"https://github.com/iNavFlight/inav/pulls\" target=\"_blank\">novih mogućnosti/ispravki</a> i slanje povratnih informacija.</li><li>Pomoć oko <a href=\"https://github.com/iNavFlight/inav/issues\" target=\"_blank\">problema i komentarisanje zahteva za novim mogućnostima</a>.</li></ul>"
+    "message": "Ako želite da pomognete da INAV bude još bolji, možete pomoći na mnogo načina, uključujući:<br /><ul><li>Odgovaranje na pitanja drugih korisnika na forumima i IRC-u.</li><li>Doprinos kôdu za firmver i konfigurator — nove mogućnosti, ispravke, poboljšanja</li><li>Testiranje <a href=\"https://github.com/iNavFlight/inav/pulls\" target=\"_blank\">novih mogućnosti/ispravki</a> i slanje povratnih informacija.</li><li>Pomoć oko <a href=\"https://github.com/iNavFlight/inav/issues\" target=\"_blank\">problema i komentarisanje zahteva za novim mogućnostima</a>.</li></ul>"
   },
   "defaultChangelogHead": {
     "message": "Configurator - Dnevnik promena"
@@ -594,7 +594,7 @@
     "message": "Facebook grupa"
   },
   "initialSetupBackupAndRestoreApiVersion": {
-    "message": "<span style=\"color: red\">Funkcionalnost bekapovanja i obnavljanja je onemogućena.</span>  Imate firmver sa API verzijom <span style=\"color: red\">$1</span>, bekapovanje i obnavljanje zahtevaju <span style=\"color: #37a8db\">$2</span>. Napravite bekap podešavanja putem CLI-ja, pogledajte INAV dokumentaciju za postupak."
+    "message": "<span style=\"color: red\">Pravljenje i vraćanje rezervne kopije je onemogućeno.</span>  Imate firmver sa API verzijom <span style=\"color: red\">$1</span>, pravljenje i vraćanje rezervne kopije zahtevaju <span style=\"color: #37a8db\">$2</span>. Napravite rezervnu kopiju podešavanja putem CLI-ja, pogledajte INAV dokumentaciju za postupak."
   },
   "initialSetupButtonCalibrateAccel": {
     "message": "Kalibriši akcelerometar"
@@ -603,7 +603,7 @@
     "message": "Kalibracija akcelerometra u 6 tačaka. Idite na wiki za iNav i pratite Sensor Calibration za više informacija"
   },
   "initialSetupButtonCalibrateMag": {
-    "message": "Kalibriši magnetometer"
+    "message": "Kalibriši magnetometar"
   },
   "initialSetupCalibrateMagText": {
     "message": "Pomerite multirotor za najmanje <strong>360</strong> stepeni po svim osama rotacije, imate 30 sekundi da izvršite ovaj zadatak"
@@ -615,25 +615,25 @@
     "message": ""
   },
   "initialSetupButtonBackup": {
-    "message": "Bekap"
+    "message": "Napravi rezervnu kopiju"
   },
   "initialSetupButtonRestore": {
     "message": "Vrati"
   },
   "initialSetupBackupRestoreText": {
-    "message": "<strong>Sačuvajte bekap</strong> konfiguracije u slučaju nezgode, <strong>CLI</strong> podešavanja <span style=\"color: red\">nisu</span> uključena — pogledajte CLI komandu 'dump'"
+    "message": "<strong>Sačuvajte rezervnu kopiju</strong> konfiguracije u slučaju nezgode, <strong>CLI</strong> podešavanja <span style=\"color: red\">nisu</span> uključena — pogledajte CLI komandu 'dump'"
   },
   "initialSetupBackupSuccess": {
-    "message": "Bekap je <span style=\"color: #37a8db\">uspešno</span> sačuvan"
+    "message": "Rezervna kopija je <span style=\"color: #37a8db\">uspešno</span> sačuvana"
   },
   "initialSetupRestoreSuccess": {
     "message": "Konfiguracija je <span style=\"color: #37a8db\">uspešno</span> vraćena"
   },
   "initialSetupButtonResetZaxis": {
-    "message": "Resetuj Z osu, pomak: 0 deg"
+    "message": "Resetuj Z osu, pomeraj: 0 deg"
   },
   "initialSetupButtonResetZaxisValue": {
-    "message": "Resetuj Z osu, pomak: $1 deg"
+    "message": "Resetuj Z osu, pomeraj: $1 deg"
   },
   "initialSetupMixerHead": {
     "message": "Tip mixer-a"
@@ -675,7 +675,7 @@
     "message": "Roll:"
   },
   "initialSetupMagHead": {
-    "message": "Magnetometer"
+    "message": "Magnetometar"
   },
   "initialSetupDeclination": {
     "message": "Deklinacija:"
@@ -771,10 +771,13 @@
     "message": "Kalibracija akcelerometra je <span style=\"color: #37a8db\">završena</span>"
   },
   "initialSetupMagCalibStarted": {
-    "message": "Započeta Magnetometer kalibracija"
+    "message": "Započeta kalibracija magnetometra"
   },
   "initialSetupMagCalibEnded": {
-    "message": "Magnetometer kalibracija je <span style=\"color: #37a8db\">završena</span>"
+    "message": "Kalibracija magnetometra je <span style=\"color: #37a8db\">završena</span>"
+  },
+  "magCalibOrientationReportFailed": {
+    "message": "Rezultat poravnanja kompasa nije mogao da se pročita posle kalibracije — proverite vezu i ponovo otvorite ovu karticu."
   },
   "initialSetupOpflowCalibStarted": {
     "message": "Započeta kalibracija optičkog protoka"
@@ -786,7 +789,7 @@
     "message": "Podešavanja su vraćena na <strong>podrazumevana</strong>"
   },
   "initialSetupEepromSaved": {
-    "message": "EEPROM <span style=\"color: #37a8db\">sačuvan</span>: Setup"
+    "message": "EEPROM <span style=\"color: #37a8db\">sačuvan</span>: Status"
   },
   "RX_PPM": {
     "message": "PPM RX ulaz"
@@ -810,10 +813,10 @@
     "message": "Praćenje napona baterije"
   },
   "featureTX_PROF_SEL": {
-    "message": "Izbor profila komandom palice stanice"
+    "message": "Izbor profila komandom palica predajnika"
   },
   "featureINFLIGHT_ACC_CAL": {
-    "message": "Kalibracija nivelacije u letu"
+    "message": "Kalibracija nivelisanja u letu"
   },
   "featureMOTOR_STOP": {
     "message": "Zaustavljanje motora pri niskom throttle-u"
@@ -879,7 +882,7 @@
     "message": "Omogući izlaz za motore i servo"
   },
   "featurePWM_OUTPUT_ENABLETip": {
-    "message": "Omogućavanje ove opcije je neophodno da bi iNav slao signale ka ESC. Ovo je bezbednosna mera koja sprečava oštećenje servo-a odmah nakon flešovanja kontrolera leta."
+    "message": "Omogućavanje ove opcije je neophodno da bi INAV slao signale ka ESC. Ovo je bezbednosna mera koja sprečava oštećenje servoa odmah nakon flešovanja kontrolera leta."
   },
   "featureBLACKBOX": {
     "message": "Blackbox snimač podataka o letu"
@@ -891,7 +894,10 @@
     "message": "Blackbox uređaj za beleženje"
   },
   "onboardLoggingBlackboxRate": {
-    "message": "Udeo iteracija petlje leta za zapisivanje (učestalost zapisivanja)"
+    "message": "Udeo iteracija petlje leta za beleženje (učestalost beleženja)"
+  },
+  "onboardLoggingSecondaryGyroNotSaved": {
+    "message": "Podešavanje drugog žiroskopa <span style=\"color: #e74c3c\">nije sačuvano</span>: kontroler leta ga nije prihvatio. U EEPROM nije upisano ništa."
   },
   "featureCHANNEL_FORWARDING": {
     "message": "Prosledi aux kanale na servo izlaze"
@@ -903,7 +909,7 @@
     "message": "Eksterni PWM servo drajver"
   },
   "featurePWM_SERVO_DRIVERTip": {
-    "message": "Koristite eksterni PCA9685 PWM drajver za povezivanje do 16 servoa na kontrolor leta. PCA9685 mora biti povezan kako bi se omogućila ova funkcija."
+    "message": "Koristite eksterni PCA9685 PWM drajver za povezivanje do 16 servoa na kontroler leta. PCA9685 mora biti povezan kako bi se omogućila ova funkcija."
   },
   "featureRSSI_ADCTip": {
     "message": "RSSI je merenje jačine signala i veoma je koristan kako biste znali kada vaša letelica izlazi iz dometa ili trpi RF smetnje."
@@ -915,16 +921,16 @@
     "message": "Trajno omogući AIRMODE"
   },
   "featureFW_LAUNCH": {
-    "message": "Trajno omogući Launch Mode za Fixed Wing"
+    "message": "Trajno omogući Launch Mode za fiksno krilo"
   },
   "featureFW_AUTOTRIM": {
-    "message": "Kontinuirano trimuj servoa na Fixed Wing"
+    "message": "Kontinuirano trimuj servoe na fiksnom krilu"
   },
   "featureFW_AUTOTRIMTip": {
-    "message": "Tokom leta u stabilizovanom režimu, kontinuirano podešava srednje tačke servoa kako bi avion nastavio da leti pravo pri prelasku na manual režim. Zahteva GPS."
+    "message": "Tokom leta u stabilizovanom režimu, kontinuirano podešava srednje tačke servoa kako bi avion nastavio da leti pravo pri prelasku na MANUAL režim. Zahteva GPS."
   },
   "featureDYNAMIC_FILTERS": {
-    "message": "Dinamički gyro filteri"
+    "message": "Dinamički filteri žiroskopa"
   },
   "featureDYNAMIC_FILTERSTip": {
     "message": "Koristite automatsku FFT analizu žiroskopa za podešavanje notch filtera radi prigušivanja šuma žiroskopa. Treba da bude omogućeno sve vreme!"
@@ -1011,7 +1017,7 @@
     "message": "Sekunde do razoružavanja usled niskog THR"
   },
   "configurationAutoDisarmDelayHelp": {
-    "message": "Koristi se samo za arming palicom (tj. bez korišćenja prekidača)"
+    "message": "Koristi se samo za armovanje palicom (tj. bez korišćenja prekidača)"
   },
   "configurationThrottleMinimum": {
     "message": "Minimalni throttle"
@@ -1158,13 +1164,13 @@
     "message": "Prag brzine"
   },
   "configurationLaunchVelocityHelp": {
-    "message": "Prag brzine unapred za detekciju swing-launch-a. Podrazumevano: 300 [100-10000]"
+    "message": "Prag brzine unapred za detekciju launch-a zamahom. Podrazumevano: 300 [100-10000]"
   },
   "configurationLaunchAccel": {
     "message": "Prag ubrzanja"
   },
   "configurationLaunchAccelHelp": {
-    "message": "Prag ubrzanja unapred za bungee launch ili throw launch, 1G = 981 cm/s/s. Podrazumevano: 1863 [1000-20000]"
+    "message": "Prag ubrzanja unapred za launch pomoću bungee užeta ili bacanjem iz ruke, 1G = 981 cm/s/s. Podrazumevano: 1863 [1000-20000]"
   },
   "configurationLaunchMaxAngle": {
     "message": "Maksimalni ugao bacanja"
@@ -1230,7 +1236,7 @@
     "message": "Vreme završetka tranzicije"
   },
   "configurationLaunchEndTimeHelp": {
-    "message": "Vreme blage tranzicije na kraju launch sekvence (ms). Ovo se dodaje na Launch Timeout. Podrazumevano: 2000 [0-5000]"
+    "message": "Vreme blage tranzicije na kraju launch sekvence (ms). Ovo se dodaje na „Vremensko ograničenje za launch“. Podrazumevano: 2000 [0-5000]"
   },
   "configurationLaunchMaxAltitude": {
     "message": "Maksimalna visina"
@@ -1254,7 +1260,7 @@
     "message": "Gornja mrtva zona reverzibilnih motora"
   },
   "configuration3dNeutral": {
-    "message": "Neutral reverzibilnih motora"
+    "message": "Neutralni položaj reverzibilnih motora"
   },
   "configuration3dDeadbandThrottle": {
     "message": "Mrtva zona throttle-a za reverzibilne motore"
@@ -1284,10 +1290,10 @@
     "message": "GPS koristi Glonass satelite (RU)"
   },
   "gpsPresetMode": {
-    "message": "Predpodešavanje GPS konfiguracije"
+    "message": "Preset GPS konfiguracije"
   },
   "gpsPresetModeHelp": {
-    "message": "Izaberite predpodešavanje optimizovano za vaš GPS modul ili koristite Manual za prilagođenu konfiguraciju. Automatska detekcija će prepoznati vaš GPS modul ako je povezan."
+    "message": "Izaberite preset optimizovan za vaš GPS modul ili koristite Manual Settings za prilagođenu konfiguraciju. Automatska detekcija će prepoznati vaš GPS modul ako je povezan."
   },
   "gpsUpdateRate": {
     "message": "Učestalost osvežavanja GPS-a (Hz)"
@@ -1296,7 +1302,7 @@
     "message": "Koliko često GPS modul šalje osveženja pozicije. Veće brzine pružaju manje kašnjenje, ali mogu smanjiti preciznost pri korišćenju više konstelacija na M10 modulima."
   },
   "gpsAutoDetectFailed": {
-    "message": "Automatsko prepoznavanje GPS modula nije uspelo. Povežite kontrolor leta ili izaberite ručno podešavanje."
+    "message": "Automatsko prepoznavanje GPS modula nije uspelo. Povežite kontroler leta ili izaberite ručno podešavanje."
   },
   "gpsAutoDetectSuccess": {
     "message": "Detektovan GPS modul:"
@@ -1356,10 +1362,10 @@
     "message": "Nivo snage VTX-a. Tačna snaga u mW (ili dBm) zavisi od konkretnog hardvera. Proverite uputstvo za VTX."
   },
   "configurationVTXLowerPowerDisarm": {
-    "message": "Koristite malu snagu dok je letelica disarmed"
+    "message": "Koristite malu snagu dok je letelica razoružana"
   },
   "configurationVTXLowerPowerDisarmHelp": {
-    "message": "Omogućavanje ove opcije čini da VTX koristi svoju najnižu snagu dok je letelica disarmed. Koristite 'Until first arm' da bi se najniža snaga koristila samo do prvog arming-a."
+    "message": "Omogućavanje ove opcije čini da VTX koristi svoju najnižu snagu dok je letelica razoružana. Koristite 'Do prvog armovanja' da bi se najniža snaga koristila samo do prvog armovanja."
   },
   "configurationVTXLowPowerDisarmValue_0": {
     "message": "Onemogućeno"
@@ -1368,7 +1374,7 @@
     "message": "Uvek"
   },
   "configurationVTXLowPowerDisarmValue_2": {
-    "message": "Do prvog arming-a"
+    "message": "Do prvog armovanja"
   },
   "configurationGimbal": {
     "message": "Serijski gimbal"
@@ -1426,6 +1432,111 @@
   },
   "portsFunction_OPFLOW": {
     "message": "Optički protok"
+  },
+  "portsBaudFixedByProtocol": {
+    "message": "Ovaj protokol sam određuje brzinu prenosa i zanemaruje ovo podešavanje. SRXL2 se otvara na 115200, kako specifikacija zahteva, a zatim tokom uspostavljanja veze pregovara o većoj brzini."
+  },
+  "portsFunction_ESC_SRXL2": {
+    "message": "Spektrum Smart ESC (SRXL2)"
+  },
+  "srxl2Info": {
+    "message": "Signalna žica ESC-a ide na TX pin porta dodeljenog funkciji Spektrum Smart ESC, a ne na lemnu pločicu za motor, i istom žicom vraća telemetriju. Jedan ESC po portu: modelu sa više motora treba po jedan port za svaki motor, dodeljen redom motora, pa je motor 1 port sa najmanjim brojem."
+  },
+  "srxl2ProtocolAutoSet": {
+    "message": "ESC protokol je postavljen na SRXL2, da odgovara portu dodeljenom funkciji Spektrum Smart ESC. Promenite ga na kartici Izlazi ako to niste želeli."
+  },
+  "srxl2ProtocolNotSet": {
+    "message": "Port je dodeljen funkciji Spektrum Smart ESC, ali ESC protokol iznad nije SRXL2 — pa se port nikada ne otvara i motor se ne pokreće. Postavite protokol na SRXL2, pa sačuvajte i ponovo pokrenite ploču. Dodeljivanje porta i izbor protokola su dva odvojena podešavanja."
+  },
+  "srxl2NoPort": {
+    "message": "Nijedan port nije dodeljen funkciji Spektrum Smart ESC. Dodelite jedan na kartici Portovi, inače se motor uopšte neće pokretati — ovaj protokol nema povratak na PWM, jer taj pin nije izlaz tajmera."
+  },
+  "srxl2TooFewPorts": {
+    "message": "Broj motora na ovom modelu: $1, a broj SRXL2 portova koje je ploča otvorila: $2. Jedan ESC traži jedan port, pa na kartici Portovi dodelite po jedan za svaki motor. Ploča neće dozvoliti armovanje dok se ta dva broja ne izjednače."
+  },
+  "srxl2PortCountOpenNoMixer": {
+    "message": "Broj otvorenih SRXL2 portova na ploči: $1. Izaberite model na kartici Mixer da biste odredili koliko motora ima."
+  },
+  "srxl2PortCountOpen": {
+    "message": "Broj otvorenih SRXL2 portova na ploči: $1, a broj motora: $2. Motor 1 koristi port sa najmanjim brojem."
+  },
+  "srxl2PortNeedsReboot": {
+    "message": "Broj portova dodeljenih funkciji Spektrum Smart ESC: $1, ali ploča nije otvorila nijedan. Portovi se otvaraju pri pokretanju — sačuvajte i ponovo pokrenite ploču."
+  },
+  "srxl2PortCount": {
+    "message": "Broj portova dodeljenih funkciji Spektrum Smart ESC: $1. Motor 1 koristi onaj sa najmanjim brojem."
+  },
+  "srxl2Telemetry": {
+    "message": "Čitaj telemetriju sa ESC-a"
+  },
+  "srxl2TelemetryHelp": {
+    "message": "Telemetrija deli žicu za throttle, pa za razliku od običnog ESC-a ovde nema porta koji bi se ostavio nedodeljen. Isključite ovo da se sa ESC-a ne čita ništa."
+  },
+  "portsBaudAuto": {
+    "message": "auto"
+  },
+  "srxl2TelemetryRate": {
+    "message": "Traženje telemetrije od ESC-a"
+  },
+  "srxl2TelemetryRateHelp": {
+    "message": "Odgovor deli žicu za throttle sa upravljačkim podacima, pa brža učestalost ostavlja manje rezerve na magistrali. Od bržih podešavanja korist ima samo RPM filter; sve ostalo je prikaz i sasvim se dobro čita na nekoliko herca."
+  },
+  "srxl2ReverseEnable": {
+    "message": "Obrnuti potisak"
+  },
+  "srxl2ReverseEnableHelp": {
+    "message": "Uključite samo ako je ESC programiran za obrnuti potisak. Kada je uključeno, dodelite režim THRUST REVERSE prekidaču na kartici Režimi — to je ono što ga zaista aktivira u letu."
+  },
+  "srxl2ReverseChannel": {
+    "message": "Obrnuti potisak: kanal na ESC-u"
+  },
+  "srxl2ReverseChannelHelp": {
+    "message": "Koji kanal na SRXL2 žici nosi signal za obrnuti potisak do ESC-a. Ovo NIJE kanal na predajniku — mora da odgovara parametru „Thrust Rev.“ u samom ESC-u, jer ga ništa na žici ne objavljuje. Spektrum dozvoljava kanale od 5 do 9, a fabrički je podešen kanal 7. Postavite 0 ako ESC nema obrnuti potisak. Da biste ga koristili u letu, dodelite režim THRUST REVERSE prekidaču na kartici Režimi."
+  },
+  "srxl2CalibrateTitle": {
+    "message": "Kalibracija opsega throttle-a"
+  },
+  "srxl2CalibrateWarning": {
+    "message": "SKINITE PROPELER. Ovaj postupak dovodi pun throttle na ESC. Baterija mora biti odspojena da bi postupak počeo: ESC uči svoje krajnje tačke samo pri uključivanju napajanja."
+  },
+  "srxl2CalibrateAck": {
+    "message": "Propeler je skinut i baterija je odspojena"
+  },
+  "srxl2CalibrateRefused": {
+    "message": "Kontroler leta je odbio da pokrene kalibraciju."
+  },
+  "srxl2CalibrateRefusedArmed": {
+    "message": "Odbijeno: letelica je armovana. Prvo je razoružajte — ovaj postupak dovodi pun throttle."
+  },
+  "srxl2CalibrateRefusedNoPort": {
+    "message": "Odbijeno: nijedan SRXL2 ESC port nije otvoren. Dodelite jedan na kartici Portovi, postavite ESC protokol na SRXL2 i ponovo pokrenite ploču."
+  },
+  "srxl2CalibrateRefusedBattery": {
+    "message": "Odbijeno: baterija je priključena. ESC uči svoj opseg throttle-a samo pri uključivanju napajanja, pa postupak mora da počne sa odspojenom baterijom."
+  },
+  "srxl2CalibrateRefusedNoSensor": {
+    "message": "Odbijeno: ova ploča ne meri napon baterije, pa ne može da prepozna kada se ESC uključi. Umesto toga koristite esc_calibrate high / low iz CLI-ja."
+  },
+  "srxl2CalibrateStart": {
+    "message": "Pokreni kalibraciju"
+  },
+  "srxl2CalibrateAbort": {
+    "message": "Prekini"
+  },
+  "srxl2CalibrateConnect": {
+    "message": "Pun throttle je na žici. Sada priključite bateriju."
+  },
+  "srxl2CalibrateHeard": {
+    "message": "ESC je dobio napajanje. Pun throttle se drži dok ESC prihvata gornju krajnju tačku."
+  },
+  "srxl2CalibrateLow": {
+    "message": "Throttle je spušten. Osluškujte broj ćelija, pa zatim jedan dug ton."
+  },
+  "srxl2CalibrateDone": {
+    "message": "Završeno. Dug ton sa ESC-a znači da je opseg sačuvan."
+  },
+  "srxl2CalibrateAborted": {
+    "message": "Prekinuto. Throttle je vraćen pod normalno upravljanje."
   },
   "portsFunction_ESC": {
     "message": "ESC izlaz/telemetrija"
@@ -1554,10 +1665,10 @@
     "message": "Angle/Horizon"
   },
   "pidTuning_Altitude": {
-    "message": "Barometer & Sonar/Visina"
+    "message": "Barometar i sonar/Visina"
   },
   "pidTuning_Mag": {
-    "message": "Magnometer/Pravac"
+    "message": "Magnetometar/Pravac"
   },
   "pidTuning_GPS": {
     "message": "GPS navigacija"
@@ -1581,25 +1692,25 @@
     "message": "Stabilizovane brzine"
   },
   "pidTuning_Rates_Roll": {
-    "message": "Valjanje (°/s)"
+    "message": "Roll (°/s)"
   },
   "pidTuning_Rates_Pitch": {
-    "message": "Naginjanje (°/s)"
+    "message": "Pitch (°/s)"
   },
   "pidTuning_Rates_Yaw": {
-    "message": "Skretanje (°/s)"
+    "message": "Yaw (°/s)"
   },
   "pidTuning_Expo_Stabilized": {
-    "message": "Stabilizovani ekspo"
+    "message": "Stabilizovani Expo"
   },
   "pidTuning_Expo_Manual": {
-    "message": "Ručni ekspo"
+    "message": "Ručni Expo"
   },
   "pidTuning_Expo_RollPitch": {
-    "message": "Valjanje i naginjanje (%)"
+    "message": "Roll & Pitch (%)"
   },
   "pidTuning_Expo_Yaw": {
-    "message": "Skretanje (%)"
+    "message": "Yaw (%)"
   },
   "pidTuning_RateDynamics": {
     "message": "Dinamika odziva"
@@ -1632,10 +1743,10 @@
     "message": "YAW brzina"
   },
   "pidTuning_RollAndPitchExpo": {
-    "message": "Roll & Pitch ekspo"
+    "message": "Roll & Pitch Expo"
   },
   "pidTuning_YawExpo": {
-    "message": "Yaw ekspo"
+    "message": "Yaw Expo"
   },
   "pidTuning_MaxRollAngle": {
     "message": "Maks. ROLL ugao"
@@ -1659,31 +1770,31 @@
     "message": "Ručna YAW brzina"
   },
   "pidTuning_magHoldYawRate": {
-    "message": "Ograničenje Heading Hold brzine"
+    "message": "Ograničenje brzine držanja pravca"
   },
   "pidTuning_MagHoldYawRateHelp": {
-    "message": "Maksimalna brzina YAW rotacije koju MagHold kontroler može zahtevati od UAV-a. Koristi se samo kada je omogućen MagHold režim, tokom RTH i WAYPOINT navigacije. Vrednosti ispod 30dps daju lepa \"cinematic\" skretanja"
+    "message": "Maksimalna brzina YAW rotacije koju MagHold kontroler može zahtevati od UAV-a. Koristi se samo kada je omogućen MagHold režim, tokom RTH i WAYPOINT navigacije. Vrednosti ispod 30dps daju lepa \"filmska\" skretanja"
   },
   "pidTuning_Filters": {
     "message": "Filteri"
   },
   "pidTuning_mainFilters": {
-    "message": "Žiro filteri"
+    "message": "Filteri žiroskopa"
   },
   "pidTuning_advancedFilters": {
-    "message": "Napredni žiro filteri"
+    "message": "Napredni filteri žiroskopa"
   },
   "pidTuning_gyro_main_lpf_hz": {
-    "message": "Granična frekvencija glavnog žiro filtera"
+    "message": "Granična frekvencija glavnog filtera žiroskopa"
   },
   "pidTuning_gyro_main_lpf_hz_help": {
-    "message": "Veće vrednosti nude manje kašnjenje ali više šuma. Manje vrednosti nude manje šuma, ali veće kašnjenje pri obradi žiro signala"
+    "message": "Veće vrednosti nude manje kašnjenje ali više šuma. Manje vrednosti nude manje šuma, ali veće kašnjenje pri obradi signala žiroskopa"
   },
   "pidTuning_MatrixFilterMinFrequency": {
     "message": "Minimalna frekvencija Matrix filtera"
   },
   "pidTuning_MatrixFilterMinFrequencyHelp": {
-    "message": "Minimalna frekvencija za Matrix filter. Vrednost treba da zavisi od veličine elise. 150Hz radi dobro sa 5&quot; i manjim. Za 7&quot; i veće smanjite čak i ispod 100Hz."
+    "message": "Minimalna frekvencija za Matrix filter. Vrednost treba da zavisi od veličine propelera. 150Hz radi dobro sa 5&quot; i manjim. Za 7&quot; i veće smanjite čak i ispod 100Hz."
   },
   "pidTuning_MatrixFilterQFactor": {
     "message": "Q faktor Matrix filtera"
@@ -1704,13 +1815,13 @@
     "message": "Niskopropusni granični filter za Dterm za sve PID kontrolere"
   },
   "pidTuning_rpmFilters": {
-    "message": "Gyro RPM filteri"
+    "message": "RPM filteri žiroskopa"
   },
   "pidTuning_rpm_gyro_filter_enabled": {
-    "message": "Gyro RPM filter (zahteva ESC telemetriju)"
+    "message": "RPM filter žiroskopa (zahteva ESC telemetriju)"
   },
   "pidTuning_rpm_gyro_min_hz": {
-    "message": "Gyro RPM filter min. frekvencija"
+    "message": "Min. frekvencija RPM filtera žiroskopa"
   },
   "pidTuning_Mechanics": {
     "message": "Mehanika"
@@ -1761,10 +1872,10 @@
     "message": "D-Boost je potpuno aktivan kada ugaono ubrzanje (bilo detektovano žiroskopom ili ciljnom brzinom) dostigne zadato ubrzanje. Između 0 i ove vrednosti, D-Boost faktor se skalira linearno"
   },
   "pidTuning_d_boost_gyro_delta_lpf_hz": {
-    "message": "D-Boost gyro LPF"
+    "message": "D-Boost LPF žiroskopa"
   },
   "pidTuning_d_boost_gyro_delta_lpf_hz_help": {
-    "message": "Treba podesiti na frekvenciju oscilacija usled strujanja elise. Kvadovi od 5 inča najbolje rade na oko 80Hz, a od 7 inča na oko 50Hz"
+    "message": "Treba podesiti na frekvenciju oscilacija usled strujanja propelera. Kvadovi od 5 inča najbolje rade na oko 80Hz, a od 7 inča na oko 50Hz"
   },
   "pidTuning_tpaMechanics": {
     "message": "Prigušenje PID potiska"
@@ -1779,7 +1890,7 @@
     "message": "Vremenska konstanta TPA za fiksna krila"
   },
   "pidTuning_FW_TPATimeConstantHelp": {
-    "message": "Vremenska konstanta glačanja i kašnjenja TPA radi odražavanja ne-trenutnog odziva brzine/throttle-a aviona."
+    "message": "Vremenska konstanta ublažavanja i kašnjenja TPA radi odražavanja ne-trenutnog odziva brzine/throttle-a aviona."
   },
   "pidTuning_fwLevelTrimMechanics": {
     "message": "Mehanika fiksnog krila"
@@ -1803,7 +1914,7 @@
     "message": "Učitani profil: <strong style=\"color: #37a8db\">$1</strong>"
   },
   "pidTuning_Manual_Rates": {
-    "message": "Manual rates"
+    "message": "Ručne brzine"
   },
   "pidTuning_Manual_Roll": {
     "message": "Roll (%)"
@@ -1812,16 +1923,16 @@
     "message": "Pitch (%)"
   },
   "pidTuning_Manual_Yaw": {
-    "message": "Skretanje (%)"
+    "message": "Yaw (%)"
   },
   "pidTuning_gyro_dyn_lpf_min_hz": {
-    "message": "Dinamička žiro LPF min. granična frekvencija"
+    "message": "Min. granična frekvencija dinamičkog LPF-a žiroskopa"
   },
   "pidTuning_gyro_dyn_lpf_max_hz": {
-    "message": "Dinamička žiro LPF max. granična frekvencija"
+    "message": "Maks. granična frekvencija dinamičkog LPF-a žiroskopa"
   },
   "pidTuning_gyro_dyn_lpf_curve_expo": {
-    "message": "Expo krive dinamičkog žiro LPF-a"
+    "message": "Expo krive dinamičkog LPF-a žiroskopa"
   },
   "pidTuning_gyro_dyn_lpf_min_hz_help": {
     "message": "Definiše graničnu frekvenciju LPF filtera žiroskopa pri minimalnom throttle-u. Kada se throttle poveća, granična frekvencija LPF filtera se takođe povećava, sve do maksimalne granične frekvencije."
@@ -1830,13 +1941,13 @@
     "message": "Definiše graničnu frekvenciju LPF filtera žiroskopa pri maksimalnom throttle-u. Kada se throttle smanji, granična frekvencija LPF filtera se takođe smanjuje, sve do minimalne granične frekvencije."
   },
   "loadedMixerProfile": {
-    "message": "Učitan mixer profil: <strong style=\"color: #37a8db\">$1</strong>, proverite karticu sa režimima: MIXER PROFILE 2 ako ne vidite promene"
+    "message": "Učitan mixer profil: <strong style=\"color: #37a8db\">$1</strong>, proverite karticu Režimi: MIXER PROFILE 2 ako ne vidite promene"
   },
   "loadedBatteryProfile": {
     "message": "Učitan profil baterije: <strong style=\"color: #37a8db\">$1</strong>"
   },
   "setControlProfile": {
-    "message": "Postavljen upravljački profil: <strong style=\"color: #37a8db\">$1</strong>"
+    "message": "Postavljen profil upravljanja: <strong style=\"color: #37a8db\">$1</strong>"
   },
   "setMixerProfile": {
     "message": "Podešavanje mixer profila: <strong style=\"color: #37a8db\">$1</strong>"
@@ -1848,10 +1959,10 @@
     "message": "PID podaci su <strong>osveženi</strong>"
   },
   "pidTuningEepromSaved": {
-    "message": "EEPROM je <span style=\"color: #37a8db\">sačuvan</span>: PID podešavanje"
+    "message": "EEPROM <span style=\"color: #37a8db\">sačuvan</span>: Fino podešavanje"
   },
   "receiverHelp": {
-    "message": "Molimo pročitajte poglavlje o prijemniku u dokumentaciji. Podesite serijski port (ako je potrebno), režim prijemnika (serial/ppm/pwm), provajdera (za serijske prijemnike), povežite prijemnik, podesite raspored kanala, podesite krajnje vrednosti/opseg kanala na TX-u tako da svi kanali idu od ~1000 do ~2000. Podesite srednju tačku (podrazumevano 1500), trimujte kanale na 1500, podesite mrtvu zonu palica, proverite ponašanje kada je TX isključen ili izvan dometa. Uverite se da se sve vrednosti kanala povećavaju kada gurnete palice nagore i udesno. Ako to nije slučaj, obrnite smer kanala na TX-u. Nemojte primenjivati nikakvo drugo miksovanje na TX-u.<br /><span style=\"color: red\">VAŽNO:</span> Pre letenja pročitajte poglavlje o failsafe-u u dokumentaciji i podesite failsafe."
+    "message": "Molimo pročitajte poglavlje o prijemniku u dokumentaciji. Podesite serijski port (ako je potrebno), režim prijemnika (serial/ppm/pwm), provajdera (za serijske prijemnike), povežite prijemnik, podesite mapu kanala, podesite krajnje vrednosti/opseg kanala na TX-u tako da svi kanali idu od ~1000 do ~2000. Podesite srednju tačku (podrazumevano 1500), trimujte kanale na 1500, podesite mrtvu zonu palica, proverite ponašanje kada je TX isključen ili izvan dometa. Uverite se da se sve vrednosti kanala povećavaju kada gurnete palice nagore i udesno. Ako to nije slučaj, obrnite smer kanala na TX-u. Nemojte primenjivati nikakvo drugo miksovanje na TX-u.<br /><span style=\"color: red\">VAŽNO:</span> Pre letenja pročitajte poglavlje o failsafe-u u dokumentaciji i podesite failsafe."
   },
   "receiverThrottleMid": {
     "message": "Throttle sredina"
@@ -1860,7 +1971,7 @@
     "message": "Throttle EXPO"
   },
   "receiverRcRate": {
-    "message": "RC odziv"
+    "message": "RC Rate"
   },
   "receiverDeadband": {
     "message": "RC mrtva zona"
@@ -1911,13 +2022,13 @@
     "message": "Upravljačke palice"
   },
   "receiverDataRefreshed": {
-    "message": "RC Tuning podaci su <strong>osveženi</strong>"
+    "message": "Podaci o podešavanju komandi su <strong>osveženi</strong>"
   },
   "receiverEepromSaved": {
     "message": "EEPROM <span style=\"color: #37a8db\">sačuvan</span>: Prijemnik"
   },
   "auxiliaryHelp": {
-    "message": "Koristite opsege za definisanje prekidača na predajniku i odgovarajućih dodela režima. Kanal prijemnika koji daje očitavanje između min/maks opsega aktiviraće režim. Ne zaboravite da sačuvate podešavanja pomoću dugmeta Sačuvaj (Save)."
+    "message": "Koristite opsege za definisanje prekidača na predajniku i odgovarajućih dodela režima. Kanal prijemnika koji daje očitavanje između min/maks opsega aktiviraće režim. Ne zaboravite da sačuvate podešavanja pomoću dugmeta Sačuvaj."
   },
   "auxiliaryToggleUnused": {
     "message": "Sakrij nekorišćene režime"
@@ -1953,7 +2064,7 @@
     "message": "Koristite Slot 1 i 3POS prekidač na CH5 za izbor između Pitch/Roll P, I i D, i drugi 3POS prekidač na CH6 za povećanje ili smanjenje vrednosti kada se drži nagore ili nadole."
   },
   "adjustmentsExample2": {
-    "message": "Koristite Slot 2 i 3POS prekidač na CH8 za omogućavanje izbora Rate Profile-a preko istog 3POS prekidača na istom kanalu."
+    "message": "Koristite Slot 2 i 3POS prekidač na CH8 za omogućavanje izbora Rate profila preko istog 3POS prekidača na istom kanalu."
   },
   "adjustmentsColumnEnable": {
     "message": "Ako je omogućeno"
@@ -2007,7 +2118,7 @@
     "message": "Bez promena"
   },
   "adjustmentsFunction1": {
-    "message": "Podešavanje RC rate-a"
+    "message": "Podešavanje RC Rate-a"
   },
   "adjustmentsFunction2": {
     "message": "Podešavanje RC Expo-a"
@@ -2016,46 +2127,46 @@
     "message": "Podešavanje Throttle Expo-a"
   },
   "adjustmentsFunction4": {
-    "message": "Podešavanje Pitch & Roll rate-a"
+    "message": "Podešavanje Pitch & Roll brzine"
   },
   "adjustmentsFunction5": {
-    "message": "Podešavanje Yaw rate-a"
+    "message": "Podešavanje Yaw brzine"
   },
   "adjustmentsFunction6": {
-    "message": "Podešavanje Pitch & Roll P-a"
+    "message": "Podešavanje Pitch & Roll P"
   },
   "adjustmentsFunction7": {
-    "message": "Podešavanje Pitch & Roll I-a"
+    "message": "Podešavanje Pitch & Roll I"
   },
   "adjustmentsFunction8": {
-    "message": "Pitch i Roll D"
+    "message": "Pitch & Roll D"
   },
   "adjustmentsFunction9": {
-    "message": "Pitch i Roll CD/FF podešavanje"
+    "message": "Podešavanje Pitch & Roll CD/FF"
   },
   "adjustmentsFunction10": {
-    "message": "Pitch P podešavanje"
+    "message": "Podešavanje Pitch P"
   },
   "adjustmentsFunction11": {
-    "message": "Pitch I podešavanje"
+    "message": "Podešavanje Pitch I"
   },
   "adjustmentsFunction12": {
-    "message": "Pitch D podešavanje"
+    "message": "Podešavanje Pitch D"
   },
   "adjustmentsFunction13": {
-    "message": "Pitch CD/FF podešavanje"
+    "message": "Podešavanje Pitch CD/FF"
   },
   "adjustmentsFunction14": {
-    "message": "Roll P podešavanje"
+    "message": "Podešavanje Roll P"
   },
   "adjustmentsFunction15": {
-    "message": "Roll I podešavanje"
+    "message": "Podešavanje Roll I"
   },
   "adjustmentsFunction16": {
-    "message": "Roll D podešavanje"
+    "message": "Podešavanje Roll D"
   },
   "adjustmentsFunction17": {
-    "message": "Roll CD/FF podešavanje"
+    "message": "Podešavanje Roll CD/FF"
   },
   "adjustmentsFunction18": {
     "message": "Podešavanje Yaw P"
@@ -2073,19 +2184,19 @@
     "message": "Izbor Rate profila"
   },
   "adjustmentsFunction23": {
-    "message": "Pitch odziv"
+    "message": "Pitch brzina"
   },
   "adjustmentsFunction24": {
-    "message": "Roll odziv"
+    "message": "Roll brzina"
   },
   "adjustmentsFunction25": {
-    "message": "Podešavanje RC Yaw Expo"
+    "message": "Podešavanje RC Yaw Expo-a"
   },
   "adjustmentsFunction26": {
-    "message": "Podešavanje Manual RC Expo"
+    "message": "Podešavanje ručnog RC Expo-a"
   },
   "adjustmentsFunction27": {
-    "message": "Podešavanje Manual RC Yaw Expo"
+    "message": "Podešavanje ručnog RC Yaw Expo-a"
   },
   "adjustmentsFunction28": {
     "message": "Podešavanje ručne brzine za Pitch i Roll"
@@ -2100,10 +2211,10 @@
     "message": "Podešavanje ručne brzine za Yaw"
   },
   "adjustmentsFunction32": {
-    "message": "Podešavanje Navigation FW Cruise Throttle-a"
+    "message": "Podešavanje throttle-a za krstarenje u FW navigaciji"
   },
   "adjustmentsFunction33": {
-    "message": "Podešavanje Navigation FW Pitch to Throttle-a"
+    "message": "Podešavanje odnosa pitch-a i throttle-a za FW navigaciju"
   },
   "adjustmentsFunction34": {
     "message": "Podešavanje Roll poravnanja ploče"
@@ -2112,10 +2223,10 @@
     "message": "Podešavanje Pitch poravnanja ploče"
   },
   "adjustmentsFunction36": {
-    "message": "Podešavanje Level P vrednosti"
+    "message": "Podešavanje Level P"
   },
   "adjustmentsFunction37": {
-    "message": "Podešavanje Level I vrednosti"
+    "message": "Podešavanje Level I"
   },
   "adjustmentsFunction38": {
     "message": "Podešavanje Level D"
@@ -2166,7 +2277,7 @@
     "message": "Podešavanje nivoa snage VTX-a"
   },
   "adjustmentsFunction54": {
-    "message": "Podešavanje slabljenja PID potiska (TPA)"
+    "message": "Podešavanje prigušenja PID potiska (TPA)"
   },
   "adjustmentsFunction55": {
     "message": "Podešavanje TPA prelomne tačke"
@@ -2190,7 +2301,7 @@
     "message": "Sačuvaj"
   },
   "adjustmentsEepromSaved": {
-    "message": "EEPROM <span style=\"color: #37a8db\">sačuvan</span>: Podešavanja"
+    "message": "EEPROM <span style=\"color: #37a8db\">sačuvan</span>: Prilagođavanja"
   },
   "programmingEepromSaved": {
     "message": "EEPROM <span style=\"color: #37a8db\">sačuvan</span>: Programiranje"
@@ -2217,7 +2328,7 @@
     "message": "Izlaz"
   },
   "servosRate": {
-    "message": "Stopa (%)"
+    "message": "Odziv (%)"
   },
   "servosLiveMode": {
     "message": "Omogući režim uživo"
@@ -2322,22 +2433,22 @@
     "message": "Alat za poravnanje"
   },
   "magnetometerHelp": {
-    "message": "1. Podesite orijentaciju kontrolera leta kako bi odgovarala fizičkoj orijentaciji na letelici <u>prema strelici za \"smer\" na kontroleru leta</u>.<br/>2. Podesite orijentaciju magnetometer modela, magnetometer čipa ili magnetometer osa kako bi odgovarala fizičkoj orijentaciji na letelici.<br/><strong>Napomena:</strong> Unapred podešena orijentacija za magnetometer (align_mag) je relativna u odnosu na FC. Prvo obavezno poravnajte FC (align_board_pitch, align_board_roll, align_board_yaw).<br/>Ako se ne koristi unapred podešena vrednost (orijentacija se podešava pomoću align_mag_roll, align_mag_pitch i align_mag_yaw), orijentacija za magnetometer je nezavisna."
+    "message": "1. Podesite orijentaciju kontrolera leta kako bi odgovarala fizičkoj orijentaciji na letelici <u>prema strelici za \"smer\" na kontroleru leta</u>.<br/>2. Podesite orijentaciju modela magnetometra, čipa magnetometra ili osa magnetometra kako bi odgovarala fizičkoj orijentaciji na letelici.<br/><strong>Napomena:</strong> Preset orijentacije magnetometra (align_mag) je relativan u odnosu na FC. Prvo obavezno poravnajte FC (align_board_pitch, align_board_roll, align_board_yaw).<br/>Ako se ne koristi preset (orijentacija se podešava pomoću align_mag_roll, align_mag_pitch i align_mag_yaw), orijentacija magnetometra je nezavisna."
   },
   "magnetometerOrientationPreset": {
-    "message": "Unapred podešena orijentacija (align_mag). Relativno u odnosu na orijentaciju FC-a"
+    "message": "Preset orijentacije (align_mag). Relativno u odnosu na orijentaciju FC-a"
   },
   "boardInfo": {
     "message": "1. Izaberite poravnanje kontrolera leta<br>(align_board_roll, align_board_pitch, align_board_yaw)"
   },
   "magnetometerInfo": {
-    "message": "2. Izaberite unapred podešenu vrednost (align_mag) ili kreirajte prilagođenu konfiguraciju pomoću klizača<br>(align_mag_roll, align_mag_pitch, align_mag_yaw)"
+    "message": "2. Izaberite preset (align_mag) ili kreirajte prilagođenu konfiguraciju pomoću klizača<br>(align_mag_roll, align_mag_pitch, align_mag_yaw)"
   },
   "magnetometerElementToShow": {
-    "message": "Element za prikaz: Magnetometer model, čip ili ose"
+    "message": "Element za prikaz: model, čip ili ose magnetometra"
   },
   "magnetometerAxes": {
-    "message": "XYZ (Magnetometer ose)"
+    "message": "XYZ (ose magnetometra)"
   },
   "axisTableTitleAxis": {
     "message": "Osa"
@@ -2352,7 +2463,7 @@
     "message": "Orijentacija se podešava pomoću: ANGLES (align_mag_roll, align_mag_pitch ,align_mag_yaw)"
   },
   "configurationMagnetometerHelp": {
-    "message": "<strong>Napomena:</strong> Ne zaboravite da konfigurišete serijski port (putem kartice Portovi) kada koristite funkciju Magnetometer."
+    "message": "<strong>Napomena:</strong> Ne zaboravite da konfigurišete serijski port (putem kartice Portovi) kada koristite magnetometar."
   },
   "magnetometerStatHead": {
     "message": "Mag statistika"
@@ -2448,16 +2559,16 @@
     "message": "Izvrši"
   },
   "loggingNote": {
-    "message": "Podaci će se beležiti <span style=\"color: red\">samo</span> na ovoj kartici, napuštanje kartice će <span style=\"color: red\">otkazati</span> beleženje i aplikacija će se vratiti u svoje normalno <strong>\"configurator\"</strong> stanje.<br /> Možete slobodno izabrati globalni period osvežavanja, podaci će se upisivati u log datoteku svakih <strong>1</strong> sekundi radi performansi."
+    "message": "Podaci će se beležiti <span style=\"color: red\">samo</span> na ovoj kartici, napuštanje kartice će <span style=\"color: red\">otkazati</span> beleženje i aplikacija će se vratiti u svoje normalno <strong>\"konfigurator\"</strong> stanje.<br /> Možete slobodno izabrati globalni period osvežavanja, podaci će se upisivati u datoteku dnevnika svake <strong>1</strong> sekunde radi performansi."
   },
   "loggingSamplesSaved": {
     "message": "Sačuvano uzoraka:"
   },
   "loggingLogSize": {
-    "message": "Veličina loga:"
+    "message": "Veličina dnevnika:"
   },
   "loggingButtonLogFile": {
-    "message": "Izaberite log datoteku"
+    "message": "Izaberite datoteku dnevnika"
   },
   "loggingStart": {
     "message": "Započni beleženje"
@@ -2472,16 +2583,16 @@
     "message": "Prvo morate da se <strong>povežete</strong>"
   },
   "loggingErrorLogFile": {
-    "message": "Molimo izaberite log datoteku"
+    "message": "Molimo izaberite datoteku dnevnika"
   },
   "loggingErrorOneProperty": {
-    "message": "Molimo izaberite bar jedno svojstvo za logovanje"
+    "message": "Molimo izaberite bar jedno svojstvo za beleženje"
   },
   "loggingAutomaticallyRetained": {
-    "message": "Automatski je učitana prethodna log datoteka: <strong>$1</strong>"
+    "message": "Automatski je učitana prethodna datoteka dnevnika: <strong>$1</strong>"
   },
   "blackboxNotSupported": {
-    "message": "Firmver vašeg kontrolera leta ne podržava Blackbox logovanje ili Blackbox funkcija nije omogućena"
+    "message": "Firmver vašeg kontrolera leta ne podržava Blackbox beleženje ili Blackbox funkcija nije omogućena"
   },
   "blackboxConfiguration": {
     "message": "Blackbox konfiguracija"
@@ -2490,10 +2601,10 @@
     "message": "Sačuvaj i ponovo pokreni"
   },
   "serialLogging": {
-    "message": "Spoljašnji serijski uređaj za logovanje"
+    "message": "Spoljašnji serijski uređaj za beleženje"
   },
   "serialLoggingSupportedNote": {
-    "message": "Možete vršiti logovanje na spoljašnji uređaj za logovanje (kao što je OpenLog ili kompatibilni klon) pomoću serijskog porta. Konfigurišite port na kartici Portovi."
+    "message": "Možete vršiti beleženje na spoljašnji uređaj za beleženje (kao što je OpenLog ili kompatibilni klon) pomoću serijskog porta. Konfigurišite port na kartici Portovi."
   },
   "onboardLoggingFlashLogger": {
     "message": "Ugrađeni dataflash čip"
@@ -2502,13 +2613,13 @@
     "message": "Ugrađena SD kartica"
   },
   "sdcardNote": {
-    "message": "Dnevnici leta se mogu snimiti na slot za SD karticu kontrolora leta."
+    "message": "Dnevnici leta se mogu snimiti na slot za SD karticu kontrolera leta."
   },
   "dataflashNote": {
-    "message": "Dnevnici leta se mogu snimiti na integrisani dataflash čip kontrolora leta."
+    "message": "Dnevnici leta se mogu snimiti na integrisani dataflash čip kontrolera leta."
   },
   "dataflashNotPresentNote": {
-    "message": "Vaš kontrolor leta nema dostupan kompatibilan dataflash čip."
+    "message": "Vaš kontroler leta nema dostupan kompatibilan dataflash čip."
   },
   "dataflashFirmwareUpgradeRequired": {
     "message": "Dataflash zahteva firmver &gt;= 1.8.0."
@@ -2535,7 +2646,7 @@
     "message": "Čuvanje može trajati nekoliko minuta, molimo sačekajte."
   },
   "dataflashSavingNoteAfter": {
-    "message": "Čuvanje je završeno! Pritisnite „Ok” za nastavak."
+    "message": "Čuvanje je završeno! Pritisnite „U redu“ za nastavak."
   },
   "dataflashButtonSaveCancel": {
     "message": "Otkaži"
@@ -2550,7 +2661,7 @@
     "message": "Otkaži"
   },
   "dataflashFileWriteFailed": {
-    "message": "Pisanje u izabranu datoteku nije uspelo, da li su dozvole za taj direktorijum u redu?"
+    "message": "Pisanje u izabranu datoteku nije uspelo, da li su dozvole za tu fasciklu u redu?"
   },
   "firmwareFlasherReleaseSummaryHead": {
     "message": "Informacije o izdanju"
@@ -2574,16 +2685,16 @@
     "message": "Target:"
   },
   "firmwareFlasherReleaseFile": {
-    "message": "Binarni fajl:"
+    "message": "Binarna datoteka:"
   },
   "firmwareFlasherReleaseStatusReleaseCandidate": {
-    "message": "<span style=\"color: red\">VAŽNO: Ovo izdanje firmvera je trenutno označeno kao release candidate. Molimo vas da odmah prijavite sve probleme.</span>"
+    "message": "<span style=\"color: red\">VAŽNO: Ovo izdanje firmvera je trenutno označeno kao kandidat za izdanje. Molimo vas da odmah prijavite sve probleme.</span>"
   },
   "firmwareFlasherReleaseFileUrl": {
     "message": "Preuzmite ručno."
   },
   "firmwareFlasherTargetWarning": {
-    "message": "<span style=\"color: red\">VAŽNO</span>: Uverite se da flešujete odgovarajući fajl za vaš target. Flešovanje binarnog fajla za pogrešan target može izazvati <span style=\"color: red\">loše</span> stvari."
+    "message": "<span style=\"color: red\">VAŽNO</span>: Uverite se da flešujete odgovarajuću datoteku za vaš target. Flešovanje binarne datoteke za pogrešan target može izazvati <span style=\"color: red\">loše</span> stvari."
   },
   "firmwareFlasherPath": {
     "message": "Putanja:"
@@ -2604,7 +2715,7 @@
     "message": "Bez sekvence ponovnog pokretanja"
   },
   "firmwareFlasherOnlineSelectBoardDescription": {
-    "message": "Izaberite vašu ploču da biste videli dostupna izdanja firmvera na mreži - Izaberite odgovarajući firmver za vašu ploču. Obratite pažnju da će <strong>Auto-select Target</strong> raditi samo za INAV firmvere 5.0 i novije."
+    "message": "Izaberite vašu ploču da biste videli dostupna izdanja firmvera na mreži - Izaberite odgovarajući firmver za vašu ploču. Obratite pažnju da će <strong>Automatski izaberi Target</strong> raditi samo za INAV firmvere 5.0 i novije."
   },
   "firmwareFlasherOnlineSelectFirmwareVersionDescription": {
     "message": "Izaberite verziju firmvera za vašu ploču.<br />Napomena: iako možete flešovati različite verzije firmvera pomoću ovog Configurator-a, prilikom podešavanja kontrolera leta bi trebalo da se poklapaju glavni i sporedni brojevi verzija i za firmver i za Configurator."
@@ -2658,19 +2769,19 @@
     "message": "Automatski izaberi Target"
   },
   "firmwareFlasherButtonLoadLocal": {
-    "message": "Učitaj Firmware [Lokalno]"
+    "message": "Učitaj firmver [Lokalno]"
   },
   "firmwareFlasherButtonLoadOnline": {
-    "message": "Učitaj Firmware [Online]"
+    "message": "Učitaj firmver [Onlajn]"
   },
   "firmwareFlasherButtonLoading": {
     "message": "Učitavanje..."
   },
   "firmwareFlasherFlashFirmware": {
-    "message": "Flešuj Firmware"
+    "message": "Flešuj firmver"
   },
   "firmwareFlasherGithubInfoHead": {
-    "message": "Github Firmware informacije"
+    "message": "Informacije o firmveru sa GitHub-a"
   },
   "firmwareFlasherCommiter": {
     "message": "Autor izmene:"
@@ -2691,28 +2802,28 @@
     "message": "Upozorenje"
   },
   "firmwareFlasherWarningText": {
-    "message": "Molimo <span style=\"color: red\">ne pokušavajte</span> da flešujete hardver koji <strong>nije iNAV</strong> pomoću ovog flashera za firmware.<br /><span style=\"color: red\">Nemojte</span> <strong>odspajati</strong> ploču niti <strong>isključivati</strong> računar tokom flešovanja.<br /><br /><strong>Napomena: </strong>STM32 bootloader je smešten u ROM-u, ne može se oštetiti.<br /><!--strong>Note: </strong><span style=\"color: red\">Auto-Connect</span> is always disabled while you are inside firmware flasher.<br / --><strong>Napomena: </strong>Proverite da li imate rezervnu kopiju; neke nadogradnje/poništavanja verzije će obrisati vašu konfiguraciju.<br /><strong>Napomena:</strong> Ako imate problema sa flešovanjem, prvo pokušajte da odspojite sve kablove sa vašeg FC, ponovo pokrenete računar, ažurirate Chrome i drajvere.<br /><strong>Napomena:</strong> Prilikom flešovanja ploča koje imaju direktno povezane USB utičnice (Matek H743-SLIM, Holybro Kakute itd.) uverite se da ste pročitali odeljak USB Flashing u INAV uputstvu i da imate instaliran odgovarajući softver i drajvere."
+    "message": "Molimo <span style=\"color: red\">ne pokušavajte</span> da flešujete hardver koji <strong>nije iNAV</strong> pomoću ovog alata za programiranje firmvera.<br /><span style=\"color: red\">Nemojte</span> <strong>odspajati</strong> ploču niti <strong>isključivati</strong> računar tokom flešovanja.<br /><br /><strong>Napomena: </strong>STM32 bootloader je smešten u ROM-u, ne može se oštetiti.<br /><!--strong>Napomena: </strong><span style=\"color: red\">Automatsko povezivanje</span> je uvek onemogućeno dok ste na kartici Programiranje firmvera.<br / --><strong>Napomena: </strong>Proverite da li imate rezervnu kopiju; neke nadogradnje/vraćanja na stariju verziju će obrisati vašu konfiguraciju.<br /><strong>Napomena:</strong> Ako imate problema sa flešovanjem, prvo pokušajte da odspojite sve kablove sa vašeg FC, ponovo pokrenete računar, ažurirate Chrome i drajvere.<br /><strong>Napomena:</strong> Prilikom flešovanja ploča koje imaju direktno povezane USB utičnice (Matek H743-SLIM, Holybro Kakute itd.) uverite se da ste pročitali odeljak USB Flashing u INAV uputstvu i da imate instaliran odgovarajući softver i drajvere."
   },
   "firmwareFlasherRecoveryHead": {
     "message": "<strong>Oporavak / Izgubljena komunikacija<strong>"
   },
   "firmwareFlasherRecoveryText": {
-    "message": "Ako ste izgubili komunikaciju sa vašom pločom, pratite ove korake da biste je obnovili: <ul><li>Isključite napajanje</li><li>Omogućite 'No reboot sequence', omogućite 'Full chip erase'.</li><li>Spojite BOOT pinove kratkospojnikom ili držite BOOT dugme.</li><li>Uključite napajanje (LED indikator aktivnosti NEĆE treperiti ako je ispravno urađeno).</li><li>Instalirajte sve STM32 drajvere i Zadig po potrebi (pogledajte odeljak <a href=\"https://github.com/iNavFlight/inav/blob/master/docs/USB%20Flashing.md\"target=\"_blank\">USB Flashing</a> u INAV uputstvu).</li><li>Zatvorite Configurator, zatvorite sve pokrenute Chrome komponente, zatvorite sve Chrome aplikacije, ponovo pokrenite Configurator.</li><li>Otpustite BOOT dugme ako ga vaš FC ima.</li><li>Flešujte odgovarajući firmware (koristeći ručni baud rate ako je navedeno u uputstvu za vaš FC).</li><li>Isključite napajanje.</li><li>Uklonite BOOT kratkospojnik.</li><li>Uključite napajanje (LED indikator aktivnosti bi trebalo da treperi).</li><li>Povežite se normalno.</li></ul>"
+    "message": "Ako ste izgubili komunikaciju sa vašom pločom, pratite ove korake da biste je obnovili: <ul><li>Isključite napajanje</li><li>Omogućite 'Bez sekvence ponovnog pokretanja', omogućite 'Potpuno brisanje čipa'.</li><li>Spojite BOOT pinove kratkospojnikom ili držite BOOT dugme.</li><li>Uključite napajanje (LED indikator aktivnosti NEĆE treperiti ako je ispravno urađeno).</li><li>Instalirajte sve STM32 drajvere i Zadig po potrebi (pogledajte odeljak <a href=\"https://github.com/iNavFlight/inav/blob/master/docs/USB%20Flashing.md\"target=\"_blank\">USB Flashing</a> u INAV uputstvu).</li><li>Zatvorite Configurator, zatvorite sve pokrenute Chrome komponente, zatvorite sve Chrome aplikacije, ponovo pokrenite Configurator.</li><li>Otpustite BOOT dugme ako ga vaš FC ima.</li><li>Flešujte odgovarajući firmver (koristeći ručni baud rate ako je navedeno u uputstvu za vaš FC).</li><li>Isključite napajanje.</li><li>Uklonite BOOT kratkospojnik.</li><li>Uključite napajanje (LED indikator aktivnosti bi trebalo da treperi).</li><li>Povežite se normalno.</li></ul>"
   },
   "firmwareFlasherButtonLeave": {
-    "message": "Napusti Firmware Flasher"
+    "message": "Napusti programiranje firmvera"
   },
   "firmwareFlasherFirmwareNotLoaded": {
-    "message": "Firmware nije učitan"
+    "message": "Firmver nije učitan"
   },
   "firmwareFlasherHexCorrupted": {
     "message": "Izgleda da je HEX datoteka oštećena"
   },
   "firmwareFlasherRemoteFirmwareLoaded": {
-    "message": "<span style=\"color: #37a8db\">Udaljeni firmware je učitan, spremno za flešovanje</span>"
+    "message": "<span style=\"color: #37a8db\">Udaljeni firmver je učitan, spremno za flešovanje</span>"
   },
   "firmwareFlasherFailedToLoadOnlineFirmware": {
-    "message": "Neuspešno učitavanje udaljenog firmware-a"
+    "message": "Neuspešno učitavanje udaljenog firmvera"
   },
   "ledStripHelp": {
     "message": "Kontroler leta može upravljati bojama i efektima pojedinačnih LED dioda na traci.<br />Podesite LED diode na mreži, podesite redosled povezivanja, a zatim rasporedite LED diode na vašoj letelici prema pozicijama na mreži. LED diode bez broja redosleda povezivanja neće biti sačuvane.<br />Dvostruki klik na boju za izmenu HSV vrednosti."
@@ -2721,7 +2832,7 @@
     "message": "Sačuvaj"
   },
   "ledStripEepromSaved": {
-    "message": "EEPROM <span style=\"color: #37a8db\">sačuvano</span>: LED"
+    "message": "EEPROM <span style=\"color: #37a8db\">sačuvan</span>: LED"
   },
   "controlAxisRoll": {
     "message": "Roll [A]"
@@ -2742,7 +2853,7 @@
     "message": "CH "
   },
   "configHelp2": {
-    "message": "Proizvoljna rotacija ploče u stepenima, kako bi se omogućila montaža sa strane / naopačke / rotirano itd. Kada koristite eksterne senzore, koristite poravnanja senzora (Gyro, Acc, Mag) za definisanje položaja senzora nezavisno od orijentacije ploče. "
+    "message": "Proizvoljna rotacija ploče u stepenima, kako bi se omogućila montaža sa strane / naopačke / rotirano itd. Kada koristite eksterne senzore, koristite poravnanja senzora (žiroskop, akcelerometar, magnetometar) za definisanje položaja senzora nezavisno od orijentacije ploče. "
   },
   "failsafeFeaturesHelpOld": {
     "message": "Failsafe konfiguracija se značajno promenila. Koristite najnoviji INAV"
@@ -2757,13 +2868,13 @@
     "message": "Failsafe throttle"
   },
   "failsafeFeaturesHelpNew": {
-    "message": "Failsafe ima dva stupnja. U <strong>Stupanj 1</strong> se ulazi kada kanal leta ima neispravne trajanje impulsa, prijemnik prijavljuje failsafe režim ili uopšte nema signala sa prijemnika, podešavanja rezervnih vrednosti kanala se primenjuju na <span style=\"color: red\">sve kanale</span> i ostavlja se kratak period kako bi se omogućio oporavak. U <strong>Stupanj 2</strong> se ulazi kada stanje greške traje duže od podešenog zaštitnog vremena dok je letelica <span style=\"color: red\">armed</span>, svi kanali ostaju na primenjenim rezervnim podešavanjima kanala osim ako ih izabrana procedura ne promeni. <br /><strong>Napomena:</strong> Pre ulaska u stupanj 1, rezervna podešavanja kanala se takođe primenjuju na pojedinačne radio kanale koji imaju neispravne impulse."
+    "message": "Failsafe ima dve faze. U <strong>Fazu 1</strong> se ulazi kada kanal leta ima neispravno trajanje impulsa, prijemnik prijavljuje failsafe režim ili uopšte nema signala sa prijemnika, podešavanja rezervnih vrednosti kanala se primenjuju na <span style=\"color: red\">sve kanale</span> i ostavlja se kratak period kako bi se omogućio oporavak. U <strong>Fazu 2</strong> se ulazi kada stanje greške traje duže od podešenog zaštitnog vremena dok je letelica <span style=\"color: red\">armovana</span>, svi kanali ostaju na primenjenim rezervnim podešavanjima kanala osim ako ih izabrana procedura ne promeni. <br /><strong>Napomena:</strong> Pre ulaska u fazu 1, rezervna podešavanja kanala se takođe primenjuju na pojedinačne radio kanale koji imaju neispravne impulse."
   },
   "failsafePulsrangeTitle": {
     "message": "Podešavanja opsega važećih impulsa"
   },
   "failsafePulsrangeHelp": {
-    "message": "Impulsi kraći od minimalnog ili duži od maksimalnog su neispravni i aktiviraće primenu rezervnih podešavanja pojedinačnih kanala za radio kanale ili ulazak u stupanj 1 za kanale leta"
+    "message": "Impulsi kraći od minimalnog ili duži od maksimalnog su neispravni i aktiviraće primenu rezervnih podešavanja pojedinačnih kanala za radio kanale ili ulazak u fazu 1 za kanale leta"
   },
   "failsafeRxMinUsecItem": {
     "message": "Minimalno trajanje"
@@ -2775,7 +2886,7 @@
     "message": "Podešavanja rezervnih vrednosti kanala"
   },
   "failsafeChannelFallbackSettingsHelp": {
-    "message": "Ova podešavanja se primenjuju na neispravne pojedinačne radio kanale ili na sve kanale prilikom ulaska u stupanj 1. <strong>Napomena:</strong> vrednosti se čuvaju u koracima od 25usec, pa male promene nestaju"
+    "message": "Ova podešavanja se primenjuju na neispravne pojedinačne radio kanale ili na sve kanale prilikom ulaska u fazu 1. <strong>Napomena:</strong> vrednosti se čuvaju u koracima od 25usec, pa male promene nestaju"
   },
   "failsafeChannelFallbackSettingsAuto": {
     "message": "<strong>Auto</strong> znači Roll, Pitch i Yaw u centar i throttle nizak. <strong>Hold</strong> znači zadržavanje poslednje primljene ispravne vrednosti"
@@ -2805,7 +2916,7 @@
     "message": "Kašnjenje isključivanja motora tokom Failsafe-a"
   },
   "failsafeOffDelayHelp": {
-    "message": "Vreme zadržavanja u režimu sletanja dok se motori ne isključe i letelica ne disarm-uje"
+    "message": "Vreme zadržavanja u režimu sletanja dok se motori ne isključe i letelica se ne razoruža"
   },
   "failsafeSubTitle1": {
     "message": "Procedura"
@@ -2823,31 +2934,31 @@
     "message": "Ne radi ništa"
   },
   "failsafeKillSwitchItem": {
-    "message": "Failsafe prekidač za gašenje (trenutno disarm-uje letelicu pri failsafe-u)"
+    "message": "Failsafe prekidač za gašenje (odmah razoružava letelicu pri failsafe-u)"
   },
   "failsafeKillSwitchHelp": {
-    "message": "Aktivirajte ovu opciju da bi failsafe prekidač, konfigurisan u kartici Režimi, delovao kao direktni prekidač za gašenje, zaobilazeći izabranu failsafe proceduru. <strong>Napomena:</strong> Arming je blokiran kada je failsafe prekidač za gašenje u položaju ON."
+    "message": "Aktivirajte ovu opciju da bi failsafe prekidač, konfigurisan u kartici Režimi, delovao kao direktni prekidač za gašenje, zaobilazeći izabranu failsafe proceduru. <strong>Napomena:</strong> Armovanje je onemogućeno kada je failsafe prekidač za gašenje u položaju ON."
   },
   "failsafeUseMinimumDistanceItem": {
-    "message": "Koristi alternativnu failsafe proceduru za minimalno udaljenost u blizini Home lokacije"
+    "message": "Koristi alternativnu failsafe proceduru za minimalnu udaljenost u blizini početne tačke"
   },
   "failsafeUseMinimumDistanceHelp": {
-    "message": "Aktivirajte ovu opciju ako Vam je potrebno alternativno failsafe ponašanje kada je letelica blizu Home lokacije. Na primer, autor ove funkcije ima avion koji aktivira failsafe kada se krila odvoje pri sletanju, kada uobičajeno RTH failsafe ponašanje tokom leta više nije poželjno niti potrebno."
+    "message": "Aktivirajte ovu opciju ako Vam je potrebno alternativno failsafe ponašanje kada je letelica blizu početne tačke. Na primer, autor ove funkcije ima avion koji aktivira failsafe kada se krila odvoje pri sletanju, kada uobičajeno RTH failsafe ponašanje tokom leta više nije poželjno niti potrebno."
   },
   "failsafeMinDistanceItem": {
-    "message": "Failsafe minimalno udaljenost"
+    "message": "Failsafe minimalna udaljenost"
   },
   "failsafeMinDistanceHelp": {
-    "message": "Letelica će koristiti alternativno failsafe ponašanje kada se nalazi na udaljenosti između 0 i ovog minimalnog udaljenosti u centimetrima od Home lokacije. Na primer, ako je podešeno na 2000 centimetara (20 metara), a letelica je na 13 metara, primeniće se Failsafe procedura minimalnog udaljenosti. Kada se letelica nalazi na 25 metara, primeniće se uobičajena failsafe procedura. Ako je podešeno na 0, uvek će se koristiti uobičajena failsafe procedura. "
+    "message": "Letelica će koristiti alternativno failsafe ponašanje kada se nalazi na udaljenosti između 0 i ove minimalne udaljenosti u centimetrima od početne tačke. Na primer, ako je podešeno na 2000 centimetara (20 metara), a letelica je na 13 metara, primeniće se Failsafe procedura za minimalnu udaljenost. Kada se letelica nalazi na 25 metara, primeniće se uobičajena failsafe procedura. Ako je podešeno na 0, uvek će se koristiti uobičajena failsafe procedura. "
   },
   "failsafeMinDistanceProcedureItem": {
-    "message": "Failsafe procedura za minimalno udaljenost"
+    "message": "Failsafe procedura za minimalnu udaljenost"
   },
   "failsafeMinDistanceProcedureHelp": {
-    "message": "Ovo je failsafe procedura koja će se primeniti kada je letelica bliža od Failsafe minimalne udaljenosti od Home pozicije."
+    "message": "Ovo je failsafe procedura koja će se primeniti kada je letelica bliža od Failsafe minimalne udaljenosti od početne tačke."
   },
   "mainHelpArmed": {
-    "message": "Arming motora"
+    "message": "Armovanje motora"
   },
   "mainHelpFailsafe": {
     "message": "Failsafe režim"
@@ -2874,7 +2985,7 @@
     "message": "Servo brzina osvežavanja"
   },
   "servoRefreshRatelHelp": {
-    "message": "Servo mora da podržava brzinu osvežavanja. Promenite samo ako znate da je servo podržava. Previsoka brzina osvežavanja može oštetiti servo-e!"
+    "message": "Servo mora da podržava brzinu osvežavanja. Promenite samo ako znate da je servo podržava. Previsoka brzina osvežavanja može oštetiti servoe!"
   },
   "logPwmOutputDisabled": {
     "message": "PWM izlaz je onemogućen. Motori i servoi neće raditi. Koristite karticu <u>Izlazi</u> da biste ga omogućili!"
@@ -2898,16 +3009,16 @@
     "message": "Yaw P ograničenje"
   },
   "yawPLimitHelp": {
-    "message": "Ograničavač za yaw P član. Povećanje poboljšava yaw autoritet, ali može izazvati nestabilnost po ROLL i PITCH osi."
+    "message": "Ograničavač za yaw P-term. Povećanje poboljšava yaw autoritet, ali može izazvati nestabilnost po ROLL i PITCH osi."
   },
   "tabFiltering": {
     "message": "Filtriranje"
   },
   "gyroLpfCutoffFrequency": {
-    "message": "Granična frekvencija Gyro LPF-a"
+    "message": "Granična frekvencija LPF-a žiroskopa"
   },
   "gyroLpfCutoffFrequencyHelp": {
-    "message": "Softverski filter za uklanjanje mehaničkih vibracija iz žiroskopskog signala. Vrednost je granična frekvencija (Hz). Za veće ramove sa većim elisama podesite na manju vrednost. Previsoka vrednost može izazvati pregrevanje motora i ESC-a."
+    "message": "Softverski filter za uklanjanje mehaničkih vibracija iz žiroskopskog signala. Vrednost je granična frekvencija (Hz). Za veće ramove sa većim propelerima podesite na manju vrednost. Previsoka vrednost može izazvati pregrevanje motora i ESC-a."
   },
   "accLpfCutoffFrequency": {
     "message": "Granična frekvencija LPF akcelerometra"
@@ -2943,10 +3054,10 @@
     "message": "Ovo je maksimalno ugaono ubrzanje koje pilot sme da zahteva od UAV-a. UAV bi trebalo da može da zadovolji ovo ubrzanje. Po pravilu, što je UAV veći, to manje ubrzanje može da podnese."
   },
   "pidTuningTPAHelp": {
-    "message": "Faktor Throttle PID atenuacije. PID pojačanja biće linearno smanjena počevši od 0 na TPA Breakpoint-u (Throttle) do TPA faktora pri maksimalnom throttle-u."
+    "message": "Faktor prigušenja PID potiska (TPA). PID pojačanja biće linearno smanjena počevši od 0 na TPA prelomnoj tački (throttle) do TPA faktora pri maksimalnom throttle-u."
   },
   "pidTuningTPABreakPointHelp": {
-    "message": "Throttle PID atenuacija počinje kada položaj throttle-a premaši ovu vrednost. "
+    "message": "Prigušenje PID potiska počinje kada položaj throttle-a premaši ovu vrednost. "
   },
   "configurationAsyncMode": {
     "message": "Asinhroni režim"
@@ -2964,10 +3075,10 @@
     "message": "Hardverska granična frekvencija za žiroskop. Uopšteno, veća vrednost je bolja, ali čini UAV osetljivijim na vibracije."
   },
   "configurationAsyncModeHelp": {
-    "message": "Pogledajte dokumentaciju firmvera „Looptime” za detalje."
+    "message": "Pogledajte dokumentaciju firmvera „Looptime“ za detalje."
   },
   "configurationGyroFrequencyHelp": {
-    "message": "Uopšteno, veća vrednost je bolja, ali čini UAV osetljivijim na vibracije. Trebalo bi je držati iznad frekvencije „Flight Controller Loop Time”. Maksimalna praktična vrednost zavisi od hardvera. Ako se podesi previsoko, ploča možda neće raditi ispravno. Pratite zauzeće CPU-a."
+    "message": "Uopšteno, veća vrednost je bolja, ali čini UAV osetljivijim na vibracije. Trebalo bi je držati iznad frekvencije „Vreme petlje kontrolera leta“. Maksimalna praktična vrednost zavisi od hardvera. Ako se podesi previsoko, ploča možda neće raditi ispravno. Pratite zauzeće CPU-a."
   },
   "configurationAccelerometerFrequencyHelp": {
     "message": "Za potrebe Acro režima, ova vrednost se može smanjiti u odnosu na podrazumevanu."
@@ -2988,10 +3099,10 @@
     "message": "Akcelerometar"
   },
   "sensorMagnetometer": {
-    "message": "Magnetometer"
+    "message": "Magnetometar"
   },
   "sensorBarometer": {
-    "message": "Barometer"
+    "message": "Barometar"
   },
   "sensorPitot": {
     "message": "Pitoova cev"
@@ -3006,7 +3117,7 @@
     "message": "Za omogućavanje putem CLI-ja koristite komandu <strong>feature {name}</strong>"
   },
   "armingFailureReasonTitle": {
-    "message": "Pre-arming provere"
+    "message": "Provere pre armovanja"
   },
   "BLOCKED_UAV_NOT_LEVEL": {
     "message": "UAV je iznivelisan"
@@ -3045,19 +3156,19 @@
     "message": "Vrednosti akcelerometra"
   },
   "calibrationHead3": {
-    "message": "Kalibracija nivoa"
+    "message": "Kalibracija nivelisanja"
   },
   "calibrationHead4": {
     "message": "Kalibracija kompasa"
   },
   "calibrationHead5": {
-    "message": "Kalibracija Optic Flow senzora"
+    "message": "Kalibracija senzora optičkog protoka"
   },
   "OpflowCalText": {
-    "message": "Nakon pritiska na dugme imate 30 sekundi da držite model u vazduhu i naginjete ga u strane bez horizontalnog pomeranja. Obratite pažnju da Optic Flow senzor sve vreme mora da posmatra površinu."
+    "message": "Nakon pritiska na dugme imate 30 sekundi da držite model u vazduhu i naginjete ga u strane bez horizontalnog pomeranja. Obratite pažnju da senzor optičkog protoka sve vreme mora da posmatra površinu."
   },
   "OpflowCalBtn": {
-    "message": "Kalibrišite Optic Flow senzor"
+    "message": "Kalibriši senzor optičkog protoka"
   },
   "accZero": {
     "message": "Acc nula"
@@ -3123,7 +3234,7 @@
     "message": "Molimo unesite tekst ovde…"
   },
   "LevBtn": {
-    "message": "Kalibracija ravni"
+    "message": "Kalibracija nivelisanja"
   },
   "tabMixer": {
     "message": "Mixer"
@@ -3132,7 +3243,7 @@
     "message": "Upozorenje"
   },
   "presetApplyDescription": {
-    "message": "<p style='color: darkred;'>Uverite se da je <strong>mixer</strong> konfigurisan pre primene bilo kog Preset-a!</p><p>Preset prepisuje izabrane konfiguracione vrednosti uključujući mixer, filtriranje, PIDs i ostalo. Podešavanja kao što su: režimi leta, podešavanja radija, failsafe i OSD se ne menjaju. Primenjene vrednosti <strong>NE</strong> bi trebalo smatrati konačnim vrednostima, već početnim tačkama za konačno podešavanje. <br> Uvek proverite novu konfiguraciju pre leta!</p>"
+    "message": "<p style='color: darkred;'>Uverite se da je <strong>mixer</strong> konfigurisan pre primene bilo kog Preset-a!</p><p>Preset prepisuje izabrane konfiguracione vrednosti uključujući mixer, filtriranje, PID-ove i ostalo. Podešavanja kao što su: režimi leta, podešavanja radija, failsafe i OSD se ne menjaju. Primenjene vrednosti <strong>NE</strong> bi trebalo smatrati konačnim vrednostima, već početnim tačkama za konačno podešavanje. <br> Uvek proverite novu konfiguraciju pre leta!</p>"
   },
   "OK": {
     "message": "U redu"
@@ -3141,7 +3252,7 @@
     "message": "Kalibracija akcelerometra"
   },
   "accCalibrationStartBody": {
-    "message": "Postavite kontroler leta u položaj prikazan na slici, a zatim ponovo pritisnite dugme <strong>Calibrate</strong>. Ponovite za svaki od 6 položaja. Održavajte ga stabilnim tokom kalibracije."
+    "message": "Postavite kontroler leta u položaj prikazan na slici, a zatim ponovo pritisnite dugme <strong>Kalibriši akcelerometar</strong>. Ponovite za svaki od 6 položaja. Održavajte ga stabilnim tokom kalibracije."
   },
   "accCalibrationStopTitle": {
     "message": "Kalibracija je završena"
@@ -3186,13 +3297,13 @@
     "message": "Frekv. drugog notch filtera žiroskopa"
   },
   "gyroNotchCutoff2": {
-    "message": "Granična frekvencija drugog gyro notch filtera."
+    "message": "Granična frekv. drugog notch filtera žiroskopa"
   },
   "gyroNotchHz1Help": {
-    "message": "Treba podesiti na harmonijsku frekvenciju propelera. Obično iznosi <i>[motor_frequency] * [propeller_blades_number]</i><br><br>Mora biti iznad granične frekvencije<br><br><i>0</i> onemogućava filter"
+    "message": "Treba podesiti na harmonijsku frekvenciju propelera. Obično iznosi <i>[frekvencija motora] * [broj krakova propelera]</i><br><br>Mora biti iznad granične frekvencije<br><br><i>0</i> onemogućava filter"
   },
   "gyroNotchHz2Help": {
-    "message": "Treba podesiti na frekvenciju motora.<br><br>Mora biti iznad granične frekvencije i ispod frekvencije prvog gyro notch filtera.<br><br><i>0</i> onemogućava filter"
+    "message": "Treba podesiti na frekvenciju motora.<br><br>Mora biti iznad granične frekvencije i ispod frekvencije prvog notch filtera žiroskopa.<br><br><i>0</i> onemogućava filter"
   },
   "gyroNotchCutoff1Help": {
     "message": "Definiše opseg notch filtera. <br><br>Mora se držati ispod frekvencije notch filtera."
@@ -3207,7 +3318,7 @@
     "message": "Granična frekvencija Dterm notch filtera."
   },
   "dtermNotchHzHelp": {
-    "message": "Treba postaviti između frekvencije prvog i drugog gyro notch filtera<br><br>Mora biti iznad granične frekvencije<br><br><i>0</i> onemogućava filter"
+    "message": "Treba postaviti između frekvencije prvog i drugog notch filtera žiroskopa<br><br>Mora biti iznad granične frekvencije<br><br><i>0</i> onemogućava filter"
   },
   "dtermNotchCutoffHelp": {
     "message": "Definiše opseg filtera. <br><br>Mora se držati ispod frekvencije notch filtera."
@@ -3243,7 +3354,7 @@
     "message": "Maksimalni ugao nagiba multirotora"
   },
   "posholdMaxBankAngleHelp": {
-    "message": "Maksimalni ugao nagiba u režimima navigacije. Ograničeno maksimalnim ROLL uglom u kartici za PID podešavanje."
+    "message": "Maksimalni ugao nagiba u režimima navigacije. Ograničeno maksimalnim ROLL uglom na kartici Fino podešavanje."
   },
   "posholdHoverThrottle": {
     "message": "Throttle za lebdenje"
@@ -3255,7 +3366,7 @@
     "message": "Usporavanje pri prilasku waypoint-u"
   },
   "mcWpSlowdownHelp": {
-    "message": "Kada je omogućeno, NAV engine će usporiti pri prelasku na sledeći waypoint. Ovim se daje prioritet skretanju u odnosu na kretanje unapred. Kada je onemogućeno, NAV engine će nastaviti ka sledećem waypoint-u i skretati u hodu."
+    "message": "Kada je omogućeno, navigacioni sistem će usporiti pri prelasku na sledeći waypoint. Ovim se daje prioritet skretanju u odnosu na kretanje unapred. Kada je onemogućeno, navigacioni sistem će nastaviti ka sledećem waypoint-u i skretati u hodu."
   },
   "positionEstimatorConfiguration": {
     "message": "Procenjivač pozicije"
@@ -3279,13 +3390,13 @@
     "message": "Ove vrednosti treba menjati veoma pažljivo. U većini slučajeva nema potrebe da ih menjate. Samo za napredne korisnike!"
   },
   "gps_min_sats": {
-    "message": "Min. GPS satelita za važeći fix"
+    "message": "Min. GPS satelita za važeći fiks"
   },
   "w_z_baro_p_help": {
-    "message": "Kada je ova vrednost postavljena na <strong>0</strong>, barometer se ne koristi za izračunavanje visine"
+    "message": "Kada je ova vrednost postavljena na <strong>0</strong>, barometar se ne koristi za izračunavanje visine"
   },
   "w_z_gps_p_help": {
-    "message": "Ova postavka se koristi samo kada barometer nije instaliran i kada je podešeno <strong>inav_use_gps_no_baro</strong>."
+    "message": "Ova postavka se koristi samo kada barometar nije instaliran i kada je podešeno <strong>inav_use_gps_no_baro</strong>."
   },
   "wirelessModeSwitch": {
     "message": "Bežični režim"
@@ -3306,7 +3417,7 @@
     "message": "Penjanje pre RTH"
   },
   "rthClimbFirstHelp": {
-    "message": "Ako je postavljeno na ON ili ON_FW_SPIRAL, letelica će se prvo popeti na nav_rth_altitude pre nego što se okrene prema početnoj tački. Ako je postavljeno na OFF, letelica će se odmah okrenuti i krenuti ka početnoj tački, penjajući se usput. Za fiksno krilo, ON koristi linearno penjanje, a ON_FW_SPIRAL koristi loiter penjanje u zaokretu sa brzinom penjanja podešenom preko nav_auto_climb_rate i radijusom zaokreta podešenim preko nav_fw_loiter_radius (ON_FW_SPIRAL je podešavanje za fiksno krilo i ponaša se isto kao ON za multirotor)."
+    "message": "Ako je postavljeno na ON ili ON_FW_SPIRAL, letelica će se prvo popeti na nav_rth_altitude pre nego što se okrene prema početnoj tački. Ako je postavljeno na OFF, letelica će se odmah okrenuti i krenuti ka početnoj tački, penjajući se usput. Za fiksno krilo, ON koristi linearno penjanje, a ON_FW_SPIRAL koristi loiter penjanje u zaokretu sa brzinom penjanja podešenom preko nav_auto_climb_rate i poluprečnikom zaokreta podešenim preko nav_fw_loiter_radius (ON_FW_SPIRAL je podešavanje za fiksno krilo i ponaša se isto kao ON za multirotor)."
   },
   "rthClimbIgnoreEmergency": {
     "message": "Penjanje bez obzira na ispravnost senzora pozicije"
@@ -3315,7 +3426,7 @@
     "message": "Poništavanje podešavanja RTH visine i penjanja pomoću roll/pitch palice"
   },
   "rthAltControlOverrideHELP": {
-    "message": "Kada je omogućeno, penjanje pri RTH se može otkazati držanjem palice za pitch punim intenzitetom na dole duže od 1 sekunde, tako da će letelica leteti kući na trenutnoj visini. Na letelicama sa fiksiranim krilima, podešavanje 'Climb before RTH' se može zaobići držanjem palice za roll ulevo ili udesno duže od 1 sekunde, kako bi letelica odmah skrenula ka kući."
+    "message": "Kada je omogućeno, penjanje pri RTH se može otkazati držanjem palice za pitch punim intenzitetom na dole duže od 1 sekunde, tako da će letelica leteti ka početnoj tački na trenutnoj visini. Na letelicama sa fiksnim krilima, podešavanje 'Penjanje pre RTH' se može zaobići držanjem palice za roll ulevo ili udesno duže od 1 sekunde, kako bi letelica odmah skrenula ka početnoj tački."
   },
   "rthTailFirst": {
     "message": "Repom napred"
@@ -3330,19 +3441,19 @@
     "message": "Prag prekida RTH-a"
   },
   "rthAbortThresholdHelp": {
-    "message": "Funkcija provere RTH logike će primetiti ako se udaljenost od kuće povećava tokom RTH-a, i ako pređe prag definisan ovim parametrom, umesto nastavka RTH-a letelica će započeti vanredno sletanje. Podrazumevana vrednost je 500m, što je dovoljno bezbedno i za multirotore i za avione."
+    "message": "Funkcija provere RTH logike će primetiti ako se udaljenost od početne tačke povećava tokom RTH-a, i ako pređe prag definisan ovim parametrom, umesto nastavka RTH-a letelica će započeti vanredno sletanje. Podrazumevana vrednost je 500m, što je dovoljno bezbedno i za multirotore i za avione."
   },
   "fsMissionDelay": {
     "message": "Failsafe kašnjenje misije"
   },
   "fsMissionDelayHelp": {
-    "message": "Definiše kašnjenje u sekundama, odnosno koliko dugo iNav mora da sačeka pre nego što se aktivira Failsafe RTH ako je letelica u waypoint misiji. Postavite na -1 da biste potpuno onemogućili Failsafe [0-600s]"
+    "message": "Definiše kašnjenje u sekundama, odnosno koliko dugo INAV mora da sačeka pre nego što se aktivira Failsafe RTH ako je letelica u waypoint misiji. Postavite na -1 da biste potpuno onemogućili Failsafe [0-600s]"
   },
   "drNavigation": {
     "message": "Dead Reckoning navigacija"
   },
   "drNavigationHelp": {
-    "message": "Omogućava INAV-u da nastavi navigaciju (Waypoint, Return to Home, Cruise, Coursehold, itd.) tokom kratkih prekida GPS signala. Ova funkcija zahteva omogućen kompas i senzor za airspeed na Fixed Wing letelicama."
+    "message": "Omogućava INAV-u da nastavi navigaciju (Waypoint, Return to Home, Cruise, Coursehold, itd.) tokom kratkih prekida GPS signala. Ova funkcija zahteva omogućen kompas i senzor za airspeed na letelicama sa fiksnim krilima."
   },
   "rthAltitude": {
     "message": "RTH visina"
@@ -3354,13 +3465,13 @@
     "message": "RTH Track Back režim"
   },
   "rthTrackBackHelp": {
-    "message": "Kada je omogućeno, letelica će prvo pratiti svoju poslednju putanju unazad pre nego što odleti direktno kući. Fixed Wing letelice će leteti nazad po putanji uz penjanje, ali bez spuštanja. Režimi korišćenja za RTH Track Back: OFF = onemogućeno, ON = normalni i Failsafe RTH, FS = samo Failsafe RTH."
+    "message": "Kada je omogućeno, letelica će prvo pratiti svoju poslednju putanju unazad pre nego što odleti direktno ka početnoj tački. Letelice sa fiksnim krilima će leteti nazad po putanji uz penjanje, ali bez spuštanja. Režimi korišćenja za RTH Track Back: OFF = onemogućeno, ON = normalni i Failsafe RTH, FS = samo Failsafe RTH."
   },
   "rthTrackBackDistance": {
     "message": "RTH Track Back udaljenost"
   },
   "rthTrackBackDistanceHelp": {
-    "message": "Pređeno udaljenost tokom Track Back-a. Normalni RTH se izvršava kada se prekorači ovo ukupno udaljenost leta [m]."
+    "message": "Pređena udaljenost tokom Track Back-a. Normalni RTH se izvršava kada se prekorači ova ukupna udaljenost leta [m]."
   },
   "rthSafeHome": {
     "message": "Safe Home režim"
@@ -3372,55 +3483,55 @@
     "message": "Maksimalna udaljenost za Safe Home"
   },
   "rthSafeHomeDistanceHelp": {
-    "message": "Da bi se safehome koristio, mora biti na manjoj udaljenosti od ove [u cm] od tačke za arming."
+    "message": "Da bi se safehome koristio, mora biti na manjoj udaljenosti od ove [u cm] od tačke armovanja."
   },
   "navMaxAltitude": {
     "message": "Maksimalna visina za navigaciju"
   },
   "navMaxAltitudeHelp": {
-    "message": "Maksimalna dozvoljena visina (iznad Home tačke) koja važi za sve NAV režime (uključujući Altitude Hold). 0 znači da je ograničenje onemogućeno"
+    "message": "Maksimalna dozvoljena visina (iznad početne tačke) koja važi za sve NAV režime (uključujući Altitude Hold). 0 znači da je ograničenje onemogućeno"
   },
   "rthHomeAltitudeLabel": {
-    "message": "RTH Home visina"
+    "message": "RTH visina na početnoj tački"
   },
   "rthHomeAltitudeHelp": {
-    "message": "Koristi se kada se ne sleće na home tačku. Po dolasku na home, avion će vršiti loiter i promeniti visinu na RTH Home visinu. Podrazumevana vrednost je 0, čime je funkcija onemogućena."
+    "message": "Koristi se kada se ne sleće na početnu tačku. Po dolasku na početnu tačku, avion će vršiti loiter i promeniti visinu na vrednost „RTH visina na početnoj tački“. Podrazumevana vrednost je 0, čime je funkcija onemogućena."
   },
   "rthTwoStage": {
-    "message": "Metoda prvog stepena Climb First-a"
+    "message": "Metoda prve faze penjanja pre RTH-a"
   },
   "rthTwoStageHelp": {
-    "message": "Funkcija Staged Return To Home ako je omogućen Climb First. Postavite Climb First Stage Altitude na 0 za korišćenje klasičnog jednofaznog RTH-a."
+    "message": "Funkcija RTH-a u fazama, ako je omogućeno 'Penjanje pre RTH'. Postavite 'Visina prve faze penjanja pre RTH-a' na 0 za korišćenje klasičnog jednofaznog RTH-a."
   },
   "rthTwoStageAlt": {
-    "message": "Visina prvog stepena Climb First-a"
+    "message": "Visina prve faze penjanja pre RTH-a"
   },
   "rthTwoStageAltHelp": {
-    "message": "Podešavanje visine za prvi stepen za Staged RTH. Postavite na 0 za onemogućavanje dvofaznog RTH-a [0-65000cm]"
+    "message": "Podešavanje visine za prvu fazu RTH-a u fazama. Postavite na 0 za onemogućavanje dvofaznog RTH-a [0-65000cm]"
   },
   "rthUseLinearDescent": {
     "message": "Koristi linearno spuštanje"
   },
   "rthUseLinearDescentHelp": {
-    "message": "Ako je omogućeno, letelica će se polako spuštati na RTH visinu kuće tokom etape povratka kući u RTH-u."
+    "message": "Ako je omogućeno, letelica će se polako spuštati na vrednost „RTH visina na početnoj tački“ tokom etape povratka na početnu tačku u RTH-u."
   },
   "rthLinearDescentStart": {
     "message": "Udaljenost početka linearnog spuštanja"
   },
   "rthLinearDescentStartHelp": {
-    "message": "Ovo je udaljenost od matične pozicije na kojoj počinje linearno spuštanje. Ako je postavljeno na 0, linearno spuštanje počinje odmah."
+    "message": "Ovo je udaljenost od početne tačke na kojoj počinje linearno spuštanje. Ako je postavljeno na 0, linearno spuštanje počinje odmah."
   },
   "landMaxAltVspd": {
-    "message": "Letelica će početi da se spušta ovom brzinom kada stigne na lokaciju <strong>Home</strong>."
+    "message": "Letelica će početi da se spušta ovom brzinom kada stigne na <strong>početnu tačku</strong>."
   },
   "landMaxAltVspdHelp": {
-    "message": "Nakon RTH-a, ako je automatsko sletanje omogućeno, letelica će početi da se spušta ovom brzinom dok ne dostigne <strong>Slow down altitude</strong>"
+    "message": "Nakon RTH-a, ako je automatsko sletanje omogućeno, letelica će početi da se spušta ovom brzinom dok ne dostigne <strong>visinu usporavanja</strong>"
   },
   "landSlowdownMaxAlt": {
     "message": "Kada se letelica spusti na <i>ovu</i> visinu, počeće da usporava radi sletanja."
   },
   "landSlowdownMaxAltHelp": {
-    "message": "Kada letelica dostigne ovu visinu, počeće linearno da usporava između <strong>Initial landing speed</strong> i <strong>Final landing speed</strong> kako bi je dostigla na <strong>Final approach altitude</strong>"
+    "message": "Kada letelica dostigne ovu visinu, počeće linearno da usporava između <strong>početne brzine sletanja</strong> i <strong>završne brzine sletanja</strong> kako bi je dostigla na <strong>visini završnog prilaza</strong>"
   },
   "landSlowdownMinAlt": {
     "message": "Kada se letelica spusti na <i>ovu</i> visinu, usporiće na brzinu dodira tla."
@@ -3429,19 +3540,25 @@
     "message": "Ovo je brzina dodira tla."
   },
   "landMinAltVspdHelp": {
-    "message": "Ciljna vertikalna brzina letelice biće ova vrednost kada letelica dostigne <strong>Final approach altitude</strong> nakon linearnog usporenja sa <strong>Slow down altitude</strong> pri <strong>Initial landing speed</strong>"
+    "message": "Ciljna vertikalna brzina letelice biće ova vrednost kada letelica dostigne <strong>visinu završnog prilaza</strong> nakon linearnog usporenja sa <strong>visine usporavanja</strong> pri <strong>početnoj brzini sletanja</strong>"
   },
   "emergencyDescentRate": {
     "message": "Brzina prinudnog sletanja"
   },
   "cruiseThrottle": {
-    "message": "Cruise throttle"
+    "message": "Throttle za krstarenje"
   },
   "cruiseYawRateLabel": {
     "message": "Brzina skretanja u Cruise režimu"
   },
   "cruiseYawRateHelp": {
     "message": "Ovo je ugaona brzina skretanja u režimima Cruise i 3D Cruise."
+  },
+  "cruiseLockOnLevel": {
+    "message": "Zaključaj kurs kada su krila u horizontali"
+  },
+  "cruiseLockOnLevelHelp": {
+    "message": "Samo za fiksno krilo: kada je uključeno, Course Hold / Cruise zaključava novi kurs tek kada letelica izađe iz zaokreta u horizontalu (nagib ispod 10°) posle promene pravca ili ulaska u režim dok je letelica u nagibu, pa se kurs ne preleti dok letelica još skreće. Kada je isključeno, kurs se zaključava čim se palice centriraju (staro ponašanje)."
   },
   "cruiseManualThrottleLabel": {
     "message": "Omogući ručno povećanje throttle-a"
@@ -3453,19 +3570,19 @@
     "message": "Min. throttle"
   },
   "maxThrottle": {
-    "message": "Max. throttle"
+    "message": "Maks. throttle"
   },
   "maxBankAngle": {
     "message": "Maksimalni ugao nagiba u navigaciji"
   },
   "maxBankAngleHelp": {
-    "message": "Maksimalni ugao nagiba u režimima navigacije. Ograničeno maksimalnim ROLL uglom u kartici za PID podešavanje."
+    "message": "Maksimalni ugao nagiba u režimima navigacije. Ograničeno maksimalnim ROLL uglom na kartici Fino podešavanje."
   },
   "maxClimbAngle": {
     "message": "Maks. navigacioni ugao penjanja"
   },
   "maxClimbAngleHelp": {
-    "message": "Maksimalni ugao penjanja u navigacionim režimima. Ograničeno maksimalnim PITCH uglom na kartici za PID podešavanje."
+    "message": "Maksimalni ugao penjanja u navigacionim režimima. Ograničeno maksimalnim PITCH uglom na kartici Fino podešavanje."
   },
   "navManualClimbRate": {
     "message": "Maks. Alt-hold brzina penjanja"
@@ -3483,22 +3600,22 @@
     "message": "Maks. navigacioni ugao poniranja"
   },
   "maxDiveAngleHelp": {
-    "message": "Maksimalni ugao poniranja u navigacionim režimima. Ograničeno maksimalnim PITCH uglom na kartici za PID podešavanje."
+    "message": "Maksimalni ugao poniranja u navigacionim režimima. Ograničeno maksimalnim PITCH uglom na kartici Fino podešavanje."
   },
   "pitchToThrottle": {
     "message": "Odnos Pitch-a i throttle-a"
   },
   "pitchToThrottleHelp": {
-    "message": "U navigacionim režimima, svaki stepen penjanja dodaje toliko jedinica na cruise throttle. Obrnuto, svaki stepen poniranja oduzima od toga."
+    "message": "U navigacionim režimima, svaki stepen penjanja dodaje toliko jedinica na throttle za krstarenje. Obrnuto, svaki stepen poniranja oduzima od toga."
   },
   "minThrottleDownPitch": {
     "message": "Minimalni pitch naniže pri minimalnom throttle-u"
   },
   "minThrottleDownPitchHelp": {
-    "message": "Automatski ugao pitch-a naniže kada je throttle na 0 u angle režimu. Postepeno se primenjuje između cruise throttle-a i nultog throttle-a."
+    "message": "Automatski ugao pitch-a naniže kada je throttle na 0 u ANGLE režimu. Postepeno se primenjuje između throttle-a za krstarenje i nultog throttle-a."
   },
   "pitchToThrottleSmoothing": {
-    "message": "Glađenje throttle-a"
+    "message": "Ublažavanje throttle-a"
   },
   "pitchToThrottleSmoothingHelp": {
     "message": "Koliko glatko autopilot prilagođava nivo throttle-a kao odgovor na promene ugla pitch-a [0-9]."
@@ -3507,7 +3624,7 @@
     "message": "Prag trenutnog prilagođavanja throttle-a"
   },
   "pitchToThrottleThresholdHelp": {
-    "message": "Autopilot će trenutno prilagoditi nivo throttle-a bez glađenja prema odnosu pitch-a i throttle-a ako se ugao pitch-a razlikuje za više od ovoliko centistepeni od filtrirane vrednosti."
+    "message": "Autopilot će trenutno prilagoditi nivo throttle-a bez ublažavanja prema odnosu pitch-a i throttle-a ako se ugao pitch-a razlikuje za više od ovoliko centistepeni od filtrirane vrednosti."
   },
   "loiterRadius": {
     "message": "Loiter poluprečnik"
@@ -3522,7 +3639,7 @@
     "message": "Glatkoća upravljanja"
   },
   "controlSmoothnessHelp": {
-    "message": "Koliko glatko autopilot upravlja avionom radi ispravljanja navigacijske greške [0-9]."
+    "message": "Koliko glatko autopilot upravlja avionom radi ispravljanja navigacione greške [0-9]."
   },
   "wpTrackingAccuracy": {
     "message": "Preciznost praćenja waypoint-a"
@@ -3546,22 +3663,22 @@
     "message": "Potrošnja snage pri nultom throttle-u koja se koristi za procenu preostalog vremena/udaljenosti leta u jedinicama od 0.01W"
   },
   "cruisePower": {
-    "message": "Snaga u cruise režimu"
+    "message": "Snaga pri krstarenju"
   },
   "cruisePowerHelp": {
-    "message": "Potrošnja snage pri cruise throttle-u koja se koristi za procenu preostalog vremena/udaljenosti leta u jedinicama od 0.01W"
+    "message": "Potrošnja snage pri throttle-u za krstarenje koja se koristi za procenu preostalog vremena/udaljenosti leta u jedinicama od 0.01W"
   },
   "cruiseSpeed": {
-    "message": "Cruise brzina"
+    "message": "Brzina krstarenja"
   },
   "cruiseSpeedHelp": {
-    "message": "Brzina aviona/krila pri cruise throttle-u koja se koristi za procenu preostalog vremena/udaljenosti leta u cm/s"
+    "message": "Brzina aviona/krila pri throttle-u za krstarenje koja se koristi za procenu preostalog vremena/udaljenosti leta u cm/s"
   },
   "rthEnergyMargin": {
     "message": "RTH energetska rezerva"
   },
   "rthEnergyMarginHelp": {
-    "message": "Željena energetska rezerva nakon povratka kući (procenat kapaciteta baterije). Koristi se za proračun preostalog vremena/udaljenosti leta."
+    "message": "Željena energetska rezerva nakon povratka na početnu tačku (procenat kapaciteta baterije). Koristi se za proračun preostalog vremena/udaljenosti leta."
   },
   "generalNavigationSettings": {
     "message": "Opšta podešavanja navigacije"
@@ -3582,7 +3699,7 @@
     "message": "Osigurava da se visina na svakom waypoint-u dostigne pre nastavka ka sledećem. Letelica će održavati poziciju [loiter za fiksna krila] i penjati se/spuštati dok visina ne bude u zadatom opsegu [1-2000 cm] od waypoint visine. Postavite na [0] za onemogućavanje. Za letelice sa fiksnim krilima ne bi trebalo postaviti ispod 500cm."
   },
   "waypointRadius": {
-    "message": "Radijus waypoint-a"
+    "message": "Poluprečnik waypoint-a"
   },
   "wpRestartMission": {
     "message": "Ponovno pokretanje waypoint misije"
@@ -3590,17 +3707,23 @@
   "wpRestartMissionHelp": {
     "message": "Podešava ponašanje ponovnog pokretanja WP misije kada je prekinuta tokom leta. START od prvog WP-a, RESUME od poslednjeg aktivnog WP-a ili SWITCH između START i RESUME svaki put kada se WP režim ponovo uključi. SWITCH praktično omogućava nastavak samo jednom sa prethodnog waypoint-a tokom misije, nakon čega će se misija ponovo pokrenuti od prvog waypoint-a."
   },
-  "wpTurnSmoothing": {
-    "message": "Ublažavanje zaokreta na waypoint-u"
+  "wpTurnMode": {
+    "message": "Režim zaokreta na waypoint-u"
   },
-  "wpTurnSmoothingHelp": {
-    "message": "Ublažava zaokrete tokom WP misija prelaženjem na loiter zaokret na waypoint-ima. Kada je podešeno na ON, letelica će dostići waypoint tokom zaokreta. Kada je podešeno na ON-CUT, letelica će skrenuti unutar waypoint-a bez stvarnog dostizanja (seče krivinu)."
+  "wpTurnModeHelp": {
+    "message": "Samo za fiksno krilo: kako letelica skreće na waypoint-ima tokom misija. DIRECT koristi klasičan reaktivni regulator pravca (staro ponašanje). COORD režimi izvode zaokret kao izričit koordinisan luk sa stvarnim poluprečnikom zaokreta letelice (iz brzine i podešavanja „Maksimalni ugao nagiba u navigaciji“): COORD_FLYBY počinje zaokret ranije, pa se putanja glatko nastavlja na sledeću deonicu bez prebačaja — krivina se seče, a waypoint se prolazi bočno umesto da se preleti. COORD_FLYOVER leti tačno iznad waypoint-a, a zatim izlazi iz zaokreta tačno na liniji ka sledećem waypoint-u. Kod COORD_FLYINTO letelica se pre waypoint-a blago udaljava od krivine i zatim ga prelazi već poravnata na izlazni kurs (ulazak u linije za snimanje/mapiranje). Zaokreti u prilazu za automatsko sletanje uvek se izvode kao COORD_FLYBY, bez obzira na ovo podešavanje."
+  },
+  "wpTurnMaxLeadTime": {
+    "message": "Maks. vreme ranijeg ulaska u zaokret na waypoint-u"
+  },
+  "wpTurnMaxLeadTimeHelp": {
+    "message": "Samo za COORD_FLYBY zaokrete kod fiksnog krila: ograničava koliko ranije pre waypoint-a zaokret sme da počne [ms]. Potrebno vreme raste sa brzinom i uglom zaokreta; prenisko ograničenje primorava na kasan ulazak u zaokret i preletanje. Povećajte ka 12000 za trome modele, smanjite ka 3000 da zaokreti ostanu blizu waypoint-a [3000-12000]."
   },
   "navMotorStop": {
     "message": "Premošćavanje zaustavljanja motora u navigaciji"
   },
   "navMotorStopHelp": {
-    "message": "Kada je podešeno na OFF, navigacioni sistem neće preuzeti kontrolu nad motorom ako je throttle nizak (motor će se zaustaviti). Kada je podešeno na OFF_ALWAYS, navigacioni sistem neće preuzeti kontrolu nad motorom ako je throttle bio nizak čak i kada se aktivira failsafe. Kada je podešeno na AUTO_ONLY, navigacioni sistem će preuzeti kontrolu nad throttle-om samo u autonomnim režimima navigacije (NAV WP i NAV RTH). Kada je podešeno na ALL_NAV (podrazumevano), navigacioni sistem će u potpunosti preuzeti kontrolu nad motorom i nikada neće dozvoliti da se motor zaustavi čak ni kada je throttle nizak. Ova postavka utiče samo na NAV režime koji preuzimaju kontrolu nad throttle-om u kombinaciji sa MOTOR_STOP i može izazvati gubljenje uzgona (stall) ako fw_min_throttle_down_pitch nije ispravno podešen ili je procena za pitch pogrešna za modele sa fiksiranim krilima kada nije podešeno na ALL_NAV."
+    "message": "Kada je podešeno na OFF, navigacioni sistem neće preuzeti kontrolu nad motorom ako je throttle nizak (motor će se zaustaviti). Kada je podešeno na OFF_ALWAYS, navigacioni sistem neće preuzeti kontrolu nad motorom ako je throttle bio nizak čak i kada se aktivira failsafe. Kada je podešeno na AUTO_ONLY, navigacioni sistem će preuzeti kontrolu nad throttle-om samo u autonomnim režimima navigacije (NAV WP i NAV RTH). Kada je podešeno na ALL_NAV (podrazumevano), navigacioni sistem će u potpunosti preuzeti kontrolu nad motorom i nikada neće dozvoliti da se motor zaustavi čak ni kada je throttle nizak. Ova postavka utiče samo na NAV režime koji preuzimaju kontrolu nad throttle-om u kombinaciji sa MOTOR_STOP i može izazvati gubljenje uzgona (stall) ako fw_min_throttle_down_pitch nije ispravno podešen ili je procena za pitch pogrešna za modele sa fiksnim krilima kada nije podešeno na ALL_NAV."
   },
   "soarMotorStop": {
     "message": "Zaustavljanje motora u Soaring režimu"
@@ -3612,7 +3735,7 @@
     "message": "Pitch mrtva zona u Soaring režimu"
   },
   "soarPitchDeadbandHelp": {
-    "message": "Mrtva zona ugla pitch-a kada je omogućen režim jedrenja (deg). Režim Angle je neaktivan unutar mrtve zone, što omogućava da pitch slobodno pluta tokom jedrenja."
+    "message": "Mrtva zona ugla pitch-a kada je omogućen Soaring režim (deg). ANGLE režim je neaktivan unutar mrtve zone, što omogućava da pitch slobodno pluta tokom jedrenja."
   },
   "altControlResponse": {
     "message": "Faktor odziva kontrole visine"
@@ -3642,22 +3765,22 @@
     "message": "Dužina završnog prilaza"
   },
   "fwLandApproachLengthHelp": {
-    "message": "Dužina završnog prilaza, takođe uključuje fazu planiranja i presretanja. Ovo je dužina od bezbedne kućne tačke do tačke poslednjeg zaokreta."
+    "message": "Dužina završnog prilaza, takođe uključuje fazu planiranja i presretanja. Ovo je dužina od safehome tačke do tačke poslednjeg zaokreta."
   },
   "fwLandFinalApproachPitch2throttle": {
     "message": "Modifikator za odnos pitch-a i throttle-a pri završnom prilazu"
   },
   "fwLandFinalApproachPitch2throttleHelp": {
-    "message": "Ova vrednost se množi sa vrednošću \"pitch to throttle ratio\" tokom završnog prilaza. Omogućava smanjenje brzine."
+    "message": "Ova vrednost se množi sa vrednošću \"Odnos Pitch-a i throttle-a\" tokom završnog prilaza. Omogućava smanjenje brzine."
   },
   "fwLandGlideAlt": {
     "message": "Početna visina faze planiranja"
   },
   "fwLandGlideAltHelp": {
-    "message": "Na ovoj visini (mereno od visine tačke sletanja) motor se isključuje i letelica odatle ponire."
+    "message": "Na ovoj visini (mereno od visine tačke sletanja) motor se isključuje i letelica odatle planira."
   },
   "fwLandFlareAlt": {
-    "message": "Početna visina faze poravnanja"
+    "message": "Početna visina faze izravnavanja"
   },
   "fwLandFlareAltHelp": {
     "message": "Na ovoj visini (mereno od visine tačke sletanja) izvodi se poslednja faza sletanja."
@@ -3669,7 +3792,7 @@
     "message": "Ovaj ugao pitch-a se održava tokom faze planiranja."
   },
   "fwLandFlarePitch": {
-    "message": "Vrednost pitch-a za fazu poravnanja"
+    "message": "Vrednost pitch-a za fazu izravnavanja"
   },
   "fwLandFlarePitchHelp": {
     "message": "Ovaj pitch ugao se održava tokom faze izravnavanja."
@@ -3681,10 +3804,10 @@
     "message": "Ova vrednost se koristi kada sletanje u vetar nije moguće i brzine vetra ispod ove vrednosti se zanemaruju (netačnosti u INAV merenju vetra)."
   },
   "osd_unsupported_msg1": {
-    "message": "Vaš kontrolor leta ne odgovara na OSD komande. To verovatno znači da nema integrisani OSD."
+    "message": "Vaš kontroler leta ne odgovara na OSD komande. To verovatno znači da nema integrisani OSD."
   },
   "osd_unsupported_msg2": {
-    "message": "Imajte na umu da neki kontrolori leta imaju ugrađeni <a href=\"https://www.youtube.com/watch?v=ikKH_6SQ-Tk\" target=\"_blank\">MinimOSD</a> koji se može flešovati i konfigurisati pomoću <a href=\"https://github.com/ShikOfTheRa/scarab-osd/releases/latest\" target=\"_blank\">scarab-osd</a>, međutim MinimOSD se ne može konfigurisati preko ovog interfejsa."
+    "message": "Imajte na umu da neki kontroleri leta imaju ugrađeni <a href=\"https://www.youtube.com/watch?v=ikKH_6SQ-Tk\" target=\"_blank\">MinimOSD</a> koji se može flešovati i konfigurisati pomoću <a href=\"https://github.com/ShikOfTheRa/scarab-osd/releases/latest\" target=\"_blank\">scarab-osd</a>, međutim MinimOSD se ne može konfigurisati preko ovog interfejsa."
   },
   "osd_elements": {
     "message": "Elementi"
@@ -3735,16 +3858,16 @@
     "message": "Režim leta"
   },
   "osdElement_HEADING": {
-    "message": "Smer"
+    "message": "Pravac"
   },
   "osdElement_HEADING_GRAPH": {
-    "message": "Grafik smera"
+    "message": "Grafik pravca"
   },
   "osdElement_AIR_SPEED": {
-    "message": "Air Speed"
+    "message": "Airspeed"
   },
   "osdElement_MIN_GROUND_SPEED": {
-    "message": "Min. brzina u odnosu na tlo"
+    "message": "Min. brzina u odnosu na zemlju"
   },
   "osdElement_GLIDE_TIME": {
     "message": "Vreme planiranja"
@@ -3786,10 +3909,10 @@
     "message": "Bočne trake horizonta"
   },
   "osdElement_PITCH_ANGLE": {
-    "message": "Ugao uzdužnog nagiba"
+    "message": "Ugao pitch-a"
   },
   "osdElement_ROLL_ANGLE": {
-    "message": "Ugao poprečnog nagiba"
+    "message": "Ugao roll-a"
   },
   "osdElement_CURRENT_DRAW": {
     "message": "Potrošnja struje"
@@ -3810,13 +3933,13 @@
     "message": "Geografska širina"
   },
   "osdElement_DIRECTION_TO_HOME": {
-    "message": "Smer ka kući"
+    "message": "Smer ka početnoj tački"
   },
   "osdElement_HOME_HEADING_ERROR": {
-    "message": "Greška smera ka kući"
+    "message": "Greška pravca ka početnoj tački"
   },
   "osdElement_DISTANCE_TO_HOME": {
-    "message": "Udaljenost do kuće"
+    "message": "Udaljenost do početne tačke"
   },
   "osdElement_ODOMETER": {
     "message": "Odometar"
@@ -3885,10 +4008,10 @@
     "message": "Throttle Expo"
   },
   "osdElement_STABILIZED.RC_EXPO": {
-    "message": "Stabilized.rc Expo"
+    "message": "Stabilizovani RC Expo"
   },
   "osdElement_STABILIZED.RC_YAW_EXPO": {
-    "message": "Stabilized.rc Yaw Expo"
+    "message": "Stabilizovani RC Yaw Expo"
   },
   "osdElement_STABILIZED.PITCH_RATE": {
     "message": "Stabilizovana pitch brzina"
@@ -3918,13 +4041,13 @@
     "message": "Nav FW Cruise Throttle"
   },
   "osdElement_NAV_FW_PITCH_TO_THROTTLE": {
-    "message": "Nav FW Pitch na Throttle"
+    "message": "Nav FW odnos pitch-a i throttle-a"
   },
   "osdElement_FW_MIN_THROTTLE_DOWN_PITCH_ANGLE": {
     "message": "Fw min throttle ugao poniranja"
   },
   "osdElement_THRUST_PID_ATTENUATION": {
-    "message": "Thrust PID prigušenje"
+    "message": "Prigušenje PID potiska"
   },
   "osdElement_CONTROL_SMOOTHNESS": {
     "message": "Glatkoća upravljanja"
@@ -3933,7 +4056,7 @@
     "message": "TPA vremenska konstanta"
   },
   "osdElement_FW_LEVEL_TRIM": {
-    "message": "Fw level trim"
+    "message": "Fw trim nivelisanja"
   },
   "osdElement_MISSION_INDEX": {
     "message": "Indeks misije"
@@ -3948,7 +4071,7 @@
     "message": "Koristi logo pilota"
   },
   "osd_use_large_pilot_logo_help": {
-    "message": "Koristi vaš veliki logo pilota zajedno sa/umesto INAV loga. Za ovo je potreban prilagođeni font sa vašim logom pilota. Ovo se prikazuje na ekranu za arming."
+    "message": "Koristi vaš veliki logo pilota zajedno sa/umesto INAV loga. Za ovo je potreban prilagođeni font sa vašim logom pilota. Ovo se prikazuje na ekranu armovanja."
   },
   "osd_units": {
     "message": "Jedinice"
@@ -4002,7 +4125,7 @@
     "message": "Strelice za skrolovanje bočne trake"
   },
   "osd_home_position_arm_screen": {
-    "message": "Home pozicija na arming ekranu"
+    "message": "Položaj početne tačke na ekranu armovanja"
   },
   "osd_hud_settings": {
     "message": "Podešavanja Heads-up prikaza"
@@ -4116,7 +4239,7 @@
     "message": "Udaljenost"
   },
   "osdAlarmDIST_HELP": {
-    "message": "Indikator udaljenosti do kuće treperiće kada je udaljenost veća od ove vrednosti. Nula onemogućava ovaj alarm."
+    "message": "Indikator udaljenosti do početne tačke treperiće kada je udaljenost veća od ove vrednosti. Nula onemogućava ovaj alarm."
   },
   "osd_neg_alt_alarm": {
     "message": "Negativna visina"
@@ -4149,7 +4272,7 @@
     "message": "Elementi G-sile po osama će početi da trepere kada su manji od ove vrednosti"
   },
   "osd_gforce_axis_alarm_max": {
-    "message": "G-sila po osi max"
+    "message": "G-sila po osi maks"
   },
   "osdAlarmGFORCE_AXIS_MAX_HELP": {
     "message": "Elementi G-sile po osama će početi da trepere kada su veći od ove vrednosti"
@@ -4203,7 +4326,7 @@
     "message": "ADSB upozorenje na udaljenost"
   },
   "osd_adsb_distance_alert": {
-    "message": "ADSB alarm za udaljenost"
+    "message": "ADSB uzbuna za udaljenost"
   },
   "osd_rssi_dbm_alarm_HELP": {
     "message": "RSSI indikator treperi ispod ove vrednosti. Opseg: [-130,0]. Nula onemogućava ovaj alarm."
@@ -4218,7 +4341,7 @@
     "message": "Tajmeri"
   },
   "osdGroupGForce": {
-    "message": "G sila"
+    "message": "G-sila"
   },
   "osdGroupTemperature": {
     "message": "Temperatura"
@@ -4293,10 +4416,10 @@
     "message": "Preostali kapacitet baterije"
   },
   "osdElement_REMAINING_FLIGHT_TIME_HELP": {
-    "message": "Procenjeno preostalo vreme leta pre nego što letelica mora da se vrati kući, na osnovu preostale energije baterije, prosečne snage i udaljenosti od kuće (Samo za fiksna krila, pročitajte dokumentaciju)"
+    "message": "Procenjeno preostalo vreme leta pre nego što letelica mora da se vrati na početnu tačku, na osnovu preostale energije baterije, prosečne snage i udaljenosti od početne tačke (Samo za fiksna krila, pročitajte dokumentaciju)"
   },
   "osdElement_REMAINING_FLIGHT_DISTANCE_HELP": {
-    "message": "Procenjena preostala udaljenost leta pre nego što letelica mora da se vrati kući, na osnovu preostale energije baterije, prosečne snage i udaljenosti od kuće (Samo za fiksna krila, pročitajte dokumentaciju)"
+    "message": "Procenjena preostala udaljenost leta pre nego što letelica mora da se vrati na početnu tačku, na osnovu preostale energije baterije, prosečne snage i udaljenosti od početne tačke (Samo za fiksna krila, pročitajte dokumentaciju)"
   },
   "osdElement_MAIN_BATT_CELL_VOLTAGE_HELP": {
     "message": "Prikazuje prosečan napon ćelije glavne baterije"
@@ -4320,10 +4443,10 @@
     "message": "Aktivno ograničenje snage"
   },
   "osdElement_THROTTLE_POSITION_HELP": {
-    "message": "Prikazuje položaj palice throttle-a u režimima leta gde <i>ona</i> kontroliše izlaz throttle-a. U navigacijskim režimima prikazuje vrednost throttle-a koju zadaje INAV."
+    "message": "Prikazuje položaj palice throttle-a u režimima leta gde <i>ona</i> kontroliše izlaz throttle-a. U navigacionim režimima prikazuje vrednost throttle-a koju zadaje INAV."
   },
   "osdElement_SCALED_THROTTLE_POSITION_HELP": {
-    "message": "Prikazuje položaj palice throttle-a u režimima leta gde <i>ona</i> kontroliše izlaz throttle-a. U navigacijskim režimima prikazuje vrednost throttle-a koju zadaje INAV. Ovaj throttle je skaliran na osnovu idle throttle-a i max throttle-a."
+    "message": "Prikazuje položaj palice throttle-a u režimima leta gde <i>ona</i> kontroliše izlaz throttle-a. U navigacionim režimima prikazuje vrednost throttle-a koju zadaje INAV. Ovaj throttle je skaliran na osnovu idle throttle-a i maks. throttle-a."
   },
   "osdElement_GPS_SPEED": {
     "message": "Brzina u odnosu na zemlju"
@@ -4335,7 +4458,7 @@
     "message": "Maksimalna GPS brzina"
   },
   "osdElement_GPS_MAX_SPEED_HELP": {
-    "message": "Prikazuje najveću GPS brzinu po zemlji."
+    "message": "Prikazuje najveću GPS brzinu u odnosu na zemlju."
   },
   "osdElement_MSL_ALTITUDE": {
     "message": "MSL visina"
@@ -4356,10 +4479,10 @@
     "message": "Prikazuje najveću 3D brzinu uzimajući u obzir i horizontalnu i vertikalnu brzinu."
   },
   "osdElement_AIR_MAX_SPEED": {
-    "message": "Maksimalna airspeed brzina"
+    "message": "Maksimalni airspeed"
   },
   "osdElement_AIR_MAX_SPEED_HELP": {
-    "message": "Prikazuje najveću airspeed brzinu."
+    "message": "Prikazuje najveći airspeed."
   },
   "osdElement_GPS_SATS": {
     "message": "GPS sateliti"
@@ -4431,7 +4554,7 @@
     "message": "Yaw PID-ovi"
   },
   "osdElement_ONTIME_FLYTIME_HELP": {
-    "message": "Prikazuje \"On Time\" dok nije armed i \"Fly Time\" dok je armed."
+    "message": "Prikazuje \"Vreme rada\" dok letelica nije armovana i \"Vreme leta\" dok je armovana."
   },
   "osdElement_RTC_TIME": {
     "message": "Vreme dana"
@@ -4485,7 +4608,7 @@
     "message": "Kvalitet RX silazne veze %"
   },
   "osdElement_SNR_DB": {
-    "message": "RX Uplink SNR u dB"
+    "message": "RX SNR uzlazne veze u dB"
   },
   "osdElement_SNR_DB_HELP": {
     "message": "Prikazuje se samo kada SNR padne ispod nivoa alarma. Na 0dB, nivo primljenog signala jednak je nivou šuma."
@@ -4500,7 +4623,7 @@
     "message": "Mapa (Gore je sever)"
   },
   "osdElement_MAP_TAKEOFF": {
-    "message": "Mapa (Gore je pravac poletanja)"
+    "message": "Mapa (Gore je smer poletanja)"
   },
   "osdElement_RADAR": {
     "message": "Radar"
@@ -4515,7 +4638,7 @@
     "message": "Referenca mape"
   },
   "osdElement_MAP_REFERENCE_HELP": {
-    "message": "Referenca (smer okrenut nagore) trenutne mape. N za sever i T za pravac poletanja."
+    "message": "Referenca (smer okrenut nagore) trenutne mape. N za sever i T za smer poletanja."
   },
   "osdElement_FORMATION_FLIGHT": {
     "message": "Inav radar fiksiran"
@@ -4542,7 +4665,7 @@
     "message": "Level PID-ovi"
   },
   "osdElement_POS_XY_PIDS": {
-    "message": "Position XY PID-ovi"
+    "message": "PID-ovi pozicije XY"
   },
   "osdElement_POS_Z_PIDS": {
     "message": "PID-ovi pozicije Z"
@@ -4581,7 +4704,7 @@
     "message": "Baro temperatura"
   },
   "osdElement_BARO_TEMPERATURE_HELP": {
-    "message": "Temperatura za barometer"
+    "message": "Temperatura barometra"
   },
   "osdElement_ESC_TEMPERATURE": {
     "message": "ESC temperatura"
@@ -4608,7 +4731,7 @@
     "message": "Pan servo OSD podešavanja"
   },
   "osd_pan_servo_settings_HELP": {
-    "message": "Ovaj odeljak omogućava i podešava funkciju offset-a pan servoa. Koristi se za održavanje OSD elemenata, poput home strelice i POI, usmerenim u tačnom smeru, čak i kada je kamera rotirana."
+    "message": "Ovaj odeljak omogućava i podešava funkciju pomeraja pan servoa. Koristi se za održavanje OSD elemenata, poput strelice ka početnoj tački i POI, usmerenim u tačnom smeru, čak i kada je kamera rotirana."
   },
   "osdPanServoIndex": {
     "message": "Izlaz pan servoa"
@@ -4623,13 +4746,13 @@
     "message": "Stepeni rotacije pan servoa. Servou sa rotacijom od 180 stepeni obično je potrebno 180 za ovo podešavanje. Postavite negativnu vrednost da biste obrnuli smer."
   },
   "osdPanServoIndicatorShowDegrees": {
-    "message": "Prikaži stepene offset-a pored pan indikatora"
+    "message": "Prikaži stepene pomeraja pored pan indikatora"
   },
   "osdPanServoOffcentreWarning": {
     "message": "Upozorenje za van-centralni položaj"
   },
   "osdPanServoOffcentreWarning_HELP": {
-    "message": "Stepeni sa obe strane centra pan servoa u kojima se pretpostavlja da kamera treba da gleda unapred, ali nije na 0. Ako je u ovom opsegu i nije na 0 duže od 10 sekundi, OSD element offset-a pan servoa će trepereti. 0 znači da je upozorenje onemogućeno."
+    "message": "Stepeni sa obe strane centra pan servoa u kojima se pretpostavlja da kamera treba da gleda unapred, ali nije na 0. Ako je u ovom opsegu i nije na 0 duže od 10 sekundi, OSD element pomeraja pan servoa će trepereti. 0 znači da je upozorenje onemogućeno."
   },
   "osdGroupOSDCustomElements": {
     "message": "Prilagođeni OSD elementi"
@@ -4710,16 +4833,16 @@
     "message": "Sakrij nepodržane elemente"
   },
   "osd_dji_ESC_temp": {
-    "message": "Izvor za <i>ESC Temperature</i>"
+    "message": "Izvor za element <i>ESC temperatura</i>"
   },
   "osd_dji_RSSI_source": {
     "message": "Izvor za <i>RSSI</i>"
   },
   "osd_dji_GPS_source": {
-    "message": "Izvor za <i>GPS Speed</i>"
+    "message": "Izvor za element <i>Brzina u odnosu na zemlju</i>"
   },
   "osd_dji_speed_source": {
-    "message": "Izvor za <i>3D Speed</i>"
+    "message": "Izvor za element <i>3D brzina</i>"
   },
   "osd_dji_use_craft_name_elements": {
     "message": "Koristite naziv letelice za poruke i dodatne elemente.</span><br/>Elementi u <span class=\"blue\">plavoj boji</span> se pojavljuju u nazivu letelice."
@@ -4734,7 +4857,7 @@
     "message": "Podešavanja indikatora prekidača"
   },
   "osd_switch_indicator_settings_HELP": {
-    "message": "Preporučuje se korišćenje Custom OSD Elements kao zamene za indikatore prekidača. Oni su mnogo moćniji. Kliknite da biste videli primer."
+    "message": "Preporučuje se korišćenje prilagođenih OSD elemenata kao zamene za indikatore prekidača. Oni su mnogo moćniji. Kliknite da biste videli primer."
   },
   "osd_switch_indicators_align_left": {
     "message": "Poravnavanje naziva prekidača levo od prekidača"
@@ -4809,7 +4932,7 @@
     "message": "Periferije"
   },
   "appUpdateNotificationHeader": {
-    "message": "Dostupna je nova verzija Configuratora."
+    "message": "Dostupna je nova verzija Configurator-a."
   },
   "appUpdateNotificationDescription": {
     "message": "Posetite <a href=\"https://github.com/iNavFlight/inav-configurator/releases\" target=\"_blank\">veb-sajt</a> da biste pročitali napomene o izdanju i preuzeli ga."
@@ -4988,6 +5111,48 @@
   "missionSeaLevelRef": {
     "message": "Referenca nivoa mora: "
   },
+  "missionWpListHead": {
+    "message": "Waypoint-i"
+  },
+  "missionWpListSelect": {
+    "message": "Waypoint:"
+  },
+  "missionWpListPrev": {
+    "message": "Prethodni waypoint"
+  },
+  "missionWpListNext": {
+    "message": "Sledeći waypoint"
+  },
+  "missionWpListCount": {
+    "message": "Broj waypoint-a u misiji: $1"
+  },
+  "missionApplyNoElevation": {
+    "message": "Preuzimanje visine terena nije uspelo, visine waypoint-a nisu promenjene"
+  },
+  "missionApplyMissionChanged": {
+    "message": "Misija se promenila dok su se učitavale visine terena, ništa nije sačuvano"
+  },
+  "missionApplyViaHome": {
+    "message": "Referenca nivoa mora je primenjena (broj waypoint-a: $1), uz preračunavanje preko visine početne tačke"
+  },
+  "missionApplyViaTerrain": {
+    "message": "Referenca nivoa mora je primenjena (broj waypoint-a: $1), uz preračunavanje preko visine terena ispod svakog waypoint-a"
+  },
+  "missionApplyAltApplied": {
+    "message": "Podrazumevana visina je primenjena (broj waypoint-a: $1)"
+  },
+  "missionApplySpeedApplied": {
+    "message": "Podrazumevana brzina je primenjena (broj waypoint-a: $1)"
+  },
+  "missionApplyBelowGround": {
+    "message": "Upozorenje: broj waypoint-a koji su sada ispod tla: $1 — proverite visine"
+  },
+  "missionApplySpeedLandTitle": {
+    "message": "Brzina sletanja nije ažurirana"
+  },
+  "missionApplySpeedLandSkipped": {
+    "message": "Podrazumevana brzina nije primenjena ni na jedan LAND waypoint ove misije, jer sletanje obično traži drugačiju brzinu od brzine krstarenja. Ako brzinu treba promeniti, podesite je direktno na tom waypoint-u."
+  },
   "missionElevation": {
     "message": "Elevacija (m):"
   },
@@ -5019,10 +5184,10 @@
     "message": "Smer prilaza:"
   },
   "missionFwLandHeading1": {
-    "message": "Kurs 1 (deg):"
+    "message": "Pravac 1 (deg):"
   },
   "missionFwLandHeading2": {
-    "message": "Kurs 2 (deg):"
+    "message": "Pravac 2 (deg):"
   },
   "missionExclusive": {
     "message": "Izuz."
@@ -5175,13 +5340,13 @@
     "message": "Udaljenost zaustavljanja multirotora"
   },
   "geozoneMrStopDistanceHelp": {
-    "message": "Udaljenost na kom se multirotori zaustavljaju pre granice"
+    "message": "Udaljenost na kojoj se multirotori zaustavljaju pre granice"
   },
   "geozoneNoWayHomeAction": {
-    "message": "Radnja kada nema puta kući"
+    "message": "Radnja kada nema puta do početne tačke"
   },
   "geozoneNoWayHomeActionHelp": {
-    "message": "Radnja ako RTH sa aktivnim geozonama ne može da izračuna put kući. RTH: Povratak kući i ignorisanje svih geozona."
+    "message": "Radnja ako RTH sa aktivnim geozonama ne može da izračuna put do početne tačke. RTH: povratak na početnu tačku i ignorisanje svih geozona."
   },
   "missionGeozoneReboot": {
     "message": "Da li želite da sačuvate i ponovo pokrenete?"
@@ -5220,7 +5385,7 @@
     "message": "Šablon misije"
   },
   "missionActionMenuHead": {
-    "message": "Meni radnja"
+    "message": "Meni radnji"
   },
   "useOnlyStandalone": {
     "message": "Koristite samostalnu aplikaciju.<br> Molimo posetite <a href=\"https://github.com/iNavFlight/inav-configurator/releases\" target=\"_blank\">veb-sajt</a> da biste pročitali napomene o izdanju i preuzeli program."
@@ -5271,7 +5436,7 @@
     "message": "Izlazni režim"
   },
   "mixerPreset": {
-    "message": "Mixer predpodešavanje"
+    "message": "Mixer preset"
   },
   "mixerNotLoaded": {
     "message": "Mixer nije učitan.<br />Kliknite na <b>Učitaj i primeni</b> ili <b>Učitaj mixer</b> da biste koristili izabrani mixer.<br />Ili kliknite na <b>Osveži mixer</b> da biste koristili trenutni mixer."
@@ -5376,7 +5541,7 @@
     "message": "Brzina (10µs/s)"
   },
   "mixerPresetTitle": {
-    "message": "Mixer predpodešavanje"
+    "message": "Mixer preset"
   },
   "fcFirmwareUpdateRequired": {
     "message": "Potrebno je ažurirati firmver kontrolera leta na najnoviju verziju da bi se koristila ova funkcija"
@@ -5418,7 +5583,7 @@
     "message": "Brzina u odnosu na zemlju"
   },
   "HOME_DISTANCE": {
-    "message": "Udaljenost od početne lokacije"
+    "message": "Udaljenost od početne tačke"
   },
   "brakingSpeedThreshold": {
     "message": "Min. prag brzine"
@@ -5436,7 +5601,7 @@
     "message": "Maks. trajanje kočenja"
   },
   "brakingTimeoutTip": {
-    "message": "Sigurnosna mera. Ovo je najduži vremenski period tokom kojeg kočenje može biti aktivno."
+    "message": "Bezbednosna mera. Ovo je najduži vremenski period tokom kojeg kočenje može biti aktivno."
   },
   "brakingBoostFactor": {
     "message": "Faktor pojačanja"
@@ -5448,7 +5613,7 @@
     "message": "Maks. trajanje pojačanja kočenja"
   },
   "brakingBoostTimeoutTip": {
-    "message": "Sigurnosna mera. Ovo je najduži vremenski period tokom kojeg pojačanje kočenja može biti aktivno."
+    "message": "Bezbednosna mera. Ovo je najduži vremenski period tokom kojeg pojačanje kočenja može biti aktivno."
   },
   "brakingBoostSpeedThreshold": {
     "message": "Min. prag brzine za pojačanje"
@@ -5484,7 +5649,7 @@
     "message": "Frekv. Acc. notch filtera"
   },
   "accNotchHzHelp": {
-    "message": "Omogućava podešavanje jednog notch filtera za očitavanje akcelerometra. Treba ga podesiti na isti način kao gyro notch ako akcelerometar beleži pik šuma iznad acc. LPF filtera."
+    "message": "Omogućava podešavanje jednog notch filtera za očitavanje akcelerometra. Treba ga podesiti na isti način kao notch filter žiroskopa ako akcelerometar beleži pik šuma iznad acc. LPF filtera."
   },
   "accNotchCutoff": {
     "message": "Granična frekv. Acc. notch filtera"
@@ -5493,10 +5658,10 @@
     "message": "Treba da bude ispod frekvencije Acc. notch filtera"
   },
   "gyroStage2LpfCutoffFrequency": {
-    "message": "Granična frekvencija Gyro Stage 2 LPF-a"
+    "message": "Granična frekvencija LPF-a žiroskopa 2. stepena"
   },
   "gyroStage2LpfCutoffFrequencyHelp": {
-    "message": "Drugi stepen gyro low-pass filtera koji je ekvivalent Betaflight ne-Kalman filtera 2. stepena. Mora biti podešen iznad gyro LPF-a prvog stepena. Za mini-kvadove od 5 i 6 inča, to obično znači iznad 150Hz. Za kvadove od 7 inča iznad 125Hz."
+    "message": "Drugi stepen niskopropusnog filtera žiroskopa koji je ekvivalent Betaflight ne-Kalman filtera 2. stepena. Mora biti podešen iznad LPF-a žiroskopa prvog stepena. Za mini-kvadove od 5 i 6 inča, to obično znači iznad 150Hz. Za kvadove od 7 inča iznad 125Hz."
   },
   "escProtocolNotAdvised": {
     "message": "Ovaj ESC protokol se ne preporučuje, koristite ga na sopstvenu odgovornost"
@@ -5508,7 +5673,7 @@
     "message": "PID petlja možda neće biti stabilna ako se koristi GPS"
   },
   "gyroLpfSuggestedMessage": {
-    "message": "Ovo je preporučeno podešavanje za sve multirotore sa veličinom elisa ispod 8 inča. Uvek proverite temperaturu motora nakon prvog leta"
+    "message": "Ovo je preporučeno podešavanje za sve multirotore sa veličinom propelera ispod 8 inča. Uvek proverite temperaturu motora nakon prvog leta"
   },
   "gyroLpfNotAdvisedMessage": {
     "message": "Preporučuje se izbor više granične frekvencije"
@@ -5541,7 +5706,7 @@
     "message": "Operand B"
   },
   "logicFlags": {
-    "message": "Flegovi"
+    "message": "Zastavice"
   },
   "logicStatus": {
     "message": "Status"
@@ -5571,7 +5736,7 @@
     "message": "Aktivno"
   },
   "itermRelax": {
-    "message": "Iterm relaksacija"
+    "message": "Iterm Relax"
   },
   "itermRelaxHelp": {
     "message": "Određuje aktivaciju algoritma Iterm relaksacije. PR znači da je aktivan na Roll i Pitch osi. PRY je aktivan i na Yaw osi."
@@ -5583,13 +5748,13 @@
     "message": "BIQUAD nudi bolje prigušenje šuma po ceni većeg kašnjenja. PT1 ima slabije prigušenje, ali nudi manje kašnjenje."
   },
   "dterm_lpf2_type": {
-    "message": "Tip D-term Stage 2 LPF filtera"
+    "message": "Tip D-term LPF filtera 2. stepena"
   },
   "dterm_lpf2_type_help": {
     "message": "BIQUAD nudi bolje prigušenje šuma po ceni većeg kašnjenja. PT1 ima slabije prigušenje, ali nudi manje kašnjenje."
   },
   "dterm_lpf2_hz": {
-    "message": "Granična frekvencija D-term Stage 2 LPF filtera"
+    "message": "Granična frekvencija D-term LPF filtera 2. stepena"
   },
   "dterm_lpf2_hz_help": {
     "message": "Niskopropusni granični filter za D-term na ROLL i PITCH osama. 0 znači da je filter onemogućen"
@@ -5634,7 +5799,7 @@
     "message": "Kada se koriste reverzibilni motori, podesite IDLE snagu motora na 0%"
   },
   "dynamic_gyro_notch_enabled_help": {
-    "message": "Matrix Gyro Filter je nova generacija dinamičkih žiro notch filtera dostupnih u INAV-u. Preporučuje se omogućavanje na svim multirotorskim letelicama sa F4 i F7 kontrolerima leta."
+    "message": "Matrix filter žiroskopa je nova generacija dinamičkih notch filtera dostupnih u INAV-u. Preporučuje se omogućavanje na svim multirotorskim letelicama sa F4 i F7 kontrolerima leta."
   },
   "globalFunctions": {
     "message": "Globalne funkcije"
@@ -5655,7 +5820,7 @@
     "message": "Operand"
   },
   "functionFlags": {
-    "message": "Flegovi"
+    "message": "Zastavice"
   },
   "configurationI2cSpeed": {
     "message": "I2C brzina"
@@ -5685,7 +5850,7 @@
     "message": "Neispravna JUMP podešavanja: Nije moguće skočiti na POI! \nPrinudno preusmereno na WP 1!"
   },
   "MissionPlannerHeadSettingsCheck": {
-    "message": "Neispravna vrednost smera: Proverite ponovo! Prinudno postavljeno na podrazumevanih -1!"
+    "message": "Neispravna vrednost pravca: Proverite ponovo! Prinudno postavljeno na podrazumevanih -1!"
   },
   "MissionPlannerRTHSettingsCheck": {
     "message": "RTH opcija je neispravna: Treba da bude 0 ili 1. Proverite ponovo! \nPrinudno postavljeno na podrazumevano 0, tj. bez LAND nakon RTH!"
@@ -5706,10 +5871,10 @@
     "message": "Omogućeno"
   },
   "SafehomeLon": {
-    "message": "Lon"
+    "message": "Dužina"
   },
   "SafehomeLat": {
-    "message": "Lat"
+    "message": "Širina"
   },
   "SafehomeAlt": {
     "message": "Elev"
@@ -5769,16 +5934,19 @@
     "message": "Obrnut smer motora / Props-out konfiguracija"
   },
   "motor_direction_inverted_hint": {
-    "message": "Omogućite ako je smer motora obrnut i elise montirane u suprotnom smeru."
+    "message": "Omogućite ako je smer motora obrnut i propeleri montirani u suprotnom smeru."
   },
   "mixer_control_profile_linking": {
-    "message": "Control Profile će koristiti isti indeks kao i Mixer Profile"
+    "message": "Profil upravljanja će koristiti isti indeks kao i mixer profil"
   },
   "mixer_control_profile_linking_hint": {
-    "message": "mixer_control_profile_linking: Omogućite na oba Mixer Profile ako želite da prebacivanjem Control Profile upravlja prebacivanje Mixer Profile (preporučuje se za VTOL/mešovite tipove platformi)"
+    "message": "mixer_control_profile_linking: Omogućite na oba mixer profila ako želite da prebacivanjem profila upravljanja upravlja prebacivanje mixer profila (preporučuje se za VTOL/mešovite tipove platformi)"
   },
   "blackboxFields": {
     "message": "Blackbox polja"
+  },
+  "blackboxGyroSecondaryEnabled": {
+    "message": "Beleži drugi IMU (ploče sa dva žiroskopa)"
   },
   "BLACKBOX_FEATURE_NAV_ACC": {
     "message": "Navigacioni akcelerometar"
@@ -5790,7 +5958,7 @@
     "message": "Navigacioni PID"
   },
   "BLACKBOX_FEATURE_MAG": {
-    "message": "Magnetometer"
+    "message": "Magnetometar"
   },
   "BLACKBOX_FEATURE_ACC": {
     "message": "Akcelerometar"
@@ -5808,19 +5976,19 @@
     "message": "Izlaz motora"
   },
   "BLACKBOX_FEATURE_GYRO_RAW": {
-    "message": "Gyro RAW (bez filtriranja)"
+    "message": "Sirovi podaci žiroskopa (bez filtriranja)"
   },
   "BLACKBOX_FEATURE_GYRO_PEAKS_ROLL": {
-    "message": "Vršna frekv. šuma Gyro-a (Roll)"
+    "message": "Vršna frekv. šuma žiroskopa (Roll)"
   },
   "BLACKBOX_FEATURE_GYRO_PEAKS_PITCH": {
-    "message": "Vršna frekv. šuma Gyro-a (Pitch)"
+    "message": "Vršna frekv. šuma žiroskopa (Pitch)"
   },
   "BLACKBOX_FEATURE_GYRO_PEAKS_YAW": {
-    "message": "Vršna frekv. šuma Gyro-a (Yaw)"
+    "message": "Vršna frekv. šuma žiroskopa (Yaw)"
   },
   "BLACKBOX_FEATURE_SERVOS": {
-    "message": "Izlaz servo-a"
+    "message": "Izlaz servoa"
   },
   "axisRoll": {
     "message": "Roll"
@@ -5838,25 +6006,25 @@
     "message": "Ručni LPF Hz"
   },
   "rc_filter_smoothing_factor": {
-    "message": "Faktor automatskog zaglađivanja"
+    "message": "Faktor automatskog ublažavanja"
   },
   "rc_filter_auto": {
-    "message": "Koristi automatsko RC zaglađivanje"
+    "message": "Koristi automatsko RC ublažavanje"
   },
   "rcSmoothing": {
-    "message": "RC zaglađivanje"
+    "message": "RC ublažavanje"
   },
   "throttle_scale": {
     "message": "Throttle skala"
   },
   "throttle_scale_help": {
-    "message": "Omogućava ograničenje efektivne snage koja se šalje motorima. Throttle Scale 1 znači da nema ograničavanja snage. Throttle Scale 0.5 znači da će položaj throttle-a biti prepolovljen pre nego što se prosledi motorima."
+    "message": "Omogućava ograničenje efektivne snage koja se šalje motorima. Throttle skala 1 znači da nema ograničavanja snage. Throttle skala 0.5 znači da će položaj throttle-a biti prepolovljen pre nego što se prosledi motorima."
   },
   "pidTuning_MatrixFilterType": {
-    "message": "Tip matričnog filtera"
+    "message": "Tip Matrix filtera"
   },
   "pidTuning_MatrixFilterTypeHelp": {
-    "message": "Definiše tip matričnog filtera. Podrazumevani 2D filter se preporučuje većini korisnika. Kvadovima od 7 inča i većim može pogodovati 3D filter."
+    "message": "Definiše tip Matrix filtera. Podrazumevani 2D filter se preporučuje većini korisnika. Kvadovima od 7 inča i većim može pogodovati 3D filter."
   },
   "softSerialWarning": {
     "message": "Nije preporučljivo koristiti softserial za uređaje kritične za let kao što su GPS ili prijemnik, ili za uređaje sa velikim saobraćajem kao što je MSP DisplayPort."
@@ -5898,7 +6066,7 @@
     "message": "Režimi &amp; orijentacija"
   },
   "ledStripFunctionArmOption": {
-    "message": "Arm stanje"
+    "message": "Stanje armovanja"
   },
   "ledStripFunctionBatteryOption": {
     "message": "Baterija"
@@ -5938,6 +6106,24 @@
   },
   "ledStripEnableStrobeLightEffectText": {
     "message": "Omogući strob svetlosni efekat"
+  },
+  "ledStripRainbowOverlay": {
+    "message": "Duga"
+  },
+  "ledStripRainbowSettingsTitle": {
+    "message": "Podešavanja preklapanja „Duga“"
+  },
+  "ledStripRainbowFreqLabel": {
+    "message": "Brzina preliva"
+  },
+  "ledStripRainbowFreqUnit": {
+    "message": "0-255"
+  },
+  "ledStripRainbowColorDeltaLabel": {
+    "message": "Razlika boje"
+  },
+  "ledStripRainbowDeltaUnit": {
+    "message": "Stepeni"
   },
   "ledStripOverlayTitle": {
     "message": "Preklapanje"
@@ -6063,7 +6249,7 @@
     "message": "Povezivanje LED trake"
   },
   "ledStripWiringMode": {
-    "message": "Režim rasporeda žica"
+    "message": "Režim redosleda povezivanja"
   },
   "ledStripWiringClearControl": {
     "message": "Obriši izabrano"
@@ -6117,25 +6303,25 @@
     "message": "Profil baterije 3"
   },
   "sensorStatusGyro": {
-    "message": "Žiroskop — Plavo: ispravno, Crveno: greška, Tamno: nije detektovan"
+    "message": "Žiroskop — Plavo: ispravno, Crveno: greška, Tamno: nije detektovano"
   },
   "sensorStatusGyroShort": {
     "message": "Žiro"
   },
   "sensorStatusAccel": {
-    "message": "Akcelerometar — Plavo: ispravno, Crveno: greška, Tamno: nije detektovan"
+    "message": "Akcelerometar — Plavo: ispravno, Crveno: greška, Tamno: nije detektovano"
   },
   "sensorStatusAccelShort": {
     "message": "Akcel"
   },
   "sensorStatusMag": {
-    "message": "Magnetometer — Plavo: ispravno, Crveno: greška, Tamno: nije detektovano"
+    "message": "Magnetometar — Plavo: ispravno, Crveno: greška, Tamno: nije detektovano"
   },
   "sensorStatusMagShort": {
     "message": "Mag"
   },
   "sensorStatusBaro": {
-    "message": "Barometer — Plavo: ispravno, Crveno: greška, Tamno: nije detektovano"
+    "message": "Barometar — Plavo: ispravno, Crveno: greška, Tamno: nije detektovano"
   },
   "sensorStatusBaroShort": {
     "message": "Baro"
@@ -6189,7 +6375,7 @@
     "message": "Logički uslovi"
   },
   "PIDControllers": {
-    "message": "PID regulatori"
+    "message": "PID kontroleri"
   },
   "sensorsGyroSelect": {
     "message": "Žiroskop"
@@ -6198,16 +6384,16 @@
     "message": "Akcelerometar"
   },
   "sensorsMagSelect": {
-    "message": "Magnetometer"
+    "message": "Magnetometar"
   },
   "sensorsAltitudeSelect": {
-    "message": "Barometer"
+    "message": "Barometar"
   },
   "sensorsSonarSelect": {
     "message": "Sonar"
   },
   "sensorsAirSpeedSelect": {
-    "message": "Air speed"
+    "message": "Airspeed"
   },
   "sensorsTemperaturesSelect": {
     "message": "Temperature"
@@ -6225,16 +6411,16 @@
     "message": "Akcelerometar - g"
   },
   "sensorsMagnetometer": {
-    "message": "Magnetometer - Ga"
+    "message": "Magnetometar - Ga"
   },
   "sensorsBarometer": {
-    "message": "Barometer - metri"
+    "message": "Barometar - metri"
   },
   "sensorsSonar": {
     "message": "Sonar - cm"
   },
   "sensorsAirspeed": {
-    "message": "Air speed - cm/s"
+    "message": "Airspeed - cm/s"
   },
   "sensorsTemperature0": {
     "message": "Temperatura 0 - °C"
@@ -6362,6 +6548,9 @@
   "osdClearLayout": {
     "message": "Raspored je očišćen"
   },
+  "osdLayoutSaveItemFailed": {
+    "message": "<span style=\"color: red\">Nije uspelo</span> čuvanje stavke OSD rasporeda; neke izmene možda nisu primenjene"
+  },
   "failedToOpenSerialPort": {
     "message": "<span style=\"color: red\">Neuspešno</span> otvaranje serijskog porta"
   },
@@ -6369,7 +6558,7 @@
     "message": "<span style=\"color: red\">Neuspešno</span> flešovanje"
   },
   "targetPrefetchsuccessful": {
-    "message": "Preuzimanje mete uspešno: "
+    "message": "Preuzimanje Target-a uspešno: "
   },
   "targetPrefetchFail": {
     "message": "Nije moguće preuzeti Target: "
@@ -6396,7 +6585,7 @@
     "message": "Odnos osa"
   },
   "ezTuneResponse": {
-    "message": "Odaziv"
+    "message": "Odziv"
   },
   "ezTuneDamping": {
     "message": "Prigušenje"
@@ -6417,28 +6606,28 @@
     "message": "Oštrina"
   },
   "ezTuneSnappinessTips": {
-    "message": "Pomaže u postizanju oštrog osećaja na palicama. Pri brzom pomeranju palice, visoka Oštrina ubrzava odaziv drona, kako na početku, tako i na kraju manevra. Isprobajte različite vrednosti kako biste pronašli onu koja Vam najbolje odgovara."
+    "message": "Pomaže u postizanju oštrog osećaja na palicama. Pri brzom pomeranju palice, visoka Oštrina ubrzava odziv drona, kako na početku, tako i na kraju manevra. Isprobajte različite vrednosti kako biste pronašli onu koja Vam najbolje odgovara."
   },
   "ezTuneFilterHzTips": {
-    "message": "Ovo podešava osnovnu graničnu frekvenciju za sve iNav žiro i D-term filtere. Više vrednosti dovode do manjeg kašnjenja filtera i bolje stabilizacije, ali će više šuma proći kroz filtere i motori će se grejati, a UAV može oscilovati i postati nemoguć za letenje. Cilj je povećati ovu vrednost što je više moguće pre nego što se pojave negativni efekti. Negativni efekti uključuju: vruće motore, čujne oscilacije, brzo podrhtavanje UAV-a i samostalno dobijanje visine. Uobičajene početne tačke za 'Filter Hz' su: <strong>3-inčne elise</strong>: 90, <strong>5-inčne elise</strong>: 110, <strong>7-inčne elise</strong>: 90, <strong>10-inčne elise</strong>: 75, <strong>12-inčne elise</strong>: 60. Koristite Blackbox i zdrav razum kako biste pronašli vrednost koja najbolje odgovara Vašem UAV-u."
+    "message": "Ovo podešava osnovnu graničnu frekvenciju za sve INAV filtere žiroskopa i D-term filtere. Više vrednosti dovode do manjeg kašnjenja filtera i bolje stabilizacije, ali će više šuma proći kroz filtere i motori će se grejati, a UAV može oscilovati i postati nemoguć za letenje. Cilj je povećati ovu vrednost što je više moguće pre nego što se pojave negativni efekti. Negativni efekti uključuju: vruće motore, čujne oscilacije, brzo podrhtavanje UAV-a i samostalno dobijanje visine. Uobičajene početne tačke za 'Filter Hz' su: <strong>3-inčni propeleri</strong>: 90, <strong>5-inčni propeleri</strong>: 110, <strong>7-inčni propeleri</strong>: 90, <strong>10-inčni propeleri</strong>: 75, <strong>12-inčni propeleri</strong>: 60. Koristite Blackbox i zdrav razum kako biste pronašli vrednost koja najbolje odgovara Vašem UAV-u."
   },
   "ezTuneAxisRatioTips": {
-    "message": "Opisuje raspodelu težine/momenta inercije vašeg UAV-a. Što je ram duži (više mase na osi napred-nazad), to je potreban veći Axis Ratio. Savršen X ram ima odnos 100. Većina modernih ramova se nalazi između 110 i 130. Podrazumevana vrednost od 110 je dobra početna tačka."
+    "message": "Opisuje raspodelu težine/momenta inercije vašeg UAV-a. Što je ram duži (više mase na osi napred-nazad), to je potrebna veća vrednost „Odnos osa“. Savršen X ram ima odnos 100. Većina modernih ramova se nalazi između 110 i 130. Podrazumevana vrednost od 110 je dobra početna tačka."
   },
   "ezTuneResponseTips": {
-    "message": "Ovo podešavanje definiše koliko će brzo UAV reagovati na pomeranje palica i signal žiroskopa. Veće vrednosti rezultiraju bržom reakcijom, ali i većim prelaženjem zadate vrednosti i oscilacijama. Ako je UAV trom ili ima sporo ljuljanje, povećajte Response. Ako su motori vrući, čujno osciluje, prelazi zadatu vrednost ili deluje previše nervozno, smanjite Response. Većina modernih kvadova sa jakim motorima najbolje leti sa Response ispod 80. Treba podešavati zajedno sa Damping-om. Predstavlja ekvivalent P-termina."
+    "message": "Ovo podešavanje definiše koliko će brzo UAV reagovati na pomeranje palica i signal žiroskopa. Veće vrednosti rezultiraju bržom reakcijom, ali i većim prelaženjem zadate vrednosti i oscilacijama. Ako je UAV trom ili ima sporo ljuljanje, povećajte „Odziv“. Ako su motori vrući, čujno osciluje, prelazi zadatu vrednost ili deluje previše nervozno, smanjite „Odziv“. Većina modernih kvadova sa jakim motorima najbolje leti sa vrednošću „Odziv“ ispod 80. Treba podešavati zajedno sa parametrom „Prigušenje“. Predstavlja ekvivalent P-terma."
   },
   "ezTuneDampingTips": {
-    "message": "Opisuje jačinu sile koja se protivi bilo kakvoj promeni brzine rotacije. Ublažava ubrzanje po osi roll i pitch i omogućava mirniji i stabilniji let. Vaš zadatak tokom podešavanja je da utvrdite koliko možete da ga povećate pre nego što se pojave negativni simptomi: vrući motori, čujne oscilacije, prelaženje zadate vrednosti. Većina modernih kvadova može da prihvati „Damping“ do 150-180. Predstavlja ekvivalent D-termina."
+    "message": "Opisuje jačinu sile koja se protivi bilo kakvoj promeni brzine rotacije. Ublažava ubrzanje po osi roll i pitch i omogućava mirniji i stabilniji let. Vaš zadatak tokom podešavanja je da utvrdite koliko možete da ga povećate pre nego što se pojave negativni simptomi: vrući motori, čujne oscilacije, prelaženje zadate vrednosti. Većina modernih kvadova može da prihvati „Prigušenje“ do 150-180. Predstavlja ekvivalent D-terma."
   },
   "ezTuneStabilityTips": {
-    "message": "Definiše jačinu dugotrajne stabilizacije. Većina modernih kvadova podnosi „Stability“ čak do 120-130. Obično se uopšte ne mora podešavati. Ako UAV ima jak propwash tokom vertikalnog spuštanja, smanjenje parametra „Stability“ može pomoći. Predstavlja ekvivalent I-termina"
+    "message": "Definiše jačinu dugotrajne stabilizacije. Većina modernih kvadova podnosi „Stabilnost“ čak do 120-130. Obično se uopšte ne mora podešavati. Ako UAV ima jak propwash tokom vertikalnog spuštanja, smanjenje parametra „Stabilnost“ može pomoći. Predstavlja ekvivalent I-terma"
   },
   "ezTuneAggressivenessTips": {
-    "message": "Definiše koliko će brzo UAV reagovati na brze pokrete palica. Veća „Aggressiveness“ rezultira odsečnijim i bržim manevrima. Ne utiče na stabilizaciju, već samo na osećaj na palicama. Predstavlja ekvivalent FF-termina."
+    "message": "Definiše koliko će brzo UAV reagovati na brze pokrete palica. Veća „Agresivnost“ rezultira odsečnijim i bržim manevrima. Ne utiče na stabilizaciju, već samo na osećaj na palicama. Predstavlja ekvivalent FF-terma."
   },
   "ezTuneRateTips": {
-    "message": "Definiše koliko će se brzo UAV rotirati oko osa roll, pitch i yaw. Veća vrednost „Rate“ rezultira bržom rotacijom. Vrednost 0 je ekvivalent 300 dps, 100 je ekvivalent 600 dps, a 200 je ekvivalent 900 dps."
+    "message": "Definiše koliko će se brzo UAV rotirati oko osa roll, pitch i yaw. Veća vrednost „Brzina obrtanja“ rezultira bržom rotacijom. Vrednost 0 je ekvivalent 300 dps, 100 je ekvivalent 600 dps, a 200 je ekvivalent 900 dps."
   },
   "ezTuneExpoTips": {
     "message": "Definiše expo RC ulaza. Niže vrednosti daju osetljiviju palicu u centru. Veće vrednosti daju manje osetljiv centar i brži odziv na kraju hoda palice. Vrednost 0 je ekvivalent 0 expo, 100 je ekvivalent 0,7 expo, a 200 je ekvivalent 1,0 expo."
@@ -6447,7 +6636,7 @@
     "message": "PID pregled"
   },
   "ezTuneRatePreview": {
-    "message": "Rate pregled"
+    "message": "Pregled brzine obrtanja"
   },
   "ezTuneRatePreviewAxis": {
     "message": "Osa"
@@ -6459,13 +6648,13 @@
     "message": "Expo"
   },
   "ezTuneEnabledTips": {
-    "message": "Kada je omogućen, <strong>Ez Tune</strong> će preglasati više podešavanja za INAV kako bi se pojednostavio proces podešavanja. Umesto nezavisnog podešavanja svakog PID parametra i filtriranja, radite samo sa 7 klizača. Ez Tune će automatski prilagoditi sva ostala podešavanja vašim potrebama. Ez Tune je odlična početna tačka za nove korisnike i odličan način za brzo podešavanje novog UAV-a. Ne preporučuje se korišćenje Ez Tune na naprednim letelicama, jer će preglasati sva vaša podešavanja i nećete moći fino da podesite UAV. Kada je Ez Tune omogućen, podešavanja sa kartice <strong>PID tuning</strong> biće preglasana od strane EzTune-a."
+    "message": "Kada je omogućen, <strong>Ez Tune</strong> će preglasati više podešavanja za INAV kako bi se pojednostavio proces podešavanja. Umesto nezavisnog podešavanja svakog PID parametra i filtriranja, radite samo sa 7 klizača. Ez Tune će automatski prilagoditi sva ostala podešavanja vašim potrebama. Ez Tune je odlična početna tačka za nove korisnike i odličan način za brzo podešavanje novog UAV-a. Ne preporučuje se korišćenje Ez Tune na naprednim letelicama, jer će preglasati sva vaša podešavanja i nećete moći fino da podesite UAV. Kada je Ez Tune omogućen, podešavanja sa kartice <strong>Fino podešavanje</strong> biće preglasana od strane EzTune-a."
   },
   "ezTuneDisclaimer": {
-    "message": "<strong>Odricanje od odgovornosti:</strong> Ez Tune je eksperimentalna funkcija. Nije garantovano da će raditi na svim UAV letelicama. Nije garantovano da će raditi sa svim tipovima ramova. Nije garantovano da će raditi sa svim elisama. Sva izračunavanja i rezultati podešavanja mogu se promeniti u budućim verzijama INAV-a. I dalje vas podstičemo da je isprobate i podelite svoje iskustvo na INAV Discord-u u kanalu <strong>#ez-tune</strong>"
+    "message": "<strong>Odricanje od odgovornosti:</strong> Ez Tune je eksperimentalna funkcija. Nije garantovano da će raditi na svim UAV letelicama. Nije garantovano da će raditi sa svim tipovima ramova. Nije garantovano da će raditi sa svim propelerima. Sva izračunavanja i rezultati podešavanja mogu se promeniti u budućim verzijama INAV-a. I dalje vas podstičemo da je isprobate i podelite svoje iskustvo na INAV Discord-u u kanalu <strong>#ez-tune</strong>"
   },
   "ezTuneNote": {
-    "message": "<strong>Važno</strong> Ez Tune je omogućen. Sva podešavanja na ovoj kartici postavlja i kontroliše Ez Tune. Da biste koristili karticu Fino podešavanje, morate onemogućiti Ez Tune. Da biste to uradili, odznačite polje <strong>Enabled</strong> na kartici Ez Tune."
+    "message": "<strong>Važno</strong> Ez Tune je omogućen. Sva podešavanja na ovoj kartici postavlja i kontroliše Ez Tune. Da biste koristili karticu Fino podešavanje, morate onemogućiti Ez Tune. Da biste to uradili, odznačite polje <strong>Omogućeno</strong> na kartici Ez Tune."
   },
   "gsActivated": {
     "message": "Režim zemaljske stanice je aktiviran"
@@ -6495,7 +6684,7 @@
     "message": "Sateliti"
   },
   "gsTelemetryFix": {
-    "message": "Fix"
+    "message": "Fiks"
   },
   "gsTelemetrySpeed": {
     "message": "Brzina"
@@ -6564,7 +6753,7 @@
     "message": "JavaScript programiranje"
   },
   "javascriptProgrammingDescription": {
-    "message": "Napišite JavaScript kod za upravljanje vašom letelicom. Transpajler pretvara vaš kod u INAV Logic Conditions."
+    "message": "Napišite JavaScript kod za upravljanje vašom letelicom. Transpajler pretvara vaš kod u INAV logičke uslove."
   },
   "javascriptBetaWarning": {
     "message": "<strong>Trenutno u beta fazi, za testiranje. Ne koristiti za primene kritične po bezbednost!</strong>"
@@ -6621,10 +6810,10 @@
     "message": "Kompletan primer"
   },
   "sensorProfileTitle": {
-    "message": "Profil upravljanja — čuva podešavanja za PID, rates i filtriranje"
+    "message": "Profil upravljanja — čuva podešavanja za PID, brzine i filtriranje"
   },
   "mixerProfileTitle": {
-    "message": "Mixer profil — čuva miksing motora/servoa i konfiguraciju izlaza"
+    "message": "Mixer profil — čuva miksovanje motora/servoa i konfiguraciju izlaza"
   },
   "sensorBatteryProfileTitle": {
     "message": "Profil baterije — čuva podešavanja napona, kapaciteta i senzora struje"
@@ -6639,13 +6828,13 @@
     "message": "Pretraga podešavanja..."
   },
   "backupRestoreButtonBackup": {
-    "message": "Napravite bekap"
+    "message": "Napravi rezervnu kopiju"
   },
   "backupRestoreButtonRestore": {
-    "message": "Vratite konfiguraciju"
+    "message": "Vrati konfiguraciju"
   },
   "backupRestoreOpenBackupsFolder": {
-    "message": "Otvorite bekape"
+    "message": "Otvori rezervne kopije"
   },
   "backupRestoreStatusConnecting": {
     "message": "Povezivanje sa kontrolerom leta..."
@@ -6657,7 +6846,7 @@
     "message": "Čitanje konfiguracije (diff all)..."
   },
   "backupRestoreStatusSavingFile": {
-    "message": "Čuvanje bekap fajla..."
+    "message": "Čuvanje datoteke rezervne kopije..."
   },
   "backupRestoreStatusExitingCli": {
     "message": "Izlazak iz CLI-ja (ponovno pokretanje)..."
@@ -6696,13 +6885,13 @@
     "message": "Vraćanje nije uspelo."
   },
   "backupRestoreFlashCompleteBackupSaved": {
-    "message": "Flešovanje je završeno. Rezervna kopija podešavanja je sačuvana."
+    "message": "Flešovanje je završeno. Rezervna kopija konfiguracije je sačuvana."
   },
   "backupRestoreOverlayTitle": {
-    "message": "Vraćanje podešavanja"
+    "message": "Vraćanje konfiguracije"
   },
   "backupRestoreStatusRestoringProgress": {
-    "message": "Vraćanje podešavanja... ($1 / $2)"
+    "message": "Vraćanje konfiguracije... ($1 / $2)"
   },
   "backupRestoreRestoreAborted": {
     "message": "Vraćanje je obustavljeno — podešavanja NISU sačuvana."
@@ -6711,7 +6900,7 @@
     "message": "Greške tokom vraćanja"
   },
   "backupRestoreErrorText": {
-    "message": "Kontrolor leta je prijavio sledeće greške. Možete ipak sačuvati podešavanja ili prekinuti bez čuvanja."
+    "message": "Kontroler leta je prijavio sledeće greške. Možete ipak sačuvati podešavanja ili prekinuti bez čuvanja."
   },
   "backupRestoreErrorAbort": {
     "message": "Prekini (bez čuvanja)"
@@ -6723,13 +6912,13 @@
     "message": "Flešovanje je završeno. Rezervna kopija je sačuvana pre flešovanja."
   },
   "backupRestoreAutoRestoreConfirm": {
-    "message": "Izvršeno je potpuno brisanje čipa. Želite li da povratite rezervnu kopiju konfiguracije sačuvanu pre flešovanja?"
+    "message": "Izvršeno je potpuno brisanje čipa. Želite li da vratite rezervnu kopiju konfiguracije sačuvanu pre flešovanja?"
   },
   "backupRestoreAutoRestoreWaiting": {
     "message": "Čeka se pokretanje kontrolera leta..."
   },
   "backupRestoreAutoRestoreYes": {
-    "message": "Da, povrati"
+    "message": "Da, vrati"
   },
   "backupRestoreAutoRestoreNo": {
     "message": "Ne, preskoči"
@@ -6780,7 +6969,7 @@
     "message": "Ponovna mapiranja podešavanja ($1):"
   },
   "migrationPreviewContinue": {
-    "message": "Nastavi sa restauracijom"
+    "message": "Nastavi sa vraćanjem"
   },
   "migrationPreviewCancel": {
     "message": "Otkaži (ručna provera)"
@@ -6832,7 +7021,7 @@
     "message": "ID čvora kontrolera leta"
   },
   "dronecanSave": {
-    "message": "Sačuvaj i restartuj"
+    "message": "Sačuvaj i ponovo pokreni"
   },
   "dronecanNodeIdReservedWarning": {
     "message": "ID čvorova 126 i 127 rezervisani su za dijagnostičke alate. Da li ste sigurni?"
@@ -6877,7 +7066,7 @@
     "message": "Izvor podataka o visini terena"
   },
   "mapgenProvider": {
-    "message": "Dobavljač"
+    "message": "Provajder"
   },
   "mapgenMapType": {
     "message": "Vrsta mape"
@@ -6967,7 +7156,7 @@
     "message": "Obriši EEPROM"
   },
   "sitlEepromFileName": {
-    "message": "Naziv EEPROM fajla"
+    "message": "Naziv EEPROM datoteke"
   },
   "sitlEepromActions": {
     "message": "Radnje"
@@ -6988,16 +7177,16 @@
     "message": "Broj porta Websocket-to-Socket proksija koji radi na host sistemu."
   },
   "sitlEepromFiles": {
-    "message": "EEPROM fajlovi"
+    "message": "EEPROM datoteke"
   },
   "sitlEepromFilesHelp": {
-    "message": "Ovde možete da upravljate EEPROM fajlovima za SITL. Možete da preuzmete ili obrišete postojeće EEPROM fajlove."
+    "message": "Ovde možete da upravljate EEPROM datotekama za SITL. Možete da preuzmete ili obrišete postojeće EEPROM datoteke."
   },
   "webDfuPermission": {
     "message": "Odobrite dozvolu za DFU uređaj..."
   },
   "onboardLoggingTerrainRateWarning": {
-    "message": "Terrain je omogućen, ne preporučuje se stopa beleženja veća od 25%"
+    "message": "Funkcija terena je omogućena, ne preporučuje se učestalost beleženja veća od 25%"
   },
   "configurationIna226I2cBus": {
     "message": "INA226 I2C magistrala"
@@ -7018,10 +7207,10 @@
     "message": "Vrednost šant otpornika u mikroomima (µΩ) koja se koristi za računanje struje."
   },
   "configurationLaunchManual": {
-    "message": "Ručno lansiranje throttle-om"
+    "message": "Launch sa ručnim throttle-om"
   },
   "configurationLaunchManualHelp": {
-    "message": "Dozvoljava lansiranje sa throttle-om kojim se upravlja direktno ručicom gasa. Launch kontrola tokom lansiranja samo drži krila u ravni i održava ugao penjanja. AKO SE KORISTI BEZ GPS FIKSA, avion se mora lansirati odmah nakon povećanja throttle-a, da bi se izbegli problemi sa stabilizacijom penjanja i prevremenim završetkom lansiranja."
+    "message": "Dozvoljava launch sa throttle-om kojim se upravlja direktno palicom throttle-a. Launch kontrola tokom launch-a samo drži krila u ravni i održava ugao penjanja. AKO SE KORISTI BEZ GPS FIKSA, avion se mora lansirati odmah nakon povećanja throttle-a, da bi se izbegli problemi sa stabilizacijom penjanja i prevremenim završetkom launch-a."
   },
   "gpsDroneCANInfo": {
     "message": "GPS se dobija preko DroneCAN-a. Magistralu podesite na kartici DroneCAN. Serijski port i brzina prenosa se ne primenjuju."
@@ -7036,10 +7225,10 @@
     "message": "MassZero termalna kamera"
   },
   "configurationThermalCameraNote": {
-    "message": "Dodelite MZTC_CAMERA nekom UART-u na kartici Ports da biste omogućili kameru. Port i njegova brzina prenosa se tamo podešavaju. Kamera fabrički radi na 115200."
+    "message": "Dodelite MZTC_CAMERA nekom UART-u na kartici Portovi da biste omogućili kameru. Port i njegova brzina prenosa se tamo podešavaju. Kamera fabrički radi na 115200."
   },
   "configurationThermalCameraPreset": {
-    "message": "Namenska postavka"
+    "message": "Namenski preset"
   },
   "configurationThermalCameraPalette": {
     "message": "Paleta boja"
@@ -7102,7 +7291,7 @@
     "message": "Najmanji dozvoljeni throttle u horizontalnom letu"
   },
   "autoSpeedLevelMinThrHelp": {
-    "message": "Najmanji throttle za LEVEL let u režimu automatske brzine, kada se kao referenca koristi brzina u odnosu na tlo [us]. Postavite ga sa taman toliko rezerve da se izbegne gubitak uzgona. Throttle može ići i niže od ove vrednosti pri obaranju nosa, najniže do nav_fw_min_thr."
+    "message": "Najmanji throttle za LEVEL let u režimu automatske brzine, kada se kao referenca koristi brzina u odnosu na zemlju [us]. Postavite ga sa taman toliko rezerve da se izbegne gubitak uzgona. Throttle može ići i niže od ove vrednosti pri obaranju nosa, najniže do nav_fw_min_thr."
   },
   "fixedWingAutoSpeedConfiguration": {
     "message": "Podešavanja automatske brzine za fiksna krila"
@@ -7111,7 +7300,7 @@
     "message": "OSD broj slika u sekundi (Hz)"
   },
   "osd_framerate_hz_help": {
-    "message": "Ciljna učestanost osvežavanja OSD elemenata u Hz. Svaki element se ponovo iscrtava približno ovom brzinom. Vrednosti iznad 10 Hz ne donose vidljivo poboljšanje za uobičajene podatke o letu, a povećavaju opterećenje procesora. Veštački horizont i telemetrija se uvek osvežavaju u svakom ciklusu, bez obzira na ovo podešavanje. Postavite -1 za staro ponašanje (jedan element po slici)."
+    "message": "Ciljna učestanost osvežavanja OSD elemenata u Hz. Svaki element se ponovo iscrtava približno ovom brzinom. Vrednosti iznad 10 Hz ne donose vidljivo poboljšanje za uobičajene podatke o letu, a povećavaju opterećenje CPU-a. Veštački horizont i telemetrija se uvek osvežavaju u svakom ciklusu, bez obzira na ovo podešavanje. Postavite -1 za staro ponašanje (jedan element po slici)."
   },
   "osdGroupThermalCamera": {
     "message": "Termalna kamera"
@@ -7132,10 +7321,10 @@
     "message": "Simulacija putanje leta"
   },
   "missionSimulationSpeed": {
-    "message": "Krstareća brzina (m/s)"
+    "message": "Brzina krstarenja (m/s)"
   },
   "missionSimulationSpeedHelp": {
-    "message": "Čita se iz fw_reference_airspeed kada je kontroler leta povezan — ista brzina koju firmver koristi za sopstveni proračun koordinisanog zaokreta kada nema senzora brzine. Promenite je da vidite kako misija izgleda pri drugoj brzini; poluprečnik zaokreta raste sa kvadratom ove vrednosti. Imajte u vidu da se nav_auto_speed i brzina po waypoint-u ne primenjuju na letelicu sa fiksnim krilima, koja leti po zadatom throttle-u."
+    "message": "Čita se iz fw_reference_airspeed kada je kontroler leta povezan — ista brzina koju firmver koristi za sopstveni proračun koordinisanog zaokreta kada nema senzora za airspeed. Promenite je da vidite kako misija izgleda pri drugoj brzini; poluprečnik zaokreta raste sa kvadratom ove vrednosti. Imajte u vidu da se nav_auto_speed i brzina po waypoint-u ne primenjuju na letelicu sa fiksnim krilima, koja leti po zadatom throttle-u."
   },
   "missionSimulationLegendCruise": {
     "message": "krstarenje"
@@ -7168,7 +7357,7 @@
     "message": "Prilaz waypoint-a $1 i misija koriste različite referentne visine, a bez visine početne tačke ne mogu se uskladiti. Postavite početnu tačku da biste videli prilaz."
   },
   "missionSimulationApproachSuspect": {
-    "message": "Prilaz waypoint-a $1 sleće $2 m dalje po visini od same tačke — njegova podešavanja sletanja deluju neispravno. Proverite Approach Alt i Land Alt."
+    "message": "Prilaz waypoint-a $1 sleće $2 m dalje po visini od same tačke — njegova podešavanja sletanja deluju neispravno. Proverite „Visina prilaza“ i „Visina sletanja“."
   },
   "missionSimulationApproachAnchored": {
     "message": "Početna tačka nije postavljena, pa je profil prilaza usidren na svojoj visini sletanja. Oblik je tačan; postavite početnu tačku za podelu visina tačno po firmveru."
@@ -7189,7 +7378,7 @@
     "message": "Zaokreti su ograničeni na $1 stepeni nagiba preko max_angle_inclination_rll, ispod ugla koji navigacija traži, pa su širi nego što bi se očekivalo samo po nav_fw_bank_angle."
   },
   "missionSimulationSpeedEstimated": {
-    "message": "Krstareća brzina je pretpostavka: povežite kontroler leta da bi se pročitao fw_reference_airspeed, ili je postavite na ono što vaša letelica stvarno krstari. Poluprečnik zaokreta zavisi od njenog kvadrata."
+    "message": "Brzina krstarenja je pretpostavka: povežite kontroler leta da bi se pročitao fw_reference_airspeed, ili je postavite na ono što vaša letelica stvarno krstari. Poluprečnik zaokreta zavisi od njenog kvadrata."
   },
   "missionSimulationFixedWingOnly": {
     "message": "Ovo predstavlja letelicu sa fiksnim krilima. Povezana letelica to nije, pa prikazana putanja ne opisuje kako će ona leteti."
@@ -7207,7 +7396,7 @@
     "message": "Ova misija koristi apsolutne visine, ali visina početne tačke nije poznata, pa vertikalni profil može biti pogrešan. Postavite početnu tačku da se to reši."
   },
   "missionSimulationDisclaimer": {
-    "message": "Visine i prilaz za sletanje prate sopstvene formule kontrolera leta. Zaokreti se lete poluprečnikom ograničenim nagibom: kada je nav_fw_wp_turn_smoothing na ON ili ON-CUT, letelica počinje zaokret pre waypoint-a i seče krivinu iznutra, što ovde nije prikazano. Takođe nisu prikazani: vetar, zadržavanja (POSHOLD tačka i poslednji waypoint misije prolaze se pravo, a letelica bi tu kružila), skokovi, vraćanje na liniju deonice, kao ni spuštanje sa zadržanim pitch-om i izravnanje na poslednjih nekoliko metara, gde se simulacija zaustavlja. Pretpostavlja se da letelica savršeno prati zadatu putanju, pa u stvarnosti zaokreti počinju i završavaju se blaže. Ovo je pomoć pri planiranju, a ne dokaz da je misiju bezbedno leteti."
+    "message": "Visine i prilaz za sletanje prate sopstvene formule kontrolera leta. Zaokreti se lete poluprečnikom ograničenim nagibom: kada je nav_fw_wp_turn_smoothing na ON ili ON-CUT, letelica počinje zaokret pre waypoint-a i seče krivinu iznutra, što ovde nije prikazano. Takođe nisu prikazani: vetar, zadržavanja (POSHOLD tačka i poslednji waypoint misije prolaze se pravo, a letelica bi tu kružila), skokovi, vraćanje na liniju deonice, kao ni planiranje sa zadržanim pitch-om i izravnavanje na poslednjih nekoliko metara, gde se simulacija zaustavlja. Pretpostavlja se da letelica savršeno prati zadatu putanju, pa u stvarnosti zaokreti počinju i završavaju se blaže. Ovo je pomoć pri planiranju, a ne dokaz da je misiju bezbedno leteti."
   },
   "missionMap3DEmpty": {
     "message": "Nema misije za prikaz u 3D."
@@ -7246,22 +7435,22 @@
     "message": "<span style=\"color: red\">Nije sačuvano.</span> Ova podešavanja dolaze iz odgovora $1 sa kontrolera leta, koji u ovoj sesiji nije mogao da se pročita, pa se njihovo upisivanje odbija. Povežite se ponovo pa pokušajte opet."
   },
   "ledStripQuickPresets": {
-    "message": "Brze postavke:"
+    "message": "Brzi preseti:"
   },
   "ledStripQuickPresetXFrame": {
-    "message": "Kvadkopter sa X ramom"
+    "message": "Kvad sa X ramom"
   },
   "ledStripQuickPresetCrossFrame": {
-    "message": "Kvadkopter sa krstastim ramom"
+    "message": "Kvad sa krstastim ramom"
   },
   "ledStripQuickPresetWing": {
     "message": "Krilo"
   },
   "ledStripStep1Header": {
-    "message": "Redosled ožičenja"
+    "message": "Redosled povezivanja"
   },
   "ledStripStep1Instruction": {
-    "message": "Kliknite na Redosled ožičenja, pa prevlačite ćelije mreže redom kojim su LED diode povezane"
+    "message": "Kliknite na Režim redosleda povezivanja, pa prevlačite ćelije mreže redom kojim su LED diode povezane"
   },
   "ledStripStep2Header": {
     "message": "Položaj i smer"
@@ -7273,7 +7462,7 @@
     "message": "Funkcija"
   },
   "ledStripStep3Instruction": {
-    "message": "Izaberite LED diode i dodelite im funkciju (režim leta, stanje armiranja i slično) i preklapanja."
+    "message": "Izaberite LED diode i dodelite im funkciju (režim leta, stanje armovanja i slično) i preklapanja."
   },
   "ledStripStep4Header": {
     "message": "Boja"
@@ -7282,7 +7471,7 @@
     "message": "Izaberite LED diode pa kliknite na boju da biste je dodelili"
   },
   "ledStripPlacedText": {
-    "message": " / 128 postavljeno"
+    "message": "/ 128 postavljeno"
   },
   "ledStripEditPalette": {
     "message": "Uredi boje palete"
@@ -7327,7 +7516,7 @@
     "message": "Google usluge lokacije i vremenske prognoze"
   },
   "googleLocationHelpBenefit": {
-    "message": "Sa Google API ključem, Mission Control može da odredi vašu približnu lokaciju na osnovu IP adrese još pre nego što kontroler leta uhvati GPS fiks. Može i da prikaže trenutne vremenske uslove, za planiranje misije van mreže ili za GPS poziciju letelice."
+    "message": "Sa Google API ključem, kartica Upravljanje misijom može da odredi vašu približnu lokaciju na osnovu IP adrese još pre nego što kontroler leta uhvati GPS fiks. Može i da prikaže trenutne vremenske uslove, za planiranje misije van mreže ili za GPS poziciju letelice."
   },
   "googleLocationHelpHowTitle": {
     "message": "Kako se podešava API ključ:"
@@ -7375,7 +7564,7 @@
     "message": "Pretraga"
   },
   "addressSearchConfirmation": {
-    "message": "Pronađeno: $1 Izvor: $2  Premestiti se na ovu lokaciju?"
+    "message": "Pronađeno: $1\nIzvor: $2\n\nPremestiti se na ovu lokaciju?"
   },
   "addressSearchNotFound": {
     "message": "Adresa nije pronađena."
@@ -7550,5 +7739,59 @@
   },
   "dronecanNameError": {
     "message": "Greška"
+  },
+  "accAlignTitle": {
+    "message": "Čarobnjak za automatsko poravnanje"
+  },
+  "accAlignFinished": {
+    "message": "Poravnanje ploče je <span style=\"color: #37a8db\">završeno</span>"
+  },
+  "autoAlignWizardTitle": {
+    "message": "Eksperimentalno: čarobnjak za automatsko poravnanje"
+  },
+  "autoAlignWizardButton": {
+    "message": "Pokreni čarobnjak"
+  },
+  "accAlignStartText": {
+    "message": "Postavite letelicu vodoravno na sto, nosom otprilike ka severu (+/- 20°).<br />Za najbolje rezultate pokušajte da je postavite što dalje od ekrana računara. Kliknite „U redu“ kada letelica stoji vodoravno, nosom ka severu."
+  },
+  "accAlign45Text": {
+    "message": "Nagnite letelicu tako da joj nos bude podignut za oko 45 stepeni. Zatim, dok je nos i dalje podignut, kliknite dugme „U redu“."
+  },
+  "accAlignEastText": {
+    "message": "Postavite letelicu vodoravno, nosom otprilike ka <em>istoku</em>, a zatim kliknite „U redu“."
+  },
+  "accAlignDoneBoardLabel": {
+    "message": "Poravnanje ploče postavljeno na"
+  },
+  "accAlignDoneCompassLabel": {
+    "message": "Poravnanje kompasa postavljeno na"
+  },
+  "accAlignCalibrationError": {
+    "message": "Akcelerometar nije ispravno kalibrisan za ovu planetu. Kalibrišite ga na kartici Kalibracija prema lokalnoj gravitaciji."
+  },
+  "accAlignVerticalError": {
+    "message": "Očitavanja ne odgovaraju nijednoj podržanoj montaži. To se može desiti ako je kontroler leta montiran bočno (senzor je okrenut u stranu, a ne nagore ili nadole), ako se ploča pomerila između dva očitavanja ili ako nagib nosa nije bio dovoljno blizu 45 stepeni. Montirajte ploču vodoravno ili naopačke i pokušajte ponovo, ili ručno podesite poravnanje ploče."
+  },
+  "accAlignMagUncalibratedError": {
+    "message": "Kompas mora biti kalibrisan pre nego što se odredi njegovo poravnanje. Idite na karticu <b>Kalibracija</b> i kliknite <b>Kalibriši kompas</b>, a zatim ponovo pokrenite ovaj čarobnjak."
+  },
+  "accAlignMagDisagreementError": {
+    "message": "Očitavanja kompasa u položajima ka severu i ka istoku se ne slažu. To obično znači da letelica nije bila dovoljno tačno okrenuta ka severu ili da između dva očitavanja nije okrenuta za približno 90 stepeni. Pokušajte ponovo i okrenite nos letelice što tačnije ka geografskom severu."
+  },
+  "accAlignMagNoDataError": {
+    "message": "Sa kontrolera leta nije primljeno nijedno očitavanje kompasa. To može značiti da je veza nestabilna ili da firmver na ovoj ploči ne podržava zahtev kojim čarobnjak za automatsko poravnanje traži podatke kompasa. Proverite vezu i pokušajte ponovo, ili ažurirajte firmver."
+  },
+  "accAlignTiltError": {
+    "message": "Drugo očitavanje je previše slično prvom. Uverite se da je nos podignut za oko 45 stepeni, a zatim pokušajte ponovo."
+  },
+  "accAlignNoMagDetected": {
+    "message": "N/D (magnetometar nije otkriven)"
+  },
+  "magCalibOrientationTitle": {
+    "message": "Orijentacija kompasa je <span style=\"color: #37a8db\">otkrivena</span>"
+  },
+  "magCalibOrientationNotDetected": {
+    "message": "Podešavanje poravnanja kompasa nije se promenilo tokom upravo završene kalibracije. To obično znači da INAV nije mogao dovoljno pouzdano da otkrije orijentaciju montaže — ali ako je ona već bila ispravno podešena (npr. ranijim pokretanjem čarobnjaka za automatsko poravnanje), ovako izgleda i uspešno otkrivanje koje ništa nije promenilo. Ako pravac kompasa na kartici Status izgleda pogrešno, podesite orijentaciju kompasa sami pomoću tog čarobnjaka na kartici <b>Alat za poravnanje</b>."
   }
 }
