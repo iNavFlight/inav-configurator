@@ -548,6 +548,27 @@ test('setSetting() on a blocked write stops the save chain without invoking the 
     clearParseFailures();
 });
 
+test('setSetting() propagates an exception thrown by the success callback instead of swallowing it', async () => {
+    // Drives the encodeSetting() failure branch (unknown setting - no MSP
+    // traffic involved) rather than a real write, so this doesn't depend on
+    // the queue ever draining: setSetting() still runs callback() on that
+    // branch, and a bug in callback must surface either way.
+    const originalGetSetting = mspHelper._getSetting;
+    mspHelper._getSetting = () => Promise.resolve(undefined);
+
+    let rejected = false;
+    try {
+        await mspHelper.setSetting('nonexistent_setting', 5, () => { throw new Error('save chain bug'); });
+    } catch (error) {
+        rejected = true;
+        assert.equal(error.message, 'save chain bug');
+    }
+
+    mspHelper._getSetting = originalGetSetting;
+
+    assert.equal(rejected, true, 'a bug in the save chain must surface, not disappear like a refused write');
+});
+
 test('an unrelated page keeps saving after another page failed to load', () => {
     resetQueue();
     clearParseFailures();

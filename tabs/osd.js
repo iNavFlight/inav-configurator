@@ -2614,19 +2614,25 @@ OSD.saveConfig = function(callback) {
     }).catch(() => {});
 };
 
-// Resolves true on success, false if the FC refused/dropped the write -
-// never rejects, so fire-and-forget callers (OSD.GUI.saveItem) don't produce
-// an unhandled rejection, while callers that await the result (bulk paste/
-// clear) can detect a failed write instead of assuming it landed.
+// Resolves true on success, false if the FC refused the write or the queue
+// dropped it after exhausting retries (MSP.promise() can resolve with false
+// instead of rejecting for that case) - so callers that await the result
+// (bulk paste/clear) can detect a failed write instead of assuming it
+// landed. The success callback only runs when the write actually landed,
+// and its exceptions are not swallowed here - they propagate with the rest
+// of the fulfillment chain instead of being reported as a refused write.
 OSD.saveItem = function(item, callback) {
     let pos = OSD.data.items[item.id];
     let data = OSD.msp.encodeLayoutItem(OSD.data.selected_layout, item, pos);
-    return MSP.promise(MSPCodes.MSP2_INAV_OSD_SET_LAYOUT_ITEM, data).then(function() {
-        if (callback) {
+    return MSP.promise(MSPCodes.MSP2_INAV_OSD_SET_LAYOUT_ITEM, data).then(
+        function (result) { return result !== false; },
+        function () { return false; }
+    ).then(function (saved) {
+        if (saved && callback) {
             callback();
         }
-        return true;
-    }).catch(() => false);
+        return saved;
+    });
 };
 
 //noinspection JSUnusedLocalSymbols
