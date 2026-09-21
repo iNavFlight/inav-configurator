@@ -1028,14 +1028,8 @@
     "featureTX_PROF_SEL": {
         "message": "Profile selection with TX stick command"
     },
-    "featureINFLIGHT_ACC_CAL": {
-        "message": "In-flight level calibration"
-    },
     "featureMOTOR_STOP": {
         "message": "Stop motors on low throttle"
-    },
-    "featureSERVO_TILT": {
-        "message": "Servo gimbal"
     },
     "featureBAT_PROFILE_AUTOSWITCH": {
         "message": "Automatic battery profile selection"
@@ -1061,12 +1055,6 @@
     "featureGPSTip": {
         "message": "Configure port scenario first"
     },
-    "featureFAILSAFE": {
-        "message": "Apply failsafe settings on RX signal loss"
-    },
-    "featureSONAR": {
-        "message": "Sonar"
-    },
     "featureTELEMETRY": {
         "message": "Telemetry output"
     },
@@ -1084,12 +1072,6 @@
     },
     "featureDASHBOARD": {
         "message": "OLED Screen Display"
-    },
-    "featureONESHOT125": {
-        "message": "ONESHOT ESC support"
-    },
-    "featureONESHOT125Tip": {
-        "message": "Disconnect flight battery and remove props before enabling."
     },
     "featurePWM_OUTPUT_ENABLE": {
         "message": "Enable motor and servo output"
@@ -1115,18 +1097,6 @@
     "onboardLoggingTerrainRateWarning": {
         "message": "Terrain is enabled, not recommended to use more than 25% logging rate"
     },
-    "featureCHANNEL_FORWARDING": {
-        "message": "Forward aux channels to servo outputs"
-    },
-    "featureSOFTSPI": {
-        "message": "CPU based SPI"
-    },
-    "featurePWM_SERVO_DRIVER": {
-        "message": "External PWM servo driver"
-    },
-    "featurePWM_SERVO_DRIVERTip": {
-        "message": "Use external PCA9685 PWM driver to connect up to 16 servos to flight controller. PCA9685 has to be connected to enable this feature."
-    },
     "featureRSSI_ADCTip": {
         "message": "RSSI is a measurement of signal strength and is very handy so you know when your aircraft is going out of range or if it is suffering RF interference."
     },
@@ -1144,12 +1114,6 @@
     },
     "featureFW_AUTOTRIMTip": {
         "message": "When flying in a stabilized mode, continuously adjust the servo midpoints so that the airplane keeps flying straight when switching to manual mode. Requires GPS."
-    },
-    "featureDYNAMIC_FILTERS": {
-        "message": "Dynamic Gyro Filters"
-    },
-    "featureDYNAMIC_FILTERSTip": {
-        "message": "Use automatic FFT gyro analysis to setup notch filters to attenuate gyro noise. Should be enabled all the time!"
     },
     "configurationFeatureEnabled": {
         "message": "Enabled"

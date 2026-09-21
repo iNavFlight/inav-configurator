@@ -702,7 +702,6 @@ var FC = {
             {bit: 17, group: 'other', name: 'DASHBOARD', showNameInTip: true},
             {bit: 19, group: 'other', name: 'BLACKBOX', haveTip: true, showNameInTip: true},
             {bit: 28, group: 'other', name: 'PWM_OUTPUT_ENABLE', haveTip: true},
-            {bit: 26, group: 'other', name: 'SOFTSPI'},
             {bit: 29, group: 'other', name: 'OSD', haveTip: false, showNameInTip: false},
             {bit: 22, group: 'other', name: 'AIRMODE', haveTip: false, showNameInTip: false},
             {bit: 30, group: 'other', name: 'FW_LAUNCH', haveTip: false, showNameInTip: false},
