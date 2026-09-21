@@ -1909,7 +1909,7 @@ var mspHelper = (function () {
                 break;    
 
             case MSPCodes.MSP2_MZTC_CONFIG:
-                // Fixed 12 byte payload, little endian, one field at a time.
+                // Fixed 11 byte payload, little endian, one field at a time.
                 // The firmware writes it with the sbufWrite helpers, so there
                 // is no compiler padding to account for here. The serial port
                 // and its baud rate are not in this payload. They live in the
@@ -2583,7 +2583,7 @@ var mspHelper = (function () {
 
 
             case MSPCodes.MSP2_SET_MZTC_CONFIG:
-                // Fixed 12 byte payload matching MSP2_MZTC_CONFIG. The firmware
+                // Fixed 11 byte payload matching MSP2_MZTC_CONFIG. The firmware
                 // validates the whole request before applying any of it, so an
                 // out of range value is rejected in full.
                 // One push in field order. The field order is the wire order,
