@@ -7,6 +7,7 @@ import store from './store'
 
 
 const availableLanguages = ['en', 'de', 'it', 'ja', 'ru', 'bg', 'uk', 'zh_CN', 'sr'];
+
 const i18n = {};
 
 i18n.loadMessages = async function(languages) {
