@@ -14,16 +14,26 @@ import { mixer, PLATFORM } from './../js/model';
 import timeout from './../js/timeouts';
 import interval from './../js/intervals';
 
+/* Phase 0 of the firmware's calibration state machine, which is also how the
+ * sequence is called off. Out here because cleanup() needs it too. */
+const SRXL2_CAL_OFF = 0;
+
+/* MSP.send_message calls back with false when the request never made it. Reading
+ * .data off that throws, and a poller running every 500 ms throws on every tick,
+ * so every use of a reply checks it arrived first. */
+function srxl2StatusArrived(resp) {
+    return Boolean(resp?.data);
+}
+
 const outputsTab = {
     allowTestMode: false,
-    feature3DEnabled: false,
-    feature3DSupported: false
+    srxl2Calibrating: false,
+    feature3DEnabled: false
 };
 outputsTab.initialize = function (callback) {
     var self = this;
 
     self.armed = false;
-    self.feature3DSupported = false;
     self.allowTestMode = true;
 
     var $motorsEnableTestMode;
@@ -46,6 +56,20 @@ outputsTab.initialize = function (callback) {
         mspHelper.loadOutputMappingExt,
         mspHelper.loadRcData,
         mspHelper.loadAdvancedConfig,
+        /* Needed to count the ports assigned to Spektrum Smart ESC. Without it
+         * FC.SERIAL_CONFIG is whatever an earlier tab happened to leave behind -
+         * empty on a fresh start - and the tab reports no port assigned however
+         * many there are. */
+        mspHelper.loadSerialPorts,
+        /* One Smart ESC status request before the UI is built. On a board
+         * without the driver it comes back as an unsupported command, and that
+         * is what stops the tab offering a protocol and a port function the
+         * board has no code to perform. */
+        function (callback) {
+            MSP.send_message(MSPCodes.MSP2_INAV_ESC_SRXL2_STATUS, false, false, function () {
+                callback();
+            });
+        },
         function(callback) {
             mspHelper.getSetting("motor_direction_inverted").then((data)=>{
                 self.motorDirectionInverted=data.value;
@@ -79,13 +103,13 @@ outputsTab.initialize = function (callback) {
         Settings.saveInputs(onComplete);
     }
 
-    function onLoad() {
+    function onLoad(settingsPromise) {
 
         self.feature3DEnabled = BitHelper.bit_check(FC.FEATURES, 12);
 
         process_motors();
         process_servos();
-        processConfiguration();
+        processConfiguration(settingsPromise);
 
         finalize();
     }
@@ -102,7 +126,7 @@ outputsTab.initialize = function (callback) {
         }
     }
 
-    function processConfiguration() {
+    function processConfiguration(settingsPromise) {
         let escProtocols = FC.getEscProtocols(),
             servoRates = FC.getServoRates(),
             $idlePercent = $('#throttle_idle'),
@@ -129,6 +153,249 @@ outputsTab.initialize = function (callback) {
             }
         }
 
+        /*
+         * SRXL2 is not a timer waveform like every other entry in this list: the
+         * ESC hangs off a UART, so the block below only makes sense for it, and a
+         * port has to have been assigned in the Ports tab for it to work at all.
+         */
+        const SRXL2_PROTOCOL = 7;
+
+        /* Offering SRXL2 where the firmware has none is not a cosmetic mistake:
+         * saving it leaves the board on a protocol nothing drives, and the
+         * motors unwritten. */
+        if (!FC.SRXL2_STATUS.supported) {
+            delete escProtocols[SRXL2_PROTOCOL];
+        }
+
+        const SRXL2_CAL_WAIT_BATTERY = 1, SRXL2_CAL_SETTLE = 2, SRXL2_CAL_LOW = 3;
+
+        /* srxl2CalResult_e in the firmware. The sequence presents full throttle, so
+         * it has preconditions, and the operator needs to know which one failed
+         * rather than watching a wizard start and immediately finish. */
+        const SRXL2_CAL_REFUSED = {
+            1: 'srxl2CalibrateRefusedArmed',
+            2: 'srxl2CalibrateRefusedNoPort',
+            3: 'srxl2CalibrateRefusedBattery',
+            4: 'srxl2CalibrateRefusedNoSensor',
+        };
+
+        /* Registered with the interval helper rather than setInterval, because
+         * GUI.tab_switch_cleanup kills those for us: a poller that outlives its
+         * own Abort button would keep asking, and keep writing into content that
+         * is no longer on screen. */
+        const SRXL2_POLL = 'srxl2_cal_poll';
+
+        /*
+         * How many ports the firmware actually opened, and how many motors the
+         * mixer wants. Both come from the board rather than being inferred here,
+         * because they are exactly the two numbers pwmInitMotors() compares when it
+         * decides whether arming is allowed - so the warning cannot disagree with
+         * the behaviour it is warning about.
+         *
+         * Note MSP2_INAV_MIXER does NOT carry the model's motor count: its last two
+         * bytes are MAX_SUPPORTED_MOTORS and MAX_SUPPORTED_SERVOS, the compile-time
+         * ceilings. Reading numberOfMotors from there reports 12 on any board.
+         */
+        let srxl2Counts = null;     // {ports, motors}, or null if not yet known
+
+        function srxl2RefreshCounts(done) {
+            MSP.send_message(MSPCodes.MSP2_INAV_ESC_SRXL2_STATUS, false, false, function (resp) {
+                /* The reply is parsed into FC.SRXL2_STATUS before this runs, so
+                 * the numbers come from there rather than being read a second
+                 * time out of the buffer. */
+                srxl2Counts = srxl2StatusArrived(resp)
+                    ? { ports: FC.SRXL2_STATUS.ports, motors: FC.SRXL2_STATUS.motors }
+                    : null;
+                if (done) {
+                    done();
+                }
+            });
+        }
+
+        /* What the Ports tab currently shows, saved or not. Used only to notice an
+         * assignment the board has not rebooted into yet. */
+        function srxl2PortsAssignedInUi() {
+            if (!FC.SERIAL_CONFIG?.ports) {
+                return 0;
+            }
+            let n = 0;
+            for (const port of FC.SERIAL_CONFIG.ports) {
+                if (port.functions.includes('ESC_SRXL2')) {
+                    n++;
+                }
+            }
+            return n;
+        }
+
+        function srxl2CalStop() {
+            interval.remove(SRXL2_POLL);
+            outputsTab.srxl2Calibrating = false;
+            $('#srxl2-cal-abort').hide();
+            $('#srxl2-cal-start').show();
+            $('#srxl2-cal-ack').prop('checked', false);
+            $('#srxl2-cal-start').addClass('disabled');
+        }
+
+        function srxl2CalShow(messageId) {
+            $('#srxl2-cal-status').html(i18n.getMessage(messageId)).show();
+        }
+
+        function srxl2CalPoll() {
+            MSP.send_message(MSPCodes.MSP2_INAV_ESC_SRXL2_STATUS, false, false, function (resp) {
+                if (!srxl2StatusArrived(resp)) {
+                    return;     /* one lost poll; the next one in 500 ms decides */
+                }
+                switch (FC.SRXL2_STATUS.phase) {
+                case SRXL2_CAL_WAIT_BATTERY: srxl2CalShow('srxl2CalibrateConnect'); break;
+                case SRXL2_CAL_SETTLE:       srxl2CalShow('srxl2CalibrateHeard');   break;
+                case SRXL2_CAL_LOW:          srxl2CalShow('srxl2CalibrateLow');     break;
+                default:
+                    /* The firmware ends every phase on its own, so reaching OFF is
+                     * the normal finish as well as the result of an abort. */
+                    srxl2CalShow('srxl2CalibrateDone');
+                    srxl2CalStop();
+                    break;
+                }
+            });
+        }
+
+        function srxl2UpdateVisibility() {
+            const isSrxl2 = Number.parseInt(FC.ADVANCED_CONFIG.motorPwmProtocol, 10) === SRXL2_PROTOCOL;
+            $('#srxl2-esc').toggle(isSrxl2);
+
+            /*
+             * Reversible motors is the centre-zero throttle arrangement, which is a
+             * different kind of ESC. A Smart ESC reverses on a switch and goes on
+             * reading the throttle normally, so enabling it would hand the ESC
+             * roughly half throttle where the pilot expects the motor stopped. The
+             * firmware clears the feature for this protocol at startup; hiding the
+             * control keeps the tab from offering what the board will undo.
+             */
+            $('#feature-12').closest('.checkbox').toggle(!isSrxl2);
+
+            /*
+             * Assigning the port and choosing the protocol are two settings, and
+             * doing only the first is the easy mistake: the block below is hidden
+             * until the protocol is SRXL2, so without this the tab says nothing at
+             * all to someone who has configured the port and is wondering why
+             * nothing happened.
+             */
+            $('#srxl2-protocol-hint')
+                .toggle(!isSrxl2 && srxl2PortsAssignedInUi() > 0)
+                .html(i18n.getMessage('srxl2ProtocolNotSet'));
+
+            if (isSrxl2) {
+                const assigned = srxl2PortsAssignedInUi();
+                const $warn = $('#srxl2-no-port');
+                const $info = $('#srxl2-port-count');
+
+                if (!srxl2Counts) {
+                    /* The board has not been asked yet, or does not answer - say
+                     * only what is certain rather than inventing a motor count. */
+                    $warn.toggle(assigned === 0).html(i18n.getMessage('srxl2NoPort'));
+                    $info.html(i18n.getMessage('srxl2PortCount', [assigned]));
+                    return;
+                }
+
+                const ports = srxl2Counts.ports;
+                const motors = srxl2Counts.motors;
+
+                if (assigned === 0 && ports === 0) {
+                    $warn.html(i18n.getMessage('srxl2NoPort')).show();
+                } else if (ports === 0) {
+                    /* Assigned in the tab but not yet opened by the board: the ports
+                     * are opened at startup, so this needs a reboot rather than
+                     * another port. */
+                    $warn.html(i18n.getMessage('srxl2PortNeedsReboot', [assigned])).show();
+                } else if (ports < motors) {
+                    $warn.html(i18n.getMessage('srxl2TooFewPorts', [motors, ports])).show();
+                } else {
+                    $warn.hide();
+                }
+
+                /* A board with no mixer preset applied reports no motors, which is
+                 * a normal starting state and not worth phrasing as "for 0 motors". */
+                $info.html(motors > 0
+                    ? i18n.getMessage('srxl2PortCountOpen', [ports, motors])
+                    : i18n.getMessage('srxl2PortCountOpenNoMixer', [ports]));
+            } else {
+                srxl2CalStop();
+            }
+        }
+
+        /*
+         * Reverse is off when the channel is 0, which is how the firmware stores it,
+         * but a bare number field gives no hint that zero is the off switch. The
+         * checkbox is that switch; the channel only appears once it is on.
+         *
+         * SRXL2_REVERSE_DEFAULT is what Spektrum ship, so turning it on lands
+         * somewhere sensible rather than on a channel the ESC never watches.
+         */
+        const SRXL2_REVERSE_DEFAULT = 7;
+        const $reverseEnable = $('#srxl2-reverse-enable');
+        const $reverseChannel = $('#esc_srxl2_reverse_channel');
+        const $reverseRow = $('#srxl2-reverse-channel-row');
+
+        function srxl2ReverseSync() {
+            const on = $reverseEnable.is(':checked');
+            $reverseRow.toggle(on);
+            if (on && Number.parseInt($reverseChannel.val(), 10) === 0) {
+                $reverseChannel.val(SRXL2_REVERSE_DEFAULT).trigger('change');
+            } else if (!on) {
+                $reverseChannel.val(0).trigger('change');
+            }
+        }
+
+        $reverseEnable.on('change', srxl2ReverseSync);
+
+        $('#srxl2-cal-ack').on('change', function () {
+            $('#srxl2-cal-start').toggleClass('disabled', !$(this).is(':checked'));
+        });
+
+        $('#srxl2-cal-start').on('click', function () {
+            if ($(this).hasClass('disabled')) {
+                return;
+            }
+            const data = [SRXL2_CAL_WAIT_BATTERY];
+            MSP.send_message(MSPCodes.MSP2_INAV_ESC_SRXL2_CALIBRATE, data, false, function () {
+                /*
+                 * The callback fires whether or not the firmware accepted: this is
+                 * an MSP IN command, so a refusal comes back as an error with no
+                 * payload to explain it. Read the status instead and let that
+                 * decide - otherwise the wizard announces "connect the battery" for
+                 * a sequence that never started, then reports it finished.
+                 */
+                MSP.send_message(MSPCodes.MSP2_INAV_ESC_SRXL2_STATUS, false, false, function (resp) {
+                    if (!srxl2StatusArrived(resp)) {
+                        srxl2CalShow('srxl2CalibrateRefused');
+                        $('#srxl2-cal-ack').prop('checked', false);
+                        $('#srxl2-cal-start').addClass('disabled');
+                        return;
+                    }
+                    if (FC.SRXL2_STATUS.phase === SRXL2_CAL_OFF) {
+                        const why = FC.SRXL2_STATUS.lastResult;
+                        srxl2CalShow(SRXL2_CAL_REFUSED[why] || 'srxl2CalibrateRefused');
+                        $('#srxl2-cal-ack').prop('checked', false);
+                        $('#srxl2-cal-start').addClass('disabled');
+                        return;
+                    }
+
+                    $('#srxl2-cal-start').hide();
+                    $('#srxl2-cal-abort').show();
+                    srxl2CalShow('srxl2CalibrateConnect');
+                    outputsTab.srxl2Calibrating = true;
+                    interval.add(SRXL2_POLL, srxl2CalPoll, 500);
+                });
+            });
+        });
+
+        $('#srxl2-cal-abort').on('click', function () {
+            MSP.send_message(MSPCodes.MSP2_INAV_ESC_SRXL2_CALIBRATE, [SRXL2_CAL_OFF], false, function () {
+                srxl2CalShow('srxl2CalibrateAborted');
+                srxl2CalStop();
+            });
+        });
+
         let $escProtocol = $('#esc-protocol');
         
         for (let i in escProtocols) {
@@ -142,12 +409,34 @@ outputsTab.initialize = function (callback) {
 
         $escProtocol.on('change', function () {
             FC.ADVANCED_CONFIG.motorPwmProtocol = $(this).val();
+            srxl2UpdateVisibility();
         });
 
         $idlePercent.on('change', handleIdleMessageBox);
         handleIdleMessageBox();
 
+        /*
+         * Waited for on purpose. Settings.processHtml() starts configureInputs()
+         * and then calls this back immediately, by design, so the data-setting
+         * inputs are still empty here - reading the reverse channel now returns
+         * nothing and the switch would come up off every time, saved value or not.
+         */
+        function srxl2ReverseInit() {
+            $reverseEnable.prop('checked', Number.parseInt($reverseChannel.val(), 10) > 0);
+            $reverseRow.toggle($reverseEnable.is(':checked'));
+        }
+
+        if (settingsPromise && typeof settingsPromise.then === 'function') {
+            settingsPromise.then(srxl2ReverseInit);
+        } else {
+            srxl2ReverseInit();
+        }
+
         $("#esc-protocols").show();
+        srxl2UpdateVisibility();
+        /* Asked once: both counts are settled at startup and cannot change without
+         * a reboot. Refreshes the block when the answer arrives. */
+        srxl2RefreshCounts(srxl2UpdateVisibility);
 
         let $servoRate = $('#servo-rate');
 
@@ -402,10 +691,6 @@ outputsTab.initialize = function (callback) {
     function process_motors() {
         $motorsEnableTestMode = $('#motorsEnableTestMode');
 
-        if (self.feature3DEnabled && !self.feature3DSupported) {
-            self.allowTestMode = false;
-        }
-
         $motorsEnableTestMode.prop('checked', false);
         $motorsEnableTestMode.prop('disabled', true);
 
@@ -527,10 +812,9 @@ outputsTab.initialize = function (callback) {
         $slidersInput.prop('max', FC.MISC.maxthrottle);
         $('div.values li:not(:last)').text(FC.MISC.mincommand);
 
-        if (self.feature3DEnabled && self.feature3DSupported) {
-            //Arbitrary sanity checks
-            //Note: values may need to be revisited
-            if (FC.REVERSIBLE_MOTORS.neutral > 1575 || FC.EVERSIBLE_MOTORS.neutral < 1425)
+        if (self.feature3DEnabled) {
+            // Clamp neutral to safe range around midpoint (1500us); values outside indicate corrupt config
+            if (FC.REVERSIBLE_MOTORS.neutral > 1575 || FC.REVERSIBLE_MOTORS.neutral < 1425)
                 FC.REVERSIBLE_MOTORS.neutral = 1500;
 
             $slidersInput.val(FC.REVERSIBLE_MOTORS.neutral);
@@ -591,7 +875,7 @@ outputsTab.initialize = function (callback) {
                 $slidersInput.prop('disabled', true);
 
                 // change all values to default
-                if (self.feature3DEnabled && self.feature3DSupported) {
+                if (self.feature3DEnabled) {
                     $slidersInput.val(FC.REVERSIBLE_MOTORS.neutral);
                 } else {
                     $slidersInput.val(FC.MISC.mincommand);
@@ -751,6 +1035,19 @@ outputsTab.initialize = function (callback) {
 };
 
 outputsTab.cleanup = function (callback) {
+    /*
+     * Leaving the tab takes the Abort button with it, so the sequence it would
+     * have stopped is called off here instead. The firmware is holding full
+     * throttle on the wire while it waits for the battery, and a control that
+     * has gone off screen is not a reason to leave it holding.
+     */
+    if (outputsTab.srxl2Calibrating) {
+        outputsTab.srxl2Calibrating = false;
+        MSP.send_message(MSPCodes.MSP2_INAV_ESC_SRXL2_CALIBRATE, [SRXL2_CAL_OFF], false, function () {
+            if (callback) callback();
+        });
+        return;
+    }
     if (callback) callback();
 };
 

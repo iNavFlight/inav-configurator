@@ -135,6 +135,23 @@
                             <input type="checkbox" name="strobe" class="toggle function-e" />
                             <label> <span i18n="ledStripEnableStrobeLightEffectText"></span></label>
                         </div>
+                        <div class="checkbox rainbowOverlay extra_functions20">
+                            <input type="checkbox" id="rainbowOverlayToggle" name="rainbow" class="toggle function-v" />
+                            <label for="rainbowOverlayToggle"> <span i18n="ledStripRainbowOverlay"></span></label>
+                        </div>
+                    </div>
+                    <div class="rainbowSettings" id="rainbowSettings" style="margin-top: 8px; margin-left: 4px;">
+                        <div style="font-weight: bold; margin-bottom: 6px; color: #1dacf2;" i18n="ledStripRainbowSettingsTitle"></div>
+                        <div class="rainbowSettingRow" style="display: flex; align-items: center; margin-bottom: 4px;">
+                            <label for="rainbowFreqInput" style="width: 100px; flex-shrink: 0;" i18n="ledStripRainbowFreqLabel"></label>
+                            <input type="number" id="rainbowFreqInput" min="0" max="255" step="1" disabled style="width: 40px; text-align: right;" aria-labelledby="rainbowFreqInput" />
+                            <span style="margin-left: 6px;" i18n="ledStripRainbowFreqUnit"></span>
+                        </div>
+                        <div class="rainbowSettingRow" style="display: flex; align-items: center; margin-bottom: 4px;">
+                            <label for="rainbowDeltaInput" style="width: 100px; flex-shrink: 0;" i18n="ledStripRainbowColorDeltaLabel"></label>
+                            <input type="number" id="rainbowDeltaInput" min="0" max="359" step="1" disabled style="width: 40px; text-align: right;" aria-labelledby="rainbowDeltaInput" />
+                            <span style="margin-left: 6px;" i18n="ledStripRainbowDeltaUnit"></span>
+                        </div>
                     </div>
                 </div>
 
@@ -201,7 +218,6 @@
         </div>
 
         <div class="colorControls">
-
         </div>
 
         <div class="clear-both"></div>
