@@ -1,5 +1,7 @@
 'use strict';
 
+import { parseEscDirection } from '../escDirection';
+
 import semver from 'semver';
 
 import './../injected_methods';
@@ -1955,6 +1957,13 @@ var mspHelper = (function () {
 
             case MSPCodes.MSP2_SET_MZTC_CONFIG:
                 console.log("MZTC config saved");
+                break;
+
+            case MSPCodes.MSP2_INAV_ESC_DIRECTION:
+                FC.ESC_DIRECTION = dataHandler.unsupported ? null : parseEscDirection(data);
+                break;
+            case MSPCodes.MSP2_INAV_SET_ESC_DIRECTION:
+            case MSPCodes.MSP2_INAV_SET_ESC_DIRECTION_TEST:
                 break;
 
             case MSPCodes.MSP2_INAV_ESC_SRXL2_STATUS:

@@ -116,7 +116,10 @@ const inertGeozoneUrl = dataModule(`
     export const GeozoneShapes = {};
 `);
 
+const realEscDirectionUrl = rewriteAndWrite('js/escDirection.js', [], 'esc-direction-generated');
+
 const realMspHelperUrl = rewriteAndWrite('js/msp/MSPHelper.js', [
+    [/^import \{ parseEscDirection \} from '\.\.\/escDirection';$/m, `import { parseEscDirection } from '${realEscDirectionUrl}';`, 'import parseEscDirection'],
     [/^import semver from 'semver';$/m, `import semver from '${inertDefaultUrl}';`, "import semver"],
     [/^import '\.\/\.\.\/injected_methods';$/m, `import '${realInjectedMethodsUrl}';`, "import injected_methods"],
     [/^import GUI from '\.\/\.\.\/gui';$/m, `import GUI from '${guiStubUrl}';`, "import GUI"],
@@ -416,6 +419,7 @@ test('reads, reboot and live commands are never blocked', () => {
         // stopMotors() stops a running motor test with this - refusing it would
         // strand the motors spinning.
         'MSP_SET_MOTOR',
+        'MSP2_INAV_SET_ESC_DIRECTION_TEST',
         'MSP_SET_RAW_RC',
         // Only the user-selected preset index is sent, never parsed FC state.
         'MSP2_SET_MZTC_PRESET',
@@ -447,6 +451,7 @@ test('a write is recognised however its name spells SET', () => {
     // Codes named after SET that are reads, or writes carrying no FC-read data:
     const notGuarded = [
         'MSPV2_SETTING', 'MSP2_COMMON_SETTING_INFO',
+        'MSP2_INAV_SET_ESC_DIRECTION_TEST',
         'MSP_SET_REBOOT', 'MSP_SET_MOTOR', 'MSP_SET_RAW_RC', 'MSP_SET_RAW_GPS',
         'MSP_SET_HEAD', 'MSP_SET_RTC', 'MSP_RESET_CONF', 'MSP_SET_RESET_CURR_PID',
         'MSP_SELECT_SETTING', 'MSP_SET_BOX', 'MSP2_SET_MZTC_PRESET',

@@ -110,7 +110,10 @@ var FC = {
     isRpyDComponentUsed: function () {
         return true; // Currently all platforms use D term
     },
+    ESC_DIRECTION: null,
+
     resetState: function () {
+        this.ESC_DIRECTION = null;
         // MassZero thermal camera. MZTC_CONFIG mirrors the 15 byte
         // MSP2_MZTC_CONFIG payload. MZTC_STATUS stays null until the flight
         // controller answers MSP2_MZTC_STATUS.

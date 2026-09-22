@@ -15,6 +15,7 @@ const WRITE_CODE_NAMES = Object.keys(MSPCodes)
 // them. Refusing the live ones would be a hazard of its own.
 const ALWAYS_ALLOWED_WRITE_NAMES = [
     'MSP_SET_REBOOT',            // stores nothing; the user's way out of a bad session
+    'MSP2_INAV_SET_ESC_DIRECTION_TEST', // includes unconditional stop; start is guarded in firmware
     'MSP_SET_MOTOR',             // stopMotors() stops a running motor test with this
     'MSP_SET_RAW_RC', 'MSP_SET_RAW_GPS', 'MSP_SET_HEAD', 'MSP_SET_RTC',
     'MSP_EEPROM_WRITE',          // persists what is already on the FC

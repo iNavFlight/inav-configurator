@@ -7768,5 +7768,107 @@
     },
     "magCalibOrientationNotDetected": {
         "message": "The compass alignment setting didn't change during that calibration spin. This usually means INAV wasn't confident enough to detect the mounting orientation -- but if it was already set correctly (e.g. from a previous run of this wizard), this is also what a successful, unchanged detection looks like. If your compass heading looks wrong on the Status tab, use the auto alignment wizard on the <b>Alignment</b> tab to set it manually."
+    },
+    "escDirectionTitle": {
+        "message": "Motor direction"
+    },
+    "escDirectionAck": {
+        "message": "All propellers are removed and all motors have stopped."
+    },
+    "escDirectionNormal": {
+        "message": "Set Normal"
+    },
+    "escDirectionReverse": {
+        "message": "Set Reverse"
+    },
+    "escDirectionReady": {
+        "message": "Select one motor and the desired ESC direction."
+    },
+    "escDirectionBusy": {
+        "message": "Sending direction and save commands. Keep ESC power connected."
+    },
+    "escDirectionUncertain": {
+        "message": "No reliable confirmation. Keep propellers removed, restart and check the ESC configuration before retrying."
+    },
+    "escDirectionRefused": {
+        "message": "Request refused. Stop motor testing, check DShot/3D settings and restart before retrying."
+    },
+    "escWizardSummary": {
+        "message": "Check each motor against the mixer diagram and change its direction."
+    },
+    "escWizardOpen": {
+        "message": "Motor direction wizard"
+    },
+    "escWizardDemo": {
+        "message": "Demo · Motor tests and ESC commands are simulated."
+    },
+    "escWizardSafety": {
+        "message": "Remove all propellers before connecting the battery. Motors will spin during the test."
+    },
+    "escWizardGuided": {
+        "message": "Wizard"
+    },
+    "escWizardGuidedHint": {
+        "message": "Check one motor at a time"
+    },
+    "escWizardIndividual": {
+        "message": "Individually"
+    },
+    "escWizardIndividualHint": {
+        "message": "Select a motor yourself"
+    },
+    "escWizardInitialize": {
+        "message": "Wizard starts each selected ESC from Normal. Individually keeps its direction until you change it. Changes are saved to compatible ESCs."
+    },
+    "escWizardMap": {
+        "message": "Top view · expected direction"
+    },
+    "escWizardObserve": {
+        "message": "Does this motor turn in the direction of the arrow?"
+    },
+    "escWizardTest": {
+        "message": "Hold to spin"
+    },
+    "escWizardPulse": {
+        "message": "Release to stop · max. 1.5 s · low speed"
+    },
+    "escWizardFlip": {
+        "message": "Reverse direction"
+    },
+    "escWizardNext": {
+        "message": "Direction correct → Next"
+    },
+    "escWizardFinish": {
+        "message": "Direction correct → Finish"
+    },
+    "escWizardClose": {
+        "message": "Stop & close"
+    },
+    "escWizardLock": {
+        "message": "Existing arming behavior is unchanged. Arming cancels an active test."
+    },
+    "escWizardStep": {
+        "message": "Motor $1 of $2"
+    },
+    "escWizardSelected": {
+        "message": "Motor $1"
+    },
+    "escWizardRunning": {
+        "message": "Motor test active — release to stop."
+    },
+    "escWizardStopped": {
+        "message": "Motor stopped. Compare its direction with the arrow."
+    },
+    "escWizardComplete": {
+        "message": "All motors checked. Verify ESC persistence after a power cycle."
+    },
+    "escWizardUnsupported": {
+        "message": "Matching test firmware with motor-test support required."
+    },
+    "escWizardSaved": {
+        "message": "Direction commands sent. Confirm by observing the motor; ESC save has no readback."
+    },
+    "escWizardSimSaved": {
+        "message": "Simulated direction set. Ready for the motor test."
     }
 }

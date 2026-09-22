@@ -13,6 +13,7 @@ import features from './../js/feature_framework';
 import { mixer, PLATFORM } from './../js/model';
 import timeout from './../js/timeouts';
 import interval from './../js/intervals';
+import { mountEscDirection } from '../js/escDirectionPanel';
 
 /* Phase 0 of the firmware's calibration state machine, which is also how the
  * sequence is called off. Out here because cleanup() needs it too. */
@@ -110,6 +111,9 @@ outputsTab.initialize = function (callback) {
         process_motors();
         process_servos();
         processConfiguration(settingsPromise);
+        self.disposeEscDirection = mountEscDirection({ MSP, MSPCodes, FC, i18n, interval,
+            isArmed: () => self.armed
+        });
 
         finalize();
     }
@@ -1035,6 +1039,7 @@ outputsTab.initialize = function (callback) {
 };
 
 outputsTab.cleanup = function (callback) {
+    this.disposeEscDirection?.();
     /*
      * Leaving the tab takes the Abort button with it, so the sequence it would
      * have stopped is called off here instead. The firmware is holding full

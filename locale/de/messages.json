@@ -6820,5 +6820,107 @@
     },
     "migrationMissingProfileWarning": {
         "message": "Kein Migrationsprofil für Version $1 → $2 verfügbar. Die Einstellungen werden ohne Konvertierung wiederhergestellt — einige können fehlschlagen oder von der Firmware ignoriert werden."
+    },
+    "escDirectionTitle": {
+        "message": "Motor-Drehrichtung"
+    },
+    "escDirectionAck": {
+        "message": "Alle Propeller sind entfernt und alle Motoren stehen still."
+    },
+    "escDirectionNormal": {
+        "message": "Normal setzen"
+    },
+    "escDirectionReverse": {
+        "message": "Reverse setzen"
+    },
+    "escDirectionReady": {
+        "message": "Einen Motor und die gewünschte ESC-Richtung auswählen."
+    },
+    "escDirectionBusy": {
+        "message": "Richtung und Speicherbefehl werden gesendet. ESC-Stromversorgung angeschlossen lassen."
+    },
+    "escDirectionUncertain": {
+        "message": "Keine zuverlässige Bestätigung. Propeller entfernt lassen, neu starten und ESC-Konfiguration vor einem erneuten Versuch prüfen."
+    },
+    "escDirectionRefused": {
+        "message": "Anfrage abgelehnt. Motortest stoppen, DShot-/3D-Einstellungen prüfen und vor einem erneuten Versuch neu starten."
+    },
+    "escWizardSummary": {
+        "message": "Prüfe jeden Motor am Motorbild und ändere seine Drehrichtung."
+    },
+    "escWizardOpen": {
+        "message": "Drehrichtungs-Assistent"
+    },
+    "escWizardDemo": {
+        "message": "Demo · Drehproben und ESC-Befehle werden simuliert."
+    },
+    "escWizardSafety": {
+        "message": "Alle Propeller entfernen, dann den Akku anschließen. Bei der Drehprobe laufen Motoren an."
+    },
+    "escWizardGuided": {
+        "message": "Assistent"
+    },
+    "escWizardGuidedHint": {
+        "message": "Schritt für Schritt durch alle Motoren"
+    },
+    "escWizardIndividual": {
+        "message": "Einzeln"
+    },
+    "escWizardIndividualHint": {
+        "message": "Einen Motor direkt auswählen"
+    },
+    "escWizardInitialize": {
+        "message": "Der Assistent beginnt je Motor mit Normal. „Einzeln“ ändert erst auf Knopfdruck. Änderungen werden in kompatiblen ESCs gespeichert."
+    },
+    "escWizardMap": {
+        "message": "Draufsicht · erwartete Drehrichtung"
+    },
+    "escWizardObserve": {
+        "message": "Dreht dieser Motor in Pfeilrichtung?"
+    },
+    "escWizardTest": {
+        "message": "Gedrückt halten zum Drehen"
+    },
+    "escWizardPulse": {
+        "message": "Loslassen stoppt · max. 1,5 s · niedrige Drehzahl"
+    },
+    "escWizardFlip": {
+        "message": "Drehrichtung umkehren"
+    },
+    "escWizardNext": {
+        "message": "Richtung stimmt → Weiter"
+    },
+    "escWizardFinish": {
+        "message": "Richtung stimmt → Fertig"
+    },
+    "escWizardClose": {
+        "message": "Stoppen & schließen"
+    },
+    "escWizardLock": {
+        "message": "Arming bleibt unverändert. Beim Armen wird ein laufender Test abgebrochen."
+    },
+    "escWizardStep": {
+        "message": "Motor $1 von $2"
+    },
+    "escWizardSelected": {
+        "message": "Motor $1"
+    },
+    "escWizardRunning": {
+        "message": "Drehprobe läuft – zum Stoppen loslassen."
+    },
+    "escWizardStopped": {
+        "message": "Motor gestoppt. Vergleiche seine Drehrichtung mit dem Pfeil."
+    },
+    "escWizardComplete": {
+        "message": "Alle Motoren geprüft. ESC-Speicherung nach einem Neustart prüfen."
+    },
+    "escWizardUnsupported": {
+        "message": "Passende Test-Firmware mit Unterstützung für die Drehprobe erforderlich."
+    },
+    "escWizardSaved": {
+        "message": "Richtungsbefehle gesendet. Am Motor prüfen; der ESC bestätigt das Speichern nicht."
+    },
+    "escWizardSimSaved": {
+        "message": "Simulierte Richtung gesetzt. Bereit zur Drehprobe."
     }
 }

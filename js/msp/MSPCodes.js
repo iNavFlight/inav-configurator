@@ -266,6 +266,9 @@ var MSPCodes = {
     // 0x2232 went to MSP2_INAV_MAG_UNALIGNED upstream while this branch was open, so
     // the firmware side moved both of these up by one. The numbers are what travels on
     // the wire, so the two lists have to agree.
+    MSP2_INAV_ESC_DIRECTION:           0x2235,
+    MSP2_INAV_SET_ESC_DIRECTION:       0x2236,
+    MSP2_INAV_SET_ESC_DIRECTION_TEST:  0x2237,
     MSP2_INAV_ESC_SRXL2_STATUS:         0x2233,
     MSP2_INAV_ESC_SRXL2_CALIBRATE:      0x2234,
 
