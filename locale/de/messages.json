@@ -812,14 +812,8 @@
     "featureTX_PROF_SEL": {
         "message": "Profilauswahl per TX-Stick-Kommando"
     },
-    "featureINFLIGHT_ACC_CAL": {
-        "message": "Level-Kalibrierung im Flug"
-    },
     "featureMOTOR_STOP": {
         "message": "Motoren bei niedrigem Throttle stoppen"
-    },
-    "featureSERVO_TILT": {
-        "message": "Servo-Gimbal"
     },
     "featureBAT_PROFILE_AUTOSWITCH": {
         "message": "Automatische Akku-Profil-Auswahl"
@@ -845,12 +839,6 @@
     "featureGPSTip": {
         "message": "Zuerst das Port-Szenario konfigurieren"
     },
-    "featureFAILSAFE": {
-        "message": "Failsafe-Einstellungen bei RX-Signalverlust anwenden"
-    },
-    "featureSONAR": {
-        "message": "Sonar"
-    },
     "featureTELEMETRY": {
         "message": "Telemetrie-Ausgabe"
     },
@@ -868,12 +856,6 @@
     },
     "featureDASHBOARD": {
         "message": "OLED-Bildschirm-Anzeige"
-    },
-    "featureONESHOT125": {
-        "message": "ONESHOT-ESC-Unterstützung"
-    },
-    "featureONESHOT125Tip": {
-        "message": "Vor dem Aktivieren Flugakku trennen und Propeller entfernen."
     },
     "featurePWM_OUTPUT_ENABLE": {
         "message": "Motor- und Servo-Ausgang aktivieren"
@@ -893,18 +875,6 @@
     "onboardLoggingBlackboxRate": {
         "message": "Anteil der Flight-Loop-Iterationen, der aufgezeichnet wird (Aufzeichnungsrate)"
     },
-    "featureCHANNEL_FORWARDING": {
-        "message": "AUX-Kanäle an Servo-Ausgänge weiterleiten"
-    },
-    "featureSOFTSPI": {
-        "message": "CPU-basiertes SPI"
-    },
-    "featurePWM_SERVO_DRIVER": {
-        "message": "Externer PWM-Servo-Treiber"
-    },
-    "featurePWM_SERVO_DRIVERTip": {
-        "message": "Nutze den externen PCA9685-PWM-Treiber, um bis zu 16 Servos an den Flight Controller anzuschließen. Der PCA9685 muss angeschlossen sein, um dieses Feature zu aktivieren."
-    },
     "featureRSSI_ADCTip": {
         "message": "RSSI ist ein Maß für die Signalstärke und sehr praktisch, damit du weißt, wann dein Modell außer Reichweite gerät oder unter RF-Störungen leidet."
     },
@@ -922,12 +892,6 @@
     },
     "featureFW_AUTOTRIMTip": {
         "message": "Beim Fliegen in einem stabilisierten Modus werden die Servo-Mittelpunkte kontinuierlich angepasst, damit das Flugzeug beim Umschalten in den manuellen Modus geradeaus weiterfliegt. Erfordert GPS."
-    },
-    "featureDYNAMIC_FILTERS": {
-        "message": "Dynamische Gyro-Filter"
-    },
-    "featureDYNAMIC_FILTERSTip": {
-        "message": "Nutzt automatische FFT-Gyro-Analyse, um Notch-Filter zur Dämpfung von Gyro-Rauschen einzurichten. Sollte immer aktiviert sein!"
     },
     "configurationFeatureEnabled": {
         "message": "Aktiviert"
@@ -4987,6 +4951,42 @@
     },
     "missionSeaLevelRef": {
         "message": "Meeresspiegel-Ref.: "
+    },
+    "missionWpListHead": {
+        "message": "Wegpunkte"
+    },
+    "missionWpListSelect": {
+        "message": "Wegpunkt:"
+    },
+    "missionWpListPrev": {
+        "message": "Vorheriger Wegpunkt"
+    },
+    "missionWpListNext": {
+        "message": "N\u00e4chster Wegpunkt"
+    },
+    "missionWpListCount": {
+        "message": "$1 Wegpunkt(e) in der Mission"
+    },
+    "missionApplyNoElevation": {
+        "message": "H\u00f6henabfrage fehlgeschlagen, H\u00f6hen wurden nicht ge\u00e4ndert"
+    },
+    "missionApplyMissionChanged": {
+        "message": "Die Mission hat sich w\u00e4hrend der H\u00f6henabfrage ge\u00e4ndert, es wurde nichts gespeichert"
+    },
+    "missionApplyViaHome": {
+        "message": "Meeresspiegel-Referenz auf $1 Wegpunkt(e) angewendet, umgerechnet \u00fcber die Home-H\u00f6he"
+    },
+    "missionApplyViaTerrain": {
+        "message": "Meeresspiegel-Referenz auf $1 Wegpunkt(e) angewendet, umgerechnet \u00fcber die Gel\u00e4ndeh\u00f6he je Wegpunkt"
+    },
+    "missionApplyAltApplied": {
+        "message": "Standardh\u00f6he auf $1 Wegpunkt(e) angewendet"
+    },
+    "missionApplySpeedApplied": {
+        "message": "Standard-Geschwindigkeit auf $1 Wegpunkt(e) angewendet"
+    },
+    "missionApplyBelowGround": {
+        "message": "Achtung: $1 Wegpunkt(e) liegen jetzt unter dem Gel\u00e4nde, bitte H\u00f6hen pr\u00fcfen"
     },
     "missionElevation": {
         "message": "Geländehöhe (m):"

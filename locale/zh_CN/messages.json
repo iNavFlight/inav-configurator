@@ -792,14 +792,8 @@
     "featureTX_PROF_SEL": {
         "message": "使用遥控器摇杆选择设置档"
     },
-    "featureINFLIGHT_ACC_CAL": {
-        "message": "实时水平校准"
-    },
     "featureMOTOR_STOP": {
         "message": "解锁后处于最低油门时不转动电机"
-    },
-    "featureSERVO_TILT": {
-        "message": "舵机云台"
     },
     "featureBAT_PROFILE_AUTOSWITCH": {
         "message": "自动选择电池类型"
@@ -825,12 +819,6 @@
     "featureGPSTip": {
         "message": "请先设置串口"
     },
-    "featureFAILSAFE": {
-        "message": "当接收机信号丢失启用失控保护"
-    },
-    "featureSONAR": {
-        "message": "声呐"
-    },
     "featureTELEMETRY": {
         "message": "遥测输出"
     },
@@ -848,12 +836,6 @@
     },
     "featureDASHBOARD": {
         "message": "OLED 显示屏"
-    },
-    "featureONESHOT125": {
-        "message": "ONESHOT 电调支持"
-    },
-    "featureONESHOT125Tip": {
-        "message": "开启前请务必拔掉电池，卸下螺旋桨。"
     },
     "featurePWM_OUTPUT_ENABLE": {
         "message": "开启电机和舵机输出"
@@ -873,18 +855,6 @@
     "onboardLoggingBlackboxRate": {
         "message": "飞行循环迭代到日志的部分(日志速率)"
     },
-    "featureCHANNEL_FORWARDING": {
-        "message": "转发 Aux 通道信号到舵机输出"
-    },
-    "featureSOFTSPI": {
-        "message": "启用软SPI"
-    },
-    "featurePWM_SERVO_DRIVER": {
-        "message": "外置 PWM 伺服设备"
-    },
-    "featurePWM_SERVO_DRIVERTip": {
-        "message": "在飞控中使用外部PCA9685 PMW驱动器可以连接多达16个舵机飞行控制器。必须连接PCA9685才能启用该特性。"
-    },
     "featureRSSI_ADCTip": {
         "message": "RSSI是一种信号强度的测量方法，非常方便，你可以知道你的飞机何时超出了遥控范围，或者是否受到射频干扰。"
     },
@@ -902,12 +872,6 @@
     },
     "featureFW_AUTOTRIMTip": {
         "message": "在自稳模式飞行时，持续调整伺服中点，使飞机在切换到手动模式时保持直线飞行。需要GPS。"
-    },
-    "featureDYNAMIC_FILTERS": {
-        "message": "动态陀螺仪滤波器"
-    },
-    "featureDYNAMIC_FILTERSTip": {
-        "message": "使用自动FFT陀螺分析来设置陷波滤波器来衰减陀螺噪声。应该一直启用!"
     },
     "configurationFeatureEnabled": {
         "message": "启用"

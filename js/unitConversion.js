@@ -167,7 +167,7 @@ const unitExpandedNames = {
 // unitConversionTable[toUnit][fromUnit] -> factor
 const unitRatioTable = {
     'cm' : {
-        'm' : 100.0, 
+        'm' : 100.0,
         'ft' : 30.48
     },
     'm' : {
@@ -180,8 +180,8 @@ const unitRatioTable = {
         'nm' : 1852.0
     },
     'cms' : { // Horizontal speed
-        'kmh' : 27.77777777777778, 
-        'kt': 51.44444444444457, 
+        'kmh' : 27.77777777777778,
+        'kt': 51.44444444444457,
         'mph' : 44.704,
         'ms' : 100.0
     },
@@ -465,4 +465,3 @@ export {
     smartRound,
     toDisplayUnits
 };
-

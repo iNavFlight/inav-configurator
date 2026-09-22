@@ -10,6 +10,7 @@ import features from './../js/feature_framework';
 import i18n from './../js/localization';
 import BitHelper from './../js/bitHelper';
 import dialog from './../js/dialog';
+import Settings from './../js/settings';
 
 var sdcardTimer;
 
@@ -75,6 +76,31 @@ onboardLoggingTab.initialize = function (callback) {
         MSP.send_message(MSPCodes.MSP_EEPROM_WRITE, false, false, reboot);
     }
 
+    /*
+     * Read the setting back before committing to flash.
+     *
+     * mspHelper.setSetting() logs an encoding or write failure to the console and
+     * then calls its success continuation anyway, so a value that never reached
+     * the flight controller would still reach the EEPROM write, the "saved"
+     * message and the reboot. That is shared behaviour across every tab, not
+     * something this one can fix, but it should not be relied on either: this
+     * setting is checked, and the tab says so instead of claiming a save it
+     * cannot vouch for.
+     */
+    function save_secondary_gyro_verified() {
+        const wanted = $('#gyro_secondary_enabled').is(':checked') ? 1 : 0;
+
+        mspHelper.getSetting('gyro_secondary_enabled').then(function (setting) {
+            if (setting && Number(setting.value) !== wanted) {
+                GUI.log(i18n.getMessage('onboardLoggingSecondaryGyroNotSaved'));
+                return;
+            }
+            save_to_eeprom();
+        }).catch(function () {
+            GUI.log(i18n.getMessage('onboardLoggingSecondaryGyroNotSaved'));
+        });
+    }
+
     function reboot() {
         GUI.log(i18n.getMessage('configurationEepromSaved'));
 
@@ -89,7 +115,14 @@ onboardLoggingTab.initialize = function (callback) {
     }
 
     function load_html() {
-        import('./onboard_logging.html?raw').then(({default: html}) => GUI.load(html, function() {
+        import('./onboard_logging.html?raw').then(({default: html}) => GUI.load(html, Settings.processHtml(async function(settingsPromise) {
+            // Wait for the settings to finish loading before the save handler is
+            // bound, so a quick save cannot race the background MSP reads and
+            // either overwrite the user's choice or drop it from the save.
+            if (settingsPromise) {
+                await settingsPromise;
+            }
+
             // translate to user-selected language
            i18n.localize();
 
@@ -140,7 +173,12 @@ onboardLoggingTab.initialize = function (callback) {
                     features.reset();
                     features.fromUI($('.require-blackbox-supported'));
                     features.execute(function () {
-                        mspHelper.sendBlackboxConfiguration(save_to_eeprom);
+                        // The include flags travel inside the blackbox configuration
+                        // message; gyro_secondary_enabled is a regular setting and
+                        // takes the settings path instead.
+                        mspHelper.sendBlackboxConfiguration(function () {
+                            Settings.saveInputs(save_secondary_gyro_verified);
+                        });
                     });
                 });
             }
@@ -174,7 +212,7 @@ onboardLoggingTab.initialize = function (callback) {
             update_html();
 
             GUI.content_ready(callback);
-        }));
+        })));
     }
 
     function populateDevices() {
