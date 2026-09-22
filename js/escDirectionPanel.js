@@ -13,6 +13,7 @@ export function mountEscDirection({ MSP, MSPCodes, FC, i18n, interval, isArmed, 
     let disposed = false, status = null, updatedAt = 0, pending = null, requesting = false;
     let selected = 0, mode = null, held = false, starting = false, stopping = false, lastTestToken = 0;
     let polling = false, unsupported = false, stopPromise = null;
+    const connectionConfig = FC.CONFIG; // resetState replaces this on a new connection
     const known = [], checked = [];
     const dialog = document.getElementById('esc-direction-dialog');
     const t = (key, args) => i18n.getMessage(key, args);
@@ -27,6 +28,7 @@ export function mountEscDirection({ MSP, MSPCodes, FC, i18n, interval, isArmed, 
         else interval.remove('esc_direction_poll');
     }
     async function write(code, payload, field) {
+        if (FC.CONFIG !== connectionConfig) throw new Error('FC connection changed');
         FC[field] = null;
         const response = await MSP.promise(code, payload);
         // Queue exhaustion resolves false; an MSP error also completes its callback.
@@ -149,6 +151,7 @@ export function mountEscDirection({ MSP, MSPCodes, FC, i18n, interval, isArmed, 
         });
     }
     function sendStop() {
+        if (FC.CONFIG !== connectionConfig) return Promise.resolve();
         if (stopPromise) return stopPromise;
         stopping = true;
         refresh();

@@ -107,3 +107,24 @@ test('quad diagram is independent of the asynchronous Outputs preview, including
         h.dispose();
     }
 });
+
+test('stop retry after tab cleanup cannot send into a new FC connection', async () => {
+    const h = harness(); await h.open(); h.fire('#esc-direction-test', 'pointerdown');
+    const start = h.calls.at(-1); h.dispose(); const stop = h.calls.at(-1);
+    h.FC.CONFIG = {}; // reconnect replaces the FC state
+    const count = h.calls.length;
+    await h.answer(stop, false); await h.answer(start);
+    assert.equal(h.calls.length, count);
+    assert.equal(h.timers.size, 0);
+});
+test('a late start failure cannot clear acknowledgements on a new connection', async () => {
+    const h = harness(); await h.open(); h.fire('#esc-direction-test', 'pointerdown');
+    const start = h.calls.at(-1); h.dispose(); const stop = h.calls.at(-1);
+    await h.answer(stop);
+    h.FC.CONFIG = {};
+    const count = h.calls.length;
+    await h.answer(start, false);
+    assert.equal(h.calls.length, count);
+    assert.equal(h.FC.ESC_DIRECTION_TEST_ACK, false);
+    assert.equal(h.timers.size, 0);
+});
