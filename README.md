@@ -144,8 +144,8 @@ The key is saved automatically and persists across sessions.
 
 #### Airspace Overlays (openAIP)
 
-Mission Control can draw controlled airspace and airports from [openAIP](https://www.openaip.net) 
-on top of any map provider. Both overlays are off by default and are switched on individually in 
+Mission Control can draw controlled airspace and airports from [openAIP](https://www.openaip.net)
+on top of any map provider. Both overlays are off by default and are switched on individually in
 **Options -> Airspace data (openAIP)**.
 
 A free openAIP API key is required:
@@ -154,10 +154,10 @@ A free openAIP API key is required:
 2. Open your user profile and generate an API key
 3. Paste it into the **openAIP API key** field in Options
 
-The key is stored locally and persists across sessions, the same way the MapTiler key is. Without 
+The key is stored locally and persists across sessions, the same way the MapTiler key is. Without
 a key the switches stay available but no tiles are requested.
 
-> Airspace data is advisory. It is not a substitute for an official aeronautical chart or for 
+> Airspace data is advisory. It is not a substitute for an official aeronautical chart or for
 > checking the rules that apply where you fly.
 
 #### Output Paths
@@ -239,7 +239,7 @@ unzip INAV-Configurator_linux_arch_x.y.z.zip -d /tmp/
 sudo mkdir /opt/inav
 sudo chown $USER /opt/inav
 ```
-7. Move the temporary files into their home 
+7. Move the temporary files into their home
 ```
 mv /tmp/INAV\ Configurator /opt/inav/inav-configurator
 ```
@@ -248,7 +248,7 @@ mv /tmp/INAV\ Configurator /opt/inav/inav-configurator
 sudo mkdir /opt/inav/inav-configurator/icon
 sudo cp /opt/inav/inav-configurator/resources/app/images/inav_icon_128.png /opt/inav/inav-configurator/icon
 ```
-9. As a one-off, move the desktop file into the applications directory 
+9. As a one-off, move the desktop file into the applications directory
 ```
 sudo mv inav-configurator.desktop /usr/share/applications/
 ```
@@ -263,6 +263,7 @@ sudo mv inav-configurator.desktop /usr/share/applications/
 3. Install
     * Extract ZIP archive and run INAV Configurator
     * OR use the DMG package for installation
+4. Official tagged builds (`9.1.3` or `v9.1.3`) are signed and notarized. Nightlies are signed when repo secrets are configured. Pull-request and fork CI builds are always unsigned. If Gatekeeper blocks an unsigned app, run `xattr -cr "/path/to/INAV Configurator.app"` from Terminal.
 
 ## Building and running INAV Configurator locally (for development)
 
@@ -276,11 +277,11 @@ For local development, the **node.js** build system is used.
 To build the App run `yarn run make` to build for your platform.
 
 Options:
-* Architecture: --arch  - Allowed values are: "ia32", "x64", "armv7l", "arm64", "universal", or "mips64el". 
+* Architecture: --arch  - Allowed values are: "ia32", "x64", "armv7l", "arm64", "universal", or "mips64el".
 
 See [Electron Forge CLI Documentation](https://www.electronforge.io/cli#options-2) for details
 
-Note: Not all architectures are available for all platforms. For example, ia32 (32bit) support is not available for Linux. 
+Note: Not all architectures are available for all platforms. For example, ia32 (32bit) support is not available for Linux.
 Tested architectures:
 - Windows: x64 and ia32
 - Linux: x64 and armv7l
@@ -289,7 +290,7 @@ Tested architectures:
 To build the setup program for windows, you have to install [WiX Toolset V3](https://github.com/wixtoolset/wix3/releases) and add the `bin` folder to you `PATH`, e.g.
 ```C:\Program Files (x86)\WiX Toolset v3.14\bin```
 
-To build deb and rpm packages for Linux, you have to install the following packages: 
+To build deb and rpm packages for Linux, you have to install the following packages:
 - Ubuntu/Debian: `dpkg, fakeroot, rpm, build-essential, libudev-dev`
 - OpenSuse/Fedora: `dpkg, fakeroot, rpmbuild, systemd-devel, devel-basis (zypper install -t pattern devel_basis), zip`
 
