@@ -37,48 +37,17 @@
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync, writeFileSync, mkdtempSync, rmSync } from 'node:fs';
-import { tmpdir } from 'node:os';
-import { join, dirname, resolve } from 'node:path';
-import { fileURLToPath, pathToFileURL } from 'node:url';
+import { readFileSync, readdirSync } from 'node:fs';
+import { join } from 'node:path';
+import { pathToFileURL } from 'node:url';
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const repoRoot = resolve(__dirname, '..');
+import { dataModule } from './helpers/dataModule.mjs';
+import { makeHarness } from './helpers/harness.mjs';
 
-const tmpDir = mkdtempSync(join(tmpdir(), 'msp-parse-failure-'));
-process.on('exit', () => rmSync(tmpDir, { recursive: true, force: true }));
-
-function dataModule(code) {
-    // encodeURIComponent leaves ' ( ) ! * unescaped; the generated specifiers are
-    // embedded in single-quoted string literals, so escape those too.
-    const encoded = encodeURIComponent(code).replace(/['()!*]/g, (c) => '%' + c.charCodeAt(0).toString(16).toUpperCase());
-    return 'data:text/javascript,' + encoded;
-}
+const { repoRoot, tmpDir, rewriteAndWrite } = makeHarness(import.meta.url, 'msp-parse-failure-recovery.test.mjs', 'msp-parse-failure-');
 
 function realModuleUrl(relPath) {
     return pathToFileURL(join(repoRoot, relPath)).href;
-}
-
-/**
- * Rewrite the listed import specifiers in a real source file and write the
- * result to a temp module. Throws loudly if a pattern stops matching, so a
- * future reshuffle of those imports fails the test instead of passing
- * vacuously.
- */
-function rewriteAndWrite(relSrcPath, rules, outName) {
-    let source = readFileSync(join(repoRoot, relSrcPath), 'utf8');
-    for (const [regex, replacement, label] of rules) {
-        if (!regex.test(source)) {
-            throw new Error(
-                `msp-parse-failure-recovery.test.mjs: expected to find and replace "${label}" in ${relSrcPath} ` +
-                `but the pattern ${regex} did not match. Update the test's substitution rules.`
-            );
-        }
-        source = source.replace(regex, replacement);
-    }
-    const outPath = join(tmpDir, outName);
-    writeFileSync(outPath, source, 'utf8');
-    return pathToFileURL(outPath).href;
 }
 
 // --- real, import-free leaf modules, loadable straight by absolute URL -------
@@ -89,6 +58,8 @@ const realDedupUrl = realModuleUrl('js/msp/mspDeduplicationQueue.js');
 const realStatisticsUrl = realModuleUrl('js/msp/mspStatistics.js');
 const realSmoothFilterUrl = realModuleUrl('js/simple_smooth_filter.js');
 const realInjectedMethodsUrl = realModuleUrl('js/injected_methods.js');
+const realMspWriteOutcomeUrl = realModuleUrl('js/mspWriteOutcome.js');
+const realBitHelperUrl = realModuleUrl('js/bitHelper.js');
 
 // eventFrequencyAnalyzer and serial_queue start un-refed intervals in their
 // IIFEs. `.unref()` changes nothing about whether or how they run - it only
@@ -96,7 +67,7 @@ const realInjectedMethodsUrl = realModuleUrl('js/injected_methods.js');
 // would otherwise hang `node --test` forever.
 const realEventFrequencyAnalyzerUrl = rewriteAndWrite('js/eventFrequencyAnalyzer.js', [
     [/privateScope\.intervalHandler = setInterval\(publicScope\.analyze, bufferPeriod\);/g, 'privateScope.intervalHandler = setInterval(publicScope.analyze, bufferPeriod).unref();', "analyze setInterval"],
-], 'eventFrequencyAnalyzer-generated.mjs');
+], 'eventFrequencyAnalyzer-generated');
 
 const realMspQueueUrl = rewriteAndWrite('js/serial_queue.js', [
     [/^import CONFIGURATOR from '\.\/data_storage';$/m, `import CONFIGURATOR from '${realConfiguratorUrl}';`, "import CONFIGURATOR"],
@@ -106,7 +77,7 @@ const realMspQueueUrl = rewriteAndWrite('js/serial_queue.js', [
     [/^import mspDeduplicationQueue from '\.\/msp\/mspDeduplicationQueue';$/m, `import mspDeduplicationQueue from '${realDedupUrl}';`, "import mspDeduplicationQueue"],
     [/setInterval\(publicScope\.executor, Math\.round\(1000 \/ privateScope\.handlerFrequency\)\);/, 'setInterval(publicScope.executor, Math.round(1000 / privateScope.handlerFrequency)).unref();', "executor setInterval"],
     [/setInterval\(publicScope\.balancer, Math\.round\(1000 \/ privateScope\.balancerFrequency\)\);/, 'setInterval(publicScope.balancer, Math.round(1000 / privateScope.balancerFrequency)).unref();', "balancer setInterval"],
-], 'serial_queue-generated.mjs');
+], 'serial_queue-generated');
 
 const realMspUrl = rewriteAndWrite('js/msp.js', [
     [/^import MSPCodes from '\.\/msp\/MSPCodes';$/m, `import MSPCodes from '${realMspCodesUrl}';`, "import MSPCodes"],
@@ -114,7 +85,7 @@ const realMspUrl = rewriteAndWrite('js/msp.js', [
     [/^import eventFrequencyAnalyzer from '\.\/eventFrequencyAnalyzer';$/m, `import eventFrequencyAnalyzer from '${realEventFrequencyAnalyzerUrl}';`, "import eventFrequencyAnalyzer"],
     [/^import timeout from '\.\/timeouts';$/m, `import timeout from '${realTimeoutsUrl}';`, "import timeout"],
     [/^import CONFIGURATOR from '\.\/data_storage';$/m, `import CONFIGURATOR from '${realConfiguratorUrl}';`, "import CONFIGURATOR"],
-], 'msp-generated.mjs');
+], 'msp-generated');
 
 // FC has to be controllable (the tests set up PID banks); everything below it
 // is only referenced from switch cases these tests never reach, so those
@@ -159,7 +130,7 @@ const realMspHelperUrl = rewriteAndWrite('js/msp/MSPHelper.js', [
     [/^import ServoMixRule from '\.\/\.\.\/servoMixRule';$/m, `import ServoMixRule from '${inertDefaultUrl}';`, "import ServoMixRule"],
     [/^import MotorMixRule from '\.\/\.\.\/motorMixRule';$/m, `import MotorMixRule from '${inertDefaultUrl}';`, "import MotorMixRule"],
     [/^import LogicCondition from '\.\/\.\.\/logicCondition';$/m, `import LogicCondition from '${inertDefaultUrl}';`, "import LogicCondition"],
-    [/^import BitHelper from '\.\.\/bitHelper';$/m, `import BitHelper from '${inertDefaultUrl}';`, "import BitHelper"],
+    [/^import BitHelper from '\.\.\/bitHelper';$/m, `import BitHelper from '${realBitHelperUrl}';`, "import BitHelper"],
     [/^import serialPortHelper from '\.\/\.\.\/serialPortHelper';$/m, `import serialPortHelper from '${inertDefaultUrl}';`, "import serialPortHelper"],
     [/^import ProgrammingPid from '\.\/\.\.\/programmingPid';$/m, `import ProgrammingPid from '${inertDefaultUrl}';`, "import ProgrammingPid"],
     [/^import Safehome from '\.\/\.\.\/safehome';$/m, `import Safehome from '${inertDefaultUrl}';`, "import Safehome"],
@@ -168,9 +139,10 @@ const realMspHelperUrl = rewriteAndWrite('js/msp/MSPHelper.js', [
     [/^import Waypoint from '\.\/\.\.\/waypoint';$/m, `import Waypoint from '${inertDefaultUrl}';`, "import Waypoint"],
     [/^import mspDeduplicationQueue from '\.\/mspDeduplicationQueue';$/m, `import mspDeduplicationQueue from '${realDedupUrl}';`, "import mspDeduplicationQueue"],
     [/^import mspStatistics from '\.\/mspStatistics';$/m, `import mspStatistics from '${realStatisticsUrl}';`, "import mspStatistics"],
+    [/^import \{ resolveMspWrite, guardMspCallback \} from '\.\/\.\.\/mspWriteOutcome';$/m, `import { resolveMspWrite, guardMspCallback } from '${realMspWriteOutcomeUrl}';`, "import resolveMspWrite, guardMspCallback"],
     [/^import settingsCache from '\.\/\.\.\/settingsCache';$/m, `import settingsCache from '${inertDefaultUrl}';`, "import settingsCache"],
     [/^import \{Geozone, GeozoneVertex, GeozoneShapes \} from '\.\/\.\.\/geozone';$/m, `import { Geozone, GeozoneVertex, GeozoneShapes } from '${inertGeozoneUrl}';`, "import Geozone"],
-], 'MSPHelper-generated.mjs');
+], 'MSPHelper-generated');
 
 const { default: mspHelper } = await import(realMspHelperUrl);
 const { default: MSPCodes } = await import(realMspCodesUrl);
@@ -334,7 +306,33 @@ function clearParseFailures() {
     MSP.parseFailures.clear();
 }
 
-test('every write code is classified - none falls through unnoticed', () => {
+// Declared protocol constants with no sender yet. Their conservative production
+// fallback stays in force; implementing a sender requires classifying its input.
+const unusedWriteNames = [
+    'MSP2_SET_MZTC_PALETTE', 'MSP2_SET_MZTC_ZOOM', 'MSP2_SET_MZTC_SHUTTER',
+    'MSP2_SET_MZTC_IMAGE_PARAMS', 'MSP2_SET_MZTC_CORRECTION', 'MSP2_SET_MZTC_VIGNETTING',
+];
+
+test('unused MZTC writes remain unused and conservatively blocked', () => {
+    const sources = ['js', 'tabs'].flatMap(dir =>
+        readdirSync(join(repoRoot, dir), { recursive: true })
+            .filter(file => file.endsWith('.js') && !(dir === 'js' && file === 'msp/MSPCodes.js'))
+            .map(file => readFileSync(join(repoRoot, dir, file), 'utf8'))
+    ).join('\n');
+    clearParseFailures();
+    MSP.parseFailures.add(MSPCodes.MSP_BOARD_INFO);
+    try {
+        for (const name of unusedWriteNames) {
+            assert.notEqual(MSPCodes[name], undefined);
+            assert.equal(sources.includes(name), false, `${name} now has a sender: classify its input source`);
+            assert.equal(MSP.blockedWriteSource(MSPCodes[name]), MSPCodes.MSP_BOARD_INFO);
+        }
+    } finally {
+        clearParseFailures();
+    }
+});
+
+test('every implemented write code is classified - none falls through unnoticed', () => {
     // A write nobody classified would be refused wholesale the moment anything
     // else fails to parse. That is the safe direction, but it is not the intended
     // behaviour, so adding an MSP write command must fail here until it is either
@@ -347,7 +345,8 @@ test('every write code is classified - none falls through unnoticed', () => {
     // probe the classification with one arbitrary failure in place instead.
     MSP.parseFailures.add(MSPCodes.MSP_BOARD_INFO); // a read no write hands back
 
-    const unclassified = writeNames.filter(name => MSP.blockedWriteSource(MSPCodes[name]) !== false);
+    const unclassified = writeNames.filter(name =>
+        !unusedWriteNames.includes(name) && MSP.blockedWriteSource(MSPCodes[name]) !== false);
 
     clearParseFailures();
     assert.deepEqual(
@@ -419,6 +418,8 @@ test('reads, reboot and live commands are never blocked', () => {
         // strand the motors spinning.
         'MSP_SET_MOTOR',
         'MSP_SET_RAW_RC',
+        // Only the user-selected preset index is sent, never parsed FC state.
+        'MSP2_SET_MZTC_PRESET',
         // Persists what is already on the FC; a refused write never got there.
         'MSP_EEPROM_WRITE',
     ];
@@ -449,7 +450,7 @@ test('a write is recognised however its name spells SET', () => {
         'MSPV2_SETTING', 'MSP2_COMMON_SETTING_INFO',
         'MSP_SET_REBOOT', 'MSP_SET_MOTOR', 'MSP_SET_RAW_RC', 'MSP_SET_RAW_GPS',
         'MSP_SET_HEAD', 'MSP_SET_RTC', 'MSP_RESET_CONF', 'MSP_SET_RESET_CURR_PID',
-        'MSP_SELECT_SETTING', 'MSP_SET_BOX',
+        'MSP_SELECT_SETTING', 'MSP_SET_BOX', 'MSP2_SET_MZTC_PRESET',
     ];
 
     clearParseFailures();
@@ -501,6 +502,96 @@ test('a blocked write reaches neither the wire nor the save chain behind it', ()
     clearParseFailures();
 });
 
+test('MSP.promise() on a blocked write settles instead of hanging', async () => {
+    resetQueue();
+    clearParseFailures();
+    MSP.parseFailures.add(MSPCodes.MSP2_PID);
+
+    // A refused write fires no callback; promise() must not leave the caller
+    // awaiting a response that can never arrive.
+    const outcome = await Promise.race([
+        MSP.promise(MSPCodes.MSP2_SET_PID, [1, 2, 3, 4]).then(
+            () => 'resolved',
+            () => 'rejected',
+        ),
+        wait(100).then(() => 'timeout'),
+    ]);
+
+    assert.notEqual(outcome, 'timeout', 'a refused write must not leave the promise pending forever');
+    assert.equal(outcome, 'rejected', 'a refused write must reject, not resolve as success');
+    assert.equal(mspQueue.getLength(), 0, 'nothing may be queued for the FC');
+
+    clearParseFailures();
+});
+
+test('setSetting() on a blocked write stops the save chain without invoking the success callback', async () => {
+    resetQueue();
+    clearParseFailures();
+    MSP.parseFailures.add(MSPCodes.MSPV2_SETTING);
+
+    // Bypass the settings read so the write path is exercised directly.
+    const originalGetSetting = mspHelper._getSetting;
+    mspHelper._getSetting = () => Promise.resolve({ index: 0, type: 'uint8_t' });
+
+    let callbackCalled = false;
+    const outcome = await Promise.race([
+        mspHelper.setSetting('test_setting', 5, () => { callbackCalled = true; }).then(
+            () => 'settled',
+            () => 'rejected',
+        ),
+        wait(100).then(() => 'timeout'),
+    ]);
+
+    mspHelper._getSetting = originalGetSetting;
+
+    assert.notEqual(outcome, 'timeout', 'a blocked setting write must settle, not hang');
+    assert.equal(outcome, 'settled', 'the refusal is consumed without propagating');
+    assert.equal(callbackCalled, false, 'the success callback must not run after a refused write');
+    assert.equal(mspQueue.getLength(), 0, 'nothing may be queued for the FC');
+
+    clearParseFailures();
+});
+
+test('setSetting() does not advance the save chain when the queue drops the write after exhausting retries', async () => {
+    // The queue resolves (rather than rejects) with false when it gives up
+    // retrying - a congestion drop, not a rejected write. Mocking MSP.promise()
+    // directly exercises this without waiting out the queue's real retry delay.
+    const originalPromise = MSP.promise;
+    const originalGetSetting = mspHelper._getSetting;
+    MSP.promise = () => Promise.resolve(false);
+    mspHelper._getSetting = () => Promise.resolve({ index: 0, type: 'uint8_t' });
+
+    let callbackCalled = false;
+    const result = await mspHelper.setSetting('test_setting', 5, () => { callbackCalled = true; });
+
+    MSP.promise = originalPromise;
+    mspHelper._getSetting = originalGetSetting;
+
+    assert.equal(result, false, 'a dropped setting write must not be reported as saved');
+    assert.equal(callbackCalled, false, 'the save chain must not advance past a setting that never reached the FC');
+});
+
+test('setSetting() propagates an exception thrown by the success callback instead of swallowing it', async () => {
+    // Drives the encodeSetting() failure branch (unknown setting - no MSP
+    // traffic involved) rather than a real write, so this doesn't depend on
+    // the queue ever draining: setSetting() still runs callback() on that
+    // branch, and a bug in callback must surface either way.
+    const originalGetSetting = mspHelper._getSetting;
+    mspHelper._getSetting = () => Promise.resolve(undefined);
+
+    let rejected = false;
+    try {
+        await mspHelper.setSetting('nonexistent_setting', 5, () => { throw new Error('save chain bug'); });
+    } catch (error) {
+        rejected = true;
+        assert.equal(error.message, 'save chain bug');
+    }
+
+    mspHelper._getSetting = originalGetSetting;
+
+    assert.equal(rejected, true, 'a bug in the save chain must surface, not disappear like a refused write');
+});
+
 test('an unrelated page keeps saving after another page failed to load', () => {
     resetQueue();
     clearParseFailures();
@@ -529,6 +620,34 @@ test('reconnecting clears the block', () => {
     assert.equal(mspQueue.getLength(), 1, 'writes must work again after a reconnect');
 
     resetQueue();
+});
+
+test('sendLedStripConfig() stops mid-chain when the queue drops one LED\'s write', () => {
+    // Witnessed live on real hardware before this fix: with two LEDs queued,
+    // mocking MSP.send_message() to simulate the queue giving up on the
+    // first one (onFinish(false), same as a real exhausted-retries drop)
+    // let the chain advance to the second LED and then call
+    // onCompleteCallback anyway, as if both had landed.
+    FC.LED_STRIP = [
+        { x: 0, y: 0, functions: [], directions: [], color: 0 },
+        { x: 1, y: 1, functions: [], directions: [], color: 0 },
+    ];
+
+    const originalSendMessage = MSP.send_message;
+    const sentCodes = [];
+    MSP.send_message = function (code, data, callbackSent, callbackMsp) {
+        sentCodes.push(code);
+        callbackMsp(false);
+        return true;
+    };
+
+    let completed = false;
+    mspHelper.sendLedStripConfig(() => { completed = true; }, new Set([0, 1]));
+
+    MSP.send_message = originalSendMessage;
+
+    assert.equal(sentCodes.length, 1, 'a dropped write must not advance to the next LED');
+    assert.equal(completed, false, 'onCompleteCallback must not run when an LED write never landed');
 });
 
 // A save can finish while the initial profile-name read is still queued.
