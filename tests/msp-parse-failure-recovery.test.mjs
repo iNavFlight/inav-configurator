@@ -653,3 +653,17 @@ test('sendLedStripConfig() stops mid-chain when the queue drops one LED\'s write
     assert.equal(sentCodes.length, 1, 'a dropped write must not advance to the next LED');
     assert.equal(completed, false, 'onCompleteCallback must not run when an LED write never landed');
 });
+
+
+test('ESC write acknowledgement distinguishes accepted, unsupported and malformed responses', () => {
+    for (const [code, field] of [[MSPCodes.MSP2_INAV_SET_ESC_DIRECTION, 'ESC_DIRECTION_WRITE_ACK'],
+        [MSPCodes.MSP2_INAV_SET_ESC_DIRECTION_TEST, 'ESC_DIRECTION_TEST_ACK']]) {
+        for (const [payload, unsupported, accepted] of [[[], false, true], [[], true, false], [[1], false, false]]) {
+            FC[field] = null;
+            const handler = makeDataHandler(code, payload, () => {});
+            handler.unsupported = unsupported;
+            mspHelper.handleResponse(handler);
+            assert.equal(FC[field], accepted);
+        }
+    }
+});

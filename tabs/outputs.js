@@ -112,7 +112,7 @@ outputsTab.initialize = function (callback) {
         process_servos();
         processConfiguration(settingsPromise);
         self.disposeEscDirection = mountEscDirection({ MSP, MSPCodes, FC, i18n, interval,
-            isArmed: () => self.armed
+            isArmed: () => self.armed, isMotorDirectionInverted: () => self.motorDirectionInverted
         });
 
         finalize();

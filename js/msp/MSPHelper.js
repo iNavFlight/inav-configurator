@@ -1963,7 +1963,11 @@ var mspHelper = (function () {
                 FC.ESC_DIRECTION = dataHandler.unsupported ? null : parseEscDirection(data);
                 break;
             case MSPCodes.MSP2_INAV_SET_ESC_DIRECTION:
+                // An empty ACK accepts the request; it does not confirm ESC storage.
+                FC.ESC_DIRECTION_WRITE_ACK = !dataHandler.unsupported && data.byteLength === 0;
+                break;
             case MSPCodes.MSP2_INAV_SET_ESC_DIRECTION_TEST:
+                FC.ESC_DIRECTION_TEST_ACK = !dataHandler.unsupported && data.byteLength === 0;
                 break;
 
             case MSPCodes.MSP2_INAV_ESC_SRXL2_STATUS:
