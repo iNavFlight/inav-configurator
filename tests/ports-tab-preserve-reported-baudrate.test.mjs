@@ -130,6 +130,7 @@ const realSerialPortHelperUrl = rewriteImports('js/serialPortHelper.js', [
 // MSP and mspQueue are only touched from self.init() and the send helpers,
 // which these tests never call.
 const realMspHelperUrl = rewriteImports('js/msp/MSPHelper.js', [
+    ["import { resolveMspWrite, guardMspCallback } from './../mspWriteOutcome';", "import { resolveMspWrite, guardMspCallback } from '" + realModuleUrl('js/mspWriteOutcome.js') + "';"],
     ["import semver from 'semver';", "import semver from '" + inertDefaultUrl + "';"],
     ["import './../injected_methods';", "import '" + realInjectedMethodsUrl + "';"],
     ["import GUI from './../gui';", "import GUI from '" + guiStubUrl + "';"],
