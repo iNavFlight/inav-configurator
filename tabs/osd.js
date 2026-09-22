@@ -17,6 +17,7 @@ import { PortHandler } from './../js/port_handler';
 import i18n from './../js/localization';
 import store from './../js/store';
 import dialog from './../js/dialog';
+import { resolveMspWrite } from './../js/mspWriteOutcome';
 
 var SYM = SYM || {};
 SYM.LAST_CHAR = 225; // For drawing the font preview
@@ -1448,7 +1449,7 @@ OSD.constants = {
             items: [
                 {
                     name: 'MZTC_STATUS',
-                    id: 171,
+                    id: 172,
                     // min_version stays commented out until the firmware
                     // version is bumped, matching AUTO SPEED. The
                     // maintenance-10.x firmware still reports 9.x, so a
@@ -2474,13 +2475,15 @@ OSD.is_item_displayed = function(item, group) {
     if (!group) {
         return false;
     }
-    if (typeof group.enabled === 'function' && group.enabled() === false) {
-        return false;
-    }
-    if (typeof item.enabled === 'function' && item.enabled() === false) {
-        return false;
-    }
-    return true;
+    return OSD.is_item_available(item, group) || OSD.data.items[item.id].isVisible === true;
+};
+
+// Keep an enabled element toggleable until Save, but do not mistake that UI
+// exception for available hardware when deciding what to disable on the FC.
+OSD.is_item_available = function(item, group) {
+    return OSD.is_item_supported(item) && !!group
+        && !(typeof group.enabled === 'function' && group.enabled() === false)
+        && !(typeof item.enabled === 'function' && item.enabled() === false);
 };
 
 OSD.get_item_name = function(item) {
@@ -2506,7 +2509,7 @@ OSD.get_unreachable_items = function() {
             if (!OSD.is_item_supported(item)) {
                 return;
             }
-            if (OSD.is_item_displayed(item, group)) {
+            if (OSD.is_item_available(item, group)) {
                 reachable.push(item.id);
             } else if (OSD.data.items[item.id].isVisible && !unreachable.some(function(other) { return other.id == item.id; })) {
                 unreachable.push(item);
@@ -2663,26 +2666,25 @@ OSD.updateDisplaySize = function () {
     OSD.GUI.updateGuidesView($('#videoGuides').find('input').is(':checked'));
 };
 
+// Each save's .catch() only observes a refused write - the blocked-write notice
+// is already shown by MSP.onConfigWriteBlocked, and the success callback must
+// not run when the value was not stored.
 OSD.saveAlarms = function(callback) {
     let data = OSD.msp.encodeAlarms();
-    return MSP.promise(MSPCodes.MSP2_INAV_OSD_SET_ALARMS, data).then(callback);
+    return MSP.promise(MSPCodes.MSP2_INAV_OSD_SET_ALARMS, data).then(callback).catch(() => {});
 }
 
 OSD.saveConfig = function(callback) {
     return OSD.saveAlarms(function () {
         var data = OSD.msp.encodePreferences();
         return MSP.promise(MSPCodes.MSP2_INAV_OSD_SET_PREFERENCES, data).then(callback);
-    });
+    }).catch(() => {});
 };
 
+// Report refused or dropped writes, including writes to non-selected layouts.
 OSD.saveItem = function(item, callback, layout = OSD.data.selected_layout, pos = OSD.data.items[item.id]) {
     const data = OSD.msp.encodeLayoutItem(layout, item, pos);
-    return new Promise(function(resolve) {
-        // A refused write returns false without calling its transport callback.
-        if (MSP.send_message(MSPCodes.MSP2_INAV_OSD_SET_LAYOUT_ITEM, data, false, resolve) === false) {
-            resolve(false);
-        }
-    }).then(callback);
+    return resolveMspWrite(MSP.promise(MSPCodes.MSP2_INAV_OSD_SET_LAYOUT_ITEM, data), callback);
 };
 
 //noinspection JSUnusedLocalSymbols
@@ -3591,15 +3593,19 @@ OSD.GUI.updateAll = function() {
                 OSD.data.layouts[OSD.data.selected_layout] = JSON.parse(JSON.stringify(layout_clipboard.layout));
                 layouts.trigger('change');
 
+                var allSaved = true;
                 for(var index in OSD.data.layouts[OSD.data.selected_layout])
                 {
                     var item = OSD.data.layouts[OSD.data.selected_layout][index];
                     if(!(item.isVisible === false && oldLayout[index].isVisible === false) && (oldLayout[index].x !== item.x || oldLayout[index].y !== item.y || oldLayout[index].position !== item.position || oldLayout[index].isVisible !== item.isVisible)){
-                        await OSD.saveItem({id: index});
+                        if (!(await OSD.saveItem({id: index}))) {
+                            allSaved = false;
+                            break;
+                        }
                     }
                 }
 
-                GUI.log(i18n.getMessage('osdLayoutPasteFromClipboard'));
+                GUI.log(i18n.getMessage(allSaved ? 'osdLayoutPasteFromClipboard' : 'osdLayoutSaveItemFailed'));
             }
         });
 
@@ -3616,14 +3622,18 @@ OSD.GUI.updateAll = function() {
             OSD.data.layouts[OSD.data.selected_layout] = clearedLayout;
             layouts.trigger('change');
 
+            var allSaved = true;
             for(var index in OSD.data.layouts[OSD.data.selected_layout]) {
                 var item = OSD.data.layouts[OSD.data.selected_layout][index];
                 if(oldLayout[index].isVisible === true){
-                    await OSD.saveItem({id: index});
+                    if (!(await OSD.saveItem({id: index}))) {
+                        allSaved = false;
+                        break;
+                    }
                 }
             }
 
-            GUI.log(i18n.getMessage('osdClearLayout'));
+            GUI.log(i18n.getMessage(allSaved ? 'osdClearLayout' : 'osdLayoutSaveItemFailed'));
         });
 
 
@@ -4523,7 +4533,8 @@ function customElementsInitCallback() {
         customElementNormaliseRow(row);
         customElementDisableNonValidOptionsRow(row);
 
-        MSP.promise(MSPCodes.MSP2_INAV_SET_CUSTOM_OSD_ELEMENTS, customElementGetDataForRow(row));
+        // A refused write is already reported by MSP.onConfigWriteBlocked.
+        MSP.promise(MSPCodes.MSP2_INAV_SET_CUSTOM_OSD_ELEMENTS, customElementGetDataForRow(row)).catch(() => {});
     };
 
     var customElements = $('#osdCustomElementCards');
