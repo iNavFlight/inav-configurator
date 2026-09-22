@@ -989,6 +989,9 @@
     "initialSetupMagCalibEnded": {
         "message": "Magnetometer calibration <span style=\"color: #37a8db\">finished</span>"
     },
+    "magCalibOrientationReportFailed": {
+        "message": "Could not read the compass alignment result after calibration -- check the connection and reopen this tab."
+    },
     "initialSetupOpflowCalibStarted": {
         "message": "Optic flow calibration started"
     },
@@ -1025,14 +1028,8 @@
     "featureTX_PROF_SEL": {
         "message": "Profile selection with TX stick command"
     },
-    "featureINFLIGHT_ACC_CAL": {
-        "message": "In-flight level calibration"
-    },
     "featureMOTOR_STOP": {
         "message": "Stop motors on low throttle"
-    },
-    "featureSERVO_TILT": {
-        "message": "Servo gimbal"
     },
     "featureBAT_PROFILE_AUTOSWITCH": {
         "message": "Automatic battery profile selection"
@@ -1058,12 +1055,6 @@
     "featureGPSTip": {
         "message": "Configure port scenario first"
     },
-    "featureFAILSAFE": {
-        "message": "Apply failsafe settings on RX signal loss"
-    },
-    "featureSONAR": {
-        "message": "Sonar"
-    },
     "featureTELEMETRY": {
         "message": "Telemetry output"
     },
@@ -1081,12 +1072,6 @@
     },
     "featureDASHBOARD": {
         "message": "OLED Screen Display"
-    },
-    "featureONESHOT125": {
-        "message": "ONESHOT ESC support"
-    },
-    "featureONESHOT125Tip": {
-        "message": "Disconnect flight battery and remove props before enabling."
     },
     "featurePWM_OUTPUT_ENABLE": {
         "message": "Enable motor and servo output"
@@ -1106,20 +1091,11 @@
     "onboardLoggingBlackboxRate": {
         "message": "Portion of flight loop iterations to log (logging rate)"
     },
+    "onboardLoggingSecondaryGyroNotSaved": {
+        "message": "Secondary gyro setting was <span style=\"color: #e74c3c\">not saved</span>: the flight controller did not accept it. Nothing was written to EEPROM."
+    },
     "onboardLoggingTerrainRateWarning": {
         "message": "Terrain is enabled, not recommended to use more than 25% logging rate"
-    },
-    "featureCHANNEL_FORWARDING": {
-        "message": "Forward aux channels to servo outputs"
-    },
-    "featureSOFTSPI": {
-        "message": "CPU based SPI"
-    },
-    "featurePWM_SERVO_DRIVER": {
-        "message": "External PWM servo driver"
-    },
-    "featurePWM_SERVO_DRIVERTip": {
-        "message": "Use external PCA9685 PWM driver to connect up to 16 servos to flight controller. PCA9685 has to be connected to enable this feature."
     },
     "featureRSSI_ADCTip": {
         "message": "RSSI is a measurement of signal strength and is very handy so you know when your aircraft is going out of range or if it is suffering RF interference."
@@ -1138,12 +1114,6 @@
     },
     "featureFW_AUTOTRIMTip": {
         "message": "When flying in a stabilized mode, continuously adjust the servo midpoints so that the airplane keeps flying straight when switching to manual mode. Requires GPS."
-    },
-    "featureDYNAMIC_FILTERS": {
-        "message": "Dynamic Gyro Filters"
-    },
-    "featureDYNAMIC_FILTERSTip": {
-        "message": "Use automatic FFT gyro analysis to setup notch filters to attenuate gyro noise. Should be enabled all the time!"
     },
     "configurationFeatureEnabled": {
         "message": "Enabled"
@@ -1669,6 +1639,111 @@
     },
     "portsFunction_OPFLOW": {
         "message": "Optic flow"
+    },
+    "portsBaudFixedByProtocol": {
+        "message": "This protocol sets its own line rate and ignores this setting. SRXL2 opens at 115200, as the specification requires, then negotiates upwards during the handshake."
+    },
+    "portsFunction_ESC_SRXL2": {
+        "message": "Spektrum Smart ESC (SRXL2)"
+    },
+    "srxl2Info": {
+        "message": "The ESC signal wire goes to the TX pin of a port assigned to Spektrum Smart ESC, not to a motor pad, and carries telemetry back on the same wire. One ESC per port: a model with several motors needs a port each, assigned in motor order, so motor 1 is the lowest-numbered port."
+    },
+    "srxl2ProtocolAutoSet": {
+        "message": "ESC protocol set to SRXL2, to match the port assigned to Spektrum Smart ESC. Change it in the Outputs tab if that is not what you wanted."
+    },
+    "srxl2ProtocolNotSet": {
+        "message": "A port is assigned to Spektrum Smart ESC, but the ESC protocol above is not SRXL2 - so the port is never opened and the motor is not driven. Set the protocol to SRXL2, then save and reboot. Assigning the port and choosing the protocol are two separate settings."
+    },
+    "srxl2NoPort": {
+        "message": "No port is assigned to Spektrum Smart ESC. Assign one in the Ports tab, or the motor will not be driven at all - this protocol has no fallback to PWM, because the pin is not a timer output."
+    },
+    "srxl2TooFewPorts": {
+        "message": "This model has $1 motors but the board opened only $2 SRXL2 port(s). One ESC needs one port, so assign one per motor in the Ports tab. The board will refuse to arm until they match."
+    },
+    "srxl2PortCountOpenNoMixer": {
+        "message": "SRXL2 ports open on the board: $1. Choose a model in the Mixer tab to set how many motors it has."
+    },
+    "srxl2PortCountOpen": {
+        "message": "SRXL2 ports open on the board: $1, for $2 motor(s). Motor 1 uses the lowest-numbered port."
+    },
+    "srxl2PortNeedsReboot": {
+        "message": "$1 port(s) assigned to Spektrum Smart ESC, but the board has not opened any. Ports are opened at startup - save and reboot."
+    },
+    "srxl2PortCount": {
+        "message": "Ports assigned to Spektrum Smart ESC: $1. Motor 1 uses the lowest-numbered of them."
+    },
+    "srxl2Telemetry": {
+        "message": "Read telemetry from the ESC"
+    },
+    "srxl2TelemetryHelp": {
+        "message": "Telemetry shares the throttle wire, so unlike a conventional ESC there is no port to leave unassigned. Turn this off to read nothing from the ESC."
+    },
+    "portsBaudAuto": {
+        "message": "auto"
+    },
+    "srxl2TelemetryRate": {
+        "message": "Ask the ESC for telemetry"
+    },
+    "srxl2TelemetryRateHelp": {
+        "message": "The reply shares the throttle wire with the control data, so a faster rate leaves the bus less headroom. Only the RPM filter benefits from the faster settings; everything else is a display and reads fine at a few hertz."
+    },
+    "srxl2ReverseEnable": {
+        "message": "Thrust reverse"
+    },
+    "srxl2ReverseEnableHelp": {
+        "message": "Turn on only if the ESC is programmed for reverse. Once on, assign the THRUST REVERSE mode to a switch in the Modes tab - that is what actually engages it in flight."
+    },
+    "srxl2ReverseChannel": {
+        "message": "Thrust Reverse: ESC channel"
+    },
+    "srxl2ReverseChannelHelp": {
+        "message": "Which channel on the SRXL2 wire carries the reverse signal to the ESC. This is NOT a transmitter channel - it must match the ESC's own \"Thrust Rev.\" parameter, because nothing on the wire advertises it. Spektrum allow channels 5 to 9 and ship channel 7 by default. Set 0 if the ESC has no reverse. To fly with it, assign the THRUST REVERSE mode to a switch in the Modes tab."
+    },
+    "srxl2CalibrateTitle": {
+        "message": "Throttle range calibration"
+    },
+    "srxl2CalibrateWarning": {
+        "message": "REMOVE THE PROPELLER. This presents full throttle to the ESC. The battery must be disconnected to start: the ESC only learns its endpoints as it powers up."
+    },
+    "srxl2CalibrateAck": {
+        "message": "The propeller is removed and the battery is disconnected"
+    },
+    "srxl2CalibrateRefused": {
+        "message": "The flight controller refused to start the calibration."
+    },
+    "srxl2CalibrateRefusedArmed": {
+        "message": "Refused: the aircraft is armed. Disarm first - this sequence presents full throttle."
+    },
+    "srxl2CalibrateRefusedNoPort": {
+        "message": "Refused: no SRXL2 ESC port is open. Assign one in the Ports tab, set the motor protocol to SRXL2, and reboot."
+    },
+    "srxl2CalibrateRefusedBattery": {
+        "message": "Refused: the battery is connected. The ESC only learns its throttle range as it powers up, so it has to start with the pack out."
+    },
+    "srxl2CalibrateRefusedNoSensor": {
+        "message": "Refused: this board cannot sense battery voltage, so it cannot tell when the ESC powers up. Use esc_calibrate high / low from the CLI instead."
+    },
+    "srxl2CalibrateStart": {
+        "message": "Start calibration"
+    },
+    "srxl2CalibrateAbort": {
+        "message": "Abort"
+    },
+    "srxl2CalibrateConnect": {
+        "message": "Full throttle is on the wire. Connect the battery now."
+    },
+    "srxl2CalibrateHeard": {
+        "message": "The ESC has power. Holding full throttle while it accepts the high endpoint."
+    },
+    "srxl2CalibrateLow": {
+        "message": "Throttle lowered. Listen for the cell count, then one long tone."
+    },
+    "srxl2CalibrateDone": {
+        "message": "Finished. A long tone from the ESC means the range was stored."
+    },
+    "srxl2CalibrateAborted": {
+        "message": "Aborted. Throttle returned to normal control."
     },
     "portsFunction_ESC": {
         "message": "ESC output/telemetry"
@@ -3743,6 +3818,12 @@
     "cruiseYawRateHelp": {
         "message": "This is the turning rate in Cruise and 3D Cruise."
     },
+    "cruiseLockOnLevel": {
+        "message": "Lock Course when Level"
+    },
+    "cruiseLockOnLevelHelp": {
+        "message": "Fixed wing only: When enabled, Course Hold / Cruise locks the new course only once the aircraft has rolled out level (below 10° bank) after a heading adjustment or a banked mode entry, so the course is not overshot while the aircraft is still turning. When disabled, the course locks as soon as the sticks are centered (legacy behaviour)."
+    },
     "cruiseManualThrottleLabel": {
         "message": "Allow manual throttle increase"
     },
@@ -3890,11 +3971,17 @@
     "wpRestartMissionHelp": {
         "message": "Sets restart behaviour for a WP mission when interrupted mid mission. START from first WP, RESUME from last active WP or SWITCH between START and RESUME each time WP Mode is reselected ON. SWITCH effectively allows resuming once only from a previous mid mission waypoint after which the mission will restart from the first waypoint."
     },
-    "wpTurnSmoothing": {
-        "message": "Waypoint Turn Smoothing"
+    "wpTurnMode": {
+        "message": "Waypoint Turn Mode"
     },
-    "wpTurnSmoothingHelp": {
-        "message": "Smooths turns during WP missions by switching to a loiter turn at waypoints. When set to ON the craft will reach the waypoint during the turn. When set to ON-CUT the craft will turn inside the waypoint without actually reaching it (cuts the corner)."
+    "wpTurnModeHelp": {
+        "message": "Fixed wing only: How the aircraft turns at waypoints during missions. DIRECT uses the classic reactive heading controller (legacy behaviour). The COORD modes fly the turn as an explicit coordinated arc of the aircraft's real turn radius (from speed and maximum navigation bank angle): COORD_FLYBY starts the turn early so the flight path joins the next leg smoothly without overshoot - the corner is cut and the waypoint is passed abeam instead of overflown. COORD_FLYOVER flies directly over the waypoint, then rolls out exactly on the line to the next waypoint. COORD_FLYINTO eases away from the corner before the waypoint and then crosses it already aligned on the outbound course (survey/mapping line entries). Autoland approach turns always fly COORD_FLYBY, regardless of this setting."
+    },
+    "wpTurnMaxLeadTime": {
+        "message": "Waypoint Turn Max Lead Time"
+    },
+    "wpTurnMaxLeadTimeHelp": {
+        "message": "Fixed wing COORD_FLYBY turns only: Limits how early before a waypoint the turn is allowed to start [ms]. The required lead time grows with speed and turn angle; a too-low cap forces late turn-ins and overshoot. Raise towards 12000 for sluggish models, lower towards 3000 to keep turns close to the waypoint [3000-12000]."
     },
     "navMotorStop": {
         "message": "Navigation Motor Stop Override"
@@ -5204,6 +5291,90 @@
     "removeAllPointButtonSave": {
         "message": "Remove all points"
     },
+    "missionTitleSimulate": {
+        "message": "Show the track a fixed wing will actually fly"
+    },
+    "missionSimulationHead": {
+        "message": "Flight path simulation"
+    },
+    "missionSimulationSpeed": {
+        "message": "Cruise speed (m/s)"
+    },
+    "missionSimulationSpeedHelp": {
+        "message": "Read from fw_reference_airspeed when a flight controller is connected - the same speed the firmware uses for its own coordinated turn calculation when no airspeed sensor is fitted. Override it to see how the mission looks at another speed; the turn radius grows with the square of this figure. Note that nav_auto_speed and the per-waypoint speed do not apply to a fixed wing, which flies a throttle setting."
+    },
+    "missionSimulationLegendCruise": {
+        "message": "cruise"
+    },
+    "missionSimulationLegendTurn": {
+        "message": "turning"
+    },
+    "missionSimulationLegendApproach": {
+        "message": "landing approach"
+    },
+    "missionSimulationTurnRadius": {
+        "message": "Turn radius:"
+    },
+    "missionSimulationTime": {
+        "message": "Flight time:"
+    },
+    "missionSimulationDistance": {
+        "message": "Track length:"
+    },
+    "missionSimulationTooFewPoints": {
+        "message": "Add at least two waypoints to simulate the flight path."
+    },
+    "missionSimulationNoLandingHeading": {
+        "message": "Waypoint $1 lands without a landing heading, so no approach pattern is flown - the aircraft circles down onto the point. Set a landing heading to see the approach."
+    },
+    "missionSimulationNoApproachLength": {
+        "message": "Waypoint $1 has a landing heading, but the approach length is unknown. Connect the flight controller to read nav_fw_land_approach_length."
+    },
+    "missionSimulationApproachNoHome": {
+        "message": "Waypoint $1's approach and the mission use different altitude references, and without the home elevation they cannot be brought together. Set home to see the approach."
+    },
+    "missionSimulationApproachSuspect": {
+        "message": "Waypoint $1's approach lands $2 m away in altitude from the waypoint itself - its landing settings look corrupted. Check Approach Alt and Land Alt."
+    },
+    "missionSimulationApproachAnchored": {
+        "message": "Home is not set, so the approach profile is anchored at its landing altitude. The shape is right; set home for the firmware-exact altitude split."
+    },
+    "missionSimulationWaypointMissed": {
+        "message": "Waypoint $1 is passed at $2 m instead of being reached - the turn onto it is tighter than the aircraft flies."
+    },
+    "missionSimulationLegNotFlyable": {
+        "message": "Waypoint $1 is never reached: at $2 m turn radius the aircraft circles it instead of closing in."
+    },
+    "missionSimulationApproachAltitudes": {
+        "message": "Waypoint $1 has an approach altitude that is not above its landing altitude, so no approach can be drawn. Check the landing settings for this waypoint."
+    },
+    "missionSimulationDefaults": {
+        "message": "No flight controller connected: approach length and loiter radius fall back to the firmware defaults, so the approach shown is generic."
+    },
+    "missionSimulationBankCeiling": {
+        "message": "Turns are limited to $1 degrees of bank by max_angle_inclination_rll, below the angle navigation asks for, so they are wider than nav_fw_bank_angle alone suggests."
+    },
+    "missionSimulationSpeedEstimated": {
+        "message": "Cruise speed is an assumption: connect the flight controller to read fw_reference_airspeed, or set it to what your aircraft really cruises at. The turn radius depends on it squared."
+    },
+    "missionSimulationFixedWingOnly": {
+        "message": "This models a fixed wing. The connected aircraft is not one, so the track shown does not describe how it will fly."
+    },
+    "missionSimulationMultiMission": {
+        "message": "The flight path is simulated one mission at a time. Select a single mission to see it."
+    },
+    "missionSimulationJumps": {
+        "message": "This mission repeats waypoints with a jump, which the simulation does not follow, so flight time and track length are not shown. The track drawn is the first pass only."
+    },
+    "missionSimulationTruncated": {
+        "message": "The mission is longer than the simulation runs for, so the track stops part way and the figures are not shown."
+    },
+    "missionSimulationNoHomeElevation": {
+        "message": "This mission uses absolute altitudes, but the home elevation is unknown, so the vertical profile may be off. Set home to resolve it."
+    },
+    "missionSimulationDisclaimer": {
+        "message": "Altitudes and the landing approach follow the flight controller's own formulas. Turns are flown at the bank-limited radius: with nav_fw_wp_turn_smoothing ON or ON-CUT the aircraft starts its turn before the waypoint and curves inside the corner, which is not modelled here. Also not modelled: wind, holds (a POSHOLD point and the last waypoint of a mission are flown straight through, where the aircraft would circle), jumps, tracking back onto the leg line, and the pitch-held glide and flare over the last few metres, where the simulation stops. Assumes the aircraft follows its commanded track perfectly, so real turns start and finish more gently. A planning aid, not proof that a mission is safe to fly."
+    },
     "missionTotalInformationHead": {
         "message": "Total information"
     },
@@ -5332,6 +5503,48 @@
     },
     "missionSeaLevelRef": {
         "message": "Sea level Ref: "
+    },
+    "missionWpListHead": {
+        "message": "Waypoints"
+    },
+    "missionWpListSelect": {
+        "message": "Waypoint:"
+    },
+    "missionWpListPrev": {
+        "message": "Previous waypoint"
+    },
+    "missionWpListNext": {
+        "message": "Next waypoint"
+    },
+    "missionWpListCount": {
+        "message": "$1 waypoint(s) in the mission"
+    },
+    "missionApplyNoElevation": {
+        "message": "Elevation lookup failed, altitudes were not changed"
+    },
+    "missionApplyMissionChanged": {
+        "message": "The mission changed while elevations were loading, nothing was saved"
+    },
+    "missionApplyViaHome": {
+        "message": "Sea level reference applied to $1 waypoint(s), converted via the home elevation"
+    },
+    "missionApplyViaTerrain": {
+        "message": "Sea level reference applied to $1 waypoint(s), converted via the terrain under each waypoint"
+    },
+    "missionApplyAltApplied": {
+        "message": "Default altitude applied to $1 waypoint(s)"
+    },
+    "missionApplySpeedApplied": {
+        "message": "Default speed applied to $1 waypoint(s)"
+    },
+    "missionApplyBelowGround": {
+        "message": "Warning: $1 waypoint(s) now sit below the ground, check the altitudes"
+    },
+    "missionApplySpeedLandTitle": {
+        "message": "Landing Speed Not Updated"
+    },
+    "missionApplySpeedLandSkipped": {
+        "message": "The default speed was not applied to this mission's LAND waypoint(s), since a landing usually needs a different speed than cruise. Set it directly on the waypoint if it needs to change."
     },
     "missionElevation": {
         "message": "Elevation (m):"
@@ -6161,6 +6374,9 @@
     "blackboxFields": {
         "message": "Blackbox fields"
     },
+    "blackboxGyroSecondaryEnabled": {
+        "message": "Log secondary IMU (dual-gyro boards)"
+    },
     "BLACKBOX_FEATURE_NAV_ACC": {
         "message": "Navigation accelerometer"
     },
@@ -6319,6 +6535,24 @@
     },
     "ledStripEnableStrobeLightEffectText": {
         "message": "Enable strobe light effect"
+    },
+    "ledStripRainbowOverlay": {
+        "message": "Rainbow"
+    },
+    "ledStripRainbowSettingsTitle": {
+        "message": "Rainbow Overlay Settings"
+    },
+    "ledStripRainbowFreqLabel": {
+        "message": "Sweep Rate"
+    },
+    "ledStripRainbowFreqUnit": {
+        "message": "0-255"
+    },
+    "ledStripRainbowColorDeltaLabel": {
+        "message": "Color Delta"
+    },
+    "ledStripRainbowDeltaUnit": {
+        "message": "Degrees"
     },
     "ledStripOverlayTitle": {
         "message": "Overlay"
@@ -6790,6 +7024,9 @@
     },
     "osdClearLayout": {
         "message": "Layout has been cleared"
+    },
+    "osdLayoutSaveItemFailed": {
+        "message": "<span style=\"color: red\">Failed</span> to save OSD layout item; some changes may not have been applied"
     },
     "failedToOpenSerialPort": {
         "message": "<span style=\"color: red\">Failed</span> to open serial port"
@@ -7480,5 +7717,59 @@
     },
     "dronecanNameError": {
         "message": "Error"
+    },
+    "accAlignTitle": {
+        "message": "Automatic Alignment Wizard"
+    },
+    "accAlignFinished": {
+        "message": "Board alignment <span style=\"color: #37a8db\">finished</span>"
+    },
+    "autoAlignWizardTitle": {
+        "message": "Experimental: Auto Alignment Wizard"
+    },
+    "autoAlignWizardButton": {
+        "message": "Launch Wizard"
+    },
+    "accAlignStartText": {
+        "message": "Place the aircraft flat on the table, facing roughly north (+/- 20°).<br />For best results, try to put it as far from the computer screen as you can. Click OK after the aircraft is flat and pointing north."
+    },
+    "accAlign45Text": {
+        "message": "Please tilt the aircraft to about 45 degrees nose up. Then click the OK button while the aircraft is pitched nose up."
+    },
+    "accAlignEastText": {
+        "message": "Place the aircraft flat and pointing roughly <em>east</em>, then click OK."
+    },
+    "accAlignDoneBoardLabel": {
+        "message": "Board alignment set to"
+    },
+    "accAlignDoneCompassLabel": {
+        "message": "Compass alignment set to"
+    },
+    "accAlignCalibrationError": {
+        "message": "Accelerometer is not correctly calibrated for the current planet. Please use the calibration tab to calibrate for the local gravity."
+    },
+    "accAlignVerticalError": {
+        "message": "Readings did not match a supported mount. This can happen if the flight controller is mounted on its edge (sensor pointing sideways rather than up or down), if the board moved between the two readings, or if the nose wasn't raised close enough to 45 degrees. Please use a flat or upside-down mount and try again, or set the board alignment manually."
+    },
+    "accAlignMagUncalibratedError": {
+        "message": "The compass must be calibrated before its alignment can be determined. Please go to the <b>Calibration</b> tab and click <b>Calibrate Magnetometer</b>, then re-run this wizard."
+    },
+    "accAlignMagDisagreementError": {
+        "message": "The compass readings from the north and east positions don't agree. This usually means the aircraft wasn't actually facing north closely enough, or wasn't turned close enough to 90 degrees between the two readings. Please try again, facing as close to true north as you can."
+    },
+    "accAlignMagNoDataError": {
+        "message": "No compass reading was received from the flight controller. This may mean the connection is unstable, or the firmware on this board doesn't support the alignment wizard's compass data request. Please check the connection and try again, or update the firmware."
+    },
+    "accAlignTiltError": {
+        "message": "The second reading looks too similar to the first. Please make sure the nose is raised by about 45 degrees, then try again."
+    },
+    "accAlignNoMagDetected": {
+        "message": "N/A (no magnetometer detected)"
+    },
+    "magCalibOrientationTitle": {
+        "message": "Compass orientation <span style=\"color: #37a8db\">detected</span>"
+    },
+    "magCalibOrientationNotDetected": {
+        "message": "The compass alignment setting didn't change during that calibration spin. This usually means INAV wasn't confident enough to detect the mounting orientation -- but if it was already set correctly (e.g. from a previous run of this wizard), this is also what a successful, unchanged detection looks like. If your compass heading looks wrong on the Status tab, use the auto alignment wizard on the <b>Alignment</b> tab to set it manually."
     }
 }

@@ -16,12 +16,29 @@ portsTab.initialize = function (callback) {
     var columns = ['data', 'logging', 'sensors', 'telemetry', 'rx', 'peripherals'];
     var mspWarningModal;
 
+    /* PWM_TYPE_SRXL2. Assigning the Spektrum Smart ESC function and selecting that
+     * protocol are two settings, and a port assigned without it is always a
+     * misconfiguration - the port is never opened and the motor never driven. So
+     * saving one implies the other; see on_save_handler(). */
+    const SRXL2_PROTOCOL = 7;
+
     if (GUI.active_tab !== this) {
         GUI.active_tab = this;
     }
 
     mspHelper.loadSerialPorts(function () {
-        import('./ports.html?raw').then(({default: html}) => GUI.load(html, on_tab_loaded_handler));
+        /* Needed because saving may have to set the motor protocol as well, and
+         * writing MSP_SET_ADVANCED_CONFIG from a copy this tab never read would
+         * overwrite the rest of the motor configuration with zeroes. */
+        mspHelper.loadAdvancedConfig(function () {
+            /* Asked before the function menu is built. On a board without the
+             * Smart ESC driver this comes back as an unsupported command, and
+             * that is what keeps ESC_SRXL2 out of the list: a port assigned to
+             * a function the firmware cannot perform is never opened. */
+            MSP.send_message(MSPCodes.MSP2_INAV_ESC_SRXL2_STATUS, false, false, function () {
+                import('./ports.html?raw').then(({default: html}) => GUI.load(html, on_tab_loaded_handler));
+            });
+        });
     });
 
     function checkMSPPortCount(excludeCheckbox) {
@@ -162,6 +179,15 @@ portsTab.initialize = function (callback) {
             }            
         }
 
+        /* The table exists now, so lock the rate selectors of any function that
+         * sets its own - without going through updateDefaultBaud(), which would
+         * overwrite the saved rates of every other port. */
+        $('table.ports tbody [id^="portFunc-"]').each(function () {
+            const id = $(this).attr('id');
+            const column = id.split('-')[1];
+            applyBaudLock(id, column);
+        });
+
         $('table.ports tbody').on('change', 'select', onSwitchChange);
         $('table.ports tbody').on('change', 'input', onSwitchChange);
     }
@@ -287,7 +313,28 @@ portsTab.initialize = function (callback) {
             FC.SERIAL_CONFIG.ports.push(serialPort);
         });
 
-        mspHelper.saveSerialPorts(save_to_eeprom);
+        /*
+         * A port assigned to Spektrum Smart ESC with any other motor protocol does
+         * nothing at all: the port is never opened, the motor never driven, and
+         * nothing says why. Since that combination is never what anyone wants, the
+         * protocol follows the port rather than being a second thing to remember.
+         *
+         * Logged rather than done quietly - it changes how the motors are driven,
+         * so it should be visible even though the state it replaces was broken.
+         */
+        const wantsSrxl2 = FC.SERIAL_CONFIG.ports.some(function (p) {
+            return p.functions.includes('ESC_SRXL2');
+        });
+
+        if (wantsSrxl2 && Number.parseInt(FC.ADVANCED_CONFIG.motorPwmProtocol, 10) !== SRXL2_PROTOCOL) {
+            FC.ADVANCED_CONFIG.motorPwmProtocol = SRXL2_PROTOCOL;
+            GUI.log(i18n.getMessage('srxl2ProtocolAutoSet'));
+            mspHelper.saveAdvancedConfig(function () {
+                mspHelper.saveSerialPorts(save_to_eeprom);
+            });
+        } else {
+            mspHelper.saveSerialPorts(save_to_eeprom);
+        }
 
         function save_to_eeprom() {
             MSP.send_message(MSPCodes.MSP_EEPROM_WRITE, false, false, on_saved_handler);
@@ -319,9 +366,43 @@ function updateDefaultBaud(baudSelect, column) {
         baudRate = rule.defaultBaud;
     }
 
-    const $baudSelect = section.find("." + column + "_baudrate");
-    $baudSelect.children('[value=' + baudRate + ']').prop('selected', true);
-    $baudSelect.prop('disabled', !!(rule && rule.lockedBaud));
+    section.find("." + column + "_baudrate").children('[value=' + baudRate + ']').prop('selected', true);
+
+    applyBaudLock(baudSelect, column);
+}
+
+/*
+ * Disable the rate selector of a function that sets its own rate, and for one whose
+ * rate is negotiated rather than merely fixed, show that instead of a number.
+ *
+ * Separate from updateDefaultBaud() because that also rewrites the rate, so it must
+ * not run over a saved configuration when the tab loads - and without a load-time
+ * pass a locked selector comes up editable until the function is changed.
+ *
+ * A locked rate is usually still a real number: CRSF_SENSOR runs at 420000 and says
+ * so. SRXL2 is different - 115200 is only where the link starts before the handshake
+ * negotiates upwards - so a rule can say negotiatedBaud and get the word "auto". The
+ * substitute option carries the stored rate as its value and changes only the text,
+ * so .val() still returns the real rate and the configuration is saved unchanged.
+ */
+function applyBaudLock(baudSelect, column) {
+    const section = $("#" + baudSelect);
+    const rule = serialPortHelper.getRuleByName(section.find('.function-' + column).val());
+    const $baud = section.find("." + column + "_baudrate");
+
+    $baud.prop('disabled', Boolean(rule?.lockedBaud));
+    $baud.find('option.baudAutoOption').remove();
+
+    if (rule?.negotiatedBaud) {
+        $baud.append($('<option/>')
+            .addClass('baudAutoOption')
+            .attr('value', $baud.val())
+            .text(i18n.getMessage('portsBaudAuto')));
+        $baud.find('option.baudAutoOption').prop('selected', true);
+        $baud.attr('title', i18n.getMessage('portsBaudFixedByProtocol'));
+    } else {
+        $baud.removeAttr('title');
+    }
 }
 
 portsTab.cleanup = function (callback) {
