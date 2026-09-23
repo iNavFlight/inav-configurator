@@ -2246,7 +2246,7 @@ OSD.constants = {
                 },
                 {
                     name: 'CONTROL_PROFILE_NAME',
-                    id: 172,
+                    id: 173,
                     preview: function(osd_data) {
                         const name = FC.PROFILE_NAMES?.control?.[FC.CONFIG.profile];
                         return profileNamePreview(name, FONT.symbol(SYM.PROFILE) + (FC.CONFIG.profile + 1), FC.PROFILE_NAMES?.maxLength);
@@ -2254,7 +2254,7 @@ OSD.constants = {
                 },
                 {
                     name: 'BATTERY_PROFILE_NAME',
-                    id: 173,
+                    id: 174,
                     preview: function(osd_data) {
                         const name = FC.PROFILE_NAMES?.battery?.[FC.CONFIG.battery_profile];
                         return profileNamePreview(name, FONT.symbol(SYM.BATT) + (FC.CONFIG.battery_profile + 1), FC.PROFILE_NAMES?.maxLength);
@@ -2262,7 +2262,7 @@ OSD.constants = {
                 },
                 {
                     name: 'MIXER_PROFILE_NAME',
-                    id: 174,
+                    id: 175,
                     preview: function(osd_data) {
                         const name = FC.PROFILE_NAMES?.mixer?.[FC.CONFIG.mixer_profile];
                         return profileNamePreview(name, 'M' + (FC.CONFIG.mixer_profile + 1), FC.PROFILE_NAMES?.maxLength);
