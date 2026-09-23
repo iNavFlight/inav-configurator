@@ -17,6 +17,7 @@ import { PortHandler } from './../js/port_handler';
 import i18n from './../js/localization';
 import store from './../js/store';
 import dialog from './../js/dialog';
+import { profileNamePreview } from './../js/profileNames';
 
 var SYM = SYM || {};
 SYM.LAST_CHAR = 225; // For drawing the font preview
@@ -2248,7 +2249,7 @@ OSD.constants = {
                     id: 172,
                     preview: function(osd_data) {
                         const name = FC.PROFILE_NAMES?.control?.[FC.CONFIG.profile];
-                        return name ? name.toUpperCase() : FONT.symbol(SYM.PROFILE) + (FC.CONFIG.profile + 1);
+                        return profileNamePreview(name, FONT.symbol(SYM.PROFILE) + (FC.CONFIG.profile + 1), FC.PROFILE_NAMES?.maxLength);
                     }
                 },
                 {
@@ -2256,7 +2257,7 @@ OSD.constants = {
                     id: 173,
                     preview: function(osd_data) {
                         const name = FC.PROFILE_NAMES?.battery?.[FC.CONFIG.battery_profile];
-                        return name ? name.toUpperCase() : FONT.symbol(SYM.BATT) + (FC.CONFIG.battery_profile + 1);
+                        return profileNamePreview(name, FONT.symbol(SYM.BATT) + (FC.CONFIG.battery_profile + 1), FC.PROFILE_NAMES?.maxLength);
                     }
                 },
                 {
@@ -2264,7 +2265,7 @@ OSD.constants = {
                     id: 174,
                     preview: function(osd_data) {
                         const name = FC.PROFILE_NAMES?.mixer?.[FC.CONFIG.mixer_profile];
-                        return name ? name.toUpperCase() : 'M' + (FC.CONFIG.mixer_profile + 1);
+                        return profileNamePreview(name, 'M' + (FC.CONFIG.mixer_profile + 1), FC.PROFILE_NAMES?.maxLength);
                     }
                 },
                 {

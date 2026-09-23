@@ -66,3 +66,16 @@ export function parseProfileNames(data) {
 export function profileOptionLabel(baseLabel, name) {
     return name ? baseLabel + ': ' + name : baseLabel;
 }
+
+// MAX_PROFILE_NAME_LENGTH in the firmware, used until the name list has been read.
+const DEFAULT_NAME_LENGTH = 12;
+
+/**
+ * OSD preview of a profile name element. The firmware pads the element to the
+ * full name length, so a shorter name clears the previous one; the preview
+ * shows that footprint so overlaps with neighbouring elements are visible.
+ */
+export function profileNamePreview(name, fallback, maxLength) {
+    const text = name ? name.toUpperCase() : fallback;
+    return text.padEnd(maxLength || DEFAULT_NAME_LENGTH);
+}

@@ -7,7 +7,7 @@
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { parseProfileNames, profileOptionLabel } from '../js/profileNames.js';
+import { parseProfileNames, profileOptionLabel, profileNamePreview } from '../js/profileNames.js';
 
 function buildPayload(maxLength, lists) {
     const bytes = [maxLength];
@@ -59,4 +59,11 @@ test('option label appends the name only when there is one', () => {
     assert.equal(profileOptionLabel('Control Profile 1', 'Cruise'), 'Control Profile 1: Cruise');
     assert.equal(profileOptionLabel('Control Profile 2', ''), 'Control Profile 2');
     assert.equal(profileOptionLabel('Control Profile 3', undefined), 'Control Profile 3');
+});
+
+test('OSD preview covers the full padded name field', () => {
+    assert.equal(profileNamePreview('Cruise', 'P1', 12), 'CRUISE      ');
+    assert.equal(profileNamePreview('', 'M2', 12), 'M2          ');
+    assert.equal(profileNamePreview(undefined, 'B3', undefined), 'B3          ');
+    assert.equal(profileNamePreview('ABCDEFGHIJKL', 'P1', 12), 'ABCDEFGHIJKL');
 });
