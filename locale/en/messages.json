@@ -5852,6 +5852,24 @@
     "mixerWizardStop": {
         "message": "Emergency Stop"
     },
+    "mixerWizardDirectionQuestion": {
+        "message": "is spinning. Does it turn the way the arrow at its position shows?"
+    },
+    "mixerWizardDirectionHint": {
+        "message": "Reverse tells that ESC to spin the other way with a DShot command; nothing is changed in the ESC itself. Save the mixer afterwards to keep it."
+    },
+    "mixerWizardDirectionSpin": {
+        "message": "Spin again"
+    },
+    "mixerWizardDirectionCorrect": {
+        "message": "Turns correctly"
+    },
+    "mixerWizardDirectionReverse": {
+        "message": "Reverse"
+    },
+    "mixerWizardDirectionSkip": {
+        "message": "Skip direction check"
+    },
     "settings": {
         "message": "Settings"
     },

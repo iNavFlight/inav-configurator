@@ -5402,6 +5402,24 @@
     "mixerWizardStop": {
         "message": "Not-Stopp"
     },
+    "mixerWizardDirectionQuestion": {
+        "message": "dreht. Dreht er so, wie der Pfeil an seiner Position zeigt?"
+    },
+    "mixerWizardDirectionHint": {
+        "message": "„Umkehren“ weist den ESC per DShot-Befehl an, andersherum zu drehen; im ESC selbst wird nichts geändert. Danach den Mixer speichern, damit es erhalten bleibt."
+    },
+    "mixerWizardDirectionSpin": {
+        "message": "Nochmals drehen"
+    },
+    "mixerWizardDirectionCorrect": {
+        "message": "Dreht richtig"
+    },
+    "mixerWizardDirectionReverse": {
+        "message": "Umkehren"
+    },
+    "mixerWizardDirectionSkip": {
+        "message": "Richtungsprüfung überspringen"
+    },
     "settings": {
         "message": "Einstellungen"
     },
