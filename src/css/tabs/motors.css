@@ -525,16 +525,16 @@
 #esc-direction-dialog .esc-wizard-step h3 { font-size: 1.5rem; font-weight: 600; line-height: 1.3; margin: 0 0 12px; color: var(--esc-ink); }
 #esc-direction-dialog .esc-wizard-step > p:not(.esc-fine-print):not(#esc-wizard-progress) { margin: 0 0 16px; color: #5a6570; }
 #esc-direction-panel #esc-direction-test { min-height: 2.625rem; background: #303b45; color: #fff; border-color: #303b45; touch-action: none; user-select: none; }
-#esc-direction-panel #esc-direction-test:disabled { background: #e7ebee; border-color: #e7ebee; color: #9299a0; }
-#esc-direction-panel #esc-direction-test.running { background: #ba6333; border-color: #ba6333; color: #fff; }
+#esc-direction-panel #esc-direction-test:disabled { background: #e7ebee; border-color: #e7ebee; color: #5a6570; }
+#esc-direction-panel #esc-direction-test.running { background: #b15e31; border-color: #b15e31; color: #fff; }
 #esc-direction-panel .esc-direction-actions { display: flex; gap: 8px; margin: 20px 0 10px; }
 #esc-direction-panel .esc-direction-actions button { flex: 1; }
 #esc-direction-panel #esc-wizard-next { min-height: 2.625rem; background: #ffcc00; border-color: #e2b600; color: #292e34; }
-#esc-direction-panel #esc-wizard-next:disabled { background: #f7f2d8; border-color: #ede5be; color: #a49d7b; }
+#esc-direction-panel #esc-wizard-next:disabled { background: #f7f2d8; border-color: #ede5be; color: #746d50; }
 #esc-direction-normal[aria-pressed="true"], #esc-direction-reverse[aria-pressed="true"] { box-shadow: inset 0 0 0 1px #37a8db; }
-#esc-direction-dialog #esc-direction-status { min-height: 18px; margin: 20px 0 0; padding: 12px 0 0; border-top: 1px solid #e8ebee; color: #68737e; font-size: 0.75rem; }
-#esc-direction-status:empty { display: none; }
-#esc-direction-dialog footer { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 12px 24px; background: #fafbfc; border-top: 1px solid #e4e7ea; color: #77818b; }
+#esc-direction-dialog #esc-direction-status { display: block; min-height: 18px; margin: 20px 0 0; padding: 12px 0 0; border-top: 1px solid #e8ebee; color: #68737e; font-size: 0.75rem; line-height: 1.55; }
+#esc-direction-dialog #esc-direction-status:empty { display: none; }
+#esc-direction-dialog footer { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 12px 24px; background: #fafbfc; border-top: 1px solid #e4e7ea; color: #68737e; }
 #esc-direction-dialog footer span { font-size: 0.6875rem; line-height: 1.5; max-width: 24rem; }
 #esc-direction-dialog footer button { padding: 8px 12px; white-space: normal; font-size: 0.75rem; }
 @media (max-width: 35rem) { .esc-wizard-layout { grid-template-columns: 1fr; } .esc-mode-options { flex-direction: column; } }

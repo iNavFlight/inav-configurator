@@ -215,15 +215,15 @@
             <div class="spacer esc-launcher">
                 <p data-i18n="escWizardSummary"></p>
                 <button type="button" id="esc-direction-open" disabled data-i18n="escWizardOpen"></button>
-                <span id="esc-direction-availability" role="status"></span>
+                <output id="esc-direction-availability"></output>
             </div>
             <dialog id="esc-direction-dialog" aria-labelledby="esc-wizard-title">
-                <header><h2 id="esc-wizard-title" data-i18n="escDirectionTitle"></h2><button type="button" id="esc-direction-close"><span aria-hidden="true">×</span><span class="sr-only" data-i18n="escWizardClose"></span></button></header>
+                <header><h2 id="esc-wizard-title" data-i18n="escDirectionTitle">Motor direction</h2><button type="button" id="esc-direction-close"><span aria-hidden="true">×</span><span class="sr-only" data-i18n="escWizardClose"></span></button></header>
                 <div class="esc-wizard-body">
                     <p id="esc-direction-simulation" class="info-box" hidden data-i18n="escWizardDemo"></p>
                     <div id="esc-wizard-intro">
                         <p class="warning-box" data-i18n="escWizardSafety"></p>
-                        <div class="checkbox"><input id="esc-direction-ack" type="checkbox" /><label for="esc-direction-ack" data-i18n="escDirectionAck"></label></div>
+                        <div class="checkbox"><input id="esc-direction-ack" type="checkbox" /><label for="esc-direction-ack" data-i18n="escDirectionAck">All propellers are removed and all motors have stopped.</label></div>
                         <div class="esc-mode-options">
                             <button id="esc-mode-wizard" disabled><strong data-i18n="escWizardGuided"></strong><span data-i18n="escWizardGuidedHint"></span></button>
                             <button id="esc-mode-individual" disabled><strong data-i18n="escWizardIndividual"></strong><span data-i18n="escWizardIndividualHint"></span></button>
@@ -234,7 +234,7 @@
                         <div class="esc-wizard-layout">
                             <div><div id="esc-wizard-map"><img id="esc-wizard-image" alt="" /><div id="esc-wizard-motors"></div></div><p class="esc-map-caption" data-i18n="escWizardMap"></p></div>
                             <div class="esc-wizard-step">
-                                <p id="esc-wizard-progress"></p><h3 id="esc-wizard-motor"></h3>
+                                <p id="esc-wizard-progress"></p><h3 id="esc-wizard-motor">Motor 1</h3>
                                 <p data-i18n="escWizardObserve"></p>
                                 <button type="button" id="esc-direction-test" data-i18n="escWizardTest" disabled></button>
                                 <p class="esc-fine-print" data-i18n="escWizardPulse"></p>
@@ -247,7 +247,7 @@
                             </div>
                         </div>
                     </div>
-                    <p id="esc-direction-status" role="status" aria-live="polite"></p>
+                    <output id="esc-direction-status" aria-live="polite"></output>
                 </div>
                 <footer><span data-i18n="escWizardLock"></span><button type="button" id="esc-wizard-done" data-i18n="escWizardClose"></button></footer>
             </dialog>

@@ -33,7 +33,7 @@ export function mountEscDirection({ MSP, MSPCodes, FC, i18n, interval, isArmed, 
         const response = await MSP.promise(code, payload);
         // Queue exhaustion resolves false; an MSP error also completes its callback.
         // Neither is an acknowledgement, and neither confirms an ESC flash write.
-        if (!response || response.length !== 0 || FC[field] !== true) throw new Error('ESC command not acknowledged');
+        if (response?.length !== 0 || FC[field] !== true) throw new Error('ESC command not acknowledged');
     }
 
     function permitted() {
@@ -89,6 +89,21 @@ export function mountEscDirection({ MSP, MSPCodes, FC, i18n, interval, isArmed, 
             $motors.append($button);
         }
     }
+    // Resolve the direction write this status request was sent for, if it is still pending.
+    function settlePendingWrite(operation) {
+        if (pending && pending === operation) {
+            const matches = status.token === pending.payload[2] && status.motor === pending.payload[0]
+                && status.reverse === pending.payload[1];
+            if (matches && status.phase === 6) {
+                known[status.motor] = status.reverse;
+                pending = null;
+                message(status.simulated ? 'escWizardSimSaved' : 'escWizardSaved');
+            } else if (pending.writeReturned && (!matches || status.phase === 0) && Date.now() - pending.started > 2000) {
+                pending = null;
+                message('escDirectionRefused');
+            }
+        }
+    }
     function poll() {
         if (disposed) return;
         if (pending && Date.now() - pending.started > 8000) {
@@ -110,18 +125,7 @@ export function mountEscDirection({ MSP, MSPCodes, FC, i18n, interval, isArmed, 
             if (!status?.count) { refresh(); return; }
             $('#esc-direction-simulation').prop('hidden', !status.simulated);
             if (previous?.count !== status.count) drawMotors();
-            if (pending && pending === operation) {
-                const matches = status.token === pending.payload[2] && status.motor === pending.payload[0]
-                    && status.reverse === pending.payload[1];
-                if (matches && status.phase === 6) {
-                    known[status.motor] = status.reverse;
-                    pending = null;
-                    message(status.simulated ? 'escWizardSimSaved' : 'escWizardSaved');
-                } else if (pending.writeReturned && (!matches || status.phase === 0) && Date.now() - pending.started > 2000) {
-                    pending = null;
-                    message('escDirectionRefused');
-                }
-            }
+            settlePendingWrite(operation);
             if (previous?.testActive && !status.testActive && !pending) message('escWizardStopped');
             refresh();
         }).catch(() => {
