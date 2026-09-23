@@ -252,6 +252,13 @@
     border-color: #1e8449;
 }
 
+/* Position button of the motor whose spin direction is being checked */
+.wizard-position-btn.checking {
+    background-color: #f39c12;
+    border-color: #d68910;
+    animation: pulse 1s infinite;
+}
+
 @keyframes pulse {
     0%, 100% { transform: scale(1); }
     50% { transform: scale(1.15); }

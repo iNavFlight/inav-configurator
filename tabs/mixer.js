@@ -682,7 +682,11 @@ mixerTab.initialize = function (callback, scrollPosition) {
             motorPositions: {},     // Map: motorIndex -> positionIndex
             locateInterval: null,   // Interval for repeating locate command
             isActive: false,        // Is wizard in progress?
-            savedDshotBeeper: null  // Original dshot_beeper_enabled value to restore
+            savedDshotBeeper: null, // Original dshot_beeper_enabled value to restore
+            directionAvailable: false, // DShot with a firmware that has dshot_reversed_motors
+            directionMotor: 0,      // Which motor's spin direction is being checked
+            directionTimer: null,   // Timeout that ends a direction spin or delays the next one
+            reversedMask: 0         // dshot_reversed_motors as currently set in the FC
         };
 
         function sendMotorValues(motorIndex, value) {
@@ -712,6 +716,7 @@ mixerTab.initialize = function (callback, scrollPosition) {
 
             $('#wizard-intro').removeClass('is-hidden');
             $('#wizard-progress').addClass('is-hidden');
+            $('#wizard-direction').addClass('is-hidden');
             $('#wizard-complete').addClass('is-hidden');
 
             // Regenerate progress steps for this motor count
@@ -803,7 +808,11 @@ mixerTab.initialize = function (callback, scrollPosition) {
 
             if (wizardState.currentMotor >= currentMixerPreset.motorMixer.length) {
                 // All motors identified
-                wizardComplete();
+                if (wizardState.directionAvailable) {
+                    startDirectionCheck();
+                } else {
+                    wizardComplete();
+                }
             } else {
                 // Start locating next motor
                 startLocatingMotor(wizardState.currentMotor);
@@ -817,8 +826,86 @@ mixerTab.initialize = function (callback, scrollPosition) {
             $('.wizard-progress-step').removeClass('active').addClass('complete');
 
             $('#wizard-progress').addClass('is-hidden');
+            $('#wizard-direction').addClass('is-hidden');
             $('#wizard-complete').removeClass('is-hidden');
         }
+
+        // Direction check, DShot only. Once the positions are known each output is spun for a
+        // moment and the user says whether it turns the way the arrows show. "Reverse" flips
+        // that output's bit in dshot_reversed_motors; the firmware sends the new direction
+        // commands within about 100 ms of the change, so the next spin shows the result.
+        // Nothing is written to the ESC itself.
+        const DIRECTION_SPIN_MS = 2000;
+        const DIRECTION_APPLY_DELAY_MS = 300;
+
+        function stopDirectionSpin() {
+            if (wizardState.directionTimer) {
+                clearTimeout(wizardState.directionTimer);
+                wizardState.directionTimer = null;
+            }
+            stopMotors();
+        }
+
+        function spinMotorForDirection(motorIndex) {
+            stopDirectionSpin();
+            if (!wizardState.isActive) return;
+
+            const spinValue = Math.round(FC.MISC.mincommand + 0.15 * (FC.MISC.maxthrottle - FC.MISC.mincommand));
+            sendMotorValues(motorIndex, spinValue);
+            wizardState.locateInterval = setInterval(function() {
+                sendMotorValues(motorIndex, spinValue);
+            }, 50);
+            wizardState.directionTimer = setTimeout(stopDirectionSpin, DIRECTION_SPIN_MS);
+        }
+
+        function showDirectionMotor(motorIndex) {
+            $('#wizard-direction-motor').text(motorIndex + 1);
+            $('.wizard-position-btn').removeClass('checking');
+            $(`#wizardPos${wizardState.motorPositions[motorIndex]}`).addClass('checking');
+            spinMotorForDirection(motorIndex);
+        }
+
+        function startDirectionCheck() {
+            wizardState.directionMotor = 0;
+            $('#wizard-progress').addClass('is-hidden');
+            $('#wizard-direction').removeClass('is-hidden');
+            showDirectionMotor(0);
+        }
+
+        function endDirectionCheck() {
+            stopDirectionSpin();
+            $('.wizard-position-btn').removeClass('checking');
+            wizardComplete();
+        }
+
+        $('#wizard-direction-spin').on('click', function() {
+            spinMotorForDirection(wizardState.directionMotor);
+        });
+
+        $('#wizard-direction-ok').on('click', function() {
+            stopDirectionSpin();
+            wizardState.directionMotor++;
+            if (wizardState.directionMotor >= currentMixerPreset.motorMixer.length) {
+                endDirectionCheck();
+            } else {
+                showDirectionMotor(wizardState.directionMotor);
+            }
+        });
+
+        $('#wizard-direction-reverse').on('click', function() {
+            stopDirectionSpin();
+            const motorIndex = wizardState.directionMotor;
+            wizardState.reversedMask ^= (1 << motorIndex);
+            mspHelper.setSetting('dshot_reversed_motors', wizardState.reversedMask, function() {
+                // Give the firmware time to notice the change and get the command frames out
+                wizardState.directionTimer = setTimeout(function() {
+                    wizardState.directionTimer = null;
+                    spinMotorForDirection(motorIndex);
+                }, DIRECTION_APPLY_DELAY_MS);
+            });
+        });
+
+        $('#wizard-direction-skip').on('click', endDirectionCheck);
 
         // Position button click handler — delegated so it works on dynamically generated buttons
         $('.wizard-motor-preview').on('click', '.wizard-position-btn', function() {
@@ -855,8 +942,8 @@ mixerTab.initialize = function (callback, scrollPosition) {
         });
 
         // Emergency stop button click handler
-        $('#wizard-stop-button').on('click', function() {
-            stopMotors();
+        $('#wizard-stop-button, #wizard-direction-stop').on('click', function() {
+            stopDirectionSpin();
             motorWizardModal.close();
         });
 
@@ -904,11 +991,29 @@ mixerTab.initialize = function (callback, scrollPosition) {
             }
 
             buildPositionButtons(positions);
+
+            // The direction step needs DShot and a firmware that knows the setting; anything
+            // else (older firmware, PWM ESCs) just ends the wizard after the positions
+            wizardState.directionAvailable = false;
+            wizardState.reversedMask = 0;
+            Promise.all([
+                mspHelper.getSetting('motor_pwm_protocol'),
+                mspHelper.getSetting('dshot_reversed_motors'),
+            ]).then(function([protocol, reversed]) {
+                if (!protocol || !reversed || !protocol.setting.table) return;
+                const protocolName = protocol.setting.table.values[protocol.value] || '';
+                if (protocolName.startsWith('DSHOT')) {
+                    wizardState.directionAvailable = true;
+                    wizardState.reversedMask = reversed.value;
+                }
+            }).catch(function() {
+                // Setting unknown to this firmware: keep the direction step off
+            });
         };
 
         // Clean up when modal closes
         motorWizardModal.options.onClose = function() {
-            stopMotors();
+            stopDirectionSpin();
             wizardState.isActive = false;
 
             // Restore DShot beeper if it was enabled before the wizard
