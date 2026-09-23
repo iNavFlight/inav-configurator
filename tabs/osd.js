@@ -11,13 +11,13 @@ import GUI from './../js/gui';
 import MSP from './../js/msp';
 import MSPCodes from './../js/msp/MSPCodes';
 import mspHelper from './../js/msp/MSPHelper';
+import { profileNamePreview } from './../js/profileNames';
 import Settings, { smartRound } from './../js/settings';
 import { globalSettings } from './../js/globalSettings';
 import { PortHandler } from './../js/port_handler';
 import i18n from './../js/localization';
 import store from './../js/store';
 import dialog from './../js/dialog';
-import { profileNamePreview } from './../js/profileNames';
 
 var SYM = SYM || {};
 SYM.LAST_CHAR = 225; // For drawing the font preview
