@@ -138,6 +138,7 @@ var MSP = {
     lastFrameReceivedMs: 0,
 
     processData: null,
+    transportTransform: null,
 
     // Reads whose response failed to parse this session. The FC state they fill is
     // then part fresh and part stale, so the writes handing it back are refused.
@@ -191,6 +192,10 @@ var MSP = {
 
     setProcessData(cb) {
         this.processData = cb;
+    },
+
+    setTransportTransform(cb) {
+        this.transportTransform = cb;
     },
 
     read: function (readInfo) {
@@ -468,7 +473,7 @@ var MSP = {
 
         var message = new MspMessageClass();
         message.code = code;
-        message.messageBody = buffer;
+        message.messageBody = this.transportTransform ? this.transportTransform(buffer) : buffer;
         message.onFinish = callback_msp;
         message.onSend = callback_sent;
 
@@ -549,6 +554,7 @@ var MSP = {
         this.last_received_timestamp = null;
         this.analog_last_received_timestamp = null;
         this.lastFrameReceivedMs = 0;
+        this.transportTransform = null;
         this.parseFailures.clear(); // the next session re-reads everything from scratch
 
         this.callbacks_cleanup();

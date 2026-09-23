@@ -181,7 +181,7 @@ input[type="number"]::-webkit-inner-spin-button {
     float: right;
     margin-top: 20px;
     margin-right: 20px;
-    width: 450px;
+    width: 540px;
 }
 
 #portsinput .dropdown {
@@ -232,6 +232,10 @@ input[type="number"]::-webkit-inner-spin-button {
     top: 2px;
 }
 
+#mavlink-sysid-option {
+    width: 85px !important;
+}
+
 .portsinput__row {
     text-align: right;
 }
@@ -254,8 +258,29 @@ input[type="number"]::-webkit-inner-spin-button {
     top: 1px;
 }
 
+#mavlink-sysid-option label {
+    color: #ddd;
+    position: relative;
+    top: 1px;
+    float: left;
+}
+
 #port-override input {
     width: 136px;
+}
+
+#wireless-mavlink-sysid {
+    background-color: rgba(0, 0, 0, 0.1);
+    color: #888888;
+    width: 44px;
+    margin-left: 2px;
+    margin-top: 0;
+    padding: 1px;
+    border-radius: 3px;
+    height: 15px;
+    font-size: 12px;
+    float: right;
+    text-align: right;
 }
 
 #header_dataflash {
