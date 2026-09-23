@@ -25,3 +25,17 @@ export function escDirectionPayload(status, motor, reverse) {
     }
     return [motor, reverse, (status.token % 255) + 1];
 }
+
+// MSP2_INAV_SET_ESC_DIRECTION_TEST: motor, run (0/1), token.
+export function escDirectionTestPayload(status, motor, token) {
+    if (!status?.supportsTest || !Number.isInteger(motor) || motor < 0 || motor >= status.count
+        || !Number.isInteger(token) || token < 1 || token > 255) {
+        throw new Error('Invalid ESC test request');
+    }
+    return [motor, 1, token];
+}
+
+// Run=0 stops unconditionally; the firmware ignores motor and token. Never throws.
+export function escDirectionStopPayload() {
+    return [255, 0, 0];
+}

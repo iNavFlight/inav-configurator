@@ -87,7 +87,8 @@ test('a dropped start sends a compensating stop; failed stop is retried', async 
 });
 test('release before a queued start ACK sends a fresh stop after that ACK', async () => {
     const h = harness(); await h.open(); h.fire('#esc-direction-test', 'pointerdown');
-    const start = h.calls.at(-1); h.fire('#esc-direction-test', 'pointerup');
+    const start = h.calls.at(-1); assert.deepEqual(Array.from(start.payload), [0,1,1]);
+    h.fire('#esc-direction-test', 'pointerup');
     const stop = h.calls.at(-1); await h.answer(stop); await h.answer(start);
     assert.deepEqual(Array.from(h.calls.at(-1).payload), [255,0,0]);
     assert.notEqual(h.calls.at(-1), stop); await h.answer(h.calls.at(-1)); h.dispose();

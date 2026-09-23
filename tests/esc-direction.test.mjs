@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { parseEscDirection, canSetEscDirection, escDirectionPayload } from '../js/escDirection.js';
+import { parseEscDirection, canSetEscDirection, escDirectionPayload, escDirectionTestPayload, escDirectionStopPayload } from '../js/escDirection.js';
 const data = bytes => new DataView(Uint8Array.from(bytes).buffer);
 const status = parseEscDirection(data([1, 4, 0, 0, 0, 0]));
 const ready = { status, acknowledged: true, armed: false, testing: false, busy: false, fresh: true, motor: 2 };
@@ -44,4 +44,14 @@ test('bounded pulse capability validates running motor, token and state', () => 
         assert.equal(parseEscDirection(data(bytes)), null);
     }
     assert.equal(status.supportsTest, false);
+});
+
+test('pulse start is validated like the firmware; stop is unconditional', () => {
+    const pulse = parseEscDirection(data([2,4,0,0,0,0,0,0,0,0]));
+    assert.deepEqual(escDirectionTestPayload(pulse, 3, 255), [3,1,255]);
+    for (const [s, motor, token] of [[status, 0, 1], [null, 0, 1], [pulse, 4, 1], [pulse, -1, 1],
+        [pulse, 1.5, 1], [pulse, 0, 0], [pulse, 0, 256]]) {
+        assert.throws(() => escDirectionTestPayload(s, motor, token));
+    }
+    assert.deepEqual(escDirectionStopPayload(), [255,0,0]);
 });

@@ -1,5 +1,5 @@
 import { mixer } from './model';
-import { canSetEscDirection, escDirectionPayload } from './escDirection';
+import { canSetEscDirection, escDirectionPayload, escDirectionTestPayload, escDirectionStopPayload } from './escDirection';
 import quadImage from '../resources/motor_order/quad_x.svg';
 import quadReverseImage from '../resources/motor_order/quad_x_reverse.svg';
 
@@ -160,7 +160,7 @@ export function mountEscDirection({ MSP, MSPCodes, FC, i18n, interval, isArmed, 
         stopPromise = (async () => {
             for (let attempt = 0; attempt < 3; attempt++) {
                 try {
-                    await write(MSPCodes.MSP2_INAV_SET_ESC_DIRECTION_TEST, [255, 0, 0], 'ESC_DIRECTION_TEST_ACK');
+                    await write(MSPCodes.MSP2_INAV_SET_ESC_DIRECTION_TEST, escDirectionStopPayload(), 'ESC_DIRECTION_TEST_ACK');
                     return;
                 } catch {
                     if (!disposed) message('escDirectionUncertain');
@@ -181,12 +181,13 @@ export function mountEscDirection({ MSP, MSPCodes, FC, i18n, interval, isArmed, 
     }
     function start() {
         if (!dialog.open || !mode || !permitted() || !status.supportsTest) return;
+        lastTestToken = (Math.max(lastTestToken, status.testToken) % 255) + 1;
+        const payload = escDirectionTestPayload(status, selected, lastTestToken);
         held = true;
         starting = true;
-        lastTestToken = (Math.max(lastTestToken, status.testToken) % 255) + 1;
         message('escWizardRunning');
         refresh();
-        write(MSPCodes.MSP2_INAV_SET_ESC_DIRECTION_TEST, [selected, 1, lastTestToken], 'ESC_DIRECTION_TEST_ACK').then(async () => {
+        write(MSPCodes.MSP2_INAV_SET_ESC_DIRECTION_TEST, payload, 'ESC_DIRECTION_TEST_ACK').then(async () => {
             starting = false;
             // Release/close may happen while the start is still queued. Stop
             // again after its acknowledgement, not just before it is delivered.
