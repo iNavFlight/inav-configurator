@@ -224,6 +224,7 @@ $(function() {
         globalSettings.mapProviderType = store.get('map_provider_type', 'osm'); 
         globalSettings.assistnowApiKey = store.get('assistnow_api_key', '');
         globalSettings.googleApiKey = store.get('google_api_key', '');
+        globalSettings.openaipApiKey = store.get('openaip_api_key', '');
         globalSettings.proxyURL = store.get('proxyurl', 'http://192.168.1.222/mapproxy/service?');
         globalSettings.proxyLayer = store.get('proxylayer', 'your_proxy_layer_name');
         globalSettings.showProfileParameters = store.get('show_profile_parameters', 1);
@@ -589,6 +590,7 @@ $(function() {
                     $('#cliAutocomplete').prop('checked', globalSettings.cliAutocomplete);
                     $('#assistnow-api-key').val(globalSettings.assistnowApiKey);
                     $('#google-api-key').val(globalSettings.googleApiKey);
+                    $('#openaip-api-key').val(globalSettings.openaipApiKey);
                     
                     i18n.getLanguages().forEach(lng => {
                         $('#languageOption').append("<option value='{0}'>{1}</option>".format(lng, i18n.getMessage("language_" + lng)));
@@ -639,6 +641,13 @@ $(function() {
                         $(this).val(apiKey);
                         store.set('google_api_key', apiKey);
                         globalSettings.googleApiKey = apiKey;
+                    });
+                    $('#openaip-api-key').on('change', function () {
+                        const apiKey = String($(this).val() || '').trim();
+                        $(this).val(apiKey);
+                        store.set('openaip_api_key', apiKey);
+                        globalSettings.openaipApiKey = apiKey;
+                        GUI.active_tab?.onOpenAipKeyChanged?.();
                     });
                     $('#google-api-key-test').on('click', testGoogleApiKey);
                     $('#google-api-key-help').on('click', showGoogleApiHelp);

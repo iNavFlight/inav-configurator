@@ -7175,6 +7175,15 @@
     "gpsOptionsAssistnowToken": {
         "message": "AssitNow Token"
     },
+    "openaipOptions": {
+        "message": "Airspace data (openAIP)"
+    },
+    "openaipApiKey": {
+        "message": "openAIP API key"
+    },
+    "openaipApiKeyHelp": {
+        "message": "Lets Mission Control show airspace and airport overlays on the map. Register for free at <a href=\"https://www.openaip.net\" target=\"_blank\">openaip.net</a> and create an API key in your account settings. The key is stored locally and only sent to the openAIP tile server."
+    },
     "googleLocationServices": {
         "message": "Google Location & Weather Services"
     },
@@ -7351,6 +7360,15 @@
     },
     "layerDragDropHint": {
         "message": "or drag & drop GEO files onto the map"
+    },
+    "layerOpenAipAirspaces": {
+        "message": "Airspaces (openAIP)"
+    },
+    "layerOpenAipAirports": {
+        "message": "Airports (openAIP)"
+    },
+    "layerOpenAipNoKey": {
+        "message": "Airspace and airport overlays need a free openAIP API key. Enter it in the Options."
     },
     "layerConfirmDelete": {
         "message": "Are you sure you want to delete this layer?"
