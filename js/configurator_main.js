@@ -8,6 +8,7 @@ import * as THREE from 'three'
 import GUI, { TABS } from './gui';
 import interval from './intervals';
 import CONFIGURATOR from './data_storage';
+import { loadOsdUnits } from './osdUnits';
 import FC  from './fc';
 import { globalSettings, UnitType } from './globalSettings';
 import { PLATFORM } from './model'
@@ -603,14 +604,14 @@ $(function() {
 
                     // Set the value of the unit type
                     // none, OSD, imperial, metric
-                    $('#ui-unit-type').on('change', function () {
+                    $('#ui-unit-type').on('change', async function () {
                         store.set('unit_type', $(this).val());
                         globalSettings.unitType = $(this).val();
 
                         // Update the osd units in global settings
                         // but only if we need it
                         if (globalSettings.unitType === UnitType.OSD) {
-                            get_osd_settings();
+                            await loadOsdUnits();
                         }
 
                         // Horrible way to reload the tab
@@ -820,23 +821,6 @@ $(function() {
 });
 
 
-function get_osd_settings() {
-    if (globalSettings.osdUnits !== undefined && globalSettings.osdUnits !== null) {
-        return;
-    }
-
-    MSP.promise(MSPCodes.MSP2_INAV_OSD_PREFERENCES).then(function (resp) {
-        var prefs = resp.data;
-        prefs.readU8();
-        prefs.readU8();
-        prefs.readU8();
-        prefs.readU8();
-        prefs.readU8();
-        prefs.readU8();
-        prefs.readU8();
-        globalSettings.osdUnits = prefs.readU8();
-    });
-}
 
 function updateProfilesHighlightColours() {
     if (globalSettings.showProfileParameters) {

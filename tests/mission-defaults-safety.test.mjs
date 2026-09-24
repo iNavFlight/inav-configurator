@@ -3,11 +3,13 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import vm from 'node:vm';
 import {parse} from 'acorn';
+import {toDisplayUnits} from '../js/unitConversion.js';
+import {globalSettings as displaySettings, UnitType} from '../js/globalSettings.js';
 
 // Execute the production functions unchanged. The tab normally needs Electron, Vite
 // and an OpenLayers map; only those surrounding services are replaced here.
 const source = readFileSync(process.env.MISSION_CONTROL_SOURCE || new URL('../tabs/mission_control.js', import.meta.url), 'utf8');
-const names = new Set(['resolveHomeElevationCm', 'homePositionKey', 'invalidateHomeElevation',
+const names = new Set(['altitudeToDisplay', 'resolveHomeElevationCm', 'homePositionKey', 'invalidateHomeElevation',
     'applyMissionDefaultsLocked', 'missionWasReplaced', 'collectionChangedSince',
     'settleDraggedWaypoint', 'waypointPositionKey', 'settleLandingApproach',
     'convertLandingApproach', 'writeDefaultsToWaypoint', 'writeSpeedToWaypoint',
@@ -55,7 +57,7 @@ function harness() {
     const state = {items: [wp], writes: 0};
     const HOME = waypoint(0);
     HOME.setAlt(200);
-    const ctx = vm.createContext({$, HOME, homeMarkers: [{}], homeElevationPosition: null,
+    const ctx = vm.createContext({toDisplayUnits, MISSION_UNIT_ALT: 'cm', MISSION_UNIT_SPEED: 'cms', $, HOME, homeMarkers: [{}], homeElevationPosition: null,
         homeElevationRequest: null, pendingWaypointDrags: new WeakMap(),
         landSpeedNotUpdatedModal: null,
         locationLifecycleId: 1, missionControlLocationLifecycleId: 1,
@@ -91,6 +93,26 @@ for (const gotGrounds of [true, false]) {
         assert.deepEqual(state.items, replacement);
     });
 }
+
+test('aborted mission apply restores default fields in the selected display units', async () => {
+    const previous = displaySettings.unitType;
+    displaySettings.unitType = UnitType.imperial;
+    try {
+        const {ctx, state, $} = harness();
+        const wait = deferred();
+        ctx.resolveGroundsForDefaults = () => wait.promise;
+        const saving = ctx.applyMissionDefaultsLocked(15240, 500);
+        state.items = [waypoint(1)];
+        wait.resolve(true);
+        await saving;
+        assert.equal($('#MPdefaultPointAlt').value, '500');
+        assert.equal($('#MPdefaultPointSpeed').value, toDisplayUnits(500, 'cms').text);
+        assert.equal(ctx.settings.alt, 15240);
+        assert.equal(ctx.settings.speed, 500);
+    } finally {
+        displaySettings.unitType = previous;
+    }
+});
 
 test('save abandons home or waypoint movement during elevation wait', async () => {
     for (const moveHome of [true, false]) {
