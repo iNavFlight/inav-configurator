@@ -1,6 +1,6 @@
 <div class="tab-gps toolbar_fixed_bottom">
     <div class="content_wrapper">
-        <div class="tab_title" data-i18n="tabGPS">GPS</div>
+        <div class="tab_title"><span data-i18n="tabGPS">GPS</span><span id="gps_title_model"></span></div>
         <div class="cf_column third_left">
             <div class="spacer_right">
 
@@ -31,12 +31,6 @@
                             <select id="gps_baud" class="gps_baud"></select>
                             <label for="gps_baud"><span data-i18n="gpsBaud"></span></label>
                         </div>
-                        <div class="select">
-                            <select id="gps_ubx_sbas" class="gps_ubx_sbas">
-                                <!-- list generated here -->
-                            </select>
-                            <label for="gps_ubx_sbas"><span data-i18n="configurationGPSubxSbas"></span></label>
-                        </div>
                         <div class="number is-hidden">
                             <input type="number" id="mag_declination" name="mag_declination" step="0.1" min="-180" max="180" />
                             <label for="mag_declination"><span data-i18n="configurationMagDeclination"></span></label>
@@ -57,12 +51,6 @@
                             </label>
                             <div for="gps_preset_mode" class="helpicon cf_tip" data-i18n_title="gpsPresetModeHelp"></div>
                         </div>
-                        <!-- Hardware detection status -->
-                        <div id="gps_hardware_status" style="display: none; padding: 5px; margin: 5px 0; font-size: 12px; color: #28a745;">
-                            <span style="margin-right: 5px;">✓</span>
-                            <span id="gps_hardware_name"></span>
-                            <a href="#" id="gps_apply_optimal" style="margin-left: 10px; color: #007bff; text-decoration: none;">[Use optimal settings]</a>
-                        </div>
                         <!-- GPS Preset Info (shown when preset selected) -->
                         <div class="preset-info" id="preset_info" style="display: none; padding: 5px; margin: 5px 0; background: #f0f0f0; border-radius: 3px;">
                             <strong><span id="preset_name"></span></strong>
@@ -76,18 +64,6 @@
                             </label>
                             <div for="gps_ublox_nav_hz" class="helpicon cf_tip" data-i18n_title="gpsUpdateRateHelp"></div>
                         </div>
-                        <div class="checkbox">
-                            <input type="checkbox" id="gps_use_galileo" class="toggle update_preview preset-controlled" data-setting="gps_ublox_use_galileo">
-                            <label for="gps_use_galileo"><span data-i18n="configurationGPSUseGalileo"></span></label>
-                        </div>
-                        <div class="checkbox">
-                            <input type="checkbox" id="gps_use_beidou" class="toggle update_preview preset-controlled" data-setting="gps_ublox_use_beidou">
-                            <label for="gps_use_beidou"><span data-i18n="configurationGPSUseBeidou"></span></label>
-                        </div>
-                        <div class="checkbox">
-                            <input type="checkbox" id="gps_use_glonass" class="toggle update_preview preset-controlled" data-setting="gps_ublox_use_glonass">
-                            <label for="gps_use_glonass"><span data-i18n="configurationGPSUseGlonass"></span></label>
-                        </div>
                         <div class="number">
                             <input type="number" id="tzOffset" data-setting="tz_offset" data-unit="tzmins" data-setting-multiplier="1" step="1" min="-1440" max="1440" />
                             <label for="tzOffset"><span data-i18n="tzOffset"></span></label>
@@ -97,6 +73,59 @@
                             <select id="tzAutomaticDST" data-setting="tz_automatic_dst"></select>
                             <label for="tzAutomaticDST"><span data-i18n="tzAutomaticDST"></span></label>
                             <div for="tzAutomaticDST" class="helpicon cf_tip" data-i18n_title="tzAutomaticDSTHelp"></div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="config-section gui_box grey">
+                    <div class="gui_box_titlebar">
+                        <div class="spacer_box_title" data-i18n="gpsConstellations"></div>
+                    </div>
+                    <div class="spacer_box">
+                        <!-- The switches INAV can actually move. One is withdrawn only when
+                             the receiver has told us it does not have that constellation -->
+                        <div class="checkbox gnss-fixed is-hidden" id="gps_have_gps_row">
+                            <input type="checkbox" id="gps_have_gps" class="toggle" checked disabled>
+                            <label for="gps_have_gps"><span data-i18n="configurationGPSUseGps">Use GPS Satellites (US)</span></label>
+                            <div for="gps_have_gps" class="helpicon cf_tip" data-i18n_title="configurationGPSUseGpsHelp"></div>
+                        </div>
+                        <div class="checkbox">
+                            <input type="checkbox" id="gps_use_galileo" class="toggle update_preview preset-controlled" data-setting="gps_ublox_use_galileo">
+                            <label for="gps_use_galileo"><span data-i18n="configurationGPSUseGalileo"></span></label>
+                            <div for="gps_use_galileo" class="helpicon cf_tip" data-i18n_title="configurationGPSUseGalileoHelp"></div>
+                        </div>
+                        <div class="checkbox">
+                            <input type="checkbox" id="gps_use_beidou" class="toggle update_preview preset-controlled" data-setting="gps_ublox_use_beidou">
+                            <label for="gps_use_beidou"><span data-i18n="configurationGPSUseBeidou"></span></label>
+                            <div for="gps_use_beidou" class="helpicon cf_tip" data-i18n_title="configurationGPSUseBeidouHelp"></div>
+                        </div>
+                        <div class="checkbox">
+                            <input type="checkbox" id="gps_use_glonass" class="toggle update_preview preset-controlled" data-setting="gps_ublox_use_glonass">
+                            <label for="gps_use_glonass"><span data-i18n="configurationGPSUseGlonass"></span></label>
+                            <div for="gps_use_glonass" class="helpicon cf_tip" data-i18n_title="configurationGPSUseGlonassHelp"></div>
+                        </div>
+                        <!-- Counts the four majors above it, which are the ones the
+                             receiver has a limit on -->
+                        <div class="gnss-budget is-hidden" id="gps_gnss_budget"></div>
+                        <div class="checkbox is-hidden" id="gps_use_navic_row">
+                            <input type="checkbox" id="gps_use_navic" class="toggle" data-setting="gps_ublox_use_navic">
+                            <label for="gps_use_navic"><span data-i18n="configurationGPSUseNavic">Use NavIC Satellites (IN)</span></label>
+                            <div for="gps_use_navic" class="helpicon cf_tip" data-i18n_title="configurationGPSUseNavicHelp"></div>
+                        </div>
+                        <!-- The one INAV decides on its own. It is here so the tab answers
+                             what the receiver can do, not only what it is asked -->
+                        <div class="checkbox gnss-fixed is-hidden" id="gps_have_qzss_row">
+                            <input type="checkbox" id="gps_have_qzss" class="toggle" checked disabled>
+                            <label for="gps_have_qzss"><span data-i18n="configurationGPSUseQzss">Use QZSS Satellites (JP)</span></label>
+                            <div for="gps_have_qzss" class="helpicon cf_tip" data-i18n_title="configurationGPSUseQzssHelp"></div>
+                        </div>
+                        <div class="select">
+                            <select id="gps_ubx_sbas" class="gps_ubx_sbas">
+                                <!-- list generated here -->
+                            </select>
+                            <label for="gps_ubx_sbas"><span data-i18n="configurationGPSubxSbas"></span></label>
+                            <div for="gps_ubx_sbas" class="helpicon cf_tip" data-i18n_title="configurationGPSubxSbasHelp"></div>
                         </div>
                     </div>
                 </div>
