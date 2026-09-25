@@ -111,6 +111,15 @@ var FC = {
         return true; // Currently all platforms use D term
     },
     resetState: function () {
+        // Bit positions are only valid for the connection that reported them (see
+        // AUX_CONFIG_IDS_RAW above). Clear them on every reset so a dropped/timed-out
+        // MSP_BOXIDS on reconnect can't leave getModeId() resolving against a stale
+        // controller's box layout instead of failing safely until generateAuxConfig()
+        // runs again for the new connection.
+        this.AUX_CONFIG = [];
+        this.AUX_CONFIG_IDS = [];
+        this.AUX_CONFIG_IDS_RAW = [];
+
         this.SENSOR_STATUS = {
             isHardwareHealthy: 0,
             gyroHwStatus: 0,
@@ -1004,7 +1013,11 @@ var FC = {
         return BitHelper.bit_check(this.CONFIG.mode[Math.trunc(i / 32)], i % 32);
     },
     isModeEnabled: function (name) {
-        return this.isModeBitSet(this.getModeId(name));
+        const modeId = this.getModeId(name);
+        if (modeId < 0) {
+            return false;
+        }
+        return this.isModeBitSet(modeId);
     },
     getBatteryProfileParameters: function () {
         return [
