@@ -15,6 +15,7 @@ import {
     commandedTurnRadius,
     destination,
     distanceBetween,
+    arcTurnRadius,
     flyByLeadDistance,
     flyIntoSTurn,
     getSimulationRoute,
@@ -1175,5 +1176,29 @@ describe('turn modes', () => {
         assert.deepEqual(result.warnings, []);
         // The module's default acceptance radius is 8 m.
         assert.ok(result.events[0].distanceM <= 8 + 5, `passed ${result.events[0].distanceM.toFixed(0)} m off`);
+    });
+
+    test('below the 10 m planning floor every mode steers, plans and budgets at the floor', () => {
+        // 8 m/s at 45 degrees banks round 6.5 m, but the firmware never plans a corner tighter than 10 m.
+        const params = {speedMs: 8, bankAngleDeg: 45, waypointRadiusM: 1};
+        assert.ok(turnRadius(params.speedMs, params.bankAngleDeg) < 7);
+        assert.equal(arcTurnRadius(params.speedMs, params.bankAngleDeg), 10);
+
+        const corner = destination(HOME, 0, 600);
+        const points = [HOME, corner, destination(corner, 180, 40)];
+        const stepM = params.speedMs * 0.1;
+        for (const turnMode of [TurnMode.COORD_FLYBY, TurnMode.DIRECT]) {
+            const result = simulateGroundTrack(points, {...params, turnMode});
+            assert.ok(!result.events.some((event) => event.type === SimEvent.ABANDONED), `${turnMode} abandoned a leg`);
+            assert.ok(!result.warnings.some((warning) => warning.code === 'leg-not-flyable'), turnMode);
+
+            const radii = [];
+            for (let index = 1; index < result.samples.length; index++) {
+                const radius = flownRadius(result.samples[index - 1], result.samples[index], stepM);
+                if (Number.isFinite(radius)) radii.push(radius);
+            }
+            const tightest = Math.min(...radii);
+            assert.ok(Math.abs(tightest - 10) < 0.1, `${turnMode} turned at ${tightest.toFixed(2)} m`);
+        }
     });
 });

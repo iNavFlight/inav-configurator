@@ -612,7 +612,8 @@ export function simulateGroundTrack(points, params = {}) {
     const config = {...DEFAULT_PARAMS, ...params};
     const {speedMs, waypointRadiusM, timeStepS, maxDurationS} = config;
 
-    const radiusM = commandedTurnRadius(speedMs, config.bankAngleDeg);
+    // One radius for steering, planned arcs, leg budgets and warnings: the firmware never plans tighter than 10 m.
+    const radiusM = arcTurnRadius(speedMs, config.bankAngleDeg);
     const turnRate = turnRateDegPerSecond(speedMs, radiusM);
     const stepM = speedMs * timeStepS;
     const plan = turnPlanState(config, radiusM);
