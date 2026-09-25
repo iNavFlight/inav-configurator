@@ -4,7 +4,7 @@ import { describe, test } from 'node:test';
 import MWNP from '../js/mwnp.js';
 import {
     SimEvent,
-    TurnSmoothing,
+    TurnMode,
     altitudeAlongLeg,
     bankForTurnRate,
     buildLandingApproach,
@@ -15,9 +15,13 @@ import {
     commandedTurnRadius,
     destination,
     distanceBetween,
+    flyByLeadDistance,
+    flyIntoSTurn,
     getSimulationRoute,
     headingDifference,
     phaseRuns,
+    planningTurnRadius,
+    rejoinIntercept,
     simulateGroundTrack,
     turnRadius,
     turnRateDegPerSecond
@@ -48,9 +52,9 @@ function waypoint({
 // ignored the parameters it is handed, these tests have to notice.
 const FC = {
     bankAngleDeg: 25,
-    loiterRadiusM: 90,
     waypointRadiusM: 12,
-    speedMs: 22
+    speedMs: 22,
+    turnMaxLeadTimeMs: 7000
 };
 
 const HOME = {lat: 47.5716018, lon: 9.3338224};
@@ -449,34 +453,25 @@ describe('turn geometry', () => {
         }
     });
 
-    test('with turn smoothing off the corner is bank limited, not loiter sized', () => {
-        // nav_fw_wp_turn_smoothing defaults to OFF, and the firmware then never
-        // enters the smoothing block at all — the loiter radius stays out of it.
-        assert.ok(Math.abs(
-            commandedTurnRadius(15, 35, 75, TurnSmoothing.OFF) - turnRadius(15, 35)
-        ) < 1e-9);
+    test('the flown corner radius is the bank-limited one, not loiter sized', () => {
+        // The turn mode moves where a turn starts and ends, never how tight it is.
+        assert.ok(Math.abs(commandedTurnRadius(15, 35) - turnRadius(15, 35)) < 1e-9);
     });
 
-    test('turn smoothing never widens the flown radius', () => {
-        // The firmware anticipates the corner instead of turning wider. Widening
-        // here would push the track further outside the corner than the aircraft
-        // ever goes, so every mode flies the bank-limited radius.
-        for (const mode of [TurnSmoothing.OFF, TurnSmoothing.ON, TurnSmoothing.CUT]) {
-            assert.ok(Math.abs(commandedTurnRadius(15, 35, 75, mode) - turnRadius(15, 35)) < 1e-9, mode);
-        }
+    test('corners are planned with the firmware clamp of 10 to 300 m', () => {
+        assert.ok(Math.abs(planningTurnRadius(22, 25) - turnRadius(22, 25)) < 1e-9);
+        assert.equal(planningTurnRadius(60, 10), 300);
+        assert.equal(planningTurnRadius(5, 60), 10);
     });
 
-    test('every smoothing mode reaches the simulator and flies the same track', () => {
+    test('the turn mode reaches the simulator', () => {
         const corner = destination(HOME, 0, 900);
         const exit = destination(corner, 90, 900);
-        const tracks = [TurnSmoothing.OFF, TurnSmoothing.ON, TurnSmoothing.CUT].map(
-            (turnSmoothing) => simulateGroundTrack([HOME, corner, exit], {...FC, turnSmoothing})
+        const lengths = Object.values(TurnMode).map(
+            (turnMode) => simulateGroundTrack([HOME, corner, exit], {...FC, turnMode}).summary.totalDistanceM
         );
 
-        for (const track of tracks) {
-            assert.equal(track.samples.length, tracks[0].samples.length);
-            assert.ok(Math.abs(track.summary.turnRadiusM - turnRadius(FC.speedMs, FC.bankAngleDeg)) < 1e-9);
-        }
+        assert.equal(new Set(lengths).size, lengths.length, `track lengths ${lengths.join(', ')}`);
     });
 });
 
@@ -546,9 +541,7 @@ describe('ground track', () => {
         const exit = destination(corner, 90, 1000);
         const result = simulateGroundTrack([HOME, corner, exit], FC);
 
-        const expected = commandedTurnRadius(
-            FC.speedMs, FC.bankAngleDeg, FC.loiterRadiusM, TurnSmoothing.OFF
-        );
+        const expected = commandedTurnRadius(FC.speedMs, FC.bankAngleDeg);
         const stepM = FC.speedMs * 0.1;
 
         const turningRadii = [];
@@ -569,16 +562,14 @@ describe('ground track', () => {
         );
     });
 
-    test('with turn smoothing off the aircraft flies past the corner', () => {
+    test('in DIRECT mode the aircraft flies past the corner', () => {
         // The corner waypoint is reached first, and only then does the turn
         // begin, so the track has to swing clear of the ideal corner.
         const corner = destination(HOME, 0, 1000);
         const exit = destination(corner, 90, 1000);
-        const result = simulateGroundTrack([HOME, corner, exit], FC);
+        const result = simulateGroundTrack([HOME, corner, exit], {...FC, turnMode: TurnMode.DIRECT});
 
-        const expected = commandedTurnRadius(
-            FC.speedMs, FC.bankAngleDeg, FC.loiterRadiusM, TurnSmoothing.OFF
-        );
+        const expected = commandedTurnRadius(FC.speedMs, FC.bankAngleDeg);
 
         // How far the track strays from the leg it is supposed to join. Turning at
         // the waypoint rather than before it has to cost roughly one radius.
@@ -596,9 +587,10 @@ describe('ground track', () => {
     test('a waypoint is given up on relative to the leg, not to the aircraft', () => {
         // INAV fixes the reference bearing at the moment the waypoint becomes
         // active — previous waypoint to active waypoint — and calls the waypoint
-        // passed once the bearing to it has swung 100 degrees off that line
-        // (navigation.c:4224-4229 and 3062-3064). Taking the reference from the
-        // aircraft's own position instead would move every switch after a corner.
+        // passed once the aircraft crosses the line through it square to that leg,
+        // i.e. the bearing to it has swung 90 degrees off the leg (navigation.c
+        // isWaypointReached). Taking the reference from the aircraft's own
+        // position instead would move every switch after a corner.
         // A near reversal onto a 40 m leg: too tight to curl back onto, so the
         // aircraft has to give the waypoint up and the rule actually fires.
         const corner = destination(HOME, 0, 1000);
@@ -617,8 +609,8 @@ describe('ground track', () => {
         ));
 
         assert.ok(
-            offLeg > 99 && offLeg < 115,
-            `gave up at ${offLeg.toFixed(1)} degrees off the leg, expected about 100`
+            offLeg > 89 && offLeg < 105,
+            `gave up at ${offLeg.toFixed(1)} degrees off the leg, expected about 90`
         );
     });
 
@@ -690,5 +682,498 @@ describe('ground track', () => {
         const result = simulateGroundTrack([HOME], FC);
         assert.equal(result.samples.length, 0);
         assert.equal(result.summary.totalDistanceM, 0);
+    });
+});
+
+describe('turn modes', () => {
+    const RADIUS = turnRadius(FC.speedMs, FC.bankAngleDeg);
+    const LEAD = FC.speedMs * 1.0;
+    const STEP = FC.speedMs * 0.1;
+
+    function corner(turnDeg) {
+        const vertex = destination(HOME, 0, 1000);
+        return {vertex, exit: destination(vertex, turnDeg, 1000)};
+    }
+
+    function fly(turnDeg, turnMode, extra = {}) {
+        const {vertex, exit} = corner(turnDeg);
+        return {vertex, exit, result: simulateGroundTrack([HOME, vertex, exit], {...FC, turnMode, ...extra})};
+    }
+
+    // How far past the corner the track reaches, measured along the inbound leg.
+    function pastCorner(samples, vertex) {
+        return Math.max(...samples.map((point) => {
+            const distance = distanceBetween(HOME, point);
+            return distance * Math.cos((bearingBetween(HOME, point) - bearingBetween(HOME, vertex)) * Math.PI / 180);
+        })) - distanceBetween(HOME, vertex);
+    }
+
+    // The first sample on the new leg that holds exactly the given course: where a planned arc rolled out.
+    function rollOut(samples, headingDeg) {
+        return samples.find((point) => point.waypointIndex === 2
+            && Math.abs(headingDifference(headingDeg, point.heading)) < 0.01);
+    }
+
+    function nearestTo(samples, target) {
+        return samples.reduce((best, point) =>
+            (distanceBetween(point, target) < distanceBetween(best, target) ? point : best));
+    }
+
+    test('the fly-by lead is roll-in plus R tan(turn / 2), capped by the lead time', () => {
+        const plain = flyByLeadDistance(100, 90, 20, 8000);
+        assert.ok(Math.abs(plain.distanceM - 120) < 1e-6);
+        assert.equal(plain.capped, false);
+        // The side of the turn does not matter.
+        assert.ok(Math.abs(flyByLeadDistance(100, -90, 20, 8000).distanceM - 120) < 1e-6);
+
+        // 20 m + 100 m * tan(60) = 193 m wanted, but 6 s at 20 m/s allows only 120 m.
+        const capped = flyByLeadDistance(100, 120, 20, 6000);
+        assert.ok(Math.abs(capped.distanceM - 120) < 1e-6);
+        assert.equal(capped.capped, true);
+
+        // Near a reversal the tangent is clamped the way the firmware clamps it.
+        assert.ok(Math.abs(flyByLeadDistance(100, 170, 20, 60000).distanceM - (20 + 370)) < 1e-6);
+    });
+
+    test('a fly-by cuts a 90 degree corner and rolls out on the next leg', () => {
+        const {vertex, exit, result} = fly(90, TurnMode.COORD_FLYBY);
+
+        assert.equal(result.events[0].type, SimEvent.REACHED);
+        assert.ok(Math.abs(result.events[0].distanceM - (LEAD + RADIUS)) <= STEP,
+            `turn started ${result.events[0].distanceM.toFixed(1)} m out`);
+        assert.ok(pastCorner(result.samples, vertex) < 1, 'the track must stay inside the corner');
+
+        // The arc inscribed in a right angle passes R * (sqrt(2) - 1) from the vertex.
+        const closest = distanceBetween(nearestTo(result.samples, vertex), vertex);
+        assert.ok(Math.abs(closest - RADIUS * (Math.SQRT2 - 1)) < 3, `closest ${closest.toFixed(1)} m`);
+
+        const out = rollOut(result.samples, 90);
+        assert.ok(out, 'the arc must roll out on the outbound course');
+        assert.ok(Math.abs(crossTrackDistance(vertex, exit, out)) < 3,
+            `rolled out ${crossTrackDistance(vertex, exit, out).toFixed(1)} m off the leg`);
+    });
+
+    test('a capped fly-by starts late and rolls out beside the next leg', () => {
+        const {vertex, exit, result} = fly(120, TurnMode.COORD_FLYBY);
+        const capM = FC.speedMs * FC.turnMaxLeadTimeMs / 1000;
+
+        assert.ok(result.events[0].distanceM <= capM && result.events[0].distanceM > capM - STEP);
+
+        // The arc starts one roll-in after the cap point; rolled out on 120 degrees
+        // the aircraft sits p * sin(120) - R * (1 - cos(120)) right of the leg.
+        const arcStartM = capM - LEAD;
+        const expected = arcStartM * Math.sin(Math.PI * 2 / 3) - RADIUS * 1.5;
+        const out = rollOut(result.samples, 120);
+        assert.ok(out, 'the arc must roll out on the outbound course');
+        const offLeg = crossTrackDistance(vertex, exit, out);
+        assert.ok(Math.abs(offLeg - expected) < 4,
+            `rolled out ${offLeg.toFixed(1)} m off the leg, expected ${expected.toFixed(1)}`);
+        assert.equal(result.events.at(-1).type, SimEvent.REACHED);
+    });
+
+    test('a reversal is flown as a capture turn and rolls out two radii off the leg', () => {
+        const {vertex, exit, result} = fly(180, TurnMode.COORD_FLYBY);
+
+        // Too sharp to anticipate: the corner is reached first, then the turn begins.
+        assert.ok(result.events[0].distanceM <= FC.waypointRadiusM);
+        const out = rollOut(result.samples, 180);
+        assert.ok(out, 'the capture must roll out on the outbound course');
+        const offLeg = crossTrackDistance(vertex, exit, out);
+        assert.ok(Math.abs(Math.abs(offLeg) - 2 * RADIUS) < 3,
+            `rolled out ${offLeg.toFixed(1)} m off the leg, expected ${(2 * RADIUS).toFixed(1)}`);
+    });
+
+    test('a fly-over passes the waypoint, then turns towards the next one', () => {
+        const {vertex, exit, result} = fly(90, TurnMode.COORD_FLYOVER);
+
+        assert.ok(result.events[0].distanceM <= FC.waypointRadiusM, 'the waypoint itself must be reached');
+        // Roll-in plus one radius beyond the point where the waypoint was reached.
+        const past = pastCorner(result.samples, vertex);
+        assert.ok(past > RADIUS && past < RADIUS + LEAD + STEP, `went ${past.toFixed(1)} m past the corner`);
+
+        // The arc rolls out pointing at the next waypoint, not onto the leg's course.
+        const turned = result.samples.filter((point) => point.waypointIndex === 2 && point.phase === 'turn').at(-1);
+        assert.ok(Math.abs(headingDifference(turned.heading, bearingBetween(turned, exit))) < 2);
+        assert.ok(Math.abs(headingDifference(90, turned.heading)) > 5, 'the exit is the tangent to the waypoint');
+        assert.equal(result.events.at(-1).type, SimEvent.REACHED);
+    });
+
+    test('a fly-into flies its S before the waypoint and crosses it on the next leg', () => {
+        // Beyond 90 degrees the S crosses the waypoint's square line on the way; that is the plan, not a miss.
+        for (const turnDeg of [90, 135]) {
+            const {vertex, exit, result} = fly(turnDeg, TurnMode.COORD_FLYINTO);
+            const sTurn = flyIntoSTurn(planningTurnRadius(FC.speedMs, FC.bankAngleDeg), 0, turnDeg, 2 * LEAD);
+
+            // The S starts well before the waypoint, turning away from the corner first.
+            const leaves = result.samples.find((point) => Math.abs(headingDifference(0, point.heading)) > 0.1);
+            const startedM = distanceBetween(leaves, vertex);
+            assert.ok(Math.abs(startedM - sTurn.startBeforeM) < 2 * STEP,
+                `turned ${startedM.toFixed(1)} m out, S starts ${sTurn.startBeforeM.toFixed(1)} m out`);
+            assert.ok(headingDifference(0, leaves.heading) < 0, 'a right-hand corner opens to the left');
+            const widest = Math.min(...result.samples.map((point) => crossTrackDistance(HOME, vertex, point)));
+            assert.ok(widest < -RADIUS / 2, `swung out only ${widest.toFixed(1)} m`);
+
+            const crossing = nearestTo(result.samples, vertex);
+            const passedM = distanceBetween(crossing, vertex);
+            assert.ok(passedM < 3, `${turnDeg}: passed ${passedM.toFixed(1)} m off`);
+            assert.ok(Math.abs(headingDifference(turnDeg, crossing.heading)) < 2,
+                `${turnDeg}: crossed on ${crossing.heading.toFixed(1)}`);
+            assert.ok(Math.abs(crossTrackDistance(vertex, exit, crossing)) < 3);
+            assert.deepEqual(result.warnings, [], `${turnDeg}: ${result.warnings.map((warning) => warning.code)}`);
+        }
+    });
+
+    test('the fly-into tangent joins both arcs over the planned gap', () => {
+        const sTurn = flyIntoSTurn(100, 0, 90, 40);
+        assert.equal(sTurn.turnDirection, 1);
+        assert.ok(Math.abs(sTurn.tangentLengthM - 40) < 1e-6);
+        assert.ok(sTurn.startBeforeM > 200);
+        // Counter-arc to the left first, so the tangent heads left of the inbound course.
+        assert.ok(headingDifference(0, sTurn.tangentHeadingDeg) < 0);
+
+        const mirrored = flyIntoSTurn(100, 0, 270, 40);
+        assert.equal(mirrored.turnDirection, -1);
+        assert.ok(Math.abs(mirrored.startBeforeM - sTurn.startBeforeM) < 1e-6);
+        const mirroredSide = headingDifference(0, mirrored.tangentHeadingDeg);
+        assert.ok(Math.abs(mirroredSide + headingDifference(0, sTurn.tangentHeadingDeg)) < 1e-6);
+    });
+
+    test('DIRECT steers at the waypoint and turns only once it is reached', () => {
+        const {result} = fly(90, TurnMode.DIRECT);
+
+        assert.ok(result.events[0].distanceM <= FC.waypointRadiusM);
+        for (const point of result.samples.filter((sample) => sample.waypointIndex === 1)) {
+            assert.ok(Math.abs(headingDifference(0, point.heading)) < 0.5);
+        }
+    });
+
+    test('corners of 30 degrees or less fly the same track in every mode', () => {
+        const tracks = Object.values(TurnMode).map((turnMode) => fly(20, turnMode).result.samples);
+        for (const track of tracks.slice(1)) {
+            assert.deepEqual(track, tracks[0]);
+        }
+    });
+
+    test('the landing approach turns fly-by whatever the mode', () => {
+        const LAND = {lat: 47.5716018, lon: 9.3338224};
+        const approach = {
+            approachAltCm: 6000, landAltCm: 500,
+            approachDirection: 0, landHeading1: 90, landHeading2: 0, isSeaLevelRef: 0
+        };
+        const built = buildLandingApproach(
+            LAND, approach, {approachLengthCm: 35000, loiterRadiusCm: 7500, homeAltM: 0}
+        );
+        // Inbound from the west onto the turn point, then south onto final: a 90 degree corner.
+        const route = [
+            {...destination(built.points[0], 270, 800), altM: 60, action: MWNP.WPTYPE.WAYPOINT},
+            ...built.points
+        ];
+        const result = simulateGroundTrack(route, {...FC, turnMode: TurnMode.DIRECT});
+
+        const turnPoint = result.events.find((event) => event.waypointIndex === 1);
+        assert.ok(turnPoint.distanceM > RADIUS, `turn point switched ${turnPoint.distanceM.toFixed(1)} m out`);
+    });
+
+    // Where the track is back on the leg line and holding its course, well before the next waypoint.
+    function rejoinPoint(samples, vertex, exit, turnDeg) {
+        return samples.find((point) => point.waypointIndex === 2
+            && distanceBetween(point, vertex) > 50
+            && Math.abs(crossTrackDistance(vertex, exit, point)) < 3
+            && Math.abs(headingDifference(turnDeg, point.heading)) < 1);
+    }
+
+    // The steepest course flown towards the leg line after the track's widest point, relative to the leg.
+    function steepestIntercept(samples, vertex, exit, turnDeg, fromT = 0) {
+        const leg = samples.filter((point) => point.waypointIndex === 2 && point.t >= fromT);
+        const offsets = leg.map((point) => crossTrackDistance(vertex, exit, point));
+        const widest = offsets.reduce(
+            (best, offset, index) => (Math.abs(offset) > Math.abs(offsets[best]) ? index : best), 0
+        );
+        const side = Math.sign(offsets[widest]);
+        return Math.max(...leg.slice(widest).map((point) => -side * headingDifference(turnDeg, point.heading)));
+    }
+
+    function settlesOnLeg(result, vertex, exit, turnDeg) {
+        const back = rejoinPoint(result.samples, vertex, exit, turnDeg);
+        assert.ok(back, 'the track never settled on the leg line');
+        const backM = distanceBetween(back, exit);
+        assert.ok(backM > 500, `back on the line only ${backM.toFixed(0)} m out`);
+        const after = result.samples.filter((point) => point.t >= back.t && distanceBetween(point, exit) > 50);
+        for (const point of after) {
+            assert.ok(Math.abs(crossTrackDistance(vertex, exit, point)) < 3);
+            assert.ok(Math.abs(headingDifference(turnDeg, point.heading)) < 1);
+        }
+        assert.deepEqual(result.warnings, []);
+    }
+
+    const TRACKING = {trackingEnabled: true, trackingMaxAngleDeg: 60};
+
+    test('a fly-over with path tracking flies its S back onto the leg line', () => {
+        const {vertex, exit, result} = fly(90, TurnMode.COORD_FLYOVER, TRACKING);
+        settlesOnLeg(result, vertex, exit, 90);
+    });
+
+    test('the fly-over S intercepts at half the heading error, 20 to 45 degrees, whatever the max angle', () => {
+        // fwArcPlanFlyOverTrackingS: nav_fw_wp_tracking_max_angle plays no part in the S.
+        const steep = fly(90, TurnMode.COORD_FLYOVER, {...TRACKING, trackingMaxAngleDeg: 80});
+        const shallow = fly(90, TurnMode.COORD_FLYOVER, {...TRACKING, trackingMaxAngleDeg: 30});
+        assert.deepEqual(steep.result.samples, shallow.result.samples);
+
+        for (const [turnDeg, expectedDeg] of [[90, 45], [60, 30]]) {
+            const {vertex, exit, result} = fly(turnDeg, TurnMode.COORD_FLYOVER, {...TRACKING, trackingMaxAngleDeg: 80});
+            const steepest = steepestIntercept(result.samples, vertex, exit, turnDeg);
+            assert.ok(Math.abs(steepest - expectedDeg) < 0.5,
+                `${turnDeg} degree corner intercepted at ${steepest.toFixed(1)}, expected ${expectedDeg}`);
+        }
+    });
+
+    test('a fly-over S that does not fit before the next waypoint falls back to the tangent exit', () => {
+        const flyOver = {...FC, turnMode: TurnMode.COORD_FLYOVER};
+        const vertex = destination(HOME, 0, 1000);
+        const short = [HOME, vertex, destination(vertex, 90, 250)];
+        assert.deepEqual(
+            simulateGroundTrack(short, {...flyOver, ...TRACKING}).samples,
+            simulateGroundTrack(short, flyOver).samples
+        );
+        // Where it fits, tracking must make a difference, or the comparison above proves nothing.
+        const long = [HOME, vertex, destination(vertex, 90, 1000)];
+        assert.notDeepEqual(
+            simulateGroundTrack(long, {...flyOver, ...TRACKING}).samples,
+            simulateGroundTrack(long, flyOver).samples
+        );
+    });
+
+    test('a fly-over without path tracking still heads straight for the next waypoint', () => {
+        const plain = fly(90, TurnMode.COORD_FLYOVER).result;
+        const off = fly(90, TurnMode.COORD_FLYOVER, {...TRACKING, trackingEnabled: false}).result;
+        assert.deepEqual(off.samples, plain.samples);
+
+        const {vertex, exit} = corner(90);
+        assert.equal(rejoinPoint(off.samples, vertex, exit, 90), undefined, 'must not converge onto the leg line');
+    });
+
+    test('DIRECT with path tracking converges onto the leg at up to nav_fw_wp_tracking_max_angle', () => {
+        for (const [offsetM, towardDeg] of [[5, 0], [60, 0], [200, -90], [300, 170], [40, -30], [-12, -90]]) {
+            for (const maxAngleDeg of [30, 45, 60, 80]) {
+                const intercept = rejoinIntercept(offsetM, towardDeg, RADIUS, maxAngleDeg);
+                assert.ok(intercept, `no intercept for ${offsetM} m at ${towardDeg} degrees`);
+                assert.ok(intercept.angleDeg <= maxAngleDeg, `${intercept.angleDeg} > ${maxAngleDeg}`);
+            }
+        }
+        // A small offset needs a shallow S, not the full angle.
+        assert.ok(rejoinIntercept(5, 0, RADIUS, 60).angleDeg < 15);
+
+        for (const maxAngleDeg of [30, 60]) {
+            const {vertex, exit, result} = fly(90, TurnMode.DIRECT, {...TRACKING, trackingMaxAngleDeg: maxAngleDeg});
+            settlesOnLeg(result, vertex, exit, 90);
+            const steepest = steepestIntercept(result.samples, vertex, exit, 90);
+            assert.ok(steepest > 20 && steepest <= maxAngleDeg + 0.01,
+                `intercepted at ${steepest.toFixed(1)} degrees with a ${maxAngleDeg} degree limit`);
+        }
+
+        const untracked = fly(90, TurnMode.DIRECT).result;
+        const {vertex, exit} = corner(90);
+        assert.equal(rejoinPoint(untracked.samples, vertex, exit, 90), undefined);
+    });
+
+    test('an uncapped fly-by and a fly-into S ignore path tracking', () => {
+        // With the firmware's 1 m acceptance radius the tolerance band is 2 m, which a rolled-out arc can miss.
+        for (const waypointRadiusM of [FC.waypointRadiusM, 1]) {
+            for (const [turnDeg, turnMode] of [[90, TurnMode.COORD_FLYBY], [60, TurnMode.COORD_FLYBY],
+                [90, TurnMode.COORD_FLYINTO], [135, TurnMode.COORD_FLYINTO]]) {
+                const tracked = fly(turnDeg, turnMode, {...TRACKING, waypointRadiusM}).result;
+                const untracked = fly(turnDeg, turnMode, {waypointRadiusM}).result;
+                assert.deepEqual(tracked.samples, untracked.samples, `${turnMode} ${turnDeg} at ${waypointRadiusM} m`);
+            }
+        }
+    });
+
+    test('after a capped fly-by path tracking converges onto the leg at up to the max angle', () => {
+        for (const maxAngleDeg of [30, 60]) {
+            const tracking = {...TRACKING, trackingMaxAngleDeg: maxAngleDeg};
+            const {vertex, exit, result} = fly(120, TurnMode.COORD_FLYBY, tracking);
+            assert.notDeepEqual(result.samples, fly(120, TurnMode.COORD_FLYBY).result.samples);
+            settlesOnLeg(result, vertex, exit, 120);
+            // Measured from where the capped arc rolled out beside the leg.
+            const steepest = steepestIntercept(result.samples, vertex, exit, 120, rollOut(result.samples, 120).t);
+            assert.ok(steepest > 1 && steepest <= maxAngleDeg + 0.01,
+                `intercepted at ${steepest.toFixed(1)} with a ${maxAngleDeg} limit`);
+        }
+    });
+
+    test('after a reversal path tracking converges onto the leg', () => {
+        const {vertex, exit, result} = fly(180, TurnMode.COORD_FLYBY, TRACKING);
+        settlesOnLeg(result, vertex, exit, 180);
+        const steepest = steepestIntercept(result.samples, vertex, exit, 180, rollOut(result.samples, 180).t);
+        assert.ok(steepest > 1 && steepest <= TRACKING.trackingMaxAngleDeg + 0.01,
+            `intercepted at ${steepest.toFixed(1)}`);
+    });
+
+    test('a fly-over whose S does not fit takes the tangent exit, then converges at up to the max angle', () => {
+        // At 150 degrees the 45 degree S does not fit and no shallower one is tried.
+        for (const maxAngleDeg of [30, 60]) {
+            const tracking = {...TRACKING, trackingMaxAngleDeg: maxAngleDeg};
+            const {vertex, exit, result} = fly(150, TurnMode.COORD_FLYOVER, tracking);
+            settlesOnLeg(result, vertex, exit, 150);
+            const steepest = steepestIntercept(result.samples, vertex, exit, 150);
+            assert.ok(steepest > 1 && steepest <= maxAngleDeg + 0.01,
+                `intercepted at ${steepest.toFixed(1)} with a ${maxAngleDeg} limit`);
+        }
+    });
+
+    // Routes from the review fuzz, flown from a fixed origin.
+    function reviewRoute(legs) {
+        const points = [{lat: 47, lon: 8}];
+        for (const [bearingDeg, lengthM] of legs) points.push(destination(points.at(-1), bearingDeg, lengthM));
+        return points;
+    }
+
+    // The largest heading change flown in one direction without turning back.
+    function longestSweep(samples) {
+        let longest = 0;
+        let sweep = 0;
+        for (let index = 1; index < samples.length; index++) {
+            const change = headingDifference(samples[index - 1].heading, samples[index].heading);
+            if (change === 0) continue;
+            sweep = Math.sign(change) === Math.sign(sweep) || sweep === 0 ? sweep + change : change;
+            longest = Math.max(longest, Math.abs(sweep));
+        }
+        return longest;
+    }
+
+    test('a fly-into S is not staged when it would have to turn the long way round', () => {
+        // The S window opens while the aircraft still turns onto a short leg; staging it then flew a full orbit.
+        const points = reviewRoute([[0, 600], [330, 80], [269, 600]]);
+        const params = {speedMs: 15, bankAngleDeg: 25, waypointRadiusM: 8};
+        const into = simulateGroundTrack(points, {...params, turnMode: TurnMode.COORD_FLYINTO});
+        const direct = simulateGroundTrack(points, {...params, turnMode: TurnMode.DIRECT});
+
+        assert.ok(longestSweep(into.samples) < 180, `swept ${longestSweep(into.samples).toFixed(0)} degrees`);
+        assert.ok(into.summary.totalTimeS < direct.summary.totalTimeS + 5);
+        assert.deepEqual(into.warnings, []);
+    });
+
+    test('DIRECT with path tracking leaves legs too short to rejoin on plain steering', () => {
+        // The review route: a rejoin planned here used to swing the aircraft off onto the old leg's course.
+        const points = reviewRoute([[89.6, 301], [231.8, 229], [271.7, 415]]);
+        const params = {speedMs: 26, bankAngleDeg: 31.5, turnMode: TurnMode.DIRECT};
+        const tracked = simulateGroundTrack(points, {...params, trackingEnabled: true, trackingMaxAngleDeg: 79});
+        const untracked = simulateGroundTrack(points, params);
+
+        assert.deepEqual(tracked.warnings, [], tracked.warnings.map((warning) => warning.text).join(' '));
+        const lastLeg = tracked.samples.filter((point) => point.waypointIndex === 3);
+        const widest = Math.max(
+            ...lastLeg.map((point) => Math.abs(crossTrackDistance(points[2], points[3], point)))
+        );
+        assert.ok(widest < 20, `strayed ${widest.toFixed(1)} m off the last leg`);
+        assert.ok(tracked.summary.totalTimeS < untracked.summary.totalTimeS + 5);
+    });
+
+    test('the rejoin fit check counts the along-track run of its first arc', () => {
+        // After a sharp corner the first arc alone runs about 1.6 R along the leg; ignoring it overshot the waypoint.
+        const points = reviewRoute([[89.6, 301], [231.8, 229], [271.7, 415]]);
+        const tracked = simulateGroundTrack(points, {
+            speedMs: 26, bankAngleDeg: 31.5, turnMode: TurnMode.DIRECT, trackingEnabled: true, trackingMaxAngleDeg: 79
+        });
+        assert.ok(!tracked.events.some((event) => event.type === SimEvent.OVERSHOT), 'a waypoint was overshot');
+
+        const intercept = rejoinIntercept(0, -142, 113, 79);
+        assert.ok(intercept && intercept.alongM > 113 * 1.5, `along ${intercept?.alongM?.toFixed(0)} m`);
+    });
+
+    test('a fly-into waypoint the S cannot reach is not reported as reached', () => {
+        // The leg is shorter than the S needs, so no S is staged and the corner is flown like any other.
+        const points = reviewRoute([[0, 600], [90, 150], [210, 600]]);
+        const result = simulateGroundTrack(points, {speedMs: 25, bankAngleDeg: 30, turnMode: TurnMode.COORD_FLYINTO});
+        const second = result.events.find((event) => event.waypointIndex === 2);
+
+        const missed = result.warnings.some(
+            (warning) => warning.code === 'waypoint-missed' && warning.waypointIndex === 2
+        );
+        assert.ok(second.distanceM <= 8 + 5 || missed,
+            `reached at ${second.distanceM.toFixed(0)} m without a warning`);
+        // No orbit back onto the waypoint either: about as quick as DIRECT, which just misses it.
+        const direct = simulateGroundTrack(points, {speedMs: 25, bankAngleDeg: 30, turnMode: TurnMode.DIRECT});
+        assert.ok(result.summary.totalTimeS < direct.summary.totalTimeS + 10);
+    });
+
+    test('a turn planned for the old leg does not carry over into the new one', () => {
+        // A capped fly-by arc still turning towards leg 2 when its short leg is passed must give way to leg 3.
+        const points = reviewRoute([[115, 322], [354, 64], [222, 511]]);
+        const params = {speedMs: 26, bankAngleDeg: 26, waypointRadiusM: 3};
+        const flyBy = simulateGroundTrack(points, {...params, turnMode: TurnMode.COORD_FLYBY});
+        const direct = simulateGroundTrack(points, {...params, turnMode: TurnMode.DIRECT});
+        // Finishing the stale arc swung the aircraft round the wrong way for most of a circle.
+        assert.ok(longestSweep(flyBy.samples) < 180, `swept ${longestSweep(flyBy.samples).toFixed(0)} degrees`);
+        assert.ok(flyBy.summary.totalTimeS < direct.summary.totalTimeS,
+            `fly-by took ${flyBy.summary.totalTimeS.toFixed(1)} s, DIRECT ${direct.summary.totalTimeS.toFixed(1)} s`);
+    });
+
+    test('a fly-into S is only staged from on the inbound leg line', () => {
+        // Started beside the line, the S passes the waypoint just as far beside it.
+        const points = reviewRoute([[241, 142], [158, 777], [98, 216]]);
+        const result = simulateGroundTrack(points, {
+            speedMs: 30, bankAngleDeg: 42, waypointRadiusM: 1, turnMode: TurnMode.COORD_FLYINTO
+        });
+        assert.deepEqual(result.warnings, []);
+    });
+
+    test('a fly-into S never reports its waypoint reached from far away', () => {
+        // Crossing the square line mid-S is part of the S; only passing the waypoint itself counts.
+        const points = reviewRoute([[12, 222], [44, 592], [138, 271], [267, 580]]);
+        const result = simulateGroundTrack(points, {
+            speedMs: 26, bankAngleDeg: 38, waypointRadiusM: 15, turnMode: TurnMode.COORD_FLYINTO
+        });
+        for (const event of result.events.filter((item) => item.type === SimEvent.REACHED)) {
+            assert.ok(event.distanceM <= 15 + 5,
+                `waypoint ${event.waypointIndex} reached ${event.distanceM.toFixed(0)} m off`);
+        }
+    });
+
+    test('a finished fly-into S hands its waypoint over at the pickup', () => {
+        // The S ends a few metres off a 1 m acceptance circle; steering on from there used to miss it.
+        const points = reviewRoute([[247, 728], [292, 525], [37, 264]]);
+        const result = simulateGroundTrack(points, {
+            speedMs: 26, bankAngleDeg: 33, waypointRadiusM: 1, turnMode: TurnMode.COORD_FLYINTO
+        });
+        assert.deepEqual(result.warnings, []);
+        const second = result.events.find((event) => event.waypointIndex === 2);
+        assert.equal(second.type, SimEvent.REACHED);
+        assert.ok(second.distanceM <= 1 + 5);
+    });
+
+    test('on the landing approach a point is given up at 100 degrees, not at its square line', () => {
+        // The square-line test only runs in WP mode; the approach keeps the older bearing test.
+        const corner = destination(HOME, 0, 1000);
+        const exit = destination(corner, 170, 40);
+        const points = [HOME, {...corner, isApproach: true}, {...exit, isApproach: true}];
+        const result = simulateGroundTrack(points, FC);
+
+        const overshot = result.events.find((event) => event.type === SimEvent.OVERSHOT);
+        assert.ok(overshot, 'expected the approach point to be given up');
+        const atEvent = result.samples.find((point) => point.t >= overshot.t);
+        const offLeg = Math.abs(headingDifference(bearingBetween(corner, exit), bearingBetween(atEvent, exit)));
+        assert.ok(offLeg > 99 && offLeg < 115, `gave up at ${offLeg.toFixed(1)} degrees off the leg`);
+    });
+
+    test('a fly-into S is not staged while the aircraft is still well off the inbound course', () => {
+        // After a shallow corner the aircraft is on the line but 20-30 degrees off it; the S would miss the waypoint.
+        const points = reviewRoute([[113.8, 87], [217.2, 737], [213.2, 431], [138.1, 637], [120.1, 114]]);
+        const result = simulateGroundTrack(points, {
+            speedMs: 24.66, bankAngleDeg: 20.06, turnMode: TurnMode.COORD_FLYINTO, trackingEnabled: true
+        });
+        assert.deepEqual(result.warnings, [], result.warnings.map((warning) => warning.text).join(' '));
+    });
+
+    test('a fly-into S is sized at the radius it is flown at, beyond the 300 m planning clamp', () => {
+        const vertex = destination(HOME, 0, 2000);
+        const points = [HOME, vertex, destination(vertex, 90, 2000)];
+        const params = {speedMs: 30, bankAngleDeg: 15, turnMode: TurnMode.COORD_FLYINTO};
+        assert.ok(turnRadius(params.speedMs, params.bankAngleDeg) > 300);
+
+        const result = simulateGroundTrack(points, params);
+        assert.deepEqual(result.warnings, []);
+        // The module's default acceptance radius is 8 m.
+        assert.ok(result.events[0].distanceM <= 8 + 5, `passed ${result.events[0].distanceM.toFixed(0)} m off`);
     });
 });

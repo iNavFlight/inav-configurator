@@ -6,7 +6,8 @@
  * This is deliberately NOT a flight dynamics simulation: no aerodynamics, no PID
  * loops, no inertia. It models the one thing a straight line between waypoints
  * cannot show — that the aircraft steers towards its target at a limited turn
- * rate, so it rounds every corner and overshoots the ones it cannot make.
+ * rate, so it rounds every corner and overshoots the ones it cannot make. Where
+ * nav_fw_wp_turn_mode plans a corner, the planned arcs are approximated too.
  *
  * The standing assumption is perfect path following: bank goes straight to
  * whatever the commanded radius needs and is capped at nav_fw_bank_angle. In the
@@ -163,40 +164,21 @@ export function destination(from, bearingDeg, distanceM) {
     return {lat: toDegrees(latNew), lon: toDegrees(lonNew)};
 }
 
-/*
- * Radius of a level coordinated turn: r = v^2 / (g * tan(bank)).
- *
- * INAV also holds nav_fw_loiter_radius. Either one can be the wider of the two
- * depending on the setup, and the wider one is what the aircraft actually
- * flies; see effectiveTurnRadius().
- */
+// Radius of a level coordinated turn: r = v^2 / (g * tan(bank)).
 export function turnRadius(speedMs, bankAngleDeg) {
     if (!isPositive(speedMs) || !isPositive(bankAngleDeg) || bankAngleDeg >= 90) return Infinity;
     return (speedMs * speedMs) / (GRAVITY_MSS * Math.tan(toRadians(bankAngleDeg)));
 }
 
-export const TurnSmoothing = Object.freeze({
-    OFF: 'off',
-    ON: 'on',
-    CUT: 'cut'
+export const TurnMode = Object.freeze({
+    DIRECT: 'DIRECT',
+    COORD_FLYBY: 'COORD_FLYBY',
+    COORD_FLYOVER: 'COORD_FLYOVER',
+    COORD_FLYINTO: 'COORD_FLYINTO'
 });
 
-/*
- * The radius flown through a corner: always the bank-limited one.
- *
- * With nav_fw_wp_turn_smoothing OFF — the firmware default — that is exactly
- * right: the smoothing block never runs (navigation.c only computes the turn
- * angle when the setting is not OFF) and nav_fw_loiter_radius plays no part.
- *
- * With ON or ON-CUT the firmware ANTICIPATES the corner — it starts the turn
- * roughly a loiter radius before the waypoint and curves through or inside it
- * (navigation_fixedwing.c:341-375). Simply widening the radius here would do the
- * opposite: turn late and swing wide, putting the track further outside the
- * corner than the aircraft ever goes. Modelling anticipation properly is a piece
- * of work in its own right, so until then the bank-limited turn stands for every
- * mode and the difference is stated in the UI rather than drawn wrongly.
- */
-export function commandedTurnRadius(speedMs, bankAngleDeg, loiterRadiusM, smoothing = TurnSmoothing.OFF) {
+// Every turn mode flies the bank-limited radius; nav_fw_wp_turn_mode only moves where turns start and end.
+export function commandedTurnRadius(speedMs, bankAngleDeg) {
     return turnRadius(speedMs, bankAngleDeg);
 }
 
@@ -218,6 +200,102 @@ export function bankForTurnRate(rateDegPerSecond, speedMs) {
     return toDegrees(Math.atan2(toRadians(rateDegPerSecond) * speedMs, GRAVITY_MSS));
 }
 
+// Planning limits of the firmware's turn predictor (NAV_FW_TURN_* / NAV_FW_ARC_* in navigation_fixedwing.c).
+const TURN_RADIUS_MIN_M = 10;
+const TURN_RADIUS_MAX_M = 300;
+const TURN_LEAD_TAN_MAX = 3.7;
+const ARC_MIN_TURN_DEG = 30;
+const FLYBY_MAX_TURN_DEG = 160;
+// Sharper than this, the new leg is captured without an inscribed arc (NAV_FW_ARC_SHARP_TURN_CD).
+const ARC_SHARP_TURN_DEG = 150;
+// Fly-over S intercept: half the heading error to the new leg, bounded (fwArcPlanFlyOverTrackingS).
+const FLYOVER_S_ERROR_FRACTION = 0.5;
+const FLYOVER_S_MIN_DEG = 20;
+const FLYOVER_S_MAX_DEG = 45;
+// One second of flight stands in for the firmware's roll-in ramp, which it sizes from roll rate and control settings.
+const TRANSITION_LEAD_S = 1.0;
+// The fly-into S keeps two roll-in leads of straight between its arcs, like the firmware's Ls.
+const FLYINTO_GAP_LEADS = 2;
+// An S started this far beside its inbound line passes the waypoint that far off, which still counts as through it.
+const FLYINTO_LINE_TOLERANCE_M = 5;
+// An S started this far off the inbound course swings past the waypoint instead of through it.
+const FLYINTO_HEADING_TOLERANCE_DEG = 10;
+// A planned arc this close to its exit heading is done; steering takes the last fraction of a degree.
+const ARC_ALIGNED_DEG = 0.5;
+// A turn running at a switch carries on only if it already rolls out on the new leg (fwArcRetargetOnLegChange).
+const RETARGET_TOLERANCE_DEG = 5;
+// Rejoin intercepts: at least a degree, and short of square to the leg, where the along-track run diverges.
+const INTERCEPT_ANGLE_MIN_DEG = 1;
+const INTERCEPT_ANGLE_MAX_DEG = 89;
+// The narrowest band counted as on the leg line; the firmware's own tracking deadband is not modelled.
+const TRACKING_BAND_MIN_M = 2;
+
+// The radius the firmware plans corners with: the bank-limited one, clamped to 10..300 m.
+export function planningTurnRadius(speedMs, bankAngleDeg) {
+    return clamp(turnRadius(speedMs, bankAngleDeg), TURN_RADIUS_MIN_M, TURN_RADIUS_MAX_M);
+}
+
+// The radius planned arcs are flown at: the planning radius, but never tighter than the bank allows.
+export function arcTurnRadius(speedMs, bankAngleDeg) {
+    return Math.max(planningTurnRadius(speedMs, bankAngleDeg), turnRadius(speedMs, bankAngleDeg));
+}
+
+// Fly-by turn start: roll-in lead + R * tan(turn / 2), capped at nav_fw_wp_turn_max_lead_time of flight.
+export function flyByLeadDistance(radiusM, turnAngleDeg, speedMs, maxLeadTimeMs) {
+    const tangentM = radiusM * Math.min(Math.tan(toRadians(Math.abs(turnAngleDeg)) / 2), TURN_LEAD_TAN_MAX);
+    const wantedM = speedMs * TRANSITION_LEAD_S + tangentM;
+    const capM = isPositive(maxLeadTimeMs) ? speedMs * maxLeadTimeMs / 1000 : Infinity;
+    return {distanceM: Math.min(wantedM, capM), capped: wantedM > capM};
+}
+
+// Internal-tangent S ahead of a fly-into waypoint (fwArcPlanFlyInto), in a north/east frame centred on it.
+export function flyIntoSTurn(radiusM, inboundDeg, outboundDeg, gapM) {
+    const dir = Math.sign(headingDifference(inboundDeg, outboundDeg)) || 1;
+    const unit = (bearingDeg) => [Math.cos(toRadians(bearingDeg)), Math.sin(toRadians(bearingDeg))];
+    const u = unit(inboundDeg);
+    const o2 = unit(outboundDeg + dir * 90).map((c) => c * radiusM);
+    const a = unit(inboundDeg - dir * 90).map((c) => c * radiusM);
+    const w = [o2[0] - a[0], o2[1] - a[1]];
+    const wu = w[0] * u[0] + w[1] * u[1];
+    const disc = wu * wu - (w[0] * w[0] + w[1] * w[1]) + 4 * radiusM * radiusM + gapM * gapM;
+    if (!(disc > 0)) return null;
+
+    const s = wu - Math.sqrt(disc);
+    if (!(s < 0)) return null;
+
+    const o1 = [a[0] + s * u[0], a[1] + s * u[1]];
+    const centreDistanceM = Math.hypot(o2[0] - o1[0], o2[1] - o1[1]);
+    const centreLineDeg = toDegrees(Math.atan2(o2[1] - o1[1], o2[0] - o1[0]));
+    const tangentAngleDeg = toDegrees(Math.asin(Math.min(1, 2 * radiusM / centreDistanceM)));
+
+    return {
+        turnDirection: dir,
+        startBeforeM: -s,
+        tangentHeadingDeg: normalizeHeading(centreLineDeg - dir * tangentAngleDeg),
+        tangentLengthM: Math.sqrt(Math.max(0, centreDistanceM ** 2 - 4 * radiusM * radiusM))
+    };
+}
+
+// Steepest intercept in [min, max] whose two arcs fit beside the leg line; headings relative to the leg, + towards it.
+export function rejoinIntercept(offsetM, towardDeg, radiusM, maxAngleDeg, minAngleDeg = INTERCEPT_ANGLE_MIN_DEG) {
+    for (let angleDeg = maxAngleDeg; angleDeg >= minAngleDeg; angleDeg--) {
+        // The first arc turns the short way round to the intercept heading.
+        const fromDeg = angleDeg - towardDeg > 180 ? towardDeg + 360 : towardDeg;
+        const sense = Math.sign(angleDeg - fromDeg);
+        const [from, to] = [toRadians(fromDeg), toRadians(angleDeg)];
+        // Arc a -> b: sign(b - a) * R * (cos a - cos b) towards the line, sign(b - a) * R * (sin b - sin a) along it.
+        const firstArcM = sense * radiusM * (Math.cos(from) - Math.cos(to));
+        const rollOutM = radiusM * (1 - Math.cos(to));
+        const straightM = offsetM - firstArcM - rollOutM;
+        if (straightM >= 0) {
+            const firstAlongM = sense * radiusM * (Math.sin(to) - Math.sin(from));
+            const alongM = firstAlongM + straightM / Math.tan(to) + radiusM * Math.sin(to);
+            return {angleDeg, sense, rollOutM, alongM};
+        }
+    }
+    return null;
+}
+
 export const ApproachDirectionLeft = 0;
 
 /*
@@ -229,7 +307,11 @@ export const FirmwareDefaults = Object.freeze({
     approachLengthCm: 35000,
     loiterRadiusCm: 7500,
     bankAngleDeg: 35,
-    waypointRadiusCm: 100
+    waypointRadiusCm: 100,
+    turnMode: TurnMode.COORD_FLYBY,
+    turnMaxLeadTimeMs: 6000,
+    trackingEnabled: false,
+    trackingMaxAngleDeg: 60
 });
 
 export const LandingApproachProblem = Object.freeze({
@@ -475,16 +557,18 @@ const DEFAULT_PARAMS = {
     // number, so it is the most sensitive input in the whole model.
     speedMs: 15,
     bankAngleDeg: 35,
-    loiterRadiusM: 0,
-    turnSmoothing: TurnSmoothing.OFF,
+    turnMode: FirmwareDefaults.turnMode,
+    turnMaxLeadTimeMs: FirmwareDefaults.turnMaxLeadTimeMs,
+    trackingEnabled: FirmwareDefaults.trackingEnabled,
+    trackingMaxAngleDeg: FirmwareDefaults.trackingMaxAngleDeg,
     waypointRadiusM: 8,
     timeStepS: 0.1,
     maxDurationS: 3600
 };
 
-// A waypoint counts as passed once the bearing to it has swung this far away
-// from the leg's own bearing (navigation.c:3062-3064).
-const PASS_ANGLE_DEG = 100;
+// Passed once across the waypoint's square line (isWaypointReached, WP mode); the approach keeps the 100 degree test.
+const PASS_ANGLE_DEG = 90;
+const APPROACH_PASS_ANGLE_DEG = 100;
 
 // Below this bank the aircraft is holding a course, not turning.
 const TURN_BANK_THRESHOLD_DEG = 5;
@@ -513,27 +597,25 @@ export function altitudeAlongLeg(startAltM, targetAltM, initialDistanceM, remain
  * Fly a list of {lat, lon} points and return the ground track.
  *
  * The guidance rule is the one INAV uses in its simplest form: steer towards the
- * active waypoint, limited by the turn rate.
+ * active waypoint, limited by the turn rate. Around a corner the turn mode may
+ * replace it for a while with a planned turn: straight stretches and arcs at the
+ * turn radius, after which the aircraft steers for its waypoint again.
  *
- * A waypoint is done once the aircraft is inside the acceptance radius, or once
- * the bearing to it has swung more than 100 degrees away from the LEG's bearing —
- * the line from the previous waypoint to this one, fixed when the waypoint became
- * active (navigation.c:4224-4229, 3062-3064). Measuring that angle from the
- * aircraft's own position instead would move every switch point after the first
- * corner, which is exactly where anyone looks.
+ * A waypoint is done once the aircraft is inside the acceptance radius, once a
+ * fly-by turn starts, or once it has crossed the line through the waypoint square
+ * to the LEG — the line from the previous waypoint to this one, fixed when the
+ * waypoint became active (navigation.c:4224-4229, isWaypointReached). Measuring
+ * from the aircraft's own position instead would move every switch point after the
+ * first corner, which is exactly where anyone looks.
  */
 export function simulateGroundTrack(points, params = {}) {
     const config = {...DEFAULT_PARAMS, ...params};
     const {speedMs, waypointRadiusM, timeStepS, maxDurationS} = config;
 
-    // The reduced 60 degree limit only applies while the firmware is actually in a
-    // smoothing turn, which this model never enters, so the plain limit stands.
-    const passAngleDeg = PASS_ANGLE_DEG;
-    const radiusM = commandedTurnRadius(
-        speedMs, config.bankAngleDeg, config.loiterRadiusM, config.turnSmoothing
-    );
+    const radiusM = commandedTurnRadius(speedMs, config.bankAngleDeg);
     const turnRate = turnRateDegPerSecond(speedMs, radiusM);
     const stepM = speedMs * timeStepS;
+    const plan = turnPlanState(config, radiusM);
 
     const samples = [];
     const events = [];
@@ -573,10 +655,19 @@ export function simulateGroundTrack(points, params = {}) {
         const bearingToTarget = bearingBetween(position, target);
         const offCourse = headingDifference(heading, bearingToTarget);
         const relativeBearing = headingDifference(legBearing, bearingToTarget);
+        const leg = {
+            targetIndex, target, next: points[targetIndex + 1], legFrom: points[targetIndex - 1],
+            legBearing, position, heading, distanceM, bearingToTarget
+        };
 
         const done = waypointOutcome({
-            distanceM, relativeBearing, legTravelledM, waypointRadiusM, passAngleDeg, legBudgetM
-        });
+            distanceM, relativeBearing, legTravelledM, waypointRadiusM, legBudgetM,
+            passAngleDeg: target.isApproach ? APPROACH_PASS_ANGLE_DEG : PASS_ANGLE_DEG,
+            // Right after a fly-into S the pickup tolerance applies, whichever test fires first.
+            passToleranceM: plan.pickupIndex === targetIndex ? FLYINTO_LINE_TOLERANCE_M : stepM,
+            // A fly-into S crosses its own waypoint's square line by design; its pickup decides instead.
+            flyingInto: plan.maneuver?.pickupIndex === targetIndex
+        }) ?? anticipate(plan, leg);
 
         if (done) {
             events.push({t: elapsedS, type: done, waypointIndex: targetIndex, distanceM});
@@ -590,11 +681,21 @@ export function simulateGroundTrack(points, params = {}) {
                 legTravelledM = 0;
                 legInitialDistanceM = distanceBetween(position, points[targetIndex]);
                 legStartAltM = altitudeM;
+                plan.maneuver = maneuverForNewLeg(plan, {
+                    target: points[targetIndex],
+                    legFrom: points[targetIndex - 1],
+                    legBearing,
+                    position,
+                    heading,
+                    bearingToTarget: bearingBetween(position, points[targetIndex])
+                });
             }
+            plan.cappedCorner = false;
             continue;
         }
 
-        const turnThisStep = clamp(offCourse, -turnRate * timeStepS, turnRate * timeStepS);
+        const planned = plannedStep(plan, leg);
+        const turnThisStep = planned ?? clamp(offCourse, -turnRate * timeStepS, turnRate * timeStepS);
         heading = normalizeHeading(heading + turnThisStep);
         position = destination(position, heading, stepM);
 
@@ -624,7 +725,7 @@ export function simulateGroundTrack(points, params = {}) {
             break;
         }
 
-        const turning = Math.abs(bank) >= TURN_BANK_THRESHOLD_DEG;
+        const turning = Math.abs(bank) >= TURN_BANK_THRESHOLD_DEG || Boolean(planned);
         samples.push(sample(
             elapsedS,
             position,
@@ -673,12 +774,266 @@ function reachedGlideAltitude(target, altitudeM) {
     return Number.isFinite(target.stopAtAltM) && altitudeM <= target.stopAtAltM;
 }
 
-// Whether the active waypoint is done with, and why.
-function waypointOutcome({distanceM, relativeBearing, legTravelledM, waypointRadiusM, passAngleDeg, legBudgetM}) {
+// Whether the active waypoint is done with, and why; a pass just outside the radius is a reach the step skipped.
+function waypointOutcome({
+    distanceM, relativeBearing, legTravelledM, waypointRadiusM, passAngleDeg, legBudgetM, passToleranceM, flyingInto
+}) {
     if (distanceM <= waypointRadiusM) return SimEvent.REACHED;
-    if (Math.abs(relativeBearing) > passAngleDeg) return SimEvent.OVERSHOT;
+    if (!flyingInto && Math.abs(relativeBearing) > passAngleDeg) {
+        return distanceM <= waypointRadiusM + passToleranceM ? SimEvent.REACHED : SimEvent.OVERSHOT;
+    }
     if (legTravelledM > legBudgetM) return SimEvent.ABANDONED;
     return null;
+}
+
+// Planned-turn state carried through the run; turn is null when the aircraft cannot turn at all.
+function turnPlanState(config, radiusM) {
+    return {
+        turn: turnPlanning(config, radiusM),
+        turnMode: config.turnMode,
+        waypointRadiusM: config.waypointRadiusM,
+        maneuver: null,
+        // The waypoint a turn was last planned ahead of, a fly-into waiting for its pickup, and a capped fly-by.
+        anticipatedIndex: -1,
+        pickupIndex: -1,
+        cappedCorner: false
+    };
+}
+
+function turnPlanning(config, radiusM) {
+    if (!Number.isFinite(radiusM) || !isPositive(config.speedMs)) return null;
+
+    const arcRadiusM = arcTurnRadius(config.speedMs, config.bankAngleDeg);
+    return {
+        planRadiusM: planningTurnRadius(config.speedMs, config.bankAngleDeg),
+        arcRadiusM,
+        arcStepDeg: turnRateDegPerSecond(config.speedMs, arcRadiusM) * config.timeStepS,
+        leadM: config.speedMs * TRANSITION_LEAD_S,
+        stepM: config.speedMs * config.timeStepS,
+        speedMs: config.speedMs,
+        maxLeadTimeMs: config.turnMaxLeadTimeMs,
+        tracking: Boolean(config.trackingEnabled),
+        trackingMaxAngleDeg: clamp(Number(config.trackingMaxAngleDeg) || 0, 0, INTERCEPT_ANGLE_MAX_DEG),
+        trackingBandM: Math.max(config.waypointRadiusM, TRACKING_BAND_MIN_M),
+        flyIntoBandM: config.waypointRadiusM + FLYINTO_LINE_TOLERANCE_M
+    };
+}
+
+// The landing approach always flies fly-by turns (fwEffectiveTurnMode in navigation_fixedwing.c).
+function effectiveTurnMode(target, turnMode) {
+    return target?.isApproach ? TurnMode.COORD_FLYBY : turnMode;
+}
+
+// A finished fly-into S hands the waypoint over at its pickup; otherwise the turn mode may anticipate the corner.
+function anticipate(plan, leg) {
+    if (plan.pickupIndex === leg.targetIndex) {
+        plan.pickupIndex = -1;
+        const throughM = plan.waypointRadiusM + FLYINTO_LINE_TOLERANCE_M;
+        return leg.distanceM <= throughM ? SimEvent.REACHED : SimEvent.OVERSHOT;
+    }
+    if (!plan.turn || plan.maneuver || plan.anticipatedIndex === leg.targetIndex) return null;
+
+    const anticipation = anticipateWaypoint({...leg, turnMode: plan.turnMode, turn: plan.turn});
+    if (!anticipation) return null;
+
+    plan.anticipatedIndex = leg.targetIndex;
+    plan.maneuver = startManeuver(anticipation.phases);
+    if (plan.maneuver && anticipation.flyInto) plan.maneuver.pickupIndex = leg.targetIndex;
+    plan.cappedCorner = Boolean(anticipation.capped);
+    return anticipation.reached ? SimEvent.REACHED : null;
+}
+
+// Before the waypoint a fly-by declares it reached at the turn start and a fly-into stages its S; both need a next leg.
+function anticipateWaypoint(leg) {
+    const {turnMode, target, next, legBearing, distanceM, turn} = leg;
+    if (!next || !(distanceBetween(target, next) > 0)) return null;
+
+    const outboundDeg = bearingBetween(target, next);
+    const turnAngleDeg = Math.abs(headingDifference(legBearing, outboundDeg));
+    const mode = effectiveTurnMode(target, turnMode);
+    if (turnAngleDeg <= ARC_MIN_TURN_DEG) return null;
+    if (mode === TurnMode.COORD_FLYINTO) return flyIntoAnticipation(leg, outboundDeg);
+    if (mode !== TurnMode.COORD_FLYBY || turnAngleDeg >= FLYBY_MAX_TURN_DEG) return null;
+
+    const lead = flyByLeadDistance(turn.planRadiusM, turnAngleDeg, turn.speedMs, turn.maxLeadTimeMs);
+    return distanceM < lead.distanceM ? {reached: true, capped: lead.capped, phases: []} : null;
+}
+
+// The S only works from on the inbound line, before its start point and turning the short way; otherwise none is flown.
+function flyIntoAnticipation({legFrom, legBearing, position, heading, distanceM, turn}, outboundDeg) {
+    const sTurn = flyIntoSTurn(turn.arcRadiusM, legBearing, outboundDeg, FLYINTO_GAP_LEADS * turn.leadM);
+    if (!sTurn || distanceM < sTurn.startBeforeM || distanceM >= sTurn.startBeforeM + turn.leadM) return null;
+    if (!legFrom || Math.abs(crossTrackM(legFrom, legBearing, position)) > turn.flyIntoBandM) return null;
+    if (Math.abs(headingDifference(legBearing, heading)) > FLYINTO_HEADING_TOLERANCE_DEG) return null;
+    if (normalizeHeading(-sTurn.turnDirection * (sTurn.tangentHeadingDeg - heading)) > 180) return null;
+
+    return {
+        reached: false,
+        flyInto: true,
+        phases: [
+            {turnDirection: 0, straightDistanceM: distanceM - sTurn.startBeforeM},
+            {turnDirection: -sTurn.turnDirection, exitHeadingDeg: sTurn.tangentHeadingDeg},
+            {turnDirection: 0, straightDistanceM: sTurn.tangentLengthM},
+            {turnDirection: sTurn.turnDirection, exitHeadingDeg: outboundDeg}
+        ]
+    };
+}
+
+// A turn still running at a switch belongs to the old leg unless it already rolls out on the new one.
+function maneuverForNewLeg(plan, leg) {
+    const running = plan.maneuver;
+    const exitDeg = running?.phases.at(-1)?.exitHeadingDeg;
+    if (Number.isFinite(exitDeg) && Math.abs(headingDifference(exitDeg, leg.legBearing)) <= RETARGET_TOLERANCE_DEG) {
+        return running;
+    }
+    if (!plan.turn) return null;
+    return turnOntoLeg({...leg, turnMode: plan.turnMode, capped: plan.cappedCorner, turn: plan.turn});
+}
+
+// After a switch, a course more than 30 degrees off is flown as an arc first (fwArcPlanNewLeg, navigation_fixedwing.c).
+function turnOntoLeg(leg) {
+    const {turnMode, target, legBearing, heading, bearingToTarget, capped, turn} = leg;
+    const mode = effectiveTurnMode(target, turnMode);
+    // With path tracking DIRECT converges onto the leg line instead of steering at the waypoint.
+    if (mode === TurnMode.DIRECT) {
+        return turn.tracking ? planRejoin(leg, {maxAngleDeg: turn.trackingMaxAngleDeg}) : null;
+    }
+
+    const overfly = mode === TurnMode.COORD_FLYOVER;
+    const errorDeg = headingDifference(heading, overfly ? bearingToTarget : legBearing);
+    if (Math.abs(errorDeg) <= ARC_MIN_TURN_DEG) return null;
+
+    const rollIn = {turnDirection: 0, straightDistanceM: turn.leadM};
+    if (overfly && turn.tracking) {
+        const halfErrorDeg = FLYOVER_S_ERROR_FRACTION * Math.abs(headingDifference(heading, legBearing));
+        const interceptDeg = clamp(halfErrorDeg, FLYOVER_S_MIN_DEG, FLYOVER_S_MAX_DEG);
+        return {...startManeuver([rollIn]), overflyS: {interceptDeg, turnDirection: Math.sign(errorDeg)}};
+    }
+    // A null exit heading means: until the nose points at the active waypoint.
+    const arc = {turnDirection: Math.sign(errorDeg), exitHeadingDeg: overfly ? null : legBearing};
+    // A capped or capture turn rolls out beside the leg, and path tracking takes over from there.
+    const fallback = !overfly && (capped || Math.abs(errorDeg) > ARC_SHARP_TURN_DEG);
+    return {...startManeuver([rollIn, arc]), rejoinAfter: fallback && turn.tracking};
+}
+
+function startManeuver(phases) {
+    return phases.length ? {phases: phases.map((phase) => ({...phase})), index: 0} : null;
+}
+
+// Signed distance beside the leg line through legFrom, positive to the right of its bearing.
+function crossTrackM(legFrom, legBearingDeg, point) {
+    return distanceBetween(legFrom, point) * Math.sin(toRadians(bearingBetween(legFrom, point) - legBearingDeg));
+}
+
+// Heading change from the planned turn, or null to steer at the waypoint; a finished turn hands on to its follow-up.
+function plannedStep(plan, leg) {
+    const running = plan.maneuver;
+    if (!running) return null;
+
+    let step = maneuverStep(running, leg, plan.turn);
+    if (step === null) {
+        if (running.pickupIndex === leg.targetIndex) plan.pickupIndex = leg.targetIndex;
+        plan.maneuver = followUpManeuver(running, {...leg, turn: plan.turn});
+        step = plan.maneuver ? maneuverStep(plan.maneuver, leg, plan.turn) : null;
+    }
+    if (step === null) plan.maneuver = null;
+    return step;
+}
+
+// What follows a finished turn with path tracking on: the fly-over S, or the rejoin after a fallback turn.
+function followUpManeuver(finished, leg) {
+    if (finished.overflyS) return overflyExit(finished.overflyS, leg);
+    if (finished.rejoinAfter) return planRejoin(leg, {maxAngleDeg: leg.turn.trackingMaxAngleDeg});
+    return null;
+}
+
+// After the fly-over roll-in: the tracking S back onto the leg, or the tangent exit when it does not fit.
+function overflyExit(overflyS, leg) {
+    // Exactly the planned intercept, and rolled out more than 2R before the next waypoint, as in the firmware.
+    const sTurn = planRejoin(leg, {
+        maxAngleDeg: overflyS.interceptDeg,
+        minAngleDeg: overflyS.interceptDeg,
+        marginM: 2 * leg.turn.arcRadiusM
+    });
+    const tangentExit = {turnDirection: overflyS.turnDirection, exitHeadingDeg: null};
+    return sTurn ?? {...startManeuver([tangentExit]), rejoinAfter: true};
+}
+
+// Arc onto an intercept course, straight until one roll-out short of the leg line, arc onto the leg.
+function planRejoin({position, heading, legFrom, target, legBearing, turn}, {maxAngleDeg, minAngleDeg, marginM = 0}) {
+    if (!legFrom) return null;
+
+    const offsetM = crossTrackM(legFrom, legBearing, position);
+    const driftDeg = headingDifference(legBearing, heading);
+    const onLine = !(Math.abs(offsetM) > turn.trackingBandM);
+    if (onLine && Math.abs(driftDeg) <= ARC_MIN_TURN_DEG) return null;
+
+    // On the line but heading off it, the aircraft is about to be on the side it drifts to.
+    const side = onLine ? Math.sign(driftDeg) : Math.sign(offsetM);
+    const intercept = rejoinIntercept(side * offsetM, -side * driftDeg, turn.arcRadiusM, maxAngleDeg, minAngleDeg);
+    if (!intercept) return null;
+
+    const toTargetDeg = bearingBetween(position, target) - legBearing;
+    const aheadM = distanceBetween(position, target) * Math.cos(toRadians(toTargetDeg));
+    if (aheadM < intercept.alongM + marginM) return null;
+
+    const phases = [
+        {turnDirection: 0, untilOnLeg: true, legFrom, legBearingDeg: legBearing, side, rollOutM: intercept.rollOutM},
+        {turnDirection: side, exitHeadingDeg: legBearing}
+    ];
+    if (intercept.sense !== 0) {
+        phases.unshift({
+            turnDirection: -side * intercept.sense,
+            exitHeadingDeg: normalizeHeading(legBearing - side * intercept.angleDeg)
+        });
+    }
+    return startManeuver(phases);
+}
+
+// Heading change for one step of a planned turn, or null once it is flown.
+function maneuverStep(maneuver, {heading, bearingToTarget, position}, turn) {
+    while (maneuver.index < maneuver.phases.length) {
+        const phase = maneuver.phases[maneuver.index];
+        const step = phase.turnDirection === 0
+            ? straightStep(phase, turn.stepM, position)
+            : arcStep(phase, heading, bearingToTarget, turn.arcStepDeg);
+        if (step !== null) return step;
+        maneuver.index += 1;
+    }
+    return null;
+}
+
+function straightStep(phase, stepM, position) {
+    if (phase.untilOnLeg) {
+        // Stop one roll-out short of the line, so the closing arc ends on it.
+        const remainingM = phase.side * crossTrackM(phase.legFrom, phase.legBearingDeg, position);
+        return remainingM > phase.rollOutM ? 0 : null;
+    }
+    phase.remainingM ??= phase.straightDistanceM;
+    if (!(phase.remainingM >= stepM / 2)) return null;
+    phase.remainingM -= stepM;
+    return 0;
+}
+
+function arcStep(phase, heading, bearingToTarget, maxTurnDeg) {
+    let remainingDeg;
+    if (phase.exitHeadingDeg === null) {
+        // Once it points at the waypoint the arc is done; the small corrections after that are steering.
+        remainingDeg = phase.turnDirection * headingDifference(heading, bearingToTarget);
+        if (remainingDeg <= ARC_ALIGNED_DEG) return null;
+    } else {
+        // Fixed on entry, in the arc's own direction, so a turn past 180 degrees is not read as a short one back.
+        if (phase.remainingDeg === undefined) {
+            const aheadDeg = normalizeHeading(phase.turnDirection * (phase.exitHeadingDeg - heading));
+            phase.remainingDeg = aheadDeg > 360 - ARC_ALIGNED_DEG ? 0 : aheadDeg;
+        }
+        remainingDeg = phase.remainingDeg;
+    }
+    if (!(remainingDeg > 0) || !(maxTurnDeg > 0)) return null;
+
+    const turnDeg = Math.min(remainingDeg, maxTurnDeg);
+    if (phase.exitHeadingDeg !== null) phase.remainingDeg -= turnDeg;
+    return phase.turnDirection * turnDeg;
 }
 
 // Only the outcomes the pilot needs to act on produce a warning.
