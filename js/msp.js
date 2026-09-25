@@ -349,6 +349,38 @@ var MSP = {
         this.last_received_timestamp = Date.now();
     },
 
+    /**
+     * Feeds bytes to read() for as long as a frame is still being decoded and
+     * returns how many of them were taken.
+     *
+     * A caller that takes the port over while a frame is only half decoded (the
+     * CLI tab does, on tab entry) can use this to let the decoder finish the
+     * frame in progress - which also completes the request that was in flight -
+     * and keep the bytes that follow for itself. The bytes are handed over one
+     * at a time because only the decoder knows where the frame ends: it returns
+     * to the IDLE state as soon as it has dispatched the frame.
+     *
+     * @param {{data: ArrayBuffer|Uint8Array}} readInfo
+     * @returns {number} bytes taken from the front of readInfo.data
+     */
+    read_until_idle: function (readInfo) {
+        var data;
+        try {
+            data = new Uint8Array(readInfo.data);
+        } catch (e) {
+            console.error('MSP read_until_idle: Failed to create Uint8Array from readInfo.data:', e, 'readInfo:', readInfo);
+            return 0;
+        }
+
+        var consumed = 0;
+        while (consumed < data.length && this.state != this.decoder_states.IDLE) {
+            this.read({ data: data.subarray(consumed, consumed + 1) });
+            consumed++;
+        }
+
+        return consumed;
+    },
+
     _initialize_read_buffer() {
         this.message_buffer = new ArrayBuffer(this.message_length_expected);
         this.message_buffer_uint8_view = new Uint8Array(this.message_buffer);

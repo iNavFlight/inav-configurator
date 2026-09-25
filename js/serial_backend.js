@@ -572,8 +572,26 @@ var SerialBackend = (function () {
     publicScope.read_serial = function (info) {
         if (!CONFIGURATOR.cliActive) {
             MSP.read(info);
-        } else if (CONFIGURATOR.cliActive) {
+            return;
+        }
+
+        // The FC only switches to CLI mode once it sees the '#', so the response
+        // to a request sent just before the tab was opened can still be arriving,
+        // and the decoder can already hold the front half of it. Those trailing
+        // bytes belong to that frame, not to the CLI session: let the decoder
+        // finish it - which also completes the request that was in flight - and
+        // hand the CLI tab only what follows, instead of printing the tail of an
+        // MSP response as junk. Nothing is taken once the FC has answered with
+        // the CLI banner: from there on every byte is CLI output.
+        var mspBytes = CONFIGURATOR.cliValid ? 0 : MSP.read_until_idle(info);
+        if (mspBytes === 0) {
             cliTab.read(info);
+            return;
+        }
+
+        var rest = info.data.slice(mspBytes);
+        if (rest.byteLength > 0) {
+            cliTab.read({ ...info, data: rest });
         }
     }
 
