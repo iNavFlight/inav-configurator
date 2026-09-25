@@ -7,6 +7,7 @@
  *   Bug 3 — _enterCli left its receive callback registered after resolving
  * plus:
  *   Bug 4 — restore's MSP version query ran against a null FC.CONFIG
+ *   Bug 5 — the unstable-releases toggle threw before the nightly list had arrived
  */
 
 import { test, describe } from 'node:test';
@@ -152,5 +153,37 @@ describe('restore seeds FC.CONFIG before the MSP version query', () => {
         const guardIdx = between.indexOf('!FC.CONFIG');
         assert.notEqual(guardIdx, -1, 'resetState() must be guarded by !FC.CONFIG');
         assert.ok(guardIdx < resetIdx, 'the !FC.CONFIG guard must come before resetState()');
+    });
+});
+
+// ---------------------------------------------------------------------------
+// Bug 5 — buildBoardOptions must not assume the nightly list has arrived
+//
+// The nightly and stable release lists are fetched in parallel. Toggling
+// "Show unstable releases" before the nightly callback ran made
+// buildBoardOptions() call forEach on undefined (or on the {} stored on a
+// failed fetch), which left the board dropdown empty.
+// ---------------------------------------------------------------------------
+
+describe('buildBoardOptions tolerates a missing nightly list', () => {
+    const src = readFileSync(resolve(root, 'tabs/firmware_flasher.js'), 'utf8');
+    const fnStart = src.indexOf('var buildBoardOptions = function');
+    const nightlyGet = src.indexOf("$.get('https://api.github.com/repos/iNavFlight/inav-nightly/releases");
+
+    test('the nightly passes are gated by Array.isArray', () => {
+        assert.notEqual(fnStart, -1, 'buildBoardOptions must exist');
+        assert.ok(nightlyGet > fnStart, 'the nightly fetch must follow buildBoardOptions');
+
+        const body = src.slice(fnStart, nightlyGet);
+        assert.match(body, /Array\.isArray\(\s*firmwareFlasherTab\.devReleasesData\s*\)/,
+            'nightly data must be checked with Array.isArray before forEach');
+        assert.doesNotMatch(body, /if\s*\(\s*showDevReleases\s*\)/,
+            'a bare showDevReleases check lets forEach run on a missing nightly list');
+    });
+
+    test('a failed nightly fetch stores an empty array', () => {
+        const failBody = src.slice(nightlyGet, src.indexOf("$.get('https://api.github.com/repos/iNavFlight/inav/releases"));
+        assert.match(failBody, /\.fail\([\s\S]*firmwareFlasherTab\.devReleasesData = \[\];/,
+            'the nightly failure path must store [] rather than {}');
     });
 });
