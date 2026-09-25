@@ -598,7 +598,7 @@ $(function() {
                     $('#languageOption').val(i18n.getCurrentLanguage());
                     
                     $('#languageOption').on('change', () => {
-                        i18n.changeLanguage($('#languageOption').val());
+                        i18n.changeLanguage($('#languageOption').val()).then(GUI.updateProfileNames);
                     });
 
                     // Set the value of the unit type

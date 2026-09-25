@@ -29,6 +29,7 @@ import mspDeduplicationQueue from './mspDeduplicationQueue';
 import mspStatistics from './mspStatistics';
 import { resolveMspWrite, guardMspCallback } from './../mspWriteOutcome';
 import settingsCache from './../settingsCache';
+import { parseProfileNames } from './../profileNames';
 import {Geozone, GeozoneVertex, GeozoneShapes } from './../geozone';
 import { parseDronecanAsyncRequestResponse } from './../dronecanAsyncRequestParse';
 
@@ -165,6 +166,10 @@ var mspHelper = (function () {
                 GUI.updateStatusBar();
                 if (profile_changed > 0 || wasUninitialized) {
                     GUI.updateProfileChange(profile_changed);
+                }
+                if (wasUninitialized) {
+                    // first status of this connection: fetch the profile names for the header dropdowns
+                    MSP.send_message(MSPCodes.MSP2_INAV_PROFILE_NAMES, false, false);
                 }
                 break;
 
@@ -731,6 +736,15 @@ var mspHelper = (function () {
                 break;
             case MSPCodes.MSP_EEPROM_WRITE:
                 console.log('Settings Saved in EEPROM');
+                // a save may have renamed the active profile
+                MSP.send_message(MSPCodes.MSP2_INAV_PROFILE_NAMES, false, false);
+                break;
+
+            case MSPCodes.MSP2_INAV_PROFILE_NAMES:
+                // null = firmware without the message (unsupported reply) or a malformed payload
+                FC.PROFILE_NAMES = dataHandler.unsupported ? null : parseProfileNames(data);
+                GUI.updateProfileNames();
+                GUI.active_tab?.onProfileNamesChanged?.();
                 break;
             case MSPCodes.MSP_DEBUGMSG:
                 for (var ii = 0; ii < data.byteLength; ii++) {
@@ -3900,6 +3914,10 @@ var mspHelper = (function () {
 
     self.loadMixerConfig = function (callback) {
         MSP.send_message(MSPCodes.MSP2_INAV_MIXER, false, false, callback);
+    };
+
+    self.loadProfileNames = function (callback) {
+        MSP.send_message(MSPCodes.MSP2_INAV_PROFILE_NAMES, false, false, callback);
     };
 
     self.saveMixerConfig = function (callback) {
