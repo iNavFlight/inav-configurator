@@ -30,3 +30,5 @@ fonts:
     extra: true
   - source: vision
     extra: true
+  - source: Digital_NAV
+    extra: true
