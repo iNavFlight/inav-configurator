@@ -268,6 +268,7 @@ var SerialBackend = (function () {
                             this.isDemoRunning = false;
                         }
 
+                        GUI.resetProfileCopy?.();
                         var wasConnected = CONFIGURATOR.connectionValid;
 
                         timeout.killAll();
@@ -551,6 +552,7 @@ var SerialBackend = (function () {
     }
 
     privateScope.onClosed = function (result) {
+        GUI.resetProfileCopy?.();
         if (result) { // All went as expected
             GUI.log(i18n.getMessage('serialPortClosedOk'));
         } else { // Something went wrong

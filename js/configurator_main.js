@@ -816,6 +816,92 @@ $(function() {
             });
         });
 
+        // Copy the active control / battery / mixer profile onto another slot (MSP2_INAV_COPY_PROFILE)
+        const profileCopyKinds = {
+            0: { label: 'copyProfileKindControl', current: () => Number.parseInt(profile_e.val()), count: () => profile_e.find('option').length },
+            1: { label: 'copyProfileKindBattery', current: () => Number.parseInt(batteryprofile_e.val()), count: () => batteryprofile_e.find('option').length },
+            2: { label: 'copyProfileKindMixer', current: () => Number.parseInt(mixerprofile_e.val()), count: () => mixerprofile_e.find('option').length },
+        };
+        let profileCopyModal = null;
+        let profileCopyRequest = null;
+        let profileCopyInFlight = false;
+
+        GUI.resetProfileCopy = function () {
+            profileCopyRequest = null;
+            profileCopyInFlight = false;
+            $('#copy-profile-confirm').prop('disabled', false);
+            profileCopyModal?.close();
+        };
+
+        $('#profiles_wrapper_global .profile-copy').on('click', function (event) {
+            event.preventDefault();
+
+            if (!CONFIGURATOR.connectionValid || profileCopyInFlight) {
+                return;
+            }
+            const type = Number.parseInt($(this).attr('data-profile-type'));
+            const kind = profileCopyKinds[type];
+            const fromIndex = kind.current();
+            const $to = $('#copy-profile-to').empty();
+
+            for (let i = 0; i < kind.count(); i++) {
+                if (i !== fromIndex) {
+                    $to.append($('<option>').val(i).text(i18n.getMessage('copyProfileSlot', [i + 1])));
+                }
+            }
+            $('#copy-profile-kind').text(i18n.getMessage(kind.label));
+            $('#copy-profile-from').text(fromIndex + 1);
+            profileCopyRequest = { type: type, kind: kind, fromIndex: fromIndex };
+
+            // The template is moved into the jBox on first use, so keep a single instance
+            if (!profileCopyModal) {
+                profileCopyModal = new jBox('Modal', {
+                    width: 420,
+                    height: 240,
+                    animation: false,
+                    closeOnClick: false,
+                    closeOnEsc: true,
+                    content: $('#modal-copy-profile')
+                });
+            }
+            $('#copy-profile-confirm').prop('disabled', false);
+            profileCopyModal.open();
+            $('#copy-profile-to').trigger('focus');
+        });
+
+        $(document).on('click', '#copy-profile-cancel', function () {
+            profileCopyModal.close();
+        });
+
+        $(document).on('click', '#copy-profile-confirm', function () {
+            const toIndex = Number.parseInt($('#copy-profile-to').val());
+            if (!CONFIGURATOR.connectionValid || profileCopyInFlight || !profileCopyRequest || Number.isNaN(toIndex)) {
+                return;
+            }
+            const request = profileCopyRequest;
+            profileCopyInFlight = true;
+            $('#copy-profile-confirm').prop('disabled', true);
+            const finishCopy = function (response) {
+                // A disconnect invalidates this request, including any late response.
+                if (profileCopyRequest !== request) {
+                    return;
+                }
+                GUI.resetProfileCopy();
+                if (!response) {
+                    GUI.log(i18n.getMessage('copyProfileTransportFailed'));
+                    return;
+                }
+                if (response.unsupported) {
+                    GUI.log(i18n.getMessage('copyProfileFailed'));
+                    return;
+                }
+                GUI.log(i18n.getMessage('copyProfileDone', [i18n.getMessage(request.kind.label), request.fromIndex + 1, toIndex + 1]));
+            };
+            if (MSP.send_message(MSPCodes.MSP2_INAV_COPY_PROFILE, [request.type, request.fromIndex, toIndex], false, finishCopy) === false) {
+                finishCopy(false);
+            }
+        });
+
     });
 });
 

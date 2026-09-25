@@ -2210,6 +2210,48 @@
     "setMixerProfile": {
         "message": "Setting Mixer Profile: <strong style=\"color: #37a8db\">$1</strong>"
     },
+    "copyProfileTooltip": {
+        "message": "Copy this profile to another slot"
+    },
+    "copyProfileTitle": {
+        "message": "Copy profile"
+    },
+    "copyProfileFrom": {
+        "message": "Copy the active"
+    },
+    "copyProfileTo": {
+        "message": "to"
+    },
+    "copyProfileSlot": {
+        "message": "Profile $1"
+    },
+    "copyProfileKindControl": {
+        "message": "control profile"
+    },
+    "copyProfileKindBattery": {
+        "message": "battery profile"
+    },
+    "copyProfileKindMixer": {
+        "message": "mixer profile"
+    },
+    "copyProfileWarning": {
+        "message": "The destination profile is overwritten and saved to the flight controller right away."
+    },
+    "copyProfileButton": {
+        "message": "Copy"
+    },
+    "copyProfileCancel": {
+        "message": "Cancel"
+    },
+    "copyProfileDone": {
+        "message": "Copied $1 $2 to profile $3."
+    },
+    "copyProfileTransportFailed": {
+        "message": "Profile copy could not be confirmed. Check the connection and destination profile before trying again."
+    },
+    "copyProfileFailed": {
+        "message": "The flight controller did not copy the profile: it needs a firmware with MSP2_INAV_COPY_PROFILE (INAV 10), must be disarmed, and the target slot must exist."
+    },
     "setBatteryProfile": {
         "message": "Setting Battery Profile: <strong style=\"color: #37a8db\">$1</strong>"
     },
