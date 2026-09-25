@@ -6845,6 +6845,30 @@
     "outputStatsTableVoltage": {
         "message": "Voltage [V]"
     },
+    "outputsEscTelemetry": {
+        "message": "ESC telemetry"
+    },
+    "outputsEscTelemetryHelp": {
+        "message": "Live values reported by each ESC over the telemetry wire (KISS / BLHeli_32 / AM32 protocol). Needs a serial port with the ESC function; RPM is only right when the motor pole count above matches the motors."
+    },
+    "outputsEscTelemetryMotor": {
+        "message": "Motor"
+    },
+    "outputsEscTelemetryRpm": {
+        "message": "RPM"
+    },
+    "outputsEscTelemetryTemperature": {
+        "message": "Temperature [°C]"
+    },
+    "outputsEscTelemetryVoltage": {
+        "message": "Voltage [V]"
+    },
+    "outputsEscTelemetryCurrent": {
+        "message": "Current [A]"
+    },
+    "outputsEscTelemetryNoData": {
+        "message": "No telemetry frames received yet. Check the ESC telemetry wire, the port assignment and that the ESCs are powered."
+    },
     "LogicConditions": {
         "message": "Logic Conditions"
     },

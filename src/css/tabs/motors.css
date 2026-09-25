@@ -327,6 +327,29 @@
     text-align: left;
 }
 
+.tab-motors .esc-telemetry-table {
+    border-collapse: collapse;
+}
+
+.tab-motors .esc-telemetry-table th,
+.tab-motors .esc-telemetry-table td {
+    padding: 4px 30px 4px 0;
+    text-align: right;
+}
+
+.tab-motors .esc-telemetry-table th:first-child,
+.tab-motors .esc-telemetry-table td:first-child {
+    text-align: left;
+}
+
+.tab-motors .esc-telemetry-invalid td {
+    opacity: 0.5;
+}
+
+.tab-motors .esc-telemetry-no-data {
+    margin-top: 8px;
+}
+
 .tab-servos .title {
     margin-top: 0;
     line-height: 30px;

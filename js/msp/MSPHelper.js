@@ -29,6 +29,7 @@ import mspDeduplicationQueue from './mspDeduplicationQueue';
 import mspStatistics from './mspStatistics';
 import { resolveMspWrite, guardMspCallback } from './../mspWriteOutcome';
 import settingsCache from './../settingsCache';
+import { parseEscTelemetry } from './../escTelemetry';
 import {Geozone, GeozoneVertex, GeozoneShapes } from './../geozone';
 import { parseDronecanAsyncRequestResponse } from './../dronecanAsyncRequestParse';
 
@@ -1976,6 +1977,14 @@ var mspHelper = (function () {
                 break;
 
             case MSPCodes.MSP2_INAV_ESC_SRXL2_CALIBRATE:
+                break;
+
+            case MSPCodes.MSP2_INAV_ESC_TELEM:
+                // null = firmware built without USE_ESC_SENSOR (unsupported reply) or an unknown payload layout
+                FC.ESC_TELEMETRY = dataHandler.unsupported ? null : parseEscTelemetry(data);
+                if (!dataHandler.unsupported && FC.ESC_TELEMETRY === null) {
+                    console.log('MSP2_INAV_ESC_TELEM: unexpected payload length ' + data.byteLength);
+                }
                 break;
 
             default:
