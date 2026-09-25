@@ -5312,6 +5312,9 @@
     "missionSimulationTurnRadius": {
         "message": "Turn radius:"
     },
+    "missionSimulationTurnMode": {
+        "message": "Turn mode:"
+    },
     "missionSimulationTime": {
         "message": "Flight time:"
     },
@@ -5354,9 +5357,6 @@
     "missionSimulationSpeedEstimated": {
         "message": "Cruise speed is an assumption: connect the flight controller to read fw_reference_airspeed, or set it to what your aircraft really cruises at. The turn radius depends on it squared."
     },
-    "missionSimulationFixedWingOnly": {
-        "message": "This models a fixed wing. The connected aircraft is not one, so the track shown does not describe how it will fly."
-    },
     "missionSimulationMultiMission": {
         "message": "The flight path is simulated one mission at a time. Select a single mission to see it."
     },
@@ -5370,7 +5370,7 @@
         "message": "This mission uses absolute altitudes, but the home elevation is unknown, so the vertical profile may be off. Set home to resolve it."
     },
     "missionSimulationDisclaimer": {
-        "message": "Altitudes and the landing approach follow the flight controller's own formulas. Turns are flown at the bank-limited radius: with nav_fw_wp_turn_smoothing ON or ON-CUT the aircraft starts its turn before the waypoint and curves inside the corner, which is not modelled here. Also not modelled: wind, holds (a POSHOLD point and the last waypoint of a mission are flown straight through, where the aircraft would circle), jumps, tracking back onto the leg line, and the pitch-held glide and flare over the last few metres, where the simulation stops. Assumes the aircraft follows its commanded track perfectly, so real turns start and finish more gently. A planning aid, not proof that a mission is safe to fly."
+        "message": "Altitudes and the landing approach follow the flight controller's own formulas. Turns are an approximation of nav_fw_wp_turn_mode: arcs at the bank-limited radius after one second of roll-in - COORD_FLYBY starts the turn before the waypoint (no earlier than nav_fw_wp_turn_max_lead_time allows) and cuts the corner, COORD_FLYOVER turns after passing the waypoint, COORD_FLYINTO flies an S-turn that crosses the waypoint already on the next leg, DIRECT simply steers at the next waypoint. After a turn the aircraft heads straight for the next waypoint; with nav_fw_wp_tracking_accuracy set, DIRECT and any capped, reversal or unfitting fly-over turn converge back onto the leg line at up to nav_fw_wp_tracking_max_angle and COORD_FLYOVER otherwise flies an S back onto it (a simple approximation of path tracking). Not modelled: wind, holds (a POSHOLD point and the last waypoint of a mission are flown straight through, where the aircraft would circle), jumps, and the pitch-held glide and flare over the last few metres, where the simulation stops. Real turns start and finish more gently. A planning aid, not proof that a mission is safe to fly."
     },
     "missionTotalInformationHead": {
         "message": "Total information"
