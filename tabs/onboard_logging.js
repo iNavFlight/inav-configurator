@@ -231,12 +231,28 @@ onboardLoggingTab.initialize = function (callback) {
     }
 
     function populateLoggingRates() {
-        var
-            userRateGCD = gcd(FC.BLACKBOX.blackboxRateNum, FC.BLACKBOX.blackboxRateDenom),
-            userRate = {num: FC.BLACKBOX.blackboxRateNum / userRateGCD, denom: FC.BLACKBOX.blackboxRateDenom / userRateGCD};
+        let
+            rateNum = FC.BLACKBOX.blackboxRateNum,
+            rateDenom = FC.BLACKBOX.blackboxRateDenom;
+
+        /* A flight controller that reports no usable rate logs every iteration.
+         * Written as a negated conjunction on purpose, not as rateNum <= 0: the
+         * guard has to catch a value that is not a number too. Any comparison with
+         * NaN or undefined is false, so rateNum <= 0 would not fire for those and
+         * they would reach the recursive gcd() below, which never meets its base
+         * case and recurses until the stack overflows. Please do not "simplify".
+         */
+        if (!(rateNum > 0 && rateDenom > 0)) {
+            rateNum = 1;
+            rateDenom = 1;
+        }
+
+        const
+            userRateGCD = gcd(rateNum, rateDenom),
+            userRate = {num: rateNum / userRateGCD, denom: rateDenom / userRateGCD};
 
         // Offer a reasonable choice of logging rates (if people want weird steps they can use CLI)
-        var
+        const
             loggingRates = [
                  {num: 1, denom: 32},
                  {num: 1, denom: 16},
@@ -251,24 +267,31 @@ onboardLoggingTab.initialize = function (callback) {
                  {num: 7, denom: 8},
                  {num: 1, denom: 1},
             ],
-            loggingRatesSelect = $(".blackboxRate select");
+            loggingRatesSelect = $(".blackboxRate select").empty();
 
-        var
-            addedCurrentValue = false;
+        /* The rate configured on the aircraft may be outside that list, e.g. 1/256 set over the CLI.
+         * It has to be offered and preselected as well, otherwise the select box stays empty and
+         * saving the tab without touching it would quietly write a different rate.
+         */
+        const
+            offeredRates = loggingRates.filter(function (rate) {
+                return rate.num != userRate.num || rate.denom != userRate.denom;
+            });
 
-        for (var i = 0; i < loggingRates.length; i++) {
-            if (!addedCurrentValue && userRate.num / userRate.denom <= loggingRates[i].num / loggingRates[i].denom) {
-                if (userRate.num / userRate.denom < loggingRates[i].num / loggingRates[i].denom) {
-                    var userPercent = Math.round(userRate.num / userRate.denom * 100);
-                    loggingRatesSelect.append('<option value="' + userRate.num + '/' + userRate.denom + '" data-percent="' + userPercent + '">'
-                            + userRate.num + '/' + userRate.denom + ' (' + userPercent + '%)</option>');
-                }
-                addedCurrentValue = true;
-            }
+        offeredRates.push(userRate);
+        offeredRates.sort(function (a, b) {
+            return a.num / a.denom - b.num / b.denom;
+        });
 
-            var percent = Math.round(loggingRates[i].num / loggingRates[i].denom * 100);
-            loggingRatesSelect.append('<option value="' + loggingRates[i].num + '/' + loggingRates[i].denom + '" data-percent="' + percent + '">'
-                + loggingRates[i].num + '/' + loggingRates[i].denom + ' (' + percent + '%)</option>');
+        for (const rate of offeredRates) {
+            const
+                ratio = rate.num / rate.denom,
+                percent = Math.round(ratio * 100),
+                // Rates well below one percent would all be shown as 0%
+                label = ratio < 0.01 ? (ratio * 100).toFixed(1) : percent;
+
+            loggingRatesSelect.append('<option value="' + rate.num + '/' + rate.denom + '" data-percent="' + percent + '">'
+                + rate.num + '/' + rate.denom + ' (' + label + '%)</option>');
 
         }
         loggingRatesSelect.val(userRate.num + '/' + userRate.denom);
