@@ -186,4 +186,16 @@ describe('buildBoardOptions tolerates a missing nightly list', () => {
         assert.match(failBody, /\.fail\([\s\S]*firmwareFlasherTab\.devReleasesData = \[\];/,
             'the nightly failure path must store [] rather than {}');
     });
+
+    test('the late nightly rebuild waits for the lock and spares a loaded local hex', () => {
+        const fnLate = src.indexOf('var applyLateNightlyReleases = function');
+        assert.notEqual(fnLate, -1, 'applyLateNightlyReleases must exist');
+        assert.ok(nightlyGet > fnLate, 'the nightly fetch must follow applyLateNightlyReleases');
+
+        const body = src.slice(fnLate, nightlyGet);
+        assert.match(body, /GUI\.active_tab !== firmwareFlasherTab/, 'must stop once the tab is left');
+        assert.match(body, /if \(GUI\.connect_lock\) \{\s*setTimeout\(applyLateNightlyReleases, \d+\);\s*return;/,
+            'must retry instead of dropping the rebuild while connect_lock is held');
+        assert.match(body, /\|\| localFirmwareLoaded \|\|/, 'must not rebuild over a loaded local hex');
+    });
 });

@@ -370,18 +370,32 @@ firmwareFlasherTab.initialize = function (callback) {
             return;
         };
 
+        // A toggle before the nightly list arrived built the board list without nightlies.
+        var applyLateNightlyReleases = function () {
+            if (GUI.active_tab !== firmwareFlasherTab) {
+                return;
+            }
+            // The board change handler skips the version list while locked, so wait for the lock to clear.
+            if (GUI.connect_lock) {
+                setTimeout(applyLateNightlyReleases, 500);
+                return;
+            }
+            // The rebuild fires the board change handler, which would discard a loaded local hex or chosen version.
+            if (!$('input.show_development_releases').is(':checked') || !Array.isArray(firmwareFlasherTab.releasesData)
+                    || localFirmwareLoaded || $('select[name="firmware_version"]').val() !== '0') {
+                return;
+            }
+            let selectedTarget = String($('select[name="board"]').val());
+            buildBoardOptions();
+            if (selectedTarget !== '0' && selectedTarget !== 'null') {
+                $('select[name="board"] option[value="' + selectedTarget + '"]').attr("selected", "selected");
+                $('select[name="board"]').trigger('change');
+            }
+        };
+
         $.get('https://api.github.com/repos/iNavFlight/inav-nightly/releases?per_page=50', function(releasesData) {
             firmwareFlasherTab.devReleasesData = releasesData;
-            // A toggle before this list arrived built the board list without nightlies.
-            if ($('input.show_development_releases').is(':checked') && Array.isArray(firmwareFlasherTab.releasesData)
-                    && !GUI.connect_lock && $('select[name="firmware_version"]').val() === '0') {
-                let selectedTarget = String($('select[name="board"]').val());
-                buildBoardOptions();
-                if (selectedTarget !== '0' && selectedTarget !== 'null') {
-                    $('select[name="board"] option[value="' + selectedTarget + '"]').attr("selected", "selected");
-                    $('select[name="board"]').trigger('change');
-                }
-            }
+            applyLateNightlyReleases();
         }).fail(function (data){
             firmwareFlasherTab.devReleasesData = [];
             if (data["responseJSON"]){
