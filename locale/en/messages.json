@@ -1628,6 +1628,9 @@
     "portsTelemetryDisabled": {
         "message": "Disabled"
     },
+    "portsBaudrateFromFC": {
+        "message": "$1 (from FC)"
+    },
     "portsFunction_MSP": {
         "message": "MSP"
     },
