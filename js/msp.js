@@ -54,6 +54,10 @@ for (const name of WRITE_CODE_NAMES) {
 // Reads whose loss makes a save unsafe; losing any other read (status polls) is not reported.
 const WRITE_SOURCE_VALUES = new Set(WRITE_SOURCE_CODES.values());
 
+// Live control, never part of a save: "nothing was saved" would be wrong, and a slider would spam it.
+const LIVE_WRITE_CODES = new Set(['MSP_SET_MOTOR', 'MSP_SET_RAW_RC', 'MSP_SET_RAW_GPS', 'MSP_SET_HEAD', 'MSP_SET_RTC']
+    .map(name => MSPCodes[name]));
+
 function payloadKey(data) {
     return data && data.length ? Array.from(data, byte => (byte & 0xFF).toString(16).padStart(2, '0')).join('') : '';
 }
@@ -149,6 +153,8 @@ var MSP = {
 
     // Tunnel retry budget for the message being built by send_message(); null = queue default.
     nextTunnelRetries: null,
+    // Set by sendLinkProbe() for the message being built by send_message().
+    nextLinkProbe: false,
 
     // Reads whose response failed to parse this session. The FC state they fill is
     // then part fresh and part stale, so the writes handing it back are refused.
@@ -161,9 +167,13 @@ var MSP = {
     // MAVLink telemetry feed of a tunnel session: answers covered reads without the wire.
     virtualReplies: null,
 
+    // Tunnel session only: the link survives the reboot, so it is confirmed by watching the FC.
+    rebootTracker: null,
+
     // Set by MSPHelper; injected because gui.js already imports this module.
     onConfigWriteBlocked: null,
     onResponseLost: null,
+    onWriteLost: null,
 
     getCodeName(code) {
         return CODE_NAMES.get(code) || ('0x' + code.toString(16));
@@ -213,11 +223,20 @@ var MSP = {
     },
 
     // A lost read leaves its FC state stale, so the write handing it back is blocked as after
-    // an unreadable response. A lost write reports nothing, like a refused one: callers ignore
-    // the argument and would go on to save and reboot.
+    // an unreadable response. A lost write gets no callback, like a refused one: callers ignore
+    // the argument and would go on to save and reboot. The user is told to reload and save again.
     handleTunnelRequestLost(request) {
+        if (request.rebootTracked || request.linkProbe) {
+            if (request.onFinish) {
+                request.onFinish(false);
+            }
+            return;
+        }
         if (WRITE_CODES.has(request.code)) {
             console.error('MSP write ' + this.getCodeName(request.code) + ' got no reply over the MAVLink tunnel');
+            if (this.onWriteLost && !LIVE_WRITE_CODES.has(request.code)) {
+                this.onWriteLost(request.code);
+            }
             return;
         }
         const payloads = this.lostReplies.get(request.code) || new Set();
@@ -551,12 +570,22 @@ var MSP = {
         message.onFinish = callback_msp;
         message.onSend = callback_sent;
         message.payloadKey = payloadKey(data);
+        message.linkProbe = this.nextLinkProbe;
 
         /*
          * In case of MSP_REBOOT special procedure is required
          */
         if (code == MSPCodes.MSP_SET_REBOOT || code == MSPCodes.MSP_EEPROM_WRITE) {
             message.retryCounter = 10;
+        }
+
+        if (code == MSPCodes.MSP_SET_REBOOT && this.rebootTracker) {
+            message.rebootTracked = true;
+            message.onFinish = this.rebootTracker.track(callback_msp);
+            // A reboot is already being confirmed: a second one would reboot the FC again.
+            if (!message.onFinish) {
+                return false;
+            }
         }
 
         this._enqueue(message);
@@ -616,6 +645,15 @@ var MSP = {
             return this.send_message(code, data, false, callback_msp);
         } finally {
             this.nextTunnelRetries = null;
+        }
+    },
+    // Reboot monitor reads: their loss says the FC is down, not that its state is stale.
+    sendLinkProbe(code, callback_msp, retries) {
+        this.nextLinkProbe = true;
+        try {
+            return this.sendWithTunnelRetries(code, false, callback_msp, retries);
+        } finally {
+            this.nextLinkProbe = false;
         }
     },
     promise(code, data, protocolVersion) {

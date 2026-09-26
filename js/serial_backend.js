@@ -33,6 +33,7 @@ import javascriptProgrammingTab from '../tabs/javascript_programming';
 import { MavlinkLink } from './mavlink/mavlinkLink';
 import { concatFrames } from './mavlink/mavlinkProtocol';
 import { MavlinkTelemetryFeed, isTelemetryFeedEnabled, mspCodeOfFrame } from './mavlink/mavlinkTelemetryFeed';
+import { TunnelRebootMonitor, readOnTimeSeconds } from './mavlink/tunnelRebootMonitor';
 
 // Probe attempts on top of the first one: a weak radio link may lose the first request.
 const MAVLINK_TUNNEL_PROBE_RETRIES = 2;
@@ -60,6 +61,20 @@ var SerialBackend = (function () {
     });
     privateScope.telemetryFeed = null;
 
+    privateScope.rebootMonitor = new TunnelRebootMonitor({
+        sendProbe: done => MSP.sendLinkProbe(MSPCodes.MSP_API_VERSION, response => done(response !== false), 0),
+        resendReboot: () => MSP.send_message(MSPCodes.MSP_SET_REBOOT, false, false),
+        readUptime: done => MSP.sendLinkProbe(MSPCodes.MSP2_INAV_MISC2, response => done(readOnTimeSeconds(response)), 1),
+        onStart: () => privateScope.onTunnelRebootStart(),
+        onBack: () => privateScope.onTunnelRebootBack(),
+        onNotRebooted: () => privateScope.onTunnelRebootNotRebooted(),
+        onGone: () => privateScope.onTunnelRebootGone(),
+        log: (key, args) => GUI.log(i18n.getMessage(key, args)),
+    });
+    privateScope.tunnelRebootModal = null;
+    // handleReconnect() may name the tab to reopen before or after the reboot request is sent.
+    privateScope.tunnelRebootTabChosen = false;
+
     // Latched per connection; tunnel decisions never read the DOM.
     privateScope.newMavlinkSession = function () {
         return { tunnel: false, v1HeartbeatSeen: false, pendingHeartbeat: null, rawProbeSentAt: Date.now(), foreignSystems: new Set() };
@@ -86,6 +101,7 @@ var SerialBackend = (function () {
         privateScope.$baud = $('#baud'),
         publicScope.$portOverride = $('#port-override'),
         mspHelper.setSensorStatusEx(privateScope.sensor_status_ex);
+        mspHelper.onWriteLostRecovery = privateScope.onWriteLost;
 
         $('#wireless-mode').on('change', function () {
             var $this = $(this);
@@ -99,28 +115,15 @@ var SerialBackend = (function () {
 
         GUI.handleReconnect = function (reopenLastTab = true) {
 
-            let modal = new jBox('Modal', {
-                width: 400,
-                height: 120,
-                animation: false,
-                closeOnClick: false,
-                closeOnEsc: false,
-                content: '<div id="modal-reconnect"><div data-i18n="deviceRebooting">Device - <span style="color: red">Rebooting</span></div></div>'
-            }).open();
+            privateScope.chooseReopenTab(reopenLastTab);
 
-            if (typeof reopenLastTab === 'boolean') {
-                const $anchor = $('#tabs > ul li.active a');
-                privateScope.reopenTab = reopenLastTab && $anchor.length ? $anchor : null;
-            } else {
-                // Callers may pass an <a> or an <li>; normalize to the <a> element
-                const $el = reopenLastTab ? $(reopenLastTab) : null;
-                if ($el) {
-                    const anchor = $el.is('a') ? $el : $('a', $el);
-                    privateScope.reopenTab = anchor.length ? anchor : null;
-                } else {
-                    privateScope.reopenTab = null;
-                }
+            // The tunnel survives the reboot: the reboot monitor reconnects without closing the port.
+            if (CONFIGURATOR.mavlinkTunnelActive) {
+                privateScope.tunnelRebootTabChosen = true;
+                return;
             }
+
+            let modal = privateScope.openRebootModal();
 
             /*
             Disconnect
@@ -136,6 +139,33 @@ var SerialBackend = (function () {
                 modal.close();
                 privateScope.reConnect();
             }, 5000);
+        };
+
+        privateScope.chooseReopenTab = function (reopenLastTab) {
+            if (typeof reopenLastTab === 'boolean') {
+                const $anchor = $('#tabs > ul li.active a');
+                privateScope.reopenTab = reopenLastTab && $anchor.length ? $anchor : null;
+            } else {
+                // Callers may pass an <a> or an <li>; normalize to the <a> element
+                const $el = reopenLastTab ? $(reopenLastTab) : null;
+                if ($el) {
+                    const anchor = $el.is('a') ? $el : $('a', $el);
+                    privateScope.reopenTab = anchor.length ? anchor : null;
+                } else {
+                    privateScope.reopenTab = null;
+                }
+            }
+        };
+
+        privateScope.openRebootModal = function () {
+            return new jBox('Modal', {
+                width: 400,
+                height: 120,
+                animation: false,
+                closeOnClick: false,
+                closeOnEsc: false,
+                content: '<div id="modal-reconnect"><div data-i18n="deviceRebooting">Device - <span style="color: red">Rebooting</span></div></div>'
+            }).open();
         };
 
 
@@ -272,9 +302,10 @@ var SerialBackend = (function () {
                             CONFIGURATOR.connection.connect(selected_port, {bitrate: selected_baud}, privateScope.onOpen);
                         }
                     } else {
-                        // Check for unsaved changes in JavaScript Programming tab
+                        // Check for unsaved changes in JavaScript Programming tab. A dead session (FC gone after a
+                        // tunnel reboot) cannot save anyway; the landing-tab switch still asks before discarding.
                         if (GUI.active_tab === javascriptProgrammingTab &&
-                            javascriptProgrammingTab.isDirty) {
+                            javascriptProgrammingTab.isDirty && CONFIGURATOR.connectionValid) {
                             console.log('[Disconnect] Checking for unsaved changes in JavaScript Programming tab');
                             const confirmMsg = i18n.getMessage('unsavedChanges') ||
                                 'You have unsaved changes. Leave anyway?';
@@ -391,11 +422,7 @@ var SerialBackend = (function () {
 
                 defaultsDialog.init().then( () => {
 
-                    if (privateScope.reopenTab) {
-                        privateScope.reopenTab.trigger('click');
-                    } else {
-                        $(`#tabs ul.mode-connected .tab_setup a`).trigger('click');
-                    }
+                    privateScope.reopenLastTab();
 
                     update.firmwareVersion();
                 });
@@ -678,25 +705,89 @@ var SerialBackend = (function () {
         CONFIGURATOR.connection.removeOnReceiveCallback(publicScope.read_ltm);
 
         // The raw MSP_API_VERSION still pending would otherwise be answered by the tunnel probe.
+        privateScope.resetTunnelQueue();
+        mspQueue.setTransportTransform(
+            body => privateScope.wrapForTunnel(body),
+            () => link.resetReassembly()
+        );
+        MSP.rebootTracker = privateScope.rebootMonitor;
+        privateScope.tunnelRebootTabChosen = false;
+        // Own timer: tab switches kill every named interval outside their keep-lists.
+        privateScope.sendGcsHeartbeat();
+        privateScope.gcsHeartbeatTimer = setInterval(privateScope.sendGcsHeartbeat, MAVLINK_GCS_HEARTBEAT_INTERVAL_MS);
+        privateScope.sendTunnelHandshake();
+    };
+
+    privateScope.resetTunnelQueue = function () {
         mspQueue.flush();
         mspDeduplicationQueue.flush();
         MSP.callbacks_cleanup();
         MSP.resetDecoder();
         mspQueue.freeHardLock();
         mspQueue.freeSoftLock();
-
         mspQueue.setTunnelMode(true);
-        mspQueue.setTransportTransform(
-            body => privateScope.wrapForTunnel(body),
-            () => link.resetReassembly()
-        );
-        // Own timer: tab switches kill every named interval outside their keep-lists.
-        privateScope.sendGcsHeartbeat();
-        privateScope.gcsHeartbeatTimer = setInterval(privateScope.sendGcsHeartbeat, MAVLINK_GCS_HEARTBEAT_INTERVAL_MS);
-        privateScope.armConnectingTimeout();
+    };
 
+    privateScope.sendTunnelHandshake = function () {
+        privateScope.armConnectingTimeout();
         MSP.protocolVersion = MSP.constants.PROTOCOL_V2;
         MSP.sendWithTunnelRetries(MSPCodes.MSP_API_VERSION, false, privateScope.onApiVersion, MAVLINK_TUNNEL_PROBE_RETRIES);
+    };
+
+    // The port stays open over the reboot: stop polling and the telemetry feed, keep the MAVLink session.
+    privateScope.onTunnelRebootStart = function () {
+        if (!privateScope.tunnelRebootTabChosen) {
+            privateScope.chooseReopenTab(true);
+        }
+        privateScope.tunnelRebootModal = privateScope.tunnelRebootModal || privateScope.openRebootModal();
+        interval.killAll(['msp-load-update', 'ltm-connection-check']);
+        CONFIGURATOR.connectionValid = false;
+        privateScope.stopTelemetryFeed(false);
+    };
+
+    // rebooted: the caller's reboot callback ran and closed its own dialogs; otherwise close them here.
+    privateScope.endTunnelReboot = function (rebooted) {
+        if (!rebooted) {
+            defaultsDialog.abortSaving();
+        }
+        if (privateScope.tunnelRebootModal) {
+            privateScope.tunnelRebootModal.close();
+            privateScope.tunnelRebootModal = null;
+        }
+        privateScope.tunnelRebootTabChosen = false;
+        // The reopened tab must not be the active one, or its click is ignored.
+        $('#tabs > ul li').removeClass('active');
+    };
+
+    // Same as after the probe; onValidFirmware() then reopens the tab as after a USB reconnect.
+    privateScope.onTunnelRebootBack = function () {
+        privateScope.endTunnelReboot(true);
+        FC.resetState();
+        MSP.parseFailures.clear();
+        MSP.lostReplies.clear();
+        privateScope.resetTunnelQueue();
+        privateScope.sendTunnelHandshake();
+    };
+
+    privateScope.onTunnelRebootNotRebooted = function () {
+        privateScope.endTunnelReboot(false);
+        CONFIGURATOR.connectionValid = true;
+        privateScope.startTelemetryFeed();
+        privateScope.startStatusPolling();
+        privateScope.reopenLastTab();
+    };
+
+    privateScope.onTunnelRebootGone = function () {
+        privateScope.endTunnelReboot(false);
+        privateScope.abortConnecting();
+    };
+
+    privateScope.reopenLastTab = function () {
+        if (privateScope.reopenTab) {
+            privateScope.reopenTab.trigger('click');
+        } else {
+            $(`#tabs ul.mode-connected .tab_setup a`).trigger('click');
+        }
     };
 
     privateScope.wrapForTunnel = function (body) {
@@ -708,6 +799,10 @@ var SerialBackend = (function () {
     };
 
     privateScope.onMavlinkMessage = function (frame) {
+        const target = privateScope.mavlinkLink.getTarget();
+        if (target && frame.sysid === target.sysid && frame.compid === target.compid) {
+            privateScope.rebootMonitor.noteFcActivity();
+        }
         if (privateScope.telemetryFeed) {
             privateScope.telemetryFeed.handleFrame(frame);
         }
@@ -782,6 +877,11 @@ var SerialBackend = (function () {
 
     // Also runs before every connect, so the firmware flasher and the next session start clean.
     privateScope.endMavlinkSession = function () {
+        privateScope.rebootMonitor.cancel();
+        MSP.rebootTracker = null;
+        if (privateScope.tunnelRebootModal) {
+            privateScope.endTunnelReboot(false);
+        }
         privateScope.stopTelemetryFeed(false);
         CONFIGURATOR.mavlinkTelemetryFeed = false;
         clearInterval(privateScope.gcsHeartbeatTimer);
@@ -836,9 +936,22 @@ var SerialBackend = (function () {
                 $('#hardware-roundtrip').text("HW round trip: " + mspQueue.getHardwareRoundtrip().toFixed(0));
             }, 100);
 
-            interval.add('global_data_refresh', periodicStatusUpdater.run, periodicStatusUpdater.getUpdateInterval(CONFIGURATOR.connection.bitrate), false);
+            privateScope.startStatusPolling();
         });
     }
+
+    privateScope.startStatusPolling = function () {
+        interval.add('global_data_refresh', periodicStatusUpdater.run, periodicStatusUpdater.getUpdateInterval(CONFIGURATOR.connection.bitrate), false);
+    };
+
+    // A lost tunnel write stalls its save chain: undo what the chain had paused or disabled.
+    privateScope.onWriteLost = function (code) {
+        defaultsDialog.abortSaving();
+        $(document).trigger(GUI.EVENT_MSP_WRITE_LOST, [code]);
+        if (CONFIGURATOR.connectionValid && !privateScope.rebootMonitor.active) {
+            privateScope.startStatusPolling();
+        }
+    };
 
     privateScope.onClosed = function (result) {
         if (result) { // All went as expected

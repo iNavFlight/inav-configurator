@@ -2,8 +2,9 @@
 /**
  * Status polling: a plain MSP link keeps its four requests per run; a MAVLink tunnel with the
  * telemetry feed polls MSP_SENSOR_STATUS every 500 ms (the FC's isMspConfigActive() window is
- * 1000 ms) and the other three every second run; with the feed off (A/B) the tunnel keeps
- * phase 1's single 1 Hz run. Runs the real js/periodicStatusUpdater.js with stubbed imports.
+ * 1000 ms) and the other two every second run; with the feed off (A/B) the tunnel keeps
+ * phase 1's single 1 Hz run. A tunnel never polls MSP_ACTIVEBOXES: MSPV2_INAV_STATUS carries
+ * the same box bitmask. Runs the real js/periodicStatusUpdater.js with stubbed imports.
  */
 
 import { test } from 'node:test';
@@ -34,6 +35,7 @@ const periodicStatusUpdater = (await import(updaterUrl)).default;
 const { sent, configurator } = globalThis.__statusStubs;
 
 const ALL = [MSP_CODES.MSP_SENSOR_STATUS, MSP_CODES.MSPV2_INAV_STATUS, MSP_CODES.MSP_ACTIVEBOXES, MSP_CODES.MSPV2_INAV_ANALOG];
+const TUNNEL = ALL.filter(code => code !== MSP_CODES.MSP_ACTIVEBOXES);
 
 test('plain MSP: every run sends all four requests at the baud-rate interval', () => {
     configurator.mavlinkTunnelActive = false;
@@ -44,7 +46,7 @@ test('plain MSP: every run sends all four requests at the baud-rate interval', (
     assert.equal(periodicStatusUpdater.getUpdateInterval(115200), 300);
 });
 
-test('tunnel with the telemetry feed: MSP_SENSOR_STATUS at 2 Hz, the other three at 1 Hz', () => {
+test('tunnel with the telemetry feed: MSP_SENSOR_STATUS at 2 Hz, STATUS and ANALOG at 1 Hz, no ACTIVEBOXES', () => {
     configurator.mavlinkTunnelActive = true;
     configurator.mavlinkTelemetryFeed = true;
     periodicStatusUpdater.resetTunnelCycle();
@@ -53,19 +55,19 @@ test('tunnel with the telemetry feed: MSP_SENSOR_STATUS at 2 Hz, the other three
     for (let i = 0; i < 4; i++) {
         periodicStatusUpdater.run();
     }
-    assert.deepEqual(sent, [...ALL, MSP_CODES.MSP_SENSOR_STATUS, ...ALL, MSP_CODES.MSP_SENSOR_STATUS]);
+    assert.deepEqual(sent, [...TUNNEL, MSP_CODES.MSP_SENSOR_STATUS, ...TUNNEL, MSP_CODES.MSP_SENSOR_STATUS]);
 
     // A session that ended after a full run starts the next one with a full run again.
     periodicStatusUpdater.run();
     periodicStatusUpdater.resetTunnelCycle();
     sent.length = 0;
     periodicStatusUpdater.run();
-    assert.deepEqual(sent, ALL);
+    assert.deepEqual(sent, TUNNEL);
     configurator.mavlinkTunnelActive = false;
     configurator.mavlinkTelemetryFeed = false;
 });
 
-test('tunnel with the feed off (A/B): phase 1 behaviour, all four every 1000 ms', () => {
+test('tunnel with the feed off (A/B): one run every 1000 ms, no ACTIVEBOXES', () => {
     configurator.mavlinkTunnelActive = true;
     configurator.mavlinkTelemetryFeed = false;
     periodicStatusUpdater.resetTunnelCycle();
@@ -74,6 +76,6 @@ test('tunnel with the feed off (A/B): phase 1 behaviour, all four every 1000 ms'
     for (let i = 0; i < 3; i++) {
         periodicStatusUpdater.run();
     }
-    assert.deepEqual(sent, [...ALL, ...ALL, ...ALL]);
+    assert.deepEqual(sent, [...TUNNEL, ...TUNNEL, ...TUNNEL]);
     configurator.mavlinkTunnelActive = false;
 });

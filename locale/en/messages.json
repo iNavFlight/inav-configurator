@@ -731,6 +731,36 @@
     "mavlinkTelemetryNoAck": {
         "message": "MAVLink telemetry: no ack, MSP polling stays"
     },
+    "mavlinkTunnelRebootWaiting": {
+        "message": "MSP over MAVLink: reboot accepted, waiting for the flight controller to restart"
+    },
+    "mavlinkTunnelRebootReplyLost": {
+        "message": "MSP over MAVLink: no reply to the reboot request, checking whether the flight controller restarted"
+    },
+    "mavlinkTunnelRebootResend": {
+        "message": "MSP over MAVLink: the reboot request did not arrive, sending it once more"
+    },
+    "mavlinkTunnelRebootSilent": {
+        "message": "MSP over MAVLink: flight controller went silent"
+    },
+    "mavlinkTunnelRebootUptime": {
+        "message": "MSP over MAVLink: flight controller uptime $1 s, reboot requested $2 s ago"
+    },
+    "mavlinkTunnelRebootUptimeUnavailable": {
+        "message": "MSP over MAVLink: flight controller uptime could not be read, going by its silence alone"
+    },
+    "mavlinkTunnelRebootAlreadyRunning": {
+        "message": "MSP over MAVLink: a reboot is already being confirmed, the second reboot request was not sent"
+    },
+    "mavlinkTunnelRebootBack": {
+        "message": "MSP over MAVLink: flight controller is back after the reboot, reconnecting"
+    },
+    "mavlinkTunnelRebootNotRebooted": {
+        "message": "<span style=\"color: red\">The flight controller did not reboot</span> (it may be armed). The connection stays open; changes that need a reboot are not active until you reboot or power-cycle it."
+    },
+    "mavlinkTunnelRebootNotBack": {
+        "message": "<span style=\"color: red\">The flight controller did not come back after the reboot.</span> Reconnect manually."
+    },
     "firmwareVersion": {
         "message": "Firmware Version: <strong>$1</strong>"
     },
@@ -6394,6 +6424,9 @@
     },
     "mspTunnelReplyLost": {
         "message": "No reply to $1 over the MAVLink tunnel. Saving the settings it carries is <span style=\"color: red\">blocked</span> until it has been read again."
+    },
+    "mspTunnelWriteLost": {
+        "message": "The FC did not confirm $1 over the MAVLink tunnel. Reload the tab to see what the FC holds, then save again."
     },
     "mspWriteBlockedAfterLostReply": {
         "message": "<span style=\"color: red\">Not saved.</span> These settings come from the flight controller's $1 response, whose reply was lost on the MAVLink tunnel, so writing them back is refused. Reopen the tab to read them again."

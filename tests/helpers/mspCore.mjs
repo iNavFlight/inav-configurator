@@ -1,7 +1,9 @@
+import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 
 import { makeHarness } from './harness.mjs';
+import { dataModule } from './dataModule.mjs';
 
 /**
  * Loads the real js/serial_queue.js and js/msp.js with only their extensionless import
@@ -46,7 +48,68 @@ export async function loadMspCore(importMetaUrl, testFileName, tmpPrefix) {
         MSPCodes: (await import(mspCodesUrl)).default,
         CONFIGURATOR: (await import(configuratorUrl)).default,
         mspDeduplicationQueue: (await import(dedupUrl)).default,
+        urls: { msp: mspUrl, mspQueue: mspQueueUrl, mspCodes: mspCodesUrl, dedup: dedupUrl },
+        rewriteAndWrite,
+        realUrl,
+        repoRoot,
     };
+}
+
+/**
+ * Loads the real js/msp/MSPHelper.js on top of loadMspCore(): MSP, MSPCodes, the queue and the
+ * dedup queue are the real ones, FC / GUI / i18n are the caller's stubs (data: module sources
+ * exporting a default), every other import is an inert stub that only has to resolve.
+ */
+export async function loadMspHelper(importMetaUrl, testFileName, tmpPrefix, { fc, gui, i18n }) {
+    const core = await loadMspCore(importMetaUrl, testFileName, tmpPrefix);
+    const wired = {
+        './../msp': core.urls.msp,
+        './MSPCodes': core.urls.mspCodes,
+        './../serial_queue': core.urls.mspQueue,
+        './mspDeduplicationQueue': core.urls.dedup,
+        './mspStatistics': core.realUrl('js/msp/mspStatistics.js'),
+        './../fc': fc,
+        './../gui': gui,
+        './../localization': i18n,
+    };
+    const source = readFileSync(join(core.repoRoot, 'js/msp/MSPHelper.js'), 'utf8');
+    const rules = [];
+    for (const [statement, clause, specifier] of source.matchAll(/^import (?:(.+) from )?'([^']+)';$/gm)) {
+        const url = wired[specifier] || inertModule(clause);
+        const replacement = clause ? `import ${clause} from '${url}';` : `import '${url}';`;
+        rules.push([new RegExp('^' + escapeRegExp(statement) + '$', 'm'), replacement, statement]);
+    }
+    const helperUrl = core.rewriteAndWrite('js/msp/MSPHelper.js', rules, 'MSPHelper-generated');
+    return { ...core, mspHelper: (await import(helperUrl)).default };
+}
+
+function inertModule(clause) {
+    const named = /\{([^}]*)\}/.exec(clause || '');
+    const exports = named ? named[1].split(',').map(name => `export const ${name.trim()} = function () {};`) : [];
+    return dataModule(['export default {};', ...exports].join('\n'));
+}
+
+function escapeRegExp(text) {
+    return text.replace(/[.*+?^${}()|[\]\\/]/g, '\\$&');
+}
+
+/**
+ * Leaves the previous test's queue, callbacks, decoder and loss records behind; tunnel mode ends
+ * up off. Run it before enabling the next test's mock timers: clearing the previous test's
+ * timers through a new mock corrupts its queue.
+ */
+export function resetMspCore({ MSP, mspQueue, mspDeduplicationQueue, CONFIGURATOR }) {
+    mspQueue.setTunnelMode(false);
+    mspQueue.flush();
+    mspDeduplicationQueue.flush();
+    MSP.callbacks_cleanup();
+    MSP.resetDecoder();
+    mspQueue.freeHardLock();
+    mspQueue.freeSoftLock();
+    mspQueue.unlock();
+    MSP.parseFailures.clear();
+    MSP.lostReplies.clear();
+    CONFIGURATOR.cliActive = false;
 }
 
 /** Framed MSP v2 reply ($X>) as the FC's msp_serial.c builds it. */

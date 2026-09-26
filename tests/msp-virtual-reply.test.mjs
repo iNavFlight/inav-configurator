@@ -27,7 +27,7 @@ import {
     mspCodeOfFrame,
 } from '../js/mavlink/mavlinkTelemetryFeed.js';
 import { COMMAND_SPACING_MS } from '../js/mavlink/mavlinkStreamControl.js';
-import { loadMspCore } from './helpers/mspCore.mjs';
+import { loadMspCore, resetMspCore } from './helpers/mspCore.mjs';
 
 const { MSP, mspQueue, MSPCodes, CONFIGURATOR, mspDeduplicationQueue } =
     await loadMspCore(import.meta.url, 'msp-virtual-reply.test.mjs', 'msp-virtual-reply-');
@@ -90,15 +90,7 @@ function startSession(t, { withFeed = true } = {}) {
     // The previous feed's timers were mock timers and ended with its test.
     feed = null;
     MSP.virtualReplies = null;
-    mspQueue.setTunnelMode(false);
-    mspQueue.flush();
-    mspDeduplicationQueue.flush();
-    MSP.callbacks_cleanup();
-    MSP.resetDecoder();
-    mspQueue.freeHardLock();
-    mspQueue.freeSoftLock();
-    MSP.lostReplies.clear();
-    CONFIGURATOR.cliActive = false;
+    resetMspCore({ MSP, mspQueue, mspDeduplicationQueue, CONFIGURATOR });
     wire.length = 0;
     logs.length = 0;
 

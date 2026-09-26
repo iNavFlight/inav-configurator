@@ -129,7 +129,10 @@ const TUNNEL_STATUS_INTERVAL_MS = 1000;
                 return;
             }
             MSP.send_message(MSPCodes.MSPV2_INAV_STATUS, false, false);
-            MSP.send_message(MSPCodes.MSP_ACTIVEBOXES, false, false);
+            // MSPV2_INAV_STATUS carries the same box bitmask; a tunnel request per poll is not free.
+            if (!CONFIGURATOR.mavlinkTunnelActive) {
+                MSP.send_message(MSPCodes.MSP_ACTIVEBOXES, false, false);
+            }
             MSP.send_message(MSPCodes.MSPV2_INAV_ANALOG, false, false);
             
 

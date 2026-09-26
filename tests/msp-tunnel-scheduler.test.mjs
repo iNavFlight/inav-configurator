@@ -16,7 +16,7 @@ import { MavlinkParser } from '../js/mavlink/mavlinkParser.js';
 import { MavlinkLink } from '../js/mavlink/mavlinkLink.js';
 import { MAVLINK_MSG_ID, encodeFrameV2, concatFrames } from '../js/mavlink/mavlinkProtocol.js';
 import { buildTunnelPayload } from '../js/mavlink/mavlinkTunnel.js';
-import { loadMspCore, mspV2Reply } from './helpers/mspCore.mjs';
+import { loadMspCore, mspV2Reply, resetMspCore } from './helpers/mspCore.mjs';
 
 const { MSP, mspQueue, MSPCodes, CONFIGURATOR, mspDeduplicationQueue } =
     await loadMspCore(import.meta.url, 'msp-tunnel-scheduler.test.mjs', 'msp-tunnel-scheduler-');
@@ -81,19 +81,8 @@ const link = new MavlinkLink({
 link.lockTarget(1, 1);
 
 function startTunnelSession(t) {
-    // Clean up before mocking: clearing the previous test's mock timers through a new mock corrupts its queue.
-    mspQueue.setTunnelMode(false);
-    mspQueue.flush();
-    mspDeduplicationQueue.flush();
-    MSP.callbacks_cleanup();
-    MSP.resetDecoder();
-    mspQueue.freeHardLock();
-    mspQueue.freeSoftLock();
-    mspQueue.unlock();
-    MSP.parseFailures.clear();
-    MSP.lostReplies.clear();
+    resetMspCore({ MSP, mspQueue, mspDeduplicationQueue, CONFIGURATOR });
     CONFIGURATOR.connectionValid = false;
-    CONFIGURATOR.cliActive = false;
     sent.length = 0;
     processed.length = 0;
     fcResponder = null;
@@ -591,7 +580,7 @@ test('a lost read blocks the write that hands it back until it has been read aga
     }
 });
 
-test('a lost write never calls back, so a save chain cannot go on to EEPROM write and reboot', (t) => {
+test('a lost write gets no callback, so its save chain stops before EEPROM write and reboot (message: msp-tunnel-write-lost)', (t) => {
     startTunnelSession(t);
     const results = [];
     assert.equal(MSP.send_message(MSPCodes.MSP2_SET_PID, [1, 2, 3], false, (response) => results.push(response)), true);

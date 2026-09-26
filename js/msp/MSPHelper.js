@@ -16,6 +16,8 @@ import mspQueue from './../serial_queue';
 // keeps the parse and the build path from drifting apart.
 const MZTC_CONFIG_BYTES = 11;
 const MZTC_STATUS_BYTES = 7;
+// cycleTime, i2c errors, sensor status, cpu load (u16 each), profile byte, arming flags (u32).
+const INAV_STATUS_BOX_MODES_OFFSET = 13;
 import ServoMixRule from './../servoMixRule';
 import MotorMixRule from './../motorMixRule';
 import LogicCondition from './../logicCondition';
@@ -50,6 +52,9 @@ var mspHelper = (function () {
     self.setSensorStatusEx = function (cb)  {
         self.sensorStatusEx = cb;
     }
+
+    // Set by serial_backend: undoes what a stalled save chain leaves paused.
+    self.onWriteLostRecovery = null;
 
     self.BAUD_RATES_post1_6_3 = [
         'AUTO',
@@ -91,6 +96,12 @@ var mspHelper = (function () {
         MSP.onResponseLost = function (code) {
             GUI.log(i18n.getMessage('mspTunnelReplyLost', [MSP.getCodeName(code)]));
         };
+        MSP.onWriteLost = function (code) {
+            GUI.log(i18n.getMessage('mspTunnelWriteLost', [MSP.getCodeName(code)]));
+            if (self.onWriteLostRecovery) {
+                self.onWriteLostRecovery(code);
+            }
+        };
     }
 
     /**
@@ -113,6 +124,20 @@ var mspHelper = (function () {
 
         completeRequest(dataHandler, new DataView(dataHandler.message_buffer, 0));
     };
+
+    // Same boxBitmask_t as MSP_ACTIVEBOXES (fc_msp.c:547-552), between the arming flags and the
+    // trailing mixer profile byte (fc_msp.c:579-598), so a tunnel session can skip ACTIVEBOXES.
+    function applyInavStatusBoxModes(data, length) {
+        const words = Math.floor((length - INAV_STATUS_BOX_MODES_OFFSET - 1) / 4);
+        if (words <= 0) {
+            return;
+        }
+        const mode = [];
+        for (let i = 0; i < words; i++) {
+            mode.push(data.getUint32(INAV_STATUS_BOX_MODES_OFFSET + i * 4, true));
+        }
+        FC.CONFIG.mode = mode;
+    }
 
     /**
      *
@@ -157,6 +182,7 @@ var mspHelper = (function () {
 
                 FC.CONFIG.armingFlags = data.getUint32(offset, true);
                 offset += 4;
+                applyInavStatusBoxModes(data, dataHandler.message_length_expected);
 
                 //As there are 8 bytes for mspBoxModeFlags (number of bytes is actually variable)
                 //read mixer profile as the last byte in the the message
@@ -819,6 +845,10 @@ var mspHelper = (function () {
 
             case MSPCodes.MSP_SET_REBOOT:
                 console.log('Reboot request accepted');
+                break;
+
+            case MSPCodes.MSP2_INAV_MISC2:
+                // Read from the reply by the tunnel reboot monitor (FC uptime).
                 break;
 
             //

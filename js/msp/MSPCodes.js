@@ -218,6 +218,7 @@ var MSPCodes = {
     
     MSP2_INAV_SAFEHOME:                 0x2038,
     MSP2_INAV_SET_SAFEHOME:             0x2039,
+    MSP2_INAV_MISC2:                    0x203A,
     
     MSP2_INAV_LOGIC_CONDITIONS_SINGLE:      0x203B,
     MSP2_INAV_LOGIC_CONDITIONS_CONFIGURED:  0x203C,
