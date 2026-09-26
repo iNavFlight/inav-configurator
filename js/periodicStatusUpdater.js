@@ -6,12 +6,17 @@ import CONFIGURATOR from './data_storage';
 import MSP from './msp';
 import MSPCodes from './msp/MSPCodes';
 
+// The FC's isMspConfigActive() lapses 1000 ms after the last MSP_SENSOR_STATUS, so a telemetry-fed tunnel polls it at 2 Hz.
+const TUNNEL_SENSOR_STATUS_INTERVAL_MS = 500;
+const TUNNEL_STATUS_INTERVAL_MS = 1000;
+
  var periodicStatusUpdater = (function () {
 
     var publicScope = {},
         privateScope = {};
 
     var stoppped = false;
+    var tunnelRunCount = 0;
 
     /**
      *
@@ -21,7 +26,8 @@ import MSPCodes from './msp/MSPCodes';
     publicScope.getUpdateInterval = function (baudSpeed) {
 
         if (CONFIGURATOR.mavlinkTunnelActive) {
-            return 1000;
+            // phase-2 A/B: without the telemetry feed the tunnel keeps phase 1's single 1 Hz run.
+            return CONFIGURATOR.mavlinkTelemetryFeed ? TUNNEL_SENSOR_STATUS_INTERVAL_MS : TUNNEL_STATUS_INTERVAL_MS;
         }
 
         if (!baudSpeed) {
@@ -41,7 +47,7 @@ import MSPCodes from './msp/MSPCodes';
 
     privateScope.updateView = function () {
 
-        var active = ((Date.now() - MSP.analog_last_received_timestamp) < publicScope.getUpdateInterval(CONFIGURATOR.connection.bitrate) * 3);
+        var active = ((Date.now() - MSP.analog_last_received_timestamp) < privateScope.analogFreshWindowMs());
 
         if (FC.isModeEnabled('ARM')) {
             $("#armedIcon").removeClass('armed');
@@ -91,6 +97,21 @@ import MSPCodes from './msp/MSPCodes';
         $('#quad-status_wrapper').show();
     };
 
+    privateScope.analogFreshWindowMs = function () {
+        const interval = CONFIGURATOR.mavlinkTunnelActive ? TUNNEL_STATUS_INTERVAL_MS : publicScope.getUpdateInterval(CONFIGURATOR.connection.bitrate);
+        return interval * 3;
+    };
+
+    // Only every second tunnel run polls the rest, which keeps them at 1 Hz.
+    privateScope.skipSlowStatus = function () {
+        // phase-2 A/B: gated on the feed flag.
+        if (!CONFIGURATOR.mavlinkTunnelActive || !CONFIGURATOR.mavlinkTelemetryFeed) {
+            return false;
+        }
+        tunnelRunCount = (tunnelRunCount + 1) % (TUNNEL_STATUS_INTERVAL_MS / TUNNEL_SENSOR_STATUS_INTERVAL_MS);
+        return tunnelRunCount !== 1;
+    };
+
     publicScope.run = function () {
 
         if (!CONFIGURATOR.connectionValid) {
@@ -104,6 +125,9 @@ import MSPCodes from './msp/MSPCodes';
         if (!stoppped && !CONFIGURATOR.cliActive) {
 
             MSP.send_message(MSPCodes.MSP_SENSOR_STATUS, false, false);
+            if (privateScope.skipSlowStatus()) {
+                return;
+            }
             MSP.send_message(MSPCodes.MSPV2_INAV_STATUS, false, false);
             MSP.send_message(MSPCodes.MSP_ACTIVEBOXES, false, false);
             MSP.send_message(MSPCodes.MSPV2_INAV_ANALOG, false, false);
@@ -111,6 +135,11 @@ import MSPCodes from './msp/MSPCodes';
 
             privateScope.updateView();
         }
+    };
+
+    // A new session starts with a full run.
+    publicScope.resetTunnelCycle = function () {
+        tunnelRunCount = 0;
     };
 
     publicScope.stop = function() {

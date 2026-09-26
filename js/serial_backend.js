@@ -32,6 +32,7 @@ import cliTab from '../tabs/cli';
 import javascriptProgrammingTab from '../tabs/javascript_programming';
 import { MavlinkLink } from './mavlink/mavlinkLink';
 import { concatFrames } from './mavlink/mavlinkProtocol';
+import { MavlinkTelemetryFeed, isTelemetryFeedEnabled, mspCodeOfFrame } from './mavlink/mavlinkTelemetryFeed';
 
 // Probe attempts on top of the first one: a weak radio link may lose the first request.
 const MAVLINK_TUNNEL_PROBE_RETRIES = 2;
@@ -54,8 +55,10 @@ var SerialBackend = (function () {
     privateScope.mavlinkLink = new MavlinkLink({
         onHeartbeat: frame => privateScope.onMavlinkHeartbeat(frame),
         onTunnelChunk: bytes => privateScope.onTunnelChunk(bytes),
+        onMessage: frame => privateScope.onMavlinkMessage(frame),
         onReassemblyTimeout: () => MSP.resetDecoder(),
     });
+    privateScope.telemetryFeed = null;
 
     // Latched per connection; tunnel decisions never read the DOM.
     privateScope.newMavlinkSession = function () {
@@ -318,7 +321,9 @@ var SerialBackend = (function () {
                             mspQueue.freeSoftLock();
                             mspDeduplicationQueue.flush();
 
-                            CONFIGURATOR.connection.disconnect(privateScope.onClosed);
+                            const connection = CONFIGURATOR.connection;
+                            // The port closes once the FC got its stream defaults back (bounded, see RESTORE_DEADLINE_MS).
+                            privateScope.stopTelemetryFeed(true, () => connection.disconnect(privateScope.onClosed));
                             MSP.disconnect_cleanup();
                             privateScope.ltmProtocolGate.reset();
                             privateScope.endMavlinkSession();
@@ -381,6 +386,7 @@ var SerialBackend = (function () {
                 CONFIGURATOR.connectionValid = true;
                 GUI.allowedTabs = privateScope.connectedTabs();
                 privateScope.showLinkType(CONFIGURATOR.mavlinkTunnelActive);
+                privateScope.startTelemetryFeed();
                 privateScope.onConnect();
 
                 defaultsDialog.init().then( () => {
@@ -681,7 +687,7 @@ var SerialBackend = (function () {
 
         mspQueue.setTunnelMode(true);
         mspQueue.setTransportTransform(
-            body => concatFrames(link.wrapMsp(body)).buffer,
+            body => privateScope.wrapForTunnel(body),
             () => link.resetReassembly()
         );
         // Own timer: tab switches kill every named interval outside their keep-lists.
@@ -691,6 +697,64 @@ var SerialBackend = (function () {
 
         MSP.protocolVersion = MSP.constants.PROTOCOL_V2;
         MSP.sendWithTunnelRetries(MSPCodes.MSP_API_VERSION, false, privateScope.onApiVersion, MAVLINK_TUNNEL_PROBE_RETRIES);
+    };
+
+    privateScope.wrapForTunnel = function (body) {
+        // phase-2 A/B: wire counter.
+        if (privateScope.telemetryFeed) {
+            privateScope.telemetryFeed.noteWire(mspCodeOfFrame(body));
+        }
+        return concatFrames(privateScope.mavlinkLink.wrapMsp(body)).buffer;
+    };
+
+    privateScope.onMavlinkMessage = function (frame) {
+        if (privateScope.telemetryFeed) {
+            privateScope.telemetryFeed.handleFrame(frame);
+        }
+    };
+
+    privateScope.startTelemetryFeed = function () {
+        // phase-2 A/B: read once per connect; false keeps the whole session on phase-1 behaviour.
+        CONFIGURATOR.mavlinkTelemetryFeed = CONFIGURATOR.mavlinkTunnelActive && isTelemetryFeedEnabled(store);
+        periodicStatusUpdater.resetTunnelCycle();
+        if (!CONFIGURATOR.mavlinkTelemetryFeed) {
+            return;
+        }
+        privateScope.telemetryFeed = new MavlinkTelemetryFeed({
+            link: privateScope.mavlinkLink,
+            send: (data, callback) => CONFIGURATOR.connection.send(data, callback),
+            roundTripMs: () => mspQueue.getRoundtrip(),
+            fc: FC,
+            msp: MSP,
+            onSensorStatus: status => privateScope.sensor_status_ex(status),
+            onStreamsReady: privateScope.onTelemetryStreamsReady,
+            onFirstVirtual: () => privateScope.showLinkType(true, true),
+        });
+        MSP.virtualReplies = privateScope.telemetryFeed;
+        privateScope.telemetryFeed.start();
+    };
+
+    // restore: the port is still open, so the FC gets its stream defaults back. done() always runs once.
+    privateScope.stopTelemetryFeed = function (restore, done = null) {
+        const feed = privateScope.telemetryFeed;
+        privateScope.telemetryFeed = null;
+        MSP.virtualReplies = null;
+        if (!feed) {
+            if (done) {
+                done();
+            }
+            return;
+        }
+        const portOpen = Boolean(CONFIGURATOR.connection) && CONFIGURATOR.connection.hasConnectionId();
+        feed.stop(restore && portOpen, done);
+    };
+
+    privateScope.onTelemetryStreamsReady = function (accepted) {
+        if (accepted > 0) {
+            GUI.log(i18n.getMessage('mavlinkTelemetryStreamsActive', [accepted]));
+        } else {
+            GUI.log(i18n.getMessage('mavlinkTelemetryNoAck'));
+        }
     };
 
     privateScope.onTunnelChunk = function (bytes) {
@@ -704,8 +768,11 @@ var SerialBackend = (function () {
         }
     };
 
-    privateScope.showLinkType = function (tunnel) {
-        const key = tunnel ? 'linkTypeMavlinkTunnel' : 'linkTypeMsp';
+    privateScope.showLinkType = function (tunnel, telemetry = false) {
+        let key = tunnel ? 'linkTypeMavlinkTunnel' : 'linkTypeMsp';
+        if (telemetry) {
+            key = 'linkTypeMavlinkTunnelTelemetry';
+        }
         $('#link-type').attr('data-i18n', key).data('i18n', key).text(i18n.getMessage(key));
     };
 
@@ -715,6 +782,8 @@ var SerialBackend = (function () {
 
     // Also runs before every connect, so the firmware flasher and the next session start clean.
     privateScope.endMavlinkSession = function () {
+        privateScope.stopTelemetryFeed(false);
+        CONFIGURATOR.mavlinkTelemetryFeed = false;
         clearInterval(privateScope.gcsHeartbeatTimer);
         privateScope.gcsHeartbeatTimer = null;
         privateScope.mavlinkLink.reset();

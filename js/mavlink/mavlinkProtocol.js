@@ -18,6 +18,7 @@ export const MAVLINK_MSG_ID = Object.freeze({
     GLOBAL_POSITION_INT: 33,
     RC_CHANNELS: 65,
     VFR_HUD: 74,
+    COMMAND_LONG: 76,
     COMMAND_ACK: 77,
     BATTERY_STATUS: 147,
     AUTOPILOT_VERSION: 148,
@@ -37,6 +38,7 @@ const MESSAGE_INFO = new Map([
     [MAVLINK_MSG_ID.GLOBAL_POSITION_INT, { crcExtra: 104, length: 28, minLength: 28 }],
     [MAVLINK_MSG_ID.RC_CHANNELS, { crcExtra: 118, length: 42, minLength: 42 }],
     [MAVLINK_MSG_ID.VFR_HUD, { crcExtra: 20, length: 20, minLength: 20 }],
+    [MAVLINK_MSG_ID.COMMAND_LONG, { crcExtra: 152, length: 33, minLength: 33 }],
     [MAVLINK_MSG_ID.COMMAND_ACK, { crcExtra: 143, length: 10, minLength: 3 }],
     [MAVLINK_MSG_ID.BATTERY_STATUS, { crcExtra: 154, length: 54, minLength: 36 }],
     [MAVLINK_MSG_ID.AUTOPILOT_VERSION, { crcExtra: 178, length: 78, minLength: 60 }],
@@ -49,6 +51,8 @@ export const MAV_TYPE_GCS = 6;
 export const MAV_AUTOPILOT_INVALID = 8;
 export const MAV_STATE_ACTIVE = 4;
 export const MAVLINK_PROTOCOL_VERSION = 3;
+export const MAV_CMD_SET_MESSAGE_INTERVAL = 511;
+export const MAV_RESULT_ACCEPTED = 0;
 
 export function getMessageInfo(msgid) {
     return MESSAGE_INFO.get(msgid);
@@ -113,6 +117,27 @@ export function encodeGcsHeartbeatPayload() {
     payload[7] = MAV_STATE_ACTIVE;
     payload[8] = MAVLINK_PROTOCOL_VERSION;
     return payload;
+}
+
+export function encodeCommandLongPayload(command, target, params, confirmation = 0) {
+    const payload = new Uint8Array(getMessageInfo(MAVLINK_MSG_ID.COMMAND_LONG).length);
+    const view = new DataView(payload.buffer);
+    params.forEach((value, index) => view.setFloat32(index * 4, value, true));
+    view.setUint16(28, command, true);
+    payload[30] = target.sysid;
+    payload[31] = target.compid;
+    payload[32] = confirmation;
+    return payload;
+}
+
+export function decodeCommandAck(payload) {
+    const view = new DataView(payload.buffer, payload.byteOffset, payload.byteLength);
+    return {
+        command: view.getUint16(0, true),
+        result: payload[2],
+        targetSystem: payload[8],
+        targetComponent: payload[9],
+    };
 }
 
 export function heartbeatType(payload) {

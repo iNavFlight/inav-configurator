@@ -716,6 +716,15 @@
     "linkTypeMavlinkTunnel": {
         "message": "Link: MSP over MAVLink"
     },
+    "linkTypeMavlinkTunnelTelemetry": {
+        "message": "Link: MSP over MAVLink +telemetry"
+    },
+    "mavlinkTelemetryStreamsActive": {
+        "message": "MAVLink telemetry: $1 streams active"
+    },
+    "mavlinkTelemetryNoAck": {
+        "message": "MAVLink telemetry: no ack, MSP polling stays"
+    },
     "firmwareVersion": {
         "message": "Firmware Version: <strong>$1</strong>"
     },

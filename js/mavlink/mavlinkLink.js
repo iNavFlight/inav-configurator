@@ -6,6 +6,7 @@ import {
     MAV_TYPE_GCS,
     encodeFrameV2,
     encodeGcsHeartbeatPayload,
+    encodeCommandLongPayload,
     heartbeatType,
 } from './mavlinkProtocol.js';
 import {
@@ -68,6 +69,14 @@ export class MavlinkLink {
 
     heartbeatFrame() {
         return encodeFrameV2(MAVLINK_MSG_ID.HEARTBEAT, encodeGcsHeartbeatPayload(), GCS_SYSTEM_ID, GCS_COMPONENT_ID, this._nextSeq());
+    }
+
+    commandLongFrame(command, params) {
+        if (!this._target) {
+            throw new Error('MAVLink command target is not locked');
+        }
+        const payload = encodeCommandLongPayload(command, this._target, params);
+        return encodeFrameV2(MAVLINK_MSG_ID.COMMAND_LONG, payload, GCS_SYSTEM_ID, GCS_COMPONENT_ID, this._nextSeq());
     }
 
     _nextSeq() {

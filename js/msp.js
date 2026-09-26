@@ -158,6 +158,9 @@ var MSP = {
     // setting name). Unlike parse failures an entry clears when that same read succeeds again.
     lostReplies: new Map(),
 
+    // MAVLink telemetry feed of a tunnel session: answers covered reads without the wire.
+    virtualReplies: null,
+
     // Set by MSPHelper; injected because gui.js already imports this module.
     onConfigWriteBlocked: null,
     onResponseLost: null,
@@ -407,6 +410,12 @@ var MSP = {
         }
     },
 
+    _noteWireReply(request) {
+        if (request && this.virtualReplies) {
+            this.virtualReplies.noteWireReply(request.code);
+        }
+    },
+
     _initialize_read_buffer() {
         this.message_buffer = new ArrayBuffer(this.message_length_expected);
         this.message_buffer_uint8_view = new Uint8Array(this.message_buffer);
@@ -422,6 +431,7 @@ var MSP = {
                     // A parse failure keeps the code blocked through parseFailures instead.
                     if (!this.unsupported) {
                         this._clearLostReply(mspQueue.lastAnsweredRequest());
+                        this._noteWireReply(mspQueue.lastAnsweredRequest());
                     }
                 }
                 this.lastFrameReceivedMs = Date.now();
@@ -470,6 +480,11 @@ var MSP = {
         // would run the EEPROM write and reboot as if the settings had been stored.
         if (this.refuseBlockedWrite(code)) {
             return false;
+        }
+
+        if (this.virtualReplies && this.virtualReplies.serve(code, data, callback_sent, callback_msp)) {
+            eventFrequencyAnalyzer.put('MPS virtual ' + code);
+            return true;
         }
 
         var payloadLength = data && data.length ? data.length : 0;
@@ -618,6 +633,9 @@ var MSP = {
     },
     callbacks_cleanup() {
         mspQueue.abandonPending();
+        if (this.virtualReplies) {
+            this.virtualReplies.cancelPending();
+        }
         for (var i = 0; i < this.callbacks.length; i++) {
             clearInterval(this.callbacks[i].timer);
         }
