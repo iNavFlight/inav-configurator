@@ -32,6 +32,11 @@ var FC = {
     RC_tuning: null,
     AUX_CONFIG: [],
     AUX_CONFIG_IDS: [],
+    // Raw MSP_BOXIDS order, unfiltered by whether the configurator recognizes each id.
+    // Firmware's packBoxModeFlags() sets CONFIG.mode bit i for the i-th entry of this
+    // same delivery order (fc_msp_box.c activeBoxIds[]), so this array - not the
+    // filtered AUX_CONFIG_IDS above - is what bit positions must be resolved against.
+    AUX_CONFIG_IDS_RAW: [],
     MODE_RANGES: null,
     ADJUSTMENT_RANGES: null,
     SERVO_CONFIG: null,
@@ -106,6 +111,15 @@ var FC = {
         return true; // Currently all platforms use D term
     },
     resetState: function () {
+        // Bit positions are only valid for the connection that reported them (see
+        // AUX_CONFIG_IDS_RAW above). Clear them on every reset so a dropped/timed-out
+        // MSP_BOXIDS on reconnect can't leave getModeId() resolving against a stale
+        // controller's box layout instead of failing safely until generateAuxConfig()
+        // runs again for the new connection.
+        this.AUX_CONFIG = [];
+        this.AUX_CONFIG_IDS = [];
+        this.AUX_CONFIG_IDS_RAW = [];
+
         this.SENSOR_STATUS = {
             isHardwareHealthy: 0,
             gyroHwStatus: 0,
@@ -207,6 +221,7 @@ var FC = {
             // tabs/auxiliary.js pairs them by position, so an unrecognized id must be
             // dropped from both, not just from the name list.
             const ids = this.AUX_CONFIG_IDS;
+            this.AUX_CONFIG_IDS_RAW = ids.slice();
             this.AUX_CONFIG = [];
             this.AUX_CONFIG_IDS = [];
             for ( let i = 0; i < ids.length; i++ ) {
@@ -984,18 +999,25 @@ var FC = {
         return this.getServoMixInputNames()[input];
     },
     getModeId: function (name) {
-
-        for (var i = 0; i < FC.AUX_CONFIG.length; i++) {
-            if (FC.AUX_CONFIG[i] == name)
-                return i;
+        // Resolve via permanentId against the raw, unfiltered box order so the
+        // returned index matches the firmware's actual CONFIG.mode bit position
+        // (see AUX_CONFIG_IDS_RAW above) rather than a position in the filtered
+        // display list, which shifts whenever an unrecognized mode precedes it.
+        const mode = FLIGHT_MODES.find((m) => m.boxName === name);
+        if (!mode) {
+            return -1;
         }
-        return -1;
+        return FC.AUX_CONFIG_IDS_RAW.indexOf(mode.permanentId);
     },
     isModeBitSet: function (i) {
         return BitHelper.bit_check(this.CONFIG.mode[Math.trunc(i / 32)], i % 32);
     },
     isModeEnabled: function (name) {
-        return this.isModeBitSet(this.getModeId(name));
+        const modeId = this.getModeId(name);
+        if (modeId < 0) {
+            return false;
+        }
+        return this.isModeBitSet(modeId);
     },
     getBatteryProfileParameters: function () {
         return [

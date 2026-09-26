@@ -39,8 +39,9 @@ import assert from 'node:assert/strict';
 import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, dirname, resolve } from 'node:path';
-import { fileURLToPath, pathToFileURL } from 'node:url';
+import { fileURLToPath } from 'node:url';
 import { makeRewriteAndWrite } from './helpers/rewriteAndWrite.mjs';
+import { buildCommonFcImportRules, mockBitHelperUrl } from './helpers/fcModuleLoader.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const repoRoot = resolve(__dirname, '..');
@@ -48,61 +49,14 @@ const repoRoot = resolve(__dirname, '..');
 const tmpDir = mkdtempSync(join(tmpdir(), 'fc-generate-aux-config-'));
 process.on('exit', () => rmSync(tmpDir, { recursive: true, force: true }));
 
-function dataModule(code) {
-    // encodeURIComponent leaves ' ( ) ! * unescaped; the generated specifiers are
-    // embedded in single-quoted string literals, so escape those too.
-    const encoded = encodeURIComponent(code).replace(/['()!*]/g, (c) => '%' + c.charCodeAt(0).toString(16).toUpperCase());
-    return 'data:text/javascript,' + encoded;
-}
-
-// Trivial no-arg-constructible stand-ins for the collection/model classes
-// FC.resetState() instantiates. generateAuxConfig() never reads from these,
-// so their internal behavior is irrelevant - they only need to exist and be
-// `new`-able so resetState() (which is where generateAuxConfig itself is
-// defined, as `this.generateAuxConfig = function () {...}`) can run.
-const mockClassUrl = dataModule(`
-    class MockCollection {}
-    export default MockCollection;
-`);
-
-const mockModelUrl = dataModule(`
-    export const PLATFORM = { AIRPLANE: 0, MULTIROTOR: 1, TRICOPTER: 2 };
-`);
-
-const mockVtxUrl = dataModule(`
-    const VTX = { DEV_UNKNOWN: 0xFF };
-    export default VTX;
-`);
-
-const mockBitHelperUrl = dataModule(`
-    const BitHelper = { bit_check: () => false };
-    export default BitHelper;
-`);
-
-// The real, unmodified flightModes.js - this file has no imports of its own,
-// so it can be loaded directly off disk with no rewriting.
-const realFlightModesUrl = pathToFileURL(join(repoRoot, 'js/flightModes.js')).href;
-
 const rewriteAndWrite = makeRewriteAndWrite(repoRoot, tmpDir, 'fc-generate-aux-config.test.mjs');
 
-const realFcUrl = rewriteAndWrite('js/fc.js', [
-    [/^import ServoMixerRuleCollection from '\.\/servoMixerRuleCollection';$/m, `import ServoMixerRuleCollection from '${mockClassUrl}';`, "import ServoMixerRuleCollection"],
-    [/^import MotorMixerRuleCollection from '\.\/motorMixerRuleCollection';$/m, `import MotorMixerRuleCollection from '${mockClassUrl}';`, "import MotorMixerRuleCollection"],
-    [/^import LogicConditionsCollection from '\.\/logicConditionsCollection';$/m, `import LogicConditionsCollection from '${mockClassUrl}';`, "import LogicConditionsCollection"],
-    [/^import LogicConditionsStatus from '\.\/logicConditionsStatus';$/m, `import LogicConditionsStatus from '${mockClassUrl}';`, "import LogicConditionsStatus"],
-    [/^import GlobalVariablesStatus from '\.\/globalVariablesStatus';$/m, `import GlobalVariablesStatus from '${mockClassUrl}';`, "import GlobalVariablesStatus"],
-    [/^import ProgrammingPidCollection from '\.\/programmingPidCollection';$/m, `import ProgrammingPidCollection from '${mockClassUrl}';`, "import ProgrammingPidCollection"],
-    [/^import ProgrammingPidStatus from '\.\/programmingPidStatus';$/m, `import ProgrammingPidStatus from '${mockClassUrl}';`, "import ProgrammingPidStatus"],
-    [/^import WaypointCollection from '\.\/waypointCollection';$/m, `import WaypointCollection from '${mockClassUrl}';`, "import WaypointCollection"],
-    [/^import OutputMappingCollection from '\.\/outputMapping';$/m, `import OutputMappingCollection from '${mockClassUrl}';`, "import OutputMappingCollection"],
-    [/^import SafehomeCollection from '\.\/safehomeCollection';$/m, `import SafehomeCollection from '${mockClassUrl}';`, "import SafehomeCollection"],
-    [/^import FwApproachCollection from '\.\/fwApproachCollection';$/m, `import FwApproachCollection from '${mockClassUrl}';`, "import FwApproachCollection"],
-    [/^import GeozoneCollection from '\.\/geozoneCollection';$/m, `import GeozoneCollection from '${mockClassUrl}';`, "import GeozoneCollection"],
-    [/^import \{ PLATFORM \} from '\.\/model';$/m, `import { PLATFORM } from '${mockModelUrl}';`, "import PLATFORM"],
-    [/^import VTX from '\.\/vtx';$/m, `import VTX from '${mockVtxUrl}';`, "import VTX"],
-    [/^import BitHelper from '\.\/bitHelper';$/m, `import BitHelper from '${mockBitHelperUrl}';`, "import BitHelper"],
-    [/^import \{ FLIGHT_MODES \} from '\.\/flightModes';$/m, `import { FLIGHT_MODES } from '${realFlightModesUrl}';`, "import FLIGHT_MODES"],
-], 'fc-generated');
+// BitHelper is stubbed here (rather than the real js/bitHelper.js) because
+// these tests never assert on CONFIG.mode bit arithmetic - only on
+// AUX_CONFIG/AUX_CONFIG_IDS array shape and alignment.
+const { realFlightModesUrl, commonImportRules } = buildCommonFcImportRules(repoRoot, { bitHelperUrl: mockBitHelperUrl });
+
+const realFcUrl = rewriteAndWrite('js/fc.js', commonImportRules, 'fc-generated');
 
 const { default: FC } = await import(realFcUrl);
 
