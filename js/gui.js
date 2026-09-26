@@ -52,6 +52,8 @@ var GUI_control = function () {
         'ez_tune',
         'search'
     ];
+    // CLI is not carried by the MSP tunnel; the sensors tab polls faster than the tunnel can answer.
+    this.tabsUnavailableOverMavlinkTunnel = ['cli', 'sensors'];
     this.allowedTabs = this.defaultAllowedTabsWhenDisconnected;
 
     this.PROFILES_CHANGED = {

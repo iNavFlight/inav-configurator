@@ -30,6 +30,15 @@ import mspDeduplicationQueue from './msp/mspDeduplicationQueue';
 import store from './store';
 import cliTab from '../tabs/cli';
 import javascriptProgrammingTab from '../tabs/javascript_programming';
+import { MavlinkLink } from './mavlink/mavlinkLink';
+import { concatFrames } from './mavlink/mavlinkProtocol';
+
+// Probe attempts on top of the first one: a weak radio link may lose the first request.
+const MAVLINK_TUNNEL_PROBE_RETRIES = 2;
+const MAVLINK_GCS_HEARTBEAT_INTERVAL_MS = 1000;
+const CONNECTING_TIMEOUT_MS = 10000;
+// A port serving MSP and MAVLink answers the raw probe within this window; plain MSP wins there.
+const RAW_MSP_PRIORITY_WINDOW_MS = 500;
 
 var SerialBackend = (function () {
 
@@ -41,6 +50,19 @@ var SerialBackend = (function () {
     privateScope.isWirelessMode = false;
 
     privateScope.reopenTab = null;
+
+    privateScope.mavlinkLink = new MavlinkLink({
+        onHeartbeat: frame => privateScope.onMavlinkHeartbeat(frame),
+        onTunnelChunk: bytes => privateScope.onTunnelChunk(bytes),
+        onReassemblyTimeout: () => MSP.resetDecoder(),
+    });
+
+    // Latched per connection; tunnel decisions never read the DOM.
+    privateScope.newMavlinkSession = function () {
+        return { tunnel: false, v1HeartbeatSeen: false, pendingHeartbeat: null, rawProbeSentAt: Date.now(), foreignSystems: new Set() };
+    };
+    privateScope.mavlinkSession = privateScope.newMavlinkSession();
+    privateScope.gcsHeartbeatTimer = null;
 
     privateScope.ltmProtocolGate = createLtmProtocolGate({
         ltmDecoder,
@@ -299,6 +321,7 @@ var SerialBackend = (function () {
                             CONFIGURATOR.connection.disconnect(privateScope.onClosed);
                             MSP.disconnect_cleanup();
                             privateScope.ltmProtocolGate.reset();
+                            privateScope.endMavlinkSession();
 
                             // Reset various UI elements
                             $('span.i2c-error').text(0);
@@ -333,21 +356,31 @@ var SerialBackend = (function () {
 
     privateScope.onValidFirmware = function ()
     {
-    MSP.send_message(MSPCodes.MSP_BUILD_INFO, false, false, function () {
+    MSP.send_message(MSPCodes.MSP_BUILD_INFO, false, false, function (response) {
+        if (privateScope.isTunnelReplyLost(response, MSPCodes.MSP_BUILD_INFO)) {
+            return;
+        }
 
         GUI.log(i18n.getMessage('buildInfoReceived', [FC.CONFIG.buildInfo]));
 
-        MSP.send_message(MSPCodes.MSP_BOARD_INFO, false, false, function () {
+        MSP.send_message(MSPCodes.MSP_BOARD_INFO, false, false, function (response) {
+            if (privateScope.isTunnelReplyLost(response, MSPCodes.MSP_BOARD_INFO)) {
+                return;
+            }
 
             GUI.log(i18n.getMessage('boardInfoReceived', [FC.CONFIG.boardIdentifier, FC.CONFIG.boardVersion]));
 
-            MSP.send_message(MSPCodes.MSP_UID, false, false, function () {
+            MSP.send_message(MSPCodes.MSP_UID, false, false, function (response) {
+                if (privateScope.isTunnelReplyLost(response, MSPCodes.MSP_UID)) {
+                    return;
+                }
 
                 GUI.log(i18n.getMessage('uniqueDeviceIdReceived', [FC.CONFIG.uid[0].toString(16) + FC.CONFIG.uid[1].toString(16) + FC.CONFIG.uid[2].toString(16)]));
 
                 // continue as usually
                 CONFIGURATOR.connectionValid = true;
-                GUI.allowedTabs = GUI.defaultAllowedTabsWhenConnected.slice();
+                GUI.allowedTabs = privateScope.connectedTabs();
+                privateScope.showLinkType(CONFIGURATOR.mavlinkTunnelActive);
                 privateScope.onConnect();
 
                 defaultsDialog.init().then( () => {
@@ -368,6 +401,10 @@ var SerialBackend = (function () {
     privateScope.onInvalidFirmwareVariant = function ()
     {
         GUI.log(i18n.getMessage('firmwareVariantNotSupported'));
+        if (CONFIGURATOR.mavlinkTunnelActive) {
+            privateScope.refuseCliOverTunnel();
+            return;
+        }
         CONFIGURATOR.connectionValid = true; // making it possible to open the CLI tab
         GUI.allowedTabs = ['cli'];
         privateScope.onConnect();
@@ -377,6 +414,10 @@ var SerialBackend = (function () {
     privateScope.onInvalidFirmwareVersion = function ()
     {
         GUI.log(i18n.getMessage('firmwareVersionNotSupported', [CONFIGURATOR.minfirmwareVersionAccepted, CONFIGURATOR.maxFirmwareVersionAccepted]));
+        if (CONFIGURATOR.mavlinkTunnelActive) {
+            privateScope.refuseCliOverTunnel();
+            return;
+        }
         CONFIGURATOR.connectionValid = true; // making it possible to open the CLI tab
         GUI.allowedTabs = ['cli'];
         privateScope.onConnect();
@@ -427,26 +468,14 @@ var SerialBackend = (function () {
             FC.resetState();
             MSP.disconnect_cleanup();
             privateScope.ltmProtocolGate.reset();
+            privateScope.endMavlinkSession();
 
             CONFIGURATOR.connection.addOnReceiveListener(publicScope.read_serial);
             CONFIGURATOR.connection.addOnReceiveListener(publicScope.read_ltm);
+            // Passive detection: an FC on a MAVLink-only port answers with heartbeats, not MSP.
+            CONFIGURATOR.connection.addOnReceiveListener(privateScope.read_mavlink);
 
-            // disconnect after 10 seconds with error if we don't get IDENT data
-            timeout.add('connecting', function () {
-
-                //As we add LTM listener, we need to invalidate connection only when both protocols are not listening!
-                if (!CONFIGURATOR.connectionValid && !ltmDecoder.isReceiving()) {
-                    GUI.log(i18n.getMessage('noConfigurationReceived'));
-
-                        mspQueue.flush();
-                        mspQueue.freeHardLock();
-                        mspQueue.freeSoftLock();
-                        mspDeduplicationQueue.flush();
-                        CONFIGURATOR.connection.emptyOutputBuffer();
-
-                    $('div.connect_controls a').click(); // disconnect
-                }
-            }, 10000);
+            privateScope.armConnectingTimeout();
 
             // LTM is only a fallback for an LTM-only connection. Once MSP has
             // been validated, its payloads (including raw dataflash blocks)
@@ -458,41 +487,8 @@ var SerialBackend = (function () {
             // request configuration data. Start with MSPv1 and
             // upgrade to MSPv2 if possible.
             MSP.protocolVersion = MSP.constants.PROTOCOL_V2;
-            MSP.send_message(MSPCodes.MSP_API_VERSION, false, false, function () {
-
-                if (FC.CONFIG.apiVersion === "0.0.0") {
-                    GUI.log("<span style='color: red; font-weight: bolder'><strong>" + i18n.getMessage("illegalStateRestartRequired") + "</strong></span>");
-                    FC.restartRequired = true;
-                    return;
-                }
-
-                GUI.log(i18n.getMessage('apiVersionReceived', [FC.CONFIG.apiVersion]));
-
-                MSP.send_message(MSPCodes.MSP_FC_VARIANT, false, false, function () {
-                    if (FC.CONFIG.flightControllerIdentifier == 'INAV') {
-                        MSP.send_message(MSPCodes.MSP_FC_VERSION, false, false, function () {
-
-                            GUI.log(i18n.getMessage('fcInfoReceived', [FC.CONFIG.flightControllerIdentifier, FC.CONFIG.flightControllerVersion]));
-                            if (semver.gte(FC.CONFIG.flightControllerVersion, CONFIGURATOR.minfirmwareVersionAccepted) && semver.lt(FC.CONFIG.flightControllerVersion, CONFIGURATOR.maxFirmwareVersionAccepted)) {
-                                if (CONFIGURATOR.connection.type == ConnectionType.BLE && semver.lt(FC.CONFIG.flightControllerVersion, "5.0.0")) {
-                                    privateScope.onBleNotSupported();
-                                } else {
-                                    mspHelper.getCraftName(function(name) {
-                                        if (name) {
-                                            FC.CONFIG.name = name;
-                                        }
-                                        privateScope.onValidFirmware();
-                                    });
-                                }
-                            } else  {
-                                privateScope.onInvalidFirmwareVersion();
-                            }
-                        });
-                    } else {
-                        privateScope.onInvalidFirmwareVariant();
-                    }
-                });
-            });
+            privateScope.mavlinkSession.rawProbeSentAt = Date.now();
+            MSP.send_message(MSPCodes.MSP_API_VERSION, false, false, privateScope.onApiVersion);
         } else {
             console.log('Failed to open serial port');
             GUI.log(i18n.getMessage('serialPortOpenFail'));
@@ -511,6 +507,225 @@ var SerialBackend = (function () {
         }
     }
 
+    privateScope.onApiVersion = function (response) {
+        if (response === false && CONFIGURATOR.mavlinkTunnelActive) {
+            GUI.log(i18n.getMessage('mavlinkTunnelNoReply'));
+            privateScope.abortConnecting();
+            return;
+        }
+
+        if (FC.CONFIG.apiVersion === "0.0.0") {
+            GUI.log("<span style='color: red; font-weight: bolder'><strong>" + i18n.getMessage("illegalStateRestartRequired") + "</strong></span>");
+            FC.restartRequired = true;
+            return;
+        }
+
+        GUI.log(i18n.getMessage('apiVersionReceived', [FC.CONFIG.apiVersion]));
+
+        MSP.send_message(MSPCodes.MSP_FC_VARIANT, false, false, privateScope.onFcVariant);
+    };
+
+    privateScope.onFcVariant = function (response) {
+        if (privateScope.isTunnelReplyLost(response, MSPCodes.MSP_FC_VARIANT)) {
+            return;
+        }
+        if (FC.CONFIG.flightControllerIdentifier == 'INAV') {
+            MSP.send_message(MSPCodes.MSP_FC_VERSION, false, false, privateScope.onFcVersion);
+        } else {
+            privateScope.onInvalidFirmwareVariant();
+        }
+    };
+
+    privateScope.onFcVersion = function (response) {
+        if (privateScope.isTunnelReplyLost(response, MSPCodes.MSP_FC_VERSION)) {
+            return;
+        }
+        const version = FC.CONFIG.flightControllerVersion;
+        GUI.log(i18n.getMessage('fcInfoReceived', [FC.CONFIG.flightControllerIdentifier, version]));
+        if (!privateScope.isAcceptedFirmwareVersion(version)) {
+            privateScope.onInvalidFirmwareVersion();
+        } else if (CONFIGURATOR.connection.type == ConnectionType.BLE && semver.lt(version, "5.0.0")) {
+            privateScope.onBleNotSupported();
+        } else {
+            mspHelper.getCraftName(privateScope.onCraftName);
+        }
+    };
+
+    // semver throws on the empty string a lost or garbled FC_VERSION leaves behind.
+    privateScope.isAcceptedFirmwareVersion = function (version) {
+        return Boolean(semver.valid(version)) &&
+            semver.gte(version, CONFIGURATOR.minfirmwareVersionAccepted) &&
+            semver.lt(version, CONFIGURATOR.maxFirmwareVersionAccepted);
+    };
+
+    privateScope.onCraftName = function (name) {
+        if (privateScope.isTunnelReplyLost(name === null ? false : name, MSPCodes.MSP_NAME)) {
+            return;
+        }
+        if (name) {
+            FC.CONFIG.name = name;
+        }
+        privateScope.onValidFirmware();
+    };
+
+    // disconnect after 10 seconds with error if we don't get IDENT data
+    privateScope.armConnectingTimeout = function () {
+        timeout.remove('connecting');
+        timeout.add('connecting', function () {
+
+            //As we add LTM listener, we need to invalidate connection only when both protocols are not listening!
+            if (!CONFIGURATOR.connectionValid && !ltmDecoder.isReceiving()) {
+                const reason = privateScope.mavlinkSession.v1HeartbeatSeen ? 'mavlinkTunnelV1Only' : 'noConfigurationReceived';
+                GUI.log(i18n.getMessage(reason));
+                privateScope.abortConnecting();
+            }
+        }, CONNECTING_TIMEOUT_MS);
+    };
+
+    privateScope.abortConnecting = function () {
+        mspQueue.flush();
+        mspQueue.freeHardLock();
+        mspQueue.freeSoftLock();
+        mspDeduplicationQueue.flush();
+        CONFIGURATOR.connection.emptyOutputBuffer();
+
+        $('div.connect_controls a').click(); // disconnect
+    };
+
+    privateScope.connectedTabs = function () {
+        const tabs = GUI.defaultAllowedTabsWhenConnected.slice();
+        if (!CONFIGURATOR.mavlinkTunnelActive) {
+            return tabs;
+        }
+        return tabs.filter(tab => !GUI.tabsUnavailableOverMavlinkTunnel.includes(tab));
+    };
+
+    // The queue ends a lost tunnel request with onFinish(false); the handshake must not go on with stale FC state.
+    privateScope.isTunnelReplyLost = function (response, code) {
+        if (response !== false || !CONFIGURATOR.mavlinkTunnelActive) {
+            return false;
+        }
+        GUI.log(i18n.getMessage('mavlinkTunnelLostReply', [MSP.getCodeName(code)]));
+        privateScope.abortConnecting();
+        return true;
+    };
+
+    privateScope.refuseCliOverTunnel = function () {
+        GUI.log(i18n.getMessage('mavlinkTunnelNoCli'));
+        privateScope.abortConnecting();
+    };
+
+    privateScope.read_mavlink = function (info) {
+        if (!privateScope.mavlinkSession.tunnel && MSP.wasEverReceiving()) {
+            // Plain MSP answered first; interleaved MAVLink bytes stay ignored as before.
+            CONFIGURATOR.connection.removeOnReceiveCallback(privateScope.read_mavlink);
+            return;
+        }
+        privateScope.mavlinkLink.ingest(info.data);
+    };
+
+    privateScope.onMavlinkHeartbeat = function (frame) {
+        const session = privateScope.mavlinkSession;
+        if (session.tunnel) {
+            const target = privateScope.mavlinkLink.getTarget();
+            if (frame.sysid !== target.sysid && !session.foreignSystems.has(frame.sysid)) {
+                session.foreignSystems.add(frame.sysid);
+                console.log('MAVLink tunnel: ignoring heartbeat from system ' + frame.sysid);
+            }
+            return;
+        }
+        if (frame.version === 1) {
+            session.v1HeartbeatSeen = true;
+            return;
+        }
+        if (session.pendingHeartbeat) {
+            return;
+        }
+
+        session.pendingHeartbeat = { sysid: frame.sysid, compid: frame.compid };
+        const remaining = session.rawProbeSentAt + RAW_MSP_PRIORITY_WINDOW_MS - Date.now();
+        timeout.add('mavlink-tunnel-switch', privateScope.onRawMspWindowEnd, Math.max(0, remaining));
+    };
+
+    privateScope.onRawMspWindowEnd = function () {
+        const session = privateScope.mavlinkSession;
+        const heartbeat = session.pendingHeartbeat;
+        if (!heartbeat || session.tunnel || GUI.connected_to === false) {
+            return;
+        }
+        if (MSP.wasEverReceiving()) {
+            GUI.log(i18n.getMessage('mavlinkTunnelSkippedPlainMsp', [heartbeat.sysid]));
+            CONFIGURATOR.connection.removeOnReceiveCallback(privateScope.read_mavlink);
+            return;
+        }
+        privateScope.startTunnelSession(heartbeat.sysid, heartbeat.compid);
+    };
+
+    privateScope.startTunnelSession = function (sysid, compid) {
+        const link = privateScope.mavlinkLink;
+        privateScope.mavlinkSession.tunnel = true;
+        CONFIGURATOR.mavlinkTunnelActive = true;
+        link.lockTarget(sysid, compid);
+        GUI.log(i18n.getMessage('mavlinkTunnelDetected', [sysid]));
+
+        CONFIGURATOR.connection.removeOnReceiveCallback(publicScope.read_serial);
+        CONFIGURATOR.connection.removeOnReceiveCallback(publicScope.read_ltm);
+
+        // The raw MSP_API_VERSION still pending would otherwise be answered by the tunnel probe.
+        mspQueue.flush();
+        mspDeduplicationQueue.flush();
+        MSP.callbacks_cleanup();
+        MSP.resetDecoder();
+        mspQueue.freeHardLock();
+        mspQueue.freeSoftLock();
+
+        mspQueue.setTunnelMode(true);
+        mspQueue.setTransportTransform(
+            body => concatFrames(link.wrapMsp(body)).buffer,
+            () => link.resetReassembly()
+        );
+        // Own timer: tab switches kill every named interval outside their keep-lists.
+        privateScope.sendGcsHeartbeat();
+        privateScope.gcsHeartbeatTimer = setInterval(privateScope.sendGcsHeartbeat, MAVLINK_GCS_HEARTBEAT_INTERVAL_MS);
+        privateScope.armConnectingTimeout();
+
+        MSP.protocolVersion = MSP.constants.PROTOCOL_V2;
+        MSP.sendWithTunnelRetries(MSPCodes.MSP_API_VERSION, false, privateScope.onApiVersion, MAVLINK_TUNNEL_PROBE_RETRIES);
+    };
+
+    privateScope.onTunnelChunk = function (bytes) {
+        mspQueue.notifyTunnelProgress();
+        MSP.read({ data: bytes });
+    };
+
+    privateScope.sendGcsHeartbeat = function () {
+        if (CONFIGURATOR.connection) {
+            CONFIGURATOR.connection.send(privateScope.mavlinkLink.heartbeatFrame().buffer, null);
+        }
+    };
+
+    privateScope.showLinkType = function (tunnel) {
+        const key = tunnel ? 'linkTypeMavlinkTunnel' : 'linkTypeMsp';
+        $('#link-type').attr('data-i18n', key).data('i18n', key).text(i18n.getMessage(key));
+    };
+
+    privateScope.clearLinkType = function () {
+        $('#link-type').removeAttr('data-i18n').removeData('i18n').text('');
+    };
+
+    // Also runs before every connect, so the firmware flasher and the next session start clean.
+    privateScope.endMavlinkSession = function () {
+        clearInterval(privateScope.gcsHeartbeatTimer);
+        privateScope.gcsHeartbeatTimer = null;
+        privateScope.mavlinkLink.reset();
+        timeout.remove('mavlink-tunnel-switch');
+        privateScope.mavlinkSession = privateScope.newMavlinkSession();
+        CONFIGURATOR.mavlinkTunnelActive = false;
+        mspQueue.setTunnelMode(false);
+        mspQueue.setTransportTransform(null);
+        privateScope.clearLinkType();
+    };
+
     privateScope.onConnect = function () {
         timeout.remove('connecting'); // kill connecting timer
         $('#connectbutton a.connect_state').text(i18n.getMessage('disconnect')).addClass('active');
@@ -519,11 +734,17 @@ var SerialBackend = (function () {
         $('.mode-connected').show();
 
 
-        MSP.send_message(MSPCodes.MSP_BOXIDS, false, false, function () {
+        MSP.send_message(MSPCodes.MSP_BOXIDS, false, false, function (response) {
+            if (privateScope.isTunnelReplyLost(response, MSPCodes.MSP_BOXIDS)) {
+                return;
+            }
             FC.generateAuxConfig();
         });
 
-        MSP.send_message(MSPCodes.MSP_DATAFLASH_SUMMARY, false, false, function () {
+        MSP.send_message(MSPCodes.MSP_DATAFLASH_SUMMARY, false, false, function (response) {
+            if (privateScope.isTunnelReplyLost(response, MSPCodes.MSP_DATAFLASH_SUMMARY)) {
+                return;
+            }
             $('#sensor-status').show();
             $('#portsinput').hide();
             $('#dataflash_wrapper_global').show();

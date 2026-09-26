@@ -297,6 +297,11 @@ $(function() {
                     return;
                 }
 
+                if (CONFIGURATOR.mavlinkTunnelActive && GUI.tabsUnavailableOverMavlinkTunnel.includes(tab)) {
+                    GUI.log(i18n.getMessage('tabSwitchMavlinkTunnelUnavailable', [tabName]));
+                    return;
+                }
+
                 if (GUI.allowedTabs.indexOf(tab) < 0) {
                     GUI.log(i18n.getMessage('tabSwitchUpgradeRequired', [tabName]));
                     return;

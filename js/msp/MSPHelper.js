@@ -85,7 +85,11 @@ var mspHelper = (function () {
                 return;
             }
             lastWriteBlockedNotice = now;
-            GUI.log(i18n.getMessage('mspWriteBlockedAfterParseFailure', [MSP.getCodeName(sourceCode)]));
+            const key = MSP.parseFailures.has(sourceCode) ? 'mspWriteBlockedAfterParseFailure' : 'mspWriteBlockedAfterLostReply';
+            GUI.log(i18n.getMessage(key, [MSP.getCodeName(sourceCode)]));
+        };
+        MSP.onResponseLost = function (code) {
+            GUI.log(i18n.getMessage('mspTunnelReplyLost', [MSP.getCodeName(code)]));
         };
     }
 
@@ -1999,14 +2003,11 @@ var mspHelper = (function () {
                     /*
                      * Compute roundtrip
                      */
-                    if (dataHandler.callbacks[i]) {
-                        mspQueue.putRoundtrip(new Date().getTime() - dataHandler.callbacks[i].createdOn);
-
-                        const hardwareRountrip = new Date().getTime() - dataHandler.callbacks[i].sentOn;
-
-                        mspQueue.putHardwareRoundtrip(hardwareRountrip);
-
-                        mspStatistics.add(dataHandler.code, hardwareRountrip);
+                    const sample = dataHandler.callbacks[i] ? mspQueue.roundtripSample(dataHandler.callbacks[i]) : null;
+                    if (sample) {
+                        mspQueue.putRoundtrip(sample.total);
+                        mspQueue.putHardwareRoundtrip(sample.hardware);
+                        mspStatistics.add(dataHandler.code, sample.hardware);
                     }
 
                     //remove message from queue as received
@@ -3882,7 +3883,8 @@ var mspHelper = (function () {
 
     self.getCraftName = function (callback) {
         MSP.send_message(MSPCodes.MSP_NAME, false, false, function (resp) {
-            var name = resp.data.readString();
+            // null tells a lost reply apart from an empty name
+            var name = resp ? resp.data.readString() : null;
             if (callback) {
                 callback(name);
             }

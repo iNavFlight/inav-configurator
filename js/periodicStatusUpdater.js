@@ -20,6 +20,10 @@ import MSPCodes from './msp/MSPCodes';
      */
     publicScope.getUpdateInterval = function (baudSpeed) {
 
+        if (CONFIGURATOR.mavlinkTunnelActive) {
+            return 1000;
+        }
+
         if (!baudSpeed) {
             baudSpeed = 115200;
         }
