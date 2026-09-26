@@ -562,6 +562,12 @@ $(function() {
                         store.set('disable_3d_acceleration', check);
                     });
 
+                    // phase-2 A/B: read by the MAVLink tunnel at the next connect.
+                    $('div.mavlink_telemetry_feed input').prop('checked', store.get('mavlink_telemetry_feed', true) !== false);
+                    $('div.mavlink_telemetry_feed input').on('change', function () {
+                        store.set('mavlink_telemetry_feed', $(this).is(':checked'));
+                    });
+
                     $('div.statistics input').on('change', function () {
                         var check = $(this).is(':checked');
                     });

@@ -55,6 +55,12 @@
     "options_cliAutocomplete": {
         "message": "Advanced CLI AutoComplete"
     },
+    "options_mavlinkTelemetryFeed": {
+        "message": "MAVLink telemetry feed (experimental)"
+    },
+    "options_mavlinkTelemetryFeedHelp": {
+        "message": "When connected through the MAVLink tunnel, standard MAVLink telemetry replaces MSP polling for attitude, RC, battery and GPS. Turn off to compare with pure MSP polling. A change takes effect at the next connect."
+    },
     "navExpandAll": {
         "message": "Expand All"
     },
