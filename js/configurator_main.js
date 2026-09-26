@@ -122,7 +122,7 @@ $(function() {
                 return;
             }
 
-            if ($(this).parent().hasClass('active') == false && !GUI.tab_switch_in_progress) { // only initialize when the tab isn't already active
+            if ($(this).parent().hasClass('active') == false && !GUI.tab_cleanup_in_progress) { // only initialize when the tab isn't already active
                 
                 if (CONFIGURATOR.cliActive && CONFIGURATOR.cliValid) {
                     cliTab.exit($(this).parent());
@@ -167,8 +167,12 @@ $(function() {
                 }
 
                 GUI.tab_switch_in_progress = true;
+                GUI.tab_cleanup_in_progress = true;
+                const switchId = ++GUI.tab_switch_id;
 
                 GUI.tab_switch_cleanup(function () {
+                    GUI.tab_cleanup_in_progress = false;
+
                     // disable previously active tab highlight
                     $('li', ui_tabs).removeClass('active');
 
@@ -184,6 +188,10 @@ $(function() {
                     $('#cache .data-loading').clone().appendTo(content);
 
                     function content_ready() {
+                        // A later click has taken over; its own load clears the flag.
+                        if (switchId !== GUI.tab_switch_id) {
+                            return;
+                        }
                         GUI.tab_switch_in_progress = false;
 
                         // Update CSS on to show highlighing or not
@@ -274,6 +282,7 @@ $(function() {
                            break;
                         default:
                             console.log('Tab not found:' + tab);
+                            GUI.tab_switch_in_progress = false;
                     }
                 });
             }

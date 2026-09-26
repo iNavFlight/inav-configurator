@@ -37,52 +37,14 @@
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { join } from 'node:path';
-import { pathToFileURL } from 'node:url';
 
 import { dataModule } from './helpers/dataModule.mjs';
 import { makeHarness } from './helpers/harness.mjs';
+import { rewriteMspStack, rewriteMspHelper } from './helpers/mspModules.mjs';
 
-const { repoRoot, tmpDir, rewriteAndWrite } = makeHarness(import.meta.url, 'msp-parse-failure-recovery.test.mjs', 'msp-parse-failure-');
+const { repoRoot, rewriteAndWrite } = makeHarness(import.meta.url, 'msp-parse-failure-recovery.test.mjs', 'msp-parse-failure-');
 
-function realModuleUrl(relPath) {
-    return pathToFileURL(join(repoRoot, relPath)).href;
-}
-
-// --- real, import-free leaf modules, loadable straight by absolute URL -------
-const realMspCodesUrl = realModuleUrl('js/msp/MSPCodes.js');
-const realTimeoutsUrl = realModuleUrl('js/timeouts.js');
-const realConfiguratorUrl = realModuleUrl('js/data_storage.js');
-const realDedupUrl = realModuleUrl('js/msp/mspDeduplicationQueue.js');
-const realStatisticsUrl = realModuleUrl('js/msp/mspStatistics.js');
-const realSmoothFilterUrl = realModuleUrl('js/simple_smooth_filter.js');
-const realInjectedMethodsUrl = realModuleUrl('js/injected_methods.js');
-
-// eventFrequencyAnalyzer and serial_queue start un-refed intervals in their
-// IIFEs. `.unref()` changes nothing about whether or how they run - it only
-// stops Node from waiting on them to decide when the process may exit, which
-// would otherwise hang `node --test` forever.
-const realEventFrequencyAnalyzerUrl = rewriteAndWrite('js/eventFrequencyAnalyzer.js', [
-    [/privateScope\.intervalHandler = setInterval\(publicScope\.analyze, bufferPeriod\);/g, 'privateScope.intervalHandler = setInterval(publicScope.analyze, bufferPeriod).unref();', "analyze setInterval"],
-], 'eventFrequencyAnalyzer-generated');
-
-const realMspQueueUrl = rewriteAndWrite('js/serial_queue.js', [
-    [/^import CONFIGURATOR from '\.\/data_storage';$/m, `import CONFIGURATOR from '${realConfiguratorUrl}';`, "import CONFIGURATOR"],
-    [/^import MSPCodes from '\.\/msp\/MSPCodes';$/m, `import MSPCodes from '${realMspCodesUrl}';`, "import MSPCodes"],
-    [/^import SimpleSmoothFilter from '\.\/simple_smooth_filter';$/m, `import SimpleSmoothFilter from '${realSmoothFilterUrl}';`, "import SimpleSmoothFilter"],
-    [/^import eventFrequencyAnalyzer from '\.\/eventFrequencyAnalyzer';$/m, `import eventFrequencyAnalyzer from '${realEventFrequencyAnalyzerUrl}';`, "import eventFrequencyAnalyzer"],
-    [/^import mspDeduplicationQueue from '\.\/msp\/mspDeduplicationQueue';$/m, `import mspDeduplicationQueue from '${realDedupUrl}';`, "import mspDeduplicationQueue"],
-    [/setInterval\(publicScope\.executor, Math\.round\(1000 \/ privateScope\.handlerFrequency\)\);/, 'setInterval(publicScope.executor, Math.round(1000 / privateScope.handlerFrequency)).unref();', "executor setInterval"],
-    [/setInterval\(publicScope\.balancer, Math\.round\(1000 \/ privateScope\.balancerFrequency\)\);/, 'setInterval(publicScope.balancer, Math.round(1000 / privateScope.balancerFrequency)).unref();', "balancer setInterval"],
-], 'serial_queue-generated');
-
-const realMspUrl = rewriteAndWrite('js/msp.js', [
-    [/^import MSPCodes from '\.\/msp\/MSPCodes';$/m, `import MSPCodes from '${realMspCodesUrl}';`, "import MSPCodes"],
-    [/^import mspQueue from '\.\/serial_queue';$/m, `import mspQueue from '${realMspQueueUrl}';`, "import mspQueue"],
-    [/^import eventFrequencyAnalyzer from '\.\/eventFrequencyAnalyzer';$/m, `import eventFrequencyAnalyzer from '${realEventFrequencyAnalyzerUrl}';`, "import eventFrequencyAnalyzer"],
-    [/^import timeout from '\.\/timeouts';$/m, `import timeout from '${realTimeoutsUrl}';`, "import timeout"],
-    [/^import CONFIGURATOR from '\.\/data_storage';$/m, `import CONFIGURATOR from '${realConfiguratorUrl}';`, "import CONFIGURATOR"],
-], 'msp-generated');
+const mspUrls = rewriteMspStack(repoRoot, rewriteAndWrite);
 
 // FC has to be controllable (the tests set up PID banks); everything below it
 // is only referenced from switch cases these tests never reach, so those
@@ -94,7 +56,6 @@ const fcStubUrl = dataModule(`
     const FC = globalThis['${FC_STATE_ID}'];
     export default FC;
 `);
-const inertDefaultUrl = dataModule('export default {};');
 // GUI.log and i18n.getMessage are called on the parse-failure path, so these two
 // have to behave like the real thing rather than being inert.
 const guiStubUrl = dataModule(`
@@ -105,44 +66,15 @@ const i18nStubUrl = dataModule(`
     const i18n = { getMessage(key) { return key; } };
     export default i18n;
 `);
-const inertFwApproachUrl = dataModule('export const FwApproach = class {};');
-const inertGeozoneUrl = dataModule(`
-    export const Geozone = class {};
-    export const GeozoneVertex = class {};
-    export const GeozoneShapes = {};
-`);
 
-const realMspHelperUrl = rewriteAndWrite('js/msp/MSPHelper.js', [
-    [/^import semver from 'semver';$/m, `import semver from '${inertDefaultUrl}';`, "import semver"],
-    [/^import '\.\/\.\.\/injected_methods';$/m, `import '${realInjectedMethodsUrl}';`, "import injected_methods"],
-    [/^import GUI from '\.\/\.\.\/gui';$/m, `import GUI from '${guiStubUrl}';`, "import GUI"],
-    [/^import i18n from '\.\/\.\.\/localization';$/m, `import i18n from '${i18nStubUrl}';`, "import i18n"],
-    [/^import MSP from '\.\/\.\.\/msp';$/m, `import MSP from '${realMspUrl}';`, "import MSP"],
-    [/^import MSPCodes from '\.\/MSPCodes';$/m, `import MSPCodes from '${realMspCodesUrl}';`, "import MSPCodes"],
-    [/^import FC from '\.\/\.\.\/fc';$/m, `import FC from '${fcStubUrl}';`, "import FC"],
-    [/^import VTX from '\.\/\.\.\/vtx';$/m, `import VTX from '${inertDefaultUrl}';`, "import VTX"],
-    [/^import mspQueue from '\.\/\.\.\/serial_queue';$/m, `import mspQueue from '${realMspQueueUrl}';`, "import mspQueue"],
-    [/^import ServoMixRule from '\.\/\.\.\/servoMixRule';$/m, `import ServoMixRule from '${inertDefaultUrl}';`, "import ServoMixRule"],
-    [/^import MotorMixRule from '\.\/\.\.\/motorMixRule';$/m, `import MotorMixRule from '${inertDefaultUrl}';`, "import MotorMixRule"],
-    [/^import LogicCondition from '\.\/\.\.\/logicCondition';$/m, `import LogicCondition from '${inertDefaultUrl}';`, "import LogicCondition"],
-    [/^import BitHelper from '\.\.\/bitHelper';$/m, `import BitHelper from '${inertDefaultUrl}';`, "import BitHelper"],
-    [/^import serialPortHelper from '\.\/\.\.\/serialPortHelper';$/m, `import serialPortHelper from '${inertDefaultUrl}';`, "import serialPortHelper"],
-    [/^import ProgrammingPid from '\.\/\.\.\/programmingPid';$/m, `import ProgrammingPid from '${inertDefaultUrl}';`, "import ProgrammingPid"],
-    [/^import Safehome from '\.\/\.\.\/safehome';$/m, `import Safehome from '${inertDefaultUrl}';`, "import Safehome"],
-    [/^import \{ FwApproach \} from '\.\/\.\.\/fwApproach';$/m, `import { FwApproach } from '${inertFwApproachUrl}';`, "import FwApproach"],
-    [/^import Waypoint from '\.\/\.\.\/waypoint';$/m, `import Waypoint from '${inertDefaultUrl}';`, "import Waypoint"],
-    [/^import mspDeduplicationQueue from '\.\/mspDeduplicationQueue';$/m, `import mspDeduplicationQueue from '${realDedupUrl}';`, "import mspDeduplicationQueue"],
-    [/^import mspStatistics from '\.\/mspStatistics';$/m, `import mspStatistics from '${realStatisticsUrl}';`, "import mspStatistics"],
-    [/^import settingsCache from '\.\/\.\.\/settingsCache';$/m, `import settingsCache from '${inertDefaultUrl}';`, "import settingsCache"],
-    [/^import \{Geozone, GeozoneVertex, GeozoneShapes \} from '\.\/\.\.\/geozone';$/m, `import { Geozone, GeozoneVertex, GeozoneShapes } from '${inertGeozoneUrl}';`, "import Geozone"],
-], 'MSPHelper-generated');
+const realMspHelperUrl = rewriteMspHelper(rewriteAndWrite, mspUrls, { fc: fcStubUrl, gui: guiStubUrl, i18n: i18nStubUrl });
 
 const { default: mspHelper } = await import(realMspHelperUrl);
-const { default: MSPCodes } = await import(realMspCodesUrl);
-const { default: MSP } = await import(realMspUrl);
-const { default: mspQueue } = await import(realMspQueueUrl);
-const { default: mspDeduplicationQueue } = await import(realDedupUrl);
-const { default: CONFIGURATOR } = await import(realConfiguratorUrl);
+const { default: MSPCodes } = await import(mspUrls.mspCodes);
+const { default: MSP } = await import(mspUrls.msp);
+const { default: mspQueue } = await import(mspUrls.mspQueue);
+const { default: mspDeduplicationQueue } = await import(mspUrls.dedup);
+const { default: CONFIGURATOR } = await import(mspUrls.configurator);
 const { default: GUI } = await import(guiStubUrl);
 
 const FC = globalThis[FC_STATE_ID];

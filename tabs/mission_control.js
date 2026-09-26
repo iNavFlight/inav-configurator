@@ -184,17 +184,17 @@ missionControlTab.initialize = function (callback) {
             function (callback) {
                 mspHelper.getSetting("nav_fw_land_approach_length").then((data) =>  {
                     settings.fwApproachLength = parseInt(data.value);
-                }).then(callback);
+                }).catch((err) => console.error('Failed to read setting "nav_fw_land_approach_length":', err)).then(() => callback());
             },
             function (callback) {
                 mspHelper.getSetting("safehome_max_distance").then((data) => {
                     settings.maxDistSH = parseInt(data.value) / 100;
-                }).then(callback);
+                }).catch((err) => console.error('Failed to read setting "safehome_max_distance":', err)).then(() => callback());
             },
             function (callback) {
                 mspHelper.getSetting(("nav_fw_loiter_radius")).then((data) => {
                     settings.fwLoiterRadius = parseInt(data.value);
-                }).then(callback);
+                }).catch((err) => console.error('Failed to read setting "nav_fw_loiter_radius":', err)).then(() => callback());
             }
         ]);
         loadChainer.setExitPoint(loadHtml);

@@ -245,6 +245,7 @@ var SerialBackend = (function () {
 
                         function finishDisconnect() {
                             GUI.tab_switch_in_progress = false;
+                            GUI.tab_cleanup_in_progress = false;
                             CONFIGURATOR.connectionValid = false;
                             GUI.connected_to = false;
                             GUI.connecting_to = false;
