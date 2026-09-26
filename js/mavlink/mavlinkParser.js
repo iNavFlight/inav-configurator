@@ -12,8 +12,10 @@ import {
     crcCalculate,
 } from './mavlinkProtocol.js';
 
-const CANDIDATE_INVALID = -1;
-const CANDIDATE_INCOMPLETE = 0;
+// Every candidate step returns { status, ... }; the two failures are shared, frozen results.
+const STATUS_VALID = 'valid';
+const CANDIDATE_INVALID = Object.freeze({ status: 'invalid' });
+const CANDIDATE_INCOMPLETE = Object.freeze({ status: 'incomplete' });
 
 // Validate, then consume: a stray magic byte must not swallow the real frame behind it.
 export class MavlinkParser {
@@ -70,7 +72,7 @@ export class MavlinkParser {
 
     _tryDecodeAt(position) {
         const header = this._readHeader(position);
-        if (header === CANDIDATE_INCOMPLETE || header === CANDIDATE_INVALID) {
+        if (header.status !== STATUS_VALID) {
             return header;
         }
 
@@ -93,6 +95,7 @@ export class MavlinkParser {
         payload.set(this._buffer.subarray(payloadStart, payloadStart + header.payloadLength));
 
         return {
+            status: STATUS_VALID,
             length: frameLength,
             frame: {
                 version: header.version,
@@ -116,8 +119,8 @@ export class MavlinkParser {
 
         const payloadLength = buffer[position + 1];
         const header = isV2 ? this._readV2Header(position) : this._readV1Header(position);
-        if (header === CANDIDATE_INVALID) {
-            return CANDIDATE_INVALID;
+        if (header.status !== STATUS_VALID) {
+            return header;
         }
 
         const info = getMessageInfo(header.msgid);
@@ -136,6 +139,7 @@ export class MavlinkParser {
             return CANDIDATE_INVALID;
         }
         return {
+            status: STATUS_VALID,
             version: 2,
             seq: buffer[position + 4],
             sysid: buffer[position + 5],
@@ -148,6 +152,7 @@ export class MavlinkParser {
     _readV1Header(position) {
         const buffer = this._buffer;
         return {
+            status: STATUS_VALID,
             version: 1,
             seq: buffer[position + 2],
             sysid: buffer[position + 3],

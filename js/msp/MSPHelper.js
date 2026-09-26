@@ -139,6 +139,15 @@ var mspHelper = (function () {
         FC.CONFIG.mode = mode;
     }
 
+    // fc_msp.c:998-1004. A short reply leaves onTime null: the tunnel reboot check must not act on a stale uptime.
+    function applyMisc2(data) {
+        const length = data.byteLength;
+        FC.MISC2.onTime = length >= 4 ? data.getUint32(0, true) : null;
+        FC.MISC2.flightTime = length >= 8 ? data.getUint32(4, true) : 0;
+        FC.MISC2.throttlePercent = length >= 9 ? data.getUint8(8) : 0;
+        FC.MISC2.autoThrottle = length >= 10 && data.getUint8(9) !== 0;
+    }
+
     /**
      *
      * @param {MSP} dataHandler
@@ -848,7 +857,7 @@ var mspHelper = (function () {
                 break;
 
             case MSPCodes.MSP2_INAV_MISC2:
-                // Read from the reply by the tunnel reboot monitor (FC uptime).
+                applyMisc2(data);
                 break;
 
             //
@@ -2019,6 +2028,15 @@ var mspHelper = (function () {
         }
     };
 
+    function recordRoundtrip(code, request) {
+        const sample = mspQueue.roundtripSample(request);
+        if (sample) {
+            mspQueue.putRoundtrip(sample.total);
+            mspQueue.putHardwareRoundtrip(sample.hardware);
+            mspStatistics.add(code, sample.hardware);
+        }
+    }
+
     var completeRequest = function (dataHandler, data) {
         // trigger callbacks, cleanup/remove callback after trigger
         for (let i = dataHandler.callbacks.length - 1; i >= 0; i--) { // iterating in reverse because we use .splice which modifies array length
@@ -2033,11 +2051,8 @@ var mspHelper = (function () {
                     /*
                      * Compute roundtrip
                      */
-                    const sample = dataHandler.callbacks[i] ? mspQueue.roundtripSample(dataHandler.callbacks[i]) : null;
-                    if (sample) {
-                        mspQueue.putRoundtrip(sample.total);
-                        mspQueue.putHardwareRoundtrip(sample.hardware);
-                        mspStatistics.add(dataHandler.code, sample.hardware);
+                    if (dataHandler.callbacks[i]) {
+                        recordRoundtrip(dataHandler.code, dataHandler.callbacks[i]);
                     }
 
                     //remove message from queue as received

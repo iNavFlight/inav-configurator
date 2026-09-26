@@ -20,11 +20,6 @@ const PHASE_AWAIT_REPLY = 'awaitReply';
 const PHASE_PROBING = 'probing';
 const PHASE_VERIFY = 'verify';
 
-// MSP2_INAV_MISC2 starts with the FC's on-time in seconds, u32 LE (fc_msp.c:998-1000).
-export function readOnTimeSeconds(response) {
-    return response && response.data && response.data.byteLength >= 4 ? response.data.getUint32(0, true) : null;
-}
-
 /**
  * MSP_SET_REBOOT over a link that survives the reboot (MAVLink tunnel): the FC flushes the
  * reply before rebooting, so a missing reply means a lost request or a lost reply chunk.

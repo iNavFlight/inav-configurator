@@ -84,13 +84,18 @@ export async function loadMspHelper(importMetaUrl, testFileName, tmpPrefix, { fc
 }
 
 function inertModule(clause) {
-    const named = /\{([^}]*)\}/.exec(clause || '');
-    const exports = named ? named[1].split(',').map(name => `export const ${name.trim()} = function () {};`) : [];
+    const exports = namedImports(clause).map(name => `export const ${name.trim()} = function () {};`);
     return dataModule(['export default {};', ...exports].join('\n'));
 }
 
+function namedImports(clause) {
+    const open = clause ? clause.indexOf('{') : -1;
+    const close = open >= 0 ? clause.indexOf('}', open) : -1;
+    return close > open ? clause.slice(open + 1, close).split(',') : [];
+}
+
 function escapeRegExp(text) {
-    return text.replace(/[.*+?^${}()|[\]\\/]/g, '\\$&');
+    return text.replace(/[.*+?^${}()|[\]\\/]/g, String.raw`\$&`);
 }
 
 /**

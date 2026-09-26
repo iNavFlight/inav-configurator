@@ -56,6 +56,7 @@ var FC = {
     ARMING_CONFIG: null,
     FC_CONFIG: null,
     MISC: null,
+    MISC2: null,
     REVERSIBLE_MOTORS: null,
     DATAFLASH: null,
     SDCARD: null,
@@ -397,6 +398,13 @@ var FC = {
             battery_capacity_warning: 0,
             battery_capacity_critical: 0,
             battery_capacity_unit: 'mAh'
+        };
+
+        this.MISC2 = {
+            onTime: 0,
+            flightTime: 0,
+            throttlePercent: 0,
+            autoThrottle: false
         };
 
         this.BATTERY_CONFIG = {

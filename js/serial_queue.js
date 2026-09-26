@@ -253,7 +253,7 @@ var mspQueue = function () {
             }
             return undefined;
         }
-        if (head && head.heldSince) {
+        if (head?.heldSince) {
             head.heldBackMs = Date.now() - head.heldSince;
         }
         return privateScope.queue.shift();
@@ -534,11 +534,11 @@ var mspQueue = function () {
 
     // Each caller gets its own DataView: readers keep their offset on it.
     privateScope.copyResponse = function (response) {
-        if (!response || !response.data) {
+        if (!response?.data) {
             return response;
         }
         const data = new DataView(response.data.buffer, response.data.byteOffset, response.data.byteLength);
-        return Object.assign({}, response, { data });
+        return { ...response, data };
     };
 
     privateScope.onTunnelTimeout = function (request) {
@@ -614,7 +614,7 @@ var mspQueue = function () {
         }
         // An identical request may have taken the duplicate as its answer; its own reply is the duplicate now.
         const watch = privateScope.activeWatch(request.code);
-        if (watch && watch.duplicate && !privateScope.isHeldBack(request)) {
+        if (watch?.duplicate && !privateScope.isHeldBack(request)) {
             watch.until = now + watch.windowMs;
         }
     };

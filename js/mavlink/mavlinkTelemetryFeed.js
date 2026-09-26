@@ -3,7 +3,7 @@
 import MSPCodes from '../msp/MSPCodes.js';
 import { MAVLINK_MSG_ID, MAV_CMD_SET_MESSAGE_INTERVAL } from './mavlinkProtocol.js';
 import { GCS_SYSTEM_ID, GCS_COMPONENT_ID } from './mavlinkTunnel.js';
-import { MavlinkTelemetry } from './mavlinkTelemetry.js';
+import { MavlinkTelemetry, MIN_FRESH_WINDOW_MS } from './mavlinkTelemetry.js';
 import { MavlinkStreamControl } from './mavlinkStreamControl.js';
 
 // Reads answered from telemetry; MSP_SENSOR_STATUS stays on the wire because it feeds the FC's isMspConfigActive().
@@ -37,7 +37,7 @@ export const BOOST_WINDOW_MS = 1000;
 export const UNBOOST_IDLE_MS = 2000;
 const IDLE_CHECK_MS = 250;
 const FRESH_INTERVALS = 3;
-export const MIN_FRESH_WINDOW_MS = 3000;
+export { MIN_FRESH_WINDOW_MS };
 export const STATS_PERIOD_MS = 10000;
 // Fields MAVLink does not carry (battery state, remaining capacity, mWh, barometer, hdop) come from this wire read.
 export const WIRE_REFRESH_MS = 10000;
@@ -104,9 +104,11 @@ export class MavlinkTelemetryFeed {
 
     start() {
         this.streams.requestBase(BASE_INTERVALS_US, (accepted, total) => this._streamsDone(accepted, total));
-        this._timers.push(setInterval(() => this._checkStreams(), IDLE_CHECK_MS));
-        // phase-2 A/B: wire vs virtual counter on the console.
-        this._timers.push(setInterval(() => this._logCounts(), STATS_PERIOD_MS));
+        this._timers.push(
+            setInterval(() => this._checkStreams(), IDLE_CHECK_MS),
+            // phase-2 A/B: wire vs virtual counter on the console.
+            setInterval(() => this._logCounts(), STATS_PERIOD_MS),
+        );
     }
 
     // restore only while the port is open: the FC keeps our intervals until reboot otherwise. done() runs once.
@@ -128,7 +130,7 @@ export class MavlinkTelemetryFeed {
 
     serve(code, data, onSent, onFinish) {
         const sources = TELEMETRY_COVERED.get(code);
-        if (!sources || (data && data.length)) {
+        if (!sources || data?.length) {
             return false;
         }
         const reason = this._fallbackReason(code, sources);
@@ -207,7 +209,8 @@ export class MavlinkTelemetryFeed {
         }
         for (const msgid of sources) {
             const intervalUs = this.streams.acceptedIntervalUs(msgid);
-            if (!(intervalUs > 0)) {
+            const acknowledged = intervalUs > 0;
+            if (!acknowledged) {
                 return 'interval for message ' + msgid + ' not acknowledged';
             }
             if (!this.telemetry.seenWithin(msgid, freshWindowMs(intervalUs))) {

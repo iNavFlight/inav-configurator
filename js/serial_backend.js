@@ -33,7 +33,7 @@ import javascriptProgrammingTab from '../tabs/javascript_programming';
 import { MavlinkLink } from './mavlink/mavlinkLink';
 import { concatFrames } from './mavlink/mavlinkProtocol';
 import { MavlinkTelemetryFeed, isTelemetryFeedEnabled, mspCodeOfFrame } from './mavlink/mavlinkTelemetryFeed';
-import { TunnelRebootMonitor, readOnTimeSeconds } from './mavlink/tunnelRebootMonitor';
+import { TunnelRebootMonitor } from './mavlink/tunnelRebootMonitor';
 
 // Probe attempts on top of the first one: a weak radio link may lose the first request.
 const MAVLINK_TUNNEL_PROBE_RETRIES = 2;
@@ -64,7 +64,7 @@ var SerialBackend = (function () {
     privateScope.rebootMonitor = new TunnelRebootMonitor({
         sendProbe: done => MSP.sendLinkProbe(MSPCodes.MSP_API_VERSION, response => done(response !== false), 0),
         resendReboot: () => MSP.send_message(MSPCodes.MSP_SET_REBOOT, false, false),
-        readUptime: done => MSP.sendLinkProbe(MSPCodes.MSP2_INAV_MISC2, response => done(readOnTimeSeconds(response)), 1),
+        readUptime: done => MSP.sendLinkProbe(MSPCodes.MSP2_INAV_MISC2, response => done(response ? FC.MISC2.onTime : null), 1),
         onStart: () => privateScope.onTunnelRebootStart(),
         onBack: () => privateScope.onTunnelRebootBack(),
         onNotRebooted: () => privateScope.onTunnelRebootNotRebooted(),
@@ -146,15 +146,18 @@ var SerialBackend = (function () {
                 const $anchor = $('#tabs > ul li.active a');
                 privateScope.reopenTab = reopenLastTab && $anchor.length ? $anchor : null;
             } else {
-                // Callers may pass an <a> or an <li>; normalize to the <a> element
-                const $el = reopenLastTab ? $(reopenLastTab) : null;
-                if ($el) {
-                    const anchor = $el.is('a') ? $el : $('a', $el);
-                    privateScope.reopenTab = anchor.length ? anchor : null;
-                } else {
-                    privateScope.reopenTab = null;
-                }
+                privateScope.reopenTab = privateScope.tabAnchorOf(reopenLastTab);
             }
+        };
+
+        // Callers may pass an <a> or an <li>; normalize to the <a> element
+        privateScope.tabAnchorOf = function (tab) {
+            if (!tab) {
+                return null;
+            }
+            const $el = $(tab);
+            const anchor = $el.is('a') ? $el : $('a', $el);
+            return anchor.length ? anchor : null;
         };
 
         privateScope.openRebootModal = function () {

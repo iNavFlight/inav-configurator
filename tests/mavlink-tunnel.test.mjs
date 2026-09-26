@@ -168,21 +168,43 @@ test('a dense 5-chunk reply (MSP_BOXNAMES-like) is reassembled into MSP.read', (
     assert.deepEqual([...received[0].payload], [...names]);
 });
 
-test('a chunk after a gap of more than 1000 ms drops the partial MSP frame first', () => {
+// fc_mavlink.c mavlinkPrepareTunnelParser() resets its own parser at >= MAVLINK_TUNNEL_MSP_TIMEOUT_MS.
+for (const gapMs of [1000, 1001]) {
+    test(`a chunk after a gap of ${gapMs} ms drops the partial MSP frame first`, () => {
+        const received = captureMspFrames();
+        let now = 0;
+        const link = tunnelLinkIntoMsp({ now: () => now });
+
+        const lost = fcReplyFrames(mspV2Reply(116, new Uint8Array(300).fill(0x41)));
+        link.ingest(lost[0]);
+        link.ingest(lost[1]);
+        assert.notEqual(MSP.state, MSP.decoder_states.IDLE, 'sanity: the decoder is mid-frame');
+
+        now += gapMs;
+        const next = mspV2Reply(1, [0, 2, 6]);
+        for (const frame of fcReplyFrames(next)) {
+            link.ingest(frame);
+        }
+
+        assert.deepEqual(received.map((r) => r.code), [1], 'the next reply must not be eaten as payload of the lost one');
+    });
+}
+
+test('a chunk after a gap of 999 ms still continues the partial MSP frame', () => {
     const received = captureMspFrames();
     let now = 0;
     const link = tunnelLinkIntoMsp({ now: () => now });
 
-    const lost = fcReplyFrames(mspV2Reply(116, new Uint8Array(300).fill(0x41)));
-    link.ingest(lost[0]);
-    link.ingest(lost[1]);
-    assert.notEqual(MSP.state, MSP.decoder_states.IDLE, 'sanity: the decoder is mid-frame');
-
-    now += 1001;
-    const next = mspV2Reply(1, [0, 2, 6]);
-    for (const frame of fcReplyFrames(next)) {
+    const payload = new Uint8Array(300).fill(0x41);
+    const frames = fcReplyFrames(mspV2Reply(116, payload));
+    link.ingest(frames[0]);
+    link.ingest(frames[1]);
+    now += 999;
+    for (const frame of frames.slice(2)) {
         link.ingest(frame);
     }
 
-    assert.deepEqual(received.map((r) => r.code), [1], 'the next reply must not be eaten as payload of the lost one');
+    assert.equal(received.length, 1);
+    assert.equal(received[0].code, 116);
+    assert.deepEqual([...received[0].payload], [...payload]);
 });

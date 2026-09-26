@@ -202,7 +202,7 @@ export class MavlinkStreamControl {
     }
 
     _resolveBase(msgid, accepted) {
-        if (!this._basePending || !this._basePending.delete(msgid)) {
+        if (!this._basePending?.delete(msgid)) {
             return;
         }
         this._baseAccepted += accepted ? 1 : 0;

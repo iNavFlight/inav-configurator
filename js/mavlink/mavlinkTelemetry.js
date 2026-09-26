@@ -31,6 +31,8 @@ const BATTERY_VOLTAGES_EXT_LENGTH = 4;
 const BATTERY_PRESENT_THRESHOLD_MV = 2200;
 const NOT_MEASURED = -1;
 const UINT16_RANGE = 65536;
+// Older than this, a message no longer counts as streaming; the feed's freshness rule never goes below it.
+export const MIN_FRESH_WINDOW_MS = 3000;
 
 function payloadView(payload) {
     return new DataView(payload.buffer, payload.byteOffset, payload.byteLength);
@@ -244,7 +246,7 @@ export class MavlinkTelemetry {
 
     _applyVfrHud(hud) {
         const sensorData = this._fc.SENSOR_DATA;
-        sensorData.altitude = parseFloat((Math.round(hud.alt * 100) / 100.0).toFixed(2));
+        sensorData.altitude = Number.parseFloat((Math.round(hud.alt * 100) / 100.0).toFixed(2));
     }
 
     _applyRcChannels(rc) {
@@ -267,7 +269,8 @@ export class MavlinkTelemetry {
         this._packEstimateMv = packVoltageFromCells(battery.voltages, battery.voltagesExt);
         analog.mAhdrawn = measured(battery.currentConsumed);
         analog.battery_percentage = Math.max(0, battery.batteryRemaining);
-        if (this._msp) {
+        // Voltage, current and power come from SYS_STATUS: BATTERY_STATUS alone must not mark them fresh.
+        if (this._msp && this.seenWithin(MAVLINK_MSG_ID.SYS_STATUS, MIN_FRESH_WINDOW_MS)) {
             this._msp.analog_last_received_timestamp = this._now();
         }
     }

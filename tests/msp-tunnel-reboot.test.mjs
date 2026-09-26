@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 /**
- * MSP_SET_REBOOT over a MAVLink tunnel that survives the reboot: the real js/msp.js +
- * js/serial_queue.js (import specifiers rewritten only), the real MavlinkLink and the real
- * TunnelRebootMonitor against a fake FC on Node's mock timers. The FC replies before it
+ * MSP_SET_REBOOT over a MAVLink tunnel that survives the reboot: the real js/msp.js,
+ * js/serial_queue.js and js/msp/MSPHelper.js (import specifiers rewritten only), the real
+ * MavlinkLink and the real TunnelRebootMonitor against a fake FC on Node's mock timers. The FC replies before it
  * reboots, so a missing reply is a lost request or a lost reply, and a blind resend would
  * reboot a freshly started FC twice. Silence marks a candidate, the FC's uptime
  * (MSP2_INAV_MISC2) decides; a resend needs a positive uptime reading.
@@ -17,34 +17,25 @@ import { MAVLINK_MSG_ID, encodeFrameV2, getMessageInfo, concatFrames } from '../
 import { buildTunnelPayload } from '../js/mavlink/mavlinkTunnel.js';
 import {
     TunnelRebootMonitor,
-    readOnTimeSeconds,
     REBOOT_BACK_TIMEOUT_MS,
     REBOOT_REPLY_WATCHDOG_MS,
     REBOOT_UPTIME_WATCHDOG_MS,
 } from '../js/mavlink/tunnelRebootMonitor.js';
-import { loadMspCore, mspV2Reply, resetMspCore } from './helpers/mspCore.mjs';
+import { dataModule } from './helpers/dataModule.mjs';
+import { loadMspHelper, mspV2Reply, resetMspCore } from './helpers/mspCore.mjs';
 
-const { MSP, mspQueue, MSPCodes, CONFIGURATOR, mspDeduplicationQueue } =
-    await loadMspCore(import.meta.url, 'msp-tunnel-reboot.test.mjs', 'msp-tunnel-reboot-');
+globalThis.__rebootFcState = { CONFIG: {}, MISC2: { onTime: 0, flightTime: 0, throttlePercent: 0, autoThrottle: false } };
+const { mspHelper, MSP, mspQueue, MSPCodes, CONFIGURATOR, mspDeduplicationQueue } =
+    await loadMspHelper(import.meta.url, 'msp-tunnel-reboot.test.mjs', 'msp-tunnel-reboot-', {
+        fc: dataModule('export default globalThis.__rebootFcState;'),
+        gui: dataModule('export default { log() {} };'),
+        i18n: dataModule('export default { getMessage: key => key };'),
+    });
+const fcState = globalThis.__rebootFcState;
 
 globalThis.$ = () => ({ html() {} });
 MSP.init();
-
-// Stand-in for MSPHelper.completeRequest: fire and remove the first pending callback of the code.
-MSP.setProcessData((handler) => {
-    for (let i = handler.callbacks.length - 1; i >= 0; i--) {
-        const pending = handler.callbacks[i];
-        if (pending.code == handler.code) {
-            clearTimeout(pending.timer);
-            mspDeduplicationQueue.remove(handler.code);
-            handler.callbacks.splice(i, 1);
-            if (pending.onFinish) {
-                pending.onFinish({ command: handler.code, data: new DataView(handler.message_buffer, 0) });
-            }
-            break;
-        }
-    }
-});
+mspHelper.init();
 
 const REPLY_DELAY_MS = 3;
 const REBOOT_REPLY_WINDOW_MS = 5000;
@@ -219,7 +210,7 @@ function startSession(t, fcOptions) {
         // Same wiring as js/serial_backend.js.
         sendProbe: done => MSP.sendLinkProbe(MSPCodes.MSP_API_VERSION, response => done(response !== false), 0),
         resendReboot: () => MSP.send_message(MSPCodes.MSP_SET_REBOOT, false, false),
-        readUptime: done => MSP.sendLinkProbe(MSPCodes.MSP2_INAV_MISC2, response => done(readOnTimeSeconds(response)), 1),
+        readUptime: done => MSP.sendLinkProbe(MSPCodes.MSP2_INAV_MISC2, response => done(response ? fcState.MISC2.onTime : null), 1),
         onStart: () => session.started++,
         onBack: () => session.outcomes.push('back'),
         onNotRebooted: () => session.outcomes.push('notRebooted'),
@@ -528,4 +519,13 @@ test('a lost MSP_SET_REBOOT reply does not report a lost write', (t) => {
     sendReboot(session);
     advance(t, REBOOT_REPLY_WINDOW_MS + 100);
     assert.deepEqual(lostWrites, []);
+});
+
+test('MSP2_INAV_MISC2 fills FC.MISC2; an error reply leaves no stale uptime behind', () => {
+    const handle = (bytes, unsupported) => mspHelper.processData({ code: MSPCodes.MSP2_INAV_MISC2,
+        message_buffer: Uint8Array.from(bytes).buffer, message_length_expected: bytes.length, unsupported, callbacks: [] });
+    handle([...u32(600), ...u32(42), 55, 1], 0);
+    assert.deepEqual(fcState.MISC2, { onTime: 600, flightTime: 42, throttlePercent: 55, autoThrottle: true });
+    handle([], 1);
+    assert.equal(fcState.MISC2.onTime, null);
 });

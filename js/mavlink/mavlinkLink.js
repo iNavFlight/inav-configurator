@@ -114,7 +114,7 @@ export class MavlinkLink {
         }
 
         const now = this._now();
-        if (this._lastChunkAt !== null && now - this._lastChunkAt > TUNNEL_REASSEMBLY_TIMEOUT_MS && this.onReassemblyTimeout) {
+        if (this._lastChunkAt !== null && now - this._lastChunkAt >= TUNNEL_REASSEMBLY_TIMEOUT_MS && this.onReassemblyTimeout) {
             this.onReassemblyTimeout();
         }
         this._lastChunkAt = now;

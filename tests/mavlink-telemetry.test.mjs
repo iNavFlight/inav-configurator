@@ -10,7 +10,7 @@ import assert from 'node:assert/strict';
 
 import { MavlinkParser } from '../js/mavlink/mavlinkParser.js';
 import { MAVLINK_MSG_ID } from '../js/mavlink/mavlinkProtocol.js';
-import { MavlinkTelemetry, cellCountFromVoltages } from '../js/mavlink/mavlinkTelemetry.js';
+import { MavlinkTelemetry, cellCountFromVoltages, MIN_FRESH_WINDOW_MS } from '../js/mavlink/mavlinkTelemetry.js';
 
 const GOLDEN = {
     attitude_a: 'fd1000000001011e0000e8030000e5d35bbe25be4bbfe8f1c7bfdfd4',
@@ -172,6 +172,8 @@ test('BATTERY_STATUS: cell count from cell voltages, mAh, percentage, analog tim
         ['battery_absent', { cell_count: 0, mAhdrawn: 0, battery_percentage: 0 }],
         ['battery_no_vbat_no_current', { cell_count: 0, mAhdrawn: 0, battery_percentage: 0 }],
     ];
+    setNow(5000);
+    telemetry.handleFrame(frameOf('sys_status_healthy'));
     for (const [name, expected] of cases) {
         setNow(5000);
         telemetry.handleFrame(frameOf(name));
@@ -187,6 +189,33 @@ test('BATTERY_STATUS: cell count from cell voltages, mAh, percentage, analog tim
     assert.equal(fc.ANALOG.battery_remaining_capacity, 1500);
     assert.equal(fc.ANALOG.use_capacity_thresholds, true);
     assert.equal(fc.ANALOG.battery_full_when_plugged_in, true);
+});
+
+test('analog timestamp: BATTERY_STATUS refreshes it only while SYS_STATUS streams too', () => {
+    const { msp, telemetry, setNow } = makeTelemetry();
+    setNow(1000);
+    telemetry.handleFrame(frameOf('battery_4s'));
+    assert.equal(msp.analog_last_received_timestamp, null, 'no SYS_STATUS yet');
+
+    telemetry.handleFrame(frameOf('sys_status_healthy'));
+    telemetry.handleFrame(frameOf('battery_4s'));
+    assert.equal(msp.analog_last_received_timestamp, 1000);
+
+    // SYS_STATUS stops, BATTERY_STATUS keeps streaming at 1 Hz.
+    setNow(1000 + MIN_FRESH_WINDOW_MS);
+    telemetry.handleFrame(frameOf('battery_4s'));
+    assert.equal(msp.analog_last_received_timestamp, 1000 + MIN_FRESH_WINDOW_MS, 'still inside the window');
+    for (let now = 2000 + MIN_FRESH_WINDOW_MS; now <= 10000; now += 1000) {
+        setNow(now);
+        telemetry.handleFrame(frameOf('battery_4s'));
+    }
+    assert.equal(msp.analog_last_received_timestamp, 1000 + MIN_FRESH_WINDOW_MS, 'stale SYS_STATUS: voltage and current are stale');
+
+    setNow(10500);
+    telemetry.handleFrame(frameOf('sys_status_healthy'));
+    setNow(11000);
+    telemetry.handleFrame(frameOf('battery_4s'));
+    assert.equal(msp.analog_last_received_timestamp, 11000);
 });
 
 test('cell count: one entry above the battery-present threshold reads as one cell', () => {

@@ -59,7 +59,7 @@ const LIVE_WRITE_CODES = new Set(['MSP_SET_MOTOR', 'MSP_SET_RAW_RC', 'MSP_SET_RA
     .map(name => MSPCodes[name]));
 
 function payloadKey(data) {
-    return data && data.length ? Array.from(data, byte => (byte & 0xFF).toString(16).padStart(2, '0')).join('') : '';
+    return data?.length ? Array.from(data, byte => (byte & 0xFF).toString(16).padStart(2, '0')).join('') : '';
 }
 
 const CODE_NAMES = new Map(Object.keys(MSPCodes).map(name => [MSPCodes[name], name]));
@@ -501,8 +501,7 @@ var MSP = {
             return false;
         }
 
-        if (this.virtualReplies && this.virtualReplies.serve(code, data, callback_sent, callback_msp)) {
-            eventFrequencyAnalyzer.put('MPS virtual ' + code);
+        if (this._serveVirtualReply(code, data, callback_sent, callback_msp)) {
             return true;
         }
 
@@ -579,18 +578,29 @@ var MSP = {
             message.retryCounter = 10;
         }
 
-        if (code == MSPCodes.MSP_SET_REBOOT && this.rebootTracker) {
-            message.rebootTracked = true;
-            message.onFinish = this.rebootTracker.track(callback_msp);
-            // A reboot is already being confirmed: a second one would reboot the FC again.
-            if (!message.onFinish) {
-                return false;
-            }
+        if (!this._trackReboot(message)) {
+            return false;
         }
 
         this._enqueue(message);
 
         return true;
+    },
+    _serveVirtualReply(code, data, callback_sent, callback_msp) {
+        if (!this.virtualReplies?.serve(code, data, callback_sent, callback_msp)) {
+            return false;
+        }
+        eventFrequencyAnalyzer.put('MPS virtual ' + code);
+        return true;
+    },
+    // False when a reboot is already being confirmed: a second one would reboot the FC again.
+    _trackReboot(message) {
+        if (message.code != MSPCodes.MSP_SET_REBOOT || !this.rebootTracker) {
+            return true;
+        }
+        message.rebootTracked = true;
+        message.onFinish = this.rebootTracker.track(message.onFinish);
+        return Boolean(message.onFinish);
     },
     /*
      * Hand a message to the queue. put() can reject it (queue locked, or a
