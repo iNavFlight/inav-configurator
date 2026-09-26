@@ -16,6 +16,8 @@ import mspQueue from './../serial_queue';
 // keeps the parse and the build path from drifting apart.
 const MZTC_CONFIG_BYTES = 11;
 const MZTC_STATUS_BYTES = 7;
+// cycleTime, i2c errors, sensor status, cpu load (u16 each), profile byte, arming flags (u32).
+const INAV_STATUS_BOX_MODES_OFFSET = 13;
 import ServoMixRule from './../servoMixRule';
 import MotorMixRule from './../motorMixRule';
 import LogicCondition from './../logicCondition';
@@ -51,6 +53,9 @@ var mspHelper = (function () {
         self.sensorStatusEx = cb;
     }
 
+    // Set by serial_backend: undoes what a stalled save chain leaves paused.
+    self.onWriteLostRecovery = null;
+
     self.BAUD_RATES_post1_6_3 = [
         'AUTO',
         '1200',
@@ -85,7 +90,17 @@ var mspHelper = (function () {
                 return;
             }
             lastWriteBlockedNotice = now;
-            GUI.log(i18n.getMessage('mspWriteBlockedAfterParseFailure', [MSP.getCodeName(sourceCode)]));
+            const key = MSP.parseFailures.has(sourceCode) ? 'mspWriteBlockedAfterParseFailure' : 'mspWriteBlockedAfterLostReply';
+            GUI.log(i18n.getMessage(key, [MSP.getCodeName(sourceCode)]));
+        };
+        MSP.onResponseLost = function (code) {
+            GUI.log(i18n.getMessage('mspTunnelReplyLost', [MSP.getCodeName(code)]));
+        };
+        MSP.onWriteLost = function (code) {
+            GUI.log(i18n.getMessage('mspTunnelWriteLost', [MSP.getCodeName(code)]));
+            if (self.onWriteLostRecovery) {
+                self.onWriteLostRecovery(code);
+            }
         };
     }
 
@@ -109,6 +124,29 @@ var mspHelper = (function () {
 
         completeRequest(dataHandler, new DataView(dataHandler.message_buffer, 0));
     };
+
+    // Same boxBitmask_t as MSP_ACTIVEBOXES (fc_msp.c:547-552), between the arming flags and the
+    // trailing mixer profile byte (fc_msp.c:579-598), so a tunnel session can skip ACTIVEBOXES.
+    function applyInavStatusBoxModes(data, length) {
+        const words = Math.floor((length - INAV_STATUS_BOX_MODES_OFFSET - 1) / 4);
+        if (words <= 0) {
+            return;
+        }
+        const mode = [];
+        for (let i = 0; i < words; i++) {
+            mode.push(data.getUint32(INAV_STATUS_BOX_MODES_OFFSET + i * 4, true));
+        }
+        FC.CONFIG.mode = mode;
+    }
+
+    // fc_msp.c:998-1004. A short reply leaves onTime null: the tunnel reboot check must not act on a stale uptime.
+    function applyMisc2(data) {
+        const length = data.byteLength;
+        FC.MISC2.onTime = length >= 4 ? data.getUint32(0, true) : null;
+        FC.MISC2.flightTime = length >= 8 ? data.getUint32(4, true) : 0;
+        FC.MISC2.throttlePercent = length >= 9 ? data.getUint8(8) : 0;
+        FC.MISC2.autoThrottle = length >= 10 && data.getUint8(9) !== 0;
+    }
 
     /**
      *
@@ -153,6 +191,7 @@ var mspHelper = (function () {
 
                 FC.CONFIG.armingFlags = data.getUint32(offset, true);
                 offset += 4;
+                applyInavStatusBoxModes(data, dataHandler.message_length_expected);
 
                 //As there are 8 bytes for mspBoxModeFlags (number of bytes is actually variable)
                 //read mixer profile as the last byte in the the message
@@ -815,6 +854,10 @@ var mspHelper = (function () {
 
             case MSPCodes.MSP_SET_REBOOT:
                 console.log('Reboot request accepted');
+                break;
+
+            case MSPCodes.MSP2_INAV_MISC2:
+                applyMisc2(data);
                 break;
 
             //
@@ -1985,6 +2028,15 @@ var mspHelper = (function () {
         }
     };
 
+    function recordRoundtrip(code, request) {
+        const sample = mspQueue.roundtripSample(request);
+        if (sample) {
+            mspQueue.putRoundtrip(sample.total);
+            mspQueue.putHardwareRoundtrip(sample.hardware);
+            mspStatistics.add(code, sample.hardware);
+        }
+    }
+
     var completeRequest = function (dataHandler, data) {
         // trigger callbacks, cleanup/remove callback after trigger
         for (let i = dataHandler.callbacks.length - 1; i >= 0; i--) { // iterating in reverse because we use .splice which modifies array length
@@ -2000,13 +2052,7 @@ var mspHelper = (function () {
                      * Compute roundtrip
                      */
                     if (dataHandler.callbacks[i]) {
-                        mspQueue.putRoundtrip(new Date().getTime() - dataHandler.callbacks[i].createdOn);
-
-                        const hardwareRountrip = new Date().getTime() - dataHandler.callbacks[i].sentOn;
-
-                        mspQueue.putHardwareRoundtrip(hardwareRountrip);
-
-                        mspStatistics.add(dataHandler.code, hardwareRountrip);
+                        recordRoundtrip(dataHandler.code, dataHandler.callbacks[i]);
                     }
 
                     //remove message from queue as received
@@ -3882,7 +3928,8 @@ var mspHelper = (function () {
 
     self.getCraftName = function (callback) {
         MSP.send_message(MSPCodes.MSP_NAME, false, false, function (resp) {
-            var name = resp.data.readString();
+            // null tells a lost reply apart from an empty name
+            var name = resp ? resp.data.readString() : null;
             if (callback) {
                 callback(name);
             }

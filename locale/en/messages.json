@@ -55,6 +55,12 @@
     "options_cliAutocomplete": {
         "message": "Advanced CLI AutoComplete"
     },
+    "options_mavlinkTelemetryFeed": {
+        "message": "MAVLink telemetry feed (experimental)"
+    },
+    "options_mavlinkTelemetryFeedHelp": {
+        "message": "When connected through the MAVLink tunnel, standard MAVLink telemetry replaces MSP polling for attitude, RC, battery and GPS. Turn off to compare with pure MSP polling. A change takes effect at the next connect."
+    },
     "navExpandAll": {
         "message": "Expand All"
     },
@@ -688,6 +694,72 @@
     },
     "tabSwitchUpgradeRequired": {
         "message": "You need to <strong>upgrade</strong> your firmware before you can use the $1 tab."
+    },
+    "tabSwitchMavlinkTunnelUnavailable": {
+        "message": "The $1 tab is not available over the MAVLink tunnel. Connect over USB or a plain MSP port to use it."
+    },
+    "mavlinkTunnelDetected": {
+        "message": "MAVLink heartbeat from system <strong>$1</strong> received - using MSP over MAVLink"
+    },
+    "mavlinkTunnelNoReply": {
+        "message": "MAVLink heartbeat received but no MSP tunnel reply - needs INAV 10.0 or later with mavlink_version 2"
+    },
+    "mavlinkTunnelV1Only": {
+        "message": "Only MAVLink 1 heartbeats received - the MSP tunnel needs mavlink_version 2 on the flight controller"
+    },
+    "mavlinkTunnelLostReply": {
+        "message": "MSP over MAVLink: no reply to $1 after retries, disconnecting"
+    },
+    "mavlinkTunnelSkippedPlainMsp": {
+        "message": "MAVLink heartbeat from system <strong>$1</strong> seen, but the port also answers plain MSP - staying on MSP"
+    },
+    "mavlinkTunnelNoCli": {
+        "message": "The CLI is not available over the MAVLink tunnel. Connect over USB or a plain MSP port to use it."
+    },
+    "linkTypeMsp": {
+        "message": "Link: MSP"
+    },
+    "linkTypeMavlinkTunnel": {
+        "message": "Link: MSP over MAVLink"
+    },
+    "linkTypeMavlinkTunnelTelemetry": {
+        "message": "Link: MSP over MAVLink +telemetry"
+    },
+    "mavlinkTelemetryStreamsActive": {
+        "message": "MAVLink telemetry: $1 streams active"
+    },
+    "mavlinkTelemetryNoAck": {
+        "message": "MAVLink telemetry: no ack, MSP polling stays"
+    },
+    "mavlinkTunnelRebootWaiting": {
+        "message": "MSP over MAVLink: reboot accepted, waiting for the flight controller to restart"
+    },
+    "mavlinkTunnelRebootReplyLost": {
+        "message": "MSP over MAVLink: no reply to the reboot request, checking whether the flight controller restarted"
+    },
+    "mavlinkTunnelRebootResend": {
+        "message": "MSP over MAVLink: the reboot request did not arrive, sending it once more"
+    },
+    "mavlinkTunnelRebootSilent": {
+        "message": "MSP over MAVLink: flight controller went silent"
+    },
+    "mavlinkTunnelRebootUptime": {
+        "message": "MSP over MAVLink: flight controller uptime $1 s, reboot requested $2 s ago"
+    },
+    "mavlinkTunnelRebootUptimeUnavailable": {
+        "message": "MSP over MAVLink: flight controller uptime could not be read, going by its silence alone"
+    },
+    "mavlinkTunnelRebootAlreadyRunning": {
+        "message": "MSP over MAVLink: a reboot is already being confirmed, the second reboot request was not sent"
+    },
+    "mavlinkTunnelRebootBack": {
+        "message": "MSP over MAVLink: flight controller is back after the reboot, reconnecting"
+    },
+    "mavlinkTunnelRebootNotRebooted": {
+        "message": "<span style=\"color: red\">The flight controller did not reboot</span> (it may be armed). The connection stays open; changes that need a reboot are not active until you reboot or power-cycle it."
+    },
+    "mavlinkTunnelRebootNotBack": {
+        "message": "<span style=\"color: red\">The flight controller did not come back after the reboot.</span> Reconnect manually."
     },
     "firmwareVersion": {
         "message": "Firmware Version: <strong>$1</strong>"
@@ -6349,6 +6421,15 @@
     },
     "mspResponseUnreadable": {
         "message": "The flight controller's $1 response could not be read. The values it carries may be incomplete, so <span style=\"color: red\">saving them has been disabled</span> to prevent writing wrong settings to the aircraft. Settings that do not use this data are unaffected. Reconnect to try again."
+    },
+    "mspTunnelReplyLost": {
+        "message": "No reply to $1 over the MAVLink tunnel. Saving the settings it carries is <span style=\"color: red\">blocked</span> until it has been read again."
+    },
+    "mspTunnelWriteLost": {
+        "message": "The FC did not confirm $1 over the MAVLink tunnel. Reload the tab to see what the FC holds, then save again."
+    },
+    "mspWriteBlockedAfterLostReply": {
+        "message": "<span style=\"color: red\">Not saved.</span> These settings come from the flight controller's $1 response, whose reply was lost on the MAVLink tunnel, so writing them back is refused. Reopen the tab to read them again."
     },
     "mspWriteBlockedAfterParseFailure": {
         "message": "<span style=\"color: red\">Not saved.</span> These settings come from the flight controller's $1 response, which could not be read this session, so writing them back is refused. Reconnect to try again."

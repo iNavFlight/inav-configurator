@@ -51,6 +51,17 @@ for (const name of WRITE_CODE_NAMES) {
     }
 }
 
+// Reads whose loss makes a save unsafe; losing any other read (status polls) is not reported.
+const WRITE_SOURCE_VALUES = new Set(WRITE_SOURCE_CODES.values());
+
+// Live control, never part of a save: "nothing was saved" would be wrong, and a slider would spam it.
+const LIVE_WRITE_CODES = new Set(['MSP_SET_MOTOR', 'MSP_SET_RAW_RC', 'MSP_SET_RAW_GPS', 'MSP_SET_HEAD', 'MSP_SET_RTC']
+    .map(name => MSPCodes[name]));
+
+function payloadKey(data) {
+    return data?.length ? Array.from(data, byte => (byte & 0xFF).toString(16).padStart(2, '0')).join('') : '';
+}
+
 const CODE_NAMES = new Map(Object.keys(MSPCodes).map(name => [MSPCodes[name], name]));
 
 /**
@@ -69,6 +80,7 @@ var MspMessageClass = function () {
     publicScope.createdOn = new Date().getTime();
     publicScope.sentOn = null;
     publicScope.retryCounter = 5;
+    publicScope.tunnelRetries = null;
 
     return publicScope;
 };
@@ -139,12 +151,29 @@ var MSP = {
 
     processData: null,
 
+    // Tunnel retry budget for the message being built by send_message(); null = queue default.
+    nextTunnelRetries: null,
+    // Set by sendLinkProbe() for the message being built by send_message().
+    nextLinkProbe: false,
+
     // Reads whose response failed to parse this session. The FC state they fill is
     // then part fresh and part stale, so the writes handing it back are refused.
     parseFailures: new Set(),
 
+    // code -> payloads of reads whose tunnel reply was lost; the payload selects the item (WP n,
+    // setting name). Unlike parse failures an entry clears when that same read succeeds again.
+    lostReplies: new Map(),
+
+    // MAVLink telemetry feed of a tunnel session: answers covered reads without the wire.
+    virtualReplies: null,
+
+    // Tunnel session only: the link survives the reboot, so it is confirmed by watching the FC.
+    rebootTracker: null,
+
     // Set by MSPHelper; injected because gui.js already imports this module.
     onConfigWriteBlocked: null,
+    onResponseLost: null,
+    onWriteLost: null,
 
     getCodeName(code) {
         return CODE_NAMES.get(code) || ('0x' + code.toString(16));
@@ -152,18 +181,19 @@ var MSP = {
 
     // Which unreadable response makes this write unsafe, or false if it is safe.
     blockedWriteSource(code) {
-        if (this.parseFailures.size === 0 || ALWAYS_ALLOWED_WRITE_CODES.has(code)) {
+        if ((this.parseFailures.size === 0 && this.lostReplies.size === 0) || ALWAYS_ALLOWED_WRITE_CODES.has(code)) {
             return false;
         }
 
         const source = WRITE_SOURCE_CODES.get(code);
         if (source !== undefined) {
-            return this.parseFailures.has(source) ? source : false;
+            return this.parseFailures.has(source) || this.lostReplies.has(source) ? source : false;
         }
 
         // Unpaired write: refuse rather than guess. Over-blocking costs a refused save,
         // under-blocking puts wrong values into the aircraft.
-        return WRITE_CODES.has(code) ? this.parseFailures.values().next().value : false;
+        const unusable = this.parseFailures.size > 0 ? this.parseFailures.values() : this.lostReplies.keys();
+        return WRITE_CODES.has(code) ? unusable.next().value : false;
     },
 
     // Reports and refuses a write built from an unreadable response.
@@ -187,6 +217,45 @@ var MSP = {
     init() {
         mspQueue.setPutCallback(this.putCallback);
         mspQueue.setremoveCallback(this.removeCallback);
+        mspQueue.setDecoderResetCallback(() => MSP.resetDecoder());
+        mspQueue.setTunnelFailureCallback(request => MSP.handleTunnelRequestLost(request));
+        mspQueue.setWriteCodePredicate(code => WRITE_CODES.has(code));
+    },
+
+    // A lost read leaves its FC state stale, so the write handing it back is blocked as after
+    // an unreadable response. A lost write gets no callback, like a refused one: callers ignore
+    // the argument and would go on to save and reboot. The user is told to reload and save again.
+    handleTunnelRequestLost(request) {
+        if (request.rebootTracked || request.linkProbe) {
+            if (request.onFinish) {
+                request.onFinish(false);
+            }
+            return;
+        }
+        if (WRITE_CODES.has(request.code)) {
+            console.error('MSP write ' + this.getCodeName(request.code) + ' got no reply over the MAVLink tunnel');
+            if (this.onWriteLost && !LIVE_WRITE_CODES.has(request.code)) {
+                this.onWriteLost(request.code);
+            }
+            return;
+        }
+        const payloads = this.lostReplies.get(request.code) || new Set();
+        const firstLoss = payloads.size === 0;
+        payloads.add(request.payloadKey || '');
+        this.lostReplies.set(request.code, payloads);
+        // The handshake reports its own lost replies and disconnects.
+        if (firstLoss && WRITE_SOURCE_VALUES.has(request.code) && this.onResponseLost && CONFIGURATOR.connectionValid) {
+            this.onResponseLost(request.code);
+        }
+        if (request.onFinish) {
+            request.onFinish(false);
+        }
+    },
+
+    // A lost tunnel chunk leaves the decoder mid-frame; the next reply would be eaten as its payload.
+    resetDecoder() {
+        this.state = this.decoder_states.IDLE;
+        this.message_length_received = 0;
     },
 
     setProcessData(cb) {
@@ -349,6 +418,23 @@ var MSP = {
         this.last_received_timestamp = Date.now();
     },
 
+    _clearLostReply(request) {
+        const payloads = request ? this.lostReplies.get(request.code) : null;
+        if (!payloads) {
+            return;
+        }
+        payloads.delete(request.payloadKey || '');
+        if (payloads.size === 0) {
+            this.lostReplies.delete(request.code);
+        }
+    },
+
+    _noteWireReply(request) {
+        if (request && this.virtualReplies) {
+            this.virtualReplies.noteWireReply(request.code);
+        }
+    },
+
     _initialize_read_buffer() {
         this.message_buffer = new ArrayBuffer(this.message_length_expected);
         this.message_buffer_uint8_view = new Uint8Array(this.message_buffer);
@@ -359,7 +445,14 @@ var MSP = {
         try {
             if (this.message_checksum == expected_checksum) {
                 // message received, process
-                this.processData(this);
+                if (mspQueue.admitReply(this.code)) {
+                    this.processData(this);
+                    // A parse failure keeps the code blocked through parseFailures instead.
+                    if (!this.unsupported) {
+                        this._clearLostReply(mspQueue.lastAnsweredRequest());
+                        this._noteWireReply(mspQueue.lastAnsweredRequest());
+                    }
+                }
                 this.lastFrameReceivedMs = Date.now();
             } else {
                 console.log('code: ' + this.code + ' - crc failed');
@@ -371,7 +464,7 @@ var MSP = {
              * Free port - processData is pluggable, so this cannot depend on it returning.
              */
             timeout.add('delayedFreeHardLock', function() {
-                mspQueue.freeHardLock();
+                mspQueue.freeHardLockAfterFrame();
             }, 10);
 
             // Reset variables - MUST happen even if an exception occurred
@@ -392,10 +485,10 @@ var MSP = {
      * @param {number} code
      */
     removeCallback(code) {
-
-        for (var i in this.callbacks) {
-            if (MSP.callbacks.hasOwnProperty(i) && this.callbacks[i].code == code) {
-                clearTimeout(this.callbacks[i].timer);
+        // The queue calls this unbound, so it must not rely on `this`.
+        for (let i = MSP.callbacks.length - 1; i >= 0; i--) {
+            if (MSP.callbacks[i].code == code) {
+                clearTimeout(MSP.callbacks[i].timer);
                 MSP.callbacks.splice(i, 1);
             }
         }
@@ -406,6 +499,10 @@ var MSP = {
         // would run the EEPROM write and reboot as if the settings had been stored.
         if (this.refuseBlockedWrite(code)) {
             return false;
+        }
+
+        if (this._serveVirtualReply(code, data, callback_sent, callback_msp)) {
+            return true;
         }
 
         var payloadLength = data && data.length ? data.length : 0;
@@ -471,6 +568,8 @@ var MSP = {
         message.messageBody = buffer;
         message.onFinish = callback_msp;
         message.onSend = callback_sent;
+        message.payloadKey = payloadKey(data);
+        message.linkProbe = this.nextLinkProbe;
 
         /*
          * In case of MSP_REBOOT special procedure is required
@@ -479,9 +578,29 @@ var MSP = {
             message.retryCounter = 10;
         }
 
+        if (!this._trackReboot(message)) {
+            return false;
+        }
+
         this._enqueue(message);
 
         return true;
+    },
+    _serveVirtualReply(code, data, callback_sent, callback_msp) {
+        if (!this.virtualReplies?.serve(code, data, callback_sent, callback_msp)) {
+            return false;
+        }
+        eventFrequencyAnalyzer.put('MPS virtual ' + code);
+        return true;
+    },
+    // False when a reboot is already being confirmed: a second one would reboot the FC again.
+    _trackReboot(message) {
+        if (message.code != MSPCodes.MSP_SET_REBOOT || !this.rebootTracker) {
+            return true;
+        }
+        message.rebootTracked = true;
+        message.onFinish = this.rebootTracker.track(message.onFinish);
+        return Boolean(message.onFinish);
     },
     /*
      * Hand a message to the queue. put() can reject it (queue locked, or a
@@ -491,6 +610,9 @@ var MSP = {
      * awaiting it, so retry briefly before giving up.
      */
     _enqueue(message) {
+        if (message.tunnelRetries === null) {
+            message.tunnelRetries = this.nextTunnelRetries;
+        }
         // CONFIGURATOR.cliActive can flip true between retries (each one is a
         // separate setTimeout, well after the original send_message() call).
         // Check it before every attempt, including the first: a successful
@@ -499,6 +621,9 @@ var MSP = {
         // this is. Give up rather than retry once that's happened - same as
         // exhausting putRetries.
         if (!CONFIGURATOR.cliActive && mspQueue.put(message)) {
+            return;
+        }
+        if (!CONFIGURATOR.cliActive && !WRITE_CODES.has(message.code) && mspQueue.coalesce(message)) {
             return;
         }
         if (message.putRetries === undefined) {
@@ -523,6 +648,24 @@ var MSP = {
         }
         return crc;
     },
+    // Own retry budget in tunnel mode (the probe); a plain MSP link ignores it.
+    sendWithTunnelRetries(code, data, callback_msp, retries) {
+        this.nextTunnelRetries = retries;
+        try {
+            return this.send_message(code, data, false, callback_msp);
+        } finally {
+            this.nextTunnelRetries = null;
+        }
+    },
+    // Reboot monitor reads: their loss says the FC is down, not that its state is stale.
+    sendLinkProbe(code, callback_msp, retries) {
+        this.nextLinkProbe = true;
+        try {
+            return this.sendWithTunnelRetries(code, false, callback_msp, retries);
+        } finally {
+            this.nextLinkProbe = false;
+        }
+    },
     promise(code, data, protocolVersion) {
         var self = this;
         return new Promise(function(resolve, reject) {
@@ -537,6 +680,10 @@ var MSP = {
         });
     },
     callbacks_cleanup() {
+        mspQueue.abandonPending();
+        if (this.virtualReplies) {
+            this.virtualReplies.cancelPending();
+        }
         for (var i = 0; i < this.callbacks.length; i++) {
             clearInterval(this.callbacks[i].timer);
         }
@@ -550,6 +697,9 @@ var MSP = {
         this.analog_last_received_timestamp = null;
         this.lastFrameReceivedMs = 0;
         this.parseFailures.clear(); // the next session re-reads everything from scratch
+        this.lostReplies.clear();
+        mspQueue.setTunnelMode(false);
+        mspQueue.setTransportTransform(null);
 
         this.callbacks_cleanup();
     },

@@ -297,6 +297,11 @@ $(function() {
                     return;
                 }
 
+                if (CONFIGURATOR.mavlinkTunnelActive && GUI.tabsUnavailableOverMavlinkTunnel.includes(tab)) {
+                    GUI.log(i18n.getMessage('tabSwitchMavlinkTunnelUnavailable', [tabName]));
+                    return;
+                }
+
                 if (GUI.allowedTabs.indexOf(tab) < 0) {
                     GUI.log(i18n.getMessage('tabSwitchUpgradeRequired', [tabName]));
                     return;
@@ -555,6 +560,12 @@ $(function() {
                     $('div.disable_3d_acceleration input').on('change', function () {
                         var check = $(this).is(':checked');
                         store.set('disable_3d_acceleration', check);
+                    });
+
+                    // phase-2 A/B: read by the MAVLink tunnel at the next connect.
+                    $('div.mavlink_telemetry_feed input').prop('checked', store.get('mavlink_telemetry_feed', true) !== false);
+                    $('div.mavlink_telemetry_feed input').on('change', function () {
+                        store.set('mavlink_telemetry_feed', $(this).is(':checked'));
                     });
 
                     $('div.statistics input').on('change', function () {

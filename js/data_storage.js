@@ -12,6 +12,9 @@ var CONFIGURATOR = {
     'connectionValidCliOnly': false,
     'cliActive': false,
     'cliValid': false,
+    'mavlinkTunnelActive': false,
+    // phase-2 A/B: MAVLink telemetry feed of this tunnel session, read once at connect.
+    'mavlinkTelemetryFeed': false,
     'connection': false
 };
 
