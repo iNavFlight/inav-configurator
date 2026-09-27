@@ -83,8 +83,7 @@
                         <div class="spacer_box_title" data-i18n="gpsConstellations"></div>
                     </div>
                     <div class="spacer_box">
-                        <!-- The switches INAV can actually move. One is withdrawn only when
-                             the receiver has told us it does not have that constellation -->
+                        <!-- Withdrawn only when the receiver says it lacks the constellation -->
                         <div class="checkbox gnss-fixed is-hidden" id="gps_have_gps_row">
                             <input type="checkbox" id="gps_have_gps" class="toggle" checked disabled>
                             <label for="gps_have_gps"><span data-i18n="configurationGPSUseGps">Use GPS Satellites (US)</span></label>
@@ -105,16 +104,14 @@
                             <label for="gps_use_glonass"><span data-i18n="configurationGPSUseGlonass"></span></label>
                             <div for="gps_use_glonass" class="helpicon cf_tip" data-i18n_title="configurationGPSUseGlonassHelp"></div>
                         </div>
-                        <!-- Counts the four majors above it, which are the ones the
-                             receiver has a limit on -->
+                        <!-- Counts the four majors above, the ones the receiver limits -->
                         <div class="gnss-budget is-hidden" id="gps_gnss_budget"></div>
                         <div class="checkbox is-hidden" id="gps_use_navic_row">
                             <input type="checkbox" id="gps_use_navic" class="toggle" data-setting="gps_ublox_use_navic">
                             <label for="gps_use_navic"><span data-i18n="configurationGPSUseNavic">Use NavIC Satellites (IN)</span></label>
                             <div for="gps_use_navic" class="helpicon cf_tip" data-i18n_title="configurationGPSUseNavicHelp"></div>
                         </div>
-                        <!-- The one INAV decides on its own. It is here so the tab answers
-                             what the receiver can do, not only what it is asked -->
+                        <!-- Decided by INAV; shown so the tab answers what the receiver can do -->
                         <div class="checkbox gnss-fixed is-hidden" id="gps_have_qzss_row">
                             <input type="checkbox" id="gps_have_qzss" class="toggle" checked disabled>
                             <label for="gps_have_qzss"><span data-i18n="configurationGPSUseQzss">Use QZSS Satellites (JP)</span></label>

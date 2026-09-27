@@ -1,14 +1,7 @@
 #!/usr/bin/env node
 /**
- * The constellation table addresses the tab by selector, and the tab addresses
- * the translations by key. Neither link is checked by anything that runs: a
- * renamed id leaves a switch that never appears, and a missing key leaves an
- * empty label. Both have happened here, and both look like the tab simply
- * deciding not to show something.
- *
- * So: every selector in the table has to name something in the markup, every
- * key in the markup has to name something in the messages, and the rows that
- * only report have to sit in the row geometry the rest of the section uses.
+ * The constellation table addresses the tab by selector and the tab the translations by key;
+ * nothing that runs checks either link, and a broken one just hides a switch or a label.
  */
 
 import { test } from 'node:test';
@@ -26,9 +19,7 @@ const messages = JSON.parse(readFileSync(join(root, 'locale/en/messages.json'), 
 
 const ids = new Set([...html.matchAll(/\bid="([^"]+)"/g)].map(m => m[1]));
 
-/* The last two rules live inside the tab's own closure, so they are read from the
- * source rather than called: what matters is that the pass is still written the way
- * the receiver's answers need it to be. */
+// These two rules live in the tab's closure, so they are read from the source
 function around(anchor, length) {
     const at = script.indexOf(anchor);
     assert.notEqual(at, -1, `${anchor} is no longer in tabs/gps.js`);
@@ -62,8 +53,7 @@ test('every message the tab script asks for exists', () => {
 });
 
 test('the rows that only report carry the section row geometry', () => {
-    // .checkbox is what gives a row its column, its separator and its spacing.
-    // Without it the row lands hard against the one above it
+    // .checkbox gives a row its column, separator and spacing
     for (const id of ['gps_have_gps', 'gps_have_qzss']) {
         const row = new RegExp(`<div class="checkbox gnss-fixed[^"]*"[^>]*>[^]{0,600}?id="${id}"`);
         assert.match(html, row, `${id} is not inside a .checkbox .gnss-fixed row`);
@@ -95,8 +85,7 @@ test('the real switches are bound to their settings', () => {
 });
 
 test('the NavIC switch starts hidden and is left alone by the presets', () => {
-    // The tab shows it once the receiver names NavIC. Before that it must not be
-    // on screen, whatever the setting says
+    // Hidden until the receiver names NavIC, whatever the setting says
     assert.match(html, /<div class="checkbox is-hidden" id="gps_use_navic_row">/);
     const input = html.match(/<input[^>]*id="gps_use_navic"[^>]*>/)[0];
     assert.doesNotMatch(input, /preset-controlled/, 'no preset knows about NavIC');
@@ -110,16 +99,13 @@ test('the read-only summary the switches replaced is gone', () => {
 });
 
 test('a switch the receiver cannot use is cleared, not just hidden', () => {
-    // Settings are serialized whether their row is on screen or not, so hiding a
-    // constellation the receiver does not have would keep saving it with nobody
-    // able to turn it off
+    // Hidden rows are still saved, so a withdrawn constellation must be cleared too
     const block = around('const offered = gnssIsOffered', 700);
     assert.match(block, /prop\('checked', false\)/, 'the withdrawn switch stays checked');
 });
 
 test('the title names the receiver, whether or not it names itself', () => {
-    // The module name is the good one, and the hardware version is what is left when
-    // the receiver does not report one, as an M8 does not
+    // The module name, or the hardware version when the receiver reports none (M8)
     const block = around('function updateReceiverName', 500);
     assert.match(block, /moduleName \|\| UBLOX_GENERATION/, 'the title has lost its fallback');
     assert.ok(ids.has('gps_title_model'), 'the title has nowhere to put the name');
@@ -131,8 +117,7 @@ test('the title names the receiver, whether or not it names itself', () => {
 });
 
 test('the green detected-hardware line is gone from the tab', () => {
-    // The title says which receiver it is, and the preset menu already offers the
-    // auto-detect that its link duplicated
+    // The title names the receiver; the preset menu already offers auto-detect
     assert.ok(!ids.has('gps_hardware_status'), 'the detection line is still in the markup');
     assert.ok(!ids.has('gps_apply_optimal'), 'the optimal-settings link is still in the markup');
     assert.doesNotMatch(script, /gps_hardware_status|gps_apply_optimal/, 'the tab still reaches for it');

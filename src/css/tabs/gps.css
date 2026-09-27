@@ -198,8 +198,7 @@ td.adsbVehicleList {
     color: #323232;
 }
 
-/* A constellation INAV decides on its own. The switch still shows its state, but
-   it is plainly not something to reach for */
+/* Decided by INAV: the switch shows its state but is not for reaching */
 .tab-gps .gnss-fixed .ios7-switch {
     cursor: default;
     opacity: 0.55;
@@ -209,8 +208,7 @@ td.adsbVehicleList {
     cursor: default;
 }
 
-/* Sits right under the switches it counts, and carries their separator so it
-   reads as the last line of that group rather than a heading for the next */
+/* Carries the separator of the switches it counts, as the last line of their group */
 .tab-gps .gnss-budget {
     clear: left;
     float: left;

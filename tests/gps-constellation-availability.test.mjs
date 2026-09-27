@@ -1,23 +1,8 @@
 #!/usr/bin/env node
 /**
- * The GPS tab used to offer the same three constellation switches to every
- * receiver. A u-blox F10 has no GLONASS at all, so ticking that box asked the
- * firmware for something the receiver cannot do, and nothing in the tab said
- * which constellations the receiver did have.
- *
- * INAV now reports both: the four major constellations from UBX-MON-GNSS, and
- * SBAS, QZSS and NavIC from the MON-VER version strings, which MON-GNSS does
- * not carry. These are the rules the tab applies to the two masks.
- *
- * The two rules pull in opposite directions on purpose. A switch is withdrawn
- * only when the receiver is known not to have that constellation, because
- * hiding one on a guess would leave someone unable to turn on something they
- * have. A row that only reports is shown only once the receiver has confirmed
- * it, because an unfounded row is worse than no row.
- *
- * The case that drives both is the empty mask. An older firmware, a receiver
- * that is not u-blox, and one that never answered all report it, and it means
- * nothing is known, not that there is nothing there.
+ * Rules the GPS tab applies to the receiver's two masks: the four majors from UBX-MON-GNSS,
+ * SBAS, QZSS and NavIC from MON-VER. A switch is withdrawn only when the receiver is known
+ * not to have it; a reporting row is shown only once confirmed. An empty mask means unknown.
  */
 
 import { test } from 'node:test';
@@ -82,8 +67,7 @@ test('NavIC is shown on the receiver that has it and nowhere else', () => {
 });
 
 test('NavIC is a switch, but one that waits for the receiver to name it', () => {
-    // Offering it on a guess would show a NavIC switch on nearly every receiver,
-    // and the firmware only sends its keys to the ones that listed it
+    // The firmware only sends NavIC keys to receivers that list it
     assert.equal(extra('navic').box, '#gps_use_navic');
     assert.equal(gnssIsConfirmed(UNKNOWN, extra('navic')), false);
     assert.equal(gnssIsConfirmed(EXT_M10, extra('navic')), false);
@@ -112,7 +96,7 @@ test('the names come out in the order the tab lists them', () => {
 test('only the three constellations with a switch can be hidden', () => {
     const withBox = GNSS_CONSTELLATIONS.filter(c => c.box).map(c => c.key);
     assert.deepEqual(withBox, ['galileo', 'beidou', 'glonass']);
-    // GPS has no switch: INAV never offers to turn it off, and never should
+    // GPS has no switch: INAV never turns it off
     assert.equal(major('gps').box, undefined);
 });
 
@@ -122,8 +106,7 @@ test('every entry points at something the tab can show', () => {
     }
 });
 
-// The same cases the firmware was run through in SITL, with the same outcome: the
-// tab has to name exactly what the receiver ends up without
+// The cases the firmware was run through in SITL, with the same outcome
 const ALL = 0x0F;
 const leftOut = (selected, supported, max) => gnssLeftOut(selected, supported, max).map(c => c.key);
 

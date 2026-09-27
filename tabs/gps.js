@@ -40,8 +40,7 @@ import { GNSS_CONSTELLATIONS, GNSS_EXTENDED, gnssIsOffered, gnssIsConfirmed, gns
 
 const gpsTab = {};
 
-// Loading a setting shows the row it sits in, with an inline display that would
-// outrank the class, so that goes before the class decides
+// Loading a setting shows its row with an inline display that outranks the class: clear it first
 function show_row(row, visible) {
     row.css('display', '').toggleClass('is-hidden', !visible);
 }
@@ -450,15 +449,13 @@ gpsTab.initialize = function (callback) {
             applyGPSPreset($(this).val());
         });
 
-        // All the hardware version alone can say. The module name is better wherever
-        // the receiver reports one, since an F10 and an M10 both report 000A0000
+        // The hardware version alone: F10 and M10 both report 000A0000, so the module name wins
         const UBLOX_GENERATION = {
             0x48: 'u-blox M8',
             0x49: 'u-blox M9',
             0x4A: 'u-blox M10'
         };
 
-        // Which receiver this is, next to the tab title
         function updateReceiverName() {
             if (!FC.GPS_DATA?.hwVersion) {
                 return;
@@ -588,8 +585,7 @@ gpsTab.initialize = function (callback) {
             }
         }
 
-        // What the detected generation is rated for. Taken from the presets this tab
-        // already ships, rather than a second table that could drift away from them.
+        // From the tab's own presets, not a second table that could drift from them
         const NAV_HZ_PRESETS = {
             0x48: ['m8'],
             0x49: ['m9-precision', 'm9-sport'],
@@ -608,9 +604,7 @@ gpsTab.initialize = function (callback) {
             const ceiling = Math.max(...presets.map(id => GPS_PRESETS[id].rate));
             field.attr('title', i18n.getMessage('gpsUpdateRateCeiling', [String(ceiling)]));
 
-            // Only tighten the field when the stored value still fits. Lowering the
-            // ceiling under someone's own setting would leave it sitting in a field
-            // that calls it invalid, which is worse than leaving it alone.
+            // Only when the stored value still fits: a ceiling under the user's setting marks it invalid
             if (Number.parseInt(field.val(), 10) <= ceiling) {
                 field.attr('max', ceiling);
             }
@@ -620,15 +614,11 @@ gpsTab.initialize = function (callback) {
             const supported = FC.GPS_DATA.gnssSupported;
             const extended = FC.GPS_DATA.gnssExtended;
 
-            // The four majors keep their switches. One is withdrawn only when the
-            // receiver has said it has no such constellation, never on a guess
+            // A major's switch is withdrawn only when the receiver has said it lacks it
             GNSS_CONSTELLATIONS.filter(c => c.box).forEach(function (c) {
                 const offered = gnssIsOffered(supported, c);
 
-                // Hidden inputs are saved like any other, so a constellation the
-                // receiver has just said it does not have is cleared as well as
-                // withdrawn: otherwise a preset, or the receiver before this one,
-                // keeps sending it a setting it cannot use and nobody can turn off
+                // Hidden inputs are still saved: clear the setting too, or nobody could turn it off
                 if (!offered && $(c.box).is(':checked')) {
                     $(c.box).prop('checked', false).trigger('change');
                 }
@@ -639,8 +629,7 @@ gpsTab.initialize = function (callback) {
             const sbas = GNSS_EXTENDED.find(e => e.key === 'sbas');
             show_row($(sbas.row).closest('.select'), gnssIsOffered(extended, sbas));
 
-            // The rest go the other way: they appear once the receiver has confirmed
-            // them, and stay away while nothing is known
+            // The rest appear only once the receiver confirms them
             const rows = GNSS_CONSTELLATIONS.filter(c => c.row)
                 .map(c => ({ el: c.row, on: gnssIsConfirmed(supported, c) }))
                 .concat(GNSS_EXTENDED.filter(e => e !== sbas)
@@ -653,12 +642,8 @@ gpsTab.initialize = function (callback) {
             update_gnss_budget();
         }
 
-        /*
-         * A receiver tracks only so many constellations at once, and MON-GNSS says how
-         * many. When the selection is more than that, the firmware leaves some out and
-         * keeps the setting, so the tab says which, before and after saving alike.
-         * NavIC is not part of it: MON-GNSS counts the four majors only.
-         */
+        // Over the receiver's limit (MON-GNSS, the four majors only) the firmware leaves some out and
+        // keeps the setting, so the tab says which
         function update_gnss_budget() {
             const note = $('#gps_gnss_budget');
 
@@ -680,15 +665,13 @@ gpsTab.initialize = function (callback) {
 
         $('#gps_use_galileo, #gps_use_beidou, #gps_use_glonass').on('change.gpsTab', update_gnss_budget);
 
-        // Once now, before the first statistics arrive, so a row the receiver has not
-        // confirmed is never shown just because its setting loaded
+        // Now too, so a row not confirmed is never shown just because its setting loaded
         update_gnss_availability();
 
         function update_gps_ui() {
             update_gnss_availability();
             update_nav_hz_limit();
-            // The module name arrives with the statistics, which can be later than the
-            // one-shot check done when the tab opens
+            // The module name can arrive after the one-shot check at tab open
             updateReceiverName();
 
             let lat = FC.GPS_DATA.lat / 10000000;

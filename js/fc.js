@@ -316,17 +316,14 @@ var FC = {
             timeouts: 0,
             packetCount: 0,
             hwVersion: 0,
-            // Bit 0 GPS, 1 Glonass, 2 Beidou, 3 Galileo, as the receiver reports them.
-            // Zero means the firmware could not read them, not that there are none
+            // Bit 0 GPS, 1 Glonass, 2 Beidou, 3 Galileo; 0 when the firmware could not read them
             gnssSupported: 0,
             gnssEnabled: 0,
-            // Bit 0 SBAS, 1 QZSS, 2 NavIC, which the receiver lists in its version
-            // strings rather than alongside the four major constellations
+            // Bit 0 SBAS, 1 QZSS, 2 NavIC, from the receiver's version strings
             gnssExtended: 0,
             // How many of the major constellations the receiver can track together
             gnssMaxConcurrent: 0,
-            // The name the receiver reports for itself, such as NEO-F10N. Empty when
-            // the firmware could not read it
+            // As the receiver reports it (NEO-F10N), empty when unknown
             moduleName: ''
         };
 
