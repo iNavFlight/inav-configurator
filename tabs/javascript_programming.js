@@ -19,6 +19,7 @@ import * as LCHighlighting from './../js/transpiler/lc_highlighting.js';
 import * as GvarDisplay from './../js/transpiler/gvar_display.js';
 import examples from './../js/transpiler/examples/index.js';
 import settingsCache from './../js/settingsCache.js';
+import dialog from './../js/dialog.js';
 import * as monaco from 'monaco-editor';
 import tsWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker'
 import editorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker'
@@ -36,6 +37,7 @@ const javascriptProgrammingTab = {
 
     currentProgrammingPIDProfile: null,
     isDirty: false,
+    discardPrompt: null,
     editor: null,
     transpiler: null,
     decompiler: null,
@@ -169,8 +171,8 @@ if (inav.flight.homeDistance > 100) {
         });
 
         // Clear button
-        $('.tab-programming .clear').click(function() {
-            if (confirm('Clear editor? This cannot be undone.')) {
+        $('.tab-programming .clear').click(async function() {
+            if (await dialog.confirm('Clear editor? This cannot be undone.') && self.editor) {
                 self.editor.setValue(self.getDefaultCode());
                 self.isDirty = false;
                 self.updateSaveButtonState();
@@ -220,9 +222,14 @@ if (inav.flight.homeDistance > 100) {
             if (self.isDirty) {
                 const confirmMsg = i18n.getMessage('loadExampleConfirm') ||
                     'You have unsaved changes. Load example anyway?';
-                if (!confirm(confirmMsg)) {
-                    return; // User cancelled
-                }
+                // Re-enter after the async dialog; the tab may have been left meanwhile
+                dialog.confirm(confirmMsg).then(function(confirmed) {
+                    if (confirmed && self.editor) {
+                        self.isDirty = false;
+                        self.loadExample(exampleId);
+                    }
+                });
+                return;
             }
 
             const example = examples[exampleId];
@@ -321,6 +328,33 @@ if (inav.flight.homeDistance > 100) {
             // Code matches FC - disable Save button
             $saveButton.addClass('disabled');
         }
+    },
+
+    /**
+     * Resolves true when nothing is lost; concurrent callers (tab switch, disconnect) share one dialog
+     */
+    confirmDiscard: function() {
+        const self = this;
+
+        if (!self.isDirty) {
+            return Promise.resolve(true);
+        }
+
+        if (!self.discardPrompt) {
+            const confirmMsg = i18n.getMessage('unsavedChanges') ||
+                'You have unsaved changes. Leave anyway?';
+            self.discardPrompt = dialog.confirm(confirmMsg)
+                .catch(() => false)
+                .then(function(leave) {
+                    self.discardPrompt = null;
+                    if (leave) {
+                        self.isDirty = false;
+                    }
+                    return leave;
+                });
+        }
+
+        return self.discardPrompt;
     },
 
     /**
@@ -645,7 +679,7 @@ if (inav.flight.homeDistance > 100) {
      * Save transpiled logic conditions to FC
      * Uses MSP chaining pattern from programming.js
      */
-    saveToFC: function() {
+    saveToFC: async function() {
         const self = this;
         const code = this.editor.getValue();
 
@@ -674,9 +708,10 @@ if (inav.flight.homeDistance > 100) {
         }
 
         // Confirm save
-        const confirmMsg = i18n.getMessage('confirmSaveLogicConditions') ||
+        const confirmMsg = i18n.getMessage('confirmSaveLogicConditions', [result.logicConditionCount]) ||
             `Save ${result.logicConditionCount} logic conditions to flight controller?`;
-        if (!confirm(confirmMsg)) {
+        // The dialog is non-modal: the tab may have been left or the script edited meanwhile
+        if (!await dialog.confirm(confirmMsg) || !self.editor || self.editor.getValue() !== code) {
             return;
         }
 
@@ -957,6 +992,7 @@ if (inav.flight.homeDistance > 100) {
             this.editor.dispose();
             this.editor = null;
         }
+        this.isDirty = false;
 
         if (callback) callback();
     }

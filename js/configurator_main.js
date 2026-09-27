@@ -155,15 +155,13 @@ $(function() {
                 // Check for unsaved changes in current tab before switching
                 if (GUI.active_tab === javascriptProgrammingTab &&
                     javascriptProgrammingTab.isDirty) {
-                    console.log('[Tab Switch] Checking for unsaved changes in JavaScript Programming tab');
-                    const confirmMsg = i18n.getMessage('unsavedChanges') ||
-                        'You have unsaved changes. Leave anyway?';
-
-                    if (!confirm(confirmMsg)) {
-                        console.log('[Tab Switch] User cancelled tab switch');
-                        return; // Cancel tab switch
-                    }
-                    console.log('[Tab Switch] User confirmed tab switch');
+                    // Re-clicking after the async dialog re-runs every guard above
+                    javascriptProgrammingTab.confirmDiscard().then(leave => {
+                        if (leave) {
+                            $(self).trigger('click');
+                        }
+                    });
+                    return;
                 }
 
                 GUI.tab_switch_in_progress = true;
