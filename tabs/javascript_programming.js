@@ -172,8 +172,10 @@ if (inav.flight.homeDistance > 100) {
 
         // Clear button
         $('.tab-programming .clear').click(async function() {
-            if (await dialog.confirm('Clear editor? This cannot be undone.') && self.editor) {
-                self.editor.setValue(self.getDefaultCode());
+            // A tab switch during the non-modal dialog disposes or replaces the editor
+            const editor = self.editor;
+            if (await dialog.confirm('Clear editor? This cannot be undone.') && editor && self.editor === editor) {
+                editor.setValue(self.getDefaultCode());
                 self.isDirty = false;
                 self.updateSaveButtonState();
             }
@@ -334,27 +336,28 @@ if (inav.flight.homeDistance > 100) {
      * Resolves true when nothing is lost; concurrent callers (tab switch, disconnect) share one dialog
      */
     confirmDiscard: function() {
-        const self = this;
-
-        if (!self.isDirty) {
+        if (!this.isDirty) {
             return Promise.resolve(true);
         }
 
-        if (!self.discardPrompt) {
+        if (!this.discardPrompt) {
             const confirmMsg = i18n.getMessage('unsavedChanges') ||
                 'You have unsaved changes. Leave anyway?';
-            self.discardPrompt = dialog.confirm(confirmMsg)
-                .catch(() => false)
-                .then(function(leave) {
-                    self.discardPrompt = null;
+            this.discardPrompt = dialog.confirm(confirmMsg)
+                .catch((error) => {
+                    console.error('Discard prompt failed', error);
+                    return false;
+                })
+                .then((leave) => {
+                    this.discardPrompt = null;
                     if (leave) {
-                        self.isDirty = false;
+                        this.isDirty = false;
                     }
                     return leave;
                 });
         }
 
-        return self.discardPrompt;
+        return this.discardPrompt;
     },
 
     /**
@@ -681,7 +684,8 @@ if (inav.flight.homeDistance > 100) {
      */
     saveToFC: async function() {
         const self = this;
-        const code = this.editor.getValue();
+        const editor = this.editor;
+        const code = editor.getValue();
 
         if (!this.transpiler) {
             GUI.log(i18n.getMessage('transpilerNotAvailable') || 'Transpiler not available');
@@ -711,7 +715,7 @@ if (inav.flight.homeDistance > 100) {
         const confirmMsg = i18n.getMessage('confirmSaveLogicConditions', [result.logicConditionCount]) ||
             `Save ${result.logicConditionCount} logic conditions to flight controller?`;
         // The dialog is non-modal: the tab may have been left or the script edited meanwhile
-        if (!await dialog.confirm(confirmMsg) || !self.editor || self.editor.getValue() !== code) {
+        if (!await dialog.confirm(confirmMsg) || self.editor !== editor || editor.getValue() !== code) {
             return;
         }
 

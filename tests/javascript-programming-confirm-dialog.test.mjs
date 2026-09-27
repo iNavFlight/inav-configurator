@@ -37,10 +37,12 @@ const tabUrl = rewriteAndWrite('tabs/javascript_programming.js', [
     'static imports'],
 ], 'javascript_programming');
 
-const rewritten = readFileSync(fileURLToPath(tabUrl), 'utf8');
-assert.doesNotMatch(rewritten, /^import\s/m, 'a static import was not stubbed; update STATIC_IMPORT');
-
 const { default: tab } = await import(tabUrl);
+
+test('harness stubs every static import', () => {
+    const rewritten = readFileSync(fileURLToPath(tabUrl), 'utf8');
+    assert.doesNotMatch(rewritten, /^import\s/m, 'a static import was not stubbed; update STATIC_IMPORT');
+});
 
 function deferred() {
     let resolve;
@@ -105,8 +107,15 @@ test('confirmDiscard: concurrent callers share one pending dialog', async () => 
 
 test('confirmDiscard: a rejected dialog resolves false and keeps isDirty', async () => {
     const calls = setup(true, () => Promise.reject(new Error('ipc failed')));
-
-    assert.equal(await tab.confirmDiscard(), false);
+    const originalConsoleError = console.error;
+    const errors = [];
+    console.error = (...args) => errors.push(args);
+    try {
+        assert.equal(await tab.confirmDiscard(), false);
+    } finally {
+        console.error = originalConsoleError;
+    }
+    assert.equal(errors.length, 1);
     assert.equal(tab.isDirty, true);
     assert.equal(calls.length, 1);
     assert.equal(tab.discardPrompt, null);

@@ -116,6 +116,7 @@ $(function() {
 
         // Tabs
         var ui_tabs = $('#tabs > ul');
+        let tabClickAfterPrompt = null;
         $('a', ui_tabs).on('click', function() {
 
             if ($(this).parent().hasClass("tab_help")) {
@@ -155,9 +156,11 @@ $(function() {
                 // Check for unsaved changes in current tab before switching
                 if (GUI.active_tab === javascriptProgrammingTab &&
                     javascriptProgrammingTab.isDirty) {
-                    // Re-clicking after the async dialog re-runs every guard above
+                    // Replay only the last tab clicked while the dialog was open; the click re-runs every guard above
+                    tabClickAfterPrompt = self;
                     javascriptProgrammingTab.confirmDiscard().then(leave => {
-                        if (leave) {
+                        if (leave && self === tabClickAfterPrompt) {
+                            tabClickAfterPrompt = null;
                             $(self).trigger('click');
                         }
                     });
