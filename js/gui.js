@@ -12,6 +12,8 @@ var GUI_control = function () {
     this.connecting_to = false;
     this.connected_to = false;
     this.connect_lock = false;
+    // Tunnel handshake running: a tab switch would abandon its requests (serial_backend.js).
+    this.tunnelHandshakePending = false;
     this.active_tab;
     this.tab_switch_in_progress = false;
     this.operating_system;

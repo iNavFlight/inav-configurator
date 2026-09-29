@@ -30,7 +30,7 @@ import mspDeduplicationQueue from './msp/mspDeduplicationQueue';
 import store from './store';
 import cliTab from '../tabs/cli';
 import javascriptProgrammingTab from '../tabs/javascript_programming';
-import { MavlinkLink } from './mavlink/mavlinkLink';
+import { MavlinkLink, TUNNEL_REASSEMBLY_TIMEOUT_MS } from './mavlink/mavlinkLink';
 import { concatFrames } from './mavlink/mavlinkProtocol';
 import { MavlinkTelemetryFeed, isTelemetryFeedEnabled, mspCodeOfFrame } from './mavlink/mavlinkTelemetryFeed';
 import { TunnelRebootMonitor } from './mavlink/tunnelRebootMonitor';
@@ -39,6 +39,8 @@ import { TunnelRebootMonitor } from './mavlink/tunnelRebootMonitor';
 const MAVLINK_TUNNEL_PROBE_RETRIES = 2;
 const MAVLINK_GCS_HEARTBEAT_INTERVAL_MS = 1000;
 const CONNECTING_TIMEOUT_MS = 10000;
+// Per tunnel handshake step, on top of its attempts at the window cap: queue time and the reply's own transfer.
+const TUNNEL_HANDSHAKE_STEP_MARGIN_MS = 3000;
 // A port serving MSP and MAVLink answers the raw probe within this window; plain MSP wins there.
 const RAW_MSP_PRIORITY_WINDOW_MS = 500;
 
@@ -61,6 +63,8 @@ var SerialBackend = (function () {
             MSP.resetDecoder();
             mspQueue.discardTunnelChunks();
         },
+        // The queue waits a whole silence window per chunk; reassembly must not give up earlier.
+        reassemblyTimeoutMs: () => Math.max(TUNNEL_REASSEMBLY_TIMEOUT_MS, mspQueue.getTunnelSilenceWindow()),
     });
     privateScope.telemetryFeed = null;
 
@@ -399,6 +403,7 @@ var SerialBackend = (function () {
 
     privateScope.onValidFirmware = function ()
     {
+    privateScope.armTunnelHandshakeStep();
     MSP.send_message(MSPCodes.MSP_BUILD_INFO, false, false, function (response) {
         if (privateScope.isTunnelReplyLost(response, MSPCodes.MSP_BUILD_INFO)) {
             return;
@@ -406,6 +411,7 @@ var SerialBackend = (function () {
 
         GUI.log(i18n.getMessage('buildInfoReceived', [FC.CONFIG.buildInfo]));
 
+        privateScope.armTunnelHandshakeStep();
         MSP.send_message(MSPCodes.MSP_BOARD_INFO, false, false, function (response) {
             if (privateScope.isTunnelReplyLost(response, MSPCodes.MSP_BOARD_INFO)) {
                 return;
@@ -413,6 +419,7 @@ var SerialBackend = (function () {
 
             GUI.log(i18n.getMessage('boardInfoReceived', [FC.CONFIG.boardIdentifier, FC.CONFIG.boardVersion]));
 
+            privateScope.armTunnelHandshakeStep();
             MSP.send_message(MSPCodes.MSP_UID, false, false, function (response) {
                 if (privateScope.isTunnelReplyLost(response, MSPCodes.MSP_UID)) {
                     return;
@@ -421,6 +428,7 @@ var SerialBackend = (function () {
                 GUI.log(i18n.getMessage('uniqueDeviceIdReceived', [FC.CONFIG.uid[0].toString(16) + FC.CONFIG.uid[1].toString(16) + FC.CONFIG.uid[2].toString(16)]));
 
                 // continue as usually
+                privateScope.endTunnelHandshake();
                 CONFIGURATOR.connectionValid = true;
                 GUI.allowedTabs = privateScope.connectedTabs();
                 privateScope.showLinkType(CONFIGURATOR.mavlinkTunnelActive);
@@ -562,6 +570,7 @@ var SerialBackend = (function () {
 
         GUI.log(i18n.getMessage('apiVersionReceived', [FC.CONFIG.apiVersion]));
 
+        privateScope.armTunnelHandshakeStep();
         MSP.send_message(MSPCodes.MSP_FC_VARIANT, false, false, privateScope.onFcVariant);
     };
 
@@ -570,6 +579,7 @@ var SerialBackend = (function () {
             return;
         }
         if (FC.CONFIG.flightControllerIdentifier == 'INAV') {
+            privateScope.armTunnelHandshakeStep();
             MSP.send_message(MSPCodes.MSP_FC_VERSION, false, false, privateScope.onFcVersion);
         } else {
             privateScope.onInvalidFirmwareVariant();
@@ -587,6 +597,7 @@ var SerialBackend = (function () {
         } else if (CONFIGURATOR.connection.type == ConnectionType.BLE && semver.lt(version, "5.0.0")) {
             privateScope.onBleNotSupported();
         } else {
+            privateScope.armTunnelHandshakeStep();
             mspHelper.getCraftName(privateScope.onCraftName);
         }
     };
@@ -608,21 +619,38 @@ var SerialBackend = (function () {
         privateScope.onValidFirmware();
     };
 
-    // disconnect after 10 seconds with error if we don't get IDENT data
-    privateScope.armConnectingTimeout = function () {
+    // disconnect with error if we don't get IDENT data in time
+    privateScope.armConnectingTimeout = function (timeoutMs = CONNECTING_TIMEOUT_MS) {
         timeout.remove('connecting');
         timeout.add('connecting', function () {
 
             //As we add LTM listener, we need to invalidate connection only when both protocols are not listening!
             if (!CONFIGURATOR.connectionValid && !ltmDecoder.isReceiving()) {
-                const reason = privateScope.mavlinkSession.v1HeartbeatSeen ? 'mavlinkTunnelV1Only' : 'noConfigurationReceived';
-                GUI.log(i18n.getMessage(reason));
+                privateScope.logConnectingTimeout(timeoutMs);
                 privateScope.abortConnecting();
             }
-        }, CONNECTING_TIMEOUT_MS);
+        }, timeoutMs);
+    };
+
+    privateScope.logConnectingTimeout = function (timeoutMs) {
+        if (CONFIGURATOR.mavlinkTunnelActive) {
+            GUI.log(i18n.getMessage('mavlinkTunnelNoConfigurationReceived', [Math.round(timeoutMs / 1000)]));
+            return;
+        }
+        const reason = privateScope.mavlinkSession.v1HeartbeatSeen ? 'mavlinkTunnelV1Only' : 'noConfigurationReceived';
+        GUI.log(i18n.getMessage(reason));
+    };
+
+    // Re-armed before every handshake request over the tunnel; a plain link keeps the one 10 s budget from onOpen().
+    privateScope.armTunnelHandshakeStep = function (retries = mspQueue.getTunnelDefaultRetries()) {
+        if (CONFIGURATOR.mavlinkTunnelActive) {
+            const attemptsMs = (retries + 1) * mspQueue.getTunnelSilenceMax();
+            privateScope.armConnectingTimeout(attemptsMs + TUNNEL_HANDSHAKE_STEP_MARGIN_MS);
+        }
     };
 
     privateScope.abortConnecting = function () {
+        privateScope.endTunnelHandshake();
         mspQueue.flush();
         mspQueue.freeHardLock();
         mspQueue.freeSoftLock();
@@ -725,14 +753,19 @@ var SerialBackend = (function () {
         privateScope.sendTunnelHandshake();
     };
 
-    privateScope.resetTunnelQueue = function () {
+    // keepLinkTiming: same link as before (reboot-back), so the learned silence window still holds.
+    privateScope.resetTunnelQueue = function (keepLinkTiming = false) {
         mspQueue.flush();
         mspDeduplicationQueue.flush();
         MSP.callbacks_cleanup();
         MSP.resetDecoder();
         mspQueue.freeHardLock();
         mspQueue.freeSoftLock();
-        mspQueue.setTunnelMode(true, privateScope.tunnelSerialBaud());
+        if (keepLinkTiming) {
+            mspQueue.resetTunnelRequests();
+        } else {
+            mspQueue.setTunnelMode(true, privateScope.tunnelSerialBaud());
+        }
     };
 
     // TCP, UDP and BLE report a nominal 115200 whatever radio link sits behind them.
@@ -742,9 +775,12 @@ var SerialBackend = (function () {
     };
 
     privateScope.sendTunnelHandshake = function () {
-        privateScope.armConnectingTimeout();
+        GUI.tunnelHandshakePending = true;
+        privateScope.armTunnelHandshakeStep(MAVLINK_TUNNEL_PROBE_RETRIES);
         MSP.protocolVersion = MSP.constants.PROTOCOL_V2;
-        MSP.sendWithTunnelRetries(MSPCodes.MSP_API_VERSION, false, privateScope.onApiVersion, MAVLINK_TUNNEL_PROBE_RETRIES);
+        // Wait the cap per attempt: a first reply above the learned (or prior) window must not fail the handshake.
+        MSP.sendWithTunnelRetries(MSPCodes.MSP_API_VERSION, false, privateScope.onApiVersion,
+            MAVLINK_TUNNEL_PROBE_RETRIES, mspQueue.getTunnelSilenceMax());
     };
 
     // The port stays open over the reboot: stop polling and the telemetry feed, keep the MAVLink session.
@@ -759,17 +795,28 @@ var SerialBackend = (function () {
     };
 
     // rebooted: the caller's reboot callback ran and closed its own dialogs; otherwise close them here.
+    // After a reboot the modal stays up until the handshake ends: a tab click would abandon its requests.
     privateScope.endTunnelReboot = function (rebooted) {
         if (!rebooted) {
             defaultsDialog.abortSaving();
-        }
-        if (privateScope.tunnelRebootModal) {
-            privateScope.tunnelRebootModal.close();
-            privateScope.tunnelRebootModal = null;
+            privateScope.closeTunnelRebootModal();
         }
         privateScope.tunnelRebootTabChosen = false;
         // The reopened tab must not be the active one, or its click is ignored.
         $('#tabs > ul li').removeClass('active');
+    };
+
+    // Every exit of the tunnel handshake: tabs become clickable again, a post-reboot modal closes.
+    privateScope.endTunnelHandshake = function () {
+        GUI.tunnelHandshakePending = false;
+        privateScope.closeTunnelRebootModal();
+    };
+
+    privateScope.closeTunnelRebootModal = function () {
+        if (privateScope.tunnelRebootModal) {
+            privateScope.tunnelRebootModal.close();
+            privateScope.tunnelRebootModal = null;
+        }
     };
 
     // Same as after the probe; onValidFirmware() then reopens the tab as after a USB reconnect.
@@ -778,7 +825,7 @@ var SerialBackend = (function () {
         FC.resetState();
         MSP.parseFailures.clear();
         MSP.lostReplies.clear();
-        privateScope.resetTunnelQueue();
+        privateScope.resetTunnelQueue(true);
         privateScope.sendTunnelHandshake();
     };
 
@@ -891,11 +938,13 @@ var SerialBackend = (function () {
 
     // Also runs before every connect, so the firmware flasher and the next session start clean.
     privateScope.endMavlinkSession = function () {
+        const rebootRunning = privateScope.rebootMonitor.active;
         privateScope.rebootMonitor.cancel();
         MSP.rebootTracker = null;
-        if (privateScope.tunnelRebootModal) {
+        if (rebootRunning) {
             privateScope.endTunnelReboot(false);
         }
+        privateScope.endTunnelHandshake();
         privateScope.stopTelemetryFeed(false);
         CONFIGURATOR.mavlinkTelemetryFeed = false;
         clearInterval(privateScope.gcsHeartbeatTimer);

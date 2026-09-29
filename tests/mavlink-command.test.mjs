@@ -182,6 +182,54 @@ test('a slower stream is not taken as acknowledged; 10 Hz at the FC\'s real ~9.5
     assert.equal(control.acceptedIntervalUs(30), 100000);
 });
 
+/** Ack never arrives; returns ms from the request to the implicit ack, or null within 20 s. */
+function implicitAckAfter(t, requestUs, streamPeriodMs, lossEvery = 0) {
+    t.mock.timers.enable({ apis: ['setTimeout', 'Date'], now: 1000 });
+    const { control } = makeControl();
+    control.setInterval(147, requestUs);
+    let frames = 0;
+    for (let elapsed = streamPeriodMs; elapsed <= 20000; elapsed += streamPeriodMs) {
+        t.mock.timers.tick(streamPeriodMs);
+        frames++;
+        if (lossEvery === 0 || frames % lossEvery !== 0) {
+            control.noteMessage(147);
+        }
+        if (control.acceptedIntervalUs(147) === requestUs) {
+            t.mock.timers.reset();
+            return elapsed;
+        }
+    }
+    t.mock.timers.reset();
+    return null;
+}
+
+test('the implicit-ack window spans four intervals of a slow stream, so 0.5 Hz and 1 Hz are told apart', (t) => {
+    assert.equal(implicitAckAfter(t, 2000000, 2000), 8000, 'a true 0.5 Hz stream');
+    assert.equal(implicitAckAfter(t, 2000000, 2050), 8200, 'the FC\'s slightly slow 0.5 Hz');
+    assert.equal(implicitAckAfter(t, 2000000, 1000), null, '1 Hz does not prove a 0.5 Hz request');
+    assert.equal(implicitAckAfter(t, 2000000, 1000, 4), null, 'not even with every fourth frame lost');
+    assert.equal(implicitAckAfter(t, 1000000, 1025), 4100, '1 Hz at the FC\'s real rate');
+    assert.equal(implicitAckAfter(t, 1000000, 500), null, '2 Hz does not prove a 1 Hz request');
+    assert.equal(implicitAckAfter(t, 500000, 510), 2040, '2 Hz: the 2 s window as before');
+    assert.equal(implicitAckAfter(t, 100000, 105), 2100, '10 Hz: the 2 s window as before');
+});
+
+test('a 0.5 Hz command without an ack waits a whole implicit-ack window before the base result', (t) => {
+    t.mock.timers.enable({ apis: ['setTimeout', 'Date'], now: 1000 });
+    const { control } = makeControl();
+    let done = null;
+    control.requestBase(new Map([[147, 2000000]]), (accepted, total) => { done = [accepted, total]; });
+    // Both attempts time out within the first 2 s; the grace window then runs from the second timeout.
+    for (let i = 0; i < 3; i++) {
+        t.mock.timers.tick(2000);
+        control.noteMessage(147);
+    }
+    assert.equal(done, null, 'still inside the 8 s window');
+    t.mock.timers.tick(2000);
+    control.noteMessage(147);
+    assert.deepEqual(done, [1, 1], 'proven by its rate before the grace window ends');
+});
+
 test('ack timeout scales with the tunnel round trip, 500 ms minimum', (t) => {
     t.mock.timers.enable({ apis: ['setTimeout', 'Date'], now: 1000 });
     const sent = [];

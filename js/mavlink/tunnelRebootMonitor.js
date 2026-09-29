@@ -160,7 +160,8 @@ export class TunnelRebootMonitor {
             }
             return;
         }
-        if (this.phase === PHASE_VERIFY && now - this.probingSince < REBOOT_BACK_TIMEOUT_MS) {
+        // After a received reply the uptime check always ends in finish(), bounded by its own watchdog.
+        if (this.phase === PHASE_VERIFY && (this.mode === 'afterReply' || now - this.probingSince < REBOOT_BACK_TIMEOUT_MS)) {
             if (now - this.verifyStartedAt >= this.uptimeWatchdogMs()) {
                 this.onUptime(null);
             }

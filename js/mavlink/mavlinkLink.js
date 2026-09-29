@@ -17,7 +17,7 @@ import {
 } from './mavlinkTunnel.js';
 
 export const FC_COMPONENT_ID = 1;
-// Mirrors MAVLINK_TUNNEL_MSP_TIMEOUT_MS: the FC drops its partial frame after this gap too.
+// Mirrors MAVLINK_TUNNEL_MSP_TIMEOUT_MS: the FC abandons a reply whose chunks stall this long (fc_mavlink.c).
 export const TUNNEL_REASSEMBLY_TIMEOUT_MS = 1000;
 
 // Bytes in, callbacks out; no DOM or connection, so it works over any transport.
@@ -28,6 +28,7 @@ export class MavlinkLink {
         this.onTunnelChunk = handlers.onTunnelChunk || null;
         this.onMessage = handlers.onMessage || null;
         this.onReassemblyTimeout = handlers.onReassemblyTimeout || null;
+        this._reassemblyTimeoutMs = handlers.reassemblyTimeoutMs || (() => TUNNEL_REASSEMBLY_TIMEOUT_MS);
         this._now = handlers.now || (() => Date.now());
         this._parser = new MavlinkParser();
         this.reset();
@@ -114,7 +115,7 @@ export class MavlinkLink {
         }
 
         const now = this._now();
-        if (this._lastChunkAt !== null && now - this._lastChunkAt >= TUNNEL_REASSEMBLY_TIMEOUT_MS && this.onReassemblyTimeout) {
+        if (this._lastChunkAt !== null && now - this._lastChunkAt >= this._reassemblyTimeoutMs() && this.onReassemblyTimeout) {
             this.onReassemblyTimeout();
         }
         this._lastChunkAt = now;

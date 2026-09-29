@@ -18,7 +18,6 @@ export const TELEMETRY_COVERED = new Map([
 const TWO_HZ_US = 500000;
 const ONE_HZ_US = 1000000;
 const HALF_HZ_US = 2000000;
-const STREAM_OFF = -1;
 // Requested explicitly: a MAVLink port with index > 0 streams only HEARTBEAT by default.
 export const BASE_INTERVALS_US = new Map([
     [MAVLINK_MSG_ID.SYS_STATUS, TWO_HZ_US],
@@ -30,14 +29,14 @@ export const BASE_INTERVALS_US = new Map([
 ]);
 
 // For a serial wire at 9600 baud or less, from the start (measured at 4800: the base set crowded out MSP replies).
-// MSP_RC then goes on the wire.
+// RC_CHANNELS is left alone, not switched off: the FC would keep that override until reboot. MSP_RC goes on the wire.
+// Cost: MAVLink port index 0 keeps its mavlink_port1_rc_chan_rate (default 1 Hz, ~54 B/s, ~11 % of 4800 baud).
 export const REDUCED_INTERVALS_US = new Map([
     [MAVLINK_MSG_ID.SYS_STATUS, ONE_HZ_US],
     [MAVLINK_MSG_ID.ATTITUDE, ONE_HZ_US],
     [MAVLINK_MSG_ID.VFR_HUD, HALF_HZ_US],
     [MAVLINK_MSG_ID.GPS_RAW_INT, ONE_HZ_US],
     [MAVLINK_MSG_ID.BATTERY_STATUS, HALF_HZ_US],
-    [MAVLINK_MSG_ID.RC_CHANNELS, STREAM_OFF],
 ]);
 
 export const BOOST_INTERVAL_US = 100000;
@@ -60,6 +59,8 @@ export const RE_REQUEST_MS = 10000;
 export const NEVER_SEEN_RE_REQUESTS = 2;
 // A quiet or unconfirmed stream is asked for again once per 10 s for a minute, then left alone.
 export const MAX_RE_REQUESTS = 6;
+// No frame from the FC for this long: the link is down, or the FC rebooted and dropped every override.
+export const FC_SILENCE_MS = 3000;
 // The FC reads one MAVLink message per cycle out of a 64 byte budget: restore commands go out one by one.
 export const RESTORE_SPACING_MS = 20;
 export const RESTORE_DEADLINE_MS = 300;
@@ -91,6 +92,8 @@ export class MavlinkTelemetryFeed {
         this._msp = options.msp;
         this._now = options.now || (() => Date.now());
         this._log = options.log || (line => console.log(line));
+        // The periodic counter line is noise on the console; debug level keeps it available.
+        this._statsLog = options.log || (line => console.debug(line));
         this._onStreamsReady = options.onStreamsReady || null;
         this._onFirstVirtual = options.onFirstVirtual || null;
         this._slowSerialLink = options.slowSerialLink === true;
@@ -110,6 +113,8 @@ export class MavlinkTelemetryFeed {
         this._lastReRequest = new Map();
         this._neverSeenReRequests = new Map();
         this._reRequestCount = new Map();
+        this._lastFcFrameAt = null;
+        this._silenceEndedAt = null;
         this._recentRequests = new Map();
         this._boosted = new Set();
         this._baseIntervals = BASE_INTERVALS_US;
@@ -127,7 +132,7 @@ export class MavlinkTelemetryFeed {
             this._baseIntervals = REDUCED_INTERVALS_US;
             this._log('MAVLink telemetry: slow serial link, reduced telemetry set without boost');
         }
-        this.streams.requestBase(this._baseIntervals, (accepted, total) => this._streamsDone(accepted, total));
+        this.streams.requestBase(this._baseIntervals, (_accepted, total) => this._streamsDone(total));
         this._timers.push(
             setInterval(() => this._checkStreams(), IDLE_CHECK_MS),
             // Diagnostic: wire vs virtual counts on the console.
@@ -147,9 +152,24 @@ export class MavlinkTelemetryFeed {
 
     handleFrame(frame) {
         const target = this._link.getTarget();
-        if (target && frame.sysid === target.sysid && frame.compid === target.compid && this.telemetry.handleFrame(frame)) {
+        if (!target || frame.sysid !== target.sysid || frame.compid !== target.compid) {
+            return;
+        }
+        this._noteFcFrame();
+        if (this.telemetry.handleFrame(frame)) {
             this.streams.noteMessage(frame.msgid);
         }
+    }
+
+    // After a silence the FC may have rebooted, so every stream gets its full re-request budget back.
+    _noteFcFrame() {
+        const now = this._now();
+        if (this._lastFcFrameAt !== null && now - this._lastFcFrameAt >= FC_SILENCE_MS) {
+            this._reRequestCount.clear();
+            this._neverSeenReRequests.clear();
+            this._silenceEndedAt = now;
+        }
+        this._lastFcFrameAt = now;
     }
 
     serve(code, data, onSent, onFinish) {
@@ -216,10 +236,13 @@ export class MavlinkTelemetryFeed {
         }
     }
 
-    _streamsDone(accepted, total) {
+    // Counts streams the FC confirmed.
+    _streamsDone(total) {
         this._streamsReady = true;
+        const active = [...this._baseIntervals.keys()]
+            .filter(msgid => this.streams.acceptedIntervalUs(msgid) > 0).length;
         if (this._onStreamsReady) {
-            this._onStreamsReady(accepted, total);
+            this._onStreamsReady(active, total);
         }
     }
 
@@ -258,8 +281,10 @@ export class MavlinkTelemetryFeed {
         return null;
     }
 
+    // Never requested counts as off: the FC may stream it at the port's rate or not at all.
     _isOff(msgid) {
-        return this.streams.requestedIntervalUs(msgid) < 0;
+        const intervalUs = this.streams.requestedIntervalUs(msgid);
+        return intervalUs === undefined || intervalUs < 0;
     }
 
     // The slower of accepted and requested: a stream just slowed down is not stale at its new rate.
@@ -312,6 +337,10 @@ export class MavlinkTelemetryFeed {
 
     _checkStreams() {
         this._unboostIdle();
+        // The re-request passes are skipped while the FC is silent: their commands could not reach it.
+        if (this._lastFcFrameAt === null || this._now() - this._lastFcFrameAt >= FC_SILENCE_MS) {
+            return;
+        }
         this._reRequestStale();
         this._reRequestUnconfirmed();
     }
@@ -340,11 +369,14 @@ export class MavlinkTelemetryFeed {
             return false;
         }
         const windowMs = this._freshWindowFor(msgid);
+        // A fade or a blocking erase keeps the overrides: a stream is quiet only after a full window since the silence.
+        const sinceSilenceEnd = this._silenceEndedAt === null ? Infinity : now - this._silenceEndedAt;
         if (this.telemetry.lastSeen.has(msgid)) {
-            return !this.telemetry.seenWithin(msgid, windowMs);
+            return !this.telemetry.seenWithin(msgid, windowMs) && sinceSilenceEnd > windowMs;
         }
         const sentAt = this.streams.sentAt(msgid);
-        return accepted === this.streams.requestedIntervalUs(msgid) && sentAt !== null && now - sentAt >= windowMs;
+        return accepted === this.streams.requestedIntervalUs(msgid) && sentAt !== null &&
+            now - sentAt >= windowMs && sinceSilenceEnd >= windowMs;
     }
 
     // The stream control gives up after two unanswered attempts, and a slowdown (unboost) is confirmed by
@@ -435,7 +467,7 @@ export class MavlinkTelemetryFeed {
 
     _logCounts() {
         const seconds = Math.round((this._now() - this.counts.since) / 1000);
-        this._log('MAVLink telemetry, last ' + seconds + ' s: wire ' + this._formatCounts(this.counts.wire) +
+        this._statsLog('MAVLink telemetry, last ' + seconds + ' s: wire ' + this._formatCounts(this.counts.wire) +
             ', virtual ' + this._formatCounts(this.counts.virtual));
         this.resetCounts();
     }

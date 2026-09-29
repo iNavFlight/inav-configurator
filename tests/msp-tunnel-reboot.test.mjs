@@ -396,6 +396,17 @@ test('2000 baud, fast reboot after the reply: the uptime read waits out held and
     assert.equal(fc.reboots, 1);
 });
 
+test('1200 baud, slow reboot after the reply: an uptime check running past 15 s still ends on its own watchdog', (t) => {
+    // At the 3 s window the check takes up to three windows; it starts at 9.6 s and must not be cut at 15 s.
+    const session = startSession(t, { rebootMs: 9600, dropMisc2: 2 }, 1200);
+    assert.equal(mspQueue.getTunnelSilenceWindow(), 3000);
+    sendReboot(session);
+    advance(t, 20000);
+    assert.ok(session.logs.includes('mavlinkTunnelRebootUptimeUnavailable'), 'sanity: both uptime reads lost');
+    assert.deepEqual(session.outcomes, ['back'], 'silent after the reply, then back: the silence verdict stands');
+    assert.equal(fc.reboots, 1);
+});
+
 test('2400 baud, request lost: the uptime proves it, the reboot is sent exactly once more', (t) => {
     const session = startSession(t, { rebootMs: 2000, dropRequests: 1 }, 2400);
     sendReboot(session);

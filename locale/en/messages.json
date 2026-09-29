@@ -701,6 +701,12 @@
     "mavlinkTunnelDetected": {
         "message": "MAVLink heartbeat from system <strong>$1</strong> received - using MSP over MAVLink"
     },
+    "mavlinkTunnelNoConfigurationReceived": {
+        "message": "No configuration received from the flight controller within <span style=\"color: red\">$1 seconds</span>, communication <span style=\"color: red\">failed</span>"
+    },
+    "mavlinkTunnelHandshakePendingTabRefused": {
+        "message": "Please wait, the flight controller is still connecting over the MAVLink tunnel"
+    },
     "mavlinkTunnelNoReply": {
         "message": "MAVLink heartbeat received but no MSP tunnel reply - needs INAV 10.0 or later with mavlink_version 2"
     },

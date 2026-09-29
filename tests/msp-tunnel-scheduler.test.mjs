@@ -227,6 +227,38 @@ test('a per-request retry budget gives the probe three attempts', (t) => {
     assert.deepEqual(results, [false]);
 });
 
+test('a window floor holds for every attempt of the probe and does not leak into the next request', (t) => {
+    startTunnelSession(t);
+    const FLOOR_MS = 3000;
+    const results = [];
+    MSP.sendWithTunnelRetries(MSPCodes.MSP_API_VERSION, false, (response) => results.push(response), 2, FLOOR_MS);
+    for (let attempt = 1; attempt <= 3; attempt++) {
+        mspQueue.executor();
+        t.mock.timers.tick(FLOOR_MS - 10);
+        mspQueue.executor();
+        assert.equal(sent.length, attempt, `attempt ${attempt} is still inside the floor`);
+        t.mock.timers.tick(10);
+    }
+    assert.deepEqual(results, [false]);
+
+    t.mock.timers.tick(SILENCE_MS); // the last attempt's stale watch would hold the next probe back
+    MSP.sendWithTunnelRetries(MSPCodes.MSP_API_VERSION, false, (response) => results.push(response), 2, FLOOR_MS);
+    mspQueue.executor();
+    t.mock.timers.tick(1400);
+    reply(MSPCodes.MSP_API_VERSION);
+    assert.equal(results.length, 2);
+    assert.notEqual(results[1], false);
+    assert.equal(mspQueue.getTunnelSilenceWindow(), 2100, 'the first real reply sets the window');
+
+    t.mock.timers.tick(QUEUE_TICK_MS);
+    send(MSPCodes.MSP_FC_VARIANT);
+    mspQueue.executor();
+    t.mock.timers.tick(2100);
+    mspQueue.executor();
+    assert.equal(sentCodes().at(-1), MSPCodes.MSP_FC_VARIANT);
+    assert.equal(sent.length, 6, 'the next request waits the learned window, not the floor');
+});
+
 test('reboot is never retried, EEPROM write is retried once', (t) => {
     startTunnelSession(t);
     const results = [];
@@ -244,6 +276,31 @@ test('reboot is never retried, EEPROM write is retried once', (t) => {
         t.mock.timers.tick(SLOW_INITIAL_MS);
     }
     assert.deepEqual(sentCodes(), [MSPCodes.MSP_SET_REBOOT, MSPCodes.MSP_EEPROM_WRITE, MSPCodes.MSP_EEPROM_WRITE]);
+});
+
+test('a dataflash erase waits 40 s for its reply and is never resent', (t) => {
+    startTunnelSession(t);
+    const results = [];
+    const lostWrites = [];
+    MSP.onWriteLost = (code) => lostWrites.push(code);
+    try {
+        send(MSPCodes.MSP_DATAFLASH_ERASE, (response) => results.push(response));
+        mspQueue.executor();
+        t.mock.timers.tick(40000 - 10);
+        mspQueue.executor();
+        assert.equal(sent.length, 1, 'a NAND erase keeps the FC silent for seconds');
+        t.mock.timers.tick(10);
+        for (let tick = 0; tick < 3; tick++) {
+            mspQueue.executor();
+            t.mock.timers.tick(SLOW_INITIAL_MS);
+        }
+        assert.deepEqual(sentCodes(), [MSPCodes.MSP_DATAFLASH_ERASE], 'a resend would erase the flash again');
+        assert.deepEqual(results, []);
+        assert.deepEqual(lostWrites, [MSPCodes.MSP_DATAFLASH_ERASE]);
+        assert.equal(mspQueue.isLocked(), false);
+    } finally {
+        MSP.onWriteLost = null;
+    }
 });
 
 test('EEPROM write and reboot wait 5 s for the first chunk, then 500 ms between chunks', (t) => {
@@ -622,6 +679,32 @@ test('the learned window never decays below the link prior and never exceeds 3 s
     assert.equal(mspQueue.getTunnelSilenceWindow(), 2700, 'stored at the cap: 3600 would still read 3000 here');
 });
 
+test('resetting the tunnel requests keeps the learned window but drops pending request and stale watch', (t) => {
+    startTunnelSession(t);
+    lateReplyAfterLapse(t, MSPCodes.MSP_FC_VARIANT, 800);
+    assert.equal(mspQueue.getTunnelSilenceWindow(), 1200);
+
+    MSP.sendLinkProbe(MSPCodes.MSP_FC_VERSION, () => {}, 0);
+    mspQueue.executor();
+    t.mock.timers.tick(1200);
+    assert.equal(mspQueue.isStaleWatched(MSPCodes.MSP_FC_VERSION), true, 'sanity: the lapsed probe is watched');
+    MSP.sendLinkProbe(MSPCodes.MSP_FC_VARIANT, () => {}, 1);
+    mspQueue.executor();
+    const sentBefore = sent.length;
+
+    MSP.callbacks_cleanup();
+    mspQueue.resetTunnelRequests();
+    mspQueue.freeHardLock();
+    mspQueue.freeSoftLock();
+    assert.equal(mspQueue.getTunnelSilenceWindow(), 1200, 'same link: the learned window still holds');
+    assert.equal(mspQueue.isStaleWatched(MSPCodes.MSP_FC_VERSION), false);
+    assert.equal(mspQueue.getStaleReplyCount(), 0);
+    assert.equal(mspQueue.isLocked(), false, 'nothing pending');
+    t.mock.timers.tick(1200);
+    mspQueue.executor();
+    assert.equal(sent.length, sentBefore, 'the dropped request neither times out nor retries');
+});
+
 test('slow codes keep their 5 s first window, and their flash wait does not widen the window', (t) => {
     startTunnelSession(t);
     send(MSPCodes.MSP_EEPROM_WRITE);
@@ -641,6 +724,27 @@ test('slow codes keep their 5 s first window, and their flash wait does not wide
     t.mock.timers.tick(10);
     mspQueue.executor();
     assert.equal(sent.length, 4, 'retried at 5 s, as before');
+});
+
+test('a dataflash erase that answers after 8 s does not widen the window', (t) => {
+    startTunnelSession(t);
+    // The round-trip filters are module-global: an 8 s sample would leak into the balancer tests below.
+    MSP.setProcessData((handler) => {
+        const pending = handler.callbacks.find((c) => c.code == handler.code);
+        MSP.setProcessData(defaultProcessData);
+        pending.lastSentOn = null;
+        defaultProcessData(handler);
+    });
+    const results = [];
+    send(MSPCodes.MSP_DATAFLASH_ERASE, (response) => results.push(response));
+    mspQueue.executor();
+    t.mock.timers.tick(8000);
+    reply(MSPCodes.MSP_DATAFLASH_ERASE, []);
+    t.mock.timers.tick(QUEUE_TICK_MS);
+    assert.equal(results.length, 1);
+    assert.notEqual(results[0], false);
+    assert.equal(sent.length, 1);
+    assert.equal(mspQueue.getTunnelSilenceWindow(), SILENCE_MS, 'the erase wait is not link latency');
 });
 
 test('an abandoned EEPROM write that lapses at 5 s and then replies does not widen the window', (t) => {

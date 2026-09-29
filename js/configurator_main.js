@@ -284,6 +284,11 @@ $(function() {
 
                 var tabRequiresConnection = $(self).parent().hasClass('mode-connected');
 
+                if (GUI.tunnelHandshakePending) {
+                    GUI.log(i18n.getMessage('mavlinkTunnelHandshakePendingTabRefused'));
+                    return;
+                }
+
                 var tab = tabClass.substring(4);
                 var tabName = $(self).text();
 

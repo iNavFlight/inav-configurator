@@ -208,3 +208,38 @@ test('a chunk after a gap of 999 ms still continues the partial MSP frame', () =
     assert.equal(received[0].code, 116);
     assert.deepEqual([...received[0].payload], [...payload]);
 });
+
+// A slow link's queue waits a whole silence window per chunk (serial_backend.js passes it in).
+test('a reassembly timeout provider widens the gap a partial MSP frame survives', () => {
+    const payload = new Uint8Array(300).fill(0x41);
+    const frames = fcReplyFrames(mspV2Reply(116, payload));
+
+    const received = captureMspFrames();
+    let now = 0;
+    let resets = 0;
+    const link = tunnelLinkIntoMsp({
+        now: () => now,
+        reassemblyTimeoutMs: () => 2117,
+        onReassemblyTimeout: () => {
+            resets++;
+            MSP.resetDecoder();
+        },
+    });
+    link.ingest(frames[0]);
+    now += 1500;
+    link.ingest(frames[1]);
+    now += 2116;
+    link.ingest(frames[2]);
+    assert.equal(resets, 0, 'gaps below the provided timeout keep the partial frame');
+    assert.equal(received.length, 1);
+    assert.deepEqual([...received[0].payload], [...payload]);
+
+    const lost = fcReplyFrames(mspV2Reply(116, payload));
+    link.ingest(lost[0]);
+    now += 2117;
+    for (const frame of fcReplyFrames(mspV2Reply(1, [0, 2, 6]))) {
+        link.ingest(frame);
+    }
+    assert.equal(resets, 1);
+    assert.deepEqual(received.map((r) => r.code), [116, 1]);
+});

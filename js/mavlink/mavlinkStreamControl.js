@@ -11,10 +11,16 @@ const ACK_TIMEOUT_ROUND_TRIPS = 3;
 const COMMAND_ATTEMPTS = 2;
 // A message arriving at a requested higher rate proves the command took effect even if its ack was lost.
 export const IMPLICIT_ACK_WINDOW_MS = 2000;
+// A slow stream needs a window long enough to tell its rate from the next faster one (0.5 Hz from 1 Hz).
+const IMPLICIT_ACK_MIN_INTERVALS = 4;
 // The FC reschedules one interval after each send, so streams run slightly slow (SITL: 9.3-9.7 Hz at 10 Hz).
 const IMPLICIT_ACK_RATE_TOLERANCE = 0.8;
 // A speed-up is not proven by a stream that already ran faster than asked.
-const IMPLICIT_ACK_RATE_CEILING = 1.5;
+const IMPLICIT_ACK_RATE_CEILING = 1.25;
+
+export function implicitAckWindowMs(intervalUs) {
+    return Math.max(IMPLICIT_ACK_WINDOW_MS, IMPLICIT_ACK_MIN_INTERVALS * intervalUs / 1000);
+}
 
 // One command in flight: COMMAND_ACK names the command but not the message id it answers.
 export class MavlinkStreamControl {
@@ -119,13 +125,14 @@ export class MavlinkStreamControl {
             return;
         }
         const now = this._now();
-        const arrivals = (this._arrivals.get(msgid) || []).filter(at => now - at < IMPLICIT_ACK_WINDOW_MS);
+        const windowMs = implicitAckWindowMs(requested.intervalUs);
+        const arrivals = (this._arrivals.get(msgid) || []).filter(at => now - at < windowMs);
         arrivals.push(now);
         this._arrivals.set(msgid, arrivals);
-        const framesAtRate = IMPLICIT_ACK_WINDOW_MS * 1000 / requested.intervalUs;
+        const framesAtRate = windowMs * 1000 / requested.intervalUs;
         const expected = Math.max(2, Math.round(IMPLICIT_ACK_RATE_TOLERANCE * framesAtRate));
         const ceiling = Math.ceil(IMPLICIT_ACK_RATE_CEILING * framesAtRate);
-        if (now - requested.at >= IMPLICIT_ACK_WINDOW_MS && arrivals.length >= expected && arrivals.length <= ceiling) {
+        if (now - requested.at >= windowMs && arrivals.length >= expected && arrivals.length <= ceiling) {
             this._acceptImplicitly(msgid, requested.intervalUs);
         }
     }
@@ -242,7 +249,7 @@ export class MavlinkStreamControl {
         const grace = setTimeout(() => {
             this._graceTimers.delete(grace);
             this._resolveBase(command.msgid, this._accepted.get(command.msgid) === command.intervalUs);
-        }, IMPLICIT_ACK_WINDOW_MS);
+        }, implicitAckWindowMs(command.intervalUs));
         this._graceTimers.add(grace);
     }
 

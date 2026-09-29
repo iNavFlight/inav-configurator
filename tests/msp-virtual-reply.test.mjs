@@ -638,6 +638,38 @@ test('an accepted stream never received is requested again twice, 10 s apart, th
     assert.equal(logs.filter(line => line.includes('message 24 never received, interval requested again')).length, NEVER_SEEN_RE_REQUESTS);
 });
 
+test('a link outage does not spend the re-request budget, and an FC back after it gets every stream again', (t) => {
+    startSession(t);
+    readyForVirtual(t);
+    runLink(t, 3000, { periods: BASE_PERIODS_MS, fade: [0, 3000], alive: false });
+    const silent = wireTraffic().commands.length;
+    runLink(t, 67000, { periods: BASE_PERIODS_MS, fade: [0, 67000], alive: false });
+    assert.equal(wireTraffic().commands.length, silent, 'no command while the FC has been silent for 3 s');
+
+    // It rebooted meanwhile: every override is gone, only heartbeats come back.
+    const back = wireTraffic().commands.length;
+    const heartbeatsOnly = { periods: new Map(), alive: false, extra: () => [MAVLINK_MSG_ID.HEARTBEAT] };
+    runLink(t, MIN_FRESH_WINDOW_MS, heartbeatsOnly);
+    assert.deepEqual(commandsSince(back), [], 'nothing before one fresh window since the FC came back');
+    runLink(t, 30000 - MIN_FRESH_WINDOW_MS, heartbeatsOnly);
+    const asked = new Set(commandsSince(back).map(([msgid]) => msgid));
+    for (const msgid of BASE_INTERVALS_US.keys()) {
+        assert.ok(asked.has(msgid), `message ${msgid} requested again after the outage`);
+    }
+});
+
+test('after a fade the streams that resume are left alone; one that stays quiet is asked for after a fresh window', (t) => {
+    startSession(t);
+    readyForVirtual(t);
+    runLink(t, 8000, { periods: BASE_PERIODS_MS, fade: [0, 8000], alive: false });
+    const back = wireTraffic().commands.length;
+    const withoutAttitude = periodsWith(new Map([[MAVLINK_MSG_ID.ATTITUDE, 0]]));
+    runLink(t, MIN_FRESH_WINDOW_MS, { periods: withoutAttitude, alive: false });
+    assert.deepEqual(commandsSince(back), [], 'nothing before one fresh window since the FC came back');
+    runLink(t, 10000 - MIN_FRESH_WINDOW_MS, { periods: withoutAttitude, alive: false });
+    assert.deepEqual(new Set(commandsSince(back).map(([msgid]) => msgid)), new Set([MAVLINK_MSG_ID.ATTITUDE]));
+});
+
 test('a slow serial start: freshness uses the reduced intervals, MSP_RC goes on the wire, analog does without RC_CHANNELS', (t) => {
     startSession(t, { serialBaud: 4800 });
     answerCommands(t);
@@ -657,6 +689,14 @@ test('a slow serial start: freshness uses the reduced intervals, MSP_RC goes on 
     assert.equal(feed.serve(MSPCodes.MSPV2_INAV_ANALOG, false, null, null), true, 'RC_CHANNELS is off: rssi from the wire refresh');
     assert.equal(feed.serve(MSPCodes.MSP_RC, false, null, null), false);
     assert.ok(logs.some(line => line.includes('MSP_RC goes over the tunnel (message 65 switched off)')));
+
+    // The FC may still stream RC_CHANNELS at the port's own rate; MSP_RC stays on the wire anyway.
+    link.ingest(fcFrame(MAVLINK_MSG_ID.RC_CHANNELS));
+    const rcBefore = wireTraffic().msp.filter(code => code === MSPCodes.MSP_RC).length;
+    assert.notEqual(wireRoundTrip(t, MSPCodes.MSP_RC), undefined);
+    assert.equal(wireTraffic().msp.filter(code => code === MSPCodes.MSP_RC).length, rcBefore + 1);
+    assert.equal(wireTraffic().commands.some(([msgid]) => msgid === MAVLINK_MSG_ID.RC_CHANNELS), false,
+        'no RC_CHANNELS override the FC would keep until reboot');
 });
 
 test('a stream slowed down is judged at its new interval before the FC acknowledged it', (t) => {
@@ -707,9 +747,13 @@ test('a serial link at 9600 baud or less starts in the reduced set and never boo
     for (const [baud, reduced] of [[4800, true], [9600, true], [14400, false], [19200, false], [0, false]]) {
         t.mock.timers.reset();
         startSession(t, { serialBaud: baud });
+        let ready = null;
+        feed._onStreamsReady = (active, total) => { ready = [active, total]; };
         answerCommands(t);
         const expected = reduced ? reducedCommands() : Array.from(BASE_INTERVALS_US, ([msgid, us]) => [msgid, us]);
         assert.deepEqual(wireTraffic().commands, expected, `baud ${baud}`);
+        assert.equal(expected.some(([msgid]) => msgid === MAVLINK_MSG_ID.RC_CHANNELS), !reduced, `baud ${baud}: RC_CHANNELS left alone`);
+        assert.deepEqual(ready, reduced ? [5, 5] : [6, 6], `baud ${baud}: streams active`);
         assert.equal(feed.isReduced(), reduced, `baud ${baud}`);
         assert.equal(logs.filter(line => line.includes('slow serial link')).length, reduced ? 1 : 0, `baud ${baud}`);
     }

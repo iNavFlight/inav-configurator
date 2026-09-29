@@ -20,7 +20,9 @@ const TUNNEL_LEARNED_DECAY = 0.9;
 const TUNNEL_LEARNED_DECAY_PERIOD_MS = 60000;
 // Flash erase blocks the FC for well over a second before the first reply byte.
 const TUNNEL_SLOW_REQUEST_TIMEOUT_MS = 5000;
-// Handlers that write the config flash before replying (fc_msp.c, maintenance-10.x).
+// NAND has no chip erase: W25N02KV / MX35LF2G have 2048 blocks and the driver waits up to 15 ms per block (~31 s).
+const TUNNEL_ERASE_TIMEOUT_MS = 40000;
+// Handlers that block before replying (fc_msp.c, maintenance-10.x).
 const TUNNEL_SLOW_REQUEST_CODES = new Set([
     MSPCodes.MSP_EEPROM_WRITE,
     MSPCodes.MSP_SET_REBOOT,
@@ -29,6 +31,7 @@ const TUNNEL_SLOW_REQUEST_CODES = new Set([
     MSPCodes.MSP_WP_MISSION_SAVE,
     MSPCodes.MSP2_INAV_SELECT_BATTERY_PROFILE,
     MSPCodes.MSP2_INAV_SELECT_MIXER_PROFILE,
+    MSPCodes.MSP_DATAFLASH_ERASE,
 ]);
 const TUNNEL_DEFAULT_RETRIES = 1;
 // After a retry was answered, the other attempt's reply may still be on its way.
@@ -396,15 +399,20 @@ var mspQueue = function () {
     publicScope.setTunnelMode = function (enabled, serialBaud = 0) {
         privateScope.tunnelMode = enabled;
         privateScope.lockMethod = enabled ? 'hard' : privateScope.requestedLockMethod;
-        privateScope.clearTunnelTimer();
-        privateScope.tunnelPending = null;
-        privateScope.staleWatch.clear();
-        privateScope.staleReplyCount = 0;
+        publicScope.resetTunnelRequests();
         privateScope.silencePriorMs = enabled ? privateScope.serialSilencePrior(serialBaud) : TUNNEL_SILENCE_MIN_MS;
         privateScope.serialBaud = enabled && serialBaud > 0 ? serialBaud : 0;
         privateScope.silenceLearnedMs = 0;
         privateScope.silenceDecayFrom = Date.now();
         privateScope.silenceLoggedMs = null;
+    };
+
+    // Drops pending and stale-watch state but keeps the link timing learned so far.
+    publicScope.resetTunnelRequests = function () {
+        privateScope.clearTunnelTimer();
+        privateScope.tunnelPending = null;
+        privateScope.staleWatch.clear();
+        privateScope.staleReplyCount = 0;
     };
 
     privateScope.serialSilencePrior = function (baud) {
@@ -425,6 +433,14 @@ var mspQueue = function () {
 
     publicScope.hasSlowSerialPrior = function () {
         return privateScope.serialBaud > 0 && privateScope.serialBaud <= TUNNEL_SLOW_SERIAL_MAX_BAUD;
+    };
+
+    publicScope.getTunnelSilenceMax = function () {
+        return TUNNEL_SILENCE_MAX_MS;
+    };
+
+    publicScope.getTunnelDefaultRetries = function () {
+        return TUNNEL_DEFAULT_RETRIES;
     };
 
     publicScope.getTunnelSilenceWindow = function () {
@@ -635,8 +651,8 @@ var mspQueue = function () {
         if (request.tunnelRetries === null || request.tunnelRetries === undefined) {
             request.tunnelRetries = TUNNEL_DEFAULT_RETRIES;
         }
-        // The FC replies and then reboots; a resend would reboot the freshly started FC again.
-        if (request.code == MSPCodes.MSP_SET_REBOOT) {
+        // A resend would reboot the freshly started FC again, or run the whole erase again.
+        if (request.code == MSPCodes.MSP_SET_REBOOT || request.code == MSPCodes.MSP_DATAFLASH_ERASE) {
             request.tunnelRetries = 0;
         }
         // lastSentOn is set after this, so here it is still the previous attempt's.
@@ -645,7 +661,9 @@ var mspQueue = function () {
         privateScope.tunnelPending = request;
         const silenceMs = privateScope.tunnelSilenceWindowMs();
         const slow = TUNNEL_SLOW_REQUEST_CODES.has(request.code);
-        privateScope.armTunnelTimer(request, slow ? Math.max(TUNNEL_SLOW_REQUEST_TIMEOUT_MS, silenceMs) : silenceMs);
+        const slowMs = request.code == MSPCodes.MSP_DATAFLASH_ERASE ? TUNNEL_ERASE_TIMEOUT_MS : TUNNEL_SLOW_REQUEST_TIMEOUT_MS;
+        const firstMs = slow ? Math.max(slowMs, silenceMs) : silenceMs;
+        privateScope.armTunnelTimer(request, Math.max(request.tunnelMinWindowMs || 0, firstMs));
     };
 
     privateScope.armTunnelTimer = function (request, timeoutMs) {

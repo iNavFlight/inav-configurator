@@ -155,6 +155,8 @@ var MSP = {
     nextTunnelRetries: null,
     // Set by sendLinkProbe() for the message being built by send_message().
     nextLinkProbe: false,
+    // Tunnel silence window floor for the message being built by send_message(); 0 = none.
+    nextTunnelMinWindowMs: 0,
 
     // Reads whose response failed to parse this session. The FC state they fill is
     // then part fresh and part stale, so the writes handing it back are refused.
@@ -570,6 +572,7 @@ var MSP = {
         message.onSend = callback_sent;
         message.payloadKey = payloadKey(data);
         message.linkProbe = this.nextLinkProbe;
+        message.tunnelMinWindowMs = this.nextTunnelMinWindowMs;
 
         /*
          * In case of MSP_REBOOT special procedure is required
@@ -648,13 +651,15 @@ var MSP = {
         }
         return crc;
     },
-    // Own retry budget in tunnel mode (the probe); a plain MSP link ignores it.
-    sendWithTunnelRetries(code, data, callback_msp, retries) {
+    // Own retry budget and window floor in tunnel mode (the probe); a plain MSP link ignores both.
+    sendWithTunnelRetries(code, data, callback_msp, retries, minWindowMs = 0) {
         this.nextTunnelRetries = retries;
+        this.nextTunnelMinWindowMs = minWindowMs;
         try {
             return this.send_message(code, data, false, callback_msp);
         } finally {
             this.nextTunnelRetries = null;
+            this.nextTunnelMinWindowMs = 0;
         }
     },
     // Reboot monitor reads: their loss says the FC is down, not that its state is stale.
