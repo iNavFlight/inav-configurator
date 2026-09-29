@@ -839,6 +839,10 @@ function getMission3DSampleCartesian(sample) {
 missionControlTab.initialize = function (callback) {
 
     cleanupMissionControlLocationResources();
+    // A stalled save chain never reaches the callback that re-enables its button.
+    $(document).off(GUI.EVENT_MSP_WRITE_LOST + '.missionControl').on(GUI.EVENT_MSP_WRITE_LOST + '.missionControl', () => {
+        $('#saveEepromSafehomeButton, #saveEepromGeozoneButton, #saveMissionButton, #saveEepromMissionButton').removeClass('disabled');
+    });
     const locationLifecycleId = missionControlLocationLifecycleId;
 
     let cursorInitialized = false;
@@ -8297,6 +8301,7 @@ missionControlTab.setBit = function(bits, bit, value) {
 // }
 
 missionControlTab.cleanup = function (callback) {
+    $(document).off(GUI.EVENT_MSP_WRITE_LOST + '.missionControl');
     // The elevation panel's drag listens on the document, so it outlives the tab unless
     // it is taken off here - reopening the tab would otherwise stack one pair per visit.
     $(document).off('.elevationDrag');

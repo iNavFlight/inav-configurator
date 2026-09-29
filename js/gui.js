@@ -12,6 +12,8 @@ var GUI_control = function () {
     this.connecting_to = false;
     this.connected_to = false;
     this.connect_lock = false;
+    // Tunnel handshake running: a tab switch would abandon its requests (serial_backend.js).
+    this.tunnelHandshakePending = false;
     this.active_tab;
     this.tab_switch_in_progress = false;
     this.operating_system;
@@ -52,6 +54,10 @@ var GUI_control = function () {
         'ez_tune',
         'search'
     ];
+    // CLI is not carried by the MSP tunnel.
+    this.tabsUnavailableOverMavlinkTunnel = ['cli'];
+    // Triggered on document when a tunnel write got no reply, so its save chain stopped; arg: MSP code.
+    this.EVENT_MSP_WRITE_LOST = 'mspWriteLost';
     this.allowedTabs = this.defaultAllowedTabsWhenDisconnected;
 
     this.PROFILES_CHANGED = {

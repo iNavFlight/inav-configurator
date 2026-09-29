@@ -173,6 +173,7 @@ See `tests/transpiler/TESTING_GUIDE.md` for the transpiler test suite specifical
 docs on this repo — check it before assuming something isn't documented:
 
 - `patterns/msp-async-data-access.md` - Avoiding MSP async data races
+- `mavlink-msp-tunnel.md` - MSP over MAVLink tunnel: detection, scheduler tunnel mode, telemetry feed, reboot confirmation
 
 ## AI Agent Guidelines
 

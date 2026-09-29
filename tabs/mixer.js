@@ -15,6 +15,7 @@ import ServoMixRule from './../js/servoMixRule';
 import { getServoTargetWarning } from './../js/servoMixerTargetWarning';
 import MotorMixRule from './../js/motorMixRule';
 import BitHelper from './../js/bitHelper';
+import CONFIGURATOR from './../js/data_storage';
 
 const mixerTab = {};
 
@@ -830,6 +831,8 @@ mixerTab.initialize = function (callback, scrollPosition) {
         // Start button click handler
         $('#wizard-start-button').on('click', function() {
             if (wizardState.isActive) return;
+            // A lost radio link over the tunnel would leave the motor spinning.
+            if (CONFIGURATOR.mavlinkTunnelActive) return;
             wizardState.isActive = true;
             wizardState.currentMotor = 0;
             wizardState.motorPositions = {};
@@ -896,6 +899,12 @@ mixerTab.initialize = function (callback, scrollPosition) {
                 return;
             }
             resetWizard(positions.length);
+
+            const tunnelActive = !!CONFIGURATOR.mavlinkTunnelActive;
+            $('#wizard-tunnel-notice').toggleClass('is-hidden', !tunnelActive);
+            $('#wizard-start-button').toggleClass('modal__button--disabled', tunnelActive);
+            // The notice adds two lines; the modal has a fixed height, so grow it instead of scrolling.
+            motorWizardModal.setHeight(tunnelActive ? 620 : 560);
 
             // Update preview image
             const $wizardImg = $('#wizard-preview-img');

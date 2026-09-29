@@ -320,6 +320,14 @@ var defaultsDialog = (function () {
         }
     };
 
+    // A lost tunnel write stalls the preset chain; the modal cannot be closed by the user.
+    publicScope.abortSaving = function () {
+        if (savingDefaultsModal) {
+            savingDefaultsModal.close();
+        }
+        periodicStatusUpdater.resume();
+    };
+
     privateScope.render = function () {
         $container.find('.defaults-dialog__content').show();
         $container.find('.defaults-dialog__wizard').hide();
