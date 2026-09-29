@@ -673,7 +673,7 @@ $(function() {
                     })
         
                     $('div#options-window').slideDown(250);
-                });
+                }).catch(err => console.error('Options window failed to load: ' + err));
             } else {
                 closeOptions();
             }

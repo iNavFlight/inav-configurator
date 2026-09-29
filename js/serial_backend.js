@@ -384,14 +384,7 @@ var SerialBackend = (function () {
                             const connection = CONFIGURATOR.connection;
                             // The port closes after the restore writes completed or their computed deadline ran out.
                             privateScope.portClosingUntil = Date.now() + PORT_CLOSE_WAIT_MS;
-                            privateScope.stopTelemetryFeed(true, () => connection.disconnect(result => {
-                                privateScope.portClosingUntil = 0;
-                                // A port type chosen while closing kept the old connection object; swap it now.
-                                if (GUI.connected_to === false && GUI.connecting_to === false) {
-                                    GUI.updateManualPortVisibility();
-                                }
-                                privateScope.onClosed(result);
-                            }));
+                            privateScope.stopTelemetryFeed(true, () => connection.disconnect(privateScope.onPortClosed));
                             MSP.disconnect_cleanup();
                             privateScope.ltmProtocolGate.reset();
                             privateScope.endMavlinkSession();
@@ -466,6 +459,10 @@ var SerialBackend = (function () {
                     privateScope.reopenLastTab();
 
                     update.firmwareVersion();
+                }).catch(err => {
+                    // The session is usable without the defaults check; leave the user in a tab.
+                    console.log('Defaults check failed: ' + err);
+                    privateScope.reopenLastTab();
                 });
             });
         });
@@ -1040,6 +1037,15 @@ var SerialBackend = (function () {
         if (CONFIGURATOR.connectionValid && !privateScope.rebootMonitor.active) {
             privateScope.startStatusPolling();
         }
+    };
+
+    privateScope.onPortClosed = function (result) {
+        privateScope.portClosingUntil = 0;
+        // A port type chosen while closing kept the old connection object; swap it now.
+        if (GUI.connected_to === false && GUI.connecting_to === false) {
+            GUI.updateManualPortVisibility();
+        }
+        privateScope.onClosed(result);
     };
 
     privateScope.onClosed = function (result) {

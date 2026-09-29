@@ -441,7 +441,7 @@ export class MavlinkTelemetryFeed {
                 return;
             }
             this._send(frames[index].buffer, sendInfo => {
-                if (!sendInfo || !sendInfo.resultCode) {
+                if (!sendInfo?.resultCode) {
                     written++;
                 }
                 if (index + 1 < frames.length) {

@@ -563,7 +563,7 @@ sensorsTab.initialize = function (callback) {
         });
 
         GUI.content_ready(callback);
-    }));
+    })).catch(err => console.error('Sensors tab failed to load: ' + err));
 };
 
 sensorsTab.cleanup = function (callback) {
