@@ -1670,6 +1670,42 @@
     "srxl2PortNeedsReboot": {
         "message": "$1 port(s) assigned to Spektrum Smart ESC, but the board has not opened any. Ports are opened at startup - save and reboot."
     },
+    "srxl2Connector": {
+        "message": "ESC on the board's ESC connector"
+    },
+    "srxl2ConnectorUart": {
+        "message": "ESC on the board's ESC connector (uses $1)"
+    },
+    "srxl2ConnectorHelp": {
+        "message": "This board's ESC connector can carry a Smart ESC on the one UART its pin can be wired to. That ESC is motor 1, and that UART must have no function in the Ports tab. More ESCs go on UARTs assigned in the Ports tab and follow as motors 2 and on. Takes effect after saving and rebooting."
+    },
+    "srxl2InfoConnector": {
+        "message": "The ESC signal wire goes to this board's ESC connector, with the option below turned on, or to the TX pin of a port assigned to Spektrum Smart ESC, and carries telemetry back on the same wire. One ESC per port: motor 1 is the ESC on the connector when it is used, otherwise the lowest-numbered port, and the other ports follow in order."
+    },
+    "srxl2NoPortConnector": {
+        "message": "No ESC is set up. Turn on the ESC connector option below or assign a port to Spektrum Smart ESC in the Ports tab, or the motor will not be driven at all - this protocol has no fallback to PWM."
+    },
+    "srxl2PortCountConnector": {
+        "message": "ESCs set up: $1. Motor 1 is the ESC on the connector, and the ports assigned in the Ports tab follow."
+    },
+    "srxl2PortCountOpenConnector": {
+        "message": "SRXL2 ports open on the board: $1, for $2 motor(s). Motor 1 is the ESC on the connector, and the ports assigned in the Ports tab follow."
+    },
+    "srxl2ConnectorNeedsReboot": {
+        "message": "The ESC connector is chosen, but the board has not opened it yet. It is opened at startup - save and reboot."
+    },
+    "srxl2ConnectorOffNeedsReboot": {
+        "message": "The ESC connector is turned off, but the board goes on using it until it restarts - save and reboot."
+    },
+    "srxl2ConnectorPortBusy": {
+        "message": "$1 has a function in the Ports tab, so the ESC connector stays unused. Clear the functions of $1 in the Ports tab to use it."
+    },
+    "portsEscConnector": {
+        "message": "SRXL2 via ESC connector"
+    },
+    "portsUsedByEscConnector": {
+        "message": "This port carries the Smart ESC on the board's ESC connector. Turn that off in the Outputs tab to use the port for something else."
+    },
     "srxl2PortCount": {
         "message": "Ports assigned to Spektrum Smart ESC: $1. Motor 1 uses the lowest-numbered of them."
     },

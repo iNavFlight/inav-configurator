@@ -272,7 +272,8 @@ var FC = {
             connected: false,
             lastResult: 0,
             ports: 0,
-            motors: 0
+            motors: 0,
+            connectors: []
         };
 
         this.MIXER_CONFIG = {

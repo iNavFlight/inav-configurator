@@ -56,6 +56,10 @@
     margin-right: 3px;
 }
 
+.tab-ports .srxl2-connector-locked td:not(.identifierCell):not(.functionsCell-peripherals) {
+    opacity: 0.5;
+}
+
 .tab-ports .require-support {
     display: none;
 }

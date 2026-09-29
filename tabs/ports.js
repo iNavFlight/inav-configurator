@@ -190,6 +190,36 @@ portsTab.initialize = function (callback) {
 
         $('table.ports tbody').on('change', 'select', onSwitchChange);
         $('table.ports tbody').on('change', 'input', onSwitchChange);
+
+        lockEscConnectorPort();
+    }
+
+    /* The UART behind the board's ESC connector, when the Outputs tab puts the Smart ESC
+     * there. Locked only while it has no function: with one, the firmware leaves the
+     * connector unused, and the port must stay editable to clear it. */
+    function lockEscConnectorPort() {
+        const connectors = FC.SRXL2_STATUS?.connectors || [];
+        if (!connectors.length || Number.parseInt(FC.ADVANCED_CONFIG.motorPwmProtocol, 10) !== SRXL2_PROTOCOL) {
+            return;
+        }
+        mspHelper.getSetting('esc_srxl2_connector').then(function (s) {
+            if (!s || !s.value) {
+                return;
+            }
+            $('.tab-ports .portConfiguration').each(function () {
+                const port = $(this).data('serialPort');
+                if (port && connectors.includes(port.identifier) && port.functions.length === 0) {
+                    $(this).addClass('srxl2-connector-locked')
+                        .attr('title', i18n.getMessage('portsUsedByEscConnector'))
+                        .find('input, select').prop('disabled', true);
+                    // Its empty value keeps the port function-free when the tab is saved
+                    $('<option value=""></option>')
+                        .text(i18n.getMessage('portsEscConnector'))
+                        .appendTo($(this).find('select[name=function-peripherals]'))
+                        .prop('selected', true);
+                }
+            });
+        });
     }
 
     function onSwitchChange(e) {
