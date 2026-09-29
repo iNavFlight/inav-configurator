@@ -459,15 +459,17 @@ var SerialBackend = (function () {
                     privateScope.reopenLastTab();
 
                     update.firmwareVersion();
-                }).catch(err => {
-                    // The session is usable without the defaults check; leave the user in a tab.
-                    console.log('Defaults check failed: ' + err);
-                    privateScope.reopenLastTab();
-                });
+                }).catch(privateScope.onDefaultsCheckFailed);
             });
         });
     });
 }
+
+    // The session is usable without the defaults check; leave the user in a tab.
+    privateScope.onDefaultsCheckFailed = function (err) {
+        console.log('Defaults check failed: ' + err);
+        privateScope.reopenLastTab();
+    };
 
     privateScope.onInvalidFirmwareVariant = function ()
     {
