@@ -722,6 +722,12 @@
     "mavlinkTunnelNoCli": {
         "message": "The CLI is not available over the MAVLink tunnel. Connect over USB or a plain MSP port to use it."
     },
+    "mavlinkTunnelMotorTestUnavailable": {
+        "message": "Motor test is <strong style=\"color: red\">not available over a MAVLink connection</strong>. Please use an MSP connection (USB or a plain MSP port) to test motors."
+    },
+    "mavlinkTunnelSensorsUnavailable": {
+        "message": "The sensors view is <strong style=\"color: red\">not available over a MAVLink connection</strong>. Please use an MSP connection (USB or a plain MSP port)."
+    },
     "linkTypeMsp": {
         "message": "Link: MSP"
     },

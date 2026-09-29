@@ -32,7 +32,7 @@ import cliTab from '../tabs/cli';
 import javascriptProgrammingTab from '../tabs/javascript_programming';
 import { MavlinkLink, TUNNEL_REASSEMBLY_TIMEOUT_MS } from './mavlink/mavlinkLink';
 import { concatFrames } from './mavlink/mavlinkProtocol';
-import { MavlinkTelemetryFeed, isTelemetryFeedEnabled, mspCodeOfFrame } from './mavlink/mavlinkTelemetryFeed';
+import { MavlinkTelemetryFeed, isTelemetryFeedEnabled, mspCodeOfFrame, RESTORE_DEADLINE_MAX_MS } from './mavlink/mavlinkTelemetryFeed';
 import { TunnelRebootMonitor } from './mavlink/tunnelRebootMonitor';
 
 // Probe attempts on top of the first one: a weak radio link may lose the first request.
@@ -43,6 +43,9 @@ const CONNECTING_TIMEOUT_MS = 10000;
 const TUNNEL_HANDSHAKE_STEP_MARGIN_MS = 3000;
 // A port serving MSP and MAVLink answers the raw probe within this window; plain MSP wins there.
 const RAW_MSP_PRIORITY_WINDOW_MS = 500;
+const PORT_CLOSE_POLL_MS = 50;
+// The restore deadline plus time for the transport's own close.
+const PORT_CLOSE_WAIT_MS = RESTORE_DEADLINE_MAX_MS + 1000;
 
 var SerialBackend = (function () {
 
@@ -54,6 +57,10 @@ var SerialBackend = (function () {
     privateScope.isWirelessMode = false;
 
     privateScope.reopenTab = null;
+
+    privateScope.portClosingUntil = 0;
+
+    privateScope.connectAfterClose = null;
 
     privateScope.mavlinkLink = new MavlinkLink({
         onHeartbeat: frame => privateScope.onMavlinkHeartbeat(frame),
@@ -275,6 +282,17 @@ var SerialBackend = (function () {
                 }
                 else if (selected_port != '0') {
                     if (isIdle) {
+                        // The previous port's deferred disconnect() would close this port on the shared connection object.
+                        if (Date.now() < privateScope.portClosingUntil) {
+                            privateScope.connectAfterClose = privateScope.connectAfterClose || setTimeout(() => {
+                                privateScope.connectAfterClose = null;
+                                // reConnect() toggles: a click after the close may have started a connect already.
+                                if (GUI.connected_to === false && GUI.connecting_to === false) {
+                                    privateScope.reConnect();
+                                }
+                            }, PORT_CLOSE_POLL_MS);
+                            return;
+                        }
                         console.log('Connecting to: ' + selected_port);
                         GUI.connecting_to = selected_port;
 
@@ -364,8 +382,16 @@ var SerialBackend = (function () {
                             mspDeduplicationQueue.flush();
 
                             const connection = CONFIGURATOR.connection;
-                            // The port closes once the FC got its stream defaults back (bounded, see RESTORE_DEADLINE_MS).
-                            privateScope.stopTelemetryFeed(true, () => connection.disconnect(privateScope.onClosed));
+                            // The port closes after the restore writes completed or their computed deadline ran out.
+                            privateScope.portClosingUntil = Date.now() + PORT_CLOSE_WAIT_MS;
+                            privateScope.stopTelemetryFeed(true, () => connection.disconnect(result => {
+                                privateScope.portClosingUntil = 0;
+                                // A port type chosen while closing kept the old connection object; swap it now.
+                                if (GUI.connected_to === false && GUI.connecting_to === false) {
+                                    GUI.updateManualPortVisibility();
+                                }
+                                privateScope.onClosed(result);
+                            }));
                             MSP.disconnect_cleanup();
                             privateScope.ltmProtocolGate.reset();
                             privateScope.endMavlinkSession();

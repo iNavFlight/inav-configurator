@@ -208,6 +208,14 @@ sensorsTab.initialize = function (callback) {
         // translate to user-selected language
        i18n.localize();;
 
+        // The graphs poll faster than the tunnel can answer.
+        if (CONFIGURATOR.mavlinkTunnelActive) {
+            $('.tab-sensors .content_wrapper').children().not('.tab_title').hide();
+            $('.tab-sensors .mavlinkTunnelSensorsUnavailable').show();
+            GUI.content_ready(callback);
+            return;
+        }
+
         // disable graphs for sensors that are missing
         var checkboxes = $('.tab-sensors .info .checkboxes input');
         if (!BitHelper.bit_check(FC.CONFIG.activeSensors, 2)) { // mag

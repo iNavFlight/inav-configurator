@@ -64,6 +64,9 @@ export const FC_SILENCE_MS = 3000;
 // The FC reads one MAVLink message per cycle out of a 64 byte budget: restore commands go out one by one.
 export const RESTORE_SPACING_MS = 20;
 export const RESTORE_DEADLINE_MS = 300;
+// Per restore frame: the 44 B COMMAND_LONG takes ~92 ms on a 4800 baud wire, plus the spacing.
+export const RESTORE_FRAME_ALLOWANCE_MS = 200;
+export const RESTORE_DEADLINE_MAX_MS = 1500;
 
 // 'mavlink_telemetry_feed' = false in the store keeps a tunnel session on pure MSP polling.
 export function isTelemetryFeedEnabled(store) {
@@ -414,20 +417,33 @@ export class MavlinkTelemetryFeed {
 
     _sendRestore(frames, done) {
         let finished = false;
+        let written = 0;
         const finish = () => {
             if (!finished) {
                 finished = true;
                 clearTimeout(deadline);
+                if (written < frames.length) {
+                    this._log('MAVLink telemetry: restore cut short, ' + (frames.length - written) + ' of ' +
+                        frames.length + ' restore frames not confirmed, the FC may keep those intervals until it reboots');
+                }
                 done();
             }
         };
-        const deadline = setTimeout(finish, RESTORE_DEADLINE_MS);
+        const deadlineMs = Math.min(RESTORE_DEADLINE_MS + frames.length * RESTORE_FRAME_ALLOWANCE_MS, RESTORE_DEADLINE_MAX_MS);
+        const deadline = setTimeout(finish, deadlineMs);
         const sendFrom = index => {
+            // The port may already be closing once done() ran.
+            if (finished) {
+                return;
+            }
             if (index >= frames.length) {
                 finish();
                 return;
             }
-            this._send(frames[index].buffer, () => {
+            this._send(frames[index].buffer, sendInfo => {
+                if (!sendInfo || !sendInfo.resultCode) {
+                    written++;
+                }
                 if (index + 1 < frames.length) {
                     setTimeout(() => sendFrom(index + 1), RESTORE_SPACING_MS);
                 } else {

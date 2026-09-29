@@ -27,6 +27,7 @@ import {
     WIRE_REFRESH_MS,
     RESTORE_SPACING_MS,
     RESTORE_DEADLINE_MS,
+    RESTORE_FRAME_ALLOWANCE_MS,
     isTelemetryFeedEnabled,
     mspCodeOfFrame,
 } from '../js/mavlink/mavlinkTelemetryFeed.js';
@@ -496,14 +497,77 @@ test('counters log per 10 s; stop(true) restores every interval one frame at a t
     MSP.virtualReplies = null;
 });
 
-test('restore gives up after 300 ms when the connection never reports a write', (t) => {
+// A mock-timer tick does not run timers set during it, so time advances in steps.
+function advance(t, ms, stepMs = 10) {
+    for (let elapsed = 0; elapsed < ms; elapsed += stepMs) {
+        t.mock.timers.tick(stepMs);
+    }
+}
+
+// Replaces the connection's write with one that reports completion after writeMs; returns the restore.
+function slowWire(writeMs) {
+    const fastSend = CONFIGURATOR.connection.send;
+    CONFIGURATOR.connection.send = (data, callback) => {
+        wire.push(new Uint8Array(data));
+        setTimeout(() => callback({ bytesSent: data.byteLength }), writeMs);
+    };
+    return () => {
+        CONFIGURATOR.connection.send = fastSend;
+        feed = null;
+        MSP.virtualReplies = null;
+    };
+}
+
+test('restore on a slow wire: every frame goes out before done', (t) => {
+    startSession(t);
+    readyForVirtual(t);
+    const writeMs = 150;
+    const restoreWire = slowWire(writeMs);
+    try {
+        const writes = wire.length;
+        let closed = 0;
+        feed.stop(true, () => closed++);
+        advance(t, RESTORE_DEADLINE_MS);
+        assert.equal(closed, 0, 'not done while frames are still being written');
+        advance(t, BASE_INTERVALS_US.size * (writeMs + RESTORE_SPACING_MS));
+        assert.equal(wire.length, writes + BASE_INTERVALS_US.size, 'every restore frame went out');
+        assert.equal(closed, 1);
+        assert.equal(logs.some(line => line.includes('restore cut short')), false);
+    } finally {
+        restoreWire();
+    }
+});
+
+test('restore on a wire too slow for the deadline: done once, no frame after it', (t) => {
+    startSession(t);
+    readyForVirtual(t);
+    const writeMs = 500;
+    const restoreWire = slowWire(writeMs);
+    try {
+        const writes = wire.length;
+        let closed = 0;
+        feed.stop(true, () => closed++);
+        advance(t, RESTORE_DEADLINE_MS + BASE_INTERVALS_US.size * RESTORE_FRAME_ALLOWANCE_MS);
+        assert.equal(closed, 1, 'the deadline still bounds the restore');
+        const atDone = wire.length;
+        assert.ok(atDone - writes < BASE_INTERVALS_US.size, 'the deadline ran before the last frame');
+        assert.equal(logs.filter(line => line.includes('restore cut short')).length, 1, 'one console line');
+        advance(t, BASE_INTERVALS_US.size * (writeMs + RESTORE_SPACING_MS));
+        assert.equal(wire.length, atDone, 'no frame after done()');
+        assert.equal(closed, 1);
+    } finally {
+        restoreWire();
+    }
+});
+
+test('restore gives up after its deadline when the connection never reports a write', (t) => {
     startSession(t);
     readyForVirtual(t);
     const stuck = new MavlinkTelemetryFeed({ link, send: () => {}, fc, msp: MSP, log: () => {} });
     stuck.streams.setInterval(MAVLINK_MSG_ID.ATTITUDE, 500000);
     let closed = 0;
     stuck.stop(true, () => closed++);
-    t.mock.timers.tick(RESTORE_DEADLINE_MS - 1);
+    t.mock.timers.tick(RESTORE_DEADLINE_MS + RESTORE_FRAME_ALLOWANCE_MS - 1);
     assert.equal(closed, 0);
     t.mock.timers.tick(1);
     assert.equal(closed, 1);
@@ -511,6 +575,19 @@ test('restore gives up after 300 ms when the connection never reports a write', 
     const idle = new MavlinkTelemetryFeed({ link, send: () => {}, fc, msp: MSP, log: () => {} });
     idle.stop(false, () => closed++);
     assert.equal(closed, 2, 'no restore: done at once');
+});
+
+test('a failed restore write is logged once with the count left on the FC', (t) => {
+    startSession(t);
+    const lines = [];
+    const failing = new MavlinkTelemetryFeed({ link, send: (data, callback) => callback && callback({ bytesSent: 0, resultCode: 1 }),
+        fc, msp: MSP, log: line => lines.push(line) });
+    failing.streams.setInterval(MAVLINK_MSG_ID.ATTITUDE, 500000);
+    let closed = 0;
+    failing.stop(true, () => closed++);
+    assert.equal(closed, 1);
+    assert.deepEqual(lines.filter(line => line.includes('restore cut short')),
+        ['MAVLink telemetry: restore cut short, 1 of 1 restore frames not confirmed, the FC may keep those intervals until it reboots']);
 });
 
 // --- bandwidth guard -------------------------------------------------------------------------------

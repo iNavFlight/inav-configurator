@@ -54,8 +54,8 @@ var GUI_control = function () {
         'ez_tune',
         'search'
     ];
-    // CLI is not carried by the MSP tunnel; the sensors tab polls faster than the tunnel can answer.
-    this.tabsUnavailableOverMavlinkTunnel = ['cli', 'sensors'];
+    // CLI is not carried by the MSP tunnel.
+    this.tabsUnavailableOverMavlinkTunnel = ['cli'];
     // Triggered on document when a tunnel write got no reply, so its save chain stopped; arg: MSP code.
     this.EVENT_MSP_WRITE_LOST = 'mspWriteLost';
     this.allowedTabs = this.defaultAllowedTabsWhenDisconnected;

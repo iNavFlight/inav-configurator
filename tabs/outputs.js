@@ -13,6 +13,7 @@ import features from './../js/feature_framework';
 import { mixer, PLATFORM } from './../js/model';
 import timeout from './../js/timeouts';
 import interval from './../js/intervals';
+import CONFIGURATOR from './../js/data_storage';
 
 /* Phase 0 of the firmware's calibration state machine, which is also how the
  * sequence is called off. Out here because cleanup() needs it too. */
@@ -34,7 +35,8 @@ outputsTab.initialize = function (callback) {
     var self = this;
 
     self.armed = false;
-    self.allowTestMode = true;
+    // A lost radio link over the tunnel would leave the motors spinning.
+    self.allowTestMode = !CONFIGURATOR.mavlinkTunnelActive;
 
     var $motorsEnableTestMode;
 
@@ -693,6 +695,7 @@ outputsTab.initialize = function (callback) {
 
         $motorsEnableTestMode.prop('checked', false);
         $motorsEnableTestMode.prop('disabled', true);
+        $('.mavlinkTunnelMotorTestUnavailable').toggle(!self.allowTestMode);
 
         update_model(FC.MIXER_CONFIG.appliedMixerPreset);
 
