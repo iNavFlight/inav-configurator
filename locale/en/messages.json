@@ -2648,6 +2648,45 @@
     "gpsSignalStr": {
         "message": "Signal Strength"
     },
+    "gpsSignalStrHead": {
+        "message": "Satellite signals"
+    },
+    "gpsSignalGnssId": {
+        "message": "GNSS"
+    },
+    "gpsSignalSatId": {
+        "message": "Sat ID"
+    },
+    "gpsSignalQuality": {
+        "message": "Quality"
+    },
+    "gpsSignalNone": {
+        "message": "No satellites to show. They come from a u-blox receiver, once it reports them."
+    },
+    "gnssQualityNoSignal": {
+        "message": "no signal"
+    },
+    "gnssQualitySearching": {
+        "message": "searching"
+    },
+    "gnssQualityAcquired": {
+        "message": "acquired"
+    },
+    "gnssQualityUnusable": {
+        "message": "unusable"
+    },
+    "gnssQualityLocked": {
+        "message": "locked"
+    },
+    "gnssQualityFullyLocked": {
+        "message": "fully locked"
+    },
+    "gnssUsedUsed": {
+        "message": "Used in the fix"
+    },
+    "gnssUsedUnused": {
+        "message": "Not used in the fix"
+    },
     "gpsPort": {
         "message": "Serial Port"
     },

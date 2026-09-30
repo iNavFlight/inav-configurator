@@ -36,6 +36,7 @@ import SerialBackend from '../js/serial_backend';
 import ublox from '../js/ublox/UBLOX';
 import dialog from '../js/dialog';
 import { GNSS_CONSTELLATIONS, GNSS_EXTENDED, gnssIsOffered, gnssIsConfirmed, gnssLeftOut } from '../js/gpsConstellations';
+import { CNO_FULL_SCALE, gnssName, qualityKey, qualityLevel } from '../js/gpsSatellites';
 
 
 const gpsTab = {};
@@ -889,6 +890,42 @@ gpsTab.initialize = function (callback) {
             get_raw_gps_data();
 
         }, 200);
+
+        function update_satellites_ui() {
+            const satellites = FC.GPS_DATA.satellites;
+            $('.GPS_signal_strength .gps-signal-none').toggleClass('is-hidden', satellites.length > 0);
+            $('.gps-signal-table').toggleClass('is-hidden', satellites.length === 0);
+
+            const rows = satellites.map(function (sat) {
+                const row = $('<tr>');
+                $('<td>').text(gnssName(sat.gnssId)).appendTo(row);
+                $('<td>').append($('<span>')
+                    .addClass('gps-sat-id')
+                    .toggleClass('is-used', sat.used)
+                    .attr('title', i18n.getMessage(sat.used ? 'gnssUsedUsed' : 'gnssUsedUnused'))
+                    .text(sat.svId)).appendTo(row);
+                $('<td>').append($('<div>').addClass('gps-sat-signal').append(
+                    $('<progress>').attr({ max: CNO_FULL_SCALE, value: sat.cno }),
+                    $('<span>').addClass('gps-sat-cno').text(sat.cno)
+                )).appendTo(row);
+                $('<td>').append($('<span>')
+                    .addClass('gps-sat-quality gps-sat-quality--' + qualityLevel(sat.quality))
+                    .text(i18n.getMessage(qualityKey(sat.quality)))).appendTo(row);
+                return row;
+            });
+            $('.gps-signal-table tbody').empty().append(rows);
+        }
+
+        // Satellites change slowly, and this is the largest reply the tab asks for
+        interval.add('gps_sats_pull', function gps_satellites_update() {
+            if (!SerialBackend.have_sensor(FC.CONFIG.activeSensors, 'gps')) {
+                // A lost GPS sends no list: the last one would stay on screen
+                FC.GPS_DATA.satellites = [];
+                update_satellites_ui();
+                return;
+            }
+            MSP.send_message(MSPCodes.MSP_GPS_SV_INFO, false, false, update_satellites_ui);
+        }, 1000);
 
 
         if (semver.gte(FC.CONFIG.flightControllerVersion, "8.0.0")) {

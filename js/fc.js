@@ -324,7 +324,9 @@ var FC = {
             // How many of the major constellations the receiver can track together
             gnssMaxConcurrent: 0,
             // As the receiver reports it (NEO-F10N), empty when unknown
-            moduleName: ''
+            moduleName: '',
+            // From MSP_GPS_SV_INFO: { gnssId, svId, quality, used, cno }, empty without a u-blox
+            satellites: []
         };
 
         this.ADSB_VEHICLES = {

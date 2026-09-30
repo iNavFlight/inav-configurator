@@ -30,6 +30,7 @@ import mspStatistics from './mspStatistics';
 import settingsCache from './../settingsCache';
 import {Geozone, GeozoneVertex, GeozoneShapes } from './../geozone';
 import { parseDronecanAsyncRequestResponse } from './../dronecanAsyncRequestParse';
+import { decodeSatellites } from './../gpsSatellites';
 
 var mspHelper = (function () {
     var self = {};
@@ -286,6 +287,9 @@ var mspHelper = (function () {
                         FC.GPS_DATA.moduleName += String.fromCodePoint(data.getUint8(26 + i));
                     }
                 }
+                break;
+            case MSPCodes.MSP_GPS_SV_INFO:
+                FC.GPS_DATA.satellites = decodeSatellites(data);
                 break;
             case MSPCodes.MSP2_ADSB_VEHICLE_LIST:
                 var byteOffsetCounter = 0;
