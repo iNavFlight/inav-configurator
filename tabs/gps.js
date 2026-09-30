@@ -377,6 +377,30 @@ gpsTab.initialize = function (callback) {
                     "Only use if you KNOW your M10 has high-performance clock enabled"
                 ]
             },
+            f9p: {
+                name: "u-blox ZED-F9P",
+                galileo: true,
+                glonass: false,
+                beidou: true,
+                rate: 5,
+                description: [
+                    "Dual-band, 3 GNSS constellations (GPS+Galileo+Beidou)",
+                    "5Hz update rate, below the receiver limit on every firmware",
+                    "Adding GLONASS: max 7Hz on HPG 1.51 (9Hz on HPG 1.32)"
+                ]
+            },
+            x20p: {
+                name: "u-blox ZED-X20P",
+                galileo: true,
+                glonass: true,
+                beidou: true,
+                rate: 10,
+                description: [
+                    "All-band, 4 GNSS constellations (GPS+Galileo+GLONASS+Beidou)",
+                    "10Hz update rate (receiver supports up to 25Hz)",
+                    "GLONASS needs receiver firmware HPG 2.10 or later"
+                ]
+            },
             manual: {
                 name: "Manual Settings",
                 description: [
@@ -391,6 +415,8 @@ gpsTab.initialize = function (callback) {
                 case 0x48: return 'm8';
                 case 0x49: return 'm9-precision';
                 case 0x4A: return 'm10';
+                case 0x54: return 'x20p';
+                case 0x89: return 'f9p';
                 default:   return 'manual';
             }
         }
