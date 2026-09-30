@@ -1250,6 +1250,21 @@
     "configurationBatteryVoltage": {
         "message": "Battery Voltage"
     },
+    "configurationBecVoltage": {
+        "message": "BEC Voltage"
+    },
+    "configurationBecScale": {
+        "message": "BEC Voltage Scale"
+    },
+    "configurationBecScaleHelp": {
+        "message": "Calibrates the BEC voltage measured by the board, as the voltage scale does for the battery: adjust it until the BEC voltage above matches a multimeter's reading."
+    },
+    "configurationBecWarningVoltage": {
+        "message": "BEC Warning Voltage"
+    },
+    "configurationBecWarningVoltageHelp": {
+        "message": "Below this voltage the OSD's BEC voltage element blinks. 0 turns the warning off."
+    },
     "configurationCurrentScale": {
         "message": "Current Meter Scale"
     },
@@ -4117,6 +4132,12 @@
     },
     "osdElement_POWER_SUPPLY_IMPEDANCE": {
         "message": "Power Supply Impedance"
+    },
+    "osdElement_BEC_VOLTAGE": {
+        "message": "BEC Voltage"
+    },
+    "osdElement_BEC_VOLTAGE_HELP": {
+        "message": "The servo rail the BEC supplies, which also powers the flight controller, on boards that measure it: NEXUS, NEXUS X/XR, Vantac RF007 and FlyDragon Pro"
     },
     "osdElement_REMAINING_FLIGHT_TIME": {
         "message": "Remaining Flight Time"

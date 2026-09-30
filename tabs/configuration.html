@@ -107,6 +107,26 @@
                             <span data-i18n="configurationBatteryVoltage"></span>
                         </label>
                     </div>
+                    <div class="number" id="becvoltage-row" style="display: none;">
+                        <input type="text" id="becvoltage" name="becvoltage" readonly class="disabled" />
+                        <label for="becvoltage">
+                            <span data-i18n="configurationBecVoltage"></span>
+                        </label>
+                    </div>
+                    <div class="number">
+                        <input type="number" id="vbec_scale" data-setting="vbec_scale" step="1" />
+                        <label for="vbec_scale">
+                            <span data-i18n="configurationBecScale"></span>
+                        </label>
+                        <div for="vbec_scale" class="helpicon cf_tip" data-i18n_title="configurationBecScaleHelp"></div>
+                    </div>
+                    <div class="number">
+                        <input type="number" id="vbec_warning_voltage" data-setting="vbec_warning_voltage" data-setting-multiplier="100" step="0.01" />
+                        <label for="vbec_warning_voltage">
+                            <span data-i18n="configurationBecWarningVoltage"></span>
+                        </label>
+                        <div for="vbec_warning_voltage" class="helpicon cf_tip" data-i18n_title="configurationBecWarningVoltageHelp"></div>
+                    </div>
                     <div class="features batteryCurrent"></div>
                     <div class="select">
                         <select id="current_meter_type" data-setting="current_meter_type"></select>
