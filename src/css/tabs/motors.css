@@ -465,6 +465,11 @@
     margin-right: 4px;
 }
 
+/* The status banner below clears the floated button, which swallows its own top margin */
+.tab-motors #srxl2-calibration .default_btn {
+    margin-bottom: 10px;
+}
+
 .tab-motors .mixerPreview {
   position: relative;
 }
