@@ -7199,6 +7199,7 @@ function iconKey(filename) {
 
         // Programmatically select a waypoint by its layer number (0-based display index)
         function selectWaypointByLayerNumber(layerNum) {
+            const previousMarker = selectedMarker;
             // Deselect current
             if (selectedFeature && selectedMarker) {
                 try {
@@ -7219,7 +7220,8 @@ function iconKey(filename) {
             }
 
             tempMarker = markerLayer;
-            if (!mission.getWaypoint(markerLayer.number) || !markerLayer.getSource().getFeatures()[0]) {
+            const waypoint = mission.getWaypoint(markerLayer.number);
+            if (!waypoint || !markerLayer.getSource().getFeatures()[0]) {
                 clearEditForm();
                 return;
             }
@@ -7229,8 +7231,10 @@ function iconKey(filename) {
             $card.stop(true, true);
             const cardWasVisible = $card.is(':visible');
 
+            // After a delete or a new grid the same layer number can belong to another waypoint
+            const previousLayerIndex = previousMarker === waypoint ? layerNum : null;
             // Same path as a click on the marker, so the editor and the elevation lookup match it
-            selectWaypointMarkerByNumber(markerLayer.number, null);
+            selectWaypointMarkerByNumber(markerLayer.number, previousLayerIndex);
             if (!singleMissionActive()) {
                 updateMultimissionState();
             }
