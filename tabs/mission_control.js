@@ -7219,79 +7219,25 @@ function iconKey(filename) {
             }
 
             tempMarker = markerLayer;
-            selectedMarker = mission.getWaypoint(markerLayer.number);
-            selectedFeature = markerLayer.getSource().getFeatures()[0];
-
-            if (!selectedMarker || !selectedFeature) {
+            if (!mission.getWaypoint(markerLayer.number) || !markerLayer.getSource().getFeatures()[0]) {
                 clearEditForm();
                 return;
             }
 
-            selectedFwApproachWp = FC.FW_APPROACH.get()[FC.SAFEHOMES.getMaxSafehomeCount() + selectedMarker.getMultiMissionIdx()];
-
-            selectedFeature.setStyle(getWaypointIcon(selectedMarker, true));
-
-            const coord = toLonLat(selectedFeature.getGeometry().getCoordinates());
-            let P3Value = selectedMarker.getP3();
-
-            changeSwitch($('#pointP3Alt'), TABS.mission_control.isBitSet(P3Value, MWNP.P3.ALT_TYPE));
-            changeSwitch($('#pointP3UserAction1'), TABS.mission_control.isBitSet(P3Value, MWNP.P3.USER_ACTION_1));
-            changeSwitch($('#pointP3UserAction2'), TABS.mission_control.isBitSet(P3Value, MWNP.P3.USER_ACTION_2));
-            changeSwitch($('#pointP3UserAction3'), TABS.mission_control.isBitSet(P3Value, MWNP.P3.USER_ACTION_3));
-            changeSwitch($('#pointP3UserAction4'), TABS.mission_control.isBitSet(P3Value, MWNP.P3.USER_ACTION_4));
-
-            const altitudeMeters = selectedMarker.getAlt() / 100;
-
-            if (selectedMarker.getAction() == MWNP.WPTYPE.LAND) {
-                $('#wpFwLanding').fadeIn(300);
-            } else {
-                $('#wpFwLanding').fadeOut(300);
-            }
-
-            (async () => {
-                const elevationAtWP = await selectedMarker.getElevation(globalSettings);
-                $('#elevationValueAtWP').text(elevationAtWP);
-                const returnAltitude = checkAltElevSanity(false, selectedMarker.getAlt(), elevationAtWP, P3Value);
-                selectedMarker.setAlt(returnAltitude);
-                plotElevation();
-            })();
-
-            $('#elevationAtWP').fadeIn();
-            $('#groundClearanceAtWP').fadeIn();
-
-            $('#altitudeInMeters').text(` ${altitudeMeters}m`);
-            $('#pointLon').val(Math.round(coord[0] * 10000000) / 10000000);
-            $('#pointLat').val(Math.round(coord[1] * 10000000) / 10000000);
-            $('#pointAlt').val(selectedMarker.getAlt());
-            $('#pointType').val(selectedMarker.getAction());
-            $('#pointP1').val(selectedMarker.getP1());
-            $('#pointP2').val(selectedMarker.getP2());
-
-            for (const j in dictOfLabelParameterPoint[selectedMarker.getAction()]) {
-                const labelText = dictOfLabelParameterPoint[selectedMarker.getAction()][j];
-                const parameterSuffix = String(j).slice(-1);
-
-                if (labelText === '') {
-                    $('#pointP' + parameterSuffix + 'class').fadeOut(300);
-                    continue;
-                }
-
-                $('#pointP' + parameterSuffix + 'class').fadeIn(300);
-                $('label[for=pointP' + parameterSuffix + ']').html(labelText);
-            }
-            selectedMarker = renderWaypointOptionsTable(selectedMarker);
-            $('#EditPointNumber').text("Edit point "+String(selectedMarker.getLayerNumber()+1));
-
-            // Stop any in-progress fadeOut from clearEditForm, then show card
+            // Stop any in-progress fadeOut from clearEditForm
             const $card = $('#MPeditPoint');
             $card.stop(true, true);
-            if ($card.is(':visible')) {
-                $card.css('opacity', 0.3).animate({ opacity: 1 }, 200);
-            } else {
-                $card.fadeIn(300);
+            const cardWasVisible = $card.is(':visible');
+
+            // Same path as a click on the marker, so the editor and the elevation lookup match it
+            selectWaypointMarkerByNumber(markerLayer.number, null);
+            if (!singleMissionActive()) {
+                updateMultimissionState();
             }
-            $('#pointP3UserActionClass').fadeIn();
-            redrawLayer();
+
+            if (cardWasVisible) {
+                $card.stop(true, true).css('opacity', 0.3).animate({ opacity: 1 }, 200);
+            }
         }
 
         function selectPreviousWaypoint(prevLayerNum) {
