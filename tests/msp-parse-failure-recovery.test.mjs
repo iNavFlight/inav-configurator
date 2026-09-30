@@ -221,6 +221,19 @@ test('MSP2_PID positive control: a matching bank count parses unchanged', () => 
     assert.notEqual(response, null);
 });
 
+test('an error reply reaches the request callback flagged as unsupported', () => {
+    const replies = [];
+    for (const unsupported of [false, true]) {
+        const handler = makeDataHandler(MSPCodes.MSP_OSD_CHAR_WRITE, [], (resp) => { replies.push(resp); });
+        handler.unsupported = unsupported ? 1 : 0;
+        mspHelper.handleResponse(handler);
+        clearTimeout(handler.entry.timer);
+    }
+
+    assert.deepEqual(replies.map((resp) => resp.unsupported), [false, true]);
+    assert.equal(replies[1].command, MSPCodes.MSP_OSD_CHAR_WRITE);
+});
+
 test('a parser that throws must still complete the request', async () => {
     // MSP_LOOP_TIME's case does data.getInt16(0) and writes into FC.FC_CONFIG.
     // With an empty payload from a mismatched FC that throws mid-parse - which

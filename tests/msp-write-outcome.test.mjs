@@ -14,7 +14,7 @@
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { resolveMspWrite, guardMspCallback } from '../js/mspWriteOutcome.js';
+import { resolveMspWrite, guardMspCallback, mspReplyFailed } from '../js/mspWriteOutcome.js';
 
 test('resolveMspWrite resolves true and runs the callback when the write lands', async () => {
     let ran = false;
@@ -68,4 +68,11 @@ test('guardMspCallback skips the wrapped callback when the queue drops the write
 test('guardMspCallback tolerates a missing onFinish', () => {
     assert.doesNotThrow(() => guardMspCallback(undefined)(false));
     assert.doesNotThrow(() => guardMspCallback(undefined)({}));
+});
+
+test('mspReplyFailed accepts an ACK and flags an error reply or a queue drop', () => {
+    assert.equal(mspReplyFailed({ command: 87, data: null, length: 0, unsupported: false }), false);
+    assert.equal(mspReplyFailed({ command: 87 }), false, 'a payload without the flag is an ACK');
+    assert.equal(mspReplyFailed({ command: 87, data: null, length: 0, unsupported: true }), true);
+    assert.equal(mspReplyFailed(false), true);
 });

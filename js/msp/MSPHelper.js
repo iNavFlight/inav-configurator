@@ -2017,7 +2017,7 @@ var mspHelper = (function () {
 
                     // fire callback
                     if (callback) {
-                        callback({ 'command': dataHandler.code, 'data': data, 'length': dataHandler.message_length_expected });
+                        callback({ 'command': dataHandler.code, 'data': data, 'length': dataHandler.message_length_expected, 'unsupported': Boolean(dataHandler.unsupported) });
                     }
                     break;
                 }
