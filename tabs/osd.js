@@ -365,10 +365,21 @@ function checkOsdFeatureForFontUpload() {
     // Re-read: FC.FEATURES is reset on connect and not reloaded when this tab is reopened after a reboot.
     return MSP.promise(MSPCodes.MSP_FEATURE).then(function (reply) {
         checkFontUploadReply(reply);
+        // A short reply is not parsed and would leave the previous feature mask in place.
+        if (!reply.data || reply.data.byteLength < 4) {
+            throw fontUploadError('osdFontUploadFailed');
+        }
         if (!FC.isFeatureEnabled('OSD')) {
             throw fontUploadError('osdFontUploadOsdDisabled');
         }
     });
+}
+
+function showFontUploadError(error) {
+    console.error(error);
+    const message = i18n.getMessage(error.messageKey || 'osdFontUploadFailed');
+    $('.progressLabel').text(message);
+    GUI.log(message);
 }
 
 FONT.upload = function (callback) {
@@ -395,12 +406,12 @@ FONT.upload = function (callback) {
             // on F3 when the configurator is running on macOS
             var proto = next <= 255 ? MSP.constants.PROTOCOL_V1 : MSP.constants.PROTOCOL_V2;
             var data = FONT.msp.encode(next);
-            return MSP.promise(MSPCodes.MSP_OSD_CHAR_WRITE, data, proto).then(checkFontUploadReply);
-        });
+            return MSP.promise(MSPCodes.MSP_OSD_CHAR_WRITE, data, proto);
+        }).then(checkFontUploadReply);
     }, checkOsdFeatureForFontUpload()).then(function() {
         OSD.GUI.jbox.close();
         return MSP.promise(MSPCodes.MSP_SET_REBOOT);
-    });
+    }).catch(showFontUploadError);
 };
 
 FONT.preview = function ($el) {
@@ -3876,12 +3887,7 @@ osdTab.initialize = function (callback) {
                             progressLabel.text(uploading + ' (' + done + '/' + total + ')');
                         }
                     }
-                    FONT.upload(progressCallback).catch(function (error) {
-                        console.error(error);
-                        var message = i18n.getMessage(error.messageKey || 'osdFontUploadFailed');
-                        progressLabel.text(message);
-                        GUI.log(message);
-                    });
+                    FONT.upload(progressCallback);
                 }
             });
 

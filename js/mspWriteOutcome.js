@@ -25,7 +25,7 @@ export function resolveMspWrite(mspPromise, callback) {
  * answered with an error reply, which the MSP callback flags as unsupported.
  */
 export function mspReplyFailed(result) {
-    return result === false || Boolean(result && result.unsupported);
+    return result === false || Boolean(result?.unsupported);
 }
 
 /**
