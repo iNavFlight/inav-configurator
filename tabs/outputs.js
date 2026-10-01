@@ -291,6 +291,60 @@ outputsTab.initialize = function (callback) {
             });
         }
 
+        // The connector row and its texts: says where motor 1 goes, and whether its UART is taken
+        function srxl2UpdateConnector() {
+            const connectors = FC.SRXL2_STATUS.connectors || [];
+            $('#srxl2-connector-row').toggle(connectors.length > 0);
+            if (connectors.length > 0) {
+                const uart = serialPortHelper.getPortName(connectors[0]);
+                $('#srxl2-connector-label').text(i18n.getMessage('srxl2ConnectorUart', [uart]));
+                $('#srxl2-info').html(i18n.getMessage('srxl2InfoConnector'));
+                $('#srxl2-connector-busy').html(i18n.getMessage('srxl2ConnectorPortBusy', [uart]));
+            }
+            const busy = srxl2ConnectorChosen() && srxl2ConnectorPortBusy();
+            $('#srxl2-connector-busy').toggle(busy);
+            return {
+                noPortMessage: connectors.length > 0 ? 'srxl2NoPortConnector' : 'srxl2NoPort',
+                busy: busy,
+                onConnector: srxl2ConnectorChosen() && !busy,
+            };
+        }
+
+        // The warning once the board has reported its ports, or null for none
+        function srxl2PortWarning(assigned, connector, boardOnConnector) {
+            const ports = srxl2Counts.ports;
+            if (boardOnConnector !== connector.onConnector) {
+                return i18n.getMessage(connector.onConnector ? 'srxl2ConnectorNeedsReboot' : 'srxl2ConnectorOffNeedsReboot');
+            }
+            if (assigned === 0 && ports === 0) {
+                // A chosen connector on a taken UART has its own warning, which says what to do
+                return connector.busy ? null : i18n.getMessage(connector.noPortMessage);
+            }
+            if (ports === 0) {
+                /* Assigned in the tab but not yet opened by the board: the ports
+                 * are opened at startup, so this needs a reboot rather than
+                 * another port. */
+                if (connector.onConnector) {
+                    return i18n.getMessage('srxl2ConnectorNeedsReboot');
+                }
+                return i18n.getMessage('srxl2PortNeedsReboot', [assigned]);
+            }
+            if (ports < srxl2Counts.motors) {
+                return i18n.getMessage('srxl2TooFewPorts', [srxl2Counts.motors, ports]);
+            }
+            return null;
+        }
+
+        /* A board with no mixer preset applied reports no motors, which is
+         * a normal starting state and not worth phrasing as "for 0 motors". */
+        function srxl2PortCountText(boardOnConnector) {
+            if (srxl2Counts.motors <= 0) {
+                return i18n.getMessage('srxl2PortCountOpenNoMixer', [srxl2Counts.ports]);
+            }
+            const key = boardOnConnector ? 'srxl2PortCountOpenConnector' : 'srxl2PortCountOpen';
+            return i18n.getMessage(key, [srxl2Counts.ports, srxl2Counts.motors]);
+        }
+
         function srxl2UpdateVisibility() {
             const isSrxl2 = Number.parseInt(FC.ADVANCED_CONFIG.motorPwmProtocol, 10) === SRXL2_PROTOCOL;
             $('#srxl2-esc').toggle(isSrxl2);
@@ -316,59 +370,29 @@ outputsTab.initialize = function (callback) {
                 .toggle(!isSrxl2 && srxl2PortsAssignedInUi() > 0)
                 .html(i18n.getMessage('srxl2ProtocolNotSet'));
 
-            const connectors = FC.SRXL2_STATUS.connectors || [];
-            const noPortMessage = connectors.length > 0 ? 'srxl2NoPortConnector' : 'srxl2NoPort';
-            $('#srxl2-connector-row').toggle(connectors.length > 0);
-            if (connectors.length > 0) {
-                const uart = serialPortHelper.getPortName(connectors[0]);
-                $('#srxl2-connector-label').text(i18n.getMessage('srxl2ConnectorUart', [uart]));
-                $('#srxl2-info').html(i18n.getMessage('srxl2InfoConnector'));
-                $('#srxl2-connector-busy').html(i18n.getMessage('srxl2ConnectorPortBusy', [uart]));
-            }
-            const connectorBusy = srxl2ConnectorChosen() && srxl2ConnectorPortBusy();
-            const onConnector = srxl2ConnectorChosen() && !connectorBusy;
-            $('#srxl2-connector-busy').toggle(connectorBusy);
+            const connector = srxl2UpdateConnector();
 
             if (isSrxl2) {
-                const assigned = srxl2PortsAssignedInUi() + (onConnector ? 1 : 0);
+                const assigned = srxl2PortsAssignedInUi() + (connector.onConnector ? 1 : 0);
                 const $warn = $('#srxl2-no-port');
                 const $info = $('#srxl2-port-count');
 
                 if (!srxl2Counts) {
                     /* The board has not been asked yet, or does not answer - say
                      * only what is certain rather than inventing a motor count. */
-                    $warn.toggle(assigned === 0 && !connectorBusy).html(i18n.getMessage(noPortMessage));
-                    $info.html(i18n.getMessage(onConnector ? 'srxl2PortCountConnector' : 'srxl2PortCount', [assigned]));
+                    $warn.toggle(assigned === 0 && !connector.busy).html(i18n.getMessage(connector.noPortMessage));
+                    $info.html(i18n.getMessage(connector.onConnector ? 'srxl2PortCountConnector' : 'srxl2PortCount', [assigned]));
                     return;
                 }
 
-                const ports = srxl2Counts.ports;
-                const motors = srxl2Counts.motors;
-                const boardOnConnector = srxl2BoardUsesConnector(onConnector);
-
-                if (boardOnConnector !== onConnector) {
-                    $warn.html(i18n.getMessage(onConnector ? 'srxl2ConnectorNeedsReboot' : 'srxl2ConnectorOffNeedsReboot')).show();
-                } else if (assigned === 0 && ports === 0) {
-                    // A chosen connector on a taken UART has its own warning, which says what to do
-                    $warn.html(i18n.getMessage(noPortMessage)).toggle(!connectorBusy);
-                } else if (ports === 0) {
-                    /* Assigned in the tab but not yet opened by the board: the ports
-                     * are opened at startup, so this needs a reboot rather than
-                     * another port. */
-                    $warn.html(onConnector
-                        ? i18n.getMessage('srxl2ConnectorNeedsReboot')
-                        : i18n.getMessage('srxl2PortNeedsReboot', [assigned])).show();
-                } else if (ports < motors) {
-                    $warn.html(i18n.getMessage('srxl2TooFewPorts', [motors, ports])).show();
-                } else {
+                const boardOnConnector = srxl2BoardUsesConnector(connector.onConnector);
+                const warning = srxl2PortWarning(assigned, connector, boardOnConnector);
+                if (warning === null) {
                     $warn.hide();
+                } else {
+                    $warn.html(warning).show();
                 }
-
-                /* A board with no mixer preset applied reports no motors, which is
-                 * a normal starting state and not worth phrasing as "for 0 motors". */
-                $info.html(motors > 0
-                    ? i18n.getMessage(boardOnConnector ? 'srxl2PortCountOpenConnector' : 'srxl2PortCountOpen', [ports, motors])
-                    : i18n.getMessage('srxl2PortCountOpenNoMixer', [ports]));
+                $info.html(srxl2PortCountText(boardOnConnector));
             } else {
                 srxl2CalStop();
             }
