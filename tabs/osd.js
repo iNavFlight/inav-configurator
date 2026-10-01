@@ -17,7 +17,7 @@ import i18n from './../js/localization';
 import store from './../js/store';
 import dialog from './../js/dialog';
 import { resolveMspWrite } from './../js/mspWriteOutcome';
-import { copyPositions } from './../js/osdLayouts';
+import { positionsToCopy } from './../js/osdLayouts';
 
 var SYM = SYM || {};
 SYM.LAST_CHAR = 225; // For drawing the font preview
@@ -2472,8 +2472,11 @@ OSD.is_item_displayed = function(item, group) {
         return true;
     }
     // Hardware/feature gate closed (e.g. pitot_hardware set to NONE): keep an
-    // already-enabled element toggleable so the user can turn it off (#2639).
-    return OSD.data.items[item.id].isVisible === true;
+    // already-enabled element toggleable so the user can turn it off (#2639),
+    // in whichever layout shows it
+    return OSD.data.layouts.some(function (layout) {
+        return layout[item.id] && layout[item.id].isVisible === true;
+    });
 };
 
 OSD.get_item_preview = function(item) {
@@ -2862,15 +2865,13 @@ OSD.GUI.preview = {
             position += overflows_line;
         }
 
+        var to = OSD.msp.helpers.calculate.coords({position: position});
         OSD.GUI.layoutsMovedTogether().forEach(function (layout) {
-            var itemData = OSD.data.layouts[layout][item_id];
-            itemData.position = position;
-            OSD.msp.helpers.calculate.coords(itemData);
-            OSD.saveItem(item, function () {
-                if (layout == OSD.data.selected_layout) {
-                    OSD.GUI.updatePreviews();
+            OSD.GUI.moveItem(item, layout, to).then(function (landed) {
+                if (!landed) {
+                    GUI.log(i18n.getMessage('osdLayoutSaveItemFailed'));
                 }
-            }, layout);
+            });
         });
     },
 
@@ -3476,7 +3477,7 @@ OSD.GUI.updateAll = function() {
                 var oldLayout = JSON.parse(JSON.stringify(OSD.data.layouts[target]))
                 OSD.data.layouts[target] = JSON.parse(JSON.stringify(layout_clipboard.layout));
                 OSD.GUI.showLayout(target);
-                OSD.GUI.syncLayoutChecks();
+                OSD.GUI.rebuildFields();
 
                 var allSaved = true;
                 for(var index in OSD.data.layouts[target])
@@ -3507,7 +3508,7 @@ OSD.GUI.updateAll = function() {
 
             OSD.data.layouts[target] = clearedLayout;
             OSD.GUI.showLayout(target);
-            OSD.GUI.syncLayoutChecks();
+            OSD.GUI.rebuildFields();
 
             var allSaved = true;
             for(var index in OSD.data.layouts[target]) {
@@ -3529,8 +3530,8 @@ OSD.GUI.updateAll = function() {
                 return;
             }
             var allSaved = true;
-            for (var change of copyPositions(OSD.data.layouts, from)) {
-                if (!(await OSD.saveItem({id: change.id}, null, change.layout))) {
+            for (var change of positionsToCopy(OSD.data.layouts, from)) {
+                if (!(await OSD.GUI.moveItem({id: change.id}, change.layout, change))) {
                     allSaved = false;
                     break;
                 }
@@ -3604,6 +3605,7 @@ OSD.GUI.layoutChecks = function (item) {
 
 OSD.GUI.setItemVisible = function (item, layout, visible) {
     var itemData = OSD.data.layouts[layout][item.id];
+    var before = {x: itemData.x, y: itemData.y, position: itemData.position, isVisible: itemData.isVisible};
     itemData.isVisible = visible;
 
     if (visible) {
@@ -3617,20 +3619,38 @@ OSD.GUI.setItemVisible = function (item, layout, visible) {
     }
 
     // A custom element has its checkboxes on its card as well
-    $('.osd-layout-check[data-item-id="' + item.id + '"][data-layout="' + layout + '"]').prop('checked', visible);
-    OSD.saveItem(item, function () {
+    var $checks = $('.osd-layout-check[data-item-id="' + item.id + '"][data-layout="' + layout + '"]');
+    $checks.prop('checked', visible);
+    OSD.saveItem(item, null, layout).then(function (landed) {
+        if (!landed) {
+            Object.assign(itemData, before);
+            $checks.prop('checked', before.isVisible);
+        }
         if (layout == OSD.data.selected_layout) {
             OSD.GUI.updatePreviews();
         }
-    }, layout);
+    });
 };
 
-// After a paste or a clear replaced a whole layout
-OSD.GUI.syncLayoutChecks = function () {
-    $('.osd-layout-check').each(function () {
-        var layout = OSD.data.layouts[$(this).attr('data-layout')];
-        $(this).prop('checked', layout[$(this).attr('data-item-id')].isVisible);
-    });
+// Moves the element in one layout; a position the flight controller refused is put back
+OSD.GUI.moveItem = async function (item, layout, to) {
+    var itemData = OSD.data.layouts[layout][item.id];
+    var before = {x: itemData.x, y: itemData.y, position: itemData.position};
+    Object.assign(itemData, {x: to.x, y: to.y, position: to.position});
+    var landed = await OSD.saveItem(item, null, layout);
+    if (!landed) {
+        Object.assign(itemData, before);
+    }
+    if (layout == OSD.data.selected_layout) {
+        OSD.GUI.updatePreviews();
+    }
+    return landed;
+};
+
+// After a paste or a clear replaced a whole layout: the rows depend on what every layout shows
+OSD.GUI.rebuildFields = function () {
+    OSD.GUI.updateFields();
+    OSD.GUI.updateDjiView($('#djiUnsupportedElements').find('input').is(':checked'));
 };
 
 // Whether the previewed layout shows the element with this name
@@ -3716,7 +3736,7 @@ OSD.GUI.fitPreview = function () {
             - $('.tab-osd .tab_title').outerHeight(true);
     }
     roomHeight -= box.offsetHeight - stage.offsetHeight;
-    var zoom = Math.max(0.5, Math.min(roomWidth / width, roomHeight / height));
+    var zoom = Math.max(0.1, Math.min(roomWidth / width, roomHeight / height));
     $('.tab-osd .display-layout')[0].style.setProperty('--osd-preview-zoom', zoom);
 };
 
