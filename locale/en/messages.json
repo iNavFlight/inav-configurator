@@ -1658,6 +1658,9 @@
     "srxl2NoPort": {
         "message": "No port is assigned to Spektrum Smart ESC. Assign one in the Ports tab, or the motor will not be driven at all - this protocol has no fallback to PWM, because the pin is not a timer output."
     },
+    "srxl2TooManyPorts": {
+        "message": "More than four Smart ESCs are set up, the ESC connector counting as one. The board drives four, so the one on the last port would never get a throttle, and it refuses to arm. Remove the extra port in the Ports tab."
+    },
     "srxl2TooFewPorts": {
         "message": "This model has $1 motors but the board opened only $2 SRXL2 port(s). One ESC needs one port, so assign one per motor in the Ports tab. The board will refuse to arm until they match."
     },

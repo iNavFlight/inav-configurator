@@ -166,6 +166,7 @@ outputsTab.initialize = function (callback) {
          * port has to have been assigned in the Ports tab for it to work at all.
          */
         const SRXL2_PROTOCOL = 7;
+        const SRXL2_MAX_ESCS = 4;   // the firmware's SRXL2_ESC_MAX_MOTORS
 
         /* Offering SRXL2 where the firmware has none is not a cosmetic mistake:
          * saving it leaves the board on a protocol nothing drives, and the
@@ -313,6 +314,9 @@ outputsTab.initialize = function (callback) {
         // The warning once the board has reported its ports, or null for none
         function srxl2PortWarning(assigned, connector, boardOnConnector) {
             const ports = srxl2Counts.ports;
+            if (assigned > SRXL2_MAX_ESCS) {
+                return i18n.getMessage('srxl2TooManyPorts');
+            }
             if (boardOnConnector !== connector.onConnector) {
                 return i18n.getMessage(connector.onConnector ? 'srxl2ConnectorNeedsReboot' : 'srxl2ConnectorOffNeedsReboot');
             }
