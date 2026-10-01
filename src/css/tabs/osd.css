@@ -454,6 +454,16 @@
     border-bottom: 1px solid #ddd;
 }
 
+/* For screen readers: the placeholder already says it on screen */
+.tab-osd .osd-search-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+}
+
 .tab-osd .osd-elements-head .osd_search {
     width: 100%;
     box-sizing: border-box;
@@ -613,12 +623,12 @@
 
 .tab-osd .osd-action--quiet {
     background-color: #fff;
-    color: #2b88b4;
+    color: #25749a;
 }
 
 .tab-osd .osd-action--quiet:hover {
     background-color: #e8f4fd;
-    color: #2b88b4;
+    color: #25749a;
 }
 
 /* Wider than a narrow window, the preview scrolls from its left edge instead of losing it */
