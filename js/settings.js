@@ -185,10 +185,12 @@ var Settings = (function () {
                     input.attr('type', 'number');
                     if (typeof s.setting.min !== 'undefined' && s.setting.min !== null) {
                         input.attr('min', (s.setting.min / multiplier).toFixed(Math.log10(multiplier)));
+                        input.data('default-min', s.setting.min);
                     }
 
                     if (typeof s.setting.max !== 'undefined' && s.setting.max !== null) {
                         input.attr('max', (s.setting.max / multiplier).toFixed(Math.log10(multiplier)));
+                        input.data('default-max', s.setting.max);
                     }
                 }
 
@@ -648,8 +650,8 @@ var Settings = (function () {
                     value = Math.round((parseFloat(input.val()) * multiplier) * Math.pow(10, precision)) / Math.pow(10, precision);
                 }
 
-                // data-default-min and data-default-max only exist once a unit
-                // multiplier has rewritten the min and max attributes, so they
+                // data-default-min and data-default-max only exist once a unit or
+                // setting multiplier has rewritten the min and max attributes, so they
                 // hold the bounds in firmware units. Settings without a
                 // multiplier never get them, and parseInt(undefined) is NaN,
                 // which makes both comparisons false and skips the clamp
