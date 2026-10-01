@@ -2475,7 +2475,7 @@ OSD.is_item_displayed = function(item, group) {
     // already-enabled element toggleable so the user can turn it off (#2639),
     // in whichever layout shows it
     return OSD.data.layouts.some(function (layout) {
-        return layout[item.id] && layout[item.id].isVisible === true;
+        return layout[item.id]?.isVisible === true;
     });
 };
 
@@ -2871,6 +2871,8 @@ OSD.GUI.preview = {
                 if (!landed) {
                     GUI.log(i18n.getMessage('osdLayoutSaveItemFailed'));
                 }
+            }).catch(function (error) {
+                console.error('OSD: could not move the element', error);
             });
         });
     },
