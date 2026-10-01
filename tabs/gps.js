@@ -602,13 +602,9 @@ gpsTab.initialize = function (callback) {
                 return;
             }
 
+            // Only a hint: settings.js would cut a faster rate to the field's max on save
             const ceiling = Math.max(...presets.map(id => GPS_PRESETS[id].rate));
             field.attr('title', i18n.getMessage('gpsUpdateRateCeiling', [String(ceiling)]));
-
-            // Only when the stored value still fits: a ceiling under the user's setting marks it invalid
-            if (Number.parseInt(field.val(), 10) <= ceiling) {
-                field.attr('max', ceiling);
-            }
         }
 
         function update_gnss_availability() {
