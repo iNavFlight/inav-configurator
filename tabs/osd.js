@@ -3652,6 +3652,15 @@ HARDWARE.init = function() {
     };
 };
 
+// Only a firmware built with the BEC voltage has this setting
+function probeBecVoltage() {
+    return mspHelper.getSetting("vbec_warning_voltage").then(function(data) {
+        HARDWARE.capabilities.useBecVoltage = Boolean(data);
+    }).catch(function() {
+        HARDWARE.capabilities.useBecVoltage = false;
+    });
+}
+
 HARDWARE.update = function(callback) {
 
     HARDWARE.init();
@@ -3686,17 +3695,10 @@ HARDWARE.update = function(callback) {
                 }).catch(function() {
                     // Setting not available in this firmware
                     HARDWARE.capabilities.useTerrain = false;
-                }).finally(function() {
-                    // Only a firmware built with the BEC voltage has this setting
-                    mspHelper.getSetting("vbec_warning_voltage").then(function(data) {
-                        HARDWARE.capabilities.useBecVoltage = Boolean(data);
-                    }).catch(function() {
-                        HARDWARE.capabilities.useBecVoltage = false;
-                    }).finally(function() {
-                        if (callback) {
-                            callback();
-                        }
-                    });
+                }).then(probeBecVoltage).finally(function() {
+                    if (callback) {
+                        callback();
+                    }
                 });
             });
         });
