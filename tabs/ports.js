@@ -11,6 +11,12 @@ import jBox from 'jbox';
 
 const portsTab = {};
 
+// The row as it stands: a function picked while the connector setting was on its way counts too
+function portRowHasFunction(row) {
+    return $(row).find('input:checkbox:checked').length > 0
+        || $(row).find('select.function-select').toArray().some(select => select.value);
+}
+
 portsTab.initialize = function (callback) {
 
     var columns = ['data', 'logging', 'sensors', 'telemetry', 'rx', 'peripherals'];
@@ -194,12 +200,6 @@ portsTab.initialize = function (callback) {
         lockEscConnectorPort();
     }
 
-    // The row as it stands: a function picked while the connector setting was on its way counts too
-    function portRowHasFunction(row) {
-        return $(row).find('input:checkbox:checked').length > 0
-            || $(row).find('select.function-select').toArray().some(select => select.value);
-    }
-
     /* The UART behind the board's ESC connector, when the Outputs tab puts the Smart ESC
      * there. Locked only while it has no function: with one, the firmware leaves the
      * connector unused, and the port must stay editable to clear it. */
@@ -209,7 +209,7 @@ portsTab.initialize = function (callback) {
             return;
         }
         mspHelper.getSetting('esc_srxl2_connector').then(function (s) {
-            if (!s || !s.value) {
+            if (!s?.value) {
                 return;
             }
             $('.tab-ports .portConfiguration').each(function () {
