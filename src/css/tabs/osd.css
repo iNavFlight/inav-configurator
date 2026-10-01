@@ -360,11 +360,60 @@
     min-height: 0;
 }
 
+/* It scrolls when the window is too small for the preview at its own size. The gutter keeps the
+   width OSD.GUI.fitPreview() picks the arrangement with, scrollbar or not. */
+.tab-osd .supported {
+    overflow-y: auto;
+    scrollbar-gutter: stable;
+}
+
 .tab-osd .osd-columns {
-    height: 100%;
+    height: var(--osd-main-height, 100%);
     display: grid;
-    grid-template-columns: minmax(20em, 1fr) minmax(0, 2fr) minmax(22em, 1fr);
+    grid-template-columns: minmax(20em, 1fr) minmax(var(--osd-preview-need, 0px), 2fr) minmax(22em, 1fr);
     column-gap: 1em;
+}
+
+/* No room for three columns: the settings go below the elements and the preview */
+.tab-osd .osd-columns--two {
+    height: auto;
+    grid-template-columns: minmax(20em, 1fr) minmax(var(--osd-preview-need, 0px), 2fr);
+    grid-template-rows: var(--osd-main-height, auto) auto;
+    row-gap: 1em;
+}
+
+.tab-osd .osd-columns--two .osd_settings {
+    grid-column: 1 / -1;
+    overflow: visible;
+    columns: 22em;
+    column-gap: 1em;
+}
+
+.tab-osd .osd-columns--two .osd_settings .gui_box {
+    break-inside: avoid;
+}
+
+/* Not even for two: the preview goes above the elements and the settings */
+.tab-osd .osd-columns--stacked {
+    height: auto;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    row-gap: 1em;
+}
+
+.tab-osd .osd-columns--stacked .osd-preview-column {
+    grid-column: 1 / -1;
+    grid-row: 1;
+    overflow-x: auto;
+}
+
+.tab-osd .osd-columns--stacked .osd__elements,
+.tab-osd .osd-columns--stacked .osd_settings {
+    grid-row: 2;
+    overflow: visible;
+}
+
+.tab-osd .osd-columns--stacked .osd-elements-list {
+    overflow: visible;
 }
 
 .tab-osd .osd-columns > .cf_column,
@@ -481,11 +530,7 @@
     margin: 0;
 }
 
-/* Preview: as large as the column allows, scaled by OSD.GUI.fitPreview() */
-.tab-osd .osd-preview-column {
-    overflow: auto;
-}
-
+/* Preview: as large as the column allows and never smaller than the font, scaled by OSD.GUI.fitPreview() */
 .tab-osd .osd-preview-box {
     margin-bottom: 0;
 }
@@ -570,9 +615,10 @@
     color: #2b88b4;
 }
 
+/* Wider than a narrow window, the preview scrolls from its left edge instead of losing it */
 .tab-osd .osd-preview-stage {
     display: flex;
-    justify-content: center;
+    justify-content: safe center;
     padding: 0 0.6em;
 }
 
@@ -628,39 +674,6 @@
 /* Two controls before the name: the name takes what is left */
 .tab-osd .switch-indicator-container label > .i18n-replaced {
     width: auto;
-}
-
-/* Narrow windows: the preview on top, the elements and the settings below it */
-@media only screen and (max-width: 1100px) {
-    .tab-osd .content_wrapper {
-        display: block;
-        overflow-y: auto;
-    }
-
-    .tab-osd .osd-columns {
-        height: auto;
-        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-        row-gap: 1em;
-    }
-
-    .tab-osd .osd-preview-column {
-        grid-column: 1 / -1;
-        grid-row: 1;
-    }
-
-    .tab-osd .osd__elements,
-    .tab-osd .osd_settings {
-        grid-row: 2;
-        overflow: visible;
-    }
-
-    .tab-osd .osd-elements-list {
-        overflow: visible;
-    }
-
-    .tab-osd .cf_doc_version_bt a {
-        margin-top: -35px;
-    }
 }
 
 .font-preview {
