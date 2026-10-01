@@ -3474,8 +3474,8 @@ OSD.GUI.updateAll = function() {
             if(layout_clipboard.filled == true){
                 // A layout picked while the writes run must not get the rest of them
                 var target = OSD.data.selected_layout;
-                var oldLayout = JSON.parse(JSON.stringify(OSD.data.layouts[target]))
-                OSD.data.layouts[target] = JSON.parse(JSON.stringify(layout_clipboard.layout));
+                var oldLayout = structuredClone(OSD.data.layouts[target]);
+                OSD.data.layouts[target] = structuredClone(layout_clipboard.layout);
                 OSD.GUI.showLayout(target);
                 OSD.GUI.rebuildFields();
 
@@ -3497,7 +3497,7 @@ OSD.GUI.updateAll = function() {
 
         clear.on('click', async function() {
             var target = OSD.data.selected_layout;
-            var oldLayout = JSON.parse(JSON.stringify(OSD.data.layouts[target]));
+            var oldLayout = structuredClone(OSD.data.layouts[target]);
 
             var clearedLayout = [];
             oldLayout.forEach(function(item, index){
@@ -3512,7 +3512,6 @@ OSD.GUI.updateAll = function() {
 
             var allSaved = true;
             for(var index in OSD.data.layouts[target]) {
-                var item = OSD.data.layouts[target][index];
                 if(oldLayout[index].isVisible === true){
                     if (!(await OSD.saveItem({id: index}, null, target))) {
                         allSaved = false;
@@ -4003,7 +4002,9 @@ osdTab.initialize = function (callback) {
             });
 
             GUI.content_ready(callback);
-        })));
+        }))).catch(function (error) {
+            console.error('OSD: could not load the tab', error);
+        });
     });
 };
 

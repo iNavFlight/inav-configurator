@@ -13,7 +13,8 @@
                         <div class="spacer_box_title" data-i18n="osd_elements"></div>
                     </div>
                     <div class="osd-elements-head">
-                        <input class="osd_search" type="search" i18n_placeholder="osdElementSearch">
+                        <label for="osd_search" class="osd-search-label" data-i18n="osdElementSearch">Search elements</label>
+                        <input id="osd_search" class="osd_search" type="search" i18n_placeholder="osdElementSearch">
                         <div class="osd-layout-heads"></div>
                     </div>
                     <div class="osd-elements-list">
@@ -36,9 +37,9 @@
                     <div class="osd-preview-toolbar">
                         <div class="osd-layout-tabs" role="tablist"></div>
                         <div class="osd-layout-actions">
-                            <a href="#" class="osd-action osd_copy" data-i18n="copy"></a>
-                            <a href="#" class="osd-action osd_paste" data-i18n="paste"></a>
-                            <a href="#" class="osd-action osd-action--danger osd_clear" data-i18n="clear"></a>
+                            <a href="#" class="osd-action osd_copy" data-i18n="copy">Copy</a>
+                            <a href="#" class="osd-action osd_paste" data-i18n="paste">Paste</a>
+                            <a href="#" class="osd-action osd-action--danger osd_clear" data-i18n="clear">Clear</a>
                         </div>
                     </div>
                     <div class="osd-preview-stage">
@@ -64,9 +65,9 @@
                         <div class="osd-preview-options">
                             <label class="osd-move-all">
                                 <input type="checkbox" class="osd-move-all-check">
-                                <span data-i18n="osdMoveInAllLayouts"></span>
+                                <span data-i18n="osdMoveInAllLayouts">Dragging moves the element in every layout</span>
                             </label>
-                            <a href="#" class="osd-action osd-action--quiet osd_positions_to_all" data-i18n="osdPositionsToAllLayouts"></a>
+                            <a href="#" class="osd-action osd-action--quiet osd_positions_to_all" data-i18n="osdPositionsToAllLayouts">Use these positions in every layout</a>
                         </div>
                     </div>
                 </div>
