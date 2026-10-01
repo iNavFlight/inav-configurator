@@ -3761,7 +3761,9 @@ OSD.loadLayoutReach = function () {
             OSD.reach.failsafeShowsDefault = Boolean(data && data.value);
             OSD.reach.loaded = true;
         })
-        .catch(function () {});
+        .catch(function (error) {
+            console.warn('OSD: could not read what selects the layouts', error);
+        });
 };
 
 OSD.GUI.updateLayoutReach = function () {
@@ -4082,9 +4084,12 @@ osdTab.initialize = function (callback) {
                 OSD.GUI.previewResize.observe(this);
             });
 
-            OSD.loadLayoutReach().then(OSD.GUI.updateLayoutReach);
-
-            GUI.content_ready(callback);
+            // Before the tab counts as loaded: it refills FC.LOGIC_CONDITIONS, which the Programming tab
+            // fills too, and no tab switch may start while it runs
+            OSD.loadLayoutReach().then(function () {
+                OSD.GUI.updateLayoutReach();
+                GUI.content_ready(callback);
+            });
         })));
     });
 };
