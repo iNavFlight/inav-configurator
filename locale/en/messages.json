@@ -4515,6 +4515,37 @@
     "osdPositionsCopiedToAllLayouts": {
         "message": "Positions copied to every layout"
     },
+    "osdLayoutReachDefault": {
+        "message": "Shown while no OSD ALT mode is on."
+    },
+    "osdLayoutReachFailsafe": {
+        "message": "Also shown in failsafe (osd_failsafe_switch_layout)."
+    },
+    "osdLayoutReachFailsafeDefault": {
+        "message": "In failsafe the default layout shows instead (osd_failsafe_switch_layout)."
+    },
+    "osdLayoutReachMode": {
+        "message": "Shown while OSD ALT $1 is on: $2."
+    },
+    "osdLayoutReachRange": {
+        "message": "CH $1 $2-$3",
+        "description": "A mode range: the channel as the Modes tab names it, then the range in microseconds"
+    },
+    "osdLayoutReachHigher": {
+        "message": "A higher OSD ALT that is on takes over."
+    },
+    "osdLayoutReachNone": {
+        "message": "No switch shows this layout: give OSD ALT $1 a range in the Modes tab."
+    },
+    "osdLayoutReachLogic": {
+        "message": "Logic condition $1 shows it too."
+    },
+    "osdLayoutReachDefaultLogic": {
+        "message": "Logic condition $1 shows ALT $2 instead."
+    },
+    "osdLayoutReachLogicValue": {
+        "message": "Logic condition $1 picks a layout from a value."
+    },
     "osdUnitImperial": {
         "message": "Imperial"
     },

@@ -17,7 +17,7 @@ import i18n from './../js/localization';
 import store from './../js/store';
 import dialog from './../js/dialog';
 import { resolveMspWrite } from './../js/mspWriteOutcome';
-import { copyPositions } from './../js/osdLayouts';
+import { layoutReach, copyPositions } from './../js/osdLayouts';
 
 var SYM = SYM || {};
 SYM.LAST_CHAR = 225; // For drawing the font preview
@@ -3677,6 +3677,7 @@ OSD.GUI.buildLayoutSwitch = function () {
             .appendTo($heads);
     }
     OSD.GUI.markShownLayout();
+    OSD.GUI.updateLayoutReach();
 };
 
 OSD.GUI.markShownLayout = function () {
@@ -3692,6 +3693,7 @@ OSD.GUI.markShownLayout = function () {
 OSD.GUI.showLayout = function (layout) {
     OSD.updateSelectedLayout(layout);
     OSD.GUI.markShownLayout();
+    OSD.GUI.updateLayoutReach();
     OSD.GUI.updatePreviews();
 };
 
@@ -3718,6 +3720,91 @@ OSD.GUI.fitPreview = function () {
     roomHeight -= box.offsetHeight - stage.offsetHeight;
     var zoom = Math.max(0.5, Math.min(roomWidth / width, roomHeight / height));
     $('.tab-osd .display-layout')[0].style.setProperty('--osd-preview-zoom', zoom);
+};
+
+// Which switch or logic condition shows each layout in flight; apart from OSD.data, which every
+// font change reloads
+OSD.reach = {loaded: false, failsafeShowsDefault: false};
+
+OSD.loadLayoutReach = function () {
+    OSD.reach.loaded = false;
+    return MSP.promise(MSPCodes.MSP_MODE_RANGES)
+        .then(function () {
+            return new Promise(function (resolve) {
+                mspHelper.loadLogicConditions(resolve);
+            });
+        })
+        .then(function () {
+            return mspHelper.getSetting('osd_failsafe_switch_layout');
+        })
+        .then(function (data) {
+            OSD.reach.failsafeShowsDefault = Boolean(data && data.value);
+            OSD.reach.loaded = true;
+        })
+        .catch(function () {});
+};
+
+OSD.GUI.updateLayoutReach = function () {
+    var $reach = $('.osd-layout-reach');
+    if (!OSD.reach.loaded || OSD.data.layout_count < 2) {
+        $reach.text('');
+        return;
+    }
+
+    var conditions = FC.LOGIC_CONDITIONS.get().map(function (condition) {
+        return {
+            enabled: condition.getEnabled(),
+            operation: condition.getOperation(),
+            operandAType: condition.getOperandAType(),
+            operandAValue: condition.getOperandAValue()
+        };
+    });
+    var reach = layoutReach(FC.MODE_RANGES || [], conditions, OSD.data.layout_count);
+    var ranges = reach.ranges;
+    var reached = reach.reached;
+    var picks = reach.picks;
+
+    $('.osd-layout-tab, .osd-layout-head').each(function () {
+        $(this).toggleClass('is-unreached', !reached[$(this).attr('data-layout')]);
+    });
+
+    var shown = OSD.data.selected_layout;
+    var text;
+    if (shown == 0) {
+        text = i18n.getMessage('osdLayoutReachDefault');
+        if (OSD.reach.failsafeShowsDefault) {
+            text += ' ' + i18n.getMessage('osdLayoutReachFailsafe');
+        }
+    } else if (ranges[shown].length > 0) {
+        var where = ranges[shown].map(function (modeRange) {
+            return i18n.getMessage('osdLayoutReachRange', [modeRange.auxChannelIndex + 5, modeRange.range.start, modeRange.range.end]);
+        }).join(', ');
+        text = i18n.getMessage('osdLayoutReachMode', [shown, where]);
+        // The firmware checks OSD ALT 3, then 2, then 1
+        var higher = ranges.slice(shown + 1).some(function (modeRanges) {
+            return modeRanges.length > 0;
+        });
+        if (higher) {
+            text += ' ' + i18n.getMessage('osdLayoutReachHigher');
+        }
+    } else {
+        text = i18n.getMessage('osdLayoutReachNone', [shown]);
+    }
+    // Any OSD ALT switch that is on wins over a logic condition
+    picks.forEach(function (pick) {
+        if (pick.layout === null) {
+            text += ' ' + i18n.getMessage('osdLayoutReachLogicValue', [pick.index]);
+        } else if (shown == 0 && pick.layout > 0) {
+            text += ' ' + i18n.getMessage('osdLayoutReachDefaultLogic', [pick.index, pick.layout]);
+        } else if (shown > 0 && pick.layout == shown) {
+            text += ' ' + i18n.getMessage('osdLayoutReachLogic', [pick.index]);
+        }
+    });
+    // Failsafe comes before the modes and the logic conditions
+    if (shown > 0 && OSD.reach.failsafeShowsDefault) {
+        text += ' ' + i18n.getMessage('osdLayoutReachFailsafeDefault');
+    }
+    $reach.text(text);
 };
 
 let HARDWARE = {};
@@ -3974,6 +4061,8 @@ osdTab.initialize = function (callback) {
             $('.tab-osd .content_wrapper, .tab-osd .osd-preview-toolbar, .tab-osd .osd-preview-footer').each(function () {
                 OSD.GUI.previewResize.observe(this);
             });
+
+            OSD.loadLayoutReach().then(OSD.GUI.updateLayoutReach);
 
             GUI.content_ready(callback);
         })));
