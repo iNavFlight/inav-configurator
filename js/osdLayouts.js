@@ -37,10 +37,11 @@ export function layoutReach(modeRanges, conditions, layoutCount) {
     return {ranges: ranges, reached: reached, picks: picks};
 }
 
-// Positions only, what each layout shows stays; returns the { layout, id } to save.
+// Positions only, what each layout shows stays: the { layout, id, x, y, position } to write. The layouts
+// stay as they are, so a write that fails leaves nothing to undo and a second copy tries it again.
 // An element hidden in the source has no position anyone chose there, so it keeps its own.
-export function copyPositions(layouts, from) {
-    const changed = [];
+export function positionsToCopy(layouts, from) {
+    const changes = [];
     layouts.forEach(function (items, layout) {
         if (layout == from) {
             return;
@@ -50,11 +51,8 @@ export function copyPositions(layouts, from) {
             if (!source.isVisible || (target.x == source.x && target.y == source.y)) {
                 return;
             }
-            target.x = source.x;
-            target.y = source.y;
-            target.position = source.position;
-            changed.push({layout: layout, id: id});
+            changes.push({layout: layout, id: id, x: source.x, y: source.y, position: source.position});
         });
     });
-    return changed;
+    return changes;
 }
