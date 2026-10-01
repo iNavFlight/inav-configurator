@@ -3717,29 +3717,36 @@ OSD.GUI.showLayout = function (layout) {
     OSD.GUI.updatePreviews();
 };
 
-// The preview takes the room its column leaves; the font's pixels stay square
+// Placing elements needs the font readable: the preview never goes below its own size. Where the
+// three columns leave it less, the settings go below, then the preview above the lists, and the tab scrolls
 OSD.GUI.fitPreview = function () {
     var stage = $('.tab-osd .osd-preview-stage')[0];
-    if (!stage || !OSD.data || !OSD.data.display_size) {
+    var view = $('.tab-osd .supported')[0];
+    if (!stage || !view?.clientHeight || !OSD.data?.display_size) {
         return;
     }
+    var columns = $('.tab-osd .osd-columns');
     var box = $('.tab-osd .osd-preview-box')[0];
-    var column = $('.tab-osd .osd-preview-column')[0];
     var width = OSD.data.display_size.x * FONT.constants.SIZES.CHAR_WIDTH;
     var height = OSD.data.display_size.y * FONT.constants.SIZES.CHAR_HEIGHT;
     var style = getComputedStyle(stage);
-    var roomWidth = stage.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight);
-    var roomHeight = column.clientHeight;
-    // Above the lists, in a narrow window, the column has no height of its own: the tab's view gives it
-    if (window.matchMedia('(max-width: 1100px)').matches) {
-        var wrapper = $('.tab-osd .content_wrapper')[0];
-        var wrapperStyle = getComputedStyle(wrapper);
-        roomHeight = wrapper.clientHeight - parseFloat(wrapperStyle.paddingTop) - parseFloat(wrapperStyle.paddingBottom)
-            - $('.tab-osd .tab_title').outerHeight(true);
+    var padding = Number.parseFloat(style.paddingLeft) + Number.parseFloat(style.paddingRight);
+    columns[0].style.setProperty('--osd-preview-need', (width + padding + box.offsetWidth - box.clientWidth) + 'px');
+    columns[0].style.setProperty('--osd-main-height', view.clientHeight + 'px');
+    for (var arrangement of ['', 'osd-columns--two', 'osd-columns--stacked']) {
+        columns.removeClass('osd-columns--two osd-columns--stacked').addClass(arrangement);
+        if (columns[0].scrollWidth <= columns[0].clientWidth) {
+            break;
+        }
     }
-    roomHeight -= box.offsetHeight - stage.offsetHeight;
-    var zoom = Math.max(0.1, Math.min(roomWidth / width, roomHeight / height));
+    var roomWidth = stage.clientWidth - padding;
+    var roomHeight = view.clientHeight - (box.getBoundingClientRect().height - stage.getBoundingClientRect().height);
+    // Rounded down, so the scaled rows cannot add the pixel that would make the tab scroll
+    var zoom = Math.max(1, Math.floor(Math.min(roomWidth / width, roomHeight / height) * 1000) / 1000);
     $('.tab-osd .display-layout')[0].style.setProperty('--osd-preview-zoom', zoom);
+    if (roomHeight < height) {
+        columns[0].style.setProperty('--osd-main-height', Math.ceil(box.getBoundingClientRect().height) + 'px');
+    }
 };
 
 // Which switch or logic condition shows each layout in flight; apart from OSD.data, which every
