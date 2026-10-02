@@ -13,6 +13,8 @@ import features from './../js/feature_framework';
 import { mixer, PLATFORM } from './../js/model';
 import timeout from './../js/timeouts';
 import interval from './../js/intervals';
+import { escTelemetryExpected } from './../js/escTelemetry';
+import mspDeduplicationQueue from './../js/msp/mspDeduplicationQueue';
 
 /* Phase 0 of the firmware's calibration state machine, which is also how the
  * sequence is called off. Out here because cleanup() needs it too. */
@@ -35,9 +37,7 @@ function processEscTelemetry() {
         $tbody = $('.esc-telemetry-table tbody'),
         $noData = $('.esc-telemetry-no-data');
 
-    // Only worth polling when a serial port carries the ESC telemetry function
-    const ports = FC.SERIAL_CONFIG?.ports || [];
-    if (!ports.some(port => port.functions.includes('ESC'))) {
+    if (!escTelemetryExpected(FC.SERIAL_CONFIG?.ports, FC.isMotorOutputEnabled(), FC.ADVANCED_CONFIG.motorPwmProtocol)) {
         return;
     }
 
@@ -71,7 +71,12 @@ function processEscTelemetry() {
         $noData.toggle(!anyValid);
     }
 
-    function updateEscTelemetry() {
+    function updateEscTelemetry(resp) {
+        // A request the queue gave up on says nothing about the firmware, so it must not end the polling
+        if (!resp) {
+            return;
+        }
+
         if (FC.ESC_TELEMETRY === null) {
             // Firmware without ESC sensor support answers "unsupported": stop asking and hide the box
             interval.remove('esc_telemetry_pull');
@@ -84,6 +89,10 @@ function processEscTelemetry() {
     }
 
     interval.add('esc_telemetry_pull', function () {
+        // On a slow link a second request would only start an MSP._enqueue retry chain that outlives the tab
+        if (mspDeduplicationQueue.check(MSPCodes.MSP2_INAV_ESC_TELEM)) {
+            return;
+        }
         MSP.send_message(MSPCodes.MSP2_INAV_ESC_TELEM, false, false, updateEscTelemetry);
     }, 250, true);
 }

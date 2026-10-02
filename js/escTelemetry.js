@@ -1,34 +1,36 @@
 'use strict';
 
-// Per-motor ESC telemetry as reported by MSP2_INAV_ESC_TELEM.
-//
-// The firmware answers with one byte motor count followed by one raw
-// escSensorData_t per motor. The struct is written straight from memory
-// (sbufWriteDataSafe), so it carries the compiler's alignment padding:
-//
-//   offset  0  uint8   dataAge      (255 = never received, see ESC_DATA_INVALID)
-//   offset  2  int16   temperature  [°C]
-//   offset  4  int16   voltage      [0.01 V]
-//   offset  8  int32   current      [0.01 A]
-//   offset 12  uint32  rpm
-//
-// A packed 13-byte layout is accepted as well, in case a future firmware
-// drops the padding.
+// MSP2_INAV_ESC_TELEM sends escSensorData_t (src/main/sensors/esc_sensor.h) raw, so the offsets include its alignment padding.
 
 // Mirrors ESC_DATA_MAX_AGE in src/main/sensors/esc_sensor.h: the firmware
 // itself (battery, OSD) only trusts a motor whose frames are at most this old.
 export const ESC_DATA_MAX_AGE = 10;
 export const ESC_DATA_INVALID = 255;
 
-const LAYOUTS = {
-    16: { temperature: 2, voltage: 4, current: 8, rpm: 12 },
-    13: { temperature: 1, voltage: 3, current: 5, rpm: 9 },
-};
+// PWM_TYPE_SRXL2 in src/main/drivers/pwm_mapping.h
+const MOTOR_PROTOCOL_SRXL2 = 7;
+
+const ENTRY_SIZE = 16;
+const OFFSET = { temperature: 2, voltage: 4, current: 8, rpm: 12 };
+
+/**
+ * @param {Array<{functions: string[]}>} serialPorts FC.SERIAL_CONFIG.ports
+ * @param {boolean} motorOutputEnabled feature PWM_OUTPUT_ENABLE
+ * @param {number|string} motorProtocol FC.ADVANCED_CONFIG.motorPwmProtocol
+ * @returns {boolean} true when the firmware has ESC telemetry it could report
+ */
+export function escTelemetryExpected(serialPorts, motorOutputEnabled, motorProtocol) {
+    // Without motor output escSensorInitialize() returns early and leaves every dataAge at 0, so zeros would pass as live values
+    if (!motorOutputEnabled || Number.parseInt(motorProtocol, 10) === MOTOR_PROTOCOL_SRXL2) {
+        return false;
+    }
+    return (serialPorts || []).some(port => port.functions.includes('ESC'));
+}
 
 /**
  * @param {DataView} data payload of an MSP2_INAV_ESC_TELEM reply
  * @returns {Array<{dataAge: number, valid: boolean, temperature: number, voltage: number, current: number, rpm: number}>|null}
- *          one entry per motor, or null when the payload does not match a known layout
+ *          one entry per motor, or null when the payload length does not fit the motor count
  */
 export function parseEscTelemetry(data) {
     if (!data || data.byteLength < 1) {
@@ -36,33 +38,22 @@ export function parseEscTelemetry(data) {
     }
 
     const motorCount = data.getUint8(0);
-    if (motorCount === 0) {
-        return [];
-    }
-
-    const payloadLength = data.byteLength - 1;
-    if (payloadLength % motorCount !== 0) {
-        return null;
-    }
-
-    const entrySize = payloadLength / motorCount;
-    const layout = LAYOUTS[entrySize];
-    if (!layout) {
+    if (data.byteLength !== 1 + motorCount * ENTRY_SIZE) {
         return null;
     }
 
     const motors = [];
     for (let i = 0; i < motorCount; i++) {
-        const base = 1 + i * entrySize;
+        const base = 1 + i * ENTRY_SIZE;
         const dataAge = data.getUint8(base);
 
         motors.push({
             dataAge: dataAge,
             valid: dataAge <= ESC_DATA_MAX_AGE,
-            temperature: data.getInt16(base + layout.temperature, true),
-            voltage: data.getInt16(base + layout.voltage, true) / 100,
-            current: data.getInt32(base + layout.current, true) / 100,
-            rpm: data.getUint32(base + layout.rpm, true),
+            temperature: data.getInt16(base + OFFSET.temperature, true),
+            voltage: data.getInt16(base + OFFSET.voltage, true) / 100,
+            current: data.getInt32(base + OFFSET.current, true) / 100,
+            rpm: data.getUint32(base + OFFSET.rpm, true),
         });
     }
 
