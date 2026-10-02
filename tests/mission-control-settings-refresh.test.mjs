@@ -17,7 +17,9 @@
  * to the store. So the map was always painted with the values of the previous
  * tab visit: after changing nav_fw_land_approach_length in Advanced Tuning and
  * rebooting, the approach lines kept their old length until the tab was left
- * and entered a second time.
+ * and entered a second time. The same early save wrote the built in defaults
+ * over the stored mission planner defaults, so a default altitude or speed set
+ * by the user was lost two tab visits later.
  *
  * The test runs the real `loadSettings()` and `saveSettings()` source out of
  * tabs/mission_control.js inside a stand-in for the tab closure, so a future
@@ -144,6 +146,21 @@ describe('Mission Control settings: FC values versus the stored copy', () => {
         assert.equal(result.stored.fwApproachLength, APPROACH_LENGTH_NEW);
         assert.equal(result.stored.maxDistSH, 50);
         assert.equal(result.stored.fwLoiterRadius, 5000);
+    });
+
+    test('the stored mission planner defaults are written back, not the built in ones', () => {
+        const result = runLoadSettings(fcSettings(), storedSettings());
+        assert.equal(result.stored.alt, 3000);
+        assert.equal(result.stored.speed, 500);
+        assert.equal(result.stored.safeRadiusSH, 70);
+    });
+
+    test('an offline visit keeps the stored FC values in the store', () => {
+        const offline = fcSettings({ fwApproachLength: 0, maxDistSH: 0, fwLoiterRadius: 0 });
+        const result = runLoadSettings(offline, storedSettings(), true);
+        assert.equal(result.stored.fwApproachLength, APPROACH_LENGTH_OLD);
+        assert.equal(result.stored.maxDistSH, 20);
+        assert.equal(result.stored.fwLoiterRadius, 2000);
     });
 
     test('without a stored copy the FC values are kept unchanged', () => {
