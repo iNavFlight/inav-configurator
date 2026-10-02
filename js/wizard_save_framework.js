@@ -45,12 +45,7 @@ var wizardSaveFramework = (function () {
         }
     };
 
-    /*
-     * The virtual pitot derives airspeed from GPS and the wind estimator, which is
-     * only of use on a fixed wing. Every other platform keeps the firmware default.
-     * An airspeed sensor that is already selected is never replaced either, so
-     * re-running the wizard does not take a pitot away from the user.
-     */
+    // Virtual airspeed needs the wind estimator (fixed wing only); never replace a pitot the user already selected
     self.enableVirtualPitot = function (config, callback) {
         if (config.value.port == '-1' || !FC.isAirplane()) {
             callback();
@@ -63,7 +58,7 @@ var wizardSaveFramework = (function () {
             } else {
                 callback();
             }
-        }).catch(function () {
+        }, function () {
             callback();
         });
     };
