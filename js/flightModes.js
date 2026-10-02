@@ -315,6 +315,11 @@ var FLIGHT_MODES = [
         boxId: 62,
         boxName: "IN FLIGHT MENU",
         permanentId: 71
+    },
+    {
+        boxId: 63,
+        boxName: "THRUST REVERSE",
+        permanentId: 72
     }
 ];
 

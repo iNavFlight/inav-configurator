@@ -10,16 +10,32 @@ import MSP from './../js/msp';
 import MSPCodes from './../js/msp/MSPCodes';
 import mspHelper from './../js/msp/MSPHelper';
 import FC from './../js/fc';
+import BitHelper from './../js/bitHelper';
 import GUI from './../js/gui';
 import i18n from './../js/localization';
 import { mixer } from './../js/model';
 import interval from './../js/intervals';
+import jBox from 'jbox';
+import {
+    rad2degrees,
+    calculateRawFromTransformed,
+    vecCross,
+    findBestBoardAlignment,
+    computeCompassYaw,
+} from './../js/boardAlignmentMath';
 
 const magnetometerTab = {};
 
 
 magnetometerTab.initialize = function (callback) {
     var self = this;
+
+    let modal;
+    let heading_flat;
+
+    // Gates verbose per-step tracing (raw vectors, intermediate transforms) from the
+    // board/compass auto-align wizard. Flip to true when debugging a hardware issue.
+    const DEBUG_ALIGN = false;
 
     if (GUI.active_tab !== this) {
         GUI.active_tab = this;
@@ -48,10 +64,17 @@ magnetometerTab.initialize = function (callback) {
     var loadChain = [
         mspHelper.loadMixerConfig,
         mspHelper.loadBoardAlignment,
+        // Needed by accAutoAlignButton's step-1 FC.getMagnetometerCalibrated() check --
+        // without this, opening this tab directly (without having visited Calibration
+        // first) leaves FC.CALIBRATION_DATA null.
+        mspHelper.loadCalibrationData,
         function (callback) {
             self.boardAlignmentConfig.pitch = Math.round(FC.BOARD_ALIGNMENT.pitch / 10);
             self.boardAlignmentConfig.roll = Math.round(FC.BOARD_ALIGNMENT.roll / 10);
             self.boardAlignmentConfig.yaw = Math.round(FC.BOARD_ALIGNMENT.yaw / 10);
+            self.boardAlignmentConfig.saved_pitch = Math.round(FC.BOARD_ALIGNMENT.pitch / 10);
+            self.boardAlignmentConfig.saved_roll = Math.round(FC.BOARD_ALIGNMENT.roll / 10);
+            self.boardAlignmentConfig.saved_yaw = Math.round(FC.BOARD_ALIGNMENT.yaw / 10);
             callback();
         },
         mspHelper.loadSensorAlignment,
@@ -99,7 +122,7 @@ magnetometerTab.initialize = function (callback) {
     loadChainer.execute();
 
     function areAnglesZero() {
-        return self.alignmentConfig.pitch === 0 && self.alignmentConfig.roll === 0 && self.alignmentConfig.yaw === 0
+        return self.alignmentConfig.pitch === 0 && self.alignmentConfig.roll === 0 && self.alignmentConfig.yaw === 0;
     }
 
     function isBoardAlignmentZero() {
@@ -526,8 +549,23 @@ magnetometerTab.initialize = function (callback) {
             updateYawAxis(clamp(this, -180, 360));
         });
 
-        $('a.save').on('click', function () {
+        // #modal-acc-align-done-save is handled below (close the modal, then save) rather
+        // than by this generic handler, so the modal is guaranteed closed before the
+        // save/reboot chain runs, regardless of how long that chain takes.
+        $('a.save').not('#modal-acc-align-done-save').on('click', function () {
             saveChainer.execute()
+        });
+
+        $('#fc-align-start-button').on('click', {"step": "1"}, accAutoAlignButton);
+        $('#modal-acc-align-2').on('click', {"step": "2" }, accAutoAlignButton);
+        $('#modal-acc-align-3').on('click', {"step": "3" }, accAutoAlignButton);
+        $('#modal-acc-align-4').on('click', {"step": "4" }, accAutoAlignButton);
+
+        $('#modal-acc-align-done-save').on('click', function () {
+            if (modal !== undefined) {
+                modal.close();
+            }
+            saveChainer.execute();
         });
 
         noUiSlider.create(self.pageElements.roll_slider[0], {
@@ -609,9 +647,461 @@ magnetometerTab.initialize = function (callback) {
 
         interval.add('setup_data_pull_fast', get_fast_data, 40);
 
-        GUI.content_ready(callback);
+    // rad2degrees, snap45, buildRotationMatrix, applyRotation, calculateRawFromTransformed,
+    // vecCross, vecNormalize, vecSquaredDistance and findBestBoardAlignment now live in
+    // js/boardAlignmentMath.js (imported above) -- pure math with no self/DOM/FC
+    // dependency, extracted so it's unit-testable (see tests/board-alignment-math.test.mjs).
+
+    function getMagHeading() {
+        // MSP2_INAV_MAG_UNALIGNED is calibrated (zero/gain) but NOT alignment-rotated --
+        // firmware never applies align_mag or align_board to it. Unlike MSP_RAW_IMU's
+        // magnetometer field, there is no rotation to undo here: whatever the current
+        // align_mag/align_board settings are, this reading is unaffected by them, which is
+        // exactly why the wizard (trying to determine those settings) uses it instead.
+        // FC.SENSOR_DATA.magnetometerUnaligned initializes to [0,0,0] and is only ever
+        // overwritten by an actual MSP2_INAV_MAG_UNALIGNED response (see startAlignPoll()).
+        // If none has arrived yet -- unstable connection, or older firmware that doesn't
+        // support this message -- that [0,0,0] would otherwise look like a perfectly valid
+        // (and, worse, perfectly *repeatable*) heading of 0 for both wizard readings,
+        // silently producing a bogus alignment. Return null instead so callers can bail.
+        if (!self.magUnalignedReceived) {
+            return null;
+        }
+        let mag = FC.SENSOR_DATA.magnetometerUnaligned;
+        // Must match firmware's own heading convention (atan2(magY, magX) on
+        // magADC directly, confirmed against inav2 rotationMatrixRotateVector output on
+        // 2026-09-13 hardware test) so heading_flat/heading_east below are directly
+        // comparable to what align_mag_yaw needs to produce.
+        let magHeading = rad2degrees ( Math.atan2(mag[1], mag[0]) );
+        if (DEBUG_ALIGN) console.log("magHeading (unaligned, degrees): " + magHeading.toString());
+        return magHeading;
     }
 
+    function showMagNoDataError() {
+        console.error("getMagHeading: no MSP2_INAV_MAG_UNALIGNED response received yet");
+        resetAlignButtons();
+        stopAlignPoll();
+        modal = new jBox('Modal', {
+            width: 460,
+            height: 360,
+            animation: false,
+            closeOnClick: true,
+            content: $('#modal-acc-align-mag-no-data-error')
+        }).open();
+    }
+
+    // Scoped to the wizard's own modal ids (all prefixed modal-acc-align-) rather than a
+    // bare `.modal__button` selector, so this can't reach into some other modal that
+    // happens to share the class name.
+    function resetAlignButtons() {
+        $('[id^="modal-acc-align-"].modal__button, #fc-align-start-button')
+            .css({ opacity: '', pointerEvents: '' });
+    }
+
+    // Starts/stops the 40ms MSP_RAW_IMU/MSP2_INAV_MAG_UNALIGNED poll the wizard's readings
+    // depend on. Started at wizard step 1, and again if the user takes the manual-compass
+    // fallback after a board-alignment-only run (that path needs fresh mag data too).
+    // Stopped wherever the wizard actually ends -- error-abort modals and both successful
+    // completion points -- so it doesn't keep doubling MSP traffic once the user is done
+    // with (or has abandoned) the wizard. Not folded into resetAlignButtons() itself, since
+    // that's also called at the top of every step (including mid-wizard progression) purely
+    // for button visual feedback, and killing the poll there would starve steps 2-4 of data.
+    function startAlignPoll() {
+        self.magUnalignedReceived = false;
+        interval.add('imu_data', function() {
+            MSP.send_message(MSPCodes.MSP_RAW_IMU, false, false);
+            MSP.send_message(MSPCodes.MSP2_INAV_MAG_UNALIGNED, false, false, function () {
+                self.magUnalignedReceived = true;
+            });
+        }, 40);
+    }
+
+    function stopAlignPoll() {
+        interval.remove('imu_data');
+    }
+
+    function accAutoAlignReadFlat() {
+        // Get accelerometer data from MSP_RAW_IMU
+        let acc_g_transformed = [...FC.SENSOR_DATA.accelerometer];
+
+        // Check if board already has non-zero alignment
+        const hasAlignment = self.boardAlignmentConfig.pitch !== 0 ||
+                           self.boardAlignmentConfig.roll !== 0 ||
+                           self.boardAlignmentConfig.yaw !== 0;
+
+        let acc_g_flat;
+        if (hasAlignment) {
+            // MSP_RAW_IMU returns TRANSFORMED data when alignment is set
+            // Apply inverse transformation to get true raw sensor readings
+            if (DEBUG_ALIGN) {
+                console.log("Board has existing alignment - applying inverse transformation");
+                console.log("Current alignment: pitch=" + self.boardAlignmentConfig.pitch +
+                           "°, roll=" + self.boardAlignmentConfig.roll +
+                           "°, yaw=" + self.boardAlignmentConfig.yaw + "°");
+            }
+
+            acc_g_flat = calculateRawFromTransformed(
+                acc_g_transformed,
+                self.boardAlignmentConfig.pitch,
+                self.boardAlignmentConfig.roll,
+                self.boardAlignmentConfig.yaw
+            );
+            if (DEBUG_ALIGN) {
+                console.log("Transformed data: [" + acc_g_transformed.map(x => x.toFixed(3)).join(", ") + "] g");
+                console.log("Raw data (inverse): [" + acc_g_flat.map(x => x.toFixed(3)).join(", ") + "] g");
+            }
+        } else {
+            // No alignment set - data is already raw (INAV optimization at boardalignment.c:100-102)
+            acc_g_flat = acc_g_transformed;
+            if (DEBUG_ALIGN) console.log("No board alignment - data is raw: [" + acc_g_flat.map(x => x.toFixed(3)).join(", ") + "] g");
+        }
+
+        // Check gravity magnitude to ensure valid reading
+        let A = Math.hypot(acc_g_flat[0], acc_g_flat[1], acc_g_flat[2]);
+        if (DEBUG_ALIGN) console.log("Gravity magnitude: " + A.toFixed(3) + "g");
+
+        if (A > 1.15 || A < 0.85) {
+            console.error("Gravity magnitude out of range: " + A.toFixed(3) + "g (expected 0.85-1.15g)");
+            console.error("This usually means:");
+            console.error("  - Board moved during reading");
+            console.error("  - Accelerometer needs calibration");
+            console.error("  - Board is on an unstable surface");
+
+            resetAlignButtons();
+            stopAlignPoll();
+            modal = new jBox('Modal', {
+                width: 460,
+                height: 360,
+                animation: false,
+                closeOnClick: true,
+                content: $('#modal-acc-align-calibration-error')
+            }).open();
+            return;
+        }
+
+        // Calculate pitch and roll from raw accelerometer data
+        // Note: Using standard aerospace conventions
+        let roll = ( Math.atan2(acc_g_flat[1], acc_g_flat[2]) * 180/Math.PI ) % 360;
+        let pitch = ( Math.atan2(-1 * acc_g_flat[0], Math.hypot(acc_g_flat[1], acc_g_flat[2])) * 180/Math.PI ) % 360;
+        if (DEBUG_ALIGN) console.log("Calculated attitude: pitch=" + pitch.toFixed(1) + "°, roll=" + roll.toFixed(1) + "°");
+
+        // Snap to the nearest 45 degrees: this is the board's mounting
+        // pitch/roll relative to the (level) airframe.
+        let roundedPitch = Math.round(pitch / 45) * 45;
+        let roundedRoll = Math.round(roll / 45) * 45;
+
+        // BOARD_ALIGNMENT only supports flat (0) or upside-down (180)
+        // pitch/roll. Anything else means the board is mounted on edge
+        // (sensor Z axis horizontal) or at a non-standard tilt, which this
+        // wizard can't resolve.
+        if (Math.abs(roundedPitch) % 180 !== 0 || Math.abs(roundedRoll) % 180 !== 0) {
+            console.error("Unsupported board orientation: pitch=" + roundedPitch + "°, roll=" + roundedRoll + "°");
+            resetAlignButtons();
+            stopAlignPoll();
+            modal = new jBox('Modal', {
+                width: 460,
+                height: 360,
+                animation: false,
+                closeOnClick: true,
+                content: $('#modal-acc-align-vertical-error')
+            }).open();
+            return;
+        }
+
+        // Raw (de-rotated) flat-attitude vector, kept for the TRIAD solve in
+        // accAutoAlignRead45() -- a single vector reading can't tell a pure
+        // roll-180 flip from a pure pitch-180 flip (both read as ~(0,0,-1)g),
+        // so roundedPitch/roundedRoll above are NOT the final answer, only a
+        // sanity check that the mount is flat-or-upside-down (not on edge).
+        self.acc_flat_raw = acc_g_flat;
+
+        heading_flat = getMagHeading();
+        if (heading_flat === null) {
+            showMagNoDataError();
+            return;
+        }
+
+        modal = new jBox('Modal', {
+            width: 460,
+            height: 460,
+            animation: false,
+            closeOnClick: false,
+            content: $('#modal-acc-align-45')
+        }).open();
+    }
+
+
+
+    function accAutoAlignRead45() {
+        // Get accelerometer data from MSP_RAW_IMU
+        let acc_g_transformed = [...FC.SENSOR_DATA.accelerometer];
+
+        // Check if board already has non-zero alignment
+        const hasAlignment = self.boardAlignmentConfig.pitch !== 0 ||
+                           self.boardAlignmentConfig.roll !== 0 ||
+                           self.boardAlignmentConfig.yaw !== 0;
+
+        let acc_g_45;
+        if (hasAlignment) {
+            // Apply inverse transformation to get raw sensor data
+            if (DEBUG_ALIGN) console.log("Applying inverse transformation for 45° reading");
+            acc_g_45 = calculateRawFromTransformed(
+                acc_g_transformed,
+                self.boardAlignmentConfig.pitch,
+                self.boardAlignmentConfig.roll,
+                self.boardAlignmentConfig.yaw
+            );
+            if (DEBUG_ALIGN) console.log("Raw data (45°): [" + acc_g_45.map(x => x.toFixed(3)).join(", ") + "] g");
+        } else {
+            // No alignment - data is already raw
+            acc_g_45 = acc_g_transformed;
+        }
+
+        // Check gravity magnitude again
+        let A = Math.hypot(acc_g_45[0], acc_g_45[1], acc_g_45[2]);
+        if (DEBUG_ALIGN) console.log("Gravity magnitude (45°): " + A.toFixed(3) + "g");
+
+        if (A > 1.15 || A < 0.85) {
+            console.error("Gravity magnitude out of range at 45°: " + A.toFixed(3) + "g");
+            console.error("Board may have moved between readings!");
+
+            resetAlignButtons();
+            stopAlignPoll();
+            modal = new jBox('Modal', {
+                width: 460,
+                height: 360,
+                animation: false,
+                closeOnClick: true,
+                content: $('#modal-acc-align-calibration-error')
+            }).open();
+            return false;
+        }
+
+        if (DEBUG_ALIGN) console.log("Raw data (45°, absolute): [" + acc_g_45.map(x => x.toFixed(3)).join(", ") + "] g");
+
+        // A single vector reading (the flat step) can't tell a pure roll-180
+        // mount from a pure pitch-180 mount -- both read as ~(0,0,-1)g when
+        // level, since gravity alone doesn't constrain rotation about itself.
+        // Solve for roll/pitch/yaw jointly using BOTH readings: the flat
+        // reading and the known ~45 degree nose-up tilt give two non-parallel
+        // vectors, which is enough to fully determine the mounting rotation,
+        // independent of whatever alignment is currently configured on the FC.
+        const refFlat = [0, 0, 1];
+        // Nose-up is NEGATIVE attitude.values.pitch in INAV (see io/osd.c:
+        // "attitude.values.pitch > 0 -> SYM_PITCH_DOWN"), so the canonical
+        // reading for a correctly-mounted board tilted nose-up 45 degrees has
+        // a POSITIVE x-component here (x = -sin(pitch) = -sin(-45) = +sin45).
+        const refTilt = [Math.SQRT1_2, 0, Math.SQRT1_2]; // nose-up 45 degrees
+
+        // Cross-product magnitude of two unit vectors is sin(angle between them);
+        // 0.3 ~= sin(17°), i.e. reject if the two readings are less than ~17
+        // degrees apart -- tight enough to catch "forgot to tilt" while leaving
+        // margin below the ~45 degrees this wizard actually asks for.
+        const crossMag = Math.sqrt(vecCross(self.acc_flat_raw, acc_g_45).reduce((s, v) => s + v * v, 0));
+        if (crossMag < 0.3) {
+            console.error("Flat and 45° readings are too similar (cross magnitude " + crossMag.toFixed(3) + ") -- aircraft probably wasn't tilted enough between readings");
+            resetAlignButtons();
+            stopAlignPoll();
+            modal = new jBox('Modal', {
+                width: 460,
+                height: 360,
+                animation: false,
+                closeOnClick: true,
+                content: $('#modal-acc-align-tilt-error')
+            }).open();
+            return false;
+        }
+
+        const bestAlignment = findBestBoardAlignment(refFlat, refTilt, self.acc_flat_raw, acc_g_45);
+        if (DEBUG_ALIGN) {
+            console.log("Best-fit board alignment: pitch=" + bestAlignment.pitch + "°, roll=" + bestAlignment.roll +
+                       "°, yaw=" + bestAlignment.yaw + "° (fit error " + bestAlignment.err.toFixed(4) + ")");
+        }
+
+        // err is a sum of two squared-distance-between-unit-vectors terms; 1.0
+        // tolerates roughly 41 degrees of combined error across both readings
+        // (comfortably more than expected accelerometer noise) before giving up.
+        if (bestAlignment.err > 1.0) {
+            console.error("No supported board mount fits these readings well (fit error " + bestAlignment.err.toFixed(4) + ") -- board may be mounted on edge, moved during the test, or tilted at a non-45° angle");
+            resetAlignButtons();
+            stopAlignPoll();
+            modal = new jBox('Modal', {
+                width: 460,
+                height: 360,
+                animation: false,
+                closeOnClick: true,
+                content: $('#modal-acc-align-vertical-error')
+            }).open();
+            return false;
+        }
+
+        let newPitch = bestAlignment.pitch;
+        let newRoll  = bestAlignment.roll;
+        let newYaw   = bestAlignment.yaw;
+
+        updateBoardPitchAxis(newPitch);
+        updateBoardRollAxis (newRoll);
+        updateBoardYawAxis(newYaw);
+
+        $("#modal-acc-align-setting").text(newPitch + ", " + newRoll + ", " + newYaw);
+        return true;
+    }
+
+    function accAutoAlignCompass() {
+        if (modal !== undefined) {
+          modal.close();
+        }
+
+        // heading_flat was captured at step 2 ("nose north, flat") by accAutoAlignReadFlat().
+        // Capture the second raw (unaligned) reading now, at step 4 ("nose east, flat").
+        // Both come from getMagHeading(), which reads MSP2_INAV_MAG_UNALIGNED -- unaffected
+        // by the current align_mag/align_board settings, unlike FC.SENSOR_DATA.magnetometer.
+        let heading_east = getMagHeading();
+        if (heading_east === null) {
+            showMagNoDataError();
+            return;
+        }
+
+        // Flip (right-side-up vs upside-down), and the mounting yaw offset itself, are
+        // derived in computeCompassYaw() -- see its doc comment in boardAlignmentMath.js
+        // for the full explanation and the hardware-validated derivation (two sign bugs
+        // were found and fixed here via live testing on 2026-09-13/14).
+        const { change, flipped, yawFromNorth, yawFromEast, yawDiff } = computeCompassYaw(heading_flat, heading_east);
+
+        if (DEBUG_ALIGN) {
+            console.log("accAutoAlignCompass: heading_flat=" + heading_flat.toFixed(1) +
+                        ", heading_east=" + heading_east.toFixed(1) +
+                        ", change=" + change.toFixed(1) + ", flipped=" + flipped +
+                        ", yawFromNorth=" + yawFromNorth + ", yawFromEast=" + yawFromEast);
+        }
+
+        if (yawDiff > 1) {
+            console.error("accAutoAlignCompass: north/east yaw estimates disagree (" +
+                           yawFromNorth + " vs " + yawFromEast + ") -- ask the user to retry");
+            resetAlignButtons();
+            stopAlignPoll();
+            modal = new jBox('Modal', {
+                width: 460,
+                height: 360,
+                animation: false,
+                closeOnClick: true,
+                content: $('#modal-acc-align-mag-disagreement-error')
+            }).open();
+            return;
+        }
+
+        // The wizard always produces a specific angle triple, never a "use the preset
+        // as-is" result -- without this, isSavePreset stays true (its default/loaded
+        // state), and Save silently writes align_mag_roll/pitch/yaw = 0 instead of the
+        // values computed below, discarding the wizard's result.
+        disableSavePreset();
+
+        // Flip is encoded as pitch=180 (not roll), matching the CW*FLIP presets
+        // (getAxisDegreeWithPreset) so the sliders/3D model/CLI string stay consistent
+        // with the rest of the tab.
+        updateRollAxis(0);
+        updateYawAxis(yawFromNorth);
+        updatePitchAxis(flipped ? 180 : 0);
+
+        $("#modal-compass-align-setting").text(
+                self.alignmentConfig.roll + ", " + self.alignmentConfig.pitch + ", " + self.alignmentConfig.yaw
+        );
+
+        stopAlignPoll();
+        modal = new jBox('Modal', {
+            width: 460,
+            height: 360,
+            animation: false,
+            closeOnClick: false,
+            content: $('#modal-acc-align-done')
+        }).open();
+    }
+
+    function accAutoAlignButton(event) {
+        // Visual feedback so a slow step doesn't look unresponsive and invite repeated clicks.
+        resetAlignButtons();
+        $(event.target).css({ opacity: 0.5, pointerEvents: 'none' });
+
+        let step = event.data.step;
+
+        // Steps: 1 start, 2 craft is flat north, 3 craft is nose up, 4 craft is flat and east
+        if (step === undefined) {
+            step = "1";
+        }
+
+        if (modal !== undefined) {
+          modal.close();
+        }
+
+
+        if (step == "1") {
+            // Check compass calibration before the user does any physical positioning, not
+            // after -- this flow ends by using the compass (on every board class -- see the
+            // step-3 comment below), so there's no point walking through the board-alignment
+            // steps first if that's doomed to fail.
+            if (BitHelper.bit_check(FC.CONFIG.activeSensors, 2) && !FC.getMagnetometerCalibrated()) {
+                resetAlignButtons();
+                modal = new jBox('Modal', {
+                    width: 460,
+                    height: 360,
+                    animation: false,
+                    closeOnClick: true,
+                    content: $('#modal-acc-align-mag-uncalibrated-error')
+                }).open();
+                return;
+            }
+            modal = new jBox("Modal", {
+                animation: false,
+                height: 460,
+                width: 500,
+                closeOnClick: false,
+                content: $("#modal-acc-align-start")
+            }).open();
+            startAlignPoll();
+        }
+
+
+        else if (step == "2") {
+            MSP.send_message(MSPCodes.MSP_CALIBRATION_DATA, false, false, accAutoAlignReadFlat);
+        }
+
+        else if (step == "3") {
+            if (!accAutoAlignRead45()) {
+                return;
+            }
+
+            // The "face east" step costs the user one more modal and one more click on an
+            // aircraft they're already holding in position -- cheap enough that every board
+            // class gets a complete, immediate board+compass result from this one wizard
+            // pass, rather than RAM-capable boards being sent off to do a full compass
+            // calibration spin (relying on firmware's calibration-time auto-detection, which
+            // stays available and unaffected for anyone who skips this wizard entirely).
+            let next_step = $('#modal-acc-align-east');
+            if (!BitHelper.bit_check(FC.CONFIG.activeSensors, 2)) {
+                // No mag: skip the compass-orientation step.
+                // #modal-acc-align-done also shows a "Compass alignment set to" line, which
+                // accAutoAlignCompass() normally fills in -- fill it in here too since that
+                // step never runs on this path, so it isn't left blank.
+                $("#modal-compass-align-setting").text(i18n.getMessage("accAlignNoMagDetected"));
+                next_step = $('#modal-acc-align-done');
+                // No compass step follows, so the wizard ends here -- stop the poll.
+                stopAlignPoll();
+            }
+            modal = new jBox('Modal', {
+                width: 460,
+                height: 360,
+                animation: false,
+                closeOnClick: false,
+                content: next_step
+            }).open();
+        }
+        else if (step == "4") {
+            accAutoAlignCompass();
+        }
+    }
+
+        GUI.content_ready(callback);
+    }
 };
 
 
@@ -753,11 +1243,6 @@ magnetometerTab.initialize3D = function () {
         var boardRotation = new THREE.Euler( THREE.MathUtils.degToRad( self.boardAlignmentConfig.pitch), THREE.MathUtils.degToRad( -self.boardAlignmentConfig.yaw ), THREE.MathUtils.degToRad( self.boardAlignmentConfig.roll ), 'YXZ');
         var matrix1 = (new THREE.Matrix4()).makeRotationFromEuler(boardRotation);
 
-/*
-        if ( self.isSavePreset ) {
-          matrix.premultiply(matrix1);  //preset specifies orientation relative to FC, align_max_xxx specify absolute orientation
-        }
-*/
         magModels.forEach( (m,i) => m.rotation.setFromRotationMatrix(matrix) );
         fc.rotation.setFromRotationMatrix(matrix1);
 
