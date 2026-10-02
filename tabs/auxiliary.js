@@ -392,13 +392,33 @@ auxiliaryTab.initialize = function (callback) {
             MSP.send_message(MSPCodes.MSP_RC, false, false, update_ui);
         }
 
+        function isRangeSelected(modeElement, auxChannelCount) {
+            var modeRanges = modeElement.find(' .range');
+            for (let r = 0; r < modeRanges.length; r++) {
+                // update_marker() never moves the marker for auto-select (-1) or a channel the receiver lacks
+                const channel = Number.parseInt($(modeRanges[r]).find('.channel').val(), 10);
+                if (!Number.isInteger(channel) || channel < 0 || channel >= auxChannelCount) {
+                    continue;
+                }
+                const markerPosition = Number.parseFloat($(modeRanges[r]).find('.marker')[0].style.left);
+                if (!Number.isFinite(markerPosition)) {
+                    continue;
+                }
+
+                const rangeLow = ($(modeRanges[r]).find('.lowerLimitValue').html() - 900) / (2100-900) * 100;
+                const rangeHigh = ($(modeRanges[r]).find('.upperLimitValue').html() - 900) / (2100-900) * 100;
+
+                if ((markerPosition >= rangeLow) && (markerPosition <= rangeHigh)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
         function update_ui() {
             let hasUsedMode = false;
             let acroEnabled = true;
-            let acroFail = new Set(["ANGLE", "HORIZON", "MANUAL", "ANGLE HOLD", "NAV RTH", "NAV POSHOLD", "NAV CRUISE", "NAV COURSE HOLD", "NAV WP", "GCS NAV"]);
-            // The flight controller reports these modes as active for as long as the Configurator
-            // is connected, so only the selected channel range can make them block ACRO.
-            let acroFailOnlyWhenSelected = new Set(["MANUAL"]);
+            const acroFail = new Set(["ANGLE", "HORIZON", "MANUAL", "ANGLE HOLD", "NAV RTH", "NAV POSHOLD", "NAV CRUISE", "NAV COURSE HOLD", "NAV WP", "GCS NAV"]);
 
             var auxChannelCount = FC.RC.active_channels - 4;
 
@@ -408,46 +428,31 @@ auxiliaryTab.initialize = function (callback) {
 
             for (var i = 0; i < LOCAL_AUX_CONFIG.length; i++) {
                 var modeElement = $('#mode-' + i);
-                let inRange = false;
+                const modeActive = FC.isModeBitSet(modeElement.data('origId'));
+
+                // Before the unused-mode skip: the FC forces MANUAL on a fixed wing while sensors calibrate, range or not
+                if (modeActive) {
+                    $('.mode .name').eq(modeElement.data('index')).data('modeElement').addClass('on').removeClass('inRange').removeClass('off');
+
+                    if (acroFail.has(modeElement.data('modeName'))) {
+                        acroEnabled = false;
+                    }
+                }
 
                 if (modeElement.find(' .range').length == 0) {
                     // if the mode is unused, skip it
-                    modeElement.removeClass('off').removeClass('on');
+                    if (!modeActive) {
+                        modeElement.removeClass('off').removeClass('on');
+                    }
                     continue;
                 }
 
-                // Check to see if the mode is in range
-                var modeRanges = modeElement.find(' .range');
-                for (let r = 0; r < modeRanges.length; r++) {
-                    const channel = Number.parseInt($(modeRanges[r]).find('.channel').val(), 10);
-                    if (!Number.isInteger(channel) || channel < 0 || channel >= auxChannelCount) {
-                        continue;
-                    }
-                    var rangeLow = $(modeRanges[r]).find('.lowerLimitValue').html();
-                    var rangeHigh = $(modeRanges[r]).find('.upperLimitValue').html();
-                    var markerPosition = $(modeRanges[r]).find('.marker')[0].style.left;
-                    markerPosition = Number.parseFloat(markerPosition);
-                    if (!Number.isFinite(markerPosition)) {
-                        continue;
-                    }
-
-                    rangeLow = (rangeLow - 900) / (2100-900) * 100;
-                    rangeHigh = (rangeHigh - 900) / (2100-900) * 100;
-
-                    if ((markerPosition >= rangeLow) && (markerPosition <= rangeHigh)) {
-                        inRange = true;
-                    }
+                hasUsedMode = true;
+                if (modeActive) {
+                    continue;
                 }
 
-                if (FC.isModeBitSet(modeElement.data('origId'))) {
-                    // The flight controller can activate the mode
-                    $('.mode .name').eq(modeElement.data('index')).data('modeElement').addClass('on').removeClass('inRange').removeClass('off');
-
-                    if (acroFail.has(modeElement.data('modeName')) &&
-                        (inRange || !acroFailOnlyWhenSelected.has(modeElement.data('modeName')))) {
-                        acroEnabled = false;
-                    }
-                } else if (inRange) {
+                if (isRangeSelected(modeElement, auxChannelCount)) {
                     $('.mode .name').eq(modeElement.data('index')).data('modeElement').removeClass('on').addClass('inRange').removeClass('off');
 
                     if (acroFail.has(modeElement.data('modeName'))) {
@@ -457,7 +462,6 @@ auxiliaryTab.initialize = function (callback) {
                     // If not, it is shown as disabled.
                     $('.mode .name').eq(modeElement.data('index')).data('modeElement').removeClass('on').removeClass('inRange').addClass('off');
                 }
-                hasUsedMode = true;
             }
 
             if (acroEnabled) {
