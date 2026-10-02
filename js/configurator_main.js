@@ -675,24 +675,18 @@ $(function() {
             }
         });
 
-        // Keep letters and punctuation out of numeric fields, but only those.
-        // A keyCode whitelist cannot express "any shortcut", so it used to
-        // swallow select all, copy, paste, cut, undo, Home and End as well,
-        // which left overwriting an existing value to backspace alone.
+        // block stray characters only; shortcuts like Ctrl+A and keys like Home or End must reach the field
         $content.on('keydown', 'input[type="number"]', function (e) {
-            // Shortcuts carry a modifier, the browser handles them.
             if (e.ctrlKey || e.metaKey || e.altKey) {
                 return;
             }
 
-            // Keys that do not insert text report a name rather than a single
-            // character: arrows, Home, End, backspace, delete, tab, enter.
+            // keys that insert no text (arrows, Home, End, Backspace, Tab) have multi-character names
             if (typeof e.key !== 'string' || e.key.length > 1) {
                 return;
             }
 
-            // What is left are the characters a number may consist of. The
-            // comma is the decimal separator the numpad emits on many layouts.
+            // the comma is what the numpad decimal key sends on many layouts
             if (!/[0-9.,-]/.test(e.key)) {
                 e.preventDefault();
             }
