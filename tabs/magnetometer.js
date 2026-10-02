@@ -24,13 +24,11 @@ import {
     computeCompassYaw,
 } from './../js/boardAlignmentMath';
 import timeout from './../js/timeouts';
+import CONFIGURATOR from './../js/data_storage';
 
 const magnetometerTab = {};
 
-// The load chain has no error path: a request that is never answered (a setting
-// the firmware does not know, a dropped MSP frame) leaves the tab on the loading
-// spinner and GUI.content_ready() is never reached, which keeps the tab switcher
-// blocked. Give up after this many milliseconds and show a message instead.
+// An unanswered MSP request stalls the load chain and blocks the tab switcher
 const LOAD_TIMEOUT = 10000;
 
 
@@ -124,13 +122,15 @@ magnetometerTab.initialize = function (callback) {
         }
     ];
 
-    self.loadFinished = false;
+    let loadFinished = false;
+    // The MSP queue waits 3 s per try on fast links and longer on slow ones
+    const loadTimeout = Math.round(LOAD_TIMEOUT * CONFIGURATOR.connection.getTimeout() / 3000);
 
     loadChainer.setChain(loadChain);
     loadChainer.setExitPoint(load_html);
     loadChainer.execute();
 
-    timeout.add('magnetometer_load', load_timed_out, LOAD_TIMEOUT);
+    timeout.add('magnetometer_load', load_timed_out, loadTimeout);
 
     function areAnglesZero() {
         return self.alignmentConfig.pitch === 0 && self.alignmentConfig.roll === 0 && self.alignmentConfig.yaw === 0;
@@ -207,33 +207,30 @@ magnetometerTab.initialize = function (callback) {
     }
 
     function load_html() {
-        if (self.loadFinished) {
+        if (loadFinished) {
             return;
         }
-        self.loadFinished = true;
+        loadFinished = true;
         timeout.remove('magnetometer_load');
 
         import('./magnetometer.html?raw').then(({default: html}) => GUI.load(html, process_html));
     }
 
     function load_timed_out() {
-        if (self.loadFinished) {
+        if (loadFinished) {
             return;
         }
 
-        // A hidden window throttles the timers that drive the MSP queue, so the
-        // chain is allowed to take longer than LOAD_TIMEOUT while the window is
-        // in the background. Only give up on a window the user can see.
+        // A hidden window throttles the timers that drive the MSP queue
         if (document.hidden) {
-            timeout.add('magnetometer_load', load_timed_out, LOAD_TIMEOUT);
+            timeout.add('magnetometer_load', load_timed_out, loadTimeout);
             return;
         }
 
-        self.loadFinished = true;
+        loadFinished = true;
 
         GUI.log(i18n.getMessage('magnetometerLoadFailed'));
 
-        // Hand the tab back to the user instead of leaving it loading forever.
         GUI.load('<div class="tab-magnetometer"><div class="content_wrapper"><div class="note"><p data-i18n="magnetometerLoadFailed"></p></div></div></div>', function () {
             i18n.localize();
             GUI.content_ready(callback);
@@ -1255,10 +1252,7 @@ magnetometerTab.initialize3D = function () {
             GUI.log("<span style='color: red; font-weight: bolder'><strong>" + i18n.getMessage("mixerNotConfigured") + "</strong></span>");
         }
         else {
-            // A flight controller can report a preset this Configurator does not
-            // know; use the generic model rather than throwing out of the tab.
-            const appliedMixer = mixer.getById(FC.MIXER_CONFIG.appliedMixerPreset);
-            model_file = appliedMixer ? appliedMixer.model : 'fallback';
+            model_file = mixer.getById(FC.MIXER_CONFIG.appliedMixerPreset).model;
         }
     }
     else {

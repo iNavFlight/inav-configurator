@@ -2,10 +2,10 @@
 /**
  * Regression tests for the Alignment Tool (magnetometer tab) load guard.
  *
- * The tab's MSP load chain has no error path: a request that is never answered
- * used to leave the tab on the loading spinner forever, and GUI.content_ready()
- * was never reached. These tests mirror the guard added to tabs/magnetometer.js
- * and check that the real file keeps it wired up.
+ * The tab's MSP load chain has no error path: a request the MSP queue drops after
+ * its retries used to leave the tab on the loading spinner forever, and
+ * GUI.content_ready() was never reached. These tests mirror the guard added to
+ * tabs/magnetometer.js and check that the real file keeps it wired up.
  */
 
 import { test, describe } from 'node:test';
@@ -50,15 +50,6 @@ function createLoadGuard(isHidden) {
     };
 }
 
-// Mirrors the model selection in magnetometerTab.initialize3D()
-function selectModel(appliedMixerPreset, knownPresets) {
-    if (appliedMixerPreset === -1) {
-        return 'fallback';
-    }
-    const appliedMixer = knownPresets[appliedMixerPreset];
-    return appliedMixer ? appliedMixer.model : 'fallback';
-}
-
 describe('Alignment Tool load guard', () => {
 
     test('a completed chain loads the tab once and a late timeout does nothing', () => {
@@ -94,18 +85,22 @@ describe('Alignment Tool load guard', () => {
         assert.equal(guard.state.failed, 0);
     });
 
-    test('an unknown mixer preset falls back to the generic model', () => {
-        const knownPresets = { 3: { model: 'quad_x' } };
-        assert.equal(selectModel(3, knownPresets), 'quad_x');
-        assert.equal(selectModel(-1, knownPresets), 'fallback');
-        assert.equal(selectModel(99, knownPresets), 'fallback');
-    });
-
     test('the tab arms the load timeout and drops it again', () => {
-        assert.match(tabSource, /timeout\.add\('magnetometer_load'/);
-        assert.match(tabSource, /timeout\.remove\('magnetometer_load'\)/);
+        const sliceFunction = (name) => {
+            const rest = tabSource.slice(tabSource.indexOf('function ' + name + '('));
+            const end = rest.search(/\r?\n {4}\}\r?\n/);
+            assert.ok(rest.startsWith('function ') && end > 0, name + ' not found');
+            return rest.slice(0, end);
+        };
+        assert.match(tabSource, /timeout\.add\('magnetometer_load', load_timed_out, loadTimeout\)/);
+        assert.match(sliceFunction('load_html'), /timeout\.remove\('magnetometer_load'\)/);
+        assert.match(sliceFunction('load_timed_out'), /GUI\.content_ready\(callback\)/);
+        // the give-up time follows the MSP queue's per-try timeout of the link
+        assert.match(tabSource, /LOAD_TIMEOUT \* CONFIGURATOR\.connection\.getTimeout\(\) \/ 3000/);
         // cleanup() has to drop the timer, otherwise it fires into the next tab
         const cleanup = tabSource.slice(tabSource.indexOf('magnetometerTab.cleanup'));
         assert.match(cleanup, /timeout\.remove\('magnetometer_load'\)/);
+        // a failed first load leaves resize3D unset, and off() without a handler drops every resize listener
+        assert.match(cleanup, /if \(this\.resize3D\)/);
     });
 });
