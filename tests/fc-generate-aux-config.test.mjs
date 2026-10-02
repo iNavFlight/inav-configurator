@@ -65,9 +65,7 @@ const mockClassUrl = dataModule(`
     export default MockCollection;
 `);
 
-// fc.js imports PID_TYPE alongside PLATFORM (used by usesFixedWingPidBank(),
-// which generateAuxConfig() never calls). The named import still has to
-// resolve, so the stub has to provide it or fc.js fails to load.
+// fc.js also imports PID_TYPE; the named import must resolve or fc.js fails to load
 const mockModelUrl = dataModule(`
     export const PLATFORM = { AIRPLANE: 0, MULTIROTOR: 1, TRICOPTER: 2 };
     export const PID_TYPE = { NONE: 0, PID: 1, PIFF: 2, AUTO: 3 };

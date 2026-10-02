@@ -104,16 +104,13 @@ var FC = {
     isMultirotor: function () {
         return (this.MIXER_CONFIG.platformType == PLATFORM.MULTIROTOR || this.MIXER_CONFIG.platformType == PLATFORM.TRICOPTER);
     },
-    // Navigation always runs on the bank that belongs to the platform type, no
-    // matter what pid_type says. Airplanes, rovers and boats use the nav_fw_*
-    // gains, every other platform the nav_mc_* ones.
+    // Airplanes, rovers and boats run the fixed-wing navigation controllers, whatever pid_type says
     usesFixedWingNavPids: function () {
         return (this.MIXER_CONFIG.platformType == PLATFORM.AIRPLANE ||
             this.MIXER_CONFIG.platformType == PLATFORM.ROVER ||
             this.MIXER_CONFIG.platformType == PLATFORM.BOAT);
     },
-    // The bank the FC reports over MSP2_PID follows pid_type instead, so it can
-    // point at the other set of gains than the one navigation is using.
+    // MSP2_PID serves pidBank(), which follows pid_type instead
     usesFixedWingPidBank: function (pidType) {
         if (pidType == PID_TYPE.AUTO) {
             return this.usesFixedWingNavPids();

@@ -1889,8 +1889,23 @@
     "pidTuning_PIDother": {
         "message": "Additional PID Gains"
     },
-    "pidTuningNavPidBankMismatch": {
-        "message": "pid_type does not match the platform type. The flight controller reports the $1 gains, but navigation runs on $2. The navigation gains shown below are not the ones in use, so changing them has no effect. Set pid_type back to AUTO, or tune the $2 settings in the CLI."
+    "pidTuningNavPidBankMismatchFixedWing": {
+        "message": "pid_type = $1 does not match the platform type. This tab shows and saves the fixed-wing PID bank, but navigation uses the multirotor gains, so Position Z, Velocity Z, Position XY, Velocity XY, Nav Heading and Auto Speed below have no effect. Tune nav_mc_pos_z_p, nav_mc_vel_z_*, nav_mc_pos_xy_p and nav_mc_vel_xy_* in the CLI instead."
+    },
+    "pidTuningNavPidBankMismatchMultirotor": {
+        "message": "pid_type = $1 does not match the platform type. This tab shows and saves the multirotor PID bank, but navigation uses the fixed-wing gains, so Position Z, Velocity Z, Position XY, Velocity XY, Nav Heading and Auto Speed below have no effect. Tune nav_fw_pos_z_*, nav_fw_pos_xy_*, nav_fw_pos_hdg_* and nav_fw_auto_speed_* in the CLI instead."
+    },
+    "pidTuningNavPidBankMismatchRoverBoat": {
+        "message": "pid_type = $1 does not match the platform type. This tab shows and saves the multirotor PID bank, but rover and boat navigation only uses the fixed-wing navigation heading gains, so Position Z, Velocity Z, Position XY, Velocity XY, Nav Heading and Auto Speed below have no effect. Tune nav_fw_pos_hdg_p, nav_fw_pos_hdg_i and nav_fw_pos_hdg_d in the CLI instead."
+    },
+    "pidTuningNavPidBankMismatchAutoPid": {
+        "message": "Setting pid_type to AUTO also switches the rate controller to PID with the multirotor Roll, Pitch, Yaw, Level and Heading Hold gains."
+    },
+    "pidTuningNavPidBankMismatchAutoPiff": {
+        "message": "Setting pid_type to AUTO also switches the rate controller to PIFF with the fixed-wing Roll, Pitch, Yaw, Level and Heading Hold gains."
+    },
+    "pidTuningNavPidBankMismatchAutoFromNone": {
+        "message": "With pid_type = NONE the rate controller is off, so Roll, Pitch, Yaw, Level and Heading Hold have no effect either. Setting pid_type to AUTO turns on the fixed-wing rate controller (PIFF) with the fixed-wing Roll, Pitch, Yaw, Level and Heading Hold gains."
     },
     "pidTuning_SelectNewDefaults": {
         "message": "Select New Defaults"
