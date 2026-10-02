@@ -611,12 +611,16 @@ async function fetchSrtmTile(lat, lon, statusCb) {
 }
 
 // ─── Copernicus GLO-30 → HGT-shaped grid ───────────────────────────────
-// Copernicus tiles are 1°x1° Cloud-Optimized GeoTIFF (Float32, 3600x3600,
-// pixel-is-point). Their sample points fall on exactly the same whole
-// arc-second graticule as SRTM .hgt, so filling the 3601x3601 grid that
-// hgtElevation()/createDatFromHgt() expect is a direct copy — no resampling,
-// no half-pixel shift. The 3601st row/column (the tile's south and east
-// edges) belong to the south / east neighbour tiles and are copied from them.
+// Copernicus tiles are 1°x1° Cloud-Optimized GeoTIFF (Float32, pixel-is-point,
+// always 3600 rows tall). Below 50° latitude they are also 3600 px wide and
+// their sample points fall on exactly the same whole arc-second graticule as
+// SRTM .hgt, so filling the 3601x3601 grid that hgtElevation()/
+// createDatFromHgt() expect is a direct copy. Towards the poles the tiles get
+// NARROWER (2400 px at 50–60°, 1800 at 60–70°, 1200 at 70–80°, 720 at 80–85°,
+// 360 at 85–90°, mirrored south of the equator), so there the grid columns map
+// onto the tile's real width via copernicusColPlan(). The 3601st row/column
+// (the tile's south and east edges) belong to the south / east neighbour
+// tiles and are copied from them.
 const COPERNICUS_BASE_URL = 'https://copernicus-dem-30m.s3.amazonaws.com';
 // Required verbatim by the Copernicus WorldDEM-30 licence (Art. 6). These must
 // be reproduced character-for-character wherever the derived .TER files are
@@ -644,6 +648,41 @@ function copernicusNoticeText() {
 const COPERNICUS_GRID = 3600;
 const COPERNICUS_ROW_BAND = 600;      // rows decoded per step, to cap peak memory
 const COPERNICUS_MAX_RETRIES = 2;
+// Grids cached under the old 'cop_' prefix were built assuming every tile is
+// 3600 px wide and are wrong at |lat| >= 50° — never reuse them.
+const COPERNICUS_CACHE_PREFIX = 'cop2_';
+
+// Sampling plan for mapping 3600-grid columns [colFrom..colTo] onto a tile
+// that is `width` px wide: each grid column sits at source position
+// col*width/3600 and is interpolated linearly between the two neighbouring
+// sample columns. The weight is exactly 0 when width == 3600 (below 50°
+// latitude), where the plan degenerates to a direct column copy.
+function copernicusColPlan(colFrom, colTo, width) {
+    const n = colTo - colFrom + 1;
+    const left = new Int32Array(n);       // left sample column, relative to srcFrom
+    const right = new Int32Array(n);      // right sample column, relative to srcFrom
+    const weight = new Float64Array(n);   // share of the right sample
+    const srcFrom = Math.floor(colFrom * width / COPERNICUS_GRID);
+    let srcTo = srcFrom;
+    for (let k = 0; k < n; k++) {
+        const x = (colFrom + k) * width / COPERNICUS_GRID;
+        const a = Math.floor(x);
+        const b = Math.min(width - 1, a + 1);
+        left[k] = a - srcFrom;
+        right[k] = b - srcFrom;
+        weight[k] = x - a;
+        if (b > srcTo) srcTo = b;
+    }
+    return { srcFrom, srcTo, left, right, weight };
+}
+
+// Interpolates one value from a raster row slice using a copernicusColPlan
+// entry. The weight-0 shortcut keeps width-3600 output bit-exact.
+function copernicusSample(data, base, plan, k) {
+    const a = data[base + plan.left[k]];
+    const w = plan.weight[k];
+    return w === 0 ? a : a + (data[base + plan.right[k]] - a) * w;
+}
 
 function copernicusTileStem(lat, lon) {
     const ns = (lat >= 0 ? 'N' : 'S') + String(Math.abs(lat)).padStart(2, '0');
@@ -743,6 +782,11 @@ async function buildCopernicusGrid(degLat, degLon, rowFrom, rowTo, colFrom, colT
     const statusCb = options.statusCb;
     const primary = await openCopernicusImage(degLat, degLon, imgCache, !!options.full, statusCb);
     if (!primary) return null;
+    const primaryWidth = primary.getWidth();
+    if (primary.getHeight() !== COPERNICUS_GRID) {
+        throw new Error('Unexpected Copernicus tile height ' + primary.getHeight() +
+            ' for ' + copernicusTileStem(degLat, degLon));
+    }
 
     const bytes = new Uint8Array(SRTM_GRID * SRTM_GRID * 2);
     const view = new DataView(bytes.buffer);
@@ -751,18 +795,21 @@ async function buildCopernicusGrid(degLat, degLon, rowFrom, rowTo, colFrom, colT
     const colMainTo = Math.min(colTo, COPERNICUS_GRID - 1);
     const bandTotal = Math.max(1, rowMainTo - rowFrom + 1);
 
-    // Body: grid row r == tile pixel row r, grid col c == tile pixel col c.
+    // Body: grid row r == tile pixel row r; grid columns sample the tile at
+    // their true positions via copernicusColPlan() — reading past the tile's
+    // real width would make geotiff.js silently zero-fill instead of failing.
+    const plan = copernicusColPlan(colFrom, colMainTo, primaryWidth);
+    const srcWidth = plan.srcTo - plan.srcFrom + 1;
     for (let bandTop = rowFrom; bandTop <= rowMainTo; bandTop += COPERNICUS_ROW_BAND) {
         const bandBottom = Math.min(rowMainTo, bandTop + COPERNICUS_ROW_BAND - 1);
         const [band] = await primary.readRasters({
-            window: [colFrom, bandTop, colMainTo + 1, bandBottom + 1],
+            window: [plan.srcFrom, bandTop, plan.srcTo + 1, bandBottom + 1],
         });
-        const bandWidth = colMainTo - colFrom + 1;
         for (let r = bandTop; r <= bandBottom; r++) {
-            const src = (r - bandTop) * bandWidth;
+            const src = (r - bandTop) * srcWidth;
             let off = (r * SRTM_GRID + colFrom) * 2;
-            for (let c = 0; c < bandWidth; c++) {
-                view.setInt16(off, copernicusToInt16(band[src + c]), false);
+            for (let k = 0; k < plan.left.length; k++) {
+                view.setInt16(off, copernicusToInt16(copernicusSample(band, src, plan, k)), false);
                 off += 2;
             }
         }
@@ -781,14 +828,17 @@ async function buildCopernicusGrid(degLat, degLon, rowFrom, rowTo, colFrom, colT
         }
     }
 
-    // South edge (grid row 3600) is the north row of the south neighbour.
+    // South edge (grid row 3600) is the north row of the south neighbour,
+    // which can sit in a different width band (e.g. N49 under an N50 tile),
+    // so its columns map through its OWN width.
     if (rowTo >= COPERNICUS_GRID) {
         const south = await openCopernicusImage(degLat - 1, degLon, imgCache, false, null);
         if (south) {
-            const [row] = await south.readRasters({ window: [colFrom, 0, colMainTo + 1, 1] });
+            const southPlan = copernicusColPlan(colFrom, colMainTo, south.getWidth());
+            const [row] = await south.readRasters({ window: [southPlan.srcFrom, 0, southPlan.srcTo + 1, 1] });
             let off = (COPERNICUS_GRID * SRTM_GRID + colFrom) * 2;
-            for (let c = 0; c <= colMainTo - colFrom; c++) {
-                view.setInt16(off, copernicusToInt16(row[c]), false);
+            for (let k = 0; k < southPlan.left.length; k++) {
+                view.setInt16(off, copernicusToInt16(copernicusSample(row, 0, southPlan, k)), false);
                 off += 2;
             }
         }
@@ -825,7 +875,7 @@ function copernicusEastMarginCols(degLat) {
 async function ensureCopernicusCellData(degLat, degLon, runCache, imgCache, statusCb) {
     const primaryKey = degLat + '_' + degLon;
     if (!runCache[primaryKey]) {
-        const cachedBuf = await hgtDb.get('cop_' + primaryKey);
+        const cachedBuf = await hgtDb.get(COPERNICUS_CACHE_PREFIX + primaryKey);
         if (cachedBuf) runCache[primaryKey] = makeHgtView(new Uint8Array(cachedBuf));
     }
 
@@ -838,7 +888,7 @@ async function ensureCopernicusCellData(degLat, degLon, runCache, imgCache, stat
         if (!grid) return null;
         runCache[primaryKey] = grid;
         cellCache[primaryKey] = grid;
-        hgtDb.put('cop_' + primaryKey, grid.buffer);
+        hgtDb.put(COPERNICUS_CACHE_PREFIX + primaryKey, grid.buffer);
     }
 
     const rowStart = COPERNICUS_GRID - copernicusNorthMarginRows();
@@ -2338,7 +2388,7 @@ TABS.map_generator.initialize = function (callback) {
             const totalHgt = hgtKeysSet.size;
             const cachedSetKeys = await hgtDb.cachedSet();
             let cachedCount = 0;
-            const cachePrefix = getTerrainSource() === 'copernicus' ? 'cop_' : '';
+            const cachePrefix = getTerrainSource() === 'copernicus' ? COPERNICUS_CACHE_PREFIX : '';
             hgtKeysSet.forEach(k => { if (cachedSetKeys.has(cachePrefix + k)) cachedCount++; });
 
             const copernicus = getTerrainSource() === 'copernicus';
