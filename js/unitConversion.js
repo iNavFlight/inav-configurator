@@ -456,6 +456,30 @@ function fromDisplayUnits(value, inputUnit, precision = 0) {
     return Math.round(raw * factor) / factor;
 }
 
+/**
+ * Text for an editable field: the fewest decimals that convert back to the
+ * same firmware value, so an untouched field never changes what it saves.
+ */
+function toFieldText(value, inputUnit, precision = 0) {
+    const multiplier = getUnitMultiplier(inputUnit).multiplier;
+    const numeric = Number(value);
+
+    if (typeof multiplier !== 'number' || !Number.isFinite(numeric)) {
+        return String(value);
+    }
+
+    const displayValue = numeric / multiplier;
+    // A stored value finer than the firmware unit (e.g. terrain * 100) aims at its rounding
+    const target = fromDisplayUnits(displayValue, inputUnit, precision);
+    for (let decimals = 0; decimals <= 6; decimals++) {
+        const text = String(Number(displayValue.toFixed(decimals)));
+        if (fromDisplayUnits(text, inputUnit, precision) === target) {
+            return text;
+        }
+    }
+    return String(displayValue);
+}
+
 export {
     fromDisplayUnits,
     getUnitDecimals,
@@ -463,5 +487,6 @@ export {
     getUnitExpandedName,
     getUnitMultiplier,
     smartRound,
-    toDisplayUnits
+    toDisplayUnits,
+    toFieldText
 };

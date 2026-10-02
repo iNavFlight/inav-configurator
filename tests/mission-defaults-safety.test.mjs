@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import vm from 'node:vm';
 import {parse} from 'acorn';
-import {toDisplayUnits} from '../js/unitConversion.js';
+import {toDisplayUnits, toFieldText} from '../js/unitConversion.js';
 import {globalSettings as displaySettings, UnitType} from '../js/globalSettings.js';
 
 // Execute the production functions unchanged. The tab normally needs Electron, Vite
@@ -57,7 +57,7 @@ function harness() {
     const state = {items: [wp], writes: 0};
     const HOME = waypoint(0);
     HOME.setAlt(200);
-    const ctx = vm.createContext({toDisplayUnits, MISSION_UNIT_ALT: 'cm', MISSION_UNIT_SPEED: 'cms', $, HOME, homeMarkers: [{}], homeElevationPosition: null,
+    const ctx = vm.createContext({toDisplayUnits, toFieldText, MISSION_UNIT_ALT: 'cm', MISSION_UNIT_SPEED: 'cms', $, HOME, homeMarkers: [{}], homeElevationPosition: null,
         homeElevationRequest: null, pendingWaypointDrags: new WeakMap(),
         landSpeedNotUpdatedModal: null,
         locationLifecycleId: 1, missionControlLocationLifecycleId: 1,
@@ -106,7 +106,7 @@ test('aborted mission apply restores default fields in the selected display unit
         wait.resolve(true);
         await saving;
         assert.equal($('#MPdefaultPointAlt').value, '500');
-        assert.equal($('#MPdefaultPointSpeed').value, toDisplayUnits(500, 'cms').text);
+        assert.equal($('#MPdefaultPointSpeed').value, toFieldText(500, 'cms'));
         assert.equal(ctx.settings.alt, 15240);
         assert.equal(ctx.settings.speed, 500);
     } finally {

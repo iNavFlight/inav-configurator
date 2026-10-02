@@ -11,7 +11,7 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
 import { globalSettings, UnitType } from '../js/globalSettings.js';
-import { fromDisplayUnits, getUnitMultiplier, smartRound, toDisplayUnits } from '../js/unitConversion.js';
+import { fromDisplayUnits, getUnitMultiplier, smartRound, toDisplayUnits, toFieldText } from '../js/unitConversion.js';
 
 function withUnits(unitType, osdUnits, body) {
     const previousType = globalSettings.unitType;
@@ -104,11 +104,11 @@ test('a typed speed survives storing and reloading in imperial', () => {
 
 test('metre based planner defaults keep two decimals of precision', () => {
     withUnits(UnitType.imperial, null, () => {
-        // Approach and landing altitude are held in whole metres by the
-        // planner settings, so they are converted with a finer precision.
+        // Approach and landing altitude are held in metres with two decimals
+        // by the planner settings, so they are converted with that precision.
         const stored = fromDisplayUnits('16.40', 'm', 2);
         assert.equal(stored, 5);
-        assert.equal(toDisplayUnits(stored, 'm').text, '16.40');
+        assert.equal(toFieldText(stored, 'm', 2), '16.4');
     });
 });
 
@@ -142,4 +142,47 @@ test('display rounding hides conversion noise and snaps to round numbers', () =>
 
     // Below two decimal places the value is left to toFixed().
     assert.equal(smartRound(12.34, 1), '12.3');
+});
+
+const fieldSystems = [[UnitType.none, null], [UnitType.imperial, null], [UnitType.metric, null],
+    [UnitType.OSD, 2], [UnitType.OSD, 3], [UnitType.OSD, 4]];
+
+test('a typed whole number comes back unchanged in every field unit', () => {
+    for (const [unitType, osdUnits] of fieldSystems) {
+        withUnits(unitType, osdUnits, () => {
+            for (const [unit, precision] of [['cm', 0], ['cms', 0], ['m', 2]]) {
+                for (let typed = 1; typed <= 3000; typed++) {
+                    const stored = fromDisplayUnits(typed, unit, precision);
+                    assert.equal(toFieldText(stored, unit, precision), String(typed),
+                        unitType + '/' + osdUnits + ' ' + unit + ': ' + typed + ' came back changed');
+                }
+            }
+        });
+    }
+});
+
+test('an untouched field reads back the stored firmware value', () => {
+    for (const [unitType, osdUnits] of fieldSystems) {
+        withUnits(unitType, osdUnits, () => {
+            for (let stored = -2000; stored <= 20000; stored += 7) {
+                for (const unit of ['cm', 'cms']) {
+                    assert.equal(fromDisplayUnits(toFieldText(stored, unit), unit), stored,
+                        unitType + '/' + osdUnits + ' ' + unit + ': ' + stored + ' drifted');
+                }
+            }
+            for (const stored of [5, 5.5, 60, 60.05, 123.45]) {
+                assert.equal(fromDisplayUnits(toFieldText(stored, 'm', 2), 'm', 2), stored,
+                    unitType + '/' + osdUnits + ' m: ' + stored + ' drifted');
+            }
+        });
+    }
+});
+
+test('a value finer than the firmware unit is shown as its rounded firmware value', () => {
+    withUnits(UnitType.imperial, null, () => {
+        // terrain elevation * 100 is not a whole centimetre
+        const text = toFieldText(49271.4, 'cm');
+        assert.equal(fromDisplayUnits(text, 'cm'), 49271);
+        assert.ok(text.length <= 8, text);
+    });
 });
