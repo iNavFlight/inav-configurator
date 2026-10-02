@@ -740,6 +740,18 @@ function showMission3DTerrainWarnings(types) {
                 'HOME is not set: Relative-altitude terrain checks are unavailable.'
             ));
         }
+        if (types.includes('incomplete')) {
+            messages.push(mission3DMessage(
+                'missionMap3DRouteIncomplete',
+                'JUMP loops too long to follow: Route collision check covers only part of the mission.'
+            ));
+        }
+        if (types.includes('invalidJump')) {
+            messages.push(mission3DMessage(
+                'missionMap3DInvalidJump',
+                'A JUMP has settings the flight controller refuses to arm with: its legs are not shown or checked.'
+            ));
+        }
     }
 
     if (!messages.length) return;
@@ -1942,7 +1954,7 @@ function iconKey(filename) {
 
         // Terrain warnings for a finished render. A provider that never loaded or a sample that
         // failed makes every clearance meaningless, so that single warning replaces the others.
-        function showMissionWarnings(terrainSamplingFailed, hasTerrainCollision, missingHomeReference) {
+        function showMissionWarnings(terrainSamplingFailed, hasTerrainCollision, missingHomeReference, routeWalk) {
             if (terrainLoadFailed || terrainSamplingFailed) {
                 showMission3DTerrainWarnings(['unavailable']);
                 return;
@@ -1951,6 +1963,8 @@ function iconKey(filename) {
             const warningTypes = [];
             if (hasTerrainCollision) warningTypes.push('collision');
             if (missingHomeReference) warningTypes.push('home');
+            if (routeWalk.truncated) warningTypes.push('incomplete');
+            if (routeWalk.invalidJumps) warningTypes.push('invalidJump');
             showMission3DTerrainWarnings(warningTypes);
         }
 
@@ -2023,7 +2037,8 @@ function iconKey(filename) {
             hideMission3DTerrainWarning();
 
             const points = getMission3DPoints(waypoints, home);
-            const flightLegs = getMission3DFlightLegs(waypoints);
+            const routeWalk = getMission3DFlightLegs(waypoints);
+            const flightLegs = routeWalk.legs;
             const missionPoints = points.filter((point) => !point.isHome);
             if (!missionPoints.length) {
                 showEmptyMap();
@@ -2059,7 +2074,7 @@ function iconKey(filename) {
                 terrainCache = {groundHeights, routeTerrain};
             }
             const hasTerrainCollision = renderRouteTerrain(routeTerrain.routeSamples);
-            showMissionWarnings(terrainSamplingFailed, hasTerrainCollision, missingHomeReference);
+            showMissionWarnings(terrainSamplingFailed, hasTerrainCollision, missingHomeReference, routeWalk);
             // The track's altitudes are metres above home, so they need the same
             // ground the waypoints are measured from. Falling back to sea level
             // instead buries the whole track as far underground as the site is

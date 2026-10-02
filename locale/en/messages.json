@@ -5429,6 +5429,12 @@
     "missionMap3DHomeRequired": {
         "message": "HOME is not set: Relative-altitude terrain checks are unavailable."
     },
+    "missionMap3DRouteIncomplete": {
+        "message": "JUMP loops too long to follow: Route collision check covers only part of the mission."
+    },
+    "missionMap3DInvalidJump": {
+        "message": "A JUMP has settings the flight controller refuses to arm with: its legs are not shown or checked."
+    },
     "missionMap3DUnavailable": {
         "message": "3D view unavailable on this system."
     },
