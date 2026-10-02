@@ -5760,7 +5760,7 @@
         "message": "Do you really want to reset all settings?\nATTENTION: All settings are lost! You have to setup the whole aircraft after this operation!"
     },
     "confirm_select_defaults": {
-        "message": "Continuing reboots the flight controller and reopens the setup wizard, where the model you pick applies that model's default settings. This overwrites the motor and servo mixer, the platform type, the gyro filtering and motor output settings, and the PID, rate and navigation values in all three control and battery profiles, and it cannot be undone from here. If your current configuration matters, cancel and back it up first with Diff All and Save to File on the CLI tab.\nDo you want to continue?"
+        "message": "Continuing reboots the flight controller and reopens the setup wizard. Picking a model there loads that model's defaults: it replaces the motor and servo mixer and the platform type and, depending on the model, overwrites PIDs, rates, filters, airmode, idle throttle, the motor protocol, the arming angle, the failsafe procedure, RTH, landing, launch and waypoint settings and more, some of them in all control and battery profiles. This cannot be undone.\n\nTo change nothing, pick \"Keep current settings\" in the wizard. If your current configuration matters, answer No and back it up first with Diff All and Save to File on the CLI tab.\n\nDo you want to continue?"
     },
     "confirm_reset_pid": {
         "message": "This will reset all PID settings to firmware default values and save.\nDo you want to continue?"
