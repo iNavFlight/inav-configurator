@@ -134,9 +134,15 @@ outputsTab.initialize = function (callback) {
             $motorStopWarningBox = $("#motor-stop-warning"),
             $reversibleMotorBox = $(".for-reversible-motors");
 
+        // First digital protocol in motorPwmProtocolTypes_e: STANDARD, ONESHOT125,
+        // MULTISHOT and BRUSHED are the analog ones below it. It was 5 until
+        // ONESHOT42 was removed from the firmware in 2021 and everything after it
+        // shifted down by one.
+        const PROTOCOL_DSHOT150 = 4;
+
         function handleIdleMessageBox() {
             $idleInfoBox.hide();
-            if (FC.ADVANCED_CONFIG.motorPwmProtocol >= 5) {
+            if (FC.ADVANCED_CONFIG.motorPwmProtocol >= PROTOCOL_DSHOT150) {
                 $('.hide-for-shot').hide();
                 if ($idlePercent.val() > 7.0) {
                     $idleInfoBox.html(i18n.getMessage('throttleIdleDigitalInfo'));
