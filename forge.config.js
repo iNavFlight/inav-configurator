@@ -13,8 +13,15 @@ const pruneSitlBinaries = (stagingPath, electronVersion, platform, arch, done) =
     let sitlPath;
 
     if (platform === 'darwin') {
-      // afterCopyExtraResources receives the .app bundle as stagingPath.
-      sitlPath = path.join(stagingPath, 'Contents', 'Resources', 'sitl');
+      // stagingPath is @electron/packager's temp staging dir, NOT the .app bundle:
+      // the bundle is a subdirectory of it (created by renameAppAndHelpers() before
+      // this hook runs), so Resources lives at <stagingPath>/<AppName>.app/Contents/Resources.
+      const appBundle = fs.readdirSync(stagingPath).find((name) => name.endsWith('.app'));
+      if (!appBundle) {
+        console.log(`pruneSitlBinaries: no .app bundle found in ${stagingPath}, skipping`);
+        return done();
+      }
+      sitlPath = path.join(stagingPath, appBundle, 'Contents', 'Resources', 'sitl');
     } else {
       // Windows/Linux: <stagingPath>/resources/sitl
       sitlPath = path.join(stagingPath, 'resources', 'sitl');
