@@ -1,19 +1,10 @@
 'use strict';
 
-/*
- * Display-only conversion of a value that is shown in a raw firmware unit
- * (cm, cm/s, ms, decidegrees, ...) into a unit that is easier to read.
- *
- * The configurator keeps sending the raw value to the flight controller;
- * the hint only exists so that a misplaced zero is obvious at a glance:
- * "5000 cm" is easy to overlook, "= 50 m" next to it is not.
- */
+// Display-only: makes a misplaced zero in a raw firmware unit obvious ("5000 cm" vs "= 50 m").
 
 const KILOMETRES = { factor: 100000, unit: 'km', decimals: 3, name: 'Kilometres' };
 
-// Keys are the data-unit values used by the settings inputs. `factor` is
-// how many raw units make one hint unit. `larger` is an optional unit to
-// switch to once the converted value reaches `from`.
+// data-unit -> raw units per hint unit; `larger` takes over once the converted value reaches `from`
 const UNIT_HINTS = {
     'cm':       { factor: 100,       unit: 'm',    decimals: 2, name: 'Metres',
                   larger: { from: 1000, ...KILOMETRES } },

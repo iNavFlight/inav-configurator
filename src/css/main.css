@@ -2517,16 +2517,16 @@ ol li {
 .unit-hint {
     float: right;
     /* padding, not margin: some tabs reset span margins */
-    padding: 0 8px 0 6px;
+    padding: 0 0.7em 0 0.5em;
     color: #888;
-    font-size: 11px;
-    line-height: 22px;
+    font-size: 0.9em;
+    line-height: 2em;
     white-space: nowrap;
 }
 
 /* Rows without a help icon: leave room for one so the hints stay aligned */
 .unit-hint--no-icon {
-    padding-right: 22px;
+    padding-right: 2em;
 }
 
 .batteryProfileHighlight {

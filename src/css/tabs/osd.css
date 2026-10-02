@@ -645,7 +645,6 @@
 
 .tab-osd .settings label {
     display: block;
-    position: relative;
     width: 100%;
     border-bottom: 1px solid #ddd;
     margin-top: 5px;
@@ -657,22 +656,24 @@
     padding-bottom: 0;
 }
 
-/* The label text span has a fixed width, so a floated unit hint would push
-   the text onto its own line. Pin the hint to the right edge of the
-   (relatively positioned) label instead. */
-.tab-osd .settings label > .unit-hint {
-    float: none;
-    position: absolute;
-    top: 0;
-    right: 16px;
-    padding-right: 8px;
-    line-height: 20px;
+/* Flex row so the label text wraps beside the unit hint instead of under it */
+.tab-osd .settings label:has(> .unit-hint) {
+    display: flex;
+    width: auto;
+    align-items: flex-start;
+    gap: 0.5em;
 }
 
-/* Keep the label text clear of the pinned hint: long translations wrap
-   inside the span instead of running underneath the hint */
-.tab-osd .settings label > .unit-hint ~ .i18n-replaced {
-    width: calc(100% - 220px);
+.tab-osd .settings label:has(> .unit-hint) > .i18n-replaced {
+    flex: 1 1 auto;
+    width: auto;
+}
+
+.tab-osd .settings label > .unit-hint {
+    float: none;
+    order: 1;
+    padding: 0 0.5em 0 0;
+    line-height: inherit;
 }
 
 .tab-osd .settings input {
