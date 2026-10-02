@@ -6,6 +6,9 @@ import eventFrequencyAnalyzer from './eventFrequencyAnalyzer';
 import timeout from './timeouts';
 import CONFIGURATOR from './data_storage';
 
+// Longest gap inside one frame; the CLI banner comes at least 350 ms ('#' delay + FC guard time) after the tab switch.
+const FRAME_TAIL_TIMEOUT_MS = 200;
+
 // Every MSP code that changes something on the FC, recognised by name so a write
 // added later is covered without maintaining a list here.
 const WRITE_CODE_NAMES = Object.keys(MSPCodes)
@@ -348,21 +351,15 @@ var MSP = {
         this.last_received_timestamp = Date.now();
     },
 
-    /**
-     * Feeds bytes to read() for as long as a frame is still being decoded and
-     * returns how many of them were taken.
-     *
-     * A caller that takes the port over while a frame is only half decoded (the
-     * CLI tab does, on tab entry) can use this to let the decoder finish the
-     * frame in progress - which also completes the request that was in flight -
-     * and keep the bytes that follow for itself. The bytes are handed over one
-     * at a time because only the decoder knows where the frame ends: it returns
-     * to the IDLE state as soon as it has dispatched the frame.
-     *
-     * @param {{data: ArrayBuffer|Uint8Array}} readInfo
-     * @returns {number} bytes taken from the front of readInfo.data
-     */
+    // Byte by byte, because only the decoder knows where the frame in progress ends; returns the bytes taken.
     read_until_idle: function (readInfo) {
+        // A frame whose tail was lost must not swallow the CLI banner that follows; drop it.
+        if (Date.now() - this.last_received_timestamp > FRAME_TAIL_TIMEOUT_MS) {
+            this.state = this.decoder_states.IDLE;
+            this.message_length_received = 0;
+            return 0;
+        }
+
         var data;
         try {
             data = new Uint8Array(readInfo.data);
