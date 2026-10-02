@@ -3486,7 +3486,7 @@
         "message": "Reset Accelerometer Calibration"
     },
     "MagCalText": {
-        "message": "After pressing the button you have 30 seconds to hold the model in the air and rotate it so that each side (front, back, left, right, top and bottom) points down towards the earth. Be sure that your compass is not near magnets or electromagnets when installed in the craft or performing the calibration."
+        "message": "After pressing the button, hold the model in the air for the calibration time set on the flight controller (mag_calibration_time, default 30 seconds; the countdown shows it) and rotate it so that each side (front, back, left, right, top and bottom) points down towards the earth. Be sure that your compass is not near magnets or electromagnets when installed in the craft or performing the calibration."
     },
     "MagBtn": {
         "message": "Calibrate Compass"

@@ -34,7 +34,8 @@ function formatMagAlignment(alignment) {
     }
     return roll + ", " + pitch + ", " + yaw;
 }
-// Used when the FC does not know mag_calibration_time. Matches the firmware default.
+
+// Used when mag_calibration_time cannot be read. Matches the firmware default.
 const MAG_CALIBRATION_TIME_DEFAULT = 30;
 
 calibrationTab.model = (function () {
@@ -94,18 +95,24 @@ calibrationTab.initialize = function (callback) {
         mspHelper.loadCalibrationData,
         function (callback) {
             let finished = false;
-            function finish(setting) {
+            function finish() {
                 if (finished) return;
                 finished = true;
                 timeout.remove('mag_calibration_time_load');
-                if (setting && setting.value > 0) {
-                    magCalibrationTime = setting.value;
-                }
                 callback();
             }
             // getSetting can remain pending after transport retries are exhausted.
-            timeout.add('mag_calibration_time_load', () => finish(), 5000);
-            mspHelper.getSetting('mag_calibration_time').then(finish, () => finish());
+            timeout.add('mag_calibration_time_load', () => {
+                console.warn('mag_calibration_time not read within 5 s, using ' + magCalibrationTime + ' s until it arrives');
+                finish();
+            }, 5000);
+            mspHelper.getSetting('mag_calibration_time').then((setting) => {
+                // A late answer still applies to calibrations started after it arrives.
+                if (setting?.value > 0) {
+                    magCalibrationTime = setting.value;
+                }
+                finish();
+            }, () => finish());
         }
     ]);
     loadChainer.setExitPoint(loadHtml);
