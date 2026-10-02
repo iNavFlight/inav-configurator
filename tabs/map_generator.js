@@ -2105,7 +2105,7 @@ TABS.map_generator.initialize = function (callback) {
                     $('<span>').text(COPERNICUS_NOTICE_2).html() + '.</div>');
                 $('#mapgen_hint_terrain').text('Hint: One .TER file per 1°×1° grid square (~111 km). Data: Copernicus GLO-30 at 30m resolution. Ocean depths are clamped to 0m.');
             } else {
-                $('#mapgen_terrain_source_note').html('Coverage 60°N to 56°S.');
+                $('#mapgen_terrain_source_note').html('Global coverage — NASA SRTM between 60°N and 56°S, ArcticDEM and other sources beyond.');
                 $('#mapgen_hint_terrain').text('Hint: One .TER file per 1°×1° grid square (~111 km). Data: NASA SRTM1 at 30m resolution. Ocean depths are clamped to 0m.');
             }
         }
@@ -2120,7 +2120,7 @@ TABS.map_generator.initialize = function (callback) {
             $('#mapgen_sync_info').html(
                 '<div style="color:#aaa; font-size:13px; line-height:1.6; margin:8px 0;">' +
                 '<b style="color:#ff9800;">Copernicus GLO-30 is unavailable</b> (server unreachable or throttling).<br><br>' +
-                'You can switch this generation to the <b>NASA SRTM1</b> fallback source (coverage 60°N to 56°S), ' +
+                'You can switch this generation to the <b>NASA SRTM1</b> fallback source (global coverage), ' +
                 'or close and try Copernicus again later.</div>');
             terrainFallbackPending = true;
             $('#mapgen_modal_confirm').show().text('Switch to SRTM & Retry');
@@ -2225,12 +2225,12 @@ TABS.map_generator.initialize = function (callback) {
                 `<span class="mapgen-area">Grid Coverage: ${tiles.length} tile(s) \u00b7 ${formatArea(gridAreaSqM, unit)}</span><br>` +
                 `<span class="mapgen-tiles">Est. Size: ~${estSizeMB} MB</span><br>` +
                 `<span style="color:#888; font-size:11px;">${fileList.join(', ')}</span>`;
-            const outsideCoverage = getTerrainSource() === 'copernicus'
-                ? (bounds.getNorth() > 84 || bounds.getSouth() < -90)
-                : (bounds.getNorth() > 60 || bounds.getSouth() < -56);
-            if (outsideCoverage) {
-                const range = getTerrainSource() === 'copernicus' ? '84\u00b0N to 90\u00b0S' : '60\u00b0N to 56\u00b0S';
-                statusHtml += `<br><span style="color:#c62828; font-size:11px;">&#9888;&#65039; Selection extends beyond elevation coverage (${range}). Tiles outside this range will have no elevation data.</span>`;
+            // Copernicus publishes no tiles north of 84\u00b0N. The SRTM fallback's
+            // server is a global composite (ArcticDEM and others outside the
+            // SRTM mission's 60\u00b0N\u201356\u00b0S), so only Copernicus can run out of
+            // coverage.
+            if (getTerrainSource() === 'copernicus' && bounds.getNorth() > 84) {
+                statusHtml += `<br><span style="color:#c62828; font-size:11px;">&#9888;&#65039; Selection extends beyond Copernicus coverage (84\u00b0N). Tiles beyond will have no elevation data.</span>`;
             }
             $('#mapgen_status').html(statusHtml);
         }
