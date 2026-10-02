@@ -250,12 +250,22 @@ test('the disconnect reset drops the memoised hash so the next connection redraw
         'the GPS row should light up again on the next connection');
 });
 
+test('finishDisconnect() calls the sensor row reset', () => {
+    const finishDisconnect = sliceSource(
+        'js/serial_backend.js',
+        'function finishDisconnect()',
+        "$('#tabs .tab_landing a')");
+
+    assert.ok(finishDisconnect.includes('privateScope.sensor_status(0)'),
+        'finishDisconnect() should reset the sensor row with privateScope.sensor_status(0)');
+});
+
 test('the disconnect reset stays a no-op before FC state exists', async () => {
     installSensorRowDomStub();
     const { FC, privateScope } = await loadSensorStatusHandlers();
 
-    // FC.SENSOR_STATUS is null until the first FC.resetState(); a disconnect
-    // before any connection completed must not throw.
+    // FC.SENSOR_STATUS stays null until the first port open runs FC.resetState();
+    // a disconnect click while that first port is still opening must not throw.
     FC.SENSOR_STATUS = null;
 
     privateScope.sensor_status(0);

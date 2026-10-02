@@ -640,11 +640,7 @@ var SerialBackend = (function () {
             hw_status.flowHwStatus;
     }
 
-    /**
-     * Legacy sensor handler used in INAV < 1.5 versions
-     * @param sensors_detected
-     * @deprecated
-     */
+    // Only caller left is the sensor row reset in finishDisconnect().
     privateScope.sensor_status = function (sensors_detected) {
 
         if (!FC.SENSOR_STATUS) {
