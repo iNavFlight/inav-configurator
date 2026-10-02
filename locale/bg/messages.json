@@ -800,14 +800,8 @@
   "featureTX_PROF_SEL": {
     "message": "Избор на профил с команда от стиковете на TX"
   },
-  "featureINFLIGHT_ACC_CAL": {
-    "message": "Калибриране на нивото по време на полет"
-  },
   "featureMOTOR_STOP": {
     "message": "Спри моторите при ниска газ"
-  },
-  "featureSERVO_TILT": {
-    "message": "Серво кардан (gimbal)"
   },
   "featureBAT_PROFILE_AUTOSWITCH": {
     "message": "Автоматичен избор на профил за батерията"
@@ -833,12 +827,6 @@
   "featureGPSTip": {
     "message": "Първо конфигурирайте сценария на порта."
   },
-  "featureFAILSAFE": {
-    "message": "Приложи failsafe настройките при загуба на RX сигнал"
-  },
-  "featureSONAR": {
-    "message": "Сонар"
-  },
   "featureTELEMETRY": {
     "message": "Телеметричен изход"
   },
@@ -856,12 +844,6 @@
   },
   "featureDASHBOARD": {
     "message": "OLED екранен дисплей"
-  },
-  "featureONESHOT125": {
-    "message": "ONESHOT ESC поддръжка"
-  },
-  "featureONESHOT125Tip": {
-    "message": "Преди активиране, изключете полетната батерия и свалете перките."
   },
   "featurePWM_OUTPUT_ENABLE": {
     "message": "Активиране на изходите за мотори и сервосистеми"
@@ -881,18 +863,6 @@
   "onboardLoggingBlackboxRate": {
     "message": "Част от итерациите на полетния цикъл, които да се записват (честота на запис)"
   },
-  "featureCHANNEL_FORWARDING": {
-    "message": "Препращане на спомагателни канали към изходите за серво"
-  },
-  "featureSOFTSPI": {
-    "message": "CPU базиран SPI"
-  },
-  "featurePWM_SERVO_DRIVER": {
-    "message": "Външен PWM драйвер за серво"
-  },
-  "featurePWM_SERVO_DRIVERTip": {
-    "message": "Използвайте външен PCA9685 PWM драйвер, за да свържете до 16 сервосистеми към полетния контролер. За активиране на тази функция PCA9685 трябва да е свързан."
-  },
   "featureRSSI_ADCTip": {
     "message": "RSSI е мярка за силата на сигнала и е много удобна, за да знаете кога самолетът ви излиза извън обхват или страда от радиосмущения."
   },
@@ -910,12 +880,6 @@
   },
   "featureFW_AUTOTRIMTip": {
     "message": "При летене в стабилизиран режим, непрекъснато коригира средните позиции на серво, така че самолетът да продължава да лети право при превключване към ръчен режим. Изисква GPS."
-  },
-  "featureDYNAMIC_FILTERS": {
-    "message": "Динамични жиро филтри"
-  },
-  "featureDYNAMIC_FILTERSTip": {
-    "message": "Използва автоматичен FFT анализ на жирото, за да настрои notch филтри за затихване на шума от жирото. Трябва да е включено през цялото време!"
   },
   "configurationFeatureEnabled": {
     "message": "Активирано"

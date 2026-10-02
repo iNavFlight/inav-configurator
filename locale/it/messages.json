@@ -786,14 +786,8 @@
     "featureTX_PROF_SEL": {
         "message": "Selezione profilo tramite comando stick TX"
     },
-    "featureINFLIGHT_ACC_CAL": {
-        "message": "Calibrazione livello in volo"
-    },
     "featureMOTOR_STOP": {
         "message": "Ferma i motori a throttle basso"
-    },
-    "featureSERVO_TILT": {
-        "message": "Gimbal servo"
     },
     "featureBAT_PROFILE_AUTOSWITCH": {
         "message": "Selezione automatica profilo batteria"
@@ -819,12 +813,6 @@
     "featureGPSTip": {
         "message": "Configura prima lo scenario porte"
     },
-    "featureFAILSAFE": {
-        "message": "Applica impostazioni failsafe alla perdita segnale RX"
-    },
-    "featureSONAR": {
-        "message": "Sonar"
-    },
     "featureTELEMETRY": {
         "message": "Uscita telemetria"
     },
@@ -842,12 +830,6 @@
     },
     "featureDASHBOARD": {
         "message": "Display OLED"
-    },
-    "featureONESHOT125": {
-        "message": "Supporto ESC ONESHOT"
-    },
-    "featureONESHOT125Tip": {
-        "message": "Scollega la batteria di volo e rimuovi le eliche prima di abilitare."
     },
     "featurePWM_OUTPUT_ENABLE": {
         "message": "Abilita uscita motori e servo"
@@ -867,18 +849,6 @@
     "onboardLoggingBlackboxRate": {
         "message": "Frazione di iterazioni del loop di volo da registrare (rate logging)"
     },
-    "featureCHANNEL_FORWARDING": {
-        "message": "Instrada canali aux verso uscite servo"
-    },
-    "featureSOFTSPI": {
-        "message": "SPI basato su CPU"
-    },
-    "featurePWM_SERVO_DRIVER": {
-        "message": "Driver servo PWM esterno"
-    },
-    "featurePWM_SERVO_DRIVERTip": {
-        "message": "Usa il driver PWM esterno PCA9685 per collegare fino a 16 servo al flight controller. Il PCA9685 deve essere collegato per abilitare questa funzione."
-    },
     "featureRSSI_ADCTip": {
         "message": "RSSI è una misura della potenza del segnale ed è molto utile per sapere quando il velivolo sta uscendo dalla portata o subisce interferenze RF."
     },
@@ -896,12 +866,6 @@
     },
     "featureFW_AUTOTRIMTip": {
         "message": "Durante il volo in modalità stabilizzata, regola continuamente i punti medi dei servo per mantenere l'aereo in volo rettilineo al passaggio in manuale. Richiede GPS."
-    },
-    "featureDYNAMIC_FILTERS": {
-        "message": "Filtri gyro dinamici"
-    },
-    "featureDYNAMIC_FILTERSTip": {
-        "message": "Usa l'analisi FFT automatica del gyro per impostare filtri notch che attenuano il rumore del gyro. Dovrebbe restare sempre abilitato!"
     },
     "configurationFeatureEnabled": {
         "message": "Abilitato"
