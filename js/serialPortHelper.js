@@ -375,30 +375,33 @@ const serialPortHelper = (function () {
         return privateScope.bauds[functionName];
     };
 
-    /**
-     * Same as getBauds(), with a rate the flight controller reports appended
-     * when this group does not offer it (set over the CLI, or added by a newer
-     * firmware). Without it the drop-down has no matching option, ends up with
-     * nothing selected, and reads back as null on save - overwriting a rate the
-     * user never touched.
-     *
-     * @param {string} functionName
-     * @param {string} baudrate rate reported by the flight controller
-     * @returns {array} rates to offer, the reported one last if it is extra
-     */
-    publicScope.getBaudsIncluding = function (functionName, baudrate) {
-        let bauds = privateScope.bauds[functionName] || [];
+    // A drop-down without the reported rate reads back as null and the save overwrites the rate.
+    privateScope.getBaudsIncluding = function (functionName, baudrate) {
+        const bauds = privateScope.bauds[functionName] || [];
 
         if (baudrate === undefined || baudrate === null || baudrate === '') {
             return bauds;
         }
 
-        let reported = String(baudrate);
+        const reported = String(baudrate);
         if (bauds.includes(reported)) {
             return bauds;
         }
 
         return bauds.concat([reported]);
+    };
+
+    publicScope.fillBaudSelect = function ($select, functionName, baudrate) {
+        const offered = privateScope.bauds[functionName] || [];
+
+        for (const baud of privateScope.getBaudsIncluding(functionName, baudrate)) {
+            const label = offered.includes(baud) ? baud : i18n.getMessage('portsBaudrateFromFC', [baud]);
+            $select.append('<option value="' + baud + '">' + label + '</option>');
+        }
+
+        if (baudrate !== undefined && baudrate !== null && baudrate !== '') {
+            $select.val(baudrate);
+        }
     };
 
     publicScope.getPortByIdentifier = function (identifier) {

@@ -1,47 +1,10 @@
 #!/usr/bin/env node
 /**
- * Regression tests for iNavFlight/inav#10615: a baud rate set over the CLI is
- * silently reset when anything else is changed in the Ports tab.
- *
- * Two things combined to lose the rate:
- *
- *   1. MSPHelper's BAUD_RATES_post1_6_3 table stopped at 921600, while the
- *      firmware's baudRate_e / baudRates[] (src/main/io/serial.c) runs to
- *      index 16 (2470000). The index is what MSP2_COMMON_SERIAL_CONFIG carries
- *      on the wire, so an FC reporting BAUD_2000000 (index 15) decoded to
- *      `undefined` - the Ports tab never even learned what the rate was.
- *
- *   2. Each column's drop-down only offers a subset of the rates the firmware
- *      supports (serialPortHelper's `bauds` groups: MSP stops at 230400,
- *      PERIPHERAL at 250000, and so on). The tab set the reported rate with
- *      jQuery's `.val()`, and when no option carries that value jQuery's
- *      select valHook forces `selectedIndex = -1`. Reading it back on save
- *      then yields `null`, `BAUD_RATES.indexOf(null)` yields -1, and
- *      send_message() stores that into a Uint8Array as 255 - so saving any
- *      unrelated change in the tab overwrote the rate on that UART.
- *
- * Fix under test:
- *   - the wire table now lists every rate the firmware knows, so the reported
- *     rate decodes;
- *   - serialPortHelper.getBaudsIncluding() appends a reported rate the group
- *     does not offer, and tabs/ports.js builds each row's drop-down from it,
- *     so the rate has a matching option, stays selected and is written back
- *     unchanged.
- *
- * These tests execute the REAL js/msp/MSPHelper.js (its MSP2_CF_SERIAL_CONFIG
- * parse and its MSP2_SET_CF_SERIAL_CONFIG crunch) and the REAL
- * js/serialPortHelper.js. As in tests/msp-parse-failure-recovery.test.mjs and
- * tests/fc-generate-aux-config.test.mjs, plain Node's ESM resolver refuses
- * this codebase's Vite-style extensionless relative imports, so both sources
- * are read fresh off disk and only their *import statements* are rewritten -
- * FC becomes controllable, the modules the executed paths never touch become
- * inert, and BitHelper/serialPortHelper stay wired to the real files. No
- * statement, expression or ordering in the code under test is changed.
- *
- * The one thing not executed for real is the DOM: this repo has no jsdom (see
- * tests/magnetometer-slider.test.mjs), so `SelectElement` below models the
- * handful of <select> and jQuery `val()` behaviours the bug turns on, quoting
- * jquery.js for each of them.
+ * iNavFlight/inav#10615: saving the Ports or GPS tab overwrote a baud rate its
+ * drop-down does not offer (an unmatched select reads back as null, written as
+ * index 255, which the firmware clamps to BAUD_MAX). Runs the real MSPHelper
+ * parse/crunch and the real serialPortHelper with only their imports rewritten;
+ * the <select> is modelled because the repo has no jsdom.
  */
 
 import { test } from 'node:test';
@@ -106,8 +69,11 @@ const fcStubUrl = stubModule('fc-stub.mjs',
     "const FC = globalThis['" + FC_STATE_ID + "'];\nexport default FC;\n");
 
 const inertDefaultUrl = stubModule('inert-default.mjs', 'export default {};\n');
+// Resolves keys from the real English locale, with Chrome-style $1 substitution.
 const i18nStubUrl = stubModule('i18n-stub.mjs',
-    'const i18n = { getMessage(key) { return key; } };\nexport default i18n;\n');
+    'const messages = ' + readFileSync(join(repoRoot, 'locale/en/messages.json'), 'utf8') + ';\n' +
+    'const i18n = { getMessage(key, subs = []) { const m = messages[key]; return m ? m.message.replace(/[$]([1-9])/g, (s, n) => subs[n - 1]) : key; } };\n' +
+    'export default i18n;\n');
 const guiStubUrl = stubModule('gui-stub.mjs',
     'const GUI = { log() {} };\nexport default GUI;\n');
 const inertFwApproachUrl = stubModule('fw-approach-stub.mjs', 'export const FwApproach = class {};\n');
@@ -116,9 +82,7 @@ const inertGeozoneUrl = stubModule('geozone-stub.mjs',
 const inertDronecanParseUrl = stubModule('dronecan-parse-stub.mjs',
     'export const parseDronecanAsyncRequestResponse = () => null;\n');
 
-// The real serialPortHelper: getBauds/getBaudsIncluding are what the fix lives
-// in, and maskToFunctions/functionsToMask are exercised by the parse/crunch
-// round trip below. Only its three imports are redirected.
+// The real serialPortHelper: the fix lives in fillBaudSelect(), and the parse/crunch round trip uses its function masks.
 const realSerialPortHelperUrl = rewriteImports('js/serialPortHelper.js', [
     ["import FC from './fc';", "import FC from '" + fcStubUrl + "';"],
     ["import BitHelper from './bitHelper';", "import BitHelper from '" + realBitHelperUrl + "';"],
@@ -291,24 +255,21 @@ class SelectElement {
     }
 }
 
-/**
- * How tabs/ports.js fills one baud rate drop-down after the fix (its
- * fillBaudrates()): options from the real getBaudsIncluding(), the extra entry
- * labelled as coming from the FC, then the reported rate selected.
- */
+/** Fills a modelled select through the real serialPortHelper.fillBaudSelect(), as the Ports and GPS tabs do. */
 function renderBaudSelect(group, reportedBaud) {
-    const offered = serialPortHelper.getBauds(group);
-    const bauds = serialPortHelper.getBaudsIncluding(group, reportedBaud);
     const select = new SelectElement();
+    const $select = {
+        append(html) {
+            const option = /^<option value="([^"]*)">([^<]*)<[/]option>$/.exec(html);
+            assert.ok(option, 'unexpected option markup: ' + html);
+            select.append(option[1], option[2]);
+        },
+        val(value) {
+            select.setValue(value);
+        },
+    };
 
-    for (const baud of bauds) {
-        const label = (offered.indexOf(baud) === -1) ? baud + ' (from FC)' : baud;
-        select.append(baud, label);
-    }
-
-    if (reportedBaud !== undefined && reportedBaud !== null && reportedBaud !== '') {
-        select.setValue(reportedBaud);
-    }
+    serialPortHelper.fillBaudSelect($select, group, reportedBaud);
 
     return select;
 }
@@ -488,7 +449,7 @@ test('the extra entry is per drop-down and never leaks into the offered list', (
     assert.deepEqual(
         serialPortHelper.getBauds('PERIPHERAL'),
         offeredBefore,
-        'getBaudsIncluding() must not mutate the shared group list - the next port would inherit the entry'
+        'fillBaudSelect() must not mutate the shared group list - the next port would inherit the entry'
     );
     assert.deepEqual(
         renderBaudSelect('PERIPHERAL', '115200').values(),
@@ -497,34 +458,20 @@ test('the extra entry is per drop-down and never leaks into the offered list', (
     );
 });
 
-test('tabs/ports.js really fills its baud drop-downs through getBaudsIncluding()', () => {
-    // renderBaudSelect() above mirrors fillBaudrates() in tabs/ports.js, which
-    // cannot be executed here (jQuery, no jsdom). This anchors the mirror: if
-    // the tab stopped going through the helper, every assertion above would
-    // still pass while the tab itself had regressed.
+test('the Ports and GPS tabs fill their baud drop-downs through fillBaudSelect()', () => {
+    // The tabs themselves need jQuery and a DOM, so anchor that they still go through the tested helper.
     const portsTab = readFileSync(join(repoRoot, 'tabs/ports.js'), 'utf8');
-
-    assert.ok(
-        portsTab.includes('serialPortHelper.getBaudsIncluding('),
-        'tabs/ports.js must build its baud drop-downs from getBaudsIncluding()'
-    );
-    assert.ok(
-        portsTab.includes("i18n.getMessage('portsBaudrateFromFC'"),
-        'the extra entry must be labelled as coming from the flight controller'
-    );
+    const gpsTab = readFileSync(join(repoRoot, 'tabs/gps.js'), 'utf8');
 
     for (const select of ['msp_baudrate', 'telemetry_baudrate', 'sensors_baudrate', 'peripherals_baudrate']) {
         assert.ok(
-            portsTab.includes("fillBaudrates(port_configuration_e.find('select." + select + "')"),
-            select + ' must be filled through fillBaudrates(), not set straight with .val()'
+            portsTab.includes("serialPortHelper.fillBaudSelect(port_configuration_e.find('select." + select + "')"),
+            select + ' must be filled through fillBaudSelect(), not set straight with .val()'
         );
     }
-
-    const messages = JSON.parse(readFileSync(join(repoRoot, 'locale/en/messages.json'), 'utf8'));
-    assert.ok(messages.portsBaudrateFromFC, 'locale/en/messages.json must carry the portsBaudrateFromFC label');
     assert.ok(
-        messages.portsBaudrateFromFC.message.includes('$1'),
-        'the label has to interpolate the rate itself'
+        gpsTab.includes("serialPortHelper.fillBaudSelect($baud, 'SENSOR', gpsPortConfig?.sensors_baudrate)"),
+        'the GPS tab baud drop-down must be filled through fillBaudSelect() with the reported rate'
     );
 });
 

@@ -87,10 +87,10 @@ portsTab.initialize = function (callback) {
             //Append only port different than USB VCP
             if (serialPort.identifier != 20) {
 
-                fillBaudrates(port_configuration_e.find('select.msp_baudrate'), 'MSP', serialPort.msp_baudrate);
-                fillBaudrates(port_configuration_e.find('select.telemetry_baudrate'), 'TELEMETRY', serialPort.telemetry_baudrate);
-                fillBaudrates(port_configuration_e.find('select.sensors_baudrate'), 'SENSOR', serialPort.sensors_baudrate);
-                fillBaudrates(port_configuration_e.find('select.peripherals_baudrate'), 'PERIPHERAL', serialPort.peripherals_baudrate);
+                serialPortHelper.fillBaudSelect(port_configuration_e.find('select.msp_baudrate'), 'MSP', serialPort.msp_baudrate);
+                serialPortHelper.fillBaudSelect(port_configuration_e.find('select.telemetry_baudrate'), 'TELEMETRY', serialPort.telemetry_baudrate);
+                serialPortHelper.fillBaudSelect(port_configuration_e.find('select.sensors_baudrate'), 'SENSOR', serialPort.sensors_baudrate);
+                serialPortHelper.fillBaudSelect(port_configuration_e.find('select.peripherals_baudrate'), 'PERIPHERAL', serialPort.peripherals_baudrate);
 
                 port_configuration_e.find('.identifier').text(serialPortHelper.getPortName(serialPort.identifier));
                 if (serialPort.identifier >= 30) {
@@ -334,28 +334,6 @@ portsTab.initialize = function (callback) {
     }
 };
 
-/**
- * Fills one baud rate drop-down and selects the rate the flight controller
- * reported. A rate this group does not offer is listed as an extra entry,
- * marked as coming from the flight controller, so it stays visible and is
- * written back unchanged on save.
- */
-function fillBaudrates($select, group, baudRate) {
-    let offered = serialPortHelper.getBauds(group);
-    let bauds = serialPortHelper.getBaudsIncluding(group, baudRate);
-
-    for (const baud of bauds) {
-        let label = offered.includes(baud)
-            ? baud
-            : (i18n.getMessage('portsBaudrateFromFC', [baud]) || baud);
-        $select.append('<option value="' + baud + '">' + label + '</option>');
-    }
-
-    if (baudRate !== undefined && baudRate !== null && baudRate !== '') {
-        $select.val(baudRate);
-    }
-}
-
 function updateDefaultBaud(baudSelect, column) {
     let section = $("#" + baudSelect);
     let portName = section.find('.function-' + column).val();
@@ -367,15 +345,8 @@ function updateDefaultBaud(baudSelect, column) {
         baudRate = rule.defaultBaud;
     }
 
-    const $baudSelect = section.find("." + column + "_baudrate");
-    const currentBaud = $baudSelect.val();
-    const group = { telemetry: 'TELEMETRY', sensors: 'SENSOR', peripherals: 'PERIPHERAL' }[column];
-    const offeredBauds = serialPortHelper.getBauds(group);
-    const hasReportedRate = currentBaud !== null && !offeredBauds.includes(String(currentBaud));
-    // Preserve a reported rate unless the newly selected protocol mandates its baud.
-    if (!hasReportedRate || rule?.lockedBaud) {
-        $baudSelect.children('[value=' + baudRate + ']').prop('selected', true);
-    }
+    section.find("." + column + "_baudrate").children('[value=' + baudRate + ']').prop('selected', true);
+
     applyBaudLock(baudSelect, column);
 }
 

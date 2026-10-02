@@ -51,11 +51,7 @@ var mspHelper = (function () {
         self.sensorStatusEx = cb;
     }
 
-    // Index into this array is the baudRate_e value carried on the wire by
-    // MSP2_COMMON_SERIAL_CONFIG, so it has to list every rate the firmware
-    // knows (baudRates[] in src/main/io/serial.c). A rate missing here decodes
-    // to undefined and is written back as index -1. This is not the list of
-    // rates the Ports tab offers - that one lives in serialPortHelper.
+    // Index = firmware baudRate_e (baudRates[] in src/main/io/serial.c); a missing rate is written back as 255.
     self.BAUD_RATES_post1_6_3 = [
         'AUTO',
         '1200',
