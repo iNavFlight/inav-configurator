@@ -774,6 +774,39 @@ function copernicusToInt16(v) {
     return r;
 }
 
+// East edge (grid column 3600) is the west column of the east neighbour.
+async function copernicusFillEastEdge(degLat, degLon, rowFrom, rowMainTo, imgCache, view) {
+    const east = await openCopernicusImage(degLat, degLon + 1, imgCache, false, null);
+    if (!east) return;
+    const [col] = await east.readRasters({ window: [0, rowFrom, 1, rowMainTo + 1] });
+    for (let r = rowFrom; r <= rowMainTo; r++) {
+        view.setInt16((r * SRTM_GRID + COPERNICUS_GRID) * 2, copernicusToInt16(col[r - rowFrom]), false);
+    }
+}
+
+// South edge (grid row 3600) is the north row of the south neighbour, which
+// can sit in a different width band (e.g. N49 under an N50 tile), so its
+// columns map through its OWN width. Also fills the SE corner when asked.
+async function copernicusFillSouthEdge(degLat, degLon, colFrom, colMainTo, withCorner, imgCache, view) {
+    const south = await openCopernicusImage(degLat - 1, degLon, imgCache, false, null);
+    if (south) {
+        const plan = copernicusColPlan(colFrom, colMainTo, south.getWidth());
+        const [row] = await south.readRasters({ window: [plan.srcFrom, 0, plan.srcTo + 1, 1] });
+        let off = (COPERNICUS_GRID * SRTM_GRID + colFrom) * 2;
+        for (let k = 0; k < plan.left.length; k++) {
+            view.setInt16(off, copernicusToInt16(copernicusSample(row, 0, plan, k)), false);
+            off += 2;
+        }
+    }
+    if (withCorner) {
+        const southEast = await openCopernicusImage(degLat - 1, degLon + 1, imgCache, false, null);
+        if (southEast) {
+            const [px] = await southEast.readRasters({ window: [0, 0, 1, 1] });
+            view.setInt16((COPERNICUS_GRID * SRTM_GRID + COPERNICUS_GRID) * 2, copernicusToInt16(px[0]), false);
+        }
+    }
+}
+
 // Fills rows [rowFrom..rowTo] x cols [colFrom..colTo] of a 3601x3601
 // big-endian int16 grid for the 1° cell (degLat, degLon). Returns null if the
 // cell's own Copernicus tile does not exist.
@@ -817,38 +850,11 @@ async function buildCopernicusGrid(degLat, degLon, rowFrom, rowTo, colFrom, colT
         await new Promise(r => setTimeout(r, 0));
     }
 
-    // East edge (grid column 3600) is the west column of the east neighbour.
     if (colTo >= COPERNICUS_GRID) {
-        const east = await openCopernicusImage(degLat, degLon + 1, imgCache, false, null);
-        if (east) {
-            const [col] = await east.readRasters({ window: [0, rowFrom, 1, rowMainTo + 1] });
-            for (let r = rowFrom; r <= rowMainTo; r++) {
-                view.setInt16((r * SRTM_GRID + COPERNICUS_GRID) * 2, copernicusToInt16(col[r - rowFrom]), false);
-            }
-        }
+        await copernicusFillEastEdge(degLat, degLon, rowFrom, rowMainTo, imgCache, view);
     }
-
-    // South edge (grid row 3600) is the north row of the south neighbour,
-    // which can sit in a different width band (e.g. N49 under an N50 tile),
-    // so its columns map through its OWN width.
     if (rowTo >= COPERNICUS_GRID) {
-        const south = await openCopernicusImage(degLat - 1, degLon, imgCache, false, null);
-        if (south) {
-            const southPlan = copernicusColPlan(colFrom, colMainTo, south.getWidth());
-            const [row] = await south.readRasters({ window: [southPlan.srcFrom, 0, southPlan.srcTo + 1, 1] });
-            let off = (COPERNICUS_GRID * SRTM_GRID + colFrom) * 2;
-            for (let k = 0; k < southPlan.left.length; k++) {
-                view.setInt16(off, copernicusToInt16(copernicusSample(row, 0, southPlan, k)), false);
-                off += 2;
-            }
-        }
-        if (colTo >= COPERNICUS_GRID) {
-            const southEast = await openCopernicusImage(degLat - 1, degLon + 1, imgCache, false, null);
-            if (southEast) {
-                const [px] = await southEast.readRasters({ window: [0, 0, 1, 1] });
-                view.setInt16((COPERNICUS_GRID * SRTM_GRID + COPERNICUS_GRID) * 2, copernicusToInt16(px[0]), false);
-            }
-        }
+        await copernicusFillSouthEdge(degLat, degLon, colFrom, colMainTo, colTo >= COPERNICUS_GRID, imgCache, view);
     }
 
     return view;
@@ -888,7 +894,7 @@ async function ensureCopernicusCellData(degLat, degLon, runCache, imgCache, stat
         if (!grid) return null;
         runCache[primaryKey] = grid;
         cellCache[primaryKey] = grid;
-        hgtDb.put(COPERNICUS_CACHE_PREFIX + primaryKey, grid.buffer);
+        void hgtDb.put(COPERNICUS_CACHE_PREFIX + primaryKey, grid.buffer);   // fire-and-forget by design
     }
 
     const rowStart = COPERNICUS_GRID - copernicusNorthMarginRows();
