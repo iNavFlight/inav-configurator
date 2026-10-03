@@ -677,11 +677,17 @@ function copernicusColPlan(colFrom, colTo, width) {
 }
 
 // Interpolates one value from a raster row slice using a copernicusColPlan
-// entry. The weight-0 shortcut keeps width-3600 output bit-exact.
+// entry. The weight-0 shortcut keeps width-3600 output bit-exact. A
+// non-finite (void) sample must not bleed into its valid neighbour through
+// the interpolation, so it stays local: the nearer pixel wins, matching how
+// copernicusToInt16() treats a void on the direct-copy path.
 function copernicusSample(data, base, plan, k) {
     const a = data[base + plan.left[k]];
     const w = plan.weight[k];
-    return w === 0 ? a : a + (data[base + plan.right[k]] - a) * w;
+    if (w === 0) return a;
+    const b = data[base + plan.right[k]];
+    if (!Number.isFinite(a) || !Number.isFinite(b)) return w < 0.5 ? a : b;
+    return a + (b - a) * w;
 }
 
 function copernicusTileStem(lat, lon) {
@@ -997,6 +1003,27 @@ const hgtDb = {
             });
         } catch (_) { /* ignore */ }
     },
+
+    // One-time sweep: grids stored under the pre-width-fix 'cop_' prefix are
+    // wrong at |lat| >= 50° and unreachable since the bump to 'cop2_' — drop
+    // them so they stop taking up space. ('cop2_' keys do not match.)
+    async dropOldCopernicusGrids() {
+        try {
+            const db = await this.open();
+            return new Promise(resolve => {
+                const tx = db.transaction('hgt', 'readwrite');
+                const store = tx.objectStore('hgt');
+                const req = store.getAllKeys();
+                req.onsuccess = () => {
+                    for (const key of req.result) {
+                        if (typeof key === 'string' && key.startsWith('cop_')) store.delete(key);
+                    }
+                };
+                tx.oncomplete = () => resolve();
+                tx.onerror = () => resolve();
+            });
+        } catch (_) { /* ignore */ }
+    },
 };
 
 // ─── Tab lifecycle ──────────────────────────────────────────────────────
@@ -1006,6 +1033,8 @@ TABS.map_generator.initialize = function (callback) {
     if (GUI.active_tab !== TABS.map_generator) {
         GUI.active_tab = TABS.map_generator;
     }
+
+    void hgtDb.dropOldCopernicusGrids();
 
     loadHtml();
 
