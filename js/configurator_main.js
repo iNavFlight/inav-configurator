@@ -116,6 +116,7 @@ $(function() {
 
         // Tabs
         var ui_tabs = $('#tabs > ul');
+        let tabClickAfterPrompt = null;
         $('a', ui_tabs).on('click', function() {
 
             if ($(this).parent().hasClass("tab_help")) {
@@ -155,15 +156,15 @@ $(function() {
                 // Check for unsaved changes in current tab before switching
                 if (GUI.active_tab === javascriptProgrammingTab &&
                     javascriptProgrammingTab.isDirty) {
-                    console.log('[Tab Switch] Checking for unsaved changes in JavaScript Programming tab');
-                    const confirmMsg = i18n.getMessage('unsavedChanges') ||
-                        'You have unsaved changes. Leave anyway?';
-
-                    if (!confirm(confirmMsg)) {
-                        console.log('[Tab Switch] User cancelled tab switch');
-                        return; // Cancel tab switch
-                    }
-                    console.log('[Tab Switch] User confirmed tab switch');
+                    // Replay only the last tab clicked while the dialog was open; the click re-runs every guard above
+                    tabClickAfterPrompt = self;
+                    javascriptProgrammingTab.confirmDiscard().then(leave => {
+                        if (leave && self === tabClickAfterPrompt) {
+                            tabClickAfterPrompt = null;
+                            $(self).trigger('click');
+                        }
+                    });
+                    return;
                 }
 
                 GUI.tab_switch_in_progress = true;

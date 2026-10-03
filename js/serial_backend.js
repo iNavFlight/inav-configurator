@@ -212,17 +212,13 @@ var SerialBackend = (function () {
                         // Check for unsaved changes in JavaScript Programming tab
                         if (GUI.active_tab === javascriptProgrammingTab &&
                             javascriptProgrammingTab.isDirty) {
-                            console.log('[Disconnect] Checking for unsaved changes in JavaScript Programming tab');
-                            const confirmMsg = i18n.getMessage('unsavedChanges') ||
-                                'You have unsaved changes. Leave anyway?';
-
-                            if (!confirm(confirmMsg)) {
-                                console.log('[Disconnect] User cancelled disconnect due to unsaved changes');
-                                return; // Cancel disconnect
-                            }
-                            console.log('[Disconnect] User confirmed, proceeding with disconnect');
-                            // Clear isDirty flag so tab switch during disconnect doesn't show warning again
-                            javascriptProgrammingTab.isDirty = false;
+                            // confirmDiscard clears isDirty, so the landing-tab switch after disconnect does not prompt again
+                            javascriptProgrammingTab.confirmDiscard().then(leave => {
+                                if (leave && (GUI.connected_to !== false || GUI.connecting_to !== false)) {
+                                    privateScope.reConnect();
+                                }
+                            });
+                            return;
                         }
 
                         if (this.isDemoRunning) {
