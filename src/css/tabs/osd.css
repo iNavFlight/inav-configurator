@@ -464,7 +464,7 @@
 
 .tab-osd .osd-elements-head {
     flex: none;
-    padding: 0.6em 0.6em 0;
+    padding: 0.6em;
     border-bottom: 1px solid #ddd;
 }
 
@@ -486,27 +486,10 @@
     border-radius: 3px;
 }
 
-.tab-osd .osd-layout-heads,
 .tab-osd .osd-layout-checks {
     display: flex;
     gap: 0.45em;
     flex: none;
-}
-
-.tab-osd .osd-layout-heads {
-    padding: 0.5em 0.3em 0.3em;
-    color: #707070;
-    font-family: 'open_sanssemibold', Arial, serif;
-}
-
-.tab-osd .osd-layout-head {
-    width: 1.15em;
-    text-align: center;
-    cursor: pointer;
-}
-
-.tab-osd .osd-layout-head.is-active {
-    color: #37a8db;
 }
 
 .tab-osd .osd-layout-check {
