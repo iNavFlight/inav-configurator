@@ -34,6 +34,10 @@
         "message": "Русский",
         "_comment": "Don't translate!"
     },
+    "language_sr": {
+        "message": "Srpski",
+        "_comment": "Don't translate!"
+    },
     "language": {
         "message": "Language"
     },
