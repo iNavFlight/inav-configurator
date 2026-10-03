@@ -374,7 +374,8 @@
     column-gap: 1em;
 }
 
-/* No room for three columns: the settings go below the elements and the preview */
+/* No room for three columns: the settings go below the preview, in columns as wide as it, and the
+   elements run down beside both, so every edge lines up with the ones above */
 .tab-osd .osd-columns--two {
     height: auto;
     grid-template-columns: minmax(20em, 1fr) minmax(var(--osd-preview-need, 0px), 2fr);
@@ -382,9 +383,22 @@
     row-gap: 1em;
 }
 
+/* Sized by the two rows, not by its list, which scrolls inside it */
+.tab-osd .osd-columns--two .osd__elements {
+    grid-row: 1 / span 2;
+    contain: size;
+}
+
+.tab-osd .osd-columns--two .osd-preview-column {
+    grid-column: 2;
+    grid-row: 1;
+}
+
 .tab-osd .osd-columns--two .osd_settings {
-    grid-column: 1 / -1;
+    grid-column: 2;
+    grid-row: 2;
     overflow: visible;
+    padding-right: 0;
     columns: 22em;
     column-gap: 1em;
 }
