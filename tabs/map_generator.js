@@ -2140,7 +2140,7 @@ TABS.map_generator.initialize = function (callback) {
                     $('<span>').text(COPERNICUS_NOTICE_2).html() + '.</div>');
                 $('#mapgen_hint_terrain').text('Hint: One .TER file per 1°×1° grid square (~111 km). Data: Copernicus GLO-30 at 30m resolution. Ocean depths are clamped to 0m.');
             } else {
-                $('#mapgen_terrain_source_note').html('Global coverage — NASA SRTM between 60°N and 56°S, ArcticDEM and other sources beyond.');
+                $('#mapgen_terrain_source_note').html('Real SRTM between 60°N and 56°S. Beyond that the server only has coarse fill data (errors of tens to hundreds of metres) — use Copernicus there.');
                 $('#mapgen_hint_terrain').text('Hint: One .TER file per 1°×1° grid square (~111 km). Data: NASA SRTM1 at 30m resolution. Ocean depths are clamped to 0m.');
             }
         }
@@ -2155,7 +2155,7 @@ TABS.map_generator.initialize = function (callback) {
             $('#mapgen_sync_info').html(
                 '<div style="color:#aaa; font-size:13px; line-height:1.6; margin:8px 0;">' +
                 '<b style="color:#ff9800;">Copernicus GLO-30 is unavailable</b> (server unreachable or throttling).<br><br>' +
-                'You can switch this generation to the <b>NASA SRTM1</b> fallback source (global coverage), ' +
+                'You can switch this generation to the <b>NASA SRTM1</b> fallback source (real SRTM between 60°N and 56°S, coarse fill data beyond), ' +
                 'or close and try Copernicus again later.</div>');
             terrainFallbackPending = true;
             $('#mapgen_modal_confirm').show().text('Switch to SRTM & Retry');
@@ -2261,11 +2261,16 @@ TABS.map_generator.initialize = function (callback) {
                 `<span class="mapgen-tiles">Est. Size: ~${estSizeMB} MB</span><br>` +
                 `<span style="color:#888; font-size:11px;">${fileList.join(', ')}</span>`;
             // Copernicus publishes no tiles north of 84\u00b0N. The SRTM fallback's
-            // server is a global composite (ArcticDEM and others outside the
-            // SRTM mission's 60\u00b0N\u201356\u00b0S), so only Copernicus can run out of
-            // coverage.
-            if (getTerrainSource() === 'copernicus' && bounds.getNorth() > 84) {
-                statusHtml += `<br><span style="color:#c62828; font-size:11px;">&#9888;&#65039; Selection extends beyond Copernicus coverage (84\u00b0N). Tiles beyond will have no elevation data.</span>`;
+            // server answers everywhere, but outside the SRTM mission's
+            // 60\u00b0N\u201356\u00b0S band it only holds coarse 2016 fill data (GMTED /
+            // ETOPO1 \u2014 measured errors reach hundreds of metres), so it gets
+            // a warning of its own there.
+            if (getTerrainSource() === 'copernicus') {
+                if (bounds.getNorth() > 84) {
+                    statusHtml += `<br><span style="color:#c62828; font-size:11px;">&#9888;&#65039; Selection extends beyond Copernicus coverage (84\u00b0N). Tiles beyond will have no elevation data.</span>`;
+                }
+            } else if (bounds.getNorth() > 60 || bounds.getSouth() < -56) {
+                statusHtml += `<br><span style="color:#c62828; font-size:11px;">&#9888;&#65039; Selection extends beyond real SRTM coverage (60\u00b0N\u201356\u00b0S). This source only has coarse fill data there \u2014 errors reach hundreds of metres. Use Copernicus instead.</span>`;
             }
             $('#mapgen_status').html(statusHtml);
         }
