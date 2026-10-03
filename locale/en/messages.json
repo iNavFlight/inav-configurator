@@ -4496,10 +4496,6 @@
     "osdLayoutTabAlternative": {
         "message": "ALT $1"
     },
-    "osdLayoutHeadDefault": {
-        "message": "D",
-        "description": "Heads the column of checkboxes for the default layout, beside the columns 1, 2 and 3"
-    },
     "osdElementSearch": {
         "message": "Search elements"
     },

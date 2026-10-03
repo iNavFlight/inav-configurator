@@ -3462,7 +3462,7 @@ OSD.GUI.updateAll = function() {
     });
     if (OSD.data.layout_count > 1) {
         OSD.GUI.buildLayoutSwitch();
-        $('.osd-layout-tabs, .osd-layout-heads, .osd-layout-actions, .osd-preview-options').show();
+        $('.osd-layout-tabs, .osd-layout-actions, .osd-preview-options').show();
 
         copy.on('click', function() {
             if(OSD.data.selected_layout >= 0 && OSD.data.selected_layout < OSD.data.layout_count){
@@ -3547,7 +3547,7 @@ OSD.GUI.updateAll = function() {
                 store.set('osdMoveInAllLayouts', this.checked);
             });
     } else {
-        $('.osd-layout-tabs, .osd-layout-heads, .osd-layout-actions, .osd-preview-options').hide();
+        $('.osd-layout-tabs, .osd-layout-actions, .osd-preview-options').hide();
     }
 
     $('.osd_search').off('input').on('input', function(event) {
@@ -3678,7 +3678,6 @@ OSD.GUI.layoutsMovedTogether = function () {
 
 OSD.GUI.buildLayoutSwitch = function () {
     var $tabs = $('.osd-layout-tabs').empty();
-    var $heads = $('.osd-layout-heads').empty();
     for (let layout = 0; layout < OSD.data.layout_count; layout++) {
         $('<button type="button" class="osd-layout-tab" role="tab"/>')
             .attr('data-layout', layout)
@@ -3688,26 +3687,15 @@ OSD.GUI.buildLayoutSwitch = function () {
                 OSD.GUI.showLayout(layout);
             })
             .appendTo($tabs);
-        $('<span class="osd-layout-head"/>')
-            .attr('data-layout', layout)
-            .attr('title', OSD.GUI.layoutName(layout))
-            .text(layout > 0 ? layout : i18n.getMessage('osdLayoutHeadDefault'))
-            .on('click', function () {
-                OSD.GUI.showLayout(layout);
-            })
-            .appendTo($heads);
     }
     OSD.GUI.markShownLayout();
     OSD.GUI.updateLayoutReach();
 };
 
 OSD.GUI.markShownLayout = function () {
-    $('.osd-layout-tab, .osd-layout-head').each(function () {
+    $('.osd-layout-tab').each(function () {
         var shown = $(this).attr('data-layout') == OSD.data.selected_layout;
-        $(this).toggleClass('is-active', shown);
-        if ($(this).is('.osd-layout-tab')) {
-            $(this).attr('aria-selected', shown);
-        }
+        $(this).toggleClass('is-active', shown).attr('aria-selected', shown);
     });
 };
 
@@ -3814,7 +3802,7 @@ OSD.GUI.updateLayoutReach = function () {
     var reached = reach.reached;
     var picks = reach.picks;
 
-    $('.osd-layout-tab, .osd-layout-head').each(function () {
+    $('.osd-layout-tab').each(function () {
         $(this).toggleClass('is-unreached', !reached[$(this).attr('data-layout')]);
     });
 
