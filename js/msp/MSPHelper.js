@@ -51,6 +51,7 @@ var mspHelper = (function () {
         self.sensorStatusEx = cb;
     }
 
+    // Index = firmware baudRate_e (baudRates[] in src/main/io/serial.c); a missing rate is written back as 255.
     self.BAUD_RATES_post1_6_3 = [
         'AUTO',
         '1200',
@@ -64,7 +65,11 @@ var mspHelper = (function () {
         '230400',
         '250000',
         '460800',
-        '921600'
+        '921600',
+        '1000000',
+        '1500000',
+        '2000000',
+        '2470000'
     ];
 
     // Required for MSP_DEBUGMSG because console.log() doesn't allow omitting
