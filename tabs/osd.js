@@ -3732,20 +3732,40 @@ OSD.GUI.fitPreview = function () {
     var padding = Number.parseFloat(style.paddingLeft) + Number.parseFloat(style.paddingRight);
     columns[0].style.setProperty('--osd-preview-need', (width + padding + box.offsetWidth - box.clientWidth) + 'px');
     columns[0].style.setProperty('--osd-main-height', view.clientHeight + 'px');
+    // Measured on the column tracks, not the preview: after a format change it still has the old size
+    var columnsFit = function () {
+        var grid = getComputedStyle(columns[0]);
+        var tracks = grid.gridTemplateColumns.split(' ').map(Number.parseFloat);
+        var used = tracks.reduce((sum, track) => sum + track, 0) + (tracks.length - 1) * Number.parseFloat(grid.columnGap);
+        return used <= columns[0].clientWidth + 0.5;
+    };
     for (var arrangement of ['', 'osd-columns--two', 'osd-columns--stacked']) {
         columns.removeClass('osd-columns--two osd-columns--stacked').addClass(arrangement);
-        if (columns[0].scrollWidth <= columns[0].clientWidth) {
+        if (columnsFit()) {
             break;
         }
     }
     var roomWidth = stage.clientWidth - padding;
-    var roomHeight = view.clientHeight - (box.getBoundingClientRect().height - stage.getBoundingClientRect().height);
-    // Rounded down, so the scaled rows cannot add the pixel that would make the tab scroll
-    var zoom = Math.max(1, Math.floor(Math.min(roomWidth / width, roomHeight / height) * 1000) / 1000);
+    var chrome = box.getBoundingClientRect().height - stage.getBoundingClientRect().height;
+    var roomHeight = view.clientHeight - chrome;
+    // Whole screen pixels per font pixel: a fraction makes some of them one pixel wide and some two
+    var steps = Math.floor(Math.min(roomWidth / width, roomHeight / height) * window.devicePixelRatio + 1e-6);
+    var zoom = Math.max(1, steps / window.devicePixelRatio);
     $('.tab-osd .display-layout')[0].style.setProperty('--osd-preview-zoom', zoom);
-    if (roomHeight < height) {
-        columns[0].style.setProperty('--osd-main-height', Math.ceil(box.getBoundingClientRect().height) + 'px');
-    }
+    columns[0].style.setProperty('--osd-main-height', Math.max(view.clientHeight, Math.ceil(chrome + height * zoom)) + 'px');
+};
+
+// A resize can arrive before the new scaling does, and the whole pixels per font pixel depend on it
+OSD.GUI.watchPixelRatio = function () {
+    var query = window.matchMedia('(resolution: ' + window.devicePixelRatio + 'dppx)');
+    var changed = function () {
+        OSD.GUI.watchPixelRatio();
+        OSD.GUI.fitPreview();
+    };
+    query.addEventListener('change', changed, {once: true});
+    OSD.GUI.stopPixelRatioWatch = function () {
+        query.removeEventListener('change', changed);
+    };
 };
 
 let HARDWARE = {};
@@ -4002,6 +4022,7 @@ osdTab.initialize = function (callback) {
             $('.tab-osd .content_wrapper, .tab-osd .osd-preview-toolbar, .tab-osd .osd-preview-footer').each(function () {
                 OSD.GUI.previewResize.observe(this);
             });
+            OSD.GUI.watchPixelRatio();
 
             GUI.content_ready(callback);
         }))).catch(function (error) {
@@ -4856,6 +4877,7 @@ osdTab.cleanup = function (callback) {
     $('.jBox-wrapper').remove();
 
     OSD.GUI.previewResize?.disconnect();
+    OSD.GUI.stopPixelRatioWatch?.();
 
     if (callback) callback();
 };
