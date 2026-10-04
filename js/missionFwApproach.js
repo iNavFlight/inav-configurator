@@ -1,12 +1,8 @@
 'use strict';
 
-/*
- * Serialisation of the <fwapproach> elements of a mission file.
- *
- * The approach collection keeps the safehome approaches first, so the approach
- * of the mission with index n lives in slot maxSafehomeCount + n. The mission
- * file stores that mission index in "index" and the collection slot in "no".
- */
+import { FwApproach } from './fwApproach';
+
+// Mission n's approach lives in collection slot maxSafehomeCount + n; a mission file keeps n in "index" and the slot in "no".
 
 function toInteger(value, fallback = 0) {
     const number = Number.parseInt(value, 10);
@@ -18,36 +14,22 @@ function toFlag(value, trueValues) {
     return trueValues.test(String(value).trim()) ? 1 : 0;
 }
 
-export function hasFwApproachData(approach) {
-    if (!approach) return false;
-
-    return approach.getApproachAltAsl() != 0 ||
-        approach.getLandAltAsl() != 0 ||
-        approach.getApproachDirection() != 0 ||
-        approach.getLandHeading1() != 0 ||
-        approach.getLandHeading2() != 0 ||
-        approach.getIsSeaLevelRef() != 0;
+// The firmware flies no autoland approach without a landing heading (navigation.c), so such entries carry nothing.
+function hasLandingHeading(approach) {
+    return !!approach && (approach.getLandHeading1() != 0 || approach.getLandHeading2() != 0);
 }
 
-/* An approach is written whenever it carries data or whenever its mission ends
- * with a landing point. Landing altitude, approach altitude, approach direction
- * and the sea level reference are lost otherwise, because they are useful
- * without a landing heading. */
-export function buildFwApproachItems(approaches, maxSafehomeCount, maxFwApproachCount, landingMissionIndexes = [], sourceMissionIndex = null) {
-    const landingMissions = new Set(landingMissionIndexes);
+// sourceMissionIndex set: only that mission is saved, as standalone mission 0.
+export function buildFwApproachItems(approaches, maxSafehomeCount, maxFwApproachCount, sourceMissionIndex = null) {
     const items = [];
 
     for (let i = maxSafehomeCount; i < maxFwApproachCount; i++) {
         const approach = approaches[i];
         const missionIndex = i - maxSafehomeCount;
-        if (sourceMissionIndex !== null && missionIndex !== sourceMissionIndex) {
+        if (!hasLandingHeading(approach) || (sourceMissionIndex !== null && missionIndex !== sourceMissionIndex)) {
             continue;
         }
         const fileMissionIndex = sourceMissionIndex === null ? missionIndex : 0;
-
-        if (!approach || !(landingMissions.has(missionIndex) || hasFwApproachData(approach))) {
-            continue;
-        }
 
         items.push({ $: {
             'index': fileMissionIndex,
@@ -64,9 +46,8 @@ export function buildFwApproachItems(approaches, maxSafehomeCount, maxFwApproach
     return items;
 }
 
-/* Attribute names are matched loosely so that the dashless names of the first
- * mission planner approaches ("ApproachAlt", "SeaLevelRef") are read too. */
-export function parseFwApproachAttributes(attributes) {
+// mwp writes the same attributes without dashes ("approachalt", "sealevelref").
+function parseFwApproachAttributes(attributes) {
     const approach = {
         index: null,
         number: null,
@@ -103,9 +84,8 @@ export function parseFwApproachAttributes(attributes) {
     return approach;
 }
 
-/* Returns the collection slot of a parsed approach, or -1 when the element
- * addresses no usable mission slot. */
-export function resolveFwApproachSlot(approach, maxSafehomeCount, maxFwApproachCount) {
+// Returns -1 when the element addresses no mission slot, so it can never land in a safehome slot.
+function resolveFwApproachSlot(approach, maxSafehomeCount, maxFwApproachCount) {
     let slot = null;
 
     if (Number.isInteger(approach.index) && approach.index >= 0) {
@@ -116,4 +96,22 @@ export function resolveFwApproachSlot(approach, maxSafehomeCount, maxFwApproachC
     }
 
     return slot !== null && slot >= maxSafehomeCount && slot < maxFwApproachCount ? slot : -1;
+}
+
+// Returns the approach of a <fwapproach> element for its fixed collection slot, or null when it addresses none.
+export function fwApproachFromElement(attributes, maxSafehomeCount, maxFwApproachCount) {
+    const parsed = parseFwApproachAttributes(attributes);
+    const slot = resolveFwApproachSlot(parsed, maxSafehomeCount, maxFwApproachCount);
+
+    if (slot < 0) {
+        return null;
+    }
+
+    return new FwApproach(slot,
+                          parsed.approachAltAsl,
+                          parsed.landAltAsl,
+                          parsed.approachDirection,
+                          parsed.landHeading1,
+                          parsed.landHeading2,
+                          parsed.isSeaLevelRef);
 }

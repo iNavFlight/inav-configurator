@@ -78,7 +78,7 @@ import Safehome from './../js/safehome';
 import SafehomeCollection from './../js/safehomeCollection';
 import { ApproachDirection, FwApproach } from './../js/fwApproach';
 import FwApproachCollection from './../js/fwApproachCollection';
-import { buildFwApproachItems, parseFwApproachAttributes, resolveFwApproachSlot } from './../js/missionFwApproach';
+import { buildFwApproachItems, fwApproachFromElement } from './../js/missionFwApproach';
 import SerialBackend from './../js/serial_backend';
 import { distanceOnLine, wrap_360, calculate_new_cooridatnes } from './../js/helpers';
 import interval from './../js/intervals';
@@ -6420,16 +6420,9 @@ function iconKey(filename) {
                                 }
                                 mission.put(point);
                             } else if (node['#name'].match(/fwapproach/i) && node.$) {
-                                const approachData = parseFwApproachAttributes(node.$);
-                                const approachSlot = resolveFwApproachSlot(approachData, FC.SAFEHOMES.getMaxSafehomeCount(), FC.FW_APPROACH.getMaxFwApproachCount());
-                                if (approachSlot >= 0) {
-                                    FC.FW_APPROACH.updateFwApproach(new FwApproach(approachSlot,
-                                                                                   approachData.approachAltAsl,
-                                                                                   approachData.landAltAsl,
-                                                                                   approachData.approachDirection,
-                                                                                   approachData.landHeading1,
-                                                                                   approachData.landHeading2,
-                                                                                   approachData.isSeaLevelRef));
+                                const approach = fwApproachFromElement(node.$, FC.SAFEHOMES.getMaxSafehomeCount(), FC.FW_APPROACH.getMaxFwApproachCount());
+                                if (approach) {
+                                    FC.FW_APPROACH.updateFwApproach(approach);
                                 }
                             }
                         }
@@ -6506,7 +6499,6 @@ function iconKey(filename) {
 
         let missionStartWPNumber = 0;
         let missionNumber = 1;
-        let landingMissionIndexes = [];
         mission.get().forEach(function (waypoint) {
             if (waypoint.getNumber() - missionStartWPNumber == 0 && multimission) {
                 let meta = {$:{
@@ -6527,20 +6519,17 @@ function iconKey(filename) {
                     } };
             data.missionitem.push(point);
 
-            if (waypoint.getAction() == MWNP.WPTYPE.LAND) {
-                landingMissionIndexes.push(waypoint.getMultiMissionIdx());
-            }
-
             if (waypoint.getEndMission() == 0xA5) {
                 missionStartWPNumber = waypoint.getNumber() + 1;
                 missionNumber ++;
             }
         });
+        // Missions read from the FC carry their index only on the last waypoint
+        const lastWaypoint = mission.get()[mission.get().length - 1];
         data.fwapproach = buildFwApproachItems(FC.FW_APPROACH.get(),
                                                FC.SAFEHOMES.getMaxSafehomeCount(),
                                                FC.FW_APPROACH.getMaxFwApproachCount(),
-                                               landingMissionIndexes,
-                                               multimission ? null : (mission.get()[0]?.getMultiMissionIdx() ?? 0));
+                                               multimission ? null : (lastWaypoint?.getMultiMissionIdx() ?? 0));
 
         var builder = new xml2js.Builder({ 'rootName': 'mission', 'renderOpts': { 'pretty': true, 'indent': '\t', 'newline': '\n' } });
         var xml = builder.buildObject(data);
