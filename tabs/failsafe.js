@@ -120,7 +120,7 @@ failsafeTab.initialize = function (callback, scrollPosition) {
             });
 
             GUI.content_ready(callback);
-        })));
+        }))).catch(err => console.error('Failed to load failsafe tab:', err));
     }
 
     load_failssafe_config();
