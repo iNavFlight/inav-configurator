@@ -2,12 +2,24 @@
 
 import MWNP from './mwnp.js';
 
-const ROUTE_ACTIONS = new Set([
+export const ROUTE_ACTIONS = new Set([
     MWNP.WPTYPE.WAYPOINT,
     MWNP.WPTYPE.POSHOLD_UNLIM,
     MWNP.WPTYPE.POSHOLD_TIME,
     MWNP.WPTYPE.LAND
 ]);
+
+export const END_OF_MISSION_MARKER = 0xA5;
+
+// The single source of truth for "the flown route stops here", shared with
+// js/mission_sim.js's getSimulationRoute() so the 3D terrain view and the
+// kinematic simulator can't drift apart on what ends a mission.
+export function routeTerminatesAt(waypoint) {
+    const action = waypoint.getAction();
+    return action === MWNP.WPTYPE.RTH
+        || (action === MWNP.WPTYPE.LAND && !waypoint.isAttached())
+        || waypoint.getEndMission() === END_OF_MISSION_MARKER;
+}
 
 function hasValidHomePosition(home) {
     if (!home?.getLat || !home?.getLon) return false;
@@ -44,15 +56,7 @@ export function getMission3DPoints(waypoints, home) {
             }
         }
 
-        // RTH and an unattached LAND end the flown route wherever they occur —
-        // same firmware semantics js/mission_sim.js's getSimulationRoute() stops
-        // at — not just when the multi-mission end marker happens to be set on
-        // that slot.
-        const terminatesRoute = action === MWNP.WPTYPE.RTH
-            || (action === MWNP.WPTYPE.LAND && !waypoint.isAttached())
-            || waypoint.getEndMission() === 0xA5;
-
-        if (terminatesRoute && points.length) {
+        if (routeTerminatesAt(waypoint) && points.length) {
             points.at(-1).endsMission = true;
         }
     });

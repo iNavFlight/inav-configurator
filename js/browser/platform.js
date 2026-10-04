@@ -1,9 +1,6 @@
 "use strict";
 
-const WEB_VERSION =
-  typeof __INAV_WEB_VERSION__ !== "undefined"
-    ? __INAV_WEB_VERSION__
-    : "web-dev";
+const WEB_VERSION = __INAV_WEB_VERSION__;
 
 const fileHandles = new Map();
 let nextFileHandleId = 1;
