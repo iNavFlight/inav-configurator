@@ -278,7 +278,7 @@ pidTuningTab.initialize = function (callback) {
         //Slider rates
         GUI.sliderize($('#rate_roll_rate'), FC.RC_tuning.roll_rate, 40, 1000);
         GUI.sliderize($('#rate_pitch_rate'), FC.RC_tuning.pitch_rate, 40, 1000);
-        GUI.sliderize($('#rate_yaw_rate'), FC.RC_tuning.yaw_rate, 40, 1000);
+        GUI.sliderize($('#rate_yaw_rate'), FC.RC_tuning.yaw_rate, 10, 1000);
 
         GUI.sliderize($('#rate_rollpitch_expo'), FC.RC_tuning.RC_EXPO * 100, 0, 100);
         GUI.sliderize($('#rate_yaw_expo'), FC.RC_tuning.RC_YAW_EXPO * 100, 0, 100);
