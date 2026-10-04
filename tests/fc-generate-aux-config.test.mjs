@@ -65,8 +65,10 @@ const mockClassUrl = dataModule(`
     export default MockCollection;
 `);
 
+// fc.js also imports PID_TYPE; the named import must resolve or fc.js fails to load
 const mockModelUrl = dataModule(`
     export const PLATFORM = { AIRPLANE: 0, MULTIROTOR: 1, TRICOPTER: 2 };
+    export const PID_TYPE = { NONE: 0, PID: 1, PIFF: 2, AUTO: 3 };
 `);
 
 const mockVtxUrl = dataModule(`
@@ -98,7 +100,7 @@ const realFcUrl = rewriteAndWrite('js/fc.js', [
     [/^import SafehomeCollection from '\.\/safehomeCollection';$/m, `import SafehomeCollection from '${mockClassUrl}';`, "import SafehomeCollection"],
     [/^import FwApproachCollection from '\.\/fwApproachCollection';$/m, `import FwApproachCollection from '${mockClassUrl}';`, "import FwApproachCollection"],
     [/^import GeozoneCollection from '\.\/geozoneCollection';$/m, `import GeozoneCollection from '${mockClassUrl}';`, "import GeozoneCollection"],
-    [/^import \{ PLATFORM \} from '\.\/model';$/m, `import { PLATFORM } from '${mockModelUrl}';`, "import PLATFORM"],
+    [/^import \{ PLATFORM, PID_TYPE \} from '\.\/model';$/m, `import { PLATFORM, PID_TYPE } from '${mockModelUrl}';`, "import PLATFORM, PID_TYPE"],
     [/^import VTX from '\.\/vtx';$/m, `import VTX from '${mockVtxUrl}';`, "import VTX"],
     [/^import BitHelper from '\.\/bitHelper';$/m, `import BitHelper from '${mockBitHelperUrl}';`, "import BitHelper"],
     [/^import \{ FLIGHT_MODES \} from '\.\/flightModes';$/m, `import { FLIGHT_MODES } from '${realFlightModesUrl}';`, "import FLIGHT_MODES"],
