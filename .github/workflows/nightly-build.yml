@@ -9,8 +9,11 @@ on:
 jobs:
     build:
         name: build
-        # Trusted path only: this workflow runs on push to protected branches,
-        # not on pull_request. secrets: inherit is what enables signed nightlies.
+        # Gate secrets on the ref actually being protected, not just on the
+        # branches: glob above - a maintenance-* branch (or a newly created one
+        # matching the glob) isn't automatically protected in repo settings, and
+        # this job passes signing/notarization secrets to whatever code is on it.
+        if: github.ref_protected == true
         uses: ./.github/workflows/ci.yml
         secrets: inherit
     
