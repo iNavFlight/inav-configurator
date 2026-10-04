@@ -17,7 +17,7 @@ import { PortHandler } from './../js/port_handler';
 import i18n from './../js/localization';
 import store from './../js/store';
 import dialog from './../js/dialog';
-import { resolveMspWrite } from './../js/mspWriteOutcome';
+import { resolveMspWrite, mspReplyFailed } from './../js/mspWriteOutcome';
 
 var SYM = SYM || {};
 SYM.LAST_CHAR = 225; // For drawing the font preview
@@ -349,6 +349,39 @@ FONT.msp = {
     }
 };
 
+function fontUploadError(messageKey) {
+    const error = new Error('OSD font upload stopped: ' + messageKey);
+    error.messageKey = messageKey;
+    return error;
+}
+
+function checkFontUploadReply(reply) {
+    if (mspReplyFailed(reply)) {
+        throw fontUploadError('osdFontUploadFailed');
+    }
+}
+
+function checkOsdFeatureForFontUpload() {
+    // Re-read: FC.FEATURES is reset on connect and not reloaded when this tab is reopened after a reboot.
+    return MSP.promise(MSPCodes.MSP_FEATURE).then(function (reply) {
+        checkFontUploadReply(reply);
+        // A short reply is not parsed and would leave the previous feature mask in place.
+        if (!reply.data || reply.data.byteLength < 4) {
+            throw fontUploadError('osdFontUploadFailed');
+        }
+        if (!FC.isFeatureEnabled('OSD')) {
+            throw fontUploadError('osdFontUploadOsdDisabled');
+        }
+    });
+}
+
+function showFontUploadError(error) {
+    console.error(error);
+    const message = i18n.getMessage(error.messageKey || 'osdFontUploadFailed');
+    $('.progressLabel').text(message);
+    GUI.log(message);
+}
+
 FONT.upload = function (callback) {
     // Always upload 512 characters, using extra blanks if the font
     // has less characters. This ensures we overwrite the 2nd page
@@ -364,7 +397,7 @@ FONT.upload = function (callback) {
         var charIndex = ii < 256 ? ii + 256 : ii - 256;
         addrs.push(charIndex);
     }
-    addrs.reduce(function(p, next, idx) {
+    return addrs.reduce(function(p, next, idx) {
         return p.then(function() {
             if (callback) {
                 callback(idx, count, (idx / count) * 100);
@@ -374,11 +407,11 @@ FONT.upload = function (callback) {
             var proto = next <= 255 ? MSP.constants.PROTOCOL_V1 : MSP.constants.PROTOCOL_V2;
             var data = FONT.msp.encode(next);
             return MSP.promise(MSPCodes.MSP_OSD_CHAR_WRITE, data, proto);
-        });
-    }, Promise.resolve()).then(function() {
+        }).then(checkFontUploadReply);
+    }, checkOsdFeatureForFontUpload()).then(function() {
         OSD.GUI.jbox.close();
         return MSP.promise(MSPCodes.MSP_SET_REBOOT);
-    });
+    }).catch(showFontUploadError);
 };
 
 FONT.preview = function ($el) {

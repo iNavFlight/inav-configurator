@@ -5229,6 +5229,12 @@
     "uploadedCharacters": {
         "message": "Uploaded $1 characters"
     },
+    "osdFontUploadOsdDisabled": {
+        "message": "OSD feature is disabled. Enable OSD in the Configuration tab and save, then upload the font."
+    },
+    "osdFontUploadFailed": {
+        "message": "Font upload failed. The font may be incomplete; the flight controller was not rebooted."
+    },
     "portsIdentifier": {
         "message": "Identifier"
     },

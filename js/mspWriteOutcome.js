@@ -21,6 +21,14 @@ export function resolveMspWrite(mspPromise, callback) {
 }
 
 /**
+ * True when a request did not land: the queue dropped it (false), or the FC
+ * answered with an error reply, which the MSP callback flags as unsupported.
+ */
+export function mspReplyFailed(result) {
+    return result === false || Boolean(result?.unsupported);
+}
+
+/**
  * Same idea as resolveMspWrite(), for a plain MSP.send_message() completion
  * callback instead of an MSP.promise(). MSP.send_message()'s callback fires
  * with the literal false MSP.promise() would otherwise reject on when the
