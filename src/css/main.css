@@ -1973,6 +1973,14 @@ dialog {
     margin-left: 6px;
 }
 
+/* In flow below the text: the shared absolute placement overlaps the wrapped warning */
+#modal-copy-profile .modal__buttons {
+    position: static;
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5em;
+}
+
 .dataflash-contents_global {
     border: 1px solid #4A4A4A;
     background-color: #4A4A4A;

@@ -54,6 +54,10 @@ import onboardLoggingTab from  './../tabs/onboard_logging';
 import cliTab from './../tabs/cli';
 import searchTab from './../tabs/search';
 import dialog from './dialog'
+import mspQueue from './serial_queue';
+import mspDeduplicationQueue from './msp/mspDeduplicationQueue';
+import BackupRestore from './backup_restore';
+import { copyProfileViaCli, profileCopyResultKey, leaveProfileCopyCli, profileCopyInterruptedKey } from './profile_copy';
 
 window.$ = $;
 
@@ -816,7 +820,7 @@ $(function() {
             });
         });
 
-        // Copy the active control / battery / mixer profile onto another slot (MSP2_INAV_COPY_PROFILE)
+        // Copy the active control / battery / mixer profile onto another slot through the CLI
         const profileCopyKinds = {
             0: { label: 'copyProfileKindControl', current: () => Number.parseInt(profile_e.val()), count: () => profile_e.find('option').length },
             1: { label: 'copyProfileKindBattery', current: () => Number.parseInt(batteryprofile_e.val()), count: () => batteryprofile_e.find('option').length },
@@ -825,18 +829,68 @@ $(function() {
         let profileCopyModal = null;
         let profileCopyRequest = null;
         let profileCopyInFlight = false;
+        let profileCopyProgress = null;
+        let profileCopyStopping = false;
 
-        GUI.resetProfileCopy = function () {
+        function releaseProfileCopy() {
+            if (profileCopyInFlight) {
+                // A copy interrupted by a disconnect must not leave MSP blocked for the next connection
+                CONFIGURATOR.cliActive = false;
+                CONFIGURATOR.cliValid = false;
+                GUI.tab_switch_in_progress = false;
+                BackupRestore._cleanup();
+            }
             profileCopyRequest = null;
+            profileCopyProgress = null;
             profileCopyInFlight = false;
-            $('#copy-profile-confirm').prop('disabled', false);
+            profileCopyStopping = false;
+            $('#copy-profile-confirm, #copy-profile-cancel').prop('disabled', false);
             profileCopyModal?.close();
+        }
+
+        function sendProfileCopyExit() {
+            return new Promise(resolve => {
+                BackupRestore._cleanup();
+                BackupRestore._sendString('exit\r', sendInfo => {
+                    // Same flush delay as the CLI tab before the port closes
+                    setTimeout(() => resolve(sendInfo?.resultCode === 0), 200);
+                });
+            });
+        }
+
+        // Called when the port is already closed, so no "exit" can be sent any more
+        GUI.resetProfileCopy = function (interrupted = true) {
+            if (profileCopyInFlight && interrupted) {
+                GUI.log(i18n.getMessage(profileCopyInterruptedKey(profileCopyProgress ?? {}, false)));
+            }
+            releaseProfileCopy();
+        };
+
+        GUI.isProfileCopyRunning = () => profileCopyInFlight;
+
+        // A disconnect during a copy: leave the CLI first, as the CLI tab does, then close the port
+        GUI.stopProfileCopy = function (callback) {
+            if (profileCopyStopping) {
+                return;
+            }
+            profileCopyStopping = true;
+            const progress = profileCopyProgress ?? {};
+            // Late CLI answers of the cut-off copy must not finish it
+            profileCopyRequest = null;
+            // Cleared first, as in the CLI tab, so the FC's "Rebooting" is not taken for a CLI reboot
+            CONFIGURATOR.cliActive = false;
+            CONFIGURATOR.cliValid = false;
+            leaveProfileCopyCli({ exitCli: sendProfileCopyExit }, progress).then(exited => {
+                GUI.log(i18n.getMessage(profileCopyInterruptedKey(progress, exited)));
+                releaseProfileCopy();
+                callback();
+            });
         };
 
         $('#profiles_wrapper_global .profile-copy').on('click', function (event) {
             event.preventDefault();
 
-            if (!CONFIGURATOR.connectionValid || profileCopyInFlight) {
+            if (!CONFIGURATOR.connectionValid || CONFIGURATOR.cliActive || profileCopyInFlight) {
                 return;
             }
             const type = Number.parseInt($(this).attr('data-profile-type'));
@@ -857,10 +911,10 @@ $(function() {
             if (!profileCopyModal) {
                 profileCopyModal = new jBox('Modal', {
                     width: 420,
-                    height: 240,
                     animation: false,
                     closeOnClick: false,
-                    closeOnEsc: true,
+                    // Esc would also close the dialog during a running copy; Cancel covers the idle case
+                    closeOnEsc: false,
                     content: $('#modal-copy-profile')
                 });
             }
@@ -870,37 +924,69 @@ $(function() {
         });
 
         $(document).on('click', '#copy-profile-cancel', function () {
+            if (profileCopyInFlight) {
+                return;
+            }
             profileCopyModal.close();
         });
 
         $(document).on('click', '#copy-profile-confirm', function () {
             const toIndex = Number.parseInt($('#copy-profile-to').val());
-            if (!CONFIGURATOR.connectionValid || profileCopyInFlight || !profileCopyRequest || Number.isNaN(toIndex)) {
+            if (!CONFIGURATOR.connectionValid || CONFIGURATOR.cliActive || profileCopyInFlight || !profileCopyRequest || Number.isNaN(toIndex)) {
                 return;
             }
             const request = profileCopyRequest;
             profileCopyInFlight = true;
-            $('#copy-profile-confirm').prop('disabled', true);
-            const finishCopy = function (response) {
-                // A disconnect invalidates this request, including any late response.
-                if (profileCopyRequest !== request) {
-                    return;
-                }
-                GUI.resetProfileCopy();
-                if (!response) {
-                    GUI.log(i18n.getMessage('copyProfileTransportFailed'));
-                    return;
-                }
-                if (response.unsupported) {
-                    GUI.log(i18n.getMessage('copyProfileFailed'));
-                    return;
-                }
-                GUI.log(i18n.getMessage('copyProfileDone', [i18n.getMessage(request.kind.label), request.fromIndex + 1, toIndex + 1]));
-            };
-            if (MSP.send_message(MSPCodes.MSP2_INAV_COPY_PROFILE, [request.type, request.fromIndex, toIndex], false, finishCopy) === false) {
-                finishCopy(false);
-            }
+            // A tab click would send "exit" into the copy's CLI session (cliActive && cliValid branch)
+            GUI.tab_switch_in_progress = true;
+            $('#copy-profile-confirm, #copy-profile-cancel').prop('disabled', true);
+            interval.remove('global_data_refresh');
+            GUI.tab_switch_cleanup(function () {
+                runProfileCopy(request, toIndex);
+            });
         });
+
+        async function runProfileCopy(request, toIndex) {
+            if (profileCopyRequest !== request) {
+                return;
+            }
+            // Same hand-over as the CLI tab: MSP traffic stops so no request is typed into the CLI
+            CONFIGURATOR.cliActive = true;
+            CONFIGURATOR.cliValid = true;
+            mspQueue.flush();
+            mspDeduplicationQueue.flush();
+            MSP.callbacks_cleanup();
+
+            let copied = false;
+            const progress = {};
+            profileCopyProgress = progress;
+            try {
+                await copyProfileViaCli({
+                    enterCli: () => BackupRestore._enterCli(),
+                    sendCommand: line => BackupRestore._sendCommand(line),
+                }, request.type, request.fromIndex, toIndex, undefined, progress);
+                copied = true;
+            } catch (err) {
+                console.error('Profile copy failed:', err);
+            }
+            // A disconnect invalidates this request, including a late CLI answer
+            if (profileCopyRequest !== request) {
+                return;
+            }
+            GUI.resetProfileCopy(false);
+            const kindName = i18n.getMessage(request.kind.label);
+            GUI.log(i18n.getMessage(profileCopyResultKey(copied, progress), [kindName, request.fromIndex + 1, toIndex + 1]));
+            if (progress.cliEntered) {
+                GUI.log(i18n.getMessage('deviceRebooting'));
+            }
+            // Both "save" and "exit" reboot the FC, so register the reconnect first
+            GUI.handleReconnect(true);
+            if (copied) {
+                BackupRestore.saveAndReboot();
+            } else {
+                BackupRestore.abortRestore();
+            }
+        }
 
     });
 });

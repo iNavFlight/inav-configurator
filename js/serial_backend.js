@@ -268,13 +268,14 @@ var SerialBackend = (function () {
                             this.isDemoRunning = false;
                         }
 
-                        GUI.resetProfileCopy?.();
                         var wasConnected = CONFIGURATOR.connectionValid;
 
                         timeout.killAll();
                         interval.killAll(['global_data_refresh', 'msp-load-update']);
 
-                        if (CONFIGURATOR.cliActive) {
+                        if (GUI.isProfileCopyRunning?.()) {
+                            GUI.stopProfileCopy(finishDisconnect);
+                        } else if (CONFIGURATOR.cliActive) {
                             GUI.tab_switch_cleanup(finishDisconnect);
                         } else {
                             GUI.tab_switch_cleanup();

@@ -2160,7 +2160,7 @@
         "message": "mixer profile"
     },
     "copyProfileWarning": {
-        "message": "The destination profile is overwritten and saved to the flight controller right away."
+        "message": "The destination profile is overwritten. The flight controller then saves and reboots; unsaved changes in the open tab are lost."
     },
     "copyProfileButton": {
         "message": "Copy"
@@ -2169,13 +2169,22 @@
         "message": "Cancel"
     },
     "copyProfileDone": {
-        "message": "Copied $1 $2 to profile $3."
-    },
-    "copyProfileTransportFailed": {
-        "message": "Profile copy could not be confirmed. Check the connection and destination profile before trying again."
+        "message": "Copied $1 $2 to profile $3, saving."
     },
     "copyProfileFailed": {
-        "message": "The flight controller did not copy the profile: it needs a firmware with MSP2_INAV_COPY_PROFILE (INAV 10), must be disarmed, and the target slot must exist."
+        "message": "The profile copy failed before anything was changed."
+    },
+    "copyProfileFailedSlotChanged": {
+        "message": "The profile copy failed and was not saved, but selecting the destination already made $1 $3 the active one. Select profile $2 again after the reconnect."
+    },
+    "copyProfileUnconfirmed": {
+        "message": "Copying $1 $2 to profile $3 could not be confirmed and may already be saved. Check profile $3 and the active profile after the reconnect."
+    },
+    "copyProfileInterrupted": {
+        "message": "The connection closed during the profile copy. Check the destination profile and the active profile after reconnecting."
+    },
+    "copyProfileInterruptedCli": {
+        "message": "The connection closed during the profile copy, before the flight controller could leave CLI mode. If the next connection gets no answer, power-cycle the flight controller (or type exit in a CLI terminal). Then check the destination profile and the active profile."
     },
     "setBatteryProfile": {
         "message": "Setting Battery Profile: <strong style=\"color: #37a8db\">$1</strong>"
