@@ -3364,7 +3364,14 @@ var mspHelper = (function () {
         }
     }
 
-    self._getSetting = function (name) {
+    function retrySettingInfo(name, replyName, retried) {
+        if (retried) {
+            throw new Error("Setting info for '" + name + "' answered with '" + replyName + "'");
+        }
+        return self._getSetting(name, true);
+    }
+
+    self._getSetting = function (name, retried) {
 
         const storedSetting = settingsCache.get(name);
         if (typeof storedSetting !== 'undefined') {
@@ -3386,8 +3393,11 @@ var mspHelper = (function () {
             };
             var setting = {};
 
-            // Discard setting name
-            result.data.readString();
+            // Replies match by code only, so one left on the wire by an interrupted tab lands here.
+            const replyName = result.data.readString();
+            if (replyName !== '' && replyName !== name) {
+                return retrySettingInfo(name, replyName, retried);
+            }
 
             // Discard PG ID
             result.data.readU16();

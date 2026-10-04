@@ -68,6 +68,7 @@ var MspMessageClass = function () {
     publicScope.createdOn = new Date().getTime();
     publicScope.sentOn = null;
     publicScope.retryCounter = 5;
+    publicScope.generation = 0;
 
     return publicScope;
 };
@@ -123,6 +124,8 @@ var MSP = {
     message_checksum:           0,
     message_flag:               0,
     callbacks:                  [],
+    // Bumped by callbacks_cleanup() so put-retries of an older generation are dropped.
+    callbackGeneration:         0,
     packet_error:               0,
     unsupported:                0,
 
@@ -470,6 +473,7 @@ var MSP = {
         message.messageBody = buffer;
         message.onFinish = callback_msp;
         message.onSend = callback_sent;
+        message.generation = this.callbackGeneration;
 
         /*
          * In case of MSP_REBOOT special procedure is required
@@ -490,6 +494,10 @@ var MSP = {
      * awaiting it, so retry briefly before giving up.
      */
     _enqueue(message) {
+        // No onFinish: callbacks_cleanup() discards in-flight callbacks the same way.
+        if (message.generation !== this.callbackGeneration) {
+            return;
+        }
         // CONFIGURATOR.cliActive can flip true between retries (each one is a
         // separate setTimeout, well after the original send_message() call).
         // Check it before every attempt, including the first: a successful
@@ -536,6 +544,7 @@ var MSP = {
         });
     },
     callbacks_cleanup() {
+        this.callbackGeneration++;
         for (var i = 0; i < this.callbacks.length; i++) {
             clearInterval(this.callbacks[i].timer);
         }
