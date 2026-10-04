@@ -1955,6 +1955,10 @@ dialog {
     height: 14px;
     margin: 3px 0 0 4px;
     opacity: 0.7;
+    /* The link text is for screen readers; the icon is the visible label */
+    overflow: hidden;
+    white-space: nowrap;
+    text-indent: 100%;
     background: no-repeat center / 12px 12px url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><rect x='1' y='1' width='9' height='9' rx='1.5' fill='none' stroke='white' stroke-width='1.6'/><rect x='6' y='6' width='9' height='9' rx='1.5' fill='%23222' stroke='white' stroke-width='1.6'/></svg>");
 }
 

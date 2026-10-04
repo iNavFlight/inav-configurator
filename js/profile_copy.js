@@ -46,18 +46,22 @@ async function sendChecked(cli, line) {
     }
 }
 
-async function readProfileDump(cli, command, fromIndex, settleMs) {
-    for (let attempt = 1; ; attempt++) {
-        // Each "# " header can end a read chunk and look like the prompt, so validate and retry
-        await new Promise(resolve => setTimeout(resolve, settleMs));
-        try {
-            return extractProfileCopyLines(await cli.sendCommand(`dump ${command}`), command, fromIndex);
-        } catch (err) {
-            if (attempt >= DUMP_ATTEMPTS) {
-                throw err;
-            }
+async function readProfileDump(cli, command, fromIndex, settleMs, attempt = 1) {
+    // Each "# " header can end a read chunk and look like the prompt, so validate and retry
+    await new Promise(resolve => setTimeout(resolve, settleMs));
+    try {
+        return extractProfileCopyLines(await cli.sendCommand(`dump ${command}`), command, fromIndex);
+    } catch (err) {
+        if (attempt >= DUMP_ATTEMPTS) {
+            throw err;
         }
+        return readProfileDump(cli, command, fromIndex, settleMs, attempt + 1);
     }
+}
+
+// One line at a time: the CLI answers each line before it reads the next
+function replayLines(cli, lines) {
+    return lines.reduce((previous, line) => previous.then(() => sendChecked(cli, line)), Promise.resolve());
 }
 
 async function selectProfile(cli, command, index) {
@@ -90,9 +94,7 @@ export async function copyProfileViaCli(cli, type, fromIndex, toIndex, settleMs 
     // Set before sending: an unconfirmed answer can still have switched the slot
     progress.destinationActive = true;
     await selectProfile(cli, command, toIndex);
-    for (const line of lines) {
-        await sendChecked(cli, line);
-    }
+    await replayLines(cli, lines);
     progress.sourceRequested = true;
     await selectProfile(cli, command, fromIndex);
     progress.destinationActive = false;

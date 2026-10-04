@@ -61,6 +61,17 @@ import { copyProfileViaCli, profileCopyResultKey, leaveProfileCopyCli, profileCo
 
 window.$ = $;
 
+// Ends the CLI session of an interrupted profile copy; resolves to whether "exit" was written
+function sendProfileCopyExit() {
+    return new Promise(resolve => {
+        BackupRestore._cleanup();
+        BackupRestore._sendString('exit\r', sendInfo => {
+            // Same flush delay as the CLI tab before the port closes
+            setTimeout(() => resolve(sendInfo?.resultCode === 0), 200);
+        });
+    });
+}
+
 function showGoogleApiTestResult($result, messages) {
     $result.empty();
     messages.forEach((message, index) => {
@@ -848,16 +859,6 @@ $(function() {
             profileCopyModal?.close();
         }
 
-        function sendProfileCopyExit() {
-            return new Promise(resolve => {
-                BackupRestore._cleanup();
-                BackupRestore._sendString('exit\r', sendInfo => {
-                    // Same flush delay as the CLI tab before the port closes
-                    setTimeout(() => resolve(sendInfo?.resultCode === 0), 200);
-                });
-            });
-        }
-
         // Called when the port is already closed, so no "exit" can be sent any more
         GUI.resetProfileCopy = function (interrupted = true) {
             if (profileCopyInFlight && interrupted) {
@@ -880,11 +881,12 @@ $(function() {
             // Cleared first, as in the CLI tab, so the FC's "Rebooting" is not taken for a CLI reboot
             CONFIGURATOR.cliActive = false;
             CONFIGURATOR.cliValid = false;
-            leaveProfileCopyCli({ exitCli: sendProfileCopyExit }, progress).then(exited => {
+            const finish = exited => {
                 GUI.log(i18n.getMessage(profileCopyInterruptedKey(progress, exited)));
                 releaseProfileCopy();
                 callback();
-            });
+            };
+            leaveProfileCopyCli({ exitCli: sendProfileCopyExit }, progress).then(finish, () => finish(false));
         };
 
         $('#profiles_wrapper_global .profile-copy').on('click', function (event) {
@@ -942,7 +944,8 @@ $(function() {
             $('#copy-profile-confirm, #copy-profile-cancel').prop('disabled', true);
             interval.remove('global_data_refresh');
             GUI.tab_switch_cleanup(function () {
-                runProfileCopy(request, toIndex);
+                // runProfileCopy handles its own failures
+                void runProfileCopy(request, toIndex);
             });
         });
 
@@ -982,9 +985,9 @@ $(function() {
             // Both "save" and "exit" reboot the FC, so register the reconnect first
             GUI.handleReconnect(true);
             if (copied) {
-                BackupRestore.saveAndReboot();
+                await BackupRestore.saveAndReboot();
             } else {
-                BackupRestore.abortRestore();
+                await BackupRestore.abortRestore();
             }
         }
 
