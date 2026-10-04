@@ -99,8 +99,8 @@ import {
     LandingApproachProblem,
     SimPhase,
     phaseRuns,
-    TurnSmoothing,
-    commandedTurnRadius,
+    TurnMode,
+    arcTurnRadius,
     getSimulationRoute,
     resolveRouteAltitudes,
     simulateGroundTrack,
@@ -881,7 +881,10 @@ missionControlTab.initialize = function (callback) {
         loiterRadiusCm: null,
         approachLengthCm: null,
         speedFromFc: false,
-        turnSmoothing: TurnSmoothing.OFF
+        turnMode: FirmwareDefaults.turnMode,
+        turnMaxLeadTimeMs: FirmwareDefaults.turnMaxLeadTimeMs,
+        trackingEnabled: FirmwareDefaults.trackingEnabled,
+        trackingMaxAngleDeg: FirmwareDefaults.trackingMaxAngleDeg
     };
     let googleLocationRequestStarted = false;
     let conditionsFetched = false;
@@ -1305,8 +1308,23 @@ missionControlTab.initialize = function (callback) {
                 }).catch(() => {}).then(() => callback());
             },
             function (callback) {
-                mspHelper.getSetting("nav_fw_wp_turn_smoothing").then((data) => {
-                    if (data) simulation.turnSmoothing = readTurnSmoothing(data);
+                mspHelper.getSetting("nav_fw_wp_turn_mode").then((data) => {
+                    if (data) simulation.turnMode = readTurnMode(data);
+                }).catch(() => {}).then(() => callback());
+            },
+            function (callback) {
+                mspHelper.getSetting("nav_fw_wp_turn_max_lead_time").then((data) => {
+                    if (data) simulation.turnMaxLeadTimeMs = readNumericSetting(data, simulation.turnMaxLeadTimeMs);
+                }).catch(() => {}).then(() => callback());
+            },
+            function (callback) {
+                mspHelper.getSetting("nav_fw_wp_tracking_accuracy").then((data) => {
+                    if (data) simulation.trackingEnabled = readNumericSetting(data, 0) > 0;
+                }).catch(() => {}).then(() => callback());
+            },
+            function (callback) {
+                mspHelper.getSetting("nav_fw_wp_tracking_max_angle").then((data) => {
+                    if (data) simulation.trackingMaxAngleDeg = readNumericSetting(data, simulation.trackingMaxAngleDeg);
                 }).catch(() => {}).then(() => callback());
             },
             // The speed the firmware itself plans coordinated turns with when there
@@ -3768,15 +3786,10 @@ function iconKey(filename) {
         layerFilter: (layer) => layer?.get('no_interaction') !== true
     };
 
-    // nav_fw_wp_turn_smoothing arrives as an index into its own lookup table.
-    function readTurnSmoothing(setting) {
-        const name = setting.setting?.table?.values?.[setting.value];
-        if (!name) return TurnSmoothing.OFF;
-
-        const normalized = String(name).toUpperCase();
-        if (normalized.includes('CUT')) return TurnSmoothing.CUT;
-        if (normalized === 'ON') return TurnSmoothing.ON;
-        return TurnSmoothing.OFF;
+    // nav_fw_wp_turn_mode arrives as an index into its own lookup table.
+    function readTurnMode(setting) {
+        const name = String(setting.setting?.table?.values?.[setting.value] ?? '').toUpperCase();
+        return Object.values(TurnMode).includes(name) ? name : FirmwareDefaults.turnMode;
     }
 
     // The approach settings for a landing waypoint live after the safehome block
@@ -3850,9 +3863,11 @@ function iconKey(filename) {
             parameters: {
                 speedMs: simulation.speedMs,
                 bankAngleDeg: bankCeilingBinds ? simulation.bankCeilingDeg : simulation.bankAngleDeg,
-                loiterRadiusM: loiterRadiusCm / 100,
                 waypointRadiusM: simulation.wpRadiusCm / 100,
-                turnSmoothing: simulation.turnSmoothing
+                turnMode: simulation.turnMode,
+                turnMaxLeadTimeMs: simulation.turnMaxLeadTimeMs,
+                trackingEnabled: simulation.trackingEnabled,
+                trackingMaxAngleDeg: simulation.trackingMaxAngleDeg
             }
         };
     }
@@ -3883,11 +3898,6 @@ function iconKey(filename) {
         if (plan.bankCeilingBinds) {
             notices.push(i18n.getMessage('missionSimulationBankCeiling', [String(simulation.bankCeilingDeg)]));
         }
-        // Said rather than hidden: a hidden button is indistinguishable from a broken
-        // one, and airframe detection is not reliable enough to hide a feature on.
-        if (CONFIGURATOR.connectionValid && !FC.isAirplane()) {
-            notices.push(i18n.getMessage('missionSimulationFixedWingOnly'));
-        }
         plan.suspectLandings.forEach(({number, gapM}) => {
             notices.push(i18n.getMessage('missionSimulationApproachSuspect',
                 [String(Number(number) + 1), String(gapM)]));
@@ -3909,11 +3919,9 @@ function iconKey(filename) {
     // A repeat or a truncated run means the figures no longer describe the whole
     // flight. Showing a rounded number anyway would read as a complete answer.
     function showSimulationFigures(plan, result) {
-        const radius = commandedTurnRadius(
-            plan.parameters.speedMs, plan.parameters.bankAngleDeg,
-            plan.parameters.loiterRadiusM, plan.parameters.turnSmoothing
-        );
+        const radius = arcTurnRadius(plan.parameters.speedMs, plan.parameters.bankAngleDeg);
         $('#simulationTurnRadius').text(Number.isFinite(radius) ? `${radius.toFixed(0)} m` : '-');
+        $('#simulationTurnMode').text(plan.parameters.turnMode);
 
         const repeats = mission.get().some((waypoint) => waypoint.getAction() === MWNP.WPTYPE.JUMP);
         const truncated = result.warnings.some((warning) => warning.code === 'simulation-truncated');
@@ -3935,7 +3943,7 @@ function iconKey(filename) {
 
         const $warnings = $('#simulationWarnings').empty();
         const stop = (message) => {
-            $('#simulationTurnRadius').text('');
+            $('#simulationTurnRadius, #simulationTurnMode').text('');
             $('#simulationTime, #simulationDistance').text('-');
             $warnings.text(i18n.getMessage(message));
         };
@@ -6636,8 +6644,10 @@ function iconKey(filename) {
             // The model is parameterised from the flight controller; without one it
             // could only guess. Offline the feature stays out of the way entirely and
             // the 3D view shows the plan alone.
-            $('#simulateMission').toggle(CONFIGURATOR.connectionValid);
-            if (!CONFIGURATOR.connectionValid) simulation.enabled = false;
+            // Multirotor waypoint turns work differently; only fixed wing turn modes are modelled.
+            const available = CONFIGURATOR.connectionValid && FC.isAirplane();
+            $('#simulateMission').toggle(available);
+            if (!available) simulation.enabled = false;
 
             // Namespaced and released first: the tab can be entered more than once,
             // and a delegated handler would otherwise pile up on every visit and keep
