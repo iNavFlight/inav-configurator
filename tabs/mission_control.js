@@ -1425,7 +1425,7 @@ missionControlTab.initialize = function (callback) {
             }
         ]);
         loadChainer.setExitPoint(function () {
-            loadOsdUnits().then(loadHtml);
+            loadOsdUnits().then(loadHtml).catch(err => console.error('Failed to load mission control tab:', err));
         });
         loadChainer.execute();
     } else {
@@ -2507,7 +2507,8 @@ function iconKey(filename) {
         cleanSafehomeLayers();
     }
 
-    async function checkApproachAltitude(altitude, isSeaLevelRef, sealevel) {
+    // Synchronous on purpose: callers branch on the result, a Promise would always pass.
+    function checkApproachAltitude(altitude, isSeaLevelRef, sealevel) {
 
         if (altitude - (isSeaLevelRef ? sealevel * 100 : 0 ) < 0) {
             dialog.alert(i18n.getMessage('MissionPlannerAltitudeChangeReset'));
@@ -4159,7 +4160,7 @@ function iconKey(filename) {
                 $('#wpApproachAltM').text(altitudeReadout(approachWp.getApproachAltAsl()));
 
                 plotElevation();
-            })()
+            })().catch(err => console.error('Failed to update waypoint elevation:', err));
         }
         $('#elevationAtWP').fadeIn();
         $('#groundClearanceAtWP').fadeIn();
@@ -6065,7 +6066,7 @@ function iconKey(filename) {
                     mission.update(singleMissionActive());
                     redrawLayer();
                     plotElevation();
-                })();
+                })().catch(err => console.error('Failed to update waypoint elevation:', err));
             }
         });
 
@@ -6141,6 +6142,9 @@ function iconKey(filename) {
                     $('#wpApproachAltM').text(altitudeReadout(selectedFwApproachWp.getApproachAltAsl()));
                     repaintSimulation();
                     updateMission3D();
+                } else {
+                    $(event.currentTarget).val(altitudeToDisplay(selectedFwApproachWp.getApproachAltAsl()));
+                    refusePointEdit();
                 }
             }
         });
@@ -6408,7 +6412,7 @@ function iconKey(filename) {
                     $('#safehomeApproachAltM').text(altitudeReadout(selectedFwApproachSh.getApproachAltAsl()));
 
                     renderSafeHomeOptions();
-                })();
+                })().catch(err => console.error('Failed to update safehome elevation:', err));
             }
         });
 

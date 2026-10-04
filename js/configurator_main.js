@@ -658,7 +658,7 @@ $(function() {
                     })
         
                     $('div#options-window').slideDown(250);
-                });
+                }).catch(err => console.error('Failed to load options window:', err));
             } else {
                 closeOptions();
             }
