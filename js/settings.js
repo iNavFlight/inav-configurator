@@ -7,6 +7,7 @@ import GUI from './gui';
 import FC from './fc';
 import { globalSettings, UnitType } from './globalSettings';
 import i18n from './localization';
+import { getUnitHint, hasUnitHint } from './unitHint';
 
 function padZeros(val, length) {
     let str = val.toString();
@@ -596,10 +597,53 @@ var Settings = (function () {
         // Now wrap the input in a display that shows the unit
         element.wrap(`<div data-unit="${unitDisplayNames[unitName]}" title="${unitExpandedNames[unitName]}" class="unit_wrapper unit"></div>`);
 
+        // Raw firmware units hide a misplaced zero, so show a readable conversion next to them
+        if (multiplier === 1) {
+            self.attachUnitHint(element, inputUnit);
+        }
+
         function toFahrenheit(decidegC) {
             return (decidegC / 10) * 1.8 + 32;
         };
     }
+
+    /**
+     * Display only: the input and the value written to the FC stay in the firmware unit.
+     *
+     * @param {JQuery Element} input Input already wrapped in .unit_wrapper
+     * @param {String} unit Unit from HTML Dom input
+     */
+    self.attachUnitHint = function (input, unit) {
+        if (!hasUnitHint(unit)) {
+            return;
+        }
+        // A second configureInputs() run on the same tab must not add a second hint
+        if (input.data('unit-hint-update')) {
+            input.data('unit-hint-update')();
+            return;
+        }
+
+        const hint = $('<span class="unit-hint"></span>');
+        const wrapper = input.parent('.unit_wrapper');
+
+        // Behind the help icon so the icon stays at the far right; without one, padded to keep hints aligned
+        const helpIcon = wrapper.siblings('.helpicon, .helpiconLink').last();
+        if (helpIcon.length) {
+            hint.insertAfter(helpIcon);
+        } else {
+            hint.addClass('unit-hint--no-icon').insertAfter(wrapper);
+        }
+
+        const update = function () {
+            const converted = getUnitHint(unit, input.val());
+            hint.text(converted ? converted.text : '');
+            hint.attr('title', converted ? converted.title : null);
+        };
+
+        input.data('unit-hint-update', update);
+        input.on('input change', update);
+        update();
+    };
 
     self.processInput = function(input) {
         var settingName = input.data('setting');

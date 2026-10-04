@@ -88,7 +88,7 @@ failsafeTab.initialize = function (callback, scrollPosition) {
                     $('#failsafe_min_distance_procedure_elements').show();
                 } else {
                     // If they uncheck it, clear the distance to 0, which disables this feature
-                    $('#failsafe_min_distance').val(0);
+                    $('#failsafe_min_distance').val(0).trigger('input');
                     $('#failsafe_min_distance_elements').hide();
                     $('#failsafe_min_distance_procedure_elements').hide();
                 }
@@ -120,7 +120,7 @@ failsafeTab.initialize = function (callback, scrollPosition) {
             });
 
             GUI.content_ready(callback);
-        })));
+        }))).catch(err => console.error('Failed to load failsafe tab:', err));
     }
 
     load_failssafe_config();

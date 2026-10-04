@@ -656,6 +656,26 @@
     padding-bottom: 0;
 }
 
+/* Flex row so the label text wraps beside the unit hint instead of under it */
+.tab-osd .settings label:has(> .unit-hint) {
+    display: flex;
+    width: auto;
+    align-items: flex-start;
+    gap: 0.5em;
+}
+
+.tab-osd .settings label:has(> .unit-hint) > .i18n-replaced {
+    flex: 1 1 auto;
+    width: auto;
+}
+
+.tab-osd .settings label > .unit-hint {
+    float: none;
+    order: 1;
+    padding: 0 0.5em 0 0;
+    line-height: inherit;
+}
+
 .tab-osd .settings input {
     width: 75px;
     padding-left: 3px;
