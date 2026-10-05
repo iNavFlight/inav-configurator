@@ -13,6 +13,8 @@ import features from './../js/feature_framework';
 import { mixer, PLATFORM } from './../js/model';
 import timeout from './../js/timeouts';
 import interval from './../js/intervals';
+import { escTelemetryExpected } from './../js/escTelemetry';
+import mspDeduplicationQueue from './../js/msp/mspDeduplicationQueue';
 
 /* Phase 0 of the firmware's calibration state machine, which is also how the
  * sequence is called off. Out here because cleanup() needs it too. */
@@ -30,6 +32,71 @@ const outputsTab = {
     srxl2Calibrating: false,
     feature3DEnabled: false
 };
+function processEscTelemetry() {
+    const $box = $('.esc-telemetry-box'),
+        $tbody = $('.esc-telemetry-table tbody'),
+        $noData = $('.esc-telemetry-no-data');
+
+    if (!escTelemetryExpected(FC.SERIAL_CONFIG?.ports, FC.isMotorOutputEnabled(), FC.ADVANCED_CONFIG.motorPwmProtocol)) {
+        return;
+    }
+
+    function renderRows(motors) {
+        if ($tbody.children().length !== motors.length) {
+            $tbody.empty();
+            motors.forEach((motor, index) => {
+                $tbody.append('<tr><td class="esc-motor">' + (index + 1) + '</td><td class="esc-rpm"></td><td class="esc-temperature"></td><td class="esc-voltage"></td><td class="esc-current"></td></tr>');
+            });
+        }
+
+        let anyValid = false;
+        $tbody.children().each(function (index) {
+            const motor = motors[index],
+                $row = $(this);
+
+            if (!motor.valid) {
+                $row.addClass('esc-telemetry-invalid');
+                $row.find('td:not(.esc-motor)').text('-');
+                return;
+            }
+
+            anyValid = true;
+            $row.removeClass('esc-telemetry-invalid');
+            $row.find('.esc-rpm').text(motor.rpm);
+            $row.find('.esc-temperature').text(motor.temperature);
+            $row.find('.esc-voltage').text(motor.voltage.toFixed(2));
+            $row.find('.esc-current').text(motor.current.toFixed(2));
+        });
+
+        $noData.toggle(!anyValid);
+    }
+
+    function updateEscTelemetry(resp) {
+        // A request the queue gave up on says nothing about the firmware, so it must not end the polling
+        if (!resp) {
+            return;
+        }
+
+        if (FC.ESC_TELEMETRY === null) {
+            // Firmware without ESC sensor support answers "unsupported": stop asking and hide the box
+            interval.remove('esc_telemetry_pull');
+            $box.addClass('is-hidden');
+            return;
+        }
+
+        $box.removeClass('is-hidden');
+        renderRows(FC.ESC_TELEMETRY);
+    }
+
+    interval.add('esc_telemetry_pull', function () {
+        // On a slow link a second request would only start an MSP._enqueue retry chain that outlives the tab
+        if (mspDeduplicationQueue.check(MSPCodes.MSP2_INAV_ESC_TELEM)) {
+            return;
+        }
+        MSP.send_message(MSPCodes.MSP2_INAV_ESC_TELEM, false, false, updateEscTelemetry);
+    }, 250, true);
+}
+
 outputsTab.initialize = function (callback) {
     var self = this;
 
@@ -109,6 +176,7 @@ outputsTab.initialize = function (callback) {
 
         process_motors();
         process_servos();
+        processEscTelemetry();
         processConfiguration(settingsPromise);
 
         finalize();
