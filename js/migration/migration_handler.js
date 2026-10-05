@@ -4,6 +4,7 @@ import semver from 'semver';
 
 import profile_7_to_8 from './7_to_8.json';
 import profile_8_to_9 from './8_to_9.json';
+import profile_9_to_10 from './9_to_10.json';
 
 /**
  * All available migration profiles, ordered by version.
@@ -12,6 +13,7 @@ import profile_8_to_9 from './8_to_9.json';
 const MIGRATION_PROFILES = [
     profile_7_to_8,
     profile_8_to_9,
+    profile_9_to_10,
 ];
 
 /**

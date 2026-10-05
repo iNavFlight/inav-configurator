@@ -1,0 +1,42 @@
+{
+    "fromVersion": "9",
+    "toVersion": "10",
+    "description": "INAV 9.x → 10.0 migration profile",
+
+    "commandRenames": {},
+
+    "settingRenames": {
+        "mavlink_ext_status_rate": "mavlink_port1_ext_status_rate",
+        "mavlink_extra1_rate": "mavlink_port1_extra1_rate",
+        "mavlink_extra2_rate": "mavlink_port1_extra2_rate",
+        "mavlink_extra3_rate": "mavlink_port1_extra3_rate",
+        "mavlink_min_txbuffer": "mavlink_port1_min_txbuffer",
+        "mavlink_pos_rate": "mavlink_port1_pos_rate",
+        "mavlink_rc_chan_rate": "mavlink_port1_rc_chan_rate",
+        "mavlink_radio_type": "mavlink_port1_radio_type",
+        "nav_fw_wp_turn_smoothing": "nav_fw_wp_turn_mode"
+    },
+
+    "valueReplacements": {
+        "nav_fw_wp_turn_smoothing": {
+            "OFF": "DIRECT",
+            "ON": "COORD_FLYBY",
+            "ON-CUT": "COORD_FLYBY"
+        }
+    },
+
+    "removed": [
+        "led_pin_pwm_mode",
+        "frsky_use_legacy_gps_mode_sensor_ids",
+        "servo_autotrim_iterm_rate_limit"
+    ],
+
+    "settingPatternMappings": [],
+
+    "warnings": [
+        "GPS defaults changed: gps_ublox_nav_hz 10→8, gps_ublox_use_galileo and gps_ublox_use_beidou OFF→ON. Backups that still carry the old defaults keep the old values.",
+        "pinio_box1..4 defaults changed from NONE to USER1..USER4. A backup without these lines gets the new defaults.",
+        "LED pin PWM (led_pin_pwm_mode, ledpinpwm) is replaced by PINIO PWM (piniopwm). Logic condition operation 52 now targets the PINIO channel given by operand B (0 = former LED pin).",
+        "Backups taken on 9.0.0: custom special LED colors (mode_color 6 …) map to a different index since 9.1.0. Re-check LED special colors after restore."
+    ]
+}

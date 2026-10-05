@@ -783,14 +783,8 @@
     "featureTX_PROF_SEL": {
         "message": "TXスティックコマンドによるプロファイル選択"
     },
-    "featureINFLIGHT_ACC_CAL": {
-        "message": "フライト中の水平キャリブレーション"
-    },
     "featureMOTOR_STOP": {
         "message": "アーム後にモーターを回転させない"
-    },
-    "featureSERVO_TILT": {
-        "message": "サーボジンバル"
     },
     "featureBAT_PROFILE_AUTOSWITCH": {
         "message": "Battery Profile 自動選択"
@@ -816,12 +810,6 @@
     "featureGPSTip": {
         "message": "最初にポートの設定をしてください"
     },
-    "featureFAILSAFE": {
-        "message": "RX信号喪失時にフェイルセーフ設定を適用"
-    },
-    "featureSONAR": {
-        "message": "ソナー 距離センサー"
-    },
     "featureTELEMETRY": {
         "message": "テレメトリー出力"
     },
@@ -839,12 +827,6 @@
     },
     "featureDASHBOARD": {
         "message": "OLEDスクリーンディスプレイ"
-    },
-    "featureONESHOT125": {
-        "message": "ONESHOT ESCサポート"
-    },
-    "featureONESHOT125Tip": {
-        "message": "この機能を有効にする前に、必ずバッテリーとプロペラを外してください。"
     },
     "featurePWM_OUTPUT_ENABLE": {
         "message": "モーターとサーボ出力を有効"
@@ -864,18 +846,6 @@
     "onboardLoggingBlackboxRate": {
         "message": "ログに記録する飛行ループの反復の一部 (ロギング率)"
     },
-    "featureCHANNEL_FORWARDING": {
-        "message": "AUXチャンネルをサーボ出力に転送"
-    },
-    "featureSOFTSPI": {
-        "message": "CPUベース SPI"
-    },
-    "featurePWM_SERVO_DRIVER": {
-        "message": "外部PWMサーボドライバ"
-    },
-    "featurePWM_SERVO_DRIVERTip": {
-        "message": "外付けのPCA9685 PWMドライバを使用して、最大16個のサーボをフライトコントローラに接続します。この機能を有効にするにはPCA9685を接続する必要があります。"
-    },
     "featureRSSI_ADCTip": {
         "message": "RSSIは信号強度を測定するもので、航空機が圏外になったときやRF干渉を受けたときに知るのに非常に便利です。"
     },
@@ -893,12 +863,6 @@
     },
     "featureFW_AUTOTRIMTip": {
         "message": "スタビライズモードで飛行しているときは、マニュアルモードに切り替えたときに機体がまっすぐ飛行し続けるようにサーボの中間点を調整し続けます。これにはGPSが必要です。"
-    },
-    "featureDYNAMIC_FILTERS": {
-        "message": "動的ジャイロフィルター"
-    },
-    "featureDYNAMIC_FILTERSTip": {
-        "message": "自動FFTジャイロ解析を使用して、ジャイロノイズを減衰させるノッチフィルターを設定します。常に有効にすること！"
     },
     "configurationFeatureEnabled": {
         "message": "有効"

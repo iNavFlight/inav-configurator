@@ -484,9 +484,6 @@
     "sitlStopped": {
         "message": "SITL остановлен\n"
     },
-    "featurePWM_SERVO_DRIVERTip": {
-        "message": "Используйте внешний PWM-драйвер PCA9685 для подключения до 16 сервоприводов к полётному контроллеру. Для включения этой функции необходимо подключить PCA9685."
-    },
     "showAdvancedPIDs": {
         "message": "Показать расширенные настройки PID-регулятора"
     },
@@ -771,9 +768,6 @@
     "configurationAutoDisarmDelayHelp": {
         "message": "Используется только для взведения стиками (т.е. не с помощью тумблера)"
     },
-    "featureDYNAMIC_FILTERSTip": {
-        "message": "Использовать автоматический анализ гироскопа с помощью FFT (быстрого преобразования Фурье), чтобы настроить режекторные фильтры для подавления шума гироскопа. Должен быть включён постоянно!"
-    },
     "SafehomeAlt": {
         "message": "Высота"
     },
@@ -866,9 +860,6 @@
     },
     "osd_switch_indicators_align_left": {
         "message": "Выровнять имена переключателей слева от переключателей"
-    },
-    "featureONESHOT125": {
-        "message": "Поддержка ONESHOT ESC"
     },
     "configurationHeadtracker": {
         "message": "Система слежения за головой"
@@ -1713,9 +1704,6 @@
     "pidTuning_magHoldYawRate": {
         "message": "Ограничение скорости удержания курса"
     },
-    "featureSOFTSPI": {
-        "message": "SPI на базе процессора"
-    },
     "pidTuning_MatrixFilterQFactor": {
         "message": "Добротность матричного фильтра (Q-фактор)"
     },
@@ -2024,9 +2012,6 @@
     },
     "osdElement_BARO_TEMPERATURE_HELP": {
         "message": "Температура барометра"
-    },
-    "featureINFLIGHT_ACC_CAL": {
-        "message": "Калибровка в полёте"
     },
     "logicActivator": {
         "message": "Активен при"
@@ -3346,9 +3331,6 @@
     "geozoneActionPosHold": {
         "message": "Удержание позиции"
     },
-    "featureONESHOT125Tip": {
-        "message": "Перед включением отсоедините летную батарею и снимите пропеллеры."
-    },
     "pidTuning_PitchRate": {
         "message": "Скорость тангажа"
     },
@@ -3841,9 +3823,6 @@
     },
     "sensorsBarometer": {
         "message": "Барометр, метры"
-    },
-    "featurePWM_SERVO_DRIVER": {
-        "message": "Внешний PWM-драйвер сервоприводов"
     },
     "gyroNotchHz2": {
         "message": "Частота второго режекторного фильтра гироскопа"
@@ -4391,9 +4370,6 @@
     },
     "adjustmentsFunction28": {
         "message": "Ручная регулировка скорости тангажа и крена"
-    },
-    "featureFAILSAFE": {
-        "message": "Применить настройки failsafe при потере сигнала с приёмника"
     },
     "missionGeozoneAvailableVertices": {
         "message": "Доступные вершины:"
@@ -5036,9 +5012,6 @@
     "pidTuning_gyro_dyn_lpf_max_hz": {
         "message": "Динамический ФНЧ гироскопа, макс. частота отсечки"
     },
-    "featureSERVO_TILT": {
-        "message": "Сервоподвес"
-    },
     "osdElement_VTX_CHANNEL": {
         "message": "Диапазон и канал видеопередатчика"
     },
@@ -5608,9 +5581,6 @@
     "pidTuning_ITermMechanics": {
         "message": "Механика I-составляющей"
     },
-    "featureSONAR": {
-        "message": "Сонар"
-    },
     "portsHelp": {
         "message": "<strong>Примечание:</strong> не все комбинации настроек валидны. Когда прошивка полётного контроллера обнаружит это, конфигурация последовательного порта будет сброшена."
     },
@@ -5629,9 +5599,6 @@
     "sensorStatusGPSShort": {
         "message": "GPS",
         "description": "Текст для иконок датчиков вверху. Сделайте его кратким."
-    },
-    "featureCHANNEL_FORWARDING": {
-        "message": "Перенаправление aux каналов на сервовыходы"
     },
     "maxDiveAngle": {
         "message": "Макс. угол тангажа при снижении при навигации"
@@ -5785,9 +5752,6 @@
     },
     "sensorsAccelSelect": {
         "message": "Акселерометр"
-    },
-    "featureDYNAMIC_FILTERS": {
-        "message": "Динамические фильтры гироскопа"
     },
     "adjustmentsFunction38": {
         "message": "Регулировка D-коэффициента уровня"

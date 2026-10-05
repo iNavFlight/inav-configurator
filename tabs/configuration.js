@@ -25,8 +25,8 @@ function updateIna226SettingsVisibility() {
     const usesIna226Voltage = isIna226Selected($('#vbat_meter_type'));
     const usesIna226Current = isIna226Selected($('#current_meter_type'));
 
-    $('.ina226-common-setting').toggle(usesIna226Voltage || usesIna226Current);
-    $('.ina226-current-setting').toggle(usesIna226Current);
+    $('.ina226-common-setting').prop('hidden', !(usesIna226Voltage || usesIna226Current));
+    $('.ina226-current-setting').prop('hidden', !usesIna226Current);
     $('.adc-voltage-setting').toggle(!usesIna226Voltage);
     $('.adc-current-setting').toggle(!usesIna226Current);
 }

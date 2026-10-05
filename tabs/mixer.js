@@ -885,6 +885,7 @@ mixerTab.initialize = function (callback, scrollPosition) {
             renderOutputMapping();
 
             motorWizardModal.close();
+            saveAndReboot();
         });
 
         // Reset wizard when modal opens
@@ -935,7 +936,7 @@ mixerTab.initialize = function (callback, scrollPosition) {
                 }
             });
 
-            renderServoOutputImage();
+            renderOutputMapping();
         };
 
         $("#motor_direction_inverted").on('change', updateMotorDirection);

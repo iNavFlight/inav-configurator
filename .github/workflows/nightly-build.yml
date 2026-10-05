@@ -3,14 +3,19 @@ name: Build pre-release
 on: 
   push:
     branches:
-      - master
       - maintenance-*
 #  pull_request:
 
 jobs:
     build:
         name: build
+        # Gate secrets on the ref actually being protected, not just on the
+        # branches: glob above - a maintenance-* branch (or a newly created one
+        # matching the glob) isn't automatically protected in repo settings, and
+        # this job passes signing/notarization secrets to whatever code is on it.
+        if: github.ref_protected == true
         uses: ./.github/workflows/ci.yml
+        secrets: inherit
     
     release:
         name: Build nightly-release
@@ -52,7 +57,9 @@ jobs:
 
                   ### MacOS builds
 
-                  MacOS builds are not signed, so you will need to run ```xattr -cr /path/to/your/INAV Configurator.app``` from the command line to remove the warnings about it being a downloaded application or moving it to trash when trying to launch.
+                  Nightly macOS builds from protected-branch pushes are signed and notarized when the repo has Apple credentials configured. Pull-request CI builds are always unsigned.
+
+                  If Gatekeeper blocks an unsigned app, run ```xattr -cr /path/to/your/INAV Configurator.app``` from the command line.
       
                   ### Repository:
                   ${{ github.repository }} ([link](${{ github.event.repository.html_url }}))
