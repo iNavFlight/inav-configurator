@@ -4,7 +4,6 @@ import { titleize } from  'inflection';
 import semver from 'semver';
 import mapSeries from 'promise-map-series';
 import jBox from 'jbox';
-import { debounce } from 'throttle-debounce';
 
 import FC from './../js/fc';
 import GUI from './../js/gui';
@@ -18,6 +17,7 @@ import i18n from './../js/localization';
 import store from './../js/store';
 import dialog from './../js/dialog';
 import { resolveMspWrite } from './../js/mspWriteOutcome';
+import { layoutReach, positionsToCopy } from './../js/osdLayouts';
 
 var SYM = SYM || {};
 SYM.LAST_CHAR = 225; // For drawing the font preview
@@ -2472,8 +2472,11 @@ OSD.is_item_displayed = function(item, group) {
         return true;
     }
     // Hardware/feature gate closed (e.g. pitot_hardware set to NONE): keep an
-    // already-enabled element toggleable so the user can turn it off (#2639).
-    return OSD.data.items[item.id].isVisible === true;
+    // already-enabled element toggleable so the user can turn it off (#2639),
+    // in whichever layout shows it
+    return OSD.data.layouts.some(function (layout) {
+        return layout[item.id]?.isVisible === true;
+    });
 };
 
 OSD.get_item_preview = function(item) {
@@ -2579,24 +2582,7 @@ OSD.updateDisplaySize = function () {
         }
     }
 
-    // set the preview size based on the video type
-    // -- AVATAR
-    $('.third_left').toggleClass('preview_avatar_side', (video_type == 'AVATAR'))
-    $('.preview').toggleClass('preview_avatar cut43_left', (video_type == 'AVATAR'))
-    $('.third_right').toggleClass('preview_avatar_side', (video_type == 'AVATAR'))
-    // -- DJI WTF
-    $('.third_left').toggleClass('preview_dji_hd_side', video_type == 'DJIWTF')
-    $('.preview').toggleClass('preview_dji_hd cut43_left', video_type == 'DJIWTF')
-    $('.third_right').toggleClass('preview_dji_hd_side', video_type == 'DJIWTF')
-    // -- HD ZERO
-    $('.third_left').toggleClass('preview_hdzero_side', (video_type == 'HDZERO'))
-    $('.preview').toggleClass('preview_hdzero cut43_left', (video_type == 'HDZERO'))
-    $('.third_right').toggleClass('preview_hdzero_side', (video_type == 'HDZERO'))
-    // -- BFHDCOMPAT
-    $('.third_left').toggleClass('preview_bfhdcompat_side', (video_type == 'BFHDCOMPAT' || video_type == 'DJI_NATIVE'))
-    $('.preview').toggleClass('preview_bfhdcompat cut43_left', (video_type == 'BFHDCOMPAT' || video_type == 'DJI_NATIVE'))
-    $('.third_right').toggleClass('preview_bfhdcompat_side', (video_type == 'BFHDCOMPAT' || video_type == 'DJI_NATIVE'))
-
+    OSD.GUI.fitPreview();
     OSD.GUI.updateGuidesView($('#videoGuides').find('input').is(':checked'));
 };
 
@@ -2619,9 +2605,9 @@ OSD.saveConfig = function(callback) {
 // dropped it after exhausting retries - so callers that await the result
 // (bulk paste/clear) can detect a failed write instead of assuming it
 // landed.
-OSD.saveItem = function(item, callback) {
-    let pos = OSD.data.items[item.id];
-    let data = OSD.msp.encodeLayoutItem(OSD.data.selected_layout, item, pos);
+OSD.saveItem = function(item, callback, layout = OSD.data.selected_layout) {
+    let pos = OSD.data.layouts[layout][item.id];
+    let data = OSD.msp.encodeLayoutItem(layout, item, pos);
     return resolveMspWrite(MSP.promise(MSPCodes.MSP2_INAV_OSD_SET_LAYOUT_ITEM, data), callback);
 };
 
@@ -2879,16 +2865,23 @@ OSD.GUI.preview = {
             position += overflows_line;
         }
 
-        var $positionInput = $('input.' + item_id + '.position');
-        if ($positionInput.length > 0) {
-            $positionInput.val(position).trigger('change');
-        } else {
-            // The element is hidden from the list by the search filter, so its
-            // position input doesn't exist in the DOM. Update the item directly.
-            var itemData = OSD.data.items[item_id];
-            itemData.position = position;
-            OSD.msp.helpers.calculate.coords(itemData);
-            OSD.GUI.saveItem(item);
+        var to = OSD.msp.helpers.calculate.coords({position: position});
+        OSD.GUI.layoutsMovedTogether().forEach(function (layout) {
+            OSD.GUI.moveItem(item, layout, to).then(function (landed) {
+                if (!landed) {
+                    GUI.log(i18n.getMessage('osdLayoutSaveItemFailed'));
+                }
+            }).catch(function (error) {
+                console.error('OSD: could not move the element', error);
+            });
+        });
+    },
+
+    // Brings the element's row into view, the list being long
+    onClick: function () {
+        var item = $(this).data('item');
+        if (item) {
+            $('.display-field.field-' + item.id)[0]?.scrollIntoView({block: 'nearest'});
         }
     }
 };
@@ -3046,9 +3039,11 @@ OSD.GUI.updateFields = function(event) {
         var osdSearch = $('.osd_search');
         for (var jj = 0; jj < groupItems.length; jj++) {
             var item = groupItems[jj];
-            var itemData = OSD.data.items[item.id];
-            var checked = itemData.isVisible ? 'checked' : '';
-            var $field = $('<div class="display-field field-' + item.id + '"/>');
+            var $field = $('<div class="display-field field-' + item.id + '"/>')
+                .attr('data-name', item.name)
+                .data('item', item)
+                .on('mouseenter', OSD.GUI.preview.onMouseEnter)
+                .on('mouseleave', OSD.GUI.preview.onMouseLeave);
             var name = item.name;
             var nameKey = 'osdElement_' + name;
             var nameMessage = i18n.getMessage(nameKey);
@@ -3077,55 +3072,10 @@ OSD.GUI.updateFields = function(event) {
                         outside: 'x'
                     });
             }
-            $field.append(
-                $('<input type="checkbox" name="' + item.name + '" class="togglesmall"></input>')
-                    .data('item', item)
-                    .attr('checked', itemData.isVisible)
-                    .on('change', function () {
-                        var item = $(this).data('item');
-                        var itemData = OSD.data.items[item.id];
-                        var $position = $(this).parent().find('.position.' + item.name);
-                        itemData.isVisible = !itemData.isVisible;
-
-                        if (itemData.isVisible) {
-                            // Ensure the element is inside the viewport, at least partially.
-                            // In that case move it to the very first row/col, otherwise there's
-                            // no way to reposition items that are outside the viewport.
-                            OSD.msp.helpers.calculate.coords(itemData);
-                            if (itemData.x > OSD.data.display_size.x || itemData.y > OSD.data.display_size.y) {
-                                itemData.x = itemData.y = itemData.position = 0;
-                            }
-                            $position.show();
-                        } else {
-                            $position.hide();
-                        }
-
-                        OSD.GUI.saveItem(item);
-
-                        // Sync card header toggle if applicable
-                        var ceMatch = item.name.match(/^CUSTOM_ELEMENT_(\d+)$/);
-                        if (ceMatch) {
-                            var $card = $('.ce-card[data-ce-index="' + (parseInt(ceMatch[1]) - 1) + '"]');
-                            $card.find('.ce-card-header input[type="checkbox"]').prop('checked', itemData.isVisible);
-                        }
-                    })
-            );
-
-            $field.append('<label for="' + item.name + '" class="char-label">' + name + '</label>');
-            if (item.positionable !== false) {
-                $field.append(
-                    $('<input type="number" class="' + item.id + ' position"></input>')
-                        .data('item', item)
-                        .val(itemData.position)
-                        .on('change', debounce(250, function (e) {
-                            var item = $(this).data('item');
-                            var itemData = OSD.data.items[item.id];
-                            itemData.position = parseInt($(this).val());
-                            OSD.msp.helpers.calculate.coords(itemData);
-                            OSD.GUI.saveItem(item);
-                        }))
-                );
-            }
+            $field.append(OSD.GUI.layoutChecks(item));
+            // The full name, for when a narrow column cuts it
+            var $label = $('<label class="char-label">' + name + '</label>');
+            $field.append($label.attr('title', $label.text()));
             $displayFields.append($field);
         }
         if (groupContainer.find('.display-fields').children().length > 0) {
@@ -3191,7 +3141,7 @@ OSD.GUI.removeBottomLines = function(){
 
 OSD.GUI.updateDjiMessageElements = function(on) {
     $('.display-field').each(function(index, element) {
-        var name = $(element).find('input').attr('name');
+        var name = $(element).attr('data-name');
         if (OSD.DjiElements.craftNameElements.includes(name)) {
             if (on) {
                 $(element)
@@ -3249,7 +3199,7 @@ OSD.GUI.updateDjiView = function(on) {
 
         var displayFields = $('.display-field');
         displayFields.each(function(index, element) {
-            var name = $(element).find('input').attr('name');
+            var name = $(element).attr('data-name');
             if (!OSD.DjiElements.supported.includes(name)) {
                 $(element).hide();
             }
@@ -3308,7 +3258,7 @@ OSD.GUI.updateAlarms = function() {
 };
 
 OSD.GUI.updateMapPreview = function(mapCenter, name, directionSymbol, centerSymbol) {
-    if ($('input[name="' + name + '"]').prop('checked')) {
+    if (OSD.GUI.isPreviewed(name)) {
         var mapInitialX = OSD.data.display_size.x - 2;
         OSD.GUI.checkAndProcessSymbolPosition(mapCenter, centerSymbol);
     }
@@ -3401,14 +3351,14 @@ OSD.GUI.updatePreviews = function() {
         let hudCenterPosition = centerPosition - (OSD.constants.VIDEO_COLS[video_type] * $('#osd_horizon_offset').val());
 
         // artificial horizon
-        if ($('input[name="ARTIFICIAL_HORIZON"]').prop('checked')) {
+        if (OSD.GUI.isPreviewed('ARTIFICIAL_HORIZON')) {
             for (let i = 0; i < 9; i++) {
                 OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition - 4 + i, SYM.AH_BAR9_0 + 4);
             }
         }
 
         // crosshairs
-        if ($('input[name="CROSSHAIRS"]').prop('checked')) {
+        if (OSD.GUI.isPreviewed('CROSSHAIRS')) {
             let crsHNumber = Settings.getInputValue('osd_crosshairs_style');
             if (crsHNumber == 1) {
                 // AIRCRAFT style
@@ -3431,7 +3381,7 @@ OSD.GUI.updatePreviews = function() {
         }
 
         // sidebars
-        if ($('input[name="HORIZON_SIDEBARS"]').prop('checked')) {
+        if (OSD.GUI.isPreviewed('HORIZON_SIDEBARS')) {
             var hudwidth = OSD.constants.AHISIDEBARWIDTHPOSITION;
             var hudheight = OSD.constants.AHISIDEBARHEIGHTPOSITION;
             for (let i = -hudheight; i <= hudheight; i++) {
@@ -3468,6 +3418,7 @@ OSD.GUI.updatePreviews = function() {
                 .on('dragover', OSD.GUI.preview.onDragOver)
                 .on('dragleave', OSD.GUI.preview.onDragLeave)
                 .on('drop', OSD.GUI.preview.onDrop)
+                .on('click', OSD.GUI.preview.onClick)
                 .data('item', item)
                 .data('position', i);
             // Required for NW.js - Otherwise the <img /> will
@@ -3502,25 +3453,16 @@ OSD.GUI.updateAll = function() {
         $('.unsupported').fadeIn();
         return;
     }
-    var layouts = $('.osd_layouts');
     var copy = $('.osd_copy');
     var paste = $('.osd_paste').hide();
     var clear = $('.osd_clear');
+    // updateAll runs again after each font change: bind once
+    $('.osd-layout-actions a, .osd_positions_to_all').off('click').on('click', function (e) {
+        e.preventDefault();
+    });
     if (OSD.data.layout_count > 1) {
-        layouts.empty();
-        for (var ii = 0; ii < OSD.data.layout_count; ii++) {
-            var name = ii > 0 ? i18n.getMessage('osdLayoutAlternative', [ii]) : i18n.getMessage('osdLayoutDefault');
-            var opt = $('<option/>').val(ii).text(name).appendTo(layouts);
-        }
-        layouts.val(OSD.data.selected_layout);
-        layouts.show();
-        layouts.on('change', function() {
-            OSD.updateSelectedLayout(parseInt(layouts.val()));
-            OSD.GUI.updateFields();
-            OSD.GUI.updateGuidesView($('#videoGuides').find('input').is(':checked'));
-            OSD.GUI.updateDjiView($('#djiUnsupportedElements').find('input').is(':checked'));
-            OSD.GUI.updatePreviews();
-        });
+        OSD.GUI.buildLayoutSwitch();
+        $('.osd-layout-tabs, .osd-layout-actions, .osd-preview-options').show();
 
         copy.on('click', function() {
             if(OSD.data.selected_layout >= 0 && OSD.data.selected_layout < OSD.data.layout_count){
@@ -3532,17 +3474,19 @@ OSD.GUI.updateAll = function() {
 
         paste.on('click',  async function() {
             if(layout_clipboard.filled == true){
-
-                var oldLayout = JSON.parse(JSON.stringify(OSD.data.layouts[OSD.data.selected_layout]))
-                OSD.data.layouts[OSD.data.selected_layout] = JSON.parse(JSON.stringify(layout_clipboard.layout));
-                layouts.trigger('change');
+                // A layout picked while the writes run must not get the rest of them
+                var target = OSD.data.selected_layout;
+                var oldLayout = structuredClone(OSD.data.layouts[target]);
+                OSD.data.layouts[target] = structuredClone(layout_clipboard.layout);
+                OSD.GUI.showLayout(target);
+                OSD.GUI.rebuildFields();
 
                 var allSaved = true;
-                for(var index in OSD.data.layouts[OSD.data.selected_layout])
+                for(var index in OSD.data.layouts[target])
                 {
-                    var item = OSD.data.layouts[OSD.data.selected_layout][index];
+                    var item = OSD.data.layouts[target][index];
                     if(!(item.isVisible === false && oldLayout[index].isVisible === false) && (oldLayout[index].x !== item.x || oldLayout[index].y !== item.y || oldLayout[index].position !== item.position || oldLayout[index].isVisible !== item.isVisible)){
-                        if (!(await OSD.saveItem({id: index}))) {
+                        if (!(await OSD.saveItem({id: index}, null, target))) {
                             allSaved = false;
                             break;
                         }
@@ -3554,7 +3498,8 @@ OSD.GUI.updateAll = function() {
         });
 
         clear.on('click', async function() {
-            var oldLayout = JSON.parse(JSON.stringify(OSD.data.layouts[OSD.data.selected_layout]));
+            var target = OSD.data.selected_layout;
+            var oldLayout = structuredClone(OSD.data.layouts[target]);
 
             var clearedLayout = [];
             oldLayout.forEach(function(item, index){
@@ -3563,14 +3508,14 @@ OSD.GUI.updateAll = function() {
                 clearedLayout[index] = itemCopy;
             })
 
-            OSD.data.layouts[OSD.data.selected_layout] = clearedLayout;
-            layouts.trigger('change');
+            OSD.data.layouts[target] = clearedLayout;
+            OSD.GUI.showLayout(target);
+            OSD.GUI.rebuildFields();
 
             var allSaved = true;
-            for(var index in OSD.data.layouts[OSD.data.selected_layout]) {
-                var item = OSD.data.layouts[OSD.data.selected_layout][index];
+            for(var index in OSD.data.layouts[target]) {
                 if(oldLayout[index].isVisible === true){
-                    if (!(await OSD.saveItem({id: index}))) {
+                    if (!(await OSD.saveItem({id: index}, null, target))) {
                         allSaved = false;
                         break;
                     }
@@ -3580,22 +3525,32 @@ OSD.GUI.updateAll = function() {
             GUI.log(i18n.getMessage(allSaved ? 'osdClearLayout' : 'osdLayoutSaveItemFailed'));
         });
 
+        $('.osd_positions_to_all').on('click', async function () {
+            var from = OSD.data.selected_layout;
+            if (!(await dialog.confirm(i18n.getMessage('osdPositionsToAllLayoutsConfirm', [OSD.GUI.layoutName(from)])))) {
+                return;
+            }
+            var allSaved = true;
+            for (var change of positionsToCopy(OSD.data.layouts, from)) {
+                if (!(await OSD.GUI.moveItem({id: change.id}, change.layout, change))) {
+                    allSaved = false;
+                    break;
+                }
+            }
+            GUI.log(i18n.getMessage(allSaved ? 'osdPositionsCopiedToAllLayouts' : 'osdLayoutSaveItemFailed'));
+        });
 
+        $('.osd-move-all-check')
+            .prop('checked', store.get('osdMoveInAllLayouts', false))
+            .off('change')
+            .on('change', function () {
+                store.set('osdMoveInAllLayouts', this.checked);
+            });
     } else {
-        layouts.hide();
-        layouts.off('change');
-
-        copy.hide();
-        copy.off('change');
-
-        paste.hide();
-        paste.off('change');
-
-        clear.hide();
-        clear.off('change');
+        $('.osd-layout-tabs, .osd-layout-actions, .osd-preview-options').hide();
     }
 
-    $('.osd_search').on('input', function(event) {
+    $('.osd_search').off('input').on('input', function(event) {
         OSD.GUI.updateFields(event);
     });
     $('.supported').fadeIn();
@@ -3626,6 +3581,268 @@ OSD.GUI.saveConfig = function() {
     OSD.saveConfig(function() {
         OSD.GUI.updatePreviews();
     });
+};
+
+OSD.GUI.layoutName = function (layout) {
+    return layout > 0 ? i18n.getMessage('osdLayoutAlternative', [layout]) : i18n.getMessage('osdLayoutDefault');
+};
+
+// One checkbox per layout: whether that layout shows the element
+OSD.GUI.layoutChecks = function (item) {
+    var $checks = $('<span class="osd-layout-checks"/>');
+    for (let layout = 0; layout < OSD.data.layout_count; layout++) {
+        $('<input type="checkbox" class="osd-layout-check">')
+            .attr('data-item-id', item.id)
+            .attr('data-layout', layout)
+            .attr('title', OSD.GUI.layoutName(layout))
+            .prop('checked', OSD.data.layouts[layout][item.id].isVisible)
+            .on('change', function () {
+                OSD.GUI.setItemVisible(item, layout, this.checked);
+            })
+            .appendTo($checks);
+    }
+    return $checks;
+};
+
+OSD.GUI.setItemVisible = function (item, layout, visible) {
+    var itemData = OSD.data.layouts[layout][item.id];
+    var before = {x: itemData.x, y: itemData.y, position: itemData.position, isVisible: itemData.isVisible};
+    itemData.isVisible = visible;
+
+    if (visible) {
+        // Ensure the element is inside the viewport, at least partially.
+        // In that case move it to the very first row/col, otherwise there's
+        // no way to reposition items that are outside the viewport.
+        OSD.msp.helpers.calculate.coords(itemData);
+        if (itemData.x > OSD.data.display_size.x || itemData.y > OSD.data.display_size.y) {
+            itemData.x = itemData.y = itemData.position = 0;
+        }
+    }
+
+    // A custom element has its checkboxes on its card as well
+    var $checks = $('.osd-layout-check[data-item-id="' + item.id + '"][data-layout="' + layout + '"]');
+    $checks.prop('checked', visible);
+    OSD.saveItem(item, null, layout).then(function (landed) {
+        if (!landed) {
+            Object.assign(itemData, before);
+            $checks.prop('checked', before.isVisible);
+        }
+        if (layout == OSD.data.selected_layout) {
+            OSD.GUI.updatePreviews();
+        }
+    });
+};
+
+// Moves the element in one layout; a position the flight controller refused is put back
+OSD.GUI.moveItem = async function (item, layout, to) {
+    var itemData = OSD.data.layouts[layout][item.id];
+    var before = {x: itemData.x, y: itemData.y, position: itemData.position};
+    Object.assign(itemData, {x: to.x, y: to.y, position: to.position});
+    var landed = await OSD.saveItem(item, null, layout);
+    if (!landed) {
+        Object.assign(itemData, before);
+    }
+    if (layout == OSD.data.selected_layout) {
+        OSD.GUI.updatePreviews();
+    }
+    return landed;
+};
+
+// After a paste or a clear replaced a whole layout: the rows depend on what every layout shows
+OSD.GUI.rebuildFields = function () {
+    OSD.GUI.updateFields();
+    OSD.GUI.updateDjiView($('#djiUnsupportedElements').find('input').is(':checked'));
+};
+
+// Whether the previewed layout shows the element with this name
+OSD.GUI.isPreviewed = function (name) {
+    for (var group of OSD.constants.ALL_DISPLAY_GROUPS) {
+        var item = group.items.find(function (groupItem) {
+            return groupItem.name == name;
+        });
+        if (item) {
+            return OSD.is_item_displayed(item, group) && OSD.data.items[item.id].isVisible;
+        }
+    }
+    return false;
+};
+
+OSD.GUI.layoutsMovedTogether = function () {
+    if (!$('.osd-move-all-check').is(':checked')) {
+        return [OSD.data.selected_layout];
+    }
+    return Array.from({length: OSD.data.layout_count}, function (unused, layout) {
+        return layout;
+    });
+};
+
+OSD.GUI.buildLayoutSwitch = function () {
+    var $tabs = $('.osd-layout-tabs').empty();
+    for (let layout = 0; layout < OSD.data.layout_count; layout++) {
+        $('<button type="button" class="osd-layout-tab" role="tab"/>')
+            .attr('data-layout', layout)
+            .attr('title', OSD.GUI.layoutName(layout))
+            .text(layout > 0 ? i18n.getMessage('osdLayoutTabAlternative', [layout]) : i18n.getMessage('osdLayoutTabDefault'))
+            .on('click', function () {
+                OSD.GUI.showLayout(layout);
+            })
+            .appendTo($tabs);
+    }
+    OSD.GUI.markShownLayout();
+    OSD.GUI.updateLayoutReach();
+};
+
+OSD.GUI.markShownLayout = function () {
+    $('.osd-layout-tab').each(function () {
+        var shown = $(this).attr('data-layout') == OSD.data.selected_layout;
+        $(this).toggleClass('is-active', shown).attr('aria-selected', shown);
+    });
+};
+
+OSD.GUI.showLayout = function (layout) {
+    OSD.updateSelectedLayout(layout);
+    OSD.GUI.markShownLayout();
+    OSD.GUI.updateLayoutReach();
+    OSD.GUI.updatePreviews();
+};
+
+// Placing elements needs the font readable: the preview never goes below its own size. Where the
+// three columns leave it less, the settings go below, then the preview above the lists, and the tab scrolls
+OSD.GUI.fitPreview = function () {
+    var stage = $('.tab-osd .osd-preview-stage')[0];
+    var view = $('.tab-osd .supported')[0];
+    if (!stage || !view?.clientHeight || !OSD.data?.display_size) {
+        return;
+    }
+    var columns = $('.tab-osd .osd-columns');
+    var box = $('.tab-osd .osd-preview-box')[0];
+    var width = OSD.data.display_size.x * FONT.constants.SIZES.CHAR_WIDTH;
+    var height = OSD.data.display_size.y * FONT.constants.SIZES.CHAR_HEIGHT;
+    var style = getComputedStyle(stage);
+    var padding = Number.parseFloat(style.paddingLeft) + Number.parseFloat(style.paddingRight);
+    columns[0].style.setProperty('--osd-preview-need', (width + padding + box.offsetWidth - box.clientWidth) + 'px');
+    columns[0].style.setProperty('--osd-main-height', view.clientHeight + 'px');
+    // Measured on the column tracks, not the preview: after a format change it still has the old size
+    var columnsFit = function () {
+        var grid = getComputedStyle(columns[0]);
+        var tracks = grid.gridTemplateColumns.split(' ').map(Number.parseFloat);
+        var used = tracks.reduce((sum, track) => sum + track, 0) + (tracks.length - 1) * Number.parseFloat(grid.columnGap);
+        return used <= columns[0].clientWidth + 0.5;
+    };
+    for (var arrangement of ['', 'osd-columns--two', 'osd-columns--stacked']) {
+        columns.removeClass('osd-columns--two osd-columns--stacked').addClass(arrangement);
+        if (columnsFit()) {
+            break;
+        }
+    }
+    var roomWidth = stage.clientWidth - padding;
+    var chrome = box.getBoundingClientRect().height - stage.getBoundingClientRect().height;
+    var roomHeight = view.clientHeight - chrome;
+    // Whole screen pixels per font pixel: a fraction makes some of them one pixel wide and some two
+    var steps = Math.floor(Math.min(roomWidth / width, roomHeight / height) * window.devicePixelRatio + 1e-6);
+    var zoom = Math.max(1, steps / window.devicePixelRatio);
+    $('.tab-osd .display-layout')[0].style.setProperty('--osd-preview-zoom', zoom);
+    columns[0].style.setProperty('--osd-main-height', Math.max(view.clientHeight, Math.ceil(chrome + height * zoom)) + 'px');
+};
+
+// A resize can arrive before the new scaling does, and the whole pixels per font pixel depend on it
+OSD.GUI.watchPixelRatio = function () {
+    var query = window.matchMedia('(resolution: ' + window.devicePixelRatio + 'dppx)');
+    var changed = function () {
+        OSD.GUI.watchPixelRatio();
+        OSD.GUI.fitPreview();
+    };
+    query.addEventListener('change', changed, {once: true});
+    OSD.GUI.stopPixelRatioWatch = function () {
+        query.removeEventListener('change', changed);
+    };
+};
+
+// Which switch or logic condition shows each layout in flight; apart from OSD.data, which every
+// font change reloads
+OSD.reach = {loaded: false, failsafeShowsDefault: false};
+
+OSD.loadLayoutReach = function () {
+    OSD.reach.loaded = false;
+    return MSP.promise(MSPCodes.MSP_MODE_RANGES)
+        .then(function () {
+            return new Promise(function (resolve) {
+                mspHelper.loadLogicConditions(resolve);
+            });
+        })
+        .then(function () {
+            return mspHelper.getSetting('osd_failsafe_switch_layout');
+        })
+        .then(function (data) {
+            OSD.reach.failsafeShowsDefault = Boolean(data?.value);
+            OSD.reach.loaded = true;
+        })
+        .catch(function (error) {
+            console.warn('OSD: could not read what selects the layouts', error);
+        });
+};
+
+OSD.GUI.updateLayoutReach = function () {
+    var $reach = $('.osd-layout-reach');
+    if (!OSD.reach.loaded || OSD.data.layout_count < 2) {
+        $reach.text('');
+        return;
+    }
+
+    var conditions = FC.LOGIC_CONDITIONS.get().map(function (condition) {
+        return {
+            enabled: condition.getEnabled(),
+            operation: condition.getOperation(),
+            operandAType: condition.getOperandAType(),
+            operandAValue: condition.getOperandAValue()
+        };
+    });
+    var reach = layoutReach(FC.MODE_RANGES || [], conditions, OSD.data.layout_count);
+    var ranges = reach.ranges;
+    var reached = reach.reached;
+    var picks = reach.picks;
+
+    $('.osd-layout-tab').each(function () {
+        $(this).toggleClass('is-unreached', !reached[$(this).attr('data-layout')]);
+    });
+
+    var shown = OSD.data.selected_layout;
+    var text;
+    if (shown == 0) {
+        text = i18n.getMessage('osdLayoutReachDefault');
+        if (OSD.reach.failsafeShowsDefault) {
+            text += ' ' + i18n.getMessage('osdLayoutReachFailsafe');
+        }
+    } else if (ranges[shown].length > 0) {
+        var where = ranges[shown].map(function (modeRange) {
+            return i18n.getMessage('osdLayoutReachRange', [modeRange.auxChannelIndex + 5, modeRange.range.start, modeRange.range.end]);
+        }).join(', ');
+        text = i18n.getMessage('osdLayoutReachMode', [shown, where]);
+        // The firmware checks OSD ALT 3, then 2, then 1
+        var higher = ranges.slice(shown + 1).some(function (modeRanges) {
+            return modeRanges.length > 0;
+        });
+        if (higher) {
+            text += ' ' + i18n.getMessage('osdLayoutReachHigher');
+        }
+    } else {
+        text = i18n.getMessage('osdLayoutReachNone', [shown]);
+    }
+    // Any OSD ALT switch that is on wins over a logic condition
+    picks.forEach(function (pick) {
+        if (pick.layout === null) {
+            text += ' ' + i18n.getMessage('osdLayoutReachLogicValue', [pick.index]);
+        } else if (shown == 0 && pick.layout > 0) {
+            text += ' ' + i18n.getMessage('osdLayoutReachDefaultLogic', [pick.index, pick.layout]);
+        } else if (shown > 0 && pick.layout == shown) {
+            text += ' ' + i18n.getMessage('osdLayoutReachLogic', [pick.index]);
+        }
+    });
+    // Failsafe comes before the modes and the logic conditions
+    if (shown > 0 && OSD.reach.failsafeShowsDefault) {
+        text += ' ' + i18n.getMessage('osdLayoutReachFailsafeDefault');
+    }
+    $reach.text(text);
 };
 
 let HARDWARE = {};
@@ -3875,8 +4092,26 @@ osdTab.initialize = function (callback) {
                 OSD.GUI.updateDjiMessageElements(this.checked);
             });
 
-            GUI.content_ready(callback);
-        })));
+            // The window, or the text above and below the preview, changes the room it has
+            OSD.GUI.previewResize = new ResizeObserver(function () {
+                OSD.GUI.fitPreview();
+            });
+            $('.tab-osd .content_wrapper, .tab-osd .osd-preview-toolbar, .tab-osd .osd-preview-footer').each(function () {
+                OSD.GUI.previewResize.observe(this);
+            });
+            OSD.GUI.watchPixelRatio();
+
+            // Before the tab counts as loaded: it refills FC.LOGIC_CONDITIONS, which the Programming tab
+            // fills too, and no tab switch may start while it runs
+            OSD.loadLayoutReach().then(function () {
+                OSD.GUI.updateLayoutReach();
+                GUI.content_ready(callback);
+            }).catch(function (error) {
+                console.error('OSD: could not load the tab', error);
+            });
+        }))).catch(function (error) {
+            console.error('OSD: could not load the tab', error);
+        });
     });
 };
 
@@ -4129,33 +4364,10 @@ function buildCustomElementCard(i) {
 
     // Header
     var $header = $('<div>').addClass('ce-card-header');
-    var ceItemData = ceDisplayItem && OSD.data.items[ceDisplayItem.id] ? OSD.data.items[ceDisplayItem.id] : null;
-    var isChecked = ceItemData ? ceItemData.isVisible : false;
+    var $checks = ceDisplayItem && OSD.data.items[ceDisplayItem.id] ? OSD.GUI.layoutChecks(ceDisplayItem) : $('<span>');
 
-    var $toggle = $('<input type="checkbox" class="togglesmall">')
-        .prop('checked', isChecked)
-        .data('displayItem', ceDisplayItem)
-        .on('change', function(e) {
-            e.stopPropagation();
-            var displayItem = $(this).data('displayItem');
-            if (!displayItem) return;
-            var itemData = OSD.data.items[displayItem.id];
-            itemData.isVisible = $(this).is(':checked');
-
-            if (itemData.isVisible) {
-                OSD.msp.helpers.calculate.coords(itemData);
-                if (itemData.x > OSD.data.display_size.x || itemData.y > OSD.data.display_size.y) {
-                    itemData.x = itemData.y = itemData.position = 0;
-                }
-            }
-
-            OSD.GUI.saveItem(displayItem);
-            // Sync the hidden left-panel checkbox
-            $('input[name="' + displayItem.name + '"]').prop('checked', itemData.isVisible);
-        });
-
-    // Prevent header click from toggling when clicking the switch area
-    $header.on('click', '.ios7-switch', function(e) {
+    // Prevent header click from toggling when clicking the checkboxes
+    $header.on('click', '.osd-layout-checks', function(e) {
         e.stopPropagation();
     });
 
@@ -4163,7 +4375,7 @@ function buildCustomElementCard(i) {
     var $preview = $('<span>').addClass('ce-card-preview');
     var $chevron = $('<span>').addClass('ce-card-chevron').html('&#9662;'); // ▾
 
-    $header.append($toggle).append($name).append($preview).append($chevron);
+    $header.append($checks).append($name).append($preview).append($chevron);
 
     // Header click toggles collapse
     $header.on('click', function(e) {
@@ -4274,13 +4486,6 @@ function injectCustomElementCards() {
 
     // Set collapse states
     updateCustomElementCardStates();
-
-    // Apply switchery to card toggles
-    $container.find('.togglesmall').each(function(index, elem) {
-        $(elem).wrapAll('<label class="ios7-switch" style="font-size: 12px"/>');
-        $(elem).after('<span></span>');
-        $(elem).removeClass('togglesmall');
-    });
 }
 
 function updateOSDCustomElementsDisplay() {
@@ -4754,6 +4959,9 @@ osdTab.cleanup = function (callback) {
 
     delete OSD.GUI.jbox;
     $('.jBox-wrapper').remove();
+
+    OSD.GUI.previewResize?.disconnect();
+    OSD.GUI.stopPixelRatioWatch?.();
 
     if (callback) callback();
 };

@@ -289,23 +289,6 @@
     padding: 1em;
 }
 
-.tab-osd .col {
-    display: inline-block;
-}
-
-.tab-osd .left {
-    float: left;
-}
-
-.tab-osd .right {
-    float: right;
-    margin-top: -7px;
-}
-
-.tab-osd .preview .gui_box_titlebar {
-    position: relative;
-}
-
 .tab-osd .preview .char {
     display: inline-block;
     padding: 0;
@@ -329,11 +312,386 @@
 }
 
 .tab-osd .preview .row {
+    display: flex;
     height: 18px;
 }
 
+/* Three columns that keep the tab's height: the elements and the settings scroll on their own,
+   the preview stays in view. The toolbar takes its own room below them instead of covering them. */
+.tab-osd {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
 .tab-osd .content_wrapper {
-    height: calc(100% - 41px);
+    flex: 1;
+    min-height: 0;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr);
+    overflow: hidden;
+}
+
+.tab-osd .content_toolbar {
+    position: static;
+    flex: none;
+}
+
+.tab-osd .tab_title,
+.tab-osd .cf_doc_version_bt {
+    grid-row: 1;
+    grid-column: 1;
+}
+
+/* Inserted after the title by gui.js, it shares the title row */
+.tab-osd .cf_doc_version_bt {
+    justify-self: end;
+}
+
+.tab-osd .cf_doc_version_bt a {
+    margin-top: 0;
+}
+
+.tab-osd .supported,
+.tab-osd .unsupported {
+    grid-row: 2;
+    grid-column: 1;
+    min-height: 0;
+}
+
+/* It scrolls when the window is too small for the preview at its own size. The gutter keeps the
+   width OSD.GUI.fitPreview() picks the arrangement with, scrollbar or not. */
+.tab-osd .supported {
+    overflow-y: auto;
+    scrollbar-gutter: stable;
+}
+
+.tab-osd .osd-columns {
+    height: var(--osd-main-height, 100%);
+    display: grid;
+    grid-template-columns: minmax(20em, 1fr) minmax(var(--osd-preview-need, 0px), 2fr) minmax(22em, 1fr);
+    column-gap: 1em;
+}
+
+/* No room for three columns: the settings go below the preview, in columns as wide as it, and the
+   elements run down beside both, so every edge lines up with the ones above */
+.tab-osd .osd-columns--two {
+    height: auto;
+    grid-template-columns: minmax(20em, 1fr) minmax(var(--osd-preview-need, 0px), 2fr);
+    grid-template-rows: var(--osd-main-height, auto) auto;
+    row-gap: 1em;
+}
+
+/* Sized by the two rows, not by its list, which scrolls inside it */
+.tab-osd .osd-columns--two .osd__elements {
+    grid-row: 1 / span 2;
+    contain: size;
+}
+
+.tab-osd .osd-columns--two .osd-preview-column {
+    grid-column: 2;
+    grid-row: 1;
+}
+
+.tab-osd .osd-columns--two .osd_settings {
+    grid-column: 2;
+    grid-row: 2;
+    overflow: visible;
+    padding-right: 0;
+    columns: 22em;
+    column-gap: 1em;
+}
+
+.tab-osd .osd-columns--two .osd_settings .gui_box {
+    break-inside: avoid;
+}
+
+/* Not even for two: the preview goes above the elements and the settings */
+.tab-osd .osd-columns--stacked {
+    height: auto;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    row-gap: 1em;
+}
+
+.tab-osd .osd-columns--stacked .osd-preview-column {
+    grid-column: 1 / -1;
+    grid-row: 1;
+    overflow-x: auto;
+}
+
+.tab-osd .osd-columns--stacked .osd__elements,
+.tab-osd .osd-columns--stacked .osd_settings {
+    grid-row: 2;
+    overflow: visible;
+}
+
+.tab-osd .osd-columns--stacked .osd-elements-list {
+    overflow: visible;
+}
+
+.tab-osd .osd-columns > .cf_column,
+.tab-osd .osd-preview-column {
+    float: none;
+    width: auto;
+    min-width: 0;
+    min-height: 0;
+}
+
+.tab-osd .osd-columns .gui_box {
+    float: none;
+    width: auto;
+}
+
+/* Elements: one box, its list scrolls under the search field and the layout headings */
+.tab-osd .osd__elements {
+    display: flex;
+    flex-direction: column;
+}
+
+.tab-osd .osd-elements-box {
+    flex: 1;
+    min-height: 0;
+    margin-bottom: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.tab-osd .osd-elements-box > .gui_box_titlebar {
+    flex: none;
+    margin-bottom: 0;
+}
+
+.tab-osd .osd-elements-head {
+    flex: none;
+    padding: 0.6em;
+    border-bottom: 1px solid #ddd;
+}
+
+/* For screen readers: the placeholder already says it on screen */
+.tab-osd .osd-search-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+}
+
+.tab-osd .osd-elements-head .osd_search {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0.25em 0.5em;
+    border: 1px solid silver;
+    border-radius: 3px;
+}
+
+.tab-osd .osd-layout-checks {
+    display: flex;
+    gap: 0.45em;
+    flex: none;
+}
+
+.tab-osd .osd-layout-check {
+    width: 1.15em;
+    height: 1.15em;
+    margin: 0;
+    accent-color: #37a8db;
+    cursor: pointer;
+}
+
+.tab-osd .osd-elements-list {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+}
+
+.tab-osd .osd-group > .gui_box_titlebar {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    width: auto;
+    height: auto;
+    margin: 0;
+    padding: 0.3em 0.6em;
+    border-radius: 0;
+    border-bottom: 1px solid #ddd;
+    background-color: #efefef;
+    font-size: inherit;
+}
+
+.tab-osd .osd-group > .gui_box_titlebar .spacer_box_title {
+    flex: 1;
+    padding: 0;
+}
+
+.tab-osd .osd-group > .gui_box_titlebar .helpicon {
+    float: none;
+    margin: 0 !important;
+}
+
+.tab-osd .osd-group > .spacer_box {
+    padding: 0 0.3em;
+    margin: 0;
+}
+
+/* Preview: as large as the column allows and never smaller than the font, scaled by OSD.GUI.fitPreview() */
+.tab-osd .osd-preview-box {
+    margin-bottom: 0;
+}
+
+.tab-osd .osd-preview-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5em;
+    padding: 0 0.6em 0.6em;
+}
+
+.tab-osd .osd-layout-tabs {
+    display: inline-flex;
+    border: 1px solid #c6c6c6;
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.tab-osd .osd-layout-tab {
+    border: 0;
+    border-right: 1px solid #c6c6c6;
+    background-color: #fff;
+    color: #303030;
+}
+
+.tab-osd .osd-layout-tab:last-child {
+    border-right: 0;
+}
+
+.tab-osd .osd-layout-tab:hover {
+    background-color: #e8f4fd;
+}
+
+.tab-osd .osd-layout-tab.is-active {
+    background-color: #37a8db;
+    color: #fff;
+}
+
+/* No switch or logic condition reaches it */
+.tab-osd .osd-layout-tab.is-unreached:not(.is-active) {
+    color: #a0a0a0;
+}
+
+.tab-osd .osd-layout-actions,
+.tab-osd .osd-preview-options {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5em;
+}
+
+.tab-osd .osd-action {
+    padding: 0.2em 0.7em;
+    border: 1px solid #3394b5;
+    border-radius: 3px;
+    background-color: #37a8db;
+    color: #fff;
+    font-family: 'open_sanssemibold', Arial, serif;
+    line-height: 1.6;
+}
+
+.tab-osd .osd-action:hover {
+    background-color: #3394b5;
+    color: #fff;
+}
+
+.tab-osd .osd-action--danger {
+    border-color: #e58383;
+    background-color: #fff;
+    color: #c0392b;
+}
+
+.tab-osd .osd-action--danger:hover {
+    background-color: #fdecea;
+    color: #c0392b;
+}
+
+.tab-osd .osd-action--quiet {
+    background-color: #fff;
+    color: #25749a;
+}
+
+.tab-osd .osd-action--quiet:hover {
+    background-color: #e8f4fd;
+    color: #25749a;
+}
+
+/* Wider than a narrow window, the preview scrolls from its left edge instead of losing it */
+.tab-osd .osd-preview-stage {
+    display: flex;
+    justify-content: safe center;
+    padding: 0 0.6em;
+}
+
+.tab-osd .display-layout {
+    position: relative;
+    width: max-content;
+    zoom: var(--osd-preview-zoom, 1);
+}
+
+.tab-osd .display-layout .preview {
+    image-rendering: pixelated;
+}
+
+.tab-osd .osd-preview-footer {
+    padding: 0.6em;
+}
+
+.tab-osd .osd-layout-reach {
+    margin: 0 0 0.5em;
+    color: #4f4f4f;
+    line-height: 1.5;
+}
+
+.tab-osd .osd-preview-options {
+    justify-content: space-between;
+}
+
+.tab-osd .osd-move-all {
+    display: flex;
+    align-items: center;
+    gap: 0.4em;
+    cursor: pointer;
+}
+
+.tab-osd .osd-move-all input {
+    margin: 0;
+    accent-color: #37a8db;
+}
+
+.tab-osd .osd-move-all > .i18n-replaced {
+    width: auto;
+}
+
+.tab-osd .osd_settings {
+    overflow-y: auto;
+    padding-right: 0.3em;
+}
+
+/* A switch is a label too: it stays on its row, before what it sets, aligned like the inputs */
+.tab-osd .osd_settings .settings label.ios7-switch {
+    display: inline-block;
+    width: auto;
+    margin: 0 0.5em 0 0;
+    padding: 0;
+    border: 0;
+    vertical-align: top;
+}
+
+/* Two controls before the name: the name takes what is left */
+.tab-osd .switch-indicator-container label > .i18n-replaced {
+    width: auto;
 }
 
 .font-preview {
@@ -359,38 +717,35 @@
 }
 
 .tab-osd .display-field {
-    padding: 4px;
-    border-bottom: 1px solid #ddd;
+    display: flex;
+    align-items: center;
+    gap: 0.7em;
+    padding: 0.25em 0.3em;
+    border-bottom: 1px solid #e6e6e6;
 }
 
 .tab-osd .display-field.mouseover {
     background: #fff;
-    border: 1px solid #ccc;
-    font-weight: 800;
+    box-shadow: inset 0 0 0 1px #ccc;
 }
 
-.tab-osd .display-field input {
-    float: right;
-    width: 50px;
-    border-radius: 3px;
-    border: 1px solid #ddd;
-    padding: 2px;
-    margin-top: -2px;
-    display: none;
-
+.tab-osd .display-field .char-label {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    margin: 0;
 }
 
-.tab-osd .display-field label {
-    margin-left: 5px;
-
+.tab-osd .display-field .helpicon {
+    order: 1;
+    float: none;
+    margin: 0 !important;
 }
 
 .tab-osd .display-fields {
-    float: left;
-    margin-top: 5px;
-    margin-bottom: 8px;
-    width: 100%;
-
+    margin: 0;
 }
 
 .spacer_box_title span {
@@ -411,32 +766,12 @@
     border-bottom: 0;
 }
 
-.tab-osd .third_left {
-	float: left;
-	width: calc(50% - 197px);
-}
-
-.tab-osd .third_right {
-    float: right;
-	width: calc(50% - 197px);
-}
-
-.tab-osd .preview {
-    width: 360px;
-    left: calc(50% - 197px);
-}
-
-.tab-osd .preview_bfhdcompat {
-    width: 636px !important; /* 12 X char width */
-    left: calc(50% - 335px) !important; /* width / 2 + 17 */
-}
-
 .tab-osd .hd_bfhdcompat_43_left {
     border-left: 2px solid red;
     position: absolute;
     /*left: 77.5px; // Calculated correct position */
     left: 70px;
-    height: calc(100% - 27px);
+    height: 100%;
 }
 
 .tab-osd .hd_bfhdcompat_43_right {
@@ -444,16 +779,7 @@
     position: absolute;
     /* right: 77.5px; // Calculated correct position */
     right: 70px;
-    height: calc(100% - 27px);
-}
-
-.tab-osd .preview_bfhdcompat_side {
-	width: calc(50% - 335px) !important;
-}
-
-.tab-osd .preview_avatar {
-    width: 636px !important; /* 12 X char width */
-    left: calc(50% - 335px) !important; /* width / 2 + 17 */
+    height: 100%;
 }
 
 .spacer_box.osd_customelement_icons_help {
@@ -468,7 +794,7 @@
 	position: absolute;
 	/*left: 77.5px; // Calculated correct position */
     left: 30px;
-	height: calc(100% - 27px);
+	height: 100%;
 }
 
 .tab-osd .hd_avatar_43_right {
@@ -476,63 +802,41 @@
 	position: absolute;
 	/* right: 77.5px; // Calculated correct position */
     right: 36px;
-	height: calc(100% - 27px);
-}
-
-.tab-osd .preview_avatar_side {
-	width: calc(50% - 335px) !important;
-}
-
-.tab-osd .preview_hdzero {
-    width: 600px !important;
-    left: calc(50% - 317px) !important;
+	height: 100%;
 }
 
 .tab-osd .hdzero_43_left {
 	border-left: 2px solid red;
 	position: absolute;
 	left: 60px;
-	height: calc(100% - 27px);
+	height: 100%;
 }
 
 .tab-osd .hdzero_43_right {
 	border-right: 2px solid red;
 	position: absolute;
 	right: 60px;
-	height: calc(100% - 27px);
-}
-
-.tab-osd .preview_hdzero_side {
-	width: calc(50% - 317px) !important;
-}
-
-.tab-osd .preview_dji_hd {
-    width: 720px !important;
-    left: calc(50% - 377px) !important;
+	height: 100%;
 }
 
 .tab-osd .dji_hd_43_left {
 	border-left: 2px solid red;
 	position: absolute;
 	left: 84px;
-	height: calc(100% - 27px);
+	height: 100%;
 }
 
 .tab-osd .dji_hd_43_right {
 	border-right: 2px solid red;
 	position: absolute;
 	right: 84px;
-	height: calc(100% - 27px);
-}
-
-.tab-osd .preview_dji_hd_side {
-	width: calc(50% - 377px) !important;
+	height: 100%;
 }
 
 .tab-osd .hd_3016_top {
     border-top: 2px solid blue;
     position: absolute;
-    top: 46px;
+    top: 19px;
     left: 120px;
     width: 360px;
 }
@@ -548,7 +852,7 @@
 .tab-osd .hd_3016_left {
     border-left: 2px solid blue;
     position: absolute;
-    top: 46px;
+    top: 19px;
     left: 120px;
     height: 288px;
 }
@@ -556,7 +860,7 @@
 .tab-osd .hd_3016_right {
     border-right: 2px solid blue;
     position: absolute;
-    top: 46px;
+    top: 19px;
     right: 120px;
     height: 288px;
 }
@@ -574,7 +878,7 @@
 .tab-osd .hd_bfhdcompat_storagebox {
     border: 2px solid purple;
     position: absolute;
-    top: 115px;
+    top: 88px;
     height: 55px;
     right: 0px;
     width: 80px;
@@ -592,7 +896,7 @@
 .tab-osd .hd_avatar_storagebox_t {
     border-top: 2px solid purple;
     position: absolute;
-    top: 56px;
+    top: 29px;
     height: 1px;
     right: 34px;
     width: 48px;
@@ -601,7 +905,7 @@
 .tab-osd .hd_avatar_storagebox_b {
     border-bottom: 2px solid purple;
     position: absolute;
-    top: 88px;
+    top: 61px;
     height: 1px;
     right: 34px;
     width: 48px;
@@ -610,7 +914,7 @@
 .tab-osd .hd_avatar_storagebox_l {
     border-left: 2px solid purple;
     position: absolute;
-    top: 56px;
+    top: 29px;
     height: 35px;
     right: 80px;
     width: 1px;
@@ -619,7 +923,7 @@
 .tab-osd .hd_avatar_storagebox_r {
     border-right: 2px solid purple;
     position: absolute;
-    top: 56px;
+    top: 29px;
     height: 35px;
     right: 32px;
     width: 1px;
@@ -695,28 +999,6 @@
     }
 }
 
-@media only screen and (max-width: 1055px) , only screen and (max-device-width: 1055px) {
-    .tab-osd .content_wrapper {
-        height: calc(100% - 30px);
-    }
-}
-
-.osd__elements {
-    margin-bottom: 3em;
-}
-
-.osd_layouts {
-    display: inline-block;
-    margin-bottom: 1em;
-    width: auto !important;
-}
-
-.osd_search {
-    float: right;
-    width: auto !important;
-    margin-right: 0 !important;
-}
-
 .tab-osd label > .i18n-replaced {
     display: inline-block;
     left: 108px;
@@ -785,17 +1067,6 @@
     flex-shrink: 0;
     width: 16px;
     text-align: center;
-}
-
-.osd__elements > .spacer_right:not(.settings) {
-    column-width: 300px;
-    column-gap: 10px;
-}
-
-.osd_group {
-    float: none;
-    display: flow-root;
-    break-inside: avoid;
 }
 
 .ce-card-body {
