@@ -35,6 +35,9 @@ function formatMagAlignment(alignment) {
     return roll + ", " + pitch + ", " + yaw;
 }
 
+// Used when mag_calibration_time cannot be read. Matches the firmware default.
+const MAG_CALIBRATION_TIME_DEFAULT = 30;
+
 calibrationTab.model = (function () {
     var publicScope = {},
         privateScope = {};
@@ -78,7 +81,8 @@ calibrationTab.initialize = function (callback) {
         saveChainer = new MSPChainerClass(),
         modalStart,
         modalStop,
-        modalProcessing;
+        modalProcessing,
+        magCalibrationTime = MAG_CALIBRATION_TIME_DEFAULT;
 
     modalMagAlign = undefined; // reset the module-scoped modal handle for this tab session
 
@@ -88,7 +92,28 @@ calibrationTab.initialize = function (callback) {
     loadChainer.setChain([
         mspHelper.queryFcStatus,
         mspHelper.loadSensorConfig,
-        mspHelper.loadCalibrationData
+        mspHelper.loadCalibrationData,
+        function (callback) {
+            let finished = false;
+            function finish() {
+                if (finished) return;
+                finished = true;
+                timeout.remove('mag_calibration_time_load');
+                callback();
+            }
+            // getSetting can remain pending after transport retries are exhausted.
+            timeout.add('mag_calibration_time_load', () => {
+                console.warn('mag_calibration_time not read within 5 s, using ' + magCalibrationTime + ' s until it arrives');
+                finish();
+            }, 5000);
+            mspHelper.getSetting('mag_calibration_time').then((setting) => {
+                // A late answer still applies to calibrations started after it arrives.
+                if (setting?.value > 0) {
+                    magCalibrationTime = setting.value;
+                }
+                finish();
+            }, () => finish());
+        }
     ]);
     loadChainer.setExitPoint(loadHtml);
     loadChainer.execute();
@@ -328,7 +353,8 @@ calibrationTab.initialize = function (callback) {
                 content: $('#modal-compass-processing').clone()
             }).open();
 
-            var countdown = 30;
+            var countdown = magCalibrationTime;
+            modalProcessing.content.find('.modal-compass-countdown').text(countdown);
             interval.add('compass_calibration_interval', function () {
                 countdown--;
                 if (countdown === 0) {
@@ -423,6 +449,7 @@ calibrationTab.cleanup = function (callback) {
         modalMagAlign.close();
     }
 
+    timeout.remove('mag_calibration_time_load');
     if (callback) callback();
 };
 
