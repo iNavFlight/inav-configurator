@@ -28,6 +28,7 @@ import ltmDecoder from './ltmDecoder';
 import createLtmProtocolGate from './ltmProtocolGate';
 import mspDeduplicationQueue from './msp/mspDeduplicationQueue';
 import store from './store';
+import dialog from './dialog';
 import cliTab from '../tabs/cli';
 import javascriptProgrammingTab from '../tabs/javascript_programming';
 
@@ -189,7 +190,7 @@ var SerialBackend = (function () {
         privateScope.reConnect()
     });
 
-    privateScope.reConnect = function() {
+    privateScope.reConnect = async function() {
         if (groundstation.isActivated()) {
             groundstation.deactivate();
         }
@@ -254,7 +255,7 @@ var SerialBackend = (function () {
                             const confirmMsg = i18n.getMessage('unsavedChanges') ||
                                 'You have unsaved changes. Leave anyway?';
 
-                            if (!confirm(confirmMsg)) {
+                            if (!await dialog.confirm(confirmMsg)) {
                                 console.log('[Disconnect] User cancelled disconnect due to unsaved changes');
                                 return; // Cancel disconnect
                             }

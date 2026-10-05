@@ -122,18 +122,21 @@
 
 }
 
-.tab-onboard_logging dialog {
+.dataflash-confirm-erase-modal .jBox-content,
+.dataflash-saving-modal .jBox-content {
     width: 40em;
     border-radius: 5px;
     height: fit-content;
 }
 
-.tab-onboard_logging dialog .buttons {
+.dataflash-confirm-erase-modal .buttons,
+.dataflash-saving-modal .buttons {
     position: static;
     margin-top: 2em;
 }
 
-.tab-onboard_logging dialog h3 {
+.dataflash-confirm-erase-modal h3,
+.dataflash-saving-modal h3 {
     margin-bottom: 0.5em;
 }
 

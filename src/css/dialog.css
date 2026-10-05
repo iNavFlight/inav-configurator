@@ -1,0 +1,38 @@
+.inav-dialog .jBox-content {
+    padding: 1.2em 1.5em;
+}
+
+.inav-dialog__message {
+    margin-bottom: 1em;
+    white-space: pre-line;
+}
+
+.inav-dialog__footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75em;
+}
+
+.inav-dialog__button {
+    padding: 0.4em 1.2em;
+    border: 1px solid #ccc;
+    border-radius: 2px;
+    background: #efefef;
+    color: #222;
+    cursor: pointer;
+    text-align: center;
+}
+
+.inav-dialog__button:hover {
+    background: #e0e0e0;
+}
+
+.inav-dialog__button--primary {
+    background: #37a8db;
+    border-color: #3394b5;
+    color: #fff;
+}
+
+.inav-dialog__button--primary:hover {
+    background: #3394b5;
+}

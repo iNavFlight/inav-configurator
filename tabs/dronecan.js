@@ -477,7 +477,7 @@ function saveNodeIdAndReboot(nodeId, useDNAServer) {
     });
 }
 
-dronecanTab.saveConfig = function () {
+dronecanTab.saveConfig = async function () {
     if (!dnaSettingLoaded) {
         console.warn('dronecan: save blocked, dronecan_use_dna_server not yet read');
         return;
@@ -489,7 +489,7 @@ dronecanTab.saveConfig = function () {
         return;
     }
     const useDNAServer = $('#dronecan-use-dna-server').prop('checked') ? 1 : 0;
-    if (nodeId >= 126 && !confirm(i18n.getMessage('dronecanNodeIdReservedWarning'))) return;
+    if (nodeId >= 126 && !await dialog.confirm(i18n.getMessage('dronecanNodeIdReservedWarning'))) return;
     mspHelper.setSetting('dronecan_bitrate_kbps', bitrate, () => saveNodeIdAndReboot(nodeId, useDNAServer));
 };
 

@@ -3519,6 +3519,9 @@
     "OK": {
         "message": "OK"
     },
+    "dialogCancel": {
+        "message": "Cancel"
+    },
     "accCalibrationStartTitle": {
         "message": "Accelerometer Calibration"
     },

@@ -12,8 +12,13 @@ import i18n from './../js/localization';
 import BitHelper from './../js/bitHelper';
 import dialog from './../js/dialog';
 import Settings from './../js/settings';
+import jBox from 'jbox';
 
 var sdcardTimer;
+// Module-scoped (not local to initialize()) so load_html() can destroy the previous
+// visit's modal — and the stale .jBox-wrapper it left under <body> — before GUI.load()
+// replaces the tab HTML and produces fresh .dataflash-confirm-erase/.dataflash-saving elements.
+var eraseModal, savingModal;
 
 const onboardLoggingTab = {
 };
@@ -139,6 +144,34 @@ onboardLoggingTab.initialize = function (callback) {
                 .toggleClass("only-terrain-supported", !blackboxSupport && terrainEnabled);
 
             if (dataflashPresent) {
+                // jBox modals wrapping the existing dataflash-saving / dataflash-confirm-erase
+                // markup in place (CSS state classes like .erasing/.done still apply to the
+                // same elements, same pattern as js/defaults_dialog.js's saving modal).
+                // Destroy any instance from a previous visit to this tab first: jBox reparents
+                // its content to <body>, outside the container GUI.load() just replaced, so the
+                // old wrapper would otherwise be orphaned there instead of garbage collected.
+                eraseModal && eraseModal.destroy();
+                eraseModal = new jBox('Modal', {
+                    addClass: 'dataflash-confirm-erase-modal',
+                    animation: 'zoomIn',
+                    closeOnClick: false,
+                    closeOnEsc: false,
+                    closeButton: false,
+                    overlay: true,
+                    content: $('.dataflash-confirm-erase'),
+                });
+
+                savingModal && savingModal.destroy();
+                savingModal = new jBox('Modal', {
+                    addClass: 'dataflash-saving-modal',
+                    animation: 'zoomIn',
+                    closeOnClick: false,
+                    closeOnEsc: false,
+                    closeButton: false,
+                    overlay: true,
+                    content: $('.dataflash-saving'),
+                });
+
                 // UI hooks
                 $('.tab-onboard_logging a.erase-flash').on('click', ask_to_erase_flash);
 
@@ -352,11 +385,11 @@ onboardLoggingTab.initialize = function (callback) {
         saveCancelled = false;
         $(".dataflash-saving").removeClass("done");
 
-        $(".dataflash-saving")[0].showModal();
+        savingModal.open();
     }
 
     function dismiss_saving_dialog() {
-        $(".dataflash-saving")[0].close();
+        savingModal.close();
     }
 
     function mark_saving_dialog_done() {
@@ -446,14 +479,14 @@ onboardLoggingTab.initialize = function (callback) {
     function ask_to_erase_flash() {
         eraseCancelled = false;
         $(".dataflash-confirm-erase").removeClass('erasing');
-        $(".dataflash-confirm-erase")[0].showModal();
+        eraseModal.open();
     }
 
     function poll_for_erase_completion() {
         flash_update_summary(function() {
             if (CONFIGURATOR.connectionValid && !eraseCancelled) {
                 if (FC.DATAFLASH.ready) {
-                    $(".dataflash-confirm-erase")[0].close();
+                    eraseModal.close();
                 } else {
                     setTimeout(poll_for_erase_completion, 500);
                 }
@@ -469,7 +502,7 @@ onboardLoggingTab.initialize = function (callback) {
 
     function flash_erase_cancel() {
         eraseCancelled = true;
-        $(".dataflash-confirm-erase")[0].close();
+        eraseModal.close();
     }
 
     function getIncludeFlags(){
@@ -491,6 +524,14 @@ onboardLoggingTab.cleanup = function (callback) {
         clearTimeout(sdcardTimer);
         sdcardTimer = false;
     }
+
+    // Covers leaving the tab when dataflashPresent was false on this visit (so load_html()
+    // never reached the branch that destroys+recreates these) but a previous visit had
+    // created them — otherwise that orphaned .jBox-wrapper stays under <body> indefinitely.
+    eraseModal && eraseModal.destroy();
+    eraseModal = null;
+    savingModal && savingModal.destroy();
+    savingModal = null;
 
     if (callback) {
         callback();

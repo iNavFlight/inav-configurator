@@ -266,7 +266,7 @@ $(function() {
 
         // Tabs
         var ui_tabs = $('#tabs > ul');
-        $('a', ui_tabs).on('click', function() {
+        $('a', ui_tabs).on('click', async function() {
 
             if ($(this).parent().hasClass("tab_help") || $(this).parent().hasClass("nav-toggle-all")) {
                 return;
@@ -309,7 +309,7 @@ $(function() {
                     const confirmMsg = i18n.getMessage('unsavedChanges') ||
                         'You have unsaved changes. Leave anyway?';
 
-                    if (!confirm(confirmMsg)) {
+                    if (!await dialog.confirm(confirmMsg)) {
                         console.log('[Tab Switch] User cancelled tab switch');
                         return; // Cancel tab switch
                     }
