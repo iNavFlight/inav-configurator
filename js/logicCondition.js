@@ -1,7 +1,7 @@
 'use strict';
 
 import FC from './fc';
-import { GUI } from './../js/gui';
+import GUI from './../js/gui';
 import { LOGIC_OPERATORS } from './logicConditionOperators';
 import { OPERAND_TYPES } from './logicConditionOperantTypes';
 

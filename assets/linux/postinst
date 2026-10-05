@@ -1,0 +1,13 @@
+#!/bin/bash
+# Post-installation script: install udev rules for INAV flight controllers
+
+RULES_SRC="/usr/lib/inav-configurator/resources/45-inav.rules"
+RULES_DST="/etc/udev/rules.d/45-inav.rules"
+
+if [ -f "$RULES_SRC" ]; then
+    cp "$RULES_SRC" "$RULES_DST"
+    udevadm control --reload-rules 2>/dev/null || true
+    udevadm trigger 2>/dev/null || true
+fi
+
+exit 0

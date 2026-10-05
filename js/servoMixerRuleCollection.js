@@ -119,25 +119,13 @@ var ServoMixerRuleCollection = function () {
     };
 
     self.getUsedServoIndexes = function () {
-        let out = [];
+        let out = new Set();
 
-        for (let ruleIndex in data) {
-            if (data.hasOwnProperty(ruleIndex)) {
-                let rule = data[ruleIndex];
-                out.push(rule.getTarget());
-            }
-        }
-        for (let ruleIndex in inactiveData) {
-            if (inactiveData.hasOwnProperty(ruleIndex)) {
-                let rule = inactiveData[ruleIndex];
-                out.push(rule.getTarget());
-            }
-        }
+        data.forEach(rule => {
+            if (rule.isUsed()) out.add(rule.getTarget());
+        });
 
-
-        let minIndex = Math.min(...out);
-        let maxIndex = Math.max(...out);
-        return Array.from({ length: maxIndex - minIndex + 1 }, (_, index) => minIndex + index);
+        return Array.from(out).sort((a, b) => a - b);
     }
 
     self.getNextUnusedIndex = function() {

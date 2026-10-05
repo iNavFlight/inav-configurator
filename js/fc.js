@@ -50,6 +50,8 @@ var FC = {
     SERVO_DATA: null,
     GPS_DATA: null,
     ADSB_VEHICLES: null,
+    ADSB_LIMITS: null,
+    ADSB_WARNING_ICAO: null,
     MISSION_PLANNER: null,
     ROI: null,
     ANALOG: null,
@@ -90,6 +92,9 @@ var FC = {
     EZ_TUNE: null,
     FLIGHT_MODES: null,
     GEOZONES: null,
+    DRONECAN_NODES: [],
+    DRONECAN_ASYNC_REQUEST: null,
+    DRONECAN_ASYNC_RESULT: null,
 
     restartRequired: false,
     MAX_SERVO_RATE: 125,
@@ -108,6 +113,29 @@ var FC = {
         return true; // Currently all platforms use D term
     },
     resetState: function () {
+        // MassZero thermal camera. MZTC_CONFIG mirrors the 15 byte
+        // MSP2_MZTC_CONFIG payload. MZTC_STATUS stays null until the flight
+        // controller answers MSP2_MZTC_STATUS.
+        this.MZTC_CONFIG = {
+            enabled: 0,
+            port: 1,
+            baudrate: 8,
+            mode: 1,
+            update_rate: 9,
+            palette_mode: 0,
+            auto_shutter: 2,
+            digital_enhancement: 50,
+            spatial_denoise: 50,
+            temporal_denoise: 50,
+            brightness: 50,
+            contrast: 50,
+            zoom_level: 0,
+            mirror_mode: 0,
+            ffc_interval: 5
+        };
+
+        this.MZTC_STATUS = null;
+
         this.SENSOR_STATUS = {
             isHardwareHealthy: 0,
             gyroHwStatus: 0,
@@ -138,6 +166,7 @@ var FC = {
             multiType: 0,
             msp_version: 0, // not specified using semantic versioning
             capability: 0,
+            capabilities: 0,
             cycleTime: 0,
             i2cError: 0,
             activeSensors: 0,
@@ -205,11 +234,17 @@ var FC = {
 
         this.generateAuxConfig = function () {
             console.log('Generating AUX_CONFIG');
+            // AUX_CONFIG and AUX_CONFIG_IDS must stay the same length and index-aligned —
+            // tabs/auxiliary.js pairs them by position, so an unrecognized id must be
+            // dropped from both, not just from the name list.
+            const ids = this.AUX_CONFIG_IDS;
             this.AUX_CONFIG = [];
-            for ( let i = 0; i < this.AUX_CONFIG_IDS.length; i++ ) {
-                let found = FLIGHT_MODES.find( mode => mode.permanentId === this.AUX_CONFIG_IDS[i] );
+            this.AUX_CONFIG_IDS = [];
+            for ( let i = 0; i < ids.length; i++ ) {
+                let found = FLIGHT_MODES.find( mode => mode.permanentId === ids[i] );
                 if (found) {
                     this.AUX_CONFIG.push(found.boxName);
+                    this.AUX_CONFIG_IDS.push(ids[i]);
                 }
             }
         };
@@ -225,6 +260,22 @@ var FC = {
         this.GLOBAL_VARIABLES_STATUS = new GlobalVariablesStatus();
         this.PROGRAMMING_PID         = new ProgrammingPidCollection();
         this.PROGRAMMING_PID_STATUS  = new ProgrammingPidStatus();
+
+        /*
+         * What the Smart ESC driver reports about itself. `supported` starts
+         * false and is set by the first reply: firmware built without the driver
+         * answers MSP2_INAV_ESC_SRXL2_STATUS as an unsupported command, which is
+         * what tells the Configurator not to offer the protocol or the port
+         * function on that board.
+         */
+        this.SRXL2_STATUS = {
+            supported: false,
+            phase: 0,
+            connected: false,
+            lastResult: 0,
+            ports: 0,
+            motors: 0
+        };
 
         this.MIXER_CONFIG = {
             yawMotorDirection: 0,
@@ -251,6 +302,7 @@ var FC = {
             gyroscope: [0, 0, 0],
             accelerometer: [0, 0, 0],
             magnetometer: [0, 0, 0],
+            magnetometerUnaligned: [0, 0, 0],
             altitude: 0,
             barometer: 0,
             sonar: 0,
@@ -280,15 +332,27 @@ var FC = {
             messageDt: 0,
             errors: 0,
             timeouts: 0,
-            packetCount: 0
+            packetCount: 0,
+            hwVersion: 0
         };
-        
+
         this.ADSB_VEHICLES = {
             vehiclesCount: 0,
             callsignLength: 0,
             vehiclePacketCount: 0,
             heartbeatPacketCount: 0,
             vehicles: []
+        };
+
+        this.ADSB_LIMITS = {
+            adsb_distance_alert: 0,
+            adsb_distance_warning: 0,
+            adsb_ignore_plane_above_me_limit: 0,
+        };
+
+        this.ADSB_WARNING_ICAO = {
+            icao: 0,
+            isAlert: 0,
         };
 
         this.MISSION_PLANNER = new WaypointCollection();
@@ -359,6 +423,10 @@ var FC = {
             power: 0,
             pitmode: 0,
             low_power_disarm: 0,
+            band_count: 0,
+            channel_count: 0,
+            power_count: 0,
+            power_min: 1,
         };
 
         this.ADVANCED_CONFIG = {
@@ -583,7 +651,7 @@ var FC = {
             sensitivityEnd: null,
             correctionCenter: null,
             correctionEnd: null,
-            weightCenter: null, 
+            weightCenter: null,
             weightEnd: null
         };
 
@@ -609,6 +677,10 @@ var FC = {
            items: [],
         };
 
+        this.DRONECAN_NODES = [];
+        this.DRONECAN_ASYNC_REQUEST = null;
+        this.DRONECAN_ASYNC_RESULT = null;
+
     },
     getOutputUsages: function() {
         return {
@@ -633,7 +705,6 @@ var FC = {
             {bit: 17, group: 'other', name: 'DASHBOARD', showNameInTip: true},
             {bit: 19, group: 'other', name: 'BLACKBOX', haveTip: true, showNameInTip: true},
             {bit: 28, group: 'other', name: 'PWM_OUTPUT_ENABLE', haveTip: true},
-            {bit: 26, group: 'other', name: 'SOFTSPI'},
             {bit: 29, group: 'other', name: 'OSD', haveTip: false, showNameInTip: false},
             {bit: 22, group: 'other', name: 'AIRMODE', haveTip: false, showNameInTip: false},
             {bit: 30, group: 'other', name: 'FW_LAUNCH', haveTip: false, showNameInTip: false},
@@ -659,13 +730,6 @@ var FC = {
     },
     isMotorOutputEnabled: function () {
         return this.isFeatureEnabled('PWM_OUTPUT_ENABLE', this.getFeatures());
-    },
-    getGpsProtocols: function () {
-        return [
-            'UBLOX',
-            'MSP',
-            'FAKE'
-        ];
     },
     getGpsBaudRates: function () {
         return [
@@ -761,6 +825,16 @@ var FC = {
                 rates: {
                     16000: "16kHz"
                 }
+            },
+            7: {
+                /* Not a timer waveform: the ESC is driven over a UART, so the
+                 * output rate is the protocol's own and nothing here selects it. */
+                name: "SRXL2",
+                message: null,
+                defaultRate: 50,
+                rates: {
+                    50: "50Hz"
+                }
             }
         };
     },
@@ -836,7 +910,7 @@ var FC = {
         var calibrated = true;
         var flagNames = FC.getArmingFlags();
 
-        if (this.CALIBRATION_DATA.accGain.X === 4096 && this.CALIBRATION_DATA.accGain.Y === 4096 && this.CALIBRATION_DATA.accGain.Z === 4096 && 
+        if (this.CALIBRATION_DATA.accGain.X === 4096 && this.CALIBRATION_DATA.accGain.Y === 4096 && this.CALIBRATION_DATA.accGain.Z === 4096 &&
             this.CALIBRATION_DATA.accZero.X === 0 && this.CALIBRATION_DATA.accZero.Y === 0 && this.CALIBRATION_DATA.accZero.Z === 0
            ) {
             calibrated = false;
@@ -849,6 +923,26 @@ var FC = {
         }
 
         return calibrated;
+    },
+    getMagnetometerCalibrated: function () {
+        // CALIBRATION_DATA is null until something actually requests MSP_CALIBRATION_DATA
+        // (e.g. visiting the Calibration tab) -- treat "we don't know yet" as NOT
+        // calibrated (fail-safe) rather than let a caller that forgot to load it silently
+        // treat an absent answer as a pass.
+        if (!this.CALIBRATION_DATA) {
+            return false;
+        }
+        // 1024 gain / 0 zero on all three axes is firmware's own "uncalibrated" sentinel --
+        // see sensors/compass.c's resetCompass() defaults and the matching check this
+        // mirrors (compassIsCalibrationComplete(), same three-axis test). If those defaults
+        // ever change, this needs to change with them.
+        return !(this.CALIBRATION_DATA.magGain.X === 1024 && this.CALIBRATION_DATA.magGain.Y === 1024 && this.CALIBRATION_DATA.magGain.Z === 1024 &&
+                 this.CALIBRATION_DATA.magZero.X === 0 && this.CALIBRATION_DATA.magZero.Y === 0 && this.CALIBRATION_DATA.magZero.Z === 0);
+    },
+    hasCalibrationOrientationDetection: function () {
+        // MSP_BOARD_INFO capabilities bit 2: set iff the firmware auto-detects the
+        // compass's mounting orientation as part of MSP_MAG_CALIBRATION.
+        return !!(this.CONFIG.capabilities & (1 << 2));
     },
     getUserControlMode: function () {
         return [
@@ -868,7 +962,8 @@ var FC = {
             'Level',
             'Heading Hold',
             'Velocity Z',
-            'Nav Heading'
+            'Nav Heading',
+            'Auto Speed'
         ];
     },
     getRthAltControlMode: function () {
@@ -939,7 +1034,7 @@ var FC = {
             'Stabilized Pitch-',    // 26
             'Stabilized Yaw+',      // 27
             'Stabilized Yaw-',      // 28,
-            'MAX',                  // 29,
+            'Fixed Value',          // 29,
             'GVAR 0',               // 30
             'GVAR 1',               // 31
             'GVAR 2',               // 32

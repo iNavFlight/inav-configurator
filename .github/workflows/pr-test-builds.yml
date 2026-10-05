@@ -1,0 +1,102 @@
+name: PR Test Builds
+
+# Runs after "Build Configurator" completes. Uses workflow_run (rather than
+# pull_request directly) so that secrets are available even for PRs from forks.
+#
+# No PAT token is required — build artifacts are linked via the GitHub Actions
+# run URL, which requires a GitHub login to download (acceptable for testers).
+on:
+  workflow_run:
+    workflows: ["Build Configurator"]
+    types: [completed]
+
+jobs:
+  comment:
+    runs-on: ubuntu-latest
+    # Only act on pull_request-triggered runs that succeeded.
+    if: >
+      github.event.workflow_run.event == 'pull_request' &&
+      github.event.workflow_run.conclusion == 'success'
+    # Prevent concurrent runs for the same PR branch racing on comment updates.
+    concurrency:
+      group: pr-test-build-configurator-${{ github.event.workflow_run.head_repository.full_name }}-${{ github.event.workflow_run.head_branch }}
+      cancel-in-progress: true
+    permissions:
+      actions: read          # to download pr-number artifact from the triggering run
+      issues: write          # github.rest.issues.* used to post PR comments
+      pull-requests: write   # to post/update the PR comment
+
+    steps:
+      - name: Download PR number artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: pr-number
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Read and validate PR number
+        id: pr
+        run: |
+          PR_NUM=$(tr -dc '0-9' < pr_number.txt)
+          if [ -z "$PR_NUM" ]; then
+            echo "::error::Invalid PR number in artifact"
+            exit 1
+          fi
+          echo "number=${PR_NUM}" >> $GITHUB_OUTPUT
+
+      - name: Post or update PR comment
+        uses: actions/github-script@v7
+        env:
+          PR_NUMBER: ${{ steps.pr.outputs.number }}
+          RUN_ID: ${{ github.event.workflow_run.id }}
+          SHORT_SHA: ${{ github.event.workflow_run.head_sha }}
+        with:
+          script: |
+            const prNumber  = parseInt(process.env.PR_NUMBER, 10);
+            if (isNaN(prNumber)) throw new Error(`Invalid PR number: ${process.env.PR_NUMBER}`);
+            const runId    = process.env.RUN_ID;
+            const shortSha = process.env.SHORT_SHA.slice(0, 7);
+            const artifactsUrl = `https://github.com/iNavFlight/inav-configurator/actions/runs/${runId}`;
+
+            const body = [
+              '<!-- pr-test-build-configurator -->',
+              `**Configurator test build ready** — commit \`${shortSha}\``,
+              '',
+              `[Download build artifacts for PR #${prNumber}](${artifactsUrl})`,
+              '',
+              'Available platforms (scroll to the Artifacts section at the bottom of the run page):',
+              '- **Windows** x64 (ZIP, MSI) and x32 (ZIP, MSI)',
+              '- **macOS** arm64 (ZIP, DMG) and x64 (ZIP, DMG)',
+              '- **Linux** x64 (DEB, RPM, ZIP) and aarch64 (DEB, RPM, ZIP)',
+              '',
+              '> A GitHub login is required to download artifacts. Build is for testing only.',
+            ].join('\n');
+
+            const comments = await github.paginate(
+              github.rest.issues.listComments,
+              {
+                owner: context.repo.owner,
+                repo:  context.repo.repo,
+                issue_number: prNumber,
+              }
+            );
+
+            const existing = comments.find(c =>
+              c.user.type === 'Bot' && c.body.includes('<!-- pr-test-build-configurator -->')
+            );
+
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner:      context.repo.owner,
+                repo:       context.repo.repo,
+                comment_id: existing.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner:        context.repo.owner,
+                repo:         context.repo.repo,
+                issue_number: prNumber,
+                body,
+              });
+            }

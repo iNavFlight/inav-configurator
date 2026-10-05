@@ -10,6 +10,10 @@
         "message": "English",
         "_comment": "Don't translate!"
     },
+	"language_bg": {
+		"message": "Български",
+		"_comment": "Don't translate!"
+	},
     "language_uk": {
         "message": "українська",
         "_comment": "Don't translate!"
@@ -779,14 +783,8 @@
     "featureTX_PROF_SEL": {
         "message": "Вибір профілю за допомогою команди стіка TX"
     },
-    "featureINFLIGHT_ACC_CAL": {
-        "message": "Калібрування під час польоту"
-    },
     "featureMOTOR_STOP": {
         "message": "Зупиняти мотори при низькій тязі"
-    },
-    "featureSERVO_TILT": {
-        "message": "Сервоприводний підвіс"
     },
     "featureBAT_PROFILE_AUTOSWITCH": {
         "message": "Автоматичний вибір профілю батареї"
@@ -812,12 +810,6 @@
     "featureGPSTip": {
         "message": "Спочатку налаштуйте порт"
     },
-    "featureFAILSAFE": {
-        "message": "Застосування налаштувань безаварійності при втраті сигналу приймачем"
-    },
-    "featureSONAR": {
-        "message": "Сонар"
-    },
     "featureTELEMETRY": {
         "message": "Вивід телеметрії"
     },
@@ -835,12 +827,6 @@
     },
     "featureDASHBOARD": {
         "message": "OLED Дисплей"
-    },
-    "featureONESHOT125": {
-        "message": "Підтримка ONESHOT ESC"
-    },
-    "featureONESHOT125Tip": {
-        "message": "Від'єднайте батарею та зніміть пропелери перед увімкненням."
     },
     "featurePWM_OUTPUT_ENABLE": {
         "message": "Увімкнути вивід моторів та сервоприводів"
@@ -860,18 +846,6 @@
     "onboardLoggingBlackboxRate": {
         "message": "Частка ітерацій циклу процесора для журналювання (частота журналювання)"
     },
-    "featureCHANNEL_FORWARDING": {
-        "message": "Перенаправляти AUX канали на серво виходи"
-    },
-    "featureSOFTSPI": {
-        "message": "SPI на основі ЦП"
-    },
-    "featurePWM_SERVO_DRIVER": {
-        "message": "Зовнішній драйвер ШІМ сервоприводу"
-    },
-    "featurePWM_SERVO_DRIVERTip": {
-        "message": "Використовуйте зовнішній PCA9685 ШІМ-драйвер, щоб підключити до 16 сервоприводів до польотного контролеру. PCA9685 повинен бути підключений для увімкнення цієї функції."
-    },
     "featureRSSI_ADCTip": {
         "message": "Індикатор рівня потужності отриманого сигналу (RSSI) - це вимірювання рівня сигналу, і він дуже зручний, щоб ви знали, коли ваше повітряне судно виходить за межі діапазону або зазнає радіочастотних перешкод."
     },
@@ -889,12 +863,6 @@
     },
     "featureFW_AUTOTRIMTip": {
         "message": "Під час польоту в стабілізованому режимі постійно регулювати середні точки сервоприводів, щоб літак продовжував летіти прямо під час переключення на ручний режим. Потребує GPS."
-    },
-    "featureDYNAMIC_FILTERS": {
-        "message": "Динамічні фільтри гіроскопу"
-    },
-    "featureDYNAMIC_FILTERSTip": {
-        "message": "Використовує автоматичний ШПФ-аналіз даних гіроскопу при налаштуванні режекторниx фільтрів для послаблення шумів гіроскопу. Має бути ввімкнений весь час!"
     },
     "configurationFeatureEnabled": {
         "message": "Увімкнено"
@@ -1234,6 +1202,63 @@
     },
     "configurationNoBand": {
         "message": "Відсутній"
+    },
+    "configurationPowerLimits": {
+        "message": "Обмеження потужності"
+    },
+    "configurationPowerLimitsHelp": {
+        "message": "Обмежте споживання струму та потужності для захисту акумулятора та регуляторів. Встановіть 0 для вимкнення. Одиниці: dA (деці-ампер) = А×10, dW (деці-ват) = Вт×10, ds (деці-секунда) = с×10."
+    },
+    "configurationPowerLimitsNote": {
+        "message": "Захищає акумулятор від перевантаження по струму, плавно зменшуючи газ. Потребує датчик струму. Задайте безперервні та пікові обмеження відповідно до специфікації акумулятора."
+    },
+    "configurationLimitContCurrent": {
+        "message": "Безперервний струм (dA)"
+    },
+    "configurationLimitContCurrentHelp": {
+        "message": "Максимальний постійний струм у деці-амперах (dA). Приклад: 500 = 50А. Встановіть 0 для вимкнення обмеження струму."
+    },
+    "configurationLimitBurstCurrent": {
+        "message": "Піковий струм (dA)"
+    },
+    "configurationLimitBurstCurrentHelp": {
+        "message": "Підвищений струм допускається на короткий час (різкі маневри, набір висоти). Приклад: 750 = 75А. Має бути >= безперервного."
+    },
+    "configurationLimitBurstCurrentTime": {
+        "message": "Час пікового струму (ds)"
+    },
+    "configurationLimitBurstCurrentTimeHelp": {
+        "message": "Тривалість пікового струму у деці-секундах (ds). Приклад: 100 = 10 секунд. Після закінчення знижується до безперервного."
+    },
+    "configurationLimitBurstCurrentFalldownTime": {
+        "message": "Час зниження струму (ds)"
+    },
+    "configurationLimitBurstCurrentFalldownTimeHelp": {
+        "message": "Час плавного зниження від пікового до безперервного обмеження у деці-секундах (ds). Приклад: 20 = 2 секунди."
+    },
+    "configurationLimitContPower": {
+        "message": "Безперервна потужність (dW)"
+    },
+    "configurationLimitContPowerHelp": {
+        "message": "Максимальна постійна потужність у деці-ватах (dW). Приклад: 8000 = 800 Вт. Встановіть 0 для вимкнення. Потребує вимірювання напруги."
+    },
+    "configurationLimitBurstPower": {
+        "message": "Пікова потужність (dW)"
+    },
+    "configurationLimitBurstPowerHelp": {
+        "message": "Підвищена потужність допускається на короткий час. Приклад: 10000 = 1000 Вт. Має бути >= безперервної."
+    },
+    "configurationLimitBurstPowerTime": {
+        "message": "Час пікової потужності (ds)"
+    },
+    "configurationLimitBurstPowerTimeHelp": {
+        "message": "Тривалість пікової потужності у деці-секундах (ds). Приклад: 50 = 5 секунд."
+    },
+    "configurationLimitBurstPowerFalldownTime": {
+        "message": "Час зниження потужності (ds)"
+    },
+    "configurationLimitBurstPowerFalldownTimeHelp": {
+        "message": "Час плавного зниження від пікової до безперервної потужності у деці-секундах (ds). Приклад: 10 = 1 секунда."
     },
     "configurationVTXNoBandHelp": {
         "message": "Частота VTX була встановлена вручну. Вибір діапазону перезапише налаштовану частоту."
@@ -5695,6 +5720,24 @@
     },
     "ledStripWiringMessage": {
         "message": "Світлодіоди без порядкового номера підключення не будуть збережені."
+    },
+    "ledStripQuickPresets": {
+        "message": "Швидкі пресети:"
+    },
+    "ledStripStep1Header": {
+        "message": "Порядок підключення"
+    },
+    "ledStripStep2Header": {
+        "message": "Положення та напрямок"
+    },
+    "ledStripStep3Header": {
+        "message": "Функція"
+    },
+    "ledStripStep4Header": {
+        "message": "Колір"
+    },
+    "ledStripEditPalette": {
+        "message": "Редагувати кольори палітри"
     },
     "mainLogoText": {
         "message": "Конфігуратор"

@@ -26,6 +26,65 @@
                     <div class="clear-both"></div>
                 </div>
 
+                <div id="srxl2-protocol-hint" class="warning-box" style="display: none;"></div>
+
+                <div id="srxl2-esc" style="display: none;">
+                    <div id="srxl2-no-port" class="warning-box" style="display: none;"></div>
+                    <div data-i18n="srxl2Info" class="info-box"></div>
+                    <div id="srxl2-port-count" class="info-box"></div>
+
+                    <div class="checkbox">
+                        <input id="esc_srxl2_telemetry" type="checkbox" class="toggle" data-setting="esc_srxl2_telemetry" />
+                        <label for="esc_srxl2_telemetry">
+                            <span data-i18n="srxl2Telemetry">Read telemetry from the ESC</span>
+                        </label>
+                        <div for="esc_srxl2_telemetry" class="helpicon cf_tip" data-i18n_title="srxl2TelemetryHelp"></div>
+                    </div>
+
+                    <div class="select">
+                        <select id="esc_srxl2_telemetry_rate" data-setting="esc_srxl2_telemetry_rate"></select>
+                        <label for="esc_srxl2_telemetry_rate">
+                            <span data-i18n="srxl2TelemetryRate">How often to ask the ESC for telemetry</span>
+                        </label>
+                        <div for="esc_srxl2_telemetry_rate" class="helpicon cf_tip" data-i18n_title="srxl2TelemetryRateHelp"></div>
+                    </div>
+
+                    <div class="checkbox">
+                        <input id="srxl2-reverse-enable" type="checkbox" class="toggle" />
+                        <label for="srxl2-reverse-enable">
+                            <span data-i18n="srxl2ReverseEnable">Thrust reverse</span>
+                        </label>
+                        <div for="srxl2-reverse-enable" class="helpicon cf_tip" data-i18n_title="srxl2ReverseEnableHelp"></div>
+                    </div>
+
+                    <div class="number" id="srxl2-reverse-channel-row">
+                        <input id="esc_srxl2_reverse_channel" data-setting="esc_srxl2_reverse_channel" type="number" />
+                        <label for="esc_srxl2_reverse_channel">
+                            <span data-i18n="srxl2ReverseChannel">Thrust Reverse: ESC channel</span>
+                        </label>
+                        <div for="esc_srxl2_reverse_channel" class="helpicon cf_tip" data-i18n_title="srxl2ReverseChannelHelp"></div>
+                    </div>
+
+                    <div class="spacer_box">
+                        <div data-i18n="srxl2CalibrateTitle" class="spacer_box_title"></div>
+                        <div data-i18n="srxl2CalibrateWarning" class="warning-box"></div>
+
+                        <div class="checkbox">
+                            <input id="srxl2-cal-ack" type="checkbox" class="toggle" />
+                            <label for="srxl2-cal-ack">
+                                <span data-i18n="srxl2CalibrateAck">The propeller is removed and the battery is disconnected</span>
+                            </label>
+                        </div>
+
+                        <div class="line">
+                            <a href="#" id="srxl2-cal-start" class="regular-button disabled" data-i18n="srxl2CalibrateStart">Start calibration</a>
+                            <a href="#" id="srxl2-cal-abort" class="regular-button" style="display: none;" data-i18n="srxl2CalibrateAbort">Abort</a>
+                        </div>
+
+                        <div id="srxl2-cal-status" class="info-box" style="display: none;"></div>
+                    </div>
+                </div>
+
                 <div id="servo-rate-container">
                     <div class="select">
                         <select name="servo-rate" id="servo-rate" data-setting-placeholder="servo_pwm_rate"></select>
@@ -47,7 +106,7 @@
 
                 <div id="throttle_idle-info" class="info-box"></div>
                 <div class="number">
-                    <input id="throttle_idle" data-setting="throttle_idle" type="number" data-step="1.0" />
+                    <input id="throttle_idle" data-setting="throttle_idle" type="number" data-step="1.0" /><span class="input-unit">%</span>
                     <label for="throttle_idle">
                         <span data-i18n="throttleIdle"></span>
                     </label>
@@ -158,22 +217,24 @@
             <div class="spacer" style="padding-left: 0">
                 <div class="servos">
                     <ul class="titles">
-                        <li title="Servo - 8">15</li>
-                        <li title="Servo - 7">14</li>
-                        <li title="Servo - 6">13</li>
-                        <li title="Servo - 5">12</li>
-                        <li title="Servo - 4">11</li>
-                        <li title="Servo - 3">10</li>
-                        <li title="Servo - 2">9</li>
-                        <li title="Servo - 1">8</li>
-                        <li title="Servo - 8">7</li>
-                        <li title="Servo - 7">6</li>
-                        <li title="Servo - 6">5</li>
-                        <li title="Servo - 5">4</li>
-                        <li title="Servo - 4">3</li>
-                        <li title="Servo - 3">2</li>
-                        <li title="Servo - 2">1</li>
-                        <li title="Servo - 1">0</li>
+                        <li title="Servo - 18">18</li>
+                        <li title="Servo - 17">17</li>
+                        <li title="Servo - 16">16</li>
+                        <li title="Servo - 15">15</li>
+                        <li title="Servo - 14">14</li>
+                        <li title="Servo - 13">13</li>
+                        <li title="Servo - 12">12</li>
+                        <li title="Servo - 11">11</li>
+                        <li title="Servo - 10">10</li>
+                        <li title="Servo - 9">9</li>
+                        <li title="Servo - 8">8</li>
+                        <li title="Servo - 7">7</li>
+                        <li title="Servo - 6">6</li>
+                        <li title="Servo - 5">5</li>
+                        <li title="Servo - 4">4</li>
+                        <li title="Servo - 3">3</li>
+                        <li title="Servo - 2">2</li>
+                        <li title="Servo - 1">1</li>
                     </ul>
                     <div class="bar-wrapper"></div>
                 </div>

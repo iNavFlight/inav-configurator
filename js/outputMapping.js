@@ -5,7 +5,8 @@ import BitHelper from "./bitHelper";
 var OutputMappingCollection = function () {
     let self = {},
         data = [],
-        timerOverrides = {};
+        timerOverrides = {},
+        directAssignments = [];
 
     const colorTable = [
             "#8ecae6",
@@ -27,24 +28,72 @@ var OutputMappingCollection = function () {
     //const TIM_USE_FW_SERVO = 6;
     const TIM_USE_LED = 24;
     const TIM_USE_BEEPER = 25;
+    const TIM_USE_PINIO = 26;
 
-    const OUTPUT_TYPE_MOTOR = 0;
-    const OUTPUT_TYPE_SERVO = 1;
-    const OUTPUT_TYPE_LED   = 2;
+    const OUTPUT_TYPE_MOTOR  = 0;
+    const OUTPUT_TYPE_SERVO  = 1;
+    const OUTPUT_TYPE_LED    = 2;
+    const OUTPUT_TYPE_PINIO  = 3;
+    const OUTPUT_TYPE_BEEPER = 4;
 
     const SPECIAL_LABEL_LED = 1;
+    const SPECIAL_LABEL_PINIO_BASE = 2;  // values 2..5 = USER1..USER4 (add channel index 0-3)
 
     self.TIMER_OUTPUT_MODE_AUTO = 0;
     self.TIMER_OUTPUT_MODE_MOTORS = 1;
     self.TIMER_OUTPUT_MODE_SERVOS = 2;
     self.TIMER_OUTPUT_MODE_LED = 3;
+    self.TIMER_OUTPUT_MODE_PINIO = 4;
+    self.TIMER_OUTPUT_MODE_BEEPER = 5;
 
     self.flushTimerOverrides = function() {
         timerOverrides = {};
     }
 
+    self.flushDirectAssignment = function() {
+        directAssignments = [];
+    }
+
+    // Discard cached data to force JS fallback on the next render — used when local
+    // motor/servo rules change before being saved, so firmware data is stale.
+    self.invalidateDirectAssignment = function() {
+        directAssignments = [];
+    }
+
+    self.setDirectAssignment = function(outputIndex, type, number) {
+        directAssignments.push({ outputIndex, type, number });
+    }
+
+    self.hasDirectAssignment = function() {
+        return directAssignments.length > 0;
+    }
+
+    // Build output table from firmware-reported direct assignments.
+    // Falls back gracefully: outputs not present in directAssignments show as '-'.
+    self.getOutputTableDirect = function() {
+        let offset = getFirstOutputOffset();
+        let outputCount = self.getOutputCount();
+        let outputMap = new Array(outputCount).fill('-');
+
+        for (let entry of directAssignments) {
+            let displayIndex = entry.outputIndex - offset;
+            if (displayIndex < 0 || displayIndex >= outputCount) continue;
+            if (entry.type === TIM_USE_MOTOR) {
+                outputMap[displayIndex] = 'Motor ' + entry.number;
+            } else if (entry.type === TIM_USE_SERVO) {
+                outputMap[displayIndex] = 'Servo ' + entry.number;
+            } else if (entry.type === TIM_USE_BEEPER) {
+                outputMap[displayIndex] = 'Buzzer';
+            } else if (entry.type === TIM_USE_PINIO) {
+                outputMap[displayIndex] = 'USER' + entry.number;
+            }
+        }
+
+        return outputMap;
+    }
+
     self.setTimerOverride = function (timer, outputMode) {
-        timerOverrides[timer] = outputMode;
+        timerOverrides[timer] = parseInt(outputMode, 10);
     }
 
     self.getTimerOverride = function (timer) {
@@ -57,8 +106,41 @@ var OutputMappingCollection = function () {
         return colorTable[timerIndex % colorTable.length];
     }
 
-    self.isLedPin = function(timer) {
-        return data[timer].specialLabels == SPECIAL_LABEL_LED;
+    self.isLedPin = function(outputIndex) {
+        return BitHelper.bit_check(data[outputIndex]['usageFlags'], TIM_USE_LED);
+    }
+
+    self.isBeeperPin = function(outputIndex) {
+        return BitHelper.bit_check(data[outputIndex]['usageFlags'], TIM_USE_BEEPER);
+    }
+
+    function isTimerDefault(timerId, flag) {
+        let found = false;
+        for (const entry of data) {
+            if (entry['timerId'] !== timerId) continue;
+            const flags = entry['usageFlags'];
+            if (BitHelper.bit_check(flags, TIM_USE_MOTOR) || BitHelper.bit_check(flags, TIM_USE_SERVO)) return false;
+            if (BitHelper.bit_check(flags, flag)) found = true;
+        }
+        return found;
+    }
+
+    // Returns true when the timer's compile-time default assignment is LED.
+    self.isTimerDefaultLed = function(timerId) {
+        // LED can also be identified by specialLabels, so check both.
+        let hasLed = false;
+        for (const entry of data) {
+            if (entry['timerId'] !== timerId) continue;
+            const flags = entry['usageFlags'];
+            if (BitHelper.bit_check(flags, TIM_USE_MOTOR) || BitHelper.bit_check(flags, TIM_USE_SERVO)) return false;
+            if (BitHelper.bit_check(flags, TIM_USE_LED) || entry['specialLabels'] === SPECIAL_LABEL_LED) hasLed = true;
+        }
+        return hasLed;
+    }
+
+    // Returns true when the timer's compile-time default assignment is BEEPER.
+    self.isTimerDefaultBeeper = function(timerId) {
+        return isTimerDefault(timerId, TIM_USE_BEEPER);
     }
 
     self.getOutputTimerColor = function (output) {
@@ -86,18 +168,68 @@ var OutputMappingCollection = function () {
 
         for (let i = 0; i < data.length; i++) {
             timerMap[i] = null;
+        }
 
-            if (servosToGo > 0 && BitHelper.bit_check(data[i]['usageFlags'], TIM_USE_LED)) {
-                console.log(i + ": LED");
+        // Pre-assign PINIO outputs — identified by specialLabels, not timer priority
+        for (let i = 0; i < data.length; i++) {
+            if (data[i]['specialLabels'] >= SPECIAL_LABEL_PINIO_BASE) {
+                timerMap[i] = OUTPUT_TYPE_PINIO;
+            }
+        }
+
+        // Pre-assign BEEPER outputs — explicitly overridden by user, takes precedence over flag-based assignment.
+        // A timer's mode applies to every pad sharing it, but only one pad can ever be the real
+        // beeper (firmware wires up just the first match), so only that first pad is pre-assigned here.
+        let beeperTimerClaimed = {};
+        for (let i = 0; i < data.length; i++) {
+            let timerId = data[i]['timerId'];
+            let mode = timerOverrides[timerId] || self.TIMER_OUTPUT_MODE_AUTO;
+            if (mode === self.TIMER_OUTPUT_MODE_BEEPER && !beeperTimerClaimed[timerId]) {
+                timerMap[i] = OUTPUT_TYPE_BEEPER;
+                beeperTimerClaimed[timerId] = true;
+            }
+        }
+
+        let ledTimerClaimed = {};
+        for (let i = 0; i < data.length; i++) {
+            let timerId = data[i]['timerId'];
+            let mode = timerOverrides[timerId] || self.TIMER_OUTPUT_MODE_AUTO;
+            if (mode === self.TIMER_OUTPUT_MODE_LED && !ledTimerClaimed[timerId]) {
                 timerMap[i] = OUTPUT_TYPE_LED;
-            } else if (servosToGo > 0 && BitHelper.bit_check(data[i]['usageFlags'], TIM_USE_SERVO)) {
-                console.log(i + ": SERVO");
-                servosToGo--;
-                timerMap[i] = OUTPUT_TYPE_SERVO;
-            } else if (motorsToGo > 0 && BitHelper.bit_check(data[i]['usageFlags'], TIM_USE_MOTOR)) {
-                console.log(i + ": MOTOR");
-                motorsToGo--;
-                timerMap[i] = OUTPUT_TYPE_MOTOR;
+                ledTimerClaimed[timerId] = true;
+            }
+        }
+
+        // Two priority passes: dedicated outputs first, then auto.
+        // Matches firmware pwmBuildTimerOutputList() behavior.
+        for (let priority = 0; priority < 2; priority++) {
+            let isDedicated = (priority === 0);
+
+            for (let i = 0; i < data.length; i++) {
+                if (timerMap[i] !== null) continue;
+
+                let flags = data[i]['usageFlags'];
+                let timerId = data[i]['timerId'];
+                let mode = timerOverrides[timerId] || self.TIMER_OUTPUT_MODE_AUTO;
+
+                // Pass 1: skip dedicated overrides — they were handled (or intentionally skipped) in Pass 0
+                if (!isDedicated && (mode === self.TIMER_OUTPUT_MODE_MOTORS || mode === self.TIMER_OUTPUT_MODE_SERVOS)) {
+                    continue;
+                }
+
+                if (motorsToGo > 0 && BitHelper.bit_check(flags, TIM_USE_MOTOR)
+                        && (isDedicated ? mode === self.TIMER_OUTPUT_MODE_MOTORS : mode !== self.TIMER_OUTPUT_MODE_MOTORS)) {
+                    timerMap[i] = OUTPUT_TYPE_MOTOR;
+                    motorsToGo--;
+                } else if (servosToGo > 0 && BitHelper.bit_check(flags, TIM_USE_SERVO)
+                        && (isDedicated ? mode === self.TIMER_OUTPUT_MODE_SERVOS : mode !== self.TIMER_OUTPUT_MODE_SERVOS)) {
+                    timerMap[i] = OUTPUT_TYPE_SERVO;
+                    servosToGo--;
+                } else if (!isDedicated && BitHelper.bit_check(flags, TIM_USE_LED)) {
+                    timerMap[i] = OUTPUT_TYPE_LED;
+                } else if (!isDedicated && BitHelper.bit_check(flags, TIM_USE_BEEPER)) {
+                    timerMap[i] = OUTPUT_TYPE_BEEPER;
+                }
             }
         }
 
@@ -105,27 +237,40 @@ var OutputMappingCollection = function () {
     };
 
     self.getOutputTable = function (isMR, motors, servos) {
-        let currentMotorIndex = 1,
-            currentServoIndex = 0,
+        let currentServoIndex = 0,
             timerMap = getTimerMap(isMR, motors, servos.length),
+            motorNumbers = {},
             outputMap = [],
             offset = getFirstOutputOffset();
 
-        console.log("Offset: " + offset)
+        // Number motors in assignment order: dedicated (OUTPUT_MODE_MOTORS) first, then auto.
+        // Matches firmware timMotors[] build order in pwmBuildTimerOutputList().
+        let motorNum = 1;
+        for (let i = 0; i < data.length; i++) {
+            if (timerMap[i] !== OUTPUT_TYPE_MOTOR) continue;
+            let mode = timerOverrides[data[i]['timerId']] || self.TIMER_OUTPUT_MODE_AUTO;
+            if (mode === self.TIMER_OUTPUT_MODE_MOTORS) motorNumbers[i] = motorNum++;
+        }
+        for (let i = 0; i < data.length; i++) {
+            if (timerMap[i] === OUTPUT_TYPE_MOTOR && motorNumbers[i] === undefined) motorNumbers[i] = motorNum++;
+        }
         for (let i = 0; i < self.getOutputCount(); i++) {
-            
+
             let assignment = timerMap[i + offset];
 
             if (assignment === null) {
                 outputMap[i] = "-";
             } else if (assignment == OUTPUT_TYPE_MOTOR) {
-                outputMap[i] = "Motor " + currentMotorIndex;
-                currentMotorIndex++;
+                outputMap[i] = "Motor " + motorNumbers[i + offset];
             } else if (assignment == OUTPUT_TYPE_SERVO) {
                 outputMap[i] = "Servo " + servos[currentServoIndex];
                 currentServoIndex++;
             } else if (assignment == OUTPUT_TYPE_LED) {
                 outputMap[i] = "Led";
+            } else if (assignment == OUTPUT_TYPE_PINIO) {
+                outputMap[i] = "USER" + (data[i + offset]['specialLabels'] - SPECIAL_LABEL_PINIO_BASE + 1);
+            } else if (assignment == OUTPUT_TYPE_BEEPER) {
+                outputMap[i] = "Buzzer";
             }
         }
 
@@ -134,27 +279,18 @@ var OutputMappingCollection = function () {
 
     self.flush = function () {
         data = [];
+        directAssignments = [];
     };
 
     self.put = function (element) {
         data.push(element);
     };
 
+    // Counts every pad from the first real output through the end of data —
+    // not just currently-flagged ones, since a BEEPER timer's sibling pads are
+    // legitimately flagless (see getTimerMap()) but still occupy a real column.
     self.getOutputCount = function () {
-        let retVal = 0;
-
-        for (let i = 0; i < data.length; i++) {
-            let flags = data[i]['usageFlags'];
-            if (
-                BitHelper.bit_check(flags, TIM_USE_MOTOR) ||
-                BitHelper.bit_check(flags, TIM_USE_SERVO) ||
-                BitHelper.bit_check(flags, TIM_USE_LED)
-            ) {
-                retVal++;
-            };
-        }
-
-        return retVal;
+        return data.length - getFirstOutputOffset();
     }
 
     function getFirstOutputOffset() {
@@ -162,7 +298,10 @@ var OutputMappingCollection = function () {
             if (
                 BitHelper.bit_check(data[i]['usageFlags'], TIM_USE_MOTOR) ||
                 BitHelper.bit_check(data[i]['usageFlags'], TIM_USE_SERVO) ||
-                BitHelper.bit_check(data[i]['usageFlags'], TIM_USE_LED)
+                BitHelper.bit_check(data[i]['usageFlags'], TIM_USE_LED) ||
+                BitHelper.bit_check(data[i]['usageFlags'], TIM_USE_BEEPER) ||
+                BitHelper.bit_check(data[i]['usageFlags'], TIM_USE_PINIO) ||
+                data[i]['specialLabels'] >= SPECIAL_LABEL_PINIO_BASE
             ) {
                 return i;
             }

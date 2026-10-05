@@ -10,6 +10,10 @@
         "message": "English",
         "_comment": "Don't translate!"
     },
+	"language_bg": {
+		"message": "Български",
+		"_comment": "Don't translate!"
+	},
     "language_uk": {
         "message": "українська",
         "_comment": "Don't translate!"
@@ -779,14 +783,8 @@
     "featureTX_PROF_SEL": {
         "message": "TXスティックコマンドによるプロファイル選択"
     },
-    "featureINFLIGHT_ACC_CAL": {
-        "message": "フライト中の水平キャリブレーション"
-    },
     "featureMOTOR_STOP": {
         "message": "アーム後にモーターを回転させない"
-    },
-    "featureSERVO_TILT": {
-        "message": "サーボジンバル"
     },
     "featureBAT_PROFILE_AUTOSWITCH": {
         "message": "Battery Profile 自動選択"
@@ -812,12 +810,6 @@
     "featureGPSTip": {
         "message": "最初にポートの設定をしてください"
     },
-    "featureFAILSAFE": {
-        "message": "RX信号喪失時にフェイルセーフ設定を適用"
-    },
-    "featureSONAR": {
-        "message": "ソナー 距離センサー"
-    },
     "featureTELEMETRY": {
         "message": "テレメトリー出力"
     },
@@ -835,12 +827,6 @@
     },
     "featureDASHBOARD": {
         "message": "OLEDスクリーンディスプレイ"
-    },
-    "featureONESHOT125": {
-        "message": "ONESHOT ESCサポート"
-    },
-    "featureONESHOT125Tip": {
-        "message": "この機能を有効にする前に、必ずバッテリーとプロペラを外してください。"
     },
     "featurePWM_OUTPUT_ENABLE": {
         "message": "モーターとサーボ出力を有効"
@@ -860,18 +846,6 @@
     "onboardLoggingBlackboxRate": {
         "message": "ログに記録する飛行ループの反復の一部 (ロギング率)"
     },
-    "featureCHANNEL_FORWARDING": {
-        "message": "AUXチャンネルをサーボ出力に転送"
-    },
-    "featureSOFTSPI": {
-        "message": "CPUベース SPI"
-    },
-    "featurePWM_SERVO_DRIVER": {
-        "message": "外部PWMサーボドライバ"
-    },
-    "featurePWM_SERVO_DRIVERTip": {
-        "message": "外付けのPCA9685 PWMドライバを使用して、最大16個のサーボをフライトコントローラに接続します。この機能を有効にするにはPCA9685を接続する必要があります。"
-    },
     "featureRSSI_ADCTip": {
         "message": "RSSIは信号強度を測定するもので、航空機が圏外になったときやRF干渉を受けたときに知るのに非常に便利です。"
     },
@@ -889,12 +863,6 @@
     },
     "featureFW_AUTOTRIMTip": {
         "message": "スタビライズモードで飛行しているときは、マニュアルモードに切り替えたときに機体がまっすぐ飛行し続けるようにサーボの中間点を調整し続けます。これにはGPSが必要です。"
-    },
-    "featureDYNAMIC_FILTERS": {
-        "message": "動的ジャイロフィルター"
-    },
-    "featureDYNAMIC_FILTERSTip": {
-        "message": "自動FFTジャイロ解析を使用して、ジャイロノイズを減衰させるノッチフィルターを設定します。常に有効にすること！"
     },
     "configurationFeatureEnabled": {
         "message": "有効"
@@ -1234,6 +1202,63 @@
     },
     "configurationNoBand": {
         "message": "なし"
+    },
+    "configurationPowerLimits": {
+        "message": "電力制限"
+    },
+    "configurationPowerLimitsHelp": {
+        "message": "バッテリーとESCを保護するために電流と電力の消費を制限します。0に設定すると無効になります。単位: dA（デシアンペア）= A×10、dW（デシワット）= W×10、ds（デシ秒）= s×10。"
+    },
+    "configurationPowerLimitsNote": {
+        "message": "スロットルを滑らかに絞ることでバッテリーの過電流を防止します。電流センサーが必要です。バッテリーの仕様に合わせて連続制限とバースト制限を設定してください。"
+    },
+    "configurationLimitContCurrent": {
+        "message": "連続電流制限 (dA)"
+    },
+    "configurationLimitContCurrentHelp": {
+        "message": "デシアンペア（dA）での最大持続電流。例：500 = 50A。電流制限を無効にするには0に設定。"
+    },
+    "configurationLimitBurstCurrent": {
+        "message": "バースト電流制限 (dA)"
+    },
+    "configurationLimitBurstCurrentHelp": {
+        "message": "短時間のバースト（急上昇など）に許容される高電流。例：750 = 75A。連続制限以上に設定してください。"
+    },
+    "configurationLimitBurstCurrentTime": {
+        "message": "バースト電流時間 (ds)"
+    },
+    "configurationLimitBurstCurrentTimeHelp": {
+        "message": "デシ秒（ds）でのバースト電流許容時間。例：100 = 10秒。この時間を超えると連続制限に戻ります。"
+    },
+    "configurationLimitBurstCurrentFalldownTime": {
+        "message": "バースト電流低下時間 (ds)"
+    },
+    "configurationLimitBurstCurrentFalldownTimeHelp": {
+        "message": "バースト制限から連続制限へのデシ秒（ds）での滑らかな移行時間。例：20 = 2秒。"
+    },
+    "configurationLimitContPower": {
+        "message": "連続電力制限 (dW)"
+    },
+    "configurationLimitContPowerHelp": {
+        "message": "デシワット（dW）での最大持続電力。例：8000 = 800W。電力制限を無効にするには0に設定。電圧測定が必要です。"
+    },
+    "configurationLimitBurstPower": {
+        "message": "バースト電力制限 (dW)"
+    },
+    "configurationLimitBurstPowerHelp": {
+        "message": "短時間のバーストに許容される高電力。例：10000 = 1000W。連続制限以上に設定してください。"
+    },
+    "configurationLimitBurstPowerTime": {
+        "message": "バースト電力時間 (ds)"
+    },
+    "configurationLimitBurstPowerTimeHelp": {
+        "message": "デシ秒（ds）でのバースト電力許容時間。例：50 = 5秒。"
+    },
+    "configurationLimitBurstPowerFalldownTime": {
+        "message": "バースト電力低下時間 (ds)"
+    },
+    "configurationLimitBurstPowerFalldownTimeHelp": {
+        "message": "バースト制限から連続電力制限へのデシ秒（ds）での滑らかな移行時間。例：10 = 1秒。"
     },
     "configurationVTXNoBandHelp": {
         "message": "VTXの周波数が手動で設定されています。バンドを選択すると設定された周波数が上書きされます。"
@@ -5683,6 +5708,24 @@
     },
     "ledStripWiringMessage": {
         "message": "ワイヤーオーダー番号のないLEDは保存されません"
+    },
+    "ledStripQuickPresets": {
+        "message": "クイックプリセット:"
+    },
+    "ledStripStep1Header": {
+        "message": "配線順序"
+    },
+    "ledStripStep2Header": {
+        "message": "位置と方向"
+    },
+    "ledStripStep3Header": {
+        "message": "機能"
+    },
+    "ledStripStep4Header": {
+        "message": "色"
+    },
+    "ledStripEditPalette": {
+        "message": "パレットの色を編集"
     },
     "mainLogoText": {
         "message": "CONFIGURATOR"

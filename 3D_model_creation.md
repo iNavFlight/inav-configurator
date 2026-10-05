@@ -5,10 +5,10 @@ INAV configurator uses the [glTF](https://en.wikipedia.org/wiki/GlTF) format for
 In this tutorial we see how to export glTF from Blender
 
 ## Pre-requisites
-- [Blender](https://www.blender.org/), when i wrote this tutorial i was using the version 3.1, but also the next versions should be fine.
+- [Blender](https://www.blender.org/), when I wrote this tutorial I was using the version 3.1, but also the next versions should be fine.
 
 ## Creating the model
-Create the model in your preferred 3D package. I use Fusion 360 and created quite large models. The size doesn't matter, it can be resized in Blender. I simply created the model, combined most parts, and added colour where I wanted it. The annoying thing is that the materials don't copy across in to Blender. But it's easier to get everything set with the package you're comfortable with. I would also highly reccomend naming each object in the model, as it will make things simpler later on. I also name the materials, as I'm sure Blender understands the material names. Once you're happy with the model, export it as an .obj file.
+Create the model in your preferred 3D package. I use Fusion 360 and created quite large models. The size doesn't matter, it can be resized in Blender. I simply created the model, combined most parts, and added colour where I wanted it. The annoying thing is that the materials don't copy across in to Blender. But it's easier to get everything set with the package you're comfortable with. I would also highly recommend naming each object in the model, as it will make things simpler later on. I also name the materials, as I'm sure Blender understands the material names. Once you're happy with the model, export it as an .obj file.
 ## Basic modification in Blender
 Open Blender, and import your .obj. This should be pretty uneventful. 
 ### Scaling
@@ -25,11 +25,11 @@ Next up, you will want to replicate the materials that you selected when designi
 ![image](https://user-images.githubusercontent.com/17590174/120714284-e59a7c00-c4ba-11eb-83d6-cff07a8fb476.png)
 
 ### Joining
-The final stage before exporting the model is joining all the individual parts. You can still edit things afterwards. But if you don't do this, you will only export the last selected part. First, select all the parts of the 3D model that you want visible in configurator. Click on the triangle to the left of the object name, in the obkect list in the top right of the screen. Hold the __shift__ key to select multiples. Once they're all selected, hold __Ctrl__ and press __J__. The parts should all now join, and you will see only one object in the list (objects not selected to be joined will of course still be there). If it didn't work, try __Ctrl__ + __J__ again, as sometimes I have had to issue the command twice.
+The final stage before exporting the model is joining all the individual parts. You can still edit things afterwards. But if you don't do this, you will only export the last selected part. First, select all the parts of the 3D model that you want visible in configurator. Click on the triangle to the left of the object name, in the object list in the top right of the screen. Hold the __shift__ key to select multiples. Once they're all selected, hold __Ctrl__ and press __J__. The parts should all now join, and you will see only one object in the list (objects not selected to be joined will of course still be there). If it didn't work, try __Ctrl__ + __J__ again, as sometimes I have had to issue the command twice.
 ## Exporting the model to glTF
-Select you joined object and head to the top menu with __File__ > __Export__ > **glTF 2.0 (.glb/.gltf)**. Select the format **glTF Embedded (.gltf)**, Select the export folder and give it a name should be pretty straight forward. These export settings have worked fine for me.
+Select your joined object and head to the top menu with __File__ > __Export__ > **glTF 2.0 (.glb/.gltf)**. Select the format **glTF Embedded (.gltf)**, Select the export folder and give it a name should be pretty straight forward. These export settings have worked fine for me.
 ![Immagine 2022-03-28 115931](https://user-images.githubusercontent.com/40276199/160375086-ef0eb587-9574-4f4e-b101-ce24e27e0e12.png)
 
-You can then put the .gltf model in the Configurator __/resources/models/__ folder, and ammend the code to display the model.
+You can then put the .gltf model in the Configurator __/resources/models/__ folder, and amend the code to display the model.
 
-The old .json files was converted to .glTF using this [tool](https://gist.github.com/donmccurdy/c090dc53c7bfb704ef9de654ecc07632)
+The old .json files were converted to .glTF using this [tool](https://gist.github.com/donmccurdy/c090dc53c7bfb704ef9de654ecc07632)

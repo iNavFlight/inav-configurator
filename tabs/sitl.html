@@ -4,6 +4,7 @@
         <div class="note" style="margin-bottom: 20px;">
             <div class="note_spacer">
                 <p data-i18n="sitlHelp"></p>
+                <p id="sitlWebAssemblyInfo" style="display: none;" data-i18n="sitlWebAssemblyInfo"></p>
             </div>
         </div>
         <div class="leftWrapper">
@@ -32,6 +33,16 @@
                     <div class="spacer_box_title" data-i18n="sitlOptions"></div>
                 </div>
                 <div class="spacer_box">
+                    <div id="wasmProxy" class="checkbox is-hidden">
+                        <input type="checkbox" id="sitlEnableWasmProxy" class="toggle" data-live="true">
+                        <label for="sitlEnableWasmProxy"><span data-i18n="sitlEnableWasmProxy"></span></label>
+                        <div class="helpicon cf_tip" data-i18n_title="sitlEnableWasmProxyHelp"></div>
+                    </div>
+                    <div id="wasmProxyPort" class="number is-hidden">
+                        <input type="number" id="sitlWasmProxyPort" data-setting-multiplier="1" step="1" min="1" max="64500" />
+                        <label for="sitlWasmProxyPort" class="sitlNumber"><span data-i18n="sitlWasmProxyPort"></span></label>
+                        <div class="helpicon cf_tip" data-i18n_title="sitlWasmProxyPortHelp"></div>
+                    </div>
                     <div class="checkbox">
                         <input type="checkbox" id="sitlEnableSim" class="toggle" data-live="true">
                         <label for="enableSim"><span data-i18n="sitlEnableSim"></span></label>
@@ -86,7 +97,26 @@
                     </table>
                 </div>
             </div>
-            <div class="config-section gui_box grey">
+            <div id="eepromFiles" class="config-section gui_box grey is-hidden">
+                <div class="gui_box_titlebar">
+                    <div class="spacer_box_title" data-i18n="sitlEepromFiles"></div>
+                    <div class="helpicon cf_tip" data-i18n_title="sitlEepromFilesHelp"></div>
+                </div>
+                <div class="spacer_box">
+                    <table id="eepromFiles-table" class="map-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 200px" data-i18n="sitlEepromFileName"></th>
+                                <th style="width: 100px" data-i18n="sitlEepromActions"></th>
+                            </tr>
+                        </thead>
+                        <tbody class="eepromFilesTableBody">
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div id="serialReceiver" class="config-section gui_box grey">
                 <div class="gui_box_titlebar">
                     <div class="spacer_box_title" data-i18n="serialReceiver"></div>
                     <div class="helpicon cf_tip" data-i18n_title="sitlSerialReceiverHelp"></div>

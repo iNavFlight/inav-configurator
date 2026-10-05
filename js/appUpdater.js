@@ -2,7 +2,7 @@
 
 import semver from 'semver';
 
-import { GUI } from './gui';
+import GUI from './gui';
 import jBox from 'jbox';
 import i18n from './localization';
 
@@ -16,9 +16,15 @@ appUpdater.checkRelease = function (currVersion) {
         let newVersion = releaseData.tag_name;
         let newPrerelase = releaseData.prerelease;
 
-        if (newPrerelase == false && semver.gt(newVersion, currVersion)) {
-            
-            window.electronAPI.appGetVersion().then(currentVersion => {
+        let updateAvailable = false;
+        try {
+            updateAvailable = !newPrerelase && semver.gt(newVersion, currVersion);
+        } catch (_) {
+            // Non-semver version string (e.g. untagged dev builds) — skip update check
+        }
+
+        if (updateAvailable) {
+            Promise.resolve(window.electronAPI.appGetVersion()).then(currentVersion => {
                 GUI.log(newVersion, currentVersion);
                 GUI.log(currVersion);
 

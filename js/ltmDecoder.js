@@ -2,40 +2,42 @@
 
 const ltmDecoder = (function () {
 
-    let TELEMETRY = {
-        //A frame
-        pitch: null,
-        roll: null,
-        heading: null,
+    const createTelemetry = function () {
+        return {
+            //A frame
+            pitch: null,
+            roll: null,
+            heading: null,
 
-        //S frame
-        voltage: null,
-        currectDrawn: null,
-        rssi: null,
-        airspeed: null,
-        flightmode: null,
-        flightmodeName: null,
+            //S frame
+            voltage: null,
+            currectDrawn: null,
+            rssi: null,
+            airspeed: null,
+            flightmode: null,
+            flightmodeName: null,
 
-        armed: null,
-        failsafe: null,
+            armed: null,
+            failsafe: null,
 
-        //G frame
-        latitude: null,
-        longitude: null,
-        altitude: null,
-        groundSpeed: null,
-        gpsFix: null,
-        gpsSats: null,
-        
-        
-        //X frame
-        hdop: null,
-        sensorStatus: null,
-        frameCounter: null,
-        disarmReason: null,
-        disarmReasonName: null
+            //G frame
+            latitude: null,
+            longitude: null,
+            altitude: null,
+            groundSpeed: null,
+            gpsFix: null,
+            gpsSats: null,
 
+            //X frame
+            hdop: null,
+            sensorStatus: null,
+            frameCounter: null,
+            disarmReason: null,
+            disarmReasonName: null
+        };
     };
+
+    let TELEMETRY = createTelemetry();
 
     let publicScope = {},
         privateScope = {};
@@ -248,6 +250,19 @@ const ltmDecoder = (function () {
 
     publicScope.wasEverReceiving = function () {
         return privateScope.lastFrameReceivedMs !== null;
+    };
+
+    // LTM detection is only meaningful for the current connection. Keep no
+    // partially decoded frame or telemetry from a previous serial session.
+    publicScope.reset = function () {
+        TELEMETRY = createTelemetry();
+        privateScope.protocolState = LTM_STATE_IDLE;
+        privateScope.lastFrameReceivedMs = null;
+        privateScope.frameType = null;
+        privateScope.frameLength = null;
+        privateScope.receiverIndex = 0;
+        privateScope.serialBuffer = [];
+        privateScope.frameProcessingStartedAtMs = 0;
     };
 
     publicScope.get = function () {

@@ -93,6 +93,7 @@ const OPERAND_TYPES = {
             13: "USER 4",
             14: "Acro",
             15: "Waypoint Mission",
+            16: "Angle Hold",
         }
     },
     4: {

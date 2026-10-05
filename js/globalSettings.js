@@ -22,6 +22,7 @@ var globalSettings = {
     configuratorTreeLocation: 'master',
     cliAutocomplete: true,
     assistnowApiKey: null,
+    googleApiKey: null,
     assistnowOfflineData: [],
     assistnowOfflineDate: 0,
     store: null,

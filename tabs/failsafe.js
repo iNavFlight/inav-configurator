@@ -3,17 +3,17 @@
 import mspHelper from './../js/msp/MSPHelper';
 import MSPCodes from './../js/msp/MSPCodes';
 import MSP from './../js/msp';
-import { GUI, TABS } from './../js/gui';
+import GUI from './../js/gui';
 import FC from './../js/fc';
 import Settings from './../js/settings';
 import i18n from './../js/localization';
 
-TABS.failsafe = {};
+const failsafeTab = {};
 
-TABS.failsafe.initialize = function (callback, scrollPosition) {
+failsafeTab.initialize = function (callback, scrollPosition) {
 
-    if (GUI.active_tab != 'failsafe') {
-        GUI.active_tab = 'failsafe';
+    if (GUI.active_tab !== this) {
+        GUI.active_tab = this;
     }
 
     // Can get rid of this when MSPHelper supports strings (fixed in #7734, awaiting merge)
@@ -144,6 +144,8 @@ TABS.failsafe.initialize = function (callback, scrollPosition) {
     }
 };
 
-TABS.failsafe.cleanup = function (callback) {
+failsafeTab.cleanup = function (callback) {
     if (callback) callback();
 };
+
+export default failsafeTab;

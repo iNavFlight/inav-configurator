@@ -6,16 +6,16 @@ import noUiSlider from 'nouislider';
 import mspHelper from './../js/msp/MSPHelper';
 import MSPCodes from './../js/msp/MSPCodes';
 import MSP from './../js/msp';
-import { GUI, TABS } from './../js/gui';
+import GUI from './../js/gui';
 import FC from './../js/fc';
 import i18n from './../js/localization';
 import interval from './../js/intervals';
 
-TABS.adjustments = {};
+const adjustmentsTab = {};
 
-TABS.adjustments.initialize = function (callback) {
+adjustmentsTab.initialize = function (callback) {
     GUI.active_tab_ref = this;
-    GUI.active_tab = 'adjustments';
+    GUI.active_tab = this;
 
     MSP.send_message(MSPCodes.MSP_ADJUSTMENT_RANGES, false, false, get_rc_data);
 
@@ -272,6 +272,8 @@ TABS.adjustments.initialize = function (callback) {
     }
 };
 
-TABS.adjustments.cleanup = function (callback) {
+adjustmentsTab.cleanup = function (callback) {
     if (callback) callback();
 };
+
+export default adjustmentsTab;

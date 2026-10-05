@@ -10,6 +10,10 @@
         "message": "English",
         "_comment": "Don't translate!"
     },
+		"language_bg": {
+		"message": "Български",
+		"_comment": "Don't translate!"
+	},
     "language_uk": {
         "message": "українська",
         "_comment": "Don't translate!"
@@ -788,14 +792,8 @@
     "featureTX_PROF_SEL": {
         "message": "使用遥控器摇杆选择设置档"
     },
-    "featureINFLIGHT_ACC_CAL": {
-        "message": "实时水平校准"
-    },
     "featureMOTOR_STOP": {
         "message": "解锁后处于最低油门时不转动电机"
-    },
-    "featureSERVO_TILT": {
-        "message": "舵机云台"
     },
     "featureBAT_PROFILE_AUTOSWITCH": {
         "message": "自动选择电池类型"
@@ -821,12 +819,6 @@
     "featureGPSTip": {
         "message": "请先设置串口"
     },
-    "featureFAILSAFE": {
-        "message": "当接收机信号丢失启用失控保护"
-    },
-    "featureSONAR": {
-        "message": "声呐"
-    },
     "featureTELEMETRY": {
         "message": "遥测输出"
     },
@@ -844,12 +836,6 @@
     },
     "featureDASHBOARD": {
         "message": "OLED 显示屏"
-    },
-    "featureONESHOT125": {
-        "message": "ONESHOT 电调支持"
-    },
-    "featureONESHOT125Tip": {
-        "message": "开启前请务必拔掉电池，卸下螺旋桨。"
     },
     "featurePWM_OUTPUT_ENABLE": {
         "message": "开启电机和舵机输出"
@@ -869,18 +855,6 @@
     "onboardLoggingBlackboxRate": {
         "message": "飞行循环迭代到日志的部分(日志速率)"
     },
-    "featureCHANNEL_FORWARDING": {
-        "message": "转发 Aux 通道信号到舵机输出"
-    },
-    "featureSOFTSPI": {
-        "message": "启用软SPI"
-    },
-    "featurePWM_SERVO_DRIVER": {
-        "message": "外置 PWM 伺服设备"
-    },
-    "featurePWM_SERVO_DRIVERTip": {
-        "message": "在飞控中使用外部PCA9685 PMW驱动器可以连接多达16个舵机飞行控制器。必须连接PCA9685才能启用该特性。"
-    },
     "featureRSSI_ADCTip": {
         "message": "RSSI是一种信号强度的测量方法，非常方便，你可以知道你的飞机何时超出了遥控范围，或者是否受到射频干扰。"
     },
@@ -898,12 +872,6 @@
     },
     "featureFW_AUTOTRIMTip": {
         "message": "在自稳模式飞行时，持续调整伺服中点，使飞机在切换到手动模式时保持直线飞行。需要GPS。"
-    },
-    "featureDYNAMIC_FILTERS": {
-        "message": "动态陀螺仪滤波器"
-    },
-    "featureDYNAMIC_FILTERSTip": {
-        "message": "使用自动FFT陀螺分析来设置陷波滤波器来衰减陀螺噪声。应该一直启用!"
     },
     "configurationFeatureEnabled": {
         "message": "启用"
@@ -1237,6 +1205,63 @@
     },
     "configurationNoBand": {
         "message": "None"
+    },
+    "configurationPowerLimits": {
+        "message": "功率限制"
+    },
+    "configurationPowerLimitsHelp": {
+        "message": "限制电流和功率消耗以保护电池和电调。设为0禁用。单位：dA（分安培）= A×10，dW（分瓦）= W×10，ds（分秒）= s×10。"
+    },
+    "configurationPowerLimitsNote": {
+        "message": "通过平滑降低油门来保护电池免受过流。需要电流传感器。根据电池规格设置连续限制和突发限制。"
+    },
+    "configurationLimitContCurrent": {
+        "message": "持续电流限制 (dA)"
+    },
+    "configurationLimitContCurrentHelp": {
+        "message": "最大持续电流（分安培 dA）。示例：500 = 50A。设为0禁用电流限制。"
+    },
+    "configurationLimitBurstCurrent": {
+        "message": "突发电流限制 (dA)"
+    },
+    "configurationLimitBurstCurrentHelp": {
+        "message": "短时突发（急推油门、爬升）允许的更高电流。示例：750 = 75A。应大于等于持续限制值。"
+    },
+    "configurationLimitBurstCurrentTime": {
+        "message": "突发电流时间 (ds)"
+    },
+    "configurationLimitBurstCurrentTimeHelp": {
+        "message": "允许突发电流的持续时间（分秒 ds）。示例：100 = 10秒。超时后限制降回持续值。"
+    },
+    "configurationLimitBurstCurrentFalldownTime": {
+        "message": "突发电流降落时间 (ds)"
+    },
+    "configurationLimitBurstCurrentFalldownTimeHelp": {
+        "message": "从突发限制平滑过渡到持续限制的时间（分秒 ds）。示例：20 = 2秒。"
+    },
+    "configurationLimitContPower": {
+        "message": "持续功率限制 (dW)"
+    },
+    "configurationLimitContPowerHelp": {
+        "message": "最大持续功率（分瓦 dW）。示例：8000 = 800W。设为0禁用功率限制。需要电压测量。"
+    },
+    "configurationLimitBurstPower": {
+        "message": "突发功率限制 (dW)"
+    },
+    "configurationLimitBurstPowerHelp": {
+        "message": "短时突发允许的更高功率。示例：10000 = 1000W。应大于等于持续限制值。"
+    },
+    "configurationLimitBurstPowerTime": {
+        "message": "突发功率时间 (ds)"
+    },
+    "configurationLimitBurstPowerTimeHelp": {
+        "message": "允许突发功率的持续时间（分秒 ds）。示例：50 = 5秒。"
+    },
+    "configurationLimitBurstPowerFalldownTime": {
+        "message": "突发功率降落时间 (ds)"
+    },
+    "configurationLimitBurstPowerFalldownTimeHelp": {
+        "message": "从突发限制平滑过渡到持续功率限制的时间（分秒 ds）。示例：10 = 1秒。"
     },
     "configurationVTXNoBandHelp": {
         "message": "已手动设置VTX频率。选择一个频段将覆盖当前配置的频率。"
@@ -5704,6 +5729,24 @@
     },
     "ledStripWiringMessage": {
         "message": "没有布线序号的 LED 不会被保存。"
+    },
+    "ledStripQuickPresets": {
+        "message": "快速预设:"
+    },
+    "ledStripStep1Header": {
+        "message": "接线顺序"
+    },
+    "ledStripStep2Header": {
+        "message": "位置和方向"
+    },
+    "ledStripStep3Header": {
+        "message": "功能"
+    },
+    "ledStripStep4Header": {
+        "message": "颜色"
+    },
+    "ledStripEditPalette": {
+        "message": "编辑调色板颜色"
     },
 
 
