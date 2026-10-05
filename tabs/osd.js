@@ -11,6 +11,7 @@ import GUI from './../js/gui';
 import MSP from './../js/msp';
 import MSPCodes from './../js/msp/MSPCodes';
 import mspHelper from './../js/msp/MSPHelper';
+import { profileNamePreview } from './../js/profileNames';
 import Settings, { smartRound } from './../js/settings';
 import { globalSettings } from './../js/globalSettings';
 import { PortHandler } from './../js/port_handler';
@@ -2242,6 +2243,30 @@ OSD.constants = {
                     id: 128,
                     preview:  function(osd_data) {
                         return FONT.symbol(SYM.PROFILE) + '1';
+                    }
+                },
+                {
+                    name: 'CONTROL_PROFILE_NAME',
+                    id: 173,
+                    preview: function(osd_data) {
+                        const name = FC.PROFILE_NAMES?.control?.[FC.CONFIG.profile];
+                        return profileNamePreview(name, FONT.symbol(SYM.PROFILE) + (FC.CONFIG.profile + 1), FC.PROFILE_NAMES?.maxLength);
+                    }
+                },
+                {
+                    name: 'BATTERY_PROFILE_NAME',
+                    id: 174,
+                    preview: function(osd_data) {
+                        const name = FC.PROFILE_NAMES?.battery?.[FC.CONFIG.battery_profile];
+                        return profileNamePreview(name, FONT.symbol(SYM.BATT) + (FC.CONFIG.battery_profile + 1), FC.PROFILE_NAMES?.maxLength);
+                    }
+                },
+                {
+                    name: 'MIXER_PROFILE_NAME',
+                    id: 175,
+                    preview: function(osd_data) {
+                        const name = FC.PROFILE_NAMES?.mixer?.[FC.CONFIG.mixer_profile];
+                        return profileNamePreview(name, 'M' + (FC.CONFIG.mixer_profile + 1), FC.PROFILE_NAMES?.maxLength);
                     }
                 },
                 {
@@ -4744,6 +4769,12 @@ function updatePanServoPreview() {
 
     OSD.GUI.updatePreviews();
 }
+
+osdTab.onProfileNamesChanged = function () {
+    if (GUI.active_tab === osdTab && $('.tab-osd').length && OSD.data?.items) {
+        OSD.GUI.updatePreviews();
+    }
+};
 
 osdTab.cleanup = function (callback) {
     PortHandler.flush_callbacks();
