@@ -2115,19 +2115,19 @@ OSD.constants = {
                 },
                 {
                     name: 'ACTIVE_RX_LINK',
-                    id: 171,
+                    id: 173,
                     positionable: true,
                     preview: 'RX:1'
                 },
                 {
                     name: 'RX1_LINK_STATS',
-                    id: 172,
+                    id: 174,
                     positionable: true,
                     preview: 'RX1 LQ100'
                 },
                 {
                     name: 'RX2_LINK_STATS',
-                    id: 173,
+                    id: 175,
                     positionable: true,
                     preview: 'RX2 LQ100'
                 },
