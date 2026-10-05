@@ -3265,13 +3265,13 @@ function iconKey(filename) {
 
     /////////////////////////////////////////////
     //
-    // openAIP airspace / airport tile overlays
+    // openAIP airspace / airport tile overlay
     //
     /////////////////////////////////////////////
 
+    // The tiles API only serves the combined 'openaip' PNG layer (plus 'hotspots'), see https://api.tiles.openaip.net/api/system/specs/v1/schema.json
     const OPENAIP_OVERLAYS = [
-        { id: 'airspaces', label: 'layerOpenAipAirspaces' },
-        { id: 'airports', label: 'layerOpenAipAirports' },
+        { id: 'openaip', label: 'layerOpenAip' },
     ];
     const OPENAIP_VISIBILITY_KEY = 'openaip_overlay_visibility';
 
@@ -3280,13 +3280,14 @@ function iconKey(filename) {
     }
 
     function createOpenAipSource(overlayId) {
-        // openAIP tile server v2: raster tiles up to zoom 14, key as query parameter,
-        // four subdomains for load balancing (see https://docs.openaip.net)
-        return new XYZ({
-            url: 'https://{0-3}.api.tiles.openaip.net/api/data/' + overlayId + '/{z}/{x}/{y}.png?apiKey=' + encodeURIComponent(openAipApiKey()),
+        const source = new XYZ({
+            url: 'https://{a-c}.api.tiles.openaip.net/api/data/' + overlayId + '/{z}/{x}/{y}.png?apiKey=' + encodeURIComponent(openAipApiKey()),
             attributions: '<a href="https://www.openaip.net" target="_blank">openAIP</a>',
-            maxZoom: 14
+            minZoom: 2
         });
+        // Failed tiles are otherwise silent; never log the event, the tile URL carries the key
+        source.once('tileloaderror', () => $('#openaipLayerList .openaip-load-error').prop('hidden', false));
+        return source;
     }
 
     missionControlTab.onOpenAipKeyChanged = function () {
@@ -3350,6 +3351,7 @@ function iconKey(filename) {
         if (!hasKey) {
             $container.append($('<div class="openaip-no-key"></div>').text(i18n.getMessage('layerOpenAipNoKey')));
         }
+        $container.append($('<div class="openaip-no-key openaip-load-error" hidden></div>').text(i18n.getMessage('layerOpenAipLoadError')));
 
         GUI.switchery();
         $('.openaip-layer-toggle').on('change', function () {

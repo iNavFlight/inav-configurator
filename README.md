@@ -142,24 +142,6 @@ The key is saved automatically and persists across sessions.
 | Topo | Pure contour lines — elevation and terrain awareness |
 | Winter | Ski-resort style — pistes and winter terrain |
 
-#### Airspace Overlays (openAIP)
-
-Mission Control can draw controlled airspace and airports from [openAIP](https://www.openaip.net)
-on top of any map provider. Both overlays are off by default and are switched on individually in
-**Options -> Airspace data (openAIP)**.
-
-A free openAIP API key is required:
-
-1. Create a free account at [openaip.net](https://www.openaip.net)
-2. Open your user profile and generate an API key
-3. Paste it into the **openAIP API key** field in Options
-
-The key is stored locally and persists across sessions, the same way the MapTiler key is. Without
-a key the switches stay available but no tiles are requested.
-
-> Airspace data is advisory. It is not a substitute for an official aeronautical chart or for
-> checking the rules that apply where you fly.
-
 #### Output Paths
 
 | Target | Sub-target | SD Card Path |
@@ -239,7 +221,7 @@ unzip INAV-Configurator_linux_arch_x.y.z.zip -d /tmp/
 sudo mkdir /opt/inav
 sudo chown $USER /opt/inav
 ```
-7. Move the temporary files into their home
+7. Move the temporary files into their home 
 ```
 mv /tmp/INAV\ Configurator /opt/inav/inav-configurator
 ```
@@ -248,7 +230,7 @@ mv /tmp/INAV\ Configurator /opt/inav/inav-configurator
 sudo mkdir /opt/inav/inav-configurator/icon
 sudo cp /opt/inav/inav-configurator/resources/app/images/inav_icon_128.png /opt/inav/inav-configurator/icon
 ```
-9. As a one-off, move the desktop file into the applications directory
+9. As a one-off, move the desktop file into the applications directory 
 ```
 sudo mv inav-configurator.desktop /usr/share/applications/
 ```
@@ -277,11 +259,11 @@ For local development, the **node.js** build system is used.
 To build the App run `yarn run make` to build for your platform.
 
 Options:
-* Architecture: --arch  - Allowed values are: "ia32", "x64", "armv7l", "arm64", "universal", or "mips64el".
+* Architecture: --arch  - Allowed values are: "ia32", "x64", "armv7l", "arm64", "universal", or "mips64el". 
 
 See [Electron Forge CLI Documentation](https://www.electronforge.io/cli#options-2) for details
 
-Note: Not all architectures are available for all platforms. For example, ia32 (32bit) support is not available for Linux.
+Note: Not all architectures are available for all platforms. For example, ia32 (32bit) support is not available for Linux. 
 Tested architectures:
 - Windows: x64 and ia32
 - Linux: x64 and armv7l
@@ -290,7 +272,7 @@ Tested architectures:
 To build the setup program for windows, you have to install [WiX Toolset V3](https://github.com/wixtoolset/wix3/releases) and add the `bin` folder to you `PATH`, e.g.
 ```C:\Program Files (x86)\WiX Toolset v3.14\bin```
 
-To build deb and rpm packages for Linux, you have to install the following packages:
+To build deb and rpm packages for Linux, you have to install the following packages: 
 - Ubuntu/Debian: `dpkg, fakeroot, rpm, build-essential, libudev-dev`
 - OpenSuse/Fedora: `dpkg, fakeroot, rpmbuild, systemd-devel, devel-basis (zypper install -t pattern devel_basis), zip`
 
@@ -334,6 +316,23 @@ INAV Configurator allows you to choose between OpenStreetMap, Esri World Imagery
 	1. Enter MapProxy service URL, eg: http://192.168.145.20/inavmapproxy/service?
 	1. Enter MapProxy service layer (inav_layer if configured from MAPPROXY.md)
 1. Once completed, you can zoom in on the area you will be flying in while connected to the internet in either the GPS or Mission Control tab to save the cache for offline use
+
+### Airspace and airport overlay (openAIP)
+
+Mission Control can draw airspaces, airports and other aeronautical data from [openAIP](https://www.openaip.net)
+on top of any map provider. It needs a free openAIP API key:
+
+1. Create a free account at [openaip.net](https://www.openaip.net)
+1. Open the **API Clients** page of your profile and request a new API client
+1. Paste its key into **Settings -> Airspace data (openAIP) -> openAIP API key**
+
+The overlay is then switched on and off in the **Map Layers** box of Mission Control and remembers
+its state. Without a key the switch is disabled and no tiles are requested. The key is stored locally
+and is sent only to the openAIP tile server, together with the map tiles being viewed. The overlay
+needs an internet connection and is not cached by MapProxy.
+
+> Airspace data is advisory. It is not a substitute for an official aeronautical chart or for
+> checking the rules that apply where you fly.
 
 ## Font Customisation
 

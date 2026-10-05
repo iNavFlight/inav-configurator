@@ -7182,7 +7182,7 @@
         "message": "openAIP API key"
     },
     "openaipApiKeyHelp": {
-        "message": "Lets Mission Control show airspace and airport overlays on the map. Register for free at <a href=\"https://www.openaip.net\" target=\"_blank\">openaip.net</a> and create an API key in your account settings. The key is stored locally and only sent to the openAIP tile server."
+        "message": "Lets Mission Control show an airspace and airport overlay on the map. Register for free at <a href=\"https://www.openaip.net\" target=\"_blank\">openaip.net</a> and request an API client on the API Clients page of your profile. The key is stored locally and only sent to the openAIP tile server, together with the map tiles being viewed."
     },
     "googleLocationServices": {
         "message": "Google Location & Weather Services"
@@ -7361,14 +7361,14 @@
     "layerDragDropHint": {
         "message": "or drag & drop GEO files onto the map"
     },
-    "layerOpenAipAirspaces": {
-        "message": "Airspaces (openAIP)"
-    },
-    "layerOpenAipAirports": {
-        "message": "Airports (openAIP)"
+    "layerOpenAip": {
+        "message": "openAIP airspace"
     },
     "layerOpenAipNoKey": {
-        "message": "Airspace and airport overlays need a free openAIP API key. Enter it in the Options."
+        "message": "The airspace and airport overlay needs a free openAIP API key. Enter it in the Options."
+    },
+    "layerOpenAipLoadError": {
+        "message": "openAIP rejected the key or is unreachable."
     },
     "layerConfirmDelete": {
         "message": "Are you sure you want to delete this layer?"
