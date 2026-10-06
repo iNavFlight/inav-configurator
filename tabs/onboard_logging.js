@@ -5,6 +5,7 @@ import MSP from './../js/msp';
 import mspHelper from"./../js/msp/MSPHelper";
 import GUI from './../js/gui';
 import FC from './../js/fc';
+import { buildLoggingRateOptions } from './../js/blackboxLoggingRates';
 import CONFIGURATOR from './../js/data_storage';
 import features from './../js/feature_framework';
 import i18n from './../js/localization';
@@ -63,13 +64,6 @@ onboardLoggingTab.initialize = function (callback) {
         }).then(function() {
             MSP.send_message(MSPCodes.MSP2_BLACKBOX_CONFIG, false, false, load_html);
         });
-    }
-
-    function gcd(a, b) {
-        if (b == 0)
-            return a;
-
-        return gcd(b, a % b);
     }
 
     function save_to_eeprom() {
@@ -231,47 +225,14 @@ onboardLoggingTab.initialize = function (callback) {
     }
 
     function populateLoggingRates() {
-        var
-            userRateGCD = gcd(FC.BLACKBOX.blackboxRateNum, FC.BLACKBOX.blackboxRateDenom),
-            userRate = {num: FC.BLACKBOX.blackboxRateNum / userRateGCD, denom: FC.BLACKBOX.blackboxRateDenom / userRateGCD};
+        const
+            loggingRates = buildLoggingRateOptions(FC.BLACKBOX.blackboxRateNum, FC.BLACKBOX.blackboxRateDenom),
+            loggingRatesSelect = $(".blackboxRate select").empty();
 
-        // Offer a reasonable choice of logging rates (if people want weird steps they can use CLI)
-        var
-            loggingRates = [
-                 {num: 1, denom: 32},
-                 {num: 1, denom: 16},
-                 {num: 1, denom: 8},
-                 {num: 1, denom: 5},
-                 {num: 1, denom: 4},
-                 {num: 1, denom: 3},
-                 {num: 1, denom: 2},
-                 {num: 2, denom: 3},
-                 {num: 3, denom: 4},
-                 {num: 4, denom: 5},
-                 {num: 7, denom: 8},
-                 {num: 1, denom: 1},
-            ],
-            loggingRatesSelect = $(".blackboxRate select");
-
-        var
-            addedCurrentValue = false;
-
-        for (var i = 0; i < loggingRates.length; i++) {
-            if (!addedCurrentValue && userRate.num / userRate.denom <= loggingRates[i].num / loggingRates[i].denom) {
-                if (userRate.num / userRate.denom < loggingRates[i].num / loggingRates[i].denom) {
-                    var userPercent = Math.round(userRate.num / userRate.denom * 100);
-                    loggingRatesSelect.append('<option value="' + userRate.num + '/' + userRate.denom + '" data-percent="' + userPercent + '">'
-                            + userRate.num + '/' + userRate.denom + ' (' + userPercent + '%)</option>');
-                }
-                addedCurrentValue = true;
-            }
-
-            var percent = Math.round(loggingRates[i].num / loggingRates[i].denom * 100);
-            loggingRatesSelect.append('<option value="' + loggingRates[i].num + '/' + loggingRates[i].denom + '" data-percent="' + percent + '">'
-                + loggingRates[i].num + '/' + loggingRates[i].denom + ' (' + percent + '%)</option>');
-
+        for (const rate of loggingRates.options) {
+            loggingRatesSelect.append('<option value="' + rate.value + '" data-percent="' + rate.percent + '">' + rate.label + '</option>');
         }
-        loggingRatesSelect.val(userRate.num + '/' + userRate.denom);
+        loggingRatesSelect.val(loggingRates.selected);
 
         loggingRatesSelect.on('change', update_terrain_rate_warning);
         update_terrain_rate_warning();
