@@ -112,21 +112,37 @@
     border-radius: 4px;
 }
 
-.tab-onboard_logging progress::-webkit-progress-bar {
+.tab-onboard_logging progress::-webkit-progress-bar,
+.dataflash-saving-modal progress::-webkit-progress-bar {
     height: 24px;
     background-color: #eee;
 }
 
-.tab-onboard_logging progress::-webkit-progress-value {
+.tab-onboard_logging progress::-webkit-progress-value,
+.dataflash-saving-modal progress::-webkit-progress-value {
     background-color: #bcf;
 
 }
 
 .dataflash-confirm-erase-modal .jBox-content,
 .dataflash-saving-modal .jBox-content {
-    width: 40em;
+    width: min(90vw, 40em);
     border-radius: 5px;
     height: fit-content;
+}
+
+/* Hidden by default so the raw markup can't show inline in the tab flow before
+   a jBox Modal wraps it (e.g. FC.DATAFLASH.supported but totalSize is 0, so
+   onboard_logging.js never constructs the modal this visit); shown again once
+   reparented into the modal, which controls actual open/close visibility. */
+.dataflash-confirm-erase,
+.dataflash-saving {
+    display: none;
+}
+
+.dataflash-confirm-erase-modal .dataflash-confirm-erase,
+.dataflash-saving-modal .dataflash-saving {
+    display: block;
 }
 
 .dataflash-confirm-erase-modal .buttons,
@@ -155,7 +171,8 @@
     display: none;
 }
 
-.tab-onboard_logging progress {
+.tab-onboard_logging progress,
+.dataflash-saving-modal progress {
     display: block;
     width: 100%;
     margin: 1em 0;
@@ -269,7 +286,9 @@
     border-radius: 45px;
 }
 
-.tab-onboard_logging .regular-button {
+.tab-onboard_logging .regular-button,
+.dataflash-confirm-erase-modal .regular-button,
+.dataflash-saving-modal .regular-button {
     margin-top: 8px;
     margin-bottom: 8px;
     margin-right: 10px;
@@ -288,16 +307,22 @@
     padding-right: 9px;
     line-height: 28px;
 }
-.tab-onboard_logging .regular-button:hover {
+.tab-onboard_logging .regular-button:hover,
+.dataflash-confirm-erase-modal .regular-button:hover,
+.dataflash-saving-modal .regular-button:hover {
     background-color: #3599bc;
     transition: all ease 0.2s;
 }
-.tab-onboard_logging .regular-button:active {
+.tab-onboard_logging .regular-button:active,
+.dataflash-confirm-erase-modal .regular-button:active,
+.dataflash-saving-modal .regular-button:active {
     background-color: #3599bc;
     transition: all ease 0.0s;
     box-shadow: inset 0px 1px 5px rgba(0, 0, 0, 0.35);
 }
-.tab-onboard_logging .regular-button.disabled {
+.tab-onboard_logging .regular-button.disabled,
+.dataflash-confirm-erase-modal .regular-button.disabled,
+.dataflash-saving-modal .regular-button.disabled {
     cursor: default;
     color: #fff;
     background-color: #AFAFAF;

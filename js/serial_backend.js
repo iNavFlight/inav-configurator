@@ -37,6 +37,12 @@ var SerialBackend = (function () {
     var publicScope = {},
         privateScope = {};
 
+    // dialog.confirm() is non-blocking, unlike the window.confirm() it replaced, so the
+    // renderer's event loop keeps running while the unsaved-changes dialog is open. Guards
+    // reConnect() against being re-entered (e.g. a second click on connect/disconnect)
+    // while that dialog is still awaiting an answer.
+    var disconnectConfirmPending = false;
+
     privateScope.isDemoRunning = false;
 
     privateScope.isWirelessMode = false;
@@ -251,16 +257,40 @@ var SerialBackend = (function () {
                         // Check for unsaved changes in JavaScript Programming tab
                         if (GUI.active_tab === javascriptProgrammingTab &&
                             javascriptProgrammingTab.isDirty) {
+                            if (disconnectConfirmPending) {
+                                console.log('[Disconnect] Unsaved-changes dialog already open, ignoring re-entrant call');
+                                return;
+                            }
                             console.log('[Disconnect] Checking for unsaved changes in JavaScript Programming tab');
                             const confirmMsg = i18n.getMessage('unsavedChanges') ||
                                 'You have unsaved changes. Leave anyway?';
 
-                            if (!await dialog.confirm(confirmMsg)) {
+                            disconnectConfirmPending = true;
+                            let confirmed;
+                            try {
+                                confirmed = await dialog.confirm(confirmMsg);
+                            } finally {
+                                disconnectConfirmPending = false;
+                            }
+
+                            if (!confirmed) {
                                 console.log('[Disconnect] User cancelled disconnect due to unsaved changes');
                                 return; // Cancel disconnect
                             }
                             console.log('[Disconnect] User confirmed, proceeding with disconnect');
-                            // Clear isDirty flag so tab switch during disconnect doesn't show warning again
+
+                            // The confirm above is non-blocking, unlike the native window.confirm()
+                            // it replaced, so connection state checked above can go stale while the
+                            // user was deciding. Re-check before proceeding.
+                            if (GUI.connect_lock ||
+                                (GUI.connected_to === false && GUI.connecting_to === false)) {
+                                console.log('[Disconnect] Connection state changed while confirm dialog was open, aborting disconnect');
+                                return;
+                            }
+
+                            // Only clear isDirty once we're actually committed to disconnecting
+                            // (past the re-check above) — otherwise an aborted disconnect would
+                            // silently mark real unsaved edits as clean.
                             javascriptProgrammingTab.isDirty = false;
                         }
 

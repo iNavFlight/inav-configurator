@@ -15,9 +15,10 @@ function createDialog(message, buttons) {
 
         const $footer = $('<div class="inav-dialog__footer"></div>');
         let modal;
+        let $primaryButton;
 
         buttons.forEach(({ label, value, primary }) => {
-            $('<div class="inav-dialog__button"></div>')
+            const $button = $('<button type="button" class="inav-dialog__button"></button>')
                 .toggleClass('inav-dialog__button--primary', !!primary)
                 .text(label)
                 .on('click', () => {
@@ -25,6 +26,9 @@ function createDialog(message, buttons) {
                     modal.close();
                 })
                 .appendTo($footer);
+            if (primary) {
+                $primaryButton = $button;
+            }
         });
 
         const $content = $('<div></div>')
@@ -39,6 +43,12 @@ function createDialog(message, buttons) {
             closeButton: false,
             overlay: true,
             content: $content,
+            // onOpen fires before the open animation finishes, while the wrapper is
+            // still display:none — focusing anything has no visible effect yet.
+            // onOpenComplete fires once the wrapper is actually visible.
+            onOpenComplete: () => {
+                $primaryButton && $primaryButton.trigger('focus');
+            },
             onCloseComplete: () => {
                 settle(buttons[0].value);
                 modal.destroy();

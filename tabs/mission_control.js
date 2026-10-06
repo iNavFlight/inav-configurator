@@ -613,6 +613,14 @@ function createSweepWaypointPair(intersections, pairIndex, y, direction, oversho
     ];
 }
 
+// Returns an array of waypoints, or null specifically when the latitude makes
+// projection unavailable (near the poles) — callers need to tell that case
+// apart from a generic empty result so they show exactly one alert, not two:
+// dialog.alert() no longer blocks like window.confirm() used to, so a caller
+// that also alerts on an empty array would otherwise stack both alerts in the
+// same tick. (updateGridPreview(), the live-preview caller, calls this on
+// every parameter change and must not alert at all, so it needs this
+// distinction too, not just the one-time Generate button.)
 function generateGridWaypoints(coordsLonLat, params) {
     const vertices = coordsLonLat.slice(0, -1);
     if (vertices.length < 3 || params.spacing <= 0) {
@@ -621,8 +629,7 @@ function generateGridWaypoints(coordsLonLat, params) {
 
     const projection = createGridProjection(vertices);
     if (!projection) {
-        dialog.alert('Grid generation is unavailable at this latitude because longitude scale collapses near the poles.');
-        return [];
+        return null;
     }
 
     const angleRad = params.angle * Math.PI / 180;
@@ -6998,7 +7005,7 @@ function iconKey(filename) {
 
             gridPreviewLayer.getSource().clear();
 
-            if (waypoints.length < 2) {
+            if (!waypoints || waypoints.length < 2) {
                 $('#gridWaypointCount').text(i18n.getMessage('missionGridNoWaypoints')).css('color', '#c00');
                 return;
             }
@@ -7074,6 +7081,11 @@ function iconKey(filename) {
 
             const params = getGridParams();
             const waypoints = generateGridWaypoints(gridPolygonCoords, params);
+
+            if (waypoints === null) {
+                dialog.alert('Grid generation is unavailable at this latitude because longitude scale collapses near the poles.');
+                return;
+            }
 
             if (waypoints.length === 0) {
                 dialog.alert(i18n.getMessage('missionGridNoWaypoints'));

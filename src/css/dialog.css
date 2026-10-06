@@ -14,6 +14,7 @@
 }
 
 .inav-dialog__button {
+    font: inherit;
     padding: 0.4em 1.2em;
     border: 1px solid #ccc;
     border-radius: 2px;
@@ -21,6 +22,11 @@
     color: #222;
     cursor: pointer;
     text-align: center;
+}
+
+.inav-dialog__button:focus-visible {
+    outline: 2px solid #37a8db;
+    outline-offset: 1px;
 }
 
 .inav-dialog__button:hover {

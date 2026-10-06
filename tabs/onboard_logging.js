@@ -144,6 +144,15 @@ onboardLoggingTab.initialize = function (callback) {
                 .toggleClass("only-terrain-supported", !blackboxSupport && terrainEnabled);
 
             if (dataflashPresent) {
+                // Capture these BEFORE constructing the jBox Modals below: jBox reparents
+                // `content` into a wrapper under <body> immediately (inside `new jBox()`,
+                // not lazily on open()), so a later `$('.tab-onboard_logging a...')` query
+                // would no longer find elements that used to be its descendants. Binding
+                // directly to the captured jQuery objects works regardless of where the
+                // DOM nodes end up living.
+                const $eraseContent = $('.dataflash-confirm-erase');
+                const $savingContent = $('.dataflash-saving');
+
                 // jBox modals wrapping the existing dataflash-saving / dataflash-confirm-erase
                 // markup in place (CSS state classes like .erasing/.done still apply to the
                 // same elements, same pattern as js/defaults_dialog.js's saving modal).
@@ -158,7 +167,7 @@ onboardLoggingTab.initialize = function (callback) {
                     closeOnEsc: false,
                     closeButton: false,
                     overlay: true,
-                    content: $('.dataflash-confirm-erase'),
+                    content: $eraseContent,
                 });
 
                 savingModal && savingModal.destroy();
@@ -169,18 +178,20 @@ onboardLoggingTab.initialize = function (callback) {
                     closeOnEsc: false,
                     closeButton: false,
                     overlay: true,
-                    content: $('.dataflash-saving'),
+                    content: $savingContent,
                 });
 
-                // UI hooks
+                // UI hooks. The flash/erase trigger buttons stay outside the modals, so an
+                // ancestor-scoped selector still finds them; the dialogs' own confirm/cancel/
+                // dismiss buttons moved with $eraseContent/$savingContent, so bind on those.
                 $('.tab-onboard_logging a.erase-flash').on('click', ask_to_erase_flash);
 
-                $('.tab-onboard_logging a.erase-flash-confirm').on('click', flash_erase);
-                $('.tab-onboard_logging a.erase-flash-cancel').on('click', flash_erase_cancel);
+                $eraseContent.find('a.erase-flash-confirm').on('click', flash_erase);
+                $eraseContent.find('a.erase-flash-cancel').on('click', flash_erase_cancel);
 
                 $('.tab-onboard_logging a.save-flash').on('click', flash_save_begin);
-                $('.tab-onboard_logging a.save-flash-cancel').on('click', flash_save_cancel);
-                $('.tab-onboard_logging a.save-flash-dismiss').on('click', dismiss_saving_dialog);
+                $savingContent.find('a.save-flash-cancel').on('click', flash_save_cancel);
+                $savingContent.find('a.save-flash-dismiss').on('click', dismiss_saving_dialog);
             }
 
             $('.save-blackbox-feature').on('click', function () {
