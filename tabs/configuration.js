@@ -361,6 +361,11 @@ configurationTab.initialize = function (callback, scrollPosition) {
         interval.add('config_load_analog', function () {
             $('#batteryvoltage').val([FC.ANALOG.voltage.toFixed(2)]);
             $('#batterycurrent').val([FC.ANALOG.amperage.toFixed(2)]);
+            const bec = FC.ANALOG.bec_voltage;
+            $('#becvoltage-row').toggle(bec !== null);
+            if (bec !== null) {
+                $('#becvoltage').val(bec.toFixed(2));
+            }
         }, 100, true); // 10 fps
 
         GUI.content_ready(callback);

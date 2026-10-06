@@ -963,6 +963,14 @@ OSD.constants = {
                     preview: ' 23' + FONT.symbol(SYM.MILLIOHM)
                 },
                 {
+                    name: 'BEC_VOLTAGE',
+                    id: 173,
+                    enabled: function() {
+                        return HARDWARE.capabilities.useBecVoltage;
+                    },
+                    preview: 'BEC ' + FONT.embed_dot('5.12') + FONT.symbol(SYM.VOLT)
+                },
+                {
                     name: 'MAIN_BATT_REMAINING_PERCENTAGE',
                     id: 38,
                     preview: FONT.symbol(SYM.BATT) + '100%'
@@ -3639,9 +3647,19 @@ HARDWARE.init = function() {
         useBaro: false,
         usePitot: false,
         useTerrain: false,
-        useMztcCamera: false
+        useMztcCamera: false,
+        useBecVoltage: false
     };
 };
+
+// Only a firmware built with the BEC voltage has this setting
+function probeBecVoltage() {
+    return mspHelper.getSetting("vbec_warning_voltage").then(function(data) {
+        HARDWARE.capabilities.useBecVoltage = Boolean(data);
+    }).catch(function() {
+        HARDWARE.capabilities.useBecVoltage = false;
+    });
+}
 
 HARDWARE.update = function(callback) {
 
@@ -3677,7 +3695,7 @@ HARDWARE.update = function(callback) {
                 }).catch(function() {
                     // Setting not available in this firmware
                     HARDWARE.capabilities.useTerrain = false;
-                }).finally(function() {
+                }).then(probeBecVoltage).finally(function() {
                     if (callback) {
                         callback();
                     }
