@@ -344,7 +344,18 @@ var FC = {
             errors: 0,
             timeouts: 0,
             packetCount: 0,
-            hwVersion: 0
+            hwVersion: 0,
+            // Bit 0 GPS, 1 Glonass, 2 Beidou, 3 Galileo; 0 when the firmware could not read them
+            gnssSupported: 0,
+            gnssEnabled: 0,
+            // Bit 0 SBAS, 1 QZSS, 2 NavIC, from the receiver's version strings
+            gnssExtended: 0,
+            // How many of the major constellations the receiver can track together
+            gnssMaxConcurrent: 0,
+            // As the receiver reports it (NEO-F10N), empty when unknown
+            moduleName: '',
+            // From MSP_GPS_SV_INFO: { gnssId, svId, quality, used, cno }, empty without a u-blox
+            satellites: []
         };
 
         this.ADSB_VEHICLES = {

@@ -261,3 +261,109 @@ td.adsbVehicleList {
     padding: 8px;
     color: #323232;
 }
+
+/* Satellites as Betaflight shows them: the id green when used in the fix, a C/N0 bar, a quality label */
+.tab-gps .gps-signal-none {
+    margin: 0.3em 0;
+    color: #4f4f4f;
+}
+
+.tab-gps .gps-signal-table {
+    width: 100%;
+}
+
+.tab-gps .gps-signal-table th {
+    text-align: left;
+    font-weight: bold;
+    padding: 0.2em 0.4em;
+    border-bottom: 1px solid #e4e4e4;
+}
+
+.tab-gps .gps-signal-table td {
+    padding: 0.15em 0.4em;
+    vertical-align: middle;
+}
+
+/* cf_table puts the last column on the right; here it is a label under its heading */
+.tab-gps .gps-signal-table td:last-child {
+    text-align: left;
+}
+
+.tab-gps .gps-sat-id {
+    display: inline-block;
+    min-width: 2.2em;
+    padding: 0 0.3em;
+    border-radius: 3px;
+    text-align: center;
+    color: #fff;
+    background-color: #c0392b;
+}
+
+.tab-gps .gps-sat-id.is-used {
+    background-color: #59aa29;
+}
+
+.tab-gps .gps-sat-signal {
+    display: flex;
+    align-items: center;
+    gap: 0.4em;
+}
+
+.tab-gps .gps-sat-signal progress {
+    flex: 1;
+    min-width: 4em;
+}
+
+.tab-gps .gps-sat-cno {
+    min-width: 1.6em;
+    text-align: right;
+    color: #4f4f4f;
+}
+
+.tab-gps .gps-sat-quality {
+    padding: 0 0.4em;
+    border-radius: 3px;
+    white-space: nowrap;
+}
+
+.tab-gps .gps-sat-quality--locked {
+    color: #fff;
+    background-color: #59aa29;
+}
+
+.tab-gps .gps-sat-quality--code {
+    color: #4f4f4f;
+    background-color: #fff7cd;
+}
+
+.tab-gps .gps-sat-quality--weak {
+    color: #4f4f4f;
+    background-color: #e4e4e4;
+}
+
+/* Decided by INAV: the switch shows its state but is not for reaching */
+.tab-gps .gnss-fixed .ios7-switch {
+    cursor: default;
+    opacity: 0.55;
+}
+
+.tab-gps .gnss-fixed label {
+    cursor: default;
+}
+
+/* Carries the separator of the switches it counts, as the last line of their group */
+.tab-gps .gnss-budget {
+    clear: left;
+    float: left;
+    width: 100%;
+    margin-bottom: 5px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid #ddd;
+    color: #a13d20;
+    font-size: 0.9em;
+    line-height: 1.4;
+}
+
+.tab-gps .gnss-budget.is-hidden {
+    display: none;
+}
