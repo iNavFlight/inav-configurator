@@ -79,28 +79,7 @@ portsTab.initialize = function (callback) {
 
         $(".tab-ports").addClass("supported");
 
-        var i,
-            $elements;
-
-        $elements = $('select.sensors_baudrate');
-        for (i = 0; i < serialPortHelper.getBauds('SENSOR').length; i++) {
-            $elements.append('<option value="' + serialPortHelper.getBauds('SENSOR')[i] + '">' + serialPortHelper.getBauds('SENSOR')[i] + '</option>');
-        }
-
-        $elements = $('select.msp_baudrate');
-        for (i = 0; i < serialPortHelper.getBauds('MSP').length; i++) {
-            $elements.append('<option value="' + serialPortHelper.getBauds('MSP')[i] + '">' + serialPortHelper.getBauds('MSP')[i] + '</option>');
-        }
-
-        $elements = $('select.telemetry_baudrate');
-        for (i = 0; i < serialPortHelper.getBauds('TELEMETRY').length; i++) {
-            $elements.append('<option value="' + serialPortHelper.getBauds('TELEMETRY')[i] + '">' + serialPortHelper.getBauds('TELEMETRY')[i] + '</option>');
-        }
-
-        $elements = $('select.peripherals_baudrate');
-        for (i = 0; i < serialPortHelper.getBauds('PERIPHERAL').length; i++) {
-            $elements.append('<option value="' + serialPortHelper.getBauds('PERIPHERAL')[i] + '">' + serialPortHelper.getBauds('PERIPHERAL')[i] + '</option>');
-        }
+        let i;
 
         var ports_e = $('.tab-ports .ports');
         var port_configuration_template_e = $('#tab-ports-templates .portConfiguration');
@@ -114,10 +93,10 @@ portsTab.initialize = function (callback) {
             //Append only port different than USB VCP
             if (serialPort.identifier != 20) {
 
-                port_configuration_e.find('select.msp_baudrate').val(serialPort.msp_baudrate);
-                port_configuration_e.find('select.telemetry_baudrate').val(serialPort.telemetry_baudrate);
-                port_configuration_e.find('select.sensors_baudrate').val(serialPort.sensors_baudrate);
-                port_configuration_e.find('select.peripherals_baudrate').val(serialPort.peripherals_baudrate);
+                serialPortHelper.fillBaudSelect(port_configuration_e.find('select.msp_baudrate'), 'MSP', serialPort.msp_baudrate);
+                serialPortHelper.fillBaudSelect(port_configuration_e.find('select.telemetry_baudrate'), 'TELEMETRY', serialPort.telemetry_baudrate);
+                serialPortHelper.fillBaudSelect(port_configuration_e.find('select.sensors_baudrate'), 'SENSOR', serialPort.sensors_baudrate);
+                serialPortHelper.fillBaudSelect(port_configuration_e.find('select.peripherals_baudrate'), 'PERIPHERAL', serialPort.peripherals_baudrate);
 
                 port_configuration_e.find('.identifier').text(serialPortHelper.getPortName(serialPort.identifier));
                 if (serialPort.identifier >= 30) {
