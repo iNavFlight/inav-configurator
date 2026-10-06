@@ -5,8 +5,15 @@ import mapSeries from 'promise-map-series';
 import mspHelper from './../js/msp/MSPHelper';
 import GUI from './gui';
 import FC from './fc';
-import { globalSettings, UnitType } from './globalSettings';
+import { globalSettings } from './globalSettings';
 import i18n from './localization';
+import {
+    getUnitDecimals,
+    getUnitDisplayName,
+    getUnitExpandedName,
+    getUnitMultiplier,
+    smartRound
+} from './unitConversion';
 
 function padZeros(val, length) {
     let str = val.toString();
@@ -21,49 +28,6 @@ function padZeros(val, length) {
     }
 
     return str;
-}
-
-/**
- * Round a converted value to fewer decimal places when doing so
- * changes the value by less than 1%. For example, 328.08 ft (from 100m)
- * becomes "328" and 9842.52 ft becomes "9843". Also rounds to the
- * nearest 10/100/etc when within 1 of a boundary (e.g. 999 → "1000").
- * Returns a string like toFixed().
- */
-function smartRound(value, decimalPlaces) {
-    if (decimalPlaces < 2 || value === 0) {
-        return value.toFixed(decimalPlaces);
-    }
-    // Try removing decimal places (most aggressive first)
-    let best = null;
-    for (let dp = 0; dp <= decimalPlaces - 2; dp++) {
-        let rounded = parseFloat(value.toFixed(dp));
-        if (Math.abs(rounded - value) / Math.abs(value) < 0.01) {
-            best = rounded.toFixed(dp);
-            break;
-        }
-    }
-    // Try rounding to nearest 10, 100, etc. but only when the integer
-    // value is within 1 of a boundary (e.g. 999->1000, 1001->1000).
-    // Use absolute values for boundary detection to handle negatives.
-    if (best !== null) {
-        let intVal = Math.round(Math.abs(value));
-        for (let mag = 1; mag <= 3; mag++) {
-            let factor = Math.pow(10, mag);
-            let remainder = intVal % factor;
-            if (remainder <= 1 || remainder >= factor - 1) {
-                let rounded = Math.sign(value) * Math.round(Math.abs(value) / factor) * factor;
-                if (Math.abs(rounded - value) / Math.abs(value) < 0.01) {
-                    best = rounded.toFixed(0);
-                } else {
-                    break;
-                }
-            } else {
-                break;
-            }
-        }
-    }
-    return best !== null ? best : value.toFixed(decimalPlaces);
 }
 
 var Settings = (function () {
@@ -224,326 +188,15 @@ var Settings = (function () {
      */
     self.convertToUnitSetting = function (element, inputUnit) {
 
-        // One of the following;
-        // none, OSD, imperial, metric
-        const configUnitType = globalSettings.unitType;
-
-        // Small closure to grab the unit as described by either 
-        // the app settings or the app OSD settings, confused? yeah
-        const getUnitDisplayTypeValue = () => {
-            // Try and match the values 
-            switch (configUnitType) {
-                case UnitType.imperial:
-                    return 0;
-                    break;
-                case UnitType.metric:
-                    return 1;
-                    break;
-                case UnitType.OSD: // Match the OSD value on the UI
-                    return globalSettings.osdUnits;
-                    break;
-                case UnitType.none:
-                default:
-                    return -1;
-                    break;
-            }
-        }
-
-        // Sets the int value of the way we want to display the 
-        // units. We use the OSD unit values here for easy
-        const uiUnitValue = getUnitDisplayTypeValue();
-
         const oldValue = element.val();
-
-        // Display names for the units
-        const unitDisplayNames = {
-            // Misc
-            'cw' : 'cW',
-            'percent'   : '%',
-            'cmss'      : 'cm/s/s',
-            // Time
-            'us'        : "uS",
-            'msec'      : 'ms',
-            'msec-nc'   : 'ms', // Milliseconds, but not converted.
-            'dsec'      : 'ds',
-            'sec'       : 's',
-            'mins'      : 'm',
-            'hours'     : 'h',
-            'tzmins'    : 'm',
-            'tzhours'   : 'hh:mm',
-            // Angles
-            'centideg'      : 'centi&deg;',
-            'centideg-deg'  : 'centi&deg;', // Centidegrees, but always converted to degrees by default
-            'decideg'       : 'deci&deg;',
-            'decideg-lrg'   : 'deci&deg;', // Decidegrees, but always converted to degrees by default
-            'deg'           : '&deg;',
-            'decadeg'       : 'deca&deg;',
-            // Rotational speed
-            'degps'     : '&deg; per second',
-            'decadegps' : 'deca&deg; per second',
-            // Temperature
-            'decidegc'  : 'deci&deg;C',
-            'degc'      : '&deg;C',
-            'degf'      : '&deg;F',
-            // Speed
-            'cms'       : 'cm/s',
-            'v-cms'     : 'cm/s',
-            'ms'        : 'm/s',
-            'kmh'       : 'Km/h',
-            'mph'       : 'mph',
-            'hftmin'    : 'x100 ft/min',
-            'fts'       : 'ft/s',
-            'kt'        : 'Kt',
-            // Distance
-            'cm'    : 'cm',
-            'm'     : 'm',
-            'km'    : 'Km',
-            'm-lrg' : 'm', // Metres, but converted to larger units
-            'ft'    : 'ft',
-            'mi'    : 'mi',
-            'nm'    : 'NM'
-        }
-
-        // Hover full descriptions for the units
-        const unitExpandedNames = {
-            // Misc
-            'cw'        : 'CentiWatts',
-            'percent'   : 'Percent',
-            'cmss'      : 'Centimetres per second, per second',
-            // Time
-            'us'        : "Microseconds",
-            'msec'      : 'Milliseconds',
-            'msec-nc'   : 'Milliseconds',
-            'dsec'      : 'Deciseconds',
-            'sec'       : 'Seconds',
-            'mins'      : 'Minutes',
-            'hours'     : 'Hours',
-            'tzmins'    : 'Minutes',
-            'tzhours'   : 'Hours:Minutes',
-            // Angles
-            'centideg'      : 'CentiDegrees',
-            'centideg-deg'  : 'CentiDegrees',
-            'decideg'       : 'DeciDegrees',
-            'decideg-lrg'   : 'DeciDegrees',
-            'deg'           : 'Degrees',
-            'decadeg'       : 'DecaDegrees',
-            // Rotational speed
-            'degps'     : 'Degrees per second',
-            'decadegps' : 'DecaDegrees per second',
-            // Temperature
-            'decidegc'  : 'DeciDegrees Celsius',
-            'degc'      : 'Degrees Celsius',
-            'degf'      : 'Degrees Fahrenheit',
-            // Speed
-            'cms'       : 'Centimetres per second',
-            'v-cms'     : 'Centimetres per second',
-            'ms'        : 'Metres per second',
-            'kmh'       : 'Kilometres per hour',
-            'mph'       : 'Miles per hour',
-            'hftmin'    : 'Hundred feet per minute',
-            'fts'       : 'Feet per second',
-            'kt'        : 'Knots',
-            // Distance
-            'cm'    : 'Centimetres',
-            'm'     : 'Metres',
-            'km'    : 'Kilometres',
-            'm-lrg' : 'Metres',
-            'ft'    : 'Feet',
-            'mi'    : 'Miles',
-            'nm'    : 'Nautical Miles'
-        }
 
         // Ensure we can do conversions
         if (!inputUnit || !oldValue || !element) {
             return;
         }
 
-        //this is used to get the factor in which we multiply
-        //to get the correct conversion, the first index is the from
-        //unit and the second is the too unit
-        //unitConversionTable[toUnit][fromUnit] -> factor
-        const unitRatioTable = {
-            'cm' : {
-                'm' : 100.0, 
-                'ft' : 30.48
-            },
-            'm' : {
-                'm' : 1.0,
-                'ft' : 0.3048
-            },
-            'm-lrg' : {
-                'km' : 1000.0,
-                'mi' : 1609.344,
-                'nm' : 1852.0
-            },
-            'cms' : { // Horizontal speed
-                'kmh' : 27.77777777777778, 
-                'kt': 51.44444444444457, 
-                'mph' : 44.704,
-                'ms' : 100.0
-            },
-            'v-cms' : { // Vertical speed
-                'ms' : 100.0,
-                'hftmin' : 50.8,
-                'fts' : 30.48
-            },
-            'msec-nc' : {
-                'msec-nc' : 1.0
-            },
-            'msec' : {
-                'sec' : 1000.0
-            },
-            'dsec' : {
-                'sec' : 10.0
-            },
-            'mins' : {
-                'hours' : 60.0
-            },
-            'tzmins' : {
-                'tzhours' : 'TZHOURS'
-            },
-            'centideg' : {
-                'deg' : 100
-            },
-            'centideg-deg' : {
-                'deg' : 100
-            },
-            'decideg' : {
-                'deg' : 10.0
-            },
-            'decideg-lrg' : {
-                'deg' : 10.0
-            },
-            'decadeg' : {
-                'deg' : 0.1
-            },
-            'decadegps' : {
-                'degps' : 0.1
-            },
-            'decidegc' : {
-                'degc' : 10.0,
-                'degf' : 'FAHREN'
-            },
-        };
-
-        //this holds which units get converted in which unit systems
-        const conversionTable = {
-            0: { //imperial
-                'cm' : 'ft',
-                'm' : 'ft',
-                'm-lrg' : 'mi',
-                'cms' : 'mph',
-                'v-cms' : 'fts',
-                'msec' : 'sec',
-                'dsec' : 'sec',
-                'mins' : 'hours',
-                'tzmins' : 'tzhours',
-                'decadegps' : 'degps',
-                'centideg' : 'deg',
-                'centideg-deg' : 'deg',
-                'decideg' : 'deg',
-                'decideg-lrg' : 'deg',
-                'decadeg' : 'deg',
-                'decidegc' : 'degf',
-            },
-            1: { //metric
-                'cm': 'm',
-                'm' : 'm',
-                'm-lrg' : 'km',
-                'cms' : 'kmh',
-                'v-cms' : 'ms',
-                'msec' : 'sec',
-                'dsec' : 'sec',
-                'mins' : 'hours',
-                'tzmins' : 'tzhours',
-                'decadegps' : 'degps',
-                'centideg' : 'deg',
-                'centideg-deg' : 'deg',
-                'decideg' : 'deg',
-                'decideg-lrg' : 'deg',
-                'decadeg' : 'deg',
-                'decidegc' : 'degc',
-            },
-            2: { //metric with MPH
-                'cm': 'm',
-                'm' : 'm',
-                'm-lrg' : 'km',
-                'cms' : 'mph',
-                'v-cms' : 'ms',
-                'decadegps' : 'degps',
-                'centideg' : 'deg',
-                'centideg-deg' : 'deg',
-                'decideg' : 'deg',
-                'decideg-lrg' : 'deg',
-                'decadeg' : 'deg',
-                'msec' : 'sec',
-                'dsec' : 'sec',
-                'mins' : 'hours',
-                'tzmins' : 'tzhours',
-                'decidegc' : 'degc',
-            },
-            3:{ //UK
-                'cm' : 'ft',
-                'm' : 'ft',
-                'm-lrg' : 'mi',
-                'cms' : 'mph',
-                'v-cms' : 'fts',
-                'decadegps' : 'degps',
-                'centideg' : 'deg',
-                'centideg-deg' : 'deg',
-                'decideg' : 'deg',
-                'decideg-lrg' : 'deg',
-                'decadeg' : 'deg',
-                'msec' : 'sec',
-                'dsec' : 'sec',
-                'mins' : 'hours',
-                'tzmins' : 'tzhours',
-                'decidegc' : 'degc',
-            },
-            4: { //General aviation
-                'cm' : 'ft',
-                'm' : 'ft',
-                'm-lrg' : 'nm',
-                'cms': 'kt',
-                'v-cms' : 'hftmin',
-                'decadegps' : 'degps',
-                'centideg' : 'deg',
-                'centideg-deg' : 'deg',
-                'decideg' : 'deg',
-                'decideg-lrg' : 'deg',
-                'decadeg' : 'deg',
-                'msec' : 'sec',
-                'dsec' : 'sec',
-                'mins' : 'hours',
-                'tzmins' : 'tzhours',
-                'decidegc' : 'degc',
-            },
-            default: { //show base units
-                'decadegps' : 'degps',
-                'decideg-lrg' : 'deg',
-                'centideg' : 'deg',
-                'centideg-deg' : 'deg',
-                'decadeg' : 'deg',
-                'tzmins' : 'tzhours',
-            }
-        };
-
-        //this returns the factor in which to multiply to convert a unit
-        const getUnitMultiplier = () => {
-            let uiUnits = (uiUnitValue != -1) ? uiUnitValue : 'default';
-
-            if (conversionTable[uiUnits]){
-                const fromUnits = conversionTable[uiUnits];
-                if (fromUnits[inputUnit]){
-                    const multiplier = unitRatioTable[inputUnit][fromUnits[inputUnit]];
-                    return {'multiplier':multiplier, 'unitName':fromUnits[inputUnit]};
-                }
-            }
-            return {multiplier:1, unitName:inputUnit};
-        }
-
-        // Get the default multi obj or the custom       
-        const multiObj = getUnitMultiplier();
+        // Get the default multi obj or the custom
+        const multiObj = getUnitMultiplier(inputUnit);
 
         const multiplier = multiObj.multiplier;
         const unitName = multiObj.unitName;
@@ -554,11 +207,7 @@ var Settings = (function () {
             let step = parseFloat(element.data("step")) || parseFloat(element.attr('step')) || 1;
 
             if (multiplier !== 1) { 
-                decimalPlaces = Math.min(Math.ceil(multiplier / 100), 3);
-                // Add extra decimal place for non-integer conversions.
-                if (multiplier % 1 != 0 && decimalPlaces < 3) {
-                    decimalPlaces++;
-                }
+                decimalPlaces = getUnitDecimals(multiplier);
                 step = 1 / Math.pow(10, decimalPlaces);
             } else { 
                 decimalPlaces = this.countDecimals(step);
@@ -594,7 +243,7 @@ var Settings = (function () {
         element.data('setting-multiplier', multiplier);
 
         // Now wrap the input in a display that shows the unit
-        element.wrap(`<div data-unit="${unitDisplayNames[unitName]}" title="${unitExpandedNames[unitName]}" class="unit_wrapper unit"></div>`);
+        element.wrap(`<div data-unit="${getUnitDisplayName(unitName)}" title="${getUnitExpandedName(unitName)}" class="unit_wrapper unit"></div>`);
 
         function toFahrenheit(decidegC) {
             return (decidegC / 10) * 1.8 + 32;

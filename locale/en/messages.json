@@ -34,6 +34,10 @@
         "message": "Русский",
         "_comment": "Don't translate!"
     },
+    "language_sr": {
+        "message": "Srpski",
+        "_comment": "Don't translate!"
+    },
     "language": {
         "message": "Language"
     },
@@ -1628,6 +1632,9 @@
     "portsTelemetryDisabled": {
         "message": "Disabled"
     },
+    "portsBaudrateFromFC": {
+        "message": "$1 (from FC)"
+    },
     "portsFunction_MSP": {
         "message": "MSP"
     },
@@ -1888,6 +1895,24 @@
     },
     "pidTuning_PIDother": {
         "message": "Additional PID Gains"
+    },
+    "pidTuningNavPidBankMismatchFixedWing": {
+        "message": "pid_type = $1 does not match the platform type. This tab shows and saves the fixed-wing PID bank, but navigation uses the multirotor gains, so Position Z, Velocity Z, Position XY, Velocity XY, Nav Heading and Auto Speed below have no effect. Tune nav_mc_pos_z_p, nav_mc_vel_z_*, nav_mc_pos_xy_p and nav_mc_vel_xy_* in the CLI instead."
+    },
+    "pidTuningNavPidBankMismatchMultirotor": {
+        "message": "pid_type = $1 does not match the platform type. This tab shows and saves the multirotor PID bank, but navigation uses the fixed-wing gains, so Position Z, Velocity Z, Position XY, Velocity XY, Nav Heading and Auto Speed below have no effect. Tune nav_fw_pos_z_*, nav_fw_pos_xy_*, nav_fw_pos_hdg_* and nav_fw_auto_speed_* in the CLI instead."
+    },
+    "pidTuningNavPidBankMismatchRoverBoat": {
+        "message": "pid_type = $1 does not match the platform type. This tab shows and saves the multirotor PID bank, but rover and boat navigation only uses the fixed-wing navigation heading gains, so Position Z, Velocity Z, Position XY, Velocity XY, Nav Heading and Auto Speed below have no effect. Tune nav_fw_pos_hdg_p, nav_fw_pos_hdg_i and nav_fw_pos_hdg_d in the CLI instead."
+    },
+    "pidTuningNavPidBankMismatchAutoPid": {
+        "message": "Setting pid_type to AUTO also switches the rate controller to PID with the multirotor Roll, Pitch, Yaw, Level and Heading Hold gains."
+    },
+    "pidTuningNavPidBankMismatchAutoPiff": {
+        "message": "Setting pid_type to AUTO also switches the rate controller to PIFF with the fixed-wing Roll, Pitch, Yaw, Level and Heading Hold gains."
+    },
+    "pidTuningNavPidBankMismatchAutoFromNone": {
+        "message": "With pid_type = NONE the rate controller is off, so Roll, Pitch, Yaw, Level and Heading Hold have no effect either. Setting pid_type to AUTO turns on the fixed-wing rate controller (PIFF) with the fixed-wing Roll, Pitch, Yaw, Level and Heading Hold gains."
     },
     "pidTuning_SelectNewDefaults": {
         "message": "Select New Defaults"
@@ -2689,6 +2714,9 @@
     },
     "magnetometerHead": {
         "message": "Alignment Tool"
+    },
+    "magnetometerLoadFailed": {
+        "message": "The Alignment Tool did not receive its configuration from the flight controller. The connection stays open; switch to another tab and back to try again."
     },
     "magnetometerHelp": {
         "message": "1. Adjust Flight Controller orientation to match physical orientation on the aircraft <u>according to \"direction\" arrow on the Flight Controller</u>.<br/>2. Adjust magnetometer model, or magnetometer chip, or magnetometer axes orientation to match physical orientation on the aircraft.<br/><strong>Note:</strong> Magnetometer orientation preset (align_mag) is relative to FC. Make sure to align FC first (align_board_pitch, align_board_roll, align_board_yaw).<br/>If preset is not used (orientation is set using align_mag_roll, align_mag_pitch and align_mag_yaw), then magnetometer orientation is independent."
@@ -5379,7 +5407,7 @@
         "message": "Filename loaded:"
     },
     "missionTotalInfoDistance": {
-        "message": "Distance (m):"
+        "message": "Distance:"
     },
     "missionTotalInfoAvailablePoints": {
         "message": "Available Points"
@@ -5388,10 +5416,10 @@
         "message": "Mission valid"
     },
     "missionDefaultPointAlt": {
-        "message": "Alt (cm): "
+        "message": "Alt: "
     },
     "missionDefaultPointSpeed": {
-        "message": "Speed (cm/s): "
+        "message": "Speed: "
     },
     "missionDefaultSafeRangeSH": {
         "message": "Radius (m): "
@@ -5558,6 +5586,12 @@
     "missionMap3DHomeRequired": {
         "message": "HOME is not set: Relative-altitude terrain checks are unavailable."
     },
+    "missionMap3DRouteIncomplete": {
+        "message": "JUMP loops too long to follow: Route collision check covers only part of the mission."
+    },
+    "missionMap3DInvalidJump": {
+        "message": "A JUMP has settings the flight controller refuses to arm with: its legs are not shown or checked."
+    },
     "missionMap3DUnavailable": {
         "message": "3D view unavailable on this system."
     },
@@ -5580,10 +5614,10 @@
         "message": "Fixed Wing landing settings:"
     },
     "missionFwApproachAlt": {
-        "message": "Approach Alt: (cm):"
+        "message": "Approach Alt:"
     },
     "missionFwLandAlt": {
-        "message": "Land Alt: (cm):"
+        "message": "Land Alt:"
     },
     "missionFwApproachDir": {
         "message": "Approach direction:"
@@ -7740,7 +7774,7 @@
         "message": "Board alignment <span style=\"color: #37a8db\">finished</span>"
     },
     "autoAlignWizardTitle": {
-        "message": "Experimental: Auto Alignment Wizard"
+        "message": "New: Auto Alignment Wizard"
     },
     "autoAlignWizardButton": {
         "message": "Launch Wizard"

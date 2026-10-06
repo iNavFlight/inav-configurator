@@ -31,7 +31,9 @@ var wizardSaveFramework = (function () {
 
                 serialPortHelper.set(config.value.port, 'GPS', config.value.baud);
                 mspHelper.saveSerialPorts(function () {
-                    features.execute(self.enableVirtulaPitot(config, callback));
+                    features.execute(function () {
+                        self.enableVirtualPitot(config, callback);
+                    });
                 });
                 break;
             case 'gpsProtocol':
@@ -43,12 +45,22 @@ var wizardSaveFramework = (function () {
         }
     };
 
-    self.enableVirtulaPitot = function (config, callback) {
-        if (config.value.port != '-1') {
-            mspHelper.setSetting('pitot_hardware', "VIRTUAL", callback);
-        } else {
+    // Virtual airspeed needs the wind estimator (fixed wing only); never replace a pitot the user already selected
+    self.enableVirtualPitot = function (config, callback) {
+        if (config.value.port == '-1' || !FC.isAirplane()) {
             callback();
+            return;
         }
+
+        mspHelper.getSetting('pitot_hardware').then(function (data) {
+            if (data?.setting?.table?.values?.[data.value] == 'NONE') {
+                mspHelper.setSetting('pitot_hardware', "VIRTUAL", callback);
+            } else {
+                callback();
+            }
+        }, function () {
+            callback();
+        });
     };
 
     self.handleSetting = function (configs, finalCallback) {

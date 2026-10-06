@@ -8,6 +8,7 @@ import * as THREE from 'three'
 import GUI, { TABS } from './gui';
 import interval from './intervals';
 import CONFIGURATOR from './data_storage';
+import { loadOsdUnits } from './osdUnits';
 import FC  from './fc';
 import { globalSettings, UnitType } from './globalSettings';
 import { PLATFORM } from './model'
@@ -605,14 +606,14 @@ $(function() {
 
                     // Set the value of the unit type
                     // none, OSD, imperial, metric
-                    $('#ui-unit-type').on('change', function () {
+                    $('#ui-unit-type').on('change', async function () {
                         store.set('unit_type', $(this).val());
                         globalSettings.unitType = $(this).val();
 
                         // Update the osd units in global settings
                         // but only if we need it
                         if (globalSettings.unitType === UnitType.OSD) {
-                            get_osd_settings();
+                            await loadOsdUnits();
                         }
 
                         // Horrible way to reload the tab
@@ -666,7 +667,7 @@ $(function() {
                     })
         
                     $('div#options-window').slideDown(250);
-                });
+                }).catch(err => console.error('Failed to load options window:', err));
             } else {
                 closeOptions();
             }
@@ -684,17 +685,19 @@ $(function() {
             }
         });
 
+        // block stray characters only; shortcuts like Ctrl+A and keys like Home or End must reach the field
         $content.on('keydown', 'input[type="number"]', function (e) {
-            // whitelist all that we need for numeric control
-            var whitelist = [
-                96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, // numpad and standard number keypad
-                109, 189, // minus on numpad and in standard keyboard
-                8, 46, 9, // backspace, delete, tab
-                190, 110, // decimal point
-                37, 38, 39, 40, 13 // arrows and enter
-            ];
+            if (e.ctrlKey || e.metaKey || e.altKey) {
+                return;
+            }
 
-            if (whitelist.indexOf(e.keyCode) == -1) {
+            // keys that insert no text (arrows, Home, End, Backspace, Tab) have multi-character names
+            if (typeof e.key !== 'string' || e.key.length > 1) {
+                return;
+            }
+
+            // the comma is what the numpad decimal key sends on many layouts
+            if (!/[0-9.,-]/.test(e.key)) {
                 e.preventDefault();
             }
         });
@@ -829,23 +832,6 @@ $(function() {
 });
 
 
-function get_osd_settings() {
-    if (globalSettings.osdUnits !== undefined && globalSettings.osdUnits !== null) {
-        return;
-    }
-
-    MSP.promise(MSPCodes.MSP2_INAV_OSD_PREFERENCES).then(function (resp) {
-        var prefs = resp.data;
-        prefs.readU8();
-        prefs.readU8();
-        prefs.readU8();
-        prefs.readU8();
-        prefs.readU8();
-        prefs.readU8();
-        prefs.readU8();
-        globalSettings.osdUnits = prefs.readU8();
-    });
-}
 
 function updateProfilesHighlightColours() {
     if (globalSettings.showProfileParameters) {
