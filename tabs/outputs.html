@@ -30,8 +30,17 @@
 
                 <div id="srxl2-esc" style="display: none;">
                     <div id="srxl2-no-port" class="warning-box" style="display: none;"></div>
-                    <div data-i18n="srxl2Info" class="info-box"></div>
+                    <div id="srxl2-info" data-i18n="srxl2Info" class="info-box"></div>
                     <div id="srxl2-port-count" class="info-box"></div>
+
+                    <div class="checkbox" id="srxl2-connector-row" style="display: none;">
+                        <input id="esc_srxl2_connector" type="checkbox" class="toggle" data-setting="esc_srxl2_connector" />
+                        <label for="esc_srxl2_connector">
+                            <span id="srxl2-connector-label" data-i18n="srxl2Connector">ESC on the board's ESC connector</span>
+                        </label>
+                        <div for="esc_srxl2_connector" class="helpicon cf_tip" data-i18n_title="srxl2ConnectorHelp"></div>
+                    </div>
+                    <div id="srxl2-connector-busy" class="warning-box" style="display: none;"></div>
 
                     <div class="checkbox">
                         <input id="esc_srxl2_telemetry" type="checkbox" class="toggle" data-setting="esc_srxl2_telemetry" />

@@ -1969,6 +1969,15 @@ var mspHelper = (function () {
                 FC.SRXL2_STATUS.lastResult = data.byteLength > 2 ? data.getUint8(2) : 0;
                 FC.SRXL2_STATUS.ports = data.byteLength > 3 ? data.getUint8(3) : 0;
                 FC.SRXL2_STATUS.motors = data.byteLength > 4 ? data.getUint8(4) : 0;
+                /* The board's ESC connectors, each as the UART behind it. None from
+                 * older firmware, and none on boards without one. */
+                FC.SRXL2_STATUS.connectors = [];
+                if (data.byteLength > 5) {
+                    const connectorCount = data.getUint8(5);
+                    for (let i = 0; i < connectorCount && 6 + i < data.byteLength; i++) {
+                        FC.SRXL2_STATUS.connectors.push(data.getUint8(6 + i));
+                    }
+                }
                 break;
 
             case MSPCodes.MSP2_INAV_ESC_SRXL2_CALIBRATE:
