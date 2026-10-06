@@ -12,7 +12,7 @@ import OutputMappingCollection from './outputMapping';
 import SafehomeCollection from './safehomeCollection';
 import FwApproachCollection from './fwApproachCollection';
 import GeozoneCollection from './geozoneCollection';
-import { PLATFORM } from './model';
+import { PLATFORM, PID_TYPE } from './model';
 import VTX from './vtx';
 import BitHelper from './bitHelper';
 import { FLIGHT_MODES } from './flightModes';
@@ -103,6 +103,19 @@ var FC = {
     },
     isMultirotor: function () {
         return (this.MIXER_CONFIG.platformType == PLATFORM.MULTIROTOR || this.MIXER_CONFIG.platformType == PLATFORM.TRICOPTER);
+    },
+    // Airplanes, rovers and boats run the fixed-wing navigation controllers, whatever pid_type says
+    usesFixedWingNavPids: function () {
+        return (this.MIXER_CONFIG.platformType == PLATFORM.AIRPLANE ||
+            this.MIXER_CONFIG.platformType == PLATFORM.ROVER ||
+            this.MIXER_CONFIG.platformType == PLATFORM.BOAT);
+    },
+    // MSP2_PID serves pidBank(), which follows pid_type instead
+    usesFixedWingPidBank: function (pidType) {
+        if (pidType == PID_TYPE.AUTO) {
+            return this.usesFixedWingNavPids();
+        }
+        return (pidType == PID_TYPE.PIFF);
     },
     isRpyFfComponentUsed: function () {
         return true; // Currently all planes have roll, pitch and yaw FF
@@ -258,6 +271,22 @@ var FC = {
         this.GLOBAL_VARIABLES_STATUS = new GlobalVariablesStatus();
         this.PROGRAMMING_PID         = new ProgrammingPidCollection();
         this.PROGRAMMING_PID_STATUS  = new ProgrammingPidStatus();
+
+        /*
+         * What the Smart ESC driver reports about itself. `supported` starts
+         * false and is set by the first reply: firmware built without the driver
+         * answers MSP2_INAV_ESC_SRXL2_STATUS as an unsupported command, which is
+         * what tells the Configurator not to offer the protocol or the port
+         * function on that board.
+         */
+        this.SRXL2_STATUS = {
+            supported: false,
+            phase: 0,
+            connected: false,
+            lastResult: 0,
+            ports: 0,
+            motors: 0
+        };
 
         this.MIXER_CONFIG = {
             yawMotorDirection: 0,
@@ -695,7 +724,6 @@ var FC = {
             {bit: 17, group: 'other', name: 'DASHBOARD', showNameInTip: true},
             {bit: 19, group: 'other', name: 'BLACKBOX', haveTip: true, showNameInTip: true},
             {bit: 28, group: 'other', name: 'PWM_OUTPUT_ENABLE', haveTip: true},
-            {bit: 26, group: 'other', name: 'SOFTSPI'},
             {bit: 29, group: 'other', name: 'OSD', haveTip: false, showNameInTip: false},
             {bit: 22, group: 'other', name: 'AIRMODE', haveTip: false, showNameInTip: false},
             {bit: 30, group: 'other', name: 'FW_LAUNCH', haveTip: false, showNameInTip: false},
@@ -815,6 +843,16 @@ var FC = {
                 defaultRate: 16000,
                 rates: {
                     16000: "16kHz"
+                }
+            },
+            7: {
+                /* Not a timer waveform: the ESC is driven over a UART, so the
+                 * output rate is the protocol's own and nothing here selects it. */
+                name: "SRXL2",
+                message: null,
+                defaultRate: 50,
+                rates: {
+                    50: "50Hz"
                 }
             }
         };

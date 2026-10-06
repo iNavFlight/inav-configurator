@@ -1,5 +1,8 @@
 'use strict';
 
+import mspHelper from './msp/MSPHelper';
+import MSPChainerClass from './msp/MSPchainer';
+
 var LogicConditionsCollection = function () {
 
     let self = {},
