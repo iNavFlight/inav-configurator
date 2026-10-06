@@ -27,6 +27,7 @@ import { FwApproach } from './../fwApproach';
 import Waypoint from './../waypoint';
 import mspDeduplicationQueue from './mspDeduplicationQueue';
 import mspStatistics from './mspStatistics';
+import { resolveMspWrite, guardMspCallback } from './../mspWriteOutcome';
 import settingsCache from './../settingsCache';
 import {Geozone, GeozoneVertex, GeozoneShapes } from './../geozone';
 import { parseDronecanAsyncRequestResponse } from './../dronecanAsyncRequestParse';
@@ -51,6 +52,7 @@ var mspHelper = (function () {
         self.sensorStatusEx = cb;
     }
 
+    // Index = firmware baudRate_e (baudRates[] in src/main/io/serial.c); a missing rate is written back as 255.
     self.BAUD_RATES_post1_6_3 = [
         'AUTO',
         '1200',
@@ -64,7 +66,11 @@ var mspHelper = (function () {
         '230400',
         '250000',
         '460800',
-        '921600'
+        '921600',
+        '1000000',
+        '1500000',
+        '2000000',
+        '2470000'
     ];
 
     // Required for MSP_DEBUGMSG because console.log() doesn't allow omitting
@@ -1251,15 +1257,6 @@ var mspHelper = (function () {
                 FC.SDCARD.freeSizeKB = data.getUint32(3, true);
                 FC.SDCARD.totalSizeKB = data.getUint32(7, true);
                 break;
-            case MSPCodes.MSP_BLACKBOX_CONFIG:
-                FC.BLACKBOX.supported = (data.getUint8(0) & 1) != 0;
-                FC.BLACKBOX.blackboxDevice = data.getUint8(1);
-                FC.BLACKBOX.blackboxRateNum = data.getUint8(2);
-                FC.BLACKBOX.blackboxRateDenom = data.getUint8(3);
-                break;
-            case MSPCodes.MSP_SET_BLACKBOX_CONFIG:
-                console.log("Blackbox config saved");
-                break;
             case MSPCodes.MSP_VTX_CONFIG:
                 FC.VTX_CONFIG.device_type = data.getUint8(offset++);
                 if (FC.VTX_CONFIG.device_type != VTX.DEV_UNKNOWN) {
@@ -1628,8 +1625,8 @@ var mspHelper = (function () {
             case MSPCodes.MSP2_BLACKBOX_CONFIG:
                 FC.BLACKBOX.supported = (data.getUint8(0) & 1) != 0;
                 FC.BLACKBOX.blackboxDevice = data.getUint8(1);
-                FC.BLACKBOX.blackboxRateNum = data.getUint16(2);
-                FC.BLACKBOX.blackboxRateDenom = data.getUint16(4);
+                FC.BLACKBOX.blackboxRateNum = data.getUint16(2, true);
+                FC.BLACKBOX.blackboxRateDenom = data.getUint16(4, true);
                 FC.BLACKBOX.blackboxIncludeFlags = data.getUint32(6,true);
                 break;
             case MSPCodes.MSP2_SET_BLACKBOX_CONFIG:
@@ -1934,7 +1931,7 @@ var mspHelper = (function () {
                 break;    
 
             case MSPCodes.MSP2_MZTC_CONFIG:
-                // Fixed 12 byte payload, little endian, one field at a time.
+                // Fixed 11 byte payload, little endian, one field at a time.
                 // The firmware writes it with the sbufWrite helpers, so there
                 // is no compiler padding to account for here. The serial port
                 // and its baud rate are not in this payload. They live in the
@@ -1979,6 +1976,27 @@ var mspHelper = (function () {
 
             case MSPCodes.MSP2_SET_MZTC_CONFIG:
                 console.log("MZTC config saved");
+                break;
+
+            case MSPCodes.MSP2_INAV_ESC_SRXL2_STATUS:
+                if (dataHandler.unsupported) {
+                    /* Built without the Smart ESC driver. Recorded rather than
+                     * only logged, so the tabs can stop offering a protocol and
+                     * a port function this board cannot perform. */
+                    FC.SRXL2_STATUS.supported = false;
+                    break;
+                }
+                FC.SRXL2_STATUS.supported = true;
+                FC.SRXL2_STATUS.phase = data.getUint8(0);
+                FC.SRXL2_STATUS.connected = data.getUint8(1) !== 0;
+                /* Older firmware stops here; the fields past the end read as
+                 * zero rather than as a refusal that never happened. */
+                FC.SRXL2_STATUS.lastResult = data.byteLength > 2 ? data.getUint8(2) : 0;
+                FC.SRXL2_STATUS.ports = data.byteLength > 3 ? data.getUint8(3) : 0;
+                FC.SRXL2_STATUS.motors = data.byteLength > 4 ? data.getUint8(4) : 0;
+                break;
+
+            case MSPCodes.MSP2_INAV_ESC_SRXL2_CALIBRATE:
                 break;
 
             default:
@@ -2587,7 +2605,7 @@ var mspHelper = (function () {
 
 
             case MSPCodes.MSP2_SET_MZTC_CONFIG:
-                // Fixed 12 byte payload matching MSP2_MZTC_CONFIG. The firmware
+                // Fixed 11 byte payload matching MSP2_MZTC_CONFIG. The firmware
                 // validates the whole request before applying any of it, so an
                 // out of range value is rejected in full.
                 // One push in field order. The field order is the wire order,
@@ -2632,9 +2650,8 @@ var mspHelper = (function () {
 
     self.sendBlackboxConfiguration = function (onDataCallback) {
         var buffer = [];
-        var messageId = MSPCodes.MSP_SET_BLACKBOX_CONFIG;
+        var messageId = MSPCodes.MSP2_SET_BLACKBOX_CONFIG;
         buffer.push(FC.BLACKBOX.blackboxDevice & 0xFF);
-        messageId = MSPCodes.MSP2_SET_BLACKBOX_CONFIG;
         buffer.push(BitHelper.lowByte(FC.BLACKBOX.blackboxRateNum));
         buffer.push(BitHelper.highByte(FC.BLACKBOX.blackboxRateNum));
         buffer.push(BitHelper.lowByte(FC.BLACKBOX.blackboxRateDenom));
@@ -3082,7 +3099,7 @@ var mspHelper = (function () {
                 buffer.push(color.s);
                 buffer.push(color.v);
             }
-            MSP.send_message(MSPCodes.MSP_SET_LED_COLORS, buffer, false, onCompleteCallback);
+            MSP.send_message(MSPCodes.MSP_SET_LED_COLORS, buffer, false, guardMspCallback(onCompleteCallback));
         }
     };
 
@@ -3177,7 +3194,7 @@ var mspHelper = (function () {
             position++;
             var nextFunction = (position === indicesToSend.length) ? onCompleteCallback : send_next_led_strip_config;
 
-            MSP.send_message(MSPCodes.MSP2_INAV_SET_LED_STRIP_CONFIG_EX, buffer, false, nextFunction);
+            MSP.send_message(MSPCodes.MSP2_INAV_SET_LED_STRIP_CONFIG_EX, buffer, false, guardMspCallback(nextFunction));
         }
     };
 
@@ -3207,7 +3224,7 @@ var mspHelper = (function () {
                 nextFunction = onCompleteCallback;
             }
 
-            MSP.send_message(MSPCodes.MSP_SET_LED_STRIP_MODECOLOR, buffer, false, nextFunction);
+            MSP.send_message(MSPCodes.MSP_SET_LED_STRIP_MODECOLOR, buffer, false, guardMspCallback(nextFunction));
         }
     };
 
@@ -3825,9 +3842,14 @@ var mspHelper = (function () {
     };
 
     self.setSetting = function (name, value, callback) {
-        this.encodeSetting(name, value).then(function (data) {
-            return MSP.promise(MSPCodes.MSPV2_SET_SETTING, data).then(callback);
-        }).catch(error =>  {
+        // resolveMspWrite() treats a refused write and a write the queue
+        // dropped after exhausting retries (MSP.promise() resolves false
+        // rather than rejecting for that case) the same way: stop the save
+        // chain without reaching callback. An exception thrown by callback
+        // itself still propagates instead of being silently swallowed.
+        return this.encodeSetting(name, value).then(function (data) {
+            return resolveMspWrite(MSP.promise(MSPCodes.MSPV2_SET_SETTING, data), callback);
+        }, function (error) {
             console.log("Invalid setting: " + name, error);
             return Promise.resolve().then(callback);
         });

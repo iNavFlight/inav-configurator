@@ -44,10 +44,75 @@
     margin-top: 10px;
 }
 
+/* The map keeps the whole height of the tab in view; only the settings column scrolls */
+.tab-gps .content_wrapper {
+    display: grid;
+    grid-template-columns: minmax(28em, 40em) minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr);
+    column-gap: 1.25em;
+    overflow: hidden;
+}
+
+.tab-gps .tab_title {
+    grid-row: 1;
+    grid-column: 1 / -1;
+}
+
+/* Inserted after the title by gui.js, it shares the title row */
+.tab-gps .cf_doc_version_bt {
+    grid-row: 1;
+    grid-column: 1 / -1;
+    justify-self: end;
+}
+
+.tab-gps .cf_doc_version_bt a {
+    margin-top: 0;
+}
+
+.tab-gps .cf_column.third_left,
+.tab-gps .cf_column.twothird {
+    grid-row: 2;
+    float: none;
+    width: auto;
+    min-height: 0;
+}
+
+.tab-gps .cf_column.third_left {
+    grid-column: 1;
+    overflow-y: auto;
+}
+
+.tab-gps .cf_column.third_left .spacer_right {
+    float: none;
+    width: auto;
+    padding-right: 0.5em;
+}
+
+.tab-gps .cf_column.twothird {
+    grid-column: 2;
+    display: flex;
+    flex-direction: column;
+}
+
+.tab-gps .gps_map {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    margin-bottom: 0;
+}
+
 .tab-gps #loadmap {
-    height: 100%;
-    width: 100%;
-    float: left;
+    flex: 1;
+    min-height: 0;
+    position: relative;
+}
+
+/* Narrow windows keep the map beside the settings, in the thirds the tab had before */
+@media only screen and (max-width: 1055px) {
+    .tab-gps .content_wrapper {
+        grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+    }
 }
 
 .map-button {
@@ -124,9 +189,8 @@
 }
 
 #gps-map {
-    height: 400px;
+    height: 100%;
     width: 100%;
-    float: left;
     position: relative;
 }
 

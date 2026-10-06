@@ -265,15 +265,12 @@ gpsTab.initialize = function (callback) {
         }
 
         //Generate baud select
-        serialPortHelper.getBauds('SENSOR').forEach(function (baud) {
-            $baud.append('<option value="' + baud + '">' + baud + '</option>');
-        });
+        const gpsPortConfig = currentPort !== null ? serialPortHelper.getPortByIdentifier(currentPort) : null;
+        serialPortHelper.fillBaudSelect($baud, 'SENSOR', gpsPortConfig?.sensors_baudrate);
 
         //Select defaults
         if (currentPort !== null) {
             $port.val(currentPort);
-            let portConfig = serialPortHelper.getPortByIdentifier(currentPort);
-            $baud.val(portConfig.sensors_baudrate);
         } else {
             $port.val(-1);
             $baud.val(serialPortHelper.getRuleByName('GPS').defaultBaud);

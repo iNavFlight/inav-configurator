@@ -17,6 +17,7 @@ import { PortHandler } from './../js/port_handler';
 import i18n from './../js/localization';
 import store from './../js/store';
 import dialog from './../js/dialog';
+import { resolveMspWrite } from './../js/mspWriteOutcome';
 
 var SYM = SYM || {};
 SYM.LAST_CHAR = 225; // For drawing the font preview
@@ -1448,7 +1449,7 @@ OSD.constants = {
             items: [
                 {
                     name: 'MZTC_STATUS',
-                    id: 171,
+                    id: 172,
                     // min_version stays commented out until the firmware
                     // version is bumped, matching AUTO SPEED. The
                     // maintenance-10.x firmware still reports 9.x, so a
@@ -2462,16 +2463,17 @@ OSD.is_item_displayed = function(item, group) {
     if (!group) {
         return false;
     }
-    if (typeof group.enabled === 'function' && group.enabled() === false) {
-        return false;
-    }
     if (item.min_version && !semver.gte(FC.CONFIG.flightControllerVersion, item.min_version)) {
         return false;
     }
-    if (typeof item.enabled === 'function' && item.enabled() === false) {
-        return false;
+    var gateOpen = !(typeof group.enabled === 'function' && group.enabled() === false)
+        && !(typeof item.enabled === 'function' && item.enabled() === false);
+    if (gateOpen) {
+        return true;
     }
-    return true;
+    // Hardware/feature gate closed (e.g. pitot_hardware set to NONE): keep an
+    // already-enabled element toggleable so the user can turn it off (#2639).
+    return OSD.data.items[item.id].isVisible === true;
 };
 
 OSD.get_item_preview = function(item) {
@@ -2598,22 +2600,29 @@ OSD.updateDisplaySize = function () {
     OSD.GUI.updateGuidesView($('#videoGuides').find('input').is(':checked'));
 };
 
+// Each save's .catch() only observes a refused write - the blocked-write notice
+// is already shown by MSP.onConfigWriteBlocked, and the success callback must
+// not run when the value was not stored.
 OSD.saveAlarms = function(callback) {
     let data = OSD.msp.encodeAlarms();
-    return MSP.promise(MSPCodes.MSP2_INAV_OSD_SET_ALARMS, data).then(callback);
+    return MSP.promise(MSPCodes.MSP2_INAV_OSD_SET_ALARMS, data).then(callback).catch(() => {});
 }
 
 OSD.saveConfig = function(callback) {
     return OSD.saveAlarms(function () {
         var data = OSD.msp.encodePreferences();
         return MSP.promise(MSPCodes.MSP2_INAV_OSD_SET_PREFERENCES, data).then(callback);
-    });
+    }).catch(() => {});
 };
 
+// Resolves true on success, false if the FC refused the write or the queue
+// dropped it after exhausting retries - so callers that await the result
+// (bulk paste/clear) can detect a failed write instead of assuming it
+// landed.
 OSD.saveItem = function(item, callback) {
     let pos = OSD.data.items[item.id];
     let data = OSD.msp.encodeLayoutItem(OSD.data.selected_layout, item, pos);
-    return MSP.promise(MSPCodes.MSP2_INAV_OSD_SET_LAYOUT_ITEM, data).then(callback);
+    return resolveMspWrite(MSP.promise(MSPCodes.MSP2_INAV_OSD_SET_LAYOUT_ITEM, data), callback);
 };
 
 //noinspection JSUnusedLocalSymbols
@@ -3528,15 +3537,19 @@ OSD.GUI.updateAll = function() {
                 OSD.data.layouts[OSD.data.selected_layout] = JSON.parse(JSON.stringify(layout_clipboard.layout));
                 layouts.trigger('change');
 
+                var allSaved = true;
                 for(var index in OSD.data.layouts[OSD.data.selected_layout])
                 {
                     var item = OSD.data.layouts[OSD.data.selected_layout][index];
                     if(!(item.isVisible === false && oldLayout[index].isVisible === false) && (oldLayout[index].x !== item.x || oldLayout[index].y !== item.y || oldLayout[index].position !== item.position || oldLayout[index].isVisible !== item.isVisible)){
-                        await OSD.saveItem({id: index});
+                        if (!(await OSD.saveItem({id: index}))) {
+                            allSaved = false;
+                            break;
+                        }
                     }
                 }
 
-                GUI.log(i18n.getMessage('osdLayoutPasteFromClipboard'));
+                GUI.log(i18n.getMessage(allSaved ? 'osdLayoutPasteFromClipboard' : 'osdLayoutSaveItemFailed'));
             }
         });
 
@@ -3553,14 +3566,18 @@ OSD.GUI.updateAll = function() {
             OSD.data.layouts[OSD.data.selected_layout] = clearedLayout;
             layouts.trigger('change');
 
+            var allSaved = true;
             for(var index in OSD.data.layouts[OSD.data.selected_layout]) {
                 var item = OSD.data.layouts[OSD.data.selected_layout][index];
                 if(oldLayout[index].isVisible === true){
-                    await OSD.saveItem({id: index});
+                    if (!(await OSD.saveItem({id: index}))) {
+                        allSaved = false;
+                        break;
+                    }
                 }
             }
 
-            GUI.log(i18n.getMessage('osdClearLayout'));
+            GUI.log(i18n.getMessage(allSaved ? 'osdClearLayout' : 'osdLayoutSaveItemFailed'));
         });
 
 
@@ -4445,7 +4462,8 @@ function customElementsInitCallback() {
         customElementNormaliseRow(row);
         customElementDisableNonValidOptionsRow(row);
 
-        MSP.promise(MSPCodes.MSP2_INAV_SET_CUSTOM_OSD_ELEMENTS, customElementGetDataForRow(row));
+        // A refused write is already reported by MSP.onConfigWriteBlocked.
+        MSP.promise(MSPCodes.MSP2_INAV_SET_CUSTOM_OSD_ELEMENTS, customElementGetDataForRow(row)).catch(() => {});
     };
 
     var customElements = $('#osdCustomElementCards');
