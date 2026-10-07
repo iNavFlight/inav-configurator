@@ -45,8 +45,8 @@ export default {
 
   bearing: {
     type: 'number',
-    unit: 'deg',
-    desc: 'Bearing to ROI',
+    unit: 'cdeg',
+    desc: 'Bearing to ROI in centidegrees (0-35999, 0 = North)',
     readonly: true,
     inavOperand: { type: OPERAND_TYPE.ROI, value: ROI_PARAM.BEARING }
   },
