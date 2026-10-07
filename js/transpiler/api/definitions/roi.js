@@ -53,8 +53,8 @@ export default {
 
   elevation: {
     type: 'number',
-    unit: 'deg',
-    desc: 'Elevation angle to ROI',
+    unit: 'cdeg',
+    desc: 'Elevation angle to ROI in centidegrees (positive = above)',
     readonly: true,
     inavOperand: { type: OPERAND_TYPE.ROI, value: ROI_PARAM.ELEVATION }
   },
