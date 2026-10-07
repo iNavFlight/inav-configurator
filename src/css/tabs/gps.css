@@ -47,7 +47,8 @@
 /* The map keeps the whole height of the tab in view; only the settings column scrolls */
 .tab-gps .content_wrapper {
     display: grid;
-    grid-template-columns: minmax(28em, 40em) minmax(0, 1fr);
+    /* A third of the width, as the tab had before; below 32em the labels wrap */
+    grid-template-columns: clamp(32em, 33.333%, 40em) minmax(0, 1fr);
     grid-template-rows: auto minmax(0, 1fr);
     column-gap: 1.25em;
     overflow: hidden;
