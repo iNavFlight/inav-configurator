@@ -2306,6 +2306,9 @@
     "receiverSwitchApiHandover": {
         "message": "API handover"
     },
+    "receiverSwitchRx1Prearm": {
+        "message": "RX1 back before arming"
+    },
     "receiverHandoverRefused": {
         "message": "Receiver handover refused: target link is not currently usable."
     },

@@ -111,6 +111,7 @@ receiverTab.initialize = function (callback) {
                 'receiverSwitchLogicHandover',
                 'receiverSwitchMspHandover',
                 'receiverSwitchApiHandover',
+                'receiverSwitchRx1Prearm',
             ];
             return i18n.getMessage(keys[reason] || 'receiverStatusUnavailable');
         }
