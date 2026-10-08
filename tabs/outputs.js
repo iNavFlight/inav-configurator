@@ -28,6 +28,7 @@ function srxl2StatusArrived(resp) {
 const outputsTab = {
     allowTestMode: false,
     srxl2Calibrating: false,
+    srxl2Starting: false,       // Start sent, the status that confirms it not back yet
     feature3DEnabled: false
 };
 outputsTab.initialize = function (callback) {
@@ -236,6 +237,7 @@ outputsTab.initialize = function (callback) {
         function srxl2CalStop() {
             interval.remove(SRXL2_POLL);
             outputsTab.srxl2Calibrating = false;
+            outputsTab.srxl2Starting = false;
             $('#srxl2-cal-abort').hide();
             $('#srxl2-cal-start').show();
             $('#srxl2-cal-ack').prop('checked', false);
@@ -331,7 +333,7 @@ outputsTab.initialize = function (callback) {
             } else {
                 /* Another protocol hides the Abort button with the box, and the
                  * firmware would go on holding full throttle: call the sequence off. */
-                if (outputsTab.srxl2Calibrating) {
+                if (outputsTab.srxl2Calibrating || outputsTab.srxl2Starting) {
                     MSP.send_message(MSPCodes.MSP2_INAV_ESC_SRXL2_CALIBRATE, [SRXL2_CAL_OFF], false);
                     srxl2CalShow('srxl2CalibrateAborted');
                 }
@@ -373,6 +375,7 @@ outputsTab.initialize = function (callback) {
                 return;
             }
             const data = [SRXL2_CAL_WAIT_BATTERY];
+            outputsTab.srxl2Starting = true;
             MSP.send_message(MSPCodes.MSP2_INAV_ESC_SRXL2_CALIBRATE, data, false, function () {
                 /*
                  * The callback fires whether or not the firmware accepted: this is
@@ -382,6 +385,11 @@ outputsTab.initialize = function (callback) {
                  * a sequence that never started, then reports it finished.
                  */
                 MSP.send_message(MSPCodes.MSP2_INAV_ESC_SRXL2_STATUS, false, false, function (resp) {
+                    /* Called off on the way (protocol changed, tab left): the stop went out after the start */
+                    if (!outputsTab.srxl2Starting) {
+                        return;
+                    }
+                    outputsTab.srxl2Starting = false;
                     if (!srxl2StatusArrived(resp)) {
                         srxl2CalShow('srxl2CalibrateRefused');
                         $('#srxl2-cal-ack').prop('checked', false);
@@ -1057,8 +1065,9 @@ outputsTab.cleanup = function (callback) {
      * throttle on the wire while it waits for the battery, and a control that
      * has gone off screen is not a reason to leave it holding.
      */
-    if (outputsTab.srxl2Calibrating) {
+    if (outputsTab.srxl2Calibrating || outputsTab.srxl2Starting) {
         outputsTab.srxl2Calibrating = false;
+        outputsTab.srxl2Starting = false;
         MSP.send_message(MSPCodes.MSP2_INAV_ESC_SRXL2_CALIBRATE, [SRXL2_CAL_OFF], false, function () {
             if (callback) callback();
         });
