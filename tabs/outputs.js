@@ -248,6 +248,10 @@ outputsTab.initialize = function (callback) {
 
         function srxl2CalPoll() {
             MSP.send_message(MSPCodes.MSP2_INAV_ESC_SRXL2_STATUS, false, false, function (resp) {
+                /* A reply on its way when the sequence was called off must not bring its status back */
+                if (!outputsTab.srxl2Calibrating) {
+                    return;
+                }
                 if (!srxl2StatusArrived(resp)) {
                     return;     /* one lost poll; the next one in 500 ms decides */
                 }
@@ -325,6 +329,12 @@ outputsTab.initialize = function (callback) {
                     ? i18n.getMessage('srxl2PortCountOpen', [ports, motors])
                     : i18n.getMessage('srxl2PortCountOpenNoMixer', [ports]));
             } else {
+                /* Another protocol hides the Abort button with the box, and the
+                 * firmware would go on holding full throttle: call the sequence off. */
+                if (outputsTab.srxl2Calibrating) {
+                    MSP.send_message(MSPCodes.MSP2_INAV_ESC_SRXL2_CALIBRATE, [SRXL2_CAL_OFF], false);
+                    srxl2CalShow('srxl2CalibrateAborted');
+                }
                 srxl2CalStop();
             }
         }
