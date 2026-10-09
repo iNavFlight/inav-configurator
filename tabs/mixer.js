@@ -42,6 +42,7 @@ mixerTab.initialize = function (callback, scrollPosition) {
         mspHelper.loadMotors,
         mspHelper.loadServoMixRules,
         mspHelper.loadMotorMixRules,
+        mspHelper.loadAdvancedConfig,
         mspHelper.loadOutputMappingExt,
         mspHelper.loadTimerOutputModes,
         mspHelper.loadLogicConditions,
@@ -172,7 +173,9 @@ mixerTab.initialize = function (callback, scrollPosition) {
 
     function renderOutputMapping() {
         let isMR = FC.MIXER_CONFIG.platformType == PLATFORM.MULTIROTOR || FC.MIXER_CONFIG.platformType == PLATFORM.TRICOPTER;
-        let jsMap = FC.OUTPUT_MAPPING.getOutputTable(isMR, FC.MOTOR_RULES.getNumberOfConfiguredMotors(), FC.SERVO_RULES.getUsedServoIndexes());
+        // Motors on a serial bus get no pad, as in the firmware's pwmBuildTimerOutputList()
+        const motors = FC.motorsUseTimers() ? FC.MOTOR_RULES.getNumberOfConfiguredMotors() : 0;
+        let jsMap = FC.OUTPUT_MAPPING.getOutputTable(isMR, motors, FC.SERVO_RULES.getUsedServoIndexes());
         let outputMap;
         if (FC.OUTPUT_MAPPING.hasDirectAssignment()) {
             outputMap = FC.OUTPUT_MAPPING.getOutputTableDirect();
