@@ -98,8 +98,12 @@ receiverTab.initialize = function (callback) {
             }
             const ports = serialPortHelper.getPortIdentifiersForFunction('RX_SERIAL');
             $portNote.toggle(ports.length === 0).html(i18n.getMessage('configurationSerialRXHelp'));
-            if (ports.length > 0 && (FC.CONFIG.armingFlags & ARMING_DISABLED_RC_LINK) !== 0) {
-                $linkWarning.html(i18n.getMessage('receiverSerialNoLink', [serialPortHelper.getPortName(ports[0])])).show();
+            const names = ports.map(serialPortHelper.getPortName);
+            if (ports.length > 1) {
+                // The firmware opens the first port in its order and ignores the rest
+                $linkWarning.html(i18n.getMessage('receiverSerialTwoPorts', [names[0], names.slice(1).join(', ')])).show();
+            } else if (ports.length === 1 && (FC.CONFIG.armingFlags & ARMING_DISABLED_RC_LINK) !== 0) {
+                $linkWarning.html(i18n.getMessage('receiverSerialNoLink', [names[0]])).show();
             } else {
                 $linkWarning.hide();
             }

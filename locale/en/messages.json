@@ -1170,6 +1170,9 @@
     "receiverSerialNoLink": {
         "message": "The serial receiver is set on $1, but no valid RC data arrives: transmitter off or out of range, wiring, the protocol below or the bind."
     },
+    "receiverSerialTwoPorts": {
+        "message": "Serial RX is set on $1 and on $2: the board reads the receiver on $1 only and ignores the other. Clear it in the Ports tab."
+    },
     "configurationFrSkyOptions": {
         "message": "FrSky Options"
     },
