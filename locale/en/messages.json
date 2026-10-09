@@ -1165,7 +1165,10 @@
         "message": "<strong>Note:</strong> Not all combinations of features are valid.  When the flight controller firmware detects invalid feature combinations conflicting features will be disabled.<br /><strong>Note:</strong> Configure serial ports <span style=\"color: red\">before</span> enabling the features that will use the ports."
     },
     "configurationSerialRXHelp": {
-        "message": "<strong>Note:</strong> Remember to configure a Serial Port (via Ports tab) for the serial receiver"
+        "message": "<strong>Note:</strong> no port carries the serial receiver yet. In the Ports tab, turn on Serial RX for the UART the receiver is wired to."
+    },
+    "receiverSerialNoLink": {
+        "message": "The serial receiver is set on $1, but no valid RC data arrives: transmitter off or out of range, wiring, the protocol below or the bind."
     },
     "configurationFrSkyOptions": {
         "message": "FrSky Options"
