@@ -18,6 +18,14 @@ var sdcardTimer;
 const onboardLoggingTab = {
 };
 
+// A failed lookup leaves the box out, not the tab
+function lookupMagLearn() {
+    return mspHelper.getSetting("mag_learn").catch(function(err) {
+        console.warn("mag_learn lookup failed", err);
+        return null;
+    });
+}
+
 onboardLoggingTab.initialize = function (callback) {
     let
         saveCancelled, eraseCancelled,
@@ -63,13 +71,7 @@ onboardLoggingTab.initialize = function (callback) {
             }
 
             terrainEnabled = Boolean(data.value);
-        }).then(function() {
-            // a failed lookup leaves the box out, not the tab
-            return mspHelper.getSetting("mag_learn").catch(function(err) {
-                console.warn("mag_learn lookup failed", err);
-                return null;
-            });
-        }).then(function(data) {
+        }).then(lookupMagLearn).then(function(data) {
             // only firmware that can learn the compass offsets logs them
             magLearnSupported = data != null;
             MSP.send_message(MSPCodes.MSP2_BLACKBOX_CONFIG, false, false, load_html);

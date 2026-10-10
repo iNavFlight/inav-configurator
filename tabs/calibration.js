@@ -36,6 +36,17 @@ function updateMagZero() {
     });
 }
 
+// Progress while armed and the outcome after the disarm change with the tab open; a save shows the new offsets
+function pollMagLearn() {
+    const savedBefore = FC.MAG_LEARN.flags & MAG_LEARN_FLAG.SAVED;
+    MSP.send_message(MSPCodes.MSP2_INAV_MAG_LEARN, false, false, function () {
+        updateMagLearnStatus();
+        if (!savedBefore && (FC.MAG_LEARN.flags & MAG_LEARN_FLAG.SAVED)) {
+            MSP.send_message(MSPCodes.MSP_CALIBRATION_DATA, false, false, updateMagZero);
+        }
+    });
+}
+
 function formatMagAlignment(alignment) {
     var roll = alignment[0].value / 10;
     var pitch = alignment[1].value / 10;
@@ -171,17 +182,6 @@ calibrationTab.initialize = function (callback) {
             });
         }).catch(function (err) {
             console.error('Calibration settings did not load, nothing saved', err);
-        });
-    }
-
-    // Progress while armed and the outcome after the disarm change with the tab open; a save shows the new offsets
-    function pollMagLearn() {
-        const savedBefore = FC.MAG_LEARN.flags & MAG_LEARN_FLAG.SAVED;
-        MSP.send_message(MSPCodes.MSP2_INAV_MAG_LEARN, false, false, function () {
-            updateMagLearnStatus();
-            if (!savedBefore && (FC.MAG_LEARN.flags & MAG_LEARN_FLAG.SAVED)) {
-                MSP.send_message(MSPCodes.MSP_CALIBRATION_DATA, false, false, updateMagZero);
-            }
         });
     }
 
