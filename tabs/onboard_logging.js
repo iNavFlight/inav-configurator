@@ -64,7 +64,11 @@ onboardLoggingTab.initialize = function (callback) {
 
             terrainEnabled = Boolean(data.value);
         }).then(function() {
-            return mspHelper.getSetting("mag_learn");
+            // a failed lookup leaves the box out, not the tab
+            return mspHelper.getSetting("mag_learn").catch(function(err) {
+                console.warn("mag_learn lookup failed", err);
+                return null;
+            });
         }).then(function(data) {
             // only firmware that can learn the compass offsets logs them
             magLearnSupported = data != null;
@@ -215,7 +219,9 @@ onboardLoggingTab.initialize = function (callback) {
             update_html();
 
             GUI.content_ready(callback);
-        })));
+        }))).catch(function(err) {
+            console.error('Blackbox tab failed to load', err);
+        });
     }
 
     function populateDevices() {

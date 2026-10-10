@@ -2,7 +2,7 @@
 
 // magLearnFlags_e in the firmware's sensors/compass_learn.h
 export const MAG_LEARN_FLAG = {
-    COLLECTING: 1 << 0,
+    COLLECTING: 1,
     PAUSED: 1 << 1,
     SAVE_DUE: 1 << 4,
     FEW_SECTORS: 1 << 5,
