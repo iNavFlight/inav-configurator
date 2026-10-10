@@ -3507,6 +3507,48 @@
     "MagGainZText": {
         "message": "Gain Z"
     },
+    "magLearn": {
+        "message": "Learn in flight"
+    },
+    "magLearnHelp": {
+        "message": "ON refits the compass offsets (Zero X, Y, Z) from the readings of each flight and saves them at disarm, if the flight turned through at least 270 degrees and the readings agree with the stored calibration. The gains stay as they are. Needs a calibrated compass: after moving the compass, or what sits near it, calibrate again."
+    },
+    "magLearnNeedsCalibration": {
+        "message": "Calibrate the compass first: learning in flight only refines a calibration."
+    },
+    "magLearnNoFlight": {
+        "message": "Nothing learned since the last arming."
+    },
+    "magLearnPending": {
+        "message": "Last flight: the offsets will be saved once the aircraft is still, 5 s after the disarm at the earliest."
+    },
+    "magLearnArmed": {
+        "message": "Learning: $1 of 72 directions, $2 of 12 headings."
+    },
+    "magLearnSaved": {
+        "message": "Last flight: offsets saved, changed by $1, $2, $3."
+    },
+    "magLearnDisarmedFlying": {
+        "message": "Last flight: the aircraft still moved a minute after the disarm, offsets not saved."
+    },
+    "magLearnNotSaved": {
+        "message": "Last flight: offsets not saved, $1."
+    },
+    "magLearnFewHeadings": {
+        "message": "it turned through $1 of 12 headings and needs 9"
+    },
+    "magLearnFewSectors": {
+        "message": "it filled $1 of 72 directions and needs 12"
+    },
+    "magLearnNotSphere": {
+        "message": "the field strength varied by $1%, more than 5%: motor current or iron near the compass"
+    },
+    "magLearnOffScale": {
+        "message": "the field strength no longer matches the gains: calibrate the compass again"
+    },
+    "magLearnStepTooBig": {
+        "message": "the change ($1, $2, $3) is more than 30% of the field: calibrate the compass again"
+    },
     "OpflowScaleText": {
         "message": "Scale"
     },
@@ -6449,6 +6491,9 @@
     },
     "BLACKBOX_FEATURE_SERVOS": {
         "message": "Servos output"
+    },
+    "BLACKBOX_FEATURE_MAG_LEARN": {
+        "message": "Learned compass offsets"
     },
     "axisRoll": {
         "message": "Roll"

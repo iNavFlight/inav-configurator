@@ -6,9 +6,11 @@ import MSPCodes from './../js/msp/MSPCodes';
 import MSP from './../js/msp';
 import GUI from './../js/gui';
 import FC from './../js/fc';
+import { magLearnStatusText } from './../js/magLearnStatus';
 import timeout from './../js/timeouts';
 import interval from './../js/intervals';
 import i18n from './../js/localization';
+import Settings from './../js/settings';
 import jBox from 'jbox';
 
 const calibrationTab = {};
@@ -95,6 +97,7 @@ calibrationTab.initialize = function (callback) {
 
     saveChainer.setChain([
         mspHelper.saveCalibrationData,
+        Settings.saveInputs,
         mspHelper.saveToEeprom
     ]);
     saveChainer.setExitPoint(reboot);
@@ -115,7 +118,7 @@ calibrationTab.initialize = function (callback) {
     }
 
     function loadHtml() {
-        import('./calibration.html?raw').then(({default: html}) => GUI.load(html, processHtml));
+        import('./calibration.html?raw').then(({default: html}) => GUI.load(html, Settings.processHtml(processHtml)));
     }
 
     function updateCalibrationSteps() {
@@ -140,6 +143,20 @@ calibrationTab.initialize = function (callback) {
         });
         $('[name=OpflowScale]').val(FC.CALIBRATION_DATA.opflow.Scale);
         updateCalibrationSteps();
+        updateMagLearnStatus();
+    }
+
+    function updateMagLearnStatus() {
+        const text = magLearnStatusText(FC.MAG_LEARN, FC.getMagnetometerCalibrated(), i18n.getMessage);
+        $('#mag-learn-status').text(text).toggleClass('is-hidden', !FC.MAG_LEARN.supported);
+    }
+
+    // The board may have saved learned offsets since the tab loaded: save on top of what it holds now
+    function saveCalibration(change) {
+        MSP.send_message(MSPCodes.MSP_CALIBRATION_DATA, false, false, function () {
+            change();
+            saveChainer.execute();
+        });
     }
 
     // Reads the settings the firmware's compass-orientation auto-detect (run as
@@ -281,24 +298,25 @@ calibrationTab.initialize = function (callback) {
     }
 
     function resetAccCalibration() {
-        var pos = ['X', 'Y', 'Z'];
-        pos.forEach(function (item) {
-            FC.CALIBRATION_DATA.accGain[item] = 4096;
-            FC.CALIBRATION_DATA.accZero[item] = 0;
+        saveCalibration(function () {
+            ['X', 'Y', 'Z'].forEach(function (item) {
+                FC.CALIBRATION_DATA.accGain[item] = 4096;
+                FC.CALIBRATION_DATA.accZero[item] = 0;
+            });
         });
-
-        saveChainer.execute();
     }
 
     function processHtml() {
         $('#calibrateButtonSave').on('click', function () {
-            FC.CALIBRATION_DATA.opflow.Scale = parseFloat($('[name=OpflowScale]').val());
-            saveChainer.execute();
+            const opflowScale = parseFloat($('[name=OpflowScale]').val());
+            saveCalibration(function () {
+                FC.CALIBRATION_DATA.opflow.Scale = opflowScale;
+            });
         });
 
         if (FC.SENSOR_CONFIG.magnetometer === 0) {
             //Comment for test
-            $('#mag_btn, #mag-calibrated-data').css('pointer-events', 'none').css('opacity', '0.4');
+            $('#mag_btn, #mag-calibrated-data, #mag-learn-setting').css('pointer-events', 'none').css('opacity', '0.4');
         }
 
         if (FC.SENSOR_CONFIG.opflow === 0) {
@@ -411,6 +429,7 @@ calibrationTab.initialize = function (callback) {
         $('#calibrate-start-button').on('click', actionCalibrateButton);
        
         MSP.send_message(MSPCodes.MSP_CALIBRATION_DATA, false, false, updateSensorData);
+        MSP.send_message(MSPCodes.MSP2_INAV_MAG_LEARN, false, false, updateMagLearnStatus);
 
         GUI.content_ready(callback);
     }
