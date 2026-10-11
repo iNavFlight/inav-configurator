@@ -1439,6 +1439,10 @@ function iconKey(filename) {
     
         i18n.localize();
 
+        // Destroy any instance from a previous visit to this tab first — jBox reparents
+        // its content to <body>, outside what GUI.load() just replaced, so the old
+        // wrapper would otherwise be orphaned there instead of garbage collected.
+        landSpeedNotUpdatedModal && landSpeedNotUpdatedModal.destroy();
         landSpeedNotUpdatedModal = new jBox('Modal', {
             width: 480,
             height: 200,
@@ -8351,9 +8355,14 @@ missionControlTab.cleanup = function (callback) {
     // The elevation panel's drag listens on the document, so it outlives the tab unless
     // it is taken off here - reopening the tab would otherwise stack one pair per visit.
     $(document).off('.elevationDrag');
-    /* jBox appends its wrapper to body, which the tab switch does not empty, so the
-       modal's markup and its ids would stack one copy per visit. */
-    $('.jBox-wrapper').remove();
+    /* Destroy only this tab's own modal via jBox's API. Removing jBox wrappers
+       directly from the DOM instead (e.g. `$('.jBox-wrapper').remove()`) would hit
+       every jBox modal in the app, not just this tab's, and skips close()/destroy()
+       entirely — leaving any dialog.confirm()/alert() elsewhere in the app
+       permanently unresolved, since only a button click or jBox's own
+       onCloseComplete settles those promises. */
+    landSpeedNotUpdatedModal && landSpeedNotUpdatedModal.destroy();
+    landSpeedNotUpdatedModal = null;
     cleanupMissionControlLocationResources();
     if (elevationChartInstance) {
         elevationChartInstance.destroy();

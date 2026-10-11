@@ -37,11 +37,10 @@ var SerialBackend = (function () {
     var publicScope = {},
         privateScope = {};
 
-    // dialog.confirm() is non-blocking, unlike the window.confirm() it replaced, so the
-    // renderer's event loop keeps running while the unsaved-changes dialog is open. Guards
-    // reConnect() against being re-entered (e.g. a second click on connect/disconnect)
-    // while that dialog is still awaiting an answer.
-    var disconnectConfirmPending = false;
+    // Tracks the pending unsaved-changes confirm dialog, if any. A reentrant
+    // reConnect() call (e.g. handleReconnect()'s 5s reconnect timer firing while
+    // the dialog is still open) awaits this instead of opening a second dialog.
+    var disconnectConfirmPromise = null;
 
     privateScope.isDemoRunning = false;
 
@@ -257,21 +256,22 @@ var SerialBackend = (function () {
                         // Check for unsaved changes in JavaScript Programming tab
                         if (GUI.active_tab === javascriptProgrammingTab &&
                             javascriptProgrammingTab.isDirty) {
-                            if (disconnectConfirmPending) {
-                                console.log('[Disconnect] Unsaved-changes dialog already open, ignoring re-entrant call');
-                                return;
+                            if (disconnectConfirmPromise) {
+                                // Dialog already open from another call. Wait for the answer,
+                                // then retry from the top so this call re-evaluates fresh state.
+                                console.log('[Disconnect] Unsaved-changes dialog already open, waiting on existing answer then retrying');
+                                await disconnectConfirmPromise;
+                                return privateScope.reConnect();
                             }
+
                             console.log('[Disconnect] Checking for unsaved changes in JavaScript Programming tab');
                             const confirmMsg = i18n.getMessage('unsavedChanges') ||
                                 'You have unsaved changes. Leave anyway?';
 
-                            disconnectConfirmPending = true;
-                            let confirmed;
-                            try {
-                                confirmed = await dialog.confirm(confirmMsg);
-                            } finally {
-                                disconnectConfirmPending = false;
-                            }
+                            disconnectConfirmPromise = dialog.confirm(confirmMsg).finally(() => {
+                                disconnectConfirmPromise = null;
+                            });
+                            const confirmed = await disconnectConfirmPromise;
 
                             if (!confirmed) {
                                 console.log('[Disconnect] User cancelled disconnect due to unsaved changes');
