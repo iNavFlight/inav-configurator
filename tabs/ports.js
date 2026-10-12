@@ -11,10 +11,12 @@ import jBox from 'jbox';
 
 const portsTab = {};
 
+// Module-scoped (not local to initialize()) so cleanup() below can destroy it too.
+let mspWarningModal;
+
 portsTab.initialize = function (callback) {
 
     var columns = ['data', 'logging', 'sensors', 'telemetry', 'rx', 'peripherals'];
-    var mspWarningModal;
 
     /* PWM_TYPE_SRXL2. Assigning the Spektrum Smart ESC function and selecting that
      * protocol are two settings, and a port assigned without it is always a
@@ -227,6 +229,7 @@ portsTab.initialize = function (callback) {
         update_ui();
 
         // Initialize the MSP warning modal
+        mspWarningModal && mspWarningModal.destroy();
         mspWarningModal = new jBox('Modal', {
             width: 480,
             height: 200,
@@ -385,7 +388,8 @@ function applyBaudLock(baudSelect, column) {
 }
 
 portsTab.cleanup = function (callback) {
-    $('.jBox-wrapper').remove();
+    mspWarningModal && mspWarningModal.destroy();
+    mspWarningModal = null;
     if (callback) callback();
 };
 
