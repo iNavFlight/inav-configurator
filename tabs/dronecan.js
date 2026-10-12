@@ -485,7 +485,7 @@ dronecanTab.saveConfig = async function () {
     const bitrate = $('#dronecan-bitrate').val();
     const nodeId = Number.parseInt($('#dronecan-node-id').val(), 10);
     if (!isValidDronecanNodeId(nodeId)) {
-        dialog.alert(i18n.getMessage('dronecanNodeIdInvalid'));
+        void dialog.alert(i18n.getMessage('dronecanNodeIdInvalid'));
         return;
     }
     const useDNAServer = $('#dronecan-use-dna-server').prop('checked') ? 1 : 0;
