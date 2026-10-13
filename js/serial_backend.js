@@ -572,8 +572,19 @@ var SerialBackend = (function () {
     publicScope.read_serial = function (info) {
         if (!CONFIGURATOR.cliActive) {
             MSP.read(info);
-        } else if (CONFIGURATOR.cliActive) {
+            return;
+        }
+
+        // Until the banner, the tail of a response cut by the tab switch belongs to the decoder, not the CLI.
+        var mspBytes = CONFIGURATOR.cliValid ? 0 : MSP.read_until_idle(info);
+        if (mspBytes === 0) {
             cliTab.read(info);
+            return;
+        }
+
+        var rest = info.data.slice(mspBytes);
+        if (rest.byteLength > 0) {
+            cliTab.read({ ...info, data: rest });
         }
     }
 
