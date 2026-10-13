@@ -578,6 +578,11 @@
     color: #fff;
 }
 
+/* No switch or logic condition reaches it */
+.tab-osd .osd-layout-tab.is-unreached:not(.is-active) {
+    color: #a0a0a0;
+}
+
 .tab-osd .osd-layout-actions,
 .tab-osd .osd-preview-options {
     display: flex;
@@ -641,6 +646,12 @@
 
 .tab-osd .osd-preview-footer {
     padding: 0.6em;
+}
+
+.tab-osd .osd-layout-reach {
+    margin: 0 0 0.5em;
+    color: #4f4f4f;
+    line-height: 1.5;
 }
 
 .tab-osd .osd-preview-options {
