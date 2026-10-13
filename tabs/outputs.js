@@ -25,6 +25,49 @@ function srxl2StatusArrived(resp) {
     return Boolean(resp?.data);
 }
 
+/* The warning about the ports, or null when none is missing */
+function srxl2PortWarning(assigned, ports, motors) {
+    if (assigned === 0 && ports === 0) {
+        return i18n.getMessage('srxl2NoPort');
+    }
+    if (ports === 0) {
+        /* Assigned in the tab but not yet opened by the board: the ports
+         * are opened at startup, so this needs a reboot rather than
+         * another port. */
+        return i18n.getMessage('srxl2PortNeedsReboot', [assigned]);
+    }
+    if (ports < motors) {
+        return i18n.getMessage('srxl2TooFewPorts', [motors, ports]);
+    }
+    return null;
+}
+
+/*
+ * The count line, or null when the ports match the mixer: that is the
+ * normal state, and a line saying so is noise, so the figures appear
+ * only while the mixer is not set or a port is left over.
+ */
+function srxl2PortCountText(ports, motors) {
+    if (motors === 0) {
+        /* A board with no mixer preset applied reports no motors, which is
+         * a normal starting state and not worth phrasing as "for 0 motors". */
+        return i18n.getMessage('srxl2PortCountOpenNoMixer', [ports]);
+    }
+    if (ports > motors) {
+        return i18n.getMessage('srxl2PortCountOpen', [ports, motors]);
+    }
+    return null;
+}
+
+/* A note box shows its text, or goes away when there is none */
+function srxl2Note($box, text) {
+    if (text === null) {
+        $box.hide();
+    } else {
+        $box.html(text).show();
+    }
+}
+
 const outputsTab = {
     allowTestMode: false,
     srxl2Calibrating: false,
@@ -299,31 +342,13 @@ outputsTab.initialize = function (callback) {
                     /* The board has not been asked yet, or does not answer - say
                      * only what is certain rather than inventing a motor count. */
                     $warn.toggle(assigned === 0).html(i18n.getMessage('srxl2NoPort'));
-                    $info.html(i18n.getMessage('srxl2PortCount', [assigned]));
+                    $info.hide();
                     return;
                 }
 
-                const ports = srxl2Counts.ports;
-                const motors = srxl2Counts.motors;
-
-                if (assigned === 0 && ports === 0) {
-                    $warn.html(i18n.getMessage('srxl2NoPort')).show();
-                } else if (ports === 0) {
-                    /* Assigned in the tab but not yet opened by the board: the ports
-                     * are opened at startup, so this needs a reboot rather than
-                     * another port. */
-                    $warn.html(i18n.getMessage('srxl2PortNeedsReboot', [assigned])).show();
-                } else if (ports < motors) {
-                    $warn.html(i18n.getMessage('srxl2TooFewPorts', [motors, ports])).show();
-                } else {
-                    $warn.hide();
-                }
-
-                /* A board with no mixer preset applied reports no motors, which is
-                 * a normal starting state and not worth phrasing as "for 0 motors". */
-                $info.html(motors > 0
-                    ? i18n.getMessage('srxl2PortCountOpen', [ports, motors])
-                    : i18n.getMessage('srxl2PortCountOpenNoMixer', [ports]));
+                const warning = srxl2PortWarning(assigned, srxl2Counts.ports, srxl2Counts.motors);
+                srxl2Note($warn, warning);
+                srxl2Note($info, warning === null ? srxl2PortCountText(srxl2Counts.ports, srxl2Counts.motors) : null);
             } else {
                 srxl2CalStop();
             }
