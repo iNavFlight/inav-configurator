@@ -263,6 +263,8 @@ var MSPCodes = {
     // can't rely on a reading the current alignment settings already rotated.
     MSP2_INAV_MAG_UNALIGNED:            0x2232,
 
+    MSP2_INAV_I2C_BUSES:                0x2238,
+
     // MassZero Thermal Camera.
     // These sit in INAV's own 0x2000-0x2FFF range. The 0x3000 block belongs to
     // the Betaflight compatibility commands. MSP2_BETAFLIGHT_BIND is 0x3000.

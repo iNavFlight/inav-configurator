@@ -31,6 +31,35 @@ import settingsCache from './../settingsCache';
 import {Geozone, GeozoneVertex, GeozoneShapes } from './../geozone';
 import { parseDronecanAsyncRequestResponse } from './../dronecanAsyncRequestParse';
 
+// Stops at the end of the data, and drops a sensor whose bus is not listed.
+// Bit 7 of a bus number marks a software bus.
+function parseI2cBuses(data) {
+    if (data.byteLength < 1) {
+        return null;
+    }
+    const buses = [];
+    let offset = 0;
+    const busCount = data.getUint8(offset++);
+    for (let i = 0; i < busCount && offset + 2 <= data.byteLength; i++) {
+        const bus = data.getUint8(offset);
+        buses.push({ bus: bus & 0x7f, software: (bus & 0x80) !== 0, speed: data.getUint8(offset + 1), sensors: [] });
+        offset += 2;
+    }
+    const sensorCount = offset < data.byteLength ? data.getUint8(offset++) : 0;
+    for (let i = 0; i < sensorCount && offset + 4 <= data.byteLength; i++) {
+        const bus = buses.find(b => b.bus === (data.getUint8(offset) & 0x7f));
+        if (bus) {
+            bus.sensors.push({
+                address: data.getUint8(offset + 1),
+                role: data.getUint8(offset + 2),
+                hardware: data.getUint8(offset + 3)
+            });
+        }
+        offset += 4;
+    }
+    return buses;
+}
+
 var mspHelper = (function () {
     var self = {};
 
@@ -1956,6 +1985,10 @@ var mspHelper = (function () {
                 console.log("MZTC config saved");
                 break;
 
+            case MSPCodes.MSP2_INAV_I2C_BUSES:
+                FC.I2C_BUSES = dataHandler.unsupported ? null : parseI2cBuses(data);
+                break;
+
             default:
                 console.log('Unknown code detected: 0x' + dataHandler.code.toString(16));
         } else {
@@ -3252,6 +3285,10 @@ var mspHelper = (function () {
 
     self.loadMiscV2 = function (callback) {
         MSP.send_message(MSPCodes.MSPV2_INAV_MISC, false, false, callback);
+    };
+
+    self.loadI2cBuses = function (callback) {
+        MSP.send_message(MSPCodes.MSP2_INAV_I2C_BUSES, false, false, callback);
     };
 
     self.loadADSBLimits = function (callback) {
