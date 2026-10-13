@@ -23,6 +23,7 @@ var globalSettings = {
     cliAutocomplete: true,
     assistnowApiKey: null,
     googleApiKey: null,
+    openaipApiKey: null,
     assistnowOfflineData: [],
     assistnowOfflineDate: 0,
     store: null,
