@@ -267,7 +267,7 @@ outputsTab.initialize = function (callback) {
 
         function srxl2UpdateVisibility() {
             const isSrxl2 = Number.parseInt(FC.ADVANCED_CONFIG.motorPwmProtocol, 10) === SRXL2_PROTOCOL;
-            $('#srxl2-esc').toggle(isSrxl2);
+            $('#srxl2-esc, #srxl2-calibration').toggle(isSrxl2);
 
             /*
              * Reversible motors is the centre-zero throttle arrangement, which is a
