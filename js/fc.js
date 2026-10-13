@@ -773,6 +773,11 @@ var FC = {
             'CW 270° flip'
         ];
     },
+    // The one ESC protocol that is not a timer waveform: the motor is driven over a UART and takes no output pad
+    SRXL2_MOTOR_PROTOCOL: 7,
+    motorsUseTimers: function () {
+        return Number.parseInt(this.ADVANCED_CONFIG.motorPwmProtocol, 10) !== this.SRXL2_MOTOR_PROTOCOL;
+    },
     getEscProtocols: function () {
         return {
             0: {
