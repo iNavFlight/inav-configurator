@@ -651,12 +651,6 @@
     font-weight: bold;
 }
 
-.tab-mission-control .mpUnitHint {
-    margin-left: 4px;
-    color: #888;
-    font-size: 11px;
-}
-
 .tab-mission-control .pointSavedTick {
     float: right;
     margin: 5px 4px 0 0;
