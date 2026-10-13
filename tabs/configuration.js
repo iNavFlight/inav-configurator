@@ -41,9 +41,6 @@ const I2C_SENSOR_ROLES = {
     5: { label: 'sensorPitot', select: '#sensor-pitot' },
 };
 
-// I2CSpeed values, in the order of the i2c_speed table
-const I2C_SPEED_KHZ = [400, 800, 100, 200, 1000];
-
 function i2cBusSetting(bus) {
     return 'i2c' + (bus.bus + 1) + '_speed';
 }
@@ -88,13 +85,10 @@ function fillI2cBusRows() {
         // the firmware table keeps its historical order; show them by speed
         const $select = $('#' + i2cBusSetting(bus));
         const value = $select.val();
-        $select.append($select.children('option').get().sort((a, b) => parseInt(a.text, 10) - parseInt(b.text, 10)));
+        $select.append($select.children('option').get().sort((a, b) => Number.parseInt(a.text, 10) - Number.parseInt(b.text, 10)));
         $select.val(value);
         const sensors = bus.sensors.length ? bus.sensors.map(describeI2cSensor).join(', ') : i18n.getMessage('i2cBusNoSensors');
-        const running = i18n.getMessage('i2cBusRunningAt', [I2C_SPEED_KHZ[bus.speed] ?? '?']);
-        $select.siblings('label').find('.i2c-bus-sensors')
-            .text(sensors + ' · ')
-            .append($('<span class="i2c-bus-clock"></span>').text(running));
+        $select.siblings('label').find('.i2c-bus-sensors').text(sensors);
     }
 }
 
@@ -204,7 +198,7 @@ configurationTab.initialize = function (callback, scrollPosition) {
         import('./configuration.html?raw').then(({default: html}) => GUI.load(html, function () {
             addI2cBusRows();
             Settings.processHtml(process_html)();
-        }));
+        })).catch(error => console.error('Configuration tab failed to load:', error));
     }
 
     function process_html(settingsPromise) {

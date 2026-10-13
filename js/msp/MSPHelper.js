@@ -40,10 +40,9 @@ function parseI2cBuses(data) {
     const buses = [];
     let offset = 0;
     const busCount = data.getUint8(offset++);
-    for (let i = 0; i < busCount && offset + 2 <= data.byteLength; i++) {
-        const bus = data.getUint8(offset);
-        buses.push({ bus: bus & 0x7f, software: (bus & 0x80) !== 0, speed: data.getUint8(offset + 1), sensors: [] });
-        offset += 2;
+    for (let i = 0; i < busCount && offset < data.byteLength; i++) {
+        const bus = data.getUint8(offset++);
+        buses.push({ bus: bus & 0x7f, software: (bus & 0x80) !== 0, sensors: [] });
     }
     const sensorCount = offset < data.byteLength ? data.getUint8(offset++) : 0;
     for (let i = 0; i < sensorCount && offset + 4 <= data.byteLength; i++) {

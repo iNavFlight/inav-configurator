@@ -6177,13 +6177,10 @@
         "message": "$1 (software) Speed"
     },
     "configurationI2cBusSpeedHelp": {
-        "message": "Clock of this bus. 400kHz suits most setups; use 800kHz or 1000kHz only when every chip on the bus supports it, and 200kHz or 100kHz when a chip or long wires do not work reliably at 400kHz. The line below lists the sensors detected on the bus and the clock it runs at since the last boot."
+        "message": "Clock of this bus. 400kHz suits most setups; use 800kHz or 1000kHz only when every chip on the bus supports it, and 200kHz or 100kHz when a chip or long wires do not work reliably at 400kHz. The line below lists the sensors detected on the bus."
     },
     "i2cBusNoSensors": {
         "message": "No sensor detected"
-    },
-    "i2cBusRunningAt": {
-        "message": "running at $1 kHz"
     },
     "configurationVoltageMeterType": {
         "message": "Voltage Meter Type"

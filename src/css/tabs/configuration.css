@@ -292,7 +292,3 @@ hr {
     margin-top: 0.2em;
     color: #707070;
 }
-
-.tab-configuration .i2c-bus-clock {
-    white-space: nowrap;
-}
