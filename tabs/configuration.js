@@ -31,6 +31,67 @@ function updateIna226SettingsVisibility() {
     $('.adc-current-setting').toggle(!usesIna226Current);
 }
 
+// sensorIndex_e values the firmware lists in MSP2_INAV_I2C_BUSES, with the
+// select whose setting table names the detected hardware
+const I2C_SENSOR_ROLES = {
+    1: { label: 'sensorAccelerometer', select: '#sensor-acc' },
+    2: { label: 'sensorBarometer', select: '#sensor-baro' },
+    3: { label: 'sensorMagnetometer', select: '#sensor-mag' },
+    4: { label: 'sensorRangefinder', select: '#sensor-rangefinder' },
+    5: { label: 'sensorPitot', select: '#sensor-pitot' },
+};
+
+function i2cBusSetting(bus) {
+    return 'i2c' + (bus.bus + 1) + '_speed';
+}
+
+// Added before the settings are bound, so each select fills from its
+// i2cN_speed setting like the static ones and disappears without it.
+function addI2cBusRows() {
+    const $buses = $('.i2c-buses');
+    if (!FC.I2C_BUSES?.length) {
+        // keeps I2C Speed the last row, without the separator under it
+        $buses.remove();
+        return;
+    }
+    for (const bus of FC.I2C_BUSES) {
+        const setting = i2cBusSetting(bus);
+        const $row = $('<div class="select i2c-bus"></div>');
+        $('<select></select>').attr({ id: setting, 'data-setting': setting }).appendTo($row);
+        $('<label></label>').attr('for', setting)
+            .append($('<span></span>').text(i18n.getMessage(bus.software ? 'configurationI2cSoftwareBusSpeed' : 'configurationI2cBusSpeed',
+                ['I2C' + (bus.bus + 1)])))
+            .append('<span class="i2c-bus-sensors"></span>')
+            .appendTo($row);
+        $('<div class="helpicon cf_tip"></div>').attr({ for: setting, title: i18n.getMessage('configurationI2cBusSpeedHelp') })
+            .appendTo($row);
+        $row.appendTo($buses);
+    }
+}
+
+function describeI2cSensor(sensor) {
+    const role = I2C_SENSOR_ROLES[sensor.role];
+    const address = '0x' + sensor.address.toString(16).toUpperCase().padStart(2, '0');
+    if (!role) {
+        return address;
+    }
+    const names = $(role.select).data('setting-info')?.table?.values;
+    return i18n.getMessage(role.label) + ' ' + (names?.[sensor.hardware] ?? sensor.hardware) + ' (' + address + ')';
+}
+
+// Needs the sensor selects' setting tables, so it runs once the settings are loaded.
+function fillI2cBusRows() {
+    for (const bus of FC.I2C_BUSES || []) {
+        // the firmware table keeps its historical order; show them by speed
+        const $select = $('#' + i2cBusSetting(bus));
+        const value = $select.val();
+        $select.append($select.children('option').get().sort((a, b) => Number.parseInt(a.text, 10) - Number.parseInt(b.text, 10)));
+        $select.val(value);
+        const sensors = bus.sensors.length ? bus.sensors.map(describeI2cSensor).join(', ') : i18n.getMessage('i2cBusNoSensors');
+        $select.siblings('label').find('.i2c-bus-sensors').text(sensors);
+    }
+}
+
 function isMztcPortAssigned() {
     const ports = FC.SERIAL_CONFIG?.ports;
     if (!Array.isArray(ports)) {
@@ -91,7 +152,8 @@ configurationTab.initialize = function (callback, scrollPosition) {
         mspHelper.loadBoardAlignment,
         mspHelper.loadCurrentMeterConfig,
         mspHelper.loadMiscV2,
-        mspHelper.loadSerialPorts
+        mspHelper.loadSerialPorts,
+        mspHelper.loadI2cBuses
     ];
 
     loadChainer.setChain(loadChain);
@@ -133,7 +195,10 @@ configurationTab.initialize = function (callback, scrollPosition) {
     }
 
     function load_html() {
-        import('./configuration.html?raw').then(({default: html}) => GUI.load(html, Settings.processHtml(process_html)));
+        import('./configuration.html?raw').then(({default: html}) => GUI.load(html, function () {
+            addI2cBusRows();
+            Settings.processHtml(process_html)();
+        })).catch(error => console.error('Configuration tab failed to load:', error));
     }
 
     function process_html(settingsPromise) {
@@ -291,40 +356,30 @@ configurationTab.initialize = function (callback, scrollPosition) {
         $('#battery_capacity_critical').val(isNaN(batCapWarnCrit) ? "" : batCapWarnCrit);
         $('#battery_capacity_unit').val(FC.MISC.battery_capacity_unit);
 
-        let $i2cSpeed = $('#i2c_speed'),
-            $i2cSpeedInfo = $('#i2c_speed-info');
+        const $i2cSpeedInfo = $('#i2c_speed-info');
 
-        $i2cSpeed.on('change', function () {
-            let $this = $(this),
-                value = $this.children("option:selected").text();
+        // One speed per bus, or the single i2c_speed of older firmware
+        function updateI2cSpeedInfo() {
+            const speeds = $('#i2c_speed, .i2c-bus select').map(function () {
+                return $(this).children('option:selected').text();
+            }).get();
 
-            if (value == "400KHZ") {
-
-                $i2cSpeedInfo.removeClass('ok-box');
-                $i2cSpeedInfo.addClass('info-box');
-                $i2cSpeedInfo.removeClass('warning-box');
-
-                $i2cSpeedInfo.html(i18n.getMessage('i2cSpeedSuggested800khz'));
-                $i2cSpeedInfo.show();
-
-            } else if (value == "800KHZ") {
-                $i2cSpeedInfo.removeClass('ok-box');
-                $i2cSpeedInfo.removeClass('info-box');
-                $i2cSpeedInfo.removeClass('warning-box');
-                $i2cSpeedInfo.hide();
+            $i2cSpeedInfo.removeClass('ok-box info-box warning-box');
+            if (speeds.some(speed => speed === '100KHZ' || speed === '200KHZ')) {
+                $i2cSpeedInfo.addClass('warning-box').html(i18n.getMessage('i2cSpeedTooLow')).show();
+            } else if (speeds.includes('400KHZ')) {
+                $i2cSpeedInfo.addClass('info-box').html(i18n.getMessage('i2cSpeedSuggested800khz')).show();
             } else {
-                $i2cSpeedInfo.removeClass('ok-box');
-                $i2cSpeedInfo.removeClass('info-box');
-                $i2cSpeedInfo.addClass('warning-box');
-                $i2cSpeedInfo.html(i18n.getMessage('i2cSpeedTooLow'));
-                $i2cSpeedInfo.show();
+                $i2cSpeedInfo.hide();
             }
+        }
 
-        });
+        $('#i2c_speed, .i2c-bus select').on('change', updateI2cSpeedInfo);
 
         // Wait for settings to load before triggering change event
         settingsPromise.then(function() {
-            $i2cSpeed.trigger('change');
+            fillI2cBusRows();
+            updateI2cSpeedInfo();
             $('#vbat_meter_type, #current_meter_type').on('change', updateIna226SettingsVisibility);
             updateIna226SettingsVisibility();
             updateMztcSettingsVisibility();

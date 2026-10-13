@@ -275,3 +275,20 @@ hr {
     margin-right: 72px;
     vertical-align: top;
 }
+
+/* An I2C bus row: speed select, then its label with the sensors on that bus under it */
+.tab-configuration .i2c-bus {
+    display: flex;
+    align-items: flex-start;
+    column-gap: 0.26em;
+}
+
+.tab-configuration .i2c-bus label {
+    flex: 1;
+}
+
+.tab-configuration .i2c-bus-sensors {
+    display: block;
+    margin-top: 0.2em;
+    color: #707070;
+}

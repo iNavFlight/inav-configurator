@@ -134,6 +134,9 @@ var FC = {
 
         this.MZTC_STATUS = null;
 
+        // stays null on firmware without MSP2_INAV_I2C_BUSES
+        this.I2C_BUSES = null;
+
         this.SENSOR_STATUS = {
             isHardwareHealthy: 0,
             gyroHwStatus: 0,
