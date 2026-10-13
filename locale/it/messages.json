@@ -4981,7 +4981,7 @@
         "message": "Vuoi davvero ripristinare tutte le impostazioni?\nATTENZIONE: tutte le impostazioni andranno perse! Dovrai configurare tutto il velivolo dopo questa operazione!"
     },
     "confirm_select_defaults": {
-        "message": "Questo permette di selezionare nuovi valori predefiniti per tutte le impostazioni. I PID tune esistenti e altre impostazioni potrebbero andare persi!\nVuoi continuare?"
+        "message": "Questo permette di selezionare nuovi valori predefiniti per tutte le impostazioni. I PID tune esistenti e altre impostazioni verranno reimpostati!\nVuoi continuare?"
     },
     "confirm_reset_pid": {
         "message": "Questo ripristinerà tutte le impostazioni PID ai valori predefiniti del firmware e salverà.\nVuoi continuare?"
