@@ -315,7 +315,8 @@ const unusedWriteNames = [
 test('unused MZTC writes remain unused and conservatively blocked', () => {
     const sources = ['js', 'tabs'].flatMap(dir =>
         readdirSync(join(repoRoot, dir), { recursive: true })
-            .filter(file => file.endsWith('.js') && !(dir === 'js' && file === 'msp/MSPCodes.js'))
+            // readdirSync gives paths with the platform's separator
+            .filter(file => file.endsWith('.js') && !(dir === 'js' && file === join('msp', 'MSPCodes.js')))
             .map(file => readFileSync(join(repoRoot, dir, file), 'utf8'))
     ).join('\n');
     clearParseFailures();
