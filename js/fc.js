@@ -380,7 +380,8 @@ var FC = {
             battery_full_when_plugged_in: false,
             use_capacity_thresholds: false,
             battery_remaining_capacity: 0,
-            battery_flags: 0
+            battery_flags: 0,
+            bec_voltage: null
         };
 
         this.FC_CONFIG = {

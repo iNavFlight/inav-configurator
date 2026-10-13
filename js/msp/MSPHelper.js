@@ -347,6 +347,15 @@ var mspHelper = (function () {
                 FC.ANALOG.battery_percentage = data.getUint8(offset++);
                 FC.ANALOG.rssi = data.getUint16(offset, true); // 0-1023
                 offset += 2;
+                // Older firmware ends here; 0xFFFF: no BEC input on the board, or its channel is off
+                FC.ANALOG.bec_voltage = null;
+                if (data.byteLength >= offset + 2) {
+                    const bec = data.getUint16(offset, true);
+                    if (bec !== 0xFFFF) {
+                        FC.ANALOG.bec_voltage = bec / 100.0;
+                    }
+                    offset += 2;
+                }
                 //noinspection JSValidateTypes
                 dataHandler.analog_last_received_timestamp = Date.now();
                 break;
