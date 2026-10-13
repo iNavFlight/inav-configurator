@@ -117,6 +117,7 @@ const inertGeozoneUrl = dataModule(`
 `);
 
 const realMspHelperUrl = rewriteAndWrite('js/msp/MSPHelper.js', [
+    [/^import \{ parseProfileNames \} from '\.\/\.\.\/profileNames';$/m, `import { parseProfileNames } from '${realModuleUrl('js/profileNames.js')}';`, "import parseProfileNames"],
     [/^import semver from 'semver';$/m, `import semver from '${inertDefaultUrl}';`, "import semver"],
     [/^import '\.\/\.\.\/injected_methods';$/m, `import '${realInjectedMethodsUrl}';`, "import injected_methods"],
     [/^import GUI from '\.\/\.\.\/gui';$/m, `import GUI from '${guiStubUrl}';`, "import GUI"],
@@ -647,4 +648,28 @@ test('sendLedStripConfig() stops mid-chain when the queue drops one LED\'s write
 
     assert.equal(sentCodes.length, 1, 'a dropped write must not advance to the next LED');
     assert.equal(completed, false, 'onCompleteCallback must not run when an LED write never landed');
+});
+
+// A save can finish while the initial profile-name read is still queued.
+// Exercise the real MSP retry path so this refresh cannot silently disappear.
+test('profile names refresh is retried after an in-flight read clears', async () => {
+    mspQueue.flush();
+    mspDeduplicationQueue.flush();
+    mspQueue.unlock();
+    CONFIGURATOR.cliActive = false;
+    CONFIGURATOR.connection = false;
+    MSP.parseFailures.clear();
+    const code = MSPCodes.MSP2_INAV_PROFILE_NAMES;
+    mspDeduplicationQueue.put(code);
+    try {
+        mspHelper.handleResponse(makeDataHandler(MSPCodes.MSP_EEPROM_WRITE, [], null));
+        assert.equal(mspQueue.getLength(), 0, 'duplicate is initially deferred');
+        mspDeduplicationQueue.remove(code);
+        await wait(200);
+        assert.equal(mspQueue.getLength(), 1, 'saved names must be requested again');
+        assert.equal(mspDeduplicationQueue.check(code), true);
+    } finally {
+        mspQueue.flush();
+        mspDeduplicationQueue.flush();
+    }
 });

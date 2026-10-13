@@ -5,6 +5,7 @@ import FC from './fc';
 import interval from './intervals';
 import { scaleRangeInt } from './helpers';
 import i18n from './localization';
+import { profileOptionLabel } from './profileNames';
 import mspDeduplicationQueue from "./msp/mspDeduplicationQueue";
 import mspQueue from './serial_queue';
 
@@ -240,6 +241,21 @@ GUI_control.prototype.updateProfileChange = function(refresh) {
         }
         GUI.updateActivatedTab();
     }
+};
+
+// Label the header profile dropdowns with the user-defined profile names (FC.PROFILE_NAMES),
+// falling back to the plain translated labels when the firmware has none.
+GUI_control.prototype.updateProfileNames = function () {
+    const names = FC.PROFILE_NAMES;
+    const relabel = function ($select, messageKey, list) {
+        $select.find('option').each(function (index) {
+            $(this).text(profileOptionLabel(i18n.getMessage(messageKey + (index + 1)), list ? list[index] : ''));
+        });
+    };
+
+    relabel($('#profilechange'), 'sensorProfile', names ? names.control : null);
+    relabel($('#batteryprofilechange'), 'sensorBatteryProfile', names ? names.battery : null);
+    relabel($('#mixerprofilechange'), 'mixerProfile', names ? names.mixer : null);
 };
 
 GUI_control.prototype.fillSelect = function ($element, values, currentValue, unit) {
