@@ -4518,6 +4518,27 @@
     "osdLayoutAlternative": {
         "message": "Alternative Layout #$1"
     },
+    "osdLayoutTabDefault": {
+        "message": "Default"
+    },
+    "osdLayoutTabAlternative": {
+        "message": "ALT $1"
+    },
+    "osdElementSearch": {
+        "message": "Search elements"
+    },
+    "osdMoveInAllLayouts": {
+        "message": "Dragging moves the element in every layout"
+    },
+    "osdPositionsToAllLayouts": {
+        "message": "Use these positions in every layout"
+    },
+    "osdPositionsToAllLayoutsConfirm": {
+        "message": "Move the elements of the other layouts to where the $1 shows them? Elements it hides keep their places, and what each layout shows does not change."
+    },
+    "osdPositionsCopiedToAllLayouts": {
+        "message": "Positions copied to every layout"
+    },
     "osdUnitImperial": {
         "message": "Imperial"
     },
