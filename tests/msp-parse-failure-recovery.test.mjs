@@ -52,6 +52,7 @@ function realModuleUrl(relPath) {
 
 // --- real, import-free leaf modules, loadable straight by absolute URL -------
 const realMspCodesUrl = realModuleUrl('js/msp/MSPCodes.js');
+const realGpsSatellitesUrl = realModuleUrl('js/gpsSatellites.js');
 const realTimeoutsUrl = realModuleUrl('js/timeouts.js');
 const realConfiguratorUrl = realModuleUrl('js/data_storage.js');
 const realDedupUrl = realModuleUrl('js/msp/mspDeduplicationQueue.js');
@@ -135,6 +136,7 @@ const realMspHelperUrl = rewriteAndWrite('js/msp/MSPHelper.js', [
     [/^import Safehome from '\.\/\.\.\/safehome';$/m, `import Safehome from '${inertDefaultUrl}';`, "import Safehome"],
     [/^import \{ FwApproach \} from '\.\/\.\.\/fwApproach';$/m, `import { FwApproach } from '${inertFwApproachUrl}';`, "import FwApproach"],
     [/^import \{ parseDronecanAsyncRequestResponse \} from '\.\/\.\.\/dronecanAsyncRequestParse';$/m, `import { parseDronecanAsyncRequestResponse } from '${inertDronecanAsyncRequestParseUrl}';`, "import parseDronecanAsyncRequestResponse"],
+    [/^import \{ decodeSatellites \} from '\.\/\.\.\/gpsSatellites';$/m, `import { decodeSatellites } from '${realGpsSatellitesUrl}';`, "import decodeSatellites"],
     [/^import Waypoint from '\.\/\.\.\/waypoint';$/m, `import Waypoint from '${inertDefaultUrl}';`, "import Waypoint"],
     [/^import mspDeduplicationQueue from '\.\/mspDeduplicationQueue';$/m, `import mspDeduplicationQueue from '${realDedupUrl}';`, "import mspDeduplicationQueue"],
     [/^import mspStatistics from '\.\/mspStatistics';$/m, `import mspStatistics from '${realStatisticsUrl}';`, "import mspStatistics"],
