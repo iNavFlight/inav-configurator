@@ -5286,6 +5286,42 @@
     "portsPeripherals": {
         "message": "Peripherals"
     },
+    "portsPins": {
+        "message": "Pins"
+    },
+    "portsPinsHelp": {
+        "message": "Moves the port's TX or RX to an output pad, after Save and Reboot. A single-wire device (SmartAudio, Tramp, Smart ESC, SmartPort) needs only TX. A pad that carries a motor or servo of the mixer keeps the board from arming until the mixer no longer uses it."
+    },
+    "portsPinTx": {
+        "message": "TX"
+    },
+    "portsPinRx": {
+        "message": "RX"
+    },
+    "portsPinOwn": {
+        "message": "Own pin"
+    },
+    "portsPinMotor": {
+        "message": "motor $1"
+    },
+    "portsPinServo": {
+        "message": "servo $1"
+    },
+    "portsPinLed": {
+        "message": "LED strip"
+    },
+    "portsPinNote": {
+        "message": "replaces $1"
+    },
+    "portsPinBlocks": {
+        "message": "$1: no arming"
+    },
+    "portsPinRefused": {
+        "message": "The flight controller refused a pin choice in the Pins column. Nothing was saved."
+    },
+    "portsPinRefusedNotUndone": {
+        "message": "The flight controller refused a pin choice in the Pins column, and the choices sent before it could not be taken back. Nothing was saved: reconnect before saving from another tab."
+    },
     "appUpdateNotificationHeader": {
         "message": "New Configurator version available."
     },

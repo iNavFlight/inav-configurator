@@ -288,6 +288,13 @@ var FC = {
             motors: 0
         };
 
+        /*
+         * Output pads that can carry a UART's TX or RX instead, one entry per
+         * UART, direction and pad the board's pins allow. Empty on firmware
+         * without the feature, which keeps the Pins column out of the Ports tab.
+         */
+        this.SERIAL_PADS = [];
+
         this.MIXER_CONFIG = {
             yawMotorDirection: 0,
             yawJumpPreventionLimit: 0,
