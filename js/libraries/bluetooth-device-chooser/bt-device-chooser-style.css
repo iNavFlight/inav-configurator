@@ -52,3 +52,9 @@ h1 {
     text-align: center;
     display: block;
 }
+
+.divider {
+    border: none;
+    border-top: 1px solid #555;
+    margin: 8px 5px;
+}
