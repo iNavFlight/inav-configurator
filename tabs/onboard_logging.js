@@ -26,11 +26,20 @@ function lookupMagLearn() {
     });
 }
 
+// Firmware with the GSF estimator has its setting
+function lookupGsf() {
+    return mspHelper.getSetting("ahrs_gsf_yaw").catch(function(err) {
+        console.warn("ahrs_gsf_yaw lookup failed", err);
+        return null;
+    });
+}
+
 onboardLoggingTab.initialize = function (callback) {
     let
         saveCancelled, eraseCancelled,
         terrainEnabled = false,
-        magLearnSupported = false;
+        magLearnSupported = false,
+        gsfSupported = false;
 
     //Add future blackbox values here and in messages.json, the checkbox are drawn by js
     const blackBoxFields = [
@@ -49,6 +58,7 @@ onboardLoggingTab.initialize = function (callback) {
         "BLACKBOX_FEATURE_GYRO_PEAKS_YAW",
         "BLACKBOX_FEATURE_SERVOS",
         "BLACKBOX_FEATURE_MAG_LEARN",
+        "BLACKBOX_FEATURE_GSF",
     ];
 
     if (GUI.active_tab !== this) {
@@ -74,6 +84,9 @@ onboardLoggingTab.initialize = function (callback) {
         }).then(lookupMagLearn).then(function(data) {
             // only firmware that can learn the compass offsets logs them
             magLearnSupported = data != null;
+            return lookupGsf();
+        }).then(function(data) {
+            gsfSupported = data != null;
             MSP.send_message(MSPCodes.MSP2_BLACKBOX_CONFIG, false, false, load_html);
         });
     }
@@ -194,6 +207,9 @@ onboardLoggingTab.initialize = function (callback) {
             for (let i = 0; i < blackBoxFields.length; i++) {
                 const FIELD_ID = blackBoxFields[i];
                 if (FIELD_ID === "BLACKBOX_FEATURE_MAG_LEARN" && !magLearnSupported) {
+                    continue;
+                }
+                if (FIELD_ID === "BLACKBOX_FEATURE_GSF" && !gsfSupported) {
                     continue;
                 }
                 const isEnabled = (FC.BLACKBOX.blackboxIncludeFlags & 1<<i) !==0;

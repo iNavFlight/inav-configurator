@@ -3549,6 +3549,18 @@
     "magLearnStepTooBig": {
         "message": "the change ($1, $2, $3) is more than 30% of the field: calibrate the compass again"
     },
+    "gsfHead": {
+        "message": "Heading from GPS"
+    },
+    "gsfText": {
+        "message": "Learned in flight from the GPS velocity, without the compass."
+    },
+    "gsfAhrs": {
+        "message": "Use it for the heading"
+    },
+    "gsfAhrsHelp": {
+        "message": "Airplanes only. The GSF estimator learns the heading in flight from the GPS velocity and the accelerometers, without the compass, once the aircraft turns or changes speed; the blackbox can log it (field group GSF). ON: once settled it replaces the GPS course as the GPS heading, shared with the compass as set by ahrs_gps_yaw_weight; the compass is left out while it stays more than 25 degrees off it, and a heading far from it with no compass to hold it is reset to it, at most twice a flight."
+    },
     "OpflowScaleText": {
         "message": "Scale"
     },
@@ -6494,6 +6506,9 @@
     },
     "BLACKBOX_FEATURE_MAG_LEARN": {
         "message": "Learned compass offsets"
+    },
+    "BLACKBOX_FEATURE_GSF": {
+        "message": "Heading from GPS (GSF)"
     },
     "axisRoll": {
         "message": "Roll"

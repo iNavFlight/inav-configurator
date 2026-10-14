@@ -462,6 +462,10 @@ calibrationTab.initialize = function (callback) {
                 interval.add('mag_learn_status', pollMagLearn, 1000);
             }
         });
+        settingsLoaded.then(function () {
+            // Settings.processHtml() drops the switch when the firmware has no ahrs_gsf_yaw: the box goes with it
+            $('#gsf-box').toggleClass('is-hidden', $('#gsfAhrs').length === 0);
+        });
 
         GUI.content_ready(callback);
     }
