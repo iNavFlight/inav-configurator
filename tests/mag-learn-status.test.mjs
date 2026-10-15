@@ -6,7 +6,7 @@
 import { test, describe } from 'node:test';
 import assert from 'node:assert/strict';
 
-import { MAG_LEARN_FLAG, magLearnStatusText, magLearnedZero } from '../js/magLearnStatus.js';
+import { MAG_LEARN_FLAG, magLearnStatusText, magLearnedZero, magLearnedYawTrim } from '../js/magLearnStatus.js';
 
 const seen = [];
 
@@ -134,5 +134,28 @@ describe('magLearnedZero', () => {
 
     test('after a save the stored offsets already hold the change', () => {
         assert.deepEqual(magLearnedZero(state(MAG_LEARN_FLAG.SAVE_DUE | MAG_LEARN_FLAG.SAVED, [12, -9, 30]), stored), stored);
+    });
+});
+
+describe('magLearnedYawTrim', () => {
+    function state(flags, yawTrimDelta) {
+        return { supported: true, flags, sectors: 0, headings: 0, spread: 0, delta: [0, 0, 0], field: [0, 0, 0], yawTrimDelta };
+    }
+
+    test('nothing without the attitude fit or before the setting loaded', () => {
+        assert.equal(magLearnedYawTrim(state(MAG_LEARN_FLAG.SAVE_DUE, 30), -20), null);
+        assert.equal(magLearnedYawTrim(state(MAG_LEARN_FLAG.ATTITUDE_FIT, 30), NaN), null);
+    });
+
+    test('a pending trim adds to the stored one, a saved one is the stored one', () => {
+        assert.equal(magLearnedYawTrim(state(MAG_LEARN_FLAG.ATTITUDE_FIT | MAG_LEARN_FLAG.SAVE_DUE, 30), -20), 10);
+        assert.equal(magLearnedYawTrim(state(MAG_LEARN_FLAG.ATTITUDE_FIT | MAG_LEARN_FLAG.SAVED, 30), 10), 10);
+    });
+
+    test('the status says how far the trim moves', () => {
+        const s = state(MAG_LEARN_FLAG.SAVE_DUE | MAG_LEARN_FLAG.SAVED | MAG_LEARN_FLAG.ATTITUDE_FIT, -45);
+        s.delta = [1, 2, 3];
+        assert.equal(magLearnStatusText(s, true, (k, p) => k + (p ? '(' + p.join(',') + ')' : '')),
+            'magLearnSaved(1,2,3) magLearnYawTrim(-4.5)');
     });
 });

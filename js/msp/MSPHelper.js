@@ -1987,6 +1987,7 @@ var mspHelper = (function () {
                 FC.MAG_LEARN.delta = [data.getInt16(6, true), data.getInt16(8, true), data.getInt16(10, true)];
                 // The earth field came later: firmware before it stops at the delta
                 FC.MAG_LEARN.field = data.byteLength >= 18 ? [data.getInt16(12, true), data.getInt16(14, true), data.getInt16(16, true)] : [0, 0, 0];
+                FC.MAG_LEARN.yawTrimDelta = data.byteLength >= 20 ? data.getInt16(18, true) : 0;
                 break;
 
             default:

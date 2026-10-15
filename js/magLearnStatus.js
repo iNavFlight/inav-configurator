@@ -30,7 +30,18 @@ function attitudeNotes(learn, getMessage) {
         const declination = -Math.atan2(learn.field[1], learn.field[0]) * 180 / Math.PI;
         notes.push(getMessage('magLearnDeclinationOff', [declination.toFixed(0)]));
     }
+    if (learn.yawTrimDelta) {
+        notes.push(getMessage('magLearnYawTrim', [(learn.yawTrimDelta / 10).toFixed(1)]));
+    }
     return notes;
+}
+
+// The yaw trim the last flight's fit arrived at, in decidegrees, or null without one
+export function magLearnedYawTrim(learn, storedDecidegrees) {
+    if (!learn.supported || !(learn.flags & MAG_LEARN_FLAG.ATTITUDE_FIT) || !Number.isFinite(storedDecidegrees)) {
+        return null;
+    }
+    return learn.flags & MAG_LEARN_FLAG.SAVED ? storedDecidegrees : storedDecidegrees + learn.yawTrimDelta;
 }
 
 function withNotes(text, learn, getMessage) {
@@ -62,7 +73,7 @@ export function magLearnStatusText(learn, calibrated, getMessage) {
     }
     if (learn.flags & (MAG_LEARN_FLAG.COLLECTING | MAG_LEARN_FLAG.PAUSED)) {
         if (learn.flags & MAG_LEARN_FLAG.ATTITUDE_FIT) {
-            return getMessage('magLearnArmedAttitude', learn.delta);
+            return withNotes(getMessage('magLearnArmedAttitude', learn.delta), learn, getMessage);
         }
         return withNotes(getMessage('magLearnArmed', [learn.sectors, learn.headings]), learn, getMessage);
     }

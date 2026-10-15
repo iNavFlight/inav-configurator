@@ -300,7 +300,8 @@ var FC = {
             headings: 0,
             spread: 0,
             delta: [0, 0, 0],
-            field: [0, 0, 0]
+            field: [0, 0, 0],
+            yawTrimDelta: 0
         };
 
         this.MIXER_CONFIG = {

@@ -6,7 +6,7 @@ import MSPCodes from './../js/msp/MSPCodes';
 import MSP from './../js/msp';
 import GUI from './../js/gui';
 import FC from './../js/fc';
-import { MAG_LEARN_FLAG, magLearnStatusText, magLearnedZero } from './../js/magLearnStatus';
+import { MAG_LEARN_FLAG, magLearnStatusText, magLearnedZero, magLearnedYawTrim } from './../js/magLearnStatus';
 import timeout from './../js/timeouts';
 import interval from './../js/intervals';
 import i18n from './../js/localization';
@@ -36,6 +36,9 @@ function updateMagLearnStatus() {
             $('[name=MagLearned' + item + ']').val(learned[item]);
         });
     }
+    // The stored trim is a setting the page shows in degrees; empty until the settings have loaded
+    const trim = magLearnedYawTrim(FC.MAG_LEARN, Math.round(parseFloat($('#MagYawTrim').val()) * 10));
+    $('[name=MagLearnedYawTrim]').val(trim === null ? '' : (trim / 10).toFixed(1));
 }
 
 // Only the offsets the board wrote: an unsaved edit elsewhere in the tab stays
