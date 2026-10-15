@@ -1,3 +1,9 @@
+/* The accelerometer steps stay in view while the right column scrolls past them */
+.tab-calibration .threefourth_left {
+    position: sticky;
+    top: 0;
+}
+
 .tab-calibration .content_toolbar {
     left: 0px;
     }
