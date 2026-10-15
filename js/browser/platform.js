@@ -124,8 +124,6 @@ export function installBrowserPlatform() {
         filePath: `browser-download:${defaultPath.split("/").pop()}`,
       };
     },
-    alertDialog: (message) => alert(message),
-    confirmDialog: async (message) => confirm(message),
     async readFile(id, encoding = "utf8") {
       const file = fileHandles.get(id);
       if (!file)

@@ -22,4 +22,5 @@ eeprom.bin
 tags
 TAGS
 start-with-debugging.sh
+configurator-dev-debug.log
 dist-web/

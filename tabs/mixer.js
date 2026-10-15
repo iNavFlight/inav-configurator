@@ -18,6 +18,9 @@ import BitHelper from './../js/bitHelper';
 
 const mixerTab = {};
 
+// Module-scoped (not local to initialize()) so cleanup() below can destroy them too.
+let modal, motorWizardModal, servoTargetWarningModal;
+
 mixerTab.initialize = function (callback, scrollPosition) {
 
     let loadChainer = new MSPChainerClass(),
@@ -28,10 +31,7 @@ mixerTab.initialize = function (callback, scrollPosition) {
         $servoMixTable,
         $servoMixTableBody,
         $motorMixTable,
-        $motorMixTableBody,
-        modal,
-        motorWizardModal,
-        servoTargetWarningModal;
+        $motorMixTableBody;
 
     if (GUI.active_tab !== this) {
         GUI.active_tab = this;
@@ -648,6 +648,7 @@ mixerTab.initialize = function (callback, scrollPosition) {
             $mixerPreset = $('#mixer-preset'),
             $wizardButton = $("#mixer-wizard");
 
+        motorWizardModal && motorWizardModal.destroy();
         motorWizardModal = new jBox('Modal', {
             width: 500,
             height: 560,
@@ -1007,6 +1008,7 @@ mixerTab.initialize = function (callback, scrollPosition) {
         // Re-run after settings load, since configureInputs() is async.
         settingsPromise.then(() => updateMotorDirection());
 
+        modal && modal.destroy();
         modal = new jBox('Modal', {
             width: 480,
             height: 240,
@@ -1017,6 +1019,7 @@ mixerTab.initialize = function (callback, scrollPosition) {
             content: $('#mixerApplyContent')
         });
 
+        servoTargetWarningModal && servoTargetWarningModal.destroy();
         servoTargetWarningModal = new jBox('Modal', {
             width: 480,
             height: 200,
@@ -1163,9 +1166,12 @@ mixerTab.initialize = function (callback, scrollPosition) {
 };
 
 mixerTab.cleanup = function (callback) {
-    //delete modal;
-    //delete motorWizardModal;
-    $('.jBox-wrapper').remove();
+    modal && modal.destroy();
+    modal = null;
+    motorWizardModal && motorWizardModal.destroy();
+    motorWizardModal = null;
+    servoTargetWarningModal && servoTargetWarningModal.destroy();
+    servoTargetWarningModal = null;
     if (callback) callback();
 };
 

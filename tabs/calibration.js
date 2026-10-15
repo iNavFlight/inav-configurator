@@ -13,8 +13,8 @@ import jBox from 'jbox';
 
 const calibrationTab = {};
 
-// Module-scoped (not local to initialize()) so cleanup() below can close it too.
-let modalMagAlign;
+// Module-scoped (not local to initialize()) so cleanup() below can close them too.
+let modalMagAlign, modalStart, modalStop, modalProcessing;
 
 // Pure functions of their arguments -- module-scoped rather than redeclared on
 // every calibrationTab.initialize() call.
@@ -75,12 +75,9 @@ calibrationTab.model = (function () {
 calibrationTab.initialize = function (callback) {
 
     var loadChainer = new MSPChainerClass(),
-        saveChainer = new MSPChainerClass(),
-        modalStart,
-        modalStop,
-        modalProcessing;
+        saveChainer = new MSPChainerClass();
 
-    modalMagAlign = undefined; // reset the module-scoped modal handle for this tab session
+    modalMagAlign = modalStart = modalStop = modalProcessing = undefined;
 
     if (GUI.active_tab !== this) {
         GUI.active_tab = this;
@@ -173,6 +170,7 @@ calibrationTab.initialize = function (callback) {
                 $('#modal-mag-align-setting').text(formatMagAlignment(after));
                 content = $('#modal-mag-align-done');
             }
+            modalMagAlign && modalMagAlign.destroy();
             modalMagAlign = new jBox('Modal', {
                 width: 460,
                 height: 200,
@@ -190,6 +188,7 @@ calibrationTab.initialize = function (callback) {
 
     function checkFinishAccCalibrate() {
         if (calibrationTab.model.next() === null) {
+            modalStop && modalStop.destroy();
             modalStop = new jBox('Modal', {
                 width: 400,
                 height: 200,
@@ -213,6 +212,7 @@ calibrationTab.initialize = function (callback) {
                 }
             }
             updateCalibrationSteps();
+            modalStart && modalStart.destroy();
             modalStart = new jBox('Modal', {
                 width: 400,
                 height: 200,
@@ -231,6 +231,7 @@ calibrationTab.initialize = function (callback) {
         if (newStep !== null) {
             $button.addClass('disabled');
 
+            modalProcessing && modalProcessing.destroy();
             modalProcessing = new jBox('Modal', {
                 width: 400,
                 height: 120,
@@ -319,7 +320,8 @@ calibrationTab.initialize = function (callback) {
 
             $(button).addClass('disabled');
 
-            let modalProcessing = new jBox('Modal', {
+            modalProcessing && modalProcessing.destroy();
+            modalProcessing = new jBox('Modal', {
                 width: 400,
                 height: 120,
                 animation: false,
@@ -335,15 +337,13 @@ calibrationTab.initialize = function (callback) {
                     setTimeout(function () {
                         $(button).removeClass('disabled');
 
-                        modalProcessing.close();
+                        // content is a .clone(), so destroy() (not close()) to discard
+                        // this clone's wrapper rather than leaving it closed-but-present.
+                        modalProcessing.destroy();
                         GUI.log(i18n.getMessage('initialSetupMagCalibEnded'));
 
                         MSP.send_message(MSPCodes.MSP_CALIBRATION_DATA, false, false, updateSensorData);
                         interval.remove('compass_calibration_interval');
-
-                        //Cleanup
-                       //delete modalProcessing;
-                        $('.jBox-wrapper').remove();
 
                         if (magAlignBefore !== null) {
                             reportMagCalibrationOrientation(magAlignBefore);
@@ -365,6 +365,7 @@ calibrationTab.initialize = function (callback) {
 
             $(button).addClass('disabled');
 
+            modalProcessing && modalProcessing.destroy();
             modalProcessing = new jBox('Modal', {
                 width: 400,
                 height: 120,
@@ -417,11 +418,15 @@ calibrationTab.initialize = function (callback) {
 };
 
 calibrationTab.cleanup = function (callback) {
-    // reportMagCalibrationOrientation() can leave this open if the user switches tabs
-    // before dismissing it -- without this, it stays visible over whatever tab they land on.
-    if (modalMagAlign) {
-        modalMagAlign.close();
-    }
+    // Any of these can still be open if the user switches tabs mid-calibration, or (for
+    // modalMagAlign specifically) after reportMagCalibrationOrientation() opens it
+    // asynchronously once calibration finishes -- without this they'd stay visible over
+    // whatever tab the user lands on.
+    modalMagAlign && modalMagAlign.destroy();
+    modalStart && modalStart.destroy();
+    modalStop && modalStop.destroy();
+    modalProcessing && modalProcessing.destroy();
+    modalMagAlign = modalStart = modalStop = modalProcessing = null;
 
     if (callback) callback();
 };
