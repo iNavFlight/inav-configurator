@@ -6,7 +6,7 @@
 import { test, describe } from 'node:test';
 import assert from 'node:assert/strict';
 
-import { MAG_LEARN_FLAG, magLearnStatusText } from '../js/magLearnStatus.js';
+import { MAG_LEARN_FLAG, magLearnStatusText, magLearnedZero } from '../js/magLearnStatus.js';
 
 const seen = [];
 
@@ -108,5 +108,31 @@ describe('magLearnStatusText', () => {
                 MAG_LEARN_FLAG.STEP_TOO_BIG, MAG_LEARN_FLAG.SAVED, MAG_LEARN_FLAG.DISARMED_FLYING, MAG_LEARN_FLAG.DECLINATION_OFF,
                 MAG_LEARN_FLAG.FITS_DISAGREE, MAG_LEARN_FLAG.CONFIRMED],
             [1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384]);
+    });
+});
+
+describe('magLearnedZero', () => {
+    const stored = { X: -46, Y: -98, Z: 122 };
+
+    function state(flags, delta = [0, 0, 0]) {
+        return { supported: true, flags, sectors: 0, headings: 0, spread: 0, delta, field: [0, 0, 0] };
+    }
+
+    test('nothing without a fit', () => {
+        assert.equal(magLearnedZero(state(0), stored), null);
+        assert.equal(magLearnedZero(state(MAG_LEARN_FLAG.COLLECTING | MAG_LEARN_FLAG.FEW_SECTORS), stored), null);
+    });
+
+    test('nothing on firmware without mag_learn', () => {
+        assert.equal(magLearnedZero({ ...state(MAG_LEARN_FLAG.SAVE_DUE, [5, 5, 5]), supported: false }, stored), null);
+    });
+
+    test('a fit not yet written adds its change to the stored offsets', () => {
+        assert.deepEqual(magLearnedZero(state(MAG_LEARN_FLAG.SAVE_DUE, [12, -9, 30]), stored), { X: -34, Y: -107, Z: 152 });
+        assert.deepEqual(magLearnedZero(state(MAG_LEARN_FLAG.STEP_TOO_BIG, [400, 0, 0]), stored), { X: 354, Y: -98, Z: 122 });
+    });
+
+    test('after a save the stored offsets already hold the change', () => {
+        assert.deepEqual(magLearnedZero(state(MAG_LEARN_FLAG.SAVE_DUE | MAG_LEARN_FLAG.SAVED, [12, -9, 30]), stored), stored);
     });
 });

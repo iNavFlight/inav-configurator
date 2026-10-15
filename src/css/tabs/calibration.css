@@ -1,7 +1,73 @@
-/* The accelerometer steps stay in view while the right column scrolls past them */
+/* Each column scrolls on its own: the accelerometer steps stay in view while the right column scrolls */
+.tab-calibration .content_wrapper {
+    overflow: hidden;
+}
+
+/* The step tiles shrink with the window so the accelerometer column fits without scrolling down to a 768 px high one */
+.tab-calibration {
+    --cal-tile: clamp(95px, calc((100vh - 580px) / 2), 180px);
+}
+
+.tab-calibration .content_wrapper > .cf_column.full {
+    display: grid;
+    grid-template-columns: 75% 25%;
+    grid-template-rows: auto minmax(0, 1fr);
+    float: none;
+    height: 100%;
+}
+
+/* Placed by hand: the documentation button the app adds after the title is a grid item too */
+.tab-calibration .content_wrapper > .cf_column.full > .tab_title {
+    grid-column: 1 / -1;
+    grid-row: 1;
+}
+
+.tab-calibration .content_wrapper > .cf_column.full > .cf_doc_version_bt {
+    grid-column: 1 / -1;
+    grid-row: 1;
+    justify-self: end;
+    align-self: start;
+}
+
+/* Its usual negative margin lifts it from the row below into the title's; here it already sits in that row */
+.tab-calibration .cf_doc_version_bt a {
+    margin-top: 0;
+}
+
+.tab-calibration .threefourth_left,
+.tab-calibration .fourth {
+    grid-row: 2;
+    float: none;
+    width: auto;
+    min-height: 0;
+    overflow-y: auto;
+}
+
 .tab-calibration .threefourth_left {
-    position: sticky;
-    top: 0;
+    grid-column: 1;
+}
+
+.tab-calibration .fourth {
+    grid-column: 2;
+}
+
+/* What mag_learn worked out in the last flight, next to the stored offsets */
+.tab-calibration #mag-calibrated-data .mag-learned,
+.tab-calibration #mag-calibrated-data .mag-learned-head {
+    display: none;
+}
+
+.tab-calibration #mag-calibrated-data.with-learned .mag-learned {
+    display: table-cell;
+}
+
+.tab-calibration #mag-calibrated-data.with-learned .mag-learned-head {
+    display: table-row;
+}
+
+.tab-calibration #mag-calibrated-data .mag-learned-head td {
+    font-size: 11px;
+    color: #828885;
 }
 
 .tab-calibration .content_toolbar {
@@ -11,17 +77,17 @@
 .tab-calibration .tile {
     float: left;
     width: calc(33% - 10px);
-    height: 180px;
+    height: var(--cal-tile);
     background-color: #ddd;
     border-radius: 7px;
     border: solid 1px silver;
     margin-right: 14px;
     margin-bottom: 15px;
     box-shadow: inset 0 0 10px #ccc;
-    background-size: 140px;
+    background-size: calc(var(--cal-tile) * 0.78);
     background-position: center;
     background-repeat: no-repeat;
-    background-position-y: 30px;
+    background-position-y: calc(var(--cal-tile) * 0.167);
 } 
   
 .tab-calibration .tile:nth-child(4) {
@@ -49,7 +115,7 @@
 .tab-calibration .indicator {
     float: right;
     margin-right: 20px;
-    margin-top: 106px;
+    margin-top: calc(var(--cal-tile) - 74px);
     width: 30px;
     height: 30px;
     text-align: center;
@@ -84,8 +150,8 @@
 
  .tab-calibration .step1 {
     background-image: url(./../../../images/icons/pos1_grey.svg);
-    background-size: 185px;
-    background-position-y: 10px;
+    background-size: calc(var(--cal-tile) * 1.03);
+    background-position-y: calc(var(--cal-tile) * 0.056);
 }
 
  .tab-calibration .step1.active, .tab-calibration .step1.finished {
@@ -94,8 +160,8 @@
 
 .tab-calibration .step2 {
     background-image: url(./../../../images/icons/pos2_grey.svg);
-    background-size: 185px;
-    background-position-y: 10px;
+    background-size: calc(var(--cal-tile) * 1.03);
+    background-position-y: calc(var(--cal-tile) * 0.056);
 }
 
  .tab-calibration .step2.active, .tab-calibration .step2.finished {
@@ -140,10 +206,6 @@
     margin-top: 5px;
     padding:5px;
     min-height: 45px;
-}
-
-.tab-calibration #mag-learn-status {
-    margin-top: 0.5em;
 }
 
 .tab-calibration .gsf-intro {

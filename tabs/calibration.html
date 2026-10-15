@@ -84,29 +84,40 @@
                             </div>
                         </div>
                         <table id="mag-calibrated-data" class="cf_table">
+                            <tr class="mag-learned-head">
+                                <td></td>
+                                <td data-i18n="magStored"></td>
+                                <td data-i18n="magLearned" id="mag-learned-title"></td>
+                            </tr>
                             <tr>
                                 <td><label for="MagX" data-i18n="MagXText"><span></span></label></td>
                                 <td><input readonly disabled type="number" name="MagX" min="-32768" max="32767"></td>
+                                <td class="mag-learned"><input readonly disabled type="number" name="MagLearnedX"></td>
                             </tr>
                             <tr>
                                 <td><label for="MagY" data-i18n="MagYText"><span></span></label></td>
                                 <td><input readonly disabled type="number" name="MagY" min="-32768" max="32767"></td>
+                                <td class="mag-learned"><input readonly disabled type="number" name="MagLearnedY"></td>
                             </tr>
                             <tr>
                                 <td><label for="MagZ" data-i18n="MagZText"><span></span></label></td>
                                 <td><input readonly disabled type="number" name="MagZ" min="-32768" max="32767"></td>
+                                <td class="mag-learned"><input readonly disabled type="number" name="MagLearnedZ"></td>
                             </tr>
                             <tr>
                                 <td><label for="MagGainX" data-i18n="MagGainXText"><span></span></label></td>
                                 <td><input readonly disabled type="number" name="MagGainX" min="-32768" max="32767"></td>
+                                <td class="mag-learned"></td>
                             </tr>
                             <tr>
                                 <td><label for="MagGainY" data-i18n="MagGainYText"><span></span></label></td>
                                 <td><input readonly disabled type="number" name="MagGainY" min="-32768" max="32767"></td>
+                                <td class="mag-learned"></td>
                             </tr>
                             <tr>
                                 <td><label for="MagGainZ" data-i18n="MagGainZText"><span></span></label></td>
                                 <td><input readonly disabled type="number" name="MagGainZ" min="-32768" max="32767"></td>
+                                <td class="mag-learned"></td>
                             </tr>
                         </table>
                         <div class="checkbox setting-container" id="mag-learn-setting">
@@ -114,7 +125,6 @@
                             <label for="magLearn"><span data-i18n="magLearn">Learn in flight</span></label>
                             <div for="magLearn" class="helpicon cf_tip" data-i18n_title="magLearnHelp"></div>
                         </div>
-                        <div id="mag-learn-status" class="is-hidden"></div>
                     </div>
                 </div>
                 <div class="gui_box grey is-hidden" id="gsf-box">

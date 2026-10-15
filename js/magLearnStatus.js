@@ -37,6 +37,23 @@ function withNotes(text, learn, getMessage) {
     return [text, ...attitudeNotes(learn, getMessage)].join(' ');
 }
 
+// A fit ran and left an estimate in delta, saved or not
+const FIT_FLAGS = MAG_LEARN_FLAG.ATTITUDE_FIT | MAG_LEARN_FLAG.SAVE_DUE | MAG_LEARN_FLAG.SAVED | MAG_LEARN_FLAG.CONFIRMED |
+    MAG_LEARN_FLAG.NOT_SPHERE | MAG_LEARN_FLAG.OFF_SCALE | MAG_LEARN_FLAG.STEP_TOO_BIG | MAG_LEARN_FLAG.FITS_DISAGREE;
+
+// The offsets the last flight's fit arrived at, or null without one. After a save the stored ones already hold them.
+export function magLearnedZero(learn, stored) {
+    if (!learn.supported || !(learn.flags & FIT_FLAGS)) {
+        return null;
+    }
+    const saved = learn.flags & MAG_LEARN_FLAG.SAVED;
+    const learned = {};
+    ['X', 'Y', 'Z'].forEach(function (axis, i) {
+        learned[axis] = saved ? stored[axis] : stored[axis] + learn.delta[i];
+    });
+    return learned;
+}
+
 // The firmware resets this state at every arming and keeps it in RAM, so it covers the last flight since power-on.
 // getMessage is i18n.getMessage, passed in to keep this free of the app's modules.
 export function magLearnStatusText(learn, calibrated, getMessage) {

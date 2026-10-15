@@ -6,7 +6,7 @@ import MSPCodes from './../js/msp/MSPCodes';
 import MSP from './../js/msp';
 import GUI from './../js/gui';
 import FC from './../js/fc';
-import { MAG_LEARN_FLAG, magLearnStatusText } from './../js/magLearnStatus';
+import { MAG_LEARN_FLAG, magLearnStatusText, magLearnedZero } from './../js/magLearnStatus';
 import timeout from './../js/timeouts';
 import interval from './../js/intervals';
 import i18n from './../js/localization';
@@ -26,7 +26,16 @@ function magAlignmentSettingsEqual(a, b) {
 
 function updateMagLearnStatus() {
     const text = magLearnStatusText(FC.MAG_LEARN, FC.getMagnetometerCalibrated(), i18n.getMessage);
-    $('#mag-learn-status').text(text).toggleClass('is-hidden', !FC.MAG_LEARN.supported);
+    // The column says what the flight learned; why it was or was not written shows on its title
+    $('#mag-learned-title').attr('title', text);
+
+    const learned = magLearnedZero(FC.MAG_LEARN, FC.CALIBRATION_DATA.magZero);
+    $('#mag-calibrated-data').toggleClass('with-learned', learned !== null);
+    if (learned) {
+        ['X', 'Y', 'Z'].forEach(function (item) {
+            $('[name=MagLearned' + item + ']').val(learned[item]);
+        });
+    }
 }
 
 // Only the offsets the board wrote: an unsaved edit elsewhere in the tab stays
@@ -34,6 +43,7 @@ function updateMagZero() {
     ['X', 'Y', 'Z'].forEach(function (item) {
         $('[name=Mag' + item + ']').val(FC.CALIBRATION_DATA.magZero[item]);
     });
+    updateMagLearnStatus();
 }
 
 // Progress while armed and the outcome after the disarm change with the tab open; a save shows the new offsets
