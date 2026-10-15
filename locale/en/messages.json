@@ -3511,7 +3511,7 @@
         "message": "Learn in flight"
     },
     "magLearnHelp": {
-        "message": "ON refits the compass offsets (Zero X, Y, Z) from the readings of each flight and saves them at disarm, if the flight turned through at least 270 degrees and the readings agree with the stored calibration. The gains stay as they are. Needs a calibrated compass: after moving the compass, or what sits near it, calibrate again."
+        "message": "ON refits the compass offsets (Zero X, Y, Z) from the readings of each flight and saves them at disarm, if the flight turned through at least 270 degrees and the readings agree with the stored calibration. While the heading from GPS is usable in flight the readings are also fitted against the attitude: a right-angle turn is then enough for a small correction, a large one is saved only when both fits agree, and a compass that does not follow the attitude is reported. A change under 1% is not written. The gains stay as they are. Needs a calibrated compass: after moving the compass, or what sits near it, calibrate again."
     },
     "magLearnNeedsCalibration": {
         "message": "Calibrate the compass first: learning in flight only refines a calibration."
@@ -3548,6 +3548,21 @@
     },
     "magLearnStepTooBig": {
         "message": "the change ($1, $2, $3) is more than 30% of the field: calibrate the compass again"
+    },
+    "magLearnArmedAttitude": {
+        "message": "Learning against the heading from GPS: offsets off by $1, $2, $3."
+    },
+    "magLearnMisfit": {
+        "message": "The readings did not follow the attitude: check the compass orientation and gains."
+    },
+    "magLearnDeclinationOff": {
+        "message": "The field pointed $1 degrees from magnetic north: the compass may sit turned, or the declination is wrong."
+    },
+    "magLearnConfirmed": {
+        "message": "Last flight: calibration confirmed, the change would have been under 1%."
+    },
+    "magLearnFitsDisagree": {
+        "message": "the fit against the heading from GPS and the sphere fit disagree on the offsets: iron near the compass, or a tilt the alignment does not know"
     },
     "gsfHead": {
         "message": "Heading from GPS"
