@@ -39,30 +39,9 @@
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtempSync, rmSync } from 'node:fs';
-import { tmpdir } from 'node:os';
-import { join, dirname, resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
-import { makeRewriteAndWrite } from './helpers/rewriteAndWrite.mjs';
-import { buildCommonFcImportRules } from './helpers/fcModuleLoader.mjs';
+import { loadRealFc } from './helpers/fcModuleLoader.mjs';
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const repoRoot = resolve(__dirname, '..');
-
-const tmpDir = mkdtempSync(join(tmpdir(), 'fc-getmodeid-raw-box-order-'));
-process.on('exit', () => rmSync(tmpDir, { recursive: true, force: true }));
-
-const rewriteAndWrite = makeRewriteAndWrite(repoRoot, tmpDir, 'fc-getmodeid-raw-box-order.test.mjs');
-
-const { realFlightModesUrl, commonImportRules } = buildCommonFcImportRules(repoRoot);
-
-// The real, current (fixed) js/fc.js, imports rewritten only.
-const fixedFcUrl = rewriteAndWrite('js/fc.js', commonImportRules, 'fc-fixed');
-const { default: FC_fixed } = await import(fixedFcUrl);
-
-// Also import the real FLIGHT_MODES table directly to look up permanentIds
-// for building the scenario below without hand-duplicating box data.
-const { FLIGHT_MODES } = await import(realFlightModesUrl);
+const { FC: FC_fixed, FLIGHT_MODES } = await loadRealFc('fc-getmodeid-raw-box-order.test.mjs');
 
 const ARM_PERMANENT_ID = FLIGHT_MODES.find((m) => m.boxName === 'ARM').permanentId;
 const FAILSAFE_PERMANENT_ID = FLIGHT_MODES.find((m) => m.boxName === 'FAILSAFE').permanentId;
