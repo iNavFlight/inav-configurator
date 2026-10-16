@@ -17,6 +17,7 @@ import { PortHandler } from './../js/port_handler';
 import i18n from './../js/localization';
 import store from './../js/store';
 import dialog from './../js/dialog';
+import { changedItemIds, visibleItemIds, saveLayoutItems } from './../js/osdBulkSave';
 
 var SYM = SYM || {};
 SYM.LAST_CHAR = 225; // For drawing the font preview
@@ -3461,16 +3462,10 @@ OSD.GUI.updateAll = function() {
                 OSD.data.layouts[OSD.data.selected_layout] = JSON.parse(JSON.stringify(layout_clipboard.layout));
                 layouts.trigger('change');
 
-                var allSaved = true;
-                for(var index in OSD.data.layouts[OSD.data.selected_layout])
-                {
-                    var item = OSD.data.layouts[OSD.data.selected_layout][index];
-                    if(!(item.isVisible === false && oldLayout[index].isVisible === false) && (oldLayout[index].x !== item.x || oldLayout[index].y !== item.y || oldLayout[index].position !== item.position || oldLayout[index].isVisible !== item.isVisible)){
-                        if (!(await OSD.saveItem({id: index}))) {
-                            allSaved = false;
-                            break;
-                        }
-                    }
+                var layout = OSD.data.layouts[OSD.data.selected_layout];
+                var allSaved = await saveLayoutItems(layout, oldLayout, changedItemIds(oldLayout, layout), OSD.saveItem);
+                if (!allSaved) {
+                    layouts.trigger('change');
                 }
 
                 GUI.log(i18n.getMessage(allSaved ? 'osdLayoutPasteFromClipboard' : 'osdLayoutSaveItemFailed'));
@@ -3490,15 +3485,9 @@ OSD.GUI.updateAll = function() {
             OSD.data.layouts[OSD.data.selected_layout] = clearedLayout;
             layouts.trigger('change');
 
-            var allSaved = true;
-            for(var index in OSD.data.layouts[OSD.data.selected_layout]) {
-                var item = OSD.data.layouts[OSD.data.selected_layout][index];
-                if(oldLayout[index].isVisible === true){
-                    if (!(await OSD.saveItem({id: index}))) {
-                        allSaved = false;
-                        break;
-                    }
-                }
+            var allSaved = await saveLayoutItems(clearedLayout, oldLayout, visibleItemIds(oldLayout), OSD.saveItem);
+            if (!allSaved) {
+                layouts.trigger('change');
             }
 
             GUI.log(i18n.getMessage(allSaved ? 'osdClearLayout' : 'osdLayoutSaveItemFailed'));

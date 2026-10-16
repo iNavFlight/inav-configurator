@@ -16,15 +16,15 @@
  * clear loops check that return value, stop on the first failure, and log a
  * failure message instead of the success one.
  *
- * This file does not drive the real MSP transport or DOM (see
- * tests/magnetometer-slider.test.mjs for the established pattern) - it
- * mirrors the relevant logic with a mock MSP.promise() and a mock saveItem
- * built the same way as the real tabs/osd.js code, plus a line-for-line
- * mirror of the paste/clear loop.
+ * This file does not drive the real MSP transport or DOM. It imports the
+ * production bulk-save helpers from js/osdBulkSave.js, the same functions the
+ * paste/clear handlers in tabs/osd.js call. OSD.saveItem is stood in for by a
+ * mock built the same way as the real one.
  */
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import { changedItemIds, visibleItemIds, saveLayoutItems } from '../js/osdBulkSave.js';
 
 // Mirrors the fixed tabs/osd.js `OSD.saveItem` body, parameterized on a mock
 // MSP.promise() so tests can control which writes the "FC" refuses.
@@ -37,20 +37,6 @@ function createSaveItem(mspPromise) {
             return true;
         }).catch(() => false);
     };
-}
-
-// Mirrors the fixed `paste`/`clear` click-handler loop shape: await each
-// saveItem() call, stop on the first failure, and pick success vs. failure
-// message based on whether every item saved.
-async function runSaveLoop(saveItem, ids) {
-    var allSaved = true;
-    for (const id of ids) {
-        if (!(await saveItem({ id }))) {
-            allSaved = false;
-            break;
-        }
-    }
-    return allSaved ? 'success-message' : 'failure-message';
 }
 
 test('OSD.saveItem resolves true and runs the callback when the write succeeds', async () => {
@@ -75,30 +61,58 @@ test('OSD.saveItem resolves false (not rejected) and skips the callback when the
     assert.equal(result, false);
 });
 
-test('paste/clear loop stops at the first refused write and reports failure', async () => {
-    const refusedId = 2;
-    const attempted = [];
-    const saveItem = createSaveItem((item) => {
-        attempted.push(item.id);
-        return item.id === refusedId ? Promise.reject(new Error('refused')) : Promise.resolve();
-    });
+const item = (x, y, isVisible) => ({ x, y, position: y * 30 + x, isVisible });
+const clone = (v) => JSON.parse(JSON.stringify(v));
 
-    const message = await runSaveLoop(saveItem, [0, 1, 2, 3, 4]);
+test('changedItemIds skips entries hidden before and after, and unmoved ones', () => {
+    const oldLayout = [item(1, 1, true), item(2, 2, false), item(3, 3, true), item(4, 4, false)];
+    const newLayout = [item(1, 1, true), item(9, 9, false), item(5, 3, true), item(4, 4, true)];
 
-    assert.equal(message, 'failure-message');
-    // Items after the refused one must never be attempted.
-    assert.deepEqual(attempted, [0, 1, 2]);
+    assert.deepEqual(changedItemIds(oldLayout, newLayout), ['2', '3']);
 });
 
-test('paste/clear loop reports success only when every write succeeds', async () => {
+test('visibleItemIds lists only visible entries', () => {
+    assert.deepEqual(visibleItemIds([item(0, 0, true), item(1, 1, false), item(2, 2, true)]), ['0', '2']);
+});
+
+test('saveLayoutItems writes every id and keeps the layout when all writes land', async () => {
+    const oldLayout = [item(0, 0, true), item(1, 1, true), item(2, 2, true)];
+    const layout = oldLayout.map((i) => ({ ...i, isVisible: false }));
     const attempted = [];
-    const saveItem = createSaveItem((item) => {
-        attempted.push(item.id);
-        return Promise.resolve();
-    });
+    const saveItem = async ({ id }) => { attempted.push(id); return true; };
 
-    const message = await runSaveLoop(saveItem, [0, 1, 2]);
+    assert.equal(await saveLayoutItems(layout, oldLayout, ['0', '1', '2'], saveItem), true);
+    assert.deepEqual(attempted, ['0', '1', '2']);
+    assert.ok(layout.every((i) => i.isVisible === false));
+});
 
-    assert.equal(message, 'success-message');
-    assert.deepEqual(attempted, [0, 1, 2]);
+test('saveLayoutItems stops at a refused write and restores it and the unattempted entries', async () => {
+    const oldLayout = [item(0, 0, true), item(1, 1, true), item(2, 2, true), item(3, 3, true)];
+    const layout = oldLayout.map((i) => ({ ...i, isVisible: false }));
+    const attempted = [];
+    const saveItem = async ({ id }) => { attempted.push(id); return id !== '1'; };
+
+    assert.equal(await saveLayoutItems(layout, oldLayout, ['0', '1', '2', '3'], saveItem), false);
+    assert.deepEqual(attempted, ['0', '1']);
+    assert.equal(layout[0].isVisible, false, 'the entry that landed stays applied');
+    assert.deepEqual(layout.slice(1), oldLayout.slice(1), 'refused and unattempted entries are put back');
+});
+
+test('saveLayoutItems restores copies so the layout never aliases oldLayout', async () => {
+    const oldLayout = [item(0, 0, true)];
+    const layout = [item(5, 5, true)];
+
+    await saveLayoutItems(layout, oldLayout, ['0'], async () => false);
+    layout[0].x = 99;
+
+    assert.equal(oldLayout[0].x, 0);
+});
+
+test('a retry after a failed save writes the entries that were not persisted', async () => {
+    const oldLayout = [item(0, 0, true), item(1, 1, true)];
+    const requested = oldLayout.map((i) => ({ ...i, isVisible: false }));
+    const layout = clone(requested);
+
+    await saveLayoutItems(layout, oldLayout, visibleItemIds(oldLayout), async ({ id }) => id !== '1');
+    assert.deepEqual(changedItemIds(layout, requested), ['1']);
 });
