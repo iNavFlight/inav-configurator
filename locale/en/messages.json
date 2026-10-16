@@ -4800,6 +4800,9 @@
     "osdFontUploadFailed": {
         "message": "<span style=\"color: red\">Failed</span> to upload the OSD font; the upload is incomplete, please try again"
     },
+    "ErrorReadingFile": {
+        "message": "<span style=\"color: red\">Failed</span> to read the file"
+    },
     "osdFontFileInvalid": {
         "message": "<span style=\"color: red\">Failed</span> to load the font file; it is not a valid MCM font"
     },
