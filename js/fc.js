@@ -565,7 +565,9 @@ var FC = {
             state: 0,
             filesystemLastError: 0,
             freeSizeKB: 0,
-            totalSizeKB: 0
+            totalSizeKB: 0,
+            // Free space of the whole card: null if the firmware does not report it, MSP.SDCARD_FREE_SPACE_UNKNOWN until counted
+            cardFreeSizeKB: null
         };
 
         this.BLACKBOX = {

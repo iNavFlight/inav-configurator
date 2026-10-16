@@ -1231,6 +1231,7 @@ var mspHelper = (function () {
                 FC.SDCARD.filesystemLastError = data.getUint8(2);
                 FC.SDCARD.freeSizeKB = data.getUint32(3, true);
                 FC.SDCARD.totalSizeKB = data.getUint32(7, true);
+                FC.SDCARD.cardFreeSizeKB = data.byteLength >= 15 ? data.getUint32(11, true) : null;
                 break;
             case MSPCodes.MSP_VTX_CONFIG:
                 FC.VTX_CONFIG.device_type = data.getUint8(offset++);
