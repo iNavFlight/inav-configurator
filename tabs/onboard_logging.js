@@ -285,12 +285,46 @@ onboardLoggingTab.initialize = function (callback) {
         }
     }
 
+    // A segment of the SD card bar and its legend entry, both hidden when empty
+    function update_sdcard_part(part, valueKB, label) {
+        $(".tab-onboard_logging .sdcard-contents ." + part).css({
+            width: (valueKB / FC.SDCARD.totalSizeKB * 100) + "%",
+            display: valueKB > 0 ? 'block' : 'none'
+        });
+        $(".tab-onboard_logging .sdcard-legend ." + part)
+            .toggle(valueKB > 0)
+            .text(label + " " + formatFilesizeKilobytes(valueKB));
+    }
+
+    function update_sdcard_space() {
+        const
+            sdcard = FC.SDCARD,
+            unknown = sdcard.cardFreeSizeKB === MSP.SDCARD_FREE_SPACE_UNKNOWN;
+
+        update_sdcard_part("sdcard-free", sdcard.freeSizeKB, i18n.getMessage('sdcardFreeForLogs'));
+
+        $(".tab-onboard_logging .sdcard-other").toggleClass("not-counted", unknown);
+
+        // Older firmware only reports the freefile, where logs go: the rest of the card shows as one part
+        if (sdcard.cardFreeSizeKB === null || unknown) {
+            update_sdcard_part("sdcard-card-free", 0, "");
+            update_sdcard_part("sdcard-other", sdcard.totalSizeKB - sdcard.freeSizeKB, i18n.getMessage(unknown ? 'sdcardNotCounted' : 'sdcardUnavailable'));
+        } else {
+            update_sdcard_part("sdcard-card-free", sdcard.cardFreeSizeKB - sdcard.freeSizeKB, i18n.getMessage('sdcardOtherFree'));
+            update_sdcard_part("sdcard-other", sdcard.totalSizeKB - sdcard.cardFreeSizeKB, i18n.getMessage('sdcardUsed'));
+        }
+
+        $(".tab-onboard_logging .sdcard-card-space").toggle(sdcard.cardFreeSizeKB !== null);
+        $(".tab-onboard_logging .sdcard-card-free-note").toggle(!unknown);
+        $(".tab-onboard_logging .sdcard-card-free-total").text(unknown ? i18n.getMessage('sdcardCardFreeUnknown') :
+            i18n.getMessage('sdcardCardFree', [formatFilesizeKilobytes(sdcard.cardFreeSizeKB), formatFilesizeKilobytes(sdcard.totalSizeKB)]));
+    }
+
     function update_html() {
         update_bar_width($(".tab-onboard_logging .dataflash-used"), FC.DATAFLASH.usedSize, FC.DATAFLASH.totalSize, "Used space", false);
         update_bar_width($(".tab-onboard_logging .dataflash-free"), FC.DATAFLASH.totalSize - FC.DATAFLASH.usedSize, FC.DATAFLASH.totalSize, "Free space", false);
 
-        update_bar_width($(".tab-onboard_logging .sdcard-other"), FC.SDCARD.totalSizeKB - FC.SDCARD.freeSizeKB, FC.SDCARD.totalSizeKB, "Unavailable space", true);
-        update_bar_width($(".tab-onboard_logging .sdcard-free"), FC.SDCARD.freeSizeKB, FC.SDCARD.totalSizeKB, "Free space for logs", true);
+        update_sdcard_space();
 
         $(".btn a.erase-flash, .btn a.save-flash").toggleClass("disabled", FC.DATAFLASH.usedSize == 0);
 
