@@ -1,6 +1,9 @@
-import { join } from 'node:path';
-import { pathToFileURL } from 'node:url';
+import { mkdtempSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join, dirname, resolve } from 'node:path';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { dataModule } from './dataModule.mjs';
+import { makeRewriteAndWrite } from './rewriteAndWrite.mjs';
 
 // Trivial no-arg-constructible stand-ins for the collection/model classes
 // FC.resetState() instantiates. Shared across the js/fc.js-loading regression
@@ -73,4 +76,26 @@ export function buildCommonFcImportRules(repoRoot, { bitHelperUrl } = {}) {
     ];
 
     return { realFlightModesUrl, realBitHelperUrl, commonImportRules };
+}
+
+const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
+
+/**
+ * Loads the real, current js/fc.js (imports rewritten only) together with the
+ * real FLIGHT_MODES table, for tests that look up permanentIds to build their
+ * scenarios without hand-duplicating box data. The rewritten copy lives in a
+ * temp dir that is removed when the process exits.
+ *
+ * Returns { FC, FLIGHT_MODES }.
+ */
+export async function loadRealFc(testFileName) {
+    const tmpDir = mkdtempSync(join(tmpdir(), testFileName.replace(/\.test\.mjs$/, '-')));
+    process.on('exit', () => rmSync(tmpDir, { recursive: true, force: true }));
+
+    const rewriteAndWrite = makeRewriteAndWrite(repoRoot, tmpDir, testFileName);
+    const { realFlightModesUrl, commonImportRules } = buildCommonFcImportRules(repoRoot);
+
+    const { default: FC } = await import(rewriteAndWrite('js/fc.js', commonImportRules, 'fc-fixed'));
+    const { FLIGHT_MODES } = await import(realFlightModesUrl);
+    return { FC, FLIGHT_MODES };
 }
