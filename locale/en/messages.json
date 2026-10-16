@@ -4084,7 +4084,7 @@
         "message": "Length of the final approach, also includes the glide and intercept phase. This is the length from the safe home point to the final turn point."
     },
     "fwLandFinalApproachPitch2throttle": {
-        "message": "Modifier for pitch to throttle ratio at final approach"
+        "message": "Pitch to throttle on the final"
     },
     "fwLandFinalApproachPitch2throttleHelp": {
         "message": "This value is multiplied by the \"pitch to throttle ratio\" value during the final approach. Allows the velocity to be reduced."
@@ -4118,6 +4118,297 @@
     },
     "fwLandMaxTailwindHelp": {
         "message": "This value is used when no headwind landing is possible and wind speeds below this value are ignored (inaccuracies in INAV wind measurement)."
+    },
+    "tabAutoland": {
+        "message": "Autoland"
+    },
+    "tabAutolandTitle": {
+        "message": "Fixed wing autoland"
+    },
+    "autolandNotAirplane": {
+        "message": "The landing approach and circuit are for fixed wing aircraft; the other platforms do not fly them. A multirotor lands straight down on its home or safehome point: see Advanced Tuning, Auto landing settings."
+    },
+    "autolandSite": {
+        "message": "Landing site"
+    },
+    "autolandSiteSelect": {
+        "message": "Safehome"
+    },
+    "autolandSafehomeN": {
+        "message": "Safehome {{number}}"
+    },
+    "autolandSafehomeUnset": {
+        "message": "Safehome {{number}} (not set)"
+    },
+    "autolandApproachAlt": {
+        "message": "Approach altitude [m]"
+    },
+    "autolandApproachAltHelp": {
+        "message": "Altitude of the wind circle and of the start of the approach, relative to the home altitude unless measured from sea level."
+    },
+    "autolandLandAlt": {
+        "message": "Landing altitude [m]"
+    },
+    "autolandLandAltHelp": {
+        "message": "Altitude of the landing site, with the same reference as the approach altitude. Compare it with the GPS altitude measured at the field."
+    },
+    "autolandSeaLevel": {
+        "message": "Altitudes above sea level"
+    },
+    "autolandSide": {
+        "message": "Approach side"
+    },
+    "autolandSideLeft": {
+        "message": "Left"
+    },
+    "autolandSideRight": {
+        "message": "Right"
+    },
+    "autolandSideHelp": {
+        "message": "Side of the runway the approach is flown on, seen from the first landing heading. With a landing circuit this is the free side, away from trees and buildings, whatever the landing direction."
+    },
+    "autolandHeading1": {
+        "message": "Landing heading 1 [deg]"
+    },
+    "autolandHeading2": {
+        "message": "Landing heading 2 [deg]"
+    },
+    "autolandHeadingHelp": {
+        "message": "Runway heading. The aircraft can land both ways along it unless it is set as only in this direction. 0 = not used."
+    },
+    "autolandHeadingExclusive": {
+        "message": "Only in this direction"
+    },
+    "autolandCircuit": {
+        "message": "Landing circuit"
+    },
+    "fwLandDownwindOffset": {
+        "message": "Wind circle distance from the runway"
+    },
+    "fwLandDownwindOffsetHelp": {
+        "message": "Gap between the landing site and the edge of the wind circle, flown beside the runway on the approach side. 0 = classic approach: the circle is flown over the landing site."
+    },
+    "fwLandLoiterRadius": {
+        "message": "Wind circle radius"
+    },
+    "fwLandLoiterRadiusHelp": {
+        "message": "Radius of the wind circle. The aircraft cannot turn tighter than its coordinated turn at the approach speed and the navigation bank angle, so the circle grows to that. 0 = the loiter radius."
+    },
+    "fwLandFinalAlt": {
+        "message": "Altitude at the start of the final"
+    },
+    "fwLandFinalAltHelp": {
+        "message": "Height above the landing site where the straight final starts. 0 = two thirds of the approach altitude."
+    },
+    "fwLandAimOffset": {
+        "message": "Aim point before the landing site"
+    },
+    "fwLandAimOffsetHelp": {
+        "message": "The glide path meets the ground this far before the landing site: the float after the throttle cut lands the aircraft on the site instead of past it."
+    },
+    "autolandGlideFlare": {
+        "message": "Glide and flare"
+    },
+    "fwLandApproachSpeed": {
+        "message": "Approach speed"
+    },
+    "fwLandApproachSpeedHelp": {
+        "message": "Airspeed held with the throttle from the wind circle to the throttle cut, within the Auto Speed limits (fw_auto_speed_min_speed, fw_auto_speed_max_speed); the wind circle is planned for it. With flaps it can be lower than the cruise speed: a smaller circle, gentler turns, a slower touchdown. Needs a valid airspeed, a pitot or the virtual one; never held on ground speed. 0 = the throttle follows the pitch."
+    },
+    "fwLandFlareSink": {
+        "message": "Flare sink rate"
+    },
+    "fwLandFlareSinkHelp": {
+        "message": "Sink rate the flare holds, with the flare pitch as the lowest pitch it commands. 0 = the flare holds the flare pitch."
+    },
+    "autolandChecks": {
+        "message": "Checks"
+    },
+    "autolandCheckRangefinder": {
+        "message": "Rangefinder for the flare"
+    },
+    "autolandCheckSafehome": {
+        "message": "Safehome position set"
+    },
+    "autolandCheckSafehomeNote": {
+        "message": "Not set: RTH will not land here. Set it in Mission Control."
+    },
+    "autolandCheckHeading": {
+        "message": "Landing heading set"
+    },
+    "autolandCheckHeadingNote": {
+        "message": "None: the aircraft circles down over the site."
+    },
+    "autolandCheckRth": {
+        "message": "RTH lands"
+    },
+    "autolandCheckRthNote": {
+        "message": "NEVER: RTH circles over the site."
+    },
+    "autolandCheckRthFailsafe": {
+        "message": "Only after a failsafe RTH."
+    },
+    "autolandCheckCircuit": {
+        "message": "Landing circuit"
+    },
+    "autolandCheckCircuitClassic": {
+        "message": "Off (circle distance 0): classic approach, circle over the site."
+    },
+    "autolandCheckCircuitMissing": {
+        "message": "Not in this firmware: classic approach."
+    },
+    "autolandTopView": {
+        "message": "Seen from above"
+    },
+    "autolandSpeed": {
+        "message": "Approach speed"
+    },
+    "autolandSatellite": {
+        "message": "Satellite image"
+    },
+    "autolandSatelliteOffline": {
+        "message": "No satellite image with the map proxy chosen in the options, which serves the maps offline."
+    },
+    "autolandUnitM": {
+        "message": "m"
+    },
+    "autolandUnitMs": {
+        "message": "m/s"
+    },
+    "autolandSatelliteNoSite": {
+        "message": "This safehome has no position yet: set it in Mission Control to see the satellite image."
+    },
+    "autolandNoApproach": {
+        "message": "No landing heading for this site: enter landing heading 1 on the left."
+    },
+    "autolandRunway": {
+        "message": "Runway"
+    },
+    "autolandDrawingHelp": {
+        "message": "Only for the drawing, not sent to the flight controller. The radius of the turns and the space they take depend on the approach speed: the one set in the landing circuit when it is held, otherwise an estimate that starts from the navigation cruise speed. INAV knows the landing site, not the runway: its length and width only draw it, centred on the site."
+    },
+    "autolandAltitudeLegend": {
+        "message": "Altitude above the landing site: 0"
+    },
+    "autolandAltitudeMax": {
+        "message": "{{alt}} m"
+    },
+    "autolandProfile": {
+        "message": "Altitude along the approach"
+    },
+    "autolandSave": {
+        "message": "Save"
+    },
+    "autolandSaved": {
+        "message": "Autoland settings and landing sites saved"
+    },
+    "autolandGridStep": {
+        "message": "grid {{step}} m"
+    },
+    "autolandRunwayAxis": {
+        "message": "runway axis, heading {{heading}}°"
+    },
+    "autolandWindCircle": {
+        "message": "wind circle"
+    },
+    "autolandRadiusValue": {
+        "message": "r {{radius}} m"
+    },
+    "autolandAltitudeRange": {
+        "message": "{{from}} → {{to}} m"
+    },
+    "autolandAimPoint": {
+        "message": "aim point"
+    },
+    "autolandThrottleCut": {
+        "message": "throttle cut {{alt}} m"
+    },
+    "autolandFlarePoint": {
+        "message": "flare {{alt}} m"
+    },
+    "autolandFlareFrom": {
+        "message": "flare from {{alt}} m"
+    },
+    "fwLandFlareTime": {
+        "message": "Flare time constant"
+    },
+    "fwLandFlareTimeHelp": {
+        "message": "Time constant of the sink-rate flare: it asks (height + this x the flare sink) / this, so it ends at the flare sink on the ground, and starts where that equals the final's sink. Longer is gentler and takes longer over the ground; at least twice the time the aircraft takes to answer a pitch command with its flight path, about a second on a small model."
+    },
+    "autolandLandingSite": {
+        "message": "landing site"
+    },
+    "autolandProfileAxis": {
+        "message": "distance from the circle exit [m]"
+    },
+    "autolandFinalAltLine": {
+        "message": "final altitude {{alt}} m"
+    },
+    "autolandTooltip": {
+        "message": "{{alt}} m high, {{distance}} m to the aim point"
+    },
+    "autolandLandTowards": {
+        "message": "Landing towards {{heading}}°"
+    },
+    "autolandPhase_downwind": {
+        "message": "Downwind"
+    },
+    "autolandPhase_base": {
+        "message": "Base"
+    },
+    "autolandPhase_turnFinal": {
+        "message": "Turn onto the final"
+    },
+    "autolandPhase_final": {
+        "message": "Final"
+    },
+    "autolandPhase_glide": {
+        "message": "Glide"
+    },
+    "autolandPhase_flare": {
+        "message": "Flare"
+    },
+    "autolandPhaseShort_turnFinal": {
+        "message": "T into F"
+    },
+    "autolandRunwayStart": {
+        "message": "Runway start"
+    },
+    "autolandRunwayStartAt": {
+        "message": "m, crossed at"
+    },
+    "autolandRunwayStartHeight": {
+        "message": "Height the final crosses the runway start at"
+    },
+    "autolandRunwayStartHelp": {
+        "message": "For the selected landing direction, saved with the site: where the runway begins before the landing site, and the height the final crosses it at. The wheels touch where the flare ends from there: the ground before the runway (a field, obstacles) is crossed high enough and the flare is flown over the runway. A greater height moves the touchdown further down the runway, as the profile shows. Empty: the wheels touch at the common point of the landing circuit (nav_fw_land_aim_offset)."
+    },
+    "autolandWarning_lowBeforeRunway": {
+        "message": "Below {{height}} m {{value}} m before the runway: the ground there need not be level or clear. Set where the runway starts for this direction, or a greater height over it."
+    },
+    "autolandWarning_noHeading": {
+        "message": "No landing heading set: the aircraft will circle down over the site instead of flying an approach."
+    },
+    "autolandWarning_finalSteep": {
+        "message": "The final descends at {{value}}°: steeper than 8° builds speed before the flare."
+    },
+    "autolandWarning_legsSteep": {
+        "message": "The circuit descends at {{value}}° before the final: steeper than 8° builds speed."
+    },
+    "autolandWarning_circleClose": {
+        "message": "The edge of the wind circle is only {{value}} m from the landing site."
+    },
+    "autolandWarning_circleWider": {
+        "message": "At {{speed}} m/s and {{bank}}° bank the tightest circle is {{value}} m: flown instead of {{setting}} m, moved out to keep the gap from the runway."
+    },
+    "autolandWarning_baseShort": {
+        "message": "The base leg is only {{value}} m long: the two turns overlap and the aircraft turns from the downwind straight onto the final."
+    },
+    "autolandWarning_finalAboveApproach": {
+        "message": "The final starts at {{value}} m, above the approach altitude."
+    },
+    "autolandWarning_glideBelowFlare": {
+        "message": "The throttle cut ({{value}} m) is not above the flare altitude."
     },
     "osd_unsupported_msg1": {
         "message": "Your flight controller isn't responding to OSD commands. This probably means that it does not have an integrated OSD."

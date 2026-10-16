@@ -82,8 +82,14 @@ let FwApproachCollection = function () {
             buffer.push(BitHelper.specificByte(fwApproach.getLandHeading2(), 0));
             buffer.push(BitHelper.specificByte(fwApproach.getLandHeading2(), 1));
             buffer.push(fwApproach.getIsSeaLevelRef());
+            for (let i = 0; i < 4; i++) {
+                buffer.push(fwApproach.getRunwayStart(i));
+            }
+            for (let i = 0; i < 4; i++) {
+                buffer.push(fwApproach.getRunwayStartHeight(i));
+            }
         } else {
-            buffer = Array(15).fill(0);
+            buffer = Array(23).fill(0);
             buffer[0] = safehomeId;
         }
         

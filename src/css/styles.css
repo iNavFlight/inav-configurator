@@ -11,6 +11,7 @@
 @import '../../node_modules/ol/ol.css';
 @import 'tabs/adjustments.css';
 @import 'tabs/advanced_tuning.css';
+@import 'tabs/autoland.css';
 @import 'tabs/auxiliary.css';
 @import 'tabs/calibration.css';
 @import 'tabs/cli.css';

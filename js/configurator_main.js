@@ -51,6 +51,7 @@ import osdTab from './../tabs/osd';
 import sensorsTab from './../tabs/sensors';
 import loggingTab from './../tabs/logging';
 import advancedTuningTab from './../tabs/advanced_tuning';
+import autolandTab from './../tabs/autoland';
 import onboardLoggingTab from  './../tabs/onboard_logging';
 import cliTab from './../tabs/cli';
 import searchTab from './../tabs/search';
@@ -416,6 +417,9 @@ $(function() {
                             break;
                         case 'advanced_tuning':
                             advancedTuningTab.initialize(content_ready);
+                            break;
+                        case 'autoland':
+                            autolandTab.initialize(content_ready);
                             break;
                         case 'programming':
                             programmingTab.initialize(content_ready);

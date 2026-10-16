@@ -10,6 +10,12 @@ const ApproachDirection = Object.freeze({
 let FwApproach = function (number, approachAltAsl = 0, landAltAsl = 0, approachDirection = 0, landHeading1 = 0, landHeading2 = 0, isSeaLevelRef = 0, elevation = 0) {
 
     var self = {};
+    // landing along heading 1, its reverse, heading 2, its reverse: where the runway starts before the site [m]
+    // (0: the common touchdown point) and the height the final crosses it at [dm]
+    let runwayStarts = [0, 0, 0, 0];
+    let runwayStartHeights = [0, 0, 0, 0];
+    // the firmware sent them (INAV 11): an older one has no runway start
+    let runwayKnown = false;
 
     self.getNumber = function () {
         return number;
@@ -67,6 +73,30 @@ let FwApproach = function (number, approachAltAsl = 0, landAltAsl = 0, approachD
         isSeaLevelRef = data;
     }
 
+    self.getRunwayKnown = function () {
+        return runwayKnown;
+    }
+
+    self.setRunwayKnown = function (data) {
+        runwayKnown = data;
+    }
+
+    self.getRunwayStart = function (index) {
+        return runwayStarts[index];
+    }
+
+    self.setRunwayStart = function (index, data) {
+        runwayStarts[index] = data;
+    }
+
+    self.getRunwayStartHeight = function (index) {
+        return runwayStartHeights[index];
+    }
+
+    self.setRunwayStartHeight = function (index, data) {
+        runwayStartHeights[index] = data;
+    }
+
     self.getElevation = function() {
         return elevation;
     }
@@ -83,6 +113,8 @@ let FwApproach = function (number, approachAltAsl = 0, landAltAsl = 0, approachD
         landHeading2 = 0;
         isSeaLevelRef = 0;
         elevation = 0
+        runwayStarts = [0, 0, 0, 0];
+        runwayStartHeights = [0, 0, 0, 0];
     };
 
     self.getElevationFromServer = async function (lon, lat, globalSettings) {

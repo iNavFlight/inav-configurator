@@ -1,0 +1,396 @@
+/* as the other tabs: the content wrapper scrolls and the save bar stays at the bottom */
+.tab-autoland {
+    height: 100%;
+    position: relative;
+}
+
+/* the layout follows the room the tab has, which the tab bar's width changes as much as the window */
+.tab-autoland .content_wrapper {
+    container-type: inline-size;
+}
+
+.tab-autoland .autolandLayout {
+    display: grid;
+    grid-template-columns: minmax(26em, 34em) minmax(0, 1fr);
+    gap: 1em;
+    align-items: start;
+}
+
+/* Wide windows: the drawings stay in view and only the settings scroll; the tab sets the height that fits */
+.tab-autoland .autolandLayout.fitted {
+    align-items: stretch;
+}
+
+.tab-autoland .autolandLayout.fitted .autolandSettings {
+    overflow-y: auto;
+    min-height: 0;
+    padding-right: 0.5em;
+}
+
+.tab-autoland .autolandLayout.fitted .autolandDrawing {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+.tab-autoland .autolandLayout.fitted .autolandPlanBox {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    margin-bottom: 0.6em;
+}
+
+.tab-autoland .autolandLayout.fitted .autolandPlanBox .spacer_box {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+.tab-autoland .autolandLayout.fitted .autolandPlanWrap {
+    flex: 1 1 auto;
+    min-height: 0;
+}
+
+.tab-autoland .autolandLayout.fitted .autolandProfileBox {
+    flex: 0 0 auto;
+    margin-bottom: 0;
+}
+
+.tab-autoland .autolandSettings .config-section select,
+.tab-autoland .autolandSettings .spacer_box div input {
+    margin-right: 0 !important;
+}
+
+.tab-autoland .autolandWarnings {
+    list-style: none;
+    margin: 0.5em 0 0;
+    padding: 0;
+}
+
+.tab-autoland .autolandWarnings li {
+    padding: 0.25em 0 0.25em 1.4em;
+    position: relative;
+    line-height: 1.35;
+}
+
+.tab-autoland .autolandWarnings li::before {
+    position: absolute;
+    left: 0;
+    font-weight: bold;
+    content: "\26A0";
+    color: #b45f06;
+}
+
+.tab-autoland .autolandCheckTable {
+    margin-bottom: 0.6em;
+}
+
+.tab-autoland .autolandCheckTable td:last-child {
+    width: 2em;
+    vertical-align: top;
+}
+
+.tab-autoland .autolandOptional {
+    float: right;
+    position: relative;
+    margin-top: 3px;
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    background: #a3a19b;
+}
+
+.tab-autoland .autolandOptional::after {
+    content: "";
+    position: absolute;
+    left: 3.5px;
+    right: 3.5px;
+    top: 6.5px;
+    height: 2px;
+    border-radius: 1px;
+    background: #fcfcfb;
+}
+
+.tab-autoland .autolandCheckNote {
+    color: #52514e;
+    font-size: 0.9em;
+    margin-top: 0.15em;
+}
+
+.tab-autoland .autolandToolbar {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5em 1em;
+    margin-bottom: 0.5em;
+}
+
+.tab-autoland .autolandDirections {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4em;
+}
+
+.tab-autoland .autolandDirections button {
+    border: 1px solid #c3c2b7;
+    background: #fcfcfb;
+    color: #0b0b0b;
+    border-radius: 3px;
+    padding: 0.3em 0.8em;
+    cursor: pointer;
+}
+
+.tab-autoland .autolandDirections button.active {
+    background: #2a78d6;
+    border-color: #2a78d6;
+    color: #fff;
+}
+
+.tab-autoland .autolandToolbarFields {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 0.4em 1.2em;
+}
+
+.tab-autoland .autolandToolbar select {
+    width: auto;
+    min-width: 13em;
+    padding: 0.15em 0.3em;
+}
+
+.tab-autoland .autolandSatelliteField.unavailable {
+    opacity: 0.45;
+}
+
+.tab-autoland .autolandField {
+    display: flex;
+    align-items: center;
+    gap: 0.4em;
+}
+
+.tab-autoland .autolandField input {
+    width: 4.5em;
+}
+
+/* the image toned down, so the drawing over it reads */
+.tab-autoland .autolandSatelliteTiles {
+    filter: saturate(0.55) contrast(0.85);
+}
+
+.tab-autoland .autolandSatelliteVeil {
+    fill: #fcfcfb;
+    opacity: 0.3;
+}
+
+.tab-autoland .autolandRunwayStrip {
+    fill: #e7e6df;
+    stroke: #c3c2b7;
+    stroke-width: 1;
+}
+
+.tab-autoland .autolandRunwayCentre {
+    stroke: #fcfcfb;
+    stroke-width: 1.5;
+    stroke-dasharray: 10 8;
+}
+
+.tab-autoland .autolandPlanWrap {
+    position: relative;
+}
+
+.tab-autoland svg {
+    display: block;
+    /* drawn at the width measured; a scroll bar that comes later shrinks them instead of cutting them */
+    max-width: 100%;
+    background: #fcfcfb;
+    border: 1px solid rgba(11, 11, 11, 0.1);
+    border-radius: 3px;
+    font-family: inherit;
+}
+
+.tab-autoland .autolandGrid {
+    stroke: #e1e0d9;
+    stroke-width: 1;
+}
+
+.tab-autoland .autolandAxis {
+    stroke: #c3c2b7;
+    stroke-width: 1.5;
+    stroke-dasharray: 8 5;
+}
+
+.tab-autoland .autolandAxisText {
+    fill: #52514e;
+    font-size: 1em;
+}
+
+.tab-autoland .autolandAxisBack {
+    fill: #fcfcfb;
+    fill-opacity: 0.85;
+}
+
+/* over the satellite image the real strip shows through */
+.tab-autoland .withSatellite .autolandRunwayStrip {
+    fill: #fcfcfb;
+    fill-opacity: 0.2;
+    stroke: #fcfcfb;
+    stroke-width: 1.5;
+}
+
+.tab-autoland .withSatellite .autolandGrid {
+    stroke: #fcfcfb;
+    stroke-opacity: 0.35;
+}
+
+.tab-autoland .withSatellite .autolandAxis {
+    stroke: #fcfcfb;
+    stroke-opacity: 0.85;
+}
+
+.tab-autoland .withSatellite .autolandCircle {
+    stroke: #0b0b0b;
+    stroke-opacity: 0.7;
+    stroke-width: 1.5;
+}
+
+.tab-autoland .autolandCircle {
+    fill: none;
+    stroke: #898781;
+    stroke-width: 1;
+    stroke-dasharray: 3 4;
+}
+
+.tab-autoland .autolandTrack {
+    stroke-width: 4;
+    stroke-linecap: round;
+}
+
+.tab-autoland .autolandTrackCasing {
+    fill: none;
+    stroke: #fcfcfb;
+    stroke-width: 8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-opacity: 0.9;
+}
+
+.tab-autoland .autolandLegStart {
+    fill: #fcfcfb;
+    stroke: #0b0b0b;
+    stroke-width: 2;
+}
+
+.tab-autoland .autolandEvent {
+    fill: #0b0b0b;
+    stroke: #fcfcfb;
+    stroke-width: 1.5;
+}
+
+.tab-autoland .autolandAimCasing {
+    stroke: #fcfcfb;
+    stroke-width: 5;
+    stroke-linecap: round;
+    fill: none;
+}
+
+.tab-autoland .autolandAim {
+    stroke: #0b0b0b;
+    stroke-width: 2;
+    stroke-linecap: round;
+    fill: none;
+}
+
+.tab-autoland .autolandSite {
+    fill: #0b0b0b;
+    stroke: #fcfcfb;
+    stroke-width: 1.5;
+}
+
+/* labels on a light backing: they read over the track, the grid and the satellite image alike */
+.tab-autoland .autolandLabel {
+    fill: #0b0b0b;
+    font-size: 1.1em;
+    font-weight: 600;
+}
+
+.tab-autoland .autolandLabelValue {
+    fill: #3d3c39;
+    font-weight: 400;
+}
+
+.tab-autoland .autolandLabelBack {
+    fill: #fcfcfb;
+    fill-opacity: 0.9;
+    stroke: #0b0b0b;
+    stroke-opacity: 0.12;
+    stroke-width: 1;
+}
+
+.tab-autoland .autolandBand {
+    fill: #f0efec;
+}
+
+.tab-autoland .autolandBandName {
+    fill: #52514e;
+}
+
+.tab-autoland .autolandFinalAlt {
+    stroke: #898781;
+    stroke-width: 1;
+    stroke-dasharray: 4 4;
+}
+
+.tab-autoland .autolandHover {
+    fill: none;
+    stroke: #0b0b0b;
+    stroke-width: 2;
+}
+
+.tab-autoland .autolandProfileHover {
+    stroke: #0b0b0b;
+    stroke-width: 1;
+}
+
+.tab-autoland .autolandTooltip {
+    position: absolute;
+    pointer-events: none;
+    background: #fcfcfb;
+    border: 1px solid rgba(11, 11, 11, 0.15);
+    border-radius: 3px;
+    padding: 0.35em 0.6em;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+    color: #0b0b0b;
+    white-space: nowrap;
+}
+
+.tab-autoland .autolandLegend {
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+    margin-top: 0.5em;
+    color: #52514e;
+}
+
+.tab-autoland .autolandRamp {
+    display: inline-block;
+    width: 10em;
+    height: 0.7em;
+    border-radius: 2px;
+    background: linear-gradient(to right, #86b6ef, #5598e7, #2a78d6, #1c5cab, #104281, #0d366b);
+}
+
+/* narrow: one column, the drawings first so they are in view while the settings change (NARROW_LAYOUT_PX) */
+@container (max-width: 980px) {
+    .tab-autoland .autolandLayout {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .tab-autoland .autolandDrawing {
+        order: -1;
+    }
+}
