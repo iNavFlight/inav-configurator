@@ -47,7 +47,7 @@ setupTab.initialize = function (callback) {
     let headingnstrument;
 
     function load_html() {
-        import('./setup.html?raw').then(({default: html}) => GUI.load(html, process_html));
+        import('./setup.html?raw').then(({default: html}) => GUI.load(html, process_html)).catch(console.error);
     }
 
     function updateInstruments () {
@@ -90,7 +90,7 @@ setupTab.initialize = function (callback) {
             $('default_btn').addClass('disabled');
         }
 
-        initializeInstruments();
+        initializeInstruments().catch(console.error);
 
         $('a.resetSettings').on('click', async function () {
             if (await dialog.confirm(i18n.getMessage('confirm_reset_settings'))) {
@@ -273,7 +273,7 @@ setupTab.initialize3D = function () {
             model.scale.set(15, 15, 15);
             modelWrapper.add(model);
         });
-    });
+    }).catch(console.error);
 
     // stationary camera
     camera = new THREE.PerspectiveCamera(50, wrapper.width() / wrapper.height(), 1, 10000);

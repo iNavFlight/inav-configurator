@@ -493,7 +493,7 @@ $(function() {
                     })
         
                     $('div#options-window').slideDown(250);
-                });
+                }).catch(console.error);
             } else {
                 closeOptions();
             }
