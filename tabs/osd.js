@@ -206,17 +206,18 @@ FONT.constants = {
  */
 FONT.parseMCMFontFile = function (data) {
     data = data.split("\n");
-    // clear local data
-    FONT.data.characters.length = 0;
-    FONT.data.characters_bytes.length = 0;
-    FONT.data.character_image_urls.length = 0;
 
-    // make sure the font file is valid
+    // validate before clearing, so a bad file leaves the loaded font intact
     if (data.shift().trim() != 'MAX7456') {
         var msg = 'that font file doesn\'t have the MAX7456 header, giving up';
         console.debug(msg);
         throw new Error(msg);
     }
+
+    // clear local data
+    FONT.data.characters.length = 0;
+    FONT.data.characters_bytes.length = 0;
+    FONT.data.character_image_urls.length = 0;
 
     var character_bits = [];
     var character_bytes = [];
@@ -283,7 +284,7 @@ FONT.openFontFile = function ($preview) {
                     FONT.parseMCMFontFile(response.data.toString());
                     resolve();
                 }).catch(err => {
-                    GUI.log(i18n.getMessage('ErrorReadingFile'));
+                    GUI.log(i18n.getMessage('osdFontFileInvalid'));
                     console.error(err);
                 });
             }
@@ -382,6 +383,7 @@ FONT.upload = function (callback) {
         return MSP.promise(MSPCodes.MSP_SET_REBOOT);
     }).catch(function (err) {
         console.error(err);
+        GUI.log(i18n.getMessage('osdFontUploadFailed'));
         OSD.GUI.jbox.close();
     });
 };
