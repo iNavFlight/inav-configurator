@@ -215,7 +215,7 @@ FONT.parseMCMFontFile = function (data) {
     if (data.shift().trim() != 'MAX7456') {
         var msg = 'that font file doesn\'t have the MAX7456 header, giving up';
         console.debug(msg);
-        Promise.reject(msg);
+        throw new Error(msg);
     }
 
     var character_bits = [];
@@ -282,6 +282,9 @@ FONT.openFontFile = function ($preview) {
 
                     FONT.parseMCMFontFile(response.data.toString());
                     resolve();
+                }).catch(err => {
+                    GUI.log(i18n.getMessage('ErrorReadingFile'));
+                    console.error(err);
                 });
             }
         }).catch (err => {
@@ -377,6 +380,9 @@ FONT.upload = function (callback) {
     }, Promise.resolve()).then(function() {
         OSD.GUI.jbox.close();
         return MSP.promise(MSPCodes.MSP_SET_REBOOT);
+    }).catch(function (err) {
+        console.error(err);
+        OSD.GUI.jbox.close();
     });
 };
 
@@ -3713,7 +3719,7 @@ osdTab.initialize = function (callback) {
                     FONT.parseMCMFontFile(data);
                     FONT.preview($preview);
                     OSD.GUI.update();
-                });
+                }).catch(console.error);
                 
             });
 
@@ -3737,7 +3743,7 @@ osdTab.initialize = function (callback) {
                 FONT.openFontFile().then(function () {
                     FONT.preview($preview);
                     OSD.GUI.update();
-                });
+                }).catch(console.error);
             });
 
             // font upload
@@ -3777,7 +3783,7 @@ osdTab.initialize = function (callback) {
             });
 
             GUI.content_ready(callback);
-        })));
+        }))).catch(console.error);
     });
 };
 

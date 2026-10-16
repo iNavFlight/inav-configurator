@@ -111,7 +111,7 @@ const javascriptProgrammingTab = {
                 }
 
             });
-        });
+        }).catch(console.error);
     },
 
     /**
@@ -167,7 +167,7 @@ if (inav.flight.homeDistance > 100) {
 
         // Save to FC button
         $('.tab-programming .save').click(function() {
-            self.saveToFC();
+            self.saveToFC().catch(console.error);
         });
 
         // Clear button

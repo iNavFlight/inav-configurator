@@ -174,7 +174,7 @@ magnetometerTab.initialize = function (callback) {
     }
 
     function load_html() {
-        import('./magnetometer.html?raw').then(({default: html}) => GUI.load(html, process_html));
+        import('./magnetometer.html?raw').then(({default: html}) => GUI.load(html, process_html)).catch(console.error);
     }
 
     function generateRange(min, max, step) {
@@ -799,7 +799,7 @@ magnetometerTab.initialize3D = function () {
                         magModels[i]=gps;
                         this.resize3D();
                     });
-                });
+                }).catch(console.error);
             });
 
             //Load the FC model
@@ -813,12 +813,12 @@ magnetometerTab.initialize3D = function () {
                     modelScene.add(fc);
                     this.render3D();
                 });
-            });
+            }).catch(console.error);
 
         });
         this.render3D();
         this.resize3D();
-    });
+    }).catch(console.error);
 };
 
 

@@ -316,7 +316,7 @@ var SerialBackend = (function () {
                     }
                     
                     update.firmwareVersion();
-                });
+                }).catch(console.error);
             });
         });
     });
