@@ -12,6 +12,12 @@ on:
 jobs:
   build:
     name: build
+    # Gate secrets on the tag actually being protected - without a tag
+    # protection rule for these patterns, anyone with push access can push a
+    # matching tag pointing at any commit and this job hands it the signing
+    # certificate and notarization credentials with require_signing forcing
+    # full use of them.
+    if: github.ref_protected == true
     uses: ./.github/workflows/ci.yml
     secrets: inherit
     with:

@@ -2563,12 +2563,23 @@ var mspHelper = (function () {
                             (mask.upper & (1 << (idx - 32))) !== 0;
 
                         if (isConfigured) {
-                            // Fetch from firmware - handler will put() it
-                            const onComplete = function() {
+                            // Fetch from firmware - handler will put() it. Guard
+                            // with a timeout so a dropped response (or a
+                            // disconnect, which discards queued callbacks
+                            // outright) can't stall this loop forever.
+                            let conditionResponseReceived = false;
+                            const advance = function() {
+                                if (conditionResponseReceived) return;
+                                conditionResponseReceived = true;
+                                clearTimeout(conditionTimeout);
                                 idx++;
                                 processNextCondition();
                             };
-                            MSP.send_message(MSPCodes.MSP2_INAV_LOGIC_CONDITIONS_SINGLE, [idx], false, onComplete);
+                            const conditionTimeout = setTimeout(function() {
+                                console.warn('MSP2_INAV_LOGIC_CONDITIONS_SINGLE: timed out waiting for condition ' + idx);
+                                advance();
+                            }, 1000);
+                            MSP.send_message(MSPCodes.MSP2_INAV_LOGIC_CONDITIONS_SINGLE, [idx], false, advance);
                             return; // Wait for async MSP response
                         } else {
                             // Not configured - put default directly and continue loop

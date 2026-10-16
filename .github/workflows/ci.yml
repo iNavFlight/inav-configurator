@@ -76,6 +76,8 @@ jobs:
                 command: yarn install
                 timeout_minutes: 10
                 on_retry_command: rm -rfv node_modules
+            - name: Run tests
+              run: yarn test
             - name: Build Linux
               run: yarn run make
             - name: Upload Linux deb

@@ -17,6 +17,7 @@ import { PortHandler } from './../js/port_handler';
 import i18n from './../js/localization';
 import store from './../js/store';
 import dialog from './../js/dialog';
+import { changedItemIds, visibleItemIds, saveLayoutItems } from './../js/osdBulkSave';
 
 var SYM = SYM || {};
 SYM.LAST_CHAR = 225; // For drawing the font preview
@@ -205,17 +206,18 @@ FONT.constants = {
  */
 FONT.parseMCMFontFile = function (data) {
     data = data.split("\n");
+
+    // validate before clearing, so a bad file leaves the loaded font intact
+    if (data.shift().trim() != 'MAX7456') {
+        var msg = 'that font file doesn\'t have the MAX7456 header, giving up';
+        console.debug(msg);
+        throw new Error(msg);
+    }
+
     // clear local data
     FONT.data.characters.length = 0;
     FONT.data.characters_bytes.length = 0;
     FONT.data.character_image_urls.length = 0;
-
-    // make sure the font file is valid
-    if (data.shift().trim() != 'MAX7456') {
-        var msg = 'that font file doesn\'t have the MAX7456 header, giving up';
-        console.debug(msg);
-        Promise.reject(msg);
-    }
 
     var character_bits = [];
     var character_bytes = [];
@@ -281,6 +283,9 @@ FONT.openFontFile = function ($preview) {
 
                     FONT.parseMCMFontFile(response.data.toString());
                     resolve();
+                }).catch(err => {
+                    GUI.log(i18n.getMessage('osdFontFileInvalid'));
+                    console.error(err);
                 });
             }
         }).catch (err => {
@@ -376,6 +381,10 @@ FONT.upload = function (callback) {
     }, Promise.resolve()).then(function() {
         OSD.GUI.jbox.close();
         return MSP.promise(MSPCodes.MSP_SET_REBOOT);
+    }).catch(function (err) {
+        console.error(err);
+        GUI.log(i18n.getMessage('osdFontUploadFailed'));
+        OSD.GUI.jbox.close();
     });
 };
 
@@ -2392,16 +2401,17 @@ OSD.is_item_displayed = function(item, group) {
     if (!group) {
         return false;
     }
-    if (typeof group.enabled === 'function' && group.enabled() === false) {
-        return false;
-    }
     if (item.min_version && !semver.gte(FC.CONFIG.flightControllerVersion, item.min_version)) {
         return false;
     }
-    if (typeof item.enabled === 'function' && item.enabled() === false) {
-        return false;
+    var gateOpen = !(typeof group.enabled === 'function' && group.enabled() === false)
+        && !(typeof item.enabled === 'function' && item.enabled() === false);
+    if (gateOpen) {
+        return true;
     }
-    return true;
+    // Hardware/feature gate closed (e.g. pitot_hardware set to NONE): keep an
+    // already-enabled element toggleable so the user can turn it off (#2639).
+    return OSD.data.items[item.id].isVisible === true;
 };
 
 OSD.get_item_preview = function(item) {
@@ -2543,10 +2553,19 @@ OSD.saveConfig = function(callback) {
     }).catch(() => {});
 };
 
+// Resolves true on success, false if the FC refused/dropped the write -
+// never rejects, so fire-and-forget callers (OSD.GUI.saveItem) don't produce
+// an unhandled rejection, while callers that await the result (bulk paste/
+// clear) can detect a failed write instead of assuming it landed.
 OSD.saveItem = function(item, callback) {
     let pos = OSD.data.items[item.id];
     let data = OSD.msp.encodeLayoutItem(OSD.data.selected_layout, item, pos);
-    return MSP.promise(MSPCodes.MSP2_INAV_OSD_SET_LAYOUT_ITEM, data).then(callback).catch(() => {});
+    return MSP.promise(MSPCodes.MSP2_INAV_OSD_SET_LAYOUT_ITEM, data).then(function() {
+        if (callback) {
+            callback();
+        }
+        return true;
+    }).catch(() => false);
 };
 
 //noinspection JSUnusedLocalSymbols
@@ -3451,15 +3470,13 @@ OSD.GUI.updateAll = function() {
                 OSD.data.layouts[OSD.data.selected_layout] = JSON.parse(JSON.stringify(layout_clipboard.layout));
                 layouts.trigger('change');
 
-                for(var index in OSD.data.layouts[OSD.data.selected_layout])
-                {
-                    var item = OSD.data.layouts[OSD.data.selected_layout][index];
-                    if(!(item.isVisible === false && oldLayout[index].isVisible === false) && (oldLayout[index].x !== item.x || oldLayout[index].y !== item.y || oldLayout[index].position !== item.position || oldLayout[index].isVisible !== item.isVisible)){
-                        await OSD.saveItem({id: index});
-                    }
+                var layout = OSD.data.layouts[OSD.data.selected_layout];
+                var allSaved = await saveLayoutItems(layout, oldLayout, changedItemIds(oldLayout, layout), OSD.saveItem);
+                if (!allSaved) {
+                    layouts.trigger('change');
                 }
 
-                GUI.log(i18n.getMessage('osdLayoutPasteFromClipboard'));
+                GUI.log(i18n.getMessage(allSaved ? 'osdLayoutPasteFromClipboard' : 'osdLayoutSaveItemFailed'));
             }
         });
 
@@ -3476,14 +3493,12 @@ OSD.GUI.updateAll = function() {
             OSD.data.layouts[OSD.data.selected_layout] = clearedLayout;
             layouts.trigger('change');
 
-            for(var index in OSD.data.layouts[OSD.data.selected_layout]) {
-                var item = OSD.data.layouts[OSD.data.selected_layout][index];
-                if(oldLayout[index].isVisible === true){
-                    await OSD.saveItem({id: index});
-                }
+            var allSaved = await saveLayoutItems(clearedLayout, oldLayout, visibleItemIds(oldLayout), OSD.saveItem);
+            if (!allSaved) {
+                layouts.trigger('change');
             }
 
-            GUI.log(i18n.getMessage('osdClearLayout'));
+            GUI.log(i18n.getMessage(allSaved ? 'osdClearLayout' : 'osdLayoutSaveItemFailed'));
         });
 
 
@@ -3706,7 +3721,7 @@ osdTab.initialize = function (callback) {
                     FONT.parseMCMFontFile(data);
                     FONT.preview($preview);
                     OSD.GUI.update();
-                });
+                }).catch(console.error);
                 
             });
 
@@ -3730,7 +3745,7 @@ osdTab.initialize = function (callback) {
                 FONT.openFontFile().then(function () {
                     FONT.preview($preview);
                     OSD.GUI.update();
-                });
+                }).catch(console.error);
             });
 
             // font upload
@@ -3770,7 +3785,7 @@ osdTab.initialize = function (callback) {
             });
 
             GUI.content_ready(callback);
-        })));
+        }))).catch(console.error);
     });
 };
 

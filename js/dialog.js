@@ -1,3 +1,4 @@
+// Native window.alert/confirm leave the Windows app without keyboard input (electron/electron#31917)
 const dialog =  {
     showOpenDialog: async function (options) {
         return window.electronAPI.showOpenDialog(options);

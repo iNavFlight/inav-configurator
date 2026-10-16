@@ -4797,6 +4797,15 @@
     "uploadedCharacters": {
         "message": "Uploaded $1 characters"
     },
+    "osdFontUploadFailed": {
+        "message": "<span style=\"color: red\">Failed</span> to upload the OSD font; the upload is incomplete, please try again"
+    },
+    "ErrorReadingFile": {
+        "message": "<span style=\"color: red\">Failed</span> to read the file"
+    },
+    "osdFontFileInvalid": {
+        "message": "<span style=\"color: red\">Failed</span> to load the font file; it is not a valid MCM font"
+    },
     "portsIdentifier": {
         "message": "Identifier"
     },
@@ -6423,6 +6432,9 @@
     "osdClearLayout": {
         "message": "Layout has been cleared"
     },
+    "osdLayoutSaveItemFailed": {
+        "message": "<span style=\"color: red\">Failed</span> to save OSD layout item; some changes may not have been applied"
+    },
     "failedToOpenSerialPort": {
         "message": "<span style=\"color: red\">Failed</span> to open serial port"
     },
@@ -6680,6 +6692,15 @@
     },
     "javascriptCompleteExample": {
         "message": "Complete Example"
+    },
+    "unsavedChanges": {
+        "message": "You have unsaved changes. Leave anyway?"
+    },
+    "loadExampleConfirm": {
+        "message": "You have unsaved changes. Load example anyway?"
+    },
+    "confirmSaveLogicConditions": {
+        "message": "Save $1 logic conditions to flight controller?"
     },
     "sensorProfileTitle": {
         "message": "Control profile — stores PID tuning, rates, and filtering settings"
