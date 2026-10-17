@@ -6267,6 +6267,30 @@
     "motor_poles": {
         "message": "Number of motor poles (number of magnets)"
     },
+    "dshotBidirEnabled": {
+        "message": "RPM telemetry (bidirectional DShot)"
+    },
+    "dshotBidirEnabledHelp": {
+        "message": "The ESCs send each motor's RPM back on the motor signal. Needs ESC firmware that supports it, such as BLHeli_32, AM32 or Bluejay."
+    },
+    "dynamicIdleEnabled": {
+        "message": "Dynamic idle"
+    },
+    "dynamicIdleEnabledHelp": {
+        "message": "Keeps the slowest motor at least at the RPM below once the throttle has been raised, from the RPM the ESCs report. It comes on with the RPM telemetry; off sets the RPM to 0."
+    },
+    "dynamicIdleMinRpm": {
+        "message": "Lowest motor RPM"
+    },
+    "dynamicIdleMinRpmHelp": {
+        "message": "Once the throttle has been raised after arming, keeps the slowest motor at least this fast, from the RPM the ESCs report. 0 turns it off. Throttle idle stays the low end until then, and whenever the RPM telemetry is not reliable. In RPM, not in Betaflight's hundreds: 35 there is 3500 here."
+    },
+    "dynamicIdleSizes": {
+        "message": "Typical for the propeller size:"
+    },
+    "dynamicIdleCustom": {
+        "message": "Custom"
+    },
     "motorStopWarning": {
         "message": "Should be enabled on Airplanes, Rovers and Boats. Should not be enabled on Multirotors! On Multirotors, when Airmode is active, motors will not stop."
     },

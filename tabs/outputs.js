@@ -413,9 +413,71 @@ outputsTab.initialize = function (callback) {
 
         $escProtocol.val(FC.ADVANCED_CONFIG.motorPwmProtocol);
 
+        // Dynamic idle works on the RPM the ESCs send back over bidirectional DShot, and only on multirotors
+        function dynamicIdleUpdateVisibility() {
+            const protocol = Number(FC.ADVANCED_CONFIG.motorPwmProtocol);
+            const dshot = protocol >= PROTOCOL_DSHOT150 && protocol !== SRXL2_PROTOCOL;
+            const multirotor = [PLATFORM.MULTIROTOR, PLATFORM.TRICOPTER].includes(FC.MIXER_CONFIG.platformType);
+            $('#dshot-bidir').toggle(dshot);
+            $('#dynamic-idle').toggle(dshot && multirotor && $('#dshot_bidir_enabled').is(':checked'));
+        }
+
+        // The size whose value the field holds, Custom for any other value, none while it is off
+        function dynamicIdleShowSize() {
+            const rpm = Number($('#dynamic_idle_min_rpm').val());
+            const $sizes = $('.dynamic-idle-sizes a[data-rpm]').removeClass('selected');
+            const $size = $sizes.filter(function () {
+                return Number($(this).data('rpm')) === rpm;
+            }).addClass('selected');
+            $('.dynamic-idle-custom').toggleClass('selected', rpm > 0 && $size.length === 0);
+        }
+
+        $('.dynamic-idle-sizes a[data-rpm]').on('click', function (e) {
+            e.preventDefault();
+            dynamicIdleSetRpm($(this).data('rpm'));
+        });
+
+        $('.dynamic-idle-custom').on('click', function (e) {
+            e.preventDefault();
+            $('.dynamic-idle-sizes a').removeClass('selected');
+            $(this).addClass('selected');
+            $('#dynamic_idle_min_rpm').trigger('focus').trigger('select');
+        });
+
+        // On while dynamic_idle_min_rpm is above 0: off writes 0, on puts the last value back (the 5" one if none)
+        let dynamicIdleLastRpm = 3500;
+        function dynamicIdleShowEnabled() {
+            const rpm = Number($('#dynamic_idle_min_rpm').val());
+            if (rpm > 0) {
+                dynamicIdleLastRpm = rpm;
+            }
+            $('#dynamic-idle-enabled').prop('checked', rpm > 0);
+            $('#dynamic-idle-rpm').toggle(rpm > 0);
+        }
+
+        function dynamicIdleSetRpm(rpm) {
+            $('#dynamic_idle_min_rpm').val(rpm).trigger('change');
+        }
+
+        $('#dynamic-idle-enabled').on('change', function () {
+            dynamicIdleSetRpm($(this).is(':checked') ? dynamicIdleLastRpm : 0);
+        });
+
+        // Not on input: an emptied field on its way to a new value would switch dynamic idle off
+        $('#dynamic_idle_min_rpm').on('input change', dynamicIdleShowSize).on('change', dynamicIdleShowEnabled);
+
+        $('#dshot_bidir_enabled').on('change', function () {
+            // Dynamic idle comes on with the RPM telemetry
+            if ($(this).is(':checked') && !(Number($('#dynamic_idle_min_rpm').val()) > 0)) {
+                dynamicIdleSetRpm(dynamicIdleLastRpm);
+            }
+            dynamicIdleUpdateVisibility();
+        });
+
         $escProtocol.on('change', function () {
             FC.ADVANCED_CONFIG.motorPwmProtocol = $(this).val();
             srxl2UpdateVisibility();
+            dynamicIdleUpdateVisibility();
         });
 
         $idlePercent.on('change', handleIdleMessageBox);
@@ -432,10 +494,17 @@ outputsTab.initialize = function (callback) {
             $reverseRow.toggle($reverseEnable.is(':checked'));
         }
 
+        function dynamicIdleInit() {
+            dynamicIdleUpdateVisibility();
+            dynamicIdleShowEnabled();
+            dynamicIdleShowSize();
+        }
+
         if (settingsPromise && typeof settingsPromise.then === 'function') {
-            settingsPromise.then(srxl2ReverseInit);
+            settingsPromise.then(srxl2ReverseInit).then(dynamicIdleInit);
         } else {
             srxl2ReverseInit();
+            dynamicIdleInit();
         }
 
         $("#esc-protocols").show();
