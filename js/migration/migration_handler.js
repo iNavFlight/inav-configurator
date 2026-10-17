@@ -4,6 +4,8 @@ import semver from 'semver';
 
 import profile_7_to_8 from './7_to_8.json';
 import profile_8_to_9 from './8_to_9.json';
+import profile_9_to_10 from './9_to_10.json';
+import { rescaleTpaBreakpoint } from './tpa_breakpoint_rescale';
 
 /**
  * All available migration profiles, ordered by version.
@@ -12,6 +14,7 @@ import profile_8_to_9 from './8_to_9.json';
 const MIGRATION_PROFILES = [
     profile_7_to_8,
     profile_8_to_9,
+    profile_9_to_10,
 ];
 
 /**
@@ -254,8 +257,21 @@ const MigrationHandler = {
             }
         }
 
+        // Multi-line steps: need the whole control_profile section, not one line at a time
+        let finalLines = migratedLines;
+        for (const profile of chain) {
+            if (!profile.tpaBreakpointRescale) continue;
+            const result = rescaleTpaBreakpoint(finalLines, profile.tpaBreakpointRescale);
+            finalLines = result.lines;
+            for (const change of result.changes) {
+                summary.totalChanges++;
+                summary.settingRemappings.push(change);
+            }
+            summary.warnings.push(...result.warnings);
+        }
+
         return {
-            migratedContent: migratedLines.join('\n'),
+            migratedContent: finalLines.join('\n'),
             summary,
         };
     },

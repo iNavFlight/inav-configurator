@@ -1,0 +1,15 @@
+{
+    "fromVersion": "9",
+    "toVersion": "10",
+    "description": "INAV 9.x \u2192 10.0 migration profile",
+    "commandRenames": {},
+    "settingRenames": {},
+    "valueReplacements": {},
+    "removed": [],
+    "settingPatternMappings": [],
+    "tpaBreakpointRescale": {
+        "fromBreakpoint": 1200,
+        "toBreakpoint": 1500
+    },
+    "warnings": []
+}
