@@ -103,7 +103,7 @@ var defaultsDialogData = [
             },
             {
                 key: "tpa_breakpoint",
-                value: 1200
+                value: 1500
             },
             {
                 key: "platform_type",
@@ -236,7 +236,7 @@ var defaultsDialogData = [
             },
             {
                 key: "tpa_breakpoint",
-                value: 1200
+                value: 1500
             },
             {
                 key: "platform_type",
@@ -354,7 +354,7 @@ var defaultsDialogData = [
             },
             {
                 key: "tpa_breakpoint",
-                value: 1200
+                value: 1500
             },
             {
                 key: "platform_type",
