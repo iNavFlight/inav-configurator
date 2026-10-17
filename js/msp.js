@@ -21,6 +21,7 @@ const ALWAYS_ALLOWED_WRITE_NAMES = [
     'MSP_RESET_CONF', 'MSP_SET_RESET_CURR_PID',
     'MSP_SELECT_SETTING', 'MSP2_INAV_SELECT_BATTERY_PROFILE', 'MSP2_INAV_SELECT_MIXER_PROFILE',
     'MSP_WP_MISSION_SAVE', 'MSP_DATAFLASH_ERASE', 'MSP_OSD_CHAR_WRITE',
+    'MSP2_SET_MZTC_PRESET',      // explicit user-selected index, not FC-read configuration
     'MSP_SET_BOX',               // legacy, never sent by this Configurator
 ];
 
@@ -129,7 +130,7 @@ var MSP = {
     ledDirectionLetters:        ['n', 'e', 's', 'w', 'u', 'd'],        // in LSB bit order
     ledFunctionLetters:         ['i', 'w', 'f', 'a', 't', 'r', 'c', 'g', 's', 'b', 'l'], // in LSB bit order
     ledBaseFunctionLetters:     ['c', 'f', 'a', 'l', 's', 'g', 'r', 'h'], // in LSB bit
-    ledOverlayLetters:          ['t', 'o', 'b', 'n', 'i', 'w', 'e'], // in LSB bit
+    ledOverlayLetters:          ['t', 'o', 'b', 'n', 'i', 'w', 'e', 'v'], // in LSB bit
 
     last_received_timestamp:   null,
     analog_last_received_timestamp: null,
@@ -524,10 +525,15 @@ var MSP = {
     },
     promise(code, data, protocolVersion) {
         var self = this;
-        return new Promise(function(resolve) {
-            self.send_message(code, data, false, function(data) {
+        return new Promise(function(resolve, reject) {
+            // A refused write fires no callback; reject so the caller cannot
+            // hang awaiting a response that will never arrive (resolving would
+            // run the save chain as if the settings had been stored).
+            if (!self.send_message(code, data, false, function(data) {
                 resolve(data);
-            }, protocolVersion);
+            }, protocolVersion)) {
+                reject(new Error('Refusing MSP write ' + self.getCodeName(code) + ': blocked by an unreadable response'));
+            }
         });
     },
     callbacks_cleanup() {

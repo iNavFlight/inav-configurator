@@ -1,6 +1,7 @@
 'use strict';
 
 import xml2js from 'xml2js';
+import jBox from 'jbox';
 import { Chart, registerables } from 'chart.js';
 import {
     ArcGisMapServerImageryProvider,
@@ -79,21 +80,42 @@ import SafehomeCollection from './../js/safehomeCollection';
 import { ApproachDirection, FwApproach } from './../js/fwApproach';
 import FwApproachCollection from './../js/fwApproachCollection';
 import SerialBackend from './../js/serial_backend';
+import { loadOsdUnits } from './../js/osdUnits';
 import { distanceOnLine, wrap_360, calculate_new_cooridatnes } from './../js/helpers';
 import interval from './../js/intervals';
 import { Geozone, GeozoneVertex, GeozoneType, GeozoneShapes, GeozoneFenceAction }  from './../js/geozone';
 import store from './../js/store';
 import dialog from '../js/dialog';
+import elevationFetch from './../js/elevationFetch';
+import { fromDisplayUnits, getUnitDisplayName, getUnitMultiplier, toDisplayUnits, toFieldText } from './../js/unitConversion';
 import {
+    getMission3DFlightLegs,
+    getMission3DFlightSegments,
+    getMission3DJumpLabel,
     getMission3DPlannedHeight,
     getMission3DPointLabel,
     getMission3DPoints,
     getMission3DRouteRuns,
-    getMission3DRouteSegments,
     getMission3DSamplingSpacing
 } from './../js/mission_3d';
+import {
+    FirmwareDefaults,
+    LandingApproachProblem,
+    SimPhase,
+    phaseRuns,
+    TurnSmoothing,
+    commandedTurnRadius,
+    getSimulationRoute,
+    resolveRouteAltitudes,
+    simulateGroundTrack,
+    withLandingApproaches
+} from './../js/mission_sim';
 
 import html from'./mission_control.html?raw';
+
+function waypointPositionKey(wp) {
+    return wp.getLatMap() + ',' + wp.getLonMap();
+}
 
 function extractKmlFromKmz(source) {
     const data = source instanceof Uint8Array ? source : new Uint8Array(source);
@@ -112,17 +134,108 @@ class KMZ extends KML {
 
 var MAX_NEG_FW_LAND_ALT = -2000; // cm
 
+// Firmware units behind the mission planner fields. Missions are stored and
+// sent in these units, only what the user reads and types is converted, so a
+// value typed in feet comes back unchanged after a save and a reload.
+const MISSION_UNIT_ALT = 'cm';
+const MISSION_UNIT_SPEED = 'cms';
+const MISSION_UNIT_DIST = 'm';
+
 // Dictionary of Parameter 1,2,3 definition depending on type of action selected (refer to MWNP.WPTYPE)
 var dictOfLabelParameterPoint = {
-    1:  {parameter1: 'Speed (cm/s)', parameter2: '', parameter3: 'Sea level Ref'},
+    1:  {parameter1: 'Speed', parameter2: '', parameter3: 'Sea level Ref'},
     2:  {parameter1: '', parameter2: '', parameter3: ''},
-    3:  {parameter1: 'Wait time (s)', parameter2: 'Speed (cm/s)', parameter3: 'Sea level Ref'},
+    3:  {parameter1: 'Wait time (s)', parameter2: 'Speed', parameter3: 'Sea level Ref'},
     4:  {parameter1: 'Force land (non zero)', parameter2: '', parameter3: ''},
     5:  {parameter1: '', parameter2: '', parameter3: ''},
     6:  {parameter1: 'Target WP number', parameter2: 'Number of repeat (-1: infinite)', parameter3: ''},
     7:  {parameter1: 'Heading (deg)', parameter2: '', parameter3: ''},
-    8:  {parameter1: 'Speed (cm/s)', parameter2: '', parameter3: 'Sea level Ref'}
+    8:  {parameter1: 'Speed', parameter2: '', parameter3: 'Sea level Ref'}
 };
+
+// Parameters that carry a firmware value which has to follow the unit
+// setting. Their unit is appended to the label above and the field is
+// converted on the way in and out; every other parameter keeps the unit
+// spelled out in its own label.
+const dictOfUnitParameterPoint = {
+    1:  {parameter1: MISSION_UNIT_SPEED},
+    3:  {parameter2: MISSION_UNIT_SPEED},
+    8:  {parameter1: MISSION_UNIT_SPEED}
+};
+
+/* Symbol of the unit a firmware unit is currently displayed in. */
+function missionUnitLabel(firmwareUnit) {
+    return getUnitDisplayName(getUnitMultiplier(firmwareUnit).unitName);
+}
+
+/* Waypoint and approach altitudes, held in centimetres by the firmware. */
+function altitudeToDisplay(centimetres) {
+    return toFieldText(centimetres, MISSION_UNIT_ALT);
+}
+
+function altitudeFromDisplay(value) {
+    return fromDisplayUnits(value, MISSION_UNIT_ALT);
+}
+
+/* A typed value in firmware units, or null when it is no number: NaN would be uploaded as 0. */
+function parseFieldValue(text, unit, precision = 0) {
+    const typed = String(text ?? '').trim().replace(',', '.');
+    const value = Number(typed);
+    if (typed === '' || !Number.isFinite(value)) return null;
+    return unit ? fromDisplayUnits(value, unit, precision) : value;
+}
+
+/*
+ * Readout next to an altitude field. Without a unit system the field still
+ * holds centimetres, so the metre value stays the hint it has always been.
+ * Once a unit system is selected the field itself is converted and only the
+ * unit name is missing.
+ */
+function altitudeReadout(centimetres) {
+    const converted = toDisplayUnits(centimetres, MISSION_UNIT_ALT);
+
+    if (converted.multiplier === 1) {
+        // The field itself is in centimetres, so keep showing the metre
+        // value that has always been spelled out next to it.
+        return ' cm (' + (Number(centimetres) / 100) + ' m)';
+    }
+    return ' ' + converted.displayName;
+}
+
+/* Unit of a waypoint parameter, undefined when it does not follow the setting. */
+function parameterUnit(action, parameterKey) {
+    return dictOfUnitParameterPoint[action] ? dictOfUnitParameterPoint[action][parameterKey] : undefined;
+}
+
+/* Label of a waypoint parameter, with its unit appended when it has one. */
+function parameterLabel(action, parameterKey) {
+    const label = dictOfLabelParameterPoint[action][parameterKey];
+    const unit = parameterUnit(action, parameterKey);
+
+    if (label === '' || !unit) {
+        return label;
+    }
+    return label + ' (' + missionUnitLabel(unit) + ')';
+}
+
+/* Waypoint parameter for display, unchanged when it has no unit. */
+function parameterToDisplay(action, parameterKey, value) {
+    const unit = parameterUnit(action, parameterKey);
+    return unit ? toFieldText(value, unit) : value;
+}
+
+/* Waypoint parameter back in firmware units. */
+function parameterFromDisplay(action, parameterKey, value) {
+    return parseFieldValue(value, parameterUnit(action, parameterKey));
+}
+
+/* Total mission length, always shown with the unit it is expressed in. */
+function missionDistanceText(metres) {
+    const converted = toDisplayUnits(metres, MISSION_UNIT_DIST);
+    const text = converted.multiplier === 1 ? Number(metres).toFixed(1) : converted.text;
+
+    return text + ' ' + converted.displayName;
+}
 
 var waypointOptions = ['JUMP','SET_HEAD','RTH'];
 
@@ -150,7 +263,7 @@ const iconNames = [
     'icon_safehome_white.svg',
     'icon_geozone_white.svg',
     'icon_elevation_white.svg',
-    'icon_multimission_white.svg'    
+    'icon_multimission_white.svg'
 ];
 
 const icons = Object.create(null)
@@ -655,7 +768,132 @@ const missionControlTab = {};
 missionControlTab.isYmapLoad = false;
 
 // Shared between plotElevation() (inside initialize) and cleanup()
+// A setting that will not parse must not reach the model: NaN spreads through the
+// geometry and comes back out as an empty map and a nonsense warning.
+function readNumericSetting(setting, fallback) {
+    const value = Number.parseInt(setting.value, 10);
+    return Number.isFinite(value) ? value : fallback;
+}
+
+// One colour per flight phase, identical on the 2D map and in the 3D view, so a
+// stretch of track means the same thing wherever it is looked at.
+const SIMULATION_PHASE_COLOURS = Object.freeze({
+    [SimPhase.CRUISE]: '#00c2a8',
+    [SimPhase.TURN]: '#ffb020',
+    [SimPhase.APPROACH]: '#ff5fd2'
+});
+
+function simulationTrackFeatures(samples) {
+    return phaseRuns(samples)
+        .filter((run) => run.to > run.from)
+        .map((run) => {
+            const feature = new Feature({
+                geometry: new LineString(samples.slice(run.from, run.to + 1)
+                    .map((point) => fromLonLat([point.lon, point.lat])))
+            });
+            feature.setStyle(new Style({
+                stroke: new Stroke({
+                    color: SIMULATION_PHASE_COLOURS[run.phase] ?? SIMULATION_PHASE_COLOURS[SimPhase.CRUISE],
+                    width: 3
+                })
+            }));
+            return feature;
+        });
+}
+
+function formatSimulationTime(seconds) {
+    const whole = Math.round(seconds);
+    return `${Math.floor(whole / 60)}:${String(whole % 60).padStart(2, '0')} min`;
+}
+
 let elevationChartInstance = null;
+
+// The mission-wide default speed is never applied to LAND waypoints (the
+// firmware's getActiveSpeed() still honors their own P1), so the pilot needs
+// telling rather than a quiet skip.
+let landSpeedNotUpdatedModal = null;
+
+function convertCentimetersToMeters(val) {
+    return Number.parseInt(val) / 100;
+}
+
+/* How a waypoint reads in the selector: its number, what it does, how high it flies. */
+function wpListLabel(wp) {
+    const typeNames = {1: 'Waypoint', 2: 'PH_UNLIM', 3: 'PH_TIME', 4: 'RTH', 5: 'POI', 6: 'JUMP', 7: 'HEAD', 8: 'Land'};
+    const type = typeNames[wp.getAction()] || ('Type ' + wp.getAction());
+    const converted = toDisplayUnits(wp.getAlt(), MISSION_UNIT_ALT);
+    // Without a unit system the list keeps the metres it showed before.
+    const altitude = converted.multiplier === 1 ? convertCentimetersToMeters(wp.getAlt()) + ' m'
+        : altitudeToDisplay(wp.getAlt()) + ' ' + converted.displayName;
+    return (wp.getLayerNumber() + 1) + ' \u00b7 ' + type + ' \u00b7 ' + altitude;
+}
+
+/* Below the ground it flies over means straight into the terrain. The terrain is the
+   true ground; the conversion datum stands in when only the reference moved on a known
+   home, and without either there is nothing to judge against. */
+function endsBelowGround(wp, index, plan) {
+    // A point of interest marks a place on the ground for the camera to look at; the
+    // aircraft never flies to it, and the save leaves its altitude alone.
+    if (wp.getAction() == MWNP.WPTYPE.SET_POI) return false;
+
+    let groundCm = null;
+    if (plan.terrainCm) {
+        groundCm = plan.terrainCm[index];
+    } else if (plan.homeCm !== null) {
+        groundCm = plan.homeCm;
+    }
+    if (groundCm === null) return false;
+
+    const wpAbsolute = missionControlTab.isBitSet(wp.getP3(), MWNP.P3.ALT_TYPE);
+    return (wpAbsolute ? wp.getAlt() - groundCm : wp.getAlt()) < 0;
+}
+
+/* Without a unit system the defaults hold cm and cm/s, so metres and km/h stay alongside. */
+function updateDefaultUnitHints() {
+    const altCm = altitudeFromDisplay($('#MPdefaultPointAlt').val());
+    const speedCms = fromDisplayUnits($('#MPdefaultPointSpeed').val(), MISSION_UNIT_SPEED);
+    const speedConverted = toDisplayUnits(speedCms, MISSION_UNIT_SPEED);
+    $('#MPdefaultPointAltUnit').text(Number.isNaN(altCm) ? missionUnitLabel(MISSION_UNIT_ALT) : altitudeReadout(altCm).trim());
+    $('#MPdefaultPointSpeedUnit').text(speedConverted.multiplier !== 1 || Number.isNaN(speedCms)
+        ? missionUnitLabel(MISSION_UNIT_SPEED)
+        : missionUnitLabel(MISSION_UNIT_SPEED) + ' (' + (Math.round(speedCms * 0.36) / 10) + ' km/h)');
+}
+
+/* The default fields are plain text boxes and hold whatever was typed. A value that is
+   not a number differs from the stored one, so it would count as a change and be written
+   into every waypoint the save touches. Refuse it and put the stored value back. */
+function readNumericField(selector, stored, unit, power = 0) {
+    const typed = String($(selector).val()).trim();
+    const value = Number(typed);
+    if (typed !== '' && Number.isFinite(value)) {
+        return unit ? fromDisplayUnits(value, unit, power) : value;
+    }
+
+    $(selector).val(unit ? toFieldText(stored, unit, power) : String(stored));
+    return stored;
+}
+
+/* One request for the whole mission instead of one per waypoint; opentopodata takes
+   locations separated by a pipe and answers in the same order. */
+async function fetchWaypointElevations(waypoints) {
+    const elevations = [];
+    try {
+        for (let start = 0; start < waypoints.length; start += 100) {
+            const chunk = waypoints.slice(start, start + 100);
+            const locations = chunk.map(wp => wp.getLatMap() + ',' + wp.getLonMap()).join('|');
+            const response = await elevationFetch('https://api.opentopodata.org/v1/aster30m?locations=' + locations);
+            if (!response.ok) return null;
+            const answer = await response.json();
+            if (answer.status != 'OK' || !answer.results || answer.results.length != chunk.length) return null;
+            answer.results.forEach(result => elevations.push(result.elevation == null ? null : result.elevation));
+        }
+    } catch (error) {
+        // offline or the service unreachable - same handled failure as a bad answer
+        console.warn('elevation lookup failed:', error.message);
+        return null;
+    }
+    return elevations.includes(null) ? null : elevations;
+}
 let mission3DViewer = null;
 
 function mission3DMessage(key, fallback) {
@@ -686,6 +924,18 @@ function showMission3DTerrainWarnings(types) {
             messages.push(mission3DMessage(
                 'missionMap3DHomeRequired',
                 'HOME is not set: Relative-altitude terrain checks are unavailable.'
+            ));
+        }
+        if (types.includes('incomplete')) {
+            messages.push(mission3DMessage(
+                'missionMap3DRouteIncomplete',
+                'JUMP loops too long to follow: Route collision check covers only part of the mission.'
+            ));
+        }
+        if (types.includes('invalidJump')) {
+            messages.push(mission3DMessage(
+                'missionMap3DInvalidJump',
+                'A JUMP has settings the flight controller refuses to arm with: its legs are not shown or checked.'
             ));
         }
     }
@@ -730,6 +980,24 @@ missionControlTab.initialize = function (callback) {
     let invalidGeoZones = false;
     let isGeozoneEnabeld = false;
     let settings = {speed: 0, alt: 5000, safeRadiusSH: 50, fwApproachAlt: 60, fwLandAlt: 5, maxDistSH: 0, fwApproachLength: 0, fwLoiterRadius: 0};
+    // Flight path simulation. Everything but the cruise speed comes from the
+    // flight controller; the speed is the pilot's estimate, because a fixed wing
+    // holds a throttle setting rather than a commanded speed.
+    let simulation = {
+        enabled: false,
+        layer: null,
+        samples: [],
+        altitudesAbsolute: false,
+        speedMs: 15,
+        bankAngleDeg: FirmwareDefaults.bankAngleDeg,
+        bankCeilingDeg: 0,
+        wpRadiusCm: FirmwareDefaults.waypointRadiusCm,
+        // null = not yet read; 0 is a valid configured value for both settings.
+        loiterRadiusCm: null,
+        approachLengthCm: null,
+        speedFromFc: false,
+        turnSmoothing: TurnSmoothing.OFF
+    };
     let googleLocationRequestStarted = false;
     let conditionsFetched = false;
     let activeWeatherSource = null;
@@ -1095,6 +1363,9 @@ missionControlTab.initialize = function (callback) {
             //mspHelper.loadWaypoints,
             mspHelper.loadSafehomes,
             mspHelper.loadFwApproach,
+            // Without this the tab never learns which airframe is attached, and
+            // FC.isAirplane() answers from stale defaults.
+            mspHelper.loadMixerConfig,
             function (callback) {
                 if (isGeozoneEnabeld) {
                     mspHelper.loadGeozones(callback);
@@ -1116,9 +1387,60 @@ missionControlTab.initialize = function (callback) {
                 mspHelper.getSetting(("nav_fw_loiter_radius")).then((data) => {
                     settings.fwLoiterRadius = parseInt(data.value);
                 }).then(callback);
+            },
+            // The simulation keeps its own defaults, so a firmware that does not
+            // carry one of these settings leaves the tab working.
+            function (callback) {
+                mspHelper.getSetting("nav_fw_bank_angle").then((data) => {
+                    if (data) simulation.bankAngleDeg = readNumericSetting(data, simulation.bankAngleDeg);
+                }).catch(() => {}).then(() => callback());
+            },
+            function (callback) {
+                mspHelper.getSetting("nav_fw_loiter_radius").then((data) => {
+                    if (data) simulation.loiterRadiusCm = readNumericSetting(data, null);
+                }).catch(() => {}).then(() => callback());
+            },
+            function (callback) {
+                mspHelper.getSetting("nav_fw_land_approach_length").then((data) => {
+                    if (data) simulation.approachLengthCm = readNumericSetting(data, null);
+                }).catch(() => {}).then(() => callback());
+            },
+            // The absolute ceiling on roll. nav_fw_bank_angle is what navigation asks
+            // for, but it can never be delivered beyond this, so the flown radius is
+            // set by whichever is the tighter of the two.
+            function (callback) {
+                mspHelper.getSetting("max_angle_inclination_rll").then((data) => {
+                    const deciDegrees = data ? readNumericSetting(data, 0) : 0;
+                    if (deciDegrees > 0) simulation.bankCeilingDeg = deciDegrees / 10;
+                }).catch(() => {}).then(() => callback());
+            },
+            function (callback) {
+                mspHelper.getSetting("nav_wp_radius").then((data) => {
+                    if (data) simulation.wpRadiusCm = readNumericSetting(data, simulation.wpRadiusCm);
+                }).catch(() => {}).then(() => callback());
+            },
+            function (callback) {
+                mspHelper.getSetting("nav_fw_wp_turn_smoothing").then((data) => {
+                    if (data) simulation.turnSmoothing = readTurnSmoothing(data);
+                }).catch(() => {}).then(() => callback());
+            },
+            // The speed the firmware itself plans coordinated turns with when there
+            // is no airspeed sensor. Far better than asking the pilot to guess, and
+            // it is the same number the turn radius is derived from on the aircraft.
+            function (callback) {
+                mspHelper.getSetting("fw_reference_airspeed").then((data) => {
+                    if (!data) return;
+                    const centimetresPerSecond = readNumericSetting(data, 0);
+                    if (centimetresPerSecond > 0) {
+                        simulation.speedMs = Math.round(centimetresPerSecond / 100);
+                        simulation.speedFromFc = true;
+                    }
+                }).catch(() => {}).then(() => callback());
             }
         ]);
-        loadChainer.setExitPoint(loadHtml);
+        loadChainer.setExitPoint(function () {
+            loadOsdUnits().then(loadHtml).catch(err => console.error('Failed to load mission control tab:', err));
+        });
         loadChainer.execute();
     } else {
 
@@ -1212,6 +1534,18 @@ function iconKey(filename) {
             }
     
         i18n.localize();
+
+        landSpeedNotUpdatedModal = new jBox('Modal', {
+            width: 480,
+            height: 200,
+            closeButton: 'title',
+            animation: false,
+            title: i18n.getMessage('missionApplySpeedLandTitle'),
+            content: $('#landSpeedNotUpdatedContent')
+        });
+        $('#landSpeedNotUpdatedOk').on('click', function () {
+            landSpeedNotUpdatedModal.close();
+        });
 
         // Append shortcut hints after i18n sets titles (Ctrl-based)
         const addShortcutHint = (selector, suffix) => {
@@ -1494,6 +1828,7 @@ function iconKey(filename) {
 
     const mission3DRouteColor = Color.fromCssColorString('#13b5ea');
     const mission3DCollisionColor = Color.fromCssColorString('#e02f2f');
+    const mission3DJumpColor = Color.fromCssColorString('#e935d6');
 
     function createMission3DViewer(container) {
         buildModuleUrl.setBaseUrl('./');
@@ -1566,6 +1901,8 @@ function iconKey(filename) {
         let terrainLoadFailed = false;
         let lastWaypoints = [];
         let lastHome = null;
+        let lastSimulationSamples = [];
+        let lastSimulationAbsolute = false;
         let terrainCacheSignature = null;
         let terrainCache = null;
 
@@ -1633,10 +1970,11 @@ function iconKey(filename) {
             return {groundHeights, samplingFailed};
         }
 
-        async function sampleRouteTerrain(renderedPoints) {
-            const routeSegments = getMission3DRouteSegments(renderedPoints).filter((segment) => segment.length > 1);
-            const routeEdges = routeSegments.flatMap((segment, segmentIndex) => segment.slice(1).map((end, index) => {
-                const start = segment[index];
+        async function sampleRouteTerrain(renderedPoints, flightLegs) {
+            // One segment per chain of flown legs, plus one per JUMP leg so it can be drawn apart.
+            const routeSegments = getMission3DFlightSegments(renderedPoints, flightLegs);
+            const routeEdges = routeSegments.flatMap((segment, segmentIndex) => segment.points.slice(1).map((end, index) => {
+                const start = segment.points[index];
                 const geodesic = new EllipsoidGeodesic(
                     Cartographic.fromDegrees(start.lon, start.lat),
                     Cartographic.fromDegrees(end.lon, end.lat)
@@ -1651,7 +1989,7 @@ function iconKey(filename) {
                 };
             }));
             const samplingSpacing = getMission3DSamplingSpacing(routeEdges.map((edge) => edge.distance));
-            const routeSamples = routeSegments.map(() => []);
+            const routeSamples = routeSegments.map((segment) => ({jump: segment.jump, samples: []}));
             const terrainSamplePositions = [];
             const terrainSampleDescriptors = [];
 
@@ -1673,7 +2011,7 @@ function iconKey(filename) {
                         terrainClearanceAvailable: edge.terrainClearanceAvailable
                     };
 
-                    routeSamples[edge.segmentIndex].push(descriptor);
+                    routeSamples[edge.segmentIndex].samples.push(descriptor);
                     if (descriptor.terrainClearanceAvailable) {
                         terrainSampleDescriptors.push(descriptor);
                         terrainSamplePositions.push(Cartographic.clone(position));
@@ -1698,7 +2036,7 @@ function iconKey(filename) {
                     : 0;
                 sample.clearance = sample.plannedHeight - terrainHeight;
             });
-            routeSamples.flat().forEach((sample) => {
+            routeSamples.flatMap((segment) => segment.samples).forEach((sample) => {
                 if (!sample.terrainClearanceAvailable) sample.clearance = Number.POSITIVE_INFINITY;
                 sample.cartesian = Cartesian3.fromRadians(
                     sample.position.longitude,
@@ -1778,18 +2116,37 @@ function iconKey(filename) {
         function renderRouteTerrain(routeSamples) {
             let hasTerrainCollision = false;
 
-            routeSamples.forEach((samples) => {
+            routeSamples.forEach(({samples, jump}) => {
+                const clearColor = jump ? mission3DJumpColor : mission3DRouteColor;
                 getMission3DRouteRuns(samples).forEach((run) => {
                     hasTerrainCollision ||= run.collidesWithTerrain;
                     viewer.entities.add({
                         polyline: {
                             positions: run.samples.map(getMission3DSampleCartesian),
                             width: run.collidesWithTerrain ? 6 : 4,
-                            material: run.collidesWithTerrain ? mission3DCollisionColor : mission3DRouteColor,
+                            material: run.collidesWithTerrain ? mission3DCollisionColor : clearColor,
                             depthFailMaterial: run.collidesWithTerrain ? mission3DCollisionColor.withAlpha(0.9) : undefined
                         }
                     });
                 });
+
+                // The repeat count sits mid-leg, like the label on the 2D editor's jump line.
+                if (jump && samples.length) {
+                    viewer.entities.add({
+                        position: getMission3DSampleCartesian(samples[Math.floor(samples.length / 2)]),
+                        label: {
+                            text: getMission3DJumpLabel(jump.repeat),
+                            font: '600 12px Segoe UI, Calibri, sans-serif',
+                            fillColor: mission3DJumpColor,
+                            outlineColor: Color.BLACK,
+                            outlineWidth: 3,
+                            style: LabelStyle.FILL_AND_OUTLINE,
+                            verticalOrigin: VerticalOrigin.BOTTOM,
+                            pixelOffset: new Cartesian2(0, -6),
+                            disableDepthTestDistance: Number.POSITIVE_INFINITY
+                        }
+                    });
+                }
             });
 
             return hasTerrainCollision;
@@ -1797,7 +2154,7 @@ function iconKey(filename) {
 
         // Terrain warnings for a finished render. A provider that never loaded or a sample that
         // failed makes every clearance meaningless, so that single warning replaces the others.
-        function showMissionWarnings(terrainSamplingFailed, hasTerrainCollision, missingHomeReference) {
+        function showMissionWarnings(terrainSamplingFailed, hasTerrainCollision, missingHomeReference, routeWalk) {
             if (terrainLoadFailed || terrainSamplingFailed) {
                 showMission3DTerrainWarnings(['unavailable']);
                 return;
@@ -1806,15 +2163,82 @@ function iconKey(filename) {
             const warningTypes = [];
             if (hasTerrainCollision) warningTypes.push('collision');
             if (missingHomeReference) warningTypes.push('home');
+            if (routeWalk.truncated) warningTypes.push('incomplete');
+            if (routeWalk.invalidJumps) warningTypes.push('invalidJump');
             showMission3DTerrainWarnings(warningTypes);
         }
 
-        async function renderMission(waypoints, home) {
+        /*
+         * The track the aircraft will really fly, drawn beside the planned route.
+         *
+         * The samples carry their own altitude — the flight controller's ramp along
+         * each leg, and the approach altitudes on a landing — so the track is drawn
+         * where the aircraft will actually be, not where the plan says. Heights are
+         * metres above home, which is the frame the simulation works in; the ground
+         * beneath home puts them back into the same frame as the mission points.
+         */
+        function renderSimulatedTrack(samples, homeGroundHeight) {
+            if (!samples?.length) return [];
+
+            const datum = Number.isFinite(homeGroundHeight) ? homeGroundHeight : 0;
+            const positions = samples.map(
+                (sample) => Cartesian3.fromDegrees(sample.lon, sample.lat, datum + (sample.altM ?? 0))
+            );
+
+            // One stretch per phase, in the same colours as the 2D map. Each
+            // stretch also hangs a translucent curtain from the track down to the
+            // ground: a line floating in space gives no sense of how high it is,
+            // and on the landing approach the curtain visibly narrows to nothing
+            // as the aircraft comes down — which is the point of drawing it.
+            phaseRuns(samples)
+                .filter((run) => run.to > run.from)
+                .forEach((run) => {
+                    const color = Color.fromCssColorString(
+                        SIMULATION_PHASE_COLOURS[run.phase] ?? SIMULATION_PHASE_COLOURS[SimPhase.CRUISE]
+                    );
+                    const runPositions = positions.slice(run.from, run.to + 1);
+
+                    // Every third sample keeps the curtain light without changing
+                    // its shape; the run's last point is kept so nothing is cut off.
+                    const curtainPositions = runPositions.filter((_, index) => index % 3 === 0);
+                    if ((runPositions.length - 1) % 3 !== 0) {
+                        curtainPositions.push(runPositions[runPositions.length - 1]);
+                    }
+                    if (curtainPositions.length > 1) {
+                        viewer.entities.add({
+                            wall: {
+                                positions: curtainPositions,
+                                material: color.withAlpha(0.22)
+                            }
+                        });
+                    }
+
+                    viewer.entities.add({
+                        polyline: {
+                            positions: runPositions,
+                            width: 4,
+                            material: color,
+                            // The globe depth-tests everything drawn against it, so a
+                            // track running behind a hill — or lying on the ellipsoid
+                            // when no terrain is loaded — would vanish. Keep it
+                            // readable there instead, dimmed, the way the waypoint
+                            // markers stay readable.
+                            depthFailMaterial: color.withAlpha(0.45)
+                        }
+                    });
+                });
+
+            return positions;
+        }
+
+        async function renderMission(waypoints, home, simulationSamples = [], simulationAltitudesAbsolute = false) {
             const sequence = ++updateSequence;
             viewer.entities.removeAll();
             hideMission3DTerrainWarning();
 
             const points = getMission3DPoints(waypoints, home);
+            const routeWalk = getMission3DFlightLegs(waypoints);
+            const flightLegs = routeWalk.legs;
             const missionPoints = points.filter((point) => !point.isHome);
             if (!missionPoints.length) {
                 showEmptyMap();
@@ -1824,7 +2248,7 @@ function iconKey(filename) {
 
             $('#missionMap3DHelp').hide();
 
-            const signature = JSON.stringify(points);
+            const signature = JSON.stringify({points, flightLegs});
             const cache = terrainCacheSignature === signature ? terrainCache : null;
             // A cache hit answers straight away. A miss goes through samplePointTerrain, which asks
             // the terrain provider only when a real one is loaded, but awaits either way, so on a
@@ -1842,7 +2266,7 @@ function iconKey(filename) {
             const missingHomeReference = !hasHome && missionPoints.some((point) => !point.absoluteAltitude);
             const {displayPositions, renderedPoints} = renderMissionPoints(points, groundHeights, homeGroundHeight, hasHome);
 
-            const routeTerrain = cache ? cache.routeTerrain : await sampleRouteTerrain(renderedPoints);
+            const routeTerrain = cache ? cache.routeTerrain : await sampleRouteTerrain(renderedPoints, flightLegs);
             if (destroyed || sequence !== updateSequence) return;
             terrainSamplingFailed ||= routeTerrain.samplingFailed;
             if (!cache && !terrainSamplingFailed && !(terrainProvider instanceof EllipsoidTerrainProvider)) {
@@ -1850,9 +2274,26 @@ function iconKey(filename) {
                 terrainCache = {groundHeights, routeTerrain};
             }
             const hasTerrainCollision = renderRouteTerrain(routeTerrain.routeSamples);
-            showMissionWarnings(terrainSamplingFailed, hasTerrainCollision, missingHomeReference);
+            showMissionWarnings(terrainSamplingFailed, hasTerrainCollision, missingHomeReference, routeWalk);
+            // The track's altitudes are metres above home, so they need the same
+            // ground the waypoints are measured from. Falling back to sea level
+            // instead buries the whole track as far underground as the site is
+            // high — which is exactly what it looks like: nothing there at all.
+            // Cesium places everything by absolute height. Track altitudes that are
+            // already AMSL need no reference at all — adding the ground to them puts
+            // the aircraft a site's elevation above where it flies.
+            let trackDatum = 0;
+            if (!simulationAltitudesAbsolute) {
+                trackDatum = Number.isFinite(homeGroundHeight)
+                    ? homeGroundHeight
+                    : (groundHeights[points.findIndex((point) => !point.isHome)] ?? 0);
+            }
+            const trackPositions = renderSimulatedTrack(simulationSamples, trackDatum);
 
-            const missionBounds = BoundingSphere.fromPoints(displayPositions);
+            // The simulated track has to be framed too. A landing approach runs an
+            // approach length past the touchdown point and out to the side, so
+            // framing the waypoints alone leaves the part worth looking at off screen.
+            const missionBounds = BoundingSphere.fromPoints(displayPositions.concat(trackPositions));
             const range = Math.max(350, missionBounds.radius * 2.5, Math.max(...missionPoints.map((point) => Math.abs(point.altitude))) * 5);
             viewer.camera.flyToBoundingSphere(missionBounds, {
                 duration: 0,
@@ -1890,11 +2331,11 @@ function iconKey(filename) {
             viewer.terrainProvider = provider;
             terrainCacheSignature = null;
             terrainCache = null;
-            if (missionMapViewMode === '3d') renderMission(lastWaypoints, lastHome);
+            if (missionMapViewMode === '3d') renderMission(lastWaypoints, lastHome, lastSimulationSamples, lastSimulationAbsolute);
         }).catch((error) => {
             terrainLoadFailed = true;
             console.warn('Mission Planner 3D terrain is unavailable, using an ellipsoid:', error);
-            if (!destroyed && missionMapViewMode === '3d') renderMission(lastWaypoints, lastHome);
+            if (!destroyed && missionMapViewMode === '3d') renderMission(lastWaypoints, lastHome, lastSimulationSamples, lastSimulationAbsolute);
         });
 
         return {
@@ -1909,10 +2350,12 @@ function iconKey(filename) {
                 }
                 scheduleResize();
             },
-            update(waypoints, home) {
+            update(waypoints, home, simulationSamples = [], simulationAltitudesAbsolute = false) {
                 lastWaypoints = waypoints;
                 lastHome = home;
-                renderMission(waypoints, home);
+                lastSimulationSamples = simulationSamples;
+                lastSimulationAbsolute = simulationAltitudesAbsolute;
+                renderMission(waypoints, home, simulationSamples, simulationAltitudesAbsolute);
             },
             destroy() {
                 if (destroyed) return;
@@ -1929,7 +2372,11 @@ function iconKey(filename) {
 
     function updateMission3D() {
         if (mission3DViewer && missionMapViewMode === '3d') {
-            mission3DViewer.update(mission.get(), HOME);
+            mission3DViewer.update(
+                mission.get(), HOME,
+                simulation.enabled ? simulation.samples : [],
+                simulation.altitudesAbsolute
+            );
         }
     }
 
@@ -2041,7 +2488,8 @@ function iconKey(filename) {
         $('#pointP1').val('');
         $('#pointP2').val('');
         $('#pointP3Alt').val('');
-        $('#missionDistance').text(0);
+        $('#pointSavedTick').hide();
+        $('#missionDistance').text(missionDistanceText(0));
         $('#MPeditPoint').fadeOut(300);
     }
 
@@ -2073,11 +2521,15 @@ function iconKey(filename) {
     }
 
     function refreshSettings() {
-        $('#MPdefaultPointAlt').val(String(settings.alt));
-        $('#MPdefaultPointSpeed').val(String(settings.speed));
+        $('#MPdefaultPointAlt').val(altitudeToDisplay(settings.alt));
+        $('#MPdefaultPointSpeed').val(toFieldText(settings.speed, MISSION_UNIT_SPEED));
         $('#MPdefaultSafeRangeSH').val(String(settings.safeRadiusSH));
-        $('#MPdefaultFwApproachAlt').val(String(settings.fwApproachAlt));
-        $('#MPdefaultLandAlt').val(String(settings.fwLandAlt));
+        $('#MPdefaultFwApproachAlt').val(toFieldText(settings.fwApproachAlt, MISSION_UNIT_DIST, 2));
+        $('#MPdefaultLandAlt').val(toFieldText(settings.fwLandAlt, MISSION_UNIT_DIST, 2));
+
+        $('#MPdefaultFwApproachAltUnit').text(missionUnitLabel(MISSION_UNIT_DIST));
+        $('#MPdefaultLandAltUnit').text(missionUnitLabel(MISSION_UNIT_DIST));
+        updateDefaultUnitHints();
     }
 
     function closeSettingsPanel() {
@@ -2094,7 +2546,8 @@ function iconKey(filename) {
         cleanSafehomeLayers();
     }
 
-    async function checkApproachAltitude(altitude, isSeaLevelRef, sealevel) {
+    // Synchronous on purpose: callers branch on the result, a Promise would always pass.
+    function checkApproachAltitude(altitude, isSeaLevelRef, sealevel) {
 
         if (altitude - (isSeaLevelRef ? sealevel * 100 : 0 ) < 0) {
             dialog.alert(i18n.getMessage('MissionPlannerAltitudeChangeReset'));
@@ -2635,28 +3088,19 @@ function iconKey(filename) {
          * Process home table UI
          */
 
-        $(".home-lat").val(HOME.getLatMap()).on('change', function () {
+        $(".home-lat").val(HOME.getLatMap()).off('change.homePosition').on('change.homePosition', function () {
             HOME.setLat(Math.round(Number($(this).val()) * 10000000));
-            cleanHomeLayers();
-            renderHomeOnMap();
-            updateMission3D();
+            updateHome();
         });
 
-        $(".home-lon").val(HOME.getLonMap()).on('change', function () {
+        $(".home-lon").val(HOME.getLonMap()).off('change.homePosition').on('change.homePosition', function () {
             HOME.setLon(Math.round(Number($(this).val()) * 10000000));
-            cleanHomeLayers();
-            renderHomeOnMap();
-            updateMission3D();
+            updateHome();
         });
 
-        if (HOME.getLatMap() == 0 && HOME.getLonMap() == 0) {
-            HOME.setAlt("N/A");
-        } else {
-            (async () => {
-                const elevationAtHome = await HOME.getElevation(globalSettings);
-                $('#elevationValueAtHome').text(elevationAtHome+' m');
-                HOME.setAlt(elevationAtHome);
-            })()
+        invalidateHomeElevation();
+        if (HOME.getLatMap() != 0 || HOME.getLonMap() != 0) {
+            void resolveHomeElevationCm();
         }
     }
 
@@ -2714,9 +3158,9 @@ function iconKey(filename) {
     }
 
     function updateHome() {
-        renderHomeTable();
         cleanHomeLayers();
         renderHomeOnMap();
+        renderHomeTable();
         updateMission3D();
         plotElevation();
     }
@@ -3208,7 +3652,7 @@ function iconKey(filename) {
             multiMissionWPNum = 0;
         let activatePoi = false;
         let activateHead = false;
-        $('#missionDistance').text(0);
+        $('#missionDistance').text(missionDistanceText(0));
         cleanLines();
         mission.get().forEach(function (element) {
             if (!element.isAttached()) {
@@ -3351,12 +3795,13 @@ function iconKey(filename) {
             $('#missionDistance').text('N/A');
         } else {
             if (lengthMission.length >= 1) {
-                $('#missionDistance').text(lengthMission[lengthMission.length -1].toFixed(1));
+                $('#missionDistance').text(missionDistanceText(lengthMission[lengthMission.length -1]));
             } else {
                 $('#missionDistance').text('infinite');
             }
         }
 
+        repaintSimulation();
         updateMission3D();
     }
 
@@ -3437,6 +3882,7 @@ function iconKey(filename) {
     }
 
     function cleanLayers() {
+        cleanSimulation();
         for (var i in lines) {
             map.removeLayer(lines[i]);
         }
@@ -3455,6 +3901,218 @@ function iconKey(filename) {
         lines = [];
     }
 
+    /////////////////////////////////////////////
+    //
+    // Flight path simulation
+    //
+    /////////////////////////////////////////////
+
+    // Layers that only illustrate something must stay out of every hit test:
+    // picking one up as a marker to drag, or as a line to insert a waypoint into,
+    // would let an overlay quietly rewrite the mission.
+    const interactiveLayersOnly = {
+        layerFilter: (layer) => layer?.get('no_interaction') !== true
+    };
+
+    // nav_fw_wp_turn_smoothing arrives as an index into its own lookup table.
+    function readTurnSmoothing(setting) {
+        const name = setting.setting?.table?.values?.[setting.value];
+        if (!name) return TurnSmoothing.OFF;
+
+        const normalized = String(name).toUpperCase();
+        if (normalized.includes('CUT')) return TurnSmoothing.CUT;
+        if (normalized === 'ON') return TurnSmoothing.ON;
+        return TurnSmoothing.OFF;
+    }
+
+    // The approach settings for a landing waypoint live after the safehome block
+    // in the same collection, indexed by the mission the waypoint belongs to -
+    // the same lookup addFwApproach uses for the drawn approach lines.
+    function landingApproachFor(point) {
+        const approach = FC.FW_APPROACH?.get()?.[FC.SAFEHOMES.getMaxSafehomeCount() + (point.multiMissionIdx ?? 0)];
+        if (!approach) return {};
+
+        return {
+            approachAltCm: approach.getApproachAltAsl(),
+            landAltCm: approach.getLandAltAsl(),
+            approachDirection: approach.getApproachDirection(),
+            landHeading1: approach.getLandHeading1(),
+            landHeading2: approach.getLandHeading2(),
+            isSeaLevelRef: approach.getIsSeaLevelRef()
+        };
+    }
+
+    function cleanSimulation() {
+        if (simulation.layer) {
+            map.removeLayer(simulation.layer);
+            simulation.layer = null;
+        }
+        simulation.samples = [];
+    }
+
+    // Everything the run needs, gathered in one place: the route with its landing
+    // approaches, the parameters, and what had to be assumed to get there.
+    function buildSimulationPlan() {
+        const planned = getSimulationRoute(mission.get());
+        if (planned.length < 2) return null;
+
+        // Home elevation is what turns an AMSL waypoint into the above-home frame
+        // the flight controller navigates in. Without it, absolute altitudes are
+        // left alone and the mismatch is reported rather than hidden.
+        const homeAltM = homeMarkers.length && HOME.getAlt() !== 'N/A' ? Number(HOME.getAlt()) : undefined;
+        const {route: withAltitudes, homeKnown, absolute} = resolveRouteAltitudes(planned, homeAltM);
+
+        // Offline these are still null — they are only read from a connected flight
+        // controller — so the firmware's own defaults stand in rather than letting
+        // the approach quietly disappear. ?? (not ||) so a configured 0 survives.
+        const approachLengthCm = simulation.approachLengthCm ?? FirmwareDefaults.approachLengthCm;
+        const loiterRadiusCm = simulation.loiterRadiusCm ?? FirmwareDefaults.loiterRadiusCm;
+
+        const {route, landingsWithoutApproach, suspectLandings} = withLandingApproaches(
+            withAltitudes,
+            (point) => landingApproachFor(point),
+            {approachLengthCm, loiterRadiusCm, homeAltM, routeFrameAbsolute: absolute}
+        );
+
+        // nav_fw_bank_angle is what navigation asks for; max_angle_inclination_rll
+        // is what the aircraft can deliver. The tighter one sizes the turn.
+        const bankCeilingBinds = simulation.bankCeilingDeg > 0
+            && simulation.bankCeilingDeg < simulation.bankAngleDeg;
+
+        return {
+            planned,
+            route,
+            landingsWithoutApproach,
+            suspectLandings,
+            homeKnown,
+            altitudesAbsolute: absolute,
+            // The AMSL-on-AMSL case is drawn without home, anchored at the landing
+            // altitude — the shape is right, the one-third split may differ from
+            // the home-anchored firmware rule, and that assumption is worth a line.
+            approachAnchoredAtLanding: !homeKnown && absolute
+                && route.some((point) => point.isApproach),
+            bankCeilingBinds,
+            usingDefaults: simulation.approachLengthCm === null || simulation.loiterRadiusCm === null,
+            parameters: {
+                speedMs: simulation.speedMs,
+                bankAngleDeg: bankCeilingBinds ? simulation.bankCeilingDeg : simulation.bankAngleDeg,
+                loiterRadiusM: loiterRadiusCm / 100,
+                waypointRadiusM: simulation.wpRadiusCm / 100,
+                turnSmoothing: simulation.turnSmoothing
+            }
+        };
+    }
+
+    const LANDING_PROBLEM_MESSAGE = {
+        [LandingApproachProblem.NO_HEADING]: 'missionSimulationNoLandingHeading',
+        [LandingApproachProblem.NO_APPROACH_LENGTH]: 'missionSimulationNoApproachLength',
+        [LandingApproachProblem.NO_HOME_ELEVATION]: 'missionSimulationApproachNoHome',
+        [LandingApproachProblem.ALTITUDES_IMPLAUSIBLE]: 'missionSimulationApproachAltitudes'
+    };
+
+    // The model reports track warnings as code plus figures; the words belong to
+    // the app, where they go through i18n like every other user-facing string.
+    const TRACK_WARNING_MESSAGE = {
+        'waypoint-missed': (warning) => i18n.getMessage('missionSimulationWaypointMissed',
+            [String(warning.waypointNumber), String(Math.round(warning.distanceM))]),
+        'leg-not-flyable': (warning) => i18n.getMessage('missionSimulationLegNotFlyable',
+            [String(warning.waypointNumber), String(warning.radiusM)])
+    };
+
+    // Everything the reader has to know to judge what they are looking at.
+    function simulationNotices(plan, result) {
+        const notices = plan.landingsWithoutApproach.map(({number, reason}) =>
+            i18n.getMessage(LANDING_PROBLEM_MESSAGE[reason], [String(Number(number) + 1)]));
+
+        if (plan.usingDefaults) notices.push(i18n.getMessage('missionSimulationDefaults'));
+        if (!simulation.speedFromFc) notices.push(i18n.getMessage('missionSimulationSpeedEstimated'));
+        if (plan.bankCeilingBinds) {
+            notices.push(i18n.getMessage('missionSimulationBankCeiling', [String(simulation.bankCeilingDeg)]));
+        }
+        // Said rather than hidden: a hidden button is indistinguishable from a broken
+        // one, and airframe detection is not reliable enough to hide a feature on.
+        if (CONFIGURATOR.connectionValid && !FC.isAirplane()) {
+            notices.push(i18n.getMessage('missionSimulationFixedWingOnly'));
+        }
+        plan.suspectLandings.forEach(({number, gapM}) => {
+            notices.push(i18n.getMessage('missionSimulationApproachSuspect',
+                [String(Number(number) + 1), String(gapM)]));
+        });
+        if (plan.approachAnchoredAtLanding) {
+            notices.push(i18n.getMessage('missionSimulationApproachAnchored'));
+        }
+        if (!plan.homeKnown && plan.planned.some((point) => point.absoluteAltitude)) {
+            notices.push(i18n.getMessage('missionSimulationNoHomeElevation'));
+        }
+
+        return notices.concat(
+            result.warnings
+                .filter((warning) => warning.code !== 'simulation-truncated')
+                .map((warning) => TRACK_WARNING_MESSAGE[warning.code]?.(warning) ?? warning.text)
+        );
+    }
+
+    // A repeat or a truncated run means the figures no longer describe the whole
+    // flight. Showing a rounded number anyway would read as a complete answer.
+    function showSimulationFigures(plan, result) {
+        const radius = commandedTurnRadius(
+            plan.parameters.speedMs, plan.parameters.bankAngleDeg,
+            plan.parameters.loiterRadiusM, plan.parameters.turnSmoothing
+        );
+        $('#simulationTurnRadius').text(Number.isFinite(radius) ? `${radius.toFixed(0)} m` : '-');
+
+        const repeats = mission.get().some((waypoint) => waypoint.getAction() === MWNP.WPTYPE.JUMP);
+        const truncated = result.warnings.some((warning) => warning.code === 'simulation-truncated');
+
+        if (repeats || truncated) {
+            $('#simulationTime, #simulationDistance').text('-');
+            return i18n.getMessage(repeats ? 'missionSimulationJumps' : 'missionSimulationTruncated');
+        }
+
+        $('#simulationTime').text(formatSimulationTime(result.summary.totalTimeS));
+        $('#simulationDistance').text(`${(result.summary.totalDistanceM / 1000).toFixed(2)} km`);
+        return null;
+    }
+
+    function repaintSimulation() {
+        cleanSimulation();
+        $('#missionPlannerSimulation').toggle(simulation.enabled);
+        if (!simulation.enabled) return;
+
+        const $warnings = $('#simulationWarnings').empty();
+        const stop = (message) => {
+            $('#simulationTurnRadius').text('');
+            $('#simulationTime, #simulationDistance').text('-');
+            $warnings.text(i18n.getMessage(message));
+        };
+
+        // In the all-missions view the map shows every mission but the simulation
+        // only ever flies one, so figures would describe something else entirely.
+        if (!singleMissionActive()) return stop('missionSimulationMultiMission');
+
+        const plan = buildSimulationPlan();
+        if (!plan) return stop('missionSimulationTooFewPoints');
+
+        const result = simulateGroundTrack(plan.route, plan.parameters);
+        simulation.samples = result.samples;
+        simulation.altitudesAbsolute = plan.altitudesAbsolute;
+
+        if (result.samples.length > 1) {
+            simulation.layer = new VectorLayer({
+                source: new VectorSource({features: simulationTrackFeatures(result.samples)})
+            });
+            // Keep the track out of every hit test: it must never be picked up as a
+            // marker to drag or a line to insert a waypoint into.
+            simulation.layer.set('no_interaction', true);
+            map.addLayer(simulation.layer);
+        }
+
+        const incomplete = showSimulationFigures(plan, result);
+        simulationNotices(plan, result)
+            .concat(incomplete ?? [])
+            .forEach((text) => $warnings.append($('<div/>').text(text)));
+    }
+
     function redrawLayers() {
         if (!mission.isEmpty()) {
             repaintLine4Waypoints(mission);
@@ -3464,7 +4122,13 @@ function iconKey(filename) {
                 }
             });
 
+        } else {
+            // An emptied mission must empty the panel too, or its figures keep
+            // describing a track that is no longer there.
+            repaintSimulation();
         }
+
+        renderWaypointSelect();
 
         if (!isOffline) geozoneWarning();
     }
@@ -3474,6 +4138,671 @@ function iconKey(filename) {
         if (selectedFeature && selectedMarker) {
             selectedFeature.setStyle(getWaypointIcon(selectedMarker, true));
         }
+        renderWaypointSelect();
+    }
+
+    /////////////////////////////////////////////
+    //
+    // Waypoint selector panel
+    //
+    /////////////////////////////////////////////
+
+    function selectWaypointMarkerByNumber(wpNumber, previousLayerIndex) {
+        $("#editMission").hide();
+        selectedMarker = mission.getWaypoint(wpNumber);
+        selectedFeature = markers[selectedMarker.getLayerNumber()].getSource().getFeatures()[0];
+
+        selectedFwApproachWp = FC.FW_APPROACH.get()[FC.SAFEHOMES.getMaxSafehomeCount() + selectedMarker.getMultiMissionIdx()];
+
+        if (selectedFwApproachWp.getLandHeading1() == 0 && selectedFwApproachWp.getLandHeading1() == 0 && selectedFwApproachWp.getApproachAltAsl() == 0 && selectedFwApproachWp.getLandAltAsl() == 0) {
+            selectedFwApproachWp.setApproachAltAsl(Math.round(settings.fwApproachAlt * 100));
+            selectedFwApproachWp.setLandAltAsl(Math.round(settings.fwLandAlt * 100));
+        }
+
+        var geometry = selectedFeature.getGeometry();
+        var coord = toLonLat(geometry.getCoordinates());
+
+        selectedFeature.setStyle(getWaypointIcon(selectedMarker, true));
+
+        let P3Value = selectedMarker.getP3();
+
+        changeSwitch($('#pointP3Alt'), missionControlTab.isBitSet(P3Value, MWNP.P3.ALT_TYPE));
+        changeSwitch($('#pointP3UserAction1'), missionControlTab.isBitSet(P3Value, MWNP.P3.USER_ACTION_1));
+        changeSwitch($('#pointP3UserAction2'), missionControlTab.isBitSet(P3Value, MWNP.P3.USER_ACTION_2));
+        changeSwitch($('#pointP3UserAction3'), missionControlTab.isBitSet(P3Value, MWNP.P3.USER_ACTION_3));
+        changeSwitch($('#pointP3UserAction4'), missionControlTab.isBitSet(P3Value, MWNP.P3.USER_ACTION_4));
+
+
+        if (selectedMarker.getAction() == MWNP.WPTYPE.LAND) {
+            $('#wpFwLanding').fadeIn(300);
+        } else  {
+            $('#wpFwLanding').fadeOut(300);
+        }
+
+        if (previousLayerIndex == null || previousLayerIndex != selectedMarker.getLayerNumber()) {
+            const wp = selectedMarker;
+            const approachWp = selectedFwApproachWp;
+            (async () => {
+                const elevationAtWP = await wp.getElevation(globalSettings);
+                // the waypoint may have been deleted or deselected while the elevation was fetched
+                if (selectedMarker !== wp) return;
+
+                $('#elevationValueAtWP').text(elevationAtWP);
+                rememberTerrain(wp, elevationAtWP);
+                const returnAltitude = checkAltElevSanity(false, wp.getAlt(), elevationAtWP, P3Value);
+                wp.setAlt(returnAltitude);
+
+                approachWp.setIsSeaLevelRef(missionControlTab.isBitSet(P3Value, MWNP.P3.ALT_TYPE) ? 1 : 0);
+                $('#wpApproachAlt').val(altitudeToDisplay(approachWp.getApproachAltAsl()));
+                $('#wpLandAlt').val(altitudeToDisplay(approachWp.getLandAltAsl()));
+                $('#wpLandAltM').text(altitudeReadout(approachWp.getLandAltAsl()));
+                $('#wpApproachAltM').text(altitudeReadout(approachWp.getApproachAltAsl()));
+
+                plotElevation();
+            })().catch(err => console.error('Failed to update waypoint elevation:', err));
+        }
+        $('#elevationAtWP').fadeIn();
+        $('#groundClearanceAtWP').fadeIn();
+
+        $('#altitudeInMeters').text(altitudeReadout(selectedMarker.getAlt()));
+        $('#pointLon').val(Math.round(coord[0] * 10000000) / 10000000);
+        $('#pointLat').val(Math.round(coord[1] * 10000000) / 10000000);
+        $('#pointAlt').val(altitudeToDisplay(selectedMarker.getAlt()));
+        $('#pointType').val(selectedMarker.getAction());
+        // Change SpeedValue to Parameter1, 2, 3
+        $('#pointP1').val(parameterToDisplay(selectedMarker.getAction(), 'parameter1', selectedMarker.getP1()));
+        $('#pointP2').val(parameterToDisplay(selectedMarker.getAction(), 'parameter2', selectedMarker.getP2()));
+
+        $('#wpApproachDirection').val(selectedFwApproachWp.getApproachDirection());
+        $('#wpLandHeading1').val(Math.abs(selectedFwApproachWp.getLandHeading1()));
+        changeSwitch($('#wpLandHeading1Excl'), selectedFwApproachWp.getLandHeading1() < 0);
+        $('#wpLandHeading2').val(Math.abs(selectedFwApproachWp.getLandHeading2()));
+        changeSwitch($('#wpLandHeading2Excl'), selectedFwApproachWp.getLandHeading2() < 0);
+
+        // Selection box update depending on choice of type of waypoint
+        for (var j in dictOfLabelParameterPoint[selectedMarker.getAction()]) {
+            if (dictOfLabelParameterPoint[selectedMarker.getAction()][j] != '') {
+                $('#pointP'+String(j).slice(-1)+'class').fadeIn(300);
+                $('label[for=pointP'+String(j).slice(-1)+']').html(parameterLabel(selectedMarker.getAction(), j));
+            }
+            else {$('#pointP'+String(j).slice(-1)+'class').fadeOut(300);}
+        }
+        selectedMarker = renderWaypointOptionsTable(selectedMarker);
+        $('#EditPointNumber').text("Edit point "+String(selectedMarker.getLayerNumber()+1));
+        // the tick belongs to edits of the previously shown waypoint
+        $('#pointSavedTick').hide();
+        $('#MPeditPoint').fadeIn(300);
+        $('#pointP3UserActionClass').fadeIn();
+        redrawLayer();
+    }
+
+    function selectWaypointFromList(wpNumber) {
+        let previousLayerIndex = null;
+        if (selectedMarker != null && selectedFeature != null) {
+            previousLayerIndex = selectedMarker.getLayerNumber();
+            selectedFeature.setStyle(getWaypointIcon(selectedMarker, false));
+            selectedMarker = null;
+            selectedFeature = null;
+        }
+        selectWaypointMarkerByNumber(wpNumber, previousLayerIndex);
+        map.getView().animate({center: fromLonLat([selectedMarker.getLonMap(), selectedMarker.getLatMap()]), duration: 200});
+    }
+
+    function wpListSelectableWaypoints() {
+        return mission.get().filter(wp => !wp.isAttached());
+    }
+
+    function renderWaypointSelect() {
+        const $select = $('#wpListSelect');
+        if (!$select.length) return;
+
+        const waypoints = wpListSelectableWaypoints();
+        const previous = selectedMarker ? String(selectedMarker.getNumber()) : String($select.val());
+
+        $select.empty();
+        waypoints.forEach(function (wp) {
+            $select.append($('<option>').val(String(wp.getNumber())).text(wpListLabel(wp)));
+        });
+        if (waypoints.some(wp => String(wp.getNumber()) === previous)) {
+            $select.val(previous);
+        }
+
+        $('#wpListCount').text(i18n.getMessage('missionWpListCount', [String(waypoints.length)]));
+        $select.prop('disabled', waypoints.length === 0);
+        $('#wpListPrev, #wpListNext').toggleClass('disabled', waypoints.length === 0);
+        syncSeaLevelSwitch();
+    }
+
+    /* Terrain height and ground clearance are otherwise only recomputed by
+       checkAltElevSanity, which also corrects the altitude. This one only reports, using
+       the same two formulas, so the panel can be refreshed without moving a waypoint. */
+    async function refreshGroundClearanceDisplay(knownElevation) {
+        const wp = selectedMarker;
+        if (!wp) return;
+
+        // The terrain height is already on screen for the selected waypoint, so a caller
+        // that only needs the reading recomputed can hand it over and skip the lookup.
+        let elevation = Number(knownElevation);
+        if (Number.isNaN(elevation)) {
+            try {
+                elevation = Number(await wp.getElevation(globalSettings));
+            } catch (error) {
+                console.warn('elevation lookup failed:', error.message);
+                return;
+            }
+            if (selectedMarker !== wp || Number.isNaN(elevation)) return;
+        }
+
+        $('#elevationValueAtWP').text(elevation);
+        rememberTerrain(wp, elevation);
+
+        let clearance = 'NO HOME';
+        if (missionControlTab.isBitSet(wp.getP3(), MWNP.P3.ALT_TYPE)) {
+            clearance = wp.getAlt() / 100 - elevation;
+        } else if (homeMarkers.length && HOME.getAlt() != "N/A") {
+            clearance = wp.getAlt() / 100 + (Number(HOME.getAlt()) - elevation);
+        }
+        document.getElementById('groundClearanceAtWP').style.color =
+            (typeof clearance === 'number' && clearance < settings.alt / 100) ? "#FF0000" : "#303030";
+        $('#groundClearanceValueAtWP').val(clearance);
+    }
+
+    /* Push values a save may have altered back into the single point panel directly:
+       re-selecting the waypoint would start another elevation lookup. */
+    function syncEditPanelWithSelection() {
+        if (!selectedMarker) return;
+        $('#pointAlt').val(altitudeToDisplay(selectedMarker.getAlt()));
+        $('#altitudeInMeters').text(altitudeReadout(selectedMarker.getAlt()));
+        $('#pointP1').val(parameterToDisplay(selectedMarker.getAction(), 'parameter1', selectedMarker.getP1()));
+        $('#pointP2').val(parameterToDisplay(selectedMarker.getAction(), 'parameter2', selectedMarker.getP2()));
+        changeSwitch($('#pointP3Alt'), missionControlTab.isBitSet(selectedMarker.getP3(), MWNP.P3.ALT_TYPE));
+        // A landing's approach fields share the waypoint's datum; after a conversion
+        // they would otherwise keep showing - and write back - the old numbers.
+        if (selectedMarker.getAction() == MWNP.WPTYPE.LAND && selectedFwApproachWp) {
+            $('#wpApproachAlt').val(altitudeToDisplay(selectedFwApproachWp.getApproachAltAsl()));
+            $('#wpLandAlt').val(altitudeToDisplay(selectedFwApproachWp.getLandAltAsl()));
+            $('#wpLandAltM').text(altitudeReadout(selectedFwApproachWp.getLandAltAsl()));
+            $('#wpApproachAltM').text(altitudeReadout(selectedFwApproachWp.getApproachAltAsl()));
+        }
+        refreshGroundClearanceDisplay();
+    }
+
+    function stepWaypointSelection(offset) {
+        const waypoints = wpListSelectableWaypoints();
+        if (!waypoints.length) return;
+        const current = waypoints.findIndex(wp => selectedMarker && wp.getNumber() == selectedMarker.getNumber());
+        const next = current < 0 ? 0 : (current + offset + waypoints.length) % waypoints.length;
+        selectWaypointFromList(waypoints[next].getNumber());
+    }
+
+    /* The switch mirrors the mission, so saving only converts when the pilot actually
+       moved it away from what the mission already says. */
+    let seaLevelSwitchOnOpen = false;
+
+    /* An empty mission has no waypoint to read the reference from. It keeps the choice
+       that was last saved instead, so the switch survives until there is a waypoint and
+       the first one placed adopts it. */
+    function missionUsesSeaLevel() {
+        const waypoints = wpListSelectableWaypoints();
+        if (!waypoints.length) return seaLevelSwitchOnOpen;
+
+        return missionControlTab.isBitSet(waypoints[0].getP3(), MWNP.P3.ALT_TYPE);
+    }
+
+    function refreshSeaLevelSwitch() {
+        seaLevelSwitchOnOpen = missionUsesSeaLevel();
+        changeSwitch($('#MPapplySlrValue'), seaLevelSwitchOnOpen);
+        $('.mpApplySaved').hide();
+    }
+
+    /* A new waypoint is built from the default altitude, which is a height above the
+       ground. Dropped into a mission that reads its altitudes from sea level it would
+       keep that number and sit hundreds of metres below the rest of the route, so it
+       joins on the mission's own reference instead. */
+    async function adoptMissionAltitudeReference(waypoint, knownElevation) {
+        if (!missionUsesSeaLevel()) return;
+
+        // Adding the waypoint must never hinge on the elevation service: with no answer
+        // it joins on the relative reference, which the log says out loud.
+        let elevation = knownElevation === undefined ? Number.NaN : Number(knownElevation);
+        if (Number.isNaN(elevation)) {
+            // The caller may already have looked this terrain up, and every lookup waits
+            // its turn at the elevation service's one-per-second gate.
+            try {
+                elevation = Number(await waypoint.getElevation(globalSettings));
+            } catch (error) {
+                console.warn('elevation lookup failed:', error.message);
+            }
+        }
+        if (Number.isNaN(elevation)) {
+            GUI.log(i18n.getMessage('missionApplyNoElevation'));
+            return;
+        }
+
+        rememberTerrain(waypoint, elevation);
+        waypoint.setP3(missionControlTab.setBit(waypoint.getP3(), MWNP.P3.ALT_TYPE, true));
+        waypoint.setAlt(Math.round(Number(settings.alt) + elevation * 100));
+    }
+
+    /* Dragging a waypoint, adding one or loading a mission can change what the mission
+       says, so the switch follows along - unless the pilot has already moved it and is
+       waiting to save, which must not be overwritten. */
+    function syncSeaLevelSwitch() {
+        if (!$('#MPapplySlrValue').length) return;
+        if ($('#MPapplySlrValue').prop('checked') !== seaLevelSwitchOnOpen) return;
+        const inMission = missionUsesSeaLevel();
+        if (inMission === seaLevelSwitchOnOpen) return;
+        seaLevelSwitchOnOpen = inMission;
+        changeSwitch($('#MPapplySlrValue'), inMission);
+        $('#MPapplySlrSaved').hide();
+    }
+
+    /* The firmware measures a relative waypoint altitude from home and from nothing
+       else, so converting between the two references needs the home elevation. The
+       terrain under a waypoint is a different quantity: substituting it would store
+       numbers that fly at a different height than the ones on screen. Without a home
+       position there is no conversion to make, and the save says so. */
+    let homeElevationPosition = null;
+    let homeElevationRequest = null;
+
+    function homePositionKey() {
+        return homeMarkers.length ? HOME.getLatMap() + ',' + HOME.getLonMap() : null;
+    }
+
+    function invalidateHomeElevation() {
+        homeElevationPosition = null;
+        homeElevationRequest = null;
+        HOME.setAlt("N/A");
+        $('#elevationValueAtHome').text('N/A');
+    }
+
+    async function resolveHomeElevationCm() {
+        const position = homePositionKey();
+        if (position === null) return null;
+        if (homeElevationPosition === position && Number.isFinite(Number(HOME.getAlt()))) {
+            return Number(HOME.getAlt()) * 100;
+        }
+        if (homeElevationRequest?.position === position) return homeElevationRequest.promise;
+
+        // A numeric value alone is not evidence that it belongs to this home position.
+        invalidateHomeElevation();
+        const request = {position};
+        homeElevationRequest = request;
+        request.promise = (async () => {
+            try {
+                const value = await HOME.getElevation(globalSettings);
+                if (homeElevationRequest !== request || homePositionKey() !== position ||
+                    locationLifecycleId !== missionControlLocationLifecycleId) return null;
+                const elevation = Number(value);
+                if (value === null || value === '' || !Number.isFinite(elevation)) return null;
+                HOME.setAlt(elevation);
+                homeElevationPosition = position;
+                $('#elevationValueAtHome').text(elevation + ' m');
+                return elevation * 100;
+            } catch (error) {
+                console.warn('home elevation lookup failed:', error.message);
+                return null;
+            } finally {
+                if (homeElevationRequest === request) homeElevationRequest = null;
+            }
+        })();
+        return request.promise;
+    }
+
+    let applyingMissionDefaults = false;
+
+    function applySpeedToWaypoints(waypoints) {
+        waypoints.forEach(function (wp) {
+            if (wp.getAction() == MWNP.WPTYPE.WAYPOINT) {
+                wp.setP1(settings.speed);
+            } else if (wp.getAction() == MWNP.WPTYPE.POSHOLD_TIME) {
+                wp.setP2(settings.speed);
+            }
+            mission.updateWaypoint(wp);
+        });
+    }
+
+    /* Only the two types applySpeedToWaypoints actually writes to. A LAND waypoint keeps its
+       own speed, so counting it would claim the default reached more points than it did. */
+    function countSpeedWaypoints(waypoints) {
+        return waypoints.filter(function (wp) {
+            return wp.getAction() == MWNP.WPTYPE.WAYPOINT || wp.getAction() == MWNP.WPTYPE.POSHOLD_TIME;
+        }).length;
+    }
+
+    /* The defaults describe the whole mission, so saving them applies what actually
+       changed to every waypoint: a moved reference switch converts, a changed default
+       altitude or speed is written out. Nothing is touched while the fields are edited,
+       and an unchanged value never rewrites the mission. */
+    async function applyMissionDefaults(oldAlt, oldSpeed) {
+        if (disableMarkerEdit || applyingMissionDefaults) return;
+        applyingMissionDefaults = true;
+        try {
+            await applyMissionDefaultsLocked(oldAlt, oldSpeed);
+        } finally {
+            applyingMissionDefaults = false;
+        }
+    }
+
+    /* Relative approach heights measure from the landing terrain, independently of
+       the waypoint's home-relative datum. Keep the terrain cache on that same ground. */
+    function convertLandingApproach(wp, toAbsolute, groundCm) {
+        if (wp.getAction() != MWNP.WPTYPE.LAND) return;
+        const approach = FC.FW_APPROACH.get()[FC.SAFEHOMES.getMaxSafehomeCount() + wp.getMultiMissionIdx()];
+        if (!approach || approach.getIsSeaLevelRef() == toAbsolute) return;
+
+        const oldGroundCm = approach.getIsSeaLevelRef() ? approach.getElevation() : 0;
+        const shift = toAbsolute ? groundCm - oldGroundCm : -groundCm;
+        approach.setApproachAltAsl(Math.round(approach.getApproachAltAsl() + shift));
+        approach.setLandAltAsl(Math.round(approach.getLandAltAsl() + shift));
+        approach.setElevation(groundCm);
+        approach.setIsSeaLevelRef(toAbsolute ? 1 : 0);
+    }
+
+    /* Writes one waypoint and reports whether it ended up under the ground. Altitudes
+       are read on the waypoint's own datum, since a mission can carry mixed references
+       set per waypoint in the point editor. */
+    function writeSpeedToWaypoint(wp) {
+        if (wp.getAction() == MWNP.WPTYPE.WAYPOINT) {
+            wp.setP1(settings.speed);
+        } else if (wp.getAction() == MWNP.WPTYPE.POSHOLD_TIME) {
+            wp.setP2(settings.speed);
+        }
+    }
+
+    function writeDefaultsToWaypoint(wp, index, plan) {
+        if (plan.switchMoved && missionControlTab.isBitSet(wp.getP3(), MWNP.P3.ALT_TYPE) != plan.toAbsolute) {
+            // Waypoint relative altitude is measured from home, never local terrain.
+            const conversionCm = plan.homeCm;
+            wp.setP3(missionControlTab.setBit(wp.getP3(), MWNP.P3.ALT_TYPE, plan.toAbsolute));
+            wp.setAlt(Math.round(wp.getAlt() + (plan.toAbsolute ? conversionCm : -conversionCm)));
+            if (plan.terrainCm) convertLandingApproach(wp, plan.toAbsolute, plan.terrainCm[index]);
+        }
+
+        // A POI's altitude is not flown, so the default is not forced onto it. On sea
+        // level the default measures from the terrain under this waypoint.
+        if (plan.applyAlt && wp.getAction() != MWNP.WPTYPE.SET_POI) {
+            const wpAbsolute = missionControlTab.isBitSet(wp.getP3(), MWNP.P3.ALT_TYPE);
+            wp.setAlt(wpAbsolute ? Math.round(plan.terrainCm[index] + settings.alt) : settings.alt);
+        }
+        if (plan.speedChanged) writeSpeedToWaypoint(wp);
+        mission.updateWaypoint(wp);
+
+        return endsBelowGround(wp, index, plan);
+    }
+
+    /* Fetches the ground levels the requested changes need. Two different grounds serve
+       two different jobs: converting the reference shifts every altitude by the datum
+       offset, and home is that offset when known, which keeps the flown path identical;
+       the default altitude is a height above the ground each waypoint flies over, so it
+       always measures from the terrain under that waypoint. */
+    async function resolveGroundsForDefaults(waypoints, plan, onAltitudeUnavailable) {
+        if (plan.switchMoved) {
+            plan.homeCm = await resolveHomeElevationCm();
+        }
+
+        const altitudeNeedsTerrain = plan.applyAlt && (plan.switchMoved
+            ? plan.toAbsolute
+            : waypoints.some(wp => missionControlTab.isBitSet(wp.getP3(), MWNP.P3.ALT_TYPE)));
+
+        // The below-ground warning is judged against the ground each waypoint flies over,
+        // so the terrain is worth having whenever altitudes move at all: a save that only
+        // switches the reference would otherwise be judged against home and stay quiet
+        // about a waypoint sitting inside its own hill.
+        if (plan.switchMoved || plan.applyAlt) {
+            const terrain = await fetchWaypointElevations(waypoints);
+            if (terrain) {
+                plan.terrainCm = terrain.map(e => e * 100);
+                waypoints.forEach((wp, i) => rememberTerrain(wp, terrain[i]));
+            } else if (altitudeNeedsTerrain) {
+                // without terrain the altitude cannot be placed above it; the switch and
+                // the speed still go ahead
+                plan.applyAlt = false;
+                onAltitudeUnavailable();
+            }
+        }
+
+        // A LAND approach also needs local terrain; do not leave it on a different
+        // reference from its waypoint when that lookup fails.
+        const landingNeedsTerrain = waypoints.some(wp => wp.getAction() == MWNP.WPTYPE.LAND);
+        return !plan.switchMoved || (plan.homeCm !== null && (!landingNeedsTerrain || plan.terrainCm !== null));
+    }
+
+    function showLandSpeedNotUpdatedWarning() {
+        if (landSpeedNotUpdatedModal && typeof landSpeedNotUpdatedModal.open === 'function') {
+            landSpeedNotUpdatedModal.open();
+        }
+    }
+
+    function reportDefaultsApplied(plan, count, belowGround, hasLandWaypoint, speedCount) {
+        if (plan.switchMoved) $('#MPapplySlrSaved').show();
+        if (plan.applyAlt) $('#MPapplyAltSaved').show();
+        if (plan.speedChanged) $('#MPapplySpeedSaved').show();
+
+        if (plan.switchMoved) {
+            GUI.log(i18n.getMessage(plan.homeCm !== null ? 'missionApplyViaHome' : 'missionApplyViaTerrain',
+                                    [String(count)]));
+        }
+        if (plan.applyAlt) GUI.log(i18n.getMessage('missionApplyAltApplied', [String(count)]));
+        if (plan.speedChanged) {
+            GUI.log(i18n.getMessage('missionApplySpeedApplied', [String(speedCount)]));
+            if (hasLandWaypoint) showLandSpeedNotUpdatedWarning();
+        }
+        if (belowGround) GUI.log(i18n.getMessage('missionApplyBelowGround', [String(belowGround)]));
+    }
+
+    async function applyMissionDefaultsLocked(oldAlt, oldSpeed) {
+        /* Saving writes the defaults into the mission whether or not the fields were
+           touched. After a waypoint has been dragged or edited by hand, pressing save is
+           how the pilot puts the whole mission back onto the defaults - a button that
+           quietly does nothing because the field still reads the same is no help. */
+        const plan = {
+            toAbsolute: $('#MPapplySlrValue').prop('checked'),
+            speedChanged: true,
+            applyAlt: true,
+            homeCm: null,
+            terrainCm: null,
+        };
+        plan.switchMoved = plan.toAbsolute !== seaLevelSwitchOnOpen;
+
+        const waypoints = wpListSelectableWaypoints();
+        if (!waypoints.length) {
+            seaLevelSwitchOnOpen = plan.toAbsolute;
+            return;
+        }
+        // Neither write path below applies the default speed to a LAND waypoint
+        // (see applySpeedToWaypoints / writeSpeedToWaypoint) - a landing usually
+        // needs its own speed, not cruise speed.
+        const hasLandWaypoint = waypoints.some((wp) => wp.getAction() == MWNP.WPTYPE.LAND);
+
+        // A failed apply is rolled back into the settings so the next save can retry it -
+        // otherwise nothing would count as changed any more.
+        const revertAltitude = function () {
+            settings.alt = oldAlt;
+            $('#MPdefaultPointAlt').val(altitudeToDisplay(oldAlt));
+            saveSettings();
+        };
+
+        const homePosition = homePositionKey();
+        const waypointPositions = waypoints.map(waypointPositionKey);
+        const gotGrounds = await resolveGroundsForDefaults(waypoints, plan, function () {
+            revertAltitude();
+            GUI.log(i18n.getMessage('missionApplyNoElevation'));
+        });
+
+        // The fetches took real time; deleting waypoints, switching the multi mission or
+        // loading a file meanwhile replaced the mission, and writing the captured
+        // waypoints back would resurrect it. Abort this save instead.
+        if (missionWasReplaced(waypoints) || homePositionKey() !== homePosition ||
+            waypointPositions.some((position, i) => position !== waypointPositionKey(waypoints[i])) ||
+            locationLifecycleId !== missionControlLocationLifecycleId) {
+            if (settings.alt !== oldAlt) revertAltitude();
+            if (plan.speedChanged) {
+                settings.speed = oldSpeed;
+                $('#MPdefaultPointSpeed').val(toFieldText(oldSpeed, MISSION_UNIT_SPEED));
+                saveSettings();
+            }
+            refreshSeaLevelSwitch();
+            GUI.log(i18n.getMessage('missionApplyMissionChanged'));
+            return;
+        }
+
+        if (!gotGrounds) {
+            // The speed needs no ground levels, so it is still written
+            if (plan.speedChanged) {
+                applySpeedToWaypoints(waypoints);
+                mission.update(singleMissionActive());
+                syncEditPanelWithSelection();
+                redrawLayer();
+                $('#MPapplySpeedSaved').show();
+                GUI.log(i18n.getMessage('missionApplySpeedApplied', [String(countSpeedWaypoints(waypoints))]));
+                if (hasLandWaypoint) showLandSpeedNotUpdatedWarning();
+            }
+            if (plan.applyAlt) revertAltitude();
+            changeSwitch($('#MPapplySlrValue'), seaLevelSwitchOnOpen);
+            GUI.log(i18n.getMessage('missionApplyNoElevation'));
+            return;
+        }
+
+        let belowGround = 0;
+        waypoints.forEach(function (wp, index) {
+            if (writeDefaultsToWaypoint(wp, index, plan)) belowGround++;
+        });
+
+        seaLevelSwitchOnOpen = plan.toAbsolute;
+        mission.update(singleMissionActive());
+        syncEditPanelWithSelection();
+        redrawLayer();
+        plotElevation();
+        reportDefaultsApplied(plan, waypoints.length, belowGround, hasLandWaypoint, countSpeedWaypoints(waypoints));
+    }
+
+    function missionWasReplaced(waypoints) {
+        const current = wpListSelectableWaypoints();
+        return current.length !== waypoints.length || current.some((wp, i) => wp !== waypoints[i]);
+    }
+
+    /* Placing a waypoint waits on the elevation service while the map keeps taking
+       clicks. Run the additions one after another, so each one reads the mission length
+       it is actually appending to instead of the one two clicks ago. A failed addition
+       must not stall the ones behind it. */
+    let waypointAdditions = Promise.resolve();
+    function queueWaypointAddition(task) {
+        // The catch settles the chain either way, so one addition that fails neither
+        // stalls the clicks behind it nor escapes as an unhandled rejection.
+        waypointAdditions = waypointAdditions.then(task).catch(function (error) {
+            console.warn('adding a waypoint failed:', error.message);
+        });
+    }
+
+    /* A file load or a switch of multi mission replaces the whole waypoint collection.
+       An addition that started before that belongs to a mission which is gone, and
+       putting it in would graft it onto the new one. */
+    function collectionChangedSince(snapshot) {
+        const current = mission.get();
+        return current.length !== snapshot.length || current.some((wp, i) => wp !== snapshot[i]);
+    }
+
+    /* The ground a waypoint was last measured against. Dragged somewhere else it should
+       keep its height above the ground it flies over, not its height above the sea, and
+       that needs the ground it had before the move. Keyed by the waypoint itself, so a
+       deleted one takes its entry with it. */
+    const terrainUnderWaypoint = new WeakMap();
+    function rememberTerrain(wp, elevationMeters) {
+        const value = Number(elevationMeters);
+        if (!Number.isNaN(value)) terrainUnderWaypoint.set(wp, value * 100);
+    }
+
+    /* A waypoint that was never looked at has no remembered ground, and once the drag has
+       moved it its old coordinates are gone for good. So the question is asked the moment
+       it is picked up, while it still stands where it stood. */
+    let groundBeforeDragCm = Promise.resolve(undefined);
+    function captureGroundBeforeDrag(wp) {
+        const known = wp ? terrainUnderWaypoint.get(wp) : undefined;
+        if (!wp || known !== undefined) {
+            groundBeforeDragCm = Promise.resolve(known);
+            return;
+        }
+        groundBeforeDragCm = wp.getElevation(globalSettings)
+            .then(elevation => (Number.isNaN(Number(elevation)) ? undefined : Number(elevation) * 100))
+            .catch(error => {
+                console.warn('elevation lookup failed:', error.message);
+                return undefined;
+            });
+    }
+
+    /* A landing waypoint carries an approach with altitudes of its own. Held against the
+       sea they were measured over the ground the waypoint used to stand on, so they are
+       shifted onto the new ground and keep the height above it they had. Held against home
+       the terrain never entered into them and they are left alone. */
+    function settleLandingApproach(wp, elevationAtWP) {
+        if (wp.getAction() != MWNP.WPTYPE.LAND) return;
+
+        const approach = FC.FW_APPROACH.get()[FC.SAFEHOMES.getMaxSafehomeCount() + wp.getMultiMissionIdx()];
+        if (approach.getIsSeaLevelRef()) {
+            if (approach.getElevation() != 0) {
+                approach.setApproachAltAsl(approach.getApproachAltAsl() - approach.getElevation() + elevationAtWP * 100);
+                approach.setLandAltAsl(approach.getLandAltAsl() - approach.getElevation() + elevationAtWP * 100);
+            }
+            approach.setElevation(elevationAtWP * 100);
+        }
+    }
+
+    /* A dragged waypoint now sits over different ground. Measured from the sea its number
+       says nothing about how high it flies any more, so it keeps the clearance it had and
+       the altitude follows the new terrain. Measured from home the terrain never entered
+       into the number, so only the sanity check applies, as before. The landing approach
+       of a LAND waypoint is settled separately, on its own reference. */
+    const pendingWaypointDrags = new WeakMap();
+
+    async function settleDraggedWaypoint(wp, isSelected) {
+        if (!wp) return;
+        const snapshot = mission.get().slice();
+        const position = waypointPositionKey(wp);
+        const request = {};
+        pendingWaypointDrags.set(wp, request);
+        const isStale = () => collectionChangedSince(snapshot) || !mission.get().includes(wp) ||
+            waypointPositionKey(wp) !== position || pendingWaypointDrags.get(wp) !== request ||
+            locationLifecycleId !== missionControlLocationLifecycleId;
+
+        const groundBeforeCm = await groundBeforeDragCm;
+        if (isStale()) return;
+        let elevationAtWP = Number.NaN;
+        try {
+            elevationAtWP = Number(await wp.getElevation(globalSettings));
+        } catch (error) {
+            console.warn('elevation lookup failed:', error.message);
+        }
+        if (isStale()) return;
+        if (Number.isNaN(elevationAtWP)) {
+            plotElevation();
+            return;
+        }
+        rememberTerrain(wp, elevationAtWP);
+
+        if (groundBeforeCm !== undefined && missionControlTab.isBitSet(wp.getP3(), MWNP.P3.ALT_TYPE)) {
+            wp.setAlt(Math.round(elevationAtWP * 100 + (wp.getAlt() - groundBeforeCm)));
+        }
+        wp.setAlt(checkAltElevSanity(false, wp.getAlt(), elevationAtWP, wp.getP3()));
+
+        settleLandingApproach(wp, elevationAtWP);
+
+        mission.updateWaypoint(wp);
+        renderWaypointSelect();
+        if (isSelected && selectedMarker === wp) {
+            $('#elevationValueAtWP').text(elevationAtWP);
+            syncEditPanelWithSelection();
+            refreshGroundClearanceDisplay(elevationAtWP);
+        }
+        plotElevation();
+    }
+
+    /* Some editor fields check what was typed and keep the stored value when it does not
+       hold up. The field handler says so here, so the tick in the title bar does not
+       claim an edit was taken that never reached the waypoint. */
+    let pointEditRefused = false;
+    function refusePointEdit() {
+        pointEditRefused = true;
     }
 
     function renderSafeHomeOptions()  {
@@ -3487,8 +4816,8 @@ function iconKey(filename) {
             $('#SafehomeContentBox').show();
 
             if (selectedFwApproachSh.getLandHeading1() == 0 && selectedFwApproachSh.getLandHeading1() == 0 && selectedFwApproachSh.getApproachAltAsl() == 0 && selectedFwApproachSh.getLandAltAsl() == 0) {
-                selectedFwApproachSh.setApproachAltAsl(settings.fwApproachAlt * 100);
-                selectedFwApproachSh.setLandAltAsl(settings.fwLandAlt * 100);
+                selectedFwApproachSh.setApproachAltAsl(Math.round(settings.fwApproachAlt * 100));
+                selectedFwApproachSh.setLandAltAsl(Math.round(settings.fwLandAlt * 100));
             }
 
             if (selectedFwApproachSh.getElevation() == 0) {
@@ -3505,15 +4834,15 @@ function iconKey(filename) {
             $('#safehomeLatitude').val(selectedSafehome.getLatMap());
             $('#safehomeLongitude').val(selectedSafehome.getLonMap());
             changeSwitch($('#safehomeSeaLevelRef'), selectedFwApproachSh.getIsSeaLevelRef());
-            $('#safehomeApproachAlt').val(selectedFwApproachSh.getApproachAltAsl());
-            $('#safehomeLandAlt').val(selectedFwApproachSh.getLandAltAsl());
+            $('#safehomeApproachAlt').val(altitudeToDisplay(selectedFwApproachSh.getApproachAltAsl()));
+            $('#safehomeLandAlt').val(altitudeToDisplay(selectedFwApproachSh.getLandAltAsl()));
             $('#geozoneApproachDirection').val(selectedFwApproachSh.getApproachDirection());
             $('#safehomeLandHeading1').val(Math.abs(selectedFwApproachSh.getLandHeading1()));
             changeSwitch($('#safehomeLandHeading1Excl'), selectedFwApproachSh.getLandHeading1() < 0);
             $('#safehomeLandHeading2').val(Math.abs(selectedFwApproachSh.getLandHeading2()));
             changeSwitch($('#safehomeLandHeading2Excl'), selectedFwApproachSh.getLandHeading2() < 0);
-            $('#safehomeLandAltM').text(selectedFwApproachSh.getLandAltAsl() / 100 + " m");
-            $('#safehomeApproachAltM').text(selectedFwApproachSh.getApproachAltAsl() / 100 + " m");
+            $('#safehomeLandAltM').text(altitudeReadout(selectedFwApproachSh.getLandAltAsl()));
+            $('#safehomeApproachAltM').text(altitudeReadout(selectedFwApproachSh.getApproachAltAsl()));
             lockShExclHeading = false;
         } else {
             $('#SafehomeContentBox').hide();
@@ -3769,10 +5098,6 @@ function iconKey(filename) {
             }
         }
 
-        app.ConvertCentimetersToMeters = function (val) {
-            return parseInt(val) / 100;
-        };
-
         class PlannerSettingsControl extends Control {
             
             constructor(opt_options) {
@@ -3784,6 +5109,7 @@ function iconKey(filename) {
                 
 
                 var handleShowSettings = function () {
+                    refreshSeaLevelSwitch();
                     $('#missionPlannerSettings').fadeIn(300);
                 };
 
@@ -3879,8 +5205,8 @@ function iconKey(filename) {
                 var handleShowSettings = function () {
                     $('#missionPlannerHome').fadeIn(300);
                     cleanHomeLayers();
-                    renderHomeTable();
                     renderHomeOnMap();
+                    renderHomeTable();
                     $('#missionPlannerElevation').fadeIn(300);
                     plotElevation();
                 };
@@ -3938,17 +5264,15 @@ function iconKey(filename) {
 
             var map = evt.map;
 
-            const isInteractable = (layer) => layer?.get('no_interaction') !== true;
-
             var feature = map.forEachFeatureAtPixel(evt.pixel,
-                function (feature, layer) {
-                    return isInteractable(layer) ? feature : null;
-                });
+                function (feature) {
+                    return feature;
+                }, interactiveLayersOnly);
 
             tempMarker = map.forEachFeatureAtPixel(evt.pixel,
                 function (feature, layer) {
-                    return isInteractable(layer) ? layer : null;
-                });
+                    return layer;
+                }, interactiveLayersOnly);
 
             if (feature) {
                 // Ignore features from layers without a 'kind' (e.g. grid preview)
@@ -3957,6 +5281,9 @@ function iconKey(filename) {
                 this.feature_ = feature;
                 this.layer_ = tempMarker;
             }
+
+            captureGroundBeforeDrag(feature && tempMarker?.kind == "waypoint"
+                ? mission.getWaypoint(tempMarker.number) : null);
 
             return !!feature;
         };
@@ -3974,9 +5301,9 @@ function iconKey(filename) {
             var map = evt.map;
 
             var feature = map.forEachFeatureAtPixel(evt.pixel,
-                function (feature, layer) {
+                function (feature) {
                     return feature;
-                });
+                }, interactiveLayersOnly);
 
             var deltaX = evt.coordinate[0] - this.coordinate_[0];
             var deltaY = evt.coordinate[1] - this.coordinate_[1];
@@ -4016,6 +5343,7 @@ function iconKey(filename) {
             else if (tempMarker.kind == "home") {
                 HOME.setLon(Math.round(coord[0] * 10000000));
                 HOME.setLat(Math.round(coord[1] * 10000000));
+                invalidateHomeElevation();
                 $('.home-lon').val(Math.round(coord[0] * 10000000) / 10000000);
                 $('.home-lat').val(Math.round(coord[1] * 10000000) / 10000000);
             } else if (tempMarker.kind == "geozone") {
@@ -4036,16 +5364,26 @@ function iconKey(filename) {
         /**
          * @param {ol.MapBrowserEvent} evt Event.
          */
+        // Asking what lies under the cursor reads pixels back from the map, which Chrome
+        // warns about once per read; on every mouse move that is thousands of warnings in
+        // a session. A few checks per second is as much as a cursor change needs.
+        let lastHoverCheckAt = 0;
         app.handleMoveEvent = function (evt) {
+            const now = Date.now();
+            if (now - lastHoverCheckAt < 150) return;
+            lastHoverCheckAt = now;
             var map = evt.map;
+            // The simulated track is drawn on top of the mission lines, so it has to
+            // stay out of the hover test too — otherwise it offers a crosshair and an
+            // "insert waypoint" tooltip over a layer that accepts neither.
             const feature = map.forEachFeatureAtPixel(evt.pixel,
-                function (feature, layer) {
+                function (feature) {
                     return feature;
-                });
+                }, interactiveLayersOnly);
             const hoverLayer = map.forEachFeatureAtPixel(evt.pixel,
                 function (feature, layer) {
                     return layer;
-                });
+                }, interactiveLayersOnly);
             const element = evt.map.getTargetElement();
             const isLine = hoverLayer?.kind === 'line' && hoverLayer.selection;
 
@@ -4071,42 +5409,12 @@ function iconKey(filename) {
         app.handleUpEvent = function (evt) { // NOSONAR - OpenLayers PointerInteraction ends the drag sequence by returning false here.
             if (!tempMarker?.kind) return false;
             if (tempMarker.kind == "waypoint") {
-                if (selectedMarker != null && tempMarker.number == selectedMarker.getLayerNumber()) {
-                    (async () => {
-                        const elevationAtWP = await mission.getWaypoint(tempMarker.number).getElevation(globalSettings);
-                        $('#elevationValueAtWP').text(elevationAtWP);
-                        const returnAltitude = checkAltElevSanity(false, mission.getWaypoint(tempMarker.number).getAlt(), elevationAtWP, mission.getWaypoint(tempMarker.number).getP3());
-                        mission.getWaypoint(tempMarker.number).setAlt(returnAltitude);
-
-                        if (mission.getWaypoint(tempMarker.number).getAction() == MWNP.WPTYPE.LAND) {
-                            let approach = FC.FW_APPROACH.get()[FC.SAFEHOMES.getMaxSafehomeCount() + mission.getWaypoint(tempMarker.number).getMultiMissionIdx()];
-                            if (approach.getIsSeaLevelRef()) {
-                                if (approach.getElevation() != 0) {
-                                    approach.setApproachAltAsl(approach.getApproachAltAsl() - approach.getElevation() + elevationAtWP * 100);
-                                    approach.setLandAltAsl(approach.getLandAltAsl() - approach.getElevation() + elevationAtWP * 100);
-                                }
-                                approach.setElevation(elevationAtWP * 100);
-                                $('#wpApproachAlt').val(approach.getApproachAltAsl());
-                                $('#wpLandAlt').val(approach.getLandAltAsl);
-                                $('#wpLandAltM').text(approach.getLandAltAsl() / 100 + " m");
-                                $('#wpApproachAltM').text(approach.getApproachAltAsl() / 100 + " m");
-                            }
-                        }
-
-                        plotElevation();
-                    })()
-                } else {
-                    // Update elevation chart even for non-selected waypoints
-                    plotElevation();
-                }
+                renderWaypointSelect();
+                settleDraggedWaypoint(mission.getWaypoint(tempMarker.number),
+                                      selectedMarker != null && tempMarker.number == selectedMarker.getLayerNumber());
             }
             else if (tempMarker.kind == "home" ) {
-                (async () => {
-                    const elevationAtHome = await HOME.getElevation(globalSettings);
-                    $('#elevationValueAtHome').text(elevationAtHome+' m');
-                    HOME.setAlt(elevationAtHome);
-                    plotElevation();
-                })()
+                void resolveHomeElevationCm().then(() => plotElevation());
             }
             else if (tempMarker.kind == "safehome") {
                 (async () => {
@@ -4332,10 +5640,17 @@ function iconKey(filename) {
             }
         };
 
+        // Hit-testing reads pixels back from the canvas, which is expensive and floods
+        // the console with Chrome's readback warning when done on every mouse move, so
+        // both hover handlers are held to a few checks per second.
+        let lastHoverInfoAt = 0;
         map.on('pointermove', function(evt) {
             if (evt.dragging) {
                 return;
             }
+            const now = Date.now();
+            if (now - lastHoverInfoAt < 150) return;
+            lastHoverInfoAt = now;
             const pixel = map.getEventPixel(evt.originalEvent);
             displayFeatureInfo(pixel);
         });
@@ -4359,13 +5674,13 @@ function iconKey(filename) {
                 }
             }
             selectedFeature = map.forEachFeatureAtPixel(evt.pixel,
-                function (feature, layer) {
+                function (feature) {
                     return feature;
-                });
+                }, interactiveLayersOnly);
             tempMarker = map.forEachFeatureAtPixel(evt.pixel,
                 function (feature, layer) {
                     return layer;
-                });
+                }, interactiveLayersOnly);
             // Ignore features from layers without a kind (e.g. grid preview overlay)
             if (selectedFeature && tempMarker && !tempMarker.kind) {
                 selectedFeature = null;
@@ -4377,126 +5692,45 @@ function iconKey(filename) {
                 return;
             }
             if (selectedFeature && tempMarker?.kind == "waypoint") {
-                $("#editMission").hide();
-                selectedMarker = mission.getWaypoint(tempMarker.number);
-
-                selectedFwApproachWp = FC.FW_APPROACH.get()[FC.SAFEHOMES.getMaxSafehomeCount() + selectedMarker.getMultiMissionIdx()];
-
-                if (selectedFwApproachWp.getLandHeading1() == 0 && selectedFwApproachWp.getLandHeading1() == 0 && selectedFwApproachWp.getApproachAltAsl() == 0 && selectedFwApproachWp.getLandAltAsl() == 0) {
-                    selectedFwApproachWp.setApproachAltAsl(settings.fwApproachAlt * 100);
-                    selectedFwApproachWp.setLandAltAsl(settings.fwLandAlt * 100);
-                }
-
-                const geometry = selectedFeature.getGeometry();
-                const coord = toLonLat(geometry.getCoordinates());
-
-                selectedFeature.setStyle(getWaypointIcon(selectedMarker, true));
-
-                let P3Value = selectedMarker.getP3();
-
-                changeSwitch($('#pointP3Alt'), missionControlTab.isBitSet(P3Value, MWNP.P3.ALT_TYPE));
-                changeSwitch($('#pointP3UserAction1'), missionControlTab.isBitSet(P3Value, MWNP.P3.USER_ACTION_1));
-                changeSwitch($('#pointP3UserAction2'), missionControlTab.isBitSet(P3Value, MWNP.P3.USER_ACTION_2));
-                changeSwitch($('#pointP3UserAction3'), missionControlTab.isBitSet(P3Value, MWNP.P3.USER_ACTION_3));
-                changeSwitch($('#pointP3UserAction4'), missionControlTab.isBitSet(P3Value, MWNP.P3.USER_ACTION_4));
-
-                const altitudeMeters = app.ConvertCentimetersToMeters(selectedMarker.getAlt());
-
-                if (selectedMarker.getAction() == MWNP.WPTYPE.LAND) {
-                    $('#wpFwLanding').fadeIn(300);
-                } else  {
-                    $('#wpFwLanding').fadeOut(300);
-                }
-
-                if (tempSelectedMarkerIndex == null || tempSelectedMarkerIndex != selectedMarker.getLayerNumber()) {
-                    (async () => {
-                        const elevationAtWP = await selectedMarker.getElevation(globalSettings);
-                        $('#elevationValueAtWP').text(elevationAtWP);
-                        const returnAltitude = checkAltElevSanity(false, selectedMarker.getAlt(), elevationAtWP, P3Value);
-                        selectedMarker.setAlt(returnAltitude);
-
-                        /*
-                        if (missionControlTab.isBitSet(P3Value, MWNP.P3.ALT_TYPE)) {
-                            if (!selectedFwApproachWp.getIsSeaLevelRef()) {
-                                selectedFwApproachWp.setApproachDirection(selectedFwApproachWp.getApproachDirection() + elevationAtWP * 100);
-                                selectedFwApproachWp.setLandAltAsl(selectedFwApproachWp.getLandAltAsl() + elevationAtWP * 100);
-                            }
-
-                        }
-                        */
-                        selectedFwApproachWp.setIsSeaLevelRef(missionControlTab.isBitSet(P3Value, MWNP.P3.ALT_TYPE) ? 1 : 0);
-                        $('#wpApproachAlt').val(selectedFwApproachWp.getApproachAltAsl());
-                        $('#wpLandAlt').val(selectedFwApproachWp.getLandAltAsl);
-                        $('#wpLandAltM').text(selectedFwApproachWp.getLandAltAsl() / 100 + " m");
-                        $('#wpApproachAltM').text(selectedFwApproachWp.getApproachAltAsl() / 100 + " m");
-
-                        plotElevation();
-                    })()
-                }
-                $('#elevationAtWP').fadeIn();
-                $('#groundClearanceAtWP').fadeIn();
-
-                $('#altitudeInMeters').text(` ${altitudeMeters}m`);
-                $('#pointLon').val(Math.round(coord[0] * 10000000) / 10000000);
-                $('#pointLat').val(Math.round(coord[1] * 10000000) / 10000000);
-                $('#pointAlt').val(selectedMarker.getAlt());
-                $('#pointType').val(selectedMarker.getAction());
-                // Change SpeedValue to Parameter1, 2, 3
-                $('#pointP1').val(selectedMarker.getP1());
-                $('#pointP2').val(selectedMarker.getP2());
-
-
-
-
-                $('#wpApproachDirection').val(selectedFwApproachWp.getApproachDirection());
-                $('#wpLandHeading1').val(Math.abs(selectedFwApproachWp.getLandHeading1()));
-                changeSwitch($('#wpLandHeading1Excl'), selectedFwApproachWp.getLandHeading1() < 0);
-                $('#wpLandHeading2').val(Math.abs(selectedFwApproachWp.getLandHeading2()));
-                changeSwitch($('#wpLandHeading2Excl'), selectedFwApproachWp.getLandHeading2() < 0);
-
-
-
-                $('#wpApproachDirection').val(selectedFwApproachWp.getApproachDirection());
-                $('#wpLandHeading1').val(Math.abs(selectedFwApproachWp.getLandHeading1()));
-                changeSwitch($('#wpLandHeading1Excl'), selectedFwApproachWp.getLandHeading1() < 0);
-                $('#wpLandHeading2').val(Math.abs(selectedFwApproachWp.getLandHeading2()));
-                changeSwitch($('#wpLandHeading2Excl'), selectedFwApproachWp.getLandHeading2() < 0);
-
-                // Selection box update depending on choice of type of waypoint
-                for (var j in dictOfLabelParameterPoint[selectedMarker.getAction()]) {
-                    if (dictOfLabelParameterPoint[selectedMarker.getAction()][j] != '') {
-                        $('#pointP'+String(j).slice(-1)+'class').fadeIn(300);
-                        $('label[for=pointP'+String(j).slice(-1)+']').html(dictOfLabelParameterPoint[selectedMarker.getAction()][j]);
-                    }
-                    else {$('#pointP'+String(j).slice(-1)+'class').fadeOut(300);}
-                }
-                selectedMarker = renderWaypointOptionsTable(selectedMarker);
-                $('#EditPointNumber').text("Edit point "+String(selectedMarker.getLayerNumber()+1));
-                $('#MPeditPoint').fadeIn(300);
-                $('#pointP3UserActionClass').fadeIn();
-                redrawLayer();
+                selectWaypointMarkerByNumber(tempMarker.number, tempSelectedMarkerIndex);
             }
             else if (selectedFeature && tempMarker.kind == "line" && tempMarker.selection && !disableMarkerEdit) {
                 let tempWpCoord = toLonLat(evt.coordinate);
-                let tempWp = new Waypoint(tempMarker.number, MWNP.WPTYPE.WAYPOINT, Math.round(tempWpCoord[1] * 10000000), Math.round(tempWpCoord[0] * 10000000), Number(settings.alt), Number(settings.speed));
-                tempWp.setMultiMissionIdx(mission.getWaypoint(0).getMultiMissionIdx());
+                const insertAt = tempMarker.number;
+                const wpLat = Math.round(tempWpCoord[1] * 10000000);
+                const wpLon = Math.round(tempWpCoord[0] * 10000000);
 
-                if (homeMarkers.length && HOME.getAlt() != "N/A") {
-                    (async () => {
-                        const elevationAtWP = await tempWp.getElevation(globalSettings);
-                        tempWp.setAlt(checkAltElevSanity(false, settings.alt, elevationAtWP, false));
+                queueWaypointAddition(async () => {
+                    const snapshot = mission.get().slice();
+                    let tempWp = new Waypoint(insertAt, MWNP.WPTYPE.WAYPOINT, wpLat, wpLon, Number(settings.alt), Number(settings.speed));
+                    tempWp.setMultiMissionIdx(mission.getWaypoint(0).getMultiMissionIdx());
 
-                        mission.insertWaypoint(tempWp, tempMarker.number);
-                        mission.update(singleMissionActive());
-                        refreshLayers();
-                        plotElevation();
-                    })()
-                } else {
-                    mission.insertWaypoint(tempWp, tempMarker.number);
+                    let elevationAtWP;
+                    if (homeMarkers.length && HOME.getAlt() != "N/A") {
+                        // Placing a waypoint must not hinge on the elevation service; with
+                        // no answer it keeps the default altitude.
+                        try {
+                            elevationAtWP = await tempWp.getElevation(globalSettings);
+                            tempWp.setAlt(checkAltElevSanity(false, settings.alt, elevationAtWP, false));
+                        } catch (error) {
+                            console.warn('elevation lookup failed:', error.message);
+                            elevationAtWP = undefined;
+                        }
+                    }
+                    await adoptMissionAltitudeReference(tempWp, elevationAtWP);
+                    if (collectionChangedSince(snapshot)) {
+                        GUI.log(i18n.getMessage('missionApplyMissionChanged'));
+                        return;
+                    }
+
+                    mission.insertWaypoint(tempWp, insertAt);
                     mission.update(singleMissionActive());
                     refreshLayers();
                     plotElevation();
-                }
+                    // the counters read the mission, so they are refreshed once it holds
+                    // the new point rather than when the click was taken
+                    updateMultimissionState();
+                });
             }
             else if (selectedFeature && tempMarker.kind == "safehome" && tempMarker.selection) {
                 updateSelectedShAndFwAp(tempMarker.number);
@@ -4530,32 +5764,49 @@ function iconKey(filename) {
             }
             else if (!disableMarkerEdit) {
                 let tempWpCoord = toLonLat(evt.coordinate);
-                let tempWp = new Waypoint(mission.get().length, MWNP.WPTYPE.WAYPOINT, Math.round(tempWpCoord[1] * 10000000), Math.round(tempWpCoord[0] * 10000000), Number(settings.alt), Number(settings.speed));
+                const wpLat = Math.round(tempWpCoord[1] * 10000000);
+                const wpLon = Math.round(tempWpCoord[0] * 10000000);
 
-                if (mission.get().length == 0) {
-                    tempWp.setMultiMissionIdx(multimissionCount == 0 ? 0 : multimissionCount - 1);
-                    FC.FW_APPROACH.clean(FC.SAFEHOMES.getMaxSafehomeCount() + tempWp.getMultiMissionIdx());
-                } else {
-                    tempWp.setMultiMissionIdx(mission.getWaypoint(mission.get().length - 1).getMultiMissionIdx());
-                }
+                queueWaypointAddition(async () => {
+                    // The number and the mission it belongs to are read here, once the
+                    // click ahead of this one has finished appending.
+                    const snapshot = mission.get().slice();
+                    let tempWp = new Waypoint(snapshot.length, MWNP.WPTYPE.WAYPOINT, wpLat, wpLon, Number(settings.alt), Number(settings.speed));
 
-                if (homeMarkers.length && HOME.getAlt() != "N/A") {
-                    (async () => {
-                        const elevationAtWP = await tempWp.getElevation(globalSettings);
-                        tempWp.setAlt(checkAltElevSanity(false, settings.alt, elevationAtWP, false));
+                    if (snapshot.length == 0) {
+                        tempWp.setMultiMissionIdx(multimissionCount == 0 ? 0 : multimissionCount - 1);
+                        FC.FW_APPROACH.clean(FC.SAFEHOMES.getMaxSafehomeCount() + tempWp.getMultiMissionIdx());
+                    } else {
+                        tempWp.setMultiMissionIdx(mission.getWaypoint(snapshot.length - 1).getMultiMissionIdx());
+                    }
 
-                        mission.put(tempWp);
-                        mission.update(singleMissionActive());
-                        refreshLayers();
-                        plotElevation();
-                    })()
-                } else {
+                    let elevationAtWP;
+                    if (homeMarkers.length && HOME.getAlt() != "N/A") {
+                        // Placing a waypoint must not hinge on the elevation service; with
+                        // no answer it keeps the default altitude.
+                        try {
+                            elevationAtWP = await tempWp.getElevation(globalSettings);
+                            tempWp.setAlt(checkAltElevSanity(false, settings.alt, elevationAtWP, false));
+                        } catch (error) {
+                            console.warn('elevation lookup failed:', error.message);
+                            elevationAtWP = undefined;
+                        }
+                    }
+                    await adoptMissionAltitudeReference(tempWp, elevationAtWP);
+                    if (collectionChangedSince(snapshot)) {
+                        GUI.log(i18n.getMessage('missionApplyMissionChanged'));
+                        return;
+                    }
+
                     mission.put(tempWp);
                     mission.update(singleMissionActive());
                     refreshLayers();
                     plotElevation();
-                }
-                updateLocationButtonsVisibility();
+                    updateLocationButtonsVisibility();
+                    // the counters read the mission, so they are refreshed once it holds
+                    // the new point rather than when the click was taken
+                    updateMultimissionState();
+                });
             }
             //mission.missionDisplayDebug();
             updateMultimissionState();
@@ -4564,15 +5815,19 @@ function iconKey(filename) {
         //////////////////////////////////////////////////////////////////////////
         // change mouse cursor when over marker
         //////////////////////////////////////////////////////////////////////////
+        let lastHoverCursorAt = 0;
         $(map.getViewport()).on('mousemove', function (e) {
+            const nowCursor = Date.now();
+            if (nowCursor - lastHoverCursorAt < 150) return;
+            lastHoverCursorAt = nowCursor;
             var pixel = map.getEventPixel(e.originalEvent);
             var name = "";
-            var hit = map.forEachFeatureAtPixel(pixel, function (feature, layer) {
+            const hit = map.forEachFeatureAtPixel(pixel, function (feature) {
                 if (feature) {
                     name = feature.getProperties().name;
                 }
                 return true;
-            });
+            }, interactiveLayersOnly);
             if (hit && name != "safehomeDist" && name != "safehomeSafe" && name != "geozoneCircle") {
                 map.getTargetElement().style.cursor = 'pointer';
             } else {
@@ -4593,8 +5848,7 @@ function iconKey(filename) {
         // Update Alt display in meters on ALT field keypress up
         //////////////////////////////////////////////////////////////////////////
         $('#pointAlt').on('keyup', () => {
-            let altitudeMeters = app.ConvertCentimetersToMeters($('#pointAlt').val());
-            $('#altitudeInMeters').text(` ${altitudeMeters}m`);
+            $('#altitudeInMeters').text(altitudeReadout(altitudeFromDisplay($('#pointAlt').val())));
         });
 
         /////////////////////////////////////////////
@@ -4621,6 +5875,9 @@ function iconKey(filename) {
         setupShowHidePanel('showHideWPeditButton',      'WPeditContent');
         setupShowHidePanel('showHideMultimissionButton','multimissionContent');
         setupShowHidePanel('showHideGeozonesButton',    'geozoneContent');
+        setupShowHidePanel('showHideWpListButton',      'wpListContent');
+
+        renderWaypointSelect();
 
         /////////////////////////////////////////////
         // Callback for Waypoint edition
@@ -4653,10 +5910,12 @@ function iconKey(filename) {
                 for (var j in dictOfLabelParameterPoint[selectedMarker.getAction()]) {
                     if (dictOfLabelParameterPoint[selectedMarker.getAction()][j] != '') {
                         $('#pointP'+String(j).slice(-1)+'class').fadeIn(300);
-                        $('label[for=pointP'+String(j).slice(-1)+']').html(dictOfLabelParameterPoint[selectedMarker.getAction()][j]);
+                        $('label[for=pointP'+String(j).slice(-1)+']').html(parameterLabel(selectedMarker.getAction(), j));
                     }
                     else {$('#pointP'+String(j).slice(-1)+'class').fadeOut(300);}
                 }
+                $('#pointP1').val(parameterToDisplay(selectedMarker.getAction(), 'parameter1', selectedMarker.getP1()));
+                $('#pointP2').val(parameterToDisplay(selectedMarker.getAction(), 'parameter2', selectedMarker.getP2()));
                 mission.updateWaypoint(selectedMarker);
                 mission.update(singleMissionActive());
                 redrawLayer();
@@ -4689,8 +5948,21 @@ function iconKey(filename) {
 
         $('#pointAlt').on('change', function (event) {
             if (selectedMarker) {
+                const typedAltitude = parseFieldValue($('#pointAlt').val(), MISSION_UNIT_ALT);
+                if (typedAltitude === null) {
+                    $('#pointAlt').val(altitudeToDisplay(selectedMarker.getAlt()));
+                    $('#altitudeInMeters').text(altitudeReadout(selectedMarker.getAlt()));
+                    refusePointEdit();
+                    return;
+                }
                 const elevationAtWP = Number($('#elevationValueAtWP').text());
-                const returnAltitude = checkAltElevSanity(true, Number($('#pointAlt').val()), elevationAtWP, selectedMarker.getP3());
+                const returnAltitude = checkAltElevSanity(true, typedAltitude, elevationAtWP, selectedMarker.getP3());
+                if (returnAltitude !== typedAltitude) {
+                    // the sanity check kept the stored altitude, so show that one back
+                    $('#pointAlt').val(altitudeToDisplay(returnAltitude));
+                    $('#altitudeInMeters').text(altitudeReadout(returnAltitude));
+                    refusePointEdit();
+                }
                 selectedMarker.setAlt(returnAltitude);
                 mission.updateWaypoint(selectedMarker);
                 mission.update(singleMissionActive());
@@ -4701,10 +5973,15 @@ function iconKey(filename) {
 
         $('#pointP1').on('change', function (event) {
             if (selectedMarker) {
-                if (selectedMarker.getAction() != MWNP.WPTYPE.SET_HEAD) {
-                    $('#pointP1').val(Math.abs(Number($('#pointP1').val())));
+                const action = selectedMarker.getAction();
+                let p1 = parameterFromDisplay(action, 'parameter1', $('#pointP1').val());
+                if (p1 === null) {
+                    p1 = selectedMarker.getP1();
+                } else if (action != MWNP.WPTYPE.SET_HEAD) {
+                    p1 = Math.abs(p1);
                 }
-                selectedMarker.setP1(Number($('#pointP1').val()));
+                $('#pointP1').val(parameterToDisplay(action, 'parameter1', p1));
+                selectedMarker.setP1(p1);
                 mission.updateWaypoint(selectedMarker);
                 mission.update(singleMissionActive());
                 redrawLayer();
@@ -4713,14 +5990,39 @@ function iconKey(filename) {
 
         $('#pointP2').on('change', function (event) {
             if (selectedMarker) {
-                if (selectedMarker.getAction() == MWNP.WPTYPE.POSHOLD_TIME) {
-                    $('#pointP2').val(Math.abs(Number($('#pointP2').val())));
+                const action = selectedMarker.getAction();
+                let p2 = parameterFromDisplay(action, 'parameter2', $('#pointP2').val());
+                if (p2 === null) {
+                    p2 = selectedMarker.getP2();
+                } else if (action == MWNP.WPTYPE.POSHOLD_TIME) {
+                    p2 = Math.abs(p2);
                 }
-                selectedMarker.setP2(Number($('#pointP2').val()));
+                $('#pointP2').val(parameterToDisplay(action, 'parameter2', p2));
+                selectedMarker.setP2(p2);
                 mission.updateWaypoint(selectedMarker);
                 mission.update(singleMissionActive());
                 redrawLayer();
             }
+        });
+
+        /////////////////////////////////////////////
+        // Callback for the waypoint selector panel
+        /////////////////////////////////////////////
+        $('#wpListSelect').on('change', function () {
+            const wpNumber = Number($(this).val());
+            if (!Number.isNaN(wpNumber) && mission.getWaypoint(wpNumber)) {
+                selectWaypointFromList(wpNumber);
+            }
+        });
+
+        $('#wpListPrev').on('click', function (event) {
+            event.preventDefault();
+            stepWaypointSelection(-1);
+        });
+
+        $('#wpListNext').on('click', function (event) {
+            event.preventDefault();
+            stepWaypointSelection(1);
         });
 
         $('#pointP3Alt').on('change', function (event) {
@@ -4733,14 +6035,19 @@ function iconKey(filename) {
 
                 P3Value = missionControlTab.setBit(P3Value, MWNP.P3.ALT_TYPE, $('#pointP3Alt').prop("checked"));
                 (async () => {
-                    const elevationAtWP = await selectedMarker.getElevation(globalSettings);
+                    // The elevation lookup takes a moment and the selector makes it easy to
+                    // move on meanwhile; the answer belongs to the waypoint that asked for it.
+                    const wp = selectedMarker;
+                    const elevationAtWP = await wp.getElevation(globalSettings);
+                    if (selectedMarker !== wp) return;
+
                     $('#elevationValueAtWP').text(elevationAtWP);
-                    var altitude = Number($('#pointAlt').val());
+                    rememberTerrain(wp, elevationAtWP);
 
                     if (P3Value != selectedMarker.getP3()) {
                         selectedMarker.setP3(P3Value);
 
-                        let groundClearance = 100 * Number($('#groundClearanceValueAtWP').text());
+                        let groundClearance = 100 * Number($('#groundClearanceValueAtWP').val());
                         if (isNaN(groundClearance)) {
                             groundClearance = settings.alt; // use default altitude if no current ground clearance
                         }
@@ -4771,44 +6078,34 @@ function iconKey(filename) {
                             }
                             selectedFwApproachWp.setElevation(elevationAtWP * 100);
                             selectedFwApproachWp.setIsSeaLevelRef($('#pointP3Alt').prop("checked") ? 1 : 0);
-                            $('#wpApproachAlt').val(selectedFwApproachWp.getApproachAltAsl());
-                            $('#wpLandAlt').val(selectedFwApproachWp.getLandAltAsl());
+                            $('#wpApproachAlt').val(altitudeToDisplay(selectedFwApproachWp.getApproachAltAsl()));
+                            $('#wpLandAlt').val(altitudeToDisplay(selectedFwApproachWp.getLandAltAsl()));
                         }
 
                     }
 
                     const returnAltitude = checkAltElevSanity(false, selectedMarker.getAlt(), elevationAtWP, selectedMarker.getP3());
                     selectedMarker.setAlt(returnAltitude);
-                    $('#pointAlt').val(selectedMarker.getAlt());
-                    let altitudeMeters = app.ConvertCentimetersToMeters(selectedMarker.getAlt());
-                    $('#altitudeInMeters').text(` ${altitudeMeters}m`);
+                    $('#pointAlt').val(altitudeToDisplay(selectedMarker.getAlt()));
+                    $('#altitudeInMeters').text(altitudeReadout(selectedMarker.getAlt()));
 
-                    $('#wpLandAltM').text(selectedFwApproachWp.getLandAltAsl() / 100 + " m");
-                    $('#wpApproachAltM').text(selectedFwApproachWp.getApproachAltAsl() / 100 + " m");
+                    $('#wpLandAltM').text(altitudeReadout(selectedFwApproachWp.getLandAltAsl()));
+                    $('#wpApproachAltM').text(altitudeReadout(selectedFwApproachWp.getApproachAltAsl()));
 
-                    if (selectedFwApproachWp && selectedFwApproachWp.getIsSeaLevelRef() != $('#pointP3Alt').prop("checked")) {
-                        selectedFwApproachWp.setIsSeaLevelRef($('#pointP3Alt').prop("checked"));
-                        selectedFwApproachWp.setElevation(elevationAtWP * 100);
-                        if ($('#pointP3Alt').prop("checked")) {
-                            selectedFwApproachWp.setApproachAltAsl(selectedFwApproachWp.getApproachAltAsl() + elevationAtWP * 100);
-                            selectedFwApproachWp.setLandAltAsl(selectedFwApproachWp.getLandAltAsl() + elevationAtWP * 100);
-                        } else {
-                            selectedFwApproachWp.setApproachAltAsl(selectedFwApproachWp.getApproachAltAsl() - elevationAtWP * 100);
-                            selectedFwApproachWp.setLandAltAsl(selectedFwApproachWp.getLandAltAsl() - elevationAtWP * 100);
-                        }
-
-                        $('#wpApproachAlt').val(selectedFwApproachWp.getApproachAltAsl());
-                        $('#wpLandAlt').val(selectedFwApproachWp.getLandAltAsl());
-                    }
-
-                    $('#wpLandAltM').text(selectedFwApproachWp.getLandAltAsl() / 100 + " m");
-                    $('#wpApproachAltM').text(selectedFwApproachWp.getApproachAltAsl() / 100 + " m");
+                    // The LAND branch above is the one and only conversion of the
+                    // approach altitudes. A second block here used to convert them
+                    // again WITHOUT checking that the selected waypoint is a landing
+                    // at all — and since one approach object serves the whole
+                    // mission, toggling the altitude reference on any ordinary
+                    // waypoint silently added the site elevation to the approach
+                    // altitudes, once per toggle. That is where the ever-growing
+                    // approach and landing altitudes came from.
 
                     mission.updateWaypoint(selectedMarker);
                     mission.update(singleMissionActive());
                     redrawLayer();
                     plotElevation();
-                })();
+                })().catch(err => console.error('Failed to update waypoint elevation:', err));
             }
         });
 
@@ -4874,20 +6171,37 @@ function iconKey(filename) {
 
         $('#wpApproachAlt').on('change', (event) => {
             if (selectedMarker && selectedFwApproachWp) {
-                let altitude = Number($(event.currentTarget).val());
+                let altitude = parseFieldValue($(event.currentTarget).val(), MISSION_UNIT_ALT);
+                if (altitude === null) {
+                    $(event.currentTarget).val(altitudeToDisplay(selectedFwApproachWp.getApproachAltAsl()));
+                    return;
+                }
                 if (checkApproachAltitude(altitude, $('#pointP3Alt').prop('checked'), Number($('#elevationValueAtWP').text()))) {
-                    selectedFwApproachWp.setApproachAltAsl(Number($(event.currentTarget).val()));
-                    $('#wpApproachAltM').text(selectedFwApproachWp.getApproachAltAsl() / 100 + " m");
+                    selectedFwApproachWp.setApproachAltAsl(altitude);
+                    $('#wpApproachAltM').text(altitudeReadout(selectedFwApproachWp.getApproachAltAsl()));
+                    repaintSimulation();
+                    updateMission3D();
+                } else {
+                    $(event.currentTarget).val(altitudeToDisplay(selectedFwApproachWp.getApproachAltAsl()));
+                    refusePointEdit();
                 }
             }
         });
 
         $('#wpLandAlt').on('change', (event) => {
             if (selectedMarker && selectedFwApproachWp) {
-                let altitude = Number($(event.currentTarget).val());
+                let altitude = parseFieldValue($(event.currentTarget).val(), MISSION_UNIT_ALT);
+                if (altitude === null) {
+                    $(event.currentTarget).val(altitudeToDisplay(selectedFwApproachWp.getLandAltAsl()));
+                    return;
+                }
                 if (checkLandingAltitude(altitude, $('#pointP3Alt').prop('checked'), Number($('#elevationValueAtWP').text()))) {
-                    selectedFwApproachWp.setLandAltAsl(Number($(event.currentTarget).val()));
-                    $('#wpLandAltM').text(selectedFwApproachWp.getLandAltAsl() / 100 + " m");
+                    selectedFwApproachWp.setLandAltAsl(altitude);
+                    $('#wpLandAltM').text(altitudeReadout(selectedFwApproachWp.getLandAltAsl()));
+                    repaintSimulation();
+                    updateMission3D();
+                } else {
+                    refusePointEdit();
                 }
             }
         });
@@ -5064,9 +6378,10 @@ function iconKey(filename) {
                 mspHelper.saveSafehomes,
                 mspHelper.saveFwApproach,
                 function() {
-                    mspHelper.saveToEeprom();
-                    GUI.log(i18n.getMessage('endSendingSafehomePoints'));
-                    $('#saveEepromSafehomeButton').removeClass('disabled');
+                    mspHelper.saveToEeprom(() => {
+                        GUI.log(i18n.getMessage('endSendingSafehomePoints'));
+                        $('#saveEepromSafehomeButton').removeClass('disabled');
+                    });
                 }
             ]);
             saveChainer.execute();
@@ -5130,28 +6445,28 @@ function iconKey(filename) {
                     }
 
                     $('#safehomeElevation').text(elevation / 100);
-                    $('#safehomeApproachAlt').val(selectedFwApproachSh.getApproachAltAsl());
-                    $('#safehomeLandAlt').val(selectedFwApproachSh.getLandAltAsl());
-                    $('#safehomeLandAltM').text(selectedFwApproachSh.getLandAltAsl() / 100 + " m");
-                    $('#safehomeApproachAltM').text(selectedFwApproachSh.getApproachAltAsl() / 100 + " m");
+                    $('#safehomeApproachAlt').val(altitudeToDisplay(selectedFwApproachSh.getApproachAltAsl()));
+                    $('#safehomeLandAlt').val(altitudeToDisplay(selectedFwApproachSh.getLandAltAsl()));
+                    $('#safehomeLandAltM').text(altitudeReadout(selectedFwApproachSh.getLandAltAsl()));
+                    $('#safehomeApproachAltM').text(altitudeReadout(selectedFwApproachSh.getApproachAltAsl()));
 
                     renderSafeHomeOptions();
-                })();
+                })().catch(err => console.error('Failed to update safehome elevation:', err));
             }
         });
 
         $('#safehomeApproachAlt').on('change', event => {
 
             if (selectedFwApproachSh) {
-                let altitude = Number($(event.currentTarget).val());
-                if (checkApproachAltitude(altitude, $('#safehomeSeaLevelRef').prop('checked'), Number($('#safehomeElevation').text()))) {
-                    selectedFwApproachSh.setApproachAltAsl(Number($(event.currentTarget).val()));
-                    $('#safehomeApproachAltM').text(selectedFwApproachSh.getApproachAltAsl() / 100 + " m");
+                let altitude = parseFieldValue($(event.currentTarget).val(), MISSION_UNIT_ALT);
+                if (altitude !== null && checkApproachAltitude(altitude, $('#safehomeSeaLevelRef').prop('checked'), Number($('#safehomeElevation').text()))) {
+                    selectedFwApproachSh.setApproachAltAsl(altitude);
+                    $('#safehomeApproachAltM').text(altitudeReadout(selectedFwApproachSh.getApproachAltAsl()));
                     cleanSafehomeLayers();
                     renderSafehomesOnMap();
                     renderHomeTable();
                 }
-                $('#safehomeApproachAlt').val(selectedFwApproachSh.getApproachAltAsl());
+                $('#safehomeApproachAlt').val(altitudeToDisplay(selectedFwApproachSh.getApproachAltAsl()));
             }
 
         });
@@ -5159,15 +6474,15 @@ function iconKey(filename) {
         $('#safehomeLandAlt').on('change', event => {
 
             if (selectedFwApproachSh) {
-                let altitude = Number($(event.currentTarget).val());
-                if (checkLandingAltitude(altitude, $('#safehomeSeaLevelRef').prop('checked'), Number($('#safehomeElevation').text()))) {
+                let altitude = parseFieldValue($(event.currentTarget).val(), MISSION_UNIT_ALT);
+                if (altitude !== null && checkLandingAltitude(altitude, $('#safehomeSeaLevelRef').prop('checked'), Number($('#safehomeElevation').text()))) {
                     selectedFwApproachSh.setLandAltAsl(altitude);
-                    $('#safehomeLandAltM').text(selectedFwApproachSh.getLandAltAsl() / 100 + " m");
+                    $('#safehomeLandAltM').text(altitudeReadout(selectedFwApproachSh.getLandAltAsl()));
                     cleanSafehomeLayers();
                     renderSafehomesOnMap();
                     renderHomeTable();
                 } else {
-                    $('#safehomeLandAlt').val(selectedFwApproachSh.getLandAltAsl());
+                    $('#safehomeLandAlt').val(altitudeToDisplay(selectedFwApproachSh.getLandAltAsl()));
                 }
             }
         });
@@ -5307,9 +6622,10 @@ function iconKey(filename) {
                 $(event.currentTarget).addClass('disabled');
                 GUI.log('Start of sending Geozones');
                 mspHelper.saveGeozones(() => {
-                    mspHelper.saveToEeprom();
-                    GUI.log('End of sending Geozones');
-                    reboot();
+                    mspHelper.saveToEeprom(() => {
+                        GUI.log('End of sending Geozones');
+                        reboot();
+                    });
                 });
             }
         });
@@ -5474,6 +6790,44 @@ function iconKey(filename) {
                 plotElevation();
             }
         });
+
+        /////////////////////////////////////////////
+        // Flight path simulation
+        /////////////////////////////////////////////
+        wireSimulationControls();
+
+        // Wiring the simulation controls in one place keeps initMap's own body
+        // to the map it builds. Declared here, next to the call, because the
+        // whole block is about one feature and nothing else in initMap needs it.
+        function wireSimulationControls() {
+            $('#simulationSpeed').val(simulation.speedMs);
+            // The model is parameterised from the flight controller; without one it
+            // could only guess. Offline the feature stays out of the way entirely and
+            // the 3D view shows the plan alone.
+            $('#simulateMission').toggle(CONFIGURATOR.connectionValid);
+            if (!CONFIGURATOR.connectionValid) simulation.enabled = false;
+
+            // Namespaced and released first: the tab can be entered more than once,
+            // and a delegated handler would otherwise pile up on every visit and keep
+            // answering out of the previous closure.
+            $(document).off('click.mcSimulate').on('click.mcSimulate', '#simulateMissionButton, #simulateMission', function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                simulation.enabled = !simulation.enabled;
+                $('#simulateMission').toggleClass('active', simulation.enabled);
+                repaintSimulation();
+                updateMission3D();
+            });
+
+            $(document).off('change.mcSimulate input.mcSimulate')
+                .on('change.mcSimulate input.mcSimulate', '#simulationSpeed', function () {
+                    const speed = Number($(this).val());
+                    if (!Number.isFinite(speed) || speed <= 0) return;
+                    simulation.speedMs = speed;
+                    repaintSimulation();
+                    updateMission3D();
+                });
+        }
 
         function closeAddressSearchDialog() {
             $('#addressSearchDialog, #addressSearchBackdrop').remove();
@@ -6054,8 +7408,6 @@ function iconKey(filename) {
             changeSwitch($('#pointP3UserAction3'), TABS.mission_control.isBitSet(P3Value, MWNP.P3.USER_ACTION_3));
             changeSwitch($('#pointP3UserAction4'), TABS.mission_control.isBitSet(P3Value, MWNP.P3.USER_ACTION_4));
 
-            const altitudeMeters = selectedMarker.getAlt() / 100;
-
             if (selectedMarker.getAction() == MWNP.WPTYPE.LAND) {
                 $('#wpFwLanding').fadeIn(300);
             } else {
@@ -6073,16 +7425,16 @@ function iconKey(filename) {
             $('#elevationAtWP').fadeIn();
             $('#groundClearanceAtWP').fadeIn();
 
-            $('#altitudeInMeters').text(` ${altitudeMeters}m`);
+            $('#altitudeInMeters').text(altitudeReadout(selectedMarker.getAlt()));
             $('#pointLon').val(Math.round(coord[0] * 10000000) / 10000000);
             $('#pointLat').val(Math.round(coord[1] * 10000000) / 10000000);
-            $('#pointAlt').val(selectedMarker.getAlt());
+            $('#pointAlt').val(altitudeToDisplay(selectedMarker.getAlt()));
             $('#pointType').val(selectedMarker.getAction());
-            $('#pointP1').val(selectedMarker.getP1());
-            $('#pointP2').val(selectedMarker.getP2());
+            $('#pointP1').val(parameterToDisplay(selectedMarker.getAction(), 'parameter1', selectedMarker.getP1()));
+            $('#pointP2').val(parameterToDisplay(selectedMarker.getAction(), 'parameter2', selectedMarker.getP2()));
 
             for (const j in dictOfLabelParameterPoint[selectedMarker.getAction()]) {
-                const labelText = dictOfLabelParameterPoint[selectedMarker.getAction()][j];
+                const labelText = parameterLabel(selectedMarker.getAction(), j);
                 const parameterSuffix = String(j).slice(-1);
 
                 if (labelText === '') {
@@ -6275,15 +7627,27 @@ function iconKey(filename) {
         /////////////////////////////////////////////
         // Callback for settings
         /////////////////////////////////////////////
-        $('#saveSettings').on('click', function () {
+        $('#saveSettings').on('click', async function () {
+            if ($(this).hasClass('disabled')) return;
+            $(this).addClass('disabled');
+            try {
+                await saveSettingsAndApply();
+            } finally {
+                $(this).removeClass('disabled');
+            }
+        });
+
+        async function saveSettingsAndApply() {
             let oldSafeRadiusSH = settings.safeRadiusSH;
+            const oldAlt = settings.alt;
+            const oldSpeed = settings.speed;
 
             // update only default settings
-            settings.alt = Number($('#MPdefaultPointAlt').val());
-            settings.speed = Number($('#MPdefaultPointSpeed').val());
-            settings.safeRadiusSH = Number($('#MPdefaultSafeRangeSH').val());
-            settings.fwApproachAlt = Number($('#MPdefaultFwApproachAlt').val());
-            settings.fwLandAlt = Number($('#MPdefaultLandAlt').val());
+            settings.alt = readNumericField('#MPdefaultPointAlt', oldAlt, MISSION_UNIT_ALT);
+            settings.speed = readNumericField('#MPdefaultPointSpeed', oldSpeed, MISSION_UNIT_SPEED);
+            settings.safeRadiusSH = readNumericField('#MPdefaultSafeRangeSH', oldSafeRadiusSH);
+            settings.fwApproachAlt = readNumericField('#MPdefaultFwApproachAlt', settings.fwApproachAlt, MISSION_UNIT_DIST, 2);
+            settings.fwLandAlt = readNumericField('#MPdefaultLandAlt', settings.fwLandAlt, MISSION_UNIT_DIST, 2);
 
             saveSettings();
 
@@ -6293,12 +7657,146 @@ function iconKey(filename) {
                 $('#SafeHomeSafeDistance').text(settings.safeRadiusSH);
             }
 
-            closeSettingsPanel();
-        });
+            // The box stays open on save so the ticks next to the fields are visible;
+            // the cancel button is what closes it.
+            await applyMissionDefaults(oldAlt, oldSpeed);
+
+            // The clearance display warns against the default altitude, which may just
+            // have changed, so recompute it against the terrain already on screen.
+            refreshGroundClearanceDisplay(Number($('#elevationValueAtWP').text()));
+        }
 
         $('#cancelSettings').on('click', function () {
             loadSettings();
+            refreshSeaLevelSwitch();
             closeSettingsPanel();
+        });
+
+        // Editing a value clears the tick of the previous save
+        $('#MPapplySlrValue').on('change', function () {
+            $('#MPapplySlrSaved').hide();
+        });
+        $('#MPdefaultPointAlt').on('input change', function () {
+            $('#MPapplyAltSaved').hide();
+            updateDefaultUnitHints();
+        });
+        $('#MPdefaultPointSpeed').on('input change', function () {
+            $('#MPapplySpeedSaved').hide();
+            updateDefaultUnitHints();
+        });
+
+        // Typing the wanted ground clearance computes the altitude, instead of the
+        // pilot adding terrain height and clearance by hand.
+        $('#groundClearanceValueAtWP').on('change', function () {
+            if (!selectedMarker || disableMarkerEdit) return;
+
+            const clearance = Number($(this).val());
+            const elevation = Number($('#elevationValueAtWP').text());
+            if (Number.isNaN(clearance) || Number.isNaN(elevation)) {
+                refreshGroundClearanceDisplay();
+                return;
+            }
+
+            // Inverse of the two display formulas: absolute is clearance above the
+            // terrain; relative counts from home, so the terrain-home offset is added.
+            let altitude;
+            if (missionControlTab.isBitSet(selectedMarker.getP3(), MWNP.P3.ALT_TYPE)) {
+                altitude = Math.round((clearance + elevation) * 100);
+            } else if (homeMarkers.length && HOME.getAlt() != "N/A") {
+                altitude = Math.round((clearance + elevation - Number(HOME.getAlt())) * 100);
+            } else {
+                // without home a relative altitude cannot be derived from a clearance
+                refreshGroundClearanceDisplay(elevation);
+                return;
+            }
+
+            selectedMarker.setAlt(altitude);
+            mission.updateWaypoint(selectedMarker);
+            mission.update(singleMissionActive());
+            $('#pointAlt').val(altitudeToDisplay(altitude));
+            $('#altitudeInMeters').text(altitudeReadout(altitude));
+            redrawLayer();
+            plotElevation();
+            refreshGroundClearanceDisplay(elevation);
+        });
+
+        // The editor fields write into the waypoint when they commit (on change), so
+        // the tick in the title tracks that: typing hides it, a committed change shows
+        // it, and the save button commits whatever is still being typed. These handlers
+        // sit after the field handlers above, so the tick appears once the value is in.
+        const pointEditorFields = '#pointType, #pointLat, #pointLon, #pointAlt, #pointP1, #pointP2,'
+            + ' #groundClearanceValueAtWP, #pointP3Alt, #pointP3UserAction1, #pointP3UserAction2,'
+            + ' #pointP3UserAction3, #pointP3UserAction4, #wpApproachAlt, #wpLandAlt,'
+            + ' #wpApproachDirection, #wpLandHeading1, #wpLandHeading1Excl, #wpLandHeading2, #wpLandHeading2Excl';
+        $(pointEditorFields).on('input', function () {
+            $('#pointSavedTick').hide();
+            pointEditRefused = false;
+        });
+        $(pointEditorFields).on('change', function () {
+            // A field that kept its stored value has nothing to confirm, and neither has
+            // a panel that is read only right now.
+            const taken = selectedMarker && !disableMarkerEdit && !pointEditRefused;
+            pointEditRefused = false;
+            $('#pointSavedTick').toggle(!!taken);
+        });
+
+        // The elevation profile floats over the map with both sides anchored, so its
+        // width always follows the map. The title bar drags it vertically, clamped to
+        // the map area; a double click puts it back onto its default spot at the bottom.
+        (function () {
+            const panel = $('#missionPlannerElevation');
+            const bar = panel.find('.gui_box_titlebar');
+            bar.css('cursor', 'ns-resize');
+            let dragging = false, startY = 0, startTop = 0;
+
+            const clampTop = function (top) {
+                const parentH = panel[0].offsetParent.getBoundingClientRect().height;
+                const panelH = panel[0].getBoundingClientRect().height;
+                return Math.min(Math.max(top, 10), Math.max(10, parentH - panelH - 10));
+            };
+
+            bar.on('mousedown', function (e) {
+                if ($(e.target).closest('a').length) return;   // the close button stays a button
+                const rect = panel[0].getBoundingClientRect();
+                const parentRect = panel[0].offsetParent.getBoundingClientRect();
+                startTop = rect.top - parentRect.top;
+                panel.css({top: startTop + 'px', bottom: 'auto'});
+                dragging = true;
+                startY = e.clientY;
+                e.preventDefault();
+            });
+
+            $(document).on('mousemove.elevationDrag', function (e) {
+                if (!dragging) return;
+                panel.css('top', clampTop(startTop + e.clientY - startY) + 'px');
+            });
+
+            $(document).on('mouseup.elevationDrag', function () {
+                if (!dragging) return;
+                dragging = false;
+                // a window resize must never leave it outside the map
+                panel.css('top', clampTop(panel[0].getBoundingClientRect().top - panel[0].offsetParent.getBoundingClientRect().top) + 'px');
+            });
+
+            bar.on('dblclick', function () {
+                panel.css({bottom: '10px', top: 'auto'});
+            });
+        })();
+
+        $('#savePointButton').on('click', function (event) {
+            event.preventDefault();
+            if (!selectedMarker) return;
+            // The change handler is what writes a value into the waypoint, and a field
+            // still being typed in has not fired it yet - so fire it, then leave the
+            // field. Fields already committed just show the tick.
+            const active = document.activeElement;
+            if (active && $(active).closest('#MPeditPoint').length) {
+                // the change handler above sets the tick according to what was taken
+                $(active).trigger('change');
+                active.blur();
+                return;
+            }
+            $('#pointSavedTick').toggle(!disableMarkerEdit);
         });
 
         updateTotalInfo();
@@ -6722,7 +8220,7 @@ function iconKey(filename) {
                     dialog.alert(i18n.getMessage('MissionPlannerAltitudeChangeReset'));
                     altitude = selectedMarker.getAlt();
                 } else {
-                    let currentGroundClearance = 100 * Number($('#groundClearanceValueAtWP').text());
+                    let currentGroundClearance = 100 * Number($('#groundClearanceValueAtWP').val());
                     if (isNaN(currentGroundClearance) || selectedMarker == null) {
                         currentGroundClearance = settings.alt;  // use default altitude if no current ground clearance
                     }
@@ -6731,11 +8229,10 @@ function iconKey(filename) {
             }
             groundClearance = altitude / 100 + (elevationAtHome - elevation);
         }
-        $('#pointAlt').val(altitude);
-        let altitudeMeters = parseInt(altitude) / 100;
-        $('#altitudeInMeters').text(` ${altitudeMeters}m`);
+        $('#pointAlt').val(altitudeToDisplay(altitude));
+        $('#altitudeInMeters').text(altitudeReadout(altitude));
         document.getElementById('groundClearanceAtWP').style.color = groundClearance < (settings.alt / 100) ? "#FF0000" : "#303030";
-        $('#groundClearanceValueAtWP').text(` ${groundClearance}`);
+        $('#groundClearanceValueAtWP').val(groundClearance);
 
         return altitude;
     }
@@ -6965,6 +8462,12 @@ missionControlTab.setBit = function(bits, bit, value) {
 // }
 
 missionControlTab.cleanup = function (callback) {
+    // The elevation panel's drag listens on the document, so it outlives the tab unless
+    // it is taken off here - reopening the tab would otherwise stack one pair per visit.
+    $(document).off('.elevationDrag');
+    /* jBox appends its wrapper to body, which the tab switch does not empty, so the
+       modal's markup and its ids would stack one copy per visit. */
+    $('.jBox-wrapper').remove();
     cleanupMissionControlLocationResources();
     if (elevationChartInstance) {
         elevationChartInstance.destroy();

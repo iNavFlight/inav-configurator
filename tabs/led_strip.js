@@ -1,11 +1,11 @@
 'use strict';
 
-import mspHelper from './../js/msp/MSPHelper';
-import MSPCodes from './../js/msp/MSPCodes';
-import MSP from './../js/msp';
-import GUI from './../js/gui';
-import FC from './../js/fc';
-import i18n from './../js/localization';
+import mspHelper from '../js/msp/MSPHelper.js';
+import MSPCodes from '../js/msp/MSPCodes.js';
+import MSP from '../js/msp.js';
+import GUI from '../js/gui.js';
+import FC from '../js/fc.js';
+import i18n from '../js/localization.js';
 import LED_STRIP_PRESETS from './led_strip_presets.js';
 
 const ledStripTab = {
@@ -22,7 +22,7 @@ ledStripTab.initialize = function (callback, scrollPosition) {
 
     ledStripTab.functions = ['i', 'w', 'f', 'a', 't', 'r', 'c', 'g', 's', 'b', 'l', 'o', 'n'];
     ledStripTab.baseFuncs = ['c', 'f', 'a', 'l', 's', 'g', 'r', 'h'];
-    ledStripTab.overlays = ['t', 'o', 'b', 'n', 'i', 'w', 'e'];
+    ledStripTab.overlays = ['t', 'o', 'b', 'n', 'i', 'w', 'e', 'v'];
 
     ledStripTab.wireMode = false;
 
@@ -219,6 +219,28 @@ ledStripTab.initialize = function (callback, scrollPosition) {
         }
 
        i18n.localize();;
+
+    function syncRainbowInputState() {
+        var checkboxActive = $('.toggle.function-v').prop('checked');
+        var selectionActive = !!$('.ui-selected').filter(function() {
+            return $(this).is('.function-v');
+        }).length;
+        var rainbowActive = checkboxActive || selectionActive;
+        $('#rainbowFreqInput, #rainbowDeltaInput').prop('disabled', !rainbowActive).css('pointer-events', rainbowActive ? 'auto' : '');
+    }
+
+                mspHelper.getSetting('ledstrip_rainbow_sweep_rate').then(function (result) {
+            if (result?.value != null) {
+                $('#rainbowFreqInput').val(result.value);
+            }
+        }).catch(function () {});
+        mspHelper.getSetting('ledstrip_rainbow_delta_deg').then(function (result) {
+            if (result?.value != null) {
+                $('#rainbowDeltaInput').val(result.value);
+            }
+        }).catch(function () {});
+
+        syncRainbowInputState();
 
         // Build Grid
         var theHTML = [];
@@ -598,11 +620,13 @@ ledStripTab.initialize = function (callback, scrollPosition) {
                         }
                     });
                 }
-                updateBulkCmd();
-
+                
                 setColorSliders(selectedColorIndex);
 
                 setOptionalGroupsVisibility();
+                syncRainbowInputState();
+
+                updateBulkCmd();
 
                 $('.directions button').removeClass('btnOn');
                 directionsInSelection.forEach(function(direction_e) {
@@ -672,6 +696,7 @@ ledStripTab.initialize = function (callback, scrollPosition) {
                                         p.addClass('function-' + letter);
                                     break;
                                 case 'i':
+                                case 'v':
                                     if (areOverlaysActive('function-' + f))
                                         p.addClass('function-' + letter);
                                     break;
@@ -691,12 +716,13 @@ ledStripTab.initialize = function (callback, scrollPosition) {
             return $(that).is(':checked');
         }
 
-        // UI: check-box toggle
+                // UI: check-box toggle
         $('.checkbox').on('change', function(e) {
             if (e.originalEvent) {
                 // user-triggered event
-                saveUndoState();
                 var that = $(this).find('input');
+
+                saveUndoState();
                 if ($('.ui-selected').length > 0) {
 
                     ledStripTab.overlays.forEach(function(letter) {
@@ -723,6 +749,10 @@ ledStripTab.initialize = function (callback, scrollPosition) {
                     clearModeColorSelection();
                     updateBulkCmd();
                     setOptionalGroupsVisibility();
+                }
+
+                if ($(that).is('.function-v')) {
+                    syncRainbowInputState();
                 }
             } else {
                 // code-triggered event
@@ -782,7 +812,19 @@ ledStripTab.initialize = function (callback, scrollPosition) {
             }
 
             function send_led_strip_mode_colors() {
-                mspHelper.sendLedStripModeColors(save_to_eeprom);
+                mspHelper.sendLedStripModeColors(save_rainbow_settings);
+            }
+
+                        function save_rainbow_settings() {
+                var freqRaw = Number($('#rainbowFreqInput').val());
+                var deltaRaw = Number($('#rainbowDeltaInput').val());
+
+                var freq = Number.isFinite(freqRaw) ? Math.max(0, Math.min(255, freqRaw)) : 100;
+                var delta = Number.isFinite(deltaRaw) ? Math.max(0, Math.min(359, deltaRaw)) : 30;
+
+                mspHelper.setSetting('ledstrip_rainbow_sweep_rate', freq, function () {
+                    mspHelper.setSetting('ledstrip_rainbow_delta_deg', delta, save_to_eeprom);
+                });
             }
 
             function save_to_eeprom() {
@@ -1017,6 +1059,14 @@ ledStripTab.initialize = function (callback, scrollPosition) {
             $('.strobeOverlay').show();
         }
 
+        if (areOverlaysActive(activeFunction)) {
+            $('.rainbowOverlay').show();
+            $('#rainbowSettings').show();
+        } else {
+            $('.rainbowOverlay').hide();
+            $('#rainbowSettings').hide();
+        }
+        
         if (isWarningActive(activeFunction))
             $('.warningOverlay').show();
 

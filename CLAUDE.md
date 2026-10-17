@@ -95,6 +95,78 @@ MSP.send_message(MSPCodes.MSP_SOME_CODE, payload, false, () => {
 | macOS    | `yarn make --platform darwin` | DMG |
 | Linux    | `yarn make --platform linux` | DEB, RPM |
 
+## macOS Code Signing & Notarization
+
+Signing is opt-in. Without credentials, `yarn make` produces an unsigned app.
+
+### What gets signed
+
+| Build | Signed | Notarized |
+|---|---|---|
+| Pull request CI (`ci.yml` on `pull_request`) | No | No |
+| Fork PRs | No | No |
+| Official tagged release (`release.yml` on `9.1.3` / `v9.1.3`) | **Yes** (required) | **Yes** (required) |
+| Nightly (`nightly-build.yml` on `master` or `maintenance-*`) | Yes, if the full signing secret set is present | Yes, if the full API-key set is also present |
+| Local `yarn make` | Yes, if `OSX_SIGN_IDENTITY` is set | Yes, if a complete notarization method is also set |
+
+A **partial** signing set (P12, password, or identity missing) stays unsigned. A **partial** notarization set (API key file, key id, or issuer missing) stays signed-only; packaging does not fail.
+
+PR jobs never import certs or API keys. `yarn make` loads the checked-out `forge.config.js`, so same-repo PRs must not see those secrets.
+
+### Local release build (signed + notarized)
+
+```bash
+export OSX_SIGN_IDENTITY="Developer ID Application: Your Name (TEAMID)"
+export APPLE_KEYCHAIN_PROFILE="your-notary-profile"  # from: xcrun notarytool store-credentials
+yarn make --platform darwin --arch arm64
+yarn make --platform darwin --arch x64
+```
+
+Notarization can also use an App Store Connect API key (`APPLE_API_KEY` path + `APPLE_API_KEY_ID` + `APPLE_API_ISSUER`) instead of a keychain profile.
+
+### GitHub Actions secrets (nightlies and official releases)
+
+All six are required for a signed **and** notarized build. Signing needs the first three together; notarization needs the last three together. Official tagged releases (`9.1.3` or `v9.1.3`) **fail** if either set is incomplete. Nightlies fall back to unsigned / signed-only.
+
+- `MACOS_CERT_P12`, `MACOS_CERT_PASSWORD`, `MACOS_SIGN_IDENTITY`
+- `APPLE_API_KEY_P8`, `APPLE_API_KEY_ID`, `APPLE_API_ISSUER`
+
+See the macOS jobs in `.github/workflows/ci.yml`.
+
+### Cutting an official release (e.g. 9.1.3)
+
+1. On the maintenance branch, bump `"version"` in `package.json` and merge that PR (PR CI stays unsigned).
+2. Tag the merge commit to match historical tags (`9.1.3`) or with a `v` prefix (`v9.1.3`):
+   ```bash
+   git tag 9.1.3
+   git push origin 9.1.3
+   ```
+3. `.github/workflows/release.yml` builds every platform and requires signed+notarized macOS. Download the workflow artifacts, then create the GitHub Release by hand in the same style as [9.1.1](https://github.com/iNavFlight/inav-configurator/releases/tag/9.1.1).
+
+Verify a notarized build with:
+
+```bash
+xcrun stapler validate "out/INAV Configurator-darwin-arm64/INAV Configurator.app"
+spctl --assess --type execute -v "out/INAV Configurator-darwin-arm64/INAV Configurator.app"
+# expected: accepted, source=Notarized Developer ID
+```
+
+**Gotchas (learned the hard way):**
+
+- **Never run two macOS builds concurrently on one machine.** `@electron/packager`
+  wipes its shared temp dir (`$TMPDIR/electron-packager`) at the start of every
+  run — deleting the other build's staged app while it waits on Apple — and the
+  DMG maker writes to a fixed intermediate path (`out/make/INAV-Configurator.dmg`).
+  Run architectures sequentially, or isolate each with its own `TMPDIR`.
+- **Files must not be deleted from the bundle after signing.** SITL pruning runs
+  in the `afterCopyExtraResources` hook (before signing) for this reason; moving
+  it to `postPackage` breaks the signature seal and fails notarization.
+- Notarization (`notarytool --wait`) can take minutes to hours depending on
+  Apple's queue; a quiet build is usually waiting, not hung.
+- If the DMG/ZIP step fails after successful notarization, don't rebuild —
+  re-run `yarn make -- --arch=<arch> --skip-package` to re-wrap the already
+  notarized app in `out/` without another Apple round-trip.
+
 ## Key Files by Importance
 
 | File | Purpose |

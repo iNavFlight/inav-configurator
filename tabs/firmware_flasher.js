@@ -198,8 +198,11 @@ firmwareFlasherTab.initialize = function (callback) {
             var releases = {};
             var sortedTargets = [];
             var unsortedTargets = [];
+            // The release lists are fetched asynchronously; the unstable toggle can run before either arrives.
+            var stableReleases = Array.isArray(firmwareFlasherTab.releasesData) ? firmwareFlasherTab.releasesData : [];
+            var hasDevReleases = showDevReleases && Array.isArray(firmwareFlasherTab.devReleasesData);
 
-            firmwareFlasherTab.releasesData.forEach(function(release){
+            stableReleases.forEach(function(release){
                 release.assets.forEach(function(asset){
                     var result = parseFilename(asset.name);
 
@@ -212,7 +215,7 @@ firmwareFlasherTab.initialize = function (callback) {
                 });
             });
 
-            if (showDevReleases) {
+            if (hasDevReleases) {
                 var majorCount = {};
                 firmwareFlasherTab.devReleasesData.forEach(function (release) {
                     release.assets.forEach(function (asset) {
@@ -233,7 +236,7 @@ firmwareFlasherTab.initialize = function (callback) {
                 releases[release] = [];
             });
 
-            firmwareFlasherTab.releasesData.forEach(function(release){
+            stableReleases.forEach(function(release){
 
                 var versionFromTagExpression = /v?(.*)/;
                 var matchVersionFromTag = versionFromTagExpression.exec(release.tag_name);
@@ -283,7 +286,7 @@ firmwareFlasherTab.initialize = function (callback) {
                 });
             });
 
-            if(showDevReleases && firmwareFlasherTab.devReleasesData) {
+            if (hasDevReleases) {
                 var majorCount = {};
                 firmwareFlasherTab.devReleasesData.forEach(function(release){
                     var major = getReleaseMajor(release.name);
@@ -367,10 +370,34 @@ firmwareFlasherTab.initialize = function (callback) {
             return;
         };
 
+        // A toggle before the nightly list arrived built the board list without nightlies.
+        var applyLateNightlyReleases = function () {
+            if (GUI.active_tab !== firmwareFlasherTab) {
+                return;
+            }
+            // The board change handler skips the version list while locked, so wait for the lock to clear.
+            if (GUI.connect_lock) {
+                setTimeout(applyLateNightlyReleases, 500);
+                return;
+            }
+            // The rebuild fires the board change handler, which would discard a loaded local hex or chosen version.
+            if (!$('input.show_development_releases').is(':checked') || !Array.isArray(firmwareFlasherTab.releasesData)
+                    || localFirmwareLoaded || $('select[name="firmware_version"]').val() !== '0') {
+                return;
+            }
+            let selectedTarget = String($('select[name="board"]').val());
+            buildBoardOptions();
+            if (selectedTarget !== '0' && selectedTarget !== 'null') {
+                $('select[name="board"] option[value="' + selectedTarget + '"]').attr("selected", "selected");
+                $('select[name="board"]').trigger('change');
+            }
+        };
+
         $.get('https://api.github.com/repos/iNavFlight/inav-nightly/releases?per_page=50', function(releasesData) {
             firmwareFlasherTab.devReleasesData = releasesData;
+            applyLateNightlyReleases();
         }).fail(function (data){
-            firmwareFlasherTab.devReleasesData = {};
+            firmwareFlasherTab.devReleasesData = [];
             if (data["responseJSON"]){
                 GUI.log("<b>GITHUB Query Failed: <code>{0}</code></b>".format(data["responseJSON"].message));
             }

@@ -2380,6 +2380,16 @@ select {
     clear: both;
 }
 
+/*
+ * A banner inside a spacer_box is inset by that box's padding and sits hard against
+ * its title, which makes it read as less important than the identical banners
+ * elsewhere on the same tab. Line it up with them.
+ */
+.spacer_box > .warning-box,
+.spacer_box > .info-box {
+    margin: 0.9em -10px;
+}
+
 .info-box {
     background-color: #37a8db;
     color: white;

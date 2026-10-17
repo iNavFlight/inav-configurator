@@ -2,6 +2,13 @@
     position: relative;
 }
 
+/* Settings.configureInputs() calls .show() while loading each setting.
+ * Keep INA226 controls hidden until their visibility is resolved. */
+.tab-configuration .ina226-common-setting[hidden],
+.tab-configuration .ina226-current-setting[hidden] {
+    display: none !important;
+}
+
 .tab-configuration .leftWrapper {
     float: left;
     width: calc(50% - 2em);

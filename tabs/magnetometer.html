@@ -1,6 +1,126 @@
+
+
+
 <div class="tab-magnetometer toolbar_fixed_bottom">
     <div class="content_wrapper">
         <div class="tab_title" data-i18n="tabMAGNETOMETER">Magnetometer</div>
+
+        <div class="gui_box grey wizard-launch-box">
+            <div class="gui_box_titlebar">
+                <div class="spacer_box_title" data-i18n="autoAlignWizardTitle">Experimental: Auto Alignment Wizard</div>
+            </div>
+            <div class="spacer_box">
+                <div class="default_btn narrow wizard-launch-button">
+                    <a id="fc-align-start-button" class="calibrate" href="#" data-i18n="autoAlignWizardButton">Launch Wizard</a>
+                </div>
+            </div>
+        </div>
+
+<div id="modal-acc-align-start" class="is-hidden">
+    <div class="modal__content">
+        <h1 class="modal__title" data-i18n="accAlignTitle"></h1>
+        <div class="modal__text"><span data-i18n="accAlignStartText"></span><img src="../images/acc-align-north.png" alt="Top-down view of a quad sitting flat on a table, nose pointing toward the labeled North direction"></div>
+    </div>
+    <div class="modal__buttons">
+        <a id="modal-acc-align-2" class="modal__button modal__button--main" data-i18n="OK"></a>
+    </div>
+</div>
+
+
+<div id="modal-acc-align-45" class="is-hidden">
+    <div class="modal__content">
+        <h1 class="modal__title" data-i18n="accAlignTitle"></h1>
+        <div class="modal__text"><span data-i18n="accAlign45Text"></span><img src="../images/acc-align-45.png" alt="Side view of a quad tilted with its nose raised about 45 degrees"></div>
+    </div>
+    <div class="modal__buttons">
+        <a id="modal-acc-align-3" class="modal__button modal__button--main" data-i18n="OK"></a>
+    </div>
+</div>
+
+
+<div id="modal-acc-align-east" class="is-hidden">
+    <div class="modal__content">
+        <h1 class="modal__title" data-i18n="accAlignTitle"></h1>
+        <div class="modal__text" data-i18n="accAlignEastText"></div>
+    </div>
+    <div class="modal__buttons">
+        <a id="modal-acc-align-4" class="modal__button modal__button--main" data-i18n="OK"></a>
+    </div>
+</div>
+
+<div id="modal-acc-align-done" class="is-hidden">
+    <div class="modal__content">
+        <h1 class="modal__title" data-i18n="accAlignFinished"></h1>
+        <div class="modal__text">
+            <span data-i18n="accAlignDoneBoardLabel"></span> <span id="modal-acc-align-setting"></span><br />
+            <span data-i18n="accAlignDoneCompassLabel"></span> <span id="modal-compass-align-setting"></span>
+        </div>
+    </div>
+    <div class="modal__buttons">
+        <a id="modal-acc-align-done-save" class="save modal__button modal__button--main" href="#" data-i18n="configurationButtonSave"></a>
+    </div>
+</div>
+
+<div id="modal-acc-align-calibration-error" class="is-hidden">
+    <div class="modal__content">
+        <h1 class="modal__title" data-i18n="accAlignTitle"></h1>
+        <div class="modal__text" data-i18n="accAlignCalibrationError"></div>
+    </div>
+    <div class="modal__buttons">
+        <a id="modal-acc-align-error-calibration-ok" class="modal__button modal__button--main" data-i18n="OK"></a>
+    </div>
+</div>
+
+<div id="modal-acc-align-vertical-error" class="is-hidden">
+    <div class="modal__content">
+        <h1 class="modal__title" data-i18n="accAlignTitle"></h1>
+        <div class="modal__text" data-i18n="accAlignVerticalError"></div>
+    </div>
+    <div class="modal__buttons">
+        <a id="modal-acc-align-vertical-error-ok" class="modal__button modal__button--main" data-i18n="OK"></a>
+    </div>
+</div>
+
+<div id="modal-acc-align-mag-disagreement-error" class="is-hidden">
+    <div class="modal__content">
+        <h1 class="modal__title" data-i18n="accAlignTitle"></h1>
+        <div class="modal__text" data-i18n="accAlignMagDisagreementError"></div>
+    </div>
+    <div class="modal__buttons">
+        <a id="modal-acc-align-mag-disagreement-error-ok" class="modal__button modal__button--main" data-i18n="OK"></a>
+    </div>
+</div>
+
+<div id="modal-acc-align-mag-uncalibrated-error" class="is-hidden">
+    <div class="modal__content">
+        <h1 class="modal__title" data-i18n="accAlignTitle"></h1>
+        <div class="modal__text" data-i18n="accAlignMagUncalibratedError"></div>
+    </div>
+    <div class="modal__buttons">
+        <a id="modal-acc-align-mag-uncalibrated-error-ok" class="modal__button modal__button--main" data-i18n="OK"></a>
+    </div>
+</div>
+
+<div id="modal-acc-align-tilt-error" class="is-hidden">
+    <div class="modal__content">
+        <h1 class="modal__title" data-i18n="accAlignTitle"></h1>
+        <div class="modal__text" data-i18n="accAlignTiltError"></div>
+    </div>
+    <div class="modal__buttons">
+        <a id="modal-acc-align-tilt-error-ok" class="modal__button modal__button--main" data-i18n="OK"></a>
+    </div>
+</div>
+
+<div id="modal-acc-align-mag-no-data-error" class="is-hidden">
+    <div class="modal__content">
+        <h1 class="modal__title" data-i18n="accAlignTitle"></h1>
+        <div class="modal__text" data-i18n="accAlignMagNoDataError"></div>
+    </div>
+    <div class="modal__buttons">
+        <a id="modal-acc-align-mag-no-data-error-ok" class="modal__button modal__button--main" data-i18n="OK"></a>
+    </div>
+</div>
+
         <div class="note spacebottom">
             <div class="note_spacer">
                 <p i18n="magnetometerHelp"></p>

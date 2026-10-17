@@ -31,13 +31,13 @@ Two elevation sources are selectable:
 | Source | Coverage | Notes |
 |--------|----------|-------|
 | **Copernicus GLO-30** (default) | 84°N – 90°S | [Copernicus WorldDEM-30](https://registry.opendata.aws/copernicus-dem/); more accurate on bare earth and covers latitudes above 60°N |
-| NASA SRTM1 | 60°N – 56°S | [NASA SRTM1](https://www.usgs.gov/centers/eros/science/usgs-eros-archive-digital-elevation-shuttle-radar-topography-mission-srtm-1), public domain |
+| NASA SRTM1 | 60°N – 56°S (only coarse fill data beyond) | [NASA SRTM1](https://www.usgs.gov/centers/eros/science/usgs-eros-archive-digital-elevation-shuttle-radar-topography-mission-srtm-1), public domain |
 
 The `.TER` file format is identical for both sources — only the elevation values differ. If the Copernicus service cannot be reached, the Configurator asks before falling back to SRTM; the elevation source is never switched silently.
 
 #### Why Copernicus is the default
 
-The candidate elevation sources were benchmarked against ICESat-2 satellite laser ground truth (ATL08 bare earth, n = 10,777 filtered points, block-bootstrap 95% CI, paired Wilcoxon): **Copernicus GLO-30 reaches a mean absolute error of ~1.07 m versus ~2.01 m for SRTM — about twice as accurate on bare earth** — and it also covers latitudes above 60°N, where SRTM has no data. SRTM is kept as a selectable fallback. The full methodology, numbers and charts are in [this PR comment](https://github.com/iNavFlight/inav-configurator/pull/2599#issuecomment-5085961982).
+The candidate elevation sources were benchmarked against ICESat-2 satellite laser ground truth (ATL08 bare earth, n = 10,777 filtered points, block-bootstrap 95% CI, paired Wilcoxon): **Copernicus GLO-30 reaches a mean absolute error of ~1.07 m versus ~2.01 m for SRTM — about twice as accurate on bare earth** — and it also covers latitudes above 60°N natively, where the SRTM mission never mapped (the SRTM option only has coarse fill data there). SRTM is kept as a selectable fallback. The full methodology, numbers and charts are in [this PR comment](https://github.com/iNavFlight/inav-configurator/pull/2599#issuecomment-5085961982).
 
 ![DEM accuracy vs the ICESat-2 laser](images/map_generator/dem_accuracy_forest.png)
 
@@ -72,7 +72,7 @@ This product is not endorsed by or affiliated with the European Union, ESA, Airb
 |--------|-------|
 | **Data source** | Copernicus GLO-30 (default) or NASA SRTM1 — selectable in the tab |
 | **Resolution** | 1 arc-second (~30 meters) |
-| **Coverage** | 84°N to 90°S (Copernicus) · 60°N to 56°S (SRTM) |
+| **Coverage** | 84°N to 90°S (Copernicus) · 60°N to 56°S (SRTM — only coarse fill data beyond) |
 | **Output** | One `.TER` file per 1°×1° grid square (~111 km), e.g. `N42E023.TER` |
 | **Output location** | FC SD card root (e.g. `G:\N42E023.TER`) |
 | **File size** | ~30 MB per tile |
@@ -245,6 +245,7 @@ sudo mv inav-configurator.desktop /usr/share/applications/
 3. Install
     * Extract ZIP archive and run INAV Configurator
     * OR use the DMG package for installation
+4. Official tagged builds (`9.1.3` or `v9.1.3`) are signed and notarized. Nightlies are signed when repo secrets are configured. Pull-request and fork CI builds are always unsigned. If Gatekeeper blocks an unsigned app, run `xattr -cr "/path/to/INAV Configurator.app"` from Terminal.
 
 ## Building and running INAV Configurator locally (for development)
 

@@ -7,6 +7,7 @@ import MSP from './../js/msp';
 import GUI from './../js/gui';
 import tabs from './../js/tabs';
 import FC from './../js/fc';
+import { PLATFORM, PID_TYPE } from './../js/model';
 import Settings from './../js/settings';
 import i18n from './../js/localization';
 import { scaleRangeInt } from './../js/helpers';
@@ -228,6 +229,39 @@ pidTuningTab.initialize = function (callback) {
 
     }
 
+    // AUTO resolves to PID on multirotors and to PIFF on airplanes, rovers and boats
+    function navPidBankMismatchKeys(pidType, shownBankIsFixedWing) {
+        if (shownBankIsFixedWing) {
+            return ['pidTuningNavPidBankMismatchFixedWing', 'pidTuningNavPidBankMismatchAutoPid'];
+        }
+        const platformType = FC.MIXER_CONFIG.platformType;
+        const isRoverOrBoat = platformType == PLATFORM.ROVER || platformType == PLATFORM.BOAT;
+        return [
+            isRoverOrBoat ? 'pidTuningNavPidBankMismatchRoverBoat' : 'pidTuningNavPidBankMismatchMultirotor',
+            pidType == PID_TYPE.NONE ? 'pidTuningNavPidBankMismatchAutoFromNone' : 'pidTuningNavPidBankMismatchAutoPiff'
+        ];
+    }
+
+    // The tab shows the bank pid_type selects, but navigation uses the bank of the platform type
+    function showNavPidBankMismatch() {
+        mspHelper.getSetting('pid_type').then(function (data) {
+            if (!data) {
+                return;
+            }
+
+            const shownBankIsFixedWing = FC.usesFixedWingPidBank(data.value);
+            if (shownBankIsFixedWing === FC.usesFixedWingNavPids()) {
+                return;
+            }
+
+            const pidTypeName = data.setting.table?.values[data.value] ?? data.value;
+            const [unusedKey, autoKey] = navPidBankMismatchKeys(data.value, shownBankIsFixedWing);
+            $('#nav-pid-bank-mismatch').text(i18n.getMessage(unusedKey, [pidTypeName]) + ' ' + i18n.getMessage(autoKey)).show();
+        }).catch(function (err) {
+            console.debug('pid_tuning: pid_type setting not available:', err?.message);
+        });
+    }
+
     function process_html() {
         // translate to user-selected language
         i18n.localize();
@@ -256,6 +290,8 @@ pidTuningTab.initialize = function (callback) {
         if (FC.isMultirotor()) {
             $('.not-for-multirotor').hide();
         }
+
+        showNavPidBankMismatch();
 
         $("#ez_tune_enabled").prop('checked', FC.EZ_TUNE.enabled).trigger('change');
 
