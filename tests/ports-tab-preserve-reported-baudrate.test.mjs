@@ -116,6 +116,7 @@ const realMspHelperUrl = rewriteImports('js/msp/MSPHelper.js', [
     ["import mspDeduplicationQueue from './mspDeduplicationQueue';", "import mspDeduplicationQueue from '" + inertDefaultUrl + "';"],
     ["import mspStatistics from './mspStatistics';", "import mspStatistics from '" + inertDefaultUrl + "';"],
     ["import settingsCache from './../settingsCache';", "import settingsCache from '" + inertDefaultUrl + "';"],
+    ["import { parseProfileNames } from './../profileNames';", "import { parseProfileNames } from '" + realModuleUrl('js/profileNames.js') + "';"],
     ["import {Geozone, GeozoneVertex, GeozoneShapes } from './../geozone';", "import { Geozone, GeozoneVertex, GeozoneShapes } from '" + inertGeozoneUrl + "';"],
     ["import { parseDronecanAsyncRequestResponse } from './../dronecanAsyncRequestParse';", "import { parseDronecanAsyncRequestResponse } from '" + inertDronecanParseUrl + "';"],
 ], 'MSPHelper-generated.mjs');
