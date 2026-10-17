@@ -235,6 +235,27 @@
 	padding:10px;
 	float:left;
 }
+/* The boxes and the card icon float: without these the last box ends under the Save toolbar */
+.tab-onboard_logging .content_wrapper::after {
+    content: "";
+    display: block;
+    clear: both;
+}
+.tab-onboard_logging .require-sdcard-logging .spacer_box {
+    display: flow-root;
+}
+.tab-onboard_logging .require-msc {
+    display: none;
+}
+.tab-onboard_logging.msc-supported .require-msc {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.tab-onboard_logging .msc-line .regular-button {
+    margin-right: 0;
+    flex: none;
+}
 .tab-onboard_logging .sdcard-status {
     padding-top: 4px;
     text-align: center;

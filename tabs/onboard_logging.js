@@ -12,8 +12,14 @@ import i18n from './../js/localization';
 import BitHelper from './../js/bitHelper';
 import dialog from './../js/dialog';
 import Settings from './../js/settings';
+import mspQueue from './../js/serial_queue';
+import periodicStatusUpdater from './../js/periodicStatusUpdater';
 
 var sdcardTimer;
+var mscStarting = false;
+
+// The time the flight controller has to show the CLI prompt, then to answer "msc"
+const MSC_STEP_TIMEOUT_MS = 3000;
 
 const onboardLoggingTab = {
 };
@@ -108,6 +114,79 @@ onboardLoggingTab.initialize = function (callback) {
         GUI.handleReconnect($('.tab_onboard_logging a'));
     }
 
+    function send_text(text) {
+        const buffer = new Uint8Array(text.length);
+        for (let i = 0; i < text.length; i++) {
+            buffer[i] = text.charCodeAt(i);
+        }
+        CONFIGURATOR.connection.send(buffer.buffer);
+    }
+
+    // MSP_SET_REBOOT has no mass storage mode: enter the CLI and send "msc", as the CLI tab's button does
+    function reboot_to_msc() {
+        if (mscStarting || !CONFIGURATOR.connectionValid) {
+            return;
+        }
+        if (FC.isModeEnabled('ARM')) {
+            GUI.log(i18n.getMessage('onboardLoggingMscArmed'));
+            return;
+        }
+
+        mscStarting = true;
+        clearTimeout(sdcardTimer);
+        sdcardTimer = false;
+        $('.tab-onboard_logging a.msc-reboot').addClass('disabled');
+
+        // MSP bytes sent while the FC is in the CLI come back as typed text
+        periodicStatusUpdater.stop();
+        mspQueue.flush();
+        mspQueue.lock();
+        MSP.callbacks_cleanup();
+
+        let received = '';
+        let inCli = false;
+        let stepTimer = setTimeout(() => finish(false), MSC_STEP_TIMEOUT_MS);
+
+        function onReceive(info) {
+            received += String.fromCharCode.apply(null, new Uint8Array(info.data));
+
+            if (!inCli && received.includes('CLI')) {
+                inCli = true;
+                received = '';
+                clearTimeout(stepTimer);
+                stepTimer = setTimeout(() => finish(false), MSC_STEP_TIMEOUT_MS);
+                send_text('msc\r\n');
+            } else if (inCli && received.includes('Rebooting')) {
+                finish(true);
+            } else if (inCli && /Storage not present|Unknown command/.test(received)) {
+                finish(false);
+            }
+        }
+
+        function finish(started) {
+            clearTimeout(stepTimer);
+            CONFIGURATOR.connection.removeOnReceiveCallback(onReceive);
+            mspQueue.unlock();
+            periodicStatusUpdater.resume();
+            mscStarting = false;
+
+            if (started) {
+                GUI.log(i18n.getMessage('onboardLoggingMscStarted'));
+                // The serial port goes away with the reboot: disconnect as the Disconnect button does
+                $('div.connect_controls a.connect').trigger('click');
+            } else {
+                console.log('MSC reboot failed, received:', received);
+                GUI.log(i18n.getMessage('onboardLoggingMscFailed'));
+                // The CLI is left only through a reboot, and the prompt may have come after the timeout
+                send_text('exit\r\n');
+                GUI.handleReconnect($('.tab_onboard_logging a'));
+            }
+        }
+
+        CONFIGURATOR.connection.addOnReceiveCallback(onReceive);
+        send_text('#');
+    }
+
     function load_html() {
         import('./onboard_logging.html?raw').then(({default: html}) => GUI.load(html, Settings.processHtml(async function(settingsPromise) {
             // Wait for the settings to finish loading before the save handler is
@@ -136,7 +215,10 @@ onboardLoggingTab.initialize = function (callback) {
                 .toggleClass("blackbox-config-supported", FC.BLACKBOX.supported)
                 .toggleClass("blackbox-supported", blackboxSupport)
                 .toggleClass("blackbox-unsupported", !blackboxSupport)
-                .toggleClass("only-terrain-supported", !blackboxSupport && terrainEnabled);
+                .toggleClass("only-terrain-supported", !blackboxSupport && terrainEnabled)
+                .toggleClass("msc-supported", FC.CONFIG.target !== 'SITL');
+
+            $('.tab-onboard_logging a.msc-reboot').on('click', reboot_to_msc);
 
             if (dataflashPresent) {
                 // UI hooks
@@ -319,7 +401,7 @@ onboardLoggingTab.initialize = function (callback) {
                 $(".sdcard-status").text("Unknown state " + FC.SDCARD.state);
         }
 
-        if (FC.SDCARD.supported && !sdcardTimer) {
+        if (FC.SDCARD.supported && !sdcardTimer && !mscStarting) {
             // Poll for changes in SD card status
             sdcardTimer = setTimeout(function() {
                 sdcardTimer = false;
