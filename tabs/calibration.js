@@ -24,6 +24,24 @@ function magAlignmentSettingsEqual(a, b) {
     return a.every(function (setting, i) { return setting.value === b[i].value; });
 }
 
+// mag_yaw_trim as the board holds it, in decidegrees: the input can show an edit not saved yet, or a value the board
+// has replaced since (a learned save, a compass calibration)
+let storedYawTrim = null;
+let yawTrimEdited = false;
+
+function refreshYawTrim() {
+    return mspHelper.getSetting('mag_yaw_trim').then(function (result) {
+        if (!result) {
+            return;
+        }
+        storedYawTrim = result.value;
+        if (!yawTrimEdited) {
+            $('#MagYawTrim').val((storedYawTrim / 10).toFixed(1));
+        }
+        updateMagLearnStatus();
+    });
+}
+
 function updateMagLearnStatus() {
     const text = magLearnStatusText(FC.MAG_LEARN, FC.getMagnetometerCalibrated(), i18n.getMessage);
     // The column says what the flight learned; why it was or was not written shows on its title
@@ -36,8 +54,7 @@ function updateMagLearnStatus() {
             $('[name=MagLearned' + item + ']').val(learned[item]);
         });
     }
-    // The stored trim is a setting the page shows in degrees; empty until the settings have loaded
-    const trim = magLearnedYawTrim(FC.MAG_LEARN, Math.round(parseFloat($('#MagYawTrim').val()) * 10));
+    const trim = storedYawTrim === null ? null : magLearnedYawTrim(FC.MAG_LEARN, storedYawTrim);
     $('[name=MagLearnedYawTrim]').val(trim === null ? '' : (trim / 10).toFixed(1));
 }
 
@@ -56,6 +73,9 @@ function pollMagLearn() {
         updateMagLearnStatus();
         if (!savedBefore && (FC.MAG_LEARN.flags & MAG_LEARN_FLAG.SAVED)) {
             MSP.send_message(MSPCodes.MSP_CALIBRATION_DATA, false, false, updateMagZero);
+            refreshYawTrim().catch(function (err) {
+                console.error('mag_yaw_trim did not load', err);
+            });
         }
     });
 }
@@ -189,6 +209,9 @@ calibrationTab.initialize = function (callback) {
     // the settings have loaded would leave the learning switch out.
     function saveCalibration(change) {
         settingsLoaded.then(function () {
+            // The trim too, unless edited here: Settings.saveInputs writes the input
+            return yawTrimEdited ? null : refreshYawTrim();
+        }).then(function () {
             MSP.send_message(MSPCodes.MSP_CALIBRATION_DATA, false, false, function () {
                 change();
                 saveChainer.execute();
@@ -347,6 +370,8 @@ calibrationTab.initialize = function (callback) {
 
     function processHtml(settingsPromise) {
         settingsLoaded = Promise.resolve(settingsPromise);
+        // Module scope: nothing of the last visit, or of another board, until the settings are in
+        storedYawTrim = null;
         $('#calibrateButtonSave').on('click', function () {
             const opflowScale = Number.parseFloat($('[name=OpflowScale]').val());
             saveCalibration(function () {
@@ -406,6 +431,10 @@ calibrationTab.initialize = function (callback) {
 
                         MSP.send_message(MSPCodes.MSP_CALIBRATION_DATA, false, false, updateSensorData);
                         interval.remove('compass_calibration_interval');
+                        // The calibration sets the trim back to 0
+                        refreshYawTrim().catch(function (err) {
+                            console.error('mag_yaw_trim did not load', err);
+                        });
 
                         //Cleanup
                        //delete modalProcessing;
@@ -486,6 +515,14 @@ calibrationTab.initialize = function (callback) {
         settingsLoaded.then(function () {
             // Settings.processHtml() drops the switch when the firmware has no ahrs_gsf_yaw: the box goes with it
             $('#gsf-box').toggleClass('is-hidden', $('#gsfAhrs').length === 0);
+            if ($('#MagYawTrim').length) {
+                yawTrimEdited = false;
+                storedYawTrim = Math.round(Number.parseFloat($('#MagYawTrim').val()) * 10);
+                $('#MagYawTrim').on('input', function () {
+                    yawTrimEdited = true;
+                });
+                updateMagLearnStatus();
+            }
         }).catch(function (err) {
             console.error('Calibration tab settings failed to load', err);
         });

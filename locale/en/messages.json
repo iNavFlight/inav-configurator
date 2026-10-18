@@ -3565,7 +3565,7 @@
         "message": "In flight"
     },
     "MagYawTrimText": {
-        "message": "Yaw trim (deg)"
+        "message": "Yaw trim"
     },
     "magLearnYawTrim": {
         "message": "The yaw trim moves by $1 degrees."
