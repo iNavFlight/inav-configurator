@@ -26,7 +26,7 @@ function magAlignmentSettingsEqual(a, b) {
 
 function updateMagLearnStatus() {
     const text = magLearnStatusText(FC.MAG_LEARN, FC.getMagnetometerCalibrated(), i18n.getMessage);
-    $('#mag-learn-status').text(text).toggleClass('is-hidden', !FC.MAG_LEARN.supported);
+    $('#mag-learn-status').text(text).toggleClass('is-hidden', !FC.MAG_LEARN.supported || FC.SENSOR_CONFIG.magnetometer === 0);
 }
 
 // Only the offsets the board wrote: an unsaved edit elsewhere in the tab stays
@@ -344,6 +344,14 @@ calibrationTab.initialize = function (callback) {
         if (FC.SENSOR_CONFIG.magnetometer === 0) {
             //Comment for test
             $('#mag_btn, #mag-calibrated-data, #mag-learn-setting').css('pointer-events', 'none').css('opacity', '0.4');
+        } else {
+            // A click before the board's value arrives would be overwritten by it, and saved as the board had it
+            $('#mag-learn-setting').css('pointer-events', 'none');
+            settingsLoaded.then(function () {
+                $('#mag-learn-setting').css('pointer-events', '');
+            }).catch(function (err) {
+                console.error('Calibration tab settings failed to load', err);
+            });
         }
 
         if (FC.SENSOR_CONFIG.opflow === 0) {
