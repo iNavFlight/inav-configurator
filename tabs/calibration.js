@@ -473,6 +473,8 @@ calibrationTab.initialize = function (callback) {
         settingsLoaded.then(function () {
             // Settings.processHtml() drops the switch when the firmware has no ahrs_gsf_yaw: the box goes with it
             $('#gsf-box').toggleClass('is-hidden', $('#gsfAhrs').length === 0);
+        }).catch(function (err) {
+            console.error('Calibration tab settings failed to load', err);
         });
 
         GUI.content_ready(callback);
