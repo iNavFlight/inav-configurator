@@ -16,10 +16,12 @@ import mspQueue from './../js/serial_queue';
 import periodicStatusUpdater from './../js/periodicStatusUpdater';
 
 var sdcardTimer;
-var mscStarting = false;
+let mscStarting = false;
 
 // The time the flight controller has to show the CLI prompt, then to answer "msc"
 const MSC_STEP_TIMEOUT_MS = 3000;
+// INAV enters the CLI 100 ms after a "#" with nothing else coming in
+const MSC_CLI_ENTRY_MS = 500;
 
 const onboardLoggingTab = {
 };
@@ -117,7 +119,7 @@ onboardLoggingTab.initialize = function (callback) {
     function send_text(text) {
         const buffer = new Uint8Array(text.length);
         for (let i = 0; i < text.length; i++) {
-            buffer[i] = text.charCodeAt(i);
+            buffer[i] = text.codePointAt(i);
         }
         CONFIGURATOR.connection.send(buffer.buffer);
     }
@@ -133,6 +135,8 @@ onboardLoggingTab.initialize = function (callback) {
         }
 
         mscStarting = true;
+        // No tab switch or disconnect halfway: a leftover attempt would act on the next tab or connection
+        GUI.connect_lock = true;
         clearTimeout(sdcardTimer);
         sdcardTimer = false;
         $('.tab-onboard_logging a.msc-reboot').addClass('disabled');
@@ -148,9 +152,10 @@ onboardLoggingTab.initialize = function (callback) {
         let stepTimer = setTimeout(() => finish(false), MSC_STEP_TIMEOUT_MS);
 
         function onReceive(info) {
-            received += String.fromCharCode.apply(null, new Uint8Array(info.data));
+            received += String.fromCodePoint(...new Uint8Array(info.data));
 
-            if (!inCli && received.includes('CLI')) {
+            // The banner, then the prompt the CLI waits at; an MSP reply still on its way can't end like this
+            if (!inCli && /CLI[\s\S]*\n# $/.test(received)) {
                 inCli = true;
                 received = '';
                 clearTimeout(stepTimer);
@@ -163,24 +168,42 @@ onboardLoggingTab.initialize = function (callback) {
             }
         }
 
-        function finish(started) {
-            clearTimeout(stepTimer);
-            CONFIGURATOR.connection.removeOnReceiveCallback(onReceive);
+        function release() {
             mspQueue.unlock();
             periodicStatusUpdater.resume();
             mscStarting = false;
+            GUI.connect_lock = false;
+        }
+
+        // The CLI is left only through a reboot into MSP, before the reconnect
+        function leaveCli() {
+            send_text('exit\r\n');
+            release();
+            GUI.handleReconnect($('.tab_onboard_logging a'));
+        }
+
+        function finish(started) {
+            clearTimeout(stepTimer);
+            CONFIGURATOR.connection.removeOnReceiveCallback(onReceive);
 
             if (started) {
+                release();
                 GUI.log(i18n.getMessage('onboardLoggingMscStarted'));
                 // The serial port goes away with the reboot: disconnect as the Disconnect button does
                 $('div.connect_controls a.connect').trigger('click');
-            } else {
-                console.log('MSC reboot failed, received:', received);
-                GUI.log(i18n.getMessage('onboardLoggingMscFailed'));
-                // The CLI is left only through a reboot, and the prompt may have come after the timeout
-                send_text('exit\r\n');
-                GUI.handleReconnect($('.tab_onboard_logging a'));
+                return;
             }
+
+            console.log('MSC reboot failed, received:', received);
+            GUI.log(i18n.getMessage('onboardLoggingMscFailed'));
+            if (inCli) {
+                leaveCli();
+                return;
+            }
+            // No prompt seen: this "#" enters the CLI, or is a comment line to a late entry. INAV drops what follows a
+            // "#" in the same read, so the exit waits for the entry, and the lock keeps MSP out of the CLI meanwhile
+            send_text('#\r\n');
+            setTimeout(leaveCli, MSC_CLI_ENTRY_MS);
         }
 
         CONFIGURATOR.connection.addOnReceiveCallback(onReceive);
@@ -288,7 +311,7 @@ onboardLoggingTab.initialize = function (callback) {
             update_html();
 
             GUI.content_ready(callback);
-        })));
+        }))).catch(error => console.error('Onboard logging tab failed to load', error));
     }
 
     function populateDevices() {
