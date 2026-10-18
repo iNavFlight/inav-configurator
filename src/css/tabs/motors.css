@@ -501,7 +501,9 @@
 .tab-motors .dynamic-idle-sizes .default_btn a {
     min-width: 32px;
 }
+/* Darker than the hover blue: white text on #37a8db is 2.7:1 */
 .tab-motors .dynamic-idle-sizes .default_btn a.selected {
-    background-color: #37a8db;
+    background-color: #257aa5;
+    border-color: #257aa5;
     color: #fff;
 }

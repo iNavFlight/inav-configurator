@@ -468,7 +468,7 @@ outputsTab.initialize = function (callback) {
 
         $('#dshot_bidir_enabled').on('change', function () {
             // Dynamic idle comes on with the RPM telemetry
-            if ($(this).is(':checked') && !(Number($('#dynamic_idle_min_rpm').val()) > 0)) {
+            if ($(this).is(':checked') && Number($('#dynamic_idle_min_rpm').val()) <= 0) {
                 dynamicIdleSetRpm(dynamicIdleLastRpm);
             }
             dynamicIdleUpdateVisibility();
