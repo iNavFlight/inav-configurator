@@ -14,6 +14,9 @@ var GUI_control = function () {
     this.connect_lock = false;
     this.active_tab;
     this.tab_switch_in_progress = false;
+    // Only the cleanup phase blocks a new click; a slow tab load may be interrupted.
+    this.tab_cleanup_in_progress = false;
+    this.tab_switch_id = 0;
     this.operating_system;
     this.defaultAllowedTabsWhenDisconnected = [
         'landing',
