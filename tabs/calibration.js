@@ -357,6 +357,14 @@ calibrationTab.initialize = function (callback) {
         if (FC.SENSOR_CONFIG.magnetometer === 0) {
             //Comment for test
             $('#mag_btn, #mag-calibrated-data, #mag-learn-setting').css('pointer-events', 'none').css('opacity', '0.4');
+        } else {
+            // A click before the board's value arrives would be overwritten by it, and saved as the board had it
+            $('#mag-learn-setting').css('pointer-events', 'none');
+            settingsLoaded.then(function () {
+                $('#mag-learn-setting').css('pointer-events', '');
+            }).catch(function (err) {
+                console.error('Calibration tab settings failed to load', err);
+            });
         }
 
         if (FC.SENSOR_CONFIG.opflow === 0) {
@@ -478,6 +486,8 @@ calibrationTab.initialize = function (callback) {
         settingsLoaded.then(function () {
             // Settings.processHtml() drops the switch when the firmware has no ahrs_gsf_yaw: the box goes with it
             $('#gsf-box').toggleClass('is-hidden', $('#gsfAhrs').length === 0);
+        }).catch(function (err) {
+            console.error('Calibration tab settings failed to load', err);
         });
 
         GUI.content_ready(callback);
