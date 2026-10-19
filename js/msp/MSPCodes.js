@@ -269,6 +269,9 @@ var MSPCodes = {
     MSP2_INAV_ESC_SRXL2_STATUS:         0x2233,
     MSP2_INAV_ESC_SRXL2_CALIBRATE:      0x2234,
 
+    // In-flight compass offset learning: state of the current or the last flight.
+    MSP2_INAV_MAG_LEARN:                0x2235,
+
     // MassZero Thermal Camera.
     // These sit in INAV's own 0x2000-0x2FFF range. The 0x3000 block belongs to
     // the Betaflight compatibility commands. MSP2_BETAFLIGHT_BIND is 0x3000.
