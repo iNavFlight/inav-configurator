@@ -2928,6 +2928,21 @@
     "sdcardLost": {
         "message": "Lost space"
     },
+    "onboardLoggingMscButton": {
+        "message": "Mass storage mode"
+    },
+    "onboardLoggingMscNote": {
+        "message": "Restarts the flight controller as a USB drive, to copy the logs from the computer. Unplug the USB cable to leave it."
+    },
+    "onboardLoggingMscArmed": {
+        "message": "Disarm before restarting in mass storage mode."
+    },
+    "onboardLoggingMscStarted": {
+        "message": "Restarting in mass storage mode: the logs appear as a USB drive. Unplug the USB cable to leave it."
+    },
+    "onboardLoggingMscFailed": {
+        "message": "The flight controller did not start mass storage mode."
+    },
     "dataflashNote": {
         "message": "Flight logs can be recorded to your flight controller's onboard dataflash chip."
     },

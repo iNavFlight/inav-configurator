@@ -292,9 +292,35 @@
     line-height: 20px;
 }
 
+.tab-onboard_logging .require-sdcard-logging .spacer_box {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
 .tab-onboard_logging .sdcard {
-	padding:10px;
-	float:left;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.tab-onboard_logging .sdcard .regular-button {
+    margin: 8px 0 0;
+}
+.tab-onboard_logging .sdcard-details {
+    flex: 1;
+    min-width: 0;
+}
+/* The boxes float: without this the last one ends under the Save toolbar */
+.tab-onboard_logging .content_wrapper::after {
+    content: "";
+    display: block;
+    clear: both;
+}
+.tab-onboard_logging .require-msc {
+    display: none;
+}
+.tab-onboard_logging.msc-supported .require-msc {
+    display: inline-block;
 }
 .tab-onboard_logging .sdcard-status {
     padding-top: 4px;
