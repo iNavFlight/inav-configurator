@@ -42,6 +42,13 @@ function refreshYawTrim() {
     });
 }
 
+// A refresh nothing waits for: a failed read leaves the input as it was
+function refreshYawTrimInBackground() {
+    refreshYawTrim().catch(function (err) {
+        console.error('mag_yaw_trim did not load', err);
+    });
+}
+
 function updateMagLearnStatus() {
     const text = magLearnStatusText(FC.MAG_LEARN, FC.getMagnetometerCalibrated(), i18n.getMessage);
     // The column says what the flight learned; why it was or was not written shows on its title
@@ -73,9 +80,7 @@ function pollMagLearn() {
         updateMagLearnStatus();
         if (!savedBefore && (FC.MAG_LEARN.flags & MAG_LEARN_FLAG.SAVED)) {
             MSP.send_message(MSPCodes.MSP_CALIBRATION_DATA, false, false, updateMagZero);
-            refreshYawTrim().catch(function (err) {
-                console.error('mag_yaw_trim did not load', err);
-            });
+            refreshYawTrimInBackground();
         }
     });
 }
@@ -432,9 +437,7 @@ calibrationTab.initialize = function (callback) {
                         MSP.send_message(MSPCodes.MSP_CALIBRATION_DATA, false, false, updateSensorData);
                         interval.remove('compass_calibration_interval');
                         // The calibration sets the trim back to 0
-                        refreshYawTrim().catch(function (err) {
-                            console.error('mag_yaw_trim did not load', err);
-                        });
+                        refreshYawTrimInBackground();
 
                         //Cleanup
                        //delete modalProcessing;
