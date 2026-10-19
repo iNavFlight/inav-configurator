@@ -109,6 +109,25 @@
                                 <td><input readonly disabled type="number" name="MagGainZ" min="-32768" max="32767"></td>
                             </tr>
                         </table>
+                        <div class="checkbox setting-container" id="mag-learn-setting">
+                            <input type="checkbox" class="toggle" id="magLearn" data-setting="mag_learn" />
+                            <label for="magLearn"><span data-i18n="magLearn">Learn in flight</span></label>
+                            <div for="magLearn" class="helpicon cf_tip" data-i18n_title="magLearnHelp"></div>
+                        </div>
+                        <div id="mag-learn-status" class="is-hidden"></div>
+                    </div>
+                </div>
+                <div class="gui_box grey is-hidden" id="gsf-box">
+                    <div class="gui_box_titlebar">
+                        <div class="spacer_box_title" data-i18n="gsfHead"></div>
+                    </div>
+                    <div class="spacer_box">
+                        <p class="gsf-intro" data-i18n="gsfText"></p>
+                        <div class="checkbox setting-container" id="gsf-ahrs-setting">
+                            <input type="checkbox" class="toggle" id="gsfAhrs" data-setting="ahrs_gsf_yaw" />
+                            <label for="gsfAhrs"><span data-i18n="gsfAhrs">Use it for the heading</span></label>
+                            <div for="gsfAhrs" class="helpicon cf_tip" data-i18n_title="gsfAhrsHelp"></div>
+                        </div>
                     </div>
                 </div>
                 <div class="gui_box grey">

@@ -288,6 +288,20 @@ var FC = {
             motors: 0
         };
 
+        /*
+         * In-flight compass offset learning (MSP2_INAV_MAG_LEARN). Firmware
+         * without it (512 KB targets, older versions) answers the command as
+         * unsupported, and `supported` stays false.
+         */
+        this.MAG_LEARN = {
+            supported: false,
+            flags: 0,
+            sectors: 0,
+            headings: 0,
+            spread: 0,
+            delta: [0, 0, 0]
+        };
+
         this.MIXER_CONFIG = {
             yawMotorDirection: 0,
             yawJumpPreventionLimit: 0,
