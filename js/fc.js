@@ -567,7 +567,11 @@ var FC = {
             freeSizeKB: 0,
             totalSizeKB: 0,
             // Free space of the whole card: null if the firmware does not report it, MSP.SDCARD_FREE_SPACE_UNKNOWN until counted
-            cardFreeSizeKB: null
+            cardFreeSizeKB: null,
+            // What holds the taken space, likewise: the unused ends of logs, terrain files, and space no file holds
+            logTailsKB: null,
+            terrainKB: null,
+            lostKB: null
         };
 
         this.BLACKBOX = {

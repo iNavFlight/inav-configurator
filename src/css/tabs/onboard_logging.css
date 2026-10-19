@@ -117,7 +117,7 @@
     background: repeating-linear-gradient(-45deg, rgba(55, 168, 219, 0.3) 0 4px, transparent 4px 8px);
 }
 
-/* The SD card has three parts, too many for labels under the bar */
+/* The SD card has up to six parts, too many for labels under the bar */
 .tab-onboard_logging .sdcard-contents {
     margin-bottom: 8px;
 }
@@ -157,12 +157,20 @@
     background-color: silver;
 }
 
-.tab-onboard_logging .sdcard-card-space {
-    margin-top: 8px;
+.tab-onboard_logging .sdcard-contents .sdcard-terrain,
+.tab-onboard_logging .sdcard-legend .sdcard-terrain::before {
+    background-color: #59aa29;
 }
 
-.tab-onboard_logging .sdcard-card-free-total {
-    font-weight: bold;
+/* Taken without data */
+.tab-onboard_logging .sdcard-contents .sdcard-log-tails,
+.tab-onboard_logging .sdcard-legend .sdcard-log-tails::before {
+    background-color: #e2a32e;
+}
+
+.tab-onboard_logging .sdcard-contents .sdcard-lost,
+.tab-onboard_logging .sdcard-legend .sdcard-lost::before {
+    background-color: #e2563b;
 }
 
 .tab-onboard_logging progress::-webkit-progress-bar {

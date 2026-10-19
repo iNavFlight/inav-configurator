@@ -305,19 +305,24 @@ onboardLoggingTab.initialize = function (callback) {
 
         $(".tab-onboard_logging .sdcard-other").toggleClass("not-counted", unknown);
 
+        // The taken space is broken down once the firmware has also read the card's directories
+        const
+            broken = !unknown && sdcard.lostKB !== null && sdcard.lostKB !== MSP.SDCARD_FREE_SPACE_UNKNOWN,
+            terrainKB = broken ? sdcard.terrainKB : 0,
+            logTailsKB = broken ? sdcard.logTailsKB : 0,
+            lostKB = broken ? sdcard.lostKB : 0;
+
         // Older firmware only reports the freefile, where logs go: the rest of the card shows as one part
         if (sdcard.cardFreeSizeKB === null || unknown) {
             update_sdcard_part("sdcard-card-free", 0, "");
             update_sdcard_part("sdcard-other", sdcard.totalSizeKB - sdcard.freeSizeKB, i18n.getMessage(unknown ? 'sdcardNotCounted' : 'sdcardUnavailable'));
         } else {
             update_sdcard_part("sdcard-card-free", sdcard.cardFreeSizeKB - sdcard.freeSizeKB, i18n.getMessage('sdcardOtherFree'));
-            update_sdcard_part("sdcard-other", sdcard.totalSizeKB - sdcard.cardFreeSizeKB, i18n.getMessage('sdcardUsed'));
+            update_sdcard_part("sdcard-other", sdcard.totalSizeKB - sdcard.cardFreeSizeKB - terrainKB - logTailsKB - lostKB, i18n.getMessage('sdcardUsed'));
         }
-
-        $(".tab-onboard_logging .sdcard-card-space").toggle(sdcard.cardFreeSizeKB !== null);
-        $(".tab-onboard_logging .sdcard-card-free-note").toggle(!unknown);
-        $(".tab-onboard_logging .sdcard-card-free-total").text(unknown ? i18n.getMessage('sdcardCardFreeUnknown') :
-            i18n.getMessage('sdcardCardFree', [formatFilesizeKilobytes(sdcard.cardFreeSizeKB), formatFilesizeKilobytes(sdcard.totalSizeKB)]));
+        update_sdcard_part("sdcard-terrain", terrainKB, i18n.getMessage('sdcardTerrain'));
+        update_sdcard_part("sdcard-log-tails", logTailsKB, i18n.getMessage('sdcardLogTails'));
+        update_sdcard_part("sdcard-lost", lostKB, i18n.getMessage('sdcardLost'));
     }
 
     function update_html() {

@@ -2919,14 +2919,14 @@
     "sdcardNotCounted": {
         "message": "Not counted yet"
     },
-    "sdcardCardFree": {
-        "message": "Free on the card: $1 of $2."
+    "sdcardTerrain": {
+        "message": "Terrain data"
     },
-    "sdcardCardFreeNote": {
-        "message": "Logs go to the free space for logs, at most 4GB, which is topped up from the other free space at boot."
+    "sdcardLogTails": {
+        "message": "Unused end of logs"
     },
-    "sdcardCardFreeUnknown": {
-        "message": "Free on the card: not counted yet."
+    "sdcardLost": {
+        "message": "Lost space"
     },
     "dataflashNote": {
         "message": "Flight logs can be recorded to your flight controller's onboard dataflash chip."
