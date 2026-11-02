@@ -670,7 +670,17 @@ function iconKey(filename) {
         cleanSafehomeLayers();
     }
 
-    async function checkApproachAltitude(altitude, isSeaLevelRef, sealevel) {
+    // The elevation field is rendered with a unit suffix ("412 m") for reading,
+    // so Number() turns it into NaN and the altitude checks below never fire.
+    function parseElevationMeters(text) {
+
+        const value = parseFloat(text);
+
+        return Number.isNaN(value) ? 0 : value;
+
+    }
+
+    function checkApproachAltitude(altitude, isSeaLevelRef, sealevel) {
 
         if (altitude - (isSeaLevelRef ? sealevel * 100 : 0 ) < 0) {
             dialog.alert(i18n.getMessage('MissionPlannerAltitudeChangeReset'));
@@ -3560,7 +3570,7 @@ function iconKey(filename) {
 
                     }
 
-                    $('#safehomeElevation').text(elevation / 100);
+                    $('#safehomeElevation').text(elevation / 100 + " m");
                     $('#safehomeApproachAlt').val(selectedFwApproachSh.getApproachAltAsl());
                     $('#safehomeLandAlt').val(selectedFwApproachSh.getLandAltAsl());
                     $('#safehomeLandAltM').text(selectedFwApproachSh.getLandAltAsl() / 100 + " m");
@@ -3575,7 +3585,7 @@ function iconKey(filename) {
 
             if (selectedFwApproachSh) {
                 let altitude = Number($(event.currentTarget).val());
-                if (checkApproachAltitude(altitude, $('#safehomeSeaLevelRef').prop('checked'), Number($('#safehomeElevation').text()))) {
+                if (checkApproachAltitude(altitude, $('#safehomeSeaLevelRef').prop('checked'), parseElevationMeters($('#safehomeElevation').text()))) {
                     selectedFwApproachSh.setApproachAltAsl(Number($(event.currentTarget).val()));
                     $('#safehomeApproachAltM').text(selectedFwApproachSh.getApproachAltAsl() / 100 + " m");
                     cleanSafehomeLayers();
@@ -3591,7 +3601,7 @@ function iconKey(filename) {
 
             if (selectedFwApproachSh) {
                 let altitude = Number($(event.currentTarget).val());
-                if (checkLandingAltitude(altitude, $('#safehomeSeaLevelRef').prop('checked'), Number($('#safehomeElevation').text()))) {
+                if (checkLandingAltitude(altitude, $('#safehomeSeaLevelRef').prop('checked'), parseElevationMeters($('#safehomeElevation').text()))) {
                     selectedFwApproachSh.setLandAltAsl(altitude);
                     $('#safehomeLandAltM').text(selectedFwApproachSh.getLandAltAsl() / 100 + " m");
                     cleanSafehomeLayers();
