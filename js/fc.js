@@ -12,7 +12,7 @@ import OutputMappingCollection from './outputMapping';
 import SafehomeCollection from './safehomeCollection';
 import FwApproachCollection from './fwApproachCollection';
 import GeozoneCollection from './geozoneCollection';
-import { PLATFORM } from './model';
+import { PLATFORM, PID_TYPE } from './model';
 import VTX from './vtx';
 import BitHelper from './bitHelper';
 import { FLIGHT_MODES } from './flightModes';
@@ -103,6 +103,19 @@ var FC = {
     },
     isMultirotor: function () {
         return (this.MIXER_CONFIG.platformType == PLATFORM.MULTIROTOR || this.MIXER_CONFIG.platformType == PLATFORM.TRICOPTER);
+    },
+    // Airplanes, rovers and boats run the fixed-wing navigation controllers, whatever pid_type says
+    usesFixedWingNavPids: function () {
+        return (this.MIXER_CONFIG.platformType == PLATFORM.AIRPLANE ||
+            this.MIXER_CONFIG.platformType == PLATFORM.ROVER ||
+            this.MIXER_CONFIG.platformType == PLATFORM.BOAT);
+    },
+    // MSP2_PID serves pidBank(), which follows pid_type instead
+    usesFixedWingPidBank: function (pidType) {
+        if (pidType == PID_TYPE.AUTO) {
+            return this.usesFixedWingNavPids();
+        }
+        return (pidType == PID_TYPE.PIFF);
     },
     isRpyFfComponentUsed: function () {
         return true; // Currently all planes have roll, pitch and yaw FF

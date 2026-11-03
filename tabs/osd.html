@@ -6,59 +6,72 @@
             <p data-i18n="osd_unsupported_msg2" class="note"></p>
         </div>
         <div class="supported hide">
-            <div class="cf_column third_left osd__elements">
-                <div class="settings spacer_right">
-                    <select class="osd_layouts">
-                    </select>
-                    <span class="btn btn_blue">
-                        <a class="active osd_copy" href="#" data-i18n="copy"></a>
-                    </span>
-                    <span class="btn btn_blue">
-                        <a class="active osd_paste" href="#" data-i18n="paste"></a>
-                    </span>
-                    <span class="btn btn_danger">
-                        <a class="active osd_clear" href="#" data-i18n="clear"></a>
-                    </span>
-                    <input class="osd_search" placeholder="Search...">
-                </div>
-                <div class="spacer_right">
-                    <div id="osd_group_template" class="gui_box grey">
-                        <div
-                            class="gui_box_titlebar"
-                            style="margin-bottom: 0">
-                            <div class="spacer_box_title" data-i18n="osd_elements"></div>
-                        </div>
-                        <div class="spacer_box">
-                            <div class="display-fields"></div>
+            <div class="osd-columns">
+            <div class="cf_column osd__elements">
+                <div class="gui_box grey osd-elements-box">
+                    <div class="gui_box_titlebar">
+                        <div class="spacer_box_title" data-i18n="osd_elements"></div>
+                    </div>
+                    <div class="osd-elements-head">
+                        <label for="osd_search" class="osd-search-label" data-i18n="osdElementSearch">Search elements</label>
+                        <input id="osd_search" class="osd_search" type="search" i18n_placeholder="osdElementSearch">
+                    </div>
+                    <div class="osd-elements-list">
+                        <div id="osd_group_template" class="osd-group">
+                            <div class="gui_box_titlebar">
+                                <div class="spacer_box_title"></div>
+                            </div>
+                            <div class="spacer_box">
+                                <div class="display-fields"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="gui_box preview" style="float: left; position: fixed;">
-                <div class="gui_box_titlebar">
-                    <div class="spacer_box_title" data-i18n="osd_preview_title"></div>
-                </div>
-                <div class="display-layout">
-                    <div class="col right">
-                        <div class="hd_43_margin_left"></div>
-                        <div class="hd_43_margin_right"></div>
-                        <div class="hd_3016_box_top"></div>
-                        <div class="hd_3016_box_bottom"></div>
-                        <div class="hd_3016_box_left"></div>
-                        <div class="hd_3016_box_right"></div>
-                        <div class="pal_ntsc_box_bottom"></div>
-                        <div class="hd_avatar_storage_box_top"></div>
-                        <div class="hd_avatar_storage_box_bottom"></div>
-                        <div class="hd_avatar_storage_box_left"></div>
-                        <div class="hd_avatar_storage_box_right"></div>
-                        <div class="hd_avatar_bottom_bar"></div>
-                        <div class="hd_bfhdcompat_storage_box"></div>
-                        <div class="hd_bfhdcompat_bottom_box"></div>
-                        <div class="preview"></div>
+            <div class="osd-preview-column">
+                <div class="gui_box grey osd-preview-box">
+                    <div class="gui_box_titlebar">
+                        <div class="spacer_box_title" data-i18n="osd_preview_title"></div>
+                    </div>
+                    <div class="osd-preview-toolbar">
+                        <div class="osd-layout-tabs" role="tablist"></div>
+                        <div class="osd-layout-actions">
+                            <a href="#" class="osd-action osd_copy" data-i18n="copy">Copy</a>
+                            <a href="#" class="osd-action osd_paste" data-i18n="paste">Paste</a>
+                            <a href="#" class="osd-action osd-action--danger osd_clear" data-i18n="clear">Clear</a>
+                        </div>
+                    </div>
+                    <div class="osd-preview-stage">
+                        <div class="display-layout">
+                            <div class="hd_43_margin_left"></div>
+                            <div class="hd_43_margin_right"></div>
+                            <div class="hd_3016_box_top"></div>
+                            <div class="hd_3016_box_bottom"></div>
+                            <div class="hd_3016_box_left"></div>
+                            <div class="hd_3016_box_right"></div>
+                            <div class="pal_ntsc_box_bottom"></div>
+                            <div class="hd_avatar_storage_box_top"></div>
+                            <div class="hd_avatar_storage_box_bottom"></div>
+                            <div class="hd_avatar_storage_box_left"></div>
+                            <div class="hd_avatar_storage_box_right"></div>
+                            <div class="hd_avatar_bottom_bar"></div>
+                            <div class="hd_bfhdcompat_storage_box"></div>
+                            <div class="hd_bfhdcompat_bottom_box"></div>
+                            <div class="preview"></div>
+                        </div>
+                    </div>
+                    <div class="osd-preview-footer">
+                        <div class="osd-preview-options">
+                            <label class="osd-move-all">
+                                <input type="checkbox" class="osd-move-all-check">
+                                <span data-i18n="osdMoveInAllLayouts">Dragging moves the element in every layout</span>
+                            </label>
+                            <a href="#" class="osd-action osd-action--quiet osd_positions_to_all" data-i18n="osdPositionsToAllLayouts">Use these positions in every layout</a>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="cf_column third_right osd_settings">
+            <div class="cf_column osd_settings">
                 <div class="gui_box grey">
                     <div class="gui_box_titlebar">
                         <div class="spacer_box_title" data-i18n="osd_video_format"></div>
@@ -83,11 +96,11 @@
                                 <input type="text" id="pilot_name" data-setting="pilot_name" data-live="true" />
                                 <span data-i18n="osd_pilot_name"></span>
                             </label>
+                            <div for="usePilotLogo" class="helpicon cf_tip" data-i18n_title="osdElement_PILOT_LOGO_HELP"></div>
                             <label>
                                 <input type="checkbox" id="usePilotLogo" class="toggle update_preview" data-setting="osd_use_pilot_logo" data-live="true">
                                 <span data-i18n="osd_use_pilot_logo"></span>
                             </label>
-                            <div for="usePilotLogo" class="helpicon cf_tip" data-i18n_title="osdElement_PILOT_LOGO_HELP"></div>
                             <label class="craft_name">
                                 <input type="text" id="craft_name" data-setting="name" data-live="true" />
                                 <span data-i18n="osd_craft_name"></span>
@@ -456,6 +469,7 @@
                     </div>
                 </div>
 
+            </div>
             </div>
             <div id="fontmanagercontent" style="display:none; width:712px;">
                 <div class="font-picker" style="margin-bottom: 10px;">

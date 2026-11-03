@@ -58,6 +58,14 @@ const PLATFORM = {
     BOAT:       5
 }
 
+// Values of the pid_type setting, see pidTypeTable in the firmware
+const PID_TYPE = {
+    NONE: 0,
+    PID:  1,
+    PIFF: 2,
+    AUTO: 3
+}
+
 // generate mixer
 const mixerList = [
     // ** Multirotor
@@ -829,4 +837,4 @@ var platform = (function (platforms) {
     return publicScope;
 })(platformList);
 
-export { mixer, platform, PLATFORM, SERVO, INPUT, STABILIZED };
+export { mixer, platform, PLATFORM, PID_TYPE, SERVO, INPUT, STABILIZED };

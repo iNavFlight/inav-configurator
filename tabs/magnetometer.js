@@ -23,8 +23,13 @@ import {
     findBestBoardAlignment,
     computeCompassYaw,
 } from './../js/boardAlignmentMath';
+import timeout from './../js/timeouts';
+import CONFIGURATOR from './../js/data_storage';
 
 const magnetometerTab = {};
+
+// An unanswered MSP request stalls the load chain and blocks the tab switcher
+const LOAD_TIMEOUT = 10000;
 
 
 magnetometerTab.initialize = function (callback) {
@@ -117,9 +122,15 @@ magnetometerTab.initialize = function (callback) {
         }
     ];
 
+    let loadFinished = false;
+    // The MSP queue waits 3 s per try on fast links and longer on slow ones
+    const loadTimeout = Math.round(LOAD_TIMEOUT * CONFIGURATOR.connection.getTimeout() / 3000);
+
     loadChainer.setChain(loadChain);
     loadChainer.setExitPoint(load_html);
     loadChainer.execute();
+
+    timeout.add('magnetometer_load', load_timed_out, loadTimeout);
 
     function areAnglesZero() {
         return self.alignmentConfig.pitch === 0 && self.alignmentConfig.roll === 0 && self.alignmentConfig.yaw === 0;
@@ -196,7 +207,34 @@ magnetometerTab.initialize = function (callback) {
     }
 
     function load_html() {
+        if (loadFinished) {
+            return;
+        }
+        loadFinished = true;
+        timeout.remove('magnetometer_load');
+
         import('./magnetometer.html?raw').then(({default: html}) => GUI.load(html, process_html));
+    }
+
+    function load_timed_out() {
+        if (loadFinished) {
+            return;
+        }
+
+        // A hidden window throttles the timers that drive the MSP queue
+        if (document.hidden) {
+            timeout.add('magnetometer_load', load_timed_out, loadTimeout);
+            return;
+        }
+
+        loadFinished = true;
+
+        GUI.log(i18n.getMessage('magnetometerLoadFailed'));
+
+        GUI.load('<div class="tab-magnetometer"><div class="content_wrapper"><div class="note"><p data-i18n="magnetometerLoadFailed"></p></div></div></div>', function () {
+            i18n.localize();
+            GUI.content_ready(callback);
+        });
     }
 
     function generateRange(min, max, step) {
@@ -1377,7 +1415,12 @@ magnetometerTab.initialize3D = function () {
 
 
 magnetometerTab.cleanup = function (callback) {
-    $(window).off('resize', this.resize3D);
+    timeout.remove('magnetometer_load');
+
+    // Without the handler, off() would drop every resize listener on the window.
+    if (this.resize3D) {
+        $(window).off('resize', this.resize3D);
+    }
 
     if (callback) callback();
 };
