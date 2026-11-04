@@ -76,6 +76,7 @@
 .tab-autoland .autolandCheckTable {
     width: 100%;
     border-spacing: 0;
+    margin-bottom: 0.6em;
 }
 
 .tab-autoland .autolandWarnings {
@@ -96,10 +97,6 @@
     font-weight: bold;
     content: "\26A0";
     color: #b45f06;
-}
-
-.tab-autoland .autolandCheckTable {
-    margin-bottom: 0.6em;
 }
 
 .tab-autoland .autolandCheckTable td:last-child {
