@@ -15,6 +15,9 @@ const SMOOTH_TCONST_MAX_MS = 900;
 const STEEP_SLOPE_DEG = 8;
 const MIN_CIRCLE_GAP_M = 10;
 const ARC_STEP_DEG = 5;
+// the firmware's corner cut (navigation_fixedwing.c): FLY_BY below 160 degrees, its lead capped at tan(half angle) 3.7
+const FLY_BY_MAX_DEG = 160;
+const TURN_LEAD_TAN_MAX = 3.7;
 const STRAIGHT_STEP_M = 5;
 const CIRCLE_EXIT_STRAIGHT_S = 1.5;
 const FLARE_TIME_S = 2;
@@ -114,12 +117,23 @@ function approachSide(approach, configuredHeading, circuit) {
     return wrap360(Math.abs(heading) + (approach.side === ApproachSide.LEFT ? -90 : 90));
 }
 
-/* Corner cut of radius r between the legs a->corner and corner->b, as points along the arc */
+/*
+ * Corner cut of radius r between the legs a->corner and corner->b, as points along the arc. As the firmware: a turn
+ * whose lead would pass the cap starts at the capped lead and is flown direct, turning until it points at the next
+ * waypoint; a turn of 160 degrees or more is not cut, the aircraft turns at the waypoint itself
+ */
 function fillet(a, corner, b, r) {
     const inBearing = bearing(a, corner);
     const outBearing = bearing(corner, b);
     const turn = wrap180(outBearing - inBearing);
-    const tangent = r * Math.tan(rad(Math.abs(turn) / 2));
+    const halfTan = Math.tan(rad(Math.abs(turn) / 2));
+    if (Math.abs(turn) >= FLY_BY_MAX_DEG || halfTan > TURN_LEAD_TAN_MAX) {
+        const lead = Math.abs(turn) >= FLY_BY_MAX_DEG ? 0 : r * TURN_LEAD_TAN_MAX;
+        const start = move(corner, inBearing + 180, lead);
+        const points = [start, ...turnTowards(start, inBearing, b, r)];
+        return { start, end: points.at(-1), points, tangent: lead, inBearing, moved: true };
+    }
+    const tangent = r * halfTan;
     const start = move(corner, inBearing + 180, tangent);
     const end = move(corner, outBearing, tangent);
     const dir = turn >= 0 ? 1 : -1;
@@ -158,10 +172,15 @@ function turnTowards(start, heading, target, r) {
     if (Math.abs(off) < ARC_STEP_DEG) {
         return points;
     }
-    const dir = off > 0 ? 1 : -1;
-    const center = move(start, heading + 90 * dir, r);
+    let dir = off > 0 ? 1 : -1;
+    let center = move(start, heading + 90 * dir, r);
     if (distance(center, target) <= r) {
-        return points;    // the target is inside the turn: no arc reaches it
+        // the target is inside the turn on that side: the aircraft goes the other way round
+        dir = -dir;
+        center = move(start, heading + 90 * dir, r);
+        if (distance(center, target) <= r) {
+            return points;
+        }
     }
     const startAngle = bearing(center, start);
     for (let turned = ARC_STEP_DEG; turned < 360; turned += ARC_STEP_DEG) {

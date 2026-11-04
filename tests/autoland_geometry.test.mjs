@@ -144,6 +144,47 @@ test('the circuit joins its corner cuts without turning back, a short downwind i
     }
 });
 
+// the sharpest turn between two segments of the track [deg]
+const sharpest = (track) => {
+    let worst = 0;
+    for (let i = 2; i < track.length; i++) {
+        const a = Math.atan2(track[i - 1].e - track[i - 2].e, track[i - 1].n - track[i - 2].n);
+        const b = Math.atan2(track[i].e - track[i - 1].e, track[i].n - track[i - 1].n);
+        if (Math.hypot(track[i].e - track[i - 1].e, track[i].n - track[i - 1].n) > 0.01) {
+            worst = Math.max(worst, Math.abs(((b - a) * 180 / Math.PI + 540) % 360 - 180));
+        }
+    }
+    return worst;
+};
+
+test('a corner the firmware does not cut: a 180 degree one is planned, and turned at the waypoint', () => {
+    // a reversal at a waypoint had an infinite lead: the plan never ended
+    const reversed = {
+        ...circuit,
+        approach: { side: ApproachSide.RIGHT, heading1: 180, heading2: -270, runwayStarts: [0, 0, 0, 0], runwayHeights: [0, 0, 0, 0] },
+        approachAlt: 35,
+        finalAlt: 6,
+        approachLength: 60,
+        downwindOffset: 10,
+        landLoiterRadius: 35,
+        aimOffset: 60,
+        runwayLength: 100,
+        loiterDirection: LoiterDirection.RIGHT
+    };
+    planAutoland(reversed).directions.forEach((dir, i) => assert.ok(sharpest(dir.track) < 20, `direction ${i}: the track folds`));
+});
+
+test('classic approach with a short final: the turn onto the base starts at the turn point, as the firmware flies it', () => {
+    // 60 m of final: the turn at the turn point is about 170 degrees, past the firmware's corner cut (160)
+    const classic = { ...circuit, downwindOffset: 0, finalAlt: 0, approachLength: 60, landLoiterRadius: 0 };
+    for (const dir of planAutoland(classic).directions) {
+        const base = dir.track.find((pt) => pt.phase === Phase.BASE);
+        const fromTurn = Math.hypot(base.n - dir.waypoints.turn.n, base.e - dir.waypoints.turn.e);
+        assert.ok(fromTurn < 6, `the base turn starts ${fromTurn.toFixed(1)} m from the turn point`);
+        assert.ok(sharpest(dir.track) < 8, 'the track folds');
+    }
+});
+
 test('sink-rate flare: it starts where its law asks the sink of the final and the wheels touch at the aim point', () => {
     const plan = planAutoland({ ...circuit, flareSink: 0.15, flareTime: 2 }).directions[0];
     assert.ok(plan.sinkFlare);
