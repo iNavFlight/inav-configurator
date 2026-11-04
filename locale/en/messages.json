@@ -4266,6 +4266,12 @@
     "autolandSatellite": {
         "message": "Satellite image"
     },
+    "autolandCheckColumn": {
+        "message": "Check"
+    },
+    "autolandCheckStateColumn": {
+        "message": "State"
+    },
     "autolandSatelliteOffline": {
         "message": "No satellite image with the map proxy chosen in the options, which serves the maps offline."
     },

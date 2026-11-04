@@ -59,8 +59,8 @@ function rampColor(t) {
     const x = Math.min(Math.max(t, 0), 1) * (ALTITUDE_RAMP.length - 1);
     const i = Math.min(Math.floor(x), ALTITUDE_RAMP.length - 2);
     const k = x - i;
-    const a = ALTITUDE_RAMP[i].match(/\w\w/g).map((h) => parseInt(h, 16));
-    const b = ALTITUDE_RAMP[i + 1].match(/\w\w/g).map((h) => parseInt(h, 16));
+    const a = ALTITUDE_RAMP[i].match(/\w\w/g).map((h) => Number.parseInt(h, 16));
+    const b = ALTITUDE_RAMP[i + 1].match(/\w\w/g).map((h) => Number.parseInt(h, 16));
     return '#' + a.map((v, j) => Math.round(v + (b[j] - v) * k).toString(16).padStart(2, '0')).join('');
 }
 
@@ -82,16 +82,21 @@ function phaseShortName(phase) {
 /* Inputs -> the geometry's parameters, in metres, degrees and m/s */
 function readParams() {
     const a = approach();
-    const heading = (value, exclusive) => (value ? (exclusive ? -value : value) : 0);
+    const heading = (value, exclusive) => {
+        if (!value) {
+            return 0;
+        }
+        return exclusive ? -value : value;
+    };
     return {
         approach: {
-            side: parseInt($('#autolandSide').val(), 10),
-            heading1: heading(parseInt($('#autolandHeading1').val(), 10) || 0, $('#autolandHeading1Exclusive').prop('checked')),
-            heading2: heading(parseInt($('#autolandHeading2').val(), 10) || 0, $('#autolandHeading2Exclusive').prop('checked')),
+            side: Number.parseInt($('#autolandSide').val(), 10),
+            heading1: heading(Number.parseInt($('#autolandHeading1').val(), 10) || 0, $('#autolandHeading1Exclusive').prop('checked')),
+            heading2: heading(Number.parseInt($('#autolandHeading2').val(), 10) || 0, $('#autolandHeading2Exclusive').prop('checked')),
             runwayStarts: a ? [0, 1, 2, 3].map((i) => a.getRunwayStart(i)) : [0, 0, 0, 0],
             runwayHeights: a ? [0, 1, 2, 3].map((i) => a.getRunwayStartHeight(i) / 10) : [0, 0, 0, 0]
         },
-        runwayLength: parseFloat($('#autolandRunwayLength').val()) || 0,
+        runwayLength: Number.parseFloat($('#autolandRunwayLength').val()) || 0,
         approachAlt: a ? (a.getApproachAltAsl() - a.getLandAltAsl()) / 100 : 0,
         finalAlt: cm('nav_fw_land_final_alt'),
         approachLength: cm('nav_fw_land_approach_length', 350),
@@ -103,7 +108,7 @@ function readParams() {
         flareAlt: cm('nav_fw_land_flare_alt', 2),
         flareSink: cm('nav_fw_land_flare_sink'),
         flareTime: (settingValue('nav_fw_land_flare_time') || 0) / 10,
-        speed: cm('nav_fw_land_approach_speed') || parseFloat($('#autolandSpeed').val()) || DEFAULT_SPEED_MS,
+        speed: cm('nav_fw_land_approach_speed') || Number.parseFloat($('#autolandSpeed').val()) || DEFAULT_SPEED_MS,
         bankDeg: navSettings.bankDeg,
         rollRateDps: navSettings.rollRateDps,
         controlSmoothness: navSettings.controlSmoothness,
@@ -142,13 +147,13 @@ function storeApproach() {
         return;
     }
     const signed = (id) => {
-        const value = parseInt($(`#${id}`).val(), 10) || 0;
+        const value = Number.parseInt($(`#${id}`).val(), 10) || 0;
         return $(`#${id}Exclusive`).prop('checked') ? -value : value;
     };
-    a.setApproachAltAsl(Math.round(parseFloat($('#autolandApproachAlt').val() || 0) * 100));
-    a.setLandAltAsl(Math.round(parseFloat($('#autolandLandAlt').val() || 0) * 100));
+    a.setApproachAltAsl(Math.round(Number.parseFloat($('#autolandApproachAlt').val() || 0) * 100));
+    a.setLandAltAsl(Math.round(Number.parseFloat($('#autolandLandAlt').val() || 0) * 100));
     a.setIsSeaLevelRef($('#autolandSeaLevel').prop('checked') ? 1 : 0);
-    a.setApproachDirection(parseInt($('#autolandSide').val(), 10));
+    a.setApproachDirection(Number.parseInt($('#autolandSide').val(), 10));
     a.setLandHeading1(signed('autolandHeading1'));
     a.setLandHeading2(signed('autolandHeading2'));
 }
@@ -189,8 +194,8 @@ function labelMetrics(svgElement) {
         t.setAttribute('class', cls);
         svgElement.appendChild(t);
         const cs = getComputedStyle(t);
-        const font = { font: `${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`, size: parseFloat(cs.fontSize) || 12 };
-        svgElement.removeChild(t);
+        const font = { font: `${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`, size: Number.parseFloat(cs.fontSize) || 12 };
+        t.remove();
         return font;
     };
     const name = probe('autolandLabel');
@@ -237,7 +242,8 @@ function labelBox(m, x, y, lines, anchor, labelClass, b) {
 /* An axis note on its own backing, so it reads over the satellite image as well */
 function axisNote(m, x, y, str, anchor) {
     const b = textBox(m, { at: x, anchor }, y, m.axisWidth(str), m.axisSize, 1);
-    return { b, svg: `<g class="autolandAxisGroup">${backing(b, 'autolandAxisBack')}${text(x, y, str, `text-anchor="${anchor}" class="autolandAxisText"`)}</g>` };
+    const attrs = 'text-anchor="' + anchor + '" class="autolandAxisText"';
+    return { b, svg: `<g class="autolandAxisGroup">${backing(b, 'autolandAxisBack')}${text(x, y, str, attrs)}</g>` };
 }
 
 /*
@@ -340,10 +346,10 @@ function legsOf(track) {
     const legs = [];
     for (const pt of track) {
         const name = pt.phase === Phase.GLIDE || pt.phase === Phase.FLARE ? Phase.FINAL : pt.phase;
-        if (!legs.length || legs[legs.length - 1].phase !== name) {
+        if (!legs.length || legs.at(-1).phase !== name) {
             legs.push({ phase: name, points: [] });
         }
-        legs[legs.length - 1].points.push(pt);
+        legs.at(-1).points.push(pt);
     }
     return legs;
 }
@@ -354,7 +360,7 @@ function legsOf(track) {
  */
 function satelliteLayer(params, site, scale, width, height) {
     const safehome = FC.SAFEHOMES.get()[siteIndex];
-    if (!$('#autolandSatellite').prop('checked') || !safehome || !safehome.getEnabled() || globalSettings.mapProviderType === 'mapproxy') {
+    if (!$('#autolandSatellite').prop('checked') || !safehome?.getEnabled() || globalSettings.mapProviderType === 'mapproxy') {
         return '';
     }
     const lat = safehome.getLatMap() * Math.PI / 180;
@@ -388,27 +394,16 @@ function satelliteLayer(params, site, scale, width, height) {
         `<rect x="0" y="0" width="${fmt(width)}" height="${fmt(height)}" class="autolandSatelliteVeil"/>`;
 }
 
-function drawPlan(params, plan) {
-    const svg = $('.autolandPlan');
-    const wrap = $('.autolandPlanWrap');
-    const fitted = $('.autolandLayout').hasClass('fitted');
-    // measured without the old drawing, which would hold the box at its own size
-    svg.attr('height', 0);
-    const m = labelMetrics(svg[0]);
-    const width = Math.max(wrap.width() || 600, 320);
-    const maxHeight = fitted ? wrap.height() : PLAN_MAX_HEIGHT_PX;
+/* The drawing's frame: everything drawn fits, with room on the sides for the leg labels pushed out of the circuit */
+function planFrame(params, dir, runway, box, m) {
     const toFrame = frame(params);
-    const dir = plan.directions[directionIndex];
-    const runway = { length: parseFloat($('#autolandRunwayLength').val()) || 0, width: parseFloat($('#autolandRunwayWidth').val()) || 0 };
-
     const points = [{ x: -runway.length / 2, y: -runway.width / 2 }, { x: runway.length / 2, y: runway.width / 2 }];
     const add = (p) => points.push(toFrame(p));
     add({ n: 0, e: 0 });
     if (dir) {
         dir.track.forEach(add);
         const c = toFrame(dir.circle.center);
-        points.push({ x: c.x - dir.circle.radius, y: c.y - dir.circle.radius });
-        points.push({ x: c.x + dir.circle.radius, y: c.y + dir.circle.radius });
+        points.push({ x: c.x - dir.circle.radius, y: c.y - dir.circle.radius }, { x: c.x + dir.circle.radius, y: c.y + dir.circle.radius });
         // the land waypoint lies past the site on the final's line and is not drawn: it would only shrink the drawing
         Object.entries(dir.waypoints).filter(([name, wp]) => wp && name !== 'land').forEach(([, wp]) => add(wp));
     }
@@ -417,117 +412,163 @@ function drawPlan(params, plan) {
     const minY = Math.min(...points.map((p) => p.y));
     const maxY = Math.max(...points.map((p) => p.y));
     const pad = Math.max(maxX - minX, maxY - minY) * 0.08 + 15;
-    // room on the sides for the leg labels pushed out of the circuit
-    const margin = Math.min(LABEL_MARGIN_EM * m.size, width / 6);
-    const scale = Math.min((width - 2 * margin) / (maxX - minX + 2 * pad), maxHeight / (maxY - minY + 2 * pad));
-    const height = fitted ? maxHeight : (maxY - minY + 2 * pad) * scale;
-    const ox = (width - (maxX - minX) * scale) / 2 - minX * scale;
+    const margin = Math.min(LABEL_MARGIN_EM * m.size, box.width / 6);
+    const scale = Math.min((box.width - 2 * margin) / (maxX - minX + 2 * pad), box.maxHeight / (maxY - minY + 2 * pad));
+    const height = box.fitted ? box.maxHeight : (maxY - minY + 2 * pad) * scale;
+    const ox = (box.width - (maxX - minX) * scale) / 2 - minX * scale;
     const oy = (height - (maxY - minY) * scale) / 2 - minY * scale;
     const pxFrame = (f) => ({ x: ox + f.x * scale, y: oy + f.y * scale });
-    const px = (p) => pxFrame(toFrame(p));
+    return { scale, width: box.width, height, ox, oy, pxFrame, px: (p) => pxFrame(toFrame(p)) };
+}
 
-    let out = satelliteLayer(params, px({ n: 0, e: 0 }), scale, width, height);
-    // grid in metres around the landing site
-    const step = niceStep(width / scale);
-    for (let gx = Math.floor(-ox / scale / step) * step; gx <= (width - ox) / scale; gx += step) {
-        out += `<line x1="${fmt(ox + gx * scale, 1)}" y1="0" x2="${fmt(ox + gx * scale, 1)}" y2="${fmt(height, 1)}" class="autolandGrid"/>`;
+/* Grid in metres around the landing site */
+function planGrid(f) {
+    const step = niceStep(f.width / f.scale);
+    let out = '';
+    for (let gx = Math.floor(-f.ox / f.scale / step) * step; gx <= (f.width - f.ox) / f.scale; gx += step) {
+        const x = fmt(f.ox + gx * f.scale, 1);
+        out += `<line x1="${x}" y1="0" x2="${x}" y2="${fmt(f.height, 1)}" class="autolandGrid"/>`;
     }
-    for (let gy = Math.floor(-oy / scale / step) * step; gy <= (height - oy) / scale; gy += step) {
-        out += `<line x1="0" y1="${fmt(oy + gy * scale, 1)}" x2="${fmt(width, 1)}" y2="${fmt(oy + gy * scale, 1)}" class="autolandGrid"/>`;
+    for (let gy = Math.floor(-f.oy / f.scale / step) * step; gy <= (f.height - f.oy) / f.scale; gy += step) {
+        const y = fmt(f.oy + gy * f.scale, 1);
+        out += `<line x1="0" y1="${y}" x2="${fmt(f.width, 1)}" y2="${y}" class="autolandGrid"/>`;
     }
-    const gridNote = axisNote(m, width - 10, height - 10, i18n.getMessage('autolandGridStep', { step: fmt(step) }), 'end');
+    return { out, step };
+}
 
-    // runway axis through the site, along approach heading 1, and the runway as entered for the drawing
-    const site = px({ n: 0, e: 0 });
-    const heading = fmt(Math.abs(params.approach.heading1 || params.approach.heading2 || 0));
-    out += `<line x1="0" y1="${fmt(site.y, 1)}" x2="${fmt(width, 1)}" y2="${fmt(site.y, 1)}" class="autolandAxis"/>`;
-    const axisLabel = axisNote(m, width - 10, site.y + m.axisSize * 1.6, i18n.getMessage('autolandRunwayAxis', { heading }), 'end');
+/* The runway axis through the site, along approach heading 1, the runway as entered for the drawing, the site */
+function planRunway(f, site, runway) {
+    let out = `<line x1="0" y1="${fmt(site.y, 1)}" x2="${fmt(f.width, 1)}" y2="${fmt(site.y, 1)}" class="autolandAxis"/>`;
     if (runway.length > 0 && runway.width > 0) {
-        const a = pxFrame({ x: -runway.length / 2, y: -runway.width / 2 });
-        const b = pxFrame({ x: runway.length / 2, y: runway.width / 2 });
+        const a = f.pxFrame({ x: -runway.length / 2, y: -runway.width / 2 });
+        const b = f.pxFrame({ x: runway.length / 2, y: runway.width / 2 });
         out += `<rect x="${fmt(a.x, 1)}" y="${fmt(a.y, 1)}" width="${fmt(b.x - a.x, 1)}" height="${fmt(Math.max(b.y - a.y, 2), 1)}" class="autolandRunwayStrip"/>`;
         out += `<line x1="${fmt(a.x + 4, 1)}" y1="${fmt(site.y, 1)}" x2="${fmt(b.x - 4, 1)}" y2="${fmt(site.y, 1)}" class="autolandRunwayCentre"/>`;
     }
+    return out + `<rect x="${fmt(site.x - 5, 1)}" y="${fmt(site.y - 5, 1)}" width="10" height="10" class="autolandSite"/>`;
+}
 
-    out += `<rect x="${fmt(site.x - 5, 1)}" y="${fmt(site.y - 5, 1)}" width="10" height="10" class="autolandSite"/>`;
-    if (!dir) {
+/* The track coloured by the altitude asked for, on a light casing that keeps it apart from the satellite image */
+function planTrack(params, dir, screen) {
+    const maxAlt = Math.max(params.approachAlt, 1);
+    const points = screen.map((p) => fmt(p.x, 1) + ',' + fmt(p.y, 1)).join(' ');
+    let out = `<polyline points="${points}" class="autolandTrackCasing"/>`;
+    for (let i = 1; i < screen.length; i++) {
+        const color = rampColor((dir.track[i - 1].alt + dir.track[i].alt) / 2 / maxAlt);
+        out += `<line x1="${fmt(screen[i - 1].x, 1)}" y1="${fmt(screen[i - 1].y, 1)}" x2="${fmt(screen[i].x, 1)}" y2="${fmt(screen[i].y, 1)}" stroke="${color}" class="autolandTrack"/>`;
+    }
+    return out;
+}
+
+/* The marks the labels keep clear of: where each leg starts, the aim point, the throttle cut and flare */
+function planMarks(dir, f, placer, site) {
+    let out = '';
+    const legs = legsOf(dir.track);
+    for (const leg of legs) {
+        const start = f.px(leg.points[0]);
+        out += `<circle cx="${fmt(start.x, 1)}" cy="${fmt(start.y, 1)}" r="5" class="autolandLegStart"/>`;
+        placer.mark(start, 7);
+    }
+    const aim = f.px(dir.waypoints.aim);
+    const cross = `M${fmt(aim.x - 6, 1)} ${fmt(aim.y - 6, 1)} l12 12 m0 -12 l-12 12`;
+    out += `<path d="${cross}" class="autolandAimCasing"/><path d="${cross}" class="autolandAim"/>`;
+    placer.mark(aim, 7);
+    placer.mark(site, 7);
+    // the touchdown of the sink-rate flare is the aim point's cross
+    const events = flareEvents(dir).filter(([point, key]) => point && key);
+    for (const [point] of events) {
+        const p = f.px(point);
+        out += `<circle cx="${fmt(p.x, 1)}" cy="${fmt(p.y, 1)}" r="5" class="autolandEvent"/>`;
+        placer.mark(p, 7);
+    }
+    return { out, legs, aim, events };
+}
+
+/* A leg's label: its name and altitudes, or only its name where the drawing has no room for both */
+function legLabel(placer, f, leg, outward) {
+    const first = leg.points[0];
+    const endAlt = leg.phase === Phase.FINAL ? 0 : leg.points.at(-1).alt;
+    const lines = [phaseName(leg.phase), i18n.getMessage('autolandAltitudeRange', { from: fmt(first.alt, 1), to: fmt(endAlt, 1) })];
+    const spots = leg.phase === Phase.FINAL ? [0.25, 0.1, 0.4] : [0.5, 0.35, 0.65, 0.2, 0.8];
+    const along = spots.map((k) => f.px(leg.points[Math.floor((leg.points.length - 1) * k)]));
+    const [ux, uy] = outward(along[0]);
+    return placer.place(lines, along, ux, uy, undefined, true) || placer.place(lines.slice(0, 1), along, ux, uy);
+}
+
+/* The labels, out from the circuit's centre: the site and aim point, the legs from the runway outwards, then what the
+   drawing can do without (the flare's marks, which the profile names too, and the wind circle) */
+function planLabels(dir, f, site, marks, screen, placer) {
+    const cx = screen.reduce((sum, p) => sum + p.x, 0) / screen.length;
+    const cy = screen.reduce((sum, p) => sum + p.y, 0) / screen.length;
+    const outward = (p) => {
+        const len = Math.hypot(p.x - cx, p.y - cy) || 1;
+        return [(p.x - cx) / len, (p.y - cy) / len];
+    };
+    const [sx, sy] = outward(site);
+    let out = placer.place([i18n.getMessage('autolandLandingSite')], [site], sx, sy);
+    if (!dir.sinkFlare) {
+        out += placer.place([i18n.getMessage('autolandAimPoint')], [marks.aim], -sx, -sy);
+    }
+    for (const leg of marks.legs.slice().reverse()) {
+        out += legLabel(placer, f, leg, outward);
+    }
+    marks.events.forEach(([point, key], i) => {
+        out += placer.place([i18n.getMessage(key, { alt: fmt(point.alt, 1) })], [f.px(point)], i === 0 ? -0.5 : 0.5, -0.9, undefined, true);
+    });
+    const circleLines = [i18n.getMessage('autolandWindCircle'), i18n.getMessage('autolandRadiusValue', { radius: fmt(dir.circle.radius) })];
+    return out + placer.place(circleLines, [f.px(dir.circle.center)], 0, -1, undefined, true);
+}
+
+/* The circle, the track, its marks and the labels around them */
+function planCircuit(params, dir, f, site, notes, m) {
+    const c = f.px(dir.circle.center);
+    let out = `<circle cx="${fmt(c.x, 1)}" cy="${fmt(c.y, 1)}" r="${fmt(dir.circle.radius * f.scale, 1)}" class="autolandCircle"/>`;
+    const screen = dir.track.map(f.px);
+    out += planTrack(params, dir, screen);
+    const placer = labelPlacer(f.width, f.height, screen, m);
+    notes.forEach((note) => placer.markBox(note.b));
+    const marks = planMarks(dir, f, placer, site);
+    return out + marks.out + planLabels(dir, f, site, marks, screen, placer);
+}
+
+function drawPlan(params, plan) {
+    const svg = $('.autolandPlan');
+    const wrap = $('.autolandPlanWrap');
+    const fitted = $('.autolandLayout').hasClass('fitted');
+    // measured without the old drawing, which would hold the box at its own size
+    svg.attr('height', 0);
+    const m = labelMetrics(svg[0]);
+    const box = { width: Math.max(wrap.width() || 600, 320), maxHeight: fitted ? wrap.height() : PLAN_MAX_HEIGHT_PX, fitted };
+    const dir = plan.directions[directionIndex];
+    const runway = {
+        length: Number.parseFloat($('#autolandRunwayLength').val()) || 0,
+        width: Number.parseFloat($('#autolandRunwayWidth').val()) || 0
+    };
+    const f = planFrame(params, dir, runway, box, m);
+    const { width, height } = f;
+    const site = f.px({ n: 0, e: 0 });
+    const grid = planGrid(f);
+    const heading = fmt(Math.abs(params.approach.heading1 || params.approach.heading2 || 0));
+    const notes = [
+        axisNote(m, width - 10, height - 10, i18n.getMessage('autolandGridStep', { step: fmt(grid.step) }), 'end'),
+        axisNote(m, width - 10, site.y + m.axisSize * 1.6, i18n.getMessage('autolandRunwayAxis', { heading }), 'end')
+    ];
+    let out = satelliteLayer(params, site, f.scale, width, height) + grid.out + planRunway(f, site, runway);
+    if (dir) {
+        out += planCircuit(params, dir, f, site, notes, m);
+    } else {
         out += text(width / 2, height / 2 - 30, i18n.getMessage('autolandNoApproach'), 'text-anchor="middle" class="autolandLabel"');
         out += text(site.x + 9, site.y + 18, i18n.getMessage('autolandLandingSite'), 'class="autolandLabel"');
-    } else {
-        const c = px(dir.circle.center);
-        out += `<circle cx="${fmt(c.x, 1)}" cy="${fmt(c.y, 1)}" r="${fmt(dir.circle.radius * scale, 1)}" class="autolandCircle"/>`;
-
-        // track coloured by the altitude asked for, on a light casing that keeps it apart from the satellite image
-        const maxAlt = Math.max(params.approachAlt, 1);
-        const screen = dir.track.map(px);
-        out += `<polyline points="${screen.map((p) => `${fmt(p.x, 1)},${fmt(p.y, 1)}`).join(' ')}" class="autolandTrackCasing"/>`;
-        for (let i = 1; i < screen.length; i++) {
-            const color = rampColor((dir.track[i - 1].alt + dir.track[i].alt) / 2 / maxAlt);
-            out += `<line x1="${fmt(screen[i - 1].x, 1)}" y1="${fmt(screen[i - 1].y, 1)}" x2="${fmt(screen[i].x, 1)}" y2="${fmt(screen[i].y, 1)}" stroke="${color}" class="autolandTrack"/>`;
-        }
-
-        // marks first, then the labels around them, the crowded ones near the runway before the legs
-        const placer = labelPlacer(width, height, screen, m);
-        placer.markBox(gridNote.b);
-        placer.markBox(axisLabel.b);
-        const legs = legsOf(dir.track);
-        for (const leg of legs) {
-            const start = px(leg.points[0]);
-            out += `<circle cx="${fmt(start.x, 1)}" cy="${fmt(start.y, 1)}" r="5" class="autolandLegStart"/>`;
-            placer.mark(start, 7);
-        }
-        const aim = px(dir.waypoints.aim);
-        const cross = `M${fmt(aim.x - 6, 1)} ${fmt(aim.y - 6, 1)} l12 12 m0 -12 l-12 12`;
-        out += `<path d="${cross}" class="autolandAimCasing"/><path d="${cross}" class="autolandAim"/>`;
-        placer.mark(aim, 7);
-        placer.mark(site, 7);
-        // the touchdown of the sink-rate flare is the aim point's cross
-        const events = flareEvents(dir).filter(([p, key]) => p && key);
-        for (const [point] of events) {
-            const p = px(point);
-            out += `<circle cx="${fmt(p.x, 1)}" cy="${fmt(p.y, 1)}" r="5" class="autolandEvent"/>`;
-            placer.mark(p, 7);
-        }
-
-        // the circuit's centre: labels go out of it
-        const cx = screen.reduce((s, p) => s + p.x, 0) / screen.length;
-        const cy = screen.reduce((s, p) => s + p.y, 0) / screen.length;
-        const outward = (p) => {
-            const len = Math.hypot(p.x - cx, p.y - cy) || 1;
-            return [(p.x - cx) / len, (p.y - cy) / len];
-        };
-        const [sx, sy] = outward(site);
-        out += placer.place([i18n.getMessage('autolandLandingSite')], [site], sx, sy);
-        if (!dir.sinkFlare) {
-            out += placer.place([i18n.getMessage('autolandAimPoint')], [aim], -sx, -sy);
-        }
-        // the flare's marks on the final come after the legs: the profile below names them too
-        const eventLabels = () => events.map(([point, key], i) => placer.place([i18n.getMessage(key, { alt: fmt(point.alt, 1) })],
-            [px(point)], i === 0 ? -0.5 : 0.5, -0.9, undefined, true)).join('');
-        // the legs from the runway outwards; each tries points along itself
-        for (const leg of legs.slice().reverse()) {
-            const first = leg.points[0];
-            const endAlt = leg.phase === Phase.FINAL ? 0 : leg.points[leg.points.length - 1].alt;
-            const lines = [phaseName(leg.phase), i18n.getMessage('autolandAltitudeRange', { from: fmt(first.alt, 1), to: fmt(endAlt, 1) })];
-            const along = (leg.phase === Phase.FINAL ? [0.25, 0.1, 0.4] : [0.5, 0.35, 0.65, 0.2, 0.8])
-                .map((f) => px(leg.points[Math.floor((leg.points.length - 1) * f)]));
-            const [ux, uy] = outward(along[0]);
-            // a small drawing keeps the leg's name and leaves its altitudes to the profile
-            out += placer.place(lines, along, ux, uy, undefined, true) || placer.place(lines.slice(0, 1), along, ux, uy);
-        }
-        out += eventLabels();
-        out += placer.place([i18n.getMessage('autolandWindCircle'), i18n.getMessage('autolandRadiusValue', { radius: fmt(dir.circle.radius) })],
-            [c], 0, -1, undefined, true);
     }
     // the axis notes over the drawing, the leg labels kept clear of them
-    out += gridNote.svg + axisLabel.svg;
+    out += notes.map((note) => note.svg).join('');
     out += '<circle class="autolandHover" r="7" style="display: none"/>';
 
     svg.attr({ width, height: fmt(height), viewBox: `0 0 ${fmt(width)} ${fmt(height)}` }).html(out)
         .toggleClass('withSatellite', out.includes('autolandSatelliteVeil'));
     svg.attr('aria-label', i18n.getMessage('autolandTopView'));
     $('.autolandRampMax').text(i18n.getMessage('autolandAltitudeMax', { alt: fmt(params.approachAlt) }));
-    return { px, dir };
+    return { px: f.px, dir };
 }
 
 function drawProfile(params, dir) {
@@ -556,7 +597,7 @@ function drawProfile(params, dir) {
     const gap = m.axisSize * 0.8;
     const placed = [{ x0: 0, x1: 4 + m.axisWidth(unit) + gap }]; // the unit's label is on the same line
     const names = legs.map((leg) => {
-        const mid = (sx(leg.points[0].flown) + sx(leg.points[leg.points.length - 1].flown)) / 2;
+        const mid = (sx(leg.points[0].flown) + sx(leg.points.at(-1).flown)) / 2;
         for (const name of [phaseName(leg.phase), phaseShortName(leg.phase)]) {
             const w = m.axisWidth(name);
             const cx = Math.min(Math.max(mid, left + w / 2), width - 12 - w / 2);
@@ -578,7 +619,7 @@ function drawProfile(params, dir) {
     };
     legs.forEach((leg, i) => {
         const x0 = sx(leg.points[0].flown);
-        const x1 = sx(leg.points[leg.points.length - 1].flown);
+        const x1 = sx(leg.points.at(-1).flown);
         if (i % 2 === 1) {
             out += `<rect x="${fmt(x0, 1)}" y="${top}" width="${fmt(x1 - x0, 1)}" height="${fmt(sy(0) - top, 1)}" class="autolandBand"/>`;
         }
@@ -646,23 +687,23 @@ function updateChecks(params, plan) {
     // optional: without it the glide goes on to the ground, no flare
     rows.push({ label: 'autolandCheckRangefinder', ok: range === 1 ? true : OPTIONAL, note: null });
     const safehome = FC.SAFEHOMES.get()[siteIndex];
-    const located = !!(safehome && safehome.getEnabled());
-    rows.push({ label: 'autolandCheckSafehome', ok: located, note: located ? null : 'autolandCheckSafehomeNote' });
-    rows.push({ label: 'autolandCheckHeading', ok: plan.directions.length > 0, note: plan.directions.length > 0 ? null : 'autolandCheckHeadingNote' });
+    const located = !!safehome?.getEnabled();
+    rows.push({ label: 'autolandCheckSafehome', ok: located, note: located ? null : 'autolandCheckSafehomeNote' },
+        { label: 'autolandCheckHeading', ok: plan.directions.length > 0, note: plan.directions.length > 0 ? null : 'autolandCheckHeadingNote' });
     // nav_rth_allow_landing's table: NEVER, ALWAYS, FS_ONLY (the option texts can be translated)
-    const rth = parseInt($('#autolandRthAllowLanding').val(), 10);
+    const rth = Number.parseInt($('#autolandRthAllowLanding').val(), 10);
     let rthNote = null;
     if (rth === 0) {
         rthNote = 'autolandCheckRthNote';
     } else if (rth === 2) {
         rthNote = 'autolandCheckRthFailsafe';
     }
-    rows.push({ label: 'autolandCheckRth', ok: !isNaN(rth) && rth !== 0, note: rthNote });
+    rows.push({ label: 'autolandCheckRth', ok: !Number.isNaN(rth) && rth !== 0, note: rthNote });
     const circuitAvailable = $('[data-setting="nav_fw_land_downwind_offset"]').length > 0;
     let circuitNote = null;
     if (!circuitAvailable) {
         circuitNote = 'autolandCheckCircuitMissing';
-    } else if (!(params.downwindOffset > 0)) {
+    } else if (params.downwindOffset <= 0) {
         circuitNote = 'autolandCheckCircuitClassic';
     }
     rows.push({ label: 'autolandCheckCircuit', ok: circuitAvailable && params.downwindOffset > 0 ? true : null, note: circuitNote });
@@ -694,7 +735,7 @@ function drawDirections(plan) {
     const a = approach();
     const start = dir && a ? a.getRunwayStart(dir.aimIndex) : 0;
     // the fields exist from the firmware that sends them; an older one would ignore what they set
-    $('#autolandRunwayStart').closest('.autolandField').toggle(!!(a && a.getRunwayKnown()));
+    $('#autolandRunwayStart').closest('.autolandField').toggle(!!a?.getRunwayKnown());
     const startField = $('#autolandRunwayStart').prop('disabled', !dir);
     const heightField = $('#autolandRunwayStartHeight').prop('disabled', !dir || !start);
     // the field being typed in keeps what it holds
@@ -708,7 +749,7 @@ function drawDirections(plan) {
         `<button type="button" role="radio" aria-checked="${i === directionIndex}" data-index="${i}" class="${i === directionIndex ? 'active' : ''}">` +
         i18n.getMessage('autolandLandTowards', { heading: fmt(d.landing) }) + '</button>').join(''));
     box.find('button').on('click', function () {
-        directionIndex = parseInt($(this).data('index'), 10);
+        directionIndex = Number.parseInt($(this).data('index'), 10);
         redraw();
     });
 }
@@ -774,7 +815,7 @@ function fitLayout() {
     const wrapper = layout.closest('.content_wrapper')[0];
     if (wrapper) {
         const cs = getComputedStyle(wrapper);
-        bottom = Math.min(bottom, wrapper.getBoundingClientRect().bottom - parseFloat(cs.paddingBottom) - parseFloat(cs.borderBottomWidth));
+        bottom = Math.min(bottom, wrapper.getBoundingClientRect().bottom - Number.parseFloat(cs.paddingBottom) - Number.parseFloat(cs.borderBottomWidth));
     }
     layout.addClass('fitted').css('height', Math.max(bottom - top - 4, 420) + 'px');
     // a window too short for the top view next to the settings: the page scrolls instead
@@ -801,7 +842,7 @@ function redraw() {
     syncSpeed();
     // the satellite image needs the safehome's position
     const safehome = FC.SAFEHOMES.get()[siteIndex];
-    const located = !!(safehome && safehome.getEnabled());
+    const located = !!safehome?.getEnabled();
     const offline = globalSettings.mapProviderType === 'mapproxy';
     $('#autolandSatellite').prop('disabled', !located || offline);
     let why = '';
@@ -827,7 +868,7 @@ function loadNavSettings() {
         'fw_loiter_direction', 'nav_fw_loiter_radius', 'nav_fw_cruise_speed'];
     return Promise.all(names.map((n) => mspHelper.getSetting(n).catch(() => null))).then((s) => {
         const value = (i, fallback) => (s[i] ? s[i].value : fallback);
-        const loiter = s[4] && s[4].setting.table ? s[4].setting.table.values[s[4].value] : 'RIGHT';
+        const loiter = s[4]?.setting.table ? s[4].setting.table.values[s[4].value] : 'RIGHT';
         navSettings = {
             bankDeg: value(0, 35),
             rollRateDps: value(1, 18) * 10,
@@ -838,6 +879,15 @@ function loadNavSettings() {
             cruiseSpeed: value(6, 0) / 100
         };
     });
+}
+
+/* The settings, then the approaches, then the EEPROM */
+function save() {
+    Settings.saveInputs(() => mspHelper.saveFwApproach(saveToEeprom));
+}
+
+function saveToEeprom() {
+    mspHelper.saveToEeprom(() => GUI.log(i18n.getMessage('autolandSaved')));
 }
 
 autolandTab.initialize = function (callback) {
@@ -856,7 +906,8 @@ autolandTab.initialize = function (callback) {
     loadChainer.execute();
 
     function loadHtml() {
-        import('./autoland.html?raw').then(({ default: html }) => GUI.load(html, Settings.processHtml(processHtml)));
+        import('./autoland.html?raw').then(({ default: html }) => GUI.load(html, Settings.processHtml(processHtml)))
+        .catch((e) => console.error('autoland: the tab did not load', e));
     }
 
     function processHtml(settingsPromise) {
@@ -872,11 +923,11 @@ autolandTab.initialize = function (callback) {
         const select = $('#autolandSiteSelect');
         for (let i = 0; i < FC.SAFEHOMES.getMaxSafehomeCount(); i++) {
             const safehome = FC.SAFEHOMES.get()[i];
-            const key = safehome && safehome.getEnabled() ? 'autolandSafehomeN' : 'autolandSafehomeUnset';
+            const key = safehome?.getEnabled() ? 'autolandSafehomeN' : 'autolandSafehomeUnset';
             select.append($('<option/>').val(i).text(i18n.getMessage(key, { number: String(i + 1) })));
         }
         select.val(siteIndex).on('change', () => {
-            siteIndex = parseInt(select.val(), 10);
+            siteIndex = Number.parseInt(select.val(), 10);
             directionIndex = 0;
             fillApproach();
             fillRunway();
@@ -894,17 +945,17 @@ autolandTab.initialize = function (callback) {
         const clamp = (value) => Math.min(Math.max(Math.round(value || 0), 0), 255);
         $('#autolandRunwayStart').on('input change', function () {
             const a = approach();
-            const dir = lastPlan && lastPlan.directions[directionIndex];
+            const dir = lastPlan?.directions[directionIndex];
             if (a && dir) {
-                a.setRunwayStart(dir.aimIndex, clamp(parseFloat($(this).val())));
+                a.setRunwayStart(dir.aimIndex, clamp(Number.parseFloat($(this).val())));
                 redraw();
             }
         });
         $('#autolandRunwayStartHeight').on('input change', function () {
             const a = approach();
-            const dir = lastPlan && lastPlan.directions[directionIndex];
-            const value = parseFloat($(this).val());
-            if (a && dir && !isNaN(value)) {
+            const dir = lastPlan?.directions[directionIndex];
+            const value = Number.parseFloat($(this).val());
+            if (a && dir && !Number.isNaN(value)) {
                 a.setRunwayStartHeight(dir.aimIndex, clamp(value * 10));
                 redraw();
             }
@@ -913,8 +964,8 @@ autolandTab.initialize = function (callback) {
         $('#autolandRunwayLength, #autolandRunwayWidth').on('input change', () => {
             const runways = store.get(RUNWAY_STORE_KEY, {});
             runways[siteIndex] = {
-                length: parseFloat($('#autolandRunwayLength').val()) || 0,
-                width: parseFloat($('#autolandRunwayWidth').val()) || 0
+                length: Number.parseFloat($('#autolandRunwayLength').val()) || 0,
+                width: Number.parseFloat($('#autolandRunwayWidth').val()) || 0
             };
             store.set(RUNWAY_STORE_KEY, runways);
             redraw();
@@ -933,11 +984,7 @@ autolandTab.initialize = function (callback) {
         });
 
         // the approach fields are stored on change: storing them again here would round what Mission Control set
-        $('a.save').on('click', () => {
-            Settings.saveInputs(() => mspHelper.saveFwApproach(() => mspHelper.saveToEeprom(() => {
-                GUI.log(i18n.getMessage('autolandSaved'));
-            })));
-        });
+        $('a.save').on('click', save);
 
         // the tab is ready even if the first drawing fails, or no other tab could be opened
         Promise.all([settingsPromise, loadNavSettings()]).then(() => {

@@ -60,7 +60,22 @@
 
 .tab-autoland .autolandSettings .config-section select,
 .tab-autoland .autolandSettings .spacer_box div input {
-    margin-right: 0 !important;
+    margin-right: 0;
+}
+
+/* read by screen readers only: the checks table's headers, the runway start height's label */
+.tab-autoland .autolandHidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+}
+
+.tab-autoland .autolandCheckTable {
+    width: 100%;
+    border-spacing: 0;
 }
 
 .tab-autoland .autolandWarnings {
@@ -144,8 +159,8 @@
 }
 
 .tab-autoland .autolandDirections button.active {
-    background: #2a78d6;
-    border-color: #2a78d6;
+    background: #1c5cab;
+    border-color: #1c5cab;
     color: #fff;
 }
 

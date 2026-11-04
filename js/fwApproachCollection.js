@@ -89,7 +89,7 @@ let FwApproachCollection = function () {
                 buffer.push(fwApproach.getRunwayStartHeight(i));
             }
         } else {
-            buffer = Array(23).fill(0);
+            buffer = new Array(23).fill(0);
             buffer[0] = safehomeId;
         }
         

@@ -44,6 +44,9 @@ const Phase = Object.freeze({
     FLARE: 'flare'
 });
 
+// the landing site: the frame's origin
+const SITE = Object.freeze({ n: 0, e: 0 });
+
 function wrap360(deg) {
     return ((deg % 360) + 360) % 360;
 }
@@ -145,7 +148,7 @@ function after(prevEnd, corner, target, r) {
     if (!arc.length) {
         return corner;
     }
-    return { start: prevEnd, end: arc[arc.length - 1], points: [prevEnd, ...arc], inBearing: corner.inBearing, moved: true };
+    return { start: prevEnd, end: arc.at(-1), points: [prevEnd, ...arc], inBearing: corner.inBearing, moved: true };
 }
 
 /* Arc of radius r from a heading until the aircraft points at the target, as the navigation turns after the circle */
@@ -181,157 +184,40 @@ function straight(a, b) {
     return points;
 }
 
-/*
- * One landing direction. p: approachAlt and finalAlt (m above the landing altitude), approachLength, downwindOffset,
- * landLoiterRadius, loiterRadius, aimOffset, glideAlt, flareAlt, runwayLength (m), flareSink, speed (m/s), flareTime (s),
- * bankDeg, rollRateDps,
- * controlSmoothness, wpTurnControlEaseMs, loiterDirection (+1 right, -1 left), approach {side, heading1, heading2,
- * runwayStarts [4] (m before the site, 0: aimOffset is the touchdown), runwayHeights [4] (m)}
- */
-function planDirection(p, direction) {
-    const circuit = p.downwindOffset > 0;
-    const L = direction.landing;
-    const side = approachSide(p.approach, direction.configured, circuit);
-    const site = { n: 0, e: 0 };
-    const finalAlt = p.finalAlt > 0 ? p.finalAlt : p.approachAlt / 3 * 2;
-    const warnings = [];
-
+/* The turn radii a direction plans with: the coordinated turn at the approach speed, the wind circle widened to it */
+function planRadii(ctx) {
+    const p = ctx.p;
     const turnRadius = coordinatedTurnRadius(p.speed, p.bankDeg);
     const plannedLead = turnRadius + p.speed * turnEaseTimeMs(p) / 1000 * 1.5;
     const loiterRadius = p.landLoiterRadius > 0 ? p.landLoiterRadius : p.loiterRadius;
-    const circleRadius = circuit ? Math.max(loiterRadius, turnRadius) : loiterRadius;
-    if (circuit && p.landLoiterRadius > 0 && turnRadius > p.landLoiterRadius + 0.5) {
-        warnings.push({ id: AutolandWarning.CIRCLE_WIDER, value: turnRadius, speed: p.speed, bank: p.bankDeg, setting: p.landLoiterRadius });
+    const circleRadius = ctx.circuit ? Math.max(loiterRadius, turnRadius) : loiterRadius;
+    if (ctx.circuit && p.landLoiterRadius > 0 && turnRadius > p.landLoiterRadius + 0.5) {
+        ctx.warnings.push({ id: AutolandWarning.CIRCLE_WIDER, value: turnRadius, speed: p.speed, bank: p.bankDeg, setting: p.landLoiterRadius });
     }
     // Turn space before the straight final, and the radius the corners are flown at
-    const turnSpace = circuit ? Math.max(loiterRadius, plannedLead, circleRadius) : 0;
-    const cornerRadius = circuit ? circleRadius : turnRadius;
+    return {
+        circleRadius,
+        turnSpace: ctx.circuit ? Math.max(loiterRadius, plannedLead, circleRadius) : 0,
+        cornerRadius: ctx.circuit ? circleRadius : turnRadius
+    };
+}
 
-    // Sink-rate flare (nav_fw_land_flare_sink): it asks height / flare time down to the flare sink, held below flare sink
-    // x flare time, from where that equals the final's sink (between flare_alt and twice glide_alt). The final's line
-    // goes on below the ground and is aimed short by the part of the flare's run past where it meets it, so the wheels
-    // touch at the aim point
-    const sinkFlare = circuit && p.flareSink > 0;
-    const lineSlope = finalAlt / Math.max(p.approachLength, 1);
+/*
+ * Sink-rate flare (nav_fw_land_flare_sink): it asks height / flare time down to the flare sink, held below flare sink
+ * x flare time, from where that equals the final's sink (between flare_alt and twice glide_alt). The final's line goes
+ * on below the ground and is aimed short by the part of the flare's run past where it meets it, so the wheels touch at
+ * the aim point
+ */
+function planFlare(ctx) {
+    const p = ctx.p;
+    const sinkFlare = ctx.circuit && p.flareSink > 0;
+    const lineSlope = ctx.finalAlt / Math.max(p.approachLength, 1);
     const flareTime = p.flareTime > 0 ? p.flareTime : FLARE_TIME_S;
     const floorHeight = (p.flareSink || 0) * flareTime;
     const flareStart = sinkFlare ? Math.min(Math.max(lineSlope * p.speed * flareTime, p.flareAlt), 2 * p.glideAlt) : 0;
     const flareStartToGo = flareStart / Math.max(lineSlope, 0.001);
     const roundOutRun = flareStart > floorHeight ? p.speed * flareTime * Math.log(flareStart / floorHeight) : 0;
     const floorRun = Math.min(flareStart, floorHeight) / Math.max(p.flareSink || 0, 0.01) * p.speed;
-    const flareRun = sinkFlare ? roundOutRun + floorRun - flareStartToGo : 0;
-    // With the direction's runway start set the line crosses it at its height and the wheels touch where the flare
-    // ends; else nav_fw_land_aim_offset before the site
-    const runwayStart = p.approach.runwayStarts ? p.approach.runwayStarts[direction.aimIndex] : 0;
-    let lineGroundBefore = p.aimOffset + flareRun;
-    if (runwayStart > 0) {
-        const height = Math.min(p.approach.runwayHeights ? p.approach.runwayHeights[direction.aimIndex] : 0, finalAlt);
-        lineGroundBefore = runwayStart - height / Math.max(lineSlope, 0.001);
-    }
-    const aimOffset = lineGroundBefore - flareRun;
-    const lineGround = move(site, L + 180, lineGroundBefore);
-    const aim = move(lineGround, L, flareRun);
-    const finalLength = p.approachLength + turnSpace;
-    const finalStart = move(lineGround, L + 180, finalLength);
-    const landWp = move(lineGround, L, finalLength);
-
-    let circleCenter;
-    let downwindDistance;
-    let exitPoint;
-    let exitHeading;
-    let downwindCorner = null;
-    if (circuit) {
-        circleCenter = move(site, side, p.downwindOffset + circleRadius);
-        const rightOfLanding = wrap180(side - L) > 0;
-        const inner = rightOfLanding ? p.loiterDirection < 0 : p.loiterDirection > 0;
-        // The downwind leg is the circle's far tangent, two radii further out. The circle is left heading down it;
-        // when the circle turns towards the runway that heading comes on its near side, with no room for the base,
-        // so it is left heading out instead, on the side of the final: a straight to roll level and a 90 degree
-        // turn onto the downwind, which then lies out by both
-        downwindDistance = p.downwindOffset + (inner
-            ? circleRadius + turnSpace + p.speed * CIRCLE_EXIT_STRAIGHT_S
-            : 2 * circleRadius);
-        exitHeading = inner ? side : wrap360(L + 180);
-        exitPoint = move(circleCenter, exitHeading - 90 * p.loiterDirection, circleRadius);
-        if (inner) {
-            const u = unit(side);
-            const lateral = (exitPoint.n - site.n) * u.n + (exitPoint.e - site.e) * u.e;
-            downwindCorner = move(exitPoint, side, Math.max(downwindDistance - lateral, 0));
-        }
-        if (p.downwindOffset < MIN_CIRCLE_GAP_M) {
-            warnings.push({ id: AutolandWarning.CIRCLE_CLOSE, value: p.downwindOffset });
-        }
-    } else {
-        circleCenter = site;
-        downwindDistance = Math.max(p.loiterRadius * 4, p.approachLength / 2);
-    }
-    const turnWp = move(finalStart, side, downwindDistance);
-    if (!circuit) {
-        // The classic approach heads for the turn point from the circle over the site
-        exitPoint = move(circleCenter, bearing(circleCenter, turnWp), circleRadius);
-        exitHeading = bearing(exitPoint, turnWp);
-    }
-    if (circuit && downwindDistance < 2 * cornerRadius) {
-        warnings.push({ id: AutolandWarning.BASE_SHORT, value: downwindDistance });
-    }
-
-    // Track: exit -> [straight out, corner onto the downwind | turn towards the turn point] -> downwind -> corner at
-    // the turn point -> base -> corner at the final start -> final past the aim
-    const track = [];
-    const push = (points, phase, leg) => points.forEach((pt) => track.push({ ...pt, phase, leg }));
-    push([exitPoint], Phase.DOWNWIND, 0);
-    // The leg the firmware flies switches where the corner cut starts turning (FLY_BY)
-    let downwindStart;
-    let downwindFrom;   // the point the downwind's line runs from, towards the turn point
-    let leg = 0;
-    if (downwindCorner) {
-        const corner0 = after(exitPoint, fillet(exitPoint, downwindCorner, turnWp, cornerRadius), turnWp, cornerRadius);
-        push(straight(exitPoint, corner0.start), Phase.DOWNWIND, leg++);
-        push(corner0.points.slice(1), Phase.DOWNWIND, leg);
-        downwindStart = corner0.end;
-        downwindFrom = corner0.moved ? corner0.end : downwindCorner;
-    } else {
-        const leaving = turnTowards(exitPoint, exitHeading, turnWp, cornerRadius);
-        push(leaving, Phase.DOWNWIND, leg);
-        downwindStart = leaving.length ? leaving[leaving.length - 1] : exitPoint;
-        downwindFrom = downwindStart;
-    }
-    // each turn from where its leg really runs, so a turn that came late keeps the next leg tangent
-    const corner1 = after(downwindStart, fillet(downwindFrom, turnWp, finalStart, cornerRadius), finalStart, cornerRadius);
-    const corner2 = after(corner1.end, fillet(corner1.moved ? corner1.end : turnWp, finalStart, aim, cornerRadius), aim,
-        cornerRadius);
-    const touchdownEnd = move(aim, L, Math.max(aimOffset, 20));
-    push(straight(downwindStart, corner1.start), Phase.DOWNWIND, leg++);
-    push(corner1.points.slice(1), Phase.BASE, leg);
-    push(straight(corner1.end, corner2.start), Phase.BASE, leg++);
-    push(corner2.points.slice(1), Phase.TURN_FINAL, leg);
-    push(straight(corner2.end, touchdownEnd), Phase.FINAL, leg);
-
-    // Distance still to go (fwLandCircuitPathToGo): along the leg flown to its end, plus the distance from it, plus
-    // the legs after it
-    const baseLength = distance(turnWp, finalStart);
-    const legs = [
-        { end: turnWp, dir: wrap360(L + 180), after: baseLength + finalLength },
-        { end: finalStart, dir: bearing(turnWp, finalStart), after: finalLength },
-        { end: lineGround, dir: L, after: 0 }
-    ];
-    if (downwindCorner) {
-        // straight out to the corner, square to the final
-        const u = unit(L);
-        const out = { n: downwindCorner.n - finalStart.n, e: downwindCorner.e - finalStart.e };
-        const onFinal = out.n * u.n + out.e * u.e;
-        const outward = bearing({ n: 0, e: 0 }, { n: out.n - onFinal * u.n, e: out.e - onFinal * u.e });
-        legs.unshift({ end: downwindCorner, dir: outward, after: distance(downwindCorner, turnWp) + baseLength + finalLength });
-    }
-    const toGoOf = (pt) => {
-        const flownLeg = legs[pt.leg];
-        const u = unit(flownLeg.dir);
-        let along = (flownLeg.end.n - pt.n) * u.n + (flownLeg.end.e - pt.e) * u.e;
-        if (pt.leg < legs.length - 1) {
-            along = Math.max(along, 0);
-        }
-        return along + Math.abs((flownLeg.end.n - pt.n) * u.e - (flownLeg.end.e - pt.e) * u.n) + flownLeg.after;
-    };
     // the final's height over the distance to where its line meets the ground: the line, then the flare
     const finalLine = (toGo) => {
         if (!sinkFlare || toGo >= flareStartToGo) {
@@ -343,11 +229,156 @@ function planDirection(p, direction) {
         }
         return Math.max(Math.min(flareStart, floorHeight) - (into - roundOutRun) * p.flareSink / Math.max(p.speed, 1), 0);
     };
+    return { sinkFlare, lineSlope, flareStart, flareRun: sinkFlare ? roundOutRun + floorRun - flareStartToGo : 0, finalLine };
+}
 
-    // Altitude asked along the track
+/* With the direction's runway start set the line crosses it at its height and the wheels touch where the flare ends;
+   else nav_fw_land_aim_offset before the site */
+function planFinal(ctx, direction, flare, turnSpace) {
+    const p = ctx.p;
+    const runwayStart = p.approach.runwayStarts ? p.approach.runwayStarts[direction.aimIndex] : 0;
+    let lineGroundBefore = p.aimOffset + flare.flareRun;
+    if (runwayStart > 0) {
+        const height = Math.min(p.approach.runwayHeights ? p.approach.runwayHeights[direction.aimIndex] : 0, ctx.finalAlt);
+        lineGroundBefore = runwayStart - height / Math.max(flare.lineSlope, 0.001);
+    }
+    const lineGround = move(SITE, ctx.L + 180, lineGroundBefore);
+    const finalLength = p.approachLength + turnSpace;
+    return {
+        runwayStart,
+        aimOffset: lineGroundBefore - flare.flareRun,
+        lineGround,
+        aim: move(lineGround, ctx.L, flare.flareRun),
+        finalLength,
+        finalStart: move(lineGround, ctx.L + 180, finalLength),
+        landWp: move(lineGround, ctx.L, finalLength)
+    };
+}
+
+/*
+ * The wind circle, where it is left and the turn point before the base. The circuit's downwind leg is the circle's far
+ * tangent, two radii further out. The circle is left heading down it; when the circle turns towards the runway that
+ * heading comes on its near side, with no room for the base, so it is left heading out instead, on the side of the
+ * final: a straight to roll level and a 90 degree turn onto the downwind, which then lies out by both
+ */
+function planCircle(ctx, radii, finalStart) {
+    const p = ctx.p;
+    if (!ctx.circuit) {
+        // The classic approach heads for the turn point from the circle over the site
+        const turnWp = move(finalStart, ctx.side, Math.max(p.loiterRadius * 4, p.approachLength / 2));
+        const exitPoint = move(SITE, bearing(SITE, turnWp), radii.circleRadius);
+        return { circleCenter: SITE, exitPoint, exitHeading: bearing(exitPoint, turnWp), downwindCorner: null, turnWp };
+    }
+    const circleCenter = move(SITE, ctx.side, p.downwindOffset + radii.circleRadius);
+    const rightOfLanding = wrap180(ctx.side - ctx.L) > 0;
+    const inner = rightOfLanding ? p.loiterDirection < 0 : p.loiterDirection > 0;
+    const out = inner ? radii.circleRadius + radii.turnSpace + p.speed * CIRCLE_EXIT_STRAIGHT_S : 2 * radii.circleRadius;
+    const downwindDistance = p.downwindOffset + out;
+    const exitHeading = inner ? ctx.side : wrap360(ctx.L + 180);
+    const exitPoint = move(circleCenter, exitHeading - 90 * p.loiterDirection, radii.circleRadius);
+    let downwindCorner = null;
+    if (inner) {
+        const u = unit(ctx.side);
+        const lateral = exitPoint.n * u.n + exitPoint.e * u.e;
+        downwindCorner = move(exitPoint, ctx.side, Math.max(downwindDistance - lateral, 0));
+    }
+    if (p.downwindOffset < MIN_CIRCLE_GAP_M) {
+        ctx.warnings.push({ id: AutolandWarning.CIRCLE_CLOSE, value: p.downwindOffset });
+    }
+    if (downwindDistance < 2 * radii.cornerRadius) {
+        ctx.warnings.push({ id: AutolandWarning.BASE_SHORT, value: downwindDistance });
+    }
+    return { circleCenter, exitPoint, exitHeading, downwindCorner, turnWp: move(finalStart, ctx.side, downwindDistance) };
+}
+
+/*
+ * Track: exit -> [straight out, corner onto the downwind | turn towards the turn point] -> downwind -> corner at the
+ * turn point -> base -> corner at the final start -> final past the aim. The leg the firmware flies switches where the
+ * corner cut starts turning (FLY_BY); each turn from where its leg really runs, so a turn that came late keeps the
+ * next leg tangent
+ */
+function planTrack(ctx, c, fin, r) {
+    const track = [];
+    const push = (points, phase, leg) => points.forEach((pt) => track.push({ ...pt, phase, leg }));
+    push([c.exitPoint], Phase.DOWNWIND, 0);
+    let downwindStart = c.exitPoint;
+    let downwindFrom;   // the point the downwind's line runs from, towards the turn point
+    let leg = 0;
+    if (c.downwindCorner) {
+        const corner0 = after(c.exitPoint, fillet(c.exitPoint, c.downwindCorner, c.turnWp, r), c.turnWp, r);
+        push(straight(c.exitPoint, corner0.start), Phase.DOWNWIND, leg++);
+        push(corner0.points.slice(1), Phase.DOWNWIND, leg);
+        downwindStart = corner0.end;
+        downwindFrom = corner0.moved ? corner0.end : c.downwindCorner;
+    } else {
+        const leaving = turnTowards(c.exitPoint, c.exitHeading, c.turnWp, r);
+        push(leaving, Phase.DOWNWIND, leg);
+        if (leaving.length) {
+            downwindStart = leaving.at(-1);
+        }
+        downwindFrom = downwindStart;
+    }
+    const corner1 = after(downwindStart, fillet(downwindFrom, c.turnWp, fin.finalStart, r), fin.finalStart, r);
+    const corner2 = after(corner1.end, fillet(corner1.moved ? corner1.end : c.turnWp, fin.finalStart, fin.aim, r), fin.aim, r);
+    push(straight(downwindStart, corner1.start), Phase.DOWNWIND, leg++);
+    push(corner1.points.slice(1), Phase.BASE, leg);
+    push(straight(corner1.end, corner2.start), Phase.BASE, leg++);
+    push(corner2.points.slice(1), Phase.TURN_FINAL, leg);
+    push(straight(corner2.end, move(fin.aim, ctx.L, Math.max(fin.aimOffset, 20))), Phase.FINAL, leg);
+    return track;
+}
+
+/* Distance still to go (fwLandCircuitPathToGo): along the leg flown to its end, plus the distance from it, plus the
+   legs after it */
+function planToGo(ctx, c, fin) {
+    const baseLength = distance(c.turnWp, fin.finalStart);
+    const legs = [
+        { end: c.turnWp, dir: wrap360(ctx.L + 180), after: baseLength + fin.finalLength },
+        { end: fin.finalStart, dir: bearing(c.turnWp, fin.finalStart), after: fin.finalLength },
+        { end: fin.lineGround, dir: ctx.L, after: 0 }
+    ];
+    if (c.downwindCorner) {
+        // straight out to the corner, square to the final
+        const u = unit(ctx.L);
+        const out = { n: c.downwindCorner.n - fin.finalStart.n, e: c.downwindCorner.e - fin.finalStart.e };
+        const onFinal = out.n * u.n + out.e * u.e;
+        const outward = bearing(SITE, { n: out.n - onFinal * u.n, e: out.e - onFinal * u.e });
+        legs.unshift({ end: c.downwindCorner, dir: outward, after: distance(c.downwindCorner, c.turnWp) + baseLength + fin.finalLength });
+    }
+    return (pt) => {
+        const flownLeg = legs[pt.leg];
+        const u = unit(flownLeg.dir);
+        let along = (flownLeg.end.n - pt.n) * u.n + (flownLeg.end.e - pt.e) * u.e;
+        if (pt.leg < legs.length - 1) {
+            along = Math.max(along, 0);
+        }
+        return along + Math.abs((flownLeg.end.n - pt.n) * u.e - (flownLeg.end.e - pt.e) * u.n) + flownLeg.after;
+    };
+}
+
+/* The altitude asked at a point: the circuit descends evenly to the final, the classic approach on its base */
+function altitudeAt(ctx, pt, before, flare, c, fin) {
+    const p = ctx.p;
+    if (ctx.circuit) {
+        const descent = ctx.finalAlt + (p.approachAlt - ctx.finalAlt) * Math.min(Math.max(1 - pt.flown / before, 0), 1);
+        return Math.min(descent, flare.finalLine(pt.toGo));
+    }
+    if (pt.phase === Phase.DOWNWIND) {
+        return p.approachAlt;
+    }
+    if (pt.phase === Phase.BASE) {
+        const baseLen = Math.max(distance(c.turnWp, fin.finalStart), 1);
+        const done = Math.min(distance(c.turnWp, pt) / (0.9 * baseLen), 1);
+        return p.approachAlt + (ctx.finalAlt - p.approachAlt) * done;
+    }
+    return Math.min(ctx.finalAlt, flare.finalLine(pt.toGo));
+}
+
+/* Distance flown, to go and the altitude asked along the track; returns the distance the circuit's legs descend over */
+function planAltitudes(ctx, track, flare, c, fin) {
+    const toGoOf = planToGo(ctx, c, fin);
+    const before = Math.max(toGoOf(track[0]) - ctx.p.approachLength, 1);
     let flown = 0;
-    const pathLength = toGoOf(track[0]);
-    const before = Math.max(pathLength - p.approachLength, 1);
     for (let i = 0; i < track.length; i++) {
         if (i > 0) {
             flown += distance(track[i - 1], track[i]);
@@ -355,86 +386,105 @@ function planDirection(p, direction) {
         const pt = track[i];
         pt.flown = flown;
         pt.toGo = toGoOf(pt);
-        if (circuit) {
-            const descent = finalAlt + (p.approachAlt - finalAlt) * Math.min(Math.max(1 - flown / before, 0), 1);
-            pt.alt = Math.min(descent, finalLine(pt.toGo));
-        } else if (pt.phase === Phase.DOWNWIND) {
-            pt.alt = p.approachAlt;
-        } else if (pt.phase === Phase.BASE) {
-            const baseLen = Math.max(distance(turnWp, finalStart), 1);
-            const done = Math.min(distance(turnWp, pt) / (0.9 * baseLen), 1);
-            pt.alt = p.approachAlt + (finalAlt - p.approachAlt) * done;
-        } else {
-            pt.alt = Math.min(finalAlt, finalLine(pt.toGo));
-        }
-        pt.alt = Math.max(pt.alt, 0);
+        pt.alt = Math.max(altitudeAt(ctx, pt, before, flare, c, fin), 0);
     }
+    return before;
+}
 
-    // Throttle cut and flare where the final crosses their heights
-    const crossing = (height) => {
-        for (let i = 1; i < track.length; i++) {
-            if (track[i - 1].alt > height && track[i].alt <= height) {
-                const k = (track[i - 1].alt - height) / (track[i - 1].alt - track[i].alt);
-                return {
-                    n: track[i - 1].n + (track[i].n - track[i - 1].n) * k,
-                    e: track[i - 1].e + (track[i].e - track[i - 1].e) * k,
-                    flown: track[i - 1].flown + (track[i].flown - track[i - 1].flown) * k,
-                    alt: height
-                };
-            }
+/* Where the final crosses a height, between two track points */
+function crossingOf(track, height) {
+    for (let i = 1; i < track.length; i++) {
+        const a = track[i - 1];
+        const b = track[i];
+        if (a.alt > height && b.alt <= height) {
+            const k = (a.alt - height) / (a.alt - b.alt);
+            return { n: a.n + (b.n - a.n) * k, e: a.e + (b.e - a.e) * k, flown: a.flown + (b.flown - a.flown) * k, alt: height };
         }
-        return null;
-    };
-    const glide = crossing(sinkFlare ? flareStart - 0.01 : p.glideAlt);
-    const flare = p.flareAlt > 0 ? crossing(p.flareAlt) : null;
-    const touchdown = sinkFlare ? crossing(0.01) : null;
+    }
+    return null;
+}
+
+/* Throttle cut and flare where the final crosses their heights, the track's phases after them */
+function planFlareMarks(ctx, track, flare) {
+    const glide = crossingOf(track, flare.sinkFlare ? flare.flareStart - 0.01 : ctx.p.glideAlt);
+    const flarePoint = ctx.p.flareAlt > 0 ? crossingOf(track, ctx.p.flareAlt) : null;
     for (const pt of track) {
-        if (flare && pt.flown >= flare.flown) {
+        if (flarePoint && pt.flown >= flarePoint.flown) {
             pt.phase = Phase.FLARE;
         } else if (glide && pt.flown >= glide.flown) {
             pt.phase = Phase.GLIDE;
         }
     }
+    return { glide, flare: flarePoint, touchdown: flare.sinkFlare ? crossingOf(track, 0.01) : null };
+}
 
-    const finalSlope = Math.atan(finalAlt / Math.max(p.approachLength, 1)) * 180 / Math.PI;
+/* The slopes, and the height over the ground before the runway */
+function planWarnings(ctx, track, before, runwayStart) {
+    const p = ctx.p;
+    const finalSlope = Math.atan(ctx.finalAlt / Math.max(p.approachLength, 1)) * 180 / Math.PI;
     if (finalSlope > STEEP_SLOPE_DEG) {
-        warnings.push({ id: AutolandWarning.FINAL_STEEP, value: finalSlope });
+        ctx.warnings.push({ id: AutolandWarning.FINAL_STEEP, value: finalSlope });
     }
     // the runway starts where set for the direction, else where it is drawn (centred on the site): low before that is
     // low over the ground before the runway, which need not be level or clear
     const startBefore = runwayStart > 0 ? runwayStart : p.runwayLength / 2;
-    if (startBefore > 0) {
-        const threshold = move(site, L + 180, startBefore);
-        const u = unit(L);
-        const low = track.find((pt) => pt.phase !== Phase.DOWNWIND && pt.phase !== Phase.BASE && pt.alt < LOW_HEIGHT_M);
-        const shortOf = low ? (threshold.n - low.n) * u.n + (threshold.e - low.e) * u.e : 0;
+    const low = track.find((pt) => pt.phase !== Phase.DOWNWIND && pt.phase !== Phase.BASE && pt.alt < LOW_HEIGHT_M);
+    if (startBefore > 0 && low) {
+        const threshold = move(SITE, ctx.L + 180, startBefore);
+        const u = unit(ctx.L);
+        const shortOf = (threshold.n - low.n) * u.n + (threshold.e - low.e) * u.e;
         if (shortOf > 1) {
-            warnings.push({ id: AutolandWarning.LOW_BEFORE_RUNWAY, value: shortOf, height: LOW_HEIGHT_M });
+            ctx.warnings.push({ id: AutolandWarning.LOW_BEFORE_RUNWAY, value: shortOf, height: LOW_HEIGHT_M });
         }
     }
-    if (circuit) {
-        const legsSlope = Math.atan((p.approachAlt - finalAlt) / before) * 180 / Math.PI;
-        if (legsSlope > STEEP_SLOPE_DEG) {
-            warnings.push({ id: AutolandWarning.LEGS_STEEP, value: legsSlope });
-        }
+    const legsSlope = Math.atan((p.approachAlt - ctx.finalAlt) / before) * 180 / Math.PI;
+    if (ctx.circuit && legsSlope > STEEP_SLOPE_DEG) {
+        ctx.warnings.push({ id: AutolandWarning.LEGS_STEEP, value: legsSlope });
     }
+}
+
+/*
+ * One landing direction. p: approachAlt and finalAlt (m above the landing altitude), approachLength, downwindOffset,
+ * landLoiterRadius, loiterRadius, aimOffset, glideAlt, flareAlt, runwayLength (m), flareSink, speed (m/s), flareTime (s),
+ * bankDeg, rollRateDps,
+ * controlSmoothness, wpTurnControlEaseMs, loiterDirection (+1 right, -1 left), approach {side, heading1, heading2,
+ * runwayStarts [4] (m before the site, 0: aimOffset is the touchdown), runwayHeights [4] (m)}
+ */
+function planDirection(p, direction) {
+    const circuit = p.downwindOffset > 0;
+    const ctx = {
+        p,
+        circuit,
+        L: direction.landing,
+        side: approachSide(p.approach, direction.configured, circuit),
+        finalAlt: p.finalAlt > 0 ? p.finalAlt : p.approachAlt / 3 * 2,
+        warnings: []
+    };
+    const radii = planRadii(ctx);
+    const flare = planFlare(ctx);
+    const fin = planFinal(ctx, direction, flare, radii.turnSpace);
+    const c = planCircle(ctx, radii, fin.finalStart);
+    const track = planTrack(ctx, c, fin, radii.cornerRadius);
+    const before = planAltitudes(ctx, track, flare, c, fin);
+    const marks = planFlareMarks(ctx, track, flare);
+    planWarnings(ctx, track, before, fin.runwayStart);
 
     return {
-        landing: L,
-        side,
+        landing: ctx.L,
+        side: ctx.side,
         circuit,
-        circle: { center: circleCenter, radius: circleRadius },
+        circle: { center: c.circleCenter, radius: radii.circleRadius },
         aimIndex: direction.aimIndex,
-        aimOffset,
-        waypoints: { exit: exitPoint, downwind: downwindCorner, turn: turnWp, finalStart, aim, land: landWp },
-        cornerRadius,
-        finalAlt,
+        aimOffset: fin.aimOffset,
+        waypoints: { exit: c.exitPoint, downwind: c.downwindCorner, turn: c.turnWp, finalStart: fin.finalStart, aim: fin.aim, land: fin.landWp },
+        cornerRadius: radii.cornerRadius,
+        finalAlt: ctx.finalAlt,
         track,
-        glide,
-        flare,
-        sinkFlare,
-        touchdown,
-        warnings
+        glide: marks.glide,
+        flare: marks.flare,
+        sinkFlare: flare.sinkFlare,
+        touchdown: marks.touchdown,
+        warnings: ctx.warnings
     };
 }
 
