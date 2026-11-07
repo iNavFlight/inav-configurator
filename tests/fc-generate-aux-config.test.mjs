@@ -163,6 +163,16 @@ test('generateAuxConfig() positive control: an all-recognized id list passes thr
     assert.deepEqual(FC.AUX_CONFIG, ['ARM', 'ANGLE', 'HORIZON']);
 });
 
+test('generateAuxConfig() keeps THERMAL CALIBRATE (permanentId 73): the firmware only advertises it when the camera UART is assigned, so a missing FLIGHT_MODES entry silently hides the mode', () => {
+    FC.resetState();
+    FC.AUX_CONFIG_IDS = [0, 73];
+
+    FC.generateAuxConfig();
+
+    assert.deepEqual(FC.AUX_CONFIG_IDS, [0, 73]);
+    assert.deepEqual(FC.AUX_CONFIG, ['ARM', 'THERMAL CALIBRATE']);
+});
+
 test('generateAuxConfig() negative control: an all-unrecognized id list empties both arrays', () => {
     FC.resetState();
     FC.AUX_CONFIG_IDS = [9990, 9991, 9992];
