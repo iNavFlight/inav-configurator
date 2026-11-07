@@ -20,7 +20,13 @@ adjustmentsTab.initialize = function (callback) {
     MSP.send_message(MSPCodes.MSP_ADJUSTMENT_RANGES, false, false, get_rc_data);
 
     function get_rc_data() {
-        MSP.send_message(MSPCodes.MSP_RC, false, false, load_html);
+        MSP.send_message(MSPCodes.MSP_RC, false, false, get_serial_config);
+    }
+
+    function get_serial_config() {
+        // FC.isMztcPortAssigned() gates the thermal camera adjustments and
+        // reads FC.SERIAL_CONFIG, which no other request on this tab fills in.
+        mspHelper.loadSerialPorts(load_html);
     }
 
     function load_html() {
@@ -63,12 +69,17 @@ adjustmentsTab.initialize = function (callback) {
 
         var functionList = $(newAdjustment).find('.functionSelection .function');
 
-        // update list of selected functions
-        var functionListOptions = $(functionList).find('option');
-        var availableFunctionCount = 63; // Set this to highest adjustment value + 1
-
-        var functionListOptions = $(functionListOptions).slice(0,availableFunctionCount);
-        //functionList.empty().append(functionListOptions);
+        // The thermal camera adjustments only exist on firmware that can
+        // report the MZTC_CAMERA port function, so drop them from the list
+        // otherwise. An option whose value the firmware already reports stays
+        // regardless: removing it would blank the select and a save would
+        // then rewrite the range with NaN.
+        if (!FC.isMztcPortAssigned()) {
+            $(functionList).find('option').filter(function () {
+                var value = parseInt($(this).val(), 10);
+                return (value === 61 || value === 62) && value !== adjustmentRange.adjustmentFunction;
+            }).remove();
+        }
 
         functionList.val(adjustmentRange.adjustmentFunction);
 
