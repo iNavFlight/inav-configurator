@@ -1828,7 +1828,7 @@
         "message": "MassZero Thermal Camera"
     },
     "configurationThermalCameraNote": {
-        "message": "Assign MZTC_CAMERA to a UART in the Ports tab to enable the camera. The port and its baud rate are set there. The camera ships at 115200."
+        "message": "Assign MZTC_CAMERA to a UART in the Ports tab to enable the camera. The port and its baud rate are set there. The camera ships at 115200. Compatible modules and how to identify them are listed in the <a href=\"https://github.com/iNavFlight/inav/blob/master/docs/MassZero_Thermal_Camera.md\" target=\"_blank\">thermal camera documentation</a>."
     },
     "configurationThermalCameraPreset": {
         "message": "Purpose preset"
