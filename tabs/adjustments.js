@@ -76,7 +76,7 @@ adjustmentsTab.initialize = function (callback) {
         // then rewrite the range with NaN.
         if (!FC.isMztcPortAssigned()) {
             $(functionList).find('option').filter(function () {
-                var value = parseInt($(this).val(), 10);
+                var value = Number.parseInt($(this).val(), 10);
                 return (value === 61 || value === 62) && value !== adjustmentRange.adjustmentFunction;
             }).remove();
         }
