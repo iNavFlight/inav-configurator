@@ -136,6 +136,24 @@
     min-height: 45px;
 }
 
+.tab-calibration #mag-learn-status {
+    margin-top: 0.5em;
+}
+
+.tab-calibration .gsf-intro {
+    margin: 0 0 8px;
+}
+
+.tab-calibration #gsf-ahrs-setting {
+    display: flex;
+    align-items: center;
+}
+
+.tab-calibration #gsf-ahrs-setting .helpicon {
+    float: none;
+    margin: 0 0 0 auto;
+}
+
 #calib_btn {
     margin-top: 5px;
     margin-left: 5px;
