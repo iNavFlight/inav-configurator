@@ -12,8 +12,16 @@ import i18n from './../js/localization';
 import BitHelper from './../js/bitHelper';
 import dialog from './../js/dialog';
 import Settings from './../js/settings';
+import mspQueue from './../js/serial_queue';
+import periodicStatusUpdater from './../js/periodicStatusUpdater';
 
 var sdcardTimer;
+let mscStarting = false;
+
+// The time the flight controller has to show the CLI prompt, then to answer "msc"
+const MSC_STEP_TIMEOUT_MS = 3000;
+// INAV enters the CLI 100 ms after a "#" with nothing else coming in
+const MSC_CLI_ENTRY_MS = 500;
 
 const onboardLoggingTab = {
 };
@@ -108,6 +116,100 @@ onboardLoggingTab.initialize = function (callback) {
         GUI.handleReconnect($('.tab_onboard_logging a'));
     }
 
+    function send_text(text) {
+        const buffer = new Uint8Array(text.length);
+        for (let i = 0; i < text.length; i++) {
+            buffer[i] = text.codePointAt(i);
+        }
+        CONFIGURATOR.connection.send(buffer.buffer);
+    }
+
+    // MSP_SET_REBOOT has no mass storage mode: enter the CLI and send "msc", as the CLI tab's button does
+    function reboot_to_msc() {
+        if (mscStarting || !CONFIGURATOR.connectionValid) {
+            return;
+        }
+        if (FC.isModeEnabled('ARM')) {
+            GUI.log(i18n.getMessage('onboardLoggingMscArmed'));
+            return;
+        }
+
+        mscStarting = true;
+        // No tab switch or disconnect halfway: a leftover attempt would act on the next tab or connection
+        GUI.connect_lock = true;
+        clearTimeout(sdcardTimer);
+        sdcardTimer = false;
+        $('.tab-onboard_logging a.msc-reboot').addClass('disabled');
+
+        // MSP bytes sent while the FC is in the CLI come back as typed text
+        periodicStatusUpdater.stop();
+        mspQueue.flush();
+        mspQueue.lock();
+        MSP.callbacks_cleanup();
+
+        let received = '';
+        let inCli = false;
+        let stepTimer = setTimeout(() => finish(false), MSC_STEP_TIMEOUT_MS);
+
+        function onReceive(info) {
+            received += String.fromCodePoint(...new Uint8Array(info.data));
+
+            // The banner, then the prompt the CLI waits at; an MSP reply still on its way can't end like this
+            if (!inCli && /CLI[\s\S]*\n# $/.test(received)) {
+                inCli = true;
+                received = '';
+                clearTimeout(stepTimer);
+                stepTimer = setTimeout(() => finish(false), MSC_STEP_TIMEOUT_MS);
+                send_text('msc\r\n');
+            } else if (inCli && received.includes('Rebooting')) {
+                finish(true);
+            } else if (inCli && /Storage not present|Unknown command/.test(received)) {
+                finish(false);
+            }
+        }
+
+        function release() {
+            mspQueue.unlock();
+            periodicStatusUpdater.resume();
+            mscStarting = false;
+            GUI.connect_lock = false;
+        }
+
+        // The CLI is left only through a reboot into MSP, before the reconnect
+        function leaveCli() {
+            send_text('exit\r\n');
+            release();
+            GUI.handleReconnect($('.tab_onboard_logging a'));
+        }
+
+        function finish(started) {
+            clearTimeout(stepTimer);
+            CONFIGURATOR.connection.removeOnReceiveCallback(onReceive);
+
+            if (started) {
+                release();
+                GUI.log(i18n.getMessage('onboardLoggingMscStarted'));
+                // The serial port goes away with the reboot: disconnect as the Disconnect button does
+                $('div.connect_controls a.connect').trigger('click');
+                return;
+            }
+
+            console.log('MSC reboot failed, received:', received);
+            GUI.log(i18n.getMessage('onboardLoggingMscFailed'));
+            if (inCli) {
+                leaveCli();
+                return;
+            }
+            // No prompt seen: this "#" enters the CLI, or is a comment line to a late entry. INAV drops what follows a
+            // "#" in the same read, so the exit waits for the entry, and the lock keeps MSP out of the CLI meanwhile
+            send_text('#\r\n');
+            setTimeout(leaveCli, MSC_CLI_ENTRY_MS);
+        }
+
+        CONFIGURATOR.connection.addOnReceiveCallback(onReceive);
+        send_text('#');
+    }
+
     function load_html() {
         import('./onboard_logging.html?raw').then(({default: html}) => GUI.load(html, Settings.processHtml(async function(settingsPromise) {
             // Wait for the settings to finish loading before the save handler is
@@ -136,7 +238,10 @@ onboardLoggingTab.initialize = function (callback) {
                 .toggleClass("blackbox-config-supported", FC.BLACKBOX.supported)
                 .toggleClass("blackbox-supported", blackboxSupport)
                 .toggleClass("blackbox-unsupported", !blackboxSupport)
-                .toggleClass("only-terrain-supported", !blackboxSupport && terrainEnabled);
+                .toggleClass("only-terrain-supported", !blackboxSupport && terrainEnabled)
+                .toggleClass("msc-supported", FC.CONFIG.target !== 'SITL');
+
+            $('.tab-onboard_logging a.msc-reboot').on('click', reboot_to_msc);
 
             if (dataflashPresent) {
                 // UI hooks
@@ -206,7 +311,7 @@ onboardLoggingTab.initialize = function (callback) {
             update_html();
 
             GUI.content_ready(callback);
-        })));
+        }))).catch(error => console.error('Onboard logging tab failed to load', error));
     }
 
     function populateDevices() {
@@ -285,12 +390,51 @@ onboardLoggingTab.initialize = function (callback) {
         }
     }
 
+    // A segment of the SD card bar and its legend entry, both hidden when empty
+    function update_sdcard_part(part, valueKB, label) {
+        $(".tab-onboard_logging .sdcard-contents ." + part).css({
+            width: (valueKB / FC.SDCARD.totalSizeKB * 100) + "%",
+            display: valueKB > 0 ? 'block' : 'none'
+        });
+        $(".tab-onboard_logging .sdcard-legend ." + part)
+            .toggle(valueKB > 0)
+            .text(label + " " + formatFilesizeKilobytes(valueKB));
+    }
+
+    function update_sdcard_space() {
+        const
+            sdcard = FC.SDCARD,
+            unknown = sdcard.cardFreeSizeKB === MSP.SDCARD_FREE_SPACE_UNKNOWN;
+
+        update_sdcard_part("sdcard-free", sdcard.freeSizeKB, i18n.getMessage('sdcardFreeForLogs'));
+
+        $(".tab-onboard_logging .sdcard-other").toggleClass("not-counted", unknown);
+
+        // The taken space is broken down once the firmware has also read the card's directories
+        const
+            broken = !unknown && sdcard.lostKB !== null && sdcard.lostKB !== MSP.SDCARD_FREE_SPACE_UNKNOWN,
+            terrainKB = broken ? sdcard.terrainKB : 0,
+            logTailsKB = broken ? sdcard.logTailsKB : 0,
+            lostKB = broken ? sdcard.lostKB : 0;
+
+        // Older firmware only reports the freefile, where logs go: the rest of the card shows as one part
+        if (sdcard.cardFreeSizeKB === null || unknown) {
+            update_sdcard_part("sdcard-card-free", 0, "");
+            update_sdcard_part("sdcard-other", sdcard.totalSizeKB - sdcard.freeSizeKB, i18n.getMessage(unknown ? 'sdcardNotCounted' : 'sdcardUnavailable'));
+        } else {
+            update_sdcard_part("sdcard-card-free", sdcard.cardFreeSizeKB - sdcard.freeSizeKB, i18n.getMessage('sdcardOtherFree'));
+            update_sdcard_part("sdcard-other", sdcard.totalSizeKB - sdcard.cardFreeSizeKB - terrainKB - logTailsKB - lostKB, i18n.getMessage('sdcardUsed'));
+        }
+        update_sdcard_part("sdcard-terrain", terrainKB, i18n.getMessage('sdcardTerrain'));
+        update_sdcard_part("sdcard-log-tails", logTailsKB, i18n.getMessage('sdcardLogTails'));
+        update_sdcard_part("sdcard-lost", lostKB, i18n.getMessage('sdcardLost'));
+    }
+
     function update_html() {
         update_bar_width($(".tab-onboard_logging .dataflash-used"), FC.DATAFLASH.usedSize, FC.DATAFLASH.totalSize, "Used space", false);
         update_bar_width($(".tab-onboard_logging .dataflash-free"), FC.DATAFLASH.totalSize - FC.DATAFLASH.usedSize, FC.DATAFLASH.totalSize, "Free space", false);
 
-        update_bar_width($(".tab-onboard_logging .sdcard-other"), FC.SDCARD.totalSizeKB - FC.SDCARD.freeSizeKB, FC.SDCARD.totalSizeKB, "Unavailable space", true);
-        update_bar_width($(".tab-onboard_logging .sdcard-free"), FC.SDCARD.freeSizeKB, FC.SDCARD.totalSizeKB, "Free space for logs", true);
+        update_sdcard_space();
 
         $(".btn a.erase-flash, .btn a.save-flash").toggleClass("disabled", FC.DATAFLASH.usedSize == 0);
 
@@ -319,7 +463,7 @@ onboardLoggingTab.initialize = function (callback) {
                 $(".sdcard-status").text("Unknown state " + FC.SDCARD.state);
         }
 
-        if (FC.SDCARD.supported && !sdcardTimer) {
+        if (FC.SDCARD.supported && !sdcardTimer && !mscStarting) {
             // Poll for changes in SD card status
             sdcardTimer = setTimeout(function() {
                 sdcardTimer = false;

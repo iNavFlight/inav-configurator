@@ -132,6 +132,7 @@
                         <div>
                             <a class="regular-button erase-flash" href="#" data-i18n="dataflashButtonErase"></a>
                             <a class="regular-button save-flash" href="#" data-i18n="dataflashButtonSaveFile"></a>
+                            <a class="regular-button msc-reboot require-msc" href="#" data-i18n="onboardLoggingMscButton" data-i18n_title="onboardLoggingMscNote">Mass storage mode</a>
                         </div>
                     </div>
 
@@ -153,20 +154,32 @@
                     <div class="sdcard">
                         <div class="sdcard-icon"></div>
                         <div class="sdcard-status"></div>
+                        <div class="require-sdcard-ready">
+                            <a class="regular-button msc-reboot require-msc" href="#" data-i18n="onboardLoggingMscButton" data-i18n_title="onboardLoggingMscNote">Mass storage mode</a>
+                        </div>
                     </div>
 
-                    <p data-i18n="sdcardNote"></p>
+                    <div class="sdcard-details">
+                        <p data-i18n="sdcardNote"></p>
 
-                    <div class="require-sdcard-ready">
-                        <ul class="sdcard-contents">
-                            <li class="sdcard-free">
-                                <div class="legend"></div>
-                            </li>
-                            <li class="sdcard-other">
-                                <div class="legend right"></div>
-                            </li>
-                        </ul>
-                        <br />
+                        <div class="require-sdcard-ready">
+                            <ul class="sdcard-contents">
+                                <li class="sdcard-free"></li>
+                                <li class="sdcard-card-free"></li>
+                                <li class="sdcard-other"></li>
+                                <li class="sdcard-terrain"></li>
+                                <li class="sdcard-log-tails"></li>
+                                <li class="sdcard-lost"></li>
+                            </ul>
+                            <ul class="sdcard-legend">
+                                <li class="sdcard-free"></li>
+                                <li class="sdcard-card-free"></li>
+                                <li class="sdcard-other"></li>
+                                <li class="sdcard-terrain"></li>
+                                <li class="sdcard-log-tails"></li>
+                                <li class="sdcard-lost"></li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>
