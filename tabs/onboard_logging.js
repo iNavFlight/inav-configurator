@@ -18,10 +18,19 @@ var sdcardTimer;
 const onboardLoggingTab = {
 };
 
+// A failed lookup leaves the box out, not the tab
+function lookupMagLearn() {
+    return mspHelper.getSetting("mag_learn").catch(function(err) {
+        console.warn("mag_learn lookup failed", err);
+        return null;
+    });
+}
+
 onboardLoggingTab.initialize = function (callback) {
     let
         saveCancelled, eraseCancelled,
-        terrainEnabled = false;
+        terrainEnabled = false,
+        magLearnSupported = false;
 
     //Add future blackbox values here and in messages.json, the checkbox are drawn by js
     const blackBoxFields = [
@@ -39,6 +48,7 @@ onboardLoggingTab.initialize = function (callback) {
         "BLACKBOX_FEATURE_GYRO_PEAKS_PITCH",
         "BLACKBOX_FEATURE_GYRO_PEAKS_YAW",
         "BLACKBOX_FEATURE_SERVOS",
+        "BLACKBOX_FEATURE_MAG_LEARN",
     ];
 
     if (GUI.active_tab !== this) {
@@ -61,7 +71,9 @@ onboardLoggingTab.initialize = function (callback) {
             }
 
             terrainEnabled = Boolean(data.value);
-        }).then(function() {
+        }).then(lookupMagLearn).then(function(data) {
+            // only firmware that can learn the compass offsets logs them
+            magLearnSupported = data != null;
             MSP.send_message(MSPCodes.MSP2_BLACKBOX_CONFIG, false, false, load_html);
         });
     }
@@ -181,6 +193,9 @@ onboardLoggingTab.initialize = function (callback) {
             const blackboxFieldsDiv = $("#blackBoxFlagsDiv");
             for (let i = 0; i < blackBoxFields.length; i++) {
                 const FIELD_ID = blackBoxFields[i];
+                if (FIELD_ID === "BLACKBOX_FEATURE_MAG_LEARN" && !magLearnSupported) {
+                    continue;
+                }
                 const isEnabled = (FC.BLACKBOX.blackboxIncludeFlags & 1<<i) !==0;
                 const input = $('<input type="checkbox" class="toggle feature" />')
                 input.attr("id",FIELD_ID);
@@ -206,7 +221,9 @@ onboardLoggingTab.initialize = function (callback) {
             update_html();
 
             GUI.content_ready(callback);
-        })));
+        }))).catch(function(err) {
+            console.error('Blackbox tab failed to load', err);
+        });
     }
 
     function populateDevices() {
@@ -472,14 +489,20 @@ onboardLoggingTab.initialize = function (callback) {
         $(".dataflash-confirm-erase")[0].close();
     }
 
+    // A bit with no box here (a feature this firmware lacks, or one newer than this Configurator) keeps its value
     function getIncludeFlags(){
-        let flags = 0;
+        let flags = FC.BLACKBOX.blackboxIncludeFlags;
         for (let i = 0; i < blackBoxFields.length; i++) {
             const FIELD_ID = blackBoxFields[i];
 
             const checkbox = $("#"+FIELD_ID);
+            if (checkbox.length === 0) {
+                continue;
+            }
             if(checkbox.prop("checked")){
                 flags=flags|1<<i;
+            } else {
+                flags=flags&~(1<<i);
             }
         }
         return flags;

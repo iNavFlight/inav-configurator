@@ -136,6 +136,10 @@
     min-height: 45px;
 }
 
+.tab-calibration #mag-learn-status {
+    margin-top: 0.5em;
+}
+
 #calib_btn {
     margin-top: 5px;
     margin-left: 5px;
