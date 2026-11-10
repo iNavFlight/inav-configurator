@@ -478,3 +478,32 @@
 .tab-motors .mixer-preview-image-numbers {
     width: fit-content;
 }
+
+/* Rows like the others in the box: the switch's wrapper makes it a :last-child, which drops the divider */
+.tab-motors #dshot-bidir .checkbox,
+.tab-motors .dynamic-idle-sizes {
+    margin-bottom: 5px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid #ddd;
+}
+.tab-motors .dynamic-idle-sizes {
+    clear: both;
+    float: left;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.tab-motors .dynamic-idle-sizes .default_btn {
+    float: none;
+    margin: 0;
+}
+.tab-motors .dynamic-idle-sizes .default_btn a {
+    min-width: 32px;
+}
+/* Darker than the hover blue: white text on #37a8db is 2.7:1 */
+.tab-motors .dynamic-idle-sizes .default_btn a.selected {
+    background-color: #257aa5;
+    border-color: #257aa5;
+    color: #fff;
+}
