@@ -449,7 +449,7 @@ test('a write is recognised however its name spells SET', () => {
         'MSPV2_SETTING', 'MSP2_COMMON_SETTING_INFO',
         'MSP_SET_REBOOT', 'MSP_SET_MOTOR', 'MSP_SET_RAW_RC', 'MSP_SET_RAW_GPS',
         'MSP_SET_HEAD', 'MSP_SET_RTC', 'MSP_RESET_CONF', 'MSP_SET_RESET_CURR_PID',
-        'MSP_SELECT_SETTING', 'MSP_SET_BOX', 'MSP2_SET_MZTC_PRESET',
+        'MSP_SELECT_SETTING', 'MSP_SET_BOX', 'MSP2_SET_MZTC_PRESET', 'MSP2_INAV_SET_RX_LINK',
     ];
 
     clearParseFailures();

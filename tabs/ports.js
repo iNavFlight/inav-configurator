@@ -15,6 +15,7 @@ portsTab.initialize = function (callback) {
 
     var columns = ['data', 'logging', 'sensors', 'telemetry', 'rx', 'peripherals'];
     var mspWarningModal;
+    let dualRxEnabled = false;
 
     /* PWM_TYPE_SRXL2. Assigning the Spektrum Smart ESC function and selecting that
      * protocol are two settings, and a port assigned without it is always a
@@ -27,16 +28,22 @@ portsTab.initialize = function (callback) {
     }
 
     mspHelper.loadSerialPorts(function () {
-        /* Needed because saving may have to set the motor protocol as well, and
-         * writing MSP_SET_ADVANCED_CONFIG from a copy this tab never read would
-         * overwrite the rest of the motor configuration with zeroes. */
-        mspHelper.loadAdvancedConfig(function () {
-            /* Asked before the function menu is built. On a board without the
-             * Smart ESC driver this comes back as an unsupported command, and
-             * that is what keeps ESC_SRXL2 out of the list: a port assigned to
-             * a function the firmware cannot perform is never opened. */
-            MSP.send_message(MSPCodes.MSP2_INAV_ESC_SRXL2_STATUS, false, false, function () {
-                import('./ports.html?raw').then(({default: html}) => GUI.load(html, on_tab_loaded_handler));
+        mspHelper.getSetting('dual_rx_enabled').then(function (setting) {
+            dualRxEnabled = !!(setting && setting.value);
+        }).catch(function () {
+            dualRxEnabled = false;
+        }).then(function () {
+            /* Needed because saving may have to set the motor protocol as well, and
+             * writing MSP_SET_ADVANCED_CONFIG from a copy this tab never read would
+             * overwrite the rest of the motor configuration with zeroes. */
+            mspHelper.loadAdvancedConfig(function () {
+                /* Asked before the function menu is built. On a board without the
+                 * Smart ESC driver this comes back as an unsupported command, and
+                 * that is what keeps ESC_SRXL2 out of the list: a port assigned to
+                 * a function the firmware cannot perform is never opened. */
+                MSP.send_message(MSPCodes.MSP2_INAV_ESC_SRXL2_STATUS, false, false, function () {
+                    import('./ports.html?raw').then(({default: html}) => GUI.load(html, on_tab_loaded_handler));
+                });
             });
         });
     });
@@ -117,10 +124,22 @@ portsTab.initialize = function (callback) {
                             continue;
                         }
 
+                        if (!dualRxEnabled && functionName === 'RX_SERIAL_SECONDARY') {
+                            if (serialPort.functions.indexOf(functionName) >= 0) {
+                                functions_e.append('<input type="checkbox" value="' + functionName + '" checked hidden />');
+                            }
+                            continue;
+                        }
+
                         var select_e;
                         if (column !== 'telemetry' && column !== 'peripherals' && column !== 'sensors') {
                             var checkboxId = 'functionCheckbox-' + portIndex + '-' + columnIndex + '-' + i;
-                            functions_e.prepend('<span class="function"><input type="checkbox" class="togglemedium" id="' + checkboxId + '" value="' + functionName + '" /><label for="' + checkboxId + '"> ' + functionRule.displayName + '</label></span>');
+                            var checkboxHtml = '<span class="function"><input type="checkbox" class="togglemedium" id="' + checkboxId + '" value="' + functionName + '" /><label for="' + checkboxId + '"> ' + functionRule.displayName + '</label></span>';
+                            if (column === 'rx') {
+                                functions_e.append(checkboxHtml);
+                            } else {
+                                functions_e.prepend(checkboxHtml);
+                            }
 
                             if (serialPort.functions.indexOf(functionName) >= 0) {
                                 var checkbox_e = functions_e.find('#' + checkboxId);
