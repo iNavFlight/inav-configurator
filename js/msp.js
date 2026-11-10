@@ -6,6 +6,9 @@ import eventFrequencyAnalyzer from './eventFrequencyAnalyzer';
 import timeout from './timeouts';
 import CONFIGURATOR from './data_storage';
 
+// Longest gap inside one frame; the CLI banner comes at least 350 ms ('#' delay + FC guard time) after the tab switch.
+const FRAME_TAIL_TIMEOUT_MS = 200;
+
 // Every MSP code that changes something on the FC, recognised by name so a write
 // added later is covered without maintaining a list here.
 const WRITE_CODE_NAMES = Object.keys(MSPCodes)
@@ -347,6 +350,32 @@ var MSP = {
             }
         }
         this.last_received_timestamp = Date.now();
+    },
+
+    // Byte by byte, because only the decoder knows where the frame in progress ends; returns the bytes taken.
+    read_until_idle: function (readInfo) {
+        // A frame whose tail was lost must not swallow the CLI banner that follows; drop it.
+        if (Date.now() - this.last_received_timestamp > FRAME_TAIL_TIMEOUT_MS) {
+            this.state = this.decoder_states.IDLE;
+            this.message_length_received = 0;
+            return 0;
+        }
+
+        var data;
+        try {
+            data = new Uint8Array(readInfo.data);
+        } catch (e) {
+            console.error('MSP read_until_idle: Failed to create Uint8Array from readInfo.data:', e, 'readInfo:', readInfo);
+            return 0;
+        }
+
+        var consumed = 0;
+        while (consumed < data.length && this.state != this.decoder_states.IDLE) {
+            this.read({ data: data.subarray(consumed, consumed + 1) });
+            consumed++;
+        }
+
+        return consumed;
     },
 
     _initialize_read_buffer() {
