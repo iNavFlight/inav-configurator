@@ -31,19 +31,10 @@ function updateIna226SettingsVisibility() {
     $('.adc-current-setting').toggle(!usesIna226Current);
 }
 
-function isMztcPortAssigned() {
-    const ports = FC.SERIAL_CONFIG?.ports;
-    if (!Array.isArray(ports)) {
-        return false;
-    }
-
-    return ports.some(port => port.functions?.includes('MZTC_CAMERA'));
-}
-
 function updateMztcSettingsVisibility() {
     // The camera settings only reach the firmware over a UART, so the card is
     // meaningless until the peripheral is assigned in the Ports tab.
-    $('.config-mztc').toggle(isMztcPortAssigned());
+    $('.config-mztc').toggle(FC.isMztcPortAssigned());
 }
 
 // Applying a preset is an action on the firmware, not a stored value. The

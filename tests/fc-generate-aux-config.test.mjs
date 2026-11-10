@@ -163,6 +163,16 @@ test('generateAuxConfig() positive control: an all-recognized id list passes thr
     assert.deepEqual(FC.AUX_CONFIG, ['ARM', 'ANGLE', 'HORIZON']);
 });
 
+test('generateAuxConfig() keeps THERMAL CALIBRATE (permanentId 73): the firmware only advertises it when the camera UART is assigned, so a missing FLIGHT_MODES entry silently hides the mode', () => {
+    FC.resetState();
+    FC.AUX_CONFIG_IDS = [0, 73];
+
+    FC.generateAuxConfig();
+
+    assert.deepEqual(FC.AUX_CONFIG_IDS, [0, 73]);
+    assert.deepEqual(FC.AUX_CONFIG, ['ARM', 'THERMAL CALIBRATE']);
+});
+
 test('generateAuxConfig() negative control: an all-unrecognized id list empties both arrays', () => {
     FC.resetState();
     FC.AUX_CONFIG_IDS = [9990, 9991, 9992];
@@ -171,4 +181,31 @@ test('generateAuxConfig() negative control: an all-unrecognized id list empties 
 
     assert.equal(FC.AUX_CONFIG.length, 0);
     assert.equal(FC.AUX_CONFIG_IDS.length, 0);
+});
+
+// isMztcPortAssigned() is the capability gate for every MZTC control
+// (configuration card, adjustment functions 61/62). Firmware without the
+// driver can never set the MZTC_CAMERA port function bit, so "a port has the
+// function" doubles as "the firmware supports the camera".
+test('isMztcPortAssigned() is true only when a serial port carries MZTC_CAMERA', () => {
+    FC.resetState();
+    assert.equal(FC.isMztcPortAssigned(), false, 'fresh state has no ports');
+
+    FC.SERIAL_CONFIG.ports = [
+        { identifier: 0, functions: ['MSP'] },
+        { identifier: 1, functions: ['GPS'] },
+    ];
+    assert.equal(FC.isMztcPortAssigned(), false, 'no port carries the camera');
+
+    FC.SERIAL_CONFIG.ports.push({ identifier: 2, functions: ['MZTC_CAMERA'] });
+    assert.equal(FC.isMztcPortAssigned(), true, 'a port carries the camera');
+});
+
+test('isMztcPortAssigned() tolerates unloaded serial config', () => {
+    FC.resetState();
+    FC.SERIAL_CONFIG = null;
+    assert.equal(FC.isMztcPortAssigned(), false);
+
+    FC.SERIAL_CONFIG = { ports: [{ identifier: 0 }] };
+    assert.equal(FC.isMztcPortAssigned(), false, 'a port without a functions array must not throw');
 });

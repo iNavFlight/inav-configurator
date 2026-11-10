@@ -320,6 +320,11 @@ var FLIGHT_MODES = [
         boxId: 63,
         boxName: "THRUST REVERSE",
         permanentId: 72
+    },
+    {
+        boxId: 64,
+        boxName: "THERMAL CALIBRATE",
+        permanentId: 73
     }
 ];
 

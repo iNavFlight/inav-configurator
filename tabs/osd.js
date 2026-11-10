@@ -1457,7 +1457,9 @@ OSD.constants = {
                     // actually support it.
                     // min_version: '10.0.0',
                     preview: function(osd_data) {
-                        return 'IR OK ';
+                        // Mirrors the firmware's widest layout: link state,
+                        // zoom and palette, padded to a constant 13 columns.
+                        return 'IR OK 2X WHT ';
                     }
                 },
             ]

@@ -260,6 +260,20 @@ var FC = {
             }
         };
 
+        // Whether a serial port is assigned to the MZTC thermal camera. This
+        // doubles as the capability check for every MZTC control: firmware
+        // without the driver can never report the MZTC_CAMERA port function,
+        // and firmware with it ignores MZTC commands until the port is
+        // assigned. Needs FC.SERIAL_CONFIG populated (mspHelper.loadSerialPorts).
+        this.isMztcPortAssigned = function () {
+            const ports = this.SERIAL_CONFIG?.ports;
+            if (!Array.isArray(ports)) {
+                return false;
+            }
+
+            return ports.some(port => port.functions?.includes('MZTC_CAMERA'));
+        };
+
         this.MODE_RANGES = [];
         this.ADJUSTMENT_RANGES = [];
 
