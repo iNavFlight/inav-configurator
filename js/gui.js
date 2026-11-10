@@ -46,6 +46,7 @@ var GUI_control = function () {
         'profiles',
         'advanced_tuning',
         'mission_control',
+        'autoland',
         'mixer',
         'programming',
         'javascript_programming',

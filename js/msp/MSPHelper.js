@@ -1747,8 +1747,8 @@ var mspHelper = (function () {
                 }
                 break;
 
-            case MSPCodes.MSP2_INAV_FW_APPROACH:
-                FC.FW_APPROACH.put(new FwApproach(
+            case MSPCodes.MSP2_INAV_FW_APPROACH: {
+                const fwApproach = new FwApproach(
                     data.getUint8(0),
                     data.getInt32(1, true),
                     data.getInt32(5, true),
@@ -1756,8 +1756,18 @@ var mspHelper = (function () {
                     data.getInt16(10, true),
                     data.getInt16(12, true),
                     data.getUint8(14, true),
-                ));                
+                );
+                // the runway start and its height per landing direction, from INAV 11
+                if (data.byteLength >= 23) {
+                    fwApproach.setRunwayKnown(true);
+                    for (let i = 0; i < 4; i++) {
+                        fwApproach.setRunwayStart(i, data.getUint8(15 + i));
+                        fwApproach.setRunwayStartHeight(i, data.getUint8(19 + i));
+                    }
+                }
+                FC.FW_APPROACH.put(fwApproach);
                 break;
+            }
             
                 case MSPCodes.MSP2_INAV_SET_FW_APPROACH:
                     console.log('FW Approach saved');
