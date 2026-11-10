@@ -96,3 +96,66 @@
         height: 22px;
     }
 }
+
+.tab-ports table.noPins .pinsColumn {
+    display: none;
+}
+
+/* every row on the line of its controls: a second pin line or a note makes a row taller without moving its
+   controls off the line of the others, also where narrow windows wrap the cells */
+.tab-ports table.pins tbody td {
+    vertical-align: baseline;
+}
+
+/* as narrow as its choices: the table gives the free width to the other columns */
+.tab-ports .pinsColumn {
+    width: 1px;
+    white-space: nowrap;
+}
+
+.tab-ports .pinLine + .pinLine {
+    margin-top: 0.3em;
+}
+
+.tab-ports .pinPlaceholder {
+    display: none;
+}
+
+.tab-ports .pinPlaceholder + .pinLine {
+    margin-top: 0;
+}
+
+/* a flex row takes its baseline from the TX choice, so both choices sit on the line of the row's controls */
+.tab-ports table.pinsSideBySide .pinLines {
+    display: flex;
+    align-items: flex-start;
+    column-gap: 0.6em;
+}
+
+.tab-ports table.pinsSideBySide .pinLine + .pinLine {
+    margin-top: 0;
+}
+
+.tab-ports table.pinsSideBySide .pinPlaceholder {
+    display: block;
+    visibility: hidden;
+}
+
+.tab-ports .pinLabel {
+    display: inline-block;
+    width: 1.8em;
+    color: #555;
+}
+
+/* under its choice and label, wrapping at the column's width instead of widening it */
+.tab-ports .pinNote {
+    white-space: normal;
+    font-size: 0.9em;
+    line-height: 1.2;
+    color: #d40000;
+    margin-top: 0.2em;
+}
+
+.tab-ports .pinNote:empty {
+    display: none;
+}
