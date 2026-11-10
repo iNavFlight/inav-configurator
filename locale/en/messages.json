@@ -1654,7 +1654,7 @@
         "message": "Spektrum Smart ESC (SRXL2)"
     },
     "srxl2Info": {
-        "message": "The ESC signal wire goes to the TX pin of a port assigned to Spektrum Smart ESC, not to a motor pad, and carries telemetry back on the same wire. One ESC per port: a model with several motors needs a port each, assigned in motor order, so motor 1 is the lowest-numbered port."
+        "message": "The ESC signal wire goes to the TX pin of the port assigned to Spektrum Smart ESC, not to a motor pad, and carries telemetry back on the same wire. One port per motor: motor 1 on the lowest-numbered port, the others in order."
     },
     "srxl2ProtocolAutoSet": {
         "message": "ESC protocol set to SRXL2, to match the port assigned to Spektrum Smart ESC. Change it in the Outputs tab if that is not what you wanted."
@@ -1672,13 +1672,10 @@
         "message": "SRXL2 ports open on the board: $1. Choose a model in the Mixer tab to set how many motors it has."
     },
     "srxl2PortCountOpen": {
-        "message": "SRXL2 ports open on the board: $1, for $2 motor(s). Motor 1 uses the lowest-numbered port."
+        "message": "SRXL2 ports open on the board: $1, for $2 motor(s). Motor 1 uses the lowest-numbered port and the others follow in motor order; the ports beyond the motor count drive nothing."
     },
     "srxl2PortNeedsReboot": {
         "message": "$1 port(s) assigned to Spektrum Smart ESC, but the board has not opened any. Ports are opened at startup - save and reboot."
-    },
-    "srxl2PortCount": {
-        "message": "Ports assigned to Spektrum Smart ESC: $1. Motor 1 uses the lowest-numbered of them."
     },
     "srxl2Telemetry": {
         "message": "Read telemetry from the ESC"
