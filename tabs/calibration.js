@@ -6,9 +6,11 @@ import MSPCodes from './../js/msp/MSPCodes';
 import MSP from './../js/msp';
 import GUI from './../js/gui';
 import FC from './../js/fc';
+import { MAG_LEARN_FLAG, magLearnStatusText, magLearnedZero, magLearnedYawTrim } from './../js/magLearnStatus';
 import timeout from './../js/timeouts';
 import interval from './../js/intervals';
 import i18n from './../js/localization';
+import Settings from './../js/settings';
 import jBox from 'jbox';
 
 const calibrationTab = {};
@@ -20,6 +22,67 @@ let modalMagAlign;
 // every calibrationTab.initialize() call.
 function magAlignmentSettingsEqual(a, b) {
     return a.every(function (setting, i) { return setting.value === b[i].value; });
+}
+
+// mag_yaw_trim as the board holds it, in decidegrees: the input can show an edit not saved yet, or a value the board
+// has replaced since (a learned save, a compass calibration)
+let storedYawTrim = null;
+let yawTrimEdited = false;
+
+function refreshYawTrim() {
+    return mspHelper.getSetting('mag_yaw_trim').then(function (result) {
+        if (!result) {
+            return;
+        }
+        storedYawTrim = result.value;
+        if (!yawTrimEdited) {
+            $('#MagYawTrim').val((storedYawTrim / 10).toFixed(1));
+        }
+        updateMagLearnStatus();
+    });
+}
+
+// A refresh nothing waits for: a failed read leaves the input as it was
+function refreshYawTrimInBackground() {
+    refreshYawTrim().catch(function (err) {
+        console.error('mag_yaw_trim did not load', err);
+    });
+}
+
+function updateMagLearnStatus() {
+    const text = magLearnStatusText(FC.MAG_LEARN, FC.getMagnetometerCalibrated(), i18n.getMessage);
+    // The column says what the flight learned; why it was or was not written shows on its title
+    $('#mag-learned-title').attr('title', text);
+
+    const learned = magLearnedZero(FC.MAG_LEARN, FC.CALIBRATION_DATA.magZero);
+    $('#mag-calibrated-data').toggleClass('with-learned', learned !== null);
+    if (learned) {
+        ['X', 'Y', 'Z'].forEach(function (item) {
+            $('[name=MagLearned' + item + ']').val(learned[item]);
+        });
+    }
+    const trim = storedYawTrim === null ? null : magLearnedYawTrim(FC.MAG_LEARN, storedYawTrim);
+    $('[name=MagLearnedYawTrim]').val(trim === null ? '' : (trim / 10).toFixed(1));
+}
+
+// Only the offsets the board wrote: an unsaved edit elsewhere in the tab stays
+function updateMagZero() {
+    ['X', 'Y', 'Z'].forEach(function (item) {
+        $('[name=Mag' + item + ']').val(FC.CALIBRATION_DATA.magZero[item]);
+    });
+    updateMagLearnStatus();
+}
+
+// Progress while armed and the outcome after the disarm change with the tab open; a save shows the new offsets
+function pollMagLearn() {
+    const savedBefore = FC.MAG_LEARN.flags & MAG_LEARN_FLAG.SAVED;
+    MSP.send_message(MSPCodes.MSP2_INAV_MAG_LEARN, false, false, function () {
+        updateMagLearnStatus();
+        if (!savedBefore && (FC.MAG_LEARN.flags & MAG_LEARN_FLAG.SAVED)) {
+            MSP.send_message(MSPCodes.MSP_CALIBRATION_DATA, false, false, updateMagZero);
+            refreshYawTrimInBackground();
+        }
+    });
 }
 
 function formatMagAlignment(alignment) {
@@ -78,7 +141,8 @@ calibrationTab.initialize = function (callback) {
         saveChainer = new MSPChainerClass(),
         modalStart,
         modalStop,
-        modalProcessing;
+        modalProcessing,
+        settingsLoaded = Promise.resolve();
 
     modalMagAlign = undefined; // reset the module-scoped modal handle for this tab session
 
@@ -95,6 +159,7 @@ calibrationTab.initialize = function (callback) {
 
     saveChainer.setChain([
         mspHelper.saveCalibrationData,
+        Settings.saveInputs,
         mspHelper.saveToEeprom
     ]);
     saveChainer.setExitPoint(reboot);
@@ -115,7 +180,9 @@ calibrationTab.initialize = function (callback) {
     }
 
     function loadHtml() {
-        import('./calibration.html?raw').then(({default: html}) => GUI.load(html, processHtml));
+        import('./calibration.html?raw').then(({default: html}) => GUI.load(html, Settings.processHtml(processHtml))).catch(function (err) {
+            console.error('Calibration tab failed to load', err);
+        });
     }
 
     function updateCalibrationSteps() {
@@ -140,6 +207,23 @@ calibrationTab.initialize = function (callback) {
         });
         $('[name=OpflowScale]').val(FC.CALIBRATION_DATA.opflow.Scale);
         updateCalibrationSteps();
+        updateMagLearnStatus();
+    }
+
+    // The board may have saved learned offsets since the tab loaded: save on top of what it holds now. A save before
+    // the settings have loaded would leave the learning switch out.
+    function saveCalibration(change) {
+        settingsLoaded.then(function () {
+            // The trim too, unless edited here: Settings.saveInputs writes the input
+            return yawTrimEdited ? null : refreshYawTrim();
+        }).then(function () {
+            MSP.send_message(MSPCodes.MSP_CALIBRATION_DATA, false, false, function () {
+                change();
+                saveChainer.execute();
+            });
+        }).catch(function (err) {
+            console.error('Calibration settings did not load, nothing saved', err);
+        });
     }
 
     // Reads the settings the firmware's compass-orientation auto-detect (run as
@@ -281,24 +365,36 @@ calibrationTab.initialize = function (callback) {
     }
 
     function resetAccCalibration() {
-        var pos = ['X', 'Y', 'Z'];
-        pos.forEach(function (item) {
-            FC.CALIBRATION_DATA.accGain[item] = 4096;
-            FC.CALIBRATION_DATA.accZero[item] = 0;
+        saveCalibration(function () {
+            ['X', 'Y', 'Z'].forEach(function (item) {
+                FC.CALIBRATION_DATA.accGain[item] = 4096;
+                FC.CALIBRATION_DATA.accZero[item] = 0;
+            });
         });
-
-        saveChainer.execute();
     }
 
-    function processHtml() {
+    function processHtml(settingsPromise) {
+        settingsLoaded = Promise.resolve(settingsPromise);
+        // Module scope: nothing of the last visit, or of another board, until the settings are in
+        storedYawTrim = null;
         $('#calibrateButtonSave').on('click', function () {
-            FC.CALIBRATION_DATA.opflow.Scale = parseFloat($('[name=OpflowScale]').val());
-            saveChainer.execute();
+            const opflowScale = Number.parseFloat($('[name=OpflowScale]').val());
+            saveCalibration(function () {
+                FC.CALIBRATION_DATA.opflow.Scale = opflowScale;
+            });
         });
 
         if (FC.SENSOR_CONFIG.magnetometer === 0) {
             //Comment for test
-            $('#mag_btn, #mag-calibrated-data').css('pointer-events', 'none').css('opacity', '0.4');
+            $('#mag_btn, #mag-calibrated-data, #mag-learn-setting').css('pointer-events', 'none').css('opacity', '0.4');
+        } else {
+            // A click before the board's value arrives would be overwritten by it, and saved as the board had it
+            $('#mag-learn-setting').css('pointer-events', 'none');
+            settingsLoaded.then(function () {
+                $('#mag-learn-setting').css('pointer-events', '');
+            }).catch(function (err) {
+                console.error('Calibration tab settings failed to load', err);
+            });
         }
 
         if (FC.SENSOR_CONFIG.opflow === 0) {
@@ -340,6 +436,8 @@ calibrationTab.initialize = function (callback) {
 
                         MSP.send_message(MSPCodes.MSP_CALIBRATION_DATA, false, false, updateSensorData);
                         interval.remove('compass_calibration_interval');
+                        // The calibration sets the trim back to 0
+                        refreshYawTrimInBackground();
 
                         //Cleanup
                        //delete modalProcessing;
@@ -411,6 +509,26 @@ calibrationTab.initialize = function (callback) {
         $('#calibrate-start-button').on('click', actionCalibrateButton);
        
         MSP.send_message(MSPCodes.MSP_CALIBRATION_DATA, false, false, updateSensorData);
+        MSP.send_message(MSPCodes.MSP2_INAV_MAG_LEARN, false, false, function () {
+            updateMagLearnStatus();
+            if (FC.MAG_LEARN.supported) {
+                interval.add('mag_learn_status', pollMagLearn, 1000);
+            }
+        });
+        settingsLoaded.then(function () {
+            // Settings.processHtml() drops the switch when the firmware has no ahrs_gsf_yaw: the box goes with it
+            $('#gsf-box').toggleClass('is-hidden', $('#gsfAhrs').length === 0);
+            if ($('#MagYawTrim').length) {
+                yawTrimEdited = false;
+                storedYawTrim = Math.round(Number.parseFloat($('#MagYawTrim').val()) * 10);
+                $('#MagYawTrim').on('input', function () {
+                    yawTrimEdited = true;
+                });
+                updateMagLearnStatus();
+            }
+        }).catch(function (err) {
+            console.error('Calibration tab settings failed to load', err);
+        });
 
         GUI.content_ready(callback);
     }
