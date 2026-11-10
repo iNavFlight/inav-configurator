@@ -10,6 +10,15 @@
             <span class="subtab__header_label" for="subtab-mechanics" data-i18n="pidTuning_Mechanics"></span>
         </div>
         <div id="subtab-pid" class="subtab__content subtab__content--current">
+            <div class="cf_column profile-name-column">
+                <div class="number">
+                    <input type="text" id="control_profile_name" data-setting="control_profile_name" />
+                    <label for="control_profile_name">
+                        <span data-i18n="controlProfileName">Control profile name</span>
+                    </label>
+                    <div for="control_profile_name" class="helpicon cf_tip" data-i18n_title="profileNameHelp"></div>
+                </div>
+            </div>
             <div class="cf_column right" style="margin-top: -6px;">
                 <div class="default_btn resetbt">
                     <a href="#" class="action-resetDefaults" data-i18n="pidTuning_SelectNewDefaults"></a>

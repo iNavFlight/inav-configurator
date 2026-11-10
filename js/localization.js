@@ -119,7 +119,7 @@ i18n.getLanguages = function() {
 
 i18n.changeLanguage = function(languageSelected) {
     store.set('userLanguage', languageSelected);
-    i18next.changeLanguage(i18n.getValidLocale(languageSelected));
+    return i18next.changeLanguage(i18n.getValidLocale(languageSelected));
 };
 
 i18n.localize = function (reTranslate = false) {
