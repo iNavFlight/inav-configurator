@@ -79,6 +79,7 @@ import Safehome from './../js/safehome';
 import SafehomeCollection from './../js/safehomeCollection';
 import { ApproachDirection, FwApproach } from './../js/fwApproach';
 import FwApproachCollection from './../js/fwApproachCollection';
+import { buildFwApproachItems, fwApproachFromElement } from './../js/missionFwApproach';
 import SerialBackend from './../js/serial_backend';
 import { loadOsdUnits } from './../js/osdUnits';
 import { distanceOnLine, wrap_360, calculate_new_cooridatnes } from './../js/helpers';
@@ -7917,28 +7918,10 @@ function iconKey(filename) {
                                 }
                                 mission.put(point);
                             } else if (node['#name'].match(/fwapproach/i) && node.$) {
-                                var fwApproach = new FwApproach(0);
-                                var idx = -1;
-                                for (var attr in node.$) {
-                                    if (attr.match(/index/i)) {
-                                        idx = parseInt(node.$[attr]);
-                                    } else if (attr.match(/no/i)) {
-                                        fwApproach.setNumber(parseInt(node.$[attr]));
-                                    } else if (attr.match(/approach-alt/i)) {
-                                        fwApproach.setApproachAltAsl(parseInt(node.$[attr]));
-                                    } else if (attr.match(/land-alt/i)) {
-                                        fwApproach.setLandAltAsl(parseInt(node.$[attr]));
-                                    } else if (attr.match(/approach-direction/i)) {
-                                        fwApproach.setApproachDirection(node.$[attr] == 'left' ? 0 : 1);
-                                    } else if (attr.match(/landheading1/i)) {
-                                        fwApproach.setLandHeading1(parseInt(node.$[attr]));
-                                    } else if (attr.match(/landheading2/i)) {
-                                        fwApproach.setLandHeading2(parseInt(node.$[attr]));
-                                    } else if (attr.match(/sealevel-ref/i)) {
-                                        fwApproach.setIsSeaLevelRef(parseBooleans(node.$[attr]) ? 1 : 0);
-                                    }
+                                const approach = fwApproachFromElement(node.$, FC.SAFEHOMES.getMaxSafehomeCount(), FC.FW_APPROACH.getMaxFwApproachCount());
+                                if (approach) {
+                                    FC.FW_APPROACH.updateFwApproach(approach);
                                 }
-                                FC.FW_APPROACH.insert(fwApproach, FC.SAFEHOMES.getMaxSafehomeCount() + idx);
                             }
                         }
                     }
@@ -8039,24 +8022,12 @@ function iconKey(filename) {
                 missionNumber ++;
             }
         });
-        let approachIdx = 0;
-        for (let i = FC.SAFEHOMES.getMaxSafehomeCount(); i < FC.FW_APPROACH.getMaxFwApproachCount(); i++){
-            let approach = FC.FW_APPROACH.get()[i];
-            if (approach.getLandHeading1() != 0 || approach.getLandHeading2() != 0) {
-                var item = { $: {
-                    'index': approachIdx,
-                    'no': approach.getNumber(),
-                    'approach-alt': approach.getApproachAltAsl(),
-                    'land-alt': approach.getLandAltAsl(),
-                    'approach-direction': approach.getApproachDirection() == 0 ? 'left' : 'right',
-                    'landheading1': approach.getLandHeading1(),
-                    'landheading2': approach.getLandHeading2(),
-                    'sealevel-ref': approach.getIsSeaLevelRef() ? 'true' : 'false'
-                }};
-                data.fwapproach.push(item);
-            }
-            approachIdx++;
-        }
+        // Missions read from the FC carry their index only on the last waypoint
+        const lastWaypoint = mission.get()[mission.get().length - 1];
+        data.fwapproach = buildFwApproachItems(FC.FW_APPROACH.get(),
+                                               FC.SAFEHOMES.getMaxSafehomeCount(),
+                                               FC.FW_APPROACH.getMaxFwApproachCount(),
+                                               multimission ? null : (lastWaypoint?.getMultiMissionIdx() ?? 0));
 
         var builder = new xml2js.Builder({ 'rootName': 'mission', 'renderOpts': { 'pretty': true, 'indent': '\t', 'newline': '\n' } });
         var xml = builder.buildObject(data);
@@ -8432,13 +8403,6 @@ function iconKey(filename) {
             }
         }
     }
-
-    function parseBooleans (str) {
-        if (/^(?:true|false)$/i.test(str)) {
-          str = str.toLowerCase() === 'true';
-        }
-        return str;
-      };
 };
 
 missionControlTab.isBitSet = function(bits, testBit) {
