@@ -35,9 +35,17 @@ import jBox from 'jbox';
 import SerialBackend from '../js/serial_backend';
 import ublox from '../js/ublox/UBLOX';
 import dialog from '../js/dialog';
+import { GNSS_CONSTELLATIONS, GNSS_EXTENDED, gnssIsOffered, gnssIsConfirmed, gnssLeftOut } from '../js/gpsConstellations';
+import { CNO_FULL_SCALE, gnssName, qualityKey, qualityLevel } from '../js/gpsSatellites';
 
 
 const gpsTab = {};
+
+// Loading a setting shows its row with an inline display that outranks the class: clear it first
+function show_row(row, visible) {
+    row.css('display', '').toggleClass('is-hidden', !visible);
+}
+
 gpsTab.initialize = function (callback) {
 
     if (GUI.active_tab !== this) {
@@ -439,35 +447,28 @@ gpsTab.initialize = function (callback) {
             applyGPSPreset($(this).val());
         });
 
-        // Hardware detection status indicator
-        function updateHardwareStatus() {
-            if (FC.GPS_DATA && FC.GPS_DATA.hwVersion && FC.GPS_DATA.hwVersion > 0) {
-                const detectedPreset = detectGPSPreset(FC.GPS_DATA.hwVersion);
-                if (detectedPreset && detectedPreset !== 'manual' && GPS_PRESETS[detectedPreset]) {
-                    $('#gps_hardware_name').text(GPS_PRESETS[detectedPreset].name + ' detected');
-                    $('#gps_hardware_status').show();
-                }
-            }
-        }
+        // The hardware version alone: F10 and M10 both report 000A0000, so the module name wins
+        const UBLOX_GENERATION = {
+            0x48: 'u-blox M8',
+            0x49: 'u-blox M9',
+            0x4A: 'u-blox M10'
+        };
 
-        // Handler for "Use optimal settings" link (namespaced)
-        $('#gps_apply_optimal').on('click.gpsTab', function(e) {
-            e.preventDefault();
-            if (FC.GPS_DATA && FC.GPS_DATA.hwVersion) {
-                const detectedPreset = detectGPSPreset(FC.GPS_DATA.hwVersion);
-                if (detectedPreset && detectedPreset !== 'manual') {
-                    $('#gps_preset_mode').val(detectedPreset).trigger('change');
-                    GUI.log('Applied recommended settings for ' + GPS_PRESETS[detectedPreset].name);
-                }
+        function updateReceiverName() {
+            if (!FC.GPS_DATA?.hwVersion) {
+                return;
             }
-        });
+
+            const name = FC.GPS_DATA.moduleName || UBLOX_GENERATION[FC.GPS_DATA.hwVersion] || '';
+            $('#gps_title_model').text(name ? ' - ' + name : '');
+        }
 
         // Initialize - default to manual mode to preserve user's existing settings
         // User can explicitly select a preset or use "Auto-detect" if desired
         applyGPSPreset('manual');
 
-        // Check for hardware detection after a short delay to allow GPS data to arrive
-        setTimeout(updateHardwareStatus, 500);
+        // Name the receiver after a short delay, to let the first GPS data arrive
+        setTimeout(updateReceiverName, 500);
 
         let mapView = new View({
             center: [0, 0],
@@ -582,7 +583,91 @@ gpsTab.initialize = function (callback) {
             }
         }
 
+        // From the tab's own presets, not a second table that could drift from them
+        const NAV_HZ_PRESETS = {
+            0x48: ['m8'],
+            0x49: ['m9-precision', 'm9-sport'],
+            0x4A: ['m10', 'm10-highperf']
+        };
+
+        function update_nav_hz_limit() {
+            const field = $('#gps_ublox_nav_hz');
+            const presets = NAV_HZ_PRESETS[FC.GPS_DATA.hwVersion];
+
+            if (!presets) {
+                field.removeAttr('title');
+                return;
+            }
+
+            // Only a hint: settings.js would cut a faster rate to the field's max on save
+            const ceiling = Math.max(...presets.map(id => GPS_PRESETS[id].rate));
+            field.attr('title', i18n.getMessage('gpsUpdateRateCeiling', [String(ceiling)]));
+        }
+
+        function update_gnss_availability() {
+            const supported = FC.GPS_DATA.gnssSupported;
+            const extended = FC.GPS_DATA.gnssExtended;
+
+            // A major's switch is withdrawn only when the receiver has said it lacks it
+            GNSS_CONSTELLATIONS.filter(c => c.box).forEach(function (c) {
+                const offered = gnssIsOffered(supported, c);
+
+                // Hidden inputs are still saved: clear the setting too, or nobody could turn it off
+                if (!offered && $(c.box).is(':checked')) {
+                    $(c.box).prop('checked', false).trigger('change');
+                }
+
+                show_row($(c.box).closest('.checkbox'), offered);
+            });
+
+            const sbas = GNSS_EXTENDED.find(e => e.key === 'sbas');
+            show_row($(sbas.row).closest('.select'), gnssIsOffered(extended, sbas));
+
+            // The rest appear only once the receiver confirms them
+            const rows = GNSS_CONSTELLATIONS.filter(c => c.row)
+                .map(c => ({ el: c.row, on: gnssIsConfirmed(supported, c) }))
+                .concat(GNSS_EXTENDED.filter(e => e !== sbas)
+                    .map(e => ({ el: e.box || e.row, on: gnssIsConfirmed(extended, e) })));
+
+            rows.forEach(function (r) {
+                show_row($(r.el).closest('.checkbox'), r.on);
+            });
+
+            update_gnss_budget();
+        }
+
+        // Over the receiver's limit (MON-GNSS, the four majors only) the firmware leaves some out and
+        // keeps the setting, so the tab says which
+        function update_gnss_budget() {
+            const note = $('#gps_gnss_budget');
+
+            const selected = GNSS_CONSTELLATIONS
+                .filter(c => c.box && $(c.box).is(':checked'))
+                .reduce((mask, c) => mask | c.bit, 0);
+            const leftOut = gnssLeftOut(selected, FC.GPS_DATA.gnssSupported, FC.GPS_DATA.gnssMaxConcurrent);
+
+            if (!leftOut.length) {
+                note.addClass('is-hidden');
+                return;
+            }
+
+            note.text(i18n.getMessage('gpsConstellationsLeftOut', [
+                String(FC.GPS_DATA.gnssMaxConcurrent),
+                leftOut.map(c => c.name).join(' and ')
+            ])).removeClass('is-hidden');
+        }
+
+        $('#gps_use_galileo, #gps_use_beidou, #gps_use_glonass').on('change.gpsTab', update_gnss_budget);
+
+        // Now too, so a row not confirmed is never shown just because its setting loaded
+        update_gnss_availability();
+
         function update_gps_ui() {
+            update_gnss_availability();
+            update_nav_hz_limit();
+            // The module name can arrive after the one-shot check at tab open
+            updateReceiverName();
+
             let lat = FC.GPS_DATA.lat / 10000000;
             let lon = FC.GPS_DATA.lon / 10000000;
 
@@ -799,6 +884,42 @@ gpsTab.initialize = function (callback) {
 
         }, 200);
 
+        function update_satellites_ui() {
+            const satellites = FC.GPS_DATA.satellites;
+            $('.GPS_signal_strength .gps-signal-none').toggleClass('is-hidden', satellites.length > 0);
+            $('.gps-signal-table').toggleClass('is-hidden', satellites.length === 0);
+
+            const rows = satellites.map(function (sat) {
+                const row = $('<tr>');
+                $('<td>').text(gnssName(sat.gnssId)).appendTo(row);
+                $('<td>').append($('<span>')
+                    .addClass('gps-sat-id')
+                    .toggleClass('is-used', sat.used)
+                    .attr('title', i18n.getMessage(sat.used ? 'gnssUsedUsed' : 'gnssUsedUnused'))
+                    .text(sat.svId)).appendTo(row);
+                $('<td>').append($('<div>').addClass('gps-sat-signal').append(
+                    $('<progress>').attr({ max: CNO_FULL_SCALE, value: sat.cno }),
+                    $('<span>').addClass('gps-sat-cno').text(sat.cno)
+                )).appendTo(row);
+                $('<td>').append($('<span>')
+                    .addClass('gps-sat-quality gps-sat-quality--' + qualityLevel(sat.quality))
+                    .text(i18n.getMessage(qualityKey(sat.quality)))).appendTo(row);
+                return row;
+            });
+            $('.gps-signal-table tbody').empty().append(rows);
+        }
+
+        // Satellites change slowly, and this is the largest reply the tab asks for
+        interval.add('gps_sats_pull', function gps_satellites_update() {
+            if (!SerialBackend.have_sensor(FC.CONFIG.activeSensors, 'gps')) {
+                // A lost GPS sends no list: the last one would stay on screen
+                FC.GPS_DATA.satellites = [];
+                update_satellites_ui();
+                return;
+            }
+            MSP.send_message(MSPCodes.MSP_GPS_SV_INFO, false, false, update_satellites_ui);
+        }, 1000);
+
 
         if (semver.gte(FC.CONFIG.flightControllerVersion, "8.0.0")) {
             $('.adsb_info_block').hide();
@@ -888,7 +1009,6 @@ gpsTab.initialize = function (callback) {
 gpsTab.cleanup = function (callback) {
     // Remove all namespaced event handlers to prevent memory leaks
     $('#gps_preset_mode').off('.gpsTab');
-    $('#gps_apply_optimal').off('.gpsTab');
     $('#center_button').off('.gpsTab');
     $('a.save').off('.gpsTab');
     $('a.loadAssistnowOnline').off('.gpsTab');
