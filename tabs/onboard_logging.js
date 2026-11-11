@@ -12,8 +12,13 @@ import i18n from './../js/localization';
 import BitHelper from './../js/bitHelper';
 import dialog from './../js/dialog';
 import Settings from './../js/settings';
+import jBox from 'jbox';
 
 var sdcardTimer;
+// Module-scoped (not local to initialize()) so load_html() can destroy the previous
+// visit's modal — and the stale .jBox-wrapper it left under <body> — before GUI.load()
+// replaces the tab HTML and produces fresh .dataflash-confirm-erase/.dataflash-saving elements.
+var eraseModal, savingModal;
 
 const onboardLoggingTab = {
 };
@@ -139,15 +144,54 @@ onboardLoggingTab.initialize = function (callback) {
                 .toggleClass("only-terrain-supported", !blackboxSupport && terrainEnabled);
 
             if (dataflashPresent) {
-                // UI hooks
+                // Capture these BEFORE constructing the jBox Modals below: jBox reparents
+                // `content` into a wrapper under <body> immediately (inside `new jBox()`,
+                // not lazily on open()), so a later `$('.tab-onboard_logging a...')` query
+                // would no longer find elements that used to be its descendants. Binding
+                // directly to the captured jQuery objects works regardless of where the
+                // DOM nodes end up living.
+                const $eraseContent = $('.dataflash-confirm-erase');
+                const $savingContent = $('.dataflash-saving');
+
+                // jBox modals wrapping the existing dataflash-saving / dataflash-confirm-erase
+                // markup in place (CSS state classes like .erasing/.done still apply to the
+                // same elements, same pattern as js/defaults_dialog.js's saving modal).
+                // Destroy any instance from a previous visit to this tab first: jBox reparents
+                // its content to <body>, outside the container GUI.load() just replaced, so the
+                // old wrapper would otherwise be orphaned there instead of garbage collected.
+                eraseModal && eraseModal.destroy();
+                eraseModal = new jBox('Modal', {
+                    addClass: 'dataflash-confirm-erase-modal',
+                    animation: 'zoomIn',
+                    closeOnClick: false,
+                    closeOnEsc: false,
+                    closeButton: false,
+                    overlay: true,
+                    content: $eraseContent,
+                });
+
+                savingModal && savingModal.destroy();
+                savingModal = new jBox('Modal', {
+                    addClass: 'dataflash-saving-modal',
+                    animation: 'zoomIn',
+                    closeOnClick: false,
+                    closeOnEsc: false,
+                    closeButton: false,
+                    overlay: true,
+                    content: $savingContent,
+                });
+
+                // UI hooks. The flash/erase trigger buttons stay outside the modals, so an
+                // ancestor-scoped selector still finds them; the dialogs' own confirm/cancel/
+                // dismiss buttons moved with $eraseContent/$savingContent, so bind on those.
                 $('.tab-onboard_logging a.erase-flash').on('click', ask_to_erase_flash);
 
-                $('.tab-onboard_logging a.erase-flash-confirm').on('click', flash_erase);
-                $('.tab-onboard_logging a.erase-flash-cancel').on('click', flash_erase_cancel);
+                $eraseContent.find('a.erase-flash-confirm').on('click', flash_erase);
+                $eraseContent.find('a.erase-flash-cancel').on('click', flash_erase_cancel);
 
                 $('.tab-onboard_logging a.save-flash').on('click', flash_save_begin);
-                $('.tab-onboard_logging a.save-flash-cancel').on('click', flash_save_cancel);
-                $('.tab-onboard_logging a.save-flash-dismiss').on('click', dismiss_saving_dialog);
+                $savingContent.find('a.save-flash-cancel').on('click', flash_save_cancel);
+                $savingContent.find('a.save-flash-dismiss').on('click', dismiss_saving_dialog);
             }
 
             $('.save-blackbox-feature').on('click', function () {
@@ -352,11 +396,11 @@ onboardLoggingTab.initialize = function (callback) {
         saveCancelled = false;
         $(".dataflash-saving").removeClass("done");
 
-        $(".dataflash-saving")[0].showModal();
+        savingModal.open();
     }
 
     function dismiss_saving_dialog() {
-        $(".dataflash-saving")[0].close();
+        savingModal.close();
     }
 
     function mark_saving_dialog_done() {
@@ -446,14 +490,14 @@ onboardLoggingTab.initialize = function (callback) {
     function ask_to_erase_flash() {
         eraseCancelled = false;
         $(".dataflash-confirm-erase").removeClass('erasing');
-        $(".dataflash-confirm-erase")[0].showModal();
+        eraseModal.open();
     }
 
     function poll_for_erase_completion() {
         flash_update_summary(function() {
             if (CONFIGURATOR.connectionValid && !eraseCancelled) {
                 if (FC.DATAFLASH.ready) {
-                    $(".dataflash-confirm-erase")[0].close();
+                    eraseModal.close();
                 } else {
                     setTimeout(poll_for_erase_completion, 500);
                 }
@@ -469,7 +513,7 @@ onboardLoggingTab.initialize = function (callback) {
 
     function flash_erase_cancel() {
         eraseCancelled = true;
-        $(".dataflash-confirm-erase")[0].close();
+        eraseModal.close();
     }
 
     function getIncludeFlags(){
@@ -491,6 +535,14 @@ onboardLoggingTab.cleanup = function (callback) {
         clearTimeout(sdcardTimer);
         sdcardTimer = false;
     }
+
+    // Covers leaving the tab when dataflashPresent was false on this visit (so load_html()
+    // never reached the branch that destroys+recreates these) but a previous visit had
+    // created them — otherwise that orphaned .jBox-wrapper stays under <body> indefinitely.
+    eraseModal && eraseModal.destroy();
+    eraseModal = null;
+    savingModal && savingModal.destroy();
+    savingModal = null;
 
     if (callback) {
         callback();

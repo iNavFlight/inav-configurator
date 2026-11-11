@@ -10,6 +10,7 @@ import jBox from 'jbox';
 import GUI, { TABS } from './../js/gui';
 import i18n from './../js/localization';
 import store from './../js/store';
+import dialog from './../js/dialog';
 import { globalSettings, UnitType } from './../js/globalSettings';
 import JSZip from 'jszip';
 import { fromUrl, fromArrayBuffer } from 'geotiff';
@@ -1786,7 +1787,7 @@ TABS.map_generator.initialize = function (callback) {
         });
 
         $('#mapgen_clear_cache').on('click', async () => {
-            if (!globalThis.electronAPI.confirmDialog('Clear all cached map tiles?')) return;
+            if (!await dialog.confirm('Clear all cached map tiles?')) return;
             await tileCache.clear();
             updateCacheSizeDisplay();
         });
@@ -2397,7 +2398,7 @@ TABS.map_generator.initialize = function (callback) {
         $('#mapgen_clear_hgt_cache').on('click', async () => {
             const cached = await hgtDb.cachedSet();
             if (cached.size === 0) return;
-            if (!globalThis.electronAPI.confirmDialog(`Clear ${cached.size} cached elevation tile(s) (~${cached.size * 25} MB)?`)) return;
+            if (!await dialog.confirm(`Clear ${cached.size} cached elevation tile(s) (~${cached.size * 25} MB)?`)) return;
             await hgtDb.clear();
             liveAltCache = {};
             updateHgtCacheInfo();
