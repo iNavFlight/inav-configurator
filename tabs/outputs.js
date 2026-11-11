@@ -75,13 +75,14 @@ outputsTab.initialize = function (callback) {
                 self.motorDirectionInverted=data.value;
             }).then(callback)
         },
-        /* With the RPM filter on, the firmware has a live RPM for every motor
-         * (bidirectional DSHOT or ESC telemetry), so the motor bars can show
-         * it next to the throttle. Older firmware without the setting reports
-         * null, which reads as "off". */
+        /* With bidirectional DSHOT on, the ESCs send a live RPM for every
+         * motor, so the motor bars can show it next to the throttle. The saved
+         * value is used on purpose: the firmware only reads RPM after the
+         * setting has been saved and the board rebooted. Older firmware without
+         * the setting reports null, which reads as "off". */
         function(callback) {
-            mspHelper.getSetting("rpm_gyro_filter_enabled").then((data)=>{
-                self.rpmFilterEnabled = !!(data && data.value);
+            mspHelper.getSetting("dshot_bidir_enabled").then((data)=>{
+                self.dshotBidirEnabled = !!(data && data.value);
             }).then(callback)
         }
     ]);
@@ -977,10 +978,10 @@ outputsTab.initialize = function (callback) {
         $motorsEnableTestMode.trigger('change');
 
         function getPeriodicMotorOutput() {
-            MSP.send_message(MSPCodes.MSP_MOTOR, false, false, self.rpmFilterEnabled ? getPeriodicEscRpm : getPeriodicServoOutput);
+            MSP.send_message(MSPCodes.MSP_MOTOR, false, false, self.dshotBidirEnabled ? getPeriodicEscRpm : getPeriodicServoOutput);
         }
 
-        /* Only asked for while the RPM filter is on. Firmware without ESC
+        /* Only asked for while bidirectional DSHOT is on. Firmware without ESC
          * telemetry answers "unsupported", which still reaches the callback
          * and leaves FC.ESC_RPM empty, so the chain never stalls. */
         function getPeriodicEscRpm() {
@@ -994,7 +995,7 @@ outputsTab.initialize = function (callback) {
         var full_block_scale = FC.MISC.maxthrottle - FC.MISC.mincommand;
 
         function getMotorRpmValue(index) {
-            if (!self.rpmFilterEnabled || index >= FC.ESC_RPM.length) {
+            if (!self.dshotBidirEnabled || index >= FC.ESC_RPM.length) {
                 return '';
             }
             return i18n.getMessage('motorsEscRpm', [FC.ESC_RPM[index].rpm]);
@@ -1006,7 +1007,7 @@ outputsTab.initialize = function (callback) {
          * the helper has already turned into null; that is shown as "unknown",
          * not as 0 %. */
         function getMotorTelemetryValue(index) {
-            if (!self.rpmFilterEnabled || index >= FC.ESC_RPM.length) {
+            if (!self.dshotBidirEnabled || index >= FC.ESC_RPM.length) {
                 return '';
             }
             const telemetry = FC.ESC_RPM[index];
@@ -1019,14 +1020,14 @@ outputsTab.initialize = function (callback) {
         /* A healthy link decodes practically every frame, so anything under
          * 98 % is flagged as an error. Unknown gets no colour. */
         function getMotorTelemetryClass(index) {
-            if (!self.rpmFilterEnabled || index >= FC.ESC_RPM.length || FC.ESC_RPM[index].frameSuccess === null) {
+            if (!self.dshotBidirEnabled || index >= FC.ESC_RPM.length || FC.ESC_RPM[index].frameSuccess === null) {
                 return '';
             }
             return FC.ESC_RPM[index].frameSuccess < 98 ? 'error' : '';
         }
 
         function getMotorTelemetryTitle(index) {
-            if (!self.rpmFilterEnabled || index >= FC.ESC_RPM.length) {
+            if (!self.dshotBidirEnabled || index >= FC.ESC_RPM.length) {
                 return '';
             }
             return i18n.getMessage('motorsEscTelemetryHelp');
