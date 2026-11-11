@@ -74,6 +74,16 @@ outputsTab.initialize = function (callback) {
             mspHelper.getSetting("motor_direction_inverted").then((data)=>{
                 self.motorDirectionInverted=data.value;
             }).then(callback)
+        },
+        /* With bidirectional DSHOT on, the ESCs send a live RPM for every
+         * motor, so the motor bars can show it next to the throttle. The saved
+         * value is used on purpose: the firmware only reads RPM after the
+         * setting has been saved and the board rebooted. Older firmware without
+         * the setting reports null, which reads as "off". */
+        function(callback) {
+            mspHelper.getSetting("dshot_bidir_enabled").then((data)=>{
+                self.dshotBidirEnabled = !!(data && data.value);
+            }).then(callback)
         }
     ]);
     loadChainer.setExitPoint(load_html);
@@ -413,9 +423,29 @@ outputsTab.initialize = function (callback) {
 
         $escProtocol.val(FC.ADVANCED_CONFIG.motorPwmProtocol);
 
+        /*
+         * Bidirectional DSHOT is a property of the DSHOT waveform itself, so the
+         * switch is only offered for the DSHOT protocols: the analog ones carry
+         * nothing back and SRXL2 reads its telemetry over the UART. On firmware
+         * without the setting Settings.processHtml() removes the input, and the
+         * block stays hidden rather than showing an empty box.
+         */
+        function dshotBidirUpdateVisibility() {
+            const protocol = escProtocols[FC.ADVANCED_CONFIG.motorPwmProtocol];
+            const isDshot = !!protocol && /^DSHOT/.test(protocol.name);
+            const $bidir = $('#dshot_bidir_enabled');
+            const bidirOn = $bidir.is(':checked');
+
+            $('#dshot-bidir').toggle(isDshot && $bidir.length > 0);
+            $('#dshot-bidir-warning').toggle(bidirOn);
+            $('#dshot_edt_enabled').closest('.checkbox').toggle(bidirOn);
+        }
+        $('#dshot_bidir_enabled').on('change', dshotBidirUpdateVisibility);
+
         $escProtocol.on('change', function () {
             FC.ADVANCED_CONFIG.motorPwmProtocol = $(this).val();
             srxl2UpdateVisibility();
+            dshotBidirUpdateVisibility();
         });
 
         $idlePercent.on('change', handleIdleMessageBox);
@@ -432,10 +462,14 @@ outputsTab.initialize = function (callback) {
             $reverseRow.toggle($reverseEnable.is(':checked'));
         }
 
+        /* Same reason as above: the bidirectional DSHOT checkbox is a data-setting
+         * input, so its state is only known once the settings have been read. */
         if (settingsPromise && typeof settingsPromise.then === 'function') {
             settingsPromise.then(srxl2ReverseInit);
+            settingsPromise.then(dshotBidirUpdateVisibility);
         } else {
             srxl2ReverseInit();
+            dshotBidirUpdateVisibility();
         }
 
         $("#esc-protocols").show();
@@ -774,10 +808,14 @@ outputsTab.initialize = function (callback) {
                 <div class="m-block motor-' + i + '">\
                     <div class="meter-bar">\
                         <div class="label"></div>\
+                        <div class="rpm"></div>\
+                        <div class="telemetry"></div>\
                         <div class="indicator">\
                             <div class="label">\
                                 <div class="label"></div>\
                             </div>\
+                            <div class="rpm"></div>\
+                            <div class="telemetry"></div>\
                         </div>\
                     </div>\
                 </div>\
@@ -940,7 +978,14 @@ outputsTab.initialize = function (callback) {
         $motorsEnableTestMode.trigger('change');
 
         function getPeriodicMotorOutput() {
-            MSP.send_message(MSPCodes.MSP_MOTOR, false, false, getPeriodicServoOutput);
+            MSP.send_message(MSPCodes.MSP_MOTOR, false, false, self.dshotBidirEnabled ? getPeriodicEscRpm : getPeriodicServoOutput);
+        }
+
+        /* Only asked for while bidirectional DSHOT is on. Firmware without ESC
+         * telemetry answers "unsupported", which still reaches the callback
+         * and leaves FC.ESC_RPM empty, so the chain never stalls. */
+        function getPeriodicEscRpm() {
+            MSP.send_message(MSPCodes.MSP2_INAV_ESC_RPM, false, false, getPeriodicServoOutput);
         }
 
         function getPeriodicServoOutput() {
@@ -948,6 +993,45 @@ outputsTab.initialize = function (callback) {
         }
 
         var full_block_scale = FC.MISC.maxthrottle - FC.MISC.mincommand;
+
+        function getMotorRpmValue(index) {
+            if (!self.dshotBidirEnabled || index >= FC.ESC_RPM.length) {
+                return '';
+            }
+            return i18n.getMessage('motorsEscRpm', [FC.ESC_RPM[index].rpm]);
+        }
+
+        /* Telemetry frame success % for the last closed 1 s window. The
+         * firmware reports 255 / 0 when it expected no frames at
+         * all (just booted, no telemetry, SRXL2 which does not count), which
+         * the helper has already turned into null; that is shown as "unknown",
+         * not as 0 %. */
+        function getMotorTelemetryValue(index) {
+            if (!self.dshotBidirEnabled || index >= FC.ESC_RPM.length) {
+                return '';
+            }
+            const telemetry = FC.ESC_RPM[index];
+            if (telemetry.frameSuccess === null) {
+                return i18n.getMessage('motorsEscTelemetryUnknown');
+            }
+            return i18n.getMessage('motorsEscTelemetry', [telemetry.frameSuccess]);
+        }
+
+        /* A healthy link decodes practically every frame, so anything under
+         * 98 % is flagged as an error. Unknown gets no colour. */
+        function getMotorTelemetryClass(index) {
+            if (!self.dshotBidirEnabled || index >= FC.ESC_RPM.length || FC.ESC_RPM[index].frameSuccess === null) {
+                return '';
+            }
+            return FC.ESC_RPM[index].frameSuccess < 98 ? 'error' : '';
+        }
+
+        function getMotorTelemetryTitle(index) {
+            if (!self.dshotBidirEnabled || index >= FC.ESC_RPM.length) {
+                return '';
+            }
+            return i18n.getMessage('motorsEscTelemetryHelp');
+        }
 
         function update_ui() {
             var previousArmState = self.armed,
@@ -965,6 +1049,12 @@ outputsTab.initialize = function (callback) {
                 color = parseInt(data * 0.009);
 
                 $('.motor-' + i + ' .label', motors_wrapper).text(getMotorOutputValue(FC.MOTOR_DATA[i]));
+                $('.motor-' + i + ' .rpm', motors_wrapper).text(getMotorRpmValue(i));
+                $('.motor-' + i + ' .telemetry', motors_wrapper)
+                    .text(getMotorTelemetryValue(i))
+                    .attr('title', getMotorTelemetryTitle(i))
+                    .removeClass('error')
+                    .addClass(getMotorTelemetryClass(i));
                 $('.motor-' + i + ' .indicator', motors_wrapper).css({ 'margin-top': margin_top + 'px', 'height': height + 'px', 'background-color': '#37a8db' + color + ')' });
             }
 

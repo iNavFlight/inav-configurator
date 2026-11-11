@@ -1686,6 +1686,21 @@
     "srxl2TelemetryHelp": {
         "message": "Telemetry shares the throttle wire, so unlike a conventional ESC there is no port to leave unassigned. Turn this off to read nothing from the ESC."
     },
+    "dshotBidirEnabled": {
+        "message": "Bidirectional DSHOT"
+    },
+    "dshotBidirEnabledHelp": {
+        "message": "The ESC answers every DSHOT frame with its eRPM on the motor signal wire. This gives the RPM filter a live RPM for every motor without a separate ESC telemetry UART. Requires an ESC firmware with bidirectional DSHOT support."
+    },
+    "dshotBidirWarning": {
+        "message": "Do NOT enable bidirectional DSHOT with BLHeli_32 firmware 32.9 or earlier. While settings are being saved the signal line is held high; those ESC firmwares cannot handle that and may lose the signal or react to noise on the line. BLHeli_32 32.10, BLHeli_S, Bluejay, AM32 and ESCape32 are known to work."
+    },
+    "dshotEdtEnabled": {
+        "message": "Extended DSHOT telemetry (EDT)"
+    },
+    "dshotEdtEnabledHelp": {
+        "message": "Also reads temperature, voltage and current from the ESC in addition to eRPM. The ESC is asked for it on every arm, so the values appear after the first arm."
+    },
     "portsBaudAuto": {
         "message": "auto"
     },
@@ -2777,6 +2792,18 @@
     },
     "motorsEnableControl": {
         "message": "I understand the risks, propellers are removed - Enable motor control."
+    },
+    "motorsEscRpm": {
+        "message": "$1 RPM"
+    },
+    "motorsEscTelemetry": {
+        "message": "$1 %"
+    },
+    "motorsEscTelemetryUnknown": {
+        "message": "—"
+    },
+    "motorsEscTelemetryHelp": {
+        "message": "ESC telemetry over the last 1 s window: percentage of frames decoded successfully and number of frames expected per second (bidirectional DSHOT, or ESC sensor when that is off). — means the flight controller expected no frames in that window."
     },
     "sensorsInfo": {
         "message": "Keep in mind that using fast update periods and rendering multiple graphs at the same time is resource heavy and will burn your battery quicker if you use a laptop.<br />We recommend to only render graphs for sensors you are interested in while using reasonable update periods."

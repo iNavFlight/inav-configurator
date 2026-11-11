@@ -339,6 +339,12 @@ var FC = {
 
         this.MOTOR_DATA = new Array(8);
         this.SERVO_DATA = new Array(16);
+        // Per-motor { rpm, frameSuccess, frameTotal } from MSP2_INAV_ESC_RPM.
+        // frameSuccess is the % of telemetry frames decoded in the last 1 s
+        // window (null when the firmware has nothing to count), frameTotal
+        // the frames it expected in that window. Stays empty on firmware that
+        // does not answer the command, so tabs show nothing rather than zeros.
+        this.ESC_RPM = [];
 
         this.GPS_DATA = {
             fix: 0,
