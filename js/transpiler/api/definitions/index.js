@@ -12,6 +12,7 @@
 import flight from './flight.js';
 import rc from './rc.js';
 import waypoint from './waypoint.js';
+import roi from './roi.js';
 import pid from './pid.js';
 import helpers from './helpers.js';
 import events from './events.js';
@@ -21,6 +22,7 @@ export default {
   flight,
   rc,
   waypoint,
+  roi,
   pid,
   helpers,
   events,

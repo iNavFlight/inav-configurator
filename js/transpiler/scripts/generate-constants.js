@@ -172,12 +172,14 @@ function generateConstants(headerPath, outputPath) {
     const flightParams = parseEnum(content, 'logicFlightOperands_e');
     const flightModes = parseEnum(content, 'logicFlightModeOperands_e');
     const waypointParams = parseEnum(content, 'logicWaypointOperands_e');
+    const roiParams = parseEnum(content, 'logicROIOperands_e');
     
     console.log(`Found ${Object.keys(operations).length} operations`);
     console.log(`Found ${Object.keys(operandTypes).length} operand types`);
     console.log(`Found ${Object.keys(flightParams).length} flight parameters`);
     console.log(`Found ${Object.keys(flightModes).length} flight modes`);
     console.log(`Found ${Object.keys(waypointParams).length} waypoint parameters`);
+    console.log(`Found ${Object.keys(roiParams).length} ROI parameters`);
     
     // Generate JavaScript file
     const output = `/**
@@ -216,6 +218,11 @@ ${generateJSConstants(flightModes, 'FLIGHT_MODE', 'LOGIC_CONDITION_OPERAND_FLIGH
  * Waypoint parameters (operand value for OPERAND_TYPE.WAYPOINTS)
  */
 ${generateJSConstants(waypointParams, 'WAYPOINT_PARAM', 'LOGIC_CONDITION_OPERAND_WAYPOINTS')}
+
+/**
+ * ROI parameters (operand value for OPERAND_TYPE.ROI)
+ */
+${generateJSConstants(roiParams, 'ROI_PARAM', 'LOGIC_CONDITION_OPERAND_ROI')}
 
 /**
  * RC channel configuration
@@ -261,10 +268,24 @@ ${generateNamesMapping(flightParams, 'LOGIC_CONDITION_OPERAND_FLIGHT', (jsName, 
 };
 
 /**
+ * Human-readable ROI parameter names
+ */
+const ROI_PARAM_NAMES = {
+${generateNamesMapping(roiParams, 'LOGIC_CONDITION_OPERAND_ROI', (jsName) => {
+    // Convert to camelCase for property names
+    return jsName.toLowerCase().replace(/_([a-z])/g, (_, letter) => letter.toUpperCase());
+})}
+};
+
+/**
  * Helper functions
  */
 function getFlightParamName(paramId) {
   return FLIGHT_PARAM_NAMES[paramId] || \`unknown_param_\${paramId}\`;
+}
+
+function getROIParamName(paramId) {
+  return ROI_PARAM_NAMES[paramId] || \`unknown_roi_param_\${paramId}\`;
 }
 
 function getOperationName(operationId) {
@@ -285,7 +306,9 @@ module.exports = {
   FLIGHT_PARAM,
   FLIGHT_MODE,
   WAYPOINT_PARAM,
+  ROI_PARAM,
   FLIGHT_PARAM_NAMES,
+  ROI_PARAM_NAMES,
   OPERATION_NAMES,
   RC_CHANNEL,
   GVAR_CONFIG,
@@ -293,6 +316,7 @@ module.exports = {
   
   // Helper functions
   getFlightParamName,
+  getROIParamName,
   getOperationName,
   isValidGvarIndex,
   isValidRCChannel
@@ -306,6 +330,7 @@ module.exports = {
     console.log(`  Flight params: ${Object.keys(flightParams).length - 1}`);
     console.log(`  Flight modes: ${Object.keys(flightModes).length}`);
     console.log(`  Waypoint params: ${Object.keys(waypointParams).length}`);
+    console.log(`  ROI params: ${Object.keys(roiParams).length}`);
 }
 
 // Main execution

@@ -8,6 +8,7 @@ import GlobalVariablesStatus from './globalVariablesStatus';
 import ProgrammingPidCollection from './programmingPidCollection';
 import ProgrammingPidStatus from './programmingPidStatus';
 import WaypointCollection from './waypointCollection';
+import Roi from './roi';
 import OutputMappingCollection from './outputMapping';
 import SafehomeCollection from './safehomeCollection';
 import FwApproachCollection from './fwApproachCollection';
@@ -52,6 +53,7 @@ var FC = {
     ADSB_LIMITS: null,
     ADSB_WARNING_ICAO: null,
     MISSION_PLANNER: null,
+    ROI: null,
     ANALOG: null,
     ARMING_CONFIG: null,
     FC_CONFIG: null,
@@ -381,6 +383,7 @@ var FC = {
         };
 
         this.MISSION_PLANNER = new WaypointCollection();
+        this.ROI = new Roi();
 
         this.ANALOG = {
             voltage: 0,

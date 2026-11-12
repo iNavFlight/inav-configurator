@@ -27,7 +27,7 @@ function initializeMonacoEditor(monaco, containerId, options = {}) {
     
     // Default configuration
     const defaultOptions = {
-        value: '// INAV JavaScript Programming\n// Write JavaScript, get INAV logic conditions!\n\nconst { flight, override, rc, gvar, on } = inav;\n\n// Example:\n// if (flight.homeDistance > 100) {\n//   override.vtx.power = 3;\n// }\n',
+        value: '// INAV JavaScript Programming\n// Write JavaScript, get INAV logic conditions!\n\nconst { flight, waypoint, roi, override, rc, gvar, on } = inav;\n\n// Example:\n// if (flight.homeDistance > 100) {\n//   override.vtx.power = 3;\n// }\n',
         language: 'javascript',
         theme: 'vs-dark',
         automaticLayout: true,

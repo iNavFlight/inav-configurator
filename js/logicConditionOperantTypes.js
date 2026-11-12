@@ -135,6 +135,23 @@ const OPERAND_TYPES = {
             13: "Next WP has User Action 4",
         }
     },
+    8: {
+        name: "ROI",
+        type: "dictionary",
+        default: 0,
+        values: {
+            0: "ROI Active",
+            1: "ROI Distance [m]",
+            2: "ROI Ground Distance [m]",
+            3: "ROI Altitude [cm]",
+            4: "ROI Bearing [cdeg]",
+            5: "ROI Elevation [cdeg]",
+            6: "ROI Param 1",
+            7: "ROI Param 2",
+            8: "ROI Alt datum",
+            9: "ROI Action",
+        }
+    },
 };
 
 export { OPERAND_TYPES };

@@ -42,6 +42,7 @@ declare namespace inav {
   dts += generateInterfaceFromDefinition('flight', apiDefinitions.flight);
   dts += generateInterfaceFromDefinition('rc', apiDefinitions.rc);
   dts += generateInterfaceFromDefinition('waypoint', apiDefinitions.waypoint);
+  dts += generateInterfaceFromDefinition('roi', apiDefinitions.roi);
   dts += generateInterfaceFromDefinition('override', apiDefinitions.override);
   
   // Add special types
@@ -127,7 +128,7 @@ function generateProperties(definitions, indent, parentName) {
   for (const [key, def] of Object.entries(definitions)) {
     if (typeof def.type !== 'undefined' && def.type !== 'object') {
       // Simple property (leaf node)
-      const readonly = (parentName === 'flight' || parentName === 'waypoint') ? 'readonly ' : '';
+      const readonly = (parentName === 'flight' || parentName === 'waypoint' || parentName === 'roi') ? 'readonly ' : '';
       const tsType = mapJSTypeToTS(def.type);
       const comment = def.desc + (def.unit ? ` (${def.unit})` : '');
       result += `${indent}/** ${comment} */\n`;
