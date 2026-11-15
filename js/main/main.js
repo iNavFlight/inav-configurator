@@ -131,7 +131,11 @@ function createWindow() {
       preload: path.join(__dirname, 'preload.mjs'),
       nodeIntegration: true,
       webSecurity: false,
-      contextIsolation: true
+      contextIsolation: true,
+      // The MSP queue runs on a 10 ms setInterval (js/serial_queue.js). Chromium throttles the
+      // timers of a hidden window to ~1/s (1/min after 5 min), which starves the link: saves
+      // stall for minutes and the reconnect after a reboot misses its 10 s watchdog.
+      backgroundThrottling: false
     },
   });
 
