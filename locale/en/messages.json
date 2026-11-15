@@ -6414,6 +6414,9 @@
     "mspWriteBlockedAfterParseFailure": {
         "message": "<span style=\"color: red\">Not saved.</span> These settings come from the flight controller's $1 response, which could not be read this session, so writing them back is refused. Reconnect to try again."
     },
+    "mspWriteRejectedByFc": {
+        "message": "<span style=\"color: red\">Not saved.</span> The flight controller refused $1, so that change was not stored. For a setting, the value is usually outside the range the firmware accepts."
+    },
     "motor_direction_inverted": {
         "message": "Normal motor direction / Props-in configuration"
     },
