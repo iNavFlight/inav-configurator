@@ -1002,6 +1002,9 @@
     "initialSetupOpflowCalibEnded": {
         "message": "Optic flow calibration <span style=\"color: #37a8db\">finished</span>"
     },
+    "calibrationRefusedByFc": {
+        "message": "<span style=\"color: red\">Calibration not started.</span> The flight controller refused it. It does not calibrate while armed: disarm and try again."
+    },
     "initialSetupSettingsRestored": {
         "message": "Settings restored to <strong>default</strong>"
     },
@@ -6413,6 +6416,9 @@
     },
     "mspWriteBlockedAfterParseFailure": {
         "message": "<span style=\"color: red\">Not saved.</span> These settings come from the flight controller's $1 response, which could not be read this session, so writing them back is refused. Reconnect to try again."
+    },
+    "mspWriteRejectedByFc": {
+        "message": "<span style=\"color: red\">Not saved.</span> The flight controller refused $1, so that change was not stored. For a setting, the value is usually outside the range the firmware accepts."
     },
     "motor_direction_inverted": {
         "message": "Normal motor direction / Props-in configuration"

@@ -112,7 +112,32 @@ var mspHelper = (function () {
             }
         }
 
+        reportRejectedWrite(dataHandler);
         completeRequest(dataHandler, new DataView(dataHandler.message_buffer, 0));
+    };
+
+    var lastRejectedWriteNotice = new Map();
+
+    /**
+     * The FC answers a write it refuses with '!' (MSP_RESULT_ERROR): nothing was
+     * stored. Tell the user and the console - once per command per burst, as an
+     * FC that lacks a handler refuses every repeat of a periodic write (the motor
+     * wizard sends MSP_SET_MOTOR every 10 ms).
+     * @param {MSP} dataHandler
+     */
+    var reportRejectedWrite = function (dataHandler) {
+        if (!dataHandler.unsupported || !MSP.isWriteCode(dataHandler.code)) {
+            return;
+        }
+        const now = Date.now();
+        if (now - (lastRejectedWriteNotice.get(dataHandler.code) || 0) < 3000) {
+            return;
+        }
+        lastRejectedWriteNotice.set(dataHandler.code, now);
+
+        const name = MSP.getCodeName(dataHandler.code);
+        console.error('Flight controller refused MSP write ' + name);
+        GUI.log(i18n.getMessage('mspWriteRejectedByFc', [name]));
     };
 
     /**
@@ -2011,9 +2036,9 @@ var mspHelper = (function () {
                     // remove object from array
                     dataHandler.callbacks.splice(i, 1);
 
-                    // fire callback
+                    // fire callback; unsupported marks an '!' reply (MSP_RESULT_ERROR)
                     if (callback) {
-                        callback({ 'command': dataHandler.code, 'data': data, 'length': dataHandler.message_length_expected });
+                        callback({ 'command': dataHandler.code, 'data': data, 'length': dataHandler.message_length_expected, 'unsupported': Boolean(dataHandler.unsupported) });
                     }
                     break;
                 }
