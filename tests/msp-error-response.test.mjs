@@ -19,132 +19,36 @@
  *   - the completion object carries `unsupported` (an extra field - existing
  *     readers of command/data/length see no change)
  *   - resolveMspWrite()/guardMspCallback() treat an '!' reply as not landed
- *   - a refused write is reported in the GUI log
+ *   - a refused write is reported in the GUI log and the console, both at
+ *     most once per command every 3 s
+ *   - a refused calibration (MSP_ACC/MAG_CALIBRATION, MSP2_INAV_OPFLOW_CALIBRATION,
+ *     refused while armed, inav src/main/fc/fc_msp.c:3120-3140) is told apart
+ *     from a started one
  *   - read paths that evaluate '!' on purpose (MSP2_INAV_ESC_SRXL2_STATUS,
  *     MSP2_INAV_LOGIC_CONDITIONS_CONFIGURED) keep working
  *
  * The frames go through the REAL decoder (MSP.read), the REAL queue executor,
- * the REAL MSPHelper response path and the REAL mspWriteOutcome module. As in
- * tests/msp-parse-failure-recovery.test.mjs only import specifiers are
- * rewritten so Node can load the Vite-style extensionless imports; no
- * statement of the code under test is touched.
+ * the REAL MSPHelper response path and the REAL mspWriteOutcome module, loaded
+ * by tests/helpers/realMspStack.mjs: only import specifiers are rewritten so
+ * Node can load the Vite-style extensionless imports; no statement of the code
+ * under test is touched.
  */
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { pathToFileURL } from 'node:url';
 
-import { dataModule } from './helpers/dataModule.mjs';
-import { makeHarness } from './helpers/harness.mjs';
-
-const { repoRoot, rewriteAndWrite } = makeHarness(import.meta.url, 'msp-error-response.test.mjs', 'msp-error-response-');
-
-function realModuleUrl(relPath) {
-    return pathToFileURL(join(repoRoot, relPath)).href;
-}
-
-const realMspCodesUrl = realModuleUrl('js/msp/MSPCodes.js');
-const realTimeoutsUrl = realModuleUrl('js/timeouts.js');
-const realConfiguratorUrl = realModuleUrl('js/data_storage.js');
-const realDedupUrl = realModuleUrl('js/msp/mspDeduplicationQueue.js');
-const realStatisticsUrl = realModuleUrl('js/msp/mspStatistics.js');
-const realSmoothFilterUrl = realModuleUrl('js/simple_smooth_filter.js');
-const realInjectedMethodsUrl = realModuleUrl('js/injected_methods.js');
-const realMspWriteOutcomeUrl = realModuleUrl('js/mspWriteOutcome.js');
-const realBitHelperUrl = realModuleUrl('js/bitHelper.js');
-
-// The queue's intervals are un-refed only so `node --test` can exit; how and
-// when they run is unchanged.
-const realEventFrequencyAnalyzerUrl = rewriteAndWrite('js/eventFrequencyAnalyzer.js', [
-    [/privateScope\.intervalHandler = setInterval\(publicScope\.analyze, bufferPeriod\);/g, 'privateScope.intervalHandler = setInterval(publicScope.analyze, bufferPeriod).unref();', "analyze setInterval"],
-], 'eventFrequencyAnalyzer-generated');
-
-const realMspQueueUrl = rewriteAndWrite('js/serial_queue.js', [
-    [/^import CONFIGURATOR from '\.\/data_storage';$/m, `import CONFIGURATOR from '${realConfiguratorUrl}';`, "import CONFIGURATOR"],
-    [/^import MSPCodes from '\.\/msp\/MSPCodes';$/m, `import MSPCodes from '${realMspCodesUrl}';`, "import MSPCodes"],
-    [/^import SimpleSmoothFilter from '\.\/simple_smooth_filter';$/m, `import SimpleSmoothFilter from '${realSmoothFilterUrl}';`, "import SimpleSmoothFilter"],
-    [/^import eventFrequencyAnalyzer from '\.\/eventFrequencyAnalyzer';$/m, `import eventFrequencyAnalyzer from '${realEventFrequencyAnalyzerUrl}';`, "import eventFrequencyAnalyzer"],
-    [/^import mspDeduplicationQueue from '\.\/msp\/mspDeduplicationQueue';$/m, `import mspDeduplicationQueue from '${realDedupUrl}';`, "import mspDeduplicationQueue"],
-    [/setInterval\(publicScope\.executor, Math\.round\(1000 \/ privateScope\.handlerFrequency\)\);/, 'setInterval(publicScope.executor, Math.round(1000 / privateScope.handlerFrequency)).unref();', "executor setInterval"],
-    [/setInterval\(publicScope\.balancer, Math\.round\(1000 \/ privateScope\.balancerFrequency\)\);/, 'setInterval(publicScope.balancer, Math.round(1000 / privateScope.balancerFrequency)).unref();', "balancer setInterval"],
-], 'serial_queue-generated');
-
-const realMspUrl = rewriteAndWrite('js/msp.js', [
-    [/^import MSPCodes from '\.\/msp\/MSPCodes';$/m, `import MSPCodes from '${realMspCodesUrl}';`, "import MSPCodes"],
-    [/^import mspQueue from '\.\/serial_queue';$/m, `import mspQueue from '${realMspQueueUrl}';`, "import mspQueue"],
-    [/^import eventFrequencyAnalyzer from '\.\/eventFrequencyAnalyzer';$/m, `import eventFrequencyAnalyzer from '${realEventFrequencyAnalyzerUrl}';`, "import eventFrequencyAnalyzer"],
-    [/^import timeout from '\.\/timeouts';$/m, `import timeout from '${realTimeoutsUrl}';`, "import timeout"],
-    [/^import CONFIGURATOR from '\.\/data_storage';$/m, `import CONFIGURATOR from '${realConfiguratorUrl}';`, "import CONFIGURATOR"],
-], 'msp-generated');
+import { loadRealMspStack } from './helpers/realMspStack.mjs';
 
 // FC state the read-path cases below touch; nothing else is reached.
-const FC_STATE_ID = '__mspErrorResponseFcState';
-globalThis[FC_STATE_ID] = {
+const fcState = {
     SRXL2_STATUS: { supported: true, phase: 0, connected: false, lastResult: 0, ports: 0, motors: 0 },
     LOGIC_CONDITIONS_CONFIGURED_MASK: null,
 };
-const fcStubUrl = dataModule(`
-    const FC = globalThis['${FC_STATE_ID}'];
-    export default FC;
-`);
-const inertDefaultUrl = dataModule('export default {};');
-const guiStubUrl = dataModule(`
-    const GUI = { logged: [], log(message) { GUI.logged.push(message); } };
-    export default GUI;
-`);
-// Records the substitutions too, so the test can check what the user is told.
-const i18nStubUrl = dataModule(`
-    const i18n = { calls: [], getMessage(key, subs) { i18n.calls.push({ key, subs }); return key; } };
-    export default i18n;
-`);
-const inertFwApproachUrl = dataModule('export const FwApproach = class {};');
-const inertDronecanAsyncRequestParseUrl = dataModule('export const parseDronecanAsyncRequestResponse = () => null;');
-const inertGeozoneUrl = dataModule(`
-    export const Geozone = class {};
-    export const GeozoneVertex = class {};
-    export const GeozoneShapes = {};
-`);
-
-const realMspHelperUrl = rewriteAndWrite('js/msp/MSPHelper.js', [
-    [/^import semver from 'semver';$/m, `import semver from '${inertDefaultUrl}';`, "import semver"],
-    [/^import '\.\/\.\.\/injected_methods';$/m, `import '${realInjectedMethodsUrl}';`, "import injected_methods"],
-    [/^import GUI from '\.\/\.\.\/gui';$/m, `import GUI from '${guiStubUrl}';`, "import GUI"],
-    [/^import i18n from '\.\/\.\.\/localization';$/m, `import i18n from '${i18nStubUrl}';`, "import i18n"],
-    [/^import MSP from '\.\/\.\.\/msp';$/m, `import MSP from '${realMspUrl}';`, "import MSP"],
-    [/^import MSPCodes from '\.\/MSPCodes';$/m, `import MSPCodes from '${realMspCodesUrl}';`, "import MSPCodes"],
-    [/^import FC from '\.\/\.\.\/fc';$/m, `import FC from '${fcStubUrl}';`, "import FC"],
-    [/^import VTX from '\.\/\.\.\/vtx';$/m, `import VTX from '${inertDefaultUrl}';`, "import VTX"],
-    [/^import mspQueue from '\.\/\.\.\/serial_queue';$/m, `import mspQueue from '${realMspQueueUrl}';`, "import mspQueue"],
-    [/^import ServoMixRule from '\.\/\.\.\/servoMixRule';$/m, `import ServoMixRule from '${inertDefaultUrl}';`, "import ServoMixRule"],
-    [/^import MotorMixRule from '\.\/\.\.\/motorMixRule';$/m, `import MotorMixRule from '${inertDefaultUrl}';`, "import MotorMixRule"],
-    [/^import LogicCondition from '\.\/\.\.\/logicCondition';$/m, `import LogicCondition from '${inertDefaultUrl}';`, "import LogicCondition"],
-    [/^import BitHelper from '\.\.\/bitHelper';$/m, `import BitHelper from '${realBitHelperUrl}';`, "import BitHelper"],
-    [/^import serialPortHelper from '\.\/\.\.\/serialPortHelper';$/m, `import serialPortHelper from '${inertDefaultUrl}';`, "import serialPortHelper"],
-    [/^import ProgrammingPid from '\.\/\.\.\/programmingPid';$/m, `import ProgrammingPid from '${inertDefaultUrl}';`, "import ProgrammingPid"],
-    [/^import Safehome from '\.\/\.\.\/safehome';$/m, `import Safehome from '${inertDefaultUrl}';`, "import Safehome"],
-    [/^import \{ FwApproach \} from '\.\/\.\.\/fwApproach';$/m, `import { FwApproach } from '${inertFwApproachUrl}';`, "import FwApproach"],
-    [/^import \{ parseDronecanAsyncRequestResponse \} from '\.\/\.\.\/dronecanAsyncRequestParse';$/m, `import { parseDronecanAsyncRequestResponse } from '${inertDronecanAsyncRequestParseUrl}';`, "import parseDronecanAsyncRequestResponse"],
-    [/^import Waypoint from '\.\/\.\.\/waypoint';$/m, `import Waypoint from '${inertDefaultUrl}';`, "import Waypoint"],
-    [/^import mspDeduplicationQueue from '\.\/mspDeduplicationQueue';$/m, `import mspDeduplicationQueue from '${realDedupUrl}';`, "import mspDeduplicationQueue"],
-    [/^import mspStatistics from '\.\/mspStatistics';$/m, `import mspStatistics from '${realStatisticsUrl}';`, "import mspStatistics"],
-    [/^import \{ resolveMspWrite, guardMspCallback \} from '\.\/\.\.\/mspWriteOutcome';$/m, `import { resolveMspWrite, guardMspCallback } from '${realMspWriteOutcomeUrl}';`, "import resolveMspWrite, guardMspCallback"],
-    [/^import settingsCache from '\.\/\.\.\/settingsCache';$/m, `import settingsCache from '${inertDefaultUrl}';`, "import settingsCache"],
-    [/^import \{Geozone, GeozoneVertex, GeozoneShapes \} from '\.\/\.\.\/geozone';$/m, `import { Geozone, GeozoneVertex, GeozoneShapes } from '${inertGeozoneUrl}';`, "import Geozone"],
-], 'MSPHelper-generated');
-
-const { default: mspHelper } = await import(realMspHelperUrl);
-const { default: MSPCodes } = await import(realMspCodesUrl);
-const { default: MSP } = await import(realMspUrl);
-const { default: mspQueue } = await import(realMspQueueUrl);
-const { default: mspDeduplicationQueue } = await import(realDedupUrl);
-const { default: CONFIGURATOR } = await import(realConfiguratorUrl);
-const { default: GUI } = await import(guiStubUrl);
-const { default: i18n } = await import(i18nStubUrl);
-const { resolveMspWrite, guardMspCallback } = await import(realMspWriteOutcomeUrl);
-
-const FC = globalThis[FC_STATE_ID];
+const { repoRoot, FC, mspHelper, MSPCodes, MSP, mspQueue, mspDeduplicationQueue, CONFIGURATOR, GUI, i18n, mspWriteOutcome } =
+    await loadRealMspStack(import.meta.url, 'msp-error-response.test.mjs', 'msp-error-response-', fcState);
+const { resolveMspWrite, guardMspCallback, refusedByFc } = mspWriteOutcome;
 
 // Same wiring configurator_main.js / serial_backend.js do at startup.
 MSP.init();
@@ -299,8 +203,59 @@ test("read path kept: MSP2_INAV_LOGIC_CONDITIONS_CONFIGURED '!' leaves the mask 
     });
 });
 
-test('the refusal message exists in the English locale', () => {
+test("a periodic write refused again and again is reported once, in the log and in the console", async () => {
+    // The motor wizard (tabs/mixer.js) repeats MSP_SET_MOTOR every 10 ms.
+    const consoleErrors = [];
+    const realConsoleError = console.error;
+    console.error = (...args) => { consoleErrors.push(args.join(' ')); };
+    try {
+        await withFc((code) => v2Reply('!', code), async () => {
+            for (let i = 0; i < 5; i++) {
+                await within(2000, MSP.promise(MSPCodes.MSP_SET_MOTOR, new Array(16).fill(0)), 'motor write ' + i);
+            }
+        });
+    } finally {
+        console.error = realConsoleError;
+    }
+    const refusals = consoleErrors.filter((line) => line.includes('MSP_SET_MOTOR'));
+    assert.equal(refusals.length, 1, 'the console must not get one line per refused repeat');
+    assert.equal(i18n.calls.filter((c) => c.key === REJECTED_KEY).length, 1, 'nor the GUI log');
+});
+
+const CALIBRATION_STARTS = [
+    ['MSP_ACC_CALIBRATION', 'initialSetupAccelCalibStarted'],
+    ['MSP_MAG_CALIBRATION', 'initialSetupMagCalibStarted'],
+    ['MSP2_INAV_OPFLOW_CALIBRATION', 'initialSetupOpflowCalibStarted'],
+];
+
+test("an '!' reply to a calibration reads as refused, a '>' ack as started", async () => {
+    for (const [name] of CALIBRATION_STARTS) {
+        await withFc((code) => v2Reply('!', code), async () => {
+            const resp = await within(2000, MSP.promise(MSPCodes[name]), name + ' refused');
+            assert.equal(refusedByFc(resp), true, name + ": an '!' reply means the calibration did not start");
+            assert.equal(GUI.logged.includes(REJECTED_KEY), false, name + ' stores nothing, so no "Not saved" notice');
+        });
+        await withFc((code) => v2Reply('>', code), async () => {
+            const resp = await within(2000, MSP.promise(MSPCodes[name]), name + ' acknowledged');
+            assert.equal(refusedByFc(resp), false, name + ': an ack means the calibration started');
+        });
+    }
+    assert.equal(refusedByFc(false), false, 'a dropped request is not a refusal by the FC');
+});
+
+test('the calibration tab logs each start through the refusal check', () => {
+    // tabs/calibration.js needs jQuery, jBox and the DOM, so its wiring is checked in the source.
+    const source = readFileSync(join(repoRoot, 'tabs/calibration.js'), 'utf8');
+    assert.match(source, /refusedByFc\(response\) \? 'calibrationRefusedByFc' : startedKey/);
+    for (const [name, startedKey] of CALIBRATION_STARTS) {
+        assert.ok(source.includes(`MSP.send_message(MSPCodes.${name}, false, false, logCalibrationStart('${startedKey}'));`),
+            `${name} must log through logCalibrationStart()`);
+    }
+});
+
+test('the refusal messages exist in the English locale', () => {
     const messages = JSON.parse(readFileSync(join(repoRoot, 'locale/en/messages.json'), 'utf8'));
     assert.ok(messages[REJECTED_KEY] && messages[REJECTED_KEY].message.includes('$1'),
         `${REJECTED_KEY} must exist in locale/en/messages.json and name the command via $1`);
+    assert.ok(messages.calibrationRefusedByFc, 'calibrationRefusedByFc must exist in locale/en/messages.json');
 });

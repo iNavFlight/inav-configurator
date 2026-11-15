@@ -1,12 +1,20 @@
 'use strict';
 
 /**
+ * True when the FC answered with '!' (MSP_RESULT_ERROR): the reply still
+ * completes the request, flagged with unsupported, but the FC did not act on
+ * it - nothing stored, nothing started.
+ */
+export function refusedByFc(result) {
+    return Boolean(result?.unsupported);
+}
+
+/**
  * A write landed unless the queue dropped it (the literal false) or the FC
- * answered with '!' (MSP_RESULT_ERROR) - that reply still completes the
- * request, flagged with unsupported, but nothing was stored.
+ * refused it.
  */
 function writeLanded(result) {
-    return result !== false && !(result && result.unsupported);
+    return result !== false && !refusedByFc(result);
 }
 
 /**

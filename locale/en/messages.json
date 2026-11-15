@@ -1002,6 +1002,9 @@
     "initialSetupOpflowCalibEnded": {
         "message": "Optic flow calibration <span style=\"color: #37a8db\">finished</span>"
     },
+    "calibrationRefusedByFc": {
+        "message": "<span style=\"color: red\">Calibration not started.</span> The flight controller refused it. It does not calibrate while armed: disarm and try again."
+    },
     "initialSetupSettingsRestored": {
         "message": "Settings restored to <strong>default</strong>"
     },
