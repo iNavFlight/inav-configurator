@@ -133,7 +133,11 @@ PortHandler.check = function () {
             if (!GUI.connected_to) {
                 $('div#port-picker #port').val(new_ports[0]);
             } else {
-                $('div#port-picker #port').val(GUI.connected_to);
+                // A manual-override connection (e.g. /dev/rfcomm0) has no <option>, and
+                // .val() with an unknown value would leave nothing selected.
+                const $port = $('div#port-picker #port');
+                const hasOption = $port.find('option').filter(function () { return this.value === GUI.connected_to; }).length > 0;
+                $port.val(hasOption ? GUI.connected_to : 'manual');
             }
 
             // trigger callbacks

@@ -115,41 +115,43 @@ var SerialBackend = (function () {
 
 
         GUI.updateManualPortVisibility = function(){
-            var selected_port = privateScope.$port.find('option:selected');
-            if (selected_port.data().isManual || selected_port.data().isTcp || selected_port.data().isUdp) {
+            // No option may be selected (jQuery .val() with a value that has no <option>
+            // clears the selection); .data() of that empty match is undefined.
+            var portData = privateScope.$port.find('option:selected').data() || {};
+            if (portData.isManual || portData.isTcp || portData.isUdp) {
                 $('#port-override-option').show();
             }
             else {
                 $('#port-override-option').hide();
             }
 
-            if (selected_port.data().isTcp || selected_port.data().isUdp) {
+            if (portData.isTcp || portData.isUdp) {
                 $('#port-override-label').text("IP:Port");
             } else {
                 $('#port-override-label').text("Port");
             }
 
-            if (selected_port.data().isDFU || selected_port.data().isBle || selected_port.data().isTcp || selected_port.data().isUdp || selected_port.data().isSitl) {
+            if (portData.isDFU || portData.isBle || portData.isTcp || portData.isUdp || portData.isSitl) {
                 privateScope.$baud.hide();
             }
             else {
                 privateScope.$baud.show();
             }
 
-            if (selected_port.data().isBle || selected_port.data().isTcp || selected_port.data().isUdp || selected_port.data().isSitl) {
+            if (portData.isBle || portData.isTcp || portData.isUdp || portData.isSitl) {
                 $('.tab_firmware_flasher').hide();
             } else {
                 $('.tab_firmware_flasher').show();
             }
             var type = ConnectionType.Serial;
-            if (selected_port.data().isBle) {
+            if (portData.isBle) {
                 type = ConnectionType.BLE;
-            } else if (selected_port.data().isSitl && globalThis.__INAV_BROWSER_BUILD__) {
+            } else if (portData.isSitl && globalThis.__INAV_BROWSER_BUILD__) {
                 // Browser build talks to WASM SITL in-process via ccall, not TCP.
                 type = ConnectionType.serialEXT;
-            } else if (selected_port.data().isTcp || selected_port.data().isSitl) {
+            } else if (portData.isTcp || portData.isSitl) {
                 type = ConnectionType.TCP;
-            } else if (selected_port.data().isUdp) {
+            } else if (portData.isUdp) {
                 type = ConnectionType.UDP;
             }
             CONFIGURATOR.connection = connectionFactory(type, CONFIGURATOR.connection);
@@ -165,8 +167,8 @@ var SerialBackend = (function () {
         publicScope.$portOverride.val(store.get('portOverride', ''));
 
         privateScope.$port.on('change', function (target) {
-            var selected_port = privateScope.$port.find('option:selected');
-            if (selected_port.data().isDfuPermission) {
+            var portData = privateScope.$port.find('option:selected').data() || {};
+            if (portData.isDfuPermission) {
                 requestDfuPermission().then(() => PortHandler.check_usb_devices());
             }
             if (privateScope.$port.val() === ConnectionWebSerial.CHOOSE_PORT_ID) {
@@ -200,7 +202,7 @@ var SerialBackend = (function () {
                 // async aborts could desync.
                 const isIdle = (GUI.connected_to === false) && (GUI.connecting_to === false);
                 var selected_baud = parseInt(privateScope.$baud.val());
-                var selected_port = privateScope.$port.find('option:selected').data().isManual ?
+                var selected_port = (privateScope.$port.find('option:selected').data() || {}).isManual ?
                     publicScope.$portOverride.val() :
                         String(privateScope.$port.val());
 
