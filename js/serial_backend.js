@@ -202,12 +202,14 @@ var SerialBackend = (function () {
                 // async aborts could desync.
                 const isIdle = (GUI.connected_to === false) && (GUI.connecting_to === false);
                 var selected_baud = parseInt(privateScope.$baud.val());
-                var selected_port = (privateScope.$port.find('option:selected').data() || {}).isManual ?
-                    publicScope.$portOverride.val() :
-                        String(privateScope.$port.val());
+                var selected_port = PortHandler.selected_port_name(privateScope.$port, publicScope.$portOverride);
 
                 if (selected_port === 'DFU') {
                     GUI.log(i18n.getMessage('dfu_connect_message'));
+                }
+                else if (isIdle && selected_port === null) {
+                    // No option selected: nothing to connect to. Disconnecting still works.
+                    console.log('No port selected, not connecting');
                 }
                 else if (selected_port != '0') {
                     if (isIdle) {
