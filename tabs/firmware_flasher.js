@@ -1095,7 +1095,7 @@ firmwareFlasherTab.getTarget = function() {
     GUI.log(i18n.getMessage('automaticTargetSelect'));
     
     var selected_baud = parseInt($('#baud').val());
-    var selected_port = $('#port').find('option:selected').data().isManual ? $('#port-override').val() : String($('#port').val());
+    var selected_port = PortHandler.selected_port_name($('#port'), $('#port-override'));
     
     if (selected_port !== 'DFU') {
         if (!selected_port || selected_port == '0') {

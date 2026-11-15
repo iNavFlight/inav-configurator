@@ -133,7 +133,11 @@ PortHandler.check = function () {
             if (!GUI.connected_to) {
                 $('div#port-picker #port').val(new_ports[0]);
             } else {
-                $('div#port-picker #port').val(GUI.connected_to);
+                // A manual-override connection (e.g. /dev/rfcomm0) has no <option>, and
+                // .val() with an unknown value would leave nothing selected.
+                const $port = $('div#port-picker #port');
+                const hasOption = $port.find('option').toArray().some(option => option.value === GUI.connected_to);
+                $port.val(hasOption ? GUI.connected_to : 'manual');
             }
 
             // trigger callbacks
@@ -157,12 +161,33 @@ PortHandler.check = function () {
         self.check_usb_devices();
 
         GUI.updateManualPortVisibility();
-        
+
+        self.check_failing = false;
+    }).catch(function (error) {
+        // Once per failure streak: the retry below runs every 250 ms.
+        if (!self.check_failing) {
+            console.error('PortHandler - port check failed, retrying', error);
+        }
+        self.check_failing = true;
+    }).finally(function () {
+        // Scheduled whatever happened above, so one failed check cannot stop port detection.
         setTimeout(function () {
             self.check();
         }, 250);
-        
     });
+};
+
+/**
+ * The port Connect (serial_backend.js) and the flasher's target prefetch open:
+ * the override text for "Manual Selection", else the selected option's value.
+ * null when no option is selected - String() of that null .val() used to make
+ * it a port named "null".
+ */
+PortHandler.selected_port_name = function ($port, $portOverride) {
+    if ($port.find('option:selected').data()?.isManual) {
+        return $portOverride.val();
+    }
+    return $port.val();
 };
 
 PortHandler.check_usb_devices = function (callback) {
