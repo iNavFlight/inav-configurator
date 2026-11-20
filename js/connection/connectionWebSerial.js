@@ -3,6 +3,7 @@
 import GUI from "./../gui";
 import { ConnectionType, Connection } from "./connection";
 import i18n from "./../localization";
+import {serial as serialPolyfill} from 'web-serial-polyfill';
 
 /**
  * Browser serial transport.
@@ -24,6 +25,7 @@ class ConnectionWebSerial extends Connection {
   static _nextPortIndex = 0;
   static _nextConnectionId = 1;
   static CHOOSE_PORT_ID = "webserial-choose-port";
+  static _navigatorSerial = navigator.serial;
 
   constructor() {
     super();
@@ -36,13 +38,20 @@ class ConnectionWebSerial extends Connection {
     this._disconnectHandler = null;
   }
 
+  static isAndroid() {
+    return /(android)/i.test(navigator.userAgent)
+  }
+
   static isSupported() {
     return typeof navigator !== "undefined" && "serial" in navigator;
   }
 
   static portId(port) {
+    if (ConnectionWebSerial.isAndroid()) {
+      return port.device_.productName;
+    }
     let id = ConnectionWebSerial._portObjectIds.get(port);
-    if (!id) {
+    if (!id) { 
       const info = port.getInfo();
       const vendor = info.usbVendorId?.toString(16).padStart(4, "0");
       const product = info.usbProductId?.toString(16).padStart(4, "0");
@@ -60,8 +69,9 @@ class ConnectionWebSerial extends Connection {
     if (!ConnectionWebSerial.isSupported()) {
       return [];
     }
-
-    const ports = await navigator.serial.getPorts();
+    
+    const ports = await (ConnectionWebSerial.isAndroid() ? serialPolyfill : navigator.serial).getPorts();
+    
     ConnectionWebSerial._portsById.clear();
     ports.forEach((port) => {
       ConnectionWebSerial._portsById.set(
@@ -92,7 +102,7 @@ class ConnectionWebSerial extends Connection {
         // the browser user-activation requirement for first-time permissions.
         this._port =
           ConnectionWebSerial._portsById.get(portId) ||
-          (await navigator.serial.requestPort());
+          (await (ConnectionWebSerial.isAndroid() ? serialPolyfill : navigator.serial).requestPort());
         await this._port.open({ baudRate: options.bitrate });
         // Hold a single writer for the whole connection. Acquiring a writer per
         // send fails whenever sends are queued back-to-back: the callback of the
@@ -138,15 +148,24 @@ class ConnectionWebSerial extends Connection {
       this.handleReceiveError(new Error("Serial device disconnected."));
       this.abort();
     };
-    navigator.serial.addEventListener("disconnect", this._disconnectHandler);
+    if (ConnectionWebSerial.isAndroid()) {
+      serialPolyfill.ondisconnect = this._disconnectHandler;
+    } else {
+      navigator.serial.addEventListener("disconnect", this._disconnectHandler);
+    }
+    
   }
 
   removeDisconnectListener() {
     if (this._disconnectHandler && ConnectionWebSerial.isSupported()) {
-      navigator.serial.removeEventListener(
-        "disconnect",
-        this._disconnectHandler,
-      );
+      if (ConnectionWebSerial.isAndroid()) {
+        serialPolyfill.ondisconnect = undefined;
+      } else {
+        navigator.serial.removeEventListener(
+          "disconnect",
+          this._disconnectHandler,
+        );
+      }
     }
     this._disconnectHandler = null;
   }

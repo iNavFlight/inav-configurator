@@ -58,6 +58,7 @@
     "three": "^0.180.0",
     "throttle-debounce": "^5.0.2",
     "usb": "^2.16.0",
+    "web-serial-polyfill": "^1.0.15",
     "wnumb": "^1.2.0",
     "xml2js": "^0.6.2"
   },
