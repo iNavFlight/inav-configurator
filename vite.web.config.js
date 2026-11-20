@@ -24,7 +24,7 @@ export default defineConfig({
       workbox: {
         // Largest real asset is model_flying_wing.gltf at ~9.5MB; stay
         // comfortably above Workbox's 2MB default.
-        maximumFileSizeToCacheInBytes: 11 * 1024 * 1024,
+        maximumFileSizeToCacheInBytes: 12 * 1024 * 1024,
         globPatterns: ["**/*.{js,css,html,ico,png,svg,wasm,gltf,glb}"],
       },
       manifest: {
