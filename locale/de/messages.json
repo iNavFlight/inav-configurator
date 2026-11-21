@@ -5366,6 +5366,9 @@
     "mixerWizardStop": {
         "message": "Not-Stopp"
     },
+    "mixerWizardRefused": {
+        "message": "Motor-Assistent geschlossen: Der Flugcontroller hat das Starten des Motors abgelehnt. Er ist scharfgeschaltet oder seine Firmware unterstützt den Motor-Assistenten nicht."
+    },
     "settings": {
         "message": "Einstellungen"
     },
