@@ -13,6 +13,8 @@ const TURN_RADIUS_MAX_M = 300;
 const SMOOTH_TCONST_PER_STEP_MS = 100;
 const SMOOTH_TCONST_MAX_MS = 900;
 const STEEP_SLOPE_DEG = 8;
+// the circuit's steepest final line, tan 8 degrees (fwLandFinalAlt)
+const FINAL_SLOPE_MAX = 0.14;
 const MIN_CIRCLE_GAP_M = 10;
 const ARC_STEP_DEG = 5;
 // the firmware's corner cut (navigation_fixedwing.c): FLY_BY below 160 degrees, its lead capped at tan(half angle) 3.7
@@ -29,6 +31,7 @@ const LoiterDirection = Object.freeze({ RIGHT: 1, LEFT: -1 });
 const AutolandWarning = Object.freeze({
     NO_HEADING: 'noHeading',
     FINAL_STEEP: 'finalSteep',
+    FINAL_CAPPED: 'finalCapped',
     LEGS_STEEP: 'legsSteep',
     CIRCLE_CLOSE: 'circleClose',
     CIRCLE_WIDER: 'circleWider',
@@ -223,9 +226,10 @@ function planRadii(ctx) {
 
 /*
  * Sink-rate flare (nav_fw_land_flare_sink): it asks height / flare time down to the flare sink, held below flare sink
- * x flare time, from where that equals the final's sink (between flare_alt and twice glide_alt). The final's line goes
- * on below the ground and is aimed short by the part of the flare's run past where it meets it, so the wheels touch at
- * the aim point
+ * x flare time, from where that equals the final's sink (between flare_alt and twice glide_alt). The final's line meets
+ * the ground at the aim point and the flare floats past it: drawn on its law down to the flare sink's height, then at the
+ * final's slope, as aircraft touch down at about the final's sink (HITL T-28: 5 to 18 m past the aim point; held at the
+ * flare sink to the ground, the law would float it two to seven times further)
  */
 function planFlare(ctx) {
     const p = ctx.p;
@@ -236,7 +240,6 @@ function planFlare(ctx) {
     const flareStart = sinkFlare ? Math.min(Math.max(lineSlope * p.speed * flareTime, p.flareAlt), 2 * p.glideAlt) : 0;
     const flareStartToGo = flareStart / Math.max(lineSlope, 0.001);
     const roundOutRun = flareStart > floorHeight ? p.speed * flareTime * Math.log(flareStart / floorHeight) : 0;
-    const floorRun = Math.min(flareStart, floorHeight) / Math.max(p.flareSink || 0, 0.01) * p.speed;
     // the final's height over the distance to where its line meets the ground: the line, then the flare
     const finalLine = (toGo) => {
         if (!sinkFlare || toGo >= flareStartToGo) {
@@ -246,17 +249,19 @@ function planFlare(ctx) {
         if (into < roundOutRun) {
             return flareStart * Math.exp(-into / (Math.max(p.speed, 1) * flareTime));
         }
-        return Math.max(Math.min(flareStart, floorHeight) - (into - roundOutRun) * p.flareSink / Math.max(p.speed, 1), 0);
+        return Math.max(Math.min(flareStart, floorHeight) - (into - roundOutRun) * lineSlope, 0);
     };
-    return { sinkFlare, lineSlope, flareStart, flareRun: sinkFlare ? roundOutRun + floorRun - flareStartToGo : 0, finalLine };
+    // how far past where the line meets the ground it touches down
+    const run = sinkFlare ? roundOutRun + Math.min(flareStart, floorHeight) / Math.max(lineSlope, 0.001) - flareStartToGo : 0;
+    return { sinkFlare, lineSlope, flareStart, run, finalLine };
 }
 
-/* With the direction's runway start set the line crosses it at its height and the wheels touch where the flare ends;
-   else nav_fw_land_aim_offset before the site */
+/* With the direction's runway start set the line crosses it at its height, else it meets the ground at
+   nav_fw_land_aim_offset before the site; not shorter by the flare's run, as the firmware since #12179's HITL flights */
 function planFinal(ctx, direction, flare, turnSpace) {
     const p = ctx.p;
     const runwayStart = p.approach.runwayStarts ? p.approach.runwayStarts[direction.aimIndex] : 0;
-    let lineGroundBefore = p.aimOffset + flare.flareRun;
+    let lineGroundBefore = p.aimOffset;
     if (runwayStart > 0) {
         const height = Math.min(p.approach.runwayHeights ? p.approach.runwayHeights[direction.aimIndex] : 0, ctx.finalAlt);
         lineGroundBefore = runwayStart - height / Math.max(flare.lineSlope, 0.001);
@@ -265,9 +270,11 @@ function planFinal(ctx, direction, flare, turnSpace) {
     const finalLength = p.approachLength + turnSpace;
     return {
         runwayStart,
-        aimOffset: lineGroundBefore - flare.flareRun,
+        aimOffset: lineGroundBefore,
         lineGround,
-        aim: move(lineGround, ctx.L, flare.flareRun),
+        aim: lineGround,
+        // the drawn final runs past the site, and past the touchdown
+        trackEnd: move(lineGround, ctx.L, Math.max(lineGroundBefore, 20, flare.run + 10)),
         finalLength,
         finalStart: move(lineGround, ctx.L + 180, finalLength),
         landWp: move(lineGround, ctx.L, finalLength)
@@ -343,7 +350,7 @@ function planTrack(ctx, c, fin, r) {
     push(corner1.points.slice(1), Phase.BASE, leg);
     push(straight(corner1.end, corner2.start), Phase.BASE, leg++);
     push(corner2.points.slice(1), Phase.TURN_FINAL, leg);
-    push(straight(corner2.end, move(fin.aim, ctx.L, Math.max(fin.aimOffset, 20))), Phase.FINAL, leg);
+    push(straight(corner2.end, fin.trackEnd), Phase.FINAL, leg);
     return track;
 }
 
@@ -447,7 +454,7 @@ function planWarnings(ctx, track, before, runwayStart) {
     // the runway starts where set for the direction, else where it is drawn (centred on the site): low before that is
     // low over the ground before the runway, which need not be level or clear
     const startBefore = runwayStart > 0 ? runwayStart : p.runwayLength / 2;
-    const low = track.find((pt) => pt.phase !== Phase.DOWNWIND && pt.phase !== Phase.BASE && pt.alt < LOW_HEIGHT_M);
+    const low = crossingOf(track.filter((pt) => pt.phase !== Phase.DOWNWIND && pt.phase !== Phase.BASE), LOW_HEIGHT_M);
     if (startBefore > 0 && low) {
         const threshold = move(SITE, ctx.L + 180, startBefore);
         const u = unit(ctx.L);
@@ -471,14 +478,18 @@ function planWarnings(ctx, track, before, runwayStart) {
  */
 function planDirection(p, direction) {
     const circuit = p.downwindOffset > 0;
+    const asked = p.finalAlt > 0 ? p.finalAlt : p.approachAlt / 3 * 2;
     const ctx = {
         p,
         circuit,
         L: direction.landing,
         side: approachSide(p.approach, direction.configured, circuit),
-        finalAlt: p.finalAlt > 0 ? p.finalAlt : p.approachAlt / 3 * 2,
+        finalAlt: circuit ? Math.min(asked, p.approachLength * FINAL_SLOPE_MAX) : asked,
         warnings: []
     };
+    if (ctx.finalAlt < asked - 0.05) {
+        ctx.warnings.push({ id: AutolandWarning.FINAL_CAPPED, value: ctx.finalAlt, asked });
+    }
     const radii = planRadii(ctx);
     const flare = planFlare(ctx);
     const fin = planFinal(ctx, direction, flare, radii.turnSpace);

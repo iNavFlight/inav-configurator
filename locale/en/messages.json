@@ -4204,7 +4204,7 @@
         "message": "Aim point before the landing site"
     },
     "fwLandAimOffsetHelp": {
-        "message": "The glide path meets the ground this far before the landing site: the float after the throttle cut lands the aircraft on the site instead of past it."
+        "message": "The final's line meets the ground this far before the landing site: the aircraft floats past that point while it slows down, and touches down nearer the site."
     },
     "autolandGlideFlare": {
         "message": "Glide and flare"
@@ -4219,7 +4219,7 @@
         "message": "Flare sink rate"
     },
     "fwLandFlareSinkHelp": {
-        "message": "Sink rate the flare holds, with the flare pitch as the lowest pitch it commands. 0 = the flare holds the flare pitch."
+        "message": "Sink rate the landing touches down with, 10 to 20 for delicate gear. Set, the landing flares on its sink rate: it asks the height / flare time down to this sink, from where that equals the final's sink, and the pitch follows it up to the flare pitch. The power comes off over the flare and the motor stops 30 cm over the ground, so a belly lander's propeller is not driven into it. The final's line meets the ground at the aim point and the flare floats a little past it. 0 = the pitch glide and flare, with the motor cut at the glide altitude."
     },
     "autolandChecks": {
         "message": "Checks"
@@ -4326,6 +4326,9 @@
     "autolandAimPoint": {
         "message": "aim point"
     },
+    "autolandTouchdown": {
+        "message": "touchdown"
+    },
     "autolandThrottleCut": {
         "message": "throttle cut {{alt}} m"
     },
@@ -4339,7 +4342,7 @@
         "message": "Flare time constant"
     },
     "fwLandFlareTimeHelp": {
-        "message": "Time constant of the sink-rate flare: it asks (height + this x the flare sink) / this, so it ends at the flare sink on the ground, and starts where that equals the final's sink. Longer is gentler and takes longer over the ground; at least twice the time the aircraft takes to answer a pitch command with its flight path, about a second on a small model."
+        "message": "Time constant of the sink-rate flare: its target sink is the height / this, down to the flare sink, and it starts where that equals the final's sink. Longer is gentler and takes longer over the ground; at least twice the time the aircraft takes to answer a pitch command with its flight path, about a second on a small model."
     },
     "autolandLandingSite": {
         "message": "landing site"
@@ -4387,7 +4390,7 @@
         "message": "Height the final crosses the runway start at"
     },
     "autolandRunwayStartHelp": {
-        "message": "For the selected landing direction, saved with the site: where the runway begins before the landing site, and the height the final crosses it at. The wheels touch where the flare ends from there: the ground before the runway (a field, obstacles) is crossed high enough and the flare is flown over the runway. A greater height moves the touchdown further down the runway, as the profile shows. Empty: the wheels touch at the common point of the landing circuit (nav_fw_land_aim_offset)."
+        "message": "For the selected landing direction, saved with the site: where the runway begins before the landing site, and the height the final crosses it at. The wheels touch where the flare ends from there: the ground before the runway (a field, obstacles) is crossed high enough and the flare is flown over the runway. A greater height moves the touchdown further down the runway, as the profile shows. Empty: the final's line meets the ground at the landing circuit's common aim point (nav_fw_land_aim_offset)."
     },
     "autolandWarning_lowBeforeRunway": {
         "message": "Below {{height}} m {{value}} m before the runway: the ground there need not be level or clear. Set where the runway starts for this direction, or a greater height over it."
@@ -4397,6 +4400,9 @@
     },
     "autolandWarning_finalSteep": {
         "message": "The final descends at {{value}}°: steeper than 8° builds speed before the flare."
+    },
+    "autolandWarning_finalCapped": {
+        "message": "The final starts at {{value}} m, 8° over the approach length, not at the {{asked}} m set: the downwind and base lose the rest."
     },
     "autolandWarning_legsSteep": {
         "message": "The circuit descends at {{value}}° before the final: steeper than 8° builds speed."

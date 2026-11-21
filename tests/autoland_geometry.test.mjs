@@ -185,17 +185,18 @@ test('classic approach with a short final: the turn onto the base starts at the 
     }
 });
 
-test('sink-rate flare: it starts where its law asks the sink of the final and the wheels touch at the aim point', () => {
+test('sink-rate flare: it starts where its law asks the sink of the final, the line meets the ground at the aim point', () => {
     const plan = planAutoland({ ...circuit, flareSink: 0.15, flareTime: 2 }).directions[0];
     assert.ok(plan.sinkFlare);
-    // the line's 1.9 m/s sink is h / 2 at 3.8 m, 38 m before the line meets the ground; the flare touches
-    // 19 m/s x 2 s x (ln(3.8 / 0.3) + 1) after its start, so the line is aimed short by the rest
-    const run = 38 * (Math.log(3.8 / 0.3) + 1) - 38;
+    // the line's 1.9 m/s sink is h / 2 at 3.8 m, 38 m before the line meets the ground at the aim point; the round-out
+    // takes 19 m/s x 2 s x ln(3.8 / 0.3) down to the flare sink's 0.3 m, then the final's slope to the ground
+    const past = 38 * Math.log(3.8 / 0.3) - 38 + 0.3 / 0.1;
     const aim = plan.waypoints.aim;
     const fa = plan.waypoints.finalStart;
     const turnSpace = 52.6 + 19 * 0.592 * 1.5;
-    near(Math.hypot(aim.n - fa.n, aim.e - fa.e), 70 + turnSpace + run, 0.5, 'final start');
-    near(Math.hypot(plan.touchdown.n - aim.n, plan.touchdown.e - aim.e), 0, 2, 'touchdown at the aim point');
+    near(Math.hypot(aim.n - fa.n, aim.e - fa.e), 70 + turnSpace, 0.5, 'final start');
+    near(Math.hypot(aim.n, aim.e), 40, 1e-6, 'aim point at nav_fw_land_aim_offset');
+    near(Math.hypot(plan.touchdown.n - aim.n, plan.touchdown.e - aim.e), past, 2, 'touchdown past the aim point');
     // sink = height / 2 s in the flare: 0.5 m/s at 1 m, 19 m/s over the ground
     const final = plan.track.filter((pt) => pt.phase !== Phase.DOWNWIND && pt.phase !== Phase.BASE);
     const k = final.findIndex((pt) => pt.alt < 1);
@@ -239,8 +240,13 @@ test('classic approach: turn point 4 loiter radii beside the final start, level 
 });
 
 test('warnings: steep final, no heading, glide below flare', () => {
-    const steep = planAutoland({ ...circuit, finalAlt: 15 });
+    // the classic approach flies a steep final; the circuit starts it at 8 degrees over the approach length
+    const steep = planAutoland({ ...circuit, downwindOffset: 0, finalAlt: 15 });
     assert.ok(steep.directions[0].warnings.some((w) => w.id === AutolandWarning.FINAL_STEEP));
+    const capped = planAutoland({ ...circuit, finalAlt: 15 }).directions[0];
+    near(capped.finalAlt, 70 * 0.14, 1e-6, 'final altitude at 8 degrees');
+    assert.ok(capped.warnings.some((w) => w.id === AutolandWarning.FINAL_CAPPED && Math.abs(w.asked - 15) < 1e-6));
+    assert.ok(!capped.warnings.some((w) => w.id === AutolandWarning.FINAL_STEEP));
     assert.ok(planAutoland({ ...circuit, approach: { ...circuit.approach, heading1: 0 } }).warnings
         .some((w) => w.id === AutolandWarning.NO_HEADING));
     assert.ok(planAutoland({ ...circuit, glideAlt: 1 }).warnings.some((w) => w.id === AutolandWarning.GLIDE_BELOW_FLARE));

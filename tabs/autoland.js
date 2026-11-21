@@ -334,10 +334,10 @@ function labelPlacer(width, height, obstacles, m) {
 }
 
 /* The marks along the final: the throttle cut and flare, or with the sink-rate flare where the power starts to come off
-   and the touchdown, unlabelled */
+   and the touchdown, past the aim point (named only from above: in the profile it is where the line ends) */
 function flareEvents(dir) {
     return dir.sinkFlare
-        ? [[dir.glide, 'autolandFlareFrom', -0.6], [dir.touchdown, null, 0.6]]
+        ? [[dir.glide, 'autolandFlareFrom', -0.6], [dir.touchdown, 'autolandTouchdown', 0.6, false]]
         : [[dir.glide, 'autolandThrottleCut', -0.6], [dir.flare, 'autolandFlarePoint', 0.6]];
 }
 
@@ -474,7 +474,6 @@ function planMarks(dir, f, placer, site) {
     out += `<path d="${cross}" class="autolandAimCasing"/><path d="${cross}" class="autolandAim"/>`;
     placer.mark(aim, 7);
     placer.mark(site, 7);
-    // the touchdown of the sink-rate flare is the aim point's cross
     const events = flareEvents(dir).filter(([point, key]) => point && key);
     for (const [point] of events) {
         const p = f.px(point);
@@ -506,9 +505,7 @@ function planLabels(dir, f, site, marks, screen, placer) {
     };
     const [sx, sy] = outward(site);
     let out = placer.place([i18n.getMessage('autolandLandingSite')], [site], sx, sy);
-    if (!dir.sinkFlare) {
-        out += placer.place([i18n.getMessage('autolandAimPoint')], [marks.aim], -sx, -sy);
-    }
+    out += placer.place([i18n.getMessage('autolandAimPoint')], [marks.aim], -sx, -sy);
     for (const leg of marks.legs.slice().reverse()) {
         out += legLabel(placer, f, leg, outward);
     }
@@ -653,12 +650,12 @@ function drawProfile(params, dir) {
     placer.markBox(textBox(m, { at: left + 6, anchor: 'start' }, sy(dir.finalAlt) - 5,
         m.axisWidth(i18n.getMessage('autolandFinalAltLine', { alt: fmt(dir.finalAlt, 1) })), m.axisSize, 1));
     placer.markBox(textBox(m, { at: width - 12, anchor: 'end' }, height - 6, m.axisWidth(i18n.getMessage('autolandProfileAxis')), m.axisSize, 1));
-    flareEvents(dir).forEach(([point, key, ux]) => {
+    flareEvents(dir).forEach(([point, key, ux, inProfile = true]) => {
         if (point) {
             const p = { x: sx(point.flown), y: sy(point.alt) };
             out += `<circle cx="${fmt(p.x, 1)}" cy="${fmt(p.y, 1)}" r="5" class="autolandEvent"/>`;
             placer.mark(p, 7);
-            if (key) {
+            if (key && inProfile) {
                 out += placer.place([i18n.getMessage(key, { alt: fmt(point.alt, 1) })], [p], ux, -0.8);
             }
         }
@@ -730,7 +727,7 @@ function drawDirections(plan) {
     if (directionIndex >= plan.directions.length) {
         directionIndex = 0;
     }
-    // the selected direction's runway start and height over it; empty start: the common touchdown point
+    // the selected direction's runway start and height over it; empty start: the common aim point
     const dir = plan.directions[directionIndex];
     const a = approach();
     const start = dir && a ? a.getRunwayStart(dir.aimIndex) : 0;
