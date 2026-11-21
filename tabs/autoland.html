@@ -1,0 +1,240 @@
+<div class="tab-autoland toolbar_fixed_bottom">
+    <div class="content_wrapper">
+        <div class="tab_title" data-i18n="tabAutolandTitle"></div>
+
+        <div class="note spacebottom autolandNotAirplane" style="display: none">
+            <div class="note_spacer">
+                <p data-i18n="autolandNotAirplane"></p>
+            </div>
+        </div>
+
+        <div class="autolandLayout">
+            <div class="autolandSettings">
+                <div class="config-section gui_box grey">
+                    <div class="gui_box_titlebar">
+                        <div class="spacer_box_title" data-i18n="autolandChecks"></div>
+                    </div>
+                    <div class="spacer_box">
+                        <table class="cf_table autolandCheckTable">
+                            <thead class="autolandHidden">
+                                <tr><th data-i18n="autolandCheckColumn">Check</th><th data-i18n="autolandCheckStateColumn">State</th></tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                        <div class="select">
+                            <select id="autolandRthAllowLanding" class="autolandRedraw" data-setting="nav_rth_allow_landing"></select>
+                            <label for="autolandRthAllowLanding"><span data-i18n="rthAllowLanding">Land after RTH</span></label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="config-section gui_box grey">
+                    <div class="gui_box_titlebar">
+                        <div class="spacer_box_title" data-i18n="autolandSite"></div>
+                    </div>
+                    <div class="spacer_box">
+                        <div class="number">
+                            <input type="number" id="autolandApproachAlt" class="autolandApproach" step="0.01" min="0" max="10000" />
+                            <label for="autolandApproachAlt"><span data-i18n="autolandApproachAlt">Approach altitude [m]</span></label>
+                            <div for="autolandApproachAlt" class="helpicon cf_tip" data-i18n_title="autolandApproachAltHelp"></div>
+                        </div>
+                        <div class="number">
+                            <input type="number" id="autolandLandAlt" class="autolandApproach" step="0.01" min="-1000" max="10000" />
+                            <label for="autolandLandAlt"><span data-i18n="autolandLandAlt">Landing altitude [m]</span></label>
+                            <div for="autolandLandAlt" class="helpicon cf_tip" data-i18n_title="autolandLandAltHelp"></div>
+                        </div>
+                        <div class="checkbox">
+                            <input type="checkbox" id="autolandSeaLevel" class="toggle autolandApproach" />
+                            <label for="autolandSeaLevel"><span data-i18n="autolandSeaLevel">Altitudes above sea level</span></label>
+                        </div>
+                        <div class="select">
+                            <select id="autolandSide" class="autolandApproach">
+                                <option value="0" data-i18n="autolandSideLeft"></option>
+                                <option value="1" data-i18n="autolandSideRight"></option>
+                            </select>
+                            <label for="autolandSide"><span data-i18n="autolandSide">Approach side</span></label>
+                            <div for="autolandSide" class="helpicon cf_tip" data-i18n_title="autolandSideHelp"></div>
+                        </div>
+                        <div class="number">
+                            <input type="number" id="autolandHeading1" class="autolandApproach" step="1" min="0" max="360" />
+                            <label for="autolandHeading1"><span data-i18n="autolandHeading1">Landing heading 1 [deg]</span></label>
+                            <div for="autolandHeading1" class="helpicon cf_tip" data-i18n_title="autolandHeadingHelp"></div>
+                        </div>
+                        <div class="checkbox">
+                            <input type="checkbox" id="autolandHeading1Exclusive" class="toggle autolandApproach" />
+                            <label for="autolandHeading1Exclusive"><span data-i18n="autolandHeadingExclusive">Only in this direction</span></label>
+                        </div>
+                        <div class="number">
+                            <input type="number" id="autolandHeading2" class="autolandApproach" step="1" min="0" max="360" />
+                            <label for="autolandHeading2"><span data-i18n="autolandHeading2">Landing heading 2 [deg]</span></label>
+                            <div for="autolandHeading2" class="helpicon cf_tip" data-i18n_title="autolandHeadingHelp"></div>
+                        </div>
+                        <div class="checkbox">
+                            <input type="checkbox" id="autolandHeading2Exclusive" class="toggle autolandApproach" />
+                            <label for="autolandHeading2Exclusive"><span data-i18n="autolandHeadingExclusive">Only in this direction</span></label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="config-section gui_box grey">
+                    <div class="gui_box_titlebar">
+                        <div class="spacer_box_title" data-i18n="autolandCircuit"></div>
+                    </div>
+                    <div class="spacer_box">
+                        <div class="number">
+                            <input type="number" id="fwLandApproachSpeed" class="autolandRedraw" data-unit="cms" data-setting="nav_fw_land_approach_speed" data-setting-multiplier="1" step="1" min="0" max="5000" />
+                            <label for="fwLandApproachSpeed"><span data-i18n="fwLandApproachSpeed">Approach speed</span></label>
+                            <div for="fwLandApproachSpeed" class="helpicon cf_tip" data-i18n_title="fwLandApproachSpeedHelp"></div>
+                        </div>
+                        <div class="number">
+                            <input type="number" id="fwLandDownwindOffset" class="autolandRedraw" data-unit="cm" data-setting="nav_fw_land_downwind_offset" data-setting-multiplier="1" step="1" min="0" max="50000" />
+                            <label for="fwLandDownwindOffset"><span data-i18n="fwLandDownwindOffset">Wind circle distance from the runway</span></label>
+                            <div for="fwLandDownwindOffset" class="helpicon cf_tip" data-i18n_title="fwLandDownwindOffsetHelp"></div>
+                        </div>
+                        <div class="number">
+                            <input type="number" id="fwLandLoiterRadius" class="autolandRedraw" data-unit="cm" data-setting="nav_fw_land_loiter_radius" data-setting-multiplier="1" step="1" min="0" max="30000" />
+                            <label for="fwLandLoiterRadius"><span data-i18n="fwLandLoiterRadius">Wind circle radius</span></label>
+                            <div for="fwLandLoiterRadius" class="helpicon cf_tip" data-i18n_title="fwLandLoiterRadiusHelp"></div>
+                        </div>
+                        <div class="number">
+                            <input type="number" id="fwLandFinalAlt" class="autolandRedraw" data-unit="cm" data-setting="nav_fw_land_final_alt" data-setting-multiplier="1" step="1" min="0" max="30000" />
+                            <label for="fwLandFinalAlt"><span data-i18n="fwLandFinalAlt">Altitude at the start of the final</span></label>
+                            <div for="fwLandFinalAlt" class="helpicon cf_tip" data-i18n_title="fwLandFinalAltHelp"></div>
+                        </div>
+                        <div class="number">
+                            <input type="number" id="fwLandApproachLength" class="autolandRedraw" data-unit="cm" data-setting="nav_fw_land_approach_length" data-setting-multiplier="1" step="1" min="100" max="100000" />
+                            <label for="fwLandApproachLength"><span data-i18n="fwLandApproachLength">Final approach length</span></label>
+                            <div for="fwLandApproachLength" class="helpicon cf_tip" data-i18n_title="fwLandApproachLengthHelp"></div>
+                        </div>
+                        <div class="number">
+                            <input type="number" id="fwLandAimOffset" class="autolandRedraw" data-unit="cm" data-setting="nav_fw_land_aim_offset" data-setting-multiplier="1" step="1" min="0" max="10000" />
+                            <label for="fwLandAimOffset"><span data-i18n="fwLandAimOffset">Aim point before the landing site</span></label>
+                            <div for="fwLandAimOffset" class="helpicon cf_tip" data-i18n_title="fwLandAimOffsetHelp"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="config-section gui_box grey">
+                    <div class="gui_box_titlebar">
+                        <div class="spacer_box_title" data-i18n="autolandGlideFlare"></div>
+                    </div>
+                    <div class="spacer_box">
+                        <div class="number">
+                            <input type="number" id="fwLandGlideAlt" class="autolandRedraw" data-unit="cm" data-setting="nav_fw_land_glide_alt" data-setting-multiplier="1" step="1" min="100" max="5000" />
+                            <label for="fwLandGlideAlt"><span data-i18n="fwLandGlideAlt">Initial altitude of the glide phase</span></label>
+                            <div for="fwLandGlideAlt" class="helpicon cf_tip" data-i18n_title="fwLandGlideAltHelp"></div>
+                        </div>
+                        <div class="number">
+                            <input type="number" id="fwLandGlidePitch" data-unit="deg" data-setting="nav_fw_land_glide_pitch" data-setting-multiplier="1" step="1" min="0" max="45" />
+                            <label for="fwLandGlidePitch"><span data-i18n="fwLandGlidePitch">Pitch value for glide phase</span></label>
+                            <div for="fwLandGlidePitch" class="helpicon cf_tip" data-i18n_title="fwLandGlidePitchHelp"></div>
+                        </div>
+                        <div class="number">
+                            <input type="number" id="fwLandFlareAlt" class="autolandRedraw" data-unit="cm" data-setting="nav_fw_land_flare_alt" data-setting-multiplier="1" step="1" min="0" max="10000" />
+                            <label for="fwLandFlareAlt"><span data-i18n="fwLandFlareAlt">Initial altitude of the flare phase</span></label>
+                            <div for="fwLandFlareAlt" class="helpicon cf_tip" data-i18n_title="fwLandFlareAltHelp"></div>
+                        </div>
+                        <div class="number">
+                            <input type="number" id="fwLandFlarePitch" data-unit="deg" data-setting="nav_fw_land_flare_pitch" data-setting-multiplier="1" step="1" min="0" max="45" />
+                            <label for="fwLandFlarePitch"><span data-i18n="fwLandFlarePitch">Pitch value for flare phase</span></label>
+                            <div for="fwLandFlarePitch" class="helpicon cf_tip" data-i18n_title="fwLandFlarePitchHelp"></div>
+                        </div>
+                        <div class="number">
+                            <input type="number" id="fwLandFlareSink" class="autolandRedraw" data-unit="cms" data-setting="nav_fw_land_flare_sink" data-setting-multiplier="1" step="1" min="0" max="500" />
+                            <label for="fwLandFlareSink"><span data-i18n="fwLandFlareSink">Flare sink rate</span></label>
+                            <div for="fwLandFlareSink" class="helpicon cf_tip" data-i18n_title="fwLandFlareSinkHelp"></div>
+                        </div>
+                        <div class="number">
+                            <input type="number" id="fwLandFlareTime" class="autolandRedraw" data-unit="dsec" data-setting="nav_fw_land_flare_time" data-setting-multiplier="1" step="1" min="5" max="60" />
+                            <label for="fwLandFlareTime"><span data-i18n="fwLandFlareTime">Flare time constant</span></label>
+                            <div for="fwLandFlareTime" class="helpicon cf_tip" data-i18n_title="fwLandFlareTimeHelp"></div>
+                        </div>
+                        <div class="number">
+                            <input type="number" id="fwLandFinalApproachPitch2throttle" data-unit="percent" data-setting="nav_fw_land_final_approach_pitch2throttle_mod" data-setting-multiplier="1" step="1" min="100" max="400" />
+                            <label for="fwLandFinalApproachPitch2throttle"><span data-i18n="fwLandFinalApproachPitch2throttle">Pitch to throttle on the final</span></label>
+                            <div for="fwLandFinalApproachPitch2throttle" class="helpicon cf_tip" data-i18n_title="fwLandFinalApproachPitch2throttleHelp"></div>
+                        </div>
+                        <div class="number">
+                            <input type="number" id="fwLandMaxTailwind" data-unit="cms" data-setting="nav_fw_land_max_tailwind" data-setting-multiplier="1" step="1" min="0" max="3000" />
+                            <label for="fwLandMaxTailwind"><span data-i18n="fwLandMaxTailwind">Max. tailwind</span></label>
+                            <div for="fwLandMaxTailwind" class="helpicon cf_tip" data-i18n_title="fwLandMaxTailwindHelp"></div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="autolandDrawing">
+                <div class="config-section gui_box grey autolandPlanBox">
+                    <div class="gui_box_titlebar">
+                        <div class="spacer_box_title" data-i18n="autolandTopView"></div>
+                    </div>
+                    <div class="spacer_box">
+                        <div class="autolandToolbar">
+                            <div class="autolandField autolandSiteField">
+                                <label for="autolandSiteSelect" data-i18n="autolandSiteSelect">Safehome</label>
+                                <select id="autolandSiteSelect"></select>
+                            </div>
+                            <div class="autolandDirections" role="radiogroup"></div>
+                            <div class="autolandField">
+                                <label for="autolandRunwayStart" data-i18n="autolandRunwayStart">Runway start</label>
+                                <input type="number" id="autolandRunwayStart" step="1" min="0" max="255" />
+                                <span class="autolandUnit" data-i18n="autolandRunwayStartAt">m, crossed at</span>
+                                <label for="autolandRunwayStartHeight" class="autolandHidden" data-i18n="autolandRunwayStartHeight">Height the final crosses the runway start at</label>
+                                <input type="number" id="autolandRunwayStartHeight" step="0.1" min="0" max="25.5" data-i18n_title="autolandRunwayStartHeight" />
+                                <span class="autolandUnit" data-i18n="autolandUnitM">m</span>
+                                <div for="autolandRunwayStart" class="helpicon cf_tip" data-i18n_title="autolandRunwayStartHelp"></div>
+                            </div>
+                        </div>
+                        <div class="autolandToolbar">
+                            <div class="autolandField autolandSatelliteField">
+                                <input type="checkbox" id="autolandSatellite" class="togglemedium" />
+                                <label for="autolandSatellite" data-i18n="autolandSatellite">Satellite image</label>
+                            </div>
+                            <div class="autolandToolbarFields">
+                                <label class="autolandField">
+                                    <span data-i18n="autolandSpeed">Approach speed</span>
+                                    <input type="number" id="autolandSpeed" step="0.5" min="5" max="60" />
+                                    <span class="autolandUnit" data-i18n="autolandUnitMs">m/s</span>
+                                </label>
+                                <label class="autolandField">
+                                    <span data-i18n="autolandRunway">Runway</span>
+                                    <input type="number" id="autolandRunwayLength" step="1" min="0" max="5000" />
+                                    <span class="autolandUnit">&times;</span>
+                                    <input type="number" id="autolandRunwayWidth" step="1" min="0" max="200" />
+                                    <span class="autolandUnit" data-i18n="autolandUnitM">m</span>
+                                </label>
+                                <div for="autolandSpeed" class="helpicon cf_tip" data-i18n_title="autolandDrawingHelp"></div>
+                            </div>
+                        </div>
+                        <div class="autolandPlanWrap">
+                            <svg class="autolandPlan" role="img" aria-label="Seen from above"></svg>
+                            <div class="autolandTooltip" style="display: none"></div>
+                        </div>
+                        <div class="autolandLegend">
+                            <span data-i18n="autolandAltitudeLegend">Altitude above the landing site: 0</span>
+                            <span class="autolandRamp"></span>
+                            <span class="autolandRampMax"></span>
+                        </div>
+                        <ul class="autolandWarnings"></ul>
+                    </div>
+                </div>
+
+                <div class="config-section gui_box grey autolandProfileBox">
+                    <div class="gui_box_titlebar">
+                        <div class="spacer_box_title" data-i18n="autolandProfile"></div>
+                    </div>
+                    <div class="spacer_box">
+                        <svg class="autolandProfileView" role="img" aria-label="Altitude along the approach"></svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="content_toolbar">
+        <div class="btn save_btn">
+            <a class="save" href="#" data-i18n="autolandSave">Save</a>
+        </div>
+    </div>
+</div>
