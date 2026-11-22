@@ -225,7 +225,11 @@ var MSPCodes = {
     MSP2_INAV_DRONECAN_NODES:           0x2042,
     MSP2_INAV_DRONECAN_ASYNC_REQUEST:   0x2043,
     MSP2_INAV_DRONECAN_ASYNC_RESULT:    0x2044,
-    
+
+    // 7 bytes per motor (uint32 rpm, uint8 frame success %, uint16 frames/s)
+    // from ESC telemetry / bidirectional DSHOT.
+    MSP2_INAV_ESC_RPM:                  0x2040,
+
     MSP2_INAV_LED_STRIP_CONFIG_EX:      0x2048,
     MSP2_INAV_SET_LED_STRIP_CONFIG_EX:  0x2049,
 

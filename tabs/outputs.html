@@ -154,6 +154,25 @@
                     </div>
                 </div>
 
+                <!-- Shown by outputs.js once the settings have been read and only for a DSHOT protocol. -->
+                <div id="dshot-bidir" style="display: none;">
+                    <div class="checkbox">
+                        <input id="dshot_bidir_enabled" type="checkbox" class="toggle" data-setting="dshot_bidir_enabled" />
+                        <label for="dshot_bidir_enabled">
+                            <span data-i18n="dshotBidirEnabled"></span>
+                        </label>
+                        <div for="dshot_bidir_enabled" class="helpicon cf_tip" data-i18n_title="dshotBidirEnabledHelp"></div>
+                    </div>
+                    <div id="dshot-bidir-warning" data-i18n="dshotBidirWarning" class="warning-box" style="display: none;"></div>
+                    <div class="checkbox">
+                        <input id="dshot_edt_enabled" type="checkbox" class="toggle" data-setting="dshot_edt_enabled" />
+                        <label for="dshot_edt_enabled">
+                            <span data-i18n="dshotEdtEnabled"></span>
+                        </label>
+                        <div for="dshot_edt_enabled" class="helpicon cf_tip" data-i18n_title="dshotEdtEnabledHelp"></div>
+                    </div>
+                </div>
+
             </div>
         </div>
         <div class="gui_box grey">

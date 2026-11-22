@@ -247,6 +247,44 @@
     color: white;
 }
 
+/* ESC RPM readout under the throttle percentage, filled only while the RPM
+ * filter is enabled and the firmware answers MSP2_INAV_ESC_RPM. */
+.tab-motors .m-block .rpm {
+    position: absolute;
+    width: 100%;
+    bottom: 25px;
+    text-align: center;
+    font-size: 0.85em;
+    color: #474747;
+}
+
+.tab-motors .m-block .indicator .rpm {
+    color: white;
+}
+
+/* Telemetry frame success % under the RPM. Same overlay trick as
+ * the label: a grey copy on the bar and a white copy clipped to the filled
+ * indicator. The error colour applies to both copies so a bad link stays
+ * visible whatever the throttle. */
+.tab-motors .m-block .telemetry {
+    position: absolute;
+    width: 100%;
+    bottom: 8px;
+    text-align: center;
+    font-size: 0.8em;
+    color: #474747;
+}
+
+.tab-motors .m-block .indicator .telemetry {
+    color: white;
+}
+
+.tab-motors .m-block .telemetry.error,
+.tab-motors .m-block .indicator .telemetry.error {
+    color: #e60000;
+    font-weight: bold;
+}
+
 .tab-motors .servos .m-block {
     float: right;
     width: calc((100% / 18) - 10px);
