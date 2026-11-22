@@ -14,6 +14,7 @@ import {
   OPERATION,
   FLIGHT_MODE,
   getFlightParamName,
+  getROIParamName,
   getOperationName
 } from './inav_constants.js';
 import apiDefinitions from './../api/definitions/index.js';
@@ -83,7 +84,8 @@ class Decompiler {
     // Map operand types to object names
     const typeToObject = {
       [OPERAND_TYPE.FLIGHT]: 'flight',
-      [OPERAND_TYPE.WAYPOINTS]: 'waypoint'
+      [OPERAND_TYPE.WAYPOINTS]: 'waypoint',
+      [OPERAND_TYPE.ROI]: 'roi'
     };
 
     const objName = typeToObject[objectType];
@@ -961,16 +963,20 @@ class Decompiler {
         return `inav.rc[${value}]`;
 
       case OPERAND_TYPE.FLIGHT:
-      case OPERAND_TYPE.WAYPOINTS: {
+      case OPERAND_TYPE.WAYPOINTS:
+      case OPERAND_TYPE.ROI: {
         // Try to get property name from API definitions
         const prop = this.getPropertyFromOperand(type, value);
         if (prop) {
           return prop;
         }
 
-        // Fallback to flight param name
-        const name = getFlightParamName(value);
-        const objName = type === OPERAND_TYPE.FLIGHT ? 'flight' : 'waypoint';
+        const name = type === OPERAND_TYPE.FLIGHT
+          ? getFlightParamName(value)
+          : (type === OPERAND_TYPE.ROI ? getROIParamName(value) : `unknown_waypoint_param_${value}`);
+        const objName = type === OPERAND_TYPE.FLIGHT
+          ? 'flight'
+          : (type === OPERAND_TYPE.ROI ? 'roi' : 'waypoint');
         return `${objName}.${name}`;
       }
 

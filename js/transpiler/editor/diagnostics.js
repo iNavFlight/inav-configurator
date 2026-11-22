@@ -424,7 +424,7 @@ function checkAPIUsage(line, lineNumber, monaco) {
   const writeAttempts = line.matchAll(/(\w+(?:\.\w+)*)\s*=/g);
   for (const match of writeAttempts) {
     const path = match[1];
-    if (path.startsWith('flight.') || path.startsWith('waypoint.')) {
+    if (path.startsWith('flight.') || path.startsWith('waypoint.') || path.startsWith('roi.')) {
       diagnostics.push(createDiagnostic(
         monaco,
         lineNumber,
@@ -487,7 +487,7 @@ function checkCommonMistakes(line, lineNumber, monaco) {
   const diagnostics = [];
   
   // Missing inav destructuring
-  if (line.match(/\b(flight|override|on)\b/) && 
+  if (line.match(/\b(flight|override|waypoint|roi|on)\b/) && 
       !line.includes('inav') && 
       !line.includes('const {') && 
       lineNumber < 5) {
@@ -496,7 +496,7 @@ function checkCommonMistakes(line, lineNumber, monaco) {
       lineNumber,
       0,
       line.length,
-      'Missing API destructuring. Add: const { flight, override, on } = inav;',
+      'Missing API destructuring. Add: const { flight, waypoint, roi, override, on } = inav;',
       DiagnosticSeverity.Info,
       'MISSING_DESTRUCTURE'
     ));
@@ -647,7 +647,7 @@ function getQuickFixesForCode(code, model, range) {
             resource: model.uri,
             edit: {
               range: { startLineNumber: 1, startColumn: 1, endLineNumber: 1, endColumn: 1 },
-              text: 'const { flight, rc, override, waypoint, gvar, on } = inav;\n\n'
+              text: 'const { flight, rc, waypoint, roi, override, gvar, on } = inav;\n\n'
             }
           }]
         }
