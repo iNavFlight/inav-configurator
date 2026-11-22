@@ -3,6 +3,7 @@ import { defineConfig } from "vite";
 import inject from "@rollup/plugin-inject";
 import { VitePWA } from "vite-plugin-pwa";
 import pkg from "./package.json";
+import basicSsl from '@vitejs/plugin-basic-ssl'
 
 export default defineConfig({
   base: "./",
@@ -23,7 +24,7 @@ export default defineConfig({
       workbox: {
         // Largest real asset is model_flying_wing.gltf at ~9.5MB; stay
         // comfortably above Workbox's 2MB default.
-        maximumFileSizeToCacheInBytes: 11 * 1024 * 1024,
+        maximumFileSizeToCacheInBytes: 12 * 1024 * 1024,
         globPatterns: ["**/*.{js,css,html,ico,png,svg,wasm,gltf,glb}"],
       },
       manifest: {
@@ -58,6 +59,7 @@ export default defineConfig({
         },
       },
     },
+    basicSsl()
   ],
   assetsInclude: ["**/*.gltf", "**/*.glb", "**/*.wasm"],
   // WASM SITL is built with pthread support (SharedArrayBuffer), which the
@@ -68,6 +70,8 @@ export default defineConfig({
       "Cross-Origin-Opener-Policy": "same-origin",
       "Cross-Origin-Embedder-Policy": "require-corp",
     },
+    host: true,
+
   },
   preview: {
     headers: {
