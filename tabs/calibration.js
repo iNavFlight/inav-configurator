@@ -7,6 +7,7 @@ import MSP from './../js/msp';
 import GUI from './../js/gui';
 import FC from './../js/fc';
 import timeout from './../js/timeouts';
+import { refusedByFc } from './../js/mspWriteOutcome';
 import interval from './../js/intervals';
 import i18n from './../js/localization';
 import jBox from 'jbox';
@@ -33,6 +34,14 @@ function formatMagAlignment(alignment) {
         return names[alignSetting.value] || alignSetting.value;
     }
     return roll + ", " + pitch + ", " + yaw;
+}
+
+// The FC answers a calibration request with '!' while armed and does not start
+// it (fc_msp.c, MSP_ACC_CALIBRATION and siblings) - say so instead of "started".
+function logCalibrationStart(startedKey) {
+    return function (response) {
+        GUI.log(i18n.getMessage(refusedByFc(response) ? 'calibrationRefusedByFc' : startedKey));
+    };
 }
 
 calibrationTab.model = (function () {
@@ -240,9 +249,7 @@ calibrationTab.initialize = function (callback) {
                 content: $('#modal-acc-processing')
             }).open();
 
-            MSP.send_message(MSPCodes.MSP_ACC_CALIBRATION, false, false, function () {
-                GUI.log(i18n.getMessage('initialSetupAccelCalibStarted'));
-            });
+            MSP.send_message(MSPCodes.MSP_ACC_CALIBRATION, false, false, logCalibrationStart('initialSetupAccelCalibStarted'));
 
             timeout.add('acc_calibration_timeout', function () {
                 $button.removeClass('disabled');
@@ -311,9 +318,7 @@ calibrationTab.initialize = function (callback) {
             // auto-detect actually changed anything (see reportMagCalibrationOrientation).
             var magAlignBefore = FC.hasCalibrationOrientationDetection() ? getMagAlignmentSettings() : null;
 
-            MSP.send_message(MSPCodes.MSP_MAG_CALIBRATION, false, false, function () {
-                GUI.log(i18n.getMessage('initialSetupMagCalibStarted'));
-            });
+            MSP.send_message(MSPCodes.MSP_MAG_CALIBRATION, false, false, logCalibrationStart('initialSetupMagCalibStarted'));
 
             var button = $(this);
 
@@ -357,9 +362,7 @@ calibrationTab.initialize = function (callback) {
         });
 
         $('#opflow_btn').on('click', function () {
-            MSP.send_message(MSPCodes.MSP2_INAV_OPFLOW_CALIBRATION, false, false, function () {
-                GUI.log(i18n.getMessage('initialSetupOpflowCalibStarted'));
-            });
+            MSP.send_message(MSPCodes.MSP2_INAV_OPFLOW_CALIBRATION, false, false, logCalibrationStart('initialSetupOpflowCalibStarted'));
 
             var button = $(this);
 

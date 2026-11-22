@@ -150,6 +150,10 @@ var MSP = {
         return CODE_NAMES.get(code) || ('0x' + code.toString(16));
     },
 
+    isWriteCode(code) {
+        return WRITE_CODES.has(code);
+    },
+
     // Which unreadable response makes this write unsafe, or false if it is safe.
     blockedWriteSource(code) {
         if (this.parseFailures.size === 0 || ALWAYS_ALLOWED_WRITE_CODES.has(code)) {
