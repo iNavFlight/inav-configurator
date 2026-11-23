@@ -5403,7 +5403,7 @@
         "message": "Möchtest du wirklich alle Einstellungen zurücksetzen?\nACHTUNG: Alle Einstellungen gehen verloren! Du musst das gesamte Modell danach neu einrichten!"
     },
     "confirm_select_defaults": {
-        "message": "Dies erlaubt die Auswahl neuer Standardwerte für alle Einstellungen. Bestehendes PID-Tuning und andere Einstellungen können verloren gehen!\nMöchtest du fortfahren?"
+        "message": "Dies erlaubt die Auswahl neuer Standardwerte für alle Einstellungen. Bestehendes PID-Tuning und andere Einstellungen werden zurückgesetzt!\nMöchtest du fortfahren?"
     },
     "confirm_reset_pid": {
         "message": "Dies setzt alle PID-Einstellungen auf die Firmware-Standardwerte zurück und speichert.\nMöchtest du fortfahren?"
