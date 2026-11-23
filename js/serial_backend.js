@@ -273,7 +273,9 @@ var SerialBackend = (function () {
                         timeout.killAll();
                         interval.killAll(['global_data_refresh', 'msp-load-update']);
 
-                        if (CONFIGURATOR.cliActive) {
+                        if (GUI.isProfileCopyRunning?.()) {
+                            GUI.stopProfileCopy(finishDisconnect);
+                        } else if (CONFIGURATOR.cliActive) {
                             GUI.tab_switch_cleanup(finishDisconnect);
                         } else {
                             GUI.tab_switch_cleanup();
@@ -551,6 +553,7 @@ var SerialBackend = (function () {
     }
 
     privateScope.onClosed = function (result) {
+        GUI.resetProfileCopy?.();
         if (result) { // All went as expected
             GUI.log(i18n.getMessage('serialPortClosedOk'));
         } else { // Something went wrong
