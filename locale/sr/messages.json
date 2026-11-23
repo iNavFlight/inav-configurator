@@ -1440,7 +1440,7 @@
     "message": "Spektrum Smart ESC (SRXL2)"
   },
   "srxl2Info": {
-    "message": "Signalna žica ESC-a ide na TX pin porta dodeljenog funkciji Spektrum Smart ESC, a ne na lemnu pločicu za motor, i istom žicom vraća telemetriju. Jedan ESC po portu: modelu sa više motora treba po jedan port za svaki motor, dodeljen redom motora, pa je motor 1 port sa najmanjim brojem."
+    "message": "Signalna žica ESC-a ide na TX pin porta dodeljenog funkciji Spektrum Smart ESC, a ne na lemnu pločicu za motor, i istom žicom vraća telemetriju. Jedan port po motoru: motor 1 na portu sa najmanjim brojem, ostali redom."
   },
   "srxl2ProtocolAutoSet": {
     "message": "ESC protokol je postavljen na SRXL2, da odgovara portu dodeljenom funkciji Spektrum Smart ESC. Promenite ga na kartici Izlazi ako to niste želeli."
@@ -1458,13 +1458,10 @@
     "message": "Broj otvorenih SRXL2 portova na ploči: $1. Izaberite model na kartici Mixer da biste odredili koliko motora ima."
   },
   "srxl2PortCountOpen": {
-    "message": "Broj otvorenih SRXL2 portova na ploči: $1, a broj motora: $2. Motor 1 koristi port sa najmanjim brojem."
+    "message": "Broj otvorenih SRXL2 portova na ploči: $1, a broj motora: $2. Motor 1 koristi port sa najmanjim brojem, a ostali slede redom motora; portovi preko broja motora ne pokreću ništa."
   },
   "srxl2PortNeedsReboot": {
     "message": "Broj portova dodeljenih funkciji Spektrum Smart ESC: $1, ali ploča nije otvorila nijedan. Portovi se otvaraju pri pokretanju — sačuvajte i ponovo pokrenite ploču."
-  },
-  "srxl2PortCount": {
-    "message": "Broj portova dodeljenih funkciji Spektrum Smart ESC: $1. Motor 1 koristi onaj sa najmanjim brojem."
   },
   "srxl2Telemetry": {
     "message": "Čitaj telemetriju sa ESC-a"
