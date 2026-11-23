@@ -1974,6 +1974,26 @@ var mspHelper = (function () {
             case MSPCodes.MSP2_INAV_ESC_SRXL2_CALIBRATE:
                 break;
 
+            case MSPCodes.MSP2_INAV_SERIAL_PADS:
+                FC.SERIAL_PADS = [];
+                if (dataHandler.unsupported) {
+                    break;
+                }
+                for (offset = 1; offset + 6 <= data.byteLength; offset += 6) {
+                    FC.SERIAL_PADS.push({
+                        identifier: data.getUint8(offset),
+                        direction: data.getUint8(offset + 1),
+                        output: data.getUint8(offset + 2),
+                        chosen: data.getUint8(offset + 3) === 1,
+                        usage: data.getUint8(offset + 4),
+                        usageIndex: data.getUint8(offset + 5),
+                    });
+                }
+                break;
+
+            case MSPCodes.MSP2_INAV_SET_SERIAL_PAD:
+                break;
+
             default:
                 console.log('Unknown code detected: 0x' + dataHandler.code.toString(16));
         } else {

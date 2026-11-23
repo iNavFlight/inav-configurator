@@ -11,6 +11,8 @@ import jBox from 'jbox';
 
 const portsTab = {};
 
+let pinsResizeObserver = null;
+
 portsTab.initialize = function (callback) {
 
     var columns = ['data', 'logging', 'sensors', 'telemetry', 'rx', 'peripherals'];
@@ -21,6 +23,13 @@ portsTab.initialize = function (callback) {
      * misconfiguration - the port is never opened and the motor never driven. So
      * saving one implies the other; see on_save_handler(). */
     const SRXL2_PROTOCOL = 7;
+
+    // fields of MSP2_INAV_SERIAL_PADS entries
+    const PAD_TX = 0;
+    const PAD_RX = 1;
+    const PAD_MOTOR = 1;
+    const PAD_SERVO = 2;
+    const PAD_LED = 3;
 
     if (GUI.active_tab !== this) {
         GUI.active_tab = this;
@@ -35,11 +44,17 @@ portsTab.initialize = function (callback) {
              * Smart ESC driver this comes back as an unsupported command, and
              * that is what keeps ESC_SRXL2 out of the list: a port assigned to
              * a function the firmware cannot perform is never opened. */
-            MSP.send_message(MSPCodes.MSP2_INAV_ESC_SRXL2_STATUS, false, false, function () {
-                import('./ports.html?raw').then(({default: html}) => GUI.load(html, on_tab_loaded_handler));
-            });
+            MSP.send_message(MSPCodes.MSP2_INAV_ESC_SRXL2_STATUS, false, false, loadPadsAndTab);
         });
     });
+
+    /* Firmware without the feature answers unsupported, which leaves the list
+     * empty and the Pins column hidden. */
+    function loadPadsAndTab() {
+        MSP.send_message(MSPCodes.MSP2_INAV_SERIAL_PADS, false, false, function () {
+            import('./ports.html?raw').then(({default: html}) => GUI.load(html, on_tab_loaded_handler));
+        });
+    }
 
     function checkMSPPortCount(excludeCheckbox) {
         let mspCount = 0;
@@ -167,8 +182,94 @@ portsTab.initialize = function (callback) {
             applyBaudLock(id, column);
         });
 
+        fillPins();
+
         $('table.ports tbody').on('change', 'select', onSwitchChange);
         $('table.ports tbody').on('change', 'input', onSwitchChange);
+    }
+
+    function fillPins() {
+        // the column takes width from the others, so it is there only on boards that have a pad to offer
+        $('.tab-ports table.ports').addClass(FC.SERIAL_PADS.length > 0 ? 'pins' : 'noPins');
+        $('.tab-ports .portConfiguration').each(function () {
+            const identifier = $(this).data('serialPort').identifier;
+            const hasTx = FC.SERIAL_PADS.some(pad => pad.identifier === identifier && pad.direction === PAD_TX);
+            const hasRx = FC.SERIAL_PADS.some(pad => pad.identifier === identifier && pad.direction === PAD_RX);
+            if (!hasTx && !hasRx) {
+                return;
+            }
+            const $lines = $('<div class="pinLines"/>').appendTo($(this).find('.pinsCell'));
+            if (hasRx && !hasTx) {
+                // keeps RX under the other rows' RX when they sit side by side
+                $lines.append($('<div class="pinLine pinPlaceholder"/>').append(
+                    $('<span class="pinLabel"/>').text(i18n.getMessage('portsPinTx')),
+                    $('<select/>').append($('<option/>').text(i18n.getMessage('portsPinOwn')))));
+            }
+            for (const direction of [PAD_TX, PAD_RX]) {
+                const pads = FC.SERIAL_PADS.filter(pad => pad.identifier === identifier && pad.direction === direction);
+                if (pads.length === 0) {
+                    continue;
+                }
+                const $select = $('<select class="uartPin"/>')
+                    .data('direction', direction)
+                    .append($('<option/>').attr('value', 0).text(i18n.getMessage('portsPinOwn')));
+                for (const pad of pads) {
+                    $select.append($('<option/>').attr('value', pad.output).text('S' + pad.output));
+                }
+                const chosen = pads.find(pad => pad.chosen);
+                $select.val(chosen ? chosen.output : 0);
+                $select.data('saved', $select.val());
+                $lines.append($('<div class="pinLine"/>').append(
+                    $('<span class="pinLabel"/>').text(i18n.getMessage(direction === PAD_TX ? 'portsPinTx' : 'portsPinRx')),
+                    $select,
+                    $('<div class="pinNote"/>')));
+            }
+        });
+        $('.tab-ports select.uartPin').on('change', updatePins);
+        updatePins();
+
+        if (FC.SERIAL_PADS.length > 0) {
+            let frame = null;
+            pinsResizeObserver = new ResizeObserver(() => {
+                if (frame === null) {
+                    frame = requestAnimationFrame(() => {
+                        frame = null;
+                        arrangePins();
+                    });
+                }
+            });
+            pinsResizeObserver.observe($('.tab-ports .content_wrapper')[0]);
+            arrangePins();
+        }
+    }
+
+    /* What choosing the pad costs: a motor or servo the mixer drives there keeps
+     * the board from arming, the LED strip just loses its output. */
+    function describePadUsage(pad) {
+        switch (pad.usage) {
+            case PAD_MOTOR: return i18n.getMessage('portsPinBlocks', [i18n.getMessage('portsPinMotor', [pad.usageIndex])]);
+            case PAD_SERVO: return i18n.getMessage('portsPinBlocks', [i18n.getMessage('portsPinServo', [pad.usageIndex])]);
+            case PAD_LED: return i18n.getMessage('portsPinNote', [i18n.getMessage('portsPinLed')]);
+            default: return '';
+        }
+    }
+
+    function updatePins() {
+        const $selects = $('.tab-ports select.uartPin');
+        // a pad carries one UART pin at a time, in either direction
+        $selects.each(function () {
+            const $select = $(this);
+            const takenElsewhere = $selects.not($select).map(function () { return $(this).val(); }).get();
+            $select.find('option').each(function () {
+                const value = $(this).val();
+                $(this).prop('disabled', value !== '0' && takenElsewhere.includes(value));
+            });
+
+            const identifier = $select.closest('.portConfiguration').data('serialPort').identifier;
+            const pad = FC.SERIAL_PADS.find(p => p.identifier === identifier && p.direction === $select.data('direction') &&
+                String(p.output) === $select.val());
+            $select.siblings('.pinNote').text(pad ? describePadUsage(pad) : '');
+        });
     }
 
     function onSwitchChange(e) {
@@ -309,10 +410,30 @@ portsTab.initialize = function (callback) {
             FC.ADVANCED_CONFIG.motorPwmProtocol = SRXL2_PROTOCOL;
             GUI.log(i18n.getMessage('srxl2ProtocolAutoSet'));
             mspHelper.saveAdvancedConfig(function () {
-                mspHelper.saveSerialPorts(save_to_eeprom);
+                savePins(() => mspHelper.saveSerialPorts(save_to_eeprom));
             });
         } else {
-            mspHelper.saveSerialPorts(save_to_eeprom);
+            savePins(() => mspHelper.saveSerialPorts(save_to_eeprom));
+        }
+
+        function savePins(next) {
+            const $changed = $('.tab-ports select.uartPin').filter(function () {
+                return $(this).val() !== $(this).data('saved');
+            });
+            const toWrite = (select, pad) => [$(select).closest('.portConfiguration').data('serialPort').identifier,
+                $(select).data('direction'), Number(pad)];
+            const changes = $changed.get().map(select => toWrite(select, $(select).val()));
+            const previous = $changed.get().map(select => toWrite(select, $(select).data('saved')));
+
+            sendPins(changes, next, function (accepted) {
+                if (accepted === 0) {
+                    GUI.log(i18n.getMessage('portsPinRefused'));
+                    return;
+                }
+                // the writes accepted so far sit in the FC's RAM, where a save from another tab would keep them
+                sendPins(previous, () => GUI.log(i18n.getMessage('portsPinRefused')),
+                    () => GUI.log(i18n.getMessage('portsPinRefusedNotUndone')));
+            });
         }
 
         function save_to_eeprom() {
@@ -333,6 +454,48 @@ portsTab.initialize = function (callback) {
         }
     }
 };
+
+/* Sends the writes one by one, then onDone. The first one refused, by the
+ * FC or by the parse-failure guard, stops them and calls onRefused with
+ * how many went through; the firmware takes a pad from whichever pin held
+ * it, so the order does not matter. */
+function sendPins(writes, onDone, onRefused) {
+    let accepted = 0;
+    (function sendNext() {
+        if (accepted === writes.length) {
+            onDone();
+            return;
+        }
+        const queued = MSP.send_message(MSPCodes.MSP2_INAV_SET_SERIAL_PAD, writes[accepted], false, function (result) {
+            // the FC answers a pad it cannot use with an error, which still completes the request
+            if (result === false || MSP.unsupported) {
+                onRefused(accepted);
+                return;
+            }
+            accepted++;
+            sendNext();
+        });
+        // the guard reports its refusal itself and never calls back
+        if (!queued) {
+            onRefused(accepted);
+        }
+    })();
+}
+
+/* TX and RX side by side where the table still fits on one line with them so, stacked where that would wrap
+ * the other cells: measured rather than tied to a window width, so a longer translation moves the threshold. */
+function arrangePins() {
+    const table = document.querySelector('.tab-ports table.ports.pins');
+    if (!table) {
+        return;
+    }
+    table.classList.add('pinsSideBySide');
+    const available = table.getBoundingClientRect().width;
+    table.style.width = 'max-content';
+    const needed = table.getBoundingClientRect().width;
+    table.style.width = '';
+    table.classList.toggle('pinsSideBySide', needed <= available);
+}
 
 function updateDefaultBaud(baudSelect, column) {
     let section = $("#" + baudSelect);
@@ -386,6 +549,10 @@ function applyBaudLock(baudSelect, column) {
 
 portsTab.cleanup = function (callback) {
     $('.jBox-wrapper').remove();
+    if (pinsResizeObserver) {
+        pinsResizeObserver.disconnect();
+        pinsResizeObserver = null;
+    }
     if (callback) callback();
 };
 
