@@ -3411,6 +3411,111 @@ function iconKey(filename) {
 
     /////////////////////////////////////////////
     //
+    // openAIP airspace / airport tile overlay
+    //
+    /////////////////////////////////////////////
+
+    // The tiles API only serves the combined 'openaip' PNG layer (plus 'hotspots'), see https://api.tiles.openaip.net/api/system/specs/v1/schema.json
+    const OPENAIP_OVERLAYS = [
+        { id: 'openaip', label: 'layerOpenAip' },
+    ];
+    const OPENAIP_VISIBILITY_KEY = 'openaip_overlay_visibility';
+
+    function openAipApiKey() {
+        return String(globalSettings.openaipApiKey || '').trim();
+    }
+
+    function createOpenAipSource(overlayId) {
+        const source = new XYZ({
+            url: 'https://{a-c}.api.tiles.openaip.net/api/data/' + overlayId + '/{z}/{x}/{y}.png?apiKey=' + encodeURIComponent(openAipApiKey()),
+            attributions: '<a href="https://www.openaip.net" target="_blank">openAIP</a>',
+            minZoom: 2
+        });
+        // Failed tiles are otherwise silent; never log the event, the tile URL carries the key
+        source.once('tileloaderror', () => $('#openaipLayerList .openaip-load-error').prop('hidden', false));
+        return source;
+    }
+
+    missionControlTab.onOpenAipKeyChanged = function () {
+        if (!map) {
+            return;
+        }
+        const visibility = store.get(OPENAIP_VISIBILITY_KEY, {});
+        const hasKey = openAipApiKey() !== '';
+        map.getLayers().forEach(layer => {
+            const overlayId = layer.get('openaip_overlay');
+            if (overlayId) {
+                layer.setVisible(false);
+                layer.setSource(hasKey ? createOpenAipSource(overlayId) : null);
+                layer.setVisible(hasKey && visibility[overlayId] === true);
+            }
+        });
+        updateOpenAipLayerListUI();
+    };
+
+    function createOpenAipLayer(overlay, visible) {
+        const layer = new TileLayer({
+            source: createOpenAipSource(overlay.id),
+            opacity: 0.85,
+            visible: visible
+        });
+        layer.set('name', i18n.getMessage(overlay.label));
+        layer.set('openaip_overlay', overlay.id);
+        layer.set('no_interaction', true);
+        map.addLayer(layer);
+        return layer;
+    }
+
+    function addOpenAipLayers() {
+        const visibility = store.get(OPENAIP_VISIBILITY_KEY, {});
+        const hasKey = openAipApiKey() !== '';
+
+        OPENAIP_OVERLAYS.forEach(overlay => {
+            createOpenAipLayer(overlay, hasKey && visibility[overlay.id] === true);
+        });
+        updateOpenAipLayerListUI();
+    }
+
+    function updateOpenAipLayerListUI() {
+        const $container = $('#openaipLayerList').empty();
+        const hasKey = openAipApiKey() !== '';
+
+        map.getLayers().forEach(layer => {
+            const overlayId = layer.get('openaip_overlay');
+            if (!overlayId) {
+                return;
+            }
+            const inputId = 'openaip_layer_' + overlayId;
+            $container.append(`
+                <div class="layer-item" style="display: flex; align-items: center; padding: 8px 5px; border-bottom: 1px solid #444;">
+                    <input id="${inputId}" type="checkbox" class="togglemedium openaip-layer-toggle" data-overlay-id="${overlayId}" ${layer.getVisible() ? 'checked' : ''} ${hasKey ? '' : 'disabled'} style="flex-shrink: 0;">
+                    <label for="${inputId}" style="margin-left: 8px; cursor: pointer; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${layer.get('name')}</label>
+                </div>
+            `);
+        });
+
+        if (!hasKey) {
+            $container.append($('<div class="openaip-no-key"></div>').text(i18n.getMessage('layerOpenAipNoKey')));
+        }
+        $container.append($('<div class="openaip-no-key openaip-load-error" hidden></div>').text(i18n.getMessage('layerOpenAipLoadError')));
+
+        GUI.switchery();
+        $('.openaip-layer-toggle').on('change', function () {
+            const overlayId = $(this).attr('data-overlay-id');
+            const isChecked = $(this).is(':checked');
+            map.getLayers().forEach(layer => {
+                if (layer.get('openaip_overlay') === overlayId) {
+                    layer.setVisible(isChecked);
+                }
+            });
+            const visibility = store.get(OPENAIP_VISIBILITY_KEY, {});
+            visibility[overlayId] = isChecked;
+            store.set(OPENAIP_VISIBILITY_KEY, visibility);
+        });
+    }
+
+    /////////////////////////////////////////////
+    //
     // Layer Management Functions
     //
     /////////////////////////////////////////////
@@ -5577,6 +5682,8 @@ function iconKey(filename) {
         }
 
         initializeMapLocation();
+
+        addOpenAipLayers();
 
         //////////////////////////////////////////////////////////////////////////
         // Load previously saved GEO files from electron store
@@ -8468,6 +8575,7 @@ missionControlTab.cleanup = function (callback) {
     /* jBox appends its wrapper to body, which the tab switch does not empty, so the
        modal's markup and its ids would stack one copy per visit. */
     $('.jBox-wrapper').remove();
+    missionControlTab.onOpenAipKeyChanged = null;
     cleanupMissionControlLocationResources();
     if (elevationChartInstance) {
         elevationChartInstance.destroy();

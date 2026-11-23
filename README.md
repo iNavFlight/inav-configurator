@@ -317,6 +317,23 @@ INAV Configurator allows you to choose between OpenStreetMap, Esri World Imagery
 	1. Enter MapProxy service layer (inav_layer if configured from MAPPROXY.md)
 1. Once completed, you can zoom in on the area you will be flying in while connected to the internet in either the GPS or Mission Control tab to save the cache for offline use
 
+### Airspace and airport overlay (openAIP)
+
+Mission Control can draw airspaces, airports and other aeronautical data from [openAIP](https://www.openaip.net)
+on top of any map provider. It needs a free openAIP API key:
+
+1. Create a free account at [openaip.net](https://www.openaip.net)
+1. Open the **API Clients** page of your profile and request a new API client
+1. Paste its key into **Settings -> Airspace data (openAIP) -> openAIP API key**
+
+The overlay is then switched on and off in the **Map Layers** box of Mission Control and remembers
+its state. Without a key the switch is disabled and no tiles are requested. The key is stored locally
+and is sent only to the openAIP tile server, together with the map tiles being viewed. The overlay
+needs an internet connection and is not cached by MapProxy.
+
+> Airspace data is advisory. It is not a substitute for an official aeronautical chart or for
+> checking the rules that apply where you fly.
+
 ## Font Customisation
 
 INAV provides the font images so that custom fonts can be created for your personal preference. This is the case for both analogue and digital fonts. The resources can be found in the [osd](/resources/osd) folder. Within the **analogue** and **digital** subfolders, you will find information on compiling your own fonts. There is also an [INAV Character Map](/resources/osd/INAV%20Character%20Map.md) document. This contains previews of all the character images in the fonts and the appropriate variable names within the firmware and Configurator. There are tools for compiling the [analogue](https://github.com/fiam/max7456tool) and [digital](https://github.com/MrD-RC/hdosd-font-tool) fonts. New font submissions via pull requests are welcome.
