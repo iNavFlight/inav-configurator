@@ -4153,8 +4153,10 @@ function iconKey(filename) {
         selectedFeature = markers[selectedMarker.getLayerNumber()].getSource().getFeatures()[0];
 
         selectedFwApproachWp = FC.FW_APPROACH.get()[FC.SAFEHOMES.getMaxSafehomeCount() + selectedMarker.getMultiMissionIdx()];
+        // the all-missions view is read-only: selecting a waypoint there must not change the missions
+        const readOnly = disableMarkerEdit;
 
-        if (selectedFwApproachWp.getLandHeading1() == 0 && selectedFwApproachWp.getLandHeading1() == 0 && selectedFwApproachWp.getApproachAltAsl() == 0 && selectedFwApproachWp.getLandAltAsl() == 0) {
+        if (!readOnly && selectedFwApproachWp.getLandHeading1() == 0 && selectedFwApproachWp.getLandHeading1() == 0 && selectedFwApproachWp.getApproachAltAsl() == 0 && selectedFwApproachWp.getLandAltAsl() == 0) {
             selectedFwApproachWp.setApproachAltAsl(Math.round(settings.fwApproachAlt * 100));
             selectedFwApproachWp.setLandAltAsl(Math.round(settings.fwLandAlt * 100));
         }
@@ -4187,12 +4189,15 @@ function iconKey(filename) {
                 // the waypoint may have been deleted or deselected while the elevation was fetched
                 if (selectedMarker !== wp) return;
 
-                $('#elevationValueAtWP').text(elevationAtWP);
-                rememberTerrain(wp, elevationAtWP);
-                const returnAltitude = checkAltElevSanity(false, wp.getAlt(), elevationAtWP, P3Value);
-                wp.setAlt(returnAltitude);
-
-                approachWp.setIsSeaLevelRef(missionControlTab.isBitSet(P3Value, MWNP.P3.ALT_TYPE) ? 1 : 0);
+                if (readOnly) {
+                    await refreshGroundClearanceDisplay(elevationAtWP);
+                } else {
+                    $('#elevationValueAtWP').text(elevationAtWP);
+                    rememberTerrain(wp, elevationAtWP);
+                    const returnAltitude = checkAltElevSanity(false, wp.getAlt(), elevationAtWP, P3Value);
+                    wp.setAlt(returnAltitude);
+                    approachWp.setIsSeaLevelRef(missionControlTab.isBitSet(P3Value, MWNP.P3.ALT_TYPE) ? 1 : 0);
+                }
                 $('#wpApproachAlt').val(altitudeToDisplay(approachWp.getApproachAltAsl()));
                 $('#wpLandAlt').val(altitudeToDisplay(approachWp.getLandAltAsl()));
                 $('#wpLandAltM').text(altitudeReadout(approachWp.getLandAltAsl()));
