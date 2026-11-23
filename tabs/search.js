@@ -12,6 +12,7 @@ const jslessTab = new Set(["debug_trace", "options"]);
 const tabNames = [
  "adjustments",
  "advanced_tuning",
+ "autoland",
  "auxiliary",
  "calibration",
  "cli",
