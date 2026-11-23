@@ -1974,6 +1974,22 @@ var mspHelper = (function () {
             case MSPCodes.MSP2_INAV_ESC_SRXL2_CALIBRATE:
                 break;
 
+            case MSPCodes.MSP2_INAV_MAG_LEARN:
+                if (dataHandler.unsupported || data.byteLength < 12) {
+                    FC.MAG_LEARN.supported = false;
+                    break;
+                }
+                FC.MAG_LEARN.supported = true;
+                FC.MAG_LEARN.flags = data.getUint16(0, true);
+                FC.MAG_LEARN.sectors = data.getUint8(2);
+                FC.MAG_LEARN.headings = data.getUint8(3);
+                FC.MAG_LEARN.spread = data.getUint16(4, true);
+                FC.MAG_LEARN.delta = [data.getInt16(6, true), data.getInt16(8, true), data.getInt16(10, true)];
+                // The earth field came later: firmware before it stops at the delta
+                FC.MAG_LEARN.field = data.byteLength >= 18 ? [data.getInt16(12, true), data.getInt16(14, true), data.getInt16(16, true)] : [0, 0, 0];
+                FC.MAG_LEARN.yawTrimDelta = data.byteLength >= 20 ? data.getInt16(18, true) : 0;
+                break;
+
             default:
                 console.log('Unknown code detected: 0x' + dataHandler.code.toString(16));
         } else {
