@@ -261,3 +261,30 @@ td.adsbVehicleList {
     padding: 8px;
     color: #323232;
 }
+
+/* Decided by INAV: the switch shows its state but is not for reaching */
+.tab-gps .gnss-fixed .ios7-switch {
+    cursor: default;
+    opacity: 0.55;
+}
+
+.tab-gps .gnss-fixed label {
+    cursor: default;
+}
+
+/* Carries the separator of the switches it counts, as the last line of their group */
+.tab-gps .gnss-budget {
+    clear: left;
+    float: left;
+    width: 100%;
+    margin-bottom: 5px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid #ddd;
+    color: #a13d20;
+    font-size: 0.9em;
+    line-height: 1.4;
+}
+
+.tab-gps .gnss-budget.is-hidden {
+    display: none;
+}
