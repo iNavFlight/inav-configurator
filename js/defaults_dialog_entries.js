@@ -24,6 +24,10 @@ var defaultsDialogData = [
                 key: "motor_pwm_protocol",
                 value: "DSHOT300"
             },
+            {
+                key: "dynamic_idle_min_rpm",
+                value: 5500
+            },
             /*
             Ez Tune setup
             */
@@ -141,6 +145,10 @@ var defaultsDialogData = [
             {
                 key: "motor_pwm_protocol",
                 value: "DSHOT300"
+            },
+            {
+                key: "dynamic_idle_min_rpm",
+                value: 3500
             },
             /*
             Ez Tune setup
@@ -274,6 +282,10 @@ var defaultsDialogData = [
             {
                 key: "motor_pwm_protocol",
                 value: "DSHOT300"
+            },
+            {
+                key: "dynamic_idle_min_rpm",
+                value: 3000
             },
             /*
             Ez Tune setup
