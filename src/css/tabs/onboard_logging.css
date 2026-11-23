@@ -107,9 +107,70 @@
 }
 
 .tab-onboard_logging .dataflash-used,
-.tab-onboard_logging .sdcard-other {
+.tab-onboard_logging .sdcard-contents .sdcard-other {
     background-color: #37a8db;
     border-radius: 4px;
+}
+
+/* Free, but outside the freefile that logs are written to */
+.tab-onboard_logging .sdcard-contents .sdcard-card-free {
+    background: repeating-linear-gradient(-45deg, rgba(55, 168, 219, 0.3) 0 4px, transparent 4px 8px);
+}
+
+/* The SD card has up to six parts, too many for labels under the bar */
+.tab-onboard_logging .sdcard-contents {
+    margin-bottom: 8px;
+}
+
+.tab-onboard_logging .sdcard-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 16px;
+}
+
+.tab-onboard_logging .sdcard-legend li {
+    white-space: nowrap;
+}
+
+.tab-onboard_logging .sdcard-legend li::before {
+    content: "";
+    display: inline-block;
+    width: 0.9em;
+    height: 0.9em;
+    margin-right: 0.4em;
+    vertical-align: -0.1em;
+    border: 1px solid silver;
+    border-radius: 3px;
+    background-color: #eee;
+}
+
+.tab-onboard_logging .sdcard-legend .sdcard-card-free::before {
+    background: repeating-linear-gradient(-45deg, rgba(55, 168, 219, 0.45) 0 2px, #eee 2px 4px);
+}
+
+.tab-onboard_logging .sdcard-legend .sdcard-other::before {
+    background-color: #37a8db;
+}
+
+.tab-onboard_logging .sdcard-contents .sdcard-other.not-counted,
+.tab-onboard_logging .sdcard-legend .sdcard-other.not-counted::before {
+    background-color: silver;
+}
+
+.tab-onboard_logging .sdcard-contents .sdcard-terrain,
+.tab-onboard_logging .sdcard-legend .sdcard-terrain::before {
+    background-color: #59aa29;
+}
+
+/* Taken without data */
+.tab-onboard_logging .sdcard-contents .sdcard-log-tails,
+.tab-onboard_logging .sdcard-legend .sdcard-log-tails::before {
+    background-color: #e2a32e;
+}
+
+.tab-onboard_logging .sdcard-contents .sdcard-lost,
+.tab-onboard_logging .sdcard-legend .sdcard-lost::before {
+    background-color: #e2563b;
 }
 
 .tab-onboard_logging progress::-webkit-progress-bar {
@@ -231,9 +292,35 @@
     line-height: 20px;
 }
 
+.tab-onboard_logging .require-sdcard-logging .spacer_box {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
 .tab-onboard_logging .sdcard {
-	padding:10px;
-	float:left;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.tab-onboard_logging .sdcard .regular-button {
+    margin: 8px 0 0;
+}
+.tab-onboard_logging .sdcard-details {
+    flex: 1;
+    min-width: 0;
+}
+/* The boxes float: without this the last one ends under the Save toolbar */
+.tab-onboard_logging .content_wrapper::after {
+    content: "";
+    display: block;
+    clear: both;
+}
+.tab-onboard_logging .require-msc {
+    display: none;
+}
+.tab-onboard_logging.msc-supported .require-msc {
+    display: inline-block;
 }
 .tab-onboard_logging .sdcard-status {
     padding-top: 4px;

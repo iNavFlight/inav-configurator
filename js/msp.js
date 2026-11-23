@@ -79,6 +79,7 @@ var MSP = {
     SDCARD_STATE_CARD_INIT:     2,
     SDCARD_STATE_FS_INIT:       3,
     SDCARD_STATE_READY:         4,
+    SDCARD_FREE_SPACE_UNKNOWN:  0xFFFFFFFF,
         
     symbols: {
         BEGIN: '$'.charCodeAt(0),
