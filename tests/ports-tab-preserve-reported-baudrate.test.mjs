@@ -118,6 +118,7 @@ const realMspHelperUrl = rewriteImports('js/msp/MSPHelper.js', [
     ["import settingsCache from './../settingsCache';", "import settingsCache from '" + inertDefaultUrl + "';"],
     ["import {Geozone, GeozoneVertex, GeozoneShapes } from './../geozone';", "import { Geozone, GeozoneVertex, GeozoneShapes } from '" + inertGeozoneUrl + "';"],
     ["import { parseDronecanAsyncRequestResponse } from './../dronecanAsyncRequestParse';", "import { parseDronecanAsyncRequestResponse } from '" + inertDronecanParseUrl + "';"],
+    ["import { decodeSatellites } from './../gpsSatellites';", "import { decodeSatellites } from '" + realModuleUrl('js/gpsSatellites.js') + "';"],
 ], 'MSPHelper-generated.mjs');
 
 const { default: mspHelper } = await import(realMspHelperUrl);
