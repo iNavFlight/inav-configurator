@@ -335,15 +335,6 @@ app.whenReady().then(() => {
     return result;
   }),
 
-  ipcMain.on('dialog.alert', (event, message) => {
-    event.returnValue = dialog.showMessageBoxSync({ message: message, icon: path.join(__dirname, 'inav_icon_128.png')});
-  });
-
-  ipcMain.handle('dialog.confirm', async (_event, message) => {
-    const result = await dialog.showMessageBox({ message: message, icon: path.join(__dirname, 'inav_icon_128.png'), buttons: ["Yes", "No"] });
-    return result.response === 0;
-  });
-
   ipcMain.handle('tcpConnect', (_event, host, port) => {
     return tcp.connect(host, port, mainWindow);
   });

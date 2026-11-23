@@ -349,7 +349,7 @@ sitlTab.initialize = (callback) => {
                     return;
 
                 if (profiles.find(e => e.name == name )) {
-                    dialog.alert(i18n.getMessage('sitlProfileExists'));
+                    void dialog.alert(i18n.getMessage('sitlProfileExists'));
                     return;
                 }
                 const safeText = $('<div>').text(name).html(); // escape
@@ -383,7 +383,7 @@ sitlTab.initialize = (callback) => {
         profileDeleteBtn_e.on('click', function () {
 
             if (currentProfile.isStdProfile) {
-                dialog.alert(i18n.getMessage('sitlStdProfileCantDeleted'));            
+                void dialog.alert(i18n.getMessage('sitlStdProfileCantDeleted'));            
                 return;
             }
 
@@ -504,7 +504,7 @@ sitlTab.initialize = (callback) => {
 
         function saveProfiles() {
             if (currentProfile.isStdProfile) {
-                dialog.alert(i18n.getMessage('sitlStdProfileCantOverwritten'));
+                void dialog.alert(i18n.getMessage('sitlStdProfileCantOverwritten'));
                 return;
             }        
             var profilesToSave = [];

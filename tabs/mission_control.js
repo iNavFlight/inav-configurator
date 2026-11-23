@@ -706,6 +706,14 @@ function createSweepWaypointPair(intersections, pairIndex, y, direction, oversho
     ];
 }
 
+// Returns an array of waypoints, or null specifically when the latitude makes
+// projection unavailable (near the poles) — callers need to tell that case
+// apart from a generic empty result so they show exactly one alert, not two:
+// dialog.alert() no longer blocks like window.confirm() used to, so a caller
+// that also alerts on an empty array would otherwise stack both alerts in the
+// same tick. (updateGridPreview(), the live-preview caller, calls this on
+// every parameter change and must not alert at all, so it needs this
+// distinction too, not just the one-time Generate button.)
 function generateGridWaypoints(coordsLonLat, params) {
     const vertices = coordsLonLat.slice(0, -1);
     if (vertices.length < 3 || params.spacing <= 0) {
@@ -714,8 +722,7 @@ function generateGridWaypoints(coordsLonLat, params) {
 
     const projection = createGridProjection(vertices);
     if (!projection) {
-        dialog.alert('Grid generation is unavailable at this latitude because longitude scale collapses near the poles.');
-        return [];
+        return null;
     }
 
     const angleRad = params.angle * Math.PI / 180;
@@ -1535,6 +1542,10 @@ function iconKey(filename) {
     
         i18n.localize();
 
+        // Destroy any instance from a previous visit to this tab first — jBox reparents
+        // its content to <body>, outside what GUI.load() just replaced, so the old
+        // wrapper would otherwise be orphaned there instead of garbage collected.
+        landSpeedNotUpdatedModal && landSpeedNotUpdatedModal.destroy();
         landSpeedNotUpdatedModal = new jBox('Modal', {
             width: 480,
             height: 200,
@@ -2550,7 +2561,7 @@ function iconKey(filename) {
     function checkApproachAltitude(altitude, isSeaLevelRef, sealevel) {
 
         if (altitude - (isSeaLevelRef ? sealevel * 100 : 0 ) < 0) {
-            dialog.alert(i18n.getMessage('MissionPlannerAltitudeChangeReset'));
+            void dialog.alert(i18n.getMessage('MissionPlannerAltitudeChangeReset'));
             return false;
         }
 
@@ -2560,7 +2571,7 @@ function iconKey(filename) {
     function checkLandingAltitude(altitude, isSeaLevelRef, sealevel) {
 
         if (altitude - (isSeaLevelRef ? sealevel * 100 : 0 ) < MAX_NEG_FW_LAND_ALT) {
-            dialog.alert(i18n.getMessage('MissionPlannerFwLAndingAltitudeChangeReset'));
+            void dialog.alert(i18n.getMessage('MissionPlannerFwLAndingAltitudeChangeReset'));
             return false;
         }
 
@@ -3045,12 +3056,12 @@ function iconKey(filename) {
     function addGeozone() {
 
         if (FC.GEOZONES.geozoneCount() + 1 > FC.GEOZONES.getMaxZones()) {
-            dialog.alert(i18n.getMessage('missionGeozoneMaxZonesReached'));
+            void dialog.alert(i18n.getMessage('missionGeozoneMaxZonesReached'));
             return;
         }
 
         if (FC.GEOZONES.getUsedVerticesCount() + 2 > FC.GEOZONES.getMaxVertices()) {
-            dialog.alert(i18n.getMessage('missionGeozoneMaxVerticesReached'));
+            void dialog.alert(i18n.getMessage('missionGeozoneMaxVerticesReached'));
             return;
         }
 
@@ -3526,7 +3537,7 @@ function iconKey(filename) {
         const response = await globalThis.electronAPI.readFile(filePath, ext === 'kmz' ? null : undefined);
         if (response.error) {
             GUI.log(`Error reading file: ${response.error}`);
-            dialog.alert(i18n.getMessage('layerLoadError'));
+            void dialog.alert(i18n.getMessage('layerLoadError'));
             return;
         }
 
@@ -4904,7 +4915,7 @@ function iconKey(filename) {
                     .on('change', event => {
                         const lat = $(event.currentTarget).val();
                         if (isNaN(lat) || lat < -90 || lat > 90) {
-                            dialog.alert(i18n.getMessage("geozoneInvalidLat"));
+                            void dialog.alert(i18n.getMessage("geozoneInvalidLat"));
                             $(event.currentTarget).val(vertex.getLatMap());
                             return;
                         }
@@ -4921,7 +4932,7 @@ function iconKey(filename) {
                     .on('change', event => {
                         const lat = $(event.currentTarget).val();
                         if (isNaN(lat) || lat < -180 || lat > 180) {
-                            dialog.alert(i18n.getMessage("geozoneInvalidLon"));
+                            void dialog.alert(i18n.getMessage("geozoneInvalidLon"));
                             $(event.currentTarget).val(vertex.getLonMap());
                             return;
                         }
@@ -5013,14 +5024,14 @@ function iconKey(filename) {
                     if ($(this).val() >= 360 || ($(this).val() < 0 && $(this).val() != -1))
                     {
                       $(this).val(-1);
-                      dialog.alert(i18n.getMessage('MissionPlannerHeadSettingsCheck'));
+                      void dialog.alert(i18n.getMessage('MissionPlannerHeadSettingsCheck'));
                     }
                 }
                 else if (MWNP.WPTYPE.REV[element.getAction()] == "RTH") {
                     if ($(this).val() != 0 && $(this).val() != 1)
                     {
                       $(this).val(0);
-                      dialog.alert(i18n.getMessage('MissionPlannerRTHSettingsCheck'));
+                      void dialog.alert(i18n.getMessage('MissionPlannerRTHSettingsCheck'));
                     }
                 }
                 else if (MWNP.WPTYPE.REV[element.getAction()] == "JUMP") {
@@ -5032,7 +5043,7 @@ function iconKey(filename) {
                     else if (mission.getPoiList().length != 0 && mission.getPoiList()) {
                         if (mission.getPoiList().includes(mission.convertJumpNumberToWaypoint(Number($(this).val())-1))) {
                             $(this).val(1);
-                            dialog.alert(i18n.getMessage('MissionPlannerJump3SettingsCheck'));
+                            void dialog.alert(i18n.getMessage('MissionPlannerJump3SettingsCheck'));
                         }
                     }
                 }
@@ -5047,7 +5058,7 @@ function iconKey(filename) {
                     if ($(this).val() > 10 || ($(this).val() < 0 && $(this).val() != -1))
                     {
                       $(this).val(0);
-                      dialog.alert(i18n.getMessage('MissionPlannerJump2SettingsCheck'));
+                      void dialog.alert(i18n.getMessage('MissionPlannerJump2SettingsCheck'));
                     }
                 }
                 element.setP2(Number($(this).val()));
@@ -5750,7 +5761,7 @@ function iconKey(filename) {
             else if (selectedFeature && tempMarker.kind == "geozoneline" && tempMarker.selection) {
 
                 if (FC.GEOZONES.getUsedVerticesCount() + 1 > FC.GEOZONES.getMaxVertices()) {
-                    dialog.alert(i18n.getMessage('missionGeozoneMaxVerticesReached'));
+                    void dialog.alert(i18n.getMessage('missionGeozoneMaxVerticesReached'));
                     return;
                 }
                 
@@ -5888,7 +5899,7 @@ function iconKey(filename) {
                     let found = false;
                     mission.get().forEach(wp => {
                         if (wp.getAction() == MWNP.WPTYPE.LAND) {
-                            dialog.alert(i18n.getMessage('MissionPlannerOnlyOneLandWp'));
+                            void dialog.alert(i18n.getMessage('MissionPlannerOnlyOneLandWp'));
                             found = true;
                             $(event.currentTarget).val(selectedMarker.getAction());
                         }
@@ -6325,7 +6336,7 @@ function iconKey(filename) {
 
         $('#addSafehome').on('click', () => {
             if (FC.SAFEHOMES.safehomeCount() + 1 > FC.SAFEHOMES.getMaxSafehomeCount()){
-                dialog.alert(i18n.getMessage('missionSafehomeMaxSafehomesReached'));
+                void dialog.alert(i18n.getMessage('missionSafehomeMaxSafehomesReached'));
                 return;
             }
 
@@ -6614,7 +6625,7 @@ function iconKey(filename) {
         $('#saveEepromGeozoneButton').on('click', async event => {
 
             if (invalidGeoZones) {
-                dialog.alert(i18n.getMessage("geozoneUnableToSave"));
+                void dialog.alert(i18n.getMessage("geozoneUnableToSave"));
                 return;
             }
             
@@ -6639,7 +6650,7 @@ function iconKey(filename) {
                     selectedGeozone.setVertices([tmpVertex]);
                 } else {
                     if (FC.GEOZONES.getUsedVerticesCount() + 2 > FC.GEOZONES.getMaxVertices()) {
-                        dialog.alert(i18n.getMessage('missionGeozoneMaxVerticesReached'));
+                        void dialog.alert(i18n.getMessage('missionGeozoneMaxVerticesReached'));
                         renderGeozoneOptions();
                         return;
                     }
@@ -6921,7 +6932,7 @@ function iconKey(filename) {
                 const result = googleResult
                     || await searchNominatimAddress(address, requestController.signal);
                 if (!result) {
-                    dialog.alert(i18n.getMessage('addressSearchNotFound'));
+                    void dialog.alert(i18n.getMessage('addressSearchNotFound'));
                     return;
                 }
 
@@ -6929,7 +6940,7 @@ function iconKey(filename) {
             } catch (error) {
                 if (error.name !== 'AbortError') {
                     console.error('Address search failed:', error.message);
-                    dialog.alert(i18n.getMessage('addressSearchFailed'));
+                    void dialog.alert(i18n.getMessage('addressSearchFailed'));
                 }
             } finally {
                 if (addressSearchAbortController === requestController) {
@@ -7127,7 +7138,7 @@ function iconKey(filename) {
 
             gridPreviewLayer.getSource().clear();
 
-            if (waypoints.length < 2) {
+            if (!waypoints || waypoints.length < 2) {
                 $('#gridWaypointCount').text(i18n.getMessage('missionGridNoWaypoints')).css('color', '#c00');
                 return;
             }
@@ -7204,15 +7215,20 @@ function iconKey(filename) {
             const params = getGridParams();
             const waypoints = generateGridWaypoints(gridPolygonCoords, params);
 
+            if (waypoints === null) {
+                void dialog.alert('Grid generation is unavailable at this latitude because longitude scale collapses near the poles.');
+                return;
+            }
+
             if (waypoints.length === 0) {
-                dialog.alert(i18n.getMessage('missionGridNoWaypoints'));
+                void dialog.alert(i18n.getMessage('missionGridNoWaypoints'));
                 return;
             }
 
             const totalCount = waypoints.length + ($('#gridEndRTH').is(':checked') ? 1 : 0);
 
             if (totalCount > mission.getMaxWaypoints()) {
-                dialog.alert(i18n.getMessage('missionGridTooManyWaypoints', [totalCount, mission.getMaxWaypoints()]));
+                void dialog.alert(i18n.getMessage('missionGridTooManyWaypoints', [totalCount, mission.getMaxWaypoints()]));
                 return;
             }
 
@@ -7499,7 +7515,7 @@ function iconKey(filename) {
             const attachedWaypoints = mission.getAttachedFromWaypoint(selectedMarker) || [];
 
             if (mission.isJumpTargetAttached(selectedMarker)) {
-                dialog.alert(i18n.getMessage('MissionPlannerJumpTargetRemoval'));
+                void dialog.alert(i18n.getMessage('MissionPlannerJumpTargetRemoval'));
             } else if (attachedWaypoints.length > 0) {
                 if (!(await dialog.confirm(i18n.getMessage('confirm_delete_point_with_options')))) {
                     return;
@@ -7565,7 +7581,7 @@ function iconKey(filename) {
 
         $('#saveMissionButton').on('click', function () {
             if (mission.isEmpty()) {
-                dialog.alert(i18n.getMessage('no_waypoints_to_save'));
+                void dialog.alert(i18n.getMessage('no_waypoints_to_save'));
                 return;
             }
             $(this).addClass('disabled');
@@ -7584,7 +7600,7 @@ function iconKey(filename) {
 
         $('#saveEepromMissionButton').on('click', function () {
             if (mission.isEmpty()) {
-                dialog.alert(i18n.getMessage('no_waypoints_to_save'));
+                void dialog.alert(i18n.getMessage('no_waypoints_to_save'));
                 return;
             }
             $(this).addClass('disabled');
@@ -7608,7 +7624,7 @@ function iconKey(filename) {
                 result = await dialog.showOpenDialog(options);
             } catch (error) {
                 GUI.log(`Error opening file dialog: ${error.message || error}`);
-                dialog.alert(i18n.getMessage('layerLoadError'));
+                void dialog.alert(i18n.getMessage('layerLoadError'));
                 return;
             }
 
@@ -7618,7 +7634,7 @@ function iconKey(filename) {
                 await loadGeoFile(result.filePaths[0]);
             } catch (error) {
                 GUI.log(`Error loading file: ${error.message}`);
-                dialog.alert(i18n.getMessage('layerParseError'));
+                void dialog.alert(i18n.getMessage('layerParseError'));
             }
         });
 
@@ -8097,7 +8113,7 @@ function iconKey(filename) {
                 $('#loadMissionButton').removeClass('disabled');
             }
             if (!FC.MISSION_PLANNER.getCountBusyPoints()) {
-                dialog.alert(i18n.getMessage('no_waypoints_to_load'));
+                void dialog.alert(i18n.getMessage('no_waypoints_to_load'));
                 return;
             }
             mission.reinit();
@@ -8206,7 +8222,7 @@ function iconKey(filename) {
         if (AbsAltCheck) {
             if (checkAltitude < 100 * elevation) {
                 if (resetAltitude) {
-                    dialog.alert(i18n.getMessage('MissionPlannerAltitudeChangeReset'));
+                    void dialog.alert(i18n.getMessage('MissionPlannerAltitudeChangeReset'));
                     altitude = selectedMarker.getAlt();
                 } else {
                     altitude = settings.alt + 100 * elevation;
@@ -8217,7 +8233,7 @@ function iconKey(filename) {
             let elevationAtHome = HOME.getAlt();
             if ((checkAltitude / 100 + elevationAtHome) < elevation) {
                 if (resetAltitude) {
-                    dialog.alert(i18n.getMessage('MissionPlannerAltitudeChangeReset'));
+                    void dialog.alert(i18n.getMessage('MissionPlannerAltitudeChangeReset'));
                     altitude = selectedMarker.getAlt();
                 } else {
                     let currentGroundClearance = 100 * Number($('#groundClearanceValueAtWP').val());
@@ -8465,9 +8481,14 @@ missionControlTab.cleanup = function (callback) {
     // The elevation panel's drag listens on the document, so it outlives the tab unless
     // it is taken off here - reopening the tab would otherwise stack one pair per visit.
     $(document).off('.elevationDrag');
-    /* jBox appends its wrapper to body, which the tab switch does not empty, so the
-       modal's markup and its ids would stack one copy per visit. */
-    $('.jBox-wrapper').remove();
+    /* Destroy only this tab's own modal via jBox's API. Removing jBox wrappers
+       directly from the DOM instead (e.g. `$('.jBox-wrapper').remove()`) would hit
+       every jBox modal in the app, not just this tab's, and skips close()/destroy()
+       entirely — leaving any dialog.confirm()/alert() elsewhere in the app
+       permanently unresolved, since only a button click or jBox's own
+       onCloseComplete settles those promises. */
+    landSpeedNotUpdatedModal && landSpeedNotUpdatedModal.destroy();
+    landSpeedNotUpdatedModal = null;
     cleanupMissionControlLocationResources();
     if (elevationChartInstance) {
         elevationChartInstance.destroy();

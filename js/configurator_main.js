@@ -267,7 +267,7 @@ $(function() {
 
         // Tabs
         var ui_tabs = $('#tabs > ul');
-        $('a', ui_tabs).on('click', function() {
+        $('a', ui_tabs).on('click', async function() {
 
             if ($(this).parent().hasClass("tab_help") || $(this).parent().hasClass("nav-toggle-all")) {
                 return;
@@ -310,11 +310,32 @@ $(function() {
                     const confirmMsg = i18n.getMessage('unsavedChanges') ||
                         'You have unsaved changes. Leave anyway?';
 
-                    if (!confirm(confirmMsg)) {
+                    // dialog.confirm() is non-blocking, unlike the window.confirm() it
+                    // replaced, so the renderer's event loop keeps running while this is
+                    // open. Set the busy flag BEFORE awaiting so a second click on a tab
+                    // link can't re-enter this handler and open a second dialog — the
+                    // top-of-handler gate (`!GUI.tab_switch_in_progress`) then rejects it.
+                    GUI.tab_switch_in_progress = true;
+                    let confirmed;
+                    try {
+                        confirmed = await dialog.confirm(confirmMsg);
+                    } finally {
+                        GUI.tab_switch_in_progress = false;
+                    }
+
+                    if (!confirmed) {
                         console.log('[Tab Switch] User cancelled tab switch');
                         return; // Cancel tab switch
                     }
                     console.log('[Tab Switch] User confirmed tab switch');
+
+                    // Connection/lock state checked above can also have gone stale while
+                    // the user was deciding. Re-check before proceeding.
+                    if (GUI.connect_lock ||
+                        (tabRequiresConnection && !CONFIGURATOR.connectionValid)) {
+                        console.log('[Tab Switch] State changed while confirm dialog was open, aborting tab switch');
+                        return;
+                    }
                 }
 
                 GUI.tab_switch_in_progress = true;

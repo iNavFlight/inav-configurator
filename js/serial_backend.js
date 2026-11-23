@@ -28,6 +28,7 @@ import ltmDecoder from './ltmDecoder';
 import createLtmProtocolGate from './ltmProtocolGate';
 import mspDeduplicationQueue from './msp/mspDeduplicationQueue';
 import store from './store';
+import dialog from './dialog';
 import cliTab from '../tabs/cli';
 import javascriptProgrammingTab from '../tabs/javascript_programming';
 
@@ -35,6 +36,11 @@ var SerialBackend = (function () {
 
     var publicScope = {},
         privateScope = {};
+
+    // Tracks the pending unsaved-changes confirm dialog, if any. A reentrant
+    // reConnect() call (e.g. handleReconnect()'s 5s reconnect timer firing while
+    // the dialog is still open) awaits this instead of opening a second dialog.
+    var disconnectConfirmPromise = null;
 
     privateScope.isDemoRunning = false;
 
@@ -189,7 +195,7 @@ var SerialBackend = (function () {
         privateScope.reConnect()
     });
 
-    privateScope.reConnect = function() {
+    privateScope.reConnect = async function() {
         if (groundstation.isActivated()) {
             groundstation.deactivate();
         }
@@ -250,16 +256,41 @@ var SerialBackend = (function () {
                         // Check for unsaved changes in JavaScript Programming tab
                         if (GUI.active_tab === javascriptProgrammingTab &&
                             javascriptProgrammingTab.isDirty) {
+                            if (disconnectConfirmPromise) {
+                                // Dialog already open from another call. Wait for the answer,
+                                // then retry from the top so this call re-evaluates fresh state.
+                                console.log('[Disconnect] Unsaved-changes dialog already open, waiting on existing answer then retrying');
+                                await disconnectConfirmPromise;
+                                return privateScope.reConnect();
+                            }
+
                             console.log('[Disconnect] Checking for unsaved changes in JavaScript Programming tab');
                             const confirmMsg = i18n.getMessage('unsavedChanges') ||
                                 'You have unsaved changes. Leave anyway?';
 
-                            if (!confirm(confirmMsg)) {
+                            disconnectConfirmPromise = dialog.confirm(confirmMsg).finally(() => {
+                                disconnectConfirmPromise = null;
+                            });
+                            const confirmed = await disconnectConfirmPromise;
+
+                            if (!confirmed) {
                                 console.log('[Disconnect] User cancelled disconnect due to unsaved changes');
                                 return; // Cancel disconnect
                             }
                             console.log('[Disconnect] User confirmed, proceeding with disconnect');
-                            // Clear isDirty flag so tab switch during disconnect doesn't show warning again
+
+                            // The confirm above is non-blocking, unlike the native window.confirm()
+                            // it replaced, so connection state checked above can go stale while the
+                            // user was deciding. Re-check before proceeding.
+                            if (GUI.connect_lock ||
+                                (GUI.connected_to === false && GUI.connecting_to === false)) {
+                                console.log('[Disconnect] Connection state changed while confirm dialog was open, aborting disconnect');
+                                return;
+                            }
+
+                            // Only clear isDirty once we're actually committed to disconnecting
+                            // (past the re-check above) — otherwise an aborted disconnect would
+                            // silently mark real unsaved edits as clean.
                             javascriptProgrammingTab.isDirty = false;
                         }
 

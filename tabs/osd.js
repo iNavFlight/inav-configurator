@@ -3839,6 +3839,7 @@ osdTab.initialize = function (callback) {
            i18n.localize();
 
             // Open modal window
+            OSD.GUI.jbox && OSD.GUI.jbox.destroy();
             OSD.GUI.jbox = new jBox('Modal', {
                 width: 750,
                 height: 300,
@@ -4863,8 +4864,8 @@ osdTab.cleanup = function (callback) {
     $(document).unbind('keypress');
     $(document).off('click', 'span.progressLabel a');
 
-    delete OSD.GUI.jbox;
-    $('.jBox-wrapper').remove();
+    OSD.GUI.jbox && OSD.GUI.jbox.destroy();
+    OSD.GUI.jbox = null;
 
     OSD.GUI.previewResize?.disconnect();
     OSD.GUI.stopPixelRatioWatch?.();

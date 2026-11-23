@@ -19,6 +19,7 @@ import * as LCHighlighting from './../js/transpiler/lc_highlighting.js';
 import * as GvarDisplay from './../js/transpiler/gvar_display.js';
 import examples from './../js/transpiler/examples/index.js';
 import settingsCache from './../js/settingsCache.js';
+import dialog from './../js/dialog.js';
 import * as monaco from 'monaco-editor';
 import tsWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker'
 import editorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker'
@@ -169,8 +170,8 @@ if (inav.flight.homeDistance > 100) {
         });
 
         // Clear button
-        $('.tab-programming .clear').click(function() {
-            if (confirm('Clear editor? This cannot be undone.')) {
+        $('.tab-programming .clear').click(async function() {
+            if (await dialog.confirm('Clear editor? This cannot be undone.')) {
                 self.editor.setValue(self.getDefaultCode());
                 self.isDirty = false;
                 self.updateSaveButtonState();
@@ -206,7 +207,7 @@ if (inav.flight.homeDistance > 100) {
      * Load a specific example into the editor
      * @param {string} exampleId - The ID of the example to load
      */
-    loadExample: function(exampleId) {
+    loadExample: async function(exampleId) {
         const self = this;
 
         try {
@@ -220,7 +221,7 @@ if (inav.flight.homeDistance > 100) {
             if (self.isDirty) {
                 const confirmMsg = i18n.getMessage('loadExampleConfirm') ||
                     'You have unsaved changes. Load example anyway?';
-                if (!confirm(confirmMsg)) {
+                if (!await dialog.confirm(confirmMsg)) {
                     return; // User cancelled
                 }
             }
@@ -645,7 +646,7 @@ if (inav.flight.homeDistance > 100) {
      * Save transpiled logic conditions to FC
      * Uses MSP chaining pattern from programming.js
      */
-    saveToFC: function() {
+    saveToFC: async function() {
         const self = this;
         const code = this.editor.getValue();
 
@@ -676,7 +677,7 @@ if (inav.flight.homeDistance > 100) {
         // Confirm save
         const confirmMsg = i18n.getMessage('confirmSaveLogicConditions') ||
             `Save ${result.logicConditionCount} logic conditions to flight controller?`;
-        if (!confirm(confirmMsg)) {
+        if (!await dialog.confirm(confirmMsg)) {
             return;
         }
 
