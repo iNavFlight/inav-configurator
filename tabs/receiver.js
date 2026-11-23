@@ -10,6 +10,7 @@ import CONFIGURATOR from './../js/data_storage';
 import Settings from './../js/settings';
 import i18n from './../js/localization';
 import interval from './../js/intervals';
+import serialPortHelper from './../js/serialPortHelper';
 
 const receiverTab = {
     rateChartHeight: 117
@@ -26,6 +27,7 @@ receiverTab.initialize = function (callback) {
 
     var loadChain = [
         mspHelper.loadMiscV2,
+        mspHelper.loadSerialPorts,
         mspHelper.loadRcData,
         mspHelper.loadRcMap,
         mspHelper.loadRxConfig,
@@ -79,8 +81,36 @@ receiverTab.initialize = function (callback) {
             }
         });
 
+        const ARMING_DISABLED_RC_LINK = 1 << 18;    // as in gui.js
+        const $portNote = $('#serialrx-port-note');
+        const $linkWarning = $('#serialrx-link-warning');
+
+        function isSerialSelected() {
+            return $receiverMode.find("option:selected").text() == "SERIAL";
+        }
+
+        // The port note only until a port carries the receiver; then only the link matters
+        function updateSerialRxNote() {
+            if (!isSerialSelected()) {
+                $portNote.hide();
+                $linkWarning.hide();
+                return;
+            }
+            const ports = serialPortHelper.getPortIdentifiersForFunction('RX_SERIAL');
+            $portNote.toggle(ports.length === 0).html(i18n.getMessage('configurationSerialRXHelp'));
+            const names = ports.map(serialPortHelper.getPortName);
+            if (ports.length > 1) {
+                // The firmware opens the first port in its order and ignores the rest
+                $linkWarning.html(i18n.getMessage('receiverSerialTwoPorts', [names[0], names.slice(1).join(', ')])).show();
+            } else if (ports.length === 1 && (FC.CONFIG.armingFlags & ARMING_DISABLED_RC_LINK) !== 0) {
+                $linkWarning.html(i18n.getMessage('receiverSerialNoLink', [names[0]])).show();
+            } else {
+                $linkWarning.hide();
+            }
+        }
+
         $receiverMode.on('change', function () {
-            if ($(this).find("option:selected").text() == "SERIAL") {
+            if (isSerialSelected()) {
                 $serialWrapper.show();
                 $serialRxProvider.trigger("change");
                 $receiverMode.parent().removeClass("no-bottom-border");
@@ -89,7 +119,11 @@ receiverTab.initialize = function (callback) {
                 $("#frSkyOptions").hide();
                 $receiverMode.parent().addClass("no-bottom-border");
             }
+            updateSerialRxNote();
         });
+
+        // The arming flags come in with the status the Configurator already polls
+        interval.add('receiver_link', updateSerialRxNote, 1000);
 
         // Wait for settings to load before triggering change events
         // Trigger receiverMode which will trigger serialRxProvider when mode is SERIAL
