@@ -349,7 +349,7 @@ class PropertyAccessChecker {
    * @private
    */
   extractGvarIndex(gvarStr) {
-    const match = gvarStr.match(/gvar\[(\d+)\]/);
+    const match = gvarStr.match(/^(?:inav\.)?gvar\[(\d+)\]$/);
     return match ? parseInt(match[1]) : -1;
   }
 

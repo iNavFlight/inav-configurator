@@ -238,6 +238,41 @@ describe('Decompiler', () => {
       expect(action).toBe('inav.gvar[0] = 100;');
     });
 
+    test('should decompile gvar set with a dynamic (gvar) index', () => {
+      const setGvar = {
+        operation: 18, // GVAR_SET
+        operandAType: 5, // GVAR
+        operandAValue: 2,
+        operandBType: 0,
+        operandBValue: 50
+      };
+
+      const action = decompiler.decompileAction(setGvar);
+      expect(action).toBe('inav.gvar[inav.gvar[2]] = 50;');
+    });
+
+    test('should decompile disableGpsFix using operand A as the value', () => {
+      const mk = (v) => ({ operation: 53, operandAType: 0, operandAValue: v, operandBType: 0, operandBValue: 0 });
+
+      expect(decompiler.decompileAction(mk(0))).toBe('inav.override.disableGpsFix = false;');
+      expect(decompiler.decompileAction(mk(1))).toBe('inav.override.disableGpsFix = true;');
+      expect(decompiler.warnings).toHaveLength(0);
+    });
+
+    test('should decompile inc/dec with a dynamic gvar index', () => {
+      const mk = (op) => ({ operation: op, operandAType: 5, operandAValue: 2, operandBType: 0, operandBValue: 3 });
+
+      expect(decompiler.decompileAction(mk(19))).toBe('inav.gvar[inav.gvar[2]] = inav.gvar[inav.gvar[2]] + 3;');
+      expect(decompiler.decompileAction(mk(20))).toBe('inav.gvar[inav.gvar[2]] = inav.gvar[inav.gvar[2]] - 3;');
+    });
+
+    test('should decompile disableGpsFix with negative and non-constant operand A', () => {
+      const mk = (type, v) => ({ operation: 53, operandAType: type, operandAValue: v, operandBType: 0, operandBValue: 0 });
+
+      expect(decompiler.decompileAction(mk(0, -1))).toBe('inav.override.disableGpsFix = false;');
+      expect(decompiler.decompileAction(mk(5, 0))).toBe('inav.override.disableGpsFix = (inav.gvar[0]) > 0;');
+    });
+
     test('should decompile increment/decrement', () => {
       const incGvar = {
         operation: 19, // GVAR_INC

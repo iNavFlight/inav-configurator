@@ -1103,6 +1103,9 @@ class Decompiler {
       case OPERATION.GVAR_DEC: {
         // GVAR operations return the resulting value
         // Return just the variable - JS truthiness handles non-zero check
+        if (lc.operandAType !== OPERAND_TYPE.VALUE) {
+          return `gvar[${this.decompileOperand(lc.operandAType, lc.operandAValue, allConditions)}]`;
+        }
         const gvarIndex = lc.operandAValue;
         return this.getVarNameForGvar(gvarIndex) || `gvar[${gvarIndex}]`;
       }

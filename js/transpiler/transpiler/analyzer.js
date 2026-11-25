@@ -187,6 +187,12 @@ class SemanticAnalyzer {
 
     // Check if target is valid
     if (normalizedTarget.startsWith('gvar[')) {
+      // A write may index with any operand (gvar[rc[1]] = 0); only a literal index is range-checked.
+      const dynamicIndex = normalizedTarget.match(/^gvar\[(.+)\]$/);
+      if (dynamicIndex && !/^\d+$/.test(dynamicIndex[1])) {
+        this.checkPropertyAccess(dynamicIndex[1], line);
+        return;
+      }
       const index = this.extractGvarIndex(normalizedTarget);
       if (index === -1) {
         this.addError(`Invalid gvar syntax: ${stmt.target}`, line);

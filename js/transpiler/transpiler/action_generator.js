@@ -87,13 +87,31 @@ class ActionGenerator {
   generateGvarAssignment(action, activatorId) {
     const target = action.target;
     const value = action.value;
-    const index = parseInt(target.match(/\d+/)[0]);
+    // Index of a write may be any operand (firmware evaluates operandA of GVAR_SET),
+    // e.g. gvar[rc[1]] = 0. Reads (gvar[N] as an operand) only take a literal index.
+    const indexMatch = target.match(/^(?:inav\.)?gvar\[(.+)\]$/);
+    if (!indexMatch) {
+      this.errorHandler.addError(`Invalid gvar assignment target '${target}'`, null, 'invalid_gvar');
+      return;
+    }
+    const isLiteralIndex = /^\d+$/.test(indexMatch[1]);
+    const indexOperand = isLiteralIndex
+      ? { type: OPERAND_TYPE.VALUE, value: parseInt(indexMatch[1]) }
+      : this.getOperand(indexMatch[1]);
+    const index = isLiteralIndex ? indexOperand.value : null;
 
     // Invalidate CSE cache for expressions referencing this gvar
     // This is critical for correctness: after gvar[N] is mutated,
-    // any cached condition like "gvar[N] < 2" must be re-evaluated
+    // any cached condition like "gvar[N] < 2" must be re-evaluated.
+    // A dynamic index may hit any gvar, so invalidate them all.
     if (this.conditionGenerator) {
-      this.conditionGenerator.invalidateCacheForVariable(target);
+      if (isLiteralIndex) {
+        this.conditionGenerator.invalidateCacheForVariable(target);
+      } else {
+        for (let i = 0; i < 8; i++) {
+          this.conditionGenerator.invalidateCacheForVariable(`gvar[${i}]`);
+        }
+      }
     }
 
     if (action.operation) {
@@ -102,13 +120,13 @@ class ActionGenerator {
       const right = this.getOperand(action.right);
 
       // Optimize gvar[n] = gvar[n] +/- value to use GVAR_INC/GVAR_DEC
-      const isLeftSameGvar = left.type === OPERAND_TYPE.GVAR && left.value === index;
-      const isRightSameGvar = right.type === OPERAND_TYPE.GVAR && right.value === index;
+      const isLeftSameGvar = isLiteralIndex && left.type === OPERAND_TYPE.GVAR && left.value === index;
+      const isRightSameGvar = isLiteralIndex && right.type === OPERAND_TYPE.GVAR && right.value === index;
 
       if (action.operation === '+' && isLeftSameGvar) {
         // gvar[n] = gvar[n] + value → GVAR_INC
         this.pushLogicCommand(OPERATION.GVAR_INC,
-          { type: OPERAND_TYPE.VALUE, value: index },
+          indexOperand,
           right,
           activatorId
         );
@@ -118,7 +136,7 @@ class ActionGenerator {
       if (action.operation === '-' && isLeftSameGvar) {
         // gvar[n] = gvar[n] - value → GVAR_DEC
         this.pushLogicCommand(OPERATION.GVAR_DEC,
-          { type: OPERAND_TYPE.VALUE, value: index },
+          indexOperand,
           right,
           activatorId
         );
@@ -128,7 +146,7 @@ class ActionGenerator {
       if (action.operation === '+' && isRightSameGvar) {
         // gvar[n] = value + gvar[n] → GVAR_INC (addition is commutative)
         this.pushLogicCommand(OPERATION.GVAR_INC,
-          { type: OPERAND_TYPE.VALUE, value: index },
+          indexOperand,
           left,
           activatorId
         );
@@ -143,7 +161,7 @@ class ActionGenerator {
 
       // Then assign to gvar
       this.pushLogicCommand(OPERATION.GVAR_SET,
-        { type: OPERAND_TYPE.VALUE, value: index },
+        indexOperand,
         { type: OPERAND_TYPE.LC, value: resultId },
         activatorId
       );
@@ -151,7 +169,7 @@ class ActionGenerator {
       // Simple assignment: gvar[0] = 100
       const valueOperand = this.getOperand(value);
       this.pushLogicCommand(OPERATION.GVAR_SET,
-        { type: OPERAND_TYPE.VALUE, value: index },
+        indexOperand,
         valueOperand,
         activatorId
       );

@@ -166,6 +166,10 @@ class Optimizer {
         // Direct gvar assignment: gvar[0] = ... or gvar[0]++
         if (stmt.target.startsWith('gvar[')) {
           mutated.add(stmt.target);
+          // A non-literal index (gvar[rc[1]] = ...) may write any gvar
+          if (this.extractGVARIndex(stmt.target) === -1) {
+            for (let i = 0; i < 8; i++) mutated.add(`gvar[${i}]`);
+          }
         }
         // Variable assignment that might resolve to gvar
         // For now, we're conservative and track the target
@@ -436,6 +440,9 @@ class Optimizer {
             // GVAR set
             if (bodyStmt.target.startsWith('gvar[')) {
               const index = this.extractGVARIndex(bodyStmt.target);
+              if (index === -1) {
+                return ast; // dynamic index may write any gvar; don't inline
+              }
               if (!gvarSets.has(index)) {
                 gvarSets.set(index, bodyStmt.value);
               } else {
@@ -502,7 +509,7 @@ class Optimizer {
    * Extract GVAR index from string like "gvar[0]"
    */
   extractGVARIndex(str) {
-    const match = str.match(/gvar\[(\d+)\]/);
+    const match = str.match(/^(?:inav\.)?gvar\[(\d+)\]$/);
     return match ? parseInt(match[1]) : -1;
   }
 
