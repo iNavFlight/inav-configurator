@@ -273,6 +273,17 @@ describe('Decompiler', () => {
       expect(decompiler.decompileAction(mk(5, 0))).toBe('inav.override.disableGpsFix = (inav.gvar[0]) > 0;');
     });
 
+    test('should warn when a reference to an action result has no JavaScript name', () => {
+      const lcs = [
+        { index: 0, enabled: 1, activatorId: -1, operation: 25, operandAType: 0, operandAValue: 3, operandBType: 0, operandBValue: 0, flags: 0 },
+        { index: 1, enabled: 1, activatorId: -1, operation: 18, operandAType: 4, operandAValue: 0, operandBType: 0, operandBValue: 7, flags: 0 }
+      ];
+
+      const result = decompiler.decompile(lcs);
+      expect(result.code).toContain('logicCondition[0]');
+      expect(result.warnings.some(w => w.includes('logicCondition[0]') && w.includes('will not compile'))).toBe(true);
+    });
+
     test('should decompile increment/decrement', () => {
       const incGvar = {
         operation: 19, // GVAR_INC
