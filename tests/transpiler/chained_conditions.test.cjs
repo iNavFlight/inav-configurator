@@ -54,7 +54,7 @@ describe('Chained Conditions', () => {
         enabled: 1,
         activatorId: 1,
         operation: 18, // GVAR_SET
-        operandAType: 5, // GVAR
+        operandAType: 0, // VALUE (constant gvar index)
         operandAValue: 0,
         operandBType: 0, // VALUE
         operandBValue: 1
@@ -123,7 +123,7 @@ describe('Chained Conditions', () => {
         enabled: 1,
         activatorId: 22,
         operation: 18, // GVAR_SET
-        operandAType: 5, // GVAR
+        operandAType: 0, // VALUE (constant gvar index)
         operandAValue: 0,
         operandBType: 0,
         operandBValue: 42

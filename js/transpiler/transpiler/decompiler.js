@@ -1019,19 +1019,19 @@ class Decompiler {
               if (actionDesc) {
                 return actionDesc;
               }
-              return `logicCondition[${value}]`;
+              return this.unresolvedLcReference(value);
             }
             // Don't inline STICKY - its state is maintained internally
             // Use generated variable name if available
             if (referencedLC.operation === OPERATION.STICKY) {
               const varName = this.stickyVarNames.get(value);
-              return varName || `logicCondition[${value}]`;
+              return varName || this.unresolvedLcReference(value);
             }
             // Don't inline TIMER - it has no underlying condition to show
             // Use generated variable name if available
             if (referencedLC.operation === OPERATION.TIMER) {
               const varName = this.stickyVarNames.get(value);
-              return varName || `logicCondition[${value}]`;
+              return varName || this.unresolvedLcReference(value);
             }
             // EDGE: returns true on rising edge of condition for duration ms
             if (referencedLC.operation === OPERATION.EDGE) {
@@ -1073,7 +1073,7 @@ class Decompiler {
           }
         }
         // Fallback to reference notation if we can't resolve
-        return `logicCondition[${value}]`;
+        return this.unresolvedLcReference(value);
 
       case OPERAND_TYPE.PID:
         // PID operands 0-3 map to pid[0].output through pid[3].output
@@ -1103,6 +1103,9 @@ class Decompiler {
       case OPERATION.GVAR_DEC: {
         // GVAR operations return the resulting value
         // Return just the variable - JS truthiness handles non-zero check
+        if (lc.operandAType !== OPERAND_TYPE.VALUE) {
+          return `gvar[${this.decompileOperand(lc.operandAType, lc.operandAValue, allConditions)}]`;
+        }
         const gvarIndex = lc.operandAValue;
         return this.getVarNameForGvar(gvarIndex) || `gvar[${gvarIndex}]`;
       }
@@ -1112,6 +1115,17 @@ class Decompiler {
       default:
         return null;
     }
+  }
+
+  /**
+   * Placeholder for a reference to an LC result that has no JavaScript name.
+   * The compiler has no logicCondition[N] syntax, so this text will not recompile.
+   * @param {number} lcIndex
+   * @returns {string}
+   */
+  unresolvedLcReference(lcIndex) {
+    this.addWarning(`logicCondition[${lcIndex}] refers to a logic condition result that has no JavaScript name. This code will not compile back to logic conditions.`);
+    return `logicCondition[${lcIndex}]`;
   }
 
   /**

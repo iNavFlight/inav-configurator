@@ -187,12 +187,7 @@ class SemanticAnalyzer {
 
     // Check if target is valid
     if (normalizedTarget.startsWith('gvar[')) {
-      const index = this.extractGvarIndex(normalizedTarget);
-      if (index === -1) {
-        this.addError(`Invalid gvar syntax: ${stmt.target}`, line);
-      } else if (index >= this.gvarCount) {
-        this.addError(`Invalid gvar index ${index}. INAV only has gvar[0] through gvar[${this.gvarCount - 1}]`, line);
-      }
+      this.checkGvarTarget(normalizedTarget, stmt.target, line);
     } else if (this.variableHandler.isVariable(normalizedTarget)) {
       // Variable assignment - allowed for var variables
       // (let reassignment already caught above)
@@ -214,8 +209,10 @@ class SemanticAnalyzer {
     
     // Check arithmetic operands
     if (stmt.operation) {
-      this.checkPropertyAccess(stmt.left, line);
-      if (typeof stmt.right === 'string') {
+      if (!this.isDynamicGvarSelfRead(stmt, stmt.left, 'left')) {
+        this.checkPropertyAccess(stmt.left, line);
+      }
+      if (typeof stmt.right === 'string' && !this.isDynamicGvarSelfRead(stmt, stmt.right, 'right')) {
         this.checkPropertyAccess(stmt.right, line);
       }
     }
@@ -224,6 +221,42 @@ class SemanticAnalyzer {
     this.checkValueRanges(stmt, line);
   }
   
+  /**
+   * Validate the target of a gvar assignment. The index may be any operand (gvar[rc[1]] = 0);
+   * only a literal index is range-checked.
+   */
+  checkGvarTarget(normalizedTarget, originalTarget, line) {
+    const dynamicIndex = normalizedTarget.match(/^gvar\[(.+)\]$/);
+    if (dynamicIndex && !/^\d+$/.test(dynamicIndex[1])) {
+      if (dynamicIndex[1].includes('[object Object]')) {
+        this.addError(
+          `This gvar index is too complex to compile directly. Assign the expression to a const first, e.g. const i = inav.rc[1] + 1; inav.gvar[i] = 0;`,
+          line
+        );
+      } else {
+        this.checkPropertyAccess(dynamicIndex[1], line);
+      }
+      return;
+    }
+
+    const index = this.extractGvarIndex(normalizedTarget);
+    if (index === -1) {
+      this.addError(`Invalid gvar syntax: ${originalTarget}`, line);
+    } else if (index >= this.gvarCount) {
+      this.addError(`Invalid gvar index ${index}. INAV only has gvar[0] through gvar[${this.gvarCount - 1}]`, line);
+    }
+  }
+
+  /**
+   * gvar[i] = gvar[i] + x / - x with a dynamic index decompiles from GVAR_INC/DEC and compiles
+   * back to it. The self-read is not a real operand, so it is exempt from the literal-index rule.
+   */
+  isDynamicGvarSelfRead(stmt, operand, side) {
+    if (typeof operand !== 'string' || !stmt.target.replace(/^inav\./, '').startsWith('gvar[')) return false;
+    if (operand.replace(/^inav\./, '') !== stmt.target.replace(/^inav\./, '')) return false;
+    return stmt.operation === '+' || (stmt.operation === '-' && side === 'left');
+  }
+
   /**
    * Check value ranges for assignments
    */

@@ -62,7 +62,8 @@ class ActionDecompiler {
       OPERATION.OVERRIDE_MIN_GROUND_SPEED,
       OPERATION.SET_HEADING_TARGET,
       OPERATION.SET_PROFILE,
-      OPERATION.SET_GIMBAL_SENSITIVITY
+      OPERATION.SET_GIMBAL_SENSITIVITY,
+      OPERATION.DISABLE_GPS_FIX
     ];
 
     // Operations that use no operands (boolean flags only)
@@ -72,7 +73,6 @@ class ActionDecompiler {
       OPERATION.INVERT_ROLL,
       OPERATION.INVERT_PITCH,
       OPERATION.INVERT_YAW,
-      OPERATION.DISABLE_GPS_FIX,
       OPERATION.RESET_MAG_CALIBRATION
     ];
 
@@ -109,10 +109,10 @@ class ActionDecompiler {
     switch (lc.operation) {
       // GVAR operations: operandA = index, operandB = value
       case OPERATION.GVAR_INC:
-        return this.handleGvarInc(lc, valueB);
+        return this.handleGvarInc(lc, valueB, allConditions);
 
       case OPERATION.GVAR_DEC:
-        return this.handleGvarDec(lc, valueB);
+        return this.handleGvarDec(lc, valueB, allConditions);
 
       // OVERRIDE_THROTTLE_SCALE and OVERRIDE_THROTTLE handled in first switch (structural hoisting)
 
@@ -178,7 +178,7 @@ class ActionDecompiler {
         return this.handlePortSet(lc, valueB);
 
       case OPERATION.DISABLE_GPS_FIX:
-        return this.handleDisableGpsFix();
+        return this.handleDisableGpsFix(valueA);
 
       case OPERATION.RESET_MAG_CALIBRATION:
         return this.handleResetMagCalibration();
@@ -202,7 +202,7 @@ class ActionDecompiler {
    * @returns {string} JavaScript statement(s)
    */
   handleGvarSet(lc, allConditions) {
-    const targetName = this.getVarNameForGvar(lc.operandAValue) || `inav.gvar[${lc.operandAValue}]`;
+    const targetName = this.gvarTargetName(lc, allConditions);
     return this.handleAssignmentWithHoisting(
       targetName,
       lc.operandBType, lc.operandBValue,
@@ -377,13 +377,24 @@ class ActionDecompiler {
   // simplifyNestedExpr, generateVarName) have been removed. Hoisting is now done structurally
   // at the LC level in handleAssignmentWithHoisting/decompileWithHoisting.
 
-  handleGvarInc(lc, value) {
-    const targetName = this.getVarNameForGvar(lc.operandAValue) || `inav.gvar[${lc.operandAValue}]`;
+  /**
+   * Target expression for a GVAR_SET/INC/DEC. operandA is normally a constant index,
+   * but may be any operand (e.g. another gvar), giving inav.gvar[<expr>].
+   */
+  gvarTargetName(lc, allConditions) {
+    if (lc.operandAType !== OPERAND_TYPE.VALUE) {
+      return `inav.gvar[${this.decompileOperand(lc.operandAType, lc.operandAValue, allConditions)}]`;
+    }
+    return this.getVarNameForGvar(lc.operandAValue) || `inav.gvar[${lc.operandAValue}]`;
+  }
+
+  handleGvarInc(lc, value, allConditions) {
+    const targetName = this.gvarTargetName(lc, allConditions);
     return `${targetName} = ${targetName} + ${value};`;
   }
 
-  handleGvarDec(lc, value) {
-    const targetName = this.getVarNameForGvar(lc.operandAValue) || `inav.gvar[${lc.operandAValue}]`;
+  handleGvarDec(lc, value, allConditions) {
+    const targetName = this.gvarTargetName(lc, allConditions);
     return `${targetName} = ${targetName} - ${value};`;
   }
 
@@ -542,8 +553,10 @@ class ActionDecompiler {
     return `/* inav.override.port(${lc.operandAValue}, ${value}); */ // PORT_SET - may not be supported`;
   }
 
-  handleDisableGpsFix() {
-    return `inav.override.disableGpsFix = true;`;
+  handleDisableGpsFix(valueA) {
+    // Firmware: operandA > 0 enables the override, otherwise it disables it
+    if (/^-?\d+$/.test(valueA)) return `inav.override.disableGpsFix = ${Number(valueA) > 0};`;
+    return `inav.override.disableGpsFix = (${valueA}) > 0;`;
   }
 
   handleResetMagCalibration() {

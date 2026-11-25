@@ -85,77 +85,83 @@ class ActionGenerator {
    * @private
    */
   generateGvarAssignment(action, activatorId) {
-    const target = action.target;
-    const value = action.value;
-    const index = parseInt(target.match(/\d+/)[0]);
+    const gvar = this.resolveGvarTarget(action.target);
+    if (!gvar) return;
 
-    // Invalidate CSE cache for expressions referencing this gvar
-    // This is critical for correctness: after gvar[N] is mutated,
-    // any cached condition like "gvar[N] < 2" must be re-evaluated
+    // Invalidate CSE cache for expressions referencing this gvar.
+    // After gvar[N] is mutated, a cached condition like "gvar[N] < 2" must be re-evaluated.
+    // A dynamic index may hit any gvar, so invalidate them all.
     if (this.conditionGenerator) {
-      this.conditionGenerator.invalidateCacheForVariable(target);
+      const keys = gvar.isLiteral ? [gvar.key] : Array.from({ length: 8 }, (_, i) => `gvar[${i}]`);
+      keys.forEach(key => this.conditionGenerator.invalidateCacheForVariable(key));
     }
 
     if (action.operation) {
-      // Arithmetic: gvar[0] = gvar[0] + 10
-      const left = this.getOperand(action.left);
-      const right = this.getOperand(action.right);
-
-      // Optimize gvar[n] = gvar[n] +/- value to use GVAR_INC/GVAR_DEC
-      const isLeftSameGvar = left.type === OPERAND_TYPE.GVAR && left.value === index;
-      const isRightSameGvar = right.type === OPERAND_TYPE.GVAR && right.value === index;
-
-      if (action.operation === '+' && isLeftSameGvar) {
-        // gvar[n] = gvar[n] + value → GVAR_INC
-        this.pushLogicCommand(OPERATION.GVAR_INC,
-          { type: OPERAND_TYPE.VALUE, value: index },
-          right,
-          activatorId
-        );
-        return;
-      }
-
-      if (action.operation === '-' && isLeftSameGvar) {
-        // gvar[n] = gvar[n] - value → GVAR_DEC
-        this.pushLogicCommand(OPERATION.GVAR_DEC,
-          { type: OPERAND_TYPE.VALUE, value: index },
-          right,
-          activatorId
-        );
-        return;
-      }
-
-      if (action.operation === '+' && isRightSameGvar) {
-        // gvar[n] = value + gvar[n] → GVAR_INC (addition is commutative)
-        this.pushLogicCommand(OPERATION.GVAR_INC,
-          { type: OPERAND_TYPE.VALUE, value: index },
-          left,
-          activatorId
-        );
-        return;
-      }
-
-      // Fall back to compute + set for other operations
-      const op = this.getArithmeticOperation(action.operation);
-
-      // First compute the result
-      const resultId = this.pushLogicCommand(op, left, right, activatorId);
-
-      // Then assign to gvar
-      this.pushLogicCommand(OPERATION.GVAR_SET,
-        { type: OPERAND_TYPE.VALUE, value: index },
-        { type: OPERAND_TYPE.LC, value: resultId },
-        activatorId
-      );
+      this.generateGvarArithmetic(action, gvar, activatorId);
     } else {
       // Simple assignment: gvar[0] = 100
-      const valueOperand = this.getOperand(value);
-      this.pushLogicCommand(OPERATION.GVAR_SET,
-        { type: OPERAND_TYPE.VALUE, value: index },
-        valueOperand,
-        activatorId
-      );
+      this.pushLogicCommand(OPERATION.GVAR_SET, gvar.indexOperand, this.getOperand(action.value), activatorId);
     }
+  }
+
+  /**
+   * Resolve the index of a gvar assignment target. A write may index with any operand
+   * (firmware evaluates operandA of GVAR_SET), e.g. gvar[rc[1]] = 0. Reads (gvar[N] as an
+   * operand) only take a literal index.
+   * @returns {{isLiteral: boolean, index: number|null, indexOperand: Object, key: string}|null}
+   * @private
+   */
+  resolveGvarTarget(target) {
+    const match = target.match(/^(?:inav\.)?gvar\[(.+)\]$/);
+    if (!match) {
+      this.errorHandler.addError(`Invalid gvar assignment target '${target}'`, null, 'invalid_gvar');
+      return null;
+    }
+    const isLiteral = /^\d+$/.test(match[1]);
+    const indexOperand = isLiteral
+      ? { type: OPERAND_TYPE.VALUE, value: parseInt(match[1], 10) }
+      : this.getOperand(match[1]);
+    return { isLiteral, index: isLiteral ? indexOperand.value : null, indexOperand, key: `gvar[${match[1]}]` };
+  }
+
+  /**
+   * gvar[i] = a op b. gvar[i] = gvar[i] +/- v becomes GVAR_INC/GVAR_DEC. With a dynamic index
+   * the self-read cannot be compiled as an operand (reads need a literal index), so it is
+   * recognised textually and is only valid in that INC/DEC form.
+   * @private
+   */
+  generateGvarArithmetic(action, gvar, activatorId) {
+    const isDynamicSelfRead = (v) => !gvar.isLiteral && typeof v === 'string' && v.replace(/^inav\./, '') === gvar.key;
+    const left = isDynamicSelfRead(action.left) ? null : this.getOperand(action.left);
+    const right = isDynamicSelfRead(action.right) ? null : this.getOperand(action.right);
+    const isSelf = (operand, node) => gvar.isLiteral
+      ? operand.type === OPERAND_TYPE.GVAR && operand.value === gvar.index
+      : isDynamicSelfRead(node);
+    const leftIsSelf = isSelf(left, action.left);
+    const rightIsSelf = isSelf(right, action.right);
+    const op = action.operation;
+
+    if (op === '+' && leftIsSelf && right) return this.pushGvarIncDec(OPERATION.GVAR_INC, gvar, right, activatorId);
+    if (op === '-' && leftIsSelf && right) return this.pushGvarIncDec(OPERATION.GVAR_DEC, gvar, right, activatorId);
+    if (op === '+' && rightIsSelf && left) return this.pushGvarIncDec(OPERATION.GVAR_INC, gvar, left, activatorId);
+
+    if (!left || !right) {
+      this.errorHandler.addError(
+        `Cannot read '${action.target}' here: a gvar read needs a literal index. Only gvar[i] = gvar[i] + x or - x is supported with a dynamic index.`,
+        null,
+        'invalid_gvar'
+      );
+      return;
+    }
+
+    // Fall back to compute + set for other operations
+    const resultId = this.pushLogicCommand(this.getArithmeticOperation(op), left, right, activatorId);
+    this.pushLogicCommand(OPERATION.GVAR_SET, gvar.indexOperand, { type: OPERAND_TYPE.LC, value: resultId }, activatorId);
+  }
+
+  /** @private */
+  pushGvarIncDec(operation, gvar, amount, activatorId) {
+    this.pushLogicCommand(operation, gvar.indexOperand, amount, activatorId);
   }
 
   /**

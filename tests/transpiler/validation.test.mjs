@@ -9,6 +9,8 @@ const cases = [
     { name: 'Assign to intermediate object (2-level)',    code: 'inav.override.vtx = 3;',        shouldError: true, pattern: /Cannot (use|assign to).*vtx.*object/i },
     { name: 'Assign to intermediate object (3-level)',    code: 'inav.override.flightAxis.yaw = 180;', shouldError: true, pattern: /Cannot (use|assign to).*yaw.*object/i },
     { name: 'Use intermediate object in expression',      code: 'gvar[0] = inav.flight + 1;',    shouldError: true, pattern: /Cannot use.*flight.*object/i },
+    { name: 'Dynamic gvar write index is accepted', code: 'inav.gvar[inav.gvar[2]] = 50;', shouldError: false },
+    { name: 'Out-of-range literal gvar write index is rejected', code: 'inav.gvar[9] = 1;', shouldError: true, pattern: /Invalid gvar index 9/ },
     { name: 'Valid yaw angle assignment',   code: 'inav.override.flightAxis.yaw.angle = 180;', shouldError: false },
     { name: 'Valid VTX power assignment',   code: 'inav.override.vtx.power = 3;',              shouldError: false },
     { name: 'Valid helper function call',   code: 'sticky(() => inav.flight.altitude > 100, () => inav.flight.altitude < 50, () => { gvar[0] = 1; });', shouldError: false },

@@ -142,11 +142,12 @@ class Optimizer {
       // any variables and invalidate cached conditions that reference them.
       // This ensures subsequent statements don't incorrectly reuse conditions
       // that depend on values that have been modified.
-      if (statement.type === 'EventHandler' && statement.body) {
-        const mutatedVars = this.findMutatedVariables(statement.body);
-        for (const varName of mutatedVars) {
-          this.invalidateCacheForVariable(conditionMap, invertedMap, varName);
-        }
+      // A top-level assignment between two identical conditions mutates state the same way.
+      const mutatedVars = statement.type === 'EventHandler' && statement.body
+        ? this.findMutatedVariables(statement.body)
+        : this.findMutatedVariables([statement]);
+      for (const varName of mutatedVars) {
+        this.invalidateCacheForVariable(conditionMap, invertedMap, varName);
       }
     }
 
@@ -163,13 +164,7 @@ class Optimizer {
 
     for (const stmt of body) {
       if (stmt.type === 'Assignment' && stmt.target) {
-        // Direct gvar assignment: gvar[0] = ... or gvar[0]++
-        if (stmt.target.startsWith('gvar[')) {
-          mutated.add(stmt.target);
-        }
-        // Variable assignment that might resolve to gvar
-        // For now, we're conservative and track the target
-        mutated.add(stmt.target);
+        this.addMutatedTarget(mutated, stmt.target);
       }
 
       // Recursively check nested event handlers
@@ -181,6 +176,20 @@ class Optimizer {
     }
 
     return mutated;
+  }
+
+  /**
+   * Record an assignment target as mutated. A gvar target whose index is not a
+   * literal (gvar[rc[1]] = ..., with or without the inav. prefix) may write any gvar.
+   */
+  addMutatedTarget(mutated, target) {
+    mutated.add(target);
+    // Condition cache keys use the form without the inav. prefix
+    const normalized = target.replace(/^inav\./, '');
+    mutated.add(normalized);
+    if (normalized.startsWith('gvar[') && this.extractGVARIndex(normalized) === -1) {
+      for (let i = 0; i < 8; i++) mutated.add(`gvar[${i}]`);
+    }
   }
 
   /**
@@ -436,6 +445,9 @@ class Optimizer {
             // GVAR set
             if (bodyStmt.target.startsWith('gvar[')) {
               const index = this.extractGVARIndex(bodyStmt.target);
+              if (index === -1) {
+                return ast; // dynamic index may write any gvar; don't inline
+              }
               if (!gvarSets.has(index)) {
                 gvarSets.set(index, bodyStmt.value);
               } else {
@@ -502,7 +514,7 @@ class Optimizer {
    * Extract GVAR index from string like "gvar[0]"
    */
   extractGVARIndex(str) {
-    const match = str.match(/gvar\[(\d+)\]/);
+    const match = str.match(/^(?:inav\.)?gvar\[(\d+)\]$/);
     return match ? parseInt(match[1]) : -1;
   }
 
