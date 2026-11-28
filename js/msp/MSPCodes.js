@@ -268,8 +268,8 @@ var MSPCodes = {
     // the wire, so the two lists have to agree.
     MSP2_INAV_ESC_SRXL2_STATUS:         0x2233,
     MSP2_INAV_ESC_SRXL2_CALIBRATE:      0x2234,
-    MSP2_INAV_MOTOR_WIZARD_START:       0x2235,
-    MSP2_INAV_MOTOR_WIZARD_STOP:        0x2236,
+    MSP2_INAV_MOTOR_WIZARD_START:       0x2238,
+    MSP2_INAV_MOTOR_WIZARD_STOP:        0x2239,
 
     // MassZero Thermal Camera.
     // These sit in INAV's own 0x2000-0x2FFF range. The 0x3000 block belongs to
