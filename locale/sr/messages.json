@@ -5516,6 +5516,9 @@
   "mixerWizardStop": {
     "message": "Hitno zaustavljanje"
   },
+  "mixerWizardRefused": {
+    "message": "Čarobnjak za motore je zatvoren: kontroler leta je odbio da pokrene motor. Naoružan je ili njegov firmver ne podržava čarobnjak za motore."
+  },
   "settings": {
     "message": "Podešavanja"
   },

@@ -6534,6 +6534,9 @@
     "mixerWizardStop": {
         "message": "Arresto di emergenza"
     },
+    "mixerWizardRefused": {
+        "message": "Procedura guidata motori chiusa: il flight controller ha rifiutato di avviare il motore. È armato oppure il suo firmware non supporta la procedura guidata motori."
+    },
     "layerManagementTitle": {
         "message": "Livelli mappa"
     },

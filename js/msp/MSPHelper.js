@@ -1974,6 +1974,10 @@ var mspHelper = (function () {
             case MSPCodes.MSP2_INAV_ESC_SRXL2_CALIBRATE:
                 break;
 
+            case MSPCodes.MSP2_INAV_MOTOR_WIZARD_START:
+            case MSPCodes.MSP2_INAV_MOTOR_WIZARD_STOP:
+                break;
+
             default:
                 console.log('Unknown code detected: 0x' + dataHandler.code.toString(16));
         } else {
@@ -2013,7 +2017,7 @@ var mspHelper = (function () {
 
                     // fire callback
                     if (callback) {
-                        callback({ 'command': dataHandler.code, 'data': data, 'length': dataHandler.message_length_expected });
+                        callback({ 'command': dataHandler.code, 'data': data, 'length': dataHandler.message_length_expected, 'unsupported': !!dataHandler.unsupported });
                     }
                     break;
                 }

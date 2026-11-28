@@ -4,6 +4,7 @@ import MSPChainerClass from './../js/msp/MSPchainer';
 import mspHelper from './../js/msp/MSPHelper';
 import MSPCodes from './../js/msp/MSPCodes';
 import MSP from './../js/msp';
+import CONFIGURATOR from './../js/data_storage';
 import GUI from './../js/gui';
 import FC from './../js/fc';
 import i18n from './../js/localization';
@@ -14,9 +15,12 @@ import interval from './../js/intervals';
 import ServoMixRule from './../js/servoMixRule';
 import { getServoTargetWarning } from './../js/servoMixerTargetWarning';
 import MotorMixRule from './../js/motorMixRule';
-import BitHelper from './../js/bitHelper';
 
 const mixerTab = {};
+
+// Stops the wizard's periodic motor start and tells whether it was running;
+// set while the tab is initialized
+let stopMotorWizardRequests = null;
 
 mixerTab.initialize = function (callback, scrollPosition) {
 
@@ -685,25 +689,35 @@ mixerTab.initialize = function (callback, scrollPosition) {
             motorPositions: {},     // Map: motorIndex -> positionIndex
             locateInterval: null,   // Interval for repeating locate command
             isActive: false,        // Is wizard in progress?
-            savedDshotBeeper: null  // Original dshot_beeper_enabled value to restore
+            startSentAt: 0,         // When a motor start still waiting for its reply was sent, 0 = none
+            startCurrentMotor: null // Sends a start for the motor being located right now
         };
 
-        function sendMotorValues(motorIndex, value) {
-            var buffer = [];
-            for (var i = 0; i < 8; i++) {
-                var val = (i === motorIndex) ? value : FC.MISC.mincommand;
-                buffer.push(BitHelper.lowByte(val));
-                buffer.push(BitHelper.highByte(val));
+        stopMotorWizardRequests = function() {
+            const wasRunning = wizardState.locateInterval !== null;
+            if (wasRunning) {
+                clearInterval(wizardState.locateInterval);
+                wizardState.locateInterval = null;
             }
-            MSP.send_message(MSPCodes.MSP_SET_MOTOR, buffer);
-        }
+            wizardState.isActive = false;
+            return wasRunning;
+        };
+
+        // The firmware twitches the motor by itself and stops 2.4 to 3 s after the
+        // last start, so a lost link cannot leave a motor running. While the user is
+        // still looking for the motor the wizard repeats the start; the firmware
+        // keeps the rhythm, so the only requirement is to stay well below its limit.
+        const WIZARD_RESTART_MS = 1000;
+        // A start without a reply for this long is taken as lost (the MSP queue
+        // drops it silently on a timeout)
+        const WIZARD_REPLY_TIMEOUT_MS = 2000;
 
         function stopMotors() {
             if (wizardState.locateInterval) {
                 clearInterval(wizardState.locateInterval);
                 wizardState.locateInterval = null;
             }
-            sendMotorValues(-1, FC.MISC.mincommand);  // All motors at mincommand
+            MSP.send_message(MSPCodes.MSP2_INAV_MOTOR_WIZARD_STOP, false, false);
         }
 
         function resetWizard(numMotors) {
@@ -762,33 +776,60 @@ mixerTab.initialize = function (callback, scrollPosition) {
         }
 
         function startMotorPulse(motorIndex) {
-            // Three short twitches with a pause, repeating
-            // ON 20ms, OFF 20ms, ON 20ms, OFF 20ms, ON 20ms, OFF 700ms (800ms cycle)
-            // Safety: every tick defaults to OFF unless inside an ON window
-            var spinValue = Math.round(FC.MISC.mincommand + 0.15 * (FC.MISC.maxthrottle - FC.MISC.mincommand));
-            var stopped = FC.MISC.mincommand;
-            var startTime = Date.now();
-            var CYCLE = 800;
+            const startSequence = function(isRepeat) {
+                // The MSP queue holds a second start back until the first one is
+                // answered and it cannot be recalled then: after the next click it
+                // would arrive late and twitch this motor instead of the next one.
+                // So a repeat waits for the previous reply; the first start of a
+                // motor always goes out.
+                if (isRepeat && wizardState.startSentAt && Date.now() - wizardState.startSentAt < WIZARD_REPLY_TIMEOUT_MS) {
+                    return;
+                }
+                wizardState.startSentAt = Date.now();
 
-            sendMotorValues(motorIndex, spinValue);
+                MSP.send_message(MSPCodes.MSP2_INAV_MOTOR_WIZARD_START, [motorIndex], false, function(resp) {
+                    wizardState.startSentAt = 0;
+
+                    // The FC refuses the start when it is armed (or does not know the
+                    // command). Close the wizard, otherwise the next periodic start
+                    // would make the motor twitch again right after disarming.
+                    if (resp.unsupported && wizardState.isActive) {
+                        GUI.log(i18n.getMessage('mixerWizardRefused'));
+                        motorWizardModal.close();
+                    } else if (resp && !resp.unsupported && CONFIGURATOR.connectionValid) {
+                        // The MSP queue can deliver a start late, after the wizard has
+                        // moved on. The FC then twitches a motor nobody asked for any
+                        // more, so correct it as soon as its reply shows up.
+                        if (!wizardState.isActive) {
+                            MSP.send_message(MSPCodes.MSP2_INAV_MOTOR_WIZARD_STOP, false, false);
+                        } else if (motorIndex !== wizardState.currentMotor) {
+                            wizardState.startCurrentMotor();
+                        }
+                    }
+                });
+            };
+
+            if (wizardState.locateInterval) {
+                clearInterval(wizardState.locateInterval);
+            }
+            wizardState.startCurrentMotor = function() {
+                startSequence(false);
+            };
+            startSequence(false);
             wizardState.locateInterval = setInterval(function() {
-                var elapsed = (Date.now() - startTime) % CYCLE;
-                // ON windows: [0,20), [40,60), [80,100)
-                var isOn = (elapsed < 20) || (elapsed >= 40 && elapsed < 60) || (elapsed >= 80 && elapsed < 100);
-                sendMotorValues(motorIndex, isOn ? spinValue : stopped);
-            }, 10);
+                startSequence(true);
+            }, WIZARD_RESTART_MS);
         }
 
         function startLocatingMotor(motorIndex) {
             updateWizardProgress(motorIndex);
-            stopMotors();
+            // No stop between motors: a start for another motor replaces the running
+            // sequence, and a pause in it would let the DShot beeper through
             startMotorPulse(motorIndex);
         }
 
         function onPositionClicked(positionIndex) {
             if (!wizardState.isActive) return;
-
-            stopMotors();
 
             // Record this motor's position
             wizardState.motorPositions[wizardState.currentMotor] = positionIndex;
@@ -806,6 +847,7 @@ mixerTab.initialize = function (callback, scrollPosition) {
 
             if (wizardState.currentMotor >= currentMixerPreset.motorMixer.length) {
                 // All motors identified
+                stopMotors();
                 wizardComplete();
             } else {
                 // Start locating next motor
@@ -840,21 +882,8 @@ mixerTab.initialize = function (callback, scrollPosition) {
             $('#wizard-intro').addClass('is-hidden');
             $('#wizard-progress').removeClass('is-hidden');
 
-            // Disable DShot beeper so it doesn't twitch all motors during locate
-            mspHelper.getSetting('dshot_beeper_enabled').then(function(setting) {
-                if (setting) {
-                    wizardState.savedDshotBeeper = setting.value;
-                    if (setting.value) {
-                        mspHelper.setSetting('dshot_beeper_enabled', 0, function() {
-                            startLocatingMotor(0);
-                        });
-                        return;
-                    }
-                }
-                startLocatingMotor(0);
-            }).catch(function() {
-                startLocatingMotor(0);
-            });
+            // The firmware keeps the DShot beeper quiet while a sequence runs
+            startLocatingMotor(0);
         });
 
         // Emergency stop button click handler
@@ -914,12 +943,6 @@ mixerTab.initialize = function (callback, scrollPosition) {
         motorWizardModal.options.onClose = function() {
             stopMotors();
             wizardState.isActive = false;
-
-            // Restore DShot beeper if it was enabled before the wizard
-            if (wizardState.savedDshotBeeper) {
-                mspHelper.setSetting('dshot_beeper_enabled', wizardState.savedDshotBeeper);
-                wizardState.savedDshotBeeper = null;
-            }
         };
 
         const updateMotorDirection = function () {
@@ -1168,6 +1191,13 @@ mixerTab.initialize = function (callback, scrollPosition) {
 mixerTab.cleanup = function (callback) {
     //delete modal;
     //delete motorWizardModal;
+    if (stopMotorWizardRequests) {
+        // On a lost link the firmware ends the sequence by itself
+        if (stopMotorWizardRequests() && CONFIGURATOR.connectionValid) {
+            MSP.send_message(MSPCodes.MSP2_INAV_MOTOR_WIZARD_STOP, false, false);
+        }
+        stopMotorWizardRequests = null;
+    }
     $('.jBox-wrapper').remove();
     if (callback) callback();
 };

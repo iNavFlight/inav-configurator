@@ -5997,6 +5997,9 @@
     "mixerWizardStop": {
         "message": "Emergency Stop"
     },
+    "mixerWizardRefused": {
+        "message": "Motor wizard closed: the flight controller refused to run the motor. It is armed or its firmware does not support the motor wizard."
+    },
     "settings": {
         "message": "Settings"
     },
